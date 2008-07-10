@@ -147,6 +147,7 @@ class Omega : public Singleton<Omega>
 		void 		loadSimulationFromStream(std::istream&);
 
 		long int	getCurrentIteration();
+		void		setCurrentIteration(long int i);
 		void		incrementCurrentIteration();
 		
 		Real		getSimulationTime() { return simulationTime;};

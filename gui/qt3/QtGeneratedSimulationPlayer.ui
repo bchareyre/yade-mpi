@@ -29,511 +29,538 @@
         </property>
         <widget class="QSplitter">
             <property name="name">
-                <cstring>splitter9</cstring>
+                <cstring>splitter3</cstring>
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>
             </property>
-            <widget class="QLayoutWidget">
+            <widget class="QSplitter">
                 <property name="name">
-                    <cstring>layout29</cstring>
+                    <cstring>splitter2</cstring>
                 </property>
-                <vbox>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <widget class="QGroupBox">
                     <property name="name">
-                        <cstring>unnamed</cstring>
+                        <cstring>gbInput</cstring>
                     </property>
-                    <widget class="QGroupBox">
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>4</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>Input</string>
+                    </property>
+                    <hbox>
                         <property name="name">
-                            <cstring>gbInput</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>1</hsizetype>
-                                <vsizetype>4</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="title">
-                            <string>Input</string>
-                        </property>
-                        <hbox>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>layout28</cstring>
                             </property>
-                            <widget class="QLayoutWidget">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>layout28</cstring>
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <vbox>
+                                <widget class="QLabel">
                                     <property name="name">
-                                        <cstring>unnamed</cstring>
+                                        <cstring>tlInputConfigFile</cstring>
                                     </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>tlInputConfigFile</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string>Simluation file:</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabel1</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string>Stride:</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>tlInputBaseName</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string>Base name:</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>tlInputDirectory</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string>Directory:</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout27</cstring>
-                                </property>
-                                <grid>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Simluation file:</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
                                     <property name="name">
-                                        <cstring>unnamed</cstring>
+                                        <cstring>textLabel1</cstring>
                                     </property>
-                                    <widget class="QPushButton" row="3" column="2">
-                                        <property name="name">
-                                            <cstring>pbInputDirectory</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image0</pixmap>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit" row="0" column="0" rowspan="1" colspan="2">
-                                        <property name="name">
-                                            <cstring>leInputConfigFile</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>7</hsizetype>
-                                                <vsizetype>1</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit" row="2" column="0" rowspan="1" colspan="3">
-                                        <property name="name">
-                                            <cstring>leInputBaseName</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>1</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="paletteBackgroundColor">
-                                            <color>
-                                                <red>170</red>
-                                                <green>170</green>
-                                                <blue>127</blue>
-                                            </color>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit" row="3" column="0" rowspan="1" colspan="2">
-                                        <property name="name">
-                                            <cstring>leInputDirectory</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>7</hsizetype>
-                                                <vsizetype>1</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="paletteBackgroundColor">
-                                            <color>
-                                                <red>170</red>
-                                                <green>170</green>
-                                                <blue>127</blue>
-                                            </color>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QSpinBox" row="1" column="0">
-                                        <property name="name">
-                                            <cstring>sbStride</cstring>
-                                        </property>
-                                        <property name="maxValue">
-                                            <number>100</number>
-                                        </property>
-                                        <property name="minValue">
-                                            <number>1</number>
-                                        </property>
-                                        <property name="lineStep">
-                                            <number>1</number>
-                                        </property>
-                                        <property name="value">
-                                            <number>1</number>
-                                        </property>
-                                        <property name="toolTip" stdset="0">
-                                            <string>take only every i-th file in the sequence found</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton" row="1" column="1" rowspan="1" colspan="2">
-                                        <property name="name">
-                                            <cstring>pbLoad</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string>Load</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton" row="0" column="2">
-                                        <property name="name">
-                                            <cstring>pbInputConfigFile</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>0</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image0</pixmap>
-                                        </property>
-                                    </widget>
-                                </grid>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>gbSnapShots</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>1</hsizetype>
-                                <vsizetype>4</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="title">
-                            <string>Snapshots</string>
-                        </property>
-                        <grid>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Stride:</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlInputBaseName</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Base name:</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>tlInputDirectory</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Directory:</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>layout27</cstring>
                             </property>
-                            <widget class="QLineEdit" row="2" column="1">
+                            <grid>
                                 <property name="name">
-                                    <cstring>leOutputDirectory</cstring>
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>1</hsizetype>
-                                        <vsizetype>1</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>/tmp</string>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="1" column="0">
-                                <property name="name">
-                                    <cstring>tlOuputBaseName</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>4</hsizetype>
-                                        <vsizetype>5</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>Base Name:</string>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton" row="2" column="2">
-                                <property name="name">
-                                    <cstring>pbOutputDirectory</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>0</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image0</pixmap>
-                                </property>
-                            </widget>
-                            <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>leOutputBaseName</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>1</hsizetype>
-                                        <vsizetype>1</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>frame-</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox" row="0" column="0" rowspan="1" colspan="3">
-                                <property name="name">
-                                    <cstring>cbSaveSnapShots</cstring>
-                                </property>
-                                <property name="enabled">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="text">
-                                    <string>Save snapshots</string>
-                                </property>
-                                <property name="checked">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="tristate">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="2" column="0">
-                                <property name="name">
-                                    <cstring>tlOutputDirectory</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>4</hsizetype>
-                                        <vsizetype>5</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>Directory:</string>
-                                </property>
-                            </widget>
-                        </grid>
-                    </widget>
-                    <widget class="QGroupBox">
+                                <widget class="QPushButton" row="3" column="2">
+                                    <property name="name">
+                                        <cstring>pbInputDirectory</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                    <property name="pixmap">
+                                        <pixmap>image0</pixmap>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit" row="0" column="0" rowspan="1" colspan="2">
+                                    <property name="name">
+                                        <cstring>leInputConfigFile</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>7</hsizetype>
+                                            <vsizetype>1</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit" row="2" column="0" rowspan="1" colspan="3">
+                                    <property name="name">
+                                        <cstring>leInputBaseName</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>1</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="paletteBackgroundColor">
+                                        <color>
+                                            <red>170</red>
+                                            <green>170</green>
+                                            <blue>127</blue>
+                                        </color>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit" row="3" column="0" rowspan="1" colspan="2">
+                                    <property name="name">
+                                        <cstring>leInputDirectory</cstring>
+                                    </property>
+                                    <property name="enabled">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>7</hsizetype>
+                                            <vsizetype>1</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="paletteBackgroundColor">
+                                        <color>
+                                            <red>170</red>
+                                            <green>170</green>
+                                            <blue>127</blue>
+                                        </color>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox" row="1" column="0">
+                                    <property name="name">
+                                        <cstring>sbStride</cstring>
+                                    </property>
+                                    <property name="maxValue">
+                                        <number>100</number>
+                                    </property>
+                                    <property name="minValue">
+                                        <number>1</number>
+                                    </property>
+                                    <property name="lineStep">
+                                        <number>1</number>
+                                    </property>
+                                    <property name="value">
+                                        <number>1</number>
+                                    </property>
+                                    <property name="toolTip" stdset="0">
+                                        <string>take only every i-th file in the sequence found</string>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton" row="1" column="1" rowspan="1" colspan="2">
+                                    <property name="name">
+                                        <cstring>pbLoad</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>1</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>Load</string>
+                                    </property>
+                                </widget>
+                                <widget class="QPushButton" row="0" column="2">
+                                    <property name="name">
+                                        <cstring>pbInputConfigFile</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                    <property name="pixmap">
+                                        <pixmap>image0</pixmap>
+                                    </property>
+                                </widget>
+                            </grid>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>gbSnapShots</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>4</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>Snapshots</string>
+                    </property>
+                    <grid>
                         <property name="name">
-                            <cstring>gbController</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>1</hsizetype>
-                                <vsizetype>4</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="title">
-                            <string>Controller</string>
-                        </property>
-                        <hbox>
+                        <widget class="QLineEdit" row="2" column="1">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>leOutputDirectory</cstring>
                             </property>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pbPlay</cstring>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image1</pixmap>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pbStep</cstring>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image2</pixmap>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pbPause</cstring>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image3</pixmap>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>pbReset</cstring>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image4</pixmap>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget class="QGroupBox">
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>1</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>/tmp</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="1" column="0">
+                            <property name="name">
+                                <cstring>tlOuputBaseName</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>4</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Base Name:</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="2" column="2">
+                            <property name="name">
+                                <cstring>pbOutputDirectory</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image0</pixmap>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>leOutputBaseName</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>1</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>frame-</string>
+                            </property>
+                        </widget>
+                        <widget class="QCheckBox" row="0" column="0" rowspan="1" colspan="3">
+                            <property name="name">
+                                <cstring>cbSaveSnapShots</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>Save snapshots</string>
+                            </property>
+                            <property name="checked">
+                                <bool>false</bool>
+                            </property>
+                            <property name="tristate">
+                                <bool>false</bool>
+                            </property>
+                        </widget>
+                        <widget class="QLabel" row="2" column="0">
+                            <property name="name">
+                                <cstring>tlOutputDirectory</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>4</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Directory:</string>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>gbController</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>4</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>Controller</string>
+                    </property>
+                    <hbox>
                         <property name="name">
-                            <cstring>gbStatus</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>1</hsizetype>
-                                <vsizetype>3</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="title">
-                            <string>status</string>
-                        </property>
-                        <hbox>
+                        <widget class="QPushButton">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>pbPlay</cstring>
                             </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>tlStatus</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>2</hsizetype>
-                                        <vsizetype>3</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>0</width>
-                                        <height>180</height>
-                                    </size>
-                                </property>
-                                <property name="font">
-                                    <font>
-                                        <family>Monospace</family>
-                                        <pointsize>6</pointsize>
-                                    </font>
-                                </property>
-                                <property name="text">
-                                    <string>idleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidle idle idleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidle idle idleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidleidle idle</string>
-                                </property>
-                                <property name="textFormat">
-                                    <enum>PlainText</enum>
-                                </property>
-                                <property name="scaledContents">
-                                    <bool>false</bool>
-                                </property>
-                                <property name="alignment">
-                                    <set>AlignTop</set>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                </vbox>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image1</pixmap>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbStep</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image2</pixmap>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbPause</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image3</pixmap>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pbReset</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="pixmap">
+                                <pixmap>image4</pixmap>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>gbFilters</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>4</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>Filters</string>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QCheckBox">
+                            <property name="name">
+                                <cstring>cbAllowFiltration</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Allow filtration</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>gbStatus</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>3</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>status</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>tlStatus</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>2</hsizetype>
+                                    <vsizetype>1</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>0</width>
+                                    <height>180</height>
+                                </size>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <family>Monospace</family>
+                                    <pointsize>6</pointsize>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string>idle</string>
+                            </property>
+                            <property name="textFormat">
+                                <enum>PlainText</enum>
+                            </property>
+                            <property name="scaledContents">
+                                <bool>false</bool>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignTop</set>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
             </widget>
             <widget class="GLSimulationPlayerViewer">
                 <property name="name">
@@ -644,6 +671,12 @@
         <receiver>QtGeneratedSimulationPlayer</receiver>
         <slot>pbInputDirectoryClicked()</slot>
     </connection>
+    <connection>
+        <sender>cbAllowFiltration</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QtGeneratedSimulationPlayer</receiver>
+        <slot>cbAllowFiltrationToggled(bool)</slot>
+    </connection>
 </connections>
 <slots>
     <slot>pbLoadClicked()</slot>
@@ -655,6 +688,7 @@
     <slot>pbResetClicked()</slot>
     <slot>pbInputConfigFileClicked()</slot>
     <slot>cbSaveSnapShotsToggled(bool)</slot>
+    <slot>cbAllowFiltrationToggled(bool)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

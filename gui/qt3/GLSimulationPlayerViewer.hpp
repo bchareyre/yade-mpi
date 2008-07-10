@@ -11,6 +11,7 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/RenderingEngine.hpp>
+#include<yade/core/FiltrationalEngine.hpp>
 #include<yade/core/MetaBody.hpp>
 //#include<yade/lib-QGLViewer/qglviewer.h>
 #include<yade/gui-qt3/GLViewer.hpp>
@@ -35,6 +36,7 @@ class GLSimulationPlayerViewer: public GLViewer {
 		bool loadPositionOrientationFile();
 		list<string> xyzFiles;
 		list<string>::iterator xyzFilesIter;
+		vector< shared_ptr< FiltrationalEngine > >   filters;
 	public :
 		GLSimulationPlayerViewer(QWidget* parent,char* name);
 		virtual ~GLSimulationPlayerViewer(){};

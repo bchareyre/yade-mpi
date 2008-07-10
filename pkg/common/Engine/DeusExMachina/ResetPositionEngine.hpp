@@ -26,6 +26,7 @@ class ResetPositionEngine : public DeusExMachina {
 		/// import/export initial positions
 		std::string fileName; 
 		std::vector<Vector3r> initial_positions; // for serialization
+		bool onlyDynamic;
 		
 		DECLARE_LOGGER;
 	protected:
@@ -35,6 +36,7 @@ class ResetPositionEngine : public DeusExMachina {
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 	private:
 		std::vector<Vector3r> ini_pos;
+		std::vector<long int> subscrBodies;
 		bool first;
 		void initialize(MetaBody * ncb);
 };

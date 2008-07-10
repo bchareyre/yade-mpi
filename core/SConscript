@@ -5,6 +5,7 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'BodyContainer.cpp',
 			'BoundingVolume.cpp',
 			'DeusExMachina.cpp',
+			'FiltrEngine.cpp',
 			'FileGenerator.cpp',
 			'FrontEnd.cpp',
 			'GeometricalModel.cpp',

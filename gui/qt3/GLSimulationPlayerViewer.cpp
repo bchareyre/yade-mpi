@@ -80,6 +80,10 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 	if(fromFile){	
 		Omega::instance().setSimulationFileName(fileName);
 		Omega::instance().loadSimulation();
+		filters.clear();
+		FOREACH(shared_ptr<Engine> e, Omega::instance().getRootBody()->engines){
+			if( dynamic_cast<FiltrationalEngine*>(e.get()) ) filters.push_back(e);
+		}
 	}
 	updateGL();
 	frameNumber=0;
@@ -191,5 +195,8 @@ bool GLSimulationPlayerViewer::loadPositionOrientationFile(){
 			rgb>>myColor[0]>>myColor[1]>>myColor[2];
 		}
 	}
+	Omega::instance().setCurrentIteration(atoi(fileName.substr(fileName.rfind('_')+1).c_str()));
+	FOREACH(const shared_ptr<FiltrationalEngine>& e, filters) 
+		{ if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	return true;
 }

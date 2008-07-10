@@ -40,6 +40,8 @@ const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs
 
 void Omega::incrementCurrentIteration(){ ++currentIteration;}
 long int Omega::getCurrentIteration(){ return currentIteration; }
+void Omega::setCurrentIteration(long int i) { currentIteration=i; }
+
 void Omega::setSimulationFileName(const string f){simulationFileName = f;}
 string Omega::getSimulationFileName(){return simulationFileName;}
 
