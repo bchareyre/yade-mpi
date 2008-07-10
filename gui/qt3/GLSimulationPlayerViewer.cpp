@@ -224,8 +224,6 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 			}
 		}
 		Omega::instance().setCurrentIteration(atoi(fileName.substr(fileName.rfind('_')+1).c_str()));
-		FOREACH(const shared_ptr<FiltrationalEngine>& e, filters) 
-			{ if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	} else {
 		string tableName=*(xyzNamesIter++);
 		simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" "+tableName);
@@ -254,6 +252,8 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 			if(col_rgb_g>=0) b->geometricalModel->diffuseColor[1]=reader.getdouble(col_rgb_g);
 			if(col_rgb_b>=0) b->geometricalModel->diffuseColor[2]=reader.getdouble(col_rgb_b);
 		}
+		Omega::instance().setCurrentIteration(con->executeint("SELECT iter from 'records' where bodyTable='"+tableName+"';"));
 	}
+	FOREACH(const shared_ptr<FiltrationalEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	return true;
 }
