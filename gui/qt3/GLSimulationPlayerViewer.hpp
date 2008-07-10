@@ -11,21 +11,23 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/RenderingEngine.hpp>
-#include<yade/core/FiltrationalEngine.hpp>
 #include<yade/core/MetaBody.hpp>
-//#include<yade/lib-QGLViewer/qglviewer.h>
 #include<yade/gui-qt3/GLViewer.hpp>
-
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include<yade/lib-sqlite3x/sqlite3x.hpp>
+
 class QtSimulationPlayer;
+class FiltrEngine;
 
 class GLSimulationPlayerViewer: public GLViewer {
 	private :
 		shared_ptr<MetaBody>		 rootBody;
 		void tryFillingOutputPattern();	
+		bool useSQLite;
+		shared_ptr<sqlite3x::sqlite3_connection> con;
 	public:
 		QtSimulationPlayer* simPlayer;
 		boost::posix_time::ptime lastCheckPointTime;
@@ -33,10 +35,11 @@ class GLSimulationPlayerViewer: public GLViewer {
 		string fileName, inputBaseName, inputBaseDirectory, outputBaseName, outputBaseDirectory;
 		bool saveSnapShots;
 		int frameNumber;
-		bool loadPositionOrientationFile();
-		list<string> xyzFiles;
-		list<string>::iterator xyzFilesIter;
-		vector< shared_ptr< FiltrationalEngine > >   filters;
+ 		bool loadNextRecordedData();
+ 		//! filenames or table names (if useSQLite)
+ 		list<string> xyzNames;
+ 		list<string>::iterator xyzNamesIter;
+		vector< shared_ptr< FiltrEngine > >   filters;
 	public :
 		GLSimulationPlayerViewer(QWidget* parent,char* name);
 		virtual ~GLSimulationPlayerViewer(){};

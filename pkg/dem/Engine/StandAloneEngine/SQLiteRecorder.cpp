@@ -1,5 +1,7 @@
 #include"SQLiteRecorder.hpp"
 #include<boost/algorithm/string.hpp>
+#include<boost/filesystem/operations.hpp>
+#include<boost/filesystem/convenience.hpp>
 #include<yade/core/MetaBody.hpp>
 using namespace boost;
 CREATE_LOGGER(SQLiteRecorder);
@@ -22,14 +24,28 @@ void SQLiteRecorder::init(MetaBody* rootBody){
 	con->executenonquery("PRAGMA synchronous = OFF");
 	// create supertable (only if the db is empty)
 	if(0==con->executeint("select count(*) from sqlite_master where name='meta';")){
-		ostringstream out;
-		LOG_DEBUG("Saving simulation to stream");
-		Omega::instance().saveSimulationToStream(out);
-		con->executenonquery("create table meta (simulationXML)");
+		LOG_DEBUG("Saving simulation to stream"); ostringstream out; Omega::instance().saveSimulationToStream(out);
+		con->executenonquery("create table meta (simulationXML STRING,maxIter INTEGER)");
 		LOG_DEBUG("Inserting simulation XML into the table 'meta'");
-		{ sqlite3x::sqlite3_command cmd(*con,"insert into meta values (?)"); cmd.bind(1,out.str()); cmd.executenonquery(); }
+		{ sqlite3x::sqlite3_command cmd(*con,"insert into meta values (?,-1)"); cmd.bind(1,out.str()); cmd.executenonquery(); }
 		assert(con->executeint("select count(*) from sqlite_master where name='records';")==0);
 		con->executenonquery("create table records (iter INTEGER, realTime FLOAT, virtTime FLOAT, wallClock FLOAT, bodyTable STRING, interactionTable STRING);");
+	} else { /* db exists already! */
+		/* if the last iteration saved is greater or equal to ours, we're not running the same simulation.
+		 * The database will be renamed and init() called again.
+		 */
+		long maxIter=con->executeint("SELECT maxIter from meta;");
+		LOG_DEBUG("maxIter in existing database is "<<maxIter);
+		if(maxIter>=Omega::instance().getCurrentIteration()){
+			LOG_DEBUG("This db is not continuation of current simulation (maxIter>currentIter), will be moved away.");
+			assert(filesystem::exists(dbFile));
+			int i=0;
+			while(filesystem::exists(dbFile+"~"+lexical_cast<string>(i))) i++;
+			string newDbFile=dbFile+"~"+lexical_cast<string>(i);
+			filesystem::rename(dbFile,newDbFile);
+			LOG_INFO("Renamed old database "<<dbFile<<" to "<<newDbFile<<" (rerun initialization).");
+			init(rootBody);
+		}
 	}
 }
 
@@ -41,9 +57,10 @@ void SQLiteRecorder::action(MetaBody* rootBody){
 		else if(rec=="rgb") recActive[REC_RGB]=true;
 		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: se3, rgb). Ignored.");
 	}
-
 	// create table
-	string perBodyTable="bodies_iter_"+lexical_cast<string>(Omega::instance().getCurrentIteration());
+	char iterPadded[16]; snprintf(iterPadded,16,"%07ld",Omega::instance().getCurrentIteration());
+	string perBodyTable="bodies_iter_"+string(iterPadded);
+	// FIXME: handle this gracefully
 	assert(0==con->executeint("select count(*) from sqlite_master where name='"+perBodyTable+"';")); // table shouldn't exist yet
 	vector<string> columns; columns.push_back("id INTEGER");
 	if(recActive[REC_SE3]){columns.push_back("se3_x FLOAT"); columns.push_back("se3_y FLOAT"); columns.push_back("se3_z FLOAT"); columns.push_back("se3_ori0 FLOAT"); columns.push_back("se3_ori1 FLOAT"); columns.push_back("se3_ori2 FLOAT"); columns.push_back("se3_ori3 FLOAT");}
@@ -75,6 +92,7 @@ void SQLiteRecorder::action(MetaBody* rootBody){
 			assert(field-1==columns.size());
 			cmd.executenonquery();
 		}
+		con->executenonquery("UPDATE 'meta' SET maxIter="+lexical_cast<string>(Omega::instance().getCurrentIteration())+";");
 	}
 	transaction.commit();
 }

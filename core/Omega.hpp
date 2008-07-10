@@ -85,8 +85,6 @@ class Omega : public Singleton<Omega>
 		ptime				 msStartingPauseTime;
 		time_duration			 simulationPauseDuration;
 		string				 simulationFileName;
-		long int			currentIteration;
-		Real				simulationTime;
 		void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 
 		public: long int stopAtIteration;
@@ -150,9 +148,9 @@ class Omega : public Singleton<Omega>
 		void		setCurrentIteration(long int i);
 		void		incrementCurrentIteration();
 		
-		Real		getSimulationTime() { return simulationTime;};
+		Real		getSimulationTime();
 		Real 		getComputationTime();
-		void		incrementSimulationTime() { simulationTime+=getTimeStep();};
+		void		incrementSimulationTime();
 		
 		void init();
 		void timeInit();

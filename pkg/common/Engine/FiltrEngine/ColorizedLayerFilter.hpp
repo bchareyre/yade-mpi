@@ -9,7 +9,7 @@
 #ifndef COLORIZED_LAYER_FILTER_HPP
 #define COLORIZED_LAYER_FILTER_HPP 
 
-#include<yade/core/FiltrEngine.hpp>
+#include<yade/pkg-common/FiltrEngine.hpp>
 #include<yade/core/MetaBody.hpp>
 
 class ColorizedLayerFilter : public FiltrEngine {

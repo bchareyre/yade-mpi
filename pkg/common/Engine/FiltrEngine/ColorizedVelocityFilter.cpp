@@ -8,6 +8,8 @@
 
 #include"ColorizedVelocityFilter.hpp"
 
+CREATE_LOGGER(ColorizedVelocityFilter);
+
 ColorizedVelocityFilter::ColorizedVelocityFilter() : FiltrEngine() 
 {
 	first=true;

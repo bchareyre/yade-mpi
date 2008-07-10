@@ -35,6 +35,7 @@ if 'qt3' not in env['exclude']:
 				'yade-serialization-qt',
 				'OpenGLRenderingEngine',
 				'PositionOrientationRecorder',
+				'sqlite3x',
 				'$QGLVIEWER_LIB']+linkPythonUI,
 			CPPPATH=env['CPPPATH']+['qt3']),
 	])

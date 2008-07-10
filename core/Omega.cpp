@@ -38,9 +38,12 @@ Omega::~Omega(){LOG_INFO("Shuting down; duration "<<(microsec_clock::local_time(
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
-void Omega::incrementCurrentIteration(){ ++currentIteration;}
-long int Omega::getCurrentIteration(){ return currentIteration; }
-void Omega::setCurrentIteration(long int i) { currentIteration=i; }
+void Omega::incrementCurrentIteration(){ if(rootBody) rootBody->currentIteration++;}
+long int Omega::getCurrentIteration(){ return (rootBody?rootBody->currentIteration:-1); }
+void Omega::setCurrentIteration(long int i) { if(rootBody) rootBody->currentIteration=i; }
+
+Real Omega::getSimulationTime() { return rootBody?rootBody->simulationTime:-1;};
+void Omega::incrementSimulationTime() { if(rootBody) rootBody->simulationTime+=getTimeStep();};
 
 void Omega::setSimulationFileName(const string f){simulationFileName = f;}
 string Omega::getSimulationFileName(){return simulationFileName;}
@@ -63,7 +66,6 @@ void Omega::reset(){
 
 void Omega::init(){
 	simulationFileName="";
-	currentIteration = 0;
 	stopAtIteration = 0;
 	resetRootBody();
 }
@@ -266,14 +268,10 @@ void Omega::loadSimulation()
 	timeInit();
 
 	LOG_DEBUG("Simulation loaded");
-	currentIteration = 0;
-	simulationTime = 0;
 
 	if(rootBody->recover){
 		LOG_INFO("Simulation recovery effective.");
-		currentIteration=rootBody->recoverCurrentIteration;
 		stopAtIteration=rootBody->recoverStopAtIteration;
-		simulationTime=rootBody->recoverSimulationTime;	
 		rootBody->recover=false;
 	}
 }
@@ -287,9 +285,7 @@ void Omega::saveSimulation(const string name, bool recover)
 	if(recover){
 		LOG_INFO("Simulation recovery enabled.");
 		rootBody->recover=true;
-		rootBody->recoverCurrentIteration=currentIteration;
 		rootBody->recoverStopAtIteration=stopAtIteration;
-		rootBody->recoverSimulationTime=simulationTime;
 	}
 
 	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.gz") || algorithm::ends_with(name,".xml.bz2")){

@@ -260,8 +260,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'yade-loki',
 			'yade-multimethods',
 			'ParticleParameters'],
-		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/DeusExMachina']),
+		CPPPATH=env['CPPPATH']+['$PREFIX/include','Engine/DeusExMachina']),
 	
+	env.SharedLibrary('FiltrEngine',['Engine/FiltrEngine/FiltrEngine.cpp']),
+
 	env.SharedLibrary('ColorizedLayerFilter',
 		['Engine/FiltrEngine/ColorizedLayerFilter.cpp'],
 		LIBS=env['LIBS']+['yade-base',

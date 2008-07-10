@@ -9,7 +9,7 @@
 #ifndef COLORIZED_VELOCITY_FILTER_HPP
 #define COLORIZED_VELOCITY_FILTER_HPP 
 
-#include<yade/core/FiltrEngine.hpp>
+#include<yade/pkg-common/FiltrEngine.hpp>
 #include<yade/core/MetaBody.hpp>
 
 class ColorizedVelocityFilter : public FiltrEngine {
@@ -38,6 +38,7 @@ class ColorizedVelocityFilter : public FiltrEngine {
 	
 		virtual void registerAttributes();
 		//virtual void postProcessAttributes(bool deserializing);
+		DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(ColorizedVelocityFilter);
 	REGISTER_BASE_CLASS_NAME(FiltrEngine);
 };

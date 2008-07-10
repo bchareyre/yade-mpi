@@ -16,9 +16,9 @@ class PeriodicEngine:  public StandAloneEngine {
 			Real virtNow=Omega::instance().getSimulationTime();
 			Real realNow=getClock();
 			long iterNow=Omega::instance().getCurrentIteration();
-			if((virtPeriod>0 && virtNow-virtLast>virtPeriod) ||
-				(realPeriod>0 && realNow-realLast>realPeriod) ||
-				(iterPeriod>0 && iterNow-iterLast>iterPeriod)){
+			if((virtPeriod>0 && virtNow-virtLast>=virtPeriod) ||
+				(realPeriod>0 && realNow-realLast>=realPeriod) ||
+				(iterPeriod>0 && iterNow-iterLast>=iterPeriod)){
 				realLast=realNow; virtLast=virtNow; iterLast=iterNow;
 				return true;
 			}

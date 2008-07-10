@@ -10,7 +10,6 @@
 #define FILTRATIONAL_ENGINE_HPP
 
 #include<yade/core/DeusExMachina.hpp>
-
 class FiltrEngine : public DeusExMachina {
 	public:
 		/// Activation of filtration from GUI
@@ -33,8 +32,9 @@ class FiltrEngine : public DeusExMachina {
 	REGISTER_CLASS_NAME(FiltrEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-
 REGISTER_SERIALIZABLE(FiltrEngine,false);
+
+typedef FiltrEngine FiltrationalEngine;
 
 #endif // FILTRATIONAL_ENGINE_HPP
 

@@ -10,7 +10,7 @@
 #include "FileDialog.hpp"
 #include "GLSimulationPlayerViewer.hpp"
 #include<yade/core/FileGenerator.hpp>
-#include<yade/core/FiltrationalEngine.hpp>
+#include<yade/pkg-common/FiltrEngine.hpp>
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qspinbox.h>
@@ -36,8 +36,9 @@ void QtSimulationPlayer::pbInputConfigFileClicked(){
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
+	filters.push_back("SQLite simulation states (*)");
 	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a file to load",NULL,selectedFilter );
-	if (!fileName.empty() && selectedFilter == "XML Yade File (*.xml *.xml.gz *.xml.bz2)")
+	if (!fileName.empty()) // && selectedFilter== "XML Yade File (*.xml *.xml.gz *.xml.bz2)")
 		leInputConfigFile->setText(fileName);
 }
 void QtSimulationPlayer::pbInputDirectoryClicked(){
