@@ -80,19 +80,12 @@ void GLSimulationPlayerViewer::animate(){
 
 void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 {
-	updateGL();
 	frameNumber=0;
 	setSnapshotCounter(0);
 	simPlayer->enableControls(false);
 	useSQLite=!(algorithm::ends_with(fileName,".xml.bz2")||algorithm::ends_with(fileName,".xml.gz")||algorithm::ends_with(fileName,".xml"));
 	xyzNames.clear();
 	filters.clear();
-
-	FOREACH(shared_ptr<Engine>& e, Omega::instance().getRootBody()->engines){
-		// FIXME
-		#warning FIXME: this gives me syntax error (invalid conversion) ?!
-		if(dynamic_cast<FilterEngine*>(e.get())) filters.push_back(e);
-	}
 
 	if(!useSQLite){
 		if(fromFile){	
@@ -158,6 +151,14 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 			}
 		}
 	}
+	/* Filters */
+	FOREACH(shared_ptr<Engine>& e, Omega::instance().getRootBody()->engines){
+		if(dynamic_cast<FilterEngine*>(e.get())) {
+			filters.push_back(e);
+			simPlayer->pushMessage("Find filter: "+e->getClassName());
+		}
+	}
+
 	/* strided access is common for both db and file access */
 	int stride=simPlayer->sbStride->value();
 	xyzNames.sort();
@@ -174,6 +175,7 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 	simPlayer->pushMessage("Found "+lexical_cast<string>(xyzNames.size())+" states to process.");
 	xyzNamesIter=xyzNames.begin();
 	simPlayer->enableControls(true);
+	updateGL();
 }
 
 void GLSimulationPlayerViewer::doOneStep(){
