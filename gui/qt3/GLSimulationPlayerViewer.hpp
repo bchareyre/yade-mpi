@@ -20,7 +20,7 @@
 #include<yade/lib-sqlite3x/sqlite3x.hpp>
 
 class QtSimulationPlayer;
-class FiltrEngine;
+class FilterEngine;
 
 class GLSimulationPlayerViewer: public GLViewer {
 	private :
@@ -39,7 +39,7 @@ class GLSimulationPlayerViewer: public GLViewer {
  		//! filenames or table names (if useSQLite)
  		list<string> xyzNames;
  		list<string>::iterator xyzNamesIter;
-		vector< shared_ptr< FiltrEngine > >   filters;
+		vector< shared_ptr< FilterEngine > >   filters;
 	public :
 		GLSimulationPlayerViewer(QWidget* parent,char* name);
 		virtual ~GLSimulationPlayerViewer(){};

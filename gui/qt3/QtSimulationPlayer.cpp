@@ -10,7 +10,7 @@
 #include "FileDialog.hpp"
 #include "GLSimulationPlayerViewer.hpp"
 #include<yade/core/FileGenerator.hpp>
-#include<yade/pkg-common/FiltrEngine.hpp>
+#include<yade/pkg-common/FilterEngine.hpp>
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qspinbox.h>
@@ -28,7 +28,7 @@ void QtSimulationPlayer::pbPauseClicked(){ glSimulationPlayerViewer->stopAnimati
 void QtSimulationPlayer::pbStepClicked(){ glSimulationPlayerViewer->stopAnimation(); glSimulationPlayerViewer->doOneStep(); }
 void QtSimulationPlayer::pbResetClicked(){ setParameters();	glSimulationPlayerViewer->reset();}
 void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewer->saveSnapShots=b;}
-void QtSimulationPlayer::cbAllowFiltrationToggled(bool b){	FiltrationalEngine::isFiltrationActivated=b; }
+void QtSimulationPlayer::cbAllowFilterationToggled(bool b){	FilterEngine::isFilterationActivated=b; }
 void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e);}
 
 

@@ -10,7 +10,7 @@
 
 CREATE_LOGGER(ColorizedVelocityFilter);
 
-ColorizedVelocityFilter::ColorizedVelocityFilter() : FiltrEngine() 
+ColorizedVelocityFilter::ColorizedVelocityFilter() : FilterEngine() 
 {
 	first=true;
 	autoScale=true;
@@ -31,12 +31,12 @@ ColorizedVelocityFilter::~ColorizedVelocityFilter()
 
 bool ColorizedVelocityFilter::isActivated()
 {
-	return FiltrEngine::isActivated();
+	return FilterEngine::isActivated();
 }
 
 void ColorizedVelocityFilter::registerAttributes()
 {
-	FiltrEngine::registerAttributes();
+	FilterEngine::registerAttributes();
 	REGISTER_ATTRIBUTE(autoScale);
 	REGISTER_ATTRIBUTE(onlyDynamic);
 	REGISTER_ATTRIBUTE(minValue);

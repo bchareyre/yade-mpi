@@ -32,7 +32,7 @@ if 'qt3' not in env['exclude']:
 				'OpenGLRenderingEngine',
 				'PositionOrientationRecorder',
 				'sqlite3x',
-				'FiltrEngine',
+				'FilterEngine',
 				'$QGLVIEWER_LIB']+linkPythonUI,
 			CPPPATH=env['CPPPATH']+['qt3']),
 	])

@@ -8,7 +8,7 @@
 
 #include"ColorizedLayerFilter.hpp"
 
-ColorizedLayerFilter::ColorizedLayerFilter() : FiltrEngine() 
+ColorizedLayerFilter::ColorizedLayerFilter() : FilterEngine() 
 {
 	near = Vector3r(0,0,0);
 	normal = Vector3r(0,1,0);
@@ -25,13 +25,13 @@ ColorizedLayerFilter::~ColorizedLayerFilter()
 
 bool ColorizedLayerFilter::isActivated()
 {
-	return FiltrEngine::isActivated() 
+	return FilterEngine::isActivated() 
 		&& ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
 void ColorizedLayerFilter::registerAttributes()
 {
-	FiltrEngine::registerAttributes();
+	FilterEngine::registerAttributes();
 	REGISTER_ATTRIBUTE(near);
 	REGISTER_ATTRIBUTE(normal);
 	REGISTER_ATTRIBUTE(thickness);

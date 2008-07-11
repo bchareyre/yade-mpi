@@ -6,35 +6,33 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FILTRATIONAL_ENGINE_HPP
-#define FILTRATIONAL_ENGINE_HPP
+#ifndef FILTER_ENGINE_HPP
+#define FILTER_ENGINE_HPP
 
 #include<yade/core/DeusExMachina.hpp>
-class FiltrEngine : public DeusExMachina {
+class FilterEngine : public DeusExMachina {
 	public:
 		/// Activation of filtration from GUI
-		static bool isFiltrationActivated;
+		static bool isFilterationActivated;
 
 		/// Activation of the filter
 		bool isFilterActivated;
 
 		bool isActivated();
 
-		FiltrEngine();
+		FilterEngine();
 	
 		void registerAttributes()
 		{
-//			REGISTER_ATTRIBUTE(isFiltrationActivated);
+//			REGISTER_ATTRIBUTE(isFilterationActivated);
 			REGISTER_ATTRIBUTE(isFilterActivated);
 		}
 
 	protected :
-	REGISTER_CLASS_NAME(FiltrEngine);
+	REGISTER_CLASS_NAME(FilterEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-REGISTER_SERIALIZABLE(FiltrEngine,false);
+REGISTER_SERIALIZABLE(FilterEngine,false);
 
-typedef FiltrEngine FiltrationalEngine;
-
-#endif // FILTRATIONAL_ENGINE_HPP
+#endif // FILTER_ENGINE_HPP
 

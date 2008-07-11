@@ -9,10 +9,10 @@
 #ifndef COLORIZED_VELOCITY_FILTER_HPP
 #define COLORIZED_VELOCITY_FILTER_HPP 
 
-#include<yade/pkg-common/FiltrEngine.hpp>
+#include<yade/pkg-common/FilterEngine.hpp>
 #include<yade/core/MetaBody.hpp>
 
-class ColorizedVelocityFilter : public FiltrEngine {
+class ColorizedVelocityFilter : public FilterEngine {
 	protected:
 		Real midValue;
 		vector<Vector3r> prevPositions;
@@ -40,7 +40,7 @@ class ColorizedVelocityFilter : public FiltrEngine {
 		//virtual void postProcessAttributes(bool deserializing);
 		DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(ColorizedVelocityFilter);
-	REGISTER_BASE_CLASS_NAME(FiltrEngine);
+	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };
 
 REGISTER_SERIALIZABLE(ColorizedVelocityFilter,false);

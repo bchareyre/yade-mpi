@@ -6,15 +6,15 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "FiltrEngine.hpp"
+#include "FilterEngine.hpp"
 
-bool FiltrEngine::isFiltrationActivated = false;
+bool FilterEngine::isFilterationActivated = false;
 
-FiltrEngine::FiltrEngine() : DeusExMachina(), isFilterActivated(false)
+FilterEngine::FilterEngine() : DeusExMachina(), isFilterActivated(false)
 {
 }
 
-bool FiltrEngine::isActivated() 
+bool FilterEngine::isActivated() 
 {
-	return FiltrEngine::isFiltrationActivated && isFilterActivated; 
+	return FilterEngine::isFilterationActivated && isFilterActivated; 
 }

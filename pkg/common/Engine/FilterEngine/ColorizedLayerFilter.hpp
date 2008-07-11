@@ -9,10 +9,10 @@
 #ifndef COLORIZED_LAYER_FILTER_HPP
 #define COLORIZED_LAYER_FILTER_HPP 
 
-#include<yade/pkg-common/FiltrEngine.hpp>
+#include<yade/pkg-common/FilterEngine.hpp>
 #include<yade/core/MetaBody.hpp>
 
-class ColorizedLayerFilter : public FiltrEngine {
+class ColorizedLayerFilter : public FilterEngine {
 	private:
 		Vector3r far;
 	public :
@@ -30,7 +30,7 @@ class ColorizedLayerFilter : public FiltrEngine {
 		virtual void registerAttributes();
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(ColorizedLayerFilter);
-	REGISTER_BASE_CLASS_NAME(FiltrEngine);
+	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };
 
 REGISTER_SERIALIZABLE(ColorizedLayerFilter,false);

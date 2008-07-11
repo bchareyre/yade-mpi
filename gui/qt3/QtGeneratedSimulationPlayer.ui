@@ -495,7 +495,7 @@
                         </property>
                         <widget class="QCheckBox">
                             <property name="name">
-                                <cstring>cbAllowFiltration</cstring>
+                                <cstring>cbAllowFilteration</cstring>
                             </property>
                             <property name="text">
                                 <string>Allow filtration</string>
@@ -672,10 +672,10 @@
         <slot>pbInputDirectoryClicked()</slot>
     </connection>
     <connection>
-        <sender>cbAllowFiltration</sender>
+        <sender>cbAllowFilteration</sender>
         <signal>toggled(bool)</signal>
         <receiver>QtGeneratedSimulationPlayer</receiver>
-        <slot>cbAllowFiltrationToggled(bool)</slot>
+        <slot>cbAllowFilterationToggled(bool)</slot>
     </connection>
 </connections>
 <slots>
@@ -688,7 +688,7 @@
     <slot>pbResetClicked()</slot>
     <slot>pbInputConfigFileClicked()</slot>
     <slot>cbSaveSnapShotsToggled(bool)</slot>
-    <slot>cbAllowFiltrationToggled(bool)</slot>
+    <slot>cbAllowFilterationToggled(bool)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

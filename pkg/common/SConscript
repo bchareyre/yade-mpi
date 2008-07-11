@@ -260,16 +260,16 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 			'ParticleParameters'],
 		CPPPATH=env['CPPPATH']+['$PREFIX/include','Engine/DeusExMachina']),
 	
-	env.SharedLibrary('FiltrEngine',['Engine/FiltrEngine/FiltrEngine.cpp']),
+	env.SharedLibrary('FilterEngine',['Engine/FilterEngine/FilterEngine.cpp']),
 
 	env.SharedLibrary('ColorizedLayerFilter',
-		['Engine/FiltrEngine/ColorizedLayerFilter.cpp'],
-		LIBS=env['LIBS']+['yade-base','FiltrEngine']),
+		['Engine/FilterEngine/ColorizedLayerFilter.cpp'],
+		LIBS=env['LIBS']+['yade-base','FilterEngine']),
 	
 	env.SharedLibrary('ColorizedVelocityFilter',
-		['Engine/FiltrEngine/ColorizedVelocityFilter.cpp'],
-		LIBS=env['LIBS']+['yade-base','FiltrEngine'],
-		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/FiltrEngine']),
+		['Engine/FilterEngine/ColorizedVelocityFilter.cpp'],
+		LIBS=env['LIBS']+['yade-base','FilterEngine'],
+		CPPPATH=env['CPPPATH']+['$PREFIX/include', 'Engine/FilterEngine']),
 	
 	env.SharedLibrary('BoundingVolumeMetaEngine',
 		['Engine/MetaEngine/BoundingVolumeMetaEngine.cpp'],

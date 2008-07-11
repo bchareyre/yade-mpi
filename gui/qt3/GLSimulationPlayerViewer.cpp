@@ -20,7 +20,7 @@
 #include<boost/algorithm/string.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/pkg-common/FiltrEngine.hpp>
+#include<yade/pkg-common/FilterEngine.hpp>
 #include<qspinbox.h>
 #include"QtSimulationPlayer.hpp"
 
@@ -91,7 +91,7 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 	FOREACH(shared_ptr<Engine>& e, Omega::instance().getRootBody()->engines){
 		// FIXME
 		#warning FIXME: this gives me syntax error (invalid conversion) ?!
-		//if(dynamic_cast<FiltrEngine*>(e.get())) filters.push_back(e);
+		if(dynamic_cast<FilterEngine*>(e.get())) filters.push_back(e);
 	}
 
 	if(!useSQLite){
@@ -254,6 +254,6 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 		}
 		Omega::instance().setCurrentIteration(con->executeint("SELECT iter from 'records' where bodyTable='"+tableName+"';"));
 	}
-	FOREACH(const shared_ptr<FiltrationalEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
+	FOREACH(const shared_ptr<FilterEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	return true;
 }
