@@ -153,14 +153,13 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		}
 	}
 	/* Filters */
-#if 0
+	#warning the following dynamic_cast is not accepted by g++>=4.3 !!
 	FOREACH(shared_ptr<Engine> e, Omega::instance().getRootBody()->engines){
 		if(dynamic_cast<FilterEngine*>(e.get())) {
 			filters.push_back(e);
 			simPlayer->pushMessage("Find filter: "+e->getClassName());
 		}
 	}
-#endif 
 	/* strided access is common for both db and file access */
 	if(stride>1){
 		list<string> xyz2;
