@@ -36,9 +36,10 @@ GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget* parent, char* name):
 	setSceneRadius(2);
 	showEntireScene();
 	resize(720, 576);
-	setAnimationPeriod(1);
+	setAnimationPeriod(0); // as fast as possible
 	saveSnapShots=false;
 	frameNumber=0;
+	stride=1;
 	lastCheckPointFrame=0;
 }
 
@@ -67,11 +68,11 @@ void GLSimulationPlayerViewer::animate(){
 	} else {
 		if (saveSnapShots) {
 			setSnapshotFormat("PNG");
-			setSnapshotFileName(outputBaseDirectory+"/"+outputBaseName+".png");
+			setSnapshotFileName(snapshotsBase+".png");
 			saveSnapshot(/*automatic*/true,/*overwrite*/ true);
 			// mimick qglviewer's algorithm for making snapshot filename
 			char num[64]; snprintf(num,64,"%04d",frameNumber);
-			simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" -> "+outputBaseDirectory+"/"+outputBaseName+"-"+num+".png");
+			simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" -> "+snapshotsBase+"-"+num+".png");
 		}
 		frameNumber++;
 	}
@@ -141,8 +142,8 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		// load simulation
 		string xml=con->executestring("select simulationXML from 'meta';");
 		istringstream xmlStream(xml); Omega::instance().loadSimulationFromStream(xmlStream);
-		{ // the "ORDER BY" seems to be broken in some cases (lexical comparison instead of numerical? But the field is INTEGER)
-			sqlite3x::sqlite3_command cmd(*con,"select bodyTable from 'records' ORDER BY 'iter';");
+		{
+			sqlite3x::sqlite3_command cmd(*con,"select bodyTable from 'records' ORDER BY iter;");
 			sqlite3x::sqlite3_cursor reader=cmd.executecursor();
 			assert(reader.colcount()==1);
 			while(reader.step()){
@@ -152,16 +153,15 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		}
 	}
 	/* Filters */
-	FOREACH(shared_ptr<Engine>& e, Omega::instance().getRootBody()->engines){
+#if 0
+	FOREACH(shared_ptr<Engine> e, Omega::instance().getRootBody()->engines){
 		if(dynamic_cast<FilterEngine*>(e.get())) {
 			filters.push_back(e);
 			simPlayer->pushMessage("Find filter: "+e->getClassName());
 		}
 	}
-
+#endif 
 	/* strided access is common for both db and file access */
-	int stride=simPlayer->sbStride->value();
-	xyzNames.sort();
 	if(stride>1){
 		list<string> xyz2;
 		long i=stride-1;
@@ -254,7 +254,7 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 			if(col_rgb_g>=0) b->geometricalModel->diffuseColor[1]=reader.getdouble(col_rgb_g);
 			if(col_rgb_b>=0) b->geometricalModel->diffuseColor[2]=reader.getdouble(col_rgb_b);
 		}
-		Omega::instance().setCurrentIteration(con->executeint("SELECT iter from 'records' where bodyTable='"+tableName+"';"));
+		Omega::instance().setCurrentIteration(con->executeint("select iter from 'records' where bodyTable='"+tableName+"';"));
 	}
 	FOREACH(const shared_ptr<FilterEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	return true;

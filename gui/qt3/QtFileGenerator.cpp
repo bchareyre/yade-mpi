@@ -346,9 +346,9 @@ void QtFileGenerator::pbSaveClicked()
 
 void QtFileGenerator::closeEvent(QCloseEvent *evt)
 {
-	if(m_worker || m_runner)
-		return;
+	if(m_worker || m_runner) return;
 	close();
 	QtFileGeneratorController::closeEvent(evt);
+	emit closeSignal();
 }
 

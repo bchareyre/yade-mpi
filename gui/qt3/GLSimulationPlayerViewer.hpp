@@ -32,14 +32,15 @@ class GLSimulationPlayerViewer: public GLViewer {
 		QtSimulationPlayer* simPlayer;
 		boost::posix_time::ptime lastCheckPointTime;
 		long lastCheckPointFrame;
-		string fileName, inputBaseName, inputBaseDirectory, outputBaseName, outputBaseDirectory;
+		string fileName, inputBaseName, inputBaseDirectory, outputBaseName, outputBaseDirectory, snapshotsBase;
 		bool saveSnapShots;
 		int frameNumber;
+		int stride;
  		bool loadNextRecordedData();
  		//! filenames or table names (if useSQLite)
  		list<string> xyzNames;
  		list<string>::iterator xyzNamesIter;
-		vector< shared_ptr< FilterEngine > >   filters;
+		vector< shared_ptr< FilterEngine > > filters;
 	public :
 		GLSimulationPlayerViewer(QWidget* parent,char* name);
 		virtual ~GLSimulationPlayerViewer(){};

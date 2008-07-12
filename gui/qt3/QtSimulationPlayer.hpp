@@ -19,8 +19,8 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 	public : ~QtSimulationPlayer();
 
 	private : void setParameters();
-		list<string> messages;
 	public: void pushMessage(std::string);
+		list<string> messages;
 
 
 	public slots : virtual void pbInputDirectoryClicked();
@@ -41,6 +41,8 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 //						void keyPressEvent(QKeyEvent *){};
 	public:
 	void enableControls(bool);
+
+	DECLARE_LOGGER;
 
 	REGISTER_CLASS_NAME(QtSimulationPlayer);
 	REGISTER_BASE_CLASS_NAME(Factorable);

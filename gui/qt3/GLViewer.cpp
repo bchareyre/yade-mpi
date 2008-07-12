@@ -51,6 +51,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	setKeyDescription(Qt::Key_X,"Toggle YZ grid (or: align manipulated clip plane normal with +X)");
 	setKeyDescription(Qt::Key_Y,"Toggle XZ grid (or: align manipulated clip plane normal with +Y)");
 	setKeyDescription(Qt::Key_Z,"Toggle XY grid (or: align manipulated clip plane normal with +Z)");
+	setKeyDescription(Qt::Key_S & Qt::ALT,   "Save QGLViewer state to /tmp/qglviewerState.xml");
 	setKeyDescription(Qt::Key_Delete,"(lattice) increase isoValue");
 	setKeyDescription(Qt::Key_Insert,"(lattice) decrease isoValue");
 	setKeyDescription(Qt::Key_Next,  "(lattice) increase isoThic");
@@ -162,6 +163,12 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		}
 		updateGL();
 	}
+	else if(e->key()==Qt::Key_S && (e->state()&AltButton)){
+		setStateFileName("/tmp/qglviewerState.xml");
+		saveStateToFile();
+		setStateFileName(QString::null);
+	}
+
 	else if(e->key()==Qt::Key_D) wasDynamic = true;
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; updateGL();}
 	else if(e->key()==Qt::Key_X || e->key()==Qt::Key_Y || e->key()==Qt::Key_Z){

@@ -24,6 +24,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+
+
 using namespace std;
 
 CREATE_LOGGER(YadeQtMainWindow);
@@ -69,7 +71,8 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
 
 	// HACK
-	if(Omega::instance().getSimulationFileName()!="") createSimulationController();
+	if(Omega::instance().getSimulationFileName()!="") createController();
+
 
 	// updates GL views, may also hide/show this window as needed
 	startTimer(100);
@@ -79,7 +82,7 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 	#if 1
 	//shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 		//if((rb && rb->bodies->size()>0) ||
-		if(simulationController) {this->hide();}
+		if(controller || player || generator) {this->hide();}
 		else {this->show(); }
 	#endif
 	// update GL views (if any)
@@ -87,25 +90,18 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 }
 
 void YadeQtMainWindow::redrawAll(bool force){
-	if(force || (simulationController && !simulationController->syncRunning)){
+	if(force || (controller && !controller->syncRunning)){
 		FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
 	}
 }
 
-void YadeQtMainWindow::loadSimulation(string file){
-	createSimulationController();
-	simulationController->loadSimulationFromFileName(file);
-}
-
-void YadeQtMainWindow::centerViews(){
-	FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->centerScene(); }
-}
+void YadeQtMainWindow::loadSimulation(string file){createController();	controller->loadSimulationFromFileName(file);}
+void YadeQtMainWindow::centerViews(){FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->centerScene(); }}
 
 
 YadeQtMainWindow::~YadeQtMainWindow()
 {
 	filesystem::path yadeQtGUIPrefPath = filesystem::path( Omega::instance().yadeConfigPath + "/QtGUIPreferences.xml", filesystem::native);
-
 	preferences->mainWindowPositionX	= pos().x();
 	preferences->mainWindowPositionY	= pos().y();
 	preferences->mainWindowSizeX		= size().width();
@@ -113,24 +109,9 @@ YadeQtMainWindow::~YadeQtMainWindow()
 	IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
 }
 
-
-void YadeQtMainWindow::closeSimulationControllerEvent() { deleteSimulationController(); }
-
 void YadeQtMainWindow::Quit(){ emit close(); }
-#define RUN_PLUGIN_AS_WIDGET(method,plugin) \
-	void YadeQtMainWindow::method(){cerr<<plugin<<endl; shared_ptr<Factorable> tmp=ClassFactory::instance().createShared(plugin); qtWidgets.push_back(tmp); shared_ptr<QWidget> widget=dynamic_pointer_cast<QWidget>(tmp); if(widget) widget->show(); else LOG_FATAL("Widget of type "<<plugin" not created?"); }
-RUN_PLUGIN_AS_WIDGET(createGenerator,"QtFileGenerator")
-RUN_PLUGIN_AS_WIDGET(createPlayer,"QtSimulationPlayer")
 
-void YadeQtMainWindow::closeEvent(QCloseEvent *e)
-{
-	simulationController=shared_ptr<SimulationController>();
-	YadeQtGeneratedMainWindow::closeEvent(e);
-}
-
-
-	/******************************************************************************************/
-
+void YadeQtMainWindow::closeEvent(QCloseEvent *e){ closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e); }
 
 void YadeQtMainWindow::ensureRenderer(){
 	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
@@ -156,23 +137,6 @@ void YadeQtMainWindow::saveRendererConfig(){
 	IOFormatManager::saveToFile("XMLFormatManager",rendererConfig.string(),"renderer",renderer);
 }
 
-void YadeQtMainWindow::createSimulationController(){
-	if(!simulationController){
-		simulationController=shared_ptr<SimulationController>(new SimulationController(NULL));
-		simulationController->show();
-		connect(simulationController.get(),SIGNAL(closeSignal()),this,SLOT(closeSimulationControllerEvent()));
-	}
-	else{
-		simulationController->show(); // if hidden
-		simulationController->raise(); //bring to fg
-	}
-}
-
-void YadeQtMainWindow::deleteSimulationController(){
-	if(simulationController) simulationController=shared_ptr<SimulationController>();
-	Omega::instance().setSimulationFileName("");
-}
-
 void YadeQtMainWindow::createView(){
 	ensureRenderer();
 
@@ -182,16 +146,14 @@ void YadeQtMainWindow::createView(){
 	glv->camera()->frame()->setWheelSensitivity(-1.0f);
 	glv->centerScene();
 	glViews.push_back(glv);
-
 	//connect( glv, SIGNAL(closeSignal(int)), this, SLOT( closeGLViewEvent(int) ) );
-
 }
 
 void YadeQtMainWindow::closeView(GLViewer* glv){
 	for(size_t i=0; i<glViews.size(); i++){
 		if(glViews[i].get()==glv){
 			if(i>0) { // non-primary view can be closed safely
-				glViews[i]=shared_ptr<GLViewer>(); // will close the window as well (?)
+				glViews[i]=shared_ptr<GLViewer>(); // will close the window as well
 				return;
 			}else{ // requesting closing primary view
 				bool noOtherViews=true;
@@ -207,7 +169,7 @@ void YadeQtMainWindow::closeView(GLViewer* glv){
 			}
 		}
 	}
-	LOG_FATAL("No such view???");
+	LOG_FATAL("No such view???"<<glv);
 }
 
 /* Close the last view (default); close the i-th view from the beginning (0=primary) */
@@ -219,5 +181,20 @@ void YadeQtMainWindow::closeView(int ii=-1){
 	} else {	if(glViews[ii]) closeView(glViews[ii].get()); }
 }
 
+void YadeQtMainWindow::closeAllChilds(){
+	while(glViews.size()>0 && glViews[0]!=NULL) { LOG_INFO("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);}
+	if(player) player=shared_ptr<QtSimulationPlayer>();
+	if(controller) controller=shared_ptr<SimulationController>();
+	if(generator) generator=shared_ptr<QtFileGenerator>();
+}
 
+void YadeQtMainWindow::customEvent(QCustomEvent* e){
+	switch(e->type()){
+		case EVENT_CONTROLLER: createController(); break;
+		case EVENT_VIEW: createView(); break;
+		case EVENT_PLAYER: createPlayer(); break;
+		case EVENT_GENERATOR: createGenerator(); break;
+		default: ;
+	}
+}
 

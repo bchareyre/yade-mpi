@@ -59,18 +59,13 @@ int QtGUI::run(int argc, char *argv[])
 	XInitThreads();
    QApplication app(argc,argv);
 	mainWindow=new YadeQtMainWindow();
-//	#ifdef EMBED_PYTHON
-//		if(!mainWindowHidden)
-//	#endif	
-		mainWindow->show();
+	mainWindow->show();
 	app.setMainWidget(mainWindow);
-
 	#ifdef EMBED_PYTHON
 		LOG_INFO("Launching Python thread now...");
 		//PyEval_InitThreads();
 		boost::thread pyThread(boost::function0<void>(&PythonUI::pythonSession));
 	#endif
-
 	int res =  app.exec();
 
 	delete mainWindow;

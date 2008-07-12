@@ -116,18 +116,20 @@
         <sender>btController</sender>
         <signal>pressed()</signal>
         <receiver>YadeQtGeneratedMainWindow</receiver>
-        <slot>createSimulationController()</slot>
+        <slot>createController()</slot>
     </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">YadeQtGeneratedMainWindow.ui.h</include>
 </includes>
 <slots>
-    <slot>closeSimulationControllerEvent()</slot>
+    <slot>closeController()</slot>
     <slot>createGenerator()</slot>
     <slot>createPlayer()</slot>
     <slot>Quit()</slot>
-    <slot>createSimulationController()</slot>
+    <slot>createController()</slot>
+    <slot>closePlayer()</slot>
+    <slot>closeGenerator()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

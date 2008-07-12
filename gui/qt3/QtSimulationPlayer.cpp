@@ -16,6 +16,7 @@
 #include <qspinbox.h>
 #include<qlabel.h>
 #include<qstring.h>
+CREATE_LOGGER(QtSimulationPlayer);
 
 QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
 	glSimulationPlayerViewer->simPlayer=this;
@@ -29,7 +30,7 @@ void QtSimulationPlayer::pbStepClicked(){ glSimulationPlayerViewer->stopAnimatio
 void QtSimulationPlayer::pbResetClicked(){ setParameters();	glSimulationPlayerViewer->reset();}
 void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewer->saveSnapShots=b;}
 void QtSimulationPlayer::cbAllowFilterationToggled(bool b){	FilterEngine::isFilterationActivated=b; }
-void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e);}
+void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e); emit closeSignal(); }
 
 
 void QtSimulationPlayer::pbInputConfigFileClicked(){
@@ -59,6 +60,8 @@ void QtSimulationPlayer::setParameters(){
 	glSimulationPlayerViewer->inputBaseDirectory=leInputDirectory->text().ascii();
 	glSimulationPlayerViewer->outputBaseName=leOutputBaseName->text().ascii();
 	glSimulationPlayerViewer->outputBaseDirectory=leOutputDirectory->text().ascii();
+	glSimulationPlayerViewer->snapshotsBase=string(leOutputDirectory->text().ascii())+"/"+leOutputBaseName->text().ascii();
+	glSimulationPlayerViewer->stride=sbStride->value();
 }
 
 void QtSimulationPlayer::enableControls(bool enable=true){
@@ -69,6 +72,7 @@ void QtSimulationPlayer::enableControls(bool enable=true){
 }
 
 void QtSimulationPlayer::pushMessage(string msg){
+	LOG_INFO(msg)
 	messages.push_back(msg);
 	if(messages.size()>15) messages.pop_front();
 	QString disp;

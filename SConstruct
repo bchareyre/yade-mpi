@@ -7,7 +7,7 @@
 #
 # Type "scons -h" for yade-specific options and "scons -H" for scons' options. Note that yade options will be remembered (saved in scons.config) so that you need to specify them only for the first time. Like this, for example:
 #
-#	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,fem,lattice,realtime-rigidbody,mass-spring CPPPATH=/usr/local/include/wm3
+#	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,fem,lattice,realtime-rigidbody,mass-spring
 #
 # Next time, you can simply run "scons" or "scons -j4" (for 4-parallel builds) to rebuild targets that need it. IF YOU NEED TO READ CODE IN THIS FILE, SOMETHING IS BROKEN AND YOU SHOULD REALLY TELL ME.
 #
@@ -64,21 +64,23 @@ if sconsVersion<9803.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
 ##########################################################################################
 
 env=Environment(tools=['default'])
-
 profileFile='scons.current-profile'
+
 profOpts=Options(profileFile)
-profOpts.AddOptions(('profile','Config profile to use (predefined: default or "", opt)','default'))
+profOpts.AddOptions(('profile','Config profile to use (predefined: default or "", opt); append ! to use it but not save for next build (in scons.current-profile)','default'))
 profOpts.Update(env)
 # multiple profiles - run them all at the same time
 # take care not to save current profile for those parallel builds
-if not os.environ.has_key('SCONS_PROFILE_NOSAVE'): profOpts.Save(profileFile,env)
+if env['profile']=='': env['profile']='default'
+# save the profile only if the last char is not !
+if env['profile'][-1]=='!': env['profile']=env['profile'][:-1]
+else: profOpts.Save(profileFile,env)
 
 if ',' in env['profile']:
 	profiles=env['profile'].split(',')
 	import threading,subprocess
-	def runProfile(profile): subprocess.call([sys.argv[0],'-Q','profile='+p])
+	def runProfile(profile): subprocess.call([sys.argv[0],'-Q','profile='+p+'!'])
 	profileThreads=[]
-	os.environ['SCONS_PROFILE_NOSAVE']=''
 	for arg in sys.argv[2:]:
 		print "WARNING: parallel-building, extra argument `%s' ignored!"%arg
 	for p in profiles:
@@ -88,7 +90,6 @@ if ',' in env['profile']:
 	for t in profileThreads:
 		t.join()
 	Exit()
-
 
 if env['profile']=='': env['profile']='default'
 optsFile='scons.profile-'+env['profile']
@@ -310,7 +311,7 @@ if not env.GetOption('clean'):
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
 	def featureNotOK(featureName):
-		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."
+		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."%featureName
 		Exit(1)
 	# check "optional" libs
 	if 'log4cxx' in env['features']:

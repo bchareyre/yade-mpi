@@ -336,9 +336,9 @@
         <slot>cbSerializationNameActivated(const QString&amp;)</slot>
     </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">QtFileGeneratorController.ui.h</include>
-</includes>
+<signals>
+    <signal>closeSignal()</signal>
+</signals>
 <slots>
     <slot>cbGeneratorNameActivated( const QString &amp; )</slot>
     <slot>pbGenerateClicked()</slot>

@@ -35,7 +35,7 @@ o.engines=[
 	### NOTE these extra engines.
 	###
 	StandAloneEngine('PositionOrientationRecorder',{'interval':100,'saveRgb':True,'outputFile':'/tmp/_simple-scene'}),
-	StandAloneEngine('SQLiteRecorder',{'recorders':['se3','rgb'],'dbFile':'/tmp/aa.sqlite','iterPeriod':100})
+	StandAloneEngine('SQLiteRecorder',{'recorders':['se3','rgb'],'dbFile':'/tmp/player.sqlite','iterPeriod':100})
 ]
 from yade import utils
 o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
@@ -44,6 +44,6 @@ o.dt=.2*utils.PWaveTimeStep()
 
 ## load this file with player afterwards!
 o.save('/tmp/player.xml.bz2')
-o.run(20000)
+o.run(5000)
 o.wait()
 quit()
