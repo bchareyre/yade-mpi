@@ -71,8 +71,10 @@ void GLSimulationPlayerViewer::animate(){
 			setSnapshotFileName(snapshotsBase+".png");
 			saveSnapshot(/*automatic*/true,/*overwrite*/ true);
 			// mimick qglviewer's algorithm for making snapshot filename
-			char num[64]; snprintf(num,64,"%04d",frameNumber);
-			simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" -> "+snapshotsBase+"-"+num+".png");
+			char num[64]; snprintf(num,64,"%.04d",frameNumber);
+			snapshots.push_back(snapshotsBase+"-"+num+".png");
+			simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" -> "+*snapshots.rbegin());
+			//+snapshotsBase+"-"+num+".png");
 		}
 		frameNumber++;
 	}
@@ -153,10 +155,10 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		}
 	}
 	/* Filters */
-	#warning the following dynamic_cast is not accepted by g++>=4.3 !!
 	FOREACH(shared_ptr<Engine> e, Omega::instance().getRootBody()->engines){
-		if(dynamic_cast<FilterEngine*>(e.get())) {
-			filters.push_back(e);
+		shared_ptr<FilterEngine> fe=dynamic_pointer_cast<FilterEngine>(e);
+		if(fe){
+			filters.push_back(fe);
 			simPlayer->pushMessage("Find filter: "+e->getClassName());
 		}
 	}

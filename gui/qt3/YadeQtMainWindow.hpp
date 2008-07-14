@@ -38,7 +38,6 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		void loadSimulation(string file);
 		void redrawAll(bool force=false);
 
-
 	protected :
 		shared_ptr<QtGUIPreferences> preferences;
 		vector<shared_ptr<Factorable> > qtWidgets;

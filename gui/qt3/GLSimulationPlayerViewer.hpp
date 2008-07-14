@@ -29,6 +29,7 @@ class GLSimulationPlayerViewer: public GLViewer {
 		bool useSQLite;
 		shared_ptr<sqlite3x::sqlite3_connection> con;
 	public:
+		list<string> snapshots;
 		QtSimulationPlayer* simPlayer;
 		boost::posix_time::ptime lastCheckPointTime;
 		long lastCheckPointFrame;

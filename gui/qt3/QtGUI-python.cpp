@@ -8,6 +8,13 @@
 
 #include<qapplication.h>
 
+#include<cstdio>
+
+#ifdef LOG4CXX
+log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.QtGUI-python");
+#endif
+
+
 using namespace boost::python;
 
 BASIC_PY_PROXY_HEAD(pyOpenGLRenderingEngine,OpenGLRenderingEngine)
@@ -20,25 +27,26 @@ void centerViews(void){ensuredMainWindow()->centerViews();}
 void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
 pyOpenGLRenderingEngine getRenderer(){return pyOpenGLRenderingEngine(ensuredMainWindow()->renderer);}
 
-#define POST_SYNTH_EVENT(EVT) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT));}
-POST_SYNTH_EVENT(PLAYER);
-POST_SYNTH_EVENT(CONTROLLER);
-POST_SYNTH_EVENT(VIEW);
-POST_SYNTH_EVENT(GENERATOR);
+#define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(bool wait=false){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
+POST_SYNTH_EVENT(PLAYER,player); BOOST_PYTHON_FUNCTION_OVERLOADS(evtPLAYER_overloads,evtPLAYER,0,1);
+POST_SYNTH_EVENT(CONTROLLER,controller); BOOST_PYTHON_FUNCTION_OVERLOADS(evtCONTROLLER_overloads,evtCONTROLLER,0,1);
+POST_SYNTH_EVENT(GENERATOR,generator); BOOST_PYTHON_FUNCTION_OVERLOADS(evtGENERATOR_overloads,evtGENERATOR,0,1);
+void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); }
+
 
 /* This function adds the ability to non-interactively run the player. 
+ *
  * @param savedSim is simulation saved by either SQLiteRecorder (preferrably) or 
  * is a simulation XML if using PositionOrientationRecorder (beware: must be run from the
  * same dir if the base xyz snapshot dir is relative.
- *
- * @param snapBase is basename for snapshots saved as .png images. It contains both path
- * and first part of filename, e.g. /tmp/abc will create /tmp/abc-0001.png and so on.
  *
  * @param savedQGLState is file with QGLViewer state (camera position, orientation, display 
  * dimensions etc) saved when running the GLViewer (either in player or during simulation) and
  * pressing Alt-S; this saves state to /tmp/qglviewerState.xml.
  *
  * @param stride is that every stride-th simulation state will be taken
+
+ * @param snapBase is basename for .png snapshots. If ommited, tmpnam generates unique basename.
  *
  * This function may be especially useful for offsreen rendering using Xvfb
  * (install the xvfb package first). Then run
@@ -55,34 +63,35 @@ POST_SYNTH_EVENT(GENERATOR);
  *  qt.runPlayer('/tmp/aa.sqlite','/tmp/__g','/tmp/qglviewerState.xml',20)
  *  quit()
  *
- *
+ * @returns tuple of (wildcard,[snap0,snap1,snap2,...]), where the list contains filename of snapshots.
  */
-void runPlayer(string savedSim,string snapBase,string savedQGLState="",int stride=1){
-	evtPLAYER();
-	usleep(1000000); // ugly: sleep 1 secs to get the window hopefully ready
-	cerr<<".";
+python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState="",int stride=1){
+	evtPLAYER(true); // wait for the window to become ready
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
+	string snapBase2(snapBase);
+	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; }
 	glv->stride=stride;
 	glv->load(savedSim);
-	cerr<<":";
 	glv->saveSnapShots=true;
-	glv->snapshotsBase=snapBase;
+	glv->snapshotsBase=snapBase2;
 	if(!savedQGLState.empty()){
 		glv->setStateFileName(savedQGLState);
 		glv->restoreStateFromFile();
 		glv->setStateFileName(QString::null);
 	}
-	cerr<<"!";
 	glv->startAnimation();
-	cerr<<"@";
-	while(glv->animationIsStarted()) { usleep(2000000); /*cerr<<"Last msg: "<<*player->messages.rbegin()<<endl;*/ }
+	while(glv->animationIsStarted()) { usleep(2000000); LOG_DEBUG("Last msg: "<<*player->messages.rbegin()); }
+	python::list snaps; FOREACH(string s, glv->snapshots){snaps.append(s);}
+	return python::make_tuple(snapBase2+"-%.04d.png",snaps);
 }
+
 BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayer_overloads,runPlayer,2,4);
 
 BOOST_PYTHON_MODULE(qt){
-	def("Controller",evtCONTROLLER);
-	def("Player",evtPLAYER);
+	def("Generator",evtGENERATOR,evtGENERATOR_overloads(args("wait")));
+	def("Controller",evtCONTROLLER,evtCONTROLLER_overloads(args("wait")));
+	def("Player",evtPLAYER,evtPLAYER_overloads(args("wait")));
 	def("View",evtVIEW);
 	def("center",centerViews);
 	def("Renderer",getRenderer);
