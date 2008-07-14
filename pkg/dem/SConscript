@@ -332,6 +332,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ParticleParameters',
 			'ElasticContactInteraction',
 			'InteractingSphere',
+			'InteractingBox',
 			'SpheresContactGeometry',
 			'Sphere']),
 
