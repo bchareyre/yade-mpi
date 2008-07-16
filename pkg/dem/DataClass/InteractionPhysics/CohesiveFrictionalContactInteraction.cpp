@@ -55,6 +55,7 @@ void CohesiveFrictionalContactInteraction::registerAttributes()
 	SimpleElasticInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(prevNormal);
 	REGISTER_ATTRIBUTE(shearForce);
+	REGISTER_ATTRIBUTE(ks);
 	REGISTER_ATTRIBUTE(initialKn);
 	REGISTER_ATTRIBUTE(initialKs);
 	REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
