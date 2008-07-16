@@ -1,6 +1,6 @@
 /*************************************************************************
 *  Copyright (C) 2007 by Bruno Chareyre                                 *
-*  bruno.chareyre@imag.fr                                               *
+*  bruno.chareyre@hmg.inpg.fr                                               *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *

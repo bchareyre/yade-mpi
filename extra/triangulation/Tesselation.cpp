@@ -158,7 +158,7 @@ Point Tesselation::Dual ( const Cell_handle &cell )
 
 void Tesselation::Compute ()
 {
-	std::cout << "Tesselation::Compute ()" << std::endl;
+	std::cerr << "Tesselation::Compute ()" << std::endl;
 	Finite_cells_iterator cell_end = Tri->finite_cells_end();
 	for ( Finite_cells_iterator cell = Tri->finite_cells_begin(); cell != cell_end; cell++ )
 	{

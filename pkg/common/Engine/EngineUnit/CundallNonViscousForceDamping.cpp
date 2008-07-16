@@ -32,7 +32,6 @@ void CundallNonViscousForceDamping::go(    const shared_ptr<PhysicalAction>& a
 	if(body->isClump()) return;
 	Force * af = static_cast<Force*>(a.get());
 	ParticleParameters * p = static_cast<ParticleParameters*>(b.get());
-		
 	
 	for (int i=0; i<3; ++i)
 	{

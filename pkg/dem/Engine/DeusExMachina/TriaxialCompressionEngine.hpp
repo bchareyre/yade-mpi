@@ -17,14 +17,12 @@
 #include <string>
 
 
-/*! \brief Isotropic compression + uniaxial compression test
-
-	detailed description...
- */
 
 class PhysicalAction;
 
-/** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial stress test with hydrostatic confinement.
+
+
+/** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial test with constant lateral stress and constant axial strain rate.
  *
  * The engine is a state machine with the following states (and automatic transitions):
  *
@@ -41,6 +39,7 @@ class PhysicalAction;
  * 4. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
  *
  */
+
 class TriaxialCompressionEngine : public TriaxialStressController
 {
 	private :

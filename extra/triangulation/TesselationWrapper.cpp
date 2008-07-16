@@ -47,6 +47,21 @@ TesselationWrapper::~TesselationWrapper()
 	bounded = false;
 	facet_it = Tes->Triangulation().finite_edges_end ();
  }
+ 
+ 
+ void TesselationWrapper::clear2(void) //for testing purpose
+ {
+ 	Tes->Clear();
+ 	
+//  	Pmin = Point(inf, inf, inf);
+// 	Pmax = Point(-inf, -inf, -inf);
+// 	mean_radius = 0;
+// 	n_spheres = 0;
+// 	rad_divided = false;
+//	bounded = false;
+// 	facet_it = Tes->Triangulation().finite_edges_end ();
+ }
+ 
 
 double TesselationWrapper::Volume( unsigned int id )
 {
@@ -66,6 +81,21 @@ bool TesselationWrapper::insert(double x, double y, double z, double rad, unsign
 		++n_spheres;
 		
 		return (Tes->insert(x,y,z,rad,id)!=NULL);
+}
+
+void TesselationWrapper::checkMinMax(double x, double y, double z, double rad)
+{	
+	using namespace std;
+		Pmin = Point( min(Pmin.x(), x-rad),
+							min(Pmin.y(), y-rad),
+							min(Pmin.z(), z-rad) );
+		Pmax = Point( max(Pmax.x(), x+rad),
+							max(Pmax.y(), y+rad),
+							max(Pmax.z(), z+rad) );
+		mean_radius += rad;
+		++n_spheres;
+		
+		//return (Tes->insert(x,y,z,rad,id)!=NULL);
 }
 
 

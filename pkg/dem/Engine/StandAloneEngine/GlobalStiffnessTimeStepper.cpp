@@ -23,7 +23,7 @@ GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecC
 //cerr << "GlobalStiffnessTimeStepper()"  << endl;
 	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
-	timestepSafetyCoefficient = 1;
+	timestepSafetyCoefficient = 0.8;
 	computedOnce = false;
 	defaultDt = 1;
 	previousDt = defaultDt;
@@ -110,7 +110,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	//cerr << "sdec->inertia=" << sdec->inertia.x() << " " << sdec->inertia.x() << " " << sdec->inertia.x() << endl;
 	//cerr << "timesteps : dt=" << dt << " / Rdt=" << Rdt << endl;
 	
-	dt = 0.709*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//0.709 = 1/sqrt(2)
+	dt = 1.41044*timestepSafetyCoefficient*std::sqrt(std::min(dt,Rdt));//1.41044 = sqrt(2)
 	
 	newDt = std::min(dt,newDt);
 	//computedSomething = true;

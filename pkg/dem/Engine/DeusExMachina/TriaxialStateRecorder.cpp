@@ -1,6 +1,8 @@
 /*************************************************************************
-*  Copyright (C) 2006 by luc scholtes                                    *
+*  Copyright (C) 2006 by luc Scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
+*  Copyright (C) 2008 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -42,7 +44,7 @@ void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
 	{
 		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
-		if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_f porosity" << endl;
+		if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
 	}
 }
 
@@ -122,7 +124,8 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
-	<< lexical_cast<string> ( porosity )
+	<< lexical_cast<string> ( porosity ) << " "
+	<< lexical_cast<string> ( kinematicE )
 	<< endl;
 }
 

@@ -227,7 +227,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 	{
 		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
 		{
-			cerr << "Compression started" << endl;
+			LOG_INFO ("Compression started");
 		}
 		// if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
 		Real dt = Omega::instance().getTimeStep();

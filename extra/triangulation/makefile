@@ -61,6 +61,12 @@ RegularTriangulation$(OBJ_EXT): RegularTriangulation.cpp
 
 Tenseur3$(OBJ_EXT): Tenseur3.cpp
 	$(CGAL_CXX) $(CXXFLAGS) $(OBJ_OPT) Tenseur3.cpp
+	
+TriaxialState$(OBJ_EXT): TriaxialState.cpp
+	$(CGAL_CXX) $(CXXFLAGS) $(OBJ_OPT) TriaxialState.cpp
+	
+KinematicLocalisationAnalyser$(OBJ_EXT): KinematicLocalisationAnalyser.cpp
+	$(CGAL_CXX) $(CXXFLAGS) $(OBJ_OPT) KinematicLocalisationAnalyser.cpp
 
 Tesselation$(OBJ_EXT): Tesselation.cpp
 	$(CGAL_CXX) $(CXXFLAGS) $(OBJ_OPT) Tesselation.cpp
@@ -74,12 +80,18 @@ test$(EXE_EXT): test$(OBJ_EXT)\
 	-L. -lTesselationWrapper -lCGAL_static
 	
 libTesselationWrapper.a : 	TesselationWrapper$(OBJ_EXT) \
+				Tenseur3$(OBJ_EXT) \
 				Tesselation$(OBJ_EXT) \
-				RegularTriangulation$(OBJ_EXT)
+				RegularTriangulation$(OBJ_EXT) \
+				TriaxialState$(OBJ_EXT) \
+				KinematicLocalisationAnalyser$(OBJ_EXT)
 	 		ar cr	libTesselationWrapper.a \
-				TesselationWrapper$(OBJ_EXT) \
+	 			TesselationWrapper$(OBJ_EXT) \
+				Tenseur3$(OBJ_EXT) \
 				Tesselation$(OBJ_EXT) \
-				RegularTriangulation$(OBJ_EXT)
+				RegularTriangulation$(OBJ_EXT) \
+				TriaxialState$(OBJ_EXT) \
+				KinematicLocalisationAnalyser$(OBJ_EXT)
 	
 TesselationWrapper$(OBJ_EXT): TesselationWrapper.cpp 
 	$(CGAL_CXX) $(CXXFLAGS) $(OBJ_OPT) TesselationWrapper.cpp $(LDFLAGS)

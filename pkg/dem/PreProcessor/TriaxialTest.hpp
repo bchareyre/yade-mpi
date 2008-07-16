@@ -24,7 +24,7 @@ class TriaxialStressController;
 class TriaxialCompressionEngine;
 class TriaxialStateRecorder;
 
-/*! \brief Isotropic compression + uniaxial compression test
+/*! \brief Isotropic compression + triaxial compression test
 
 	This preprocessor is designed to :
 	1/ generate random loose packings and compress them under isotropic confining stress, either squeezing the packing between moving rigid boxes or expanding the particles while boxes are fixed (depending on flag "InternalCompaction").

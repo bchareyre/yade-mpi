@@ -13,6 +13,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-common/Force.hpp>
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 
 
 
@@ -179,7 +180,8 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 	   else
 		translation = wall_max_vel * Mathr::Sign(translation)*Omega::instance().getTimeStep();
 	}
-	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
+	//previousTranslation[wall] = (1-wallDamping)*translation*normal[wall];// + 0.7*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
+	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
 	//cerr << "translation = " << previousTranslation[wall] << endl;
 	p->se3.position += previousTranslation[wall];
 	if(log)TRVAR2(previousTranslation,p->se3.position);
@@ -304,6 +306,9 @@ void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multipl
 		{
 			(static_cast<InteractingSphere*> ((*bi)->interactingGeometry.get()))->radius *= multiplier;
 			(static_cast<Sphere*>((*bi)->geometricalModel.get()))->radius *= multiplier;
+			(static_cast<ParticleParameters*>((*bi)->physicalParameters.get()))->mass *= pow(multiplier,3);
+			(static_cast<RigidBodyParameters*>((*bi)->physicalParameters.get()))->inertia *= pow(multiplier,5);
+			
 		}
 	}
 	// << "bouclesurInteraction" << endl;
@@ -342,10 +347,10 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if ((*ii)->isReal) {
 			const shared_ptr<Interaction>& contact = *ii;
-			Real fn = (static_cast<ElasticContactInteraction*> ((contact->interactionPhysics.get()))->normalForce+static_cast<ElasticContactInteraction*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
-			if (fn!=0)
+			Real f = (static_cast<ElasticContactInteraction*> ((contact->interactionPhysics.get()))->normalForce+static_cast<ElasticContactInteraction*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
+			if (f!=0)
 			{
-			MeanForce += Mathr::Sqrt(fn);
+			MeanForce += Mathr::Sqrt(f);
 			++nForce;
 			}
 		}
