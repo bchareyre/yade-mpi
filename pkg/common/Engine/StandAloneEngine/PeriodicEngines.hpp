@@ -65,6 +65,8 @@ class StretchPeriodicEngine: public PeriodicEngine{
 			REGISTER_ATTRIBUTE(realLim);
 			REGISTER_ATTRIBUTE(virtLim);
 			REGISTER_ATTRIBUTE(iterLim);
+			REGISTER_ATTRIBUTE(mayStretch);
+			REGISTER_ATTRIBUTE(stretchFactor);
 		}
 	REGISTER_CLASS_NAME(StretchPeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
@@ -72,7 +74,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 REGISTER_SERIALIZABLE(StretchPeriodicEngine,false);
 
 // obsolete, too complicated etc
-#if 1 
+#if 0 
 
 /* Run an action with adjustable and constrained periodicity (real time, virtual time, iteration)
  *

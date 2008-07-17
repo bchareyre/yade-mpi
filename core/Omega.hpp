@@ -87,8 +87,6 @@ class Omega : public Singleton<Omega>
 		string				 simulationFileName;
 		void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 
-		public: long int stopAtIteration;
-
 	public :
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
@@ -140,7 +138,7 @@ class Omega : public Singleton<Omega>
 		void		setSimulationFileName(const string);
 		string	getSimulationFileName();
 		void		loadSimulation();
-		void		saveSimulation(const string name, bool recover=false);
+		void		saveSimulation(const string name);
 		void 		saveSimulationToStream(std::ostream&);
 		void 		loadSimulationFromStream(std::istream&);
 

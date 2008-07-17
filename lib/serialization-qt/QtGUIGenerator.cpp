@@ -179,7 +179,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 	QPoint p = widget->pos();
 	widget->move(p.x()+translationX,p.y()+translationY);
 	
-	s->unregisterSerializableAttributes(false);
+	//s->unregisterSerializableAttributes(false);
 
 }
 
@@ -234,7 +234,7 @@ void QtGUIGenerator::deserialize(Serializable* s)
 	}
 
 	//ac.markProcessed();
-	s->unregisterSerializableAttributes(true);
+	//s->unregisterSerializableAttributes(true);
 
 }
 

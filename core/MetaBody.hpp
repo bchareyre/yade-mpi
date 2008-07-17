@@ -11,9 +11,10 @@
 #ifndef METABODY_HPP
 #define METABODY_HPP
 
-#include "Body.hpp"
-#include "BodyContainer.hpp"
-#include "Engine.hpp"
+#include"Body.hpp"
+#include"BodyContainer.hpp"
+#include"Engine.hpp"
+#include"DisplayParameters.hpp"
 
 class MetaBody : public Body
 {
@@ -27,23 +28,20 @@ class MetaBody : public Body
 		vector<shared_ptr<Serializable> > miscParams; // will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)
 		//! tags like mp3 tags: author, date, version, description etc.
 		list<string> tags;
+		//! "hash maps" of display parameters
+		vector<shared_ptr<DisplayParameters> > dispParams;
 
 		MetaBody ();
 
 		void moveToNextTimeStep();
 
-		void setTimeSteppersActive(bool a); // FIXME - wtf ?
+		void setTimeSteppersActive(bool a);
 		shared_ptr<Engine> engineByName(string s);
-
-		/* Recovery stuff: copy of state variables from Omega that should be copied back over. 	
-		 *	Copying is being done ine Omega::loadSimulation and Omega::saveSimulation -- keep vars in sync.
-		 * */
-		bool recover;
-		long recoverStopAtIteration;
 
 		Real dt;
 		long currentIteration;
 		Real simulationTime;
+		long stopAtIteration;
 
 		bool needsInitializers;
 /// Serialization

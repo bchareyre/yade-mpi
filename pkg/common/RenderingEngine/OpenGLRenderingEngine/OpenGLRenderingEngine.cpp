@@ -555,8 +555,8 @@ void OpenGLRenderingEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(Shadow_volumes);
 	REGISTER_ATTRIBUTE(Fast_shadow_volume);
 
-	//REGISTER_ATTRIBUTE(clipPlaneSe3);
-	//REGISTER_ATTRIBUTE(clipPlaneActive); // oh, serialization chokes on vector<bool> ... :-|
+	REGISTER_ATTRIBUTE(clipPlaneSe3);
+	REGISTER_ATTRIBUTE(clipPlaneActive);
 }
 
 

@@ -36,12 +36,12 @@ def reduceData(l):
 	if l>maxDataLen:
 		global plotDataCollector
 		if not plotDataCollector: plotDataCollector=o.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
-		if plotDataCollector['mayDouble']: # may we double the period without getting over limits?
+		if plotDataCollector['mayStretch']: # may we double the period without getting over limits?
+			plotDataCollector['stretchFactor']=2. # just to make sure
 			print "Reducing data: %d > %d"%(l,maxDataLen)
 			for d in data: data[d]=data[d][::2]
-			for attr in ['virtTimeLim','realTimeLim','iterLim']:
-				val=plotDataCollector[attr]
-				plotDataCollector[attr]=[val[0],val[1]*2,val[2]]
+			for attr in ['virtPeriod','realPeriod','iterPeriod']:
+				if(plotDataCollector[attr]>0) plotDataCollector[attr]=2*plotDataCollector[attr]
 
 def reverseData():
 	for k in data: data[k].reverse()

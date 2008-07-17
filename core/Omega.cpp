@@ -66,7 +66,6 @@ void Omega::reset(){
 
 void Omega::init(){
 	simulationFileName="";
-	stopAtIteration = 0;
 	resetRootBody();
 }
 
@@ -145,49 +144,35 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 }
 
 
-bool Omega::isInheritingFrom(const string& className, const string& baseClassName )
-{
+bool Omega::isInheritingFrom(const string& className, const string& baseClassName){
 	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
-
 
 void Omega::scanPlugins()
 {
 	FOREACH(string dld,preferences->dynlibDirectories) ClassFactory::instance().addBaseDirectory(dld);
-			
 	vector<string> dynlibsList;
-	FOREACH(string si, preferences->dynlibDirectories)	{
+	FOREACH(string si, preferences->dynlibDirectories){
 		filesystem::path directory(si);
-		if ( filesystem::exists( directory ) )	{
-			filesystem::directory_iterator di( directory );
-			filesystem::directory_iterator diEnd;
-			for ( ; di != diEnd; ++di )
-			{
-				// node is not a directory and is either regular file or non-dangling symlink; and extension is not ".a"; AND moreover transforming it to library name and back to filename is identity; otherwise the file wouldn't be loaded by the DynLibManager anyway
-				if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a" &&
-					ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(*di)))==(di->leaf())){
-					filesystem::path name(filesystem::basename((*di)));
-					int prevLength = (*di).leaf().size();
-					int length = name.leaf().size();
-					// warning: this can produce invalid name (too short).
-					// 0-length names are dumped directly
-					// names 0<length<4 should fail assertion in DynLibManager::systemNameToLibName
-					// the whole loading "logic" should be rewritten from scratch...
-					//
-					// my reading of what it is supposed to do: returns the part of filename before the first dot... !!??
-					// humm, perhaps it is a result of obfuscative c++ contest (obfuscative c++ = oxymoron, anyway)
-					while (length!=prevLength) { prevLength=length;	name=filesystem::path(filesystem::basename(name)); length = name.leaf().size();
-					}
-					if(name.leaf().length()<1) continue; // filter out 0-length filenames
-					if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
-						LOG_DEBUG("Added plugin: "<<si<<"/"<<di->leaf()<<".");
-						dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
-					}
-					else LOG_DEBUG("Possible plugin discarded: "<<si<<"/"<<name.leaf()<<".");
-				} else LOG_DEBUG("File not considered a plugin: "<<di->leaf()<<".");
-			}
+		if(!filesystem::exists(directory)){LOG_ERROR("Nonexistent plugin directory: "<<directory.native_directory_string()<<".");continue; }
+		filesystem::directory_iterator di(directory),diEnd;
+		FOREACH(filesystem::path pth,std::make_pair(di,diEnd)){
+			// node is not a directory and is either regular file or non-dangling symlink; and extension is not ".a"; AND moreover transforming it to library name and back to filename is identity; otherwise the file wouldn't be loaded by the DynLibManager anyway
+			if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a" &&
+				ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(pth)))==(pth.leaf())){
+				filesystem::path name(filesystem::basename(pth));
+				// warning: this can produce invalid name (too short).
+				// 0-length names are dumped directly
+				// names 0<length<4 should fail assertion in DynLibManager::systemNameToLibName
+				// the whole loading "logic" should be rewritten from scratch...
+				if(name.leaf().length()<1) continue; // filter out 0-length filenames
+				if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
+					LOG_DEBUG("Added plugin: "<<si<<"/"<<pth.leaf()<<".");
+					dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
+				}
+				else LOG_DEBUG("Possible plugin discarded: "<<si<<"/"<<name.leaf()<<".");
+			} else LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<".");
 		}
-		else LOG_ERROR("Nonexistent plugin directory: "<<directory.native_directory_string()<<".");
 	}
 
 	bool allLoaded = true;
@@ -230,19 +215,11 @@ void Omega::loadSimulationFromStream(std::istream& stream){
 	LOG_DEBUG("Loading simulation from stream.");
 	resetRootBody();
 	timeInit();
-	shared_ptr<IOFormatManager> ioManager(YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared("XMLFormatManager")));
-	shared_ptr<Archive> ac=Archive::create("rootBody",rootBody);
-	string tmp=ioManager->beginDeserialization(stream,*ac);
-	ac->deserialize(stream,*ac,tmp);
-	ioManager->finalizeDeserialization(stream,*ac);
+	IOFormatManager::loadFromStream("XMLFormatManager",stream,"rootBody",rootBody);
 }
 void Omega::saveSimulationToStream(std::ostream& stream){
 	LOG_DEBUG("Saving simulation to stream.");
-	shared_ptr<IOFormatManager> ioManager(YADE_PTR_CAST<IOFormatManager>(ClassFactory::instance().createShared("XMLFormatManager")));
-	shared_ptr<Archive> ac=Archive::create("rootBody",rootBody);
-	ioManager->beginSerialization(stream, *ac);
-	ac->serialize(stream, *ac, 1);
-	ioManager->finalizeSerialization(stream, *ac);
+	IOFormatManager::saveToStream("XMLFormatManager",stream,"rootBody",rootBody);
 }
 
 void Omega::loadSimulation()
@@ -268,25 +245,14 @@ void Omega::loadSimulation()
 	timeInit();
 
 	LOG_DEBUG("Simulation loaded");
-
-	if(rootBody->recover){
-		LOG_INFO("Simulation recovery effective.");
-		stopAtIteration=rootBody->recoverStopAtIteration;
-		rootBody->recover=false;
-	}
 }
 
 
 
-void Omega::saveSimulation(const string name, bool recover)
+void Omega::saveSimulation(const string name)
 {
 	if(name.size()==0) throw yadeBadFile("Filename with zero length.");
 	LOG_INFO("Saving file " << name);
-	if(recover){
-		LOG_INFO("Simulation recovery enabled.");
-		rootBody->recover=true;
-		rootBody->recoverStopAtIteration=stopAtIteration;
-	}
 
 	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.gz") || algorithm::ends_with(name,".xml.bz2")){
 		FormatChecker::format=FormatChecker::XML;
@@ -297,10 +263,8 @@ void Omega::saveSimulation(const string name, bool recover)
 		IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
 	}
 	else {
-		rootBody->recover=false;
 		throw(yadeBadFile(("Filename extension not recognized in `"+name+"'").c_str()));
 	}
-	rootBody->recover=false;
 }
 
 

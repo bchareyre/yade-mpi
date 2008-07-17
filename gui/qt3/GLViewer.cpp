@@ -17,6 +17,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
+#include<boost/filesystem/operations.hpp>
 
 CREATE_LOGGER(GLViewer);
 
@@ -121,34 +122,44 @@ void GLViewer::startClipPlaneManipulation(int planeNo){
 	displayMessage("Manipulating clip plane #"+lexical_cast<string>(planeNo+1)+(grp.empty()?grp:"(bound planes:"+grp+")"));
 }
 
+string GLViewer::getState(){
+	QString origStateFileName=stateFileName();
+	char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str);
+	setStateFileName(tmpnam_str); saveStateToFile(); setStateFileName(origStateFileName);
+	LOG_DEBUG("State saved to temp file "<<tmpnam_str);
+	// read tmp file contents and return it as string
+	// this will replace all whitespace by space (nowlines will disappear, which is what we want)
+	ifstream in(tmpnam_str); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
+	boost::filesystem::remove(boost::filesystem::path(tmpnam_str));
+	return ret;
+}
+
+void GLViewer::setState(string state){
+	char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str);
+	std::ofstream out(tmpnam_str);
+	if(!out.good()){ LOG_ERROR("Error opening temp file `"<<tmpnam_str<<"', loading aborted."); return; }
+	out<<state; out.close();
+	LOG_DEBUG("Will load state from temp file "<<tmpnam_str);
+	QString origStateFileName=stateFileName(); setStateFileName(tmpnam_str); restoreStateFromFile(); setStateFileName(origStateFileName);
+	boost::filesystem::remove(boost::filesystem::path(tmpnam_str));
+}
+
 void GLViewer::keyPressEvent(QKeyEvent *e)
 {
-	if (e->key()==Qt::Key_M && selectedName() >= 0){
-		if(!(isMoving=!isMoving)){displayMessage("Moving done."); mouseMovesCamera();}
-		else{ displayMessage("Moving selected object"); mouseMovesManipulatedFrame();}
+	if(false){}
+	/* special keys: Escape and Space */
+	else if(e->key()==Qt::Key_Escape){ resetManipulation(); displayMessage("Manipulating scene."); }
+	else if(e->key()==Qt::Key_Space){
+		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; }
 	}
-	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position()), updateGL();
-	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); updateGL(); }
-
-	else if(e->key()==Qt::Key_Escape){ resetManipulation();displayMessage("Manipulating scene."); }
+	/* function keys */
 	else if(e->key()==Qt::Key_F1 || e->key()==Qt::Key_F2 || e->key()==Qt::Key_F3 /* || ... */ ){
 		int n=0; if(e->key()==Qt::Key_F1) n=1; else if(e->key()==Qt::Key_F2) n=2; else if(e->key()==Qt::Key_F3) n=3; assert(n>0); int planeId=n-1;
 		if(planeId>=renderer->clipPlaneNum) return;
 		if(planeId!=manipulatedClipPlane) startClipPlaneManipulation(planeId);
-		updateGL();
 	}
-	else if(e->key()==Qt::Key_R){ // reverse the plane
-		if(manipulatedClipPlane>=0 && manipulatedClipPlane<renderer->clipPlaneNum){
-			manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
-			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane-1)+" reversed.");
-		}
-		updateGL();
-	}
-	else if(e->key()==Qt::Key_F2){ startClipPlaneManipulation(1); updateGL(); }
-	else if(e->key()==Qt::Key_Space){
-		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; updateGL(); }
-	}
-	else if(e->key()==Qt::Key_0 &&(e->state() & AltButton)) {boundClipPlanes.clear(); displayMessage("Cleared the bound group.");}
+	/* numbers */
+	else if(e->key()==Qt::Key_0 &&(e->state() & AltButton)) { boundClipPlanes.clear(); displayMessage("Cleared bound planes group.");}
 	else if(e->key()==Qt::Key_1 || e->key()==Qt::Key_2 || e->key()==Qt::Key_3 /* || ... */ ){
 		int n=0; if(e->key()==Qt::Key_1) n=1; else if(e->key()==Qt::Key_2) n=2; else if(e->key()==Qt::Key_3) n=3; assert(n>0); int planeId=n-1;
 		if(planeId>=renderer->clipPlaneNum) return; // no such clipping plane
@@ -161,42 +172,73 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			manipulatedFrame()->setOrientation(qglviewer::Quaternion(o[0],o[1],o[2],o[3]));
 			displayMessage("Copied orientation from plane #1");
 		}
-		updateGL();
 	}
-	else if(e->key()==Qt::Key_S && (e->state()&AltButton)){
-		setStateFileName("/tmp/qglviewerState.xml");
-		saveStateToFile();
-		setStateFileName(QString::null);
+	else if(e->key()==Qt::Key_7 || e->key()==Qt::Key_8 || e->key()==Qt::Key_9){
+		int nn=-1; if(e->key()==Qt::Key_7)nn=0; else if(e->key()==Qt::Key_8)nn=1; else if(e->key()==Qt::Key_9)nn=2; assert(nn>=0); size_t n=(size_t)nn;
+		vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getRootBody()->dispParams;
+		if(e->state() & AltButton){// save display parameters
+			LOG_DEBUG("Saving display parameters to #"<<n);
+			if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
+			shared_ptr<DisplayParameters>& dp=dispParams[n];
+			ostringstream oglre; IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
+			IOFormatManager::saveToFile("XMLFormatManager","/tmp/rendererConfig.xml","renderer",renderer);
+			dp->setValue("OpenGLRenderingEngine",oglre.str());
+			dp->setValue("GLViewer",GLViewer::getState());
+		} else { // load display parameters
+			LOG_DEBUG("Loading display parameters from #"<<n);
+			if(dispParams.size()<=(size_t)n){LOG_ERROR("Display parameters #"<<n<<" don't exist (number of entries "<<dispParams.size()<<")"); return;}
+			const shared_ptr<DisplayParameters>& dp=dispParams[n];
+			string val;
+			if(dp->getValue("OpenGLRenderingEngine",val)){ istringstream oglre(val); IOFormatManager::loadFromStream("XMLFormatManager",oglre,"renderer",renderer);}
+			else { LOG_WARN("OpenGLRenderingEngine configuration not found in display parameters, skipped.");}
+			if(dp->getValue("GLViewer",val)){ GLViewer::setState(val);}
+			else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
+		}
 	}
-
-	else if(e->key()==Qt::Key_D) wasDynamic = true;
-	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; updateGL();}
+	/* letters alphabetically */
+	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
+	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); }
+	else if(e->key()==Qt::Key_D) wasDynamic=true;
+	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
+	else if (e->key()==Qt::Key_M && selectedName() >= 0){
+		if(!(isMoving=!isMoving)){displayMessage("Moving done."); mouseMovesCamera();}
+		else{ displayMessage("Moving selected object"); mouseMovesManipulatedFrame();}
+	}
+	else if (e->key() == Qt::Key_T) camera()->setType(camera()->type()==qglviewer::Camera::ORTHOGRAPHIC ? qglviewer::Camera::PERSPECTIVE : qglviewer::Camera::ORTHOGRAPHIC);
+	else if(e->key()==Qt::Key_O) camera()->setFieldOfView(camera()->fieldOfView()*0.9);
+	else if(e->key()==Qt::Key_P) camera()->setFieldOfView(camera()->fieldOfView()*1.1);
+	else if(e->key()==Qt::Key_R){ // reverse the clipping plane; revolve around scene center if no clipping plane selected
+		if(manipulatedClipPlane>=0 && manipulatedClipPlane<renderer->clipPlaneNum){
+			manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
+			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane-1)+" reversed.");
+		}
+		else {
+			camera()->setRevolveAroundPoint(sceneCenter());
+		}
+	}
+	else if(e->key()==Qt::Key_S){
+		LOG_DEBUG("Saving QGLViewer state to /tmp/qglviewerState.xml");
+		setStateFileName("/tmp/qglviewerState.xml"); saveStateToFile(); setStateFileName(QString::null);
+	}
 	else if(e->key()==Qt::Key_X || e->key()==Qt::Key_Y || e->key()==Qt::Key_Z){
 		int axisIdx=(e->key()==Qt::Key_X?0:(e->key()==Qt::Key_Y?1:2));
 		if(manipulatedClipPlane<0){ drawGridXYZ[axisIdx]=!drawGridXYZ[axisIdx]; }
 		else{ // align clipping plane with world axis
-			// x: (0,1,0),pi/2
-			// y: (0,0,1),pi/2
-			// z: (1,0,0),0
+			// x: (0,1,0),pi/2; y: (0,0,1),pi/2; z: (1,0,0),0
 			qglviewer::Vec axis(0,0,0); axis[(axisIdx+1)%3]=1;
 			manipulatedFrame()->setOrientation(qglviewer::Quaternion(axis,axisIdx==2?0:Mathr::PI/2));
 		}
-		updateGL();
 	}
-	else if(e->key()==Qt::Key_Y) drawGridXYZ[1]=!drawGridXYZ[1], updateGL();
-	else if(e->key()==Qt::Key_Z) drawGridXYZ[2]=!drawGridXYZ[2], updateGL();
+
+
 // FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
-	else if(e->key()==Qt::Key_Delete) Omega::instance().isoValue-=0.05, updateGL();
-	else if(e->key()==Qt::Key_Insert) Omega::instance().isoValue+=0.05, updateGL();
-	else if(e->key()==Qt::Key_Next) Omega::instance().isoThick-=0.05, updateGL();
-	else if(e->key()==Qt::Key_Prior)	Omega::instance().isoThick+=0.05, updateGL();
-	else if(e->key()==Qt::Key_End) Omega::instance().isoSec=std::max(1, Omega::instance().isoSec-1), updateGL();
-	else if(e->key()==Qt::Key_Home) Omega::instance().isoSec+=1, updateGL();
+	else if(e->key()==Qt::Key_Delete) Omega::instance().isoValue-=0.05;
+	else if(e->key()==Qt::Key_Insert) Omega::instance().isoValue+=0.05;
+	else if(e->key()==Qt::Key_Next) Omega::instance().isoThick-=0.05;
+	else if(e->key()==Qt::Key_Prior)	Omega::instance().isoThick+=0.05;
+	else if(e->key()==Qt::Key_End) Omega::instance().isoSec=std::max(1, Omega::instance().isoSec-1);
+	else if(e->key()==Qt::Key_Home) Omega::instance().isoSec+=1;
 // FIXME END
-	else if (e->key() == Qt::Key_T) camera()->setType(camera()->type()==qglviewer::Camera::ORTHOGRAPHIC ? qglviewer::Camera::PERSPECTIVE : qglviewer::Camera::ORTHOGRAPHIC), updateGL();
-	else if(e->key()==Qt::Key_O) camera()->setFieldOfView(camera()->fieldOfView()*0.9), updateGL();
-	else if(e->key()==Qt::Key_P) camera()->setFieldOfView(camera()->fieldOfView()*1.1), updateGL();
-	else if(e->key()==Qt::Key_R) camera()->setRevolveAroundPoint(sceneCenter()), updateGL();
 
 //////////////////////////////////////////////
 // FIXME that all should be in some nice GUI
@@ -221,9 +263,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 // FIXME END
 //////////////////////////////////////////////
 //
-	else if( e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space )
-		QGLViewer::keyPressEvent(e);
+	else if(e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space) QGLViewer::keyPressEvent(e);
+	updateGL();
 }
+
 /* Calculate medians for x, y and z coordinates of all bodies;
  *then set scene center to median position and scene radius to 2*inter-quartile distance.
  *
@@ -254,15 +297,12 @@ void GLViewer::centerMedianQuartile(){
 	showEntireScene();
 }
 
-void GLViewer::centerScene()
-{
+void GLViewer::centerScene(){
 	MetaBody* rb=Omega::instance().getRootBody().get();
 	if (!rb) return;
 
-	if(rb->bodies->size() < 500)
-		displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move. Use / * - + for cutting plane.", 6000);
-	else
-		displayMessage("More than 500 bodies. Moving not possible. Use / * - + for cutting plane.", 6000);
+	if(rb->bodies->size() < 500) displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move. Use / * - + for cutting plane.", 6000);
+	else displayMessage("More than 500 bodies. Moving not possible. Use / * - + for cutting plane.", 6000);
 	Vector3r min,max;	
 	if(rb->boundingVolume){
 		min=rb->boundingVolume->min; max=rb->boundingVolume->max;
@@ -419,3 +459,30 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
 		default: break; // avoid warning
 	}
 }
+
+// cut&paste from QGLViewer::domElement documentation
+QDomElement GLViewer::domElement(const QString& name, QDomDocument& document) const{
+	QDomElement de=document.createElement("gridXYZ");
+	string val; if(drawGridXYZ[0])val+="x"; if(drawGridXYZ[1])val+="y"; if(drawGridXYZ[2])val+="z";
+	de.setAttribute("normals",val);
+	QDomElement res=QGLViewer::domElement(name,document);
+	res.appendChild(de);
+	return res;
+}
+
+// cut&paste from QGLViewer::initFromDomElement documentation
+void GLViewer::initFromDOMElement(const QDomElement& element){
+	QGLViewer::initFromDOMElement(element);
+	QDomElement child=element.firstChild().toElement();
+	while (!child.isNull()){
+		if (child.tagName()=="gridXYZ"){
+			if (child.hasAttribute("normals")){
+				string val=child.attribute("normals").lower();
+				drawGridXYZ[0]=false; drawGridXYZ[1]=false; drawGridXYZ[2]=false;
+				if(val.find("x")!=string::npos)drawGridXYZ[0]=true; if(val.find("y")!=string::npos)drawGridXYZ[1]=true; if(val.find("z")!=string::npos)drawGridXYZ[2]=true;
+			}
+		}
+		child = child.nextSibling().toElement();
+	}
+}
+

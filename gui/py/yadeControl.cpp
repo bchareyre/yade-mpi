@@ -382,17 +382,17 @@ class pyOmega{
 	double dt_get(){return OMEGA.getTimeStep();}
 	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt);}
 
-	long stopAtIter_get(){return OMEGA.stopAtIteration; }
-	void stopAtIter_set(long s){OMEGA.stopAtIteration=s; }
+	long stopAtIter_get(){return OMEGA.getRootBody()->stopAtIteration; }
+	void stopAtIter_set(long s){OMEGA.getRootBody()->stopAtIteration=s; }
 
 	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
 	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
 	void run(long int numIter=-1){
-		if(numIter>0) OMEGA.stopAtIteration=OMEGA.getCurrentIteration()+numIter;
+		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		//else OMEGA.stopAtIteration=-1;
 		OMEGA.startSimulationLoop();
-		long toGo=OMEGA.stopAtIteration-OMEGA.getCurrentIteration();
+		long toGo=OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration();
 		LOG_DEBUG("RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!");
 	}
 	void pause(){OMEGA.stopSimulationLoop(); LOG_DEBUG("PAUSE!");}
@@ -411,9 +411,9 @@ class pyOmega{
 		OMEGA.reset();
 	}
 
-	void save(std::string fileName, bool recover=false){
+	void save(std::string fileName){
 		assertRootBody();
-		OMEGA.saveSimulation(fileName,recover);
+		OMEGA.saveSimulation(fileName);
 		OMEGA.setSimulationFileName(fileName);
 		LOG_DEBUG("SAVE!");
 	}
@@ -475,7 +475,6 @@ class pyOmega{
 };
 	
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_save_overloads,save,1,2);
 
 class pySTLImporter : public STLImporter {
     public:
@@ -502,7 +501,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set)
 		.add_property("usesTimeStepper",&pyOmega::usesTimeStepper_get,&pyOmega::usesTimeStepper_set)
 		.def("load",&pyOmega::load)
-		.def("save",&pyOmega::save,omega_save_overloads())
+		.def("save",&pyOmega::save)
 		.def("saveSpheres",&pyOmega::saveSpheres)
 		.def("run",&pyOmega::run,omega_run_overloads())
 		.def("pause",&pyOmega::pause)

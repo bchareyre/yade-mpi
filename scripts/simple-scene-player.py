@@ -44,7 +44,10 @@ o.dt=.4*utils.PWaveTimeStep()
 o.run(15000)
 o.wait()
 
+def setWire():
+	o=Omega()
+	for b in o.bodies: b.shape['wire']=True
 # you must have saved the viewer state by using Alt-S in the view...
-utils.qtCreateVideo('/tmp/player.sqlite','/tmp/player.ogg','/tmp/qglviewerState.xml',stride=10,fps=12)
+utils.qtCreateVideo('/tmp/player.sqlite','/tmp/player.ogg','/tmp/qglviewerState.xml',stride=10,fps=12,postLoadHook='setWire()')
 
 quit()

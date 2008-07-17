@@ -60,7 +60,6 @@ class Serializable : public Factorable
 		virtual void serialize(any& )	{ throw SerializableError(SerializationExceptions::SetFunctionNotDeclared); };
 		virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
 
-		//virtual void __HACK__D@_N@T_ABUSE_postProcessAttributes(bool deserializating){postProcessAttributes;} /* public access to protected postProcessAttributes, from python */
 		virtual void postProcessAttributes(bool /*deserializing*/) {};
 
 	private :

@@ -31,7 +31,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		int Draw_mask;
 
 		vector<Se3r> clipPlaneSe3;
-		vector<bool> clipPlaneActive;
+		vector<int> clipPlaneActive; // should be bool, but serialization doesn't handle vector<bool>
 		const int clipPlaneNum;
 
 		vector<Se3r> refSe3;

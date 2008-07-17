@@ -64,6 +64,15 @@ class GLViewer : public QGLViewer
 		void mouseMovesManipulatedFrame(qglviewer::Constraint* c=NULL);
 		void resetManipulation();
 		void startClipPlaneManipulation(int planeNo);
+		//! get QGLViewer state as string (XML); QGLViewer normally only supports saving state to file.
+		string getState();
+		//! set QGLViewer state from string (XML); QGLVIewer normally only supports loading state from file.
+		void setState(string);
+
+		//! Adds our attributes to the QGLViewer state that can be saved
+		QDomElement domElement(const QString& name, QDomDocument& document) const;
+		//! Adds our attributes to the QGLViewer state that can be restored
+		void initFromDOMElement(const QDomElement& element);
 		int viewId;
 
 

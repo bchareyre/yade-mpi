@@ -18,7 +18,7 @@ void SimulationFlow::singleAction()
 		OO.getRootBody()->moveToNextTimeStep();
 		OO.incrementCurrentIteration();
 		OO.incrementSimulationTime();
-		if(OO.stopAtIteration>0 && OO.getCurrentIteration()==OO.stopAtIteration){
+		if(OO.getRootBody()->stopAtIteration>0 && OO.getCurrentIteration()==OO.getRootBody()->stopAtIteration){
 			setTerminate(true);
 			return;
 		}

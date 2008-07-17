@@ -81,18 +81,14 @@ class IOFormatManager : public Factorable
 		static void deserializeFundamentalSerializable(istream& stream, Archive& ac, const string& str);
 
 		template<typename Type>
+		static void loadFromStream(const string& libName, istream& in,const string& name, Type& t);
+		template<typename Type>
+		static void saveToStream(const string& libName, ostream& out,const string& name, Type& t);
+		template<typename Type>
 		static void loadFromFile(const string& libName, const string& fileName,const string& name, Type& t);
-		
 		template<typename Type>
 		static void saveToFile(const string& libName, const string& fileName,const string& name, Type& t);
 		
-		
-		template<typename Type>
-		void loadArchive(const string& libName, istream& stream, Type& t, const string& name);
-		
-		template<typename Type>
-		void saveArchive(const string& libName, ostream& stream, Type& t, const string& name);
-
 	REGISTER_CLASS_NAME(IOFormatManager);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 

@@ -15,6 +15,7 @@
 #include "Archive.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/type_traits.hpp>
+#include<boost/algorithm/string.hpp>
 
 using namespace boost; 
 
@@ -41,11 +42,10 @@ struct FundamentalHandler< string >
 			const string * tmpStr = any_cast<const string*>(a);
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmp=*tmpStr;
-			#define _RESTORE_SPECIAL(escape,special)pos=0; while((pos=tmp->find(escape,pos))!=string::npos){tmp->replace(pos,2,special);}
-			unsigned long pos;
-			_RESTORE_SPECIAL("\\n","\n"); _RESTORE_SPECIAL("\\t","\t"); _RESTORE_SPECIAL("\\'","\"");
-			_RESTORE_SPECIAL("\\[","<"); _RESTORE_SPECIAL("\\]",">"); _RESTORE_SPECIAL("\\\\","\\"); // order matters!
-			#undef _RESTORE_SPECIAL
+			#define _HANDLE_SPECIAL(special,escape) boost::algorithm::replace_all(*tmp,escape,special);
+			_HANDLE_SPECIAL("\n","&br;"); _HANDLE_SPECIAL("\t","&tab;"); _HANDLE_SPECIAL("<","&lt;"); _HANDLE_SPECIAL(">","&gt;"); _HANDLE_SPECIAL("\"","&quot;"); _HANDLE_SPECIAL("'","&apos;"); _HANDLE_SPECIAL(" ","&nbsp;"); _HANDLE_SPECIAL("[","&lsquare;"); _HANDLE_SPECIAL("]","&rsquare;"); _HANDLE_SPECIAL("{","&lcurly;"); _HANDLE_SPECIAL("}","&rcurly;");
+			_HANDLE_SPECIAL("&","&amp;");
+			#undef _HANDLE_SPECIAL
 			
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
@@ -67,10 +67,9 @@ struct FundamentalHandler< string >
 			string * tmpStr = any_cast<string*>(a);
 			string * tmp = any_cast<string*>(ac.getAddress());
 			*tmpStr=*tmp;
-			#define _ESCAPE_SPECIAL(special,escape) pos=0; while((pos=tmpStr->find(special,pos))!=string::npos){tmpStr->replace(pos,1,escape); pos+=2;}
-			unsigned long pos;
-			_ESCAPE_SPECIAL("\\","\\\\"); _ESCAPE_SPECIAL('\n',"\\n"); _ESCAPE_SPECIAL('\t',"\\t"); _ESCAPE_SPECIAL('\"',"\\'");
-			_ESCAPE_SPECIAL('<',"\\["); _ESCAPE_SPECIAL('>',"\\]");  // order matters!
+			#define _HANDLE_SPECIAL(special,escape) boost::algorithm::replace_all(*tmpStr,special,escape);
+			_HANDLE_SPECIAL("&","&amp;");
+			_HANDLE_SPECIAL("\n","&br;"); _HANDLE_SPECIAL("\t","&tab;"); _HANDLE_SPECIAL("<","&lt;"); _HANDLE_SPECIAL(">","&gt;"); _HANDLE_SPECIAL("\"","&quot;"); _HANDLE_SPECIAL("'","&apos;"); _HANDLE_SPECIAL(" ","&nbsp;"); _HANDLE_SPECIAL("[","&lsquare;"); _HANDLE_SPECIAL("]","&rsquare;"); _HANDLE_SPECIAL("{","&lcurly;"); _HANDLE_SPECIAL("}","&rcurly;");
 			#undef _ESCAPE_SPECIAL
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from string to binary stream

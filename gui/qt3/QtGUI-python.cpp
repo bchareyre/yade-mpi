@@ -48,6 +48,9 @@ void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(Yade
 
  * @param snapBase is basename for .png snapshots. If ommited, tmpnam generates unique basename.
  *
+ * @param postLoadHook is string with python command(s) that will be interpreted after loading if non-empty.
+ * 	Can be used e.g. for adjusting wire display of bodies after loading the simulation.
+ *
  * This function may be especially useful for offsreen rendering using Xvfb
  * (install the xvfb package first). Then run
  *
@@ -65,7 +68,7 @@ void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(Yade
  *
  * @returns tuple of (wildcard,[snap0,snap1,snap2,...]), where the list contains filename of snapshots.
  */
-python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState="",int stride=1){
+python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState="",int stride=1,string postLoadHook=""){
 	evtPLAYER(true); // wait for the window to become ready
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
@@ -73,6 +76,7 @@ python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState=
 	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; }
 	glv->stride=stride;
 	glv->load(savedSim);
+	if(!postLoadHook.empty()){ PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); }
 	glv->saveSnapShots=true;
 	glv->snapshotsBase=snapBase2;
 	if(!savedQGLState.empty()){
@@ -86,7 +90,7 @@ python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState=
 	return python::make_tuple(snapBase2+"-%.04d.png",snaps);
 }
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayer_overloads,runPlayer,2,4);
+BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayer_overloads,runPlayer,2,5);
 
 BOOST_PYTHON_MODULE(qt){
 	def("Generator",evtGENERATOR,evtGENERATOR_overloads(args("wait")));
@@ -96,7 +100,7 @@ BOOST_PYTHON_MODULE(qt){
 	def("center",centerViews);
 	def("Renderer",getRenderer);
 	def("close",Quit);
-	def("runPlayer",runPlayer,runPlayer_overloads(args("viewStateFile","stride")));
+	def("runPlayer",runPlayer,runPlayer_overloads(args("viewStateFile","stride","postLoadHook")));
 
 	BASIC_PY_PROXY_WRAPPER(pyOpenGLRenderingEngine,"GLRenderer")
 		.def("setRefSe3",&pyOpenGLRenderingEngine::setRefSe3);
