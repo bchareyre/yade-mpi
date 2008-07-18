@@ -59,7 +59,7 @@ Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartin
 
 
 void Omega::reset(){
-	finishSimulationLoop();
+	//finishSimulationLoop();
 	joinSimulationLoop();
 	init();
 }
@@ -75,11 +75,9 @@ void Omega::timeInit(){
 	msStartingPauseTime=msStartingSimulationTime;
 }
 
-void Omega::createSimulationLoop(){	simulationLoop   = shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
-void Omega::finishSimulationLoop(){ if (simulationLoop) simulationLoop->stop();}
-void Omega::joinSimulationLoop(){
-	if (simulationLoop){ simulationLoop->stop(); simulationLoop = shared_ptr<ThreadRunner>(); }
-}
+void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new ThreadRunner(&simulationFlow_));}
+void Omega::finishSimulationLoop(){ LOG_DEBUG(""); if (simulationLoop&&simulationLoop->looping())simulationLoop->stop();}
+void Omega::joinSimulationLoop(){ LOG_DEBUG(""); finishSimulationLoop(); if (simulationLoop) simulationLoop=shared_ptr<ThreadRunner>(); }
 
 void Omega::spawnSingleSimulationLoop(){
 	if (simulationLoop){

@@ -44,6 +44,7 @@ class GLViewer : public QGLViewer
 		shared_ptr<OpenGLRenderingEngine> renderer;
 	private :
 		bool 			drawGridXYZ[3];
+		bool 			drawScale;
 		bool			isMoving;
 		bool			wasDynamic;
 		float			cut_plane;
@@ -72,6 +73,10 @@ class GLViewer : public QGLViewer
 		void useDisplayParameters(size_t n);
 		//! Save display parameters (QGOViewer and OpenGLRenderingEngine) to MetaBody::dispParams[n]
 		void saveDisplayParameters(size_t n);
+		//! Get radius of the part of scene that fits the current view
+		float displayedSceneRadius();
+		//! Get center of the part of scene that fits the current view
+		qglviewer::Vec displayedSceneCenter();
 
 		//! Adds our attributes to the QGLViewer state that can be saved
 		QDomElement domElement(const QString& name, QDomDocument& document) const;
@@ -87,5 +92,6 @@ class GLViewer : public QGLViewer
 		virtual void closeEvent(QCloseEvent *e);
 		virtual void postSelection(const QPoint& point);
 		virtual void endSelection(const QPoint &point);
-		virtual void mouseDoubleClickEvent (QMouseEvent *e);
+		virtual void mouseDoubleClickEvent(QMouseEvent *e);
+		virtual void wheelEvent(QWheelEvent* e);
 };

@@ -184,7 +184,7 @@ void YadeQtMainWindow::closeView(int ii=-1){
 }
 
 void YadeQtMainWindow::closeAllChilds(){
-	while(glViews.size()>0 && glViews[0]!=NULL) { LOG_INFO("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);}
+	while(glViews.size()>0 && glViews[0]!=NULL) { LOG_DEBUG("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);}
 	if(player) player=shared_ptr<QtSimulationPlayer>();
 	if(controller) controller=shared_ptr<SimulationController>();
 	if(generator) generator=shared_ptr<QtFileGenerator>();

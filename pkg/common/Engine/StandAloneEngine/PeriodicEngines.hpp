@@ -52,7 +52,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 	StretchPeriodicEngine(): PeriodicEngine(), realLim(0.), virtLim(0.), iterLim(0), stretchFactor(2.){}
 	Real realLim, virtLim; long iterLim;
 	Real stretchFactor;
-	bool mayStretch;
+	int mayStretch;
 	virtual bool isActivated(){
 		assert(stretchFactor>0);
 		if(iterLim==0 && iterPeriod!=0){iterLim=iterPeriod;} else if(iterLim!=0 && iterPeriod==0){iterPeriod=iterLim;}

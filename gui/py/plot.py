@@ -60,9 +60,9 @@ def addData(d):
 	nan=float('nan')
 	for name in d:
 		if not name in data.keys():
-			data[name]=numpy.array([nan for i in range(numSamples)])
+			data[name]=[nan for i in range(numSamples)] #numpy.array([nan for i in range(numSamples)])
 	for name in data:
-		if name in d: data[name].append(d[name])
+		if name in d: data[name].append(d[name]) #numpy.append(data[name],[d[name]],1)
 		else: data[name].append(nan)
 
 def fillNonSequence(o):

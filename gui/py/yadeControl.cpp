@@ -399,7 +399,7 @@ class pyOmega{
 	void step() {OMEGA.spawnSingleSimulationLoop(); LOG_DEBUG("STEP!");}
 
 	void load(std::string fileName) {
-		OMEGA.finishSimulationLoop();
+		//OMEGA.finishSimulationLoop();
 		OMEGA.joinSimulationLoop();
 		OMEGA.setSimulationFileName(fileName);
 		OMEGA.loadSimulation();

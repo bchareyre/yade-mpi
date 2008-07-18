@@ -26,6 +26,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	isMoving=false;
 	renderer=_renderer;
 	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
+	drawScale=fals;
 	viewId = id;
 	cut_plane = 0;
 	cut_plane_delta = -2;
@@ -375,6 +376,7 @@ void GLViewer::drawWithNames(){
 // set frame coordinates, and isDynamic=false;
 void GLViewer::postSelection(const QPoint& point) 
 {
+	LOG_DEBUG("Selection is "<<selectedName());
 	int selection = selectedName();
 	if(selection<0){
 		if(isMoving){
@@ -382,14 +384,14 @@ void GLViewer::postSelection(const QPoint& point)
 		}
 		return;
 	}
-	if((*(Omega::instance().getRootBody()->bodies)).exists(selection)){
+	if(selection>=0 && (*(Omega::instance().getRootBody()->bodies)).exists(selection)){
 		resetManipulation();
 		if(Body::byId(body_id_t(selection))->isClumpMember()){ // select clump (invisible) instead of its member
 			LOG_DEBUG("Clump member #"<<selection<<" selected, selecting clump instead.");
 			selection=Body::byId(body_id_t(selection))->clumpId;
 		}
 		setSelectedName(selection);
-		//LOG_DEBUG("New selection "<<selection);
+		LOG_DEBUG("New selection "<<selection);
 		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
 		wasDynamic=Body::byId(selection)->isDynamic;
 		Body::byId(selection)->isDynamic = false;
@@ -397,7 +399,6 @@ void GLViewer::postSelection(const QPoint& point)
 		Vector3r&    v = Body::byId(selection)->physicalParameters->se3.position;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
 	}
-
 }
 
 // maybe new object will be selected.
@@ -409,20 +410,66 @@ void GLViewer::endSelection(const QPoint &point){
 	if(old != -1 && old!=selectedName() && (*(Omega::instance().getRootBody()->bodies)).exists(old)) Body::byId(old)->isDynamic = wasDynamic;
 }
 
+qglviewer::Vec GLViewer::displayedSceneCenter(){
+	return camera()->unprojectedCoordinatesOf(qglviewer::Vec(width()/2 /* pixels */ ,height()/2 /* pixels */, /*middle between near plane and far plane*/ .5));
+}
+
+float GLViewer::displayedSceneRadius(){
+	return (camera()->unprojectedCoordinatesOf(qglviewer::Vec(width(),height(),.5))-camera()->unprojectedCoordinatesOf(qglviewer::Vec(0,0,.5))).norm();
+}
+
 void GLViewer::postDraw(){
-	//if(!(drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2])) return;
-	Real diameter=QGLViewer::camera()->sceneRadius()*2;
+	Real wholeDiameter=QGLViewer::camera()->sceneRadius()*2;
+	Real dispDiameter=min(wholeDiameter,max((Real)displayedSceneRadius()*2,wholeDiameter/1e3)); // limit to avoid drawing 1e5 lines with big zoom level
 	//qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
-	Real gridStep=pow(10,(floor(log10(diameter)-.5)));
-	int nSegments=((int)(diameter/gridStep));
+	Real gridStep=pow(10,(floor(log10(dispDiameter)-.7)));
+	Real scaleStep=pow(10,(floor(log10(displayedSceneRadius()*2)-.7))); // unsconstrained
+	int nSegments=((int)(wholeDiameter/gridStep))+1;
 	Real realSize=nSegments*gridStep;
 	//LOG_DEBUG("nSegments="<<nSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	glPushMatrix();
 
+	// XYZ grids
+	glLineWidth(.5);
 	if(drawGridXYZ[0]) {glColor3f(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
 	if(drawGridXYZ[1]) {glColor3f(0.3,0.6,0.3); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
 	if(drawGridXYZ[2]) {glColor3f(0.3,0.3,0.6); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
+	
+	// scale
+	if(drawScale){
+		Real segmentSize=scaleStep;
+		qglviewer::Vec screenDxDy[3]; // dx,dy for x,y,z scale segments
+		int extremalDxDy[2];
+		for(int axis=0; axis<3; axis++){
+			qglviewer::Vec delta(0,0,0); delta[axis]=segmentSize;
+			qglviewer::Vec center=displayedSceneCenter();
+			screenDxDy[axis]=camera()->projectedCoordinatesOf(center+delta)-camera()->projectedCoordinatesOf(center);
+			for(int xy=0;xy<2;xy++)extremalDxDy[xy]=(axis>0 ? min(extremalDxDy[xy],(int)screenDxDy[axis][xy]) : screenDxDy[axis][xy]);
+		}
+		//LOG_DEBUG("Screen offsets for axes: "<<" x("<<screenDxDy[0][0]<<","<<screenDxDy[0][1]<<") y("<<screenDxDy[1][0]<<","<<screenDxDy[1][1]<<") z("<<screenDxDy[2][0]<<","<<screenDxDy[2][1]<<")");
+		int margin=20; // screen pixels
+		int scaleCenter[2]; scaleCenter[0]=abs(extremalDxDy[0])+margin; scaleCenter[1]=abs(extremalDxDy[1])+margin;
+		//LOG_DEBUG("Center of scale "<<scaleCenter[0]<<","<<scaleCenter[1]);
+		startScreenCoordinatesSystem();
+			glDisable(GL_LIGHTING);
+			glDisable(GL_DEPTH_TEST);
+			glLineWidth(3.0);
+			for(int axis=0; axis<3; axis++){
+				Vector3r color(.4,.4,.4); color[axis]=.9;
+				glColor3v(color);
+				glBegin(GL_LINES);
+				glVertex2f(scaleCenter[0],scaleCenter[1]);
+				glVertex2f(scaleCenter[0]+screenDxDy[axis][0],scaleCenter[1]+screenDxDy[axis][1]);
+				glEnd();
+			}
+			glLineWidth(1.);
+			glEnable(GL_DEPTH_TEST);
+		stopScreenCoordinatesSystem();
+		QGLViewer::drawText(scaleCenter[0],scaleCenter[1],QString().sprintf("%.3g",scaleStep));
+	}
 
+	// cutting planes (should be moved to OpenGLRenderingEngine perhaps?)
+	// TODO: transparent planes
 	for(int planeId=0; planeId<renderer->clipPlaneNum; planeId++){
 		if(!renderer->clipPlaneActive[planeId] && planeId!=manipulatedClipPlane) continue;
 		glPushMatrix();
@@ -435,9 +482,10 @@ void GLViewer::postDraw(){
 			if(!renderer->clipPlaneActive[planeId]) cff=.4;
 			glColor3f(max(0.,cff*cos(planeId)),max(0.,cff*sin(planeId)),planeId==manipulatedClipPlane); // variable colors
 			QGLViewer::drawGrid(realSize,2*nSegments);
-			drawArrow(diameter/6);
+			drawArrow(wholeDiameter/6);
 		glPopMatrix();
 	}
+
 	QGLViewer::postDraw();
 }
 
@@ -463,6 +511,19 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
 		// case Qt::RightButton: projectOnLine(camera->position(), camera->viewDirection()); break;
 		default: break; // avoid warning
 	}
+}
+
+void GLViewer::wheelEvent(QWheelEvent* event){
+	if(manipulatedClipPlane<0){ QGLViewer::wheelEvent(event); return; }
+	assert(manipulatedClipPlane<renderer->clipPlaneNum);
+	float distStep=1e-3*sceneRadius();
+	//const float wheelSensitivityCoef = 8E-4f;
+	//Vec trans(0.0, 0.0, -event->delta()*wheelSensitivity()*wheelSensitivityCoef*(camera->position()-position()).norm());
+	float dist=-event->delta()*manipulatedFrame()->wheelSensitivity()*distStep;
+	Vector3r normal=renderer->clipPlaneSe3[manipulatedClipPlane].orientation*Vector3r(0,0,1);
+	qglviewer::Vec nnormal(normal[0],normal[1],normal[2]);
+	manipulatedFrame()->setPosition(manipulatedFrame()->position()+nnormal*dist);
+	/* in draw, bound cutting planes will be moved as well */
 }
 
 // cut&paste from QGLViewer::domElement documentation
