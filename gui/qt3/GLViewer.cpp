@@ -122,6 +122,28 @@ void GLViewer::startClipPlaneManipulation(int planeNo){
 	displayMessage("Manipulating clip plane #"+lexical_cast<string>(planeNo+1)+(grp.empty()?grp:"(bound planes:"+grp+")"));
 }
 
+void GLViewer::useDisplayParameters(size_t n){
+	LOG_DEBUG("Loading display parameters from #"<<n);
+	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getRootBody()->dispParams;
+	if(dispParams.size()<=(size_t)n){LOG_ERROR("Display parameters #"<<n<<" don't exist (number of entries "<<dispParams.size()<<")"); return;}
+	const shared_ptr<DisplayParameters>& dp=dispParams[n];
+	string val;
+	if(dp->getValue("OpenGLRenderingEngine",val)){ istringstream oglre(val); IOFormatManager::loadFromStream("XMLFormatManager",oglre,"renderer",renderer);}
+	else { LOG_WARN("OpenGLRenderingEngine configuration not found in display parameters, skipped.");}
+	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val);}
+	else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
+}
+
+void GLViewer::saveDisplayParameters(size_t n){
+	LOG_DEBUG("Saving display parameters to #"<<n);
+	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getRootBody()->dispParams;
+	if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
+	shared_ptr<DisplayParameters>& dp=dispParams[n];
+	ostringstream oglre; IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
+	dp->setValue("OpenGLRenderingEngine",oglre.str());
+	dp->setValue("GLViewer",GLViewer::getState());
+}
+
 string GLViewer::getState(){
 	QString origStateFileName=stateFileName();
 	char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str);
@@ -175,25 +197,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	}
 	else if(e->key()==Qt::Key_7 || e->key()==Qt::Key_8 || e->key()==Qt::Key_9){
 		int nn=-1; if(e->key()==Qt::Key_7)nn=0; else if(e->key()==Qt::Key_8)nn=1; else if(e->key()==Qt::Key_9)nn=2; assert(nn>=0); size_t n=(size_t)nn;
-		vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getRootBody()->dispParams;
-		if(e->state() & AltButton){// save display parameters
-			LOG_DEBUG("Saving display parameters to #"<<n);
-			if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
-			shared_ptr<DisplayParameters>& dp=dispParams[n];
-			ostringstream oglre; IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
-			IOFormatManager::saveToFile("XMLFormatManager","/tmp/rendererConfig.xml","renderer",renderer);
-			dp->setValue("OpenGLRenderingEngine",oglre.str());
-			dp->setValue("GLViewer",GLViewer::getState());
-		} else { // load display parameters
-			LOG_DEBUG("Loading display parameters from #"<<n);
-			if(dispParams.size()<=(size_t)n){LOG_ERROR("Display parameters #"<<n<<" don't exist (number of entries "<<dispParams.size()<<")"); return;}
-			const shared_ptr<DisplayParameters>& dp=dispParams[n];
-			string val;
-			if(dp->getValue("OpenGLRenderingEngine",val)){ istringstream oglre(val); IOFormatManager::loadFromStream("XMLFormatManager",oglre,"renderer",renderer);}
-			else { LOG_WARN("OpenGLRenderingEngine configuration not found in display parameters, skipped.");}
-			if(dp->getValue("GLViewer",val)){ GLViewer::setState(val);}
-			else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
-		}
+		if(e->state() & AltButton) saveDisplayParameters(n);
+		else useDisplayParameters(n);
 	}
 	/* letters alphabetically */
 	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());

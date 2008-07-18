@@ -25,12 +25,14 @@ YadeQtMainWindow* ensuredMainWindow(){if(!YadeQtMainWindow::self) throw runtime_
 
 void centerViews(void){ensuredMainWindow()->centerViews();}
 void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
-pyOpenGLRenderingEngine getRenderer(){return pyOpenGLRenderingEngine(ensuredMainWindow()->renderer);}
+pyOpenGLRenderingEngine ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return pyOpenGLRenderingEngine(ensuredMainWindow()->renderer);}
 
-#define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(bool wait=false){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
-POST_SYNTH_EVENT(PLAYER,player); BOOST_PYTHON_FUNCTION_OVERLOADS(evtPLAYER_overloads,evtPLAYER,0,1);
-POST_SYNTH_EVENT(CONTROLLER,controller); BOOST_PYTHON_FUNCTION_OVERLOADS(evtCONTROLLER_overloads,evtCONTROLLER,0,1);
-POST_SYNTH_EVENT(GENERATOR,generator); BOOST_PYTHON_FUNCTION_OVERLOADS(evtGENERATOR_overloads,evtGENERATOR,0,1);
+#define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
+POST_SYNTH_EVENT(PLAYER,player);
+POST_SYNTH_EVENT(CONTROLLER,controller);
+POST_SYNTH_EVENT(GENERATOR,generator);
+// BOOST_PYTHON_FUNCTION_OVERLOADS(evtPLAYER_overloads,evtPLAYER,0,1); BOOST_PYTHON_FUNCTION_OVERLOADS(evtCONTROLLER_overloads,evtCONTROLLER,0,1); BOOST_PYTHON_FUNCTION_OVERLOADS(evtGENERATOR_overloads,evtGENERATOR,0,1);
+#undef POST_SYNT_EVENT
 void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); }
 
 
@@ -42,7 +44,10 @@ void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(Yade
  *
  * @param savedQGLState is file with QGLViewer state (camera position, orientation, display 
  * dimensions etc) saved when running the GLViewer (either in player or during simulation) and
- * pressing Alt-S; this saves state to /tmp/qglviewerState.xml.
+ * pressing 'S'; this saves state to /tmp/qglviewerState.xml.
+ *
+ * @param dispParamsNo reloads n-th display parameters (GLViewer and OpenGLRenderingEngine)
+ * from states saved in MetaBody::dispParams.
  *
  * @param stride is that every stride-th simulation state will be taken
 
@@ -68,12 +73,12 @@ void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(Yade
  *
  * @returns tuple of (wildcard,[snap0,snap1,snap2,...]), where the list contains filename of snapshots.
  */
-python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState="",int stride=1,string postLoadHook=""){
-	evtPLAYER(true); // wait for the window to become ready
+python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQGLState="",int dispParamsNo=-1,int stride=1,string postLoadHook=""){
+	evtPLAYER();
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
 	string snapBase2(snapBase);
-	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; }
+	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots."); }
 	glv->stride=stride;
 	glv->load(savedSim);
 	if(!postLoadHook.empty()){ PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); }
@@ -84,25 +89,29 @@ python::tuple runPlayer(string savedSim,string snapBase="",string savedQGLState=
 		glv->restoreStateFromFile();
 		glv->setStateFileName(QString::null);
 	}
+	if(dispParamsNo>=0) glv->useDisplayParameters(dispParamsNo);
 	glv->startAnimation();
 	while(glv->animationIsStarted()) { usleep(2000000); LOG_DEBUG("Last msg: "<<*player->messages.rbegin()); }
 	python::list snaps; FOREACH(string s, glv->snapshots){snaps.append(s);}
 	return python::make_tuple(snapBase2+"-%.04d.png",snaps);
 }
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayer_overloads,runPlayer,2,5);
+bool qtGuiIsActive(){return (bool)YadeQtMainWindow::self;}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayerSession_overloads,runPlayerSession,2,6);
 
 BOOST_PYTHON_MODULE(qt){
-	def("Generator",evtGENERATOR,evtGENERATOR_overloads(args("wait")));
-	def("Controller",evtCONTROLLER,evtCONTROLLER_overloads(args("wait")));
-	def("Player",evtPLAYER,evtPLAYER_overloads(args("wait")));
-	def("View",evtVIEW);
-	def("center",centerViews);
-	def("Renderer",getRenderer);
+	def("Generator",evtGENERATOR,"Start simulation generator");
+	def("Controller",evtCONTROLLER,"Start simulation controller");
+	def("Player",evtPLAYER,"Start simulation player");
+	def("View",evtVIEW,"Create new 3d view");
+	def("center",centerViews,"Center all existing views.");
+	def("Renderer",ensuredRenderer,"Return wrapped OpenGLRenderingEngine; the renderer is constructed if necessary.");
 	def("close",Quit);
-	def("runPlayer",runPlayer,runPlayer_overloads(args("viewStateFile","stride","postLoadHook")));
+	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
+	def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook")));
 
 	BASIC_PY_PROXY_WRAPPER(pyOpenGLRenderingEngine,"GLRenderer")
-		.def("setRefSe3",&pyOpenGLRenderingEngine::setRefSe3);
+		.def("setRefSe3",&pyOpenGLRenderingEngine::setRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
 
 }

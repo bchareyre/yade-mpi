@@ -47,9 +47,9 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
 			/* E */ E12,
-			/* G */ E12/G_over_E, /*/2*(1+nu12)*(1-alpha*nu12)/(1+nu12),*/ /* FIXME FIXME FIXME ???? */
+			/* G */ E12*G_over_E, /*/2*(1+nu12)*(1-alpha*nu12)/(1+nu12),*/
 			/* tanFrictionAngle */ tan(.5*(elast1->frictionAngle+elast2->frictionAngle)),
-			/* undamagedCohesion */ S12*sigmaT, /* FIXME FIXME FIXME ??? should be sigmaT??? */
+			/* undamagedCohesion */ sigmaT,
 			/* equilibriumDist */ d0,
 			/* crossSection */ S12,
 			/* epsCrackOnset */ epsCrackOnset,

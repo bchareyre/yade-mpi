@@ -43,7 +43,9 @@ REGISTER_SERIALIZABLE(PeriodicEngine,false);
  * stretchFactor must be positive; if >1, period is stretched, for <1, it is shrunk.
  *
  * Limit consistency (whether actual period is not over/below the limit) is checked: period is set to the 
- * limit value if we are off.
+ * limit value if we are off. If the limit is zero, however, and the period is non-zero, the limit is set
+ * to the period value (therefore, if you initialize only iterPeriod, you will get what you expect: engine
+ * running at iterPeriod).
  */
 class StretchPeriodicEngine: public PeriodicEngine{
 	public:
@@ -53,6 +55,9 @@ class StretchPeriodicEngine: public PeriodicEngine{
 	bool mayStretch;
 	virtual bool isActivated(){
 		assert(stretchFactor>0);
+		if(iterLim==0 && iterPeriod!=0){iterLim=iterPeriod;} else if(iterLim!=0 && iterPeriod==0){iterPeriod=iterLim;}
+		if(realLim==0 && realPeriod!=0){realLim=realPeriod;} else if(realLim!=0 && realPeriod==0){realPeriod=realLim;}
+		if(virtLim==0 && virtPeriod!=0){virtLim=virtPeriod;} else if(virtLim!=0 && virtPeriod==0){virtPeriod=virtLim;}
 		if(stretchFactor>1){iterPeriod=min(iterPeriod,iterLim); realPeriod=min(realPeriod,realLim); virtPeriod=min(virtPeriod,virtLim);}
 		else {iterPeriod=max(iterPeriod,iterLim); realPeriod=max(realPeriod,realLim); virtPeriod=max(virtPeriod,virtLim);}
 		mayStretch=((virtPeriod<0 || (stretchFactor>1 ? stretchFactor*virtPeriod<=virtLim : stretchFactor*virtPeriod>=virtLim))

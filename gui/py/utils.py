@@ -155,7 +155,7 @@ def spheresToFile(filename,consider=lambda id: True):
 		out.write('%g\t%g\t%g\t%g\n'%(b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
 	out.close()
 
-def qtCreateVideo(playerDb,out,viewerState,stride,fps=24,postLoadHook=None):
+def qtCreateVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None):
 	"""Create video by replaying a simulation. Snapshots are taken to temporary files,
 	encoded to a .ogg stream (theora codec); temps are deleted at the end.
 
@@ -163,7 +163,7 @@ def qtCreateVideo(playerDb,out,viewerState,stride,fps=24,postLoadHook=None):
 
 	playerDb is the database with saved simulation states,
 	out is the output file (like a.ogg), fps is frames-per-second for the video that is created,
-	viewerState, stride and postLoadHook are passed to qt.runPlayer (docs in gui/qt3/QtGUI-Python.cpp).
+	dispParamsNo, stride and postLoadHook are passed to qt.runPlayer (docs in gui/qt3/QtGUI-Python.cpp).
 	
 	You need a display to run this (either virtual, like xvfb, or physical).
 
@@ -174,10 +174,16 @@ def qtCreateVideo(playerDb,out,viewerState,stride,fps=24,postLoadHook=None):
 	import gst
 	from yade import qt
 	qt.Player(True)
-	# postLoadHook has "" instead of None in the c++ interface
-	wildcard,snaps=qt.runPlayer(playerDb,'',viewerState,stride=stride,postLoadHook=(postLoadHook if postLoadHook else ''))
+	# postLoadHook and viewerState have "" instead of None in the c++ interface
+	wildcard,snaps=qt.runPlayer(
+		savedSim=playerDb,
+		snapBase='',
+		viewerState=(viewerstate if viewerState else ""),
+		dispParamsNo=dispParamsNo,
+		stride=stride,
+		postLoadHook=(postLoadHook if postLoadHook else ''))
 	if(os.path.exists(out)):
-		i=0
+		i=0;
 		while(os.path.exists(out+"~%d"%i)): i+=1
 		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
 	print "Encoding video from %s (%d files total) to %s"%(wildcard,len(snaps),out)

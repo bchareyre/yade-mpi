@@ -68,6 +68,10 @@ class GLViewer : public QGLViewer
 		string getState();
 		//! set QGLViewer state from string (XML); QGLVIewer normally only supports loading state from file.
 		void setState(string);
+		//! Load display parameters (QGLViewer and OpenGLRenderingEngine) from MetaBody::dispParams[n] and use them
+		void useDisplayParameters(size_t n);
+		//! Save display parameters (QGOViewer and OpenGLRenderingEngine) to MetaBody::dispParams[n]
+		void saveDisplayParameters(size_t n);
 
 		//! Adds our attributes to the QGLViewer state that can be saved
 		QDomElement domElement(const QString& name, QDomDocument& document) const;

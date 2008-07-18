@@ -41,7 +41,7 @@ def reduceData(l):
 			print "Reducing data: %d > %d"%(l,maxDataLen)
 			for d in data: data[d]=data[d][::2]
 			for attr in ['virtPeriod','realPeriod','iterPeriod']:
-				if(plotDataCollector[attr]>0) plotDataCollector[attr]=2*plotDataCollector[attr]
+				if(plotDataCollector[attr]>0): plotDataCollector[attr]=2*plotDataCollector[attr]
 
 def reverseData():
 	for k in data: data[k].reverse()
@@ -53,13 +53,14 @@ def addData(d):
 	This way, equal length of all data is assured so that they can be plotted one against any other.
 
 	Nan's don't appear in graphs."""
+	import numpy
 	if len(data)>0: numSamples=len(data[data.keys()[0]])
 	else: numSamples=0
 	reduceData(numSamples)
 	nan=float('nan')
 	for name in d:
 		if not name in data.keys():
-			data[name]=[nan for i in range(numSamples)]
+			data[name]=numpy.array([nan for i in range(numSamples)])
 	for name in data:
 		if name in d: data[name].append(d[name])
 		else: data[name].append(nan)
@@ -69,21 +70,22 @@ def fillNonSequence(o):
 	else: return (o,'')
 
 def show(): plot()
+
 def plot():
 	pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
 	for p in plots:
 		pylab.figure()
 		plots_p=[fillNonSequence(o) for o in plots[p]]
 		plotsFilled[p]=plots_p
-		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[])V)
+		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
 	pylab.show()
 
 def update():
-	for p in plots:
-
-		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[])V)
+	pylab.draw();
+#	for p in plots:
+#		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
 
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None):

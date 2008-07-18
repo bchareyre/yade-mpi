@@ -90,7 +90,7 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 }
 
 void YadeQtMainWindow::redrawAll(bool force){
-	if(force || (controller && !controller->syncRunning)){
+	if(force || (controller && !controller->syncRunning) || (!controller)){
 		FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
 	}
 }
@@ -114,8 +114,10 @@ void YadeQtMainWindow::Quit(){ emit close(); }
 void YadeQtMainWindow::closeEvent(QCloseEvent *e){ closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e); }
 
 void YadeQtMainWindow::ensureRenderer(){
-	shared_ptr<Factorable> tmpRenderer = ClassFactory::instance().createShared("OpenGLRenderingEngine");
-	renderer = static_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
+	if(!renderer){
+		shared_ptr<Factorable> tmpRenderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
+		renderer=static_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
+	}
 
 	if(!renderer) throw runtime_error("Renderer could not be created, why?");
 
