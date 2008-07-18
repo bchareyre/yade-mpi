@@ -25,7 +25,7 @@
  Copyright (C) 2002-2007 Gilles Debunne (Gilles.Debunne@imag.fr)
 
  This file is part of the QGLViewer library.
- Version 2.2.6-3, released on August 28, 2007.
+ Version 2.3.0, released on June 29, 2008.
 
  http://artis.imag.fr/Members/Gilles.Debunne/QGLViewer
 
@@ -44,8 +44,10 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-#include <limits.h>
+
 #include <assert.h>
+#include <climits>
+
 #include "VRender.h"
 #include "Primitive.h"
 #include "PrimitivePositioning.h"

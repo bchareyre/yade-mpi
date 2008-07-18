@@ -25,7 +25,7 @@
  Copyright (C) 2002-2007 Gilles Debunne (Gilles.Debunne@imag.fr)
 
  This file is part of the QGLViewer library.
- Version 2.2.6-3, released on August 28, 2007.
+ Version 2.3.0, released on June 29, 2008.
 
  http://artis.imag.fr/Members/Gilles.Debunne/QGLViewer
 
@@ -62,7 +62,7 @@ void Exporter::exportToFile(	const char *filename,
 										const vector<PtrPrimitive>& primitive_tab,
 										VRenderParams& vparams)
 {
-	FILE *f = fopen(filename,"w") ;
+	FILE *f = fopen(filename, "w") ;
 
 	if(f == NULL)
 		throw runtime_error(string("could not open file ") + filename) ;

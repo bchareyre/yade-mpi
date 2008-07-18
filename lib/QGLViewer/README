@@ -1,6 +1,6 @@
 Contents of this directory is a copy of upstream from http://artis.imag.fr/Software/QGLViewer/, as of
 
-2007-08-28 23:40 libQGLViewer-2.2.6-3.tar.gz
+2008-06-29 http://artis.imag.fr/Members/Gilles.Debunne/QGLViewer/src/libQGLViewer-2.3.0.tar.gz
 
 SConscript file is mostly cut&paste from the original .pro file. Since the qt3 tool in scons doesn't properly
 handle files named like VRenderInterace.Qt3.ui (multiple suffixes), two offending files are symlinked to 
@@ -30,6 +30,21 @@ and the following change is needed then:
  # else
  #  include "ImageInterface.Qt2.h"
  # endif
+
+Further, to avoid Qt gratuitously #defining DEBUG, apply this patch to the header:
+
+--- qglviewer.h.~orig~	2008-06-29 23:04:16.000000000 +0200
++++ qglviewer.h	2008-07-18 08:46:13.000000000 +0200
+@@ -1229,4 +1229,8 @@
+ 	bool updateGLOK_;
+ };
+ 
++#ifdef DEBUG
++	#undef DEBUG
++#endif
++
+ #endif // QGLVIEWER_QGLVIEWER_H
+
 
 This has to be kept in mind when synchronizing with upstream.
 

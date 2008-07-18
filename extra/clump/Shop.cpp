@@ -446,7 +446,7 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& m
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
 		spheres.push_back(pair<Vector3r,Real>(C,r));
 	}
-	TRVAR2(minXYZ,maxXYZ);
+	//TRVAR2(minXYZ,maxXYZ);
 	return spheres;
 }
 
