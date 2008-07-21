@@ -61,6 +61,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			),
 		env.File('__init__.py','py'),
 		env.File('utils.py','py'),
+		env.File('eudoxos.py','py'),
 		env.File('runtime.py','py'),
 		env.File('ipython.py','py'),
 		env.File('plot.py','py'),

@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "CundallNonViscousForceDamping.hpp"
-#include "ParticleParameters.hpp"
-#include "Force.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/Force.hpp>
+#include"CundallNonViscousForceDamping.hpp"
 
 
 CundallNonViscousForceDamping::CundallNonViscousForceDamping() : damping(0)
