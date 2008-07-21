@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawMesh2D.hpp"
-#include "Mesh2D.hpp"
+#include<yade/pkg-common/Mesh2D.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 

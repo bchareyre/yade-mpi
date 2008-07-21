@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "MomentEngine.hpp"
-#include "ParticleParameters.hpp"
-#include "Momentum.hpp"
+#include"MomentEngine.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/Momentum.hpp>
 
 
 #include<yade/core/MetaBody.hpp>

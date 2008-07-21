@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawInteractingBox.hpp"
-#include "InteractingBox.hpp"
+#include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&,bool)

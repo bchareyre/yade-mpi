@@ -9,7 +9,7 @@
 #ifndef BOUNDINGVOLUMEUPDATOR_HPP
 #define BOUNDINGVOLUMEUPDATOR_HPP
 
-#include "BoundingVolumeEngineUnit.hpp"
+#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>

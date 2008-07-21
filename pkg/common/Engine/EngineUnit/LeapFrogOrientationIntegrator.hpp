@@ -9,7 +9,7 @@
 #ifndef LEAP_FROG_ORIENTATION_INTEGRATOR_HPP
 #define LEAP_FROG_ORIENTATION_INTEGRATOR_HPP 
 
-#include "PhysicalParametersEngineUnit.hpp"
+#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 
 class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit 
 {

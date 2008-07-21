@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawSimpleElasticInteraction.hpp"
-#include "SimpleElasticInteraction.hpp"
+#include<yade/pkg-common/SimpleElasticInteraction.hpp>
 
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

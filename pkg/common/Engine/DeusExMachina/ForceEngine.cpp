@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ForceEngine.hpp"
-#include "ParticleParameters.hpp"
-#include "Force.hpp"
+#include"ForceEngine.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/Force.hpp>
 #include<yade/core/MetaBody.hpp>
 
 #include<boost/foreach.hpp>

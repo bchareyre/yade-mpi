@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawBoxShadowVolume.hpp"
-#include "Box.hpp"
+#include<yade/pkg-common/Box.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<PhysicalParameters>& pp, const Vector3r& lightPos)

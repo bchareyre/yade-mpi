@@ -9,7 +9,7 @@
 #ifndef __GLDRAWINTERACTIONSPHERE_HPP__
 #define __GLDRAWINTERACTIONSPHERE_HPP__
 
-#include "GLDrawInteractingGeometryFunctor.hpp"
+#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
 
 class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 {	

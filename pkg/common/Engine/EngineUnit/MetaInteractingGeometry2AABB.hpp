@@ -9,7 +9,7 @@
 #ifndef METAINTERACTINGGEOMETRY2AABB_HPP
 #define METAINTERACTINGGEOMETRY2AABB_HPP
 
-#include "BoundingVolumeEngineUnit.hpp"
+#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
 class MetaInteractingGeometry2AABB : public BoundingVolumeEngineUnit
 {

@@ -14,13 +14,13 @@
 #include<yade/core/MetaEngine1D.hpp>
 #include<yade/core/Body.hpp>
 
-#include "GLDrawStateFunctor.hpp"
-#include "GLDrawBoundingVolumeFunctor.hpp"
-#include "GLDrawInteractingGeometryFunctor.hpp"
-#include "GLDrawGeometricalModelFunctor.hpp"
-#include "GLDrawShadowVolumeFunctor.hpp"
-#include "GLDrawInteractionPhysicsFunctor.hpp"
-#include "GLDrawInteractionGeometryFunctor.hpp"
+#include<yade/pkg-common/GLDrawStateFunctor.hpp>
+#include<yade/pkg-common/GLDrawBoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawShadowVolumeFunctor.hpp>
+#include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/GLDrawInteractionGeometryFunctor.hpp>
 
 class OpenGLRenderingEngine : public RenderingEngine
 {	
@@ -33,7 +33,6 @@ class OpenGLRenderingEngine : public RenderingEngine
 		vector<Se3r> clipPlaneSe3;
 		vector<int> clipPlaneActive; // should be bool, but serialization doesn't handle vector<bool>
 		const int clipPlaneNum;
-
 		vector<Se3r> refSe3;
 		bool scaleDisplacements,scaleRotations;
 		Vector3r displacementScale; Real rotationScale;

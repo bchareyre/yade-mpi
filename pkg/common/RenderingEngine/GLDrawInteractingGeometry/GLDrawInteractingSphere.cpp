@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawInteractingSphere.hpp"
-#include "InteractingSphere.hpp"
+#include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 

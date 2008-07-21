@@ -16,7 +16,7 @@
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalAction.hpp>
 
-#include "PhysicalActionApplierUnit.hpp"
+#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 
 class Body;
 

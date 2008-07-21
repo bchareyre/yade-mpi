@@ -1,3 +1,4 @@
+// 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"SQLiteRecorder.hpp"
 #include<boost/algorithm/string.hpp>
 #include<boost/filesystem/operations.hpp>

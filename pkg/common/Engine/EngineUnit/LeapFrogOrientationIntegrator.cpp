@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "LeapFrogOrientationIntegrator.hpp"
-#include "RigidBodyParameters.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 
 // FIXME : should we pass timestep as parameter of functor

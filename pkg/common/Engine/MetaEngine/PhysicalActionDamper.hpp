@@ -12,7 +12,7 @@
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalAction.hpp>
-#include "PhysicalActionDamperUnit.hpp"
+#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
 
 class Body;
 

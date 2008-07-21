@@ -9,7 +9,7 @@
 #ifndef ELASTICBODYSIMPLERELATIONSHIP_HPP
 #define ELASTICBODYSIMPLERELATIONSHIP_HPP
 
-#include "InteractionPhysicsEngineUnit.hpp"
+#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
 class ElasticBodySimpleRelationship : public InteractionPhysicsEngineUnit
 {

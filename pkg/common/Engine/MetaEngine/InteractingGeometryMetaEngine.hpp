@@ -9,7 +9,7 @@
 #ifndef INTERACTINGGEOMETRYMETAENGINE_HPP
 #define INTERACTINGGEOMETRYMETAENGINE_HPP
 
-#include "InteractingGeometryEngineUnit.hpp"
+#include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>

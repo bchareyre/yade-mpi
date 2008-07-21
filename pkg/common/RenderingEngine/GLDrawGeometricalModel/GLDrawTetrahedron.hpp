@@ -9,7 +9,7 @@
 #ifndef GLDRAW_TETRAHEDRON_HPP
 #define GLDRAW_TETRAHEDRON_HPP 
 
-#include "GLDrawGeometricalModelFunctor.hpp"
+#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
 
 class GLDrawTetrahedron : public GLDrawGeometricalModelFunctor
 {

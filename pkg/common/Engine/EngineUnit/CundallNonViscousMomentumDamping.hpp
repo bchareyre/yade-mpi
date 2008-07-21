@@ -9,7 +9,7 @@
 #ifndef ACTION_MOMENTUM_DAMPING_HPP
 #define ACTION_MOMENTUM_DAMPING_HPP
 
-#include "PhysicalActionDamperUnit.hpp"
+#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
 
 class CundallNonViscousMomentumDamping : public PhysicalActionDamperUnit
 {

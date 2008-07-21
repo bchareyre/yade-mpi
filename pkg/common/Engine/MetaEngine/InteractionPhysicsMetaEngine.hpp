@@ -14,7 +14,7 @@
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Interaction.hpp>
-#include "InteractionPhysicsEngineUnit.hpp"
+#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
 class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 					<	

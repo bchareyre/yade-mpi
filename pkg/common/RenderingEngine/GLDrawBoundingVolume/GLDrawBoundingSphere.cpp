@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawBoundingSphere.hpp"
-#include "BoundingSphere.hpp"
+#include"GLDrawBoundingSphere.hpp"
+#include<yade/pkg-common/BoundingSphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 void GLDrawBoundingSphere::go(const shared_ptr<BoundingVolume>& bv)

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawTetrahedron.hpp"
-#include "Tetrahedron.hpp"
+#include<yade/pkg-common/Tetrahedron.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 

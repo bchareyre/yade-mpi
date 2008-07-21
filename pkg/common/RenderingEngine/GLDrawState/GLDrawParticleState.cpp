@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawParticleState.hpp"
-#include "ParticleParameters.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
 
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

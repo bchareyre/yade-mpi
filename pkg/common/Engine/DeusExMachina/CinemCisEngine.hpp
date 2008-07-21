@@ -11,7 +11,7 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/DeusExMachina.hpp>
-#include <Wm3Vector3.h>
+#include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
 /*! \brief To apply a zero normal displacement shear for a parallelogram box

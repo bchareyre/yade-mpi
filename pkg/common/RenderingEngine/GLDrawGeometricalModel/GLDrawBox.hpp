@@ -9,7 +9,7 @@
 #ifndef GLDRAWBOX_HPP
 #define GLDRAWBOX_HPP
 
-#include "GLDrawGeometricalModelFunctor.hpp"
+#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
 
 class GLDrawBox : public GLDrawGeometricalModelFunctor
 {

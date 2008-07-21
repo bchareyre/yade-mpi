@@ -9,9 +9,9 @@
 *************************************************************************/
 
 #include "NewtonsForceLaw.hpp"
-#include "ParticleParameters.hpp"
-#include "RigidBodyParameters.hpp"
-#include "Force.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-common/Force.hpp>
 
 
 void NewtonsForceLaw::go( const shared_ptr<PhysicalAction>& a

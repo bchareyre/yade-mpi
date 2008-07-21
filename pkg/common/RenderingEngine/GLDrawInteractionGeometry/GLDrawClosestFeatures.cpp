@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawClosestFeatures.hpp"
-#include "ClosestFeatures.hpp"
+#include<yade/pkg-common/ClosestFeatures.hpp>
 
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

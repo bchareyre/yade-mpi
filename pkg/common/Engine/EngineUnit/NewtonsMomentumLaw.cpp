@@ -9,8 +9,8 @@
 *************************************************************************/
 
 #include "NewtonsMomentumLaw.hpp"
-#include "RigidBodyParameters.hpp"
-#include "Momentum.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-common/Momentum.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 

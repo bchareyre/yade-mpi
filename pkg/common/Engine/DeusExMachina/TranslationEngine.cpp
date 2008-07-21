@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "TranslationEngine.hpp"
-#include "ParticleParameters.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 
 void TranslationEngine::postProcessAttributes(bool deserializing)

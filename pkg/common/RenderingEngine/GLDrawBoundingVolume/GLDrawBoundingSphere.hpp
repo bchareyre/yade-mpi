@@ -9,7 +9,7 @@
 #ifndef GLDRAWBOUNDINGSPHERE_HPP
 #define GLDRAWBOUNDINGSPHERE_HPP
 
-#include "GLDrawBoundingVolumeFunctor.hpp"
+#include<yade/pkg-common/GLDrawBoundingVolumeFunctor.hpp>
 
 class GLDrawBoundingSphere : public GLDrawBoundingVolumeFunctor
 {	

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawBox.hpp"
-#include "Box.hpp"
+#include<yade/pkg-common/Box.hpp>
 
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

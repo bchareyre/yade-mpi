@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "LeapFrogPositionIntegrator.hpp" 
-#include "ParticleParameters.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/Omega.hpp>
 
 

@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include "GLDrawRigidBodyState.hpp"
-#include "GLDrawParticleState.hpp"
-#include "RigidBodyParameters.hpp"
+#include<yade/pkg-common/GLDrawParticleState.hpp>
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

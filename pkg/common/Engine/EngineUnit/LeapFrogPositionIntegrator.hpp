@@ -9,7 +9,7 @@
 #ifndef LEAPFROG_POSITION_INTEGRATOR_HPP
 #define LEAPFROG_POSITION_INTEGRATOR_HPP 
 
-#include "PhysicalParametersEngineUnit.hpp"
+#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 
 class LeapFrogPositionIntegrator : public PhysicalParametersEngineUnit
 {

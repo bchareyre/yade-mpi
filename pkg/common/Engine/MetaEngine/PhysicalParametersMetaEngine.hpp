@@ -9,7 +9,7 @@
 #ifndef BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP
 #define BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP 
 
-#include "PhysicalParametersEngineUnit.hpp"
+#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 #include<yade/core/MetaEngine1D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>

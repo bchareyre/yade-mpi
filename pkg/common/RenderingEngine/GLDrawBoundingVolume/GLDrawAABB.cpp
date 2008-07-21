@@ -6,12 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawAABB.hpp"
-#include "AABB.hpp"
-
-
+#include"GLDrawAABB.hpp"
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-
+#include<yade/pkg-common/AABB.hpp>
 
 void GLDrawAABB::go(const shared_ptr<BoundingVolume>& bv)
 {

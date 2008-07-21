@@ -9,7 +9,7 @@
 #ifndef NEWTONSFORCELAW_HPP
 #define NEWTONSFORCELAW_HPP
 
-#include "PhysicalActionApplierUnit.hpp"
+#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 
 class NewtonsForceLaw : public PhysicalActionApplierUnit
 {

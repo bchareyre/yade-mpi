@@ -9,7 +9,7 @@
 #ifndef GLDRAW_QUADRILATERAL_HPP
 #define GLDRAW_QUADRILATERAL_HPP
 
-#include "GLDrawGeometricalModelFunctor.hpp"
+#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
 
 class GLDrawQuadrilateral : public GLDrawGeometricalModelFunctor
 {

@@ -9,7 +9,7 @@
 #ifndef GLDRAW_SIMPLE_ELASTIC_INTERACTION_HPP
 #define GLDRAW_SIMPLE_ELASTIC_INTERACTION_HPP
 
-#include "GLDrawInteractionPhysicsFunctor.hpp"
+#include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
 
 class GLDrawSimpleElasticInteraction : public GLDrawInteractionPhysicsFunctor
 {

@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "DisplacementToForceEngine.hpp"
+#include"DisplacementToForceEngine.hpp"
 #include<yade/core/MetaBody.hpp>
-#include "ParticleParameters.hpp"
-#include "Force.hpp"
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/Force.hpp>
 
 DisplacementToForceEngine::DisplacementToForceEngine() : actionParameterForce(new Force), targetForce(Vector3r::ZERO), targetForceMask(Vector3r::ZERO) 
 {

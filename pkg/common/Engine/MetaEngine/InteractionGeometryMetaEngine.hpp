@@ -16,7 +16,7 @@
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/core/InteractingGeometry.hpp>
-#include "InteractionGeometryEngineUnit.hpp"
+#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
 class Body;
 

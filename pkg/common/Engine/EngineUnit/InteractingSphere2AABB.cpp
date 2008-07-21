@@ -7,8 +7,8 @@
 *************************************************************************/
  
 #include "InteractingSphere2AABB.hpp"
-#include "InteractingSphere.hpp"
-#include "AABB.hpp"
+#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/AABB.hpp>
 
 void InteractingSphere2AABB::go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
 	InteractingSphere* sphere = static_cast<InteractingSphere*>(cm.get());

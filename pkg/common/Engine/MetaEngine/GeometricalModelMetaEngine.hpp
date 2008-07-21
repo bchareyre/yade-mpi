@@ -9,7 +9,7 @@
 #ifndef GEOMETRICAL_MODEL_DISPATCHER_HPP
 #define GEOMETRICAL_MODEL_DISPATCHER_HPP
 
-#include "GeometricalModelEngineUnit.hpp"
+#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>

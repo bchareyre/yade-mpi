@@ -9,7 +9,7 @@
 #ifndef GLDRAWINTERACTIONBOX_HPP
 #define GLDRAWINTERACTIONBOX_HPP
 
-#include "GLDrawInteractingGeometryFunctor.hpp"
+#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
 
 class GLDrawInteractingBox : public GLDrawInteractingGeometryFunctor
 {

@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "CundallNonViscousMomentumDamping.hpp"
-#include "RigidBodyParameters.hpp"
-#include "Momentum.hpp"
+#include"CundallNonViscousMomentumDamping.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-common/Momentum.hpp>
 
 
 CundallNonViscousMomentumDamping::CundallNonViscousMomentumDamping() : damping(0)

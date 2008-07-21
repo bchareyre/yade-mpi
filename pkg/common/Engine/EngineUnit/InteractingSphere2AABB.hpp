@@ -9,7 +9,7 @@
 #ifndef SPHERE2AABB_HPP
 #define SPHERE2AABB_HPP
 
-#include "BoundingVolumeEngineUnit.hpp"
+#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
 class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 {

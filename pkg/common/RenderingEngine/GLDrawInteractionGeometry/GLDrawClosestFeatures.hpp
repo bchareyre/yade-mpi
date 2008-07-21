@@ -9,7 +9,7 @@
 #ifndef GLDRAW_CLOSEST_FEATURES_HPP
 #define GLDRAW_CLOSEST_FEATURES_HPP
 
-#include "GLDrawInteractionGeometryFunctor.hpp"
+#include<yade/pkg-common/GLDrawInteractionGeometryFunctor.hpp>
 
 class GLDrawClosestFeatures : public GLDrawInteractionGeometryFunctor
 {

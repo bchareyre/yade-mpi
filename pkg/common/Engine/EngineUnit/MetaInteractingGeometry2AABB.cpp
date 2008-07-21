@@ -9,8 +9,8 @@
 #include "MetaInteractingGeometry2AABB.hpp"
 
 
-#include "MetaInteractingGeometry.hpp"
-#include "AABB.hpp"
+#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/AABB.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 

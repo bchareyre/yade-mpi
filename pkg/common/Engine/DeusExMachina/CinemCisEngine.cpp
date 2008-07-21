@@ -6,12 +6,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
-#include "CinemCisEngine.hpp"
-#include "RigidBodyParameters.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
-#include <yade/lib-miniWm3/Wm3Math.h>
+#include<yade/lib-miniWm3/Wm3Math.h>
+
+#include"CinemCisEngine.hpp"
 
 
 CinemCisEngine::CinemCisEngine()

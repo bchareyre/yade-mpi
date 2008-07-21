@@ -9,7 +9,7 @@
 #ifndef GLDRAWRIGIDBODYSTATE_HPP
 #define GLDRAWRIGIDBODYSTATE_HPP
 
-#include "GLDrawStateFunctor.hpp"
+#include<yade/pkg-common/GLDrawStateFunctor.hpp>
 
 class GLDrawRigidBodyState : public GLDrawStateFunctor
 {

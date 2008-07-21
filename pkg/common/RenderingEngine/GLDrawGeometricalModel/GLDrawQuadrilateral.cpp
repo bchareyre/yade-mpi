@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawQuadrilateral.hpp"
-#include "Quadrilateral.hpp"
+#include<yade/pkg-common/Quadrilateral.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 

@@ -9,7 +9,7 @@
 #ifndef GLDRAWCOLLISIONGEOMETRYSET_HPP
 #define GLDRAWCOLLISIONGEOMETRYSET_HPP
 
-#include "GLDrawInteractingGeometryFunctor.hpp"
+#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
 
 class GLDrawMetaInteractingGeometry : public GLDrawInteractingGeometryFunctor
 {

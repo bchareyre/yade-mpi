@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ElasticBodySimpleRelationship.hpp"
-#include "SimpleElasticInteraction.hpp"
-#include "ElasticBodyParameters.hpp"
+#include"ElasticBodySimpleRelationship.hpp"
+#include<yade/pkg-common/SimpleElasticInteraction.hpp>
+#include<yade/pkg-common/ElasticBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 

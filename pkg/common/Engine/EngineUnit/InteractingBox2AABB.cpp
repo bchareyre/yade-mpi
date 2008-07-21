@@ -7,8 +7,8 @@
 *************************************************************************/
  
 #include "InteractingBox2AABB.hpp"
-#include "InteractingBox.hpp"
-#include "AABB.hpp"
+#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/AABB.hpp>
 
 
 void InteractingBox2AABB::go(	const shared_ptr<InteractingGeometry>& cm,

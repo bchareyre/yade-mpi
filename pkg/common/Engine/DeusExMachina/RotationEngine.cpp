@@ -10,7 +10,7 @@
 
 
 #include "RotationEngine.hpp"
-#include "RigidBodyParameters.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 

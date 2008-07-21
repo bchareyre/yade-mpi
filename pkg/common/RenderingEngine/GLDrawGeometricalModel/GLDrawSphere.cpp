@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawSphere.hpp"
-#include "Sphere.hpp"
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 

@@ -10,7 +10,7 @@
 #define INTERACTINGBOX2AABB_HPP
 
 
-#include "BoundingVolumeEngineUnit.hpp"
+#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
 
 class InteractingBox2AABB : public BoundingVolumeEngineUnit
