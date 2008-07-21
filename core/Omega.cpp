@@ -79,6 +79,8 @@ void Omega::createSimulationLoop(){	simulationLoop=shared_ptr<ThreadRunner>(new 
 void Omega::finishSimulationLoop(){ LOG_DEBUG(""); if (simulationLoop&&simulationLoop->looping())simulationLoop->stop();}
 void Omega::joinSimulationLoop(){ LOG_DEBUG(""); finishSimulationLoop(); if (simulationLoop) simulationLoop=shared_ptr<ThreadRunner>(); }
 
+/* WARNING: single simulation is still run asynchronously; the call will return before the iteration is finished.
+ */
 void Omega::spawnSingleSimulationLoop(){
 	if (simulationLoop){
 		msStartingPauseTime = microsec_clock::local_time();

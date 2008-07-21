@@ -18,7 +18,7 @@
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
-#include<yade/pkg-common/GravityEngine.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>

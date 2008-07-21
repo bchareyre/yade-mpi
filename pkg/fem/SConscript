@@ -115,7 +115,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-fem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
 			

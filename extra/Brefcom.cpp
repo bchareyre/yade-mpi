@@ -123,7 +123,9 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		#endif
 
 		// shorthands
-		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); Real& omega(BC->omega); Real& sigmaN(BC->sigmaN); 
+		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate);
+		// for python access
+		Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs);
 
 		Real dist=(rbp1->se3.position-rbp2->se3.position).Length();
 		#define NNAN(a) assert(!isnan(a));
@@ -183,9 +185,6 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 			//epsT-=contGeom->normal*epsT.Dot(contGeom->normal);
 			//TRVAR1(epsT.Dot(contGeom->normal));
 			
-
-		Vector3r sigmaT;
-
 		#ifdef BREFCOM_MATERIAL_MODEL
 			BREFCOM_MATERIAL_MODEL
 		#else
@@ -197,12 +196,9 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		//if(BC->omega==1){TRVAR5(equilibriumDist,dist,epsN,kappaD,BC->epsFracture);}
 
 		// store Fn (and Fs?), for use with BrefcomStiffnessCounter
-		NNAN(sigmaN);
-		NNAN(sigmaT[0]);
-		NNAN(sigmaT[1]);
-		NNAN(sigmaT[2]);
+		NNAN(sigmaN); NNAN(sigmaT[0]);NNAN(sigmaT[1]);NNAN(sigmaT[2]);
 		NNAN(crossSection);
-		Fn=sigmaN*crossSection;
+		Fn=sigmaN*crossSection;	Fs=sigmaT*crossSection;
 		//TRVAR5(epsN,epsT,sigmaN,sigmaT,crossSection*(contGeom->normal*sigmaN + sigmaT));
 		applyForce(crossSection*(contGeom->normal*sigmaN + sigmaT)); /* this is the force applied on the _first_ body */
 

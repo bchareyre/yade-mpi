@@ -395,7 +395,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
 			
@@ -433,7 +433,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
@@ -471,7 +471,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'CinemCisEngine',
 			'yade-serialization',
 			'yade-base',
@@ -507,7 +507,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
 			
@@ -542,7 +542,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
 			'PhysicalActionContainerInitializer',
@@ -576,7 +576,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'TranslationEngine',
 			'yade-serialization',
 			'yade-base',
@@ -610,7 +610,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
@@ -648,7 +648,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'InteractingBox',
 			'NewtonsDampedLaw',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
@@ -696,7 +696,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
@@ -744,7 +744,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
@@ -787,7 +787,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
 			
@@ -860,7 +860,7 @@ env.SharedLibrary('TriaxialTestWater',
         CundallNonViscousMomentumDamping
         CundallNonViscousForceDamping
         MetaInteractingGeometry
-        GravityEngine
+        GravityEngines
         yade-serialization
         PhysicalActionContainerInitializer
         PhysicalActionContainerReseter
@@ -944,7 +944,7 @@ env.SharedLibrary('InteractingSphere2AABBwater',
 		
 env.SharedLibrary('HydraulicForceEngine',
 		['Engine/DeusExMachina/HydraulicForceEngine.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Force', 'Momentum', 'ParticleParameters', 'CohesiveFrictionalBodyParameters', 'TriaxialCompressionEngine', 'GravityEngine'],
+		LIBS=env['LIBS']+['yade-base',  'Force', 'Momentum', 'ParticleParameters', 'CohesiveFrictionalBodyParameters', 'TriaxialCompressionEngine', 'GravityEngines'],
 		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
 			'DataClass/PhysicalAction',
 			'$PREFIX/include',
@@ -983,7 +983,7 @@ env.SharedLibrary('HydraulicTest',
 			'CundallNonViscousMomentumDamping',
 			'CundallNonViscousForceDamping',
 			'MetaInteractingGeometry',
-			'GravityEngine',
+			'GravityEngines',
 			'yade-serialization',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
@@ -1068,7 +1068,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 			    ,'SimpleViscoelasticBodyParameters'
 			    ,'SimpleViscoelasticInteraction'
 			    ,'SimpleViscoelasticSpheresInteractionRecorder'
-			    ,'GravityEngine'
+			    ,'GravityEngines'
 			    ,'BodyRedirectionVector'
 			    ,'BoundingVolumeMetaEngine'
 			    ,'InteractingSphere'
@@ -1100,7 +1100,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'ElasticCriterionTimeStepper'
 				,'Facet'
 				,'GeometricalEdge'
-				,'GravityEngine'
+				,'GravityEngines'
 				,'InteractingEdge'
 				,'InteractingFacet'
 				,'InteractingSphere'

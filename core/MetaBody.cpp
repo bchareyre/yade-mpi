@@ -92,7 +92,7 @@ void MetaBody::moveToNextTimeStep()
 		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated()) e->action(this); }
 		needsInitializers=false;
 	}
-	FOREACH(const shared_ptr<Engine>& e, engines){ if(e->isActivated()) e->action(this); }
+	FOREACH(const shared_ptr<Engine>& e, engines){ if(e->isActivated()){ e->action(this); }}
 }
 
 shared_ptr<Engine> MetaBody::engineByName(string s){

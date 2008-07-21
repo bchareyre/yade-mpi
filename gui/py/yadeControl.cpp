@@ -263,6 +263,7 @@ class pyBodyContainer{
 		else return pyBody(proxee->operator[](id));
 	}
 	body_id_t insert(pyBody b){return proxee->insert(b.proxee);}
+	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
 };
 
@@ -320,7 +321,7 @@ class pyInteractionContainer{
 		/* return nth iteration from the container (0-based index); this is to facilitate picking random interaction */
 		pyInteraction pyNth(long n){
 			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(i++==n) return pyInteraction(I); }
-			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">"+lexical_cast<string>(i)+").");
+			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
 		}
 };
 
@@ -373,11 +374,7 @@ class pyOmega{
 
 	long iter(){ return OMEGA.getCurrentIteration();}
 	double simulationTime(){return OMEGA.getSimulationTime();}
-	double realTime(){
-		posix_time::time_duration duration=microsec_clock::local_time()-OMEGA.getMsStartingSimulationTime();
-		duration-=OMEGA.getSimulationPauseDuration();
-		return double(duration.total_seconds())+double(duration.total_milliseconds()%1000)/1000; // FIXME: fractional_seconds are usec or msec or compile-time dependent?! documentation not clear on that.
-	}
+	double realTime(){ return OMEGA.getComputationTime(); }
 	// long realTime(){return OMEGA(get...);}
 	double dt_get(){return OMEGA.getTimeStep();}
 	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt);}
@@ -390,26 +387,23 @@ class pyOmega{
 
 	void run(long int numIter=-1){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
-		//else OMEGA.stopAtIteration=-1;
 		OMEGA.startSimulationLoop();
 		long toGo=OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration();
 		LOG_DEBUG("RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!");
 	}
-	void pause(){OMEGA.stopSimulationLoop(); LOG_DEBUG("PAUSE!");}
-	void step() {OMEGA.spawnSingleSimulationLoop(); LOG_DEBUG("STEP!");}
+	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
+	void step() { LOG_DEBUG("STEP!"); run(1); wait();  }
+	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS; }
 
 	void load(std::string fileName) {
-		//OMEGA.finishSimulationLoop();
-		OMEGA.joinSimulationLoop();
+		Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; 
 		OMEGA.setSimulationFileName(fileName);
 		OMEGA.loadSimulation();
 		OMEGA.createSimulationLoop();
 		LOG_DEBUG("LOAD!");
 	}
 
-	void reset(){
-		OMEGA.reset();
-	}
+	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
 
 	void save(std::string fileName){
 		assertRootBody();
@@ -458,7 +452,6 @@ class pyOmega{
 	}
 
 
-	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /*40 ms*/ while(OMEGA.isRunning()) nanosleep(&t1,&t2); }
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->transientInteractions); }
@@ -525,6 +518,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	
 	boost::python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
+		.def("__len__",&pyBodyContainer::length)
 		.def("append",&pyBodyContainer::insert)
 		.def("clear", &pyBodyContainer::clear);
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())

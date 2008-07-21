@@ -16,7 +16,6 @@ class PeriodicPythonRunner: public StretchPeriodicEngine {
 		PeriodicPythonRunner(): command("pass"){};
 		/* virtual bool isActivated: not overridden, PeriodicEngine handles that */
 		virtual void action(MetaBody* b){
-			//cerr<<"[PeriodicPythonRunner]";
 			PyGILState_STATE gstate;
 				gstate = PyGILState_Ensure();
 				PyRun_SimpleString(command.c_str()); // this is suboptimal, since it has to be parsed at every execution; critical?

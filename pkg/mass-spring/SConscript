@@ -54,7 +54,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-mass-spring',[
 			'yade-base',
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
-			'GravityEngine',
+			'GravityEngines',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
 			'GeometricalModelMetaEngine',

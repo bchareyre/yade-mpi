@@ -20,7 +20,6 @@ void SimulationFlow::singleAction()
 		OO.incrementSimulationTime();
 		if(OO.getRootBody()->stopAtIteration>0 && OO.getCurrentIteration()==OO.getRootBody()->stopAtIteration){
 			setTerminate(true);
-			return;
 		}
 	}
 };

@@ -28,7 +28,7 @@
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
 #include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/GravityEngine.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/TranslationEngine.hpp>
 
 // body

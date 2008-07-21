@@ -34,7 +34,7 @@
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticContactLaw.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticRelationships.hpp>
-#include<yade/pkg-common/GravityEngine.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
 
 TestSimpleViscoelastic::TestSimpleViscoelastic() : FileGenerator()
 {

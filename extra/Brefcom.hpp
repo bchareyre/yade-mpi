@@ -38,10 +38,10 @@ class BrefcomContact: public InteractionPhysics {
 		bool neverDamage;
 
 		/*! auxiliary variable for visualization and BrefcomStiffnessCounter, recalculated by BrefcomLaw at every iteration */
-		Real omega, Fn, sigmaN, epsN;
+		Real omega, Fn, sigmaN, epsN; Vector3r sigmaT, Fs;
 
 		BrefcomContact(): InteractionPhysics(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), equilibriumDist(0), crossSection(0), expBending(0), xiShear(0), tau(0), expDmgRate(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; }
-		BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
+		BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
 
 
 		void registerAttributes(){
@@ -67,7 +67,12 @@ class BrefcomContact: public InteractionPhysics {
 			REGISTER_ATTRIBUTE(isCohesive);
 
 			// auxiliary params, to make them accessible from python
-			REGISTER_ATTRIBUTE(omega);REGISTER_ATTRIBUTE(Fn);
+			REGISTER_ATTRIBUTE(omega);
+			REGISTER_ATTRIBUTE(Fn);
+			REGISTER_ATTRIBUTE(Fs);
+			REGISTER_ATTRIBUTE(epsN);
+			REGISTER_ATTRIBUTE(sigmaN);
+			REGISTER_ATTRIBUTE(sigmaT);
 		};
 
 	REGISTER_CLASS_NAME(BrefcomContact);
@@ -88,7 +93,7 @@ class BrefcomLaw: public InteractionSolver{
 		 *
 		 * The orientation is conventionally as forces should be applied on the FIRST element in the interaction.
 		 */
-		Vector3r Fs; Real Fn;
+		//Vector3r Fs; Real Fn;
 		/* temporaries initialized in the loop over interactions; above methods use these. */
 		body_id_t id1, id2;
 		shared_ptr<Body> body1, body2;

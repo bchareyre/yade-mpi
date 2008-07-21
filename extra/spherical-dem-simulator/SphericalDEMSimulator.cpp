@@ -14,7 +14,7 @@
 #include<yade/core/Engine.hpp>
 
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/GravityEngine.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>

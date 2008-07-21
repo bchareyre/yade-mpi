@@ -26,7 +26,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	isMoving=false;
 	renderer=_renderer;
 	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
-	drawScale=fals;
+	drawScale=true;
 	viewId = id;
 	cut_plane = 0;
 	cut_plane_delta = -2;
@@ -415,7 +415,7 @@ qglviewer::Vec GLViewer::displayedSceneCenter(){
 }
 
 float GLViewer::displayedSceneRadius(){
-	return (camera()->unprojectedCoordinatesOf(qglviewer::Vec(width(),height(),.5))-camera()->unprojectedCoordinatesOf(qglviewer::Vec(0,0,.5))).norm();
+	return (camera()->unprojectedCoordinatesOf(qglviewer::Vec(width()/2,height()/2,.5))-camera()->unprojectedCoordinatesOf(qglviewer::Vec(0,0,.5))).norm();
 }
 
 void GLViewer::postDraw(){
@@ -423,7 +423,7 @@ void GLViewer::postDraw(){
 	Real dispDiameter=min(wholeDiameter,max((Real)displayedSceneRadius()*2,wholeDiameter/1e3)); // limit to avoid drawing 1e5 lines with big zoom level
 	//qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
 	Real gridStep=pow(10,(floor(log10(dispDiameter)-.7)));
-	Real scaleStep=pow(10,(floor(log10(displayedSceneRadius()*2)-.7))); // unsconstrained
+	Real scaleStep=pow(10,(floor(log10(displayedSceneRadius()*2)-.7))); // unconstrained
 	int nSegments=((int)(wholeDiameter/gridStep))+1;
 	Real realSize=nSegments*gridStep;
 	//LOG_DEBUG("nSegments="<<nSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
@@ -447,9 +447,10 @@ void GLViewer::postDraw(){
 			for(int xy=0;xy<2;xy++)extremalDxDy[xy]=(axis>0 ? min(extremalDxDy[xy],(int)screenDxDy[axis][xy]) : screenDxDy[axis][xy]);
 		}
 		//LOG_DEBUG("Screen offsets for axes: "<<" x("<<screenDxDy[0][0]<<","<<screenDxDy[0][1]<<") y("<<screenDxDy[1][0]<<","<<screenDxDy[1][1]<<") z("<<screenDxDy[2][0]<<","<<screenDxDy[2][1]<<")");
-		int margin=20; // screen pixels
+		int margin=10; // screen pixels
 		int scaleCenter[2]; scaleCenter[0]=abs(extremalDxDy[0])+margin; scaleCenter[1]=abs(extremalDxDy[1])+margin;
 		//LOG_DEBUG("Center of scale "<<scaleCenter[0]<<","<<scaleCenter[1]);
+		//displayMessage(QString().sprintf("displayed scene radius %g",displayedSceneRadius()));
 		startScreenCoordinatesSystem();
 			glDisable(GL_LIGHTING);
 			glDisable(GL_DEPTH_TEST);
@@ -464,8 +465,8 @@ void GLViewer::postDraw(){
 			}
 			glLineWidth(1.);
 			glEnable(GL_DEPTH_TEST);
+			QGLViewer::drawText(scaleCenter[0],scaleCenter[1],QString().sprintf("%.3g",scaleStep));
 		stopScreenCoordinatesSystem();
-		QGLViewer::drawText(scaleCenter[0],scaleCenter[1],QString().sprintf("%.3g",scaleStep));
 	}
 
 	// cutting planes (should be moved to OpenGLRenderingEngine perhaps?)

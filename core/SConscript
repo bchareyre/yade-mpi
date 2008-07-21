@@ -32,7 +32,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 		LIBS=env['LIBS']+['yade-base',
 			'yade-serialization',
 			'yade-factory',
-			'yade-base',
 			'yade-loki',
 			'yade-multimethods',
 			'glut'],

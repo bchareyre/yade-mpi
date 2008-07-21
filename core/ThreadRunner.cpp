@@ -70,11 +70,11 @@ void ThreadRunner::start()
 
 void ThreadRunner::stop()
 {
-	std::cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<std::endl;
+	//std::cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<std::endl;
 	if(!m_looping) return;
-	std::cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<std::endl;
+	//std::cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<std::endl;
 	boost::mutex::scoped_lock lock(m_boolmutex);
-	std::cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<std::endl;
+	//std::cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<std::endl;
 	m_looping=false;
 }
 

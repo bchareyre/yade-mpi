@@ -48,7 +48,7 @@
 
 #include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
-#include<yade/pkg-common/GravityEngine.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/CinemCisEngine.hpp>
 
 

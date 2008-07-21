@@ -1,31 +1,49 @@
+// Copyright (C) 2004 by Janek Kozicki <cosurgi@berlios.de>
+// 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #pragma once
-
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/pkg-common/Force.hpp>
 
-/* Engine attracting all bodies towards a central body, using Newton's gravity law.
+/* Homogeneous gravity field; applies gravity*mass force on all bodies.
  *
- * http://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation.
- * Unlike in real gravity, there are no forces exerted on the central body.
- * Should there be? This way, we don't have energy conservation.
+ * @bug is a DeusExMachina, but doesn't care about subscribedBodies.
+ */
+class GravityEngine : public DeusExMachina{
+		int cachedForceClassIndex;
+	public :
+		Vector3r gravity;
+		GravityEngine(): gravity(Vector3r::ZERO){shared_ptr<Force> f(new Force); cachedForceClassIndex=f->getClassIndex();};
+		virtual ~GravityEngine(){};
+		virtual void applyCondition(MetaBody*);
+	protected :
+		virtual void registerAttributes(){REGISTER_ATTRIBUTE(gravity);}
+	NEEDS_BEX("Force");
+	REGISTER_CLASS_NAME(GravityEngine);
+	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+};
+REGISTER_SERIALIZABLE(GravityEngine,false);
+
+
+/* Engine attracting all bodies towards a central body (doesn't depend on distance);
  *
  * @todo This code has not been yet tested at all.
- *
+ * @bug is a DeusExMachina, but doesn't care about subscribedBodies.
  */
-
 class CentralGravityEngine: public DeusExMachina {
 	private:
 		int cachedForceClassIndex;
 	public:
 		//! The body towards which all other bodies are attracted.
 		body_id_t centralBody;
-		//! The gravity constant. Must be big enough to have realistic influence when masses are small.
-		Real kappa;
-		CentralGravityEngine(){ shared_ptr<Force> f(new Force); cachedForceClassIndex=f->getClassIndex(); }
+		//! acceleration towards the central body
+		Real accel;
+		//! Whether to apply reciprocal force to the central body as well
+		bool reciprocal;
+		CentralGravityEngine(){ shared_ptr<Force> f(new Force); cachedForceClassIndex=f->getClassIndex(); reciprocal=false; }
 		virtual ~CentralGravityEngine(){};
 		virtual void applyCondition(MetaBody*);
 	protected:
-		virtual void registerAttributes(){REGISTER_ATTRIBUTE(centralBody); REGISTER_ATTRIBUTE(kappa);}
+		virtual void registerAttributes(){REGISTER_ATTRIBUTE(centralBody); REGISTER_ATTRIBUTE(accel); REGISTER_ATTRIBUTE(reciprocal); }
 		NEEDS_BEX("Force");
 		REGISTER_CLASS_NAME(CentralGravityEngine);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
@@ -34,6 +52,7 @@ REGISTER_SERIALIZABLE(CentralGravityEngine,false);
 
 /*! Apply acceleration (independent of distance) directed towards an axis.
  *
+ * @bug is a DeusExMachina, but doesn't care about subscribedBodies.
  */
 class AxialGravityEngine: public DeusExMachina {
 	private:
@@ -53,7 +72,6 @@ class AxialGravityEngine: public DeusExMachina {
 		NEEDS_BEX("Force");
 		REGISTER_CLASS_NAME(AxialGravityEngine);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
-		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(AxialGravityEngine,false);
 
