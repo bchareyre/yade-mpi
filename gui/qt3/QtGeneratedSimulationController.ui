@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>275</width>
-            <height>510</height>
+            <width>261</width>
+            <height>470</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -33,17 +33,94 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
         <widget class="QLayoutWidget" row="0" column="0">
             <property name="name">
-                <cstring>layout10</cstring>
+                <cstring>layout11</cstring>
             </property>
             <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <property name="spacing">
-                    <number>0</number>
-                </property>
+                <widget class="QLayoutWidget" row="0" column="0">
+                    <property name="name">
+                        <cstring>layout9</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelRealTime</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>real 0:00:00.000</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelSimulTime</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>virt 00:000.000m000u000n</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelIter</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>iter #0, 0/s</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>labelStep</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>step 4e-3</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
                 <widget class="QTabWidget" row="1" column="0">
                     <property name="name">
                         <cstring>tabWidget</cstring>
@@ -56,6 +133,9 @@
                     </property>
                     <property name="tabShape">
                         <enum>Rounded</enum>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
                     </property>
                     <widget class="QWidget">
                         <property name="name">
@@ -412,6 +492,12 @@
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
+                            <property name="margin">
+                                <number>0</number>
+                            </property>
+                            <property name="spacing">
+                                <number>0</number>
+                            </property>
                             <widget class="QLabel" row="3" column="0">
                                 <property name="name">
                                     <cstring>textLabel1</cstring>
@@ -533,96 +619,46 @@
                                 <property name="frameShadow">
                                     <enum>Raised</enum>
                                 </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
                             </widget>
                         </grid>
                     </widget>
                 </widget>
-                <widget class="QLayoutWidget" row="0" column="0">
-                    <property name="name">
-                        <cstring>layout9</cstring>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="spacing">
-                            <number>0</number>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelRealTime</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>real 0:00:00.000</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelSimulTime</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>virt 00:000.000m000u000n</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelIter</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>iter #0, 0/s</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelStep</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>step 4e-3</string>
-                            </property>
-                        </widget>
-                    </vbox>
-                </widget>
                 <widget class="QLayoutWidget" row="2" column="0">
                     <property name="name">
-                        <cstring>layout5</cstring>
+                        <cstring>layout8</cstring>
                     </property>
-                    <hbox>
+                    <grid>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
-                        <widget class="QPushButton">
+                        <widget class="QPushButton" row="0" column="1">
+                            <property name="name">
+                                <cstring>pbReference</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Reference</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="0" column="2">
+                            <property name="name">
+                                <cstring>pbCenterScene_2</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Center</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="0" column="0">
                             <property name="name">
                                 <cstring>pbNewView_2</cstring>
                             </property>
@@ -631,7 +667,7 @@
                             </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
-                                    <hsizetype>0</hsizetype>
+                                    <hsizetype>7</hsizetype>
                                     <vsizetype>0</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
@@ -641,23 +677,7 @@
                                 <string>New 3D</string>
                             </property>
                         </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>pbCenterScene_2</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>Center all</string>
-                            </property>
-                        </widget>
-                    </hbox>
+                    </grid>
                 </widget>
             </grid>
         </widget>
@@ -771,6 +791,12 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>bgTimeStepClicked(int)</slot>
     </connection>
+    <connection>
+        <sender>pbReference</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbReferenceClicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
@@ -799,6 +825,8 @@
     <slot>cbSyncToggled( bool )</slot>
     <slot>pbStart2Clicked()</slot>
     <slot>closeGLViewEvent( int )</slot>
+    <slot>pbReference_clicked()</slot>
+    <slot>pbReferenceClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -1,10 +1,5 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi, Janek Kozicki                  *
-*  2008 Václav Šmilauer
-*  *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// Copyright (C) 2004 by Olivier Galizzi, Janek Kozicki                  *
+// © 2008 Václav Šmilauer
 #pragma once
 
 #include<yade/core/Omega.hpp>

@@ -18,7 +18,7 @@ log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.QtGUI-python");
 using namespace boost::python;
 
 BASIC_PY_PROXY_HEAD(pyOpenGLRenderingEngine,OpenGLRenderingEngine)
-	void setRefSe3(){ proxee->setRefSe3(Omega::instance().getRootBody()); }
+	void setRefSe3(){ proxee->setBodiesRefSe3(Omega::instance().getRootBody()); }
 BASIC_PY_PROXY_TAIL;
 
 YadeQtMainWindow* ensuredMainWindow(){if(!YadeQtMainWindow::self) throw runtime_error("No instance of YadeQtMainWindow"); return YadeQtMainWindow::self; }

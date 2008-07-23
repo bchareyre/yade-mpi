@@ -90,7 +90,7 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 }
 
 void YadeQtMainWindow::redrawAll(bool force){
-	if(force || (controller && !controller->syncRunning) || (!controller)){
+	if(renderer && (force || (controller && !controller->syncRunning) || (!controller))){
 		FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
 	}
 }
@@ -115,6 +115,7 @@ void YadeQtMainWindow::closeEvent(QCloseEvent *e){ closeAllChilds(); YadeQtGener
 
 void YadeQtMainWindow::ensureRenderer(){
 	if(!renderer){
+		LOG_DEBUG("Creating OpenGLRenderingEngine instance.");
 		shared_ptr<Factorable> tmpRenderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
 		renderer=static_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
 	}
@@ -166,6 +167,7 @@ void YadeQtMainWindow::closeView(GLViewer* glv){
 				if(noOtherViews){
 					LOG_DEBUG("Deleting primary view (no other views exist).");
 					glViews.clear();
+					renderer=shared_ptr<OpenGLRenderingEngine>();
 				}else{LOG_INFO("Cannot close primary view, other views still exist.");}
 				return;
 			}

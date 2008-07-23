@@ -33,14 +33,14 @@ class OpenGLRenderingEngine : public RenderingEngine
 		vector<Se3r> clipPlaneSe3;
 		vector<int> clipPlaneActive; // should be bool, but serialization doesn't handle vector<bool>
 		const int clipPlaneNum;
-		vector<Se3r> refSe3;
 		bool scaleDisplacements,scaleRotations;
 		Vector3r displacementScale; Real rotationScale;
 
 		bool pointClipped(const Vector3r& p);
-		Se3r renderedSe3(const shared_ptr<Body>&);
 		vector<Vector3r> clipPlaneNormals;
-		void setRefSe3(const shared_ptr<MetaBody>& rootBody);
+		void setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody);
+		void setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody);
+		long numBodiesWhenRefSe3LastSet;
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;

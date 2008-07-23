@@ -111,8 +111,8 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 :09:37] eudoxos2: enum {LOOP1,LOOP2,END}
 [16:09:37] eudoxos2: for(int state=LOOP1; state!=END; state++){
 [16:09:37] eudoxos2: 	FOREACH(const shared_ptr<Body>& b, rootBody->bodies){
-[16:09:38] eudoxos2: 		if(b->isClumpMember() && LOOP1){ /* apply that on b->clumpId  }
-[16:09:38] eudoxos2: 		if((b->isStandalone && LOOP1) || (b->isClump && LOOP2){ /* damping, newton, integrate }
+[16:09:38] eudoxos2: 		if(b->isClumpMember() && LOOP1){ [[apply that on b->clumpId]]  }
+[16:09:38] eudoxos2: 		if((b->isStandalone && LOOP1) || (b->isClump && LOOP2){ [[damping, newton, integrate]] }
 [16:09:38] eudoxos2: 		if(b->isClump() && LOOP 2){ b->moveMembers(); }
 [16:09:40] eudoxos2: 		}
 [16:09:42] eudoxos2: 	}

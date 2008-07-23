@@ -251,8 +251,8 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 		glutSolidCube(1);
 	} */
 
-	if(contactLine) Shop::GLDrawLine(b1->physicalParameters->se3.position,b2->physicalParameters->se3.position,Vector3r(BC->omega,1-BC->omega,0.0) /* damaged links red, undamaged green */ );
-	if(dmgLabel){ Shop::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->se3.position+b2->physicalParameters->se3.position),Vector3r(BC->omega,1-BC->omega,0.)); }
+	if(contactLine) Shop::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,Vector3r(BC->omega,1-BC->omega,0.0) /* damaged links red, undamaged green */ );
+	if(dmgLabel){ Shop::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),Vector3r(BC->omega,1-BC->omega,0.)); }
 	const Vector3r& cp=static_pointer_cast<SpheresContactGeometry>(i->interactionGeometry)->contactPoint;
 	if(epsT){
 		Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;

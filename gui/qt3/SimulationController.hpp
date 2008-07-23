@@ -62,6 +62,7 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void pbStopClicked();
 		virtual void pbStartClicked();
 		virtual void pbResetClicked();
+		virtual void pbReferenceClicked();
 		virtual void pbCenterSceneClicked();
 		virtual void pbOneSimulationStepClicked();
 		virtual void bgTimeStepClicked(int i);
