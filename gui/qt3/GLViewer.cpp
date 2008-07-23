@@ -215,8 +215,9 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if(e->key()==Qt::Key_P) camera()->setFieldOfView(camera()->fieldOfView()*1.1);
 	else if(e->key()==Qt::Key_R){ // reverse the clipping plane; revolve around scene center if no clipping plane selected
 		if(manipulatedClipPlane>=0 && manipulatedClipPlane<renderer->clipPlaneNum){
-			manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
-			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane-1)+" reversed.");
+			//manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
+			renderer->clipPlaneSe3[manipulatedClipPlane].orientation=Quaternionr(Vector3r(0,1,0),Mathr::PI)*renderer->clipPlaneSe3[manipulatedClipPlane].orientation; 
+			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane+1)+" reversed.");
 		}
 		else {
 			camera()->setRevolveAroundPoint(sceneCenter());

@@ -19,7 +19,7 @@
 	All kinematic engines must derived from this class. A kinematic engine is used to modify the state of an object
 	(position,veloity ...) according to a predefined law (mathematical function, stored data ...) and not according
 	to a dynamic law as dynamic engines do. A kinematic engine contains a list of bodies to act on, and bodies can
-	subscribe to several deux ex machinas.
+	subscribe to several dii ex machina.
 */
 
 class DeusExMachina : public Engine

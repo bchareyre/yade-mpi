@@ -13,6 +13,7 @@ DeusExMachina::DeusExMachina() : Engine() {
 }
 
 void DeusExMachina::registerAttributes() {
+	Engine::registerAttributes();
 	REGISTER_ATTRIBUTE(subscribedBodies);
 }
 

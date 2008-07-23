@@ -96,13 +96,18 @@ inline void lexical_copy(Archive& ac , any& a )
 	{
 		const string * tmpStr = any_cast<const string*>(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
-		*tmp = lexical_cast<Type>(*tmpStr);
+		try{
+			*tmp = lexical_cast<Type>(*tmpStr);
+		} catch(boost::bad_lexical_cast& e){
+			if(a.type()==typeid(bool*) && atoi(tmpStr->c_str())!=0) { *tmp=lexical_cast<Type>("true"); cerr<<"Offensive bool value `"<<*tmpStr<<"' encountered.!!"<<endl; }
+			else throw e;
+		}
 	}
 	else if (a.type()==typeid(string*)) // serialization - writing to string from some Type
 	{ CHK_XML();
 		string * tmpStr = any_cast<string*>(a);
 		Type * tmp = any_cast<Type*>(ac.getAddress());
-		*tmpStr = lexical_cast<string>(*tmp);
+			*tmpStr = lexical_cast<string>(*tmp);
 	}
 	else
 		cerr<<"lexical_cast(XML): (de)serialization format mismatch"<<endl;

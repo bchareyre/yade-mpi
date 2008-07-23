@@ -41,7 +41,7 @@ o.engines=[
 	### 
 	### The engine _must_ be labeled 'plotDataCollector', so that the reducer may find it and adjust its periods if necessary.
 	###
-	StandAloneEngine('PeriodicPythonRunner',{'realTimeLim':[1,1,4],'iterLim':[50,50,200],'command':'myAddPlotData()','label':'plotDataCollector'})
+	StandAloneEngine('PeriodicPythonRunner',{'realPeriod':1,'realLim':10,'iterPeriod':1000,'iterLim':10000,'command':'myAddPlotData()','label':'plotDataCollector'})
 ]
 from yade import utils
 o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
@@ -79,3 +79,4 @@ print """Now, you can say
 
 to see figures.
 """
+import yade.plot as yp

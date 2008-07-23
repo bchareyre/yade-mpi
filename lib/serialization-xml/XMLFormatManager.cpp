@@ -321,7 +321,7 @@ void XMLFormatManager::deserializeFundamental(istream& stream, Archive& ac, cons
 	}
 	catch(boost::bad_lexical_cast& )
 	{
-		string error=string(IOManagerExceptions::BadAttributeValue) + " (bad lexical_cast), Tag: \"" + saxParser.getTagName() + + "\", Attribute: \"" + ac.getName() + "\", Line: " + lexical_cast<string>(saxParser.getLineNumber());
+		string error=string(IOManagerExceptions::BadAttributeValue) + " (bad lexical_cast), Tag: \"" + saxParser.getTagName() + + "\", Attribute: \"" + ac.getName() + "\", offending value: `"+str+"', Line: " + lexical_cast<string>(saxParser.getLineNumber());
 		throw SerializableError(error.c_str());
 	}
 }

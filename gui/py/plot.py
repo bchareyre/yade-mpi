@@ -81,11 +81,24 @@ def plot():
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
 	pylab.show()
-
-def update():
-	pylab.draw();
-#	for p in plots:
-#		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
+updatePeriod=0
+def periodicUpdate(period):
+	import time
+	global updatePeriod
+	while updatePeriod>0:
+		doUpdate()
+		time.sleep(updatePeriod)
+def startUpdate(period=10):
+	global updatePeriod
+	updatePeriod=period
+	import threading
+	threading.Thread(target=periodicUpdate,args=(period,),name='Thread-update').start()
+def stopUpdate():
+	global updatePeriod
+	updatePeriod=0
+def doUpdate():
+	pylab.close('all')
+	plot()
 
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None):

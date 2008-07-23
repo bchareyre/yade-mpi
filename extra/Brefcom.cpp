@@ -148,22 +148,27 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		// /* TODO: recover non-cohesive contact deletion: */
 		if(!BC->isCohesive && epsN>0.){ /* delete this interaction later */ I->isReal=false; continue; }
-
+		#define BREFCOM_DETAIL
 		/* shear strain: always use it, even for epsN>0 */
 		/*if(false && epsN>0) { epsT=Vector3r::ZERO; } else {*/
 				NNANV(epsT);
 			/* rotate epsT to the new contact plane */
 				const Real& dt=Omega::instance().getTimeStep();
 				// rotation of the contact normal
-				//TRVAR2(epsT,BC->prevNormal.Cross(contGeom->normal));
-				//TRVAR1((BC->prevNormal.Cross(contGeom->normal)).Cross(epsT));
+				#ifdef BREFCOM_DETAIL
+					TRVAR2(epsT,BC->prevNormal.Cross(contGeom->normal));
+					TRVAR1((BC->prevNormal.Cross(contGeom->normal)).Cross(epsT));
+				#endif
 				epsT+=(BC->prevNormal.Cross(contGeom->normal)).Cross(epsT);
 				NNANV(epsT);
 				
 				// mutual rotation
 				Real angle=dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity); /*assumes equal radii */
-				//TRVAR1(dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity));
-				//TRVAR1(epsT.Cross(angle*contGeom->normal));
+				#ifdef BREFCOM_DETAIL
+					TRVAR1(epsT);
+					TRVAR1(dt*.5*contGeom->normal.Dot(rbp1->angularVelocity+rbp2->angularVelocity));
+					TRVAR1((angle*contGeom->normal).Cross(epsT));
+				#endif
 				epsT+=(angle*contGeom->normal).Cross(epsT);
 				NNANV(epsT);
 
@@ -171,15 +176,21 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 				Vector3r AtoC(contGeom->contactPoint-rbp1->se3.position), BtoC(contGeom->contactPoint-rbp2->se3.position);
 				//TRVAR3(contGeom->contactPoint,rbp1->se3.position,rbp2->se3.position);
 				Vector3r relVelocity /* at the contact point */ = 
-					//rbp2->velocity-rbp1->velocity +
+					rbp2->velocity-rbp1->velocity +
 					rbp2->angularVelocity.Cross(BtoC)
 					-rbp1->angularVelocity.Cross(AtoC);
 
 				Vector3r tangentialDisplacement=dt*(relVelocity- /* subtract non-shear component */ contGeom->normal.Dot(relVelocity)*contGeom->normal);
-				//TRVAR4(AtoC,BtoC,rbp2->angularVelocity,rbp1->angularVelocity);
-				//TRVAR3(relVelocity,tangentialDisplacement,tangentialDisplacement/dist);
-				//TRWM3VEC(contGeom->normal);
-			epsT+=tangentialDisplacement/dist;
+				#ifdef BREFCOM_DETAIL
+					TRVAR1(epsT);
+					TRVAR4(AtoC,BtoC,rbp2->angularVelocity,rbp1->angularVelocity);
+					TRVAR3(relVelocity,tangentialDisplacement,tangentialDisplacement/dist);
+					TRWM3VEC(contGeom->normal);
+				#endif
+				epsT+=tangentialDisplacement/dist;
+				#ifdef BREFCOM_DETAIL
+					TRVAR1(epsT);
+				#endif
 				NNANV(epsT);
 			/* artificially remove residuum in the normal direction */
 			//epsT-=contGeom->normal*epsT.Dot(contGeom->normal);
@@ -198,7 +209,8 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		// store Fn (and Fs?), for use with BrefcomStiffnessCounter
 		NNAN(sigmaN); NNAN(sigmaT[0]);NNAN(sigmaT[1]);NNAN(sigmaT[2]);
 		NNAN(crossSection);
-		Fn=sigmaN*crossSection;	Fs=sigmaT*crossSection;
+		Fn=sigmaN*crossSection;
+		Fs=sigmaT*crossSection;
 		//TRVAR5(epsN,epsT,sigmaN,sigmaT,crossSection*(contGeom->normal*sigmaN + sigmaT));
 		applyForce(crossSection*(contGeom->normal*sigmaN + sigmaT)); /* this is the force applied on the _first_ body */
 

@@ -318,9 +318,9 @@ class pyInteractionContainer{
 			shared_ptr<Interaction> i=proxee->find(id1_(),id2_());
 			if(i) return pyInteraction(i); else throw invalid_argument("No such interaction.");
 		}
-		/* return nth iteration from the container (0-based index); this is to facilitate picking random interaction */
+		/* return nth _real_ iteration from the container (0-based index); this is to facilitate picking random interaction */
 		pyInteraction pyNth(long n){
-			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(i++==n) return pyInteraction(I); }
+			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(!I->isReal) continue; if(i++==n) return pyInteraction(I); }
 			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
 		}
 };
