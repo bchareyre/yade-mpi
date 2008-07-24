@@ -9,7 +9,7 @@
 #ifndef __GLDRAWINTERACTINGEDGE_HPP__
 #define __GLDRAWINTERACTINGEDGE_HPP__
 
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawInteractingEdge : public GLDrawInteractingGeometryFunctor
 {	

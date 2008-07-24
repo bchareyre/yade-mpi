@@ -9,7 +9,7 @@
 #ifndef GLDRAWMESH2D_HPP
 #define GLDRAWMESH2D_HPP
 
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawMesh2D : public GLDrawGeometricalModelFunctor
 {	

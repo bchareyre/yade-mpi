@@ -9,7 +9,7 @@
 #ifndef GLDRAWAABB_HPP
 #define GLDRAWAABB_HPP
 
-#include<yade/pkg-common/GLDrawBoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawAABB : public GLDrawBoundingVolumeFunctor
 {

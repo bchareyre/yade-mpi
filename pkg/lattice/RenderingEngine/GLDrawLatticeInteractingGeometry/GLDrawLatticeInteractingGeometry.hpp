@@ -9,7 +9,7 @@
 #ifndef GLDRAW_LATTICE_INTERACTING_GEOMETRY_HPP
 #define GLDRAW_LATTICE_INTERACTING_GEOMETRY_HPP
 
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 #include <vector>
 
 class GLDrawLatticeInteractingGeometry : public GLDrawInteractingGeometryFunctor

@@ -9,7 +9,7 @@
 #ifndef GLDRAW_CohesiveFrictionalContactInteraction_HPP
 #define GLDRAW_CohesiveFrictionalContactInteraction_HPP
 
-#include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawCohesiveFrictionalContactInteraction : public GLDrawInteractionPhysicsFunctor
 {	

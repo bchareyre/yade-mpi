@@ -9,7 +9,7 @@
 #ifndef GLDRAW_SPHERES_LINK_CONTACT_GEOMETRY_HPP
 #define GLDRAW_SPHERES_LINK_CONTACT_GEOMETRY_HPP
 
-#include<yade/pkg-common/GLDrawInteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawSDECLinkGeometry : public GLDrawInteractionGeometryFunctor
 {	

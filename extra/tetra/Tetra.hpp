@@ -14,7 +14,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
 #include<yade/pkg-common/Force.hpp>

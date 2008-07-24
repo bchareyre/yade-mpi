@@ -9,7 +9,7 @@
 #ifndef GLDRAWBOXSHADOWVOLUME_HPP
 #define GLDRAWBOXSHADOWVOLUME_HPP
 
-#include<yade/pkg-common/GLDrawShadowVolumeFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawBoxShadowVolume : public GLDrawShadowVolumeFunctor
 {

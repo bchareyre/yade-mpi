@@ -9,7 +9,7 @@
 #ifndef GLDRAW_LATTICE_BEAM_STATE_HPP
 #define GLDRAW_LATTICE_BEAM_STATE_HPP
 
-#include<yade/pkg-common/GLDrawStateFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawLatticeBeamState : public GLDrawStateFunctor
 {

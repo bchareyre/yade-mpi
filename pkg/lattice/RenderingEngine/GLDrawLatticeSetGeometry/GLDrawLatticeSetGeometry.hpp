@@ -9,7 +9,7 @@
 #ifndef GLDRAW_LATTICE_SET_GEOMETRY_HPP
 #define GLDRAW_LATTICE_SET_GEOMETRY_HPP
 
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/lib-computational-geometry/MarchingCube.hpp>
 #include <vector>
 

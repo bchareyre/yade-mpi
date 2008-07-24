@@ -9,7 +9,7 @@
 #ifndef __GLDRAWINTERACTINGFACET_HPP__
 #define __GLDRAWINTERACTINGFACET_HPP__
 
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawInteractingFacet : public GLDrawInteractingGeometryFunctor
 {	

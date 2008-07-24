@@ -9,7 +9,7 @@
 #ifndef __GLDRAWINTERACTINGVERTEX_HPP__
 #define __GLDRAWINTERACTINGVERTEX_HPP__
 
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawInteractingVertex : public GLDrawInteractingGeometryFunctor
 {	

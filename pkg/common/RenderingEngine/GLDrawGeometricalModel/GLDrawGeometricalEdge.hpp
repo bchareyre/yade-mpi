@@ -8,7 +8,7 @@
 #ifndef GLDRAWGEOMETRICALEDGE_HPP
 #define GLDRAWGEOMETRICALEDGE_HPP
 
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawGeometricalEdge : public GLDrawGeometricalModelFunctor
 {

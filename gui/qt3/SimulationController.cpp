@@ -57,7 +57,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	scrollView = new QScrollView( scrollViewOutsideFrame, "scrollView" );
 	scrollView->setVScrollBarMode(QScrollView::Auto);
 	scrollView->setHScrollBarMode(QScrollView::Auto);
-	scrollViewLayout->addWidget( scrollView );
+	scrollViewLayout->addWidget(scrollView);
 	scrollView->show();
 
 	YadeQtMainWindow::self->ensureRenderer(); /* create renderer if none, load its config */

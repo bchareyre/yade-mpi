@@ -9,7 +9,7 @@
 #ifndef GLDRAWSPHERE_HPP
 #define GLDRAWSPHERE_HPP
 
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawSphere : public GLDrawGeometricalModelFunctor
 {

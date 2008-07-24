@@ -9,7 +9,7 @@
 #ifndef GLDRAWFACET_HPP
 #define GLDRAWFACET_HPP
 
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawFacet : public GLDrawGeometricalModelFunctor
 {

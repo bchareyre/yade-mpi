@@ -9,7 +9,7 @@
 #include<yade/pkg-common/Momentum.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-dem/GlobalStiffness.hpp>
 

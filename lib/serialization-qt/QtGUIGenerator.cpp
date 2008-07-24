@@ -126,7 +126,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 			IOFormatManager::parseFundamental(stream.str(), descriptor->strings);
 				
 			descriptor->label = new QLabel( widget);
-			descriptor->label->setText(descriptor->name+" : ");
+			descriptor->label->setText(descriptor->name); // was: +" : "
 			
 			unsigned int nbStrings = descriptor->strings.size();
 			for(unsigned int i=0;i<nbStrings;i++)

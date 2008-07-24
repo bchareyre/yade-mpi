@@ -9,7 +9,7 @@
 #ifndef GLDRAWVERTEX_HPP
 #define GLDRAWVERTEX_HPP
 
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawVertex : public GLDrawGeometricalModelFunctor
 {

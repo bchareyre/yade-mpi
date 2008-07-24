@@ -9,7 +9,7 @@
 #ifndef GLDRAWSPHERESHADOWVOLUME_HPP
 #define GLDRAWSPHERESHADOWVOLUME_HPP
 
-#include<yade/pkg-common/GLDrawShadowVolumeFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawSphereShadowVolume : public GLDrawShadowVolumeFunctor
 {

@@ -118,6 +118,7 @@ void YadeQtMainWindow::ensureRenderer(){
 		LOG_DEBUG("Creating OpenGLRenderingEngine instance.");
 		shared_ptr<Factorable> tmpRenderer=ClassFactory::instance().createShared("OpenGLRenderingEngine");
 		renderer=static_pointer_cast<OpenGLRenderingEngine>(tmpRenderer);
+		renderer->init();
 	}
 
 	if(!renderer) throw runtime_error("Renderer could not be created, why?");

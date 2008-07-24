@@ -9,7 +9,7 @@
 #ifndef GLDRAW_SIMPLEVISCOELASTIC_INTERACTION_HPP
 #define GLDRAW_SIMPLEVISCOELASTIC_INTERACTION_HPP
 
-#include <yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
+#include <yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawSimpleViscoelasticInteraction : public GLDrawInteractionPhysicsFunctor
 {

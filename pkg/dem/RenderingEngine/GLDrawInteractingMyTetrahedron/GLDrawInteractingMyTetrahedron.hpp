@@ -8,7 +8,7 @@
 #ifndef GLDRAWINTERACTINGMYTETRAHEDRON_HPP
 #define GLDRAWINTERACTINGMYTETRAHEDRON_HPP
 
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 /*! 
  * \brief This class exists for the sole purpose of drawing InteractingMyTetrahedron using OpenGL

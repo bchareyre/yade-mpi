@@ -1,32 +1,19 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
-
-#ifndef OPENGLRENDERINGENGINE_HPP
-#define OPENGLRENDERINGENGINE_HPP
+// © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
+// © 2008 Václav Šmilauer <eudoxos@arcig.cz>
+#pragma once
 
 #include<yade/core/RenderingEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/MetaEngine1D.hpp>
 #include<yade/core/Body.hpp>
 
-#include<yade/pkg-common/GLDrawStateFunctor.hpp>
-#include<yade/pkg-common/GLDrawBoundingVolumeFunctor.hpp>
-#include<yade/pkg-common/GLDrawInteractingGeometryFunctor.hpp>
-#include<yade/pkg-common/GLDrawGeometricalModelFunctor.hpp>
-#include<yade/pkg-common/GLDrawShadowVolumeFunctor.hpp>
-#include<yade/pkg-common/GLDrawInteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/GLDrawInteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class OpenGLRenderingEngine : public RenderingEngine
 {	
 	public :
 		Vector3r Light_position,Background_color;
-		bool Body_state,Body_bounding_volume,Body_interacting_geom,Body_geometrical_model,Cast_shadows,Shadow_volumes,Fast_shadow_volume,Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics,needInit;
+		bool Body_state,Body_bounding_volume,Body_interacting_geom,Body_geometrical_model,Cast_shadows,Shadow_volumes,Fast_shadow_volume,Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics;
 		body_id_t current_selection;
 		int Draw_mask;
 
@@ -40,7 +27,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 		vector<Vector3r> clipPlaneNormals;
 		void setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody);
 		void setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody);
-		long numBodiesWhenRefSe3LastSet;
+		long numBodiesWhenRefSe3LastSet,numIterWhenRefSe3LastSet;
+		static bool glutInitDone;
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
@@ -97,7 +85,4 @@ class OpenGLRenderingEngine : public RenderingEngine
 	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
 	REGISTER_BASE_CLASS_NAME(RenderingEngine);
 };
-
 REGISTER_SERIALIZABLE(OpenGLRenderingEngine,false);
-
-#endif // OPENGLRENDERINGENGINE_HPP

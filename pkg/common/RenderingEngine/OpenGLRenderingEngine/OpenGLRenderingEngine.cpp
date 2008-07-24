@@ -1,21 +1,18 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
+// © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-#include "OpenGLRenderingEngine.hpp"
+#include"OpenGLRenderingEngine.hpp"
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include <GL/glu.h>
-#include <GL/gl.h>
-#include <GL/glut.h>
+#include<GL/glu.h>
+#include<GL/gl.h>
+#include<GL/glut.h>
+
+YADE_PLUGIN("OpenGLRenderingEngine");
 CREATE_LOGGER(OpenGLRenderingEngine);
 
-OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(3)
-{
+bool OpenGLRenderingEngine::glutInitDone=false;
 
+OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(3){
 	Body_state = false;
 	Body_bounding_volume = false;
 	Body_interacting_geom = false;
@@ -26,7 +23,6 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	Body_wire = false;
 	Interaction_wire = false;
 	Draw_inside = true;
-	needInit = true;
 	Draw_mask = ~0;
 	Light_position = Vector3r(75.0,130.0,0.0);
 	Background_color = Vector3r(0.2,0.2,0.2);
@@ -36,7 +32,6 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	scaleDisplacements=false; scaleRotations=false;
 	displacementScale=Vector3r(1,1,1); rotationScale=1;
 	numBodiesWhenRefSe3LastSet=0;
-
 
 	for(int i=0; i<clipPlaneNum; i++){clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)); clipPlaneActive.push_back(false); clipPlaneNormals.push_back(Vector3r(1,0,0));}
 	
@@ -55,16 +50,20 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 }
 
 OpenGLRenderingEngine::~OpenGLRenderingEngine(){}
-void OpenGLRenderingEngine::init(){ if (needInit)needInit = false; }
+
+void OpenGLRenderingEngine::init(){
+	if (glutInitDone) return;
+	glutInit(&Omega::instance().origArgc,Omega::instance().origArgv);
+	/* transparent spheres (still not working): glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); */
+	glutInitDone=true;
+}
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b->geometricalModel) continue;
 		glPushMatrix();
-		Se3r& se3 = b->physicalParameters->se3;
-		Real angle;
-		Vector3r axis;	
-		se3.orientation.ToAxisAngle(axis,angle);	
+		const Se3r& se3=b->physicalParameters->se3;
+		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		if(b->geometricalModel->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
@@ -84,12 +83,14 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 
 void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) b->physicalParameters->refSe3=b->physicalParameters->se3;
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b->physicalParameters) b->physicalParameters->refSe3=b->physicalParameters->se3;
 	numBodiesWhenRefSe3LastSet=rootBody->bodies->size();
+	numIterWhenRefSe3LastSet=Omega::instance().getCurrentIteration();
 }
 
 void OpenGLRenderingEngine::setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(!b->physicalParameters) continue;
 		const Se3r& se3=b->physicalParameters->se3; const Se3r& refSe3=b->physicalParameters->refSe3; Se3r& dispSe3=b->physicalParameters->dispSe3;
 		b->physicalParameters->isDisplayed=!pointClipped(se3.position);
 		// if no scaling, return quickly
@@ -105,49 +106,33 @@ void OpenGLRenderingEngine::setBodiesDispSe3(const shared_ptr<MetaBody>& rootBod
 	}
 }
 
-void OpenGLRenderingEngine::render(
-		const shared_ptr<MetaBody>& rootBody, 
-		body_id_t selection	// FIXME: not sure. maybe a list of selections, 
-					// or maybe bodies themselves should remember if they are selected?
-		)
-{	// FIXME - make a compile time flag for that. So yade can compile with different versions.
-#ifndef NO_GLUTINIT
-	static bool initDone=false;
-	if(!initDone) // FIXME - this is a quick hack for newest version of libglut
-	{
-		int a=1;
-		char* b=(char*)"./yade";
-		glutInit(&a,&b);
-// transparent spheres (still not working)
-//glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA);
-//glEnable(GL_BLEND);
-//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		initDone=true;
-	}
-#endif
+void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id_t selection	/*FIXME: not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
+
+	assert(glutInitDone);
 	current_selection = selection;
 
+	// Draw light source
 	const GLfloat pos[4]	= {Light_position[0],Light_position[1],Light_position[2],1.0};
 	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
-
 	glClearColor(Background_color[0],Background_color[1],Background_color[2],1.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 	glEnable(GL_LIGHT0);
-	
 	glDisable(GL_LIGHTING);
-	
 	glPushMatrix();
-	glTranslatef(Light_position[0],Light_position[1],Light_position[2]);
-	glColor3f(1.0,1.0,1.0);
-	glutSolidSphere(3,10,10);
+		glTranslatef(Light_position[0],Light_position[1],Light_position[2]);
+		glColor3f(1.0,1.0,1.0);
+		glutSolidSphere(3,10,10);
 	glPopMatrix();	
 
-	// TODO: do this only if clipping is effective (i.e. if clipPlaneActive[i] AND'ed together); dtto for pointClipped
-	for(int i=0;i<clipPlaneNum; i++){ clipPlaneNormals[i]=clipPlaneSe3[i].orientation*Vector3r(0,0,1); /* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */ }
+	// clipping
+	for(int i=0;i<clipPlaneNum; i++){
+		if(clipPlaneActive[i]) clipPlaneNormals[i]=clipPlaneSe3[i].orientation*Vector3r(0,0,1);
+		/* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */
+	}
 
-	// if scaling positions or orientations, save reference values if not already done; if # of bodies changes, we have to reset those
-	if((scaleDisplacements || scaleRotations) && rootBody->bodies->size()!=numBodiesWhenRefSe3LastSet){setBodiesRefSe3(rootBody);}
+	// if scaling positions or orientations, save reference values if not already done; if # of bodies changes, we have to reset those; remember iteration when this was done to detect (at least in most cases) that the simulation was reloaded
+	if((scaleDisplacements || scaleRotations) && (rootBody->bodies->size()!=numBodiesWhenRefSe3LastSet||Omega::instance().getCurrentIteration()<=numIterWhenRefSe3LastSet)){setBodiesRefSe3(rootBody);}
 	
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispSe3(rootBody);
@@ -157,8 +142,7 @@ void OpenGLRenderingEngine::render(
 		if(scaleDisplacements){
 			glColor3d(1,1,0); glBegin(GL_LINES); 
 			FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-				Se3r se3=renderedSe3(b);
-				glVertex3v(b->physicalParameters->se3.position); glVertex3v(se3.position); }
+				glVertex3v(b->physicalParameters->se3.position); glVertex3v(b->physicalParameters->dispSe3.position); }
 			glEnd();
 		}
 	#endif
@@ -347,7 +331,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position){	
 	if (!rootBody->geometricalModel){
 		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-			if(pointClipped(b->physicalParameters->se3.position)) continue;
+			if(!b->physicalParameters->isDisplayed) continue;
 			if (b->geometricalModel->shadowCaster && ( (b->getGroupMask() & Draw_mask) || b->getGroupMask()==0 ))
 				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,Light_position);
 		}
@@ -361,7 +345,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
 		FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
 			if(b->geometricalModel && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
-				if(!b->physicalParameters->isDisplayed) continue;
+				if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 				const Se3r& se3=b->physicalParameters->dispSe3;
 				glPushMatrix();
 				Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
@@ -381,111 +365,67 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody){	
 	{
 		boost::mutex::scoped_lock lock(rootBody->persistentInteractions->drawloopmutex);
-
-		InteractionContainer::iterator bi    = rootBody->persistentInteractions->begin();
-		InteractionContainer::iterator biEnd = rootBody->persistentInteractions->end();
-		for( ; bi!=biEnd ; ++bi)
-		{
-			if((*bi)->interactionGeometry){
-				const shared_ptr<Body>& b1=Body::byId((*bi)->getId1(),rootBody), b2=Body::byId((*bi)->getId2(),rootBody);
-				if(pointClipped(b1->physicalParameters->se3.position)&&pointClipped(b2->physicalParameters->se3.position)) continue;
-				glPushMatrix();
-					interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
-				glPopMatrix();
-			}
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->persistentInteractions){
+			if(!I->interactionGeometry) continue;
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
+			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
 	}
-
 	{
 		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
-
-		InteractionContainer::iterator bi    = rootBody->transientInteractions->begin();
-		InteractionContainer::iterator biEnd = rootBody->transientInteractions->end();
-		for( ; bi!=biEnd ; ++bi)
-		{
-			glPushMatrix();
-			if((*bi)->interactionGeometry)
-				interactionGeometryDispatcher((*bi)->interactionGeometry,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
-			glPopMatrix();
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+			if(!I->interactionGeometry) continue;
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
+			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
 	}
 }
 
 
-void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody)
-{	
+void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody){	
 	{
 		boost::mutex::scoped_lock lock(rootBody->persistentInteractions->drawloopmutex);
-
-		InteractionContainer::iterator bi    = rootBody->persistentInteractions->begin();
-		InteractionContainer::iterator biEnd = rootBody->persistentInteractions->end();
-		for( ; bi!=biEnd ; ++bi)
-		{
-			glPushMatrix();
-			if((*bi)->interactionPhysics)
-				interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
-			glPopMatrix();
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->persistentInteractions){
+			if(!I->interactionGeometry) continue;
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
+			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
 	}
-
 	{
 		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
-
-		InteractionContainer::iterator bi    = rootBody->transientInteractions->begin();
-		InteractionContainer::iterator biEnd = rootBody->transientInteractions->end();
-		for( ; bi!=biEnd ; ++bi)
-		{
-			if((*bi)->interactionPhysics){
-				const shared_ptr<Body>& b1=Body::byId((*bi)->getId1(),rootBody), b2=Body::byId((*bi)->getId2(),rootBody);
-				if(pointClipped(b1->physicalParameters->se3.position)&&pointClipped(b2->physicalParameters->se3.position)) continue;
-				glPushMatrix();
-					interactionPhysicsDispatcher((*bi)->interactionPhysics,(*bi),(*(rootBody->bodies))[(*bi)->getId1()],(*(rootBody->bodies))[(*bi)->getId2()],Interaction_wire);
-				glPopMatrix();
-			}
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+			if(!I->interactionGeometry) continue;
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
+			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
 	}
 }
 
 
-void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody)
-{	
-	BodyContainer::iterator bi    = rootBody->bodies->begin();
-	BodyContainer::iterator biEnd = rootBody->bodies->end();
-	for( ; bi!=biEnd ; ++bi)
-	{
-		if(pointClipped((*bi)->physicalParameters->se3.position)) continue;
-		glPushMatrix();
-		if((*bi)->physicalParameters && ( ((*bi)->getGroupMask() & Draw_mask ) || (*bi)->getGroupMask()==0 ))
-			stateDispatcher((*bi)->physicalParameters);
-		glPopMatrix();
+void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody){	
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
+		if(b->physicalParameters && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
+			glPushMatrix(); stateDispatcher(b->physicalParameters); glPopMatrix();
+		}
 	}
-	
-	glPushMatrix();
-	if(rootBody->physicalParameters)
-		stateDispatcher(rootBody->physicalParameters);
-	glPopMatrix();
+	if(rootBody->physicalParameters){ glPushMatrix(); stateDispatcher(rootBody->physicalParameters); glPopMatrix();}
 }
 
 
-void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody)
-{	
-	BodyContainer::iterator bi    = rootBody->bodies->begin();
-	BodyContainer::iterator biEnd = rootBody->bodies->end();
-	for( ; bi!=biEnd ; ++bi)
-	{		
-		if(pointClipped((*bi)->physicalParameters->se3.position)) continue;
-		glPushMatrix();
-		if((*bi)->boundingVolume && ( ((*bi)->getGroupMask() & Draw_mask) || (*bi)->getGroupMask()==0 ))
-			boundingVolumeDispatcher((*bi)->boundingVolume);
-		glPopMatrix();
+void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody){	
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
+		if(b->boundingVolume && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
+			glPushMatrix(); boundingVolumeDispatcher(b->boundingVolume); glPopMatrix();
+		}
 	}
-	
-	glPushMatrix();
-	if(rootBody->boundingVolume)
-		boundingVolumeDispatcher(rootBody->boundingVolume);
-	glPopMatrix();
+	if(rootBody->boundingVolume){ glPushMatrix(); boundingVolumeDispatcher(rootBody->boundingVolume); glPopMatrix(); }
 }
-
 
 
 void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody)
@@ -497,19 +437,18 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		glEnable(GL_CLIP_PLANE0);
 	#endif
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b->physicalParameters->isDisplayed) continue;
+		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 		const Se3r& se3=b->physicalParameters->dispSe3;
-		glPushMatrix();
+		if(b->interactingGeometry && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
+			glPushMatrix();
 			Real angle;	Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
 			glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			if(b->interactingGeometry && ( (b->getGroupMask() & Draw_mask) || b->getGroupMask()==0 ))
-				interactingGeometryDispatcher(b->interactingGeometry,b->physicalParameters,Body_wire);
-		glPopMatrix();
+			interactingGeometryDispatcher(b->interactingGeometry,b->physicalParameters,Body_wire);
+			glPopMatrix();
+		}
 	}
-	glPushMatrix();
-		if(rootBody->interactingGeometry) interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters,Body_wire);
-	glPopMatrix();
+	if(rootBody->interactingGeometry){ glPushMatrix(); interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->physicalParameters,Body_wire); glPopMatrix(); }
 }
 
 
@@ -546,99 +485,42 @@ void OpenGLRenderingEngine::registerAttributes()
 }
 
 
-void OpenGLRenderingEngine::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		for(unsigned int i=0;i<stateFunctorNames.size();i++)
-			stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
-			
-		for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++)
-			boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
-			
-		for(unsigned int i=0;i<interactingGeometryFunctorNames.size();i++)
-			interactingGeometryDispatcher.add1DEntry(interactingGeometryFunctorNames[i][0],interactingGeometryFunctorNames[i][1]);
-			
-		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++)
-			geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
-		
-		for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++)
-			shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
-		
-		for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++)
-			interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
-			
-		for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++)
-			interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
-	}
+void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
+	if(!deserializing) return;
+	for(unsigned int i=0;i<stateFunctorNames.size();i++) stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
+	for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++) boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
+	for(unsigned int i=0;i<interactingGeometryFunctorNames.size();i++) interactingGeometryDispatcher.add1DEntry(interactingGeometryFunctorNames[i][0],interactingGeometryFunctorNames[i][1]);
+	for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++) geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
+	for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++) shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
+	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
+	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
 }
-
-
-void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	interactionGeometryFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); interactionGeometryFunctorNames.push_back(v);
 }
-
-void OpenGLRenderingEngine::addInteractionPhysicsFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addInteractionPhysicsFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawInteractionPhysicsFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	interactionPhysicsFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); interactionPhysicsFunctorNames.push_back(v);
 }
-
-void OpenGLRenderingEngine::addStateFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addStateFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawStateFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	stateFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); stateFunctorNames.push_back(v);
 }
-
-
-void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	boundingVolumeFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); boundingVolumeFunctorNames.push_back(v);
 }
-
-
-void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	interactingGeometryFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); interactingGeometryFunctorNames.push_back(v);
 }
-
-
-void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	geometricalModelFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); geometricalModelFunctorNames.push_back(v);
 }
-
-
-void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2)
-{
+void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawShadowVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v;
-	v.push_back(str1);
-	v.push_back(str2);
-	shadowVolumeFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); shadowVolumeFunctorNames.push_back(v);
 }
 
-YADE_PLUGIN();

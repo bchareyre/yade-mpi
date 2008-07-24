@@ -9,7 +9,7 @@
 #ifndef GLDRAWPARTICLESTATE_HPP
 #define GLDRAWPARTICLESTATE_HPP
 
-#include<yade/pkg-common/GLDrawStateFunctor.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
 class GLDrawParticleState : public GLDrawStateFunctor
 {
