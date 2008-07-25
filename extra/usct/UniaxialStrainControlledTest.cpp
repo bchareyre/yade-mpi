@@ -320,8 +320,7 @@ void USCTGen::createEngines(){
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
 		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
 		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
-		bmc->expBending=20;
-		//bmc->calibratedEpsFracture=3e-4;
+		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1; bmc->expBending=1; bmc->xiShear=.8; bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 

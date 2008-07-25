@@ -257,9 +257,6 @@ bool CohesiveTriaxialTest::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-// 	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
-// 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 

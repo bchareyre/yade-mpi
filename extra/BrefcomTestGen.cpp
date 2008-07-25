@@ -98,7 +98,7 @@ void BrefcomTestGen::createEngines(){
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
 		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
-		bmc->cohesiveThresholdIter=-1;
+		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1; bmc->expBending=1; bmc->xiShear=.8; bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
 		//bmc->calibratedEpsFracture=.5; /* arbitrary, but large enough */
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);

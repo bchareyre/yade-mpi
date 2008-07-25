@@ -14,10 +14,15 @@ runSimul="""
 # generated file
 simulFile='%s'; msgFile='%s'; nIter=%d;
 import time
-o=Omega(); o.load(simulFile)
-o.run(10); o.wait() # run first 10 iterations
-start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
-speed=nIter/(finish-start); open(msgFile,'w').write('%%g iter/sec'%%speed)
+try:
+	o=Omega(); o.load(simulFile)
+	o.run(10); o.wait() # run first 10 iterations
+	start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
+	speed=nIter/(finish-start); open(msgFile,'w').write('%%g iter/sec'%%speed)
+except:
+	import sys, traceback
+	traceback.print_exc()
+	sys.exit(1)
 quit()
 """%(simulFile,msgFile,100)
 
@@ -94,4 +99,4 @@ if reports:
 
 print "\n\n========================================= SUMMARY ======================================\n"
 for l in summary: print "%30s: %s"%(l[0],l[1])
-
+quit()
