@@ -29,7 +29,7 @@ if runtime.simulation:
 if runtime.script:
 	print "Running script "+runtime.script
 	execfile(runtime.script)
-	if runtime.stopAfter: sys.exit(0)
+if runtime.stopAfter: sys.exit(0)
 
 # run commands if requested from the command line
 #if yadeRunCommands:
