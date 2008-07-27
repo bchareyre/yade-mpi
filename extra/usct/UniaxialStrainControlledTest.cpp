@@ -23,8 +23,23 @@ void UniaxialStrainer::init(){
 	assert(posIds.size()>0);
 	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
-	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id); posCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
-	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id); negCoords.push_back(b->physicalParameters->se3.position[axis]); b->isDynamic=false;}
+	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id); posCoords.push_back(b->physicalParameters->se3.position[axis]);
+		if(blockDisplacements && blockRotations) b->isDynamic=false;
+		else{
+			shared_ptr<PhysicalParameters> &pp=b->physicalParameters;
+			if(!blockDisplacements)pp->blockedDOFs=PhysicalParameters::axisDOF(axis); else pp->blockedDOFs=PhysicalParameters::DOF_XYZ;
+			if(blockRotations) pp->blockedDOFs|=PhysicalParameters::DOF_RXRYRZ;
+		}
+	}
+	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id); negCoords.push_back(b->physicalParameters->se3.position[axis]);
+		if(blockDisplacements && blockRotations) b->isDynamic=false;
+		else{
+			shared_ptr<PhysicalParameters> &pp=b->physicalParameters;
+			if(!blockDisplacements)pp->blockedDOFs=PhysicalParameters::axisDOF(axis); else pp->blockedDOFs=PhysicalParameters::DOF_XYZ;
+			if(blockRotations) pp->blockedDOFs|=PhysicalParameters::DOF_RXRYRZ;
+		}
+	}
+
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size());
 
 	originalLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
@@ -244,13 +259,6 @@ bool USCTGen::generate(){
 		}
 	}
 
-#if 0
-	/* clump spheres together if requested */
-	if(clumped){
-		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
-		shared_ptr<Body> clumpAsBody(static_pointer_cast<Body>(clump));
-	}
-#endif
 	return true;
 }
 
@@ -285,8 +293,8 @@ bool USCTGen::generate(){
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 
 
 

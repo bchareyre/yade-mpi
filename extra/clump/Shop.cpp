@@ -54,8 +54,8 @@ class MetaInteractingGeometry2AABB; */
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-dem/BodyMacroParameters.hpp>

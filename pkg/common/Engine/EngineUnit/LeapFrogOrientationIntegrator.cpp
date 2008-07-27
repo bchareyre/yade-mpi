@@ -37,7 +37,12 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 	Real angle = axis.Normalize();
 	Quaternionr q;
 	q.FromAxisAngle(axis,angle*dt);
-	rb->se3.orientation = q*rb->se3.orientation;
+	if(rb->blockedDOFs==0) rb->se3.orientation = q*rb->se3.orientation;
+	else{
+		if((rb->blockedDOFs & PhysicalParameters::DOF_RX)==0) rb->angularVelocity[0]+=dt*rb->angularAcceleration[0];
+		if((rb->blockedDOFs & PhysicalParameters::DOF_RY)==0) rb->angularVelocity[1]+=dt*rb->angularAcceleration[1];
+		if((rb->blockedDOFs & PhysicalParameters::DOF_RZ)==0) rb->angularVelocity[2]+=dt*rb->angularAcceleration[2];
+	}
 	rb->se3.orientation.Normalize();
 
 // 	firsts[id] = false;

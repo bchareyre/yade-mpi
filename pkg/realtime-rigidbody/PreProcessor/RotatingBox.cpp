@@ -22,8 +22,8 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 

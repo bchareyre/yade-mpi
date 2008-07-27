@@ -6,13 +6,14 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "NewtonsDampedLaw.hpp"
+#include"NewtonsDampedLaw.hpp"
 #include<yade/core/MetaBody.hpp>
-#include <yade/pkg-common/RigidBodyParameters.hpp>
-#include <yade/pkg-common/Momentum.hpp>
-#include <yade/pkg-common/Force.hpp>
+#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-common/Momentum.hpp>
+#include<yade/pkg-common/Force.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
+YADE_PLUGIN("NewtonsDampedLaw");
 
 void NewtonsDampedLaw::registerAttributes()
 {
@@ -30,26 +31,15 @@ NewtonsDampedLaw::NewtonsDampedLaw()
 
 void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for ( ; bi!=biEnd ; ++bi )
-	{
-
-		const shared_ptr<Body>& b = *bi;
-
+	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		if (!b->isDynamic) continue;
 		
-		RigidBodyParameters * rb = YADE_CAST<RigidBodyParameters*> ( b->physicalParameters.get() );
+		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		unsigned int id = b->getId();
 		Vector3r& m = ( static_cast<Momentum*> ( ncb->physicalActions->find ( id, momentumClassIndex ).get() ) )->momentum;
 		Vector3r& f = ( static_cast<Force*> ( ncb->physicalActions->find ( id, forceClassIndex ).get() ) )->force;
 
 		Real dt = Omega::instance().getTimeStep();
-
-		
-
-
 
 		//Newtons mometum law :
 		if ( b->isStandalone() ) rb->angularAcceleration=diagDiv ( m,rb->inertia );
@@ -91,9 +81,17 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 				rb->acceleration[i] *= 1 - damping*Mathr::Sign ( f[i]*(rb->velocity[i] + (Real) 0.5 *dt*rb->acceleration[i]) );
 			}
 		}
-
-		rb->angularVelocity = rb->angularVelocity+ dt*rb->angularAcceleration;
-		rb->velocity = rb->velocity+ dt*rb->acceleration;
+		if(rb->blockedDOFs==0){ /* same as: rb->blockedDOFs==PhysicalParameters::DOF_NONE */
+			rb->angularVelocity=rb->angularVelocity+dt*rb->angularAcceleration;
+			rb->velocity=rb->velocity+dt*rb->acceleration;
+		} else {
+			if((rb->blockedDOFs & PhysicalParameters::DOF_X)==0) rb->velocity[0]+=dt*rb->acceleration[0];
+			if((rb->blockedDOFs & PhysicalParameters::DOF_Y)==0) rb->velocity[1]+=dt*rb->acceleration[1];
+			if((rb->blockedDOFs & PhysicalParameters::DOF_Z)==0) rb->velocity[2]+=dt*rb->acceleration[2];
+			if((rb->blockedDOFs & PhysicalParameters::DOF_RX)==0) rb->angularVelocity[0]+=dt*rb->angularAcceleration[0];
+			if((rb->blockedDOFs & PhysicalParameters::DOF_RY)==0) rb->angularVelocity[1]+=dt*rb->angularAcceleration[1];
+			if((rb->blockedDOFs & PhysicalParameters::DOF_RZ)==0) rb->angularVelocity[2]+=dt*rb->angularAcceleration[2];
+		}
 
 		Vector3r axis = rb->angularVelocity;
 		Real angle = axis.Normalize();
@@ -101,7 +99,6 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		q.FromAxisAngle ( axis,angle*dt );
 		rb->se3.orientation = q*rb->se3.orientation;
 		rb->se3.orientation.Normalize();
-
 
 		rb->se3.position += rb->velocity*dt;
 	}
@@ -119,4 +116,3 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 [16:09:44] eudoxos2: }*/
 
 
-YADE_PLUGIN();

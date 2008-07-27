@@ -33,7 +33,12 @@ void LeapFrogPositionIntegrator::go(       const shared_ptr<PhysicalParameters>&
 // 	if (!firsts[id])
 // 		p->velocity = prevVelocities[id]+((Real)0.5)*dt*p->acceleration;
 
-	p->velocity = p->velocity+dt*p->acceleration;
+	if(p->blockedDOFs==0) p->velocity = p->velocity+dt*p->acceleration;
+	else{
+		if((p->blockedDOFs & PhysicalParameters::DOF_X)==0) p->velocity[0]+=dt*p->acceleration[0];
+		if((p->blockedDOFs & PhysicalParameters::DOF_Y)==0) p->velocity[1]+=dt*p->acceleration[1];
+		if((p->blockedDOFs & PhysicalParameters::DOF_Z)==0) p->velocity[2]+=dt*p->acceleration[2];
+	}
 	p->se3.position += p->velocity*dt;
 
 	//cerr<<"#"<<body->getId()<<"dx="<<prevVelocities[id]*dt<<endl;

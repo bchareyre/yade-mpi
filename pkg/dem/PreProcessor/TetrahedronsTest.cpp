@@ -35,8 +35,8 @@
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-common/InteractingGeometryMetaEngine.hpp>

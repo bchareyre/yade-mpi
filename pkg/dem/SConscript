@@ -392,8 +392,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -430,8 +430,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-base',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -468,8 +468,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'CinemCisEngine',
@@ -504,8 +504,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -539,8 +539,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -573,8 +573,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'TranslationEngine',
@@ -607,8 +607,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'InteractingMyTetrahedron',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'PhysicalActionContainerInitializer',
@@ -693,8 +693,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'InteractingBox',
 			'InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
 			'InteractingBox2InteractingSphere4SpheresContactGeometry',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -741,8 +741,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'InteractingBox',
 			'InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
 			'InteractingBox2InteractingSphere4SpheresContactGeometry',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -784,8 +784,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -857,8 +857,8 @@ env.SharedLibrary('TriaxialTestWater',
         BodyRedirectionVector
         InteractingSphere
         InteractingBox
-        CundallNonViscousMomentumDamping
-        CundallNonViscousForceDamping
+        CundallNonViscousDamping
+        CundallNonViscousDamping
         MetaInteractingGeometry
         GravityEngines
         yade-serialization
@@ -980,8 +980,8 @@ env.SharedLibrary('HydraulicTest',
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'CundallNonViscousMomentumDamping',
-			'CundallNonViscousForceDamping',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
@@ -1094,8 +1094,8 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'STLImporter'
 				,'BodyRedirectionVector'
 				,'BoundingVolumeMetaEngine'
-				,'CundallNonViscousForceDamping'
-				,'CundallNonViscousMomentumDamping'
+				,'CundallNonViscousDamping'
+				,'CundallNonViscousDamping'
 				,'ElasticContactLaw'
 				,'ElasticCriterionTimeStepper'
 				,'Facet'

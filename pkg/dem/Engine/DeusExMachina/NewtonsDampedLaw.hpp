@@ -5,13 +5,10 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#pragma once
 
-#ifndef NEWTONSDAMPEDLAW_HPP
-#define NEWTONSDAMPEDLAW_HPP
-
-#include <yade/core/DeusExMachina.hpp>
-#include <Wm3Vector3.h>
-
+#include<yade/core/DeusExMachina.hpp>
+#include<Wm3Vector3.h>
 
 /*! An engine that can replace the usual series of engines used for integrating the laws of motion.
 
@@ -57,6 +54,4 @@ class NewtonsDampedLaw : public DeusExMachina
 };
 
 REGISTER_SERIALIZABLE(NewtonsDampedLaw,false);
-
-#endif // NEWTONSFORCELAW_HPP
 

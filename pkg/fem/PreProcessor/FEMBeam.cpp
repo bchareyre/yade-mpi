@@ -24,8 +24,8 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
 // engines
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>

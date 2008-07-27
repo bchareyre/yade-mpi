@@ -28,8 +28,8 @@
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>

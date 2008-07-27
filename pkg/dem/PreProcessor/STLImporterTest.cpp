@@ -16,8 +16,8 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
-#include<yade/pkg-common/CundallNonViscousForceDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousMomentumDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>

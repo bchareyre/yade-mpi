@@ -96,11 +96,11 @@ class UniaxialStrainer: public DeusExMachina {
 		int axis;
 		//! If 0, straining is symmetric for negIds and posIds; for 1 (or -1), only posIds are strained and negIds don't move (or vice versa)
 		int asymmetry;
+		//! Whether displacement of boundary bodies perpendicular to the strained axis are blocked of are free
+		bool blockDisplacements;
+		//! Whether rotations of boundary bodies are blocked.
+		bool blockRotations;
 
-		/** currently unused: would make posIds and negIds as clumps, which would then be moved as rigid whole;
-		 * that is practically the case now, since transversal displacemenets do not happen
-		 * since posIds and negIds are not dynamic */
-		bool clumped;
 		/** bodies on which straining will be applied (on the positive and negative side of axis) */
 		vector<body_id_t> posIds, negIds;
 		/** coordinates of pos/neg bodies in the direction of axis */
@@ -118,7 +118,7 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strain, avgStress, avgTransStrain;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; clumped=false; sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); recordFile="/tmp/usct.data"; strain=avgStress=avgTransStrain=0; };
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); recordFile="/tmp/usct.data"; strain=avgStress=avgTransStrain=0; blockRotations=false; blockDisplacements=false;};
 		virtual ~UniaxialStrainer(){};
 		void registerAttributes(){
 			DeusExMachina::registerAttributes();
@@ -139,6 +139,8 @@ class UniaxialStrainer: public DeusExMachina {
 			REGISTER_ATTRIBUTE(strain);
 			REGISTER_ATTRIBUTE(avgStress);
 			REGISTER_ATTRIBUTE(avgTransStrain);
+			REGISTER_ATTRIBUTE(blockDisplacements);
+			REGISTER_ATTRIBUTE(blockRotations);
 		}
 		void prepareRecStream(void){ if(recordFile!="") recStream.open(recordFile.c_str()); }
 		void postProcessAttributes(bool deserializing){ if(deserializing) prepareRecStream(); } 	

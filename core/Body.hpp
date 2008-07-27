@@ -7,20 +7,16 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#pragma once
 
-#ifndef BODY_HPP
-#define BODY_HPP
-
-#include <iostream>
-
-#include "GeometricalModel.hpp"
-#include "InteractingGeometry.hpp"
-#include "BoundingVolume.hpp"
-#include "PhysicalParameters.hpp"
-#include "InteractionContainer.hpp"
-#include "Interaction.hpp"
-#include "PhysicalActionContainer.hpp"
-
+#include<iostream>
+#include"GeometricalModel.hpp"
+#include"InteractingGeometry.hpp"
+#include"BoundingVolume.hpp"
+#include"PhysicalParameters.hpp"
+#include"InteractionContainer.hpp"
+#include"Interaction.hpp"
+#include"PhysicalActionContainer.hpp"
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
@@ -72,7 +68,6 @@ class Body : public Serializable
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
-		// FIXME - should be private ...
 		/// here are stored physical things that describe the Body: mass, stiffness
 		shared_ptr<PhysicalParameters>	physicalParameters;
 		/// the 'perfect' representation of body's geometry: Polyhedron, Box
@@ -99,8 +94,4 @@ class Body : public Serializable
 	REGISTER_CLASS_NAME(Body);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
-
 REGISTER_SERIALIZABLE(Body,false);
-
-#endif // BODY_HPP
-
