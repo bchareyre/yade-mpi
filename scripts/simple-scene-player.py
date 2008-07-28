@@ -48,6 +48,7 @@ def setWire():
 	o=Omega()
 	for b in o.bodies: b.shape['wire']=True
 # you must have saved the viewer state by using Alt-S in the view...
-utils.qtCreateVideo('/tmp/player.sqlite','/tmp/player.ogg','/tmp/qglviewerState.xml',stride=10,fps=12,postLoadHook='setWire()')
+from yade import qt
+qt.createVideo('/tmp/player.sqlite','/tmp/player.ogg','/tmp/qglviewerState.xml',stride=10,fps=12,postLoadHook='setWire()')
 
 quit()

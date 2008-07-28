@@ -199,6 +199,12 @@ void YadeQtMainWindow::customEvent(QCustomEvent* e){
 		case EVENT_VIEW: createView(); break;
 		case EVENT_PLAYER: createPlayer(); break;
 		case EVENT_GENERATOR: createGenerator(); break;
+		#if 0
+		case EVENT_RESTORE_GLVIEWER_NUM:
+			{if(glViews.size()<1 || !glViews[0]){ LOG_ERROR("No primary view to set attributes on, ignored.");} else{glViews[0]->useDisplayParameters(*(int*)(e->data())); delete (int*)e->data(); }} break;
+		case EVENT_RESTORE_GLVIEWER_STR:
+			{if(glViews.size()<1 || !glViews[0]){ LOG_ERROR("No primary view to set attributes on, ignored.");} else{glViews[0]->setState(*(string*)(e->data())); delete (string*)e->data();}} break;
+		#endif
 		default: ;
 	}
 }

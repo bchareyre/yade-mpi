@@ -112,10 +112,12 @@ class BrefcomLaw: public InteractionSolver{
 		inline Real funcH(Real kappaD){ return 1-funcG(kappaD); }
 		/*! Damage evolution law */
 		inline Real funcG(Real kappaD){
-			const Real& expBending=BC->expBending, epsCrackOnset=BC->epsCrackOnset, epsFracture=BC->epsFracture; const bool& neverDamage=BC->neverDamage; // shorthands
+			//const Real& expBending=BC->expBending, 
+			const Real& epsCrackOnset=BC->epsCrackOnset, epsFracture=BC->epsFracture; const bool& neverDamage=BC->neverDamage; // shorthands
 			if(kappaD<epsCrackOnset || neverDamage) return 0;
-			if(kappaD>epsFracture) return 1;
-			return (1/(1-exp(-expBending)))*(1-exp(-expBending*(kappaD-epsCrackOnset)/(epsFracture-epsCrackOnset)));
+			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+			//if(kappaD>epsFracture) return 1;
+			//return (1/(1-exp(-expBending)))*(1-exp(-expBending*(kappaD-epsCrackOnset)/(epsFracture-epsCrackOnset)));
 		}
 		
 	public:

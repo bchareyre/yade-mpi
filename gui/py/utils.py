@@ -74,7 +74,6 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 			walls[-1].shape['visible']=True
 	return walls
 
-
 def aabbExtrema(consider=lambda body:True):
 	"""return min and max points of an aabb around spherical packing (non-spheres are ignored)"""
 	inf=float('inf')
@@ -95,7 +94,6 @@ def perpendicularArea(axis,consider=lambda body: True):
 	other=((axis+1)%3,(axis+2)%3)
 	return (ext[1][other[0]]-ext[0][other[0]])*(ext[1][other[1]]-ext[0][other[1]])
 
-
 def randomizeColors(onShapes=True,onMolds=False,onlyDynamic=False):
 	"""Assign random colors to shape's (GeometricalModel) and/or mold's (InteractingGeometry) diffuseColor.
 	
@@ -108,9 +106,6 @@ def randomizeColors(onShapes=True,onMolds=False,onlyDynamic=False):
 		color=(random.random(),random.random(),random.random())
 		if onShapes and (b['isDynamic'] or not onlyDynamic): b.shape['diffuseColor']=color
 		if onMolds  and (b['isDynamic'] or not onlyDynamic): b.mold['diffuseColor']=color
-
-def runInQtGui(background=True):
-	raise DeprecationWarning("This  runInQtGui functions is deprecated, since python now coexists with QtGUI.")
 
 def PWaveTimeStep():
 	"""Estimate timestep by the elastic wave propagation speed (p-wave).
@@ -154,47 +149,4 @@ def spheresToFile(filename,consider=lambda id: True):
 		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
 		out.write('%g\t%g\t%g\t%g\n'%(b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
 	out.close()
-
-def qtCreateVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None):
-	"""Create video by replaying a simulation. Snapshots are taken to temporary files,
-	encoded to a .ogg stream (theora codec); temps are deleted at the end.
-
-	If the output file exists already, a ~[number] is appended and the old file is renamed.
-
-	playerDb is the database with saved simulation states,
-	out is the output file (like a.ogg), fps is frames-per-second for the video that is created,
-	dispParamsNo, stride and postLoadHook are passed to qt.runPlayer (docs in gui/qt3/QtGUI-Python.cpp).
-	
-	You need a display to run this (either virtual, like xvfb, or physical).
-
-	Necessary packages: python-gst0.10 gstreamer0.10-plugins-good python-gobject
-	"""
-	import pygst,sys,gobject,os
-	pygst.require("0.10")
-	import gst
-	from yade import qt
-	qt.Player(True)
-	# postLoadHook and viewerState have "" instead of None in the c++ interface
-	wildcard,snaps=qt.runPlayer(
-		savedSim=playerDb,
-		snapBase='',
-		viewerState=(viewerstate if viewerState else ""),
-		dispParamsNo=dispParamsNo,
-		stride=stride,
-		postLoadHook=(postLoadHook if postLoadHook else ''))
-	if(os.path.exists(out)):
-		i=0;
-		while(os.path.exists(out+"~%d"%i)): i+=1
-		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
-	print "Encoding video from %s (%d files total) to %s"%(wildcard,len(snaps),out)
-	pipeline=gst.parse_launch('multifilesrc location="%s" index=0 caps="image/png,framerate=\(fraction\)%d/1" ! pngdec ! ffmpegcolorspace ! theoraenc sharpness=2 quality=32 ! oggmux ! filesink location="%s"'%(wildcard,fps,out))
-	bus=pipeline.get_bus()
-	bus.add_signal_watch()
-	mainloop=gobject.MainLoop();
-	bus.connect("message::eos",lambda bus,msg: mainloop.quit())
-	pipeline.set_state(gst.STATE_PLAYING)
-	mainloop.run()
-	pipeline.set_state(gst.STATE_NULL); pipeline.get_state()
-	print "Cleaning snapshot files."
-	for f in snaps: os.remove(f)
 
