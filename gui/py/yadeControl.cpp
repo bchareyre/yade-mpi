@@ -385,11 +385,12 @@ class pyOmega{
 	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
 	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
-	void run(long int numIter=-1){
+	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		OMEGA.startSimulationLoop();
 		long toGo=OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration();
 		LOG_DEBUG("RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!");
+		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
 	void step() { LOG_DEBUG("STEP!"); run(1); wait();  }
@@ -467,7 +468,7 @@ class pyOmega{
 	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
 };
 	
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 
 class pySTLImporter : public STLImporter {
     public:

@@ -14,7 +14,6 @@
 log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.QtGUI-python");
 #endif
 
-
 using namespace boost::python;
 
 BASIC_PY_PROXY_HEAD(pyOpenGLRenderingEngine,OpenGLRenderingEngine)
@@ -33,7 +32,7 @@ POST_SYNTH_EVENT(CONTROLLER,controller);
 POST_SYNTH_EVENT(GENERATOR,generator);
 // BOOST_PYTHON_FUNCTION_OVERLOADS(evtPLAYER_overloads,evtPLAYER,0,1); BOOST_PYTHON_FUNCTION_OVERLOADS(evtCONTROLLER_overloads,evtCONTROLLER,0,1); BOOST_PYTHON_FUNCTION_OVERLOADS(evtGENERATOR_overloads,evtGENERATOR,0,1);
 #undef POST_SYNT_EVENT
-void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); }
+void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); size_t origViewNo=ensuredMainWindow()->glViews.size(); while(ensuredMainWindow()->glViews.size()!=origViewNo+1) usleep(50000); }
 
 // event associated data will be deleted in the event handler
 void restoreGLViewerState_str(string str){string* s=new string(str); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_STR,(void*)s));}
@@ -118,7 +117,7 @@ class pyGLViewer{
 		pyGLViewer(size_t viewNo){init(viewNo);}
 		pyGLViewer(const shared_ptr<GLViewer>& _glv){glv=_glv;}
 		python::tuple get_grid(){return python::make_tuple(glv->drawGridXYZ[0],glv->drawGridXYZ[1],glv->drawGridXYZ[2]);}
-		void set_grid(bool x,bool y,bool z){glv->drawGridXYZ[0]=x; glv->drawGridXYZ[1]=y; glv->drawGridXYZ[2]=z;}
+		void set_grid(python::tuple t){for(int i=0;i<3;i++)glv->drawGridXYZ[i]=python::extract<bool>(t[i])();}
 		#define VEC_GET_SET(property,getter,setter) python::object get_##property(){return vec2tuple(getter());} void set_##property(python::tuple t){setter(tuple2vec(t));}
 		VEC_GET_SET(upVector,glv->camera()->upVector,glv->camera()->setUpVector);
 		VEC_GET_SET(lookAt,glv->camera()->position()+glv->camera()->viewDirection,glv->camera()->lookAt);
@@ -136,6 +135,8 @@ class pyGLViewer{
 		void fitSphere(python::tuple center,Real radius){glv->camera()->fitSphere(tuple2vec(center),radius);}
 		void showEntireScene(){glv->camera()->showEntireScene();}
 		void center(bool median=false){if(median)glv->centerMedianQuartile(); else glv->centerScene();}
+		python::tuple get_screenSize(){return python::make_tuple(glv->width(),glv->height());} void set_screenSize(python::tuple t){ vector<int>* ii=new(vector<int>); ii->push_back(ensuredMainWindow()->viewNo(glv)); ii->push_back(python::extract<int>(t[0])()); ii->push_back(python::extract<int>(t[1])()); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESIZE_VIEW,(void*)ii));}
+		string pyStr(){return string("<GLViewer for view #")+lexical_cast<string>(ensuredMainWindow()->viewNo(glv))+">";}
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(pyGLViewer_center_overloads,center,0,1);
@@ -174,9 +175,11 @@ BOOST_PYTHON_MODULE(_qt){
 		.add_property("scale",&pyGLViewer::get_scale,&pyGLViewer::set_scale)
 		.add_property("sceneRadius",&pyGLViewer::get_sceneRadius,&pyGLViewer::set_sceneRadius)
 		.add_property("ortho",&pyGLViewer::get_orthographic,&pyGLViewer::set_orthographic)
+		.add_property("screenSize",&pyGLViewer::get_screenSize,&pyGLViewer::set_screenSize)
 		.def("fitAABB",&pyGLViewer::fitAABB)
 		.def("fitSphere",&pyGLViewer::fitSphere)
 		.def("showEntireScene",&pyGLViewer::showEntireScene)
 		.def("center",&pyGLViewer::center,pyGLViewer_center_overloads())
+		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
 		;
 }

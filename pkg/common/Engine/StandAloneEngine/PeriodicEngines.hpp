@@ -8,7 +8,7 @@
  * those criteria to a number > 0. */
 class PeriodicEngine:  public StandAloneEngine {
 	protected:
-		Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
+		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 	public:
 		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast;
 		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0) { realLast=getClock(); }
@@ -25,7 +25,8 @@ class PeriodicEngine:  public StandAloneEngine {
 			return false;
 		}
 	protected:
-		void registerAttributes(){ StandAloneEngine::registerAttributes();
+		virtual void registerAttributes(){ 
+			StandAloneEngine::registerAttributes();
 			REGISTER_ATTRIBUTE(virtPeriod);
 			REGISTER_ATTRIBUTE(realPeriod);
 			REGISTER_ATTRIBUTE(iterPeriod);
@@ -33,6 +34,8 @@ class PeriodicEngine:  public StandAloneEngine {
 			REGISTER_ATTRIBUTE(realLast);
 			REGISTER_ATTRIBUTE(iterLast);
 		}
+	REGISTER_CLASS_NAME(PeriodicEngine);
+	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 REGISTER_SERIALIZABLE(PeriodicEngine,false);
 

@@ -14,12 +14,16 @@ matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
 
-
 data={} # global, common for all plots: {'name':[value,...],...}
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
 plotsFilled={} # same as plots but with standalone plot specs filled to tuples (used internally only)
 plotLines={} # dictionary x-name -> Line2d objects (that hopefully still correspond to yspec in plots)
 needsFullReplot=True
+
+def reset():
+	global data, plots, plotsFilled, plotLines, needsFullReplot
+	data={}; plots={}; plotsFilled={}; plotLines={}; needsFullReplot=True; 
+	pylab.close('all')
 
 # we could have a yplot class, that would hold: (yspec,...), (Line2d,Line2d,...) ?
 

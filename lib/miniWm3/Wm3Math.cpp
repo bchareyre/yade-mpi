@@ -15,7 +15,7 @@ namespace Wm3
 {
 
 template<> const float Math<float>::EPSILON = FLT_EPSILON;
-template<> const float Math<float>::ZERO_TOLERANCE = 1e-06f;
+template<> const float Math<float>::ZERO_TOLERANCE = 1e-12f;
 template<> const float Math<float>::MAX_REAL = FLT_MAX;
 template<> const float Math<float>::PI = (float)(4.0*atan(1.0));
 template<> const float Math<float>::TWO_PI = 2.0f*Math<float>::PI;
@@ -26,7 +26,7 @@ template<> const float Math<float>::DEG_TO_RAD = Math<float>::PI/180.0f;
 template<> const float Math<float>::RAD_TO_DEG = 180.0f/Math<float>::PI;
 
 template<> const double Math<double>::EPSILON = DBL_EPSILON;
-template<> const double Math<double>::ZERO_TOLERANCE = 1e-08;
+template<> const double Math<double>::ZERO_TOLERANCE = 1e-20;
 template<> const double Math<double>::MAX_REAL = DBL_MAX;
 template<> const double Math<double>::PI = 4.0*atan(1.0);
 template<> const double Math<double>::TWO_PI = 2.0*Math<double>::PI;

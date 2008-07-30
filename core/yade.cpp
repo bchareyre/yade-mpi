@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
 		signal(SIGSEGV,sigHandler);
 		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
 	#endif
-
+	
 	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
 	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins();

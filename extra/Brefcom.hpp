@@ -135,7 +135,7 @@ class BrefcomLaw: public InteractionSolver{
 		};
 		void action(MetaBody*);
 	protected: 
-		void registerAttributes(){InteractionSolver::registerAttributes();};
+		virtual void registerAttributes(){InteractionSolver::registerAttributes();};
 		void postProcessAttributes(bool deserializing){ if(deserializing)
 		#ifdef BREFCOM_REC
 			recStream.open("/tmp/breflaw.data")
@@ -224,11 +224,12 @@ class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 };
 REGISTER_SERIALIZABLE(GLDrawBrefcomContact,false);
 
-class BrefcomDamageColorizer : public PeriodicEngine {
-	public :
-		BrefcomDamageColorizer(){}
+class BrefcomDamageColorizer: public PeriodicEngine {
+	public:
+		Real maxOmega;
+		BrefcomDamageColorizer(){maxOmega=0;}
 		virtual void action(MetaBody*);
-	virtual void registerAtributes(){PeriodicEngine::registerAttributes();}
+	virtual void registerAttributes(){ PeriodicEngine::registerAttributes(); REGISTER_ATTRIBUTE(maxOmega);}
 	REGISTER_CLASS_NAME(BrefcomDamageColorizer);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };

@@ -25,6 +25,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		shared_ptr<QtFileGenerator> generator;
 		vector<shared_ptr<GLViewer> > glViews;
 		shared_ptr<OpenGLRenderingEngine> renderer;
+		size_t viewNo(shared_ptr<GLViewer>);
 
 		void ensureRenderer();
 		void saveRendererConfig();
@@ -53,7 +54,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 
 		DECLARE_LOGGER;
 	public slots :
-		enum{EVENT_CONTROLLER=QEvent::User+1,EVENT_PLAYER,EVENT_VIEW,EVENT_GENERATOR,EVENT_RESTORE_GLVIEWER_NUM,EVENT_RESTORE_GLVIEWER_STR,EVENT_RESTORE_VIEWER_FILE};
+		enum{EVENT_CONTROLLER=QEvent::User+1,EVENT_PLAYER,EVENT_VIEW,EVENT_GENERATOR,EVENT_RESTORE_GLVIEWER_NUM,EVENT_RESTORE_GLVIEWER_STR,EVENT_RESTORE_VIEWER_FILE,EVENT_RESIZE_VIEW};
 		virtual void customEvent(QCustomEvent* e);
 		/* each of player, controller, generator have slots for them being opened and closed: create{Player,Controller,Generator} and the instances are kept in player, controller, generator. */
 		#define __MK_RM_CHILD(Child,child,YadeClass)  virtual void close##Child(){if(child)child=shared_ptr<YadeClass>();} virtual void create##Child(){if(!child){child=shared_ptr<YadeClass>(new YadeClass()); connect(child.get(),SIGNAL(closeSignal()),this,SLOT(close##Child())); child->show();} else {child->show(); child->raise();}}

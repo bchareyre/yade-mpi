@@ -148,6 +148,8 @@ void YadeQtMainWindow::createView(){
 	shared_ptr<GLViewer> glv=shared_ptr<GLViewer>(new GLViewer(glViews.size(),renderer,NULL,isFirst?NULL:glViews[0].get()));
 	glv->setCamera(new YadeCamera);
 	glv->camera()->frame()->setWheelSensitivity(-1.0f);
+	glv->camera()->setUpVector(qglviewer::Vec(0,0,1));
+	glv->camera()->setViewDirection(qglviewer::Vec(-1,0,0));
 	glv->centerScene();
 	glViews.push_back(glv);
 	//connect( glv, SIGNAL(closeSignal(int)), this, SLOT( closeGLViewEvent(int) ) );
@@ -186,6 +188,11 @@ void YadeQtMainWindow::closeView(int ii=-1){
 	} else {	if(glViews[ii]) closeView(glViews[ii].get()); }
 }
 
+size_t YadeQtMainWindow::viewNo(shared_ptr<GLViewer> g){
+	for(size_t i=0; i<glViews.size(); i++) if(glViews[i]==g) return i;
+	throw std::invalid_argument("No such view");
+}
+
 void YadeQtMainWindow::closeAllChilds(){
 	while(glViews.size()>0 && glViews[0]!=NULL) { LOG_DEBUG("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);}
 	if(player) player=shared_ptr<QtSimulationPlayer>();
@@ -199,6 +206,12 @@ void YadeQtMainWindow::customEvent(QCustomEvent* e){
 		case EVENT_VIEW: createView(); break;
 		case EVENT_PLAYER: createPlayer(); break;
 		case EVENT_GENERATOR: createGenerator(); break;
+		case EVENT_RESIZE_VIEW: {
+			vector<int>* d=(vector<int>*)e->data();
+			if(glViews.size()<d->at(0)+1 || !glViews[d->at(0)]) LOG_ERROR("No view #"+lexical_cast<string>(d->at(0))+", resize request ignored");
+			glViews[d->at(0)]->resize(d->at(1),d->at(2));
+			delete d;
+		}
 		#if 0
 		case EVENT_RESTORE_GLVIEWER_NUM:
 			{if(glViews.size()<1 || !glViews[0]){ LOG_ERROR("No primary view to set attributes on, ignored.");} else{glViews[0]->useDisplayParameters(*(int*)(e->data())); delete (int*)e->data(); }} break;

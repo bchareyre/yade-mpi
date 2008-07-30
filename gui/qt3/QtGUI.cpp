@@ -33,7 +33,7 @@ QtGUI::~QtGUI(){}
 CREATE_LOGGER(QtGUI);
 
 void QtGUI::help(){
-	cerr<<"Qt3 GUI\n=======\n\t-w to hide the main window (with python console only; unused now)\n\t-h to get this help\n"<<endl;
+	cerr<<"Qt3 GUI\n=======\n\t-h to get this help\n"<<endl;
 }
 
 int QtGUI::run(int argc, char *argv[])

@@ -28,6 +28,7 @@ class JumpChangeSe3: public DeusExMachina {
 					rbp->velocity=deltaSe3.position/dt;
 					Vector3r axis; Real angle; deltaSe3.orientation.ToAxisAngle(axis,angle); axis.Normalize();
 					rbp->angularVelocity=axis*angle/dt;
+					LOG_DEBUG("Angular velocity set to "<<axis*angle/dt<<". Axis="<<axis<<", angle="<<angle);
 				}
 				if(!setVelocities || (setVelocities && !b->isDynamic)){
 					Se3r& se3=b->physicalParameters->se3;
@@ -42,6 +43,7 @@ class JumpChangeSe3: public DeusExMachina {
 		virtual void registerAttributes(){DeusExMachina::registerAttributes();REGISTER_ATTRIBUTE(deltaSe3);REGISTER_ATTRIBUTE(setVelocities);}
 		REGISTER_CLASS_NAME(JumpChangeSe3);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(JumpChangeSe3,false);
 	

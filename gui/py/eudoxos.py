@@ -43,3 +43,42 @@ def oofemTextExport():
 		interactions.append("%d %d %g %g %g %g"%(i.id1,i.id2,cp[0],cp[1],cp[2],i.phys['crossSection']))
 
 	return material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions
+
+
+import numpy
+from pylab import *
+from matplotlib.mlab import *
+
+def eliminateJumps(eps,sigma,numSteep=10,gapWidth=5,movWd=40):
+	# get histogram of 'derivatives'
+	ds=abs(diff(sigma))
+	n,bins=numpy.histogram(ds)
+	i=1; sum=0
+	# numSteep steepest pieces will be discarded
+	while sum<numSteep:
+		#print n[-i],bins[-i]
+		sum+=n[-i]; i+=1
+	#print n[-i],bins[-i]
+	threshold=bins[-i]
+	# old algo: replace with nan's
+	##rEps,rSigma=eps[:],sigma[:]; nan=float('nan')
+	##indices=where(ds>threshold)[0]
+	##for i in indices:
+	##	for ii in range(max(0,i-gapWidth),min(len(rEps),i+gapWidth+1)): rEps[ii]=rSigma[ii]=nan
+
+	## doesn't work with older numpy (?)
+	# indices1=where(ds>threshold)[0]
+	indices1=[]
+	for i in range(len(ds)):
+		if ds[i]>threshold: indices1.append(i)
+	indices=[]
+	for i in indices1:
+		for ii in range(i-gapWidth,i+gapWidth+1): indices.append(ii)
+	#print indices1, indices
+	rEps=[eps[i] for i in range(0,len(eps)) if i not in indices]
+	rSigma=[sigma[i] for i in range(0,len(sigma)) if i not in indices]
+	# apply moving average to the result
+	rSigma=movavg(rSigma,movWd)
+	rEps=rEps[movWd/2:-movWd/2+1]
+	return rEps,rSigma.flatten().tolist()
+
