@@ -5,6 +5,7 @@
 #include<yade/core/InteractionSolver.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/Momentum.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
@@ -14,6 +15,26 @@
 #include<yade/pkg-dem/GlobalStiffness.hpp>
 
 // #define BREFCOM_REC
+
+/* Engine encompassing several computations looping over all bodies/interactions
+ *
+ * * Compute and store unbalanced force over the whole simulation.
+ * * Compute and store volumetric strain for every body.
+ *
+ * May be extended in the future to compute global stiffness etc as well.
+ */
+class BrefcomGlobalCharacteristics: public PeriodicEngine{
+	public:
+		bool useMaxForce; // use maximum unbalanced force instead of mean unbalanced force
+		Real unbalancedForce;
+		void compute(MetaBody* rb, bool useMax=false);
+		virtual void action(MetaBody* rb){compute(rb,useMaxForce);}
+		BrefcomGlobalCharacteristics(){};
+	void registerAttributes(){ PeriodicEngine::registerAttributes(); REGISTER_ATTRIBUTE(unbalancedForce); REGISTER_ATTRIBUTE(useMaxForce);}
+	REGISTER_CLASS_NAME(BrefcomGlobalCharacteristics);
+	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
+};
+REGISTER_SERIALIZABLE(BrefcomGlobalCharacteristics,false);
 
 /*! @brief representation of a single interaction of the brefcom type: storage for relevant parameters.
  *
@@ -25,8 +46,34 @@ class BrefcomContact: public InteractionPhysics {
 	private:
 	public:
 		/*! Fundamental parameters (constants) */
-		Real E, G, tanFrictionAngle, undamagedCohesion, equilibriumDist, crossSection, epsCrackOnset, epsFracture, expBending, xiShear, tau, expDmgRate;
-		/*! Up to now maximum normal strain */
+		Real
+			//! normal modulus (stiffness / crossSection)
+			E,
+			//! shear modulus
+			G,
+			//! tangens of internal friction angle
+			tanFrictionAngle, 
+			//! virgin material cohesion
+			undamagedCohesion,
+			//! normal distance at which epsN=0
+			equilibriumDist,
+			//! equivalent cross-section associated with this contact
+			crossSection,
+			//! strain at which the material starts to behave non-linearly
+			epsCrackOnset,
+			//! strain where the damage-evolution law tangent from the top (epsCrackOnset) touches the axis;
+			/// since the softening law is exponential, this doesn't mean that the contact is fully damaged at this point,
+			/// that happens only asymptotically 
+			epsFracture,
+			//! damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞
+			omegaThreshold,
+			//! weight coefficient for shear strain when computing the strain semi-norm kappaD
+			xiShear,
+			//! characteristic time (if non-positive, the law without rate-dependence is used)
+			tau,
+			//! exponent in the rate-dependent damage evolution
+			expDmgRate;
+		/*! Up to now maximum normal strain (semi-norm), non-decreasing in time. */
 		Real kappaD;
 		/*! prevNormal is oriented A→B (as in SpheresContactGeometry); */
 		Vector3r prevNormal;
@@ -40,8 +87,8 @@ class BrefcomContact: public InteractionPhysics {
 		/*! auxiliary variable for visualization and BrefcomStiffnessCounter, recalculated by BrefcomLaw at every iteration */
 		Real omega, Fn, sigmaN, epsN; Vector3r sigmaT, Fs;
 
-		BrefcomContact(): InteractionPhysics(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), equilibriumDist(0), crossSection(0), expBending(0), xiShear(0), tau(0), expDmgRate(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; }
-		BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
+		BrefcomContact(): InteractionPhysics(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), equilibriumDist(0), crossSection(0), xiShear(0), tau(0), expDmgRate(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; }
+		//	BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
 
 
 		void registerAttributes(){
@@ -54,7 +101,7 @@ class BrefcomContact: public InteractionPhysics {
 			REGISTER_ATTRIBUTE(crossSection);
 			REGISTER_ATTRIBUTE(epsCrackOnset);
 			REGISTER_ATTRIBUTE(epsFracture);
-			REGISTER_ATTRIBUTE(expBending);
+			REGISTER_ATTRIBUTE(omegaThreshold);
 			REGISTER_ATTRIBUTE(xiShear);
 			REGISTER_ATTRIBUTE(tau);
 			REGISTER_ATTRIBUTE(expDmgRate);
@@ -81,6 +128,21 @@ class BrefcomContact: public InteractionPhysics {
 };
 REGISTER_SERIALIZABLE(BrefcomContact,false);
 
+/* This class holds information associated with each body */
+class BrefcomPhysParams: public BodyMacroParameters {
+	public:
+		//! volumetric strain around this body
+		Real epsVolumetric;
+		//! number of (cohesive) contacts that damaged completely
+		int numBrokenCohesive;
+		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0){createIndex();};
+		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive);}
+		REGISTER_CLASS_NAME(BrefcomPhysParams);
+		REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
+};
+REGISTER_SERIALIZABLE(BrefcomPhysParams,false);
+
+
 #define BREFREC(a) {recValues.push_back(a); recLabels.push_back(#a);}
 #define BREFREC2(a,b) {recValues.push_back(a); recLabels.push_back(b);}
 class BrefcomLaw: public InteractionSolver{
@@ -99,7 +161,7 @@ class BrefcomLaw: public InteractionSolver{
 		shared_ptr<Body> body1, body2;
 		shared_ptr<BrefcomContact> BC;
 		shared_ptr<SpheresContactGeometry> contGeom;
-		shared_ptr<RigidBodyParameters> rbp1, rbp2;
+		shared_ptr<BrefcomPhysParams> rbp1, rbp2;
 		MetaBody* rootBody;
 		// recording  values
 		#ifdef BREFCOM_REC
@@ -112,12 +174,10 @@ class BrefcomLaw: public InteractionSolver{
 		inline Real funcH(Real kappaD){ return 1-funcG(kappaD); }
 		/*! Damage evolution law */
 		inline Real funcG(Real kappaD){
-			//const Real& expBending=BC->expBending, 
 			const Real& epsCrackOnset=BC->epsCrackOnset, epsFracture=BC->epsFracture; const bool& neverDamage=BC->neverDamage; // shorthands
 			if(kappaD<epsCrackOnset || neverDamage) return 0;
 			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 			//if(kappaD>epsFracture) return 1;
-			//return (1/(1-exp(-expBending)))*(1-exp(-expBending*(kappaD-epsCrackOnset)/(epsFracture-epsCrackOnset)));
 		}
 		
 	public:
@@ -158,8 +218,6 @@ REGISTER_SERIALIZABLE(BrefcomLaw,false);
 class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 	private:
 	public:
-		/* "constants" for macro-micro: for the algorithm, see comments in code of BrefcomMakeContact::go; values of these constants are based on CFRAC 2007 proceedings. */
-		Real alpha, beta, gamma;
 		/* nonelastic material parameters */
 		/* alternatively (and more cleanly), we would have subclass of ElasticBodyParameters,
 		 * which would define just those in addition to the elastic ones.
@@ -169,7 +227,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		expBending is positive if the damage evolution function is concave after fracture onset;
 		reasonable value seems like 4.
 		*/
-		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate;
+		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (BrefcomContact::neverDamage=true); defaults to false
@@ -177,20 +235,17 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 
 		BrefcomMakeContact(){
 			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=expBending=xiShear=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
+			sigmaT=xiShear=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
 			neverDamage=false;
-			alpha=3.7; beta=2.198; gamma=3.79; // Laurent's defaults
 			cohesiveThresholdIter=-1;
 			tau=-1; expDmgRate=0;
+			omegaThreshold=0.98;
 		}
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
 		virtual void registerAttributes(){
 			InteractionPhysicsEngineUnit::registerAttributes();
 			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
-			REGISTER_ATTRIBUTE(alpha);
-			REGISTER_ATTRIBUTE(beta);
-			REGISTER_ATTRIBUTE(gamma);
 
 			REGISTER_ATTRIBUTE(G_over_E);
 			REGISTER_ATTRIBUTE(expBending);
@@ -201,11 +256,12 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			REGISTER_ATTRIBUTE(relDuctility);
 			REGISTER_ATTRIBUTE(tau);
 			REGISTER_ATTRIBUTE(expDmgRate);
+			REGISTER_ATTRIBUTE(omegaThreshold);
 			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
 			/* REGISTER_ATTRIBUTE(Gf); */
 		}
 
-		FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
+		FUNCTOR2D(BrefcomPhysParams,BrefcomPhysParams);
 		REGISTER_CLASS_NAME(BrefcomMakeContact);
 		REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 		DECLARE_LOGGER;
@@ -215,17 +271,18 @@ REGISTER_SERIALIZABLE(BrefcomMakeContact,false);
 class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 	virtual ~GLDrawBrefcomContact() {};
-	virtual void registerAttributes(){ REGISTER_ATTRIBUTE(contactLine); REGISTER_ATTRIBUTE(dmgLabel); REGISTER_ATTRIBUTE(epsT); REGISTER_ATTRIBUTE(epsTAxes); REGISTER_ATTRIBUTE(normal); }
+	virtual void registerAttributes(){ REGISTER_ATTRIBUTE(contactLine); REGISTER_ATTRIBUTE(dmgLabel); REGISTER_ATTRIBUTE(epsT); REGISTER_ATTRIBUTE(epsTAxes); REGISTER_ATTRIBUTE(normal); REGISTER_ATTRIBUTE(colorStrain); }
 	RENDERS(BrefcomContact);
 	REGISTER_CLASS_NAME(GLDrawBrefcomContact);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 	DECLARE_LOGGER;
-	static bool contactLine,dmgLabel,epsT,epsTAxes,normal;
+	static bool contactLine,dmgLabel,epsT,epsTAxes,normal,colorStrain;
 };
 REGISTER_SERIALIZABLE(GLDrawBrefcomContact,false);
 
 class BrefcomDamageColorizer: public PeriodicEngine {
 	public:
+		//! maximum damage over all contacts
 		Real maxOmega;
 		BrefcomDamageColorizer(){maxOmega=0;}
 		virtual void action(MetaBody*);
@@ -234,6 +291,7 @@ class BrefcomDamageColorizer: public PeriodicEngine {
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(BrefcomDamageColorizer,false);
+
 
 
 /*** !!! BADLY BROKEN !!! Do not use !!! ***/

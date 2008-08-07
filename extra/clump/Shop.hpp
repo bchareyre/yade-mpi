@@ -101,5 +101,8 @@ class Shop{
 			static Vector3r& globalStiffness(body_id_t, MetaBody* mb=NULL);
 			static Vector3r& globalRStiffness(body_id_t, MetaBody* mb=NULL);
 		};
+		#if 0
+			Real PWaveTimeStep(MetaBody* rb);
+		#endif
 
 };

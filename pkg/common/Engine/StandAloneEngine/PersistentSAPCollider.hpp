@@ -106,7 +106,7 @@ class PersistentSAPCollider : public BroadInteractor
 			REGISTER_ATTRIBUTE(haveDistantTransient);
 		}
 
-
+	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(PersistentSAPCollider);
 	REGISTER_BASE_CLASS_NAME(BroadInteractor);
 

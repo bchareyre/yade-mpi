@@ -28,21 +28,15 @@ void TranslationEngine::registerAttributes()
 void TranslationEngine::applyCondition(MetaBody * ncb){
 	shared_ptr<BodyContainer>& bodies=ncb->bodies;
 
-	std::vector<int>::const_iterator ii = subscribedBodies.begin();
-	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
-
 	Real dt=Omega::instance().getTimeStep();
-	//time=dt;
 	static int sign = 1;
-	for(;ii!=iiEnd;++ii){
-		if(ParticleParameters* p = dynamic_cast<ParticleParameters*>((*bodies)[*ii]->physicalParameters.get())){
+	FOREACH(body_id_t id,subscribedBodies){
+		assert(id<bodies->size());
+		if(ParticleParameters* p = dynamic_cast<ParticleParameters*>((*bodies)[id]->physicalParameters.get())){
 			p->se3.position+=sign*dt*velocity*translationAxis;
 			p->velocity=sign*velocity*translationAxis;
-		} else if(PhysicalParameters* b = dynamic_cast<PhysicalParameters*>((*bodies)[*ii]->physicalParameters.get())){
-			// NOT everyone has velocity !
-			b->se3.position+=sign*dt*velocity*translationAxis;
-		} else {
-			std::cerr << "TranslationEngine::applyCondition, WARNING! dynamic_cast failed! for id: " << *ii << std::endl;
+		} else{
+			Body::byId(id,ncb)->physicalParameters->se3.position+=sign*dt*velocity*translationAxis;
 		}
 	}
 }

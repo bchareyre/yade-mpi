@@ -73,13 +73,11 @@ bool FileGenerator::generateAndSave()
 		message = message + "Unhandled exception: " + typeid(e).name() + " : " + e.what();
 		return false;
 	}
+	// generation wasn't successful
+	if(status==false) return false;
 
-	if(shouldTerminate())
-	{
-		message+="Generation aborted."; return false;
-	}
-	else
-	{
+	if(shouldTerminate()){ message+="Generation aborted."; return false; }
+	else {
 		boost::posix_time::ptime now2 = boost::posix_time::second_clock::local_time();
 		boost::posix_time::time_duration generationTime = now2 - now; // generation time, without save time
 		setStatus("saving...");

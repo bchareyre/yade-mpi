@@ -14,6 +14,8 @@
 #include<yade/core/BodyContainer.hpp>
 #include<limits>
 
+CREATE_LOGGER(PersistentSAPCollider);
+
 PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
 {
 	noTransientIfPersistentExists=false;
@@ -36,6 +38,7 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 {
 	rootBody=ncb;
 	shared_ptr<BodyContainer> bodies=ncb->bodies;
+	transientInteractions=ncb->transientInteractions;
 	
 	if (2*bodies->size()!=xBounds.size()){
 		xBounds.resize(2*bodies->size());
@@ -68,13 +71,19 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 			maxima[offset+0]=pos[0]; maxima[offset+1]=pos[1]; maxima[offset+2]=pos[2];
 		}
 	}
-
-	transientInteractions = ncb->transientInteractions;	
-	InteractionContainer::iterator I_end = transientInteractions->end();
-	for(InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I) {
-		if ((*I)->isReal) (*I)->isNew=false; // 
-		else (*I)->isNew=true;
-		if(!haveDistantTransient) (*I)->isReal=false; // reset this flag, is used later... (??)
+	FOREACH(const shared_ptr<Interaction>& I,*ncb->transientInteractions){
+		// remove interactions deleted by the constitutive law: thay are not new, but nor real either
+		// to make sure, do that only with haveDistantTransient
+		if(haveDistantTransient && !I->isNew && !I->isReal) { transientInteractions->erase(I->getId1(),I->getId2()); continue; }
+		// Once the interaction has been fully created, it is not "new" anymore
+		if (I->isReal) I->isNew=false;
+		// OTOH if is is now real anymore, it falls back to the potential state
+		if(!haveDistantTransient && !I->isReal) I->isNew=true;
+		// for non-distant interactions, isReal depends on whether there is geometrical overlap; that is calculated later
+		// for distant: if isReal&&!isNew means:
+		// 	the interaction was marked (by the constitutive law) as not real anymore should be deleted
+		if(!haveDistantTransient) I->isReal=false;
+		//if(!I->isReal){LOG_DEBUG("Interaction #"<<I->getId1()<<"=#"<<I->getId2()<<" is not real.");}
 	}
 	
 	updateIds(bodies->size());
@@ -95,7 +104,6 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 
 void PersistentSAPCollider::updateIds(unsigned int nbElements)
 {
-
 	// the first time broadInteractionTest is called nbObject=0
 	if (nbElements!=nbObjects){
 		int begin=0, end=nbElements;
@@ -133,51 +141,53 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 }
 
 
-void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, int nbElements)
-{
-	int i,j;
-	shared_ptr<AABBBound> tmp;
-
-	for (i=1; i<2*nbElements; i++)
-	{
-		tmp = bounds[i];
-		j = i;
-		while (j>0 && tmp->value<bounds[j-1]->value)
-		{
-			bounds[j] = bounds[j-1];
+void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, int nbElements){
+	int j;
+	for (int i=1; i<2*nbElements; i++){
+		shared_ptr<AABBBound> tmp(bounds[i]);
+		j=i;
+		while (j>0 && tmp->value<bounds[j-1]->value) {
+			bounds[j]=bounds[j-1];
 			updateOverlapingBBSet(tmp->id,bounds[j-1]->id);
 			j--;
 		}
-		bounds[j] = tmp;
+		bounds[j]=tmp;
 	}
 }
 
-
-void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2)
-{
-// 	// look if the pair (id1,id2) already exists in the overleppingBB collection
+/* Note that this function is called only for bodies that actually overlap along some axis */
+void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
+ 	// look if the pair (id1,id2) already exists in the overlappingBB collection
 	const shared_ptr<Interaction>& interaction=transientInteractions->find(body_id_t(id1),body_id_t(id2));
 	bool found=(interaction!=0);//Bruno's Hack
 	// if there is persistent interaction, we will not create transient one!
 	bool foundPersistent = noTransientIfPersistentExists ? (persistentInteractions->find(body_id_t(id1),body_id_t(id2))!=0) : false;
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
-	int offset1 = 3*id1;
-	int offset2 = 3*id2;
-	// FIXME: this is perhaps an expensive operation?!
+	int offset1=3*id1, offset2=3*id2;
 	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1),rootBody)), b2(Body::byId(body_id_t(id2),rootBody));
 	bool overlap =
-		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) && // only collide if at least one particle is standalone or they belong to different clumps
-		!b1->isClump() && !b2->isClump() && // do not collide clumps, since they are just containers, never interact
-
-		!(maxima[offset1]<minima[offset2] || maxima[offset2]<minima[offset1] || 
-		maxima[offset1+1]<minima[offset2+1] || maxima[offset2+1]<minima[offset1+1] || 
-		maxima[offset1+2]<minima[offset2+2] || maxima[offset2+2]<minima[offset1+2]);
-
+		// only collide if at least one particle is standalone or they belong to different clumps
+		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) &&
+		 // do not collide clumps, since they are just containers, never interact
+		!b1->isClump() && !b2->isClump() &&
+		// AABB collisions: 
+		!(
+			maxima[offset1  ]<minima[offset2  ] || maxima[offset2  ]<minima[offset1  ] || 
+			maxima[offset1+1]<minima[offset2+1] || maxima[offset2+1]<minima[offset1+1] || 
+			maxima[offset1+2]<minima[offset2+2] || maxima[offset2+2]<minima[offset1+2]);
 	// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
-	if(overlap && !found && !foundPersistent) transientInteractions->insert(body_id_t(id1),body_id_t(id2));
+	//if((id1==0 && id2==1) || (id1==1 && id2==0)) LOG_DEBUG("Processing #0 #1");
+	//if(interaction&&!interaction->isReal){ LOG_DEBUG("Unreal interaction #"<<id1<<"=#"<<id2<<" (overlap="<<overlap<<", haveDistantTransient="<<haveDistantTransient<<")");}
+	if(overlap && !found && !foundPersistent){
+		//LOG_DEBUG("Creating interaction #"<<id1<<"=#"<<id2);
+		transientInteractions->insert(body_id_t(id1),body_id_t(id2));
+	}
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
-	else if(!overlap && found && (haveDistantTransient ? !interaction->isReal : true) ) transientInteractions->erase(body_id_t(id1),body_id_t(id2));
+	else if(!overlap && found && (haveDistantTransient ? !interaction->isReal : true) ){
+		//LOG_DEBUG("Erasing interaction #"<<id1<<"=#"<<id2<<" (isReal="<<interaction->isReal<<")");
+		transientInteractions->erase(body_id_t(id1),body_id_t(id2));
+	}
 }
 
 

@@ -6,7 +6,33 @@
 #include<yade/lib-QGLViewer/qglviewer.h>
 
 
-YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer" /* ,"BrefcomStiffnessCounter"*/ );
+YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics" /* ,"BrefcomStiffnessComputer"*/ );
+
+void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
+	Shop::Bex::initCache();
+
+	// 1. reset volumetric strain (cummulative in the next loop)
+	// 2. get maximum force on a body and sum of all forces (for averaging)
+	Real sumF=0,maxF=0,currF;
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		YADE_PTR_CAST<BrefcomPhysParams>(b->physicalParameters)->epsVolumetric=0;
+		currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
+	}
+	Real meanF=sumF/rb->bodies->size(); 
+
+	// commulate normal strains from contacts
+	// get max force on contacts
+	Real maxContactF=0;
+	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
+		if(!I->isReal) continue;
+		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
+		maxContactF=max(maxContactF,max(BC->Fn,BC->Fs.Length()));
+		YADE_PTR_CAST<BrefcomPhysParams>(Body::byId(I->getId1(),rb)->physicalParameters)->epsVolumetric+=BC->epsN;
+		YADE_PTR_CAST<BrefcomPhysParams>(Body::byId(I->getId2(),rb)->physicalParameters)->epsVolumetric+=BC->epsN;
+	}
+	unbalancedForce=(useMaxForce?maxF:meanF)/maxContactF;
+}
+
 
 /********************** BrefcomMakeContact ****************************/
 CREATE_LOGGER(BrefcomMakeContact);
@@ -18,17 +44,10 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 	const shared_ptr<SpheresContactGeometry>& contGeom=dynamic_pointer_cast<SpheresContactGeometry>(interaction->interactionGeometry);
 	assert(contGeom); // for now, don't handle anything other than SpheresContactGeometry
 
-	if(!interaction->isNew && interaction->interactionPhysics){
-		/* BrefcomContact->prevNormal is assigned in BrefcomLaw::action */
-		#if 0
-			const shared_ptr<BrefcomContact> contPhys=dynamic_pointer_cast<BrefcomContact>(interaction->interactionPhysics);
-			assert(contPhys);
-			contPhys->prevNormal=contGeom->normal;
-		#endif
-	} else {
+	if(!interaction->isNew && interaction->interactionPhysics){/* BrefcomContact->prevNormal is assigned in BrefcomLaw::action */} 
+	else {
 		interaction->isNew; // just in case
 		//TRACE;
-
 
 		const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
 		const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
@@ -41,22 +60,21 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
 		//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
 
-		/* recommend default values for parameters
-		 * propose ways to determine them exactly */
-		if(!neverDamage) { assert(!isnan(expBending)); assert(!isnan(sigmaT)); assert(!isnan(xiShear));}
+		if(!neverDamage) { assert(!isnan(sigmaT)); assert(!isnan(xiShear));}
 
-		shared_ptr<BrefcomContact> contPhys(new BrefcomContact(
-			/* E */ E12,
-			/* G */ E12*G_over_E, /*/2*(1+nu12)*(1-alpha*nu12)/(1+nu12),*/
-			/* tanFrictionAngle */ tan(.5*(elast1->frictionAngle+elast2->frictionAngle)),
-			/* undamagedCohesion */ sigmaT,
-			/* equilibriumDist */ d0,
-			/* crossSection */ S12,
-			/* epsCrackOnset */ epsCrackOnset,
-			/* epsFracture */ relDuctility*epsCrackOnset,
-			/* expBending */ expBending,
-			/* xiShear*/ xiShear
-			));
+		shared_ptr<BrefcomContact> contPhys(new BrefcomContact());
+
+		contPhys->E=E12;
+		contPhys->G=E12*G_over_E;
+		contPhys->tanFrictionAngle=tan(.5*(elast1->frictionAngle+elast2->frictionAngle));
+		contPhys->undamagedCohesion=sigmaT;
+		contPhys->equilibriumDist=d0;
+		contPhys->crossSection=S12;
+		contPhys->epsCrackOnset=epsCrackOnset;
+		contPhys->epsFracture=relDuctility*epsCrackOnset;
+		contPhys->xiShear=xiShear;
+		contPhys->omegaThreshold=omegaThreshold;
+
 		contPhys->prevNormal=contGeom->normal;
 		if(neverDamage) contPhys->neverDamage=true;
 		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
@@ -104,8 +122,8 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		assert(body1); assert(body2);
 		BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics);
 		contGeom=YADE_PTR_CAST<SpheresContactGeometry>(I->interactionGeometry);
-		rbp1=YADE_PTR_CAST<RigidBodyParameters>(body1->physicalParameters);
-		rbp2=YADE_PTR_CAST<RigidBodyParameters>(body2->physicalParameters);
+		rbp1=YADE_PTR_CAST<BrefcomPhysParams>(body1->physicalParameters);
+		rbp2=YADE_PTR_CAST<BrefcomPhysParams>(body2->physicalParameters);
 		assert(BC); assert(contGeom); assert(rbp1); assert(rbp2);
 		
 		#ifdef BREFCOM_REC
@@ -123,7 +141,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		#endif
 
 		// shorthands
-		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate);
+		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold);
 		// for python access
 		Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs);
 
@@ -152,8 +170,8 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		#ifdef BREFCOM_DETAIL
 			LOG_TRACE("======= iteration #"<<Omega::instance().getCurrentIteration()<<", interaction "<<id1<<" + "<<id2<<"=======");
 		#endif
-		/* shear strain: always use it, even for epsN>0 */
-		/*if(false && epsN>0) { epsT=Vector3r::ZERO; } else {*/
+
+		/* shear strain: epsT */
 				NNANV(epsT);
 			/* rotate epsT to the new contact plane */
 				const Real& dt=Omega::instance().getTimeStep();
@@ -206,11 +224,18 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 			sigmaT=G*epsT;
 		#endif
 
-		//sigmaT=Vector3r::ZERO;
-		//if(BC->omega==1){TRVAR5(equilibriumDist,dist,epsN,kappaD,BC->epsFracture);}
+		/* store this normal for next timestep */
+		BC->prevNormal=contGeom->normal;
+
+		if(omega>omegaThreshold){
+			I->isReal=false;
+			if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1;}
+			LOG_INFO("Contact #"<<id1<<"=#"<<id2<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
+			continue;
+		}
 
 		// store Fn (and Fs?), for use with BrefcomStiffnessCounter
-		NNAN(sigmaN); NNAN(sigmaT[0]);NNAN(sigmaT[1]);NNAN(sigmaT[2]);
+		NNAN(sigmaN); NNANV(sigmaT);
 		NNAN(crossSection);
 		Fn=sigmaN*crossSection;
 		Fs=sigmaT*crossSection;
@@ -225,8 +250,6 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 			recStream<<endl;
 		#endif
 
-		/* store this normal for next timestep */
-		BC->prevNormal=contGeom->normal;
 	}
 }
 
@@ -242,6 +265,7 @@ bool GLDrawBrefcomContact::dmgLabel=true;
 bool GLDrawBrefcomContact::epsT=false;
 bool GLDrawBrefcomContact::epsTAxes=false;
 bool GLDrawBrefcomContact::normal=false;
+bool GLDrawBrefcomContact::colorStrain=false;
 
 
 void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
@@ -288,8 +312,10 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 		maxOmega=max(maxOmega,BC->omega);
 	}
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
+		// add damaged contacts that have already been deleted
+		unsigned numBrokenCohesive=YADE_PTR_CAST<BrefcomPhysParams>(B->physicalParameters)->numBrokenCohesive;
 		if(bodyDamage[B->getId()].first==0) {B->geometricalModel->diffuseColor=Vector3r(0.5,0.5,B->isDynamic?0:1); continue; }
-		Real normDmg=bodyDamage[B->getId()].second/bodyDamage[B->getId()].first;
+		Real normDmg=(bodyDamage[B->getId()].second+numBrokenCohesive)/(bodyDamage[B->getId()].first+numBrokenCohesive);
 		B->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,B->isDynamic?0:1);
 	}
 }

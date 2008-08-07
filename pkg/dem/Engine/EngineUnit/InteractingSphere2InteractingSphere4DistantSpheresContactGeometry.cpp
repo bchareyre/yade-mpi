@@ -39,7 +39,7 @@ bool InteractingSphere2InteractingSphere4DistantSpheresContactGeometry::go(	cons
 	//cerr<<"Depth is "<<penetrationDepthSq<<endl;
 
 	shared_ptr<SpheresContactGeometry> scm(c->interactionGeometry ? YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry) : shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()));
-		
+
 	if (penetrationDepthSq>0 || c->isReal) {
 		//cerr<<__FILE__<<":"<<__LINE__<<endl;
 		Real penetrationDepth = s1->radius+s2->radius-normal.Normalize(); /* normalize wirks in-place and returns length before normalization; from here, normal is unit vector */

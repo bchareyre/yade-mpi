@@ -105,12 +105,7 @@ __BEX_ACCESS(Vector3r,momentum,Momentum,momentumIdx,momentum);
 __BEX_ACCESS(Vector3r,globalStiffness,GlobalStiffness,globalStiffnessIdx,stiffness);
 __BEX_ACCESS(Vector3r,globalRStiffness,GlobalStiffness,globalStiffnessIdx,Rstiffness);
 #undef __BEX_ACCESS
-/*
-Vector3r& Shop::Bex::force(body_id_t id){ assert(forceIdx>=0); return static_pointer_cast<Force>(Omega::instance().getRootBody()->physicalActions->find(id,forceIdx))->force; }
-Vector3r& Shop::Bex::momentum(body_id_t id){ assert(momentumIdx>=0); return static_pointer_cast<Momentum>(Omega::instance().getRootBody()->physicalActions->find(id,forceIdx))->momentum;}
-Vector3r& Shop::Bex::globalStiffness(body_id_t id){ assert(globalStiffnessIdx>=0); return static_pointer_cast<GlobalStiffness>(Omega::instance().getRootBody()->physicalActions->find(id,globalStiffnessIdx))->stiffness; }
-Vector3r& Shop::Bex::globalRStiffness(body_id_t id){ assert(globalStiffnessIdx>=0); return static_pointer_cast<GlobalStiffness>(Omega::instance().getRootBody()->physicalActions->find(id,globalStiffnessIdx))->Rstiffness; }
-*/
+
 
 template <typename valType> valType Shop::getDefault(const string& key) {
 	ensureInit();
@@ -1081,7 +1076,7 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 
 Real Shop::ElasticWaveTimestepEstimate(shared_ptr<MetaBody> rootBody){
 	Real minDt=std::numeric_limits<Real>::infinity();
-	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		shared_ptr<Sphere> sphere=dynamic_pointer_cast<Sphere>(b->geometricalModel);
 		shared_ptr<ElasticBodyParameters> elast=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
 		if(!sphere || !elast) continue;
@@ -1116,4 +1111,17 @@ void Shop::GLDrawText(std::string txt, Vector3r pos, Vector3r color){
 	glPopMatrix();
 
 }
-
+#if 0
+Real Shop::PWaveTimeStep(MetaBody* rb){
+	dt=std::numeric_limits<Real>::infinity();
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		if(!b->physicalParameters || !b->geometricalModel) continue;
+		shared_ptr<ElasticBodyParameters> ebp=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
+		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel);
+		if(!ebp || !s) continue;
+		Real density=ebp->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
+		dt=min(dt,s->radius/sqrt(ebp->young/density));
+	}
+	return dt;
+}
+#endif

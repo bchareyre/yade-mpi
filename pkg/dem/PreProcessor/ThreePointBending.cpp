@@ -166,8 +166,7 @@ bool ThreePointBending::generate()
 			message="Error: cannot load the file that should contain spheres"; return false;
 		}
 	}
-	else
-		return "Error: cannot load the file that should contain spheres";
+	else { message="Error: cannot load the file that should contain spheres"; return false; }
 /////////////////////////////////////
 	Vector3r min(10000,10000,10000),max(-10000,-10000,-10000);
 	{// calc min/max

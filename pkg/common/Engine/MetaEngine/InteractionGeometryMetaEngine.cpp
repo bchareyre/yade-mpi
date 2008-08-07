@@ -17,38 +17,22 @@
 void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
-	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
-	InteractionContainer::iterator ii    = persistentInteractions->begin();
-	InteractionContainer::iterator iiEnd = persistentInteractions->end(); 
-	for( ; ii!=iiEnd ; ++ii)
-	{
-		const shared_ptr<Interaction> interaction = *ii;
-		
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
+	FOREACH(const shared_ptr<Interaction>& interaction, *ncb->persistentInteractions){
+		shared_ptr<Body>& b1=(*bodies)[interaction->getId1()];
+		shared_ptr<Body>& b2=(*bodies)[interaction->getId2()];
 		interaction->isReal = true;
 		operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
 	}
 	
-	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
-	ii    = transientInteractions->begin();
-	iiEnd = transientInteractions->end(); 
-	for(  ; ii!=iiEnd ; ++ii)
-	{
-		const shared_ptr<Interaction> interaction = *ii;
-		
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		
+	FOREACH(const shared_ptr<Interaction>& interaction, *ncb->transientInteractions){
+		const shared_ptr<Body>& b1=(*bodies)[interaction->getId1()];
+		const shared_ptr<Body>& b2=(*bodies)[interaction->getId2()];
 		//bool wasReal = interaction->isReal;
 		interaction->isReal =
 			b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
-			// FIXME put this inside VolatileInteractionCriterion dynlib
-			( persistentInteractions->find(interaction->getId1(),interaction->getId2()) == 0 )
+			( ncb->persistentInteractions->find(interaction->getId1(),interaction->getId2()) == 0 )
 		 	&&
 			operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
-
 
 		//if(wasReal==false && interaction->isReal)
 		//	interaction->isNew=true;

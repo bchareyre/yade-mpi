@@ -63,6 +63,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'ParallelEngine'
 			],
 			),
+		env.SharedLibrary('log',['py/log.cpp'],SHLIBPREFIX=''),
 		env.File('__init__.py','py'),
 		env.File('utils.py','py'),
 		env.File('eudoxos.py','py'),
