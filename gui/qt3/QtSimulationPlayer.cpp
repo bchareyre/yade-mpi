@@ -29,7 +29,7 @@ void QtSimulationPlayer::pbPauseClicked(){ glSimulationPlayerViewer->stopAnimati
 void QtSimulationPlayer::pbStepClicked(){ glSimulationPlayerViewer->stopAnimation(); glSimulationPlayerViewer->doOneStep(); }
 void QtSimulationPlayer::pbResetClicked(){ setParameters();	glSimulationPlayerViewer->reset();}
 void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewer->saveSnapShots=b;}
-void QtSimulationPlayer::cbAllowFilterationToggled(bool b){	FilterEngine::isFilterationActivated=b; }
+void QtSimulationPlayer::cbAllowFiltrationToggled(bool b){	FilterEngine::isFiltrationActivated=b; }
 void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e); emit closeSignal(); }
 
 
@@ -47,6 +47,7 @@ void QtSimulationPlayer::pbInputDirectoryClicked(){
 	if (!directory.empty()) leInputDirectory->setText(directory);
 }
 void QtSimulationPlayer::pbLoadClicked(){
+	glSimulationPlayerViewer->stride=sbStride->value();
 	glSimulationPlayerViewer->load(leInputConfigFile->text());
 	leInputBaseName->setText(glSimulationPlayerViewer->inputBaseName);
 	leInputDirectory->setText(glSimulationPlayerViewer->inputBaseDirectory);

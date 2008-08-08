@@ -135,6 +135,7 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 			if(dIter->leaf().find(inputBaseName)!=0 || filesystem::extension(*dIter)==".rgb" || algorithm::ends_with(dIter->string(),".rgb.bz2") || filesystem::is_directory(*dIter) || !filesystem::exists(*dIter)) continue;
 			xyzNames.push_back(dIter->string());
 		}
+		xyzNames.sort();
 	} else { /* load from sqlite database */
 		con=shared_ptr<sqlite3x::sqlite3_connection>(new sqlite3x::sqlite3_connection(fileName));
 		LOG_DEBUG("Opened sqlite db "<<fileName);

@@ -13,7 +13,7 @@
 class FilterEngine : public DeusExMachina {
 	public:
 		/// Activation of filtration from GUI
-		static bool isFilterationActivated;
+		static bool isFiltrationActivated;
 
 		/// Activation of the filter
 		bool isFilterActivated;
@@ -24,7 +24,7 @@ class FilterEngine : public DeusExMachina {
 	
 		void registerAttributes()
 		{
-//			REGISTER_ATTRIBUTE(isFilterationActivated);
+//			REGISTER_ATTRIBUTE(isFiltrationActivated);
 			REGISTER_ATTRIBUTE(isFilterActivated);
 		}
 

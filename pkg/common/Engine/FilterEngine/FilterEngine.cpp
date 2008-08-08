@@ -8,7 +8,7 @@
 
 #include "FilterEngine.hpp"
 
-bool FilterEngine::isFilterationActivated = false;
+bool FilterEngine::isFiltrationActivated = false;
 
 FilterEngine::FilterEngine() : DeusExMachina(), isFilterActivated(false)
 {
@@ -16,5 +16,5 @@ FilterEngine::FilterEngine() : DeusExMachina(), isFilterActivated(false)
 
 bool FilterEngine::isActivated() 
 {
-	return FilterEngine::isFilterationActivated && isFilterActivated; 
+	return FilterEngine::isFiltrationActivated && isFilterActivated; 
 }
