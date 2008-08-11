@@ -239,13 +239,24 @@ bool USCTGen::generate(){
 	}
 	else spheres=Shop::loadSpheresFromFile(spheresFile,minXYZ,maxXYZ);
 
+
 	TRVAR2(minXYZ,maxXYZ);
 	// get spheres that are "close enough" to the strained ends
 	for(vecVecReal::iterator I=spheres.begin(); I!=spheres.end(); I++){
 		Vector3r C=I->first;
 		Real r=I->second;
 		shared_ptr<Body> S=Shop::sphere(C,r);
+
+		// replace BodyMacroParameters by BrefcomPhysParams
+		shared_ptr<BodyMacroParameters> bmp=YADE_PTR_CAST<BodyMacroParameters>(S->physicalParameters);
+		shared_ptr<BrefcomPhysParams> bpp(new BrefcomPhysParams);
+		#define _CP(attr) bpp->attr=bmp->attr;
+		_CP(acceleration); _CP(angularVelocity); _CP(blockedDOFs); _CP(frictionAngle); _CP(inertia); _CP(mass); _CP(poisson); _CP(refSe3); _CP(se3); _CP(young); _CP(velocity);
+		#undef _CP
+		S->physicalParameters=bpp;
+
 		body_id_t sId=rootBody->bodies->insert(S);
+
 		Real distFactor=1.2;
 		if (C[axis]-distFactor*r<minXYZ[axis]) {
 			strainer->negIds.push_back(sId);
@@ -328,7 +339,7 @@ void USCTGen::createEngines(){
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
 		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
 		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
-		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1; bmc->expBending=1; bmc->xiShear=.8; bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
+		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1; bmc->expBending=1; bmc->xiShear=.8; bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5; bmc->transStrainCoeff=.5;
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 

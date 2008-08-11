@@ -32,7 +32,6 @@ POST_SYNTH_EVENT(CONTROLLER,controller);
 POST_SYNTH_EVENT(GENERATOR,generator);
 // BOOST_PYTHON_FUNCTION_OVERLOADS(evtPLAYER_overloads,evtPLAYER,0,1); BOOST_PYTHON_FUNCTION_OVERLOADS(evtCONTROLLER_overloads,evtCONTROLLER,0,1); BOOST_PYTHON_FUNCTION_OVERLOADS(evtGENERATOR_overloads,evtGENERATOR,0,1);
 #undef POST_SYNT_EVENT
-void evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); size_t origViewNo=ensuredMainWindow()->glViews.size(); while(ensuredMainWindow()->glViews.size()!=origViewNo+1) usleep(50000); }
 
 // event associated data will be deleted in the event handler
 void restoreGLViewerState_str(string str){string* s=new string(str); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_STR,(void*)s));}
@@ -137,10 +136,13 @@ class pyGLViewer{
 		void center(bool median=false){if(median)glv->centerMedianQuartile(); else glv->centerScene();}
 		python::tuple get_screenSize(){return python::make_tuple(glv->width(),glv->height());} void set_screenSize(python::tuple t){ vector<int>* ii=new(vector<int>); ii->push_back(ensuredMainWindow()->viewNo(glv)); ii->push_back(python::extract<int>(t[0])()); ii->push_back(python::extract<int>(t[1])()); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESIZE_VIEW,(void*)ii));}
 		string pyStr(){return string("<GLViewer for view #")+lexical_cast<string>(ensuredMainWindow()->viewNo(glv))+">";}
+		void saveDisplayParameters(size_t n){glv->saveDisplayParameters(n);}
+		void useDisplayParameters(size_t n){glv->useDisplayParameters(n);}
 };
-
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(pyGLViewer_center_overloads,center,0,1);
 
+
+pyGLViewer evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); size_t origViewNo=ensuredMainWindow()->glViews.size(); while(ensuredMainWindow()->glViews.size()!=origViewNo+1) usleep(50000); return pyGLViewer(*ensuredMainWindow()->glViews.rbegin());}
 
 python::list getAllViews(){
 	python::list ret;
@@ -180,6 +182,8 @@ BOOST_PYTHON_MODULE(_qt){
 		.def("fitSphere",&pyGLViewer::fitSphere)
 		.def("showEntireScene",&pyGLViewer::showEntireScene)
 		.def("center",&pyGLViewer::center,pyGLViewer_center_overloads())
+		.def("saveState",&pyGLViewer::saveDisplayParameters)
+		.def("loadState",&pyGLViewer::useDisplayParameters)
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
 		;
 }

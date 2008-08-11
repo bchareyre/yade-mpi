@@ -15,7 +15,9 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	// 2. get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		YADE_PTR_CAST<BrefcomPhysParams>(b->physicalParameters)->epsVolumetric=0;
+		BrefcomPhysParams* bpp(YADE_CAST<BrefcomPhysParams*>(b->physicalParameters.get()));
+		bpp->epsVolumetric=0;
+		bpp->numContacts=0;
 		currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
 	}
 	Real meanF=sumF/rb->bodies->size(); 
@@ -27,10 +29,29 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 		if(!I->isReal) continue;
 		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
 		maxContactF=max(maxContactF,max(BC->Fn,BC->Fs.Length()));
-		YADE_PTR_CAST<BrefcomPhysParams>(Body::byId(I->getId1(),rb)->physicalParameters)->epsVolumetric+=BC->epsN;
-		YADE_PTR_CAST<BrefcomPhysParams>(Body::byId(I->getId2(),rb)->physicalParameters)->epsVolumetric+=BC->epsN;
+		BrefcomPhysParams* bpp1(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId1())->physicalParameters.get()));
+		BrefcomPhysParams* bpp2(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId2())->physicalParameters.get()));
+		bpp1->epsVolumetric+=BC->epsN; bpp1->numContacts+=1;
+		bpp2->epsVolumetric+=BC->epsN; bpp2->numContacts+=1;
 	}
 	unbalancedForce=(useMaxForce?maxF:meanF)/maxContactF;
+
+	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
+		if(!I->isReal) continue;
+		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
+		BrefcomPhysParams* bpp1(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId1())->physicalParameters.get()));
+		BrefcomPhysParams* bpp2(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId2())->physicalParameters.get()));
+		Real epsVolAvg=.5*((3/bpp1->numContacts)*bpp1->epsVolumetric+(3/bpp2->numContacts)*bpp2->epsVolumetric);
+		BC->epsTrans=(epsVolAvg-BC->epsN)/2.;
+	}
+	#if 0
+		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+			BrefcomPhysParams* bpp(YADE_PTR_CAST<BrefcomPhysParams>(b->physicalParameters.get()));
+			bpp->epsVolumeric*=3/bpp->numContacts;
+		}
+	#endif
+
+
 }
 
 
@@ -74,6 +95,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		contPhys->epsFracture=relDuctility*epsCrackOnset;
 		contPhys->xiShear=xiShear;
 		contPhys->omegaThreshold=omegaThreshold;
+		contPhys->transStrainCoeff=transStrainCoeff;
 
 		contPhys->prevNormal=contGeom->normal;
 		if(neverDamage) contPhys->neverDamage=true;
@@ -141,7 +163,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		#endif
 
 		// shorthands
-		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold);
+		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& equilibriumDist(BC->equilibriumDist); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& epsCrackOnset(BC->epsCrackOnset);
 		// for python access
 		Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs);
 
@@ -166,7 +188,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		// /* TODO: recover non-cohesive contact deletion: */
 		if(!BC->isCohesive && epsN>0.){ /* delete this interaction later */ I->isReal=false; continue; }
-		#define BREFCOM_DETAIL
+		//#define BREFCOM_DETAIL
 		#ifdef BREFCOM_DETAIL
 			LOG_TRACE("======= iteration #"<<Omega::instance().getCurrentIteration()<<", interaction "<<id1<<" + "<<id2<<"=======");
 		#endif

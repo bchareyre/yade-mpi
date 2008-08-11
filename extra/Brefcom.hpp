@@ -72,9 +72,13 @@ class BrefcomContact: public InteractionPhysics {
 			//! characteristic time (if non-positive, the law without rate-dependence is used)
 			tau,
 			//! exponent in the rate-dependent damage evolution
-			expDmgRate;
+			expDmgRate,
+			//! coefficient that takes transversal strain into accound when calculating kappaDReduced
+			transStrainCoeff;
 		/*! Up to now maximum normal strain (semi-norm), non-decreasing in time. */
 		Real kappaD;
+		/*! Transversal strain (perpendicular to the contact axis) */
+		Real epsTrans;
 		/*! prevNormal is oriented A→B (as in SpheresContactGeometry); */
 		Vector3r prevNormal;
 		/*! previous tangential (shear) strain */
@@ -105,11 +109,13 @@ class BrefcomContact: public InteractionPhysics {
 			REGISTER_ATTRIBUTE(xiShear);
 			REGISTER_ATTRIBUTE(tau);
 			REGISTER_ATTRIBUTE(expDmgRate);
+			REGISTER_ATTRIBUTE(transStrainCoeff);
 
 			REGISTER_ATTRIBUTE(kappaD);
 			REGISTER_ATTRIBUTE(neverDamage);
 			REGISTER_ATTRIBUTE(prevNormal);
 			REGISTER_ATTRIBUTE(epsT);
+			REGISTER_ATTRIBUTE(epsTrans);
 
 			REGISTER_ATTRIBUTE(isCohesive);
 
@@ -135,7 +141,9 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		Real epsVolumetric;
 		//! number of (cohesive) contacts that damaged completely
 		int numBrokenCohesive;
-		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0){createIndex();};
+		//! number of contacts with this body
+		int numContacts;
+		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0) {createIndex();};
 		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive);}
 		REGISTER_CLASS_NAME(BrefcomPhysParams);
 		REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
@@ -227,7 +235,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		expBending is positive if the damage evolution function is concave after fracture onset;
 		reasonable value seems like 4.
 		*/
-		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold;
+		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold, transStrainCoeff;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (BrefcomContact::neverDamage=true); defaults to false
@@ -235,7 +243,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 
 		BrefcomMakeContact(){
 			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=xiShear=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
+			sigmaT=xiShear=epsCrackOnset=relDuctility=G_over_E=transStrainCoeff=std::numeric_limits<Real>::signaling_NaN();
 			neverDamage=false;
 			cohesiveThresholdIter=-1;
 			tau=-1; expDmgRate=0;
@@ -257,6 +265,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			REGISTER_ATTRIBUTE(tau);
 			REGISTER_ATTRIBUTE(expDmgRate);
 			REGISTER_ATTRIBUTE(omegaThreshold);
+			REGISTER_ATTRIBUTE(transStrainCoeff);
 			//REGISTER_ATTRIBUTE(calibratedEpsFracture);
 			/* REGISTER_ATTRIBUTE(Gf); */
 		}
