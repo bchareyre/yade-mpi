@@ -10,7 +10,6 @@
 
 #include"InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp"
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -46,24 +45,6 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 			//         the problem is that scm can be either SDECLinkGeometry or SpheresContactGeometry and the only way CURRENTLY
 			//         to check this is by dynamic cast. This has to be fixed.
 			scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
-			#if 0
-				// BEGIN .......  FIXME FIXME	- wrong hack, to make cohesion work.
-					if(! scm) // this is not SpheresContactGeometry, so it is SDECLinkGeometry, dispatcher should do this job.
-					{
-						shared_ptr<SDECLinkGeometry> linkGeometry = dynamic_pointer_cast<SDECLinkGeometry>(c->interactionGeometry);
-							cerr << "it is SpringGeometry ???: " << c->interactionGeometry->getClassName() << endl;
-							assert(linkGeometry);
-						if(linkGeometry)
-						{
-							linkGeometry->normal 			= se32.position-se31.position;
-							linkGeometry->normal.Normalize();
-							return true;
-						}
-						else
-							return false; // SpringGeometry !!!???????
-					}
-					// END
-			#endif
 		} else scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 		scm->contactPoint = se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);

@@ -18,11 +18,8 @@ class ThreePointBending : public FileGenerator
 {
 	private	:
 		std::string	 yadeFileWithSpheres;
-		Vector3r	 gravity;
 
-		Real		 supportDepth
-				,pistonWidth
-				,pistonVelocity
+		Real pistonVelocity
 				,dampingForce
 				,dampingMomentum
 

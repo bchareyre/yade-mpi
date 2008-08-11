@@ -29,7 +29,6 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometryWater::go(	const 
 	Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
 	
 	shared_ptr<SpheresContactGeometry> scm;
-//	shared_ptr<SDECLinkGeometry> linkGeometry;
 	
 	if (c->interactionGeometry)	
 	{
@@ -42,7 +41,6 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometryWater::go(	const 
 		
 	scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		
-	//linkGeometry = shared_ptr<SDECLinkGeometry>(new SDECLinkGeometry());
 		
 // 	if (penetrationDepth>0)
 	{

@@ -65,8 +65,6 @@ class MetaInteractingGeometry2AABB; */
 
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>

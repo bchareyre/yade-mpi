@@ -10,7 +10,6 @@
 
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
@@ -76,17 +75,6 @@ bool GlobalStiffnessCounter::getInteractionParameters(const shared_ptr<Interacti
 	}
 
 
-// 	shared_ptr<SDECLinkGeometry> geom3=dynamic_pointer_cast<SDECLinkGeometry>(contact->interactionGeometry);
-// 	shared_ptr<SDECLinkPhysics> phys3=dynamic_pointer_cast<SDECLinkPhysics>(contact->interactionPhysics);
-// 	if(geom3 && phys3){
-// 		Real fn=phys3->normalForce.Length();
-// 		if(fn==0) return false;
-// 		normal=geom3->normal;
-// 		radius1=geom3->radius1; radius2=geom3->radius2;
-// 		kn=phys3->kn; ks=phys3->ks;
-// 		return true;
-// 	}
-// 
 // 	shared_ptr<SpheresContactGeometry> geom2=dynamic_pointer_cast<SpheresContactGeometry>(contact->interactionGeometry);
 // 	shared_ptr<BrefcomContact> phys2=dynamic_pointer_cast<BrefcomContact>(contact->interactionPhysics);
 // 	if(geom2 && phys2){

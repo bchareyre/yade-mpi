@@ -19,8 +19,8 @@
 #include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
+#include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 
 
@@ -188,7 +188,7 @@ bool SDECLinkedSpheres::generate()
 			if ((a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 			{
 				shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
-				shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
+				shared_ptr<SpheresContactGeometry>		geometry(new SpheresContactGeometry);
 				shared_ptr<SDECLinkPhysics>	physics(new SDECLinkPhysics);
 				
 				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
@@ -213,7 +213,8 @@ bool SDECLinkedSpheres::generate()
 	
 	message="total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
-		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!";
+		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"
+		+"\nWARNING: interactions will not generate any force since we use SpheresContactGeometry instead of SDECLinkGeometry now.";
 	return true;
 }
 

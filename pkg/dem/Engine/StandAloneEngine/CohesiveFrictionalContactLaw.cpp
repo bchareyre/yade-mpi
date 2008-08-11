@@ -9,7 +9,6 @@
 #include "CohesiveFrictionalContactLaw.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>

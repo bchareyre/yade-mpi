@@ -9,8 +9,8 @@
 #include "ElasticCohesiveLaw.hpp"
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
 

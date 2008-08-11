@@ -10,7 +10,6 @@
 
 #include"InteractingSphere2InteractingSphere4DistantSpheresContactGeometry.hpp"
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>

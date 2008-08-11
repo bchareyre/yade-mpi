@@ -15,7 +15,6 @@
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>

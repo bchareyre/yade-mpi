@@ -5,8 +5,6 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/extra/Brefcom.hpp>
 #include<boost/foreach.hpp>
 

@@ -134,7 +134,6 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
                         SpheresContactGeometry* currentContactGeometry 	=
                                 static_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 
-                        //SDECLinkGeometry* currentContactGeometry	= static_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
 
                         CapillaryParameters* currentContactPhysics 	=
                                 static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());

@@ -510,6 +510,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
+			'SpheresContactGeometry',
 			'yade-base',
 			
 			'PhysicalActionContainerInitializer',
@@ -791,6 +792,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
+			'Shop',
 			
 			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',

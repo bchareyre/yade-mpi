@@ -10,7 +10,6 @@
 
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 

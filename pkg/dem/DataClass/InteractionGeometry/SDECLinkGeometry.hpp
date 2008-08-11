@@ -15,7 +15,8 @@
 #include<yade/lib-base/yadeWm3.hpp>
 #include <Wm3Quaternion.h>
 
-class SDECLinkGeometry : public InteractionGeometry
+
+class __attribute__((__deprecated__)) SDECLinkGeometry : public InteractionGeometry
 {
 	public :
 		SDECLinkGeometry();

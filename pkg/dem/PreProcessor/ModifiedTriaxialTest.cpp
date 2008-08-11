@@ -15,7 +15,6 @@
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>

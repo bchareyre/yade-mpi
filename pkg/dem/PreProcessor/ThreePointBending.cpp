@@ -17,7 +17,7 @@
 #include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
+#include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 
@@ -39,7 +39,6 @@
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
@@ -60,15 +59,14 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+#include<yade/extra/Shop.hpp>
+
 
 ThreePointBending::ThreePointBending () : FileGenerator()
 {
-	yadeFileWithSpheres	="./someFileFromTriaxial.yade";
-	gravity			= Vector3r(0,-9.81,0);
+	yadeFileWithSpheres	="";
 
-	supportDepth		= 10;
-	pistonWidth		= 5;
-	pistonVelocity		= 0.1;
+	pistonVelocity		= 1.;
 	dampingForce		= 0.2;
 	dampingMomentum		= 0.2;
 	
@@ -103,10 +101,7 @@ void ThreePointBending::registerAttributes()
 	FileGenerator::registerAttributes();
 	
 	REGISTER_ATTRIBUTE(yadeFileWithSpheres);
-	REGISTER_ATTRIBUTE(gravity);
 
-	REGISTER_ATTRIBUTE(pistonWidth);
-	REGISTER_ATTRIBUTE(supportDepth);
 	REGISTER_ATTRIBUTE(pistonVelocity);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
@@ -137,84 +132,38 @@ bool ThreePointBending::generate()
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
-/////////////////////////////////////
-/////////////////////////////////////
-	// load file
-	
-	shared_ptr<MetaBody> metaBodyWithSpheres;
-
-	if ( 	   yadeFileWithSpheres.size()!=0 
-		&& filesystem::exists(yadeFileWithSpheres) 
-		&& (filesystem::extension(yadeFileWithSpheres)==".xml" || filesystem::extension(yadeFileWithSpheres)==".yade"))
-	{
-		try
-		{
-			if(filesystem::extension(yadeFileWithSpheres)==".xml")
-				IOFormatManager::loadFromFile("XMLFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres);
-
-			else if(filesystem::extension(yadeFileWithSpheres)==".yade" )
-				IOFormatManager::loadFromFile("BINFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres);
-
-			if( metaBodyWithSpheres->getClassName() != "MetaBody"){ message="Error: cannot load the file that should contain spheres"; return false; }
-		} 
-		catch(SerializableError& e)
-		{
-			message="Error: cannot load the file that should contain spheres"; return false;
-		}
-		catch(yadeError& e)
-		{
-			message="Error: cannot load the file that should contain spheres"; return false;
-		}
-	}
-	else { message="Error: cannot load the file that should contain spheres"; return false; }
-/////////////////////////////////////
 	Vector3r min(10000,10000,10000),max(-10000,-10000,-10000);
-	{// calc min/max
-		BodyContainer::iterator bi    = metaBodyWithSpheres->bodies->begin();
-		BodyContainer::iterator biEnd = metaBodyWithSpheres->bodies->end();
-		for( ; bi!=biEnd ; ++bi )
-		{
-			if((*bi)->geometricalModel->getClassName() == "Sphere" )
-			{
-				shared_ptr<Body> b = *bi;
-				min = componentMinVector(min,b->physicalParameters->se3.position - static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
-				max = componentMaxVector(max,b->physicalParameters->se3.position + static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
 
-				BodyMacroParameters* bm = dynamic_cast<BodyMacroParameters*>(b->physicalParameters.get());
-				if(!bm) {message="Error: spheres don't use BodyMacroParameters for physical parameters"; return false;}
+	// load simulation file, extract spheres and use those
+	if (yadeFileWithSpheres.size()!=0){
+		shared_ptr<MetaBody> metaBodyWithSpheres;
+		IOFormatManager::loadFromFile("XMLFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres);
+		assert(metaBodyWithSpheres->getClassName()=="MetaBody");
 
-				bm->young		= sphereYoungModulus;
-				bm->poisson		= spherePoissonRatio;
-				bm->frictionAngle	= sphereFrictionDeg * Mathr::PI/180.0;
-				bm->mass		/= 1000.0; // FIXME !!!
-			}
+		FOREACH(shared_ptr<Body> b, *metaBodyWithSpheres->bodies){
+			if(b->geometricalModel->getClassName()!="Sphere") continue;
+			min = componentMinVector(min,b->physicalParameters->se3.position - static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
+			max = componentMaxVector(max,b->physicalParameters->se3.position + static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
+			BodyMacroParameters* bm = dynamic_cast<BodyMacroParameters*>(b->physicalParameters.get());
+			if(!bm) {message="Error: spheres don't use BodyMacroParameters for physical parameters"; return false;}
+			bm->young		= sphereYoungModulus;
+			bm->poisson		= spherePoissonRatio;
+			bm->frictionAngle	= sphereFrictionDeg * Mathr::PI/180.0;
+			bm->mass		/= 1000.0; // ???!
+
+			rootBody->bodies->insert(b);
 		}
 	}
-////////////////////////////////////
-
-	shared_ptr<Body> piston;
-	shared_ptr<Body> supportBox1;
-	shared_ptr<Body> supportBox2;
-	
-	createBox(piston,      Vector3r( (max[0]+min[0])*0.5 , max[1] + (max[0]-min[0])*0.5 ,          (max[2]+min[2])*0.5                ), Vector3r( (max[0]-min[0])*0.5, (max[0]-min[0])*0.5 , pistonWidth          ));
-	createBox(supportBox1, Vector3r( (max[0]+min[0])*0.5 , min[1] - (max[0]-min[0])*0.5 , min[2] - (max[0]-min[0])*0.5 + supportDepth ), Vector3r( (max[0]-min[0])*0.5, (max[0]-min[0])*0.5 , (max[0]-min[0])*0.5  ));
-	createBox(supportBox2, Vector3r( (max[0]+min[0])*0.5 , min[1] - (max[0]-min[0])*0.5 , max[2] + (max[0]-min[0])*0.5 - supportDepth ), Vector3r( (max[0]-min[0])*0.5, (max[0]-min[0])*0.5 , (max[0]-min[0])*0.5  ));
-			
-	rootBody->bodies->insert(piston);
-	rootBody->bodies->insert(supportBox1);
-	rootBody->bodies->insert(supportBox2);
-
-/////////////////////////////////////
-        
-	{// insert Spheres
-		BodyContainer::iterator bi    = metaBodyWithSpheres->bodies->begin();
-		BodyContainer::iterator biEnd = metaBodyWithSpheres->bodies->end();
-		for( ; bi!=biEnd ; ++bi )
-		{
-			if((*bi)->geometricalModel->getClassName() == "Sphere" )
-			{
-				shared_ptr<Body> b = *bi;
-			        rootBody->bodies->insert(b);
+	// generate specimen
+	else{
+		Real radius=1; int xxSup=2, yySup=10, zzSup=2;
+		min=Vector3r(-radius,-radius,-radius); max=Vector3r(radius*(2*xxSup-1),radius*(2*yySup-1),radius*(2*zzSup-1));
+		for(int xx=0; xx<xxSup; xx++){
+			for(int yy=0; yy<yySup; yy++){
+				for(int zz=0; zz<zzSup; zz++){
+					shared_ptr<Body> b=Shop::sphere(Vector3r(xx*2*radius,yy*2*radius,zz*2*radius),radius);
+					rootBody->bodies->insert(b);
+				}
 			}
 		}
 	}
@@ -229,11 +178,7 @@ bool ThreePointBending::generate()
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
 	BodyContainer::iterator bi2;
 
-	++bi; // skips piston
-	++bi; // skips supportBox1
-	++bi; // skips supportBox2
-		
-		
+	Real interactionFactor=1.1;
 	for( ; bi!=biEnd ; ++bi )
 	{
 		bodyA =*bi;
@@ -248,10 +193,10 @@ bool ThreePointBending::generate()
 			shared_ptr<InteractingSphere>	as = YADE_PTR_CAST<InteractingSphere>(bodyA->interactingGeometry);
 			shared_ptr<InteractingSphere>	bs = YADE_PTR_CAST<InteractingSphere>(bodyB->interactingGeometry);
 
-			if ((a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
+			if ((a->se3.position-b->se3.position).Length() < interactionFactor*(as->radius+bs->radius))  
 			{
 				shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
-				shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
+				shared_ptr<SpheresContactGeometry>		geometry(new SpheresContactGeometry);
 				shared_ptr<SDECLinkPhysics>	physics(new SDECLinkPhysics);
 				
 				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
@@ -273,10 +218,40 @@ bool ThreePointBending::generate()
 			}
 		}
 	}
+
+	// specimen supports
+	shared_ptr<Body> piston;
+	shared_ptr<Body> supportBox1;
+	shared_ptr<Body> supportBox2;
+
+	Real dimX=max[0]-min[0], dimY=max[1]-min[1], dimZ=max[2]-min[2];
+	Vector3r center=.5*(max+min);
+
+	createBox(piston,
+		Vector3r(center[0],center[1],max[2]+.5*dimZ),
+		Vector3r(.75*dimX,.05*dimY,.5*dimZ));
+	createBox(supportBox1,
+		Vector3r(center[0],min[1],min[2]-.5*dimZ),
+		Vector3r(.5*dimX,.1*dimY,.5*dimZ));
+	createBox(supportBox2,
+		Vector3r(center[0],max[1],min[2]-.5*dimZ),
+		Vector3r(.5*dimX,.1*dimY,.5*dimZ));
+			
+	rootBody->bodies->insert(piston);
+	rootBody->bodies->insert(supportBox1);
+	rootBody->bodies->insert(supportBox2);
+
+	FOREACH(const shared_ptr<Engine>& e, rootBody->engines){
+		if(e->getClassName()!="TranslationEngine") continue;
+		shared_ptr<TranslationEngine> te=YADE_PTR_CAST<TranslationEngine>(e);
+		te->subscribedBodies.clear(); te->subscribedBodies.push_back(piston->getId());
+	}
+
 	
 	message="total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
-		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!";
+		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"+
+		+"\nWARNING: The results are meaningless, since ElasticCohesiveLaw works only with (unused) SDECLinkGeometry.";
 	return true;
 }
 
@@ -289,9 +264,6 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	body->isDynamic			= false;
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
@@ -302,9 +274,7 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
 							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
 						);
-//	physics->mass			= 0;
-//	physics->inertia		= Vector3r(0,0,0);
-	physics->se3			= Se3r(position,q);
+	physics->se3			= Se3r(position,Quaternionr::IDENTITY);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
@@ -345,9 +315,6 @@ void ThreePointBending::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 		
-	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
-	gravityCondition->gravity = gravity;
-	
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
@@ -372,8 +339,8 @@ void ThreePointBending::createActors(shared_ptr<MetaBody>& rootBody)
 // moving wall
 	shared_ptr<TranslationEngine> kinematic = shared_ptr<TranslationEngine>(new TranslationEngine);
 	kinematic->velocity  = pistonVelocity;
-	kinematic->translationAxis  = Vector3r(0,-1,0);
-	kinematic->subscribedBodies.push_back(0);
+	kinematic->translationAxis  = Vector3r(0,0,-1);
+	// subscribed bodies will be initialized later
 
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
 	constitutiveLaw->sdecGroupMask = 55;
@@ -392,7 +359,6 @@ void ThreePointBending::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(constitutiveLaw);
 	rootBody->engines.push_back(constitutiveLaw2);
-	rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);

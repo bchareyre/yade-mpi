@@ -15,7 +15,6 @@
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
