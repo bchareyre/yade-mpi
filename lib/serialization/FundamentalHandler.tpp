@@ -99,8 +99,7 @@ inline void lexical_copy(Archive& ac , any& a )
 		try{
 			*tmp = lexical_cast<Type>(*tmpStr);
 		} catch(boost::bad_lexical_cast& e){
-			if(a.type()==typeid(bool*) && atoi(tmpStr->c_str())!=0) { *tmp=lexical_cast<Type>("true"); cerr<<"Offensive bool value `"<<*tmpStr<<"' encountered.!!"<<endl; }
-			else throw e;
+			if(typeid(tmp)==typeid(bool*) && atoi(tmpStr->c_str())!=0) { cerr<<"warning: offensive bool value `"<<*tmpStr<<"' encountered (interpreted as true)."<<endl; *tmp=lexical_cast<Type>("1"); /* cerr<<"New value: "<<lexical_cast<string>(*tmp)<<endl; cerr<<"Atoi returns "<<atoi(tmpStr->c_str())<<", bool !=0 is "<<(atoi(tmpStr->c_str())!=0)<<endl;*/ }
 		}
 	}
 	else if (a.type()==typeid(string*)) // serialization - writing to string from some Type
@@ -111,33 +110,6 @@ inline void lexical_copy(Archive& ac , any& a )
 	}
 	else
 		cerr<<"lexical_cast(XML): (de)serialization format mismatch"<<endl;
-	}
-	else if(FormatChecker::format==FormatChecker::BIN){
-	// Binary serialization
-	if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
-	{
-		const vector<unsigned char>* tmpBin = any_cast< const vector<unsigned char>* >(a);
-		Type * tmp = any_cast<Type*>(ac.getAddress());
-		BOOST_STATIC_ASSERT((boost::is_POD<Type>::value));
-		std::vector<unsigned char>::const_iterator ptr = (*tmpBin).begin();
-		std::vector<unsigned char>::const_iterator end = (*tmpBin).end();
-		if(sizeof(Type) != (*tmpBin).size())
-			throw HandlerError(SerializationExceptions::LexicalCopyBinError);
-		unsigned char *ptr2 = reinterpret_cast<unsigned char *>(tmp);
-		std::copy(ptr,end,ptr2);
-	}
-	else if (a.type()==typeid(vector<unsigned char>*)) // from Type to binary stream
-	{ CHK_BIN();
-		vector<unsigned char>* tmpBin = any_cast< vector<unsigned char>* >(a);
-		Type * tmp = any_cast<Type*>(ac.getAddress());
-		(*tmpBin).clear();
-		const unsigned char* ptr = reinterpret_cast<const unsigned char*>(tmp);
-		const unsigned char* end = ptr + sizeof(Type);
-		(*tmpBin).resize(sizeof(Type));
-		std::copy(ptr, end, (*tmpBin).begin() );
-	}
-	else
-		cerr<<"lexical_cast(BIN): (de)serialization format mismatch"<<endl;
 	}
 	else // never reached
 		throw HandlerError(SerializationExceptions::LexicalCopyError);
