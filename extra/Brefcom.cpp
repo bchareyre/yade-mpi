@@ -252,7 +252,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		if(omega>omegaThreshold){
 			I->isReal=false;
 			if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1;}
-			LOG_INFO("Contact #"<<id1<<"=#"<<id2<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
+			LOG_DEBUG("Contact #"<<id1<<"=#"<<id2<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
 			continue;
 		}
 
@@ -303,11 +303,13 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 	Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
 
 	Real epsTransNegAbs=-max(0.,BC->epsTrans);
-	if(colorStrain) lineColor=Vector3r(min(1.,max(0.,epsTransNegAbs/BC->epsCrackOnset-1)),min(1.,epsTransNegAbs/BC->epsCrackOnset),1);
+	if(colorStrain) lineColor=Vector3r(
+		min(1.,max(0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)),
+		min(1.,epsTransNegAbs/BC->epsCrackOnset),1);
 
-	if(contactLine) Shop::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position);
+	if(contactLine) Shop::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
 	if(dmgLabel){ Shop::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
-	if(epsNLabel){ Shop::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+	else if(epsNLabel){ Shop::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
 
 	const Vector3r& cp=static_pointer_cast<SpheresContactGeometry>(i->interactionGeometry)->contactPoint;
 	if(epsT){

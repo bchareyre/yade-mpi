@@ -222,12 +222,9 @@ void SimulationController::pbStartClicked(){
 void SimulationController::cbSyncToggled(bool b){	sync=b; if(sync && refreshTime<20) refreshTime=20; pbStopClicked(); pbStartClicked(); }
 void SimulationController::timerEvent( QTimerEvent* ){
 	doUpdate(); /* update the controller, like iteration number etc */
-	if(sync && syncRunning){
-		/* update GLViews */
-		//LOG_DEBUG("Sync: iter "<<Omega::instance().getCurrentIteration());
-		YadeQtMainWindow::self->redrawAll(true);
-		Omega::instance().spawnSingleSimulationLoop();
-	}
+	/* update GLViews */
+	YadeQtMainWindow::self->redrawAll(true);
+	if(sync && syncRunning){ Omega::instance().spawnSingleSimulationLoop(); }
 }
 
 void SimulationController::pbResetClicked()

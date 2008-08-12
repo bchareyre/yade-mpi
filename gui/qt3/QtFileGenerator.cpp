@@ -234,7 +234,7 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		 * 3. no simulation is open already (by checking Omega's simulationFileName) */
 		if(cbOpenAutomatically->isChecked() 
 			&& successfullyGenerated //filesystem::exists(filesystem::path((const char*)(leOutputFileName->text()))) 
-			&& Omega::instance().getSimulationFileName()=="")
+		)
 		{
 			//Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
 			YadeQtMainWindow::self->loadSimulation((const char*)(leOutputFileName->text()));

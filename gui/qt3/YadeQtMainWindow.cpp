@@ -90,7 +90,8 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 }
 
 void YadeQtMainWindow::redrawAll(bool force){
-	if(renderer && (force || (controller && !controller->syncRunning) || (!controller))){
+	// controller has its own timer -- and will update instead of us periodically
+	if(renderer && (force /* || (controller  && !controller->syncRunning ) */ || (!controller))){
 		FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
 	}
 }
@@ -208,7 +209,7 @@ void YadeQtMainWindow::customEvent(QCustomEvent* e){
 		case EVENT_GENERATOR: createGenerator(); break;
 		case EVENT_RESIZE_VIEW: {
 			vector<int>* d=(vector<int>*)e->data();
-			if(glViews.size()<d->at(0)+1 || !glViews[d->at(0)]) LOG_ERROR("No view #"+lexical_cast<string>(d->at(0))+", resize request ignored");
+			if(glViews.size()<(size_t)(d->at(0)+1) || !glViews[d->at(0)]) LOG_ERROR("No view #"+lexical_cast<string>(d->at(0))+", resize request ignored");
 			glViews[d->at(0)]->resize(d->at(1),d->at(2));
 			delete d;
 		}
