@@ -280,12 +280,12 @@ REGISTER_SERIALIZABLE(BrefcomMakeContact,false);
 class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 	virtual ~GLDrawBrefcomContact() {};
-	virtual void registerAttributes(){ REGISTER_ATTRIBUTE(contactLine); REGISTER_ATTRIBUTE(dmgLabel); REGISTER_ATTRIBUTE(epsT); REGISTER_ATTRIBUTE(epsTAxes); REGISTER_ATTRIBUTE(normal); REGISTER_ATTRIBUTE(colorStrain); }
+	virtual void registerAttributes(){ REGISTER_ATTRIBUTE(contactLine); REGISTER_ATTRIBUTE(dmgLabel); REGISTER_ATTRIBUTE(epsT); REGISTER_ATTRIBUTE(epsTAxes); REGISTER_ATTRIBUTE(normal); REGISTER_ATTRIBUTE(colorStrain); REGISTER_ATTRIBUTE(epsNLabel);}
 	RENDERS(BrefcomContact);
 	REGISTER_CLASS_NAME(GLDrawBrefcomContact);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 	DECLARE_LOGGER;
-	static bool contactLine,dmgLabel,epsT,epsTAxes,normal,colorStrain;
+	static bool contactLine,dmgLabel,epsT,epsTAxes,normal,colorStrain,epsNLabel;
 };
 REGISTER_SERIALIZABLE(GLDrawBrefcomContact,false);
 

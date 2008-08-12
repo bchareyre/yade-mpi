@@ -42,6 +42,7 @@ if runtime.nonInteractive:
 	import time;
 	while True: time.sleep(1)
 else:
+	sys.argv=runtime.args # could be [] as well
 	from IPython.Shell import IPShellEmbed
 	sys.argv=['<embedded python interpreter>']
 	ipshell = IPShellEmbed(banner=r"""__   __    ____          ____                      _      

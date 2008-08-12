@@ -216,6 +216,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 	
 	if ( currentState==STATE_LIMBO )
 	{		
+		Omega::instance().stopSimulationLoop();
 		return;
 	}
 
@@ -233,14 +234,14 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		Real dt = Omega::instance().getTimeStep();
 		
 		if (abs(epsilonMax) > abs(strain[1])) {
-		if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003; // !!! if unloading (?)
-		//else currentStrainRate = strainRate;
+			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003; // !!! if unloading (?)
+			//else currentStrainRate = strainRate;
 
-		/* Move top and bottom wall according to strain rate */
-		PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
-		p->se3.position += 0.5*currentStrainRate*height*translationAxis*dt;
-		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*currentStrainRate*height*translationAxis*dt;
+			/* Move top and bottom wall according to strain rate */
+			PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
+			p->se3.position += 0.5*currentStrainRate*height*translationAxis*dt;
+			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
+			p->se3.position -= 0.5*currentStrainRate*height*translationAxis*dt;
 		} else {
 			Omega::instance().stopSimulationLoop();
 		}
