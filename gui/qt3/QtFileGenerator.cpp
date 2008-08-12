@@ -238,7 +238,7 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		{
 			//Omega::instance().setSimulationFileName((const char*)(leOutputFileName->text()));
 			YadeQtMainWindow::self->loadSimulation((const char*)(leOutputFileName->text()));
-			emit close();
+//			emit close();
 		}
 	}
 }
