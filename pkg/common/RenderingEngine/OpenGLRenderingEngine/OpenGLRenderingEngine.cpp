@@ -388,7 +388,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 	{
 		boost::mutex::scoped_lock lock(rootBody->persistentInteractions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->persistentInteractions){
-			if(!I->interactionGeometry) continue;
+			if(!I->interactionPhysics) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
 			if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
 			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
@@ -397,8 +397,9 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 	{
 		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
-			if(!I->interactionGeometry) continue;
+			if(!I->interactionPhysics) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			//if(!b1->physicalParameters||!b2->physicalParameters) continue;
 			if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
 			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
