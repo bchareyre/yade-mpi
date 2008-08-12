@@ -1,3 +1,7 @@
+r.1460 (Janek)
+  1. testing if SVN commits can go to launchpad.
+  2. we need to fill in the changelog between r.1209 and r.1460
+
 r.1209 (Vaclav)
   1. SCons will download new version of itself if older thatn 0.96.93 and will proxy all calls to it transparently (hopefully)
   1a. Fix argv[0] for scons proxy.
