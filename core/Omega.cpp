@@ -229,6 +229,10 @@ void Omega::loadSimulation()
 	
 	// FIXME: should stop running simulation!!
 	LOG_INFO("Loading file " + simulationFileName);
+
+	// FIXME: stop rendering during loading - may lead to crash
+	boost::mutex::scoped_lock lock1(rootBody->transientInteractions->drawloopmutex);
+	boost::mutex::scoped_lock lock2(rootBody->persistentInteractions->drawloopmutex);
 		
 	if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 		resetRootBody();
