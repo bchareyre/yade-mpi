@@ -129,7 +129,7 @@ bool FEMBeam::generate()
 	imposeTranslation(rootBody,regionMin1,regionMax1,translationAxis1,velocity1);
 	imposeTranslation(rootBody,regionMin2,regionMax2,translationAxis2,velocity2);
 
-	#ifndef YADE_DEBUG
+	#ifdef NDEBUG
 		message="FEM currently works only in not optimized debug mode and needs to be fixed. If want to try it you must compile with option 'scons optimize=0'";
 		return false;
 	#endif

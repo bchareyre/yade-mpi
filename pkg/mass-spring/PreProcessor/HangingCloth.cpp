@@ -438,7 +438,7 @@ bool HangingCloth::generate()
 			}
 		}
 	}
-	#ifndef YADE_DEBUG
+	#ifdef NDEBUG
 		message="HangingCloth currently works only in not optimized debug mode and needs to be fixed. If want to try it you must compile with option 'scons optimize=0'";
 		return false;
 	#endif
