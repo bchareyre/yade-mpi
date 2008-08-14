@@ -37,7 +37,7 @@ using namespace std;
 #endif
 
 void nullHandler(int sig){
-	cerr<<"nullHandler called"<<endl;
+	cerr<<"WARN: nullHandler, signal "<<(sig==SIGSEGV?"SEGV":"[other]")<<endl;
 }
 
 void
@@ -252,6 +252,8 @@ int main(int argc, char *argv[])
 		// Py_Finalize(); // FIXME: http://www.boost.org/libs/python/todo.html#pyfinalize-safety says this is unsafe with boost::python
 	#endif
 	#ifdef YADE_DEBUG
+		signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers
+		signal(SIGSEGV,nullHandler); // FIXME: this is to cover up crash that occurs in log4cxx on i386 sometimes 
 		unlink(Omega::instance().gdbCrashBatch.c_str());
 	#endif
 

@@ -231,18 +231,20 @@ void Omega::loadSimulation()
 	LOG_INFO("Loading file " + simulationFileName);
 
 	// FIXME: stop rendering during loading - may lead to crash
-	boost::mutex::scoped_lock lock1(rootBody->transientInteractions->drawloopmutex);
-	boost::mutex::scoped_lock lock2(rootBody->persistentInteractions->drawloopmutex);
+	{
+		//boost::mutex::scoped_lock lock1(rootBody->persistentInteractions->drawloopmutex);
+		//boost::mutex::scoped_lock lock2(rootBody->transientInteractions->drawloopmutex);
 		
-	if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
-		resetRootBody();
-		IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
+			resetRootBody();
+			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+		}
+		else if(algorithm::ends_with(simulationFileName,".yade")){
+			resetRootBody();
+			IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+		}
+		else throw (yadeBadFile("Extension of file not recognized."));
 	}
-	else if(algorithm::ends_with(simulationFileName,".yade")){
-		resetRootBody();
-		IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
-	}
-	else throw (yadeBadFile("Extension of file not recognized."));
 
 	if( rootBody->getClassName() != "MetaBody") throw yadeBadFile("Wrong file format (rootBody is not a MetaBody!) ??");
 
