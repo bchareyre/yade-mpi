@@ -129,7 +129,21 @@ bool FEMBeam::generate()
 	imposeTranslation(rootBody,regionMin1,regionMax1,translationAxis1,velocity1);
 	imposeTranslation(rootBody,regionMin2,regionMax2,translationAxis2,velocity2);
 
-	message="\nNOTE: if it explodes, set smaller time step."; return true;
+	#ifndef YADE_DEBUG
+		message="FEM currently works only in not optimized debug mode and needs to be fixed. If want to try it you must compile with option 'scons optimize=0'";
+		return false;
+	#endif
+
+	if(filesystem::exists(femTxtFile))
+	{
+		message="NOTE: if it explodes, set smaller time step."; 
+		return true;
+	}
+	else
+	{
+		message="Cannot find input file, you can copy it from examples/ directory"; 
+		return false;
+	}
 }
 
 

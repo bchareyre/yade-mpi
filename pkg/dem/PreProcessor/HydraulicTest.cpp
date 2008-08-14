@@ -132,7 +132,10 @@ bool HydraulicTest::generate()
 		}
 	}
 	else
-		return "Error: cannot load the file that should contain spheres";
+	{
+		message="Error: cannot load the file that should contain spheres";
+		return false;
+	}
 /////////////////////////////////////
 	Vector3r min ( 10000,10000,10000 ),max ( -10000,-10000,-10000 );
 	{// calc min/max

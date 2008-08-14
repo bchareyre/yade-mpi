@@ -252,7 +252,7 @@ bool ThreePointBending::generate()
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"+
 		+"\nWARNING: The results are meaningless, since ElasticCohesiveLaw works only with (unused) SDECLinkGeometry.";
-	return true;
+	return false;
 }
 
 

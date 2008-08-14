@@ -123,6 +123,7 @@ bool STLImporterTest::generate()
 	if (!imp.open(stlFileName.c_str()))
 	{
 	    cerr << "ERROR: Bad file: " << stlFileName << endl;
+	    message="Input file not found, you can copy it from examples/ directory or make one using blender 3D modelling";
 	    return false;
 	}
 	imp.set_imported_stuff(verticesImport,edgesImport,facetsImport);

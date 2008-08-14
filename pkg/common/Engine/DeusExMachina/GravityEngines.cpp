@@ -23,8 +23,8 @@ void GravityEngine::applyCondition(MetaBody* ncb){
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		if(b->isClumpMember()) continue;
 		shared_ptr<ParticleParameters> p=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters);
-		assert(p);
-		static_cast<Force*>(ncb->physicalActions->find(b->getId(),cachedForceClassIndex).get())->force+=gravity*p->mass;
+		if(p!=0) //not everything derives from ParticleParameters; this line was    assert(p); - Janek
+			static_cast<Force*>(ncb->physicalActions->find(b->getId(),cachedForceClassIndex).get())->force+=gravity*p->mass;
 	}
 }
 

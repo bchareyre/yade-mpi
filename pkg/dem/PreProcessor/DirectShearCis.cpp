@@ -63,6 +63,7 @@
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include <boost/filesystem/convenience.hpp>
+#include <utility>
 
 using namespace std;
 
@@ -191,7 +192,7 @@ bool DirectShearCis::generate()
 // 	GenerateCloud(sphere_list,Vector3r(0,0,-profondeur/2.0),Vector3r(width,height,profondeur/2.0),nBilles,0.3,porosite);
 
 // to use a text file :
-	ImportCloud(sphere_list,filename);
+	std::pair<string,bool> res=ImportCloud(sphere_list,filename);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -203,8 +204,8 @@ bool DirectShearCis::generate()
 		rootBody->bodies->insert(body);
 	}
 	
-	
-	return true;
+	message =res.first;
+	return res.second;
 }
 
 void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
@@ -448,7 +449,7 @@ string DirectShearCis::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r l
 			+ lexical_cast<string>(dimensions[2]) + ").";
 }
 
-string DirectShearCis::ImportCloud(vector<BasicSphere>& sphere_list,string importFilename)
+std::pair<string,bool> DirectShearCis::ImportCloud(vector<BasicSphere>& sphere_list,string importFilename)
 {
 	sphere_list.clear();
 	int nombre=0;
@@ -467,12 +468,12 @@ string DirectShearCis::ImportCloud(vector<BasicSphere>& sphere_list,string impor
 			sphere_list.push_back(s);
 			nombre++;
 		}
-		return "Echantillon correctement genere : " + lexical_cast<string>(nombre) + " billes";
+		return std::make_pair(std::string("Echantillon correctement genere : " + lexical_cast<string>(nombre) + " billes"),true);
 	}
 	else
 	{
-		cerr << "PROBLEME AVEC LE FICHIER D ENTREE" << endl;
-		return "PROBLEME AVEC LE FICHIER D ENTREE";
+		cerr << "Cannot find input file" << endl;
+		return std::make_pair("Cannot find input file",false);
 	}
 }
 

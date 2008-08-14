@@ -241,6 +241,11 @@ bool SDECImpactTest::generate()
 				
 		}
 	}
+	else
+	{
+		message="Cannot find input file, you can copy it from examples/ directory"; 
+		return false;
+	}
 
 // create bigBall
 	Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);

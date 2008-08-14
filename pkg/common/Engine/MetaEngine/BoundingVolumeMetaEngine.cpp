@@ -20,8 +20,11 @@ void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 	const long numBodies=(long)bodies->size();
 	//#pragma omp parallel for
 	for(int id=0; id<numBodies; id++){
-		const shared_ptr<Body>& b=(*bodies)[id];
-		if(b->interactingGeometry && b->boundingVolume) operator()(b->interactingGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+		if(bodies->exists(id)) // don't delete this check  - Janek
+		{
+			const shared_ptr<Body>& b=(*bodies)[id];
+			if(b->interactingGeometry && b->boundingVolume) operator()(b->interactingGeometry,b->boundingVolume,b->physicalParameters->se3,b.get());
+		}
 	}
 	operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->physicalParameters->se3,ncb);
 }
