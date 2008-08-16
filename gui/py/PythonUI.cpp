@@ -70,7 +70,8 @@ void PythonUI::pythonSession(){
 	 * Hence we remap ^C (keycode in c_cc[VINTR]) to killing the line (c_cc[VKILL]) and disable VINTR afterwards.
 	 * The behavior is restored back by the PythonUI::termRestore registered with atexit.
 	 * */
-	termSetup();
+	if(getenv("TERM")) termSetup();
+	else nonInteractive=true;
 
 	LOG_DEBUG("PythonUI::pythonSession");
 	PyGILState_STATE pyState = PyGILState_Ensure();
