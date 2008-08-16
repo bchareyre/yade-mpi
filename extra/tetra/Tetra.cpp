@@ -17,7 +17,6 @@ YADE_PLUGIN(/* self-contained in hpp: */ "TetraMold", "TetraBang", "Tetrahedron2
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Tetrahedron.hpp>
 #include<yade/pkg-common/ElasticBodyParameters.hpp>
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 
 //#include<Wm3Tetrahedron3.h>
@@ -390,14 +389,12 @@ void TetraLaw::action(MetaBody* rootBody)
 		const shared_ptr<ElasticBodyParameters>& physA(dynamic_pointer_cast<ElasticBodyParameters>(A->physicalParameters));
 		const shared_ptr<ElasticBodyParameters>& physB(dynamic_pointer_cast<ElasticBodyParameters>(B->physicalParameters));
 		
-		//const shared_ptr<SimpleElasticInteraction>& contactPhys(dynamic_pointer_cast<SimpleElasticInteraction*>((*contactI)->interactionPhysics));
-
 
 		/* Cross-section is volumetrically equivalent to the penetration configuration */
 		Real averageStrain=contactGeom->equivalentPenetrationDepth/(.5*(contactGeom->maxPenetrationDepthA+contactGeom->maxPenetrationDepthB));
 
-		/* Do not use SimpleElasticInteraction::kn (as calculated by ElasticBodySimpleRelationship).
-		 * SimpleElasticInteraction::kn is not Young's modulus, it is calculated by MacroMicroElasticRelationships. So perhaps
+		/* Do not use NormalInteraction::kn (as calculated by ElasticBodySimpleRelationship).
+		 * NormalInteraction::kn is not Young's modulus, it is calculated by MacroMicroElasticRelationships. So perhaps
 		 * a new InteractionPhysicsEngineUnit will be needed that will just pass the average Young's modulus here?
 		 * For now, just go back to Young's moduli directly here. */
 		Real young=.5*(physA->young+physB->young);

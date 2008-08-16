@@ -7,11 +7,10 @@
 *************************************************************************/
 
 #include"ElasticBodySimpleRelationship.hpp"
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ElasticBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-
 
 void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& b1
 					, const shared_ptr<PhysicalParameters>& b2
@@ -23,7 +22,8 @@ void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& 
 	// the need to calculate this is only when the interaction is new
 	if( interaction->isNew)
 	{
-		boost::shared_ptr<SimpleElasticInteraction> sei(new SimpleElasticInteraction);
+		boost::shared_ptr<NormalInteraction> sei(new NormalInteraction);
+		// BUG?! kn is stiffness [N], young is modulus [N/m²] !!
 		sei->kn = (s1->young + s2->young)*0.5;
 		interaction->interactionPhysics=sei;
 	}	

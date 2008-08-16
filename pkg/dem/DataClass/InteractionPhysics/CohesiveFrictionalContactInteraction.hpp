@@ -9,7 +9,7 @@
 #ifndef COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_HPP
 #define COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_HPP
 
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 class CohesiveFrictionalContactInteraction : public ElasticContactInteraction

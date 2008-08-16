@@ -8,7 +8,7 @@
 
 #include"GLDrawSDECLinkGeometry.hpp"
 #include<yade/pkg-dem/SDECLinkGeometry.hpp>
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

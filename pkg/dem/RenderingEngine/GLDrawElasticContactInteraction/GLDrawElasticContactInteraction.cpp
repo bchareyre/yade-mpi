@@ -8,7 +8,7 @@
 
 #include "GLDrawElasticContactInteraction.hpp"
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>

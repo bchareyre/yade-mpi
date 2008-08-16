@@ -32,13 +32,11 @@ class GlobalStiffnessCounter : public InteractionSolver
 
 		bool getInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2);
 		bool getSphericalElasticInteractionParameters(const shared_ptr<Interaction>& contact, Vector3r& normal, Real& kn, Real& ks, Real& radius1, Real& radius2);
-		void traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions, bool spheresOnly=false);
+		void traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions);
 
 	public :
 		unsigned int interval;
-		int sdecGroupMask;
-		bool momentRotationLaw;
-		bool assumeElasticSpheres;
+		//int sdecGroupMask;
 	
 		GlobalStiffnessCounter();
 		void action(MetaBody*);

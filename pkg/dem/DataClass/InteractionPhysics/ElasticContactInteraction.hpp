@@ -1,22 +1,13 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
+#pragma once
 
-#ifndef ELASTIC_CONTACT_PARAMETERS_HPP
-#define ELASTIC_CONTACT_PARAMETERS_HPP
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
-
-class ElasticContactInteraction : public SimpleElasticInteraction
+class ElasticContactInteraction: public NormalShearInteraction
 {
 	public :
-		Real		// kn				// normal elastic constant. (inside SimpleElasticInteraction)
-				 ks				// shear elastic constant.
-				,initialKn			// initial normal elastic constant.
+		// kn,ks,normal inherited from NormalShearInteraction
+		Real initialKn			// initial normal elastic constant.
 				,initialKs			// initial shear elastic constant.
 				,equilibriumDistance		// equilibrium distance
 				,initialEquilibriumDistance	// initial equilibrium distance
@@ -27,19 +18,20 @@ class ElasticContactInteraction : public SimpleElasticInteraction
 				,normalForce			// normal force applied on a DE
 				,shearForce;			// shear force applied on a DE
 
-		ElasticContactInteraction();
-		virtual ~ElasticContactInteraction();
+		ElasticContactInteraction(){createIndex();};
+		virtual ~ElasticContactInteraction(){};
 	protected :
-		virtual void registerAttributes();
-
+		virtual void registerAttributes(){
+			NormalShearInteraction::registerAttributes();
+			REGISTER_ATTRIBUTE(prevNormal);
+			REGISTER_ATTRIBUTE(shearForce);
+			REGISTER_ATTRIBUTE(initialKn);
+			REGISTER_ATTRIBUTE(initialKs);
+			REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
+		}
 	REGISTER_CLASS_NAME(ElasticContactInteraction);
-	REGISTER_BASE_CLASS_NAME(SimpleElasticInteraction);
-
-	REGISTER_CLASS_INDEX(ElasticContactInteraction,SimpleElasticInteraction);
-
+	REGISTER_BASE_CLASS_NAME(NormalShearInteraction);
+	REGISTER_CLASS_INDEX(ElasticContactInteraction,NormalShearInteraction);
 };
-
 REGISTER_SERIALIZABLE(ElasticContactInteraction,false);
-
-#endif // ELASTIC_CONTACT_PARAMETERS_HPP
 

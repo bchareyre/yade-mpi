@@ -38,7 +38,7 @@
  *    They will create for us a class InteractionOfMyTetrahedron
  *
  *  - For any interaction we need to calculate the physics of interaction,
- *    class SimpleElasticInteraction. It is created by ElasticBodySimpleRelationship
+ *    class NormalInteraction. It is created by ElasticBodySimpleRelationship
  *    inside MetaEngine interactionPhysicsDispatcher
  *
  *  - with all that info available it is possibel to calculate PhysicalActions: a Force and a Momentum,

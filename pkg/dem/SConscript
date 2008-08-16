@@ -38,8 +38,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		LIBS=env['LIBS']+['yade-serialization', 'yade-base']),
 
 	env.SharedLibrary('ElasticContactInteraction',
-		['DataClass/InteractionPhysics/ElasticContactInteraction.cpp'],
-		LIBS=env['LIBS']+['SimpleElasticInteraction']),
+		['DataClass/InteractionPhysics/ElasticContactInteraction.cpp']),
 		
 	env.SharedLibrary('CohesiveFrictionalContactInteraction',
 		['DataClass/InteractionPhysics/CohesiveFrictionalContactInteraction.cpp'],
@@ -237,7 +236,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	env.SharedLibrary('MyTetrahedronLaw',
 		['Engine/StandAloneEngine/MyTetrahedronLaw.cpp'],
 		LIBS=env['LIBS']+['ElasticContactInteraction',
-			'SimpleElasticInteraction',
 			'InteractionOfMyTetrahedron',
 			'ElasticBodyParameters',
 			'yade-serialization',
@@ -358,28 +356,24 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		LIBS=env['LIBS']+['CohesiveFrictionalContactInteraction','SpheresContactGeometry',
 			'GLDrawElasticContactInteraction',
 			'ElasticContactInteraction',
-			'SimpleElasticInteraction',
 			'yade-opengl','$QGLVIEWER_LIB']),
 
 	env.SharedLibrary('GLDrawElasticContactInteraction',
 		['RenderingEngine/GLDrawElasticContactInteraction/GLDrawElasticContactInteraction.cpp'],
 		LIBS=env['LIBS']+['SpheresContactGeometry',
 			'ElasticContactInteraction',
-			'SimpleElasticInteraction',
 			'yade-opengl','$QGLVIEWER_LIB']),
 
 	env.SharedLibrary('GLDrawSpheresContactGeometry',
 		['RenderingEngine/GLDrawSpheresContactGeometry/GLDrawSpheresContactGeometry.cpp'],
 		LIBS=env['LIBS']+['SpheresContactGeometry',
 			'ElasticContactInteraction',
-			'SimpleElasticInteraction',
 			'yade-opengl']),
 
 	env.SharedLibrary('GLDrawSDECLinkGeometry',
 		['RenderingEngine/GLDrawSDECLinkGeometry/GLDrawSDECLinkGeometry.cpp'],
 		LIBS=env['LIBS']+['SDECLinkGeometry',
 			'SDECLinkPhysics',
-			'SimpleElasticInteraction',
 			'yade-opengl']),
 
 	env.SharedLibrary('Funnel',

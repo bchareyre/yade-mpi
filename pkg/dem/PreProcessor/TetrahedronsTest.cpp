@@ -314,9 +314,9 @@ void TetrahedronsTest::createActors(shared_ptr<MetaBody>& rootBody)
 	// so for this simple example I use  ElasticBodyParameters           : to store young modulus,
 	// and                               ElasticBodySimpleRelationship   : to calculate the stiffnes of current interaction
 	//                                                                     using the young modulus of two bodies, it creates
-	//                                                                     a class SimpleElasticInteraction
+	//                                                                     a class NormalInteraction
 	//
-	// Vaclav, it is very likely that you will need some other physical representation of interaction than SimpleElasticInteraction
+	// Vaclav, it is very likely that you will need some other physical representation of interaction than NormalInteraction
 	//
 	interactionPhysicsDispatcher->add("ElasticBodySimpleRelationship");
 		

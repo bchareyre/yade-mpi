@@ -641,7 +641,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//stiffnesscounter->interval = timeStepUpdateInterval;
 	
 	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	globalStiffnessCounter->sdecGroupMask = 2;
+	//globalStiffnessCounter->sdecGroupMask = 2;
 	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable

@@ -34,7 +34,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	env.SharedLibrary('Tetra',['tetra/Tetra.cpp'],LIBS=env['LIBS']+['Tetrahedron',
          'ParticleParameters',
          'RigidBodyParameters',
-         'SimpleElasticInteraction',
 			'ElasticBodyParameters',
 			'BodyMacroParameters',
 			'Momentum',

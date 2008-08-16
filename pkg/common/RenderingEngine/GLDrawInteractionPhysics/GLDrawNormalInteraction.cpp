@@ -6,21 +6,20 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawSimpleElasticInteraction.hpp"
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
-
+#include"GLDrawNormalInteraction.hpp"
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 
-void GLDrawSimpleElasticInteraction::go(
+void GLDrawNormalInteraction::go(
 		const shared_ptr<InteractionPhysics>& ip,
 		const shared_ptr<Interaction>&,
 		const shared_ptr<Body>& b1,
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	SimpleElasticInteraction* p = static_cast<SimpleElasticInteraction*>(ip.get());
+	NormalInteraction* p = static_cast<NormalInteraction*>(ip.get());
 //	FIXME: so there must be a way for *not* storing the color inside those classes like BodyBoundingVolume and BodyState
 //	       and simultaneously easy to set up the colors from the GUI according to some usful criterions:
 //	          - to which group it belongs

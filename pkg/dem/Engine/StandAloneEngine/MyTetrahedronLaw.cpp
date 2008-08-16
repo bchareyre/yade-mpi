@@ -9,7 +9,7 @@
 #include "MyTetrahedronLaw.hpp"
 #include<yade/pkg-dem/InteractionOfMyTetrahedron.hpp>
 #include<yade/pkg-common/ElasticBodyParameters.hpp>
-#include<yade/pkg-common/SimpleElasticInteraction.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Force.hpp>
@@ -60,7 +60,7 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 			ElasticBodyParameters* de1 				= YADE_CAST<ElasticBodyParameters*>((*bodies)[id1]->physicalParameters.get());
 			ElasticBodyParameters* de2 				= YADE_CAST<ElasticBodyParameters*>((*bodies)[id2]->physicalParameters.get());
 			InteractionOfMyTetrahedron* currentContactGeometry	= YADE_CAST<InteractionOfMyTetrahedron*>(contact->interactionGeometry.get());
-			SimpleElasticInteraction* currentContactPhysics		= YADE_CAST<SimpleElasticInteraction*>(contact->interactionPhysics.get());
+			NormalInteraction* currentContactPhysics		= YADE_CAST<NormalInteraction*>(contact->interactionPhysics.get());
 
 			for(int i=0 ; i<4 ; ++i )
 				for(int j=0 ; j<4 ; ++j)

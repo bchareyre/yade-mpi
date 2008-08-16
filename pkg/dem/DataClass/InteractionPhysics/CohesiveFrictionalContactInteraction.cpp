@@ -52,7 +52,7 @@ CohesiveFrictionalContactInteraction::~CohesiveFrictionalContactInteraction()
 
 void CohesiveFrictionalContactInteraction::registerAttributes()
 {
-	SimpleElasticInteraction::registerAttributes();
+	NormalInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(prevNormal);
 	REGISTER_ATTRIBUTE(shearForce);
 	REGISTER_ATTRIBUTE(ks);

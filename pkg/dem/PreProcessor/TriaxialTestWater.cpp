@@ -567,7 +567,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new
 	GlobalStiffnessCounter);
-	globalStiffnessCounter->sdecGroupMask = 2;
+	// globalStiffnessCounter->sdecGroupMask = 2;
 	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	

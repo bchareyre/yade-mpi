@@ -96,6 +96,9 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		contPhys->xiShear=xiShear;
 		contPhys->omegaThreshold=omegaThreshold;
 		contPhys->transStrainCoeff=transStrainCoeff;
+		// inherited from NormalShearInteracion, used in the timestepper
+		contPhys->kn=contPhys->E*contPhys->crossSection;
+		contPhys->ks=contPhys->G*contPhys->crossSection;
 
 		contPhys->prevNormal=contGeom->normal;
 		if(neverDamage) contPhys->neverDamage=true;
