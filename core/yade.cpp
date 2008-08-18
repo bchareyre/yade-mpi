@@ -168,12 +168,12 @@ int main(int argc, char *argv[])
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){
+			LOG_INFO("Loading  "<<logConf);
 			log4cxx::PropertyConfigurator::configure(logConf);
-			LOG_INFO("Loaded  "<<logConf);
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
 			logger->setLevel(log4cxx::Level::WARN);
-			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be ommited.");
+			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be omitted.");
 			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
 		}
 	#endif

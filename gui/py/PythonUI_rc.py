@@ -28,7 +28,11 @@ if runtime.simulation:
 ## run script if requested from the command line
 if runtime.script:
 	print "Running script "+runtime.script
-	execfile(runtime.script)
+	# an exception from python would propagate to c++ unhandled and cause crash
+	try: execfile(runtime.script)
+	except: 
+		import traceback
+		traceback.print_exc()
 if runtime.stopAfter: sys.exit(0)
 
 # run commands if requested from the command line
