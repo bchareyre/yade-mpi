@@ -8,6 +8,8 @@
 
 YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics" /* ,"BrefcomStiffnessComputer"*/ );
 
+CREATE_LOGGER(BrefcomGlobalCharacteristics);
+
 void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	Shop::Bex::initCache();
 
@@ -15,7 +17,7 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	// 2. get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		BrefcomPhysParams* bpp(YADE_CAST<BrefcomPhysParams*>(b->physicalParameters.get()));
+	BrefcomPhysParams* bpp(YADE_CAST<BrefcomPhysParams*>(b->physicalParameters.get()));
 		bpp->epsVolumetric=0;
 		bpp->numContacts=0;
 		currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
@@ -41,8 +43,10 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
 		BrefcomPhysParams* bpp1(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId1())->physicalParameters.get()));
 		BrefcomPhysParams* bpp2(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId2())->physicalParameters.get()));
-		Real epsVolAvg=.5*((3/bpp1->numContacts)*bpp1->epsVolumetric+(3/bpp2->numContacts)*bpp2->epsVolumetric);
+		Real epsVolAvg=.5*((3./bpp1->numContacts)*bpp1->epsVolumetric+(3./bpp2->numContacts)*bpp2->epsVolumetric);
 		BC->epsTrans=(epsVolAvg-BC->epsN)/2.;
+		//TRVAR5(I->getId1(),I->getId2(),BC->epsTrans,(3./bpp1->numContacts)*bpp1->epsVolumetric,(3./bpp2->numContacts)*bpp2->epsVolumetric);
+		//TRVAR4(bpp1->numContacts,bpp1->epsVolumetric,bpp2->numContacts,bpp2->epsVolumetric);
 	}
 	#if 0
 		FOREACH(const shared_ptr<Body>& b, *rb->bodies){

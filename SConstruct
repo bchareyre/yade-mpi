@@ -87,6 +87,11 @@ if ',' in env['profile']:
 		t=threading.Thread(target=runProfile,name='profile_'+p,args=(p,))
 		t.start()
 		profileThreads.append(t)
+	import atexit
+	def killAllProfileThreads():
+		for t in profileThreads:
+			t.join(0.1)
+	atexit.register(killAllProfileThreads)
 	for t in profileThreads:
 		t.join()
 	Exit()

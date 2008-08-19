@@ -32,6 +32,7 @@ class BrefcomGlobalCharacteristics: public PeriodicEngine{
 		virtual void action(MetaBody* rb){compute(rb,useMaxForce);}
 		BrefcomGlobalCharacteristics(){};
 	void registerAttributes(){ PeriodicEngine::registerAttributes(); REGISTER_ATTRIBUTE(unbalancedForce); REGISTER_ATTRIBUTE(useMaxForce);}
+	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(BrefcomGlobalCharacteristics);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
@@ -145,7 +146,7 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		//! number of contacts with this body
 		int numContacts;
 		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0) {createIndex();};
-		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive);}
+		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive); REGISTER_ATTRIBUTE(numContacts); }
 		REGISTER_CLASS_NAME(BrefcomPhysParams);
 		REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
 };
