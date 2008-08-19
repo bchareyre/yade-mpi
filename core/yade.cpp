@@ -163,7 +163,6 @@ int main(int argc, char *argv[])
 	// reset getopt globals for next processing in frontends
 	optind=0; opterr=0;
 
-
 	#ifdef LOG4CXX
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
