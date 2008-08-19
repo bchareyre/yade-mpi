@@ -272,7 +272,9 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
                        	const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);
 			const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId2())]->physicalParameters);
 						
-			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>((*ii)->interactionPhysics);
+			//FIXME - why dynamic_cast fails here?
+			//const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>((*ii)->interactionPhysics);
+			const shared_ptr<ElasticContactInteraction>& contactPhysics = static_pointer_cast<ElasticContactInteraction>((*ii)->interactionPhysics);
 			
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;

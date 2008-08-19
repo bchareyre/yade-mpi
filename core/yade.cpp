@@ -37,7 +37,7 @@ using namespace std;
 #endif
 
 void nullHandler(int sig){
-	cerr<<"WARN: nullHandler, signal "<<(sig==SIGSEGV?"SEGV":"[other]")<<endl;
+	cerr<<"WARN: nullHandler (probably log4cxx error, if it's infinite loop then press Ctrl-C or Ctrl-\\ to stop), signal "<<(sig==SIGSEGV?"SEGV":"[other]")<<endl;
 }
 
 void
@@ -168,8 +168,8 @@ int main(int argc, char *argv[])
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){
-			LOG_INFO("Loading  "<<logConf);
 			log4cxx::PropertyConfigurator::configure(logConf);
+			LOG_INFO("Loading  "<<logConf);
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
 			logger->setLevel(log4cxx::Level::WARN);
