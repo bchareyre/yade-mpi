@@ -79,7 +79,7 @@ else: profOpts.Save(profileFile,env)
 if ',' in env['profile']:
 	profiles=env['profile'].split(',')
 	import threading,subprocess
-	def runProfile(profile): subprocess.call([sys.argv[0],'-Q','profile='+p+'!'])
+	def runProfile(profile): subprocess.call([sys.argv[0],'-Q','profile='+profile+'!'])
 	profileThreads=[]
 	for arg in sys.argv[2:]:
 		print "WARNING: parallel-building, extra argument `%s' ignored!"%arg

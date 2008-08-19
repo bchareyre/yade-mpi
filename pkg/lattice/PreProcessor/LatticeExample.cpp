@@ -1714,10 +1714,10 @@ void LatticeExample::makeFibres()
 }
 
 
-bool LatticeExample::isFibre(Vector3r a,Vector3r b)
+int LatticeExample::isFibre(Vector3r a,Vector3r b)
 {
-	bool A=false;
-	bool B=false;
+	int A=0;
+	int B=0;
 	for(int i = 0 ; i < fibre_count ; ++i)
         {
 		Vector3r pos = fibres[i].first;
@@ -1728,11 +1728,11 @@ bool LatticeExample::isFibre(Vector3r a,Vector3r b)
 				pos[0] + 1.0*j*del[0],
 				pos[1] + 1.0*j*del[1],
 				pos[2] + 1.0*j*del[2] );
-			if(p == a) A=true;
-			if(p == b) B=true;
+			if(p == a) A=1;
+			if(p == b) B=1;
 		}
 	}
-	return A && B;
+	return A + B;
 }
 
 bool LatticeExample::fibreAllows(Vector3r a)
@@ -1770,8 +1770,9 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
                                 continue; // skip non-beams
 
                         LatticeBeamParameters* beam     = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
-                        if(isFibre(       (*(rootBody->bodies))[beam->id1]->physicalParameters->se3.position
-                                         ,(*(rootBody->bodies))[beam->id2]->physicalParameters->se3.position))
+			int fibreNodes=isFibre(   (*(rootBody->bodies))[beam->id1]->physicalParameters->se3.position
+						 ,(*(rootBody->bodies))[beam->id2]->physicalParameters->se3.position);
+			if(fibreNodes==2) // fibre
 			{
 				beam->longitudalStiffness       = fibre_longStiffness_noUnit;
                         	beam->bendingStiffness          = fibre_bendStiffness_noUnit;
@@ -1783,6 +1784,14 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 //                        	(*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
 				
 				fibres_total+=1.0;
+			}
+			if(fibreNodes==1) // bond
+			{
+                                beam->longitudalStiffness       = bond_longStiffness_noUnit;
+                                beam->bendingStiffness          = bond_bendStiffness_noUnit;
+                                beam->torsionalStiffness	= bond_torsStiffness_noUnit;
+                                beam->criticalTensileStrain     = bond_critTensileStrain;
+                                beam->criticalCompressiveStrain = bond_critCompressStrain;
 			}
                 }
         }

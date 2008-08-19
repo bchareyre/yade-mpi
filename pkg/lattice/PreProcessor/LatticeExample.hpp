@@ -93,7 +93,7 @@ class LatticeExample : public FileGenerator
 
                 void addAggregates(shared_ptr<MetaBody>& rootBody);
                 void makeFibreBeams(shared_ptr<MetaBody>& rootBody);
-		bool isFibre(Vector3r,Vector3r);
+		int isFibre(Vector3r,Vector3r);
 		bool fibreAllows(Vector3r);
 
 ////////////////////////////////////////////////////
