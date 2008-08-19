@@ -8,6 +8,7 @@
 
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Force.hpp>
@@ -58,8 +59,9 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 
 		SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
 		// FIXME: for some reason, the following cast is not successful. Please help!
-		cerr<<__FILE__<<":"<<__LINE__<<" Interaction physics of type "<<contact->interactionPhysics->getClassName()<<" ("<<typeid(*contact->interactionPhysics).name()<<")"<<endl;
-		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
+		//cerr<<__FILE__<<":"<<__LINE__<<" Interaction physics of type "<<contact->interactionPhysics->getClassName()<<" ("<<typeid(*contact->interactionPhysics).name()<<")"<<endl;
+		//NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
+		ElasticContactInteraction* phys=YADE_CAST<ElasticContactInteraction*>(contact->interactionPhysics.get()); assert(phys);
 		// all we need for getting stiffness
 		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
 		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
@@ -82,11 +84,11 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 		diag_Rstiffness *= ks;
 		//cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
 
-		PhysicalAction* st = ncb->physicalActions->find(contact->getId1(),actionStiffness->getClassIndex()).get();
+		PhysicalAction* st = ncb->physicalActions->find(contact->getId1(),actionStiffnessIndex).get();
 		GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
 		s->stiffness += diag_stiffness;
 		s->Rstiffness += diag_Rstiffness*pow(radius1,2);	
-		st = ncb->physicalActions->find(contact->getId2(),actionStiffness->getClassIndex()).get();
+		st = ncb->physicalActions->find(contact->getId2(),actionStiffnessIndex).get();
 		s = static_cast<GlobalStiffness*>(st);
 		s->stiffness += diag_stiffness;
 		s->Rstiffness += diag_Rstiffness*pow(radius2,2);
@@ -143,11 +145,11 @@ void GlobalStiffnessCounter::action(MetaBody* ncb)
                                 //cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
 
 
-                               PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffness->getClassIndex()).get();
+                               PhysicalAction* st = ncb->physicalActions->find(id1,actionStiffnessIndex).get();
 				GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
 				s->stiffness += diag_stiffness;
 				s->Rstiffness += diag_Rstiffness*pow(currentContactGeometry->radius1,2);	
-				st = ncb->physicalActions->find(id2,actionStiffness->getClassIndex()).get();
+				st = ncb->physicalActions->find(id2,actionStiffnessIndex).get();
 				s = static_cast<GlobalStiffness*>(st);
 				s->stiffness += diag_stiffness;
 				s->Rstiffness += diag_Rstiffness*pow(currentContactGeometry->radius2,2);

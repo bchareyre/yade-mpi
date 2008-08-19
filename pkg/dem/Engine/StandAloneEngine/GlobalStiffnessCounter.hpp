@@ -23,9 +23,6 @@ class GlobalStiffnessCounter : public InteractionSolver
 {
 /// Attributes
 	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-		shared_ptr<PhysicalAction> actionStiffness;
 		int actionForceIndex;
 		int actionMomentumIndex;
 		int actionStiffnessIndex;
