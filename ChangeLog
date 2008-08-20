@@ -1,15 +1,489 @@
+2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1484
+
+	* RELEASE: 0.12
+
+	* pkg/dem/PreProcessor/STLImporterTest.cpp: Sega's facets and vertices
+	with stl import, 
+	
+	* gui/py/PythonUI.py: much improved python interface, 
+	
+	* gui/qt3/*: qt gui underwent significant changes, 
+	
+	* gui/qt3/GLSimulationPlayerViewer.cpp: player is almost completely
+	remade, 
+	
+	* gui/qt3/GLViewer.cpp: gl viewer has many enhancements, 
+	
+	* lib/QGLViewer/* qglviewer is integrated into our tree
+	
+	* SConstruct: fixed compilation problems with Ubuntu 8.04
+
+	* wiki pages: we will be able to update documentation on the wiki by
+	removing all the stuff that is not valid anymore.
+
+
 2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1480
+
 	* ChangeLog: New ChangeLog format. Please use this format in your
-	entries (I don't like updating ChangeLog once per year with 200
+	entries (I don't like updating ChangeLog once per year with 240
 	revisions ;)). New ChangeLog format is:
 
-	* File, or list of files: summary of modifications. But Keep ChangeLog
-	short (svn log is for details), if you modify 100 files together,
-	don't list all of them. Be prudent.
+	* path/File, or list of files: summary of modifications. But please
+	keep ChangeLog short (svn log is for details), if you modify 100 files
+	together, don't list all of them. Be prudent.
 
-r.1460 (Janek)
-  1. testing if SVN commits can go to launchpad.
-  2. we need to fill in the changelog between r.1209 and r.1460
+
+WARNING: the ChangeLog update below is sloppy, because it was done by single
+person (Janek) in few hours, by examining 'svn log' output of 240 commits(!!).
+All entries above this one are supposed to be much better in quality. Because
+they will be written by the people who are authors of those changes.
+
+2008-08-19  Vaclav Smilauer <eudoxos@arcig.cz> revision 1475
+	
+	* pkg/dem/Engine/StandAloneEngine/GlobalStiffnessCounter.cpp: Fix
+	physical action index.
+
+	* SConstruct: Kill building threads if the master thread is interrupted
+	in multi-builds (profile=a,b)
+
+	* gui/py/PythonUI_rc.py, core/yade.cpp: Do not propagate exception to c++
+	-> crash if there is python exception in the script being run from
+	command-line. Just print traceback and drop to the python console
+	(unless stop after execution specified)
+
+	* gui/py/PuthonUI.cpp: Fix GUI "crash" when trying to run python
+	console without terminal (running by clicking an icon, for example):
+	if no $TERM, run non-interactively
+
+	* core/yade.cpp: Select QtGUI over PythonUI if no $TERM set
+
+
+2008-08-16  Vaclav Smilauer <eudoxos@arcig.cz> revision 1470
+
+	* NormalShearInteractions.cpp: Added new (abstract) classes:
+	NormalInteraction (with kn (normal) sitffness) and
+	NormalShearInteraction (additionally, with ks (shear) stiffness). They
+	are used by GlobalStiffnessCounter.
+
+	* pkg/common/DataClass/InteractionPhysics/SimpleElasticInteraction.cpp:
+	Removed SimpleElasticInteraction, since it it basically
+	NormalInteraction, and changed all code to reflect that.
+
+	* pkg/dem/Engine/StandAloneEngine/GlobalStiffnessCounter.cpp: Changed
+	GlobalStiffnessCounter to work with the NormalShearInteraction class,
+	since it provides an abdstract interface and will be useful with more
+	classes than just ElasticContactInteraction.
+
+
+2008-08-14 Janek Kozicki <cosurgi@gmail.com> revision 1469
+
+	* pkg/mass-spring/PreProcessor/HangingCloth.cpp
+	* pkg/fem/PreProcessor/FEMBeam.cpp: use NDEBUG to detect optimized
+	builds in FEMBeam and HangingCloth
+
+
+2008-08-14  Vaclav Smilauer <eudoxos@arcig.cz> revision 1468
+
+	* core/Omega.cpp: Remove draw mutex when loading simulation introduced
+	a few days ago (may throw boost::lock_error under some conditions)
+
+	* core/yade.cpp: Restore default signal handlers before exit from
+	main; set SEGV handler to nullHandler since on i386 we (on lenny
+	consistently) get crashes in some log4cxx destructor.
+
+
+2008-08-12  Vaclav Smilauer <eudoxos@arcig.cz> revision 1463
+
+	* gui/qt3/YadeQtMainWindow.cpp
+	* gui/qt3/SimulationController.cpp: Fix refresh period: use it for
+	regular GL rendering as well
+
+	* gui/qt3/QtFileGenerator.cpp: Make "open automatically" open
+	generated simulation even if a simulation is already loaded.
+	Fix crashes (on some machines) the close() was emitted 2× for
+	QtFileGenerato
+
+	* gui/py/PythonUI_rc.py: Fix error with newer ipython coming from the
+	fact that sys.argv wasn't defined in the embedded python env.
+
+
+2008-07-30  Vaclav Smilauer <eudoxos@arcig.cz> revision 1455-1449
+
+	* lib/miniWm3/Wm3Math.cpp:  DECREASED Mathr::ZERO_TOLERANCE to 1e-20
+	so that we don't get identity quaternions for small rotation in
+	ToAxisAngle (!!)
+
+	* gui/tq3/GLViewer.cpp: Add glue for GLViewer, currently may crash,
+	probably concurrency issues there
+
+	* scripts/make-release.sh: Add script for making release
+
+
+2008-07-17  Vaclav Smilauer <eudoxos@arcig.cz> revision 1432
+
+	* core/MetaBody.cpp: Multiple display parameters (i.e. QGLViewer
+	config and OpenGLRenderingEngine config) are stored in Metabody.
+
+	* core/MetaBody.cpp: stopAtIteration moved to MetaBody so that it is
+	saved and reloaded (MetaBody::recover hack is gone)
+
+	* lib/serialization/IOFormatManager.cpp: Add the ability to load from
+	stream and save to stream to IOFormatManager (afterwards, I discovered
+	there were actually_identical_ functions loadArchive and saveArchive;
+	those were deleted since unused elsewhere)
+
+	* gui/qt3/GLViewer.cpp: GLViewer can now load and save state from/to
+	string
+
+	* gui/qt3/GLViewer.cpp: in GLViewer, keys 7,8,9 load display config
+	#0,1,2 and Alt-{7,8,9} saves current view to #0,1,2. Those are saved
+	in MetaBody. BUG: after loading such config, the QtGUI-generated
+	OpenGLRenderingEngine config dialog doesn't work anymore (probably
+	some issue with archives, not sure).
+
+	* lib/serialization-qt/FundamentalHandler.tpp: Hopefully all
+	xml-parser-offensive characters are escaped at string serialization,
+	and unescaped at deserialization. We use standard SGML escapes (newline=&br;
+	tab=&tab; <=&lt;) and so on now. This allows to save
+	XML-as-string in the xml itself (used for DisplayParameters).
+
+	* gui/qt3/GLViewer.cpp: GLViewer now properly saves what XYZ planes
+	are displayed (using custom DOM element)
+
+	* extra/Brefcom.cpp: Some fixes in Brefcom, more to come.
+
+
+2008-07-10  Sergei Dorofeenko <dorofeenko@icp.ac.ru> revision 1419
+
+	* core/FiltrEngine.cpp: FiltrEngine is a base engine for a scene
+	filtration before visualization (both for a player and for a
+	controller). The filtration is activated through GUI (now only for
+	SimulationPlayer).
+
+	* pkg/common/Engine/FiltrEngine/ColorizedLayerFilter.cpp: allocates
+	with colour a layer of bodies
+
+	* pkg/common/Engine/FiltrEngine/ColorizedVelocityFilter.cpp: allocates
+	with colour a velocity of bodies
+
+
+2008-06-29  Vaclav Smilauer <eudoxos@arcig.cz> revision 1405
+
+	* gui/qt3/SimulationController.cpp
+	* gui/qt3/GLViewer.cpp: Implemented clipping planes in the GL viewer
+	and GL renderer
+
+	* gui/qt3/GLViewer.cpp: Moving body is now consistent with mouse
+	bindings for moving scene
+
+
+2008-05-10  Sergei Dorofeenko <dorofeenko@icp.ac.ru> revision 1347
+
+	* pkg/dem/PreProcessor/STLImporterTest.cpp: Main commit: import a
+	geometry of walls from a STL file.
+
+
+2008-03-30  Vaclav Smilauer <eudoxos@arcig.cz> revision 1290
+
+	* cmdGui.cpp: allow saving spheres (format like small.sdec.xyz) from python
+
+	* PositionOrientationRecorder.cpp can optionally record RGB color of each
+	body as well now
+
+	* GLSimulationPlayerviewer.cpp: SimulationPlayer now can change colors
+	of bodies, if the .rgb file exists
+
+	* Brefcom.cpp: Bunch of fixes if brefcom, in UniaxialStrainControlledTest
+
+	* Omega.cpp, MetaBody.cpp: dt moved from Omega to MetaBody for good;
+	this allows preprocessor to set timestep that will be used when the
+	simulation is loaded.
+
+
+2008-03-25  Sergei Dorofeenko <dorofeenko@icp.ac.ru> revision 1285
+
+	* SimpleViscoelastic*.cpp: Add linear viscoelastic contact model
+
+
+2008-03-22  Vaclav Smilauer <eudoxos@arcig.cz> revision 1281-1283
+
+	* extra/Brefcom.cpp: Include fracture strain calibration routines in brefcom.
+		- Add BrecomDamageColorizer - changes colora ccording to average
+		cohesive interactions the body has.
+		- Delete non-cohesive interactions from inside BrefcomLaw when
+		spheres become distant.
+		- Documentation updates.
+
+	* gui/qt3/GLSimulationPlayerviewer.cpp: Resurredced and un-crapped
+	simulation player (for making videos). Updated howto is
+	http://yade.wikia.com/wiki/New:Making_videos#Using_Simulation_Player_with_svn.3E1281
+
+	* pkg/common/engine/DeuxExMachina/CentralGravityEngine.cpp: 
+	* pkg/common/engine/DeuxExMachina/PositionOrientationRecorder.cpp:
+	Added some comments to didactical CentralGravityEngine and to
+	PositionOrientationRecorder.
+
+	1. MAJOR improvements of the python wrappers (constructors take attributes etc.)
+
+	2. FIRST proof-of-implementation simulation completely created in python:
+	scripts/simple-scene.py. This file will be commented abundantly shortly.
+
+	3. Add default values to some bool params so that there is no serializer error
+	if they are uninitialized.
+
+	4. Add aabbEnlargeFactor to InteractingSphere2AABB (should be added to
+	InteractingBox2AABB as well?) (not tested yet)
+
+	5. rename InteractionDetectionFactor to interactinDetectionFactor
+
+	6. Serialization now registers only attributes that have not yet been
+	registered (there were problems with python because of that: at first save,
+	attributes were duplicated and the xml file was less readble, although
+	loadable)
+
+	7. Scan .tpp and .ipp for c++ tags as well
+
+	8. Some documentation.
+
+
+2008-08-18 Janek Kozicki <cosurgi@gmail.com> revision 1280
+
+	* CohesiveFrictionalContactLaw.cpp: added Moment Law
+
+	* ForceEngine.cpp: now works on subscribedBodies
+
+	* MomentEngine.cpp: new engine added
+
+	* KnownFundamentalsHandler.tpp: it wasn't compiling if you tried to
+	save quaternions to file. Basically change the case of function calls: x();
+	into X();
+
+
+2008-03-13  Vaclav Smilauer <eudoxos@arcig.cz> revision 1274
+
+	* lib/QGLViewer/* : BIG - Moved latest upstream qglviewer to our tree. If
+	you REALLY need to use the packaged version, let me know. As of now,
+	there is no way to do that.
+
+	* gui/qt3/* : BIG: Removed many (unfunctional) parts of the qt3 GUI,
+	in the view of qt4 migration which will probably not happen. Maybe I
+	removed too much (simulation player -- does it work?!), let me know in
+	that case.
+
+
+2008-03-03  Vaclav Smilauer <eudoxos@arcig.cz> revision 1270-1273
+
+	* scripts/default-test.py: Test suite for all preprocessors
+	
+	* scripts/default-test.py: handles crashing simulations gracefully (by
+	executing them in a subprocess)
+
+	* GlobalStiffnessCounter.cpp: Added assumeElasticSpheres attribute to
+	GlobalStiffnessCounter; if set to false, dynamic_casts are used to
+	properly determine type of contact between spheres (used in USCTGen
+	now)
+
+	* yade.cpp: Debugger now dumps backtrace without interruption and
+	exits immediately (core is still dumped)
+
+	* cmdGui.cpp: now exports yade binary name (to allow spawning
+	subprocesses)
+
+	* Omega.cpp: retains original argc and argv from the command line.
+
+	* PersistentSAPCollider.cpp: Remove NaN's in PersistentSAPCollider for
+	bodies that don't have bounding box: use zero-size degenerate box at
+	its position instead. (fixes warning when running ClumpTestGen)
+
+	* SConstruct: Remove check for scientific python from scons as we
+	don't use it now.
+
+
+2008-02-27 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr> revision 1268
+
+	* NewtonsDampedLaw.cpp : new engine.
+		The result is exactly the same as with :
+		- CundallNonViscousForceDamping
+		- CundallNonViscousMomentumDamping
+		- NewtonsForceLaw
+		- NewtonsMomentumLaw
+		- LeapFrogPositionIntegrator
+		- LeapFrogOrientationIntegrator
+
+	But this engine is faster because it uses less loops and less dispatching. 
+ 
+	Requirements :
+		- All dynamic bodies must have physical parameters of type (or inheriting from) BodyMacroParameters
+		- Physical actions must include forces and moments
+
+
+2008-02-15 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr> revision 1237
+
+	* yade.cpp: conditional compilation in order to compile with boost 1.33
+
+	* TriaxialTest.cpp: instanciation of a SimpleElasticRelationship 
+	object before adding it to engines (to avoid a crash). Vaçlav please, 
+	what is going on here?
+
+	* TriaxialCompressionEngine.cpp: 
+		- 0.5 factor in front of UnbalancedForce equation
+		- small fixes in default values
+		- timestep, unbalancedForce, and "Compression started" is displayed 
+		again during triaxial test run
+
+
+2008-02-13  Vaclav Smilauer <eudoxos@arcig.cz> revision 1246
+
+	* yade.cpp: Preliminary recovery of simulation accross runs (try
+	sending SIGHUP to yade)
+
+	* cmdGui.cpp: Python wrapper for body parameters.
+
+	* Omega.cpp: Allow Omega to stop at predefined iteration number (for
+	regression tests, I work on that ;-) )
+
+
+2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1480
+
+	* CundallNonViscousMomentumDamping.cpp: Fix FUNCTOR2D mistake
+	
+	* qt3 files: make it compile with python2.4 and qt3 (which sucks)
+
+	* NOTE: python-scientific requires boost 1.34
+
+
+2008-01-24 Vaclav Smilauer <eudoxos@arcig.cz> revision 1243
+	* MetaEngine.cpp: Remove MetaEngine, inherit MetaDispatchingEngine
+	directly
+
+	* TriaxialStressEngine.cpp: Fix unbalanced force reporting (thanks for
+	complaining, Bruno)
+
+	* EngineUnit.cpp: EngineUnits now declare their types with FUNCTOR1D(.) or
+	FUNCTOR2D(.,.) macros, dispatchers will ask for their types
+	automagically. Old syntax still supported, once all engines have those
+	types declared, it will be obsoleted and removed (like
+	e->add("InteractingSphere","InteractingSphere","InteractingSphere2InteractingSphere4SpheresContactGeometry");
+	Shop and USCTGen usethe new syntax now.
+
+	* BrefcomLaw.cpp: Brefcom law passes some rudimentary tests and appears to work
+	(normal force and damage for now; we miss shear force and blocked
+	rotations)
+
+	* BrefcomContact.cpp: Brefcom contact can be drawn with opengl, damage signified by color.
+
+	* cmdGui.cpp: Updated Python wrapper.
+
+
+2008-01-24 Vaclav Smilauer <eudoxos@arcig.cz> revision 1242
+	1. BIG update of python wrappers - enagines can be created, added,
+	modified from python now. Examples will be provided very soon.
+
+	2. fix plugin loader for multi-plugins: YADE_PLUGIN() macro should be
+	used in all plugins, otherwise due to linking symbol overrides a
+	multi-plugin will shadow classes in the plugin actually being loaded
+	(better solution?!)
+
+	3. Add experimental BREakable Frictional COhesive Moment-blocking
+	material (brefcom for short), not yet fully done.
+
+	4. PersistentSAPCollider now can be parametrized to permit distant
+	contacts (is not the default, though), incorporating Bruno's changes
+	in DistantPersistentSAPCollider
+
+	5. Uniaxial strain-controlled test (USCT), a quite simple
+	implementation. Used primarily for brefcom testing now.
+
+	6. Fix SConstruct so that it is backward-compatible with python2.4
+
+
+2008-01-27 Janek Kozicki <cosurgi@gmail.com> revision 1240
+	* LatticeExample.cpp: Use lattice model for simulation of concrete
+	with steel fibres reinforcement.
+	* SConstruct: SConstruct is now working on debian etch,
+	* Doxyfile: exclude multimethods in Doxyfile
+
+
+2008-01-24 Vaclav Smilauer <eudoxos@arcig.cz> revision 1239
+	* SConstruct: Default scons to latest snapshot (should be a bit faster)
+	* SConstruct: Don't autocreate plugin path entries for paths that are not installed
+	* TriaxialStressEngine: Turn TriaxialStressEngine into state machine, while preserving the
+	possibility of changing some values by hand in .xml. (should be
+	tested).
+	* Doxyfile: Exclude Loki:: from doxygen docs.
+
+
+2007-06-30 Vaclav Smilauer <eudoxos@arcig.cz> revision 1237
+	* Tetra.cpp, TetraTestGen.cpp: 
+		- Tetrahedron fixes (intersections are ;correct now, but
+		interaction still wrong - crashes??!)
+		- Correct formulas for 4hedron inertia, testcase passes
+	* trunk/SConscruct: Fix scons to work with versions > .97 (no syntax errors;
+	didn't try if it compiles
+	* SimulationController.cpp:
+		- Switch to fixed timestep when timestep is being changed by
+		user in the qt3 ui
+		- Change default timestep to 1e-8, should prevent weidness
+		onthe first run.
+
+
+2007-07-26 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr> revision 1230
+	* Cohesive* files: 
+	1. New contact law and related classes :
+	CohesiveFrictionalContactLaw. It will be the most general
+	contac law in Yade soon probably (TODO : include rotational
+	effects like MomentRotation law).
+	2. New Stress-Strain recorder : TriaxialStateRecorder,
+	autodetect the TrixialCompressionEngine of a MetaBody and
+	write the  parameters from it in a text file.
+	3. TriaxialCompressionEngine and TriaxialStressController are
+	modified in order to compute stress and strain on demand.
+
+
+2007-07-11 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr> revision 1224
+	* CohesiveFrictionalContactLaw.cpp CohesiveTriaxialTest.cpp,
+	Cohesive* files: This commit contains new classes in order to simulate
+	cohesive interactions with transient interactions.  The new
+	SAPCollider does set IsReal=false at each time step, neither do the
+	Sphere2Sphere4Distant... engine. The user must set isReal=false in
+	another engine (here the CohesiveFrictionalContactLaw engine) in order
+	to have the interactions removed from the DistantPersistentSAPCollider
+	list.  All new engines are used in the CohesiveTriaxialTest.
+
+
+2007-06-30 Vaclav Smilauer <eudoxos@arcig.cz> revision 1216
+	* yade.spec: .spec file for fedora
+	* ScrewGen.cpp: Add screw example (this is really my personal one...)
+	* Shop.cpp: Fix Shop::tetra (tetra interacting geometry still
+	incorrect or incorrectly drawn... why???)
+	* yade.cpp: Remove python finalization, boost should take care of that.
+	* DynLibManager: Possibly fix plugin loader bug (first plugin after
+	one with yadePluginClasses "inherits" them unless it has its own
+	yadePluginClasses defined).
+
+
+2007-06-22 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr> revision 1215
+	* TriaxialCompressionEngine, GlobalStiffnessTimeStepper, TriaxialTest:
+		- TriaxialTest now includes a recorder to write stress history to a file.
+		- safety factor is set to a smaller value in the timestepper as
+		the computed value was still a bit too large in some cases.
+		- UnbalancedForce is defined in TriaxialCompressionEngine() to
+		avoid errors when loading a xml.
+
+2007-06-27 Vaclav Smilauer <eudoxos@arcig.cz> revision 1214
+	* FundamentalHandler: Don't warn on amd64 about limited type range in
+	comparison.
+
+
+2007-06-22 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr> revision 1213
+	* TriaxialCompressionEngine: UnbalancedForce member data was not
+	defined in the constructor of TriaxialCompressionEngine, it was
+	causing a crash when loading a TriaxialTest.xml.
+
+
+2007-06-21 Janek Kozicki <cosurgi@gmail.com> revision 1212
+	* ChangeLog: update
+
 
 r.1209 (Vaclav)
   1. SCons will download new version of itself if older thatn 0.96.93 and will proxy all calls to it transparently (hopefully)
