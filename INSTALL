@@ -1,17 +1,24 @@
-This is a copy of pages "Installation" and "Installation details" from http://yade.wikia.com/
-For more complete documentation please visit that website, especially
-instructions about installation for specific Linux distribution, like:
+WARNING: 
+  This file is very much likely out of date! Please have a look at 
 
-http://yade.wikia.com/wiki/Installation_of_yade_on_debian_or_kubuntu
-http://yade.wikia.com/wiki/Installation_of_yade_on_fedora
-http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo
+    http://yade.wikia.com/wiki/Installation
+
+  For more complete documentation please visit that website, especially
+  instructions about installation for specific Linux distribution, like:
+
+    http://yade.wikia.com/wiki/Installation_of_yade_on_debian_or_kubuntu
+    http://yade.wikia.com/wiki/Installation_of_yade_on_fedora
+    http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo
+
+
+
 
 ==============================================================
 ==                                                          ==
 ==         Table of Contents                                ==
 ==                                                          ==
 ==============================================================
-== 1 Prerequisites                                           ==
+== 1 Prerequisites                                          ==
 ==       1.1 Required packages                              ==
 ==       1.2 Optional packages                              ==
 == 2 Recommended installation method                        ==
