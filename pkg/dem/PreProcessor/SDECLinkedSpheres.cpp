@@ -215,7 +215,7 @@ bool SDECLinkedSpheres::generate()
 		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"
 		+"\nWARNING: interactions will not generate any force since we use SpheresContactGeometry instead of SDECLinkGeometry now.";
-	return false;
+	return true;
 }
 
 
