@@ -37,7 +37,7 @@ def crashProofRun(cmd,quiet=True):
 	import subprocess,os,os.path,yade.runtime
 	f=open(pyCmdFile,'w'); f.write(cmd); f.close(); 
 	if os.path.exists(msgFile): os.remove(msgFile)
-	p=subprocess.Popen([yade.runtime.executable,'-N','PythonUI','--','-s',pyCmdFile],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	p=subprocess.Popen([yade.runtime.executable,'-N','PythonUI','--','-n','-s',pyCmdFile],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	pout=p.communicate()[0]
 	retval=p.wait()
 	if not quiet: print pout
@@ -62,12 +62,10 @@ for pp in o.childClasses('FileGenerator'):
 	ok1,msg1,out1=crashProofRun(runGenerator%(pp,params))
 	if not ok1:
 		reports.append([pp,'generator CRASH',out1]); summary.append([pp,'generator CRASH'])
-		continue
-	ok2,msg2,out2=crashProofRun(runSimul)
-	if not ok2:
-		reports.append([pp,'simulation CRASH',out2]); summary.append([pp,'simulation CRASH'])
-	else: 
-		summary.append([pp,'passed (%s)'%msg2])
+	else:
+		ok2,msg2,out2=crashProofRun(runSimul)
+		if not ok2: reports.append([pp,'simulation CRASH',out2]); summary.append([pp,'simulation CRASH'])
+		else: summary.append([pp,'passed (%s)'%msg2])
 	print summary[-1][0]+':',summary[-1][1]
 
 # delete temporaries

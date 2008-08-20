@@ -19,6 +19,7 @@ class PythonUI: public FrontEnd
 		static PythonUI *self;
 		virtual int run(int argc, char *argv[]);
 		static string runScript;
+		// stopAfter and nonInteractive are almost identical, should be clarified/fixed
 		static bool stopAfter;
 		static bool nonInteractive;
 		static vector<string> scriptArgs;

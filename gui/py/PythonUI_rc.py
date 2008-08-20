@@ -30,17 +30,17 @@ if runtime.script:
 	print "Running script "+runtime.script
 	# an exception from python would propagate to c++ unhandled and cause crash
 	try: execfile(runtime.script)
-	except: 
+	except SystemExit: raise # re-raise sys.exit
+	except:
 		import traceback
 		traceback.print_exc()
+		if(runtime.nonInteractive or runtime.stopAfter): sys.exit(1)
 if runtime.stopAfter: sys.exit(0)
 
 # run commands if requested from the command line
 #if yadeRunCommands:
 #	print "Running commands from commandline: "+yadeRunCommands
 #	exec(yadeRunCommands)
-
-# this cannot be run directly, since importing * is allowed only at module level
 
 if runtime.nonInteractive:
 	import time;
