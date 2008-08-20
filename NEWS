@@ -1,0 +1,32 @@
+2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1484
+
+	* RELEASE: 0.12
+
+	* Sega's facets and vertices with stl import
+	
+	* python wrapper and console with the ability to control most simulation aspects (including creating simulations, modifying, inspecting, running, recording data), some parts of the UI (setting view, configuring renderer); see scripts/simple-scene.py to get started (http://yade.wikia.com/wiki/SimpleSceneTutorial)
+
+	* (experimental) plotting interface based on pylab (scripts/simple-scene-graph.py)
+
+	* much enhanced simulation recorder and player, saving optionally to a single file (sqlite database), the ability to create video from simulation with one command (may be done offscreen as well): scripts/simple-scene-player.py, http://yade.wikia.com/wiki/New:Making_videos
+
+	* selectively block any of 6 DOFs ( translation and rotation) for individual bodies (PhysicalParameters::blockedDOFs - not documented, not conveniently accessible from python yet)
+
+	* displacement and rotation scaling in GLViewer, using PhysicalParameters::refSe3
+	
+	* up to 3 clipping planes in the GLViewer, can be manipulated, bound to each other, activated/deactivated
+
+	* saving view to view configurations inside MetaBody (Alt+7 -- Alt+9), can be loaded later (from python as well)
+
+	* all simulation aspects (dt, iteration, virtual time) are now inside MetaBody, i.e. are restored exactly as they were from .xml
+
+	* transparent support for compressed .xml.gz and .xml.bz2 files; dropped support for binary format
+
+	* the (de)serializer now (un)escapes all control characters, using the &charname; format, arbitrary string values can be (de)serialized now, including parentheses, quotations marks, newlines, tabs, <>.
+
+	* refactored Qt3 interface: MDI with simulation running asynchronously, with python console
+
+	* QGLViewer source is now in our tree, no need to install it separately
+
+	* compilation profiles allow separate option sets for scons; simultaneous compilation of multiple profiles is supported via the profile=a,b,c
+

@@ -1,26 +1,3 @@
-2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1484
-
-	* RELEASE: 0.12
-
-	* pkg/dem/PreProcessor/STLImporterTest.cpp: Sega's facets and vertices
-	with stl import, 
-	
-	* gui/py/PythonUI.py: much improved python interface, 
-	
-	* gui/qt3/*: qt gui underwent significant changes, 
-	
-	* gui/qt3/GLSimulationPlayerViewer.cpp: player is almost completely
-	remade, 
-	
-	* gui/qt3/GLViewer.cpp: gl viewer has many enhancements, 
-	
-	* lib/QGLViewer/* qglviewer is integrated into our tree
-	
-	* SConstruct: fixed compilation problems with Ubuntu 8.04
-
-	* wiki pages: we will be able to update documentation on the wiki by
-	removing all the stuff that is not valid anymore.
-
 
 2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1480
 
