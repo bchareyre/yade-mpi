@@ -1,3 +1,12 @@
+2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1480
+	* ChangeLog: New ChangeLog format. Please use this format in your
+	entries (I don't like updating ChangeLog once per year with 200
+	revisions ;)). New ChangeLog format is:
+
+	* File, or list of files: summary of modifications. But Keep ChangeLog
+	short (svn log is for details), if you modify 100 files together,
+	don't list all of them. Be prudent.
+
 r.1460 (Janek)
   1. testing if SVN commits can go to launchpad.
   2. we need to fill in the changelog between r.1209 and r.1460
