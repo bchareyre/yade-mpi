@@ -31,7 +31,7 @@ if runtime.script:
 	# an exception from python would propagate to c++ unhandled and cause crash
 	try: execfile(runtime.script)
 	except SystemExit: raise # re-raise sys.exit
-	except:
+	except: # all other exceptions
 		import traceback
 		traceback.print_exc()
 		if(runtime.nonInteractive or runtime.stopAfter): sys.exit(1)

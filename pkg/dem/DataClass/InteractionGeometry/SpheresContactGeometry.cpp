@@ -10,7 +10,7 @@
 #include "SpheresContactGeometry.hpp"
 YADE_PLUGIN("SpheresContactGeometry");
 
-SpheresContactGeometry::SpheresContactGeometry() : InteractionGeometry(){createIndex();}
+SpheresContactGeometry::SpheresContactGeometry(): InteractionGeometry(), radius1(0),radius2(0),contactPoint(Vector3r::ZERO){createIndex();}
 SpheresContactGeometry::~SpheresContactGeometry(){}
 void SpheresContactGeometry::registerAttributes()
 {

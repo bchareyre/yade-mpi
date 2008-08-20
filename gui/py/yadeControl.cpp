@@ -347,10 +347,6 @@ class pyPhysicalActionContainer{
 };
 
 
-BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
-	void generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
-BASIC_PY_PROXY_TAIL;
-
 
 class pyOmega{
 	private:
@@ -467,8 +463,12 @@ class pyOmega{
 
 	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
 };
-	
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
+
+BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
+	void generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
+	void load(){ ensureAcc(); char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); this->generate(xml); pyOmega().load(xml); }
+BASIC_PY_PROXY_TAIL;
 
 class pySTLImporter : public STLImporter {
     public:
@@ -573,7 +573,8 @@ BOOST_PYTHON_MODULE(wrapper)
 	BASIC_PY_PROXY_WRAPPER(pyPhysicalAction,"Action");
 
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
-		.def("generate",&pyFileGenerator::generate);
+		.def("generate",&pyFileGenerator::generate)
+		.def("load",&pyFileGenerator::load);
 
 	boost::python::class_<pySTLImporter>("STLImporter")
 	    .def("open",&pySTLImporter::open)
