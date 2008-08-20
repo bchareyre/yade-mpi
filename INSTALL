@@ -1,3 +1,4 @@
+
 Authoritative source: http://yade.wikia.com/wiki/Installation, this file may be out-fo-date.
 
 Release sources
@@ -6,17 +7,21 @@ Go to http://yade.wikia.com/wiki/Installation for up-to-date sources.
 
 Latest SVN snapshot
 ===================
-If you want to look at the latest yade version from subversion (sometimes not working), you can download it using one of the ways shown below:
+If you want to look at the latest yade version from subversion (sometimes not
+working), you can download it using one of the ways shown below:
 
 	svn checkout svn://svn.berlios.de/yade/trunk/
 	svn checkout http://svn.berlios.de/svnroot/repos/yade/trunk
 	svn checkout https://svn.berlios.de/svnroot/repos/yade/trunk
 
-Which one of those above will work depends on your network and firewall configuration.
+Which one of those above will work depends on your network and firewall
+configuration.
 
 Prequisities
 ============
-All libraries listed below must be installed with development headers. It's better to install them using your linux's distribution package management system, instead of downloading directly from the website.
+All libraries listed below must be installed with development headers. It's
+better to install them using your linux's distribution package management
+system, instead of downloading directly from the website.
 
     * boost library >=1.34 with components: date-time, filesystem, thread, regex, algorithm, foreach
     * qt3 library, including multithreading (-mt) component
@@ -29,19 +34,21 @@ optionally:
 
     * Ctags
     * Doxygen
-    * wildmagic 3.11 ─ only if you want Delaunay triangulation support in lattice model
-    * log4cxx ─ extensive logging support and debugging
-    * python-dev, python-scientific, python-matplotlib ─ for python scripting interface
+    * wildmagic 3.11 - only if you want Delaunay triangulation support in lattice model
+    * log4cxx - extensive logging support and debugging
+    * python-dev, python-scientific, python-matplotlib - for python scripting interface
 	 * gdb
 
 Installation
 ============
 
-Run this command from inside yade-0.12/ directory to install yade as a local user without root privileages:
+Run this command from inside yade-0.12/ directory to install yade as a local
+user without root privileages:
 
 	scons PREFIX=/home/username/YADE optimize=1
 
-(If you have a machine that you are the only user on, you can instead change permission on /usr/local 
+(If you have a machine that you are the only user on, you can instead change
+permission on /usr/local 
 	
 	sudo chown username: /usr/local
 
@@ -53,7 +60,9 @@ Scons takes many options, see scons -h or http://yade.wikia.com/wiki/Installatio
 
 Distribution-specific instructions
 ==================================
-(http://yade.wikia.com/wiki/Installation_of_yade_on_debian_or_kubuntu, http://yade.wikia.com/wiki/Installation_of_yade_on_fedora, http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo is more detailed)
+(http://yade.wikia.com/wiki/Installation_of_yade_on_debian_or_kubuntu,
+http://yade.wikia.com/wiki/Installation_of_yade_on_fedora,
+http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo is more detailed)
 
 Debian/Ubuntu
 -------------
