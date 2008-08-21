@@ -568,7 +568,7 @@ bool LatticeExample::generate()
 			int del3_ind[4];
 			while(del3.GetIndexSet(del3_i++,del3_ind))
 			{
-				if(shouldTerminate()) return "";
+				if(shouldTerminate()) return false;
 				setProgress((float)del3_i/(float)del3.GetSimplexQuantity());
 				shared_ptr<Body> beam;
 
@@ -591,7 +591,8 @@ bool LatticeExample::generate()
 #else
 	if(use_Delaunay) // create beams, Delaunay not avauilable
 	{
-		return "ERROR:\n\nYade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. Please disable option use_Delaunay or compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
+		message = "ERROR:\n\nYade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. Please disable option use_Delaunay or compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
+		return false;
 	}
 #endif
 	else
@@ -612,7 +613,7 @@ bool LatticeExample::generate()
 		
 		for( ; bi2!=biEnd ; ++bi2 )
 		{
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
 			Body* bodyB = (*bi2).get(); // all other nodes
 			// warning - I'm assuming that there are ONLY Nodes in the rootBody
@@ -653,7 +654,7 @@ bool LatticeExample::generate()
                 int node2Id=-1; Real len2=100000;
                 for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to find those closest to strainRecorder_node1 and strainRecorder_node2
                 {
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
                         Body* body = (*bi).get();
                         LatticeNodeParameters* node = YADE_CAST<LatticeNodeParameters*>(body->physicalParameters.get());
@@ -677,7 +678,7 @@ bool LatticeExample::generate()
                 int node4Id=-1; Real len2=100000;
                 for(  ; bi!=biEnd ; ++bi )  // loop over all nodes, to find those closest to measurePoisson_node3 and measurePoisson_node4
                 {
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
                         Body* body = (*bi).get();
                         LatticeNodeParameters* node = YADE_CAST<LatticeNodeParameters*>(body->physicalParameters.get());
@@ -698,7 +699,7 @@ bool LatticeExample::generate()
         biEnd = bc.end();
         for(  ; bi!=biEnd ; ++bi )  // loop over all newly created beams ...
         {
-		if(shouldTerminate()) return "";
+		if(shouldTerminate()) return false;
 
                 shared_ptr<Body> b = *bi;
                 rootBody->bodies->insert(b); // .. to insert them into rootBody
@@ -732,7 +733,7 @@ bool LatticeExample::generate()
 		
 		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 		{
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
 			Body* body = (*bi).get();
 			if( ! ( body->getGroupMask() & beamGroupMask ) )
@@ -752,7 +753,7 @@ bool LatticeExample::generate()
 		int current = 0;
 		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
 		{
-			if(shouldTerminate()) return "";
+			if(shouldTerminate()) return false;
 
 			if( ++current % 100 == 0 )
 			{

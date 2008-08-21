@@ -95,7 +95,13 @@ void QtFileGenerator::pbChooseClicked()
 	std::vector<string> filters;
 	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getSaveFileName(".", filters , "Choose a file to save", this->parentWidget()->parentWidget(),selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters , "Choose a file to save", 
+		#ifdef USE_WORKSPACE
+			this->parentWidget()->parentWidget()
+		#else
+			NULL
+		#endif
+	,selectedFilter );
 
 	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && fileName!="/" )
 	{
@@ -320,7 +326,13 @@ void QtFileGenerator::pbSaveClicked()
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
 	string title = "Save FileGenerator \"" + fg->getClassName() + "\" configuration";
-	string fileName = FileDialog::getSaveFileName(".", filters, title, this->parentWidget()->parentWidget(), selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters, title, 
+		#ifdef USE_WORKSPACE
+			this->parentWidget()->parentWidget()
+		#else
+			NULL
+		#endif
+	, selectedFilter );
 
 	if ( 	   fileName.size()!=0
 		&& (selectedFilter == "XML Yade File (*.xml)") 
@@ -337,7 +349,13 @@ void QtFileGenerator::pbSaveClicked()
 	}
 	else
 	{
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",this->parentWidget()->parentWidget()));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",
+		#ifdef USE_WORKSPACE
+			this->parentWidget()->parentWidget()
+		#else
+			NULL
+		#endif
+		));
 		md->exec(); 
 	}
 }

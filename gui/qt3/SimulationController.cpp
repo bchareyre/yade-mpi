@@ -200,7 +200,13 @@ void SimulationController::pbSaveClicked()
 	}
 	else
 	{
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save aborted (check file extension).",this->parentWidget()->parentWidget()));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save aborted (check file extension).",
+		#ifdef USE_WORKSPACE
+			this->parentWidget()->parentWidget()
+		#else
+			NULL
+		#endif
+		));
 		md->exec(); 
 	}
 }
