@@ -111,7 +111,10 @@ void printHelp()
 	flags=flags+"   PREFIX=" PREFIX  "\n";
 	flags=flags+"   SUFFIX=" SUFFIX "\n";
 	#ifdef YADE_DEBUG
-		flags+="   DEBUG";
+		flags+="   YADE_DEBUG (debug information)\n";
+	#endif
+	#ifdef NDEBUG
+		flags+="   NDEBUG (heavy optimizations, static_casts everywhere, asserts() are no-ops)\n";
 	#endif
 	cerr << 
 "\n" << Omega::instance().yadeVersionName << "\n\
@@ -177,7 +180,7 @@ int main(int argc, char *argv[])
 		}
 	#endif
 
-	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.11.x, beta, SVN snapshot.";
+	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.12.x, beta, SVN snapshot.";
 	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);

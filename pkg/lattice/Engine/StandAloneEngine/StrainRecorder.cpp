@@ -29,7 +29,8 @@ void StrainRecorder::postProcessAttributes(bool deserializing)
 	//	outputFile += "_"+boost::lexical_cast<std::string>(Omega::instance().getTimeStep());
 	//	std::cerr << "using dt for StrainRecorder output file: " << outputFile << "\n";
 
-		ofile.open(outputFile.c_str());
+		//ofile.open(outputFile.c_str());
+		ofile.open(outputFile.c_str(), std::ios::app);
 
 	}
 }

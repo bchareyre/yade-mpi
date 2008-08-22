@@ -198,6 +198,12 @@ LatticeExample::LatticeExample() : FileGenerator()
 	fibre_allows		 = 0.5;
 	fibre_irregularity_noUnit= 5;
 	fibre_balancing_iterations= 300;
+        // MaterialParameters of fibre bond
+        fibre_bond_longStiffness_noUnit= 0.7;         // k_l fibre bond
+        fibre_bond_bendStiffness_noUnit= 0.28;        // k_b fibre bond
+        fibre_bond_torsStiffness_noUnit= 0.28;        // k_t fibre bond
+        fibre_bond_critCompressStrain  = 100.0;       // E.c fibre bond
+        fibre_bond_critTensileStrain   = 50.0;        // E.l fibre bond
 		
 	nodeRec_A_min=Vector3r(0,0,0);
 	nodeRec_A_max=Vector3r(0,0,0);
@@ -431,6 +437,12 @@ void LatticeExample::registerAttributes()
 	REGISTER_ATTRIBUTE(fibre_allows);
 	REGISTER_ATTRIBUTE(fibre_irregularity_noUnit);
 	REGISTER_ATTRIBUTE(fibre_balancing_iterations);
+        // MaterialParameters of fibre bond
+        REGISTER_ATTRIBUTE(fibre_bond_longStiffness_noUnit);  // k_l fibre bond
+        REGISTER_ATTRIBUTE(fibre_bond_bendStiffness_noUnit);  // k_b fibre bond
+        REGISTER_ATTRIBUTE(fibre_bond_torsStiffness_noUnit);  // k_t fibre bond
+        REGISTER_ATTRIBUTE(fibre_bond_critCompressStrain);    // E.c fibre bond
+        REGISTER_ATTRIBUTE(fibre_bond_critTensileStrain);     // E.l fibre bond
 }
 
 bool LatticeExample::generate()
@@ -1788,11 +1800,11 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 			}
 			if(fibreNodes==1) // bond
 			{
-                                beam->longitudalStiffness       = bond_longStiffness_noUnit;
-                                beam->bendingStiffness          = bond_bendStiffness_noUnit;
-                                beam->torsionalStiffness	= bond_torsStiffness_noUnit;
-                                beam->criticalTensileStrain     = bond_critTensileStrain;
-                                beam->criticalCompressiveStrain = bond_critCompressStrain;
+                                beam->longitudalStiffness       = fibre_bond_longStiffness_noUnit;
+                                beam->bendingStiffness          = fibre_bond_bendStiffness_noUnit;
+                                beam->torsionalStiffness	= fibre_bond_torsStiffness_noUnit;
+                                beam->criticalTensileStrain     = fibre_bond_critTensileStrain;
+                                beam->criticalCompressiveStrain = fibre_bond_critCompressStrain;
 			}
                 }
         }

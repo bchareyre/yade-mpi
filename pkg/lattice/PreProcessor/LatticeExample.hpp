@@ -84,6 +84,12 @@ class LatticeExample : public FileGenerator
 				,fibre_allows
 				,fibre_irregularity_noUnit
 				,fibre_balancing_iterations
+                        // MaterialParameters of fibre bond
+                                ,fibre_bond_longStiffness_noUnit      // k_l fibre bond
+                                ,fibre_bond_bendStiffness_noUnit      // k_b fibre bond
+                                ,fibre_bond_torsStiffness_noUnit      // k_t fibre bond
+                                ,fibre_bond_critCompressStrain        // E.c fibre bond
+                                ,fibre_bond_critTensileStrain         // E.l fibre bond
 				
 				,fibres_total
 				,matrix_total
