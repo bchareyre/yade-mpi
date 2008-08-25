@@ -1071,7 +1071,7 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 	{0.370512,0.415453,0.055970,0.010546},
 	{-1.,-1.,-1.,-1. } /* sentinel: non-positive radius */
 };
-
+#if 0
 Real Shop::ElasticWaveTimestepEstimate(shared_ptr<MetaBody> rootBody){
 	Real minDt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
@@ -1084,6 +1084,7 @@ Real Shop::ElasticWaveTimestepEstimate(shared_ptr<MetaBody> rootBody){
 	}
 	return minDt;
 }
+#endif
 
 void Shop::GLDrawLine(Vector3r from, Vector3r to, Vector3r color){
 	glEnable(GL_LIGHTING); glColor3v(color);
@@ -1109,9 +1110,10 @@ void Shop::GLDrawText(std::string txt, Vector3r pos, Vector3r color){
 	glPopMatrix();
 
 }
-#if 0
-Real Shop::PWaveTimeStep(MetaBody* rb){
-	dt=std::numeric_limits<Real>::infinity();
+Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
+	shared_ptr<MetaBody> rb=_rb;
+	if(!rb)rb=Omega::instance().getRootBody();
+	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->physicalParameters || !b->geometricalModel) continue;
 		shared_ptr<ElasticBodyParameters> ebp=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
@@ -1122,4 +1124,3 @@ Real Shop::PWaveTimeStep(MetaBody* rb){
 	}
 	return dt;
 }
-#endif

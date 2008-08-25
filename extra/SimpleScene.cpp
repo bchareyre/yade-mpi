@@ -156,7 +156,7 @@ bool SimpleScene::generate(){
 	rootBody->bodies->insert(sphere);
 	
 	//@
-	rootBody->dt=.2*Shop::ElasticWaveTimestepEstimate(rootBody);
+	rootBody->dt=.2*Shop::PWaveTimeStep(rootBody);
 
 	//@
 	return true;

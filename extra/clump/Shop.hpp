@@ -79,9 +79,6 @@ class Shop{
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);
 
-		//! Estimate timestep based on P-wave propagation speed
-		static Real ElasticWaveTimestepEstimate(shared_ptr<MetaBody>);
-
 		static void GLDrawLine(Vector3r from, Vector3r to, Vector3r color=Vector3r(1,1,1));
 		static void GLDrawArrow(Vector3r from, Vector3r to, Vector3r color=Vector3r(1,1,1));
 		static void GLDrawText(std::string text, Vector3r pos, Vector3r color=Vector3r(1,1,1));
@@ -101,8 +98,7 @@ class Shop{
 			static Vector3r& globalStiffness(body_id_t, MetaBody* mb=NULL);
 			static Vector3r& globalRStiffness(body_id_t, MetaBody* mb=NULL);
 		};
-		#if 0
-			Real PWaveTimeStep(MetaBody* rb);
-		#endif
 
+		//! Estimate timestep based on P-wave propagation speed
+		static Real PWaveTimeStep(shared_ptr<MetaBody> rb=shared_ptr<MetaBody>());
 };

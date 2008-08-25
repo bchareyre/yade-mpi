@@ -62,5 +62,3 @@ else:
 		import yade.qt
 		yade.qt.close()
 	except ImportError: pass
-
-

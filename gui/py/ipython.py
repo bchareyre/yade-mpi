@@ -16,4 +16,4 @@ def yade_completers(self, event):
 import IPython.ipapi
 ip=IPython.ipapi.get()
 ip.set_hook('complete_command',yade_completers,re_key='.*\\b[a-zA-Z0-9_]+\[["\'][^"\'\]]*$')
-
+ip.options.profile='yade'
