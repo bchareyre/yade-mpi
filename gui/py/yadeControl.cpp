@@ -131,7 +131,27 @@ BASIC_PY_PROXY(pyInteractionGeometry,InteractionGeometry);
 BASIC_PY_PROXY(pyInteractionPhysics,InteractionPhysics);
 
 BASIC_PY_PROXY(pyGeometricalModel,GeometricalModel);
-BASIC_PY_PROXY(pyPhysicalParameters,PhysicalParameters);
+BASIC_PY_PROXY_HEAD(pyPhysicalParameters,PhysicalParameters)
+	python::list blockedDOFs_get(){
+		python::list ret;
+		#define _SET_DOF(DOF_ANY,str) if((proxee->blockedDOFs & PhysicalParameters::DOF_ANY)!=0) ret.append(str);
+		_SET_DOF(DOF_X,"x"); _SET_DOF(DOF_Y,"y"); _SET_DOF(DOF_Z,"z"); _SET_DOF(DOF_RX,"rx"); _SET_DOF(DOF_RY,"ry"); _SET_DOF(DOF_RZ,"rz");
+		#undef _SET_DOF
+		return ret;
+	}
+	void blockedDOFs_set(python::list l){
+		proxee->blockedDOFs=PhysicalParameters::DOF_NONE;
+		int len=python::len(l);
+		for(int i=0; i<len; i++){
+			string s=python::extract<string>(l[i])();
+			#define _GET_DOF(DOF_ANY,str) if(s==str) { proxee->blockedDOFs|=PhysicalParameters::DOF_ANY; continue; }
+			_GET_DOF(DOF_X,"x"); _GET_DOF(DOF_Y,"y"); _GET_DOF(DOF_Z,"z"); _GET_DOF(DOF_RX,"rx"); _GET_DOF(DOF_RY,"ry"); _GET_DOF(DOF_RZ,"rz");
+			#undef _GET_DOF
+			throw std::invalid_argument("Invalid  DOF specification `"+s+"', must be ∈{x,y,z,rx,ry,rz}.");
+		}
+	}
+BASIC_PY_PROXY_TAIL;
+
 BASIC_PY_PROXY(pyBoundingVolume,BoundingVolume);
 BASIC_PY_PROXY(pyInteractingGeometry,InteractingGeometry);
 
@@ -547,7 +567,8 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	BASIC_PY_PROXY_WRAPPER(pyGeometricalModel,"GeometricalModel");
 	BASIC_PY_PROXY_WRAPPER(pyInteractingGeometry,"InteractingGeometry");
-	BASIC_PY_PROXY_WRAPPER(pyPhysicalParameters,"PhysicalParameters");
+	BASIC_PY_PROXY_WRAPPER(pyPhysicalParameters,"PhysicalParameters")	
+		.add_property("blockedDOFs",&pyPhysicalParameters::blockedDOFs_get,&pyPhysicalParameters::blockedDOFs_set);
 	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"BoundingVolume");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionGeometry,"InteractionGeometry");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionPhysics,"InteractionPhysics");
