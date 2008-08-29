@@ -4,6 +4,18 @@
 # I doubt there functions will be useful for anyone besides me.
 #
 
+
+def plotDirections(bins=20):
+	"Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes."
+	import pylab
+	from yade import utils
+	for axis in [0,1,2]:
+		d=utils.interactionAnglesHistogram(axis,bins)
+		fc=[0,0,0]; fc[axis]=1.
+		pylab.subplot(220+axis+1,polar=True);
+		bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
+	pylab.show()
+
 def estimatePoissonYoung(principalAxis,stress=0,plot=False):
 	"""Estimate Poisson's ration given the "principal" axis of straining.
 	For every base direction, homogenized strain is computed
