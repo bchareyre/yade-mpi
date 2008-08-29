@@ -58,16 +58,23 @@ Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
  * to the plane perpendicular to axis∈[0,1,2]; the number of bins can be specified and they cover
  * the range (0,π), since interactions are bidirecional, hence periodically the same on (π,2π).
  *
- * only contacts using SpheresContactGeometry are considered.
+ * Only contacts using SpheresContactGeometry are considered.
+ * Both bodies must be in the mask (except if mask is 0, when all bodies are considered)
+ * If the projection is shorter than minProjLen, it is skipped.
+ *
+ * @todo implement groupMask
  */
-python::tuple interactionAnglesHistogram(int axis, size_t bins=20){
+python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, Real minProjLen=1e-6){
 	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
-	FOREACH(const shared_ptr<Interaction>& i, *Omega::instance().getRootBody()->transientInteractions){
-		shared_ptr<SpheresContactGeometry> scg=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry);
-		if(!scg) continue;
+	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
+		if(!i->isReal) continue;
+		if(!(mask==0 || (mask>0 && (Body::byId(i->getId1(),rb)->getGroupMask() & mask) && (Body::byId(i->getId2(),rb)->getGroupMask() & mask)))) continue;
+		shared_ptr<SpheresContactGeometry> scg=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!scg) continue;
 		Vector3r n(scg->normal); n[axis]=0.; Real nLen=n.Length();
+		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
 		Real theta=acos(n[axis2]/nLen)*(n[axis3]>0?1:-1); if(theta<0) theta+=Mathr::PI;
 		int binNo=theta/binStep;
 		cummProj[binNo]+=nLen;
@@ -76,7 +83,7 @@ python::tuple interactionAnglesHistogram(int axis, size_t bins=20){
 	for(size_t i=0; i<(size_t)bins; i++){ val.append(cummProj[i]); binMid.append(i*binStep);}
 	return python::make_tuple(binMid,val);
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,2);
+BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,3);
 
 
 BOOST_PYTHON_MODULE(_utils){
@@ -85,7 +92,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor")));
 	def("coordsAndDisplacements",coordsAndDisplacements);
 	def("setRefSe3",setRefSe3);
-	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","bins")));
+	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins")));
 }
 
 
