@@ -50,6 +50,7 @@ void NullGUI::help()
 \n\
     input:\n\
 	-f name		- specify filename to load, or filegenerator configuration file\n\
+			  (if a filegenerator then it must be the)\n\
 \n\
     output:\n\
 	-s number	- if specified, a snapshot is saved every 'number'\n\
@@ -80,6 +81,9 @@ int NullGUI::run(int argc, char* argv[])
 {
 
 	int ch;
+	std::vector<std::string> inputFiles;
+	for(int i=argc-1 ; std::string(argv[i])[0]!='-' && i>1 ; --i )
+		inputFiles.insert(inputFiles.begin(),argv[i]);
 	while( ( ch = getopt(argc,argv,"Hf:s:S:v:pm:t:g:bQ:F:") ) != -1)
 		switch(ch)
 		{
@@ -108,7 +112,14 @@ int NullGUI::run(int argc, char* argv[])
 		return loop();
 	} 
 	else // FileGenerator
-		return gen();
+	{
+		for(int i=0; i<inputFiles.size() ; ++i)
+		{
+			std::cerr << "filegenerator: \"" << inputFiles[i] << "\"";
+			file=inputFiles[i];
+			gen();
+		}
+	}
 
 	assert(false); // never reach this place
 }
@@ -168,7 +179,7 @@ int NullGUI::loop()
 			//		+ "__dt_" + lexical_cast<string>(Omega::instance().getTimeStep())
 			//		+ "__it_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 
 					+ "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 
-					+ (binary?".yade":".xml");
+					+ (binary?".xml.gz":".xml");
 				cerr << "saving snapshot: " << fileName << "   ...";
 				Omega::instance().saveSimulation(fileName);
 				cerr << " done.\n";
@@ -188,9 +199,10 @@ int NullGUI::loop()
 int NullGUI::gen()
 {
 	if(snapshotName.empty())
-		std::cerr << "please specufy output file name with -S\n", exit(0);
+		std::cerr << "please specufy output file name with -S\n"
+		"(if output file is specified inside generator config, then specify \"none\")\n", exit(0);
 	if(file.empty())
-		std::cerr << "please specufy config file name with -f\n", exit(0);
+		std::cerr << "please specify config file name with -f\n", exit(0);
 	boost::shared_ptr<Factorable> tmpf;
 	try
 	{
@@ -212,11 +224,14 @@ int NullGUI::gen()
 	{
 		std::cerr << file << " cannot be loaded: " << e.what() << "\n", exit(0);
 	}
+	if(snapshotName=="none")
+		std::cerr << "filegenerator output name set to \"none\" - using default output name.\n";
+	else
+		f->setFileName(snapshotName + (binary?".xml.gz":".xml"));
 	std::cerr	<< "calling FileGenerator: " << filegen 
 			<< ",\nwith config file: " << file 
-			<< ",\nto generate file: " << snapshotName << (binary?".yade":".xml") << "\n\n";
-	f->setFileName(snapshotName + (binary?".yade":".xml"));
-	f->setSerializationLibrary((binary?"BINFormatManager":"XMLFormatManager"));
+			<< ",\nto generate file: " << f->getFileName() << "\n\n";
+	f->setSerializationLibrary("XMLFormatManager");
 	std::cerr << "\n" << f->generateAndSave() << "\n";
 	return 0;
 };
