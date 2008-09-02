@@ -169,6 +169,8 @@ void GLViewer::setState(string state){
 
 void GLViewer::keyPressEvent(QKeyEvent *e)
 {
+	last_user_event = boost::posix_time::second_clock::local_time();
+
 	if(false){}
 	/* special keys: Escape and Space */
 	else if(e->key()==Qt::Key_Escape){ resetManipulation(); displayMessage("Manipulating scene."); }
@@ -496,12 +498,24 @@ void GLViewer::closeEvent(QCloseEvent *e){
 	YadeQtMainWindow::self->closeView(this);
 }
 
+void GLViewer::mouseMoveEvent(QMouseEvent *e){
+	last_user_event = boost::posix_time::second_clock::local_time();
+	QGLViewer::mouseMoveEvent(e);
+}
+
+void GLViewer::mousePressEvent(QMouseEvent *e){
+	last_user_event = boost::posix_time::second_clock::local_time();
+	QGLViewer::mousePressEvent(e);
+}
+
 /* Handle double-click event; if clipping plane is manipulated, align it with the global coordinate system.
  * Otherwise pass the event to QGLViewer to handle it normally.
  *
  * mostly copied over from ManipulatedFrame::mouseDoubleClickEvent
  */
 void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
+	last_user_event = boost::posix_time::second_clock::local_time();
+
 	if(manipulatedClipPlane<0) { /* LOG_DEBUG("Double click not on clipping plane"); */ QGLViewer::mouseDoubleClickEvent(event); return; }
 #if QT_VERSION >= 0x040000
 	if (event->modifiers() == Qt::NoModifier)
@@ -516,6 +530,8 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
 }
 
 void GLViewer::wheelEvent(QWheelEvent* event){
+	last_user_event = boost::posix_time::second_clock::local_time();
+
 	if(manipulatedClipPlane<0){ QGLViewer::wheelEvent(event); return; }
 	assert(manipulatedClipPlane<renderer->clipPlaneNum);
 	float distStep=1e-3*sceneRadius();
@@ -553,4 +569,6 @@ void GLViewer::initFromDOMElement(const QDomElement& element){
 		child = child.nextSibling().toElement();
 	}
 }
+
+boost::posix_time::ptime GLViewer::getLastUserEvent(){return last_user_event;};
 

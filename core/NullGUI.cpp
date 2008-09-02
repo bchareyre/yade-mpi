@@ -50,7 +50,8 @@ void NullGUI::help()
 \n\
     input:\n\
 	-f name		- specify filename to load, or filegenerator configuration file\n\
-			  (if a filegenerator then it must be the)\n\
+			  (if a filegenerator then it must be a last parameter\n\
+			  and multiple filegenerators are allowed)\n\
 \n\
     output:\n\
 	-s number	- if specified, a snapshot is saved every 'number'\n\

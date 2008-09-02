@@ -29,6 +29,7 @@ if 'qt3' not in env['exclude']:
 				'yade-serialization',
 				'XMLFormatManager',
 				'yade-serialization-qt',
+				'GravityEngines',
 				'OpenGLRenderingEngine',
 				'PositionOrientationRecorder',
 				'sqlite3x',

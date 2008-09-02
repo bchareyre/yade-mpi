@@ -72,6 +72,9 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void sbRefreshValueChanged(int);
 		virtual void cbSyncToggled(bool);
 		virtual void pbStart2Clicked();
+		virtual void pbXYZ_clicked();
+		virtual void pbYZX_clicked();
+		virtual void pbZXY_clicked();
 
 
 

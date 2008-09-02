@@ -6,6 +6,7 @@
 #include<yade/pkg-common/OpenGLRenderingEngine.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 #include<yade/lib-QGLViewer/constraint.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include<set>
 
 /*! Class handling user interaction with the openGL rendering of simulation.
@@ -47,6 +48,7 @@ class GLViewer : public QGLViewer
 		set<int> boundClipPlanes;
 		shared_ptr<qglviewer::LocalConstraint> xyPlaneConstraint;
 		string strBoundGroup(){string ret;FOREACH(int i, boundClipPlanes) ret+=" "+lexical_cast<string>(i+1);return ret;}
+		boost::posix_time::ptime last_user_event;
 
      public :
 
@@ -82,6 +84,8 @@ class GLViewer : public QGLViewer
 		void initFromDOMElement(const QDomElement& element);
 		int viewId;
 
+		boost::posix_time::ptime getLastUserEvent();
+
 
 		DECLARE_LOGGER;
 	protected :
@@ -92,4 +96,6 @@ class GLViewer : public QGLViewer
 		virtual void endSelection(const QPoint &point);
 		virtual void mouseDoubleClickEvent(QMouseEvent *e);
 		virtual void wheelEvent(QWheelEvent* e);
+		virtual void mouseMoveEvent(QMouseEvent *e);
+		virtual void mousePressEvent(QMouseEvent *e);
 };

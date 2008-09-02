@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>261</width>
-            <height>470</height>
+            <width>269</width>
+            <height>519</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -38,90 +38,98 @@
         </property>
         <widget class="QLayoutWidget" row="0" column="0">
             <property name="name">
-                <cstring>layout11</cstring>
+                <cstring>layout9</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>labelRealTime</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>real 0:00:00.000</string>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>labelSimulTime</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>virt 00:000.000m000u000n</string>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>labelIter</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>iter #0, 0/s</string>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>labelStep</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>step 4e-3</string>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget" row="1" column="0">
+            <property name="name">
+                <cstring>layout12</cstring>
             </property>
             <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLayoutWidget" row="0" column="0">
+                <widget class="QPushButton" row="1" column="1">
                     <property name="name">
-                        <cstring>layout9</cstring>
+                        <cstring>pbReference</cstring>
                     </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="spacing">
-                            <number>0</number>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelRealTime</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>real 0:00:00.000</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelSimulTime</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>virt 00:000.000m000u000n</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelIter</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>iter #0, 0/s</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>labelStep</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>step 4e-3</string>
-                            </property>
-                        </widget>
-                    </vbox>
+                    <property name="text">
+                        <string>Reference</string>
+                    </property>
                 </widget>
-                <widget class="QTabWidget" row="1" column="0">
+                <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
                     <property name="name">
                         <cstring>tabWidget</cstring>
                     </property>
@@ -626,58 +634,124 @@
                         </grid>
                     </widget>
                 </widget>
-                <widget class="QLayoutWidget" row="2" column="0">
+                <widget class="QPushButton" row="2" column="0">
                     <property name="name">
-                        <cstring>layout8</cstring>
+                        <cstring>pbXYZ</cstring>
                     </property>
-                    <grid>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QPushButton" row="0" column="1">
-                            <property name="name">
-                                <cstring>pbReference</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Reference</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="2">
-                            <property name="name">
-                                <cstring>pbCenterScene_2</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>7</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>Center</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="0">
-                            <property name="name">
-                                <cstring>pbNewView_2</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>true</bool>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>7</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="text">
-                                <string>New 3D</string>
-                            </property>
-                        </widget>
-                    </grid>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>25</height>
+                        </size>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap>image5</pixmap>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="2">
+                    <property name="name">
+                        <cstring>pbZXY</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>25</height>
+                        </size>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap>image6</pixmap>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>pbYZX</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>3</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>25</height>
+                        </size>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="pixmap">
+                        <pixmap>image7</pixmap>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="2">
+                    <property name="name">
+                        <cstring>pbCenterScene_2</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Center</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>pbNewView_2</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>New 3D</string>
+                    </property>
                 </widget>
             </grid>
         </widget>
@@ -698,6 +772,15 @@
     </image>
     <image name="image4">
         <data format="PNG" length="160">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000006749444154388dadccd10d80300c03d1947118a1fbcb23b00e2c4013dbc9fd9ef4168098eecae6def73b8eba70893a3085aa308d2ab084b2b08c32b08556b08d66700b3dc16d1478d628fa07b6d01368a31968a11528a30c28a12c48a30a48a12a58a20e1811f101d3512a7c38fee1ac0000000049454e44ae426082</data>
+    </image>
+    <image name="image5">
+        <data format="PNG" length="409">89504e470d0a1a0a0000000d49484452000000280000002808060000008cfeb86d00000160494441545885edd8cf2a05511cc0f1cf95c80bb0916c9462c1d2c20b7801b6ec59515e025bb628af203b6b65cfe6a2946c08c502d762ce2dae3b7f34cc8c9a6ffdea77a6697edf39bf9973eaf095135ca211e22a5cab0c4b686106b3215f2c53a8d1311ec03576d187790ce3b960af44364592b7d828d9a52b63a2d6b6425e49da82a5d353b6401a9517fcd7d4df60163a17ea36ad0cf71442e567b0f282dddad7ede728adcd959fc124ea65260bb5605e6ac1bcd48279a905f3d2de637fb26b94b22f67152c7cfbeb6c712b26fe924334d11fa219ae7d13eb644874c27096725f1a692f398157ac622de4136982bd38c63dc67f4930a923dbb80bb113f790cf6ce10d73198ae589368378c0a3a87389820b61bc9ee145b290650647f01262344970124f3848289647308e3ddc84d84f2a7c8e53d139e16f09a63185772c6325e4d37185d3be95bf103cc285e8c0b42fe44771826914be50f79659bca6083e00acfe78c833f5cc8f0000000049454e44ae426082</data>
+    </image>
+    <image name="image6">
+        <data format="PNG" length="435">89504e470d0a1a0a0000000d49484452000000280000002808060000008cfeb86d0000017a494441545885edd83f6a1b411480f19f8250e20b5827100494c22e5df8023e415aa74f2a1b7289fca98c5ddbe02b1877ae0de99d4689c1100c714292328952684416696777c55a9a35ec07034fc3e3e99b3768060df39c6184c7618cc25c6318e237f6b01fe26152a31c0ef12d8ca3c42eb9ace3077ea29f52a41b997f825e88d756e4b210c7f812c64962973936f0172ff12ac49b498d6638c727932dee85f83ca1cfc3659c5a001ea51628a313991f57c859098def60e305f3b62fefc7916c9b1bdfc122da63a60aad605d5ac1bab482756905eb32bd6317b93592dccb5505577efde56df1253e9b74aa83eb30b72cc691319734e545f8bc85ed10efe6e42d2a50853e6e705524b8863bbcc701befaffba504730da9d401717f88ea74582f0d66425b77853f26575469677f8839dd82ab30c324506057955a8d2c1e761fe75519158e1b2bc4504f378865f382d2b122b5c9657978ff820f28a963da8670fe0f14c4e2caf2eb14577aa24552db634b20f988df893d472dffc03abb374caa8555fb90000000049454e44ae426082</data>
+    </image>
+    <image name="image7">
+        <data format="PNG" length="434">89504e470d0a1a0a0000000d49484452000000280000002808060000008cfeb86d00000179494441545885edd8b14a1c4118c0f1df8928be8076218d2068114b0b5fc027486b7a5345c84b68ac24d60a798560672df800369a4040021ad11416ea59ec1c6c74766f8e3d7737b07ff860f8e6dbbbffceccceb0dbf3927e2407bd82fcab3219c9e545e67082bff5e88cc6248e708d85865da27cc103d69a1689f15eb6163f372d126349b6e6be352d52c4a9ecc198695a84f8d6d1aa6de6bfa668246b65a269816114adab7e424d2db47e045b2f98bacd3436cdad1fc132ba6d26854eb02a9d60553ac1aa748255199cb1a39c1a8d9ccba982b51f7fb129fe8e334c87380bb9d7e2183f6433d3c3cf90fb87fcc82ce21e9fb019da8b91ba54fa43aefb10fa57b01adaeb6582f0157f42ec95d48d22988f3c33b8c20e767129f24efefca259dce056f685abeccfaac4806dfcc26f6c15dd659e37b80bf1b6a42e85612308f3b9bef914c17d5c843818a3604a5d61e7807778c4063e86f67205c15492050f718ea910e721f7bc6edc240b0efb915ac97fa36ec54b52c7b879020c2e72e95070cdb80000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -797,6 +880,24 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbReferenceClicked()</slot>
     </connection>
+    <connection>
+        <sender>pbXYZ</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbXYZ_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbYZX</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbYZX_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>pbZXY</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbZXY_clicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
@@ -827,6 +928,9 @@
     <slot>closeGLViewEvent( int )</slot>
     <slot>pbReference_clicked()</slot>
     <slot>pbReferenceClicked()</slot>
+    <slot>pbXYZ_clicked()</slot>
+    <slot>pbYZX_clicked()</slot>
+    <slot>pbZXY_clicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

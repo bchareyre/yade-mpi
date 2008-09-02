@@ -23,7 +23,9 @@
 #include <qpixmap.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
+#include <yade/pkg-common/GravityEngines.hpp>
 
 
 using namespace std;
@@ -96,7 +98,7 @@ void YadeQtMainWindow::redrawAll(bool force){
 	}
 }
 
-void YadeQtMainWindow::loadSimulation(string file){createController();	controller->loadSimulationFromFileName(file);}
+void YadeQtMainWindow::loadSimulation(string file){createController();	controller->loadSimulationFromFileName(file); lookDown(glViews[0]);}
 void YadeQtMainWindow::centerViews(){FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->centerScene(); }}
 
 
@@ -150,11 +152,43 @@ void YadeQtMainWindow::createView(){
 	glv->setCamera(new YadeCamera);
 	glv->camera()->frame()->setWheelSensitivity(-1.0f);
 	glv->camera()->setUpVector(qglviewer::Vec(0,0,1));
-	glv->camera()->setViewDirection(qglviewer::Vec(-1,0,0));
-	glv->centerScene();
+	glv->camera()->setViewDirection(qglviewer::Vec(-1,-1,-1));
+	lookDown(glv);
 	glViews.push_back(glv);
 	//connect( glv, SIGNAL(closeSignal(int)), this, SLOT( closeGLViewEvent(int) ) );
 }
+
+void YadeQtMainWindow::lookDown(shared_ptr<GLViewer> glv)
+{
+	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false );
+	if(hasSimulation)
+	{	
+		Vector3r g(0,0,1);
+		FOREACH(const shared_ptr<Engine>& e,Omega::instance().getRootBody()->engines){
+			if(e && e->getClassName()=="GravityEngine")  
+				g = -1.0*(dynamic_cast<GravityEngine*>(e.get()))->gravity;
+		}
+		glv->camera()->setUpVector(qglviewer::Vec(g[0],g[1],g[2]));
+	} else {
+		glv->camera()->setUpVector(qglviewer::Vec(0,0,1));
+	}
+	glv->camera()->setViewDirection(qglviewer::Vec(-1,-1,-1));
+	glv->centerScene();
+};
+		
+void YadeQtMainWindow::adjustCameraInCurrentView(qglviewer::Vec up,qglviewer::Vec dir)
+{
+	boost::posix_time::ptime last(boost::posix_time::second_clock::local_time()-boost::posix_time::hours(1000));
+	FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) last=std::max(last,glv->getLastUserEvent()); }
+	FOREACH(const shared_ptr<GLViewer>& glv,glViews){ 
+		if(glv && glv->getLastUserEvent()>=last)
+		{
+			glv->camera()->setUpVector(up);
+			glv->camera()->setViewDirection(dir);
+			glv->centerScene();
+		}
+	}
+};
 
 void YadeQtMainWindow::closeView(GLViewer* glv){
 	for(size_t i=0; i<glViews.size(); i++){

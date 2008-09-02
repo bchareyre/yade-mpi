@@ -36,8 +36,10 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		void closeView(GLViewer*);
 		void closeView(int);
 		void centerViews();
+		void adjustCameraInCurrentView(qglviewer::Vec up,qglviewer::Vec dir);
 		void loadSimulation(string file);
 		void redrawAll(bool force=false);
+		void lookDown(shared_ptr<GLViewer> glv);
 
 	protected :
 		shared_ptr<QtGUIPreferences> preferences;

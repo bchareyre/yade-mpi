@@ -94,7 +94,23 @@ void SimulationController::restartTimer()
 void SimulationController::pbApplyClicked()
 {
 	guiGen.deserialize(YadeQtMainWindow::self->renderer);
+	YadeQtMainWindow::self->redrawAll(true);
 }
+		
+void SimulationController::pbXYZ_clicked()
+{
+	YadeQtMainWindow::self->adjustCameraInCurrentView(qglviewer::Vec(0,1,0),qglviewer::Vec(0,0,-1));
+};
+
+void SimulationController::pbYZX_clicked()
+{
+	YadeQtMainWindow::self->adjustCameraInCurrentView(qglviewer::Vec(0,0,1),qglviewer::Vec(-1,0,0));
+};
+
+void SimulationController::pbZXY_clicked()
+{
+	YadeQtMainWindow::self->adjustCameraInCurrentView(qglviewer::Vec(1,0,0),qglviewer::Vec(0,-1,0));
+};
 
 
 void SimulationController::pbLoadClicked()
