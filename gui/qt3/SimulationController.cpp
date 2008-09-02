@@ -84,7 +84,11 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 }
 
 /* restart timer with SimulationController::refreshTime */
-void SimulationController::restartTimer(){ killTimer(updateTimerId); updateTimerId=startTimer(refreshTime); }
+void SimulationController::restartTimer()
+{ 
+	killTimer(updateTimerId); 
+	updateTimerId=startTimer(refreshTime); 
+}
 
 
 void SimulationController::pbApplyClicked()
@@ -225,12 +229,24 @@ void SimulationController::pbStartClicked(){
 	else Omega::instance().startSimulationLoop();
 }
 
-void SimulationController::cbSyncToggled(bool b){	sync=b; if(sync && refreshTime<20) refreshTime=20; pbStopClicked(); pbStartClicked(); }
-void SimulationController::timerEvent( QTimerEvent* ){
+void SimulationController::cbSyncToggled(bool b)
+{	
+	sync=b; 
+	if(sync && refreshTime<20) 
+		refreshTime=20; 
+	pbStopClicked(); 
+	pbStartClicked(); 
+}
+
+void SimulationController::timerEvent( QTimerEvent* )
+{
 	doUpdate(); /* update the controller, like iteration number etc */
-	/* update GLViews */
-	YadeQtMainWindow::self->redrawAll(true);
-	if(sync && syncRunning){ Omega::instance().spawnSingleSimulationLoop(); }
+	if(hasSimulation && (Omega::instance().isRunning() || syncRunning))
+	{
+		/* update GLViews */
+		YadeQtMainWindow::self->redrawAll(true);
+		if(sync && syncRunning){ Omega::instance().spawnSingleSimulationLoop(); }
+	}
 }
 
 void SimulationController::pbResetClicked()
@@ -386,8 +402,8 @@ void SimulationController::doUpdate(){
 	//cerr<<"dt="<<dt<<",exp10="<<exp10<<",10^exp10="<<pow((float)10,exp10)<<endl;
 
 	/* enable/disable controls here, dynamically */
-	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false ),
-		isRunning=Omega::instance().isRunning() || syncRunning,
+	hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false );
+	bool	isRunning=Omega::instance().isRunning() || syncRunning,
 		hasTimeStepper=Omega::instance().containTimeStepper(),
 		usesTimeStepper=Omega::instance().timeStepperActive(),
 		hasFileName=(Omega::instance().getSimulationFileName()!="");

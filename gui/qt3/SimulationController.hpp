@@ -33,6 +33,7 @@ class SimulationController : public QtGeneratedSimulationController
 		int updateTimerId;
 		bool sync;
 		bool syncRunning;
+		bool hasSimulation;
 
 		const int iterPerSec_TTL_ms;
 		long  iterPerSec_LastIter;
