@@ -151,7 +151,9 @@ int NullGUI::loop()
 	cerr << "Using timestep: " << Omega::instance().getTimeStep() << endl;
 
 	filesystem::path p(snapshotName);
-	snapshotName = filesystem::basename(p);
+	if(filesystem::extension(p)==".gz")
+		p = filesystem::basename(p); // get rid of .gz
+	snapshotName = filesystem::basename(p); // get rid of .xml
 	if( snapshotInterval != -1 )
 		cerr 	<< "Saving snapshot every " << snapshotInterval*interval << " iterations, \n"
 			<< "to filename: " << snapshotName << "_[0-9]" << endl;
