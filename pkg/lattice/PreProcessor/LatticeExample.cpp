@@ -825,8 +825,8 @@ bool LatticeExample::generate()
 	     + "Number of beams: " + lexical_cast<string>(bc.size()) + "\n"
 	     + "Fibres total: " + lexical_cast<string>(fibres_total) + "\n"
 	     + "Matrix beams total: " + lexical_cast<string>(matrix_total) + "\n"
-	     + "Fibres/matrix %: " + lexical_cast<string>(100.0*fibres_total/matrix_total) + "\n"
-	     + "Fibres/all beams %: " + lexical_cast<string>(100.0*fibres_total/beam_total) + "\n"
+//	     + "Fibres/matrix %: " + lexical_cast<string>(100.0*fibres_total/matrix_total) + "\n"
+	     + "Fibres/all other beams %: " + lexical_cast<string>(100.0*fibres_total/(beam_total-fibres_total)) + "\n"
 	     + "\nNOTE: sometimes it can look better when 'drawWireFrame' is enabled in Display tab.";
 
         cerr << "finished.. saving\n" << message << "\n";
@@ -1681,6 +1681,27 @@ void LatticeExample::makeFibres()
 							dir.Normalize();
 						}
 						d += dir * 1/(r*r);
+
+						// strong repulsion when they are intersecting (2D only)
+						if(px==0 && py==0 && AGGREGATES_Z==0 && r<beams_per_fibre*cellsizeUnit_in_meters)
+						{//stupid brute-force method
+							bool overlaps=false;
+							Vector3r start_i(fibres[i].first);
+							Vector3r delta_i(fibres[i].second);
+
+							Vector3r start_j(fibres[j].first);
+							Vector3r delta_j(fibres[j].second);
+
+							for(int I=0 ; I<beams_per_fibre ; ++I)
+								for(int J=0 ; J<beams_per_fibre ; ++J)
+								{
+									float dist = ((start_i+delta_i*I) - (start_j+delta_j*J)).Length();
+									if(dist < cellsizeUnit_in_meters*10.0)
+										overlaps=true;
+								}
+							if(overlaps)
+								d += (dir * 1/(r*r))*10;
+						}
 					}
 			}
 			// repulsion from walls.
@@ -1722,15 +1743,17 @@ void LatticeExample::makeFibres()
 		setProgress(1.0*frame/(1.0*fibre_balancing_iterations));
 	}
 
+/*
 	for(unsigned int i = 0 ; i < fibres.size() ; ++i )
 		fibres[i].first+=Vector3r(random1()-0.5, random1()-0.5, ((AGGREGATES_Z==0)?(0):(random1()-0.5)) )*fibre_irregularity_noUnit*cellsizeUnit_in_meters;
+*/
 }
 
 
 int LatticeExample::isFibre(Vector3r a,Vector3r b)
 {
-	int A=0;
-	int B=0;
+	int A=-1;
+	int B=-1;
 	for(int i = 0 ; i < fibre_count ; ++i)
         {
 		Vector3r pos = fibres[i].first;
@@ -1741,11 +1764,15 @@ int LatticeExample::isFibre(Vector3r a,Vector3r b)
 				pos[0] + 1.0*j*del[0],
 				pos[1] + 1.0*j*del[1],
 				pos[2] + 1.0*j*del[2] );
-			if(p == a) A=1;
-			if(p == b) B=1;
+			if(p == a) A=i;
+			if(p == b) B=i;
 		}
 	}
-	return A + B;
+	if(A+B==-2)
+		return 0;
+	if(A==B)
+		return 2;
+	return 1;
 }
 
 bool LatticeExample::fibreAllows(Vector3r a)
@@ -1753,8 +1780,8 @@ bool LatticeExample::fibreAllows(Vector3r a)
 	for(int i = 0 ; i < fibre_count ; ++i)
         {
 		Vector3r pos = fibres[i].first;
-		Vector3r del = fibres[i].second;
-		for(int j = 0 ; j < beams_per_fibre ; ++j)
+		Vector3r del = fibres[i].second / 3.0;
+		for(int j = 0 ; j < beams_per_fibre * 3 ; ++j)
 		{
 			Vector3r p(
 				pos[0] + 1.0*j*del[0],

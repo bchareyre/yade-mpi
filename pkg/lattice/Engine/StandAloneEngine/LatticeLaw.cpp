@@ -288,7 +288,7 @@ void LatticeLaw::action(MetaBody* lattice)
 		{ // 'E_min' 'E_max' criterion
 			if( deleteBeam(lattice , beam, body) ) // calculates strain
 			{
-				std::cerr << "one beam deleted\n";
+//				std::cerr << "one beam deleted\n";
 				futureDeletes.push_back(body->getId());
 				continue;
 			}
