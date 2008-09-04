@@ -95,7 +95,8 @@ class TriaxialTest : public FileGenerator
 				,boxWalls
 				//! flag for choosing between moving boundaries or increasing particles sizes during the compaction stage.
 				,internalCompaction
-				,saveAnimationSnapshots;
+				,saveAnimationSnapshots
+				,biaxial2dTest;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval

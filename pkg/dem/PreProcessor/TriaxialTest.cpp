@@ -23,6 +23,7 @@
 #include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
+#include<yade/pkg-dem/MakeItFlat.hpp>
 
 #include<yade/pkg-dem/AveragePositionRecorder.hpp>
 #include<yade/pkg-dem/ForceRecorder.hpp>
@@ -155,6 +156,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	sigmaLateralConfinement=sigmaIsoCompaction;
 
 	wallOversizeFactor=1.3;
+
+	biaxial2dTest=false;
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -182,6 +185,7 @@ void TriaxialTest::registerAttributes()
 	//REGISTER_ATTRIBUTE(nlayers);
 	//REGISTER_ATTRIBUTE(boxWalls);
 	REGISTER_ATTRIBUTE(internalCompaction);
+	REGISTER_ATTRIBUTE(biaxial2dTest);
 	REGISTER_ATTRIBUTE(maxMultiplier);
 	REGISTER_ATTRIBUTE(finalMaxMultiplier);
 
@@ -250,6 +254,12 @@ bool TriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	message="";
+	
+	if(biaxial2dTest && (8.0*(upperCorner[2]-lowerCorner[2]))>(upperCorner[0]-lowerCorner[0]))
+	{
+		message="Biaxial test can be generated only if Z size is more than 8 times smaller than X size";
+		return false;
+	}
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -593,12 +603,16 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
 // recording global stress
-	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
-	TriaxialStateRecorder);
+	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
 	triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
 	triaxialStateRecorder-> interval 		= recordIntervalIter;
 	//triaxialStateRecorderer-> thickness 		= thickness;
-	
+
+	shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
+	makeItFlat->direction=2;
+	makeItFlat->plane_position = (lowerCorner[2]+upperCorner[2])*0.5;
+	makeItFlat->reset_force = false;	
+
 	#if 0	
 	// moving walls to regulate the stress applied
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
@@ -632,6 +646,8 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(gravityCondition);
 	
 	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
+
+	if(biaxial2dTest) rootBody->engines.push_back(makeItFlat);
 	
 	//if(!rotationBlocked)
 	//	rootBody->engines.push_back(orientationIntegrator);

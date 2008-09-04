@@ -23,6 +23,10 @@ class MakeItFlat : public DeusExMachina
 		virtual ~MakeItFlat();
 	
 		virtual void applyCondition(MetaBody*);
+
+		int direction;
+		Real plane_position;
+		bool reset_force;
 	
 	protected :
 		virtual void registerAttributes();

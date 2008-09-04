@@ -637,6 +637,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SimpleElasticRelationships',
 			'ElasticCriterionTimeStepper',
 			'PhysicalActionVectorVector',
+			'MakeItFlat',
 			'InteractionVecSet',
 			'InteractionHashMap',
 			'BodyRedirectionVector',

@@ -281,7 +281,7 @@ void SimulationController::pbResetClicked()
 		Omega::instance().setSimulationFileName(name);
 		pbResetSimulation->setEnabled(true);
 	}
-
+	YadeQtMainWindow::self->redrawAll(true);
 //	pbCenterSceneClicked();  // FIXME - add autocenter option...
 }
 

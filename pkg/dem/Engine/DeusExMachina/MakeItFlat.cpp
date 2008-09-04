@@ -13,6 +13,9 @@
 
 MakeItFlat::MakeItFlat() : actionParameterForce(new Force)
 {
+	direction=1;
+	plane_position=0;
+	reset_force=true;
 }
 
 
@@ -23,14 +26,16 @@ MakeItFlat::~MakeItFlat()
 
 void MakeItFlat::registerAttributes()
 {
-	// REGISTER_ATTRIBUTE(hydraulicForce);
+	REGISTER_ATTRIBUTE(direction);
+	REGISTER_ATTRIBUTE(plane_position);
+	REGISTER_ATTRIBUTE(reset_force);
 }
 
 
 void MakeItFlat::applyCondition(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
+
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for( ; bi!=biEnd ; ++bi )
@@ -46,14 +51,15 @@ void MakeItFlat::applyCondition(MetaBody* ncb)
 
 		if(b->geometricalModel->getClassName()=="Sphere")
 		{
-		ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
-		if (p)
-		{
-			p->se3.position[1]=0;
-			static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force[1]=0;// 
+			ParticleParameters* p = dynamic_cast<ParticleParameters*>(b->physicalParameters.get());
+			if (p)
+			{
+				p->se3.position[direction]=plane_position;
+				if(reset_force)
+					static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force[direction]=0;// 
+			}
 		}
-		}
-        }
+	}
 }
 
 YADE_PLUGIN();
