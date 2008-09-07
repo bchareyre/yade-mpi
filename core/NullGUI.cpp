@@ -114,7 +114,7 @@ int NullGUI::run(int argc, char* argv[])
 	} 
 	else // FileGenerator
 	{
-		for(unsigned int i=0; i<inputFiles.size() ; ++i)
+		for(size_t i=0; i<inputFiles.size() ; ++i)
 		{
 			std::cerr << "filegenerator: \"" << inputFiles[i] << "\"";
 			file=inputFiles[i];

@@ -33,6 +33,13 @@ class Interaction : public Serializable
 		body_id_t getId1() {return id1;};
 		body_id_t getId2() {return id2;};
 
+		#if 0
+			//! Whether both bodies involved in interaction satisfies given mask; provide rootBody for faster lookup
+			bool maskBothOK(int mask, MetaBody* rootBody=NULL){return (mask==0) || (Body::byId(id1,rootBody)->maskOK(mask) && Body::byId(id2,rootBody)->maskOK(mask));}
+			//! Whether at least one body in interaction satisfies given mask; provide rootBody for faster lookup
+			bool maskAnyOK(int mask, MetaBody* rootBody=NULL){return (mask==0) || Body::byId(id1,rootBody)->maskOK(mask) || Body::byId(id2,rootBody)->maskOK(mask);}
+		#endif
+
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(Interaction);

@@ -7,7 +7,9 @@
 #include<cmath>
 using namespace boost::python;
 
-python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0],v[1],v[2]);};
+python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0],v[1],v[2]);}
+Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])(),extract<double>(t[1])(),extract<double>(t[2])());}
+bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
 /* \todo implement groupMask */
 python::tuple aabbExtrema(){
@@ -35,14 +37,18 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2);
 
-python::tuple coordsAndDisplacements(int axis){
+python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()){
+	Vector3r bbMin,bbMax; bool useBB=python::len(AABB)>0;
+	if(useBB){bbMin=tuple2vec(extract<python::tuple>(AABB[0])());bbMax=tuple2vec(extract<python::tuple>(AABB[1])());}
 	python::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getRootBody()->bodies){
+		if(useBB && !isInBB(b->physicalParameters->se3.position,bbMin,bbMax)) continue;
 		retCoord.append(b->physicalParameters->se3.position[axis]);
 		retDispl.append(b->physicalParameters->se3.position[axis]-b->physicalParameters->refSe3.position[axis]);
 	}
 	return python::make_tuple(retCoord,retDispl);
 }
+BOOST_PYTHON_FUNCTION_OVERLOADS(coordsAndDisplacements_overloads,coordsAndDisplacements,1,2);
 
 void setRefSe3(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
@@ -90,7 +96,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("PWaveTimeStep",PWaveTimeStep);
 	def("aabbExtrema",aabbExtrema);
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor")));
-	def("coordsAndDisplacements",coordsAndDisplacements);
+	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB")));
 	def("setRefSe3",setRefSe3);
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins")));
 }

@@ -61,9 +61,8 @@ class Body : public Serializable
 
 		body_id_t getId() const {return id;};
 
-		// FIXME - but we SHOULDN'T use them in InteractionSolver, because it allows
-		//         to have flat simulation. We should make tree simulation and see...
 		int getGroupMask() {return groupMask; };
+		bool maskOk(int mask){return (mask==0 || (groupMask&mask));}
 
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;

@@ -16,7 +16,7 @@ def plotDirections(mask=0,bins=20):
 		bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
 	pylab.show()
 
-def estimatePoissonYoung(principalAxis,stress=0,plot=False):
+def estimatePoissonYoung(principalAxis,stress=0,plot=False,keepRatio=1.):
 	"""Estimate Poisson's ration given the "principal" axis of straining.
 	For every base direction, homogenized strain is computed
 	(slope in linear regression on discrete function particle coordinate →
@@ -26,12 +26,20 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False):
 
 	Young's modulus is computed as σ/ε₀; if stress σ is not given (default 0),
 	the result is 0.
+
+	keepRatio, if < 1., will take only smaller part (centered) or the specimen into account
 	"""
 	dd=[] # storage for linear regression parameters
 	import pylab,numpy,stats
 	from yade import utils
+	if keepRatio<1.:
+		aabb=utils.aabbExtrema(); half=[.5*(aabb[1][i]-aabb[0][i]) for i in [0,1,2]]
+		cut=(tuple([aabb[0][i]+(1.-keepRatio)*half[i] for i in [0,1,2]]),tuple([aabb[1][i]-(1.-keepRatio)*half[i] for i in [0,1,2]]))
 	for axis in [0,1,2]:
-		w,dw=utils.coordsAndDisplacements(axis)
+		if keepRatio<1.:
+			w,dw=utils.coordsAndDisplacements(axis,AABB=cut)
+		else:
+			w,dw=utils.coordsAndDisplacements(axis)
 		l,ll=stats.linregress(w,dw)[0:2] # use only tangent and section
 		dd.append((l,ll,min(w),max(w)))
 		if plot: pylab.plot(w,dw,'.',label='xyz'[axis])
@@ -67,7 +75,7 @@ def oofemTextExport():
 
 	ph=o.interactions.nth(0).phys # some params are the same everywhere
 	material.append("%g %g"%(ph['E'],ph['G']))
-	material.append("%g %g %g %g"%(ph['epsCrackOnset'],ph['epsFracture'],ph['expBending'],ph['xiShear']))
+	material.append("%g %g %g %g"%(ph['epsCrackOnset'],ph['epsFracture'],1e50,ph['xiShear']))
 	material.append("%g %g"%(ph['undamagedCohesion'],ph['tanFrictionAngle']))
 
 	# need strainer for getting bodies in positive/negative boundary

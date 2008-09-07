@@ -145,12 +145,12 @@ int main(int argc, char *argv[])
 
 	string configPath=string(getenv("HOME")) + "/.yade" SUFFIX; // this is the default, may be overridden by -c / -C
 	
-	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true;
+	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
 	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cvS:"))!=-1)
 		switch(ch){
 			case 'h': printHelp(); return 1;
-			case 'n': gui="NullGUI"; break;
-			case 'N': gui=optarg; break;
+			case 'n': gui="NullGUI"; explicitUI=true; break;
+			case 'N': gui=optarg; explicitUI=true; break;
 			case 'w': setup=true; break;
 			case 'C': configPath=optarg; break;
 			case 'c': configPath="."; break;
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
 	}
 
 	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
-	if(gui=="PythonUI" && !getenv("TERM")){ LOG_WARN("No $TERM, using QtGUI instead of PythonUI"); gui="QtGUI"; }
+	if(!explicitUI && gui=="PythonUI" && !getenv("TERM")){ LOG_WARN("No $TERM, using QtGUI instead of PythonUI"); gui="QtGUI"; }
 	if(gui=="QtGUI" && !getenv("DISPLAY")){ LOG_WARN("No $DISPLAY, using PythonUI instead of QtUI"); gui="PythonUI"; }
 		
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
