@@ -16,7 +16,7 @@ def plotDirections(mask=0,bins=20):
 		bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
 	pylab.show()
 
-def estimatePoissonYoung(principalAxis,stress=0,plot=False,keepRatio=1.):
+def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	"""Estimate Poisson's ration given the "principal" axis of straining.
 	For every base direction, homogenized strain is computed
 	(slope in linear regression on discrete function particle coordinate →
@@ -27,16 +27,17 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,keepRatio=1.):
 	Young's modulus is computed as σ/ε₀; if stress σ is not given (default 0),
 	the result is 0.
 
-	keepRatio, if < 1., will take only smaller part (centered) or the specimen into account
+	cutoff, if > 0., will take only smaller part (centered) or the specimen into account
 	"""
 	dd=[] # storage for linear regression parameters
 	import pylab,numpy,stats
 	from yade import utils
-	if keepRatio<1.:
+	if cutoff>0:
 		aabb=utils.aabbExtrema(); half=[.5*(aabb[1][i]-aabb[0][i]) for i in [0,1,2]]
-		cut=(tuple([aabb[0][i]+(1.-keepRatio)*half[i] for i in [0,1,2]]),tuple([aabb[1][i]-(1.-keepRatio)*half[i] for i in [0,1,2]]))
+		cut=(tuple([aabb[0][i]+cutoff*half[i] for i in [0,1,2]]),tuple([aabb[1][i]-cutoff*half[i] for i in [0,1,2]]))
 	for axis in [0,1,2]:
-		if keepRatio<1.:
+		if cutoff>0:
+			#print cutoff,utils.aabbExtrema(),cut
 			w,dw=utils.coordsAndDisplacements(axis,AABB=cut)
 		else:
 			w,dw=utils.coordsAndDisplacements(axis)
@@ -97,11 +98,11 @@ def oofemTextExport():
 	return material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions
 
 
-import numpy
-from pylab import *
-from matplotlib.mlab import *
 
 def eliminateJumps(eps,sigma,numSteep=10,gapWidth=5,movWd=40):
+	from matplotlib.mlab import movavg
+	from numpy import diff,abs
+	import numpy
 	# get histogram of 'derivatives'
 	ds=abs(diff(sigma))
 	n,bins=numpy.histogram(ds)

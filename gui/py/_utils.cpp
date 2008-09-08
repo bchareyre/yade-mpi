@@ -38,7 +38,7 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2);
 
 python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()){
-	Vector3r bbMin,bbMax; bool useBB=python::len(AABB)>0;
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(AABB)>0;
 	if(useBB){bbMin=tuple2vec(extract<python::tuple>(AABB[0])());bbMax=tuple2vec(extract<python::tuple>(AABB[1])());}
 	python::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getRootBody()->bodies){
