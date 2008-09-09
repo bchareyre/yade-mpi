@@ -72,6 +72,14 @@ def perpendicularArea(axis):
 	other=((axis+1)%3,(axis+2)%3)
 	return (ext[1][other[0]]-ext[0][other[0]])*(ext[1][other[1]]-ext[0][other[1]])
 
+def fractionalBox(fraction=1.,minMax=None):
+	"""retrurn (min,max) that is the original minMax box (or aabb of the whole simulation if not specified)
+	linearly scaled around its center to the fraction factor"""
+	if not minMax: minMax=aabbExtrema()
+	half=[.5*(minMax[1][i]-minMax[0][i]) for i in [0,1,2]]
+	return (tuple([minMax[0][i]+(1-fraction)*half[i] for i in [0,1,2]]),tuple([minMax[1][i]-(1-fraction)*half[i] for i in [0,1,2]]))
+
+
 def randomizeColors(onShapes=True,onMolds=False,onlyDynamic=False):
 	"""Assign random colors to shape's (GeometricalModel) and/or mold's (InteractingGeometry) diffuseColor.
 	

@@ -65,7 +65,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			],
 			),
 		env.SharedLibrary('_utils',['py/_utils.cpp'],SHLIBPREFIX='',
-			LIBS=env['LIBS']+['Shop','libboost_python']),
+			LIBS=env['LIBS']+['Shop','libboost_python','Brefcom']),
 		env.SharedLibrary('log',['py/log.cpp'],SHLIBPREFIX=''),
 		env.File('__init__.py','py'),
 		env.File('utils.py','py'),

@@ -22,20 +22,15 @@ class Momentum : public PhysicalAction
 		Momentum();
 		virtual ~Momentum();
 
-//		virtual void add(const shared_ptr<PhysicalAction>& a); // FIXME - not used
-//		virtual void sub(const shared_ptr<PhysicalAction>& a); // FIXME - not used
-
 		virtual void reset();
 		virtual shared_ptr<PhysicalAction> clone();
 	
-/// Serialization
 	REGISTER_CLASS_NAME(Momentum);
 	REGISTER_BASE_CLASS_NAME(PhysicalAction);
+	virtual void registerAttributes(){REGISTER_ATTRIBUTE(momentum);}
 	
-/// Indexable
 	REGISTER_CLASS_INDEX(Momentum,PhysicalAction);
 };
-
 REGISTER_SERIALIZABLE(Momentum,false);
 
 #endif // MOMENTUM_HPP

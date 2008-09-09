@@ -10,41 +10,12 @@
 
 #include "Force.hpp"
 
+Force::Force() : PhysicalAction(){ createIndex(); }
 
-Force::Force() : PhysicalAction()
-{
-	createIndex();
-}
+Force::~Force(){}
 
-Force::~Force()
-{
-}
+void Force::reset(){	force = Vector3r::ZERO; }
 
-
-/* FIXME - not used
-void Force::add(const shared_ptr<PhysicalAction>& a)
-{
-	Force * f = static_cast<Force*>(a.get());
-	force += f->force;
-}
-
-
-void Force::sub(const shared_ptr<PhysicalAction>& a)
-{
-	Force * f = static_cast<Force*>(a.get());
-	force -= f->force;
-}
-*/
-
-void Force::reset()
-{
-	force = Vector3r::ZERO;
-}
-
-
-shared_ptr<PhysicalAction> Force::clone()
-{
-	return shared_ptr<Force>(new Force(*this));
-}
+shared_ptr<PhysicalAction> Force::clone(){ return shared_ptr<Force>(new Force(*this));}
 
 YADE_PLUGIN();

@@ -5,15 +5,15 @@
 #
 
 
-def plotDirections(mask=0,bins=20):
+def plotDirections(mask=0,bins=20,aabb=()):
 	"Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes."
-	import pylab
+	import pylab,math
 	from yade import utils
 	for axis in [0,1,2]:
-		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins)
+		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins,aabb=aabb)
 		fc=[0,0,0]; fc[axis]=1.
 		pylab.subplot(220+axis+1,polar=True);
-		bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
+		pylab.bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
 	pylab.show()
 
 def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
@@ -32,9 +32,7 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	dd=[] # storage for linear regression parameters
 	import pylab,numpy,stats
 	from yade import utils
-	if cutoff>0:
-		aabb=utils.aabbExtrema(); half=[.5*(aabb[1][i]-aabb[0][i]) for i in [0,1,2]]
-		cut=(tuple([aabb[0][i]+cutoff*half[i] for i in [0,1,2]]),tuple([aabb[1][i]-cutoff*half[i] for i in [0,1,2]]))
+	if cutoff>0: cut=utils.fractionalBox(fraction=1-cutoff)
 	for axis in [0,1,2]:
 		if cutoff>0:
 			#print cutoff,utils.aabbExtrema(),cut

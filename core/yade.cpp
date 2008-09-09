@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){
 			log4cxx::PropertyConfigurator::configure(logConf);
-			LOG_INFO("Loading  "<<logConf);
+			LOG_INFO("Loading "<<logConf);
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
 			logger->setLevel(log4cxx::Level::WARN);

@@ -28,7 +28,7 @@ class NormalShearInteraction: public NormalInteraction{
 	public:
 		//! shear stiffness
 		Real ks;
-		NormalShearInteraction(){createIndex(); }
+		NormalShearInteraction(){ createIndex(); }
 		virtual ~NormalShearInteraction(){};
 	protected:
 		virtual void registerAttributes(){	

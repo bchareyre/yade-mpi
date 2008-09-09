@@ -10,40 +10,12 @@
 
 #include "Momentum.hpp"
 
+Momentum::Momentum() : PhysicalAction(){createIndex();}
 
-Momentum::Momentum() : PhysicalAction()
-{
-	createIndex();
-}
+Momentum::~Momentum(){}
 
-Momentum::~Momentum()
-{
-}
+void Momentum::reset(){	momentum = Vector3r::ZERO; }
 
-/* FIXME - not used
-void Momentum::add(const shared_ptr<PhysicalAction>& a)
-{
-	Momentum * m = static_cast<Momentum*>(a.get());
-	momentum += m->momentum;
-}
-
-
-void Momentum::sub(const shared_ptr<PhysicalAction>& a)
-{
-	Momentum * m = static_cast<Momentum*>(a.get());
-	momentum -= m->momentum;
-}
-*/
-
-void Momentum::reset()
-{
-	momentum = Vector3r::ZERO;
-}
-
-
-shared_ptr<PhysicalAction> Momentum::clone()
-{
-	return shared_ptr<Momentum>(new Momentum(*this));
-}
+shared_ptr<PhysicalAction> Momentum::clone(){return shared_ptr<Momentum>(new Momentum(*this));}
 
 YADE_PLUGIN();
