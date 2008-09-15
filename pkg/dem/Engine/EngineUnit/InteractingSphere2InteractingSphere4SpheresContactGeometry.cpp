@@ -23,6 +23,7 @@ InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2In
 void InteractingSphere2InteractingSphere4SpheresContactGeometry::registerAttributes()
 {	
 	REGISTER_ATTRIBUTE(interactionDetectionFactor);
+	REGISTER_ATTRIBUTE(exactRot);
 }
 
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -53,6 +54,27 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 		scm->radius1 = s1->radius;
 		scm->radius2 = s2->radius;
 		if (!c->interactionGeometry) c->interactionGeometry = scm;
+		if(exactRot){
+			scm->exactRot=true;
+			scm->pos1=se31.position; scm->pos2=se32.position;
+			scm->ori1=se31.orientation; scm->ori2=se32.orientation;
+			//scm->ori1.Normalize(); scm->ori2.Normalize();
+			if(c->isNew){
+				//cerr<<"+++ Assigning constants to SpheresContactGeometry"<<endl;
+				// contact constants
+				scm->d0=(se32.position-se31.position).Length();
+				scm->d1=s1->radius-penetrationDepth; scm->d2=s2->radius-penetrationDepth;
+				// quasi-constants
+				scm->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
+				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
+				scm->cp1rel.Normalize(); scm->cp2rel.Normalize();
+				cerr<<"+++ Relative orientations: "<<scm->cp1rel<<" | "<<scm->cp2rel<<endl;
+				//cerr<<"+++ "<<se31.orientation.Conjugate()<<" | "<<se31.orientation.Conjugate()*normal<<"|"<<scm->cp1rel<<endl;
+				//cerr<<"@@@ cp1rel="<<scm->cp1rel[0]<<";"<<scm->cp1rel[1]<<";"<<scm->cp1rel[2]<<";"<<scm->cp1rel[3]<<endl;
+				//cerr<<"@@@ ori1="<<scm->ori1[0]<<";"<<scm->ori1[1]<<";"<<scm->ori1[2]<<";"<<scm->ori1[3]<<endl;
+				//cerr<<"+++ (normalized) "<<scm->cp1rel<<" || product with "<<se31.orientation<<" is "<<scm->cp1rel*se31.orientation<<endl;
+			}
+		}
 		return true;
 	} else return false;
 }

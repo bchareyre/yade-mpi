@@ -117,14 +117,14 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		comment: a user comment (may be multiline) that will be embedded in the control file
 	"""
 	import time,bz2
-	vars=data.keys()
+	vars=data.keys(); vars.sort()
 	lData=len(data[vars[0]])
 	if timestamp: baseName+=time.strftime('_%Y%m%d_%H:%M')
 	baseNameNoPath=baseName.split('/')[-1]
 	fData=bz2.BZ2File(baseName+".data.bz2",'w');
 	fData.write("# "+"\t\t".join(vars)+"\n")
 	for i in range(lData):
-		fData.write("\t".join([str(data[key][i]) for key in data.keys()])+"\n")
+		fData.write("\t".join([str(data[var][i]) for var in vars])+"\n")
 	fData.close()
 	fPlot=file(baseName+".gnuplot",'w')
 	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\n')

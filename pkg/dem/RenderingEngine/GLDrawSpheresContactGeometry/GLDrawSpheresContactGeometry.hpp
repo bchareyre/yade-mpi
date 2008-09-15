@@ -11,14 +11,14 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawSpheresContactGeometry : public GLDrawInteractionGeometryFunctor
-{	
+class GLDrawSpheresContactGeometry : public GLDrawInteractionGeometryFunctor{	
 	private :
 		Real midMax;
 		Real forceMax;
 	public :
-		GLDrawSpheresContactGeometry();
+		GLDrawSpheresContactGeometry(): midMax(0), forceMax(0){}
 		virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+		//	virtual void registerAttributes();
 
 	RENDERS(SpheresContactGeometry);
 	REGISTER_CLASS_NAME(GLDrawSpheresContactGeometry);

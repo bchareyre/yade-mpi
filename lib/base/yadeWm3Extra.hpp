@@ -25,6 +25,7 @@ __attribute__((deprecated)) Vector3f operator*(const Vector3f& v, const double s
 __attribute__((deprecated)) Vector3d operator*(const Vector3d& v, const float s);*/
 
 std::ostream & operator<< (std::ostream &os, const Vector3r &v);
+std::ostream & operator<< (std::ostream &os, const Quaternionr &q);
 
 template<class RealType1, class RealType2>
 Vector4<RealType2> operator* (RealType1 fScalar, const Vector4<RealType2>& rkV);

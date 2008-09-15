@@ -36,8 +36,10 @@ using namespace std;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 #endif
 
-void nullHandler(int sig){
-	cerr<<"WARN: nullHandler (probably log4cxx error, if it's infinite loop then press Ctrl-C or Ctrl-\\ to stop), signal "<<(sig==SIGSEGV?"SEGV":"[other]")<<endl;
+void nullHandler(int sig){}
+void warnOnceHandler(int sig){
+	cerr<<"WARN: nullHandler (probably log4cxx error), signal "<<(sig==SIGSEGV?"SEGV":"[other]. Signal will be ignored since now.")<<endl;
+	signal(sig,nullHandler);
 }
 
 void
@@ -256,7 +258,7 @@ int main(int argc, char *argv[])
 	#endif
 	#ifdef YADE_DEBUG
 		signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers
-		signal(SIGSEGV,nullHandler); // FIXME: this is to cover up crash that occurs in log4cxx on i386 sometimes 
+		signal(SIGSEGV,warnOnceHandler); // FIXME: this is to cover up crash that occurs in log4cxx on i386 sometimes 
 		unlink(Omega::instance().gdbCrashBatch.c_str());
 	#endif
 

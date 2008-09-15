@@ -364,6 +364,8 @@ class pyPhysicalActionContainer{
 			LOG_DEBUG("Got class index "<<actionClassIndex<<" for "<<actionName_());
 			return pyPhysicalAction(proxee->find(id_(),actionClassIndex));
 		}
+	python::tuple force_get(long id){ Shop::Bex::initCache(); Vector3r f=Shop::Bex::force(id); return python::make_tuple(f[0],f[1],f[2]);}
+	python::tuple momentum_get(long id){ Shop::Bex::initCache(); Vector3r m=Shop::Bex::momentum(id); return python::make_tuple(m[0],m[1],m[2]);}
 };
 
 
@@ -551,7 +553,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("next",&pyInteractionIterator::pyNext);
 
 	boost::python::class_<pyPhysicalActionContainer>("ActionContainer",python::init<pyPhysicalActionContainer&>())
-		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem);
+		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem)
+		.def("f",&pyPhysicalActionContainer::force_get)
+		.def("m",&pyPhysicalActionContainer::momentum_get);
 	
 
 	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine");

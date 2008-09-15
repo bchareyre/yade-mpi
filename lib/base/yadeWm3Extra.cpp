@@ -23,6 +23,7 @@ __attribute__((deprecated)) Vector3f operator*(const Vector3f& v, const double s
 __attribute__((deprecated)) Vector3d operator*(const Vector3d& v, const float s){return Vector3d(s*v[0],s*v[1],s*v[2]);}*/
 
 std::ostream & operator<< (std::ostream &os, const Vector3r &v){ return os << v[0] << " " << v[1] << " " << v[2];}
+std::ostream & operator<< (std::ostream &os, const Quaternionr &q){ Vector3r axis; Real angle; q.ToAxisAngle(axis,angle); return os<<axis<<" "<<angle;}
 
 template<class RealType1, class RealType2>
 Vector4<RealType2> operator* (RealType1 fScalar, const Vector4<RealType2>& rkV){ return Vector4<RealType2>(fScalar*rkV[0],fScalar*rkV[1],fScalar*rkV[2],fScalar*rkV[3]);}

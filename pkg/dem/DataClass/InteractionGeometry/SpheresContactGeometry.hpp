@@ -1,41 +1,89 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
+// © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-#ifndef SPHERESCONTACTGEOMETRY_HPP
-#define SPHERESCONTACTGEOMETRY_HPP
+#pragma once
 
-#include <vector>
 #include<yade/core/InteractionGeometry.hpp>
-#include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
-
-class SpheresContactGeometry : public InteractionGeometry
-{
+/*! Class representing geometry of two spheres in contact.
+ *
+ * exactRot code
+ * =============
+ * At initial contact, each of the two spheres fixes a point on its surface relative to its own orientation.
+ * It is therefore possible to derive at any later point how much slipping between the two spheres has taken
+ * place since the first contact.
+ *
+ * The surface point is stored as quaternion.
+ *
+ * Function is provided to manipulate those points:
+ *
+ * (a) plastic slip, when we want to limit their maximum distance (in the projected plane)
+ * (b) rolling, where those points must be relocated to not flip over the π angle from the current contact point
+ *
+ *
+ */
+class SpheresContactGeometry: public InteractionGeometry{
 	public :
-		Vector3r	 normal			// new unit normal of the contact plane.
-				,contactPoint;	
+		Vector3r normal, // unit vector in the direction from sphere1 center to sphere2 center
+			contactPoint;
+		Real radius1,radius2,penetrationDepth;
 
-		Real		 radius1
-				,radius2
-				,penetrationDepth;
+		bool exactRot; // whether the exact rotation code is being used -- following fields are needed for that
+		//! positions and orientations of both spheres -- must be updated at every iteration
+		Vector3r pos1, pos2; Quaternionr ori1, ori2;
+		/*! Orientation of the contact point relative to each sphere-local coordinates.
+		 * Those fields are almost constant, except for a few cases
+		 * 	(a) plastic slip and 
+		 * 	(b) spheres mutually rolling without slipping with big angle, when the contact point must be moved since quaternions
+		 * 		describe only rotations up to π (if the rotation is bigger, then the shorter path from the other side is
+		 * 		taken instead)
+		 */
+		Quaternionr cp1rel, cp2rel;
+		// interaction "radii" and total length; this is _really_ contant throughout the interaction life
+		// d1 is really distance from the sphere1 center to the contact plane, it may not correspond to the sphere radius!
+		// therefore, d1+d2=d0 (distance at which the contact was created)
+		Real d1, d2, d0;
 
-		SpheresContactGeometry();
-		virtual ~SpheresContactGeometry();
+		// auxiliary functions: "this" not needed
+		static Vector3r unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& normal);
+		static Quaternionr rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& normal);
+		void setTgPlanePts(Vector3r p1new, Vector3r p2new);
 
+		Vector3r contPtInTgPlane1(){return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
+		Vector3r contPtInTgPlane2(){return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
+		Vector3r contPt(){return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
+
+		Vector3r epsT(){return (1/d0)*(contPtInTgPlane2()-contPtInTgPlane1());}
+		Real epsN(){return (pos2-pos1).Length()/d0;}
+	
+		void slipToDistIfNeeded(Real slip);
+		void relocateContactPoint();
+
+
+
+		SpheresContactGeometry():InteractionGeometry(),contactPoint(Vector3r::ZERO),radius1(0),radius2(0),exactRot(false){createIndex();}
+		virtual ~SpheresContactGeometry(){};
 	protected :
-		virtual void registerAttributes();
+		virtual void registerAttributes(){
+			REGISTER_ATTRIBUTE(radius1);
+			REGISTER_ATTRIBUTE(radius2);
+			REGISTER_ATTRIBUTE(contactPoint); // to allow access from python
+			// exactRot
+			REGISTER_ATTRIBUTE(exactRot);
+			REGISTER_ATTRIBUTE(pos1);
+			REGISTER_ATTRIBUTE(pos2);
+			REGISTER_ATTRIBUTE(ori1);
+			REGISTER_ATTRIBUTE(ori2);
+			REGISTER_ATTRIBUTE(cp1rel);
+			REGISTER_ATTRIBUTE(cp2rel);
+			REGISTER_ATTRIBUTE(d1);
+			REGISTER_ATTRIBUTE(d2);
+			REGISTER_ATTRIBUTE(d0);
+		}
 	REGISTER_CLASS_NAME(SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
-
 	REGISTER_CLASS_INDEX(SpheresContactGeometry,InteractionGeometry);
 };
 
 REGISTER_SERIALIZABLE(SpheresContactGeometry,false);
-
-#endif // SPHERESCONTACTGEOMETRY_HPP
 

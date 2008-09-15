@@ -87,7 +87,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
 			//cerr<<"Interaction crosses AABB boundary, weight is "<<weight<<endl;
 			//LOG_DEBUG("Interaction crosses AABB boundary, weight is "<<weight);
 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-		E+=weight*(.5*bc->E*bc->crossSection*pow(bc->epsN,2)+.5*bc->G*bc->crossSection*pow(bc->epsT.Length(),2));
+		E+=bc->equilibriumDist*weight*(.5*bc->E*bc->crossSection*pow(bc->epsN,2)+.5*bc->G*bc->crossSection*pow(bc->epsT.Length(),2));
 		//TRVAR5(bc->crossSection,bc->E,bc->G,bc->epsN,bc->epsT.Length());;
 		//cerr<<bc->crossSection<<","<<bc->E<<","<<bc->G<<","<<bc->epsN<<","<<bc->epsT.Length()<<endl;
 	}

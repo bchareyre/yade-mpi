@@ -38,6 +38,7 @@ class USCTGen: public FileGenerator {
 };
 REGISTER_SERIALIZABLE(USCTGen,false);
 
+#if 0
 /* This class applies force on transversal strain sensors from UniaxialStrainer.
  */
 class UniaxialStrainSensorPusher: public DeusExMachina{
@@ -59,6 +60,8 @@ class UniaxialStrainSensorPusher: public DeusExMachina{
 	//DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(UniaxialStrainSensorPusher,false);
+#endif
+
 
 /*! Axial displacing two groups of bodies in the opposite direction with given strain rate.
  *
@@ -70,16 +73,12 @@ class UniaxialStrainer: public DeusExMachina {
 	private:
 		bool idInVector(body_id_t id, const vector<body_id_t>& V){for(size_t i=0; i<V.size(); i++){ if(V[i]==id) return true; }	return false; }  // unused now
 		void computeAxialForce(MetaBody* rootBody);
-		void pushTransStrainSensors(MetaBody* rb, vector<Real>& widths);
 
 		ofstream recStream;
 		string recordFile;
 		bool needsInit;
 		Real& axisCoord(body_id_t id){ return Body::byId(id)->physicalParameters->se3.position[axis]; };
 		void init();
-		void setupTransStrainSensors();
-		//! Pointer to ForceEngine that is used for transStrainSensors
-		shared_ptr<UniaxialStrainSensorPusher> sensorsPusher;
 	public:
 		Real strainRate,currentStrainRate;
 		//! distance of reference bodies in the direction of axis before straining started
@@ -91,8 +90,7 @@ class UniaxialStrainer: public DeusExMachina {
 		bool notYetReversed;
 		Real sumPosForces,sumNegForces;
 		//! crossSection perpendicular to he strained axis, computed from AABB of MetaBody
-		Real crossSectionArea,transStrainSensorArea;
-		//! Apply strain along x (0), y (1) or z(2) axis
+		Real crossSectionArea;		//! Apply strain along x (0), y (1) or z(2) axis
 		int axis;
 		//! If 0, straining is symmetric for negIds and posIds; for 1 (or -1), only posIds are strained and negIds don't move (or vice versa)
 		int asymmetry;
@@ -105,6 +103,12 @@ class UniaxialStrainer: public DeusExMachina {
 		vector<body_id_t> posIds, negIds;
 		/** coordinates of pos/neg bodies in the direction of axis */
 		vector<Real> posCoords,negCoords;
+		#if 0
+		void pushTransStrainSensors(MetaBody* rb, vector<Real>& widths);
+		void setupTransStrainSensors();
+		Real transStrainSensorArea;
+		//! Pointer to ForceEngine that is used for transStrainSensors
+		shared_ptr<UniaxialStrainSensorPusher> sensorsPusher;
 		/** Bodies that act as transversal strain sensors;
 		 * they should have very little mass (light force is applied on them)
 		 * to accurately copy strain of the underlying specimen.
@@ -113,12 +117,14 @@ class UniaxialStrainer: public DeusExMachina {
 		 * to calculate crossSection. UniaxialStrainer::init will resize and displace them as needed.
 		 * */
 		vector<body_id_t> transStrainSensors;
+		Real avgTransStrain;
+		#endif
 
 		//! Auxiliary vars (serializable, for recording)
-		Real strain, avgStress, avgTransStrain;
+		Real strain, avgStress;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); recordFile="/tmp/usct.data"; strain=avgStress=avgTransStrain=0; blockRotations=false; blockDisplacements=false;};
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile="/tmp/usct.data"; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;};
 		virtual ~UniaxialStrainer(){};
 		void registerAttributes(){
 			DeusExMachina::registerAttributes();
@@ -133,12 +139,14 @@ class UniaxialStrainer: public DeusExMachina {
 			REGISTER_ATTRIBUTE(limitStrain);
 			REGISTER_ATTRIBUTE(notYetReversed);
 			REGISTER_ATTRIBUTE(crossSectionArea);
-			REGISTER_ATTRIBUTE(transStrainSensorArea);
-			REGISTER_ATTRIBUTE(transStrainSensors);
+			#if 0
+				REGISTER_ATTRIBUTE(transStrainSensorArea);
+				REGISTER_ATTRIBUTE(transStrainSensors);
+				REGISTER_ATTRIBUTE(avgTransStrain);
+			#endif
 			REGISTER_ATTRIBUTE(recordFile);
 			REGISTER_ATTRIBUTE(strain);
 			REGISTER_ATTRIBUTE(avgStress);
-			REGISTER_ATTRIBUTE(avgTransStrain);
 			REGISTER_ATTRIBUTE(blockDisplacements);
 			REGISTER_ATTRIBUTE(blockRotations);
 		}
