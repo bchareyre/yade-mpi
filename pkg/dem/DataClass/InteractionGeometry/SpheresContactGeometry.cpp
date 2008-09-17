@@ -5,28 +5,31 @@
 #include "SpheresContactGeometry.hpp"
 YADE_PLUGIN("SpheresContactGeometry");
 
-/* Set contact points on both spheres such that their projection is the one given.
+/* Set contact points on both spheres such that their projection is the one given
+ * (should be on the plane passing through origin and oriented with normal; not checked!)
  */
 void SpheresContactGeometry::setTgPlanePts(Vector3r p1new, Vector3r p2new){
 	cp1rel=ori1.Conjugate()*rollPlanePtToSphere(p1new,d1,normal);
-	cp2rel=ori2.Conjugate()*rollPlanePtToSphere(-p2new,d2,-normal);
+	cp2rel=ori2.Conjugate()*rollPlanePtToSphere(p2new,d2,-normal);
 }
 
 
-/* Move contact point on both spheres in such way that their relative position is the same;
+/* Move contact point on both spheres in such way that their relative position (displacementT) is the same;
  * this should be done regularly to ensure that the angle doesn't go over π, since then quaternion would
  * flip axis and the point would project on other side of the tangent plane piece.
  */
-void SpheresContactGeometry::relocateContactPoint(){
+void SpheresContactGeometry::relocateContactPoints(){
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Vector3r midPt=.5*(p1+p2);
-	/* the factor 1.2 is arbitrary; it should be smaller than pi/2 and bigger than some reasonably small value to avoid frequent relocation */
-	if(midPt.Length()<1.2*min(d1,d2)) return;
-	setTgPlanePts(p1-midPt,p2-midPt);
+	if((p1.SquaredLength()>4*d1 || p2.SquaredLength()>4*d2) && midPt.SquaredLength()>.5*min(d1,d2)){
+		//cerr<<"RELOCATION with displacementT="<<displacementT(); // should be the same before and after relocation
+		setTgPlanePts(p1-midPt,p2-midPt);
+		//cerr<<" → "<<displacementT()<<endl;
+	}
 }
 
 /*! Perform slip of the projected contact points so that their distance becomes equal (or remains smaller) than the given one.
- *
+ * TODO: not yet tested
  */
 void SpheresContactGeometry::slipToDistIfNeeded(Real dist){
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
@@ -49,8 +52,8 @@ void SpheresContactGeometry::slipToDistIfNeeded(Real dist){
  * @returns The projected point coordinates (with origin at the contact point).
  */
 Vector3r SpheresContactGeometry::unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& planeNormal){
-	Quaternionr fromNormalToPt; fromNormalToPt.Align(planeNormal,fromXtoPtOri*Vector3r::UNIT_X);
-	Vector3r axis; Real angle; fromNormalToPt.ToAxisAngle(axis,angle);
+	Quaternionr normal2pt; normal2pt.Align(planeNormal,fromXtoPtOri*Vector3r::UNIT_X);
+	Vector3r axis; Real angle; normal2pt.ToAxisAngle(axis,angle);
 	return (angle*radius) /* length */ *(axis.Cross(planeNormal)) /* direction: both are unit vectors */;
 }
 
@@ -68,7 +71,9 @@ Vector3r SpheresContactGeometry::unrollSpherePtToPlane(const Quaternionr& fromXt
 Quaternionr SpheresContactGeometry::rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& planeNormal){
 		Vector3r axis=planeNormal.Cross(planePt); axis.Normalize();
 		Real angle=planePt.Length()/radius;
-		return Quaternionr(axis,angle);
+		Quaternionr normal2pt(axis,angle);
+		Quaternionr ret; ret.Align(Vector3r::UNIT_X,normal2pt*planeNormal);
+		return ret;
 }
 
 

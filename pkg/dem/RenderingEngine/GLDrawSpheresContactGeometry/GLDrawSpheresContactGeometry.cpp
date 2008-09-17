@@ -75,9 +75,9 @@ void GLDrawSpheresContactGeometry::go(
 	}
 
 	if(sc->exactRot){
-		//GLUtils::GLDrawLine(sc->pos1,sc->pos2,Vector3r(1,1,1));
+		GLUtils::GLDrawLine(sc->pos1,sc->pos2,Vector3r(.5,.5,.5));
 		// sphere center to point on the sphere
-		GLUtils::GLDrawText("[1]",sc->pos1,Vector3r(1,1,1)); GLUtils::GLDrawText("[2]",sc->pos2,Vector3r(1,1,1));
+		//GLUtils::GLDrawText("[1]",sc->pos1,Vector3r(1,1,1)); GLUtils::GLDrawText("[2]",sc->pos2,Vector3r(1,1,1));
 		GLUtils::GLDrawLine(sc->pos1,sc->pos1+(sc->ori1*sc->cp1rel*Vector3r::UNIT_X),Vector3r(0,.5,1));
 		GLUtils::GLDrawLine(sc->pos2,sc->pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X),Vector3r(0,1,.5));
 		//cerr<<"=== cp1rel="<<sc->cp1rel[0]<<";"<<sc->cp1rel[1]<<";"<<sc->cp1rel[2]<<";"<<sc->cp1rel[3]<<endl;
@@ -89,8 +89,7 @@ void GLDrawSpheresContactGeometry::go(
 		GLUtils::GLDrawLine(sc->contPt(),sc->contPt()+ptTg1,Vector3r(0,.5,1));
 		GLUtils::GLDrawLine(sc->contPt(),sc->contPt()+ptTg2,Vector3r(0,1,.5));
 		// projected shear
-		GLUtils::GLDrawLine(sc->contPt()+ptTg1,sc->contPt()+ptTg2,Vector3r(.7,.7,.7));
-		// TODO: crosshair to show contact plane (?)
+		GLUtils::GLDrawLine(sc->contPt()+ptTg1,sc->contPt()+ptTg2,Vector3r(1,1,1));
 	}
 
 

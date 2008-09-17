@@ -20,6 +20,8 @@
  * (a) plastic slip, when we want to limit their maximum distance (in the projected plane)
  * (b) rolling, where those points must be relocated to not flip over the π angle from the current contact point
  *
+ * TODO: add torsion code, that will (if a flag is on) compute torsion angle on the contact axis.
+ *
  *
  */
 class SpheresContactGeometry: public InteractionGeometry{
@@ -39,27 +41,28 @@ class SpheresContactGeometry: public InteractionGeometry{
 		 * 		taken instead)
 		 */
 		Quaternionr cp1rel, cp2rel;
-		// interaction "radii" and total length; this is _really_ contant throughout the interaction life
+		// interaction "radii" and total length; this is _really_ constant throughout the interaction life
 		// d1 is really distance from the sphere1 center to the contact plane, it may not correspond to the sphere radius!
 		// therefore, d1+d2=d0 (distance at which the contact was created)
 		Real d1, d2, d0;
 
-		// auxiliary functions: "this" not needed
+		// auxiliary functions; the quaternion magic is all in here
 		static Vector3r unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& normal);
 		static Quaternionr rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& normal);
+
 		void setTgPlanePts(Vector3r p1new, Vector3r p2new);
 
 		Vector3r contPtInTgPlane1(){return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
 		Vector3r contPtInTgPlane2(){return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
 		Vector3r contPt(){return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
 
-		Vector3r epsT(){return (1/d0)*(contPtInTgPlane2()-contPtInTgPlane1());}
-		Real epsN(){return (pos2-pos1).Length()/d0;}
+		Real displacementN(){return (pos2-pos1).Length()-d0;}
+		Real epsN(){return displacementN()*(1./d0);}
+		Vector3r displacementT(bool relocate=true){ return contPtInTgPlane2()-contPtInTgPlane1();}
+		Vector3r epsT(){return displacementT()*(1./d0);}
 	
 		void slipToDistIfNeeded(Real slip);
-		void relocateContactPoint();
-
-
+		void relocateContactPoints();
 
 		SpheresContactGeometry():InteractionGeometry(),contactPoint(Vector3r::ZERO),radius1(0),radius2(0),exactRot(false){createIndex();}
 		virtual ~SpheresContactGeometry(){};
