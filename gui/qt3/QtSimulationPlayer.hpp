@@ -36,6 +36,8 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 	public slots : virtual void pbResetClicked();
 	
 	public slots : virtual void cbAllowFiltrationToggled(bool b);
+	
+	public slots : virtual void cbBodyWireToggled(bool b);
  	
 	protected    : void closeEvent(QCloseEvent *);
 //						void keyPressEvent(QKeyEvent *){};

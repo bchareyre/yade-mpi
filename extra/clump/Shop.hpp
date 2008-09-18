@@ -96,4 +96,7 @@ class Shop{
 
 		//! Estimate timestep based on P-wave propagation speed
 		static Real PWaveTimeStep(shared_ptr<MetaBody> rb=shared_ptr<MetaBody>());
+
+		//! Calculate inscribed circle center of trianlge
+		static Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
 };

@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWFACET_HPP
-#define GLDRAWFACET_HPP
+#ifndef GLDRAWIFACET_HPP
+#define GLDRAWIFACET_HPP
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -24,5 +24,5 @@ class GLDrawFacet : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawFacet,false);
 
-#endif // GLDRAWFACET_HPP
+#endif // GLDRAWIFACET_HPP
 

@@ -26,33 +26,16 @@ void InteractingFacet::postProcessAttributes(bool deserializing)
 {
     if (deserializing)
     {
-	normal = vertices[1].UnitCross(vertices[0]);
-	for (int i=0, e=vertices.size()+1; i<e; ++i)
-	{
-	    Vector3r edge,p0;
-	    if (i==0)
-	    {
-		edge = vertices[0];
-		p0 = vertices[e-2];
-		cm = vertices[0];
-	    }
-	    else if (i==e-1)
-	    {
-		edge = vertices[e-2];
-		p0 = vertices[0];
-		cm /= e;
-	    }
-	    else
-	    {
-		edge = vertices[i] - vertices[i-1];
-		p0 = -vertices[i];
-		cm += vertices[i];
-	    }
-		
-	    Vector3r nml = p0 - edge * edge.Dot(p0) / edge.SquaredLength();
-	    nml.Normalize();
-	    edgeNormals.push_back(nml);
+		Vector3r e[3] = {vertices[1]-vertices[0] ,vertices[2]-vertices[1] ,vertices[0]-vertices[2]};
+		nf = e[0].UnitCross(e[1]);
+		for(int i=0; i<3; ++i) 
+		{
+			ne[i]=e[i].UnitCross(nf);
+			vl[i]=vertices[i].Length();
+			vu[i]=vertices[i]/vl[i];
+		}
+		Real p = e[0].Length()+e[1].Length()+e[2].Length();
+		icr = e[0].Length()*ne[0].Dot(e[2])/p;
 	}
-    }
 }
 YADE_PLUGIN();

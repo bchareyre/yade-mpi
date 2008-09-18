@@ -17,17 +17,16 @@ void InteractingFacet2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 {
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	InteractingFacet* facet = static_cast<InteractingFacet*>(cm.get());
-	Vector3r v0 = se3.position;
+	const Vector3r& O = se3.position;
 	Matrix3r facetAxisT; se3.orientation.ToRotationMatrix(facetAxisT);
-
-	aabb->min=aabb->max = v0;
-	for (int i=0,e=facet->vertices.size();i<e;++i)
+	const vector<Vector3r>& vertices=facet->vertices;
+	aabb->min=aabb->max = O + facetAxisT * vertices[0];
+	for (int i=1;i<3;++i)
 	{
-	    Vector3r v = v0 + facetAxisT * facet->vertices[i];
+	    Vector3r v = O + facetAxisT * vertices[i];
 	    aabb->min = componentMinVector( aabb->min, v);
 	    aabb->max = componentMaxVector( aabb->max, v);
 	}
-	
 	aabb->halfSize = (aabb->max - aabb->min)/2;
 	aabb->center = aabb->min + aabb->halfSize;
 }

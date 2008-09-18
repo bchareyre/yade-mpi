@@ -624,6 +624,22 @@
                                         <attribute name="title">
                                             <string>View</string>
                                         </attribute>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>cbBodyWire</cstring>
+                                            </property>
+                                            <property name="geometry">
+                                                <rect>
+                                                    <x>10</x>
+                                                    <y>10</y>
+                                                    <width>229</width>
+                                                    <height>20</height>
+                                                </rect>
+                                            </property>
+                                            <property name="text">
+                                                <string>Body wire</string>
+                                            </property>
+                                        </widget>
                                     </widget>
                                     <widget class="QWidget">
                                         <property name="name">
@@ -801,7 +817,7 @@
 <customwidgets>
     <customwidget>
         <class>GLSimulationPlayerViewer</class>
-        <header location="local">GLSimulationPlayerViewer.hpp</header>
+        <header location="global">GLSimulationPlayerViewer.hpp</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -897,6 +913,12 @@
         <receiver>QtGeneratedSimulationPlayer</receiver>
         <slot>pbInputDirectoryClicked()</slot>
     </connection>
+    <connection>
+        <sender>cbBodyWire</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QtGeneratedSimulationPlayer</receiver>
+        <slot>cbBodyWireToggled(bool)</slot>
+    </connection>
 </connections>
 <signals>
     <signal>closeSignal()</signal>
@@ -912,6 +934,7 @@
     <slot>pbInputConfigFileClicked()</slot>
     <slot>cbSaveSnapShotsToggled(bool)</slot>
     <slot>cbAllowFiltrationToggled(bool)</slot>
+    <slot>cbBodyWireToggled(bool)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

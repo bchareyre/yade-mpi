@@ -130,6 +130,11 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,4);
 
+python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::list v2)
+{
+	return vec2tuple(Shop::inscribedCircleCenter(Vector3r(python::extract<double>(v0[0]),python::extract<double>(v0[1]),python::extract<double>(v0[2])), Vector3r(python::extract<double>(v1[0]),python::extract<double>(v1[1]),python::extract<double>(v1[2])), Vector3r(python::extract<double>(v2[0]),python::extract<double>(v2[1]),python::extract<double>(v2[2]))));
+}
+
 
 BOOST_PYTHON_MODULE(_utils){
 	def("PWaveTimeStep",PWaveTimeStep);
@@ -139,6 +144,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("setRefSe3",setRefSe3);
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));
 	def("elasticEnergy",elasticEnergyInAABB);
+	def("inscribedCircleCenter",inscribedCircleCenter);
 }
 
 

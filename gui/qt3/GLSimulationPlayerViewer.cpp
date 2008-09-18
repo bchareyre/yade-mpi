@@ -261,3 +261,10 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 	FOREACH(const shared_ptr<FilterEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	return true;
 }
+
+void GLSimulationPlayerViewer::bodyWire(bool wire)
+{
+//	FOREACH(shared_ptr<Body> b, *Omega::instance().getRootBody()->bodies)
+//	{b->geometricalModel->wire=wire;}
+	renderer->Body_wire=wire;
+}

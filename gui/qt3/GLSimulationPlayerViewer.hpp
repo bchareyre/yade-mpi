@@ -49,6 +49,7 @@ class GLSimulationPlayerViewer: public GLViewer {
 		void load(const string& fileName, bool fromFile=true);
 		void doOneStep();
 		void reset();
+		void bodyWire(bool wire);
 	protected :
 		virtual void animate();
 		virtual void initializeGL();

@@ -66,6 +66,7 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 	{ 
 		if (initial_positions.size()==0) 	
 		{ // initialize positions from bodies se3
+			LOG_INFO("Initialize positions from bodies se3");
 			initial_positions.resize(subscrBodies.size());
 			shared_ptr<BodyContainer>& bodies = ncb->bodies;
 			for(int i=0,e=subscrBodies.size(); i<e; ++i)
@@ -78,6 +79,7 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 	std::ifstream is(fileName.c_str());
 	if (is) 
 	{// reading positions from file 
+		LOG_INFO("Reading positions from file: " << fileName);
 		ini_pos.resize(subscrBodies.size());
 		for(int i=0,e=subscrBodies.size(); i<e && !is.eof(); ++i)
 			is >> ini_pos[i][0] >> ini_pos[i][1] >> ini_pos[i][2];
@@ -87,6 +89,7 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 	// initialize positions form bodies se3 if need and export to file
 	if (initial_positions.size()==0)
 	{
+		LOG_INFO("Initialize positions from bodies se3");
 		ini_pos.resize(subscrBodies.size());
 		shared_ptr<BodyContainer>& bodies = ncb->bodies;
 		for(int i=0,e=subscrBodies.size(); i<e; ++i)
@@ -98,6 +101,7 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 		LOG_ERROR("Can't open file to export positions: "<<fileName<<"!");
 		return;
 	}
+	LOG_INFO("Export positions to file: "<<fileName);
 	for(int i=0,e=subscrBodies.size(); i<e; ++i)
 		os << ini_pos[i][0]<< '\t' << ini_pos[i][1]<< '\t' << ini_pos[i][2]<< std::endl;
 }

@@ -40,6 +40,22 @@ def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,fri
 	b['isDynamic']=dynamic
 	return b
 
+def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=[1,1,1],physParamsClass='BodyMacroParameters'):
+	"""Create Facet"""
+	b=Body()
+	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire,'visible':True})
+	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
+	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
+	vertices=map(lambda a,b:map(lambda x,y:x-y,a,b),vertices,[center,center,center]) 
+	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
+	b.shape.setRaw('vertices',vStr)
+	b.mold.setRaw('vertices',vStr)
+	b.phys=PhysicalParameters(physParamsClass,{'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':0,'inertia':[0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+	b['isDynamic']=dynamic
+	b.mold.postProcessAttributes()
+	return b
+
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""return 6 walls that will wrap existing packing;
 	extrema are extremal points of the AABB of the packing (will be calculated if not specified)
@@ -122,6 +138,23 @@ def spheresToFile(filename,consider=lambda id: True):
 		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
 		out.write('%g\t%g\t%g\t%g\n'%(b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
 	out.close()
+
+def import_stl_geometry(file, begin=0, young=30e9,poisson=.3,frictionAngle=0.5236,wire=True):
+		## Import walls geometry from STL file
+		imp = STLImporter()
+		imp.wire = wire
+		imp.open(file)
+		o=Omega()
+		for i in xrange(imp.number_of_facets):
+			b=Body()
+			b['isDynamic']=False
+			b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,0,1,0,0,0],'mass':0,'inertia':[0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+			b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+			o.bodies.append(b)
+		imp.import_geometry(o.bodies,begin)
+		for i in xrange(begin,begin+imp.number_of_facets):
+			o.bodies[i].mold.postProcessAttributes()
+		return imp.number_of_facets
 
 def negPosExtremes(**kw): raise DeprecationWarning("negPosExtremes is deprecated, use negPosExtremalIds instead.")
 

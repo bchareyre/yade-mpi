@@ -52,10 +52,7 @@ STLImporterTest::STLImporterTest() : FileGenerator()
 	density = 2600;
 	gravity = Vector3r(0,-9.81,0);
 	disorder = Vector3r(0.002,0.002,0.002);
-	verticesImport=true;
-       	facetsImport=true;
-       	facetsWire=true;
-       	edgesImport=true;
+	wire=true;
 	stlFileName = "hourglass.stl";
 	angularVelocity = 0.5;
 	rotationAxis = Vector3r(0,0,1);
@@ -89,10 +86,7 @@ void STLImporterTest::registerAttributes()
 	REGISTER_ATTRIBUTE(density);
 	REGISTER_ATTRIBUTE(disorder);
 	REGISTER_ATTRIBUTE(stlFileName);
-	REGISTER_ATTRIBUTE(verticesImport);
-	REGISTER_ATTRIBUTE(edgesImport);
-	REGISTER_ATTRIBUTE(facetsImport);
-	REGISTER_ATTRIBUTE(facetsWire);
+	REGISTER_ATTRIBUTE(wire);
 	REGISTER_ATTRIBUTE(angularVelocity);
 	REGISTER_ATTRIBUTE(rotationAxis);
 	REGISTER_ATTRIBUTE(dampingForce);
@@ -126,15 +120,9 @@ bool STLImporterTest::generate()
 	    message="Input file not found, you can copy it from examples/ directory or make one using blender 3D modelling";
 	    return false;
 	}
-	imp.set_imported_stuff(verticesImport,edgesImport,facetsImport);
-	imp.facets_wire=facetsWire;
-	cerr << "Vertices (corner, flat): " << imp.number_of_vertices()
-	    << " (" << imp.number_of_corner_vertices() << ", " << imp.number_of_flat_vertices() << ")"
-	    << ", Edges (corner, flat): " << imp.number_of_edges() 
-	    << " (" << imp.number_of_corner_edges() << ", " << imp.number_of_flat_edges() << ")"
-	    << ", Facets: " << imp.number_of_facets() << endl;
+	imp.wire=wire;
 	// create bodies
-	for(int i=0,e=imp.number_of_all_imported();i<e;++i)
+	for(int i=0,e=imp.number_of_facets;i<e;++i)
 	{
 	    shared_ptr<Body> b(new Body(body_id_t(0),1));
     
@@ -151,22 +139,15 @@ bool STLImporterTest::generate()
 	    physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 	    b->physicalParameters	= physics;
 
-	    // bounding box only for edges and facets (not for vertices)
-	    if(i>=imp.number_of_imported_vertices())
-	    {
+	    // bounding box 
 		shared_ptr<AABB> aabb(new AABB);
 		aabb->diffuseColor		= Vector3r(0,1,0);
 		b->boundingVolume	= aabb;
-	    }
 	    
 	    rootBody->bodies->insert(b);
 	}
 	// import bodies (create geometry)
 	imp.import(rootBody->bodies);
-	cerr << "Imported: " 
-	    << imp.number_of_imported_vertices() << " vertices, " 
-	    << imp.number_of_imported_edges() << " edges, " 
-	    << imp.number_of_imported_facets() << " facets" << endl;
 
 ///////// spheres
 	float all = nbSpheres[0]*nbSpheres[1]*nbSpheres[2];
@@ -249,8 +230,6 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingVertex2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingEdge2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingFacet2InteractingSphere4SpheresContactGeometry");
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
@@ -258,7 +237,6 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingEdge2AABB");
 	boundingVolumeDispatcher->add("InteractingFacet2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 	
@@ -289,13 +267,9 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
  	kinematic->rotateAroundZero = true;
 	
 	
-	shared_ptr<InteractingGeometry> vertex(new InteractingVertex);
-	shared_ptr<InteractingGeometry> edge(new InteractingEdge);
 	shared_ptr<InteractingGeometry> facet(new InteractingFacet);
 	for(BodyContainer::iterator bi = rootBody->bodies->begin(), biEnd=rootBody->bodies->end(); bi!=biEnd; ++bi)
-	    if ( (*bi)->interactingGeometry->getClassIndex() == vertex->getClassIndex() ||
-		    (*bi)->interactingGeometry->getClassIndex() == edge->getClassIndex() ||
-		    (*bi)->interactingGeometry->getClassIndex() == facet->getClassIndex() )
+	    if ( (*bi)->interactingGeometry->getClassIndex() == facet->getClassIndex() )
 		kinematic->subscribedBodies.push_back((*bi)->getId());
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);

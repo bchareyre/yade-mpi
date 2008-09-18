@@ -6,9 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
-#define FACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
+#ifndef IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
+#define IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
 
+#include<yade/lib-serialization/Serializable.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
 class InteractingFacet2InteractingSphere4SpheresContactGeometry : public InteractionGeometryEngineUnit
@@ -33,12 +34,15 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 	FUNCTOR2D(InteractingFacet,InteractingSphere);
 
 	DEFINE_FUNCTOR_ORDER_2D(InteractingFacet,InteractingSphere);
+
+	Real shrinkFactor;
 	
 	protected :
 		virtual void registerAttributes();
+		
 };
 
 REGISTER_SERIALIZABLE(InteractingFacet2InteractingSphere4SpheresContactGeometry,false);
 
-#endif //  FACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
+#endif //  IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
 

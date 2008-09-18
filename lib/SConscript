@@ -128,13 +128,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 		LIBS=env['LIBS']+['yade-base','yade-factory']),
 
 	env.SharedLibrary('STLImporter',
-		['import/STLReader.cpp',
-		    'import/STLImporter.cpp'],
-		LIBS=env['LIBS']+['Vertex'
-		    ,'InteractingVertex'
-		    ,'GeometricalEdge'
-		    ,'InteractingEdge'
-		    ,'Facet'
-		    ,'InteractingFacet'])
+		['import/STLReader.cpp', 'import/STLImporter.cpp'],
+		LIBS=env['LIBS']+['Facet','InteractingFacet','Shop']),
+
 ])
 

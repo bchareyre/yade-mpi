@@ -19,10 +19,7 @@ class STLImporterTest : public FileGenerator
 				,gravity;
 
 		string		stlFileName;
-		bool		 verticesImport
-				,edgesImport
-			        ,facetsImport
-			        ,facetsWire;
+		bool	wire;
 		Real		angularVelocity;
 		Vector3r	rotationAxis;
 

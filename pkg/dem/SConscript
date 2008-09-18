@@ -91,20 +91,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-multimethods',
 			'InteractingSphere']),
 			
-	env.SharedLibrary('InteractingVertex2InteractingSphere4SpheresContactGeometry'
-	    ,['Engine/EngineUnit/InteractingVertex2InteractingSphere4SpheresContactGeometry.cpp']
-	    ,LIBS=env['LIBS']+['InteractingVertex'
-				,'InteractingSphere'
-				,'InteractionGeometryMetaEngine'
-				,'SpheresContactGeometry']),
-	
-	env.SharedLibrary('InteractingEdge2InteractingSphere4SpheresContactGeometry'
-	    ,['Engine/EngineUnit/InteractingEdge2InteractingSphere4SpheresContactGeometry.cpp']
-	    ,LIBS=env['LIBS']+['InteractingEdge'
-				,'InteractingSphere'
-				,'InteractionGeometryMetaEngine'
-				,'SpheresContactGeometry']),
-    
 	env.SharedLibrary('InteractingFacet2InteractingSphere4SpheresContactGeometry'
 	    ,['Engine/EngineUnit/InteractingFacet2InteractingSphere4SpheresContactGeometry.cpp']
 	    ,LIBS=env['LIBS']+['InteractingFacet'
@@ -1097,12 +1083,9 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'ElasticContactLaw'
 				,'ElasticCriterionTimeStepper'
 				,'Facet'
-				,'GeometricalEdge'
 				,'GravityEngines'
-				,'InteractingEdge'
 				,'InteractingFacet'
 				,'InteractingSphere'
-				,'InteractingVertex'
 				,'InteractionGeometryMetaEngine'
 				,'InteractionPhysicsMetaEngine'
 				,'InteractionVecSet'
@@ -1118,7 +1101,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'SpatialQuickSortCollider'
 				,'Sphere'
 				,'RotationEngine'
-				,'Vertex'
 				])#,
 				
 	#env.SharedLibrary('MicroMacroAnalyser',

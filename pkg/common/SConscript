@@ -27,8 +27,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('InteractingBox',['DataClass/InteractingGeometry/InteractingBox.cpp'],),
 	env.SharedLibrary('InteractingSphere',['DataClass/InteractingGeometry/InteractingSphere.cpp']),
 	env.SharedLibrary('MetaInteractingGeometry',['DataClass/InteractingGeometry/MetaInteractingGeometry.cpp']),
-	env.SharedLibrary('InteractingVertex',['DataClass/InteractingGeometry/InteractingVertex.cpp']),
-	env.SharedLibrary('InteractingEdge',['DataClass/InteractingGeometry/InteractingEdge.cpp']),
 	env.SharedLibrary('InteractingFacet',['DataClass/InteractingGeometry/InteractingFacet.cpp']),
 	env.SharedLibrary('ParticleParameters',['DataClass/PhysicalParameters/ParticleParameters.cpp']),
 	env.SharedLibrary('RigidBodyParameters',['DataClass/PhysicalParameters/RigidBodyParameters.cpp'],
@@ -43,8 +41,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('Sphere',['DataClass/GeometricalModel/Sphere.cpp']),
 	env.SharedLibrary('Tetrahedron',['DataClass/GeometricalModel/Tetrahedron.cpp']),
 	env.SharedLibrary('Quadrilateral',['DataClass/GeometricalModel/Quadrilateral.cpp']),
-	env.SharedLibrary('Vertex',['DataClass/GeometricalModel/Vertex.cpp']),
-	env.SharedLibrary('GeometricalEdge',['DataClass/GeometricalModel/GeometricalEdge.cpp']),
 	env.SharedLibrary('Facet',['DataClass/GeometricalModel/Facet.cpp']),
 	env.SharedLibrary('MomentEngine',['Engine/DeusExMachina/MomentEngine.cpp'],
 		LIBS=env['LIBS']+['Momentum','ParticleParameters']),
@@ -86,8 +82,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['BoundingVolumeMetaEngine','InteractingBox','AABB','Box',]),
 	env.SharedLibrary('MetaInteractingGeometry2AABB',['Engine/EngineUnit/MetaInteractingGeometry2AABB.cpp'],
 		LIBS=env['LIBS']+['BoundingVolumeMetaEngine','MetaInteractingGeometry','AABB']),
-	env.SharedLibrary('InteractingEdge2AABB',['Engine/EngineUnit/InteractingEdge2AABB.cpp'],
-		LIBS=env['LIBS']+['AABB','InteractingEdge']),
 	env.SharedLibrary('InteractingFacet2AABB',['Engine/EngineUnit/InteractingFacet2AABB.cpp'],
 		LIBS=env['LIBS']+['AABB','InteractingFacet']),
 	env.SharedLibrary('LeapFrogOrientationIntegrator',['Engine/EngineUnit/LeapFrogOrientationIntegrator.cpp'],
@@ -133,10 +127,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['yade-base','Sphere','yade-opengl']),
 	env.SharedLibrary('GLDrawQuadrilateral',['RenderingEngine/GLDrawGeometricalModel/GLDrawQuadrilateral.cpp'],
 		LIBS=env['LIBS']+['yade-base','Quadrilateral','yade-opengl']),
-	env.SharedLibrary('GLDrawVertex',['RenderingEngine/GLDrawGeometricalModel/GLDrawVertex.cpp']
-	    ,LIBS=env['LIBS']+['yade-opengl','Vertex']),
-	env.SharedLibrary('GLDrawGeometricalEdge',['RenderingEngine/GLDrawGeometricalModel/GLDrawGeometricalEdge.cpp']
-	    ,LIBS=env['LIBS']+['yade-opengl','GeometricalEdge']),
 	env.SharedLibrary('GLDrawFacet',['RenderingEngine/GLDrawGeometricalModel/GLDrawFacet.cpp']
 	    ,LIBS=env['LIBS']+['yade-opengl','Facet']),
 	env.SharedLibrary('GLDrawInteractingBox',['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingBox.cpp'],
@@ -145,10 +135,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['yade-base','InteractingSphere','yade-opengl'],),
 	env.SharedLibrary('GLDrawMetaInteractingGeometry',['RenderingEngine/GLDrawInteractingGeometry/GLDrawMetaInteractingGeometry.cpp'],
 		LIBS=env['LIBS']+['yade-opengl']),
-	env.SharedLibrary('GLDrawInteractingVertex',['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingVertex.cpp']
-	    ,LIBS=env['LIBS']+['yade-opengl','InteractingVertex']),
-	env.SharedLibrary('GLDrawInteractingEdge',['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingEdge.cpp']
-	    ,LIBS=env['LIBS']+['yade-opengl','InteractingEdge']),
 	env.SharedLibrary('GLDrawInteractingFacet',['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingFacet.cpp']
 	    ,LIBS=env['LIBS']+['yade-opengl','InteractingFacet']),
 	env.SharedLibrary('GLDrawBoxShadowVolume',['RenderingEngine/GLDrawShadowVolume/GLDrawBoxShadowVolume.cpp'],

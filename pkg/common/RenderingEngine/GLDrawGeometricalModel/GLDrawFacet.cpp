@@ -14,31 +14,31 @@ void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Ph
 {
     Facet* facet = static_cast<Facet*>(gm.get());
     
-    glColor3v(gm->diffuseColor); 
-
-
-    if (gm->wire || wire)
+    
+	if (gm->wire || wire)
     {
-	glBegin(GL_LINE_LOOP);
-	glDisable(GL_LIGHTING);
-
-	glVertex3(0.0,0.0,0.0);
-	for (int i=0, e=facet->vertices.size(); i<e; ++i)
-	    glVertex3v(facet->vertices[i]);
-
-	glEnd();
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+	//	glBegin(GL_TRIANGLES);
+		glDisable(GL_LIGHTING);
+		glBegin(GL_LINE_LOOP);
+			glColor3v(gm->diffuseColor); 
+			glVertex3v(facet->vertices[0]);
+			glVertex3v(facet->vertices[1]);
+			glVertex3v(facet->vertices[2]);
+		glEnd();
     }
     else
     {
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_LIGHTING);
-	glBegin(GL_POLYGON);
-
-	glVertex3(0.0,0.0,0.0);
-	for (int i=0, e=facet->vertices.size(); i<e; ++i)
-	    glVertex3v(facet->vertices[i]);
-
-	glEnd();
+		//glDisable(GL_CULL_FACE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+		//glBegin(GL_TRIANGLES);
+		glEnable(GL_LIGHTING);
+		glBegin(GL_POLYGON);
+			glColor3v(gm->diffuseColor); 
+			glVertex3v(facet->vertices[0]);
+			glVertex3v(facet->vertices[1]);
+			glVertex3v(facet->vertices[2]);
+		glEnd();
     }
 }
 YADE_PLUGIN();

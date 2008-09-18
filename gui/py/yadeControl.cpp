@@ -494,7 +494,7 @@ BASIC_PY_PROXY_TAIL;
 
 class pySTLImporter : public STLImporter {
     public:
-	void py_import(pyBodyContainer bc, unsigned int begin=0) { import(bc.proxee,begin); }
+	unsigned int py_import(pyBodyContainer bc, unsigned int begin=0) { import(bc.proxee,begin); }
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,2);
@@ -603,25 +603,9 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	boost::python::class_<pySTLImporter>("STLImporter")
 	    .def("open",&pySTLImporter::open)
-	    .add_property("number_of_all_imported",&pySTLImporter::number_of_all_imported)
-	    .add_property("number_of_imported_vertices",&pySTLImporter::number_of_imported_vertices)
-	    .add_property("number_of_imported_edges",&pySTLImporter::number_of_imported_edges)
-	    .add_property("number_of_imported_facets",&pySTLImporter::number_of_imported_facets)
-	    .add_property("number_of_vertices",&pySTLImporter::number_of_vertices)
-	    .add_property("number_of_corner_vertices",&pySTLImporter::number_of_corner_vertices)
-	    .add_property("number_of_flat_vertices",&pySTLImporter::number_of_flat_vertices)
 	    .add_property("number_of_facets",&pySTLImporter::number_of_facets)
-	    .add_property("number_of_edges",&pySTLImporter::number_of_edges)
-	    .add_property("number_of_corner_edges",&pySTLImporter::number_of_corner_edges)
-	    .add_property("number_of_flat_edges",&pySTLImporter::number_of_flat_edges)
-	    .def_readwrite("max_vertices_in_facet",&pySTLImporter::max_vertices_in_facet)
-	    .def("set_imported_stuff",&pySTLImporter::set_imported_stuff)
-	    .def_readwrite("import_vertices",&pySTLImporter::import_vertices)
-	    .def_readwrite("import_edges",&pySTLImporter::import_edges)
-	    .def_readwrite("import_facets",&pySTLImporter::import_facets)
-	    .def_readwrite("facets_wire",&pySTLImporter::facets_wire)
-	    .def_readwrite("import_flat_edges_flag",&pySTLImporter::import_flat_edges_flag)
-	    .def_readwrite("import_flat_vertices_flag",&pySTLImporter::import_flat_vertices_flag)
+	    .def_readwrite("wire",&pySTLImporter::wire)
 	    .def("import_geometry",&pySTLImporter::py_import,STLImporter_import_overloads());
+	
 }
 

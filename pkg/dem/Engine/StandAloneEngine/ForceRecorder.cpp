@@ -13,7 +13,8 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Force.hpp>
-#include <boost/lexical_cast.hpp>
+#include<boost/lexical_cast.hpp>
+#include<boost/filesystem/operations.hpp>
 
 
 ForceRecorder::ForceRecorder () : DataRecorder(), actionForce(new Force)
@@ -23,17 +24,30 @@ ForceRecorder::ForceRecorder () : DataRecorder(), actionForce(new Force)
 	startId = 0;
 	endId = 1;
 	changed = false;
+	first=true;
 }
 
 
 void ForceRecorder::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		ofile.open(outputFile.c_str());
-	}
+	//if(deserializing)
+	//	ofile.open(outputFile.c_str());
 }
 
+
+void ForceRecorder::init()
+{
+	first=false;
+	if (filesystem::exists(outputFile))
+	{
+		int i=0;
+		while(filesystem::exists(outputFile+"~"+lexical_cast<string>(i))) i++;
+		string newFile=outputFile+"~"+lexical_cast<string>(i);
+		filesystem::rename(outputFile,newFile);
+		LOG_INFO("Renamed old file "<<outputFile<<" to "<<newFile);
+	}
+	ofile.open(outputFile.c_str());
+}
 
 void ForceRecorder::registerAttributes()
 {
@@ -53,6 +67,8 @@ bool ForceRecorder::isActivated()
 
 void ForceRecorder::action(MetaBody * ncb)
 {
+	if (first) init();
+
 	Real x=0, y=0, z=0;
 	
 	for( int i = startId ; i <= endId ; ++i )

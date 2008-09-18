@@ -13,7 +13,10 @@
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-/* Resets spatial position for all subscribed bodies to the desired value. */
+/*! \brief Reset the spatial position of all subscribed bodies to the desired value. 
+ *
+ *
+ * */
 class ResetPositionEngine : public DeusExMachina {
 	public:
 		void applyCondition(MetaBody*);
@@ -23,9 +26,12 @@ class ResetPositionEngine : public DeusExMachina {
 
 		int interval;
 		Real Y_min;
-		/// import/export initial positions
+		/// \brief import/export desired positions from file.
+		/// If fileName is set and initial_positions are not set, then positions are read from file.
+		/// If fileName is not set and initial_positions are set, then positions are read bodies se3
 		std::string fileName; 
 		std::vector<Vector3r> initial_positions; // for serialization
+		/// if true ResetPositionEngine is active for all isDynamic bodies 
 		bool onlyDynamic;
 		
 		DECLARE_LOGGER;
