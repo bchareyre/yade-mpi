@@ -9,6 +9,7 @@ YADE_PLUGIN("SpheresContactGeometry");
  * (should be on the plane passing through origin and oriented with normal; not checked!)
  */
 void SpheresContactGeometry::setTgPlanePts(Vector3r p1new, Vector3r p2new){
+	assert(hasShear);
 	cp1rel=ori1.Conjugate()*rollPlanePtToSphere(p1new,d1,normal);
 	cp2rel=ori2.Conjugate()*rollPlanePtToSphere(p2new,d2,-normal);
 }
@@ -19,6 +20,7 @@ void SpheresContactGeometry::setTgPlanePts(Vector3r p1new, Vector3r p2new){
  * flip axis and the point would project on other side of the tangent plane piece.
  */
 void SpheresContactGeometry::relocateContactPoints(){
+	assert(hasShear);
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Vector3r midPt=.5*(p1+p2);
 	if((p1.SquaredLength()>4*d1 || p2.SquaredLength()>4*d2) && midPt.SquaredLength()>.5*min(d1,d2)){
@@ -29,15 +31,17 @@ void SpheresContactGeometry::relocateContactPoints(){
 }
 
 /*! Perform slip of the projected contact points so that their distance becomes equal (or remains smaller) than the given one.
- * TODO: not yet tested
+ * The slipped distance is returned.
  */
-void SpheresContactGeometry::slipToDistIfNeeded(Real dist){
+Real SpheresContactGeometry::slipToDisplacementTMax(Real displacementTMax){
+	assert(hasShear);
+	assert(displacementTMax>Mathr::ZERO_TOLERANCE);
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Real currDist=(p2-p1).Length();
-	if(currDist<dist) return; // close enough, no slip needed
-	assert(dist>Mathr::ZERO_TOLERANCE);
-	Vector3r diff=.5*(currDist/dist-1)*(p2-p1);
+	if(currDist<displacementTMax) return 0; // close enough, no slip needed
+	Vector3r diff=.5*(currDist/displacementTMax-1)*(p2-p1);
 	setTgPlanePts(p1+diff,p2-diff);
+	return 2*diff.Length();
 }
 
 /*! Project point from sphere surface to tangent plane,

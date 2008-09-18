@@ -30,7 +30,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 			contactPoint;
 		Real radius1,radius2,penetrationDepth;
 
-		bool exactRot; // whether the exact rotation code is being used -- following fields are needed for that
+		bool hasShear; // whether the exact rotation code is being used -- following fields are needed for that
 		//! positions and orientations of both spheres -- must be updated at every iteration
 		Vector3r pos1, pos2; Quaternionr ori1, ori2;
 		/*! Orientation of the contact point relative to each sphere-local coordinates.
@@ -61,18 +61,21 @@ class SpheresContactGeometry: public InteractionGeometry{
 		Vector3r displacementT(bool relocate=true){ return contPtInTgPlane2()-contPtInTgPlane1();}
 		Vector3r epsT(){return displacementT()*(1./d0);}
 	
-		void slipToDistIfNeeded(Real slip);
+		Real slipToDisplacementTMax(Real displacementTMax);
+		//! slip to epsTMax if current epsT is greater; return the relative slip magnitude
+		Real slipToEpsTMax(Real epsTMax){return (1/d0)*slipToDisplacementTMax(epsTMax*d0);}
+
 		void relocateContactPoints();
 
-		SpheresContactGeometry():InteractionGeometry(),contactPoint(Vector3r::ZERO),radius1(0),radius2(0),exactRot(false){createIndex();}
+		SpheresContactGeometry():InteractionGeometry(),contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false){createIndex();}
 		virtual ~SpheresContactGeometry(){};
 	protected :
 		virtual void registerAttributes(){
 			REGISTER_ATTRIBUTE(radius1);
 			REGISTER_ATTRIBUTE(radius2);
 			REGISTER_ATTRIBUTE(contactPoint); // to allow access from python
-			// exactRot
-			REGISTER_ATTRIBUTE(exactRot);
+			// hasShear
+			REGISTER_ATTRIBUTE(hasShear);
 			REGISTER_ATTRIBUTE(pos1);
 			REGISTER_ATTRIBUTE(pos2);
 			REGISTER_ATTRIBUTE(ori1);

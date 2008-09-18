@@ -4,6 +4,7 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
+#include<yade/lib-opengl/GLUtils.hpp>
 
 
 YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics" /* ,"BrefcomStiffnessComputer"*/ );
@@ -314,9 +315,9 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 		min(1.,max(0.,BC->epsTrans/BC->epsCrackOnset)),
 		min(1.,max(0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
 
-	if(contactLine) Shop::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
-	if(dmgLabel){ Shop::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
-	else if(epsNLabel){ Shop::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
+	if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+	else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
 
 	const Vector3r& cp=static_pointer_cast<SpheresContactGeometry>(i->interactionGeometry)->contactPoint;
 	if(epsT){
@@ -325,16 +326,16 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 		Real scale=.5*BC->equilibriumDist;
 		Vector3r dirShear=BC->epsT; dirShear.Normalize();
 		if(epsTAxes){
-			Shop::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));
-			Shop::GLDrawLine(cp-Vector3r(0,scale,0),cp+Vector3r(0,scale,0));
-			Shop::GLDrawLine(cp-Vector3r(0,0,scale),cp+Vector3r(0,0,scale));
+			GLUtils::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));
+			GLUtils::GLDrawLine(cp-Vector3r(0,scale,0),cp+Vector3r(0,scale,0));
+			GLUtils::GLDrawLine(cp-Vector3r(0,0,scale),cp+Vector3r(0,0,scale));
 		}
-		Shop::GLDrawArrow(cp,cp+dirShear*relShear*scale,Vector3r(1.,0.,0.));
-		Shop::GLDrawLine(cp+dirShear*relShear*scale,cp+dirShear*scale,Vector3r(.3,.3,.3));
+		GLUtils::GLDrawArrow(cp,cp+dirShear*relShear*scale,Vector3r(1.,0.,0.));
+		GLUtils::GLDrawLine(cp+dirShear*relShear*scale,cp+dirShear*scale,Vector3r(.3,.3,.3));
 
-		/* normal strain */ Shop::GLDrawArrow(cp,cp+BC->prevNormal*(BC->epsN/maxShear),Vector3r(0.,1.,0.));
+		/* normal strain */ GLUtils::GLDrawArrow(cp,cp+BC->prevNormal*(BC->epsN/maxShear),Vector3r(0.,1.,0.));
 	}
-	//if(normal) Shop::GLDrawArrow(cp,cp+BC->prevNormal*.5*BC->equilibriumDist,Vector3r(0.,1.,0.));
+	//if(normal) GLUtils::GLDrawArrow(cp,cp+BC->prevNormal*.5*BC->equilibriumDist,Vector3r(0.,1.,0.));
 }
 
 /********************** BrefcomDamageColorizer ****************************/

@@ -74,7 +74,7 @@ void GLDrawSpheresContactGeometry::go(
 		#endif
 	}
 
-	if(sc->exactRot){
+	if(sc->hasShear){
 		GLUtils::GLDrawLine(sc->pos1,sc->pos2,Vector3r(.5,.5,.5));
 		// sphere center to point on the sphere
 		//GLUtils::GLDrawText("[1]",sc->pos1,Vector3r(1,1,1)); GLUtils::GLDrawText("[2]",sc->pos2,Vector3r(1,1,1));

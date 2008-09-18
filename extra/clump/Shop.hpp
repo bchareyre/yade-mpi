@@ -79,11 +79,6 @@ class Shop{
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);
 
-		static void GLDrawLine(Vector3r from, Vector3r to, Vector3r color=Vector3r(1,1,1));
-		static void GLDrawArrow(Vector3r from, Vector3r to, Vector3r color=Vector3r(1,1,1));
-		static void GLDrawText(std::string text, Vector3r pos, Vector3r color=Vector3r(1,1,1));
-		static void GLDrawNum(Real n, Vector3r pos, Vector3r color=Vector3r(1,1,1), unsigned precision=3);
-
 		/*! Cache for class indices for physical actions (body external variables, Bex)
 		 *
 		 * It is necessary to populate the cache by calling initCache(); then supported

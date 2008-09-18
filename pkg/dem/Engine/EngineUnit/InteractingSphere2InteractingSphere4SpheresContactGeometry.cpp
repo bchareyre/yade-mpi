@@ -24,7 +24,7 @@ InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2In
 void InteractingSphere2InteractingSphere4SpheresContactGeometry::registerAttributes()
 {	
 	REGISTER_ATTRIBUTE(interactionDetectionFactor);
-	REGISTER_ATTRIBUTE(exactRot);
+	REGISTER_ATTRIBUTE(hasShear);
 }
 
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
@@ -51,8 +51,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 		scm->radius1 = s1->radius;
 		scm->radius2 = s2->radius;
 		if (!c->interactionGeometry) c->interactionGeometry = scm;
-		if(exactRot){
-			scm->exactRot=true;
+		if(hasShear){
+			scm->hasShear=true;
 			scm->pos1=se31.position; scm->pos2=se32.position;
 			scm->ori1=se31.orientation; scm->ori2=se32.orientation;
 			if(c->isNew){
@@ -64,8 +64,13 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
 				scm->cp1rel.Normalize(); scm->cp2rel.Normalize();
 			}
-			// FIXME: temporary, testing only!
-			if((Omega::instance().getCurrentIteration()%500)==0) scm->relocateContactPoints();
+			// testing only
+			#if 0
+			if((Omega::instance().getCurrentIteration()%10000)==0) scm->relocateContactPoints();
+			if((Omega::instance().getCurrentIteration()%10000)==0) {
+				Real slip=scm->slipToEpsNMax(1.); if(slip>0) cerr<<"SLIP by Δε_N "<<slip<<" → ε_N="<<scm->epsN()<<endl;
+			}
+			#endif
 		}
 		return true;
 	} else return false;

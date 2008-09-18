@@ -26,8 +26,8 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 		 * @note This parameter is functionally coupled with InteractinSphere2AABB::aabbEnlargeFactor,
 		 * which will create larger bounding boxes and should be of the same value. */
 		double interactionDetectionFactor;
-		/*! Whether we create SpheresContactGeometry with data necessary for exact rotation computation */
-		bool exactRot;
+		/*! Whether we create SpheresContactGeometry with data necessary for (exact) shear computation */
+		bool hasShear;
 
 	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);

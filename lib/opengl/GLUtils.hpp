@@ -12,20 +12,20 @@
 
 struct GLUtils{
 
-	static void GLDrawArrow(Vector3r from, Vector3r to, Vector3r color){
+	static void GLDrawArrow(const Vector3r& from, const Vector3r& to, const Vector3r& color=Vector3r(1,1,1)){
 		glEnable(GL_LIGHTING); glColor3v(color); qglviewer::Vec a(from[0],from[1],from[2]),b(to[0],to[1],to[2]); QGLViewer::drawArrow(a,b);	
 	}
-	static void GLDrawLine(Vector3r from, Vector3r to, Vector3r color){
+	static void GLDrawLine(const Vector3r& from, const Vector3r& to, const Vector3r& color=Vector3r(1,1,1)){
 		glEnable(GL_LIGHTING); glColor3v(color);
 		glBegin(GL_LINES); glVertex3v(from); glVertex3v(to); glEnd();
 	}
 
-	static void GLDrawNum(Real n, Vector3r pos, Vector3r color, unsigned precision){
+	static void GLDrawNum(const Real& n, const Vector3r& pos, const Vector3r& color=Vector3r(1,1,1), unsigned precision=3){
 		std::ostringstream oss; oss<<std::setprecision(precision)<< /* "w="<< */ (double)n;
 		GLUtils::GLDrawText(oss.str(),pos,color);
 	}
 
-	static void GLDrawText(std::string txt, Vector3r pos, Vector3r color){
+	static void GLDrawText(const std::string& txt, const Vector3r& pos, const Vector3r& color=Vector3r(1,1,1)){
 		glPushMatrix();
 		glTranslatev(pos);
 		glColor3(color[0],color[1],color[2]);
