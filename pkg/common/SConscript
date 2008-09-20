@@ -63,7 +63,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('DisplacementEngine',['Engine/DeusExMachina/DisplacementEngine.cpp']),
 	env.SharedLibrary('FixedPositionEngine',['Engine/DeusExMachina/FixedPositionEngine.cpp']),
 	env.SharedLibrary('FixedOrientationEngine',['Engine/DeusExMachina/FixedOrientationEngine.cpp']),
-	env.SharedLibrary('ResetPositionEngine',['Engine/DeusExMachina/ResetPositionEngine.cpp'],
+	env.SharedLibrary('ResetPositionEngine',['Engine/StandAloneEngine/ResetPositionEngine.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters']),
 	env.SharedLibrary('FilterEngine',['Engine/FilterEngine/FilterEngine.cpp']),
 	env.SharedLibrary('ColorizedLayerFilter',['Engine/FilterEngine/ColorizedLayerFilter.cpp'],

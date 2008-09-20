@@ -15,35 +15,32 @@ CREATE_LOGGER(ResetPositionEngine);
 
 ResetPositionEngine::ResetPositionEngine(){
 		Y_min=-1;
-		interval=0;
 		ini_pos.clear();
 		initial_positions.clear();
-		subscrBodies.clear();
+		subscribedBodies.clear();
 		fileName="";
 		first=true;
-		onlyDynamic=false;
 }
 
 void ResetPositionEngine::postProcessAttributes(bool deserializing){}
 
 void ResetPositionEngine::registerAttributes(){
-	DeusExMachina::registerAttributes(); // for subscribedBodies
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(onlyDynamic);
+	PeriodicEngine::registerAttributes(); // for subscribedBodies
 	REGISTER_ATTRIBUTE(Y_min);
+	REGISTER_ATTRIBUTE(subscribedBodies);
 	REGISTER_ATTRIBUTE(initial_positions);
 	REGISTER_ATTRIBUTE(fileName);
 }
 
 
-void ResetPositionEngine::applyCondition(MetaBody * ncb)
+void ResetPositionEngine::action(MetaBody * ncb)
 {
 	if (first) { initialize(ncb); return; }
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	for(int i=0,e=subscrBodies.size(); i<e; ++i)
+	for(int i=0,e=subscribedBodies.size(); i<e; ++i)
 	{
-			ParticleParameters* pp = YADE_CAST<ParticleParameters*>((*bodies)[subscrBodies[i]]->physicalParameters.get());
+			ParticleParameters* pp = YADE_CAST<ParticleParameters*>((*bodies)[subscribedBodies[i]]->physicalParameters.get());
 			if (pp->se3.position[1]<Y_min)
 			{
 					pp->se3.position = ini_pos[i];
@@ -55,22 +52,15 @@ void ResetPositionEngine::applyCondition(MetaBody * ncb)
 void ResetPositionEngine::initialize(MetaBody * ncb)
 {
 	first=false;
-	if (onlyDynamic)
-	{
-		FOREACH(shared_ptr<Body> b, *ncb->bodies) { if(b->isDynamic) subscrBodies.push_back(b->getId()); }
-	}
-	else
-		subscrBodies.assign(subscribedBodies.begin(),subscribedBodies.end());
-
 	if (fileName=="")
 	{ 
 		if (initial_positions.size()==0) 	
 		{ // initialize positions from bodies se3
 			LOG_INFO("Initialize positions from bodies se3");
-			initial_positions.resize(subscrBodies.size());
+			initial_positions.resize(subscribedBodies.size());
 			shared_ptr<BodyContainer>& bodies = ncb->bodies;
-			for(int i=0,e=subscrBodies.size(); i<e; ++i)
-				initial_positions[i]=(*bodies)[subscrBodies[i]]->physicalParameters->se3.position;
+			for(int i=0,e=subscribedBodies.size(); i<e; ++i)
+				initial_positions[i]=(*bodies)[subscribedBodies[i]]->physicalParameters->se3.position;
 		}
 		ini_pos.assign(initial_positions.begin(),initial_positions.end());
 		return;
@@ -80,8 +70,8 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 	if (is) 
 	{// reading positions from file 
 		LOG_INFO("Reading positions from file: " << fileName);
-		ini_pos.resize(subscrBodies.size());
-		for(int i=0,e=subscrBodies.size(); i<e && !is.eof(); ++i)
+		ini_pos.resize(subscribedBodies.size());
+		for(int i=0,e=subscribedBodies.size(); i<e && !is.eof(); ++i)
 			is >> ini_pos[i][0] >> ini_pos[i][1] >> ini_pos[i][2];
 		return;
 	}
@@ -90,10 +80,10 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 	if (initial_positions.size()==0)
 	{
 		LOG_INFO("Initialize positions from bodies se3");
-		ini_pos.resize(subscrBodies.size());
+		ini_pos.resize(subscribedBodies.size());
 		shared_ptr<BodyContainer>& bodies = ncb->bodies;
-		for(int i=0,e=subscrBodies.size(); i<e; ++i)
-			ini_pos[i]=(*bodies)[subscrBodies[i]]->physicalParameters->se3.position;
+		for(int i=0,e=subscribedBodies.size(); i<e; ++i)
+			ini_pos[i]=(*bodies)[subscribedBodies[i]]->physicalParameters->se3.position;
 	}
 	else ini_pos.swap(initial_positions);
 	std::ofstream os(fileName.c_str());
@@ -102,7 +92,7 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 		return;
 	}
 	LOG_INFO("Export positions to file: "<<fileName);
-	for(int i=0,e=subscrBodies.size(); i<e; ++i)
+	for(int i=0,e=subscribedBodies.size(); i<e; ++i)
 		os << ini_pos[i][0]<< '\t' << ini_pos[i][1]<< '\t' << ini_pos[i][2]<< std::endl;
 }
 YADE_PLUGIN();
