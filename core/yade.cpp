@@ -57,7 +57,7 @@ sigHandler(int sig){
 		if(sig==SIGABRT || sig==SIGSEGV){
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			raise(sig); // reemit signal after exiting gdb
 		}
