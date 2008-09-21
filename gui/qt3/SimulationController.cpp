@@ -44,6 +44,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	sync=false; syncRunning=false;
 	refreshTime = 40;
 	changeTimeStep=false;
+	lastRenderedIteration=-1;
 
 	iterPerSec_LastIter=Omega::instance().getCurrentIteration();
 	iterPerSec_LastLocalTime=microsec_clock::local_time();
@@ -257,10 +258,11 @@ void SimulationController::cbSyncToggled(bool b)
 void SimulationController::timerEvent( QTimerEvent* )
 {
 	doUpdate(); /* update the controller, like iteration number etc */
-	if(hasSimulation && (Omega::instance().isRunning() || syncRunning))
+	if(hasSimulation && (Omega::instance().isRunning() || syncRunning || lastRenderedIteration!=Omega::instance().getCurrentIteration()))
 	{
 		/* update GLViews */
 		YadeQtMainWindow::self->redrawAll(true);
+		lastRenderedIteration=Omega::instance().getCurrentIteration();
 		if(sync && syncRunning){ Omega::instance().spawnSingleSimulationLoop(); }
 	}
 }

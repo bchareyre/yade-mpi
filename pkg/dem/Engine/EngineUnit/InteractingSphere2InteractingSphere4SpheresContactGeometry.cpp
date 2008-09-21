@@ -1,12 +1,7 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
+// © 2004 Janek Kozicki <cosurgi@berlios.de>
+// © 2007 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp"
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -33,24 +28,21 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 							const Se3r& se32,
 							const shared_ptr<Interaction>& c)
 {
-	InteractingSphere* s1 = static_cast<InteractingSphere*>(cm1.get());
-	InteractingSphere* s2 = static_cast<InteractingSphere*>(cm2.get());
-
-	Vector3r normal = se32.position-se31.position;
-	Real penetrationDepth = pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.SquaredLength();// Compute a wrong value just to check sign - faster than computing distances
-	//Real penetrationDepth = s1->radius+s2->radius-normal.Normalize();
-	if (penetrationDepth>0 || c->isReal){
+	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
+	Vector3r normal=se32.position-se31.position;
+	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.SquaredLength();
+	if (penetrationDepthSq>0 || c->isReal){
 		shared_ptr<SpheresContactGeometry> scm;
-		if (c->interactionGeometry) scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
-		else scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; }
+		//cerr<<"Assigned scm "<<scm.get()<<"=="<<c->interactionGeometry.get()<<endl;
 
-		penetrationDepth = s1->radius+s2->radius-normal.Normalize();
-		scm->contactPoint = se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
-		scm->normal = normal;
-		scm->penetrationDepth = penetrationDepth;
-		scm->radius1 = s1->radius;
-		scm->radius2 = s2->radius;
-		if (!c->interactionGeometry) c->interactionGeometry = scm;
+		Real penetrationDepth=s1->radius+s2->radius-normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */
+		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
+		scm->normal=normal;
+		scm->penetrationDepth=penetrationDepth;
+		scm->radius1=s1->radius;
+		scm->radius2=s2->radius;
 		if(hasShear){
 			scm->hasShear=true;
 			scm->pos1=se31.position; scm->pos2=se32.position;
@@ -73,7 +65,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 			#endif
 		}
 		return true;
-	} else return false;
+	}
+	return false;
 }
 
 

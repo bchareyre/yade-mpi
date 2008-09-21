@@ -5,6 +5,10 @@
 #include "SpheresContactGeometry.hpp"
 YADE_PLUGIN("SpheresContactGeometry");
 
+// At least one virtual method must be in the .cpp file (!!!)
+SpheresContactGeometry::~SpheresContactGeometry(){};
+
+
 /* Set contact points on both spheres such that their projection is the one given
  * (should be on the plane passing through origin and oriented with normal; not checked!)
  */
@@ -35,7 +39,9 @@ void SpheresContactGeometry::relocateContactPoints(){
  */
 Real SpheresContactGeometry::slipToDisplacementTMax(Real displacementTMax){
 	assert(hasShear);
-	assert(displacementTMax>Mathr::ZERO_TOLERANCE);
+	// very close, reset shear
+	if(displacementTMax<=Mathr::ZERO_TOLERANCE){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
+	// otherwise
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Real currDist=(p2-p1).Length();
 	if(currDist<displacementTMax) return 0; // close enough, no slip needed

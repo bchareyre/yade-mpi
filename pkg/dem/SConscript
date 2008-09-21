@@ -38,14 +38,16 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		LIBS=env['LIBS']+['yade-serialization', 'yade-base']),
 
 	env.SharedLibrary('ElasticContactInteraction',
-		['DataClass/InteractionPhysics/ElasticContactInteraction.cpp']),
+		['DataClass/InteractionPhysics/ElasticContactInteraction.cpp'],
+		LIBS=env['LIBS']+['NormalShearInteractions']),
 		
 	env.SharedLibrary('CohesiveFrictionalContactInteraction',
 		['DataClass/InteractionPhysics/CohesiveFrictionalContactInteraction.cpp'],
 		LIBS=env['LIBS']+['ElasticContactInteraction']),
 
 	env.SharedLibrary('SDECLinkPhysics',
-		['DataClass/InteractionPhysics/SDECLinkPhysics.cpp']),
+		['DataClass/InteractionPhysics/SDECLinkPhysics.cpp'],
+		LIBS=env['LIBS']+['NormalShearInteractions']),
 
 	env.SharedLibrary('GlobalStiffness',
 		['DataClass/PhysicalAction/GlobalStiffness.cpp'],
@@ -97,15 +99,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 				,'InteractingSphere'
 				,'InteractionGeometryMetaEngine'
 				,'SpheresContactGeometry']),
-
-	env.SharedLibrary('InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
-		['Engine/EngineUnit/InteractingSphere2InteractingSphere4DistantSpheresContactGeometry.cpp'],
-		LIBS=env['LIBS']+['SDECLinkGeometry',
-			'SpheresContactGeometry',
-			'InteractionGeometryMetaEngine',
-			'yade-base',
-			'yade-multimethods',
-			'InteractingSphere']),
 
 	env.SharedLibrary('InteractingMyTetrahedron2AABB',
 		['Engine/EngineUnit/InteractingMyTetrahedron2AABB.cpp'],
@@ -674,7 +667,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
+			'InteractingSphere2InteractingSphere4SpheresContactGeometry',
 			'InteractingBox2InteractingSphere4SpheresContactGeometry',
 			'CundallNonViscousDamping',
 			'CundallNonViscousDamping',
@@ -722,7 +715,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
-			'InteractingSphere2InteractingSphere4DistantSpheresContactGeometry',
+			'InteractingSphere2InteractingSphere4SpheresContactGeometry',
 			'InteractingBox2InteractingSphere4SpheresContactGeometry',
 			'CundallNonViscousDamping',
 			'CundallNonViscousDamping',

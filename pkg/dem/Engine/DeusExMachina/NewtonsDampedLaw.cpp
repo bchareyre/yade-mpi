@@ -17,7 +17,7 @@ YADE_PLUGIN("NewtonsDampedLaw");
 
 void NewtonsDampedLaw::registerAttributes()
 {
-	//DeusExMachina::registerAttributes();
+	DeusExMachina::registerAttributes(); // register (among other) Engine::label
 	REGISTER_ATTRIBUTE(damping);
 }
 

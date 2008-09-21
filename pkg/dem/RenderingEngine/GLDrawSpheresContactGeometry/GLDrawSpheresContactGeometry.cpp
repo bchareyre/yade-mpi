@@ -23,8 +23,10 @@ void GLDrawSpheresContactGeometry::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	SpheresContactGeometry*    sc = static_cast<SpheresContactGeometry*>(ig.get());
+	SpheresContactGeometry* sc = static_cast<SpheresContactGeometry*>(ig.get());
 
+	const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
+	const Vector3r& pos1=se31.position,pos2=se32.position;
 
 	if(wireFrame)
 	{
@@ -75,21 +77,24 @@ void GLDrawSpheresContactGeometry::go(
 	}
 
 	if(sc->hasShear){
-		GLUtils::GLDrawLine(sc->pos1,sc->pos2,Vector3r(.5,.5,.5));
+		Vector3r contPt=se31.position+(sc->d1/sc->d0)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
+		GLUtils::GLDrawLine(pos1,pos2,Vector3r(.5,.5,.5));
 		// sphere center to point on the sphere
 		//GLUtils::GLDrawText("[1]",sc->pos1,Vector3r(1,1,1)); GLUtils::GLDrawText("[2]",sc->pos2,Vector3r(1,1,1));
-		GLUtils::GLDrawLine(sc->pos1,sc->pos1+(sc->ori1*sc->cp1rel*Vector3r::UNIT_X),Vector3r(0,.5,1));
-		GLUtils::GLDrawLine(sc->pos2,sc->pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X),Vector3r(0,1,.5));
+		GLUtils::GLDrawLine(pos1,pos1+(sc->ori1*sc->cp1rel*Vector3r::UNIT_X*sc->d1),Vector3r(0,.5,1));
+		GLUtils::GLDrawLine(pos2,pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X*sc->d2),Vector3r(0,1,.5));
 		//cerr<<"=== cp1rel="<<sc->cp1rel[0]<<";"<<sc->cp1rel[1]<<";"<<sc->cp1rel[2]<<";"<<sc->cp1rel[3]<<endl;
 		//cerr<<"=== ori1="<<sc->ori1[0]<<";"<<sc->ori1[1]<<";"<<sc->ori1[2]<<";"<<sc->ori1[3]<<endl;
 		//cerr<<"+++ cp1rel="<<sc->cp1rel<<", ori1="<<sc->ori1<<", cp1rel*ori1="<<sc->cp1rel*sc->ori1<<endl;
 		//<<", *UNIT_X="<<sc->cp1rel*sc->ori1*Vector3r::UNIT_X<<", +pos1="<<sc->pos1+(sc->cp1rel*sc->ori1*Vector3r::UNIT_X)<<endl;
 		// contact point to projected points
 		Vector3r ptTg1=sc->contPtInTgPlane1(), ptTg2=sc->contPtInTgPlane2();
-		GLUtils::GLDrawLine(sc->contPt(),sc->contPt()+ptTg1,Vector3r(0,.5,1));
-		GLUtils::GLDrawLine(sc->contPt(),sc->contPt()+ptTg2,Vector3r(0,1,.5));
+		GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1));
+		GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5));
 		// projected shear
-		GLUtils::GLDrawLine(sc->contPt()+ptTg1,sc->contPt()+ptTg2,Vector3r(1,1,1));
+		GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
+		// 
+		GLUtils::GLDrawNum(sc->epsN(),contPt,Vector3r(1,1,1));
 	}
 
 

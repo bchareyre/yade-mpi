@@ -17,12 +17,14 @@
 InteractingFacet2InteractingSphere4SpheresContactGeometry::InteractingFacet2InteractingSphere4SpheresContactGeometry() 
 {
 	shrinkFactor=0;
+	hasShear=false;
 }
 
 void InteractingFacet2InteractingSphere4SpheresContactGeometry::registerAttributes()
 {	
     InteractionGeometryEngineUnit::registerAttributes();
     REGISTER_ATTRIBUTE(shrinkFactor);
+    REGISTER_ATTRIBUTE(hasShear);
 }
 
 bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_ptr<InteractingGeometry>& cm1,
@@ -97,6 +99,21 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 		if (!c->interactionGeometry)
 			c->interactionGeometry = scm;
+
+		if(hasShear){
+			scm->hasShear=true;
+			scm->pos1=scm->contactPoint-(2*sphereRadius-.5*penetrationDepth)*normal; scm->pos2=se32.position;
+			scm->ori1=se31.orientation; scm->ori2=se32.orientation;
+			if(c->isNew){
+				scm->d0=(scm->pos2-scm->pos1).Length();
+				scm->d1=2*sphereRadius-penetrationDepth; scm->d2=sphereRadius-penetrationDepth;
+				// quasi-constants
+				scm->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
+				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
+				scm->cp1rel.Normalize(); scm->cp2rel.Normalize();
+			}
+			cerr<<"@@ "<<scm->epsT()<<endl;
+		}
 
 		return true;
 	}

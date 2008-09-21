@@ -41,7 +41,7 @@
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/HydraulicForceEngine.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4DistantSpheresContactGeometry.hpp>
+#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
@@ -579,7 +579,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
+	shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	interactionGeometryDispatcher->add(s1);
 	shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
 	interactionGeometryDispatcher->add(s2);

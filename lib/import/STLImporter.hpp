@@ -28,6 +28,8 @@ class STLImporter {
 
 	/// import geometry 
 	void import(shared_ptr<BodyContainer> bodies, unsigned int begin=0);
+
+	DECLARE_LOGGER;
 protected:
 		vector<Vector3r> tr; 
 };

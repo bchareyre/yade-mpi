@@ -17,7 +17,8 @@ Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
 /* \todo implement groupMask */
-python::tuple aabbExtrema(){
+python::tuple aabbExtrema(Real cutoff=0.0){
+	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
@@ -26,8 +27,10 @@ python::tuple aabbExtrema(){
 		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-rrr);
 		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+rrr);
 	}
-	return python::make_tuple(vec2tuple(minimum),vec2tuple(maximum));
+	Vector3r dim=maximum-minimum;
+	return python::make_tuple(vec2tuple(minimum+.5*cutoff*dim),vec2tuple(maximum-.5*cutoff*dim));
 }
+BOOST_PYTHON_FUNCTION_OVERLOADS(aabbExtrema_overloads,aabbExtrema,0,1);
 
 python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	python::tuple extrema=aabbExtrema();
@@ -70,13 +73,12 @@ Real elasticEnergyInAABB(python::tuple AABB){
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
 		if(!i->interactionPhysics) continue;
-		//FIXME: dynamic_pointer_cast instead of static should be used here, but the downcast fails for reasons that are not know :-(
-		shared_ptr<BrefcomContact> bc=static_pointer_cast<BrefcomContact>(i->interactionPhysics); if(!bc) continue;
+		shared_ptr<BrefcomContact> bc=dynamic_pointer_cast<BrefcomContact>(i->interactionPhysics); if(!bc) continue;
+		shared_ptr<SpheresContactGeometry> geom=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!bc){LOG_ERROR("Brefcom contact doesn't have SpheresContactGeomety associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->physicalParameters->se3.position,bbMin,bbMax), isIn2=isInBB(b2->physicalParameters->se3.position,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
 		LOG_DEBUG("Interaction #"<<i->getId1()<<"--#"<<i->getId2());
-		//cerr<<"Interaction #"<<i->getId1()<<"--#"<<i->getId2()<<endl;
 		Real weight=1.;
 		if((!isIn1 && isIn2) || (isIn1 && !isIn2)){
 			//shared_ptr<Body> bIn=isIn1?b1:b2, bOut=isIn2?b2:b1;
@@ -87,13 +89,12 @@ Real elasticEnergyInAABB(python::tuple AABB){
 			//cerr<<"Interaction crosses AABB boundary, weight is "<<weight<<endl;
 			//LOG_DEBUG("Interaction crosses AABB boundary, weight is "<<weight);
 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-		E+=bc->equilibriumDist*weight*(.5*bc->E*bc->crossSection*pow(bc->epsN,2)+.5*bc->G*bc->crossSection*pow(bc->epsT.Length(),2));
+		E+=geom->d0*weight*(.5*bc->E*bc->crossSection*pow(geom->epsN(),2)+.5*bc->G*bc->crossSection*pow(geom->epsT().Length(),2));
 		//TRVAR5(bc->crossSection,bc->E,bc->G,bc->epsN,bc->epsT.Length());;
 		//cerr<<bc->crossSection<<","<<bc->E<<","<<bc->G<<","<<bc->epsN<<","<<bc->epsT.Length()<<endl;
 	}
 	return E;
 }
-
 
 /* return histogram ([bin1Min,bin2Min,…],[value1,value2,…]) from projections of interactions
  * to the plane perpendicular to axis∈[0,1,2]; the number of bins can be specified and they cover
@@ -138,7 +139,7 @@ python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::li
 
 BOOST_PYTHON_MODULE(_utils){
 	def("PWaveTimeStep",PWaveTimeStep);
-	def("aabbExtrema",aabbExtrema);
+	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff")));
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor")));
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB")));
 	def("setRefSe3",setRefSe3);

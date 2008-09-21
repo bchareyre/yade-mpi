@@ -44,7 +44,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 
 	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','GlobalStiffnessTimeStepper','GlobalStiffnessCounter','Brefcom','PositionOrientationRecorder']),
 
-	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4DistantSpheresContactGeometry']),
+	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4SpheresContactGeometry']),
 
 	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder']),
 

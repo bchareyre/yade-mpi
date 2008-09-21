@@ -25,7 +25,7 @@
  *
  */
 class SpheresContactGeometry: public InteractionGeometry{
-	public :
+	public:
 		Vector3r normal, // unit vector in the direction from sphere1 center to sphere2 center
 			contactPoint;
 		Real radius1,radius2,penetrationDepth;
@@ -52,23 +52,23 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		void setTgPlanePts(Vector3r p1new, Vector3r p2new);
 
-		Vector3r contPtInTgPlane1(){return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
-		Vector3r contPtInTgPlane2(){return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
+		Vector3r contPtInTgPlane1(){assert(hasShear); return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
+		Vector3r contPtInTgPlane2(){assert(hasShear); return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
 		Vector3r contPt(){return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
 
-		Real displacementN(){return (pos2-pos1).Length()-d0;}
+		Real displacementN(){assert(hasShear); return (pos2-pos1).Length()-d0;}
 		Real epsN(){return displacementN()*(1./d0);}
-		Vector3r displacementT(bool relocate=true){ return contPtInTgPlane2()-contPtInTgPlane1();}
+		Vector3r displacementT(){ assert(hasShear); return contPtInTgPlane2()-contPtInTgPlane1();}
 		Vector3r epsT(){return displacementT()*(1./d0);}
 	
 		Real slipToDisplacementTMax(Real displacementTMax);
 		//! slip to epsTMax if current epsT is greater; return the relative slip magnitude
-		Real slipToEpsTMax(Real epsTMax){return (1/d0)*slipToDisplacementTMax(epsTMax*d0);}
+		Real slipToEpsTMax(Real epsTMax){ return (1/d0)*slipToDisplacementTMax(epsTMax*d0);}
 
 		void relocateContactPoints();
 
-		SpheresContactGeometry():InteractionGeometry(),contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false){createIndex();}
-		virtual ~SpheresContactGeometry(){};
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false){createIndex();}
+		virtual ~SpheresContactGeometry();
 	protected :
 		virtual void registerAttributes(){
 			REGISTER_ATTRIBUTE(radius1);

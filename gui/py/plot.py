@@ -105,7 +105,7 @@ def doUpdate():
 	plot()
 
 
-def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None):
+def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None,varData=False):
 	"""baseName: used for creating baseName.gnuplot (command file for gnuplot),
 			associated baseName.data (data) and output files (if applicable) in the form baseName.[plot number].extension
 		term: specify the gnuplot terminal;
@@ -114,6 +114,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		extension: defaults to terminal name
 			fine for png for example; if you use 'cairopdf', you should also say extension='pdf' however
 		timestamp: append numeric time to the basename
+		varData: whether file to plot will be declared as variable or be in-place in the plot expression
 		comment: a user comment (may be multiline) that will be embedded in the control file
 	"""
 	import time,bz2
@@ -129,7 +130,9 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 	fPlot=file(baseName+".gnuplot",'w')
 	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\n')
 	if comment: fPlot.write('# '+comment.replace('\n','\n# ')+'#\n')
-	fPlot.write('dataFile="< bzcat %s.data.bz2"\n'%(baseNameNoPath))
+	dataFile='"< bzcat %s.data.bz2"'%(baseNameNoPath)
+	if varData:
+		fPlot.write('dataFile=%s'%dataFile); dataFile='dataFile'
 	if not extension: extension=term
 	i=0
 	for p in plots:
@@ -139,7 +142,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
 		fPlot.write("set xlabel '%s'\n"%p)
 		if title: fPlot.write("set title '%s'\n"%title)
-		fPlot.write("plot "+",".join([" dataFile using %d:%d title '%s(%s)' with lines"%(vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
+		fPlot.write("plot "+",".join([" %s using %d:%d title '%s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
 		i+=1
 	fPlot.close()
 

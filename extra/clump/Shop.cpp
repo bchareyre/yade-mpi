@@ -456,6 +456,21 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vec
 	return spheres;
 }
 
+Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
+	shared_ptr<MetaBody> rb=_rb;
+	if(!rb)rb=Omega::instance().getRootBody();
+	Real dt=std::numeric_limits<Real>::infinity();
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		if(!b->physicalParameters || !b->geometricalModel) continue;
+		shared_ptr<ElasticBodyParameters> ebp=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
+		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel);
+		if(!ebp || !s) continue;
+		Real density=ebp->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
+		dt=min(dt,s->radius/sqrt(ebp->young/density));
+	}
+	return dt;
+}
+
 Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 	{0.027814,0.028311,0.053055,0.006921},
 	{0.040115,0.039488,0.051634,0.009072},
@@ -1071,21 +1086,6 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 	{0.370512,0.415453,0.055970,0.010546},
 	{-1.,-1.,-1.,-1. } /* sentinel: non-positive radius */
 };
-
-Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
-	shared_ptr<MetaBody> rb=_rb;
-	if(!rb)rb=Omega::instance().getRootBody();
-	Real dt=std::numeric_limits<Real>::infinity();
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->physicalParameters || !b->geometricalModel) continue;
-		shared_ptr<ElasticBodyParameters> ebp=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel);
-		if(!ebp || !s) continue;
-		Real density=ebp->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
-		dt=min(dt,s->radius/sqrt(ebp->young/density));
-	}
-	return dt;
-}
 
 Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2)
 {

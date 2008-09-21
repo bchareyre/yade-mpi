@@ -34,6 +34,7 @@ class SimulationController : public QtGeneratedSimulationController
 		bool sync;
 		bool syncRunning;
 		bool hasSimulation;
+		long lastRenderedIteration;
 
 		const int iterPerSec_TTL_ms;
 		long  iterPerSec_LastIter;

@@ -58,11 +58,7 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 		if(!contact->isReal) continue;
 
 		SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
-		// FIXME: for some reason, the following dynamic cast is not successful. Please help!
-		//cerr<<__FILE__<<":"<<__LINE__<<" Interaction physics of type "<<contact->interactionPhysics->getClassName()<<" ("<<typeid(*contact->interactionPhysics).name()<<")"<<endl;
-		NormalShearInteraction* phys=static_cast<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
-		//NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
-		//ElasticContactInteraction* phys=YADE_CAST<ElasticContactInteraction*>(contact->interactionPhysics.get()); assert(phys);
+		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
 		// all we need for getting stiffness
 		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
 		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;

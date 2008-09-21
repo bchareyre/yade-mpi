@@ -4,6 +4,13 @@
 # I doubt there functions will be useful for anyone besides me.
 #
 
+def estimateStress(strain,cutoff=0.):
+	"""Use summed stored energy in contacts to compute macroscopic stress over the same volume, provided known strain."""
+	# E=(1/2)σεAl # global stored energy
+	# σ=EE/(.5εAl)=EE/(.5εV)
+	from yade import utils
+	dim=utils.aabbDim(cutoff)
+	return utils.elasticEnergy(utils.aabbExtrema(cutoff))/(.5*strain*dim[0]*dim[1]*dim[2])
 
 def plotDirections(mask=0,bins=20,aabb=()):
 	"Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes."
@@ -13,6 +20,7 @@ def plotDirections(mask=0,bins=20,aabb=()):
 		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins,aabb=aabb)
 		fc=[0,0,0]; fc[axis]=1.
 		pylab.subplot(220+axis+1,polar=True);
+		# 1.2 makes small gaps between values (but the column is decentered)
 		pylab.bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
 	pylab.show()
 
@@ -35,7 +43,6 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	if cutoff>0: cut=utils.fractionalBox(fraction=1-cutoff)
 	for axis in [0,1,2]:
 		if cutoff>0:
-			#print cutoff,utils.aabbExtrema(),cut
 			w,dw=utils.coordsAndDisplacements(axis,AABB=cut)
 		else:
 			w,dw=utils.coordsAndDisplacements(axis)

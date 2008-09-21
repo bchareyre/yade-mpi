@@ -8,6 +8,8 @@
 #include "STLImporter.hpp"
 #include <yade/extra/Shop.hpp>
 
+CREATE_LOGGER(STLImporter);
+
 STLImporter::STLImporter()  
 {
     wire=false;

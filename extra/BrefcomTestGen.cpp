@@ -36,7 +36,7 @@ YADE_PLUGIN("BrefcomTestGen");
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4DistantSpheresContactGeometry.hpp>
+#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
@@ -91,7 +91,7 @@ void BrefcomTestGen::createEngines(){
 	rootBody->engines.push_back(collider);
 
 	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
-	igeomDispatcher->add(new InteractingSphere2InteractingSphere4DistantSpheresContactGeometry);
+	igeomDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);

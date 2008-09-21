@@ -98,7 +98,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		['Engine/EngineUnit/CundallNonViscousDamping.cpp'],
 		LIBS=env['LIBS']+['PhysicalActionDamper','Force','Momentum','ParticleParameters','RigidBodyParameters']),
 	env.SharedLibrary('ElasticBodySimpleRelationship',['Engine/EngineUnit/ElasticBodySimpleRelationship.cpp'],
-		LIBS=env['LIBS']+['ElasticBodyParameters','RigidBodyParameters','ParticleParameters','InteractionPhysicsMetaEngine']),
+		LIBS=env['LIBS']+['ElasticBodyParameters','RigidBodyParameters','ParticleParameters','InteractionPhysicsMetaEngine','NormalShearInteractions']),
 	env.SharedLibrary('NormalShearInteractions',['DataClass/InteractionPhysics/NormalShearInteractions.cpp']),
 
 	#env.SharedLibrary('PersistentTriangulationCollider',
@@ -143,7 +143,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['Sphere','ParticleParameters','yade-opengl']),
 	env.SharedLibrary('GLDrawClosestFeatures',['RenderingEngine/GLDrawInteractionGeometry/GLDrawClosestFeatures.cpp'],
 		LIBS=env['LIBS']+['yade-base','ClosestFeatures','yade-opengl']),
-	env.SharedLibrary('GLDrawNormalInteraction',['RenderingEngine/GLDrawInteractionPhysics/GLDrawNormalInteraction.cpp'],LIBS=env['LIBS']+['yade-opengl']),
+	env.SharedLibrary('GLDrawNormalInteraction',['RenderingEngine/GLDrawInteractionPhysics/GLDrawNormalInteraction.cpp'],LIBS=env['LIBS']+['yade-opengl','NormalShearInteractions']),
 	env.SharedLibrary('GLDrawParticleState',['RenderingEngine/GLDrawState/GLDrawParticleState.cpp'],
 		LIBS=env['LIBS']+['yade-base','ParticleParameters','yade-opengl']),
 	env.SharedLibrary('GLDrawRigidBodyState',['RenderingEngine/GLDrawState/GLDrawRigidBodyState.cpp'],

@@ -16,6 +16,7 @@
 #include<boost/lexical_cast.hpp>
 #include<boost/filesystem/operations.hpp>
 
+CREATE_LOGGER(ForceRecorder);
 
 ForceRecorder::ForceRecorder () : DataRecorder(), actionForce(new Force)
 {

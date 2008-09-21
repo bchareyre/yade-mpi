@@ -10,7 +10,7 @@ class NormalInteraction:public InteractionPhysics {
 		//! normal stiffness
 		Real kn;
 		NormalInteraction(){createIndex(); }
-		virtual ~NormalInteraction(){};
+		virtual ~NormalInteraction();
 	protected:
 		virtual void registerAttributes(){
 			REGISTER_ATTRIBUTE(kn);
@@ -29,7 +29,7 @@ class NormalShearInteraction: public NormalInteraction{
 		//! shear stiffness
 		Real ks;
 		NormalShearInteraction(){ createIndex(); }
-		virtual ~NormalShearInteraction(){};
+		virtual ~NormalShearInteraction();
 	protected:
 		virtual void registerAttributes(){	
 			NormalInteraction::registerAttributes();

@@ -36,6 +36,7 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 	DEFINE_FUNCTOR_ORDER_2D(InteractingFacet,InteractingSphere);
 
 	Real shrinkFactor;
+	bool hasShear;
 	
 	protected :
 		virtual void registerAttributes();
