@@ -12,18 +12,6 @@ def estimateStress(strain,cutoff=0.):
 	dim=utils.aabbDim(cutoff)
 	return utils.elasticEnergy(utils.aabbExtrema(cutoff))/(.5*strain*dim[0]*dim[1]*dim[2])
 
-def plotDirections(mask=0,bins=20,aabb=()):
-	"Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes."
-	import pylab,math
-	from yade import utils
-	for axis in [0,1,2]:
-		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins,aabb=aabb)
-		fc=[0,0,0]; fc[axis]=1.
-		pylab.subplot(220+axis+1,polar=True);
-		# 1.2 makes small gaps between values (but the column is decentered)
-		pylab.bar(d[0],d[1],width=math.pi/(1.2*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
-	pylab.show()
-
 def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	"""Estimate Poisson's ration given the "principal" axis of straining.
 	For every base direction, homogenized strain is computed

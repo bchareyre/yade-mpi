@@ -144,6 +144,43 @@ def spheresToFile(filename,consider=lambda id: True):
 		out.write('%g\t%g\t%g\t%g\n'%(b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
 	out.close()
 
+def avgNumInteractions(cutoff=0.):
+	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
+	return sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
+
+def plotNumInteractionsHistogram(cutoff=0.):
+	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
+	import pylab
+	pylab.bar(nums,counts)
+	pylab.title('Number of interactions histogram, average %g (cutoff=%g)'%(avgNumInteractions(cutoff),cutoff))
+	pylab.xlabel('Number of interactions')
+	pylab.ylabel('Body count')
+	pylab.show()
+
+def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
+	"""Plot 3 histograms for distribution of interaction directions, in yz,xz and xy planes and
+	(optional but default) histogram of number of interactions per body."""
+	import pylab,math
+	from yade import utils
+	for axis in [0,1,2]:
+		d=utils.interactionAnglesHistogram(axis,mask=mask,bins=bins,aabb=aabb)
+		fc=[0,0,0]; fc[axis]=1.
+		subp=pylab.subplot(220+axis+1,polar=True);
+		# 1.1 makes small gaps between values (but the column is a bit decentered)
+		pylab.bar(d[0],d[1],width=math.pi/(1.1*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
+		#pylab.title(['yz','xz','xy'][axis]+' plane')
+		pylab.text(.5,.25,['yz','xz','xy'][axis],horizontalalignment='center',verticalalignment='center',transform=subp.transAxes,fontsize='xx-large')
+	if numHist:
+		pylab.subplot(224,polar=False)
+		nums,counts=utils.bodyNumInteractionsHistogram(aabb if len(aabb)>0 else utils.aabbExtrema())
+		avg=sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
+		pylab.bar(nums,counts,fc=[1,1,0],alpha=.7,align='center')
+		pylab.xlabel('Interactions per body (avg. %g)'%avg)
+		pylab.axvline(x=avg,linewidth=3,color='r')
+		pylab.ylabel('Body count')
+	pylab.show()
+
+
 def import_stl_geometry(file, begin=0, young=30e9,poisson=.3,frictionAngle=0.5236,wire=True):
 		## Import walls geometry from STL file
 		imp = STLImporter()
@@ -160,49 +197,4 @@ def import_stl_geometry(file, begin=0, young=30e9,poisson=.3,frictionAngle=0.523
 		for i in xrange(begin,begin+imp.number_of_facets):
 			o.bodies[i].mold.postProcessAttributes()
 		return imp.number_of_facets
-
-def negPosExtremes(**kw): raise DeprecationWarning("negPosExtremes is deprecated, use negPosExtremalIds instead.")
-
-# reimplemented in _utils in c++ (results verified to be identical)
-if 0:
-	def negPosExtremes(axis,distFactor=1.1):
-		"""Get 2 lists (negative and positive extremes) of sphere ids that are close to the boundary
-		in the direction of requested axis (0=x,1=y,2=z).
-
-		distFactor enlarges radius of the sphere, it can be considered 'extremal' even if it doesn't touch the extreme.
-		"""
-		inf=float('inf')
-		extremes=[inf,-inf]
-		ret=[[],[]]
-		o=Omega()
-		for b in o.bodies:
-			extremes[1]=max(extremes[1],+b.shape['radius']+b.phys['se3'][axis])
-			extremes[0]=min(extremes[0],-b.shape['radius']+b.phys['se3'][axis])
-		for b in o.bodies:
-			if b.phys['se3'][axis]-b.shape['radius']*distFactor<=extremes[0]: ret[0].append(b.id)
-			if b.phys['se3'][axis]+b.shape['radius']*distFactor>=extremes[1]: ret[1].append(b.id)
-		return ret
-	def aabbExtrema(consider=lambda body:True):
-		"""return min and max points of an aabb around spherical packing (non-spheres are ignored)"""
-		inf=float('inf')
-		minimum,maximum=[inf,inf,inf],[-inf,-inf,-inf]
-		o=Omega()
-		for b in o.bodies:
-			if consider(b) and b.shape.name=='Sphere':
-				minimum=[min(minimum[i],b.phys['se3'][i]-b.shape['radius']) for i in range(3)]
-				maximum=[max(maximum[i],b.phys['se3'][i]+b.shape['radius']) for i in range(3)]
-		return minimum,maximum
-	def PWaveTimeStep():
-		"""Estimate timestep by the elastic wave propagation speed (p-wave).
-		
-		Multiply the value returned by some safety factor < 1, since shear waves are not taken into account here."""
-		o=Omega()
-		dt=float('inf')
-		for b in o.bodies:
-			if not (b.phys and b.shape): continue
-			if not (b.phys.has_key('young') and b.shape.has_key('radius')): continue
-			density=b.phys['mass']/((4./3.)*math.pi*b.shape['radius']**3)
-			thisDt=b.shape['radius']/math.sqrt(b.phys['young']/density)
-			dt=min(dt,thisDt)
-		return dt
 

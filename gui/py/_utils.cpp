@@ -131,6 +131,29 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,4);
 
+python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=tuple2vec(extract<python::tuple>(aabb[0])());bbMax=tuple2vec(extract<python::tuple>(aabb[1])());}
+	const shared_ptr<MetaBody>& rb=Omega::instance().getRootBody();
+	vector<int> bodyNumInta; bodyNumInta.resize(rb->bodies->size(),-1 /* uninitialized */);
+	int maxInta=0;
+	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
+		if(!i->isReal) continue;
+		const body_id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
+		if(useBB && isInBB(b1->physicalParameters->se3.position,bbMin,bbMax)) bodyNumInta[id1]=bodyNumInta[id1]>0?bodyNumInta[id1]+1:1;
+		if(useBB && isInBB(b2->physicalParameters->se3.position,bbMin,bbMax)) bodyNumInta[id2]=bodyNumInta[id2]>0?bodyNumInta[id2]+1:1;
+		maxInta=max(max(maxInta,bodyNumInta[b1->getId()]),bodyNumInta[b2->getId()]);
+	}
+	vector<int> bins; bins.resize(maxInta+1);
+	for(size_t id=0; id<bodyNumInta.size(); id++){ if(bodyNumInta[id]>=0) bins[bodyNumInta[id]]+=1; }
+	python::list count,num;
+	for(size_t n=1; n<bins.size(); n++){
+		if(bins[n]==0) continue;
+		num.append(n); count.append(bins[n]);
+	}
+	return python::make_tuple(num,count);
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(bodyNumInteractionsHistogram_overloads,bodyNumInteractionsHistogram,0,1);
+
 python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::list v2)
 {
 	return vec2tuple(Shop::inscribedCircleCenter(Vector3r(python::extract<double>(v0[0]),python::extract<double>(v0[1]),python::extract<double>(v0[2])), Vector3r(python::extract<double>(v1[0]),python::extract<double>(v1[1]),python::extract<double>(v1[2])), Vector3r(python::extract<double>(v2[0]),python::extract<double>(v2[1]),python::extract<double>(v2[2]))));
@@ -144,6 +167,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB")));
 	def("setRefSe3",setRefSe3);
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));
+	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));
 	def("elasticEnergy",elasticEnergyInAABB);
 	def("inscribedCircleCenter",inscribedCircleCenter);
 }
