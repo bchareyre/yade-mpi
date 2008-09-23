@@ -64,6 +64,15 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	Real sh = sphereRadius*shrinkFactor;
 	Real icr = facet->icr-sh;
 
+	if (icr<0)
+	{
+		LOG_INFO("WARNING: a radius of a facet's inscribed circle less than zero! So, shrinkFactor is too large and would be reduced to zero.");
+		shrinkFactor=0;
+		icr = facet->icr;
+		sh = 0;
+	}
+
+
 	if (bm<icr) // contact with facet's surface
 	{
 		penetrationDepth = sphereRadius - L;

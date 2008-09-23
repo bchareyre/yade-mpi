@@ -20,7 +20,7 @@ o.engines=[
 	StandAloneEngine('PersistentSAPCollider'),
 	MetaEngine('InteractionGeometryMetaEngine',[
 		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'interactionDetectionFactor':1.4}),
-		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'shrinkFactor':1.}),
+		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'shrinkFactor':0.}),
 	]),
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 	StandAloneEngine('ElasticContactLaw'),

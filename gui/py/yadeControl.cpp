@@ -495,7 +495,7 @@ BASIC_PY_PROXY_TAIL;
 
 class pySTLImporter : public STLImporter {
     public:
-	unsigned int py_import(pyBodyContainer bc, unsigned int begin=0) { import(bc.proxee,begin); }
+	void py_import(pyBodyContainer bc, unsigned int begin=0) { import(bc.proxee,begin); }
 };
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,2);

@@ -35,7 +35,14 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 
 	DEFINE_FUNCTOR_ORDER_2D(InteractingFacet,InteractingSphere);
 
-	Real shrinkFactor;
+	// The radius of the inscribed circle of the facet is decreases by the
+	// value of the sphere's radius multipled by shrinkFactor. So, at
+	// definition of a contact point on the surface made of facets, the given
+	// surface is not continuous and is similar to a surface covered with a
+	// tile, with a gap between the separate tiles equal to the sphere's radius
+	// multiplied by 2*shrinkFactor. By default shrinkFactor=0.
+	Real shrinkFactor; 
+
 	bool hasShear;
 	
 	protected :
