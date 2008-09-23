@@ -45,7 +45,7 @@ def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire
 	b=Body()
 	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire,'visible':True})
 	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
-	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
+	center=inscribedCircleCenter(list(vertices[0]),list(vertices[1]),list(vertices[2]))
 	vertices=map(lambda a,b:map(lambda x,y:x-y,a,b),vertices,[center,center,center]) 
 	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
 	b.shape.setRaw('vertices',vStr)

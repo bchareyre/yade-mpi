@@ -283,6 +283,7 @@ class pyBodyContainer{
 		else return pyBody(proxee->operator[](id));
 	}
 	body_id_t insert(pyBody b){return proxee->insert(b.proxee);}
+	python::list insertList(python::list bb){python::list ret; for(int i=0; i<len(bb); i++){ret.append(insert(python::extract<pyBody>(bb[i])()));} return ret;}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
 };
@@ -543,6 +544,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
 		.def("__len__",&pyBodyContainer::length)
 		.def("append",&pyBodyContainer::insert)
+		.def("append",&pyBodyContainer::insertList)
 		.def("clear", &pyBodyContainer::clear);
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
