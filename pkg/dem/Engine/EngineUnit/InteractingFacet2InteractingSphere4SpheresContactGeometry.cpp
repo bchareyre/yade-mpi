@@ -13,6 +13,7 @@
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
+CREATE_LOGGER(InteractingFacet2InteractingSphere4SpheresContactGeometry);
 
 InteractingFacet2InteractingSphere4SpheresContactGeometry::InteractingFacet2InteractingSphere4SpheresContactGeometry() 
 {

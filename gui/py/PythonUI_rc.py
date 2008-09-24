@@ -58,6 +58,10 @@ else:
 	,rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/gui/yade/ipython.py']})
 
 	ipshell()
+	# save history -- a workaround for atexit handlers not being run (why?)
+	# http://lists.ipython.scipy.org/pipermail/ipython-user/2008-September/005839.html
+	import IPython.ipapi
+	IPython.ipapi.get().IP.atexit_operations()
 	try:
 		import yade.qt
 		yade.qt.close()

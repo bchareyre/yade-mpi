@@ -253,8 +253,14 @@ int main(int argc, char *argv[])
 	int ok = frontEnd->run(argc,argv);
 
 	#ifdef EMBED_PYTHON
+		/* pyFinalize crashes with boost:python<=1.35
+		 * http://www.boost.org/libs/python/todo.html#pyfinalize-safety has explanation 
+		 * once this is fixed, you should remove workaround that saves history from ipython session in gui/py/PythonUI_rc.py:63
+		 *   import IPython.ipapi
+		 *   IPython.ipapi.get().IP.atexit_operations()
+		 */
 		// LOG_DEBUG("Finalizing Python...");
-		// Py_Finalize(); // FIXME: http://www.boost.org/libs/python/todo.html#pyfinalize-safety says this is unsafe with boost::python
+		// Py_Finalize();
 	#endif
 	#ifdef YADE_DEBUG
 		signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers

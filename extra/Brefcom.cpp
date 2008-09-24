@@ -173,8 +173,8 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		// store Fn (and Fs?), for use with GlobalStiffnessCounter?
 		NNAN(sigmaN); NNANV(sigmaT);
 		NNAN(crossSection);
-		Fn=sigmaN*crossSection;
-		Fs=sigmaT*crossSection;
+		Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
+		Fs=sigmaT*crossSection; BC->shearForce=Fs;
 		applyForce(crossSection*(contGeom->normal*sigmaN + sigmaT),I->getId1(),I->getId2()); /* this is the force applied on the _first_ body; inverted applied to the second */
 	}
 }

@@ -99,4 +99,7 @@ class Shop{
 
 		//! Calculate inscribed circle center of trianlge
 		static Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
+
+		//! Get unbalanced force of the whole simulation
+		static Real unbalancedForce(bool useMaxForce=false, MetaBody* _rb=NULL);
 };

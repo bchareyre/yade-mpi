@@ -83,6 +83,7 @@ class BrefcomContact: public NormalShearInteraction {
 		bool neverDamage;
 
 		/*! auxiliary variable for visualization, recalculated in BrefcomLaw at every iteration */
+		// FIXME: Fn and Fs are stored as Vector3r normalForce, shearForce in NormalShearInteraction 
 		Real omega, Fn, sigmaN, epsN; Vector3r epsT, sigmaT, Fs;
 
 		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), tau(0), expDmgRate(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; }

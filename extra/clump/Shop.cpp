@@ -105,6 +105,31 @@ __BEX_ACCESS(Vector3r,globalRStiffness,GlobalStiffness,globalStiffnessIdx,Rstiff
 #undef __BEX_ACCESS
 
 
+
+Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
+	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
+
+	// get maximum force on a body and sum of all forces (for averaging)
+	Real sumF=0,maxF=0,currF;
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		if(!b->isDynamic) continue;
+		currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
+	}
+	Real meanF=sumF/rb->bodies->size(); 
+	// get max force on contacts
+	Real maxContactF=0;
+	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
+		if(!I->isReal) continue;
+		shared_ptr<NormalShearInteraction> nsi=YADE_PTR_CAST<NormalShearInteraction>(I->interactionPhysics); assert(nsi);
+		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).Length());
+	}
+	return (useMaxForce?maxF:meanF)/maxContactF;
+}
+
+
+
+
+
 template <typename valType> valType Shop::getDefault(const string& key) {
 	ensureInit();
 	try{return boost::any_cast<valType>(defaults[key]);}

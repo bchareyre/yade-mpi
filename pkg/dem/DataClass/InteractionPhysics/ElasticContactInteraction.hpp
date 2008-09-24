@@ -14,9 +14,7 @@ class ElasticContactInteraction: public NormalShearInteraction
 				,frictionAngle 			// angle of friction, according to Coulumb criterion
 				,tangensOfFrictionAngle;
 	
-		Vector3r	prevNormal			// unit normal of the contact plane.
-				,normalForce			// normal force applied on a DE
-				,shearForce;			// shear force applied on a DE
+		Vector3r	prevNormal;			// unit normal of the contact plane.
 
 		ElasticContactInteraction(){createIndex();};
 		virtual ~ElasticContactInteraction(){};
@@ -24,7 +22,6 @@ class ElasticContactInteraction: public NormalShearInteraction
 		virtual void registerAttributes(){
 			NormalShearInteraction::registerAttributes();
 			REGISTER_ATTRIBUTE(prevNormal);
-			REGISTER_ATTRIBUTE(shearForce);
 			REGISTER_ATTRIBUTE(initialKn);
 			REGISTER_ATTRIBUTE(initialKs);
 			REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
