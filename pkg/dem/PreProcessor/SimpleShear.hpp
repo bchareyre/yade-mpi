@@ -8,14 +8,16 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DIRECTSHEARCIS_HPP
-#define DIRECTSHEARCIS_HPP
+#ifndef SIMPLE_SHEAR_HPP
+#define SIMPLE_SHEAR_HPP
 
-/*! \brief A shear test		DEPRECATED, replaced by SimpleShear
+/*! \brief A simple shear test
 
-This preprocessor allows to simulate a shear test of a sample contained in a deformable parallelogram box
-The movement of the box is controlled by the Engine "CinemCisEngine" (in pkg/common/Engine/DeusExMachina/)
+This preprocessor allows to simulate a simple shear test of a sample (contained so in a deformable parallelogram box)
+
 The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.
+Thanks to the Engines (in pkg/common/Engine/DeusExMachina) CinemDNCEngine, CinemKNCEngine and CinemCNCEngine, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples
+NB : in this PreProcessor only CinemDNCEngine appears, if you want to use other engines the best is maybe to modify directly .xml files
  */
 
 
@@ -28,7 +30,7 @@ typedef pair<Vector3r, Real> BasicSphere;
 using namespace std;
 
 
-class DirectShearCis : public FileGenerator
+class SimpleShear : public FileGenerator
 {
 	private :
 		Vector3r	 gravity;
@@ -71,19 +73,19 @@ class DirectShearCis : public FileGenerator
 
 
 	public :
-		DirectShearCis ();
-		~DirectShearCis ();
+		SimpleShear ();
+		~SimpleShear ();
 		bool generate();
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 		void registerAttributes();
-	REGISTER_CLASS_NAME(DirectShearCis);
+	REGISTER_CLASS_NAME(SimpleShear);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(DirectShearCis,false);
+REGISTER_SERIALIZABLE(SimpleShear,false);
 
-#endif // DIRECTSHEARCIS_HPP
+#endif // SIMPLE_SHEAR_HPP
 
 

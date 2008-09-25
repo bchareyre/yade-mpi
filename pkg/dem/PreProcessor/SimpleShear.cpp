@@ -11,7 +11,7 @@
 
 
 
-#include "DirectShearCis.hpp"
+#include "SimpleShear.hpp"
 
 #include <yade/lib-miniWm3/Wm3Math.h>
 
@@ -68,7 +68,7 @@
 using namespace std;
 
 
-DirectShearCis::DirectShearCis () : FileGenerator()
+SimpleShear::SimpleShear () : FileGenerator()
 {
 	gravity = Vector3r(0,-9.81,0);
 
@@ -103,19 +103,19 @@ DirectShearCis::DirectShearCis () : FileGenerator()
 }
 
 
-DirectShearCis::~DirectShearCis ()
+SimpleShear::~SimpleShear ()
 {
 
 }
 
 
-void DirectShearCis::postProcessAttributes(bool)
+void SimpleShear::postProcessAttributes(bool)
 {
 
 }
 
 
-void DirectShearCis::registerAttributes()
+void SimpleShear::registerAttributes()
 {
 	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(filename);
@@ -141,7 +141,7 @@ void DirectShearCis::registerAttributes()
 }
 
 
-bool DirectShearCis::generate()
+bool SimpleShear::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
@@ -208,7 +208,7 @@ bool DirectShearCis::generate()
 	return res.second;
 }
 
-void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
+void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body(0,1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
@@ -250,7 +250,7 @@ void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 }
 
 
-void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
+void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
@@ -297,7 +297,7 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 }
 
 
-void DirectShearCis::createActors(shared_ptr<MetaBody>& rootBody)
+void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 {
 
 	shared_ptr<PositionSnapshot> possnap = shared_ptr<PositionSnapshot>(new PositionSnapshot);
@@ -382,7 +382,7 @@ void DirectShearCis::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void DirectShearCis::positionRootBody(shared_ptr<MetaBody>& rootBody) 
+void SimpleShear::positionRootBody(shared_ptr<MetaBody>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	
@@ -407,7 +407,7 @@ void DirectShearCis::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-string DirectShearCis::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowerCorner,Vector3r upperCorner,long number,Real rad_std_dev, Real porosity)
+string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowerCorner,Vector3r upperCorner,long number,Real rad_std_dev, Real porosity)
 {
 	sphere_list.clear();
 	long tries = 1000; //nb max of tries for positionning the next sphere
@@ -449,7 +449,7 @@ string DirectShearCis::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r l
 			+ lexical_cast<string>(dimensions[2]) + ").";
 }
 
-std::pair<string,bool> DirectShearCis::ImportCloud(vector<BasicSphere>& sphere_list,string importFilename)
+std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list,string importFilename)
 {
 	sphere_list.clear();
 	int nombre=0;

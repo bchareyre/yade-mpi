@@ -45,6 +45,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		['DataClass/InteractionPhysics/CohesiveFrictionalContactInteraction.cpp'],
 		LIBS=env['LIBS']+['ElasticContactInteraction']),
 
+	env.SharedLibrary('ContactLaw1Interaction',
+		['DataClass/InteractionPhysics/ContactLaw1Interaction.cpp'],
+		LIBS=env['LIBS']+['ElasticContactInteraction']),
+
+
 	env.SharedLibrary('SDECLinkPhysics',
 		['DataClass/InteractionPhysics/SDECLinkPhysics.cpp'],
 		LIBS=env['LIBS']+['NormalShearInteractions']),
@@ -446,7 +451,49 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
-			'CinemCisEngine',
+			'CinemDNCEngine',
+			'yade-serialization',
+			'yade-base',
+			'PhysicalActionContainerInitializer',
+			'PhysicalActionContainerReseter',
+			'InteractionGeometryMetaEngine',
+			'InteractionPhysicsMetaEngine',
+			'PhysicalActionApplier',
+			'PhysicalParametersMetaEngine',
+			'BoundingVolumeMetaEngine',
+			'Box',
+			'Sphere',
+			'AABB',
+			'PersistentSAPCollider',
+			'ParticleParameters',
+			'SAPCollider',
+			'MetaInteractingGeometry2AABB',
+			'yade-multimethods']),
+
+
+	env.SharedLibrary('SimpleShear',
+		['PreProcessor/SimpleShear.cpp'],
+		LIBS=env['LIBS']+['SDECLinkGeometry',
+			'BodyMacroParameters',
+			'ElasticContactLaw',
+			'MacroMicroElasticRelationships',
+			'SimpleElasticRelationships',
+			'ElasticCriterionTimeStepper',
+			'PositionOrientationRecorder',
+			'PositionRecorder',
+			'PositionSnapshot',
+			'ForceSnapshot',
+			'ForceRecorder',
+			'PhysicalActionVectorVector',
+			'InteractionVecSet',
+			'BodyRedirectionVector',
+			'InteractingSphere',
+			'InteractingBox',
+			'CundallNonViscousDamping',
+			'CundallNonViscousDamping',
+			'MetaInteractingGeometry',
+			'GravityEngines',
+			'CinemDNCEngine',
 			'yade-serialization',
 			'yade-base',
 			'PhysicalActionContainerInitializer',
@@ -1027,6 +1074,23 @@ env.SharedLibrary('NewtonsDampedLaw',
 		    ,'Momentum'
 		    ])
 	
+	,env.SharedLibrary('ContactLaw1',
+		['Engine/StandAloneEngine/ContactLaw1.cpp'],
+		LIBS=env['LIBS']+['SDECLinkPhysics',
+			'ContactLaw1Interaction',
+			'SDECLinkGeometry',
+			'SpheresContactGeometry',
+			'CohesiveFrictionalBodyParameters',
+			'yade-serialization',
+			'yade-base',
+			'yade-multimethods',
+			'Force',
+			'Momentum',
+			'Sphere',
+			'RigidBodyParameters'])
+
+
+
 	,env.SharedLibrary('SimpleViscoelasticSpheresInteractionRecorder'
 	    ,['Engine/StandAloneEngine/SimpleViscoelasticSpheresInteractionRecorder.cpp']
 	    ,LIBS=env['LIBS']+['SpheresContactGeometry','SimpleViscoelasticInteraction'])
