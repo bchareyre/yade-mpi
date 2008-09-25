@@ -162,6 +162,17 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ParticleParameters',
 			'InteractionPhysicsMetaEngine']),
 
+	env.SharedLibrary('CL1Relationships',
+		['Engine/EngineUnit/CL1Relationships.cpp'],
+		LIBS=env['LIBS']+['SDECLinkPhysics',
+			'SDECLinkGeometry',
+			'CL1Interaction',
+			'SpheresContactGeometry',
+			'CohesiveFrictionalBodyParameters',
+			'RigidBodyParameters',
+			'ParticleParameters',
+			'InteractionPhysicsMetaEngine']),
+
 	env.SharedLibrary('ElasticContactLaw',
 		['Engine/StandAloneEngine/ElasticContactLaw.cpp'],
 		LIBS=env['LIBS']+['SDECLinkPhysics',
