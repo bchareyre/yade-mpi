@@ -284,6 +284,7 @@ class pyBodyContainer{
 	}
 	body_id_t insert(pyBody b){return proxee->insert(b.proxee);}
 	python::list insertList(python::list bb){python::list ret; for(int i=0; i<len(bb); i++){ret.append(insert(python::extract<pyBody>(bb[i])()));} return ret;}
+	python::list replace(python::list bb){proxee->clear(); return insertList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
 };
@@ -407,8 +408,7 @@ class pyOmega{
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		OMEGA.startSimulationLoop();
-		long toGo=OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration();
-		LOG_DEBUG("RUN"<<(toGo>0?string(" ("+lexical_cast<string>(toGo)+" to go)"):string(""))<<"!");
+		LOG_DEBUG("RUN"<<((OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
@@ -545,7 +545,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__len__",&pyBodyContainer::length)
 		.def("append",&pyBodyContainer::insert)
 		.def("append",&pyBodyContainer::insertList)
-		.def("clear", &pyBodyContainer::clear);
+		.def("clear", &pyBodyContainer::clear)
+		.def("replace",&pyBodyContainer::replace);
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)

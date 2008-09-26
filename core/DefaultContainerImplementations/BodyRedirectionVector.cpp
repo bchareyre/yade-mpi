@@ -89,8 +89,8 @@ unsigned int BodyRedirectionVector::insert(shared_ptr<Body>& b)
 
 	if( used )
 	{
-		unsigned int newPosition = position;
-		// finds the first free key, which is bigger than id.
+		// finds the first free key (was: which is bigger than id... why bigger??)
+		unsigned int newPosition = 0; // was: newPosition=position;
 		bool newUsed = true;
 		while( newUsed )
 		{

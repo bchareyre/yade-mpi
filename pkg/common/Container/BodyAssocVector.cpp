@@ -86,8 +86,8 @@ unsigned int BodyAssocVector::insert(shared_ptr<Body>& b)
 	tmpBii = bodies.find(position);
 	if( tmpBii != bodies.end() )
 	{
-		unsigned int newPosition = position;
-		// finds the first free key, which is bigger than id.
+		// finds the first free key, which is bigger than 0 (was: newPoistion=position, i.e. greater than id... why?)
+		unsigned int newPosition = 0;
 		while( bodies.find(newPosition) != bodies.end() )
 			++newPosition;
 		//cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break interactions for this body!\n";
