@@ -166,7 +166,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		['Engine/EngineUnit/CL1Relationships.cpp'],
 		LIBS=env['LIBS']+['SDECLinkPhysics',
 			'SDECLinkGeometry',
-			'CL1Interaction',
+			'ContactLaw1Interaction',
 			'SpheresContactGeometry',
 			'CohesiveFrictionalBodyParameters',
 			'RigidBodyParameters',
