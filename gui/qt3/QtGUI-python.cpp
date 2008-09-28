@@ -138,6 +138,8 @@ class pyGLViewer{
 		string pyStr(){return string("<GLViewer for view #")+lexical_cast<string>(ensuredMainWindow()->viewNo(glv))+">";}
 		void saveDisplayParameters(size_t n){glv->saveDisplayParameters(n);}
 		void useDisplayParameters(size_t n){glv->useDisplayParameters(n);}
+		string get_timeDisp(){const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}
+		void set_timeDisp(string s){int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(pyGLViewer_center_overloads,center,0,1);
 
@@ -178,6 +180,7 @@ BOOST_PYTHON_MODULE(_qt){
 		.add_property("sceneRadius",&pyGLViewer::get_sceneRadius,&pyGLViewer::set_sceneRadius)
 		.add_property("ortho",&pyGLViewer::get_orthographic,&pyGLViewer::set_orthographic)
 		.add_property("screenSize",&pyGLViewer::get_screenSize,&pyGLViewer::set_screenSize)
+		.add_property("timeDisp",&pyGLViewer::get_timeDisp,&pyGLViewer::set_timeDisp)
 		.def("fitAABB",&pyGLViewer::fitAABB)
 		.def("fitSphere",&pyGLViewer::fitSphere)
 		.def("showEntireScene",&pyGLViewer::showEntireScene)

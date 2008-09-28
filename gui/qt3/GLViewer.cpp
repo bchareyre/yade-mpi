@@ -27,6 +27,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	renderer=_renderer;
 	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
 	drawScale=true;
+	timeDispMask=TIME_REAL|TIME_VIRT|TIME_ITER;
 	viewId = id;
 	cut_plane = 0;
 	cut_plane_delta = -2;
@@ -48,7 +49,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 
 	setKeyDescription(Qt::Key_C,"Set scene center to the selected body (if any)");
 	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
-	setKeyDescription(Qt::Key_D,"Toggle Body::isDynamic on selection");
+	setKeyDescription(Qt::Key_D,"Toggle time display mask");
 	setKeyDescription(Qt::Key_G,"Toggle grid");
 	setKeyDescription(Qt::Key_X,"Toggle YZ grid (or: align manipulated clip plane normal with +X)");
 	setKeyDescription(Qt::Key_Y,"Toggle XZ grid (or: align manipulated clip plane normal with +Y)");
@@ -206,7 +207,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	/* letters alphabetically */
 	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); }
-	else if(e->key()==Qt::Key_D) wasDynamic=true;
+	//else if(e->key()==Qt::Key_D) wasDynamic=true;
+	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
 	else if (e->key()==Qt::Key_M && selectedName() >= 0){
 		if(!(isMoving=!isMoving)){displayMessage("Moving done."); mouseMovesCamera();}
@@ -490,8 +492,51 @@ void GLViewer::postDraw(){
 		glPopMatrix();
 	}
 
+	#define _W3 setw(3)<<setfill('0')
+	#define _W2 setw(2)<<setfill('0')
+	if(timeDispMask!=0){
+		const int lineHt=12;
+		unsigned x=10,y=height()-20;
+		glColor3v(Vector3r(1,1,1));
+		if(timeDispMask & GLViewer::TIME_VIRT){
+			ostringstream oss;
+			Real t=Omega::instance().getSimulationTime();
+			unsigned min=((unsigned)t/60),sec=(((unsigned)t)%60),msec=((unsigned)(1e3*t))%1000,usec=((unsigned long)(1e6*t))%1000,nsec=((unsigned long)(1e9*t))%1000;
+			if(min>0) oss<<_W2<<min<<":"<<_W2<<sec<<"."<<_W3<<msec<<"m"<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
+			else if (sec>0) oss<<_W2<<sec<<"."<<_W3<<msec<<"m"<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
+			else if (msec>0) oss<<_W3<<msec<<"m"<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
+			else if (usec>0) oss<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
+			else oss<<_W3<<nsec<<"ns";
+			QGLViewer::drawText(x,y,oss.str());
+			y-=lineHt;
+		}
+		glColor3v(Vector3r(0,.5,.5));
+		if(timeDispMask & GLViewer::TIME_REAL){
+			QGLViewer::drawText(x,y,getRealTimeString() /* virtual, since player gets that from db */);
+			y-=lineHt;
+		}
+		if(timeDispMask & GLViewer::TIME_ITER){
+			ostringstream oss;
+			oss<<"#"<<Omega::instance().getCurrentIteration()<<"\n";
+			QGLViewer::drawText(x,y,oss.str());
+			y-=lineHt;
+		}
+	}
 	QGLViewer::postDraw();
 }
+
+string GLViewer::getRealTimeString(){
+	ostringstream oss;
+	time_duration t=Omega::instance().getComputationDuration();
+	unsigned d=t.hours()/24,h=t.hours()%24,m=t.minutes(),s=t.seconds();
+	oss<<"wall ";
+	if(d>0) oss<<d<<"days "<<_W2<<h<<":"<<_W2<<m<<":"<<_W2<<s;
+	else if(h>0) oss<<_W2<<h<<":"<<_W2<<m<<":"<<_W2<<s;
+	else oss<<_W2<<m<<":"<<_W2<<s;
+	return oss.str();
+}
+#undef _W2
+#undef _W3
 
 void GLViewer::closeEvent(QCloseEvent *e){
 	//emit closeSignal(viewId);
@@ -549,8 +594,10 @@ QDomElement GLViewer::domElement(const QString& name, QDomDocument& document) co
 	QDomElement de=document.createElement("gridXYZ");
 	string val; if(drawGridXYZ[0])val+="x"; if(drawGridXYZ[1])val+="y"; if(drawGridXYZ[2])val+="z";
 	de.setAttribute("normals",val);
+	QDomElement de2=document.createElement("timeDisplay"); de2.setAttribute("mask",timeDispMask);
 	QDomElement res=QGLViewer::domElement(name,document);
 	res.appendChild(de);
+	res.appendChild(de2);
 	return res;
 }
 
@@ -559,13 +606,12 @@ void GLViewer::initFromDOMElement(const QDomElement& element){
 	QGLViewer::initFromDOMElement(element);
 	QDomElement child=element.firstChild().toElement();
 	while (!child.isNull()){
-		if (child.tagName()=="gridXYZ"){
-			if (child.hasAttribute("normals")){
-				string val=child.attribute("normals").lower();
-				drawGridXYZ[0]=false; drawGridXYZ[1]=false; drawGridXYZ[2]=false;
-				if(val.find("x")!=string::npos)drawGridXYZ[0]=true; if(val.find("y")!=string::npos)drawGridXYZ[1]=true; if(val.find("z")!=string::npos)drawGridXYZ[2]=true;
-			}
+		if (child.tagName()=="gridXYZ" && child.hasAttribute("normals")){
+			string val=child.attribute("normals").lower();
+			drawGridXYZ[0]=false; drawGridXYZ[1]=false; drawGridXYZ[2]=false;
+			if(val.find("x")!=string::npos)drawGridXYZ[0]=true; if(val.find("y")!=string::npos)drawGridXYZ[1]=true; if(val.find("z")!=string::npos)drawGridXYZ[2]=true;
 		}
+		if(child.tagName()=="timeDisplay" && child.hasAttribute("mask")) timeDispMask=atoi(child.attribute("mask").ascii());
 		child = child.nextSibling().toElement();
 	}
 }

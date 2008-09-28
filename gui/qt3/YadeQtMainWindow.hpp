@@ -12,10 +12,10 @@
 #include<qpushbutton.h>
 #include<yade/lib-base/Logging.hpp>
 #include"YadeQtGeneratedMainWindow.h"
-#include"SimulationController.hpp"
-#include"QtFileGenerator.hpp"
-#include"QtSimulationPlayer.hpp"
-#include"QtGUIPreferences.hpp"
+#include<yade/gui-qt3/SimulationController.hpp>
+#include<yade/gui-qt3/QtFileGenerator.hpp>
+#include<yade/gui-qt3/QtSimulationPlayer.hpp>
+#include<yade/gui-qt3/QtGUIPreferences.hpp>
 
 class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 {

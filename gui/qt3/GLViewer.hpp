@@ -55,6 +55,8 @@ class GLViewer : public QGLViewer
 		void centerMedianQuartile();
 		bool 			drawGridXYZ[3];
 		bool 			drawScale;
+		int timeDispMask;
+		enum{TIME_REAL=1,TIME_VIRT=2,TIME_ITER=4};
 
 		GLViewer (int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent=0, QGLWidget * shareWidget=0);
 		virtual ~GLViewer (){};
@@ -91,6 +93,8 @@ class GLViewer : public QGLViewer
 	protected :
 		virtual void keyPressEvent(QKeyEvent *e);
 		virtual void postDraw();
+		// overridden in the player that doesn't get time from system clock but from the db
+		virtual string getRealTimeString();
 		virtual void closeEvent(QCloseEvent *e);
 		virtual void postSelection(const QPoint& point);
 		virtual void endSelection(const QPoint &point);

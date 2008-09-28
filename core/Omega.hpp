@@ -148,6 +148,7 @@ class Omega : public Singleton<Omega>
 		
 		Real		getSimulationTime();
 		Real 		getComputationTime();
+		time_duration getComputationDuration();
 		void		incrementSimulationTime();
 		
 		void init();

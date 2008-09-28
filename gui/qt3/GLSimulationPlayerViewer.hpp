@@ -28,6 +28,9 @@ class GLSimulationPlayerViewer: public GLViewer {
 		void tryFillingOutputPattern();	
 		bool useSQLite;
 		shared_ptr<sqlite3x::sqlite3_connection> con;
+		//!  read from db, used in getRealTimeString() called in GLViewer::postDraw
+		Real wallClock, realTime;
+		virtual string getRealTimeString();
 	public:
 		list<string> snapshots;
 		QtSimulationPlayer* simPlayer;

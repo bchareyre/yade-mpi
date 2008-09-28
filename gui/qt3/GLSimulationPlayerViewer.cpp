@@ -18,6 +18,7 @@
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
 #include<boost/algorithm/string.hpp>
+#include<boost/date_time/posix_time/posix_time.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/pkg-common/FilterEngine.hpp>
@@ -257,9 +258,21 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 			if(col_rgb_b>=0) b->geometricalModel->diffuseColor[2]=reader.getdouble(col_rgb_b);
 		}
 		Omega::instance().setCurrentIteration(con->executeint("select iter from 'records' where bodyTable='"+tableName+"';"));
+		Omega::instance().getRootBody()->simulationTime=con->executedouble("select virtTime from 'records' where bodyTable='"+tableName+"';");
+		realTime=con->executedouble("select realTime from 'records' where bodyTable='"+tableName+"';");
+		wallClock=con->executedouble("select wallClock from 'records' where bodyTable='"+tableName+"';");
 	}
 	FOREACH(const shared_ptr<FilterEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
 	return true;
+}
+
+string GLSimulationPlayerViewer::getRealTimeString(){
+	ostringstream oss;
+	posix_time::time_duration rt(0,0,(long)realTime,0);
+	oss<<posix_time::to_simple_string(rt)<<"."<<(long)(realTime*10)%10;
+	posix_time::ptime when=posix_time::from_time_t(wallClock);
+	oss<<" ("<<posix_time::to_simple_string(when)<<")";
+	return oss.str();
 }
 
 void GLSimulationPlayerViewer::bodyWire(bool wire)

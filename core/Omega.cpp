@@ -56,6 +56,7 @@ boost::mutex& Omega::getRootBodyMutex(){return rootBodyMutex;}
 ptime Omega::getMsStartingSimulationTime(){return msStartingSimulationTime;}
 time_duration Omega::getSimulationPauseDuration(){return simulationPauseDuration;}
 Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartingSimulationTime-simulationPauseDuration).total_milliseconds()/1e3; }
+time_duration Omega::getComputationDuration(){return microsec_clock::local_time()-msStartingSimulationTime-simulationPauseDuration;}
 
 
 void Omega::reset(){
