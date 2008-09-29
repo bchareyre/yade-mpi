@@ -73,7 +73,8 @@ BodyRedirectionVector::~BodyRedirectionVector()
 // FIXME - make sure that this is correct
 unsigned int BodyRedirectionVector::insert(shared_ptr<Body>& b)
 {
-	unsigned int position = b->getId();
+	//unsigned int position = b->getId();
+	unsigned position=0;
 
 //	std::vector< shared_ptr<Body> >::iterator tmpVii    = bodies.begin();
 //	std::vector< shared_ptr<Body> >::iterator tmpViiEnd = bodies.end();

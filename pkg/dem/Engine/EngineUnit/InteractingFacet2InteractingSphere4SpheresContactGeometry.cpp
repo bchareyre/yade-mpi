@@ -122,7 +122,6 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
 				scm->cp1rel.Normalize(); scm->cp2rel.Normalize();
 			}
-			cerr<<"@@ "<<scm->epsT()<<endl;
 		}
 
 		return true;

@@ -80,7 +80,8 @@ unsigned int BodyAssocVector::insert(shared_ptr<Body>& b)
 //	BodyContainer::setId(b,max);
 //	return max;
 
-	unsigned int position = b->getId();
+	//unsigned int position = b->getId();
+	unsigned int position=0;
 
 	Loki::AssocVector<unsigned int , shared_ptr<Body> >::const_iterator tmpBii;
 	tmpBii = bodies.find(position);
@@ -88,8 +89,7 @@ unsigned int BodyAssocVector::insert(shared_ptr<Body>& b)
 	{
 		// finds the first free key, which is bigger than 0 (was: newPoistion=position, i.e. greater than id... why?)
 		unsigned int newPosition = 0;
-		while( bodies.find(newPosition) != bodies.end() )
-			++newPosition;
+		while( bodies.find(newPosition) != bodies.end() ) ++newPosition;
 		//cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break interactions for this body!\n";
 		position = newPosition;
 	}

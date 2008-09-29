@@ -312,8 +312,8 @@ void GLViewer::centerScene(){
 	MetaBody* rb=Omega::instance().getRootBody().get();
 	if (!rb) return;
 
-	if(rb->bodies->size() < 500) displayMessage("Less than 500 bodies, moving possible. Select with shift, press 'm' to move. Use / * - + for cutting plane.", 6000);
-	else displayMessage("More than 500 bodies. Moving not possible. Use / * - + for cutting plane.", 6000);
+	if(rb->bodies->size()<500){LOG_INFO("Less than 500 bodies, moving possible. Select with shift, press 'm' to move.");}
+	else{LOG_INFO("More than 500 bodies. Moving not possible.");}
 	Vector3r min,max;	
 	if(rb->boundingVolume){
 		min=rb->boundingVolume->min; max=rb->boundingVolume->max;

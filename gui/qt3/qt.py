@@ -15,7 +15,7 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	viewNo is 0-based GL view number. 0 is the primary view and will be created if it doesn't exist.
 	It is an error if viewNo>0 and the view doesn't exist.
 
-	The simulation will run until it stops by itself. Either set Omega().stopAtIteration or have an engine
+	The simulation will run until it stops by itself. Either set Omega().stopAtIter or have an engine
 	that will call Omega().pause() at some point.
 
 	See makePlayerVideo for more documentation.

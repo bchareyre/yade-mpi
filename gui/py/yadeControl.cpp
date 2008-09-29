@@ -289,6 +289,7 @@ class pyBodyContainer{
 	void clear(){proxee->clear();}
 };
 
+
 class pyTags{
 	public:
 		pyTags(const shared_ptr<MetaBody> _mb): mb(_mb){}
@@ -345,6 +346,7 @@ class pyInteractionContainer{
 			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(!I->isReal) continue; if(i++==n) return pyInteraction(I); }
 			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
 		}
+		void clear(){proxee->clear();}
 };
 
 
@@ -550,7 +552,8 @@ BOOST_PYTHON_MODULE(wrapper)
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
-		.def("nth",&pyInteractionContainer::pyNth);
+		.def("nth",&pyInteractionContainer::pyNth)
+		.def("clear",&pyInteractionContainer::clear);
 	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
