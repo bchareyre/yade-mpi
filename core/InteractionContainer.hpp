@@ -97,6 +97,9 @@ class InteractionContainer : public Serializable
       virtual InteractionContainer::iterator end()						{throw;};
 		virtual unsigned int size() 								{throw;};
 
+		virtual shared_ptr<Interaction>& operator[] (unsigned int) {throw;};
+		virtual const shared_ptr<Interaction>& operator[] (unsigned int) const {throw;};
+
 	private :
 		vector<shared_ptr<Interaction> > interaction;
 

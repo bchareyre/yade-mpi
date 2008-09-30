@@ -14,6 +14,7 @@
 InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2InteractingSphere4SpheresContactGeometry()
 {
 	interactionDetectionFactor = 1;
+	hasShear=false;
 }
 
 void InteractingSphere2InteractingSphere4SpheresContactGeometry::registerAttributes()

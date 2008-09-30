@@ -67,7 +67,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		void relocateContactPoints();
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false){createIndex();}
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO){createIndex();}
 		virtual ~SpheresContactGeometry();
 	protected :
 		virtual void registerAttributes(){

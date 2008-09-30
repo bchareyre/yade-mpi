@@ -13,6 +13,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		['Container/InteractionHashMap.cpp'],
 		LIBS=env['LIBS']+['yade-base']),
 	
+	env.SharedLibrary('InteractionVecMap',
+		['Container/InteractionVecMap.cpp'],
+		LIBS=env['LIBS']+['yade-base']),
+	
 ## moved to core/DefaultContainerImplementations
 #	env.SharedLibrary('BodyRedirectionVector',['Container/BodyRedirectionVector.cpp']),
 #	env.SharedLibrary('InteractionVecSet',['Container/InteractionVecSet.cpp']),
