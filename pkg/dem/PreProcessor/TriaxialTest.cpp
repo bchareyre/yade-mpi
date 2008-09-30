@@ -81,15 +81,12 @@
 #include <boost/random/normal_distribution.hpp>
 
 
-
+CREATE_LOGGER(TriaxialTest);
 
 using namespace boost;
 using namespace std;
 
 
-typedef pair<Vector3r, Real> BasicSphere;
-//! generate a list of non-overlapping spheres
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
 TriaxialTest::TriaxialTest () : FileGenerator()
@@ -161,6 +158,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	biaxial2dTest=false;
 
 	radiusStdDev=0.3;
+	radiusMean=-1; // no radius specified
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -192,6 +190,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(maxMultiplier);
 	REGISTER_ATTRIBUTE(finalMaxMultiplier);
 	REGISTER_ATTRIBUTE(radiusStdDev);
+	REGISTER_ATTRIBUTE(radiusMean);
 
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
@@ -277,6 +276,25 @@ bool TriaxialTest::generate()
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
+
+
+
+	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size;
+	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
+	 */
+	Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
+	Real porosity=.75;
+	Real really_radiusMean;
+
+	if(radiusMean<=0) really_radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
+	else {
+		Real boxScaleFactor=radiusMean*pow((4/3.)*Mathr::PI*numberOfGrains/(volume*(1-porosity)),1/3.);
+		LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling box by "<<boxScaleFactor);
+		dimensions*=boxScaleFactor;
+		upperCorner=lowerCorner+dimensions;
+		really_radiusMean=radiusMean;
+	}
+
 	
 	
 	
@@ -386,27 +404,18 @@ bool TriaxialTest::generate()
 	
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, 0.75);
-	
+	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, really_radiusMean, porosity);
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
-			
-	for (;it!=it_end; ++it)
-	{
-		cerr << "sphere (" << it->first << " " << it->second << ")"<<endl;
-		createSphere(body,it->first,it->second,false,true);
+	FOREACH(const BasicSphere& it, sphere_list){
+		LOG_DEBUG("sphere (" << it.first << " " << it.second << ")");
+		createSphere(body,it.first,it.second,false,true);
 		rootBody->bodies->insert(body);
 	}	
+
 	
 	
 	return true;
-//  	return "Generated a sample inside box of dimensions: (" 
-//  		+ lexical_cast<string>(lowerCorner[0]) + "," 
-//  		+ lexical_cast<string>(lowerCorner[1]) + "," 
-//  		+ lexical_cast<string>(lowerCorner[2]) + ") and (" 
-//  		+ lexical_cast<string>(upperCorner[0]) + "," 
-//  		+ lexical_cast<string>(upperCorner[1]) + "," 
-//  		+ lexical_cast<string>(upperCorner[2]) + ").";
 
 }
 
@@ -609,10 +618,12 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
 // recording global stress
-	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
-	triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
-	triaxialStateRecorder-> interval 		= recordIntervalIter;
-	//triaxialStateRecorderer-> thickness 		= thickness;
+	if(recordIntervalIter>0){
+		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
+		triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
+		triaxialStateRecorder-> interval 		= recordIntervalIter;
+		//triaxialStateRecorderer-> thickness 		= thickness;
+	}
 
 	shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
 	makeItFlat->direction=2;
@@ -699,7 +710,7 @@ void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
+string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real mean_radius, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
 	static StdGenerator generator;
@@ -711,11 +722,8 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 	sphere_list.clear();
 	long tries = 1000; //nb of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
-		
-	Real mean_radius = std::pow(dimensions.X()*dimensions.Y()*dimensions.Z()*(1-porosity)/(3.1416*1.3333*number),0.333333);
-        //cerr << mean_radius;
 
-	std::cerr << "generating aggregates ... ";
+	LOG_INFO("Generating aggregates ...");
 	
 	long t, i;
 	for (i=0; i<number; ++i) {

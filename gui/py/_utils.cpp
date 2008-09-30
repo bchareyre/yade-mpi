@@ -17,20 +17,20 @@ Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
 /* \todo implement groupMask */
-python::tuple aabbExtrema(Real cutoff=0.0){
+python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
-		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-rrr);
-		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+rrr);
+		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-(centers?0:rrr));
+		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+(centers?0:rrr));
 	}
 	Vector3r dim=maximum-minimum;
 	return python::make_tuple(vec2tuple(minimum+.5*cutoff*dim),vec2tuple(maximum-.5*cutoff*dim));
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(aabbExtrema_overloads,aabbExtrema,0,1);
+BOOST_PYTHON_FUNCTION_OVERLOADS(aabbExtrema_overloads,aabbExtrema,0,2);
 
 python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	python::tuple extrema=aabbExtrema();
@@ -163,7 +163,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,
 
 BOOST_PYTHON_MODULE(_utils){
 	def("PWaveTimeStep",PWaveTimeStep);
-	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff")));
+	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers")));
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor")));
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB")));
 	def("setRefSe3",setRefSe3);
