@@ -138,6 +138,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	maxWallVelocity=10;
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = true;
+	autoUnload = true;
 	maxMultiplier = 1.01;
 	finalMaxMultiplier = 1.001;
 	
@@ -158,6 +159,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	wallOversizeFactor=1.3;
 
 	biaxial2dTest=false;
+
+	radiusStdDev=0.3;
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -188,6 +191,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(biaxial2dTest);
 	REGISTER_ATTRIBUTE(maxMultiplier);
 	REGISTER_ATTRIBUTE(finalMaxMultiplier);
+	REGISTER_ATTRIBUTE(radiusStdDev);
 
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
 	REGISTER_ATTRIBUTE(spherePoissonRatio);
@@ -211,6 +215,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(maxWallVelocity);
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
+	REGISTER_ATTRIBUTE(autoUnload);
 //	REGISTER_ATTRIBUTE(wall_top);
 //	REGISTER_ATTRIBUTE(wall_bottom);
 //	REGISTER_ATTRIBUTE(wall_1);
@@ -381,7 +386,7 @@ bool TriaxialTest::generate()
 	
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, 0.3, 0.75);
+	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -594,6 +599,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->strainRate = strainRate;
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
 	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
+	triaxialcompressionEngine->autoUnload = autoUnload;
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;

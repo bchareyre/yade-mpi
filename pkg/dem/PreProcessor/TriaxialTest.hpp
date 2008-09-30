@@ -73,7 +73,8 @@ class TriaxialTest : public FileGenerator
 				StabilityCriterion,
 				maxMultiplier, ///max multiplier of diameters during internal compaction
 				finalMaxMultiplier,
-				wallOversizeFactor; // make walls bigger (/smaller) than necessary by this factor
+				wallOversizeFactor,
+				radiusStdDev; // make walls bigger (/smaller) than necessary by this factor
 
 		bool		 wall_top
 				,wall_bottom
@@ -89,6 +90,8 @@ class TriaxialTest : public FileGenerator
 				,wall_4_wire
 				//! do we just want to generate a stable packing under isotropic pressure (false) or do we want the triaxial loading to start automatically right after compaction stage (true)?
 				,autoCompressionActivation
+				//! see docs for TriaxialCompressionEngine and TriaxialCompressionEngine::autoUnload
+				,autoUnload
 			
 				,rotationBlocked
 				,spheresRandomColor

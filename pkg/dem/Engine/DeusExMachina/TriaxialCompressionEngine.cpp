@@ -38,8 +38,10 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 	FinalIterationPhase1 = 0;
 	Iteration = 0;
 	testEquilibriumInterval = 20;
-	//compressionActivated=false;
+
+	autoUnload=true;
 	autoCompressionActivation=true;
+
 	UnbalancedForce = 1;
 	saveSimulation = false;
 	firstRun=true;
@@ -147,12 +149,16 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 
 		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 )
 		{
-			if ( currentState==STATE_ISO_COMPACTION && autoCompressionActivation )
-			{
-				doStateTransition (ncb, STATE_ISO_UNLOADING ); /*update stress and strain here*/ computeStressStrain ( ncb );
+			// only go to UNLOADING if it is needed (hard float comparison... :-| )
+			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
+				doStateTransition (ncb, STATE_ISO_UNLOADING );
+				computeStressStrain ( ncb ); // update stress and strain
 			}
-			else if ( currentState==STATE_ISO_UNLOADING && autoCompressionActivation )
-			{
+			else if(currentState==STATE_ISO_COMPACTION && autoCompressionActivation){
+				doStateTransition (ncb, STATE_TRIAX_LOADING );
+				computeStressStrain ( ncb ); // update stress and strain
+			}
+			else if ( currentState==STATE_ISO_UNLOADING && autoCompressionActivation ) {
 				doStateTransition (ncb, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
 			// huh?! this will never happen, because of the first condition...

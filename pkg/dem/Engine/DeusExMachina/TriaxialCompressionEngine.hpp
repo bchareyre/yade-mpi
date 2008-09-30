@@ -24,19 +24,25 @@ class PhysicalAction;
 
 /** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial test with constant lateral stress and constant axial strain rate.
  *
- * The engine is a state machine with the following states (and automatic transitions):
+ * The engine is a state machine with the following states; transitions my be automatic, see below.
  *
  * 1. STATE_ISO_COMPACTION: isotropic compaction (compression) until
  *    the prescribed mean pressue sigmaIsoCompaction is reached and the packing is stable.
  *    The compaction happens either by straining the walls (!internalCompaction)
- *    or by growing size of grains (internalCompaction)
+ *    or by growing size of grains (internalCompaction).
  * 2. STATE_ISO_UNLOADING: isotropic unloading from the previously reached state, until
- *    the mean pressure sigmaLateralConfinement is reached (and stabilizes)
+ *    the mean pressure sigmaLateralConfinement is reached (and stabilizes).
+ *    NOTE: this state will be skipped if sigmaLateralConfinement == sigmaIsoCompaction.
  * 3. STATE_TRIAX_LOADING: confined uniaxial compression:
  *		constant sigmaLateralConfinement is kept at lateral walls (left, right, front, back), while
  * 	top and bottom walls load the packing in their axis (by straining), until the value of epsilonMax
  * 	(deformation along the loading axis) is reached. At this point, the simulation is stopped.
  * 4. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
+ *
+ * Transition from COMPACTION to UNLOADING is done automatically if autoUnload==true;
+ * Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is
+ *   done automatically if autoCompressionActivation=true;
+ * Both autoUnload and autoCompressionActivation are true by default.
  *
  */
 
@@ -92,8 +98,11 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		std::string Key;//A code that is appended to file names to help distinguish between different simulations
 		// //! Is uniaxial compression currently activated?
 		// bool compressionActivated;
-		//! Auto-switch between isotropic and uniaxial compression?
+		//! Auto-switch from isotropic compaction or unloading state (if sigmaLateralConfinement<sigmaIsoCompaction)
+		// to uniaxial compression
 		bool autoCompressionActivation;
+		//! Auto-switch from isotropic compaction to unloading
+		bool autoUnload;
 				
 		virtual void applyCondition(MetaBody * ncb);
 		void updateParameters(MetaBody * ncb);
