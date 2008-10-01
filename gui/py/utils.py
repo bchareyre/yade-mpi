@@ -79,9 +79,9 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	return walls
 
 
-def aabbDim(cutoff=0.):
+def aabbDim(cutoff=0.,centers=False):
 	"""return dimensions of the bounding box, optionally cut."""
-	a=aabbExtrema(cutoff)
+	a=aabbExtrema(cutoff,centers)
 	return (a[1][0]-a[0][0],a[1][1]-a[0][1],a[1][2]-a[0][2])
 
 def perpendicularArea(axis):

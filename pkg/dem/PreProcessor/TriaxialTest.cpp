@@ -659,7 +659,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialcompressionEngine);
-	rootBody->engines.push_back(triaxialStateRecorder);
+	if(recordIntervalIter>0) rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	
 	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
@@ -673,9 +673,10 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 		
 	if (saveAnimationSnapshots) {
-	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-	positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
-	rootBody->engines.push_back(positionOrientationRecorder);}
+		shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
+		positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
+		rootBody->engines.push_back(positionOrientationRecorder);
+	}
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);

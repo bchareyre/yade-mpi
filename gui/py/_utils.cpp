@@ -24,8 +24,8 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
-		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-(centers?0:rrr));
-		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+(centers?0:rrr));
+		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-(centers?Vector3r::ZERO:rrr));
+		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+(centers?Vector3r::ZERO:rrr));
 	}
 	Vector3r dim=maximum-minimum;
 	return python::make_tuple(vec2tuple(minimum+.5*cutoff*dim),vec2tuple(maximum-.5*cutoff*dim));

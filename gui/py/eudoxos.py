@@ -9,7 +9,7 @@ def estimateStress(strain,cutoff=0.):
 	# E=(1/2)σεAl # global stored energy
 	# σ=EE/(.5εAl)=EE/(.5εV)
 	from yade import utils
-	dim=utils.aabbDim(cutoff,centers=True)
+	dim=utils.aabbDim(cutoff,centers=False)
 	return utils.elasticEnergy(utils.aabbExtrema(cutoff))/(.5*strain*dim[0]*dim[1]*dim[2])
 
 def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
