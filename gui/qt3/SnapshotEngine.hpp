@@ -21,7 +21,9 @@ class SnapshotEngine: public PeriodicEngine{
 		bool ignoreErrors;
 		//! files that have been created so far
 		vector<string> savedSnapshots;
-	SnapshotEngine():counter(0),viewNo(0),ignoreErrors(true){}
+		//! number of msec to sleep after snapshot (to prevent 3d hw problems)
+		int msecSleep;
+	SnapshotEngine():counter(0),viewNo(0),ignoreErrors(true),msecSleep(0){}
 	virtual void action(MetaBody*);
 	void registerAttributes(){	
 		PeriodicEngine::registerAttributes();
@@ -30,6 +32,7 @@ class SnapshotEngine: public PeriodicEngine{
 		REGISTER_ATTRIBUTE(viewNo);
 		REGISTER_ATTRIBUTE(ignoreErrors);
 		REGISTER_ATTRIBUTE(savedSnapshots);
+		REGISTER_ATTRIBUTE(msecSleep);
 	}
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(SnapshotEngine);

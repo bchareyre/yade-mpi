@@ -228,7 +228,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		}
 	}
 	else if(e->key()==Qt::Key_S){
-		LOG_DEBUG("Saving QGLViewer state to /tmp/qglviewerState.xml");
+		LOG_INFO("Saving QGLViewer state to /tmp/qglviewerState.xml");
 		setStateFileName("/tmp/qglviewerState.xml"); saveStateToFile(); setStateFileName(QString::null);
 	}
 	else if(e->key()==Qt::Key_X || e->key()==Qt::Key_Y || e->key()==Qt::Key_Z){

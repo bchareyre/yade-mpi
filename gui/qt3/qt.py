@@ -6,7 +6,7 @@ if not isActive():
 
 
 
-def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,fps=24):
+def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,fps=24,msecSleep=0):
 	"""Create video by running simulation. SnapshotEngine is added (and removed once done), temporary
 	files are deleted. The video is theora-encoded in the ogg container. Periodicity is controlled
 	in the same way as for PeriodicEngine (SnapshotEngine is a PeriodicEngine and realPeriod, virtPeriod 
@@ -26,7 +26,7 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	# create primary view if none
 	if len(views())==0: View()
 	# remove existing SnaphotEngines
-	se=wrapper.StandAloneEngine('SnapshotEngine',{'iterPeriod':iterPeriod,'realPeriod':realPeriod,'virtPeriod':virtPeriod,'fileBase':os.tmpnam(),'ignoreErrors':False,'viewNo':viewNo})
+	se=wrapper.StandAloneEngine('SnapshotEngine',{'iterPeriod':iterPeriod,'realPeriod':realPeriod,'virtPeriod':virtPeriod,'fileBase':os.tmpnam(),'ignoreErrors':False,'viewNo':viewNo,'msecSleep':msecSleep})
 	origEngines=o.engines; o.engines=[e for e in o.engines if e.name!='SnapshotEngine']+[se]
 	o.run(); o.wait();
 	wildcard=se['fileBase']+'%04d.png'

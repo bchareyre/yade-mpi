@@ -13,6 +13,8 @@
 //BOOST_STRONG_TYPEDEF(int, body_id_t)
 typedef int body_id_t;
 
+class InteractionGeometryEngineUnit;
+
 class Interaction : public Serializable
 {
 	private	:
@@ -32,6 +34,9 @@ class Interaction : public Serializable
 
 		body_id_t getId1() {return id1;};
 		body_id_t getId2() {return id2;};
+
+		//! swaps order of bodies within the interaction
+		void swapOrder();
 
 		#if 0
 			//! Whether both bodies involved in interaction satisfies given mask; provide rootBody for faster lookup

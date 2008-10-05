@@ -36,7 +36,6 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 		shared_ptr<SpheresContactGeometry> scm;
 		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; }
-		//cerr<<"Assigned scm "<<scm.get()<<"=="<<c->interactionGeometry.get()<<endl;
 
 		Real penetrationDepth=s1->radius+s2->radius-normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */
 		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);

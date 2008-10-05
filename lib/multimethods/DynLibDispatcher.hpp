@@ -494,7 +494,7 @@ class DynLibDispatcher
 				}
 			}
 			else if( index1_tmp != -1 && index2_tmp != -1 )
-				cerr << "DynLibDispatcher: ambigious dispatch, could not determine which multivirtual function should be called\n";
+				throw std::runtime_error("DynLibDispatcher: ambiguous or undefined dispatch for 2d multivirtual function, classes: "+base1->getClassName()+" "+base2->getClassName());
 			
 			return false;
 		  };

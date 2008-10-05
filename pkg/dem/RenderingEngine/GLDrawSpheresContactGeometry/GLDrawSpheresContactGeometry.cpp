@@ -15,6 +15,7 @@
 #include<yade/lib-opengl/GLUtils.hpp>
 
 YADE_PLUGIN("GLDrawSpheresContactGeometry");
+CREATE_LOGGER(GLDrawSpheresContactGeometry);
 
 void GLDrawSpheresContactGeometry::go(
 		const shared_ptr<InteractionGeometry>& ig,
@@ -77,15 +78,19 @@ void GLDrawSpheresContactGeometry::go(
 	}
 
 	if(sc->hasShear){
-		Vector3r contPt=se31.position+(sc->d1/sc->d0)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
+		Vector3r pos1=sc->pos1, pos2=sc->pos2, contPt=sc->contPt();
+		//Vector3r contPt=se31.position+(sc->d1/sc->d0)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
 		GLUtils::GLDrawLine(pos1,pos2,Vector3r(.5,.5,.5));
 		// sphere center to point on the sphere
 		//GLUtils::GLDrawLine(pos1,pos1+(sc->ori1*sc->cp1rel*Vector3r::UNIT_X*sc->d1),Vector3r(0,.5,1));
 		//GLUtils::GLDrawLine(pos2,pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X*sc->d2),Vector3r(0,1,.5));
+		//TRVAR4(pos1,sc->ori1,pos2,sc->ori2);
+		//TRVAR2(sc->cp2rel,pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X*sc->d2));
 		// contact point to projected points
 		Vector3r ptTg1=sc->contPtInTgPlane1(), ptTg2=sc->contPtInTgPlane2();
-		GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1));
-		GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5));
+		TRVAR3(ptTg1,ptTg2,sc->normal)
+		//GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1)); GLUtils::GLDrawLine(pos1,contPt+ptTg1,Vector3r(0,.5,1));
+		//GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5)); GLUtils::GLDrawLine(pos2,contPt+ptTg2,Vector3r(0,1,.5));
 		// projected shear
 		GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
 		// 

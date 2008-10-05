@@ -35,11 +35,17 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 							const shared_ptr<Interaction>& c)
 {
 	InteractingFacet*   facet = static_cast<InteractingFacet*>(cm1.get());
+	/* could be written as (needs to be tested):
+	 * Vector3r cl=se32.orientation.Conjugate()*(se32.position-se32.position);
+	 */
 	Matrix3r facetAxisT; se31.orientation.ToRotationMatrix(facetAxisT); 
 	Matrix3r facetAxis = facetAxisT.Transpose();
-	
 	// local orientation
 	Vector3r cl = facetAxis*(se32.position - se31.position); 
+
+	//
+	// BEGIN everything in facet-local coordinates
+	//
 
 	Vector3r normal = facet->nf;
 	Real L = normal.Dot(cl);
@@ -67,7 +73,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 	if (icr<0)
 	{
-		LOG_INFO("WARNING: a radius of a facet's inscribed circle less than zero! So, shrinkFactor is too large and would be reduced to zero.");
+		LOG_WARN("a radius of a facet's inscribed circle less than zero! So, shrinkFactor is too large and would be reduced to zero.");
 		shrinkFactor=0;
 		icr = facet->icr;
 		sh = 0;
@@ -92,6 +98,10 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 		penetrationDepth = sphereRadius - normal.Normalize();
 	}
 
+	//
+	// END everything in facet-local coordinates
+	//
+
 	if (penetrationDepth>0)
 	{
 		shared_ptr<SpheresContactGeometry> scm;
@@ -100,7 +110,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 		else
 			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 	  
-	    normal = facetAxisT*normal; // global orientation
+		normal = facetAxisT*normal; // in global orientation
 		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 
 		scm->normal = normal; 
 		scm->penetrationDepth = penetrationDepth;
@@ -112,17 +122,18 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 		if(hasShear){
 			scm->hasShear=true;
-			scm->pos1=scm->contactPoint-(2*sphereRadius-.5*penetrationDepth)*normal; scm->pos2=se32.position;
+			// fictive center of the sphere representing the facet in the sphere-sphere contact
+			scm->pos1=scm->contactPoint-(scm->radius1-.5*penetrationDepth)*normal; scm->pos2=se32.position;
 			scm->ori1=se31.orientation; scm->ori2=se32.orientation;
 			if(c->isNew){
-				scm->d0=(scm->pos2-scm->pos1).Length();
-				scm->d1=2*sphereRadius-penetrationDepth; scm->d2=sphereRadius-penetrationDepth;
+				scm->d0=scm->radius1+scm->radius2-penetrationDepth;
+				scm->d1=scm->radius1-.5*penetrationDepth; scm->d2=scm->radius2-.5*penetrationDepth;
 				// quasi-constants
 				scm->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
 				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
 				scm->cp1rel.Normalize(); scm->cp2rel.Normalize();
 			}
-			cerr<<"[n"<<scm->displacementN()<<" t"<<scm->displacementT()<<"]";
+			TRVAR2(scm->contPtInTgPlane1(),scm->contPtInTgPlane2());
 		}
 
 		return true;
@@ -137,16 +148,23 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const
 								const Se3r& se32,
 								const shared_ptr<Interaction>& c)
 {
+	c->swapOrder();
+	//LOG_WARN("Swapped interaction order for "<<c->getId2()<<"&"<<c->getId1());
+	return go(cm2,cm1,se32,se31,c);
+#if 0	
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
 	    SpheresContactGeometry* scm = static_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
-	    scm->normal = -scm->normal;
-	    Real tmpR = scm->radius1;
-	    scm->radius1 = scm->radius2;
-	    scm->radius2 = tmpR;
+		 scm->normal*=-1;
+		 std::swap(scm->radius1,scm->radius2);
+		 if(hasShear){
+			 swap(scm->pos1,scm->pos2); swap(scm->ori1,scm->ori2);
+			 if(c->isNew){ swap(scm->cp1rel,scm->cp2rel); swap(scm->d1,scm->d2); }
+		 }
 	}
 	return isInteracting;
+#endif
 }
 
 YADE_PLUGIN();

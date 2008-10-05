@@ -13,5 +13,6 @@ void SnapshotEngine::action(MetaBody* rb){
 	glv->setSnapshotFormat("PNG");
 	glv->saveSnapshot(QString(fss.str()),/*overwrite*/ true);
 	savedSnapshots.push_back(fss.str());
+	usleep((long)(msecSleep*1000));
 }
 
