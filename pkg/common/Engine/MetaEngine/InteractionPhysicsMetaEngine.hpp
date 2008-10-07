@@ -30,6 +30,7 @@ class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 {		
 	public :
 		virtual void action(MetaBody*);
+		void explicitAction(shared_ptr<PhysicalParameters>& pp1, shared_ptr<PhysicalParameters>& pp2, shared_ptr<Interaction>& i);
 
 	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);

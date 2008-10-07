@@ -12,7 +12,22 @@
 
 
 #include<yade/core/MetaBody.hpp>
+	
+/* Single dispatch for given pair of bodies, returning new interaction.
+ *
+ * The caller is responsible for inserting the interaction into some interaction container.
+ *
+ * The EngineUnit must not fail (return false).
+ */
 
+shared_ptr<Interaction> InteractionGeometryMetaEngine::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body> b2){
+	assert(b1->interactingGeometry && b2->interactingGeometry);
+	shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
+	i->isReal=true;
+	bool op=operator()(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3,b2->physicalParameters->se3,i);
+	if(!op) throw runtime_error("InteractionGeometryMetaEngine::explicitAction could not dispatch for given types ("+b1->interactingGeometry->getClassName()+","+b2->interactingGeometry->getClassName()+") or the dispatchee returned false.");
+	return i;
+}
 
 void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 {

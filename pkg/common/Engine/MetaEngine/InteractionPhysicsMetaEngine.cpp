@@ -10,6 +10,15 @@
 
 
 #include<yade/core/MetaBody.hpp>
+/* Single dispatch for given bodies pp's and interaction.
+ * 
+ * The interaction must be real (needed?).
+ */
+void InteractionPhysicsMetaEngine::explicitAction(shared_ptr<PhysicalParameters>& pp1, shared_ptr<PhysicalParameters>& pp2, shared_ptr<Interaction>& i){
+	// should we throw instead of asserting?
+	assert(i->isReal);
+	operator()(pp1,pp2,i);
+}
 
 
 void InteractionPhysicsMetaEngine::action(MetaBody* ncb)

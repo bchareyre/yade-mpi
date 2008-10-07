@@ -17,6 +17,33 @@
 #include<yade/pkg-common/Momentum.hpp>
 #include<yade/core/PhysicalAction.hpp>
 
+#include<yade/extra/Shop.hpp>
+
+ElasticContactLaw2::ElasticContactLaw2(){
+	Shop::Bex::initCache();
+	isCohesive=true;
+}
+
+ElasticContactLaw2::~ElasticContactLaw2(){}
+
+void ElasticContactLaw2::action(MetaBody* rb){
+	FOREACH(shared_ptr<Interaction> i, *rb->transientInteractions){
+		if(!i->isReal) continue;
+		shared_ptr<SpheresContactGeometry> contGeom=YADE_PTR_CAST<SpheresContactGeometry>(i->interactionGeometry);
+		shared_ptr<ElasticContactInteraction> contPhys=YADE_PTR_CAST<ElasticContactInteraction>(i->interactionPhysics);
+		assert(contGeom); assert(contPhys);
+		if(!contGeom->hasShear) throw runtime_error("SpheresContactGeometry::hasShear must be true for ElasticContactLaw2");
+		Real Fn=contPhys->kn*contGeom->displacementN(); // scalar normal force; displacementN()>=0 ≡ elongation of the contact
+		if(!isCohesive && contGeom->displacementN()>0){ cerr<<"deleting"<<endl; /* delete the interaction */ i->isReal=false; continue;}
+		contPhys->normalForce=Fn*contGeom->normal;
+		contGeom->slipToDisplacementTMax(max(0.,(-Fn*contPhys->tangensOfFrictionAngle)/contPhys->ks)); // limit shear displacement -- Coulomb criterion
+		contPhys->shearForce=contPhys->ks*contGeom->displacementT();
+		Vector3r force=contPhys->shearForce+contPhys->normalForce;
+		Shop::applyForceAtContactPoint(force,contGeom->contactPoint,i->getId1(),contGeom->pos1,i->getId2(),contGeom->pos2,rb);
+	}
+}
+
+
 
 ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
 {

@@ -128,7 +128,7 @@ void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const b
 	Shop::Bex::force(id1,rootBody)+=force;
 	Shop::Bex::force(id2,rootBody)-=force;
 	Shop::Bex::momentum(id1,rootBody)+=(contGeom->contactPoint-contGeom->pos1).Cross(force);
-	Shop::Bex::momentum(id1,rootBody)-=(contGeom->contactPoint-contGeom->pos2).Cross(force);
+	Shop::Bex::momentum(id2,rootBody)-=(contGeom->contactPoint-contGeom->pos2).Cross(force);
 }
 
 void BrefcomLaw::action(MetaBody* _rootBody){

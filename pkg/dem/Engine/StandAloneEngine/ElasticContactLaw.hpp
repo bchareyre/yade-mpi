@@ -17,6 +17,23 @@
 
 class PhysicalAction;
 
+class ElasticContactLaw2: public InteractionSolver{
+	public:
+	//! this should really be property of the interaction, but for simplicity keep it here now...
+	bool isCohesive;
+	ElasticContactLaw2();
+	virtual ~ElasticContactLaw2();
+	void action(MetaBody*);
+	void registerAttributes(){
+		InteractionSolver::registerAttributes();
+		REGISTER_ATTRIBUTE(isCohesive);
+	}
+	NEEDS_BEX("Force","Momentum");
+	REGISTER_CLASS_NAME(ElasticContactLaw2);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+};
+REGISTER_SERIALIZABLE(ElasticContactLaw2,false);
+
 class ElasticContactLaw : public InteractionSolver
 {
 /// Attributes

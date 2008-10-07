@@ -4,7 +4,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/extra/Brefcom.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<cmath>
 using namespace boost::python;
 
@@ -73,8 +73,8 @@ Real elasticEnergyInAABB(python::tuple AABB){
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
 		if(!i->interactionPhysics) continue;
-		shared_ptr<BrefcomContact> bc=dynamic_pointer_cast<BrefcomContact>(i->interactionPhysics); if(!bc) continue;
-		shared_ptr<SpheresContactGeometry> geom=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!bc){LOG_ERROR("Brefcom contact doesn't have SpheresContactGeomety associated?!"); continue;}
+		shared_ptr<NormalShearInteraction> bc=dynamic_pointer_cast<NormalShearInteraction>(i->interactionPhysics); if(!bc) continue;
+		shared_ptr<SpheresContactGeometry> geom=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!bc){LOG_ERROR("NormalShearInteraction contact doesn't have SpheresContactGeomety associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->physicalParameters->se3.position,bbMin,bbMax), isIn2=isInBB(b2->physicalParameters->se3.position,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -89,9 +89,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
 			//cerr<<"Interaction crosses AABB boundary, weight is "<<weight<<endl;
 			//LOG_DEBUG("Interaction crosses AABB boundary, weight is "<<weight);
 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-		E+=geom->d0*weight*(.5*bc->E*bc->crossSection*pow(geom->epsN(),2)+.5*bc->G*bc->crossSection*pow(geom->epsT().Length(),2));
-		//TRVAR5(bc->crossSection,bc->E,bc->G,bc->epsN,bc->epsT.Length());;
-		//cerr<<bc->crossSection<<","<<bc->E<<","<<bc->G<<","<<bc->epsN<<","<<bc->epsT.Length()<<endl;
+		E+=geom->d0*weight*(.5*bc->kn*pow(geom->epsN(),2)+.5*bc->ks*pow(geom->epsT().Length(),2));
 	}
 	return E;
 }
@@ -158,6 +156,51 @@ python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::li
 {
 	return vec2tuple(Shop::inscribedCircleCenter(Vector3r(python::extract<double>(v0[0]),python::extract<double>(v0[1]),python::extract<double>(v0[2])), Vector3r(python::extract<double>(v1[0]),python::extract<double>(v1[1]),python::extract<double>(v1[2])), Vector3r(python::extract<double>(v2[0]),python::extract<double>(v2[1]),python::extract<double>(v2[2]))));
 }
+/* Sum moments acting on bodies within mask.
+ *
+ * @param mask is Body::groupMask that must match for a body to be taken in account.
+ * @param axis is the direction of axis with respect to which the moment is calculated.
+ * @param axisPt is a point on the axis.
+ *
+ * The computation is trivial: moment from force is is by definition r×F, where r
+ * is position relative to axisPt; moment from moment is m; such moment per body is
+ * projected onto axis.
+ */
+Real sumBexMoments(int mask, python::tuple _axis, python::tuple _axisPt){
+	Shop::Bex::initCache();
+	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	Real ret;
+	Vector3r axis=tuple2vec(_axis), axisPt=tuple2vec(_axisPt);
+	FOREACH(const shared_ptr<Body> b, *rb->bodies){
+		if(!b->maskOk(mask)) continue;
+		const Vector3r& m=Shop::Bex::momentum(b->getId(),rb.get());
+		const Vector3r& f=Shop::Bex::force(b->getId(),rb.get());
+		Vector3r r=b->physicalParameters->se3.position-axisPt;
+		ret+=axis.Dot(m+r.Cross(f));
+	}
+	return ret;
+}
+/* Sum forces actiong on bodies within mask.
+ *
+ * @param mask groupMask of matching bodies
+ * @param direction direction in which forces are summed
+ *
+ */
+Real sumBexForces(int mask, python::tuple _direction){
+	Shop::Bex::initCache();
+	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	Real ret;
+	Vector3r direction=tuple2vec(_direction);
+	FOREACH(const shared_ptr<Body> b, *rb->bodies){
+		if(!b->maskOk(mask)) continue;
+		const Vector3r& f=Shop::Bex::force(b->getId(),rb.get());
+		ret+=direction.Dot(f);
+	}
+	return ret;
+}
+
+// for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
+void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 
@@ -172,6 +215,9 @@ BOOST_PYTHON_MODULE(_utils){
 	def("elasticEnergy",elasticEnergyInAABB);
 	def("inscribedCircleCenter",inscribedCircleCenter);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
+	def("sumBexForces",sumBexForces);
+	def("sumBexMoments",sumBexMoments);
+	def("createInteraction",Shop__createExplicitInteraction);
 }
 
 

@@ -97,13 +97,22 @@ void Shop::Bex::initCache(){
 	}
 }
 
-#define __BEX_ACCESS(retType,shopBexMember,bexClass,bexIdx,bexAttribute) retType& Shop::Bex::shopBexMember(body_id_t id,MetaBody* mb){ assert(bexIdx>=0); return static_pointer_cast<bexClass>((mb?mb:Omega::instance().getRootBody().get())->physicalActions->find(id,bexIdx))->bexAttribute; }
+#define __BEX_ACCESS(retType,shopBexMember,bexClass,bexIdx,bexAttribute) retType& Shop::Bex::shopBexMember(body_id_t id,MetaBody* mb){ assert(bexIdx>=0); shared_ptr<PhysicalActionContainer> pac=(mb?mb:Omega::instance().getRootBody().get())->physicalActions; /*if((long)pac->size()<=id) throw invalid_argument("No " #shopBexMember " for #"+lexical_cast<string>(id)+" (max="+lexical_cast<string>(((long)pac->size()-1))+")");*/ return static_pointer_cast<bexClass>(pac->find(id,bexIdx))->bexAttribute; }
 __BEX_ACCESS(Vector3r,force,Force,forceIdx,force);
 __BEX_ACCESS(Vector3r,momentum,Momentum,momentumIdx,momentum);
 __BEX_ACCESS(Vector3r,globalStiffness,GlobalStiffness,globalStiffnessIdx,stiffness);
 __BEX_ACCESS(Vector3r,globalRStiffness,GlobalStiffness,globalStiffnessIdx,Rstiffness);
 #undef __BEX_ACCESS
 
+/* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
+ *
+ * Shop::Bex::initCache must have been called at some point. */
+void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, MetaBody* rootBody){
+	Shop::Bex::force(id1,rootBody)+=force;
+	Shop::Bex::force(id2,rootBody)-=force;
+	Shop::Bex::momentum(id1,rootBody)+=(contPt-pos1).Cross(force);
+	Shop::Bex::momentum(id2,rootBody)-=(contPt-pos2).Cross(force);
+}
 
 
 Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
@@ -494,6 +503,26 @@ Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
 		dt=min(dt,s->radius/sqrt(ebp->young/density));
 	}
 	return dt;
+}
+
+
+shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2){
+	InteractionGeometryMetaEngine* geomMeta=NULL;
+	InteractionPhysicsMetaEngine* physMeta=NULL;
+	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	if(rb->transientInteractions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
+	FOREACH(const shared_ptr<Engine>& e, rb->engines){
+		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryMetaEngine*>(e.get()); if(geomMeta) continue; }
+		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsMetaEngine*>(e.get()); if(physMeta) continue; }
+		if(geomMeta&&physMeta){break;}
+	}
+	if(!geomMeta) throw runtime_error("No InteractionGeometryMetaEngine in engines.");
+	if(!physMeta) throw runtime_error("No InteractionPhysicsMetaEngine in engines.");
+	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
+	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2);
+	physMeta->explicitAction(b1->physicalParameters,b2->physicalParameters,i);
+	rb->transientInteractions->insert(i);
+	return i;
 }
 
 Shop::sphereGeomStruct Shop::smallSdecXyzData[]={

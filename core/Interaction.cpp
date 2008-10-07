@@ -27,7 +27,6 @@ Interaction::Interaction(body_id_t newId1,body_id_t newId2) : id1(newId1) , id2(
 {	
 	isNew = true;
 	isReal = false;
-	isNeighbor = true;
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
 
 }
