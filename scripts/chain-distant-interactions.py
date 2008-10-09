@@ -15,7 +15,7 @@ o.engines=[
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 	StandAloneEngine('ElasticContactLaw2',{'isCohesive':True}),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-1e5]}),
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.2})
+	DeusExMachina('NewtonsDampedLaw',{'damping':0.1})
 ]
 from yade import utils
 for n in range(20):
@@ -25,4 +25,7 @@ for n in range(20):
 
 
 o.dt=.04*utils.PWaveTimeStep()
-o.save('/tmp/a.xml.bz2')
+#o.save('/tmp/a.xml.bz2')
+#o.reload()
+#o.run(50000,True)
+#print o.iter/o.realtime

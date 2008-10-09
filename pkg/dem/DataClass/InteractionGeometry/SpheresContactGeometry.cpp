@@ -25,14 +25,22 @@ void SpheresContactGeometry::setTgPlanePts(Vector3r p1new, Vector3r p2new){
  */
 void SpheresContactGeometry::relocateContactPoints(){
 	assert(hasShear);
-	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Vector3r midPt=.5*(p1+p2);
+	relocateContactPoints(contPtInTgPlane1(),contPtInTgPlane2());
+}
+
+/* Like SpheresContactGeometry::relocateContactPoints(), but use already computed tangent plane points.
+ *
+ *
+ */
+void SpheresContactGeometry::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
+	Vector3r midPt=(d1/(d1+d2))*(p1+p2); // proportionally to radii, so that angle would be the same
 	if((p1.SquaredLength()>4*d1 || p2.SquaredLength()>4*d2) && midPt.SquaredLength()>.5*min(d1,d2)){
 		//cerr<<"RELOCATION with displacementT="<<displacementT(); // should be the same before and after relocation
 		setTgPlanePts(p1-midPt,p2-midPt);
 		//cerr<<" → "<<displacementT()<<endl;
 	}
 }
+
 
 /*! Perform slip of the projected contact points so that their distance becomes equal (or remains smaller) than the given one.
  * The slipped distance is returned.

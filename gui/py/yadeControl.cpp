@@ -424,6 +424,10 @@ class pyOmega{
 		OMEGA.createSimulationLoop();
 		LOG_DEBUG("LOAD!");
 	}
+	void reload(){	load(OMEGA.getSimulationFileName());}
+	void saveTmp(string mark){ save(":memory:"+mark);}
+	void loadTmp(string mark){ load(":memory:"+mark);}
+
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
 
@@ -520,7 +524,10 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("dt",&pyOmega::dt_get,&pyOmega::dt_set)
 		.add_property("usesTimeStepper",&pyOmega::usesTimeStepper_get,&pyOmega::usesTimeStepper_set)
 		.def("load",&pyOmega::load)
+		.def("reload",&pyOmega::reload)
 		.def("save",&pyOmega::save)
+		.def("loadTmp",&pyOmega::loadTmp)
+		.def("saveTmp",&pyOmega::saveTmp)
 		.def("saveSpheres",&pyOmega::saveSpheres)
 		.def("run",&pyOmega::run,omega_run_overloads())
 		.def("pause",&pyOmega::pause)

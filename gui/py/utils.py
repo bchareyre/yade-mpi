@@ -17,6 +17,8 @@ except ImportError: pass
 from yade._utils import *
 
 
+def typedEngine(name): return [e for e in Omega().engines if e.name==name][0]
+
 def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=[1,1,1],physParamsClass='BodyMacroParameters'):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
@@ -215,4 +217,51 @@ def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 	pipeline.set_state(gst.STATE_PLAYING)
 	mainloop.run()
 	pipeline.set_state(gst.STATE_NULL); pipeline.get_state()
+
+def readParamsFromTable(tableFile=None,tableLine=None,noTableOk=False,**kw):
+	"""
+	Read parameters from a file and assign them to __builtin__ variables.
+
+	tableFile is a text file (with one value per blank-separated columns)
+	tableLine is number of line where to get the values from
+
+		The format of the file is as follows (no comments, empty lines etc allowed…)
+		
+		name1 name2 … # 0th line
+		val1  val2  … # 1st line
+		val2  val2  … # 2nd line
+		…
+
+	The name `description' is special and is assigned to Omega().tags['description']
+
+	assigns Omega().tags['params']="name1=val1,name2=val2,…"
+	
+	assigns Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
+
+	return value is the number of assigned parameters.
+	"""
+	o=Omega()
+	tagsParams=[]
+	import os, __builtin__
+	if not tableFile and not os.environ.has_key('PARAM_TABLE'):
+		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
+	else:
+		if not tableFile: tableFile=os.environ['PARAM_TABLE']
+		if not tableLine: tableLine=int(os.environ['PARAM_LINE'])
+		ll=open(tableFile).readlines(); names=ll[0].split(); values=ll[tableLine].split()
+		assert(len(names)==len(values))
+		for i in range(len(names)):
+			if names[i]=='description': o.tags['description']=values[i]
+			else:
+				if names[i] not in kw.keys(): raise NameError("Parameter `%s' has no default value assigned"%names[i])
+				kw.pop(names[i])
+				eq="%s=%s"%(names[i],values[i])
+				exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]
+	defaults=[]
+	for k in kw.keys():
+		exec("__builtin__.%s=%s"%(k,kw[k]))
+		defaults+=["%s=%s"%(k,kw[k])]
+	o.tags['defaultParams']=",".join(defaults)
+	o.tags['params']=",".join(tagsParams)
+	return len(tagsParams)
 

@@ -22,6 +22,8 @@
  *
  * TODO: add torsion code, that will (if a flag is on) compute torsion angle on the contact axis.
  *
+ * TODO: add bending code, that will compute bending angle of the contact axis
+ *
  *
  */
 class SpheresContactGeometry: public InteractionGeometry{
@@ -58,7 +60,17 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Real displacementN(){assert(hasShear); return (pos2-pos1).Length()-d0;}
 		Real epsN(){return displacementN()*(1./d0);}
-		Vector3r displacementT(){ assert(hasShear); return contPtInTgPlane2()-contPtInTgPlane1();}
+		Vector3r displacementT(){ assert(hasShear);
+			// enabling automatic relocation decreases overall simulation speed by about 3%
+			// perhaps: bool largeStrains ... ?
+			#if 0 
+				Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
+				relocateContactPoints(p1,p2);
+				return p2-p1; // shear before relocation, but that should be OK
+			#else
+				return contPtInTgPlane2()-contPtInTgPlane1();
+			#endif
+		}
 		Vector3r epsT(){return displacementT()*(1./d0);}
 	
 		Real slipToDisplacementTMax(Real displacementTMax);
@@ -66,6 +78,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 		Real slipToEpsTMax(Real epsTMax){ return (1/d0)*slipToDisplacementTMax(epsTMax*d0);}
 
 		void relocateContactPoints();
+		void relocateContactPoints(const Vector3r& tgPlanePt1, const Vector3r& tgPlanePt2);
 
 		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO){createIndex();}
 		virtual ~SpheresContactGeometry();

@@ -87,6 +87,8 @@ class Omega : public Singleton<Omega>
 		string				 simulationFileName;
 		void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 
+		map<string,string> memSavedSimulations;
+
 	public :
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean

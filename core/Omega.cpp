@@ -68,6 +68,7 @@ void Omega::reset(){
 void Omega::init(){
 	simulationFileName="";
 	resetRootBody();
+	timeInit();
 }
 
 void Omega::timeInit(){
@@ -215,7 +216,6 @@ void Omega::scanPlugins()
 void Omega::loadSimulationFromStream(std::istream& stream){
 	LOG_DEBUG("Loading simulation from stream.");
 	resetRootBody();
-	timeInit();
 	IOFormatManager::loadFromStream("XMLFormatManager",stream,"rootBody",rootBody);
 }
 void Omega::saveSimulationToStream(std::ostream& stream){
@@ -223,10 +223,10 @@ void Omega::saveSimulationToStream(std::ostream& stream){
 	IOFormatManager::saveToStream("XMLFormatManager",stream,"rootBody",rootBody);
 }
 
-void Omega::loadSimulation()
-{
+void Omega::loadSimulation(){
+
 	if(Omega::instance().getSimulationFileName().size()==0) throw yadeBadFile("Simulation filename to load has zero length");
-	if(!filesystem::exists(simulationFileName)) throw yadeBadFile("Simulation file to load doesn't exist");
+	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw yadeBadFile("Simulation file to load doesn't exist");
 	
 	// FIXME: should stop running simulation!!
 	LOG_INFO("Loading file " + simulationFileName);
@@ -243,6 +243,12 @@ void Omega::loadSimulation()
 		else if(algorithm::ends_with(simulationFileName,".yade")){
 			resetRootBody();
 			IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+		}
+		else if(algorithm::starts_with(simulationFileName,":memory:")){
+			if(memSavedSimulations.count(simulationFileName)==0) throw yadeBadFile(("Cannot load nonexistent memory-saved simulation "+simulationFileName).c_str());
+			resetRootBody();
+			istringstream iss(memSavedSimulations[simulationFileName]);
+			IOFormatManager::loadFromStream("XMLFormatManager",iss,"rootBody",rootBody);
 		}
 		else throw (yadeBadFile("Extension of file not recognized."));
 	}
@@ -268,6 +274,12 @@ void Omega::saveSimulation(const string name)
 	else if(algorithm::ends_with(name,".yade")){
 		FormatChecker::format=FormatChecker::BIN;
 		IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
+	}
+	else if(algorithm::starts_with(name,":memory:")){
+		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
+		ostringstream oss;
+		IOFormatManager::saveToStream("XMLFormatManager",oss,"rootBody",rootBody);
+		memSavedSimulations[name]=oss.str();
 	}
 	else {
 		throw(yadeBadFile(("Filename extension not recognized in `"+name+"'").c_str()));

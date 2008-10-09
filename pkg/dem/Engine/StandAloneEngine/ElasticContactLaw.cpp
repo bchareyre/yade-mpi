@@ -36,6 +36,7 @@ void ElasticContactLaw2::action(MetaBody* rb){
 		Real Fn=contPhys->kn*contGeom->displacementN(); // scalar normal force; displacementN()>=0 ≡ elongation of the contact
 		if(!isCohesive && contGeom->displacementN()>0){ cerr<<"deleting"<<endl; /* delete the interaction */ i->isReal=false; continue;}
 		contPhys->normalForce=Fn*contGeom->normal;
+		//contGeom->relocateContactPoints();
 		contGeom->slipToDisplacementTMax(max(0.,(-Fn*contPhys->tangensOfFrictionAngle)/contPhys->ks)); // limit shear displacement -- Coulomb criterion
 		contPhys->shearForce=contPhys->ks*contGeom->displacementT();
 		Vector3r force=contPhys->shearForce+contPhys->normalForce;
