@@ -24,7 +24,7 @@ CREATE_LOGGER(GLViewer);
 GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
 	isMoving=false;
-	renderer=_renderer;
+	renderer=_renderer; renderer->init();
 	drawGridXYZ[0]=drawGridXYZ[1]=drawGridXYZ[2]=false;
 	drawScale=true;
 	timeDispMask=TIME_REAL|TIME_VIRT|TIME_ITER;
@@ -34,6 +34,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	resize(550,550);
 
 	if (id==0) setCaption("Primary view");
+	else if(id==-1) { setCaption("Player view"); viewId=0; }
 	else setCaption("Secondary view number "+lexical_cast<string>(id));
 	show();
 	

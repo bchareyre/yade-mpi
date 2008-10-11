@@ -72,7 +72,7 @@ def myAddPlotData():
 
 
 
-o.run();
+o.run(int(2./o.dt));
 print """Now, you can say
 
  yade.plot.plot()

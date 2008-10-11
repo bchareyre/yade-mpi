@@ -18,12 +18,21 @@
 #include<qstring.h>
 CREATE_LOGGER(QtSimulationPlayer);
 
+void QtSimulationPlayer::keyPressEvent(QKeyEvent* e){
+	assert(glSimulationPlayerViewer);
+	if(e->key()==Qt::Key_H && (e->state() & AltButton)){ glSimulationPlayerViewer->raise(); this->hide(); }
+	else QtGeneratedSimulationPlayer::keyPressEvent(e);
+}
+
 QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
+	glSimulationPlayerViewer=new GLSimulationPlayerViewer(NULL);
 	glSimulationPlayerViewer->simPlayer=this;
 	leInputConfigFile->setText(Omega::instance().getSimulationFileName());
 	enableControls(false);
 }
-QtSimulationPlayer::~QtSimulationPlayer(){}
+QtSimulationPlayer::~QtSimulationPlayer(){
+	if(glSimulationPlayerViewer) delete glSimulationPlayerViewer;
+	}
 void QtSimulationPlayer::pbPlayClicked(){	setParameters(); glSimulationPlayerViewer->startAnimation();}
 void QtSimulationPlayer::pbPauseClicked(){ glSimulationPlayerViewer->stopAnimation();}
 void QtSimulationPlayer::pbStepClicked(){ glSimulationPlayerViewer->stopAnimation(); glSimulationPlayerViewer->doOneStep(); }

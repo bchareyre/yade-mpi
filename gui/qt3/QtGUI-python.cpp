@@ -79,19 +79,22 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 	evtPLAYER();
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
+	player->hide();
 	string snapBase2(snapBase);
 	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots."); }
 	glv->stride=stride;
 	glv->load(savedSim);
-	if(!postLoadHook.empty()){ PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); }
+	if(!postLoadHook.empty()){ PyGILState_STATE gstate; LOG_INFO("Running postLoadHook "<<postLoadHook); Py_BEGIN_ALLOW_THREADS; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); Py_END_ALLOW_THREADS; }
 	glv->saveSnapShots=true;
 	glv->snapshotsBase=snapBase2;
 	if(!savedQGLState.empty()){
+		LOG_INFO("Loading view state from "<<savedQGLState);
 		glv->setStateFileName(savedQGLState);
 		glv->restoreStateFromFile();
 		glv->setStateFileName(QString::null);
 	}
-	if(dispParamsNo>=0) glv->useDisplayParameters(dispParamsNo);
+	if(dispParamsNo>=0) { LOG_INFO("Loading view state from state #"<<dispParamsNo); glv->useDisplayParameters(dispParamsNo);}
+	glv->raise();
 	glv->startAnimation();
 	while(glv->animationIsStarted()) { usleep(2000000); LOG_DEBUG("Last msg: "<<*player->messages.rbegin()); }
 	python::list snaps; FOREACH(string s, glv->snapshots){snaps.append(s);}

@@ -13,36 +13,41 @@
 #include<yade/lib-factory/Factorable.hpp>
 #include <QtGeneratedSimulationPlayer.h>
 
+class GLSimulationPlayerViewer;
+
 class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 {
-	public : QtSimulationPlayer();
-	public : ~QtSimulationPlayer();
-
-	private : void setParameters();
-	public: void pushMessage(std::string);
-		list<string> messages;
-
-
-	public slots : virtual void pbInputDirectoryClicked();
-	public slots : virtual void pbLoadClicked();
-	public slots : virtual void pbInputConfigFileClicked();
-
-	public slots : virtual void pbOutputDirectoryClicked();
-	public slots : virtual void cbSaveSnapShotsToggled(bool b);
-
-	public slots : virtual void pbPlayClicked();
-	public slots : virtual void pbPauseClicked();
-	public slots : virtual void pbStepClicked();
-	public slots : virtual void pbResetClicked();
-	
-	public slots : virtual void cbAllowFiltrationToggled(bool b);
-	
-	public slots : virtual void cbBodyWireToggled(bool b);
- 	
-	protected    : void closeEvent(QCloseEvent *);
-//						void keyPressEvent(QKeyEvent *){};
 	public:
-	void enableControls(bool);
+		QtSimulationPlayer();
+		~QtSimulationPlayer();
+		void pushMessage(std::string);
+		list<string> messages;
+		GLSimulationPlayerViewer* glSimulationPlayerViewer;
+		void enableControls(bool);
+
+	private:
+		void setParameters();
+
+	public slots:
+		virtual void pbInputDirectoryClicked();
+		virtual void pbLoadClicked();
+		virtual void pbInputConfigFileClicked();
+
+		virtual void pbOutputDirectoryClicked();
+		virtual void cbSaveSnapShotsToggled(bool b);
+
+		virtual void pbPlayClicked();
+		virtual void pbPauseClicked();
+		virtual void pbStepClicked();
+		virtual void pbResetClicked();
+		
+		virtual void cbAllowFiltrationToggled(bool b);
+		
+		virtual void cbBodyWireToggled(bool b);
+ 	
+	protected:
+		void closeEvent(QCloseEvent *);
+		virtual void keyPressEvent(QKeyEvent *);
 
 	DECLARE_LOGGER;
 

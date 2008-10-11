@@ -33,15 +33,25 @@ using namespace boost;
 
 CREATE_LOGGER(GLSimulationPlayerViewer);
 
-GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget* parent, char* name): GLViewer(0,shared_ptr<OpenGLRenderingEngine>(new OpenGLRenderingEngine),parent,NULL) {
+void GLSimulationPlayerViewer::closeEvent(QCloseEvent* ev){
+	simPlayer->close();
+}
+
+void GLSimulationPlayerViewer::keyPressEvent(QKeyEvent* e){
+	if(e->key()==Qt::Key_H && (e->state() & AltButton)){ if(simPlayer->isHidden()) simPlayer->show(); else simPlayer->hide(); }
+	else GLViewer::keyPressEvent(e);
+}
+
+GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget* parent): GLViewer(/*special value meaning player*/ -1,shared_ptr<OpenGLRenderingEngine>(new OpenGLRenderingEngine),parent,NULL) {
 	setSceneRadius(2);
 	showEntireScene();
-	resize(720, 576);
+	resize(550, 550);
 	setAnimationPeriod(0); // as fast as possible
 	saveSnapShots=false;
 	frameNumber=0;
 	stride=1;
 	lastCheckPointFrame=0;
+	LOG_INFO("Use Alt-H to hide/show the player controller")
 }
 
 void GLSimulationPlayerViewer::initializeGL(){ QGLViewer::initializeGL(); renderer->init(); }
@@ -142,9 +152,10 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		LOG_DEBUG("Opened sqlite db "<<fileName);
 		if(0==con->executeint("select count(*) from sqlite_master where name='meta';")){ LOG_ERROR("Database doesn't have the 'meta' table."); return; }
 		if(0==con->executeint("select count(*) from sqlite_master where name='records';")){ LOG_ERROR("Database doesn't have the 'records' table."); return; }
-		simPlayer->pushMessage("Database OK.");
+		simPlayer->pushMessage("Database OK, loading simulation...");
 		// load simulation
 		string xml=con->executestring("select simulationXML from 'meta';");
+		simPlayer->pushMessage("Simulation loaded.");
 		istringstream xmlStream(xml); Omega::instance().loadSimulationFromStream(xmlStream);
 		{
 			sqlite3x::sqlite3_command cmd(*con,"select bodyTable from 'records' ORDER BY iter;");

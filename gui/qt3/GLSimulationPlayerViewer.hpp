@@ -46,7 +46,7 @@ class GLSimulationPlayerViewer: public GLViewer {
  		list<string>::iterator xyzNamesIter;
 		vector< shared_ptr< FilterEngine > > filters;
 	public :
-		GLSimulationPlayerViewer(QWidget* parent,char* name);
+		GLSimulationPlayerViewer(QWidget* parent);
 		virtual ~GLSimulationPlayerViewer(){};
 		void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
 		void load(const string& fileName, bool fromFile=true);
@@ -56,6 +56,9 @@ class GLSimulationPlayerViewer: public GLViewer {
 	protected :
 		virtual void animate();
 		virtual void initializeGL();
+		virtual void closeEvent(QCloseEvent *e);
+		virtual void keyPressEvent(QKeyEvent* e);
+
 	DECLARE_LOGGER;
 };
 
