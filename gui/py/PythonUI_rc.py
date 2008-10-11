@@ -5,7 +5,7 @@ yade.runtime must have already been populated from within c++."""
 
 from yade import runtime
 import sys
-sys.excepthook=sys.__excepthook__ # apport on ubuntu override this, we don't need it
+sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
 # sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/extra')
 
 from yade.wrapper import *
@@ -19,6 +19,10 @@ from yade.wrapper import *
 if not callable(__builtins__.quit):
 	def _quit(): import sys; sys.exit(0)
 	__builtins__.quit=_quit
+
+## run the TCP server
+import yade.PythonTCPServer
+yade.PythonTCPServer.PythonTCPServer(minPort=9000)
 
 ## run simulation if requested from the command line
 if runtime.simulation:

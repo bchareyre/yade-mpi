@@ -75,5 +75,6 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.File('runtime.py','py'),
 		env.File('ipython.py','py'),
 		env.File('plot.py','py'),
+		env.File('PythonTCPServer.py','py'),
 	])
 
