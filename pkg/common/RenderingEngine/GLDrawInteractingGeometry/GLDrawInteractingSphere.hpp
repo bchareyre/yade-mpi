@@ -14,6 +14,7 @@
 class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 {	
 	private :
+		static bool first;
 		static vector<Vector3r> vertices;
 		static vector<Vector3r> faces;
 		static int glWiredSphereList;
@@ -22,7 +23,11 @@ class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 		void drawSphere(int depth);
 	
 	public :
+		GLDrawInteractingSphere();
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+/// Serialization
+	protected :
+		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};
 
 	RENDERS(InteractingSphere);
 	REGISTER_CLASS_NAME(GLDrawInteractingSphere);

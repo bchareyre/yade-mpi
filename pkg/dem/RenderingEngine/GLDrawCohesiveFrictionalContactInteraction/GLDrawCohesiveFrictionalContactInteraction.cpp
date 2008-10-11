@@ -74,6 +74,7 @@ Vector3r GLDrawCohesiveFrictionalContactInteraction::drawRotationAxis(
 	const Real size,
 	const Vector3r color)
 {
+	glPushMatrix();
 	Vector3r axis;Real angle;
 	Quaternionr delta(q);
 	delta.ToAxisAngle(axis,angle);
@@ -84,6 +85,7 @@ Vector3r GLDrawCohesiveFrictionalContactInteraction::drawRotationAxis(
 	Vector3r m(pos+ret*size);
 	drawArrow(pos, m ,color);
 	drawFlatText(m,txt);
+	glPopMatrix();
 	return ret;
 }
 
@@ -94,7 +96,7 @@ void GLDrawCohesiveFrictionalContactInteraction::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-//	if(!i->isReal) return;
+	if(!i->isReal) return;
 	isReal=i->isReal;
 
 	CohesiveFrictionalContactInteraction*    ph = static_cast<CohesiveFrictionalContactInteraction*>(ih.get());
@@ -162,8 +164,8 @@ if(wireFrame)
 //	drawArrow(middle+M2*size, middle+(M2-M1)*size ,Vector3r(1.0,0.4,0.4));
 
 
-	drawArrow(middle, middle+ph->shearForce*size/4000.0 ,Vector3r(isReal?1:0.4,0,isReal?1:0.4));
-	drawFlatText(     middle+ph->shearForce*size/4000.0 ,std::string(" Fs"));
+	drawArrow(middle, middle+ph->shearForce*size/4000000.0 ,Vector3r(isReal?1:0.4,0,isReal?1:0.4));
+	drawFlatText(     middle+ph->shearForce*size/4000000.0 ,std::string(" Fs"));
 
 // draw normal
 	drawArrow(middle, middle+sc->normal*size*0.9 ,Vector3r(0,isReal?1:0.4,0));

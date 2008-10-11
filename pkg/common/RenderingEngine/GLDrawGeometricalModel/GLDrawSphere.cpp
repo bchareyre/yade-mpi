@@ -21,16 +21,23 @@
 //      glPopMatrix();
 //}
 
+int GLDrawSphere::glSphereList=-1;
+int GLDrawSphere::glWiredSphereList=-1;
+
+vector<Vector3r> GLDrawSphere::vertices;
+vector<Vector3r> GLDrawSphere::faces;
+bool GLDrawSphere::first = true;
+
 bool GLDrawSphere::glutUse=false;
 bool GLDrawSphere::glutNormalize=true;
 int  GLDrawSphere::glutSlices=12;
 int  GLDrawSphere::glutStacks=6;
 
-GLDrawSphere::GLDrawSphere() : first(true), glWiredSphereList(-1), glSphereList(-1){};
+GLDrawSphere::GLDrawSphere(){first=true;};
 
 void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
-	if(glutUse){
+	/*if(glutUse){
 		Real r= (static_cast<Sphere*>(gm.get()))->radius;
 		glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 		glColor3v(gm->diffuseColor);
@@ -39,8 +46,9 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 			else glutSolidSphere(r,glutSlices,glutStacks);
 		if(glutNormalize) glPopAttrib();
 		return;
-	}
+	}*/
 
+	//first = true;
 	if (first)
 	{
 		Real X = 0.525731112119133606;

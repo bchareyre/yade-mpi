@@ -20,18 +20,18 @@ void InteractingMyTetrahedron2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	AABB* aabb = static_cast<AABB*>(bv.get());
 
 	// create a bounding volume from four spheres ( InteractingMyTetrahedron )
-	Vector3r min = Vector3r(0,0,0);
+	Vector3r min = Vector3r(1,1,1)*100000;
 	min = componentMinVector(min,se3.orientation*myTet->c1 - Vector3r(myTet->r1,myTet->r1,myTet->r1));
 	min = componentMinVector(min,se3.orientation*myTet->c2 - Vector3r(myTet->r2,myTet->r2,myTet->r2));
 	min = componentMinVector(min,se3.orientation*myTet->c3 - Vector3r(myTet->r3,myTet->r3,myTet->r3));
 	min = componentMinVector(min,se3.orientation*myTet->c4 - Vector3r(myTet->r4,myTet->r4,myTet->r4));
 	min += se3.position;
 
-	Vector3r max = Vector3r(0,0,0);
-	max = componentMaxVector(min,se3.orientation*myTet->c1 + Vector3r(myTet->r1,myTet->r1,myTet->r1));
-	max = componentMaxVector(min,se3.orientation*myTet->c2 + Vector3r(myTet->r2,myTet->r2,myTet->r2));
-	max = componentMaxVector(min,se3.orientation*myTet->c3 + Vector3r(myTet->r3,myTet->r3,myTet->r3));
-	max = componentMaxVector(min,se3.orientation*myTet->c4 + Vector3r(myTet->r4,myTet->r4,myTet->r4));
+	Vector3r max = Vector3r(1,1,1)*(-100000);
+	max = componentMaxVector(max,se3.orientation*myTet->c1 + Vector3r(myTet->r1,myTet->r1,myTet->r1));
+	max = componentMaxVector(max,se3.orientation*myTet->c2 + Vector3r(myTet->r2,myTet->r2,myTet->r2));
+	max = componentMaxVector(max,se3.orientation*myTet->c3 + Vector3r(myTet->r3,myTet->r3,myTet->r3));
+	max = componentMaxVector(max,se3.orientation*myTet->c4 + Vector3r(myTet->r4,myTet->r4,myTet->r4));
 	max += se3.position;
 
 	// AABB

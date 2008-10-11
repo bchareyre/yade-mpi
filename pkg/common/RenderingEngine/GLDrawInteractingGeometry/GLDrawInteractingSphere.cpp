@@ -17,10 +17,13 @@ int GLDrawInteractingSphere::glWiredSphereList=-1;
 vector<Vector3r> GLDrawInteractingSphere::vertices;
 vector<Vector3r> GLDrawInteractingSphere::faces;
 
+bool GLDrawInteractingSphere::first = true;
+
+GLDrawInteractingSphere::GLDrawInteractingSphere(){first=true;};
 
 void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool)
 {
-	static bool first=true;
+	//first=true;
 	
 	if (first)
 	{
@@ -153,3 +156,4 @@ void GLDrawInteractingSphere::drawSphere(int depth)
 }
 
 YADE_PLUGIN();
+
