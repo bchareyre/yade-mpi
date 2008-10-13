@@ -14,7 +14,7 @@ class PeriodicPythonRunner: public StretchPeriodicEngine {
 		string command;
 	public :
 		PeriodicPythonRunner(): command("pass"){};
-		/* virtual bool isActivated: not overridden, PeriodicEngine handles that */
+		/* virtual bool isActivated: not overridden, StretchPeriodicEngine handles that */
 		virtual void action(MetaBody* b){
 			PyGILState_STATE gstate;
 				gstate = PyGILState_Ensure();

@@ -96,7 +96,9 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 	if(dispParamsNo>=0) { LOG_INFO("Loading view state from state #"<<dispParamsNo); glv->useDisplayParameters(dispParamsNo);}
 	glv->raise();
 	glv->startAnimation();
+	Py_BEGIN_ALLOW_THREADS;
 	while(glv->animationIsStarted()) { usleep(2000000); LOG_DEBUG("Last msg: "<<*player->messages.rbegin()); }
+	Py_END_ALLOW_THREADS;
 	python::list snaps; FOREACH(string s, glv->snapshots){snaps.append(s);}
 	return python::make_tuple(snapBase2+"-%.04d.png",snaps);
 }

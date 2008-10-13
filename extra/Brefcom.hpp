@@ -137,8 +137,10 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		int numBrokenCohesive;
 		//! number of contacts with this body
 		int numContacts;
-		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0) {createIndex();};
-		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive); REGISTER_ATTRIBUTE(numContacts); }
+		//! average damage including already deleted contacts
+		Real normDmg;
+		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.) {createIndex();};
+		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive); REGISTER_ATTRIBUTE(numContacts); REGISTER_ATTRIBUTE(normDmg); }
 		REGISTER_CLASS_NAME(BrefcomPhysParams);
 		REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
 };

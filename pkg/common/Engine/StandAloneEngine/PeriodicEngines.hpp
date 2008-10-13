@@ -5,21 +5,26 @@
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/core/Omega.hpp>
 /* run an action with given fixed periodicity (real time, virtual time, iteration number), by setting any of 
- * those criteria to a number > 0. */
+ * those criteria to a number > 0.
+ *
+ * The number of times this engine is activated can be limited by setting nDo>0. In the contrary case, or if
+ * the number of activations was already reached, no action will be called even if any of active period has elapsed.
+ */
 class PeriodicEngine:  public StandAloneEngine {
 	protected:
 		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 	public:
-		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast;
-		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0) { realLast=getClock(); }
+		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast,nDo,nDone;
+		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0),nDo(-1),nDone(0) { realLast=getClock(); }
 		virtual bool isActivated(){
 			Real virtNow=Omega::instance().getSimulationTime();
 			Real realNow=getClock();
 			long iterNow=Omega::instance().getCurrentIteration();
-			if((virtPeriod>0 && virtNow-virtLast>=virtPeriod) ||
-				(realPeriod>0 && realNow-realLast>=realPeriod) ||
-				(iterPeriod>0 && iterNow-iterLast>=iterPeriod)){
-				realLast=realNow; virtLast=virtNow; iterLast=iterNow;
+			if((nDo<0 || nDone<nDo) &&
+				((virtPeriod>0 && virtNow-virtLast>=virtPeriod) ||
+				 (realPeriod>0 && realNow-realLast>=realPeriod) ||
+				 (iterPeriod>0 && iterNow-iterLast>=iterPeriod))){
+				realLast=realNow; virtLast=virtNow; iterLast=iterNow; nDone++;
 				return true;
 			}
 			return false;
@@ -33,11 +38,20 @@ class PeriodicEngine:  public StandAloneEngine {
 			REGISTER_ATTRIBUTE(virtLast);
 			REGISTER_ATTRIBUTE(realLast);
 			REGISTER_ATTRIBUTE(iterLast);
+			REGISTER_ATTRIBUTE(nDo);
+			REGISTER_ATTRIBUTE(nDone);
 		}
 	REGISTER_CLASS_NAME(PeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 REGISTER_SERIALIZABLE(PeriodicEngine,false);
+
+#if 0
+class StridePeriodicEngine: public PeriodicEngine{
+	public:
+		StridePeriodicEngine(): stride, maxStride
+}
+#endif
 
 /* PeriodicEngine but with constraint that may be stretched by a given stretchFactor (default 2).
  * Limits for each periodicity criterion may be set and the mayStretch bool says whether the period
@@ -55,7 +69,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 	StretchPeriodicEngine(): PeriodicEngine(), realLim(0.), virtLim(0.), iterLim(0), stretchFactor(2.){}
 	Real realLim, virtLim; long iterLim;
 	Real stretchFactor;
-	int mayStretch;
+	bool mayStretch;
 	virtual bool isActivated(){
 		assert(stretchFactor>0);
 		if(iterLim==0 && iterPeriod!=0){iterLim=iterPeriod;} else if(iterLim!=0 && iterPeriod==0){iterPeriod=iterLim;}

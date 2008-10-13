@@ -71,10 +71,12 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 			maxima[offset+0]=pos[0]; maxima[offset+1]=pos[1]; maxima[offset+2]=pos[2];
 		}
 	}
+	typedef pair<body_id_t,body_id_t> bodyIdPair;
+	list<bodyIdPair> toBeDeleted;
 	FOREACH(const shared_ptr<Interaction>& I,*ncb->transientInteractions){
 		// remove interactions deleted by the constitutive law: thay are not new, but nor real either
 		// to make sure, do that only with haveDistantTransient
-		if(haveDistantTransient && !I->isNew && !I->isReal) { transientInteractions->erase(I->getId1(),I->getId2()); continue; }
+		if(haveDistantTransient && !I->isNew && !I->isReal) { toBeDeleted.push_back(bodyIdPair(I->getId1(),I->getId2())); continue; }
 		// Once the interaction has been fully created, it is not "new" anymore
 		if (I->isReal) I->isNew=false;
 		// OTOH if is is now real anymore, it falls back to the potential state
@@ -85,6 +87,7 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 		if(!haveDistantTransient) I->isReal=false;
 		//if(!I->isReal){LOG_DEBUG("Interaction #"<<I->getId1()<<"=#"<<I->getId2()<<" is not real.");}
 	}
+	FOREACH(const bodyIdPair& p, toBeDeleted){ transientInteractions->erase(p.first,p.second); }
 	
 	updateIds(bodies->size());
 	nbObjects=bodies->size();

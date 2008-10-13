@@ -233,7 +233,7 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
 	bodyDamage.resize(rootBody->bodies->size(),pair<short,Real>(0,0));
-	FOREACH(shared_ptr<Interaction> I, *rootBody->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
 		shared_ptr<BrefcomContact> BC=dynamic_pointer_cast<BrefcomContact>(I->interactionPhysics);
 		if(!BC || !BC->isCohesive) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
@@ -242,11 +242,14 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 		maxOmega=max(maxOmega,BC->omega);
 	}
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
+		body_id_t id=B->getId();
 		// add damaged contacts that have already been deleted
-		unsigned numBrokenCohesive=YADE_PTR_CAST<BrefcomPhysParams>(B->physicalParameters)->numBrokenCohesive;
-		if(bodyDamage[B->getId()].first==0) {B->geometricalModel->diffuseColor=Vector3r(0.5,0.5,B->isDynamic?0:1); continue; }
-		Real normDmg=(bodyDamage[B->getId()].second+numBrokenCohesive)/(bodyDamage[B->getId()].first+numBrokenCohesive);
-		B->geometricalModel->diffuseColor=Vector3r(normDmg,1-normDmg,B->isDynamic?0:1);
+		shared_ptr<BrefcomPhysParams> bpp=YADE_PTR_CAST<BrefcomPhysParams>(B->physicalParameters);
+		//if(bodyDamage[B->getId()].first==0) {B->geometricalModel->diffuseColor=Vector3r(0.5,0.5,B->isDynamic?0:1); continue; }
+		int pastOrPresentContacts=bodyDamage[id].first+bpp->numBrokenCohesive;
+		if(pastOrPresentContacts>0) bpp->normDmg=(bodyDamage[id].second+bpp->numBrokenCohesive)/pastOrPresentContacts;
+		else bpp->normDmg=0;
+		B->geometricalModel->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);
 	}
 }
 
