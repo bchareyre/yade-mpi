@@ -1,5 +1,5 @@
 import SocketServer
-import sys
+import sys,time
 
 from yade.wrapper import *
 
@@ -9,7 +9,11 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 			print "TCP Connection from non-127.0.0.* address %s rejected"%self.client_address[0]
 			return
 		print self.client_address, 'connected!'
-		self.request.send("""__   __    ____                 __  _____ ____ ____  
+		self.request.send('Enter auth cookie: ')
+	def tryLogin(self):
+		if self.request.recv(1024).rstrip()==self.server.cookie:
+	  		self.server.authenticated+=[self.client_address]
+			self.request.send("""__   __    ____                 __  _____ ____ ____  
 \ \ / /_ _|  _ \  ___    ___   / / |_   _/ ___|  _ \ 
  \ V / _` | | | |/ _ \  / _ \ / /    | || |   | |_) |
   | | (_| | |_| |  __/ | (_) / /     | || |___|  __/ 
@@ -17,10 +21,15 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 
 (connected from %s:%d)
 >>> """%(str(self.client_address[0]),self.client_address[1]))
+  			return True
+		else:
+			print "invalid cookie"
+			return False
 	def displayhook(self,s):
 		import pprint
 		self.request.send(pprint.pformat(s))
 	def handle(self):
+		if self.client_address not in self.server.authenticated and not self.tryLogin(): return
 		import code,cStringIO,traceback
 		buf=[]
 		while True:
@@ -54,7 +63,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 
 class PythonTCPServer:
 	def __init__(self,minPort=9000,host='',maxPort=65536,background=True):
-		import socket
+		import socket, random
 		self.port=-1
 		self.host=host
 		tryPort=minPort
@@ -63,7 +72,9 @@ class PythonTCPServer:
 			try:
 				self.server=SocketServer.ThreadingTCPServer((host,tryPort),PythonConsoleSocketEmulator)
 				self.port=tryPort
-				print "Python TCP server listening on %s:%d"%(host if host else 'localhost',self.port)
+				self.server.cookie=''.join([i for i in random.sample('yadesucks',6)])
+				print "Python TCP server listening on %s:%d, auth cookie is `%s'"%(host if host else 'localhost',self.port,self.server.cookie)
+				self.server.authenticated=[]
 				if background:
 					import thread; thread.start_new_thread(self.server.serve_forever,())
 				else: self.server.serve_forever()
@@ -72,4 +83,6 @@ class PythonTCPServer:
 		if self.port==-1: raise RuntimeError("No free port to listen on in range %d-%d"%(minPort,maxPort))
 
 if __name__=='__main__':
-	PythonTCPServer(background=False)
+	p=PythonTCPServer(background=False)
+	#while True: time.sleep(2)
+

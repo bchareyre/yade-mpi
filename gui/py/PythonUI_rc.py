@@ -22,7 +22,8 @@ if not callable(__builtins__.quit):
 
 ## run the TCP server
 import yade.PythonTCPServer
-yade.PythonTCPServer.PythonTCPServer(minPort=9000)
+srv=yade.PythonTCPServer.PythonTCPServer(minPort=9000)
+yade.runtime.cookie=srv.server.cookie
 
 ## run simulation if requested from the command line
 if runtime.simulation:
