@@ -150,6 +150,10 @@ BASIC_PY_PROXY_HEAD(pyPhysicalParameters,PhysicalParameters)
 			throw std::invalid_argument("Invalid  DOF specification `"+s+"', must be ∈{x,y,z,rx,ry,rz}.");
 		}
 	}
+	python::tuple pos_get(){const Vector3r& p=proxee->se3.position; return python::make_tuple(p[0],p[1],p[2]);}
+	python::tuple ori_get(){Vector3r axis; Real angle; proxee->se3.orientation.ToAxisAngle(axis,angle); return python::make_tuple(axis[0],axis[1],axis[2],angle);}
+	void pos_set(python::list l){if(python::len(l)!=3) throw invalid_argument("Wrong number of vector3 elements "+lexical_cast<string>(python::len(l))+", should be 3"); proxee->se3.position=Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])());}
+	void ori_set(python::list l){if(python::len(l)!=4) throw invalid_argument("Wrong number of quaternion elements "+lexical_cast<string>(python::len(l))+", should be 4"); proxee->se3.orientation=Quaternionr(Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])()),python::extract<double>(l[3])());}
 BASIC_PY_PROXY_TAIL;
 
 BASIC_PY_PROXY(pyBoundingVolume,BoundingVolume);
@@ -271,6 +275,8 @@ BASIC_PY_PROXY_HEAD(pyBody,Body)
 	NONPOD_ATTRIBUTE_ACCESS(bound,pyBoundingVolume,boundingVolume);
 	NONPOD_ATTRIBUTE_ACCESS(phys,pyPhysicalParameters,physicalParameters);
 	unsigned id_get(){ensureAcc(); return proxee->getId();}
+	int mask_get(){ensureAcc(); return proxee->groupMask;}
+	void mask_set(int m){ensureAcc(); proxee->groupMask=m;}
 	bool isStandalone(){ensureAcc(); return proxee->isStandalone();} bool isClumpMember(){ensureAcc(); return proxee->isClumpMember();} bool isClump(){ensureAcc(); return proxee->isClump();}
 BASIC_PY_PROXY_TAIL;
 
@@ -585,7 +591,10 @@ BOOST_PYTHON_MODULE(wrapper)
 	BASIC_PY_PROXY_WRAPPER(pyGeometricalModel,"GeometricalModel");
 	BASIC_PY_PROXY_WRAPPER(pyInteractingGeometry,"InteractingGeometry");
 	BASIC_PY_PROXY_WRAPPER(pyPhysicalParameters,"PhysicalParameters")	
-		.add_property("blockedDOFs",&pyPhysicalParameters::blockedDOFs_get,&pyPhysicalParameters::blockedDOFs_set);
+		.add_property("blockedDOFs",&pyPhysicalParameters::blockedDOFs_get,&pyPhysicalParameters::blockedDOFs_set)
+		.add_property("pos",&pyPhysicalParameters::pos_get,&pyPhysicalParameters::pos_set)
+		.add_property("ori",&pyPhysicalParameters::ori_get,&pyPhysicalParameters::ori_set)
+		;
 	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"BoundingVolume");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionGeometry,"InteractionGeometry");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionPhysics,"InteractionPhysics");
@@ -598,6 +607,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bound",&pyBody::bound_get,&pyBody::bound_set)
 		.add_property("phys",&pyBody::phys_get,&pyBody::phys_set)
 		.add_property("id",&pyBody::id_get)
+		.add_property("mask",&pyBody::mask_get,&pyBody::mask_set)
 		.add_property("isStandalone",&pyBody::isStandalone)
 		.add_property("isClumpMember",&pyBody::isClumpMember)
 		.add_property("isClump",&pyBody::isClump);

@@ -93,7 +93,7 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 
 void YadeQtMainWindow::redrawAll(bool force){
 	// controller has its own timer -- and will update instead of us periodically
-	if(renderer && (force /* || (controller  && !controller->syncRunning ) */ || (!controller))){
+	if((renderer && glViews.size()>0) && (force /* || (controller  && !controller->syncRunning ) */ || (!controller))){
 		FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->updateGL(); }
 	}
 }
@@ -205,7 +205,8 @@ void YadeQtMainWindow::closeView(GLViewer* glv){
 				if(noOtherViews){
 					LOG_DEBUG("Deleting primary view (no other views exist).");
 					glViews.clear();
-					renderer=shared_ptr<OpenGLRenderingEngine>();
+					// why delete renderer if we close view? That obliterates all renderer settings.
+					// renderer=shared_ptr<OpenGLRenderingEngine>();
 				}else{LOG_INFO("Cannot close primary view, other views still exist.");}
 				return;
 			}

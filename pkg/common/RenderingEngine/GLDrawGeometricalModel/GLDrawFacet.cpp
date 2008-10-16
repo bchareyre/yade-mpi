@@ -29,7 +29,7 @@ void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Ph
     }
     else
     {
-		//glDisable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
 		//glBegin(GL_TRIANGLES);
 		glEnable(GL_LIGHTING);

@@ -139,6 +139,11 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics);
 		contGeom=YADE_PTR_CAST<SpheresContactGeometry>(I->interactionGeometry);
 		assert(BC); assert(contGeom);
+		/* kept fully damaged contacts; note that normally the contact is deleted _after_ the BREFCOM_MATERIAL_MODEL,
+		 * i.e. if it is 1.0 here, omegaThreshold is >= 1.0 for sure.
+		 * &&'ing that just to make sure anyway ...
+		 */
+		if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) continue;
 
 		// shorthands
 		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& epsCrackOnset(BC->epsCrackOnset);
@@ -188,6 +193,7 @@ CREATE_LOGGER(GLDrawBrefcomContact);
 
 bool GLDrawBrefcomContact::contactLine=true;
 bool GLDrawBrefcomContact::dmgLabel=true;
+bool GLDrawBrefcomContact::dmgPlane=false;
 bool GLDrawBrefcomContact::epsNLabel=true;
 bool GLDrawBrefcomContact::epsT=false;
 bool GLDrawBrefcomContact::epsTAxes=false;
@@ -206,9 +212,29 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 		min(1.,max(0.,BC->epsTrans/BC->epsCrackOnset)),
 		min(1.,max(0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
 
-	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
+	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,.5*lineColor);
 	if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
 	else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+	if(BC->omega>0 && dmgPlane){
+		Real halfSize=sqrt(BC->omega)*.705*sqrt(BC->crossSection);
+		Vector3r midPt=.5*Vector3r(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position);
+		glDisable(GL_CULL_FACE);
+		glPushMatrix();
+			glTranslatev(midPt);
+			Quaternionr q; q.Align(Vector3r::UNIT_Z,geom->normal);
+			Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
+			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+			glBegin(GL_POLYGON);
+				glColor3v(lineColor); 
+				glVertex3d(halfSize,0.,0.);
+				glVertex3d(.5*halfSize,.866*halfSize,0.);
+				glVertex3d(-.5*halfSize,.866*halfSize,0.);
+				glVertex3d(-halfSize,0.,0.);
+				glVertex3d(-.5*halfSize,-.866*halfSize,0.);
+				glVertex3d(.5*halfSize,-.866*halfSize,0.);
+			glEnd();
+		glPopMatrix();
+	}
 
 	const Vector3r& cp=static_pointer_cast<SpheresContactGeometry>(i->interactionGeometry)->contactPoint;
 	if(epsT){
