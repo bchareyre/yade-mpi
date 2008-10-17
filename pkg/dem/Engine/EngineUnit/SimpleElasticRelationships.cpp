@@ -65,12 +65,6 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 			Real Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 
 
-	//This is the formula used in PFC-3D
-	//
-	//Real Kn = 4 * ((Ea+Eb)*0.5) * ((Da+Db)*0.5);
-	//Real Ks = Kn/2.0;
-
-
 			contactPhysics->initialKn			= Kn;
 			contactPhysics->initialKs			= Ks;
 //cerr << "Ks: " <<       contactPhysics->initialKs			<< endl;
@@ -84,28 +78,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 			contactPhysics->ks = contactPhysics->initialKs;
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 
-		}
-// 		else
-// 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-// 			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
-// 
-// 			contactPhysics->kn = contactPhysics->initialKn;
-// 			contactPhysics->ks = contactPhysics->initialKs;
-// 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-// 		}	
-		
+		}	
 	}
-// 	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
-// 	{
-// 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
-// 		if (sdecLinkGeometry)
-// 		{		
-// 			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
-// 	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
-// 			linkPhysics->kn 			= linkPhysics->initialKn;
-// 			linkPhysics->ks 			= linkPhysics->initialKs;
-// 			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
-// 		}
-// 	}
 };
 YADE_PLUGIN();
