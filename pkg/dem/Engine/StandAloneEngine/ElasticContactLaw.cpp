@@ -27,6 +27,7 @@ ElasticContactLaw2::ElasticContactLaw2(){
 ElasticContactLaw2::~ElasticContactLaw2(){}
 
 void ElasticContactLaw2::action(MetaBody* rb){
+	Real /* bending stiffness */ kb=1e7, /* torsion stiffness */ ktor=1e8;
 	FOREACH(shared_ptr<Interaction> i, *rb->transientInteractions){
 		if(!i->isReal) continue;
 		shared_ptr<SpheresContactGeometry> contGeom=YADE_PTR_CAST<SpheresContactGeometry>(i->interactionGeometry);
@@ -37,10 +38,16 @@ void ElasticContactLaw2::action(MetaBody* rb){
 		if(!isCohesive && contGeom->displacementN()>0){ cerr<<"deleting"<<endl; /* delete the interaction */ i->isReal=false; continue;}
 		contPhys->normalForce=Fn*contGeom->normal;
 		//contGeom->relocateContactPoints();
-		contGeom->slipToDisplacementTMax(max(0.,(-Fn*contPhys->tangensOfFrictionAngle)/contPhys->ks)); // limit shear displacement -- Coulomb criterion
+		//contGeom->slipToDisplacementTMax(max(0.,(-Fn*contPhys->tangensOfFrictionAngle)/contPhys->ks)); // limit shear displacement -- Coulomb criterion
 		contPhys->shearForce=contPhys->ks*contGeom->displacementT();
 		Vector3r force=contPhys->shearForce+contPhys->normalForce;
 		Shop::applyForceAtContactPoint(force,contGeom->contactPoint,i->getId1(),contGeom->pos1,i->getId2(),contGeom->pos2,rb);
+
+		Vector3r bendAbs; Real torsionAbs; contGeom->bendingTorsionAbs(bendAbs,torsionAbs);
+		Shop::Bex::momentum(i->getId1(),rb)+=contGeom->normal*torsionAbs*ktor;
+		Shop::Bex::momentum(i->getId2(),rb)-=contGeom->normal*torsionAbs*ktor;
+		Shop::Bex::momentum(i->getId1(),rb)+=bendAbs*kb;
+		Shop::Bex::momentum(i->getId2(),rb)-=bendAbs*kb;
 	}
 }
 

@@ -84,7 +84,7 @@ if reports:
 		msg['Subject']="Automated crash report for "+yade.runtime.executable+": "+",".join([r[0] for r in reports])
 		msg['From']=mailFrom
 		msg['To']=mailTo
-		msg['Reply-To']='yade-dev@lists.berlios.de'
+		msg['Reply-To']='yade-dev@lists.launchpad.net'
 		import smtplib
 		s=smtplib.SMTP()
 		s.connect()

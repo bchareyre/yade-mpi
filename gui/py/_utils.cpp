@@ -199,6 +199,30 @@ Real sumBexForces(int mask, python::tuple _direction){
 	return ret;
 }
 
+/* Project 3d point into 2d using spiral projection along given axis;
+ * the returned tuple is
+ * 	
+ *  ( (height relative to the spiral, distance from axis), theta )
+ *
+ * dH_dTheta is the inclination of the spiral (height increase per radian),
+ * theta0 is the angle for zero height (by given axis).
+ */
+python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real theta0=0){
+	int ax1=(axis+1)%3,ax2=(axis+2)%3;
+	Vector3r pt=tuple2vec(_pt);
+	Real r=sqrt(pow(pt[ax1],2)+pow(pt[ax2],2));
+	Real theta;
+	if(r>Mathr::ZERO_TOLERANCE) theta=acos(pt[ax1]/r);
+	if(pt[ax2]<0) theta=Mathr::TWO_PI-theta;
+	else theta=0;
+	Real hRef=dH_dTheta*(theta-theta0);
+	long period;
+	Real h=Shop::periodicWrap(pt[axis],hRef-Mathr::PI*dH_dTheta,hRef+Mathr::PI*dH_dTheta,&period);
+	cerr<<":"<<h-hRef<<" "<<h<<" "<<hRef<<" "<<" ("<<hRef-Mathr::PI*dH_dTheta<<","<<hRef+Mathr::PI*dH_dTheta<<") "<<theta<<" "<<endl;
+	return python::make_tuple(python::make_tuple(r,h-dH_dTheta*(theta-theta0+2*Mathr::PI*period)),theta);
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,4);
+
 // for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
 void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
 
@@ -218,6 +242,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("sumBexForces",sumBexForces);
 	def("sumBexMoments",sumBexMoments);
 	def("createInteraction",Shop__createExplicitInteraction);
+	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","theta0")));
 }
 
 

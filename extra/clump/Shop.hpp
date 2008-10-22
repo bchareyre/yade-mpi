@@ -108,4 +108,10 @@ class Shop{
 
 		//! apply force on contact point on both bodies (reversed on body 2)
 		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, MetaBody* rb);
+
+		//! map scalar variable to 1d colorscale
+		static Vector3r scalarOnColorScale(Real x, Real xmin=0., Real xmax=1.);
+
+		//! wrap floating number periodically to the given range
+		static Real periodicWrap(Real x, Real x0, Real x1, long* period=NULL);
 };

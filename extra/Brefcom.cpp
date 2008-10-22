@@ -146,7 +146,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) continue;
 
 		// shorthands
-		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& epsCrackOnset(BC->epsCrackOnset);
+		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); const Real& xiShear(BC->xiShear); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength);
 		// for python access
 		Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs);
 		// for rate-dependence
@@ -205,18 +205,19 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 	const shared_ptr<BrefcomContact>& BC=static_pointer_cast<BrefcomContact>(ip);
 	const shared_ptr<SpheresContactGeometry>& geom=YADE_PTR_CAST<SpheresContactGeometry>(i->interactionGeometry);
 
-	Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
+	//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
+	Vector3r lineColor=Shop::scalarOnColorScale(1.-BC->relResidualStrength);
 
 	if(colorStrain) lineColor=Vector3r(
 		min(1.,max(0.,-BC->epsTrans/BC->epsCrackOnset)),
 		min(1.,max(0.,BC->epsTrans/BC->epsCrackOnset)),
 		min(1.,max(0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
 
-	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,.5*lineColor);
+	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
 	if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
 	else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
 	if(BC->omega>0 && dmgPlane){
-		Real halfSize=sqrt(BC->omega)*.705*sqrt(BC->crossSection);
+		Real halfSize=sqrt(1-BC->relResidualStrength)*.5*.705*sqrt(BC->crossSection);
 		Vector3r midPt=.5*Vector3r(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position);
 		glDisable(GL_CULL_FACE);
 		glPushMatrix();

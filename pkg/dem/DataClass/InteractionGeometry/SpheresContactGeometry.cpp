@@ -8,6 +8,20 @@ YADE_PLUGIN("SpheresContactGeometry");
 // At least one virtual method must be in the .cpp file (!!!)
 SpheresContactGeometry::~SpheresContactGeometry(){};
 
+Vector3r SpheresContactGeometry::relRotVector() const{
+	Quaternionr relOri12=ori1.Conjugate()*ori2;
+	Quaternionr oriDiff=initRelOri12.Conjugate()*relOri12;
+	Vector3r axis; Real angle;
+	oriDiff.ToAxisAngle(axis,angle);
+	if(angle>Mathr::PI)angle-=Mathr::TWO_PI;
+	return angle*axis;
+}
+
+void SpheresContactGeometry::bendingTorsionAbs(Vector3r& bend, Real& tors){
+	Vector3r relRot=relRotVector();
+	tors=relRot.Dot(normal);
+	bend=relRot-tors*normal;
+}
 
 /* Set contact points on both spheres such that their projection is the one given
  * (should be on the plane passing through origin and oriented with normal; not checked!)

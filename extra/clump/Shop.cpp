@@ -1146,3 +1146,25 @@ Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, con
 	return v0+((v2-v0)*(v1-v0).Length()+(v1-v0)*(v2-v0).Length())/((v1-v0).Length()+(v2-v1).Length()+(v0-v2).Length());
 }
 
+
+/* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale
+ *
+ */
+Vector3r Shop::scalarOnColorScale(Real x, Real xmin, Real xmax){
+	Real xnorm=min(1.,max((x-xmin)/(xmax-xmin),0.));
+	if(xnorm<.25) return Vector3r(0,.4*xnorm,1);
+	if(xnorm<.5)  return Vector3r(0,1,1.-4.*(xnorm-.25));
+	if(xnorm<.75) return Vector3r(4*(xnorm-.5),1.,0);
+	return Vector3r(1,1-4*(xnorm-.75),0);
+}
+
+/* Wrap floating point number into interval (x0,x1〉such that it is shifted
+ * by integral number of the interval range. If given, *period will hold
+ * this number. The wrapped value is returned.
+ */
+Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period){
+	double xNorm=(x-x0)/(x1-x0);
+	double xxNorm=xNorm-floor(xNorm);
+	if(period) *period=(long)floor(xNorm);
+	return x0+xxNorm*(x1-x0);
+}

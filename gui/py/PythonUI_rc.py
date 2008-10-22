@@ -3,12 +3,12 @@
 
 yade.runtime must have already been populated from within c++."""
 
-from yade import runtime
 import sys
 sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
 # sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/extra')
 
 from yade.wrapper import *
+from yade import runtime
 
 #try:
 #	import yade.qt.atexit

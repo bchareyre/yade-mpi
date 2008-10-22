@@ -81,6 +81,15 @@ void GLDrawSpheresContactGeometry::go(
 		Vector3r pos1=sc->pos1, pos2=sc->pos2, contPt=sc->contPt();
 		//Vector3r contPt=se31.position+(sc->d1/sc->d0)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
 		GLUtils::GLDrawLine(pos1,pos2,Vector3r(.5,.5,.5));
+		Vector3r bend; Real tors;
+		sc->bendingTorsionRel(bend,tors);
+		GLUtils::GLDrawLine(contPt,contPt+10*sc->radius1*(bend+sc->normal*tors),Vector3r(1,0,0));
+		#if 0
+		GLUtils::GLDrawNum(bend[0],contPt-.2*sc->normal*sc->radius1,Vector3r(1,0,0));
+		GLUtils::GLDrawNum(bend[1],contPt,Vector3r(0,1,0));
+		GLUtils::GLDrawNum(bend[2],contPt+.2*sc->normal*sc->radius1,Vector3r(0,0,1));
+		GLUtils::GLDrawNum(tors,contPt+.5*sc->normal*sc->radius2,Vector3r(1,1,0));
+		#endif
 		// sphere center to point on the sphere
 		//GLUtils::GLDrawLine(pos1,pos1+(sc->ori1*sc->cp1rel*Vector3r::UNIT_X*sc->d1),Vector3r(0,.5,1));
 		//GLUtils::GLDrawLine(pos2,pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X*sc->d2),Vector3r(0,1,.5));

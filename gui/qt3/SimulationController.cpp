@@ -133,7 +133,7 @@ void SimulationController::pbLoadClicked()
 
 void SimulationController::loadSimulationFromFileName(const std::string& fileName,bool center, bool useTimeStepperIfPresent)
 {
-	assert(filesystem::exists(fileName));
+	assert(filesystem::exists(fileName) || fileName.find(":memory:")==(size_t)0);
 
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();

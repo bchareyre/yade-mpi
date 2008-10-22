@@ -47,6 +47,8 @@ class SpheresContactGeometry: public InteractionGeometry{
 		// d1 is really distance from the sphere1 center to the contact plane, it may not correspond to the sphere radius!
 		// therefore, d1+d2=d0 (distance at which the contact was created)
 		Real d1, d2, d0;
+		// initial relative orientation, used for bending and torsion computation
+		Quaternionr initRelOri12;
 
 		// auxiliary functions; the quaternion magic is all in here
 		static Vector3r unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& normal);
@@ -54,13 +56,13 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		void setTgPlanePts(Vector3r p1new, Vector3r p2new);
 
-		Vector3r contPtInTgPlane1(){assert(hasShear); return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
-		Vector3r contPtInTgPlane2(){assert(hasShear); return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
-		Vector3r contPt(){return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
+		Vector3r contPtInTgPlane1() const {assert(hasShear); return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
+		Vector3r contPtInTgPlane2() const {assert(hasShear); return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
+		Vector3r contPt() const {return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
 
-		Real displacementN(){assert(hasShear); return (pos2-pos1).Length()-d0;}
-		Real epsN(){return displacementN()*(1./d0);}
-		Vector3r displacementT(){ assert(hasShear);
+		Real displacementN() const {assert(hasShear); return (pos2-pos1).Length()-d0;}
+		Real epsN() const {return displacementN()*(1./d0);}
+		Vector3r displacementT() const { assert(hasShear);
 			// enabling automatic relocation decreases overall simulation speed by about 3%
 			// perhaps: bool largeStrains ... ?
 			#if 0 
@@ -71,7 +73,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 				return contPtInTgPlane2()-contPtInTgPlane1();
 			#endif
 		}
-		Vector3r epsT(){return displacementT()*(1./d0);}
+		Vector3r epsT() const {return displacementT()*(1./d0);}
 	
 		Real slipToDisplacementTMax(Real displacementTMax);
 		//! slip to epsTMax if current epsT is greater; return the relative slip magnitude
@@ -79,6 +81,11 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		void relocateContactPoints();
 		void relocateContactPoints(const Vector3r& tgPlanePt1, const Vector3r& tgPlanePt2);
+
+		void bendingTorsionAbs(Vector3r& bend, Real& tors);
+		void bendingTorsionRel(Vector3r& bend, Real& tors){ bendingTorsionAbs(bend,tors); bend/=d0; tors/=d0;}
+
+		Vector3r relRotVector() const;
 
 		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO){createIndex();}
 		virtual ~SpheresContactGeometry();
@@ -98,6 +105,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 			REGISTER_ATTRIBUTE(d1);
 			REGISTER_ATTRIBUTE(d2);
 			REGISTER_ATTRIBUTE(d0);
+			REGISTER_ATTRIBUTE(initRelOri12);
 		}
 	REGISTER_CLASS_NAME(SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);

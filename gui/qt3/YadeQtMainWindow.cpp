@@ -114,7 +114,7 @@ YadeQtMainWindow::~YadeQtMainWindow()
 
 void YadeQtMainWindow::Quit(){ emit close(); }
 
-void YadeQtMainWindow::closeEvent(QCloseEvent *e){ closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e); }
+void YadeQtMainWindow::closeEvent(QCloseEvent *e){ renderer=shared_ptr<OpenGLRenderingEngine>(); closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e); }
 
 void YadeQtMainWindow::ensureRenderer(){
 	if(!renderer){

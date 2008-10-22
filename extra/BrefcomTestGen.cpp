@@ -91,7 +91,9 @@ void BrefcomTestGen::createEngines(){
 	rootBody->engines.push_back(collider);
 
 	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
-	igeomDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	shared_ptr<InteractingSphere2InteractingSphere4SpheresContactGeometry> is2is4scg(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	is2is4scg->hasShear=true;
+	igeomDispatcher->add(is2is4scg);
 	rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);

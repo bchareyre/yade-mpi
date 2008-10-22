@@ -518,7 +518,7 @@ void GLViewer::postDraw(){
 		}
 		if(timeDispMask & GLViewer::TIME_ITER){
 			ostringstream oss;
-			oss<<"#"<<Omega::instance().getCurrentIteration()<<"\n";
+			oss<<"#"<<Omega::instance().getCurrentIteration();
 			QGLViewer::drawText(x,y,oss.str());
 			y-=lineHt;
 		}

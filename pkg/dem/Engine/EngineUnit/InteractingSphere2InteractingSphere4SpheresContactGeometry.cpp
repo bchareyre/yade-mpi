@@ -51,6 +51,7 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 				// contact constants
 				scm->d0=(se32.position-se31.position).Length();
 				scm->d1=s1->radius-penetrationDepth; scm->d2=s2->radius-penetrationDepth;
+				scm->initRelOri12=se31.orientation.Conjugate()*se32.orientation;
 				// quasi-constants
 				scm->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
 				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));

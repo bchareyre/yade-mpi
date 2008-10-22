@@ -12,13 +12,13 @@
 
 class DisplayParameters: public Serializable{
 	private:
-		vector<string> values;
-		vector<string> displayTypes;
+		std::vector<std::string> values;
+		std::vector<std::string> displayTypes;
 	public:
 		//! Get value of given display type and put it in string& value and return true; if there is no such display type, return false.
-		bool getValue(string displayType, string& value){assert(values.size()==displayTypes.size()); vector<string>::iterator I=std::find(displayTypes.begin(),displayTypes.end(),displayType); if(I==displayTypes.end()) return false; value=values[std::distance(displayTypes.begin(),I)]; return true;}
+		bool getValue(std::string displayType, std::string& value){assert(values.size()==displayTypes.size()); vector<string>::iterator I=std::find(displayTypes.begin(),displayTypes.end(),displayType); if(I==displayTypes.end()) return false; value=values[std::distance(displayTypes.begin(),I)]; return true;}
 		//! Set value of given display type; if such display type exists, it is overwritten, otherwise a new one is created.
-		void setValue(string displayType, string value){assert(values.size()==displayTypes.size()); vector<string>::iterator I=std::find(displayTypes.begin(),displayTypes.end(),displayType); if(I==displayTypes.end()){displayTypes.push_back(displayType); values.push_back(value);} else {values[std::distance(displayTypes.begin(),I)]=value;};}
+		void setValue(std::string displayType, std::string value){assert(values.size()==displayTypes.size()); vector<string>::iterator I=std::find(displayTypes.begin(),displayTypes.end(),displayType); if(I==displayTypes.end()){displayTypes.push_back(displayType); values.push_back(value);} else {values[std::distance(displayTypes.begin(),I)]=value;};}
 	DisplayParameters(){}
 	virtual ~DisplayParameters(){}
 	virtual void registerAttributes(){ REGISTER_ATTRIBUTE(displayTypes); REGISTER_ATTRIBUTE(values); }
