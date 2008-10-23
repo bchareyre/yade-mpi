@@ -24,7 +24,6 @@ To use it you should also use :
 - CohesiveFrictionalBodyParameters for the bodies, with "isCohesive" = 1 (A verifier ce dernier point)
 - CL1Relationships (=> which involves interactions of "ContactLaw1Interaction" type)
 
-MODIF / SVN : ContactLaw1::action recevait un body, il faut un MetaBody
  */
 
 

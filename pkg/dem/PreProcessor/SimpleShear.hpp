@@ -19,10 +19,6 @@ The sample could be generated via the same method used in TriaxialTest Preproces
 Thanks to the Engines (in pkg/common/Engine/DeusExMachina) CinemDNCEngine, CinemKNCEngine and CinemCNCEngine, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples
 NB : in this PreProcessor only CinemDNCEngine appears, if you want to use other engines the best is maybe to modify directly .xml files
 
-Chgts depuis derniers svn
-- utilisation de ContactLaw1 => Changer les parameters en Cohe...Parameters
-- de globalstifness... pour calcul de dt
-- correction que le phi des boites etaient en la valeurs en deg (alors qu'il faut des rad)
  */
 
 
