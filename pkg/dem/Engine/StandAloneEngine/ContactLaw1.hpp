@@ -19,10 +19,12 @@
 This contact Law is inspired by CohesiveFrictionalContactLaw (inspired itselve directly from the work of Plassiard & Belheine, see the corresponding articles in "Annual Report 2006" in http://geo.hmg.inpg.fr/frederic/Discrete_Element_Group_FVD.html for example). It allows so to set moments, cohesion, tension limit and (that's the difference) inelastic unloadings in compression between bodies.
 All that concerned brokenBodies (this flag and the erosionactivated one) and the useless "iter" has been suppressed.
 
-The Relationsships corresponding are Relationships_1, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions
+The Relationsships corresponding are CL1Relationships, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions
 To use it you should also use :
-- CohesiveFrictionalBodyParameters for the bodies, with "isCohesive" = 1
+- CohesiveFrictionalBodyParameters for the bodies, with "isCohesive" = 1 (A verifier ce dernier point)
 - CL1Relationships (=> which involves interactions of "ContactLaw1Interaction" type)
+
+MODIF / SVN : ContactLaw1::action recevait un body, il faut un MetaBody
  */
 
 
@@ -42,7 +44,7 @@ class ContactLaw1 : public InteractionSolver
 		bool momentAlwaysElastic;	// if true the value of the momentum (computed only if momentRotationLaw !!) is not limited by a plastic threshold
 	
 		ContactLaw1();
-		void action(Body* body);
+		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();

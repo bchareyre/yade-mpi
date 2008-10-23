@@ -18,6 +18,11 @@ This preprocessor allows to simulate a simple shear test of a sample (contained 
 The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.
 Thanks to the Engines (in pkg/common/Engine/DeusExMachina) CinemDNCEngine, CinemKNCEngine and CinemCNCEngine, respectively constant normal displacement, constant normal rigidity and constant normal stress are possible to execute over such samples
 NB : in this PreProcessor only CinemDNCEngine appears, if you want to use other engines the best is maybe to modify directly .xml files
+
+Chgts depuis derniers svn
+- utilisation de ContactLaw1 => Changer les parameters en Cohe...Parameters
+- de globalstifness... pour calcul de dt
+- correction que le phi des boites etaient en la valeurs en deg (alors qu'il faut des rad)
  */
 
 
@@ -50,8 +55,6 @@ class SimpleShear : public FileGenerator
 				;
 		Real		 displacement
 				,shearSpeed;
-		Real		 dampingForce
-				,dampingMomentum;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval;

@@ -9,7 +9,6 @@
 #include "ContactLaw1.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/ContactLaw1Interaction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
@@ -42,9 +41,8 @@ void ContactLaw1::registerAttributes()
 }
 
 
-void ContactLaw1::action(Body* body)
+void ContactLaw1::action(MetaBody* ncb)
 {
-    MetaBody * ncb = YADE_CAST<MetaBody*>(body);
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
     Real dt = Omega::instance().getTimeStep();

@@ -15,11 +15,11 @@
 
 #include <yade/lib-miniWm3/Wm3Math.h>
 
-#include <yade/pkg-dem/BodyMacroParameters.hpp>
-#include <yade/pkg-dem/ElasticContactLaw.hpp>
-#include <yade/pkg-dem/MacroMicroElasticRelationships.hpp>
-#include <yade/pkg-dem/SimpleElasticRelationships.hpp>
-#include <yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
+#include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include <yade/pkg-dem/ContactLaw1.hpp>
+#include <yade/pkg-dem/CL1Relationships.hpp>
+#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
+#include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>
 
 #include <yade/pkg-dem/PositionRecorder.hpp>
@@ -42,11 +42,7 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/PhysicalActionApplier.hpp>
-
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/CinemDNCEngine.hpp>
 
@@ -73,7 +69,7 @@ SimpleShear::SimpleShear () : FileGenerator()
 	gravity = Vector3r(0,-9.81,0);
 
 // Fichier contenant la liste des positions des centres et des rayons des spheres qui vont generer l'echantillon :
-	filename = "../data/porosite0_55.txt";
+	filename = "../porosite0_44.txt";
 //  Deux parametres necessaires si on veut utiliser au contraire la methode de TriaxialTest pour generer l'echantillon de spheres :
 // 	porosite=0.75;
 // 	nBilles=8000;
@@ -83,18 +79,15 @@ SimpleShear::SimpleShear () : FileGenerator()
 	profondeur=0.04;
 
 	density=2600;
-	sphereYoungModulus=10000000; // 10 MPa
-	spherePoissonRatio=0.2;
+	sphereYoungModulus=2.0e9; // 2 GPa, nécessaire apparemment si on veut reproduire un joint rocheux
+	spherePoissonRatio=0.04; // Venant de "Calibration procedure...." (Plassiard et al)
 	sphereFrictionDeg=26;
 
-	boxYoungModulus=10000000; // 10 MPa
-	boxPoissonRatio=0.2;
+	boxYoungModulus=2.0e9; // 2 GPa, nécessaire apparemment si on veut reproduire un joint rocheux
+	boxPoissonRatio=0.04;
 
 	shearSpeed=0.1;
 	
-	dampingForce = 0.3;
-	dampingMomentum = 0.3;
-
 	timeStepUpdateInterval = 50;
 	
 	gravApplied = true;
@@ -135,8 +128,6 @@ void SimpleShear::registerAttributes()
 	REGISTER_ATTRIBUTE(shearSpeed);
 	REGISTER_ATTRIBUTE(gravApplied);
 	REGISTER_ATTRIBUTE(shearApplied);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum );
 	REGISTER_ATTRIBUTE(timeStepUpdateInterval );
 }
 
@@ -162,7 +153,7 @@ bool SimpleShear::generate()
 
 	shared_ptr<Body> w2;	// The lower one :
 	createBox(w2,Vector3r(width/2.0,-thickness/2.0,0),Vector3r(width/2.0,thickness/2.0,profondeur/2.0));
-	YADE_CAST<BodyMacroParameters*>(w2->physicalParameters.get())->frictionAngle = sphereFrictionDeg; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
+	YADE_CAST<CohesiveFrictionalBodyParameters*>(w2->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
 	rootBody->bodies->insert(w2);
 
 	shared_ptr<Body> w3;	// The right one
@@ -171,7 +162,7 @@ bool SimpleShear::generate()
 
 	shared_ptr<Body> w4; // The upper one
 	createBox(w4,Vector3r(width/2.0,height+thickness/2.0,0),Vector3r(width/2.0,thickness/2.0,profondeur/2.0));
-	YADE_CAST<BodyMacroParameters*>(w4->physicalParameters.get())->frictionAngle = sphereFrictionDeg; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
+	YADE_CAST<CohesiveFrictionalBodyParameters*>(w4->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
 	rootBody->bodies->insert(w4);
 
 // To close the front and the bottom of the box 
@@ -211,7 +202,7 @@ bool SimpleShear::generate()
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
@@ -229,6 +220,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	physics->isCohesive		= 1;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
@@ -253,7 +245,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
@@ -278,6 +270,7 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxPoissonRatio;
 	physics->frictionAngle		= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
+	physics->isCohesive		= 1;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
@@ -318,14 +311,15 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 	physicalActionInitializer->physicalActionNames.push_back("Force");
 	physicalActionInitializer->physicalActionNames.push_back("Momentum");
+	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationships);
-	interactionPhysicsDispatcher->add(ss);
+	shared_ptr<InteractionPhysicsEngineUnit> CL1Rel(new CL1Relationships);
+	interactionPhysicsDispatcher->add(CL1Rel);
 
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
@@ -335,47 +329,27 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
-	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-	actionForceDamping->damping = dampingForce;
-	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-	actionMomentumDamping->damping = dampingMomentum;
-	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-	actionDampingDispatcher->add(actionForceDamping);
-	actionDampingDispatcher->add(actionMomentumDamping);
-	
-	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add("NewtonsForceLaw");
-	applyActionDispatcher->add("NewtonsMomentumLaw");
-	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add("LeapFrogOrientationIntegrator");
- 	
 
-	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	sdecTimeStepper->sdecGroupMask = 1;
-	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
+	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
+	globalStiffnessTimeStepper->sdecGroupMask = 1;
+	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
 
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(sdecTimeStepper);
+	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new ElasticContactLaw));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ContactLaw1));
 	if(gravApplied)
 		rootBody->engines.push_back(gravityCondition);
 	if(shearApplied)
 		rootBody->engines.push_back(kinematic);
-	rootBody->engines.push_back(actionDampingDispatcher);
-	rootBody->engines.push_back(applyActionDispatcher);
-	rootBody->engines.push_back(positionIntegrator);
-	rootBody->engines.push_back(orientationIntegrator);
-	rootBody->engines.push_back(possnap);
-	rootBody->engines.push_back(forcesnap);
+	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
+// 	rootBody->engines.push_back(possnap);
+// 	rootBody->engines.push_back(forcesnap);
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
