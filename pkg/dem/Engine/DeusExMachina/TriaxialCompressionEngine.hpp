@@ -59,11 +59,11 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		// FIXME: current serializer doesn't handle named enum types, this is workaround.
 		#define stateNum int
 		// should be "enum stateNum {...}" once this is fixed
-		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING, STATE_LIMBO};
+		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING,  STATE_DIE_COMPACTION, STATE_LIMBO};
 		stateNum currentState;
 		void doStateTransition(MetaBody *body, stateNum nextState);
 		#define _STATE_CASE(ST) case ST: return #ST
-		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
+		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_DIE_COMPACTION);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
 		#undef _STATE_CASE
 		
 		//! Strain velocity (./s)
@@ -86,11 +86,25 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
 		//! Previous state (used to detect manual changes of the state in .xml)
+		Real spherevolume;
+		//! Value of spheres volume 
+		Real boxvolume;
+		//! Value of box volume 
+		Real calculatedporosity;
+		//! Value of porosity 
+		Real translationspeed;
+		//! Value of translation speed
+		Real wishedporosity;
+		//! Value of porosity chosen by the user
+		Real temps;
+
 		stateNum previousState;
 		//Vector3r strain;
 		Vector3r translationAxis;
+		Vector3r translationAxisx;
+		Vector3r translationAxisz;
 		//! is isotropicInternalCompactionFinished?
-		bool Phase1, saveSimulation;
+		bool Phase1, saveSimulation, DieCompaction;
 		//! is this the beginning of the simulation, after reading the scene?
 		bool firstRun;
 		int FinalIterationPhase1, Iteration, testEquilibriumInterval;

@@ -17,7 +17,8 @@
 #include<boost/lambda/lambda.hpp>
 #include<yade/extra/Shop.hpp>
 #include<yade/core/Interaction.hpp>
-
+#include <yade/pkg-common/Sphere.hpp>
+#include <yade/pkg-common/ParticleParameters.hpp>
 
 class CohesiveFrictionalRelationships;
 
@@ -26,6 +27,8 @@ CREATE_LOGGER(TriaxialCompressionEngine);
 TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force), uniaxialEpsilonCurr(strain[1])
 {
 	translationAxis=TriaxialStressController::normal[wall_bottom_id];
+	translationAxisx=Vector3r(1,0,0);
+	translationAxisz=Vector3r(0,0,1);
 	strainRate=0;
 	currentStrainRate=0;
 	StabilityCriterion=0.001;
@@ -48,6 +51,16 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 	previousSigmaIso=sigma_iso;
 	frictionAngleDegree = -1;
 	epsilonMax = 0.5;
+
+	DieCompaction=false;
+	spherevolume=0;
+ 	boxvolume=0;
+
+	calculatedporosity=1.1;
+	temps=0;
+	
+
+
 }
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
@@ -82,12 +95,18 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(frictionAngleDegree);
 	REGISTER_ATTRIBUTE(epsilonMax);
 	REGISTER_ATTRIBUTE(uniaxialEpsilonCurr);
+ 	REGISTER_ATTRIBUTE(DieCompaction);
+ 	REGISTER_ATTRIBUTE(spherevolume);
+ 	REGISTER_ATTRIBUTE(wishedporosity);
+ 	REGISTER_ATTRIBUTE(translationspeed);
 }
 
 void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
+
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
 		previousSigmaIso=sigma_iso;
+
 	}
 	else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && nextState==STATE_TRIAX_LOADING){
 		sigma_iso=sigmaLateralConfinement;
@@ -110,14 +129,20 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 		if(!firstRun) saveSimulation=true;
 		Phase1End = "Compacted";
 	}	
-	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING) && nextState==STATE_LIMBO) {
+	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING|| currentState==STATE_DIE_COMPACTION) && nextState==STATE_LIMBO) {
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
 		saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		// stop simulation here, since nothing will happen from now on
 		Phase1End = (currentState==STATE_ISO_COMPACTION ? "compacted" : "unloaded");
 		Shop::saveSpheresToFile("/tmp/limbo.spheres");
-		
+	}
+	else if( nextState==STATE_DIE_COMPACTION){		
+		internalCompaction = false;
+		wall_bottom_activated=false; wall_top_activated=false;
+		wall_front_activated=false; wall_back_activated=false;
+		wall_right_activated=false; wall_left_activated=false;
+ 
 	}	
 	else goto undefinedTransition;
 
@@ -136,7 +161,7 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 	UnbalancedForce=ComputeUnbalancedForce ( ncb );
 
 
-	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING )
+	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_DIE_COMPACTION )
 	{
 		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)
 		//ANSWER TO FIXME : yes we need that because we want to start compression from LIMBO most of the time
@@ -147,7 +172,7 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 		//TRVAR5(UnbalancedForce,StabilityCriterion,meanStress,sigma_iso,abs((meanStress-sigma_iso)/sigma_iso));
 		//}
 
-		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 )
+		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && wishedporosity<1 )
 		{
 			// only go to UNLOADING if it is needed (hard float comparison... :-| )
 			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
@@ -162,7 +187,15 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 				doStateTransition (ncb, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
 			// huh?! this will never happen, because of the first condition...
-			else doStateTransition (ncb, STATE_LIMBO );
+			else 
+			{ 
+			doStateTransition (ncb, STATE_LIMBO );
+			}
+		}
+		else if ( calculatedporosity<=wishedporosity && currentState==STATE_DIE_COMPACTION )
+		{
+			
+			doStateTransition (ncb, STATE_LIMBO );
 		}
 #if 0
 		//This is a hack in order to allow subsequent run without activating compression - like for the YADE-COMSOL coupling
@@ -189,13 +222,37 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 
 void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 {
+
+
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
 		//sigma_iso was changed, we need to rerun compaction
-		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING ) doStateTransition (ncb, STATE_ISO_COMPACTION );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && DieCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
 		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition (ncb, STATE_TRIAX_LOADING );
+
+		if ( wishedporosity<1 && currentState==STATE_UNINITIALIZED && DieCompaction!=false )
+		{
+		doStateTransition (ncb, STATE_DIE_COMPACTION );
+
+		//The volume of spheres is calculated
+
+		BodyContainer::iterator bi = ncb->bodies->begin();
+		BodyContainer::iterator biEnd = ncb->bodies->end();
+		Real sphere=0;
+		  for ( ; bi!=biEnd; ++bi )
+		  {
+		  const shared_ptr<Body>& b = *bi;
+
+			if ( b->isDynamic )
+			{
+			const shared_ptr<Sphere>& sphere =
+				YADE_PTR_CAST<Sphere> ( b->geometricalModel );
+			spherevolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
+			}
+		  }
+		}
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
@@ -220,7 +277,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
 	}
 	
-	if ( currentState==STATE_LIMBO )
+	if ( currentState==STATE_LIMBO|| calculatedporosity<=wishedporosity && DieCompaction!=false )
 	{		
 		Omega::instance().stopSimulationLoop();
 		return;
@@ -228,7 +285,6 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 
 	TriaxialStressController::applyCondition ( ncb );
 
-	
 	
 	if ( currentState==STATE_TRIAX_LOADING )
 	{
@@ -238,7 +294,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		}
 		// if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
 		Real dt = Omega::instance().getTimeStep();
-		
+		 
 		if (abs(epsilonMax) > abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003; // !!! if unloading (?)
 			//else currentStrainRate = strainRate;
@@ -252,6 +308,41 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 			Omega::instance().stopSimulationLoop();
 		}
 	}
+	if ( currentState==STATE_DIE_COMPACTION )
+	{
+		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
+		{
+			LOG_INFO ("Compression started");
+		}
+		temps=temps+1;
+		if ( temps == 5)
+		{
+		Real dt = Omega::instance().getTimeStep();
+			/* Move top and bottom wall according to strain rate */
+			PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
+			p->se3.position += 0.0*translationspeed*height*translationAxis*dt;
+			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
+			p->se3.position -= 0.0*translationspeed*height*translationAxis*dt;
+
+			p=static_cast<PhysicalParameters*> ( Body::byId ( wall_back_id )->physicalParameters.get() );
+			p->se3.position += 0.5*translationspeed*depth*translationAxisz*dt;
+			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_front_id )->physicalParameters.get() );
+			p->se3.position -= 0.5*translationspeed*depth*translationAxisz*dt;
+
+			p=static_cast<PhysicalParameters*> ( Body::byId ( wall_left_id )->physicalParameters.get() );
+			p->se3.position += 0.0*translationspeed*width*translationAxisx*dt;
+			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_right_id )->physicalParameters.get() );
+			p->se3.position -= 0.0*translationspeed*width*translationAxisx*dt;
+
+		
+			boxvolume=height*width*depth;
+			temps=0;
+			calculatedporosity=1-spherevolume/boxvolume;
+
+			}
+
+	}
+ 
 }
 
 void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real frictionDegree)
@@ -284,9 +375,9 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 		contactPhysics->frictionAngle			= std::min(fa,fb);
 		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
 	}
-}
+} 
 
-
+ 
 
 YADE_PLUGIN();
 

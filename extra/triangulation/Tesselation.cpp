@@ -1,13 +1,13 @@
 #include "Tesselation.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 //Tesselation TESSELATION = Tesselation();
-
+ 
 
 using namespace std;
-
+  
 Tesselation::Tesselation ( void )
 {
-	std::cout << "Tesselation(void)" << std::endl;
+// 	std::cout << "Tesselation(void)" << std::endl;
 	Tri = new RTriangulation;
 	Tes = Tri;
 	computed = false;
@@ -22,7 +22,7 @@ Tesselation::Tesselation ( void )
 Tesselation::Tesselation ( RTriangulation &T )
 		: Tri ( &T ), Tes ( &T ), computed ( true )
 {
-	std::cout << "Tesselation(RTriangulation &T)" << std::endl;
+// 	std::cout << "Tesselation(RTriangulation &T)" << std::endl;
 	Compute();
 }
 
@@ -57,6 +57,7 @@ void Tesselation::Clear ( void )
 
 Vertex_handle Tesselation::insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious)
 {
+
 	Vertex_handle Vh;
 	Vh = Tri->insert ( Sphere ( Point ( x,y,z ),pow ( rad,2 ) ) );
 	if ( Vh!=NULL )
@@ -65,7 +66,7 @@ Vertex_handle Tesselation::insert(Real x, Real y, Real z, Real rad, unsigned int
 		Vh->info().isFictious = isFictious;
 		if ( !isFictious ) max_id = std::max ( max_id, id );
 	}
-	else cout << id <<  " : Vh==NULL!!" << endl;
+ 	else cout << id <<  " : Vh==NULL!!" << endl;
 	return Vh;
 }
 
@@ -83,7 +84,7 @@ Vertex_handle Tesselation::move(Real x, Real y, Real z, Real rad, unsigned int i
 	} else cerr << "Vh==NULL" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
 	return Vh;
 }
-
+ 
 
 
 bool Tesselation::redirect ( void )
@@ -158,10 +159,16 @@ Point Tesselation::Dual ( const Cell_handle &cell )
 
 void Tesselation::Compute ()
 {
+<<<<<<< .mine
+// 	std::cout << "Tesselation::Compute ()" << std::endl;
+=======
 	std::cerr << "Tesselation::Compute ()" << std::endl;
+>>>>>>> .r1529
 	Finite_cells_iterator cell_end = Tri->finite_cells_end();
+
 	for ( Finite_cells_iterator cell = Tri->finite_cells_begin(); cell != cell_end; cell++ )
 	{
+
 		const Sphere& S0 = cell->vertex ( 0 )->point();
 		const Sphere& S1 = cell->vertex ( 1 )->point();
 		const Sphere& S2 = cell->vertex ( 2 )->point();
@@ -208,6 +215,7 @@ long Tesselation::New_liste_adjacent_edges ( Vertex_handle vertex0, Real** Coord
 				pass = true;
 				if ( !Tri->is_infinite ( ( *facet ).first ) && !Tri->is_infinite ( ( *facet ).first->neighbor ( ( *facet ).second ) ) )
 				{
+					cout << "p.x()     = " << p.x() << "p.y()     = " << p.y() << "p.z()     = " << p.z() << endl;
 					p = ( *facet ).first->info();
 					( *Coordonnes ) [k++] = p.x(); ( *Coordonnes ) [k++] = p.y(); ( *Coordonnes ) [k++] = p.z();
 					p = ( *facet ).first->neighbor ( ( *facet ).second )->info();
@@ -466,7 +474,7 @@ void Tesselation::ComputeVolumes ( void )
 
 
 	redirect();
-	cout << "TotalVolume : " << TotalFiniteVoronoiVolume << endl;
+// 	cout << "TotalVolume : " << TotalFiniteVoronoiVolume << endl;
 }
 
 void Tesselation::ComputePorosity ( void )  //WARNING : This function will erase real volumes of cells

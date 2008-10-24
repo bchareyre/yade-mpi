@@ -32,7 +32,7 @@ class TriaxialStressController : public DeusExMachina
 		int ForceClassIndex;
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		
-			
+		 	
 	public :
 		unsigned int stiffnessUpdateInterval, computeStressStrainInterval, radiusControlInterval;
 		//! internal index values for retrieving walls
@@ -50,6 +50,7 @@ class TriaxialStressController : public DeusExMachina
 		Vector3r	normal [6];
 		//! The values of stresses 
 		Vector3r	stress [6];
+		Vector3r	force [6];
 		Real		meanStress;
 				
 		
@@ -71,6 +72,12 @@ class TriaxialStressController : public DeusExMachina
 		Real thickness;
 		Real sigma_iso;
 		Real max_vel;
+		Real position_top;
+		Real position_bottom;
+		Real position_right;
+		Real position_left;
+		Real position_front;
+		Real position_back;
 
 		TriaxialStressController();
 		virtual ~TriaxialStressController();

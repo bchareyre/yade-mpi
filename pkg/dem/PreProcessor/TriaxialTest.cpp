@@ -10,7 +10,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
+ 
 
 
 #include "TriaxialTest.hpp"
@@ -88,13 +88,13 @@ using namespace std;
 
 
 
-
+ 
 TriaxialTest::TriaxialTest () : FileGenerator()
 {
 	lowerCorner 		= Vector3r(0,0,0);
 	upperCorner 		= Vector3r(1,1,1);
 	thickness 		= 0.001;
-	importFilename 		= ""; // "./small.sdec.xyz";
+	importFilename 		= "../../YADE/trunk-clean/examples/sphere16bidisperse.txt"; // "./small.sdec.xyz";
 	Key			="";
 	outputFileName 		= "./TriaxialTest"+Key+".xml";
 	//nlayers = 1;
@@ -159,6 +159,13 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 
 	radiusStdDev=0.3;
 	radiusMean=-1; // no radius specified
+
+	DieCompaction=false;
+	translationspeed = 0;
+	wishedporosity = 1;
+
+
+
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -250,6 +257,12 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
+	REGISTER_ATTRIBUTE(DieCompaction);
+	REGISTER_ATTRIBUTE(translationspeed);
+	REGISTER_ATTRIBUTE(wishedporosity);
+ 
+
+
 
 }
 
@@ -614,6 +627,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
 	triaxialcompressionEngine->Key = Key;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
+	triaxialcompressionEngine->translationspeed = translationspeed;
+	triaxialcompressionEngine->wishedporosity = wishedporosity;
+	triaxialcompressionEngine->DieCompaction = DieCompaction;
 		
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	

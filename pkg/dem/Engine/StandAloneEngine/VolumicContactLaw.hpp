@@ -28,6 +28,20 @@ class VolumicContactLaw : public InteractionSolver
 	public :
 		int sdecGroupMask;
 		bool momentRotationLaw;
+		vector<double> compacite_init;
+		Real rigidite_max_enreg;
+		Real max_force_enreg;
+		Real compacity_init;
+		Real compacity;
+		Real compacity_max;
+		Real interpenetration_max;
+		Real delta_interpenetration_max;
+		Real rigidite_max_1;
+		Real rigidite_max_2;
+		Real rigidite_max_3;
+		Real info;
+
+
 	
 		VolumicContactLaw();
 		void action(MetaBody*);

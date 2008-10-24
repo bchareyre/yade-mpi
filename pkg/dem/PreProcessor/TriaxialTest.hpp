@@ -75,7 +75,9 @@ class TriaxialTest : public FileGenerator
 				finalMaxMultiplier,
 				wallOversizeFactor, // make walls bigger (/smaller) than necessary by this factor
 				radiusStdDev,
-				radiusMean;
+				radiusMean,
+				translationspeed,
+				wishedporosity;
 		bool		 wall_top
 				,wall_bottom
 				,wall_1
@@ -99,7 +101,8 @@ class TriaxialTest : public FileGenerator
 				//! flag for choosing between moving boundaries or increasing particles sizes during the compaction stage.
 				,internalCompaction
 				,saveAnimationSnapshots
-				,biaxial2dTest;
+				,biaxial2dTest
+				,DieCompaction;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval

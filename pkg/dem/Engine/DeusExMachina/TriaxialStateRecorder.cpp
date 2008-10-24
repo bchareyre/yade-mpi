@@ -25,6 +25,11 @@
 #include <yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+
+
+
 CREATE_LOGGER(TriaxialStateRecorder);
 
 TriaxialStateRecorder::TriaxialStateRecorder () : DataRecorder()
@@ -44,7 +49,8 @@ void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
 	{
 		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
-		if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
+		//if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
+		if (!file_exists) ofile<<"iteration fn11 fn22 fn33 fn111 fn222 fn333 Position_right unb_f porosity Energie_Cinétique" << endl;
 	}
 }
 
@@ -116,17 +122,66 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 	}
 	porosity = ( V - Vs ) /V;
 
+
+
+
+
+
+
+
+
+// ======================================================================== 
+
+// 	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
+// 	<< lexical_cast<string> ( porosity ) << " "
+// 	<< lexical_cast<string> ( kinematicE )
+// 	<< endl;
+
+
+
+// ======================================================================== 
+	if ( Omega::instance().getCurrentIteration() % 500 == 0 || Omega::instance().getCurrentIteration() == 0 )
+	{
+
 	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
-	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->force[triaxialCompressionEngine->wall_right][0] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->force[triaxialCompressionEngine->wall_top][1] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->force[triaxialCompressionEngine->wall_front][2] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->force[triaxialCompressionEngine->wall_left][0] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->force[triaxialCompressionEngine->wall_bottom][1] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->force[triaxialCompressionEngine->wall_back][2] ) << " "
+	<< lexical_cast<string> ( triaxialCompressionEngine->position_right ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->position_top ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->position_front ) << " "
+
 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
 	<< lexical_cast<string> ( porosity ) << " "
-	<< lexical_cast<string> ( kinematicE )
-	<< endl;
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->position_left ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->position_bottom ) << " "
+// 	<< lexical_cast<string> ( triaxialCompressionEngine->position_back ) << " "
+ 	<< lexical_cast<string> ( kinematicE ) << " " << endl;
+// 	<< lexical_cast<string> ( force_sphere ) << " " << endl;
+	}
+//=======
+
+
+
+
+
+
 }
 
 YADE_PLUGIN();

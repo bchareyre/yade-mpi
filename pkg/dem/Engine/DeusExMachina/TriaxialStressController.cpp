@@ -5,7 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+ 
 #include"TriaxialStressController.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -209,6 +209,16 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
 
+
+	position_top = p_top->se3.position.Y();
+	position_bottom = p_bottom->se3.position.Y();
+	position_right = p_right->se3.position.X();
+	position_left = p_left->se3.position.X();
+	position_front = p_front->se3.position.Z();
+	position_back = p_back->se3.position.Z();
+
+
+
 	// must be done _after_ height, width, depth have been calculated
 	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
 	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000) updateStiffness(ncb);
@@ -285,6 +295,18 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	stress[wall_right] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_right],ForceClassIndex).get() )->force ) * invXSurface;
 	stress[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) * invZSurface;
 	stress[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) * invZSurface;	
+
+
+
+// ==================================================== jf
+	force[wall_bottom] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_bottom],ForceClassIndex).get() )->force );
+	force[wall_top] = static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_top],ForceClassIndex).get() )->force ;
+	force[wall_left] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_left],ForceClassIndex).get() )->force ) ;
+	force[wall_right] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_right],ForceClassIndex).get() )->force ) ;
+	force[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) ;
+	force[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) ;	
+// ====================================================
+
 
  	//cerr << "stresses : " <<  stress[wall_bottom] << " " <<
  //stress[wall_top]<< " " << stress[wall_left]<< " " << stress[wall_right]<< " "
