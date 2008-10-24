@@ -333,10 +333,16 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask = 1;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
+	globalStiffnessTimeStepper->defaultDt=1e-5;
+
+	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
+	globalStiffnessCounter->interval = timeStepUpdateInterval;
+
 
 
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
