@@ -217,9 +217,9 @@ python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real 
 	else theta=0;
 	Real hRef=dH_dTheta*(theta-theta0);
 	long period;
-	Real h=Shop::periodicWrap(pt[axis],hRef-Mathr::PI*dH_dTheta,hRef+Mathr::PI*dH_dTheta,&period);
-	cerr<<":"<<h-hRef<<" "<<h<<" "<<hRef<<" "<<" ("<<hRef-Mathr::PI*dH_dTheta<<","<<hRef+Mathr::PI*dH_dTheta<<") "<<theta<<" "<<endl;
-	return python::make_tuple(python::make_tuple(r,h-dH_dTheta*(theta-theta0+2*Mathr::PI*period)),theta);
+	Real h=Shop::periodicWrap(pt[axis],hRef-.5*Mathr::PI*dH_dTheta,hRef+.5*Mathr::PI*dH_dTheta,&period);
+	if(abs(h-hRef)>0.005) cerr<<"@@@ "<<h-hRef<<" "<<h<<" "<<hRef<<" "<<pt[axis]<<" ("<<hRef-.5*Mathr::PI*dH_dTheta<<","<<hRef+.5*Mathr::PI*dH_dTheta<<") "<<theta<<" "<<endl;
+	return python::make_tuple(python::make_tuple(r,h-hRef),theta);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,4);
 

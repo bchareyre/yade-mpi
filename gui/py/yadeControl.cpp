@@ -433,6 +433,17 @@ class pyOmega{
 	void reload(){	load(OMEGA.getSimulationFileName());}
 	void saveTmp(string mark){ save(":memory:"+mark);}
 	void loadTmp(string mark){ load(":memory:"+mark);}
+	void tmpToFile(string mark, string filename){
+		// FIXME: memSavedSimulations are private, but I don't want to recompile all yade now; move it to public and uncomment these few lines at some point
+		// if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
+		iostreams::filtering_ostream out;
+		if(boost::algorithm::ends_with(filename,".bz2")) out.push(iostreams::bzip2_compressor());
+		out.push(iostreams::file_sink(filename));
+		if(!out.good()) throw runtime_error("Error while opening file `"+filename+"' for writing.");
+		LOG_INFO("Saving :memory:"<<mark<<" to "<<filename);
+		//out<<OMEGA.memSavedSimulations[":memory:"+mark];
+	}
+
 
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
@@ -534,6 +545,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("save",&pyOmega::save)
 		.def("loadTmp",&pyOmega::loadTmp)
 		.def("saveTmp",&pyOmega::saveTmp)
+		.def("tmpToFile",&pyOmega::tmpToFile)
 		.def("saveSpheres",&pyOmega::saveSpheres)
 		.def("run",&pyOmega::run,omega_run_overloads())
 		.def("pause",&pyOmega::pause)

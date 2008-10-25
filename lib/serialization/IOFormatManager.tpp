@@ -17,7 +17,6 @@
 #include "IOManagerExceptions.hpp"
 #include<boost/scoped_ptr.hpp>
 #include<boost/iostreams/filtering_stream.hpp>
-#include<boost/iostreams/filter/gzip.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
 #include<boost/algorithm/string.hpp>
@@ -45,8 +44,7 @@ void IOFormatManager::saveToStream(const string& libName, ostream& out,const str
 template<typename Type>
 void IOFormatManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t){
 	iostreams::filtering_istream in;
-	if(boost::algorithm::ends_with(fileName,".gz")) in.push(iostreams::gzip_decompressor());
-	else if(boost::algorithm::ends_with(fileName,".bz2")) in.push(iostreams::bzip2_decompressor());
+	if(boost::algorithm::ends_with(fileName,".bz2")) in.push(iostreams::bzip2_decompressor());
 	in.push(iostreams::file_source(fileName));
 	if(!in.good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 
@@ -57,8 +55,7 @@ void IOFormatManager::loadFromFile(const string& libName, const string& fileName
 template<typename Type>
 void IOFormatManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t){
 	iostreams::filtering_ostream out;
-	if(boost::algorithm::ends_with(fileName,".gz")) out.push(iostreams::gzip_compressor());
-	else if(boost::algorithm::ends_with(fileName,".bz2")) out.push(iostreams::bzip2_compressor());
+	if(boost::algorithm::ends_with(fileName,".bz2")) out.push(iostreams::bzip2_compressor());
 	out.push(iostreams::file_sink(fileName));
 	if(!out.good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 	saveToStream(libName,out,name,t);

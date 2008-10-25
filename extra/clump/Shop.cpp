@@ -1163,8 +1163,9 @@ Vector3r Shop::scalarOnColorScale(Real x, Real xmin, Real xmax){
  * this number. The wrapped value is returned.
  */
 Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period){
-	double xNorm=(x-x0)/(x1-x0);
-	double xxNorm=xNorm-floor(xNorm);
+	Real xNorm=(x-x0)/(x1-x0);
+	Real xxNorm=xNorm-floor(xNorm);
 	if(period) *period=(long)floor(xNorm);
 	return x0+xxNorm*(x1-x0);
 }
+

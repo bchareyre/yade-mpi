@@ -236,7 +236,7 @@ void Omega::loadSimulation(){
 		//boost::mutex::scoped_lock lock1(rootBody->persistentInteractions->drawloopmutex);
 		//boost::mutex::scoped_lock lock2(rootBody->transientInteractions->drawloopmutex);
 		
-		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
+		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 			resetRootBody();
 			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 		}
@@ -267,7 +267,7 @@ void Omega::saveSimulation(const string name)
 	if(name.size()==0) throw yadeBadFile("Filename with zero length.");
 	LOG_INFO("Saving file " << name);
 
-	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.gz") || algorithm::ends_with(name,".xml.bz2")){
+	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.bz2")){
 		FormatChecker::format=FormatChecker::XML;
 		IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
 	}

@@ -1,6 +1,11 @@
 # vim: set filetype=python :
 Import('*')
 
+if 'EMBED_PYTHON' in env['CPPDEFINES']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/gui/yade',[
+		env.SharedLibrary('WeightedAverage2d',['smoothing/WeightedAverage2d.cpp'],SHLIBPREFIX='',
+		LIBS=env['LIBS']+['yade-base'])
+	])
 
 
 if 'qt3' not in env['exclude']:
