@@ -1,5 +1,32 @@
 # vim: set filetype=python :
 Import('*')
+
+import os.path,os
+#  Dir('#') expands to the root of the source tree -- that is done by scons
+if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a'):
+	print "Will build VolumetricContactLaw since libTesselationWrapper.a was found."
+	env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
+		env.SharedLibrary('VolumicContactLaw',
+			['Engine/StandAloneEngine/VolumicContactLaw.cpp'],
+			LIBPATH=env['LIBPATH']+['../extra/triangulation'],
+			LIBS=env['LIBS']+['SDECLinkPhysics',
+				'ElasticContactInteraction',
+				'SDECLinkGeometry',
+				'SpheresContactGeometry',
+				'BodyMacroParameters',
+				'yade-serialization',
+				'yade-base',
+				'GLDrawInteractingSphere',
+				'yade-multimethods',
+				'Force',
+				'Momentum',
+				'Sphere',
+				'RigidBodyParameters',
+				'InteractingSphere',
+				'TesselationWrapper',
+				'CGAL'])
+		])
+
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('SQLiteRecorder',
@@ -188,28 +215,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Momentum',
 			'Sphere',
 			'RigidBodyParameters']),
-			
-   
-			
-	env.SharedLibrary('VolumicContactLaw',
-		['Engine/StandAloneEngine/VolumicContactLaw.cpp'],
-		#LIBPATH=env['LIBPATH']+['/home/jf/YADE/trunk-clean/extra/triangulation'],
-		LIBS=env['LIBS']+['SDECLinkPhysics',
-			'ElasticContactInteraction',
-			'SDECLinkGeometry',
-			'SpheresContactGeometry',
-			'BodyMacroParameters',
-			'yade-serialization',
-			'yade-base',
-			'GLDrawInteractingSphere',
-			'yade-multimethods',
-			'Force',
-			'Momentum',
-			'Sphere',
-			'RigidBodyParameters',
-			'InteractingSphere',
-			'TesselationWrapper',
-			'CGAL']),
+	
 
 	env.SharedLibrary('CohesiveFrictionalContactLaw',
 		['Engine/StandAloneEngine/CohesiveFrictionalContactLaw.cpp'],

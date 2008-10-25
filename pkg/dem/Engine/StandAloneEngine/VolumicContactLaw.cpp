@@ -22,13 +22,7 @@
 
 #include "VolumicContactLaw.hpp"
 
-// <<<<<<< .mine
-// 	#include</home/jf/YADE/trunk/lib/miniWm3/Wm3Math.h>#include <cmath>
-     #include "/home/jf/YADE/trunk-clean/extra/triangulation/TesselationWrapper.h"
-
-// =======
-//      #include "TesselationWrapper.h"
-// >>>>>>> .r1327
+#include<yade/extra/TesselationWrapper.h>
 
  
 
