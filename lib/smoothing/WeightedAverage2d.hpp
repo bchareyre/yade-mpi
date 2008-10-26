@@ -119,23 +119,23 @@ struct SymmGaussianKernelAverage: public WeightedAverage<T,Tvalue> {
 	virtual Real getWeight(const Vector2r& meanPt, const T& e){	
 		Vector2r pos=getPosition(e);
 		Real rSq=pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
-		if(rSq>relThreshold*stDev) return 0.;
-		return (1./sqrt(2*M_PI*stDev))*exp(-rSq/(2*stDev));
+		if(rSq>relThreshold*stDev*stDev) return 0.;
+		return (1./sqrt(2*M_PI*stDev*stDev))*exp(-rSq/(2*stDev*stDev));
 	}
 	virtual vector<Vector2i> filterCells(const Vector2r& refPt){return WeightedAverage<T,Tvalue>::grid->circleFilter(refPt,stDev*relThreshold);}
 };
 
-/* Class for doing template specialization of gaussian kernel average  on SGKA_dataPt and for testing */
-struct dataPt{
+/* Class for doing template specialization of gaussian kernel average on SGKA_Scalar2d and for testing */
+struct Scalar2d{
 	Vector2r pos;
-	int val;
+	Real val;
 };
 
 /* Final specialization; it only needs to define getValue and getPosition -- these functions contain knowledge about the element class itself */
-struct SGKA_dataPt: public SymmGaussianKernelAverage<dataPt,Real>{
-	SGKA_dataPt(const shared_ptr<GridContainer<dataPt> >& _grid, Real _stDev, Real _relThreshold=3): SymmGaussianKernelAverage<dataPt,Real>(_grid,_stDev,_relThreshold){}
-	virtual Real getValue(const dataPt& dp){return (Real)dp.val;}
-	virtual Vector2r getPosition(const dataPt& dp){return dp.pos;}
+struct SGKA_Scalar2d: public SymmGaussianKernelAverage<Scalar2d,Real>{
+	SGKA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): SymmGaussianKernelAverage<Scalar2d,Real>(_grid,_stDev,_relThreshold){}
+	virtual Real getValue(const Scalar2d& dp){return (Real)dp.val;}
+	virtual Vector2r getPosition(const Scalar2d& dp){return dp.pos;}
 };
 
 /* simplified interface for python:
@@ -148,19 +148,50 @@ struct SGKA_dataPt: public SymmGaussianKernelAverage<dataPt,Real>{
  *
  * */
 class pyGaussAverage{
-	//struct dataPt{Vector2r pos; Real val;};
+	//struct Scalar2d{Vector2r pos; Real val;};
 	Vector2r tuple2vec2r(const python::tuple& t){return Vector2r(python::extract<Real>(t[0])(),python::extract<Real>(t[1])());}
 	Vector2i tuple2vec2i(const python::tuple& t){return Vector2i(python::extract<int>(t[0])(),python::extract<int>(t[1])());}
-	shared_ptr<SGKA_dataPt> sgka;
+	shared_ptr<SGKA_Scalar2d> sgka;
+	struct Poly2d{vector<Vector2r> vertices; bool inclusive;};
+	vector<Poly2d> clips;
 	public:
 	pyGaussAverage(python::tuple lo, python::tuple hi, python::tuple nCells, Real stDev){
-		shared_ptr<GridContainer<dataPt> > g(new GridContainer<dataPt>(tuple2vec2r(lo),tuple2vec2r(hi),tuple2vec2i(nCells)));
-		sgka=shared_ptr<SGKA_dataPt>(new SGKA_dataPt(g,stDev));
+		shared_ptr<GridContainer<Scalar2d> > g(new GridContainer<Scalar2d>(tuple2vec2r(lo),tuple2vec2r(hi),tuple2vec2i(nCells)));
+		sgka=shared_ptr<SGKA_Scalar2d>(new SGKA_Scalar2d(g,stDev));
 	}
-	void addPt(Real val, python::tuple pos){dataPt d; d.pos=tuple2vec2r(pos); d.val=val; sgka->grid->add(d,d.pos); }
-	Real avg(python::tuple pt){return sgka->computeAverage(tuple2vec2r(pt));}
-
+	bool pointInsidePolygon(const Vector2r&,const vector<Vector2r>&);
+	bool ptIsClipped(const Vector2r& pt){
+		FOREACH(const Poly2d& poly, clips){
+			bool inside=pointInsidePolygon(pt,poly.vertices);
+			if((inside && !poly.inclusive) || (!inside && poly.inclusive)) return true;
+		}
+		return false;
+	}
+	bool addPt(Real val, python::tuple pos){Scalar2d d; d.pos=tuple2vec2r(pos); if(ptIsClipped(d.pos)) return false; d.val=val; sgka->grid->add(d,d.pos); return true; } 
+	Real avg(python::tuple _pt){Vector2r pt=tuple2vec2r(_pt); if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgka->computeAverage(pt);}
 	Real stDev_get(){return sgka->stDev;} void stDev_set(Real s){sgka->stDev=s;}
 	Real relThreshold_get(){return sgka->relThreshold;} void relThreshold_set(Real rt){sgka->relThreshold=rt;}
+	python::list clips_get(){
+		python::list ret;
+		FOREACH(const Poly2d& poly, clips){
+			python::list vertices;
+			FOREACH(const Vector2r& v, poly.vertices) vertices.append(python::make_tuple(v[0],v[1]));
+			ret.append(python::make_tuple(vertices,poly.inclusive));
+		}
+		return ret;
+	}
+	void clips_set(python::list l){
+		/* [ ( [(x1,y1),(x2,y2),…], true), … ] */
+		clips.clear();
+		for(int i=0; i<python::len(l); i++){
+			python::tuple polyDesc=python::extract<python::tuple>(l[i])();
+			python::list coords=python::extract<python::list>(polyDesc[0]);
+			Poly2d poly; poly.inclusive=python::extract<bool>(polyDesc[1]);
+			for(int j=0; j<python::len(coords); j++){
+				poly.vertices.push_back(tuple2vec2r(python::extract<python::tuple>(coords[j])));
+			}
+			clips.push_back(poly);
+		}
+	}
 };
 

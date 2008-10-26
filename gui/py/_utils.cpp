@@ -6,6 +6,11 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<cmath>
+
+#include<numpy/ndarrayobject.h>
+
+
+
 using namespace boost::python;
 
 #ifdef LOG4CXX
@@ -199,6 +204,39 @@ Real sumBexForces(int mask, python::tuple _direction){
 	return ret;
 }
 
+/* Tell us whether a point lies in polygon given by array of points.
+ *  @param xy is the point that is being tested
+ *  @param vertices is Numeric.array (or list or tuple) of vertices of the polygon.
+ *         Every row of the array is x and y coordinate, numer of rows is >= 3 (triangle).
+ *
+ * Copying the algorithm from http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+ * is gratefully acknowledged:
+ *
+ * License to Use:
+ * Copyright (c) 1970-2003, Wm. Randolph Franklin
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
+ *   2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided with the distribution.
+ *   3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific prior written permission. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * http://numpy.scipy.org/numpydoc/numpy-13.html told me how to use Numeric.array from c
+ */
+bool pointInsidePolygon(python::tuple xy, python::object vertices){
+	Real testx=python::extract<double>(xy[0])(),testy=python::extract<double>(xy[1])();
+	char** vertData; int rows, cols; PyArrayObject* vert=(PyArrayObject*)vertices.ptr();
+	int result=PyArray_As2D((PyObject**)&vert /* is replaced */ ,&vertData,&rows,&cols,PyArray_DOUBLE);
+	if(result!=0) throw invalid_argument("Unable to cast vertices to 2d array");
+	if(cols!=2 || rows<3) throw invalid_argument("Vertices must have 2 columns (x and y) and at least 3 rows.");
+	int i /*current node*/, j/*previous node*/; bool inside=false;
+	for(i=0,j=rows-1; i<rows; j=i++){
+		double vx_i=*(double*)(vert->data+i*vert->strides[0]), vy_i=*(double*)(vert->data+i*vert->strides[0]+vert->strides[1]), vx_j=*(double*)(vert->data+j*vert->strides[0]), vy_j=*(double*)(vert->data+j*vert->strides[0]+vert->strides[1]);
+		if (((vy_i>testy)!=(vy_j>testy)) && (testx < (vx_j-vx_i) * (testy-vy_i) / (vy_j-vy_i) + vx_i) ) inside=!inside;
+	}
+	Py_DECREF(vert);
+	return inside;
+}
+
 /* Project 3d point into 2d using spiral projection along given axis;
  * the returned tuple is
  * 	
@@ -218,7 +256,6 @@ python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real 
 	Real hRef=dH_dTheta*(theta-theta0);
 	long period;
 	Real h=Shop::periodicWrap(pt[axis],hRef-.5*Mathr::PI*dH_dTheta,hRef+.5*Mathr::PI*dH_dTheta,&period);
-	if(abs(h-hRef)>0.005) cerr<<"@@@ "<<h-hRef<<" "<<h<<" "<<hRef<<" "<<pt[axis]<<" ("<<hRef-.5*Mathr::PI*dH_dTheta<<","<<hRef+.5*Mathr::PI*dH_dTheta<<") "<<theta<<" "<<endl;
 	return python::make_tuple(python::make_tuple(r,h-hRef),theta);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,4);
@@ -229,6 +266,9 @@ void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop:
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 
 BOOST_PYTHON_MODULE(_utils){
+	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
+	import_array();
+
 	def("PWaveTimeStep",PWaveTimeStep);
 	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers")));
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor")));
@@ -243,6 +283,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("sumBexMoments",sumBexMoments);
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","theta0")));
+	def("pointInsidePolygon",pointInsidePolygon);
 }
 
 

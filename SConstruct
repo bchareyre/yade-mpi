@@ -324,9 +324,10 @@ if not env.GetOption('clean'):
 		if not ok: featureNotOK('log4cxx')
 		env.Append(CPPDEFINES=['LOG4CXX'])
 	if 'python' in env['features']:
-		ok=(conf.CheckPython() and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
-			and (conf.CheckLibWithHeader('boost_python-mt','boost/python.hpp','c++','boost::python::scope();',autoadd=1)
-				or conf.CheckLibWithHeader('boost_python','boost/python.hpp','c++','boost::python::scope();',autoadd=1)))
+		ok=(conf.CheckPython()
+			and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
+			and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
+			and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 		if not ok: featureNotOK('python')
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
