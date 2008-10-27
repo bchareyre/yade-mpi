@@ -119,8 +119,8 @@ struct SymmGaussianKernelAverage: public WeightedAverage<T,Tvalue> {
 	virtual Real getWeight(const Vector2r& meanPt, const T& e){	
 		Vector2r pos=getPosition(e);
 		Real rSq=pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
-		if(rSq>relThreshold*stDev*stDev) return 0.;
-		return (1./sqrt(2*M_PI*stDev*stDev))*exp(-rSq/(2*stDev*stDev));
+		if(rSq>pow(relThreshold*stDev,2)) return 0.; // discard points further than relThreshold*stDev, by default 3*stDev
+		return (1./(stDev*sqrt(2*M_PI)))*exp(-rSq/(2*stDev*stDev));
 	}
 	virtual vector<Vector2i> filterCells(const Vector2r& refPt){return WeightedAverage<T,Tvalue>::grid->circleFilter(refPt,stDev*relThreshold);}
 };
