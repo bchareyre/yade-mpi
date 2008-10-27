@@ -16,6 +16,29 @@ except ImportError: pass
 # c++ implementations for performance reasons
 from yade._utils import *
 
+def saveVars(**kw):
+	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
+
+	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use
+
+	 utils.saveVars(a=a,b=b,c=c)
+
+	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once
+	the .xml is loaded again, use
+
+	 utils.loadVars()
+
+	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
+	"""
+	import cPickle
+	Omega().tags['pickledPythonVariablesDictionary']=cPickle.dumps(kw)
+
+def loadVars():
+	import cPickle
+	import __builtin__
+	d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'])
+	for k in d: __builtin__.__dict__[k]=d[k]
+
 
 def typedEngine(name): return [e for e in Omega().engines if e.name==name][0]
 

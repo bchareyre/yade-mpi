@@ -87,7 +87,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Vector3r relRotVector() const;
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO){createIndex();}
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();}
 		virtual ~SpheresContactGeometry();
 	protected :
 		virtual void registerAttributes(){

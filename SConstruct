@@ -451,7 +451,7 @@ def installHeaders(prefix=None):
 	If not, include tree will be created and syumlinked in buildDir, using relative symlinks."""
 	global env
 	import os,string,re
-	from os.path import join,split,isabs,isdir,exists,islink,isfile,sep
+	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep
 	if not prefix: yadeRoot=buildDir
 	else: yadeRoot=prefix
 	yadeInc=join(yadeRoot,'include','yade-%s'%env['version'],'yade')
@@ -489,7 +489,9 @@ def installHeaders(prefix=None):
 							while apfl[i]==aptl[i] and i<min(len(apfl),len(aptl))-1: i+=1
 							return sep.join(['..' for j in range(0,len(apfl)-i)]+aptl[i:])
 						linkName=join(subInc,f); linkTarget=relpath(linkName,join(root,f))
-						if not exists(linkName): os.symlink(linkTarget,linkName)
+						if not exists(linkName):
+							if lexists(linkName): os.remove(linkName) # broken symlink: remove it
+							os.symlink(linkTarget,linkName)
 					else: # install directory: use scons' Install facility
 						env.Install(subInc,join(root,f))
 
