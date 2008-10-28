@@ -52,6 +52,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			env.File('qt.py','qt3'),
 		])
 
+	env.InstallAs('$PREFIX/bin/yade$SUFFIX-multi',env.File('yade-multi','py'))
+
 	# python modules are one level deeper so that you can say: from yade.wrapper import *
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui/yade',[
 		env.SharedLibrary('wrapper',['py/yadeControl.cpp'],SHLIBPREFIX='',

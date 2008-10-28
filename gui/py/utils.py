@@ -16,7 +16,7 @@ except ImportError: pass
 # c++ implementations for performance reasons
 from yade._utils import *
 
-def saveVars(**kw):
+def saveVars(mark='',**kw):
 	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
 
 	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use
@@ -31,12 +31,12 @@ def saveVars(**kw):
 	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
 	"""
 	import cPickle
-	Omega().tags['pickledPythonVariablesDictionary']=cPickle.dumps(kw)
+	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
 
-def loadVars():
+def loadVars(mark=''):
 	import cPickle
 	import __builtin__
-	d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'])
+	d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])
 	for k in d: __builtin__.__dict__[k]=d[k]
 
 
@@ -241,14 +241,14 @@ def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 	mainloop.run()
 	pipeline.set_state(gst.STATE_NULL); pipeline.get_state()
 
-def readParamsFromTable(tableFile=None,tableLine=None,noTableOk=False,**kw):
+def readParamsFromTable(tableFileLine=None,noTableOk=False,**kw):
 	"""
 	Read parameters from a file and assign them to __builtin__ variables.
 
 	tableFile is a text file (with one value per blank-separated columns)
 	tableLine is number of line where to get the values from
 
-		The format of the file is as follows (no comments, empty lines etc allowed…)
+		The format of the file is as follows (commens starting with # and empty lines allowed
 		
 		name1 name2 … # 0th line
 		val1  val2  … # 1st line
@@ -261,17 +261,22 @@ def readParamsFromTable(tableFile=None,tableLine=None,noTableOk=False,**kw):
 	
 	assigns Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
 
+	saves all parameters (default as well as settable) using saveVars('table')
+
 	return value is the number of assigned parameters.
 	"""
 	o=Omega()
 	tagsParams=[]
+	dictDefaults,dictParams={},{}
 	import os, __builtin__
-	if not tableFile and not os.environ.has_key('PARAM_TABLE'):
+	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
 		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
+		o.tags['line']='l!'
 	else:
-		if not tableFile: tableFile=os.environ['PARAM_TABLE']
-		if not tableLine: tableLine=int(os.environ['PARAM_LINE'])
-		ll=open(tableFile).readlines(); names=ll[0].split(); values=ll[tableLine].split()
+		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
+		tableFile,tableLine=tableFileLine.split(':')
+		o.tags['line']='l'+tableLine
+		ll=[l.split('#')[0] for l in open(tableFile).readlines()]; names=ll[0].split(); values=ll[int(tableLine)].split()
 		assert(len(names)==len(values))
 		for i in range(len(names)):
 			if names[i]=='description': o.tags['description']=values[i]
@@ -279,12 +284,13 @@ def readParamsFromTable(tableFile=None,tableLine=None,noTableOk=False,**kw):
 				if names[i] not in kw.keys(): raise NameError("Parameter `%s' has no default value assigned"%names[i])
 				kw.pop(names[i])
 				eq="%s=%s"%(names[i],values[i])
-				exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]
+				exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
 	defaults=[]
 	for k in kw.keys():
 		exec("__builtin__.%s=%s"%(k,kw[k]))
-		defaults+=["%s=%s"%(k,kw[k])]
+		defaults+=["%s=%s"%(k,kw[k])]; dictDefaults[k]=kw[k]
 	o.tags['defaultParams']=",".join(defaults)
 	o.tags['params']=",".join(tagsParams)
+	dictParams.update(dictDefaults); saveVars('table',**dictParams)
 	return len(tagsParams)
 

@@ -24,6 +24,7 @@ if not callable(__builtins__.quit):
 import yade.PythonTCPServer
 srv=yade.PythonTCPServer.PythonTCPServer(minPort=9000)
 yade.runtime.cookie=srv.server.cookie
+sys.stdout.flush()
 
 ## run simulation if requested from the command line
 if runtime.simulation:
@@ -40,7 +41,9 @@ if runtime.script:
 		import traceback
 		traceback.print_exc()
 		if(runtime.nonInteractive or runtime.stopAfter): sys.exit(1)
-if runtime.stopAfter: sys.exit(0)
+if runtime.stopAfter:
+	print "Finished, bye."
+	sys.exit(0)
 
 # run commands if requested from the command line
 #if yadeRunCommands:
