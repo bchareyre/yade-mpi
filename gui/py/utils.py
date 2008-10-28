@@ -40,11 +40,14 @@ def loadVars(mark=''):
 	for k in d: __builtin__.__dict__[k]=d[k]
 
 
+def randomColor(): return [random.random(),random.random(),random.random()]
+
 def typedEngine(name): return [e for e in Omega().engines if e.name==name][0]
 
-def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=[1,1,1],physParamsClass='BodyMacroParameters'):
+def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
+	if not color: color=randomColor()
 	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color,'wire':wire,'visible':True})
 	s.mold=InteractingGeometry('InteractingSphere',{'radius':radius,'diffuseColor':color})
 	V=(4./3)*math.pi*radius**3
@@ -54,9 +57,10 @@ def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dy
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=[1,1,1],physParamsClass='BodyMacroParameters'):
+def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
+	if not color: color=randomColor()
 	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color,'wire':wire,'visible':True})
 	b.mold=InteractingGeometry('InteractingBox',{'extents':extents,'diffuseColor':color})
 	mass=8*extents[0]*extents[1]*extents[2]*density
@@ -65,9 +69,10 @@ def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,fri
 	b['isDynamic']=dynamic
 	return b
 
-def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=[1,1,1],physParamsClass='BodyMacroParameters'):
+def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=None,physParamsClass='BodyMacroParameters'):
 	"""Create Facet"""
 	b=Body()
+	if not color: color=randomColor()
 	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire,'visible':True})
 	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
 	center=inscribedCircleCenter(list(vertices[0]),list(vertices[1]),list(vertices[2]))
