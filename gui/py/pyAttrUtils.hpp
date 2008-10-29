@@ -4,6 +4,7 @@
 #include<map>
 #include<vector>
 #include<boost/shared_ptr.hpp>
+#include<yade/lib-serialization/Archive.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<boost/python.hpp>
 
@@ -159,6 +160,7 @@ class AttrAccess{
 		//! return python list of keys (attribute names)
 		boost::python::list pyKeys(){boost::python::list ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret.append(I->first); return ret;}
 
+
 		//! return attribute value as python object
 		boost::python::object pyGet(std::string key){
 			DescriptorMap::iterator I=descriptors.find(key);
@@ -167,15 +169,15 @@ class AttrAccess{
 			LOG_DEBUG("Got raw attribute `"<<key<<"'");
 			switch(descriptors[key].type){
 				case BOOL: return python::object(lexical_cast<bool>(raw[0]));
-				case NUMBER: return python::object(lexical_cast<double>(raw[0]));
+				case NUMBER: return python::object(lexical_cast_maybeNanInf<double>(raw[0]));
 				case STRING: return python::object(raw[0]);
 				case SEQ_STRING: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(raw[i])); return ret;}
-				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++){ ret.append(python::object(lexical_cast<double>(raw[i]))); LOG_TRACE("Appended "<<raw[i]);} return ret; }
+				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++){ ret.append(python::object(lexical_cast_maybeNanInf<double>(raw[i]))); LOG_TRACE("Appended "<<raw[i]);} return ret; }
 				case VEC_VEC: {
 					python::list ret; for(size_t i=0; i<raw.size(); i++){
 						/* raw[i] has the form "{number number number}" */
 						vector<string> s; boost::algorithm::split(s,raw[i],algorithm::is_any_of("{} "),algorithm::token_compress_on);
-						python::list subList; FOREACH(string ss, s) subList.append(python::object(lexical_cast<double>(ss)));
+						python::list subList; FOREACH(string ss, s) subList.append(python::object(lexical_cast_maybeNanInf<double>(ss)));
 						ret.append(subList);
 					}
 				}

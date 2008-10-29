@@ -120,7 +120,9 @@ class TriaxialTest : public FileGenerator
 		string		importFilename
 				,AnimationSnapshotsBaseName
 				,WallStressRecordFile
-				,Key;//A code that is added to output filenames
+				,Key //A code that is added to output filenames
+				//! string that contains some subset (max. 2) of {'x','y','z'} ; containes axes will have box dimension hardcoded, even if box is scaled as mean_radius is prescribed: scaling will be applied on the rest.
+				,fixedBoxDims;
 	
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;

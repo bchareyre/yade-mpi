@@ -110,8 +110,8 @@ struct FundamentalHandler< Vector2<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			tmp->X() = lexical_cast<RealType>(tokens[0]);
-			tmp->Y() = lexical_cast<RealType>(tokens[1]);
+			tmp->X() = lexical_cast_maybeNanInf<RealType>(tokens[0]);
+			tmp->Y() = lexical_cast_maybeNanInf<RealType>(tokens[1]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -168,9 +168,9 @@ struct FundamentalHandler< Vector3<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			tmp->X() = lexical_cast<RealType>(tokens[0]);
-			tmp->Y() = lexical_cast<RealType>(tokens[1]);
-			tmp->Z() = lexical_cast<RealType>(tokens[2]);
+			tmp->X() = lexical_cast_maybeNanInf<RealType>(tokens[0]);
+			tmp->Y() = lexical_cast_maybeNanInf<RealType>(tokens[1]);
+			tmp->Z() = lexical_cast_maybeNanInf<RealType>(tokens[2]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -231,10 +231,10 @@ struct FundamentalHandler< Vector4<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			tmp->X() = lexical_cast<RealType>(tokens[0]);
-			tmp->Y() = lexical_cast<RealType>(tokens[1]);
-			tmp->Z() = lexical_cast<RealType>(tokens[2]);
-			tmp->W() = lexical_cast<RealType>(tokens[3]);
+			tmp->X() = lexical_cast_maybeNanInf<RealType>(tokens[0]);
+			tmp->Y() = lexical_cast_maybeNanInf<RealType>(tokens[1]);
+			tmp->Z() = lexical_cast_maybeNanInf<RealType>(tokens[2]);
+			tmp->W() = lexical_cast_maybeNanInf<RealType>(tokens[3]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -299,10 +299,11 @@ struct FundamentalHandler< Matrix2<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			*tmp = Matrix2<RealType>(	lexical_cast<RealType>(tokens[0]),
-							lexical_cast<RealType>(tokens[1]),
-							lexical_cast<RealType>(tokens[2]),
-							lexical_cast<RealType>(tokens[3]));
+			*tmp = Matrix2<RealType>(
+							lexical_cast_maybeNanInf<RealType>(tokens[0]),
+							lexical_cast_maybeNanInf<RealType>(tokens[1]),
+							lexical_cast_maybeNanInf<RealType>(tokens[2]),
+							lexical_cast_maybeNanInf<RealType>(tokens[3]));
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -367,15 +368,16 @@ struct FundamentalHandler< Matrix3<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			*tmp = Matrix3<RealType>(	lexical_cast<RealType>(tokens[0]),
-							lexical_cast<RealType>(tokens[1]),
-							lexical_cast<RealType>(tokens[2]),
-							lexical_cast<RealType>(tokens[3]),
-							lexical_cast<RealType>(tokens[4]),
-							lexical_cast<RealType>(tokens[5]),
-							lexical_cast<RealType>(tokens[6]),
-							lexical_cast<RealType>(tokens[7]),
-							lexical_cast<RealType>(tokens[8]));
+			*tmp = Matrix3<RealType>(
+							lexical_cast_maybeNanInf<RealType>(tokens[0]),
+							lexical_cast_maybeNanInf<RealType>(tokens[1]),
+							lexical_cast_maybeNanInf<RealType>(tokens[2]),
+							lexical_cast_maybeNanInf<RealType>(tokens[3]),
+							lexical_cast_maybeNanInf<RealType>(tokens[4]),
+							lexical_cast_maybeNanInf<RealType>(tokens[5]),
+							lexical_cast_maybeNanInf<RealType>(tokens[6]),
+							lexical_cast_maybeNanInf<RealType>(tokens[7]),
+							lexical_cast_maybeNanInf<RealType>(tokens[8]));
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -460,22 +462,23 @@ struct FundamentalHandler< Matrix4<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			*tmp = Matrix4<RealType>(	lexical_cast<RealType>(tokens[0]),
-							lexical_cast<RealType>(tokens[1]),
-							lexical_cast<RealType>(tokens[2]),
-							lexical_cast<RealType>(tokens[3]),
-							lexical_cast<RealType>(tokens[4]),
-							lexical_cast<RealType>(tokens[5]),
-							lexical_cast<RealType>(tokens[6]),
-							lexical_cast<RealType>(tokens[7]),
-							lexical_cast<RealType>(tokens[8]),
-							lexical_cast<RealType>(tokens[9]),
-							lexical_cast<RealType>(tokens[10]),
-							lexical_cast<RealType>(tokens[11]),
-							lexical_cast<RealType>(tokens[12]),
-							lexical_cast<RealType>(tokens[13]),
-							lexical_cast<RealType>(tokens[14]),
-							lexical_cast<RealType>(tokens[15]));
+			*tmp = Matrix4<RealType>(
+							lexical_cast_maybeNanInf<RealType>(tokens[0]),
+							lexical_cast_maybeNanInf<RealType>(tokens[1]),
+							lexical_cast_maybeNanInf<RealType>(tokens[2]),
+							lexical_cast_maybeNanInf<RealType>(tokens[3]),
+							lexical_cast_maybeNanInf<RealType>(tokens[4]),
+							lexical_cast_maybeNanInf<RealType>(tokens[5]),
+							lexical_cast_maybeNanInf<RealType>(tokens[6]),
+							lexical_cast_maybeNanInf<RealType>(tokens[7]),
+							lexical_cast_maybeNanInf<RealType>(tokens[8]),
+							lexical_cast_maybeNanInf<RealType>(tokens[9]),
+							lexical_cast_maybeNanInf<RealType>(tokens[10]),
+							lexical_cast_maybeNanInf<RealType>(tokens[11]),
+							lexical_cast_maybeNanInf<RealType>(tokens[12]),
+							lexical_cast_maybeNanInf<RealType>(tokens[13]),
+							lexical_cast_maybeNanInf<RealType>(tokens[14]),
+							lexical_cast_maybeNanInf<RealType>(tokens[15]));
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -594,17 +597,17 @@ struct FundamentalHandler< Quaternion<RealType> >
 		
 			if (tokens.size()==3) // Quaternion is written as axis which norm is the angle in radian
 			{
-				axis[0] = lexical_cast<RealType>(tokens[0]);
-				axis[1] = lexical_cast<RealType>(tokens[1]);
-				axis[2] = lexical_cast<RealType>(tokens[2]);
+				axis[0] = lexical_cast_maybeNanInf<RealType>(tokens[0]);
+				axis[1] = lexical_cast_maybeNanInf<RealType>(tokens[1]);
+				axis[2] = lexical_cast_maybeNanInf<RealType>(tokens[2]);
 				angle = axis.Normalize();
 			}
 			else // tokens.size()==4 Quaternion is written as axis angle
 			{
-				axis[0] = lexical_cast<RealType>(tokens[0]);
-				axis[1] = lexical_cast<RealType>(tokens[1]);
-				axis[2] = lexical_cast<RealType>(tokens[2]);
-				angle   = lexical_cast<RealType>(tokens[3]);
+				axis[0] = lexical_cast_maybeNanInf<RealType>(tokens[0]);
+				axis[1] = lexical_cast_maybeNanInf<RealType>(tokens[1]);
+				axis[2] = lexical_cast_maybeNanInf<RealType>(tokens[2]);
+				angle   = lexical_cast_maybeNanInf<RealType>(tokens[3]);
 			}
 			tmp->FromAxisAngle(axis,angle);
 		}
@@ -687,23 +690,23 @@ struct FundamentalHandler< Se3<RealType> >
 		
 			if (tokens.size()==6) // Quaternion is written as axis which norm is the angle in radian
 			{
-				position[0]	= lexical_cast<RealType>(tokens[0]);
-				position[1]	= lexical_cast<RealType>(tokens[1]);
-				position[2]	= lexical_cast<RealType>(tokens[2]);
-				axis[0]		= lexical_cast<RealType>(tokens[4]);
-				axis[1]		= lexical_cast<RealType>(tokens[3]);
-				axis[2]		= lexical_cast<RealType>(tokens[5]);
+				position[0]	= lexical_cast_maybeNanInf<RealType>(tokens[0]);
+				position[1]	= lexical_cast_maybeNanInf<RealType>(tokens[1]);
+				position[2]	= lexical_cast_maybeNanInf<RealType>(tokens[2]);
+				axis[0]		= lexical_cast_maybeNanInf<RealType>(tokens[4]);
+				axis[1]		= lexical_cast_maybeNanInf<RealType>(tokens[3]);
+				axis[2]		= lexical_cast_maybeNanInf<RealType>(tokens[5]);
 				angle		= axis.Normalize();
 			}
 			else // tokens.size()==7 Quaternion is writted as axis angle
 			{
-				position[0]	= lexical_cast<RealType>(tokens[0]);
-				position[1]	= lexical_cast<RealType>(tokens[1]);
-				position[2]	= lexical_cast<RealType>(tokens[2]);
-				axis[0]		= lexical_cast<RealType>(tokens[3]);
-				axis[1]		= lexical_cast<RealType>(tokens[4]);
-				axis[2]		= lexical_cast<RealType>(tokens[5]);
-				angle		= lexical_cast<RealType>(tokens[6]);
+				position[0]	= lexical_cast_maybeNanInf<RealType>(tokens[0]);
+				position[1]	= lexical_cast_maybeNanInf<RealType>(tokens[1]);
+				position[2]	= lexical_cast_maybeNanInf<RealType>(tokens[2]);
+				axis[0]		= lexical_cast_maybeNanInf<RealType>(tokens[3]);
+				axis[1]		= lexical_cast_maybeNanInf<RealType>(tokens[4]);
+				axis[2]		= lexical_cast_maybeNanInf<RealType>(tokens[5]);
+				angle		= lexical_cast_maybeNanInf<RealType>(tokens[6]);
 			}
 			orientation.FromAxisAngle(axis,angle);
 			*tmp = Se3<RealType>(position,orientation);

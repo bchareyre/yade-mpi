@@ -87,6 +87,15 @@ struct FundamentalHandler< string >
 	}
 };
 
+template <typename RealType>
+RealType lexical_cast_maybeNanInf(const string& s){
+	if((s[0]=='n' || s[0]=='N') && (s[1]=='a' || s[1]=='A') && (s[2]=='n' || s[2]=='N')) return std::numeric_limits<RealType>::quiet_NaN();
+	if((s[0]=='i' || s[0]=='I') && (s[1]=='n' || s[1]=='N') && (s[2]=='f' || s[2]=='F')) return std::numeric_limits<RealType>::infinity();
+	if(s[0]=='-' && (s[1]=='i' || s[1]=='I') && (s[2]=='n' || s[2]=='N') && (s[3]=='f' || s[3]=='F')) return -std::numeric_limits<RealType>::infinity();
+	return lexical_cast<RealType>(s);
+};
+
+
 template<typename Type >
 inline void lexical_copy(Archive& ac , any& a )
 {
@@ -99,7 +108,9 @@ inline void lexical_copy(Archive& ac , any& a )
 		try{
 			*tmp = lexical_cast<Type>(*tmpStr);
 		} catch(boost::bad_lexical_cast& e){
-			if(typeid(tmp)==typeid(bool*) && atoi(tmpStr->c_str())!=0) { cerr<<"warning: offensive bool value `"<<*tmpStr<<"' encountered (interpreted as true)."<<endl; *tmp=lexical_cast<Type>("1"); /* cerr<<"New value: "<<lexical_cast<string>(*tmp)<<endl; cerr<<"Atoi returns "<<atoi(tmpStr->c_str())<<", bool !=0 is "<<(atoi(tmpStr->c_str())!=0)<<endl;*/ }
+			if(typeid(tmp)==typeid(bool*) && atoi(tmpStr->c_str())!=0) { cerr<<"warning: offensive bool value `"<<*tmpStr<<"' encountered (interpreted as true)."<<endl; *tmp=lexical_cast<Type>("1"); /* cerr<<"New value: "<<lexical_cast<string>(*tmp)<<endl; cerr<<"Atoi returns "<<atoi(tmpStr->c_str())<<", bool !=0 is "<<(atoi(tmpStr->c_str())!=0)<<endl;*/
+			}
+			else *tmp=lexical_cast_maybeNanInf<Type>(*tmpStr);
 		}
 	}
 	else if (a.type()==typeid(string*)) // serialization - writing to string from some Type
@@ -114,6 +125,9 @@ inline void lexical_copy(Archive& ac , any& a )
 	else // never reached
 		throw HandlerError(SerializationExceptions::LexicalCopyError);
 }
+
+
+
 
 template< >
 struct FundamentalHandler< int >

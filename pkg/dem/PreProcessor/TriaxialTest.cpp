@@ -94,7 +94,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	lowerCorner 		= Vector3r(0,0,0);
 	upperCorner 		= Vector3r(1,1,1);
 	thickness 		= 0.001;
-	importFilename 		= "../../YADE/trunk-clean/examples/sphere16bidisperse.txt"; // "./small.sdec.xyz";
+	importFilename 		= ""; // oh, PLEASE, keep this empty -- i.e., by default, generate spheres in the box, not load them.
 	Key			="";
 	outputFileName 		= "./TriaxialTest"+Key+".xml";
 	//nlayers = 1;
@@ -260,6 +260,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(DieCompaction);
 	REGISTER_ATTRIBUTE(translationspeed);
 	REGISTER_ATTRIBUTE(wishedporosity);
+	REGISTER_ATTRIBUTE(fixedBoxDims);
  
 
 
@@ -301,9 +302,13 @@ bool TriaxialTest::generate()
 
 	if(radiusMean<=0) really_radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
 	else {
-		Real boxScaleFactor=radiusMean*pow((4/3.)*Mathr::PI*numberOfGrains/(volume*(1-porosity)),1/3.);
-		LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling box by "<<boxScaleFactor);
-		dimensions*=boxScaleFactor;
+		bool fixedDims[3];
+		fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
+		int nScaled=(3-(int)fixedDims[0]+(int)fixedDims[1]+(int)fixedDims[2]);
+		if(nScaled==3) throw std::invalid_argument("At most 2 (not 3) axes can have fixed dimensions in fixedBoxDims if scaling for given radiusMean.");
+		Real boxScaleFactor=radiusMean*pow((4/3.)*Mathr::PI*numberOfGrains/(volume*(1-porosity)),1./nScaled);
+		LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling "<<nScaled<<" dimensions by "<<boxScaleFactor);
+		dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;
 		upperCorner=lowerCorner+dimensions;
 		really_radiusMean=radiusMean;
 	}
