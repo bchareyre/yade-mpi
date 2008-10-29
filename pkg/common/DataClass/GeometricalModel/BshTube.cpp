@@ -1,27 +1,32 @@
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
+*  vincent.richefeu@hmg.inpg.fr                                          *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "InteractingSphere.hpp"
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include "BshTube.hpp"
+#include <iostream>
 
-InteractingSphere::InteractingSphere () : InteractingGeometry(), radius(0.0)
-{
+BshTube::BshTube () : GeometricalModel()
+{		
 	createIndex();
 }
 
-InteractingSphere::~InteractingSphere ()
-{
+
+BshTube::~BshTube ()
+{		
 }
 
-void InteractingSphere::registerAttributes()
+
+void BshTube::registerAttributes()
 {
-	InteractingGeometry::registerAttributes();
+	GeometricalModel::registerAttributes();
 	REGISTER_ATTRIBUTE(radius);
+        REGISTER_ATTRIBUTE(half_height);
 }
-
 
 YADE_PLUGIN();

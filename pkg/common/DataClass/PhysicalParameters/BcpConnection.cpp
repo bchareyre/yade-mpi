@@ -1,27 +1,32 @@
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2004 by Janek Kozicki                                   *
+*  cosurgi@berlios.de                                                    *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "InteractingSphere.hpp"
+#include "BcpConnection.hpp"
 
-InteractingSphere::InteractingSphere () : InteractingGeometry(), radius(0.0)
+
+BcpConnection::BcpConnection() : PhysicalParameters()
 {
 	createIndex();
+        id1 = id2 = 0;
 }
 
-InteractingSphere::~InteractingSphere ()
+BcpConnection::~BcpConnection()
 {
 }
 
-void InteractingSphere::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-}
 
+void BcpConnection::registerAttributes()
+{
+	PhysicalParameters::registerAttributes();
+	REGISTER_ATTRIBUTE(id1);
+	REGISTER_ATTRIBUTE(id2);
+}
 
 YADE_PLUGIN();

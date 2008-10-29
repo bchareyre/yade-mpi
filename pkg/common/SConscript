@@ -190,5 +190,22 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['ParticleParameters','RigidBodyParameters','GLDrawParticleState','yade-opengl']),
 	env.SharedLibrary('OpenGLRenderingEngine',['RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine.cpp'],
 		LIBS=env['LIBS']+['yade-base',  'glut', 'GLU', 'GL']),
+                
+# In the following, there is maybe too much defined LIBS (?)
+        env.SharedLibrary('BshTube',['DataClass/GeometricalModel/BshTube.cpp'],
+                LIBS=env['LIBS']+['BoundingVolumeMetaEngine','InteractingBox',]),
+        env.SharedLibrary('BssSweptSphereLineSegment',['DataClass/InteractingGeometry/BssSweptSphereLineSegment.cpp'],
+                LIBS=env['LIBS']+['BoundingVolumeMetaEngine','InteractingBox','AABB','Box',]),
+        env.SharedLibrary('BcpConnection',['DataClass/PhysicalParameters/BcpConnection.cpp']),
+        env.SharedLibrary('ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment',
+                        ['Engine/EngineUnit/ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment.cpp'],
+                LIBS=env['LIBS']+['BoundingVolumeMetaEngine','InteractingBox','AABB','Box','BshTube','BcpConnection','BssSweptSphereLineSegment']),
+        env.SharedLibrary('ef2_BssSweptSphereLineSegment_AABB_makeAABB',
+                        ['Engine/EngineUnit/ef2_BssSweptSphereLineSegment_AABB_makeAABB.cpp'],
+                LIBS=env['LIBS']+['BoundingVolumeMetaEngine','InteractingBox','AABB','BshTube','BssSweptSphereLineSegment']),
+        
+        env.SharedLibrary('GLDrawTube',['RenderingEngine/GLDrawGeometricalModel/GLDrawTube.cpp'],
+                        LIBS=env['LIBS']+['yade-base','BshTube','yade-opengl']),
+                
 ])
 

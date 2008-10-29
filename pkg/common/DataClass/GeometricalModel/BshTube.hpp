@@ -6,22 +6,36 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "InteractingSphere.hpp"
+#ifndef BSH_TUBE_HPP
+#define BSH_TUBE_HPP
 
-InteractingSphere::InteractingSphere () : InteractingGeometry(), radius(0.0)
+
+#include<yade/core/GeometricalModel.hpp>
+
+
+class BshTube : public GeometricalModel
 {
-	createIndex();
-}
+	public :
+		Real  radius;
+                Real  half_height;
 
-InteractingSphere::~InteractingSphere ()
-{
-}
+		BshTube ();
+		virtual ~BshTube ();
+	
+/// Serialization
+	
+	REGISTER_CLASS_NAME(BshTube);
+	REGISTER_BASE_CLASS_NAME(GeometricalModel);
 
-void InteractingSphere::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-}
+	public : void registerAttributes();
+	
+/// Indexable
+	
+	REGISTER_CLASS_INDEX(BshTube,GeometricalModel);
 
+};
 
-YADE_PLUGIN();
+REGISTER_SERIALIZABLE(BshTube,false);
+
+#endif // BSH_TUBE_HPP
+
