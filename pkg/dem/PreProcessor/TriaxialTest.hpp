@@ -76,8 +76,8 @@ class TriaxialTest : public FileGenerator
 				wallOversizeFactor, // make walls bigger (/smaller) than necessary by this factor
 				radiusStdDev,
 				radiusMean,
-				translationspeed,
-				wishedporosity;
+				translationSpeed,
+				fixedPorosity;
 		bool		 wall_top
 				,wall_bottom
 				,wall_1
@@ -102,7 +102,8 @@ class TriaxialTest : public FileGenerator
 				,internalCompaction
 				,saveAnimationSnapshots
 				,biaxial2dTest
-				,DieCompaction;
+				//!flag to choose an isotropic compaction until a fixed porosity choosing a same translation speed for the six walls
+				,isotropicCompaction;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval

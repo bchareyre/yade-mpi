@@ -52,13 +52,11 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 	frictionAngleDegree = -1;
 	epsilonMax = 0.5;
 
-	DieCompaction=false;
-	spherevolume=0;
- 	boxvolume=0;
+	isotropicCompaction=false;
+	spheresVolume=0;
+ 	boxVolume=0;
 
-	calculatedporosity=1.1;
-	temps=0;
-	
+	calculatedPorosity=1.1;	
 
 
 }
@@ -95,10 +93,10 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(frictionAngleDegree);
 	REGISTER_ATTRIBUTE(epsilonMax);
 	REGISTER_ATTRIBUTE(uniaxialEpsilonCurr);
- 	REGISTER_ATTRIBUTE(DieCompaction);
- 	REGISTER_ATTRIBUTE(spherevolume);
- 	REGISTER_ATTRIBUTE(wishedporosity);
- 	REGISTER_ATTRIBUTE(translationspeed);
+ 	REGISTER_ATTRIBUTE(isotropicCompaction);
+ 	REGISTER_ATTRIBUTE(spheresVolume);
+ 	REGISTER_ATTRIBUTE(fixedPorosity);
+ 	REGISTER_ATTRIBUTE(translationSpeed);
 }
 
 void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
@@ -129,7 +127,8 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 		if(!firstRun) saveSimulation=true;
 		Phase1End = "Compacted";
 	}	
-	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING|| currentState==STATE_DIE_COMPACTION) && nextState==STATE_LIMBO) {
+	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING) && nextState==STATE_LIMBO) {
+	//urrentState==STATE_DIE_COMPACTION
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
 		saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
@@ -137,12 +136,11 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 		Phase1End = (currentState==STATE_ISO_COMPACTION ? "compacted" : "unloaded");
 		Shop::saveSpheresToFile("/tmp/limbo.spheres");
 	}
-	else if( nextState==STATE_DIE_COMPACTION){		
+	else if( nextState==STATE_FIXED_POROSITY_COMPACTION){		
 		internalCompaction = false;
 		wall_bottom_activated=false; wall_top_activated=false;
 		wall_front_activated=false; wall_back_activated=false;
 		wall_right_activated=false; wall_left_activated=false;
- 
 	}	
 	else goto undefinedTransition;
 
@@ -161,7 +159,7 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 	UnbalancedForce=ComputeUnbalancedForce ( ncb );
 
 
-	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_DIE_COMPACTION )
+	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION )
 	{
 		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)
 		//ANSWER TO FIXME : yes we need that because we want to start compression from LIMBO most of the time
@@ -172,7 +170,7 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 		//TRVAR5(UnbalancedForce,StabilityCriterion,meanStress,sigma_iso,abs((meanStress-sigma_iso)/sigma_iso));
 		//}
 
-		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && wishedporosity<1 )
+		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && isotropicCompaction==false )
 		{
 			// only go to UNLOADING if it is needed (hard float comparison... :-| )
 			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
@@ -192,10 +190,10 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 			doStateTransition (ncb, STATE_LIMBO );
 			}
 		}
-		else if ( calculatedporosity<=wishedporosity && currentState==STATE_DIE_COMPACTION )
+		else if ( calculatedPorosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
-			
-			doStateTransition (ncb, STATE_LIMBO );
+		Omega::instance().stopSimulationLoop();
+		return;
 		}
 #if 0
 		//This is a hack in order to allow subsequent run without activating compression - like for the YADE-COMSOL coupling
@@ -229,18 +227,17 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 	{
 		LOG_INFO ( "First run, will initialize!" );
 		//sigma_iso was changed, we need to rerun compaction
-		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && DieCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
-		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING ) doStateTransition (ncb, STATE_TRIAX_LOADING );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && isotropicCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
+		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING && isotropicCompaction == false ) doStateTransition (ncb, STATE_TRIAX_LOADING );
 
-		if ( wishedporosity<1 && currentState==STATE_UNINITIALIZED && DieCompaction!=false )
+		if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false )
 		{
-		doStateTransition (ncb, STATE_DIE_COMPACTION );
+		doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
 
 		//The volume of spheres is calculated
 
 		BodyContainer::iterator bi = ncb->bodies->begin();
 		BodyContainer::iterator biEnd = ncb->bodies->end();
-		Real sphere=0;
 		  for ( ; bi!=biEnd; ++bi )
 		  {
 		  const shared_ptr<Body>& b = *bi;
@@ -249,7 +246,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 			{
 			const shared_ptr<Sphere>& sphere =
 				YADE_PTR_CAST<Sphere> ( b->geometricalModel );
-			spherevolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
+			spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		  }
 		}
@@ -277,7 +274,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
 	}
 	
-	if ( currentState==STATE_LIMBO|| calculatedporosity<=wishedporosity && DieCompaction!=false )
+	if ( currentState==STATE_LIMBO )
 	{		
 		Omega::instance().stopSimulationLoop();
 		return;
@@ -308,38 +305,35 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 			Omega::instance().stopSimulationLoop();
 		}
 	}
-	if ( currentState==STATE_DIE_COMPACTION )
+	if ( currentState==STATE_FIXED_POROSITY_COMPACTION )
 	{
 		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
 		{
 			LOG_INFO ("Compression started");
 		}
-		temps=temps+1;
-		if ( temps == 5)
-		{
+		
 		Real dt = Omega::instance().getTimeStep();
 			/* Move top and bottom wall according to strain rate */
 			PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
-			p->se3.position += 0.0*translationspeed*height*translationAxis*dt;
+			p->se3.position += 0.5*translationSpeed*height*translationAxis*dt;
 			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
-			p->se3.position -= 0.0*translationspeed*height*translationAxis*dt;
+			p->se3.position -= 0.5*translationSpeed*height*translationAxis*dt;
 
 			p=static_cast<PhysicalParameters*> ( Body::byId ( wall_back_id )->physicalParameters.get() );
-			p->se3.position += 0.5*translationspeed*depth*translationAxisz*dt;
+			p->se3.position += 0.5*translationSpeed*depth*translationAxisz*dt;
 			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_front_id )->physicalParameters.get() );
-			p->se3.position -= 0.5*translationspeed*depth*translationAxisz*dt;
+			p->se3.position -= 0.5*translationSpeed*depth*translationAxisz*dt;
 
 			p=static_cast<PhysicalParameters*> ( Body::byId ( wall_left_id )->physicalParameters.get() );
-			p->se3.position += 0.0*translationspeed*width*translationAxisx*dt;
+			p->se3.position += 0.5*translationSpeed*width*translationAxisx*dt;
 			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_right_id )->physicalParameters.get() );
-			p->se3.position -= 0.0*translationspeed*width*translationAxisx*dt;
+			p->se3.position -= 0.5*translationSpeed*width*translationAxisx*dt;
 
 		
-			boxvolume=height*width*depth;
-			temps=0;
-			calculatedporosity=1-spherevolume/boxvolume;
+			boxVolume=height*width*depth;
+			
+			calculatedPorosity=1-spheresVolume/boxVolume;
 
-			}
 
 	}
  

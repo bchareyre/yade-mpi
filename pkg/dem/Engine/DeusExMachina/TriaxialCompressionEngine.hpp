@@ -34,10 +34,13 @@ class PhysicalAction;
  *    the mean pressure sigmaLateralConfinement is reached (and stabilizes).
  *    NOTE: this state will be skipped if sigmaLateralConfinement == sigmaIsoCompaction.
  * 3. STATE_TRIAX_LOADING: confined uniaxial compression:
- *		constant sigmaLateralConfinement is kept at lateral walls (left, right, front, back), while
+ *	constant sigmaLateralConfinement is kept at lateral walls (left, right, front, back), while
  * 	top and bottom walls load the packing in their axis (by straining), until the value of epsilonMax
  * 	(deformation along the loading axis) is reached. At this point, the simulation is stopped.
- * 4. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
+ * 4. STATE_FIXED_POROSITY_COMPACTION: isotropic compaction (compression) until
+ *    a chosen porosity value (parameter:fixedPorosity). The six walls move with a chosen translation speed 
+ *    (parameter translationSpeed).
+ * 5. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
  *
  * Transition from COMPACTION to UNLOADING is done automatically if autoUnload==true;
  * Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is
@@ -59,11 +62,11 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		// FIXME: current serializer doesn't handle named enum types, this is workaround.
 		#define stateNum int
 		// should be "enum stateNum {...}" once this is fixed
-		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING,  STATE_DIE_COMPACTION, STATE_LIMBO};
+		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING,  STATE_FIXED_POROSITY_COMPACTION, STATE_LIMBO};
 		stateNum currentState;
 		void doStateTransition(MetaBody *body, stateNum nextState);
 		#define _STATE_CASE(ST) case ST: return #ST
-		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_DIE_COMPACTION);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
+		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_FIXED_POROSITY_COMPACTION);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
 		#undef _STATE_CASE
 		
 		//! Strain velocity (./s)
@@ -86,17 +89,16 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
 		//! Previous state (used to detect manual changes of the state in .xml)
-		Real spherevolume;
+		Real spheresVolume;
 		//! Value of spheres volume 
-		Real boxvolume;
+		Real boxVolume;
 		//! Value of box volume 
-		Real calculatedporosity;
-		//! Value of porosity 
-		Real translationspeed;
+		Real calculatedPorosity;
+		//! Value of porosity during the simulation 
+		Real translationSpeed;
 		//! Value of translation speed
-		Real wishedporosity;
+		Real fixedPorosity;
 		//! Value of porosity chosen by the user
-		Real temps;
 
 		stateNum previousState;
 		//Vector3r strain;
@@ -117,6 +119,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		bool autoCompressionActivation;
 		//! Auto-switch from isotropic compaction to unloading
 		bool autoUnload;
+		bool isotropicCompaction;
 				
 		virtual void applyCondition(MetaBody * ncb);
 		void updateParameters(MetaBody * ncb);

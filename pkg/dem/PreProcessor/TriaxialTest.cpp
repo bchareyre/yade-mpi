@@ -160,11 +160,11 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	radiusStdDev=0.3;
 	radiusMean=-1; // no radius specified
 
-	DieCompaction=false;
-	translationspeed = 0;
-	wishedporosity = 1;
+	isotropicCompaction=false;
+	translationSpeed = 0;
+	fixedPorosity = 1;
 
-
+ 
 
 	
 //	wall_top_id =0;
@@ -257,9 +257,9 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(DieCompaction);
-	REGISTER_ATTRIBUTE(translationspeed);
-	REGISTER_ATTRIBUTE(wishedporosity);
+	REGISTER_ATTRIBUTE(isotropicCompaction);
+	REGISTER_ATTRIBUTE(translationSpeed);
+	REGISTER_ATTRIBUTE(fixedPorosity);
 	REGISTER_ATTRIBUTE(fixedBoxDims);
  
 
@@ -632,9 +632,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
 	triaxialcompressionEngine->Key = Key;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
-	triaxialcompressionEngine->translationspeed = translationspeed;
-	triaxialcompressionEngine->wishedporosity = wishedporosity;
-	triaxialcompressionEngine->DieCompaction = DieCompaction;
+	triaxialcompressionEngine->translationSpeed = translationSpeed;
+	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
+	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
 		
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
