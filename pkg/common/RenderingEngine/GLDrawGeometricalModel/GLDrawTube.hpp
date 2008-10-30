@@ -11,12 +11,13 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
+
 class GLDrawTube : public GLDrawGeometricalModelFunctor
 {
 	private :
-		bool first;
-		int  glWiredTubeList;
-		int  glTubeList;
+		static bool first;
+		static int  glWiredTubeList;
+		static int  glTubeList;
                 
 	public :
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);

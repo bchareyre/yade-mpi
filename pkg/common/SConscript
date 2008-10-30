@@ -164,7 +164,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('GLDrawMesh2D',['RenderingEngine/GLDrawGeometricalModel/GLDrawMesh2D.cpp'],
 		LIBS=env['LIBS']+['yade-base','Mesh2D','yade-opengl']),
 	env.SharedLibrary('GLDrawSphere',['RenderingEngine/GLDrawGeometricalModel/GLDrawSphere.cpp'],
-		LIBS=env['LIBS']+['yade-base','Sphere','yade-opengl']),
+		LIBS=env['LIBS']+['yade-base','Sphere','yade-opengl']),               
 	env.SharedLibrary('GLDrawQuadrilateral',['RenderingEngine/GLDrawGeometricalModel/GLDrawQuadrilateral.cpp'],
 		LIBS=env['LIBS']+['yade-base','Quadrilateral','yade-opengl']),
 	env.SharedLibrary('GLDrawFacet',['RenderingEngine/GLDrawGeometricalModel/GLDrawFacet.cpp']
@@ -173,6 +173,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['yade-base','InteractingBox','yade-opengl']),
 	env.SharedLibrary('GLDrawInteractingSphere',['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingSphere.cpp'],
 		LIBS=env['LIBS']+['yade-base','InteractingSphere','yade-opengl'],),
+         env.SharedLibrary('GLDrawBssSweptSphereLineSegment',['RenderingEngine/GLDrawInteractingGeometry/GLDrawBssSweptSphereLineSegment.cpp'],
+                LIBS=env['LIBS']+['yade-base','BssSweptSphereLineSegment','yade-opengl']),               
 	env.SharedLibrary('GLDrawMetaInteractingGeometry',['RenderingEngine/GLDrawInteractingGeometry/GLDrawMetaInteractingGeometry.cpp'],
 		LIBS=env['LIBS']+['yade-opengl']),
 	env.SharedLibrary('GLDrawInteractingFacet',['RenderingEngine/GLDrawInteractingGeometry/GLDrawInteractingFacet.cpp']

@@ -11,7 +11,10 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
-
+bool GLDrawTube::first           = true;
+int  GLDrawTube::glWiredTubeList = -1;
+int  GLDrawTube::glTubeList      = -1;
+    
 void GLDrawTube::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {
 	

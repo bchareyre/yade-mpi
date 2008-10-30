@@ -20,16 +20,17 @@ void ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment::go(	co
   //if(ig == 0)
   //  ig = boost::shared_ptr<InteractingGeometry>(new BshTube);
 
-  BssSweptSphereLineSegment* SSLS = YADE_CAST<BssSweptSphereLineSegment*>(ig.get());
+  BssSweptSphereLineSegment* SSLS = static_cast<BssSweptSphereLineSegment*>(ig.get());
   
   SSLS->radius = tube->radius;
-  SSLS->length = 2.0 * tube->half_height;
+  //SSLS->length = 2.0 * tube->half_height;
   
-  BcpConnection* bc = YADE_CAST<BcpConnection*>(body->physicalParameters.get());
+  BcpConnection* bc = static_cast<BcpConnection*>(body->physicalParameters.get());
 
   SSLS->position = (*(Omega::instance().getRootBody()->bodies))[bc->id1]->physicalParameters->se3.position;
   Vector3r len = (*(Omega::instance().getRootBody()->bodies))[bc->id2]->physicalParameters->se3.position - SSLS->position;
-  *(SSLS->orientation) = len.Normalize();
+  SSLS->length = len.Normalize();
+  SSLS->orientation = len;
   
 }
 	

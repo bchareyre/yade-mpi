@@ -204,6 +204,8 @@ void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsign
         tube->half_height           = 0.5 * link.Length();
         tube->diffuseColor          = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
         
+        bss->diffuseColor           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+        
         body->isDynamic             = false;
         body->geometricalModel      = tube;
         body->interactingGeometry   = bss;
@@ -259,10 +261,11 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
         shared_ptr<InteractingSphere> isph(new InteractingSphere);      // Bss
         	
         
-	if ((i==0 && j==0)||(i==0 && j==nbZ)||(i==nbX && j==nbZ)||(i==nbX && j==0))
-		body->isDynamic = false;
-	else
-		body->isDynamic = true;
+// 	if ((i==0 && j==0)||(i==0 && j==nbZ)||(i==nbX && j==nbZ)||(i==nbX && j==0))
+// 		body->isDynamic = false;
+// 	else
+// 		body->isDynamic = true;
+        body->isDynamic = false; // During interaction debuging
         
         node->radius                    = 0.5 * membraneThickness;
 	node->diffuseColor		= Vector3r(0.7,0.7,0.7);
@@ -293,7 +296,7 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 	physicalActionInitializer->physicalActionNames.push_back("Force");
 	//physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
-	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+	//shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
         //interactionPhysicsDispatcher->add("ElasticBodySimpleRelationship");
 		
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
@@ -306,7 +309,7 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB"); // 
 	//boundingVolumeDispatcher->add("InteractingBox2AABB");
-	//boundingVolumeDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB"); // 
+	//boundingVolumeDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB"); 
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
@@ -329,8 +332,8 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
 
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add("LeapFrogOrientationIntegrator");
+	//shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	//orientationIntegrator->add("LeapFrogOrientationIntegrator");
 	//////////////////
  	
 /*
@@ -342,18 +345,18 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 */
 
 	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	//rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
+	//rootBody->engines.push_back(interactionGeometryDispatcher);
+	//rootBody->engines.push_back(interactionPhysicsDispatcher);
 	//rootBody->engines.push_back(shared_ptr<Engine>(new MyTetrahedronLaw));
 	rootBody->engines.push_back(gravityCondition);
 	//rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
 	//if(!rotationBlocked)
-		rootBody->engines.push_back(orientationIntegrator);
+	//	rootBody->engines.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);
