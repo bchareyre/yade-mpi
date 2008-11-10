@@ -16,7 +16,13 @@
 #include <string>
 #include <iostream>
 
-#include <boost/shared_ptr.hpp>
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include<boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include<memory>
+	using std::shared_ptr;
+#endif
 
 
 #include<yade/lib-loki/Singleton.hpp>
@@ -28,9 +34,9 @@
 
 
 #define REGISTER_FACTORABLE(name) 						\
-	inline boost::shared_ptr< Factorable > CreateShared##name()			\
+	inline shared_ptr< Factorable > CreateShared##name()			\
 	{										\
-		return boost::shared_ptr< name > ( new name );				\
+		return shared_ptr< name > ( new name );				\
 	}										\
 	inline Factorable* Create##name()						\
 	{										\
@@ -68,7 +74,7 @@ class ClassFactory : public Singleton< ClassFactory >
 {
 	private :
 		/// Pointer on a function that create an instance of a serializable class an return a shared pointer on it
-		typedef boost::shared_ptr<Factorable> ( *CreateSharedFactorableFnPtr )();
+		typedef shared_ptr<Factorable> ( *CreateSharedFactorableFnPtr )();
 		/// Pointer on a function that create an instance of a serializable class an return a C pointer on it
 		typedef Factorable* ( *CreateFactorableFnPtr )();
 		/// Pointer on a function that create an instance of a custom class (i.e. not serializable) and return a void C pointer on it
@@ -118,7 +124,7 @@ class ClassFactory : public Singleton< ClassFactory >
 						CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom);
 
 		/// Create a shared pointer on a serializable class of the given name
-		boost::shared_ptr<Factorable> createShared( std::string name );
+		shared_ptr<Factorable> createShared( std::string name );
 
 		/// Create a C pointer on a serializable class of the given name
 		Factorable* createPure( std::string name );

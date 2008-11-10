@@ -23,3 +23,9 @@ template<> const Vector3<double> Vector3<double>::UNIT_X(1.0,0.0,0.0);
 template<> const Vector3<double> Vector3<double>::UNIT_Y(0.0,1.0,0.0);
 template<> const Vector3<double> Vector3<double>::UNIT_Z(0.0,0.0,1.0);
 template<> const Vector3<double> Vector3<double>::ONE(1.0,1.0,1.0);
+
+template<> const Vector3<long double> Vector3<long double>::ZERO(0.0,0.0,0.0);
+template<> const Vector3<long double> Vector3<long double>::UNIT_X(1.0,0.0,0.0);
+template<> const Vector3<long double> Vector3<long double>::UNIT_Y(0.0,1.0,0.0);
+template<> const Vector3<long double> Vector3<long double>::UNIT_Z(0.0,0.0,1.0);
+template<> const Vector3<long double> Vector3<long double>::ONE(1.0,1.0,1.0);

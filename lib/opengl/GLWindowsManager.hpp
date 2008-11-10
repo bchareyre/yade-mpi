@@ -13,7 +13,14 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <boost/shared_ptr.hpp>
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include<boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include<memory>
+	using std::shared_ptr;
+#endif
+
 
 using namespace std;
 using namespace boost;

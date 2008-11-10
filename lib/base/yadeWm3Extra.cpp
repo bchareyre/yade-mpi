@@ -8,6 +8,7 @@
 /**************** explicit instantiations ****************************/
 /* this template garbage will go away once we dump Real and go with double forver */
 template Vector3<float> operator*<double, float>(double, Wm3::Vector3<float> const&);
+template Vector3<long double> operator*<double, long double>(double, Wm3::Vector3<long double> const&);
 /****** end of explicit instantiations *******/
 
 

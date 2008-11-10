@@ -73,7 +73,7 @@ void SQLiteRecorder::action(MetaBody* rootBody){
 	LOG_DEBUG("Created table "<<perBodyTable<<" with columns "<<algorithm::join(columns,","));
 
 	// add table to the records table
-	{	sqlite3x::sqlite3_command cmd(*con,"insert into records values (?,?,?,?,?,?);"); cmd.bind(1,(sqlite3x::int64_t)Omega::instance().getCurrentIteration()); cmd.bind(2,Omega::instance().getComputationTime()); cmd.bind(3,Omega::instance().getSimulationTime()); cmd.bind(4,PeriodicEngine::getClock()); cmd.bind(5,perBodyTable); cmd.bind(6,""); cmd.executenonquery(); }
+	{	sqlite3x::sqlite3_command cmd(*con,"insert into records values (?,?,?,?,?,?);"); cmd.bind(1,(sqlite3x::int64_t)Omega::instance().getCurrentIteration()); cmd.bind(2,(double)Omega::instance().getComputationTime()); cmd.bind(3,(double)Omega::instance().getSimulationTime()); cmd.bind(4,(double)PeriodicEngine::getClock()); cmd.bind(5,perBodyTable); cmd.bind(6,""); cmd.executenonquery(); }
 
 	// loop over bodies
 	sqlite3x::sqlite3_transaction transaction(*con);
@@ -84,12 +84,12 @@ void SQLiteRecorder::action(MetaBody* rootBody){
 			size_t field=1; cmd.bind(field++,b->getId());
 			if(recActive[REC_SE3]){
 				const Se3r& se3=b->physicalParameters->se3;
-				cmd.bind(field++,se3.position[0]); cmd.bind(field++,se3.position[1]); cmd.bind(field++,se3.position[2]);
-				cmd.bind(field++,se3.orientation[0]); cmd.bind(field++,se3.orientation[1]); cmd.bind(field++,se3.orientation[2]); cmd.bind(field++,se3.orientation[3]);
+				cmd.bind(field++,(double)se3.position[0]); cmd.bind(field++,(double)se3.position[1]); cmd.bind(field++,(double)se3.position[2]);
+				cmd.bind(field++,(double)se3.orientation[0]); cmd.bind(field++,(double)se3.orientation[1]); cmd.bind(field++,(double)se3.orientation[2]); cmd.bind(field++,(double)se3.orientation[3]);
 			}
 			if(recActive[REC_RGB]){
 				const Vector3r& color=b->geometricalModel->diffuseColor;
-				cmd.bind(field++,color[0]); cmd.bind(field++,color[1]); cmd.bind(field++,color[2]);
+				cmd.bind(field++,(double)color[0]); cmd.bind(field++,(double)color[1]); cmd.bind(field++,(double)color[2]);
 			}
 			assert(field-1==columns.size());
 			cmd.executenonquery();

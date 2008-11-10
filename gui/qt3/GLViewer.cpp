@@ -471,7 +471,7 @@ void GLViewer::postDraw(){
 			}
 			glLineWidth(1.);
 			glEnable(GL_DEPTH_TEST);
-			QGLViewer::drawText(scaleCenter[0],scaleCenter[1],QString().sprintf("%.3g",scaleStep));
+			QGLViewer::drawText(scaleCenter[0],scaleCenter[1],QString().sprintf("%.3g",(double)scaleStep));
 		stopScreenCoordinatesSystem();
 	}
 
@@ -487,7 +487,7 @@ void GLViewer::postDraw(){
 			glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 			Real cff=1;
 			if(!renderer->clipPlaneActive[planeId]) cff=.4;
-			glColor3f(max(0.,cff*cos(planeId)),max(0.,cff*sin(planeId)),planeId==manipulatedClipPlane); // variable colors
+			glColor3f(max((Real)0.,cff*cos(planeId)),max((Real)0.,cff*sin(planeId)),planeId==manipulatedClipPlane); // variable colors
 			QGLViewer::drawGrid(realSize,2*nSegments);
 			drawArrow(wholeDiameter/6);
 		glPopMatrix();

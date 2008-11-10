@@ -10,7 +10,6 @@
 #include "MetaBody.hpp"
 #include "FileGenerator.hpp"
 #include <iostream>
-#include <boost/shared_ptr.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -207,7 +206,7 @@ int NullGUI::gen()
 		"(if output file is specified inside generator config, then specify \"none\")\n", exit(0);
 	if(file.empty())
 		std::cerr << "please specify config file name with -f\n", exit(0);
-	boost::shared_ptr<Factorable> tmpf;
+	shared_ptr<Factorable> tmpf;
 	try
 	{
 		tmpf = ClassFactory::instance().createShared(filegen);
@@ -216,7 +215,7 @@ int NullGUI::gen()
 	{
 		std::cerr << filegen << " is not available: " << e.what() << "\n", exit(0);
 	}
-	boost::shared_ptr<FileGenerator> f = dynamic_pointer_cast<FileGenerator>(tmpf);
+	shared_ptr<FileGenerator> f = dynamic_pointer_cast<FileGenerator>(tmpf);
 	if( f == 0 )
 		std::cerr << filegen << " is not a FileGenerator.\n", exit(0);
 	try

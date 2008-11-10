@@ -47,20 +47,28 @@ bool isFundamental(Type& )
 			typeid(Type)==typeid(string) 		|| // std::string
 			typeid(Type)==typeid(Vector2f)		||
 			typeid(Type)==typeid(Vector2d)		||
+			typeid(Type)==typeid(Vector2<long double>)		||
 			typeid(Type)==typeid(Vector3f)		||
 			typeid(Type)==typeid(Vector3d)		||
+			typeid(Type)==typeid(Vector3<long double>)		||
 			typeid(Type)==typeid(Vector4f)		||
 			typeid(Type)==typeid(Vector4d)		||
+			typeid(Type)==typeid(Vector4<long double>)		||
 			typeid(Type)==typeid(Matrix2f)		||
 			typeid(Type)==typeid(Matrix2d)		||
+			typeid(Type)==typeid(Matrix2<long double>)		||
 			typeid(Type)==typeid(Matrix3f)		||
 			typeid(Type)==typeid(Matrix3d)		||
+			typeid(Type)==typeid(Matrix3<long double>)		||
 			typeid(Type)==typeid(Matrix4f)		||
 			typeid(Type)==typeid(Matrix4d)		||
+			typeid(Type)==typeid(Matrix4<long double>)		||
 			typeid(Type)==typeid(Quaternionf)	||
 			typeid(Type)==typeid(Quaterniond)	||
+			typeid(Type)==typeid(Quaternion<long double>)	||
 			typeid(Type)==typeid(Se3f)		||
-			typeid(Type)==typeid(Se3d)
+			typeid(Type)==typeid(Se3d) ||
+			typeid(Type)==typeid(Se3<long double>)
 		);
 }
 

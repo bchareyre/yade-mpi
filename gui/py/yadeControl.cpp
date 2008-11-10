@@ -13,7 +13,6 @@
 #include<boost/filesystem/operations.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/any.hpp>
-#include<boost/shared_ptr.hpp>
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
 #include<boost/algorithm/string.hpp>

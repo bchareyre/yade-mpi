@@ -12,7 +12,6 @@
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/core/PhysicalAction.hpp>
-#include<boost/shared_ptr.hpp>
 #include<iostream>
 
 using namespace boost;

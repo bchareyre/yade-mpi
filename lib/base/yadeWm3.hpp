@@ -1,10 +1,11 @@
 #pragma once
 
 
-#ifndef SINGLE_PRECISION
-	typedef double Real;
+#ifdef QUAD_PRECISION
+	typedef long double quad;
+	typedef quad Real;
 #else
-	typedef float Real;
+	typedef double Real;
 #endif
 
 namespace Wm3 {

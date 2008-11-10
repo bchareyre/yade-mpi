@@ -651,19 +651,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	makeItFlat->plane_position = (lowerCorner[2]+upperCorner[2])*0.5;
 	makeItFlat->reset_force = false;	
 
-	#if 0	
-	// moving walls to regulate the stress applied
-	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
-	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
-	triaxialstressController-> sigma_iso = sigma_iso;
-	triaxialstressController-> max_vel = 0.0001;
-	triaxialstressController-> thickness = thickness;
-	triaxialstressController->wall_bottom_activated = false;
-	triaxialstressController->wall_top_activated = false;	
-		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	#endif
-	
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));

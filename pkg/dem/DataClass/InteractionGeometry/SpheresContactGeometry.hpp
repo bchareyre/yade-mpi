@@ -91,6 +91,8 @@ class SpheresContactGeometry: public InteractionGeometry{
 		virtual ~SpheresContactGeometry();
 	protected :
 		virtual void registerAttributes(){
+			REGISTER_ATTRIBUTE(normal);
+			REGISTER_ATTRIBUTE(contactPoint);
 			REGISTER_ATTRIBUTE(radius1);
 			REGISTER_ATTRIBUTE(radius2);
 			REGISTER_ATTRIBUTE(contactPoint); // to allow access from python

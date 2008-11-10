@@ -5,7 +5,6 @@
 YADE_PLUGIN(/* self-contained in hpp: */ "TetraMold", "TetraBang", "Tetrahedron2TetraMold","TetraAABB", 
 	/* some code in cpp (this file): */ "TetraLaw",	 "Tetra2TetraBang","TetraDraw");
 
-#include<boost/shared_ptr.hpp>
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/PhysicalAction.hpp>
@@ -422,7 +421,7 @@ void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<P
 	if (0) { // wireframe, as for Tetrahedron
 		glDisable(GL_LIGHTING);
 		glBegin(GL_LINES);
-			#define __ONEWIRE(a,b) glVertex3dv(t->v[a]);glVertex3dv(t->v[b])
+			#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
 				__ONEWIRE(0,1);__ONEWIRE(0,2);__ONEWIRE(0,3);__ONEWIRE(1,2);__ONEWIRE(1,3);__ONEWIRE(2,3);
 			#undef __ONEWIRE
 		glEnd();
@@ -432,7 +431,7 @@ void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<P
 		Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
 		glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 		glBegin(GL_TRIANGLES);
-			#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3dv(n); glVertex3dv(t->v[a]); glVertex3dv(t->v[b]); glVertex3dv(t->v[c]);
+			#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
 				__ONEFACE(3,0,1);
 				__ONEFACE(0,1,2);
 				__ONEFACE(1,2,3);

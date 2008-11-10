@@ -13,7 +13,13 @@
 
 #include <boost/any.hpp>
 #include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include<boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include<memory>
+	using std::shared_ptr;
+#endif
 #include <boost/type_traits.hpp>
 #include <boost/lexical_cast.hpp>
 #include <list>

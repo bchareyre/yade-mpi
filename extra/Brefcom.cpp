@@ -209,9 +209,9 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 	Vector3r lineColor=Shop::scalarOnColorScale(1.-BC->relResidualStrength);
 
 	if(colorStrain) lineColor=Vector3r(
-		min(1.,max(0.,-BC->epsTrans/BC->epsCrackOnset)),
-		min(1.,max(0.,BC->epsTrans/BC->epsCrackOnset)),
-		min(1.,max(0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
+		min((Real)1.,max((Real)0.,-BC->epsTrans/BC->epsCrackOnset)),
+		min((Real)1.,max((Real)0.,BC->epsTrans/BC->epsCrackOnset)),
+		min((Real)1.,max((Real)0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
 
 	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
 	if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }

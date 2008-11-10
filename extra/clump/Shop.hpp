@@ -7,7 +7,6 @@
 #include<iostream>
 #include<typeinfo>
 #include<boost/any.hpp>
-#include<boost/shared_ptr.hpp>
 #include<boost/lambda/lambda.hpp>
 
 #include<Wm3Vector3.h>

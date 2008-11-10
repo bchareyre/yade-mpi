@@ -42,7 +42,7 @@ void UniaxialStrainer::init(){
 
 	originalLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 	LOG_DEBUG("Reference particles: positive #"<<posIds[0]<<" at "<<axisCoord(posIds[0])<<"; negative #"<<negIds[0]<<" at "<<axisCoord(negIds[0]));
-	LOG_INFO("Setting initial length to "<<originalLength);
+	LOG_INFO("Setting initial length to "<<originalLength<<" (between #"<<negIds[0]<<" and #"<<posIds[0]<<")");
 	if(originalLength<=0) LOG_FATAL("Initial length is negative or zero (swapped reference particles?)! "<<originalLength);
 	/* this happens is nan propagates from e.g. brefcom consitutive law in case 2 bodies have _exactly_ the same position
 	 * (the the normal strain is 0./0.=nan). That is an user's error, however and should not happen. */

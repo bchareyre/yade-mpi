@@ -14,7 +14,6 @@
 #include<yade/lib-factory/Factorable.hpp>
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 class Serializable;
 class Archive;

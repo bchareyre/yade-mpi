@@ -16,7 +16,6 @@
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/lib-factory/Factorable.hpp>
-#include<boost/shared_ptr.hpp>
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/AABB.hpp>

@@ -92,7 +92,7 @@ class BrefcomContact: public NormalShearInteraction {
 
 
 		virtual void registerAttributes(){
-			InteractionPhysics::registerAttributes();
+			NormalShearInteraction::registerAttributes();
 			REGISTER_ATTRIBUTE(E);
 			REGISTER_ATTRIBUTE(G);
 			REGISTER_ATTRIBUTE(tanFrictionAngle);

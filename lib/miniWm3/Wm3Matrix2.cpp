@@ -26,3 +26,10 @@ template<> const Matrix2<double> Matrix2<double>::IDENTITY(
     1.0,0.0,
     0.0,1.0);
 
+
+template<> const Matrix2<long double> Matrix2<long double>::ZERO(
+    0.0,0.0,
+    0.0,0.0);
+template<> const Matrix2<long double> Matrix2<long double>::IDENTITY(
+    1.0,0.0,
+    0.0,1.0);

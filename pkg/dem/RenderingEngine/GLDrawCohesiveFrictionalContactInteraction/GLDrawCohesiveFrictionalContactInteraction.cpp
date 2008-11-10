@@ -40,7 +40,7 @@ void GLDrawCohesiveFrictionalContactInteraction::drawAxis(const Vector3r pos,con
 	glPushMatrix();
 	glTranslatev(pos);
 	quaterniontoGLMatrix(q,matrix);
-	glMultMatrixd(matrix);
+	glMultMatrix(matrix);
 	QGLViewer::drawAxis(size);
 	glPopMatrix();
 
@@ -218,8 +218,8 @@ if(wireFrame)
 	glPushMatrix();
 	glTranslatev(pos1);
 	quaterniontoGLMatrix(b1->physicalParameters->se3.orientation * ph->orientationToContact1,matrix);
-	glMultMatrixd(matrix);
-	glTranslate(sc->radius1,0.0,0.0);
+	glMultMatrix(matrix);
+	glTranslate(sc->radius1,(Real)0.0,(Real)0.0);
 	glutSolidSphere(size*0.1,4,4);
 	glPopMatrix();
 
@@ -227,8 +227,8 @@ if(wireFrame)
 	glPushMatrix();
 	glTranslatev(pos2);
 	quaterniontoGLMatrix(b2->physicalParameters->se3.orientation * ph->orientationToContact2,matrix);
-	glMultMatrixd(matrix);
-	glTranslate(-1.0*sc->radius2,0.0,0.0);
+	glMultMatrix(matrix);
+	glTranslate(-1.0*sc->radius2,(Real)0.0,(Real)0.0);
 	glutSolidSphere(size*0.1,4,4);
 	glPopMatrix();
 

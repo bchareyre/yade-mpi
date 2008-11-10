@@ -1151,7 +1151,7 @@ Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, con
  *
  */
 Vector3r Shop::scalarOnColorScale(Real x, Real xmin, Real xmax){
-	Real xnorm=min(1.,max((x-xmin)/(xmax-xmin),0.));
+	Real xnorm=min((Real)1.,max((x-xmin)/(xmax-xmin),(Real)0.));
 	if(xnorm<.25) return Vector3r(0,.4*xnorm,1);
 	if(xnorm<.5)  return Vector3r(0,1,1.-4.*(xnorm-.25));
 	if(xnorm<.75) return Vector3r(4*(xnorm-.5),1.,0);

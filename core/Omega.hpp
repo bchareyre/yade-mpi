@@ -35,7 +35,6 @@
 #include <time.h>
 #include <boost/thread/thread.hpp>
 #include <iostream>
-#include <boost/shared_ptr.hpp>
 
 #include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>

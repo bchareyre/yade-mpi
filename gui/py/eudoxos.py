@@ -57,7 +57,7 @@ def oofemTextExport():
 	The format is line-oriented as follows:
 		# 3 lines of material parameters:
 		1. E G # elastic
-		2. epsCrackOnset epsFr expBending xiShear #tension
+		2. epsCrackOnset relDuctility xiShear transStrainCoeff #tension; epsFr=epsCrackOnset*relDuctility
 		3. cohesionT tanPhi # shear
 		4. [number of spheres] [number of links]
 		5. id x y z r -1/0/1[on negative/no/positive boundary] # spheres
@@ -89,6 +89,48 @@ def oofemTextExport():
 		interactions.append("%d %d %g %g %g %g"%(i.id1,i.id2,cp[0],cp[1],cp[2],i.phys['crossSection']))
 
 	return material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions
+
+def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
+	from yade.wrapper import Omega
+	material,bodies,interactions=[],[],[]
+	o=Omega()
+	strainers=[e for e in o.engines if e.name=='UniaxialStrainer']
+	if len(strainers)>0:
+		strainer=strainers[0]
+		posIds,negIds=strainer['posIds'],strainer['negIds']
+	else: strainer=None
+	f=open(fileBase+'.in','w')
+	# header
+	f.write(fileBase+'.out\n')
+	f.write((title if title else 'Yade simulation for '+fileBase)+'\n')
+	f.write("NonLinearStatic nsteps 2 contextOutputStep 1 rtolv 1.e-2 stiffMode 2 maxiter 50 controllmode 1 nmodules 0\n")
+	f.write("domain 3dShell\n")
+	f.write("OutputManager tstep_all dofman_all element_all\n")
+	inters=[i for i in o.interactions if (i.geom and i.phys)]
+	f.write("ndofman %d nelem %d ncrosssect 1 nmat 1 nbc 2 nic 0 nltf 1 nbarrier 0\n"%(len(o.bodies)+2,len(inters)))
+	# elements
+	f.write("Node 1 coords 3 0.0 0.0 0.0 bc 6 1 1 1 1 1 1\n")
+	f.write("Node 2 coords 3 0.0 0.0 0.0 bc 6 1 2 1 1 1 1\n")
+	for b in o.bodies:
+		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
+		if b.id in negIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 1 0 0 0 0 ")
+		elif b.id in posIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 2 0 0 0 0 0")
+		f.write('\n')
+	j=1
+	for i in inters:
+		f.write('CohSur3d %d nodes 2 %d %d mat 1 crossSect 1 area %g\n'%(j,i.id1+3,i.id2+3,i.phys['crossSection']))
+		j+=1
+	# crosssection
+	f.write("SimpleCS 1 thick 1.0 width 1.0\n")
+	# material
+	ph=inters[0].phys
+	f.write("CohInt 1 kn %g ks %g e0 %g ef %g c 0. ksi %g coh %g tanphi %g d 1.0\n"%(ph['E'],ph['G'],ph['epsCrackOnset'],ph['epsFracture'],ph['xiShear'],ph['undamagedCohesion'],ph['tanFrictionAngle']))
+	# boundary conditions
+	f.write('BoundaryCondition 1 loadTimeFunction 1 prescribedvalue 0.0\n')
+	f.write('BoundaryCondition 2 loadTimeFunction 1 prescribedvalue 1.e-4\n')
+	f.write('PiecewiseLinFunction 1 npoints 3 t 3 0. 10. 1000.  f(t) 3 0. 10. 1000.\n')
+
+
 
 
 

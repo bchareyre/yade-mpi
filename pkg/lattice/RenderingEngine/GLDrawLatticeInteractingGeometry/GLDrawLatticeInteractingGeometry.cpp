@@ -178,16 +178,16 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 					p3 = static_cast<LatticeNodeParameters*>(((*(bodies))[C])->physicalParameters.get())->se3.position;
 	
 					Vector3r normal = (p2 - p1).UnitCross(p3 - p1);
-					glNormal3dv(normal);
-					glVertex3dv(p1+normal*maxLen*0.01);
-					glVertex3dv(p2+normal*maxLen*0.01);
-					glVertex3dv(p3+normal*maxLen*0.01);
+					glNormal3v(normal);
+					glVertex3v(p1+normal*maxLen*0.01);
+					glVertex3v(p2+normal*maxLen*0.01);
+					glVertex3v(p3+normal*maxLen*0.01);
 	
 					normal*=-1.0;
-					glNormal3dv(normal);
-					glVertex3dv(p1+normal*maxLen*0.01);
-					glVertex3dv(p2+normal*maxLen*0.01);
-					glVertex3dv(p3+normal*maxLen*0.01);
+					glNormal3v(normal);
+					glVertex3v(p1+normal*maxLen*0.01);
+					glVertex3v(p2+normal*maxLen*0.01);
+					glVertex3v(p3+normal*maxLen*0.01);
 				}
 			}
 			else

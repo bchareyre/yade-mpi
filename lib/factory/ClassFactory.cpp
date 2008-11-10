@@ -35,7 +35,7 @@ bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorable
 	return tmp;
 }
 
-boost::shared_ptr<Factorable> ClassFactory::createShared( std::string name )
+shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 {
 #if 0
 	cerr<<"Creating shared lib: "<<name<<"\n";

@@ -58,21 +58,27 @@ template< typename Type > inline void glRasterPos4v	( const Type )			{	static_as
 template< typename Type > inline void glRect		( Type ,Type ,Type , Type  )	{	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glMaterial	( GLenum face, GLenum pname, Type param ){	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 template< typename Type > inline void glMaterialv	( GLenum face, GLenum pname, Type param ){	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
+template< typename Type > inline void glMultMatrix	(const Type*){	static_assert<false> GL_OpenGLWrapper_bad_type;(void) GL_OpenGLWrapper_bad_type; };
 
 
 ///	Template Specializations
-
+template< > inline void glMultMatrix<double>(const double* m){glMultMatrixd(m);	};
+template< > inline void glMultMatrix<long double>(const long double* m){double mm[16]; for(int i=0;i<16;i++)mm[i]=(double)m[i]; glMultMatrixd(mm);};
 
 template< > inline void glRotate< double >			(double angle,double x,double y, double z )	{	glRotated(angle,x,y,z);	};
 template< > inline void glRotate< float >			(float angle,float x,float y, float z )	{	glRotatef(angle,x,y,z);	};
 
 template< > inline void glScale< double >			( double x,double y, double z )		{	glScaled(x,y,z);	};
+template< > inline void glScale< long double >			( long double x,long double y, long double z )		{	glScaled(x,y,z);	};
 template< > inline void glScale< float >			( float x,float y,float z )		{	glScalef(x,y,z);	};
+template< > inline void glScalev< Vector3<long double> >		( const Vector3<long double> v )		{	glScaled(v[0],v[1],v[2]);};
 template< > inline void glScalev< Vector3<double> >		( const Vector3<double> v )		{	glScaled(v[0],v[1],v[2]);};
 template< > inline void glScalev< Vector3<float> >		( const Vector3<float> v )		{	glScalef(v[0],v[1],v[2]);};
 
 template< > inline void glTranslate< double >			( double x,double y, double z )		{	glTranslated(x,y,z);	};
+template< > inline void glTranslate< long double >			( long double x, long double y, long double z )		{	glTranslated(x,y,z);	};
 template< > inline void glTranslate< float >			( float x,float y,float z )		{	glTranslatef(x,y,z);	};
+template< > inline void glTranslatev< Vector3<long double> >		( const Vector3<long double> v )		{	glTranslated(v[0],v[1],v[2]);};
 template< > inline void glTranslatev< Vector3<double> >		( const Vector3<double> v )		{	glTranslated(v[0],v[1],v[2]);};
 template< > inline void glTranslatev< Vector3<float> >		( const Vector3<float> v )		{	glTranslatef(v[0],v[1],v[2]);};
 
@@ -98,6 +104,7 @@ template< > inline void glVertex2v< Vector3<int> >		( const Vector3<int> v )		{	
 template< > inline void glVertex2v< Vector3<short> >		( const Vector3<short> v )		{	glVertex2sv(v);		};
 
 template< > inline void glVertex3v< Vector3<double> >		( const Vector3<double> v )		{	glVertex3dv(v);		};
+template< > inline void glVertex3v< Vector3<long double> >		( const Vector3<long double> v )		{	glVertex3d(v[0],v[1],v[2]);		};
 template< > inline void glVertex3v< Vector3<float> >		( const Vector3<float> v )		{	glVertex3fv(v);		};
 template< > inline void glVertex3v< Vector3<int> >		( const Vector3<int> v )		{	glVertex3iv(v);		};
 template< > inline void glVertex3v< Vector3<short> >		( const Vector3<short> v )		{	glVertex3sv(v);		};
@@ -115,6 +122,7 @@ template< > inline void glNormal3< short >			(short nx,short ny,short nz )		{	gl
 
 template< > inline void glNormal3v< Vector3<signed char> >	( const Vector3<signed char> v )	{	glNormal3bv(v);		};
 template< > inline void glNormal3v< Vector3<double> >		( const Vector3<double> v )		{	glNormal3dv(v);		};
+template< > inline void glNormal3v< Vector3<long double> >		( const Vector3<long double> v )		{	glNormal3d(v[0],v[1],v[2]);		};
 template< > inline void glNormal3v< Vector3<float> >		( const Vector3<float> v )		{	glNormal3fv(v);		};
 template< > inline void glNormal3v< Vector3<int> >		( const Vector3<int> v )		{	glNormal3iv(v);		};
 template< > inline void glNormal3v< Vector3<short> >		( const Vector3<short> v )		{	glNormal3sv(v);		};
@@ -133,6 +141,7 @@ template< > inline void glIndexv<const Vector3<unsigned char> >( const Vector3<u
 
 template< > inline void glColor3< signed char >		(signed char red,signed char green,signed char blue )					{	glColor3b(red,green,blue);	};
 template< > inline void glColor3< double >			(double red,double green,double blue )							{	glColor3d(red,green,blue);	};
+template< > inline void glColor3< long double >			(long double red,long double green,long double blue )							{	glColor3d(red,green,blue);	};
 template< > inline void glColor3< float >			(float red,float green,float blue )							{	glColor3f(red,green,blue);	};
 template< > inline void glColor3< int >			(int red,int green,int blue )								{	glColor3i(red,green,blue);	};
 template< > inline void glColor3< short >			(short red,short green,short blue )							{	glColor3s(red,green,blue);	};
@@ -152,6 +161,7 @@ template< > inline void glColor4< unsigned short >		(unsigned short red,unsigned
 
 template< > inline void glColor3v< Vector3<signed char> >	( const Vector3<signed char> v )	{	glColor3bv(v);		};
 template< > inline void glColor3v< Vector3<double> >		( const Vector3<double> v )		{	glColor3dv(v);		};
+template< > inline void glColor3v< Vector3<long double> >		( const Vector3<long double> v )		{	glColor3d(v[0],v[1],v[2]);		};
 template< > inline void glColor3v< Vector3<float> >		( const Vector3<float> v )		{	glColor3fv(v);		};
 template< > inline void glColor3v< Vector3<int> >		( const Vector3<int> v )		{	glColor3iv(v);		};
 template< > inline void glColor3v< Vector3<short> >		( const Vector3<short> v )		{	glColor3sv(v);		};

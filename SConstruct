@@ -139,6 +139,7 @@ opts.AddOptions(
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
+	BoolOption('QUAD_PRECISION','typedef Real as long double (=quad)',0),
 	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
 	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolOption('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
@@ -383,6 +384,7 @@ runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x.replace('/',
 
 ### PREPROCESSOR FLAGS
 env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"')])
+if env['QUAD_PRECISION']: env.Append(CPPDEFINES='QUAD_PRECISION')
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])

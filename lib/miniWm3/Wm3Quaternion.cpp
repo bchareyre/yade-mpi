@@ -24,3 +24,9 @@ template<> const Quaternion<double>
     Quaternion<double>::ZERO(0.0,0.0,0.0,0.0);
 template<> int Quaternion<double>::ms_iNext[3] = { 1, 2, 0 };
 
+template<> const Quaternion<long double>
+    Quaternion<long double>::IDENTITY(1.0,0.0,0.0,0.0);
+template<> const Quaternion<long double>
+    Quaternion<long double>::ZERO(0.0,0.0,0.0,0.0);
+template<> int Quaternion<long double>::ms_iNext[3] = { 1, 2, 0 };
+

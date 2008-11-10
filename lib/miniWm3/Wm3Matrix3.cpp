@@ -30,3 +30,12 @@ template<> const Matrix3<double> Matrix3<double>::IDENTITY(
     0.0,1.0,0.0,
     0.0,0.0,1.0);
 
+template<> const Matrix3<long double> Matrix3<long double>::ZERO(
+    0.0,0.0,0.0,
+    0.0,0.0,0.0,
+    0.0,0.0,0.0);
+template<> const Matrix3<long double> Matrix3<long double>::IDENTITY(
+    1.0,0.0,0.0,
+    0.0,1.0,0.0,
+    0.0,0.0,1.0);
+

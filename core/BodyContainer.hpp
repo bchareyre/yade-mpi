@@ -12,7 +12,6 @@
 
 #include<iostream>
 #include<boost/range.hpp>
-#include<boost/shared_ptr.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 
 class Body;

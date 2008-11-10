@@ -12,7 +12,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-dem/InteractingMyTetrahedron.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
-#include <boost/shared_ptr.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>

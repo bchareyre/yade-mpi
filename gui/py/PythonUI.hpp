@@ -1,7 +1,6 @@
 // © 2007 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/FrontEnd.hpp>
-#include<boost/shared_ptr.hpp>
 #include<termios.h>
 
 class PythonUI: public FrontEnd

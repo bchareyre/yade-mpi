@@ -12,9 +12,10 @@
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<boost/thread/mutex.hpp>
-#include<boost/shared_ptr.hpp>
 #include<iostream>
 #include<boost/range.hpp>
+
+
 
 #include<yade/core/Interaction.hpp>
 

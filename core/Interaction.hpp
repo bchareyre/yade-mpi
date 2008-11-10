@@ -2,10 +2,11 @@
 //  Copyright (C) 2004 by Janek Kozicki <cosurgi@berlios.de>
 //
 #pragma once
-#include<boost/shared_ptr.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 #include"InteractionGeometry.hpp"
 #include"InteractionPhysics.hpp"
+
+
 
 /////////////////////////////////
 // FIXME - this is in wrong file!

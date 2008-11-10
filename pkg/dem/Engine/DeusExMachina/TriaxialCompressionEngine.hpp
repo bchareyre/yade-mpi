@@ -88,7 +88,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real& uniaxialEpsilonCurr;
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
-		//! Previous state (used to detect manual changes of the state in .xml)
+		//! document TODO
 		Real spheresVolume;
 		//! Value of spheres volume 
 		Real boxVolume;
@@ -100,6 +100,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real fixedPorosity;
 		//! Value of porosity chosen by the user
 
+		//! Previous state (used to detect manual changes of the state in .xml)
 		stateNum previousState;
 		//Vector3r strain;
 		Vector3r translationAxis;

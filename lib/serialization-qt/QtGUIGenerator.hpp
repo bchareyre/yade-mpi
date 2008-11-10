@@ -12,7 +12,6 @@
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include <map>
 #include <vector>
-#include <boost/shared_ptr.hpp>
 #include <qobject.h>
 #include <qlabel.h>
 #include <qobject.h>

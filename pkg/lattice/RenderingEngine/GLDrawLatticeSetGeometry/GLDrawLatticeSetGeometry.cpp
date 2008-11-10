@@ -211,12 +211,12 @@ void GLDrawLatticeSetGeometry::go(const shared_ptr<GeometricalModel>& gm, const 
 			glColor3f(0.4,0.4,1.0);
 			for(int i=0;i<3*nbTriangles;++i)
 			{
-				glNormal3dv(normals[i]);
-				glVertex3dv(triangles[i]);
-				glNormal3dv(normals[++i]);
-				glVertex3dv(triangles[i]);
-				glNormal3dv(normals[++i]);
-				glVertex3dv(triangles[i]);
+				glNormal3v(normals[i]);
+				glVertex3v(triangles[i]);
+				glNormal3v(normals[++i]);
+				glVertex3v(triangles[i]);
+				glNormal3v(normals[++i]);
+				glVertex3v(triangles[i]);
 			}
 		glEnd();
 	

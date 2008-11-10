@@ -36,6 +36,17 @@ template<> const double Math<double>::INV_TWO_PI = 1.0/Math<double>::TWO_PI;
 template<> const double Math<double>::DEG_TO_RAD = Math<double>::PI/180.0;
 template<> const double Math<double>::RAD_TO_DEG = 180.0/Math<double>::PI;
 
+template<> const long double Math<long double>::EPSILON = DBL_EPSILON;
+template<> const long double Math<long double>::ZERO_TOLERANCE = 1e-80;
+template<> const long double Math<long double>::MAX_REAL = DBL_MAX;
+template<> const long double Math<long double>::PI = 4.0*atan(1.0);
+template<> const long double Math<long double>::TWO_PI = 2.0*Math<long double>::PI;
+template<> const long double Math<long double>::HALF_PI = 0.5*Math<long double>::PI;
+template<> const long double Math<long double>::INV_PI = 1.0/Math<long double>::PI;
+template<> const long double Math<long double>::INV_TWO_PI = 1.0/Math<long double>::TWO_PI;
+template<> const long double Math<long double>::DEG_TO_RAD = Math<long double>::PI/180.0;
+template<> const long double Math<long double>::RAD_TO_DEG = 180.0/Math<long double>::PI;
+
 //----------------------------------------------------------------------------
 /*
  * Those are nice, but they are not used anywhere in yade !

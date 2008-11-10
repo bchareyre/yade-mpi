@@ -411,7 +411,7 @@ void SimulationController::doUpdate(){
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
 
 	char strStep[64];
-	snprintf(strStep,64,"step %g",Omega::instance().getTimeStep());
+	snprintf(strStep,64,"step %g",(double)Omega::instance().getTimeStep());
 	labelStep->setText(string(strStep));
 
 	changeSkipTimeStepper = false;

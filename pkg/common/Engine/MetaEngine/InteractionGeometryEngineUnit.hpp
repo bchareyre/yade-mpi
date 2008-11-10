@@ -14,7 +14,6 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/EngineUnit2D.hpp>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
 
 /*! \brief

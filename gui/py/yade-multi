@@ -129,7 +129,7 @@ print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
 batches=[]
 for l in useLines:
 	logFile=logFormat.replace('%',str(l))
-	batches.append('PARAM_TABLE=%s:%d nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,nice,executable,simul,logFile))
+	batches.append('PARAM_TABLE=%s:%d nice -n %d %s -N PythonUI -- -n %s > %s 2>&1'%(table,l,nice,executable,simul,logFile))
 print "Job summary:"
 for i in range(len(batches)):
 	print '   #%d:'%i, batches[i]

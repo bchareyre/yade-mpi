@@ -3,7 +3,6 @@
 #include<boost/any.hpp>
 #include<map>
 #include<vector>
-#include<boost/shared_ptr.hpp>
 #include<yade/lib-serialization/Archive.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<boost/python.hpp>

@@ -7,9 +7,13 @@
 *************************************************************************/
 
 #include "FileDialog.hpp"
-#include <boost/shared_ptr.hpp>
-
-using namespace boost;
+#ifndef  __GXX_EXPERIMENTAL_CXX0X__
+#	include<boost/shared_ptr.hpp>
+	using boost::shared_ptr;
+#else
+#	include<memory>
+	using std::shared_ptr;
+#endif
 
 FileDialog::FileDialog (const QString& directory,const QString& filters,const string& caption,QWidget* parent) : QFileDialog(directory,filters,parent,"FileDialog",false)
 {	

@@ -25,3 +25,10 @@ template<> const Vector4<double> Vector4<double>::UNIT_Y(0.0,1.0,0.0,0.0);
 template<> const Vector4<double> Vector4<double>::UNIT_Z(0.0,0.0,1.0,0.0);
 template<> const Vector4<double> Vector4<double>::UNIT_W(0.0,0.0,0.0,1.0);
 template<> const Vector4<double> Vector4<double>::ONE(1.0,1.0,1.0,1.0);
+
+template<> const Vector4<long double> Vector4<long double>::ZERO(0.0,0.0,0.0,0.0);
+template<> const Vector4<long double> Vector4<long double>::UNIT_X(1.0,0.0,0.0,0.0);
+template<> const Vector4<long double> Vector4<long double>::UNIT_Y(0.0,1.0,0.0,0.0);
+template<> const Vector4<long double> Vector4<long double>::UNIT_Z(0.0,0.0,1.0,0.0);
+template<> const Vector4<long double> Vector4<long double>::UNIT_W(0.0,0.0,0.0,1.0);
+template<> const Vector4<long double> Vector4<long double>::ONE(1.0,1.0,1.0,1.0);
