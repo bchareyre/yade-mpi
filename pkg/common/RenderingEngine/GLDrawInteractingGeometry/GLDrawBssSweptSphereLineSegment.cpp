@@ -59,9 +59,9 @@ void GLDrawBssSweptSphereLineSegment::go(const shared_ptr<InteractingGeometry>& 
   
   // It is not very elegant but it provides assistance
   // TODO - write a gl-list that draw 2 halh spheres 
-  glTranslate(-half_length, 0.0, 0.0);
+  glTranslate((double)(-half_length), 0.0, 0.0);
   gluSphere(quadric, radius, 5, 5);
-  glTranslate(2.0*half_length, 0.0, 0.0);
+  glTranslate((double)(2.0*half_length), 0.0, 0.0);
   gluSphere(quadric, radius, 5, 5);
 }
 

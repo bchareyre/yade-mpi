@@ -92,7 +92,7 @@ class AttrAccess{
 		//! maps attribute name to its archive and vector of its types (given as ints, from the following enum)
 		DescriptorMap descriptors;
 		//! allowed types
-		enum {BOOL,STRING,NUMBER, SEQ_NUMBER, SEQ_STRING, VEC_VEC }; // allowed types
+		enum {BOOL,STRING,FLOAT,INTEGER,SEQ_FLOAT, SEQ_STRING, VEC_VEC }; // allowed types
 		
 		AttrAccess(Serializable* _ser): ser(shared_ptr<Serializable>(_ser)){init();}
 		AttrAccess(shared_ptr<Serializable> _ser):ser(_ser){init();}
@@ -108,10 +108,11 @@ class AttrAccess{
 					desc.archive=*ai;
 					any instance=(*ai)->getAddress(); // gets pointer to the stored value
 					//cerr<<"["<<(*ai)->getName()<<","<<instance.type().name()<<"]";
-					// 3 possibilities: one BOOL, one or more STRINGS, one or more NUMBERs (fallback if none matches)
+					// 3 possibilities: one BOOL, one or more STRINGS, one or more FLOATs (fallback if none matches)
 					if      (any_cast<string*>(&instance)) { desc.type=AttrAccess::STRING; goto found; }
 					else if (any_cast<bool*>(&instance)) { desc.type=AttrAccess::BOOL; goto found; }
-					else if (any_cast<Real*>(&instance) || any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) { desc.type=AttrAccess::NUMBER; goto found;}
+					else if (any_cast<Real*>(&instance) || any_cast<long double*>(&instance) || any_cast<double*>(&instance) || any_cast<float*>(&instance)) { desc.type=AttrAccess::FLOAT; goto found;}
+					else if (any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) {desc.type=AttrAccess::INTEGER; goto found; }
 					else if (any_cast<vector<string>*>(&instance)) { desc.type=AttrAccess::SEQ_STRING; goto found; }
 				#if 0
 					else if (any_cast<vector<Vector3r>*>(&instance)) { cerr<<"WWWWWWWWWWWWW"<<endl;}
@@ -121,10 +122,10 @@ class AttrAccess{
 					else if (any_cast<vector<Wm3::Vector3<double> >*>(&instance)) {
 						desc.type=AttrAccess::VEC_VEC;
 						cerr<<"Attribute "<<(*ai)->getName()<<" is a vector<Vector3r>";
-					//else if (any_cast<vector<Real>*>(&instance)) desc.type=AttrAccess::SEQ_NUMBER;
+					//else if (any_cast<vector<Real>*>(&instance)) desc.type=AttrAccess::SEQ_FLOAT;
 					}
 				#endif
-					desc.type=AttrAccess::SEQ_NUMBER;
+					desc.type=AttrAccess::SEQ_FLOAT;
 					found:
 						descriptors[(*ai)->getName()]=desc;
 				}
@@ -145,7 +146,7 @@ class AttrAccess{
 		string dumpAttr(string name){
 			string vals,types; AttrDesc desc=descriptors[name]; vector<string> values=getAttrStr(name);
 			for(size_t i=0; i<values.size(); i++) vals+=(i>0?" ":"")+values[i];
-			string typeDesc(desc.type==BOOL?"BOOL":(desc.type==STRING?"STRING":(desc.type==NUMBER?"NUMBER":(desc.type==SEQ_NUMBER?"SEQ_NUMBER":(desc.type==SEQ_STRING?"SEQ_STRING":(desc.type==VEC_VEC?"VEC_VEC":"<unknown>"))))));
+			string typeDesc(desc.type==BOOL?"BOOL":(desc.type==STRING?"STRING":(desc.type==FLOAT?"FLOAT":(desc.type==INTEGER?"INTEGER":(desc.type==SEQ_FLOAT?"SEQ_FLOAT":(desc.type==SEQ_STRING?"SEQ_STRING":(desc.type==VEC_VEC?"VEC_VEC":"<unknown>")))))));
 			return name+" =\t"+vals+"\t ("+typeDesc+")";
 		}
 		//! call dumpAttr for all attributes (used for debugging)
@@ -168,10 +169,11 @@ class AttrAccess{
 			LOG_DEBUG("Got raw attribute `"<<key<<"'");
 			switch(descriptors[key].type){
 				case BOOL: return python::object(lexical_cast<bool>(raw[0]));
-				case NUMBER: return python::object(lexical_cast_maybeNanInf<double>(raw[0]));
+				case FLOAT: return python::object(lexical_cast_maybeNanInf<double>(raw[0]));
+				case INTEGER: return python::object(lexical_cast_maybeNanInf<long>(raw[0]));
 				case STRING: return python::object(raw[0]);
 				case SEQ_STRING: {python::list ret; for(size_t i=0; i<raw.size(); i++) ret.append(python::object(raw[i])); return ret;}
-				case SEQ_NUMBER: {python::list ret; for(size_t i=0; i<raw.size(); i++){ ret.append(python::object(lexical_cast_maybeNanInf<double>(raw[i]))); LOG_TRACE("Appended "<<raw[i]);} return ret; }
+				case SEQ_FLOAT: {python::list ret; for(size_t i=0; i<raw.size(); i++){ ret.append(python::object(lexical_cast_maybeNanInf<double>(raw[i]))); LOG_TRACE("Appended "<<raw[i]);} return ret; }
 				case VEC_VEC: {
 					python::list ret; for(size_t i=0; i<raw.size(); i++){
 						/* raw[i] has the form "{number number number}" */
@@ -190,7 +192,8 @@ class AttrAccess{
 			#define SAFE_EXTRACT(from,to,type) python::extract<type> to(from); if(!to.check()) throw invalid_argument(string("Could not extract type ")+#type);
 			switch(descriptors[key].type){
 				case BOOL: {SAFE_EXTRACT(val.ptr(),extr,bool); setAttrStr(key,extr()?"1":"0"); break;}
-				case NUMBER: {SAFE_EXTRACT(val.ptr(),extr,double); setAttrStr(key,lexical_cast<string>(extr())); break; }
+				case FLOAT: {SAFE_EXTRACT(val.ptr(),extr,double); setAttrStr(key,lexical_cast<string>(extr())); break; }
+				case INTEGER: {SAFE_EXTRACT(val.ptr(),extr,long); setAttrStr(key,lexical_cast<string>(extr())); break; }
 				case STRING: {SAFE_EXTRACT(val.ptr(),extr,string); setAttrStr(key,extr()); break;}
 				case SEQ_STRING:{
 					if(!PySequence_Check(val.ptr())) throw invalid_argument("String sequence argument required.");
@@ -199,7 +202,7 @@ class AttrAccess{
 					setAttrStr(key,strVal+"]");
 				} 
 				break;
-				case SEQ_NUMBER:{
+				case SEQ_FLOAT:{
 					if(!PySequence_Check(val.ptr())) throw invalid_argument("Number sequence argument required.");
 					string strVal("{");
 					for(int i=0; i<PySequence_Size(val.ptr()); i++){SAFE_EXTRACT(PySequence_GetItem(val.ptr(),i),extr,double); strVal+=lexical_cast<string>(extr())+" ";}
