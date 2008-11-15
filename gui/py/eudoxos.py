@@ -3,6 +3,8 @@
 #
 # I doubt there functions will be useful for anyone besides me.
 #
+from yade.wrapper import *
+from math import *
 
 def estimateStress(strain,cutoff=0.):
 	"""Use summed stored energy in contacts to compute macroscopic stress over the same volume, provided known strain."""
@@ -51,7 +53,7 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	return -avgTransHomogenizedStrain/principalHomogenizedStrain,stress/principalHomogenizedStrain
 
 
-def oofemTextExport():
+def oofemTextExport(fName):
 	"""Export simulation data in text format 
 	
 	The format is line-oriented as follows:
@@ -66,6 +68,8 @@ def oofemTextExport():
 	from yade.wrapper import Omega
 	material,bodies,interactions=[],[],[]
 	o=Omega()
+
+	f=open(fName,'w') # fail early on I/O problem
 
 	ph=o.interactions.nth(0).phys # some params are the same everywhere
 	material.append("%g %g"%(ph['E'],ph['G']))
@@ -87,8 +91,9 @@ def oofemTextExport():
 		if not i.geom or not i.phys: continue
 		cp=i.geom['contactPoint']
 		interactions.append("%d %d %g %g %g %g"%(i.id1,i.id2,cp[0],cp[1],cp[2],i.phys['crossSection']))
-
-	return material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions
+	
+	f.write('\n'.join(material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions))
+	f.close()
 
 def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	from yade.wrapper import Omega
@@ -129,6 +134,28 @@ def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	f.write('BoundaryCondition 1 loadTimeFunction 1 prescribedvalue 0.0\n')
 	f.write('BoundaryCondition 2 loadTimeFunction 1 prescribedvalue 1.e-4\n')
 	f.write('PiecewiseLinFunction 1 npoints 3 t 3 0. 10. 1000.  f(t) 3 0. 10. 1000.\n')
+
+
+def displacementsInteractionsExport(fName):
+	f=open(fName,'w')
+	print "Writing body displacements and interaction strains."
+	o=Omega()
+	for b in o.bodies:
+		x0,y0,z0=b.phys['refSe3'][0:3]; x,y,z=b.phys.pos
+		rx,ry,rz,rr=b.phys['se3'][3:7]
+		f.write('%d xyz [ %g %g %g ] dxyz [ %g %g %g ] rxyz [ %g %g %g ] \n'%(b.id,x0,y0,z0,x-x0,y-y0,z-z0,rr*rx,rr*ry,rr*rz))
+	f.write('\n')
+	for i in o.interactions:
+		if not i['isReal']:continue
+		epsTNorm=sqrt(sum([e**2 for e in i.phys['epsT']]))
+		epsT='epsT [ %g %g %g ] %g'%(i.phys['epsT'][0],i.phys['epsT'][1],i.phys['epsT'][2],epsTNorm)
+		en=i.phys['epsN']; n=i.geom['normal']
+		epsN='epsN [ %g %g %g ] %g'%(en*n[0],en*n[1],en*n[2],en)
+		Fn='Fn [ %g %g %g ] %g'%(i.phys['normalForce'][0],i.phys['normalForce'][1],i.phys['normalForce'][2],i.phys['Fn'])
+		Fs='Fs [ %lf %lf %lf ] %lf'%(i.phys['shearForce'][0],i.phys['shearForce'][1],i.phys['shearForce'][2],sqrt(sum([fs**2 for fs in i.phys['shearForce']])))
+		f.write('%d %d %s %s %s %s\n'%(i.id1,i.id2,epsN,epsT,Fn,Fs))
+		# f.write('%d %d %g %g %g %g %g\n'%(i.id1,i.id2,i.phys['epsN'],i.phys['epsT'][0],i.phys['epsT'][1],i.phys['epsT'][2],epsTNorm))
+	f.close()
 
 
 
