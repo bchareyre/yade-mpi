@@ -31,6 +31,7 @@ class TriaxialStressController : public DeusExMachina
 		//int cachedForceClassIndex;
 		int ForceClassIndex;
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
+		bool firstRun;
 		
 		 	
 	public :
@@ -44,7 +45,7 @@ class TriaxialStressController : public DeusExMachina
 		//! Stores the value of the translation at the previous time step, stiffness, and normal
 		Vector3r	previousTranslation [6];
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
-		Real		stiffness [6];
+		vector<Real>	stiffness;
 		Real 		strain [3];
 		Real volumetricStrain;
 		Vector3r	normal [6];
@@ -52,6 +53,12 @@ class TriaxialStressController : public DeusExMachina
 		Vector3r	stress [6];
 		Vector3r	force [6];
 		Real		meanStress;
+		//! Value of spheres volume (solid volume)
+		Real spheresVolume;
+		//! Value of box volume 
+		Real boxVolume;
+		//! Sample porosity
+		Real porosity;
 				
 		
 		//Real UnbalancedForce;		

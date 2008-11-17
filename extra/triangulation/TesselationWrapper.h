@@ -25,7 +25,7 @@ class Tesselation;
 
 class TesselationWrapper{
 
-private:
+public:
 
 	Tesselation* Tes;
 	double mean_radius;
@@ -40,11 +40,10 @@ public:
     	///Insert a sphere
 	
     	bool insert(double x, double y, double z, double rad, unsigned int id);
+    	void checkMinMax(double x, double y, double z, double rad);//for experimentation purpose
     	bool move (double x, double y, double z, double rad, unsigned int id);
     	void clear(void);
-
-
-
+    	void clear2(void);
     	    	
 	///Add axis aligned bounding planes (modelised as spheres with (almost) infinite radius)
 //  	void 	AddBoundingPlanes (void); 

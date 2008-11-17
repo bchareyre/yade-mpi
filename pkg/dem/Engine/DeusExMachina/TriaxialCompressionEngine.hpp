@@ -88,17 +88,12 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real& uniaxialEpsilonCurr;
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
-		//! document TODO
-		Real spheresVolume;
-		//! Value of spheres volume 
-		Real boxVolume;
-		//! Value of box volume 
-		Real calculatedPorosity;
-		//! Value of porosity during the simulation 
-		Real translationSpeed;
+		
 		//! Value of translation speed
-		Real fixedPorosity;
+		Real translationSpeed;
 		//! Value of porosity chosen by the user
+		Real fixedPorosity;
+		
 
 		//! Previous state (used to detect manual changes of the state in .xml)
 		stateNum previousState;
@@ -135,6 +130,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 	protected :
 		virtual void postProcessAttributes(bool);
 		virtual void registerAttributes();
+		
 	REGISTER_CLASS_NAME(TriaxialCompressionEngine);
 	REGISTER_BASE_CLASS_NAME(TriaxialStressController);
 };

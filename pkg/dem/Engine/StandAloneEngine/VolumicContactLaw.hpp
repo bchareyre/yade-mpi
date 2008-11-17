@@ -45,6 +45,7 @@ class VolumicContactLaw : public InteractionSolver
 	
 		VolumicContactLaw();
 		void action(MetaBody*);
+		void speedTest(MetaBody* ncb);
 
 	protected :
 		void registerAttributes();

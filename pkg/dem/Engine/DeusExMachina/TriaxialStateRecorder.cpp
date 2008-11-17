@@ -183,5 +183,127 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 
 
 }
+/*
+TriaxialStressController::ComputeLoveStress ( MetaBody * ncb )
+{
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+
+	Real f1_el_x=0, f1_el_y=0, f1_el_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
+
+	Real sig11_el=0, sig22_el=0, sig33_el=0, sig12_el=0, sig13_el=0,
+ sig23_el=0;
+	//, Vwater = 0,
+ Real kinematicE = 0;
+
+ InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+ InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+
+ Real j = 0;
+ Real FT[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
+
+ for ( ; ii!=iiEnd ; ++ii )
+ {
+	 if ( ( *ii )->isReal )
+	 {
+		 const shared_ptr<Interaction>& interaction = *ii;
+
+		 unsigned int id1 = interaction -> getId1();
+		 unsigned int id2 = interaction -> getId2();
+
+		 SpheresContactGeometry* currentContactGeometry  =
+				 static_cast<SpheresContactGeometry*> ( interaction->interactionGeometry.
+				 get() );
+
+		 ElasticContactInteraction* currentContactPhysics =
+				 static_cast<ElasticContactInteraction*>
+				 ( interaction->interactionPhysics.get() );
+
+		 Real fn = currentContactPhysics->normalForce.Length();
+
+		 if ( fn!=0 )
+
+				//if (currentContactGeometry->penetrationDepth >= 0)
+
+		 {
+			 j=j+1;
+
+			 Vector3r fel =
+					 currentContactPhysics->normalForce + currentContactPhysics->shearForce;
+
+			 f1_el_x=fel[0];
+			 f1_el_y=fel[1];
+			 f1_el_z=fel[2];
+
+			 int geometryIndex1 =
+					 ( *bodies ) [id1]->geometricalModel->getClassIndex();
+			 int geometryIndex2 =
+					 ( *bodies ) [id2]->geometricalModel->getClassIndex();
+
+			 if ( geometryIndex1 == geometryIndex2 )
+
+			 {
+				 BodyMacroParameters* de1 =
+						 static_cast<BodyMacroParameters*> ( ( *bodies ) [id1]->physicalParameters.get() );
+				 x1 = de1->se3.position[0];
+				 y1 = de1->se3.position[1];
+				 z1 = de1->se3.position[2];
+
+
+				 BodyMacroParameters* de2 =
+						 static_cast<BodyMacroParameters*> ( ( *bodies ) [id2]->physicalParameters.get() );
+				 x2 = de2->se3.position[0];
+				 y2 = de2->se3.position[1];
+				 z2 = de2->se3.position[2];
+
+					///Calcul des contraintes elastiques spheres/spheres
+
+				 sig11_el = sig11_el + f1_el_x* ( x2 - x1 );
+				 sig22_el = sig22_el + f1_el_y* ( y2 - y1 );
+				 sig33_el = sig33_el + f1_el_z* ( z2 - z1 );
+				 sig12_el = sig12_el + f1_el_x* ( y2 - y1 );
+				 sig13_el = sig13_el + f1_el_x* ( z2 - z1 );
+				 sig23_el = sig23_el + f1_el_y* ( z2 - z1 );
+
+			 }
+
+			 else
+
+			 {
+				 Vector3r l =
+						 std::min ( currentContactGeometry->radius2,
+						 currentContactGeometry->radius1 )
+						 *currentContactGeometry->normal;
+
+					/// Calcul des contraintes elastiques spheres/parois
+
+				 sig11_el = sig11_el + f1_el_x*l[0];
+				 sig22_el = sig22_el + f1_el_y*l[1];
+				 sig33_el = sig33_el + f1_el_z*l[2];
+				 sig12_el = sig12_el + f1_el_x*l[1];
+				 sig13_el = sig13_el + f1_el_x*l[2];
+				 sig23_el = sig23_el + f1_el_y*l[2];
+
+			 }
+
+				/// fabric tensor
+
+			 Vector3r normal = currentContactGeometry->normal;
+
+			 for ( int i=0; i<3; ++i )
+			 {
+				 for ( int n=0; n<3; ++n )
+				 {
+						//fabricTensor[i][n]
+					 FT[i][n]
+							 += normal[i]*normal[n];
+				 }
+			 }
+
+		 }
+	 }
+ }
+}*/
+
+
 
 YADE_PLUGIN();
