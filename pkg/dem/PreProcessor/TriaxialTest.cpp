@@ -10,7 +10,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
- 
+
 
 
 #include "TriaxialTest.hpp"
@@ -26,8 +26,8 @@
 #include<yade/pkg-dem/MakeItFlat.hpp>
 
 #include<yade/pkg-dem/AveragePositionRecorder.hpp>
-#include<yade/pkg-dem/ForceRecorder.hpp>
-#include<yade/pkg-dem/VelocityRecorder.hpp>
+//#include<yade/pkg-dem/ForceRecorder.hpp>
+//#include<yade/pkg-dem/VelocityRecorder.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
@@ -88,13 +88,13 @@ using namespace std;
 
 
 
- 
+
 TriaxialTest::TriaxialTest () : FileGenerator()
 {
 	lowerCorner 		= Vector3r(0,0,0);
 	upperCorner 		= Vector3r(1,1,1);
 	thickness 		= 0.001;
-	importFilename 		= ""; // oh, PLEASE, keep this empty -- i.e., by default, generate spheres in the box, not load them.
+	importFilename          = ""; // oh, PLEASE, keep this empty -- i.e., by default, generate spheres in the box, not load them.
 	Key			="";
 	outputFileName 		= "./TriaxialTest"+Key+".xml";
 	//nlayers = 1;
@@ -159,13 +159,12 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 
 	radiusStdDev=0.3;
 	radiusMean=-1; // no radius specified
-
+	
 	isotropicCompaction=false;
 	translationSpeed = 0;
 	fixedPorosity = 1;
 
- 
-
+	
 	
 //	wall_top_id =0;
 // 	wall_bottom_id =0;
@@ -222,38 +221,11 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
 	REGISTER_ATTRIBUTE(autoUnload);
-//	REGISTER_ATTRIBUTE(wall_top);
-//	REGISTER_ATTRIBUTE(wall_bottom);
-//	REGISTER_ATTRIBUTE(wall_1);
-//	REGISTER_ATTRIBUTE(wall_2);
-//	REGISTER_ATTRIBUTE(wall_3);
-//	REGISTER_ATTRIBUTE(wall_4);
-//	REGISTER_ATTRIBUTE(wall_top_wire);
-//	REGISTER_ATTRIBUTE(wall_bottom_wire);
-//	REGISTER_ATTRIBUTE(wall_1_wire);
-//	REGISTER_ATTRIBUTE(wall_2_wire);
-//	REGISTER_ATTRIBUTE(wall_3_wire);
-//	REGISTER_ATTRIBUTE(wall_4_wire);
-//	REGISTER_ATTRIBUTE(spheresColor);
-//	REGISTER_ATTRIBUTE(spheresRandomColor);
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 	REGISTER_ATTRIBUTE(saveAnimationSnapshots);
 	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
 	REGISTER_ATTRIBUTE(WallStressRecordFile);
-
 	REGISTER_ATTRIBUTE(wallOversizeFactor);
-
-//	REGISTER_ATTRIBUTE(gravity);
-	
-	//REGISTER_ATTRIBUTE(bigBall);
-	//REGISTER_ATTRIBUTE(bigBallRadius);
-	//REGISTER_ATTRIBUTE(bigBallDensity);
-	//REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
-	//REGISTER_ATTRIBUTE(bigBallFrictDeg);
-	//REGISTER_ATTRIBUTE(bigBallYoungModulus);
-	//REGISTER_ATTRIBUTE(bigBallPoissonRatio);
-	//REGISTER_ATTRIBUTE(bigBallDropHeight);
-	//REGISTER_ATTRIBUTE(sigma_iso);
 	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
@@ -261,8 +233,6 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(translationSpeed);
 	REGISTER_ATTRIBUTE(fixedPorosity);
 	REGISTER_ATTRIBUTE(fixedBoxDims);
- 
-
 
 
 }
@@ -618,7 +588,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
-	//triaxialcompressionEngine-> sigma_iso = sigma_iso;
 	triaxialcompressionEngine-> sigmaIsoCompaction = sigmaIsoCompaction;
 	triaxialcompressionEngine-> sigmaLateralConfinement = sigmaLateralConfinement;
 	triaxialcompressionEngine->max_vel = maxWallVelocity;
@@ -635,10 +604,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->translationSpeed = translationSpeed;
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
 	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
-		
-	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
+
 	
-// recording global stress
+	// recording global stress
 	if(recordIntervalIter>0){
 		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
 		triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
@@ -651,6 +619,19 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	makeItFlat->plane_position = (lowerCorner[2]+upperCorner[2])*0.5;
 	makeItFlat->reset_force = false;	
 
+	#if 0	
+	// moving walls to regulate the stress applied
+	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
+	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
+	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
+	triaxialstressController-> sigma_iso = sigma_iso;
+	triaxialstressController-> max_vel = 0.0001;
+	triaxialstressController-> thickness = thickness;
+	triaxialstressController->wall_bottom_activated = false;
+	triaxialstressController->wall_top_activated = false;	
+		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
+	#endif
+	
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
