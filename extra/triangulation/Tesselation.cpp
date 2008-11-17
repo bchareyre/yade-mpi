@@ -1,13 +1,13 @@
 #include "Tesselation.h"
 #include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 //Tesselation TESSELATION = Tesselation();
- 
+
 
 using namespace std;
-  
+
 Tesselation::Tesselation ( void )
 {
-// 	std::cout << "Tesselation(void)" << std::endl;
+//  std::cout << "Tesselation(void)" << std::endl;
 	Tri = new RTriangulation;
 	Tes = Tri;
 	computed = false;
@@ -22,7 +22,7 @@ Tesselation::Tesselation ( void )
 Tesselation::Tesselation ( RTriangulation &T )
 		: Tri ( &T ), Tes ( &T ), computed ( true )
 {
-// 	std::cout << "Tesselation(RTriangulation &T)" << std::endl;
+//  std::cout << "Tesselation(RTriangulation &T)" << std::endl;
 	Compute();
 }
 
@@ -42,20 +42,20 @@ void Tesselation::Clear ( void )
 
 // bool Tesselation::insert ( Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious )
 // {
-// 	Vertex_handle Vh;
-// 	Vh = Tri->insert ( Sphere ( Point ( x,y,z ),pow ( rad,2 ) ) );
-// 	if ( Vh!=NULL )
-// 	{
-// 		Vh->info() = id;
-// 		Vh->info().isFictious = isFictious;
-// 		if ( !isFictious ) max_id = std::max ( max_id, id );
-// 	}
-// 	else return false;
-// 	return true;
+//  Vertex_handle Vh;
+//  Vh = Tri->insert ( Sphere ( Point ( x,y,z ),pow ( rad,2 ) ) );
+//  if ( Vh!=NULL )
+//  {
+//   Vh->info() = id;
+//   Vh->info().isFictious = isFictious;
+//   if ( !isFictious ) max_id = std::max ( max_id, id );
+//  }
+//  else return false;
+//  return true;
 // }
 
 
-Vertex_handle Tesselation::insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious)
+Vertex_handle Tesselation::insert ( Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious )
 {
 
 	Vertex_handle Vh;
@@ -66,12 +66,12 @@ Vertex_handle Tesselation::insert(Real x, Real y, Real z, Real rad, unsigned int
 		Vh->info().isFictious = isFictious;
 		if ( !isFictious ) max_id = std::max ( max_id, id );
 	}
- 	else cout << id <<  " : Vh==NULL!!" << endl;
+	else cout << id <<  " : Vh==NULL!!" << endl;
 	return Vh;
 }
 
 
-Vertex_handle Tesselation::move(Real x, Real y, Real z, Real rad, unsigned int id)
+Vertex_handle Tesselation::move ( Real x, Real y, Real z, Real rad, unsigned int id )
 {
 	bool fictious = vertexHandles[id]->info().isFictious;
 	Vertex_handle Vh;
@@ -80,11 +80,12 @@ Vertex_handle Tesselation::move(Real x, Real y, Real z, Real rad, unsigned int i
 	{
 		vertexHandles[id] = Vh;
 		Vh->info() = id;
-		Vh->info().isFictious = fictious;		
-	} else cerr << "Vh==NULL" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
+		Vh->info().isFictious = fictious;
+	}
+	else cerr << "Vh==NULL" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
 	return Vh;
 }
- 
+
 
 
 bool Tesselation::redirect ( void )
@@ -159,11 +160,8 @@ Point Tesselation::Dual ( const Cell_handle &cell )
 
 void Tesselation::Compute ()
 {
-<<<<<<< .mine
-// 	std::cout << "Tesselation::Compute ()" << std::endl;
-=======
-	std::cerr << "Tesselation::Compute ()" << std::endl;
->>>>>>> .r1529
+
+//  std::cout << "Tesselation::Compute ()" << std::endl;
 	Finite_cells_iterator cell_end = Tri->finite_cells_end();
 
 	for ( Finite_cells_iterator cell = Tri->finite_cells_begin(); cell != cell_end; cell++ )
@@ -185,11 +183,11 @@ void Tesselation::Compute ()
 			S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
 			x, y, z );
 		cell->info() =Point ( x,y,z );
-		//cout << "voronoi cell : " <<  cell->vertex(0)->info().id() << " " 
-		//		<<  cell->vertex(1)->info().id() << " " 
-		//		<<  cell->vertex(2)->info().id() << " " 
-		//		<<  cell->vertex(3)->info().id() << "(center : " << (Point) cell->info() << ")" << endl;
-}
+		//cout << "voronoi cell : " <<  cell->vertex(0)->info().id() << " "
+		//  <<  cell->vertex(1)->info().id() << " "
+		//  <<  cell->vertex(2)->info().id() << " "
+		//  <<  cell->vertex(3)->info().id() << "(center : " << (Point) cell->info() << ")" << endl;
+	}
 
 
 	computed = true;
@@ -400,30 +398,30 @@ void Tesselation::AssignPartialVolume ( Finite_edges_iterator& ed_it )
 	}
 	cell0=cell2++;
 	Cell_circulator cell1=cell2++;
-  //std::cout << "edge : " << ed_it->first->vertex ( ed_it->second )->info().id() << "-" << ed_it->first->vertex ( ed_it->third )->info().id() << std::endl;
+	//std::cout << "edge : " << ed_it->first->vertex ( ed_it->second )->info().id() << "-" << ed_it->first->vertex ( ed_it->third )->info().id() << std::endl;
 	bool isFictious1 = ( ed_it->first )->vertex ( ed_it->second )->info().isFictious;
 	bool isFictious2 = ( ed_it->first )->vertex ( ed_it->third )->info().isFictious;
 	Real r;
-	
-	//cout << "cell0 : " <<  cell0->vertex(0)->info().id() << " " 
-	//			<<  cell0->vertex(1)->info().id() << " " 
-	//			<<  cell0->vertex(2)->info().id() << " " 
-	//			<<  cell0->vertex(3)->info().id() << "(center : " << (Point) cell0->info() << ")" <<   endl;
+
+	//cout << "cell0 : " <<  cell0->vertex(0)->info().id() << " "
+	//   <<  cell0->vertex(1)->info().id() << " "
+	//   <<  cell0->vertex(2)->info().id() << " "
+	//   <<  cell0->vertex(3)->info().id() << "(center : " << (Point) cell0->info() << ")" <<   endl;
 
 	while ( cell2!=cell0 )
-	{		
+	{
 		if ( !Tri->is_infinite ( cell1 )  && !Tri->is_infinite ( cell2 ) )
 		{
-	//	cout << "cell1 : " <<  cell1->vertex(0)->info().id() << " " 
-	//			<<  cell1->vertex(1)->info().id() << " " 
-	//			<<  cell1->vertex(2)->info().id() << " " 
-	//			<<  cell1->vertex(3)->info().id() << "(center : " << (Point) cell1->info() << ")" << endl;
-	//	cout << "cell2 : " <<  cell2->vertex(0)->info().id() << " " 
-	//			<<  cell2->vertex(1)->info().id() << " " 
-	//			<<  cell2->vertex(2)->info().id() << " " 
-	//			<<  cell2->vertex(3)->info().id() << "(center : " << (Point) cell2->info() << ")" << endl;
-		
-    //std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->second )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
+			// cout << "cell1 : " <<  cell1->vertex(0)->info().id() << " "
+			//   <<  cell1->vertex(1)->info().id() << " "
+			//   <<  cell1->vertex(2)->info().id() << " "
+			//   <<  cell1->vertex(3)->info().id() << "(center : " << (Point) cell1->info() << ")" << endl;
+			// cout << "cell2 : " <<  cell2->vertex(0)->info().id() << " "
+			//   <<  cell2->vertex(1)->info().id() << " "
+			//   <<  cell2->vertex(2)->info().id() << " "
+			//   <<  cell2->vertex(3)->info().id() << "(center : " << (Point) cell2->info() << ")" << endl;
+
+			//std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->second )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
 			if ( !isFictious1 )
 			{
 				r = std::abs ( ( Tetraedre ( ed_it->first->vertex ( ed_it->second )->point(), cell0->info(), cell1->info(), cell2->info() ) ).volume() );
@@ -431,7 +429,7 @@ void Tesselation::AssignPartialVolume ( Finite_edges_iterator& ed_it )
 				( ed_it->first )->vertex ( ed_it->second )->info().v() += r;
 				TotalFiniteVoronoiVolume+=r;
 			}
-    //std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->third )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
+			//std::cout << "assign tetra : (" << ed_it->first->vertex ( ed_it->third )->point() << "),(" << cell0->info() << "),(" << cell1->info() << "),(" <<cell2->info() << ")" << std::endl;
 			if ( !isFictious2 )
 			{
 				r = std::abs ( ( Tetraedre ( ed_it->first->vertex ( ed_it->third )->point(), cell0->info(),  cell1->info(), cell2->info() ) ).volume() );
@@ -474,11 +472,12 @@ void Tesselation::ComputeVolumes ( void )
 
 
 	redirect();
-// 	cout << "TotalVolume : " << TotalFiniteVoronoiVolume << endl;
+//  cout << "TotalVolume : " << TotalFiniteVoronoiVolume << endl;
 }
 
 void Tesselation::ComputePorosity ( void )  //WARNING : This function will erase real volumes of cells
-{      // and replace it with porosity
+{
+	// and replace it with porosity
 	ComputeVolumes();
 	//Real rr=0;
 	Finite_vertices_iterator vertices_end = Tri->finite_vertices_end ();

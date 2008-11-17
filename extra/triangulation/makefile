@@ -83,18 +83,12 @@ test$(EXE_EXT): test$(OBJ_EXT)\
 libTesselationWrapper.a : 	TesselationWrapper$(OBJ_EXT) \
 				Tenseur3$(OBJ_EXT) \
 				Tesselation$(OBJ_EXT) \
-<<<<<<< .mine
-				RegularTriangulation$(OBJ_EXT)
-	ar cr 	libTesselationWrapper.a \
-				TesselationWrapper$(OBJ_EXT) \
-=======
 				RegularTriangulation$(OBJ_EXT) \
 				TriaxialState$(OBJ_EXT) \
 				KinematicLocalisationAnalyser$(OBJ_EXT)
 	 		ar cr	libTesselationWrapper.a \
 	 			TesselationWrapper$(OBJ_EXT) \
 				Tenseur3$(OBJ_EXT) \
->>>>>>> .r1529
 				Tesselation$(OBJ_EXT) \
 				RegularTriangulation$(OBJ_EXT) \
 				TriaxialState$(OBJ_EXT) \

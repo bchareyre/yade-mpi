@@ -19,12 +19,9 @@
 
 
 #include <yade/pkg-common/InteractingSphere.hpp>
-
 #include "VolumicContactLaw.hpp"
-
 #include<yade/extra/TesselationWrapper.h>
-
- 
+#include <time.h>
 
 VolumicContactLaw::VolumicContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
 {
@@ -44,12 +41,79 @@ void VolumicContactLaw::registerAttributes()
 }
 
 
+
+void VolumicContactLaw::speedTest(MetaBody* ncb)
+{
+//BEGIN SPEED TEST
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	TesselationWrapper T;
+	BodyContainer::iterator biBegin    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	BodyContainer::iterator bi = biBegin;
+	for(  ; bi!=biEnd ; ++bi )
+	{
+		if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
+			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+			const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
+			T.checkMinMax(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius);
+		}
+	}
+	
+	clock_t	T1 = clock();	
+	
+	for (int j=0; j<30; j++)
+	{
+		T.clear2();
+		T.bounded = false;
+		for( bi = biBegin; bi!=biEnd ; ++bi )
+		{
+			if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
+				const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+				const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
+				T.insert(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
+			}
+		}
+		//T.AddBoundingPlanes();	
+	}
+	
+	
+	cerr << "Bouding planes apres : time = "<< difftime(clock(), T1)/ CLOCKS_PER_SEC << endl;
+	T1 = clock();
+	
+	
+	for (int j=0; j<30; j++)
+	{	
+		T.clear2();
+		T.bounded = false;
+		//T.AddBoundingPlanes();
+		for( bi = biBegin; bi!=biEnd ; ++bi )
+		{
+			if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
+				const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+				const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
+				T.insert(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
+			}
+		
+		}
+	
+	}	
+	
+	cerr << "Bouding planes avant : time = "<< difftime(clock(), T1)/ CLOCKS_PER_SEC << endl;
+//END SPEED TEST
+
+
+
+
+}
+
+
 void VolumicContactLaw::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
 
+	speedTest(ncb);	
 
 	//BEGIN VORONOI TESSELATION
 	TesselationWrapper T1;	
@@ -139,7 +203,6 @@ void VolumicContactLaw::action(MetaBody* ncb)
 	    }
 	} 
 	//ENDOF VORONOI TESSELATION
-	 
 			
 /// Non Permanents Links												///
 

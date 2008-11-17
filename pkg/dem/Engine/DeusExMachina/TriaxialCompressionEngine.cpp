@@ -51,13 +51,13 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 	previousSigmaIso=sigma_iso;
 	frictionAngleDegree = -1;
 	epsilonMax = 0.5;
+<<<<<<< .mine
 
 	isotropicCompaction=false;
 	spheresVolume=0;
  	boxVolume=0;
 
-	calculatedPorosity=1.1;	
-
+//	calculatedPorosity=1.1;	
 
 }
 
@@ -184,11 +184,13 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 			doStateTransition (ncb, STATE_LIMBO );
 			}
 		}
-		else if ( calculatedPorosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
+
+		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
-		Omega::instance().stopSimulationLoop();
-		return;
+			Omega::instance().stopSimulationLoop();
+			return;
 		}
+
 #if 0
 		//This is a hack in order to allow subsequent run without activating compression - like for the YADE-COMSOL coupling
 		if ( !compressionActivated )
@@ -222,21 +224,22 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		LOG_INFO ( "First run, will initialize!" );
 		/* FIXME: are these three if's mutually exclusive and are partition of all possibilities? */
 		//sigma_iso was changed, we need to rerun compaction
+
 		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && isotropicCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
 		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING && isotropicCompaction == false ) doStateTransition (ncb, STATE_TRIAX_LOADING );
-		if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false )
-		{
-			doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
-			FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
-				if(!b->isDynamic) continue;
-				const shared_ptr<Sphere>& sphere=YADE_PTR_CAST<Sphere> ( b->geometricalModel );
-				spheresVolume += (4./3.)*Mathr::PI*pow( sphere->radius, 3 );
-			}
-			previousState=currentState;
-			previousSigmaIso=sigma_iso;
-			firstRun=false; // change this only _after_ state transitions
-		}
+		//if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false )
+		//{
+		//	doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
+// 			FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
+// 				if(!b->isDynamic) continue;
+// 				const shared_ptr<Sphere>& sphere=YADE_PTR_CAST<Sphere> ( b->geometricalModel );
+// 				spheresVolume += (4./3.)*Mathr::PI*pow( sphere->radius, 3 );
+// 			}
+		previousState=currentState;
+		previousSigmaIso=sigma_iso;
+		firstRun=false; // change this only _after_ state transitions
 	}
+
 	if ( saveSimulation )
 	{
 		string fileName = "./"+ Key + "_" + Phase1End + "_" +
@@ -288,6 +291,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 			Omega::instance().stopSimulationLoop();
 		}
 	}
+
 	if ( currentState==STATE_FIXED_POROSITY_COMPACTION )
 	{
 		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
@@ -311,13 +315,6 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		p->se3.position += 0.5*translationSpeed*width*translationAxisx*dt;
 		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_right_id )->physicalParameters.get() );
 		p->se3.position -= 0.5*translationSpeed*width*translationAxisx*dt;
-
-	
-		boxVolume=height*width*depth;
-		
-		calculatedPorosity=1-spheresVolume/boxVolume;
-
-
 	}
  
 }

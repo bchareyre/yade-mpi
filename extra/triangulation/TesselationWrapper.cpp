@@ -57,9 +57,7 @@ TesselationWrapper::~TesselationWrapper()
 	facet_it = Tes->Triangulation().finite_edges_end ();
 	
  }
-<<<<<<< .mine
- 
-=======
+
  
  
  void TesselationWrapper::clear2(void) //for testing purpose
@@ -76,7 +74,7 @@ TesselationWrapper::~TesselationWrapper()
  }
  
 
->>>>>>> .r1529
+
 double TesselationWrapper::Volume( unsigned int id )
 {
 	return Tes->Volume(id);

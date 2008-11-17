@@ -27,15 +27,17 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	//StiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
 	shared_ptr<Force> tmpF(new Force);
 	ForceClassIndex=tmpF->getClassIndex();
-
+	firstRun = true;
+	
 	previousStress = 0;
 	previousMultiplier = 1;
-	
+		
 	stiffnessUpdateInterval =10;
 	radiusControlInterval =10;
 	computeStressStrainInterval = 10;
 	wallDamping = 0.25;
 	//force = Vector3r::ZERO;
+	stiffness.resize(6);
 	for (int i=0; i<6; ++i)
 	{
 		wall_id[i] = 0;
@@ -68,6 +70,9 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	height = 0;
 	width = 0;
 	depth = 0;
+	spheresVolume=0;
+	boxVolume=0;
+	porosity=0;
 	height0 = 0;
 	width0 = 0;
 	depth0 = 0;
@@ -93,7 +98,7 @@ void TriaxialStressController::registerAttributes()
 	
 	//REGISTER_ATTRIBUTE(UnbalancedForce);
 	
-	//REGISTER_ATTRIBUTE(stiffness);
+	REGISTER_ATTRIBUTE(stiffness);
  	REGISTER_ATTRIBUTE(wall_bottom_id);
  	REGISTER_ATTRIBUTE(wall_top_id);
  	REGISTER_ATTRIBUTE(wall_left_id);
@@ -193,8 +198,11 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 void TriaxialStressController::applyCondition(MetaBody* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-		
+	
+	
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	
+	
 
 	if(thickness<=0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->interactingGeometry)->extents.Y();
 
@@ -208,7 +216,27 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
-
+	
+	boxVolume = height * width * depth;
+	
+	if (firstRun) {
+		BodyContainer::iterator bi = ncb->bodies->begin();
+		BodyContainer::iterator biEnd = ncb->bodies->end();
+		spheresVolume = 0;
+		for ( ; bi!=biEnd; ++bi )
+		{
+			const shared_ptr<Body>& b = *bi;
+			if ( b->isDynamic )
+			{
+				const shared_ptr<Sphere>& sphere =
+						YADE_PTR_CAST<Sphere> ( b->geometricalModel );
+				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
+			}
+		}
+		
+		firstRun = false;	
+	}
+	//porosity = ( boxVolume - spheresVolume ) /boxVolume;
 
 	position_top = p_top->se3.position.Y();
 	position_bottom = p_bottom->se3.position.Y();
@@ -221,7 +249,7 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 
 	// must be done _after_ height, width, depth have been calculated
 	//Update stiffness only if it has been computed by StiffnessCounter (see "stiffnessUpdateInterval")
-	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<1000) updateStiffness(ncb);
+	if (Omega::instance().getCurrentIteration() % stiffnessUpdateInterval == 0 || Omega::instance().getCurrentIteration()<100) updateStiffness(ncb);
 
  
 		bool isARadiusControlIteration = (Omega::instance().getCurrentIteration() % radiusControlInterval == 0);
@@ -233,9 +261,11 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 		Vector3r wallForce (0, sigma_iso*width*depth, 0);
 		if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
 		if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
+		
 		wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
 		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
 		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
+		
 		wallForce = Vector3r(0, 0, sigma_iso*height*width);
 		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
 		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
@@ -316,39 +346,40 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	meanStress/=6.;
 }
 
-void TriaxialStressController::controlInternalStress(MetaBody* ncb, Real multiplier)
+void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multiplier )
 {
-   BodyContainer::iterator bi    = ncb->bodies->begin();
-   BodyContainer::iterator biEnd = ncb->bodies->end();
-   //cerr << "meanstress = "radius = " << endl;
-   //cerr << "bouclesurBodies" << endl;
-   for (  ; bi!=biEnd ; ++bi )
-   {
-		if ((*bi)->isDynamic)
+	spheresVolume *= pow ( multiplier,3 );
+	BodyContainer::iterator bi    = ncb->bodies->begin();
+	BodyContainer::iterator biEnd = ncb->bodies->end();
+	//cerr << "meanstress = "radius = " << endl;
+	//cerr << "bouclesurBodies" << endl;
+	for ( ; bi!=biEnd ; ++bi )
+	{
+		if ( ( *bi )->isDynamic )
 		{
-			(static_cast<InteractingSphere*> ((*bi)->interactingGeometry.get()))->radius *= multiplier;
-			(static_cast<Sphere*>((*bi)->geometricalModel.get()))->radius *= multiplier;
-			(static_cast<ParticleParameters*>((*bi)->physicalParameters.get()))->mass *= pow(multiplier,3);
-			(static_cast<RigidBodyParameters*>((*bi)->physicalParameters.get()))->inertia *= pow(multiplier,5);
-			
+			( static_cast<InteractingSphere*> ( ( *bi )->interactingGeometry.get() ) )->radius *= multiplier;
+			( static_cast<Sphere*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
+			( static_cast<ParticleParameters*> ( ( *bi )->physicalParameters.get() ) )->mass *= pow ( multiplier,3 );
+			( static_cast<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() ) )->inertia *= pow ( multiplier,5 );
+
 		}
 	}
 	// << "bouclesurInteraction" << endl;
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
-	for (  ; ii!=iiEnd ; ++ii )
+	for ( ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)
+		if ( ( *ii )->isReal )
 		{
-			SpheresContactGeometry* contact = static_cast<SpheresContactGeometry*> ((*ii)->interactionGeometry.get());
-			//	     if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
-			//		 contact->radius1 *= multiplier;
-			//	     if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
-			//		 contact->radius2 *= multiplier;
-			if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
-				contact->radius1 = static_cast<InteractingSphere*> ((*(ncb->bodies))[(*ii)->getId1()]->interactingGeometry.get())->radius;
-			if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
-				contact->radius2 = static_cast<InteractingSphere*> ((*(ncb->bodies))[(*ii)->getId2()]->interactingGeometry.get())->radius;
+			SpheresContactGeometry* contact = static_cast<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() );
+			//      if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
+			//   contact->radius1 *= multiplier;
+			//      if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
+			//   contact->radius2 *= multiplier;
+			if ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->isDynamic )
+				contact->radius1 = static_cast<InteractingSphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->interactingGeometry.get() )->radius;
+			if ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->isDynamic )
+				contact->radius2 = static_cast<InteractingSphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->interactingGeometry.get() )->radius;
 		}
 	}
 }
