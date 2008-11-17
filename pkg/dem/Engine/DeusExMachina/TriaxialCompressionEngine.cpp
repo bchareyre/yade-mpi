@@ -51,7 +51,6 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 	previousSigmaIso=sigma_iso;
 	frictionAngleDegree = -1;
 	epsilonMax = 0.5;
-<<<<<<< .mine
 
 	isotropicCompaction=false;
 	spheresVolume=0;
