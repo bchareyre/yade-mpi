@@ -1,11 +1,11 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2008 by Vincent Richefeu                                *
 *  vincent.richefeu@hmg.inpg.fr                                          *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include "BshTube.hpp"
@@ -29,4 +29,4 @@ void BshTube::registerAttributes()
         REGISTER_ATTRIBUTE(half_height);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("BshTube");

@@ -10,6 +10,9 @@
 
 #include "MembraneTest.hpp"
 
+//#include<yade/pkg-dem/ElasticContactLaw.hpp>
+#include<yade/pkg-dem/SimpleViscoelasticContactLaw.hpp>
+//#include<yade/pkg-dem/ElasticBodyParameters2BcpConnection4ElasticContactInteraction.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment.hpp>
@@ -47,26 +50,29 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/InteractingNode.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
-#include<yade/pkg-common/ElasticBodyParameters.hpp>
+#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
 
 MembraneTest::MembraneTest () : FileGenerator()
 {
-	nbX 			= 10;
+	nbX 			= 9;
 	nbZ 			= 10;
 	XLength 		= 10.0e-2;
 	ZLength 		= 10.0e-2;
 	bigBallRadius 		= 1.0e-2;
 	membraneThickness 	= 1.0e-3;
 
-	dampingForce		= 0.9;
-	youngModulus		= 8.0e7;
+	tc		        = 0.001;
+        en                      = 0.3;
+        es                      = 0.3;
+        mu			= 0.4;
 	gravity			= Vector3r(0,-9.81,0);
 }
 
@@ -90,8 +96,10 @@ void MembraneTest::registerAttributes()
 	REGISTER_ATTRIBUTE(ZLength);
 	REGISTER_ATTRIBUTE(bigBallRadius);
 	REGISTER_ATTRIBUTE(membraneThickness);
-	REGISTER_ATTRIBUTE(youngModulus);
-	REGISTER_ATTRIBUTE(dampingForce);
+	REGISTER_ATTRIBUTE(tc);
+	REGISTER_ATTRIBUTE(en);
+	REGISTER_ATTRIBUTE(es);
+	REGISTER_ATTRIBUTE(mu);
 	REGISTER_ATTRIBUTE(gravity);
 }
 
@@ -168,7 +176,7 @@ bool MembraneTest::generate()
         
 // The big ball
         shared_ptr<Body> bb;       
-        createSphere(bb, Vector3r(0.5*XLength,2.0*bigBallRadius,0.5*ZLength), bigBallRadius, true );
+        createSphere(bb, Vector3r(0.5*XLength,1.05*bigBallRadius+0.5*membraneThickness,0.5*ZLength), bigBallRadius, true);
         rootBody->bodies->insert(bb);
         
 	return true;
@@ -176,23 +184,24 @@ bool MembraneTest::generate()
 
 void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsigned int id2)
 {
-        body = shared_ptr<Body>(new Body(body_id_t(0),0)); 
-        shared_ptr<BcpConnection> connection(new BcpConnection);                  // Bcp
+        body = shared_ptr<Body>(new Body(body_id_t(0),1)); 
+        shared_ptr<BcpConnection> connection(new BcpConnection);                  // Bcp + Bst
         shared_ptr<AABB> aabb(new AABB);                                          // Bbv
         shared_ptr<BshTube> tube(new BshTube);                                    // Bsh
         shared_ptr<BssSweptSphereLineSegment> bss(new BssSweptSphereLineSegment); // Bss
-        
-        
+          
         connection->id1             = id1;
         connection->id2             = id2;
+        connection->mass	    = 1.0; // !!!!
+        connection->setViscoelastic(connection->mass, tc, en, es);
+	connection->mu              = mu;
         Vector3r position1,
-                 position2,
-                 middle;
+                 position2;
         position1                   = (*(rootBody->bodies))[id1]->physicalParameters->se3.position;
         position2                   = (*(rootBody->bodies))[id2]->physicalParameters->se3.position;
-        middle                      = 0.5 * (position1 + position2);
-        connection->se3.position    = middle; 
+        connection->se3.position    = 0.5 * (position1 + position2);
         Vector3r link               = position2 - position1;
+
         
         Vector3r newX               = link; newX.Normalize();
         Vector3r newY               = Vector3r(0.0,1.0,0.0); 
@@ -206,6 +215,8 @@ void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsign
         
         bss->diffuseColor           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
         
+        aabb->diffuseColor          = Vector3r(1.0,0.0,0.0);
+        
         body->isDynamic             = false;
         body->geometricalModel      = tube;
         body->interactingGeometry   = bss;
@@ -215,8 +226,8 @@ void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsign
     
 void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
-  body = shared_ptr<Body>(new Body(body_id_t(0),2));
-  shared_ptr<ElasticBodyParameters> physics(new ElasticBodyParameters); // Bcp + Bst
+  body = shared_ptr<Body>(new Body(body_id_t(0),1));
+  shared_ptr<SimpleViscoelasticBodyParameters> physics(new SimpleViscoelasticBodyParameters); // Bcp + Bst
   shared_ptr<AABB> aabb(new AABB);                                      // Bbv
   shared_ptr<Sphere> gSphere(new Sphere);                               // Bsh
   shared_ptr<InteractingSphere> iSphere(new InteractingSphere);         // Bss
@@ -224,42 +235,43 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
   Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
   q.Normalize();
         
-  body->isDynamic                 = dynamic;
+  body->isDynamic           = dynamic;
         
-  physics->angularVelocity        = Vector3r(0,0,0);
-  physics->velocity               = Vector3r(0,0,0);
-  physics->mass                   = 4.0/3.0 * 3.1415 * radius * radius * radius * 2500.0;
+  physics->angularVelocity  = Vector3r(0,0,0);
+  physics->velocity         = Vector3r(0,0,0);
+  physics->mass             = 4.0/3.0 * 3.1415 * radius * radius * radius * 2500.0;
   
-  Real I                          = 2.0/5.0 * physics->mass * radius * radius;
-  physics->inertia                = Vector3r(I, I, I);
-  physics->se3                    = Se3r(position,q);
-  physics->young                  = youngModulus;
+  Real I                    = 2.0/5.0 * physics->mass * radius * radius;
+  physics->inertia          = Vector3r(I, I, I);
+  physics->se3              = Se3r(position,q);
+  physics->setViscoelastic(physics->mass, tc, en, es);
+  physics->mu               = mu;
         
-  aabb->diffuseColor              = Vector3r(0,1,0);
+  aabb->diffuseColor        = Vector3r(0.0,1.0,0.0);
 
-  gSphere->radius                 = radius;
-  gSphere->diffuseColor           = Vector3r(0.5,0.5,1.0);
-  gSphere->wire                   = false;
-  gSphere->visible                = true;
-  gSphere->shadowCaster           = true;
+  gSphere->radius           = radius;
+  gSphere->diffuseColor     = Vector3r(0.5,0.5,1.0);
+  gSphere->wire             = false;
+  gSphere->visible          = true;
+  gSphere->shadowCaster     = true;
         
-  iSphere->radius                 = radius;
-  iSphere->diffuseColor           = Vector3r(0.0,0.0,1.0);
+  iSphere->radius           = radius;
 
-  body->interactingGeometry       = iSphere;
-  body->geometricalModel          = gSphere;
-  body->boundingVolume            = aabb;
-  body->physicalParameters        = physics;
+  iSphere->diffuseColor     = Vector3r(0.0,0.0,1.0);
+
+  body->interactingGeometry = iSphere;
+  body->geometricalModel    = gSphere;
+  body->boundingVolume      = aabb;
+  body->physicalParameters  = physics;
 }  
     
 void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned int j)
 {
-	body = shared_ptr<Body>(new Body(body_id_t(0),0));
+	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // Bcp + Bst
 	shared_ptr<AABB> aabb(new AABB);                                // Bbv (not needed?)
 	shared_ptr<Sphere> node(new Sphere);                            // Bsh
-        shared_ptr<InteractingSphere> isph(new InteractingSphere);      // Bss
-        	
+        shared_ptr<InteractingNode> inode(new InteractingNode);         // Bss
         
 // 	if ((i==0 && j==0)||(i==0 && j==nbZ)||(i==nbX && j==nbZ)||(i==nbX && j==0))
 // 		body->isDynamic = false;
@@ -279,9 +291,9 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 	physics->mass                   = 1.0; // FIXME - Random value. It depends on the time step (?)
         physics->se3.position = position;
 
-        isph->diffuseColor              = Vector3r(0.5,0.5,1.0);
+        //inode->diffuseColor              = Vector3r(0.5,0.5,1.0);
         
-	body->interactingGeometry	= isph;
+	body->interactingGeometry	= inode;
 	body->geometricalModel		= node;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
@@ -294,69 +306,46 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
 	physicalActionInitializer->physicalActionNames.push_back("Force");
-	//physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	
-	//shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-        //interactionPhysicsDispatcher->add("ElasticBodySimpleRelationship");
+	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 		
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	//interactionGeometryDispatcher->add("InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron");
-	//interactionGeometryDispatcher->add("InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron");
+        interactionGeometryDispatcher->add("InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry");
+	
+        shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+        interactionPhysicsDispatcher->add("SimpleViscoelasticRelationships");
 
 	shared_ptr<InteractingGeometryMetaEngine> interactingGeometryDispatcher	= shared_ptr<InteractingGeometryMetaEngine>(new InteractingGeometryMetaEngine);
 	interactingGeometryDispatcher->add("ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment");
 	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB"); // 
-	//boundingVolumeDispatcher->add("InteractingBox2AABB");
-	//boundingVolumeDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
+	boundingVolumeDispatcher->add("InteractingSphere2AABB");
+        boundingVolumeDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB"); 
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
-	//shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-	//actionForceDamping->damping = dampingForce;
-
-	//shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-	//actionMomentumDamping->damping = dampingMomentum;
-
-	//shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-	//actionDampingDispatcher->add(actionForceDamping);
-	//actionDampingDispatcher->add(actionMomentumDamping);
-	
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
 	applyActionDispatcher->add("NewtonsForceLaw");
-	//applyActionDispatcher->add("NewtonsMomentumLaw");
+	applyActionDispatcher->add("NewtonsMomentumLaw");
 
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
 
-	//shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	//orientationIntegrator->add("LeapFrogOrientationIntegrator");
-	//////////////////
- 	
-/*
- * updating timestep is not used in this simplified example. But you may decide to use it later.
- *
-	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	sdecTimeStepper->sdecGroupMask = 1;
-	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-*/
+	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
 	rootBody->engines.clear();
-	//rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	//rootBody->engines.push_back(interactionGeometryDispatcher);
-	//rootBody->engines.push_back(interactionPhysicsDispatcher);
-	//rootBody->engines.push_back(shared_ptr<Engine>(new MyTetrahedronLaw));
+	rootBody->engines.push_back(interactionGeometryDispatcher);
+	rootBody->engines.push_back(interactionPhysicsDispatcher);
+        rootBody->engines.push_back(shared_ptr<Engine>(new SimpleViscoelasticContactLaw));
 	rootBody->engines.push_back(gravityCondition);
-	//rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
-	//if(!rotationBlocked)
-	//	rootBody->engines.push_back(orientationIntegrator);
+        rootBody->engines.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(physicalActionInitializer);
@@ -392,4 +381,4 @@ void MembraneTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("MembraneTest");

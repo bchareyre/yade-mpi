@@ -16,19 +16,19 @@
 class BssSweptSphereLineSegment : public InteractingGeometry
 {
 	public :
-                Real radius, length;
-		Vector3r position;
+                Real     radius, length; // FIXME halfLength
+		Vector3r position;    // This position is different from the se3 one FIXME (usefull?)
                 Vector3r orientation; // This is a normalized vector
-                
-                
+
+
                 BssSweptSphereLineSegment ();
                 virtual ~BssSweptSphereLineSegment ();	
 	
 	protected :
 		void registerAttributes();
 	
-                REGISTER_CLASS_INDEX(BssSweptSphereLineSegment,InteractingGeometry);
-                REGISTER_CLASS_NAME(BssSweptSphereLineSegment);
+        REGISTER_CLASS_INDEX(BssSweptSphereLineSegment,InteractingGeometry);
+        REGISTER_CLASS_NAME(BssSweptSphereLineSegment);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
 
 

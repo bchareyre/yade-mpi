@@ -32,10 +32,14 @@ class SpheresContactGeometry: public InteractionGeometry{
 			contactPoint;
 		Real radius1,radius2,penetrationDepth;
 
+		bool hasNormalViscosity;
+		Real NormalViscisity;
+		Real NormalRelativeVelocity;
+
 		bool hasShear; // whether the exact rotation code is being used -- following fields are needed for that
 		//! positions and orientations of both spheres -- must be updated at every iteration
 		Vector3r pos1, pos2; Quaternionr ori1, ori2;
-		/*! Orientation of the contact point relative to each sphere-local coordinates.
+		/*! Orientation of the contact point relative to each sphere-local coordinates.+
 		 * Those fields are almost constant, except for a few cases
 		 * 	(a) plastic slip and 
 		 * 	(b) spheres mutually rolling without slipping with big angle, when the contact point must be moved since quaternions

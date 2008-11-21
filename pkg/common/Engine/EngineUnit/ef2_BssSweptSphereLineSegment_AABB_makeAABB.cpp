@@ -15,15 +15,14 @@ void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<Interacti
 				const Se3r& se3,
 				const Body*	)
 {
-  
-  BssSweptSphereLineSegment* SSLS = static_cast<BssSweptSphereLineSegment*>(cm.get());
-  AABB* aabb = static_cast<AABB*>(bv.get());
-  
-  aabb->center = SSLS->position + 0.5 * SSLS->length * SSLS->orientation; // here orientation is not a quaternion but a unit vector
-  aabb->halfSize = (0.5 * SSLS->length + 1.4142135623730950488 * SSLS->radius) * SSLS->orientation; // FIXME, maybe there exist a constant for sqrt(2) ??
-  aabb->min = aabb->center - aabb->halfSize;
-  aabb->max = aabb->center + aabb->halfSize;
-  
+        BssSweptSphereLineSegment* SSLS = static_cast<BssSweptSphereLineSegment*>(cm.get());
+        AABB* aabb = static_cast<AABB*>(bv.get());
+        
+        aabb->center = SSLS->position + 0.5 * SSLS->length * SSLS->orientation; // here orientation is not a quaternion but a unit vector
+        aabb->halfSize = (0.5 * SSLS->length) * SSLS->orientation + Vector3r(SSLS->radius,SSLS->radius,SSLS->radius); 
+
+        aabb->min = aabb->center - aabb->halfSize;
+        aabb->max = aabb->center + aabb->halfSize; 
 }
 	
-YADE_PLUGIN();
+YADE_PLUGIN("ef2_BssSweptSphereLineSegment_AABB_makeAABB");

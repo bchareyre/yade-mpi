@@ -1,21 +1,19 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
+*  Copyright (C) 2008 by Vincent Richefeu                                *
 *  vincent.richefeu@hmg.inpg.fr                                          *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+
 #ifndef BCP_CONNECTION_HPP
 #define BCP_CONNECTION_HPP
 
-#include<yade/core/PhysicalParameters.hpp>
-//#include<Wm3Vector3.h>
-//#include<yade/lib-base/yadeWm3.hpp>
-//#include<yade/lib-base/yadeWm3Extra.hpp>
+#include <yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
-class BcpConnection : public PhysicalParameters
+
+class BcpConnection : public SimpleViscoelasticBodyParameters
 {
 	public :
 		// parameters (no parameters)
@@ -30,10 +28,10 @@ class BcpConnection : public PhysicalParameters
 	protected :
 		virtual void registerAttributes();
 	REGISTER_CLASS_NAME(BcpConnection);
-	REGISTER_BASE_CLASS_NAME(BcpConnection);
+	REGISTER_BASE_CLASS_NAME(SimpleViscoelasticBodyParameters);
 
 /// Indexable
-	REGISTER_CLASS_INDEX(BcpConnection,PhysicalParameters);
+	REGISTER_CLASS_INDEX(BcpConnection,SimpleViscoelasticBodyParameters);
 
 };
 

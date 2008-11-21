@@ -113,6 +113,7 @@ void ElasticContactLaw::action(MetaBody* ncb)
 	/// Here is the code with approximated rotations 	 ///
 			
 
+
 			axis = currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
 			shearForce -= shearForce.Cross(axis);
 			//angle = dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);

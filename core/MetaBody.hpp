@@ -15,6 +15,7 @@
 #include"BodyContainer.hpp"
 #include"Engine.hpp"
 #include"DisplayParameters.hpp"
+//#include"groupRelationData.hpp"
 
 class MetaBody : public Body
 {
@@ -30,6 +31,8 @@ class MetaBody : public Body
 		list<string> tags;
 		//! "hash maps" of display parameters
 		vector<shared_ptr<DisplayParameters> > dispParams;
+
+		//shared_ptr<GroupRelationData>           grpRelationData;
 
 		MetaBody ();
 

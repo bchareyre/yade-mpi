@@ -20,7 +20,7 @@ class ef2_BssSweptSphereLineSegment_AABB_makeAABB : public BoundingVolumeEngineU
 				, shared_ptr<BoundingVolume>& bv
 				, const Se3r& se3
 				, const Body*	);
-                FUNCTOR2D(ef2_BssSweptSphereLineSegment_AABB_makeAABB,AABB);
+                FUNCTOR2D(BssSweptSphereLineSegment,AABB);
                 REGISTER_CLASS_NAME(ef2_BssSweptSphereLineSegment_AABB_makeAABB);
 	        REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };

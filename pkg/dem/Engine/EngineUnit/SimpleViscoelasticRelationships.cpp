@@ -32,7 +32,7 @@ void SimpleViscoelasticRelationships::go(	  const shared_ptr<PhysicalParameters>
 
     SimpleViscoelasticBodyParameters* sdec1 = static_cast<SimpleViscoelasticBodyParameters*>(b1.get());
     SimpleViscoelasticBodyParameters* sdec2 = static_cast<SimpleViscoelasticBodyParameters*>(b2.get());
-    
+
     interaction->interactionPhysics = shared_ptr<SimpleViscoelasticInteraction>(new SimpleViscoelasticInteraction());
     SimpleViscoelasticInteraction* contactPhysics = YADE_CAST<SimpleViscoelasticInteraction*>(interaction->interactionPhysics.get());
 
