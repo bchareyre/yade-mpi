@@ -151,7 +151,7 @@ void YadeQtMainWindow::createView(){
 	shared_ptr<GLViewer> glv=shared_ptr<GLViewer>(new GLViewer(glViews.size(),renderer,NULL,isFirst?NULL:glViews[0].get()));
 	glv->setCamera(new YadeCamera);
 	glv->camera()->frame()->setWheelSensitivity(-1.0f);
-	glv->camera()->setUpVector(qglviewer::Vec(0,0,1));
+	glv->camera()->setUpVector(qglviewer::Vec(0,1,0));
 	glv->camera()->setViewDirection(qglviewer::Vec(-1,-1,-1));
 	lookDown(glv);
 	glViews.push_back(glv);
@@ -163,14 +163,14 @@ void YadeQtMainWindow::lookDown(shared_ptr<GLViewer> glv)
 	bool hasSimulation=(Omega::instance().getRootBody() ? Omega::instance().getRootBody()->bodies->size()>0 : false );
 	if(hasSimulation)
 	{	
-		Vector3r g(0,0,1);
+		Vector3r g(0,1,0);
 		FOREACH(const shared_ptr<Engine>& e,Omega::instance().getRootBody()->engines){
 			if(e && e->getClassName()=="GravityEngine")  
 				g = -1.0*(dynamic_cast<GravityEngine*>(e.get()))->gravity;
 		}
 		glv->camera()->setUpVector(qglviewer::Vec(g[0],g[1],g[2]));
 	} else {
-		glv->camera()->setUpVector(qglviewer::Vec(0,0,1));
+		glv->camera()->setUpVector(qglviewer::Vec(0,1,0));
 	}
 	glv->camera()->setViewDirection(qglviewer::Vec(-1,-1,-1));
 	glv->centerScene();

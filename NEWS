@@ -1,5 +1,19 @@
 vim:syntax=changelog
 
+2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1579
+
+	* RELEASE: 0.12.1
+	
+		- several python interface improvements
+		- add code for plotting histogram of interaction directions
+		- added buttons for looking from different directions
+		- new contact algorithm for facets
+		- added python script for making videos
+		- added a TCP server on port 9000 with python console in it
+		- new dependency on python-numpy package, which allows faster math in python
+		- added a script for parametric studies
+
+
 2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1486
 
 	* RELEASE: 0.12

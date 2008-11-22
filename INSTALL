@@ -36,7 +36,7 @@ optionally:
     * Doxygen
     * wildmagic 3.11 - only if you want Delaunay triangulation support in lattice model
     * log4cxx - extensive logging support and debugging
-    * python-dev, python-scientific, python-matplotlib - for python scripting interface
+    * python-dev, python-scientific, python-matplotlib, python-numpy - for python scripting interface
 	 * gdb
 
 Installation
