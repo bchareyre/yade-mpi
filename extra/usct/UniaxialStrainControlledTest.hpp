@@ -15,7 +15,7 @@ class USCTGen: public FileGenerator {
 	private:
 		void createEngines();
 	public:
-		USCTGen(){ axis=1; limitStrain=0; damping=0.2;cohesiveThresholdIter=200; };
+		USCTGen(){ axis=1; limitStrain=0; damping=0.2;cohesiveThresholdIter=200;};
 		~USCTGen (){};
 		bool generate();
 		string spheresFile;
@@ -81,6 +81,8 @@ class UniaxialStrainer: public DeusExMachina {
 		void init();
 	public:
 		Real strainRate,currentStrainRate;
+		//! strain at which we will pause simulation; inactive (nan) by default; must be reached from below (in absolute value)
+		Real stopAtStrain;
 		//! distance of reference bodies in the direction of axis before straining started
 		Real originalLength;
 		vector<Real> originalWidths;
@@ -124,11 +126,12 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strain, avgStress;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile="/tmp/usct.data"; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;};
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile="/tmp/usct.data"; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  stopAtStrain=numeric_limits<Real>::quiet_NaN();};
 		virtual ~UniaxialStrainer(){};
 		void registerAttributes(){
 			DeusExMachina::registerAttributes();
 			REGISTER_ATTRIBUTE(strainRate);
+			REGISTER_ATTRIBUTE(stopAtStrain);
 			REGISTER_ATTRIBUTE(currentStrainRate);
 			REGISTER_ATTRIBUTE(axis);
 			REGISTER_ATTRIBUTE(asymmetry);

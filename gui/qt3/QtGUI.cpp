@@ -62,7 +62,7 @@ int QtGUI::run(int argc, char *argv[])
 	mainWindow->show();
 	app.setMainWidget(mainWindow);
 	#ifdef EMBED_PYTHON
-		LOG_INFO("Launching Python thread now...");
+		LOG_DEBUG("Launching Python thread now...");
 		//PyEval_InitThreads();
 		boost::thread pyThread(boost::function0<void>(&PythonUI::pythonSession));
 	#endif

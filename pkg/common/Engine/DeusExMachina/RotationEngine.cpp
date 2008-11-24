@@ -9,11 +9,19 @@
 *************************************************************************/
 
 
-#include "RotationEngine.hpp"
+#include"RotationEngine.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
+#include<yade/pkg-common/LinearInterpolate.hpp>
+
+YADE_PLUGIN("RotationEngine","InterpolatingRotationEngine");
+
+void InterpolatingRotationEngine::applyCondition(MetaBody* rb){
+	angularVelocity=linearInterpolate<Real>(rb->simulationTime,times,velocities,pos);
+	RotationEngine::applyCondition(rb);
+}
 
 RotationEngine::RotationEngine()
 {
@@ -73,4 +81,3 @@ void RotationEngine::applyCondition(MetaBody *ncb)
 
 }
 
-YADE_PLUGIN();

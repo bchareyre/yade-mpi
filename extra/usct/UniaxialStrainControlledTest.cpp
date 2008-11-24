@@ -102,6 +102,9 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	// reverse if we're over the limit strain
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
+	// if(strain==stopAtStrain){LOG_INFO("Prescibed strain "<<stopAtStrain<<" reached, pausing."); }
+	if(!isnan(stopAtStrain) && ((strain*stopAtStrain>0) && abs(strain)>abs(stopAtStrain))) { strain=stopAtStrain;	rootBody->stopAtIteration=Omega::instance().getCurrentIteration()+2; LOG_INFO("Prescribed strain "<<stopAtStrain<<" reached, will stop in 2 iterations"); }
+
 	if(Omega::instance().getCurrentIteration()%10==0 ) {
 		computeAxialForce(rootBody);
 		#if 0
