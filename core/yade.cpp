@@ -79,7 +79,7 @@ sigHandler(int sig){
 
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
-	const char* libDirs[]={"extra","gui","lib","pkg-common","pkg-dem","pkg-fem","pkg-lattice","pkg-mass-spring","pkg-realtime-rigidbody",NULL /* sentinel */};
+	const char* libDirs[]={"extra","gui","lib","pkg-common","pkg-dem","pkg-fem","pkg-snow","pkg-lattice","pkg-mass-spring","pkg-realtime-rigidbody",NULL /* sentinel */};
 	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
 	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Please tune by hand if needed.");
 	string expLibDir;

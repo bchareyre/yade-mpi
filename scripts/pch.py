@@ -16,6 +16,7 @@ incModules={
 	'pkg-lattice':3,
 	'pkg-mass-spring':3,
 	'pkg-fem':3,
+	'pkg-snow':3,
 	'gui-cmd':3,
 	'gui-qt3':3, 
 	'extra':4}

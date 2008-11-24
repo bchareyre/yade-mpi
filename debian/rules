@@ -58,7 +58,7 @@ install: build
 	###   (a) use fakeroot-tcp instead of fakeroot
 	###   (b) say jobs=1
 	#install headers
-	NO_SCONS_GET_RECENT= scons jobs=1 buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_VERSION}-dev/usr variant='' version=${VERSION} exclude=realtime-rigidbody,mass-spring debian/yade${_VERSION}-dev/usr/include
+	NO_SCONS_GET_RECENT= scons jobs=1 buildPrefix=debian runtimePREFIX=/usr PREFIX=debian/yade${_VERSION}-dev/usr variant='' version=${VERSION} exclude=realtime-rigidbody,mass-spring,snow debian/yade${_VERSION}-dev/usr/include
 	#debug build
 	NO_SCONS_GET_RECENT= scons jobs=1 PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1
 	#optimized build
