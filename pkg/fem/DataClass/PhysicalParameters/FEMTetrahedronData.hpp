@@ -49,7 +49,7 @@ class FEMTetrahedronData : public PhysicalParameters
 
 };
 
-REGISTER_SERIALIZABLE(FEMTetrahedronData,false);
+REGISTER_SERIALIZABLE(FEMTetrahedronData);
 
 #endif // LATTICEBEAMPARAMETERS_HPP
 

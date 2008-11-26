@@ -60,7 +60,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
-REGISTER_SERIALIZABLE(GlobalStiffnessTimeStepper,false);
+REGISTER_SERIALIZABLE(GlobalStiffnessTimeStepper);
 
 #endif //  GLOBAL_STIFFNESS_TIME_STEPPER_HPP
 

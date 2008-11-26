@@ -36,7 +36,7 @@ class DeusExMachina : public Engine
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-REGISTER_SERIALIZABLE(DeusExMachina,false);
+REGISTER_SERIALIZABLE(DeusExMachina);
 
 #endif // __KINEMATICENGINE_H__
 

@@ -21,7 +21,7 @@ class GLDrawSimpleViscoelasticInteraction : public GLDrawInteractionPhysicsFunct
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawSimpleViscoelasticInteraction,false);
+REGISTER_SERIALIZABLE(GLDrawSimpleViscoelasticInteraction);
 
 #endif //GLDRAW_SIMPLEVISCOELASTIC_INTERACTION_HPP
 

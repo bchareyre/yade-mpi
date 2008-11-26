@@ -35,7 +35,7 @@ class BodyMacroParameters : public ElasticBodyParameters
 	REGISTER_CLASS_INDEX(BodyMacroParameters,ElasticBodyParameters);
 };
 
-REGISTER_SERIALIZABLE(BodyMacroParameters,false);
+REGISTER_SERIALIZABLE(BodyMacroParameters);
 
 #endif // __SDECDISCRETEELEMENT_H__
 

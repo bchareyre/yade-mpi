@@ -97,7 +97,7 @@ class Clump: public Body {
 	DECLARE_LOGGER;
 };
 
-REGISTER_SERIALIZABLE(Clump,false);
+REGISTER_SERIALIZABLE(Clump);
 
 /*! Update ::Clump::members positions so that the Clump behaves as a rigid body.
  *
@@ -116,7 +116,7 @@ class ClumpMemberMover: public DeusExMachina {
 	DECLARE_LOGGER;
 };
 
-REGISTER_SERIALIZABLE(ClumpMemberMover,false);
+REGISTER_SERIALIZABLE(ClumpMemberMover);
 
 /*! \brief Test some basic clump functionality; show how to use clumps as well. */
 class ClumpTestGen : public FileGenerator {
@@ -145,7 +145,7 @@ class ClumpTestGen : public FileGenerator {
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(ClumpTestGen,false);
+REGISTER_SERIALIZABLE(ClumpTestGen);
 
 
 

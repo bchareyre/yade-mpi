@@ -45,6 +45,6 @@ class JumpChangeSe3: public DeusExMachina {
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
 		DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(JumpChangeSe3,false);
+REGISTER_SERIALIZABLE(JumpChangeSe3);
 	
 

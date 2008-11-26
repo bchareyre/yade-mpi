@@ -24,7 +24,7 @@ class NewtonsMomentumLaw : public PhysicalActionApplierUnit
 	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
 };
 
-REGISTER_SERIALIZABLE(NewtonsMomentumLaw,false);
+REGISTER_SERIALIZABLE(NewtonsMomentumLaw);
 
 #endif // NEWTONSMOMENTUMLAW_HPP
 

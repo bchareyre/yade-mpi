@@ -287,7 +287,7 @@ struct Circle
 
 };
 
-REGISTER_SERIALIZABLE(LatticeExample,false);
+REGISTER_SERIALIZABLE(LatticeExample);
 
 #endif // LATTICE_BOX_HPP 
 

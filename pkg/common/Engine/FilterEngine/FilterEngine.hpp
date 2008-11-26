@@ -32,7 +32,7 @@ class FilterEngine : public DeusExMachina {
 	REGISTER_CLASS_NAME(FilterEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-REGISTER_SERIALIZABLE(FilterEngine,false);
+REGISTER_SERIALIZABLE(FilterEngine);
 
 #endif // FILTER_ENGINE_HPP
 

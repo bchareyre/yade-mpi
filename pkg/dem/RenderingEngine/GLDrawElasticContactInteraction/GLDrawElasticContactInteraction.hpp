@@ -26,7 +26,7 @@ class GLDrawElasticContactInteraction : public GLDrawInteractionPhysicsFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawElasticContactInteraction,false);
+REGISTER_SERIALIZABLE(GLDrawElasticContactInteraction);
 
 #endif 
 

@@ -45,7 +45,7 @@ class CinemCisEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(CinemCisEngine,false);
+REGISTER_SERIALIZABLE(CinemCisEngine);
 
 #endif // CINEMCISENGINE_HPP
 

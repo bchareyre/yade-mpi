@@ -35,7 +35,7 @@ class CohesiveFrictionalBodyParameters : public BodyMacroParameters
 	REGISTER_CLASS_INDEX(CohesiveFrictionalBodyParameters,BodyMacroParameters);
 };
 
-REGISTER_SERIALIZABLE(CohesiveFrictionalBodyParameters,false);
+REGISTER_SERIALIZABLE(CohesiveFrictionalBodyParameters);
 
 #endif // __SDECDISCRETEELEMENT_H__
 

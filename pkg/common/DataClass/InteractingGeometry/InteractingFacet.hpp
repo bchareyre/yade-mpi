@@ -45,6 +45,6 @@ class InteractingFacet : public InteractingGeometry {
 	REGISTER_CLASS_INDEX(InteractingFacet,InteractingGeometry);
 };
 
-REGISTER_SERIALIZABLE(InteractingFacet,false);
+REGISTER_SERIALIZABLE(InteractingFacet);
 
 #endif // INTERACTINGIFACET_HPP

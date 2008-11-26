@@ -34,7 +34,7 @@ class LatticeNodeParameters : public PhysicalParameters
 
 };
 
-REGISTER_SERIALIZABLE(LatticeNodeParameters,false);
+REGISTER_SERIALIZABLE(LatticeNodeParameters);
 
 #endif // LATTICE_NODE_PARAMETERS_HPP 
 

@@ -39,7 +39,7 @@ class PositionOrientationRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(PositionOrientationRecorder,false);
+REGISTER_SERIALIZABLE(PositionOrientationRecorder);
 
 #endif // POSITIONORIENTATIONRECORDER_HPP
 

@@ -112,7 +112,7 @@ class InteractionContainer : public Serializable
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(InteractionContainer,false);
+REGISTER_SERIALIZABLE(InteractionContainer);
 
 // BOOST_FOREACH compatibility
 #ifndef FOREACH

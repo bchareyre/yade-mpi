@@ -47,7 +47,7 @@ class LatticeSetParameters : public PhysicalParameters
 
 };
 
-REGISTER_SERIALIZABLE(LatticeSetParameters,false);
+REGISTER_SERIALIZABLE(LatticeSetParameters);
 
 #endif // LATTICE_SET_PARAMETERS_HPP 
 

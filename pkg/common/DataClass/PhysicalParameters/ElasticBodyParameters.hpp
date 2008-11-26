@@ -32,7 +32,7 @@ class ElasticBodyParameters : public RigidBodyParameters
 	REGISTER_CLASS_INDEX(ElasticBodyParameters,RigidBodyParameters);
 };
 
-REGISTER_SERIALIZABLE(ElasticBodyParameters,false);
+REGISTER_SERIALIZABLE(ElasticBodyParameters);
 
 #endif 
 

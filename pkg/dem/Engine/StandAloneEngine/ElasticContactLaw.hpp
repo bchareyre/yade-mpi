@@ -32,7 +32,7 @@ class ElasticContactLaw2: public InteractionSolver{
 	REGISTER_CLASS_NAME(ElasticContactLaw2);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
-REGISTER_SERIALIZABLE(ElasticContactLaw2,false);
+REGISTER_SERIALIZABLE(ElasticContactLaw2);
 
 class ElasticContactLaw : public InteractionSolver
 {
@@ -58,7 +58,7 @@ class ElasticContactLaw : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(ElasticContactLaw,false);
+REGISTER_SERIALIZABLE(ElasticContactLaw);
 
 #endif // ELASTIC_CONTACT_LAW_HPP
 

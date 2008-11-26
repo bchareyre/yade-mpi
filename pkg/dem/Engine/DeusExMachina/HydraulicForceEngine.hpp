@@ -36,7 +36,7 @@ class HydraulicForceEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(HydraulicForceEngine,false);
+REGISTER_SERIALIZABLE(HydraulicForceEngine);
 
 #endif // GRAVITY_FORCE_FUNCTOR_HPP 
 

@@ -34,7 +34,7 @@ class InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry : publi
         DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,BssSweptSphereLineSegment);
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry,false);
+REGISTER_SERIALIZABLE(InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry);
 
 #endif // EF2_SSLS_SPHERE_MAKE_SDECCONTACTMODEL_HPP
 

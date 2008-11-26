@@ -34,7 +34,7 @@ class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractingSphere,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingSphere);
 
 #endif //  GLDRAWINTERACTIONSPHERE_HPP
 

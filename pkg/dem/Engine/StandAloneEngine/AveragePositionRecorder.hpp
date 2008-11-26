@@ -39,7 +39,7 @@ class AveragePositionRecorder : public DataRecorder
 
 };
 
-REGISTER_SERIALIZABLE(AveragePositionRecorder,false);
+REGISTER_SERIALIZABLE(AveragePositionRecorder);
 
 #endif // AVERAGE_POSISTION_RECORDER_HPP
 

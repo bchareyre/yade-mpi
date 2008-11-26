@@ -32,7 +32,7 @@ class MomentEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(MomentEngine,false);
+REGISTER_SERIALIZABLE(MomentEngine);
 
 #endif // FORCE_ENGINE_HPP
 

@@ -21,7 +21,7 @@ class GravityEngine : public DeusExMachina{
 	REGISTER_CLASS_NAME(GravityEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-REGISTER_SERIALIZABLE(GravityEngine,false);
+REGISTER_SERIALIZABLE(GravityEngine);
 
 
 /* Engine attracting all bodies towards a central body (doesn't depend on distance);
@@ -48,7 +48,7 @@ class CentralGravityEngine: public DeusExMachina {
 		REGISTER_CLASS_NAME(CentralGravityEngine);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-REGISTER_SERIALIZABLE(CentralGravityEngine,false);
+REGISTER_SERIALIZABLE(CentralGravityEngine);
 
 /*! Apply acceleration (independent of distance) directed towards an axis.
  *
@@ -73,5 +73,5 @@ class AxialGravityEngine: public DeusExMachina {
 		REGISTER_CLASS_NAME(AxialGravityEngine);
 		REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-REGISTER_SERIALIZABLE(AxialGravityEngine,false);
+REGISTER_SERIALIZABLE(AxialGravityEngine);
 

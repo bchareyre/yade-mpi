@@ -66,5 +66,5 @@ class BodyAssocVector : public BodyContainer
 	REGISTER_BASE_CLASS_NAME(BodyContainer);
 };
 
-REGISTER_SERIALIZABLE(BodyAssocVector,false);
+REGISTER_SERIALIZABLE(BodyAssocVector);
 

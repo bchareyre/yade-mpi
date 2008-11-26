@@ -115,5 +115,5 @@ class PhysicalActionContainer : public Serializable
 		vector<shared_ptr<PhysicalAction> > action;
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionContainer,false);
+REGISTER_SERIALIZABLE(PhysicalActionContainer);
 

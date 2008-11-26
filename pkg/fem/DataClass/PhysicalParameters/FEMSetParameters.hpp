@@ -32,7 +32,7 @@ class FEMSetParameters : public PhysicalParameters
 
 };
 
-REGISTER_SERIALIZABLE(FEMSetParameters,false);
+REGISTER_SERIALIZABLE(FEMSetParameters);
 
 #endif // LATTICEBEAMPARAMETERS_HPP
 

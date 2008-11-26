@@ -41,7 +41,7 @@ class PositionSnapshot : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(PositionSnapshot,false);
+REGISTER_SERIALIZABLE(PositionSnapshot);
 
 #endif // POSITION_SNAPSHOT_HPP
 

@@ -36,7 +36,7 @@ class __attribute__((__deprecated__)) SDECLinkGeometry : public InteractionGeome
 	REGISTER_CLASS_INDEX(SDECLinkGeometry,InteractionGeometry);
 };
 
-REGISTER_SERIALIZABLE(SDECLinkGeometry,false);
+REGISTER_SERIALIZABLE(SDECLinkGeometry);
 
 #endif // SDECCPERMANENTLINK_HPP
 

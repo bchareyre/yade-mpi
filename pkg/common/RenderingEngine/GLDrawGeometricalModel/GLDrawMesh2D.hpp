@@ -22,7 +22,7 @@ class GLDrawMesh2D : public GLDrawGeometricalModelFunctor
 
 };
 
-REGISTER_SERIALIZABLE(GLDrawMesh2D,false);
+REGISTER_SERIALIZABLE(GLDrawMesh2D);
 
 #endif //  GLDRAWMESH2D_HPP
 

@@ -36,7 +36,7 @@ class USCTGen: public FileGenerator {
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(USCTGen,false);
+REGISTER_SERIALIZABLE(USCTGen);
 
 #if 0
 /* This class applies force on transversal strain sensors from UniaxialStrainer.
@@ -59,7 +59,7 @@ class UniaxialStrainSensorPusher: public DeusExMachina{
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 	//DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(UniaxialStrainSensorPusher,false);
+REGISTER_SERIALIZABLE(UniaxialStrainSensorPusher);
 #endif
 
 
@@ -128,38 +128,31 @@ class UniaxialStrainer: public DeusExMachina {
 		virtual void applyCondition(MetaBody* rootBody);
 		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile="/tmp/usct.data"; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  stopAtStrain=numeric_limits<Real>::quiet_NaN();};
 		virtual ~UniaxialStrainer(){};
-		void registerAttributes(){
-			DeusExMachina::registerAttributes();
-			REGISTER_ATTRIBUTE(strainRate);
-			REGISTER_ATTRIBUTE(stopAtStrain);
-			REGISTER_ATTRIBUTE(currentStrainRate);
-			REGISTER_ATTRIBUTE(axis);
-			REGISTER_ATTRIBUTE(asymmetry);
-			REGISTER_ATTRIBUTE(posIds);
-			REGISTER_ATTRIBUTE(negIds);
-			REGISTER_ATTRIBUTE(originalLength);
-			REGISTER_ATTRIBUTE(originalWidths);
-			REGISTER_ATTRIBUTE(limitStrain);
-			REGISTER_ATTRIBUTE(notYetReversed);
-			REGISTER_ATTRIBUTE(crossSectionArea);
-			#if 0
-				REGISTER_ATTRIBUTE(transStrainSensorArea);
-				REGISTER_ATTRIBUTE(transStrainSensors);
-				REGISTER_ATTRIBUTE(avgTransStrain);
-			#endif
-			REGISTER_ATTRIBUTE(recordFile);
-			REGISTER_ATTRIBUTE(strain);
-			REGISTER_ATTRIBUTE(avgStress);
-			REGISTER_ATTRIBUTE(blockDisplacements);
-			REGISTER_ATTRIBUTE(blockRotations);
-		}
+		REGISTER_ATTRIBUTES_WITH_BASE(DeusExMachina,
+				(strainRate) 
+				(stopAtStrain) 
+				(currentStrainRate) 
+				(axis) 
+				(asymmetry) 
+				(posIds) 
+				(negIds) 
+				(originalLength) 
+				(originalWidths) 
+				(limitStrain) 
+				(notYetReversed) 
+				(crossSectionArea) 
+				(recordFile) 
+				(strain) 
+				(avgStress) 
+				(blockDisplacements) 
+				(blockRotations) 
+		);
 		void prepareRecStream(void){ if(recordFile!="") recStream.open(recordFile.c_str()); }
 		void postProcessAttributes(bool deserializing){ if(deserializing) prepareRecStream(); } 	
 	NEEDS_BEX("Force","Momentum","GlobalStiffness");
-	REGISTER_CLASS_NAME(UniaxialStrainer);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+	REGISTER_CLASS_AND_BASE(UniaxialStrainer,DeusExMachina);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(UniaxialStrainer,false);
+REGISTER_SERIALIZABLE(UniaxialStrainer);
 
 

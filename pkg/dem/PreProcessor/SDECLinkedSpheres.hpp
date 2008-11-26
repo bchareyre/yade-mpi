@@ -57,7 +57,7 @@ class SDECLinkedSpheres : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(SDECLinkedSpheres,false);
+REGISTER_SERIALIZABLE(SDECLinkedSpheres);
 
 #endif // LINKEDSPHERES_HPP
 

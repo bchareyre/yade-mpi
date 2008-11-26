@@ -26,7 +26,7 @@ class Sphere : public GeometricalModel
 	REGISTER_CLASS_INDEX(Sphere,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(Sphere,false);
+REGISTER_SERIALIZABLE(Sphere);
 
 #endif // SPHERE_HPP
 

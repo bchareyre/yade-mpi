@@ -50,7 +50,7 @@ class SDECLinkPhysics : public InteractionPhysics
 	REGISTER_CLASS_INDEX(SDECLinkPhysics,InteractionPhysics);
 };
 
-REGISTER_SERIALIZABLE(SDECLinkPhysics,false);
+REGISTER_SERIALIZABLE(SDECLinkPhysics);
 
 #endif // SDECLINKPHYSICS_HPP
 

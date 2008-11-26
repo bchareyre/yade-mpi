@@ -25,7 +25,7 @@ class InteractingFacet2AABB : public BoundingVolumeEngineUnit
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractingFacet2AABB,false);
+REGISTER_SERIALIZABLE(InteractingFacet2AABB);
 
 #endif // IFACET2AABB_HPP
 

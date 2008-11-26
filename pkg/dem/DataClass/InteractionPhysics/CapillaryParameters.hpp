@@ -35,7 +35,7 @@ class CapillaryParameters : public ElasticContactInteraction
 
 };
 
-REGISTER_SERIALIZABLE(CapillaryParameters,false);
+REGISTER_SERIALIZABLE(CapillaryParameters);
 
 #endif // CAPILLARY_PARAMETERS_HPP
 

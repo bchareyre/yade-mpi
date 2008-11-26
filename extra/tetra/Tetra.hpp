@@ -42,7 +42,7 @@ class TetraMold: public InteractingGeometry{
 		REGISTER_BASE_CLASS_NAME(InteractingGeometry);
 		REGISTER_CLASS_INDEX(TetraMold,InteractingGeometry);
 };
-REGISTER_SERIALIZABLE(TetraMold,false);
+REGISTER_SERIALIZABLE(TetraMold);
 
 
 /*! Collision configuration for Tetra and something.
@@ -71,7 +71,7 @@ class TetraBang: public InteractionGeometry{
 		REGISTER_CLASS_NAME(TetraBang);
 		REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 };
-REGISTER_SERIALIZABLE(TetraBang,false);
+REGISTER_SERIALIZABLE(TetraBang);
 
 /*! Creates TetraMold from Tetrahedron.
  *
@@ -90,7 +90,7 @@ class Tetrahedron2TetraMold: public InteractingGeometryEngineUnit
 	REGISTER_BASE_CLASS_NAME(InteractingGeometryEngineUnit);
 	DEFINE_FUNCTOR_ORDER_2D(Tetrahedron,TetraMold);
 };
-REGISTER_SERIALIZABLE(Tetrahedron2TetraMold,false);
+REGISTER_SERIALIZABLE(Tetrahedron2TetraMold);
 
 /*! Creates AABB from TetraMold. 
  *
@@ -115,7 +115,7 @@ class TetraAABB: public BoundingVolumeEngineUnit
 		REGISTER_CLASS_NAME(TetraAABB);
 		REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
-REGISTER_SERIALIZABLE(TetraAABB,false);
+REGISTER_SERIALIZABLE(TetraAABB);
 
 
 /*! Draw TetraMold using OpenGL */
@@ -129,7 +129,7 @@ class TetraDraw: public GLDrawInteractingGeometryFunctor
 		REGISTER_CLASS_NAME(TetraDraw);
 		REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
-REGISTER_SERIALIZABLE(TetraDraw,false);
+REGISTER_SERIALIZABLE(TetraDraw);
 
 
 /*! Calculate physical response based on penetration configuration given by TetraBang. */
@@ -156,7 +156,7 @@ class TetraLaw: public InteractionSolver {
 		REGISTER_CLASS_NAME(TetraLaw);
 		REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
-REGISTER_SERIALIZABLE(TetraLaw,false);
+REGISTER_SERIALIZABLE(TetraLaw);
 
 
 
@@ -181,7 +181,7 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).Dot(normal) / (B-A).Dot(normal); /* TRWM3VEC(A); TRWM3VEC(B); TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("t="<<t); TRWM3VEC((A+t*(B-A))); */ return A+t*(B-A); }
 };
 
-REGISTER_SERIALIZABLE(Tetra2TetraBang,false);
+REGISTER_SERIALIZABLE(Tetra2TetraBang);
 
 
 // Miscillaneous functions

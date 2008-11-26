@@ -52,4 +52,4 @@ class Interaction : public Serializable
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(Interaction,false);
+REGISTER_SERIALIZABLE(Interaction);

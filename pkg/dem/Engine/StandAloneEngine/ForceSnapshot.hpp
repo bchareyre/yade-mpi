@@ -43,7 +43,7 @@ class ForceSnapshot : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(ForceSnapshot,false);
+REGISTER_SERIALIZABLE(ForceSnapshot);
 
 #endif // FORCE_SNAPSHOT_HPP
 

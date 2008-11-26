@@ -40,7 +40,7 @@ class StandAloneSimulator : public Serializable
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(StandAloneSimulator,false);
+REGISTER_SERIALIZABLE(StandAloneSimulator);
 
 #endif // STANDALONESIMULATOR_HPP
 

@@ -30,7 +30,7 @@ class MassSpringLaw : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(MassSpringLaw,false);
+REGISTER_SERIALIZABLE(MassSpringLaw);
 
 #endif // MASSSPRINGLAW_HPP
 

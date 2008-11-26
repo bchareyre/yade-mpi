@@ -40,6 +40,6 @@ protected :
     REGISTER_CLASS_NAME(SimpleViscoelasticSpheresInteractionRecorder);
     REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
-REGISTER_SERIALIZABLE(SimpleViscoelasticSpheresInteractionRecorder,false);
+REGISTER_SERIALIZABLE(SimpleViscoelasticSpheresInteractionRecorder);
 
 #endif // SIMPLEVISCOELASTICSPHERESINTERACTIONRECORDER_HPP

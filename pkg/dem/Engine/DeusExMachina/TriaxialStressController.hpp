@@ -108,7 +108,7 @@ class TriaxialStressController : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(TriaxialStressController,false);
+REGISTER_SERIALIZABLE(TriaxialStressController);
 
 #endif // TRIAXIAL_STRESS_CONTROLLER_HPP
 

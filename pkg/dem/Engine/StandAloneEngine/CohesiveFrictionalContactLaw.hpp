@@ -40,7 +40,7 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(CohesiveFrictionalContactLaw,false);
+REGISTER_SERIALIZABLE(CohesiveFrictionalContactLaw);
 
 #endif // COHESIVE_FRICTIONAL_CONTACT_LAW_HPP
 

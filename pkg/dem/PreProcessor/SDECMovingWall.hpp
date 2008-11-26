@@ -69,7 +69,7 @@ class SDECMovingWall : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(SDECMovingWall,false);
+REGISTER_SERIALIZABLE(SDECMovingWall);
 
 #endif // SDEC_MOVING_WALL_HPP 
 

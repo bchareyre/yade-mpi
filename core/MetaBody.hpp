@@ -55,7 +55,7 @@ class MetaBody : public Body
 	REGISTER_BASE_CLASS_NAME(Body);
 };
 
-REGISTER_SERIALIZABLE(MetaBody,false);
+REGISTER_SERIALIZABLE(MetaBody);
 
 #endif // METABODY_HPP
 

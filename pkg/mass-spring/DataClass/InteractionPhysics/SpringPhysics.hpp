@@ -29,7 +29,7 @@ class SpringPhysics : public InteractionPhysics
 	REGISTER_CLASS_INDEX(SpringPhysics,InteractionPhysics);
 };
 
-REGISTER_SERIALIZABLE(SpringPhysics,false);
+REGISTER_SERIALIZABLE(SpringPhysics);
 
 #endif // SPRINGPHYSICS_HPP
 

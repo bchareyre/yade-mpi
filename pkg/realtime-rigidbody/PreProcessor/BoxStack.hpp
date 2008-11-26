@@ -48,7 +48,7 @@ class BoxStack : public FileGenerator
 
 };
 
-REGISTER_SERIALIZABLE(BoxStack,false);
+REGISTER_SERIALIZABLE(BoxStack);
 
 #endif // __BOXSTACK_H__
 

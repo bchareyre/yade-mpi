@@ -44,7 +44,7 @@ class PeriodicEngine:  public StandAloneEngine {
 	REGISTER_CLASS_NAME(PeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
-REGISTER_SERIALIZABLE(PeriodicEngine,false);
+REGISTER_SERIALIZABLE(PeriodicEngine);
 
 #if 0
 class StridePeriodicEngine: public PeriodicEngine{
@@ -93,7 +93,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 	REGISTER_CLASS_NAME(StretchPeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
-REGISTER_SERIALIZABLE(StretchPeriodicEngine,false);
+REGISTER_SERIALIZABLE(StretchPeriodicEngine);
 
 // obsolete, too complicated etc
 #if 0 
@@ -165,6 +165,6 @@ class __attribute__((deprecated)) RangePeriodicEngine: public StandAloneEngine {
 	REGISTER_CLASS_NAME(RangePeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
-REGISTER_SERIALIZABLE(RangePeriodicEngine,false);
+REGISTER_SERIALIZABLE(RangePeriodicEngine);
 
 #endif

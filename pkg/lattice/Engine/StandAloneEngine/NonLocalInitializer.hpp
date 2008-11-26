@@ -36,7 +36,7 @@ class NonLocalInitializer : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(NonLocalInitializer,false);
+REGISTER_SERIALIZABLE(NonLocalInitializer);
 
 #endif // NONLOCALINITIALIZER_HPP
 

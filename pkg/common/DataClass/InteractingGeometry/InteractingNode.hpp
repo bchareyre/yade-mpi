@@ -27,6 +27,6 @@ class InteractingNode : public InteractingGeometry
 	REGISTER_CLASS_INDEX(InteractingNode,InteractingGeometry);
 };
 
-REGISTER_SERIALIZABLE(InteractingNode,false);
+REGISTER_SERIALIZABLE(InteractingNode);
 
 #endif // INTERACTING_NODE_HPP

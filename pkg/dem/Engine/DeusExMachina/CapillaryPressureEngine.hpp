@@ -36,7 +36,7 @@ class CapillaryPressureEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(CapillaryPressureEngine,false);
+REGISTER_SERIALIZABLE(CapillaryPressureEngine);
 
 #endif //  CAPILLARYPRESSUREENGINE_HPP
 

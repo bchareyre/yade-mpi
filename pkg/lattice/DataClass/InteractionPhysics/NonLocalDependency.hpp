@@ -31,7 +31,7 @@ class NonLocalDependency : public InteractionPhysics
 
 };
 
-REGISTER_SERIALIZABLE(NonLocalDependency,false);
+REGISTER_SERIALIZABLE(NonLocalDependency);
 
 #endif //  LATTICEBEAMANGULARSPRING_HPP
 

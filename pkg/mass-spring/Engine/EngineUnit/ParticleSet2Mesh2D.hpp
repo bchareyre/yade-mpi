@@ -24,7 +24,7 @@ class ParticleSet2Mesh2D : public GeometricalModelEngineUnit
 	REGISTER_BASE_CLASS_NAME(GeometricalModelEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(ParticleSet2Mesh2D,false);
+REGISTER_SERIALIZABLE(ParticleSet2Mesh2D);
 
 #endif // PARTICLESET2MESH2D_HPP
 

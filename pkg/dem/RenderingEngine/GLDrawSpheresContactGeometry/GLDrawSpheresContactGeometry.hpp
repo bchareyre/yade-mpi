@@ -26,7 +26,7 @@ class GLDrawSpheresContactGeometry : public GLDrawInteractionGeometryFunctor{
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawSpheresContactGeometry,false);
+REGISTER_SERIALIZABLE(GLDrawSpheresContactGeometry);
 
 #endif 
 

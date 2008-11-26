@@ -21,7 +21,7 @@ class InteractionPhysics : public Serializable, public Indexable
 	REGISTER_INDEX_COUNTER(InteractionPhysics);
 };
 
-REGISTER_SERIALIZABLE(InteractionPhysics,false);
+REGISTER_SERIALIZABLE(InteractionPhysics);
 
 #endif //  INTERACTIONPHYSICS_HPP
 

@@ -28,7 +28,7 @@ class GLDrawCohesiveFrictionalContactInteraction : public GLDrawInteractionPhysi
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawCohesiveFrictionalContactInteraction,false);
+REGISTER_SERIALIZABLE(GLDrawCohesiveFrictionalContactInteraction);
 
 #endif 
 

@@ -151,7 +151,7 @@ class TriaxialTest : public FileGenerator
 	DECLARE_LOGGER;
 };
 
-REGISTER_SERIALIZABLE(TriaxialTest,false);
+REGISTER_SERIALIZABLE(TriaxialTest);
 
 #endif // SDECIMPORT_HPP
 

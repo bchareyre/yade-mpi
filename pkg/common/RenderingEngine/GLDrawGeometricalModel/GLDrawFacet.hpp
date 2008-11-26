@@ -22,7 +22,7 @@ class GLDrawFacet : public GLDrawGeometricalModelFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawFacet,false);
+REGISTER_SERIALIZABLE(GLDrawFacet);
 
 #endif // GLDRAWIFACET_HPP
 

@@ -27,7 +27,7 @@ class LatticeSet2LatticeBeams : public GeometricalModelEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(LatticeSet2LatticeBeams,false);
+REGISTER_SERIALIZABLE(LatticeSet2LatticeBeams);
 
 #endif // LATTICE_SET_2_LATTICE_BEAMS_HPP 
 

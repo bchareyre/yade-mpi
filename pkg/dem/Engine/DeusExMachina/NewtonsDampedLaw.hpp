@@ -53,5 +53,5 @@ class NewtonsDampedLaw : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(NewtonsDampedLaw,false);
+REGISTER_SERIALIZABLE(NewtonsDampedLaw);
 

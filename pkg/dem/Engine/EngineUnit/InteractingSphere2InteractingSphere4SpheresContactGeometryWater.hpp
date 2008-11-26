@@ -33,7 +33,7 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometryWater : public I
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometryWater,false);
+REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometryWater);
 
 #endif // SPHERE2SPHERE4MACROMICROCONTACTGEOMETRY_HPP
 

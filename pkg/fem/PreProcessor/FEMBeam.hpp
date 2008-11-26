@@ -54,7 +54,7 @@ class FEMBeam : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(FEMBeam,false);
+REGISTER_SERIALIZABLE(FEMBeam);
 
 #endif // SDEC_SPHERES_PLANE_HPP 
 

@@ -31,7 +31,7 @@ class QtGUIPreferences : public Serializable
 
 };
 
-REGISTER_SERIALIZABLE(QtGUIPreferences,false);
+REGISTER_SERIALIZABLE(QtGUIPreferences);
 
 #endif // QTGUIPREFERENCES_HPP
 

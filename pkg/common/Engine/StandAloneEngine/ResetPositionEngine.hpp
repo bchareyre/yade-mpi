@@ -43,7 +43,7 @@ class ResetPositionEngine : public PeriodicEngine {
 		void initialize(MetaBody * ncb);
 };
 
-REGISTER_SERIALIZABLE(ResetPositionEngine,false);
+REGISTER_SERIALIZABLE(ResetPositionEngine);
 
 #endif //  RESETPOSITONENGINE_HPP
 

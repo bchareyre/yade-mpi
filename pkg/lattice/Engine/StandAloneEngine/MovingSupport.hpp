@@ -50,7 +50,7 @@ class MovingSupport : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(MovingSupport,false);
+REGISTER_SERIALIZABLE(MovingSupport);
 
 #endif // STRAIN_RECORDER_HPP 
 

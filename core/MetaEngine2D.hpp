@@ -109,7 +109,7 @@ class MetaEngine2D : public MetaEngine,
 
 };
 
-//REGISTER_SERIALIZABLE(MetaEngine2D,false);
+//REGISTER_SERIALIZABLE(MetaEngine2D);
 
 /*
 #define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\

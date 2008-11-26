@@ -25,7 +25,7 @@ class LatticeSetGeometry : public GeometricalModel
 	REGISTER_CLASS_INDEX(LatticeSetGeometry,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(LatticeSetGeometry,false);
+REGISTER_SERIALIZABLE(LatticeSetGeometry);
 
 #endif // __LATTICESETGEOMETRY_HPP__
 

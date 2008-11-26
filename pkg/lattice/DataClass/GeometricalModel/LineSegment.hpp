@@ -31,7 +31,7 @@ class LineSegment : public GeometricalModel
 
 };
 
-REGISTER_SERIALIZABLE(LineSegment,false);
+REGISTER_SERIALIZABLE(LineSegment);
 
 #endif // LINE_SEGMENT_HPP
 

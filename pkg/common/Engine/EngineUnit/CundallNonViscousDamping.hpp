@@ -17,7 +17,7 @@ class CundallNonViscousForceDamping : public PhysicalActionDamperUnit{
 	REGISTER_CLASS_NAME(CundallNonViscousForceDamping);
 	REGISTER_BASE_CLASS_NAME(PhysicalActionDamperUnit);
 };
-REGISTER_SERIALIZABLE(CundallNonViscousForceDamping,false);
+REGISTER_SERIALIZABLE(CundallNonViscousForceDamping);
 
 class CundallNonViscousMomentumDamping : public PhysicalActionDamperUnit{
 	public:
@@ -34,6 +34,6 @@ class CundallNonViscousMomentumDamping : public PhysicalActionDamperUnit{
 	REGISTER_CLASS_NAME(CundallNonViscousMomentumDamping);
 	REGISTER_BASE_CLASS_NAME(PhysicalActionDamperUnit);
 };
-REGISTER_SERIALIZABLE(CundallNonViscousMomentumDamping,false);
+REGISTER_SERIALIZABLE(CundallNonViscousMomentumDamping);
 
 

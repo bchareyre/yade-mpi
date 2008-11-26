@@ -21,7 +21,7 @@ class GLDrawBox : public GLDrawGeometricalModelFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawBox,false);
+REGISTER_SERIALIZABLE(GLDrawBox);
 
 #endif //  GLDRAWBOX_HPP
 

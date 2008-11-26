@@ -30,7 +30,7 @@ class BoundingSphere : public BoundingVolume
 	REGISTER_CLASS_INDEX(BoundingSphere,BoundingVolume);
 };
 
-REGISTER_SERIALIZABLE(BoundingSphere,false);
+REGISTER_SERIALIZABLE(BoundingSphere);
 
 #endif // __BOUNDINGSPHERE_H__
 

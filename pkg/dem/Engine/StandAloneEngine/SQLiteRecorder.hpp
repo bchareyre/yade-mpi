@@ -54,6 +54,6 @@ class SQLiteRecorder: public PeriodicEngine {
 	REGISTER_CLASS_NAME(SQLiteRecorder);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
-REGISTER_SERIALIZABLE(SQLiteRecorder,false);
+REGISTER_SERIALIZABLE(SQLiteRecorder);
 
 

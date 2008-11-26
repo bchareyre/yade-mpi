@@ -38,7 +38,7 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(CohesiveFrictionalRelationships,false);
+REGISTER_SERIALIZABLE(CohesiveFrictionalRelationships);
 
 #endif // COHESIVEFRICTIONALCONTACTMODEL_HPP
 

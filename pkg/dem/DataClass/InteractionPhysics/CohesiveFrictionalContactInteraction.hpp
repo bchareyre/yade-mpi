@@ -42,7 +42,7 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 
 };
 
-REGISTER_SERIALIZABLE(CohesiveFrictionalContactInteraction,false);
+REGISTER_SERIALIZABLE(CohesiveFrictionalContactInteraction);
 
 #endif // COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_HPP
 

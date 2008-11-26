@@ -30,7 +30,7 @@ class FEMTetrahedronStiffness : public PhysicalParametersEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(FEMTetrahedronStiffness,false);
+REGISTER_SERIALIZABLE(FEMTetrahedronStiffness);
 
 #endif // FEM_TETRAHEDRON_PARAMETERS_HPP 
 

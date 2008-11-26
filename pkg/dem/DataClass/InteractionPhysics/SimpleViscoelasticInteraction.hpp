@@ -44,7 +44,7 @@ class SimpleViscoelasticInteraction : public InteractionPhysics
 
 };
 
-REGISTER_SERIALIZABLE(SimpleViscoelasticInteraction,false);
+REGISTER_SERIALIZABLE(SimpleViscoelasticInteraction);
 
 #endif // SIMPLEVISCOELASTICINTERACTION_HPP
 

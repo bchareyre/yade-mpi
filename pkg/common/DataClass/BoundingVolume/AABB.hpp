@@ -30,7 +30,7 @@ class AABB : public BoundingVolume
 	REGISTER_CLASS_INDEX(AABB,BoundingVolume);
 };
 
-REGISTER_SERIALIZABLE(AABB,false);
+REGISTER_SERIALIZABLE(AABB);
 
 #endif // __AABB_H__
 

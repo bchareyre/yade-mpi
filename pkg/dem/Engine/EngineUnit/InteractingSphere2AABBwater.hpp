@@ -23,7 +23,7 @@ class InteractingSphere2AABBwater : public BoundingVolumeEngineUnit
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere2AABBwater,false);
+REGISTER_SERIALIZABLE(InteractingSphere2AABBwater);
 
 #endif // SPHERE2AABBWATER_HPP
 

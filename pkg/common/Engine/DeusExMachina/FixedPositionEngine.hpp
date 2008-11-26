@@ -28,7 +28,7 @@ class FixedPositionEngine : public DeusExMachina {
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(FixedPositionEngine,false);
+REGISTER_SERIALIZABLE(FixedPositionEngine);
 
 #endif //  DISPLACEMENTENGINE_HPP
 

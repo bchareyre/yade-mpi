@@ -34,7 +34,7 @@ class PhysicalActionDamper : public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionDamper,false);
+REGISTER_SERIALIZABLE(PhysicalActionDamper);
 
 #endif // __PHYSICALACTIONDAMPER_HPP__
 

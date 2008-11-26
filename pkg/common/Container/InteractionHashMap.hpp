@@ -79,5 +79,5 @@ class InteractionHashMapIterator : public InteractionContainerIterator
 
 };
 
-REGISTER_SERIALIZABLE(InteractionHashMap,false);
+REGISTER_SERIALIZABLE(InteractionHashMap);
 

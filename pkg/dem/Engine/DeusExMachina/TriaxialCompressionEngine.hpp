@@ -135,7 +135,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 	REGISTER_BASE_CLASS_NAME(TriaxialStressController);
 };
 
-REGISTER_SERIALIZABLE(TriaxialCompressionEngine,false);
+REGISTER_SERIALIZABLE(TriaxialCompressionEngine);
 
 #endif //  TRIAXIALCOMPRESSIONENGINE_HPP
 

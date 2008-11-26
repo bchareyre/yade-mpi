@@ -35,7 +35,7 @@ class GLDrawLatticeInteractingGeometry : public GLDrawInteractingGeometryFunctor
 
 };
 
-REGISTER_SERIALIZABLE(GLDrawLatticeInteractingGeometry,false);
+REGISTER_SERIALIZABLE(GLDrawLatticeInteractingGeometry);
 
 #endif
 

@@ -26,7 +26,7 @@ class StaticSpheresAttractionEngine : public StaticAttractionEngine
 	REGISTER_BASE_CLASS_NAME(StaticAttractionEngine);
 };
 
-REGISTER_SERIALIZABLE(StaticSpheresAttractionEngine,false);
+REGISTER_SERIALIZABLE(StaticSpheresAttractionEngine);
 
 #endif 
 

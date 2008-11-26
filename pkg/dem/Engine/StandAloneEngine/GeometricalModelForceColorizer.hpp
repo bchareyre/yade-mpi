@@ -29,7 +29,7 @@ class GeometricalModelForceColorizer : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(GeometricalModelForceColorizer,false);
+REGISTER_SERIALIZABLE(GeometricalModelForceColorizer);
 
 #endif // FORCE_RECORDER_HPP
 

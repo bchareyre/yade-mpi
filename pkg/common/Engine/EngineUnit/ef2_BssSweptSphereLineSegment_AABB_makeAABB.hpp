@@ -25,7 +25,7 @@ class ef2_BssSweptSphereLineSegment_AABB_makeAABB : public BoundingVolumeEngineU
 	        REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(ef2_BssSweptSphereLineSegment_AABB_makeAABB,false);
+REGISTER_SERIALIZABLE(ef2_BssSweptSphereLineSegment_AABB_makeAABB);
 
 #endif // EF2_BSS_SWEPT_SPHERE_LINE_SEGMENT__AABB__MAKE_AABB
 

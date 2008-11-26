@@ -28,7 +28,7 @@ class FixedOrientationEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(FixedOrientationEngine,false);
+REGISTER_SERIALIZABLE(FixedOrientationEngine);
 
 #endif //  DISPLACEMENTENGINE_HPP
 

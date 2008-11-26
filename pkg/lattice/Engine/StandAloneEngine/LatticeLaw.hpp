@@ -46,7 +46,7 @@ class LatticeLaw : public InteractionSolver
 };
 
 
-REGISTER_SERIALIZABLE(LatticeLaw,false);
+REGISTER_SERIALIZABLE(LatticeLaw);
 
 
 #endif // LATTICELAW_HPP

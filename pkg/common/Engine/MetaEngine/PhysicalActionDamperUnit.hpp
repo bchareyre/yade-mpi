@@ -27,6 +27,6 @@ class PhysicalActionDamperUnit : public EngineUnit2D
 	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionDamperUnit,false);
+REGISTER_SERIALIZABLE(PhysicalActionDamperUnit);
 
 #endif // __PHYSICALACTIONDAMPINGUNIT_HPP__

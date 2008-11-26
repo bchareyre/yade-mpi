@@ -21,7 +21,7 @@ class InteractionGeometry : public Serializable, public Indexable
 	REGISTER_INDEX_COUNTER(InteractionGeometry);
 };
 
-REGISTER_SERIALIZABLE(InteractionGeometry,false);
+REGISTER_SERIALIZABLE(InteractionGeometry);
 
 #endif // INTERACTIONGEOMETRY_HPP
 

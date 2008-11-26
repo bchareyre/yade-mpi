@@ -33,7 +33,7 @@ class FEMNodeData : public ParticleParameters
 
 };
 
-REGISTER_SERIALIZABLE(FEMNodeData,false);
+REGISTER_SERIALIZABLE(FEMNodeData);
 
 #endif // FEM_NODE_PARAMETERS_HPP
 

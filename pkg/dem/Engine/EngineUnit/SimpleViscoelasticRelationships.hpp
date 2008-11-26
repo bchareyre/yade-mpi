@@ -32,7 +32,7 @@ class SimpleViscoelasticRelationships : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(SimpleViscoelasticRelationships,false);
+REGISTER_SERIALIZABLE(SimpleViscoelasticRelationships);
 
 #endif // SIMPLEVISCOELASTICRELATIIONSHIPS_HPP
 

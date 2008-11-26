@@ -33,7 +33,7 @@ class MacroMicroElasticRelationships : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(MacroMicroElasticRelationships,false);
+REGISTER_SERIALIZABLE(MacroMicroElasticRelationships);
 
 #endif // __SDECLINEARCONTACTMODEL_HPP__
 

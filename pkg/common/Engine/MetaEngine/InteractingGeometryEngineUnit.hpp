@@ -45,7 +45,7 @@ class InteractingGeometryEngineUnit : 	public EngineUnit2D
 	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
-REGISTER_SERIALIZABLE(InteractingGeometryEngineUnit,false);
+REGISTER_SERIALIZABLE(InteractingGeometryEngineUnit);
 
 #endif //  INTERACTING_GEOMETRY_ENGINE_UNIT_HPP
 

@@ -42,7 +42,7 @@ class InteractionPhysicsEngineUnit : 	public EngineUnit2D
 
 };
 
-REGISTER_SERIALIZABLE(InteractionPhysicsEngineUnit,false);
+REGISTER_SERIALIZABLE(InteractionPhysicsEngineUnit);
 
 #endif // INTERACTIONPHYSICS_ENGINEUNIT_HPP
 

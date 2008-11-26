@@ -37,7 +37,7 @@ class InteractingGeometryMetaEngine : 	public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
-REGISTER_SERIALIZABLE(InteractingGeometryMetaEngine,false);
+REGISTER_SERIALIZABLE(InteractingGeometryMetaEngine);
 
 #endif //  INTERACTINGGEOMETRYMETAENGINE_HPP
 

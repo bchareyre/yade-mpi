@@ -21,6 +21,6 @@ class InteractionSolver : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(InteractionSolver,false);
+REGISTER_SERIALIZABLE(InteractionSolver);
 
 #endif // INTERACTIONSOLVER_HPP

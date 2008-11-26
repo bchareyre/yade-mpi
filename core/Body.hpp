@@ -93,4 +93,4 @@ class Body : public Serializable
 	REGISTER_CLASS_NAME(Body);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
-REGISTER_SERIALIZABLE(Body,false);
+REGISTER_SERIALIZABLE(Body);

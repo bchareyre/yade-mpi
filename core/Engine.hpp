@@ -34,7 +34,7 @@ class Engine : public Serializable
 
 };
 
-REGISTER_SERIALIZABLE(Engine,false);
+REGISTER_SERIALIZABLE(Engine);
 
 #endif // ENGINE_HPP
 

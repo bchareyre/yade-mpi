@@ -43,7 +43,7 @@ class ColorizedVelocityFilter : public FilterEngine {
 	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };
 
-REGISTER_SERIALIZABLE(ColorizedVelocityFilter,false);
+REGISTER_SERIALIZABLE(ColorizedVelocityFilter);
 
 #endif // COLORIZED_VELOCITY_FILTER_HPP 
 

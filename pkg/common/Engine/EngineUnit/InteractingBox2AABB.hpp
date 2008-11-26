@@ -25,7 +25,7 @@ class InteractingBox2AABB : public BoundingVolumeEngineUnit
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractingBox2AABB,false);
+REGISTER_SERIALIZABLE(InteractingBox2AABB);
 
 #endif // INTERACTINGBOX2AABB_HPP
 

@@ -37,7 +37,7 @@ class ElasticCohesiveLaw : public InteractionSolver
 
 };
 
-REGISTER_SERIALIZABLE(ElasticCohesiveLaw,false);
+REGISTER_SERIALIZABLE(ElasticCohesiveLaw);
 
 #endif // ELASTICCOHESIVELAW_HPP
 

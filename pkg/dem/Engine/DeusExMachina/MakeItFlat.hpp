@@ -35,7 +35,7 @@ class MakeItFlat : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(MakeItFlat,false);
+REGISTER_SERIALIZABLE(MakeItFlat);
 
 #endif // HydraulicForce_FORCE_FUNCTOR_HPP 
 

@@ -34,7 +34,7 @@ class TimeStepper : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(TimeStepper,false);
+REGISTER_SERIALIZABLE(TimeStepper);
 
 #endif // TIMESTEPPER_HPP
 

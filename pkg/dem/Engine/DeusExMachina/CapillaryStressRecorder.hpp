@@ -48,7 +48,7 @@ class CapillaryStressRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(CapillaryStressRecorder,false);
+REGISTER_SERIALIZABLE(CapillaryStressRecorder);
 
 #endif // CAPILLARY_STRESS_RECORDER_HPP
 

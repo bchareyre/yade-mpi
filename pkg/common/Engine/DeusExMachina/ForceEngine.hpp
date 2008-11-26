@@ -32,7 +32,7 @@ class ForceEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(ForceEngine,false);
+REGISTER_SERIALIZABLE(ForceEngine);
 
 #endif // FORCE_ENGINE_HPP
 

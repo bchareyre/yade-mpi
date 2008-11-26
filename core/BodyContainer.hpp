@@ -112,7 +112,7 @@ class BodyContainer : public Serializable
 		virtual void postProcessAttributes(bool deserializing);
 };
 
-REGISTER_SERIALIZABLE(BodyContainer,false);
+REGISTER_SERIALIZABLE(BodyContainer);
 
 /* for BOOST_FOREACH compatibility */
 #ifndef FOREACH

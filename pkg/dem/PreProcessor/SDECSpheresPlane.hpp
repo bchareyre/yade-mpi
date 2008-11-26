@@ -53,7 +53,7 @@ class SDECSpheresPlane : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(SDECSpheresPlane,false);
+REGISTER_SERIALIZABLE(SDECSpheresPlane);
 
 #endif // SDEC_SPHERES_PLANE_HPP 
 

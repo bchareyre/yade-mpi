@@ -36,7 +36,7 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometry,false);
+REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometry);
 
 #endif // __BOX2SPHERE4SDECCONTACTMODEL_H__
 

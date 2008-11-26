@@ -35,4 +35,4 @@ class PhysicalParameters: public Serializable, public Indexable
 	REGISTER_INDEX_COUNTER(PhysicalParameters);
 };
 
-REGISTER_SERIALIZABLE(PhysicalParameters,false);
+REGISTER_SERIALIZABLE(PhysicalParameters);

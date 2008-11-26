@@ -133,7 +133,7 @@ class CohesiveTriaxialTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(CohesiveTriaxialTest,false);
+REGISTER_SERIALIZABLE(CohesiveTriaxialTest);
 
 #endif // COHESIVE_TRIAXIAL_TEST_HPP
 

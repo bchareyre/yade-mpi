@@ -42,7 +42,7 @@ class MembraneTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(MembraneTest,false);
+REGISTER_SERIALIZABLE(MembraneTest);
 
 #endif // MEMBRANETEST_HPP
 

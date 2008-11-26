@@ -51,7 +51,7 @@ class ContactLaw1 : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(ContactLaw1,false);
+REGISTER_SERIALIZABLE(ContactLaw1);
 
 #endif // CONTACT_LAW_1_HPP
 

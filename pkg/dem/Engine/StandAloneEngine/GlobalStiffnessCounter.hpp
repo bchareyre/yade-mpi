@@ -46,7 +46,7 @@ class GlobalStiffnessCounter : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(GlobalStiffnessCounter,false);
+REGISTER_SERIALIZABLE(GlobalStiffnessCounter);
 
 #endif // GLOBALSTIFFNESSCOUNTER_HPP
 

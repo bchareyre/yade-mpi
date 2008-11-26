@@ -46,7 +46,7 @@ class SpatialQuickSortCollider : public BroadInteractor {
 	REGISTER_BASE_CLASS_NAME(BroadInteractor);
 
 };
-REGISTER_SERIALIZABLE(SpatialQuickSortCollider,false);
+REGISTER_SERIALIZABLE(SpatialQuickSortCollider);
 
 #endif //___SPATIALQUICKSORTCOLLIDER___
 

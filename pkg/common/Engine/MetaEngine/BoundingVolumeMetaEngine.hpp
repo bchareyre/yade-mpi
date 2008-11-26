@@ -39,7 +39,7 @@ class BoundingVolumeMetaEngine :	public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
-REGISTER_SERIALIZABLE(BoundingVolumeMetaEngine,false);
+REGISTER_SERIALIZABLE(BoundingVolumeMetaEngine);
 
 #endif // BOUNDINGVOLUMEUPDATOR_HPP
 

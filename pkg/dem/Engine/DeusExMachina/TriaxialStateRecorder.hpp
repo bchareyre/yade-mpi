@@ -61,7 +61,7 @@ class TriaxialStateRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(TriaxialStateRecorder,false);
+REGISTER_SERIALIZABLE(TriaxialStateRecorder);
 
 #endif // WALL_STRESS_RECORDER_HPP
 

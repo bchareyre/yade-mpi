@@ -15,5 +15,5 @@ class SimpleScene: public FileGenerator {
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(SimpleScene,false);
+REGISTER_SERIALIZABLE(SimpleScene);
 

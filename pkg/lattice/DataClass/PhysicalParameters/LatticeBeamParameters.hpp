@@ -67,7 +67,7 @@ class LatticeBeamParameters : public PhysicalParameters
 
 };
 
-REGISTER_SERIALIZABLE(LatticeBeamParameters,false);
+REGISTER_SERIALIZABLE(LatticeBeamParameters);
 
 #endif // LATTICE_BEAM_PARAMETERS_HPP 
 

@@ -23,7 +23,7 @@ class NewtonsForceLaw : public PhysicalActionApplierUnit
 	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
 };
 
-REGISTER_SERIALIZABLE(NewtonsForceLaw,false);
+REGISTER_SERIALIZABLE(NewtonsForceLaw);
 
 #endif // NEWTONSFORCELAW_HPP
 

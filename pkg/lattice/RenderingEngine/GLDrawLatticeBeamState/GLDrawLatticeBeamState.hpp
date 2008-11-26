@@ -22,7 +22,7 @@ class GLDrawLatticeBeamState : public GLDrawStateFunctor
 
 };
 
-REGISTER_SERIALIZABLE(GLDrawLatticeBeamState,false);
+REGISTER_SERIALIZABLE(GLDrawLatticeBeamState);
 
 #endif // GLDRAW_LINE_SEGMENT_HPP
 

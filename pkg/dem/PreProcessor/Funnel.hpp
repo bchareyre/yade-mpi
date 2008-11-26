@@ -49,7 +49,7 @@ class Funnel : public FileGenerator
 
 };
 
-REGISTER_SERIALIZABLE(Funnel,false);
+REGISTER_SERIALIZABLE(Funnel);
 
 #endif //  FUNNEL_HPP
 

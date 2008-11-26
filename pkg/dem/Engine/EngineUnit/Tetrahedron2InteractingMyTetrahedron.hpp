@@ -43,7 +43,7 @@ class Tetrahedron2InteractingMyTetrahedron : public InteractingGeometryEngineUni
 	DEFINE_FUNCTOR_ORDER_2D(Tetrahedron,InteractingMyTetrahedron);
 };
 
-REGISTER_SERIALIZABLE(Tetrahedron2InteractingMyTetrahedron,false);
+REGISTER_SERIALIZABLE(Tetrahedron2InteractingMyTetrahedron);
 
 #endif // TETRAHEDRON2POLYHEDRALSWEPTSPHERE_HPP
 

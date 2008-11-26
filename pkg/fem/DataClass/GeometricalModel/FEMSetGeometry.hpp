@@ -26,7 +26,7 @@ class FEMSetGeometry : public GeometricalModel
 
 };
 
-REGISTER_SERIALIZABLE(FEMSetGeometry,false);
+REGISTER_SERIALIZABLE(FEMSetGeometry);
 
 #endif // FEM_SET_GEOMETRY_HPP
 

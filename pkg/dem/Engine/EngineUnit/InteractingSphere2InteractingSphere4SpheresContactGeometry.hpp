@@ -40,5 +40,5 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 		virtual void registerAttributes();
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometry,false);
+REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometry);
 

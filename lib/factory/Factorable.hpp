@@ -16,6 +16,10 @@
 #include <string>
 #include <sstream>
 
+
+//! macro for registering both class and its base
+#define REGISTER_CLASS_AND_BASE(cn,bcn) REGISTER_CLASS_NAME(cn); REGISTER_BASE_CLASS_NAME(bcn);
+
 #define REGISTER_CLASS_NAME(cn)								\
 	public : virtual string getClassName() const { return #cn; };
 

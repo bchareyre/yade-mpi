@@ -45,7 +45,7 @@ class FEMSetTextLoader : public PhysicalParametersEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(FEMSetTextLoader,false);
+REGISTER_SERIALIZABLE(FEMSetTextLoader);
 
 #endif // FEM_SET_TEXT_LOADER_HPP 
 

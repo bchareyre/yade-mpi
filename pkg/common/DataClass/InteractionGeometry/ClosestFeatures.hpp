@@ -30,7 +30,7 @@ class ClosestFeatures : public InteractionGeometry
 	REGISTER_CLASS_INDEX(ClosestFeatures,InteractionGeometry);
 };
 
-REGISTER_SERIALIZABLE(ClosestFeatures,false);
+REGISTER_SERIALIZABLE(ClosestFeatures);
 
 #endif // __CLOSESTSFEATURES_H__
 

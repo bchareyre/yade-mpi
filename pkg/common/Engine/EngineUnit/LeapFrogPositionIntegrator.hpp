@@ -26,7 +26,7 @@ class LeapFrogPositionIntegrator : public PhysicalParametersEngineUnit
 	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(LeapFrogPositionIntegrator,false);
+REGISTER_SERIALIZABLE(LeapFrogPositionIntegrator);
 
 #endif // LEAPFROG_POSITION_INTEGRATOR_HPP
 

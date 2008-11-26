@@ -127,7 +127,7 @@ class PersistentTriangulationCollider : public BroadInteractor
 
 };
 
-REGISTER_SERIALIZABLE(PersistentTriangulationCollider,false);
+REGISTER_SERIALIZABLE(PersistentTriangulationCollider);
 
 #endif // __PERSISTENTSAPCOLLIDER_HPP__
 

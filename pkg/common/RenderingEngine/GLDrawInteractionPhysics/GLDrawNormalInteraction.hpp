@@ -21,7 +21,7 @@ class GLDrawNormalInteraction : public GLDrawInteractionPhysicsFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawNormalInteraction,false);
+REGISTER_SERIALIZABLE(GLDrawNormalInteraction);
 
 #endif
 

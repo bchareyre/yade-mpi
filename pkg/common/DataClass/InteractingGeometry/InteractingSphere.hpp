@@ -29,7 +29,7 @@ class InteractingSphere : public InteractingGeometry
 	REGISTER_CLASS_INDEX(InteractingSphere,InteractingGeometry);
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere,false);
+REGISTER_SERIALIZABLE(InteractingSphere);
 
 #endif // INTERACTIONSPHERE_HPP
 

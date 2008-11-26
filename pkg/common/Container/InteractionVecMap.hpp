@@ -58,5 +58,5 @@ class InteractionVecMap : public InteractionContainer
 
 };
 
-REGISTER_SERIALIZABLE(InteractionVecMap,false);
+REGISTER_SERIALIZABLE(InteractionVecMap);
 

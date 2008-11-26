@@ -85,4 +85,4 @@ class OpenGLRenderingEngine : public RenderingEngine
 	REGISTER_CLASS_NAME(OpenGLRenderingEngine);
 	REGISTER_BASE_CLASS_NAME(RenderingEngine);
 };
-REGISTER_SERIALIZABLE(OpenGLRenderingEngine,false);
+REGISTER_SERIALIZABLE(OpenGLRenderingEngine);

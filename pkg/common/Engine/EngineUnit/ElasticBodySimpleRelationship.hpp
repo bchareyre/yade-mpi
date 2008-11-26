@@ -28,7 +28,7 @@ class ElasticBodySimpleRelationship : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(ElasticBodySimpleRelationship,false);
+REGISTER_SERIALIZABLE(ElasticBodySimpleRelationship);
 
 #endif // 
 

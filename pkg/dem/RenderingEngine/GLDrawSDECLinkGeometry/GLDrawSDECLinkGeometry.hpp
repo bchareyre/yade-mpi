@@ -25,7 +25,7 @@ class GLDrawSDECLinkGeometry : public GLDrawInteractionGeometryFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawSDECLinkGeometry,false);
+REGISTER_SERIALIZABLE(GLDrawSDECLinkGeometry);
 
 #endif 
 

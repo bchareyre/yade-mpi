@@ -34,7 +34,7 @@ class BssSweptSphereLineSegment : public InteractingGeometry
 
 };
 
-REGISTER_SERIALIZABLE(BssSweptSphereLineSegment,false);
+REGISTER_SERIALIZABLE(BssSweptSphereLineSegment);
 
 #endif //  BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
 

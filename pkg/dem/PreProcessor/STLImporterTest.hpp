@@ -54,7 +54,7 @@ class STLImporterTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(STLImporterTest,false);
+REGISTER_SERIALIZABLE(STLImporterTest);
 
 #endif // STLIMPORTERTEST_HPP
 

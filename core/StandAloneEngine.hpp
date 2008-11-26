@@ -21,7 +21,7 @@ class StandAloneEngine : public Engine
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-REGISTER_SERIALIZABLE(StandAloneEngine,false);
+REGISTER_SERIALIZABLE(StandAloneEngine);
 
 #endif // STANDALONEENGINE_HPP
 

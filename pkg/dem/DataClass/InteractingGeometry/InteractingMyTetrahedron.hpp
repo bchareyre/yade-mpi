@@ -55,7 +55,7 @@ class InteractingMyTetrahedron : public InteractingGeometry
 	REGISTER_CLASS_INDEX(InteractingMyTetrahedron,InteractingGeometry);
 };
 
-REGISTER_SERIALIZABLE(InteractingMyTetrahedron,false);
+REGISTER_SERIALIZABLE(InteractingMyTetrahedron);
 
 #endif // INTERACTING_MY_TETRAHEDRON_HPP
 

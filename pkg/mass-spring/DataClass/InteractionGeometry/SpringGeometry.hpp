@@ -29,7 +29,7 @@ class SpringGeometry : public InteractionGeometry
 	REGISTER_CLASS_INDEX(SpringGeometry,InteractionGeometry);
 };
 
-REGISTER_SERIALIZABLE(SpringGeometry,false);
+REGISTER_SERIALIZABLE(SpringGeometry);
 
 #endif // SPRINGGEOMETRY_HPP
 

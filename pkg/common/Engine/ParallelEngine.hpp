@@ -14,4 +14,4 @@ class ParallelEngine: public Engine {
 	REGISTER_CLASS_NAME(ParallelEngine);
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
-REGISTER_SERIALIZABLE(ParallelEngine,false);
+REGISTER_SERIALIZABLE(ParallelEngine);

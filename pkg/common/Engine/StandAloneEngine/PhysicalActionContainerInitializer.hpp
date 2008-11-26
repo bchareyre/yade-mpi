@@ -34,7 +34,7 @@ class PhysicalActionContainerInitializer : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionContainerInitializer,false);
+REGISTER_SERIALIZABLE(PhysicalActionContainerInitializer);
 
 #endif // ACTION_PARAMETER_INITIALIZER_HPP
 

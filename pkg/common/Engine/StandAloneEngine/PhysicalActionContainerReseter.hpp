@@ -24,7 +24,7 @@ class PhysicalActionContainerReseter : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionContainerReseter,false);
+REGISTER_SERIALIZABLE(PhysicalActionContainerReseter);
 
 #endif // ACTION_PARAMETER_RESET_HPP 
 

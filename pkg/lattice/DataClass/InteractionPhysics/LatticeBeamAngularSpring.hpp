@@ -42,7 +42,7 @@ class LatticeBeamAngularSpring : public InteractionPhysics
 
 };
 
-REGISTER_SERIALIZABLE(LatticeBeamAngularSpring,false);
+REGISTER_SERIALIZABLE(LatticeBeamAngularSpring);
 
 #endif //  LATTICEBEAMANGULARSPRING_HPP
 

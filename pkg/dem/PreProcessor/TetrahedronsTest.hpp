@@ -106,7 +106,7 @@ class TetrahedronsTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(TetrahedronsTest,false);
+REGISTER_SERIALIZABLE(TetrahedronsTest);
 
 #endif // TETRAHEDRONSTEST_HPP
 

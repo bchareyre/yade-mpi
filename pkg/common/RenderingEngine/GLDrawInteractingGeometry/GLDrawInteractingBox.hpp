@@ -21,7 +21,7 @@ class GLDrawInteractingBox : public GLDrawInteractingGeometryFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractingBox,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingBox);
 
 #endif //  GLDRAWINTERACTIONBOX_HPP
 

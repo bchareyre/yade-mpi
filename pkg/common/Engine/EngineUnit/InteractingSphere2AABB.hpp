@@ -23,7 +23,7 @@ class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere2AABB,false);
+REGISTER_SERIALIZABLE(InteractingSphere2AABB);
 
 #endif // SPHERE2AABB_HPP
 

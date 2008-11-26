@@ -31,4 +31,4 @@ class BoundingVolume : public Serializable, public Indexable
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
 	REGISTER_INDEX_COUNTER(BoundingVolume);
 };
-REGISTER_SERIALIZABLE(BoundingVolume,false);
+REGISTER_SERIALIZABLE(BoundingVolume);

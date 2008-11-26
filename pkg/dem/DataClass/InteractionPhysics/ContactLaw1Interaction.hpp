@@ -45,7 +45,7 @@ class ContactLaw1Interaction : public ElasticContactInteraction
 
 };
 
-REGISTER_SERIALIZABLE(ContactLaw1Interaction,false);
+REGISTER_SERIALIZABLE(ContactLaw1Interaction);
 
 #endif // COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_MINEBIS_HPP
 

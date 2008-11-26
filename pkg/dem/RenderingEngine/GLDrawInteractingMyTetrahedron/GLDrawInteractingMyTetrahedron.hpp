@@ -24,7 +24,7 @@ class GLDrawInteractingMyTetrahedron : public GLDrawInteractingGeometryFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractingMyTetrahedron,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingMyTetrahedron);
 
 #endif // GLDRAWINTERACTINGMYTETRAHEDRON_HPP
 

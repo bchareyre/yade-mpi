@@ -92,7 +92,7 @@ class CinemKNCEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(CinemKNCEngine,false);
+REGISTER_SERIALIZABLE(CinemKNCEngine);
 
 #endif // CINEMKNCENGINE_HPP
 

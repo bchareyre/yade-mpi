@@ -39,7 +39,7 @@ class PhysicalActionApplier :	public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionApplier,false);
+REGISTER_SERIALIZABLE(PhysicalActionApplier);
 
 #endif // PHYSICALACTIONAPPLIER_HPP
 

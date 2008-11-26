@@ -34,7 +34,7 @@ class InteractingBox2InteractingSphere4SpheresContactGeometryWater : public Inte
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometryWater,false);
+REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometryWater);
 
 #endif // __BOX2SPHERE4SDECCONTACTMODEL_WATER_H__
 

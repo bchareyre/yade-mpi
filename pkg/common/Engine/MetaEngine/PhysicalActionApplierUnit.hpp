@@ -27,7 +27,7 @@ class PhysicalActionApplierUnit :	public EngineUnit2D
 	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
-REGISTER_SERIALIZABLE(PhysicalActionApplierUnit,false);
+REGISTER_SERIALIZABLE(PhysicalActionApplierUnit);
 
 #endif // PHYSICALACTIONAPPLIERUNIT_HPP
 

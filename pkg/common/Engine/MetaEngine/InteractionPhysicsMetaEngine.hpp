@@ -36,7 +36,7 @@ class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
-REGISTER_SERIALIZABLE(InteractionPhysicsMetaEngine,false);
+REGISTER_SERIALIZABLE(InteractionPhysicsMetaEngine);
 
 #endif //  INTERACTIONPHYSICSMETAENGINE_HPP
 

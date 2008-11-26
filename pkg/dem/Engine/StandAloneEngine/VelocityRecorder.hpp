@@ -34,7 +34,7 @@ class VelocityRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(VelocityRecorder,false);
+REGISTER_SERIALIZABLE(VelocityRecorder);
 
 #endif // VELOCITY_RECORDER_HPP 
 

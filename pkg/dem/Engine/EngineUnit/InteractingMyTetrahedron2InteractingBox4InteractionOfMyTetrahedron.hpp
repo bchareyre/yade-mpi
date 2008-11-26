@@ -45,7 +45,7 @@ class InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron : publi
 	DEFINE_FUNCTOR_ORDER_2D(InteractingMyTetrahedron,InteractingBox);
 };
 
-REGISTER_SERIALIZABLE(InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron,false);
+REGISTER_SERIALIZABLE(InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron);
 
 #endif // INTERACTINGMYTETRAHEDRON2INTERACTINGBOX4INTERACTIONOFMYTETRAHEDRON_HPP
 

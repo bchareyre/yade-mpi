@@ -22,7 +22,7 @@ class NormalInteraction:public InteractionPhysics {
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 	REGISTER_CLASS_INDEX(NormalInteraction,InteractionPhysics);
 };
-REGISTER_SERIALIZABLE(NormalInteraction,false);
+REGISTER_SERIALIZABLE(NormalInteraction);
 
 /* Abstract class for interactions that have shear stiffnesses, in addition to normal stiffness.
  *
@@ -45,4 +45,4 @@ class NormalShearInteraction: public NormalInteraction{
 	REGISTER_BASE_CLASS_NAME(NormalInteraction);
 	REGISTER_CLASS_INDEX(NormalShearInteraction,NormalInteraction);
 };
-REGISTER_SERIALIZABLE(NormalShearInteraction,false);
+REGISTER_SERIALIZABLE(NormalShearInteraction);

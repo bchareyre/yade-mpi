@@ -50,6 +50,6 @@ class GlobalStiffness : public PhysicalAction
 	REGISTER_CLASS_INDEX(GlobalStiffness,PhysicalAction);
 };
 
-REGISTER_SERIALIZABLE(GlobalStiffness,false);
+REGISTER_SERIALIZABLE(GlobalStiffness);
 
 #endif // GLOBALSTIFFNESSMATRIX_HPP

@@ -34,7 +34,7 @@ class BrefcomGlobalCharacteristics: public PeriodicEngine{
 	REGISTER_CLASS_NAME(BrefcomGlobalCharacteristics);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
-REGISTER_SERIALIZABLE(BrefcomGlobalCharacteristics,false);
+REGISTER_SERIALIZABLE(BrefcomGlobalCharacteristics);
 
 /*! @brief representation of a single interaction of the brefcom type: storage for relevant parameters.
  *
@@ -127,7 +127,7 @@ class BrefcomContact: public NormalShearInteraction {
 	REGISTER_BASE_CLASS_NAME(NormalShearInteraction);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(BrefcomContact,false);
+REGISTER_SERIALIZABLE(BrefcomContact);
 
 /* This class holds information associated with each body */
 class BrefcomPhysParams: public BodyMacroParameters {
@@ -145,7 +145,7 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		REGISTER_CLASS_NAME(BrefcomPhysParams);
 		REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
 };
-REGISTER_SERIALIZABLE(BrefcomPhysParams,false);
+REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
 class BrefcomLaw: public InteractionSolver{
 	private:
@@ -174,7 +174,7 @@ class BrefcomLaw: public InteractionSolver{
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(BrefcomLaw,false);
+REGISTER_SERIALIZABLE(BrefcomLaw);
 
 /*! @brief Convert macroscopic properties to BrefcomContact with corresponding parameters.
  *
@@ -229,7 +229,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
 		DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(BrefcomMakeContact,false);
+REGISTER_SERIALIZABLE(BrefcomMakeContact);
 
 class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
@@ -241,7 +241,7 @@ class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 	DECLARE_LOGGER;
 	static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
 };
-REGISTER_SERIALIZABLE(GLDrawBrefcomContact,false);
+REGISTER_SERIALIZABLE(GLDrawBrefcomContact);
 
 class BrefcomDamageColorizer: public PeriodicEngine {
 	public:
@@ -253,5 +253,5 @@ class BrefcomDamageColorizer: public PeriodicEngine {
 	REGISTER_CLASS_NAME(BrefcomDamageColorizer);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
-REGISTER_SERIALIZABLE(BrefcomDamageColorizer,false);
+REGISTER_SERIALIZABLE(BrefcomDamageColorizer);
 

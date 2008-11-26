@@ -112,7 +112,7 @@ class PersistentSAPCollider : public BroadInteractor
 
 };
 
-REGISTER_SERIALIZABLE(PersistentSAPCollider,false);
+REGISTER_SERIALIZABLE(PersistentSAPCollider);
 
 #endif // __PERSISTENTSAPCOLLIDER_HPP__
 

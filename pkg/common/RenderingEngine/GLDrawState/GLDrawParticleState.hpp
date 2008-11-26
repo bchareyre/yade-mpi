@@ -21,7 +21,7 @@ class GLDrawParticleState : public GLDrawStateFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawStateFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawParticleState,false);
+REGISTER_SERIALIZABLE(GLDrawParticleState);
 
 #endif //  GLDRAWPARTICLESTATE_HPP
 

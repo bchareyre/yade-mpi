@@ -31,7 +31,7 @@ class Momentum : public PhysicalAction
 	
 	REGISTER_CLASS_INDEX(Momentum,PhysicalAction);
 };
-REGISTER_SERIALIZABLE(Momentum,false);
+REGISTER_SERIALIZABLE(Momentum);
 
 #endif // MOMENTUM_HPP
 

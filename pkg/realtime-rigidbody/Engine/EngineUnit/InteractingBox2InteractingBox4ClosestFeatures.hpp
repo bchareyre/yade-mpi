@@ -46,7 +46,7 @@ class InteractingBox2InteractingBox4ClosestFeatures : public InteractionGeometry
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingBox);
 };
 
-REGISTER_SERIALIZABLE(InteractingBox2InteractingBox4ClosestFeatures,false);
+REGISTER_SERIALIZABLE(InteractingBox2InteractingBox4ClosestFeatures);
 
 #endif // BOX2BOX4CLOSESTFEATURES_HPP
 

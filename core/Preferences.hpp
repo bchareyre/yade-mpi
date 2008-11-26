@@ -32,7 +32,7 @@ class Preferences : public Serializable
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(Preferences,false);
+REGISTER_SERIALIZABLE(Preferences);
 
 #endif // PREFERENCES_HPP
 

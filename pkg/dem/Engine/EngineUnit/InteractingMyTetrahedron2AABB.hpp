@@ -34,7 +34,7 @@ class InteractingMyTetrahedron2AABB : public BoundingVolumeEngineUnit
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(InteractingMyTetrahedron2AABB,false);
+REGISTER_SERIALIZABLE(InteractingMyTetrahedron2AABB);
 
 #endif // INTERACTING_MY_TETRAHEDRON_2AABB_HPP
 

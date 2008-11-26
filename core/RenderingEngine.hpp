@@ -26,7 +26,7 @@ class RenderingEngine :  public Serializable
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(RenderingEngine,false);
+REGISTER_SERIALIZABLE(RenderingEngine);
 
 #endif // RENDERINGENGINE_HPP
 

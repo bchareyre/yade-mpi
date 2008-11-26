@@ -36,7 +36,7 @@ protected :
     REGISTER_CLASS_NAME(RigidBodyRecorder);
     REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
-REGISTER_SERIALIZABLE(RigidBodyRecorder ,false);
+REGISTER_SERIALIZABLE(RigidBodyRecorder );
 
 #endif // RIGIDBODYRECORDER_HPP
 

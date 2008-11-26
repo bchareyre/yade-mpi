@@ -38,4 +38,4 @@ class SnapshotEngine: public PeriodicEngine{
 	REGISTER_CLASS_NAME(SnapshotEngine);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
-REGISTER_SERIALIZABLE(SnapshotEngine,false);
+REGISTER_SERIALIZABLE(SnapshotEngine);

@@ -25,7 +25,7 @@ class Facet : public GeometricalModel {
     REGISTER_CLASS_INDEX(Facet,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(Facet,false);
+REGISTER_SERIALIZABLE(Facet);
 
 #endif // IFACET_HPP
 

@@ -22,7 +22,7 @@ class GLDrawInteractingFacet : public GLDrawInteractingGeometryFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawInteractingFacet,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingFacet);
 
 #endif //  GLDRAWINTERACTINGIFACET_HPP
 

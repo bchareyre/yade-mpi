@@ -40,7 +40,7 @@ class StrainRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(StrainRecorder,false);
+REGISTER_SERIALIZABLE(StrainRecorder);
 
 #endif // STRAIN_RECORDER_HPP 
 

@@ -29,7 +29,7 @@ class SimpleElasticRelationships : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(SimpleElasticRelationships,false);
+REGISTER_SERIALIZABLE(SimpleElasticRelationships);
 
 #endif // SIMPLECONTACTMODEL_HPP
 

@@ -52,7 +52,7 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 		
 };
 
-REGISTER_SERIALIZABLE(InteractingFacet2InteractingSphere4SpheresContactGeometry,false);
+REGISTER_SERIALIZABLE(InteractingFacet2InteractingSphere4SpheresContactGeometry);
 
 #endif //  IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
 

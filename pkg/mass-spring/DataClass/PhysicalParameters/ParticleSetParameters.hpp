@@ -25,7 +25,7 @@ class ParticleSetParameters : public PhysicalParameters
 	REGISTER_CLASS_INDEX(ParticleSetParameters,PhysicalParameters);
 };
 
-REGISTER_SERIALIZABLE(ParticleSetParameters,false);
+REGISTER_SERIALIZABLE(ParticleSetParameters);
 
 #endif // PARTICLESETPARAMETERS_HPP
 

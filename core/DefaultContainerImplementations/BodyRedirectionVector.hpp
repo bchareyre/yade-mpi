@@ -62,5 +62,5 @@ class BodyRedirectionVector : public BodyContainer
 	REGISTER_BASE_CLASS_NAME(BodyContainer);
 };
 
-REGISTER_SERIALIZABLE(BodyRedirectionVector,false);
+REGISTER_SERIALIZABLE(BodyRedirectionVector);
 

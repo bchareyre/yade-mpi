@@ -37,7 +37,7 @@ class GLDrawLatticeSetGeometry : public GLDrawGeometricalModelFunctor
 
 };
 
-REGISTER_SERIALIZABLE(GLDrawLatticeSetGeometry,false);
+REGISTER_SERIALIZABLE(GLDrawLatticeSetGeometry);
 
 #endif // GLDRAW_LINE_SEGMENT_HPP
 

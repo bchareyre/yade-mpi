@@ -40,7 +40,7 @@ class MeasurePoisson : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(MeasurePoisson,false);
+REGISTER_SERIALIZABLE(MeasurePoisson);
 
 #endif // POISSON_RECORDER_HPP
 

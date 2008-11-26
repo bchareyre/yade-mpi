@@ -21,7 +21,7 @@ class EngineUnit : public Serializable
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(EngineUnit,false);
+REGISTER_SERIALIZABLE(EngineUnit);
 
 #endif // ENGINEUNIT_HPP
 

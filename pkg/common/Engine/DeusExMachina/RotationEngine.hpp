@@ -27,7 +27,7 @@ class RotationEngine : public DeusExMachina
 	REGISTER_CLASS_NAME(RotationEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
-REGISTER_SERIALIZABLE(RotationEngine,false);
+REGISTER_SERIALIZABLE(RotationEngine);
 
 /*! Engine applying rotation, finding current angular velocity by interpolating in times and velocities */
 class InterpolatingRotationEngine: public RotationEngine{
@@ -44,6 +44,6 @@ class InterpolatingRotationEngine: public RotationEngine{
 	REGISTER_CLASS_NAME(InterpolatingRotationEngine);
 	REGISTER_BASE_CLASS_NAME(RotationEngine);
 };
-REGISTER_SERIALIZABLE(InterpolatingRotationEngine,false);
+REGISTER_SERIALIZABLE(InterpolatingRotationEngine);
 
 

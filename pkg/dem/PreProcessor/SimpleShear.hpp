@@ -83,7 +83,7 @@ class SimpleShear : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(SimpleShear,false);
+REGISTER_SERIALIZABLE(SimpleShear);
 
 #endif // SIMPLE_SHEAR_HPP
 

@@ -33,7 +33,7 @@ class PhysicalParametersMetaEngine :	public MetaEngine1D
 
 };
 
-REGISTER_SERIALIZABLE(PhysicalParametersMetaEngine,false);
+REGISTER_SERIALIZABLE(PhysicalParametersMetaEngine);
 
 #endif // BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP 
 

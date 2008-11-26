@@ -47,7 +47,7 @@ class NodeRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(NodeRecorder,false);
+REGISTER_SERIALIZABLE(NodeRecorder);
 
 #endif // STRAIN_RECORDER_HPP 
 

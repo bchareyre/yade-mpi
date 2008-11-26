@@ -21,6 +21,6 @@ class BroadInteractor : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(BroadInteractor,false);
+REGISTER_SERIALIZABLE(BroadInteractor);
 
 #endif // BROADINTERACTOR_HPP

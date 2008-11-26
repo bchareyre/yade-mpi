@@ -34,5 +34,5 @@ class ElasticContactInteraction: public NormalShearInteraction
 	REGISTER_BASE_CLASS_NAME(NormalShearInteraction);
 	REGISTER_CLASS_INDEX(ElasticContactInteraction,NormalShearInteraction);
 };
-REGISTER_SERIALIZABLE(ElasticContactInteraction,false);
+REGISTER_SERIALIZABLE(ElasticContactInteraction);
 

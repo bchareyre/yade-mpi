@@ -25,7 +25,7 @@ class ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment : publ
         DEFINE_FUNCTOR_ORDER_2D(BshTube,BssSweptSphereLineSegment);
 };
 
-REGISTER_SERIALIZABLE(ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment,false);
+REGISTER_SERIALIZABLE(ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment);
 
 #endif // ef2_BSH_TUBE__BSS_SSLS__MAKE_BSS_SSLS_HPP
 

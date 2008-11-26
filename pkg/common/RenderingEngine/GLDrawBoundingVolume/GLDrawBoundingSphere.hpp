@@ -21,7 +21,7 @@ class GLDrawBoundingSphere : public GLDrawBoundingVolumeFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawBoundingVolumeFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawBoundingSphere,false);
+REGISTER_SERIALIZABLE(GLDrawBoundingSphere);
 
 #endif //  GLDRAWBOUNDINGSPHERE_HPP
 

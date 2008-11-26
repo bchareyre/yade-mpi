@@ -54,7 +54,7 @@ class VolumicContactLaw : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(VolumicContactLaw,false);
+REGISTER_SERIALIZABLE(VolumicContactLaw);
 
 #endif // VOLUMIC_CONTACT_LAW_HPP
 

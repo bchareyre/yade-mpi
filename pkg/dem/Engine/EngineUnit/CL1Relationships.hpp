@@ -44,7 +44,7 @@ class CL1Relationships : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(CL1Relationships,false);
+REGISTER_SERIALIZABLE(CL1Relationships);
 
 #endif // CL_1_RELATIONSHIPS_HPP
 

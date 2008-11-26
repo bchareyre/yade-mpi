@@ -79,7 +79,7 @@ class InteractionOfMyTetrahedron : public InteractionGeometry
 
 };
 
-REGISTER_SERIALIZABLE(InteractionOfMyTetrahedron,false);
+REGISTER_SERIALIZABLE(InteractionOfMyTetrahedron);
 
 #endif // INTERACTIONOFMYTETRAHEDRON_HPP
 

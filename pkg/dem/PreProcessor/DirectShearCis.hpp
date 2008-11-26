@@ -82,7 +82,7 @@ class DirectShearCis : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(DirectShearCis,false);
+REGISTER_SERIALIZABLE(DirectShearCis);
 
 #endif // DIRECTSHEARCIS_HPP
 

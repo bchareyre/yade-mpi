@@ -47,7 +47,7 @@ class GeometricalModelEngineUnit : 	public EngineUnit2D
 	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };
 
-REGISTER_SERIALIZABLE(GeometricalModelEngineUnit,false);
+REGISTER_SERIALIZABLE(GeometricalModelEngineUnit);
 
 #endif //  GEOMETRICAL_MODEL_ENGINE_UNIT_HPP
 

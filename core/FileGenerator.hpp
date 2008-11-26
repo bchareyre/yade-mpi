@@ -51,7 +51,7 @@ class FileGenerator
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
 
-REGISTER_SERIALIZABLE(FileGenerator,false);
+REGISTER_SERIALIZABLE(FileGenerator);
 
 #endif // FILEGENERATOR_HPP
 

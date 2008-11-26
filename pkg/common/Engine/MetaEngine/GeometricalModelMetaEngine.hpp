@@ -35,7 +35,7 @@ class GeometricalModelMetaEngine :	public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 };
 
-REGISTER_SERIALIZABLE(GeometricalModelMetaEngine,false);
+REGISTER_SERIALIZABLE(GeometricalModelMetaEngine);
 
 #endif // GEOMETRICAL_MODEL_DISPATCHER_HPP
 

@@ -109,7 +109,7 @@ class capillarylaw
 		void fill (const char* filename);
 };
 
-REGISTER_SERIALIZABLE(CapillaryCohesiveLaw,false);
+REGISTER_SERIALIZABLE(CapillaryCohesiveLaw);
 
 #endif // CAPILLARY_COHESIVE_LAW_HPP
 

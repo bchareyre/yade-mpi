@@ -64,7 +64,7 @@ class TestSimpleViscoelastic : public FileGenerator {
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(TestSimpleViscoelastic,false);
+REGISTER_SERIALIZABLE(TestSimpleViscoelastic);
 
 #endif // TESTSIMPLEVISCOELASTIC_HPP
 

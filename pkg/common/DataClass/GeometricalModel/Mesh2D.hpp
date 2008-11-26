@@ -34,7 +34,7 @@ class Edge : public Serializable
 
 };
 
-REGISTER_SERIALIZABLE(Edge,true);
+REGISTER_SERIALIZABLE_FUNDAMENTAL(Edge);
 
 class Mesh2D : public GeometricalModel
 {
@@ -62,7 +62,7 @@ class Mesh2D : public GeometricalModel
 	REGISTER_CLASS_INDEX(Mesh2D,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(Mesh2D,false);
+REGISTER_SERIALIZABLE(Mesh2D);
 
 #endif // MESH2D_HPP
 

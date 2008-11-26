@@ -28,7 +28,7 @@ class GLDrawQuadrilateral : public GLDrawGeometricalModelFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawQuadrilateral,false);
+REGISTER_SERIALIZABLE(GLDrawQuadrilateral);
 
 #endif // GLDRAW_TETRAHEDRON_HPP 
 

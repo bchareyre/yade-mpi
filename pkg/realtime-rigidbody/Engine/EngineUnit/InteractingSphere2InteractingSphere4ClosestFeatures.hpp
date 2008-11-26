@@ -32,7 +32,7 @@ class InteractingSphere2InteractingSphere4ClosestFeatures : public InteractionGe
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4ClosestFeatures,false);
+REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4ClosestFeatures);
 
 #endif // SPHERE2SPHERE4CLOSESTFEATURES_HPP
 

@@ -26,7 +26,7 @@ class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit
 	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(LeapFrogOrientationIntegrator,false);
+REGISTER_SERIALIZABLE(LeapFrogOrientationIntegrator);
 
 #endif // LEAP_FROG_MOMENTUM_INTEGRATOR_HPP
 

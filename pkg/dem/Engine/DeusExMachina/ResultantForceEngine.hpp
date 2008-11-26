@@ -56,7 +56,7 @@ class ResultantForceEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(ResultantForceEngine,false);
+REGISTER_SERIALIZABLE(ResultantForceEngine);
 
 #endif // FORCE_ENGINE_HPP
 

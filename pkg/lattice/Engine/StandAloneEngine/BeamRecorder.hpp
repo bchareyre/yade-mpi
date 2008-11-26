@@ -49,7 +49,7 @@ class BeamRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(BeamRecorder,false);
+REGISTER_SERIALIZABLE(BeamRecorder);
 
 #endif // STRAIN_RECORDER_HPP 
 

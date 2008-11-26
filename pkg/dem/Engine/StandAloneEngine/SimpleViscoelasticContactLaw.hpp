@@ -40,7 +40,7 @@ class SimpleViscoelasticContactLaw : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(SimpleViscoelasticContactLaw,false);
+REGISTER_SERIALIZABLE(SimpleViscoelasticContactLaw);
 
 #endif // SIMPLEVISCOELASTIC_CONTACT_LAW_HPP
 

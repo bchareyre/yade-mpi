@@ -43,7 +43,7 @@ class CapillaryRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(CapillaryRecorder,false);
+REGISTER_SERIALIZABLE(CapillaryRecorder);
 
 #endif // CAPILLARY_RECORDER_HPP
 

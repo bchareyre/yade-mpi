@@ -48,7 +48,7 @@ class RotatingBox : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(RotatingBox,false);
+REGISTER_SERIALIZABLE(RotatingBox);
 
 #endif // ROTATINGBOX_HPP
 

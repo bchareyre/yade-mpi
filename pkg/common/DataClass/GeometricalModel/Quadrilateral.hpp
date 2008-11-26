@@ -33,7 +33,7 @@ class Quadrilateral : public GeometricalModel
 	REGISTER_CLASS_INDEX(Quadrilateral,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(Quadrilateral,false);
+REGISTER_SERIALIZABLE(Quadrilateral);
 
 #endif // TETRAHEDRON_HPP
 

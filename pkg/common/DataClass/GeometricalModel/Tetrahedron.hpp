@@ -33,7 +33,7 @@ class Tetrahedron : public GeometricalModel
 	REGISTER_CLASS_INDEX(Tetrahedron,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(Tetrahedron,false);
+REGISTER_SERIALIZABLE(Tetrahedron);
 
 #endif // TETRAHEDRON_HPP
 

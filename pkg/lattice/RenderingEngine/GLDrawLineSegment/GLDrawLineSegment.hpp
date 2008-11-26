@@ -25,7 +25,7 @@ class GLDrawLineSegment : public GLDrawGeometricalModelFunctor
 
 };
 
-REGISTER_SERIALIZABLE(GLDrawLineSegment,false);
+REGISTER_SERIALIZABLE(GLDrawLineSegment);
 
 #endif // GLDRAW_LINE_SEGMENT_HPP
 

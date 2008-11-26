@@ -47,7 +47,7 @@ class WallStressRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(WallStressRecorder,false);
+REGISTER_SERIALIZABLE(WallStressRecorder);
 
 #endif // WALL_STRESS_RECORDER_HPP
 

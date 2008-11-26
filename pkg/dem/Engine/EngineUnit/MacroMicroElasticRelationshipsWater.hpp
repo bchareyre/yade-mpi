@@ -34,7 +34,7 @@ class MacroMicroElasticRelationshipsWater : public InteractionPhysicsEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(MacroMicroElasticRelationshipsWater,false);
+REGISTER_SERIALIZABLE(MacroMicroElasticRelationshipsWater);
 
 #endif // __SDECLINEARCONTACTMODEL_HPP__
 

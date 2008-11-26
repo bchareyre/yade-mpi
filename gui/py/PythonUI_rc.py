@@ -9,6 +9,8 @@ sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't ne
 
 from yade.wrapper import *
 from yade import runtime
+from yade import utils
+__builtins__.O=Omega()
 
 #try:
 #	import yade.qt.atexit

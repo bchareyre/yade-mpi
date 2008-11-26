@@ -31,7 +31,7 @@ class FrictionLessElasticContactLaw : public InteractionSolver
 
 };
 
-REGISTER_SERIALIZABLE(FrictionLessElasticContactLaw,false);
+REGISTER_SERIALIZABLE(FrictionLessElasticContactLaw);
 
 #endif // FRICTIONLESSELASTICCONTACTLAW_HPP
 

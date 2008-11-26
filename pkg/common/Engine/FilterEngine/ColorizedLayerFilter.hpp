@@ -33,7 +33,7 @@ class ColorizedLayerFilter : public FilterEngine {
 	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };
 
-REGISTER_SERIALIZABLE(ColorizedLayerFilter,false);
+REGISTER_SERIALIZABLE(ColorizedLayerFilter);
 
 #endif // COLORIZED_LAYER_FILTER_HPP 
 

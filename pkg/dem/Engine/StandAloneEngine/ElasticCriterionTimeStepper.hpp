@@ -40,7 +40,7 @@ class ElasticCriterionTimeStepper : public TimeStepper
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
-REGISTER_SERIALIZABLE(ElasticCriterionTimeStepper,false);
+REGISTER_SERIALIZABLE(ElasticCriterionTimeStepper);
 
 #endif //  ELASTIC_CRITERION_TIME_STEPPER_HPP
 

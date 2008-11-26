@@ -36,7 +36,7 @@ class BshTube : public GeometricalModel
 
 };
 
-REGISTER_SERIALIZABLE(BshTube,false);
+REGISTER_SERIALIZABLE(BshTube);
 
 #endif // BSH_TUBE_HPP
 

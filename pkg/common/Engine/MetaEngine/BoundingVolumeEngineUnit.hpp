@@ -50,7 +50,7 @@ class BoundingVolumeEngineUnit : public EngineUnit2D
 
 };
 
-REGISTER_SERIALIZABLE(BoundingVolumeEngineUnit,false);
+REGISTER_SERIALIZABLE(BoundingVolumeEngineUnit);
 
 #endif // BOUNDINGVOLUMEFACTORY_HPP
 

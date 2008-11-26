@@ -21,7 +21,7 @@ class GLDrawBoxShadowVolume : public GLDrawShadowVolumeFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawShadowVolumeFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawBoxShadowVolume,false);
+REGISTER_SERIALIZABLE(GLDrawBoxShadowVolume);
 
 #endif //  GLDRAWBOXSHADOWVOLUME_HPP
 

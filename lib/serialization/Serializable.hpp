@@ -22,6 +22,7 @@
 #endif
 #include <boost/type_traits.hpp>
 #include <boost/lexical_cast.hpp>
+#include<boost/preprocessor.hpp>
 #include <list>
 #include <map>
 #include <string>
@@ -41,9 +42,24 @@ using namespace ArchiveTypes;
 #define REGISTER_ATTRIBUTE(attribute)                                   \
                 registerAttribute( #attribute, attribute );
 
-#define REGISTER_SERIALIZABLE(name,isFundamental) 						\
+
+
+#define _REGISTER_ATTRIBUTES_BODY(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
+#define REGISTER_ATTRIBUTES_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_BODY,~,attrs)
+//! create member function that register attributes; must be parenthesized, without commas: (attr1) (attr2) (attr3) ...
+#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
+//! Same as REGISTER_ATTRIBUTES, but with first argument of base class, of which registerAttributes will be called first
+#define REGISTER_ATTRIBUTES_WITH_BASE(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs) }
+
+
+// for both fundamental and non-fundamental cases
+#define REGISTER_SERIALIZABLE_GENERIC(name,isFundamental) 						\
 	REGISTER_FACTORABLE(name);								\
 	REGISTER_SERIALIZABLE_DESCRIPTOR(name,name,SerializableTypes::SERIALIZABLE,isFundamental);
+// implied non-fundamental
+#define REGISTER_SERIALIZABLE(name) REGISTER_SERIALIZABLE_GENERIC(name,false)
+// explicit fundamental
+#define REGISTER_SERIALIZABLE_FUNDAMENTAL(name) REGISTER_SERIALIZABLE_GENERIC(name,true);
 
 #define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 					\
 	REGISTER_FACTORABLE(sname);								\

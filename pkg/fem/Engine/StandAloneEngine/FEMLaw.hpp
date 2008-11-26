@@ -38,7 +38,7 @@ class FEMLaw : public InteractionSolver
 
 };
 
-REGISTER_SERIALIZABLE(FEMLaw,false);
+REGISTER_SERIALIZABLE(FEMLaw);
 
 #endif // FEMLAW_HPP
 

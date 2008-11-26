@@ -21,7 +21,7 @@ class GLDrawAABB : public GLDrawBoundingVolumeFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawBoundingVolumeFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawAABB,false);
+REGISTER_SERIALIZABLE(GLDrawAABB);
 
 #endif //  GLDRAWAABB_HPP
 

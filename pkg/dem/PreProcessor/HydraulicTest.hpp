@@ -53,7 +53,7 @@ class HydraulicTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(HydraulicTest,false);
+REGISTER_SERIALIZABLE(HydraulicTest);
 
 #endif // LINKEDSPHERES_HPP
 

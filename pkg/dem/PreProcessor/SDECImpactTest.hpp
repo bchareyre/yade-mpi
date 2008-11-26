@@ -92,7 +92,7 @@ class SDECImpactTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(SDECImpactTest,false);
+REGISTER_SERIALIZABLE(SDECImpactTest);
 
 #endif // SDECIMPORT_HPP
 

@@ -23,7 +23,7 @@ class GLDrawBoundingVolumeFunctor: public EngineUnit1D<void, TYPELIST_1(const sh
 	REGISTER_CLASS_NAME(GLDrawBoundingVolumeFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawBoundingVolumeFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawBoundingVolumeFunctor);
 
 class GLDrawGeometricalModelFunctor: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool)>{
 	public: 
@@ -32,7 +32,7 @@ class GLDrawGeometricalModelFunctor: public EngineUnit1D<void,TYPELIST_3(const s
 	REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawGeometricalModelFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawGeometricalModelFunctor);
 
 
 class GLDrawInteractingGeometryFunctor: public EngineUnit1D<void, TYPELIST_3(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool)>{
@@ -42,7 +42,7 @@ class GLDrawInteractingGeometryFunctor: public EngineUnit1D<void, TYPELIST_3(con
 	REGISTER_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawInteractingGeometryFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawInteractingGeometryFunctor);
 
 class GLDrawInteractionGeometryFunctor: public EngineUnit1D<void,TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)>{
 	public: 
@@ -51,7 +51,7 @@ class GLDrawInteractionGeometryFunctor: public EngineUnit1D<void,TYPELIST_5(cons
 	REGISTER_CLASS_NAME(GLDrawInteractionGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawInteractionGeometryFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawInteractionGeometryFunctor);
 
 class GLDrawInteractionPhysicsFunctor: public EngineUnit1D<void, TYPELIST_5(const shared_ptr<InteractionPhysics>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)>{
 	public: 
@@ -60,7 +60,7 @@ class GLDrawInteractionPhysicsFunctor: public EngineUnit1D<void, TYPELIST_5(cons
 	REGISTER_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawInteractionPhysicsFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawInteractionPhysicsFunctor);
 
 class GLDrawShadowVolumeFunctor: public EngineUnit1D<void, TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r&)>{
 	public:
@@ -68,7 +68,7 @@ class GLDrawShadowVolumeFunctor: public EngineUnit1D<void, TYPELIST_3(const shar
 	REGISTER_CLASS_NAME(GLDrawShadowVolumeFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawShadowVolumeFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawShadowVolumeFunctor);
 
 class GLDrawStateFunctor: public EngineUnit1D<void,TYPELIST_1(const shared_ptr<PhysicalParameters>&/*, draw parameters: color, scale, given from OpenGLRenderer, or sth.... */)>{
 	public : 
@@ -77,5 +77,5 @@ class GLDrawStateFunctor: public EngineUnit1D<void,TYPELIST_1(const shared_ptr<P
 	REGISTER_CLASS_NAME(GLDrawStateFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
-REGISTER_SERIALIZABLE(GLDrawStateFunctor,false);
+REGISTER_SERIALIZABLE(GLDrawStateFunctor);
 

@@ -29,7 +29,7 @@ class GLDrawTube : public GLDrawGeometricalModelFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawTube,false);
+REGISTER_SERIALIZABLE(GLDrawTube);
 
 #endif // GLDRAW_TUBE_HPP 
 

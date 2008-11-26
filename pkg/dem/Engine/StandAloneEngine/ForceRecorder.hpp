@@ -46,7 +46,7 @@ class ForceRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(ForceRecorder,false);
+REGISTER_SERIALIZABLE(ForceRecorder);
 
 #endif // FORCE_RECORDER_HPP
 

@@ -19,6 +19,6 @@ class TetraTestGen: public FileGenerator {
 		REGISTER_CLASS_NAME(TetraTestGen);
 		REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
-REGISTER_SERIALIZABLE(TetraTestGen,false);
+REGISTER_SERIALIZABLE(TetraTestGen);
 
 #endif

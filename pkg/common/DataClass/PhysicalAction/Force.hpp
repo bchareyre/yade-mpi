@@ -31,7 +31,7 @@ class Force : public PhysicalAction
 	REGISTER_CLASS_INDEX(Force,PhysicalAction);
 };
 
-REGISTER_SERIALIZABLE(Force,false);
+REGISTER_SERIALIZABLE(Force);
 
 #endif // ACTIONFORCE_HPP
 

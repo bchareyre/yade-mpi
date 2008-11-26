@@ -27,7 +27,7 @@ class TranslationEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(TranslationEngine,false);
+REGISTER_SERIALIZABLE(TranslationEngine);
 
 #endif // TRANSLATOR_HPP
 

@@ -54,7 +54,7 @@ class MyTetrahedronLaw : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(MyTetrahedronLaw,false);
+REGISTER_SERIALIZABLE(MyTetrahedronLaw);
 
 #endif // ELASTIC_CONTACT_LAW_HPP
 

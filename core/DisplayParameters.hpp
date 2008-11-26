@@ -25,4 +25,4 @@ class DisplayParameters: public Serializable{
 	REGISTER_CLASS_NAME(DisplayParameters);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
-REGISTER_SERIALIZABLE(DisplayParameters,false);
+REGISTER_SERIALIZABLE(DisplayParameters);

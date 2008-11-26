@@ -35,7 +35,7 @@ class PhysicalParametersEngineUnit :    public EngineUnit1D
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
-REGISTER_SERIALIZABLE(PhysicalParametersEngineUnit,false);
+REGISTER_SERIALIZABLE(PhysicalParametersEngineUnit);
 
 #endif // __GEOMETRICALMODELFACTORY_H__
 

@@ -21,7 +21,7 @@ class GLDrawRigidBodyState : public GLDrawStateFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawStateFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawRigidBodyState,false);
+REGISTER_SERIALIZABLE(GLDrawRigidBodyState);
 
 #endif //  GLDRAWAABB_HPP
 

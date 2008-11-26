@@ -35,7 +35,7 @@ class BcpConnection : public SimpleViscoelasticBodyParameters
 
 };
 
-REGISTER_SERIALIZABLE(BcpConnection,false);
+REGISTER_SERIALIZABLE(BcpConnection);
 
 #endif // BCP_CONNECTION_HPP
 

@@ -74,5 +74,5 @@ class InteractionVecSet : public InteractionContainer
 
 };
 
-REGISTER_SERIALIZABLE(InteractionVecSet,false);
+REGISTER_SERIALIZABLE(InteractionVecSet);
 

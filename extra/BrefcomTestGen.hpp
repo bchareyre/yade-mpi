@@ -19,4 +19,4 @@ class BrefcomTestGen: public FileGenerator {
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(BrefcomTestGen,false);
+REGISTER_SERIALIZABLE(BrefcomTestGen);

@@ -42,7 +42,7 @@ class SimpleViscoelasticBodyParameters : public RigidBodyParameters {
 	REGISTER_CLASS_INDEX(SimpleViscoelasticBodyParameters,RigidBodyParameters);
 };
 
-REGISTER_SERIALIZABLE(SimpleViscoelasticBodyParameters,false);
+REGISTER_SERIALIZABLE(SimpleViscoelasticBodyParameters);
 
 #endif // SIMPLEVISCOELASTICBODYPARAMETERS_HPP
 

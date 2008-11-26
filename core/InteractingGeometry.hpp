@@ -39,7 +39,7 @@ class InteractingGeometry : public Serializable, public Indexable
 	REGISTER_INDEX_COUNTER(InteractingGeometry);
 };
 
-REGISTER_SERIALIZABLE(InteractingGeometry,false);
+REGISTER_SERIALIZABLE(InteractingGeometry);
 
 #endif //  INTERACTING_GEOMETRY_HPP
 

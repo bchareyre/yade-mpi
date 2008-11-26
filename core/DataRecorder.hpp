@@ -21,6 +21,6 @@ class DataRecorder : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(DataRecorder,false);
+REGISTER_SERIALIZABLE(DataRecorder);
 
 #endif // DATARECORDER_HPP

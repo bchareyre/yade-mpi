@@ -57,7 +57,7 @@ class ContactStressRecorder : public DataRecorder
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
 
-REGISTER_SERIALIZABLE(ContactStressRecorder,false);
+REGISTER_SERIALIZABLE(ContactStressRecorder);
 
 #endif // CONTACT_STRESS_RECORDER_HPP
 

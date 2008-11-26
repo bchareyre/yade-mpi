@@ -38,7 +38,7 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 	REGISTER_CLASS_NAME(GLDrawSphere);
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
-REGISTER_SERIALIZABLE(GLDrawSphere,false);
+REGISTER_SERIALIZABLE(GLDrawSphere);
 
 #endif // GLDRAWSPHERE_HPP
 

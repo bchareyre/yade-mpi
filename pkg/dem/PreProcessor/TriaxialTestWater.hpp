@@ -129,7 +129,7 @@ class TriaxialTestWater : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(TriaxialTestWater,false);
+REGISTER_SERIALIZABLE(TriaxialTestWater);
 
 #endif // SDECIMPORT3_HPP
 

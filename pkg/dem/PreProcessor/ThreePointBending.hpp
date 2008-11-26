@@ -51,7 +51,7 @@ class ThreePointBending : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(ThreePointBending,false);
+REGISTER_SERIALIZABLE(ThreePointBending);
 
 #endif // LINKEDSPHERES_HPP
 

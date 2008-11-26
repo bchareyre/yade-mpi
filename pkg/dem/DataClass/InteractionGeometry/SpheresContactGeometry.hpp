@@ -118,5 +118,5 @@ class SpheresContactGeometry: public InteractionGeometry{
 	REGISTER_CLASS_INDEX(SpheresContactGeometry,InteractionGeometry);
 };
 
-REGISTER_SERIALIZABLE(SpheresContactGeometry,false);
+REGISTER_SERIALIZABLE(SpheresContactGeometry);
 

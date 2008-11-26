@@ -30,7 +30,7 @@ class StaticAttractionEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(StaticAttractionEngine,false);
+REGISTER_SERIALIZABLE(StaticAttractionEngine);
 
 #endif //  DISPLACEMENTENGINE_HPP
 

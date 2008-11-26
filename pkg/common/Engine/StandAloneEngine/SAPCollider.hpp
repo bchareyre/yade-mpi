@@ -90,7 +90,7 @@ class SAPCollider : public BroadInteractor
 	REGISTER_BASE_CLASS_NAME(BroadInteractor);
 };
 
-REGISTER_SERIALIZABLE(SAPCollider,false);
+REGISTER_SERIALIZABLE(SAPCollider);
 
 #endif // SAPCOLLIDER_HPP
 

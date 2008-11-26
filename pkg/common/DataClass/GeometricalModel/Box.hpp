@@ -34,7 +34,7 @@ class Box : public GeometricalModel
 
 };
 
-REGISTER_SERIALIZABLE(Box,false);
+REGISTER_SERIALIZABLE(Box);
 
 #endif // BOX_HPP
 

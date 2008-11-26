@@ -125,7 +125,7 @@ class ModifiedTriaxialTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(ModifiedTriaxialTest,false);
+REGISTER_SERIALIZABLE(ModifiedTriaxialTest);
 
 #endif // SDECIMPORT_HPP
 

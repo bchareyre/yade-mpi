@@ -23,7 +23,7 @@ class FEMSet2Tetrahedrons : public GeometricalModelEngineUnit
 
 };
 
-REGISTER_SERIALIZABLE(FEMSet2Tetrahedrons,false);
+REGISTER_SERIALIZABLE(FEMSet2Tetrahedrons);
 
 #endif // FEM_SET_2_TETRAHEDRONS_HPP 
 

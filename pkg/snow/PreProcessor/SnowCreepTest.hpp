@@ -134,7 +134,7 @@ class SnowCreepTest : public FileGenerator
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };
 
-REGISTER_SERIALIZABLE(SnowCreepTest,false);
+REGISTER_SERIALIZABLE(SnowCreepTest);
 
 #endif // COHESIVE_TRIAXIAL_TEST_HPP
 

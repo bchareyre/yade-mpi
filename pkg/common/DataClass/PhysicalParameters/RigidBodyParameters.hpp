@@ -39,7 +39,7 @@ class RigidBodyParameters : public ParticleParameters
 	REGISTER_CLASS_INDEX(RigidBodyParameters,ParticleParameters);
 };
 
-REGISTER_SERIALIZABLE(RigidBodyParameters,false);
+REGISTER_SERIALIZABLE(RigidBodyParameters);
 
 #endif // RIGIDBODYPARAMETERS_HPP
 

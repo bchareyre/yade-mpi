@@ -25,7 +25,7 @@ class LatticeInteractingGeometry : public MetaInteractingGeometry
 	REGISTER_CLASS_INDEX(LatticeInteractingGeometry,MetaInteractingGeometry);
 };
 
-REGISTER_SERIALIZABLE(LatticeInteractingGeometry,false);
+REGISTER_SERIALIZABLE(LatticeInteractingGeometry);
 
 #endif // METAINTERACTINGGEOMETRY_HPP
 

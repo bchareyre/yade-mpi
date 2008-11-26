@@ -55,7 +55,7 @@ class MicroMacroAnalyser : public StandAloneEngine
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(MicroMacroAnalyser,false);
+REGISTER_SERIALIZABLE(MicroMacroAnalyser);
 
 #endif // MACRO_MICRO_ANALYZER_HPP
 

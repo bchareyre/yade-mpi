@@ -21,7 +21,7 @@ class GLDrawTetrahedron : public GLDrawGeometricalModelFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawTetrahedron,false);
+REGISTER_SERIALIZABLE(GLDrawTetrahedron);
 
 #endif // GLDRAW_TETRAHEDRON_HPP 
 

@@ -23,7 +23,7 @@ class MetaInteractingGeometry2AABB : public BoundingVolumeEngineUnit
 	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
 };
 
-REGISTER_SERIALIZABLE(MetaInteractingGeometry2AABB,false);
+REGISTER_SERIALIZABLE(MetaInteractingGeometry2AABB);
 
 #endif // METAINTERACTINGGEOMETRY2AABB_HPP
 

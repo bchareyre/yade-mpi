@@ -53,7 +53,7 @@ class MetaEngine : public Engine
 	REGISTER_BASE_CLASS_NAME(Engine);
 };
 
-REGISTER_SERIALIZABLE(MetaEngine,false);
+REGISTER_SERIALIZABLE(MetaEngine);
 
 #endif // METADISPATCHINGENGINE_HPP
 

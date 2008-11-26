@@ -38,7 +38,7 @@ class ParticleParameters : public PhysicalParameters
 
 };
 
-REGISTER_SERIALIZABLE(ParticleParameters,false);
+REGISTER_SERIALIZABLE(ParticleParameters);
 
 #endif // PARTICLEPARAMETERS_HPP
 

@@ -36,7 +36,7 @@ class PhysicalAction : public Serializable, public Indexable
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
 };
 
-REGISTER_SERIALIZABLE(PhysicalAction,false);
+REGISTER_SERIALIZABLE(PhysicalAction);
 
 #endif // PHYSICALACTION_HPP
 

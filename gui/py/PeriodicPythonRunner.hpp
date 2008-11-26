@@ -28,5 +28,5 @@ class PeriodicPythonRunner: public StretchPeriodicEngine {
 	REGISTER_BASE_CLASS_NAME(StretchPeriodicEngine);
 };
 
-REGISTER_SERIALIZABLE(PeriodicPythonRunner,false);
+REGISTER_SERIALIZABLE(PeriodicPythonRunner);
 

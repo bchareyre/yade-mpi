@@ -37,7 +37,7 @@ class DisplacementToForceEngine : public DeusExMachina
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };
 
-REGISTER_SERIALIZABLE(DisplacementToForceEngine,false);
+REGISTER_SERIALIZABLE(DisplacementToForceEngine);
 
 #endif //  DISPLACEMENTENGINE_HPP
 

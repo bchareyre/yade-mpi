@@ -21,7 +21,7 @@ class GLDrawClosestFeatures : public GLDrawInteractionGeometryFunctor
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawClosestFeatures,false);
+REGISTER_SERIALIZABLE(GLDrawClosestFeatures);
 
 #endif
 

@@ -31,7 +31,7 @@ class InteractingBox : public InteractingGeometry
 
 };
 
-REGISTER_SERIALIZABLE(InteractingBox,false);
+REGISTER_SERIALIZABLE(InteractingBox);
 
 #endif //  INTERACTION_BOX_HPP
 

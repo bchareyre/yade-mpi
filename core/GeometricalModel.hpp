@@ -36,7 +36,7 @@ class GeometricalModel : public Serializable, public Indexable
 	REGISTER_INDEX_COUNTER(GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(GeometricalModel,false);
+REGISTER_SERIALIZABLE(GeometricalModel);
 
 #endif //  GEOMETRICALMODEL_HPP
 
