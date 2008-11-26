@@ -124,6 +124,23 @@ void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real t
 void quaterniontoGLMatrix(const Quaternionr& q, Real m[16]);
 
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 
+namespace boost {
+namespace serialization {
+
+template<class Archive>
+void serialize(Archive & ar, Vector3r & g, const unsigned int version)
+{
+    ar & g[0];
+    ar & g[1];
+    ar & g[2];
+}
+
+} // namespace serialization
+} // namespace boost
 #endif

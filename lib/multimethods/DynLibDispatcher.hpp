@@ -301,6 +301,8 @@ class DynLibDispatcher
 		
 			assert(base);
 			int& index = base->getClassIndex();
+			if(index == -1)
+				std::cerr << "--------> Did you forget to call createIndex(); in constructor?\n";
  			assert (index != -1);
 			
 			int maxCurrentIndex = base->getMaxCurrentlyUsedClassIndex();
@@ -383,9 +385,13 @@ class DynLibDispatcher
 			assert(base2);
 
  			int& index1 = base1->getClassIndex();
+			if(index1 == -1)
+				std::cerr << "--------> Did you forget to call createIndex(); in constructor?\n";
 			assert (index1 != -1);
  			
 			int& index2 = base2->getClassIndex();
+			if(index2 == -1)
+				std::cerr << "--------> Did you forget to call createIndex(); in constructor?\n";
  			assert(index2 != -1);
 	
 			if( typeid(BaseClass1) == typeid(BaseClass2) )
