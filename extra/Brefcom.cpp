@@ -156,6 +156,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 
 		epsN=contGeom->epsN();
 		epsT=contGeom->epsT();
+		//if(I->getId1()==0 && (Omega::instance().getCurrentIteration()%10==0)) LOG_INFO("##"<<I->getId1()<<"+"<<I->getId2()<<": "<<" dist2-1="<<(contGeom->pos1-contGeom->pos2).Length()-1.<<", d0="<<contGeom->d0<<", epsN="<<epsN<<", |epsT|="<<epsT.Length());
 
 		#ifdef BREFCOM_MATERIAL_MODEL
 			BREFCOM_MATERIAL_MODEL

@@ -11,9 +11,8 @@
  * the number of activations was already reached, no action will be called even if any of active period has elapsed.
  */
 class PeriodicEngine:  public StandAloneEngine {
-	protected:
-		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 	public:
+		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast,nDo,nDone;
 		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0),nDo(-1),nDone(0) { realLast=getClock(); }
 		virtual bool isActivated(){

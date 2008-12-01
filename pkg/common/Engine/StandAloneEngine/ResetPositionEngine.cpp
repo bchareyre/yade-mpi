@@ -8,7 +8,7 @@
 
 #include"ResetPositionEngine.hpp"
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/ParticleParameters.hpp>#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/ParticleParameters.hpp>
 #include<boost/foreach.hpp>
 
 CREATE_LOGGER(ResetPositionEngine);

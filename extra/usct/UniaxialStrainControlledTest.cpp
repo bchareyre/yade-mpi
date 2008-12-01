@@ -84,8 +84,19 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
 	if(abs(currentStrainRate)<abs(strainRate))currentStrainRate+=strainRate*.005; else currentStrainRate=strainRate;
-	// how much do we move; in the symmetric case, half of the strain is applied at each end;
-	Real dAX=(asymmetry==0?.5:1)*currentStrainRate*originalLength*Omega::instance().getTimeStep();
+	// how much do we move (in total, symmetry handled below)
+	Real dAX=currentStrainRate*originalLength*Omega::instance().getTimeStep();
+	if(!isnan(stopStrain)){
+		Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
+		Real newStrain=(axialLength+dAX)/originalLength-1;
+		if((newStrain*stopStrain>0) && abs(newStrain)>=stopStrain){ // same sign of newStrain and stopStrain && over the limit from below in abs values
+			dAX=originalLength*(stopStrain+1)-axialLength;
+			LOG_INFO("Reached stopStrain "<<stopStrain<<", deactivating self and stopping in "<<idleIterations+1<<" iterations.");
+			this->active=false;
+			rootBody->stopAtIteration=Omega::instance().getCurrentIteration()+1+idleIterations;
+		}
+	}
+	if(asymmetry==0) dAX*=.5; // apply half on both sides if straining symetrically
 	for(size_t i=0; i<negIds.size(); i++){
 		if(asymmetry==0 || asymmetry==-1 /* for +1, don't move*/) negCoords[i]-=dAX;
 		axisCoord(negIds[i])=negCoords[i]; // update current position
@@ -101,9 +112,6 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 
 	// reverse if we're over the limit strain
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
-
-	// if(strain==stopAtStrain){LOG_INFO("Prescibed strain "<<stopAtStrain<<" reached, pausing."); }
-	if(!isnan(stopAtStrain) && ((strain*stopAtStrain>0) && abs(strain)>abs(stopAtStrain))) { strain=stopAtStrain;	rootBody->stopAtIteration=Omega::instance().getCurrentIteration()+2; LOG_INFO("Prescribed strain "<<stopAtStrain<<" reached, will stop in 2 iterations"); }
 
 	if(Omega::instance().getCurrentIteration()%10==0 ) {
 		computeAxialForce(rootBody);
@@ -296,12 +304,6 @@ void USCTGen::createEngines(){
 #endif
 
 	rootBody->engines.push_back(shared_ptr<BrefcomDamageColorizer>(new BrefcomDamageColorizer));
-
-	shared_ptr<PositionOrientationRecorder> por(new PositionOrientationRecorder);
-	por->outputFile="/tmp/usct-traction";
-	por->interval=300;
-	por->saveRgb=true;
-	rootBody->engines.push_back(por);
 
 }
 
