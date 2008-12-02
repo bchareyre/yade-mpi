@@ -20,7 +20,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //	glTranslatef(gr->center[0],gr->center[1],gr->center[2]);
 	glColor3f(0.5,0.5,1.0);
 	glutSolidCube(LEN*0.1);
-	glTranslatef(-gr->center[0],-gr->center[1],-gr->center[2]);
+//	glTranslatef(-gr->center[0],-gr->center[1],-gr->center[2]);
 
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
@@ -31,6 +31,8 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	{
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_LIGHTING);
+		glShadeModel(GL_FLAT);
+		Vector3r prev(1,0,0);
 		//glShadeModel(GL_SMOOTH);
 		//glColor3f(gr->color[0],gr->color[1],gr->color[2]);
 		for(int i=0;i<gr->slices.size()-1;++i)
@@ -38,17 +40,31 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 			glBegin(GL_QUAD_STRIP);
 				for(int j=0;j<gr->slices[i].size()-1;++j)
 				{
-					Vector3r n=1.0*((gr->slices[i  ][j] - gr->slices[i+1][j]).Cross(gr->slices[i  ][j+1] - gr->slices[i][j]));
+					Vector3r n=((gr->slices[i  ][j] - gr->slices[i+1][j]).Cross(gr->slices[i  ][j+1] - gr->slices[i][j]));
 					n.Normalize();
-					glNormal3f(n[0],n[1],n[2]);
+					if(n.SquaredLength() == 0)
+						n=prev;
+					else
+						prev=n;
+					/*
+					Vector3<long double> p1;p1[0]=(gr->slices[i  ][j])[0];p1[1]=(gr->slices[i  ][j])[1];p1[2]=(gr->slices[i  ][j])[2];
+					Vector3<long double> p2;p2[0]=(gr->slices[i+1][j])[0];p2[1]=(gr->slices[i+1][j])[1];p2[2]=(gr->slices[i+1][j])[2];
+					Vector3<long double> p3;p3[0]=(gr->slices[i  ][j+1])[0];p3[1]=(gr->slices[i  ][j+1])[1];p3[2]=(gr->slices[i  ][j+1])[2];
+					Vector3<long double> p4;p4[0]=(gr->slices[i][j])[0];p4[1]=(gr->slices[i][j])[1];p4[2]=(gr->slices[i][j])[2];
+					Vector3<long double> a(p1 - p2),b(p3 - p4);
+					Vector3<long double> n=a.Cross(b); 
+					n /= std::sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
+					*/
 
 					glVertex3d(gr->slices[i  ][j][0],gr->slices[i  ][j][1],gr->slices[i  ][j][2]);
 					glVertex3d(gr->slices[i+1][j][0],gr->slices[i+1][j][1],gr->slices[i+1][j][2]);
+					glNormal3f(n[0],n[1],n[2]);
 				}
 				glVertex3d(gr->slices[i  ][0][0],gr->slices[i  ][0][1],gr->slices[i  ][0][2]);
 				glVertex3d(gr->slices[i+1][0][0],gr->slices[i+1][0][1],gr->slices[i+1][0][2]);
 			glEnd();
 		}
+		glShadeModel(GL_SMOOTH);
 		glEnable(GL_CULL_FACE);
 	}
 	else
@@ -70,7 +86,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 			}
 		glEnable(GL_LIGHTING);
 	}
-	glTranslatef(gr->center[0],gr->center[1],gr->center[2]);
+//	glTranslatef(gr->center[0],gr->center[1],gr->center[2]);
 /*	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);

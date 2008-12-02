@@ -1,16 +1,16 @@
 #pragma once
 
-#include <QGLViewer/qglviewer.h>
-#include <boost/program_options.hpp>
-#include <boost/foreach.hpp>
-#include <string>
-#include <set>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/set.hpp>
-#include <boost/serialization/list.hpp>
-#include <boost/serialization/utility.hpp>
+#include<yade/lib-QGLViewer/qglviewer.h>
+#include<boost/program_options.hpp>
+#include<boost/foreach.hpp>
+#include<string>
+#include<set>
+#include<boost/archive/binary_oarchive.hpp>
+#include<boost/archive/binary_iarchive.hpp>
+#include<boost/serialization/vector.hpp>
+#include<boost/serialization/set.hpp>
+#include<boost/serialization/list.hpp>
+#include<boost/serialization/utility.hpp>
 
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/gzip.hpp>

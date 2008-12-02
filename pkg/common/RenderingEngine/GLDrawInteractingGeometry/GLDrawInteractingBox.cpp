@@ -22,13 +22,13 @@ void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const s
 
 // 	if (wire)
 // 	{
-// 		glDisable(GL_LIGHTING);
-// 		glutWireCube(1);
+ 		glDisable(GL_LIGHTING);
+ 		glutWireCube(1);
 // 	}
 // 	else
 // 	{
-		glEnable(GL_LIGHTING);
-		glutSolidCube(1);
+//		glEnable(GL_LIGHTING);
+//		glutSolidCube(1);
 //	}
 }
 

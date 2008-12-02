@@ -24,7 +24,9 @@ void VoxelEnvelope::calculate_surfaces_loop(Config& c)
 void VoxelEnvelope::calculate_surfaces_loop_spawn(Config& c)
 {
 	boost::thread loop(boost::bind(&VoxelEnvelope::calculate_surfaces_loop,boost::ref(*this),boost::ref(c)));
+#if BOOST_VERSION >= 103500
 	loop.detach();
+#endif
 }
 
 void VoxelEnvelope::save_txt(Config& c)

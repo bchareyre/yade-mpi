@@ -1,7 +1,9 @@
 #include"BshSnowGrain.hpp"
 #include<Wm3Quaternion.h>
 
-const double D=1.0/610.0;
+// a pixel is 20.4 microns (2.04 × 10-5 meters)
+// the sample was 10.4mm hight
+
 
 void BshSnowGrain::registerAttributes()
 {
@@ -12,11 +14,14 @@ void BshSnowGrain::registerAttributes()
 	REGISTER_ATTRIBUTE(end);
 	REGISTER_ATTRIBUTE(color);
 	REGISTER_ATTRIBUTE(selection);
+	REGISTER_ATTRIBUTE(layer_distance);
 	REGISTER_ATTRIBUTE(gr_gr);
 }
 
-BshSnowGrain::BshSnowGrain(const T_DATA& dat,Vector3r c_ax,int SELECTION,Vector3r col)
+BshSnowGrain::BshSnowGrain(const T_DATA& dat,Vector3r c_ax,int SELECTION,Vector3r col, Real one_voxel_in_meters_is) : GeometricalModel()
 {
+	createIndex();
+
 	if(SELECTION!=0)
 	{
 		color=col;
@@ -59,8 +64,8 @@ float prevL=(start-end).SquaredLength();
 float tmpL;
 Vector3r moving_center(0,0,0),moving_sum(0,0,0);
 count=0;
-const float LAYER_DISTANCE=3.0;
-for(Vector3r S=start; (tmpL=(S-end).SquaredLength())<=prevL ; S-=c_axis*LAYER_DISTANCE, ++II)
+layer_distance=3.0;
+for(Vector3r S=start; (tmpL=(S-end).SquaredLength())<=prevL ; S-=c_axis*layer_distance, ++II)
 {
 	slices.resize(II+1);
 	float vectorY1=5.0;
@@ -71,7 +76,7 @@ for(Vector3r S=start; (tmpL=(S-end).SquaredLength())<=prevL ; S-=c_axis*LAYER_DI
 		float vectorY=(5.0*cos(angle));		
 		Vector3r tmp(vectorX1,vectorY1,0);
 		tmp=search(dat,S+moving_center,q*tmp);
-		slices[II].push_back(tmp);
+		slices[II].push_back(tmp-center);
 		vectorY1=vectorY;
 		vectorX1=vectorX;
 
@@ -87,7 +92,15 @@ for(Vector3r S=start; (tmpL=(S-end).SquaredLength())<=prevL ; S-=c_axis*LAYER_DI
 	std::cout << "slices " << II << " S-end " << (S-end).SquaredLength() << "\n";
 }
 //////////////////////////////////////////////////////////
+// we're done. Now scale everything.
+BOOST_FOREACH(std::vector<Vector3r>& g,slices)
+	BOOST_FOREACH(Vector3r& v,g)
+		v *= one_voxel_in_meters_is;
 
+c_axis.Normalize();
+start = (start-center)*one_voxel_in_meters_is;
+end = (end-center)*one_voxel_in_meters_is;
+center *= one_voxel_in_meters_is;
 
 
 		

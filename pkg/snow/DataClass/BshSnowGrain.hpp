@@ -4,8 +4,8 @@
 #include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<vector>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/shared_ptr.hpp>
+#include<boost/serialization/vector.hpp>
+#include<boost/serialization/shared_ptr.hpp>
 
 typedef std::vector< std::vector<std::vector<unsigned char> > > T_DATA;
 
@@ -34,20 +34,22 @@ class BshSnowGrain : public GeometricalModel
 		Vector3r color;
 		int selection;
 		std::vector<std::vector<Vector3r> > slices;
+		Real layer_distance;
 
 		std::vector<Grrrr> gr_gr;
 	public: 
 		BshSnowGrain():GeometricalModel(){createIndex();};
-		BshSnowGrain(const T_DATA& dat,Vector3r c_axis,int SELECTION,Vector3r col);
+		BshSnowGrain(const T_DATA& dat,Vector3r c_axis,int SELECTION,Vector3r col,Real one_voxel_in_meters_is);
 		Vector3r search(const T_DATA& dat,Vector3r c,Vector3r dir);
 		Vector3r search_plane(const T_DATA& dat,Vector3r c,Vector3r dir);
 	
 	private:
 		friend class boost::serialization::access;
 		template<class Archive>
-		void serialize(Archive & ar, const unsigned int version)
+		void serialize(Archive & ar, unsigned int version)
 		{
 			//boost::mutex::scoped_lock scoped_lock(m_voxel_envelope_mutex);
+			ar & layer_distance;
 			ar & center & c_axis;
 			ar & start & end;
 			ar & color;

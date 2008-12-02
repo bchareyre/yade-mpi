@@ -10,15 +10,15 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/lambda/lambda.hpp>
 #include<yade/extra/Shop.hpp>
 #include<yade/core/Interaction.hpp>
-#include <yade/pkg-common/Sphere.hpp>
-#include <yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 class CohesiveFrictionalRelationships;
 

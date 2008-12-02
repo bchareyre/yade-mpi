@@ -16,6 +16,7 @@
 //#include <yade/pkg-dem/ElasticContactLaw.hpp>
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include<yade/pkg-common/InteractingSphere.hpp>
 #include <yade/pkg-common/Sphere.hpp>
 
 //#include <yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -114,9 +115,7 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 			kinematicE +=
 				0.5* ( pp->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
-			const shared_ptr<Sphere>& sphere =
-				YADE_PTR_CAST<Sphere> ( b->geometricalModel );
-			Vs += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
+			Vs += 1.3333333*Mathr::PI*pow ( YADE_PTR_CAST<InteractingSphere>( b->interactingGeometry)->radius, 3 );
 
 		}
 	}
@@ -132,20 +131,20 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 
 // ======================================================================== 
 
-// 	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
-// 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
-// 	<< lexical_cast<string> ( porosity ) << " "
-// 	<< lexical_cast<string> ( kinematicE )
-// 	<< endl;
+ 	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
+ 	<< lexical_cast<string> ( porosity ) << " "
+ 	<< lexical_cast<string> ( kinematicE )
+ 	<< endl;
 
 
-
+/*
 // ======================================================================== 
 	if ( Omega::instance().getCurrentIteration() % 500 == 0 || Omega::instance().getCurrentIteration() == 0 )
 	{
@@ -176,7 +175,7 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 // 	<< lexical_cast<string> ( force_sphere ) << " " << endl;
 	}
 //=======
-
+*/
 
 
 

@@ -30,6 +30,7 @@
 
 #include"Voxel/VoxelEnvelope.hpp"
 #include<yade/pkg-snow/BshSnowGrain.hpp>
+#include<yade/pkg-snow/BssSnowGrain.hpp>
 
 class VoxelDocument
 {
@@ -48,18 +49,61 @@ class VoxelDocument
 class SnowVoxelsLoader : public FileGenerator
 {
 	private:
+		Vector3r	 gravity
+				,lowerCorner
+				,upperCorner;
+
 		Vector3r	 spheresColor;
 
 		Real		 sphereYoungModulus
 				,spherePoissonRatio
 				,sphereFrictionDeg
-				,density;
+				,boxYoungModulus
+				,boxPoissonRatio
+				,boxFrictionDeg
+				,density
+				
+				,dampingForce
+				,dampingMomentum
+
+				,defaultDt
+
+				,normalCohesion
+				,shearCohesion
+				
+				,creep_viscosity
+				,sigma_iso
+				,thickness
+				
+				,strainRate
+				,StabilityCriterion
+				
+				,maxMultiplier ///max multiplier of diameters during internal compaction
+				;
+		bool		 setCohesionOnNewContacts
+				,autoCompressionActivation
+				,internalCompaction
+				;
+		Real		 one_voxel_in_meters_is;
+
+		int		 timeStepUpdateInterval
+				,radiusControlInterval
+				,wallStiffnessUpdateInterval
+
+				,recordIntervalIter
+				;
+				
+		std::string	WallStressRecordFile;
 
 		std::string	voxel_binary_data_file;
 		std::string	voxel_txt_dir;
 		std::string	voxel_caxis_file;
 		std::string	voxel_colors_file;
 		std::string	grain_binary_data_file;
+		
+		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
+		shared_ptr<TriaxialStressController> triaxialstressController;
+		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
 
 		VoxelDocument	m_voxel;
 		std::vector<boost::shared_ptr<BshSnowGrain> > m_grains;
@@ -71,7 +115,8 @@ class SnowVoxelsLoader : public FileGenerator
 		bool load_voxels();
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
-		void create_grain(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic , boost::shared_ptr<BshSnowGrain> grain);
+		void create_grain(shared_ptr<Body>& body, Vector3r position, bool dynamic , boost::shared_ptr<BshSnowGrain> grain);
+		void create_box(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire);
 	
 	protected :
 		virtual void registerAttributes();
