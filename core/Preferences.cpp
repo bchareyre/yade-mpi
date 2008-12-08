@@ -14,11 +14,3 @@ Preferences::Preferences ()
 	version = 1;
 }
 
-
-void Preferences::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(version);
-	REGISTER_ATTRIBUTE(dynlibDirectories);
-	REGISTER_ATTRIBUTE(defaultGUILibName);
-}
-

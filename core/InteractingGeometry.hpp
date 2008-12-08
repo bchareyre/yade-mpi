@@ -30,11 +30,8 @@ class InteractingGeometry : public Serializable, public Indexable
 					// bool wire; even though GeometricalModel has bool wire ?
 	
 /// Serialization
-	protected :
-		void registerAttributes();
-	REGISTER_CLASS_NAME(InteractingGeometry);
-	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
-	
+	REGISTER_ATTRIBUTES(/*no base*/,(diffuseColor));
+	REGISTER_CLASS_AND_BASE(InteractingGeometry,Serializable Indexable);
 /// Indexable
 	REGISTER_INDEX_COUNTER(InteractingGeometry);
 };

@@ -30,8 +30,7 @@ class TimeStepper : public StandAloneEngine
 
 	protected :
 		virtual void registerAttributes();
-	REGISTER_CLASS_NAME(TimeStepper);
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_CLASS_AND_BASE(TimeStepper,StandAloneEngine);
 };
 
 REGISTER_SERIALIZABLE(TimeStepper);

@@ -25,11 +25,8 @@ class Preferences : public Serializable
 		string		 defaultGUILibName;
 		Preferences ();
 
-/// Serialization										///
-	protected :
-		void registerAttributes();
-	REGISTER_CLASS_NAME(Preferences);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_ATTRIBUTES(,(version)(dynlibDirectories)(defaultGUILibName));
+	REGISTER_CLASS_AND_BASE(Preferences,Serializable);
 };
 
 REGISTER_SERIALIZABLE(Preferences);

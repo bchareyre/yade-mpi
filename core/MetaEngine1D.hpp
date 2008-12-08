@@ -80,10 +80,6 @@ class MetaEngine1D : public MetaEngine,
 		}
 
 	protected :
-		void registerAttributes()
-		{
-			MetaEngine::registerAttributes();
-		}
 		void postProcessAttributes(bool deserializing)
 		{
 			MetaEngine::postProcessAttributes(deserializing);
@@ -93,8 +89,8 @@ class MetaEngine1D : public MetaEngine,
 					add1DEntry(functorNames[i][0],functorNames[i][1],static_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][1])));	
 			}
 		}
-	REGISTER_CLASS_NAME(MetaEngine1D);
-	REGISTER_BASE_CLASS_NAME(MetaEngine DynLibDispatcher);
+	REGISTER_ATTRIBUTES(MetaEngine,);
+	REGISTER_CLASS_AND_BASE(MetaEngine1D,MetaEngine DynLibDispatcher);
 };
 
 #endif // METADISPATCHINGENGINE1D_HPP

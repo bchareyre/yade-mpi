@@ -50,9 +50,22 @@ class MetaBody : public Body
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		virtual void registerAttributes();
-	REGISTER_CLASS_NAME(MetaBody);
-	REGISTER_BASE_CLASS_NAME(Body);
+	REGISTER_ATTRIBUTES(Body,
+		(tags)
+		(engines)
+		(initializers)
+		(bodies)
+		(transientInteractions)
+		(persistentInteractions)
+		(physicalActions) // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
+		(miscParams)
+		(dispParams)
+		(dt)
+		(currentIteration)
+		(simulationTime)
+		(stopAtIteration)
+	);
+	REGISTER_CLASS_AND_BASE(MetaBody,Body);
 };
 
 REGISTER_SERIALIZABLE(MetaBody);

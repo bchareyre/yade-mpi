@@ -105,11 +105,10 @@ class InteractionContainer : public Serializable
 		vector<shared_ptr<Interaction> > interaction;
 
 	protected :
-		virtual void registerAttributes();
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(InteractionContainer);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_ATTRIBUTES(/*no base*/,(interaction));
+	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
 
 REGISTER_SERIALIZABLE(InteractionContainer);

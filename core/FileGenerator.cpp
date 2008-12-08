@@ -36,19 +36,6 @@ void FileGenerator::setSerializationLibrary(const string& lib)
 }
 
 
-void FileGenerator::postProcessAttributes(bool) 
-{
-
-}
-
-
-void FileGenerator::registerAttributes() 
-{	
-	REGISTER_ATTRIBUTE(outputFileName);
-	REGISTER_ATTRIBUTE(serializationDynlib);
-}
-
-
 bool FileGenerator::generate() 
 {
 	message="FileGenerator (base class) generates nothing.";

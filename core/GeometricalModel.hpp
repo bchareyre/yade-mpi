@@ -28,11 +28,8 @@ class GeometricalModel : public Serializable, public Indexable
 
 		GeometricalModel(): visible(true),wire(false),shadowCaster(false),diffuseColor(Vector3r(1,1,1)){}
 
-	protected : 
-		void registerAttributes();
-
-	REGISTER_CLASS_NAME(GeometricalModel);
-	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
+	REGISTER_ATTRIBUTES(/*no base*/,(visible)(wire)(shadowCaster)(diffuseColor));
+	REGISTER_CLASS_AND_BASE(GeometricalModel,Serializable Indexable);
 	REGISTER_INDEX_COUNTER(GeometricalModel);
 };
 

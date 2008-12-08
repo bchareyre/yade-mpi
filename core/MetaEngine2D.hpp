@@ -99,13 +99,8 @@ class MetaEngine2D : public MetaEngine,
 					add2DEntry(functorNames[i][0],functorNames[i][1],functorNames[i][2],static_pointer_cast<EngineUnitType>(findFunctorArguments(functorNames[i][2])));
 			}
 		}
-
-		void registerAttributes()
-		{
-			MetaEngine::registerAttributes();
-		}
-	REGISTER_CLASS_NAME(MetaEngine2D);
-	REGISTER_BASE_CLASS_NAME(MetaEngine DynLibDispatcher);
+	REGISTER_ATTRIBUTES(MetaEngine,);
+	REGISTER_CLASS_AND_BASE(MetaEngine2D,MetaEngine DynLibDispatcher);
 
 };
 

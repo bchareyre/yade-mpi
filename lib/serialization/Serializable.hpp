@@ -43,13 +43,17 @@ using namespace ArchiveTypes;
                 registerAttribute( #attribute, attribute );
 
 
+// placeholder function for registration with empty base
+namespace{
+	void registerAttributes(){}
+};
 
 #define _REGISTER_ATTRIBUTES_BODY(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
 #define REGISTER_ATTRIBUTES_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_BODY,~,attrs)
 //! create member function that register attributes; must be parenthesized, without commas: (attr1) (attr2) (attr3) ...
-#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
+//#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
 //! Same as REGISTER_ATTRIBUTES, but with first argument of base class, of which registerAttributes will be called first
-#define REGISTER_ATTRIBUTES_WITH_BASE(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs) }
+#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs) }
 
 
 // for both fundamental and non-fundamental cases

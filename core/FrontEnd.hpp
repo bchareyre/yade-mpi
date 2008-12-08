@@ -22,8 +22,7 @@ class FrontEnd : public Factorable
 
 		virtual int run(int , char * []) { return -1;};
 
-	REGISTER_CLASS_NAME(FrontEnd);
-	REGISTER_BASE_CLASS_NAME(Factorable);
+	REGISTER_CLASS_AND_BASE(FrontEnd,Factorable);
 };
 
 REGISTER_FACTORABLE(FrontEnd);

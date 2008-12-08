@@ -24,14 +24,9 @@ class PhysicalParameters: public Serializable, public Indexable
 		static const unsigned DOF_XYZ=DOF_X|DOF_Y|DOF_Z; //! shorthand for all displacements blocked
 		static const unsigned DOF_RXRYRZ=DOF_RX|DOF_RY|DOF_RZ; //! shorthand for all rotations blocked
 		static unsigned axisDOF(int axis, bool rotationalDOF=false){return 1<<(axis+(rotationalDOF?3:0));} //! Return DOF_* constant for given axis∈{0,1,2} and rotationalDOF∈{false(default),true}; e.g. axisDOF(0,true)==DOF_RX
-	protected :
-		void registerAttributes(){
-			REGISTER_ATTRIBUTE(se3);
-			REGISTER_ATTRIBUTE(refSe3);
-			REGISTER_ATTRIBUTE(blockedDOFs);
-		}
-	REGISTER_CLASS_NAME(PhysicalParameters);
-	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
+
+	REGISTER_ATTRIBUTES(/*no base*/,(se3)(refSe3)(blockedDOFs));
+	REGISTER_CLASS_AND_BASE(PhysicalParameters,Serializable Indexable);
 	REGISTER_INDEX_COUNTER(PhysicalParameters);
 };
 

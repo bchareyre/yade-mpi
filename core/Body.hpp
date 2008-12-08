@@ -89,8 +89,17 @@ class Body : public Serializable
 
 		// Serialization
 	protected:
-		void registerAttributes();
-	REGISTER_CLASS_NAME(Body);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+		REGISTER_ATTRIBUTES(/*no base*/,
+			(id)
+			(groupMask)
+			(isDynamic) // FIXME? : only used for interaction : no collision between 2 non dynamic objects
+			(physicalParameters)
+			(geometricalModel)
+			(interactingGeometry)
+			(boundingVolume)
+			(clumpId)
+		);
+
+	REGISTER_CLASS_AND_BASE(Body,Serializable);
 };
 REGISTER_SERIALIZABLE(Body);

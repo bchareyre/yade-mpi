@@ -29,10 +29,12 @@ class BrefcomGlobalCharacteristics: public PeriodicEngine{
 		void compute(MetaBody* rb, bool useMax=false);
 		virtual void action(MetaBody* rb){compute(rb,useMaxForce);}
 		BrefcomGlobalCharacteristics(){};
-	void registerAttributes(){ PeriodicEngine::registerAttributes(); REGISTER_ATTRIBUTE(unbalancedForce); REGISTER_ATTRIBUTE(useMaxForce);}
+	REGISTER_ATTRIBUTES(PeriodicEngine,
+		(unbalancedForce)
+		(useMaxForce)
+	);
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(BrefcomGlobalCharacteristics);
-	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
+	REGISTER_CLASS_AND_BASE(BrefcomGlobalCharacteristics,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(BrefcomGlobalCharacteristics);
 
@@ -90,41 +92,37 @@ class BrefcomContact: public NormalShearInteraction {
 		//	BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
 		virtual ~BrefcomContact();
 
+		REGISTER_ATTRIBUTES(NormalShearInteraction,
+			(E)
+			(G)
+			(tanFrictionAngle)
+			(undamagedCohesion)
+			(crossSection)
+			(epsCrackOnset)
+			(epsFracture)
+			(omegaThreshold)
+			(xiShear)
+			(tau)
+			(expDmgRate)
+			(transStrainCoeff)
 
-		virtual void registerAttributes(){
-			NormalShearInteraction::registerAttributes();
-			REGISTER_ATTRIBUTE(E);
-			REGISTER_ATTRIBUTE(G);
-			REGISTER_ATTRIBUTE(tanFrictionAngle);
-			REGISTER_ATTRIBUTE(undamagedCohesion);
-			REGISTER_ATTRIBUTE(crossSection);
-			REGISTER_ATTRIBUTE(epsCrackOnset);
-			REGISTER_ATTRIBUTE(epsFracture);
-			REGISTER_ATTRIBUTE(omegaThreshold);
-			REGISTER_ATTRIBUTE(xiShear);
-			REGISTER_ATTRIBUTE(tau);
-			REGISTER_ATTRIBUTE(expDmgRate);
-			REGISTER_ATTRIBUTE(transStrainCoeff);
+			(kappaD)
+			(neverDamage)
+			(epsT)
+			(epsTrans)
 
-			REGISTER_ATTRIBUTE(kappaD);
-			REGISTER_ATTRIBUTE(neverDamage);
-			REGISTER_ATTRIBUTE(epsT);
-			REGISTER_ATTRIBUTE(epsTrans);
+			(isCohesive)
 
-			REGISTER_ATTRIBUTE(isCohesive);
-
-			// auxiliary params, to make them accessible from python
-			REGISTER_ATTRIBUTE(omega);
-			REGISTER_ATTRIBUTE(Fn);
-			REGISTER_ATTRIBUTE(Fs);
-			REGISTER_ATTRIBUTE(epsN);
-			REGISTER_ATTRIBUTE(sigmaN);
-			REGISTER_ATTRIBUTE(sigmaT);
-			REGISTER_ATTRIBUTE(relResidualStrength);
-		};
-
-	REGISTER_CLASS_NAME(BrefcomContact);
-	REGISTER_BASE_CLASS_NAME(NormalShearInteraction);
+			// auxiliary params to make them accessible from python
+			(omega)
+			(Fn)
+			(Fs)
+			(epsN)
+			(sigmaN)
+			(sigmaT)
+			(relResidualStrength)
+		);
+	REGISTER_CLASS_AND_BASE(BrefcomContact,NormalShearInteraction);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BrefcomContact);
@@ -141,9 +139,8 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		//! average damage including already deleted contacts
 		Real normDmg;
 		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.) {createIndex();};
-		virtual void registerAttributes(){BodyMacroParameters::registerAttributes(); REGISTER_ATTRIBUTE(epsVolumetric); REGISTER_ATTRIBUTE(numBrokenCohesive); REGISTER_ATTRIBUTE(numContacts); REGISTER_ATTRIBUTE(normDmg); }
-		REGISTER_CLASS_NAME(BrefcomPhysParams);
-		REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) );
+		REGISTER_CLASS_AND_BASE(BrefcomPhysParams,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
@@ -167,11 +164,8 @@ class BrefcomLaw: public InteractionSolver{
 		BrefcomLaw() { Shop::Bex::initCache(); };
 		void action(MetaBody*);
 	protected: 
-		virtual void registerAttributes(){InteractionSolver::registerAttributes();};
-		void postProcessAttributes(bool deserializing){}
 	NEEDS_BEX("Force","Momentum");
-	REGISTER_CLASS_NAME(BrefcomLaw);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_CLASS_AND_BASE(BrefcomLaw,InteractionSolver);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BrefcomLaw);
@@ -207,26 +201,23 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		}
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
-		virtual void registerAttributes(){
-			InteractionPhysicsEngineUnit::registerAttributes();
-			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
-
-			REGISTER_ATTRIBUTE(G_over_E);
-			REGISTER_ATTRIBUTE(expBending);
-			REGISTER_ATTRIBUTE(xiShear);
-			REGISTER_ATTRIBUTE(sigmaT);
-			REGISTER_ATTRIBUTE(neverDamage);
-			REGISTER_ATTRIBUTE(epsCrackOnset);
-			REGISTER_ATTRIBUTE(relDuctility);
-			REGISTER_ATTRIBUTE(tau);
-			REGISTER_ATTRIBUTE(expDmgRate);
-			REGISTER_ATTRIBUTE(omegaThreshold);
-			REGISTER_ATTRIBUTE(transStrainCoeff);
-		}
+		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
+			(cohesiveThresholdIter)
+			(G_over_E)
+			(expBending)
+			(xiShear)
+			(sigmaT)
+			(neverDamage)
+			(epsCrackOnset)
+			(relDuctility)
+			(tau)
+			(expDmgRate)
+			(omegaThreshold)
+			(transStrainCoeff)
+		);
 
 		FUNCTOR2D(BrefcomPhysParams,BrefcomPhysParams);
-		REGISTER_CLASS_NAME(BrefcomMakeContact);
-		REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
+		REGISTER_CLASS_AND_BASE(BrefcomMakeContact,InteractionPhysicsEngineUnit);
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BrefcomMakeContact);
@@ -234,10 +225,9 @@ REGISTER_SERIALIZABLE(BrefcomMakeContact);
 class GLDrawBrefcomContact: public GLDrawInteractionPhysicsFunctor {
 	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 	virtual ~GLDrawBrefcomContact() {};
-	virtual void registerAttributes(){ REGISTER_ATTRIBUTE(contactLine); REGISTER_ATTRIBUTE(dmgLabel); REGISTER_ATTRIBUTE(dmgPlane); REGISTER_ATTRIBUTE(epsT); REGISTER_ATTRIBUTE(epsTAxes); REGISTER_ATTRIBUTE(normal); REGISTER_ATTRIBUTE(colorStrain); REGISTER_ATTRIBUTE(epsNLabel);}
+	REGISTER_ATTRIBUTES(/*no base*/,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
 	RENDERS(BrefcomContact);
-	REGISTER_CLASS_NAME(GLDrawBrefcomContact);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
+	REGISTER_CLASS_AND_BASE(GLDrawBrefcomContact,GLDrawInteractionPhysicsFunctor);
 	DECLARE_LOGGER;
 	static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
 };
@@ -249,9 +239,8 @@ class BrefcomDamageColorizer: public PeriodicEngine {
 		Real maxOmega;
 		BrefcomDamageColorizer(){maxOmega=0;}
 		virtual void action(MetaBody*);
-	virtual void registerAttributes(){ PeriodicEngine::registerAttributes(); REGISTER_ATTRIBUTE(maxOmega);}
-	REGISTER_CLASS_NAME(BrefcomDamageColorizer);
-	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
+	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
+	REGISTER_CLASS_AND_BASE(BrefcomDamageColorizer,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(BrefcomDamageColorizer);
 

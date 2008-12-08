@@ -23,12 +23,6 @@ BodyContainer::~BodyContainer()
 }
 
 
-void BodyContainer::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(body);
-}
-
-
 void BodyContainer::preProcessAttributes(bool deserializing)
 {
 	if(deserializing)

@@ -32,16 +32,6 @@ Interaction::Interaction(body_id_t newId1,body_id_t newId2) : id1(newId1) , id2(
 }
 
 
-void Interaction::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(id1);
-	REGISTER_ATTRIBUTE(id2);
-	REGISTER_ATTRIBUTE(isNew);
-	REGISTER_ATTRIBUTE(isReal);
-	REGISTER_ATTRIBUTE(interactionGeometry);
-	REGISTER_ATTRIBUTE(interactionPhysics);
-}
-
 void Interaction::swapOrder(){
 	if(interactionGeometry || interactionPhysics || !isNew){
 		throw std::logic_error("Bodies in interaction cannot be swapped if !isNew, have interactionGeometry or have interactionPhysics.");

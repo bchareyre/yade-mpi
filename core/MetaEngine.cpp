@@ -41,13 +41,6 @@ void MetaEngine::postProcessAttributes(bool deserializing)
 }
 
 
-void MetaEngine::registerAttributes()
-{
-	Engine::registerAttributes();
-	REGISTER_ATTRIBUTE(functorNames);
-	REGISTER_ATTRIBUTE(functorArguments);
-}
-
 
 vector<vector<string> >& MetaEngine::getFunctorNames()
 {

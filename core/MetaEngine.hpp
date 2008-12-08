@@ -46,11 +46,10 @@ class MetaEngine : public Engine
 		virtual int getDimension() { throw; };
 		virtual string getBaseClassType(unsigned int ) { throw; };
 
-	protected :
-		virtual void registerAttributes();
+	protected:
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(MetaEngine);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_ATTRIBUTES(Engine,(functorNames)(functorArguments));
+	REGISTER_CLASS_AND_BASE(MetaEngine,Engine);
 };
 
 REGISTER_SERIALIZABLE(MetaEngine);

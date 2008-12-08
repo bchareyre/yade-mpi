@@ -12,11 +12,6 @@
 #include "Interaction.hpp"
 
 
-void InteractionContainer::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(interaction);
-}
-
 
 void InteractionContainer::preProcessAttributes(bool deserializing)
 {

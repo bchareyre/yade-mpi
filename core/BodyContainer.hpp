@@ -99,14 +99,13 @@ class BodyContainer : public Serializable
 	protected :
 		void setId(shared_ptr<Body>& , unsigned int);
 
-	REGISTER_CLASS_NAME(BodyContainer);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_CLASS_AND_BASE(BodyContainer,Serializable);
 
 	// local storage for uniform serialization of all possible container concrete implementations.
 	private :
 		vector<shared_ptr<Body> > body; 
 	public :
-		virtual void registerAttributes();
+		REGISTER_ATTRIBUTES(/*no base*/,(body));
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);

@@ -27,10 +27,8 @@ class Engine : public Serializable
 		virtual void action(MetaBody*) { throw; };
 		/* returns all BodyExternalVariable's (Bex; formerly PhysicalActions) that this engine needs */
 		virtual list<string> getNeededBex(){return list<string>();}
-		virtual void registerAttributes(){REGISTER_ATTRIBUTE(label);}
-
-	REGISTER_CLASS_NAME(Engine);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_ATTRIBUTES(/*no base*/,(label));
+	REGISTER_CLASS_AND_BASE(Engine,Serializable);
 
 };
 

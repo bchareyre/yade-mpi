@@ -9,14 +9,8 @@
 #include "DeusExMachina.hpp"
 
 DeusExMachina::DeusExMachina() : Engine() {
-	subscribedBodies.resize(0);
+	subscribedBodies.resize(0); // what is this good for?
 }
-
-void DeusExMachina::registerAttributes() {
-	Engine::registerAttributes();
-	REGISTER_ATTRIBUTE(subscribedBodies);
-}
-
 void DeusExMachina::action(MetaBody* b) {
 	this->applyCondition(b);
 }

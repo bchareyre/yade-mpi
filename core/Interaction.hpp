@@ -46,10 +46,15 @@ class Interaction : public Serializable
 			bool maskAnyOK(int mask, MetaBody* rootBody=NULL){return (mask==0) || Body::byId(id1,rootBody)->maskOK(mask) || Body::byId(id2,rootBody)->maskOK(mask);}
 		#endif
 
-	protected :
-		void registerAttributes();
-	REGISTER_CLASS_NAME(Interaction);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_ATTRIBUTES(/*no base*/,
+		(id1)
+		(id2)
+		(isNew)
+		(isReal)
+		(interactionGeometry)
+		(interactionPhysics)
+	);
+	REGISTER_CLASS_AND_BASE(Interaction,Serializable);
 };
 
 REGISTER_SERIALIZABLE(Interaction);

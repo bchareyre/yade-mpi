@@ -104,11 +104,8 @@ class PhysicalActionContainer : public Serializable
 		virtual PhysicalActionContainer::iterator begin()			{throw;};
 		virtual PhysicalActionContainer::iterator end()			{throw;};
 
-/// Serialization										///
-	protected :
-		virtual void registerAttributes();
-	REGISTER_CLASS_NAME(PhysicalActionContainer);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_ATTRIBUTES(/*no base*/,(action));
+	REGISTER_CLASS_AND_BASE(PhysicalActionContainer,Serializable);
 
 	// local storage for uniform serialization of all possible container concrete implementations.
 	private	:

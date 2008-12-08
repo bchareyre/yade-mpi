@@ -40,15 +40,13 @@ class FileGenerator
 		virtual void singleAction();
 
 	protected :
-		//! Returns whether the generation was successful; message for user is in FileGenerator::message
-		virtual bool generate();
+	//! Returns whether the generation was successful; message for user is in FileGenerator::message
+	virtual bool generate();
+	virtual void postProcessAttributes(){};
 
-		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(/*no base*/,(outputFileName)(serializationDynlib));
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(FileGenerator);
-	REGISTER_BASE_CLASS_NAME(Serializable);
+	REGISTER_CLASS_AND_BASE(FileGenerator,Serializable);
 };
 
 REGISTER_SERIALIZABLE(FileGenerator);

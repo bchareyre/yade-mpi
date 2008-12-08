@@ -28,12 +28,8 @@ class PhysicalAction : public Serializable, public Indexable
 		virtual void reset() 				{throw;};
 		virtual shared_ptr<PhysicalAction> clone()	{throw;};
 	
-/// Serialization										///
-	REGISTER_CLASS_NAME(PhysicalAction);
-
-/// Indexable											///
 	REGISTER_INDEX_COUNTER(PhysicalAction);
-	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
+	REGISTER_CLASS_AND_BASE(PhysicalAction,Serializable Indexable);
 };
 
 REGISTER_SERIALIZABLE(PhysicalAction);

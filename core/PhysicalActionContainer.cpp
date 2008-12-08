@@ -23,9 +23,3 @@ PhysicalActionContainer::~PhysicalActionContainer()
 
 }
 
-
-void PhysicalActionContainer::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(action);
-};
-

@@ -31,9 +31,8 @@ class DeusExMachina : public Engine
 		virtual void applyCondition(MetaBody*) { throw; };
 	//	virtual bool isActivated();
 	protected :
-		void registerAttributes();
-	REGISTER_CLASS_NAME(DeusExMachina);
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_ATTRIBUTES(Engine,(subscribedBodies));
+	REGISTER_CLASS_AND_BASE(DeusExMachina,Engine);
 };
 
 REGISTER_SERIALIZABLE(DeusExMachina);

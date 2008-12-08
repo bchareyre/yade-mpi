@@ -68,24 +68,6 @@ void MetaBody::postProcessAttributes(bool deserializing)
 }
 
 
-void MetaBody::registerAttributes()
-{
-	Body::registerAttributes();
-	REGISTER_ATTRIBUTE(tags);
-	REGISTER_ATTRIBUTE(engines);
-	REGISTER_ATTRIBUTE(initializers);
-	REGISTER_ATTRIBUTE(bodies);
-	REGISTER_ATTRIBUTE(transientInteractions);
-	REGISTER_ATTRIBUTE(persistentInteractions);
-	REGISTER_ATTRIBUTE(physicalActions); // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
-	REGISTER_ATTRIBUTE(miscParams);
-	REGISTER_ATTRIBUTE(dispParams);
-	REGISTER_ATTRIBUTE(dt);
-	REGISTER_ATTRIBUTE(currentIteration);
-	REGISTER_ATTRIBUTE(simulationTime);
-	REGISTER_ATTRIBUTE(stopAtIteration);
-}
-
 
 void MetaBody::moveToNextTimeStep()
 {

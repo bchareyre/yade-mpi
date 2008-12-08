@@ -37,7 +37,7 @@ class Se3Interpolator: public DeusExMachina {
 		virtual ~Se3Interpolator(){};
 		virtual void applyCondition(MetaBody* mb);
 	protected:
-		REGISTER_ATTRIBUTES_WITH_BASE(DeusExMachina,
+		REGISTER_ATTRIBUTES(DeusExMachina,
 			(done)
 			(started)
 			(start)

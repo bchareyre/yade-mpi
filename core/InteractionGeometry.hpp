@@ -17,7 +17,6 @@ class InteractionGeometry : public Serializable, public Indexable
 {
 	REGISTER_CLASS_NAME(InteractionGeometry);
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
-	
 	REGISTER_INDEX_COUNTER(InteractionGeometry);
 };
 
