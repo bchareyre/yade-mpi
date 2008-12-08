@@ -433,7 +433,6 @@ void GLViewer::postDraw(){
 	int nSegments=((int)(wholeDiameter/gridStep))+1;
 	Real realSize=nSegments*gridStep;
 	LOG_DEBUG("nSegments="<<nSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
-	std::cerr << "gridStep="<<gridStep<<"\n";
 	glPushMatrix();
 
 	// XYZ grids
