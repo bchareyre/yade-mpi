@@ -171,7 +171,7 @@ python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::li
  * is position relative to axisPt; moment from moment is m; such moment per body is
  * projected onto axis.
  */
-Real sumBexMoments(int mask, python::tuple _axis, python::tuple _axisPt){
+Real sumBexTorques(int mask, python::tuple _axis, python::tuple _axisPt){
 	Shop::Bex::initCache();
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	Real ret;
@@ -264,6 +264,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,4);
 void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
+Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
 
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
@@ -279,8 +280,9 @@ BOOST_PYTHON_MODULE(_utils){
 	def("elasticEnergy",elasticEnergyInAABB);
 	def("inscribedCircleCenter",inscribedCircleCenter);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
+	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumBexForces",sumBexForces);
-	def("sumBexMoments",sumBexMoments);
+	def("sumBexTorques",sumBexTorques);
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);

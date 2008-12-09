@@ -40,9 +40,7 @@ void CentralGravityEngine::applyCondition(MetaBody* rootBody){
 }
 
 void AxialGravityEngine::applyCondition(MetaBody* rootBody){
-	BodyContainer::iterator Iend=rootBody->bodies->end();
-	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=Iend; ++I){
-		const shared_ptr<Body>& b(*I);
+	FOREACH(const shared_ptr<Body>&b, *rootBody->bodies){
 		if(b->isClumpMember()) continue;
 		Real myMass=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters)->mass;
 		/* http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html */

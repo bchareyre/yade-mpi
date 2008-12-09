@@ -5,6 +5,7 @@
 #
 from yade.wrapper import *
 from math import *
+from yade._eudoxos import * ## c++ implementations
 
 def estimateStress(strain,cutoff=0.):
 	"""Use summed stored energy in contacts to compute macroscopic stress over the same volume, provided known strain."""

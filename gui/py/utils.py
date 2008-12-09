@@ -16,7 +16,7 @@ except ImportError: pass
 # c++ implementations for performance reasons
 from yade._utils import *
 
-def saveVars(mark='',**kw):
+def saveVars(mark='',loadNow=False,**kw):
 	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
 
 	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use
@@ -26,12 +26,15 @@ def saveVars(mark='',**kw):
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once
 	the .xml is loaded again, use
 
-	 utils.loadVars()
+	 utils.loadVars(mark)
 
 	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
+
+	If loadParam==True, variables will be loaded immediately after saving. That effectively makes **kw available in builtin namespace.
 	"""
 	import cPickle
 	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
+	if loadNow: loadVars(mark)
 
 def loadVars(mark=''):
 	import cPickle
@@ -40,9 +43,20 @@ def loadVars(mark=''):
 	for k in d: __builtin__.__dict__[k]=d[k]
 
 
+def SpherePWaveTimeStep(radius,density,young):
+	"""Compute P-wave critical timestep for a single sphere.
+	If you want to compute minimum critical timestep for all spheres in the simulation, use utils.PWaveTimeStep() instead."""
+	from math import sqrt
+	return radius/sqrt(young/density)
+
 def randomColor(): return [random.random(),random.random(),random.random()]
 
 def typedEngine(name): return [e for e in Omega().engines if e.name==name][0]
+
+def downCast(obj,newClassName):
+	"""Cast given object to class deriving from the same yade root class and copy all parameters from given object.
+	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
+	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
 def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""

@@ -149,7 +149,7 @@ void GLViewer::saveDisplayParameters(size_t n){
 
 string GLViewer::getState(){
 	QString origStateFileName=stateFileName();
-	char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str);
+	char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(!result) throw runtime_error("Failure getting temporary filename.");
 	setStateFileName(tmpnam_str); saveStateToFile(); setStateFileName(origStateFileName);
 	LOG_DEBUG("State saved to temp file "<<tmpnam_str);
 	// read tmp file contents and return it as string
@@ -160,7 +160,7 @@ string GLViewer::getState(){
 }
 
 void GLViewer::setState(string state){
-	char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str);
+	char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(!result) throw runtime_error("Failure getting temporary filename.");
 	std::ofstream out(tmpnam_str);
 	if(!out.good()){ LOG_ERROR("Error opening temp file `"<<tmpnam_str<<"', loading aborted."); return; }
 	out<<state; out.close();
@@ -492,7 +492,8 @@ void GLViewer::postDraw(){
 			drawArrow(wholeDiameter/6);
 		glPopMatrix();
 	}
-
+	
+	MetaBody* rb=Omega::instance().getRootBody().get();
 	#define _W3 setw(3)<<setfill('0')
 	#define _W2 setw(2)<<setfill('0')
 	if(timeDispMask!=0){
@@ -519,6 +520,7 @@ void GLViewer::postDraw(){
 		if(timeDispMask & GLViewer::TIME_ITER){
 			ostringstream oss;
 			oss<<"#"<<Omega::instance().getCurrentIteration();
+			if(rb->stopAtIteration>rb->currentIteration) oss<<" ("<<setiosflags(ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->currentIteration)/rb->stopAtIteration<<"%)";
 			QGLViewer::drawText(x,y,oss.str());
 			y-=lineHt;
 		}
@@ -530,7 +532,7 @@ string GLViewer::getRealTimeString(){
 	ostringstream oss;
 	time_duration t=Omega::instance().getComputationDuration();
 	unsigned d=t.hours()/24,h=t.hours()%24,m=t.minutes(),s=t.seconds();
-	oss<<"wall ";
+	oss<<"clock ";
 	if(d>0) oss<<d<<"days "<<_W2<<h<<":"<<_W2<<m<<":"<<_W2<<s;
 	else if(h>0) oss<<_W2<<h<<":"<<_W2<<m<<":"<<_W2<<s;
 	else oss<<_W2<<m<<":"<<_W2<<s;

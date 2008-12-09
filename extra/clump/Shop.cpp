@@ -135,6 +135,19 @@ Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	return (useMaxForce?maxF:meanF)/maxContactF;
 }
 
+Real Shop::kineticEnergy(MetaBody* _rb){
+	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
+	Real ret=0.;
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		if(!b->isDynamic) continue;
+		shared_ptr<RigidBodyParameters> rbp=YADE_PTR_CAST<RigidBodyParameters>(b->physicalParameters); assert(pp);
+		Matrix3r inertiaMatrix(rbp->inertia[0],rbp->inertia[1],rbp->inertia[2]);
+		// ½(mv²+ωIω)
+		ret+=.5*(rbp->mass*rbp->velocity.SquaredLength()+rbp->angularVelocity.Dot(diagMult(rbp->inertia,rbp->angularVelocity)));
+	}
+	return ret;
+}
+
 
 
 

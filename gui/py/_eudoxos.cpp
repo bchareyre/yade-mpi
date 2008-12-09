@@ -1,6 +1,6 @@
 #include<yade/extra/Brefcom.hpp>
 #include<boost/python.hpp>
-using namespace boost;
+using namespace boost::python;
 using namespace std;
 # if 0
 Real elasticEnergyDensityInAABB(python::tuple AABB){
@@ -26,4 +26,35 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 	return E/(box[0]*box[1]*box[2]);
 }
 #endif
+
+// copied from _utils.cpp
+Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])(),extract<double>(t[1])(),extract<double>(t[2])());}
+
+/*! Set velocity of all dynamic particles so that if their motion were unconstrained,
+ * axis given by axisPoint and axisDirection would be reached in timeToAxis
+ * (or, point at distance subtractDist from axis would be reached).
+ *
+ * The code is analogous to AxialGravityEngine and is intended to give initial motion
+ * to particles subject to axial compaction to speed up the process. */
+void velocityTowardsAxis(python::tuple _axisPoint, python::tuple _axisDirection, Real timeToAxis, Real subtractDist=0.){
+	Vector3r axisPoint=tuple2vec(_axisPoint), axisDirection=tuple2vec(_axisDirection);
+	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getRootBody()->bodies)){
+		if(!b->isDynamic) continue;
+		ParticleParameters* pp=YADE_CAST<ParticleParameters*>(b->physicalParameters.get());
+		const Vector3r& x0=pp->se3.position;
+		const Vector3r& x1=axisPoint;
+		const Vector3r x2=axisPoint+axisDirection;
+		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
+		Vector3r toAxis=closestAxisPoint-x0;
+		if(subtractDist>0) toAxis*=(toAxis.Length()-subtractDist)/toAxis.Length();
+		pp->velocity=toAxis/timeToAxis;
+	}
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,4);
+
+
+
+BOOST_PYTHON_MODULE(_eudoxos){
+	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist")));
+}
 
