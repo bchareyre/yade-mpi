@@ -1,0 +1,63 @@
+ M G P O S T 
+
+INTRODUCTION
+------------
+
+ This package contain the C source of mgpost.
+
+ By distributing this program freely, objective is to facilitate
+ the post-treatment and the visualization of 2D/3D simulations
+ made in search by discrete element methods (DEM). In return,
+ we ask you to hold informed about the improvements that you bring
+ to the code and we thank you for your possible remarks. We also 
+ ask you to make reference to the program mgpost if you use it for
+ your publications and communications.
+
+AUTHOR
+------
+
+ Vincent Richefeu  <vincent.richefeu@hmg.inpg.fr>
+
+
+POSTSCRIPT EXPORTATION
+----------------------
+
+ mgpost use the GL2PS library to export EPS files.
+ See http://www.geuz.org/gl2ps/ to obtain more informations on this
+ great library. 
+
+LICENSE
+-------
+
+ GPL
+
+INSTALLATION ON UNIX-LIKE OS
+-------------------------
+
+ - You need openGL (eg Mesa), glut, libxml (1.0 or 2.0), libtiff
+ - Edit Makefile and modify the variable INSTALL_DIR. 
+ - Type make, make install.
+
+INSTALLATION ON WIN32 WITH DEV-C++
+----------------------------------
+
+ - Install the requiered librairies with Dev-c++ 
+   (http://www.bloodshed.net/dev/packages/)
+ - Open the project file 'mgpost.dev' (in src directory) with Dev-c++
+ - Rebuild all the project, the binary file 'mgpost.exe' will be created
+   in the directory src.
+
+INSTALLATION ON MAC OS X
+------------------------
+
+ - You need obviously to install the Developper Tools, if not done yet. 
+ - You need libtiff. The simpliest way to have it is using Fink
+   (http://fink.sourceforge.net), an open source programs manager.  Once
+   installed, simply type 'fink install libtiff'. Fink will download and
+   install the appropriate files in the /sw root subdirectory. The
+   makefile is aware of this location. If you want to install libtiff by
+   yourself, you can go to http://www.libtiff.org/.
+ - At last, in the main mgpost directory, type 'make macosx' to build
+   the program. 'make install' will copy the binary to /usr/local/bin.
+
+
