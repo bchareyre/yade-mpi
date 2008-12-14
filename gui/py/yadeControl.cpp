@@ -149,6 +149,8 @@ BASIC_PY_PROXY_HEAD(pyPhysicalParameters,PhysicalParameters)
 			throw std::invalid_argument("Invalid  DOF specification `"+s+"', must be ∈{x,y,z,rx,ry,rz}.");
 		}
 	}
+	python::tuple displ_get(){Vector3r ret=proxee->se3.position-proxee->refSe3.position; return python::make_tuple(ret[0],ret[1],ret[2]);}
+	python::tuple rot_get(){Quaternionr relRot=proxee->refSe3.orientation.Conjugate()*proxee->se3.orientation; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); axis*=angle; return python::make_tuple(axis[0],axis[1],axis[2]); }
 	python::tuple pos_get(){const Vector3r& p=proxee->se3.position; return python::make_tuple(p[0],p[1],p[2]);}
 	python::tuple refPos_get(){const Vector3r& p=proxee->refSe3.position; return python::make_tuple(p[0],p[1],p[2]);}
 	python::tuple ori_get(){Vector3r axis; Real angle; proxee->se3.orientation.ToAxisAngle(axis,angle); return python::make_tuple(axis[0],axis[1],axis[2],angle);}
@@ -619,6 +621,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("pos",&pyPhysicalParameters::pos_get,&pyPhysicalParameters::pos_set)
 		.add_property("ori",&pyPhysicalParameters::ori_get,&pyPhysicalParameters::ori_set)
 		.add_property("refPos",&pyPhysicalParameters::refPos_get,&pyPhysicalParameters::refPos_set)
+		.add_property("displ",&pyPhysicalParameters::displ_get)
+		.add_property("rot",&pyPhysicalParameters::rot_get)
 		;
 	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"BoundingVolume");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionGeometry,"InteractionGeometry");

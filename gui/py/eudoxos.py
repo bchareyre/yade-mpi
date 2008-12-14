@@ -96,6 +96,41 @@ def oofemTextExport(fName):
 	f.write('\n'.join(material+["%d %d"%(len(bodies),len(interactions))]+bodies+interactions))
 	f.close()
 
+def oofemPrescribedDisplacementsExport(fileName):
+	f=open(fileName,'w')
+	f.write(fileName+'.out\n'+'''All Yade displacements prescribed as boundary conditions
+NonLinearStatic nsteps 2 contextOutputStep 1 rtolv 1.e-2 stiffMode 2 maxiter 50 controllmode 1 nmodules 0
+domain 3dshell
+OutputManager tstep_all dofman_all element_all
+''')
+	inters=[i for i in O.interactions if (i.geom and i.phys)]
+	f.write("ndofman %d nelem %d ncrosssect 1 nmat 1 nbc %d nic 0 nltf 1 nbarrier 0\n"%(len(O.bodies),len(inters),len(O.bodies)*6))
+	bcMax=0; bcMap={}
+	for b in O.bodies:
+		f.write("Particle %d coords 3 %.15e %.15e %.15e rad %g"%(b.id+1,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
+		bcMap[b.id]=tuple([bcMax+i for i in [1,2,3,4,5,6]])
+		bcMax+=6
+		f.write(' bc '+' '.join([str(i) for i in bcMap[b.id]])+'\n')
+	for j,i in enumerate(inters):
+		f.write('CohSur3d %d nodes 2 %d %d mat 1 crossSect 1 area %g\n'%(j+1,i.id1+1,i.id2+1,i.phys['crossSection']))
+	# crosssection
+	f.write("SimpleCS 1 thick 1.0 width 1.0\n")
+	# material
+	ph=inters[0].phys
+	f.write("CohInt 1 kn %g ks %g e0 %g ef %g c 0. ksi %g coh %g tanphi %g d 1.0 conf 0.0 maxdist 0.0\n"%(ph['E'],ph['G'],ph['epsCrackOnset'],ph['epsFracture'],ph['xiShear'],ph['undamagedCohesion'],ph['tanFrictionAngle']))
+	# boundary conditions
+	for b in O.bodies:
+		displ=b.phys.displ; rot=b.phys.rot
+		dofs=[displ[0],displ[1],displ[2],rot[0],rot[1],rot[2]]
+		f.write('# body #%d\n'%b.id)
+		for dof in range(6):
+			f.write('BoundaryCondition %d loadTimeFunction 1 prescribedvalue %.15e\n'%(bcMap[b.id][dof],dofs[dof]))
+	#f.write('PiecewiseLinFunction 1 npoints 3 t 3 0. 10. 1000.  f(t) 3 0. 10. 1000.\n')
+	f.write('ConstantFunction 1 f(t) 1.0\n')
+
+
+
+
 def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	from yade.wrapper import Omega
 	material,bodies,interactions=[],[],[]
