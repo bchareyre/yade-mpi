@@ -72,7 +72,7 @@ main(int argc, char **argv)
 
 	mgpost_init(argc, argv);
 
-	sprintf(mgpost_string, "mgpost %s, 2001-2008 V.Richefeu <richefeu@lmgc.univ-montp2.fr>", MGP_VERSION);
+	sprintf(mgpost_string, "mgpost %s, 2001-2008 V.Richefeu <vincent.richefeu@hmg.inpg.fr>", MGP_VERSION);
 
 	fprintf(stdout, "\n    mgpost version %s,\n", MGP_VERSION);
 	fprintf(stdout, "    Vincent Richefeu\n");

@@ -2053,8 +2053,7 @@ void disp_tangential_strength_2d ()
   GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
   int coul;
   float save_valc_bleu, save_valc_rouge;
-  double dist;
-  double l, ls, lc, sina, cosa;
+  double l;
 
   save_valc_bleu = valc_bleu;
   save_valc_rouge = valc_rouge;

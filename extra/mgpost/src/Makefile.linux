@@ -14,8 +14,8 @@
 #  _LINUX     : compil on linux OS
 #  _WITH_TIFF : linked with libtiff
 
-CC      =g++
-CFLAGS  =-Wall -O3 -D_FR -D_GNU_SOURCE -D_LIBXML2 -D_LINUX -D_WITH_TIFF
+CC      =gcc
+CFLAGS  =-Wall -O3 -D_GNU_SOURCE -D_LIBXML2 -D_LINUX -D_WITH_TIFF
 LIBS    =-lGL -lGLU -lglut -lm -lxml2 -ltiff -lX11 -lXmu -lXi
 LIBSDIR =-L/usr/X11R6/lib 
 INC_DIR =-I/usr/include/libxml2

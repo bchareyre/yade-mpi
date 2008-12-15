@@ -1974,184 +1974,190 @@ affiche_aide()
 void 
 mgp_buildmenu()
 {
-  int popupmenu, submenu1, submenu2, submenu3, submenu4, submenu5, submenu6;
+        int popupmenu, submenu1, submenu2, submenu3, submenu4, submenu5, submenu6;
   
 #ifdef _FR
-  submenu1 = glutCreateMenu(traitsubmenu1);	/* OPTIONS */
-  glutAddMenuEntry("Fond blanc", 0);
-  glutAddMenuEntry("Fond fun", 1);
-  glutAddMenuEntry("Fond Noir", 2);
-  glutAddMenuEntry("Traits blanc", 5);
-  glutAddMenuEntry("Traits bleu", 6);
-  glutAddMenuEntry("Traits Noir", 7);
-  glutAddMenuEntry("Transparence ON/OFF", 3);
-  glutAddMenuEntry("Section ON/OFF", 4);
-  
-  submenu2 = glutCreateMenu(traitsubmenu2);	/* outils */
-  glutAddMenuEntry("Informations sur l'echantillon", 15);
-  glutAddMenuEntry("Quadrillage de l'echantillon", 2);
-  if (with_layers) glutAddMenuEntry("Couches geologiques", 34);
-  glutAddMenuEntry("Champ de vitesses", 12);
-  glutAddMenuEntry("Anisotropie", 22);
-  glutAddMenuEntry("Evolution Anisotropie", 24);
-  glutAddMenuEntry("Informations sur les gaps", 26);
-  glutAddMenuEntry("Direction des contacts", 30);
-  glutAddMenuEntry("fn vs ft", 16);
-  glutAddMenuEntry("pdf(fn)", 14);
-  glutAddMenuEntry("Granulometrie", 27);
-  glutAddMenuEntry("Forces locales", 35);
-  
-  submenu3 = glutCreateMenu(traitsubmenu2);	/* rendu des corps */
-  glutAddMenuEntry("Rien", 10);
-  glutAddMenuEntry("Nombre de coordination", 32);
- 	glutAddMenuEntry("Contour", 13);
-  glutAddMenuEntry("Couleurs", 19);
-  glutAddMenuEntry("Tailles", 36);
-    /* 	glutAddMenuEntry("Deformations 11", 27); */
-    /* 	glutAddMenuEntry("Deformations 22", 28); */
-	glutAddMenuEntry("Vitesses angulaires (2D)", 8);
-	glutAddMenuEntry("Norme vitesses", 11);
-	/* glutAddMenuEntry ("Deplacements X cumul�s", 19); */
-	/* glutAddMenuEntry ("Deplacements Y cumul�s", 20); */
-	glutAddMenuEntry("Distance / reference", 21);
-    
-	submenu4 = glutCreateMenu(traitsubmenu2);	/* rendu des
-      * interactions */
-	glutAddMenuEntry("Rien", 0);
-	glutAddMenuEntry("Liste de Verlet", 1);
-	glutAddMenuEntry("Liens colles", 9);
+        submenu1 = glutCreateMenu(traitsubmenu1);
+        glutAddMenuEntry("Fond blanc", 0);
+        glutAddMenuEntry("Fond fun", 1);
+        glutAddMenuEntry("Fond Noir", 2);
+        glutAddMenuEntry("Traits blanc", 5);
+        glutAddMenuEntry("Traits bleu", 6);
+        glutAddMenuEntry("Traits Noir", 7);
+        glutAddMenuEntry("Transparence ON/OFF", 3);
+        glutAddMenuEntry("Section ON/OFF", 4);
+        
+        submenu2 = glutCreateMenu(traitsubmenu2);
+        glutAddMenuEntry("Informations sur l'echantillon", 15);
+        glutAddMenuEntry("Quadrillage de l'echantillon", 2);
+        if (with_layers) glutAddMenuEntry("Couches geologiques", 34);
+        glutAddMenuEntry("Champ de vitesses", 12);
+        glutAddMenuEntry("Anisotropie", 22);
+        glutAddMenuEntry("Evolution Anisotropie", 24);
+        glutAddMenuEntry("Informations sur les gaps", 26);
+        glutAddMenuEntry("Direction des contacts", 30);
+        glutAddMenuEntry("fn vs ft", 16);
+        glutAddMenuEntry("pdf(fn)", 14);
+        glutAddMenuEntry("Granulometrie", 27);
+        glutAddMenuEntry("Forces locales", 35);
+        
+        submenu3 = glutCreateMenu(traitsubmenu2);
+        glutAddMenuEntry("Rien", 10);
+        glutAddMenuEntry("Nombre de coordination", 32);
+        glutAddMenuEntry("Contour", 13);
+        glutAddMenuEntry("Couleurs", 19);
+        glutAddMenuEntry("Tailles", 36);
+        glutAddMenuEntry("Vitesses angulaires (2D)", 8);
+        glutAddMenuEntry("Norme vitesses", 11);
+        glutAddMenuEntry("Distance / reference", 21);
+        
+        submenu4 = glutCreateMenu(traitsubmenu2);
+        glutAddMenuEntry("Rien", 0);
+        glutAddMenuEntry("Liste de Verlet", 1);
+        glutAddMenuEntry("Liens colles", 9);
         glutAddMenuEntry("Fissures", 28);
-	/* glutAddMenuEntry ("Efforts normaux", 3); */
-	glutAddMenuEntry("Forces normales sup. seuil", 31);
-	glutAddMenuEntry("Forces", 33);
-  glutAddMenuEntry("Forces des fichiers for.out.xxx", 3);
-  glutAddMenuEntry("lignes de couleur pour fn", 20);
-  glutAddMenuEntry("Forces en compression et en traction", 7);
-	glutAddMenuEntry("Forces normales positives", 5);
-	glutAddMenuEntry("Forces normales negatives", 6);
-	glutAddMenuEntry("Forces tangentielles (val. abs.)", 4);
-	glutAddMenuEntry("Efforts de couple", 25);
-	glutAddMenuEntry("Vitesse relative tangente", 17);
-	glutAddMenuEntry("Volumes des ponts liquides", 29);
-    /* 	glutAddMenuEntry("Forces de cohesion", 34); */
-    
-	submenu5 = glutCreateMenu(traitsubmenu4);	/* Screenshots -
-      * exportations */
-	glutAddMenuEntry("Image TIFF", 0);
-	glutAddMenuEntry("Serie d'images(TIFF)", 1);
-	glutAddMenuEntry("Image EPS avec gl2ps", 2);
-	glutAddMenuEntry("Image EPS (2D)", 6);
-	glutAddMenuEntry("Fichier 'BODIES.DAT'", 3);
-	glutAddMenuEntry("Fichier 'export.cin'", 4);
-	glutAddMenuEntry("Fichier 'shot.pov'", 5);
+        glutAddMenuEntry("Forces normales sup. seuil", 31);
+        glutAddMenuEntry("Forces", 33);
+        glutAddMenuEntry("Forces des fichiers for.out.xxx", 3);
+        glutAddMenuEntry("lignes de couleur pour fn", 20);
+        glutAddMenuEntry("Forces en compression et en traction", 7);
+        glutAddMenuEntry("Forces normales positives", 5);
+        glutAddMenuEntry("Forces normales negatives", 6);
+        glutAddMenuEntry("Forces tangentielles (val. abs.)", 4);
+        glutAddMenuEntry("Efforts de couple", 25);
+        glutAddMenuEntry("Vitesse relative tangente", 17);
+        glutAddMenuEntry("Volumes des ponts liquides", 29);
+        
+        submenu5 = glutCreateMenu(traitsubmenu4);
+        glutAddMenuEntry("Image TIFF", 0);
+        glutAddMenuEntry("Serie d'images(TIFF)", 1);
+        glutAddMenuEntry("Image EPS avec gl2ps", 2);
+        glutAddMenuEntry("Image EPS (2D)", 6);
+        glutAddMenuEntry("Fichier 'BODIES.DAT'", 3);
+        glutAddMenuEntry("Fichier 'export.cin'", 4);
+        glutAddMenuEntry("Fichier 'shot.pov'", 5);
         glutAddMenuEntry("Fichier 'particles.Rxy'", 7);
         glutAddMenuEntry("Fichier 'deplacement.txt'", 8); 
-  
+        
         submenu6 = glutCreateMenu(traitsubmenuFluid);
         glutAddMenuEntry("Rien", 0);
         glutAddMenuEntry("Vitesses horizontales", 1);
         glutAddMenuEntry("Vitesses verticales", 2);
         glutAddMenuEntry("Norme vitesses", 3);
         glutAddMenuEntry("Pressions", 4);
+        
+        popupmenu = glutCreateMenu(traitmenu);
+        glutAddMenuEntry("defiler les etats", 5);
+        if (multifiles) {
+                glutAddMenuEntry("Etat Precedent", 7);
+                glutAddMenuEntry("Etat Suivant", 8);
+        }
+        glutAddMenuEntry("Editer mgconf", 6);
+        glutAddMenuEntry("Recharger mgconf", 4);
+        glutAddMenuEntry("Sauver mgpview", 9);
+        glutAddMenuEntry("Recharger mgpview", 10);
+        glutAddMenuEntry("Vue 3D", 3);
+        glutAddMenuEntry("Plan XY", 2);
+        glutAddMenuEntry("Plan XZ", 1);
+        glutAddSubMenu("Options", submenu1);
+        glutAddSubMenu("Outils", submenu2);
+        glutAddSubMenu("Rendu des corps", submenu3);
+        glutAddSubMenu("Rendu des interactions", submenu4);
+        glutAddSubMenu("Exportations", submenu5);
+        if (with_fluid) glutAddSubMenu("Fluide", submenu6);
+        glutAddMenuEntry("Quitter", 0);
     
-	popupmenu = glutCreateMenu(traitmenu);	/* menu PRINCIPAL */
-	glutAddMenuEntry("defiler les etats", 5);
-	if (multifiles) {
-      glutAddMenuEntry("Etat Precedent", 7);
-      glutAddMenuEntry("Etat Suivant", 8);
-	}
-	glutAddMenuEntry("Editer mgconf", 6);
-	glutAddMenuEntry("Recharger mgconf", 4);
-	glutAddMenuEntry("Sauver mgpview", 9);
-	glutAddMenuEntry("Recharger mgpview", 10);
-	glutAddMenuEntry("Vue 3D", 3);
-	glutAddMenuEntry("Plan XY", 2);
-	glutAddMenuEntry("Plan XZ", 1);
-	glutAddSubMenu("Options", submenu1);
-	glutAddSubMenu("Outils", submenu2);
-	glutAddSubMenu("Rendu des corps", submenu3);
-	glutAddSubMenu("Rendu des interactions", submenu4);
-	glutAddSubMenu("Exportations", submenu5);
-  if (with_fluid) glutAddSubMenu("Fluide", submenu6);
-	glutAddMenuEntry("Quitter", 0);
+#else	/* English */
     
-#else				/* English */
-    
-	submenu1 = glutCreateMenu(traitsubmenu1);	/* OPTIONS */
-	glutAddMenuEntry("White background", 0);
-	glutAddMenuEntry("Blue background", 1);
-	glutAddMenuEntry("Black background", 2);
-	glutAddMenuEntry("White foreground", 5);
-	glutAddMenuEntry("Blue foreground", 6);
-	glutAddMenuEntry("Black foreground", 7);
-	glutAddMenuEntry("Transparency ON/OFF", 3);
-	glutAddMenuEntry("Section      ON/OFF", 4);
-    
-	submenu2 = glutCreateMenu(traitsubmenu2);	/* tools */
-	glutAddMenuEntry("Sample informations", 15);
-	glutAddMenuEntry("Squared sample", 2);
-	glutAddMenuEntry("Velocity field", 12);
-	glutAddMenuEntry("Anisotropy", 22);
-	glutAddMenuEntry("Anisotropy evolution", 24);
-	glutAddMenuEntry("Informations on gaps", 26);
-	glutAddMenuEntry("Contacts direction", 30);
-    
-	submenu3 = glutCreateMenu(traitsubmenu2);	/* bodies render */
-	glutAddMenuEntry("Nothing", 10);
-	glutAddMenuEntry("Coordination Number", 32);
-    /* 	glutAddMenuEntry("Stresses 11", 13); */
-    /* 	glutAddMenuEntry("Stresses 22", 14); */
-    /* 	glutAddMenuEntry("Strains 11", 27); */
-    /* 	glutAddMenuEntry("Strains 22", 28); */
-	glutAddMenuEntry("Angular Velocity (2D)", 8);
-	glutAddMenuEntry("Velocity magnitude", 11);
-    /* 	glutAddMenuEntry("Cumulated X deplacements", 19); */
-    /* 	glutAddMenuEntry("Cumulated Y deplacements", 20); */
-	glutAddMenuEntry("Cumulated deplacements", 21);
-    
-	submenu4 = glutCreateMenu(traitsubmenu2);	/* interactions render */
-	glutAddMenuEntry("Nothing", 0);
-	glutAddMenuEntry("Verlet list", 1);
-	glutAddMenuEntry("Sticks links", 9);
-	/* glutAddMenuEntry ("Normal strength", 3); */
-	glutAddMenuEntry("Strong/weak Networks", 31);
-	glutAddMenuEntry("Strength", 33);
-	glutAddMenuEntry("Positives normal strength", 5);
-	glutAddMenuEntry("Negatives normal strength", 6);
-	glutAddMenuEntry("Tangentials strength", 4);
-	glutAddMenuEntry("Couple strength", 25);
-	glutAddMenuEntry("tangentials relatives velocities", 17);
-	glutAddMenuEntry("Volume of liquid bonds", 29);
-    
-	submenu5 = glutCreateMenu(traitsubmenu4);	/* Screenshots */
-	glutAddMenuEntry("Picture TIFF", 0);
-	glutAddMenuEntry("List of pictures TIFF", 1);
-	glutAddMenuEntry("Picture EPS using gl2ps", 2);
-	glutAddMenuEntry("Picture EPS (2D)", 6);
-	glutAddMenuEntry("File 'BODIES.DAT'", 3);
-	glutAddMenuEntry("File 'export.cin'", 4);
-	glutAddMenuEntry("File 'shot.pov'", 5);
+        submenu1 = glutCreateMenu(traitsubmenu1);
+        glutAddMenuEntry("White background", 0);
+        glutAddMenuEntry("Custom background", 1);
+        glutAddMenuEntry("Black background", 2);
+        glutAddMenuEntry("White foreground", 5);
+        glutAddMenuEntry("Blue foreground", 6);
+        glutAddMenuEntry("Black foreground", 7);
+        glutAddMenuEntry("Transparency ON/OFF", 3);
+        glutAddMenuEntry("Section      ON/OFF", 4);
+        
+        submenu2 = glutCreateMenu(traitsubmenu2);
+        glutAddMenuEntry("Sample informations", 15);
+        glutAddMenuEntry("Squared sample", 2);
+        if (with_layers) glutAddMenuEntry("Geologic layers", 34);
+        glutAddMenuEntry("Velocity field", 12);
+        glutAddMenuEntry("Anisotropy", 22);
+        glutAddMenuEntry("Anisotropy evolution", 24);
+        glutAddMenuEntry("Informations on gaps", 26);
+        glutAddMenuEntry("Contacts direction", 30);
+        glutAddMenuEntry("fn vs ft", 16);
+        glutAddMenuEntry("pdf(fn)", 14);
+        glutAddMenuEntry("Granulometry", 27);
+        glutAddMenuEntry("Local forces", 35);
+                
+        submenu3 = glutCreateMenu(traitsubmenu2);
+        glutAddMenuEntry("Nothing", 10);
+        glutAddMenuEntry("Coordination Number", 32);
+        glutAddMenuEntry("Outline", 13);
+        glutAddMenuEntry("Colors", 19);
+        glutAddMenuEntry("Sizes", 36);
+        glutAddMenuEntry("Angular Velocity (2D)", 8);
+        glutAddMenuEntry("Velocity magnitude", 11);
+        glutAddMenuEntry("Cumulated displacements", 21);
+        
+        submenu4 = glutCreateMenu(traitsubmenu2);
+        glutAddMenuEntry("Nothing", 0);
+        glutAddMenuEntry("Verlet list", 1);
+        glutAddMenuEntry("Sticks links", 9);
+        glutAddMenuEntry("Cracks", 28);
+        glutAddMenuEntry("Strong/weak Networks", 31);
+        glutAddMenuEntry("Forces", 33);
+        glutAddMenuEntry("Forces from files for.out.xxx", 3);
+        glutAddMenuEntry("Color lines for normal force", 20);
+        glutAddMenuEntry("Compressive and tensile force", 7);
+        glutAddMenuEntry("Positives normal force", 5);
+        glutAddMenuEntry("Negatives normal force", 6);
+        glutAddMenuEntry("Tangentials force", 4);
+        glutAddMenuEntry("Moment", 25);
+        glutAddMenuEntry("Tangential relative velocity", 17);
+        glutAddMenuEntry("Liquid bond Volume", 29);
+        
+        submenu5 = glutCreateMenu(traitsubmenu4);
+        glutAddMenuEntry("Picture TIFF", 0);
+        glutAddMenuEntry("List of pictures TIFF", 1);
+        glutAddMenuEntry("Picture EPS using gl2ps", 2);
+        glutAddMenuEntry("Picture EPS (2D)", 6);
+        glutAddMenuEntry("File 'BODIES.DAT'", 3);
+        glutAddMenuEntry("File 'export.cin'", 4);
+        glutAddMenuEntry("File 'shot.pov'", 5);
+        glutAddMenuEntry("File 'particles.Rxy'", 7);
         glutAddMenuEntry("File 'deplacement.txt'", 8);        
-    
-	popupmenu = glutCreateMenu(traitmenu);	/* main menu */
-	glutAddMenuEntry("Run the states", 5);
-	if (multifiles) {
-      glutAddMenuEntry("Previous state", 7);
-      glutAddMenuEntry("Next state", 8);
-	}
-	glutAddMenuEntry("Edit mgconf", 6);
-	glutAddMenuEntry("Reload mgconf", 4);
-	glutAddMenuEntry("Save mgpview", 9);
-	glutAddMenuEntry("Reload mgpview", 10);
-	glutAddMenuEntry("3D view", 3);
-	glutAddMenuEntry("XY plan", 2);
-	glutAddMenuEntry("XZ plan", 1);
-	glutAddSubMenu("Options", submenu1);
-	glutAddSubMenu("Tools", submenu2);
-	glutAddSubMenu("Bodies render", submenu3);
-	glutAddSubMenu("Interactions render", submenu4);
-	glutAddSubMenu("Export", submenu5);
-	glutAddMenuEntry("Quit", 0);
+        
+        submenu6 = glutCreateMenu(traitsubmenuFluid);
+        glutAddMenuEntry("Nothing", 0);
+        glutAddMenuEntry("Horizontal velocity", 1);
+        glutAddMenuEntry("Vertical velocity", 2);
+        glutAddMenuEntry("Velocity magnitude", 3);
+        glutAddMenuEntry("Pressure", 4);
+        
+        popupmenu = glutCreateMenu(traitmenu);
+        glutAddMenuEntry("Run", 5);
+        if (multifiles) {
+                glutAddMenuEntry("Previous state", 7);
+                glutAddMenuEntry("Next state", 8);
+        }
+        glutAddMenuEntry("Edit mgconf", 6);
+        glutAddMenuEntry("Reload mgconf", 4);
+        glutAddMenuEntry("Save mgpview", 9);
+        glutAddMenuEntry("Reload mgpview", 10);
+        glutAddMenuEntry("3D view", 3);
+        glutAddMenuEntry("XY plan", 2);
+        glutAddMenuEntry("XZ plan", 1);
+        glutAddSubMenu("Options", submenu1);
+        glutAddSubMenu("Tools", submenu2);
+        glutAddSubMenu("Body rendering", submenu3);
+        glutAddSubMenu("Interaction rendering", submenu4);
+        glutAddSubMenu("Export", submenu5);
+        if (with_fluid) glutAddSubMenu("Fluide", submenu6);
+        glutAddMenuEntry("Quit", 0);
 #endif
     
 }
