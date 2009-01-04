@@ -22,12 +22,10 @@ ElasticContactInteraction::~ElasticContactInteraction()
 
 void ElasticContactInteraction::registerAttributes()
 {
-//	SimpleElasticInteraction::registerAttributes();
+	NormalShearInteraction::registerAttributes();
 	REGISTER_ATTRIBUTE(prevNormal);
-	REGISTER_ATTRIBUTE(ks);
-	REGISTER_ATTRIBUTE(shearForce);
-	REGISTER_ATTRIBUTE(initialKn);
-	REGISTER_ATTRIBUTE(initialKs);
+	//REGISTER_ATTRIBUTE(initialKn);
+	//REGISTER_ATTRIBUTE(initialKs);
 	REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
 	REGISTER_ATTRIBUTE(unMax);
 	REGISTER_ATTRIBUTE(previousun);

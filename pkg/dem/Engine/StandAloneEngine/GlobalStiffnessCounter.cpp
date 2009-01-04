@@ -64,7 +64,11 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
 		// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
 		// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)
-		// or it should have been deleted already. Right?
+		// or it should have been deleted already. Right? 
+		//ANSWER : some interactions can exist without fn, e.g. distant capillary force, wich does not contribute to the overall stiffness via kn. The test is needed.
+		Real fn = (static_cast<ElasticContactInteraction *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
+
+		if (fn!=0) {
 
 		//Diagonal terms of the translational stiffness matrix
 		Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
@@ -89,6 +93,8 @@ void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_pt
 		s = static_cast<GlobalStiffness*>(st);
 		s->stiffness += diag_stiffness;
 		s->Rstiffness += diag_Rstiffness*pow(radius2,2);
+		
+		}
 	}
 }
 
