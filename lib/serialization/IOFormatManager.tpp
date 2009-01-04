@@ -18,6 +18,7 @@
 #include<boost/scoped_ptr.hpp>
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
+#include<boost/iostreams/filter/gzip.hpp>
 #include<boost/iostreams/device/file.hpp>
 #include<boost/algorithm/string.hpp>
 
@@ -45,6 +46,7 @@ template<typename Type>
 void IOFormatManager::loadFromFile(const string& libName, const string& fileName,const string& name, Type& t){
 	iostreams::filtering_istream in;
 	if(boost::algorithm::ends_with(fileName,".bz2")) in.push(iostreams::bzip2_decompressor());
+	if(boost::algorithm::ends_with(fileName,".gz")) in.push(iostreams::gzip_decompressor());
 	in.push(iostreams::file_source(fileName));
 	if(!in.good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 

@@ -228,8 +228,8 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 			const shared_ptr<Body>& b = *bi;
 			if ( b->isDynamic )
 			{
-				const shared_ptr<Sphere>& sphere =
-						YADE_PTR_CAST<Sphere> ( b->geometricalModel );
+				const shared_ptr<InteractingSphere>& sphere =
+						YADE_PTR_CAST<InteractingSphere> ( b->interactingGeometry );
 				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		}

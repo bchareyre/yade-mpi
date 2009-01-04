@@ -236,7 +236,7 @@ void Omega::loadSimulation(){
 		//boost::mutex::scoped_lock lock1(rootBody->persistentInteractions->drawloopmutex);
 		//boost::mutex::scoped_lock lock2(rootBody->transientInteractions->drawloopmutex);
 		
-		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.bz2")){
+		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 			resetRootBody();
 			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 		}
