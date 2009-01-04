@@ -59,7 +59,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 		static Quaternionr rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& normal);
 
 		void setTgPlanePts(Vector3r p1new, Vector3r p2new);
-
+		
 		Vector3r contPtInTgPlane1() const {assert(hasShear); return unrollSpherePtToPlane(ori1*cp1rel,d1,normal);}
 		Vector3r contPtInTgPlane2() const {assert(hasShear); return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
 		Vector3r contPt() const {return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}

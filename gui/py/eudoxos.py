@@ -107,11 +107,20 @@ OutputManager tstep_all dofman_all element_all
 	f.write("ndofman %d nelem %d ncrosssect 1 nmat 1 nbc %d nic 0 nltf 1 nbarrier 0\n"%(len(O.bodies),len(inters),len(O.bodies)*6))
 	bcMax=0; bcMap={}
 	for b in O.bodies:
+		mf=' '.join([str(a) for a in list(O.actions.f(b.id))+list(O.actions.m(b.id))])
+		f.write("## #%d: forces %s\n"%(b.id+1,mf))
 		f.write("Particle %d coords 3 %.15e %.15e %.15e rad %g"%(b.id+1,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
 		bcMap[b.id]=tuple([bcMax+i for i in [1,2,3,4,5,6]])
 		bcMax+=6
 		f.write(' bc '+' '.join([str(i) for i in bcMap[b.id]])+'\n')
 	for j,i in enumerate(inters):
+		epsTNorm=sqrt(sum([e**2 for e in i.phys['epsT']]))
+		epsT='epsT [ %g %g %g ] %g'%(i.phys['epsT'][0],i.phys['epsT'][1],i.phys['epsT'][2],epsTNorm)
+		en=i.phys['epsN']; n=i.geom['normal']
+		epsN='epsN [ %g %g %g ] %g'%(en*n[0],en*n[1],en*n[2],en)
+		Fn='Fn [ %g %g %g ] %g'%(i.phys['normalForce'][0],i.phys['normalForce'][1],i.phys['normalForce'][2],i.phys['Fn'])
+		Fs='Fs [ %lf %lf %lf ] %lf'%(i.phys['shearForce'][0],i.phys['shearForce'][1],i.phys['shearForce'][2],sqrt(sum([fs**2 for fs in i.phys['shearForce']])))
+		f.write('## #%d #%d: %s %s %s %s\n'%(i.id1+1,i.id2+1,epsN,epsT,Fn,Fs))
 		f.write('CohSur3d %d nodes 2 %d %d mat 1 crossSect 1 area %g\n'%(j+1,i.id1+1,i.id2+1,i.phys['crossSection']))
 	# crosssection
 	f.write("SimpleCS 1 thick 1.0 width 1.0\n")
@@ -122,7 +131,7 @@ OutputManager tstep_all dofman_all element_all
 	for b in O.bodies:
 		displ=b.phys.displ; rot=b.phys.rot
 		dofs=[displ[0],displ[1],displ[2],rot[0],rot[1],rot[2]]
-		f.write('# body #%d\n'%b.id)
+		f.write('# particle %d\n'%b.id)
 		for dof in range(6):
 			f.write('BoundaryCondition %d loadTimeFunction 1 prescribedvalue %.15e\n'%(bcMap[b.id][dof],dofs[dof]))
 	#f.write('PiecewiseLinFunction 1 npoints 3 t 3 0. 10. 1000.  f(t) 3 0. 10. 1000.\n')

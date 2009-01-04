@@ -16,11 +16,9 @@ class StandAloneEngine : public Engine
 	public :
 		StandAloneEngine() {};
 		virtual ~StandAloneEngine() {};
-
-	REGISTER_CLASS_NAME(StandAloneEngine);	
-	REGISTER_BASE_CLASS_NAME(Engine);
+	REGISTER_ATTRIBUTES(Engine,/* no own attributes*/);
+	REGISTER_CLASS_AND_BASE(StandAloneEngine,Engine);
 };
-
 REGISTER_SERIALIZABLE(StandAloneEngine);
 
 #endif // STANDALONEENGINE_HPP

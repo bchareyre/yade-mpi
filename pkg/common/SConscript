@@ -142,6 +142,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['ElasticBodyParameters','RigidBodyParameters','ParticleParameters','InteractionPhysicsMetaEngine','NormalShearInteractions']),
 	env.SharedLibrary('NormalShearInteractions',['DataClass/InteractionPhysics/NormalShearInteractions.cpp']),
 
+	#env.SharedLibrary('VelocityDamping',
+	#	['Engine/EngineUnit/VelocityDamping.cpp'],
+	#	LIBS=env['LIBS']+['Force','Momentum','RigidBodyParameters']),
+
 	#env.SharedLibrary('PersistentTriangulationCollider',
 	#	['Engine/StandAloneEngine/PersistentTriangulationCollider.cpp'],
 	#	LIBPATH=env['LIBPATH']+['/home/bruno/micromacro/KdevMicroMacro/src'],

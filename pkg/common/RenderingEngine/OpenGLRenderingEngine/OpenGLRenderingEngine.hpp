@@ -20,6 +20,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		vector<Se3r> clipPlaneSe3;
 		vector<int> clipPlaneActive; // should be bool, but serialization doesn't handle vector<bool>
 		const int clipPlaneNum;
+		//vector<body_id_t> bodiesByDepth; // camera::cameraCoordinatesOf[2]
 		bool scaleDisplacements,scaleRotations;
 		Vector3r displacementScale; Real rotationScale;
 
