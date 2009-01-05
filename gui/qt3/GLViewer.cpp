@@ -31,6 +31,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	viewId = id;
 	cut_plane = 0;
 	cut_plane_delta = -2;
+	grid_subdivision = false;
 	resize(550,550);
 
 	if (id==0) setCaption("Primary view");
@@ -55,6 +56,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	setKeyDescription(Qt::Key_X,"Toggle YZ grid (or: align manipulated clip plane normal with +X)");
 	setKeyDescription(Qt::Key_Y,"Toggle XZ grid (or: align manipulated clip plane normal with +Y)");
 	setKeyDescription(Qt::Key_Z,"Toggle XY grid (or: align manipulated clip plane normal with +Z)");
+	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
 	setKeyDescription(Qt::Key_S & Qt::ALT,   "Save QGLViewer state to /tmp/qglviewerState.xml");
 	setKeyDescription(Qt::Key_Delete,"(lattice) increase isoValue");
 	setKeyDescription(Qt::Key_Insert,"(lattice) decrease isoValue");
@@ -241,6 +243,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 			manipulatedFrame()->setOrientation(qglviewer::Quaternion(axis,axisIdx==2?0:Mathr::PI/2));
 		}
 	}
+	else if(e->key()==Qt::Key_Period) grid_subdivision = !grid_subdivision;
 
 
 // FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
@@ -435,11 +438,17 @@ void GLViewer::postDraw(){
 	LOG_DEBUG("nSegments="<<nSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	glPushMatrix();
 
+	nSegments *= 2; // there's an error in QGLViewer::drawGrid(), so we need to mitigate it by '* 2'
 	// XYZ grids
 	glLineWidth(.5);
 	if(drawGridXYZ[0]) {glColor3f(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
 	if(drawGridXYZ[1]) {glColor3f(0.3,0.6,0.3); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
 	if(drawGridXYZ[2]) {glColor3f(0.3,0.3,0.6); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments); glPopMatrix();}
+	if(grid_subdivision){
+	if(drawGridXYZ[0]) {glColor3f(0.4,0.1,0.1); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
+	if(drawGridXYZ[1]) {glColor3f(0.1,0.4,0.1); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
+	if(drawGridXYZ[2]) {glColor3f(0.1,0.1,0.4); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(realSize,nSegments*10); glPopMatrix();}
+	}
 	
 	// scale
 	if(drawScale){
@@ -497,8 +506,8 @@ void GLViewer::postDraw(){
 	#define _W3 setw(3)<<setfill('0')
 	#define _W2 setw(2)<<setfill('0')
 	if(timeDispMask!=0){
-		const int lineHt=12;
-		unsigned x=10,y=height()-20;
+		const int lineHt=13;
+		unsigned x=10,y=height()-3-lineHt*2;
 		glColor3v(Vector3r(1,1,1));
 		if(timeDispMask & GLViewer::TIME_VIRT){
 			ostringstream oss;
@@ -522,6 +531,10 @@ void GLViewer::postDraw(){
 			oss<<"#"<<Omega::instance().getCurrentIteration();
 			if(rb->stopAtIteration>rb->currentIteration) oss<<" ("<<setiosflags(ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->currentIteration)/rb->stopAtIteration<<"%)";
 			QGLViewer::drawText(x,y,oss.str());
+			y-=lineHt;
+		}
+		if(drawGridXYZ[0] || drawGridXYZ[1] || drawGridXYZ[2]){
+			QGLViewer::drawText(x,y,std::string("grid: "+boost::lexical_cast<std::string>(gridStep))+(grid_subdivision?(std::string(" ,subdivision: "+boost::lexical_cast<std::string>(gridStep*0.1))):(std::string(""))));
 			y-=lineHt;
 		}
 	}

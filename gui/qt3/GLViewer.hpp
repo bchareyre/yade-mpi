@@ -44,6 +44,7 @@ class GLViewer : public QGLViewer
 		bool			wasDynamic;
 		float			cut_plane;
 		int			cut_plane_delta;
+		bool			grid_subdivision;
 		int manipulatedClipPlane;
 		set<int> boundClipPlanes;
 		shared_ptr<qglviewer::LocalConstraint> xyPlaneConstraint;
