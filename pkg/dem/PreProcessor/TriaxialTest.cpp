@@ -80,7 +80,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
+//#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 
 
 CREATE_LOGGER(TriaxialTest);

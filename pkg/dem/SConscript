@@ -733,6 +733,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AveragePositionRecorder',
 			'VelocityRecorder',
 			'ForceRecorder',
+#			'MicroMacroAnalyser',
 			'SimpleElasticRelationships',
 			'ElasticCriterionTimeStepper',
 			'PhysicalActionVectorVector',
