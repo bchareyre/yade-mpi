@@ -31,6 +31,8 @@
 
 using namespace std;
 
+bool dontUseGdb(false);
+
 #ifdef LOG4CXX
 	// provides parent logger for everybody
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
@@ -57,7 +59,8 @@ sigHandler(int sig){
 		if(sig==SIGABRT || sig==SIGSEGV){
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			if(!dontUseGdb)
+				std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			raise(sig); // reemit signal after exiting gdb
 		}
@@ -126,6 +129,7 @@ void printHelp()
 	-n      : use NullGUI (command line interface) instead of default GUI.\n\
 	-w      : write default configuration (automatic at first run)\n\
 	-c      : use the current directory ./ as configuration directory\n\
+	-x      : don't use gdb\n\
 	-C path : configuration directory different from the default ~/.yade-something/\n\
 	-S file : load simulation from file (works with QtGUI only)\n\
 	-v      : be verbose (may be repeated)\n\
@@ -148,7 +152,7 @@ int main(int argc, char *argv[])
 	string configPath=string(getenv("HOME")) + "/.yade" SUFFIX; // this is the default, may be overridden by -c / -C
 	
 	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
-	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cvS:"))!=-1)
+	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cxvS:"))!=-1)
 		switch(ch){
 			case 'h': printHelp(); return 1;
 			case 'n': gui="NullGUI"; explicitUI=true; break;
@@ -156,6 +160,7 @@ int main(int argc, char *argv[])
 			case 'w': setup=true; break;
 			case 'C': configPath=optarg; break;
 			case 'c': configPath="."; break;
+			case 'x': dontUseGdb=true; break;
 			case 'v': verbose+=1; break;
 			case 'S': simulationFileName=optarg; break;
 			case '-': coreOptions=false; break;

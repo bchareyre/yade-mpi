@@ -885,6 +885,8 @@ env.SharedLibrary('CapillaryStressRecorder',
 		LIBS=env['LIBS']+['ParticleParameters',
 			'ElasticContactInteraction',
 			'CapillaryParameters',
+			'TriaxialStressController',
+			'TriaxialCompressionEngine',
 			'Force',
 			'CapillaryCohesiveLaw']),
 
@@ -895,6 +897,7 @@ env.SharedLibrary('TriaxialTestWater',
         CapillaryCohesiveLaw
         AveragePositionRecorder
         VelocityRecorder
+	PositionOrientationRecorder
         ForceRecorder
         TriaxialStateRecorder
         CapillaryStressRecorder
@@ -907,6 +910,7 @@ env.SharedLibrary('TriaxialTestWater',
         BodyRedirectionVector
         InteractingSphere
         InteractingBox
+	NewtonsDampedLaw
         CundallNonViscousDamping
         CundallNonViscousDamping
         MetaInteractingGeometry

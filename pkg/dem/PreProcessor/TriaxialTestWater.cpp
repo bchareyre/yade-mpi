@@ -19,7 +19,7 @@
 // #include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 // #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
-#include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
+/////////////#include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
@@ -534,8 +534,8 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW
-	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationshipsWater);
-	interactionPhysicsDispatcher->add(ss);
+/////////////	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationshipsWater);
+/////////////	interactionPhysicsDispatcher->add(ss);
 	
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
