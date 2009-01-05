@@ -50,8 +50,8 @@ void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
 	{
 		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
-		//if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
-		if (!file_exists) ofile<<"iteration fn11 fn22 fn33 fn111 fn222 fn333 Position_right unb_f porosity Energie_Cinétique" << endl;
+		if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
+		//if (!file_exists) ofile<<"iteration fn11 fn22 fn33 fn111 fn222 fn333 Position_right unb_f porosity Energie_Cinétique" << endl;
 	}
 }
 
@@ -86,6 +86,7 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
 			}
 		}
+		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
 	}
 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 ) )
 		triaxialCompressionEngine->computeStressStrain ( ncb );

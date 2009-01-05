@@ -14,15 +14,17 @@
 #include <string>
 #include <fstream>
 
+class TriaxialCompressionEngine;
 class GeometricalModel;
 
 class CapillaryStressRecorder : public DataRecorder
 {
 	private :
 		std::ofstream ofile; 
-
+		
 		bool changed;
 		shared_ptr<GeometricalModel> sphere_ptr;
+		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		int SpheresClassIndex;
 	
 	public :
@@ -32,7 +34,7 @@ class CapillaryStressRecorder : public DataRecorder
 		Real height, width, depth;
 		Real thickness; // FIXME should retrieve "extents" of a InteractingBox
 		
-		Vector3r upperCorner, lowerCorner;
+		//Vector3r upperCorner, lowerCorner;
 
 		int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;
 
@@ -41,6 +43,7 @@ class CapillaryStressRecorder : public DataRecorder
 		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated();
+		DECLARE_LOGGER;
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

@@ -17,6 +17,7 @@
 
 // ajouts
 #include <vector>
+#include <list>
 #include <utility>
 #include <iostream>
 #include <fstream>
@@ -24,27 +25,50 @@
 
 using namespace std;
 
-class Parameters
+class MeniscusParameters
+{
+public :
+	Real V;
+	Real F;
+	Real delta1;
+	Real delta2;
+	int index1;
+	int index2;
 
-{ 
-  public :
-  Real V;
-  Real F;
-  Real delta1;
-  Real delta2;
-  int index1;
-  int index2;
-
-  Parameters();
-  Parameters(const Parameters &source);
-  ~Parameters();
-} ;
+	MeniscusParameters();
+	MeniscusParameters(const MeniscusParameters &source);
+	~MeniscusParameters();
+};
 
 
 const int NB_R_VALUES = 10;
 
 class PhysicalAction;
 class capillarylaw; // fait appel a la classe def plus bas
+class Interaction;
+
+///This container class is used to check meniscii overlaps. Wet interactions are put in a series of lists, with one list per body.
+class BodiesMenisciiList
+{
+	private:
+		vector< list< shared_ptr<Interaction> > > interactionsOnBody;
+		
+		//shared_ptr<Interaction> empty;
+		
+	public:
+		BodiesMenisciiList();
+		BodiesMenisciiList(Body* body);
+		bool prepare(Body* body);
+		bool insert(const shared_ptr<Interaction>& interaction);
+		bool remove(const shared_ptr<Interaction>& interaction);
+		list< shared_ptr<Interaction> >& operator[] (int index);
+		int size();
+		void display();
+		
+		
+		bool initialized;
+};
+
 
 class CapillaryCohesiveLaw : public InteractionSolver
 {
@@ -55,10 +79,14 @@ class CapillaryCohesiveLaw : public InteractionSolver
 	public :
 		int sdecGroupMask;
 		Real CapillaryPressure;
+		bool fusionDetection;//If yes, a BodiesMenisciiList is maintained and updated at each time step
+		bool binaryFusion;//if true, capillary forces are set to zero as soon as 1 fusion at least is detected
+		void checkFusion(MetaBody * ncb);
 		shared_ptr<capillarylaw> capillary;
+		BodiesMenisciiList bodiesMenisciiList;
 						
 		CapillaryCohesiveLaw();
-		void action(MetaBody* ncb);
+		void action(MetaBody * ncb);
 
 	protected : 
 		void registerAttributes();
@@ -73,7 +101,7 @@ class TableauD
 	public:
 		Real D;
 		std::vector<std::vector<Real> > data;
-		Parameters Interpolate3(Real P, int& index);
+		MeniscusParameters Interpolate3(Real P, int& index);
 		
   		TableauD();
   		TableauD(std::ifstream& file);
@@ -86,11 +114,10 @@ std::ostream& operator<<(std::ostream& os, Tableau& T);
 
 class Tableau
 {	
-	DECLARE_LOGGER;
 	public: 
 		Real R;
 		std::vector<TableauD> full_data;
-		Parameters Interpolate2(Real D, Real P, int& index1, int& index2);
+		MeniscusParameters Interpolate2(Real D, Real P, int& index1, int& index2);
 		
 		std::ifstream& operator<< (std::ifstream& file);
 		
@@ -104,12 +131,20 @@ class capillarylaw
 	public:
 		capillarylaw();
 		std::vector<Tableau> data_complete;
-		Parameters Interpolate(Real R1, Real R2, Real D, Real P, int* index);
+		MeniscusParameters Interpolate(Real R1, Real R2, Real D, Real P, int* index);
 		
 		void fill (const char* filename);
 };
 
+
+
+
+
+
 REGISTER_SERIALIZABLE(CapillaryCohesiveLaw);
+
+
+
 
 #endif // CAPILLARY_COHESIVE_LAW_HPP
 

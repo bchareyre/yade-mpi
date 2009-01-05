@@ -46,11 +46,11 @@ public:
     	void clear2(void);
     	    	
 	///Add axis aligned bounding planes (modelised as spheres with (almost) infinite radius)
-//  	void 	AddBoundingPlanes (void); 
+  	void 	AddBoundingPlanes (void); 
  	void	AddBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
 	void 	RemoveBoundingPlanes (void);
 	///Compute voronoi centers then stop (don't compute anything else)
-// 	void	ComputeTesselation (void);
+ 	void	ComputeTesselation (void);
  	void	ComputeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
 	
 	///Compute Voronoi vertices + volumes of all cells

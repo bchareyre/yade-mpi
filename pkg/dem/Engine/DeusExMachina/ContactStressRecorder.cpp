@@ -39,7 +39,7 @@ ContactStressRecorder::ContactStressRecorder () : DataRecorder(), actionForce(ne
 	sphere_ptr = shared_ptr<GeometricalModel> (new Sphere);
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 	
-	triaxCompEng = new TriaxialCompressionEngine;
+	//triaxCompEng = NULL;
 	//sampleCapPressEng = new SampleCapillaryPressureEngine;
 	
 }
@@ -86,6 +86,22 @@ bool ContactStressRecorder::isActivated()
 void ContactStressRecorder::action(MetaBody * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	
+	if ( !triaxCompEng )
+	{
+		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+		for ( ;itFirst!=itLast; ++itFirst )
+		{
+			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
+			{
+				LOG_DEBUG ( "stress controller engine found" );
+				triaxCompEng =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
+				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
+			}
+		}
+		if ( !triaxCompEng ) LOG_DEBUG ( "stress controller engine NOT found" );
+	}
 		
 	Real f1_el_x=0, f1_el_y=0, f1_el_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
 	
@@ -251,25 +267,25 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	
 	// volume de l'echantillon
 	
-	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
-	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
-	PhysicalParameters* p_left 	= static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
-	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
-	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
-	PhysicalParameters* p_back 	= static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
+
+// 	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
+// 	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
+// 	PhysicalParameters* p_left 	= static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
+// 	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
+// 	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
+// 	PhysicalParameters* p_back 	= static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
 	
 	
-	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
-	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
-	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+// 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
+// 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
+// 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
 	
 	Real Rmoy = SR/nbElt;
 	if (Omega::instance().getCurrentIteration() == 1)
 	{cerr << "Rmoy = "<< Rmoy << "  Rmin = " << Rmin << "  Rmax = " <<
 	Rmax << endl;}
 	
-// 	Real V = (height-2*Rmoy) * (width-2*Rmoy) * (depth-2*Rmoy);
-	Real V = (height) * (width) * (depth);
+	Real V = ( triaxCompEng->height ) * ( triaxCompEng->width ) * ( triaxCompEng->depth );
 	
 	SIG_11_el = sig11_el/V;
 	SIG_22_el = sig22_el/V;
@@ -280,18 +296,18 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	
 	/// calcul des deformations
 	
-	Real EPS_11=0, EPS_22=0, EPS_33=0;
-	
-	Real width_0 = upperCorner[0]-lowerCorner[0], height_0 =
-	upperCorner[1]-lowerCorner[1],
-	depth_0 = upperCorner[2]-lowerCorner[2];
-	
-//	EPS_11 = (width_0 - width)/width_0;
-	EPS_11 = std::log(width_0) - std::log(width);
-//	EPS_22 = (height_0 - height)/height_0;
-	EPS_22 = std::log(height_0) - std::log(height);
-//	EPS_33 = (depth_0 - depth)/depth_0;
-	EPS_33 = std::log(depth_0) - std::log(depth);
+// 	Real EPS_11=0, EPS_22=0, EPS_33=0;
+// 	
+// 	Real width_0 = upperCorner[0]-lowerCorner[0], height_0 =
+// 	upperCorner[1]-lowerCorner[1],
+// 	depth_0 = upperCorner[2]-lowerCorner[2];
+// 	
+// //	EPS_11 = (width_0 - width)/width_0;
+// 	EPS_11 = std::log(width_0) - std::log(width);
+// //	EPS_22 = (height_0 - height)/height_0;
+// 	EPS_22 = std::log(height_0) - std::log(height);
+// //	EPS_33 = (depth_0 - depth)/depth_0;
+// 	EPS_33 = std::log(depth_0) - std::log(depth);
 	
 	/// porosity 
 	
@@ -312,7 +328,7 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 	{cerr << "current Iteration " << Omega::instance().getCurrentIteration()
 	<< endl;}
 		
-	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " "
+	ofile /*<< lexical_cast<string>(Omega::instance().getSimulationTime()) << " "*/
 		<< lexical_cast<string>(Omega::instance().getCurrentIteration()) << "  " 
 		<< lexical_cast<string>(kinematicE)<< " "
 		<< lexical_cast<string>(equilibriumForce)<<" "
@@ -325,9 +341,9 @@ static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 		<< lexical_cast<string>(SIG_12_el) << " "
 		<< lexical_cast<string>(SIG_13_el)<< " "
 		<< lexical_cast<string>(SIG_23_el)<< "   "
-		<< lexical_cast<string>(EPS_11) << " "
-		<< lexical_cast<string>(EPS_22) << " "
-		<< lexical_cast<string>(EPS_33) << "   "
+		<< lexical_cast<string>(triaxCompEng->strain[0]) << " "
+		<< lexical_cast<string>(triaxCompEng->strain[1]) << " "
+		<< lexical_cast<string>(triaxCompEng->strain[2]) << "   "
 		<< lexical_cast<string>(FT[0][0]/j)<<" "
 		<< lexical_cast<string>(FT[0][1]/j)<<" "
 		<< lexical_cast<string>(FT[0][2]/j)<<" "

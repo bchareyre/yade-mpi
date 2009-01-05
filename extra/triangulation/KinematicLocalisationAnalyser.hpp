@@ -91,10 +91,14 @@ class KinematicLocalisationAnalyser
 
 		Vecteur Deplacement ( Cell_handle cell );  //donne le d�placement d'un sommet de voronoi
 		Vecteur Deplacement ( Finite_cells_iterator cell, int facet ); //mean displacement on a facet
+		
 
 		// Calcul du tenseur d'orientation des voisins
 		//Tenseur_sym3 Orientation_voisins (Tesselation& Tes);
-
+		
+		//Set the list of edges of a given orientation (orientation defined via the z-coordinate of the normal)
+		vector<Edge_iterator>& Oriented_Filtered_edges (Real Nymin, Real Nymax, vector<Edge_iterator>& filteredList);
+		
 		vector<pair<Real,Real> >& NormalDisplacementDistribution ( vector<Edge_iterator>& edges, vector<pair<Real,Real> >& row );
 		//vector<pair<Real,Real> > NormalDisplacementDistribution(TriaxialState& state, TriaxialState& state0);
 

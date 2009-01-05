@@ -8,7 +8,7 @@
 
 # CGAL_MAKEFILE = ENTER_YOUR_INCLUDE_MAKEFILE_HERE
 ifndef CGAL_MAKEFILE
-CGAL_MAKEFILE = /usr/share/cgal/makefile
+CGAL_MAKEFILE = /usr/share/cgal/cgal.mk
 endif
 include $(CGAL_MAKEFILE)
 

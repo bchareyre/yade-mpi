@@ -698,7 +698,7 @@ SetForceIncrements ( void ) //WARNING : This function will modify the contact li
 		//cerr << 5;
 		if ( !TS1->contacts[j]->visited /*&& TS1->contacts[j]->status != TriaxialState::Contact::LOST*/)
 		{
-			cerr << 6;
+			//cerr << 6;
 			TS1->contacts[j]->status = TriaxialState::Contact::NEW;
 			TS1->contacts[j]->old_fn = 0;
 			TS1->contacts[j]->old_fs = CGAL::NULL_VECTOR;
@@ -985,7 +985,7 @@ void KinematicLocalisationAnalyser::ComputeParticlesDeformation ( void )
 		//cerr << "ij=" <<ij++<<endl;
 		//cerr << "ij2=" <<ij2++<<endl;
 		//if (!cell->info()->isFictious) //FIXME
-		Grad_u ( cell, grad_u, false );// false : don't divide by volume, here grad_u = volume of cell * average grad_u in cell
+		Grad_u ( cell, grad_u, false );// false : don't divide by volume, here grad_u = volume of cell * average grad_u in cell, the final value is divided by the total volume later (see below)
 		//cerr << "grad_u=" << grad_u << endl;
 		v = Tri.tetrahedron ( cell ).volume();
 		grad_u_total += grad_u;
@@ -1026,7 +1026,7 @@ void KinematicLocalisationAnalyser::ComputeParticlesDeformation ( void )
 
 	if ( v_total ) grad_u_total /= v_total;
 	cerr << "Total volume = " << v_total << ", grad_u = " << endl << grad_u_total << endl << "sym_grad_u (true average strain): " << endl << Tenseur_sym3 ( grad_u_total ) << endl;
-	cerr << "Macro strain = " << Delta_epsilon << endl;
+	cerr << "Macro strain : "<< endl << Delta_epsilon << endl;
 	
 }
 

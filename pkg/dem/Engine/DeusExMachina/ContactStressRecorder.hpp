@@ -40,7 +40,7 @@ class ContactStressRecorder : public DataRecorder
 		Real thickness; // FIXME should retrieve "extents" of a InteractingBox
 		Vector3r upperCorner, lowerCorner;
 		
-		TriaxialCompressionEngine* triaxCompEng;
+		shared_ptr<TriaxialCompressionEngine> triaxCompEng;
 		//SampleCapillaryPressureEngine* sampleCapPressEng; 
 		
 		int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;

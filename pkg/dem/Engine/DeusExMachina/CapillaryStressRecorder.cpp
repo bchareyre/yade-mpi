@@ -9,14 +9,17 @@
 #include "CapillaryStressRecorder.hpp"
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
+#include <yade/pkg-common/Sphere.hpp>
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
+#include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
+
 #include <yade/core/Omega.hpp>
 #include <yade/core/MetaBody.hpp>
-#include <yade/pkg-common/Sphere.hpp>
 #include <boost/lexical_cast.hpp>
 
+CREATE_LOGGER(CapillaryStressRecorder);
 
 CapillaryStressRecorder::CapillaryStressRecorder () : DataRecorder()
 
@@ -25,10 +28,10 @@ CapillaryStressRecorder::CapillaryStressRecorder () : DataRecorder()
 	interval = 1;
 	sphere_ptr = shared_ptr<GeometricalModel> (new Sphere);
 	SpheresClassIndex = sphere_ptr->getClassIndex();
-	height = 0;
-	width = 0;
-	depth = 0;
-	thickness = 0;
+// 	height = 0;
+// 	width = 0;
+// 	depth = 0;
+// 	thickness = 0;
 	
 // 	upperCorner = Vector3r(0,0,0);
 // 	lowerCorner = Vector3r(0,0,0);
@@ -51,17 +54,17 @@ void CapillaryStressRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(outputFile);
 	REGISTER_ATTRIBUTE(interval);
 	
-	REGISTER_ATTRIBUTE(wall_bottom_id);
- 	REGISTER_ATTRIBUTE(wall_top_id);
- 	REGISTER_ATTRIBUTE(wall_left_id);
- 	REGISTER_ATTRIBUTE(wall_right_id);
- 	REGISTER_ATTRIBUTE(wall_front_id);
- 	REGISTER_ATTRIBUTE(wall_back_id);
+// 	REGISTER_ATTRIBUTE(wall_bottom_id);
+//  	REGISTER_ATTRIBUTE(wall_top_id);
+//  	REGISTER_ATTRIBUTE(wall_left_id);
+//  	REGISTER_ATTRIBUTE(wall_right_id);
+//  	REGISTER_ATTRIBUTE(wall_front_id);
+//  	REGISTER_ATTRIBUTE(wall_back_id);
  	
- 	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(depth);
-	REGISTER_ATTRIBUTE(thickness);
+//  	REGISTER_ATTRIBUTE(height);
+// 	REGISTER_ATTRIBUTE(width);
+// 	REGISTER_ATTRIBUTE(depth);
+// 	REGISTER_ATTRIBUTE(thickness);
 	
 // 	REGISTER_ATTRIBUTE(upperCorner);
 // 	REGISTER_ATTRIBUTE(lowerCorner);
@@ -78,6 +81,24 @@ bool CapillaryStressRecorder::isActivated()
 
 void CapillaryStressRecorder::action(MetaBody * ncb)
 {
+	if ( !triaxialCompressionEngine )
+	{
+		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+		for ( ;itFirst!=itLast; ++itFirst )
+		{
+			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine")
+// 			  || (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
+			{
+				LOG_DEBUG ( "stress controller engine found" );
+				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
+				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
+			}
+		}
+		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
+	}
+// 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 )) triaxialCompressionEngine->computeStressStrain ( ncb );	
+
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 		
 	Real f1_cap_x=0, f1_cap_y=0, f1_cap_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
@@ -145,38 +166,39 @@ void CapillaryStressRecorder::action(MetaBody * ncb)
 // 	if (Omega::instance().getCurrentIteration() % 10 == 0) 
 // 	{cerr << "interactions capillaires = " << j << endl;}
 
-	/// volume de l'�hantillon
-	
-	PhysicalParameters* p_bottom =
-static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.
-get());
-	PhysicalParameters* p_top   =	
-static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get(
-));
-	PhysicalParameters* p_left =
-static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get
-());
-	PhysicalParameters* p_right =
-static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.
-get());
-	PhysicalParameters* p_front =
-static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.
-get());
-	PhysicalParameters* p_back =
-static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get
-());
-	
-	
-	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() -
-thickness;
-	width = p_right->se3.position.X() - p_left->se3.position.X() -
-thickness;
-	depth = p_front->se3.position.Z() - p_back->se3.position.Z() -
-thickness;
+	/// volume de l'echantillon
+// 	PhysicalParameters* p_bottom =
+// static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.
+// get());
+// 	PhysicalParameters* p_top   =	
+// static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get(
+// ));
+// 	PhysicalParameters* p_left =
+// static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get
+// ());
+// 	PhysicalParameters* p_right =
+// static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.
+// get());
+// 	PhysicalParameters* p_front =
+// static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.
+// get());
+// 	PhysicalParameters* p_back =
+// static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get
+// ());
+// 	
+// 	
+// 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() -
+// thickness;
+// 	width = p_right->se3.position.X() - p_left->se3.position.X() -
+// thickness;
+// 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() -
+// thickness;
+// 
+// 	Real Vech = (height) * (width) * (depth)
 
-	Real Vech = (height) * (width) * (depth);
+	Real V = ( triaxialCompressionEngine->height ) * ( triaxialCompressionEngine->width ) * ( triaxialCompressionEngine->depth );
 
-	// degr�de saturation/porosit�	
+	// degre de saturation/porosite	
 	BodyContainer::iterator bi = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	
@@ -202,27 +224,26 @@ thickness;
 		}
 	}
 	
-	Real Vv = Vech - Vs;
+	Real Vv = V - Vs;
 	
 	//Real n = Vv/Vech;
 	Real Sr = 100*Vwater/Vv;
 	if (Sr>100) Sr=100;
-	Real w = 100*Vwater/Vech;
-	if (w>(100*Vv/Vech)) w=100*(Vv/Vech);
+	Real w = 100*Vwater/V;
+	if (w>(100*Vv/V)) w=100*(Vv/V);
 	
 	/// Calcul des contraintes "globales"
 	
-	Real SIG_11_cap=0, SIG_22_cap=0, SIG_33_cap=0, SIG_12_cap=0,
-	SIG_13_cap=0, SIG_23_cap=0;
+	Real SIG_11_cap=0, SIG_22_cap=0, SIG_33_cap=0, SIG_12_cap=0, SIG_13_cap=0, SIG_23_cap=0;
 	
-	SIG_11_cap = sig11_cap/Vech;
-	SIG_22_cap = sig22_cap/Vech;
-	SIG_33_cap = sig33_cap/Vech;
-	SIG_12_cap = sig12_cap/Vech;
-	SIG_13_cap = sig13_cap/Vech;
-	SIG_23_cap = sig23_cap/Vech;
+	SIG_11_cap = sig11_cap/V;
+	SIG_22_cap = sig22_cap/V;
+	SIG_33_cap = sig33_cap/V;
+	SIG_12_cap = sig12_cap/V;
+	SIG_13_cap = sig13_cap/V;
+	SIG_23_cap = sig23_cap/V;
 	
-	ofile << lexical_cast<string>(Omega::instance().getSimulationTime()) << " " 
+	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
 		<< lexical_cast<string>(SIG_11_cap) << " " 
 		<< lexical_cast<string>(SIG_22_cap) << " " 
 		<< lexical_cast<string>(SIG_33_cap) << " " 

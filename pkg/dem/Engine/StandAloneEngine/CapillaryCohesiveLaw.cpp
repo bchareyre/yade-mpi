@@ -6,6 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+//Modifs : Parameters renamed as MeniscusParameters
+//id1/id2 classés pour que id1 soit toujours le plus petit grain, FIXME : angle de mouillage?
+//FIXME : dans triaxialStressController, changer le test de nullité de la force dans updateStiffness
+
+
 #include "CapillaryCohesiveLaw.hpp"
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -36,8 +41,6 @@ CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver() , actionForce
 
         capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
 
-        //importFilename 		= "."; // chemin vers M(r=...)
-
         capillary->fill("M(r=1)");
         capillary->fill("M(r=1.1)");
         capillary->fill("M(r=1.25)");
@@ -50,6 +53,8 @@ CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver() , actionForce
         capillary->fill("M(r=10)");
 
         CapillaryPressure=0;
+        fusionDetection = false;
+        binaryFusion = true;
 
 }
 
@@ -59,10 +64,12 @@ void CapillaryCohesiveLaw::registerAttributes()
         InteractionSolver::registerAttributes();
         REGISTER_ATTRIBUTE(sdecGroupMask);
         REGISTER_ATTRIBUTE(CapillaryPressure);
+        REGISTER_ATTRIBUTE(fusionDetection);
+        REGISTER_ATTRIBUTE(binaryFusion);
 
 }
 
-Parameters::Parameters()
+MeniscusParameters::MeniscusParameters()
 {
         V = 0;
         F = 0;
@@ -70,7 +77,7 @@ Parameters::Parameters()
         delta2 = 0;
 };
 
-Parameters::Parameters(const Parameters &source)
+MeniscusParameters::MeniscusParameters(const MeniscusParameters &source)
 {
         V = source.V;
         F = source.F;
@@ -78,19 +85,26 @@ Parameters::Parameters(const Parameters &source)
         delta2 = source.delta2;
 }
 
-Parameters::~Parameters()
+MeniscusParameters::~MeniscusParameters()
 {}
-;
+
 
 //FIXME : remove bool first !!!!!
 void CapillaryCohesiveLaw::action(MetaBody* ncb)
 {
+//	cerr << "capillaryLawAction" << endl;
+        //compteur1 = 0;
+        //compteur2 = 0;
+        //cerr << "CapillaryCohesiveLaw::action" << endl;
 
-//compteur1 = 0;
-//compteur2 = 0;
-        // 	cerr << "CapillaryCohesiveLaw::action" << endl;
-	//if (CapillaryPressure!=0) {
+//         MetaBody * ncb = static_cast<MetaBody*>(body);
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
+
+        if (fusionDetection) {
+                if (!bodiesMenisciiList.initialized)
+                        bodiesMenisciiList.prepare(ncb);
+                //bodiesMenisciiList.display();
+        }
 
 
         /// Non Permanents Links ///
@@ -105,18 +119,17 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
         for(  ; ii!=iiEnd ; ++ii ) {
 
-                if ((*ii)->isReal) {
+                if ((*ii)->isReal) {//FIXME : test to be removed when using DistantPersistentSAPCollider?
 
                         const shared_ptr<Interaction>& interaction = *ii;
                         unsigned int id1 = interaction->getId1();
                         unsigned int id2 = interaction->getId2();
-
-                        if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
+			
+			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
                                 continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
-
+			
                         /// interaction geometry search
-
-                        int geometryIndex1 = (*bodies)[id1]->geometricalModel->getClassIndex(); // !!!
+			int geometryIndex1 = (*bodies)[id1]->geometricalModel->getClassIndex(); // !!!
                         //cerr << "geo1 =" << geometryIndex1 << endl;
                         int geometryIndex2 = (*bodies)[id2]->geometricalModel->getClassIndex();
                         //cerr << "geo2 =" << geometryIndex2 << endl;
@@ -133,7 +146,6 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
                         SpheresContactGeometry* currentContactGeometry 	=
                                 static_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
-
 
                         CapillaryParameters* currentContactPhysics 	=
                                 static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
@@ -154,35 +166,41 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
                         Real alpha=1; // OK si pas de gravite!!!
 
+//                         Real R1, R2;
+//                         if (currentContactGeometry->radius2 > currentContactGeometry->radius1) {
+//                                 R1=currentContactGeometry->radius1;
+//                                 R2=currentContactGeometry->radius2;
+//                         } else {
+//                                 R1=currentContactGeometry->radius2;
+//                                 R2=currentContactGeometry->radius1;
+//                         }
+
+
                         Real R1 = 0;
-                        R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->
-                                          radius1 ) ;
+                        R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->        radius1 ) ;
                         Real R2 = 0;
-                        R2=alpha*std::max(currentContactGeometry->radius2,currentContactGeometry->
-                                          radius1 ) ;
+                        R2=alpha*std::max(currentContactGeometry->radius2,currentContactGeometry->       radius1 ) ;
                         //cerr << "R1 = " << R1 << " R2 = "<< R2 << endl;
 
                         /// intergranular distance
 
-                        //Real intergranularDistance = currentContactGeometry->penetrationDepth;
+                        Real D =                                alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(                       currentContactGeometry->radius1+ currentContactGeometry->radius2);
 
-                        Real D =
-                                alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(
-                                        currentContactGeometry->radius1+ currentContactGeometry->radius2);
-                     
+// 			Real intergranularDistance = currentContactGeometry->penetrationDepth;
+			//cerr << "D = " << intergranularDistance << endl;
 
-                        if
-                        ((currentContactGeometry->penetrationDepth>=0)||(D<=0)||CapillaryPressure<=300||
-                                        (Omega::instance().getCurrentIteration() < 2) ) 
-			{ 
-                                D = 0;	// def Fcap when spheres interpenetrate
+                        if ((currentContactGeometry->penetrationDepth>=0)||(D<=0)) //||(Omega::instance().getCurrentIteration() < 1) ) // a simplified way to define meniscii everywhere
+			{
+                                D=0;
+				//intergranularDistance = 0;	// def Fcap when spheres interpenetrate//FIXME : lead to wrong interpolation? D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
+                                if (fusionDetection && !currentContactPhysics->meniscus)                   bodiesMenisciiList.insert((*ii));
                                 currentContactPhysics->meniscus=true;
-                                //meniscusParameters->meniscus=true;
-
                         }
 
+			//currentContactPhysics->meniscus=true; /// a way to create menisci everywhere			
 
-                        Real Dinterpol = D/R2;
+                        //Real Dinterpol = -(intergranularDistance)/R2;
+			Real Dinterpol = D/R2;
 
                         /// Suction (Capillary pressure):
 
@@ -192,14 +210,12 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
                         //Real r = R2/R1;
 
                         /// Capillary solution finder:
-
                         //cerr << "solution finder " << endl;
 
-                        if ((Pinterpol>=0) && (currentContactPhysics->meniscus==true))
+                        if ((Pinterpol>=0) && (currentContactPhysics->meniscus==true)) 
+			{	//cerr << "Pinterpol = "<< Pinterpol << endl;
 
-                        {	//cerr << "Pinterpol = "<< Pinterpol << endl;
-
-                                Parameters
+                                MeniscusParameters
                                 solution(capillary->Interpolate(R1,R2,
                                                                 Dinterpol, Pinterpol, currentContactPhysics->currentIndexes));
 
@@ -208,52 +224,174 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
                                 Real Finterpol = solution.F;
                                 Vector3r Fcap =
                                         Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->
-                                        normal; /// unit�s !!!
+                                        normal; /// unites !!!
 
                                 currentContactPhysics->Fcap = Fcap;
 
                                 /// meniscus volume
 
                                 Real Vinterpol = solution.V;
-                                currentContactPhysics->Vmeniscus =
-                                        Vinterpol*(R2*R2*R2)/(alpha*alpha*alpha);
-                                
-				if (currentContactPhysics->Vmeniscus != 0)
-                                {
+                                currentContactPhysics->Vmeniscus =                                       Vinterpol*(R2*R2*R2)/(alpha*alpha*alpha);
+
+                                if (currentContactPhysics->Vmeniscus != 0) {
                                         currentContactPhysics->meniscus = true;
-                                } else
-                                {
+                                        //cerr <<"currentContactPhysics->meniscus = true;"<<endl;
+                                } else {
+                                        if (fusionDetection)
+                                                bodiesMenisciiList.remove((*ii));
                                         currentContactPhysics->meniscus = false;
+                                        //cerr <<"currentContactPhysics->meniscus = false;"<<endl;
                                 }
 
+                                /// wetting angles
                                 /// wetting angles
                                 currentContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
                                 currentContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
 
-                                static_cast<Force*>   (ncb->physicalActions->find( id1 , actionForce  ->getClassIndex()).get())->force    += Fcap;
-                                static_cast<Force*>   (ncb->physicalActions->find( id2 , actionForce  ->getClassIndex()).get())->force    -= Fcap;
+//                                 if (currentContactGeometry->radius2 > currentContactGeometry->radius1)
+// 				{
+//                                         currentContactPhysics->Delta1 = solution.delta1;
+//                                         currentContactPhysics->Delta2 = solution.delta2;
+//                                 } else {
+//                                         currentContactPhysics->Delta1 = solution.delta2;
+//                                         currentContactPhysics->Delta2 = solution.delta1;
+//                                 }
 
                                 currentContactPhysics->prevNormal = currentContactGeometry->normal;
+
+                        } else if (fusionDetection)
+                                bodiesMenisciiList.remove((*ii));//If the interaction is not real, it should not be in the list
+                }
+        }
+
+        if (fusionDetection)
+                checkFusion(ncb);
+
+        for(ii= ncb->transientInteractions->begin(); ii!=iiEnd ; ++ii ) 
+	{	//cerr << "interaction " << ii << endl;
+                if ((*ii)->isReal) 
+		{
+                        CapillaryParameters* currentContactPhysics	=	static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get());
+                        if (currentContactPhysics->meniscus) 
+			{
+                                if (fusionDetection) 
+				{//version with effect of fusion
+                                        //BINARY VERSION : if fusionNumber!=0 then no capillary force
+                                        if (binaryFusion)
+					{
+						if (currentContactPhysics->fusionNumber !=0) 
+						{	//cerr << "fusion" << endl;
+                                                        currentContactPhysics->Fcap = Vector3r::ZERO;
+                                                        continue;
+                                                }
+                                        }
+                                        //LINEAR VERSION : capillary force is divided by (fusionNumber + 1) - NOTE : any decreasing function of fusionNumber can be considered in fact
+					else if (currentContactPhysics->fusionNumber !=0)
+						currentContactPhysics->Fcap /= (currentContactPhysics->fusionNumber+1);
+                                }
+                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId1() , actionForce  ->getClassIndex()).get())->force    += currentContactPhysics->Fcap;
+                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId2() , actionForce  ->getClassIndex()).get())->force    -= currentContactPhysics->Fcap;
+
+				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
 
                         }
                 }
         }
-        //}
-//cerr << "compteur1=" << compteur1 << "; compteur2=" << compteur2 << endl;
-}
 
+
+        //if (fusionDetection)
+                //bodiesMenisciiList.display();
+        //cerr << "end of capillarylaw" << endl;
+}
 capillarylaw::capillarylaw()
 {}
 
 void capillarylaw::fill(const char* filename)
-
 {
         data_complete.push_back(Tableau(filename));
 
 }
 
-Parameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* index)
+void CapillaryCohesiveLaw::checkFusion(MetaBody * ncb)
+{
 
+	//Reset fusion numbers
+	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal) static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->fusionNumber=0;
+	
+	
+	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
+	Real angle1, angle2;
+
+	for ( int i=0; i< bodiesMenisciiList.size(); ++i )// i is the index (or id) of the body being tested
+	{
+		if ( !bodiesMenisciiList[i].empty() )
+		{
+			lastMeniscus = bodiesMenisciiList[i].end();
+			//cerr << "size = "<<bodiesMenisciiList[i].size() << " empty="<<bodiesMenisciiList[i].empty() <<endl;
+			for ( firstMeniscus=bodiesMenisciiList[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )//FOR EACH MENISCUS ON THIS BODY...
+			{
+				CapillaryParameters* interactionPhysics1 = static_cast<CapillaryParameters*>((*firstMeniscus)->interactionPhysics.get());
+				currentMeniscus = firstMeniscus; ++currentMeniscus;
+				
+				if (i == (*firstMeniscus)->getId1()) angle1=interactionPhysics1->Delta1;//get angle of meniscus1 on body i
+				else angle1=interactionPhysics1->Delta2;
+
+				for ( ;currentMeniscus!= lastMeniscus; ++currentMeniscus) {//... CHECK FUSION WITH ALL OTHER MENISCII ON THE BODY
+					CapillaryParameters* interactionPhysics2 = static_cast<CapillaryParameters*>((*currentMeniscus)->interactionPhysics.get());
+
+					if (i == (*currentMeniscus)->getId1()) angle2=interactionPhysics2->Delta1;//get angle of meniscus2 on body i
+					else angle2=interactionPhysics2->Delta2;
+
+					if (angle1==0 || angle2==0) cerr << "THIS SHOULD NOT HAPPEN!!"<< endl;
+
+					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;	
+					
+					Vector3r normalFirstMeniscus = static_cast<SpheresContactGeometry*>((*firstMeniscus)->interactionGeometry.get())->normal;
+					Vector3r normalCurrentMeniscus = static_cast<SpheresContactGeometry*>((*currentMeniscus)->interactionGeometry.get())->normal;
+					
+					//if (i != (*firstMeniscus)->getId1()) normalFirstMeniscus = -normalFirstMeniscus;
+					//if (i != (*currentMeniscus)->getId1()) normalCurrentMeniscus = -normalCurrentMeniscus;
+					// normal is always from id1 to id2
+					
+					Real normalDot = 0;
+					if ((*firstMeniscus)->getId1() ==  (*currentMeniscus)->getId1() ||  (*firstMeniscus)->getId2()  == (*currentMeniscus)->getId2()) normalDot = normalFirstMeniscus.Dot(normalCurrentMeniscus);
+					else
+					normalDot = - (normalFirstMeniscus.Dot(normalCurrentMeniscus));
+					
+					//cerr << "normalDot ="<< normalDot << endl;
+					
+					Real normalAngle = 0;
+					if (normalDot >= 0 ) normalAngle = Mathr::FastInvCos0(normalDot);
+					else normalAngle = ((Mathr::PI) - Mathr::FastInvCos0(-(normalDot)));
+					
+					//cerr << "sumMeniscAngle= " << (angle1+angle2)<< "| normalAngle" << normalAngle*Mathr::RAD_TO_DEG << endl;
+
+					if ((angle1+angle2)*Mathr::DEG_TO_RAD > normalAngle)
+
+					//if ((angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(normalFirstMeniscus.Dot(normalCurrentMeniscus)))
+					
+// 					if (//check here if wet angles are overlaping (check with squares is faster since SquaredLength of cross product gives squared sinus)
+// 					(angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(static_cast<SpheresContactGeometry*>((*firstMeniscus)->interactionGeometry.get())->normal
+// 					.Dot(
+// 					static_cast<SpheresContactGeometry*>((*currentMeniscus)->interactionGeometry.get())->normal))) 
+					{
+						++(interactionPhysics1->fusionNumber); ++(interactionPhysics2->fusionNumber);//count +1 if 2 meniscii are overlaping
+					};
+				}
+// 				if ( *firstMeniscus )
+// 					if ( firstMeniscus->get() )
+// 						cerr << "(" << ( *firstMeniscus )->getId1() << ", " << ( *firstMeniscus )->getId2() <<") ";
+// 					else cerr << "(void)";
+			}
+			//cerr << endl;
+		}
+		//else cerr << "empty" << endl;
+	}
+}
+
+MeniscusParameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* index)
 {	//cerr << "interpolate" << endl;
         if (R1 > R2) {
                 Real R3 = R1;
@@ -264,9 +402,9 @@ Parameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* inde
         Real R = R2/R1;
         //cerr << "R = " << R << endl;
 
-        Parameters result_inf;
-        Parameters result_sup;
-        Parameters result;
+        MeniscusParameters result_inf;
+        MeniscusParameters result_sup;
+        MeniscusParameters result;
         int i = 0;
 
         for ( ; i < (NB_R_VALUES); i++)
@@ -305,8 +443,6 @@ Parameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, int* inde
         return result;
 }
 
-CREATE_LOGGER(Tableau);
-
 Tableau::Tableau()
 {}
 
@@ -324,7 +460,7 @@ Tableau::Tableau(const char* filename)
 		static bool first=true;
 		if(first)
 		{
-			LOG_DEBUG("WARNING: cannot open file used for capillary law, in TriaxalTestWater");
+	                cout << "WARNING: cannot open file used for capillary law, in TriaxalTestWater" << endl;
 			first=false;
 		}
 		return;
@@ -338,12 +474,12 @@ Tableau::Tableau(const char* filename)
 Tableau::~Tableau()
 {}
 
-Parameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index2)
+MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index2)
 
 {	//cerr << "interpolate2" << endl;
-        Parameters result;
-        Parameters result_inf;
-        Parameters result_sup;
+        MeniscusParameters result;
+        MeniscusParameters result_inf;
+        MeniscusParameters result_sup;
 
         for ( unsigned int i=0; i < full_data.size(); ++i)
         {
@@ -399,15 +535,15 @@ TableauD::TableauD(ifstream& file)
         D = data[i-1][0];
 }
 
-Parameters TableauD::Interpolate3(Real P, int& index)
+MeniscusParameters TableauD::Interpolate3(Real P, int& index)
 
 {	//cerr << "interpolate3" << endl;
-        Parameters result;
+        MeniscusParameters result;
         int dataSize = data.size();
         
         if (index < dataSize && index>0)
         {
-        	if (data[index][1] >= P && data[index-1][1] <= P)
+        	if (data[index][1] >= P && data[index-1][1] < P)
         	{
         		//compteur1+=1;	
         		Real Pinf=data[index-1][1];
@@ -490,4 +626,93 @@ std::ostream& operator<<(std::ostream& os, Tableau& T)
         os << endl;
         return os;
 }
-YADE_PLUGIN();
+
+BodiesMenisciiList::BodiesMenisciiList(Body * body)
+{
+	initialized=false;
+	prepare(body);
+}
+
+bool BodiesMenisciiList::prepare(Body * body)
+{
+	//cerr << "preparing bodiesInteractionsList" << endl;
+	interactionsOnBody.clear();
+	MetaBody * ncb = static_cast<MetaBody*>(body);
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	
+	body_id_t MaxId = -1;
+	BodyContainer::iterator bi    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	for(  ; bi!=biEnd ; ++bi )
+	{
+		MaxId=max(MaxId, (*bi)->getId());
+	}
+	interactionsOnBody.resize(MaxId+1);
+	for ( unsigned int i=0; i<interactionsOnBody.size(); ++i )
+	{
+		interactionsOnBody[i].clear();
+	}
+	
+        InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
+        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+        for(  ; ii!=iiEnd ; ++ii ) {
+                if ((*ii)->isReal) {
+                	if (static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);
+                }
+        }
+                	
+	return initialized=true;
+}
+
+bool BodiesMenisciiList::insert(const shared_ptr< Interaction >& interaction)
+{
+	interactionsOnBody[interaction->getId1()].push_back(interaction);
+	interactionsOnBody[interaction->getId2()].push_back(interaction);
+	return true;	
+}
+
+
+bool BodiesMenisciiList::remove(const shared_ptr< Interaction >& interaction)
+{
+	interactionsOnBody[interaction->getId1()].remove(interaction);
+	interactionsOnBody[interaction->getId2()].remove(interaction);	
+	return true;
+}
+
+list< shared_ptr<Interaction> >&  BodiesMenisciiList::operator[] (int index)
+{
+	return interactionsOnBody[index];
+}
+
+int BodiesMenisciiList::size()
+{
+	return interactionsOnBody.size();
+}
+
+void BodiesMenisciiList::display()
+{
+	list< shared_ptr<Interaction> >::iterator firstMeniscus;
+	list< shared_ptr<Interaction> >::iterator lastMeniscus;
+	for ( unsigned int i=0; i<interactionsOnBody.size(); ++i )
+	{
+		if ( !interactionsOnBody[i].empty() )
+		{
+			lastMeniscus = interactionsOnBody[i].end();
+			//cerr << "size = "<<interactionsOnBody[i].size() << " empty="<<interactionsOnBody[i].empty() <<endl;
+			for ( firstMeniscus=interactionsOnBody[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )
+			{
+				if ( *firstMeniscus )
+					if ( firstMeniscus->get() )
+						cerr << "(" << ( *firstMeniscus )->getId1() << ", " << ( *firstMeniscus )->getId2() <<") ";
+					else cerr << "(void)";
+			}
+			cerr << endl;
+		}
+		else cerr << "empty" << endl;
+	}
+}
+
+BodiesMenisciiList::BodiesMenisciiList()
+{
+	initialized=false;
+}
