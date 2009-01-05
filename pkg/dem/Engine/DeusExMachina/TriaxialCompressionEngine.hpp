@@ -113,6 +113,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		//! Auto-switch from isotropic compaction or unloading state (if sigmaLateralConfinement<sigmaIsoCompaction)
 		// to uniaxial compression
 		bool autoCompressionActivation;
+		//! Stop the simulation when the sample reach STATE_LIMBO, or keep running
+		bool autoStopSimulation;
 		//! Auto-switch from isotropic compaction to unloading
 		bool autoUnload;
 		bool isotropicCompaction;

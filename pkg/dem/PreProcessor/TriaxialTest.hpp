@@ -94,6 +94,8 @@ class TriaxialTest : public FileGenerator
 				,autoCompressionActivation
 				//! see docs for TriaxialCompressionEngine and TriaxialCompressionEngine::autoUnload
 				,autoUnload
+				//! stop the simulation or run it forever (i.e. until the user stops it)
+				,autoStopSimulation
 			
 				,rotationBlocked
 				,spheresRandomColor

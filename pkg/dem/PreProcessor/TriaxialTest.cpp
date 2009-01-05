@@ -80,6 +80,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
+
 
 CREATE_LOGGER(TriaxialTest);
 
@@ -136,6 +138,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	StabilityCriterion = 0.01;
 	autoCompressionActivation = true;
 	autoUnload = true;
+	autoStopSimulation = false;
 	maxMultiplier = 1.01;
 	finalMaxMultiplier = 1.001;
 	
@@ -221,6 +224,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(StabilityCriterion);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
 	REGISTER_ATTRIBUTE(autoUnload);
+	REGISTER_ATTRIBUTE(autoStopSimulation);
 	REGISTER_ATTRIBUTE(recordIntervalIter);
 	REGISTER_ATTRIBUTE(saveAnimationSnapshots);
 	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
@@ -596,6 +600,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->StabilityCriterion = StabilityCriterion;
 	triaxialcompressionEngine->autoCompressionActivation = autoCompressionActivation;
 	triaxialcompressionEngine->autoUnload = autoUnload;
+	triaxialcompressionEngine->autoStopSimulation = autoStopSimulation;
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
@@ -604,6 +609,8 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->translationSpeed = translationSpeed;
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
 	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
+	
+	
 
 	
 	// recording global stress
@@ -652,7 +659,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(gravityCondition);
 	
 	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
-
+	
+	//if (0) rootBody->engines.push_back(shared_ptr<Engine>(new MicroMacroAnalyser));
+	
 	if(biaxial2dTest) rootBody->engines.push_back(makeItFlat);
 	
 	//if(!rotationBlocked)

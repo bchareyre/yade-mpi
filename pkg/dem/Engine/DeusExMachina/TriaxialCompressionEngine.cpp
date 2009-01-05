@@ -44,6 +44,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 
 	autoUnload=true;
 	autoCompressionActivation=true;
+	autoStopSimulation=true;
 
 	UnbalancedForce = 1;
 	saveSimulation = false;
@@ -82,6 +83,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(translationAxis);
 	//REGISTER_ATTRIBUTE(compressionActivated);
 	REGISTER_ATTRIBUTE(autoCompressionActivation);
+	REGISTER_ATTRIBUTE(autoStopSimulation);
 	REGISTER_ATTRIBUTE(testEquilibriumInterval);
 	REGISTER_ATTRIBUTE(currentState);
 	REGISTER_ATTRIBUTE(previousState);
@@ -259,7 +261,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
 	}
 	
-	if ( currentState==STATE_LIMBO )
+	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{		
 		Omega::instance().stopSimulationLoop();
 		return;
