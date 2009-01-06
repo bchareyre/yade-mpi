@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-void 
-mgpost_init(int argc, char **argv)
+void mgpost_init(int argc, char **argv)
 {
   int             i, c;
   char            namebuf[256];
@@ -67,6 +66,7 @@ mgpost_init(int argc, char **argv)
       
       multifiles = MG_TRUE;
     }
+
     strcpy(buf, &namebuf[strlen(namebuf) - 3]);
     buf[3] = 0;
     
@@ -74,6 +74,7 @@ mgpost_init(int argc, char **argv)
       strcpy(datafilename, (const char *) namebuf);
       multifiles = MG_FALSE;
     }
+
     strcpy(buf, &namebuf[strlen(namebuf) - 6]);
     buf[6] = 0;
     
@@ -92,37 +93,45 @@ mgpost_init(int argc, char **argv)
       
       exit(EXIT_SUCCESS);
     }
+
     if (!strcmp(argv[i], "-files")) {
       make_mgpalloc_file();
       make_mgconf_file();
       exit(EXIT_SUCCESS);
     }
+
     if (!strcmp(argv[i], "-mgpalloc")) {
       make_mgpalloc_file();
       exit(EXIT_SUCCESS);
     }
+
     if (!strcmp(argv[i], "-mgconf")) {
       make_mgconf_file();
       exit(EXIT_SUCCESS);
     }
+
     if (!strcmp(argv[i], "-nformat")) {
       strcpy(num_file_format, (const char *) argv[i + 1]);
     }
+
     if (!strcmp(argv[i], "-num")) {
        if      (atoi(argv[i + 1]) == 3) strcpy(num_file_format,"%03d");
        else if (atoi(argv[i + 1]) == 4) strcpy(num_file_format,"%04d");
        else                             strcpy(num_file_format,"%d");
     }
+
     if (!strcmp(argv[i], "-i")) {
       strcpy(datafilename, (const char *) argv[i + 1]);
       cin_mode = MG_FALSE;
       multifiles = MG_FALSE;
     }
+
     if (!strcmp(argv[i], "-cin")) {
       strcpy(datafilename, (const char *) argv[i + 1]);
       cin_mode = MG_TRUE;
       multifiles = MG_FALSE;
     }
+
     if (!strcmp(argv[i], "-his")) {
       if (argv[i + 1] != NULL)
         nfile = atoi(argv[i + 1]);
@@ -137,12 +146,15 @@ mgpost_init(int argc, char **argv)
       his_mode = MG_TRUE;
       multifiles = MG_TRUE;
     }
+
     if (!strcmp(argv[i], "-polye")) {
       more_forces = MG_TRUE;
     }
+
     if (!strcmp(argv[i], "-fluid")) {
       with_fluid = MG_TRUE;
     }
+
     if (!strcmp(argv[i], "-layer")) {
       with_layers = MG_TRUE;
       
@@ -152,6 +164,7 @@ mgpost_init(int argc, char **argv)
         nbLayers = 5;
       
     }
+
     if (!strcmp(argv[i], "-p")) {
       strcpy(pstfilename, (const char *) argv[i + 1]);
       
@@ -170,6 +183,7 @@ mgpost_init(int argc, char **argv)
       
       exit(EXIT_SUCCESS);
     }
+
     if (!strcmp(argv[i], "-pz")) {
       strcpy(pstfilename, (const char *) argv[i + 1]);
       
@@ -188,6 +202,7 @@ mgpost_init(int argc, char **argv)
       
       exit(EXIT_SUCCESS);
     }
+
     if (!strcmp(argv[i], "-mf")) {
       
       if (argv[i + 1] != NULL)
@@ -201,6 +216,7 @@ mgpost_init(int argc, char **argv)
       fgziped = MG_FALSE;
       multifiles = MG_TRUE;
     }
+
     if (!strcmp(argv[i], "-mfz")) {
       
       if (argv[i + 1] != NULL)
@@ -215,22 +231,27 @@ mgpost_init(int argc, char **argv)
       fgziped = MG_TRUE;
       multifiles = MG_TRUE;
     }
+
     if (!strcmp(argv[i], "-r0")) {
       middle_rep = MG_FALSE;
     }
+
     if (!strcmp(argv[i], "-dim")) {
       W = atoi(argv[i + 1]);
       H = atoi(argv[i + 2]);
     }
+
     if (!strcmp(argv[i], "-2d")) {
       phi = -90;
       theta = 0;
       mode2D = MG_TRUE;
     }
+
     if (!strcmp(argv[i], "-mono")) {
       for (c = 0; c <= nb_val_couleurs; c++)
         gradc[c] = gradmono[c];
     }
+
     if (!strcmp(argv[i], "-colormap")) {
       FILE * f;
       f = fopen ("colormap","r");
@@ -248,15 +269,18 @@ mgpost_init(int argc, char **argv)
         fprintf(stderr,"File colormap not found\n");
         }
     }   
+
     if (!strcmp(argv[i], "-section")) {
       section.a = atof(argv[i + 1]);
       section.b = atof(argv[i + 2]);
       section.c = atof(argv[i + 3]);
       section.d = atof(argv[i + 4]);
     }
+
     if (!strcmp(argv[i], "-dsec")) {
       dist_section = atof(argv[i + 1]);
     }
+
     i++;
   }
 }
@@ -397,8 +421,7 @@ param_init()
 }
 
 /* Convert a string in color */
-couleur 
-select_color(const char *col)
+couleur select_color(const char *col)
 {
   couleur         retcol = fg_color;
   
@@ -420,8 +443,7 @@ select_color(const char *col)
   return retcol;
 }
 
-void 
-processDialogF1()
+void processDialogF1()
 {
   if (!strcmp(dialArea[2].state, "SELECTED"))
     afficheRepere = MG_TRUE;
@@ -454,8 +476,7 @@ processDialogF1()
     dynamic_scale = MG_FALSE;  
 }
 
-void 
-processDialogF2()
+void processDialogF2()
 {
   double val;
   
@@ -501,8 +522,7 @@ processDialogF2()
 }
 
 
-void 
-processDialogF3()
+void processDialogF3()
 {
   int             val;
   
@@ -519,8 +539,7 @@ processDialogF3()
     modDirCon = val;
 }
 
-void 
-processDialogF4()
+void processDialogF4()
 {
   double val;
   
@@ -530,8 +549,7 @@ processDialogF4()
   
 }
 
-void 
-processDialogF5()
+void processDialogF5()
 {
   double val;
   int c;
@@ -555,8 +573,7 @@ processDialogF5()
     }
 }
 
-void 
-specialKey(int touche, int x, int y)
+void specialKey(int touche, int x, int y)
 {
   char            str[40];
   int             c;
@@ -567,14 +584,22 @@ specialKey(int touche, int x, int y)
       dialogMode();
       
       openDialog(20, 50, 300, 180);
-      
+
+#ifdef _FR      
       creatCheckBox(30, 55,  "Repere global", afficheRepere);
       creatCheckBox(30, 75,  "Affichage State et Time", afftime);
       creatCheckBox(30, 95,  "Orientation des grains", orient);
       creatCheckBox(30, 115, "Numero des corps", bodies_numbers);
       creatCheckBox(30, 135, "Affichage Noms fonctions", affFuncname);
       creatCheckBox(30, 155, "Echelle adaptable", dynamic_scale);    
-      
+#else
+      creatCheckBox(30, 55,  "Global Frame", afficheRepere);
+      creatCheckBox(30, 75,  "Display State and Time", afftime);
+      creatCheckBox(30, 95,  "Particle Orientation", orient);
+      creatCheckBox(30, 115, "Body Numbers", bodies_numbers);
+      creatCheckBox(30, 135, "Display Names of Functions", affFuncname);
+      creatCheckBox(30, 155, "Dynamic Color-Scale", dynamic_scale);
+#endif
       processDialog = processDialogF1;
       
       glutPostRedisplay();
@@ -751,8 +776,8 @@ specialKey(int touche, int x, int y)
   mgterminal = GL_TERMINAL;
 }
 
-void 
-clavier(unsigned char touche, int ix, int iy)
+/* keyboard */
+void clavier(unsigned char touche, int ix, int iy)
 {
   
   switch (touche) {
@@ -1096,22 +1121,21 @@ traitmenu(int value)
                 if (strcmp(mgpost_editor, "")) {
                   
 #ifdef _MACOSX
-                  strcpy(command, "open -a ");	/* MEMO a tester */
-                         strcat(command, (const char *) mgpost_editor);
-                         strcat(command, " mgconf");
+                  strcpy(command, "open -a ");	/* TODO test it */
+                  strcat(command, (const char *) mgpost_editor);
+                  strcat(command, " mgconf");
 #endif
                          
 #ifdef _WINDOWS
-                         strcpy(command, "$MGPOST_EDITOR mgconf");	/* MEMO a tester */
+                  strcpy(command, "$MGPOST_EDITOR mgconf"); /* TODO test it */
 #endif
                                 
 #ifdef _LINUX
-                                strcpy(command, "$MGPOST_EDITOR ./mgconf &");
+                  strcpy(command, "$MGPOST_EDITOR ./mgconf &");
 #endif
                                 
-                                system(command);
-                } else
-fprintf(stdout, "You must define the environment variable MGPOST_EDITOR !\n");
+                  system(command);
+                } else fprintf(stdout, "You must define the environment variable MGPOST_EDITOR !\n");
               }
 break;
 

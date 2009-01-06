@@ -89,7 +89,7 @@ void disp_boundaries ()
   glEnable (GL_LIGHTING);
 }
 
-void disp_outline () /* ne fonctionne que pour les spheres */
+void disp_outline () /* Only for spheres */
 {
   int i;
   GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
@@ -359,7 +359,7 @@ void disp_geo_layers ()
     if (pres_du_plan (i, dist_section))
       {
       
-      if (layer[i] % 2) /* a tester : if (layer[i] & 1) */
+      if (layer[i] % 2)
         glColor3f (0.7f, 1.0f, 0.7f);
       else
         glColor3f (0.0f, 0.5f, 0.25f);

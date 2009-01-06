@@ -13,17 +13,14 @@
 
 int graph_xm, graph_xM, graph_ym, graph_yM;
 
-void (*rendu) (void);
-void (*disp_current) (void); 
-void (*rendu_sup) (void);
-void (*rendu_fluid) (void);
+void (*rendu)         (void);
+void (*disp_current)  (void); 
+void (*rendu_sup)     (void);
+void (*rendu_fluid)   (void);
 void (*affgraph_func) (void);
 
 int nb_section1 = 17;
 int nb_section2 = 7;
-
-
-/* ----- display functions */
 
 void disp_time ();
 void disp_text (char *text);
