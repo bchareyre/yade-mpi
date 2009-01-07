@@ -23,6 +23,8 @@
 #include <yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
 
+CREATE_LOGGER(ContactStressRecorder);
+
 ContactStressRecorder::ContactStressRecorder () : DataRecorder(), actionForce(new Force)
 
 {

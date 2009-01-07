@@ -53,6 +53,7 @@ class ContactStressRecorder : public DataRecorder
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
+	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(ContactStressRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
