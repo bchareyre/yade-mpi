@@ -15,7 +15,7 @@ int main()
 	SpherePadder * padder = new SpherePadder();
 	padder->read_data("padding.dat");
 	TetraMesh * mesh = new TetraMesh();
-	mesh->read_data("test.msh");
+	mesh->read_data("small.msh");
 	padder->plugTetraMesh(mesh);
 	
 	padder->pad_5();
