@@ -12,16 +12,17 @@
 
 int main()
 {
-	SpherePadder * padder = new SpherePadder();
-	padder->read_data("padding.dat");
 	TetraMesh * mesh = new TetraMesh();
-	mesh->read_data("small.msh");
+	mesh->read_data("test.msh");
+        
+        SpherePadder * padder = new SpherePadder();
 	padder->plugTetraMesh(mesh);
 	
 	padder->pad_5();
 	
 	padder->save_mgpost("mgp.out.001");
-	
+        padder->save_Rxyz("out.Rxyz");
+        
 	return 0;
 }
 

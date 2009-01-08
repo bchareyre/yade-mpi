@@ -13,14 +13,15 @@
 
 #include "TetraMesh.hpp"
 
+enum SphereType {AT_NODE,AT_SEGMENT,AT_FACE,AT_TETRA_CENTER};
+
+
 struct Sphere
 {
 	double                x,y,z,R;
-	unsigned int          type; // FIXME utiliser un enum ??
+	//unsigned int          type; // FIXME utiliser un enum ??
+        SphereType     type; 
 	unsigned int          tetraOwner;
-	vector<unsigned int>  owner; // a documenter... FIXME necessaire ?
-	// type = 0 => owner = nodeId
-	// type = 1 => owner = segId
 };
 
 struct Neighbor
@@ -40,20 +41,18 @@ protected:
         	
         vector<vector<unsigned int> > combination;
   
-	double distance_spheres (unsigned int i, unsigned int j);
-        double distance_centre_spheres(Sphere& S1, Sphere& S2);
-	void place_at_nodes ();
-        void place_at_segment_middle (); // place_at_barycentre_2 ??
-	void place_at_barycentre_3 ();
-        // void place_at_barycentre_4 ();
-	void cancel_overlap ();
+	double       distance_spheres (unsigned int i, unsigned int j);
+        double       distance_centre_spheres(Sphere& S1, Sphere& S2);
+        double       distance_vector3 (double V1[],double V2[]);
+	void         place_at_nodes ();
+        void         place_at_segment_middle ();
+	void         place_at_barycentre_3 ();
+        void         place_at_tetra_centers ();
+        void         place_at_barycentre_4 ();
+	void         cancel_overlap ();
         unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
-        unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_iter_max);
-        
-	void place_at_tetra_centers ();
-	
-public:
-  
+        unsigned int place_sphere_4contacts (unsigned int sphereId);
+        	 
 	double rmin,rmax,rmoy,dr;
 	double ratio;
 	double max_overlap_rate;
@@ -62,14 +61,17 @@ public:
 	TetraMesh * mesh;
 	vector<Sphere> sphere;
 
-	void read_data (const char* filename);
+ public:
+   
 	void plugTetraMesh (TetraMesh * mesh);
 	void save_mgpost (const char* name);
-	//void save_Rxyz (const char* name);
+	void save_Rxyz   (const char* name);
 	
         SpherePadder();
+        // TODO destructor that clean TetraMesh*
         
-	void pad_5 ();		
+	void pad_5 ();
+        // void densify ();	
 };
 
 
