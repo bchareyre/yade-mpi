@@ -35,8 +35,8 @@ SpherePadder::SpherePadder()
                 combination.push_back(lst);
         }
         
-   max_overlap_rate = 1e-2;   
-   n1 = n2 = n3 = n4 = n_densify = 0;  
+   max_overlap_rate = 1e-7;   
+   n1 = n2 = n3 = n4 = n5 = n_densify = 0;  
    
    //FIXME : 
    // si on utilise la class dans un autre programme c'est peu etre pas util
@@ -77,7 +77,9 @@ void SpherePadder::pad_5 ()
 	place_at_nodes();
 	place_at_segment_middle();
         cancel_overlap();
-	place_at_barycentre_3();
+        place_at_faces();
+        place_at_tetra_centers();
+        //place_at_tetra_vertexes ();
 
         cerr << "nb spheres = " << sphere.size() << endl;
 	
@@ -94,7 +96,8 @@ void SpherePadder::save_mgpost (const char* name)
 	      << "  <newcolor name=\"at nodes\"/>" << endl
 	      << "  <newcolor name=\"at segments\"/>" << endl	
 	      << "  <newcolor name=\"at faces\"/>" << endl
-              << "  <newcolor name=\"at tetraCenters\"/>" << endl
+              << "  <newcolor name=\"at tetra centers\"/>" << endl
+              << "  <newcolor name=\"at tetra vertexes\"/>" << endl
 	      << "  <state id=\"" << 1 
 	      << "\" time=\"" << 0.0 << "\">" << endl;
 
@@ -209,7 +212,7 @@ void SpherePadder::place_at_segment_middle ()
 }
 
 
-void SpherePadder::place_at_barycentre_3 ()
+void SpherePadder::place_at_faces ()
 {
 	cerr << "place at barycentre 3... ";
  
@@ -228,10 +231,8 @@ void SpherePadder::place_at_barycentre_3 ()
 	Sphere S;
 	S.type = AT_FACE;
 
-	unsigned int ns0 = sphere.size();
-        unsigned int ns = ns0; 
+	unsigned int ns = sphere.size();
         const double div3 = 0.3333333333333;
-	double R1,R2,R3;
         Sphere S1,S2,S3;
 
 	for (unsigned int f = 0 ; f < mesh->face.size() ; ++f)
@@ -243,13 +244,8 @@ void SpherePadder::place_at_barycentre_3 ()
 
                 S.x = div3 * (S1.x + S2.x + S3.x); 
                 S.y = div3 * (S1.y + S2.y + S3.y); 
-                S.z = div3 * (S1.z + S2.z + S3.z); 
-		
-		R1 = distance_centre_spheres(S1,S) - S1.R;
-		R2 = distance_centre_spheres(S2,S) - S2.R;
-		R3 = distance_centre_spheres(S3,S) - S3.R;
-		S.R = (R1  > R2) ? R2 : R1;
-		S.R = (S.R > R3) ? R3 : S.R;
+                S.z = div3 * (S1.z + S2.z + S3.z);                 
+                S.R = rmin;
 		
 		S.tetraOwner = mesh->node[ mesh->face[f].nodeId[0] ].tetraOwner[0];
 		mesh->tetraedre[S.tetraOwner].sphereId.push_back(ns++);
@@ -347,6 +343,8 @@ unsigned int SpherePadder::place_sphere_4contacts (unsigned int sphereId)
       {
         j = tetra_neighbor.sphereId[n];
 
+        if (sphere[j].R <= 0.0) continue;
+        
         added = false;
         for (unsigned int k = 0 ; k < j_ok.size() ; ++k) 
         {
@@ -370,8 +368,9 @@ unsigned int SpherePadder::place_sphere_4contacts (unsigned int sphereId)
   
   qsort(&(neighbor[0]),neighbor.size(),sizeof(neighbor_with_distance),compare_neighbor_with_distance); 
   S.R += neighbor[0].distance;
-  sphere[sphereId].R = S.R;
-  
+  if (S.R >= 0.0) sphere[sphereId].R = S.R;
+  else            sphere[sphereId].R = 0.0;
+
   vector<vector<unsigned int> > possible_combination;
   for (unsigned int c = 0 ; c < combination.size() ; ++c)
   {
@@ -392,6 +391,21 @@ unsigned int SpherePadder::place_sphere_4contacts (unsigned int sphereId)
     s4 = neighbor[ possible_combination[c][3] ].sphereId;
 
     failure = place_fifth_sphere(s1,s2,s3,s4,S);
+    
+    if (!failure)
+    {
+//       for (unsigned n = 0 ; n < sphere.size() ; ++n)
+//       {
+//         if (sphereId == n) continue;
+//         if ((distance_centre_spheres(S,sphere[n]) - (S.R + sphere[n].R)) < -max_overlap_rate * rmin) { failure = 128; break; }
+//       }
+      
+      for (unsigned n = 0 ; n < neighbor.size() ; ++n)
+      {
+        if ((distance_centre_spheres(S,sphere[neighbor[n].sphereId]) - (S.R + sphere[neighbor[n].sphereId].R)) < -max_overlap_rate * rmin) { failure = 128; break; }
+      }
+      
+    }  
 
     if (!failure)
     {
@@ -403,7 +417,7 @@ unsigned int SpherePadder::place_sphere_4contacts (unsigned int sphereId)
     }
 
   }
-
+  // sphere[sphereId].R = 0.0; //debug
   return 0;
 }
 
@@ -431,6 +445,7 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
   unsigned int fail_overlap      =  8;
   unsigned int fail_gap          = 16;
   unsigned int fail_radius_range = 32;
+  unsigned int fail_NaN          = 64;
 
   // (x-x1)^2 + (y-y1)^2 + (z-z1)^2 = (r+r1)^2   (1)
   // (x-x2)^2 + (y-y2)^2 + (z-z2)^2 = (r+r2)^2   (2)
@@ -536,7 +551,7 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
         || ( distance4 < half_distance_rate * (R + R4)) )
   { return fail_overlap; }
   
-  // The distance must not be too large
+  // The gap between spheres must not be too large
   double distance_max = max_overlap_rate * rmin; // FIXME should be imposed by the user? for example max_gap_rate
   if (     ( distance1 > distance_max) 
         || ( distance2 > distance_max)
@@ -545,7 +560,12 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
   { return fail_gap; } 
   
   
-  // TODO check if there is no NaN or Inf
+  // Check if there is NaN 
+  if (     (centre[0] != centre[0])
+        || (centre[1] != centre[1])
+        || (centre[2] != centre[2])
+        || (R != R))
+  { return fail_NaN; }
   
   S.x = centre[0];
   S.y = centre[1];
@@ -555,15 +575,92 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
   return 0;
 }
 
-void SpherePadder::place_at_barycentre_4 ()
-{
-// TODO 
-}
-    
 void SpherePadder::place_at_tetra_centers ()
 {
-// TODO	
+  cerr << "place at tetra centers... ";
+    
+  Sphere S;
+  S.type = AT_TETRA_CENTER;
+  Tetraedre T;
+  
+  unsigned int ns = sphere.size(); 
+  Node N1,N2,N3,N4;
+
+  for (unsigned int t = 0 ; t < mesh->tetraedre.size() ; ++t)
+  {
+    T = mesh->tetraedre[t];
+    N1 = mesh->node[T.nodeId[0]];
+    N2 = mesh->node[T.nodeId[1]];
+    N3 = mesh->node[T.nodeId[2]];
+    N4 = mesh->node[T.nodeId[3]];
+    
+    S.x = 0.25 * (N1.x + N2.x + N3.x + N4.x); 
+    S.y = 0.25 * (N1.y + N2.y + N3.y + N4.y); 
+    S.z = 0.25 * (N1.z + N2.z + N3.z + N4.z); 
+
+    S.R = rmin;
+                
+    S.tetraOwner = t;
+    mesh->tetraedre[t].sphereId.push_back(ns++);
+    sphere.push_back(S); ++(n4);
+  }
+        
+  for (unsigned int n = (n1+n2+n3) ; n < sphere.size() ; ++n)
+  {
+    place_sphere_4contacts(n);
+  }
+        
+  cerr << "Done" << endl;  
 }
+
+void SpherePadder::place_at_tetra_vertexes ()
+{
+  cerr << "place at tetra vertexes... ";
+    
+  Sphere S;
+  S.type = AT_TETRA_VERTEX;
+  Tetraedre T;
+  
+  unsigned int ns = sphere.size(); 
+  Node N1,N2,N3,N4;
+  double centre[3];
+
+  for (unsigned int t = 0 ; t < mesh->tetraedre.size() ; ++t)
+  {
+    T = mesh->tetraedre[t];
+    N1 = mesh->node[T.nodeId[0]];
+    N2 = mesh->node[T.nodeId[1]];
+    N3 = mesh->node[T.nodeId[2]];
+    N4 = mesh->node[T.nodeId[3]];
+    
+    centre[0] = 0.25 * (N1.x + N2.x + N3.x + N4.x); 
+    centre[1] = 0.25 * (N1.y + N2.y + N3.y + N4.y); 
+    centre[2] = 0.25 * (N1.z + N2.z + N3.z + N4.z); 
+
+    S.R = rmin;
+                
+    double pondere = 1.0 / 3.0; // FIXME parametrable
+    for (unsigned int n = 0 ; n < 4 ; ++n)
+    {
+      S.x = pondere * mesh->node[ T.nodeId[n] ].x + (1.0-pondere) * centre[0];
+      S.y = pondere * mesh->node[ T.nodeId[n] ].y + (1.0-pondere) * centre[1];
+      S.z = pondere * mesh->node[ T.nodeId[n] ].z + (1.0-pondere) * centre[2];
+      
+      S.tetraOwner = t;
+      mesh->tetraedre[t].sphereId.push_back(ns++);
+      sphere.push_back(S); ++(n5);
+    }
+  }
+        
+  for (unsigned int n = (n1+n2+n3+n4) ; n < sphere.size() ; ++n)
+  {
+    place_sphere_4contacts(n);
+  }
+        
+  cerr << "Done" << endl; 
+}
+    
+
 
 
 

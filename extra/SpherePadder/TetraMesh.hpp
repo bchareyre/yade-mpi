@@ -52,22 +52,24 @@ struct Tetraedre
 	
 class TetraMesh
 {
-
-	
+protected:
+    
+  double xtrans,ytrans,ztrans;
+  void organize (); 
+  	
 public:
-	vector<Node>       node;
-	vector<Segment>    segment;
-    vector<Face>       face;
-	vector<Tetraedre>  tetraedre;
+  
+  vector<Node>       node;
+  vector<Segment>    segment;
+  vector<Face>       face;
+  vector<Tetraedre>  tetraedre;
+  
+  double mean_segment_length;
+  double min_segment_length;
+  double max_segment_length;
+  
+  void read_data (const char* name);
 
-	double xtrans,ytrans,ztrans;
-	double mean_segment_length;
-	double min_segment_length;
-	double max_segment_length;
-		
-	//void read_data (string filename);
-	void read_data (const char* name);
-	void organize (); // FIXME protected ?
 };
 
 #endif // TETRA_MESH_HPP

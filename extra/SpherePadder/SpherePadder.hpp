@@ -13,15 +13,13 @@
 
 #include "TetraMesh.hpp"
 
-enum SphereType {AT_NODE,AT_SEGMENT,AT_FACE,AT_TETRA_CENTER};
-
+enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX};
 
 struct Sphere
 {
-	double                x,y,z,R;
-	//unsigned int          type; // FIXME utiliser un enum ??
-        SphereType     type; 
-	unsigned int          tetraOwner;
+	double        x,y,z,R;
+        SphereType    type; 
+	unsigned int  tetraOwner;
 };
 
 struct Neighbor
@@ -46,9 +44,9 @@ protected:
         double       distance_vector3 (double V1[],double V2[]);
 	void         place_at_nodes ();
         void         place_at_segment_middle ();
-	void         place_at_barycentre_3 ();
+	void         place_at_faces ();
         void         place_at_tetra_centers ();
-        void         place_at_barycentre_4 ();
+        void         place_at_tetra_vertexes ();
 	void         cancel_overlap ();
         unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
         unsigned int place_sphere_4contacts (unsigned int sphereId);
@@ -56,7 +54,7 @@ protected:
 	double rmin,rmax,rmoy,dr;
 	double ratio;
 	double max_overlap_rate;
-        unsigned int n1,n2,n3,n4,n_densify;
+        unsigned int n1,n2,n3,n4,n5,n_densify;
 	
 	TetraMesh * mesh;
 	vector<Sphere> sphere;
