@@ -21,8 +21,8 @@ class BssSnowGrain : public InteractingSphere
 	protected :
 		void registerAttributes();
 	REGISTER_CLASS_NAME(BssSnowGrain);
-	REGISTER_BASE_CLASS_NAME(GeometricalModel);
-	REGISTER_CLASS_INDEX(BssSnowGrain,GeometricalModel);
+	REGISTER_BASE_CLASS_NAME(InteractingSphere);
+	REGISTER_CLASS_INDEX(BssSnowGrain,InteractingSphere);
 };
 
 REGISTER_SERIALIZABLE(BssSnowGrain);

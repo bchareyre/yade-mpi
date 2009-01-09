@@ -358,10 +358,10 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 
-	//shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);  //GRR 
-	//shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);//GRR 
-	shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);  //GRR 
+	shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);//GRR 
+	//shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	//shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
 	
 	interactionGeometryDispatcher->add(s1);
 	interactionGeometryDispatcher->add(s2);
@@ -533,10 +533,10 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 	shared_ptr<BshSnowGrain> gSnowGrain(grain);
 	
 
-	//shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is));//GRR 
-	//Real radius = iSphere->radius;                                                              //GRR 
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
-	Real radius = (grain->start-grain->end).Length()*0.5;
+	shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is));//GRR 
+	Real radius = iSphere->radius;                                                              //GRR 
+	//shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	//Real radius = (grain->start-grain->end).Length()*0.5;
 	
 	Quaternionr q;//(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -564,7 +564,7 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 	gSnowGrain->visible		= true;
 	gSnowGrain->shadowCaster	= true;
 	
-	iSphere->radius			= radius; // already calculated //GRR
+	//iSphere->radius			= radius; // already calculated //GRR
 	iSphere->diffuseColor		= grain->color;
 
 	body->interactingGeometry	= iSphere;

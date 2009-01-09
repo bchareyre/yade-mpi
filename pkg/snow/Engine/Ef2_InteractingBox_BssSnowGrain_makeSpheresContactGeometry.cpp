@@ -23,8 +23,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 		const Se3r& se32,
 		const shared_ptr<Interaction>& c)
 {
-	bool result = g.go(cm1,cm2,se32,se32,c);
-	std::cerr << "-------------------1\n";
+	bool result = g.go(cm1,cm2,se31,se32,c);
+//	std::cerr << "-------------------1\n";
 	return result;
 }
 
@@ -35,8 +35,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	cons
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	bool result = g.goReverse(cm1,cm2,se32,se32,c);
-	std::cerr << "-------------------2\n";
+	bool result = g.goReverse(cm1,cm2,se31,se32,c);
+//	std::cerr << "-------------------2\n";
 	return result;
 }
 
