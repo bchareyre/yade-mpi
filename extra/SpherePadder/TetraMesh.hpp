@@ -14,7 +14,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <stdlib.h> // for qsort
+#include <stdlib.h>
 #include <math.h>
 
 using namespace std;
@@ -54,22 +54,27 @@ class TetraMesh
 {
 protected:
     
-  double xtrans,ytrans,ztrans;
-  void organize (); 
+
+  void organize ();   
   	
 public:
   
-  vector<Node>       node;
-  vector<Segment>    segment;
-  vector<Face>       face;
-  vector<Tetraedre>  tetraedre;
+  vector <Node>       node;
+  vector <Segment>    segment;
+  vector <Face>       face;
+  vector <Tetraedre>  tetraedre;
   
   double mean_segment_length;
   double min_segment_length;
   double max_segment_length;
   
-  void read_data (const char* name);
-
+  TetraMesh();
+  
+  double xtrans,ytrans,ztrans;
+  bool   isOrganized;
+  
+  void read      (const char* name);
+  void read_gmsh (const char* name);
 };
 
 #endif // TETRA_MESH_HPP

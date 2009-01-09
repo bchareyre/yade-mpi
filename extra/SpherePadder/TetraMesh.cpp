@@ -10,7 +10,92 @@
 
 #include "TetraMesh.hpp"
 
-void TetraMesh::read_data (const char* name)
+TetraMesh::TetraMesh ()   
+{
+  isOrganized = false;
+}
+
+void TetraMesh::read_gmsh (const char* name)
+{
+  ifstream meshFile(name);
+  if(!meshFile)
+  {
+    cerr << "TetraMesh::read_gmsh, cannot open file " << name << endl;
+    return;
+  }  
+
+  string token;
+  char not_read[150];
+  meshFile >> token;
+
+  while(meshFile)
+  {
+    if (token == "$Nodes") 
+    {
+      unsigned int nbnodes;
+      unsigned int num_node;
+      Node N;
+
+      meshFile >> nbnodes; 
+      for (unsigned int n = 0 ; n < nbnodes ; ++n)
+      {
+        meshFile >> num_node >> N.x >> N.y >> N.z;
+        node.push_back(N);      
+      }
+    }
+
+    if (token == "$Elements") 
+    {
+      unsigned int nbElements;
+      unsigned int num_element, element_type, nbTags ;
+      Tetraedre T;
+      unsigned int t = 0;
+                        
+      meshFile >> nbElements;
+      for (unsigned int e = 0 ; e < nbElements ; ++e)
+      {
+        meshFile >> num_element >> element_type;
+        if (element_type != 4)  // 4-node tetrahedron
+        {
+          meshFile.getline(not_read,150);
+          continue;
+        }
+          
+        
+        meshFile >> nbTags;
+        // the third tag is the number of a mesh partition to which the element belongs
+        unsigned int tag;
+        for (unsigned int tg = 0 ; tg < nbTags ; ++(tg))
+        { meshFile >> tag; }
+        
+        meshFile >> T.nodeId[0] >> T.nodeId[1] >> T.nodeId[2] >> T.nodeId[3];
+                      
+        // numbers begin at 0 instead of 1
+        // (0 in C/C++ corresponds to 1 in the file)
+        T.nodeId[0] -= 1;
+        T.nodeId[1] -= 1;
+        T.nodeId[2] -= 1;
+        T.nodeId[3] -= 1;
+                                
+        node[T.nodeId[0]].tetraOwner.push_back(t);
+        node[T.nodeId[1]].tetraOwner.push_back(t);
+        node[T.nodeId[2]].tetraOwner.push_back(t);
+        node[T.nodeId[3]].tetraOwner.push_back(t);
+                                
+        tetraedre.push_back(T); 
+        ++t;
+      }                       
+    }
+                
+    if (token == "$EndElements") break;
+                
+    meshFile >> token;
+  }
+   
+  organize ();
+}
+
+void TetraMesh::read (const char* name)
 {
 	ifstream meshFile(name);
 	if(!meshFile)
@@ -19,7 +104,6 @@ void TetraMesh::read_data (const char* name)
 		return;
 	}  
 
-    cout << "Read data... " << flush;
 	string token;
 	meshFile >> token;
 
@@ -49,7 +133,7 @@ void TetraMesh::read_data (const char* name)
 				meshFile >> T.nodeId[0] >> T.nodeId[1] >> T.nodeId[2] >> T.nodeId[3];
 				
 				// numbers begin at 0 instead of 1
-				// (0 in C corresponds to 1 in the file)
+				// (0 in C/C++ corresponds to 1 in the file)
 				T.nodeId[0] -= 1;
 				T.nodeId[1] -= 1;
 				T.nodeId[2] -= 1;
@@ -68,7 +152,6 @@ void TetraMesh::read_data (const char* name)
 		
 		meshFile >> token;
 	}
-	cout << "Done" << endl;
 	
 	organize ();
 }
@@ -80,7 +163,7 @@ int compareInt (const void * a, const void * b)
 
 void TetraMesh::organize ()
 {
-	cout << "Organize data... " << flush;
+	//cout << "Organize data... " << flush;
 	
 	// Translate all nodes in such a manner that all coordinates are > 0
 	xtrans = node[0].x;
@@ -92,9 +175,9 @@ void TetraMesh::organize ()
 		ytrans = (ytrans < node[i].y) ? ytrans : node[i].y;
 		ztrans = (ztrans < node[i].z) ? ztrans : node[i].z;
 	}
-	xtrans = (xtrans<0.0) ? -xtrans : 0.0;
-	ytrans = (ytrans<0.0) ? -ytrans : 0.0;
-	ztrans = (ztrans<0.0) ? -ztrans : 0.0;
+	xtrans = (xtrans < 0.0) ? -xtrans : 0.0;
+	ytrans = (ytrans < 0.0) ? -ytrans : 0.0;
+	ztrans = (ztrans < 0.0) ? -ztrans : 0.0;
 	for (unsigned int i = 0 ; i < node.size() ; ++i)
 	{
 		node[i].x += xtrans;
@@ -109,7 +192,7 @@ void TetraMesh::organize ()
 	}
 	
 	// Face creation
-	vector <Face> tmpFace; // This will contain all faces more than one time
+	vector <Face> tmpFace; // This will contain all faces more than one time (with duplications)
 	Face F;
 	F.tetraOwner.push_back(0);
 	F.belongBoundary = true;
@@ -175,7 +258,7 @@ void TetraMesh::organize ()
 	vector <Segment> tmpSegment;
 	Segment S;
 	S.faceOwner.push_back(0);
-	//S.belongBoundary = true; // a voir
+
 	for (unsigned int i = 0 ; i < face.size() ; ++i)
 	{
 		S.faceOwner[0] = i;
@@ -251,7 +334,7 @@ void TetraMesh::organize ()
 			if (   (tetraedre[t1].nodeId[0] > tetraedre[t2].nodeId[3]) 
 				|| (tetraedre[t1].nodeId[3] < tetraedre[t2].nodeId[0]) ) continue;
                         
-                        // TODO mettre du while...
+                        // FIXME mettre du while... (?)
 			for (unsigned int i = 0 ; i < 4 ; i++)
                         {
 			        for (unsigned int j = 0 ; j < 4 ; j++)
@@ -267,17 +350,7 @@ void TetraMesh::organize ()
 		}
 	}
 	
-	// Define Owners FIXME :  a voir plus tard
-	/*
-	for (unsigned int t = 0 ; t < tetraedre.size() ; ++t)
-	{
-		node[tetraedre[t].nodeId[0]].tetraOwner.push_back(t);
-		node[tetraedre[t].nodeId[1]].tetraOwner.push_back(t);
-		node[tetraedre[t].nodeId[2]].tetraOwner.push_back(t);
-		node[tetraedre[t].nodeId[3]].tetraOwner.push_back(t);
-	}
-	*/
-	cout << "Done" << endl;
+        isOrganized = true;
 }
 
 

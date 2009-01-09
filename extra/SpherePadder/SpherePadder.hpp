@@ -13,6 +13,9 @@
 
 #include "TetraMesh.hpp"
 
+# define BEGIN_FUNCTION(arg) if (trace_functions) cerr << (arg) << "... "
+# define END_FUNCTION        if (trace_functions) cerr << "Done\n" 
+
 enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX};
 
 struct Sphere
@@ -35,41 +38,46 @@ struct neighbor_with_distance
 
 class SpherePadder
 {
-protected:
-        	
-        vector<vector<unsigned int> > combination;
+  protected:
+                
+    vector<vector<unsigned int> > combination;
   
-	double       distance_spheres (unsigned int i, unsigned int j);
-        double       distance_centre_spheres(Sphere& S1, Sphere& S2);
-        double       distance_vector3 (double V1[],double V2[]);
-	void         place_at_nodes ();
-        void         place_at_segment_middle ();
-	void         place_at_faces ();
-        void         place_at_tetra_centers ();
-        void         place_at_tetra_vertexes ();
-	void         cancel_overlap ();
-        unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
-        unsigned int place_sphere_4contacts (unsigned int sphereId);
-        	 
-	double rmin,rmax,rmoy,dr;
-	double ratio;
-	double max_overlap_rate;
-        unsigned int n1,n2,n3,n4,n5,n_densify;
-	
-	TetraMesh * mesh;
-	vector<Sphere> sphere;
-
- public:
-   
-	void plugTetraMesh (TetraMesh * mesh);
-	void save_mgpost (const char* name);
-	void save_Rxyz   (const char* name);
-	
-        SpherePadder();
-        // TODO destructor that clean TetraMesh*
+    double       distance_spheres (unsigned int i, unsigned int j);
+    double       distance_centre_spheres(Sphere& S1, Sphere& S2);
+    double       distance_vector3 (double V1[],double V2[]);
+    void         place_at_nodes ();
+    void         place_at_segment_middle ();
+    void         place_at_faces ();
+    void         place_at_tetra_centers ();
+    void         place_at_tetra_vertexes ();
+    void         cancel_overlaps ();
+    unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
+    unsigned int place_sphere_4contacts (unsigned int sphereId);
+                 
+    double       rmin,rmax,rmoy,dr;
+    double       ratio;
+    double       max_overlap_rate;
+    unsigned int n1,n2,n3,n4,n5,n_densify;
+    unsigned int nb_iter_max;
         
-	void pad_5 ();
-        // void densify ();	
+    TetraMesh *     mesh;
+    vector <Sphere> sphere;
+        
+    bool trace_functions;
+ 
+  public:
+   
+    bool meshIsPlugged;
+   
+    void plugTetraMesh (TetraMesh * mesh);
+    void save_mgpost (const char* name);
+    void save_Rxyz   (const char* name);
+        
+    SpherePadder();
+    // TODO destructor that clean TetraMesh*?
+        
+    void pad_5 ();
+    // void densify ();     
 };
 
 
