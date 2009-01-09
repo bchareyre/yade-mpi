@@ -534,6 +534,7 @@ void GLViewer::postDraw(){
 			y-=lineHt;
 		}
 		if(drawGridXYZ[0] || drawGridXYZ[1] || drawGridXYZ[2]){
+			glColor3v(Vector3r(1,1,0));
 			QGLViewer::drawText(x,y,std::string("grid: "+boost::lexical_cast<std::string>(gridStep))+(grid_subdivision?(std::string(" ,subdivision: "+boost::lexical_cast<std::string>(gridStep*0.1))):(std::string(""))));
 			y-=lineHt;
 		}

@@ -16,7 +16,6 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 
-
 bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 		const shared_ptr<InteractingGeometry>& cm1,
 		const shared_ptr<InteractingGeometry>& cm2,
@@ -25,6 +24,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 		const shared_ptr<Interaction>& c)
 {
 	bool result = g.go(cm1,cm2,se32,se32,c);
+	std::cerr << "-------------------1\n";
 	return result;
 }
 
@@ -36,6 +36,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	cons
 						const shared_ptr<Interaction>& c)
 {
 	bool result = g.goReverse(cm1,cm2,se32,se32,c);
+	std::cerr << "-------------------2\n";
 	return result;
 }
 

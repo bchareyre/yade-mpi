@@ -356,18 +356,14 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
-	/* GRR
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);
-	interactionGeometryDispatcher->add(s1);
-	shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
-	interactionGeometryDispatcher->add(s2);
-	*/
 
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	//shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);  //GRR 
+	//shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);//GRR 
 	shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	interactionGeometryDispatcher->add(s1);
 	shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	
+	interactionGeometryDispatcher->add(s1);
 	interactionGeometryDispatcher->add(s2);
 
 	shared_ptr<CohesiveFrictionalRelationships> cohesiveFrictionalRelationships = shared_ptr<CohesiveFrictionalRelationships> (new CohesiveFrictionalRelationships);
@@ -537,8 +533,8 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 	shared_ptr<BshSnowGrain> gSnowGrain(grain);
 	
 
-	//GRR shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is));
-	//GRR Real radius = iSphere->radius;
+	//shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is));//GRR 
+	//Real radius = iSphere->radius;                                                              //GRR 
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	Real radius = (grain->start-grain->end).Length()*0.5;
 	

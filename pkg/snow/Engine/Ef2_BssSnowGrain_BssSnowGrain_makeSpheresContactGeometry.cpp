@@ -26,6 +26,7 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_
 							const shared_ptr<Interaction>& c)
 {
 	bool result = g.go(cm1,cm2,se32,se32,c);
+	std::cerr << "-------------------1a\n";
 	return result;
 }
 
@@ -36,6 +37,7 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const 
 								const Se3r& se32,
 								const shared_ptr<Interaction>& c)
 {
+	std::cerr << "-------------------2a\n";
 	return g.goReverse(cm1,cm2,se31,se32,c);
 }
 

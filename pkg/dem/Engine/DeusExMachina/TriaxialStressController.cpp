@@ -358,7 +358,8 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 		if ( ( *bi )->isDynamic )
 		{
 			( static_cast<InteractingSphere*> ( ( *bi )->interactingGeometry.get() ) )->radius *= multiplier;
-			( static_cast<Sphere*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
+			//( static_cast<Sphere*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
+			Sphere* s = dynamic_cast<Sphere*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
 			( static_cast<ParticleParameters*> ( ( *bi )->physicalParameters.get() ) )->mass *= pow ( multiplier,3 );
 			( static_cast<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() ) )->inertia *= pow ( multiplier,5 );
 
