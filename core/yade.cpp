@@ -46,26 +46,28 @@ void warnOnceHandler(int sig){
 
 void
 sigHandler(int sig){
+	switch(sig){
 	#ifdef EMBED_PYTHON
-		if(sig==SIGINT){
+		case SIGINT:
 			LOG_DEBUG("Finalizing Python...");
 			Py_Finalize();
 			// http://www.cons.org/cracauer/sigint.html
 			signal(SIGINT,SIG_DFL); // reset to default
 			kill(getpid(),SIGINT); // kill ourselves, this time without Python
-		}
+			break;
 	#endif
 	#ifdef YADE_DEBUG
-		if(sig==SIGABRT || sig==SIGSEGV){
+		case SIGABRT:
+		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
 			if(!dontUseGdb)
 				std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			raise(sig); // reemit signal after exiting gdb
-		}
+			break;
 	#endif
-	if(sig==SIGHUP){
+	case SIGHUP:
 		signal(SIGHUP,SIG_DFL);
 		LOG_INFO("Received SIGHUP.");
 		if(Omega::instance().getRootBody()){
