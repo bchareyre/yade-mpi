@@ -29,21 +29,49 @@ class RotationEngine : public DeusExMachina
 };
 REGISTER_SERIALIZABLE(RotationEngine);
 
-/*! Engine applying rotation, finding current angular velocity by interpolating in times and velocities */
-class InterpolatingRotationEngine: public RotationEngine{
+/* Engine applying both rotation and translation, along the same axis, whence the name SpiralEngine
+ */
+class SpiralEngine:public DeusExMachina{
+	public:
+		SpiralEngine():angularVelocity(0.),linearVelocity(0.),axis(Vector3r::UNIT_X),axisPt(0,0,0){}
+		Real angularVelocity;
+		Real linearVelocity;
+		//! axis of translation and rotation (direction); will be normalized by the engine
+		Vector3r axis;
+		//! a point on the axis, to position it in space properly
+		Vector3r axisPt;
+	virtual void applyCondition(MetaBody*);
+	REGISTER_CLASS_AND_BASE(SpiralEngine,DeusExMachina);
+	REGISTER_ATTRIBUTES(DeusExMachina,(angularVelocity)(linearVelocity)(axis)(axisPt));
+};
+REGISTER_SERIALIZABLE(SpiralEngine);
+
+/*! Engine applying spiral motion, finding current angular velocity by linearly interpolating in
+ * times and velocities and translation by using slope parameter.
+ *
+ * The interpolation assumes the margin value before the first time point and last value
+ * after the last time point. If period is specified, time will wrap around, but no interpolation
+ * between last and first values is done!
+ * */
+class InterpolatingSpiralEngine: public SpiralEngine{
 	public:
 		//! list of times at which velocities are given; must be increasing
 		vector<Real> times;
-		//! list of angular velocities
-		vector<Real> velocities;
+		//! list of angular velocities; manadatorily of same length as times
+		vector<Real> angularVelocities;
+		//! period after which we will wrap time to zero (no wrapping if period<=0)
+		Real period;
+		//! axial translation per radian turn (can be negative)
+		Real slope;
 		//! holder of interpolation state, should not be touched by the user.
 		size_t pos;
-		InterpolatingRotationEngine(){pos=0;}
-		void registerAttributes(){ RotationEngine::registerAttributes(); REGISTER_ATTRIBUTE(times); REGISTER_ATTRIBUTE(velocities); REGISTER_ATTRIBUTE(pos); }
-		void applyCondition(MetaBody* rb);
-	REGISTER_CLASS_NAME(InterpolatingRotationEngine);
-	REGISTER_BASE_CLASS_NAME(RotationEngine);
+		InterpolatingSpiralEngine(): period(-1), slope(0), pos(0){}
+		virtual void applyCondition(MetaBody* rb);
+	REGISTER_CLASS_AND_BASE(InterpolatingSpiralEngine,SpiralEngine);
+	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(period)(slope)(pos));
 };
-REGISTER_SERIALIZABLE(InterpolatingRotationEngine);
+REGISTER_SERIALIZABLE(InterpolatingSpiralEngine);
+
+
 
 

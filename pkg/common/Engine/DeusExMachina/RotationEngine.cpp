@@ -13,14 +13,37 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/extra/Shop.hpp>
 
 #include<yade/pkg-common/LinearInterpolate.hpp>
 
-YADE_PLUGIN("RotationEngine","InterpolatingRotationEngine");
+YADE_PLUGIN("RotationEngine","SpiralEngine","InterpolatingSpiralEngine");
 
-void InterpolatingRotationEngine::applyCondition(MetaBody* rb){
-	angularVelocity=linearInterpolate<Real>(rb->simulationTime,times,velocities,pos);
-	RotationEngine::applyCondition(rb);
+
+void InterpolatingSpiralEngine::applyCondition(MetaBody* rb){
+	Real virtTime=period>0 ? Shop::periodicWrap(rb->simulationTime,0,period) : rb->simulationTime;
+	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,pos);
+	linearVelocity=angularVelocity*slope;
+	SpiralEngine::applyCondition(rb);
+}
+
+void SpiralEngine::applyCondition(MetaBody* rb){
+	Real dt=Omega::instance().getTimeStep();
+	axis.Normalize();
+	Quaternionr q;
+	q.FromAxisAngle(axis,angularVelocity*dt);
+	FOREACH(body_id_t id,subscribedBodies){
+		assert(id<bodies->size());
+		Body* b=Body::byId(id,rb).get();
+		ParticleParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
+		assert(rbp);
+		// translation
+		rbp->se3.position+=dt*linearVelocity*axis;
+		// rotation
+		rbp->se3.position=q*(rbp->se3.position-axisPt)+axisPt;
+		rbp->se3.orientation=q*rbp->se3.orientation;
+		rbp->se3.orientation.Normalize(); // to make sure
+	}
 }
 
 RotationEngine::RotationEngine()

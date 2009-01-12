@@ -58,7 +58,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('JumpChangeSe3',['Engine/DeusExMachina/JumpChangeSe3.cpp'], LIBS=env['LIBS']+['RigidBodyParameters']),
 	env.SharedLibrary('Se3Interpolator',['Engine/DeusExMachina/Se3Interpolator.cpp'], LIBS=env['LIBS']+['RigidBodyParameters']),
 	env.SharedLibrary('RotationEngine',['Engine/DeusExMachina/RotationEngine.cpp'],
-		LIBS=env['LIBS']+['ParticleParameters','RigidBodyParameters']),
+		LIBS=env['LIBS']+['ParticleParameters','RigidBodyParameters','Shop']),
 	env.SharedLibrary('TranslationEngine',['Engine/DeusExMachina/TranslationEngine.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters']),
 	env.SharedLibrary('CinemDNCEngine',['Engine/DeusExMachina/CinemDNCEngine.cpp'],
