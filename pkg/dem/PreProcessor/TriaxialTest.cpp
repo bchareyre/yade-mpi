@@ -164,7 +164,6 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	radiusMean=-1; // no radius specified
 	
 	isotropicCompaction=false;
-	translationSpeed = 0;
 	fixedPorosity = 1;
 
 	
@@ -234,7 +233,6 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
 	REGISTER_ATTRIBUTE(isotropicCompaction);
-	REGISTER_ATTRIBUTE(translationSpeed);
 	REGISTER_ATTRIBUTE(fixedPorosity);
 	REGISTER_ATTRIBUTE(fixedBoxDims);
 
@@ -606,7 +604,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
 	triaxialcompressionEngine->Key = Key;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
-	triaxialcompressionEngine->translationSpeed = translationSpeed;
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
 	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
 	

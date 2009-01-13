@@ -39,7 +39,7 @@ class PhysicalAction;
  * 	(deformation along the loading axis) is reached. At this point, the simulation is stopped.
  * 4. STATE_FIXED_POROSITY_COMPACTION: isotropic compaction (compression) until
  *    a chosen porosity value (parameter:fixedPorosity). The six walls move with a chosen translation speed 
- *    (parameter translationSpeed).
+ *    (parameter StrainRate).
  * 5. STATE_TRIAX_LIMBO: currently unused, since simulation is hard-stopped in the previous state.
  *
  * Transition from COMPACTION to UNLOADING is done automatically if autoUnload==true;
@@ -88,9 +88,6 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real& uniaxialEpsilonCurr;
 		//! Value of friction to use for the compression test
 		Real frictionAngleDegree;
-		
-		//! Value of translation speed
-		Real translationSpeed;
 		//! Value of porosity chosen by the user
 		Real fixedPorosity;
 		

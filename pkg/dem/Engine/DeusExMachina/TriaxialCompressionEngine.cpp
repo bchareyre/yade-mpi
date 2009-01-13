@@ -54,7 +54,6 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force),
 	epsilonMax = 0.5;
 
 	isotropicCompaction=false;
-	spheresVolume=0;
  	boxVolume=0;
 
 //	calculatedPorosity=1.1;	
@@ -97,7 +96,6 @@ void TriaxialCompressionEngine::registerAttributes()
  	REGISTER_ATTRIBUTE(isotropicCompaction);
  	REGISTER_ATTRIBUTE(spheresVolume);
  	REGISTER_ATTRIBUTE(fixedPorosity);
- 	REGISTER_ATTRIBUTE(translationSpeed);
 }
 
 void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
@@ -228,14 +226,10 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 
 		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && isotropicCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
 		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING && isotropicCompaction == false ) doStateTransition (ncb, STATE_TRIAX_LOADING );
-		//if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false )
-		//{
-		//	doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
-// 			FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
-// 				if(!b->isDynamic) continue;
-// 				const shared_ptr<Sphere>& sphere=YADE_PTR_CAST<Sphere> ( b->geometricalModel );
-// 				spheresVolume += (4./3.)*Mathr::PI*pow( sphere->radius, 3 );
-// 			}
+		if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false ) doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
+		
+
+
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
@@ -303,19 +297,19 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		Real dt = Omega::instance().getTimeStep();
 		/* Move top and bottom wall according to strain rate */
 		PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
-		p->se3.position += 0.5*translationSpeed*height*translationAxis*dt;
+		p->se3.position += 0.5*strainRate*height*translationAxis*dt;
 		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*translationSpeed*height*translationAxis*dt;
+		p->se3.position -= 0.5*strainRate*height*translationAxis*dt;
 
 		p=static_cast<PhysicalParameters*> ( Body::byId ( wall_back_id )->physicalParameters.get() );
-		p->se3.position += 0.5*translationSpeed*depth*translationAxisz*dt;
+		p->se3.position += 0.5*strainRate*depth*translationAxisz*dt;
 		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_front_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*translationSpeed*depth*translationAxisz*dt;
+		p->se3.position -= 0.5*strainRate*depth*translationAxisz*dt;
 
 		p=static_cast<PhysicalParameters*> ( Body::byId ( wall_left_id )->physicalParameters.get() );
-		p->se3.position += 0.5*translationSpeed*width*translationAxisx*dt;
+		p->se3.position += 0.5*strainRate*width*translationAxisx*dt;
 		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_right_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*translationSpeed*width*translationAxisx*dt;
+		p->se3.position -= 0.5*strainRate*width*translationAxisx*dt;
 	}
  
 }

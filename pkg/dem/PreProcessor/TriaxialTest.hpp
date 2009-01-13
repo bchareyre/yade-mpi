@@ -76,7 +76,6 @@ class TriaxialTest : public FileGenerator
 				wallOversizeFactor, // make walls bigger (/smaller) than necessary by this factor
 				radiusStdDev,
 				radiusMean,
-				translationSpeed,
 				fixedPorosity;
 		bool		 wall_top
 				,wall_bottom

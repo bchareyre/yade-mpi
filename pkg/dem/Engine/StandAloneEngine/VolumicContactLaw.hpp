@@ -36,10 +36,6 @@ class VolumicContactLaw : public InteractionSolver
 		Real compacity_max;
 		Real interpenetration_max;
 		Real delta_interpenetration_max;
-		Real rigidite_max_1;
-		Real rigidite_max_2;
-		Real rigidite_max_3;
-		Real info;
 
 
 	

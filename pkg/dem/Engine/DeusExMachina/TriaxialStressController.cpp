@@ -72,7 +72,7 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	depth = 0;
 	spheresVolume=0;
 	boxVolume=0;
-	porosity=0;
+	porosity=1;
 	height0 = 0;
 	width0 = 0;
 	depth0 = 0;
@@ -236,7 +236,7 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 		
 		firstRun = false;	
 	}
-	//porosity = ( boxVolume - spheresVolume ) /boxVolume;
+	porosity = ( boxVolume - spheresVolume ) /boxVolume;
 
 	position_top = p_top->se3.position.Y();
 	position_bottom = p_bottom->se3.position.Y();
