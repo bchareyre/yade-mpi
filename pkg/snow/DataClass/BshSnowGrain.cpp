@@ -15,7 +15,7 @@ void BshSnowGrain::registerAttributes()
 	REGISTER_ATTRIBUTE(color);
 	REGISTER_ATTRIBUTE(selection);
 	REGISTER_ATTRIBUTE(layer_distance);
-	REGISTER_ATTRIBUTE(gr_gr);
+	REGISTER_ATTRIBUTE(gr_gr); // slices
 }
 
 BshSnowGrain::BshSnowGrain(const T_DATA& dat,Vector3r c_ax,int SELECTION,Vector3r col, Real one_voxel_in_meters_is) : GeometricalModel()

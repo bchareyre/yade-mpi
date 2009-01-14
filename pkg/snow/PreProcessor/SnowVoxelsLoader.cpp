@@ -375,7 +375,7 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
+	boundingVolumeDispatcher->add("Ef2_BssSnowGrain_AABB_makeAABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 

@@ -32,6 +32,7 @@ void SpiralEngine::applyCondition(MetaBody* rb){
 	axis.Normalize();
 	Quaternionr q;
 	q.FromAxisAngle(axis,angularVelocity*dt);
+	shared_ptr<BodyContainer> bodies = rb->bodies;
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<bodies->size());
 		Body* b=Body::byId(id,rb).get();
