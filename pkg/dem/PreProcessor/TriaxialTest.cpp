@@ -277,7 +277,7 @@ bool TriaxialTest::generate()
 		bool fixedDims[3];
 		fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
 		int nScaled=(3-(int)fixedDims[0]+(int)fixedDims[1]+(int)fixedDims[2]);
-		if(nScaled==3) throw std::invalid_argument("At most 2 (not 3) axes can have fixed dimensions in fixedBoxDims if scaling for given radiusMean.");
+		if(nScaled==0) throw std::invalid_argument("At most 2 (not 3) axes can have fixed dimensions in fixedBoxDims if scaling for given radiusMean.");
 		Real boxScaleFactor=radiusMean*pow((4/3.)*Mathr::PI*numberOfGrains/(volume*(1-porosity)),1./nScaled);
 		LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling "<<nScaled<<" dimensions by "<<boxScaleFactor);
 		dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;

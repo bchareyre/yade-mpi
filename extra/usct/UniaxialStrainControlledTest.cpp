@@ -113,7 +113,7 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	// reverse if we're over the limit strain
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
-	if(Omega::instance().getCurrentIteration()%10==0 ) {
+	if(Omega::instance().getCurrentIteration()%10==0) {
 		computeAxialForce(rootBody);
 		#if 0
 			vector<Real> widths;
@@ -122,7 +122,7 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 			for(size_t i=0; i<widths.size(); i++) avgTransStrain+=(widths[i]/originalWidths[i]-1); avgTransStrain/=widths.size();
 		#endif
 		avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
-		if(recStream.good()) recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<endl; // <<" "<<avgTransStrain<<endl;
+		if(!recordFile.empty() && recStream.good()) recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<endl; // <<" "<<avgTransStrain<<endl;
 	}
 }
 

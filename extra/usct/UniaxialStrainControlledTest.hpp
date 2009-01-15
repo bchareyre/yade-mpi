@@ -131,7 +131,7 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strain, avgStress;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile="/tmp/usct.data"; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; };
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile=""; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; };
 		virtual ~UniaxialStrainer(){};
 		REGISTER_ATTRIBUTES(DeusExMachina,
 				(strainRate) 
@@ -154,7 +154,7 @@ class UniaxialStrainer: public DeusExMachina {
 				(blockDisplacements) 
 				(blockRotations) 
 		);
-		void prepareRecStream(void){ if(recordFile!="") recStream.open(recordFile.c_str()); }
+		void prepareRecStream(void){ if(!recordFile.empty()) recStream.open(recordFile.c_str()); }
 		void postProcessAttributes(bool deserializing){ if(deserializing) prepareRecStream(); } 	
 	NEEDS_BEX("Force","Momentum","GlobalStiffness");
 	REGISTER_CLASS_AND_BASE(UniaxialStrainer,DeusExMachina);
