@@ -50,8 +50,8 @@ REGISTER_SERIALIZABLE(SpiralEngine);
  * times and velocities and translation by using slope parameter.
  *
  * The interpolation assumes the margin value before the first time point and last value
- * after the last time point. If period is specified, time will wrap around, but no interpolation
- * between last and first values is done!
+ * after the last time point. If wrap is specified, time will wrap around the last times value to the first one (note that no interpolation
+ * between last and first values is done).
  * */
 class InterpolatingSpiralEngine: public SpiralEngine{
 	public:
@@ -59,16 +59,16 @@ class InterpolatingSpiralEngine: public SpiralEngine{
 		vector<Real> times;
 		//! list of angular velocities; manadatorily of same length as times
 		vector<Real> angularVelocities;
-		//! period after which we will wrap time to zero (no wrapping if period<=0)
-		Real period;
+		//! wrap t if t>times_n, i.e. t_wrapped=t-N*(times_n-times_0)
+		bool wrap;
 		//! axial translation per radian turn (can be negative)
 		Real slope;
 		//! holder of interpolation state, should not be touched by the user.
 		size_t pos;
-		InterpolatingSpiralEngine(): period(-1), slope(0), pos(0){}
+		InterpolatingSpiralEngine(): wrap(false), slope(0), pos(0){}
 		virtual void applyCondition(MetaBody* rb);
 	REGISTER_CLASS_AND_BASE(InterpolatingSpiralEngine,SpiralEngine);
-	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(period)(slope)(pos));
+	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(wrap)(slope)(pos));
 };
 REGISTER_SERIALIZABLE(InterpolatingSpiralEngine);
 

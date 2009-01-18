@@ -39,6 +39,7 @@ void GLSimulationPlayerViewer::closeEvent(QCloseEvent* ev){
 
 void GLSimulationPlayerViewer::keyPressEvent(QKeyEvent* e){
 	if(e->key()==Qt::Key_H && (e->state() & AltButton)){ if(simPlayer->isHidden()) simPlayer->show(); else simPlayer->hide(); }
+	else if(e->key()==Qt::Key_Backspace && !trigger) { trigger=true; }
 	else GLViewer::keyPressEvent(e);
 }
 

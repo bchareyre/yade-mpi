@@ -272,7 +272,8 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		body_id_t id=B->getId();
 		// add damaged contacts that have already been deleted
-		shared_ptr<BrefcomPhysParams> bpp=YADE_PTR_CAST<BrefcomPhysParams>(B->physicalParameters);
+		BrefcomPhysParams* bpp=dynamic_cast<BrefcomPhysParams*>(B->physicalParameters.get());
+		if(!bpp) continue;
 		//if(bodyDamage[B->getId()].first==0) {B->geometricalModel->diffuseColor=Vector3r(0.5,0.5,B->isDynamic?0:1); continue; }
 		int pastOrPresentContacts=bodyDamage[id].first+bpp->numBrokenCohesive;
 		if(pastOrPresentContacts>0) bpp->normDmg=(bodyDamage[id].second+bpp->numBrokenCohesive)/pastOrPresentContacts;

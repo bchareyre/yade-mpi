@@ -36,7 +36,7 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	o.engines=origEngines
 
 
-def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None):
+def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None,startWait=False):
 	"""Create video by replaying a simulation. Snapshots are taken to temporary files,
 	encoded to a .ogg stream (theora codec); temps are deleted at the end.
 
@@ -59,7 +59,8 @@ def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=2
 		savedQGLState=(viewerState if viewerState else ''),
 		dispParamsNo=dispParamsNo,
 		stride=stride,
-		postLoadHook=(postLoadHook if postLoadHook else ''))
+		postLoadHook=(postLoadHook if postLoadHook else ''),
+		startWait=startWait)
 	utils.encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=fps)
 	print "Cleaning snapshot files."
 	for f in snaps: os.remove(f)

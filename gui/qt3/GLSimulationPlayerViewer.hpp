@@ -32,6 +32,7 @@ class GLSimulationPlayerViewer: public GLViewer {
 		Real wallClock, realTime;
 		virtual string getRealTimeString();
 	public:
+		bool trigger;
 		list<string> snapshots;
 		QtSimulationPlayer* simPlayer;
 		boost::posix_time::ptime lastCheckPointTime;

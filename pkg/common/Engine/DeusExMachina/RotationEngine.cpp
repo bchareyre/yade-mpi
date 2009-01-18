@@ -21,7 +21,7 @@ YADE_PLUGIN("RotationEngine","SpiralEngine","InterpolatingSpiralEngine");
 
 
 void InterpolatingSpiralEngine::applyCondition(MetaBody* rb){
-	Real virtTime=period>0 ? Shop::periodicWrap(rb->simulationTime,0,period) : rb->simulationTime;
+	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;
 	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,pos);
 	linearVelocity=angularVelocity*slope;
 	SpiralEngine::applyCondition(rb);

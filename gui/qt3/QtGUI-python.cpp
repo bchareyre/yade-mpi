@@ -75,25 +75,21 @@ void restoreGLViewerState_num(int dispStateNo){int* i=new int(dispStateNo); QApp
  *
  * @returns tuple of (wildcard,[snap0,snap1,snap2,...]), where the list contains filename of snapshots.
  */
-python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQGLState="",int dispParamsNo=-1,int stride=1,string postLoadHook=""){
+python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQGLState="",int dispParamsNo=-1,int stride=1,string postLoadHook="",bool startWait=false){
 	evtPLAYER();
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
-	player->hide();
 	string snapBase2(snapBase);
 	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots."); }
 	glv->stride=stride;
 	glv->load(savedSim);
-	if(!postLoadHook.empty()){ PyGILState_STATE gstate; LOG_INFO("Running postLoadHook "<<postLoadHook); Py_BEGIN_ALLOW_THREADS; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); Py_END_ALLOW_THREADS; }
 	glv->saveSnapShots=true;
 	glv->snapshotsBase=snapBase2;
-	if(!savedQGLState.empty()){
-		LOG_INFO("Loading view state from "<<savedQGLState);
-		glv->setStateFileName(savedQGLState);
-		glv->restoreStateFromFile();
-		glv->setStateFileName(QString::null);
-	}
+	if(!savedQGLState.empty()){ LOG_INFO("Loading view state from "<<savedQGLState); glv->setStateFileName(savedQGLState); glv->restoreStateFromFile(); glv->setStateFileName(QString::null); }
 	if(dispParamsNo>=0) { LOG_INFO("Loading view state from state #"<<dispParamsNo); glv->useDisplayParameters(dispParamsNo);}
+	if(startWait){ LOG_INFO("[[[ Manual view setup, press BACKSPACE to start player ]]]"); glv->trigger=false; while(!glv->trigger) {usleep(200000);cerr<<"@";} }
+	if(!postLoadHook.empty()){ PyGILState_STATE gstate; LOG_INFO("Running postLoadHook "<<postLoadHook); Py_BEGIN_ALLOW_THREADS; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); Py_END_ALLOW_THREADS; }
+	player->hide();
 	glv->raise();
 	glv->startAnimation();
 	Py_BEGIN_ALLOW_THREADS;
@@ -105,7 +101,7 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 
 bool qtGuiIsActive(){return (bool)YadeQtMainWindow::self;}
 
-BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayerSession_overloads,runPlayerSession,2,6);
+BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayerSession_overloads,runPlayerSession,2,7);
 
 qglviewer::Vec tuple2vec(python::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){python::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 python::tuple vec2tuple(qglviewer::Vec v){return python::make_tuple(v[0],v[1],v[2]);};
@@ -166,7 +162,7 @@ BOOST_PYTHON_MODULE(_qt){
 	def("Renderer",ensuredRenderer,"Return wrapped OpenGLRenderingEngine; the renderer is constructed if necessary.");
 	def("close",Quit);
 	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
-	def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook")));
+	def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook","startWait")));
 	def("views",getAllViews);
 
 	BASIC_PY_PROXY_WRAPPER(pyOpenGLRenderingEngine,"GLRenderer")
