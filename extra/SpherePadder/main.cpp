@@ -10,7 +10,7 @@
 
 #include "SpherePadder.hpp"
 
-//#define DEBUG
+#define DEBUG
 
 unsigned int           mesh_format;
 vector <unsigned int>  output_format;
@@ -22,22 +22,24 @@ int main()
 { 
 #ifdef DEBUG
   
+ 
   TetraMesh * mesh = new TetraMesh();
-  mesh->read_gmsh("test2.msh");
-        
+  //mesh->read_gmsh("meshes/test2.msh");      
+  mesh->read("meshes/test.tetra");
+  
   SpherePadder * padder = new SpherePadder();
   padder->plugTetraMesh(mesh);
+  //padder->add_spherical_probe(0.7);
         
   padder->pad_5();
         
-  padder->save_mgpost("mgp.out.001");
-  padder->save_Rxyz("out.Rxyz");
-        
+ // padder->save_mgpost("mgp.out.001");
+  // padder->save_Rxyz("spheres.Rxyz");
   return 0;  
 
 #else
   
-  char                   name_with_ext[100];
+  char name_with_ext[100];
   
   bool mesh_format_is_defined      = false;
   bool mesh_file_name_is_defined   = false;  

@@ -106,9 +106,12 @@ void TetraMesh::read (const char* name)
 
 	string token;
 	meshFile >> token;
+        bool with_numbers = false;
+        unsigned int number;
 
 	while(meshFile)
 	{
+                if (token == "WITH_NUMBERS") with_numbers = true;
 		if (token == "NODES") 
 		{
 			unsigned int nbnodes;
@@ -117,6 +120,7 @@ void TetraMesh::read (const char* name)
 			meshFile >> nbnodes; 
 			for (unsigned int n = 0 ; n < nbnodes ; ++n)
 			{
+                          if (with_numbers) meshFile >> number;
 				meshFile >> N.x >> N.y >> N.z;
 				node.push_back(N);	
 			}
@@ -130,6 +134,7 @@ void TetraMesh::read (const char* name)
 			meshFile >> nbTetra;
 			for (unsigned int t = 0 ; t < nbTetra ; ++t)
 			{
+                          if (with_numbers) meshFile >> number;
 				meshFile >> T.nodeId[0] >> T.nodeId[1] >> T.nodeId[2] >> T.nodeId[3];
 				
 				// numbers begin at 0 instead of 1
@@ -327,29 +332,49 @@ void TetraMesh::organize ()
 	
 	
 	// Define tetraedre neighbors
+        bool stop = false;
 	for (unsigned int t1 = 0 ; t1 < tetraedre.size() ; ++t1)
 	{
-		for (unsigned int t2 = t1 ; t2 < tetraedre.size() ; ++t2)
+          tetraedre[t1].tetraNeighbor.push_back(t1);
+		for (unsigned int t2 = 0 ; t2 < tetraedre.size() ; ++t2)
 		{
+                  /*
 			if (   (tetraedre[t1].nodeId[0] > tetraedre[t2].nodeId[3]) 
 				|| (tetraedre[t1].nodeId[3] < tetraedre[t2].nodeId[0]) ) continue;
-                        
+                        */
+                  
                         // FIXME mettre du while... (?)
+                        stop = false;
 			for (unsigned int i = 0 ; i < 4 ; i++)
                         {
 			        for (unsigned int j = 0 ; j < 4 ; j++)
 				{
 				    if (tetraedre[t1].nodeId[i] == tetraedre[t2].nodeId[j])
 				    {
-				      tetraedre[t1].tetraNeighbor.push_back(t2);
-				      tetraedre[t2].tetraNeighbor.push_back(t1);
+				      if (t1 != t2) tetraedre[t1].tetraNeighbor.push_back(t2);
+				      //if (t1 != t2) tetraedre[t2].tetraNeighbor.push_back(t1);
+                                      stop = true;
 				      break;
 				    }
 				}
+                                if (stop) break;
                         }	  
 		}
 	}
 	
+/*
+        for (unsigned int t1 = 0 ; t1 < tetraedre.size() ; ++t1)
+        {
+          cerr << "Tetra " << t1 << " a " <<  tetraedre[t1].tetraNeighbor.size() << " voisins" << endl;
+          for (unsigned int i = 0 ; i < tetraedre[t1].tetraNeighbor.size() ; i++)
+          {
+            cerr <<  tetraedre[t1].tetraNeighbor[i] << ' ';
+          }
+          cerr << endl;
+        }
+        exit(0);
+*/
+        
         isOrganized = true;
 }
 

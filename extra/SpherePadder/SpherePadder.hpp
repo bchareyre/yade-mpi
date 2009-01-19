@@ -12,28 +12,42 @@
 #define SPHERE_PADDER_HPP
 
 #include "TetraMesh.hpp"
+#include "CellPartition.hpp"
+#include <time.h>
+#include <set>
 
-# define BEGIN_FUNCTION(arg) if (trace_functions) cerr << (arg) << "... "
-# define END_FUNCTION        if (trace_functions) cerr << "Done\n" 
+# define BEGIN_FUNCTION(arg) if (trace_functions) cerr << (arg) << "... " << flush
+# define END_FUNCTION        if (trace_functions) cerr << "Done\n" << flush
 
-enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX};
+enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX , VIRTUAL, INSERED_BY_USER, FROM_TRIANGULATION};
 
 struct Sphere
 {
-	double        x,y,z,R;
-        SphereType    type; 
-	unsigned int  tetraOwner;
+  double        x,y,z,R;
+  SphereType    type; 
+  unsigned int  tetraOwner;
 };
 
 struct Neighbor
 {
-        unsigned int i,j;	
+  unsigned int i,j;       
 };
 
 struct neighbor_with_distance
 {
-        unsigned int sphereId;
-        double       distance;
+  unsigned int sphereId;
+  double       distance;
+};
+
+class CompareNeighborId
+{
+  public:
+  bool operator()(Neighbor& N1, Neighbor& N2)
+  {
+    if (N1.i < N2.i) return true;
+    if ((N1.i == N2.i) && (N1.j < N2.j)) return true;
+    return false;
+  }
 };
 
 class SpherePadder
@@ -51,19 +65,37 @@ class SpherePadder
     void         place_at_tetra_centers ();
     void         place_at_tetra_vertexes ();
     void         cancel_overlaps ();
+    void         place_virtual_spheres ();
+    
+    // 
     unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
-    unsigned int place_sphere_4contacts (unsigned int sphereId);
-                 
+    unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_combi_max = 30000);
+    
+    // Check functions
+    void         detect_overlap ();
+    
     double       rmin,rmax,rmoy,dr;
     double       ratio;
     double       max_overlap_rate;
     unsigned int n1,n2,n3,n4,n5,n_densify;
     unsigned int nb_iter_max;
         
-    TetraMesh *     mesh;
-    vector <Sphere> sphere;
-        
+    TetraMesh *      mesh;
+    vector <Sphere>  sphere;
+    CellPartition    partition;
+   
+    // FOR ANALYSIS
+    set<Neighbor,CompareNeighborId> neighbor; // non utilise pour le moment    
+    bool probeIsDefined;
+    vector<unsigned int> sphereInProbe;
+    double xProbe,yProbe,zProbe,RProbe;
+    ofstream compacity_file;
+    
+    double compacity_in_probe(unsigned int ninsered);
+    void check_inProbe(unsigned int i);
+    
     bool trace_functions;
+    void save_granulo(const char* name);
  
   public:
    
@@ -74,10 +106,13 @@ class SpherePadder
     void save_Rxyz   (const char* name);
         
     SpherePadder();
-    // TODO destructor that clean TetraMesh*?
         
     void pad_5 ();
+    // void insert_sphere(double x, double y, double z, double R);
     // void densify ();     
+    
+    // FOR ANALYSIS
+    void add_spherical_probe(double Rfact = 1.0);   
 };
 
 
