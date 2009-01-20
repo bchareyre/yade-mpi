@@ -90,7 +90,7 @@ void PythonUI::pythonSession(){
 			PYTHON_DEFINE_STRING("script",runScript);
 			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
 			PYTHON_DEFINE_BOOL("nonInteractive",nonInteractive);
-			{ ostringstream oss; oss<<"yade.runtime.args=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }
+			{ ostringstream oss; oss<<"yade.runtime.argv=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
 		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");

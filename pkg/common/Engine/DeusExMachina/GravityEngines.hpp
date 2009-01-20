@@ -16,10 +16,9 @@ class GravityEngine : public DeusExMachina{
 		virtual ~GravityEngine(){};
 		virtual void applyCondition(MetaBody*);
 	protected :
-		virtual void registerAttributes(){REGISTER_ATTRIBUTE(gravity);}
 	NEEDS_BEX("Force");
-	REGISTER_CLASS_NAME(GravityEngine);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+	REGISTER_ATTRIBUTES(DeusExMachina,(gravity));
+	REGISTER_CLASS_AND_BASE(GravityEngine,DeusExMachina);
 };
 REGISTER_SERIALIZABLE(GravityEngine);
 

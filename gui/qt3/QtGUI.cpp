@@ -54,8 +54,15 @@ int QtGUI::run(int argc, char *argv[])
 		#endif
 		else optind--;
 	}
-	for (int index=optind+1; index<argc; index++) LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
-
+	for (int index=optind+1; index<argc; index++) {
+		#ifdef EMBED_PYTHON
+			LOG_DEBUG("Adding script parameter `"<<argv[index]<<"' from the command line.");
+			PythonUI::scriptArgs.push_back(string(argv[index]));
+			if(!PythonUI::runScript.empty()) LOG_WARN("Got parameter `"<<argv[index]<<"', but no .py script to be run!");
+		#else
+			LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
+		#endif
+	}
 	XInitThreads();
    QApplication app(argc,argv);
 	mainWindow=new YadeQtMainWindow();

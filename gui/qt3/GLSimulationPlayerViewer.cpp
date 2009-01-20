@@ -149,8 +149,8 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		}
 		xyzNames.sort();
 	} else { /* load from sqlite database */
+		LOG_INFO("Opening sqlite database `"<<fileName<<"'");
 		con=shared_ptr<sqlite3x::sqlite3_connection>(new sqlite3x::sqlite3_connection(fileName));
-		LOG_DEBUG("Opened sqlite db "<<fileName);
 		if(0==con->executeint("select count(*) from sqlite_master where name='meta';")){ LOG_ERROR("Database doesn't have the 'meta' table."); return; }
 		if(0==con->executeint("select count(*) from sqlite_master where name='records';")){ LOG_ERROR("Database doesn't have the 'records' table."); return; }
 		simPlayer->pushMessage("Database OK, loading simulation...");

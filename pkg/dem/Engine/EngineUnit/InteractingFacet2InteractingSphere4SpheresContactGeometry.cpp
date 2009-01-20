@@ -41,7 +41,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	Matrix3r facetAxisT; se31.orientation.ToRotationMatrix(facetAxisT); 
 	Matrix3r facetAxis = facetAxisT.Transpose();
 	// local orientation
-	Vector3r cl = facetAxis*(se32.position - se31.position); 
+	Vector3r cl = facetAxis*(se32.position - se31.position);  // "contact line" in facet-local coords
 
 	//
 	// BEGIN everything in facet-local coordinates
@@ -49,10 +49,17 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 	Vector3r normal = facet->nf;
 	Real L = normal.Dot(cl);
-	if (L<0) { normal=-normal; L=-L; }
+
+	bool newOnPositiveSide; // temp to save what will be maybe needed for new contact
+	if(c->interactionGeometry){ // contact already exists, use old data here
+		const bool& icopfs=YADE_CAST<SpheresContactGeometry*>(c->interactionGeometry.get())->initContactOnPositiveFacetSide;
+		if(!icopfs) { normal=-normal; L=-L; } // original contact on the other side, reverse the sense now
+	} else {
+		if (L<0) { normal=-normal; L=-L; newOnPositiveSide=false;} // new contact on the negative face, reverse and save that information so that since now this contact is always reversed
+		else newOnPositiveSide=true;
+	}
+
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
-
-
 	if (L > sphereRadius)  return false; // no contact
 
 	Vector3r cp = cl - L*normal;
@@ -108,7 +115,8 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 		if (c->interactionGeometry)
 			scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		else
-			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+			{ scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+			scm->initContactOnPositiveFacetSide=newOnPositiveSide; }
 	  
 		normal = facetAxisT*normal; // in global orientation
 		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 

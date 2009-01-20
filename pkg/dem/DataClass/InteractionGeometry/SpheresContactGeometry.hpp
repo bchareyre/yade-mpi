@@ -32,9 +32,14 @@ class SpheresContactGeometry: public InteractionGeometry{
 			contactPoint;
 		Real radius1,radius2,penetrationDepth;
 
+
+		// begin abusive storage
 		bool hasNormalViscosity;
 		Real NormalViscisity;
 		Real NormalRelativeVelocity;
+		//! Whether the original contact was on the positive or negative facet side; this is to permit repulsion to the right side even if the sphere passes, under extreme pressure, geometrically to the other facet's side. This is used only in InteractingFacet2IteractingSphere4SpheresContactGeometry.
+		bool initContactOnPositiveFacetSide;
+		// end abusive storage
 
 		bool hasShear; // whether the exact rotation code is being used -- following fields are needed for that
 		//! positions and orientations of both spheres -- must be updated at every iteration
@@ -93,28 +98,26 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();}
 		virtual ~SpheresContactGeometry();
-	protected :
-		virtual void registerAttributes(){
-			REGISTER_ATTRIBUTE(normal);
-			REGISTER_ATTRIBUTE(contactPoint);
-			REGISTER_ATTRIBUTE(radius1);
-			REGISTER_ATTRIBUTE(radius2);
-			REGISTER_ATTRIBUTE(contactPoint); // to allow access from python
+	REGISTER_ATTRIBUTES(/* no attributes from base class */,
+			(normal)
+			(contactPoint)
+			(radius1)
+			(radius2)
+			(contactPoint) // to allow access from python
+			(initContactOnPositiveFacetSide)
 			// hasShear
-			REGISTER_ATTRIBUTE(hasShear);
-			REGISTER_ATTRIBUTE(pos1);
-			REGISTER_ATTRIBUTE(pos2);
-			REGISTER_ATTRIBUTE(ori1);
-			REGISTER_ATTRIBUTE(ori2);
-			REGISTER_ATTRIBUTE(cp1rel);
-			REGISTER_ATTRIBUTE(cp2rel);
-			REGISTER_ATTRIBUTE(d1);
-			REGISTER_ATTRIBUTE(d2);
-			REGISTER_ATTRIBUTE(d0);
-			REGISTER_ATTRIBUTE(initRelOri12);
-		}
-	REGISTER_CLASS_NAME(SpheresContactGeometry);
-	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+			(hasShear)
+			(pos1)
+			(pos2)
+			(ori1)
+			(ori2)
+			(cp1rel)
+			(cp2rel)
+			(d1)
+			(d2)
+			(d0)
+			(initRelOri12));
+	REGISTER_CLASS_AND_BASE(SpheresContactGeometry,InteractionGeometry);
 	REGISTER_CLASS_INDEX(SpheresContactGeometry,InteractionGeometry);
 };
 

@@ -385,7 +385,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		['RenderingEngine/GLDrawSpheresContactGeometry/GLDrawSpheresContactGeometry.cpp'],
 		LIBS=env['LIBS']+['SpheresContactGeometry',
 			'ElasticContactInteraction',
-			'yade-opengl']),
+			'yade-opengl','$QGLVIEWER_LIB']),
 
 	env.SharedLibrary('GLDrawSDECLinkGeometry',
 		['RenderingEngine/GLDrawSDECLinkGeometry/GLDrawSDECLinkGeometry.cpp'],
