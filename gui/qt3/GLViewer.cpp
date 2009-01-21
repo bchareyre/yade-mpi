@@ -222,8 +222,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if(e->key()==Qt::Key_P) camera()->setFieldOfView(camera()->fieldOfView()*1.1);
 	else if(e->key()==Qt::Key_R){ // reverse the clipping plane; revolve around scene center if no clipping plane selected
 		if(manipulatedClipPlane>=0 && manipulatedClipPlane<renderer->clipPlaneNum){
-			//manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
-			renderer->clipPlaneSe3[manipulatedClipPlane].orientation=Quaternionr(Vector3r(0,1,0),Mathr::PI)*renderer->clipPlaneSe3[manipulatedClipPlane].orientation; 
+			/* here, we must update both manipulatedFrame orientation and renderer->clipPlaneSe3 orientation in the same way */
+			Quaternionr& ori=renderer->clipPlaneSe3[manipulatedClipPlane].orientation;
+			ori=Quaternionr(Vector3r(0,1,0),Mathr::PI)*ori; 
+			manipulatedFrame()->setOrientation(qglviewer::Quaternion(qglviewer::Vec(0,1,0),Mathr::PI)*manipulatedFrame()->orientation());
 			displayMessage("Plane #"+lexical_cast<string>(manipulatedClipPlane+1)+" reversed.");
 		}
 		else {
@@ -485,21 +487,23 @@ void GLViewer::postDraw(){
 	}
 
 	// cutting planes (should be moved to OpenGLRenderingEngine perhaps?)
-	// TODO: transparent planes
-	for(int planeId=0; planeId<renderer->clipPlaneNum; planeId++){
-		if(!renderer->clipPlaneActive[planeId] && planeId!=manipulatedClipPlane) continue;
-		glPushMatrix();
-			Real angle; Vector3r axis;	
-			const Se3r& se3=renderer->clipPlaneSe3[planeId];
-			se3.orientation.ToAxisAngle(axis,angle);	
-			glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-			glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			Real cff=1;
-			if(!renderer->clipPlaneActive[planeId]) cff=.4;
-			glColor3f(max((Real)0.,cff*cos(planeId)),max((Real)0.,cff*sin(planeId)),planeId==manipulatedClipPlane); // variable colors
-			QGLViewer::drawGrid(realSize,2*nSegments);
-			drawArrow(wholeDiameter/6);
-		glPopMatrix();
+	// only painted if one of those is being manipulated
+	if(manipulatedClipPlane>=0){
+		for(int planeId=0; planeId<renderer->clipPlaneNum; planeId++){
+			if(!renderer->clipPlaneActive[planeId] && planeId!=manipulatedClipPlane) continue;
+			glPushMatrix();
+				Real angle; Vector3r axis;	
+				const Se3r& se3=renderer->clipPlaneSe3[planeId];
+				se3.orientation.ToAxisAngle(axis,angle);	
+				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+				glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+				Real cff=1;
+				if(!renderer->clipPlaneActive[planeId]) cff=.4;
+				glColor3f(max((Real)0.,cff*cos(planeId)),max((Real)0.,cff*sin(planeId)),planeId==manipulatedClipPlane); // variable colors
+				QGLViewer::drawGrid(realSize,2*nSegments);
+				drawArrow(wholeDiameter/6);
+			glPopMatrix();
+		}
 	}
 	
 	MetaBody* rb=Omega::instance().getRootBody().get();
@@ -599,10 +603,12 @@ void GLViewer::wheelEvent(QWheelEvent* event){
 	float distStep=1e-3*sceneRadius();
 	//const float wheelSensitivityCoef = 8E-4f;
 	//Vec trans(0.0, 0.0, -event->delta()*wheelSensitivity()*wheelSensitivityCoef*(camera->position()-position()).norm());
-	float dist=-event->delta()*manipulatedFrame()->wheelSensitivity()*distStep;
+	float dist=event->delta()*manipulatedFrame()->wheelSensitivity()*distStep;
 	Vector3r normal=renderer->clipPlaneSe3[manipulatedClipPlane].orientation*Vector3r(0,0,1);
-	qglviewer::Vec nnormal(normal[0],normal[1],normal[2]);
-	manipulatedFrame()->setPosition(manipulatedFrame()->position()+nnormal*dist);
+	qglviewer::Vec newPos=manipulatedFrame()->position()+qglviewer::Vec(normal[0],normal[1],normal[2])*dist;
+	manipulatedFrame()->setPosition(newPos);
+	renderer->clipPlaneSe3[manipulatedClipPlane].position=Vector3r(newPos[0],newPos[1],newPos[2]);
+	updateGL();
 	/* in draw, bound cutting planes will be moved as well */
 }
 
