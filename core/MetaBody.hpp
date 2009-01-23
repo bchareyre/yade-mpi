@@ -40,6 +40,7 @@ class MetaBody : public Body
 
 		void setTimeSteppersActive(bool a);
 		shared_ptr<Engine> engineByName(string s);
+		shared_ptr<Engine> engineByLabel(string s);
 
 		Real dt;
 		long currentIteration;

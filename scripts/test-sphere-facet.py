@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # © Václav Šmilauer <eudoxos@arcig.cz>
 #
 # Test case for sphere-facet interaction preserving the original contact orientation.

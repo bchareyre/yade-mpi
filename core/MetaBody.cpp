@@ -85,6 +85,12 @@ shared_ptr<Engine> MetaBody::engineByName(string s){
 	return shared_ptr<Engine>();
 }
 
+shared_ptr<Engine> MetaBody::engineByLabel(string s){
+	FOREACH(shared_ptr<Engine> e, engines){
+		if(e->label==s) return e;
+	}
+	return shared_ptr<Engine>();
+}
 
 void MetaBody::setTimeSteppersActive(bool a)
 {
