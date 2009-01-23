@@ -33,6 +33,8 @@ protected:
 
 	void createSphere(shared_ptr<Body>& body, const Vector3r& position, Real radius);
 
+	DECLARE_LOGGER;
+
 	REGISTER_ATTRIBUTES(StandAloneEngine,(factoryFacets)(labelBroadInteractor))
 	REGISTER_CLASS_AND_BASE(SpheresFactory, StandAloneEngine);
 

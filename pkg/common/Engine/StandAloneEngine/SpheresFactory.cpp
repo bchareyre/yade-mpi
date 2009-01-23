@@ -16,6 +16,8 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include"SpheresFactory.hpp"
 
+CREATE_LOGGER(SpheresFactory);
+
 SpheresFactory::SpheresFactory() : first_run(true) 
 {
 
