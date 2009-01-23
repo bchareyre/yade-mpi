@@ -59,7 +59,7 @@ if runtime.nonInteractive:
 	import time;
 	while True: time.sleep(1)
 else:
-	sys.argv[0]=['<embedded python interpreter>']
+	sys.argv[0]='<embedded python interpreter>'
 	from IPython.Shell import IPShellEmbed
 	ipshell = IPShellEmbed(banner=r"""__   __    ____          ____                      _      
 \ \ / /_ _|  _ \  ___   / ___|___  _ __  ___  ___ | | ___ 

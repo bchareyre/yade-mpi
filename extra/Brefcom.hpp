@@ -136,7 +136,7 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		int numBrokenCohesive;
 		//! number of contacts with this body
 		int numContacts;
-		//! average damage including already deleted contacts
+		//! average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)
 		Real normDmg;
 		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.) {createIndex();};
 		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) );

@@ -266,7 +266,7 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 		if(!BC || !BC->isCohesive) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		bodyDamage[id1].first++; bodyDamage[id2].first++;
-		bodyDamage[id1].second+=BC->omega; bodyDamage[id2].second+=BC->omega;
+		bodyDamage[id1].second+=(1-BC->relResidualStrength); bodyDamage[id2].second+=(1-BC->relResidualStrength);
 		maxOmega=max(maxOmega,BC->omega);
 	}
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){

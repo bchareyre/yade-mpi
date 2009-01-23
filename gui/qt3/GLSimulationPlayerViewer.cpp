@@ -11,6 +11,8 @@
 #include<unistd.h>
 #include<fstream>
 #include<string>
+#include<sstream>
+#include<iomanip>
 #include<boost/lexical_cast.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
@@ -67,7 +69,10 @@ void GLSimulationPlayerViewer::animate(){
 		long framesToGo=xyzNames.size()-frameNumber;
 		if(elapsedFrames>0 && framesToGo>0){
 			long ETA_s=((now-lastCheckPointTime).total_milliseconds()/elapsedFrames)*(framesToGo)/1000;
-			simPlayer->pushMessage(lexical_cast<string>(framesToGo)+" frames to go, ETA "+lexical_cast<string>(ETA_s/3600)+":"+lexical_cast<string>((ETA_s%3600)/60)+":"+lexical_cast<string>(ETA_s%60));
+			ostringstream oss;
+			oss<<framesToGo<<" frames to go, ETA "<<ETA_s/3600<<":"<<setw(2)<<setfill('0')<<((ETA_s%3600)/60)<<":"<<setw(2)<<setfill('0')<<ETA_s%60;
+			simPlayer->pushMessage(oss.str());
+			// simPlayer->pushMessage(lexical_cast<string>(framesToGo)+" frames to go, ETA "+lexical_cast<string>(ETA_s/3600)+":"+lexical_cast<string>((ETA_s%3600)/60)+":"+lexical_cast<string>(ETA_s%60));
 		}
 		lastCheckPointTime=now;
 		lastCheckPointFrame=frameNumber;
