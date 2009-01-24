@@ -41,7 +41,7 @@ class SQLiteRecorder: public PeriodicEngine {
 		enum {REC_SE3=0,REC_RGB,REC_SENTINEL};
 		vector<string> recorders;
 		string dbFile;
-		SQLiteRecorder() {};
+		SQLiteRecorder() { /* we always want to save the first state as well */ initRun=true; };
 		~SQLiteRecorder(){ if(con) con->close(); }
 		void init(MetaBody*);
 		virtual void registerAttributes(){

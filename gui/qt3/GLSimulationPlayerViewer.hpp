@@ -47,7 +47,7 @@ class GLSimulationPlayerViewer: public GLViewer {
  		list<string>::iterator xyzNamesIter;
 		vector< shared_ptr< FilterEngine > > filters;
 	public :
-		GLSimulationPlayerViewer(QWidget* parent);
+		GLSimulationPlayerViewer(QWidget* parent,shared_ptr<OpenGLRenderingEngine> renderer);
 		virtual ~GLSimulationPlayerViewer(){};
 		void setRootBody(shared_ptr<MetaBody> rb) { rootBody = rb;};
 		void load(const string& fileName, bool fromFile=true);

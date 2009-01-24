@@ -45,7 +45,7 @@ void GLSimulationPlayerViewer::keyPressEvent(QKeyEvent* e){
 	else GLViewer::keyPressEvent(e);
 }
 
-GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget* parent): GLViewer(/*special value meaning player*/ -1,shared_ptr<OpenGLRenderingEngine>(new OpenGLRenderingEngine),parent,NULL) {
+GLSimulationPlayerViewer::GLSimulationPlayerViewer(QWidget* parent,shared_ptr<OpenGLRenderingEngine> renderer): GLViewer(/*special value meaning player*/ -1,renderer,parent,NULL) {
 	setSceneRadius(2);
 	showEntireScene();
 	resize(550, 550);

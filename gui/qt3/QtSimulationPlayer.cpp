@@ -16,6 +16,8 @@
 #include <qspinbox.h>
 #include<qlabel.h>
 #include<qstring.h>
+
+#include<yade/gui-qt3/YadeQtMainWindow.hpp>
 CREATE_LOGGER(QtSimulationPlayer);
 
 void QtSimulationPlayer::keyPressEvent(QKeyEvent* e){
@@ -25,7 +27,8 @@ void QtSimulationPlayer::keyPressEvent(QKeyEvent* e){
 }
 
 QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
-	glSimulationPlayerViewer=new GLSimulationPlayerViewer(NULL);
+	YadeQtMainWindow::self->ensureRenderer();
+	glSimulationPlayerViewer=new GLSimulationPlayerViewer(NULL,YadeQtMainWindow::self->renderer);
 	glSimulationPlayerViewer->simPlayer=this;
 	leInputConfigFile->setText(Omega::instance().getSimulationFileName());
 	enableControls(false);

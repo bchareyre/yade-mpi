@@ -9,12 +9,16 @@
  *
  * The number of times this engine is activated can be limited by setting nDo>0. In the contrary case, or if
  * the number of activations was already reached, no action will be called even if any of active period has elapsed.
+ *
+ * If initRun is set, the engine will run when called for the first time; otherwise it will only set *Last and will be
+ * called after desired period elapses for the first time.
  */
 class PeriodicEngine:  public StandAloneEngine {
 	public:
 		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast,nDo,nDone;
-		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0),nDo(-1),nDone(0) { realLast=getClock(); }
+		bool initRun;
+		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0),nDo(-1),nDone(0),initRun(false) { realLast=getClock(); }
 		virtual bool isActivated(){
 			Real virtNow=Omega::instance().getSimulationTime();
 			Real realNow=getClock();
@@ -25,6 +29,11 @@ class PeriodicEngine:  public StandAloneEngine {
 				 (iterPeriod>0 && iterNow-iterLast>=iterPeriod))){
 				realLast=realNow; virtLast=virtNow; iterLast=iterNow; nDone++;
 				return true;
+			}
+			if(nDone==0){
+				realLast=realNow; virtLast=virtNow; iterLast=iterNow; nDone++;
+				if(initRun) return true;
+				return false;
 			}
 			return false;
 		}
