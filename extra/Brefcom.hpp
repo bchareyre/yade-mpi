@@ -237,7 +237,7 @@ class BrefcomDamageColorizer: public PeriodicEngine {
 	public:
 		//! maximum damage over all contacts
 		Real maxOmega;
-		BrefcomDamageColorizer(){maxOmega=0;}
+		BrefcomDamageColorizer(){maxOmega=0; /* run at the very beginning */ initRun=true;}
 		virtual void action(MetaBody*);
 	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
 	REGISTER_CLASS_AND_BASE(BrefcomDamageColorizer,PeriodicEngine);
