@@ -167,13 +167,14 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 			sqlite3x::sqlite3_command cmd(*con,"select bodyTable,iter from 'records' ORDER BY iter;");
 			sqlite3x::sqlite3_cursor reader=cmd.executecursor();
 			assert(reader.colcount()==1);
-			long maxIter=0
+			long maxIter=0;
 			while(reader.step()){
 				xyzNames.push_back(reader.getstring(0)); // first column
 				LOG_DEBUG("Added table "<<reader.getstring(0));
 				maxIter=reader.getint(1);
 			}
-			Omega::instance().getRootBody()->stopAtIter=maxIter;
+			Omega::instance().getRootBody()->stopAtIteration=maxIter;
+			LOG_INFO("Setting stopAtIter="<<maxIter);
 		}
 	}
 	/* Filters */
