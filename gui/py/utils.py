@@ -295,7 +295,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,**kw):
 		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
 		tableFile,tableLine=tableFileLine.split(':')
 		o.tags['line']='l'+tableLine
-		ll=[l.split('#')[0] for l in open(tableFile).readlines()]; names=ll[0].split(); values=ll[int(tableLine)].split()
+		ll=[l.split('#')[0] for l in ['']+open(tableFile).readlines()]; names=ll[1].split(); values=ll[int(tableLine)].split()
 		assert(len(names)==len(values))
 		for i in range(len(names)):
 			if names[i]=='description': o.tags['description']=values[i]

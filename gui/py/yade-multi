@@ -3,25 +3,44 @@
 #
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
+import os, sys, thread, time
+
+class JobInfo():
+	def __init__(self,num,id,command,log):
+		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
+		self.command=command; self.num=num; self.log=log; self.id=id
+	def saveInfo(self):
+		log=file(self.log,'a')
+		log.write("""
+=================== JOB SUMMARY ================
+id      : %s
+status  : %d (%s)
+duration: %s
+command : %s
+started : %s
+finished: %s
+"""%(self.id,self.exitStatus,'OK' if self.exitStatus==0 else 'FAILED',self.duration,self.command,time.asctime(time.localtime(self.started)),time.asctime(time.localtime(self.finished))));
+		log.close()
 
 #
 # _MANY_ thanks to Mark Pettit for concurrent jobs handling!
 # http://code.activestate.com/recipes/534160/
 #
 
-import os, sys, thread, time
 
 def __concurrent_batch(cmd,thread_num,completion_status_dict,exit_code_dict):
 	"""Helper routine for 'concurrent_batches."""
-
-	t0=time.time()
+	job=jobs[thread_num]
+	job.started=time.time();
 	print '#%d started on %s'%(thread_num,time.asctime())
 	exit_code_dict[thread_num] = os.system(cmd)
 	completion_status_dict[thread_num] = 1  # for sum() routine
-	dt=int(time.time()-t0)
-	strDt='%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
-	strStatus='done   ' if exit_code_dict[thread_num]==0 else 'FAILED '
-	print "#%d %s (exit status %d), duration %s"%(thread_num,strStatus,exit_code_dict[thread_num],strDt)
+	job.finished=time.time(); dt=job.finished-job.started;
+	job.exitStatus=exit_code_dict[thread_num]
+	job.duration='%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
+	strStatus='done   ' if job.exitStatus==0 else 'FAILED '
+	print "#%d %s (exit status %d), duration %s, log %s"%(thread_num,strStatus,exit_code_dict[thread_num],job.duration,job.log)
+	job.saveInfo()
 
 def concurrent_batches(batchlist,maxjobs=0,maxtime=0):
 	"""Run a list of batch commands simultaneously.
@@ -104,8 +123,8 @@ if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log s
 
 print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d jobs at a time."%(executable,simul,nice,logFormat,maxJobs)
 
-ll=open(table,'r').readlines()
-availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1]) and i>0]
+ll=['']+open(table,'r').readlines()
+availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1]) and i>1]
 
 print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
 
@@ -120,13 +139,13 @@ if lineList:
 	useLines0=numRange2List(lineList)
 	for l in useLines0:
 		if l not in availableLines: print "WARNING: skipping unavailable line %d that was requested from the command line."%l
-		elif l==0: print "WARNING: skipping line 0 that should contain variable labels"
+		elif l==1: print "WARNING: skipping line 1 that should contain variable labels"
 		else: useLines+=[l]
 else: useLines=availableLines
 print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
 # find column where description is
 try:
-	idColumn=ll[0].split().index('description')
+	idColumn=ll[1].split().index('description')
 	idStrings={}
 	for i in useLines: idStrings[i]=ll[i].split()[idColumn] # textual descripion of respective lines 
 	print idStrings
@@ -135,14 +154,15 @@ except IndexError:
 	idStrings=None
 
 
-batches=[]
-for l in useLines:
+jobs=[]
+for i,l in enumerate(useLines):
 	logFile=logFormat.replace('%',str(l))
 	if idStrings: logFile=logFile.replace('@',idStrings[l])
-	batches.append('PARAM_TABLE=%s:%d nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,nice,executable,simul,logFile))
+	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,nice,executable,simul,logFile),logFile))
+
 print "Job summary:"
-for i in range(len(batches)):
-	print '   #%d:'%i, batches[i]
+for job in jobs:
+	print '   #%d (%s):'%(job.num,job.id),job.command
 # OK, go now
-concurrent_batches(batches,maxjobs=maxJobs)
+concurrent_batches([job.command for job in jobs],maxjobs=maxJobs)
 print 'All jobs finished, bye.'
