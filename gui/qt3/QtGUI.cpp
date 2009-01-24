@@ -58,7 +58,7 @@ int QtGUI::run(int argc, char *argv[])
 		#ifdef EMBED_PYTHON
 			LOG_DEBUG("Adding script parameter `"<<argv[index]<<"' from the command line.");
 			PythonUI::scriptArgs.push_back(string(argv[index]));
-			if(!PythonUI::runScript.empty()) LOG_WARN("Got parameter `"<<argv[index]<<"', but no .py script to be run!");
+			if(PythonUI::runScript.empty()) LOG_WARN("Got parameter `"<<argv[index]<<"', but no .py script to be run!");
 		#else
 			LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
 		#endif
