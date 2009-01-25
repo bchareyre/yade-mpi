@@ -132,8 +132,9 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //	}
 */
 
-/*
-	// check inside with other grain
+// check inside of selected grain, with grain 17
+
+
 //if(!surface)
 //{
 
@@ -150,8 +151,11 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 			{
 				std::cerr << "got body " << me << "\n";
 				int other=17;
-				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
-
+				if(other > 0 && other < Omega::instance().getRootBody()->bodies->size())
+				{
+				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+				if(oth)
+				{
 				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
 				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
 				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
@@ -163,7 +167,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 					for(size_t j=0 ; j < gr->slices[i].size() ; ++j)
 					{
 						Vector3r v(gr->slices[i][j]);
-						if(oth->is_inside( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
+						if(oth->is_point_inside_polyhedron( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
 						{
 //							me_inside.push_back( my_q * v+my_pos );
 							glTranslatev(v);
@@ -172,9 +176,15 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 						}
 					}
 				}
+				}
+				}
 			}
 		}
 	}
+
+
+
+// check inside of grain 17 with the selected one
 	me = 17;
 	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
 	{
@@ -185,8 +195,11 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 			{
 				std::cerr << "got body " << me << "\n";
 				int other=(int)(Omega::instance().selectedBody);
-				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
-
+				if(other > 0 && other < Omega::instance().getRootBody()->bodies->size())
+				{
+				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+				if(oth)
+				{
 				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
 				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
 				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
@@ -198,7 +211,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 					for(size_t j=0 ; j < gr->slices[i].size() ; ++j)
 					{
 						Vector3r v(gr->slices[i][j]);
-						if(oth->is_inside( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
+						if(oth->is_point_inside_polyhedron( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
 						{
 //							oth_inside.push_back( my_q * v+my_pos );
 							glTranslatev(v);
@@ -207,11 +220,17 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 						}
 					}
 				}
+				}
+				}
 			}
 		}
 	}
 //}
-*/
+
+
+
+
+
 	// check current grain insides
 //if(!surface)
 //{
@@ -228,7 +247,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //			for(float z=-1 ; z<1 ; z+=0.15)
 //			{
 //				Vector3r v=Vector3r(x,y,z)*LEN*0.7+my_pos-my_pos;
-//				if(gr->is_inside(v))
+//				if(gr->is_point_inside_polyhedron(v))
 //				{
 //					glTranslatev(v);
 //					glutSolidCube(LEN*0.02);
@@ -239,7 +258,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //	}
 //}
 /*
-	// check inside with other grain
+	// check inside with other grain (check 35000 points, very slow)
 if(!surface)
 {
 //	glBegin(GL_POINTS);
@@ -272,7 +291,7 @@ if(!surface)
 			for(float z=-1 ; z<1 ; z+=0.06)
 			{
 				Vector3r v=Vector3r(x,y,z)*LEN*1.2;
-						if(oth->is_inside( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
+						if(oth->is_point_inside_polyhedron( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
 						{
 						//	glVertex3v(v);
 					glTranslatev(v);

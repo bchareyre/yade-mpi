@@ -183,16 +183,16 @@ bool BshSnowGrain::is_point_orthogonally_projected_on_triangle(Vector3r& a,Vecto
 		// now check if the point (when projected on a plane) is within triangle a,b,c
 		// it could be faster with methods from http://softsurfer.com/Archive/algorithm_0105/algorithm_0105.htm
 		// but I don't understand them, so I prefer to use the method which I derived myself
-		Vector3r c1((a - b).Cross(d - a));
-		Vector3r c2((c - a).Cross(d - c));
-		Vector3r c3((b - c).Cross(d - b));
-		if(c1.Dot(N) > 0 && c2.Dot(N) > 0 && c3.Dot(N) > 0)
+		Vector3r c1((a - b).Cross(d - a)); // since points a,b,c are all clockwise, 
+		Vector3r c2((c - a).Cross(d - c)); // then if I put a point 'd' inside a triangle it will be clockwise
+		Vector3r c3((b - c).Cross(d - b)); // with each pair of other points, but will be counterclockwise if it's outside
+		if(c1.Dot(N) > 0 && c2.Dot(N) > 0 && c3.Dot(N) > 0) // therefore if any of them is counterclockwise, the dot product will be negative
 			return true;
 	}
 	return false;
 };
 		
-bool BshSnowGrain::is_inside(Vector3r P)
+bool BshSnowGrain::is_point_inside_polyhedron(Vector3r P)
 {
 	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(get_faces_const_ref());
 	// loop on all faces
@@ -203,24 +203,67 @@ bool BshSnowGrain::is_inside(Vector3r P)
 		Vector3r b(get<1>(f[i]));
 		Vector3r c(get<2>(f[i]));
 		Vector3r N(get<3>(f[i]));
+		Real depth = m_depths[i];
 		Real point_plane_distance = N.Dot(P - c);
 		if(   point_plane_distance < 0             // point has to be inside - on negative side of the plane
-		   && point_plane_distance > m_depths[i] ) // and has to be within the depth of this face 
+		   && point_plane_distance > depth ) // and has to be within the depth of this face 
 		{
 			if(is_point_orthogonally_projected_on_triangle(a,b,c,N,P,point_plane_distance))
 			{
-				// so a point orthogonally projected on triangle is crossing it
-				// now check if this point is inside a tetrahedron made by this triangle and a point Z at m_depths[i]
-				Vector3r Z((a+b+c)/3.0 + N*m_depths[i]);
-				Vector3r N1(-1.0*((a - b).Cross(Z - a)));
-				Vector3r N2(-1.0*((c - a).Cross(Z - c)));
-				Vector3r N3(-1.0*((b - c).Cross(Z - b)));
-				if(
-					is_point_orthogonally_projected_on_triangle(b,a,Z,N1,P) &&
-					is_point_orthogonally_projected_on_triangle(a,c,Z,N2,P) &&
-					is_point_orthogonally_projected_on_triangle(c,b,Z,N3,P)
-					)
+				if( point_plane_distance > depth*0.5 ) // (1-parallelepiped)
+				{ // that's close enough. We can speed up the computation by returning true at this point
+
+// therefore in fact, we are checking if point is inside a volume of parallelepiped (1) the height of 1/2 depth
+// within the polyhedron PLUS (that's the code below - the (2)) a polyhedron the height given by depth
+// like this:
+//              ____________     this weird shape is WHOLE polyhedron
+//             /         Z. \                                                         ------
+//            /          ' ` \                                                             |
+//           /          '2-tetrahedron with the height equal to depth of THIS trangle      |
+//          /          '     ` \                                                           | 
+//         /          '       ` \                                                          |d
+//        /          '         ` \______________ XX face (see description)                 |e - search below for
+//       /          '           `              /                                           |p 'arbitrary safety coefficient'
+//      /      ....'.............`......      /                                            |t
+//      \     '   '           1-parallelepiped with height equal to 1/2 of depth           |h
+//       \    '  '                 `   '    /                                              |
+//        \   ' '                   `  '   /                                               |
+//         \  ''                     ` '  /                                                |
+//          \ '                       `' /                                                 |
+//           \__________________________/                                             ------
+//               THIS triangular face                
+//
+// depth of a triangle is the distance from it to the opposite side of polyhedron, kind of
+// diameter in a sphere. The depth is calculated in four places: at three nodes of a triangle,
+// and in its center point. The shallowest one is chosen as the actual value. This is
+// not describing volume in exactly perfect math, but good enough, and rather fast.
+// Sometimes for example the 'depth' of some triangle can extend the volume of the real polyhedron a bit
+// on the other side. For example if that 'XX face' was closer to 'THIS triangular face' it would 
+// still be considered as inside of polyhedron, because the '1/2 depth parallelepiped' might extend beyond it.
+// this could happen if none of four (points a,b,c and center point) reached 'XX face' when calculating depth,
+// because it was off a bit, and depth calculation ended up on another face.
+
+// From this approach you can see that it's optimized for polyhedrons with large number of faces. For instance it will
+// be terribly wrong if polyhedron is just a single four-noded tetrahedron. But it will work well if polyhedron
+// is made from many triangles.
 					return true;
+				}
+				else
+				{ // (2-terhahdron)
+					// so a point orthogonally projected on triangle is crossing it
+					// now check if this point is inside a tetrahedron made by this triangle
+					// and a point 'Z' at 'depth', see picture
+					Vector3r Z((a+b+c)/3.0 + N*depth);
+					Vector3r N1((Z - a).Cross(a - b)); // normals of each face
+					Vector3r N2((Z - c).Cross(c - a)); // of tetrahedron a,b,c,Z
+					Vector3r N3((Z - b).Cross(b - c));
+					if(
+						is_point_orthogonally_projected_on_triangle(b,a,Z,N1,P) &&
+						is_point_orthogonally_projected_on_triangle(a,c,Z,N2,P) &&
+						is_point_orthogonally_projected_on_triangle(c,b,Z,N3,P)
+						)
+						return true;
+				}
 			}
 		}
 	}
@@ -256,7 +299,12 @@ int BshSnowGrain::how_many_faces()
 	if(m_how_many_faces != -1)
 		return m_how_many_faces;
 
-	std::cerr << "\nrecalculating polyhedron triangular faces depths\n";
+// sorry, I never got around to find time and to check out how LOG_WARN works .... std::cerr is fine for me ;)
+	std::cerr << "\nrecalculating the depths of polyhedron triangular faces - for faster collision detection\n";
+
+
+// CREATE TRIANGULAR FACES. usually a polyhedron has triangular faces, but here it's a snow grain.
+// it has layers, not faces, I have to make faces from layers
 
 	m_faces.clear();
 	//calculate amount of faces..
@@ -289,24 +337,28 @@ int BshSnowGrain::how_many_faces()
 	
 	m_how_many_faces = m_faces.size();
 
+
+// NOW I HAVE FACES. That's the code for usual polyhedrons, that already have faces:
+// calculating the depth for each face.
+
 	// now calculate the depth for each face
 	m_depths.resize(m_faces.size(),0);
 	// loop on all faces
 	size_t SS(m_faces.size());
 	for(size_t i = 0; i < SS ; ++i)
-		m_depths[i] = calc_depth(i)*0.7;
+		m_depths[i] = calc_depth(i)*0.7; // 0.7 is an arbitrary safety coefficient
 
 	return m_how_many_faces;
 };
 		
-Real BshSnowGrain::calc_depth(int I)
+Real BshSnowGrain::calc_depth(size_t I)
 {
 	Vector3r A(get<0>(m_faces[I]));
 	Vector3r B(get<1>(m_faces[I]));
 	Vector3r C(get<2>(m_faces[I]));
 	Vector3r N(get<3>(m_faces[I]));
 	Vector3r P((A+B+C)/3.0);
-	// ray N is cast from point P, whenre P is on some triangle.
+	// (1) ray N is cast from point P, where P is on some triangle.
 	// return the distance from P to next closest triangle
 
 	Real depth = 0;
@@ -319,12 +371,13 @@ Real BshSnowGrain::calc_depth(int I)
 		{
 			Vector3r n(get<3>(f[i]));
 			Real parallel = n.Dot(N); // 'N' parallel to 'n' gives 0 dot product
-			if( parallel < 0) // must face in opposite directions
+			if( parallel < 0) // (2) must face in opposite directions
 			{
 				Vector3r a(get<0>(f[i]));
 				Vector3r b(get<1>(f[i]));
 				Vector3r c(get<2>(f[i]));
-				for(int Z = 0 ; Z < 4 ; ++Z)
+				for(int Z = 0 ; Z < 4 ; ++Z) // (ad. 1) OK, in fact it's not just from 'P' - we cast four rays.
+				                             // From 'P' and all triangle nodes
 				{
 					Vector3r PP;
 					switch(Z)
@@ -335,7 +388,7 @@ Real BshSnowGrain::calc_depth(int I)
 						case 3 : PP = C; break;
 					}
 					Real neg_point_plane_distance = n.Dot(c - PP);
-					if( neg_point_plane_distance > 0 )
+					if( neg_point_plane_distance > 0 ) // (ad. 2) must be facing towards each other
 					{
 						// now calculate intersection point 'd' of ray 'N' from point 'PP' with the plane
 						Real u = neg_point_plane_distance/parallel;

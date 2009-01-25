@@ -50,7 +50,7 @@ class BshSnowGrain : public GeometricalModel
 		Vector3r search(const T_DATA& dat,Vector3r c,Vector3r dir);
 		Vector3r search_plane(const T_DATA& dat,Vector3r c,Vector3r dir);
 
-		bool is_inside(Vector3r point);
+		bool is_point_inside_polyhedron(Vector3r point);
 		int how_many_faces();
 		bool face_is_valid(Vector3r&,Vector3r&,Vector3r&);
 		Real depth(int i){return m_depths[i];};
@@ -58,7 +58,7 @@ class BshSnowGrain : public GeometricalModel
 		const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& get_faces_const_ref(){how_many_faces(); return m_faces;};
 	
 	private:
-		Real calc_depth(int);
+		Real calc_depth(size_t);
 		bool is_point_orthogonally_projected_on_triangle(Vector3r& a,Vector3r& b,Vector3r c,Vector3r& N,Vector3r& P,Real point_plane_distance = 0.0);
 
 		friend class boost::serialization::access;
