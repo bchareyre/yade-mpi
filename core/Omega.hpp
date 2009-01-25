@@ -46,7 +46,7 @@
 #include "Body.hpp"
 
 #ifndef FOREACH
-#	define FOREACH BOOST_FOREACH
+#	define FOREACH BOOST_FOREACH
 #endif
 
 class MetaBody;
@@ -92,7 +92,7 @@ class Omega : public Singleton<Omega>
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
 		string 				 yadeVersionName;	// FIXME - public ?
-		list<body_id_t> selectedBodies;
+		body_id_t			 selectedBody;
 	
 		// FIXME this is a hack. See  GLViewer:86
 		// problem is that currently there is no way to transmit arguments between UI and GLDraw* methods.

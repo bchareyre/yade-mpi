@@ -1,7 +1,7 @@
 #include"BshSnowGrain.hpp"
 #include<Wm3Quaternion.h>
 
-// a pixel is 20.4 microns (2.04 Ã— 10-5 meters)
+// a voxel is 20.4 microns (2.04 × 10-5 meters)
 // the sample was 10.4mm hight
 
 
@@ -170,6 +170,196 @@ Vector3r BshSnowGrain::search_plane(const T_DATA& dat,Vector3r c,Vector3r dir)
 
 	return result;
 };
+
+bool BshSnowGrain::is_point_orthogonally_projected_on_triangle(Vector3r& a,Vector3r& b,Vector3r c,Vector3r& N,Vector3r& P,Real point_plane_distance)
+{
+	// first check point - plane distance
+	if(point_plane_distance == 0.0)
+		point_plane_distance = N.Dot(P - c);
+	if( point_plane_distance < 0 )            // point has to be inside - on negative side of the plane 
+	{
+		// now calculate projection of point in the plane
+		Vector3r d(P - point_plane_distance*N);
+		// now check if the point (when projected on a plane) is within triangle a,b,c
+		// it could be faster with methods from http://softsurfer.com/Archive/algorithm_0105/algorithm_0105.htm
+		// but I don't understand them, so I prefer to use the method which I derived myself
+		Vector3r c1((a - b).Cross(d - a));
+		Vector3r c2((c - a).Cross(d - c));
+		Vector3r c3((b - c).Cross(d - b));
+		if(c1.Dot(N) > 0 && c2.Dot(N) > 0 && c3.Dot(N) > 0)
+			return true;
+	}
+	return false;
+};
+		
+bool BshSnowGrain::is_inside(Vector3r P)
+{
+	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(get_faces_const_ref());
+	// loop on all faces
+	size_t S(f.size());
+	for(size_t i = 0; i < S ; ++i)
+	{
+		Vector3r a(get<0>(f[i]));
+		Vector3r b(get<1>(f[i]));
+		Vector3r c(get<2>(f[i]));
+		Vector3r N(get<3>(f[i]));
+		Real point_plane_distance = N.Dot(P - c);
+		if(   point_plane_distance < 0             // point has to be inside - on negative side of the plane
+		   && point_plane_distance > m_depths[i] ) // and has to be within the depth of this face 
+		{
+			if(is_point_orthogonally_projected_on_triangle(a,b,c,N,P,point_plane_distance))
+			{
+				// so a point orthogonally projected on triangle is crossing it
+				// now check if this point is inside a tetrahedron made by this triangle and a point Z at m_depths[i]
+				Vector3r Z((a+b+c)/3.0 + N*m_depths[i]);
+				Vector3r N1(-1.0*((a - b).Cross(Z - a)));
+				Vector3r N2(-1.0*((c - a).Cross(Z - c)));
+				Vector3r N3(-1.0*((b - c).Cross(Z - b)));
+				if(
+					is_point_orthogonally_projected_on_triangle(b,a,Z,N1,P) &&
+					is_point_orthogonally_projected_on_triangle(a,c,Z,N2,P) &&
+					is_point_orthogonally_projected_on_triangle(c,b,Z,N3,P)
+					)
+					return true;
+			}
+		}
+	}
+	return false;
+};
+
+bool BshSnowGrain::face_is_valid(Vector3r& a,Vector3r& b,Vector3r& c)
+{
+	if(a != b && b != c && c != a)
+		return true;
+	return false;
+};
+
+void BshSnowGrain::push_face(Vector3r a,Vector3r b,Vector3r c)
+{
+	if(face_is_valid(a,b,c))
+	{
+		Vector3r n((a - b).Cross(c - a));
+		if(n.SquaredLength() != 0)
+		{
+			n /= n.Length();
+			m_faces.push_back(boost::make_tuple(a,b,c,n));
+		} else
+		{
+			std::cerr << "Face has no normal!\n";
+			n=Vector3r(1,0,0);
+		}
+	}
+}
+		
+int BshSnowGrain::how_many_faces()
+{
+	if(m_how_many_faces != -1)
+		return m_how_many_faces;
+
+	std::cerr << "\nrecalculating polyhedron triangular faces depths\n";
+
+	m_faces.clear();
+	//calculate amount of faces..
+
+	// connected to START - the middle point in first layer
+	int S = slices[0].size();
+	Vector3r START(slices[0][0]);
+	for(int j = 1 ; j < S ; ++j)
+		START += slices[0][j];
+	START /= (float)(S);
+	for(int j = 0 ; j < S ; ++j)
+		push_face( slices[0][j] , slices[0][(j+1 < S) ? (j+1):0] , START );
+
+	// all triangles between layers
+	int L = slices.size();
+	for(int i = 1 ; i < L ; ++i)
+		for(int j = 0 ; j < S/*slices[i].size()*/ ; ++j)
+		{
+			push_face( slices[i][j] , slices[i-1][j] , slices[i-1][(j-1 > 0) ? (j-1):(S-1)] );
+			push_face( slices[i][j] , slices[i][(j+1 < S) ? (j+1):0] , slices[i-1][j] );
+		}
+	
+	// connected to END - the middle point in last layer
+	Vector3r END(slices[L-1][0]);
+	for(int j = 1 ; j < S ; ++j)
+		END += slices[L-1][j];
+	END /= (float)(S);
+	for(int j = 0 ; j < S ; ++j)
+		push_face( slices[L-1][j] , END , slices[L-1][(j+1 < S) ? (j+1):0] );
+	
+	m_how_many_faces = m_faces.size();
+
+	// now calculate the depth for each face
+	m_depths.resize(m_faces.size(),0);
+	// loop on all faces
+	size_t SS(m_faces.size());
+	for(size_t i = 0; i < SS ; ++i)
+		m_depths[i] = calc_depth(i)*0.7;
+
+	return m_how_many_faces;
+};
+		
+Real BshSnowGrain::calc_depth(int I)
+{
+	Vector3r A(get<0>(m_faces[I]));
+	Vector3r B(get<1>(m_faces[I]));
+	Vector3r C(get<2>(m_faces[I]));
+	Vector3r N(get<3>(m_faces[I]));
+	Vector3r P((A+B+C)/3.0);
+	// ray N is cast from point P, whenre P is on some triangle.
+	// return the distance from P to next closest triangle
+
+	Real depth = 0;
+	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(get_faces_const_ref());
+	// loop on all faces
+	size_t S(f.size());
+	for(size_t i = 0; i < S ; ++i)
+	{
+		if(I != i) // don't check with itself
+		{
+			Vector3r n(get<3>(f[i]));
+			Real parallel = n.Dot(N); // 'N' parallel to 'n' gives 0 dot product
+			if( parallel < 0) // must face in opposite directions
+			{
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				for(int Z = 0 ; Z < 4 ; ++Z)
+				{
+					Vector3r PP;
+					switch(Z)
+					{
+						case 0 : PP = P; break;
+						case 1 : PP = A; break;
+						case 2 : PP = B; break;
+						case 3 : PP = C; break;
+					}
+					Real neg_point_plane_distance = n.Dot(c - PP);
+					if( neg_point_plane_distance > 0 )
+					{
+						// now calculate intersection point 'd' of ray 'N' from point 'PP' with the plane
+						Real u = neg_point_plane_distance/parallel;
+						Vector3r d(PP + u*N);
+						// now check if the point 'd' (when projected on a plane) is within triangle a,b,c
+						Vector3r c1((a - b).Cross(d - a));
+						Vector3r c2((c - a).Cross(d - c));
+						Vector3r c3((b - c).Cross(d - b));
+						if(c1.Dot(n) > 0 && c2.Dot(n) > 0 && c3.Dot(n) > 0)
+						{
+							if(depth == 0)
+							{ 
+								depth = u;
+							} else {
+								depth = std::max(depth , u ); // get the shallowest one
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return depth;
+}
 
 YADE_PLUGIN("BshSnowGrain","Grrrr");
 

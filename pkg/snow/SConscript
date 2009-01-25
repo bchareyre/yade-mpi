@@ -17,10 +17,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-snow',[
 		'BssSnowGrain','InteractingSphere','InteractingSphere2InteractingSphere4SpheresContactGeometry']),
 
 	env.SharedLibrary('Ef1_BssSnowGrain_glDraw',['RenderingEngine/Ef1_BssSnowGrain_glDraw.cpp'],
-		LIBS=env['LIBS']+['BshSnowGrain','yade-opengl','yade-base','GLDrawInteractingSphere','BssSnowGrain']),
+		LIBS=env['LIBS']+['BshSnowGrain','yade-opengl','yade-base','GLDrawInteractingSphere','BssSnowGrain','$QGLVIEWER_LIB']),
 
 	env.SharedLibrary('Ef1_BshSnowGrain_glDraw',['RenderingEngine/Ef1_BshSnowGrain_glDraw.cpp'],
-		LIBS=env['LIBS']+['BshSnowGrain','yade-opengl','yade-base']),
+		LIBS=env['LIBS']+['BshSnowGrain','yade-opengl','yade-base','$QGLVIEWER_LIB']),
 
 	env.SharedLibrary('BshSnowGrain',['DataClass/BshSnowGrain.cpp'],LIBS=['boost_serialization','yade-base']),
 	env.SharedLibrary('BssSnowGrain',['DataClass/BssSnowGrain.cpp'],LIBS=['boost_serialization','yade-base','BshSnowGrain','InteractingSphere']),

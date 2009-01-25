@@ -6,9 +6,11 @@
 #include<vector>
 #include<boost/serialization/vector.hpp>
 #include<boost/serialization/shared_ptr.hpp>
+#include<boost/tuple/tuple.hpp>
 
 typedef std::vector< std::vector<std::vector<unsigned char> > > T_DATA;
 
+// delete this class after we migrate to boost::serialization
 class Grrrr : public Serializable
 { // a workaround to stupid bug in yade::serialization
 	public:
@@ -36,14 +38,29 @@ class BshSnowGrain : public GeometricalModel
 		std::vector<std::vector<Vector3r> > slices;
 		Real layer_distance;
 
+		int m_how_many_faces;
+		std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> > m_faces; // A,B,C,normal
+		std::vector<float> m_depths; // depth for each face (allows faster checking of collision).
+		// depths are negative numbers! positive number would be an altitude and means that point is _above_ the face
+
 		std::vector<Grrrr> gr_gr;
 	public: 
-		BshSnowGrain():GeometricalModel(){createIndex();};
+		BshSnowGrain():GeometricalModel(){createIndex(); m_how_many_faces=-1;};
 		BshSnowGrain(const T_DATA& dat,Vector3r c_axis,int SELECTION,Vector3r col,Real one_voxel_in_meters_is);
 		Vector3r search(const T_DATA& dat,Vector3r c,Vector3r dir);
 		Vector3r search_plane(const T_DATA& dat,Vector3r c,Vector3r dir);
+
+		bool is_inside(Vector3r point);
+		int how_many_faces();
+		bool face_is_valid(Vector3r&,Vector3r&,Vector3r&);
+		Real depth(int i){return m_depths[i];};
+		void push_face(Vector3r,Vector3r,Vector3r);
+		const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& get_faces_const_ref(){how_many_faces(); return m_faces;};
 	
 	private:
+		Real calc_depth(int);
+		bool is_point_orthogonally_projected_on_triangle(Vector3r& a,Vector3r& b,Vector3r c,Vector3r& N,Vector3r& P,Real point_plane_distance = 0.0);
+
 		friend class boost::serialization::access;
 		template<class Archive>
 		void serialize(Archive & ar, unsigned int version)
@@ -72,6 +89,7 @@ class BshSnowGrain : public GeometricalModel
 		{
 			if(loading)
 			{
+				m_how_many_faces = -1;
 				slices.clear();
 				BOOST_FOREACH(Grrrr& g,gr_gr)
 					slices.push_back(g.grr);

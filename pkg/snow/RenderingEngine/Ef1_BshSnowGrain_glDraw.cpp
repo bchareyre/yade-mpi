@@ -9,6 +9,30 @@
 #include"Ef1_BshSnowGrain_glDraw.hpp"
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/core/Omega.hpp>
+#include<yade/core/MetaBody.hpp>
+#include<yade/lib-QGLViewer/qglviewer.h>
+
+bool light_selection(int which)
+{
+	GLfloat matAmbient[4];
+	int select = Omega::instance().isoSec;
+	if(select == which)
+	{
+		matAmbient[0] = 0.2;
+		matAmbient[1] = 0.2;
+		matAmbient[2] = 0.2;
+		matAmbient[3] = 0.0;
+	} else
+	{
+		matAmbient[0] = 0.0;
+		matAmbient[1] = 0.0;
+		matAmbient[2] = 0.0;
+		matAmbient[3] = 0.0;
+	}
+	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
+	return (select == which);
+};
 
 
 void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
@@ -17,57 +41,33 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	BshSnowGrain* gr = static_cast<BshSnowGrain*>(gm.get());
 	Real LEN=(gr->start - gr->end).Length();
 
-//	glTranslatef(gr->center[0],gr->center[1],gr->center[2]);
 	glColor3f(0.5,0.5,1.0);
 	glutSolidCube(LEN*0.1);
-//	glTranslatef(-gr->center[0],-gr->center[1],-gr->center[2]);
 
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
 
-//	std::cerr << gr->slices.size() << " ===========  \n";
-
-	if(surface)
-	{
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_LIGHTING);
-		glShadeModel(GL_FLAT);
-		Vector3r prev(1,0,0);
-		//glShadeModel(GL_SMOOTH);
-		//glColor3f(gr->color[0],gr->color[1],gr->color[2]);
-		for(int i=0;i<gr->slices.size()-1;++i)
+	int current(0);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_LIGHTING);
+	glShadeModel(GL_FLAT);
+	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(gr->get_faces_const_ref());
+	glBegin(GL_TRIANGLES);
+		for(size_t i = 0; i < f.size() ; ++i)
 		{
-			glBegin(GL_QUAD_STRIP);
-				for(int j=0;j<gr->slices[i].size()-1;++j)
-				{
-					Vector3r n=((gr->slices[i  ][j] - gr->slices[i+1][j]).Cross(gr->slices[i  ][j+1] - gr->slices[i][j]));
-					n.Normalize();
-					if(n.SquaredLength() == 0)
-						n=prev;
-					else
-						prev=n;
-					/*
-					Vector3<long double> p1;p1[0]=(gr->slices[i  ][j])[0];p1[1]=(gr->slices[i  ][j])[1];p1[2]=(gr->slices[i  ][j])[2];
-					Vector3<long double> p2;p2[0]=(gr->slices[i+1][j])[0];p2[1]=(gr->slices[i+1][j])[1];p2[2]=(gr->slices[i+1][j])[2];
-					Vector3<long double> p3;p3[0]=(gr->slices[i  ][j+1])[0];p3[1]=(gr->slices[i  ][j+1])[1];p3[2]=(gr->slices[i  ][j+1])[2];
-					Vector3<long double> p4;p4[0]=(gr->slices[i][j])[0];p4[1]=(gr->slices[i][j])[1];p4[2]=(gr->slices[i][j])[2];
-					Vector3<long double> a(p1 - p2),b(p3 - p4);
-					Vector3<long double> n=a.Cross(b); 
-					n /= std::sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
-					*/
-
-					glVertex3d(gr->slices[i  ][j][0],gr->slices[i  ][j][1],gr->slices[i  ][j][2]);
-					glVertex3d(gr->slices[i+1][j][0],gr->slices[i+1][j][1],gr->slices[i+1][j][2]);
-					glNormal3f(n[0],n[1],n[2]);
-				}
-				glVertex3d(gr->slices[i  ][0][0],gr->slices[i  ][0][1],gr->slices[i  ][0][2]);
-				glVertex3d(gr->slices[i+1][0][0],gr->slices[i+1][0][1],gr->slices[i+1][0][2]);
-			glEnd();
+			if(light_selection(current++) || surface)
+			{
+				glNormal3v(get<3>(f[i]));
+				glVertex3v(get<0>(f[i]));
+				glVertex3v(get<1>(f[i]));
+				glVertex3v(get<2>(f[i]));
+			}
 		}
-		glShadeModel(GL_SMOOTH);
-		glEnable(GL_CULL_FACE);
-	}
-	else
+	glEnd();
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_CULL_FACE);
+
+	if(!surface)
 	{
 		glDisable(GL_LIGHTING);
 		glBegin(GL_LINE_STRIP);
@@ -76,38 +76,220 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 			glVertex3d(gr->end[0]  ,gr->end[1]  ,gr->end[2]);
 		glEnd();
 			glColor3v(gm->diffuseColor);
-			for(int i=0;i < gr->slices.size();++i)
+			for(size_t i=0;i < gr->slices.size();++i)
 			{
 				glBegin(GL_LINE_STRIP);
-					for(int j=0 ; j < gr->slices[i].size() ; ++j)
-						glVertex3d(gr->slices[i][j][0],gr->slices[i][j][1],gr->slices[i][j][2]);
-					glVertex3d(gr->slices[i][0][0],gr->slices[i][0][1],gr->slices[i][0][2]);
+					for(size_t j=0 ; j < gr->slices[i].size() ; ++j)
+						glVertex3v(gr->slices[i][j]);
+					glVertex3v(gr->slices[i][0]);
 				glEnd();
 			}
 		glEnable(GL_LIGHTING);
 	}
-//	glTranslatef(gr->center[0],gr->center[1],gr->center[2]);
-/*	// FIXME : check that : one of those 2 lines are useless
-  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
-	glColor3v(gm->diffuseColor);
-	
-	Vector3r &extents = (static_cast<Box*>(gm.get()))->extents;
-	
-	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 
-	if (gm->wire || wire)
-	{
-		glDisable(GL_LIGHTING);
-		glutWireCube(1);
-	}
-	else
-	{
-		glEnable(GL_LIGHTING);
-		glutSolidCube(1);
-	}
+/*
+	// plot depth tetrahedron of selected surface
+
+//	int me = (int)(Omega::instance().selectedBody);
+//	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+//	{
+//		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+//		if(m && m==gr)
+//		{
+//			if(gr->slices[0][0] == m->slices[0][0])
+//			{
+	current = 0;
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_LIGHTING);
+	glBegin(GL_LINES);
+		for(size_t i = 0; i < f.size() ; ++i)
+		{
+			if(light_selection(current++) || surface)
+			{
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				Vector3r n(get<3>(f[i]));
+				Real l = gr->depth(i);
+				Vector3r C((a+b+c)/3.0);
+				n = n * l;
+				//QGLViewer::drawArrow(toQGLViewierVec(C), toQGLViewierVec(n), l*0.05, 8);
+				if(light_selection(current-1)) glColor3f(1.0,0.0,0.0); else glColor3f(0.0,1.0,0.0);
+				glVertex3v(a);
+				glVertex3v(C+n);
+				glVertex3v(b);
+				glVertex3v(C+n);				
+				glVertex3v(c);
+				glVertex3v(C+n);
+			}
+		}
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_CULL_FACE);
+
+//			}
+//		}
+//	}
 */
-}
 
+/*
+	// check inside with other grain
+//if(!surface)
+//{
+
+//	std::vector<Vector3r> me_inside;me_inside.clear();
+//	std::vector<Vector3r> oth_inside;oth_inside.clear();
+
+	int me = (int)(Omega::instance().selectedBody);
+	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+	{
+		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+		if(m && m==gr)
+		{
+			if(gr->slices[0][0] == m->slices[0][0])
+			{
+				std::cerr << "got body " << me << "\n";
+				int other=17;
+				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+
+				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
+				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
+				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
+				Quaternionr oth_q((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.orientation);
+
+				glColor3f(1,0,0);
+				for(size_t i=0;i < gr->slices.size();++i)
+				{
+					for(size_t j=0 ; j < gr->slices[i].size() ; ++j)
+					{
+						Vector3r v(gr->slices[i][j]);
+						if(oth->is_inside( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
+						{
+//							me_inside.push_back( my_q * v+my_pos );
+							glTranslatev(v);
+							glutSolidCube(LEN*0.01);
+							glTranslatev(-v);
+						}
+					}
+				}
+			}
+		}
+	}
+	me = 17;
+	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+	{
+		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+		if(m && m==gr)
+		{
+			if(gr->slices[0][0] == m->slices[0][0])
+			{
+				std::cerr << "got body " << me << "\n";
+				int other=(int)(Omega::instance().selectedBody);
+				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+
+				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
+				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
+				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
+				Quaternionr oth_q((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.orientation);
+
+				glColor3f(0,1,1);
+				for(size_t i=0;i < gr->slices.size();++i)
+				{
+					for(size_t j=0 ; j < gr->slices[i].size() ; ++j)
+					{
+						Vector3r v(gr->slices[i][j]);
+						if(oth->is_inside( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
+						{
+//							oth_inside.push_back( my_q * v+my_pos );
+							glTranslatev(v);
+							glutSolidCube(LEN*0.01);
+							glTranslatev(-v);
+						}
+					}
+				}
+			}
+		}
+	}
+//}
+*/
+	// check current grain insides
+//if(!surface)
+//{
+//	int me = (int)(Omega::instance().selectedBody);
+//	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+//	{
+//		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+//		if(m && m==gr)
+//		{
+//			Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
+//
+//			for(float x=-1 ; x<1 ; x+=0.15)
+//			for(float y=-1 ; y<1 ; y+=0.15)
+//			for(float z=-1 ; z<1 ; z+=0.15)
+//			{
+//				Vector3r v=Vector3r(x,y,z)*LEN*0.7+my_pos-my_pos;
+//				if(gr->is_inside(v))
+//				{
+//					glTranslatev(v);
+//					glutSolidCube(LEN*0.02);
+//					glTranslatev(-v);
+//				}
+//			}
+//		}
+//	}
+//}
+/*
+	// check inside with other grain
+if(!surface)
+{
+//	glBegin(GL_POINTS);
+	int me = (int)(Omega::instance().selectedBody);
+	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+	{
+		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+		if(m)
+		{
+			if(gr->slices[0][0] == m->slices[0][0])
+			{
+				std::cerr << "got body " << me << "\n";
+				int other=17;
+				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+
+				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
+				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
+				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
+				Quaternionr oth_q((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.orientation);
+
+				glColor3f(1,0,0);
+//				for(size_t i=0;i < gr->slices.size();++i){
+//					for(size_t j=0 ; j < gr->slices[i].size() ; ++j){
+//						Vector3r v(gr->slices[i][j]);
+
+
+
+			for(float x=-1 ; x<1 ; x+=0.06)
+			for(float y=-1 ; y<1 ; y+=0.06)
+			for(float z=-1 ; z<1 ; z+=0.06)
+			{
+				Vector3r v=Vector3r(x,y,z)*LEN*1.2;
+						if(oth->is_inside( oth_q.Conjugate()*(my_q * v+my_pos-oth_pos)))
+						{
+						//	glVertex3v(v);
+					glTranslatev(v);
+					glutSolidCube(LEN*0.01);
+					glTranslatev(-1.0*(v));
+						}
+			}
+//					}
+//				}
+			}
+		}
+	}
+//	glEnd();
+}
+*/
+
+}
 
 YADE_PLUGIN();
 

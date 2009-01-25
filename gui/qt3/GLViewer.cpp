@@ -251,10 +251,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 // FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
 	else if(e->key()==Qt::Key_Delete) Omega::instance().isoValue-=0.05;
 	else if(e->key()==Qt::Key_Insert) Omega::instance().isoValue+=0.05;
-	else if(e->key()==Qt::Key_Next) Omega::instance().isoThick-=0.05;
-	else if(e->key()==Qt::Key_Prior)	Omega::instance().isoThick+=0.05;
-	else if(e->key()==Qt::Key_End) Omega::instance().isoSec=std::max(1, Omega::instance().isoSec-1);
-	else if(e->key()==Qt::Key_Home) Omega::instance().isoSec+=1;
+	else if(e->key()==Qt::Key_Next)   Omega::instance().isoThick-=0.05;
+	else if(e->key()==Qt::Key_Prior)  Omega::instance().isoThick+=0.05;
+	else if(e->key()==Qt::Key_End)    Omega::instance().isoSec=std::max(0, Omega::instance().isoSec-1);//, std::cerr << Omega::instance().isoSec << "\n";
+	else if(e->key()==Qt::Key_Home)   Omega::instance().isoSec+=1;//, std::cerr << Omega::instance().isoSec << "\n";
 // FIXME END
 
 //////////////////////////////////////////////
@@ -352,11 +352,16 @@ void GLViewer::draw()
 	if(Omega::instance().getRootBody()){
 		int selection = selectedName();
 		if(selection!=-1 && (*(Omega::instance().getRootBody()->bodies)).exists(selection)){
-			Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
-			Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
-			float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);v[0]=v0;v[1]=v1;v[2]=v2;
-			double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);	q[0]=q0;q[1]=q1;q[2]=q2;q[3]=q3;
+			static int last(-1);
+			if(last == selection) // delay by one redraw, so the body will not jump into 0,0,0 coords
+			{
+				Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
+				Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
+				float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);v[0]=v0;v[1]=v1;v[2]=v2;
+				double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);	q[0]=q0;q[1]=q1;q[2]=q2;q[3]=q3;
+			}
 			(*(Omega::instance().getRootBody()->bodies))[selection]->userForcedDisplacementRedrawHook();	
+			last=selection;
 		}
 		if(manipulatedClipPlane>=0){
 			assert(manipulatedClipPlane<renderer->clipPlaneNum);
@@ -392,6 +397,7 @@ void GLViewer::postSelection(const QPoint& point)
 	if(selection<0){
 		if(isMoving){
 			displayMessage("Moving finished"); mouseMovesCamera(); isMoving=false;
+			Omega::instance().selectedBody = -1;
 		}
 		return;
 	}
@@ -403,12 +409,13 @@ void GLViewer::postSelection(const QPoint& point)
 		}
 		setSelectedName(selection);
 		LOG_DEBUG("New selection "<<selection);
-		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
+		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
 		wasDynamic=Body::byId(selection)->isDynamic;
 		Body::byId(selection)->isDynamic = false;
 		Quaternionr& q = Body::byId(selection)->physicalParameters->se3.orientation;
 		Vector3r&    v = Body::byId(selection)->physicalParameters->se3.position;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
+		Omega::instance().selectedBody = selection;
 	}
 }
 

@@ -7,9 +7,6 @@
 #include "VoxelEnvelope.hpp"
 #include <unistd.h>
 
-inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
-inline Vector3r       toVec(qglviewer::Vec v){return Vector3r(v[0],v[1],v[2]);};
-
 DataSurface::DataSurface()
 {
 	m_voxel_surfaces.clear();
