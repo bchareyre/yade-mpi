@@ -95,6 +95,9 @@ class PersistentSAPCollider : public BroadInteractor
 		/// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
 		void action(MetaBody *);
 
+		/// return true if BoundingVolume is in potential interaction
+		bool probeBoundingVolume(const BoundingVolume& bv);
+
 		//! When creating transient interaction, look first if a persistent link between the pair in question exists; in that case, skip it.
 		bool noTransientIfPersistentExists;
 		//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.

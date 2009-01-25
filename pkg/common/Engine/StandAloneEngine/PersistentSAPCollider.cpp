@@ -104,6 +104,27 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	}
 }
 
+bool PersistentSAPCollider::probeBoundingVolume(const BoundingVolume& bv)
+{
+	probedBodies.clear();
+	for( vector<shared_ptr<AABBBound> >::iterator 
+			it=xBounds.begin(),et=xBounds.end(); it < et; ++it)
+	{
+		if ((*it)->value > bv.max[0]) break;
+		if (!(*it)->lower) continue;
+		int offset = 3*(*it)->id;
+		if (!(maxima[offset] < bv.min[0] ||
+				minima[offset+1] > bv.max[1] ||
+				maxima[offset+1] < bv.min[1] ||
+				minima[offset+2] > bv.max[2] ||
+				maxima[offset+2] < bv.min[2] )) 
+		{
+			probedBodies.push_back((*it)->id);
+		}
+	}
+	return (bool)probedBodies.size();
+}
+
 
 void PersistentSAPCollider::updateIds(unsigned int nbElements)
 {

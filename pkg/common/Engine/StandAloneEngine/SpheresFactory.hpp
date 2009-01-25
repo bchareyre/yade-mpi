@@ -8,7 +8,8 @@
 #ifndef ___SPHERESFACTORYENGINE___
 #define ___SPHERESFACTORYENGINE___
 
-#include <yade/core/StandAloneEngine.hpp>
+#include <yade/pkg-common/PeriodicEngines.hpp>
+#include <yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include <yade/core/BroadInteractor.hpp>
 #include <yade/core/MetaBody.hpp>
 #include <vector>
@@ -16,26 +17,87 @@
 
 using namespace std;
 
-class SpheresFactory : public StandAloneEngine {
+/// @brief Produces spheres over the course of a simulation. 
+class SpheresFactory : public PeriodicEngine {
 public:
 
 	SpheresFactory();
 	virtual ~SpheresFactory();
 
+	/// @brief Create one sphere per call.
 	virtual void action(MetaBody*);
 
+	/// @brief The geometry of the surface on which spheres will be placed. 
 	vector<body_id_t> factoryFacets; 
-	string labelBroadInteractor;
 
-protected:
+	/// @brief Max attemps to place sphere.
+	/// If placing the sphere in certain random position would cause an overlap with any other physical body in the model, SpheresFactory will try to find another position. Default 20 attempts allow.
+	int maxAttempts; 
+
+	/// @brief Mean radius of spheres.
+	Real radius; 
+
+	/// @brief Half size of a radii distribution interval.
+	/// New sphere will have random radius within the range radius±radiusRange.
+	Real radiusRange;
+
+	/// @brief Mean velocity of spheres.
+	Vector3r velocity;
+
+	/// @brief Half size of a velocities distribution interval.
+	/// New sphere will have random velocity within the range velocity±velocityRange.
+	Vector3r velocityRange;
+	
+	/// @brief Mean angularVelocity of spheres.
+	Vector3r angularVelocity;
+
+	/// @brief Half size of a angularVelocity distribution interval.
+	/// New sphere will have random angularVelocity within the range angularVelocity±angularVelocityRange.
+	Vector3r angularVelocityRange;
+
+	/// @brief Young modulus.
+	Real young;
+	/// @brief Poisson ratio.
+	Real poisson;
+	/// @brief Density of material.
+	Real density;
+	/// @brief Friction angle (radians).
+	Real frictionAngle;
+	/// @brief Color.
+	Vector3r color;
+
+private:
+	/// @brief Pointer to BroadInteractor.
+	/// It is necessary in order to probe the bounding volume for new sphere.
 	BroadInteractor* bI;
+	
+	/// @brief Pointer to InteractionGeometryMetaEngine.
+	/// It is necessary in order to detect a real overlap with other bodies.
+	InteractionGeometryMetaEngine* iGME;
+
 	bool first_run;
 
-	void createSphere(shared_ptr<Body>& body, const Vector3r& position, Real radius);
+	void createSphere(shared_ptr<Body>& body, const Vector3r& position, Real r);
+
+	typedef	boost::variate_generator<boost::minstd_rand,boost::uniform_int<> > RandomInt;
+	shared_ptr<RandomInt> randomFacet;
 
 	DECLARE_LOGGER;
 
-	REGISTER_ATTRIBUTES(StandAloneEngine,(factoryFacets)(labelBroadInteractor))
+	REGISTER_ATTRIBUTES(PeriodicEngine,
+			(factoryFacets)
+			(maxAttempts)
+			(radius)
+			(radiusRange)
+			(velocity)
+			(velocityRange)
+			(angularVelocity)
+			(angularVelocityRange)
+			(young)
+			(poisson)
+			(density)
+			(frictionAngle)
+			(color))
 	REGISTER_CLASS_AND_BASE(SpheresFactory, StandAloneEngine);
 
 };

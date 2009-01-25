@@ -74,7 +74,7 @@ o.engines=[
 	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
 	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
 	## Apply kinematics to walls
-	DeusExMachina('RotationEngine',{'subscribedBodies':range(imported),'rotationAxis':[0,0,1],'rotateAroundZero':True,'angularVelocity':0.5}),
+	DeusExMachina('RotationEngine',{'subscribedBodies':imported,'rotationAxis':[0,0,1],'rotateAroundZero':True,'angularVelocity':0.5}),
 ]
 
 ## Save the scene to file, so that it can be loaded later. Supported extension are: .xml, .xml.gz, .xml.bz2.

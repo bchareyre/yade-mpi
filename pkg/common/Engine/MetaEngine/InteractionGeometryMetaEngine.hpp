@@ -37,7 +37,7 @@ class InteractionGeometryMetaEngine :	public MetaEngine2D
 {
 	public :
 		virtual void action(MetaBody*);
-		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body> b2);
+		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2);
 
 	REGISTER_CLASS_NAME(InteractionGeometryMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);

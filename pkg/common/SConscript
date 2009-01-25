@@ -153,7 +153,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	#	CPPPATH=env['CPPPATH']+['Engine/StandAloneEngine', '$PREFIX/include', '/home/bruno/micromacro/KdevMicroMacro/src']),
     
 	env.SharedLibrary('SpheresFactory',['Engine/StandAloneEngine/SpheresFactory.cpp'],
-		LIBS=env['LIBS']+['AABB','InteractingSphere','InteractingFacet','Sphere','BodyMacroParameters','PersistentSAPCollider']),
+		LIBS=env['LIBS']+['AABB','InteractingSphere','Facet','Sphere','BodyMacroParameters','InteractionGeometryMetaEngine']),
 	env.SharedLibrary('SpatialQuickSortCollider',['Engine/StandAloneEngine/SpatialQuickSortCollider.cpp']),
 	env.SharedLibrary('PersistentSAPCollider',['Engine/StandAloneEngine/PersistentSAPCollider.cpp']),
 	env.SharedLibrary('DistantPersistentSAPCollider',['Engine/StandAloneEngine/DistantPersistentSAPCollider.cpp']),

@@ -532,10 +532,10 @@ BASIC_PY_PROXY_TAIL;
 
 class pySTLImporter : public STLImporter {
     public:
-	void py_import(pyBodyContainer bc, unsigned int begin=0) { import(bc.proxee,begin); }
+	void py_import(pyBodyContainer bc, unsigned int begin=0, bool noInteractingGeometry=false) { import(bc.proxee,begin,noInteractingGeometry); }
 };
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,3);
 
 BOOST_PYTHON_MODULE(wrapper)
 {

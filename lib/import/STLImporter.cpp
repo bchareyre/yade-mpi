@@ -35,7 +35,7 @@ bool STLImporter::open(const char* filename)
 	return true;
 }
 
-void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin)
+void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, bool noInteractingGeometry)
 {
 	unsigned int b_id = begin;
 	for(int i=0,e=tr.size(); i<e; i+=3)
@@ -61,7 +61,7 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin)
 
 		(*bodies)[b_id]->physicalParameters->se3 = Se3r( icc, Quaternionr( 1,0,0,0 ) );
 		(*bodies)[b_id]->geometricalModel	= gFacet;
-		(*bodies)[b_id]->interactingGeometry	= iFacet;
+		if (!noInteractingGeometry) (*bodies)[b_id]->interactingGeometry	= iFacet;
 
 		++b_id;
 	}

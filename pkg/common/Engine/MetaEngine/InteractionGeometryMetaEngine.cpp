@@ -20,13 +20,24 @@
  * The EngineUnit must not fail (return false).
  */
 
-shared_ptr<Interaction> InteractionGeometryMetaEngine::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body> b2){
-	assert(b1->interactingGeometry && b2->interactingGeometry);
-	shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
-	i->isReal=true;
-	bool op=operator()(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3,b2->physicalParameters->se3,i);
-	if(!op) throw runtime_error("InteractionGeometryMetaEngine::explicitAction could not dispatch for given types ("+b1->interactingGeometry->getClassName()+","+b2->interactingGeometry->getClassName()+") or the dispatchee returned false.");
-	return i;
+shared_ptr<Interaction> InteractionGeometryMetaEngine::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2){
+	//assert(b1->interactingGeometry && b2->interactingGeometry);
+	//shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
+	//i->isReal=true;
+	//bool op=operator()(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3,b2->physicalParameters->se3,i);
+	//if(!op) throw runtime_error("InteractionGeometryMetaEngine::explicitAction could not dispatch for given types ("+b1->interactingGeometry->getClassName()+","+b2->interactingGeometry->getClassName()+") or the dispatchee returned false.");
+	//return i;
+	
+	// Seems asserts and throws in code above is not good idea.
+	// Below code do same (i.e. create interaction for specified bodies), but
+	// without artifical exceptions. If creating interaction is fail (for
+	// example if bodies don't have an interactionGeometry), returned
+	// interaction is non real, i.e. interaction->isReal==false. Sega.
+	shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
+	interaction->isReal =
+		b1->interactingGeometry && b2->interactingGeometry && 
+		operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+	return interaction;
 }
 
 void InteractionGeometryMetaEngine::action(MetaBody* ncb)
@@ -54,9 +65,9 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 		//cerr<<"isReal="<<interaction->isReal<<", wasReal="<<wasReal<<", isNew="<<interaction->isNew<<endl;
 
 		//tmp
-		if(!(b1->interactingGeometry&&b2->interactingGeometry)){
-			cerr<<__FILE__<<":"<<__LINE__<<": no interacting geometry "<< (b1->interactingGeometry?b1->getId():-1)<<" "<<(b2->interactingGeometry?b2->getId():-1)<<endl;
-		}
+		//if(!(b1->interactingGeometry&&b2->interactingGeometry)){
+			//cerr<<__FILE__<<":"<<__LINE__<<": no interacting geometry "<< (b1->interactingGeometry?b1->getId():-1)<<" "<<(b2->interactingGeometry?b2->getId():-1)<<endl;
+		//}
 			
 	}
 }

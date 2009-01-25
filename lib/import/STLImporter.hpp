@@ -27,7 +27,7 @@ class STLImporter {
 	bool wire;
 
 	/// import geometry 
-	void import(shared_ptr<BodyContainer> bodies, unsigned int begin=0);
+	void import(shared_ptr<BodyContainer> bodies, unsigned int begin=0, bool noInteractingGeometry=false);
 
 	DECLARE_LOGGER;
 protected:

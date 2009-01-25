@@ -225,22 +225,28 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 	pylab.show()
 
 
-def import_stl_geometry(file, begin=0, young=30e9,poisson=.3,frictionAngle=0.5236,wire=True):
-		## Import walls geometry from STL file
-		imp = STLImporter()
-		imp.wire = wire
-		imp.open(file)
-		o=Omega()
-		for i in xrange(imp.number_of_facets):
-			b=Body()
-			b['isDynamic']=False
-			b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,0,1,0,0,0],'mass':0,'inertia':[0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=0.5236,wire=True,noBoundingVolume=False,noInteractingGeometry=False):
+	""" Import geometry from stl file, create bodies and return list of their ids. 
+	"""
+	imp = STLImporter()
+	imp.wire = wire
+	imp.open(file)
+	o=Omega()
+	begin=len(o.bodies)
+	for i in xrange(imp.number_of_facets):
+		b=Body()
+		b['isDynamic']=False
+		b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,0,1,0,0,0],'mass':0,'inertia':[0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+		if not noBoundingVolume:
 			b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
-			o.bodies.append(b)
-		imp.import_geometry(o.bodies,begin)
-		for i in xrange(begin,begin+imp.number_of_facets):
+		o.bodies.append(b)
+	imp.import_geometry(o.bodies,begin,noInteractingGeometry)
+	imported=range(begin,begin+imp.number_of_facets)
+	for i in imported:
+		if not noInteractingGeometry:
 			o.bodies[i].mold.postProcessAttributes()
-		return imp.number_of_facets
+		o.bodies[i].shape['diffuseColor']=color
+	return imported
 
 def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 	import pygst,sys,gobject,os
