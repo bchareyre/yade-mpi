@@ -9,12 +9,10 @@
 #pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
-#include<yade/pkg-common/GLDrawInteractingSphere.hpp>
 
 class Ef1_BssSnowGrain_glDraw : public GLDrawInteractingGeometryFunctor
 {
 	public :
-		GLDrawInteractingSphere s;
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
 
 	RENDERS(BssSnowGrain);

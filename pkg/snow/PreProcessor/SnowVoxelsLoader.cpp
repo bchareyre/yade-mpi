@@ -68,8 +68,10 @@
 
 #include"SnowVoxelsLoader.hpp"
 #include<set>
-#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp>
-#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
+#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact.hpp>
+#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact.hpp>
+//#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp>
+//#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
 
 SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 {
@@ -96,7 +98,7 @@ SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 
-// a pixel is 20.4 microns (2.04 Ã— 10-5 meters)
+// a pixel is 20.4 microns (2.04 × 10-5 meters)
 // the sample was 10.4mm high
 	one_voxel_in_meters_is	= 2.04e-5;
 
@@ -358,8 +360,10 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 
-	shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);  //GRR 
-	shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);//GRR 
+	shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact);
+	shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
+	//shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);
+	//shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
 	//shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	//shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
 	
@@ -533,8 +537,8 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 	shared_ptr<BshSnowGrain> gSnowGrain(grain);
 	
 
-	shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is));//GRR 
-	Real radius = iSphere->radius;                                                              //GRR 
+	shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is)); 
+	Real radius = iSphere->radius;
 	//shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	//Real radius = (grain->start-grain->end).Length()*0.5;
 	
@@ -564,7 +568,7 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 	gSnowGrain->visible		= true;
 	gSnowGrain->shadowCaster	= true;
 	
-	//iSphere->radius			= radius; // already calculated //GRR
+	//iSphere->radius			= radius; // already calculated
 	iSphere->diffuseColor		= grain->color;
 
 	body->interactingGeometry	= iSphere;

@@ -8,12 +8,142 @@
 
 #include"Ef1_BssSnowGrain_glDraw.hpp"
 #include<yade/pkg-snow/BssSnowGrain.hpp>
+#include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
+void triangle(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
+{
+	glNormal3v(n);
+	glVertex3v(a);
+	glVertex3v(b);
+	glVertex3v(c);
+}
+
+void quad(Vector3r a,Vector3r b, Vector3r c, Vector3r d,Vector3r n)
+{
+	glNormal3v(n);
+	glVertex3v(a);
+	glVertex3v(b);
+	glVertex3v(c);
+	glVertex3v(d);
+}
 
 void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& pp,bool wire)
 {
-	s.go(cm,pp,wire);
+	bool surface = !wire;
+	BssSnowGrain* bssgr = static_cast<BssSnowGrain*>(cm.get());
+	BshSnowGrain& gr = bssgr->m_copy;
+
+  	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
+	glColor3v(cm->diffuseColor);
+
+	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(gr.get_faces_const_ref());
+	if(surface)
+	{
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_LIGHTING);
+		glShadeModel(GL_FLAT);
+		glBegin(GL_TRIANGLES);
+			for(size_t i = 0; i < f.size() ; ++i)
+			{
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				Vector3r n(get<3>(f[i]));
+				// plot the triangular face
+				triangle(a,b,c,n);
+				
+				// plot the depth tetrahedron
+				Real depth = gr.depth(i);
+				Vector3r Z((a+b+c)/3.0 + n*depth);
+				Vector3r N1((Z - a).Cross(a - b));
+				Vector3r N2((Z - c).Cross(c - a));
+				Vector3r N3((Z - b).Cross(b - c));
+				
+				triangle(b,a,Z,N1);
+				triangle(a,c,Z,N2);
+				triangle(c,b,Z,N3);
+				
+				// plot the parallelepiped top-face at the half depth
+				Real depth2 = depth*0.5;
+				Vector3r N(n*depth2);
+				Vector3r A(a+N);
+				Vector3r B(b+N);
+				Vector3r C(c+N);
+				triangle(A,B,C,n);
+			}
+		glEnd();
+		glBegin(GL_QUADS);
+			for(size_t i = 0; i < f.size() ; ++i)
+			{
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				Vector3r n(get<3>(f[i]));
+				// plot the parallelepiped side faces (quads)
+				Real depth = gr.depth(i)*0.5;
+				Vector3r N(n*depth);
+				Vector3r A(a+N);
+				Vector3r B(b+N);
+				Vector3r C(c+N);
+
+				Vector3r Z((a+b+c)/3.0 + n*depth);
+				Vector3r N1((A - a).Cross(a - b));
+				Vector3r N2((C - c).Cross(c - a));
+				Vector3r N3((B - b).Cross(b - c));
+				
+				quad(b,a,A,B,N1);
+				quad(a,c,C,A,N2);
+				quad(c,b,B,C,N3);
+			}
+		glEnd();
+		glShadeModel(GL_SMOOTH);
+		glEnable(GL_CULL_FACE);
+	}
+	else
+	{
+		glDisable(GL_LIGHTING);
+			glColor3v(cm->diffuseColor);
+			for(size_t i=0;i < gr.slices.size();++i)
+			{
+				glBegin(GL_LINE_STRIP);
+					for(size_t j=0 ; j < gr.slices[i].size() ; ++j)
+						glVertex3v(gr.slices[i][j]);
+					glVertex3v(gr.slices[i][0]);
+				glEnd();
+			}
+		glBegin(GL_LINES);
+			for(size_t i = 0; i < f.size() ; ++i)
+			{
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				Vector3r n(get<3>(f[i]));
+				// plot the depth tetrahedron
+				Real depth = gr.depth(i);
+				Vector3r Z((a+b+c)/3.0 + n*depth);
+				glVertex3v(a);glVertex3v(Z);
+				glVertex3v(b);glVertex3v(Z);
+				glVertex3v(c);glVertex3v(Z);
+				
+				// plot the parallelepiped top-face at the half depth
+				Real depth2 = depth*0.5;
+				Vector3r N(n*depth2);
+				Vector3r A(a+N);
+				Vector3r B(b+N);
+				Vector3r C(c+N);
+
+				glVertex3v(A);glVertex3v(B);
+				glVertex3v(B);glVertex3v(C);
+				glVertex3v(C);glVertex3v(A);
+
+				glVertex3v(a);glVertex3v(A);
+				glVertex3v(b);glVertex3v(B);
+				glVertex3v(c);glVertex3v(C);
+			}
+		glEnd();
+		glEnable(GL_LIGHTING);
+	}
 }
 
 

@@ -213,8 +213,8 @@ bool BshSnowGrain::is_point_inside_polyhedron(Vector3r P)
 				if( point_plane_distance > depth*0.5 ) // (1-parallelepiped)
 				{ // that's close enough. We can speed up the computation by returning true at this point
 
-// therefore in fact, we are checking if point is inside a volume of parallelepiped (1) the height of 1/2 depth
-// within the polyhedron PLUS (that's the code below - the (2)) a polyhedron the height given by depth
+// therefore in fact, we are checking if point is inside a volume of parallelepiped (1-) the height of 1/2 depth
+// within the polyhedron PLUS (that's the code below - the (2-)) a polyhedron the height given by depth
 // like this:
 //              ____________     this weird shape is WHOLE polyhedron
 //             /         Z. \                                                         ------
@@ -225,9 +225,9 @@ bool BshSnowGrain::is_point_inside_polyhedron(Vector3r P)
 //        /          '         ` \______________ XX face (see description)                 |e - search below for
 //       /          '           `              /                                           |p 'arbitrary safety coefficient'
 //      /      ....'.............`......      /                                            |t
-//      \     '   '           1-parallelepiped with height equal to 1/2 of depth           |h
-//       \    '  '                 `   '    /                                              |
-//        \   ' '                   `  '   /                                               |
+//      \     '   '           1-parallelepiped with height equal to 1/2 of depth           |h ('Z' is orthogonal to triangle with 
+//       \    '  '                 `   '    /                                              |   'depth' distance from the
+//        \   ' '                   `  '   /                                               |   triangle's center point )
 //         \  ''                     ` '  /                                                |
 //          \ '                       `' /                                                 |
 //           \__________________________/                                             ------

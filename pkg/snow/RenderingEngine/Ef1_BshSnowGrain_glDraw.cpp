@@ -42,7 +42,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	Real LEN=(gr->start - gr->end).Length();
 
 	glColor3f(0.5,0.5,1.0);
-	glutSolidCube(LEN*0.1);
+	glutWireCube(LEN*0.1);
 
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
@@ -72,8 +72,8 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 		glDisable(GL_LIGHTING);
 		glBegin(GL_LINE_STRIP);
 			glColor3f(0,0,0);
-			glVertex3d(gr->start[0],gr->start[1],gr->start[2]);
-			glVertex3d(gr->end[0]  ,gr->end[1]  ,gr->end[2]);
+			glVertex3v(gr->start);
+			glVertex3v(gr->end);
 		glEnd();
 			glColor3v(gm->diffuseColor);
 			for(size_t i=0;i < gr->slices.size();++i)
@@ -132,8 +132,10 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //	}
 */
 
-// check inside of selected grain, with grain 17
 
+/*
+
+// check inside of selected grain, with grain 17
 
 //if(!surface)
 //{
@@ -227,7 +229,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	}
 //}
 
-
+*/
 
 
 
