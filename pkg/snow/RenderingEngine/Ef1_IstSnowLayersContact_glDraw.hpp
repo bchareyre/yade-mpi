@@ -4,7 +4,8 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class Ef1_IstSnowLayersContact_glDraw : public GLDrawInteractionGeometryFunctor{	
+class Ef1_IstSnowLayersContact_glDraw : public GLDrawInteractionGeometryFunctor
+{
 	public :
 		Ef1_IstSnowLayersContact_glDraw(){}
 		virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);

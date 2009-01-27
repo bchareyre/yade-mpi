@@ -73,7 +73,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	scrollView->addChild(scrollViewFrame);
 	
 	maxNbViews=0;
-	addNewView();
+	//addNewView(); // postpone until a file is loaded
 
 	// there is file existence assertion in lodSimulationFromFilename, so yade will abort cleanly...
 	LOG_DEBUG("Omega's simulation filename: `"<<Omega::instance().getSimulationFileName()<<"'");
@@ -197,6 +197,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		}
 
 		if(center) pbCenterSceneClicked();
+		if(YadeQtMainWindow::self->viewsSize() == 0) addNewView();
 }
 
 void SimulationController::pbSaveClicked()

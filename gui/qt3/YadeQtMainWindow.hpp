@@ -35,6 +35,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		void createView();
 		void closeView(GLViewer*);
 		void closeView(int);
+		size_t viewsSize(){return glViews.size();};
 		void centerViews();
 		void adjustCameraInCurrentView(qglviewer::Vec up,qglviewer::Vec dir);
 		void loadSimulation(string file);
