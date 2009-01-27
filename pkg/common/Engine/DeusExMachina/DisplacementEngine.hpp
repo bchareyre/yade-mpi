@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DISPLACEMENTENGINE_HPP
-#define DISPLACEMENTENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include <Wm3Vector3.h>
@@ -32,5 +31,4 @@ class DisplacementEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(DisplacementEngine);
 
-#endif //  DISPLACEMENTENGINE_HPP
 

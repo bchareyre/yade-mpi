@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef INTERACTINGGEOMETRYMETAENGINE_HPP
-#define INTERACTINGGEOMETRYMETAENGINE_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 
@@ -39,5 +38,4 @@ class InteractingGeometryMetaEngine : 	public MetaEngine2D
 
 REGISTER_SERIALIZABLE(InteractingGeometryMetaEngine);
 
-#endif //  INTERACTINGGEOMETRYMETAENGINE_HPP
 

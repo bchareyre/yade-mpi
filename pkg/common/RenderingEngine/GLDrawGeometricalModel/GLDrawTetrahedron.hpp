@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_TETRAHEDRON_HPP
-#define GLDRAW_TETRAHEDRON_HPP 
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawTetrahedron : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawTetrahedron);
 
-#endif // GLDRAW_TETRAHEDRON_HPP 
 

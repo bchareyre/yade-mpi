@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWSPHERE_HPP
-#define GLDRAWSPHERE_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -41,5 +40,4 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 };
 REGISTER_SERIALIZABLE(GLDrawSphere);
 
-#endif // GLDRAWSPHERE_HPP
 

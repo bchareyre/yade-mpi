@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTION_HPP
-#define PHYSICALACTION_HPP
+#pragma once
 
 
 #include<yade/lib-serialization/Serializable.hpp>
@@ -34,5 +33,4 @@ class PhysicalAction : public Serializable, public Indexable
 
 REGISTER_SERIALIZABLE(PhysicalAction);
 
-#endif // PHYSICALACTION_HPP
 

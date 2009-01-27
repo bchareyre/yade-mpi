@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLWINDOW_HPP
-#define GLWINDOW_HPP
+#pragma once
 
 class GLWindow
 {	
@@ -94,5 +93,4 @@ class GLWindow
 		bool mouseIsOnWindows(int x,int y);
 };
 
-#endif //  GLWINDOW_HPP
 

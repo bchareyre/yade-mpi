@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef NODE_RECORDER_HPP
-#define NODE_RECORDER_HPP 
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -49,5 +48,4 @@ class NodeRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(NodeRecorder);
 
-#endif // STRAIN_RECORDER_HPP 
 

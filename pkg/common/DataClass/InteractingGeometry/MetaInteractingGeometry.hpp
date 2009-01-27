@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef METAINTERACTINGGEOMETRY_HPP
-#define METAINTERACTINGGEOMETRY_HPP
+#pragma once
 
 #include<yade/core/InteractingGeometry.hpp>
 
@@ -27,5 +26,4 @@ class MetaInteractingGeometry : public InteractingGeometry
 
 REGISTER_SERIALIZABLE(MetaInteractingGeometry);
 
-#endif // METAINTERACTINGGEOMETRY_HPP
 

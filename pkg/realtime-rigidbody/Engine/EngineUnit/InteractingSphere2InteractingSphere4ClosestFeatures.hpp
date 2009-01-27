@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPHERE2SPHERE4CLOSESTFEATURES_HPP
-#define SPHERE2SPHERE4CLOSESTFEATURES_HPP
+#pragma once
 
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
@@ -34,5 +33,4 @@ class InteractingSphere2InteractingSphere4ClosestFeatures : public InteractionGe
 
 REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4ClosestFeatures);
 
-#endif // SPHERE2SPHERE4CLOSESTFEATURES_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PARTICLESET2MESH2D_HPP
-#define PARTICLESET2MESH2D_HPP
+#pragma once
 
 
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
@@ -26,5 +25,4 @@ class ParticleSet2Mesh2D : public GeometricalModelEngineUnit
 
 REGISTER_SERIALIZABLE(ParticleSet2Mesh2D);
 
-#endif // PARTICLESET2MESH2D_HPP
 

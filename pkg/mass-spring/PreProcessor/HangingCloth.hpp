@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef HANGINGCLOTH_HPP
-#define HANGINGCLOTH_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -68,5 +67,4 @@ class HangingCloth : public FileGenerator
 
 REGISTER_SERIALIZABLE(HangingCloth);
 
-#endif // __HANGINGCLOTH_H__
 

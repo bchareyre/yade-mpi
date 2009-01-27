@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef EF2_BSS_SWEPT_SPHERE_LINE_SEGMENT__AABB__MAKE_AABB
-#define EF2_BSS_SWEPT_SPHERE_LINE_SEGMENT__AABB__MAKE_AABB
+#pragma once
 
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
@@ -27,5 +26,4 @@ class ef2_BssSweptSphereLineSegment_AABB_makeAABB : public BoundingVolumeEngineU
 
 REGISTER_SERIALIZABLE(ef2_BssSweptSphereLineSegment_AABB_makeAABB);
 
-#endif // EF2_BSS_SWEPT_SPHERE_LINE_SEGMENT__AABB__MAKE_AABB
 

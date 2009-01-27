@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_CohesiveFrictionalContactInteraction_HPP
-#define GLDRAW_CohesiveFrictionalContactInteraction_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -29,6 +28,4 @@ class GLDrawCohesiveFrictionalContactInteraction : public GLDrawInteractionPhysi
 };
 
 REGISTER_SERIALIZABLE(GLDrawCohesiveFrictionalContactInteraction);
-
-#endif 
 

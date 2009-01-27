@@ -5,8 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TETRAHEDRON2INTERACTINGMYTETRAHEDRON_HPP
-#define TETRAHEDRON2INTERACTINGMYTETRAHEDRON_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 
@@ -45,6 +44,5 @@ class Tetrahedron2InteractingMyTetrahedron : public InteractingGeometryEngineUni
 
 REGISTER_SERIALIZABLE(Tetrahedron2InteractingMyTetrahedron);
 
-#endif // TETRAHEDRON2POLYHEDRALSWEPTSPHERE_HPP
 
 

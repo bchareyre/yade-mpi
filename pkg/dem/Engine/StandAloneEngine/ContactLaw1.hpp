@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CONTACT_LAW_1_HPP
-#define CONTACT_LAW_1_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -53,5 +52,4 @@ class ContactLaw1 : public InteractionSolver
 
 REGISTER_SERIALIZABLE(ContactLaw1);
 
-#endif // CONTACT_LAW_1_HPP
 

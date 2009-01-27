@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FPSTRACKER_HPP
-#define FPSTRACKER_HPP
+#pragma once
 
 #include <list>
 #include <vector>
@@ -55,5 +54,4 @@ class FpsTracker : public GLWindow
 		inline void addOneAction() { nbActions++;};
 };
 
-#endif // FPSTRACKER_HPP
 

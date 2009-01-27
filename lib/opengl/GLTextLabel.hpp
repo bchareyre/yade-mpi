@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLTEXTLABEL_HPP
-#define GLTEXTLABEL_HPP
+#pragma once
 
 #include "GLWindow.hpp"
 #include <Wm3Vector3.h>
@@ -33,5 +32,4 @@ class GLTextLabel : public GLWindow
 		~GLTextLabel ();
 };
 
-#endif // GLTEXTLABEL_HPP
 

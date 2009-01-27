@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SERIALIZABLE_HPP
-#define SERIALIZABLE_HPP
+#pragma once
 
 #include <boost/any.hpp>
 #include <boost/foreach.hpp>
@@ -110,5 +109,4 @@ class Serializable : public Factorable
 
 #include "MultiTypeHandler.tpp"
 
-#endif // SERIALIZABLE_HPP
 

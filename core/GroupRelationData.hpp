@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GROUP_RELATION_DATA_HPP
-#define GROUP_RELATION_DATA_HPP
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -134,4 +133,3 @@ public:
 
 };
 
-#endif // GROUP_RELATION_DATA_HPP

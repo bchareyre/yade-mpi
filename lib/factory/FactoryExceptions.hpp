@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FACTORYEXECPTIONS_HPP
-#define FACTORYEXECPTIONS_HPP
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -35,5 +34,4 @@ struct FactoryExceptions
 	static const char* ClassNotRegistered;
 };
 
-#endif // FACTORYEXECPTIONS_HPP
 

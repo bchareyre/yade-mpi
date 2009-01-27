@@ -5,8 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTING_MY_TETRAHEDRON_HPP
-#define INTERACTING_MY_TETRAHEDRON_HPP
+#pragma once
 
 #include<yade/core/InteractingGeometry.hpp>
 #include <Wm3Math.h>
@@ -57,5 +56,4 @@ class InteractingMyTetrahedron : public InteractingGeometry
 
 REGISTER_SERIALIZABLE(InteractingMyTetrahedron);
 
-#endif // INTERACTING_MY_TETRAHEDRON_HPP
 

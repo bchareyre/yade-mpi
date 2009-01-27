@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CAPILLARY_COHESIVE_LAW_HPP
-#define CAPILLARY_COHESIVE_LAW_HPP
+#pragma once
 
 #include <yade/core/InteractionSolver.hpp>
 #include <set>
@@ -146,5 +145,4 @@ REGISTER_SERIALIZABLE(CapillaryCohesiveLaw);
 
 
 
-#endif // CAPILLARY_COHESIVE_LAW_HPP
 

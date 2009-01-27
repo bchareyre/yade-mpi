@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BOX_HPP
-#define BOX_HPP
+#pragma once
 
 
 #include<yade/core/GeometricalModel.hpp>
@@ -36,5 +35,4 @@ class Box : public GeometricalModel
 
 REGISTER_SERIALIZABLE(Box);
 
-#endif // BOX_HPP
 

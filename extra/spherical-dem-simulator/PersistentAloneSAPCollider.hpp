@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PERSISTENTSAPCOLLIDER_HPP
-#define PERSISTENTSAPCOLLIDER_HPP
+#pragma once
 
 #include "SphericalDEM.hpp"
 #include "Contact.hpp"
@@ -82,6 +81,4 @@ class PersistentAloneSAPCollider
 		void action(const vector<SphericalDEM>& spheres, ContactVecSet& contacts);
 
 };
-
-#endif // PERSISTENTSAPCOLLIDER_HPP
 

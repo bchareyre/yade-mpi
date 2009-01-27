@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BODY_PHYSICAL_PARAMETERS_FUNCTOR_HPP
-#define BODY_PHYSICAL_PARAMETERS_FUNCTOR_HPP 
+#pragma once
 
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
@@ -37,5 +36,4 @@ class PhysicalParametersEngineUnit :    public EngineUnit1D
 
 REGISTER_SERIALIZABLE(PhysicalParametersEngineUnit);
 
-#endif // __GEOMETRICALMODELFACTORY_H__
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FORCE_RECORDER_HPP
-#define FORCE_RECORDER_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -48,5 +47,4 @@ class ForceRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(ForceRecorder);
 
-#endif // FORCE_RECORDER_HPP
 

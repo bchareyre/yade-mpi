@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEMLAW_HPP
-#define FEMLAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -40,6 +39,5 @@ class FEMLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(FEMLaw);
 
-#endif // FEMLAW_HPP
 
 

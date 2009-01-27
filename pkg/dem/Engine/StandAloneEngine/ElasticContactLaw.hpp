@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ELASTIC_CONTACT_LAW_HPP
-#define ELASTIC_CONTACT_LAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 #include<yade/core/PhysicalAction.hpp>
@@ -60,5 +59,4 @@ class ElasticContactLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(ElasticContactLaw);
 
-#endif // ELASTIC_CONTACT_LAW_HPP
 

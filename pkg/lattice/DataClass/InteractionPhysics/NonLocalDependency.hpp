@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef NONLOCALDEPENDENCY_HPP
-#define NONLOCALDEPENDENCY_HPP
+#pragma once
 
 #include<yade/core/InteractionPhysics.hpp>
 #include <vector>
@@ -33,5 +32,4 @@ class NonLocalDependency : public InteractionPhysics
 
 REGISTER_SERIALIZABLE(NonLocalDependency);
 
-#endif //  LATTICEBEAMANGULARSPRING_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef SPHERE2AABB_HPP
-#define SPHERE2AABB_HPP
+#pragma once
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
@@ -25,5 +24,4 @@ class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 
 REGISTER_SERIALIZABLE(InteractingSphere2AABB);
 
-#endif // SPHERE2AABB_HPP
 

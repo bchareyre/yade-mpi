@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef __GLDRAWINTERACTINGIFACET_HPP__
-#define __GLDRAWINTERACTINGIFACET_HPP__
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -24,5 +23,4 @@ class GLDrawInteractingFacet : public GLDrawInteractingGeometryFunctor
 
 REGISTER_SERIALIZABLE(GLDrawInteractingFacet);
 
-#endif //  GLDRAWINTERACTINGIFACET_HPP
 

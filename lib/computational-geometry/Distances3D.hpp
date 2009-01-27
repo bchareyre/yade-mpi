@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DISTANCES3D_HPP
-#define DISTANCES3D_HPP
+#pragma once
 
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
@@ -18,5 +17,4 @@ using namespace std;
 
 Real sqrDistTriPoint(const Vector3r& p, const vector<Vector3r>& tri, Vector3r& pt);
 
-#endif // __DISTANCES3D_H__
 

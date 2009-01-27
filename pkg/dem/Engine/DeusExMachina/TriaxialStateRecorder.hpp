@@ -9,8 +9,7 @@
 *************************************************************************/
 
 
-#ifndef TRIAXIAL_STATE_RECORDER_HPP
-#define TRIAXIAL_STATE_RECORDER_HPP
+#pragma once
 
 #include <yade/core/DataRecorder.hpp>
 
@@ -63,5 +62,4 @@ class TriaxialStateRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(TriaxialStateRecorder);
 
-#endif // WALL_STRESS_RECORDER_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MACRO_MICRO_ANALYSER_HPP
-#define MACRO_MICRO_ANALYSER_HPP
+#pragma once
 
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
@@ -57,5 +56,4 @@ class MicroMacroAnalyser : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(MicroMacroAnalyser);
 
-#endif // MACRO_MICRO_ANALYZER_HPP
 

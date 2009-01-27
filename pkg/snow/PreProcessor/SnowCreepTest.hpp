@@ -10,8 +10,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SNOW_CREEP_TEST_HPP
-#define SNOW_CREEP_TEST_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
@@ -136,5 +135,4 @@ class SnowCreepTest : public FileGenerator
 
 REGISTER_SERIALIZABLE(SnowCreepTest);
 
-#endif // COHESIVE_TRIAXIAL_TEST_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef RESETPOSITONENGINE_HPP
-#define RESETPOSITONENGINE_HPP
+#pragma once
 
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include <Wm3Vector3.h>
@@ -45,5 +44,4 @@ class ResetPositionEngine : public PeriodicEngine {
 
 REGISTER_SERIALIZABLE(ResetPositionEngine);
 
-#endif //  RESETPOSITONENGINE_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICELAW_HPP
-#define LATTICELAW_HPP
+#pragma once
 
 
 #include "LatticeBeamParameters.hpp"
@@ -49,6 +48,5 @@ class LatticeLaw : public InteractionSolver
 REGISTER_SERIALIZABLE(LatticeLaw);
 
 
-#endif // LATTICELAW_HPP
 
 

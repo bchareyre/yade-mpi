@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MOMENT_ENGINE_HPP
-#define MOMENT_ENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 
@@ -34,5 +33,4 @@ class MomentEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(MomentEngine);
 
-#endif // FORCE_ENGINE_HPP
 

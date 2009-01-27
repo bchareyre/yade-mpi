@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ACTION_PARAMETER_RESET_HPP
-#define ACTION_PARAMETER_RESET_HPP 
+#pragma once
 
 #include<yade/core/StandAloneEngine.hpp>
 
@@ -26,5 +25,4 @@ class PhysicalActionContainerReseter : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(PhysicalActionContainerReseter);
 
-#endif // ACTION_PARAMETER_RESET_HPP 
 

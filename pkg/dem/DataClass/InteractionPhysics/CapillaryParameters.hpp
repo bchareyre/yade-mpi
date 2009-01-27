@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef CAPILLARY_PARAMETERS_HPP
-#define CAPILLARY_PARAMETERS_HPP
+#pragma once
 //#include <yade/core/InteractionPhysics.hpp>
 #include <yade/pkg-dem/ElasticContactInteraction.hpp>
 
@@ -37,5 +36,4 @@ class CapillaryParameters : public ElasticContactInteraction
 
 REGISTER_SERIALIZABLE(CapillaryParameters);
 
-#endif // CAPILLARY_PARAMETERS_HPP
 

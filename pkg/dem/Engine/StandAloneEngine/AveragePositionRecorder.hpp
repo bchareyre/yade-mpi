@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef AVERAGE_POSISTION_RECORDER_HPP
-#define AVERAGE_POSISTION_RECORDER_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -41,5 +40,4 @@ class AveragePositionRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(AveragePositionRecorder);
 
-#endif // AVERAGE_POSISTION_RECORDER_HPP
 

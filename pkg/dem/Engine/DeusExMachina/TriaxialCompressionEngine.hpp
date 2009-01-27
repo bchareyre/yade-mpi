@@ -7,8 +7,7 @@
 *************************************************************************/
 
 
-#ifndef TRIAXIALCOMPRESSIONENGINE_HPP
-#define TRIAXIALCOMPRESSIONENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include <Wm3Vector3.h>
@@ -136,5 +135,4 @@ class TriaxialCompressionEngine : public TriaxialStressController
 
 REGISTER_SERIALIZABLE(TriaxialCompressionEngine);
 
-#endif //  TRIAXIALCOMPRESSIONENGINE_HPP
 

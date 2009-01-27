@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LEAP_FROG_ORIENTATION_INTEGRATOR_HPP
-#define LEAP_FROG_ORIENTATION_INTEGRATOR_HPP 
+#pragma once
 
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 
@@ -28,5 +27,4 @@ class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit
 
 REGISTER_SERIALIZABLE(LeapFrogOrientationIntegrator);
 
-#endif // LEAP_FROG_MOMENTUM_INTEGRATOR_HPP
 

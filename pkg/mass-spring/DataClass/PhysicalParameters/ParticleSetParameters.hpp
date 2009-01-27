@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PARTICLESETPARAMETERS_HPP
-#define PARTICLESETPARAMETERS_HPP
+#pragma once
 
 #include<yade/core/PhysicalParameters.hpp>
 
@@ -27,5 +26,4 @@ class ParticleSetParameters : public PhysicalParameters
 
 REGISTER_SERIALIZABLE(ParticleSetParameters);
 
-#endif // PARTICLESETPARAMETERS_HPP
 

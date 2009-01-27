@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICE_BOX_HPP
-#define LATTICE_BOX_HPP 
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
@@ -289,5 +288,4 @@ struct Circle
 
 REGISTER_SERIALIZABLE(LatticeExample);
 
-#endif // LATTICE_BOX_HPP 
 

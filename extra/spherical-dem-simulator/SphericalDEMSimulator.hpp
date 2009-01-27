@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPHERICALDEMSIMULATOR_HPP
-#define SPHERICALDEMSIMULATOR_HPP
+#pragma once
 
 #include "SphericalDEM.hpp"
 #include "Contact.hpp"
@@ -62,5 +61,4 @@ class SphericalDEMSimulator : public StandAloneSimulator
 
 REGISTER_FACTORABLE(SphericalDEMSimulator);
 
-#endif // SPHERICALDEMSIMULATOR_HPP
 

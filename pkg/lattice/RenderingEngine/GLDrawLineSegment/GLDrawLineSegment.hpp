@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_LINE_SEGMENT_HPP
-#define GLDRAW_LINE_SEGMENT_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -27,5 +26,4 @@ class GLDrawLineSegment : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawLineSegment);
 
-#endif // GLDRAW_LINE_SEGMENT_HPP
 

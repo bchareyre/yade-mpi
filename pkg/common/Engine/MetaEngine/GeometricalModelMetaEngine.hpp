@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef GEOMETRICAL_MODEL_DISPATCHER_HPP
-#define GEOMETRICAL_MODEL_DISPATCHER_HPP
+#pragma once
 
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
 #include<yade/core/MetaEngine2D.hpp>
@@ -37,5 +36,4 @@ class GeometricalModelMetaEngine :	public MetaEngine2D
 
 REGISTER_SERIALIZABLE(GeometricalModelMetaEngine);
 
-#endif // GEOMETRICAL_MODEL_DISPATCHER_HPP
 

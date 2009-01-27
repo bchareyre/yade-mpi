@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef XMLFORMATMANAGER_HPP
-#define XMLFORMATMANAGER_HPP
+#pragma once
 
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include"XMLSaxParser.hpp"
@@ -47,5 +46,4 @@ class XMLFormatManager : public IOFormatManager
 
 REGISTER_FACTORABLE(XMLFormatManager);
 
-#endif // XMLFORMATMANAGER_HPP
 

@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef __SERIALIZABLETYPES_HPP__
-#define __SERIALIZABLETYPES_HPP__
+#pragma once
 
 namespace SerializableTypes
 {
@@ -25,5 +24,4 @@ namespace SerializableTypes
 		} Type;
 }
 
-#endif // __SERIALIZABLETYPES_HPP__
 

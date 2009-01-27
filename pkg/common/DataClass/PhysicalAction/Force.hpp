@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ACTIONFORCE_HPP
-#define ACTIONFORCE_HPP
+#pragma once
 
 #include<yade/core/PhysicalAction.hpp>
 #include <Wm3Vector3.h>
@@ -33,5 +32,4 @@ class Force : public PhysicalAction
 
 REGISTER_SERIALIZABLE(Force);
 
-#endif // ACTIONFORCE_HPP
 

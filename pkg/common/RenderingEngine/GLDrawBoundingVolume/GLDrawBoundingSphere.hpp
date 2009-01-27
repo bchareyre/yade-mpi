@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWBOUNDINGSPHERE_HPP
-#define GLDRAWBOUNDINGSPHERE_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawBoundingSphere : public GLDrawBoundingVolumeFunctor
 
 REGISTER_SERIALIZABLE(GLDrawBoundingSphere);
 
-#endif //  GLDRAWBOUNDINGSPHERE_HPP
 

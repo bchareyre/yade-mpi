@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLWINDOWSMANAGER_HPP
-#define GLWINDOWSMANAGER_HPP
+#pragma once
 
 #include "GLWindow.hpp"
 #include <vector>
@@ -95,5 +94,4 @@ class GLWindowsManager
 
 };
 
-#endif //  GLWINDOWSMANAGER_HPP
 

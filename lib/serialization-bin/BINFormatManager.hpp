@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BINFORMATMANAGER_HPP
-#define BINFORMATMANAGER_HPP
+#pragma once
 
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include <vector>
@@ -53,5 +52,4 @@ class BINFormatManager : public IOFormatManager
 
 REGISTER_FACTORABLE(BINFormatManager);
 
-#endif // BINFORMATMANAGER_HPP
 

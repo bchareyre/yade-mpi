@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef STATICSPHERESATTRACTIONENGINE_HPP
-#define STATICSPHERESATTRACTIONENGINE_HPP 
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/pkg-common/StaticAttractionEngine.hpp>
@@ -28,5 +27,4 @@ class StaticSpheresAttractionEngine : public StaticAttractionEngine
 
 REGISTER_SERIALIZABLE(StaticSpheresAttractionEngine);
 
-#endif 
 

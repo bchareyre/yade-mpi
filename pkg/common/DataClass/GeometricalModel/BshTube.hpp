@@ -7,8 +7,7 @@
 *************************************************************************/
 
 
-#ifndef BSH_TUBE_HPP
-#define BSH_TUBE_HPP
+#pragma once
 
 
 #include<yade/core/GeometricalModel.hpp>
@@ -38,5 +37,4 @@ class BshTube : public GeometricalModel
 
 REGISTER_SERIALIZABLE(BshTube);
 
-#endif // BSH_TUBE_HPP
 

@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ENGINEUNIT_HPP
-#define ENGINEUNIT_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 
@@ -22,5 +21,4 @@ class EngineUnit : public Serializable
 
 REGISTER_SERIALIZABLE(EngineUnit);
 
-#endif // ENGINEUNIT_HPP
 

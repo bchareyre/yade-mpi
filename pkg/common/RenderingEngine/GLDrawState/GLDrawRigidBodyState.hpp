@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWRIGIDBODYSTATE_HPP
-#define GLDRAWRIGIDBODYSTATE_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawRigidBodyState : public GLDrawStateFunctor
 
 REGISTER_SERIALIZABLE(GLDrawRigidBodyState);
 
-#endif //  GLDRAWAABB_HPP
 

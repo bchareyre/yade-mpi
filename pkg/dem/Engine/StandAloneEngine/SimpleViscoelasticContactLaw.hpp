@@ -9,8 +9,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMPLEVISCOELASTIC_CONTACT_LAW_HPP
-#define SIMPLEVISCOELASTIC_CONTACT_LAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -42,5 +41,4 @@ class SimpleViscoelasticContactLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(SimpleViscoelasticContactLaw);
 
-#endif // SIMPLEVISCOELASTIC_CONTACT_LAW_HPP
 

@@ -1,13 +1,12 @@
 /*************************************************************************
-*  Copyright (C) 2007 by Bruno Chareyre                                 *
-*  bruno.chareyre@hmg.inpg.fr                                               *
+*  Copyright (C) 2007 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef COHESIVE_FRICTIONAL_CONTACT_LAW_HPP
-#define COHESIVE_FRICTIONAL_CONTACT_LAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -41,6 +40,4 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 };
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalContactLaw);
-
-#endif // COHESIVE_FRICTIONAL_CONTACT_LAW_HPP
 

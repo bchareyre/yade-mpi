@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GEOMETRICALMODEL_HPP
-#define GEOMETRICALMODEL_HPP
+#pragma once
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include <Wm3Vector3.h>
@@ -35,5 +34,4 @@ class GeometricalModel : public Serializable, public Indexable
 
 REGISTER_SERIALIZABLE(GeometricalModel);
 
-#endif //  GEOMETRICALMODEL_HPP
 

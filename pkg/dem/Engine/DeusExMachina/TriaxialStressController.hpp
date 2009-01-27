@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TRIAXIAL_STRESS_CONTROLLER_HPP
-#define TRIAXIAL_STRESS_CONTROLLER_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include <Wm3Vector3.h>
@@ -110,5 +109,4 @@ class TriaxialStressController : public DeusExMachina
 
 REGISTER_SERIALIZABLE(TriaxialStressController);
 
-#endif // TRIAXIAL_STRESS_CONTROLLER_HPP
 

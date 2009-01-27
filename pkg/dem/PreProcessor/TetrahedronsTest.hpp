@@ -5,8 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TETRAHEDRONSTEST_HPP
-#define TETRAHEDRONSTEST_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 #include<yade/pkg-common/Tetrahedron.hpp>
@@ -108,5 +107,4 @@ class TetrahedronsTest : public FileGenerator
 
 REGISTER_SERIALIZABLE(TetrahedronsTest);
 
-#endif // TETRAHEDRONSTEST_HPP
 

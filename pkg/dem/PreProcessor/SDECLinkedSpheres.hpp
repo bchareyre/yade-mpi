@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LINKEDSPHERES_HPP
-#define LINKEDSPHERES_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
@@ -59,5 +58,4 @@ class SDECLinkedSpheres : public FileGenerator
 
 REGISTER_SERIALIZABLE(SDECLinkedSpheres);
 
-#endif // LINKEDSPHERES_HPP
 

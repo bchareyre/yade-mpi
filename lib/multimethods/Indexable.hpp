@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INDEXABLE_HPP
-#define INDEXABLE_HPP
+#pragma once
 
 #include <boost/scoped_ptr.hpp>
 
@@ -125,5 +124,4 @@ class Indexable
 		max++;								\
 	}									\
 
-#endif // INDEXABLE_HPP
 

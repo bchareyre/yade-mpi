@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GEOMETRICAL_MODEL_ENGINE_UNIT_HPP
-#define GEOMETRICAL_MODEL_ENGINE_UNIT_HPP
+#pragma once
 
 
 #include<yade/core/PhysicalParameters.hpp>
@@ -49,5 +48,4 @@ class GeometricalModelEngineUnit : 	public EngineUnit2D
 
 REGISTER_SERIALIZABLE(GeometricalModelEngineUnit);
 
-#endif //  GEOMETRICAL_MODEL_ENGINE_UNIT_HPP
 

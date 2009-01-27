@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_HPP
-#define COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_HPP
+#pragma once
 
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
@@ -43,6 +42,4 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 };
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalContactInteraction);
-
-#endif // COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_HPP
 

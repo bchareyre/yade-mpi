@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DYNLIB_LAUNCHER_HPP
-#define DYNLIB_LAUNCHER_HPP
+#pragma once
 
 
 #include "MultiMethodsExceptions.hpp"
@@ -195,5 +194,4 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		return (string(#class1)+" "+string(#class2)+" "+string(#class3));		\
 	}											\
 
-#endif //  DYNLIB_LAUNCHER_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICE_SET_GEOMETRY_HPP
-#define LATTICE_SET_GEOMETRY_HPP 
+#pragma once
 
 #include<yade/core/GeometricalModel.hpp>
 
@@ -27,5 +26,4 @@ class LatticeSetGeometry : public GeometricalModel
 
 REGISTER_SERIALIZABLE(LatticeSetGeometry);
 
-#endif // __LATTICESETGEOMETRY_HPP__
 

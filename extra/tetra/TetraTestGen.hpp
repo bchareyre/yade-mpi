@@ -1,5 +1,4 @@
-#ifndef TETRATESTGEN_HPP
-#define TETRATESTGEN_HPP
+#pragma once
 
 #include<vector>
 #include<yade/core/FileGenerator.hpp>
@@ -21,4 +20,3 @@ class TetraTestGen: public FileGenerator {
 };
 REGISTER_SERIALIZABLE(TetraTestGen);
 
-#endif

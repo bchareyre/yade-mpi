@@ -5,8 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONOFMYTETRAHEDRON_HPP
-#define INTERACTIONOFMYTETRAHEDRON_HPP
+#pragma once
 
 #include <vector>
 
@@ -81,5 +80,4 @@ class InteractionOfMyTetrahedron : public InteractionGeometry
 
 REGISTER_SERIALIZABLE(InteractionOfMyTetrahedron);
 
-#endif // INTERACTIONOFMYTETRAHEDRON_HPP
 

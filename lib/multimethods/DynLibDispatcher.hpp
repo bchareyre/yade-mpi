@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DYNLIB_DISPATCHER_HPP
-#define DYNLIB_DISPATCHER_HPP
+#pragma once
 
 
 #include "Indexable.hpp"
@@ -1073,5 +1072,4 @@ class DynLibDispatcher
 
 };
 
-#endif // DYNLIB_DISPATCHER_HPP
 

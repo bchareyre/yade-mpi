@@ -9,8 +9,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef VISCOUS_FORCE_DAMPING_HPP
-#define VISCOUS_FORCE_DAMPING_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -45,5 +44,4 @@ class ViscousForceDamping : public InteractionSolver
 
 REGISTER_SERIALIZABLE(ViscousForceDamping,false);
 
-#endif // VISCOUS_FORCE_DAMPING_HPP
 

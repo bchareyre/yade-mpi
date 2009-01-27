@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef YADE_EXCEPTIONS_HPP
-#define YADE_EXCEPTIONS_HPP
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -29,5 +28,4 @@ struct yadeExceptions
 	static const char* BadFile;
 };
 
-#endif //  YADE_EXCEPTIONS_HPP
 

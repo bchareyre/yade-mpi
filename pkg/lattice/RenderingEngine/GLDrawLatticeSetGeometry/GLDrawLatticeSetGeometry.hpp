@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_LATTICE_SET_GEOMETRY_HPP
-#define GLDRAW_LATTICE_SET_GEOMETRY_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/lib-computational-geometry/MarchingCube.hpp>
@@ -39,5 +38,4 @@ class GLDrawLatticeSetGeometry : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawLatticeSetGeometry);
 
-#endif // GLDRAW_LINE_SEGMENT_HPP
 

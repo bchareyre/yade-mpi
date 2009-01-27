@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWBOX_HPP
-#define GLDRAWBOX_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawBox : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawBox);
 
-#endif //  GLDRAWBOX_HPP
 

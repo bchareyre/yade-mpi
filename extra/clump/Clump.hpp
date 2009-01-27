@@ -6,8 +6,7 @@
 	Any further documentation is in doxygen comments.
 */
 
-#ifndef CLUMP_HPP
-#define CLUMP_HPP
+#pragma once
 
 #include<vector>
 #include<map>
@@ -147,8 +146,3 @@ class ClumpTestGen : public FileGenerator {
 
 REGISTER_SERIALIZABLE(ClumpTestGen);
 
-
-
-
-
-#endif /* CLUMP_HPP */

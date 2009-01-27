@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONPHYSICS_ENGINEUNIT_HPP
-#define INTERACTIONPHYSICS_ENGINEUNIT_HPP
+#pragma once
 
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Interaction.hpp>
@@ -44,5 +43,4 @@ class InteractionPhysicsEngineUnit : 	public EngineUnit2D
 
 REGISTER_SERIALIZABLE(InteractionPhysicsEngineUnit);
 
-#endif // INTERACTIONPHYSICS_ENGINEUNIT_HPP
 

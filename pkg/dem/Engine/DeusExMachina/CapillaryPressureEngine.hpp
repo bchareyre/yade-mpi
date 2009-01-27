@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CAPILLARY_PRESSURE_ENGINE_HPP
-#define CAPILLARY_PRESSURE_ENGINE_HPP
+#pragma once
 
 #include <yade/core/DeusExMachina.hpp>
 #include <Wm3Vector3.h>
@@ -38,5 +37,4 @@ class CapillaryPressureEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(CapillaryPressureEngine);
 
-#endif //  CAPILLARYPRESSUREENGINE_HPP
 

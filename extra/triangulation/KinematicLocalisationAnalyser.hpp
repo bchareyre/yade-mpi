@@ -12,8 +12,7 @@
 //This class computes statistics of micro-variables assuming axi-symetry
 
 
-#ifndef KINEMATICLOCALISATIONANALYSER_H
-#define KINEMATICLOCALISATIONANALYSER_H
+#pragma once
 
 #include "TriaxialState.h"
 #include "Tenseur3.h"
@@ -126,4 +125,3 @@ class KinematicLocalisationAnalyser
 
 };
 
-#endif

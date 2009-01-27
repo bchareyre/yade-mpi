@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LINE_SEGMENT_HPP
-#define LINE_SEGMENT_HPP
+#pragma once
 
 
 #include<yade/core/GeometricalModel.hpp>
@@ -33,5 +32,4 @@ class LineSegment : public GeometricalModel
 
 REGISTER_SERIALIZABLE(LineSegment);
 
-#endif // LINE_SEGMENT_HPP
 

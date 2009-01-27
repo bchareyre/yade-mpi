@@ -7,8 +7,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SDEC_MOVING_WALL_HPP
-#define SDEC_MOVING_WALL_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -71,5 +70,4 @@ class SDECMovingWall : public FileGenerator
 
 REGISTER_SERIALIZABLE(SDECMovingWall);
 
-#endif // SDEC_MOVING_WALL_HPP 
 

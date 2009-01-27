@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef QUADRILATERAL_HPP
-#define QUADRILATERAL_HPP
+#pragma once
 
 #include<yade/core/GeometricalModel.hpp>
 #include <Wm3Math.h>
@@ -35,5 +34,4 @@ class Quadrilateral : public GeometricalModel
 
 REGISTER_SERIALIZABLE(Quadrilateral);
 
-#endif // TETRAHEDRON_HPP
 

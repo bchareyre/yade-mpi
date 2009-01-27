@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_SET_TEXT_LOADER_HPP
-#define FEM_SET_TEXT_LOADER_HPP
+#pragma once
 
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 #include<yade/core/Body.hpp>
@@ -47,5 +46,4 @@ class FEMSetTextLoader : public PhysicalParametersEngineUnit
 
 REGISTER_SERIALIZABLE(FEMSetTextLoader);
 
-#endif // FEM_SET_TEXT_LOADER_HPP 
 

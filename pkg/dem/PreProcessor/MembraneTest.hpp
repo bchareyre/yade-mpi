@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MEMBRANETEST_HPP
-#define MEMBRANETEST_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -44,5 +43,4 @@ class MembraneTest : public FileGenerator
 
 REGISTER_SERIALIZABLE(MembraneTest);
 
-#endif // MEMBRANETEST_HPP
 

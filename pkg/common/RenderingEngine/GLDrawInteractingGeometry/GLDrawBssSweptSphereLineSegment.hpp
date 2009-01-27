@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
-#define GLDRAW_BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -32,5 +31,4 @@ class GLDrawBssSweptSphereLineSegment : public GLDrawInteractingGeometryFunctor
 
 REGISTER_SERIALIZABLE(GLDrawBssSweptSphereLineSegment);
 
-#endif //  GLDRAW_BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONSOLVER_HPP
-#define INTERACTIONSOLVER_HPP
+#pragma once
 
 #include "StandAloneEngine.hpp"
 
@@ -23,4 +22,3 @@ class InteractionSolver : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(InteractionSolver);
 
-#endif // INTERACTIONSOLVER_HPP

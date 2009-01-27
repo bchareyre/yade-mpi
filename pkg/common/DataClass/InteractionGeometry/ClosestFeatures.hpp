@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CLOSESTSFEATURES_HPP
-#define CLOSESTSFEATURES_HPP
+#pragma once
 
 #include <vector>
 
@@ -32,5 +31,4 @@ class ClosestFeatures : public InteractionGeometry
 
 REGISTER_SERIALIZABLE(ClosestFeatures);
 
-#endif // __CLOSESTSFEATURES_H__
 

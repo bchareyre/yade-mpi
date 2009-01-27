@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPHERE_HPP
-#define SPHERE_HPP
+#pragma once
 
 #include<yade/core/GeometricalModel.hpp>
 
@@ -28,5 +27,4 @@ class Sphere : public GeometricalModel
 
 REGISTER_SERIALIZABLE(Sphere);
 
-#endif // SPHERE_HPP
 

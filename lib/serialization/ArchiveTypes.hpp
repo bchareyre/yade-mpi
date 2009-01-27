@@ -7,8 +7,7 @@
 *************************************************************************/
 
 
-#ifndef __ARCHIVESTYPES_HPP__
-#define __ARCHIVESTYPES_HPP__
+#pragma once
 
 
 #include <boost/any.hpp>
@@ -56,5 +55,4 @@ namespace ArchiveTypes
 
 }
 
-#endif // __ARCHIVESTYPES_HPP__
 

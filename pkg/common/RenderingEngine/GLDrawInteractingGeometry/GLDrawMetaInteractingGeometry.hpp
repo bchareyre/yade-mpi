@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWCOLLISIONGEOMETRYSET_HPP
-#define GLDRAWCOLLISIONGEOMETRYSET_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,6 +22,5 @@ class GLDrawMetaInteractingGeometry : public GLDrawInteractingGeometryFunctor
 
 REGISTER_FACTORABLE(GLDrawMetaInteractingGeometry);
 
-#endif //  GLDRAWCOLLISIONGEOMETRYSET_HPP
 
 

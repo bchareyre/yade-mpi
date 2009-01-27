@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_NODE_PARAMETERS_HPP 
-#define FEM_NODE_PARAMETERS_HPP 
+#pragma once
 
 #include<yade/pkg-common/ParticleParameters.hpp>
 
@@ -35,5 +34,4 @@ class FEMNodeData : public ParticleParameters
 
 REGISTER_SERIALIZABLE(FEMNodeData);
 
-#endif // FEM_NODE_PARAMETERS_HPP
 

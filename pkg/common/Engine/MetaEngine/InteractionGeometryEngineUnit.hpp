@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONGEOMETRYFUNCTOR_HPP
-#define INTERACTIONGEOMETRYFUNCTOR_HPP
+#pragma once
 
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -49,5 +48,4 @@ class InteractionGeometryEngineUnit : 	public EngineUnit2D
 
 REGISTER_SERIALIZABLE(InteractionGeometryEngineUnit);
 
-#endif // INTERACTIONGEOMETRYFUNCTOR_HPP
 

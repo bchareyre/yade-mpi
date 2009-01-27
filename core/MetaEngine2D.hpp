@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef METADISPATCHINGENGINE2D_HPP
-#define METADISPATCHINGENGINE2D_HPP
+#pragma once
 
 #include "MetaEngine.hpp"
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
@@ -119,5 +118,4 @@ class MetaEngine2D : public MetaEngine,
  	}	
 */
 
-#endif // METADISPATCHINGENGINE2D_HPP
 

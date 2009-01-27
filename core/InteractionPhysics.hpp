@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONPHYSICS_HPP
-#define INTERACTIONPHYSICS_HPP
+#pragma once
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
@@ -23,5 +22,4 @@ class InteractionPhysics : public Serializable, public Indexable
 
 REGISTER_SERIALIZABLE(InteractionPhysics);
 
-#endif //  INTERACTIONPHYSICS_HPP
 

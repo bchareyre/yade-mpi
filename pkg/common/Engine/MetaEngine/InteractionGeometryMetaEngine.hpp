@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTION_GEOMETRY_METAENGINE_HPP
-#define INTERACTION_GEOMETRY_METAENGINE_HPP
+#pragma once
 
 #include <vector>
 #include <list>
@@ -45,5 +44,4 @@ class InteractionGeometryMetaEngine :	public MetaEngine2D
 
 REGISTER_SERIALIZABLE(InteractionGeometryMetaEngine);
 
-#endif //  INTERACTION_GEOMETRY_METAENGINE_HPP
 

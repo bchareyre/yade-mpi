@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_LATTICE_BEAM_STATE_HPP
-#define GLDRAW_LATTICE_BEAM_STATE_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -24,5 +23,4 @@ class GLDrawLatticeBeamState : public GLDrawStateFunctor
 
 REGISTER_SERIALIZABLE(GLDrawLatticeBeamState);
 
-#endif // GLDRAW_LINE_SEGMENT_HPP
 

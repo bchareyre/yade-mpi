@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GEOMETRICAL_MODEL_FORCE_COLORIZER_HPP
-#define GEOMETRICAL_MODEL_FORCE_COLORIZER_HPP
+#pragma once
 
 #include<yade/core/StandAloneEngine.hpp>
 
@@ -31,5 +30,4 @@ class GeometricalModelForceColorizer : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(GeometricalModelForceColorizer);
 
-#endif // FORCE_RECORDER_HPP
 

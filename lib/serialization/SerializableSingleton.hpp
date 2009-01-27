@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SERIALIZABLESINGLETON_HPP
-#define SERIALIZABLESINGLETON_HPP
+#pragma once
 
 #include "SerializableTypes.hpp"
 #include <typeinfo>
@@ -58,5 +57,4 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 	FRIEND_SINGLETON(SerializableSingleton);
 };
 
-#endif // SERIALIZABLESINGLETON_HPP
 

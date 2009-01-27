@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTIONVECTORVECTOR_HPP
-#define PHYSICALACTIONVECTORVECTOR_HPP
+#pragma once
 
 #include<yade/core/PhysicalActionContainer.hpp>
 #include<list>
@@ -87,5 +86,4 @@ class PhysicalActionVectorVector : public PhysicalActionContainer
 
 REGISTER_SERIALIZABLE(PhysicalActionVectorVector);
 
-#endif // __ACTION_VEC_VEC_HPP__
 

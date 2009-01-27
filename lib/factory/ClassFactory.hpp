@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CLASSFACTORY_HPP
-#define CLASSFACTORY_HPP
+#pragma once
 
 
 #include <map>
@@ -155,5 +154,4 @@ class ClassFactory : public Singleton< ClassFactory >
 	FRIEND_SINGLETON(ClassFactory);
 };
 
-#endif // __CLASSFACTORY_HPP__
 

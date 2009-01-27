@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMPLEVISCOELASTICINTERACTION_HPP 
-#define SIMPLEVISCOELASTICINTERACTION_HPP
+#pragma once
 
 #include<yade/core/InteractionPhysics.hpp>
 
@@ -46,5 +45,4 @@ class SimpleViscoelasticInteraction : public InteractionPhysics
 
 REGISTER_SERIALIZABLE(SimpleViscoelasticInteraction);
 
-#endif // SIMPLEVISCOELASTICINTERACTION_HPP
 

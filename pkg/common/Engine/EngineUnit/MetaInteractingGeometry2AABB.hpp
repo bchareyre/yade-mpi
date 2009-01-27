@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef METAINTERACTINGGEOMETRY2AABB_HPP
-#define METAINTERACTINGGEOMETRY2AABB_HPP
+#pragma once
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
@@ -25,5 +24,4 @@ class MetaInteractingGeometry2AABB : public BoundingVolumeEngineUnit
 
 REGISTER_SERIALIZABLE(MetaInteractingGeometry2AABB);
 
-#endif // METAINTERACTINGGEOMETRY2AABB_HPP
 

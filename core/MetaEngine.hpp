@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef METADISPATCHINGENGINE_HPP
-#define METADISPATCHINGENGINE_HPP
+#pragma once
 
 #include "Engine.hpp"
 #include "EngineUnit.hpp"
@@ -54,5 +53,4 @@ class MetaEngine : public Engine
 
 REGISTER_SERIALIZABLE(MetaEngine);
 
-#endif // METADISPATCHINGENGINE_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FIXEDPOSITIONENGINE_HPP
-#define FIXEDPOSITIONENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include <Wm3Vector3.h>
@@ -30,5 +29,4 @@ class FixedPositionEngine : public DeusExMachina {
 
 REGISTER_SERIALIZABLE(FixedPositionEngine);
 
-#endif //  DISPLACEMENTENGINE_HPP
 

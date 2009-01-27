@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWAABB_HPP
-#define GLDRAWAABB_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawAABB : public GLDrawBoundingVolumeFunctor
 
 REGISTER_SERIALIZABLE(GLDrawAABB);
 
-#endif //  GLDRAWAABB_HPP
 

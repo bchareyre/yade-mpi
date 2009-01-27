@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FORCE_ENGINE_HPP
-#define FORCE_ENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 
@@ -34,5 +33,4 @@ class ForceEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(ForceEngine);
 
-#endif // FORCE_ENGINE_HPP
 

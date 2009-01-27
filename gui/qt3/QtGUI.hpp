@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef QTGUI_HPP
-#define QTGUI_HPP
+#pragma once
 
 #include<yade/core/FrontEnd.hpp>
 
@@ -38,5 +37,4 @@ class QtGUI : public FrontEnd
 
 REGISTER_FACTORABLE(QtGUI);
 
-#endif // QTGUI_HPP
 

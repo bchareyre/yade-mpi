@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_SET_PARAMETERS_HPP
-#define FEM_SET_PARAMETERS_HPP 
+#pragma once
 
 #include<yade/core/PhysicalParameters.hpp>
 
@@ -34,5 +33,4 @@ class FEMSetParameters : public PhysicalParameters
 
 REGISTER_SERIALIZABLE(FEMSetParameters);
 
-#endif // LATTICEBEAMPARAMETERS_HPP
 

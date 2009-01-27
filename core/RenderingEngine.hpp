@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef RENDERINGENGINE_HPP
-#define RENDERINGENGINE_HPP
+#pragma once
 
 #include "MetaBody.hpp"
 #include<yade/lib-serialization/Serializable.hpp>
@@ -28,5 +27,4 @@ class RenderingEngine :  public Serializable
 
 REGISTER_SERIALIZABLE(RenderingEngine);
 
-#endif // RENDERINGENGINE_HPP
 

@@ -9,8 +9,7 @@
 *************************************************************************/
 
 
-#ifndef COHESIVEFRICTIONALBODYPARAMETERS_HPP
-#define COHESIVEFRICTIONALBODYPARAMETERS_HPP
+#pragma once
 
 
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
@@ -37,5 +36,4 @@ class CohesiveFrictionalBodyParameters : public BodyMacroParameters
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalBodyParameters);
 
-#endif // __SDECDISCRETEELEMENT_H__
 

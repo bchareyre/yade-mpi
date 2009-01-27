@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BEAM_RECORDER_HPP
-#define BEAM_RECORDER_HPP 
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -51,5 +50,4 @@ class BeamRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(BeamRecorder);
 
-#endif // STRAIN_RECORDER_HPP 
 

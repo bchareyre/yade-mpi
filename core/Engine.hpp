@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ENGINE_HPP
-#define ENGINE_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include "Omega.hpp"
@@ -34,6 +33,5 @@ class Engine : public Serializable
 
 REGISTER_SERIALIZABLE(Engine);
 
-#endif // ENGINE_HPP
 
 

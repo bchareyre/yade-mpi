@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef STIFFNESS_MATRIX_TIME_STEPPER_HPP
-#define STIFFNESS_MATRIX_TIME_STEPPER_HPP
+#pragma once
 
 #include<yade/core/TimeStepper.hpp>
 
@@ -62,5 +61,4 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 
 REGISTER_SERIALIZABLE(GlobalStiffnessTimeStepper);
 
-#endif //  GLOBAL_STIFFNESS_TIME_STEPPER_HPP
 

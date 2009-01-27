@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef OMEGA_HPP
-#define OMEGA_HPP
+#pragma once
 
 // qt3 sucks
 #ifdef EMBED_PYTHON
@@ -168,5 +167,4 @@ class Omega : public Singleton<Omega>
 	FRIEND_SINGLETON(Omega);
 };
 
-#endif // OMEGA_HPP
 

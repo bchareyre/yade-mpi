@@ -5,8 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ef2_BSH_TUBE__BSS_SSLS__MAKE_BSS_SSLS_HPP
-#define ef2_BSH_TUBE__BSS_SSLS__MAKE_BSS_SSLS_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 
@@ -27,6 +26,5 @@ class ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment : publ
 
 REGISTER_SERIALIZABLE(ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment);
 
-#endif // ef2_BSH_TUBE__BSS_SSLS__MAKE_BSS_SSLS_HPP
 
 

@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TETRA_MESH_HPP
-#define TETRA_MESH_HPP
+#pragma once
 
 #include <vector>
 #include <iostream>
@@ -77,4 +76,3 @@ public:
   void read_gmsh (const char* name);
 };
 
-#endif // TETRA_MESH_HPP

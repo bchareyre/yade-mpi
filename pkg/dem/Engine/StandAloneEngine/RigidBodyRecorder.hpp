@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef RIGIDBODYRECORDER_HPP
-#define RIGIDBODYRECORDER_HPP
+#pragma once
 
 #include <yade/core/DataRecorder.hpp>
 #include <yade/pkg-common/RigidBodyParameters.hpp>
@@ -38,5 +37,4 @@ protected :
 };
 REGISTER_SERIALIZABLE(RigidBodyRecorder );
 
-#endif // RIGIDBODYRECORDER_HPP
 

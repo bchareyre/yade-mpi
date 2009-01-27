@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP
-#define BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP 
+#pragma once
 
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 #include<yade/core/MetaEngine1D.hpp>
@@ -35,5 +34,4 @@ class PhysicalParametersMetaEngine :	public MetaEngine1D
 
 REGISTER_SERIALIZABLE(PhysicalParametersMetaEngine);
 
-#endif // BODY_PHYSICAL_PARAMETERS_DISPATCHER_HPP 
 

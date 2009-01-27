@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef KINEMATICENGINE_HPP
-#define KINEMATICENGINE_HPP
+#pragma once
 
 #include <vector>
 
@@ -37,5 +36,4 @@ class DeusExMachina : public Engine
 
 REGISTER_SERIALIZABLE(DeusExMachina);
 
-#endif // __KINEMATICENGINE_H__
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FILTER_ENGINE_HPP
-#define FILTER_ENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 class FilterEngine : public DeusExMachina {
@@ -34,5 +33,4 @@ class FilterEngine : public DeusExMachina {
 };
 REGISTER_SERIALIZABLE(FilterEngine);
 
-#endif // FILTER_ENGINE_HPP
 

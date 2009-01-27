@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPRINGPHYSICS_HPP
-#define SPRINGPHYSICS_HPP
+#pragma once
 
 #include<yade/core/InteractionPhysics.hpp>
 
@@ -31,5 +30,4 @@ class SpringPhysics : public InteractionPhysics
 
 REGISTER_SERIALIZABLE(SpringPhysics);
 
-#endif // SPRINGPHYSICS_HPP
 

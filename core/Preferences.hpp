@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PREFERENCES_HPP
-#define PREFERENCES_HPP
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -31,5 +30,4 @@ class Preferences : public Serializable
 
 REGISTER_SERIALIZABLE(Preferences);
 
-#endif // PREFERENCES_HPP
 

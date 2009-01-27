@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BOXSTACK_HPP
-#define BOXSTACK_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -50,6 +49,5 @@ class BoxStack : public FileGenerator
 
 REGISTER_SERIALIZABLE(BoxStack);
 
-#endif // __BOXSTACK_H__
 
 

@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BOUNDINGVOLUMEFACTORY_HPP
-#define BOUNDINGVOLUMEFACTORY_HPP
+#pragma once
 
 #include<yade/core/BoundingVolume.hpp>
 #include<yade/core/InteractingGeometry.hpp>
@@ -52,5 +51,4 @@ class BoundingVolumeEngineUnit : public EngineUnit2D
 
 REGISTER_SERIALIZABLE(BoundingVolumeEngineUnit);
 
-#endif // BOUNDINGVOLUMEFACTORY_HPP
 

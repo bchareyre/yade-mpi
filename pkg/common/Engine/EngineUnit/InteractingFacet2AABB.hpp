@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef IFACET2AABB_HPP
-#define IFACET2AABB_HPP
+#pragma once
 
 #include <yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
@@ -27,5 +26,4 @@ class InteractingFacet2AABB : public BoundingVolumeEngineUnit
 
 REGISTER_SERIALIZABLE(InteractingFacet2AABB);
 
-#endif // IFACET2AABB_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FUNNEL_HPP
-#define FUNNEL_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -51,5 +50,4 @@ class Funnel : public FileGenerator
 
 REGISTER_SERIALIZABLE(Funnel);
 
-#endif //  FUNNEL_HPP
 

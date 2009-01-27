@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_TETRAHEDRON_PARAMETERS_HPP
-#define FEM_TETRAHEDRON_PARAMETERS_HPP 
+#pragma once
 
 // FIXME - this file should be located in: /plugins/Interaction/InteractionPhysicsEngineUnit/FEMParameters/FEMTetrahedronStiffness
 
@@ -32,5 +31,4 @@ class FEMTetrahedronStiffness : public PhysicalParametersEngineUnit
 
 REGISTER_SERIALIZABLE(FEMTetrahedronStiffness);
 
-#endif // FEM_TETRAHEDRON_PARAMETERS_HPP 
 

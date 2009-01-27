@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_CLOSEST_FEATURES_HPP
-#define GLDRAW_CLOSEST_FEATURES_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawClosestFeatures : public GLDrawInteractionGeometryFunctor
 
 REGISTER_SERIALIZABLE(GLDrawClosestFeatures);
 
-#endif
 

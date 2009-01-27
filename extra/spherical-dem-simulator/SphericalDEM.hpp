@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPHERICALDEM_HPP
-#define SPHERICALDEM_HPP
+#pragma once
 
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
@@ -52,5 +51,4 @@ struct SphericalDEM
 	Vector3r momentum;
 };
 
-#endif // SPHERICALDEM_HPP
 

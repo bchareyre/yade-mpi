@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FILEDIALOG_HPP
-#define FILEDIALOG_HPP
+#pragma once
 
 #include <string>
 #include <qfiledialog.h>
@@ -27,5 +26,4 @@ class FileDialog : public QFileDialog
 		static string getExistingDirectory ( const string& directory,const string& caption,QWidget* parent);
 };
 
-#endif // FILEDIALOG_HPP
 

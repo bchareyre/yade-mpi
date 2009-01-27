@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef  MARCHINGCUBE_HPP
-#define  MARCHINGCUBE_HPP
+#pragma once
 
 #include <cmath>
 #include <string>
@@ -77,5 +76,4 @@ class MarchingCube
 	public  : void resizeScalarField(vector<vector<vector<float> > >& scalarField, int sx, int sy, int sz);
 };
 
-#endif // MARCHINGCUBE_HPP
 

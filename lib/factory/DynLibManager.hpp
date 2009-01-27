@@ -7,8 +7,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DYNLIBMANAGER_HPP
-#define DYNLIBMANAGER_HPP
+#pragma once
 
 #ifdef WIN32
 	#define OS "Windows"
@@ -72,5 +71,4 @@ class DynLibManager
 		string lastError_;
 };
 
-#endif // __DYNLIBMANAGER_H__
 

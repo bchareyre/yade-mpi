@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ELASTIC_CRITERION_TIME_STEPPER_HPP
-#define ELASTIC_CRITERION_TIME_STEPPER_HPP
+#pragma once
 
 #include<yade/core/TimeStepper.hpp>
 
@@ -42,5 +41,4 @@ class ElasticCriterionTimeStepper : public TimeStepper
 
 REGISTER_SERIALIZABLE(ElasticCriterionTimeStepper);
 
-#endif //  ELASTIC_CRITERION_TIME_STEPPER_HPP
 

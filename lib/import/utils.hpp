@@ -1,5 +1,4 @@
-#ifndef UTILS__HEADER__FILE__
-#define UTILS__HEADER__FILE__
+#pragma once
 
 #include<utility>
 using namespace std;
@@ -19,4 +18,3 @@ void minmaxEx(T &a, T &b)
     }
 }
 
-#endif // UTILS__HEADER__FILE__

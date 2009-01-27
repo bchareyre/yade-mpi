@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICEBEAMPARAMETERS_HPP
-#define LATTICEBEAMPARAMETERS_HPP
+#pragma once
 
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
@@ -51,5 +50,4 @@ class FEMTetrahedronData : public PhysicalParameters
 
 REGISTER_SERIALIZABLE(FEMTetrahedronData);
 
-#endif // LATTICEBEAMPARAMETERS_HPP
 

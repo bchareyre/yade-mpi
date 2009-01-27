@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTING_GEOMETRY_ENGINE_UNIT_HPP
-#define INTERACTING_GEOMETRY_ENGINE_UNIT_HPP
+#pragma once
 
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/GeometricalModel.hpp>
@@ -47,5 +46,4 @@ class InteractingGeometryEngineUnit : 	public EngineUnit2D
 
 REGISTER_SERIALIZABLE(InteractingGeometryEngineUnit);
 
-#endif //  INTERACTING_GEOMETRY_ENGINE_UNIT_HPP
 

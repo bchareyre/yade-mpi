@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef HYDRAULIC_FORCE_FUNCTOR_HPP
-#define HYDRAULIC_FORCE_FUNCTOR_HPP 
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 
@@ -38,5 +37,4 @@ class HydraulicForceEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(HydraulicForceEngine);
 
-#endif // GRAVITY_FORCE_FUNCTOR_HPP 
 

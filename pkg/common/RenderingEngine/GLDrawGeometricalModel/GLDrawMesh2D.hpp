@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWMESH2D_HPP
-#define GLDRAWMESH2D_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -24,5 +23,4 @@ class GLDrawMesh2D : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawMesh2D);
 
-#endif //  GLDRAWMESH2D_HPP
 

@@ -7,8 +7,7 @@
 *************************************************************************/
 
 
-#ifndef ELASTICBODYPARAMETERS_HPP
-#define ELASTICBODYPARAMETERS_HPP
+#pragma once
 
 
 #include "RigidBodyParameters.hpp"
@@ -34,5 +33,4 @@ class ElasticBodyParameters : public RigidBodyParameters
 
 REGISTER_SERIALIZABLE(ElasticBodyParameters);
 
-#endif 
 

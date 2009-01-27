@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONPHYSICSMETAENGINE_HPP
-#define INTERACTIONPHYSICSMETAENGINE_HPP 
+#pragma once
 
 
 #include<yade/core/MetaEngine2D.hpp>
@@ -38,6 +37,5 @@ class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 
 REGISTER_SERIALIZABLE(InteractionPhysicsMetaEngine);
 
-#endif //  INTERACTIONPHYSICSMETAENGINE_HPP
 
 

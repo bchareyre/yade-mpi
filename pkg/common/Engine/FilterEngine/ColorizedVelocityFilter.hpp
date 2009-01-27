@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef COLORIZED_VELOCITY_FILTER_HPP
-#define COLORIZED_VELOCITY_FILTER_HPP 
+#pragma once
 
 #include<yade/pkg-common/FilterEngine.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -45,5 +44,4 @@ class ColorizedVelocityFilter : public FilterEngine {
 
 REGISTER_SERIALIZABLE(ColorizedVelocityFilter);
 
-#endif // COLORIZED_VELOCITY_FILTER_HPP 
 

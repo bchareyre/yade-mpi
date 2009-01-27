@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef NULLGUI_HPP
-#define NULLGUI_HPP
+#pragma once
 
 // FIXME : there is a problem because I need to link with serialization when I include Factorable because Factorable use some Type described in serialization for the findClassInfo method
 #include "FrontEnd.hpp"
@@ -41,5 +40,4 @@ class NullGUI : public FrontEnd
 
 REGISTER_FACTORABLE(NullGUI);
 
-#endif // NULLGUI_HPP
 

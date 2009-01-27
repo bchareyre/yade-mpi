@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef COHESIVEFRICTIONALCONTACTMODEL_HPP
-#define COHESIVEFRICTIONALCONTACTMODEL_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
@@ -40,5 +39,4 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsEngineUnit
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalRelationships);
 
-#endif // COHESIVEFRICTIONALCONTACTMODEL_HPP
 

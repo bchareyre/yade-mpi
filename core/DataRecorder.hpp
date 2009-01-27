@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DATARECORDER_HPP
-#define DATARECORDER_HPP
+#pragma once
 
 #include "StandAloneEngine.hpp"
 
@@ -23,4 +22,3 @@ class DataRecorder : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(DataRecorder);
 
-#endif // DATARECORDER_HPP

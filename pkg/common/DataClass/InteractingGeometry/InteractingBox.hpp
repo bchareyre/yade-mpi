@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTION_BOX_HPP
-#define INTERACTION_BOX_HPP
+#pragma once
 
 
 #include<yade/core/InteractingGeometry.hpp>
@@ -33,5 +32,4 @@ class InteractingBox : public InteractingGeometry
 
 REGISTER_SERIALIZABLE(InteractingBox);
 
-#endif //  INTERACTION_BOX_HPP
 

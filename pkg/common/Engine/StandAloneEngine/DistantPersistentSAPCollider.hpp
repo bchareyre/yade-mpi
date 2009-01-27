@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef __DISTANTPERSISTENTSAPCOLLIDER_HPP__
-#define __DISTANTPERSISTENTSAPCOLLIDER_HPP__
+#pragma once
 
 #include<yade/core/BroadInteractor.hpp>
 #include<yade/core/InteractionContainer.hpp>
@@ -100,5 +99,4 @@ class DistantPersistentSAPCollider : public BroadInteractor
 
 REGISTER_SERIALIZABLE(DistantPersistentSAPCollider);
 
-#endif // __PERSISTENTSAPCOLLIDER_HPP__
 

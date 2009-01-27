@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FRONTEND_HPP
-#define FRONTEND_HPP
+#pragma once
 
 #include "Omega.hpp"
 
@@ -27,5 +26,4 @@ class FrontEnd : public Factorable
 
 REGISTER_FACTORABLE(FrontEnd);
 
-#endif // FRONTEND_HPP
 

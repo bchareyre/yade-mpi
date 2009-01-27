@@ -9,8 +9,7 @@
 *************************************************************************/
 
 
-#ifndef ARCHIVECONTENT_HPP
-#define ARCHIVECONTENT_HPP
+#pragma once
 
 #include <boost/any.hpp>
 
@@ -279,4 +278,3 @@ class Archive
 
 #include "Archive.tpp"
 
-#endif // ARCHIVECONTENT_HPP

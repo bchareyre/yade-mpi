@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef THREAD_RUNNER_HPP
-#define THREAD_RUNNER_HPP
+#pragma once
 
 #include <boost/thread/mutex.hpp>
 
@@ -70,5 +69,4 @@ class ThreadRunner
 		bool looping();
 };
 
-#endif // SIMULATIONLOOP_HPP
 

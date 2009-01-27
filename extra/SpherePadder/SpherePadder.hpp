@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPHERE_PADDER_HPP
-#define SPHERE_PADDER_HPP
+#pragma once
 
 #include "TetraMesh.hpp"
 #include "CellPartition.hpp"
@@ -116,5 +115,4 @@ class SpherePadder
 };
 
 
-#endif // SPHERE_PADDER_HPP
 

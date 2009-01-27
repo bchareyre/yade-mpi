@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef IFACET_HPP
-#define IFACET_HPP
+#pragma once
 
 #include<yade/core/GeometricalModel.hpp>
 
@@ -27,5 +26,4 @@ class Facet : public GeometricalModel {
 
 REGISTER_SERIALIZABLE(Facet);
 
-#endif // IFACET_HPP
 

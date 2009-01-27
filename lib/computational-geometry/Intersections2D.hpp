@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERSECTION2D_HPP
-#define INTERSECTION2D_HPP
+#pragma once
 
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
@@ -31,5 +30,4 @@ using namespace std;
 	void clipTop(Real sizeY, std::vector<Vector3r>& polygon, Vector3r v1, Vector3r v2);
 	void clipBottom(Real sizeY, std::vector<Vector3r> &polygon, Vector3r v1, Vector3r v2);
 
-#endif // INTERSECTION2D_HPP
 

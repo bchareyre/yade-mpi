@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LEAPFROG_POSITION_INTEGRATOR_HPP
-#define LEAPFROG_POSITION_INTEGRATOR_HPP 
+#pragma once
 
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 
@@ -28,6 +27,5 @@ class LeapFrogPositionIntegrator : public PhysicalParametersEngineUnit
 
 REGISTER_SERIALIZABLE(LeapFrogPositionIntegrator);
 
-#endif // LEAPFROG_POSITION_INTEGRATOR_HPP
 
 

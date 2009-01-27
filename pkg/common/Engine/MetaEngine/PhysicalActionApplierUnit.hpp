@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTIONAPPLIERUNIT_HPP
-#define PHYSICALACTIONAPPLIERUNIT_HPP
+#pragma once
 
 #include<yade/core/PhysicalAction.hpp>
 #include<yade/core/PhysicalParameters.hpp>
@@ -29,5 +28,4 @@ class PhysicalActionApplierUnit :	public EngineUnit2D
 
 REGISTER_SERIALIZABLE(PhysicalActionApplierUnit);
 
-#endif // PHYSICALACTIONAPPLIERUNIT_HPP
 

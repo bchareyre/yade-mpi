@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICEBEAMANGULARSPRING_HPP
-#define LATTICEBEAMANGULARSPRING_HPP
+#pragma once
 
 #include<yade/core/InteractionPhysics.hpp>
 #include <vector>
@@ -44,5 +43,4 @@ class LatticeBeamAngularSpring : public InteractionPhysics
 
 REGISTER_SERIALIZABLE(LatticeBeamAngularSpring);
 
-#endif //  LATTICEBEAMANGULARSPRING_HPP
 

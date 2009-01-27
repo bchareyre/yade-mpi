@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPHERE2SPHERE4MACROMICROCONTACTGEOMETRY_HPP
-#define SPHERE2SPHERE4MACROMICROCONTACTGEOMETRY_HPP
+#pragma once
 
 #include <yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
@@ -35,5 +34,4 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometryWater : public I
 
 REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometryWater);
 
-#endif // SPHERE2SPHERE4MACROMICROCONTACTGEOMETRY_HPP
 

@@ -6,10 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
-
-#ifndef GLOBALSTIFFNESSCOUNTER_HPP
-#define GLOBALSTIFFNESSCOUNTER_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -48,7 +45,6 @@ class GlobalStiffnessCounter : public InteractionSolver
 
 REGISTER_SERIALIZABLE(GlobalStiffnessCounter);
 
-#endif // GLOBALSTIFFNESSCOUNTER_HPP
 
 
 

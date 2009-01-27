@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLOBALSTIFFNESSMATRIX_HPP
-#define GLOBALSTIFFNESSMATRIX_HPP
+#pragma once
 
 #include<yade/core/PhysicalAction.hpp>
 #include <Wm3Vector3.h>
@@ -52,4 +51,3 @@ class GlobalStiffness : public PhysicalAction
 
 REGISTER_SERIALIZABLE(GlobalStiffness);
 
-#endif // GLOBALSTIFFNESSMATRIX_HPP

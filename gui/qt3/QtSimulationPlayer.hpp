@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef QTSIMULATIONPLAYER_HPP
-#define QTSIMULATIONPLAYER_HPP
+#pragma once
 
 #include<yade/core/Omega.hpp>
 #include<yade/lib-factory/Factorable.hpp>
@@ -59,5 +58,4 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 
 REGISTER_FACTORABLE(QtSimulationPlayer);
 
-#endif // QTSIMULATIONPLAYER_HPP
 

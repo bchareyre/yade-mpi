@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef IOMANAGEREXCEPTIONS_HPP
-#define IOMANAGEREXCEPTIONS_HPP
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -35,5 +34,4 @@ struct IOManagerExceptions
 	static const char* FileNotGood;
 };
 
-#endif //  IOMANAGEREXCEPTIONS_HPP
 

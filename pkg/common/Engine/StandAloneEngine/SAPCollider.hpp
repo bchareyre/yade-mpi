@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SAPCOLLIDER_HPP
-#define SAPCOLLIDER_HPP
+#pragma once
 
 #include <list>
 #include <set>
@@ -92,5 +91,4 @@ class SAPCollider : public BroadInteractor
 
 REGISTER_SERIALIZABLE(SAPCollider);
 
-#endif // SAPCOLLIDER_HPP
 

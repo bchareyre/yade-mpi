@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef OPENGLWRAPPER_HPP
-#define OPENGLWRAPPER_HPP
+#pragma once
 
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
@@ -495,5 +494,4 @@ void glWindowPos4fvMESA( const GLfloat *p );
 void glWindowPos4dvMESA( const GLdouble *p );
 */
 
-#endif // OPENGLWRAPPER_HPP
 

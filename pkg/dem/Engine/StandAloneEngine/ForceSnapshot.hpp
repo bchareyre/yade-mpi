@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FORCE_SNAPSHOT_HPP
-#define FORCE_SNAPSHOT_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 #include <string>
@@ -45,5 +44,4 @@ class ForceSnapshot : public DataRecorder
 
 REGISTER_SERIALIZABLE(ForceSnapshot);
 
-#endif // FORCE_SNAPSHOT_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
-#define BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
+#pragma once
 
 
 #include<yade/core/InteractingGeometry.hpp>
@@ -36,5 +35,4 @@ class BssSweptSphereLineSegment : public InteractingGeometry
 
 REGISTER_SERIALIZABLE(BssSweptSphereLineSegment);
 
-#endif //  BSS_SWEPT_SPHERE_LINE_SEGMENT_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_QUADRILATERAL_HPP
-#define GLDRAW_QUADRILATERAL_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -30,5 +29,4 @@ class GLDrawQuadrilateral : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawQuadrilateral);
 
-#endif // GLDRAW_TETRAHEDRON_HPP 
 

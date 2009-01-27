@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FILEGENERATOR_HPP
-#define FILEGENERATOR_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-base/Logging.hpp>
@@ -51,5 +50,4 @@ class FileGenerator
 
 REGISTER_SERIALIZABLE(FileGenerator);
 
-#endif // FILEGENERATOR_HPP
 

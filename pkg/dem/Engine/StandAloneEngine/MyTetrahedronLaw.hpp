@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MYTETRAHEDRONLAW_HPP
-#define MYTETRAHEDRONLAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -56,5 +55,4 @@ class MyTetrahedronLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(MyTetrahedronLaw);
 
-#endif // ELASTIC_CONTACT_LAW_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMULATIONPLAYERVIEWER_HPP
-#define SIMULATIONPLAYERVIEWER_HPP
+#pragma once
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/RenderingEngine.hpp>
@@ -63,5 +62,4 @@ class GLSimulationPlayerViewer: public GLViewer {
 	DECLARE_LOGGER;
 };
 
-#endif // SIMULATIONVIEWER_HPP
 

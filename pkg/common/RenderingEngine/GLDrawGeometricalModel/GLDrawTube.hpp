@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_TUBE_HPP
-#define GLDRAW_TUBE_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -31,5 +30,4 @@ class GLDrawTube : public GLDrawGeometricalModelFunctor
 
 REGISTER_SERIALIZABLE(GLDrawTube);
 
-#endif // GLDRAW_TUBE_HPP 
 

@@ -8,11 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
-
-
-#ifndef RESULTANT_FORCE_ENGINE_HPP
-#define RESULTANT_FORCE_ENGINE_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include <Wm3Math.h>
@@ -58,5 +54,4 @@ class ResultantForceEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(ResultantForceEngine);
 
-#endif // FORCE_ENGINE_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CONTACT_HPP
-#define CONTACT_HPP
+#pragma once
 
 #include<Wm3Math.h>
 #include<Wm3Vector3.h>
@@ -61,5 +60,4 @@ struct lessThanContact
 typedef set<Contact,lessThanContact> ContactSet;
 typedef vector<ContactSet> ContactVecSet;
 
-#endif // __CONTACT_HPP__
 

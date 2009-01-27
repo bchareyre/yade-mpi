@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MESSAGEDIALOG_HPP
-#define MESSAGEDIALOG_HPP
+#pragma once
 
 #include <string>
 #include "QtGeneratedMessageDialog.h"
@@ -26,5 +25,4 @@ class MessageDialog : public QtGeneratedMessageDialog
 		void timerEvent(QTimerEvent * evt);
 };
 
-#endif // MESSAGEDIALOG_HPP
 

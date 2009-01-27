@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ELASTICBODYSIMPLERELATIONSHIP_HPP
-#define ELASTICBODYSIMPLERELATIONSHIP_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
@@ -30,5 +29,4 @@ class ElasticBodySimpleRelationship : public InteractionPhysicsEngineUnit
 
 REGISTER_SERIALIZABLE(ElasticBodySimpleRelationship);
 
-#endif // 
 

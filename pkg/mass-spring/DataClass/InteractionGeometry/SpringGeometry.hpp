@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SPRINGGEOMETRY_HPP
-#define SPRINGGEOMETRY_HPP
+#pragma once
 
 
 #include<yade/core/InteractionGeometry.hpp>
@@ -31,5 +30,4 @@ class SpringGeometry : public InteractionGeometry
 
 REGISTER_SERIALIZABLE(SpringGeometry);
 
-#endif // SPRINGGEOMETRY_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_SET_2_TETRAHEDRONS_HPP
-#define FEM_SET_2_TETRAHEDRONS_HPP
+#pragma once
 
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
 
@@ -25,5 +24,4 @@ class FEMSet2Tetrahedrons : public GeometricalModelEngineUnit
 
 REGISTER_SERIALIZABLE(FEMSet2Tetrahedrons);
 
-#endif // FEM_SET_2_TETRAHEDRONS_HPP 
 

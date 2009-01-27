@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWINTERACTIONBOX_HPP
-#define GLDRAWINTERACTIONBOX_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawInteractingBox : public GLDrawInteractingGeometryFunctor
 
 REGISTER_SERIALIZABLE(GLDrawInteractingBox);
 
-#endif //  GLDRAWINTERACTIONBOX_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef STRAIN_RECORDER_HPP
-#define STRAIN_RECORDER_HPP 
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -42,5 +41,4 @@ class StrainRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(StrainRecorder);
 
-#endif // STRAIN_RECORDER_HPP 
 

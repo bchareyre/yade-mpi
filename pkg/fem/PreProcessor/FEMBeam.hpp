@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_BEAM_HPP
-#define FEM_BEAM_HPP 
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -56,5 +55,4 @@ class FEMBeam : public FileGenerator
 
 REGISTER_SERIALIZABLE(FEMBeam);
 
-#endif // SDEC_SPHERES_PLANE_HPP 
 

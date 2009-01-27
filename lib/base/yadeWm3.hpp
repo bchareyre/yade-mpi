@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifdef QUAD_PRECISION
 	typedef long double quad;
 	typedef quad Real;

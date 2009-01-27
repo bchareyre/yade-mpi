@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CL_1_RELATIONSHIPS_HPP
-#define CL_1_RELATIONSHIPS_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
@@ -46,5 +45,4 @@ class CL1Relationships : public InteractionPhysicsEngineUnit
 
 REGISTER_SERIALIZABLE(CL1Relationships);
 
-#endif // CL_1_RELATIONSHIPS_HPP
 

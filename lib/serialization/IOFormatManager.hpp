@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef IOFORMATMANAGER_HPP
-#define IOFORMATMANAGER_HPP
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -97,5 +96,4 @@ class IOFormatManager : public Factorable
 
 REGISTER_FACTORABLE(IOFormatManager);
 
-#endif //  IOFORMATMANAGER_HPP
 

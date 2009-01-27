@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef STANDALONEENGINE_HPP
-#define STANDALONEENGINE_HPP
+#pragma once
 
 #include "Engine.hpp"
 
@@ -21,5 +20,4 @@ class StandAloneEngine : public Engine
 };
 REGISTER_SERIALIZABLE(StandAloneEngine);
 
-#endif // STANDALONEENGINE_HPP
 

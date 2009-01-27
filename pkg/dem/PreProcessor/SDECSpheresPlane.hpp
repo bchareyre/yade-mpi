@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SDEC_SPHERES_PLANE_HPP
-#define SDEC_SPHERES_PLANE_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -55,6 +54,5 @@ class SDECSpheresPlane : public FileGenerator
 
 REGISTER_SERIALIZABLE(SDECSpheresPlane);
 
-#endif // SDEC_SPHERES_PLANE_HPP 
 
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTING_GEOMETRY_HPP
-#define INTERACTING_GEOMETRY_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
@@ -38,5 +37,4 @@ class InteractingGeometry : public Serializable, public Indexable
 
 REGISTER_SERIALIZABLE(InteractingGeometry);
 
-#endif //  INTERACTING_GEOMETRY_HPP
 

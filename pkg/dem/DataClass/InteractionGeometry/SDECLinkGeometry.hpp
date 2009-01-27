@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SDECLINKGEOMETRY_HPP
-#define SDECLINKGEOMETRY_HPP
+#pragma once
 
 #include <vector>
 #include<yade/core/InteractionGeometry.hpp>
@@ -38,5 +37,4 @@ class __attribute__((__deprecated__)) SDECLinkGeometry : public InteractionGeome
 
 REGISTER_SERIALIZABLE(SDECLinkGeometry);
 
-#endif // SDECCPERMANENTLINK_HPP
 

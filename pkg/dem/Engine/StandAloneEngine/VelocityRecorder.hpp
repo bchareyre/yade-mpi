@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef VELOCITY_RECORDER_HPP
-#define VELOCITY_RECORDER_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 #include <string>
@@ -36,6 +35,5 @@ class VelocityRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(VelocityRecorder);
 
-#endif // VELOCITY_RECORDER_HPP 
 
 

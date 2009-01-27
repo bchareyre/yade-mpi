@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef POSITION_SNAPSHOT_HPP
-#define POSITION_SNAPSHOT_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 #include <string>
@@ -43,5 +42,4 @@ class PositionSnapshot : public DataRecorder
 
 REGISTER_SERIALIZABLE(PositionSnapshot);
 
-#endif // POSITION_SNAPSHOT_HPP
 

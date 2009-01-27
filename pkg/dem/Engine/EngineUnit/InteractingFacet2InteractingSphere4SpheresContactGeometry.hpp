@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
-#define IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
@@ -54,5 +53,4 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 
 REGISTER_SERIALIZABLE(InteractingFacet2InteractingSphere4SpheresContactGeometry);
 
-#endif //  IFACET2SPHERE4SPHERESCONTACTGEOMETRY_HPP
 

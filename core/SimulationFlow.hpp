@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMULATION_FLOW_HPP
-#define SIMULATION_FLOW_HPP
+#pragma once
 
 #include "ThreadWorker.hpp"
 
@@ -18,6 +17,5 @@ class SimulationFlow // FIXME ; bad name
 		virtual void	singleAction();
 };
 
-#endif
 
 

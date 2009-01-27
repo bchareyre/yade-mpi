@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SDECLINKPHYSICS_HPP
-#define SDECLINKPHYSICS_HPP
+#pragma once
 
 #include<yade/core/InteractionPhysics.hpp>
 
@@ -52,5 +51,4 @@ class SDECLinkPhysics : public InteractionPhysics
 
 REGISTER_SERIALIZABLE(SDECLinkPhysics);
 
-#endif // SDECLINKPHYSICS_HPP
 

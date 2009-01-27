@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TIMESTEPPER_HPP
-#define TIMESTEPPER_HPP
+#pragma once
 
 #include <list>
 #include <vector>
@@ -35,5 +34,4 @@ class TimeStepper : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(TimeStepper);
 
-#endif // TIMESTEPPER_HPP
 

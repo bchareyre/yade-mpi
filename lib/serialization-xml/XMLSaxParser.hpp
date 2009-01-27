@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef XMLSAXPARSER_HPP
-#define XMLSAXPARSER_HPP
+#pragma once
 
 #include <map>
 #include <vector>
@@ -49,5 +48,4 @@ class XmlSaxParser
 		void deleteBasicAttribute(const string& name);
 };
 
-#endif // XMLSAXPARSER_HPP
 

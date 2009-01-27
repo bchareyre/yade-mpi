@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef STANDALONESIMULATOR_HPP
-#define STANDALONESIMULATOR_HPP
+#pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include <Wm3Math.h>
@@ -42,5 +41,4 @@ class StandAloneSimulator : public Serializable
 
 REGISTER_SERIALIZABLE(StandAloneSimulator);
 
-#endif // STANDALONESIMULATOR_HPP
 

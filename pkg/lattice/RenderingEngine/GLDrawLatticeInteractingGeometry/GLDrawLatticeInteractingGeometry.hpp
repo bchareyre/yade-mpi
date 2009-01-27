@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_LATTICE_INTERACTING_GEOMETRY_HPP
-#define GLDRAW_LATTICE_INTERACTING_GEOMETRY_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 #include <vector>
@@ -37,5 +36,4 @@ class GLDrawLatticeInteractingGeometry : public GLDrawInteractingGeometryFunctor
 
 REGISTER_SERIALIZABLE(GLDrawLatticeInteractingGeometry);
 
-#endif
 

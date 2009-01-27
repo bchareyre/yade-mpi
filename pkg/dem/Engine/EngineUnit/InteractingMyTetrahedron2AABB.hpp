@@ -5,8 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef INTERACTING_MY_TETRAHEDRON_2AABB_HPP
-#define INTERACTING_MY_TETRAHEDRON_2AABB_HPP
+#pragma once
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
@@ -36,5 +35,4 @@ class InteractingMyTetrahedron2AABB : public BoundingVolumeEngineUnit
 
 REGISTER_SERIALIZABLE(InteractingMyTetrahedron2AABB);
 
-#endif // INTERACTING_MY_TETRAHEDRON_2AABB_HPP
 

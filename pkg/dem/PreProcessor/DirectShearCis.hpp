@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DIRECTSHEARCIS_HPP
-#define DIRECTSHEARCIS_HPP
+#pragma once
 
 /*! \brief A shear test		DEPRECATED, replaced by SimpleShear
 
@@ -84,6 +83,5 @@ class DirectShearCis : public FileGenerator
 
 REGISTER_SERIALIZABLE(DirectShearCis);
 
-#endif // DIRECTSHEARCIS_HPP
 
 

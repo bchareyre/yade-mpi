@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef BOUNDINGVOLUMEUPDATOR_HPP
-#define BOUNDINGVOLUMEUPDATOR_HPP
+#pragma once
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
@@ -41,5 +40,4 @@ class BoundingVolumeMetaEngine :	public MetaEngine2D
 
 REGISTER_SERIALIZABLE(BoundingVolumeMetaEngine);
 
-#endif // BOUNDINGVOLUMEUPDATOR_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_ElasticContactInteraction_HPP
-#define GLDRAW_ElasticContactInteraction_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -28,5 +27,4 @@ class GLDrawElasticContactInteraction : public GLDrawInteractionPhysicsFunctor
 
 REGISTER_SERIALIZABLE(GLDrawElasticContactInteraction);
 
-#endif 
 

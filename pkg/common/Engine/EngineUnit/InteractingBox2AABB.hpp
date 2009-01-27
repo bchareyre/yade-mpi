@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef INTERACTINGBOX2AABB_HPP
-#define INTERACTINGBOX2AABB_HPP
+#pragma once
 
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
@@ -27,5 +26,4 @@ class InteractingBox2AABB : public BoundingVolumeEngineUnit
 
 REGISTER_SERIALIZABLE(InteractingBox2AABB);
 
-#endif // INTERACTINGBOX2AABB_HPP
 

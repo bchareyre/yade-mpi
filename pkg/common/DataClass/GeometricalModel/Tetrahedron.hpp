@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TETRAHEDRON_HPP
-#define TETRAHEDRON_HPP
+#pragma once
 
 #include<vector>
 #include<yade/core/GeometricalModel.hpp>
@@ -35,5 +34,4 @@ class Tetrahedron : public GeometricalModel
 
 REGISTER_SERIALIZABLE(Tetrahedron);
 
-#endif // TETRAHEDRON_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAW_SIMPLEVISCOELASTIC_INTERACTION_HPP
-#define GLDRAW_SIMPLEVISCOELASTIC_INTERACTION_HPP
+#pragma once
 
 #include <yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawSimpleViscoelasticInteraction : public GLDrawInteractionPhysicsFunct
 
 REGISTER_SERIALIZABLE(GLDrawSimpleViscoelasticInteraction);
 
-#endif //GLDRAW_SIMPLEVISCOELASTIC_INTERACTION_HPP
 

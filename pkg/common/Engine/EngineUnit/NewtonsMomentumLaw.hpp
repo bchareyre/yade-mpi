@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef NEWTONSMOMENTUMLAW_HPP
-#define NEWTONSMOMENTUMLAW_HPP
+#pragma once
 
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 
@@ -26,5 +25,4 @@ class NewtonsMomentumLaw : public PhysicalActionApplierUnit
 
 REGISTER_SERIALIZABLE(NewtonsMomentumLaw);
 
-#endif // NEWTONSMOMENTUMLAW_HPP
 

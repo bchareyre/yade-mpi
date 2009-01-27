@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef QTGUIPREFERENCES_HPP
-#define QTGUIPREFERENCES_HPP
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -33,5 +32,4 @@ class QtGUIPreferences : public Serializable
 
 REGISTER_SERIALIZABLE(QtGUIPreferences);
 
-#endif // QTGUIPREFERENCES_HPP
 

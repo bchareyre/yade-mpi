@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FEM_SET_GEOMETRY_HPP
-#define FEM_SET_GEOMETRY_HPP 
+#pragma once
 
 #include<yade/core/GeometricalModel.hpp>
 
@@ -28,5 +27,4 @@ class FEMSetGeometry : public GeometricalModel
 
 REGISTER_SERIALIZABLE(FEMSetGeometry);
 
-#endif // FEM_SET_GEOMETRY_HPP
 

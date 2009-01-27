@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MESH2D_HPP
-#define MESH2D_HPP
+#pragma once
 
 #include<yade/core/GeometricalModel.hpp>
 
@@ -64,5 +63,4 @@ class Mesh2D : public GeometricalModel
 
 REGISTER_SERIALIZABLE(Mesh2D);
 
-#endif // MESH2D_HPP
 

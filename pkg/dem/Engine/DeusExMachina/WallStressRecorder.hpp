@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef WALL_STRESS_RECORDER_HPP
-#define WALL_STRESS_RECORDER_HPP
+#pragma once
 
 #include <yade/core/DataRecorder.hpp>
 
@@ -49,5 +48,4 @@ class WallStressRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(WallStressRecorder);
 
-#endif // WALL_STRESS_RECORDER_HPP
 

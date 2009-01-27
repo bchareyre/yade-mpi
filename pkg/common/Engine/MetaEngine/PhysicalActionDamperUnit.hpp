@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTIONDAMPERUNIT_HPP
-#define PHYSICALACTIONDAMPERUNIT_HPP
+#pragma once
 
 #include<yade/core/PhysicalAction.hpp>
 #include<yade/core/PhysicalParameters.hpp>
@@ -29,4 +28,3 @@ class PhysicalActionDamperUnit : public EngineUnit2D
 
 REGISTER_SERIALIZABLE(PhysicalActionDamperUnit);
 
-#endif // __PHYSICALACTIONDAMPINGUNIT_HPP__

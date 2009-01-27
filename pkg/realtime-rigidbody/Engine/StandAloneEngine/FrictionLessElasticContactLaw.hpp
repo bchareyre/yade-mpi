@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FRICTIONLESSELASTICCONTACTLAW_HPP
-#define FRICTIONLESSELASTICCONTACTLAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -33,5 +32,4 @@ class FrictionLessElasticContactLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(FrictionLessElasticContactLaw);
 
-#endif // FRICTIONLESSELASTICCONTACTLAW_HPP
 

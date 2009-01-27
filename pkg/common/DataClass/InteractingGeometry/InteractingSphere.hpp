@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTIONSPHERE_HPP
-#define INTERACTIONSPHERE_HPP
+#pragma once
 
 #include<yade/core/InteractingGeometry.hpp>
 
@@ -31,5 +30,4 @@ class InteractingSphere : public InteractingGeometry
 
 REGISTER_SERIALIZABLE(InteractingSphere);
 
-#endif // INTERACTIONSPHERE_HPP
 

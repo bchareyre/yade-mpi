@@ -1,7 +1,6 @@
 // © 2007 Václav Šmilauer <eudoxos@arcig.cz>
 
-#ifndef TETRA_HPP
-#define TETRA_HPP
+#pragma once
 
 #include<vector>
 
@@ -196,4 +195,3 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v);
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody);
 
 
-#endif

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWSPHERESHADOWVOLUME_HPP
-#define GLDRAWSPHERESHADOWVOLUME_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawSphereShadowVolume : public GLDrawShadowVolumeFunctor
 
 REGISTER_SERIALIZABLE(GLDrawSphereShadowVolume);
 
-#endif //  GLDRAWSPHERESHADOWVOLUME_HPP
 

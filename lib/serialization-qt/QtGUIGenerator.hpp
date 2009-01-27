@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef QTGUIGENERATOR_HPP
-#define QTGUIGENERATOR_HPP
+#pragma once
 
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include <map>
@@ -83,5 +82,4 @@ class QtGUIGenerator : public QObject
 		virtual void pushButtonCancelClicked() ;
 };
 
-#endif // QTGUIGENERATOR_HPP
 

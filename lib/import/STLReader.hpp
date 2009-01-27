@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef __STLREADER_HPP__
-#define __STLREADER_HPP__
+#pragma once
 
 #include <stdio.h>
 #include<string.h>
@@ -226,4 +225,3 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
     return true;
 }
 
-#endif // __STLREADER_HPP__

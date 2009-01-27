@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ENGINEUNIT1D_HPP
-#define ENGINEUNIT1D_HPP
+#pragma once
 
 #include "EngineUnit.hpp"
 
@@ -29,5 +28,4 @@ class EngineUnit1D : 	public EngineUnit,
 	REGISTER_CLASS_AND_BASE(EngineUnit1D,EngineUnit FunctorWrapper);
 };
 
-#endif // ENGINEUNIT1D_HPP
 

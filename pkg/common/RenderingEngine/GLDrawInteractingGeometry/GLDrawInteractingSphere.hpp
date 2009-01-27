@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef __GLDRAWINTERACTIONSPHERE_HPP__
-#define __GLDRAWINTERACTIONSPHERE_HPP__
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -37,5 +36,4 @@ class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 
 REGISTER_SERIALIZABLE(GLDrawInteractingSphere);
 
-#endif //  GLDRAWINTERACTIONSPHERE_HPP
 

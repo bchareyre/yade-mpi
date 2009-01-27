@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef HydraulicTest_HPP
-#define HydraulicTest_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
@@ -55,5 +54,4 @@ class HydraulicTest : public FileGenerator
 
 REGISTER_SERIALIZABLE(HydraulicTest);
 
-#endif // LINKEDSPHERES_HPP
 

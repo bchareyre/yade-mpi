@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ELASTICCOHESIVELAW_HPP
-#define ELASTICCOHESIVELAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 
@@ -39,5 +38,4 @@ class ElasticCohesiveLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(ElasticCohesiveLaw);
 
-#endif // ELASTICCOHESIVELAW_HPP
 

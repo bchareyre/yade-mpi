@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef POISSON_RECORDER_HPP
-#define POISSON_RECORDER_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -42,5 +41,4 @@ class MeasurePoisson : public DataRecorder
 
 REGISTER_SERIALIZABLE(MeasurePoisson);
 
-#endif // POISSON_RECORDER_HPP
 

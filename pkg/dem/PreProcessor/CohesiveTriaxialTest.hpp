@@ -10,8 +10,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef COHESIVE_TRIAXIAL_TEST_HPP
-#define COHESIVE_TRIAXIAL_TEST_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
@@ -135,5 +134,4 @@ class CohesiveTriaxialTest : public FileGenerator
 
 REGISTER_SERIALIZABLE(CohesiveTriaxialTest);
 
-#endif // COHESIVE_TRIAXIAL_TEST_HPP
 

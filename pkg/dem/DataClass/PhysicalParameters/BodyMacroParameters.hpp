@@ -9,8 +9,7 @@
 *************************************************************************/
 
 
-#ifndef BODYMACROPARAMETERS_HPP
-#define BODYMACROPARAMETERS_HPP
+#pragma once
 
 
 #include<yade/pkg-common/ElasticBodyParameters.hpp>
@@ -37,5 +36,4 @@ class BodyMacroParameters : public ElasticBodyParameters
 
 REGISTER_SERIALIZABLE(BodyMacroParameters);
 
-#endif // __SDECDISCRETEELEMENT_H__
 

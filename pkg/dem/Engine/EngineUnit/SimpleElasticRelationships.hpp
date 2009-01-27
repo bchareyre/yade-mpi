@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMPLECONTACTMODEL_HPP
-#define SIMPLECONTACTMODEL_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
@@ -31,5 +30,4 @@ class SimpleElasticRelationships : public InteractionPhysicsEngineUnit
 
 REGISTER_SERIALIZABLE(SimpleElasticRelationships);
 
-#endif // SIMPLECONTACTMODEL_HPP
 

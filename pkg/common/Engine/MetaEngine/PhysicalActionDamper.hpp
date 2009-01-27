@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTIONDAMPER_HPP
-#define PHYSICALACTIONDAMPER_HPP
+#pragma once
 
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
@@ -36,5 +35,4 @@ class PhysicalActionDamper : public MetaEngine2D
 
 REGISTER_SERIALIZABLE(PhysicalActionDamper);
 
-#endif // __PHYSICALACTIONDAMPER_HPP__
 

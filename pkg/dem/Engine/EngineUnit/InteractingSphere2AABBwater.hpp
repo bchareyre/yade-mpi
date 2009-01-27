@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#ifndef SPHERE2AABBWATER_HPP
-#define SPHERE2AABBWATER_HPP
+#pragma once
 
 #include <yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
@@ -25,5 +24,4 @@ class InteractingSphere2AABBwater : public BoundingVolumeEngineUnit
 
 REGISTER_SERIALIZABLE(InteractingSphere2AABBwater);
 
-#endif // SPHERE2AABBWATER_HPP
 

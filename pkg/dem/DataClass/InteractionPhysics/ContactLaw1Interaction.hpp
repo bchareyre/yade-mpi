@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_MINEBIS_HPP
-#define COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_MINEBIS_HPP
+#pragma once
 
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
@@ -47,5 +46,4 @@ class ContactLaw1Interaction : public ElasticContactInteraction
 
 REGISTER_SERIALIZABLE(ContactLaw1Interaction);
 
-#endif // COHESIVE_FRICTIONAL_CONTACT_PARAMETERS_MINEBIS_HPP
 

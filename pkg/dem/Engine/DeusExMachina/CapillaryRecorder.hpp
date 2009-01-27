@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CAPILLARY_RECORDER_HPP
-#define CAPILLARY_RECORDER_HPP
+#pragma once
 
 #include <yade/core/DataRecorder.hpp>
 
@@ -45,5 +44,4 @@ class CapillaryRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(CapillaryRecorder);
 
-#endif // CAPILLARY_RECORDER_HPP
 

@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMPLE_SHEAR_HPP
-#define SIMPLE_SHEAR_HPP
+#pragma once
 
 /*! \brief A simple shear test
 
@@ -85,6 +84,5 @@ class SimpleShear : public FileGenerator
 
 REGISTER_SERIALIZABLE(SimpleShear);
 
-#endif // SIMPLE_SHEAR_HPP
 
 

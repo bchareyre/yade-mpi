@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BOX2SPHERE4SDECCONTACTMODEL_HPP
-#define BOX2SPHERE4SDECCONTACTMODEL_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
@@ -38,5 +37,4 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 
 REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometry);
 
-#endif // __BOX2SPHERE4SDECCONTACTMODEL_H__
 

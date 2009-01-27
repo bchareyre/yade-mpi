@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MOMENTUM_HPP
-#define MOMENTUM_HPP
+#pragma once
 
 #include<yade/core/PhysicalAction.hpp>
 #include <Wm3Vector3.h>
@@ -33,5 +32,4 @@ class Momentum : public PhysicalAction
 };
 REGISTER_SERIALIZABLE(Momentum);
 
-#endif // MOMENTUM_HPP
 

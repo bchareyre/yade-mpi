@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MakeItFlat_FUNCTOR_HPP
-#define MakeItFlat_FORCE_FUNCTOR_HPP 
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 
@@ -37,5 +36,4 @@ class MakeItFlat : public DeusExMachina
 
 REGISTER_SERIALIZABLE(MakeItFlat);
 
-#endif // HydraulicForce_FORCE_FUNCTOR_HPP 
 

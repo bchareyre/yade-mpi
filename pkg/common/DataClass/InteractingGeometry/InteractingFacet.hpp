@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef INTERACTINGIFACET_HPP
-#define INTERACTINGIFACET_HPP
+#pragma once
 
 
 #include <yade/core/InteractingGeometry.hpp>
@@ -47,4 +46,3 @@ class InteractingFacet : public InteractingGeometry {
 
 REGISTER_SERIALIZABLE(InteractingFacet);
 
-#endif // INTERACTINGIFACET_HPP

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BOUNDINGSPHERE_HPP
-#define BOUNDINGSPHERE_HPP
+#pragma once
 
 #include<yade/core/BoundingVolume.hpp>
 
@@ -32,5 +31,4 @@ class BoundingSphere : public BoundingVolume
 
 REGISTER_SERIALIZABLE(BoundingSphere);
 
-#endif // __BOUNDINGSPHERE_H__
 

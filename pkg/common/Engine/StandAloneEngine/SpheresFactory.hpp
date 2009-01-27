@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef ___SPHERESFACTORYENGINE___
-#define ___SPHERESFACTORYENGINE___
+#pragma once
 
 #include <yade/pkg-common/PeriodicEngines.hpp>
 #include <yade/pkg-common/InteractionGeometryMetaEngine.hpp>
@@ -103,5 +102,4 @@ private:
 };
 REGISTER_SERIALIZABLE(SpheresFactory);
 
-#endif //___SPHERESFACTORYENGINE___
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MULTIMETHODSEXCEPTIONS_HPP
-#define MULTIMETHODSEXCEPTIONS_HPP
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -41,5 +40,4 @@ struct MultiMethodsExceptions
 	static const char* BadVirtualCall;
 };
 
-#endif //  MULTIMETHODSEXCEPTIONS_HPP
 

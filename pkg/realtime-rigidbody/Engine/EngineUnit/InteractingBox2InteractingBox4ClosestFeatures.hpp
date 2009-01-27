@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BOX2BOX4CLOSESTFEATURES_HPP
-#define BOX2BOX4CLOSESTFEATURES_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
@@ -48,5 +47,4 @@ class InteractingBox2InteractingBox4ClosestFeatures : public InteractionGeometry
 
 REGISTER_SERIALIZABLE(InteractingBox2InteractingBox4ClosestFeatures);
 
-#endif // BOX2BOX4CLOSESTFEATURES_HPP
 

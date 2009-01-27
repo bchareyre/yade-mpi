@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CONTACT_STRESS_RECORDER_HPP
-#define CONTACT_STRESS_RECORDER_HPP
+#pragma once
 
 #include <yade/core/DataRecorder.hpp>
 
@@ -60,5 +59,4 @@ class ContactStressRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(ContactStressRecorder);
 
-#endif // CONTACT_STRESS_RECORDER_HPP
 

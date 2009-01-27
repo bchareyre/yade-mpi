@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef __PERSISTENTTRIANGULATIONCOLLIDER_HPP__
-#define __PERSISTENTTRIANGULATIONCOLLIDER_HPP__
+#pragma once
 
 #include<yade/core/BroadInteractor.hpp>
 #include<yade/core/InteractionContainer.hpp>
@@ -129,5 +128,4 @@ class PersistentTriangulationCollider : public BroadInteractor
 
 REGISTER_SERIALIZABLE(PersistentTriangulationCollider);
 
-#endif // __PERSISTENTSAPCOLLIDER_HPP__
 

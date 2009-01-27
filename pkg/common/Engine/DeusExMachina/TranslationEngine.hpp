@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TRANSLATOR_HPP
-#define TRANSLATOR_HPP
+#pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 #include <Wm3Vector3.h>
@@ -29,5 +28,4 @@ class TranslationEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(TranslationEngine);
 
-#endif // TRANSLATOR_HPP
 

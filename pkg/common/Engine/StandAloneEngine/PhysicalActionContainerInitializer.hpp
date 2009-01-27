@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ACTION_PARAMETER_INITIALIZER_HPP
-#define ACTION_PARAMETER_INITIALIZER_HPP 
+#pragma once
 
 #include<yade/core/StandAloneEngine.hpp>
 
@@ -36,5 +35,4 @@ class PhysicalActionContainerInitializer : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(PhysicalActionContainerInitializer);
 
-#endif // ACTION_PARAMETER_INITIALIZER_HPP
 

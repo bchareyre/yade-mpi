@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMULATIONCONTROLLER_HPP
-#define SIMULATIONCONTROLLER_HPP
+#pragma once
 
 #include<yade/core/Omega.hpp>
 #include<yade/lib-opengl/GLWindowsManager.hpp>
@@ -88,5 +87,4 @@ class SimulationController : public QtGeneratedSimulationController
 	DECLARE_LOGGER;
 };
 
-#endif // SIMULATIONCONTROLLER_HPP
 

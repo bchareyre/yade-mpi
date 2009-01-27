@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef ___SPATIALQUICKSORTCOLLIDER___
-#define ___SPATIALQUICKSORTCOLLIDER___
+#pragma once
 
 #include <yade/core/BroadInteractor.hpp>
 #include <yade/core/InteractionContainer.hpp>
@@ -48,5 +47,4 @@ class SpatialQuickSortCollider : public BroadInteractor {
 };
 REGISTER_SERIALIZABLE(SpatialQuickSortCollider);
 
-#endif //___SPATIALQUICKSORTCOLLIDER___
 

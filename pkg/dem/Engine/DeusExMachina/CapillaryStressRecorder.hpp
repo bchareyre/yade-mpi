@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CAPILLARY_STRESS_RECORDER_HPP
-#define CAPILLARY_STRESS_RECORDER_HPP
+#pragma once
 
 #include <yade/core/DataRecorder.hpp>
 
@@ -53,5 +52,4 @@ class CapillaryStressRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(CapillaryStressRecorder);
 
-#endif // CAPILLARY_STRESS_RECORDER_HPP
 

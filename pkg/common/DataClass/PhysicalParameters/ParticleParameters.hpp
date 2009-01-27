@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PARTICLEPARAMETERS_HPP
-#define PARTICLEPARAMETERS_HPP
+#pragma once
 
 #include<yade/core/PhysicalParameters.hpp>
 #include<Wm3Vector3.h>
@@ -40,5 +39,4 @@ class ParticleParameters : public PhysicalParameters
 
 REGISTER_SERIALIZABLE(ParticleParameters);
 
-#endif // PARTICLEPARAMETERS_HPP
 

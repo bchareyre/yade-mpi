@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef AABB_HPP
-#define AABB_HPP
+#pragma once
 
 #include<yade/core/BoundingVolume.hpp>
 
@@ -32,5 +31,4 @@ class AABB : public BoundingVolume
 
 REGISTER_SERIALIZABLE(AABB);
 
-#endif // __AABB_H__
 

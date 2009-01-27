@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef RIGIDBODYPARAMETERS_HPP
-#define RIGIDBODYPARAMETERS_HPP
+#pragma once
 
 #include "ParticleParameters.hpp"
 #include <Wm3Matrix3.h>
@@ -41,5 +40,4 @@ class RigidBodyParameters : public ParticleParameters
 
 REGISTER_SERIALIZABLE(RigidBodyParameters);
 
-#endif // RIGIDBODYPARAMETERS_HPP
 

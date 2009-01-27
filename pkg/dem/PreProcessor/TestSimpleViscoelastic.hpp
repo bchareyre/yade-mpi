@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef TESTSIMPLEVISCOELASTIC_HPP 
-#define TESTSIMPLEVISCOELASTIC_HPP
+#pragma once
 
 #include <yade/core/FileGenerator.hpp>
 
@@ -66,5 +65,4 @@ class TestSimpleViscoelastic : public FileGenerator {
 
 REGISTER_SERIALIZABLE(TestSimpleViscoelastic);
 
-#endif // TESTSIMPLEVISCOELASTIC_HPP
 

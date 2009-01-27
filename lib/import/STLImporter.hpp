@@ -5,8 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifndef STLIMPORTER_HPP
-#define STLIMPORTER_HPP
+#pragma once
 #include <yade/pkg-common/Facet.hpp>
 #include <yade/pkg-common/InteractingFacet.hpp>
 #include "STLReader.hpp"
@@ -34,4 +33,3 @@ protected:
 		vector<Vector3r> tr; 
 };
 
-#endif // STLIMPORTER_HPP

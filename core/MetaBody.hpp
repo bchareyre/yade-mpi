@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef METABODY_HPP
-#define METABODY_HPP
+#pragma once
 
 #include"Body.hpp"
 #include"BodyContainer.hpp"
@@ -71,5 +70,4 @@ class MetaBody : public Body
 
 REGISTER_SERIALIZABLE(MetaBody);
 
-#endif // METABODY_HPP
 

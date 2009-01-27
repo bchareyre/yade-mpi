@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef MASSSPRINGLAW_HPP
-#define MASSSPRINGLAW_HPP
+#pragma once
 
 #include<yade/core/InteractionSolver.hpp>
 #include<yade/core/PhysicalAction.hpp>
@@ -32,5 +31,4 @@ class MassSpringLaw : public InteractionSolver
 
 REGISTER_SERIALIZABLE(MassSpringLaw);
 
-#endif // MASSSPRINGLAW_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICE_SET_2_LATTICE_BEAMS_HPP
-#define LATTICE_SET_2_LATTICE_BEAMS_HPP 
+#pragma once
 
 
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
@@ -29,5 +28,4 @@ class LatticeSet2LatticeBeams : public GeometricalModelEngineUnit
 
 REGISTER_SERIALIZABLE(LatticeSet2LatticeBeams);
 
-#endif // LATTICE_SET_2_LATTICE_BEAMS_HPP 
 

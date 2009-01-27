@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef ROTATINGBOX_HPP
-#define ROTATINGBOX_HPP
+#pragma once
 
 #include<yade/core/FileGenerator.hpp>
 
@@ -50,5 +49,4 @@ class RotatingBox : public FileGenerator
 
 REGISTER_SERIALIZABLE(RotatingBox);
 
-#endif // ROTATINGBOX_HPP
 

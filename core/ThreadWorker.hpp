@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef THREAD_WORKER_HPP
-#define THREAD_WORKER_HPP
+#pragma once
 
 #include <boost/thread/mutex.hpp>
 #include <boost/any.hpp>
@@ -61,5 +60,4 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		boost::any	getReturnValue();
 };
 
-#endif
 

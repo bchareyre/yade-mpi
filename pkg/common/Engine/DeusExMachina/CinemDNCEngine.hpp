@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef CINEMDNCENGINE_HPP
-#define CINEMDNCENGINE_HPP
+#pragma once
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/DeusExMachina.hpp>
@@ -47,5 +46,4 @@ class CinemDNCEngine : public DeusExMachina
 
 REGISTER_SERIALIZABLE(CinemDNCEngine);
 
-#endif // CINEMDNCENGINE_HPP
 

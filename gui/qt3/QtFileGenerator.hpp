@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef QTFILEGENERATOR_HPP
-#define QTFILEGENERATOR_HPP
+#pragma once
 
 #include<yade/core/Omega.hpp>
 #include<yade/lib-factory/Factorable.hpp>
@@ -58,5 +57,4 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 
 REGISTER_FACTORABLE(QtFileGenerator);
 
-#endif // QTFILEGENERATOR_HPP
 

@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef FACTORABLE_HPP
-#define FACTORABLE_HPP
+#pragma once
 
 #include "ClassFactory.hpp"
 
@@ -74,5 +73,4 @@ class Factorable
 											//		shortDescription(), longDescription(),  baseClassName(), baseClassNumber()
 };
 
-#endif // FACTORABLE_HPP
 

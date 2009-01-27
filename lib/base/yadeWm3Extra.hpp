@@ -1,5 +1,4 @@
-#ifndef YADE_WM3_EXTRA_HPP
-#define YADE_WM3_EXTRA_HPP
+#pragma once 
 
 #include<Wm3Vector2.h>
 #include<Wm3Vector3.h>
@@ -150,4 +149,3 @@ void serialize(Archive & ar, Vector3r & g, const unsigned int version)
 inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
 inline Vector3r       toVec(qglviewer::Vec v){return Vector3r(v[0],v[1],v[2]);};
 
-#endif

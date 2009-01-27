@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef NONLOCALINITIALIZER_HPP
-#define NONLOCALINITIALIZER_HPP
+#pragma once
 
 #include<yade/core/StandAloneEngine.hpp>
 #include "LatticeSetParameters.hpp"
@@ -38,5 +37,4 @@ class NonLocalInitializer : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(NonLocalInitializer);
 
-#endif // NONLOCALINITIALIZER_HPP
 

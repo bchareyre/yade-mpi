@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef INTERACTING_NODE_HPP
-#define INTERACTING_NODE_HPP
+#pragma once
 
 #include<yade/core/InteractingGeometry.hpp>
 
@@ -29,4 +28,3 @@ class InteractingNode : public InteractingGeometry
 
 REGISTER_SERIALIZABLE(InteractingNode);
 
-#endif // INTERACTING_NODE_HPP

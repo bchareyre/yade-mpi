@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef NO_SHEAR_PLANE
-#define NO_SHEAR_PLANE
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 
@@ -52,5 +51,4 @@ class MovingSupport : public DataRecorder
 
 REGISTER_SERIALIZABLE(MovingSupport);
 
-#endif // STRAIN_RECORDER_HPP 
 

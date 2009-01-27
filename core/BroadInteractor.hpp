@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef BROADINTERACTOR_HPP
-#define BROADINTERACTOR_HPP
+#pragma once
 
 #include <yade/core/BoundingVolume.hpp>
 #include "StandAloneEngine.hpp"
@@ -28,4 +27,3 @@ class BroadInteractor : public StandAloneEngine
 
 REGISTER_SERIALIZABLE(BroadInteractor);
 
-#endif // BROADINTERACTOR_HPP

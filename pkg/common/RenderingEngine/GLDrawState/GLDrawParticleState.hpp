@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef GLDRAWPARTICLESTATE_HPP
-#define GLDRAWPARTICLESTATE_HPP
+#pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -23,5 +22,4 @@ class GLDrawParticleState : public GLDrawStateFunctor
 
 REGISTER_SERIALIZABLE(GLDrawParticleState);
 
-#endif //  GLDRAWPARTICLESTATE_HPP
 

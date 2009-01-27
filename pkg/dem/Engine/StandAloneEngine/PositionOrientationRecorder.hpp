@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef POSITIONORIENTATIONRECORDER_HPP
-#define POSITIONORIENTATIONRECORDER_HPP
+#pragma once
 
 #include<yade/core/DataRecorder.hpp>
 #include <string>
@@ -41,5 +40,4 @@ class PositionOrientationRecorder : public DataRecorder
 
 REGISTER_SERIALIZABLE(PositionOrientationRecorder);
 
-#endif // POSITIONORIENTATIONRECORDER_HPP
 

@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef LATTICE_NODE_PARAMETERS_HPP
-#define LATTICE_NODE_PARAMETERS_HPP 
+#pragma once
 
 #include<yade/core/PhysicalParameters.hpp>
 #include <vector>
@@ -36,6 +35,5 @@ class LatticeNodeParameters : public PhysicalParameters
 
 REGISTER_SERIALIZABLE(LatticeNodeParameters);
 
-#endif // LATTICE_NODE_PARAMETERS_HPP 
 
 

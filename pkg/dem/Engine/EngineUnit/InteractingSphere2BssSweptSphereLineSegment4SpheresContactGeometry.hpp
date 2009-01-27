@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef EF2_SSLS_SPHERE_MAKE_SDECCONTACTMODEL_HPP
-#define EF2_SSLS_SPHERE_MAKE_SDECCONTACTMODEL_HPP
+#pragma once
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
@@ -36,5 +35,4 @@ class InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry : publi
 
 REGISTER_SERIALIZABLE(InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry);
 
-#endif // EF2_SSLS_SPHERE_MAKE_SDECCONTACTMODEL_HPP
 

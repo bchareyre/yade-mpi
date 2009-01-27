@@ -8,8 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef PHYSICALACTIONAPPLIER_HPP
-#define PHYSICALACTIONAPPLIER_HPP
+#pragma once
 
 
 #include<yade/core/MetaEngine2D.hpp>
@@ -41,5 +40,4 @@ class PhysicalActionApplier :	public MetaEngine2D
 
 REGISTER_SERIALIZABLE(PhysicalActionApplier);
 
-#endif // PHYSICALACTIONAPPLIER_HPP
 

@@ -7,8 +7,7 @@
 *************************************************************************/
 
 
-#ifndef BCP_CONNECTION_HPP
-#define BCP_CONNECTION_HPP
+#pragma once
 
 #include <yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
@@ -37,5 +36,4 @@ class BcpConnection : public SimpleViscoelasticBodyParameters
 
 REGISTER_SERIALIZABLE(BcpConnection);
 
-#endif // BCP_CONNECTION_HPP
 

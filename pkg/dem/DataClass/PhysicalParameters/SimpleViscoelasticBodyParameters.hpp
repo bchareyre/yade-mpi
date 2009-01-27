@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef SIMPLEVISCOELASTICBODYPARAMETERS_HPP
-#define SIMPLEVISCOELASTICBODYPARAMETERS_HPP
+#pragma once
 
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 
@@ -44,5 +43,4 @@ class SimpleViscoelasticBodyParameters : public RigidBodyParameters {
 
 REGISTER_SERIALIZABLE(SimpleViscoelasticBodyParameters);
 
-#endif // SIMPLEVISCOELASTICBODYPARAMETERS_HPP
 
