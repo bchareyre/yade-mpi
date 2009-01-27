@@ -25,6 +25,7 @@ class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 	public :
 		GLDrawInteractingSphere();
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void initgl(){first=true;};
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};

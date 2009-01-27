@@ -155,6 +155,8 @@ void YadeQtMainWindow::createView(){
 	glv->camera()->setViewDirection(qglviewer::Vec(-1,-1,-1));
 	lookDown(glv);
 	glViews.push_back(glv);
+	if(isFirst)
+		renderer->initgl();
 	//connect( glv, SIGNAL(closeSignal(int)), this, SLOT( closeGLViewEvent(int) ) );
 }
 

@@ -29,6 +29,7 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 	public :
 		GLDrawSphere();
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void initgl(){first=true;};
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};

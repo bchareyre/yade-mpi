@@ -34,7 +34,7 @@ int  GLDrawSphere::glutSlices=12;
 int  GLDrawSphere::glutStacks=6;
 
 GLDrawSphere::GLDrawSphere(){first=true;};
-
+		
 void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
 	if(glutUse){

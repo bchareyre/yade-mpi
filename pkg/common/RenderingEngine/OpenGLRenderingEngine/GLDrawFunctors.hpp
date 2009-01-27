@@ -20,6 +20,7 @@ class GLDrawBoundingVolumeFunctor: public EngineUnit1D<void, TYPELIST_1(const sh
 	public:
 		virtual ~GLDrawBoundingVolumeFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
 	REGISTER_CLASS_NAME(GLDrawBoundingVolumeFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
@@ -29,6 +30,7 @@ class GLDrawGeometricalModelFunctor: public EngineUnit1D<void,TYPELIST_3(const s
 	public: 
 		virtual ~GLDrawGeometricalModelFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
 	REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
@@ -39,6 +41,7 @@ class GLDrawInteractingGeometryFunctor: public EngineUnit1D<void, TYPELIST_3(con
 	public:
 		virtual ~GLDrawInteractingGeometryFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
 	REGISTER_CLASS_NAME(GLDrawInteractingGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
@@ -48,6 +51,7 @@ class GLDrawInteractionGeometryFunctor: public EngineUnit1D<void,TYPELIST_5(cons
 	public: 
 		virtual ~GLDrawInteractionGeometryFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
 	REGISTER_CLASS_NAME(GLDrawInteractionGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
@@ -57,6 +61,7 @@ class GLDrawInteractionPhysicsFunctor: public EngineUnit1D<void, TYPELIST_5(cons
 	public: 
 		virtual ~GLDrawInteractionPhysicsFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
 	REGISTER_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
@@ -74,6 +79,7 @@ class GLDrawStateFunctor: public EngineUnit1D<void,TYPELIST_1(const shared_ptr<P
 	public : 
 		virtual ~GLDrawStateFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
 	REGISTER_CLASS_NAME(GLDrawStateFunctor);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };

@@ -66,6 +66,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		virtual ~OpenGLRenderingEngine();
 	
 		void init();
+		void initgl();
 		void render(const shared_ptr<MetaBody>& body, body_id_t selection = body_id_t(-1));
 		virtual void renderWithNames(const shared_ptr<MetaBody>& );
 	

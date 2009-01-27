@@ -58,6 +58,22 @@ void OpenGLRenderingEngine::init(){
 	glutInitDone=true;
 }
 
+void OpenGLRenderingEngine::initgl(){
+	LOG_INFO("(re)initializing GL for gldraw methods.\n");
+	BOOST_FOREACH(vector<string>& s,stateFunctorNames)
+		(static_pointer_cast<GLDrawStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,boundingVolumeFunctorNames)
+		(static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,interactingGeometryFunctorNames)
+		(static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,geometricalModelFunctorNames)
+		(static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames)
+		(static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames)
+		(static_pointer_cast<GLDrawInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+}
+
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b->geometricalModel) continue;

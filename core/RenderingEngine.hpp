@@ -21,6 +21,7 @@ class RenderingEngine :  public Serializable
 		virtual void render(const shared_ptr<MetaBody>& , const int selection = -1) {throw;};
 		virtual void renderWithNames(const shared_ptr<MetaBody>& ) {throw;};
 		virtual void init() {throw;};
+		virtual void initgl() {};
 
 	REGISTER_CLASS_AND_BASE(RenderingEngine,Serializable);
 };
