@@ -4,6 +4,10 @@ Import('*')
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-snow',[
 
 
+	env.SharedLibrary('Ef1_IstSnowLayersContact_glDraw',
+		['RenderingEngine/Ef1_IstSnowLayersContact_glDraw.cpp'],
+		LIBS=env['LIBS']+['SpheresContactGeometry','ElasticContactInteraction','yade-opengl','IstSnowLayersContact','$QGLVIEWER_LIB']),
+
 	env.SharedLibrary('IstSnowLayersContact',
 		['DataClass/IstSnowLayersContact.cpp'],
 		LIBS=env['LIBS']+['yade-serialization','yade-base','SpheresContactGeometry']),
