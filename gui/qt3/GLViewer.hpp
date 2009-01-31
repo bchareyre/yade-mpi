@@ -61,7 +61,7 @@ class GLViewer : public QGLViewer
 		enum{TIME_REAL=1,TIME_VIRT=2,TIME_ITER=4};
 
 		GLViewer (int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent=0, QGLWidget * shareWidget=0);
-		virtual ~GLViewer (){};
+		virtual ~GLViewer();
 		virtual void paintGL();
 		virtual void draw();
 		virtual void drawWithNames();

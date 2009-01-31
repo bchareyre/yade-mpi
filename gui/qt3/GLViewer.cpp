@@ -38,6 +38,8 @@ void GLViewer::paintGL(void){
 	//this->doneCurrent();
 }
 
+GLViewer::~GLViewer(){ /* get the GL mutex when closing */ GLLock lock(this); }
+
 GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
 	isMoving=false;
