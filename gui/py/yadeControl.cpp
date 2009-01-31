@@ -461,6 +461,7 @@ class pyOmega{
 
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
+	void resetTime(){ OMEGA.getRootBody()->currentIteration=0; OMEGA.getRootBody()->simulationTime=0; OMEGA.timeInit(); }
 
 	void save(std::string fileName){
 		assertRootBody();
@@ -567,6 +568,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("wait",&pyOmega::wait)
 		.def("reset",&pyOmega::reset)
 		.def("labeledEngine",&pyOmega::labeled_engine_get)
+		.def("resetTime",&pyOmega::resetTime)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)

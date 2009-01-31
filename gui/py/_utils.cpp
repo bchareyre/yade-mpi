@@ -263,6 +263,8 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,4);
 // for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
 void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
 
+python::tuple Shop__scalarOnColorScale(Real scalar){ return vec2tuple(Shop::scalarOnColorScale(scalar));}
+
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
 
@@ -286,6 +288,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);
+	def("scalarOnColorScale",Shop__scalarOnColorScale);
 }
 
 

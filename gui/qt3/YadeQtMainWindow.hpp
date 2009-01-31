@@ -16,8 +16,9 @@
 #include<yade/gui-qt3/QtFileGenerator.hpp>
 #include<yade/gui-qt3/QtSimulationPlayer.hpp>
 #include<yade/gui-qt3/QtGUIPreferences.hpp>
+#include<boost/thread/mutex.hpp>
 
-class YadeQtMainWindow : public YadeQtGeneratedMainWindow
+class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 {
 	public:
 		shared_ptr<SimulationController> controller;
@@ -26,6 +27,7 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		vector<shared_ptr<GLViewer> > glViews;
 		shared_ptr<OpenGLRenderingEngine> renderer;
 		size_t viewNo(shared_ptr<GLViewer>);
+		boost::try_mutex glMutex;
 
 		void ensureRenderer();
 		void saveRendererConfig();
@@ -46,10 +48,6 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		shared_ptr<QtGUIPreferences> preferences;
 		vector<shared_ptr<Factorable> > qtWidgets;
 
-	private :
-		bool menuNameExists(const string name);
-		QPopupMenu* getPopupMenu(const string name);
-
 	public :
 		YadeQtMainWindow ();
 		virtual ~YadeQtMainWindow ();
@@ -69,5 +67,6 @@ class YadeQtMainWindow : public YadeQtGeneratedMainWindow
 		virtual void closeEvent(QCloseEvent * evt);
 	protected:
 		virtual void timerEvent(QTimerEvent* evt);
+
 };
 

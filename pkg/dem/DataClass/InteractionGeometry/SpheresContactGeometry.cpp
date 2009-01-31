@@ -65,9 +65,9 @@ Real SpheresContactGeometry::slipToDisplacementTMax(Real displacementTMax){
 	if(displacementTMax<=Mathr::ZERO_TOLERANCE){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
 	// otherwise
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Real currDist=(p2-p1).Length();
-	if(currDist<displacementTMax) return 0; // close enough, no slip needed
-	Vector3r diff=.5*(currDist/displacementTMax-1)*(p2-p1);
+	Real currDistSq=(p2-p1).SquaredLength();
+	if(currDistSq<pow(displacementTMax,2)) return 0; // close enough, no slip needed
+	Vector3r diff=.5*(sqrt(currDistSq)/displacementTMax-1)*(p2-p1);
 	setTgPlanePts(p1+diff,p2-diff);
 	return 2*diff.Length();
 }

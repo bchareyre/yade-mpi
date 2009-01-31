@@ -162,7 +162,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 			shared_ptr<Body> b = *bi;
 			if (b->isDynamic) {
 			//cerr << "if (body->isDynamic) {" << endl;
-			if( b->getGroupMask() & sdecGroupMask)
+			if((b->getGroupMask() & sdecGroupMask)||sdecGroupMask==0)
 			//cerr << "if( b->getGroupMask() & sdecGroupMask)" << computedSomething << endl;
 				findTimeStepFromBody(b, ncb); }
 		}

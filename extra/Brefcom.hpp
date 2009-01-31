@@ -83,12 +83,14 @@ class BrefcomContact: public NormalShearInteraction {
 		bool isCohesive;
 		/*! the damage evlution function will always return virgin state */
 		bool neverDamage;
+		/*! cummulative plastic strain measure (scalar) on this contact */
+		Real epsPlSum;
 
 		/*! auxiliary variable for visualization, recalculated in BrefcomLaw at every iteration */
 		// FIXME: Fn and Fs are stored as Vector3r normalForce, shearForce in NormalShearInteraction 
 		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r epsT, sigmaT, Fs;
 
-		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), tau(0), expDmgRate(0) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; }
+		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), tau(0), expDmgRate(0), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; }
 		//	BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
 		virtual ~BrefcomContact();
 
@@ -110,6 +112,7 @@ class BrefcomContact: public NormalShearInteraction {
 			(neverDamage)
 			(epsT)
 			(epsTrans)
+			(epsPlSum)
 
 			(isCohesive)
 
@@ -138,8 +141,12 @@ class BrefcomPhysParams: public BodyMacroParameters {
 		int numContacts;
 		//! average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)
 		Real normDmg;
-		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) );
+		//! plastic strain on contacts already deleted
+		Real epsPlBroken;
+		//! sum of plastic strains normalized by number of contacts
+		Real normEpsPl;
+		BrefcomPhysParams(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl));
 		REGISTER_CLASS_AND_BASE(BrefcomPhysParams,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(BrefcomPhysParams);
@@ -161,11 +168,13 @@ class BrefcomLaw: public InteractionSolver{
 		}
 		
 	public:
-		BrefcomLaw() { Shop::Bex::initCache(); };
+		bool logStrain;
+		BrefcomLaw(): logStrain(false) { Shop::Bex::initCache(); };
 		void action(MetaBody*);
 	protected: 
 	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_AND_BASE(BrefcomLaw,InteractionSolver);
+	REGISTER_ATTRIBUTES(InteractionSolver,(logStrain));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BrefcomLaw);

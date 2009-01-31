@@ -50,13 +50,18 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	Vector3r normal = facet->nf;
 	Real L = normal.Dot(cl);
 
-	bool newOnPositiveSide; // temp to save what will be maybe needed for new contact
+	int contactFace=0; // temp to save what will be maybe needed for new contact
 	if(c->interactionGeometry){ // contact already exists, use old data here
-		const bool& icopfs=YADE_CAST<SpheresContactGeometry*>(c->interactionGeometry.get())->initContactOnPositiveFacetSide;
-		if(!icopfs) { normal=-normal; L=-L; } // original contact on the other side, reverse the sense now
+		contactFace=YADE_CAST<SpheresContactGeometry*>(c->interactionGeometry.get())->facetContactFace;
+		// determinate contact on negative side: reverse quantities
+		if(contactFace<0){normal=-normal; L=-L;}
+		// indeterminate contact on negative side: set to -1; if edge, will be reset to 0 below
+		else if (contactFace==0 && L<0) { normal=-normal; L=-L; contactFace=-1; }
+		// indeterminate and is on the positive side: set to 1; if edge, will be reset to 0 below
+		else if(contactFace==0 && L>0) {contactFace=1;}
 	} else {
-		if (L<0) { normal=-normal; L=-L; newOnPositiveSide=false;} // new contact on the negative face, reverse and save that information so that since now this contact is always reversed
-		else newOnPositiveSide=true;
+		if (L<0) { normal=-normal; L=-L; contactFace=-1;} // new contact on the negative face, reverse and save that information so that since now this contact is always reversed
+		else contactFace=1;
 	}
 
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
@@ -89,11 +94,14 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 	if (bm<icr) // contact with facet's surface
 	{
+		assert(contactFace!=0);
 		penetrationDepth = sphereRadius - L;
 		normal.Normalize();
 	}
 	else
 	{
+		// edge or vertex contact: become indeterminate with respect to face
+		contactFace=0;
 		cp = cp + ne[m]*(icr-bm);
 		if (cp.Dot(ne[(m-1<0)?2:m-1])>icr) // contact with vertex m
 //			cp = facet->vertices[m];
@@ -116,7 +124,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 			scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		else
 			{ scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
-			scm->initContactOnPositiveFacetSide=newOnPositiveSide; }
+			scm->facetContactFace=contactFace; }
 	  
 		normal = facetAxisT*normal; // in global orientation
 		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 

@@ -79,6 +79,7 @@ void PythonUI::pythonSession(){
 		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
 		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui')");
 		PyRun_SimpleString("import yade");
+		PyRun_SimpleString("from __future__ import division");
 
 		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
 		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())

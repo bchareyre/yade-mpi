@@ -74,7 +74,7 @@ class StridePeriodicEngine: public PeriodicEngine{
  */
 class StretchPeriodicEngine: public PeriodicEngine{
 	public:
-	StretchPeriodicEngine(): PeriodicEngine(), realLim(0.), virtLim(0.), iterLim(0), stretchFactor(2.){}
+	StretchPeriodicEngine(): PeriodicEngine(), realLim(0.), virtLim(0.), iterLim(0), stretchFactor(2.), mayStretch(false){}
 	Real realLim, virtLim; long iterLim;
 	Real stretchFactor;
 	bool mayStretch;

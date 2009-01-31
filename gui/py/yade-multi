@@ -149,7 +149,7 @@ try:
 	idStrings={}
 	for i in useLines: idStrings[i]=ll[i].split()[idColumn] # textual descripion of respective lines 
 	print idStrings
-except IndexError:
+except ValueError:
 	idColumn=None
 	idStrings=None
 

@@ -166,7 +166,7 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		{
 			sqlite3x::sqlite3_command cmd(*con,"select bodyTable,iter from 'records' ORDER BY iter;");
 			sqlite3x::sqlite3_cursor reader=cmd.executecursor();
-			assert(reader.colcount()==1);
+			assert(reader.colcount()==2);
 			long maxIter=0;
 			while(reader.step()){
 				xyzNames.push_back(reader.getstring(0)); // first column

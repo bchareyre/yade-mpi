@@ -85,8 +85,11 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 	glv->load(savedSim);
 	glv->saveSnapShots=true;
 	glv->snapshotsBase=snapBase2;
-	if(!savedQGLState.empty()){ LOG_INFO("Loading view state from "<<savedQGLState); glv->setStateFileName(savedQGLState); glv->restoreStateFromFile(); glv->setStateFileName(QString::null); }
-	if(dispParamsNo>=0) { LOG_INFO("Loading view state from state #"<<dispParamsNo); glv->useDisplayParameters(dispParamsNo);}
+	{
+		GLLock lock(glv);
+		if(!savedQGLState.empty()){ LOG_INFO("Loading view state from "<<savedQGLState); glv->setStateFileName(savedQGLState); glv->restoreStateFromFile(); glv->setStateFileName(QString::null); }
+		if(dispParamsNo>=0) { LOG_INFO("Loading view state from state #"<<dispParamsNo); glv->useDisplayParameters(dispParamsNo);}
+	}
 	if(startWait){ LOG_INFO("[[[ Manual view setup, press BACKSPACE to start player ]]]"); glv->trigger=false; while(!glv->trigger) {usleep(200000);cerr<<"@";} }
 	if(!postLoadHook.empty()){ PyGILState_STATE gstate; LOG_INFO("Running postLoadHook "<<postLoadHook); Py_BEGIN_ALLOW_THREADS; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); Py_END_ALLOW_THREADS; }
 	player->hide();
@@ -113,34 +116,35 @@ class pyGLViewer{
 		glv=YadeQtMainWindow::self->glViews[viewNo];
 	}
 	public:
+		#define MUTEX GLLock _lock(glv.get());
 		pyGLViewer(){ init(0); }
 		pyGLViewer(size_t viewNo){init(viewNo);}
 		pyGLViewer(const shared_ptr<GLViewer>& _glv){glv=_glv;}
 		python::tuple get_grid(){return python::make_tuple(glv->drawGridXYZ[0],glv->drawGridXYZ[1],glv->drawGridXYZ[2]);}
-		void set_grid(python::tuple t){for(int i=0;i<3;i++)glv->drawGridXYZ[i]=python::extract<bool>(t[i])();}
-		#define VEC_GET_SET(property,getter,setter) python::object get_##property(){return vec2tuple(getter());} void set_##property(python::tuple t){setter(tuple2vec(t));}
+		void set_grid(python::tuple t){MUTEX; for(int i=0;i<3;i++)glv->drawGridXYZ[i]=python::extract<bool>(t[i])();}
+		#define VEC_GET_SET(property,getter,setter) python::object get_##property(){return vec2tuple(getter());} void set_##property(python::tuple t){MUTEX; setter(tuple2vec(t));}
 		VEC_GET_SET(upVector,glv->camera()->upVector,glv->camera()->setUpVector);
 		VEC_GET_SET(lookAt,glv->camera()->position()+glv->camera()->viewDirection,glv->camera()->lookAt);
 		VEC_GET_SET(viewDir,glv->camera()->viewDirection,glv->camera()->setViewDirection);
 		VEC_GET_SET(eyePosition,glv->camera()->position,glv->camera()->setPosition);
-		#define BOOL_GET_SET(property,getter,setter)void set_##property(bool b){setter(b);} bool get_##property(){return getter();}
+		#define BOOL_GET_SET(property,getter,setter)void set_##property(bool b){MUTEX; setter(b);} bool get_##property(){return getter();}
 		BOOL_GET_SET(axes,glv->axisIsDrawn,glv->setAxisIsDrawn);
 		BOOL_GET_SET(fps,glv->FPSIsDisplayed,glv->setFPSIsDisplayed);
-		bool get_scale(){return glv->drawScale;} void set_scale(bool b){glv->drawScale=b;}
+		bool get_scale(){return glv->drawScale;} void set_scale(bool b){MUTEX; glv->drawScale=b;}
 		bool get_orthographic(){return glv->camera()->type()==qglviewer::Camera::ORTHOGRAPHIC;}
-		void set_orthographic(bool b){return glv->camera()->setType(b ? qglviewer::Camera::ORTHOGRAPHIC : qglviewer::Camera::PERSPECTIVE);}
-		#define FLOAT_GET_SET(property,getter,setter)void set_##property(Real r){setter(r);} Real get_##property(){return getter();}
+		void set_orthographic(bool b){MUTEX; return glv->camera()->setType(b ? qglviewer::Camera::ORTHOGRAPHIC : qglviewer::Camera::PERSPECTIVE);}
+		#define FLOAT_GET_SET(property,getter,setter)void set_##property(Real r){MUTEX; setter(r);} Real get_##property(){return getter();}
 		FLOAT_GET_SET(sceneRadius,glv->sceneRadius,glv->setSceneRadius);
-		void fitAABB(python::tuple min, python::tuple max){glv->camera()->fitBoundingBox(tuple2vec(min),tuple2vec(max));}
-		void fitSphere(python::tuple center,Real radius){glv->camera()->fitSphere(tuple2vec(center),radius);}
-		void showEntireScene(){glv->camera()->showEntireScene();}
-		void center(bool median=false){if(median)glv->centerMedianQuartile(); else glv->centerScene();}
-		python::tuple get_screenSize(){return python::make_tuple(glv->width(),glv->height());} void set_screenSize(python::tuple t){ vector<int>* ii=new(vector<int>); ii->push_back(ensuredMainWindow()->viewNo(glv)); ii->push_back(python::extract<int>(t[0])()); ii->push_back(python::extract<int>(t[1])()); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESIZE_VIEW,(void*)ii));}
+		void fitAABB(python::tuple min, python::tuple max){MUTEX; glv->camera()->fitBoundingBox(tuple2vec(min),tuple2vec(max));}
+		void fitSphere(python::tuple center,Real radius){MUTEX; glv->camera()->fitSphere(tuple2vec(center),radius);}
+		void showEntireScene(){MUTEX; glv->camera()->showEntireScene();}
+		void center(bool median=false){MUTEX; if(median)glv->centerMedianQuartile(); else glv->centerScene();}
+		python::tuple get_screenSize(){return python::make_tuple(glv->width(),glv->height());} void set_screenSize(python::tuple t){ MUTEX; vector<int>* ii=new(vector<int>); ii->push_back(ensuredMainWindow()->viewNo(glv)); ii->push_back(python::extract<int>(t[0])()); ii->push_back(python::extract<int>(t[1])()); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESIZE_VIEW,(void*)ii));}
 		string pyStr(){return string("<GLViewer for view #")+lexical_cast<string>(ensuredMainWindow()->viewNo(glv))+">";}
-		void saveDisplayParameters(size_t n){glv->saveDisplayParameters(n);}
-		void useDisplayParameters(size_t n){glv->useDisplayParameters(n);}
+		void saveDisplayParameters(size_t n){MUTEX; glv->saveDisplayParameters(n);}
+		void useDisplayParameters(size_t n){MUTEX; glv->useDisplayParameters(n);}
 		string get_timeDisp(){const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}
-		void set_timeDisp(string s){int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
+		void set_timeDisp(string s){MUTEX; int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(pyGLViewer_center_overloads,center,0,1);
 
@@ -149,7 +153,7 @@ pyGLViewer evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEven
 
 python::list getAllViews(){
 	python::list ret;
-	for(size_t i=0; i<YadeQtMainWindow::self->glViews.size(); i++) ret.append(YadeQtMainWindow::self->glViews[i]);
+	for(size_t i=0; i<YadeQtMainWindow::self->glViews.size(); i++) ret.append(pyGLViewer(YadeQtMainWindow::self->glViews[i]));
 	return ret;
 };
 

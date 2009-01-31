@@ -37,8 +37,8 @@ class SpheresContactGeometry: public InteractionGeometry{
 		bool hasNormalViscosity;
 		Real NormalViscisity;
 		Real NormalRelativeVelocity;
-		//! Whether the original contact was on the positive or negative facet side; this is to permit repulsion to the right side even if the sphere passes, under extreme pressure, geometrically to the other facet's side. This is used only in InteractingFacet2IteractingSphere4SpheresContactGeometry.
-		bool initContactOnPositiveFacetSide;
+		//! Whether the original contact was on the positive (1) or negative (-1) facet side; this is to permit repulsion to the right side even if the sphere passes, under extreme pressure, geometrically to the other facet's side. This is used only in InteractingFacet2IteractingSphere4SpheresContactGeometry. If at any point the contact is with the edge or vertex instead of face, this attribute is reset so that contact with the other face is possible.
+		int facetContactFace;
 		// end abusive storage
 
 		bool hasShear; // whether the exact rotation code is being used -- following fields are needed for that
@@ -96,7 +96,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Vector3r relRotVector() const;
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();}
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();}
 		virtual ~SpheresContactGeometry();
 	REGISTER_ATTRIBUTES(/* no attributes from base class */,
 			(normal)
@@ -104,7 +104,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 			(radius1)
 			(radius2)
 			(contactPoint) // to allow access from python
-			(initContactOnPositiveFacetSide)
+			(facetContactFace)
 			// hasShear
 			(hasShear)
 			(pos1)

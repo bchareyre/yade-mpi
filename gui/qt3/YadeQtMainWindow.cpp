@@ -7,6 +7,7 @@
 *************************************************************************/
 #include"YadeQtMainWindow.hpp"
 #include"YadeCamera.hpp"
+#include"GLViewer.hpp"
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
 #include <qvbox.h>
@@ -33,7 +34,6 @@ using namespace std;
 CREATE_LOGGER(YadeQtMainWindow);
 
 YadeQtMainWindow* YadeQtMainWindow::self=NULL;
-
 
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
@@ -99,7 +99,7 @@ void YadeQtMainWindow::redrawAll(bool force){
 }
 
 void YadeQtMainWindow::loadSimulation(string file){createController();	controller->loadSimulationFromFileName(file); lookDown(glViews[0]);}
-void YadeQtMainWindow::centerViews(){FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv) glv->centerScene(); }}
+void YadeQtMainWindow::centerViews(){FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv){ glv->centerScene();}}}
 
 
 YadeQtMainWindow::~YadeQtMainWindow()
@@ -149,6 +149,7 @@ void YadeQtMainWindow::createView(){
 
 	bool isFirst=glViews.empty();
 	shared_ptr<GLViewer> glv=shared_ptr<GLViewer>(new GLViewer(glViews.size(),renderer,NULL,isFirst?NULL:glViews[0].get()));
+	GLLock lock(glv.get());
 	glv->setCamera(new YadeCamera);
 	glv->camera()->frame()->setWheelSensitivity(-1.0f);
 	glv->camera()->setUpVector(qglviewer::Vec(0,1,0));

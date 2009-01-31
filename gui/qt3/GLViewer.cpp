@@ -21,6 +21,23 @@
 
 CREATE_LOGGER(GLViewer);
 
+GLLock::GLLock(GLViewer* _glv): boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex,true), glv(_glv){
+	if(locked()) glv->makeCurrent(); }
+GLLock::~GLLock(){ /*glv->doneCurrent();*/}
+
+void GLViewer::updateGL(void){/*GLLock lock(this); */QGLViewer::updateGL();}
+
+void GLViewer::paintGL(void){
+	/* paintGL encapsulated preDraw, draw and postDraw within QGLViewer. If the mutex cannot be locked,
+	 * we just return without repainting */
+	boost::try_mutex::scoped_try_lock lock(YadeQtMainWindow::self->glMutex);
+	if(lock.locked()){
+		this->makeCurrent(); // not sure if this is needed
+		QGLViewer::paintGL();
+	}
+	//this->doneCurrent();
+}
+
 GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent, QGLWidget * shareWidget) : QGLViewer(parent,"glview",shareWidget)//, qglThread(this,rendererInit)
 {
 	isMoving=false;

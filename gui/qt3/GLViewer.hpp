@@ -6,7 +6,8 @@
 #include<yade/pkg-common/OpenGLRenderingEngine.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 #include<yade/lib-QGLViewer/constraint.h>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include"YadeQtMainWindow.hpp"
+#include<boost/date_time/posix_time/posix_time.hpp>
 #include<set>
 
 /*! Class handling user interaction with the openGL rendering of simulation.
@@ -30,7 +31,6 @@
  * Clip plane number is 3; change OpenGLRenderingEngine::clipPlaneNum, complete switches "|| ..." in keyPressEvent
  * and recompile to have more.
  */
-
 class GLViewer : public QGLViewer
 {	
 	Q_OBJECT 
@@ -51,7 +51,8 @@ class GLViewer : public QGLViewer
 		string strBoundGroup(){string ret;FOREACH(int i, boundClipPlanes) ret+=" "+lexical_cast<string>(i+1);return ret;}
 		boost::posix_time::ptime last_user_event;
 
-     public :
+     public:
+		virtual void updateGL(void);
 
 		void centerMedianQuartile();
 		bool 			drawGridXYZ[3];
@@ -61,6 +62,7 @@ class GLViewer : public QGLViewer
 
 		GLViewer (int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget * parent=0, QGLWidget * shareWidget=0);
 		virtual ~GLViewer (){};
+		virtual void paintGL();
 		virtual void draw();
 		virtual void drawWithNames();
 		void centerScene();
@@ -104,3 +106,11 @@ class GLViewer : public QGLViewer
 		virtual void mouseMoveEvent(QMouseEvent *e);
 		virtual void mousePressEvent(QMouseEvent *e);
 };
+
+class GLLock: public boost::try_mutex::scoped_try_lock{
+	GLViewer* glv;
+	public:
+		GLLock(GLViewer* _glv);
+		~GLLock(); 
+};
+
