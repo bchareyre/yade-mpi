@@ -365,7 +365,7 @@ void SimulationController::doUpdate(){
 	labelSimulTime->setText(string(strVirt));
 
 	if(Omega::instance().isRunning()){
-		time_duration duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
+		duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();
 		duration -= Omega::instance().getSimulationPauseDuration();
 
 		unsigned int hours	= duration.hours();
@@ -379,20 +379,31 @@ void SimulationController::doUpdate(){
 		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
 		else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
 		labelRealTime->setText(string(strReal));
+        
 	}
+    // update iterations per second - only one in a while (iterPerSec_TTL_ms)
+    // does someone need to display that with more precision than integer?
+    long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
+    if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
+        iterPerSec=(1000.*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
+        iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+        iterPerSec_LastLocalTime=microsec_clock::local_time();
+    }
+    char strIter[64];
+    /* print 0 instead of bogus values (at startup) */
+    snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.);
+    labelIter->setText(strIter);
 
-	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
-	// does someone need to display that with more precision than integer?
-	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
-	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
-		iterPerSec=(1000.*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
-		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
-		iterPerSec_LastLocalTime=microsec_clock::local_time();
-	}
-	char strIter[64];
-	/* print 0 instead of bogus values (at startup) */
-	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.);
-	labelIter->setText(strIter);
+    // update estimation time
+    char strEstimation[64];
+    if (Omega::instance().getRootBody()->stopAtIteration>0 && iterPerSec>0 ) 
+        estimation=duration+time_duration(seconds((Omega::instance().getRootBody()->stopAtIteration-Omega::instance().getCurrentIteration())/iterPerSec));
+    snprintf(strEstimation,64,"estimation %02d:%02d:%02d",estimation.hours(),estimation.minutes(),estimation.seconds());
+    labelEstimationTime->setText(strEstimation);
+
+    char strStopAtIter[64];
+    snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getRootBody()->stopAtIteration);
+    labelStopAtIter->setText(strStopAtIter);
 
 	if (changeSkipTimeStepper) Omega::instance().skipTimeStepper(skipTimeStepper);
 	if (changeTimeStep) {

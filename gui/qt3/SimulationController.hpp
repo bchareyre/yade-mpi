@@ -38,6 +38,8 @@ class SimulationController : public QtGeneratedSimulationController
 		const int iterPerSec_TTL_ms;
 		long  iterPerSec_LastIter;
 		double iterPerSec;
+        boost::posix_time::time_duration duration;
+        boost::posix_time::time_duration estimation;
 		boost::posix_time::ptime iterPerSec_LastLocalTime;
 
 	

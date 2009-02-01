@@ -27,6 +27,7 @@ boost::variate_generator<boost::mt19937,boost::uniform_real<> >
 SpheresFactory::SpheresFactory() 
 {
 	factoryFacets.clear();
+    volumeSection=false;
 	maxAttempts=20;
 	radius=0.01;
 	radiusRange=0;
@@ -75,14 +76,7 @@ void SpheresFactory::action(MetaBody* ncb)
 
 	for (int attempt=0; attempt<maxAttempts; ++attempt)
 	{
-		body_id_t facetId = factoryFacets[(*randomFacet)()];
-		Real t1 = randomUnit();
-		Real t2 = randomUnit()*(1-t1);
-
-		shared_ptr<Body> facet = Body::byId(facetId);
-		Facet* gfacet = static_cast<Facet*>(facet->geometricalModel.get());
-
-		Vector3r position = t1*(gfacet->vertices[1]-gfacet->vertices[0])+t2*(gfacet->vertices[2]-gfacet->vertices[0])+gfacet->vertices[0]+facet->physicalParameters->se3.position;
+        Vector3r position = (volumeSection) ? generatePositionInVolume():generatePositionOnSurface();
 
 		Real r=radius+radiusRange*randomSymmetricUnit();
 
@@ -113,8 +107,28 @@ void SpheresFactory::action(MetaBody* ncb)
 	LOG_WARN("Can't placing sphere during " << maxAttempts << " attemps.");
 }
 
-void SpheresFactory::createSphere(shared_ptr<Body>& body, 
-		const Vector3r& position, Real r)
+Vector3r SpheresFactory::generatePositionOnSurface()
+{
+    body_id_t facetId = factoryFacets[(*randomFacet)()];
+    Real t1 = randomUnit();
+    Real t2 = randomUnit()*(1-t1);
+
+    shared_ptr<Body> facet = Body::byId(facetId);
+    Facet* gfacet = static_cast<Facet*>(facet->geometricalModel.get());
+
+    return t1*(gfacet->vertices[1]-gfacet->vertices[0])+t2*(gfacet->vertices[2]-gfacet->vertices[0])+gfacet->vertices[0]+facet->physicalParameters->se3.position;
+    
+}
+
+Vector3r SpheresFactory::generatePositionInVolume()
+{
+    Vector3r p1 = generatePositionOnSurface();
+    Vector3r p2 = generatePositionOnSurface();
+    Real t = randomUnit();
+    return p1+t*(p2-p1);
+    
+}
+void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& position, Real r)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);

@@ -26,8 +26,12 @@ public:
 	/// @brief Create one sphere per call.
 	virtual void action(MetaBody*);
 
-	/// @brief The geometry of the surface on which spheres will be placed. 
+	/// @brief The geometry of the section on which spheres will be placed. 
 	vector<body_id_t> factoryFacets; 
+
+    /// @brief Factory section may be a surface or volume (convex). 
+    /// By default it is a surface. To make its a volume set volumeSection=true
+    bool volumeSection;
 
 	/// @brief Max attemps to place sphere.
 	/// If placing the sphere in certain random position would cause an overlap with any other physical body in the model, SpheresFactory will try to find another position. Default 20 attempts allow.
@@ -76,6 +80,9 @@ private:
 
 	bool first_run;
 
+    Vector3r generatePositionOnSurface();
+    Vector3r generatePositionInVolume();
+
 	void createSphere(shared_ptr<Body>& body, const Vector3r& position, Real r);
 
 	typedef	boost::variate_generator<boost::minstd_rand,boost::uniform_int<> > RandomInt;
@@ -85,6 +92,7 @@ private:
 
 	REGISTER_ATTRIBUTES(PeriodicEngine,
 			(factoryFacets)
+			(volumeSection)
 			(maxAttempts)
 			(radius)
 			(radiusRange)
