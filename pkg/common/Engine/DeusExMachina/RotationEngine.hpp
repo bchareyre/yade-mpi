@@ -15,6 +15,7 @@ class RotationEngine : public DeusExMachina
 		RotationEngine();
 
 		Real angularVelocity;
+		//! axis of rotation (direction); will be normalized by the engine
 		Vector3r rotationAxis;
 		bool rotateAroundZero;
 		Vector3r zeroPoint;
@@ -23,7 +24,6 @@ class RotationEngine : public DeusExMachina
 
 	protected :
 		void registerAttributes();
-		void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(RotationEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

@@ -63,14 +63,9 @@ void RotationEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(zeroPoint);
 }
 
-void RotationEngine::postProcessAttributes(bool deserializing)
-{
-		if (!deserializing) return;
-		rotationAxis.Normalize();
-}
-
 void RotationEngine::applyCondition(MetaBody *ncb)
 {
+    rotationAxis.Normalize();
 
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
