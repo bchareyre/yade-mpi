@@ -626,13 +626,34 @@
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QCheckBox">
+                                    <widget class="QLayoutWidget">
                                         <property name="name">
-                                            <cstring>cbAllowFiltration</cstring>
+                                            <cstring>layout6</cstring>
                                         </property>
-                                        <property name="text">
-                                            <string>Allow filtration</string>
-                                        </property>
+                                        <hbox>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QCheckBox">
+                                                <property name="name">
+                                                    <cstring>cbAllowFiltration</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Allow filtration</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>pbRefreshFilters</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image0</pixmap>
+                                                </property>
+                                            </widget>
+                                        </hbox>
                                     </widget>
                                     <spacer>
                                         <property name="name">
@@ -821,6 +842,12 @@
         <receiver>QtGeneratedSimulationPlayer</receiver>
         <slot>cbBodyWireToggled(bool)</slot>
     </connection>
+    <connection>
+        <sender>pbRefreshFilters</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationPlayer</receiver>
+        <slot>pbRefreshFiltersClicked()</slot>
+    </connection>
 </connections>
 <signals>
     <signal>closeSignal()</signal>
@@ -837,6 +864,7 @@
     <slot>cbSaveSnapShotsToggled(bool)</slot>
     <slot>cbAllowFiltrationToggled(bool)</slot>
     <slot>cbBodyWireToggled(bool)</slot>
+    <slot>pbRefreshFiltersClicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

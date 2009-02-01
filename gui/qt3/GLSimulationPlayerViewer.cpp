@@ -178,13 +178,8 @@ void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
 		}
 	}
 	/* Filters */
-	FOREACH(shared_ptr<Engine> e, Omega::instance().getRootBody()->engines){
-		shared_ptr<FilterEngine> fe=dynamic_pointer_cast<FilterEngine>(e);
-		if(fe){
-			filters.push_back(fe);
-			simPlayer->pushMessage("Find filter: "+e->getClassName());
-		}
-	}
+    refreshFilters();
+
 	/* strided access is common for both db and file access */
 	if(stride>1){
 		list<string> xyz2;
@@ -218,6 +213,18 @@ void GLSimulationPlayerViewer::reset()
 	loadNextRecordedData();
 	frameNumber++;
 	updateGL();
+}
+
+void GLSimulationPlayerViewer::refreshFilters()
+{
+    filters.clear();
+	FOREACH(shared_ptr<Engine> e, Omega::instance().getRootBody()->engines){
+		shared_ptr<FilterEngine> fe=dynamic_pointer_cast<FilterEngine>(e);
+		if(fe){
+			filters.push_back(fe);
+			simPlayer->pushMessage("Find filter: "+e->getClassName());
+		}
+	}
 }
 
 

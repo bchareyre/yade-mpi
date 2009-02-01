@@ -42,6 +42,7 @@ void QtSimulationPlayer::pbStepClicked(){ glSimulationPlayerViewer->stopAnimatio
 void QtSimulationPlayer::pbResetClicked(){ setParameters();	glSimulationPlayerViewer->reset();}
 void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewer->saveSnapShots=b;}
 void QtSimulationPlayer::cbAllowFiltrationToggled(bool b){	FilterEngine::isFiltrationActivated=b; }
+void QtSimulationPlayer::pbRefreshFiltersClicked(){	glSimulationPlayerViewer->refreshFilters(); }
 void QtSimulationPlayer::cbBodyWireToggled(bool b){	glSimulationPlayerViewer->bodyWire(b); }
 void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e); emit closeSignal(); }
 

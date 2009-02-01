@@ -41,6 +41,7 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 		virtual void pbResetClicked();
 		
 		virtual void cbAllowFiltrationToggled(bool b);
+        virtual void pbRefreshFiltersClicked();
 		
 		virtual void cbBodyWireToggled(bool b);
  	

@@ -16,7 +16,7 @@ ColorizedVelocityFilter::ColorizedVelocityFilter() : FilterEngine()
 	autoScale=true;
 	minValue=0;
 	maxValue=0;
-	midValue=0;
+	//midValue=0;
 	onlyDynamic=true;
 	prevPositions.clear();
 	prevIteration=0;
@@ -69,6 +69,7 @@ void ColorizedVelocityFilter::applyCondition(MetaBody* ncb)
 Vector3r ColorizedVelocityFilter::getColor4Value(Real v)
 {
 	Vector3r color;
+	Real midValue = (minValue+maxValue)/2;
 	if (v<midValue) 
 	{
 		color[0] = 0;
@@ -93,9 +94,9 @@ void ColorizedVelocityFilter::makeScale()
 		if (values[i]<minValue) minValue = values[i];
 		if (values[i]>maxValue) maxValue = values[i];
 	}
-	midValue = (minValue+maxValue)/2;
+	//midValue = (minValue+maxValue)/2;
 	
-	LOG_INFO("minValue:" << minValue << '\t' << "maxValue:" << maxValue << '\t' << "midValue:" << midValue);
+	LOG_INFO("minValue:" << minValue << '\t' << "maxValue:" << maxValue /*<< '\t' << "midValue:" << midValue*/);
 }
 
 void ColorizedVelocityFilter::initialize(MetaBody* ncb)
@@ -116,12 +117,12 @@ void ColorizedVelocityFilter::initialize(MetaBody* ncb)
 	for(int i=0,e=subscrBodies.size(); i<e; ++i)
 		prevPositions[i] = (*bodies)[subscrBodies[i]]->physicalParameters->se3.position;
 	
-	midValue = (minValue+maxValue)/2;
+	//midValue = (minValue+maxValue)/2;
 	
 	dt = Omega::instance().getTimeStep();
 	prevIteration = Omega::instance().getCurrentIteration();
 
-	LOG_INFO("bodies:" << subscrBodies.size() << '\t' << "minValue:" << minValue << '\t' << "maxValue:" << maxValue << '\t' << "midValue:" << midValue);
+	LOG_INFO("bodies:" << subscrBodies.size() << '\t' << "minValue:" << minValue << '\t' << "maxValue:" << maxValue /*<< '\t' << "midValue:" << midValue*/);
 }
 
 

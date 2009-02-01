@@ -13,7 +13,7 @@
 
 class ColorizedVelocityFilter : public FilterEngine {
 	protected:
-		Real midValue;
+		//Real midValue;
 		vector<Vector3r> prevPositions;
 		long int prevIteration;
 		Real dt;
