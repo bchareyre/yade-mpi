@@ -21,14 +21,12 @@ void mgpost_init(int argc, char **argv)
   
   if (argc == 1) {
     if (!access("./mgp.out.001", F_OK)) {
-      jy_mode = MG_FALSE;
       nfile = 1;
       strcpy(datafilename, "mgp.out.001");
       strcpy(num_file_format,"%03d");
       fgziped = MG_FALSE;
       multifiles = MG_TRUE;
     } else if (!access("./mgp.out.001.gz", F_OK)) {
-      jy_mode = MG_FALSE;
       nfile = 1;
       strcpy(datafilename, "mgp.out.001.gz");
       strcpy(num_file_format,"%03d");
@@ -123,12 +121,14 @@ void mgpost_init(int argc, char **argv)
     if (!strcmp(argv[i], "-i")) {
       strcpy(datafilename, (const char *) argv[i + 1]);
       cin_mode = MG_FALSE;
+      his_mode = MG_FALSE;
       multifiles = MG_FALSE;
     }
 
     if (!strcmp(argv[i], "-cin")) {
       strcpy(datafilename, (const char *) argv[i + 1]);
       cin_mode = MG_TRUE;
+      his_mode = MG_FALSE;
       multifiles = MG_FALSE;
     }
 
@@ -144,6 +144,7 @@ void mgpost_init(int argc, char **argv)
       strcat(datafilename, ".his");
       /*strcpy(datafilename, (const char *) argv[i + 1]);*/
       his_mode = MG_TRUE;
+      cin_mode = MG_FALSE;
       multifiles = MG_TRUE;
     }
 
@@ -1623,19 +1624,36 @@ traitsubmenu4(int value)
 {
   
   switch (value) {
+    
+#ifdef _WITH_TIFF
     case 0:
-		  {
-		    char fname[40];
-            
-		    sprintf(fname,"shot%d.tif",++screenshot_counter);
-		    glutPostRedisplay();
-		    fprintf(stdout, "Picture saved in '%s'\n", fname);
-		    fprintf(stdout, "Format: %dx%d\n", W, H);
-		    writetiff(fname, mgpost_string, 0, 0, W, H, COMPRESSION_PACKBITS);
-		    break;
-		  }
+    {  
+      char fname[40];
+
+      sprintf(fname,"shot%d.tif",++screenshot_counter);
+      glutPostRedisplay();
+      fprintf(stdout, "Picture saved in '%s'\n", fname);
+      fprintf(stdout, "Format: %dx%d\n", W, H);
+      writetiff(fname, mgpost_string, 0, 0, W, H, COMPRESSION_PACKBITS);
+    }
+      break;	  
+#endif
+                  
+#ifdef _WITH_PNG
+    case 9:
+    {  
+      char fname[40];
+
+      sprintf(fname,"shot%d.png",++screenshot_counter);
+      glutPostRedisplay();
+      fprintf(stdout, "Picture saved in '%s'\n", fname);
+      fprintf(stdout, "Format: %dx%d\n", W, H);
+      writepng(fname, mgpost_string, 0, 0, W, H);
+    }
+      break;
+#endif
       
-	case 1:
+      case 1:
       
       sauve_anim = MG_TRUE;
       
@@ -2145,7 +2163,12 @@ mgp_buildmenu()
         glutAddMenuEntry("Liquid bond Volume", 29);
         
         submenu5 = glutCreateMenu(traitsubmenu4);
+#ifdef _WITH_TIFF
         glutAddMenuEntry("Picture TIFF", 0);
+#endif
+#ifdef _WITH_PNG
+        glutAddMenuEntry("Picture PNG", 9);
+#endif        
         glutAddMenuEntry("List of pictures TIFF", 1);
         glutAddMenuEntry("Picture EPS using gl2ps", 2);
         glutAddMenuEntry("Picture EPS (2D)", 6);

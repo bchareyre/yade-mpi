@@ -28,7 +28,7 @@ display_infos_on_body(int i)
 	case 1:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: SPHER\n");
+		fprintf(stdout, "  Type: sphere\n");
 		fprintf(stdout, "  Radius: %lg\n", radius[i][state]);
 		fprintf(stdout, "  Position: %lg, %lg, %lg\n", x[i][state] + xvec, y[i][state] + yvec, z[i][state] + zvec);
 		fprintf(stdout, "  Velocity: %lg, %lg, %lg\n", vx[i][state], vy[i][state], vz[i][state]);
@@ -46,7 +46,7 @@ display_infos_on_body(int i)
 	case 2:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: POLYG\n");
+		fprintf(stdout, "  Type: polygon\n");
 		fprintf(stdout, "  Position: %lg, %lg\n", x[i][state] + xvec, y[i][state] + yvec);
 		fprintf(stdout, "  Velocity: %lg, %lg\n", vx[i][state], vy[i][state]);
 		break;
@@ -54,13 +54,13 @@ display_infos_on_body(int i)
 	case 3:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: SEGMT\n");
+		fprintf(stdout, "  Type: segment\n");
 		break;
 
 	case 4:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: JONCx\n");
+		fprintf(stdout, "  Type: swept sphere segment\n");
 		fprintf(stdout, "  Position: %lg, %lg, %lg\n", x[i][state] + xvec, y[i][state] + yvec, z[i][state] + zvec);
 		fprintf(stdout, "  Velocity: %lg, %lg, %lg\n", vx[i][state], vy[i][state], vz[i][state]);
 		break;
@@ -68,7 +68,7 @@ display_infos_on_body(int i)
 	case 5:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: POLYE\n");
+		fprintf(stdout, "  Type: polyhedron\n");
 		fprintf(stdout, "  Position: %lg, %lg, %lg\n", x[i][state] + xvec, y[i][state] + yvec, z[i][state] + zvec);
 		fprintf(stdout, "  Velocity: %lg, %lg, %lg\n", vx[i][state], vy[i][state], vz[i][state]);
 		break;
@@ -84,7 +84,7 @@ display_infos_on_body(int i)
 	case 101:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: WALLX\n");
+		fprintf(stdout, "  Type: wall (X)\n");
 		fprintf(stdout, "  Position: %lg\n", datas[datadistrib[i]]);
 		break;
 
@@ -92,7 +92,7 @@ display_infos_on_body(int i)
 	case 103:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: WALLY\n");
+		fprintf(stdout, "  Type: wall (Y)\n");
 		fprintf(stdout, "  Position: %lg\n", datas[datadistrib[i]]);
 		break;
 
@@ -100,7 +100,7 @@ display_infos_on_body(int i)
 	case 105:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: WALLZ\n");
+		fprintf(stdout, "  Type: wall (Z)\n");
 		fprintf(stdout, "  Position: %lg\n", datas[datadistrib[i]]);
 		break;
 
@@ -112,7 +112,7 @@ display_infos_on_body(int i)
 }
 
 void 
-info_gap()
+info_gap() // and overlaps (FIXME)
 {
 	int             i, j, k = 0, l;
 	int             type;
@@ -201,7 +201,7 @@ affiche_infos()
 
 		case 1:
 
-			volum += 1.333333 * MG_PI * pow(radius[i][0], 3.0);
+			volum += 1.3333333333 * MG_PI * pow(radius[i][0], 3.0);
 			break;
 
 		default:
@@ -369,21 +369,25 @@ tool_anisotropy(int cstate, int save, FILE * out)
 		for (j = 1; j <= 3; j++)
 			Fabric[i][j] = 0.0;
 
-	Nc = 0;
-	Fmoy = 0.0;
-	for (i = 0; i < nbel; i++)
-		for (j = 0; j < nbneighbors[i][cstate]; j++)
-			if (Fn[i][cstate] > 0.0) {
-				Nc++;
-				Fmoy += Fn[i][cstate];
-			}
+        Nc = 0;
+        Fmoy = 0.0;
+        for (i = 0; i < nbel; i++)
+          for (j = 0; j < nbneighbors[i][cstate]; j++)
+            if (Fn[i][cstate] > 0.0)
+        {
+          Nc++;
+          Fmoy += Fn[i][cstate];
+        }
+            
 	if (Nc != 0) {
 		Fmoy = Fmoy / Nc;
 		/* calcul du tenseur de fabrique */
 		for (i = 0; i < nbel; i++)
 			for (j = 0; j < nbneighbors[i][cstate]; j++) {
 				anta = neighbor[current_adh][cstate] - 1;
-				if (Fn[current_adh][cstate] > /* Fmoy */ 0.0) {
+				if (Fn[current_adh][cstate] > 0.0) 
+                                //if (Vliq[current_adh][cstate] > 0.0)
+                                {
 					pijx = x[i][cstate] - x[anta][cstate];
 					pijy = y[i][cstate] - y[anta][cstate];
 					pijz = z[i][cstate] - z[anta][cstate];
@@ -419,12 +423,14 @@ tool_anisotropy(int cstate, int save, FILE * out)
 		fprintf(stdout, "%14.7f\t%14.7f\t%14.7f\n", Fabric[2][1], Fabric[2][2], Fabric[2][3]);
 		fprintf(stdout, "%14.7f\t%14.7f\t%14.7f\n", Fabric[3][1], Fabric[3][2], Fabric[3][3]);
 
+                /*
 		if (save == 1) {
 			fprintf(out, "%lg\n", mgp_time[cstate]);
 			fprintf(out, "%14.7f\t%14.7f\t%14.7f\n", Fabric[1][1], Fabric[1][2], Fabric[1][3]);
 			fprintf(out, "%14.7f\t%14.7f\t%14.7f\n", Fabric[2][1], Fabric[2][2], Fabric[2][3]);
 			fprintf(out, "%14.7f\t%14.7f\t%14.7f\n", Fabric[3][1], Fabric[3][2], Fabric[3][3]);
 		}
+                */
 		/* calcul des valeurs et vecteurs propres */
 		jacobi(Fabric, 3, d, v, &nrot);
 
@@ -468,15 +474,21 @@ tool_anisotropy(int cstate, int save, FILE * out)
 		fprintf(stdout, "direction principale: H=%lg  V=%lg\n", /* fabs */ ((180.0 / M_PI) * atan(v[2][1] / v[1][1])),
 		     /* fabs */ ((180.0 / M_PI) * atan(v[3][1] / v[1][1])));
 
+                /*
 		if (save == 1) {
 			fprintf(out, "%lg %lg %lg\n", d[1], d[2], d[3]);
 			fprintf(out, "%14.7f\t%14.7f\t%14.7f\n", v[1][1], v[1][2], v[1][3]);
 			fprintf(out, "%14.7f\t%14.7f\t%14.7f\n", v[2][1], v[2][2], v[2][3]);
 			fprintf(out, "%14.7f\t%14.7f\t%14.7f\n", v[3][1], v[3][2], v[3][3]);
-			/* fprintf (out, "%lg %lg %lg\n", a1, a2, a3 ); */
-
 			fprintf(out, "\n");
 		}
+                */
+                
+                if (save == 1) {
+                  // 
+                  fprintf(out, "%le %le %le %le\n", mgp_time[cstate], d[1], d[2], d[3]);
+                }
+                                
 	} else
 		fprintf(stdout, "No contact !!\n");
 

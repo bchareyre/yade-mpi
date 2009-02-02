@@ -21,7 +21,6 @@ void dialogMode ()
   glutMotionFunc (NULL);
   glutIdleFunc (NULL);
   dialOpened = MG_TRUE;
-/*   glutDetachMenu (GLUT_RIGHT_BUTTON); */
 }
 
 void normalMode ()
@@ -34,7 +33,6 @@ void normalMode ()
   glutMotionFunc (mouvement);
   glutIdleFunc (NULL);
   dialOpened = MG_FALSE;
-/*   glutAttachMenu (GLUT_RIGHT_BUTTON); */
 }
 
 void dial_specialKey (int touche, int x, int y)
@@ -52,12 +50,12 @@ void dial_specialKey (int touche, int x, int y)
 
     case GLUT_KEY_LEFT:
 
-      if (curspos > 0) curspos--;
+      if (curspos > 0) --(curspos);
       break;
 
     case GLUT_KEY_RIGHT:
 
-      if (curspos < strlen(dialArea[editedField].label)) curspos++;
+      if (curspos < strlen(dialArea[editedField].label)) ++(curspos);
       break;
     }
 

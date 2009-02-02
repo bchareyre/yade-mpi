@@ -453,7 +453,7 @@ pst_evol(unsigned char iscompressed)
         a3 = 2.0 * (d[2] - d[3]);  
         
         /* sockage des valeurs */
-				fprintf(out[c], "%lg %lg %lg %lg %lg\n", mgp_time[state], Z, a1, a2, a3);
+        fprintf(out[c], "%lg %lg %lg %lg %lg\n", mgp_time[state], Z, a1, a2, a3);
         
         }
 

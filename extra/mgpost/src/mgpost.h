@@ -24,7 +24,14 @@
 #include "post.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <tiffio.h>
+
+#ifdef _WITH_TIFF
+# include <tiffio.h>
+#endif
+
+#ifdef _WITH_PNG
+# include <png.h>
+#endif
 
 #ifdef _LIBXML2
 # include <libxml/tree.h>
@@ -36,8 +43,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#define MGP_VERSION     "0.5.3" 
-// to remove...
+#define MGP_VERSION     "0.5.4" 
 
 #define DISTANCE_INIT   15.0f
 #define DISTANCE_MAX    300.0f
@@ -75,10 +81,10 @@ typedef unsigned int  MGuint;
 #include "dialog.h"
 #include "tapio-K_export.h"
 
-char mgpost_editor[256];
-char mgpost_home[256];
-char mgpost_string[256];
-char num_file_format[20];
+char mgpost_editor   [256];
+char mgpost_home     [256];
+char mgpost_string   [256];
+char num_file_format [20];
 
 static const char delim[] = " ;,()=\t\n";
 
@@ -87,7 +93,6 @@ MGuchar   afficheRepere  = MG_FALSE;
 MGuchar   middle_rep     = MG_TRUE;
 MGuchar   sectionActive  = MG_FALSE;
 MGuchar   sauve_anim     = MG_FALSE;
-MGuchar   jy_mode        = MG_FALSE; /* a supprimer ? */
 MGuchar   cin_mode       = MG_FALSE;
 MGuchar   his_mode       = MG_FALSE;
 MGuchar   mgp_mode       = MG_TRUE;
@@ -149,9 +154,8 @@ double          findAbsMax(double **T, int n, int state);
 double          findAbsMin(double **T, int n, int state);
 double          findNegativeMax(double **T, int n, int state);
 double          findPositiveMax(double **T, int n, int state);
-void 
-findBoundaries(int state, double *xminB, double *yminB, double *zminB,
-	       double *xmaxB, double *ymaxB, double *zmaxB);
+void            findBoundaries(int state, double *xminB, double *yminB, double *zminB,
+	                       double *xmaxB, double *ymaxB, double *zmaxB);
 void            nullifyCumulatedTabs();
 void            mgpallocs();
 void            mgpfree();
@@ -193,6 +197,7 @@ void            play_filetofile();
 void            next_state();
 void            previous_state();
 int             writetiff(char *filename, char *description, int x, int y, int width, int height, int compression);
+int             writepng(const char *filename, char *description, int x, int y, int width, int height);
 void            exportCIN();
 void            export_Rxy();
 void            export_SSPX();
@@ -209,7 +214,7 @@ void            processDialogF3();
 void            processDialogF4();
 void            processDialogF5();
 
-/* fichier de command pour post-traitement */
+/* Command file for post-processing */
 typedef struct 
 {
 	char            name[50];
@@ -282,7 +287,7 @@ MGuchar  *bdyclass;
 
 double         *mgp_time;
 
-MGuchar  *discrim; /* a suprimer lorsque color sera mis en place */
+MGuchar       *discrim;
 MGuchar       *color;
 double        **x, **y, **z;
 double        *x_0, *y_0, *z_0;
@@ -315,17 +320,13 @@ double          vzrep = 0.0;
 double          v_adi = 1.0;
 
 double          xvec = 0.0, yvec = 0.0, zvec = 0.0;
-/*
-double          xmax, ymax, zmax;
-double          xmin, ymin, zmin;
-*/
+
 double          vxmax = -10000.0, vymax = -10000.0, vzmax = -10000.0;
 double          vxmin = 10000.0, vymin = 10000.0, vzmin = 10000.0;
 double          r_moy;
 double          Fcutlevel=1.;
 
 /* antialiasing  */
-
 MGuchar   antialiased = MG_FALSE;
 #define ACSIZE	8
 
@@ -353,13 +354,10 @@ jitter_point    j8[] =
 };
 
 /* vectors */
-
 typedef struct {
 	double          x1;
 	double          x2;
-}               vect2d;
-
-/* MEMO changer les me_ en mgp_ */
+}vect2d;
 
 void            jacobi(float **a, int n, float d[], float **v, int *nrot); /* numerical recipes in C */
 vect2d         *me_vect2d_new(double x1, double x2);
@@ -369,8 +367,7 @@ double          me_vect2d_vecto(vect2d * v1, vect2d * v2);
 double          me_vect2d_norm(vect2d * v);
 
 
-/* pour la visu des forces entre les polyedres (bricolage) */
-
+/* Visualization of forces between polyhedra */
 MGuchar more_forces = MG_FALSE;
 
 typedef struct 
@@ -386,8 +383,7 @@ TACT * Contact;
 unsigned int nbContacts;
 
 
-/* pour la visu des vitesses et pression de fluide */
-
+/* Visualization of velocity and pressure for fluids*/
 MGuchar with_fluid = MG_FALSE;
 
 typedef struct
@@ -400,10 +396,12 @@ typedef struct
 FLUIDCELL * FluidCell;
 unsigned int nbFluidCells;
 
-/* pour la visu des layers */
-
+/* Visualisation of layers */
 MGuchar with_layers = MG_FALSE;
 MGuchar layers_defined = MG_FALSE;
 unsigned int nbLayers = 5;
 unsigned int * layer;
+
+
+
 

@@ -112,11 +112,11 @@ load_mgpview()
 void 
 charger_CINfile()
 {
-  FILE           *cin_file;
-  char            ligne[256];
-  int             nbl;
-  int             i;
-  int             bdy_id;
+  FILE    *cin_file;
+  char     ligne[256];
+  int      nbl;
+  int      i;
+  int      bdy_id;
 
   fprintf(stdout, "Data filename: %s\n", datafilename);
   fflush(stdout);
@@ -298,21 +298,7 @@ charger_CINfile()
   }
 
   fclose(cin_file);
-
-  /*
-  if (mode2D) {
-    phi = -90;
-    theta = 0;
-
-    glDisable(GL_DEPTH_TEST);
-  } else {
-    if (!multifiles) {
-      phi = PHI_INIT;
-      theta = THETA_INIT;
-    }
-    glEnable(GL_DEPTH_TEST);
-  }
-   */
+  nb_state = 1;
 
 }
 
@@ -336,6 +322,9 @@ charger_HISfile()
   datapos = 0;
   nbel = 0;
   
+  unsigned int inCluster = 0;
+  unsigned int dec = 0; /* corps pas pris en compte pour le network */
+  
   while (!feof(his_file))
   {
 	fscanf(his_file, "%s", token);
@@ -343,53 +332,70 @@ charger_HISfile()
 	
 	if (!strcmp((const char *) token,"Sample{"))
 	{	
-		while (strcmp((const char *) token,"}"))
+		while (strcmp((const char *) token,"}") || inCluster == 1)
 		{
-		  fscanf(his_file, "%s", token); 
-		
-		  if (!strcmp((const char *) token,"disk"))
-		  {
-		  	fscanf(his_file, "%*d %lf %lf %lf %lf %lf %lf %lf",
-			     &radius[nbel][0],
-			     &x[nbel][0], &y[nbel][0], &rot[nbel][0],
-			     &vx[nbel][0], &vy[nbel][0], &vrot[nbel][0]);
+                  fscanf(his_file, "%s", token); 
+                  
+                  if (!strcmp((const char *) token,"}"))
+                  {
+                    if (inCluster == 1) { inCluster = 0;fscanf(his_file, "%s", token);}
+                  }
+                  
+                  if (!strcmp((const char *) token,"Cluster{"))
+                  {
+                    inCluster = 1;
+                  }
+                  
+                  if (!strcmp((const char *) token,"rline"))
+                  {
+                    ++dec;
+                  }
+                  
+                  if (!strcmp((const char *) token,"disk"))
+                  {
+                    fscanf(his_file, "%*d %lf %lf %lf %lf %lf %lf %lf",
+                           &radius[nbel][0],
+                           &x[nbel][0], &y[nbel][0], &rot[nbel][0],
+                           &vx[nbel][0], &vy[nbel][0], &vrot[nbel][0]);
 
-		      dataqty[i] = 1;
-		      datadistrib[i] = datapos;
-		      datas[datapos++] = radius[nbel][0];
+                    dataqty[i]       = 1;
+                    datadistrib[i]   = datapos;
+                    datas[datapos++] = radius[nbel][0];
 
-		      mode2D = MG_TRUE;
-		      bdyty[i] = MGP_DISKx;
-		      bdyclass[i] = MGP_GRAIN;
+                    mode2D      = MG_TRUE;
+                    bdyty[i]    = MGP_DISKx;
+                    bdyclass[i] = MGP_GRAIN;
 		
-			  i++;
-		      nbel++;
-		  }	
+                    i++;
+                    nbel++;
+                  }	
 		}
 	}
-	
-	if (!strcmp((const char *) token,"Network{")) /* bricolage !! */
+
+        
+	if (!strcmp((const char *) token,"Network{")) 
 	{
 		nbint = 0;
 		unsigned int ip,jp;
-		unsigned int dec = 4; /* 4 rlines non lues */
 		while (strcmp((const char *) token,"}"))
 		{
 		  fscanf(his_file, "%s", token); 
 		
-		  if (!strcmp((const char *) token,"dkdk")) 
-		  {
-			fscanf(his_file, "%d %d",&ip,&jp);
-            nbneighbors[ip-dec][0] += 1; 
-            neighbor[nbint][0] = jp-dec+1;
-            fscanf(his_file, "%*f %*f %lf %lf %*f",&Fn[nbint][0],&Ft[nbint][0]);
-			nbint++;
-		  }	
+                  if (!strcmp((const char *) token,"dkdk")) 
+                  {
+                    fscanf(his_file, "%d %d",&ip,&jp);
+                    nbneighbors[ip-dec][0] += 1; 
+                    neighbor[nbint][0] = jp-dec+1;
+                    fscanf(his_file, "%*f %*f %lf %lf %*f",&Fn[nbint][0],&Ft[nbint][0]);
+                    nbint++;
+                  }	
 		}	
 	}	
+        
   }
 
   fclose(his_file);
+  nb_state = 1;
 }
 
 void 
@@ -1093,8 +1099,7 @@ read_body_data(xmlNodePtr bdy_node, int bdy, int t)
 
 
 /* writetiff Copyright (c) Mark J. Kilgard, 1997. */
-int 
-writetiff(char *filename, char *description, int x, int y, int width, int height, int compression)
+int writetiff(char *filename, char *description, int x, int y, int width, int height, int compression)
 {
 	#ifdef _WITH_TIFF
   TIFF           *file;
@@ -1141,6 +1146,62 @@ writetiff(char *filename, char *description, int x, int y, int width, int height
 #endif
   return 0;
 }
+
+
+
+int writepng(const char *filename, char *description, int x, int y, int width, int height)
+{
+#ifdef _WITH_PNG
+  int i;
+
+  FILE *fp;
+  png_structp png_ptr;
+  png_infop info_ptr;
+  png_bytep *rowp;
+  GLubyte *glimage = NULL;
+
+  fp = fopen(filename, "wb");
+  if (!fp) return 1;
+  
+  glimage = (GLubyte *) malloc(width * height * sizeof(GLubyte) * 3);
+  
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *) glimage); 
+
+  rowp = (png_bytep *)malloc(sizeof(png_bytep *) * height);
+  if (!rowp) return 1;
+  
+  for (i = 0; i < height; i++) 
+  {
+    rowp[i] = (png_bytep)&glimage[3 * ((height - i - 1) * width)];              
+  }
+
+  png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+                                    NULL, NULL, NULL);
+  if (!png_ptr) return 1;
+
+  info_ptr = png_create_info_struct(png_ptr);
+  if (!info_ptr) return 1;
+
+
+  png_init_io(png_ptr, fp);
+  png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB,
+               PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+               PNG_FILTER_TYPE_DEFAULT);
+  png_write_info(png_ptr, info_ptr);
+  png_write_image(png_ptr, rowp);
+  png_write_end(png_ptr, info_ptr);
+  png_destroy_write_struct(&png_ptr, &info_ptr);
+
+  free(rowp);
+
+  fflush(stdout);
+
+  fclose(fp);
+#endif
+  return 0;
+}
+
 
 void 
 exportCIN()

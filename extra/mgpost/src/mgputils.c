@@ -8,7 +8,7 @@
 
 void no_warranty()
 {
-  fprintf(stdout, "There is NO WARRANTY on the results of this function !!\n");
+  fprintf(stdout, "There is NO WARRANTY on the results of this function!\n");
   fflush(stdout);
 }
 
@@ -312,9 +312,9 @@ void centrer_repere ()
   
   if (middle_rep)
     {
-    xvec = xmin + (xmax - xmin) / 2.0;
-    yvec = ymin + (ymax - ymin) / 2.0;
-    zvec = zmin + (zmax - zmin) / 2.0;
+    xvec = xmin + 0.5 * (xmax - xmin);
+    yvec = ymin + 0.5 * (ymax - ymin);
+    zvec = zmin + 0.5 * (zmax - zmin);
     
     xmin -= xvec;
     ymin -= yvec;
