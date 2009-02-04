@@ -22,9 +22,9 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 #	env.SharedLibrary('InteractionVecSet',['Container/InteractionVecSet.cpp']),
 #	env.SharedLibrary('PhysicalActionVectorVector',['Container/PhysicalActionVectorVector.cpp']),
 ## still permit linking with that
-	env.SharedLibrary('BodyRedirectionVector',[]),
-	env.SharedLibrary('InteractionVecSet',[]),
-	env.SharedLibrary('PhysicalActionVectorVector',[]),
+	env.SharedLibrary('BodyRedirectionVector',[],LIBS=[]),
+	env.SharedLibrary('InteractionVecSet',[],LIBS=[]),
+	env.SharedLibrary('PhysicalActionVectorVector',[],LIBS=[]),
 
 	env.SharedLibrary('AABB',['DataClass/BoundingVolume/AABB.cpp']),
 	env.SharedLibrary('BoundingSphere',['DataClass/BoundingVolume/BoundingSphere.cpp']),
