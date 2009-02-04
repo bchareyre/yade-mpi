@@ -51,6 +51,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	Real L = normal.Dot(cl);
 
 	int contactFace=0; // temp to save what will be maybe needed for new contact
+	assert((c->interactionGeometry&&c->isReal)||(!c->interactionGeometry&&!c->isReal));
 	if(c->interactionGeometry){ // contact already exists, use old data here
 		contactFace=YADE_CAST<SpheresContactGeometry*>(c->interactionGeometry.get())->facetContactFace;
 		// determinate contact on negative side: reverse quantities
@@ -65,7 +66,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	}
 
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
-	if (L > sphereRadius)  return false; // no contact
+	if (L>sphereRadius && !c->isReal)  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
 
 	Vector3r cp = cl - L*normal;
 	const Vector3r* ne = facet->ne;
@@ -117,7 +118,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	// END everything in facet-local coordinates
 	//
 
-	if (penetrationDepth>0)
+	if (penetrationDepth>0 || c->isReal)
 	{
 		shared_ptr<SpheresContactGeometry> scm;
 		if (c->interactionGeometry)

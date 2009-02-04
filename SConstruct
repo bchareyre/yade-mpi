@@ -137,6 +137,7 @@ opts.AddOptions(
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
+	('march','Architecture to use with -march=... when optimizing','native',None,None),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolOption('QUAD_PRECISION','typedef Real as long double (=quad)',0),
@@ -391,7 +392,7 @@ if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp')
 if env['optimize']:
-	env.Append(CXXFLAGS=Split('-O3 -ffast-math -march=native'),
+	env.Append(CXXFLAGS=Split('-O3 -ffast-math -march=%s'%env['march']),
 		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
 	# NDEBUG is used in /usr/include/assert.h: when defined, asserts() are no-ops
 
@@ -411,7 +412,7 @@ else:
 	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast'),('YADE_PTR_CAST','dynamic_pointer_cast')])
 
 if env['gprof']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
-env.Append(CXXFLAGS=['-pipe','-Wall'])
+env.Prepend(CXXFLAGS=['-pipe','-Wall'])
 
 if env['arcs']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
 if env['arcs']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])

@@ -156,12 +156,13 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		epsN=contGeom->epsN();
 		epsT=contGeom->epsT();
 
+		contGeom->relocateContactPoints(); // allow very large mutual rotations
+
 		if(logStrain && epsN<0){
 			Real epsN0=epsN;
 			epsN=log(epsN0+1);
 			epsT*=epsN/epsN0;
 		}
-
 
 		#ifdef BREFCOM_MATERIAL_MODEL
 			BREFCOM_MATERIAL_MODEL

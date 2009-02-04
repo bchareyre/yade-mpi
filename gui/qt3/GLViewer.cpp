@@ -18,11 +18,21 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<boost/filesystem/operations.hpp>
+#include<boost/version.hpp>
 
 CREATE_LOGGER(GLViewer);
+GLLock::GLLock(GLViewer* _glv):
 
-GLLock::GLLock(GLViewer* _glv): boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex,true), glv(_glv){
-	if(locked()) glv->makeCurrent(); }
+#if BOOST_VERSION<103500
+	boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex,true), glv(_glv){
+		if(locked()) glv->makeCurrent();
+	}
+#else
+	boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex), glv(_glv){
+		if(owns_lock()) glv->makeCurrent();
+	}
+#endif
+
 GLLock::~GLLock(){ /*glv->doneCurrent();*/}
 
 void GLViewer::updateGL(void){/*GLLock lock(this); */QGLViewer::updateGL();}
@@ -30,10 +40,15 @@ void GLViewer::updateGL(void){/*GLLock lock(this); */QGLViewer::updateGL();}
 void GLViewer::paintGL(void){
 	/* paintGL encapsulated preDraw, draw and postDraw within QGLViewer. If the mutex cannot be locked,
 	 * we just return without repainting */
-	boost::try_mutex::scoped_try_lock lock(YadeQtMainWindow::self->glMutex);
-	if(lock.locked()){
-		this->makeCurrent(); // not sure if this is needed
-		QGLViewer::paintGL();
+	#if BOOST_VERSION<103500
+		boost::try_mutex::scoped_try_lock lock(YadeQtMainWindow::self->glMutex);
+		if(lock.locked()){
+	#else
+		boost::try_mutex::scoped_try_lock lock(YadeQtMainWindow::self->glMutex,boost::defer_lock);
+		if(lock.owns_lock()){
+	#endif
+			this->makeCurrent(); // not sure if this is needed
+			QGLViewer::paintGL();
 	}
 	//this->doneCurrent();
 }

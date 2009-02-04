@@ -338,3 +338,42 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,**kw):
 	dictParams.update(dictDefaults); saveVars('table',**dictParams)
 	return len(tagsParams)
 
+
+def basicDEMEngines(interPhysics='SimpleElasticRelationships',constitutiveLaw='ElasticContactLaw',gravity=None,damping=.4):
+	"""Set basic set of DEM engines and initializers.
+	
+	interPhysics and constitutiveLaw specify class of respective engines to use instead of defaults.
+
+	Gravity can be list or tuple to specify numeric value, it can also be an object that will be inserted into
+	engines, however. By default, no gravity is applied.
+	"""
+	O.initializers=[
+		StandAloneEngine('PhysicalActionContainerInitializer'),
+		MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('InteractingFacet2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
+	]
+	O.engines=[
+		StandAloneEngine('PhysicalActionContainerReseter'),
+		MetaEngine('BoundingVolumeMetaEngine',[
+			EngineUnit('InteractingSphere2AABB'),
+			EngineUnit('InteractingBox2AABB'),
+			EngineUnit('InteractingFacet2AABB'),
+			EngineUnit('MetaInteractingGeometry2AABB')
+		]),
+		StandAloneEngine('PersistentSAPCollider'),
+		MetaEngine('InteractionGeometryMetaEngine',[
+			EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
+			EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry'),
+			EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')
+		]),
+		MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
+		StandAloneEngine('ElasticContactLaw'),
+	]
+	if gravity:
+		if islist(gravity) or istuple(gravity):
+			O.engines=O.engines+[DeusExMachina('GravityEngine',{'gravity':gravity}),]
+		else:
+			O.engines=O.engines+[gravity]
+	O.engines=O.engines+[DeusExMachina('NewtonsDampedLaw',{'damping':damping}),]
+	
+		
+

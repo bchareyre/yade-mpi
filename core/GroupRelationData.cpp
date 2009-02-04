@@ -8,12 +8,12 @@
 
 #include "GroupRelationData.hpp"
 
-GroupRelationData::GroupRelationData() : npar_(0), ngrp_(2)
+GroupRelationData::GroupRelationData() : ngrp_(2), npar_(0)
 { 
         initActivator(); 
 }
 
-GroupRelationData::GroupRelationData(unsigned int ngrp) : npar_(0), ngrp_(ngrp)
+GroupRelationData::GroupRelationData(unsigned int ngrp) : ngrp_(ngrp), npar_(0)
 { 
 	initActivator();
 }
