@@ -31,8 +31,6 @@
 
 using namespace std;
 
-bool dontUseGdb(false);
-
 #ifdef LOG4CXX
 	// provides parent logger for everybody
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
@@ -61,8 +59,7 @@ sigHandler(int sig){
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			if(!dontUseGdb)
-				std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			raise(sig); // reemit signal after exiting gdb
 			break;
@@ -152,6 +149,8 @@ int main(int argc, char *argv[])
 	filesystem::path::default_name_check(filesystem::native);
 
 	string configPath=string(getenv("HOME")) + "/.yade" SUFFIX; // this is the default, may be overridden by -c / -C
+
+	bool useGdb=true;
 	
 	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
 	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cxvS:"))!=-1)
@@ -162,7 +161,7 @@ int main(int argc, char *argv[])
 			case 'w': setup=true; break;
 			case 'C': configPath=optarg; break;
 			case 'c': configPath="."; break;
-			case 'x': dontUseGdb=true; break;
+			case 'x': useGdb=false; break;
 			case 'v': verbose+=1; break;
 			case 'S': simulationFileName=optarg; break;
 			case '-': coreOptions=false; break;
@@ -221,13 +220,15 @@ int main(int argc, char *argv[])
 	}
 
 	#ifdef YADE_DEBUG
-		// postponed until the config dir has been created
-		ofstream gdbBatch;
-		Omega::instance().gdbCrashBatch=(yadeConfigPath/"gdb_crash_batch-pid").string()+lexical_cast<string>(getpid());
-		gdbBatch.open(Omega::instance().gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
-		signal(SIGABRT,sigHandler);
-		signal(SIGSEGV,sigHandler);
-		LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
+		if(useGdb){
+			// postponed until the config dir has been created
+			ofstream gdbBatch;
+			Omega::instance().gdbCrashBatch=(yadeConfigPath/"gdb_crash_batch-pid").string()+lexical_cast<string>(getpid());
+			gdbBatch.open(Omega::instance().gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
+			signal(SIGABRT,sigHandler);
+			signal(SIGSEGV,sigHandler);
+			LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
+		}
 	#endif
 	
 	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
@@ -270,9 +271,11 @@ int main(int argc, char *argv[])
 		// Py_Finalize();
 	#endif
 	#ifdef YADE_DEBUG
-		signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers
-		signal(SIGSEGV,warnOnceHandler); // FIXME: this is to cover up crash that occurs in log4cxx on i386 sometimes 
-		unlink(Omega::instance().gdbCrashBatch.c_str());
+		if(useGdb){
+			signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers
+			signal(SIGSEGV,warnOnceHandler); // FIXME: this is to cover up crash that occurs in log4cxx on i386 sometimes 
+			unlink(Omega::instance().gdbCrashBatch.c_str());
+		}
 	#endif
 
 	LOG_INFO("Yade: normal exit.");

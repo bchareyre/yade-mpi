@@ -51,7 +51,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	Real L = normal.Dot(cl);
 
 	int contactFace=0; // temp to save what will be maybe needed for new contact
-	assert((c->interactionGeometry&&c->isReal)||(!c->interactionGeometry&&!c->isReal));
+	//assert((c->interactionGeometry&&c->isReal)||(!c->interactionGeometry&&!c->isReal));
 	if(c->interactionGeometry){ // contact already exists, use old data here
 		contactFace=YADE_CAST<SpheresContactGeometry*>(c->interactionGeometry.get())->facetContactFace;
 		// determinate contact on negative side: reverse quantities

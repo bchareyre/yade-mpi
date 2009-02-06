@@ -33,16 +33,18 @@ REGISTER_SERIALIZABLE(RotationEngine);
  */
 class SpiralEngine:public DeusExMachina{
 	public:
-		SpiralEngine():angularVelocity(0.),linearVelocity(0.),axis(Vector3r::UNIT_X),axisPt(0,0,0){}
+		SpiralEngine():angularVelocity(0.),linearVelocity(0.),axis(Vector3r::UNIT_X),axisPt(0,0,0),angleTurned(0.){}
 		Real angularVelocity;
 		Real linearVelocity;
 		//! axis of translation and rotation (direction); will be normalized by the engine
 		Vector3r axis;
 		//! a point on the axis, to position it in space properly
 		Vector3r axisPt;
+		//! how much have we turned so far
+		Real angleTurned;
 	virtual void applyCondition(MetaBody*);
 	REGISTER_CLASS_AND_BASE(SpiralEngine,DeusExMachina);
-	REGISTER_ATTRIBUTES(DeusExMachina,(angularVelocity)(linearVelocity)(axis)(axisPt));
+	REGISTER_ATTRIBUTES(DeusExMachina,(angularVelocity)(linearVelocity)(axis)(axisPt)(angleTurned));
 };
 REGISTER_SERIALIZABLE(SpiralEngine);
 

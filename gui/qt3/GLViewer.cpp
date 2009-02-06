@@ -22,18 +22,20 @@
 
 CREATE_LOGGER(GLViewer);
 GLLock::GLLock(GLViewer* _glv):
-
+/* 
+ * try: doneCurrent; glFlush; glSwapBuffers after paintGL
+ */
 #if BOOST_VERSION<103500
 	boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex,true), glv(_glv){
-		if(locked()) glv->makeCurrent();
+		glv->makeCurrent();
 	}
 #else
 	boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex), glv(_glv){
-		if(owns_lock()) glv->makeCurrent();
+		glv->makeCurrent();
 	}
 #endif
 
-GLLock::~GLLock(){ /*glv->doneCurrent();*/}
+GLLock::~GLLock(){ glv->doneCurrent();}
 
 void GLViewer::updateGL(void){/*GLLock lock(this); */QGLViewer::updateGL();}
 
@@ -50,7 +52,7 @@ void GLViewer::paintGL(void){
 			this->makeCurrent(); // not sure if this is needed
 			QGLViewer::paintGL();
 	}
-	//this->doneCurrent();
+	this->doneCurrent();
 }
 
 GLViewer::~GLViewer(){ /* get the GL mutex when closing */ GLLock lock(this); }

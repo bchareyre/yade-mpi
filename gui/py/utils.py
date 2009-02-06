@@ -276,7 +276,7 @@ def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 		while(os.path.exists(out+"~%d"%i)): i+=1
 		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
 	print "Encoding video from %s to %s"%(wildcard,out)
-	pipeline=gst.parse_launch('multifilesrc location="%s" index=0 caps="image/png,framerate=\(fraction\)%d/1" ! pngdec ! ffmpegcolorspace ! theoraenc sharpness=2 quality=32 ! oggmux ! filesink location="%s"'%(wildcard,fps,out))
+	pipeline=gst.parse_launch('multifilesrc location="%s" index=0 caps="image/png,framerate=\(fraction\)%d/1" ! pngdec ! ffmpegcolorspace ! theoraenc sharpness=2 quality=63 ! oggmux ! filesink location="%s"'%(wildcard,fps,out))
 	bus=pipeline.get_bus()
 	bus.add_signal_watch()
 	mainloop=gobject.MainLoop();

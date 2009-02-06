@@ -82,7 +82,9 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 	string snapBase2(snapBase);
 	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); snapBase2=tmpnam_str; LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots."); }
 	glv->stride=stride;
-	glv->load(savedSim);
+	{ GLLock lock(glv);
+		glv->load(savedSim);
+	}
 	glv->saveSnapShots=true;
 	glv->snapshotsBase=snapBase2;
 	{

@@ -245,20 +245,34 @@ bool pointInsidePolygon(python::tuple xy, python::object vertices){
  * dH_dTheta is the inclination of the spiral (height increase per radian),
  * theta0 is the angle for zero height (by given axis).
  */
-python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real theta0=0){
+python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
 	int ax1=(axis+1)%3,ax2=(axis+2)%3;
 	Vector3r pt=tuple2vec(_pt);
 	Real r=sqrt(pow(pt[ax1],2)+pow(pt[ax2],2));
 	Real theta;
-	if(r>Mathr::ZERO_TOLERANCE) theta=acos(pt[ax1]/r);
-	if(pt[ax2]<0) theta=Mathr::TWO_PI-theta;
+	if(r>Mathr::ZERO_TOLERANCE){
+		theta=acos(pt[ax1]/r);
+		if(pt[ax2]<0) theta=Mathr::TWO_PI-theta;
+	}
 	else theta=0;
 	Real hRef=dH_dTheta*(theta-theta0);
 	long period;
-	Real h=Shop::periodicWrap(pt[axis],hRef-.5*Mathr::PI*dH_dTheta,hRef+.5*Mathr::PI*dH_dTheta,&period);
-	return python::make_tuple(python::make_tuple(r,h-hRef),theta);
+	if(isnan(periodStart)){
+		Real h=Shop::periodicWrap(pt[axis]-hRef,hRef-Mathr::PI*dH_dTheta,hRef+Mathr::PI*dH_dTheta,&period);
+		return python::make_tuple(python::make_tuple(r,h),theta);
+	}
+	else{
+		Real hPeriodStart=(periodStart-theta0)*dH_dTheta;
+		//TRVAR4(hPeriodStart,periodStart,theta0,theta);
+		//Real h=Shop::periodicWrap(pt[axis]-hRef,hPeriodStart,hPeriodStart+2*Mathr::PI*dH_dTheta,&period);
+		theta=Shop::periodicWrap(theta,periodStart,periodStart+2*Mathr::PI,&period);
+		Real h=pt[axis]-hRef+period*2*Mathr::PI*dH_dTheta;
+		//TRVAR3(pt[axis],pt[axis]-hRef,period);
+		//TRVAR2(h,theta);
+		return python::make_tuple(python::make_tuple(r,h),theta);
+	}
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,4);
+BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
 
 // for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
 void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
@@ -286,7 +300,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("sumBexForces",sumBexForces);
 	def("sumBexTorques",sumBexTorques);
 	def("createInteraction",Shop__createExplicitInteraction);
-	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","theta0")));
+	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);
 	def("scalarOnColorScale",Shop__scalarOnColorScale);
 }

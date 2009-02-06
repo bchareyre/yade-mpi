@@ -36,7 +36,7 @@ Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])
  *
  * The code is analogous to AxialGravityEngine and is intended to give initial motion
  * to particles subject to axial compaction to speed up the process. */
-void velocityTowardsAxis(python::tuple _axisPoint, python::tuple _axisDirection, Real timeToAxis, Real subtractDist=0.){
+void velocityTowardsAxis(python::tuple _axisPoint, python::tuple _axisDirection, Real timeToAxis, Real subtractDist=0., Real perturbation=0.1){
 	Vector3r axisPoint=tuple2vec(_axisPoint), axisDirection=tuple2vec(_axisDirection);
 	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getRootBody()->bodies)){
 		if(!b->isDynamic) continue;
@@ -48,13 +48,15 @@ void velocityTowardsAxis(python::tuple _axisPoint, python::tuple _axisDirection,
 		Vector3r toAxis=closestAxisPoint-x0;
 		if(subtractDist>0) toAxis*=(toAxis.Length()-subtractDist)/toAxis.Length();
 		pp->velocity=toAxis/timeToAxis;
+		Vector3r ppDiff=perturbation*(1./sqrt(3.))*Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom())*pp->velocity.Length();
+		pp->velocity+=ppDiff;
 	}
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,4);
+BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,5);
 
 
 
 BOOST_PYTHON_MODULE(_eudoxos){
-	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist")));
+	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
 }
 

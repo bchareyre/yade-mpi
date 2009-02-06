@@ -29,6 +29,7 @@ void QtSimulationPlayer::keyPressEvent(QKeyEvent* e){
 QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
 	YadeQtMainWindow::self->ensureRenderer();
 	glSimulationPlayerViewer=new GLSimulationPlayerViewer(NULL,YadeQtMainWindow::self->renderer);
+	YadeQtMainWindow::self->renderer->initgl();
 	glSimulationPlayerViewer->simPlayer=this;
 	leInputConfigFile->setText(Omega::instance().getSimulationFileName());
 	enableControls(false);
