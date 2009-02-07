@@ -66,18 +66,24 @@ def downCast(obj,newClassName):
 	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
 	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
-def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
-	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
+def sphere_v2(center,radius,physicalParameters,density=1,dynamic=True,wire=False,color=None):
+	"""Create sphere, version 2. Allow any PhysicalParamters class, not only BodyMacroParameters descendan as for sphere."""
 	s=Body()
 	if not color: color=randomColor()
 	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color,'wire':wire,'visible':True})
 	s.mold=InteractingGeometry('InteractingSphere',{'radius':radius,'diffuseColor':color})
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
-	s.phys=PhysicalParameters(physParamsClass,{'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+	physParams={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert]}
+	physParams.update(physicalParameters[1])
+	s.phys=PhysicalParameters(physicalParameters[0],physParams)
 	s.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	s['isDynamic']=dynamic
 	return s
+
+def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
+	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
+	return sphere_v2(center,radius,[physParamsClass,{'young':young,'poisson':poisson,'frictionAngle':frictionAngle}],density,dynamic,wire,color)
 
 def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
@@ -91,8 +97,8 @@ def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,fri
 	b['isDynamic']=dynamic
 	return b
 
-def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=None,physParamsClass='BodyMacroParameters'):
-	"""Create Facet"""
+def facet_v2(vertices,physicalParameters,dynamic=False,wire=True,color=None):
+	"""Create facet, version 2. Allow any PhysicalParamters class, not only BodyMacroParameters descendan as for facet."""
 	b=Body()
 	if not color: color=randomColor()
 	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire,'visible':True})
@@ -102,11 +108,17 @@ def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire
 	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
 	b.shape.setRaw('vertices',vStr)
 	b.mold.setRaw('vertices',vStr)
-	b.phys=PhysicalParameters(physParamsClass,{'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':0,'inertia':[0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+	physParams={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0]}
+	physParams.update(physicalParameters[1])
+	b.phys=PhysicalParameters(physicalParameters[0],physParams)
 	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	b['isDynamic']=dynamic
 	b.mold.postProcessAttributes()
 	return b
+
+def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=None,physParamsClass='BodyMacroParameters'):
+	"""Create default facet with given parameters."""
+	return facet_v2(vertices,[physParamsClass,{'young':young,'poisson':poisson,'frictionAngle':frictionAngle}],dynamic,wire,color)
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""return 6 walls that will wrap existing packing;
@@ -244,8 +256,9 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 	pylab.show()
 
 
-def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=0.5236,wire=True,noBoundingVolume=False,noInteractingGeometry=False):
-	""" Import geometry from stl file, create bodies and return list of their ids. 
+def import_stl_geometry_v2(file, physicalParameters, color=[0,1,0],wire=True,noBoundingVolume=False,noInteractingGeometry=False):
+	"""Import geometry from stl file, version 2. 
+	Allow any PhysicalParamters class, not only BodyMacroParameters descendan as for import_stl_geometry.
 	"""
 	imp = STLImporter()
 	imp.wire = wire
@@ -255,7 +268,9 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 	for i in xrange(imp.number_of_facets):
 		b=Body()
 		b['isDynamic']=False
-		b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,0,1,0,0,0],'mass':0,'inertia':[0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+		physParams={'se3':[0,0,0,1,0,0,0]}
+		physParams.update(physicalParameters[1])
+		b.phys=PhysicalParameters(physicalParameters[0],physParams)
 		if not noBoundingVolume:
 			b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 		o.bodies.append(b)
@@ -266,6 +281,10 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 			o.bodies[i].mold.postProcessAttributes()
 		o.bodies[i].shape['diffuseColor']=color
 	return imported
+
+def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=0.5236,wire=True,noBoundingVolume=False,noInteractingGeometry=False,physParamsClass='BodyMacroParameters'):
+	""" Import geometry from stl file, create facets and return list of their ids."""
+	return import_stl_geometry_v2(file,[physParamsClass,{'young':young,'poisson':poisson,'frictionAngle':frictionAngle}],color,wire,noBoundingVolume,noInteractingGeometry)
 
 def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 	import pygst,sys,gobject,os

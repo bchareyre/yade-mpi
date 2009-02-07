@@ -28,6 +28,7 @@ Requirements :
 -All dynamic bodies must have physical parameters of type (or inheriting from) BodyMacroParameters
 -Physical actions must include forces and moments
  
+NOTE: Cundall damping affected dynamic simulation! See examples/dynamic_simulation_tests
  
  */
 

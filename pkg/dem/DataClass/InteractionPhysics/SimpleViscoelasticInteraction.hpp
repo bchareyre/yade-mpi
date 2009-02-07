@@ -23,7 +23,7 @@ class SimpleViscoelasticInteraction : public InteractionPhysics
 	    /// Shear interaction viscous constants.
 	    Real cs;
 	    /// Coulomb friction
-	    Real mu;
+	    Real tangensOfFrictionAngle;
 	    /// Unit normal of the contact plane
 	    Vector3r prevNormal;
 	    /// Normal force

@@ -44,7 +44,7 @@ void SimpleViscoelasticRelationships::go(	  const shared_ptr<PhysicalParameters>
     if (contactPhysics->cn) contactPhysics->cn = 1/contactPhysics->cn;
     if (contactPhysics->cs) contactPhysics->cs = 1/contactPhysics->cs;
    
-    contactPhysics->mu = std::min(sdec1->mu, sdec2->mu); // FIXME: May be (mu1+mu2)/2???
+    contactPhysics->tangensOfFrictionAngle		= std::tan(std::min(sdec1->frictionAngle, sdec2->frictionAngle)); 
 
     contactPhysics->shearForce = Vector3r(0,0,0);
     contactPhysics->prevNormal = Vector3r(0,0,0);

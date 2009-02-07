@@ -35,6 +35,7 @@
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
+#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/Momentum.hpp>
@@ -1156,6 +1157,17 @@ Shop::sphereGeomStruct Shop::smallSdecXyzData[]={
 Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2)
 {
 	return v0+((v2-v0)*(v1-v0).Length()+(v1-v0)*(v2-v0).Length())/((v1-v0).Length()+(v2-v1).Length()+(v0-v2).Length());
+}
+
+void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticBodyParameters> b)
+{
+    b->kn = m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(en),2) );
+    b->cn = -2.0*m/tc * Mathr::Log(en);
+    b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
+    b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
+
+    if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
+    if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
 }
 
 

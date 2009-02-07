@@ -689,6 +689,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
         env.SharedLibrary('MembraneTest',
                 ['PreProcessor/MembraneTest.cpp'],
                 LIBS=env['LIBS']+['ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment',
+                        'Shop',
                         'ef2_BssSweptSphereLineSegment_AABB_makeAABB',
                         'BcpConnection',
                         'BshTube',
@@ -1133,6 +1134,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 		,['PreProcessor/TestSimpleViscoelastic.cpp']
 		,LIBS=env['LIBS']+['AABB'
 			    ,'Box'
+                ,'Shop'
 			    ,'InteractingBox'
 			    ,'SimpleViscoelasticRelationships'
 			    ,'SimpleViscoelasticContactLaw'

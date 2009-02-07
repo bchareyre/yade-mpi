@@ -99,6 +99,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'yade-multimethods',
 			'SpheresContactGeometry',
 			'ElasticContactInteraction',
+			'SimpleViscoelasticBodyParameters',
 			'SDECLinkGeometry',
 			'SDECLinkPhysics',
 			'$QGLVIEWER_LIB'

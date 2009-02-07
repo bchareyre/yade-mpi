@@ -13,7 +13,6 @@
 
 class ColorizedVelocityFilter : public FilterEngine {
 	protected:
-		//Real midValue;
 		vector<Vector3r> prevPositions;
 		long int prevIteration;
 		Real dt;
@@ -36,7 +35,6 @@ class ColorizedVelocityFilter : public FilterEngine {
 		virtual void applyCondition(MetaBody*);
 	
 		virtual void registerAttributes();
-		//virtual void postProcessAttributes(bool deserializing);
 		DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(ColorizedVelocityFilter);
 	REGISTER_BASE_CLASS_NAME(FilterEngine);

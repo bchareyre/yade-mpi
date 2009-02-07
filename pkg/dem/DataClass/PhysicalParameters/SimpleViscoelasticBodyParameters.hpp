@@ -10,6 +10,7 @@
 
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 
+/// Note: Shop::getViscoelasticFromSpheresInteraction can get kn,cn,ks,cs from a analytical solution of a pair spheres interaction problem.
 class SimpleViscoelasticBodyParameters : public RigidBodyParameters {	
 	public :
 
@@ -21,15 +22,11 @@ class SimpleViscoelasticBodyParameters : public RigidBodyParameters {
 	    Real ks; 
 	    /// Shear viscous constants of the body
 	    Real cs; 
-	    /// Coulomb friction
-	    Real mu; 
+	    /// Friction angle
+	    Real frictionAngle; 
 	
 		SimpleViscoelasticBodyParameters();
 		virtual ~SimpleViscoelasticBodyParameters();
-
-	    /// Set viscoelastic parameters kn,cn,ks,cs of the sphere from its
-	    /// mass m, collision time tc and restitution coefficients en,es.
-	    void setViscoelastic(Real m, Real tc, Real en, Real es);
 
 	protected :
 		/// Serialization

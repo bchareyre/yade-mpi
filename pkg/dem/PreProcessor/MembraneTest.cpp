@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include <boost/lexical_cast.hpp>
+#include<yade/extra/Shop.hpp>
 
 #include "MembraneTest.hpp"
 
@@ -72,7 +73,7 @@ MembraneTest::MembraneTest () : FileGenerator()
 	tc		        = 0.001;
         en                      = 0.3;
         es                      = 0.3;
-        mu			= 0.4;
+        frictionAngle = 0.38; // rad = 21.8 grad = atan(mu=0.4);
 	gravity			= Vector3r(0,-9.81,0);
 }
 
@@ -99,7 +100,7 @@ void MembraneTest::registerAttributes()
 	REGISTER_ATTRIBUTE(tc);
 	REGISTER_ATTRIBUTE(en);
 	REGISTER_ATTRIBUTE(es);
-	REGISTER_ATTRIBUTE(mu);
+	REGISTER_ATTRIBUTE(frictionAngle);
 	REGISTER_ATTRIBUTE(gravity);
 }
 
@@ -193,8 +194,8 @@ void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsign
         connection->id1             = id1;
         connection->id2             = id2;
         connection->mass	    = 1.0; // !!!!
-        connection->setViscoelastic(connection->mass, tc, en, es);
-	connection->mu              = mu;
+        Shop::getViscoelasticFromSpheresInteraction(connection->mass,tc,en,es, static_pointer_cast<SimpleViscoelasticBodyParameters>(connection));
+		connection->frictionAngle              = frictionAngle;
         Vector3r position1,
                  position2;
         position1                   = (*(rootBody->bodies))[id1]->physicalParameters->se3.position;
@@ -244,8 +245,8 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
   Real I                    = 2.0/5.0 * physics->mass * radius * radius;
   physics->inertia          = Vector3r(I, I, I);
   physics->se3              = Se3r(position,q);
-  physics->setViscoelastic(physics->mass, tc, en, es);
-  physics->mu               = mu;
+  Shop::getViscoelasticFromSpheresInteraction(physics->mass,tc,en,es,physics);
+  physics->frictionAngle               = frictionAngle;
         
   aabb->diffuseColor        = Vector3r(0.0,1.0,0.0);
 

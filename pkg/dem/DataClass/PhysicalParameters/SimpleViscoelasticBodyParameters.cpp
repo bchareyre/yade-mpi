@@ -24,18 +24,8 @@ void SimpleViscoelasticBodyParameters::registerAttributes()
 	REGISTER_ATTRIBUTE(ks);
 	REGISTER_ATTRIBUTE(cn);
 	REGISTER_ATTRIBUTE(cs);
-	REGISTER_ATTRIBUTE(mu);
+	REGISTER_ATTRIBUTE(frictionAngle);
 }
 
-void SimpleViscoelasticBodyParameters::setViscoelastic(Real m, Real tc, Real en, Real es)
-{
-    kn = m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(en),2) );
-    cn = -2.0*m/tc * Mathr::Log(en);
-    ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
-    cs = -2.0/7.0 * m/tc * Mathr::Log(es);
-
-    if (Math<Real>::FAbs(cn) <= Math<Real>::ZERO_TOLERANCE ) cn=0;
-    if (Math<Real>::FAbs(cs) <= Math<Real>::ZERO_TOLERANCE ) cs=0;
-}
 YADE_PLUGIN();
 

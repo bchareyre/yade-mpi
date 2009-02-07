@@ -21,7 +21,7 @@ class MembraneTest : public FileGenerator
 		Real		bigBallRadius,
 				membraneThickness,
 				tc,en,es,
-				mu;
+				frictionAngle;
 
                 void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool dynamic);
 		void createNode(shared_ptr<Body>& body, unsigned int i, unsigned int j);

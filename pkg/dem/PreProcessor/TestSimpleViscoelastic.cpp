@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #include "TestSimpleViscoelastic.hpp"
+#include <yade/extra/Shop.hpp>
 #include <yade/core/Body.hpp>
 #include <yade/core/MetaBody.hpp>
 #include<yade/core/Body.hpp>
@@ -41,7 +42,7 @@ TestSimpleViscoelastic::TestSimpleViscoelastic() : FileGenerator()
     tc = 0.001;
     en = 0.3;
     es = 0.3;
-    mu = 0.1;
+    frictionAngle = 0.52; // 30 grad
     R  = 1;
     density = 2600;
     nbSpheres = 10;
@@ -67,7 +68,7 @@ void TestSimpleViscoelastic::registerAttributes()
     REGISTER_ATTRIBUTE(tc);
     REGISTER_ATTRIBUTE(en);
     REGISTER_ATTRIBUTE(es);
-    REGISTER_ATTRIBUTE(mu);
+    REGISTER_ATTRIBUTE(frictionAngle);
     REGISTER_ATTRIBUTE(R);
     REGISTER_ATTRIBUTE(density);
     REGISTER_ATTRIBUTE(nbSpheres);
@@ -139,8 +140,8 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 						, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
 						, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3);
 	physics->se3			= Se3r(position,q);
-	physics->setViscoelastic(physics->mass, tc, en, es);
-	physics->mu			= mu;
+    Shop::getViscoelasticFromSpheresInteraction(physics->mass,tc,en,es,physics);
+	physics->frictionAngle			= frictionAngle;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
@@ -239,9 +240,8 @@ void TestSimpleViscoelastic::createSphere(shared_ptr<Body>& body, int i)
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
 	physics->se3			= Se3r(position,q);
-	physics->setViscoelastic(physics->mass, tc, en, es);
-//	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
-	physics->mu			= mu;
+    Shop::getViscoelasticFromSpheresInteraction(physics->mass,tc,en,es,physics);
+    physics->frictionAngle		= frictionAngle;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 

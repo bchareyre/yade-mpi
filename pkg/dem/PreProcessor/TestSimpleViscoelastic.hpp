@@ -20,7 +20,7 @@ class TestSimpleViscoelastic : public FileGenerator {
 	/// Shear restitution coefficient
        	Real es;
 	/// Coulomb friction
-	Real mu;
+	Real frictionAngle;
 	/// Spheres radius
 	Real R;
 	/// Materials density

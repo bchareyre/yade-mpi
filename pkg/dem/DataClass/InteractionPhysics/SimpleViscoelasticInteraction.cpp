@@ -24,6 +24,7 @@ void SimpleViscoelasticInteraction::registerAttributes()
 	REGISTER_ATTRIBUTE(ks);
 	REGISTER_ATTRIBUTE(cn);
 	REGISTER_ATTRIBUTE(cs);
+	REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
 	REGISTER_ATTRIBUTE(prevNormal);
 	REGISTER_ATTRIBUTE(normalForce);
 	REGISTER_ATTRIBUTE(shearForce);

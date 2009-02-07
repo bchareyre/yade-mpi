@@ -4,6 +4,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<cmath>
 
@@ -161,6 +162,20 @@ python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::li
 {
 	return vec2tuple(Shop::inscribedCircleCenter(Vector3r(python::extract<double>(v0[0]),python::extract<double>(v0[1]),python::extract<double>(v0[2])), Vector3r(python::extract<double>(v1[0]),python::extract<double>(v1[1]),python::extract<double>(v1[2])), Vector3r(python::extract<double>(v2[0]),python::extract<double>(v2[1]),python::extract<double>(v2[2]))));
 }
+
+python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
+{
+    shared_ptr<SimpleViscoelasticBodyParameters> b = shared_ptr<SimpleViscoelasticBodyParameters>(new SimpleViscoelasticBodyParameters());
+    Shop::getViscoelasticFromSpheresInteraction(m,tc,en,es,b);
+	python::dict d;
+	d["kn"]=b->kn;
+	d["cn"]=b->cn;
+	d["ks"]=b->ks;
+	d["cs"]=b->cs;
+    return d;
+}
+
+
 /* Sum moments acting on bodies within mask.
  *
  * @param mask is Body::groupMask that must match for a body to be taken in account.
@@ -295,6 +310,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));
 	def("elasticEnergy",elasticEnergyInAABB);
 	def("inscribedCircleCenter",inscribedCircleCenter);
+	def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
 	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumBexForces",sumBexForces);
