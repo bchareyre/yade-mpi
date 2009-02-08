@@ -24,8 +24,20 @@
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
 #include<boost/algorithm/string.hpp>
+#include<boost/thread/mutex.hpp>
 
 #include<cxxabi.h>
+
+#if BOOST_VERSION<103500
+class RenderMutexLock: public boost::try_mutex::scoped_try_lock{
+	RenderMutexLock(): boost::try_mutex::scoped_try_lock(Omega::instance().renderMutex,true){cerr<<"Lock renderMutex";}
+	~RenderMutexLock(){cerr<<"Unlock renderMutex"<<endl;}
+};
+#else
+class RenderMutexLock: public boost::mutex::scoped_lock{ RenderMutexLock(): boost::mutex::scoped_lock(Omega::instance().renderMutex){cerr<<"Lock renderMutex";}
+	~RenderMutexLock(){cerr<<"Unlock renderMutex"<<endl;}
+};
+#endif
 
 CREATE_LOGGER(Omega);
 
@@ -49,9 +61,8 @@ void Omega::setSimulationFileName(const string f){simulationFileName = f;}
 string Omega::getSimulationFileName(){return simulationFileName;}
 
 const shared_ptr<MetaBody>& Omega::getRootBody(){return rootBody;}
-void Omega::setRootBody(shared_ptr<MetaBody>& rb){ rootBody=rb;}
-void Omega::resetRootBody(){ rootBody = shared_ptr<MetaBody>(new MetaBody);}
-boost::mutex& Omega::getRootBodyMutex(){return rootBodyMutex;}
+void Omega::setRootBody(shared_ptr<MetaBody>& rb){ RenderMutexLock lock(); rootBody=rb;}
+void Omega::resetRootBody(){ RenderMutexLock lock(); rootBody = shared_ptr<MetaBody>(new MetaBody);}
 
 ptime Omega::getMsStartingSimulationTime(){return msStartingSimulationTime;}
 time_duration Omega::getSimulationPauseDuration(){return simulationPauseDuration;}
@@ -228,27 +239,25 @@ void Omega::loadSimulation(){
 	if(Omega::instance().getSimulationFileName().size()==0) throw yadeBadFile("Simulation filename to load has zero length");
 	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw yadeBadFile("Simulation file to load doesn't exist");
 	
-	// FIXME: should stop running simulation!!
 	LOG_INFO("Loading file " + simulationFileName);
 
-	// FIXME: stop rendering during loading - may lead to crash
 	{
-		//boost::mutex::scoped_lock lock1(rootBody->persistentInteractions->drawloopmutex);
-		//boost::mutex::scoped_lock lock2(rootBody->transientInteractions->drawloopmutex);
-		
 		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
+			joinSimulationLoop(); // stop current simulation if running
 			resetRootBody();
-			IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+			RenderMutexLock lock(); IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
 		}
 		else if(algorithm::ends_with(simulationFileName,".yade")){
+			joinSimulationLoop();
 			resetRootBody();
-			IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+			RenderMutexLock lock(); IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
 		}
 		else if(algorithm::starts_with(simulationFileName,":memory:")){
 			if(memSavedSimulations.count(simulationFileName)==0) throw yadeBadFile(("Cannot load nonexistent memory-saved simulation "+simulationFileName).c_str());
-			resetRootBody();
 			istringstream iss(memSavedSimulations[simulationFileName]);
-			IOFormatManager::loadFromStream("XMLFormatManager",iss,"rootBody",rootBody);
+			joinSimulationLoop();
+			resetRootBody();
+			RenderMutexLock lock(); IOFormatManager::loadFromStream("XMLFormatManager",iss,"rootBody",rootBody);
 		}
 		else throw (yadeBadFile("Extension of file not recognized."));
 	}

@@ -412,7 +412,7 @@ else:
 	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast'),('YADE_PTR_CAST','dynamic_pointer_cast')])
 
 if env['gprof']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
-env.Prepend(CXXFLAGS=['-pipe','-Wall'])
+env.Prepend(CXXFLAGS=['-pipe','-Wall','-Wc++0x-compat'])
 
 if env['arcs']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
 if env['arcs']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])

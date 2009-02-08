@@ -1190,7 +1190,11 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'SpatialQuickSortCollider'
 				,'Sphere'
 				,'RotationEngine'
-				])#,
+				]),
+
+	env.SharedLibrary('ef2_Spheres_NormalShear_ElasticFrictionalLaw',
+		['Engine/EngineUnit/ef2_Spheres_NormalShear_ElasticFrictionalLaw.cpp'],
+		LIBS=env['LIBS']+['ConstitutiveLawDispatcher','NormalShearInteractions','SpheresContactGeometry']),
 				
 	#env.SharedLibrary('MicroMacroAnalyser',
 		#['Engine/StandAloneEngine/MicroMacroAnalyser.cpp'],

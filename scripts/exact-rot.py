@@ -15,7 +15,7 @@ o.engines=[
 	]),
 	StandAloneEngine('PersistentSAPCollider'),
 	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'exactRot':True}),
+		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True}),
 		EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')
 	]),
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),

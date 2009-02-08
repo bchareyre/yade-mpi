@@ -48,22 +48,6 @@ YADE_PLUGIN("BrefcomTestGen");
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/extra/UniaxialStrainControlledTest.hpp>
 
-/*
-
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/GravityEngines.hpp>
-
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
-#include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
-
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
-
-*/
 
 CREATE_LOGGER(BrefcomTestGen);
 

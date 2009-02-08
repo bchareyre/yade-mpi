@@ -38,6 +38,8 @@ MetaBody::MetaBody() :
 	currentIteration=0;
 	simulationTime=0;
 	stopAtIteration=0;
+	stopAtRealTime=0; // not yet implemented
+	stopAtVirtTime=0; // not yet implemented either
 	isDynamic=false;
 	dt=1e-8;
 

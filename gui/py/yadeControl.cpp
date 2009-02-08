@@ -42,6 +42,7 @@
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
@@ -56,6 +57,7 @@
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
 #include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
+#include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 #include<yade/extra/Shop.hpp>
 
@@ -205,7 +207,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 		// additional constructor
 		pyMetaEngine(string clss, python::list functors){init(clss); functors_set(functors);}
 		python::list functors_get(void){
-			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine (WTF?)"); python::list ret;
+			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine (?!)"); python::list ret;
 			/* garbage design: functorArguments are instances of EngineUnits, but they may not be present; therefore, only use them if they exist; our pyMetaEngine, however, will always have both names and EnguneUnit objects in the same count */
 			for(size_t i=0; i<me->functorNames.size(); i++){
 				shared_ptr<EngineUnit> eu;
@@ -220,7 +222,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 			return ret;
 		}
 		void functors_set(python::list ftrs){
-			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (WTF?)");
+			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (?!)");
 			me->clear(); int len=PySequence_Size(ftrs.ptr()) /*[boost1.34] python::len(ftrs)*/;
 			for(int i=0; i<len; i++){
 				python::extract<pyEngineUnit> euEx(ftrs[i]); if(!euEx.check()) throw invalid_argument("Unable to extract type EngineUnit from sequence.");
@@ -237,6 +239,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 				TRY_ADD_FUNCTOR(PhysicalParametersMetaEngine,PhysicalParametersEngineUnit);
 				TRY_ADD_FUNCTOR(PhysicalActionDamper,PhysicalActionDamperUnit);
 				TRY_ADD_FUNCTOR(PhysicalActionApplier,PhysicalActionApplierUnit);
+				TRY_ADD_FUNCTOR(ConstitutiveLawDispatcher,ConstitutiveLaw);
 				if(!ok) throw runtime_error(string("Unable to cast to suitable MetaEngine type when adding functor (MetaEngine: ")+me->getClassName()+", functor: "+euEx().proxee->getClassName()+")");
 				#undef TRY_ADD_FUNCTOR
 			}

@@ -10,7 +10,6 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
 #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/core/Omega.hpp>

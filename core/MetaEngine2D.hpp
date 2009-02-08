@@ -11,12 +11,6 @@
 #include "MetaEngine.hpp"
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 
-/*! Type-safe variant of the MetaEngine2D::add function. Arguments are not strings, but regular typenames and will give compile-time error if not defined. They are passed to MetaEngine2D::add in the same order as given. */
-#define DISPATCHER_ADD3(e1,e2,e3) add(#e1,#e2,#e3); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
-/*! Same as DISPATCHER_ADD3 macro, but passes the additional 4th argument to MetaEngine2D::add as its 4th, optional argument */
-#define DISPATCHER_ADD3_1(e1,e2,e3,e4) add(#e1,#e2,#e3,e4); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2; typedef e3 p3;}
-
-
 
 template
 <
@@ -37,15 +31,6 @@ class MetaEngine2D : public MetaEngine,
 				>
 {
 	public :
-		#if 0
-		__attribute__((deprecated))
-		virtual void add ( string baseClassName1, string baseClassName2, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>())  
-		{
-			storeFunctorName(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
-			add2DEntry(baseClassName1,baseClassName2,libName,static_pointer_cast<EngineUnitType>(eu));
-		}
-		#endif
-
 		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
 		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
 		/* add functor by shared pointer */
@@ -102,20 +87,4 @@ class MetaEngine2D : public MetaEngine,
 	REGISTER_CLASS_AND_BASE(MetaEngine2D,MetaEngine DynLibDispatcher);
 
 };
-
-//REGISTER_SERIALIZABLE(MetaEngine2D);
-
-/*
-#define REGISTER_BASE_CLASS_TYPE_2D(name1,name2)			\
- 	public : virtual string getBaseClassType(unsigned int i)	\
- 	{								\
- 		switch (i)						\
- 		{							\
- 			case 0  : return #name1;			\
- 			case 1  : return #name2;			\
- 			default : return "";				\
- 		}							\
- 	}	
-*/
-
 

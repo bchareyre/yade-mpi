@@ -3,6 +3,7 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include "SpheresContactGeometry.hpp"
+#include<yade/core/Omega.hpp>
 YADE_PLUGIN("SpheresContactGeometry");
 
 // At least one virtual method must be in the .cpp file (!!!)
@@ -48,7 +49,7 @@ void SpheresContactGeometry::relocateContactPoints(){
  */
 void SpheresContactGeometry::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
 	Vector3r midPt=(d1/(d1+d2))*(p1+p2); // proportionally to radii, so that angle would be the same
-	if((p1.SquaredLength()>4*d1 || p2.SquaredLength()>4*d2) && midPt.SquaredLength()>.5*min(d1,d2)){
+	if((p1.SquaredLength()>pow(d1,2) || p2.SquaredLength()>pow(d2,2)) && midPt.SquaredLength()>pow(min(d1,d2),2)){
 		//cerr<<"RELOCATION with displacementT="<<displacementT(); // should be the same before and after relocation
 		setTgPlanePts(p1-midPt,p2-midPt);
 		//cerr<<" → "<<displacementT()<<endl;

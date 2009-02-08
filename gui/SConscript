@@ -64,6 +64,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'InteractionGeometryMetaEngine',
 				'InteractionPhysicsMetaEngine',
 				'PhysicalParametersMetaEngine',
+				'ConstitutiveLawDispatcher',
 				'STLImporter',
 				'ParallelEngine'
 			],

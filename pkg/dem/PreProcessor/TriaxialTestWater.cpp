@@ -16,7 +16,6 @@
 #include "TriaxialTestWater.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-// #include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 // #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 /////////////#include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
@@ -276,7 +275,6 @@ bool TriaxialTestWater::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-	//rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
@@ -579,10 +577,6 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
 
-// 	shared_ptr<ElasticCohesiveLaw> elasticCohesiveLaw(new ElasticCohesiveLaw);
-// 	elasticCohesiveLaw->sdecGroupMask = 2;
-// 	elasticCohesiveLaw->momentRotationLaw = true;
-
 	// capillary
 	shared_ptr<CapillaryCohesiveLaw> capillaryCohesiveLaw(new CapillaryCohesiveLaw); 
 	capillaryCohesiveLaw->sdecGroupMask = 2;	
@@ -665,7 +659,6 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);
-	//rootBody->engines.push_back(elasticCohesiveLaw);
 
 	// capillary
 	

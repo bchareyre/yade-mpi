@@ -69,9 +69,6 @@ class Omega : public Singleton<Omega>
 {
 
 	private	:
-		boost::mutex			 omegaMutex
-						,rootBodyMutex;
-
 		shared_ptr<ThreadRunner>	 simulationLoop;
 		SimulationFlow			 simulationFlow_;
 
@@ -106,7 +103,12 @@ class Omega : public Singleton<Omega>
 
 		// FIXME end
 		
-		boost::mutex&	getRootBodyMutex();
+		/* Mutex for:
+		 * 1. GLViewer::paintGL (deffered lock: if fails, no GL painting is done)
+		 * 2. other threads that wish to manipulate GL
+		 * 3. Omega when substantial changes to the scene are being made (bodies being deleted, simulation loaded etc) so that GL doesn't access those and crash
+		 */
+		boost::try_mutex renderMutex;
 		
 		void		createSimulationLoop();
 		bool 		hasSimulationLoop(){return (bool)(simulationLoop);}
@@ -116,7 +118,6 @@ class Omega : public Singleton<Omega>
 		void		joinSimulationLoop();
 		void		spawnSingleSimulationLoop();
 		bool		isRunning();
-        //      shared_ptr<ThreadSynchronizer> getSynchronizer();
 
 		const		map<string,DynlibDescriptor>& getDynlibsDescriptor();
 		void		scanPlugins();

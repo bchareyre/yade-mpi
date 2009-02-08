@@ -93,6 +93,8 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			SpheresContactGeometry*    currentContactGeometry= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
 			ElasticContactInteraction* currentContactPhysics = YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			if((!currentContactGeometry)||(!currentContactPhysics)) continue;
+			// delete interaction where spheres don't touch
+			if(currentContactGeometry->penetrationDepth<0){ (*ii)->isReal=false; continue; }
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());

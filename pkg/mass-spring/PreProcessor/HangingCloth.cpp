@@ -405,7 +405,7 @@ bool HangingCloth::generate()
 			{
 				shared_ptr<Body> bodyB = *bi2;
 
-			// FIXME - this must be a dynamic cast. it is checked afterwards..
+			// this must be a dynamic cast. it is checked afterwards..
 				shared_ptr<BodyMacroParameters> a =  dynamic_pointer_cast<BodyMacroParameters>(bodyA->physicalParameters);
 				shared_ptr<BodyMacroParameters> b =  dynamic_pointer_cast<BodyMacroParameters>(bodyB->physicalParameters);
 				shared_ptr<InteractingSphere>	as = dynamic_pointer_cast<InteractingSphere>(bodyA->interactingGeometry);

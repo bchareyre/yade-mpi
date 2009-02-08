@@ -43,8 +43,8 @@ if 'qt3' not in env['exclude']:
 				QGLViewer/VRender/NVector3.cpp 
 				QGLViewer/VRender/VRender.cpp
 				'''),
-				# we want to REALLY optimize this, even in debug builds of yade
-				CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0'],
+				# we want to REALLY optimize this, even in debug builds of yade; and suppress all warnings also
+				CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0','-w'],
 				# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
 				# since the generated header is #include'd "...", it looks for it in the original dir
 				# no idea why this _does_ work with gui/qt3. Go figure.
@@ -78,8 +78,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'miniWm3/Wm3System.cpp'],
 		# miniWm3 cannot link with itself, filter it out.
 		LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
-		# miniWm3 will be always optimized and without debugging info, even in debug builds.
-		CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),
+		# miniWm3 will be always optimized and without debugging info, even in debug builds; suppress all warnings
+		CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w']),
 
 		env.SharedLibrary('sqlite3x',Split('''
 			sqlite3x/sqlite3x_command.cpp

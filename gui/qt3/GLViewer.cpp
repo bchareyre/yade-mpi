@@ -26,11 +26,11 @@ GLLock::GLLock(GLViewer* _glv):
  * try: doneCurrent; glFlush; glSwapBuffers after paintGL
  */
 #if BOOST_VERSION<103500
-	boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex,true), glv(_glv){
+	boost::try_mutex::scoped_try_lock(Omega::instance().renderMutex,true), glv(_glv){
 		glv->makeCurrent();
 	}
 #else
-	boost::try_mutex::scoped_try_lock(YadeQtMainWindow::self->glMutex), glv(_glv){
+	boost::try_mutex::scoped_try_lock(Omega::instance().renderMutex), glv(_glv){
 		glv->makeCurrent();
 	}
 #endif
@@ -43,13 +43,13 @@ void GLViewer::paintGL(void){
 	/* paintGL encapsulated preDraw, draw and postDraw within QGLViewer. If the mutex cannot be locked,
 	 * we just return without repainting */
 	#if BOOST_VERSION<103500
-		boost::try_mutex::scoped_try_lock lock(YadeQtMainWindow::self->glMutex);
+		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex);
 		if(lock.locked()){
 	#else
-		boost::try_mutex::scoped_try_lock lock(YadeQtMainWindow::self->glMutex,boost::defer_lock);
+		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,boost::defer_lock);
 		if(lock.owns_lock()){
 	#endif
-			this->makeCurrent(); // not sure if this is needed
+			this->makeCurrent();
 			QGLViewer::paintGL();
 	}
 	this->doneCurrent();

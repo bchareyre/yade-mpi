@@ -134,7 +134,6 @@ void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 {
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-// 	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
 // 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
 
 	newDt = Mathr::MAX_REAL;
@@ -142,13 +141,8 @@ void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 	
 	//computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 /*
-	InteractionContainer::iterator ii    = persistentInteractions->begin();
-	InteractionContainer::iterator iiEnd = persistentInteractions->end();
-	for(  ; ii!=iiEnd ; ++ii )
-		findTimeStepFromInteraction(*ii , bodies);
-
-	ii    = transientInteractions->begin();
-	iiEnd = transientInteractions->end();
+	InteractionContainer::iterator ii    = transientInteractions->begin();
+	InteractionContainer::iterator iiEnd = transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 		findTimeStepFromInteraction(*ii , bodies);*/
 

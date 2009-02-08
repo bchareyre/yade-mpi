@@ -11,12 +11,6 @@
 #include "MetaEngine.hpp"
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 
-/*! Type-safe variant of the MetaEngine2D::add function. Arguments are not strings, but regular typenames and will give compile-time error if not defined. They are passed to MetaEngine1D::add in the same order as given. */
-#define DISPATCHER_ADD2(e1,e2) add(#e1,#e2); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2;}
-/*! Same as DISPATCHER_ADD2 macro, but passes the additional 3rd argument to MetaEngine1D::add as its 3rd, optional argument */
-#define DISPATCHER_ADD2_1(e1,e2,e3) add(#e1,#e2,e3); {/* compile-time check for class existence */ typedef e1 p1; typedef e2 p2;}
-
-
 template
 <
 	class baseClass,
@@ -36,13 +30,6 @@ class MetaEngine1D : public MetaEngine,
 {
 
 	public :
-		#if 0
-		virtual void __attribute__((deprecated)) add(string baseClassName1, string libName, shared_ptr<EngineUnit> eu = shared_ptr<EngineUnitType>()) {
-			storeFunctorName(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
-			add1DEntry(baseClassName1,libName,static_pointer_cast<EngineUnitType>(eu));
-		}
-		#endif
-
 		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
 		virtual void add(shared_ptr<EngineUnitType> eu){
 			storeFunctorName(eu->get1DFunctorType1(),eu->getClassName(),eu);

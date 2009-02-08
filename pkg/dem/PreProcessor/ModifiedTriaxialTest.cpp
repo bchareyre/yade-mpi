@@ -261,7 +261,6 @@ bool ModifiedTriaxialTest::generate()
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
-	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);

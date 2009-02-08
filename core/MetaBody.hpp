@@ -33,7 +33,7 @@ class MetaBody : public Body
 
 		//shared_ptr<GroupRelationData>           grpRelationData;
 
-		MetaBody ();
+		MetaBody();
 
 		void moveToNextTimeStep();
 
@@ -45,9 +45,10 @@ class MetaBody : public Body
 		long currentIteration;
 		Real simulationTime;
 		long stopAtIteration;
+		Real stopAtVirtTime;
+		Real stopAtRealTime;
 
 		bool needsInitializers;
-/// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(Body,
@@ -57,7 +58,7 @@ class MetaBody : public Body
 		(bodies)
 		(transientInteractions)
 		(persistentInteractions)
-		(physicalActions) // FIXME - needed or not ? - Olivier : yes it is needed if there is no default initialization into constructor
+		(physicalActions)
 		(miscParams)
 		(dispParams)
 		(dt)

@@ -119,6 +119,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('InteractionPhysicsMetaEngine',['Engine/MetaEngine/InteractionPhysicsMetaEngine.cpp']),
 	env.SharedLibrary('PhysicalActionApplier',['Engine/MetaEngine/PhysicalActionApplier.cpp']),
 	env.SharedLibrary('PhysicalActionDamper',['Engine/MetaEngine/PhysicalActionDamper.cpp']),
+	env.SharedLibrary('ConstitutiveLawDispatcher',['Engine/MetaEngine/ConstitutiveLawDispatcher.cpp'],LIBS=env['LIBS']+['Force','Momentum']),
 	env.SharedLibrary('InteractingBox2AABB',['Engine/EngineUnit/InteractingBox2AABB.cpp'],
 		LIBS=env['LIBS']+['BoundingVolumeMetaEngine','InteractingBox','AABB','Box',]),
 	env.SharedLibrary('MetaInteractingGeometry2AABB',['Engine/EngineUnit/MetaInteractingGeometry2AABB.cpp'],

@@ -62,7 +62,6 @@ class MetaInteractingGeometry2AABB; */
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
@@ -283,15 +282,6 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	constitutiveLaw->momentRotationLaw = getDefault<bool>("param_momentRotationLaw");
 	rootBody->engines.push_back(constitutiveLaw);
 
-	shared_ptr<ElasticCohesiveLaw> constitutiveLaw2(new ElasticCohesiveLaw);
-	constitutiveLaw2->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
-	constitutiveLaw2->momentRotationLaw = getDefault<bool>("param_momentRotationLaw");
-	rootBody->engines.push_back(constitutiveLaw2);
-
-	shared_ptr<TetraLaw> constitutiveLaw3(new TetraLaw);
-	constitutiveLaw3->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
-	rootBody->engines.push_back(constitutiveLaw3);
-	
 	if(getDefault<Vector3r>("param_gravity")!=Vector3r(0,0,0)){
 		shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 		gravityCondition->gravity=getDefault<Vector3r>("param_gravity");

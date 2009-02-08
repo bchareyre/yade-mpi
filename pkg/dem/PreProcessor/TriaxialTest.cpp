@@ -16,7 +16,6 @@
 #include "TriaxialTest.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/ElasticCohesiveLaw.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
@@ -255,7 +254,6 @@ bool TriaxialTest::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-	//rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionHashMap);
 	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
@@ -572,10 +570,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
 
-	shared_ptr<ElasticCohesiveLaw> elasticCohesiveLaw(new ElasticCohesiveLaw);
-	elasticCohesiveLaw->sdecGroupMask = 2;
-	elasticCohesiveLaw->momentRotationLaw = true;
-
 	
 	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
 	//stiffnesscounter->sdecGroupMask = 2;
@@ -645,7 +639,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(elasticContactLaw);
-	//rootBody->engines.push_back(elasticCohesiveLaw);
 	
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);

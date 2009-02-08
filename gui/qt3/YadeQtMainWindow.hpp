@@ -16,7 +16,6 @@
 #include<yade/gui-qt3/QtFileGenerator.hpp>
 #include<yade/gui-qt3/QtSimulationPlayer.hpp>
 #include<yade/gui-qt3/QtGUIPreferences.hpp>
-#include<boost/thread/mutex.hpp>
 
 class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 {
@@ -27,7 +26,6 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		vector<shared_ptr<GLViewer> > glViews;
 		shared_ptr<OpenGLRenderingEngine> renderer;
 		size_t viewNo(shared_ptr<GLViewer>);
-		boost::try_mutex glMutex;
 
 		void ensureRenderer();
 		void saveRendererConfig();

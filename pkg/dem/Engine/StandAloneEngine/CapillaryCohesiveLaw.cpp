@@ -109,9 +109,7 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
         /// Non Permanents Links ///
 
-        //InteractionContainer::iterator ii    = ncb->persistentInteractions->begin();
         InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        //InteractionContainer::iterator iiEnd = ncb->persistentInteractions->end();
         InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 
         /// initialisation du volume avant calcul

@@ -71,18 +71,18 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Real displacementN() const {assert(hasShear); return (pos2-pos1).Length()-d0;}
 		Real epsN() const {return displacementN()*(1./d0);}
-		Vector3r displacementT() const { assert(hasShear);
+		Vector3r displacementT() { assert(hasShear);
 			// enabling automatic relocation decreases overall simulation speed by about 3%
 			// perhaps: bool largeStrains ... ?
-			#if 0 
+			#if 1 
 				Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 				relocateContactPoints(p1,p2);
-				return p2-p1; // shear before relocation, but that should be OK
+				return p2-p1; // shear before relocation, but that is OK
 			#else
 				return contPtInTgPlane2()-contPtInTgPlane1();
 			#endif
 		}
-		Vector3r epsT() const {return displacementT()*(1./d0);}
+		Vector3r epsT() {return displacementT()*(1./d0);}
 	
 		Real slipToDisplacementTMax(Real displacementTMax);
 		//! slip to epsTMax if current epsT is greater; return the relative slip magnitude
