@@ -11,7 +11,7 @@
 
 #include"SimpleViscoelasticContactLaw.hpp"
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
-#include<yade/pkg-dem/SimpleViscoelasticInteraction.hpp>
+#include<yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -58,7 +58,7 @@ void SimpleViscoelasticContactLaw::action(MetaBody* ncb)
 			//if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) ) continue;
 
 			SpheresContactGeometry*    currentContactGeometry= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
-			SimpleViscoelasticInteraction* currentContactPhysics = YADE_CAST<SimpleViscoelasticInteraction*> (contact->interactionPhysics.get());
+			ViscoelasticInteraction* currentContactPhysics = YADE_CAST<ViscoelasticInteraction*> (contact->interactionPhysics.get());
 			if((!currentContactGeometry)||(!currentContactPhysics)) continue;
 	
 			SimpleViscoelasticBodyParameters* de1 				= YADE_CAST<SimpleViscoelasticBodyParameters*>((*bodies)[id1]->physicalParameters.get());

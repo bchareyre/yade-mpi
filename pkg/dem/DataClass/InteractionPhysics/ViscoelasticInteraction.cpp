@@ -6,27 +6,21 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "SimpleViscoelasticInteraction.hpp"
+#include "ViscoelasticInteraction.hpp"
 
 
-SimpleViscoelasticInteraction::SimpleViscoelasticInteraction()
+ViscoelasticInteraction::ViscoelasticInteraction()
 {
 	createIndex();
 }
 
-SimpleViscoelasticInteraction::~SimpleViscoelasticInteraction()
+ViscoelasticInteraction::~ViscoelasticInteraction()
 {
 }
 
-void SimpleViscoelasticInteraction::registerAttributes()
+void ViscoelasticInteraction::registerAttributes()
 {
-	REGISTER_ATTRIBUTE(kn);
-	REGISTER_ATTRIBUTE(ks);
 	REGISTER_ATTRIBUTE(cn);
 	REGISTER_ATTRIBUTE(cs);
-	REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
-	REGISTER_ATTRIBUTE(prevNormal);
-	REGISTER_ATTRIBUTE(normalForce);
-	REGISTER_ATTRIBUTE(shearForce);
 }
 YADE_PLUGIN();

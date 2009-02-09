@@ -8,7 +8,7 @@
 
 #include"SimpleViscoelasticRelationships.hpp"
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
-#include<yade/pkg-dem/SimpleViscoelasticInteraction.hpp>
+#include<yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -33,8 +33,8 @@ void SimpleViscoelasticRelationships::go(	  const shared_ptr<PhysicalParameters>
     SimpleViscoelasticBodyParameters* sdec1 = static_cast<SimpleViscoelasticBodyParameters*>(b1.get());
     SimpleViscoelasticBodyParameters* sdec2 = static_cast<SimpleViscoelasticBodyParameters*>(b2.get());
 
-    interaction->interactionPhysics = shared_ptr<SimpleViscoelasticInteraction>(new SimpleViscoelasticInteraction());
-    SimpleViscoelasticInteraction* contactPhysics = YADE_CAST<SimpleViscoelasticInteraction*>(interaction->interactionPhysics.get());
+    interaction->interactionPhysics = shared_ptr<ViscoelasticInteraction>(new ViscoelasticInteraction());
+    ViscoelasticInteraction* contactPhysics = YADE_CAST<ViscoelasticInteraction*>(interaction->interactionPhysics.get());
 
     contactPhysics->kn = sdec1->kn * sdec2->kn / (sdec1->kn + sdec2->kn);
     contactPhysics->ks = sdec1->ks * sdec2->ks / (sdec1->ks + sdec2->ks);

@@ -10,16 +10,16 @@
 
 #include <yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawSimpleViscoelasticInteraction : public GLDrawInteractionPhysicsFunctor
+class GLDrawViscoelasticInteraction : public GLDrawInteractionPhysicsFunctor
 {
 	public :
 		virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 
-	RENDERS(SimpleViscoelasticInteraction);
-	REGISTER_CLASS_NAME(GLDrawSimpleViscoelasticInteraction);
+	RENDERS(ViscoelasticInteraction);
+	REGISTER_CLASS_NAME(GLDrawViscoelasticInteraction);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawSimpleViscoelasticInteraction);
+REGISTER_SERIALIZABLE(GLDrawViscoelasticInteraction);
 
 

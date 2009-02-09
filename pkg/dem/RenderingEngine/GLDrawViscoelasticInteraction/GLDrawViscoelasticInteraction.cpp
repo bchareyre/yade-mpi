@@ -6,19 +6,19 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawSimpleViscoelasticInteraction.hpp"
-#include <yade/pkg-dem/SimpleViscoelasticInteraction.hpp>
+#include "GLDrawViscoelasticInteraction.hpp"
+#include <yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 
-void GLDrawSimpleViscoelasticInteraction::go(
+void GLDrawViscoelasticInteraction::go(
 		const shared_ptr<InteractionPhysics>& ip,
 		const shared_ptr<Interaction>&,
 		const shared_ptr<Body>& b1,
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	SimpleViscoelasticInteraction* p = static_cast<SimpleViscoelasticInteraction*>(ip.get());
+	ViscoelasticInteraction* p = static_cast<ViscoelasticInteraction*>(ip.get());
 	Vector3r mid = 0.5*(b1->physicalParameters->se3.position+b2->physicalParameters->se3.position);
 	glTranslatev(mid);
 	glColor3(1.0,0.0,0.0);

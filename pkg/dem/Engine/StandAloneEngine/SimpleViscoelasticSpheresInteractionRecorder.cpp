@@ -10,7 +10,7 @@
 #include <yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
 
-SimpleViscoelasticSpheresInteractionRecorder::SimpleViscoelasticSpheresInteractionRecorder (): DataRecorder(), interactionSphere(new SpheresContactGeometry), viscoelasticInteraction(new SimpleViscoelasticInteraction)
+SimpleViscoelasticSpheresInteractionRecorder::SimpleViscoelasticSpheresInteractionRecorder (): DataRecorder(), interactionSphere(new SpheresContactGeometry), viscoelasticInteraction(new ViscoelasticInteraction)
 {
 	outputBase = "contacts";
 	interval=50;
@@ -58,7 +58,7 @@ void SimpleViscoelasticSpheresInteractionRecorder::action(MetaBody * ncb)
 	if ( i->interactionPhysics->getClassIndex() != viscoelasticInteraction->getClassIndex() ) continue;
 
 	const SpheresContactGeometry* s = static_cast<SpheresContactGeometry*>(i->interactionGeometry.get());
-	const SimpleViscoelasticInteraction* p = static_cast<SimpleViscoelasticInteraction*>(i->interactionPhysics.get());
+	const ViscoelasticInteraction* p = static_cast<ViscoelasticInteraction*>(i->interactionPhysics.get());
 
 	std::string outputFile = outputBase+lexical_cast<string>(i->getId1())+"-"+lexical_cast<string>(i->getId2())+".dat";
 	

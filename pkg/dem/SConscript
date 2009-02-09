@@ -698,7 +698,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SimpleViscoelasticRelationships',
 			'SimpleViscoelasticContactLaw',
 			'SimpleViscoelasticBodyParameters',
-			'SimpleViscoelasticInteraction',
+			'ViscoelasticInteraction',
                         'PhysicalActionVectorVector',
                         'InteractionVecSet',
                         'BodyRedirectionVector',
@@ -1082,23 +1082,24 @@ env.SharedLibrary('NewtonsDampedLaw',
 		,['DataClass/PhysicalParameters/SimpleViscoelasticBodyParameters.cpp']
 		,LIBS=env['LIBS']+['RigidBodyParameters'])
 
-	,env.SharedLibrary('SimpleViscoelasticInteraction'
-		,['DataClass/InteractionPhysics/SimpleViscoelasticInteraction.cpp'])
+	,env.SharedLibrary('ViscoelasticInteraction'
+		,['DataClass/InteractionPhysics/ViscoelasticInteraction.cpp']
+	    ,LIBS=env['LIBS']+['ElasticContactInteraction'])
     
-	,env.SharedLibrary('GLDrawSimpleViscoelasticInteraction'
-	    ,['RenderingEngine/GLDrawSimpleViscoelasticInteraction/GLDrawSimpleViscoelasticInteraction.cpp']
-	    ,LIBS=env['LIBS']+['yade-opengl','SimpleViscoelasticInteraction'])
+	,env.SharedLibrary('GLDrawViscoelasticInteraction'
+	    ,['RenderingEngine/GLDrawViscoelasticInteraction/GLDrawViscoelasticInteraction.cpp']
+	    ,LIBS=env['LIBS']+['yade-opengl','ViscoelasticInteraction'])
 
 	,env.SharedLibrary('SimpleViscoelasticRelationships'
 		,['Engine/EngineUnit/SimpleViscoelasticRelationships.cpp']
 		,LIBS=env['LIBS']+['SimpleViscoelasticBodyParameters'
-		    ,'SimpleViscoelasticInteraction'
+		    ,'ViscoelasticInteraction'
 		    ,'SpheresContactGeometry'
 		    ])
 
 	,env.SharedLibrary('SimpleViscoelasticContactLaw'
 		,['Engine/StandAloneEngine/SimpleViscoelasticContactLaw.cpp']
-		,LIBS=env['LIBS']+['SimpleViscoelasticInteraction'
+		,LIBS=env['LIBS']+['ViscoelasticInteraction'
 		    ,'SimpleViscoelasticBodyParameters'
 		    ,'SpheresContactGeometry'
 		    ,'Force'
@@ -1124,7 +1125,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 
 	,env.SharedLibrary('SimpleViscoelasticSpheresInteractionRecorder'
 	    ,['Engine/StandAloneEngine/SimpleViscoelasticSpheresInteractionRecorder.cpp']
-	    ,LIBS=env['LIBS']+['SpheresContactGeometry','SimpleViscoelasticInteraction'])
+	    ,LIBS=env['LIBS']+['SpheresContactGeometry','ViscoelasticInteraction'])
 
 	,env.SharedLibrary('RigidBodyRecorder'
 	,['Engine/StandAloneEngine/RigidBodyRecorder.cpp']
@@ -1139,7 +1140,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 			    ,'SimpleViscoelasticRelationships'
 			    ,'SimpleViscoelasticContactLaw'
 			    ,'SimpleViscoelasticBodyParameters'
-			    ,'SimpleViscoelasticInteraction'
+			    ,'ViscoelasticInteraction'
 			    ,'SimpleViscoelasticSpheresInteractionRecorder'
 			    ,'GravityEngines'
 			    ,'BodyRedirectionVector'
