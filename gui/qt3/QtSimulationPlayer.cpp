@@ -33,6 +33,22 @@ QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
 	glSimulationPlayerViewer->simPlayer=this;
 	leInputConfigFile->setText(Omega::instance().getSimulationFileName());
 	enableControls(false);
+
+	scrollViewFrame = new QFrame();	
+	scrollViewLayout = new QVBoxLayout( scrollViewOutsideFrame, 0, 0, "scrollViewLayout"); 
+	scrollView = new QScrollView( scrollViewOutsideFrame, "scrollView" );
+	scrollView->setVScrollBarMode(QScrollView::Auto);
+	scrollView->setHScrollBarMode(QScrollView::Auto);
+	scrollViewLayout->addWidget(scrollView);
+	scrollView->show();
+	guiGen.setResizeHeight(true);
+	guiGen.setResizeWidth(true);
+	guiGen.setShift(10,30);
+	guiGen.setShowButtons(false);
+	QSize s = scrollView->size();
+	scrollViewFrame->resize(s.width(),s.height());
+	guiGen.buildGUI(YadeQtMainWindow::self->renderer,scrollViewFrame);
+	scrollView->addChild(scrollViewFrame);
 }
 QtSimulationPlayer::~QtSimulationPlayer(){
 	if(glSimulationPlayerViewer) delete glSimulationPlayerViewer;
@@ -44,9 +60,13 @@ void QtSimulationPlayer::pbResetClicked(){ setParameters();	glSimulationPlayerVi
 void QtSimulationPlayer::cbSaveSnapShotsToggled(bool b){	glSimulationPlayerViewer->saveSnapShots=b;}
 void QtSimulationPlayer::cbAllowFiltrationToggled(bool b){	FilterEngine::isFiltrationActivated=b; }
 void QtSimulationPlayer::pbRefreshFiltersClicked(){	glSimulationPlayerViewer->refreshFilters(); }
-void QtSimulationPlayer::cbBodyWireToggled(bool b){	glSimulationPlayerViewer->bodyWire(b); }
 void QtSimulationPlayer::closeEvent(QCloseEvent *e){ QtGeneratedSimulationPlayer::closeEvent(e); emit closeSignal(); }
 
+void QtSimulationPlayer::pbApplyClicked()
+{
+	guiGen.deserialize(YadeQtMainWindow::self->renderer);
+	YadeQtMainWindow::self->redrawAll(true);
+}
 
 void QtSimulationPlayer::pbInputConfigFileClicked(){
 	string selectedFilter;

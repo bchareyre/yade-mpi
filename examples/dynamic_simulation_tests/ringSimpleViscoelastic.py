@@ -28,10 +28,7 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					z = cylinderOrigin[2]+h*2*sphereRadius
 					s=utils.sphere_v2([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,density=Density,physicalParameters=["SimpleViscoelasticBodyParameters",{'frictionAngle':frictionAngle}])
 					p=utils.getViscoelasticFromSpheresInteraction(s.phys['mass'],tc,en,es)
-					s.phys['kn']=p['kn']
-					s.phys['cn']=p['cn']
-					s.phys['ks']=p['ks']
-					s.phys['cs']=p['cs']
+					s.phys['kn'],s.phys['cn'],s.phys['ks'],s.phys['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 					o.bodies.append(s)
 					spheresCount+=1
 	return spheresCount
@@ -52,19 +49,29 @@ o.initializers=[
 
 ## Engines 
 o.engines=[
+
 	StandAloneEngine('PhysicalActionContainerReseter'),
+
 	MetaEngine('BoundingVolumeMetaEngine',[
 		EngineUnit('InteractingSphere2AABB'),
 		EngineUnit('InteractingFacet2AABB'),
 		EngineUnit('MetaInteractingGeometry2AABB')
 	]),
+
 	StandAloneEngine('PersistentSAPCollider'),
+
 	MetaEngine('InteractionGeometryMetaEngine',[
 		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
 		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry')
 	]),
+
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleViscoelasticRelationships')]),
-	StandAloneEngine('SimpleViscoelasticContactLaw'),
+
+    ## Constitutive law
+	MetaEngine('ConstitutiveLawDispatcher',[EngineUnit('Spheres_Viscoelastic_SimpleViscoelasticContactLaw')]),
+    ## or InteractionSolver 
+	#StandAloneEngine('SimpleViscoelasticContactLaw'),
+
 	DeusExMachina('GravityEngine',{'gravity':[0,-9.81,0]}),
 
 	## Cundall damping must been disabled!
@@ -80,7 +87,7 @@ for b in o.bodies:
     if b.shape.name=='Sphere':
         b.phys['blockedDOFs']=4 # blocked movement along Z
 
-o.dt=2e-5
+o.dt=0.2*tc
 
 o.saveTmp('init');
 

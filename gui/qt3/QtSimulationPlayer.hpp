@@ -10,7 +10,11 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/lib-factory/Factorable.hpp>
+#include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
 #include <QtGeneratedSimulationPlayer.h>
+#include<qlayout.h>
+#include<qframe.h>
+#include<qscrollview.h>
 
 class GLSimulationPlayerViewer;
 
@@ -27,6 +31,11 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 	private:
 		void setParameters();
 
+		QScrollView * scrollView;
+		QFrame * scrollViewFrame;
+		QVBoxLayout* scrollViewLayout;
+		QtGUIGenerator guiGen;	
+
 	public slots:
 		virtual void pbInputDirectoryClicked();
 		virtual void pbLoadClicked();
@@ -39,12 +48,12 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 		virtual void pbPauseClicked();
 		virtual void pbStepClicked();
 		virtual void pbResetClicked();
+
+		virtual void pbApplyClicked();
 		
 		virtual void cbAllowFiltrationToggled(bool b);
         virtual void pbRefreshFiltersClicked();
 		
-		virtual void cbBodyWireToggled(bool b);
- 	
 	protected:
 		void closeEvent(QCloseEvent *);
 		virtual void keyPressEvent(QKeyEvent *);
