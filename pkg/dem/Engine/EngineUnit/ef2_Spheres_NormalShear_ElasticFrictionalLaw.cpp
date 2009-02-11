@@ -9,13 +9,9 @@ void ef2_Spheres_NormalShear_ElasticFrictionalLaw::go(shared_ptr<InteractionGeom
 	NormalShearInteraction* phys=static_cast<NormalShearInteraction*>(_phys.get());
 
 	// if (geom->displacementN()>0) return; // non-cohesive behavior
-
 	phys->normalForce=(geom->displacementN()*phys->kn)*geom->normal;
 	phys->shearForce=geom->displacementT()*phys->ks;
 
-	bodyForce (I->getId1(),rootBody)+=phys->normalForce;
-	bodyForce (I->getId2(),rootBody)-=phys->normalForce;
-	bodyTorque(I->getId1(),rootBody)+=(geom->contPt()-geom->pos1).Cross(phys->shearForce);
-	bodyTorque(I->getId2(),rootBody)-=(geom->contPt()-geom->pos2).Cross(phys->shearForce);
+	applyForceAtContactPoint(phys->normalForce+phys->shearForce, geom->contPt(), I->getId1(), geom->pos1, I->getId2(), geom->pos2, rootBody);
 }
 

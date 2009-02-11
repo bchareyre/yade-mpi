@@ -7,7 +7,7 @@
 #include<yade/lib-opengl/GLUtils.hpp>
 
 
-YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics" /* ,"BrefcomStiffnessComputer"*/ );
+YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics", "ef2_Spheres_Brefcom_BrefcomLaw" /* ,"BrefcomStiffnessComputer"*/ );
 
 CREATE_LOGGER(BrefcomGlobalCharacteristics);
 
@@ -130,8 +130,65 @@ void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const b
 	Shop::Bex::momentum(id2,rootBody)+=(contGeom->contactPoint-contGeom->pos2).Cross(-force);
 }
 
+CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
+
+void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
+	SpheresContactGeometry* contGeom=static_cast<SpheresContactGeometry*>(_geom.get());
+	BrefcomContact* BC=static_cast<BrefcomContact*>(_phys.get());
+
+	/* kept fully damaged contacts; note that normally the contact is deleted _after_ the BREFCOM_MATERIAL_MODEL,
+	 * i.e. if it is 1.0 here, omegaThreshold is >= 1.0 for sure.
+	 * &&'ing that just to make sure anyway ...
+	 */
+	if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) return;
+
+	// shorthands
+	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage);
+	/* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& xiShear(BC->xiShear); */
+	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
+
+	assert(contGeom->hasShear);
+	epsN=contGeom->epsN(); epsT=contGeom->epsT();
+	// already in SpheresContactGeometry:
+	// contGeom->relocateContactPoints(); // allow very large mutual rotations
+	if(logStrain && epsN<0){ Real epsN0=epsN; epsN=log(epsN0+1); epsT*=epsN/epsN0; }
+	#ifdef BREFCOM_MATERIAL_MODEL
+		BREFCOM_MATERIAL_MODEL
+	#else
+		sigmaN=E*epsN;
+		sigmaT=G*epsT;
+	#endif
+	if(omega>omegaThreshold){
+		I->isReal=false;
+		const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
+		const shared_ptr<BrefcomPhysParams>& rbp1=YADE_PTR_CAST<BrefcomPhysParams>(body1->physicalParameters), rbp2=YADE_PTR_CAST<BrefcomPhysParams>(body2->physicalParameters);
+		if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;}
+		LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
+		return;
+	}
+	#define NNAN(a) assert(!isnan(a));
+	#define NNANV(v) assert(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
+	// store Fn (and Fs?), for use with GlobalStiffnessCounter?
+	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
+
+	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
+	Fs=sigmaT*crossSection; BC->shearForce=Fs;
+
+	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->pos1, I->getId2(), contGeom->pos2, rootBody);
+}
+
+
 void BrefcomLaw::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
+	if(useFunctor){ // testing the functor
+		if(!functor) functor=shared_ptr<ef2_Spheres_Brefcom_BrefcomLaw>(new ef2_Spheres_Brefcom_BrefcomLaw);
+		functor->logStrain=logStrain;
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+			if(!I->isReal) continue;
+			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
+		}
+		return;
+	}
 	
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
 		if(!I->isReal) continue;
@@ -145,7 +202,7 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 		if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) continue;
 
 		// shorthands
-		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); /* const Real& xiShear(BC->xiShear);*/ const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); /* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); */ const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength);
+		Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); /* const Real& xiShear(BC->xiShear);*/ const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& tau(BC->tau); const Real& expDmgRate(BC->expDmgRate); const Real& omegaThreshold(BC->omegaThreshold); /* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); */ const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage);
 		// for python access
 		Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs);
 		// for rate-dependence

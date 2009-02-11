@@ -14,6 +14,7 @@
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/GlobalStiffness.hpp>
+#include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 /* Engine encompassing several computations looping over all bodies/interactions
  *
@@ -151,30 +152,51 @@ class BrefcomPhysParams: public BodyMacroParameters {
 };
 REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
+class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
+	/*! Cohesion evolution law (it is 1-funcH here) */
+	Real funcH(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return 1-funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
+	/*! Damage evolution law */
+	inline Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{
+		if(kappaD<epsCrackOnset || neverDamage) return 0;
+		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+	}
+	public:
+		bool logStrain;
+		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false){}
+		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+	FUNCTOR2D(SpheresContactGeometry,BrefcomContact);
+	REGISTER_CLASS_AND_BASE(ef2_Spheres_Brefcom_BrefcomLaw,ConstitutiveLaw);
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain));
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(ef2_Spheres_Brefcom_BrefcomLaw);
+
+
 class BrefcomLaw: public InteractionSolver{
 	private:
-		//! aplly calculated force on both particles (applied in the inverse sense on B)
+		shared_ptr<ef2_Spheres_Brefcom_BrefcomLaw> functor;
 		shared_ptr<BrefcomContact> BC;
 		shared_ptr<SpheresContactGeometry> contGeom;
 		MetaBody* rootBody;
+		//! aplly calculated force on both particles (applied in the inverse sense on B)
 		void applyForce(const Vector3r&, const body_id_t&, const body_id_t&);
 		/*! Cohesion evolution law (it is 1-funcH here) */
-		inline Real funcH(const Real& kappaD) const{ return 1-funcG(kappaD); }
+		Real funcH(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return 1-funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 		/*! Damage evolution law */
-		inline Real funcG(const Real& kappaD) const{
-			const Real& epsCrackOnset=BC->epsCrackOnset, epsFracture=BC->epsFracture; const bool& neverDamage=BC->neverDamage; // shorthands
+		inline Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{
 			if(kappaD<epsCrackOnset || neverDamage) return 0;
 			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 		}
 		
 	public:
 		bool logStrain;
-		BrefcomLaw(): logStrain(false) { Shop::Bex::initCache(); };
+		bool useFunctor;
+		BrefcomLaw(): logStrain(false),useFunctor(false) { Shop::Bex::initCache(); };
 		void action(MetaBody*);
 	protected: 
 	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_AND_BASE(BrefcomLaw,InteractionSolver);
-	REGISTER_ATTRIBUTES(InteractionSolver,(logStrain));
+	REGISTER_ATTRIBUTES(InteractionSolver,(logStrain)(useFunctor));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BrefcomLaw);

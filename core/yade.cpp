@@ -142,6 +142,10 @@ void printHelp()
 
 int main(int argc, char *argv[])
 {
+	/* Omega::init() cannot be called from Omega::Omega (invoked at first instance() call), since init calls resetRootBody,
+	 * which locks renderMutex, calls instance() in turn, but since not constructed yet,
+	 * instance() → Omega::Omega → init → resetRootBody → lock renderMutex → deadlock */
+	Omega::instance().init();
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
 	// see http://www.boost.org/libs/filesystem/doc/portability_guide.htm#recommendations for what all they consider bad.
