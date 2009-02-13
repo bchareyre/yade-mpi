@@ -13,10 +13,7 @@ class ElasticContactInteraction: public NormalShearInteraction
 				,initialEquilibriumDistance	// initial equilibrium distance
 				,frictionAngle 			// angle of friction, according to Coulumb criterion
 				,tangensOfFrictionAngle
-				,unMax		// the maximum value of penetration depth of the history of this interaction
-				,previousun	// the value of this un at the last time step
-				,previousFn;	// the value of the normal force at the last time step
-	
+				;	
 		Vector3r	prevNormal;			// unit normal of the contact plane.
 
 		ElasticContactInteraction();
