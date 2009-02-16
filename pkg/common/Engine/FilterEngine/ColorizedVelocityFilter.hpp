@@ -11,6 +11,8 @@
 #include<yade/pkg-common/FilterEngine.hpp>
 #include<yade/core/MetaBody.hpp>
 
+class ColorScale;
+
 class ColorizedVelocityFilter : public FilterEngine {
 	protected:
 		vector<Vector3r> prevPositions;
@@ -21,12 +23,21 @@ class ColorizedVelocityFilter : public FilterEngine {
 		bool first;
 		void initialize(MetaBody*);
 		void makeScale();
+		void updateColorScale();
 		Vector3r getColor4Value(Real v);
+		shared_ptr<Body> widget;
+		shared_ptr<ColorScale> legend;
+		Real cur_minValue;
+		Real cur_maxValue;
 	public :
 		bool autoScale;
 		bool onlyDynamic;
 		Real minValue;
 		Real maxValue;
+
+		Real posX,posY;
+		Real width,height;
+		string title;
 
 		ColorizedVelocityFilter();
 		virtual ~ColorizedVelocityFilter();

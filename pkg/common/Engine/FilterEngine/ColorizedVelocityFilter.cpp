@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include"ColorizedVelocityFilter.hpp"
+#include <yade/pkg-common/ColorScale.hpp>
 
 CREATE_LOGGER(ColorizedVelocityFilter);
 
@@ -21,6 +22,12 @@ ColorizedVelocityFilter::ColorizedVelocityFilter() : FilterEngine()
 	prevIteration=0;
 	dt=0;
 	subscrBodies.clear();
+
+	posX=0;
+	posY=0.2;
+	width=0.05;
+	height=0.5;
+	title="Velocity, m/s";
 }
 
 
@@ -40,6 +47,12 @@ void ColorizedVelocityFilter::registerAttributes()
 	REGISTER_ATTRIBUTE(onlyDynamic);
 	REGISTER_ATTRIBUTE(minValue);
 	REGISTER_ATTRIBUTE(maxValue);
+
+	REGISTER_ATTRIBUTE(posX);
+	REGISTER_ATTRIBUTE(posY);
+	REGISTER_ATTRIBUTE(width);
+	REGISTER_ATTRIBUTE(height);
+	REGISTER_ATTRIBUTE(title);
 }
 
 void ColorizedVelocityFilter::applyCondition(MetaBody* ncb)
@@ -57,11 +70,52 @@ void ColorizedVelocityFilter::applyCondition(MetaBody* ncb)
 		prevPositions[i] = currPos;
 	}
 	prevIteration = currIteration;
-	if (autoScale) makeScale();
+	makeScale();
+	updateColorScale();
 	for (int i=0,e=subscrBodies.size(); i<e; ++i)
 	{
 		shared_ptr<Body> b =(*bodies)[subscrBodies[i]]; 
 		b->geometricalModel->diffuseColor = getColor4Value(values[i]);
+	}
+}
+
+void ColorizedVelocityFilter::updateColorScale()
+{
+	legend->posX = posX; 
+	legend->posY = posY; 
+	legend->width = width; 
+	legend->height = height; 
+
+	if (cur_minValue==minValue && cur_maxValue==maxValue) return;
+
+	cur_minValue=minValue;
+	cur_maxValue=maxValue;
+	legend->colors.resize(3);
+	Real h = (maxValue-minValue)/(legend->colors.size()-1);
+	for(unsigned int i=0; i<legend->colors.size(); ++i)
+		legend->colors[i] = getColor4Value(minValue+h*i);
+
+	legend->labels.resize(5);
+	h = (maxValue-minValue)/(legend->labels.size()-1);
+	for(unsigned int i=0; i<legend->labels.size(); ++i)
+	{
+		char tmp[64];
+		sprintf(tmp, "%6.3f", minValue+h*i);
+		legend->labels[i]=string(tmp);
+	}
+}
+
+void ColorizedVelocityFilter::makeScale()
+{
+	if (autoScale)
+	{
+		minValue=maxValue=values[0];
+		for(int i=0,e=values.size(); i<e; ++i)
+		{
+			if (values[i]<minValue) minValue = values[i];
+			if (values[i]>maxValue) maxValue = values[i];
+		}
+		LOG_INFO("minValue:" << minValue << '\t' << "maxValue:" << maxValue);
 	}
 }
 
@@ -84,21 +138,17 @@ Vector3r ColorizedVelocityFilter::getColor4Value(Real v)
 	return color;
 }
 
-
-void ColorizedVelocityFilter::makeScale()
-{
-	minValue=maxValue=values[0];
-	for(int i=0,e=values.size(); i<e; ++i)
-	{
-		if (values[i]<minValue) minValue = values[i];
-		if (values[i]>maxValue) maxValue = values[i];
-	}
-	LOG_INFO("minValue:" << minValue << '\t' << "maxValue:" << maxValue);
-}
-
 void ColorizedVelocityFilter::initialize(MetaBody* ncb)
 {
 	first=false;
+
+	widget = shared_ptr<Body>(new Body);
+	legend = shared_ptr<ColorScale>(new ColorScale);
+	widget->geometricalModel = legend;
+	legend->title = title;
+	widget->physicalParameters = shared_ptr<PhysicalParameters>(new PhysicalParameters);
+	widget->isDynamic=false;
+	ncb->bodies->insert(widget);
 
 	if (onlyDynamic)
 	{
