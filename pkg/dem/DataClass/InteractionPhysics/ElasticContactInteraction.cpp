@@ -3,10 +3,6 @@
 ElasticContactInteraction::ElasticContactInteraction()
 {
 	createIndex();
-
-	unMax = 0;
-	previousun = 0;
-	previousFn = 0;
 	
 }
 
@@ -27,9 +23,6 @@ void ElasticContactInteraction::registerAttributes()
 	//REGISTER_ATTRIBUTE(initialKn);
 	//REGISTER_ATTRIBUTE(initialKs);
 	REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
-	REGISTER_ATTRIBUTE(unMax);
-	REGISTER_ATTRIBUTE(previousun);
-	REGISTER_ATTRIBUTE(previousFn);
 
 
 //		Real		 kn				// normal elastic constant.
