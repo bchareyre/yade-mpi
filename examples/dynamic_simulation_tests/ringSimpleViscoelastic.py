@@ -15,7 +15,7 @@ es = 0.3
 
 ## Import wall's geometry
 p=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-walls = utils.import_stl_geometry_v2('ring.stl',physicalParameters=["SimpleViscoelasticBodyParameters",{'frictionAngle':frictionAngle,'kn':p['kn'],'cn':p['cn'],'ks':p['ks'],'cs':p['cs']}])
+walls = utils.import_stl_geometry('ring.stl',frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters",physParamsAttr={'kn':p['kn'],'cn':p['cn'],'ks':p['ks'],'cs':p['cs']})
 
 def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylinderOrigin,cylinderSlope):
 	spheresCount=0
@@ -26,7 +26,7 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					x = cylinderOrigin[0]+2*r*sphereRadius*cos(dfi*a)
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
-					s=utils.sphere_v2([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,density=Density,physicalParameters=["SimpleViscoelasticBodyParameters",{'frictionAngle':frictionAngle}])
+					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,density=Density,frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters")
 					p=utils.getViscoelasticFromSpheresInteraction(s.phys['mass'],tc,en,es)
 					s.phys['kn'],s.phys['cn'],s.phys['ks'],s.phys['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 					o.bodies.append(s)
