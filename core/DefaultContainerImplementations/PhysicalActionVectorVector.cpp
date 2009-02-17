@@ -114,16 +114,23 @@ void PhysicalActionVectorVector::clear()
 // doesn't not delete all, just resets data
 void PhysicalActionVectorVector::reset()
 {
-	vector< vector< shared_ptr<PhysicalAction> > >::iterator vvi    = physicalActions.begin();
-	vector< vector< shared_ptr<PhysicalAction> > >::iterator vviEnd = physicalActions.end();
-	for( ; vvi != vviEnd ; ++vvi )
-	{
-		vector< shared_ptr<PhysicalAction> >::iterator vi    = (*vvi).begin();
-		vector< shared_ptr<PhysicalAction> >::iterator viEnd = (*vvi).end();
-		for( ; vi != viEnd ; ++vi)
-		//if(*vi) // FIXME ?? do not check - all fields are NOT empty.
-			(*vi)->reset();
-	}
+	#if 1
+		vector< vector< shared_ptr<PhysicalAction> > >::iterator vvi    = physicalActions.begin();
+		vector< vector< shared_ptr<PhysicalAction> > >::iterator vviEnd = physicalActions.end();
+		for( ; vvi != vviEnd ; ++vvi )
+		{
+			vector< shared_ptr<PhysicalAction> >::iterator vi    = (*vvi).begin();
+			vector< shared_ptr<PhysicalAction> >::iterator viEnd = (*vvi).end();
+			for( ; vi != viEnd ; ++vi)
+			//if(*vi) // FIXME ?? do not check - all fields are NOT empty.
+				(*vi)->reset();
+		}
+	#else
+		FOREACH(int idx, usedBexIndices){
+			// reset everything
+			FOREACH(shared_ptr<PhysicalAction>& pa,physicalActions[idx]){ pa->reset();}
+		}
+	#endif
 }
 
 
@@ -142,10 +149,13 @@ void PhysicalActionVectorVector::prepare(std::vector<shared_ptr<PhysicalAction> 
 		maxSize = max(maxSize , actionTypes[i]->getClassIndex() );
 	++maxSize;
 	actionTypesResetted.resize(maxSize);
+	usedBexIndices.clear();
 	for(unsigned int i = 0 ; i < size ; ++i )
 	{
-		actionTypesResetted[actionTypes[i]->getClassIndex()] = actionTypes[i]->clone();
-		actionTypesResetted[actionTypes[i]->getClassIndex()] -> reset();
+		int idx=actionTypes[i]->getClassIndex();
+		actionTypesResetted[idx] = actionTypes[i]->clone();
+		actionTypesResetted[idx] -> reset();
+		usedBexIndices.push_back(idx);
 	}
 }
 

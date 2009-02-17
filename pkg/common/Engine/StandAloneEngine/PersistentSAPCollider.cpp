@@ -191,6 +191,8 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 	int offset1=3*id1, offset2=3*id2;
 	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1),rootBody)), b2(Body::byId(body_id_t(id2),rootBody));
 	bool overlap =
+		// only collide if at least one of the bodies is not shadow
+		((!b1->isShadow()) || (!b2->isShadow())) &&
 		// only collide if at least one particle is standalone or they belong to different clumps
 		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) &&
 		 // do not collide clumps, since they are just containers, never interact
@@ -228,8 +230,6 @@ void PersistentSAPCollider::updateBounds(int nbElements)
 		else zBounds[i]->value = maxima[3*zBounds[i]->id+2];
 	}
 }
-
-
 
 
 void PersistentSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> >& bounds, int nbElements){

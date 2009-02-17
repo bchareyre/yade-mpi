@@ -526,6 +526,30 @@ class pyOmega{
 	}
 
 	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
+
+	void interactionContainer_set(string clss){
+		MetaBody* rb=OMEGA.getRootBody().get();
+		if(rb->transientInteractions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
+		shared_ptr<InteractionContainer> ic=dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
+		rb->transientInteractions=ic;
+	}
+	string interactionContainer_get(string clss){ return OMEGA.getRootBody()->transientInteractions->getClassName(); }
+
+	void bodyContainer_set(string clss){
+		MetaBody* rb=OMEGA.getRootBody().get();
+		if(rb->bodies->size()>0) throw std::runtime_error("Body container not empty, will not change its class.");
+		shared_ptr<BodyContainer> bc=dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
+		rb->bodies=bc;
+	}
+	string bodyContainer_get(string clss){ return OMEGA.getRootBody()->bodies->getClassName(); }
+
+	void physicalActionContainer_set(string clss){
+		MetaBody* rb=OMEGA.getRootBody().get();
+		shared_ptr<PhysicalActionContainer> pac=dynamic_pointer_cast<PhysicalActionContainer>(ClassFactory::instance().createShared(clss));
+		rb->physicalActions=pac;
+	}
+	string physicalActionContainer_get(string clss){ return OMEGA.getRootBody()->physicalActions->getClassName(); }
+
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 
@@ -580,6 +604,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("actions",&pyOmega::actions_get)
 		.add_property("tags",&pyOmega::tags_get)
 		.def("childClasses",&pyOmega::listChildClasses)
+		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set)
+		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
+		.add_property("actionContainer",&pyOmega::physicalActionContainer_get,&pyOmega::physicalActionContainer_set)
 		;
 	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
