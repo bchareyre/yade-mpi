@@ -177,13 +177,16 @@ void TriaxialCompressionEngine::updateParameters ( MetaBody * ncb )
 			else if ( currentState==STATE_ISO_UNLOADING && autoCompressionActivation ) {
 				doStateTransition (ncb, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
+			// stop simulation if unloaded and compression is not activate automatically
+			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
+				Omega::instance().stopSimulationLoop();
+			}
 			// huh?! this will never happen, because of the first condition...
 			else 
 			{ 
 			doStateTransition (ncb, STATE_LIMBO );
 			}
 		}
-
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
 			Omega::instance().stopSimulationLoop();

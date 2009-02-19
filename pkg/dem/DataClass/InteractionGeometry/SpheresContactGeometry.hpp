@@ -103,7 +103,6 @@ class SpheresContactGeometry: public InteractionGeometry{
 			(contactPoint)
 			(radius1)
 			(radius2)
-			(contactPoint) // to allow access from python
 			(facetContactFace)
 			// hasShear
 			(hasShear)

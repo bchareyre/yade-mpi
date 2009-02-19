@@ -33,7 +33,7 @@ class PhysicalAction;
  *    the mean pressure sigmaLateralConfinement is reached (and stabilizes).
  *    NOTE: this state will be skipped if sigmaLateralConfinement == sigmaIsoCompaction.
  * 3. STATE_TRIAX_LOADING: confined uniaxial compression:
- *	constant sigmaLateralConfinement is kept at lateral walls (left, right, front, back), while
+ * 	constant sigmaLateralConfinement is kept at lateral walls (left, right, front, back), while
  * 	top and bottom walls load the packing in their axis (by straining), until the value of epsilonMax
  * 	(deformation along the loading axis) is reached. At this point, the simulation is stopped.
  * 4. STATE_FIXED_POROSITY_COMPACTION: isotropic compaction (compression) until

@@ -105,7 +105,7 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	ii    = transientInteractions->begin();
 	iiEnd = transientInteractions->end();
 	for( ; ii!=iiEnd ; ++ii)
-	   if ( ! (interaction = *ii)->cycle ) transientInteractions->erase( interaction->getId1(), interaction->getId2());
+	   if ( !(interaction = *ii)->cycle && !interacion->isReal ) transientInteractions->erase( interaction->getId1(), interaction->getId2());
 
 }
 

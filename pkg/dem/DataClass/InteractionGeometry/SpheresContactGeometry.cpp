@@ -63,7 +63,7 @@ void SpheresContactGeometry::relocateContactPoints(const Vector3r& p1, const Vec
 Real SpheresContactGeometry::slipToDisplacementTMax(Real displacementTMax){
 	assert(hasShear);
 	// very close, reset shear
-	if(displacementTMax<=Mathr::ZERO_TOLERANCE){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
+	if(displacementTMax<=0.){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
 	// otherwise
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
 	Real currDistSq=(p2-p1).SquaredLength();
