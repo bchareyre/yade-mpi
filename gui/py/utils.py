@@ -389,6 +389,16 @@ def basicDEMEngines(interPhysics='SimpleElasticRelationships',constitutiveLaw='E
 		
 
 def ColorizedVelocityFilter(isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Velocity, m/s'):
-	f = DeusExMachina('ColorizedVelocityFilter',{'isFilterActivated':isFilterActivated,'autoScale':autoScale,'minValue':minValue,'maxValue':maxValue,'posX':posX,'posY':posY,'width':width,'height':height,'title':title})
-	O.engines+=[f]
-	return f
+    f = DeusExMachina('ColorizedVelocityFilter',{'isFilterActivated':isFilterActivated,'autoScale':autoScale,'minValue':minValue,'maxValue':maxValue,'posX':posX,'posY':posY,'width':width,'height':height,'title':title})
+    O.engines+=[f]
+    return f
+
+def ColorizedTimeFilter(point=[0,0,0],normal=[0,1,0],isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Time, m/s'):
+    f = DeusExMachina('ColorizedTimeFilter',{'point':point,'normal':normal,'isFilterActivated':isFilterActivated,'autoScale':autoScale,'minValue':minValue,'maxValue':maxValue,'posX':posX,'posY':posY,'width':width,'height':height,'title':title})
+    O.engines+=[f]
+    return f
+
+def PythonRunnerFilter(command='pass',isFilterActivated=True):
+    f = DeusExMachina('PythonRunnerFilter',{'command':command,'isFilterActivated':isFilterActivated})
+    O.engines+=[f]
+    return f

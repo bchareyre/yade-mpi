@@ -10,7 +10,7 @@
 
 bool FilterEngine::isFiltrationActivated = false;
 
-FilterEngine::FilterEngine() : DeusExMachina(), isFilterActivated(false)
+FilterEngine::FilterEngine() : DeusExMachina(), isFilterActivated(true)
 {
 }
 
