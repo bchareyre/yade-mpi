@@ -117,8 +117,6 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 			// look if the pair (id1,id2) already exists in the overleppingBB collection
 			const shared_ptr<Interaction>& interaction=transientInteractions->find ( body_id_t ( id1 ),body_id_t ( id2 ) );
 			bool found= ( interaction!=0 );//Bruno's Hack
-			// if there is persistent interaction, we will not create transient one!
-			//bool foundPersistent = noTransientIfPersistentExists ? ( persistentInteractions->find ( body_id_t ( id1 ),body_id_t ( id2 ) ) !=0 ) : false;
 
 			// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
 			if ( !found )

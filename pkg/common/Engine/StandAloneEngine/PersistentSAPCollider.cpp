@@ -18,7 +18,6 @@ CREATE_LOGGER(PersistentSAPCollider);
 
 PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
 {
-	noTransientIfPersistentExists=false;
 	haveDistantTransient=false;
 
 	nbObjects=0;
@@ -185,7 +184,6 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 	const shared_ptr<Interaction>& interaction=transientInteractions->find(body_id_t(id1),body_id_t(id2));
 	bool found=(interaction!=0);//Bruno's Hack
 	// if there is persistent interaction, we will not create transient one!
-	bool foundPersistent = noTransientIfPersistentExists ? (persistentInteractions->find(body_id_t(id1),body_id_t(id2))!=0) : false;
 	
 	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
 	int offset1=3*id1, offset2=3*id2;
@@ -205,7 +203,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 	// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
 	//if((id1==0 && id2==1) || (id1==1 && id2==0)) LOG_DEBUG("Processing #0 #1");
 	//if(interaction&&!interaction->isReal){ LOG_DEBUG("Unreal interaction #"<<id1<<"=#"<<id2<<" (overlap="<<overlap<<", haveDistantTransient="<<haveDistantTransient<<")");}
-	if(overlap && !found && !foundPersistent){
+	if(overlap && !found){
 		//LOG_DEBUG("Creating interaction #"<<id1<<"=#"<<id2);
 		transientInteractions->insert(body_id_t(id1),body_id_t(id2));
 	}

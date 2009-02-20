@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
-#include <Wm3Vector3.h>
+#include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>

@@ -164,8 +164,7 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
 
-void Omega::scanPlugins()
-{
+void Omega::scanPlugins(){
 	FOREACH(string dld,preferences->dynlibDirectories) ClassFactory::instance().addBaseDirectory(dld);
 	vector<string> dynlibsList;
 	FOREACH(string si, preferences->dynlibDirectories){
@@ -177,54 +176,28 @@ void Omega::scanPlugins()
 			if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a" &&
 				ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(pth)))==(pth.leaf())){
 				filesystem::path name(filesystem::basename(pth));
-				// warning: this can produce invalid name (too short).
-				// 0-length names are dumped directly
-				// names 0<length<4 should fail assertion in DynLibManager::systemNameToLibName
-				// the whole loading "logic" should be rewritten from scratch...
 				if(name.leaf().length()<1) continue; // filter out 0-length filenames
-				if(dynlibsList.size()==0 || ClassFactory::instance().systemNameToLibName(name.leaf())!=dynlibsList.back()) {
-					LOG_DEBUG("Added plugin: "<<si<<"/"<<pth.leaf()<<".");
-					dynlibsList.push_back(ClassFactory::instance().systemNameToLibName(name.leaf()));
+				string plugin=name.leaf();
+				if(!ClassFactory::instance().load(ClassFactory::instance().systemNameToLibName(plugin))){
+					string err=ClassFactory::instance().lastError();
+					if(err.find(": undefined symbol: ")!=std::string::npos){
+						size_t pos=err.rfind(":");	assert(pos!=std::string::npos);
+						std::string sym(err,pos+2); //2 removes ": " from the beginning
+						int status=0; char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
+						LOG_FATAL(plugin<<": undefined symbol `"<<demangled_sym<<"'"); LOG_FATAL(plugin<<": "<<err); LOG_FATAL("Bailing out.");
+					}
+					else {
+						LOG_FATAL(plugin<<": "<<err<<" ."); /* leave space to not to confuse c++filt */ LOG_FATAL("Bailing out.");
+					}
+					abort();
 				}
-				else LOG_DEBUG("Possible plugin discarded: "<<si<<"/"<<name.leaf()<<".");
-			} else LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<".");
+			}
+			else LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<".");
 		}
 	}
-
-	bool allLoaded = true;
-	vector<string> dynlibsClassList; // dynlibsList holds filenames, this holds classes defined inside (may be different if using yadePuginClasses)
-	FOREACH(string dll, dynlibsList){
-		bool thisLoaded = ClassFactory::instance().load(dll);
-		if (!thisLoaded){
-			string err=ClassFactory::instance().lastError();
-			// HACK
-			if(err.find("cannot open shared object file: No such file or directory")!=std::string::npos){
-				LOG_INFO("Attempted to load nonexistent file; since this may be due to bad algorithm of filename construction, we pretend everything is OK (original error: `"<<err<<"').");
-				thisLoaded=true;
-			}
-			else if(err.find(": undefined symbol: ")!=std::string::npos){
-				size_t pos=err.rfind(":");
-				assert(pos!=std::string::npos);
-				std::string sym(err,pos+2); //2 removes ": " from the beginning
-				int status=0;
-				char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
-				LOG_FATAL("Undefined symbol `"<<demangled_sym<<"' ("<<err<<").");
-			}
-			else LOG_ERROR("Error loading Library `"<<dll<<"': "<<err<<" ."); // leave space to not to confuse c++filt
-		}
-		else { // no error
-			if (ClassFactory::instance().lastPluginClasses().size()==0){ // regular plugin, one class per file
-				dynlibsClassList.push_back(dll);
-				LOG_DEBUG("Plugin "<<dll<<": loaded default class "<<dll<<".");
-			} else {// if plugin defines yadePluginClasses (has multiple classes), insert these into dynLibsList
-				vector<string> css=ClassFactory::instance().lastPluginClasses();
-				for(size_t i=0; i<css.size();i++) { dynlibsClassList.push_back(css[i]); LOG_DEBUG("Plugin "<<dll<<": loaded explicit class "<<css[i]<<".");  }
-			}
-		}
-		allLoaded &= thisLoaded;
-	}
-	if(!allLoaded) { LOG_FATAL("Error loading a plugin (see above; run with -v to see more), bailing out."); abort(); }
-	buildDynlibDatabase(dynlibsClassList);
+	list<string>& plugins(ClassFactory::instance().pluginClasses);
+	plugins.sort(); plugins.unique();
+	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
 }
 
 void Omega::loadSimulationFromStream(std::istream& stream){

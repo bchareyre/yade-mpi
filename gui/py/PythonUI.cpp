@@ -15,7 +15,7 @@ using namespace boost;
 struct termios PythonUI::tios, PythonUI::tios_orig;
 string PythonUI::runScript;
 bool PythonUI::stopAfter=false;
-bool PythonUI::nonInteractive=true;
+bool PythonUI::nonInteractive=false;
 vector<string> PythonUI::scriptArgs;
 
 PythonUI* PythonUI::self=NULL;

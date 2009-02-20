@@ -57,7 +57,6 @@ class MetaBody : public Body
 		(initializers)
 		(bodies)
 		(transientInteractions)
-		(persistentInteractions)
 		(physicalActions)
 		(miscParams)
 		(dispParams)

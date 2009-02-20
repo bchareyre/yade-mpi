@@ -50,84 +50,31 @@ void DynLibManager::addBaseDirectory(const string& dir)
 }
 
 
-/*Factory DynLibManager::resolve(const string libName, const string symb )
-{
-	if (isLoaded(libName))
-	{
-		string tmpSymb;
-		tmpSymb = symb;
-		tmpSymb.push_back('_');
-		tmpSymb.append(libName);
-		
-		#ifdef WIN32
-			void * sym = (void*)GetProcAddress(handles[libName], tmpSymb);
-			if (sym==NULL)
-				error();
-			return (Factory)sym;
-		#else
-			void * sym = dlsym(handles[libName], tmpSymb.data());
-		
-			if (error())  
-				return NULL;
-			else
-				return (Factory)sym;
-		#endif
-	}
-	else
-	{
-		return NULL;
-	}
-}*/
-
-
 bool DynLibManager::loadFromDirectoryList (const string& libName )
 {
-	lastPluginClasses.clear();
-
 	if (libName.empty()) return false;
-
 	string libFileName = libNameToSystemName(libName);
-
 	string baseDir = findLibDir(libName);
-
 	string fullLibName;
 	if (baseDir.length()==0) return load(libFileName,libName);
 	else return load(baseDir+"/"+libFileName,libName);
-	
 }
 
 
 bool DynLibManager::load (const string& fullLibName, const string& libName )
 {
-	lastPluginClasses.clear();
-
 	if (libName.empty() || fullLibName.empty()){
 		LOG_ERROR("Empty filename for library `"<<libName<<"'.");
 		return false;
 	}
-	/*if(!filesystem::exists(fullLibName)){
-		LOG_ERROR("Trying to load library `"<<libName<<"' from nonexistent file `"<<fullLibName<<"'?! (still returning success)");
-		return true;
-	}*/
-
 #ifdef WIN32
 	if (isLoaded(libName)) return true;
 	HINSTANCE handle = LoadLibraryA(fullLibName.c_str());
 #else
 	void * handle = dlopen(fullLibName.data(), RTLD_NOW);
 #endif
-
 	if (!handle) return !error();
-
 	handles[libName] = handle;
-
-#ifndef WIN32
-	char**yadePluginClasses=(char**)dlsym(handle, "yadePluginClasses");
-	// errors are ignored, since definition of this sybol is optional
-	if(!dlerror()){ for(int i=0; yadePluginClasses[i]!=NULL && strlen(yadePluginClasses[i])>0; i++){
-		lastPluginClasses.push_back(yadePluginClasses[i]); LOG_DEBUG("Pushed back `"<<yadePluginClasses[i]<<"'."); }
-	}
-#endif
 	return true;
 }
 

@@ -80,6 +80,7 @@ class Omega : public Singleton<Omega>
 		ptime				 msStartingPauseTime;
 		time_duration			 simulationPauseDuration;
 		string				 simulationFileName;
+
 		void buildDynlibDatabase(const vector<string>& dynlibsList); // FIXME - maybe in ClassFactory ?
 
 		map<string,string> memSavedSimulations;

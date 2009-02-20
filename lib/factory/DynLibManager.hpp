@@ -27,11 +27,6 @@
 
 using namespace std;
 
-/*! Macro defining what classes can be found in this plugin -- must always be used in the respective .cpp file.
-
-If left empty, filename will be used to deduce that.
-*/
-#define YADE_PLUGIN(...) const char* yadePluginClasses[]={ __VA_ARGS__ "", NULL };
 
 class DynLibManager 
 {
@@ -62,7 +57,6 @@ class DynLibManager
 		string systemNameToLibName(const string& name);
 		string findLibDir(const string& name);
 		string lastError();
-		vector<string> lastPluginClasses;
 		DECLARE_LOGGER;
 
 	private :

@@ -71,7 +71,6 @@ class PersistentTriangulationCollider : public BroadInteractor
 		// collection of AABB that are in interaction
 		//protected : vector< set<unsigned int> > overlappingBB;
 		shared_ptr<InteractionContainer> transientInteractions;
-		shared_ptr<InteractionContainer> persistentInteractions;
 		/// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
 		vector<Real> maxima;
 

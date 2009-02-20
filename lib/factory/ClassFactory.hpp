@@ -11,9 +11,10 @@
 #pragma once
 
 
-#include <map>
-#include <string>
-#include <iostream>
+#include<map>
+#include<string>
+#include<list>
+#include<iostream>
 
 #ifndef  __GXX_EXPERIMENTAL_CXX0X__
 #	include<boost/shared_ptr.hpp>
@@ -141,7 +142,9 @@ class ClassFactory : public Singleton< ClassFactory >
 
 		bool load(const string& name);
 		std::string lastError();
-		vector<string> lastPluginClasses(){ return dlm.lastPluginClasses; }
+
+		void registerPluginClasses(const char* fileAndClasses[]);
+		list<string> pluginClasses;
 
 		string libNameToSystemName(const string& name);
 		string systemNameToLibName(const string& name);
@@ -154,4 +157,12 @@ class ClassFactory : public Singleton< ClassFactory >
 	FRIEND_SINGLETON(ClassFactory);
 };
 
+
+/*! Macro defining what classes can be found in this plugin -- must always be used in the respective .cpp file. If left empty, filename will be used to deduce that.
+ *
+ * Note:
+ * 	1. Visibility must be set to "internal" (or "protected") so that other plugins' init will not shadow this one and all of them get properly executed.
+ * 	2. The function must be enclosed in its own anonymous namespace, otherwise there will be clashes (liker errors) if more files with YADE_PLUGIN are linked together.
+ */
+#define YADE_PLUGIN(...) namespace{ __attribute__((constructor)) __attribute__((visibility("internal"))) void registerThisPluginClasses(void){ const char* info[]={__FILE__ , ##__VA_ARGS__ , NULL}; ClassFactory::instance().registerPluginClasses(info);} }
 
