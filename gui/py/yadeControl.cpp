@@ -383,7 +383,14 @@ class pyPhysicalActionContainer{
 	python::tuple force_get(long id){ Shop::Bex::initCache(); Vector3r f=Shop::Bex::force(id); return python::make_tuple(f[0],f[1],f[2]);}
 	python::tuple momentum_get(long id){ Shop::Bex::initCache(); Vector3r m=Shop::Bex::momentum(id); return python::make_tuple(m[0],m[1],m[2]);}
 };
-
+#ifdef BEX_CONTAINER
+class pyBexContainer{
+	public:
+		pyBexContainer(){}
+		python::tuple force_get(long id){ Vector3r& f=Omega::instance().getRootBody()->bex.force(id); return python::make_tuple(f[0],f[1],f[2]); }
+		python::tuple torque_get(long id){ Vector3r& m=Omega::instance().getRootBody()->bex.torque(id); return python::make_tuple(m[0],m[1],m[2]);}
+};
+#endif
 
 
 class pyOmega{
@@ -516,8 +523,13 @@ class pyOmega{
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->transientInteractions); }
-
-	pyPhysicalActionContainer actions_get(void){return pyPhysicalActionContainer(OMEGA.getRootBody()->physicalActions); }
+	
+	#ifdef BEX_CONTAINER
+		pyBexContainer actions_get(void){return pyBexContainer();}
+	#else
+		pyPhysicalActionContainer actions_get(void){return pyPhysicalActionContainer(OMEGA.getRootBody()->physicalActions); }
+	#endif
+	
 
 	boost::python::list listChildClasses(const string& base){
 		boost::python::list ret;
@@ -633,7 +645,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem)
 		.def("f",&pyPhysicalActionContainer::force_get)
 		.def("m",&pyPhysicalActionContainer::momentum_get);
-	
+
+	#ifdef BEX_CONTAINER
+	boost::python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
+		.def("f",&pyBexContainer::force_get)
+		.def("m",&pyBexContainer::torque_get);
+	#endif
 
 	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine");
 	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")

@@ -14,6 +14,7 @@
 #include"BodyContainer.hpp"
 #include"Engine.hpp"
 #include"DisplayParameters.hpp"
+#include"PhysicalActionContainer.hpp"
 //#include"groupRelationData.hpp"
 
 class MetaBody : public Body
@@ -25,6 +26,9 @@ class MetaBody : public Body
 		__attribute__((__deprecated__)) shared_ptr<InteractionContainer>	persistentInteractions; // disappear, reappear according to physical (or any other non-spatial) criterion
 		shared_ptr<InteractionContainer>	transientInteractions;	// disappear, reappear according to spatial criterion
 		shared_ptr<PhysicalActionContainer>	physicalActions;
+		#ifdef BEX_CONTAINER
+			BexContainer bex;
+		#endif
 		vector<shared_ptr<Serializable> > miscParams; // will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)
 		//! tags like mp3 tags: author, date, version, description etc.
 		list<string> tags;

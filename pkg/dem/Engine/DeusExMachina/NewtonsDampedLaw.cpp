@@ -36,8 +36,13 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		
 		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		unsigned int id = b->getId();
-		Vector3r& m = ( static_cast<Momentum*> ( ncb->physicalActions->find ( id, momentumClassIndex ).get() ) )->momentum;
-		Vector3r& f = ( static_cast<Force*> ( ncb->physicalActions->find ( id, forceClassIndex ).get() ) )->force;
+		#ifdef BEX_CONTAINER
+			Vector3r& m = ncb->bex.torque(id);
+			Vector3r& f = ncb->bex.force(id);
+		#else
+			Vector3r& m = ( static_cast<Momentum*> ( ncb->physicalActions->find ( id, momentumClassIndex ).get() ) )->momentum;
+			Vector3r& f = ( static_cast<Force*> ( ncb->physicalActions->find ( id, forceClassIndex ).get() ) )->force;
+		#endif
 
 		Real dt = Omega::instance().getTimeStep();
 

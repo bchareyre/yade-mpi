@@ -31,6 +31,9 @@ void PhysicalActionContainerInitializer::registerAttributes()
 
 void PhysicalActionContainerInitializer::action(MetaBody* ncb)
 {
+	#ifdef BEX_CONTAINER
+		return;
+	#endif
 	list<string> allNames;
 	// copy physical action names that were passed by the user directly
 	allNames.insert(allNames.end(),physicalActionNames.begin(),physicalActionNames.end());

@@ -14,6 +14,13 @@
 #include<yade/core/PhysicalAction.hpp>
 #include<iostream>
 
+// experimental
+#define BEX_CONTAINER
+
+#ifdef BEX_CONTAINER
+	#include<yade/core/BexContainer.hpp>
+#endif
+
 using namespace boost;
 using namespace std;
 
