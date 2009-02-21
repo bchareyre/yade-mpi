@@ -24,7 +24,11 @@ void GravityEngine::applyCondition(MetaBody* ncb){
 		if(b->isClumpMember()) continue;
 		shared_ptr<ParticleParameters> p=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters);
 		if(p!=0) //not everything derives from ParticleParameters; this line was    assert(p); - Janek
+#ifdef BEX_CONTAINER
+			ncb->bex.force(b->getId())+=gravity*p->mass;
+#else
 			static_cast<Force*>(ncb->physicalActions->find(b->getId(),cachedForceClassIndex).get())->force+=gravity*p->mass;
+#endif
 	}
 }
 
@@ -34,8 +38,13 @@ void CentralGravityEngine::applyCondition(MetaBody* rootBody){
 		if(b->isClumpMember() || b->getId()==centralBody) continue; // skip clump members and central body
 		Real F=accel*YADE_PTR_CAST<ParticleParameters>(b->physicalParameters)->mass;
 		Vector3r toCenter=centralPos-b->physicalParameters->se3.position; toCenter.Normalize();
+#ifdef BEX_CONTAINER
+		rootBody->bex.force(b->getId())+=F*toCenter;
+		if(reciprocal) rootBody->bex.force(centralBody)-=F*toCenter;
+#else
 		static_cast<Force*>(rootBody->physicalActions->find(b->getId(),cachedForceClassIndex).get())->force+=F*toCenter;
 		if(reciprocal) static_cast<Force*>(rootBody->physicalActions->find(centralBody,cachedForceClassIndex).get())->force-=F*toCenter;
+#endif
 	}
 }
 
@@ -49,7 +58,11 @@ void AxialGravityEngine::applyCondition(MetaBody* rootBody){
 		const Vector3r x2=axisPoint+axisDirection;
 		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
 		Vector3r toAxis=closestAxisPoint-x0; toAxis.Normalize();
+#ifdef BEX_CONTAINER
+		rootBody->bex.force(b->getId())+=acceleration*myMass*toAxis;
+#else
 		static_pointer_cast<Force>(rootBody->physicalActions->find(b->getId(),cachedForceClassIndex))->force+=acceleration*myMass*toAxis;
 		//if(b->getId()==20){ TRVAR3(toAxis,acceleration*myMass*toAxis,static_pointer_cast<Force>(rootBody->physicalActions->find(b->getId(),cachedForceClassIndex))->force); }
+#endif
 	}
 }
