@@ -15,7 +15,9 @@
 #include<iostream>
 
 // experimental
-#define BEX_CONTAINER
+#ifndef NO_BEX
+#	define BEX_CONTAINER
+#endif
 
 #ifdef BEX_CONTAINER
 	#include<yade/core/BexContainer.hpp>
