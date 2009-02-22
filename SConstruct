@@ -102,8 +102,8 @@ profile=env['profile']
 print '@@@ Using profile',profile,'('+optsFile+') @@@'
 
 # defaults for various profiles
-if profile=='default': defOptions={'debug':1,'variant':'','optimize':0,'openmp':True}
-elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1,'openmp':True}
+if profile=='default': defOptions={'debug':1,'variant':'','optimize':0,'openmp':False}
+elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1,'openmp':False}
 else: defOptions={'debug':0,'optimize':0,'variant':profile,'openmp':True}
 
 
@@ -390,7 +390,7 @@ if env['QUAD_PRECISION']: env.Append(CPPDEFINES='QUAD_PRECISION')
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
-if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp')
+if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -ffast-math -march=%s'%env['march']),
 		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])

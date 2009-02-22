@@ -32,6 +32,9 @@ void PhysicalActionContainerInitializer::registerAttributes()
 void PhysicalActionContainerInitializer::action(MetaBody* ncb)
 {
 	#ifdef BEX_CONTAINER
+		// this is not necessary, since BexContainer grows upon requests.
+		// But it takes about 10 resizes to get to 2000 bodies (only at the beginning), so you can save a few milliseconds here
+		ncb->bex.resize(ncb->bodies->size());
 		return;
 	#endif
 	list<string> allNames;

@@ -129,8 +129,9 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
 	sumPosForces=sumNegForces=0;
 	#ifdef BEX_CONTAINER
-		FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.force(id)[axis];
-		FOREACH(body_id_t id, posIds) sumNegForces-=rootBody->bex.force(id)[axis];
+		rootBody->bex.sync();
+		FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
+		FOREACH(body_id_t id, posIds) sumNegForces-=rootBody->bex.getForce(id)[axis];
 	#else
 		FOREACH(body_id_t id, negIds) sumNegForces+=Shop::Bex::force(id)[axis];
 		FOREACH(body_id_t id, posIds) sumPosForces-=Shop::Bex::force(id)[axis];

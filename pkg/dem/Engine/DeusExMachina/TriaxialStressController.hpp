@@ -33,7 +33,7 @@ class TriaxialStressController : public DeusExMachina
 		bool firstRun;
 		inline const Vector3r getForce(MetaBody* rb, body_id_t id){
 			#ifdef BEX_CONTAINER
-				return rb->bex.force(id);
+				return rb->bex.getForce(id); // needs sync, which is done at the beginning of applyCondition
 			#else
 				return static_cast<Force*>(rb->physicalActions->find(id,ForceClassIndex).get())->force				
 			#endif

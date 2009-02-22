@@ -23,8 +23,8 @@ class ConstitutiveLaw: public EngineUnit2D <
 	 * is done only if the derived ConstitutiveLaw says NEEDS_BEX("Force","Momentum"), for example.
 	 */
 #ifdef BEX_CONTAINER
-	inline Vector3r& bodyForce(const body_id_t id, MetaBody* rb) const { return rb->bex.force(id); }
-	inline Vector3r& bodyTorque(const body_id_t id, MetaBody* rb) const { return rb->bex.torque(id);}
+	void addForce (const body_id_t id, const Vector3r& f,MetaBody* rb){rb->bex.addForce (id,f);}
+	void addTorque(const body_id_t id, const Vector3r& t,MetaBody* rb){rb->bex.addTorque(id,t);}
 #else
 	Vector3r& bodyForce(const body_id_t id, MetaBody* rb) const { return static_pointer_cast<Force>(rb->physicalActions->find(id,forceIdx))->force; }
 	Vector3r& bodyTorque(const body_id_t id, MetaBody* rb) const { return static_pointer_cast<Momentum>(rb->physicalActions->find(id,torqueIdx))->momentum;}
@@ -33,9 +33,9 @@ class ConstitutiveLaw: public EngineUnit2D <
 	/*! Convenience function to apply force and torque from one force at contact point. Not sure if this is the right place for it. */
 	void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contactPoint, const body_id_t id1, const Vector3r& pos1, const body_id_t id2, const Vector3r& pos2, MetaBody* rb){
 		#ifdef BEX_CONTAINER
-			rb->bex.force(id1)+=force; rb->bex.force(id2)-=force;
-			rb->bex.torque(id1)+=(contactPoint-pos1).Cross(force);
-			rb->bex.torque(id2)-=(contactPoint-pos2).Cross(force);
+			rb->bex.addForce(id1,force); rb->bex.addForce(id2,-force);
+			rb->bex.addTorque(id1,(contactPoint-pos1).Cross(force));
+			rb->bex.addTorque(id2,-(contactPoint-pos2).Cross(force));
 		#else
 			bodyForce(id1,rb)+=force; bodyForce(id2,rb)-=force;
 			bodyTorque(id1,rb)+=(contactPoint-pos1).Cross(force);

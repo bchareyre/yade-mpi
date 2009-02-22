@@ -67,8 +67,8 @@ void Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Interactio
 	}
 
 	Vector3r f				= phys->normalForce + shearForce;
-	bodyForce (id1,rootBody) -= f;
-	bodyForce (id2,rootBody) += f;
-	bodyTorque(id1,rootBody) -= c1x.Cross(f);
-	bodyTorque(id2,rootBody) += c2x.Cross(f);
+	addForce (id1,-f,rootBody);
+	addForce (id2, f,rootBody);
+	addTorque(id1,-c1x.Cross(f),rootBody);
+	addTorque(id2, c2x.Cross(f),rootBody);
 }

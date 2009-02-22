@@ -44,10 +44,15 @@ void ElasticContactLaw2::action(MetaBody* rb){
 		Shop::applyForceAtContactPoint(force,contGeom->contactPoint,i->getId1(),contGeom->pos1,i->getId2(),contGeom->pos2,rb);
 
 		Vector3r bendAbs; Real torsionAbs; contGeom->bendingTorsionAbs(bendAbs,torsionAbs);
-		Shop::Bex::momentum(i->getId1(),rb)+=contGeom->normal*torsionAbs*ktor;
-		Shop::Bex::momentum(i->getId2(),rb)-=contGeom->normal*torsionAbs*ktor;
-		Shop::Bex::momentum(i->getId1(),rb)+=bendAbs*kb;
-		Shop::Bex::momentum(i->getId2(),rb)-=bendAbs*kb;
+		#ifdef BEX_CONTAINER
+			rb->bex.addTorque(i->getId1(), contGeom->normal*torsionAbs*ktor+bendAbs*kb);
+			rb->bex.addTorque(i->getId2(),-contGeom->normal*torsionAbs*ktor-bendAbs*kb);
+		#else
+			Shop::Bex::momentum(i->getId1(),rb)+=contGeom->normal*torsionAbs*ktor;
+			Shop::Bex::momentum(i->getId2(),rb)-=contGeom->normal*torsionAbs*ktor;
+			Shop::Bex::momentum(i->getId1(),rb)+=bendAbs*kb;
+			Shop::Bex::momentum(i->getId2(),rb)-=bendAbs*kb;
+		#endif
 	}
 }
 
@@ -170,10 +175,10 @@ void ElasticContactLaw::action(MetaBody* ncb)
 	
 			Vector3r f				= currentContactPhysics->normalForce + shearForce;
 			#ifdef BEX_CONTAINER
-				ncb->bex.force(id1)-=f;
-				ncb->bex.force(id2)+=f;
-				ncb->bex.torque(id1)-=c1x.Cross(f);
-				ncb->bex.torque(id2)+=c2x.Cross(f);
+				ncb->bex.addForce (id1,-f);
+				ncb->bex.addForce (id2,+f);
+				ncb->bex.addTorque(id1,-c1x.Cross(f));
+				ncb->bex.addTorque(id2, c2x.Cross(f));
 			#else
 				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
 				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;

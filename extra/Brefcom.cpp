@@ -12,7 +12,8 @@ YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomCon
 CREATE_LOGGER(BrefcomGlobalCharacteristics);
 
 void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
-	Shop::Bex::initCache();
+	//Shop::Bex::initCache();
+	rb->bex.sync();
 
 	// 1. reset volumetric strain (cummulative in the next loop)
 	// 2. get maximum force on a body and sum of all forces (for averaging)
@@ -21,7 +22,7 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	BrefcomPhysParams* bpp(YADE_CAST<BrefcomPhysParams*>(b->physicalParameters.get()));
 		bpp->epsVolumetric=0;
 		bpp->numContacts=0;
-		currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
+		currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
 	}
 	Real meanF=sumF/rb->bodies->size(); 
 
@@ -124,10 +125,10 @@ BrefcomContact::~BrefcomContact(){};
 CREATE_LOGGER(BrefcomLaw);
 
 void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const body_id_t& id2){
-	Shop::Bex::force(id1,rootBody)+=force;
-	Shop::Bex::force(id2,rootBody)-=force;
-	Shop::Bex::momentum(id1,rootBody)+=(contGeom->contactPoint-contGeom->pos1).Cross(force);
-	Shop::Bex::momentum(id2,rootBody)+=(contGeom->contactPoint-contGeom->pos2).Cross(-force);
+	rootBody->bex.addForce(id1,force);
+	rootBody->bex.addForce(id2,-force);
+	rootBody->bex.addTorque(id1,(contGeom->contactPoint-contGeom->pos1).Cross(force));
+	rootBody->bex.addTorque(id2,(contGeom->contactPoint-contGeom->pos2).Cross(-force));
 }
 
 CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);

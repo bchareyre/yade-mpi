@@ -167,6 +167,7 @@ class Omega : public Singleton<Omega>
 		Omega& operator=(const Omega&);
 
 	FRIEND_SINGLETON(Omega);
+	friend class pyOmega;
 };
 
 

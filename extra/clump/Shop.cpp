@@ -39,7 +39,6 @@
 
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/Momentum.hpp>
-#include<yade/pkg-dem/GlobalStiffness.hpp>
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
 class MetaInteractingGeometry;
@@ -87,18 +86,16 @@ map<string,boost::any> Shop::defaults;
 
 int Shop::Bex::forceIdx=-1;
 int Shop::Bex::momentumIdx=-1;
-int Shop::Bex::globalStiffnessIdx=-1;
 
 void Shop::Bex::initCache(){
 	if(Shop::Bex::forceIdx<0){
 		Shop::Bex::forceIdx=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
 		Shop::Bex::momentumIdx=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
-		Shop::Bex::globalStiffnessIdx=shared_ptr<PhysicalAction>(new GlobalStiffness())->getClassIndex();
 	}
 }
 #ifdef BEX_CONTAINER
-	Vector3r& Shop::Bex::force(body_id_t id,MetaBody* rb){ return rb->bex.force(id);}
-	Vector3r& Shop::Bex::momentum(body_id_t id,MetaBody* rb){ return rb->bex.force(id);}
+	const Vector3r& Shop::Bex::force(body_id_t id,MetaBody* rb){  rb->bex.sync();  return rb->bex.getForce(id);}
+	const Vector3r& Shop::Bex::momentum(body_id_t id,MetaBody* rb){ rb->bex.sync(); return rb->bex.getTorque(id);}
 #else
 	#define __BEX_ACCESS(retType,shopBexMember,bexClass,bexIdx,bexAttribute) retType& Shop::Bex::shopBexMember(body_id_t id,MetaBody* mb){ assert(bexIdx>=0); shared_ptr<PhysicalActionContainer> pac=(mb?mb:Omega::instance().getRootBody().get())->physicalActions; /*if((long)pac->size()<=id) throw invalid_argument("No " #shopBexMember " for #"+lexical_cast<string>(id)+" (max="+lexical_cast<string>(((long)pac->size()-1))+")");*/ return static_pointer_cast<bexClass>(pac->find(id,bexIdx))->bexAttribute; }
 	__BEX_ACCESS(Vector3r,force,Force,forceIdx,force);
@@ -110,10 +107,17 @@ void Shop::Bex::initCache(){
  *
  * Shop::Bex::initCache must have been called at some point. */
 void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, MetaBody* rootBody){
+#ifdef BEX_CONTAINER
+	rootBody->bex.addForce(id1,force);
+	rootBody->bex.addForce(id2,-force);
+	rootBody->bex.addTorque(id1,(contPt-pos1).Cross(force));
+	rootBody->bex.addTorque(id2,-(contPt-pos2).Cross(force));
+#else
 	Shop::Bex::force(id1,rootBody)+=force;
 	Shop::Bex::force(id2,rootBody)-=force;
 	Shop::Bex::momentum(id1,rootBody)+=(contPt-pos1).Cross(force);
 	Shop::Bex::momentum(id2,rootBody)-=(contPt-pos2).Cross(force);
+#endif
 }
 
 
@@ -124,7 +128,12 @@ Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
-		currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
+		#ifdef BEX_CONTAINER
+			LOG_FATAL("No implemented with BEX_CONTAINER yet");
+			abort();
+		#else
+			currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
+		#endif
 	}
 	Real meanF=sumF/rb->bodies->size(); 
 	// get max force on contacts

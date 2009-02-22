@@ -198,6 +198,9 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
 	
+	// sync thread storage of BexContainer
+	ncb->bex.sync();
+	
 	
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

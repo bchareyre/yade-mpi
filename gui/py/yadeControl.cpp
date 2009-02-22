@@ -387,8 +387,8 @@ class pyPhysicalActionContainer{
 class pyBexContainer{
 	public:
 		pyBexContainer(){}
-		python::tuple force_get(long id){ Vector3r& f=Omega::instance().getRootBody()->bex.force(id); return python::make_tuple(f[0],f[1],f[2]); }
-		python::tuple torque_get(long id){ Vector3r& m=Omega::instance().getRootBody()->bex.torque(id); return python::make_tuple(m[0],m[1],m[2]);}
+		python::tuple force_get(long id){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r f=rb->bex.getForce(id); return python::make_tuple(f[0],f[1],f[2]); }
+		python::tuple torque_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getTorque(id); return python::make_tuple(m[0],m[1],m[2]);}
 };
 #endif
 
@@ -459,13 +459,13 @@ class pyOmega{
 	void loadTmp(string mark){ load(":memory:"+mark);}
 	void tmpToFile(string mark, string filename){
 		// FIXME: memSavedSimulations are private, but I don't want to recompile all yade now; move it to public and uncomment these few lines at some point
-		// if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
+		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
 		iostreams::filtering_ostream out;
 		if(boost::algorithm::ends_with(filename,".bz2")) out.push(iostreams::bzip2_compressor());
 		out.push(iostreams::file_sink(filename));
 		if(!out.good()) throw runtime_error("Error while opening file `"+filename+"' for writing.");
 		LOG_INFO("Saving :memory:"<<mark<<" to "<<filename);
-		//out<<OMEGA.memSavedSimulations[":memory:"+mark];
+		out<<OMEGA.memSavedSimulations[":memory:"+mark];
 	}
 
 
