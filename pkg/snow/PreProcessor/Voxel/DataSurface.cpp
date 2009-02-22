@@ -63,6 +63,8 @@ void DataSurface::create_surfaces(t_voxel_data dat, std::set<int>& grains, Voxel
 		return point_plane_dist(p1,s_local_camera) > point_plane_dist(p2,s_local_camera);
 	}
 
+inline Vector3r toVec(qglviewer::Vec v){return Vector3r(v[0],v[1],v[2]);};
+
 void DataSurface::draw(SafeVectors3& axes,SafeVectors3& colors,Config& c,const std::vector<Vector3r>& centers)
 {
 	if(!c.draw_using_surfaces())

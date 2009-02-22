@@ -13,6 +13,8 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 
+inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
+
 bool light_selection(int which)
 {
 	GLfloat matAmbient[4];
