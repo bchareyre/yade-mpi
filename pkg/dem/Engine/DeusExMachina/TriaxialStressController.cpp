@@ -168,11 +168,10 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 
 void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel)
 {
-	Real translation=normal[wall].Dot(static_cast<Force*>( ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force - resultantForce);
+	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce);
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
 	const bool log=false;
-	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force<<", resultantForce="<<resultantForce<<", translation="<<translation);
-	//cerr << "wall="<<wall<<" actualForce="<<static_cast<Force*>(ncb->physicalActions->find(wall_id[wall],ForceClassIndex).get() )->force<<", resultantForce="<<resultantForce<<", deltaF="<<translation << endl;
+	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<getForce(ncb,wall_id[wall])<<", resultantForce="<<resultantForce<<", translation="<<translation);
 	if (translation!=0)
 	{
 	//cerr << "stiffness = " << stiffness[wall];
@@ -318,15 +317,22 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	Real invXSurface = 1.f/(height*depth);
 	Real invYSurface = 1.f/(width*depth);
 	Real invZSurface = 1.f/(width*height);
-		
+	
+	force[wall_bottom]=getForce(ncb,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface;
+	force[wall_top]=   getForce(ncb,wall_id[wall_top]);    stress[wall_top]=   force[wall_top]   *invYSurface;
+	force[wall_left]=  getForce(ncb,wall_id[wall_left]);   stress[wall_left]=  force[wall_left]  *invXSurface;
+	force[wall_right]= getForce(ncb,wall_id[wall_right]);  stress[wall_right]= force[wall_right] *invXSurface;
+	force[wall_front]= getForce(ncb,wall_id[wall_front]);  stress[wall_front]= force[wall_front] *invZSurface;
+	force[wall_back]=  getForce(ncb,wall_id[wall_back]);   stress[wall_back]=  force[wall_back]  *invZSurface;
+
+// remove this, it is in the 6 lines above now
+#if 0	
 	stress[wall_bottom] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_bottom],ForceClassIndex).get() )->force ) * invYSurface;
 	stress[wall_top] = static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_top],ForceClassIndex).get() )->force * invYSurface;
 	stress[wall_left] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_left],ForceClassIndex).get() )->force ) * invXSurface;
 	stress[wall_right] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_right],ForceClassIndex).get() )->force ) * invXSurface;
 	stress[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) * invZSurface;
 	stress[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) * invZSurface;	
-
-
 
 // ==================================================== jf
 	force[wall_bottom] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_bottom],ForceClassIndex).get() )->force );
@@ -336,7 +342,7 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	force[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) ;
 	force[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) ;	
 // ====================================================
-
+#endif
 
  	//cerr << "stresses : " <<  stress[wall_bottom] << " " <<
  //stress[wall_top]<< " " << stress[wall_left]<< " " << stress[wall_right]<< " "
@@ -422,7 +428,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 		Real f;
 		for(  ; bi!=biEnd ; ++bi ) {
 			if ((*bi)->isDynamic) {
-				f= (static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , ForceClassIndex).get() )->force).Length();
+				f=getForce(ncb,(*bi)->getId()).Length();
 				MeanUnbalanced += f;
 				if (f!=0) ++nBodies;
 			}
@@ -436,7 +442,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 		BodyContainer::iterator biEnd = bodies->end();
 		for(  ; bi!=biEnd ; ++bi ) {
 			if ((*bi)->isDynamic) {
-				MaxUnbalanced = std::max((static_cast<Force*>   ( ncb->physicalActions->find( (*bi)->getId() , ForceClassIndex).get() )->force).Length(), MaxUnbalanced);
+				MaxUnbalanced = std::max(getForce(ncb,(*bi)->getId()).Length(),MaxUnbalanced);
 			}
 		}
 		if (MeanForce != 0) MaxUnbalanced = MaxUnbalanced/MeanForce;

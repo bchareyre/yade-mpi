@@ -28,7 +28,7 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	// commulate normal strains from contacts
 	// get max force on contacts
 	Real maxContactF=0;
-	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal) continue;
 		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
 		maxContactF=max(maxContactF,max(BC->Fn,BC->Fs.Length()));
@@ -39,7 +39,7 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	}
 	unbalancedForce=(useMaxForce?maxF:meanF)/maxContactF;
 
-	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal) continue;
 		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
 		BrefcomPhysParams* bpp1(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId1())->physicalParameters.get()));
@@ -183,14 +183,14 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 	if(useFunctor){ // testing the functor
 		if(!functor) functor=shared_ptr<ef2_Spheres_Brefcom_BrefcomLaw>(new ef2_Spheres_Brefcom_BrefcomLaw);
 		functor->logStrain=logStrain;
-		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->isReal) continue;
 			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
 		}
 		return;
 	}
 	
-	FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		if(!I->isReal) continue;
 		BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics);
 		contGeom=YADE_PTR_CAST<SpheresContactGeometry>(I->interactionGeometry);
@@ -328,7 +328,7 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	//vector<pair<short,
 	vector<BodyStats> bodyStats; bodyStats.resize(rootBody->bodies->size());
 	assert(bodyStats[0].nCohLinks==0); // should be initialized by dfault ctor
-	FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		shared_ptr<BrefcomContact> BC=dynamic_pointer_cast<BrefcomContact>(I->interactionPhysics);
 		if(!BC || !BC->isCohesive) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();

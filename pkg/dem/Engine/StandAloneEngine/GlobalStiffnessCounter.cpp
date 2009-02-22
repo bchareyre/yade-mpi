@@ -54,6 +54,9 @@ bool GlobalStiffnessCounter::getSphericalElasticInteractionParameters(const shar
 #endif
 
 void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions){
+	#ifdef BEX_CONTAINER
+		return;
+	#endif
 	FOREACH(const shared_ptr<Interaction>& contact, *interactions){
 		if(!contact->isReal) continue;
 

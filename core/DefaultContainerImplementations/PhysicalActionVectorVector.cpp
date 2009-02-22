@@ -164,6 +164,10 @@ void PhysicalActionVectorVector::prepare(std::vector<shared_ptr<PhysicalAction> 
 // should be always succesfull. if it is not - you forgot to call prepare()
 shared_ptr<PhysicalAction>& PhysicalActionVectorVector::find(unsigned int id , int actionIndex )
 {
+	#ifdef BEX_CONTAINER
+		cerr<<"FATAL: This build of yade uses nex BexContainer instead of PhysicalActionContainer.\nFATAL: However, your simulation still uses PhysicalActionContainer.\nFATAL: Update your code, see backtrace (if in debug build) to find where the old container is used."<<endl;
+		throw std::runtime_error("Deprecated PhysicalActionContainer is not supported in this build!");
+	#endif
 	if( current_size <= id ) // this is very rarely executed, only at beginning.
 	// somebody is accesing out of bounds, make sure he will find, what he needs - a resetted PhysicalAction of his type
 	{

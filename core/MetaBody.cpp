@@ -30,7 +30,7 @@
 #include<unistd.h>
 
 MetaBody::MetaBody() :
-	  Body(),bodies(new BodyRedirectionVector),persistentInteractions(new InteractionVecSet),transientInteractions(new InteractionVecSet),physicalActions(new PhysicalActionVectorVector)
+	  Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecSet), persistentInteractions(interactions),transientInteractions(interactions),physicalActions(new PhysicalActionVectorVector)
 {	
 	engines.clear();
 	initializers.clear();

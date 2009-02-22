@@ -522,7 +522,7 @@ class pyOmega{
 
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
-	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->transientInteractions); }
+	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->interactions); }
 	
 	#ifdef BEX_CONTAINER
 		pyBexContainer actions_get(void){return pyBexContainer();}
@@ -541,11 +541,11 @@ class pyOmega{
 
 	void interactionContainer_set(string clss){
 		MetaBody* rb=OMEGA.getRootBody().get();
-		if(rb->transientInteractions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
+		if(rb->interactions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
 		shared_ptr<InteractionContainer> ic=dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
-		rb->transientInteractions=ic;
+		rb->interactions=ic;
 	}
-	string interactionContainer_get(string clss){ return OMEGA.getRootBody()->transientInteractions->getClassName(); }
+	string interactionContainer_get(string clss){ return OMEGA.getRootBody()->interactions->getClassName(); }
 
 	void bodyContainer_set(string clss){
 		MetaBody* rb=OMEGA.getRootBody().get();

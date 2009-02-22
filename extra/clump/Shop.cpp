@@ -96,13 +96,15 @@ void Shop::Bex::initCache(){
 		Shop::Bex::globalStiffnessIdx=shared_ptr<PhysicalAction>(new GlobalStiffness())->getClassIndex();
 	}
 }
-
-#define __BEX_ACCESS(retType,shopBexMember,bexClass,bexIdx,bexAttribute) retType& Shop::Bex::shopBexMember(body_id_t id,MetaBody* mb){ assert(bexIdx>=0); shared_ptr<PhysicalActionContainer> pac=(mb?mb:Omega::instance().getRootBody().get())->physicalActions; /*if((long)pac->size()<=id) throw invalid_argument("No " #shopBexMember " for #"+lexical_cast<string>(id)+" (max="+lexical_cast<string>(((long)pac->size()-1))+")");*/ return static_pointer_cast<bexClass>(pac->find(id,bexIdx))->bexAttribute; }
-__BEX_ACCESS(Vector3r,force,Force,forceIdx,force);
-__BEX_ACCESS(Vector3r,momentum,Momentum,momentumIdx,momentum);
-__BEX_ACCESS(Vector3r,globalStiffness,GlobalStiffness,globalStiffnessIdx,stiffness);
-__BEX_ACCESS(Vector3r,globalRStiffness,GlobalStiffness,globalStiffnessIdx,Rstiffness);
-#undef __BEX_ACCESS
+#ifdef BEX_CONTAINER
+	Vector3r& Shop::Bex::force(body_id_t id,MetaBody* rb){ return rb->bex.force(id);}
+	Vector3r& Shop::Bex::momentum(body_id_t id,MetaBody* rb){ return rb->bex.force(id);}
+#else
+	#define __BEX_ACCESS(retType,shopBexMember,bexClass,bexIdx,bexAttribute) retType& Shop::Bex::shopBexMember(body_id_t id,MetaBody* mb){ assert(bexIdx>=0); shared_ptr<PhysicalActionContainer> pac=(mb?mb:Omega::instance().getRootBody().get())->physicalActions; /*if((long)pac->size()<=id) throw invalid_argument("No " #shopBexMember " for #"+lexical_cast<string>(id)+" (max="+lexical_cast<string>(((long)pac->size()-1))+")");*/ return static_pointer_cast<bexClass>(pac->find(id,bexIdx))->bexAttribute; }
+	__BEX_ACCESS(Vector3r,force,Force,forceIdx,force);
+	__BEX_ACCESS(Vector3r,momentum,Momentum,momentumIdx,momentum);
+	#undef __BEX_ACCESS
+#endif
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
  *

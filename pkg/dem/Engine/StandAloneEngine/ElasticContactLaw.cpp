@@ -169,13 +169,17 @@ void ElasticContactLaw::action(MetaBody* ncb)
 	////////// PFC3d SlipModel
 	
 			Vector3r f				= currentContactPhysics->normalForce + shearForce;
-			
-	// it will be some macro(	body->physicalActions,	ActionType , bodyId )
-			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
-			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
-			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= c1x.Cross(f);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += c2x.Cross(f);
+			#ifdef BEX_CONTAINER
+				ncb->bex.force(id1)-=f;
+				ncb->bex.force(id2)+=f;
+				ncb->bex.torque(id1)-=c1x.Cross(f);
+				ncb->bex.torque(id2)+=c2x.Cross(f);
+			#else
+				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
+				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
+				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= c1x.Cross(f);
+				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += c2x.Cross(f);
+			#endif
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}

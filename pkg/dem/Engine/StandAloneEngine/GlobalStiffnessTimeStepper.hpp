@@ -26,6 +26,12 @@ class PhysicalAction;
 class GlobalStiffnessTimeStepper : public TimeStepper
 {
 	private :
+	#ifdef BEX_CONTAINER
+		vector<Vector3r> stiffnesses;
+		vector<Vector3r> Rstiffnesses;
+		void computeStiffnesses(MetaBody*); // what GlobalStiffnessCounter used to do
+	#endif
+
 		Real		newDt, previousDt;
 		bool		computedSomething,
 				computedOnce;

@@ -24,32 +24,11 @@ void InteractionPhysicsMetaEngine::explicitAction(shared_ptr<PhysicalParameters>
 void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
-	shared_ptr<InteractionContainer>& persistentInteractions = ncb->persistentInteractions;
-	InteractionContainer::iterator ii    = persistentInteractions->begin();
-	InteractionContainer::iterator iiEnd = persistentInteractions->end(); 
-	for( ; ii!=iiEnd ; ++ii)
-	{
-		const shared_ptr<Interaction> interaction = *ii;
-
+	FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
 		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		if( b1->physicalParameters && b2->physicalParameters )
-			operator()( b1->physicalParameters , b2->physicalParameters , interaction );
-	}
-
-	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
-	ii    = transientInteractions->begin();
-	iiEnd = transientInteractions->end(); 
-	for( ; ii!=iiEnd ; ++ii)
-	{
-		const shared_ptr<Interaction> interaction = *ii;
-		
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-
 		if (interaction->isReal)
-			operator()( b1->physicalParameters , b2->physicalParameters , interaction );
+			operator()(b1->physicalParameters, b2->physicalParameters, interaction);
 	}
 }
 

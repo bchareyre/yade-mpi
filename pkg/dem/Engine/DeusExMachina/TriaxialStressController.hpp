@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/DeusExMachina.hpp>
-#include <Wm3Vector3.h>
+#include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
 #define TR {if (Omega::instance().getCurrentIteration()%100==0) TRACE; }
@@ -31,6 +31,13 @@ class TriaxialStressController : public DeusExMachina
 		int ForceClassIndex;
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		bool firstRun;
+		inline const Vector3r getForce(MetaBody* rb, body_id_t id){
+			#ifdef BEX_CONTAINER
+				return rb->bex.force(id);
+			#else
+				return static_cast<Force*>(rb->physicalActions->find(id,ForceClassIndex).get())->force				
+			#endif
+		}
 		
 		 	
 	public :
