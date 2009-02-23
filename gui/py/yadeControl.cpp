@@ -164,8 +164,33 @@ BASIC_PY_PROXY_TAIL;
 BASIC_PY_PROXY(pyBoundingVolume,BoundingVolume);
 BASIC_PY_PROXY(pyInteractingGeometry,InteractingGeometry);
 
-BASIC_PY_PROXY(pyDeusExMachina,DeusExMachina);
-BASIC_PY_PROXY(pyStandAloneEngine,StandAloneEngine);
+struct pyTimingDeltas{
+	shared_ptr<TimingDeltas> proxee;
+	pyTimingDeltas(shared_ptr<TimingDeltas> td){proxee=td;}
+	python::list data_get(){
+		python::list ret;
+		for(size_t i=0; i<proxee->data.size(); i++){
+			ret.append(python::make_tuple(proxee->labels[i],proxee->data[i].nsec,proxee->data[i].nExec));
+		}
+		return ret;
+	}
+	void reset(){proxee->data.clear(); proxee->labels.clear();}
+};
+
+#define PY_PROXY_TIMING \
+	TimingInfo::delta execTime_get(void){return proxee->timingInfo.nsec;} void execTime_set(TimingInfo::delta t){proxee->timingInfo.nsec=t;} \
+	long execCount_get(void){return proxee->timingInfo.nExec;} void execCount_set(long n){proxee->timingInfo.nExec=n;} \
+	python::object timingDeltas_get(void){return proxee->timingDeltas?python::object(pyTimingDeltas(proxee->timingDeltas)):python::object();}
+
+
+BASIC_PY_PROXY_HEAD(pyDeusExMachina,DeusExMachina)
+	PY_PROXY_TIMING
+BASIC_PY_PROXY_TAIL;
+
+BASIC_PY_PROXY_HEAD(pyStandAloneEngine,StandAloneEngine)
+	PY_PROXY_TIMING
+BASIC_PY_PROXY_TAIL;
+	
 
 python::list anyEngines_get(const vector<shared_ptr<Engine> >&);
 void anyEngines_set(vector<shared_ptr<Engine> >&, python::object);
@@ -200,6 +225,7 @@ BASIC_PY_PROXY_TAIL;
 
 BASIC_PY_PROXY_HEAD(pyEngineUnit,EngineUnit)
 	python::list bases_get(void){ python::list ret; vector<string> t=proxee->getFunctorTypes(); for(size_t i=0; i<t.size(); i++) ret.append(t[i]); return ret; }
+	python::object timingDeltas_get(){return proxee->timingDeltas?python::object(pyTimingDeltas(proxee->timingDeltas)):python::object();}
 BASIC_PY_PROXY_TAIL;
 
 
@@ -244,6 +270,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 				#undef TRY_ADD_FUNCTOR
 			}
 		}
+	PY_PROXY_TIMING
 BASIC_PY_PROXY_TAIL;
 
 python::list anyEngines_get(const vector<shared_ptr<Engine> >& engContainer){
@@ -436,6 +463,9 @@ class pyOmega{
 	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
 	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
+	bool timingEnabled_get(){return TimingInfo::enabled;}
+	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
+
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		OMEGA.startSimulationLoop();
@@ -619,6 +649,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set)
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
 		.add_property("actionContainer",&pyOmega::physicalActionContainer_get,&pyOmega::physicalActionContainer_set)
+		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set)
 		;
 	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
@@ -652,16 +683,28 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("m",&pyBexContainer::torque_get);
 	#endif
 
-	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine");
+	boost::python::class_<pyTimingDeltas>("TimingDeltas",python::init<pyTimingDeltas&>())
+		.def("reset",&pyTimingDeltas::reset)
+		.add_property("data",&pyTimingDeltas::data_get);
+
+	#define TIMING_PROPS(class) .add_property("execTime",&class::execTime_get,&class::execTime_set).add_property("execCount",&class::execCount_get,&class::execCount_set).add_property("timingDeltas",&class::timingDeltas_get)
+
+	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine")
+		TIMING_PROPS(pyStandAloneEngine);
 	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")
 		.add_property("functors",&pyMetaEngine::functors_get,&pyMetaEngine::functors_set)
+		TIMING_PROPS(pyMetaEngine)
 		.def(python::init<string,python::list>());
 	BASIC_PY_PROXY_WRAPPER(pyParallelEngine,"ParallelEngine")
 		.add_property("slaves",&pyParallelEngine::slaves_get,&pyParallelEngine::slaves_set)
 		.def(python::init<python::list>());
-	BASIC_PY_PROXY_WRAPPER(pyDeusExMachina,"DeusExMachina");
+	BASIC_PY_PROXY_WRAPPER(pyDeusExMachina,"DeusExMachina")
+		TIMING_PROPS(pyDeusExMachina);
 	BASIC_PY_PROXY_WRAPPER(pyEngineUnit,"EngineUnit")
+		.add_property("timingDeltas",&pyEngineUnit::timingDeltas_get)
 		.add_property("bases",&pyEngineUnit::bases_get);
+
+	#undef TIMING_PROPS
 
 	BASIC_PY_PROXY_WRAPPER(pyGeometricalModel,"GeometricalModel");
 	BASIC_PY_PROXY_WRAPPER(pyInteractingGeometry,"InteractingGeometry");

@@ -16,6 +16,16 @@ except ImportError: pass
 # c++ implementations for performance reasons
 from yade._utils import *
 
+def resetEngineClocks():
+	for e in O.engines: e.execTime=0
+def engineClockStats():
+	tSum=sum([e.execTime for e in O.engines])
+	for e in O.engines:
+		print e.name.ljust(30),(str(e.execTime/1000)+'ms').rjust(15),'%6.2f%%'%(e.execTime*100./tSum)
+	print '='*53
+	print 'TOTAL'.ljust(30),(str(tSum/1000)+'ms').rjust(15),'100.00%'
+
+
 def saveVars(mark='',loadNow=False,**kw):
 	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
 

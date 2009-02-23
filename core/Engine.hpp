@@ -11,7 +11,8 @@
 #pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
-#include "Omega.hpp"
+#include"Omega.hpp"
+#include<yade/core/Timing.hpp>
 
 class Body;
 
@@ -19,6 +20,8 @@ class Engine : public Serializable
 {
 	public :
 		string label; /* user-definable label, to convenienty retrieve this particular engine instance even if multiple engines of the same type exist */
+		TimingInfo timingInfo; // hihg-level profiling information; not serializable
+		shared_ptr<TimingDeltas> timingDeltas;
 		Engine() {};
 		virtual ~Engine() {};
 	
@@ -28,9 +31,7 @@ class Engine : public Serializable
 		virtual list<string> getNeededBex(){return list<string>();}
 	REGISTER_ATTRIBUTES(/*no base*/,(label));
 	REGISTER_CLASS_AND_BASE(Engine,Serializable);
-
 };
-
 REGISTER_SERIALIZABLE(Engine);
 
 

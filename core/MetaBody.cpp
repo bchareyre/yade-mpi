@@ -10,6 +10,7 @@
 
 #include"MetaBody.hpp"
 #include<yade/core/Engine.hpp>
+#include<yade/core/Timing.hpp>
 #include<yade/core/TimeStepper.hpp>
 
 #include<Wm3Math.h>
@@ -28,6 +29,10 @@
 // POSIX-only
 #include<pwd.h>
 #include<unistd.h>
+#include<time.h>
+
+// should be elsewhere, probably
+bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
 	  Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecSet), persistentInteractions(interactions),transientInteractions(interactions),physicalActions(new PhysicalActionVectorVector)
@@ -77,7 +82,13 @@ void MetaBody::moveToNextTimeStep()
 		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated()) e->action(this); }
 		needsInitializers=false;
 	}
-	FOREACH(const shared_ptr<Engine>& e, engines){ if(e->isActivated()){ e->action(this); }}
+	TimingInfo::delta last=TimingInfo::getNow();
+	FOREACH(const shared_ptr<Engine>& e, engines){
+		if(e->isActivated()){
+			e->action(this);
+			if(TimingInfo::enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
+		}
+	}
 }
 
 shared_ptr<Engine> MetaBody::engineByName(string s){

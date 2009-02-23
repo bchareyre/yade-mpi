@@ -12,10 +12,13 @@
 
 #include<yade/lib-serialization/Serializable.hpp>
 
+class TimingDeltas;
+
 class EngineUnit : public Serializable
 {
 	public: virtual vector<std::string> getFunctorTypes(){throw;}
 		virtual list<string> getNeededBex(){return list<string>();}
+	shared_ptr<TimingDeltas> timingDeltas;
 	REGISTER_CLASS_AND_BASE(EngineUnit,Serializable);
 };
 

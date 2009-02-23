@@ -68,17 +68,6 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel" row="1" column="0">
-                    <property name="name">
-                        <cstring>tlOutputDynlibName</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Output Library Name :</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
-                </widget>
                 <widget class="QLineEdit" row="0" column="1">
                     <property name="name">
                         <cstring>leOutputFileName</cstring>
@@ -93,11 +82,6 @@
                     </property>
                     <property name="pixmap">
                         <pixmap>image0</pixmap>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="1" column="1" rowspan="1" colspan="2">
-                    <property name="name">
-                        <cstring>cbSerializationName</cstring>
                     </property>
                 </widget>
                 <widget class="QLabel" row="2" column="0">
@@ -328,12 +312,6 @@
         <signal>clicked()</signal>
         <receiver>QtFileGeneratorController</receiver>
         <slot>pbSaveClicked()</slot>
-    </connection>
-    <connection>
-        <sender>cbSerializationName</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>QtFileGeneratorController</receiver>
-        <slot>cbSerializationNameActivated(const QString&amp;)</slot>
     </connection>
 </connections>
 <signals>

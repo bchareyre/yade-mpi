@@ -162,7 +162,7 @@ class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
 	}
 	public:
 		bool logStrain;
-		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false){}
+		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false){ /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	FUNCTOR2D(SpheresContactGeometry,BrefcomContact);
 	REGISTER_CLASS_AND_BASE(ef2_Spheres_Brefcom_BrefcomLaw,ConstitutiveLaw);

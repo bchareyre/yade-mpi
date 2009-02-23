@@ -286,7 +286,7 @@ python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real 
 		return python::make_tuple(python::make_tuple(r,h),theta);
 	}
 	else{
-		Real hPeriodStart=(periodStart-theta0)*dH_dTheta;
+		// Real hPeriodStart=(periodStart-theta0)*dH_dTheta;
 		//TRVAR4(hPeriodStart,periodStart,theta0,theta);
 		//Real h=Shop::periodicWrap(pt[axis]-hRef,hPeriodStart,hPeriodStart+2*Mathr::PI*dH_dTheta,&period);
 		theta=Shop::periodicWrap(theta,periodStart,periodStart+2*Mathr::PI,&period);

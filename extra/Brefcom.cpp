@@ -134,6 +134,7 @@ void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const b
 CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
 
 void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
+	//timingDeltas->start();
 	SpheresContactGeometry* contGeom=static_cast<SpheresContactGeometry*>(_geom.get());
 	BrefcomContact* BC=static_cast<BrefcomContact*>(_phys.get());
 
@@ -149,16 +150,19 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 
 	assert(contGeom->hasShear);
+	//timingDeltas->checkpoint("setup");
 	epsN=contGeom->epsN(); epsT=contGeom->epsT();
 	// already in SpheresContactGeometry:
 	// contGeom->relocateContactPoints(); // allow very large mutual rotations
 	if(logStrain && epsN<0){ Real epsN0=epsN; epsN=log(epsN0+1); epsT*=epsN/epsN0; }
+	//timingDeltas->checkpoint("geom");
 	#ifdef BREFCOM_MATERIAL_MODEL
 		BREFCOM_MATERIAL_MODEL
 	#else
 		sigmaN=E*epsN;
 		sigmaT=G*epsT;
 	#endif
+	//timingDeltas->checkpoint("material");
 	if(omega>omegaThreshold){
 		I->isReal=false;
 		const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
@@ -176,6 +180,7 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
 	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->pos1, I->getId2(), contGeom->pos2, rootBody);
+	//timingDeltas->checkpoint("rest");
 }
 
 

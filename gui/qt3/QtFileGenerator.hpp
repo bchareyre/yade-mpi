@@ -40,7 +40,6 @@ class QtFileGenerator : public QtFileGeneratorController, public Factorable
 	public slots :
 		virtual void pbChooseClicked(); 
 		virtual void cbGeneratorNameActivated(const QString& s);
-		virtual void cbSerializationNameActivated(const QString& s);
 		virtual void pbGenerateClicked(); 
 		virtual void pbCloseClicked(); // FIXME - stupid qt3-designer. This is now "Stop" not "Close"
 		virtual void pbLoadClicked();

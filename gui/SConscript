@@ -81,6 +81,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.File('ipython.py','py'),
 		env.File('plot.py','py'),
 		env.File('linterpolation.py','py'),
+		env.File('timing.py','py'),
 		env.File('PythonTCPServer.py','py'),
 	])
 

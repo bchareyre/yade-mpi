@@ -33,17 +33,15 @@ QtFileGenerator::QtFileGenerator ( QWidget * parent , const char * name)
 	setMinimumSize(s);
 	setMaximumSize(QSize(s.width(),32000));	
 	textLabel1->setText("waiting for orders");
-	
+
 	map<string,DynlibDescriptor>::const_iterator di    = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di)
 	{
 		if (Omega::instance().isInheritingFrom((*di).first,"FileGenerator"))
 			cbGeneratorName->insertItem((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"IOFormatManager"))
-			cbSerializationName->insertItem((*di).first);
 	}
-	setSerializationName("XMLFormatManager");
+
 	
 	leOutputFileName->setText("./scene.xml");
 
@@ -69,15 +67,6 @@ QtFileGenerator::~QtFileGenerator()
 
 }
 
-void QtFileGenerator::setSerializationName(string n)
-{
-	for(int i=0 ; i<cbSerializationName->count() ; ++i)
-	{
-		cbSerializationName->setCurrentItem(i);
-		if(cbSerializationName->currentText() == n)
-			return;
-	}
-}
 
 void QtFileGenerator::setGeneratorName(string n)
 {
@@ -93,26 +82,10 @@ void QtFileGenerator::pbChooseClicked()
 {
 	string selectedFilter;
 	std::vector<string> filters;
-	filters.push_back("Yade Binary File (*.yade)");
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getSaveFileName(".", filters , "Choose a file to save", 
-		#ifdef USE_WORKSPACE
-			this->parentWidget()->parentWidget()
-		#else
-			NULL
-		#endif
-	,selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters , "Choose a file to save", NULL,selectedFilter );
 
-	if (fileName.size()!=0 && selectedFilter == "XML Yade File (*.xml)" && fileName!="/" )
-	{
-		setSerializationName("XMLFormatManager");
-		leOutputFileName->setText(fileName);
-	}
-	else if (fileName.size()!=0 && selectedFilter == "Yade Binary File (*.yade)" && fileName!="/" )
-	{
-		setSerializationName("BINFormatManager");
-		leOutputFileName->setText(fileName);
-	}
+	leOutputFileName->setText(fileName);
 }
 
 void QtFileGenerator::displayFileGeneratorAttributes(shared_ptr<FileGenerator>& fg)
@@ -158,21 +131,6 @@ void QtFileGenerator::cbGeneratorNameActivated(const QString& name)
 	displayFileGeneratorAttributes(fg);
 }
 
-void QtFileGenerator::cbSerializationNameActivated(const QString& s)
-{
-	string fileName = leOutputFileName->text();
-	string ext;
-	if( s == "BINFormatManager")
-		ext = ".yade";
-	else if ( s == "XMLFormatManager")
-		ext = ".xml";
-	else ext = ".unknownFormat";
-	if( filesystem::extension(fileName) != "" )
-	{
-		filesystem::path p = filesystem::change_extension(fileName,ext);
-		leOutputFileName->setText(p.string());
-	}
-}
 
 #include <boost/thread/thread.hpp>
 #include <boost/function.hpp>
@@ -188,7 +146,7 @@ void QtFileGenerator::pbGenerateClicked()
 	guiGen.deserialize(m_worker);
 
 	m_worker->setFileName(leOutputFileName->text());
-	m_worker->setSerializationLibrary(cbSerializationName->currentText());
+	m_worker->setSerializationLibrary("XMLFormatManager");
 		
 	m_runner   = shared_ptr<ThreadRunner>(new ThreadRunner(m_worker.get()));
 	m_runner->spawnSingleAction();
@@ -219,13 +177,7 @@ void QtFileGenerator::timerEvent( QTimerEvent* )
 		bool successfullyGenerated=boost::any_cast<bool>(m_worker->getReturnValue());
 		string message=m_worker->message;
 
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string(successfullyGenerated?"SUCCESS:\n\n":"FAILURE!\n\n")+message,
-		#ifdef USE_WORKSPACE
-			this->parentWidget()->parentWidget()
-		#else
-			NULL
-		#endif
-		));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string(successfullyGenerated?"SUCCESS:\n\n":"FAILURE!\n\n")+message,	NULL));
 		md->exec();
 
 		m_worker=shared_ptr<FileGenerator>();
@@ -273,13 +225,7 @@ void QtFileGenerator::pbLoadClicked()
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
-	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a FileGenerator configuration to load", 
-		#ifdef USE_WORKSPACE
-			this->parentWidget()->parentWidget()
-		#else
-			NULL
-		#endif
-		, selectedFilter );
+	string fileName = FileDialog::getOpenFileName(".", filters, "Choose a FileGenerator configuration to load", NULL, selectedFilter );
 	if ( 	   fileName.size()!=0 
 		&& (selectedFilter == "XML Yade File (*.xml)") 
 		&& filesystem::exists(fileName) 
@@ -295,18 +241,11 @@ void QtFileGenerator::pbLoadClicked()
 			if(tmp!="./scene.xml") // this check to avoid resetting data, when loading older file.
 			{
 				leOutputFileName->setText(tmp);
-				setSerializationName(fg->getSerializationLibrary());
 			}
 		} 
 		catch(SerializableError& e) // catching it...
 		{
-			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("FileGenerator failed to load: ") + e.what(),
-			#ifdef USE_WORKSPACE
-				this->parentWidget()->parentWidget()
-			#else
-				NULL
-			#endif	
-				));
+			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("FileGenerator failed to load: ") + e.what(),NULL));
 			md->exec();
 			return;
 		}
@@ -320,19 +259,13 @@ void QtFileGenerator::pbSaveClicked()
 	
 	guiGen.deserialize(fg);
 	fg->setFileName(leOutputFileName->text());
-	fg->setSerializationLibrary(cbSerializationName->currentText());
+	fg->setSerializationLibrary("XMLFormatManager");
 	
 	string selectedFilter;
 	std::vector<string> filters;
 	filters.push_back("XML Yade File (*.xml)");
 	string title = "Save FileGenerator \"" + fg->getClassName() + "\" configuration";
-	string fileName = FileDialog::getSaveFileName(".", filters, title, 
-		#ifdef USE_WORKSPACE
-			this->parentWidget()->parentWidget()
-		#else
-			NULL
-		#endif
-	, selectedFilter );
+	string fileName = FileDialog::getSaveFileName(".", filters, title, NULL, selectedFilter );
 
 	if ( 	   fileName.size()!=0
 		&& (selectedFilter == "XML Yade File (*.xml)") 
@@ -349,13 +282,7 @@ void QtFileGenerator::pbSaveClicked()
 	}
 	else
 	{
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",
-		#ifdef USE_WORKSPACE
-			this->parentWidget()->parentWidget()
-		#else
-			NULL
-		#endif
-		));
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save failed - bad file extension.",NULL));
 		md->exec(); 
 	}
 }
