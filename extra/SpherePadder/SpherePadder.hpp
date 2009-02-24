@@ -12,13 +12,14 @@
 
 #include "TetraMesh.hpp"
 #include "CellPartition.hpp"
+#include "SpherePackingTriangulation/SpherePackingTriangulation.hpp"
 #include <time.h>
 #include <set>
 
 # define BEGIN_FUNCTION(arg) if (trace_functions) cerr << (arg) << "... " << flush
 # define END_FUNCTION        if (trace_functions) cerr << "Done\n" << flush
 
-enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX , VIRTUAL, INSERED_BY_USER, FROM_TRIANGULATION};
+enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX, VIRTUAL, INSERED_BY_USER, FROM_TRIANGULATION};
 
 struct Sphere
 {
@@ -38,6 +39,13 @@ struct neighbor_with_distance
   double       distance;
 };
 
+struct tetra_porosity
+{
+  unsigned int id1,id2,id3,id4;
+  double volume;
+  double void_volume;
+};
+
 class CompareNeighborId
 {
   public:
@@ -54,10 +62,14 @@ class SpherePadder
   protected:
                 
     vector<vector<unsigned int> > combination;
-  
+    SpherePackingTriangulation    triangulation;
+    vector<tetra_porosity>        tetra_porosities;
+    
     double       distance_spheres (unsigned int i, unsigned int j);
     double       distance_centre_spheres(Sphere& S1, Sphere& S2);
     double       distance_vector3 (double V1[],double V2[]);
+    double       spherical_triangle (double point1[],double point2[],double point3[],double point4[]);
+    double       solid_volume_of_tetrahedron(Sphere& S1, Sphere& S2, Sphere& S3, Sphere& S4);
     void         place_at_nodes ();
     void         place_at_segment_middle ();
     void         place_at_faces ();
@@ -68,7 +80,7 @@ class SpherePadder
     
     // 
     unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
-    unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_combi_max = 30000);
+    unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_combi_max = 30);
     
     // Check functions
     void         detect_overlap ();
@@ -104,9 +116,14 @@ class SpherePadder
     void save_mgpost (const char* name);
     void save_Rxyz   (const char* name);
         
+    double virtual_radius_factor;
+    
     SpherePadder();
         
+    // High level pading functions
     void pad_5 ();
+    void tetra_pad();
+
     // void insert_sphere(double x, double y, double z, double R);
     // void densify ();     
     

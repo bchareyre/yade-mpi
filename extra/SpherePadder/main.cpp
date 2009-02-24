@@ -24,16 +24,17 @@ int main()
   
  
   TetraMesh * mesh = new TetraMesh();
-  //mesh->read_gmsh("meshes/test2.msh");      
-  mesh->read("meshes/test.tetra");
+  //mesh->read_gmsh("meshes/test2.msh");
+  mesh->read("meshes/tomo.tetra");
   
   SpherePadder * padder = new SpherePadder();
   padder->plugTetraMesh(mesh);
   //padder->add_spherical_probe(0.7);
         
   padder->pad_5();
-        
- // padder->save_mgpost("mgp.out.001");
+  //padder->tetra_pad();
+  
+  padder->save_mgpost("mgp.out.001");
   // padder->save_Rxyz("spheres.Rxyz");
   return 0;  
 
