@@ -123,14 +123,15 @@ void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contP
 
 Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
-
+	#ifdef BEX_CONTAINER
+		rb->bex.sync();
+	#endif
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
 		#ifdef BEX_CONTAINER
-			LOG_FATAL("No implemented with BEX_CONTAINER yet");
-			abort();
+			currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
 		#else
 			currF=Shop::Bex::force(b->id,rb).Length(); maxF=max(currF,maxF); sumF+=currF;
 		#endif

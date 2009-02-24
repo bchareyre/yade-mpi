@@ -11,6 +11,8 @@
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
+#include<yade/pkg-common/Force.hpp>
+
 
 #define TR {if (Omega::instance().getCurrentIteration()%100==0) TRACE; }
 class PhysicalAction;
@@ -35,7 +37,7 @@ class TriaxialStressController : public DeusExMachina
 			#ifdef BEX_CONTAINER
 				return rb->bex.getForce(id); // needs sync, which is done at the beginning of applyCondition
 			#else
-				return static_cast<Force*>(rb->physicalActions->find(id,ForceClassIndex).get())->force				
+				return static_cast<Force*>(rb->physicalActions->find(id,ForceClassIndex).get())->force;
 			#endif
 		}
 		

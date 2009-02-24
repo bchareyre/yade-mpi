@@ -5,27 +5,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('ParallelEngine',
 		['Engine/ParallelEngine.cpp']),
 
-	env.SharedLibrary('BodyAssocVector',
-		['Container/BodyAssocVector.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
-
-	env.SharedLibrary('InteractionHashMap',
-		['Container/InteractionHashMap.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
-	
-	env.SharedLibrary('InteractionVecMap',
-		['Container/InteractionVecMap.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
-	
-## moved to core/DefaultContainerImplementations
-#	env.SharedLibrary('BodyRedirectionVector',['Container/BodyRedirectionVector.cpp']),
-#	env.SharedLibrary('InteractionVecSet',['Container/InteractionVecSet.cpp']),
-#	env.SharedLibrary('PhysicalActionVectorVector',['Container/PhysicalActionVectorVector.cpp']),
-## still permit linking with that
-	env.SharedLibrary('BodyRedirectionVector',[],LIBS=[]),
-	env.SharedLibrary('InteractionVecSet',[],LIBS=[]),
-	env.SharedLibrary('PhysicalActionVectorVector',[],LIBS=[]),
-
 	env.SharedLibrary('AABB',['DataClass/BoundingVolume/AABB.cpp']),
 	env.SharedLibrary('BoundingSphere',['DataClass/BoundingVolume/BoundingSphere.cpp']),
 	env.SharedLibrary('InteractingBox',['DataClass/InteractingGeometry/InteractingBox.cpp'],),

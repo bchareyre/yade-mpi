@@ -465,6 +465,10 @@ class pyOmega{
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
+	#ifdef BEX_CONTAINER
+		unsigned long bexSyncCount_get(){ return OMEGA.getRootBody()->bex.syncCount;}
+		void bexSyncCount_set(unsigned long count){ OMEGA.getRootBody()->bex.syncCount=count;}
+	#endif
 
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
@@ -650,6 +654,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
 		.add_property("actionContainer",&pyOmega::physicalActionContainer_get,&pyOmega::physicalActionContainer_set)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set)
+		#ifdef BEX_CONTAINER
+			.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set)
+		#endif
 		;
 	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)

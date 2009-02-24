@@ -24,12 +24,19 @@ void InteractionPhysicsMetaEngine::explicitAction(shared_ptr<PhysicalParameters>
 void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
-		shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-		shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-		if (interaction->isReal)
-			operator()(b1->physicalParameters, b2->physicalParameters, interaction);
-	}
+	#ifdef YADE_OPENMP
+		const long size=ncb->transientInteractions->size();
+		#pragma omp parallel for
+		for(long i=0; i<size; i++){
+			const shared_ptr<Interaction>& interaction=(*ncb->transientInteractions)[i];
+	#else
+		FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
+	#endif
+			shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
+			shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
+			if (interaction->isReal)
+				operator()(b1->physicalParameters, b2->physicalParameters, interaction);
+		}
 }
 
 YADE_PLUGIN();

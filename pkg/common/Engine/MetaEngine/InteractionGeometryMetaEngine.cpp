@@ -43,12 +43,19 @@ shared_ptr<Interaction> InteractionGeometryMetaEngine::explicitAction(const shar
 void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
-		const shared_ptr<Body>& b1=(*bodies)[interaction->getId1()];
-		const shared_ptr<Body>& b2=(*bodies)[interaction->getId2()];
-		interaction->isReal =
-			b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
-			operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, interaction);
+	#ifdef YADE_OPENMP
+		const long size=ncb->transientInteractions->size();
+		#pragma omp parallel for
+		for(long i=0; i<size; i++){
+			const shared_ptr<Interaction>& interaction=(*ncb->transientInteractions)[i];
+	#else
+		FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
+	#endif
+			const shared_ptr<Body>& b1=(*bodies)[interaction->getId1()];
+			const shared_ptr<Body>& b2=(*bodies)[interaction->getId2()];
+			interaction->isReal =
+				b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
+				operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, interaction);
 	}
 }
 

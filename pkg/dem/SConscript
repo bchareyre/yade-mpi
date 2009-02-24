@@ -399,9 +399,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ElasticContactLaw',
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -436,9 +433,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ForceRecorder',
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'yade-base',
 			'InteractingSphere',
 			'InteractingBox',
@@ -475,9 +469,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'PositionSnapshot',
 			'ForceSnapshot',
 			'ForceRecorder',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -518,9 +509,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'PositionSnapshot',
 			'ForceSnapshot',
 			'ForceRecorder',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'NewtonsDampedLaw',
@@ -553,9 +541,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ElasticCohesiveLaw',
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -589,9 +574,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
 			'PositionOrientationRecorder',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -623,9 +605,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
 			'PositionOrientationRecorder',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -656,9 +635,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		LIBS=env['LIBS']+['MyTetrahedronLaw',
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingMyTetrahedron',
 			'InteractingSphere',
 			'InteractingBox',
@@ -699,9 +675,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SimpleViscoelasticContactLaw',
 			'SimpleViscoelasticBodyParameters',
 			'ViscoelasticInteraction',
-                        'PhysicalActionVectorVector',
-                        'InteractionVecSet',
-                        'BodyRedirectionVector',
                         'InteractingSphere','InteractingNode', 
                         'CundallNonViscousDamping',
                         'CundallNonViscousDamping',
@@ -737,11 +710,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 #			'MicroMacroAnalyser',
 			'SimpleElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
 			'MakeItFlat',
-			'InteractionVecSet',
-			'InteractionHashMap',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'NewtonsDampedLaw',
@@ -783,10 +752,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ForceRecorder',
 			'CohesiveFrictionalRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'InteractionHashMap',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'InteractingSphere2InteractingSphere4SpheresContactGeometry',
@@ -829,9 +794,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ElasticCohesiveLaw',
 			'MacroMicroElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -905,10 +867,6 @@ env.SharedLibrary('TriaxialTestWater',
         ContactStressRecorder
         MacroMicroElasticRelationships
         ElasticCriterionTimeStepper
-        PhysicalActionVectorVector
-        InteractionVecSet
-	InteractionHashMap
-        BodyRedirectionVector
         InteractingSphere
         InteractingBox
 	NewtonsDampedLaw
@@ -1029,10 +987,6 @@ env.SharedLibrary('HydraulicTest',
 			'ForceRecorder',
 			'CohesiveFrictionalRelationships',
 			'ElasticCriterionTimeStepper',
-			'PhysicalActionVectorVector',
-			'InteractionVecSet',
-			'InteractionHashMap',
-			'BodyRedirectionVector',
 			'InteractingSphere',
 			'InteractingBox',
 			'CundallNonViscousDamping',
@@ -1143,12 +1097,10 @@ env.SharedLibrary('NewtonsDampedLaw',
 			    ,'ViscoelasticInteraction'
 			    ,'SimpleViscoelasticSpheresInteractionRecorder'
 			    ,'GravityEngines'
-			    ,'BodyRedirectionVector'
 			    ,'BoundingVolumeMetaEngine'
 			    ,'InteractingSphere'
 			    ,'InteractionGeometryMetaEngine'
 			    ,'InteractionPhysicsMetaEngine'
-			    ,'InteractionVecSet'
 			    ,'MetaInteractingGeometry'
 			    ,'MetaInteractingGeometry2AABB'
 			    ,'ParticleParameters'
@@ -1156,7 +1108,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 			    ,'PhysicalActionApplier'
 			    ,'PhysicalActionContainerInitializer'
 			    ,'PhysicalActionContainerReseter'
-			    ,'PhysicalActionVectorVector'
 			    ,'PhysicalParametersMetaEngine'
 			    ,'PersistentSAPCollider'
 			    ,'Sphere'
@@ -1166,7 +1117,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 	    ,['PreProcessor/STLImporterTest.cpp']
 	    ,LIBS=env['LIBS']+['AABB'
 				,'STLImporter'
-				,'BodyRedirectionVector'
 				,'BoundingVolumeMetaEngine'
 				,'CundallNonViscousDamping'
 				,'CundallNonViscousDamping'
@@ -1178,7 +1128,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'InteractingSphere'
 				,'InteractionGeometryMetaEngine'
 				,'InteractionPhysicsMetaEngine'
-				,'InteractionVecSet'
 				,'MacroMicroElasticRelationships'
 				,'MetaInteractingGeometry'
 				,'MetaInteractingGeometry2AABB'
@@ -1186,7 +1135,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'PhysicalActionApplier'
 				,'PhysicalActionContainerInitializer'
 				,'PhysicalActionContainerReseter'
-				,'PhysicalActionVectorVector'
 				,'PhysicalParametersMetaEngine'
 				,'SpatialQuickSortCollider'
 				,'Sphere'

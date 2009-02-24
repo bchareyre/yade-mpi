@@ -29,7 +29,7 @@ class BexContainer{
 
 		inline void ensureSynced(){ if(!synced) throw runtime_error("BexContainer not thread-synchronized; call sync() first!"); }
 	public:
-		BexContainer(): size(0), synced(true){
+		BexContainer(): size(0), synced(true),syncCount(0){
 			nThreads=omp_get_max_threads();
 			for(int i=0; i<nThreads; i++){
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
@@ -49,14 +49,16 @@ class BexContainer{
 		inline void sync(){
 			if(synced) return;
 			boost::mutex::scoped_lock lock(globalMutex);
-			// #pragma omp parallel for private(sumF,sumT,thread);
-			for(size_t id=0; id<size; id++){
+			if(synced) return; // if synced meanwhile
+			// #pragma omp parallel for schedule(static)
+			for(long id=0; id<(long)size; id++){
 				Vector3r sumF(Vector3r::ZERO), sumT(Vector3r::ZERO);
-				for(int thread=0; thread<omp_get_max_threads(); thread++){ sumF+=_forceData[thread][id]; sumT+=_torqueData[thread][id];}
+				for(int thread=0; thread<nThreads; thread++){ sumF+=_forceData[thread][id]; sumT+=_torqueData[thread][id];}
 				_force[id]=sumF; _torque[id]=sumT;
 			}
-			synced=true;
+			synced=true; syncCount++;
 		}
+		unsigned long syncCount; 
 
 		/* Change size of containers (number of bodies).
 		 * Locks globalMutex, since on threads modifies other threads' data.
@@ -101,7 +103,7 @@ class BexContainer {
 		size_t size;
 		inline void ensureSize(body_id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
 	public:
-		BexContainer(): size(0){}
+		BexContainer(): size(0),syncCount(0){}
 		const Vector3r& getForce(body_id_t id){ensureSize(id); return _force[id];}
 		void  addForce(body_id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(body_id_t id){ensureSize(id); return _torque[id];}
@@ -113,6 +115,7 @@ class BexContainer {
 		}
 		//! No-op for API compatibility with the threaded version
 		void sync(){return;}
+		unsigned long syncCount;
 		/*! Resize the container; this happens automatically,
 		 * but you may want to set the size beforehand to avoid resizes as the simulation grows. */
 		void resize(size_t newSize){

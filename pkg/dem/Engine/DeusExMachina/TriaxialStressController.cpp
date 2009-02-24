@@ -197,9 +197,10 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 void TriaxialStressController::applyCondition(MetaBody* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-	
-	// sync thread storage of BexContainer
-	ncb->bex.sync();
+	#ifdef BEX_CONTAINER
+		// sync thread storage of BexContainer
+		ncb->bex.sync();
+	#endif
 	
 	
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

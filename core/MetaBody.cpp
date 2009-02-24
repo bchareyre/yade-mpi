@@ -23,7 +23,7 @@
 /* this is meant to improve usability: MetaBody is ready by default (so is Omega by that token)
  * and different type of containers can still be used instead by explicit assignment */
 #include<yade/core/BodyRedirectionVector.hpp>
-#include<yade/core/InteractionVecSet.hpp>
+#include<yade/core/InteractionVecMap.hpp>
 #include<yade/core/PhysicalActionVectorVector.hpp>
 
 // POSIX-only
@@ -35,7 +35,7 @@
 bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
-	  Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecSet), persistentInteractions(interactions),transientInteractions(interactions),physicalActions(new PhysicalActionVectorVector)
+	  Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), persistentInteractions(interactions),transientInteractions(interactions),physicalActions(new PhysicalActionVectorVector)
 {	
 	engines.clear();
 	initializers.clear();
