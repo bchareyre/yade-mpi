@@ -18,9 +18,4 @@ ViscoelasticInteraction::~ViscoelasticInteraction()
 {
 }
 
-void ViscoelasticInteraction::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(cn);
-	REGISTER_ATTRIBUTE(cs);
-}
 YADE_PLUGIN();

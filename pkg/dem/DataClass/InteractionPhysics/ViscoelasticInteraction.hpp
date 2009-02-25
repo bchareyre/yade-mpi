@@ -22,12 +22,9 @@ class ViscoelasticInteraction : public ElasticContactInteraction
 		ViscoelasticInteraction();
 		virtual ~ViscoelasticInteraction();
 	protected :
-		virtual void registerAttributes();
 
-	REGISTER_CLASS_NAME(ViscoelasticInteraction);
-	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
-
-	REGISTER_CLASS_INDEX(ViscoelasticInteraction,InteractionPhysics);
+	REGISTER_ATTRIBUTES(ElasticContactInteraction,(cn)(cs));
+	REGISTER_CLASS_AND_BASE(ViscoelasticInteraction,ElasticContactInteraction);
 
 };
 
