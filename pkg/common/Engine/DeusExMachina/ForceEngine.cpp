@@ -33,7 +33,11 @@ void ForceEngine::registerAttributes()
 void ForceEngine::applyCondition(MetaBody* ncb){
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(ncb->bodies->exists(id));
-		static_pointer_cast<Force>(ncb->physicalActions->find(id,actionParameterForce->getClassIndex()))->force+=force;
+		#ifdef BEX_CONTAINER
+			ncb->bex.addForce(id,force);
+		#else
+			static_pointer_cast<Force>(ncb->physicalActions->find(id,actionParameterForce->getClassIndex()))->force+=force;	
+		#endif
 	}
 }
 

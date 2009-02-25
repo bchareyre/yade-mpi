@@ -111,15 +111,6 @@ string findRecoveryCandidate(filesystem::path dir, string start){
 
 void printHelp()
 {
-	string flags("");
-	flags=flags+"   PREFIX=" PREFIX  "\n";
-	flags=flags+"   SUFFIX=" SUFFIX "\n";
-	#ifdef YADE_DEBUG
-		flags+="   YADE_DEBUG (debug information)\n";
-	#endif
-	#ifdef NDEBUG
-		flags+="   NDEBUG (heavy optimizations, static_casts everywhere, asserts() are no-ops)\n";
-	#endif
 	cerr << 
 "\n" << Omega::instance().yadeVersionName << "\n\
 \n\
@@ -135,8 +126,23 @@ void printHelp()
 \n\
 	--      : pass all remaining options to the selected GUI\n\
 ";
-	if(flags!="")
-		cout << "compilation flags:\n"+ flags +"\n\n";
+	cerr <<
+	"compilation flags:\n"
+		"   PREFIX=" PREFIX  "\n"
+	 	"   SUFFIX=" SUFFIX "\n"
+	#ifdef YADE_DEBUG
+		"   YADE_DEBUG (debug information, crash traces)\n"
+	#endif
+	#ifdef NDEBUG
+		"   NDEBUG (heavy optimizations, no assertions and debugging features)\n"
+	#endif
+	#ifdef YADE_OPENMP
+		"   YADE_OPENMP (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.\n"
+	#endif
+	#ifdef BEX_CONTAINER
+		"   BEX_CONTAINER (uses BexContainer instead of PhysicalActionContainer)\n"
+	#endif
+	"\n\n";
 }
 
 
