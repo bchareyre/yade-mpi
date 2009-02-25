@@ -13,7 +13,7 @@ CREATE_LOGGER(BrefcomGlobalCharacteristics);
 
 void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	//Shop::Bex::initCache();
-	#if BEX_CONTAINER
+	#ifdef BEX_CONTAINER
 		rb->bex.sync();
 	#else
 		throw runtime_error("Brefcom can run only with BexContainer");
@@ -159,9 +159,13 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	/* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& xiShear(BC->xiShear); */
 	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 
+	#define NNAN(a) assert(!isnan(a));
+	#define NNANV(v) assert(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
+
 	assert(contGeom->hasShear);
 	//timingDeltas->checkpoint("setup");
 	epsN=contGeom->epsN(); epsT=contGeom->epsT();
+	NNAN(epsN); NNANV(epsT);
 	// already in SpheresContactGeometry:
 	// contGeom->relocateContactPoints(); // allow very large mutual rotations
 	if(logStrain && epsN<0){ Real epsN0=epsN; epsN=log(epsN0+1); epsT*=epsN/epsN0; }
@@ -181,8 +185,6 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 		LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
 		return;
 	}
-	#define NNAN(a) assert(!isnan(a));
-	#define NNANV(v) assert(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
 	// store Fn (and Fs?), for use with GlobalStiffnessCounter?
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
 

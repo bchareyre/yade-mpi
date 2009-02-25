@@ -19,9 +19,9 @@ def _formatLine(label,time,count,totalTime,level):
 	raw=[]
 	raw.append(label)
 	raw.append(str(count) if count>=0 else '')
-	raw.append((str(time/1000)+u'μs') if time>=0 else '')
+	raw.append((str(time/1000)+u'us') if time>=0 else '')
 	raw.append(('%6.2f%%'%(time*100./totalTime)) if totalTime>0 else '')
-	return ' '.join([
+	return u' '.join([
 		(sp+raw[0]).ljust(_statCols['label']),
 		(raw[1]+negSp).rjust(_statCols['count']),
 		(raw[2]+negSp).rjust(_statCols['time']),
@@ -40,7 +40,7 @@ def _delta_stats(deltas,totalTime,level):
 def _engines_stats(engines,totalTime,level):
 	lines=0; hereLines=0
 	for e in engines:
-		if e.__class__.__name__!='EngineUnit': print _formatLine('"'+e['label']+'"' if e['label'] else e.name,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
+		if e.__class__.__name__!='EngineUnit': print _formatLine(u'"'+e['label']+'"' if e['label'] else e.name,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
 		if e.timingDeltas: 
 			if e.__class__.__name__=='EngineUnit':
 				print _formatLine(e.name,-1,-1,-1,level); lines+=1; hereLines+=1
@@ -48,6 +48,10 @@ def _engines_stats(engines,totalTime,level):
 			else: execTime=e.execTime
 			lines+=_delta_stats(e.timingDeltas,execTime,level+1)
 		if e.__class__.__name__=='MetaEngine': lines+=_engines_stats(e.functors,e.execTime,level+1)
+		if e.__class__.__name__=='InteractionDispatcher':
+			lines+=_engines_stats(e.geomDispatcher.functors,e.execTime,level+1)
+			lines+=_engines_stats(e.physDispatcher.functors,e.execTime,level+1)
+			lines+=_engines_stats(e.constLawDispatcher.functors,e.execTime,level+1)
 		elif e.__class__.__name__=='ParallelEngine': lines+=_engines_stats(e.slave,e.execTime,level+1)
 	if hereLines>1:
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1

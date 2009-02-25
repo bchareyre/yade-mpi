@@ -306,7 +306,7 @@ def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 	mainloop.run()
 	pipeline.set_state(gst.STATE_NULL); pipeline.get_state()
 
-def readParamsFromTable(tableFileLine=None,noTableOk=False,**kw):
+def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw):
 	"""
 	Read parameters from a file and assign them to __builtin__ variables.
 
@@ -346,8 +346,8 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,**kw):
 		for i in range(len(names)):
 			if names[i]=='description': o.tags['description']=values[i]
 			else:
-				if names[i] not in kw.keys(): raise NameError("Parameter `%s' has no default value assigned"%names[i])
-				kw.pop(names[i])
+				if names[i] not in kw.keys() and not unknownOk: raise NameError("Parameter `%s' has no default value assigned"%names[i])
+				if names[i] in kw.keys(): kw.pop(names[i])
 				eq="%s=%s"%(names[i],values[i])
 				exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
 	defaults=[]

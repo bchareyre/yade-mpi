@@ -106,7 +106,7 @@ def getNumCores(): return len([l for l in open('/proc/cpuinfo','r') if l.find('p
 
 parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py\n\n  %prog runs yade simulation multiple times with different parameters.\n  See http://yade.wikia.com/wiki/ScriptParametricStudy for details.')
 parser.add_option('-j',dest='maxJobs',type='int',help="Maximum number of simultaneous jobs to run (default: number of cores, i.e. %d)"%getNumCores(),metavar='NUM',default=getNumCores())
-parser.add_option('--log',dest='logFormat',help='Format of log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.%.log)',metavar='FORMAT')
+parser.add_option('--log',dest='logFormat',help='Format of log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%sys.argv[0][:-6],default=sys.argv[0][:-6],metavar='FILE') ## strip the '-multi' extension
@@ -118,13 +118,23 @@ if len(args)!=2:
 	parser.print_help()
 	sys.exit(1)
 table,simul=args[0:2]
-if not logFormat: logFormat=(simul[:-3] if simul[-3:]=='.py' else simul)+".%.log"
+if not logFormat: logFormat=(simul[:-3] if simul[-3:]=='.py' else simul)+".@.log"
 if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log string must contain at least one of `%', `@'")
 
 print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d jobs at a time."%(executable,simul,nice,logFormat,maxJobs)
 
 ll=['']+open(table,'r').readlines()
 availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1]) and i>1]
+print availableLines
+
+# read actual data
+values={}
+headings=ll[1].split()
+for l in availableLines:
+	val={}
+	for i in range(len(headings)):
+		val[i]=ll[l].split()[i]
+	values[l]=val
 
 print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
 
@@ -145,9 +155,9 @@ else: useLines=availableLines
 print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
 # find column where description is
 try:
-	idColumn=ll[1].split().index('description')
+	idColumn=headings.index('description')
 	idStrings={}
-	for i in useLines: idStrings[i]=ll[i].split()[idColumn] # textual descripion of respective lines 
+	for i in useLines: idStrings[i]=values[i][idColumn] # textual descripion of respective lines 
 	print idStrings
 except ValueError:
 	idColumn=None
@@ -158,7 +168,11 @@ jobs=[]
 for i,l in enumerate(useLines):
 	logFile=logFormat.replace('%',str(l))
 	if idStrings: logFile=logFile.replace('@',idStrings[l])
-	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,nice,executable,simul,logFile),logFile))
+	else: logFile=logFile.replace('@',str(l))
+	envVars=[]
+	for col,head in enumerate(headings):
+		if re.match('^[A-Z_]+[A-Z0-9_]+',head): envVars+=['%s=%s'%(head,values[l][col])]
+	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,logFile),logFile))
 
 print "Job summary:"
 for job in jobs:

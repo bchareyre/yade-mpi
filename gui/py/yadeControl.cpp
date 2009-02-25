@@ -43,6 +43,7 @@
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
+#include<yade/pkg-common/InteractionDispatchers.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
@@ -228,7 +229,6 @@ BASIC_PY_PROXY_HEAD(pyEngineUnit,EngineUnit)
 	python::object timingDeltas_get(){return proxee->timingDeltas?python::object(pyTimingDeltas(proxee->timingDeltas)):python::object();}
 BASIC_PY_PROXY_TAIL;
 
-
 BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 		// additional constructor
 		pyMetaEngine(string clss, python::list functors){init(clss); functors_set(functors);}
@@ -273,11 +273,24 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 	PY_PROXY_TIMING
 BASIC_PY_PROXY_TAIL;
 
+BASIC_PY_PROXY_HEAD(pyInteractionDispatchers,InteractionDispatchers)
+	pyInteractionDispatchers(python::list geomFunctors, python::list physFunctors, python::list constLawFunctors){
+		init("InteractionDispatchers");
+		pyMetaEngine(proxee->geomDispatcher).functors_set(geomFunctors);
+		pyMetaEngine(proxee->physDispatcher).functors_set(physFunctors);
+		pyMetaEngine(proxee->constLawDispatcher).functors_set(constLawFunctors);
+	}
+	pyMetaEngine geomDispatcher_get(void){ return pyMetaEngine(proxee->geomDispatcher);}
+	pyMetaEngine physDispatcher_get(void){ return pyMetaEngine(proxee->physDispatcher);}
+	pyMetaEngine constLawDispatcher_get(void){ return pyMetaEngine(proxee->constLawDispatcher);}
+	PY_PROXY_TIMING
+BASIC_PY_PROXY_TAIL;
+
 python::list anyEngines_get(const vector<shared_ptr<Engine> >& engContainer){
 	python::list ret; 
 	FOREACH(const shared_ptr<Engine>& eng, engContainer){
 		#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
-		APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina); APPEND_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine); 
+		APPEND_ENGINE_IF_POSSIBLE(InteractionDispatchers,pyInteractionDispatchers); APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina); APPEND_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine); 
 		throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine, DeusExMachina and ParallelEngine are supported)");
 	}
 	return ret;
@@ -289,7 +302,7 @@ void anyEngines_set(vector<shared_ptr<Engine> >& engContainer, python::object eg
 	engContainer.clear();
 	for(int i=0; i<len; i++){
 		#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); engContainer.push_back(e.proxee); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
-		PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina); PUSH_BACK_ENGINE_IF_POSSIBLE(pyParallelEngine);
+		PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina); PUSH_BACK_ENGINE_IF_POSSIBLE(pyParallelEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyInteractionDispatchers);
 		throw std::runtime_error("Encountered unknown engine type (unable to extract from python object)");
 	}
 }
@@ -707,6 +720,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def(python::init<python::list>());
 	BASIC_PY_PROXY_WRAPPER(pyDeusExMachina,"DeusExMachina")
 		TIMING_PROPS(pyDeusExMachina);
+	BASIC_PY_PROXY_WRAPPER(pyInteractionDispatchers,"InteractionDispatchers")
+		.def(python::init<python::list,python::list,python::list>())
+		.add_property("geomDispatcher",&pyInteractionDispatchers::geomDispatcher_get)
+		.add_property("physDispatcher",&pyInteractionDispatchers::physDispatcher_get)
+		.add_property("constLawDispatcher",&pyInteractionDispatchers::constLawDispatcher_get)
+		TIMING_PROPS(pyInteractionDispatchers);
 	BASIC_PY_PROXY_WRAPPER(pyEngineUnit,"EngineUnit")
 		.add_property("timingDeltas",&pyEngineUnit::timingDeltas_get)
 		.add_property("bases",&pyEngineUnit::bases_get);
