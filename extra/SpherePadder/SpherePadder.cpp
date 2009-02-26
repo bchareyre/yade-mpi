@@ -52,8 +52,8 @@ SpherePadder::SpherePadder()
    trace_functions = true;
    meshIsPlugged = false;   
    probeIsDefined = false;          
-   ratio = 5.0; rmoy = 0.0;
-   virtual_radius_factor = 5.0;
+   ratio = 2.0; rmoy = 0.0;
+   virtual_radius_factor = 10.0;
    
 /* FIXME
    pour le moment, l'utilisateur ne peut entre qu'un ratio.
@@ -171,9 +171,8 @@ void SpherePadder::pad_5 ()
   place_at_tetra_vertexes ();
   //save_granulo("tetra_vertexes_granulo.dat");
   //detect_overlap();
-  //place_virtual_spheres(); // TODO deplacer dans une fonction 'densify' par exemple
+  //place_virtual_spheres();
   
-
   time_t stop_time = clock();
   
   cerr << "Total number of spheres    = " << sphere.size() << endl;
@@ -185,6 +184,37 @@ void SpherePadder::pad_5 ()
   
   float time_used = (float)(stop_time - start_time) / 1000000.0;
   cerr << "Time used = " << time_used << " s" << endl;      
+}
+
+void SpherePadder::densify()
+{
+  //BEGIN_FUNCTION ("Densify");
+
+  //place_virtual_spheres();
+  for (unsigned int i = 0 ; i < sphere.size() ; i++)
+  {
+	triangulation.insert_node(sphere[i].x, sphere[i].y, sphere[i].z, i, false);
+  }
+
+  tetra_porosity P;
+  if (!tetra_porosities.empty()) tetra_porosities.clear();
+  // if triangulation is empty ...
+  triangulation.init_current_tetrahedron();
+  do
+  {
+	triangulation.current_tetrahedron_get_nodes(P.id1,P.id2,P.id3,P.id4);
+	P.volume = triangulation.current_tetrahedron_get_volume();
+	P.void_volume = P.volume - solid_volume_of_tetrahedron(sphere[P.id1], sphere[P.id2], sphere[P.id3], sphere[P.id4]);
+	tetra_porosities.push_back(P);
+  } while (triangulation.next_tetrahedron());
+  qsort(&(tetra_porosities[0]),tetra_porosities.size(),sizeof(tetra_porosity),compare_tetra_porosity);
+
+  for (unsigned int i = 0 ; i < tetra_porosities.size() ; i++)
+  {
+	cout << tetra_porosities[i].volume  << "\t" << tetra_porosities[i].void_volume << endl;
+  }
+
+  //END_FUNCTION;
 }
 
 void SpherePadder::tetra_pad() // EN TRAVAUX !!!!!!!!!!!!!!!!!!!!!!!!!
@@ -277,15 +307,16 @@ void SpherePadder::save_mgpost (const char* name)
 
     // tmp (bricolage)
     if (i < mesh->node.size())
+	{
       for (unsigned int s = 0 ; s < mesh->segment.size() ; ++s)
-    {
-      if (mesh->segment[s].nodeId[0] == i)
-      {
-	  if (mesh->segment[s].nodeId[1] < mesh->node.size())
-        fmgpost << "    <SPSPx antac=\"" << mesh->segment[s].nodeId[1] + 1 << "\"/>" << endl;
-      }
-    }
-
+	  {
+		if (mesh->segment[s].nodeId[0] == i)
+		{
+		if (mesh->segment[s].nodeId[1] < mesh->node.size())
+		  fmgpost << "    <SPSPx antac=\"" << mesh->segment[s].nodeId[1] + 1 << "\"/>" << endl;
+		}
+	  }
+	}
 
     fmgpost << "   </body>" << endl;
   }
@@ -970,13 +1001,11 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
   k = sphere_virtual_radius;
   sphereId = sphere.size();
   
-  
   for (unsigned int f = 0 ; f < mesh->face.size() ; ++f)
   {
-  
-    if ( mesh->face[f].belongBoundary == true ) 
-    {
-           
+
+    if (mesh->face[f].belongBoundary)
+    {  
       current_tetra_id = mesh->face[f].tetraOwner[0];
       current_tetra = mesh->tetraedre[current_tetra_id];
     
@@ -1139,7 +1168,7 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
       S.tetraOwner = current_tetra_id;
       sphere.push_back(S);     
       partition.add(sphereId++,S.x,S.y,S.z);
-    
+
       ///////////////////////////////////////////// 
     }
 
@@ -1415,7 +1444,7 @@ double SpherePadder::solid_volume_of_tetrahedron(Sphere& S1, Sphere& S2, Sphere&
   
 }
 
-
+// point : x,y,z,R
 double SpherePadder::spherical_triangle (double point1[],double point2[],double point3[],double point4[])
 {
 
@@ -1423,7 +1452,6 @@ double SpherePadder::spherical_triangle (double point1[],double point2[],double 
   if (rayon == 0.0) return 0.0;
   
   double vect12[3], vect13[3], vect14[3];
-  const double pi = 3.14159265;
 
   vect12[0] = point2[0] - point1[0];
   vect12[1] = point2[1] - point1[1];
@@ -1441,6 +1469,10 @@ double SpherePadder::spherical_triangle (double point1[],double point2[],double 
   double norme13 = sqrt( (vect13[0]*vect13[0]) + (vect13[1]*vect13[1]) + (vect13[2]*vect13[2]) ); 
   double norme14 = sqrt( (vect14[0]*vect14[0]) + (vect14[1]*vect14[1]) + (vect14[2]*vect14[2]) ); 
 
+//   if (norme12 == 0.0) cout << "sin(A) == 0.0" << endl;
+//   if (norme13 == 0.0) cout << "sin(B) == 0.0" << endl;
+//   if (norme14 == 0.0) cout << "sin(C) == 0.0" << endl;
+  
   double A = acos( (vect12[0]*vect13[0] + vect12[1]*vect13[1] + vect12[2]*vect13[2]) / (norme13 * norme12));
   double B = acos( (vect12[0]*vect14[0] + vect12[1]*vect14[1] + vect12[2]*vect14[2]) / (norme14 * norme12));
   double C = acos( (vect14[0]*vect13[0] + vect14[1]*vect13[1] + vect14[2]*vect13[2]) / (norme13 * norme14));
@@ -1449,13 +1481,15 @@ double SpherePadder::spherical_triangle (double point1[],double point2[],double 
   double b = acos( (cos(B) - cos(C) * cos(A)) / (sin(C) * sin(A)) );
   double c = acos( (cos(C) - cos(A) * cos(B)) / (sin(A) * sin(B)) );
 
+//   if (sin(A) == 0.0) cout << "sin(A) == 0.0" << endl;
+//   if (sin(B) == 0.0) cout << "sin(B) == 0.0" << endl;
+//   if (sin(C) == 0.0) cout << "sin(C) == 0.0" << endl;
+  
+  double aire_triangle_spherique = rayon * rayon * (a + b + c - M_PI);
 
-  double aire_triangle_spherique = rayon * rayon * (a + b + c - pi);
+  double aire_sphere = 4.0 * M_PI * rayon * rayon;
 
-  double aire_sphere = 4 * pi * rayon * rayon;
-
-  // attention division par zero !!!!
-  return ( (4 * 0.3333333 * pi * rayon * rayon * rayon) * (aire_triangle_spherique / aire_sphere) ) ;
+  return ( (4.0 * 0.3333333 * M_PI * rayon * rayon * rayon) * (aire_triangle_spherique / aire_sphere) ) ;
 
 }
 

@@ -123,6 +123,7 @@ class SpherePadder
     // High level pading functions
     void pad_5 ();
     void tetra_pad();
+	void densify();
 
     // void insert_sphere(double x, double y, double z, double R);
     // void densify ();     
