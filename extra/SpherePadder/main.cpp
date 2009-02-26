@@ -26,7 +26,8 @@ int main()
   TetraMesh * mesh = new TetraMesh();
   //mesh->read_gmsh("meshes/test2.msh");
   mesh->read("meshes/tomo.tetra");
-  
+  //mesh->write_surface_MGP ("tomo.mgp");
+
   SpherePadder * padder = new SpherePadder();
   padder->plugTetraMesh(mesh);
   //padder->add_spherical_probe(0.7);

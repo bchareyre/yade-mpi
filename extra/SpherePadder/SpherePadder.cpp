@@ -1045,6 +1045,8 @@ unsigned int SpherePadder::place_fifth_sphere(unsigned int s1, unsigned int s2, 
 
       if ( k < 0) k = -k;   
       if ( scalar_product < 0) k = -k;
+      // TODO : il suffit de prendre tester la valeur de mesh->face[f].normal_swap
+	  
    
     // First virtual sphere
       /////////////////////////////////////////////   

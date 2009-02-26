@@ -182,6 +182,52 @@ unsigned int nbignored = 0;
 	organize ();
 }
 
+void TetraMesh::write_surface_MGP (const char* name)
+{
+  ofstream fmgpost(name);
+
+  fmgpost << "<?xml version=\"1.0\"?>" << endl
+          << " <mgpost mode=\"3D\">" << endl
+          << "  <state id=\"" << 1
+          << "\" time=\"" << 0.0 << "\">" << endl;
+
+  double xm,ym,zm;
+  unsigned int id1,id2,id3;
+  unsigned int idPolyhedron = 1;
+  double div3 = 0.3333333333333333;
+  for (unsigned int i = 0 ; i < face.size() ; ++i)
+  {
+	if(!(face[i].belongBoundary)) continue;
+	id1 = face[i].nodeId[0];
+	id2 = face[i].nodeId[1];
+	id3 = face[i].nodeId[2];
+	xm = div3 * (node[id1].x + node[id2].x + node[id3].x);
+	ym = div3 * (node[id1].y + node[id2].y + node[id3].y);
+	zm = div3 * (node[id1].z + node[id2].z + node[id3].z);
+
+    fmgpost << "   <body>" << endl;
+    fmgpost << "    <POLYE id=\"" << idPolyhedron++ << "\" r=\"" << min_segment_length << "\">" << endl
+            << "     <position x=\"" << xm + xtrans << "\" y=\"" << ym + ytrans << "\" z=\"" << zm + ztrans << "\"/>" << endl
+            << "     <node x=\"" << node[id1].x - xm << "\" y=\"" << node[id1].y - ym << "\" z=\"" << node[id1].z - zm << "\"/>" << endl
+            << "     <node x=\"" << node[id2].x - xm << "\" y=\"" << node[id2].y - ym << "\" z=\"" << node[id2].z - zm << "\"/>" << endl
+            << "     <node x=\"" << node[id3].x - xm << "\" y=\"" << node[id3].y - ym << "\" z=\"" << node[id3].z - zm << "\"/>" << endl;
+
+     if (face[i].normal_swap)
+       fmgpost << "     <face n1=\"" << 0 << "\" n2=\"" << 2 << "\" n3=\"" << 1 << "\"/>" << endl;
+     else
+       fmgpost << "     <face n1=\"" << 0 << "\" n2=\"" << 1 << "\" n3=\"" << 2 << "\"/>" << endl;
+
+    fmgpost << "    </POLYE>" << endl << flush;
+
+    fmgpost << "   </body>" << endl;
+  }
+  
+  fmgpost << "  </state>" << endl
+          << " </mgpost>" << endl;
+}
+
+
+
 int compareInt (const void * a, const void * b)
 {
 	return ( *(int*)a > *(int*)b ) ? 1 :-1;
@@ -189,8 +235,6 @@ int compareInt (const void * a, const void * b)
 
 void TetraMesh::organize ()
 {
-	//cout << "Organize data... " << flush;
-
 	// Translate all nodes in such a manner that all coordinates are > 0
 	xtrans = node[0].x;
 	ytrans = node[0].y;
@@ -222,11 +266,12 @@ void TetraMesh::organize ()
 	Face F;
 	F.tetraOwner.push_back(0);
 	F.belongBoundary = true;
+    F.normal_swap    = false;
 	for (unsigned int i = 0 ; i < tetraedre.size() ; ++i)
 	{
 		F.tetraOwner[0] = i;
 
-		// Note that nodes are still organized in ascending order
+		// Notice that nodes are still organized in ascending order
 		F.nodeId[0] = tetraedre[i].nodeId[0];
 		F.nodeId[1] = tetraedre[i].nodeId[1];
 		F.nodeId[2] = tetraedre[i].nodeId[2];
@@ -273,6 +318,55 @@ void TetraMesh::organize ()
 	}
 	tmpFace.clear(); // It should be usefull to free memory before the end of the function
 
+    // Definition of unit vectors normal to the boundary faces
+    unsigned int n1,n2,n3,n4;
+    unsigned int s1,s2,s3,s4;
+    Tetraedre current_tetra;
+    double v12[3], v13[3], v14[3], vect_product[3];
+    double scal_product;
+    for (unsigned int f = 0 ; f < face.size() ; ++f)
+    {
+      if (!(face[f].belongBoundary)) continue;
+
+      current_tetra = tetraedre[ face[f].tetraOwner[0] ];
+
+      n1 = current_tetra.nodeId[0];
+      n2 = current_tetra.nodeId[1];
+      n3 = current_tetra.nodeId[2];
+      n4 = current_tetra.nodeId[3];
+
+      s1 = face[f].nodeId[0];
+      s2 = face[f].nodeId[1];
+      s3 = face[f].nodeId[2];
+
+      if      ((n1 != s1) && (n1 != s2) && (n1 != s3)) {s4 = n1;}
+      else if ((n2 != s1) && (n2 != s2) && (n2 != s3)) {s4 = n2;}
+      else if ((n3 != s1) && (n3 != s2) && (n3 != s3)) {s4 = n3;}
+      else                                             {s4 = n4;}
+
+	  v12[0] = node[s2].x - node[s1].x;
+	  v12[1] = node[s2].y - node[s1].y;
+	  v12[2] = node[s2].z - node[s1].z;
+
+	  v13[0] = node[s3].x - node[s1].x;
+	  v13[1] = node[s3].y - node[s1].y;
+	  v13[2] = node[s3].z - node[s1].z;
+
+	  v14[0] = node[s4].x - node[s1].x;
+	  v14[1] = node[s4].y - node[s1].y;
+	  v14[2] = node[s4].z - node[s1].z;
+
+	  vect_product[0] = v12[1]*v13[2] - v12[2]*v13[1];
+	  vect_product[1] = v12[2]*v13[0] - v12[0]*v13[2];
+	  vect_product[2] = v12[0]*v13[1] - v12[1]*v13[0];
+
+	  scal_product = v14[0]*vect_product[0] + v14[1]*vect_product[1] + v14[2]*vect_product[2];
+
+	  if (scal_product > 0.0) face[f].normal_swap = true;
+    }
+
+
+    // Define for each node the faces it belong to
 	for (unsigned int f = 0 ; f < face.size() ; ++f)
 	{
 		node[face[f].nodeId[0]].faceOwner.push_back(f);

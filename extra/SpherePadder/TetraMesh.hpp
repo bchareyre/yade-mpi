@@ -40,6 +40,7 @@ struct Face
 	vector<unsigned int> tetraOwner; // FIXME utile ???
 	vector<unsigned int> sphereId;
 	bool belongBoundary;
+	bool normal_swap;
 };
 
 struct Tetraedre
@@ -52,7 +53,6 @@ struct Tetraedre
 class TetraMesh
 {
 protected:
-    
 
   void organize ();   
   	
@@ -74,5 +74,6 @@ public:
   
   void read      (const char* name);
   void read_gmsh (const char* name);
+  void write_surface_MGP (const char* name);
 };
 
