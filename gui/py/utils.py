@@ -93,14 +93,22 @@ def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dy
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters'):
+def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={}):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	if not color: color=randomColor()
 	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color,'wire':wire,'visible':True})
 	b.mold=InteractingGeometry('InteractingBox',{'extents':extents,'diffuseColor':color})
 	mass=8*extents[0]*extents[1]*extents[2]*density
-	b.phys=PhysicalParameters(physParamsClass,{'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':mass,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)],'young':young,'poisson':poisson,'frictionAngle':frictionAngle})
+
+	V=extents[0]*extents[1]*extents[2]
+	
+	Pp={'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)],'young':young,'poisson':poisson,'frictionAngle':frictionAngle}
+
+	b.phys=PhysicalParameters(physParamsClass)
+	for k in [attr for attr in Pp.keys() if attr in b.phys.keys()]:
+		b.phys[k]=Pp[k]
+
 	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	b['isDynamic']=dynamic
 	return b
