@@ -103,12 +103,18 @@ void affichage()
   
   if (afficheRepere) 
   {
-    glPushMatrix();
+    GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
+
+    glLoadIdentity ();
+    gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+    glRotatef (phi, 1.0f, 0.0f, 0.0f);
+    glRotatef (theta, 0.0f, 0.0f, 1.0f);
+    
     glScalef(2.2 * maxmax * adim,
              2.2 * maxmax * adim,
              2.2 * maxmax * adim);
+    glTranslatef (-xvec, zvec, -yvec);
     glCallList(repere);
-    glPopMatrix();
   }
   
   if (afftime)

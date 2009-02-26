@@ -45,7 +45,9 @@ void disp_points ()
 void disp_boundaries ()
 {
   GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
-
+  char txt[128];
+  int ii;
+      
   glLoadIdentity ();
   gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
   glRotatef (phi, 1.0f, 0.0f, 0.0f);
@@ -86,6 +88,13 @@ void disp_boundaries ()
   glVertex3f (xmaxB * adim, -zmaxB * adim, yminB * adim);
   glEnd ();
 
+  
+  sprintf(txt,"(0,0,0)");
+  glRasterPos3f (xminB * adim, -zminB * adim, yminB * adim);
+  for (ii = 0; txt[ii]; ii++)
+    glutBitmapCharacter (GLUT_BITMAP_9_BY_15, txt[ii]);
+  
+  
   glEnable (GL_LIGHTING);
 }
 
@@ -540,7 +549,7 @@ void disp_force_colorlines ()
   
   if (dynamic_scale)
     {
-    valc_rouge = findMax ((double **) Fn, nbel, state);
+    valc_rouge = findMax ((double **) Fn, nbel, state); /* nbel ??? */
     valc_bleu = findMin ((double **) Fn, nbel, state);
     }
   
@@ -777,6 +786,108 @@ void disp_coord_number ()
     disp_grad_color ();
 
   free(NC);
+
+}
+
+
+void disp_tensile_compressive_forces_2d ()
+{
+  int i, ii, nbtac = 0, current_adh = 0, anta;
+  GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
+  int coul;
+  float save_valc_bleu, save_valc_rouge;
+  double dist;
+  double l, ls, lc, sina, cosa;
+  double val_max = 0.0;
+  double lmin = r_moy * 0.04;
+
+  save_valc_bleu = valc_bleu;
+  save_valc_rouge = valc_rouge;
+
+  if (dynamic_scale)
+    {
+     for (i = 0; i < nbel; i++) nbtac += nbneighbors[i][state];
+     valc_bleu  = findMin ((double **) Fn, nbtac, state); 
+     valc_rouge = findMax ((double **) Fn, nbtac, state);
+    }
+    
+  val_max = (fabs(valc_rouge) > fabs(valc_bleu)) ? fabs(valc_rouge) : fabs(valc_bleu);
+
+  glLineWidth (2.0f);
+  glDisable (GL_LIGHTING);
+  glEnable (GL_DEPTH_TEST);
+  for (i = 0; i < nbel; ++i)
+    if (pres_du_plan (i, dist_section))
+      {
+        glLoadIdentity ();
+        gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+        glRotatef (phi, 1.0f, 0.0f, 0.0f);
+        glRotatef (theta, 0.0f, 0.0f, 1.0f);
+
+        for (ii = 0; ii < nbneighbors[i][state]; ii++)
+          {
+            anta = neighbor[current_adh][state] - 1;
+            
+            dist = sqrt (pow ((x[i][state] - x[anta][state]), 2.0) + pow ((y[i][state] - y[anta][state]), 2.0));
+            cosa = (x[anta][state] - x[i][state]) / dist;
+            sina = (y[anta][state] - y[i][state]) / dist;
+            
+            if (Fn[current_adh][state] > 0.0 && val_max > 0.0)
+              {
+                l = r_moy * ((Fn[current_adh][state]) / (val_max));
+                l = (l > r_moy) ? r_moy : l;
+                l = (l < lmin)  ? lmin  : l;
+                lc = l * cosa;
+                ls = l * sina;
+
+                glColor3f (0.5f, 0.5f, 0.5f);
+
+                glDisable (GL_LIGHTING);
+                glBegin (GL_POLYGON);
+                glVertex3f ((ls + x[i][state]) * adim, lmin*adim, (-lc + y[i][state]) * adim);
+                glVertex3f ((ls + x[anta][state]) * adim, lmin*adim, (-lc + y[anta][state]) * adim);
+                glVertex3f ((-ls + x[anta][state]) * adim, lmin*adim, (lc + y[anta][state]) * adim);
+                glVertex3f ((-ls + x[i][state]) * adim, lmin*adim, (lc + y[i][state]) * adim);
+                glEnd ();
+                
+                if (mgterminal == PS_TERMINAL)
+                  mglinkPS(state, l, i, anta);
+              }
+              else if (Fn[current_adh][state] < 0.0 && val_max > 0.0)
+              {
+                l = r_moy * ((-Fn[current_adh][state]) / (val_max));
+                l = (l > r_moy) ? r_moy : l;
+                l = (l < lmin)  ? lmin  : l;
+                lc = l * cosa;
+                ls = l * sina;
+
+                glColor3f (0.0f, 0.0f, 0.0f);
+                
+                glDisable (GL_LIGHTING);
+                glBegin (GL_POLYGON);
+                glVertex3f ((ls + x[i][state]) * adim, 0.0f, (-lc + y[i][state]) * adim);
+                glVertex3f ((ls + x[anta][state]) * adim, 0.0f, (-lc + y[anta][state]) * adim);
+                glVertex3f ((-ls + x[anta][state]) * adim, 0.0f, (lc + y[anta][state]) * adim);
+                glVertex3f ((-ls + x[i][state]) * adim, 0.0f, (lc + y[i][state]) * adim);
+                glEnd ();
+
+                /*pastille2d(i,anta,2.0*l);*/
+
+                if (mgterminal == PS_TERMINAL)
+                  mglinkPS(state, l, i, anta);
+              }
+             
+            current_adh++;
+          }
+ }
+
+  glEnable (GL_LIGHTING);
+
+  if (affgradlinkcolor)
+    disp_grad_color ();
+
+  valc_bleu = save_valc_bleu;
+  valc_rouge = save_valc_rouge;
 
 }
 
@@ -1467,6 +1578,8 @@ suite:
   valc_rouge = save_valc_rouge;
   
 }
+
+
 
 
 void disp_networks_pos_neg()
@@ -3792,17 +3905,27 @@ void mgorient (double r)
 void pastille2d (int i, int j, double size)
 {
   double xc,yc,extend;
-  xc = 0.5 * (x[i][state]+x[j][state]);
-  yc = 0.5 * (y[i][state]+y[j][state]);
+  double inv_sumR = 1.0/(radius[i][state]+radius[j][state]);
+  double facti = radius[i][state] * inv_sumR;
+  double factj = radius[j][state] * inv_sumR;
+  xc = (factj*x[i][state]+facti*x[j][state]);
+  yc = (factj*y[i][state]+facti*y[j][state]);
   /*zc = 0.5 * (z[i][state]+z[j][state]);*/
   extend = 0.5 * size;
+  int n;
   
   glDisable (GL_LIGHTING);
   glBegin (GL_POLYGON);
+  
+  for (n = 0; n < 360; n += 18)
+        glVertex3f (adim*xc+adim*size * cos ((float)n * MG_DEG2RAD), 0.0f, adim*yc+adim*size * sin ((float)n * MG_DEG2RAD));
+  /*
   glVertex3f((xc-extend)*adim,0.0f,(yc-extend)*adim);
   glVertex3f((xc+extend)*adim,0.0f,(yc-extend)*adim);
   glVertex3f((xc+extend)*adim,0.0f,(yc+extend)*adim);
   glVertex3f((xc-extend)*adim,0.0f,(yc+extend)*adim);
+  */
+  
   glEnd ();
   glEnable (GL_LIGHTING);
   /*mgdisk_plein (r * adim);*/ 

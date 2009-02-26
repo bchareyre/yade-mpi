@@ -32,8 +32,14 @@ void mgpost_init(int argc, char **argv)
       strcpy(num_file_format,"%03d");
       fgziped = MG_TRUE;
       multifiles = MG_TRUE;
+    } else if (!access("./mgp.out.1", F_OK)) {
+      nfile = 1;
+      strcpy(datafilename, "mgp.out.1");
+      strcpy(num_file_format,"%d");
+      fgziped = MG_FALSE;
+      multifiles = MG_TRUE; 
     } else {
-      fprintf(stderr, "Cannot find 'mgp.out.001' or 'mgp.out.001.gz'\n");
+      fprintf(stderr, "Cannot find a readable file such as 'mgp.out.001' or 'mgp.out.001.gz'\n");
       exit(EXIT_FAILURE);
     }
   }
@@ -50,36 +56,36 @@ void mgpost_init(int argc, char **argv)
       strcpy(namebuf, (const char *) argv[1]);
     
     
-    if (!strncmp(namebuf, "mgp.out", 7)) {
-      strcpy(buf, &namebuf[8]);
+      if (!strncmp(namebuf, "mgp.out", 7)) {
+        strcpy(buf, &namebuf[8]);
+        buf[3] = 0;
+        nfile = atoi(buf);
+      
+        strcpy(datafilename, (const char *) namebuf);
+      
+        if (strlen(namebuf) > 11)
+          fgziped = MG_TRUE;
+        else
+          fgziped = MG_FALSE;
+      
+        multifiles = MG_TRUE;
+      }
+
+      strcpy(buf, &namebuf[strlen(namebuf) - 3]);
       buf[3] = 0;
-      nfile = atoi(buf);
-      
-      strcpy(datafilename, (const char *) namebuf);
-      
-      if (strlen(namebuf) > 11)
-        fgziped = MG_TRUE;
-      else
-        fgziped = MG_FALSE;
-      
-      multifiles = MG_TRUE;
-    }
-
-    strcpy(buf, &namebuf[strlen(namebuf) - 3]);
-    buf[3] = 0;
     
-    if (!strcmp(buf, "mgp")) {
-      strcpy(datafilename, (const char *) namebuf);
-      multifiles = MG_FALSE;
-    }
+      if (!strcmp(buf, "mgp")) {
+        strcpy(datafilename, (const char *) namebuf);
+        multifiles = MG_FALSE;
+      }
 
-    strcpy(buf, &namebuf[strlen(namebuf) - 6]);
-    buf[6] = 0;
+      strcpy(buf, &namebuf[strlen(namebuf) - 6]);
+      buf[6] = 0;
     
-    if (!strcmp(buf, "mgp.gz")) {
-      strcpy(datafilename, (const char *) namebuf);
-      multifiles = MG_FALSE;
-    }
+      if (!strcmp(buf, "mgp.gz")) {
+        strcpy(datafilename, (const char *) namebuf);
+        multifiles = MG_FALSE;
+      }
   }
   i = 1;
   while (i < argc) {
@@ -113,9 +119,9 @@ void mgpost_init(int argc, char **argv)
     }
 
     if (!strcmp(argv[i], "-num")) {
-       if      (atoi(argv[i + 1]) == 3) strcpy(num_file_format,"%03d");
-       else if (atoi(argv[i + 1]) == 4) strcpy(num_file_format,"%04d");
-       else                             strcpy(num_file_format,"%d");
+      if      (atoi(argv[i + 1]) == 3) strcpy(num_file_format,"%03d");
+      else if (atoi(argv[i + 1]) == 4) strcpy(num_file_format,"%04d");
+      else                             strcpy(num_file_format,"%d");
     }
 
     if (!strcmp(argv[i], "-i")) {
@@ -257,18 +263,18 @@ void mgpost_init(int argc, char **argv)
       FILE * f;
       f = fopen ("colormap","r");
       if (f != NULL) 
-        {
+      {
         fscanf(f,"%d",&nb_val_couleurs);
         if (nb_val_couleurs >= 80) nb_val_couleurs = 79; 
         for (c = 0; c <= nb_val_couleurs; c++)
-          {
-          fscanf(f,"%f %f %f",&(gradc[c].r),&(gradc[c].v),&(gradc[c].b));
-          }
-        }
-      else
         {
-        fprintf(stderr,"File colormap not found\n");
+          fscanf(f,"%f %f %f",&(gradc[c].r),&(gradc[c].v),&(gradc[c].b));
         }
+      }
+      else
+      {
+        fprintf(stderr,"File colormap not found\n");
+      }
     }   
 
     if (!strcmp(argv[i], "-section")) {
@@ -286,9 +292,8 @@ void mgpost_init(int argc, char **argv)
   }
 }
 
-/* Lecture du fichier 'mgconf' */
-void 
-param_init()
+/* Read the file 'mgconf' */
+void param_init()
 {
   FILE           *rcfile;
   char           *mgtoken[64];
@@ -301,12 +306,12 @@ param_init()
   if (rcfile != NULL) {
     fprintf(stdout, "Reading mgconf ... ");
     while (!feof(rcfile)) {
-      /* reading one line */
+      /* read one line */
       fgets(clin, 256, rcfile);
       if (feof(rcfile))
         break;
       
-      /* decomposition of the line */
+      /* decomposition of the line into tokens */
       s = (char *) strtok(clin, (const char *) delim);
       nbtoken = 0;
       mgtoken[0] = s;
@@ -317,7 +322,7 @@ param_init()
       }
       mgtoken[nbtoken] = 0;
       
-      /* analyze of the line */
+      /* analyze of the tokens */
       i = 0;
       while (i < nbtoken) {
         if (!strncmp((const char *) mgtoken[i], "#", 1))
@@ -326,89 +331,89 @@ param_init()
           break;
         
         if ((!strcmp((const char *) mgtoken[i], "Lfen"))
-            || (!strcmp((const char *) mgtoken[i], "Wwin"))) {
+              || (!strcmp((const char *) mgtoken[i], "Wwin"))) {
           W = atoi(mgtoken[++i]);
-        }
-        if ((!strcmp((const char *) mgtoken[i], "Hfen"))
-            || (!strcmp((const char *) mgtoken[i], "Hwin"))) {
-          H = atoi(mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "2d")) {
-          if (!strcmp((const char *) mgtoken[++i], "yes")) {
-            phi = -90;
-            theta = 0;
-            mode2D = MG_TRUE;
-            glDisable(GL_DEPTH_TEST);
-          } else {
-            if (!multifiles) {
-              phi = PHI_INIT;
-              theta = THETA_INIT;
-            }
-            mode2D = MG_FALSE;
-            glEnable(GL_DEPTH_TEST);
-          }
-        }
-        if (!strcmp((const char *) mgtoken[i], "autoScaleColors")) {
-          if (!strcasecmp((const char *) mgtoken[++i], "yes"))
-            dynamic_scale = MG_TRUE;
-          else
-            dynamic_scale = MG_FALSE;
-        }
-        if (!strcmp((const char *) mgtoken[i], "GridXYZ")) {
-          grillX = atof(mgtoken[++i]);
-          grillY = atof(mgtoken[++i]);
-          grillZ = atof(mgtoken[++i]);
-        }
-        if ((!strcmp((const char *) mgtoken[i], "multiVit"))
-            || (!strcmp((const char *) mgtoken[i], "vlocyFactor"))) {
-          v_adi = atof(mgtoken[++i]);
-        }
-        if ((!strcmp((const char *) mgtoken[i], "vitX"))
-            || (!strcmp((const char *) mgtoken[i], "vlocyX"))) {
-          vxrep = atof(mgtoken[++i]);
-        }
-        if ((!strcmp((const char *) mgtoken[i], "vitY"))
-            || (!strcmp((const char *) mgtoken[i], "vlocyY"))) {
-          vyrep = atof(mgtoken[++i]);
-        }
-        if ((!strcmp((const char *) mgtoken[i], "vitZ"))
-            || (!strcmp((const char *) mgtoken[i], "vlocyZ"))) {
-          vzrep = atof(mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "valcMAX")) {
-          valc_rouge = atof(mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "valcMIN")) {
-          valc_bleu = atof(mgtoken[++i]);
-        }
-        if ((!strcmp((const char *) mgtoken[i], "funRVB"))
-            || (!strcmp((const char *) mgtoken[i], "funRGB"))) {
-          mgfun.r = atof(mgtoken[++i]);
-          mgfun.v = atof(mgtoken[++i]);
-          mgfun.b = atof(mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "bgcolor")) {
-          bg_color = select_color((const char *) mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "fgcolor")) {
-          fg_color = select_color((const char *) mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "fgcolor1")) {
-          fg_color1 = select_color((const char *) mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "fgcolor2")) {
-          fg_color2 = select_color((const char *) mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "section")) {
-          section.a = atof(mgtoken[++i]);
-          section.b = atof(mgtoken[++i]);
-          section.c = atof(mgtoken[++i]);
-          section.d = atof(mgtoken[++i]);
-        }
-        if (!strcmp((const char *) mgtoken[i], "dsec")) {
-          dist_section = atof(mgtoken[++i]);
-        }
-        i++;
+              }
+              if ((!strcmp((const char *) mgtoken[i], "Hfen"))
+                    || (!strcmp((const char *) mgtoken[i], "Hwin"))) {
+                H = atoi(mgtoken[++i]);
+                    }
+                    if (!strcmp((const char *) mgtoken[i], "2d")) {
+                      if (!strcmp((const char *) mgtoken[++i], "yes")) {
+                        phi = -90;
+                        theta = 0;
+                        mode2D = MG_TRUE;
+                        glDisable(GL_DEPTH_TEST);
+                      } else {
+                        if (!multifiles) {
+                          phi = PHI_INIT;
+                          theta = THETA_INIT;
+                        }
+                        mode2D = MG_FALSE;
+                        glEnable(GL_DEPTH_TEST);
+                      }
+                    }
+                    if (!strcmp((const char *) mgtoken[i], "autoScaleColors")) {
+                      if (!strcasecmp((const char *) mgtoken[++i], "yes"))
+                        dynamic_scale = MG_TRUE;
+                      else
+                        dynamic_scale = MG_FALSE;
+                    }
+                    if (!strcmp((const char *) mgtoken[i], "GridXYZ")) {
+                      grillX = atof(mgtoken[++i]);
+                      grillY = atof(mgtoken[++i]);
+                      grillZ = atof(mgtoken[++i]);
+                    }
+                    if ((!strcmp((const char *) mgtoken[i], "multiVit"))
+                          || (!strcmp((const char *) mgtoken[i], "vlocyFactor"))) {
+                      v_adi = atof(mgtoken[++i]);
+                          }
+                          if ((!strcmp((const char *) mgtoken[i], "vitX"))
+                                || (!strcmp((const char *) mgtoken[i], "vlocyX"))) {
+                            vxrep = atof(mgtoken[++i]);
+                                }
+                                if ((!strcmp((const char *) mgtoken[i], "vitY"))
+                                      || (!strcmp((const char *) mgtoken[i], "vlocyY"))) {
+                                  vyrep = atof(mgtoken[++i]);
+                                      }
+                                      if ((!strcmp((const char *) mgtoken[i], "vitZ"))
+                                            || (!strcmp((const char *) mgtoken[i], "vlocyZ"))) {
+                                        vzrep = atof(mgtoken[++i]);
+                                            }
+                                            if (!strcmp((const char *) mgtoken[i], "valcMAX")) {
+                                              valc_rouge = atof(mgtoken[++i]);
+                                            }
+                                            if (!strcmp((const char *) mgtoken[i], "valcMIN")) {
+                                              valc_bleu = atof(mgtoken[++i]);
+                                            }
+                                            if ((!strcmp((const char *) mgtoken[i], "funRVB"))
+                                                  || (!strcmp((const char *) mgtoken[i], "funRGB"))) {
+                                              mgfun.r = atof(mgtoken[++i]);
+                                              mgfun.v = atof(mgtoken[++i]);
+                                              mgfun.b = atof(mgtoken[++i]);
+                                                  }
+                                                  if (!strcmp((const char *) mgtoken[i], "bgcolor")) {
+                                                    bg_color = select_color((const char *) mgtoken[++i]);
+                                                  }
+                                                  if (!strcmp((const char *) mgtoken[i], "fgcolor")) {
+                                                    fg_color = select_color((const char *) mgtoken[++i]);
+                                                  }
+                                                  if (!strcmp((const char *) mgtoken[i], "fgcolor1")) {
+                                                    fg_color1 = select_color((const char *) mgtoken[++i]);
+                                                  }
+                                                  if (!strcmp((const char *) mgtoken[i], "fgcolor2")) {
+                                                    fg_color2 = select_color((const char *) mgtoken[++i]);
+                                                  }
+                                                  if (!strcmp((const char *) mgtoken[i], "section")) {
+                                                    section.a = atof(mgtoken[++i]);
+                                                    section.b = atof(mgtoken[++i]);
+                                                    section.c = atof(mgtoken[++i]);
+                                                    section.d = atof(mgtoken[++i]);
+                                                  }
+                                                  if (!strcmp((const char *) mgtoken[i], "dsec")) {
+                                                    dist_section = atof(mgtoken[++i]);
+                                                  }
+                                                  i++;
       }
     }
     
@@ -421,18 +426,18 @@ param_init()
   
 }
 
-/* Convert a string in color */
+/* Convert a string to a color */
 couleur select_color(const char *col)
 {
   couleur         retcol = fg_color;
   
-  if ((!strcmp(col, "bleu")) || (!strcmp(col, "blue")))
+  if ((!strcmp(col, "bleu"))  || (!strcmp(col, "blue")))
     retcol = mgbleu;
   if ((!strcmp(col, "blanc")) || (!strcmp(col, "white")))
     retcol = mgblanc;
-  if ((!strcmp(col, "vert")) || (!strcmp(col, "green")))
+  if ((!strcmp(col, "vert"))  || (!strcmp(col, "green")))
     retcol = mgvert;
-  if ((!strcmp(col, "noir")) || (!strcmp(col, "black")))
+  if ((!strcmp(col, "noir"))  || (!strcmp(col, "black")))
     retcol = mgnoir;
   if ((!strcmp(col, "jaune")) || (!strcmp(col, "yellow")))
     retcol = mgjaune;
@@ -525,7 +530,7 @@ void processDialogF2()
 
 void processDialogF3()
 {
-  int             val;
+  int val;
   
   val = atoi(dialArea[5].label);
   if ((val > 0) && (val < 100))
@@ -556,7 +561,7 @@ void processDialogF5()
   int c;
   
   for (c=0;c<nbcolgrp;++c)
-    {
+  {
     if (!strcmp(dialArea[2+c*4].state, "SELECTED"))
       colIsShown[c] = MG_TRUE;
     else
@@ -571,7 +576,7 @@ void processDialogF5()
     val = atof(dialArea[5+c*4].label);
     if ((val >= 0.) && (val <= 1.))
       bcolor[c] = val;
-    }
+  }
 }
 
 void specialKey(int touche, int x, int y)
@@ -580,7 +585,7 @@ void specialKey(int touche, int x, int y)
   int             c;
   
   switch (touche) {
-	case GLUT_KEY_F1:
+    case GLUT_KEY_F1:
       
       dialogMode();
       
@@ -606,7 +611,7 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_F2:
+    case GLUT_KEY_F2:
       
       dialogMode();
       
@@ -649,7 +654,7 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_F3:
+    case GLUT_KEY_F3:
       dialogMode();
       
       openDialog(10, 50, 390, 210);
@@ -671,7 +676,7 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_F4:
+    case GLUT_KEY_F4:
       dialogMode();
       
       openDialog(10, 50, 390, 210);
@@ -691,30 +696,30 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
  
-	case GLUT_KEY_F5:
+    case GLUT_KEY_F5:
        
       dialogMode();   
       openDialog(10, 50, 390, 20+nbcolgrp*40+40);
     
-    for(c=0;c<nbcolgrp;++c)
+      for(c=0;c<nbcolgrp;++c)
       {
-      sprintf(str,"%s",colorName[c]);
-      creatCheckBox(20, 70+c*40, (const char *) str, colIsShown[c]);
-      sprintf(str, "%1.2f", rcolor[c]);
-      creatGetText(20, 55+c*40, (const char *) str);
-      sprintf(str, "%1.2f", gcolor[c]);
-      creatGetText(120, 55+c*40, (const char *) str);
-      sprintf(str, "%1.2f", bcolor[c]);
-      creatGetText(220, 55+c*40, (const char *) str);
+        sprintf(str,"%s",colorName[c]);
+        creatCheckBox(20, 70+c*40, (const char *) str, colIsShown[c]);
+        sprintf(str, "%1.2f", rcolor[c]);
+        creatGetText(20, 55+c*40, (const char *) str);
+        sprintf(str, "%1.2f", gcolor[c]);
+        creatGetText(120, 55+c*40, (const char *) str);
+        sprintf(str, "%1.2f", bcolor[c]);
+        creatGetText(220, 55+c*40, (const char *) str);
       }
                
                
       processDialog = processDialogF5;
       glutPostRedisplay();  
     
-    break;
+      break;
     
-	case GLUT_KEY_F12:
+    case GLUT_KEY_F12:
       
       sectionActive = 1 - sectionActive;
       
@@ -727,31 +732,31 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_LEFT:
+    case GLUT_KEY_LEFT:
       
       dist_section -= r_moy;
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_RIGHT:
+    case GLUT_KEY_RIGHT:
       
       dist_section += r_moy;
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_UP:
+    case GLUT_KEY_UP:
       
       section.d += r_moy;
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_DOWN:
+    case GLUT_KEY_DOWN:
       
       section.d -= r_moy;
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_PAGE_DOWN:
+    case GLUT_KEY_PAGE_DOWN:
       
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -761,7 +766,7 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
       
-	case GLUT_KEY_PAGE_UP:
+    case GLUT_KEY_PAGE_UP:
       
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -771,7 +776,7 @@ void specialKey(int touche, int x, int y)
       glutPostRedisplay();
       break;
       
-	default:
+    default:
       break;
   }
   mgterminal = GL_TERMINAL;
@@ -788,88 +793,87 @@ void clavier(unsigned char touche, int ix, int iy)
       glutPostRedisplay();
       break;
       
-	case 'q':		/* quit */
+      case 'q':		/* quit */
       
-      mgpfree();
-      exit(EXIT_SUCCESS);
+        mgpfree();
+        exit(EXIT_SUCCESS);
       
-	case 'r':		/* global frame ON/OFF */
+        case 'r':		/* global frame ON/OFF */
       
-      afficheRepere = 1 - afficheRepere;
-      glutPostRedisplay();
-      break;
+          afficheRepere = 1 - afficheRepere;
+          glutPostRedisplay();
+          break;
       
-	case 'v':		/* polyhedres shadding ON/OFF */
+          case 'v':		/* polyhedron shadding ON/OFF */
       
-      shade_polye = 1 - shade_polye;
-      glutPostRedisplay();
-      break;
+            shade_polye = 1 - shade_polye;
+            glutPostRedisplay();
+            break;
       
-	case 't':		/* display time ON/OFF */
+            case 't':		/* display time ON/OFF */
       
-      afftime = 1 - afftime;
-      glutPostRedisplay();
-      break;
+              afftime = 1 - afftime;
+              glutPostRedisplay();
+              break;
       
-	case 'T':
+    case 'T':
       
       modeTrace = 1 - modeTrace;
       break;
       
-	case 'c':		/* swap color gradient between links and
-      * bodies */
+      case 'c': /* swap color gradient between links and bodies */
       
-      if (affgradcolor != affgradlinkcolor) {
-        affgradcolor = 1 - affgradcolor;
-        affgradlinkcolor = 1 - affgradcolor;
-      } else
-        affgradcolor = MG_TRUE;
-      glutPostRedisplay();
-      break;
+        if (affgradcolor != affgradlinkcolor) {
+          affgradcolor = 1 - affgradcolor;
+          affgradlinkcolor = 1 - affgradcolor;
+        } else
+          affgradcolor = MG_TRUE;
+          glutPostRedisplay();
+          break;
       
-	case 'o':		/* angular position of bodies ON/OFF */
+          case 'o':		/* angular position of bodies ON/OFF */
       
-      orient = 1 - orient;
-      glutPostRedisplay();
-      break;
+            orient = 1 - orient;
+            glutPostRedisplay();
+            break;
       
-	case 'n':		/* Bodies numbers */
+            case 'n':		/* Bodies numbers */
       
-      bodies_numbers = 1 - bodies_numbers;
-      glutPostRedisplay();
-      break;
+              bodies_numbers = 1 - bodies_numbers;
+              glutPostRedisplay();
+              break;
       
-	case 'p':		/* bodies positions */
+              case 'p':		/* bodies positions */
       
-      strcpy(funcname, "Bodies position");
-      rendu = disp_points;
-      disp_current = rendu;
-      affgradlinkcolor = MG_FALSE;
-      glutPostRedisplay();
-      break;
+                strcpy(funcname, "Body positions");
+                rendu = disp_points;
+                disp_current = rendu;
+                affgradlinkcolor = MG_FALSE;
+                glutPostRedisplay();
+                break;
       
-	case 'e':		/* boundaries */
+                case 'e':		/* boundaries */
       
-      strcpy(funcname, "Boundaries     ");
-      rendu = disp_boundaries;
-      disp_current = rendu;
-      glutPostRedisplay();
-      break;
+                  strcpy(funcname, "Boundaries");
+                  rendu = disp_boundaries;
+                  disp_current = rendu;
+                  glutPostRedisplay();
+                  break;
       
-	case ' ':		/* Stop animation */
+                  case ' ':		/* Stop animation */
       
-      glutIdleFunc(NULL);
-      play_again = MG_FALSE;
-      sauve_anim = MG_FALSE;
-      break;
+                    glutIdleFunc(NULL);
+                    play_again = MG_FALSE;
+                    sauve_anim = MG_FALSE;
+                    break;
       
-	case 's':
+    case 's':
       
       antialiased = 1 - antialiased;
       glutPostRedisplay();
       break;
   
-	case 'x':
+    case 'x':
     
       dynamic_scale = 1 - dynamic_scale;
       glutPostRedisplay();
@@ -879,85 +883,85 @@ void clavier(unsigned char touche, int ix, int iy)
         fprintf (stdout,"dynamic scale OFF\n");
       break;
     
-	case 'z':
+    case 'z':
       
-      strcpy(funcname, "Obstacles     ");
+      strcpy(funcname, "Obstacles");
       rendu = disp_obstacles;
       disp_current = rendu;
       glutPostRedisplay();
       break;
       
-	case 'd':		/* Bodies shapes */
+      case 'd':		/* Bodies shapes */
       
-      strcpy(funcname, "Bodies shapes ");
-      rendu = disp_shapes;
-      disp_current = rendu;
-      affgradcolor = MG_FALSE;
-      glutPostRedisplay();
-      break;
+        strcpy(funcname, "Body shapes");
+        rendu = disp_shapes;
+        disp_current = rendu;
+        affgradcolor = MG_FALSE;
+        glutPostRedisplay();
+        break;
       
-	case 'f':
+    case 'f':
       
       v_adi -= 10.0;
       if (v_adi <= 0.0) v_adi = 1.;
       glutPostRedisplay();
       break;
       
-	case 'F':
+    case 'F':
       
       v_adi += 10.0;
       glutPostRedisplay();
       break;
       
-	case '!': /*** Sorties diverses ***/
+      case '!': /*** Sorties diverses ***/
       
 	  /*
-       strcpy(funcname, "#DEV TEST#     ");
-       rendu = disp_quad_strain;
-       if (!affgradcolor)
-       affgradlinkcolor = MG_TRUE;
-       glutPostRedisplay();
-       */
+        strcpy(funcname, "#DEV TEST#     ");
+        rendu = disp_quad_strain;
+        if (!affgradcolor)
+        affgradlinkcolor = MG_TRUE;
+        glutPostRedisplay();
+          */
       
-    {
-      int i,ii,k,anta;
-      double px,py,pz;
-      double unx,uny,unz,invnorm;
-      FILE *out;
+      {
+        int i,ii,k,anta;
+        double px,py,pz;
+        double unx,uny,unz,invnorm;
+        FILE *out;
       
-      out=fopen("PointForce","w");
+        out=fopen("PointForce","w");
       
-      k=0;
-      for (i = 0 ; i < nbel ; i++)
-		for (ii = 0; ii < nbneighbors[i][state]; ii++)
+        k=0;
+        for (i = 0 ; i < nbel ; i++)
+          for (ii = 0; ii < nbneighbors[i][state]; ii++)
         {
           anta = neighbor[k][state] - 1;
           
           if(Fn[k][state] != 0)
           {
-			unx = x[i][state] - x[anta][state];
-			uny = y[i][state] - y[anta][state];
-			unz = z[i][state] - z[anta][state];
-			invnorm=1./sqrt(unx*unx + uny*uny + unz*unz);
+            unx = x[i][state] - x[anta][state];
+            uny = y[i][state] - y[anta][state];
+            unz = z[i][state] - z[anta][state];
+            invnorm=1./sqrt(unx*unx + uny*uny + unz*unz);
             
-			px = x[i][state]-radius[i][state] * unx*invnorm;
-			py = y[i][state]-radius[i][state] * uny*invnorm;
-			pz = z[i][state]-radius[i][state] * unz*invnorm;
+            px = x[i][state]-radius[i][state] * unx*invnorm;
+            py = y[i][state]-radius[i][state] * uny*invnorm;
+            pz = z[i][state]-radius[i][state] * unz*invnorm;
             
-			fprintf(out,"%lg %lg %lg %lg\n",px,py,pz,
+            fprintf(out,"%lg %lg %lg %lg\n",px,py,pz,
                     Fn[k][state]);
           }
           
           k++;
         }
           
-	      fclose(out);
+        fclose(out);
       
-    }
+      }
       
-	  break;
+      break;
       
-	case 'w':
+    case 'w':
       
       sauve_anim = MG_TRUE;
       
@@ -968,22 +972,22 @@ void clavier(unsigned char touche, int ix, int iy)
         glutIdleFunc(play_filetofile);
       } else
         glutIdleFunc(play);
-      break;
+        break;
       
-	case 'h':		/* help */
+        case 'h':		/* help */
       
-      affiche_aide();
-      break;
+          affiche_aide();
+          break;
       
-	case 'i':		/* some informations */
+          case 'i':		/* some informations */
       
-      if ((selectedBody < 0) || (selectedBody > nbel))
-        affiche_infos();
-      else
-        display_infos_on_body(selectedBody);
-      break;
+            if ((selectedBody < 0) || (selectedBody > nbel))
+              affiche_infos();
+            else
+              display_infos_on_body(selectedBody);
+            break;
       
-	case '/':
+    case '/':
       
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -993,7 +997,7 @@ void clavier(unsigned char touche, int ix, int iy)
       glutPostRedisplay();
       break;
       
-	case '*':
+    case '*':
       
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -1003,171 +1007,173 @@ void clavier(unsigned char touche, int ix, int iy)
       glutPostRedisplay();
       break;
       
-	case '0':		/* initial state */
+      case '0':		/* initial state */
       
-      state = 0;
+        state = 0;
       
-      if (multifiles) {
-        nfile = 0;
-        next_state();
-      }
+        if (multifiles) {
+          nfile = 0;
+          next_state();
+        }
         
-		findBoundaries(state, &xminB, &yminB, &zminB,
+        findBoundaries(state, &xminB, &yminB, &zminB,
                        &xmaxB, &ymaxB, &zmaxB);
       
-      glutPostRedisplay();
-      break;
+        glutPostRedisplay();
+        break;
       
-	case '-':		/* previous state */
+        case '-':		/* previous state */
       
-      if ((multifiles) && (nfile > 0))
-        previous_state();
+          if ((multifiles) && (nfile > 0))
+            previous_state();
       
-      if ((state > 0) && (!multifiles))
-        state -= 1;
+          if ((state > 0) && (!multifiles))
+            state -= 1;
         
-		findBoundaries(state, &xminB, &yminB, &zminB,
-                       &xmaxB, &ymaxB, &zmaxB);
+          findBoundaries(state, &xminB, &yminB, &zminB,
+                         &xmaxB, &ymaxB, &zmaxB);
       
-      glutPostRedisplay();
-      break;
+          glutPostRedisplay();
+          break;
       
-	case '+':		/* next state */
+          case '+':		/* next state */
       
-      if (multifiles)
-        next_state();
+            if (multifiles)
+              next_state();
       
-      if ((state < nb_state - 1) && (!multifiles))
-        state += 1;
+            if ((state < nb_state - 1) && (!multifiles))
+              state += 1;
         
-		findBoundaries(state, &xminB, &yminB, &zminB,
-                       &xmaxB, &ymaxB, &zmaxB);
+            findBoundaries(state, &xminB, &yminB, &zminB,
+                           &xmaxB, &ymaxB, &zmaxB);
       
-      glutPostRedisplay();
-      break;
+            glutPostRedisplay();
+            break;
       
-	case '2':		/* 2D mode is forced */
+            case '2':		/* 2D mode is forced */
       
-      mode2D = MG_TRUE;
-      glDisable(GL_DEPTH_TEST);
-      phi = -90;
-      theta = 0;
-      glutPostRedisplay();
-      break;
+              mode2D = MG_TRUE;
+              /*glDisable(GL_DEPTH_TEST);*/
+              phi = -90;
+              theta = 0;
+              glutPostRedisplay();
+              break;
       
-	case '3':		/* 3D mode is forced */
+              case '3':		/* 3D mode is forced */
       
-      mode2D = MG_FALSE;
-      glEnable(GL_DEPTH_TEST);
-      glutPostRedisplay();
-      break;
+                mode2D = MG_FALSE;
+                glEnable(GL_DEPTH_TEST);
+                glutPostRedisplay();
+                break;
       
-	default:
+    default:
       break;
   }
   mgterminal = GL_TERMINAL;
 }
 
-void 
-traitmenu(int value)
+void traitmenu(int value)
 {
   
-  switch (value) {
+  switch (value) 
+  {
     case 0:
       
       mgpfree();
       exit(EXIT_SUCCESS);
+      break;
       
-	case 1:		/* Plan XZ */
-      
+    case 1:	
+        
       phi = 0;
-		theta = 0;
-		glutPostRedisplay();
-		break;
+      theta = 0;
+      glutPostRedisplay();
+      break;
         
-      case 2:		/* Plan XY */
-        
-		phi = -90;
-          theta = 0;
-          glutPostRedisplay();
-          break;
+    case 2:	
           
-        case 3:		/* default view in 3D */
-          
-          phi = PHI_INIT;
-            theta = THETA_INIT;
-            glutPostRedisplay();
-            break;
-            
-          case 4:		/* reload mgconf */
-            
-            param_init();
-              glutReshapeWindow(W, H);
-              glutPostRedisplay();
-              break;
-              
-            case 5:		/* play */
-              
-              if (multifiles) {
-                play_again = MG_TRUE;
-                glutIdleFunc(play_filetofile);
-              } else
-                glutIdleFunc(play);
-                break;
+      phi = -90;
+      theta = 0;
+      glutPostRedisplay();
+      break;
+             
+    case 3:
+                           
+      phi = PHI_INIT;
+      theta = THETA_INIT;
+      glutPostRedisplay();
+      break;
                 
-              case 6:
+    case 4:		   
+                        
+      param_init();
+      glutReshapeWindow(W, H);
+      glutPostRedisplay();
+      break;
                 
-              {
-                char            command[256];
-                if (strcmp(mgpost_editor, "")) {
+    case 5:		    
+                 
+      if (multifiles) 
+      {
+        play_again = MG_TRUE;
+        glutIdleFunc(play_filetofile);
+      } else 
+      { glutIdleFunc(play); }
+      break;
+                
+    case 6:            
+    {
+      char            command[256];
+      if (strcmp(mgpost_editor, "")) {
                   
 #ifdef _MACOSX
-                  strcpy(command, "open -a ");	/* TODO test it */
-                  strcat(command, (const char *) mgpost_editor);
-                  strcat(command, " mgconf");
+        /* TODO test it */
+        strcpy(command, "open -a ");	
+        strcat(command, (const char *) mgpost_editor);
+        strcat(command, " mgconf");
 #endif
                          
 #ifdef _WINDOWS
-                  strcpy(command, "$MGPOST_EDITOR mgconf"); /* TODO test it */
+        /* TODO test it */
+        strcpy(command, "$MGPOST_EDITOR mgconf"); 
 #endif
                                 
 #ifdef _LINUX
-                  strcpy(command, "$MGPOST_EDITOR ./mgconf &");
+        strcpy(command, "$MGPOST_EDITOR ./mgconf &");
 #endif
                                 
-                  system(command);
-                } else fprintf(stdout, "You must define the environment variable MGPOST_EDITOR !\n");
-              }
-break;
+        system(command);
+      } else fprintf(stdout, "You must define the environment variable MGPOST_EDITOR !\n");
+    }
+    break;
 
-case 7:
+    case 7:
   
-		previous_state();
-		break;
+      previous_state();
+      break;
   
-case 8:
+    case 8:
   
-		next_state();
-		break;
+      next_state();
+      break;
   
-case 9:
+    case 9:
   
-		save_mgpview();
-		break;
+      save_mgpview();
+      break;
   
-case 10:
+    case 10:
   
-		load_mgpview();
-		glutReshapeWindow(W, H);
-		break;
+      load_mgpview();
+      glutReshapeWindow(W, H);
+      break;
   
-default:
-		break;
+    default:
+      break;
   }
 }
 
-void 
-traitsubmenu1(int value)
+void traitsubmenu1(int value)
 {
   
   switch (value) {
@@ -1178,21 +1184,21 @@ traitsubmenu1(int value)
       glClearColor(bg_color.r, bg_color.v, bg_color.b, 0.0);
       break;
       
-	case 1:
+    case 1:
       
       bg_color = mgfun;
       glutPostRedisplay();
       glClearColor(bg_color.r, bg_color.v, bg_color.b, 0.0);
       break;
       
-	case 2:
+    case 2:
       
       bg_color = mgnoir;
       glutPostRedisplay();
       glClearColor(bg_color.r, bg_color.v, bg_color.b, 0.0);
       break;
       
-	case 3:
+    case 3:
       
       if (alpha_color == 1.0)
         alpha_color = 0.3;
@@ -1200,73 +1206,72 @@ traitsubmenu1(int value)
         alpha_color = 1.0;
       break;
       
-	case 4:
+    case 4:
       
       sectionActive = 1 - sectionActive;
       break;
       
-	case 5:
+    case 5:
       
       fg_color = mgblanc;
       glutPostRedisplay();
       break;
       
-	case 6:
+    case 6:
       
       fg_color = mgbleu;
       glutPostRedisplay();
       break;
       
-	case 7:
+    case 7:
       
       fg_color = mgnoir;
       glutPostRedisplay();
       break;
       
-	default:
+    default:
       break;
   }
 }
 
-void 
-traitsubmenu2(int value)
+void traitsubmenu2 (int value)
 {
   int             i;
   FILE           *outfile;
   
   switch (value) {
-	case 0:
+    case 0:
       
       strcpy(supfuncname, "None");
       rendu_sup = NULL;
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 1:
+    case 1:
       
       strcpy(supfuncname, "Visibility Network");
       rendu_sup = disp_network;
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 2:
+    case 2:
       
       strcpy(funcname, "Squared View");
       rendu = disp_discrim;
       disp_current = rendu;
       break;
     
-  case 3:
+    case 3:
       
-    strcpy(supfuncname, "Polye forces    ");
-    rendu_sup = disp_special_forces_3d;
-    /*rendu_sup = disp_special_forces_lines_3d;*/
-    if (!affgradcolor) affgradlinkcolor = MG_TRUE;
-    break;
+      strcpy(supfuncname, "Polyhedron forces");
+      rendu_sup = disp_special_forces_3d;
+      /*rendu_sup = disp_special_forces_lines_3d;*/
+      if (!affgradcolor) affgradlinkcolor = MG_TRUE;
+      break;
       
-	case 4:
+    case 4:
       
-      strcpy(supfuncname, "Tangential Strength");
+      strcpy(supfuncname, "Tangential forces");
       sep_networks = MG_FALSE;
       
       if (mode2D)
@@ -1275,30 +1280,30 @@ traitsubmenu2(int value)
         rendu_sup = disp_tangential_strength_3d;
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
-		break;
+      break;
       
-	case 5:
+    case 5:
       
-      strcpy(supfuncname, "Normal Positive Strength");
+      strcpy(supfuncname, "Normal Positive forces");
       sep_networks = MG_FALSE;
       
       if (mode2D)
         rendu_sup = disp_positive_normal_strength_2d;
       else
-        {
+      {
         if (more_forces)
           rendu_sup = disp_positive_normal_strength_3d_v2; 
         else
           rendu_sup = disp_positive_normal_strength_3d;
-        }
+      }
         
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
-		break;
+      break;
       
-	case 6:
+    case 6:
       
-      strcpy(supfuncname, "Normal Negative Strength");
+      strcpy(supfuncname, "Normal Negative forces");
       sep_networks = MG_FALSE;
       
       if (mode2D)
@@ -1308,22 +1313,25 @@ traitsubmenu2(int value)
       
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
-		break;
+      break;
     
- 	case 7:
+    case 7:
     
-    strcpy(supfuncname, "Compr. / Tens. ");
+      strcpy(supfuncname, "Compressive-Tensile forces");
     
-    if (mode2D)
-      rendu_sup = NULL;
-    else
-      rendu_sup = disp_networks_pos_neg;
+      if (mode2D)
+      {
+        rendu_sup = disp_tensile_compressive_forces_2d;
+        glEnable(GL_DEPTH_TEST);
+      }
+      else
+        rendu_sup = disp_networks_pos_neg;
     
-    if (!affgradcolor)
-      affgradlinkcolor = MG_TRUE;
+      if (!affgradcolor)
+        affgradlinkcolor = MG_TRUE;
       break;   
       
-	case 8:
+    case 8:
       
       strcpy(funcname, "Angular Velocities");
       rendu = disp_angular_vlocy_2d;
@@ -1332,14 +1340,14 @@ traitsubmenu2(int value)
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 9:
+    case 9:
       
       strcpy(supfuncname, "Sticked Links");
       rendu_sup = disp_stick_links;
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 10:
+    case 10:
       
       strcpy(funcname, "None");
       rendu = NULL;
@@ -1347,7 +1355,7 @@ traitsubmenu2(int value)
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 11:
+    case 11:
       
       strcpy(funcname, "Velocity Magnitudes");
       rendu = disp_vlocy_magnitude;
@@ -1356,7 +1364,7 @@ traitsubmenu2(int value)
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 12:
+    case 12:
       
       strcpy(supfuncname, "Velocity Field");
       rendu_sup = disp_vlocy_field;
@@ -1364,7 +1372,7 @@ traitsubmenu2(int value)
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 13:
+    case 13:
       
       strcpy(funcname, "Particle Outlines");
       rendu = disp_outline;
@@ -1378,47 +1386,47 @@ traitsubmenu2(int value)
       affgraph_func =plot_hist_fn;
       break;
       
-	case 15:
+    case 15:
       
       affiche_infos();
       break;
       
-	case 16:
+    case 16:
       
       affgraphic = MG_TRUE;      
       affgraph_func = plot_fn_vs_ft;
       break;
       
-	case 17:
+    case 17:
       
       strcpy(supfuncname, "Shear Velocities");
       rendu_sup = disp_shear_vlocy_2d;
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
-		break;
+      break;
       
-	case 18:
+    case 18:
       
       tool_surf_vol();
       break;
     
-  case 19:
+    case 19:
     
-    strcpy(funcname, "Family Colors");
-    rendu = disp_colors;
-    disp_current = rendu;
-    affgradlinkcolor = MG_FALSE;
-    break;
+      strcpy(funcname, "Family Colors");
+      rendu = disp_colors;
+      disp_current = rendu;
+      affgradlinkcolor = MG_FALSE;
+      break;
     
     case 20:
       
-      strcpy(supfuncname, "Colorlines");
+      strcpy(supfuncname, "Color-lines");
       rendu_sup = disp_force_colorlines;
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
       break;
     
-	case 21:
+    case 21:
       
       strcpy(funcname, "Distance from Origine");
       rendu = disp_dist_ref;
@@ -1427,17 +1435,17 @@ traitsubmenu2(int value)
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 22:
+    case 22:
       
       tool_anisotropy(state, 0, NULL);
       break;
       
-	case 23:
+    case 23:
       
-	  /*tool_contacts_direction();*/
+      /*tool_contacts_direction();*/
       break;
       
-	case 24:
+    case 24:
       
       outfile = fopen("anisotropy.dat", "w");
       
@@ -1476,10 +1484,10 @@ traitsubmenu2(int value)
         next_state();
       }
         
-		fclose(outfile);
+      fclose(outfile);
       break;
       
-	case 25:
+    case 25:
       
       strcpy(supfuncname, "Torques");
       
@@ -1489,26 +1497,26 @@ traitsubmenu2(int value)
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
           
-          break;
+      break;
       
-	case 26:
+    case 26:
       
       info_gap();
       break;
     
-  case 27:
+    case 27:
     
-    affgraphic = MG_TRUE;      
-    affgraph_func = plot_granulo;   
-    break;
+      affgraphic = MG_TRUE;      
+      affgraph_func = plot_granulo;   
+      break;
 
-        case 28:
-        strcpy(supfuncname, "Cracks");
-        rendu_sup = disp_cracks;
-        affgradlinkcolor = MG_FALSE;
-         break; 
+    case 28:
+      strcpy(supfuncname, "Cracks");
+      rendu_sup = disp_cracks;
+      affgradlinkcolor = MG_FALSE;
+      break; 
      
-	case 29:
+    case 29:
       
       strcpy(supfuncname, "Local Liquid Volume");
       rendu_sup = disp_Vliq_3d;
@@ -1517,7 +1525,7 @@ traitsubmenu2(int value)
         affgradlinkcolor = MG_TRUE;
       break;
       
-	case 30:
+    case 30:
       
       affgraphic = MG_TRUE;
       
@@ -1531,9 +1539,9 @@ traitsubmenu2(int value)
         else if (modDirCon == 3)
           affgraph_func = plot_distri_TCT_3d;			
       }
-		break;
+      break;
       
-	case 31:
+    case 31:
       
       strcpy(supfuncname, "Separate Networks");
       sep_networks = MG_TRUE;
@@ -1545,9 +1553,9 @@ traitsubmenu2(int value)
       
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
-		break;
+      break;
       
-	case 32:
+    case 32:
       
       strcpy(funcname, "Coordination Number");
       rendu = disp_coord_number;
@@ -1556,9 +1564,9 @@ traitsubmenu2(int value)
       affgradlinkcolor = MG_FALSE;
       break;
       
-	case 33:
+    case 33:
       
-      strcpy(supfuncname, "Strength");
+      strcpy(supfuncname, "Forces");
       
       if (mode2D)
         rendu_sup = disp_strength_3d;	/* !!!! */
@@ -1568,19 +1576,19 @@ traitsubmenu2(int value)
       if (!affgradcolor)
         affgradlinkcolor = MG_TRUE;
         
-		break;
+      break;
     
     
-  case 34:
+    case 34:
     
-    strcpy(funcname, "Geolayers");
-    rendu = disp_geo_layers;
-    disp_current = rendu;
-    affgradcolor = MG_TRUE;
-    affgradlinkcolor = MG_FALSE;
-    break;
+      strcpy(funcname, "Geolayers");
+      rendu = disp_geo_layers;
+      disp_current = rendu;
+      affgradcolor = MG_TRUE;
+      affgradlinkcolor = MG_FALSE;
+      break;
     
-	case 35:
+    case 35:
       
     {
       int i,k,l;
@@ -1591,28 +1599,28 @@ traitsubmenu2(int value)
       k=0;
       for (i=0;i<nbel;i++)
         for (l=0;l<nbneighbors[i][state];l++)
-		{
-		  if(Fn[k][state]!=0.0)
-            fprintf(f,"%lg %lg %lg %lg\n",Fn[k][state],Ft[k][state],Fs[k][state],
-                    sqrt(Ft[k][state]*Ft[k][state]+Fs[k][state]*Fs[k][state]));
-		  k++;
-		}
+      {
+        if(Fn[k][state]!=0.0)
+          fprintf(f,"%lg %lg %lg %lg\n",Fn[k][state],Ft[k][state],Fs[k][state],
+                  sqrt(Ft[k][state]*Ft[k][state]+Fs[k][state]*Fs[k][state]));
+        k++;
+      }
           
-          fclose(f);
+      fclose(f);
     }
       
-	  break;
-    
-  case 36:
-    
-    strcpy(funcname, "Sizes          ");
-    rendu = disp_sizes;
-    disp_current = rendu;
-    affgradcolor = MG_TRUE;
-    affgradlinkcolor = MG_FALSE;
     break;
+    
+    case 36:
+    
+      strcpy(funcname, "Sizes");
+      rendu = disp_sizes;
+      disp_current = rendu;
+      affgradcolor = MG_TRUE;
+      affgradlinkcolor = MG_FALSE;
+      break;
       
-	default:
+    default:
       break;
   }
   glutPostRedisplay();
@@ -1620,7 +1628,7 @@ traitsubmenu2(int value)
 }
 
 void 
-traitsubmenu4(int value)
+    traitsubmenu4(int value)
 {
   
   switch (value) {
@@ -1636,7 +1644,7 @@ traitsubmenu4(int value)
       fprintf(stdout, "Format: %dx%d\n", W, H);
       writetiff(fname, mgpost_string, 0, 0, W, H, COMPRESSION_PACKBITS);
     }
-      break;	  
+    break;	  
 #endif
                   
 #ifdef _WITH_PNG
@@ -1650,10 +1658,10 @@ traitsubmenu4(int value)
       fprintf(stdout, "Format: %dx%d\n", W, H);
       writepng(fname, mgpost_string, 0, 0, W, H);
     }
-      break;
+    break;
 #endif
       
-      case 1:
+    case 1:
       
       sauve_anim = MG_TRUE;
       
@@ -1666,9 +1674,9 @@ traitsubmenu4(int value)
       } else
         glutIdleFunc(play);
       
-      break;
+        break;
       
-	case 2:
+    case 2:
       
     {
       GLint           buffsize = 0, gl2ps_state = GL2PS_OVERFLOW;
@@ -1714,20 +1722,20 @@ traitsubmenu4(int value)
       
       fprintf(stdout, "Picture saved in 'shot.eps'\n");
     }
-      break;
+    break;
       
-	case 3:
+    case 3:
       
       fprintf(stderr, "pas disponible dans cette version !!\n");
       break;
       
-	case 4:
+    case 4:
       
       exportCIN();
       fprintf(stdout, "File 'export.cin' created\n");
       break;
       
-	case 5:
+    case 5:
       
       povfile = fopen("./shot.pov", "w");
       mgterminal = POV_TERMINAL;
@@ -1735,9 +1743,9 @@ traitsubmenu4(int value)
       fprintf(povfile, "#include \"stones.inc\"\n\n");
       
       /*
-       * MEMO pour le moment c'est pas top mais �a fonctionne... il
-       * faudrait le reecrire plus proprement !
-       */
+      * MEMO pour le moment c'est pas top mais �a fonctionne... il
+      * faudrait le reecrire plus proprement !
+      */
       fprintf(povfile, "camera {\n  location <%g, %g, %g>\n",
               distance * cos((double) (90 - phi) * MG_DEG2RAD) * cos((double) (theta + 90) * MG_DEG2RAD) / adim,
               distance * sin((double) (90 - phi) * MG_DEG2RAD) / adim,
@@ -1761,7 +1769,7 @@ traitsubmenu4(int value)
       fprintf(stdout, "Picture saved in 'shot.pov'\n");
       break;
       
-	case 6:
+    case 6:
       
       psfile = fopen("./shot.eps", "w");
       
@@ -1781,18 +1789,18 @@ traitsubmenu4(int value)
       if (rendu_sup != NULL)
         rendu_sup();
         
-		fclose(psfile);
+      fclose(psfile);
       
       mgterminal = GL_TERMINAL;
       
       fprintf(stdout, "Picture saved in 'shot.eps'\n");
       break;
       
- 	case 7:
+    case 7:
     
-    export_Rxy();
-    fprintf(stdout, "File 'particles.Rxy' created\n");
-    break;     
+      export_Rxy();
+      fprintf(stdout, "File 'particles.Rxy' created\n");
+      break;     
       
     case 8:
     
@@ -1800,7 +1808,7 @@ traitsubmenu4(int value)
       fprintf(stdout, "File 'deplacements.txt' created\n");
       break; 
     
-	default:
+    default:
       break;
   }
 }
@@ -1808,7 +1816,7 @@ traitsubmenu4(int value)
 void traitsubmenuFluid (int value)
 {
   switch (value) 
-    {
+  {
     case 0:
       
       rendu_fluid = NULL;
@@ -1836,11 +1844,11 @@ void traitsubmenuFluid (int value)
 
     default:
       break;
-    }
+  }
 }
 
 void 
-processHits(GLint hits, GLuint buffer[])
+    processHits(GLint hits, GLuint buffer[])
 {
   GLuint          choose = -1;
   
@@ -1862,7 +1870,7 @@ processHits(GLint hits, GLuint buffer[])
 }
 
 void 
-souris(int bouton, int state, int x, int y)
+    souris(int bouton, int state, int x, int y)
 {
   GLuint          selectBuf[BUFSIZE];
   GLint           hits;
@@ -1871,6 +1879,9 @@ souris(int bouton, int state, int x, int y)
   modifiers = glutGetModifiers();
   
   if (modifiers == GLUT_ACTIVE_CTRL) {
+    GLint nb_subdiv_sphere_backup = nb_subdiv_sphere;
+    GLint nb_subdiv_sphere_2_backup = nb_subdiv_sphere_2;
+    
     if (bouton != GLUT_LEFT_BUTTON || state != GLUT_DOWN)
       return;
     
@@ -1899,8 +1910,8 @@ souris(int bouton, int state, int x, int y)
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     
-    nb_subdiv_sphere = NB_SUBDIV_SPHERE;
-    nb_subdiv_sphere_2 = NB_SUBDIV_SPHERE_2;
+    nb_subdiv_sphere = nb_subdiv_sphere_backup;
+    nb_subdiv_sphere_2 = nb_subdiv_sphere_2_backup;
     
     hits = glRenderMode(GL_RENDER);
     renderMode = GL_RENDER;
@@ -1935,7 +1946,7 @@ souris(int bouton, int state, int x, int y)
 }
 
 void 
-mouvement(int x, int y)
+    mouvement(int x, int y)
 {
   if (b_gauche && (modifiers != GLUT_ACTIVE_SHIFT) && !mode2D) {
     theta += x - xprec;
@@ -1970,7 +1981,7 @@ mouvement(int x, int y)
 }
 
 void 
-affiche_aide()
+    affiche_aide()
 {
   
   fprintf(stdout, "+-------------------------------------------------+\n");
@@ -2014,197 +2025,197 @@ affiche_aide()
 }
 
 void 
-mgp_buildmenu()
+    mgp_buildmenu()
 {
-        int popupmenu, submenu1, submenu2, submenu3, submenu4, submenu5, submenu6;
+  int popupmenu, submenu1, submenu2, submenu3, submenu4, submenu5, submenu6;
   
 #ifdef _FR
-        submenu1 = glutCreateMenu(traitsubmenu1);
-        glutAddMenuEntry("Fond blanc", 0);
-        glutAddMenuEntry("Fond fun", 1);
-        glutAddMenuEntry("Fond Noir", 2);
-        glutAddMenuEntry("Traits blanc", 5);
-        glutAddMenuEntry("Traits bleu", 6);
-        glutAddMenuEntry("Traits Noir", 7);
-        glutAddMenuEntry("Transparence ON/OFF", 3);
-        glutAddMenuEntry("Section ON/OFF", 4);
+  submenu1 = glutCreateMenu(traitsubmenu1);
+  glutAddMenuEntry("Fond blanc", 0);
+  glutAddMenuEntry("Fond fun", 1);
+  glutAddMenuEntry("Fond Noir", 2);
+  glutAddMenuEntry("Traits blanc", 5);
+  glutAddMenuEntry("Traits bleu", 6);
+  glutAddMenuEntry("Traits Noir", 7);
+  glutAddMenuEntry("Transparence ON/OFF", 3);
+  glutAddMenuEntry("Section ON/OFF", 4);
         
-        submenu2 = glutCreateMenu(traitsubmenu2);
-        glutAddMenuEntry("Informations sur l'echantillon", 15);
-        glutAddMenuEntry("Quadrillage de l'echantillon", 2);
-        if (with_layers) glutAddMenuEntry("Couches geologiques", 34);
-        glutAddMenuEntry("Champ de vitesses", 12);
-        glutAddMenuEntry("Anisotropie", 22);
-        glutAddMenuEntry("Evolution Anisotropie", 24);
-        glutAddMenuEntry("Informations sur les gaps", 26);
-        glutAddMenuEntry("Direction des contacts", 30);
-        glutAddMenuEntry("fn vs ft", 16);
-        glutAddMenuEntry("pdf(fn)", 14);
-        glutAddMenuEntry("Granulometrie", 27);
-        glutAddMenuEntry("Forces locales", 35);
+  submenu2 = glutCreateMenu(traitsubmenu2);
+  glutAddMenuEntry("Informations sur l'echantillon", 15);
+  glutAddMenuEntry("Quadrillage de l'echantillon", 2);
+  if (with_layers) glutAddMenuEntry("Couches geologiques", 34);
+  glutAddMenuEntry("Champ de vitesses", 12);
+  glutAddMenuEntry("Anisotropie", 22);
+  glutAddMenuEntry("Evolution Anisotropie", 24);
+  glutAddMenuEntry("Informations sur les gaps", 26);
+  glutAddMenuEntry("Direction des contacts", 30);
+  glutAddMenuEntry("fn vs ft", 16);
+  glutAddMenuEntry("pdf(fn)", 14);
+  glutAddMenuEntry("Granulometrie", 27);
+  glutAddMenuEntry("Forces locales", 35);
         
-        submenu3 = glutCreateMenu(traitsubmenu2);
-        glutAddMenuEntry("Rien", 10);
-        glutAddMenuEntry("Nombre de coordination", 32);
-        glutAddMenuEntry("Contour", 13);
-        glutAddMenuEntry("Couleurs", 19);
-        glutAddMenuEntry("Tailles", 36);
-        glutAddMenuEntry("Vitesses angulaires (2D)", 8);
-        glutAddMenuEntry("Norme vitesses", 11);
-        glutAddMenuEntry("Distance / reference", 21);
+  submenu3 = glutCreateMenu(traitsubmenu2);
+  glutAddMenuEntry("Rien", 10);
+  glutAddMenuEntry("Nombre de coordination", 32);
+  glutAddMenuEntry("Contour", 13);
+  glutAddMenuEntry("Couleurs", 19);
+  glutAddMenuEntry("Tailles", 36);
+  glutAddMenuEntry("Vitesses angulaires (2D)", 8);
+  glutAddMenuEntry("Norme vitesses", 11);
+  glutAddMenuEntry("Distance / reference", 21);
         
-        submenu4 = glutCreateMenu(traitsubmenu2);
-        glutAddMenuEntry("Rien", 0);
-        glutAddMenuEntry("Liste de Verlet", 1);
-        glutAddMenuEntry("Liens colles", 9);
-        glutAddMenuEntry("Fissures", 28);
-        glutAddMenuEntry("Forces normales sup. seuil", 31);
-        glutAddMenuEntry("Forces", 33);
-        glutAddMenuEntry("Forces des fichiers for.out.xxx", 3);
-        glutAddMenuEntry("lignes de couleur pour fn", 20);
-        glutAddMenuEntry("Forces en compression et en traction", 7);
-        glutAddMenuEntry("Forces normales positives", 5);
-        glutAddMenuEntry("Forces normales negatives", 6);
-        glutAddMenuEntry("Forces tangentielles (val. abs.)", 4);
-        glutAddMenuEntry("Efforts de couple", 25);
-        glutAddMenuEntry("Vitesse relative tangente", 17);
-        glutAddMenuEntry("Volumes des ponts liquides", 29);
+  submenu4 = glutCreateMenu(traitsubmenu2);
+  glutAddMenuEntry("Rien", 0);
+  glutAddMenuEntry("Liste de Verlet", 1);
+  glutAddMenuEntry("Liens colles", 9);
+  glutAddMenuEntry("Fissures", 28);
+  glutAddMenuEntry("Forces normales sup. seuil", 31);
+  glutAddMenuEntry("Forces", 33);
+  glutAddMenuEntry("Forces des fichiers for.out.xxx", 3);
+  glutAddMenuEntry("lignes de couleur pour fn", 20);
+  glutAddMenuEntry("Forces en compression et en traction", 7);
+  glutAddMenuEntry("Forces normales positives", 5);
+  glutAddMenuEntry("Forces normales negatives", 6);
+  glutAddMenuEntry("Forces tangentielles (val. abs.)", 4);
+  glutAddMenuEntry("Efforts de couple", 25);
+  glutAddMenuEntry("Vitesse relative tangente", 17);
+  glutAddMenuEntry("Volumes des ponts liquides", 29);
         
-        submenu5 = glutCreateMenu(traitsubmenu4);
-        glutAddMenuEntry("Image TIFF", 0);
-        glutAddMenuEntry("Serie d'images(TIFF)", 1);
-        glutAddMenuEntry("Image EPS avec gl2ps", 2);
-        glutAddMenuEntry("Image EPS (2D)", 6);
-        glutAddMenuEntry("Fichier 'BODIES.DAT'", 3);
-        glutAddMenuEntry("Fichier 'export.cin'", 4);
-        glutAddMenuEntry("Fichier 'shot.pov'", 5);
-        glutAddMenuEntry("Fichier 'particles.Rxy'", 7);
-        glutAddMenuEntry("Fichier 'deplacement.txt'", 8); 
+  submenu5 = glutCreateMenu(traitsubmenu4);
+  glutAddMenuEntry("Image TIFF", 0);
+  glutAddMenuEntry("Serie d'images(TIFF)", 1);
+  glutAddMenuEntry("Image EPS avec gl2ps", 2);
+  glutAddMenuEntry("Image EPS (2D)", 6);
+  glutAddMenuEntry("Fichier 'BODIES.DAT'", 3);
+  glutAddMenuEntry("Fichier 'export.cin'", 4);
+  glutAddMenuEntry("Fichier 'shot.pov'", 5);
+  glutAddMenuEntry("Fichier 'particles.Rxy'", 7);
+  glutAddMenuEntry("Fichier 'deplacement.txt'", 8); 
         
-        submenu6 = glutCreateMenu(traitsubmenuFluid);
-        glutAddMenuEntry("Rien", 0);
-        glutAddMenuEntry("Vitesses horizontales", 1);
-        glutAddMenuEntry("Vitesses verticales", 2);
-        glutAddMenuEntry("Norme vitesses", 3);
-        glutAddMenuEntry("Pressions", 4);
+  submenu6 = glutCreateMenu(traitsubmenuFluid);
+  glutAddMenuEntry("Rien", 0);
+  glutAddMenuEntry("Vitesses horizontales", 1);
+  glutAddMenuEntry("Vitesses verticales", 2);
+  glutAddMenuEntry("Norme vitesses", 3);
+  glutAddMenuEntry("Pressions", 4);
         
-        popupmenu = glutCreateMenu(traitmenu);
-        glutAddMenuEntry("defiler les etats", 5);
-        if (multifiles) {
-                glutAddMenuEntry("Etat Precedent", 7);
-                glutAddMenuEntry("Etat Suivant", 8);
-        }
-        glutAddMenuEntry("Editer mgconf", 6);
-        glutAddMenuEntry("Recharger mgconf", 4);
-        glutAddMenuEntry("Sauver mgpview", 9);
-        glutAddMenuEntry("Recharger mgpview", 10);
-        glutAddMenuEntry("Vue 3D", 3);
-        glutAddMenuEntry("Plan XY", 2);
-        glutAddMenuEntry("Plan XZ", 1);
-        glutAddSubMenu("Options", submenu1);
-        glutAddSubMenu("Outils", submenu2);
-        glutAddSubMenu("Rendu des corps", submenu3);
-        glutAddSubMenu("Rendu des interactions", submenu4);
-        glutAddSubMenu("Exportations", submenu5);
-        if (with_fluid) glutAddSubMenu("Fluide", submenu6);
-        glutAddMenuEntry("Quitter", 0);
+  popupmenu = glutCreateMenu(traitmenu);
+  glutAddMenuEntry("defiler les etats", 5);
+  if (multifiles) {
+    glutAddMenuEntry("Etat Precedent", 7);
+    glutAddMenuEntry("Etat Suivant", 8);
+  }
+  glutAddMenuEntry("Editer mgconf", 6);
+  glutAddMenuEntry("Recharger mgconf", 4);
+  glutAddMenuEntry("Sauver mgpview", 9);
+  glutAddMenuEntry("Recharger mgpview", 10);
+  glutAddMenuEntry("Vue 3D", 3);
+  glutAddMenuEntry("Plan XY", 2);
+  glutAddMenuEntry("Plan XZ", 1);
+  glutAddSubMenu("Options", submenu1);
+  glutAddSubMenu("Outils", submenu2);
+  glutAddSubMenu("Rendu des corps", submenu3);
+  glutAddSubMenu("Rendu des interactions", submenu4);
+  glutAddSubMenu("Exportations", submenu5);
+  if (with_fluid) glutAddSubMenu("Fluide", submenu6);
+  glutAddMenuEntry("Quitter", 0);
     
 #else	/* English */
     
-        submenu1 = glutCreateMenu(traitsubmenu1);
-        glutAddMenuEntry("White background", 0);
-        glutAddMenuEntry("Custom background", 1);
-        glutAddMenuEntry("Black background", 2);
-        glutAddMenuEntry("White foreground", 5);
-        glutAddMenuEntry("Blue foreground", 6);
-        glutAddMenuEntry("Black foreground", 7);
-        glutAddMenuEntry("Transparency ON/OFF", 3);
-        glutAddMenuEntry("Section      ON/OFF", 4);
+  submenu1 = glutCreateMenu(traitsubmenu1);
+  glutAddMenuEntry("White background", 0);
+  glutAddMenuEntry("Custom background", 1);
+  glutAddMenuEntry("Black background", 2);
+  glutAddMenuEntry("White foreground", 5);
+  glutAddMenuEntry("Blue foreground", 6);
+  glutAddMenuEntry("Black foreground", 7);
+  glutAddMenuEntry("Transparency ON/OFF", 3);
+  glutAddMenuEntry("Section      ON/OFF", 4);
         
-        submenu2 = glutCreateMenu(traitsubmenu2);
-        glutAddMenuEntry("Sample informations", 15);
-        glutAddMenuEntry("Squared sample", 2);
-        if (with_layers) glutAddMenuEntry("Geologic layers", 34);
-        glutAddMenuEntry("Velocity field", 12);
-        glutAddMenuEntry("Anisotropy", 22);
-        glutAddMenuEntry("Anisotropy evolution", 24);
-        glutAddMenuEntry("Informations on gaps", 26);
-        glutAddMenuEntry("Contacts direction", 30);
-        glutAddMenuEntry("fn vs ft", 16);
-        glutAddMenuEntry("pdf(fn)", 14);
-        glutAddMenuEntry("Granulometry", 27);
-        glutAddMenuEntry("Local forces", 35);
+  submenu2 = glutCreateMenu(traitsubmenu2);
+  glutAddMenuEntry("Sample informations", 15);
+  glutAddMenuEntry("Squared sample", 2);
+  if (with_layers) glutAddMenuEntry("Geologic layers", 34);
+  glutAddMenuEntry("Velocity field", 12);
+  glutAddMenuEntry("Anisotropy", 22);
+  glutAddMenuEntry("Anisotropy evolution", 24);
+  glutAddMenuEntry("Informations on gaps", 26);
+  glutAddMenuEntry("Contacts direction", 30);
+  glutAddMenuEntry("fn vs ft", 16);
+  glutAddMenuEntry("pdf(fn)", 14);
+  glutAddMenuEntry("Granulometry", 27);
+  glutAddMenuEntry("Local forces", 35);
                 
-        submenu3 = glutCreateMenu(traitsubmenu2);
-        glutAddMenuEntry("Nothing", 10);
-        glutAddMenuEntry("Coordination Number", 32);
-        glutAddMenuEntry("Outline", 13);
-        glutAddMenuEntry("Colors", 19);
-        glutAddMenuEntry("Sizes", 36);
-        glutAddMenuEntry("Angular Velocity (2D)", 8);
-        glutAddMenuEntry("Velocity magnitude", 11);
-        glutAddMenuEntry("Cumulated displacements", 21);
+  submenu3 = glutCreateMenu(traitsubmenu2);
+  glutAddMenuEntry("Nothing", 10);
+  glutAddMenuEntry("Coordination Number", 32);
+  glutAddMenuEntry("Outline", 13);
+  glutAddMenuEntry("Colors", 19);
+  glutAddMenuEntry("Sizes", 36);
+  glutAddMenuEntry("Angular Velocity (2D)", 8);
+  glutAddMenuEntry("Velocity magnitude", 11);
+  glutAddMenuEntry("Cumulated displacements", 21);
         
-        submenu4 = glutCreateMenu(traitsubmenu2);
-        glutAddMenuEntry("Nothing", 0);
-        glutAddMenuEntry("Verlet list", 1);
-        glutAddMenuEntry("Sticks links", 9);
-        glutAddMenuEntry("Cracks", 28);
-        glutAddMenuEntry("Strong/weak Networks", 31);
-        glutAddMenuEntry("Forces", 33);
-        glutAddMenuEntry("Forces from files for.out.xxx", 3);
-        glutAddMenuEntry("Color lines for normal force", 20);
-        glutAddMenuEntry("Compressive and tensile force", 7);
-        glutAddMenuEntry("Positives normal force", 5);
-        glutAddMenuEntry("Negatives normal force", 6);
-        glutAddMenuEntry("Tangentials force", 4);
-        glutAddMenuEntry("Moment", 25);
-        glutAddMenuEntry("Tangential relative velocity", 17);
-        glutAddMenuEntry("Liquid bond Volume", 29);
+  submenu4 = glutCreateMenu(traitsubmenu2);
+  glutAddMenuEntry("Nothing", 0);
+  glutAddMenuEntry("Verlet list", 1);
+  glutAddMenuEntry("Sticks links", 9);
+  glutAddMenuEntry("Cracks", 28);
+  glutAddMenuEntry("Strong/weak Networks", 31);
+  glutAddMenuEntry("Forces", 33);
+  glutAddMenuEntry("Forces from files for.out.xxx", 3);
+  glutAddMenuEntry("Color lines for normal force", 20);
+  glutAddMenuEntry("Compressive and tensile force", 7);
+  glutAddMenuEntry("Positives normal force", 5);
+  glutAddMenuEntry("Negatives normal force", 6);
+  glutAddMenuEntry("Tangentials force", 4);
+  glutAddMenuEntry("Moment", 25);
+  glutAddMenuEntry("Tangential relative velocity", 17);
+  glutAddMenuEntry("Liquid bond Volume", 29);
         
-        submenu5 = glutCreateMenu(traitsubmenu4);
+  submenu5 = glutCreateMenu(traitsubmenu4);
 #ifdef _WITH_TIFF
-        glutAddMenuEntry("Picture TIFF", 0);
+  glutAddMenuEntry("Picture TIFF", 0);
 #endif
 #ifdef _WITH_PNG
-        glutAddMenuEntry("Picture PNG", 9);
+  glutAddMenuEntry("Picture PNG", 9);
 #endif        
-        glutAddMenuEntry("List of pictures TIFF", 1);
-        glutAddMenuEntry("Picture EPS using gl2ps", 2);
-        glutAddMenuEntry("Picture EPS (2D)", 6);
-        glutAddMenuEntry("File 'BODIES.DAT'", 3);
-        glutAddMenuEntry("File 'export.cin'", 4);
-        glutAddMenuEntry("File 'shot.pov'", 5);
-        glutAddMenuEntry("File 'particles.Rxy'", 7);
-        glutAddMenuEntry("File 'deplacement.txt'", 8);        
+  glutAddMenuEntry("List of pictures TIFF", 1);
+  glutAddMenuEntry("Picture EPS using gl2ps", 2);
+  glutAddMenuEntry("Picture EPS (2D)", 6);
+  glutAddMenuEntry("File 'BODIES.DAT'", 3);
+  glutAddMenuEntry("File 'export.cin'", 4);
+  glutAddMenuEntry("File 'shot.pov'", 5);
+  glutAddMenuEntry("File 'particles.Rxy'", 7);
+  glutAddMenuEntry("File 'deplacement.txt'", 8);        
         
-        submenu6 = glutCreateMenu(traitsubmenuFluid);
-        glutAddMenuEntry("Nothing", 0);
-        glutAddMenuEntry("Horizontal velocity", 1);
-        glutAddMenuEntry("Vertical velocity", 2);
-        glutAddMenuEntry("Velocity magnitude", 3);
-        glutAddMenuEntry("Pressure", 4);
+  submenu6 = glutCreateMenu(traitsubmenuFluid);
+  glutAddMenuEntry("Nothing", 0);
+  glutAddMenuEntry("Horizontal velocity", 1);
+  glutAddMenuEntry("Vertical velocity", 2);
+  glutAddMenuEntry("Velocity magnitude", 3);
+  glutAddMenuEntry("Pressure", 4);
         
-        popupmenu = glutCreateMenu(traitmenu);
-        glutAddMenuEntry("Run", 5);
-        if (multifiles) {
-                glutAddMenuEntry("Previous state", 7);
-                glutAddMenuEntry("Next state", 8);
-        }
-        glutAddMenuEntry("Edit mgconf", 6);
-        glutAddMenuEntry("Reload mgconf", 4);
-        glutAddMenuEntry("Save mgpview", 9);
-        glutAddMenuEntry("Reload mgpview", 10);
-        glutAddMenuEntry("3D view", 3);
-        glutAddMenuEntry("XY plan", 2);
-        glutAddMenuEntry("XZ plan", 1);
-        glutAddSubMenu("Options", submenu1);
-        glutAddSubMenu("Tools", submenu2);
-        glutAddSubMenu("Body rendering", submenu3);
-        glutAddSubMenu("Interaction rendering", submenu4);
-        glutAddSubMenu("Export", submenu5);
-        if (with_fluid) glutAddSubMenu("Fluide", submenu6);
-        glutAddMenuEntry("Quit", 0);
+  popupmenu = glutCreateMenu(traitmenu);
+  glutAddMenuEntry("Run", 5);
+  if (multifiles) {
+    glutAddMenuEntry("Previous state", 7);
+    glutAddMenuEntry("Next state", 8);
+  }
+  glutAddMenuEntry("Edit mgconf", 6);
+  glutAddMenuEntry("Reload mgconf", 4);
+  glutAddMenuEntry("Save mgpview", 9);
+  glutAddMenuEntry("Reload mgpview", 10);
+  glutAddMenuEntry("3D view", 3);
+  glutAddMenuEntry("XY plan", 2);
+  glutAddMenuEntry("XZ plan", 1);
+  glutAddSubMenu("Options", submenu1);
+  glutAddSubMenu("Tools", submenu2);
+  glutAddSubMenu("Body rendering", submenu3);
+  glutAddSubMenu("Interaction rendering", submenu4);
+  glutAddSubMenu("Export", submenu5);
+  if (with_fluid) glutAddSubMenu("Fluide", submenu6);
+  glutAddMenuEntry("Quit", 0);
 #endif
     
 }

@@ -38,6 +38,7 @@ void disp_network ();
 void disp_cracks ();
 void disp_stick_links ();
 void disp_networks_pos_neg();
+void disp_tensile_compressive_forces_2d ();
 void disp_positive_normal_strength_2d ();
 void disp_positive_normal_strength_3d ();
 void disp_positive_normal_strength_3d_v2 ();

@@ -75,7 +75,7 @@ int main(int argc, char **argv)
   for (c=0;c<6;++c)
     strcpy(colorName[c],"Nothing");
 
-  sprintf(num_file_format,"%%03d");
+  strcpy(num_file_format,"%03d");
 
 #ifdef _MACOSX
   /* obtention du chemin de travail courant */
@@ -115,6 +115,28 @@ int main(int argc, char **argv)
   else if (his_mode) charger_HISfile();
   else               charger_geometrie();
 
+  if (nbel < 200)
+  {
+    nb_subdiv_sphere = 36;
+    nb_subdiv_sphere_2 = 20;
+  }
+  else if (nbel < 5000)
+  {
+    nb_subdiv_sphere = 20;
+    nb_subdiv_sphere_2 = 12;
+  }
+  else if (nbel < 10000)
+  {
+    nb_subdiv_sphere = 12;
+    nb_subdiv_sphere_2 = 8;
+  }
+  else
+  {
+    nb_subdiv_sphere = 4;
+    nb_subdiv_sphere_2 = 4;
+  }
+
+  
   calcul_adim();
   centrer_repere();
   precalculs();

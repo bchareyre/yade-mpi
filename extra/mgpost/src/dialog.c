@@ -6,10 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-/* 
- * Il s'agit ici de quelques "Widgets" tres sommaires
- * pour les boites de dialogue...
- */
+/* Basic homemade Widgets */
 
 void dialogMode ()
 {
@@ -156,9 +153,7 @@ void dial_mouse (int bouton, int state, int x, int y)
 
 	  switch (dialArea[i].type)
 	    {
-	    case DIAL_WINDOW:
-
-          
+	    case DIAL_WINDOW:      
 	      break;
 
 	    case DIAL_BUTTON:

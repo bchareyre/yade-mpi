@@ -19,7 +19,7 @@ display_infos_on_body(int i)
 	case 0:
 
 		fprintf(stdout, "  Body id : %d\n", i + 1);
-		fprintf(stdout, "  Type: DISKx\n");
+		fprintf(stdout, "  Type: disk\n");
 		fprintf(stdout, "  Radius: %lg\n", radius[i][state]);
 		fprintf(stdout, "  Position: %lg, %lg\n", x[i][state] + xvec, y[i][state] + yvec);
 		fprintf(stdout, "  Velocity: %lg, %lg\n", vx[i][state], vy[i][state]);
@@ -178,8 +178,7 @@ info_gap() // and overlaps (FIXME)
 }
 
 
-void 
-affiche_infos()
+void affiche_infos()
 {
 	double          xm, xM, ym, yM, zm, zM;
 	int             i, ii, k, Nc_minus, Nc_plus, nbi;

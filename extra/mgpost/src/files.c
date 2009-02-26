@@ -330,7 +330,7 @@ charger_HISfile()
 	fscanf(his_file, "%s", token);
 	if (feof(his_file)) break;
 	
-	if (!strcmp((const char *) token,"Sample{"))
+	if (!strcmp((const char *) token,"Sample{") || !strcmp((const char *) token,"Sample3d{"))
 	{	
 		while (strcmp((const char *) token,"}") || inCluster == 1)
 		{
@@ -349,6 +349,28 @@ charger_HISfile()
                   if (!strcmp((const char *) token,"rline"))
                   {
                     ++dec;
+                  }
+                  
+                  if (!strcmp((const char *) token,"sphere"))
+                  {
+                    /* WARNING bricolage sur les coord */
+                    fscanf(his_file, "%*d %lf %lf %lf %lf %*f %*f %*f %lf %lf %lf %*f %*f %*f",
+                           &radius[nbel][0],
+                           &x[nbel][0], &z[nbel][0], &y[nbel][0],
+                           &vx[nbel][0], &vz[nbel][0], &vy[nbel][0]);
+                    z[nbel][0] *= -1.0;
+                    vz[nbel][0] *= -1.0;
+
+                    dataqty[i]       = 1;
+                    datadistrib[i]   = datapos;
+                    datas[datapos++] = radius[nbel][0];
+
+                    mode2D      = MG_FALSE;
+                    bdyty[i]    = MGP_SPHER;
+                    bdyclass[i] = MGP_GRAIN;
+                
+                    i++;
+                    nbel++;
                   }
                   
                   if (!strcmp((const char *) token,"disk"))

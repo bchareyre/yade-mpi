@@ -250,10 +250,8 @@ GLenum          renderMode = GL_RENDER;
 #define BUFSIZE 1024
 int             selectedBody = -1;
 
-#define NB_SUBDIV_SPHERE 12
-#define NB_SUBDIV_SPHERE_2 8
-GLint           nb_subdiv_sphere = NB_SUBDIV_SPHERE;
-GLint           nb_subdiv_sphere_2 = NB_SUBDIV_SPHERE_2;
+GLint           nb_subdiv_sphere = 12;
+GLint           nb_subdiv_sphere_2 = 8;
 
 int           **nbneighbors;
 int           **neighbor;
