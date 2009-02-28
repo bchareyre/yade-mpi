@@ -354,13 +354,13 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		for i in range(len(names)):
 			if names[i]=='description': o.tags['description']=values[i]
 			else:
-				if names[i] not in kw.keys() and not unknownOk: raise NameError("Parameter `%s' has no default value assigned"%names[i])
+				if names[i] not in kw.keys() and (not unknownOk or names[i][0]=='!'): raise NameError("Parameter `%s' has no default value assigned"%names[i])
 				if names[i] in kw.keys(): kw.pop(names[i])
-				eq="%s=%s"%(names[i],values[i])
+				eq="%s=%s"%(names[i],repr(values[i]))
 				exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
 	defaults=[]
 	for k in kw.keys():
-		exec("__builtin__.%s=%s"%(k,kw[k]))
+		exec("__builtin__.%s=%s"%(k,repr(kw[k])))
 		defaults+=["%s=%s"%(k,kw[k])]; dictDefaults[k]=kw[k]
 	o.tags['defaultParams']=",".join(defaults)
 	o.tags['params']=",".join(tagsParams)

@@ -26,6 +26,8 @@ PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
 	zBounds.clear();
 	minima.clear();
 	maxima.clear();
+
+	//timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 }
 
 PersistentSAPCollider::~PersistentSAPCollider()
@@ -38,6 +40,8 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	rootBody=ncb;
 	shared_ptr<BodyContainer> bodies=ncb->bodies;
 	transientInteractions=ncb->transientInteractions;
+
+//	timingDeltas->start();
 	
 	if (2*bodies->size()!=xBounds.size()){
 		xBounds.resize(2*bodies->size());
@@ -46,6 +50,8 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 		minima.resize(3*bodies->size());
 		maxima.resize(3*bodies->size());
 	}
+
+//	timingDeltas->checkpoint("resizeArrays");
 
 	// Updates the minima and maxima arrays according to the new center and radius of the spheres
 	int offset;
@@ -70,6 +76,9 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 			maxima[offset+0]=pos[0]; maxima[offset+1]=pos[1]; maxima[offset+2]=pos[2];
 		}
 	}
+
+//	timingDeltas->checkpoint("minMaxUpdate");
+
 	typedef pair<body_id_t,body_id_t> bodyIdPair;
 	list<bodyIdPair> toBeDeleted;
 	FOREACH(const shared_ptr<Interaction>& I,*ncb->transientInteractions){
@@ -87,8 +96,13 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 		//if(!I->isReal){LOG_DEBUG("Interaction #"<<I->getId1()<<"=#"<<I->getId2()<<" is not real.");}
 	}
 	FOREACH(const bodyIdPair& p, toBeDeleted){ transientInteractions->erase(p.first,p.second); }
+
+//	timingDeltas->checkpoint("deleteInvalid");
 	
 	updateIds(bodies->size());
+
+//	timingDeltas->checkpoint("updateIds");
+
 	nbObjects=bodies->size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
@@ -101,6 +115,8 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	//#pragma omp section
 		sortBounds(zBounds, nbObjects);
 	}
+
+//	timingDeltas->checkpoint("sortBounds");
 }
 
 bool PersistentSAPCollider::probeBoundingVolume(const BoundingVolume& bv)
@@ -132,6 +148,8 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 		int begin=0, end=nbElements;
 		if (nbElements>nbObjects) begin=nbObjects;
 
+		//timingDeltas->start();
+
 		// initialization if the xBounds, yBounds, zBounds
 		for(int i=begin;i<end;i++){
 			xBounds[2*i]	= shared_ptr<AABBBound>(new AABBBound(i,1));
@@ -142,6 +160,8 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 			zBounds[2*i+1]	= shared_ptr<AABBBound>(new AABBBound(i,0));
 		}
 
+		//timingDeltas->checkpoint("init");
+
 		// initialization if the field "value" of the xBounds, yBounds, zBounds arrays
 		updateBounds(nbElements);
 
@@ -149,16 +169,22 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 		// The first time these arrays are not sorted so it is faster to use such a sort instead
 		// of the permutation we are going to use next
 		std::sort(xBounds.begin(),xBounds.begin()+2*nbElements,AABBBoundComparator());
+		//timingDeltas->checkpoint("sortX");
 		std::sort(yBounds.begin(),yBounds.begin()+2*nbElements,AABBBoundComparator());
+		//timingDeltas->checkpoint("sortY");
 		std::sort(zBounds.begin(),zBounds.begin()+2*nbElements,AABBBoundComparator());
+		//timingDeltas->checkpoint("sortZ");
 
 		// initialize the overlappingBB collection
 		//for(unsigned int j=0;j<nbElements;j++)
 		//	overlappingBB[j].clear(); //attention memoire
 
 		findOverlappingBB(xBounds, nbElements);
+		//timingDeltas->checkpoint("findX");
 		findOverlappingBB(yBounds, nbElements);
+		//timingDeltas->checkpoint("findY");
 		findOverlappingBB(zBounds, nbElements);
+		//timingDeltas->checkpoint("findZ");
 	}
 	else updateBounds(nbElements);
 }

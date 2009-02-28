@@ -125,7 +125,6 @@ print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d j
 
 ll=['']+open(table,'r').readlines()
 availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1]) and i>1]
-print availableLines
 
 # read actual data
 values={}
@@ -171,7 +170,8 @@ for i,l in enumerate(useLines):
 	else: logFile=logFile.replace('@',str(l))
 	envVars=[]
 	for col,head in enumerate(headings):
-		if re.match('^[A-Z_]+[A-Z0-9_]+',head): envVars+=['%s=%s'%(head,values[l][col])]
+		if head=='!EXEC': executable=values[l][col]
+		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
 	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,logFile),logFile))
 
 print "Job summary:"

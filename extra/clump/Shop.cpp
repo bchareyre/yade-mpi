@@ -4,6 +4,7 @@
 #include<limits>
 
 #include<boost/filesystem/convenience.hpp>
+#include<boost/tokenizer.hpp>
 
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Body.hpp>
@@ -474,21 +475,29 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& m
 	vector<pair<Vector3r,Real> > spheres;
 	ifstream sphereFile(fname.c_str());
 	if(!sphereFile.good()) throw std::runtime_error("File with spheres `"+fname+"' couldn't be opened.");
-	int tmp1,tmp2;
 	Vector3r C;
-	Real r;
-	while(!sphereFile.eof()){
-		sphereFile>>C[0]; sphereFile>>C[1]; sphereFile>>C[2];
-		sphereFile>>r;
-		// TRVAR3(spheres.size(),C,r);
-		sphereFile>>tmp1;
-		if(r==1) continue; // arrrgh, boxes have 5 record/line, spheres have 6; 4th number for box is 1 and we assume there is no sphere with radius 1; Wenjie, I'm gonna tell you one day how smart this format is.
-		if(sphereFile.eof()) continue; // prevents trailing newlines from copying last sphere as well
-		sphereFile>>tmp2; // read the 6th (unused) number for spheres
+	Real r=0;
+	string line;
+	size_t lineNo=0;
+	while(std::getline(sphereFile, line, '\n')){
+		lineNo++;
+		boost::tokenizer<boost::char_separator<char> > toks(line,boost::char_separator<char>(" \t"));
+		int i=0;
+		FOREACH(const string& s, toks){
+			if(i<3) C[i]=lexical_cast<Real>(s);
+			if(i==4) r=lexical_cast<Real>(s);
+			i++;
+		}
+		if(i==0) continue; // empty line, skipped (can be the last one)
+		// Wenjie's format: 5 per line are boxes, which should be skipped
+		if(i==5) continue;
+		if((i!=4) and (i!=6)) {
+			LOG_ERROR("Line "+lexical_cast<string>(lineNo)+" in the spheres file "+fname+" has "+lexical_cast<string>(i)+" columns instead of 0,4,5 or 6.");
+			LOG_ERROR("The result may be garbage!");
+		}
 		for(int j=0; j<3; j++) { minXYZ[j]=(spheres.size()>0?min(C[j]-r,minXYZ[j]):C[j]-r); maxXYZ[j]=(spheres.size()>0?max(C[j]+r,maxXYZ[j]):C[j]+r);}
 		spheres.push_back(pair<Vector3r,Real>(C,r));
 	}
-	//TRVAR2(minXYZ,maxXYZ);
 	return spheres;
 }
 

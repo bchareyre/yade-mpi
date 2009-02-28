@@ -9,7 +9,7 @@ def _resetEngine(e):
 	e.execTime,e.execCount=0,0
 
 def reset():
-	for e in O.engines(): _resetEngine(e)
+	for e in O.engines: _resetEngine(e)
 
 _statCols={'label':40,'count':20,'time':20,'relTime':20}
 _maxLev=3
