@@ -584,6 +584,10 @@ class pyOmega{
 		return ret;
 	}
 
+	bool isChildClassOf(const string& child, const string& base){
+		return (Omega::instance().isInheritingFrom(child,base));
+	}
+
 	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
 
 	void interactionContainer_set(string clss){
@@ -663,6 +667,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("actions",&pyOmega::actions_get)
 		.add_property("tags",&pyOmega::tags_get)
 		.def("childClasses",&pyOmega::listChildClasses)
+		.def("isChildClassOf",&pyOmega::isChildClassOf)
 		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set)
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
 		.add_property("actionContainer",&pyOmega::physicalActionContainer_get,&pyOmega::physicalActionContainer_set)

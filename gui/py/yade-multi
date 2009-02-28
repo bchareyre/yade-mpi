@@ -6,9 +6,11 @@
 import os, sys, thread, time
 
 class JobInfo():
-	def __init__(self,num,id,command,log):
+	def __init__(self,num,id,command,log,nSlots):
 		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
-		self.command=command; self.num=num; self.log=log; self.id=id
+		self.command=command; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots
+		self.status='PENDING'
+		self.threadNum=None
 	def saveInfo(self):
 		log=file(self.log,'a')
 		log.write("""
@@ -22,84 +24,39 @@ finished: %s
 """%(self.id,self.exitStatus,'OK' if self.exitStatus==0 else 'FAILED',self.duration,self.command,time.asctime(time.localtime(self.started)),time.asctime(time.localtime(self.finished))));
 		log.close()
 
-#
-# _MANY_ thanks to Mark Pettit for concurrent jobs handling!
-# http://code.activestate.com/recipes/534160/
-#
 
 
-def __concurrent_batch(cmd,thread_num,completion_status_dict,exit_code_dict):
-	"""Helper routine for 'concurrent_batches."""
-	job=jobs[thread_num]
+def runJob(job):
+	job.status='RUNNING'
 	job.started=time.time();
-	print '#%d started on %s'%(thread_num,time.asctime())
-	exit_code_dict[thread_num] = os.system(cmd)
-	completion_status_dict[thread_num] = 1  # for sum() routine
-	job.finished=time.time(); dt=job.finished-job.started;
-	job.exitStatus=exit_code_dict[thread_num]
+	print '#%d (%s%s) started on %s'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,time.asctime())
+	job.exitStatus=os.system(job.command)
+	job.finished=time.time()
+	dt=job.finished-job.started;
 	job.duration='%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 	strStatus='done   ' if job.exitStatus==0 else 'FAILED '
-	print "#%d %s (exit status %d), duration %s, log %s"%(thread_num,strStatus,exit_code_dict[thread_num],job.duration,job.log)
+	job.status='DONE'
+	print "#%d (%s%s) %s (exit status %d), duration %s, log %s"%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,strStatus,job.exitStatus,job.duration,job.log)
 	job.saveInfo()
+	
+def runJobs(jobs,numSlots):
+	running,pending=0,len(jobs)
+	inf=1000000
+	while (running>0) or (pending>0):
+		pending,running,done=sum([j.nSlots for j in jobs if j.status=='PENDING']),sum([j.nSlots for j in jobs if j.status=='RUNNING']),sum([j.nSlots for j in jobs if j.status=='DONE'])
+		#print [j.status for j in jobs]
+		freeSlots=numSlots-running
+		minRequire=min([inf]+[j.nSlots for j in jobs if j.status=='PENDING'])
+		if minRequire==inf: minRequire=0
+		#print pending,'pending;',running,'running;',done,'done;',freeSlots,'free;',minRequire,'min'
+		if minRequire>freeSlots and running==0:
+			freeSlots=minRequire
+		for j in [j for j in jobs if j.status=='PENDING']:
+			if j.nSlots<=freeSlots:
+				thread.start_new_thread(runJob,(j,))
+				break
+		time.sleep(.5)
 
-def concurrent_batches(batchlist,maxjobs=0,maxtime=0):
-	"""Run a list of batch commands simultaneously.
-
-	'batchlist' is a list of strings suitable for submitting under os.system().
-	Each job will run in a separate thread, with the thread ending when the
-	subprocess ends.
-	'maxjobs' will, if greater then zero, be the maximum number of simultaneous
-	jobs which can concurrently run.  This would be used to limit the number of
-	processes where too many could flood a system, causing performance issues.
-	'maxtime', when greater than zero, be the maximum amount of time (seconds)
-	that we will wait for processes to complete.  After that, we will return,
-	but no jobs will be killed.  In other words, the jobs still running will
-	continue to run, and hopefully finish in the course of time.
-
-	example: concurrent_batches(("gzip abc","gzip def","gzip xyz"))
-
-	returns: a dictionary of exit status codes, but only when ALL jobs are
-			 complete, or the maximum time has been exceeded.
-			 Note that if returning due to exceeding time, the dictionary will
-			 continue to be updated by the threads as they complete.
-			 The key of the dictionary is the thread number, which matches the
-			 index of the list of batch commands.  The value is the result of
-			 the os.system call.
-
-	gotcha:  If both the maxjobs and maxtime is set, there is a possibility that
-			 not all jobs will be submitted.  The only way to detect this will be
-			 by checking for the absence of the KEY in the returned dictionary.
-	"""
-
-	if not batchlist: return {}
-	completion_status_dict, exit_code_dict = {}, {}
-	num_jobs = len(batchlist)
-	start_time = time.time()
-	for thread_num, cmd in enumerate(batchlist):
-		exit_code_dict[thread_num] = None
-		completion_status_dict[thread_num] = 0 # for sum() routine
-		thread.start_new_thread(__concurrent_batch,
-			  (cmd,thread_num,completion_status_dict,exit_code_dict))
-		while True:
-			completed = sum(completion_status_dict.values())
-			if num_jobs == completed:
-				return exit_code_dict	  # all done
-			running = thread_num - completed + 1
-			if maxtime > 0:
-				if time.time() - start_time > maxtime:
-					return exit_code_dict
-			if not maxjobs:
-				if thread_num < num_jobs-1:  # have we submitted all jobs ?
-					break				  #  no, so break to for cmd loop
-				else:
-					time.sleep(.2)		 #  yes, so wait until jobs are complete
-					continue
-			if running < maxjobs and thread_num < num_jobs-1:
-				break	# for next for loop
-			time.sleep(.2)
-#
-# now begins the yade code
-#
 
 import sys,re,optparse
 def getNumCores(): return len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
@@ -151,16 +108,16 @@ if lineList:
 		elif l==1: print "WARNING: skipping line 1 that should contain variable labels"
 		else: useLines+=[l]
 else: useLines=availableLines
-print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
-# find column where description is
 try:
 	idColumn=headings.index('description')
 	idStrings={}
 	for i in useLines: idStrings[i]=values[i][idColumn] # textual descripion of respective lines 
-	print idStrings
+	print "Will use lines ",', '.join([str(i)+' (%s)'%idStrings[i] for i in useLines])+'.'
+	#print idStrings
 except ValueError:
 	idColumn=None
 	idStrings=None
+	print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
 
 
 jobs=[]
@@ -169,14 +126,18 @@ for i,l in enumerate(useLines):
 	if idStrings: logFile=logFile.replace('@',idStrings[l])
 	else: logFile=logFile.replace('@',str(l))
 	envVars=[]
+	nSlots=1
 	for col,head in enumerate(headings):
 		if head=='!EXEC': executable=values[l][col]
+		if head=='!OMP_NUM_THREADS': nSlots=int(values[l][col])
 		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
-	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,logFile),logFile))
+	if nSlots>maxJobs: print 'WARNING: job #%d wants %d slots but only %d are available'%(i,nSlots,maxJobs)
+	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,logFile),logFile,nSlots))
 
 print "Job summary:"
 for job in jobs:
-	print '   #%d (%s):'%(job.num,job.id),job.command
+	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots),job.command
+
 # OK, go now
-concurrent_batches([job.command for job in jobs],maxjobs=maxJobs)
+runJobs(jobs,maxJobs)
 print 'All jobs finished, bye.'

@@ -354,10 +354,12 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		for i in range(len(names)):
 			if names[i]=='description': o.tags['description']=values[i]
 			else:
-				if names[i] not in kw.keys() and (not unknownOk or names[i][0]=='!'): raise NameError("Parameter `%s' has no default value assigned"%names[i])
-				if names[i] in kw.keys(): kw.pop(names[i])
-				eq="%s=%s"%(names[i],repr(values[i]))
-				exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
+				print 'Parameter name:',names[i],names[i][0]
+				if names[i] not in kw.keys():
+					if (not unknownOk) and names[i][0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
+				else: kw.pop(names[i])
+				if names[i][0]!='!':
+					exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
 	defaults=[]
 	for k in kw.keys():
 		exec("__builtin__.%s=%s"%(k,repr(kw[k])))
@@ -420,3 +422,13 @@ def PythonRunnerFilter(command='pass',isFilterActivated=True):
     f = DeusExMachina('PythonRunnerFilter',{'command':command,'isFilterActivated':isFilterActivated})
     O.engines+=[f]
     return f
+
+def replaceCollider(colliderEngine):
+	"""Replaces collider (BroadInteractor) engine with the engine supplied. Raises error if no collider is in engines."""
+	colliderIdx=-1
+	for i,e in enumerate(O.engines):
+		if O.isChildClassOf(e.name,"BroadInteractor"):
+			colliderIdx=i
+			break
+	if colliderIdx<0: raise RuntimeError("No BroadInteractor found within O.engines.")
+	O.engines=O.engines[:colliderIdx]+[colliderEngine]+O.engines[colliderIdx+1:]
