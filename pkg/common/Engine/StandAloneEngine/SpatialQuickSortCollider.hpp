@@ -31,8 +31,6 @@ class SpatialQuickSortCollider : public BroadInteractor {
 
 	vector<shared_ptr<AABBBound> > rank;
 
-	void registerAttributes();
-
     public:
 
 	SpatialQuickSortCollider();
@@ -41,6 +39,15 @@ class SpatialQuickSortCollider : public BroadInteractor {
 	virtual void action(MetaBody*);
 
 
+	//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.
+	bool haveDistantTransient;
+
+	void registerAttributes() {
+		BroadInteractor::registerAttributes();
+		REGISTER_ATTRIBUTE(haveDistantTransient);
+	}
+
+	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(SpatialQuickSortCollider);
 	REGISTER_BASE_CLASS_NAME(BroadInteractor);
 

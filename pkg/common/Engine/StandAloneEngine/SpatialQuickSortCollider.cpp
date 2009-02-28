@@ -14,16 +14,12 @@
 
 SpatialQuickSortCollider::SpatialQuickSortCollider() : BroadInteractor()
 {
+	haveDistantTransient=false;
 }
 
 SpatialQuickSortCollider::~SpatialQuickSortCollider()
 {
 
-}
-
-void SpatialQuickSortCollider::registerAttributes()
-{
-    BroadInteractor::registerAttributes();
 }
 
 void SpatialQuickSortCollider::action(MetaBody* ncb)
@@ -61,12 +57,10 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	}
 
 	shared_ptr< InteractionContainer > transientInteractions = ncb->transientInteractions;
-
 	InteractionContainer::iterator ii    = transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = transientInteractions->end();
 	for( ; ii!=iiEnd ; ++ii)
-	   (*ii)->cycle = false;
-
+		(*ii)->cycle=false;
 
 	sort(rank.begin(), rank.end(), xBoundComparator()); // sotring along X
 
@@ -80,32 +74,45 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	    j=i;
 	    while(++j<nbElements)
 	    {
-		if ( rank[j]->min[0] < max[0])
-		{
-		    if (   rank[j]->min[1] < max[1]
+			if ( rank[j]->min[0] > max[0]) break;
+			if ( rank[j]->min[1] < max[1]
 			&& rank[j]->max[1] > min[1]
 			&& rank[j]->min[2] < max[2]
 			&& rank[j]->max[2] > min[2])
-		    {
-			id2=rank[j]->id;
-			if ( (interaction = transientInteractions->find(body_id_t(id),body_id_t(id2))) == 0)
 			{
-			    interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
-			    interaction->cycle=true;
-			    transientInteractions->insert(interaction);
+				id2=rank[j]->id;
+				if ( (interaction = transientInteractions->find(body_id_t(id),body_id_t(id2))) == 0)
+				{
+					interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
+					transientInteractions->insert(interaction);
+				}
+				interaction->cycle=true; 
+				// if interaction !isReal it falls back to the potential state
+				if (!haveDistantTransient && !interaction->isReal) interaction->isNew=true;
 			}
-			else
-			    interaction->cycle = true;
-		    }
-		}
-		else break;
 	    }
 	}
 
 	ii    = transientInteractions->begin();
 	iiEnd = transientInteractions->end();
 	for( ; ii!=iiEnd ; ++ii)
-	   if ( !(interaction = *ii)->cycle && !interaction->isReal ) transientInteractions->erase( interaction->getId1(), interaction->getId2());
+	{
+		interaction = *ii;
+		if( 
+			// if haveDistantTransient remove interactions deleted by the constitutive law
+				(haveDistantTransient && !interaction->isNew && !interaction->isReal)
+			// if !haveDistantTransient remove interactions without AABB overlapping
+				|| (!haveDistantTransient && !interaction->cycle) 
+		) { 
+			transientInteractions->erase( interaction->getId1(), interaction->getId2() ); 
+			continue; 
+		}
+		// Once the interaction has been fully created, it is not "new" anymore
+		if(interaction->isReal) interaction->isNew=false;
+		// For non-distant interactions reset isReal (it would be calculated later);
+		// for distant interactions isReal is set/unset by constitutive law
+		if(!haveDistantTransient) interaction->isReal=false;
+	}
 
 }
 
