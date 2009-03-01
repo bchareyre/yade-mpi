@@ -16,7 +16,7 @@ bool Collider::handleExistingInteraction(Interaction* I){
 	/* logically, we have 4 possibilities
 	 * 1.  real  new → ¬new, keep
 	 * 2.  real ¬new → keep (same as 1.)
-	 * 3. ¬real  new → ???
+	 * 3. ¬real  new → keep (remains in potential state)
 	 * 4. ¬real ¬new → delete
 	 */
 	
@@ -25,10 +25,12 @@ bool Collider::handleExistingInteraction(Interaction* I){
 	if( I->isReal &&  I->isNew){ I->isNew=false; return true; }
 	// case 2.
 	if( I->isReal && !I->isNew) return true; 
-	//case 3.
-	if(!I->isReal && I->isNew){ /* ??? copied from PersistentSAPCollider; what is the logic here?? */ I->isReal=false; return true; }
-	// remove interactions deleted by the constitutive law
-	if(!I->isNew && !I->isReal) return false; // should be deleted
+	// case 3.
+	// Keep interaction in potential state (the collider _must_ delete it once it is not in potential state anymore, however)
+	if(!I->isReal &&  I->isNew) return true;
+	// case 4.
+	// Remove interactions deleted by the constitutive law
+	if(!I->isReal && !I->isNew) return false; // should be deleted
 
 	assert(false); // unreachable
 }
