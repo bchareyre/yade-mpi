@@ -75,7 +75,7 @@ for f in simulFile,msgFile,pyCmdFile:
 # handle crash reports, if any
 if reports:
 	mailFrom,mailTo=None,None
-	for a in yade.runtime.args:
+	for a in yade.runtime.argv:
 		if 'mail:' in a: mailFrom,mailTo=a.replace('mail:','').split(',')
 	reportText='\n'.join([80*'#'+'\n'+r[0]+': '+r[1]+'\n'+80*'#'+'\n'+r[2] for r in reports])
 	if mailTo and mailFrom:

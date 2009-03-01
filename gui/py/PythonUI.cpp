@@ -33,7 +33,7 @@ void PythonUI::help(){
 	*.py                       run this script (shorthand for -s *.py)\n\
 	*.xml *.xml.gz *.xml.bz2   open and run this simulation\n\
 \n\
-	remaining arguments are copied to yade.runtime.args (no escaping done) \n\
+	remaining arguments are copied to yade.runtime.argv (no escaping done) \n\
 ";
 }
 
