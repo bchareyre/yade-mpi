@@ -196,6 +196,9 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_pt
 	int id1 = c->getId1();
 	int id2 = c->getId2();
 
+	#ifdef MINIWM3
+		throw runtime_error(__FILE__ ": Your build uses miniWm3, which doesn't have OrthogonalPlaneFit3 function. Aborting.");
+	#else
 	if(!cross_section.empty())
 	{
 		// find the contact plane with least squre fitting from wm3 library
@@ -345,6 +348,7 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_pt
 
 		//return true;
 	}
+	#endif
 	if(! m1->depths[id2].empty()) m1->depths[id2].clear();
 	if(! m2->depths[id1].empty()) m2->depths[id1].clear();
 	return false;
