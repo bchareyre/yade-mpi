@@ -15,6 +15,8 @@
 typedef int body_id_t;
 
 class InteractionGeometryEngineUnit;
+class InteractionPhysicsEngineUnit;
+class ConstitutiveLaw;
 
 class Interaction : public Serializable
 {
@@ -38,6 +40,18 @@ class Interaction : public Serializable
 
 		//! swaps order of bodies within the interaction
 		void swapOrder();
+
+		//! cache functors that are called for this interaction. Currently used by InteractionDispatchers.
+		struct {
+			// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
+			// Therefore, geomExists must be initialized to true first (done in Interaction ctor).
+			bool geomExists;
+			// shared_ptr's are initialized to NULLs automagically
+			shared_ptr<InteractionGeometryEngineUnit> geom;
+			shared_ptr<InteractionPhysicsEngineUnit> phys;
+			shared_ptr<ConstitutiveLaw> constLaw;
+		} functorCache;
+			
 
 		#if 0
 			//! Whether both bodies involved in interaction satisfies given mask; provide rootBody for faster lookup

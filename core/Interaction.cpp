@@ -29,6 +29,7 @@ Interaction::Interaction(body_id_t newId1,body_id_t newId2) : id1(newId1) , id2(
 	isReal = false;
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
 
+	functorCache.geomExists=true;
 }
 
 

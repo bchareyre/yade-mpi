@@ -400,6 +400,9 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
  */
 Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
 {
+	#ifdef BEX_CONTAINER
+		ncb->bex.sync();
+	#endif
 	//compute the mean contact force
 	Real MeanForce = 0.f;
 	long nForce = 0;

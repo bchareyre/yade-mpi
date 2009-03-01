@@ -442,7 +442,21 @@ class DynLibDispatcher
 			#endif
 		  }
 		
-	public  : bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
+	public:
+		/* Return pointer to the functor for two base classes given. Swap is true if the dispatch objects
+		 * should be swapped before calling Executor::go.
+		 */
+		shared_ptr<Executor> getFunctor2D(shared_ptr<BaseClass1>& base1, shared_ptr<BaseClass2>& base2, bool& swap){
+			int ix1, ix2;
+			if(!locateMultivirtualFunctor2D(ix1,ix2,base1,base2)){
+				return shared_ptr<Executor>();
+			}
+			swap=(bool)(callBacksInfo[ix1][ix2]);
+			return callBacks[ix1][ix2];
+		}
+	
+	
+		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
 		  {
 			index1 = base1->getClassIndex();
 			index2 = base2->getClassIndex();

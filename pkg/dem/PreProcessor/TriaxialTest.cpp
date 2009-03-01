@@ -266,25 +266,31 @@ bool TriaxialTest::generate()
 	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size;
 	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
 	 */
-	Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
 	Real porosity=.75;
-	Real really_radiusMean;
+	
+	vector<BasicSphere> sphere_list;
 
-	if(radiusMean<=0) really_radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
-	else {
-		bool fixedDims[3];
-		fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
-		int nScaled=(3-(int)fixedDims[0]+(int)fixedDims[1]+(int)fixedDims[2]);
-		if(nScaled==0) throw std::invalid_argument("At most 2 (not 3) axes can have fixed dimensions in fixedBoxDims if scaling for given radiusMean.");
-		Real boxScaleFactor=radiusMean*pow((4/3.)*Mathr::PI*numberOfGrains/(volume*(1-porosity)),1./nScaled);
-		LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling "<<nScaled<<" dimensions by "<<boxScaleFactor);
-		dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;
-		upperCorner=lowerCorner+dimensions;
-		really_radiusMean=radiusMean;
+	if(importFilename==""){
+		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
+		Real really_radiusMean;
+		if(radiusMean<=0) really_radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
+		else {
+			bool fixedDims[3];
+			fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
+			int nScaled=(3-(int)fixedDims[0]+(int)fixedDims[1]+(int)fixedDims[2]);
+			if(nScaled==0) throw std::invalid_argument("At most 2 (not 3) axes can have fixed dimensions in fixedBoxDims if scaling for given radiusMean.");
+			Real boxScaleFactor=radiusMean*pow((4/3.)*Mathr::PI*numberOfGrains/(volume*(1-porosity)),1./nScaled);
+			LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling "<<nScaled<<" dimensions by "<<boxScaleFactor);
+			dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;
+			upperCorner=lowerCorner+dimensions;
+			really_radiusMean=radiusMean;
+		}
+		message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, really_radiusMean, porosity);
 	}
-
-	
-	
+	else {
+		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
+		sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+	}
 	
 	if(boxWalls)
 	{
@@ -388,11 +394,7 @@ bool TriaxialTest::generate()
 			}
 			 
 	}
-	
-	
-	vector<BasicSphere> sphere_list;
-	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, really_radiusMean, porosity);
+
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
 	FOREACH(const BasicSphere& it, sphere_list){
@@ -401,10 +403,8 @@ bool TriaxialTest::generate()
 		rootBody->bodies->insert(body);
 	}	
 
-	
-	
-	return true;
 
+	return true;
 }
 
 

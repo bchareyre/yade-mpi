@@ -17,6 +17,7 @@ from yade import timing
 O.timingEnabled=True
 
 p=Preprocessor('TriaxialTest',{'importFilename':spheresFile}).load()
+O.dt=utils.PWaveTimeStep()
 utils.replaceCollider(StandAloneEngine(collider))
 
 O.step()

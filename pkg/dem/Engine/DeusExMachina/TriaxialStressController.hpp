@@ -104,7 +104,7 @@ class TriaxialStressController : public DeusExMachina
 		void updateStiffness(MetaBody* ncb);
 		void computeStressStrain(MetaBody* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-    		Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
+    	Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
 
 		DECLARE_LOGGER;
 		

@@ -14,7 +14,7 @@ class JobInfo():
 	def saveInfo(self):
 		log=file(self.log,'a')
 		log.write("""
-=================== JOB SUMMARY ================
+=================== JOB SUMMARY ================
 id      : %s
 status  : %d (%s)
 duration: %s

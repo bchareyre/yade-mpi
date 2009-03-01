@@ -354,7 +354,6 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		for i in range(len(names)):
 			if names[i]=='description': o.tags['description']=values[i]
 			else:
-				print 'Parameter name:',names[i],names[i][0]
 				if names[i] not in kw.keys():
 					if (not unknownOk) and names[i][0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
 				else: kw.pop(names[i])

@@ -485,7 +485,7 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& m
 		int i=0;
 		FOREACH(const string& s, toks){
 			if(i<3) C[i]=lexical_cast<Real>(s);
-			if(i==4) r=lexical_cast<Real>(s);
+			if(i==3) r=lexical_cast<Real>(s);
 			i++;
 		}
 		if(i==0) continue; // empty line, skipped (can be the last one)
