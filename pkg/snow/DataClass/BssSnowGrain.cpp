@@ -2,6 +2,7 @@
 #include"BssSnowGrain.hpp"
 #include<Wm3Quaternion.h>
 
+
 BssSnowGrain::BssSnowGrain():InteractingSphere()
 {
 	createIndex();

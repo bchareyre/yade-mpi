@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2007 by Bruno Chareyre, Janek Kozicki                   *
-*  bruno.chareyre@hmg.inpg.fr                                                *
+*  Copyright (C) 2007 by Bruno Chareyre <bruno.chareyre@imag.fr>         *
+*  Copyright (C) 2008 by Janek Kozicki <cosurgi@berlios.de>              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -356,6 +356,8 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 //Vector3r moment = axis * elasticMoment * (angle<0.0?-1.0:1.0); // restore sign. (*)
 
 	Vector3r moment = moment_twist + moment_bending;
+currentContactPhysics->moment_twist = moment_twist;
+currentContactPhysics->moment_bending = moment_bending;
 
 			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= moment;
 			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += moment;

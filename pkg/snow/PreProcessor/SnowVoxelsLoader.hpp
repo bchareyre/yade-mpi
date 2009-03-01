@@ -83,14 +83,23 @@ class SnowVoxelsLoader : public FileGenerator
 		bool		 setCohesionOnNewContacts
 				,autoCompressionActivation
 				,internalCompaction
+				,use_grain_shear_creep
+				,use_grain_twist_creep
+				,enable_layers_creep
+				,use_gravity_engine
 				;
-		Real		 one_voxel_in_meters_is;
+		Real		 one_voxel_in_meters_is
+				,layer_distance_voxels
+				,angle_increment_radians
+				,layers_creep_viscosity;
 
 		int		 timeStepUpdateInterval
 				,radiusControlInterval
 				,wallStiffnessUpdateInterval
 
 				,recordIntervalIter
+
+				,skip_small_grains
 				;
 				
 		std::string	WallStressRecordFile;

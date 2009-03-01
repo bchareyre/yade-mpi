@@ -15,6 +15,23 @@
 
 inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
 
+void triangle(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
+{
+	glNormal3v(n);
+	glVertex3v(a);
+	glVertex3v(b);
+	glVertex3v(c);
+}
+
+void quad(Vector3r a,Vector3r b, Vector3r c, Vector3r d,Vector3r n)
+{
+	glNormal3v(n);
+	glVertex3v(a);
+	glVertex3v(b);
+	glVertex3v(c);
+	glVertex3v(d);
+}
+
 bool light_selection(int which)
 {
 	GLfloat matAmbient[4];
@@ -53,19 +70,81 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_LIGHTING);
 	glShadeModel(GL_FLAT);
-	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(gr->get_faces_const_ref());
+	
+	//if(surface)
+	{
+	std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> > f(gr->get_faces_copy());
 	glBegin(GL_TRIANGLES);
 		for(size_t i = 0; i < f.size() ; ++i)
 		{
 			if(light_selection(current++) || surface)
 			{
-				glNormal3v(get<3>(f[i]));
-				glVertex3v(get<0>(f[i]));
-				glVertex3v(get<1>(f[i]));
-				glVertex3v(get<2>(f[i]));
+//				glNormal3v(get<3>(f[i]));
+//				glVertex3v(get<0>(f[i]));
+//				glVertex3v(get<1>(f[i]));
+//				glVertex3v(get<2>(f[i]));
+
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				Vector3r n(get<3>(f[i]));
+				// plot the triangular face
+				triangle(a,b,c,n);
+				if(current - 1 == Omega::instance().isoSec && !surface)
+				{
+					// plot the depth tetrahedron
+					Real depth = gr->depth(i);
+					Vector3r Z((a+b+c)/3.0 + n*depth);
+					Vector3r N1((Z - a).Cross(a - b));
+					Vector3r N2((Z - c).Cross(c - a));
+					Vector3r N3((Z - b).Cross(b - c));
+					
+					triangle(b,a,Z,N1);
+					triangle(a,c,Z,N2);
+					triangle(c,b,Z,N3);
+					
+					// plot the parallelepiped top-face at the half depth
+					Real depth2 = depth*0.5;
+					Vector3r N(n*depth2);
+					Vector3r A(a+N);
+					Vector3r B(b+N);
+					Vector3r C(c+N);
+					triangle(A,B,C,n);
+				}
 			}
 		}
 	glEnd();
+		glDisable(GL_LIGHTING);
+		glBegin(GL_LINES);
+			size_t i = Omega::instance().isoSec;
+			if(i >= 0 && i < f.size() )
+			{
+				Vector3r a(get<0>(f[i]));
+				Vector3r b(get<1>(f[i]));
+				Vector3r c(get<2>(f[i]));
+				Vector3r n(get<3>(f[i]));
+				// plot the parallelepiped side faces (quads)
+				Real depth = gr->depth(i)*0.5;
+				Vector3r N(n*depth);
+				Vector3r A(a+N);
+				Vector3r B(b+N);
+				Vector3r C(c+N);
+
+				Vector3r Z((a+b+c)/3.0 + n*depth);
+				Vector3r N1((A - a).Cross(a - b));
+				Vector3r N2((C - c).Cross(c - a));
+				Vector3r N3((B - b).Cross(b - c));
+				
+				//quad(b,a,A,B,N1);
+				//quad(a,c,C,A,N2);
+				//quad(c,b,B,C,N3);
+				glVertex3v(a);glVertex3v(A);
+				glVertex3v(b);glVertex3v(B);
+				glVertex3v(c);glVertex3v(C);
+			}
+		glEnd();
+	}
+	glEnable(GL_LIGHTING);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_CULL_FACE);
 

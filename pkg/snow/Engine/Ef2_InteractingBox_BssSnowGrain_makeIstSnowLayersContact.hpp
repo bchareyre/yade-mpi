@@ -9,11 +9,14 @@
 #pragma once
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+//#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact.hpp>
+#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
 
 class Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact : public InteractionGeometryEngineUnit
 {
-	InteractingBox2InteractingSphere4SpheresContactGeometry g;
+	Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact g;
+	Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry ggg;
 	public :
 		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
 					const shared_ptr<InteractingGeometry>& cm2,

@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2007 by Bruno Chareyre                                 *
-*  bruno.chareyre@imag.fr                                               *
+*  Copyright (C) 2007 by Bruno Chareyre <bruno.chareyre@imag.fr>         *
+*  Copyright (C) 2008 by Janek Kozicki <cosurgi@berlios.de>              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -27,6 +27,7 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 				twistCreep;
 		Vector3r	initialPosition1,initialPosition2;
 		Real		kr; // rolling stiffness
+		Vector3r	moment_twist,moment_bending;
 	
 		CohesiveFrictionalContactInteraction();
 		virtual ~CohesiveFrictionalContactInteraction();

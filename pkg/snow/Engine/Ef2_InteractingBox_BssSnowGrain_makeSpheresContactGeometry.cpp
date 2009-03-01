@@ -1,6 +1,4 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
 *  Copyright (C) 2004 by Janek Kozicki                                   *
 *  cosurgi@berlios.de                                                    *
 *                                                                        *
@@ -12,6 +10,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-snow/BssSnowGrain.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -23,8 +22,41 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 		const Se3r& se32,
 		const shared_ptr<Interaction>& c)
 {
-	bool result = g.go(cm1,cm2,se31,se32,c);
-//	std::cerr << "-------------------1\n";
+	bool result = g.go(cm1,cm2,se31,se32,c) || assist;
+	//std::cerr << "------------------- " << __FILE__ << "\n";
+
+	if(result)
+	{
+		//InteractingBox* s1=static_cast<InteractingBox*>(cm1.get()), *s2=static_cast<BssSnowGrain*>(cm2.get());
+				InteractingBox* s1=dynamic_cast<InteractingBox*>(cm1.get());BssSnowGrain *s2=dynamic_cast<BssSnowGrain*>(cm2.get());
+				if(s1==0 || s2==0)
+				{
+					std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; 
+					return false;
+				}
+			
+		shared_ptr<SpheresContactGeometry> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		else { std::cerr << "whooooooooops!" << __FILE__ << "\n"; }
+
+//	std::cerr << __FILE__ << " " << scm->getClassName() << "\n";
+		
+		int id1 = c->getId1();
+//		int id2 = c->getId2();
+
+//		if(s1->sphere_depth.find(id2) == s1->sphere_depth.end())
+//			s1->sphere_depth[id2] = scm->penetrationDepth;
+		if(s2->sphere_depth.find(id1) == s2->sphere_depth.end())
+			s2->sphere_depth[id1] = scm->penetrationDepth;
+		
+//		Real d1 = s1->sphere_depth[id2];
+		Real d2 = s2->sphere_depth[id1];
+//		if(d1 != d2)
+//			std::cerr << "bad initial penetration?\n";
+		
+		scm->penetrationDepth -= d2;
+	}
+
 	return result;
 }
 
@@ -35,8 +67,19 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	cons
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	bool result = g.goReverse(cm1,cm2,se31,se32,c);
+//	bool result = g.goReverse(cm1,cm2,se31,se32,c);
 //	std::cerr << "-------------------2\n";
+//	return result;
+	
+	bool result = go(cm2,cm1,se32,se31,c);
+	if(result)
+	{
+		shared_ptr<SpheresContactGeometry> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
+		scm->normal *= -1.0;
+		std::swap(scm->radius1,scm->radius2);
+	}
 	return result;
 }
 

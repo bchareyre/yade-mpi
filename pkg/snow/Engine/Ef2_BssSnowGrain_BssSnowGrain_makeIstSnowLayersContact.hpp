@@ -9,17 +9,23 @@
 #pragma once
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
+//#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp>
 
 class Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact : public InteractionGeometryEngineUnit
 {
 	public :
-		InteractingSphere2InteractingSphere4SpheresContactGeometry g;
+		//InteractingSphere2InteractingSphere4SpheresContactGeometry g;
+		Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry g;
 
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 					
-		Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact();		
+		Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact();
+
+		//bool box;
+	std::vector<Vector3r> find_boundary(std::vector<Vector3r> points);
+	bool is_point_inside_cross_section(Vector3r v,Real point_plane_distance,const std::vector<Vector3r>& cross_section_circumference,Vector3r center,Vector3r N);
 		
 	REGISTER_CLASS_NAME(Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);

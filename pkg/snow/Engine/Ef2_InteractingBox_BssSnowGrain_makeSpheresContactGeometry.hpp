@@ -27,6 +27,9 @@ class Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry : public Intera
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
+		bool assist;
+		Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry():assist(false){};
+
 	REGISTER_CLASS_NAME(Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 

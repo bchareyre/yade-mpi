@@ -12,10 +12,6 @@
 #include<yade/core/Omega.hpp>
 
 
-Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry()
-{
-}
-
 void Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::registerAttributes()
 {	
 }
@@ -27,17 +23,21 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_
 							const shared_ptr<Interaction>& c)
 {
 //	bool result = g.go(cm1,cm2,se31,se32,c);
-////	std::cerr << "-------------------1a\n";
+//	std::cerr << "------------------- " << __FILE__ << "\n";
 //	return result;
 
-	BssSnowGrain* s1=static_cast<BssSnowGrain*>(cm1.get()), *s2=static_cast<BssSnowGrain*>(cm2.get());
+	BssSnowGrain* s1=dynamic_cast<BssSnowGrain*>(cm1.get()), *s2=dynamic_cast<BssSnowGrain*>(cm2.get());
 	Vector3r normal=se32.position-se31.position;
 	Real penetrationDepthSq=pow((s1->radius+s2->radius),2) - normal.SquaredLength();
-	if (penetrationDepthSq>0 || c->isReal)
+	if (penetrationDepthSq>0 || c->isReal || assist)
 	{
 		shared_ptr<SpheresContactGeometry> scm;
-		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
-		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; }
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; std::cerr << "new SpheresContactGeometry\n";}
+		if(scm==0)
+			std::cerr << "missing scm\n";
+	
+//	std::cerr << __FILE__ << " " << scm->getClassName() << "\n";
 
 		Real penetrationDepth=s1->radius+s2->radius-normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */
 		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
@@ -47,13 +47,13 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_
 		int id1 = c->getId1();
 		int id2 = c->getId2();
 
-		if(s1->depth.find(id2) == s1->depth.end())
-			s1->depth[id2] = penetrationDepth;
-		if(s2->depth.find(id1) == s2->depth.end())
-			s2->depth[id1] = penetrationDepth;
+		if(s1->sphere_depth.find(id2) == s1->sphere_depth.end())
+			s1->sphere_depth[id2] = penetrationDepth;
+		if(s2->sphere_depth.find(id1) == s2->sphere_depth.end())
+			s2->sphere_depth[id1] = penetrationDepth;
 
-		Real d1 = s1->depth[id2];
-		Real d2 = s2->depth[id1];
+		Real d1 = s1->sphere_depth[id2];
+		Real d2 = s2->sphere_depth[id1];
 		if(d1 != d2)
 			std::cerr << "bad initial penetration?\n";
 
@@ -74,7 +74,17 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const 
 								const Se3r& se32,
 								const shared_ptr<Interaction>& c)
 {
-	return go(cm1,cm2,se31,se32,c);
+	std::cerr << "---- goReverse ---- " << __FILE__ << "\n";
+	bool result = go(cm2,cm1,se32,se31,c);
+	if(result)
+	{
+		shared_ptr<SpheresContactGeometry> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
+		scm->normal *= -1.0;
+		std::swap(scm->radius1,scm->radius2);
+	}
+	return result;
 }
 
 YADE_PLUGIN();

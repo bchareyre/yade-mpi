@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2007 by Bruno Chareyre                                 *
-*  bruno.chareyre@imag.fr                                               *
+*  Copyright (C) 2007 by Bruno Chareyre <bruno.chareyre@imag.fr>         *
+*  Copyright (C) 2008 by Janek Kozicki <cosurgi@berlios.de>              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -17,6 +17,8 @@ CohesiveFrictionalContactInteraction::CohesiveFrictionalContactInteraction()
 	fragile = true;
 	normalAdhesion = 0;
 	shearAdhesion = 0;
+	moment_twist = Vector3r(0,0,0);
+	moment_bending = Vector3r(0,0,0);
 
 // assign neutral value	
 	orientationToContact1 = Quaternionr(1.0,0.0,0.0,0.0);
@@ -76,6 +78,10 @@ void CohesiveFrictionalContactInteraction::registerAttributes()
 	REGISTER_ATTRIBUTE(initialPosition1);
 	REGISTER_ATTRIBUTE(initialPosition2);
 	REGISTER_ATTRIBUTE(twistCreep);
+
+	REGISTER_ATTRIBUTE(moment_twist);
+	REGISTER_ATTRIBUTE(moment_bending);
+
 //	REGISTER_ATTRIBUTE(prevX1);
 //	REGISTER_ATTRIBUTE(prevX2);
 //	REGISTER_ATTRIBUTE(initX1);

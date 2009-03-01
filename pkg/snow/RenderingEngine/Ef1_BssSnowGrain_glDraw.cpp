@@ -10,6 +10,7 @@
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/core/Omega.hpp>
 
 void triangle(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
 {
@@ -30,6 +31,9 @@ void quad(Vector3r a,Vector3r b, Vector3r c, Vector3r d,Vector3r n)
 
 void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& pp,bool wire)
 {
+//	s.go(cm,pp,wire);
+//	return;
+
 	bool surface = !wire;
 	BssSnowGrain* bssgr = static_cast<BssSnowGrain*>(cm.get());
 	BshSnowGrain& gr = bssgr->m_copy;
@@ -37,7 +41,7 @@ void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, cons
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 	glColor3v(cm->diffuseColor);
 
-	const std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> >& f(gr.get_faces_const_ref());
+	std::vector<boost::tuple<Vector3r,Vector3r,Vector3r,Vector3r> > f(gr.get_faces_copy());
 	if(surface)
 	{
 		glDisable(GL_CULL_FACE);
@@ -112,6 +116,7 @@ void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, cons
 					glVertex3v(gr.slices[i][0]);
 				glEnd();
 			}
+		/*
 		glBegin(GL_LINES);
 			for(size_t i = 0; i < f.size() ; ++i)
 			{
@@ -142,8 +147,35 @@ void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, cons
 				glVertex3v(c);glVertex3v(C);
 			}
 		glEnd();
+		*/
 		glEnable(GL_LIGHTING);
 	}
+
+	// draw m_quick_lookup
+	size_t level = Omega::instance().isoSec;
+	const std::vector<std::vector<std::vector<std::set<int> > > >& lookup(gr.m_quick_lookup);
+	Vector3r min(gr.m_min),max(gr.m_max),dist(gr.m_dist);
+	typedef std::set<int> t_set;
+
+	for(size_t x=0;x<lookup.size();x++)
+	for(size_t y=0;y<lookup[0].size();y++)
+	for(size_t z=0;z<lookup[0][0].size();z++)
+	{
+		const t_set& s(lookup[x][y][z]);
+		if(s.size() >= level)
+		{
+			glPushMatrix();
+			glTranslatev(min + Vector3r(dist[0]*x , dist[1]*y, dist[2]*z ) + dist*0.5);
+			glScalev(dist);
+			glColor3(0.9,0.9,0.9);
+			if(wire)
+				glutWireCube(1.0);
+			else
+				glutSolidCube(1.0);
+			glPopMatrix();
+		}
+	}
+
 }
 
 

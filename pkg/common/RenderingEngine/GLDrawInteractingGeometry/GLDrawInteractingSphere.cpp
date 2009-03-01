@@ -21,7 +21,7 @@ bool GLDrawInteractingSphere::first = true;
 
 GLDrawInteractingSphere::GLDrawInteractingSphere(){first=true;};
 
-void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool)
+void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool wire)
 {
 	//first=true;
 	
@@ -82,16 +82,16 @@ void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, cons
 	
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 	glColor3v(cm->diffuseColor);
-// 	if (cm->wire)
-// 	{
-// 		glScalef(radius,radius,radius);
-// 		glCallList(glWiredSphereList);
-// 	}
-// 	else
-// 	{
+ 	if (wire)
+ 	{
+ 		glScalef(radius,radius,radius);
+ 		glCallList(glWiredSphereList);
+ 	}
+ 	else
+ 	{
 		glScalef(radius,radius,radius);
 		glCallList(glSphereList);
-//	}
+	}
 }
 
 

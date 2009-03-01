@@ -1,6 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2008 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
+*  Copyright (C) 2008 by Janek Kozicki <cosurgi@berlios.de>              *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -57,6 +56,7 @@
 #include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/InteractionHashMap.hpp>
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
+#include<yade/pkg-snow/ElawSnowLayersDeformation.hpp>
 
 #include<yade/extra/Shop.hpp>
 
@@ -72,6 +72,8 @@
 #include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact.hpp>
 //#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp>
 //#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
+
+YADE_PLUGIN();
 
 SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 {
@@ -97,16 +99,21 @@ SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 	radiusControlInterval = 10;
 
 	spheresColor		= Vector3r(0.8,0.3,0.3);
+	use_grain_shear_creep	= true;
+	use_grain_twist_creep	= true;
 
 // a pixel is 20.4 microns (2.04 × 10-5 meters)
 // the sample was 10.4mm high
 	one_voxel_in_meters_is	= 2.04e-5;
+	layer_distance_voxels   = 6.0;
+	angle_increment_radians = 0.3;
+	skip_small_grains       = 25000;
 
 	WallStressRecordFile	= "./SnowWallStresses";
 
 	normalCohesion		= 50000000;
 	shearCohesion		= 50000000;
-	setCohesionOnNewContacts= false;
+	setCohesionOnNewContacts= true;
 	
 	sigma_iso = 50000;
 	creep_viscosity = 4000000;
@@ -122,6 +129,9 @@ SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 	
 	recordIntervalIter	= 20;
 
+	use_gravity_engine = false;
+	enable_layers_creep = true;
+	layers_creep_viscosity = 100000;
 	m_grains.clear();
 }
 
@@ -134,14 +144,24 @@ void SnowVoxelsLoader::registerAttributes()
 {
 	FileGenerator::registerAttributes();
 	REGISTER_ATTRIBUTE(voxel_binary_data_file);
-	REGISTER_ATTRIBUTE(voxel_txt_dir);
-	REGISTER_ATTRIBUTE(voxel_caxis_file);
-	REGISTER_ATTRIBUTE(voxel_colors_file);
+// that was for integrating snow-read with this preprocessor, but for now it's not integrated. snow-read does the conversion separately
+//	REGISTER_ATTRIBUTE(voxel_txt_dir);
+//	REGISTER_ATTRIBUTE(voxel_caxis_file);
+//	REGISTER_ATTRIBUTE(voxel_colors_file);
 	REGISTER_ATTRIBUTE(grain_binary_data_file);
 	REGISTER_ATTRIBUTE(one_voxel_in_meters_is);
+	REGISTER_ATTRIBUTE(layer_distance_voxels);
+	REGISTER_ATTRIBUTE(angle_increment_radians);
+	REGISTER_ATTRIBUTE(skip_small_grains);
 
 	REGISTER_ATTRIBUTE(shearCohesion);
 	REGISTER_ATTRIBUTE(normalCohesion);
+        REGISTER_ATTRIBUTE(creep_viscosity)
+	REGISTER_ATTRIBUTE(use_grain_shear_creep);
+	REGISTER_ATTRIBUTE(use_grain_twist_creep);
+	REGISTER_ATTRIBUTE(enable_layers_creep);
+	REGISTER_ATTRIBUTE(layers_creep_viscosity);
+	REGISTER_ATTRIBUTE(sigma_iso);
 	REGISTER_ATTRIBUTE(setCohesionOnNewContacts);
 
 	REGISTER_ATTRIBUTE(sphereYoungModulus);
@@ -151,14 +171,13 @@ void SnowVoxelsLoader::registerAttributes()
 	REGISTER_ATTRIBUTE(boxPoissonRatio);
 	REGISTER_ATTRIBUTE(boxFrictionDeg);
 	REGISTER_ATTRIBUTE(density);
+	REGISTER_ATTRIBUTE(use_gravity_engine);
 	REGISTER_ATTRIBUTE(gravity);
 	REGISTER_ATTRIBUTE(dampingForce);
 	REGISTER_ATTRIBUTE(dampingMomentum);
 
 	REGISTER_ATTRIBUTE(WallStressRecordFile);
 	
-	REGISTER_ATTRIBUTE(sigma_iso);
-        REGISTER_ATTRIBUTE(creep_viscosity)
 }
 
 bool SnowVoxelsLoader::load_voxels()
@@ -190,10 +209,21 @@ bool SnowVoxelsLoader::load_voxels()
 	}
 	else
 	{
-		message="cannot load txt yet, or nothing to load";
+		message="cannot load input file check if voxel_binary_data_file exists. Or check if grain_binary_data_file does not exist - because if it exists it is loaded first, skipping the layers generation.";
 		return false;
 	}
 	return false;
+}
+
+int voxel_id_count(int id,const T_DATA& dat)
+{	
+	int res=0;	
+	BOOST_FOREACH(const std::vector<std::vector<unsigned char> >& a,dat)
+		BOOST_FOREACH(const std::vector<unsigned char>& b,a)
+			BOOST_FOREACH(unsigned char c,b)
+				if(c==id)
+					++res;
+	return res;
 }
 
 bool SnowVoxelsLoader::generate()
@@ -210,6 +240,7 @@ bool SnowVoxelsLoader::generate()
 	
 	if(m_grains.size() == 0)
 	{
+		int skip_total(0);
 		const T_DATA& dat(m_voxel.m_data.get_data_voxel_const_ref().get_a_voxel_const_ref());
 		std::set<unsigned char> done;done.clear();done.insert(0);
 		BOOST_FOREACH(const std::vector<std::vector<unsigned char> >& a,dat)
@@ -219,10 +250,23 @@ bool SnowVoxelsLoader::generate()
 					if(done.find(c)==done.end())
 					{
 						done.insert(c);
-						boost::shared_ptr<BshSnowGrain> grain(new BshSnowGrain(dat,m_voxel.m_data.get_axes_const_ref()[c],c,m_voxel.m_data.get_colors_const_ref()[c],one_voxel_in_meters_is));
-						m_grains.push_back(grain);
+						if(voxel_id_count(c,dat) > skip_small_grains )
+						{
+							boost::shared_ptr<BshSnowGrain> grain(new BshSnowGrain(dat,m_voxel.m_data.get_axes_const_ref()[c],c,m_voxel.m_data.get_colors_const_ref()[c],one_voxel_in_meters_is,layer_distance_voxels,angle_increment_radians));
+							m_grains.push_back(grain);
+						}
+						else
+						// skip too small grains, because they require extremely small timestep, 
+						// and calculations will take forever.
+						// (they bounce a lot with bigger timestep)
+						{
+							std::cerr << "\n======= skipped grain id: " << ((int)(c)) << "\n";
+							++skip_total;
+						}
 					}
 				};
+		
+		std::cerr << "\n======= total skipped grains: " << ((int)(skip_total)) << "\n";
 
 		std::cerr << "saving "<< grain_binary_data_file << " ...";
 		boost::iostreams::filtering_ostream ofs;
@@ -254,6 +298,7 @@ bool SnowVoxelsLoader::generate()
 	}
 	Real sx = upperCorner[0] - lowerCorner[0];
 	Real sy = upperCorner[1] - lowerCorner[1];
+// make box a little bigger - the four walls are away 10% of size x (sx) and size y (sy)
 	upperCorner[0]+=sx*0.1;
 	lowerCorner[0]-=sx*0.1;
 	upperCorner[1]+=sy*0.1;
@@ -410,12 +455,12 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
-	globalStiffnessTimeStepper->timestepSafetyCoefficient = 0.2;
+	globalStiffnessTimeStepper->timestepSafetyCoefficient = 0.1;
 	
 	shared_ptr<CohesiveFrictionalContactLaw> cohesiveFrictionalContactLaw(new CohesiveFrictionalContactLaw);
 	cohesiveFrictionalContactLaw->sdecGroupMask = 2;
-	cohesiveFrictionalContactLaw->shear_creep = true;
-	cohesiveFrictionalContactLaw->twist_creep = true;
+	cohesiveFrictionalContactLaw->shear_creep = use_grain_shear_creep;
+	cohesiveFrictionalContactLaw->twist_creep = use_grain_twist_creep;
 	cohesiveFrictionalContactLaw->creep_viscosity = creep_viscosity;
 		
 	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
@@ -449,7 +494,10 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialStateRecorder-> interval 		= recordIntervalIter;
 	//triaxialStateRecorder-> thickness 		= thickness;
 	
-	
+	shared_ptr<ElawSnowLayersDeformation>elawSnowLayersDeformation(new ElawSnowLayersDeformation);
+	elawSnowLayersDeformation->creep_viscosity = layers_creep_viscosity;
+	elawSnowLayersDeformation->sdecGroupMask = 2;
+
 	// moving walls to regulate the stress applied
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = YADE_PTR_CAST<TriaxialStressController>(triaxialcompressionEngine);
@@ -479,8 +527,11 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialStateRecorder);
-/////	rootBody->engines.push_back(gravityCondition);
+	if(use_gravity_engine)
+		rootBody->engines.push_back(gravityCondition);
 	rootBody->engines.push_back(actionDampingDispatcher);
+	if(enable_layers_creep)
+		rootBody->engines.push_back(elawSnowLayersDeformation);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
 	//if(!rotationBlocked)
