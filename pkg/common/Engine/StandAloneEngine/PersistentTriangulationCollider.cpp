@@ -20,7 +20,7 @@
 #include"TesselationWrapper.h"
 
 
-PersistentTriangulationCollider::PersistentTriangulationCollider() : BroadInteractor()
+PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 {
 	noTransientIfPersistentExists=false;
 	haveDistantTransient=false;

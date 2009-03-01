@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/BroadInteractor.hpp>
+#include<yade/core/Collider.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include <list>
 #include <set>
@@ -30,7 +30,7 @@ class TesselationWrapper;
 
 using namespace std;
 
-class PersistentTriangulationCollider : public BroadInteractor
+class PersistentTriangulationCollider : public Collider
 {
 	private :
 	
@@ -114,14 +114,14 @@ class PersistentTriangulationCollider : public BroadInteractor
 		bool isTriangulated;
 
 		void registerAttributes(){
-			BroadInteractor::registerAttributes();
+			Collider::registerAttributes();
 			REGISTER_ATTRIBUTE(noTransientIfPersistentExists);
 			REGISTER_ATTRIBUTE(haveDistantTransient);
 		}
 
 
 	REGISTER_CLASS_NAME(PersistentTriangulationCollider);
-	REGISTER_BASE_CLASS_NAME(BroadInteractor);
+	REGISTER_BASE_CLASS_NAME(Collider);
 
 };
 

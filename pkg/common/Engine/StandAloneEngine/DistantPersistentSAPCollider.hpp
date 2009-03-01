@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/BroadInteractor.hpp>
+#include<yade/core/Collider.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include <list>
 #include <set>
@@ -17,7 +17,7 @@
 
 using namespace std;
 
-class DistantPersistentSAPCollider : public BroadInteractor
+class DistantPersistentSAPCollider : public Collider
 {
 	private :
 		// represent an extrmity of an Axis ALigned bounding box
@@ -93,7 +93,7 @@ class DistantPersistentSAPCollider : public BroadInteractor
 
 
 	REGISTER_CLASS_NAME(DistantPersistentSAPCollider);
-	REGISTER_BASE_CLASS_NAME(BroadInteractor);
+	REGISTER_BASE_CLASS_NAME(Collider);
 
 };
 

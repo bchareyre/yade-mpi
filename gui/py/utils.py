@@ -423,11 +423,11 @@ def PythonRunnerFilter(command='pass',isFilterActivated=True):
     return f
 
 def replaceCollider(colliderEngine):
-	"""Replaces collider (BroadInteractor) engine with the engine supplied. Raises error if no collider is in engines."""
+	"""Replaces collider (Collider) engine with the engine supplied. Raises error if no collider is in engines."""
 	colliderIdx=-1
 	for i,e in enumerate(O.engines):
-		if O.isChildClassOf(e.name,"BroadInteractor"):
+		if O.isChildClassOf(e.name,"Collider"):
 			colliderIdx=i
 			break
-	if colliderIdx<0: raise RuntimeError("No BroadInteractor found within O.engines.")
+	if colliderIdx<0: raise RuntimeError("No Collider found within O.engines.")
 	O.engines=O.engines[:colliderIdx]+[colliderEngine]+O.engines[colliderIdx+1:]

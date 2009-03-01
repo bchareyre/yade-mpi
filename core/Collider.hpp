@@ -11,19 +11,31 @@
 #include <yade/core/BoundingVolume.hpp>
 #include "StandAloneEngine.hpp"
 
-class BroadInteractor : public StandAloneEngine
+class Collider : public StandAloneEngine
 {
 	public :
-		BroadInteractor();
-		virtual ~BroadInteractor();
+		Collider();
+		virtual ~Collider();
 		virtual  bool probeBoundingVolume(const BoundingVolume&){throw;}
+		/*! Tell whether given bodies may interact, for other than spatial reasons.
+		 *
+		 * Concrete collider implementations should call this function if
+		 * the bodies are in potential interaction geometrically.
+		 */
+		bool mayCollide(const Body*, const Body*);
+		/*! Handle various state transitions of Interaction (isReal, isNew).
+		 *
+		 * Returns whether the interaction should be preserved (true) or deleted (false).
+		 */
+		bool handleExistingInteraction(Interaction*);
+
 		vector<body_id_t> probedBodies;
 
 	protected:
 
-	REGISTER_CLASS_NAME(BroadInteractor);	
+	REGISTER_CLASS_NAME(Collider);	
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };
 
-REGISTER_SERIALIZABLE(BroadInteractor);
+REGISTER_SERIALIZABLE(Collider);
 

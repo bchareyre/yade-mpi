@@ -54,12 +54,12 @@ void SpheresFactory::action(MetaBody* ncb)
 	{
 		FOREACH(shared_ptr<Engine> eng, ncb->engines)
 		{
-			bI=dynamic_cast<BroadInteractor*>(eng.get());
+			bI=dynamic_cast<Collider*>(eng.get());
 			if (bI) break;
 		}
 		if (!bI) 
 		{
-			LOG_FATAL("Can't find BroadInteractor." );
+			LOG_FATAL("Can't find Collider." );
 			return;
 		}
 		iGME=dynamic_cast<InteractionGeometryMetaEngine*>(ncb->engineByName("InteractionGeometryMetaEngine").get());

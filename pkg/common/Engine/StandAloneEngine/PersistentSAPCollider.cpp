@@ -16,7 +16,7 @@
 
 CREATE_LOGGER(PersistentSAPCollider);
 
-PersistentSAPCollider::PersistentSAPCollider() : BroadInteractor()
+PersistentSAPCollider::PersistentSAPCollider() : Collider()
 {
 	haveDistantTransient=false;
 
@@ -82,6 +82,8 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	typedef pair<body_id_t,body_id_t> bodyIdPair;
 	list<bodyIdPair> toBeDeleted;
 	FOREACH(const shared_ptr<Interaction>& I,*ncb->transientInteractions){
+		// TODO: this logic will be unitedly in Collider::handleExistingInteraction
+		//
 		// remove interactions deleted by the constitutive law: thay are not new, but nor real either
 		// to make sure, do that only with haveDistantTransient
 		if(haveDistantTransient && !I->isNew && !I->isReal) { toBeDeleted.push_back(bodyIdPair(I->getId1(),I->getId2())); continue; }
@@ -215,12 +217,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 	int offset1=3*id1, offset2=3*id2;
 	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1),rootBody)), b2(Body::byId(body_id_t(id2),rootBody));
 	bool overlap =
-		// NOT YET IMPLEMENTED: only collide if at least one of the bodies is not shadow
-		// ((!b1->isShadow()) || (!b2->isShadow())) &&
-		// only collide if at least one particle is standalone or they belong to different clumps
-		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) &&
-		 // do not collide clumps, since they are just containers, never interact
-		!b1->isClump() && !b2->isClump() &&
+		Collider::mayCollide(b1.get(),b2.get());
 		// AABB collisions: 
 		!(
 			maxima[offset1  ]<minima[offset2  ] || maxima[offset2  ]<minima[offset1  ] || 

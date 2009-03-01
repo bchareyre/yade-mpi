@@ -12,7 +12,7 @@
 #include <algorithm>
 
 
-SpatialQuickSortCollider::SpatialQuickSortCollider() : BroadInteractor()
+SpatialQuickSortCollider::SpatialQuickSortCollider() : Collider()
 {
 	haveDistantTransient=false;
 }

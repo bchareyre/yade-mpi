@@ -12,9 +12,9 @@
 #include <set>
 #include <vector>
 #include <algorithm>
-#include<yade/core/BroadInteractor.hpp>
+#include<yade/core/Collider.hpp>
 
-class SAPCollider : public BroadInteractor
+class SAPCollider : public Collider
 {
 	private :
 		// represent an extrmity of an Axis ALigned bounding box
@@ -86,7 +86,7 @@ class SAPCollider : public BroadInteractor
 		// incrementally udated each time step
 
 	REGISTER_CLASS_NAME(SAPCollider);
-	REGISTER_BASE_CLASS_NAME(BroadInteractor);
+	REGISTER_BASE_CLASS_NAME(Collider);
 };
 
 REGISTER_SERIALIZABLE(SAPCollider);

@@ -11,7 +11,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/BodyContainer.hpp>
 
-DistantPersistentSAPCollider::DistantPersistentSAPCollider() : BroadInteractor()
+DistantPersistentSAPCollider::DistantPersistentSAPCollider() : Collider()
 {
 //	cerr << "DistantPersistentSAPCollider\n";
 

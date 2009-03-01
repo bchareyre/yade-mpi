@@ -9,7 +9,7 @@
 
 #include <yade/pkg-common/PeriodicEngines.hpp>
 #include <yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include <yade/core/BroadInteractor.hpp>
+#include <yade/core/Collider.hpp>
 #include <yade/core/MetaBody.hpp>
 #include <vector>
 #include <string>
@@ -70,9 +70,9 @@ public:
 	Vector3r color;
 
 private:
-	/// @brief Pointer to BroadInteractor.
+	/// @brief Pointer to Collider.
 	/// It is necessary in order to probe the bounding volume for new sphere.
-	BroadInteractor* bI;
+	Collider* bI;
 	
 	/// @brief Pointer to InteractionGeometryMetaEngine.
 	/// It is necessary in order to detect a real overlap with other bodies.

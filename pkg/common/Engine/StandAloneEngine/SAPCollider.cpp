@@ -11,7 +11,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/BodyContainer.hpp>
 
-SAPCollider::SAPCollider () : BroadInteractor()
+SAPCollider::SAPCollider () : Collider()
 {
 	this->maxObject = 150000;
 	nbObjects=0;
