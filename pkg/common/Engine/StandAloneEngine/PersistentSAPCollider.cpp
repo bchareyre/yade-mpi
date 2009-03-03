@@ -217,7 +217,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 	int offset1=3*id1, offset2=3*id2;
 	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1),rootBody)), b2(Body::byId(body_id_t(id2),rootBody));
 	bool overlap =
-		Collider::mayCollide(b1.get(),b2.get());
+		Collider::mayCollide(b1.get(),b2.get()) &&
 		// AABB collisions: 
 		!(
 			maxima[offset1  ]<minima[offset2  ] || maxima[offset2  ]<minima[offset1  ] || 
