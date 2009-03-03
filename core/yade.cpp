@@ -185,6 +185,11 @@ int main(int argc, char *argv[])
 	optind=0; opterr=0;
 
 	#ifdef LOG4CXX
+		#ifdef LOG4CXX_TRACE
+			log4cxx::LevelPtr debugLevel=log4cxx::Level::getDebug(), infoLevel=log4cxx::Level::getInfo(), warnLevel=log4cxx::Level::getWarn();
+		#else
+			log4cxx::LevelPtr debugLevel=log4cxx::Level::DEBUG, infoLevel=log4cxx::Level::INFO, warnLevel=log4cxx::Level::WARN;
+		#endif
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){
@@ -192,7 +197,7 @@ int main(int argc, char *argv[])
 			LOG_INFO("Loading "<<logConf);
 		} else { // otherwise use simple console-directed logging
 			log4cxx::BasicConfigurator::configure();
-			logger->setLevel(log4cxx::Level::WARN);
+			logger->setLevel(warnLevel);
 			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be omitted.");
 			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
 		}
@@ -205,11 +210,11 @@ int main(int argc, char *argv[])
 	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
 
 	#ifdef LOG4CXX
-		if(verbose==1) logger->setLevel(log4cxx::Level::INFO);
-		else if (verbose>=2) logger->setLevel(log4cxx::Level::DEBUG);
+		if(verbose==1) logger->setLevel(infoLevel);
+		else if (verbose>=2) logger->setLevel(debugLevel);
 		if(getenv("YADE_DEBUG")){
 			LOG_INFO("YADE_DEBUG environment variable is defined, setting logging level to DEBUG.");
-			logger->setLevel(log4cxx::Level::DEBUG);
+			logger->setLevel(debugLevel);
 		}
 	#endif
 

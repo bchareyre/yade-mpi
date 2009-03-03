@@ -35,7 +35,6 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/SAPCollider.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -125,7 +124,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	dampingForce = 0.2;
 	dampingMomentum = 0.2;
-	defaultDt = 0.001;
+	defaultDt = -1;
 	
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
@@ -251,7 +250,6 @@ bool TriaxialTest::generate()
 	}
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
-	createActors(rootBody);
 	positionRootBody(rootBody);
 
 	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
@@ -403,6 +401,8 @@ bool TriaxialTest::generate()
 		rootBody->bodies->insert(body);
 	}	
 
+	if(defaultDt<0) defaultDt=Shop::PWaveTimeStep();
+	createActors(rootBody);
 
 	return true;
 }

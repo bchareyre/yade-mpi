@@ -8,7 +8,7 @@
 
 #include "BoxStack.hpp"
 
-#include "FrictionLessElasticContactLaw.hpp"
+#include<yade/pkg-realtime-rigidbody/FrictionLessElasticContactLaw.hpp>
 
 
 #include<yade/pkg-common/Box.hpp>
@@ -16,7 +16,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/SAPCollider.hpp>
+#include<yade/pkg-common/PersistentSAPCollider.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/TranslationEngine.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -289,7 +289,7 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new SAPCollider));
+	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new FrictionLessElasticContactLaw));
 	rootBody->engines.push_back(gravityCondition);

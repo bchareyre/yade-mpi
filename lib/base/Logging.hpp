@@ -33,12 +33,16 @@
 
 #	define _LOG_HEAD __FILE__":"<<__LINE__<<" "<<__FUNCTION__<<": "
 	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
-// TRACE doesn't really exist ATM, will output through DEBUG
+// TRACE doesn't really exist in log4cxx 0.9.7 (does in 0.10), otput through DEBUG then
 #ifdef NDEBUG
 #	define LOG_TRACE(msg){}
 #	define LOG_DEBUG(msg){}
 #else
-#	define LOG_TRACE(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
+#	ifdef LOG4CXX_TRACE
+#		define LOG_TRACE(msg) {LOG4CXX_TRACE(logger, _LOG_HEAD<<msg);}
+#	else
+#		define LOG_TRACE(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
+#	endif
 #	define LOG_DEBUG(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
 #endif
 #	define LOG_INFO(msg)  {LOG4CXX_INFO(logger,  _LOG_HEAD<<msg);}

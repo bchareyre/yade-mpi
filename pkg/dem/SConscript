@@ -420,7 +420,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods']),
 
@@ -453,7 +452,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Sphere',
 			'AABB',
 			'PersistentSAPCollider',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB']),
 
 	env.SharedLibrary('DirectShearCis',
@@ -490,7 +488,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods']),
 
@@ -529,7 +526,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods']),
 
@@ -563,7 +559,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods']),
 
@@ -594,7 +589,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods']),
 
@@ -626,7 +620,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods']),
 
@@ -655,7 +648,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'Tetrahedron',
 			'yade-serialization',
@@ -692,7 +684,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
                         'AABB',
                         'PersistentSAPCollider',
                         'ParticleParameters',
-                        'SAPCollider',
                         'MetaInteractingGeometry2AABB',
                         'yade-serialization',
                         'yade-base',
@@ -729,7 +720,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Sphere',
 			'AABB',
 			'PersistentSAPCollider',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'GlobalStiffness',
 			'GlobalStiffnessCounter',
@@ -773,7 +763,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Sphere',
 			'AABB',
 			'DistantPersistentSAPCollider',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'GlobalStiffness',
 			'GlobalStiffnessCounter',
@@ -816,7 +805,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'yade-multimethods',
 			'TranslationEngine']),
@@ -887,7 +875,6 @@ env.SharedLibrary('TriaxialTestWater',
         Sphere
         AABB
         PersistentSAPCollider
-        SAPCollider
         MetaInteractingGeometry2AABB
 	GlobalStiffness
 	GlobalStiffnessCounter
@@ -1006,7 +993,6 @@ env.SharedLibrary('HydraulicTest',
 			'Sphere',
 			'AABB',
 			'DistantPersistentSAPCollider',
-			'SAPCollider',
 			'MetaInteractingGeometry2AABB',
 			'GlobalStiffness',
 			'GlobalStiffnessCounter',

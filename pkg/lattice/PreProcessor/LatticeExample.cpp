@@ -8,19 +8,19 @@
 
 #include "LatticeExample.hpp"
 
-#include "LatticeSetParameters.hpp"
-#include "LatticeBeamParameters.hpp"
-#include "LatticeBeamAngularSpring.hpp"
-#include "NonLocalDependency.hpp"
-#include "LatticeNodeParameters.hpp"
-#include "LineSegment.hpp"
-#include "LatticeLaw.hpp"
-#include "StrainRecorder.hpp"
-#include "NodeRecorder.hpp"
-#include "BeamRecorder.hpp"
-#include "MovingSupport.hpp"
-#include "MeasurePoisson.hpp"
-#include "NonLocalInitializer.hpp"
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LatticeBeamAngularSpring.hpp>
+#include<yade/pkg-lattice/NonLocalDependency.hpp>
+#include<yade/pkg-lattice/LatticeNodeParameters.hpp>
+#include<yade/pkg-lattice/LineSegment.hpp>
+#include<yade/pkg-lattice/LatticeLaw.hpp>
+#include<yade/pkg-lattice/StrainRecorder.hpp>
+#include<yade/pkg-lattice/NodeRecorder.hpp>
+#include<yade/pkg-lattice/BeamRecorder.hpp>
+#include<yade/pkg-lattice/MovingSupport.hpp>
+#include<yade/pkg-lattice/MeasurePoisson.hpp>
+#include<yade/pkg-lattice/NonLocalInitializer.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 #include "LatticeInteractingGeometry.hpp"

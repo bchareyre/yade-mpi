@@ -14,12 +14,21 @@ void logSetLevel(std::string loggerName,int level){
 	if(!log4cxx::LogManager::exists(fullName)) throw std::invalid_argument("No logger named `"+fullName+"'");
 	log4cxx::LevelPtr l;
 	switch(level){
-		case ll_TRACE: l=log4cxx::Level::DEBUG; break;
-		case ll_DEBUG: l=log4cxx::Level::DEBUG; break;
-		case ll_INFO: l=log4cxx::Level::INFO; break;
-		case ll_WARN: l=log4cxx::Level::WARN; break;
-		case ll_ERROR: l=log4cxx::Level::ERROR; break;
-		case ll_FATAL: l=log4cxx::Level::FATAL; break;
+		#ifdef LOG4CXX_TRACE
+			case ll_TRACE: l=log4cxx::Level::getTrace(); break;
+			case ll_DEBUG: l=log4cxx::Level::getDebug(); break;
+			case ll_INFO:  l=log4cxx::Level::getInfo(); break;
+			case ll_WARN:  l=log4cxx::Level::getWarn(); break;
+			case ll_ERROR: l=log4cxx::Level::getError(); break;
+			case ll_FATAL: l=log4cxx::Level::getFatal(); break;
+		#else
+			case ll_TRACE: l=log4cxx::Level::DEBUG; break;
+			case ll_DEBUG: l=log4cxx::Level::DEBUG; break;
+			case ll_INFO:  l=log4cxx::Level::INFO; break;
+			case ll_WARN:  l=log4cxx::Level::WARN; break;
+			case ll_ERROR: l=log4cxx::Level::ERROR; break;
+			case ll_FATAL: l=log4cxx::Level::FATAL; break;
+		#endif
 		default: throw std::invalid_argument("Unrecognized logging level "+lexical_cast<std::string>(level));
 	}
 	log4cxx::LogManager::getLogger("yade."+loggerName)->setLevel(l);

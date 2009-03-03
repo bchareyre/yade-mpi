@@ -26,7 +26,6 @@
 
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/SAPCollider.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>

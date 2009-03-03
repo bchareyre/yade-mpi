@@ -78,7 +78,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'AABB',
 			'PersistentSAPCollider',
 			'ParticleParameters',
-			'SAPCollider',
 			'MetaInteractingGeometry',
 			'MetaInteractingGeometry2AABB',
 			'GlobalStiffness',

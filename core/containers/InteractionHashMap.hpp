@@ -12,7 +12,6 @@
 #include<yade/core/Interaction.hpp>
 #include<ext/hash_map>
 #include<vector>
-#include"InteractionHashMap.hpp"
 
 using namespace std;
 using namespace __gnu_cxx;

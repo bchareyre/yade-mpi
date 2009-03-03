@@ -143,7 +143,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('SpatialQuickSortCollider',['Engine/StandAloneEngine/SpatialQuickSortCollider.cpp']),
 	env.SharedLibrary('PersistentSAPCollider',['Engine/StandAloneEngine/PersistentSAPCollider.cpp']),
 	env.SharedLibrary('DistantPersistentSAPCollider',['Engine/StandAloneEngine/DistantPersistentSAPCollider.cpp']),
-	env.SharedLibrary('SAPCollider',['Engine/StandAloneEngine/SAPCollider.cpp']),
 	env.SharedLibrary('PhysicalActionContainerInitializer',['Engine/StandAloneEngine/PhysicalActionContainerInitializer.cpp']),
 	env.SharedLibrary('PhysicalActionContainerReseter',['Engine/StandAloneEngine/PhysicalActionContainerReseter.cpp']),
 	env.SharedLibrary('GLDrawAABB',['RenderingEngine/GLDrawBoundingVolume/GLDrawAABB.cpp'],
