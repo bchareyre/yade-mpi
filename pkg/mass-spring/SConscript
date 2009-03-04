@@ -65,7 +65,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-mass-spring',[
 			'PersistentSAPCollider',
 			'Box',
 			'SDECLinkGeometry',
-			'SAPCollider',
 			'RigidBodyParameters',
 			'BodyMacroParameters',
 			'MetaInteractingGeometry2AABB',

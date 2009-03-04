@@ -224,7 +224,8 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 
 		BrefcomMakeContact(){
 			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=xiShear=epsCrackOnset=relDuctility=G_over_E=transStrainCoeff=std::numeric_limits<Real>::signaling_NaN();
+			sigmaT=epsCrackOnset=relDuctility=G_over_E=transStrainCoeff=std::numeric_limits<Real>::signaling_NaN();
+			xiShear=0;
 			neverDamage=false;
 			cohesiveThresholdIter=-1;
 			tau=-1; expDmgRate=0;
