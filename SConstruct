@@ -323,6 +323,7 @@ if not env.GetOption('clean'):
 	# check "optional" libs
 	if 'log4cxx' in env['features']:
 		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
+			#env.Append(CPPDEFINES=[('LOG4CXX','9'])
 		if not ok: featureNotOK('log4cxx')
 		env.Append(CPPDEFINES=['LOG4CXX'])
 	if 'python' in env['features']:
