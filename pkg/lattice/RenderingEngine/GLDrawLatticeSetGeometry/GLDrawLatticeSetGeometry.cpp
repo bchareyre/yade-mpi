@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include "GLDrawLatticeSetGeometry.hpp"
-#include "LatticeSetGeometry.hpp"
-#include "LatticeSetParameters.hpp"
-#include "LatticeBeamParameters.hpp"
-#include "LatticeNodeParameters.hpp"
+#include<yade/pkg-lattice/LatticeSetGeometry.hpp>
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Omega.hpp>

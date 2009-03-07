@@ -8,10 +8,10 @@
 
 #include "NonLocalInitializer.hpp"
 #include<yade/core/MetaBody.hpp>
-#include "LatticeBeamParameters.hpp"
-#include "LatticeNodeParameters.hpp"
-#include "LatticeSetParameters.hpp"
-#include "NonLocalDependency.hpp"
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LatticeNodeParameters.hpp>
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
+#include<yade/pkg-lattice/NonLocalDependency.hpp>
 
 
 NonLocalInitializer::NonLocalInitializer () : StandAloneEngine()

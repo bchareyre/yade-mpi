@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include "FEMTetrahedronStiffness.hpp"
-#include "FEMSetParameters.hpp"
-#include "FEMTetrahedronData.hpp"
+#include<yade/pkg-fem/FEMSetParameters.hpp>
+#include<yade/pkg-fem/FEMTetrahedronData.hpp>
 
 
 

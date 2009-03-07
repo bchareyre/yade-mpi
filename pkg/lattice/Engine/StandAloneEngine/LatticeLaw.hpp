@@ -9,7 +9,7 @@
 #pragma once
 
 
-#include "LatticeBeamParameters.hpp"
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/core/InteractionSolver.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include <list>

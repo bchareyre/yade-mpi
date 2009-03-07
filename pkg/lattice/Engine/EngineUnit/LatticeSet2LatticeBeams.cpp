@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include "LatticeSet2LatticeBeams.hpp"
-#include "LatticeSetParameters.hpp"
-#include "LatticeBeamParameters.hpp"
-#include "LineSegment.hpp"
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LineSegment.hpp>
 #include<yade/core/MetaBody.hpp>
 
 void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph

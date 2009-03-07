@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "ParticleSet2Mesh2D.hpp"
-#include "ParticleSetParameters.hpp"
+#include<yade/pkg-mass-spring/ParticleSetParameters.hpp>
 #include<yade/pkg-common/Mesh2D.hpp>
 #include<yade/core/MetaBody.hpp>
 

@@ -8,10 +8,10 @@
 
 #include "HangingCloth.hpp"
 
-#include "MassSpringLaw.hpp"
-#include "ParticleSetParameters.hpp"
-#include "SpringGeometry.hpp"
-#include "SpringPhysics.hpp"
+#include<yade/pkg-mass-spring/MassSpringLaw.hpp>
+#include<yade/pkg-mass-spring/ParticleSetParameters.hpp>
+#include<yade/pkg-mass-spring/SpringGeometry.hpp>
+#include<yade/pkg-mass-spring/SpringPhysics.hpp>
 
 
 #include<yade/core/Body.hpp>

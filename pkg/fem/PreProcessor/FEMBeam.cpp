@@ -9,12 +9,12 @@
 
 #include "FEMBeam.hpp"
 
-#include "FEMSetParameters.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
-#include "FEMTetrahedronStiffness.hpp"
-#include "FEMLaw.hpp"
-#include "FEMSetTextLoader.hpp"
+#include<yade/pkg-fem/FEMSetParameters.hpp>
+#include<yade/pkg-fem/FEMTetrahedronData.hpp>
+#include<yade/pkg-fem/FEMNodeData.hpp>
+#include<yade/pkg-fem/FEMTetrahedronStiffness.hpp>
+#include<yade/pkg-fem/FEMLaw.hpp>
+#include<yade/pkg-fem/FEMSetTextLoader.hpp>
 
 
 // data

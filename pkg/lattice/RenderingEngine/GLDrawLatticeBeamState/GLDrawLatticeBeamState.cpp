@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawLatticeBeamState.hpp"
-#include "LatticeBeamParameters.hpp"
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 void GLDrawLatticeBeamState::go(const shared_ptr<PhysicalParameters>& pp)

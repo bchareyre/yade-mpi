@@ -23,7 +23,7 @@
 #include<yade/pkg-lattice/NonLocalInitializer.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
-#include "LatticeInteractingGeometry.hpp"
+#include<yade/pkg-lattice/LatticeInteractingGeometry.hpp>
 
 #include<yade/pkg-common/Sphere.hpp>
 

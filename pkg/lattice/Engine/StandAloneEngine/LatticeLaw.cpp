@@ -7,11 +7,11 @@
 *************************************************************************/
 
 #include "LatticeLaw.hpp"
-#include "LatticeBeamParameters.hpp"
-#include "LatticeBeamAngularSpring.hpp"
-#include "NonLocalDependency.hpp"
-#include "LatticeNodeParameters.hpp"
-#include "LatticeSetParameters.hpp"
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LatticeBeamAngularSpring.hpp>
+#include<yade/pkg-lattice/NonLocalDependency.hpp>
+#include<yade/pkg-lattice/LatticeNodeParameters.hpp>
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawLineSegment.hpp"
-#include "LineSegment.hpp"
+#include<yade/pkg-lattice/LineSegment.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 GLDrawLineSegment::GLDrawLineSegment() : maxLen(0)

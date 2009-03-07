@@ -8,7 +8,7 @@
 
 
 #include "CinemCNCEngine.hpp"
-#include "RigidBodyParameters.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>

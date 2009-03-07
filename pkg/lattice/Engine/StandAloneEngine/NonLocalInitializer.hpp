@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/StandAloneEngine.hpp>
-#include "LatticeSetParameters.hpp"
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
 
 class Body;
 class BodyContainer;

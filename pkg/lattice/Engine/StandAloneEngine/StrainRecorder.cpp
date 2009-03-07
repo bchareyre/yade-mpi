@@ -8,8 +8,8 @@
 
 #include "StrainRecorder.hpp"
 #include<yade/core/MetaBody.hpp>
-#include "LatticeBeamParameters.hpp"
-#include "LatticeNodeParameters.hpp"
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 // to calculate strain of whole speciemen - first two bodies in subscribedBodies are Nodes. FIXME - make it clean!
 #include <boost/lexical_cast.hpp>
 

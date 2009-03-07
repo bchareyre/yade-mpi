@@ -8,8 +8,8 @@
 *************************************************************************/
 
 #include "FEMLaw.hpp"
-#include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
+#include<yade/pkg-fem/FEMTetrahedronData.hpp>
+#include<yade/pkg-fem/FEMNodeData.hpp>
 #include<yade/pkg-common/Force.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>

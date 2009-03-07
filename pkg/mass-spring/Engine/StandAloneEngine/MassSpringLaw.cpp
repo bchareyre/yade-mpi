@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #include "MassSpringLaw.hpp"
-#include "SpringGeometry.hpp"
-#include "SpringPhysics.hpp"
+#include<yade/pkg-mass-spring/SpringGeometry.hpp>
+#include<yade/pkg-mass-spring/SpringPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Mesh2D.hpp>

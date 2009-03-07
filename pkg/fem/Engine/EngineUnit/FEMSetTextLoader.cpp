@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include "FEMSetTextLoader.hpp"
-#include "FEMSetParameters.hpp"
-#include "FEMNodeData.hpp"
-#include "FEMTetrahedronData.hpp"
+#include<yade/pkg-fem/FEMSetParameters.hpp>
+#include<yade/pkg-fem/FEMNodeData.hpp>
+#include<yade/pkg-fem/FEMTetrahedronData.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Tetrahedron.hpp>
 #include <boost/filesystem/convenience.hpp>

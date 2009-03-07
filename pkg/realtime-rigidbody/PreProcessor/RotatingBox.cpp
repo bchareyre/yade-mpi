@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "RotatingBox.hpp"
-#include "FrictionLessElasticContactLaw.hpp"
+#include<yade/pkg-realtime-rigidbody/FrictionLessElasticContactLaw.hpp>
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>

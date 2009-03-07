@@ -8,8 +8,8 @@
 
 #include "FEMSet2Tetrahedrons.hpp"
 
-#include "FEMSetParameters.hpp"
-#include "FEMTetrahedronData.hpp"
+#include<yade/pkg-fem/FEMSetParameters.hpp>
+#include<yade/pkg-fem/FEMTetrahedronData.hpp>
 
 
 #include<yade/pkg-common/Tetrahedron.hpp>
