@@ -62,7 +62,6 @@
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/InteractionHashMap.hpp>
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include<yade/extra/Shop.hpp>
@@ -257,6 +256,8 @@ bool TriaxialTest::generate()
 	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
+	createActors(rootBody);
+
 	shared_ptr<Body> body;
 
 
@@ -402,7 +403,6 @@ bool TriaxialTest::generate()
 	}	
 
 	if(defaultDt<0) defaultDt=Shop::PWaveTimeStep();
-	createActors(rootBody);
 
 	return true;
 }

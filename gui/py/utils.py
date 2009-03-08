@@ -431,3 +431,13 @@ def replaceCollider(colliderEngine):
 			break
 	if colliderIdx<0: raise RuntimeError("No Collider found within O.engines.")
 	O.engines=O.engines[:colliderIdx]+[colliderEngine]+O.engines[colliderIdx+1:]
+
+
+def procStatus(name):
+	import os
+	for l in open('/proc/%d/status'%os.getpid()):
+		if l.split(':')[0]==name: return l
+	raise "No such line in /proc/[pid]/status: "+name
+def vmData():
+	l=procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
+	return int(ll[1])

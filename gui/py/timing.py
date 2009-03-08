@@ -57,12 +57,6 @@ def _engines_stats(engines,totalTime,level):
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1
 	return lines
 
-#[label,absTime,relTime,[
-#	[sub1label,sub1absTime,sub1RelTime], 
-#	…]],
-#label2,absTime2,relTime2,
-#	]
-
 def stats():
 	print 'Name'.ljust(_statCols['label'])+' '+'Count'.rjust(_statCols['count'])+' '+'Time'.rjust(_statCols['time'])+' '+'Rel. time'.rjust(_statCols['relTime'])
 	print '-'*(sum([_statCols[k] for k in _statCols])+len(_statCols)-1)

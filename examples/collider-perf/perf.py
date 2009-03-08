@@ -1,5 +1,5 @@
 
-utils.readParamsFromTable(nSpheres=1000,collider='PersistentSAPCollider',noTableOk=True)
+utils.readParamsFromTable(nSpheres=8000,collider='PersistentSAPCollider',noTableOk=True)
 # name of file containing sphere packing with given number of spheres
 spheresFile="packing-%dk.spheres"%(nSpheres/1000)
 
@@ -20,8 +20,10 @@ p=Preprocessor('TriaxialTest',{'importFilename':spheresFile}).load()
 O.dt=utils.PWaveTimeStep()
 utils.replaceCollider(StandAloneEngine(collider))
 
+mem0=utils.vmData()
 O.step()
 timing.stats()
+print 'Extra memory:',utils.vmData()-mem0,'kB'
 timing.reset()
 O.run(100,True)
 timing.stats()
