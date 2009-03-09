@@ -54,15 +54,15 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('SpheresContactGeometry',
 		['DataClass/InteractionGeometry/SpheresContactGeometry.cpp'],
-		LIBS=env['LIBS']+['yade-serialization','yade-base']),
+		LIBS=env['LIBS']+['RigidBodyParameters']),
 
 	env.SharedLibrary('SDECLinkGeometry',
-		['DataClass/InteractionGeometry/SDECLinkGeometry.cpp'],
-		LIBS=env['LIBS']+['yade-serialization','yade-base']),
+		['DataClass/InteractionGeometry/SDECLinkGeometry.cpp']
+	),
 
 	env.SharedLibrary('InteractionOfMyTetrahedron',
 		['DataClass/InteractionGeometry/InteractionOfMyTetrahedron.cpp'],
-		LIBS=env['LIBS']+['yade-serialization', 'yade-base']),
+	),
 
 	env.SharedLibrary('ElasticContactInteraction',
 		['DataClass/InteractionPhysics/ElasticContactInteraction.cpp'],

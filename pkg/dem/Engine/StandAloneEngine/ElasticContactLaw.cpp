@@ -114,6 +114,10 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			Real un=currentContactGeometry->penetrationDepth;
 			currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
+	#if 0
+		// the core under #else, refactored
+		currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,isDynamic1,isDynamic2,dt);
+	#else
 			Vector3r axis;
 			Real angle;
 
@@ -163,6 +167,8 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
 			Vector3r shearDisplacement		= shearVelocity*dt;
 			shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
+
+	#endif
 	
 	// PFC3d SlipModel, is using friction angle. CoulombCriterion
 			Real maxFs = currentContactPhysics->normalForce.SquaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
@@ -173,7 +179,9 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			}
 	////////// PFC3d SlipModel
 	
-			Vector3r f				= currentContactPhysics->normalForce + shearForce;
+			Vector3r f=currentContactPhysics->normalForce + shearForce;
+			Vector3r c1x(currentContactGeometry->contactPoint-de1->se3.position),
+				c2x(currentContactGeometry->contactPoint-de2->se3.position);
 			#ifdef BEX_CONTAINER
 				ncb->bex.addForce (id1,-f);
 				ncb->bex.addForce (id2,+f);
