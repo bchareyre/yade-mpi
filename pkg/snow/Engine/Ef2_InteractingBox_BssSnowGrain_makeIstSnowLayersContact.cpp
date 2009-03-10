@@ -117,6 +117,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 	if(!cross_section.empty())
 	{
 		// find the contact plane with least squre fitting from wm3 library
+#ifndef MINIWM3
 		Plane3<Real> plane(OrthogonalPlaneFit3 (cross_section.size(), &cross_section[0]));
 		Vector3r N = plane.Normal;
 		//const Vector3r N((normal_from_to.Dot(N) > 0) ? plane.Normal : 1.0*plane.Normal);
@@ -229,6 +230,9 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 		return res;
 
 		//return true;
+#else
+		std::cerr   << "ERROR: full version of wm3 library is needed\n";
+#endif
 	}
 //	if(! m1->depths[id2].empty()) m1->depths[id2].clear();
 	if(! m2->depths[id1].empty()) m2->depths[id1].clear();
@@ -316,6 +320,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 
 	if(!cross_section.empty())
 	{
+#ifndef MINIWM3
 		// find the contact plane with least squre fitting from wm3 library
 		Plane3<Real> plane(OrthogonalPlaneFit3 (cross_section.size(), &cross_section[0]));
 		Vector3r N = plane.Normal;
@@ -429,6 +434,9 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 		return res;
 
 		//return true;
+#else
+		std::cerr   << "ERROR: full version of wm3 library is needed\n";
+#endif
 	}
 	if(! m1->depths[id2].empty()) m1->depths[id2].clear();
 //	if(! m2->depths[id1].empty()) m2->depths[id1].clear();
