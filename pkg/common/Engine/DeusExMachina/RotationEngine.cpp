@@ -74,7 +74,6 @@ void RotationEngine::applyCondition(MetaBody *ncb)
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 
 	Real dt = Omega::instance().getTimeStep();
-	// time = dt;
 
 	Quaternionr q;
 	q.FromAxisAngle(rotationAxis,angularVelocity*dt);
@@ -86,16 +85,19 @@ void RotationEngine::applyCondition(MetaBody *ncb)
 	{
 		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
 
+		rb->angularVelocity	= rotationAxis*angularVelocity;
+
 		if(rotateAroundZero)
-			rb->se3.position	= q*(rb->se3.position-zeroPoint)+zeroPoint; // for RotatingBox
+        {
+            const Vector3r l = rb->se3.position-zeroPoint;
+			rb->se3.position	= q*l+zeroPoint; 
+            rb->velocity		= rb->angularVelocity.Cross(l);
+		}
 			
 		rb->se3.orientation	= q*rb->se3.orientation;
-
 		rb->se3.orientation.Normalize();
 		rb->se3.orientation.ToAxisAngle(ax,an);
 		
-		rb->angularVelocity	= rotationAxis*angularVelocity;
-		rb->velocity		= Vector3r(0,0,0);
 	}
 
 

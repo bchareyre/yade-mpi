@@ -9,7 +9,7 @@ YADE_PLUGIN("SpheresContactGeometry");
 // At least one virtual method must be in the .cpp file (!!!)
 SpheresContactGeometry::~SpheresContactGeometry(){};
 
-void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, bool isDynamic1, bool isDynamic2, Real dt, bool avoidGranularRatcheting){
+void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
@@ -17,13 +17,7 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 	// approximated rotations
 		axis = prevNormal.Cross(normal); 
 		shearForce -= shearForce.Cross(axis);
-		//angle = dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
-		//FIXME: if one body is kinematic then assumed its rotation centre does not lies along the normal
-		//(i.e. virtual sphere, which replaces this kinematic body on contact, does not rotate)
-		Vector3r summaryAngularVelocity(Vector3r::ZERO);
-		if (isDynamic1) summaryAngularVelocity += rbp1->angularVelocity;
-		if (isDynamic2) summaryAngularVelocity += rbp2->angularVelocity;
-		angle = dt*0.5*normal.Dot(summaryAngularVelocity);
+		angle = dt*0.5*normal.Dot(rbp1->angularVelocity + rbp2->angularVelocity);
 		axis = angle*normal;
 		shearForce -= shearForce.Cross(axis);
 		
@@ -48,10 +42,13 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 		 *  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
 		 *  "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
 		 *  ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors) */
-		c1x = (isDynamic1) ?  radius1*normal : x - rbp1->zeroPoint;
-		c2x = (isDynamic2) ? -radius2*normal : x - rbp2->zeroPoint;
+
+		// FIXME: For sphere-facet contact this will give an erroneous value of relative velocity...
+		c1x =   radius1*normal; 
+		c2x =  -radius2*normal;
 	}
 	else {
+		// FIXME: It is correct for sphere-sphere and sphere-facet contact
 		c1x = (x - rbp1->se3.position);
 		c2x = (x - rbp2->se3.position);
 	}

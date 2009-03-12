@@ -11,14 +11,14 @@
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 /// This class provides linear viscoelastic contact model
-class Spheres_Viscoelastic_SimpleViscoelasticContactLaw : public ConstitutiveLaw
+class ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw : public ConstitutiveLaw
 {
 	public :
 		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, MetaBody*);
 		NEEDS_BEX("Force","Momentum");
 		FUNCTOR2D(SpheresContactGeometry,ViscoelasticInteraction);
-		REGISTER_CLASS_AND_BASE(Spheres_Viscoelastic_SimpleViscoelasticContactLaw,ConstitutiveLaw);
+		REGISTER_CLASS_AND_BASE(ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw,ConstitutiveLaw);
 };
-REGISTER_SERIALIZABLE(Spheres_Viscoelastic_SimpleViscoelasticContactLaw);
+REGISTER_SERIALIZABLE(ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw);
 
 

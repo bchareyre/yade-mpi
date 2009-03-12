@@ -68,9 +68,7 @@ o.engines=[
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleViscoelasticRelationships')]),
 
     ## Constitutive law
-	MetaEngine('ConstitutiveLawDispatcher',[EngineUnit('Spheres_Viscoelastic_SimpleViscoelasticContactLaw')]),
-    ## or InteractionSolver 
-	#StandAloneEngine('SimpleViscoelasticContactLaw'),
+	MetaEngine('ConstitutiveLawDispatcher',[EngineUnit('ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw')]),
 
 	DeusExMachina('GravityEngine',{'gravity':[0,-9.81,0]}),
 

@@ -30,10 +30,11 @@
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-dem/RigidBodyRecorder.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticSpheresInteractionRecorder.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
-#include<yade/pkg-dem/SimpleViscoelasticContactLaw.hpp>
+#include<yade/pkg-dem/ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticRelationships.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
@@ -190,13 +191,16 @@ void TestSimpleViscoelastic::createActors(shared_ptr<MetaBody>& rootBody)
     shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
     orientationIntegrator->add("LeapFrogOrientationIntegrator");
     
+	shared_ptr<ConstitutiveLawDispatcher> constitutiveLaw(new ConstitutiveLawDispatcher);
+	constitutiveLaw->add("ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw");
+
     rootBody->engines.clear();
     rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
     rootBody->engines.push_back(boundingVolumeDispatcher);	
     rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
     rootBody->engines.push_back(interactionGeometryDispatcher);
     rootBody->engines.push_back(interactionPhysicsDispatcher);
-    rootBody->engines.push_back(shared_ptr<Engine>(new SimpleViscoelasticContactLaw));
+    rootBody->engines.push_back(constitutiveLaw);
     rootBody->engines.push_back(gravityCondition);
     rootBody->engines.push_back(applyActionDispatcher);
     rootBody->engines.push_back(positionIntegrator);

@@ -64,7 +64,7 @@ o.engines=[
 	## Create physical information about the interaction.
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleViscoelasticRelationships')]),
     ## Constitutive law
-	MetaEngine('ConstitutiveLawDispatcher',[EngineUnit('Spheres_Viscoelastic_SimpleViscoelasticContactLaw')]),
+	MetaEngine('ConstitutiveLawDispatcher',[EngineUnit('ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw')]),
 	## Apply gravity
 	DeusExMachina('GravityEngine',{'gravity':[0,-9.81,0]}),
 	## Cundall damping must been disabled!

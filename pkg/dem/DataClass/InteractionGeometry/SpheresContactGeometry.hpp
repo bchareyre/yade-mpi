@@ -100,7 +100,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();}
 		virtual ~SpheresContactGeometry();
 
-		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, bool isDynamic1, bool isDynamic2, Real dt, bool avoidGranularRatcheting=true);
+		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
 
 	REGISTER_ATTRIBUTES(/* no attributes from base class */,
 			(normal)

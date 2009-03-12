@@ -16,7 +16,6 @@ RigidBodyParameters::RigidBodyParameters() : ParticleParameters()
 	acceleration = Vector3r(0,0,0);
 	angularAcceleration = Vector3r(0,0,0);
 	angularVelocity=Vector3r(0,0,0);
-	zeroPoint=Vector3r(0,0,0);
 }
 
 RigidBodyParameters::~RigidBodyParameters()
@@ -28,7 +27,6 @@ void RigidBodyParameters::registerAttributes()
 	ParticleParameters::registerAttributes();
 	REGISTER_ATTRIBUTE(inertia);
 	REGISTER_ATTRIBUTE(angularVelocity);
-//	REGISTER_ATTRIBUTE(zeroPoint); // must be set by kinematic Engine
 }
 
 YADE_PLUGIN();
