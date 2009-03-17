@@ -113,8 +113,9 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 		['opengl/FpsTracker.cpp',
 			'opengl/GLTextLabel.cpp',
 			'opengl/GLWindow.cpp',
-			'opengl/GLWindowsManager.cpp'],
-		LIBS=env['LIBS']+['glut']),
+			'opengl/GLWindowsManager.cpp',
+			'opengl/GLUtils.cpp'],
+		LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
 
 
 	env.SharedLibrary('XMLFormatManager',

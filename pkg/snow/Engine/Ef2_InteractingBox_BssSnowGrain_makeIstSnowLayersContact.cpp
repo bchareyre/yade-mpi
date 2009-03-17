@@ -231,7 +231,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 
 		//return true;
 #else
-		std::cerr   << "ERROR: full version of wm3 library is needed\n";
+		LOG_FATAL("Using miniWm3; recompile with full Wm3 support to make snow folly functional.");
+		throw runtime_error("full wm3 required (message above).");
 #endif
 	}
 //	if(! m1->depths[id2].empty()) m1->depths[id2].clear();
@@ -435,7 +436,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 
 		//return true;
 #else
-		std::cerr   << "ERROR: full version of wm3 library is needed\n";
+		LOG_FATAL("Using miniWm3; recompile with full Wm3 support to make snow folly functional.");
+		throw runtime_error("full wm3 required (message above).");
 #endif
 	}
 	if(! m1->depths[id2].empty()) m1->depths[id2].clear();

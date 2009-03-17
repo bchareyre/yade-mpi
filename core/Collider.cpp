@@ -33,6 +33,7 @@ bool Collider::handleExistingInteraction(Interaction* I){
 	if(!I->isReal && !I->isNew) return false; // should be deleted
 
 	assert(false); // unreachable
+	return false;
 }
 
 bool Collider::mayCollide(const Body* b1, const Body* b2){

@@ -13,21 +13,27 @@ class Dem3DofGeom: public InteractionGeometry {
 		Vector3r normal;
 		//! some reference point for the interaction
 		Vector3r contactPoint;
+		//! make strain go to -∞ for length going to zero
+		bool logCompression;
 
 		// API that needs to be implemented in derived classes
-		virtual Real displacementN()=0;
-		virtual Vector3r displacementT()=0;
-		virtual Real slipToDisplacementTMax(Real displacementTMax)=0; // plasticity
+		virtual Real displacementN(){throw;}
+		virtual Vector3r displacementT(){throw;}
+		virtual Real slipToDisplacementTMax(Real displacementTMax){throw;}; // plasticity
 		// end API
 
-		Real strainN(){return displacementN()/refLength;}
+		Real strainN(){
+			//if(!logCompression)
+			return displacementN()/refLength;
+			//else{Real dn=displacementN(); }
+		}
 		Vector3r strainT(){return displacementT()/refLength;}
 		Real slipToStrainTMax(Real strainTMax){return slipToDisplacementTMax(strainTMax*refLength)/refLength;}
 
 		REGISTER_CLASS_AND_BASE(Dem3DofGeom,InteractionGeometry);
 		REGISTER_ATTRIBUTES(InteractionGeometry,(refLength)(normal)(contactPoint));
 };
-//REGISTER_SERIALIZABLE(Dem3DofGeom);
+REGISTER_SERIALIZABLE(Dem3DofGeom);
 
 #if 0
 /*! Abstract class for providing torsion and bending, in addition to inherited normal and shear strains. */

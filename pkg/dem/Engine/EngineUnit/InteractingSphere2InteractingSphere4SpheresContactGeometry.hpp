@@ -33,7 +33,7 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 	
-	//FIXME: what is this good for?!
+	// needed for the dispatcher, even if it is symmetric
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 	
 	protected :

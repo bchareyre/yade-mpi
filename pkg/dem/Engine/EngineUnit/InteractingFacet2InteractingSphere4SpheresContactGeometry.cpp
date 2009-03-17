@@ -36,7 +36,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 {
 	InteractingFacet*   facet = static_cast<InteractingFacet*>(cm1.get());
 	/* could be written as (needs to be tested):
-	 * Vector3r cl=se32.orientation.Conjugate()*(se32.position-se32.position);
+	 * Vector3r cl=se31.orientation.Conjugate()*(se32.position-se31.position);
 	 */
 	Matrix3r facetAxisT; se31.orientation.ToRotationMatrix(facetAxisT); 
 	Matrix3r facetAxis = facetAxisT.Transpose();

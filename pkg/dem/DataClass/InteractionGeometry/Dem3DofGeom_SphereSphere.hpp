@@ -15,15 +15,17 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 	public:
 		//! Positions and orientations of both spheres; must be updated at every iteration by the geom functor
 		Se3r se31, se32;
-		const Vector3r& pos1, pos2; const Quaternionr& ori1, ori2;
+		//! relative orientation of the contact point with regards to sphere-local +x axis (quasi-constant)
 		Quaternionr cp1rel, cp2rel;
-		Dem3DofGeom_SphereSphere(): pos1(se31.position), pos2(se32.position), ori1(se31.orientation), ori2(se32.orientation){}
+		//! shorthands
+		const Vector3r &pos1; const Quaternionr &ori1; const Vector3r &pos2; const Quaternionr &ori2;
+		Dem3DofGeom_SphereSphere(): pos1(se31.position), ori1(se31.orientation), pos2(se32.position), ori2(se32.orientation){createIndex();}
 		~Dem3DofGeom_SphereSphere();
 		//! effective radii of spheres for this interaction; can be smaller/larger than actual radii, but quasi-constant throughout the interaction life
 		Real effR1, effR2;
 		
 		/********* API **********/
-		Real displacementN(){ return (pos2-pos2).Length()-refLength; }
+		Real displacementN(){ return (pos2-pos1).Length()-refLength; }
 		Vector3r displacementT() {
 			// enabling automatic relocation decreases overall simulation speed by about 3%; perhaps: bool largeStrains ... ?
 			#if 1 
@@ -35,7 +37,37 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 		Real slipToDisplacementTMax(Real displacementTMax);
 		/********* end API ***********/
 
-	REGISTER_ATTRIBUTES(Dem3DofGeom,(se31)(se32)(effR1)(effR2));
+	REGISTER_ATTRIBUTES(Dem3DofGeom,(se31)(se32)(effR1)(effR2)(cp1rel)(cp2rel));
+	REGISTER_CLASS_AND_BASE(Dem3DofGeom_SphereSphere,Dem3DofGeom);
+	friend class GLDraw_Dem3DofGeom_SphereSphere;
+	friend class ef2_Sphere_Sphere_Dem3DofGeom;
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
+
+#include<yade/pkg-common/GLDrawFunctors.hpp>
+class GLDraw_Dem3DofGeom_SphereSphere:public GLDrawInteractionGeometryFunctor{
+	public:
+		virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+		static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
+	//RENDERS(Dem3DofGeom_SphereSphere);
+	//REGISTER_CLASS_AND_BASE(GLDraw_Dem3DofGeom_SphereSphere,GLDrawInteractionGeometryFunctor);
+	REGISTER_ATTRIBUTES(GLDrawInteractionGeometryFunctor,(normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel));
+};
+REGISTER_SERIALIZABLE(GLDraw_Dem3DofGeom_SphereSphere);
+
+#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
+class ef2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
+	public:
+		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<InteractingGeometry>&, const shared_ptr<InteractingGeometry>&, const Se3r&, const Se3r&, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
+		//! Factor of sphere radius such that sphere "touch" if their centers are not further than distanceFactor*(r1+r2); defaults to 1.
+		Real distanceFactor;
+		ef2_Sphere_Sphere_Dem3DofGeom(): distanceFactor(1.) {}
+	FUNCTOR2D(InteractingSphere,InteractingSphere);
+	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
+	REGISTER_CLASS_AND_BASE(ef2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryEngineUnit);
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(distanceFactor));
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(ef2_Sphere_Sphere_Dem3DofGeom);
 
