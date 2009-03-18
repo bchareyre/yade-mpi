@@ -302,9 +302,8 @@ if not env.GetOption('clean'):
 	ok&=CheckLib_maybeMT(conf,'boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
 	ok&=CheckLib_maybeMT(conf,'boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");')
 	ok&=CheckLib_maybeMT(conf,'boost_regex','boost/regex.hpp','c++','boost::regex("");')
-	foreach=conf.CheckCXXHeader('boost/foreach.hpp','<>')
-	if not foreach: print "(You can get the foreach.hpp header from http://article.gmane.org/gmane.science.physics.yade.devel/367 and save it in /usr/include/boost. It will coexist with boost 1.33 without problems.)"
-	ok&=foreach
+	env['haveForeach']=conf.CheckCXXHeader('boost/foreach.hpp','<>')
+	if not env['haveForeach']: print "(OK, local version will be used instead)"
 	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=0)
 
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
@@ -485,19 +484,21 @@ def installHeaders(prefix=None):
 					subInc=join(yadeInc,m.group(1).replace(sep,'-')) # replace pkg/lattice by pkg-lattice
 					if not prefix: # local include directory: do symlinks
 						if not isdir(subInc): os.makedirs(subInc)
-						def relpath(pf,pt):
-							"""Returns relative path from pf (path from) to pt (path to) as string.
-							Last component of pf MUST be filename, not directory name. It can be empty, though. Legal pf's: 'dir1/dir2/something.cc', 'dir1/dir2/'. Illegal: 'dir1/dir2'."""
-							from os.path import sep,join,abspath,split
-							apfl=abspath(split(pf)[0]).split(sep); aptl=abspath(pt).split(sep); i=0
-							while apfl[i]==aptl[i] and i<min(len(apfl),len(aptl))-1: i+=1
-							return sep.join(['..' for j in range(0,len(apfl)-i)]+aptl[i:])
 						linkName=join(subInc,f); linkTarget=relpath(linkName,join(root,f))
 						if not exists(linkName):
 							if lexists(linkName): os.remove(linkName) # broken symlink: remove it
 							os.symlink(linkTarget,linkName)
 					else: # install directory: use scons' Install facility
 						env.Install(subInc,join(root,f))
+
+def relpath(pf,pt):
+	"""Returns relative path from pf (path from) to pt (path to) as string.
+	Last component of pf MUST be filename, not directory name. It can be empty, though. Legal pf's: 'dir1/dir2/something.cc', 'dir1/dir2/'. Illegal: 'dir1/dir2'."""
+	from os.path import sep,join,abspath,split
+	apfl=abspath(split(pf)[0]).split(sep); aptl=abspath(pt).split(sep); i=0
+	while apfl[i]==aptl[i] and i<min(len(apfl),len(aptl))-1: i+=1
+	return sep.join(['..' for j in range(0,len(apfl)-i)]+aptl[i:])
+
 
 def makePkgConfig(fileName):
 	cflags,libs='Cflags: ','Libs: '
@@ -528,8 +529,18 @@ def makePkgConfig(fileName):
 if not env.GetOption('clean'):
 	# how to make that executed automatically??! For now, run always.
 	#env.AddPreAction(installAlias,installHeaders)
+	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep
 	installHeaders() # install to buildDir always
 	installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
+	if not env['haveForeach']:
+		boostDir=buildDir+'/include/yade-'+env['version']+'/boost'
+		foreachLink=boostDir+'/foreach.hpp'
+		foreachTarget='extra/foreach.hpp_local'
+		if not exists(boostDir): os.makedirs(boostDir)
+		if not exists(foreachLink): 
+			if lexists(foreachLink): os.remove(foreachLink) # broken symlink: remove it
+			os.symlink(relpath(foreachLink,foreachTarget),foreachLink)
+		env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
 	makePkgConfig('$buildDir/yade${SUFFIX}.pc')
 	env.Install(pcDir,'$buildDir/yade${SUFFIX}.pc')
 	installAlias=env.Alias('install',instDirs) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install); include pkgconfig stuff

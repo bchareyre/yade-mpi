@@ -1,5 +1,6 @@
 #include<yade/extra/Shop.hpp>
 #include<boost/python.hpp>
+#include<yade/extra/boost_python_len.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/Sphere.hpp>

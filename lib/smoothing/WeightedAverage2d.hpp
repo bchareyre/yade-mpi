@@ -12,8 +12,11 @@
 #include<boost/foreach.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/python.hpp>
+#include<yade/extra/boost_python_len.hpp>
 
-#define FOREACH BOOST_FOREACH
+#ifndef FOREACH
+	#define FOREACH BOOST_FOREACH
+#endif
 using namespace std;
 using namespace boost;
 

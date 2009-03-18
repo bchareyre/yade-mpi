@@ -1,5 +1,6 @@
 #include<yade/extra/Brefcom.hpp>
 #include<boost/python.hpp>
+#include<yade/extra/boost_python_len.hpp>
 using namespace boost::python;
 using namespace std;
 # if 0

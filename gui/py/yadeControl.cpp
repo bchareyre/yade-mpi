@@ -6,6 +6,7 @@
 #include<unistd.h>
 #include<list>
 
+
 #include<boost/python.hpp>
 #include<boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include<boost/bind.hpp>
@@ -66,6 +67,7 @@ using namespace boost;
 using namespace std;
 
 #include"pyAttrUtils.hpp"
+#include<yade/extra/boost_python_len.hpp>
 
 class RenderingEngine;
 
@@ -200,7 +202,7 @@ BASIC_PY_PROXY_HEAD(pyParallelEngine,ParallelEngine)
 	pyParallelEngine(python::list slaves){init("ParallelEngine"); slaves_set(slaves);}
 	void slaves_set(python::list slaves){
 		ensureAcc(); shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
-		int len=PySequence_Size(slaves.ptr()); /*[boost1.34] python::len(ftrs)*/;
+		int len=python::len(slaves);
 		me->slaves=ParallelEngine::slaveContainer(); // empty the container
 		for(int i=0; i<len; i++){
 			python::extract<python::list> grpMaybe(slaves[i]);
@@ -217,7 +219,7 @@ BASIC_PY_PROXY_HEAD(pyParallelEngine,ParallelEngine)
 		python::list ret;
 		FOREACH(vector<shared_ptr<Engine > >& grp, me->slaves){
 			python::list rret=anyEngines_get(grp);
-			if(PySequence_Size(rret.ptr())==1){ ret.append(rret[0]); } else ret.append(rret);
+			if(python::len(rret)==1){ ret.append(rret[0]); } else ret.append(rret);
 		}
 		return ret;
 	}
@@ -249,7 +251,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 		}
 		void functors_set(python::list ftrs){
 			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (?!)");
-			me->clear(); int len=PySequence_Size(ftrs.ptr()) /*[boost1.34] python::len(ftrs)*/;
+			me->clear(); int len=python::len(ftrs);
 			for(int i=0; i<len; i++){
 				python::extract<pyEngineUnit> euEx(ftrs[i]); if(!euEx.check()) throw invalid_argument("Unable to extract type EngineUnit from sequence.");
 				bool ok=false;
@@ -297,7 +299,7 @@ python::list anyEngines_get(const vector<shared_ptr<Engine> >& engContainer){
 }
 
 void anyEngines_set(vector<shared_ptr<Engine> >& engContainer, python::object egs){
-	int len=PySequence_Size(egs.ptr()) /*[boost1.34] python::len(egs)*/;
+	int len=python::len(egs);
 	//const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
 	engContainer.clear();
 	for(int i=0; i<len; i++){
@@ -386,7 +388,7 @@ class pyInteractionContainer{
 		pyInteractionIterator pyIter(){return pyInteractionIterator(proxee);}
 		pyInteraction pyGetitem(python::object id12){
 			if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
-			if(PySequence_Size(id12.ptr())!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
+			if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
 			python::extract<body_id_t> id1_(PySequence_GetItem(id12.ptr(),0)), id2_(PySequence_GetItem(id12.ptr(),1));
 			if(!id1_.check()) throw invalid_argument("Could not extract id1");
 			if(!id2_.check()) throw invalid_argument("Could not extract id2");
@@ -410,7 +412,7 @@ class pyPhysicalActionContainer{
 		pyPhysicalActionContainer(const shared_ptr<PhysicalActionContainer>& _proxee): proxee(_proxee){}
 		pyPhysicalAction pyGetitem(python::object action_and_id){
 			if(!PySequence_Check(action_and_id.ptr())) throw invalid_argument("Key must be a tuple");
-			if(PySequence_Size(action_and_id.ptr())!=2) throw invalid_argument("Key must be a 2-tuple: [action-name , body id].");
+			if(python::len(action_and_id)!=2) throw invalid_argument("Key must be a 2-tuple: [action-name , body id].");
 			python::extract<string> actionName_(PySequence_GetItem(action_and_id.ptr(),0));
 			python::extract<body_id_t> id_(PySequence_GetItem(action_and_id.ptr(),1));
 			if(!actionName_.check()) throw invalid_argument("Could not extract action-name.");
@@ -538,7 +540,7 @@ class pyOmega{
 	}
 
 	void miscParams_set(python::list l){
-		int len=PySequence_Size(l.ptr());
+		int len=python::len(l);
 		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getRootBody()->miscParams;
 		miscParams.clear();
 		for(int i=0; i<len; i++){

@@ -6,6 +6,7 @@
 #include<yade/lib-serialization/Archive.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<boost/python.hpp>
+#include<yade/extra/boost_python_len.hpp>
 
 #include<boost/foreach.hpp>
 #ifndef FOREACH
