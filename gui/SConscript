@@ -57,7 +57,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	# python modules are one level deeper so that you can say: from yade.wrapper import *
 	env.Install('$PREFIX/lib/yade$SUFFIX/gui/yade',[
 		env.SharedLibrary('wrapper',['py/yadeControl.cpp'],SHLIBPREFIX='',
-			LIBS=env['LIBS']+['libboost_python','XMLFormatManager','yade-factory','yade-serialization','Shop',
+			LIBS=env['LIBS']+['XMLFormatManager','yade-factory','yade-serialization','Shop',
 				'BoundingVolumeMetaEngine',
 				'GeometricalModelMetaEngine',
 				'InteractingGeometryMetaEngine',
@@ -71,9 +71,9 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			],
 			),
 		env.SharedLibrary('_utils',['py/_utils.cpp'],SHLIBPREFIX='',
-			LIBS=env['LIBS']+['Shop','libboost_python','Brefcom']),
+			LIBS=env['LIBS']+['Shop','Brefcom']),
 		env.SharedLibrary('_eudoxos',['py/_eudoxos.cpp'],SHLIBPREFIX='',
-			LIBS=env['LIBS']+['Shop','libboost_python','Brefcom']),
+			LIBS=env['LIBS']+['Shop','Brefcom']),
 		env.SharedLibrary('log',['py/log.cpp'],SHLIBPREFIX=''),
 		env.File('__init__.py','py'),
 		env.File('utils.py','py'),
