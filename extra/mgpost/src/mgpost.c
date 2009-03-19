@@ -125,15 +125,15 @@ int main(int argc, char **argv)
     nb_subdiv_sphere = 20;
     nb_subdiv_sphere_2 = 12;
   }
-  else if (nbel < 10000)
+  else if (nbel < 40000)
   {
     nb_subdiv_sphere = 12;
     nb_subdiv_sphere_2 = 8;
   }
   else
   {
-    nb_subdiv_sphere = 4;
-    nb_subdiv_sphere_2 = 4;
+    nb_subdiv_sphere = 6;
+    nb_subdiv_sphere_2 = 6;
   }
 
   
