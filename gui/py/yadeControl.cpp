@@ -425,12 +425,17 @@ class pyPhysicalActionContainer{
 	python::tuple force_get(long id){ Shop::Bex::initCache(); Vector3r f=Shop::Bex::force(id); return python::make_tuple(f[0],f[1],f[2]);}
 	python::tuple momentum_get(long id){ Shop::Bex::initCache(); Vector3r m=Shop::Bex::momentum(id); return python::make_tuple(m[0],m[1],m[2]);}
 };
+
+Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
+
 #ifdef BEX_CONTAINER
 class pyBexContainer{
 	public:
 		pyBexContainer(){}
 		python::tuple force_get(long id){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r f=rb->bex.getForce(id); return python::make_tuple(f[0],f[1],f[2]); }
 		python::tuple torque_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getTorque(id); return python::make_tuple(m[0],m[1],m[2]);}
+		void force_add(long id, python::tuple f){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addForce (id,tuple2vec(f)); }
+		void torque_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addTorque(id,tuple2vec(t));}
 };
 #endif
 
@@ -707,7 +712,9 @@ BOOST_PYTHON_MODULE(wrapper)
 	#ifdef BEX_CONTAINER
 	boost::python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
 		.def("f",&pyBexContainer::force_get)
-		.def("m",&pyBexContainer::torque_get);
+		.def("t",&pyBexContainer::torque_get)
+		.def("addF",&pyBexContainer::force_add)
+		.def("addT",&pyBexContainer::torque_add);
 	#endif
 
 	boost::python::class_<pyTimingDeltas>("TimingDeltas",python::init<pyTimingDeltas&>())
