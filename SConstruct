@@ -66,8 +66,8 @@ if sconsVersion<9806.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
 env=Environment(tools=['default'])
 profileFile='scons.current-profile'
 
-profOpts=Options(profileFile)
-profOpts.AddOptions(('profile','Config profile to use (predefined: default or "", opt); append ! to use it but not save for next build (in scons.current-profile)','default'))
+profOpts=Variables(profileFile)
+profOpts.Add(('profile','Config profile to use (predefined: default or "", opt); append ! to use it but not save for next build (in scons.current-profile)','default'))
 profOpts.Update(env)
 # multiple profiles - run them all at the same time
 # take care not to save current profile for those parallel builds
@@ -107,7 +107,7 @@ elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1,'openmp
 else: defOptions={'debug':0,'optimize':0,'variant':profile,'openmp':True}
 
 
-opts=Options(optsFile)
+opts=Variables(optsFile)
 #
 # The convention now is, that
 #  1. CAPITALIZED options are
@@ -115,19 +115,19 @@ opts=Options(optsFile)
 #   (b) c preprocessor macros available to the program source (like PREFIX and SUFFIX)
 #  2. lowercase options influence the building process, compiler options and the like.
 #
-opts.AddOptions(
+opts.AddVariables(
 	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
 	('PREFIX','Install path prefix','/usr/local'),
 	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.','$PREFIX'),
 	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten',defOptions['variant'],None,lambda x:x),
-	BoolOption('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
-	BoolOption('gprof','Enable profiling information for gprof',0),
-	BoolOption('optimize','Turn on heavy optimizations',defOptions['optimize']),
-	BoolOption('openmp','Compile with openMP parallelization support',defOptions['openmp']),
-	ListOption('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
-	EnumOption('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
+	BoolVariable('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
+	BoolVariable('gprof','Enable profiling information for gprof',0),
+	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
+	BoolVariable('openmp','Compile with openMP parallelization support',defOptions['openmp']),
+	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
+	EnumVariable('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListOption('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','binfmt','dummy']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','binfmt','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -140,10 +140,10 @@ opts.AddOptions(
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
-	BoolOption('QUAD_PRECISION','typedef Real as long double (=quad)',0),
-	BoolOption('pretty',"Don't show compiler command line (like the Linux kernel)",1),
-	BoolOption('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
-	#BoolOption('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
+	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
+	BoolVariable('pretty',"Don't show compiler command line (like the Linux kernel)",1),
+	BoolVariable('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
+	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
 opts.Update(env)
 opts.Save(optsFile,env)

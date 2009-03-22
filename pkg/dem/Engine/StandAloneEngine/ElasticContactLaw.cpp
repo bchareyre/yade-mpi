@@ -64,6 +64,9 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new F
 	momentRotationLaw = true;
 	actionForceIndex = actionForce->getClassIndex();
 	actionMomentumIndex = actionMomentum->getClassIndex();
+	#ifdef SCG_SHEAR
+		useShear=false;
+	#endif
 }
 
 
@@ -72,6 +75,9 @@ void ElasticContactLaw::registerAttributes()
 	InteractionSolver::registerAttributes();
 	REGISTER_ATTRIBUTE(sdecGroupMask);
 	REGISTER_ATTRIBUTE(momentRotationLaw);
+	#ifdef SCG_SHEAR
+		REGISTER_ATTRIBUTE(useShear);
+	#endif
 }
 
 
@@ -111,62 +117,30 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			Real un=currentContactGeometry->penetrationDepth;
 			currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
-	#if 0
-		// the core under #else, refactored
-		currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,isDynamic1,isDynamic2,dt);
-	#else
-			Vector3r axis;
-			Real angle;
-
-	/// Here is the code with approximated rotations 	 ///
-			axis = currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
-			shearForce -= shearForce.Cross(axis);
-			angle = dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
-			axis = angle*currentContactGeometry->normal;
-			shearForce -= shearForce.Cross(axis);
-		
-	/// Here is the code with exact rotations 		 ///
-	
-	// 		Quaternionr q;
-	//
-	// 		axis					= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-	// 		angle					= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
-	// 		q.fromAngleAxis(angle,axis);
-	//
-	// 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
-	//
-	// 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-	// 		axis					= currentContactGeometry->normal;
-	// 		q.fromAngleAxis(angle,axis);
-	// 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
-	
-	/// 							 ///
-	
-			Vector3r x				= currentContactGeometry->contactPoint;
-			Vector3r c1x				= (x - de1->se3.position);
-			Vector3r c2x				= (x - de2->se3.position);
-			 /// The following definition of c1x and c2x is to avoid "granular ratcheting" 
-			///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
-			///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
-			///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
-                    //Vector3r _c1x_	=  currentContactGeometry->radius1*currentContactGeometry->normal;
-                    //Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
-					//Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
-			Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(c2x)) - (de1->velocity+de1->angularVelocity.Cross(c1x));
-			Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
-			Vector3r shearDisplacement		= shearVelocity*dt;
-			shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
-
-	#endif
-	
-	// PFC3d SlipModel, is using friction angle. CoulombCriterion
+			// the same as under #else, but refactored
+			#ifdef SCG_SHEAR
+				if(useShear){
+					currentContactGeometry->updateShear(de1,de2,dt);
+					shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
+				} else {
+					currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
+				}
+			#else
+				currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
+			#endif
+			
+			// PFC3d SlipModel, is using friction angle. CoulombCriterion
 			Real maxFs = currentContactPhysics->normalForce.SquaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
 			if( shearForce.SquaredLength() > maxFs )
 			{
-				maxFs = Mathr::Sqrt(maxFs) / shearForce.Length();
-				shearForce *= maxFs;
+				Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+				shearForce *= ratio;
+				#ifdef SCG_SHEAR
+					// in this case, total shear displacement must be updated as well
+					if(useShear) currentContactGeometry->shear*=ratio;
+				#endif
 			}
-	////////// PFC3d SlipModel
+			////////// PFC3d SlipModel
 	
 			Vector3r f=currentContactPhysics->normalForce + shearForce;
 			Vector3r _c1x(currentContactGeometry->contactPoint-de1->se3.position),

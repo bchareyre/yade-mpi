@@ -11,15 +11,10 @@ class NormalInteraction:public InteractionPhysics {
 		Real kn;
 		//! normal force
 		Vector3r normalForce;
-		NormalInteraction(){createIndex(); }
+		NormalInteraction(): normalForce(Vector3r::ZERO) {createIndex(); }
 		virtual ~NormalInteraction();
-	protected:
-		virtual void registerAttributes(){
-			REGISTER_ATTRIBUTE(kn);
-			REGISTER_ATTRIBUTE(normalForce);
-		}
-	REGISTER_CLASS_NAME(NormalInteraction);
-	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
+	REGISTER_ATTRIBUTES(/*no base class attributes*/,(kn)(normalForce));
+	REGISTER_CLASS_AND_BASE(NormalInteraction,InteractionPhysics);
 	REGISTER_CLASS_INDEX(NormalInteraction,InteractionPhysics);
 };
 REGISTER_SERIALIZABLE(NormalInteraction);
@@ -33,16 +28,10 @@ class NormalShearInteraction: public NormalInteraction{
 		Real ks;
 		//! shear force
 		Vector3r shearForce;
-		NormalShearInteraction(){ createIndex(); }
+		NormalShearInteraction(): shearForce(Vector3r::ZERO){ createIndex(); }
 		virtual ~NormalShearInteraction();
-	protected:
-		virtual void registerAttributes(){	
-			NormalInteraction::registerAttributes();
-			REGISTER_ATTRIBUTE(ks);
-			REGISTER_ATTRIBUTE(shearForce);
-		}
-	REGISTER_CLASS_NAME(NormalShearInteraction);
-	REGISTER_BASE_CLASS_NAME(NormalInteraction);
+	REGISTER_ATTRIBUTES(NormalInteraction,(ks)(shearForce));
+	REGISTER_CLASS_AND_BASE(NormalShearInteraction,NormalInteraction);
 	REGISTER_CLASS_INDEX(NormalShearInteraction,NormalInteraction);
 };
 REGISTER_SERIALIZABLE(NormalShearInteraction);

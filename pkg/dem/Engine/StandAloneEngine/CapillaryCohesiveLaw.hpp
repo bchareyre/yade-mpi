@@ -89,6 +89,7 @@ class CapillaryCohesiveLaw : public InteractionSolver
 
 	protected : 
 		void registerAttributes();
+		virtual void postProcessAttributes(bool deserializing);
 	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(CapillaryCohesiveLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);

@@ -34,11 +34,29 @@ using namespace std;
 #ifdef LOG4CXX
 	// provides parent logger for everybody
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
+
+	#ifdef LOG4CXX_TRACE
+		log4cxx::LevelPtr debugLevel=log4cxx::Level::getDebug(), infoLevel=log4cxx::Level::getInfo(), warnLevel=log4cxx::Level::getWarn();
+	#else
+		log4cxx::LevelPtr debugLevel=log4cxx::Level::DEBUG, infoLevel=log4cxx::Level::INFO, warnLevel=log4cxx::Level::WARN;
+	#endif
+
+	/* initialization of log4cxx for early logging */
+	__attribute__((constructor(1000))) void initLog4cxx(){
+		log4cxx::BasicConfigurator::configure();
+		log4cxx::LoggerPtr localLogger=log4cxx::Logger::getLogger("yade");
+		if(getenv("YADE_DEBUG")){
+			LOG_INFO("YADE_DEBUG environment variable is defined, logging level is DEBUG.");
+			localLogger->setLevel(debugLevel);
+		}
+		else localLogger->setLevel(warnLevel);
+	}
 #endif
 
 void nullHandler(int sig){}
+void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
 void warnOnceHandler(int sig){
-	cerr<<"WARN: nullHandler (probably log4cxx error), signal "<<(sig==SIGSEGV?"SEGV":"[other]. Signal will be ignored since now.")<<endl;
+	cerr<<"WARN: nullHandler (probably log4cxx error), signal "<<(sig==SIGSEGV?"SEGV":"[other]")<<". Signal will be ignored since now."<<endl;
 	signal(sig,nullHandler);
 }
 
@@ -185,22 +203,19 @@ int main(int argc, char *argv[])
 	optind=0; opterr=0;
 
 	#ifdef LOG4CXX
-		#ifdef LOG4CXX_TRACE
-			log4cxx::LevelPtr debugLevel=log4cxx::Level::getDebug(), infoLevel=log4cxx::Level::getInfo(), warnLevel=log4cxx::Level::getWarn();
-		#else
-			log4cxx::LevelPtr debugLevel=log4cxx::Level::DEBUG, infoLevel=log4cxx::Level::INFO, warnLevel=log4cxx::Level::WARN;
-		#endif
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){
 			log4cxx::PropertyConfigurator::configure(logConf);
 			LOG_INFO("Loading "<<logConf);
 		} else { // otherwise use simple console-directed logging
-			log4cxx::BasicConfigurator::configure();
 			logger->setLevel(warnLevel);
 			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be omitted.");
 			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
 		}
+		// command-line switches override levels
+		if(verbose==1) logger->setLevel(infoLevel);
+		else if (verbose>=2) logger->setLevel(debugLevel);
 	#endif
 
 	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.12.x, beta, SVN snapshot.";
@@ -208,15 +223,6 @@ int main(int argc, char *argv[])
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
 	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
-
-	#ifdef LOG4CXX
-		if(verbose==1) logger->setLevel(infoLevel);
-		else if (verbose>=2) logger->setLevel(debugLevel);
-		if(getenv("YADE_DEBUG")){
-			LOG_INFO("YADE_DEBUG environment variable is defined, setting logging level to DEBUG.");
-			logger->setLevel(debugLevel);
-		}
-	#endif
 
 
 	#ifdef EMBED_PYTHON
@@ -288,8 +294,8 @@ int main(int argc, char *argv[])
 	#ifdef YADE_DEBUG
 		if(useGdb){
 			signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers
-			signal(SIGSEGV,warnOnceHandler); // FIXME: this is to cover up crash that occurs in log4cxx on i386 sometimes 
 			unlink(Omega::instance().gdbCrashBatch.c_str());
+			signal(SIGSEGV,termHandler);
 		}
 	#endif
 

@@ -30,6 +30,8 @@ class Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact : public Interact
 					const Se3r& se32,
 					const shared_ptr<Interaction>& c);
 
+	DECLARE_LOGGER;
+
 	REGISTER_CLASS_NAME(Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
 

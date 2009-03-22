@@ -122,7 +122,7 @@ class BexContainer {
 			_force.resize(newSize);
 			_torque.resize(newSize);
 			size=newSize;
-			std::cerr<<"[DEBUG] BexContainer: Resized to "<<size<<std::endl;
+			// std::cerr<<"[DEBUG] BexContainer: Resized to "<<size<<std::endl;
 		}
 };
 

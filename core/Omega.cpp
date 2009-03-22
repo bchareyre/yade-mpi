@@ -46,7 +46,7 @@ class RenderMutexLock: public boost::mutex::scoped_lock{
 CREATE_LOGGER(Omega);
 
 Omega::Omega(){
-	if(getenv("YADE_DEBUG")) cerr<<"Constructing Omega; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n";
+	if(getenv("YADE_DEBUG")) cerr<<"Constructing Omega; _must_ be only once, otherwise linking is broken (missing -rdynamic?)"<<endl;
 }
 
 Omega::~Omega(){LOG_INFO("Shuting down; duration "<<(microsec_clock::local_time()-msStartingSimulationTime)/1000<<" s");}

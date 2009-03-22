@@ -11,6 +11,9 @@
 #include<yade/core/InteractionSolver.hpp>
 #include<yade/core/PhysicalAction.hpp>
 
+// only to see whether SCG_SHEAR is defined, may be removed in the future
+#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
@@ -45,6 +48,9 @@ class ElasticContactLaw : public InteractionSolver
 	public :
 		int sdecGroupMask;
 		bool momentRotationLaw;
+		#ifdef SCG_SHEAR
+			bool useShear;
+		#endif
 	
 		ElasticContactLaw();
 		void action(MetaBody*);

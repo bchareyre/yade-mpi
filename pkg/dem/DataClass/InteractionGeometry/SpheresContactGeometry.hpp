@@ -8,31 +8,31 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 /*! Class representing geometry of two spheres in contact.
  *
- * exactRot code
- * =============
- * At initial contact, each of the two spheres fixes a point on its surface relative to its own orientation.
- * It is therefore possible to derive at any later point how much slipping between the two spheres has taken
- * place since the first contact.
- *
- * The surface point is stored as quaternion.
- *
- * Function is provided to manipulate those points:
- *
- * (a) plastic slip, when we want to limit their maximum distance (in the projected plane)
- * (b) rolling, where those points must be relocated to not flip over the π angle from the current contact point
- *
- * TODO: add torsion code, that will (if a flag is on) compute torsion angle on the contact axis.
- *
- * TODO: add bending code, that will compute bending angle of the contact axis
- *
- *
+ * The code under SCG_SHEAR is experimental and is used only if ElasticContactLaw::useShear is explicitly true
  */
+
+#define SCG_SHEAR
+
 class SpheresContactGeometry: public InteractionGeometry{
 	public:
 		Vector3r normal, // unit vector in the direction from sphere1 center to sphere2 center
 			contactPoint;
 		Real radius1,radius2,penetrationDepth;
 
+		#ifdef SCG_SHEAR
+			//! Total value of the current shear. Update the value using updateShear.
+			Vector3r shear;
+			//! Normal of the contact in the previous step
+			Vector3r prevNormal;
+			//! Increment of shear displacement in last step (is already added to shear); perhaps useful for viscosity or something similar
+			Vector3r shearIncrement;
+			long shearUpdateIter; // debugging only, to check when shear was updated last time
+			//! update shear on this contact given dynamic parameters of bodies. Should be called from constitutive law, exactly once per iteration
+			void updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
+			//const Vector3r& getShear(){ if(Omega::instance().getCurrentIteration()>shearUpdateIter) throw runtime_error("SpheresContactGeometry::updateShear must be called prior to getShear()."); return shear; }
+		#endif
+		
+		// all the rest here will hopefully disappear at some point...
 
 		// begin abusive storage
 		bool hasNormalViscosity;
@@ -97,7 +97,11 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Vector3r relRotVector() const;
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();}
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();
+		#ifdef SCG_SHEAR
+			shear=Vector3r::ZERO; prevNormal=Vector3r::ZERO /*initialized to aproper value by geom functor*/; shearIncrement=Vector3r::ZERO; shearUpdateIter=-1 /* proper value from geom functor */;
+		#endif	
+		}
 		virtual ~SpheresContactGeometry();
 
 		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
@@ -107,6 +111,12 @@ class SpheresContactGeometry: public InteractionGeometry{
 			(contactPoint)
 			(radius1)
 			(radius2)
+			#ifdef SCG_SHEAR
+				(shear)
+				(prevNormal)
+				(shearIncrement)
+				(shearUpdateIter)
+			#endif
 			(facetContactFace)
 			// hasShear
 			(hasShear)

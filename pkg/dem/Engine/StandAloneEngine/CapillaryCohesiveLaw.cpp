@@ -39,25 +39,29 @@ CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver() , actionForce
 {
         sdecGroupMask=1;
 
-        capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
-
-        capillary->fill("M(r=1)");
-        capillary->fill("M(r=1.1)");
-        capillary->fill("M(r=1.25)");
-        capillary->fill("M(r=1.5)");
-        capillary->fill("M(r=1.75)");
-        capillary->fill("M(r=2)");
-        capillary->fill("M(r=3)");
-        capillary->fill("M(r=4)");
-        capillary->fill("M(r=5)");
-        capillary->fill("M(r=10)");
-
         CapillaryPressure=0;
         fusionDetection = false;
         binaryFusion = true;
 
+		  // capillary setup moved to postProcessAttributes
+
 }
 
+void CapillaryCohesiveLaw::postProcessAttributes(bool deserializing){
+	if(!deserializing) return;
+
+  capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
+  capillary->fill("M(r=1)");
+  capillary->fill("M(r=1.1)");
+  capillary->fill("M(r=1.25)");
+  capillary->fill("M(r=1.5)");
+  capillary->fill("M(r=1.75)");
+  capillary->fill("M(r=2)");
+  capillary->fill("M(r=3)");
+  capillary->fill("M(r=4)");
+  capillary->fill("M(r=5)");
+  capillary->fill("M(r=10)");
+}
 
 void CapillaryCohesiveLaw::registerAttributes()
 {

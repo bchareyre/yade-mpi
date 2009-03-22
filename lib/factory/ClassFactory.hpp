@@ -26,7 +26,6 @@
 
 
 #include<yade/lib-loki/Singleton.hpp>
-#include<yade/lib-base/Logging.hpp>
 
 
 #include "FactoryExceptions.hpp"
@@ -105,7 +104,7 @@ class ClassFactory : public Singleton< ClassFactory >
 		/// Map that contains the name of the registered class and their description
 		FactorableCreatorsMap map;
 
-		ClassFactory() { if(getenv("YADE_DEBUG")) cerr<<"Constructing ClassFactory; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n"; };
+		ClassFactory() { if(getenv("YADE_DEBUG")) cerr<<"Constructing ClassFactory; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n"<<endl; };
 		ClassFactory(const ClassFactory&);
 		ClassFactory& operator=(const ClassFactory&);
 		virtual ~ClassFactory() {};
@@ -151,8 +150,6 @@ class ClassFactory : public Singleton< ClassFactory >
 
 		virtual string getClassName() const { return "Factorable"; };
 		virtual string getBaseClassName(int ) const { return "";};
-
-	DECLARE_LOGGER;
 
 	FRIEND_SINGLETON(ClassFactory);
 };

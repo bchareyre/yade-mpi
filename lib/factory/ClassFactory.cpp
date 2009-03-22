@@ -12,8 +12,6 @@
 
 #include<boost/algorithm/string/regex.hpp>
 
-CREATE_LOGGER(ClassFactory);
-
 class Factorable;
 
 void ClassFactory::addBaseDirectory(const string& dir)
@@ -128,16 +126,17 @@ string ClassFactory::systemNameToLibName(const string& name)
 
 void ClassFactory::registerPluginClasses(const char* fileAndClasses[]){
 	assert(fileAndClasses[0]!=NULL); // must be file name
+	bool log=getenv("YADE_DEBUG");
 	// only filename given, no classes names explicitly
 	if(fileAndClasses[1]==NULL){
 		/* strip leading path (if any; using / as path separator) and strip one suffix (if any) to get the contained class name */
 		string heldClass=boost::algorithm::replace_regex_copy(string(fileAndClasses[0]),boost::regex("^(.*/)?(.*?)(\\.[^.]*)?$"),string("\\2"));
-		LOG_DEBUG("Plugin "<<fileAndClasses[0]<<", class "<<heldClass<<" (deduced)");
+		if(log) cerr<<"Plugin "<<fileAndClasses[0]<<", class "<<heldClass<<" (deduced)"<<endl;
 		pluginClasses.push_back(heldClass); // last item with everything up to last / take off and .suffix strip
 	}
 	else {
 		for(int i=1; fileAndClasses[i]!=NULL; i++){
-			LOG_DEBUG("Plugin "<<fileAndClasses[0]<<", class "<<fileAndClasses[i]);
+			if(log) cerr<<"Plugin "<<fileAndClasses[0]<<", class "<<fileAndClasses[i]<<endl;
 			pluginClasses.push_back(fileAndClasses[i]);
 		}
 	}

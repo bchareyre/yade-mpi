@@ -22,6 +22,8 @@
 	#include <Wm3Plane3.h>
 #endif
 
+CREATE_LOGGER(Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
+
 bool is_point_inside_box(InteractingBox* b, Vector3r P)
 {
 	return		std::abs(P[0]) < std::abs(b->extents[0])
@@ -231,7 +233,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 
 		//return true;
 #else
-		LOG_FATAL("Using miniWm3; recompile with full Wm3 support to make snow folly functional.");
+		LOG_FATAL("Using miniWm3; recompile with full Wm3 support to make snow fully functional.");
 		throw runtime_error("full wm3 required (message above).");
 #endif
 	}

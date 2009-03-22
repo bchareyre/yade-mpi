@@ -9,6 +9,63 @@ YADE_PLUGIN("SpheresContactGeometry");
 // At least one virtual method must be in the .cpp file (!!!)
 SpheresContactGeometry::~SpheresContactGeometry(){};
 
+#ifdef SCG_SHEAR
+void SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
+
+	Vector3r axis;
+	Real angle;
+
+	shearIncrement=Vector3r::ZERO;
+
+	// approximated rotations
+		axis = prevNormal.Cross(normal); 
+		shearIncrement -= shear.Cross(axis);
+		angle = dt*0.5*normal.Dot(rbp1->angularVelocity + rbp2->angularVelocity);
+		axis = angle*normal;
+		shearIncrement -= (shear+shearIncrement).Cross(axis);
+		
+	// exact rotations (not adapted to shear/shearIncrement!)
+	#if 0
+		Quaternionr q;
+		axis					= prevNormal.Cross(normal);
+		angle					= acos(normal.Dot(prevNormal));
+		q.FromAngleAxis(angle,axis);
+		shearForce        = shearForce*q;
+		angle             = dt*0.5*normal.dot(rbp1->angularVelocity+rbp2->angularVelocity);
+		axis					= normal;
+		q.FromAngleAxis(angle,axis);
+		shearForce        = q*shearForce;
+	#endif
+
+	Vector3r& x = contactPoint;
+	Vector3r c1x, c2x;
+
+	if(avoidGranularRatcheting){
+		/* The following definition of c1x and c2x is to avoid "granular ratcheting" 
+		 *  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
+		 *  "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
+		 *  ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors) */
+
+		// FIXME: For sphere-facet contact this will give an erroneous value of relative velocity...
+		c1x =   radius1*normal; 
+		c2x =  -radius2*normal;
+	}
+	else {
+		// FIXME: It is correct for sphere-sphere and sphere-facet contact
+		c1x = (x - rbp1->se3.position);
+		c2x = (x - rbp2->se3.position);
+	}
+
+	Vector3r relativeVelocity = (rbp2->velocity+rbp2->angularVelocity.Cross(c2x)) - (rbp1->velocity+rbp1->angularVelocity.Cross(c1x));
+	Vector3r shearVelocity = relativeVelocity-normal.Dot(relativeVelocity)*normal;
+	Vector3r shearDisplacement = shearVelocity*dt;
+	shearIncrement -= shearDisplacement;
+
+	shear+=shearIncrement;
+	shearUpdateIter=Omega::instance().getCurrentIteration();
+}
+#endif
+
 void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
