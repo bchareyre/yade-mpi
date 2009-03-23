@@ -38,14 +38,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; }
 
 		#ifdef SCG_SHEAR
-			if(c->isNew){
-				scm->prevNormal=normal;
-				scm->shearUpdateIter=Omega::instance().getCurrentIteration(); /* no shear at the very beginning; shear initialized to zero vector in SCG ctor */
-			} else {
-				scm->prevNormal=scm->normal;
-				// make sure updateShear was properly called at last iteration; debugging only
-				//assert(scm->shearUpdateIter==Omega::instance().getCurrentIteration()-1);
-			}
+			if(c->isNew) scm->prevNormal=normal; 
+			else scm->prevNormal=scm->normal;
 		#endif
 
 		Real penetrationDepth=s1->radius+s2->radius-normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */

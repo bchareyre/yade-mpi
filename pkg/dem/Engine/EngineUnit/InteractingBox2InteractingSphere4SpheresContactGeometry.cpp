@@ -87,6 +87,11 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		shared_ptr<SpheresContactGeometry> scm;
 		if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+
+		#ifdef SCG_SHEAR
+			if(c->isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
+			else {scm->prevNormal=scm->normal;}
+		#endif
 			
 		// contact point is in the middle of overlapping volumes
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
@@ -129,6 +134,10 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		shared_ptr<SpheresContactGeometry> scm;
 		if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);	
+		#ifdef SCG_SHEAR
+			if(c->isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
+			else {scm->prevNormal=scm->normal;}
+		#endif
 		scm->contactPoint = 0.5*(pt1+pt2);
 		//scm->normal = pt1-pt2; scm->normal.Normalize();
 		//scm->penetrationDepth = (pt1-pt2).Length();
@@ -150,19 +159,9 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const s
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	bool isInteracting = go(cm2,cm1,se32,se31,c);
-	if (isInteracting)
-	{
-		SpheresContactGeometry* scm = static_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
-		//Vector3r tmp = scm->closestsPoints[0].first;		
-		//scm->closestsPoints[0].first = scm->closestsPoints[0].second;
-		//scm->closestsPoints[0].second = tmp;
-		scm->normal = -scm->normal;
-		Real tmpR  = scm->radius1;
-		scm->radius1 = scm->radius2;
-		scm->radius2 = tmpR;
-	}
-	return isInteracting;
+	assert(c->isNew);
+	c->swapOrder();
+	return go(cm2,cm1,se32,se31,c);
 }
 
 YADE_PLUGIN();

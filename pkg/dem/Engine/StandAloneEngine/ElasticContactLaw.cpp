@@ -123,10 +123,10 @@ void ElasticContactLaw::action(MetaBody* ncb)
 					currentContactGeometry->updateShear(de1,de2,dt);
 					shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
 				} else {
+			#endif
 					currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
+			#ifdef SCG_SHEAR
 				}
-			#else
-				currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
 			#endif
 			
 			// PFC3d SlipModel, is using friction angle. CoulombCriterion

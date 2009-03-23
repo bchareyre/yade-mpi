@@ -10,12 +10,12 @@ YADE_PLUGIN("SpheresContactGeometry");
 SpheresContactGeometry::~SpheresContactGeometry(){};
 
 #ifdef SCG_SHEAR
-void SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
+Vector3r SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
 
-	shearIncrement=Vector3r::ZERO;
+	Vector3r shearIncrement(Vector3r::ZERO);
 
 	// approximated rotations
 		axis = prevNormal.Cross(normal); 
@@ -62,7 +62,7 @@ void SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, const 
 	shearIncrement -= shearDisplacement;
 
 	shear+=shearIncrement;
-	shearUpdateIter=Omega::instance().getCurrentIteration();
+	return shearIncrement;
 }
 #endif
 

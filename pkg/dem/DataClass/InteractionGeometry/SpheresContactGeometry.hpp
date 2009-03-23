@@ -24,20 +24,13 @@ class SpheresContactGeometry: public InteractionGeometry{
 			Vector3r shear;
 			//! Normal of the contact in the previous step
 			Vector3r prevNormal;
-			//! Increment of shear displacement in last step (is already added to shear); perhaps useful for viscosity or something similar
-			Vector3r shearIncrement;
-			long shearUpdateIter; // debugging only, to check when shear was updated last time
-			//! update shear on this contact given dynamic parameters of bodies. Should be called from constitutive law, exactly once per iteration
-			void updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
-			//const Vector3r& getShear(){ if(Omega::instance().getCurrentIteration()>shearUpdateIter) throw runtime_error("SpheresContactGeometry::updateShear must be called prior to getShear()."); return shear; }
+			//! update shear on this contact given dynamic parameters of bodies. Should be called from constitutive law, exactly once per iteration. Returns shear increment in this update, which is already added to shear.
+			Vector3r updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
 		#endif
 		
 		// all the rest here will hopefully disappear at some point...
 
 		// begin abusive storage
-		bool hasNormalViscosity;
-		Real NormalViscisity;
-		Real NormalRelativeVelocity;
 		//! Whether the original contact was on the positive (1) or negative (-1) facet side; this is to permit repulsion to the right side even if the sphere passes, under extreme pressure, geometrically to the other facet's side. This is used only in InteractingFacet2IteractingSphere4SpheresContactGeometry. If at any point the contact is with the edge or vertex instead of face, this attribute is reset so that contact with the other face is possible.
 		int facetContactFace;
 		// end abusive storage
@@ -99,7 +92,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();
 		#ifdef SCG_SHEAR
-			shear=Vector3r::ZERO; prevNormal=Vector3r::ZERO /*initialized to aproper value by geom functor*/; shearIncrement=Vector3r::ZERO; shearUpdateIter=-1 /* proper value from geom functor */;
+			shear=Vector3r::ZERO; prevNormal=Vector3r::ZERO /*initialized to proper value by geom functor*/;
 		#endif	
 		}
 		virtual ~SpheresContactGeometry();
@@ -114,8 +107,6 @@ class SpheresContactGeometry: public InteractionGeometry{
 			#ifdef SCG_SHEAR
 				(shear)
 				(prevNormal)
-				(shearIncrement)
-				(shearUpdateIter)
 			#endif
 			(facetContactFace)
 			// hasShear

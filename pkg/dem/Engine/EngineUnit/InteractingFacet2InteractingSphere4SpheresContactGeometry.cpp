@@ -165,23 +165,10 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const
 								const Se3r& se32,
 								const shared_ptr<Interaction>& c)
 {
+	assert(c->isNew);
 	c->swapOrder();
 	//LOG_WARN("Swapped interaction order for "<<c->getId2()<<"&"<<c->getId1());
 	return go(cm2,cm1,se32,se31,c);
-#if 0	
-	bool isInteracting = go(cm2,cm1,se32,se31,c);
-	if (isInteracting)
-	{
-	    SpheresContactGeometry* scm = static_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
-		 scm->normal*=-1;
-		 std::swap(scm->radius1,scm->radius2);
-		 if(hasShear){
-			 swap(scm->pos1,scm->pos2); swap(scm->ori1,scm->ori2);
-			 if(c->isNew){ swap(scm->cp1rel,scm->cp2rel); swap(scm->d1,scm->d2); }
-		 }
-	}
-	return isInteracting;
-#endif
 }
 
 YADE_PLUGIN();
