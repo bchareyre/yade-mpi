@@ -70,10 +70,14 @@ class BrefcomContact: public NormalShearInteraction {
 			omegaThreshold,
 			//! weight coefficient for shear strain when computing the strain semi-norm kappaD
 			xiShear,
-			//! characteristic time (if non-positive, the law without rate-dependence is used)
-			tau,
+			//! characteristic time for damage (if non-positive, the law without rate-dependence is used)
+			dmgTau,
 			//! exponent in the rate-dependent damage evolution
-			expDmgRate,
+			dmgRateExp,
+			//! characteristic time for viscoplasticity (if non-positive, no rate-dependence for shear)
+			plTau,
+			//! exponent in the rate-dependent viscoplasticity
+			plRateExp,
 			//! coefficient that takes transversal strain into accound when calculating kappaDReduced
 			transStrainCoeff;
 		/*! Up to now maximum normal strain (semi-norm), non-decreasing in time. */
@@ -91,7 +95,14 @@ class BrefcomContact: public NormalShearInteraction {
 		// FIXME: Fn and Fs are stored as Vector3r normalForce, shearForce in NormalShearInteraction 
 		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r epsT, sigmaT, Fs;
 
-		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), tau(0), expDmgRate(0), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; }
+
+		static Real solveBeta(const Real c, const Real N);
+		Real computeDmgOverstress(Real epsN,Real dt);
+		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
+
+
+
+		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), dmgTau(-1), dmgRateExp(0), plTau(-1), plRateExp(0), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; }
 		//	BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
 		virtual ~BrefcomContact();
 
@@ -105,8 +116,10 @@ class BrefcomContact: public NormalShearInteraction {
 			(epsFracture)
 			(omegaThreshold)
 			(xiShear)
-			(tau)
-			(expDmgRate)
+			(dmgTau)
+			(dmgRateExp)
+			(plTau)
+			(plRateExp)
 			(transStrainCoeff)
 
 			(kappaD)
@@ -153,14 +166,14 @@ class BrefcomPhysParams: public BodyMacroParameters {
 REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
 class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
+	public:
 	/*! Cohesion evolution law (it is 1-funcH here) */
 	Real funcH(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return 1-funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 	/*! Damage evolution law */
-	inline Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
 		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 	}
-	public:
 		bool logStrain;
 		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false){ /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
@@ -183,20 +196,16 @@ class BrefcomLaw: public InteractionSolver{
 		/*! Cohesion evolution law (it is 1-funcH here) */
 		Real funcH(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return 1-funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 		/*! Damage evolution law */
-		inline Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{
-			if(kappaD<epsCrackOnset || neverDamage) return 0;
-			return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
-		}
+		Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return ef2_Spheres_Brefcom_BrefcomLaw::funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 		
 	public:
 		bool logStrain;
-		bool useFunctor;
-		BrefcomLaw(): logStrain(false),useFunctor(false) { Shop::Bex::initCache(); };
+		BrefcomLaw(): logStrain(false) { Shop::Bex::initCache(); };
 		void action(MetaBody*);
 	protected: 
 	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_AND_BASE(BrefcomLaw,InteractionSolver);
-	REGISTER_ATTRIBUTES(InteractionSolver,(logStrain)(useFunctor));
+	REGISTER_ATTRIBUTES(InteractionSolver,(logStrain));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BrefcomLaw);
@@ -216,7 +225,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		expBending is positive if the damage evolution function is concave after fracture onset;
 		reasonable value seems like 4.
 		*/
-		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold, transStrainCoeff;
+		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold, transStrainCoeff, dmgTau, dmgRateExp, plTau, plRateExp;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (BrefcomContact::neverDamage=true); defaults to false
@@ -228,8 +237,8 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			xiShear=0;
 			neverDamage=false;
 			cohesiveThresholdIter=-1;
-			tau=-1; expDmgRate=0;
-			omegaThreshold=0.98;
+			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1;
+			omegaThreshold=0.999;
 		}
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
@@ -242,8 +251,10 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			(neverDamage)
 			(epsCrackOnset)
 			(relDuctility)
-			(tau)
-			(expDmgRate)
+			(dmgTau)
+			(dmgRateExp)
+			(plTau)
+			(plRateExp)
 			(omegaThreshold)
 			(transStrainCoeff)
 		);
