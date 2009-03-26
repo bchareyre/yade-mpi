@@ -142,25 +142,28 @@ void printHelp()
 	-S file : load simulation from file (works with QtGUI only)\n\
 	-v      : be verbose (may be repeated)\n\
 \n\
-	--      : pass all remaining options to the selected GUI\n\
+	--      : pass all remaining options to the selected GUI\n\n\
 ";
 	cerr <<
-	"compilation flags:\n"
-		"   PREFIX=" PREFIX  "\n"
-	 	"   SUFFIX=" SUFFIX "\n"
+	"compilation flags:\n\n"
+		"   PREFIX   =    " PREFIX  "\n"
+	 	"   SUFFIX   =    " SUFFIX "\n"
 	#ifdef YADE_DEBUG
-		"   YADE_DEBUG (debug information, crash traces)\n"
+		"   YADE_DEBUG    (debug information, crash traces)\n"
 	#endif
 	#ifdef NDEBUG
-		"   NDEBUG (heavy optimizations, no assertions and debugging features)\n"
+		"   NDEBUG        (heavy optimizations, no assertions and debugging features)\n"
 	#endif
 	#ifdef YADE_OPENMP
-		"   YADE_OPENMP (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.\n"
+		"   YADE_OPENMP   (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.\n"
+	#endif
+	#ifdef LOG4CXX
+		"   LOG4CXX       configurable logging framework enabled (~/.yade-suffix/logging.conf)"
 	#endif
 	#ifdef BEX_CONTAINER
 		"   BEX_CONTAINER (uses BexContainer instead of PhysicalActionContainer)\n"
 	#endif
-	"\n\n";
+	"\n";
 }
 
 
@@ -170,6 +173,7 @@ int main(int argc, char *argv[])
 	 * which locks renderMutex, calls instance() in turn, but since not constructed yet,
 	 * instance() → Omega::Omega → init → resetRootBody → lock renderMutex → deadlock */
 	Omega::instance().init();
+	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.12.x, beta, SVN snapshot.";
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
 	// see http://www.boost.org/libs/filesystem/doc/portability_guide.htm#recommendations for what all they consider bad.
@@ -218,7 +222,6 @@ int main(int argc, char *argv[])
 		else if (verbose>=2) logger->setLevel(debugLevel);
 	#endif
 
-	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.12.x, beta, SVN snapshot.";
 	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);

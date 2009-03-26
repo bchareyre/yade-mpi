@@ -403,6 +403,7 @@ class pyInteractionContainer{
 		void clear(){proxee->clear();}
 };
 
+Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
 
 BASIC_PY_PROXY(pyPhysicalAction,PhysicalAction);
 
@@ -424,9 +425,15 @@ class pyPhysicalActionContainer{
 		}
 	python::tuple force_get(long id){ Shop::Bex::initCache(); Vector3r f=Shop::Bex::force(id); return python::make_tuple(f[0],f[1],f[2]);}
 	python::tuple momentum_get(long id){ Shop::Bex::initCache(); Vector3r m=Shop::Bex::momentum(id); return python::make_tuple(m[0],m[1],m[2]);}
+	#ifndef BEX_CONTAINER
+		void force_add(long id, python::tuple f){ Shop::Bex::initCache(); Shop::Bex::force(id)+=tuple2vec(f);}
+		void torque_add(long id, python::tuple m){ Shop::Bex::initCache(); Shop::Bex::momentum(id)+=tuple2vec(m);}
+	#else
+		void force_add(long id, python::tuple f){ throw runtime_error("ActionContainer not supported with BexContainer");}
+		void torque_add(long id, python::tuple m){ throw runtime_error("ActionContainer not supported with BexContainer");}
+	#endif
 };
 
-Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
 
 #ifdef BEX_CONTAINER
 class pyBexContainer{
@@ -707,7 +714,9 @@ BOOST_PYTHON_MODULE(wrapper)
 	boost::python::class_<pyPhysicalActionContainer>("ActionContainer",python::init<pyPhysicalActionContainer&>())
 		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem)
 		.def("f",&pyPhysicalActionContainer::force_get)
-		.def("m",&pyPhysicalActionContainer::momentum_get);
+		.def("m",&pyPhysicalActionContainer::momentum_get)
+		.def("addF",&pyPhysicalActionContainer::force_add)
+		.def("addT",&pyPhysicalActionContainer::torque_add);
 
 	#ifdef BEX_CONTAINER
 	boost::python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
