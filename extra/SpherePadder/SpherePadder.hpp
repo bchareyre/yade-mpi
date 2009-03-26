@@ -19,7 +19,7 @@
 # define BEGIN_FUNCTION(arg) if (trace_functions) cerr << (arg) << "... " << flush
 # define END_FUNCTION        if (trace_functions) cerr << "Done\n" << flush
 
-enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX, VIRTUAL, INSERED_BY_USER, FROM_TRIANGULATION};
+enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX, INSERTED_BY_USER, FROM_TRIANGULATION, VIRTUAL};
 
 struct Sphere
 {
@@ -30,18 +30,18 @@ struct Sphere
 
 struct Neighbor
 {
-  unsigned int i,j;       
+  unsigned int i,j; // FIXME long ?      
 };
 
 struct neighbor_with_distance
 {
-  unsigned int sphereId;
+  unsigned int sphereId;// FIXME long ?
   double       distance;
 };
 
 struct tetra_porosity
 {
-  unsigned int id1,id2,id3,id4;
+  unsigned int id1,id2,id3,id4;// FIXME long ?
   double volume;
   double void_volume;
 };
@@ -61,11 +61,11 @@ class SpherePadder
 {
   protected:
                 
-    vector<vector<unsigned int> > combination;
-    SpherePackingTriangulation    triangulation;
+	vector<vector<unsigned int> > combination;// FIXME long ?
+    SpherePackingTriangulation    triangulation;// TODO use Delaunay Triangulation to avoid flat tetrahedra
     vector<tetra_porosity>        tetra_porosities;
     
-    double       distance_spheres (unsigned int i, unsigned int j);
+	double       distance_spheres (unsigned int i, unsigned int j);// FIXME long ?
     double       distance_centre_spheres(Sphere& S1, Sphere& S2);
     double       distance_vector3 (double V1[],double V2[]);
     double       spherical_triangle (double point1[],double point2[],double point3[],double point4[]);
@@ -76,11 +76,11 @@ class SpherePadder
     void         place_at_tetra_centers ();
     void         place_at_tetra_vertexes ();
     void         cancel_overlaps ();
-    void         place_virtual_spheres ();
+    
     
     // 
-    unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);
-    unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_combi_max = 30);
+	unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);// FIXME long ?
+	unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_combi_max = 30);// FIXME long ?
     
     // Check functions
     void         detect_overlap ();
@@ -96,9 +96,9 @@ class SpherePadder
     CellPartition    partition;
    
     // FOR ANALYSIS
-    set<Neighbor,CompareNeighborId> neighbor; // non utilise pour le moment    
+    set<Neighbor,CompareNeighborId> neighbor; // pas utilise pour le moment
     bool probeIsDefined;
-    vector<unsigned int> sphereInProbe;
+	vector<unsigned int> sphereInProbe;// FIXME long ?
     double xProbe,yProbe,zProbe,RProbe;
     ofstream compacity_file;
     
@@ -120,13 +120,19 @@ class SpherePadder
     
     SpherePadder();
         
-    // High level pading functions
+    // Pading functions
+
+	//! \brief 5-step padding (for details see Jerier et al.)
     void pad_5 ();
-    void tetra_pad();
+
+    //! \brief Place virtual spheres at boudaries.
+	void place_virtual_spheres ();
+
+	// en cours de debuggage
 	void densify();
 
-    // void insert_sphere(double x, double y, double z, double R);
-    // void densify ();     
+	//! \brief Insert a sphere (x,y,z,R) within the packing. Overlapping spheres are cancelled.
+    void insert_sphere(double x, double y, double z, double R);   
     
     // FOR ANALYSIS
     void add_spherical_probe(double Rfact = 1.0);   

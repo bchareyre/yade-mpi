@@ -12,7 +12,7 @@
 
 CellPartition::CellPartition()
 {
-  cell_is_found = false;
+
 }
 
 void CellPartition::init(TetraMesh & mesh, double security_factor)
@@ -36,22 +36,16 @@ void CellPartition::init(TetraMesh & mesh, double security_factor)
     zmax = (zmax < mesh.node[i].z) ? mesh.node[i].z : zmax;
   }
   
-  isize = (unsigned int)((xmax - xmin) / mesh.mean_segment_length);
+  isize = (unsigned int)((xmax - xmin) / (security_factor * mesh.mean_segment_length));
   if (isize < 1) isize = 1;
   
-  jsize = (unsigned int)((ymax - ymin) / mesh.mean_segment_length);
+  jsize = (unsigned int)((ymax - ymin) / (security_factor * mesh.mean_segment_length));
   if (jsize < 1) jsize = 1;
   
-  ksize = (unsigned int)((zmax - zmin) / mesh.mean_segment_length);
+  ksize = (unsigned int)((zmax - zmin) / (security_factor * mesh.mean_segment_length));
   if (ksize < 1) ksize = 1;
   
-//   isize *= security_factor;
-//   jsize *= security_factor;
-//   ksize *= security_factor;
-  
-  //isize = jsize = ksize = 1; // pour test
-  
-  cerr << "nb cells: " << isize << ", " << jsize << ", " << ksize << endl;
+  //cerr << "nb cells: " << isize << ", " << jsize << ", " << ksize << endl;
   
   vector<unsigned int> kvec;
   for (unsigned int k = 0 ; k < ksize ; ++k) kvec.push_back(0);
@@ -76,14 +70,10 @@ void CellPartition::init(TetraMesh & mesh, double security_factor)
   x_adjuster = (double)isize / (xmax - xmin);
   y_adjuster = (double)jsize / (ymax - ymin);
   z_adjuster = (double)ksize / (zmax - zmin);
-
-  cell_is_found = false;
 }
 
 void CellPartition::add(unsigned int n, double x, double y, double z)
-{
-  cell_is_found = false;
-  
+{ 
   int i,j,k;
   i = (int)(floor((x - xmin) * x_adjuster));
   j = (int)(floor((y - ymin) * y_adjuster));
@@ -102,15 +92,11 @@ void CellPartition::add(unsigned int n, double x, double y, double z)
   else                 current_k = (unsigned int)k;
  
   cell[ cellId[current_i][current_j][current_k] ].sphereId.push_back(n);
-
-  cell_is_found = true;
 }
    
 
 void CellPartition::locateCellOf(double x, double y, double z)
 {
-  cell_is_found = false;
-
   int i,j,k;
   
   i = (int)(floor((x - xmin) * x_adjuster));
@@ -128,8 +114,6 @@ void CellPartition::locateCellOf(double x, double y, double z)
   if (k >= (int)ksize) current_k = ksize - 1;
   else if (k < 0)      current_k = 0;
   else                 current_k = (unsigned int)k;
-  
-  cell_is_found = true;
 }
 
 

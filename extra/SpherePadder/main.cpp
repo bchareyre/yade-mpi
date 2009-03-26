@@ -21,7 +21,6 @@ void resume();
 int main()
 { 
 #ifdef DEBUG
-  
  
   TetraMesh * mesh = new TetraMesh();
   //mesh->read_gmsh("meshes/cube1194.msh");
@@ -33,10 +32,12 @@ int main()
   //padder->add_spherical_probe(0.7);
         
   padder->pad_5();
+  padder->insert_sphere(0.5,0.5,0.5,0.2);
+  padder->place_virtual_spheres();
   padder->densify();
   
   padder->save_mgpost("mgp.out.001");
-  // padder->save_Rxyz("spheres.Rxyz");
+  padder->save_Rxyz("spheres.Rxyz");
   return 0;  
 
 #else

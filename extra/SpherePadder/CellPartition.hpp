@@ -35,7 +35,6 @@ class CellPartition
     
     unsigned int isize,jsize,ksize;
     unsigned int current_i,current_j,current_k;
-    bool cell_is_found; // TODO enlever
     
     CellPartition();
     void init(TetraMesh & mesh, double security_factor = 1.0);
@@ -52,8 +51,7 @@ class CellPartition
     unsigned int j_up  () { return ( (current_j < jsize - 1) ? (current_j + 1) : jsize - 1); }
     
     unsigned int k_down() { return ( (current_k > 0) ? (current_k - 1) : 0 ); }
-    unsigned int k_up  () { return ( (current_k < ksize - 1) ? (current_k + 1) : ksize - 1); }
-         
+    unsigned int k_up  () { return ( (current_k < ksize - 1) ? (current_k + 1) : ksize - 1); }        
 };
 
 #endif // CELL_PARTITION_HPP

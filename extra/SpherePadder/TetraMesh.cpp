@@ -15,7 +15,7 @@ TetraMesh::TetraMesh ()
     isOrganized = false;
 }
 
-
+// FIXME Some problem should occur with gmsh because nodes are sometimes duplicated.
 void TetraMesh::read_gmsh (const char* name)
 {
     ifstream meshFile(name);
@@ -57,7 +57,7 @@ void TetraMesh::read_gmsh (const char* name)
             for (unsigned int e = 0 ; e < nbElements ; ++e)
             {
                 meshFile >> num_element >> element_type;
-                                 // 4-node tetrahedron
+                // 4-node tetrahedron
                 if (element_type != 4)
                 {
                     meshFile.getline(not_read,150);
@@ -72,7 +72,7 @@ void TetraMesh::read_gmsh (const char* name)
 
                     meshFile >> T.nodeId[0] >> T.nodeId[1] >> T.nodeId[2] >> T.nodeId[3];
 
-                // numbers begin at 0 instead of 1
+                // nodeId has 0-offset
                 // (0 in C/C++ corresponds to 1 in the file)
                 T.nodeId[0] -= 1;
                 T.nodeId[1] -= 1;
@@ -457,11 +457,11 @@ void TetraMesh::organize ()
     }
     mean_segment_length /= (double)(segment.size());
 
-    cerr << "mean_segment_length = " << mean_segment_length << endl;
-    cerr << "min_segment_length = " << min_segment_length << endl;
-    cerr << "max_segment_length = " << max_segment_length << endl;
+//     cerr << "mean_segment_length = " << mean_segment_length << endl;
+//     cerr << "min_segment_length = " << min_segment_length << endl;
+//     cerr << "max_segment_length = " << max_segment_length << endl;
 
-    // Define tetraedre neighbors
+    // Define tetraedre neighbors FIXME still usefull??
     bool stop = false;
     for (unsigned int t1 = 0 ; t1 < tetraedre.size() ; ++t1)
     {
