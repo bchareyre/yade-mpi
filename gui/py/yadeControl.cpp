@@ -474,6 +474,16 @@ class pyOmega{
 				PyRun_SimpleString(("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')").c_str());
 				PyGILState_Release(gstate);
 			}
+			if(isChildClassOf(e->getClassName(),"MetaEngine")){
+				shared_ptr<MetaEngine> ee=dynamic_pointer_cast<MetaEngine>(e);
+				FOREACH(const shared_ptr<EngineUnit>& f, ee->functorArguments){
+					if(!f->label.empty()){
+						PyGILState_STATE gstate; gstate = PyGILState_Ensure();
+						PyRun_SimpleString(("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')").c_str());
+						PyGILState_Release(gstate);
+					}
+				}
+			}
 		}
 	}
 
@@ -576,11 +586,15 @@ class pyOmega{
 				RETURN_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine);
 				throw std::runtime_error("Unable to cast engine to MetaEngine, StandAloneEngine, DeusExMachina or ParallelEngine? ??");
 			}
+			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(eng);
+			if(me){
+				FOREACH(const shared_ptr<EngineUnit>& eu, me->functorArguments){
+					if(eu->label==label) return python::object(pyEngineUnit(eu));
+				}
+			}
 		}
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
-
-
 	
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->interactions); }
@@ -722,6 +736,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	boost::python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
 		.def("f",&pyBexContainer::force_get)
 		.def("t",&pyBexContainer::torque_get)
+		.def("m",&pyBexContainer::torque_get) // for compatibility with ActionContainer
 		.def("addF",&pyBexContainer::force_add)
 		.def("addT",&pyBexContainer::torque_add);
 	#endif

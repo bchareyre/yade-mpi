@@ -40,6 +40,7 @@ class InteractionGeometryMetaEngine :	public MetaEngine2D
 
 	REGISTER_CLASS_NAME(InteractionGeometryMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
+	REGISTER_ATTRIBUTES(MetaEngine,/* no attributes here*/ );
 };
 
 REGISTER_SERIALIZABLE(InteractionGeometryMetaEngine);

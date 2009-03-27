@@ -33,6 +33,7 @@ class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 
 	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
+	REGISTER_ATTRIBUTES(MetaEngine, /* no attributes here */);
 };
 
 REGISTER_SERIALIZABLE(InteractionPhysicsMetaEngine);

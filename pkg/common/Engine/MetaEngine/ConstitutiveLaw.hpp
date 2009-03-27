@@ -37,6 +37,7 @@ class ConstitutiveLaw: public EngineUnit2D <
 		addTorque(id1,(contactPoint-pos1).Cross(force),rb);
 		addTorque(id2,-(contactPoint-pos2).Cross(force),rb);
 	}
+	REGISTER_ATTRIBUTES(EngineUnit,/* no attributes here */);
 };
 REGISTER_SERIALIZABLE(ConstitutiveLaw);
 	

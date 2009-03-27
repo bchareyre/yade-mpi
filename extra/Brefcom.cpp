@@ -236,6 +236,8 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
 	if(!functor) functor=shared_ptr<ef2_Spheres_Brefcom_BrefcomLaw>(new ef2_Spheres_Brefcom_BrefcomLaw);
 	functor->logStrain=logStrain;
+	LOG_FATAL("Deprecated BrefcomLaw doesn't pass its parameters to the functor, results would be garbage. Fix me or use ef2_Spheres_Brefcom_BrercomLaw directly instead.");
+	throw;
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		if(!I->isReal) continue;
 		functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
