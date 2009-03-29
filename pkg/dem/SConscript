@@ -736,6 +736,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'TriaxialStateRecorder',
 			'PositionOrientationRecorder',
 			'Shop',
+			'ConstitutiveLawDispatcher',
+			'InteractionDispatchers',
 			'NewtonsDampedLaw']),
 			
 	env.SharedLibrary('CohesiveTriaxialTest',

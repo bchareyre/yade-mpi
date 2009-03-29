@@ -1,0 +1,11 @@
+!OMP_NUM_THREADS parallel description
+1 False ser1
+2 False ser2
+3 False ser3
+4 False ser4
+5 False ser5
+1 True par1
+2 True par2
+3 True par3
+4 True par4
+5 True par5

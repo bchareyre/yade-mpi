@@ -233,8 +233,7 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 }
 
 
-void BrefcomLaw::action(MetaBody* _rootBody){
-	rootBody=_rootBody;
+void BrefcomLaw::action(MetaBody* rootBody){
 	if(!functor) functor=shared_ptr<ef2_Spheres_Brefcom_BrefcomLaw>(new ef2_Spheres_Brefcom_BrefcomLaw);
 	functor->logStrain=logStrain;
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){

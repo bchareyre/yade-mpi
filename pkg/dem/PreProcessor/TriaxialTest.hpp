@@ -106,6 +106,11 @@ class TriaxialTest : public FileGenerator
 				//!flag to choose an isotropic compaction until a fixed porosity choosing a same translation speed for the six walls
 				,isotropicCompaction;
 
+		#ifdef BEX_CONTAINER
+			//! Generate parallel simulation, if it is supported
+			bool parallel;
+		#endif
+
 		int		 recordIntervalIter
 				,timeStepUpdateInterval
 				,timeStepOutputInterval

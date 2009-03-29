@@ -64,7 +64,10 @@
 #include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
+#include<yade/pkg-common/InteractionDispatchers.hpp>
+
 #include<yade/extra/Shop.hpp>
+
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -162,6 +165,10 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	isotropicCompaction=false;
 	fixedPorosity = 1;
+	
+	#ifdef BEX_CONTAINER
+		parallel=false;
+	#endif
 
 	
 	
@@ -232,8 +239,9 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(isotropicCompaction);
 	REGISTER_ATTRIBUTE(fixedPorosity);
 	REGISTER_ATTRIBUTE(fixedBoxDims);
-
-
+	#ifdef BEX_CONTAINER
+		REGISTER_ATTRIBUTE(parallel);
+	#endif
 }
 
 
@@ -253,7 +261,7 @@ bool TriaxialTest::generate()
 
 	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+	//rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	createActors(rootBody);
 
@@ -637,9 +645,34 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 //	rootBody->engines.push_back(sdecTimeStepper);	
 	rootBody->engines.push_back(boundingVolumeDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	rootBody->engines.push_back(interactionGeometryDispatcher);
-	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(elasticContactLaw);
+	#ifdef BEX_CONTAINER
+	if(parallel){
+		#if 1
+			shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
+				ids->geomDispatcher=interactionGeometryDispatcher;
+				ids->physDispatcher=interactionPhysicsDispatcher;
+				ids->constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
+				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw);
+					see->sdecGroupMask=elasticContactLaw->sdecGroupMask;
+				ids->constLawDispatcher->add(see);
+			rootBody->engines.push_back(ids);
+		#else
+			rootBody->engines.push_back(interactionGeometryDispatcher);
+			rootBody->engines.push_back(interactionPhysicsDispatcher);
+			shared_ptr<ConstitutiveLawDispatcher> cld(new ConstitutiveLawDispatcher);
+				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw);
+					see->sdecGroupMask=elasticContactLaw->sdecGroupMask;
+				cld->add(see);
+			rootBody->engines.push_back(cld);
+		#endif
+	} else {
+	#endif
+		rootBody->engines.push_back(interactionGeometryDispatcher);
+		rootBody->engines.push_back(interactionPhysicsDispatcher);
+		rootBody->engines.push_back(elasticContactLaw);
+	#ifdef BEX_CONTAINER
+	}
+	#endif
 	
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);

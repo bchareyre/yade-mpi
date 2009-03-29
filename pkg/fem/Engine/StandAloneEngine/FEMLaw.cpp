@@ -78,7 +78,7 @@ void FEMLaw::action(MetaBody* fem)
 			#ifdef BEX_CONTAINER
 				fem->bex.addForce(femTet->ids[i],force);
 			#else
-				static_cast<Force*>( physicalActions->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )->force  += force;
+				static_cast<Force*>(fem->physicalActions->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )->force  += force;
 			#endif
 					
 		}

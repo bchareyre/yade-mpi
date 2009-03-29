@@ -72,8 +72,8 @@ void MassSpringLaw::action(MetaBody * massSpring)
 				massSpring->bex.addForce(id1,-f3);
 				massSpring->bex.addForce(id2, f3);
 			#else
-				static_cast<Force*>   ( physicalActions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
-				static_cast<Force*>   ( physicalActions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
+				static_cast<Force*>   ( massSpring->physicalActions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
+				static_cast<Force*>   ( massSpring->physicalActions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
 			#endif
 		}
 	}

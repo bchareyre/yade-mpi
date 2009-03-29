@@ -19,6 +19,8 @@
 
 #include<yade/extra/Shop.hpp>
 
+YADE_PLUGIN("ElasticContactLaw2","ef2_Spheres_Elastic_ElasticLaw","ElasticContactLaw");
+
 ElasticContactLaw2::ElasticContactLaw2(){
 	Shop::Bex::initCache();
 	isCohesive=true;
@@ -58,12 +60,18 @@ void ElasticContactLaw2::action(MetaBody* rb){
 
 
 
-ElasticContactLaw::ElasticContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+
+ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
+#ifndef BEX_CONTAINER
+	, actionForce(new Force) , actionMomentum(new Momentum)
+#endif
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
-	actionForceIndex = actionForce->getClassIndex();
-	actionMomentumIndex = actionMomentum->getClassIndex();
+	#ifndef BEX_CONTAINER
+		actionForceIndex = actionForce->getClassIndex();
+		actionMomentumIndex = actionMomentum->getClassIndex();
+	#endif
 	#ifdef SCG_SHEAR
 		useShear=false;
 	#endif
@@ -81,34 +89,37 @@ void ElasticContactLaw::registerAttributes()
 }
 
 
-void ElasticContactLaw::action(MetaBody* ncb)
+void ElasticContactLaw::action(MetaBody* rootBody)
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	if(!functor) functor=shared_ptr<ef2_Spheres_Elastic_ElasticLaw>(new ef2_Spheres_Elastic_ElasticLaw);
+	functor->momentRotationLaw=momentRotationLaw;
+	functor->sdecGroupMask=sdecGroupMask;
+	#ifdef SCG_SHEAR
+		functor->useShear=useShear;
+	#endif
+	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+		if(!I->isReal) continue;
+		#ifdef YADE_DEBUG
+			// these checks would be redundant in the functor (ConstitutiveLawDispatcher does that already)
+			if(!dynamic_cast<SpheresContactGeometry*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
+		#endif
+		functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
+	}
+}
 
+void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb){
 	Real dt = Omega::instance().getTimeStep();
 
-/// Non Permanents Links												///
-
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
-	for(  ; ii!=iiEnd ; ++ii )
-	{
-		if ((*ii)->isReal)
-		{
-			const shared_ptr<Interaction>& contact = *ii;
-			int id1 = contact->getId1();
-			int id2 = contact->getId2();
-			
-			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) ) continue;
-
-			SpheresContactGeometry*    currentContactGeometry= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
-			ElasticContactInteraction* currentContactPhysics = YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
-			if((!currentContactGeometry)||(!currentContactPhysics)) continue;
+			int id1 = contact->getId1(), id2 = contact->getId2();
+			// FIXME: mask handling should move to ConstitutiveLaw itself, outside the functors
+			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
+			SpheresContactGeometry*    currentContactGeometry= static_cast<SpheresContactGeometry*>(ig.get());
+			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());
 			// delete interaction where spheres don't touch
-			if(currentContactGeometry->penetrationDepth<0){ (*ii)->isReal=false; continue; }
+			if(currentContactGeometry->penetrationDepth<0){ contact->isReal=false; return; }
 	
-			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
+			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
 
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
@@ -117,7 +128,6 @@ void ElasticContactLaw::action(MetaBody* ncb)
 			Real un=currentContactGeometry->penetrationDepth;
 			currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
-			// the same as under #else, but refactored
 			#ifdef SCG_SHEAR
 				if(useShear){
 					currentContactGeometry->updateShear(de1,de2,dt);
@@ -156,11 +166,6 @@ void ElasticContactLaw::action(MetaBody* ncb)
 				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= _c1x.Cross(f);
 				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += _c2x.Cross(f);
 			#endif
-			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
-		}
-	}
 }
 
-
-YADE_PLUGIN();

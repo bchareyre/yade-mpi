@@ -303,6 +303,7 @@ int main(int argc, char *argv[])
 	#endif
 
 	LOG_INFO("Yade: normal exit.");
+	fflush(stdout); // in case of crash at exit, logs will not disappear
 	return ok;
 }
 
