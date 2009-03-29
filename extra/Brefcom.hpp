@@ -74,6 +74,8 @@ class BrefcomContact: public NormalShearInteraction {
 			dmgTau,
 			//! exponent in the rate-dependent damage evolution
 			dmgRateExp,
+			//! damage strain
+			dmgStrain,
 			//! characteristic time for viscoplasticity (if non-positive, no rate-dependence for shear)
 			plTau,
 			//! exponent in the rate-dependent viscoplasticity
@@ -102,7 +104,7 @@ class BrefcomContact: public NormalShearInteraction {
 
 
 
-		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), dmgTau(-1), dmgRateExp(0), plTau(-1), plRateExp(0), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; }
+		BrefcomContact(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; }
 		//	BrefcomContact(Real _E, Real _G, Real _tanFrictionAngle, Real _undamagedCohesion, Real _equilibriumDist, Real _crossSection, Real _epsCrackOnset, Real _epsFracture, Real _expBending, Real _xiShear, Real _tau=0, Real _expDmgRate=1): InteractionPhysics(), E(_E), G(_G), tanFrictionAngle(_tanFrictionAngle), undamagedCohesion(_undamagedCohesion), equilibriumDist(_equilibriumDist), crossSection(_crossSection), epsCrackOnset(_epsCrackOnset), epsFracture(_epsFracture), expBending(_expBending), xiShear(_xiShear), tau(_tau), expDmgRate(_expDmgRate) { epsT=Vector3r::ZERO; kappaD=0; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; /*TRVAR5(epsCrackOnset,epsFracture,Kn,crossSection,equilibriumDist); */ }
 		virtual ~BrefcomContact();
 
@@ -118,6 +120,7 @@ class BrefcomContact: public NormalShearInteraction {
 			(xiShear)
 			(dmgTau)
 			(dmgRateExp)
+			(dmgStrain)
 			(plTau)
 			(plRateExp)
 			(transStrainCoeff)

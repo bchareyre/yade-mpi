@@ -161,15 +161,16 @@ Real BrefcomContact::solveBeta(const Real c, const Real N){
 }
 
 Real BrefcomContact::computeDmgOverstress(Real epsN, Real dt){
-	if(kappaD>=epsN*omega){ // unloading, no viscous stress
-		kappaD=epsN*omega;
+	if(dmgStrain>=dmgStrain*omega){ // unloading, no viscous stress
+		LOG_DEBUG("Unloading, no viscous overstress");
 		return 0.0;
 	}
-	Real c=epsCrackOnset*(1-omega)*pow(dmgTau/dt,dmgRateExp)*pow(epsN*omega-kappaD,dmgRateExp-1.);
+	Real c=epsCrackOnset*(1-omega)*pow(dmgTau/dt,dmgRateExp)*pow(epsN*omega-dmgStrain,dmgRateExp-1.);
 	Real beta=solveBeta(c,dmgRateExp);
-	Real deltaDmgStrain=(epsN*omega-kappaD)*exp(beta);
-	kappaD+=deltaDmgStrain;
-	return (epsN*omega-kappaD)*E;
+	Real deltaDmgStrain=(epsN*omega-dmgStrain)*exp(beta);
+	dmgStrain+=deltaDmgStrain;
+	LOG_DEBUG("deltaDmgStrain="<<deltaDmgStrain<<", viscous overstress "<<(epsN*omega-dmgStrain)*E);
+	return (epsN*omega-dmgStrain)*E;
 }
 
 Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt){
@@ -236,8 +237,6 @@ void BrefcomLaw::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
 	if(!functor) functor=shared_ptr<ef2_Spheres_Brefcom_BrefcomLaw>(new ef2_Spheres_Brefcom_BrefcomLaw);
 	functor->logStrain=logStrain;
-	LOG_FATAL("Deprecated BrefcomLaw doesn't pass its parameters to the functor, results would be garbage. Fix me or use ef2_Spheres_Brefcom_BrercomLaw directly instead.");
-	throw;
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		if(!I->isReal) continue;
 		functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
