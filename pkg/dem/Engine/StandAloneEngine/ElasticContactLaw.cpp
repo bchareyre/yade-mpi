@@ -94,6 +94,9 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 	if(!functor) functor=shared_ptr<ef2_Spheres_Elastic_ElasticLaw>(new ef2_Spheres_Elastic_ElasticLaw);
 	functor->momentRotationLaw=momentRotationLaw;
 	functor->sdecGroupMask=sdecGroupMask;
+	#ifndef BEX_CONTAINER
+		functor->actionForceIndex=actionForceIndex; functor->actionMomentumIndex=actionMomentumIndex;
+	#endif
 	#ifdef SCG_SHEAR
 		functor->useShear=useShear;
 	#endif
@@ -119,7 +122,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			if(currentContactGeometry->penetrationDepth<0){ contact->isReal=false; return; }
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
-			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
+			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id2,ncb)->physicalParameters.get());
 
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	

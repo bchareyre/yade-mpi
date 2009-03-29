@@ -42,6 +42,9 @@ class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	int sdecGroupMask;
 	bool momentRotationLaw;
+	#ifndef BEX_CONTAINER
+		int actionForceIndex,actionMomentumIndex;
+	#endif
 	#ifdef SCG_SHEAR
 		bool useShear;
 	#endif
