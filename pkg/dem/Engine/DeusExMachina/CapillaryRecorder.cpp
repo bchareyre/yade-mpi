@@ -53,9 +53,13 @@ void CapillaryRecorder::action(MetaBody * ncb)
 {
 	Real fx=0, fy=0, fz=0;
 	
+	#ifdef BEX_CONTAINER
+		ncb->bex.sync();
+		Vector3r force=ncb->bex.getForce(bigBallId);
+	#else
+		Vector3r force = static_cast<Force*>(ncb->physicalActions->find(bigBallId, actionForce->getClassIndex() ) . get() )->force;
+	#endif
 	
-	Vector3r force = static_cast<Force*>(ncb->physicalActions->find(
-bigBallId, actionForce->getClassIndex() ) . get() )->force;
 		
 		fx=force[0];
 		fy=force[1];

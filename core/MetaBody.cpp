@@ -35,7 +35,10 @@
 bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
-	  Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), persistentInteractions(interactions),transientInteractions(interactions),physicalActions(new PhysicalActionVectorVector)
+	Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), persistentInteractions(interactions),transientInteractions(interactions)
+	#ifndef BEX_CONTAINER
+	  	,physicalActions(new PhysicalActionVectorVector)
+	#endif
 {	
 	engines.clear();
 	initializers.clear();

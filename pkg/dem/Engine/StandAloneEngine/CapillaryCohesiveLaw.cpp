@@ -291,8 +291,13 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 					else if (currentContactPhysics->fusionNumber !=0)
 						currentContactPhysics->Fcap /= (currentContactPhysics->fusionNumber+1);
                                 }
-                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId1() , actionForce  ->getClassIndex()).get())->force    += currentContactPhysics->Fcap;
-                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId2() , actionForce  ->getClassIndex()).get())->force    -= currentContactPhysics->Fcap;
+											#ifdef BEX_CONTAINER
+												ncb->bex.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
+												ncb->bex.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
+											#else
+	                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId1() , actionForce  ->getClassIndex()).get())->force    += currentContactPhysics->Fcap;
+	                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId2() , actionForce  ->getClassIndex()).get())->force    -= currentContactPhysics->Fcap;
+											#endif
 
 				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
 

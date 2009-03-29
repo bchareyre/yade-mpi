@@ -479,12 +479,17 @@ void VolumicContactLaw::action(MetaBody* ncb)
 	
 			Vector3r f				= currentContactPhysics->normalForce + shearForce;
 			
-	// it will be some macro(	body->physicalActions,	ActionType , bodyId )
-			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
-			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
-			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= c1x.Cross(f);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += c2x.Cross(f);
+			#ifdef BEX_CONTAINER
+				ncb->bex.addForce (id1,-f);
+				ncb->bex.addForce (id2,+f);
+				ncb->bex.addTorque(id1,-c1x.Cross(f));
+				ncb->bex.addTorque(id2, c2x.Cross(f));
+			#else
+				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
+				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
+				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= c1x.Cross(f);
+				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += c2x.Cross(f);
+			#endif
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}

@@ -206,12 +206,19 @@ void SphericalDEMSimulator::loadConfigurationFile(const string& fileName)
 		shared_ptr<PhysicalActionDamper> pade = dynamic_pointer_cast<PhysicalActionDamper>(e);
 		if (pade)
 		{	
+		#ifdef BEX_CONTAINER
+			shared_ptr<CundallNonViscousForceDamping> cnvfd = YADE_PTR_CAST<CundallNonViscousForceDamping>(pade->getExecutor("RigidBodyParameters"));
+			assert(cnvfd);
+			forceDamping=cnvfd->damping;
+			momentumDamping=forceDamping;
+		#else
 			shared_ptr<CundallNonViscousForceDamping> cnvfd = YADE_PTR_CAST<CundallNonViscousForceDamping>(pade->getExecutor("Force","RigidBodyParameters"));
 			shared_ptr<CundallNonViscousMomentumDamping> cnvmd = YADE_PTR_CAST<CundallNonViscousMomentumDamping>(pade->getExecutor("Momentum","RigidBodyParameters"));
 			assert(cnvfd);
 			assert(cnvmd);
 			forceDamping 	= cnvfd->damping;
 			momentumDamping = cnvmd->damping;
+		#endif
 		}
 	}
 }

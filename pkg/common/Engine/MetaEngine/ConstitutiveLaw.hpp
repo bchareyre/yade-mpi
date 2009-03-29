@@ -9,12 +9,16 @@
 class ConstitutiveLaw: public EngineUnit2D <
 		void, TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, MetaBody*)
 	>{
+	#ifndef BEX_CONTAINER
 		int forceIdx, torqueIdx;
+	#endif
 	public:
 		ConstitutiveLaw(){
 			// cache force/torque indices for fast access in bodyForce and bodyTorque
-			forceIdx=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
-			torqueIdx=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
+			#ifndef BEX_CONTAINER
+				forceIdx=shared_ptr<PhysicalAction>(new Force())->getClassIndex();
+				torqueIdx=shared_ptr<PhysicalAction>(new Momentum())->getClassIndex();
+			#endif
 		}
 	REGISTER_CLASS_AND_BASE(ConstitutiveLaw,EngineUnit2D);
 	/*! Convenience functions to get forces/torques quickly.

@@ -28,6 +28,12 @@ class BexContainer{
 		}
 
 		inline void ensureSynced(){ if(!synced) throw runtime_error("BexContainer not thread-synchronized; call sync() first!"); }
+
+		/*! Function to allow friend classes to get force even if not synced.
+		* Dangerous! The caller must know what it is doing! */
+		const Vector3r& getForceUnsynced (body_id_t id){ensureSize(id); return _force[id];}
+		const Vector3r& getTorqueUnsynced(body_id_t id){ensureSize(id); return _force[id];}
+		friend class PhysicalActionDamperUnit;
 	public:
 		BexContainer(): size(0), synced(true),syncCount(0){
 			nThreads=omp_get_max_threads();
@@ -102,6 +108,9 @@ class BexContainer {
 		std::vector<Vector3r> _torque;
 		size_t size;
 		inline void ensureSize(body_id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
+		friend class PhysicalActionDamperUnit;
+		const Vector3r& getForceUnsynced (body_id_t id){ return getForce(id);}
+		const Vector3r& getTorqueUnsynced(body_id_t id){ return getForce(id);}
 	public:
 		BexContainer(): size(0),syncCount(0){}
 		const Vector3r& getForce(body_id_t id){ensureSize(id); return _force[id];}

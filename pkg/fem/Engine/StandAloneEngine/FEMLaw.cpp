@@ -42,7 +42,6 @@ void FEMLaw::registerAttributes()
 void FEMLaw::action(MetaBody* fem)
 {
 	shared_ptr<BodyContainer>& bodies = fem->bodies;
-	shared_ptr<PhysicalActionContainer>& physicalActions = fem->physicalActions;
 	
 	ublas::matrix<double> Ue1 , fe;
 	Ue1.resize(12,1);
@@ -76,10 +75,11 @@ void FEMLaw::action(MetaBody* fem)
 			Vector3r force = Vector3r(	  fe( i*3     , 0 )
 							, fe( i*3 + 1 , 0 )
 							, fe( i*3 + 2 , 0 ));
-			
-			static_cast<Force*>( physicalActions
-				->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )
-					->force  += force;
+			#ifdef BEX_CONTAINER
+				fem->bex.addForce(femTet->ids[i],force);
+			#else
+				static_cast<Force*>( physicalActions->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )->force  += force;
+			#endif
 					
 		}
 	}

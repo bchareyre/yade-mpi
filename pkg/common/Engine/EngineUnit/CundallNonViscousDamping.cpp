@@ -8,6 +8,30 @@
 
 YADE_PLUGIN("CundallNonViscousForceDamping","CundallNonViscousMomentumDamping");
 
+#ifdef BEX_CONTAINER
+//! damping of force, for bodies that have only ParticleParameters
+void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, MetaBody* rb){
+	if(body->isClump()) return;
+	Vector3r f=getForceUnsynced(body->getId(),rb);
+	ParticleParameters *p=static_cast<ParticleParameters*>(pp.get());
+	Vector3r df=Vector3r::ZERO;
+	for(int i=0; i<3; i++){df[i]=-f[i]*damping*Mathr::Sign(f[i]*p->velocity[i]);}
+	rb->bex.addForce(body->getId(),df);
+}
+//! damping of both force and torque, for bodies that have RigidBodyParameters
+void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, MetaBody* rb){
+	if(body->isClump()) return;
+	body_id_t id=body->getId();
+	Vector3r f=getForceUnsynced(id,rb),t=getTorqueUnsynced(id,rb);
+	RigidBodyParameters *p=static_cast<RigidBodyParameters*>(pp.get());
+	Vector3r df=Vector3r::ZERO, dt=Vector3r::ZERO;
+	for(int i=0; i<3; i++){
+		df[i]=-f[i]*damping*Mathr::Sign(f[i]*p->velocity[i]);
+		dt[i]=-t[i]*damping*Mathr::Sign(t[i]*p->angularVelocity[i]);
+	}
+	rb->bex.addForce(id,df); rb->bex.addTorque(id,dt);
+}
+#else
 // this is Cundall non-viscous local damping, applied to force (Force)
 void CundallNonViscousForceDamping::go(    const shared_ptr<PhysicalAction>& a
 						, const shared_ptr<PhysicalParameters>& b
@@ -38,7 +62,7 @@ void CundallNonViscousMomentumDamping::go( 	  const shared_ptr<PhysicalAction>& 
 		m[i] *= 1 - damping*Mathr::Sign(m[i]*rb->angularVelocity[i]);	
 	}
 }
-
+#endif
 
 
 

@@ -113,12 +113,17 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 			currentContactPhysics->shearForce      -= currentContactPhysics->ks*shearDisplacement;
 	
 			Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
-	
-			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
-			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
+			#ifdef BEX_CONTAINER
+				ncb->bex.addForce (id1,-f);
+				ncb->bex.addForce (id2,+f);
+				ncb->bex.addTorque(id1,-c1x.Cross(f));
+				ncb->bex.addTorque(id2, c2x.Cross(f));
+			#else
+				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
+				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
+				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
+			#endif
 	
 	
 	
@@ -214,8 +219,13 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 	
 			//if (normElastic<=normMPlastic)
 			//{
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
+			#ifdef BEX_CONTAINER
+				ncb->bex.addTorque(id1,-q_n_i*mElastic);
+				ncb->bex.addTorque(id2, q_n_i*mElastic);
+			#else
+				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
+				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
+			#endif
 	
 			//}  
 			//else

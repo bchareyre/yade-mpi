@@ -253,7 +253,6 @@ bool TriaxialTest::generate()
 
 	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 
-	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	createActors(rootBody);
@@ -399,10 +398,16 @@ bool TriaxialTest::generate()
 	FOREACH(const BasicSphere& it, sphere_list){
 		LOG_DEBUG("sphere (" << it.first << " " << it.second << ")");
 		createSphere(body,it.first,it.second,false,true);
+		if(biaxial2dTest){ body->physicalParameters->blockedDOFs=PhysicalParameters::DOF_Z; }
 		rootBody->bodies->insert(body);
 	}	
 
-	if(defaultDt<0) defaultDt=Shop::PWaveTimeStep();
+	if(defaultDt<0){
+		defaultDt=Shop::PWaveTimeStep(rootBody);
+		rootBody->dt=defaultDt;
+		globalStiffnessTimeStepper->defaultDt=defaultDt;
+		LOG_INFO("Computed default (PWave) timestep "<<defaultDt);
+	}
 
 	return true;
 }
@@ -562,7 +567,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//stiffnessMatrixTimeStepper->sdecGroupMask = 2;
 	//stiffnessMatrixTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	
-	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
+	globalStiffnessTimeStepper=shared_ptr<GlobalStiffnessTimeStepper>(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
@@ -611,11 +616,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 		triaxialStateRecorder-> interval 		= recordIntervalIter;
 		//triaxialStateRecorderer-> thickness 		= thickness;
 	}
-
-	shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
-	makeItFlat->direction=2;
-	makeItFlat->plane_position = (lowerCorner[2]+upperCorner[2])*0.5;
-	makeItFlat->reset_force = false;	
+	
 
 	#if 0	
 	// moving walls to regulate the stress applied
@@ -652,7 +653,16 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	//if (0) rootBody->engines.push_back(shared_ptr<Engine>(new MicroMacroAnalyser));
 	
-	if(biaxial2dTest) rootBody->engines.push_back(makeItFlat);
+	// replaced by PhysicalParameters::blockedDOFs
+	#if 0
+		if(biaxial2dTest){
+			shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
+			makeItFlat->direction=2;
+			makeItFlat->plane_position = (lowerCorner[2]+upperCorner[2])*0.5;
+			makeItFlat->reset_force = false;	
+			rootBody->engines.push_back(makeItFlat);
+		}
+	#endif
 	
 	//if(!rotationBlocked)
 	//	rootBody->engines.push_back(orientationIntegrator);

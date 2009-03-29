@@ -77,12 +77,18 @@ void FrictionLessElasticContactLaw::action(MetaBody * ncb)
 				Vector3r v2 = rb2->velocity+rb2->angularVelocity.Cross(o2p);
 				Real relativeVelocity = dir.Dot(v2-v1);
 				Vector3r f = (elongation*stiffness+relativeVelocity*viscosity)/size*dir;
-	
-				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
-				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-			
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.Cross(f);
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.Cross(f);
+				#ifdef BEX_CONTAINER
+					ncb->bex.addForce (id1, f);
+					ncb->bex.addForce (id2,-f);
+					ncb->bex.addTorque(id1, o1p.Cross(f));
+					ncb->bex.addTorque(id2,-o2p.Cross(f));
+				#else
+					static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    += f;
+					static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    -= f;
+					static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += o1p.Cross(f);
+					static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= o2p.Cross(f);
+				#endif
+
 			}
 		}
 	}

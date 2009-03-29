@@ -75,13 +75,15 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	maxNbViews=0;
 	//addNewView(); // postpone until a file is loaded
 
-	// there is file existence assertion in lodSimulationFromFilename, so yade will abort cleanly...
+	// there is file existence assertion in loadSimulationFromFilename, so yade will abort cleanly...
 	LOG_DEBUG("Omega's simulation filename: `"<<Omega::instance().getSimulationFileName()<<"'");
 	if (Omega::instance().getSimulationFileName()!="" && (!Omega::instance().getRootBody() || (Omega::instance().getRootBody()->bodies->size()==0 && Omega::instance().getRootBody()->engines.size()==0))){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
+	else{ LOG_DEBUG("Not loading simulation in ctor"); }
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
+
 }
 
 /* restart timer with SimulationController::refreshTime */
@@ -131,16 +133,23 @@ void SimulationController::pbLoadClicked()
 }
 
 
-void SimulationController::loadSimulationFromFileName(const std::string& fileName,bool center, bool useTimeStepperIfPresent)
+void SimulationController::loadSimulationFromFileName(const std::string& fileName,bool center)
 {
 	assert(filesystem::exists(fileName) || fileName.find(":memory:")==(size_t)0);
 
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
 
+
+		bool keepTimeStepperSettings=Omega::instance().getSimulationFileName()==fileName;
+		Real prevDt=Omega::instance().getTimeStep();
+		bool timeStepperUsed=Omega::instance().timeStepperActive();
+
 		Omega::instance().setSimulationFileName(fileName);
 		try
 		{
+			//boost::mutex::scoped_lock lock(timeMutex);
+
 			Omega::instance().loadSimulation(); // expecting throw here.
 			string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
 			tlCurrentSimulation->setText(fullName); 
@@ -151,6 +160,24 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			pbResetSimulation->setEnabled(true);
 			pbOneSimulationStep->setEnabled(true);
 
+			if(keepTimeStepperSettings){
+				LOG_DEBUG("The same simulation loaded again, keeping time stepper settings.");
+				// if we were using fixed time, set that fixed value now
+				if(!timeStepperUsed) { Omega::instance().setTimeStep(prevDt); LOG_DEBUG("Using previous fixed time step "<<prevDt);}
+				// recover whether timestepper was used or not
+				Omega::instance().skipTimeStepper(!timeStepperUsed);
+				LOG_DEBUG("Timestepper is "<<(timeStepperUsed?"":"NOT ")<<"being used.");
+			}
+			else {
+				LOG_DEBUG("New simulation loaded, timestepper is "<<(Omega::instance().timeStepperActive()?"":"NOT ")<<"being used (as per XML).");
+			}
+
+			//rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
+			//LOG_DEBUG("(Un)checking rbTimeStepper and rbFixed.");
+			//rbTimeStepper->setChecked(Omega::instance().timeStepperActive());
+			//rbFixed->setChecked(!Omega::instance().timeStepperActive());
+
+			#if 0
 			Real dt=Omega::instance().getTimeStep();
 			int exp10=(int)floor(log10(dt));
 			sbSecond->setValue((int)(dt/(pow(10.,exp10)))); // we may lose quite some precision here :-(
@@ -170,6 +197,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 				wasUsingTimeStepper = false;
 			}
 			skipTimeStepper=!wasUsingTimeStepper;
+			#endif
 		} 
 		catch(SerializableError& e) // catching it...
 		{
@@ -267,7 +295,7 @@ void SimulationController::pbResetClicked()
 	pbStopClicked();
 
 	std::string name=Omega::instance().getSimulationFileName(); 
-	loadSimulationFromFileName(name,false /* don't re-center scene */,wasUsingTimeStepper /* respect timeStepper setting from the prvious run*/);
+	loadSimulationFromFileName(name,false /* don't re-center scene */);
 
 	if(Omega::instance().getRootBody())
 	{
@@ -293,22 +321,34 @@ void SimulationController::bgTimeStepClicked(int i)
 	/* i: buttonGroupId, which is 0 for timeStepper, 2 for fixed step */
 	switch (i)
 	{
-		case 0 : //Use timeStepper
-			changeSkipTimeStepper = true;
-			skipTimeStepper = false;
+		case 0 : {//Use timeStepper
+			//changeSkipTimeStepper = true;
+			//skipTimeStepper = false;
 			wasUsingTimeStepper=true;
+			//boost::mutex::scoped_lock lock(timeMutex);
+			Omega::instance().skipTimeStepper(false);
 			break;
+			}
 		case 1 : // Try RealTime -- deprecated
-			changeSkipTimeStepper = true;
-			skipTimeStepper = true;
-			wasUsingTimeStepper=false;
+			//changeSkipTimeStepper = true;
+			//skipTimeStepper = true;
+			//wasUsingTimeStepper=false;
+			throw logic_error("RealTime timestep is deprecated and you couldn't click on it!");
 			break;
-		case 2 : // use fixed time Step
-			changeSkipTimeStepper = true;
-			skipTimeStepper = true;
+		case 2 : {// use fixed time Step
+			//changeSkipTimeStepper = true;
+			//skipTimeStepper = true;
+			//boost::mutex::scoped_lock lock(timeMutex);
 			changeTimeStep = true;
 			wasUsingTimeStepper=false;
+			Omega::instance().skipTimeStepper(true);
+			if(sbSecond->value()==0){ sbSecond->setValue(9); sb10PowerSecond->setValue(sb10PowerSecond->value()-1); }
+			if(sbSecond->value()==10){ sbSecond->setValue(1); sb10PowerSecond->setValue(sb10PowerSecond->value()+1); }
+			Real second = (Real)(sbSecond->value());
+			Real powerSecond = (Real)(sb10PowerSecond->value());
+			Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
 			break;
+		}
 		default: break;
 	}
 
@@ -317,15 +357,19 @@ void SimulationController::bgTimeStepClicked(int i)
 
 void SimulationController::sb10PowerSecondValueChanged(int)
 {
-	if(!rbFixed->isOn()){ rbFixed->toggle(); bgTimeStepClicked(2); } // this should do the callback as if user clicked fixed timestepper button
-	changeTimeStep = true;
+//	if(!rbFixed->isOn() && userChangingTimestep){ rbFixed->toggle(); bgTimeStepClicked(2); } // this should do the callback as if user clicked fixed timestepper button
+//	changeTimeStep = true;
+	//assert(rbFixed->isOn()); 
+	if(rbFixed->isOn()) bgTimeStepClicked(2);
 }
 
 
 void SimulationController::sbSecondValueChanged(int)
 { 
-	if(!rbFixed->isOn()){ rbFixed->toggle(); bgTimeStepClicked(2); } // dtto
-	changeTimeStep = true;
+//	if(!rbFixed->isOn() && userChangingTimestep){ rbFixed->toggle(); bgTimeStepClicked(2); } // dtto
+//	changeTimeStep = true;
+	//assert(rbFixed->isOn());
+	if(rbFixed->isOn()) bgTimeStepClicked(2);
 }
 
 void SimulationController::sbRefreshValueChanged(int v)
@@ -399,29 +443,23 @@ void SimulationController::doUpdate(){
     snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getRootBody()->stopAtIteration);
     labelStopAtIter->setText(strStopAtIter);
 
-	if (changeSkipTimeStepper) Omega::instance().skipTimeStepper(skipTimeStepper);
-	if (changeTimeStep) {
-		// wrap the mantissa around
-		if(sbSecond->value()==0){ sbSecond->setValue(9); sb10PowerSecond->setValue(sb10PowerSecond->value()-1); }
-		if(sbSecond->value()==10){ sbSecond->setValue(1); sb10PowerSecond->setValue(sb10PowerSecond->value()+1); }
-		Real second = (Real)(sbSecond->value());
-		Real powerSecond = (Real)(sb10PowerSecond->value());
-		Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
-	} else {
-		Real dt=Omega::instance().getTimeStep();
-		int exp10=floor(log10(dt));
-		sb10PowerSecond->setValue(exp10);
-		sbSecond->setValue((int)(.1+dt/(pow((float)10,exp10)))); // .1: rounding issues
-	}
+	//boost::mutex::scoped_lock lock(timeMutex);
+
+	//if (changeSkipTimeStepper) Omega::instance().skipTimeStepper(skipTimeStepper);
+	//if (changeTimeStep) {
+	//	// wrap the mantissa around
+	//} else {
+	//}
 
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
+
 
 	char strStep[64];
 	snprintf(strStep,64,"step %g",(double)Omega::instance().getTimeStep());
 	labelStep->setText(string(strStep));
 
-	changeSkipTimeStepper = false;
-	changeTimeStep = false;
+	//changeSkipTimeStepper = false;
+	//changeTimeStep = false;
 
 	//cerr<<"dt="<<dt<<",exp10="<<exp10<<",10^exp10="<<pow((float)10,exp10)<<endl;
 
@@ -437,9 +475,17 @@ void SimulationController::doUpdate(){
 	pbResetSimulation->setEnabled(hasSimulation && hasFileName);
 	pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
 	rbTimeStepper->setEnabled(hasTimeStepper);
+	sbSecond->setEnabled(!usesTimeStepper);
+	sb10PowerSecond->setEnabled(!usesTimeStepper);
+
 	// conditionals only avoid setting the state that is already set, to avoid spurious signals
-	if(rbFixed->isChecked()==usesTimeStepper) rbFixed->setChecked(!usesTimeStepper);
-	if(rbTimeStepper->isChecked()!=usesTimeStepper) rbTimeStepper->setChecked(usesTimeStepper);
+	if(rbFixed->isChecked()==usesTimeStepper){ LOG_DEBUG("Checking rbFixed"); rbFixed->setChecked(!usesTimeStepper); }
+	if(rbTimeStepper->isChecked()!=usesTimeStepper){ LOG_DEBUG("Checking rbTimeStepper"); rbTimeStepper->setChecked(usesTimeStepper); }
+
+	Real dt=Omega::instance().getTimeStep();
+	int exp10=floor(log10(dt));
+	sb10PowerSecond->setValue(exp10);
+	sbSecond->setValue((int)(.1+dt/(pow((float)10,exp10)))); // .1: rounding issues
 
 }
 

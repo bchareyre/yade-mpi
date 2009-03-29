@@ -40,7 +40,11 @@ void MomentEngine::applyCondition(MetaBody* ncb)
 	{
 		if(ncb->bodies->exists( *ii ))
 		{
-			static_cast<Momentum*>( ncb->physicalActions->find( *ii        , actionParameterMoment->getClassIndex() ).get() )->momentum += moment;
+			#ifdef BEX_CONTAINER
+				ncb->bex.addTorque(*ii,moment);
+			#else
+				static_cast<Momentum*>( ncb->physicalActions->find( *ii        , actionParameterMoment->getClassIndex() ).get() )->momentum += moment;
+			#endif
 		} else {
 			std::cerr << "MomentEngine: body " << *ii << "doesn't exist, cannot apply moment.";
 		}

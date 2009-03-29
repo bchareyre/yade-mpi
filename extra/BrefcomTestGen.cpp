@@ -6,24 +6,6 @@
 YADE_PLUGIN("BrefcomTestGen");
 
 
-/************************ BrefcomTestGen ****************************/
-/*#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
-
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
-
-#include<yade/pkg-common/InteractingBox.hpp>
-
-#include<yade/pkg-common/InteractingBox2AABB.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>*/
 
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>

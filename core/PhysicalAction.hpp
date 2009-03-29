@@ -20,9 +20,6 @@
 class PhysicalAction : public Serializable, public Indexable
 {
 	public :
-// FIXME - correct usage of this class, so that functions add(), etc.. are actually used!
-//		virtual void add(const shared_ptr<PhysicalAction>& )	{throw;};
-//		virtual void sub(const shared_ptr<PhysicalAction>& )	{throw;};
 
 		virtual void reset() 				{throw;};
 		virtual shared_ptr<PhysicalAction> clone()	{throw;};

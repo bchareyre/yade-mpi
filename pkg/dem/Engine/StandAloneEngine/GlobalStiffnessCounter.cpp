@@ -56,49 +56,50 @@ bool GlobalStiffnessCounter::getSphericalElasticInteractionParameters(const shar
 void GlobalStiffnessCounter::traverseInteractions(MetaBody* ncb, const shared_ptr<InteractionContainer>& interactions){
 	#ifdef BEX_CONTAINER
 		return;
-	#endif
-	FOREACH(const shared_ptr<Interaction>& contact, *interactions){
-		if(!contact->isReal) continue;
+	#else
+		FOREACH(const shared_ptr<Interaction>& contact, *interactions){
+			if(!contact->isReal) continue;
 
-		SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
-		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
-		// all we need for getting stiffness
-		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
-		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
-		// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
-		// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)
-		// or it should have been deleted already. Right? 
-		//ANSWER : some interactions can exist without fn, e.g. distant capillary force, wich does not contribute to the overall stiffness via kn. The test is needed.
-		Real fn = (static_cast<ElasticContactInteraction *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
+			SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
+			NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
+			// all we need for getting stiffness
+			Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
+			// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
+			// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
+			// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)
+			// or it should have been deleted already. Right? 
+			//ANSWER : some interactions can exist without fn, e.g. distant capillary force, wich does not contribute to the overall stiffness via kn. The test is needed.
+			Real fn = (static_cast<ElasticContactInteraction *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
 
-		if (fn!=0) {
+			if (fn!=0) {
 
-		//Diagonal terms of the translational stiffness matrix
-		Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
-		diag_stiffness *= kn-ks;
-		diag_stiffness = diag_stiffness + Vector3r(1,1,1)*ks;
+			//Diagonal terms of the translational stiffness matrix
+			Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
+			diag_stiffness *= kn-ks;
+			diag_stiffness = diag_stiffness + Vector3r(1,1,1)*ks;
 
-		//diagonal terms of the rotational stiffness matrix
-		// Vector3r branch1 = currentContactGeometry->normal*currentContactGeometry->radius1;
-		// Vector3r branch2 = currentContactGeometry->normal*currentContactGeometry->radius2;
-		Vector3r diag_Rstiffness =
-			Vector3r(std::pow(normal.Y(),2)+std::pow(normal.Z(),2),
-				std::pow(normal.X(),2)+std::pow(normal.Z(),2),
-				std::pow(normal.X(),2)+std::pow(normal.Y(),2));
-		diag_Rstiffness *= ks;
-		//cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
+			//diagonal terms of the rotational stiffness matrix
+			// Vector3r branch1 = currentContactGeometry->normal*currentContactGeometry->radius1;
+			// Vector3r branch2 = currentContactGeometry->normal*currentContactGeometry->radius2;
+			Vector3r diag_Rstiffness =
+				Vector3r(std::pow(normal.Y(),2)+std::pow(normal.Z(),2),
+					std::pow(normal.X(),2)+std::pow(normal.Z(),2),
+					std::pow(normal.X(),2)+std::pow(normal.Y(),2));
+			diag_Rstiffness *= ks;
+			//cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
 
-		PhysicalAction* st = ncb->physicalActions->find(contact->getId1(),actionStiffnessIndex).get();
-		GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
-		s->stiffness += diag_stiffness;
-		s->Rstiffness += diag_Rstiffness*pow(radius1,2);	
-		st = ncb->physicalActions->find(contact->getId2(),actionStiffnessIndex).get();
-		s = static_cast<GlobalStiffness*>(st);
-		s->stiffness += diag_stiffness;
-		s->Rstiffness += diag_Rstiffness*pow(radius2,2);
-		
+			PhysicalAction* st = ncb->physicalActions->find(contact->getId1(),actionStiffnessIndex).get();
+			GlobalStiffness* s = static_cast<GlobalStiffness*>(st);
+			s->stiffness += diag_stiffness;
+			s->Rstiffness += diag_Rstiffness*pow(radius1,2);	
+			st = ncb->physicalActions->find(contact->getId2(),actionStiffnessIndex).get();
+			s = static_cast<GlobalStiffness*>(st);
+			s->stiffness += diag_stiffness;
+			s->Rstiffness += diag_Rstiffness*pow(radius2,2);
+			
+			}
 		}
-	}
+	#endif
 }
 
 void GlobalStiffnessCounter::action(MetaBody* ncb)

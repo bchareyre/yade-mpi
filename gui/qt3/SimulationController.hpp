@@ -42,6 +42,8 @@ class SimulationController : public QtGeneratedSimulationController
         boost::posix_time::time_duration estimation;
 		boost::posix_time::ptime iterPerSec_LastLocalTime;
 
+		boost::mutex timeMutex;
+
 	
 		void doUpdate();
 		void restartTimer();
@@ -52,7 +54,7 @@ class SimulationController : public QtGeneratedSimulationController
 		void addNewView();
 	
 	public : 
-		void loadSimulationFromFileName(const std::string& fileName,bool center=true, bool useTimeStepperIfPresent=true);
+		void loadSimulationFromFileName(const std::string& fileName,bool center=true);
 		bool changeSkipTimeStepper,skipTimeStepper,changeTimeStep,wasUsingTimeStepper;
 		SimulationController (QWidget * parent=NULL);
 		virtual ~SimulationController () {}; 

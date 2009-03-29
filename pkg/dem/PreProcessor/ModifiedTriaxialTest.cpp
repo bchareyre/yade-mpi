@@ -261,7 +261,6 @@ bool ModifiedTriaxialTest::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
-	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
@@ -276,6 +275,7 @@ bool ModifiedTriaxialTest::generate()
 	{
 		cerr << "sphere (" << it->first << " " << it->second << endl;
 		createSphere(body,it->first,it->second,false,true);
+		if(want_2d) body->physicalParameters->blockedDOFs=PhysicalParameters::DOF_Z;
 		rootBody->bodies->insert(body);
 	}
 	
@@ -593,8 +593,6 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	gravityCondition->gravity = gravity;
 //	shared_ptr<HydraulicForceEngine> hydraulicForceCondition(new HydraulicForceEngine);
 //	hydraulicForceCondition->hydraulicForce = hydraulicForce;
-  	shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
-//	makeItFlatCondition->makeItFlat= makeItFlat;
 
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
@@ -687,8 +685,13 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(wallStressRecorder);
 	rootBody->engines.push_back(gravityCondition);
-	if(want_2d)
-		rootBody->engines.push_back(makeItFlat);
+	// replaced by PhysicalParameters::blockedDOFs
+	#if 0
+		if(want_2d){
+	  		shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
+			rootBody->engines.push_back(makeItFlat);
+		}
+	#endif
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);

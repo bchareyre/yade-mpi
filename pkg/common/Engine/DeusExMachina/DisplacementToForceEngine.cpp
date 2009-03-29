@@ -56,10 +56,18 @@ void DisplacementToForceEngine::applyCondition(MetaBody * ncb)
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 
+	#ifdef BEX_CONTAINER
+		ncb->bex.sync();
+	#endif
+
 	for(;ii!=iiEnd;++ii)
 		if( bodies->exists(*ii) )
 		{
-			Vector3r current_force=static_cast<Force*>( ncb->physicalActions->find( ((*bodies)[*ii])->getId() , actionParameterForce->getClassIndex() ).get() )->force;
+			#ifdef BEX_CONTAINER
+				Vector3r current_force=ncb->bex.getForce(*ii);
+			#else
+				Vector3r current_force=static_cast<Force*>( ncb->physicalActions->find(*ii,actionParameterForce->getClassIndex() ).get() )->force;
+			#endif
 
 			Real current_length_sq = 
 				  (targetForceMask[0] != 0) ? current_force[0]*current_force[0]:0.0 

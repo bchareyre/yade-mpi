@@ -234,7 +234,6 @@ bool SnowVoxelsLoader::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 	
 	if(m_grains.size() == 0)

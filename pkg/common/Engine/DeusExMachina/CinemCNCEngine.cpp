@@ -187,8 +187,11 @@ void CinemCNCEngine::computeAlpha()
 
 void CinemCNCEngine::computeDu(MetaBody* ncb)
 {
-
-	Vector3r& F_sup = dynamic_cast<Force*>(ncb->physicalActions->find(id_boxhaut,actionForce->getClassIndex()) . get() )->force;
+	#ifdef BEX_CONTAINER
+		ncb->bex.sync(); Vector3r F_sup=ncb->bex.getForce(id_boxhaut);
+	#else
+		Vector3r& F_sup = dynamic_cast<Force*>(ncb->physicalActions->find(id_boxhaut,actionForce->getClassIndex()) . get() )->force;
+	#endif
 	
 	if(firstRun)
 	{

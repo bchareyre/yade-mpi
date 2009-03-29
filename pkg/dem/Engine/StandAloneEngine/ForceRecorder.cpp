@@ -69,6 +69,9 @@ bool ForceRecorder::isActivated()
 void ForceRecorder::action(MetaBody * ncb)
 {
 	if (first) init();
+	#ifdef BEX_CONTAINER
+		ncb->bex.sync();
+	#endif
 
 	Real x=0, y=0, z=0;
 	
@@ -76,7 +79,11 @@ void ForceRecorder::action(MetaBody * ncb)
 	{
 		if(ncb->bodies->exists(i))
 		{
-			Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
+			#ifdef BEX_CONTAINER
+				Vector3r force=ncb->bex.getForce(i);
+			#else
+				Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
+			#endif
 		
 			x+=force[0];
 			y+=force[1];

@@ -140,12 +140,17 @@ void ViscousForceDamping::action(Body* body)
 			Vector3r viscousDampingForce	= normalDampingForce + shearDampingForce;
 			
 //	Add forces
-			static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= viscousDampingForce;
-			static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += viscousDampingForce;
-			
-			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(viscousDampingForce);
-			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(viscousDampingForce);
-			
+			#ifdef BEX_CONTAINER
+				ncb->bex.addForce (id1,-viscousDampingForce);
+				ncb->bex.addForce (id2,+viscousDampingForce);
+				ncb->bex.addTorque(id1,-c1x.Cross(viscousDampingForce));
+				ncb->bex.addTorque(id2, c2x.Cross(viscousDampingForce));
+			#else
+				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= viscousDampingForce;
+				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += viscousDampingForce;
+				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(viscousDampingForce);
+				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(viscousDampingForce);
+			#endif
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}
 	}

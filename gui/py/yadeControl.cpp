@@ -633,13 +633,14 @@ class pyOmega{
 		rb->bodies=bc;
 	}
 	string bodyContainer_get(string clss){ return OMEGA.getRootBody()->bodies->getClassName(); }
-
-	void physicalActionContainer_set(string clss){
-		MetaBody* rb=OMEGA.getRootBody().get();
-		shared_ptr<PhysicalActionContainer> pac=dynamic_pointer_cast<PhysicalActionContainer>(ClassFactory::instance().createShared(clss));
-		rb->physicalActions=pac;
-	}
-	string physicalActionContainer_get(string clss){ return OMEGA.getRootBody()->physicalActions->getClassName(); }
+	#ifndef BEX_CONTAINER
+		void physicalActionContainer_set(string clss){
+			MetaBody* rb=OMEGA.getRootBody().get();
+			shared_ptr<PhysicalActionContainer> pac=dynamic_pointer_cast<PhysicalActionContainer>(ClassFactory::instance().createShared(clss));
+			rb->physicalActions=pac;
+		}
+		string physicalActionContainer_get(string clss){ return OMEGA.getRootBody()->physicalActions->getClassName(); }
+	#endif
 
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
@@ -698,7 +699,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("isChildClassOf",&pyOmega::isChildClassOf)
 		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set)
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
-		.add_property("actionContainer",&pyOmega::physicalActionContainer_get,&pyOmega::physicalActionContainer_set)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set)
 		#ifdef BEX_CONTAINER
 			.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set)

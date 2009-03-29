@@ -56,7 +56,11 @@ void MakeItFlat::applyCondition(MetaBody* ncb)
 			{
 				p->se3.position[direction]=plane_position;
 				if(reset_force)
-					static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force[direction]=0;// 
+					#ifdef BEX_CONTAINER
+						throw runtime_error("BexContainer doesn't work with MakeIfFlat resetting forces, since it would have to sync() frequently. Use PhysicalParameters::blockedDOFs instead, MakeItFlat will be removed.");
+					#else
+						static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force[direction]=0;// 
+					#endif
 			}
 		}
 	}

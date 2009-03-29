@@ -128,7 +128,6 @@ bool ThreePointBending::generate()
 ////////////////////////////////////
 	
 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->physicalActions		= shared_ptr<PhysicalActionContainer>(new PhysicalActionVectorVector);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	Vector3r min(10000,10000,10000),max(-10000,-10000,-10000);

@@ -329,24 +329,6 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	force[wall_front]= getForce(ncb,wall_id[wall_front]);  stress[wall_front]= force[wall_front] *invZSurface;
 	force[wall_back]=  getForce(ncb,wall_id[wall_back]);   stress[wall_back]=  force[wall_back]  *invZSurface;
 
-// remove this, it is in the 6 lines above now
-#if 0	
-	stress[wall_bottom] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_bottom],ForceClassIndex).get() )->force ) * invYSurface;
-	stress[wall_top] = static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_top],ForceClassIndex).get() )->force * invYSurface;
-	stress[wall_left] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_left],ForceClassIndex).get() )->force ) * invXSurface;
-	stress[wall_right] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_right],ForceClassIndex).get() )->force ) * invXSurface;
-	stress[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) * invZSurface;
-	stress[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) * invZSurface;	
-
-// ==================================================== jf
-	force[wall_bottom] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_bottom],ForceClassIndex).get() )->force );
-	force[wall_top] = static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_top],ForceClassIndex).get() )->force ;
-	force[wall_left] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_left],ForceClassIndex).get() )->force ) ;
-	force[wall_right] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_right],ForceClassIndex).get() )->force ) ;
-	force[wall_front] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_front],ForceClassIndex).get() )->force ) ;
-	force[wall_back] = ( static_cast<Force*>( ncb->physicalActions->find(wall_id[wall_back],ForceClassIndex).get() )->force ) ;	
-// ====================================================
-#endif
 
  	//cerr << "stresses : " <<  stress[wall_bottom] << " " <<
  //stress[wall_top]<< " " << stress[wall_left]<< " " << stress[wall_right]<< " "

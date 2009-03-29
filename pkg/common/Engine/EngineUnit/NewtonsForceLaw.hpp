@@ -10,17 +10,27 @@
 
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 
-class NewtonsForceLaw : public PhysicalActionApplierUnit
-{
-	public :
-		virtual void go( 	  const shared_ptr<PhysicalAction>&
-					, const shared_ptr<PhysicalParameters>&
-					, const Body*);
-	NEEDS_BEX("Force");
-	FUNCTOR2D(Force,ParticleParameters);
-	REGISTER_CLASS_NAME(NewtonsForceLaw);
-	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
-};
+#ifdef BEX_CONTAINER
+	class NewtonsForceLaw: public PhysicalActionApplierUnit{
+		public:
+			virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
+			FUNCTOR1D(ParticleParameters);
+			REGISTER_CLASS_AND_BASE(NewtonsForceLaw,PhysicalActionApplierUnit);
+	};
+
+#else
+	class NewtonsForceLaw : public PhysicalActionApplierUnit
+	{
+		public :
+			virtual void go( 	  const shared_ptr<PhysicalAction>&
+						, const shared_ptr<PhysicalParameters>&
+						, const Body*);
+		NEEDS_BEX("Force");
+		FUNCTOR2D(Force,ParticleParameters);
+		REGISTER_CLASS_NAME(NewtonsForceLaw);
+		REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
+	};
+#endif
 
 REGISTER_SERIALIZABLE(NewtonsForceLaw);
 

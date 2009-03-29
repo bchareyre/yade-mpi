@@ -73,13 +73,18 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 						Vector3r x			= currentContactGeometry->contactPoints[i][j];
 						Vector3r c1x			= (x - de1->se3.position);
 						Vector3r c2x			= (x - de2->se3.position);
+						#ifdef BEX_CONTAINER
+							ncb->bex.addForce (id1,-force);
+							ncb->bex.addForce (id2,+force);
+							ncb->bex.addTorque(id1,-c1x.Cross(force));
+							ncb->bex.addTorque(id2, c2x.Cross(force));
+						#else
+							static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= force;
+							static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += force;
+							static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(force);
+							static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(force);
+						#endif
 
-						// it will be some macro(	body->physicalActions,	ActionType , bodyId )
-						static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= force;
-						static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += force;
-
-						static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(force);
-						static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(force);
 					}
 				}
 

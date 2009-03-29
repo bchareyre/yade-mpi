@@ -22,6 +22,7 @@ class VelocityRecorder;
 class TriaxialStressController;
 class TriaxialCompressionEngine;
 class TriaxialStateRecorder;
+class GlobalStiffnessTimeStepper;
 
 /*! \brief Isotropic compression + triaxial compression test
 
@@ -128,6 +129,7 @@ class TriaxialTest : public FileGenerator
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
 		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
+		shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper;
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
