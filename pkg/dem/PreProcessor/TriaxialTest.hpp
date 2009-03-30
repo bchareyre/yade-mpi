@@ -37,7 +37,7 @@ class GlobalStiffnessTimeStepper;
 		
 	2/ The class TriaxialStateRecorder is used to write to a file the history of stresses and strains.
 	
-	3/ TriaxialTest is currently using a group of classes including GlobalStiffness (data), GlobalStiffnessCounter (updater) and GlobalStiffnessTimeStepper to compute an appropriate dt for the numerical scheme. The TriaxialTest is the only preprocessor using these classes in Yade because they have been developped AFTER most of preprocessor examples, BUT they can be used in principle in any situation and they have nothing specifically related to the triaxial test.
+	3/ TriaxialTest is currently using GlobalStiffnessTimeStepper to compute an appropriate dt for the numerical scheme. The TriaxialTest is the only preprocessor using these classes in Yade because they have been developped AFTER most of preprocessor examples, BUT they can be used in principle in any situation and they have nothing specifically related to the triaxial test.
 	
 	@note TriaxialStressController::ComputeUnbalancedForce(...) returns a value that can be usefull for evaluating the stability of the packing. It is defined as (mean force on particles)/(mean contact force), so that it tends to 0 in a stable packing. This parameter is checked by TriaxialCompressionEngine to switch from one stage of the simulation to the next one (e.g. stop isotropic confinment and start axial loading)
 	
@@ -106,10 +106,8 @@ class TriaxialTest : public FileGenerator
 				//!flag to choose an isotropic compaction until a fixed porosity choosing a same translation speed for the six walls
 				,isotropicCompaction;
 
-		#ifdef BEX_CONTAINER
-			//! Generate parallel simulation, if it is supported
-			bool parallel;
-		#endif
+				//! Generate parallel simulation
+				bool parallel;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval

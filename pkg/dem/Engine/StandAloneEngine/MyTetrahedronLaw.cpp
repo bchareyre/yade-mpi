@@ -12,12 +12,8 @@
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
-
-MyTetrahedronLaw::MyTetrahedronLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+MyTetrahedronLaw::MyTetrahedronLaw() : InteractionSolver()
 {
 }
 
@@ -73,17 +69,10 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 						Vector3r x			= currentContactGeometry->contactPoints[i][j];
 						Vector3r c1x			= (x - de1->se3.position);
 						Vector3r c2x			= (x - de2->se3.position);
-						#ifdef BEX_CONTAINER
-							ncb->bex.addForce (id1,-force);
-							ncb->bex.addForce (id2,+force);
-							ncb->bex.addTorque(id1,-c1x.Cross(force));
-							ncb->bex.addTorque(id2, c2x.Cross(force));
-						#else
-							static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= force;
-							static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += force;
-							static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(force);
-							static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(force);
-						#endif
+						ncb->bex.addForce (id1,-force);
+						ncb->bex.addForce (id2,+force);
+						ncb->bex.addTorque(id1,-c1x.Cross(force));
+						ncb->bex.addTorque(id2, c2x.Cross(force));
 
 					}
 				}

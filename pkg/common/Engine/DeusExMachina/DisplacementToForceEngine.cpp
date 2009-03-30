@@ -9,9 +9,8 @@
 #include"DisplacementToForceEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
-#include<yade/pkg-common/Force.hpp>
 
-DisplacementToForceEngine::DisplacementToForceEngine() : actionParameterForce(new Force), targetForce(Vector3r::ZERO), targetForceMask(Vector3r::ZERO) 
+DisplacementToForceEngine::DisplacementToForceEngine() : targetForce(Vector3r::ZERO), targetForceMask(Vector3r::ZERO) 
 {
 	direction=1.0;
 	old_direction=1.0;
@@ -56,18 +55,12 @@ void DisplacementToForceEngine::applyCondition(MetaBody * ncb)
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync();
-	#endif
+	ncb->bex.sync();
 
 	for(;ii!=iiEnd;++ii)
 		if( bodies->exists(*ii) )
 		{
-			#ifdef BEX_CONTAINER
-				Vector3r current_force=ncb->bex.getForce(*ii);
-			#else
-				Vector3r current_force=static_cast<Force*>( ncb->physicalActions->find(*ii,actionParameterForce->getClassIndex() ).get() )->force;
-			#endif
+			Vector3r current_force=ncb->bex.getForce(*ii);
 
 			Real current_length_sq = 
 				  (targetForceMask[0] != 0) ? current_force[0]*current_force[0]:0.0 

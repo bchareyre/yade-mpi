@@ -10,7 +10,6 @@
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
-#include <yade/pkg-common/Force.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 
 #include <yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -21,7 +20,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-WallStressRecorder::WallStressRecorder () : DataRecorder(), actionForce(new Force)
+WallStressRecorder::WallStressRecorder () : DataRecorder()
 
 {
 	outputFile = "";
@@ -91,16 +90,10 @@ void WallStressRecorder::action(MetaBody * ncb)
 	/// calcul des contraintes via forces resultantes sur murs
 	
 	Real SIG_wall_11 = 0, SIG_wall_22 = 0, SIG_wall_33 = 0;
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync();
-		Vector3r F_wall_11=ncb->bex.getForce(wall_left_id);
-		Vector3r F_wall_22=ncb->bex.getForce(wall_top_id);
-		Vector3r F_wall_33=ncb->bex.getForce(wall_front_id);
-	#else
-		Vector3r F_wall_11 = static_cast<Force*>( ncb->physicalActions->find(wall_left_id, actionForce->getClassIndex() ). get() )->force;
-		Vector3r F_wall_22 = static_cast<Force*>( ncb->physicalActions->find(wall_top_id, actionForce->getClassIndex() ). get() )->force;
-		Vector3r F_wall_33 = static_cast<Force*>( ncb->physicalActions->find(wall_front_id, actionForce->getClassIndex() ). get() )->force;
-	#endif
+	ncb->bex.sync();
+	Vector3r F_wall_11=ncb->bex.getForce(wall_left_id);
+	Vector3r F_wall_22=ncb->bex.getForce(wall_top_id);
+	Vector3r F_wall_33=ncb->bex.getForce(wall_front_id);
 	
 	SIG_wall_11 = F_wall_11[0]/(depth*height);
 	SIG_wall_22 = F_wall_22[1]/(depth*width);

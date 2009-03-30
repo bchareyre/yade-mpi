@@ -36,7 +36,6 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -56,7 +55,6 @@
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
@@ -304,10 +302,6 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 
 void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-		
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
         interactionGeometryDispatcher->add("InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry");
 	
@@ -351,7 +345,6 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
         rootBody->engines.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(interactingGeometryDispatcher);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }

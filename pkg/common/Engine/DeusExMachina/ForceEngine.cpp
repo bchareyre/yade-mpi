@@ -8,13 +8,12 @@
 
 #include"ForceEngine.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/core/MetaBody.hpp>
 
 #include<boost/foreach.hpp>
 
 
-ForceEngine::ForceEngine() : actionParameterForce(new Force), force(Vector3r::ZERO)
+ForceEngine::ForceEngine() : force(Vector3r::ZERO)
 {
 }
 
@@ -33,11 +32,7 @@ void ForceEngine::registerAttributes()
 void ForceEngine::applyCondition(MetaBody* ncb){
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(ncb->bodies->exists(id));
-		#ifdef BEX_CONTAINER
-			ncb->bex.addForce(id,force);
-		#else
-			static_pointer_cast<Force>(ncb->physicalActions->find(id,actionParameterForce->getClassIndex()))->force+=force;	
-		#endif
+		ncb->bex.addForce(id,force);
 	}
 }
 

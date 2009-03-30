@@ -11,14 +11,13 @@
 #include "CapillaryRecorder.hpp"
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/pkg-common/Force.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
 
 
-CapillaryRecorder::CapillaryRecorder () : DataRecorder(), actionForce(new Force)
+CapillaryRecorder::CapillaryRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 1;
@@ -53,12 +52,8 @@ void CapillaryRecorder::action(MetaBody * ncb)
 {
 	Real fx=0, fy=0, fz=0;
 	
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync();
-		Vector3r force=ncb->bex.getForce(bigBallId);
-	#else
-		Vector3r force = static_cast<Force*>(ncb->physicalActions->find(bigBallId, actionForce->getClassIndex() ) . get() )->force;
-	#endif
+	ncb->bex.sync();
+	Vector3r force=ncb->bex.getForce(bigBallId);
 	
 		
 		fx=force[0];

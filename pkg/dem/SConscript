@@ -18,8 +18,6 @@ if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a
 				'yade-base',
 				'GLDrawInteractingSphere',
 				'yade-multimethods',
-				'Force',
-				'Momentum',
 				'Sphere',
 				'RigidBodyParameters',
 				'InteractingSphere',
@@ -84,10 +82,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	env.SharedLibrary('SDECLinkPhysics',
 		['DataClass/InteractionPhysics/SDECLinkPhysics.cpp'],
 		LIBS=env['LIBS']+['NormalShearInteractions']),
-
-	env.SharedLibrary('GlobalStiffness',
-		['DataClass/PhysicalAction/GlobalStiffness.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
 
 	env.SharedLibrary('MacroMicroElasticRelationships',
 		['Engine/EngineUnit/MacroMicroElasticRelationships.cpp'],
@@ -194,8 +188,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyMacroParameters',
 			'yade-base',
 			'yade-multimethods',
-			'Force',
-			'Momentum',
 			'Sphere',
 			'RigidBodyParameters']),
 			
@@ -232,8 +224,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-base',
 			'GLDrawInteractingSphere',
 			'yade-multimethods',
-			'Force',
-			'Momentum',
 			'Sphere',
 			'RigidBodyParameters']),
 	
@@ -249,8 +239,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-base',
 			
 			'yade-multimethods',
-			'Force',
-			'Momentum',
 			'Sphere',
 			'RigidBodyParameters']),
 
@@ -262,8 +250,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-serialization',
 			'yade-base',
 			'yade-multimethods',
-			'Force',
-			'Momentum',
 			'Sphere',
 			'RigidBodyParameters']),
 
@@ -284,7 +270,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('ForceRecorder',
 		['Engine/StandAloneEngine/ForceRecorder.cpp'],
-		LIBS=env['LIBS']+['RigidBodyParameters', 'Force']),
+		LIBS=env['LIBS']+['RigidBodyParameters']),
 
 	env.SharedLibrary('PositionOrientationRecorder',
 		['Engine/StandAloneEngine/PositionOrientationRecorder.cpp'],
@@ -307,22 +293,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		['Engine/StandAloneEngine/VelocityRecorder.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters']),
 
-	env.SharedLibrary('GlobalStiffnessCounter',
-		['Engine/StandAloneEngine/GlobalStiffnessCounter.cpp'],
-		LIBS=env['LIBS']+['SDECLinkPhysics',
-			'ElasticContactInteraction',
-			'SDECLinkGeometry',
-			'SpheresContactGeometry',
-			'BodyMacroParameters',
-			'yade-serialization',
-			'yade-base',		
-			'yade-multimethods',
-			'Force',
-			'Momentum',
-			'Sphere',
-			'RigidBodyParameters',
-			'GlobalStiffness' ]),
-
 	env.SharedLibrary('GlobalStiffnessTimeStepper',
 		['Engine/StandAloneEngine/GlobalStiffnessTimeStepper.cpp'],
 		LIBS=env['LIBS']+['yade-base',
@@ -331,25 +301,16 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SpheresContactGeometry',
 			'MacroMicroElasticRelationships',
 			'Sphere',
-			'GlobalStiffness']),
+			]),
 
 	env.SharedLibrary('GeometricalModelForceColorizer',
 		['Engine/StandAloneEngine/GeometricalModelForceColorizer.cpp'],
-		LIBS=env['LIBS']+['RigidBodyParameters', 'Force']),
-
-	env.SharedLibrary('ResultantForceEngine',
-		['Engine/DeusExMachina/ResultantForceEngine.cpp'],
-		LIBS=env['LIBS']+[
-			'yade-base',		
-			'Force',
-			'ParticleParameters',
-			'GlobalStiffness']),
+		LIBS=env['LIBS']+['RigidBodyParameters',]),
 
 	env.SharedLibrary('TriaxialStressController',
 		['Engine/DeusExMachina/TriaxialStressController.cpp'],
 		LIBS=env['LIBS']+[
 			'yade-base',
-			'Force',
 			'ParticleParameters',
 			'RigidBodyParameters',
 			'ElasticContactInteraction',
@@ -362,7 +323,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		['Engine/DeusExMachina/TriaxialCompressionEngine.cpp'],
 		LIBS=env['LIBS']+[
 			'yade-base',
-			'Force',
 			'ParticleParameters',
 			'ElasticContactInteraction',
 			'TriaxialStressController',
@@ -411,8 +371,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
-			
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -444,7 +402,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -480,7 +437,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CinemDNCEngine',
 			'yade-serialization',
 			'yade-base',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -502,8 +458,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CohesiveFrictionalBodyParameters',
 			'ContactLaw1',
 			'CL1Relationships',
-			'GlobalStiffness',
-			'GlobalStiffnessCounter',
 			'GlobalStiffnessTimeStepper',
 			'PositionOrientationRecorder',
 			'PositionRecorder',
@@ -518,7 +472,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CinemDNCEngine',
 			'yade-serialization',
 			'yade-base',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -551,7 +504,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'SpheresContactGeometry',
 			'yade-base',
 			
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -581,7 +533,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'GravityEngines',
 			'yade-serialization',
 			'yade-base',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -612,7 +563,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'TranslationEngine',
 			'yade-serialization',
 			'yade-base',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -639,7 +589,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'CundallNonViscousDamping',
 			'MetaInteractingGeometry',
 			'GravityEngines',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractingGeometryMetaEngine',
@@ -677,7 +626,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
                         'CundallNonViscousDamping',
                         'MetaInteractingGeometry',
                         'GravityEngines',
-                        'PhysicalActionContainerInitializer',
                         'PhysicalActionContainerReseter',
                         'InteractionGeometryMetaEngine',
                         'InteractingGeometryMetaEngine',
@@ -706,14 +654,12 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 #			'MicroMacroAnalyser',
 			'SimpleElasticRelationships',
 			'ElasticCriterionTimeStepper',
-			'MakeItFlat',
 			'InteractingSphere',
 			'InteractingBox',
 			'NewtonsDampedLaw',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -726,9 +672,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'PersistentSAPCollider',
 			'MetaInteractingGeometry2AABB',
-			'GlobalStiffness',
-			'GlobalStiffnessCounter',
-			'ResultantForceEngine',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
@@ -758,7 +701,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -771,9 +713,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'AABB',
 			'DistantPersistentSAPCollider',
 			'MetaInteractingGeometry2AABB',
-			'GlobalStiffness',
-			'GlobalStiffnessCounter',
-			'ResultantForceEngine',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
@@ -800,7 +739,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'yade-base',
 			'Shop',
 			
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -823,7 +761,6 @@ env.SharedLibrary('WallStressRecorder',
 			'ElasticContactInteraction',
 			'SpheresContactGeometry',
 			'BodyMacroParameters',
-			'Force',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',
 			'Sphere',
@@ -845,7 +782,6 @@ env.SharedLibrary('CapillaryStressRecorder',
 			'CapillaryParameters',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',
-			'Force',
 			'CapillaryCohesiveLaw']),
 
 env.SharedLibrary('TriaxialTestWater',
@@ -870,7 +806,6 @@ env.SharedLibrary('TriaxialTestWater',
         MetaInteractingGeometry
         GravityEngines
         yade-serialization
-        PhysicalActionContainerInitializer
         PhysicalActionContainerReseter
         InteractionGeometryMetaEngine
         InteractionPhysicsMetaEngine
@@ -883,9 +818,6 @@ env.SharedLibrary('TriaxialTestWater',
         AABB
         PersistentSAPCollider
         MetaInteractingGeometry2AABB
-	GlobalStiffness
-	GlobalStiffnessCounter
-	ResultantForceEngine
 	TriaxialStressController
 	MacroMicroElasticRelationshipsWater
 	TriaxialCompressionEngine
@@ -897,7 +829,6 @@ env.SharedLibrary('ContactStressRecorder',
 			'ElasticContactInteraction',
 			'SpheresContactGeometry',
 			'BodyMacroParameters',
-			'Force',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',
 			'Sphere',
@@ -910,8 +841,6 @@ env.SharedLibrary('CapillaryCohesiveLaw',
 			'ElasticContactInteraction',
 			'SpheresContactGeometry',
 			'BodyMacroParameters',
-			'Force',
-			'Momentum',
 			'RigidBodyParameters',
 			'Sphere',
 			'ElasticContactLaw']),
@@ -951,15 +880,7 @@ env.SharedLibrary('InteractingSphere2AABBwater',
 		
 env.SharedLibrary('HydraulicForceEngine',
 		['Engine/DeusExMachina/HydraulicForceEngine.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Force', 'Momentum', 'ParticleParameters', 'CohesiveFrictionalBodyParameters', 'TriaxialCompressionEngine', 'GravityEngines'],
-		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
-			'DataClass/PhysicalAction',
-			'$PREFIX/include',
-			'DataClass/PhysicalParameters']),
-			
-env.SharedLibrary('MakeItFlat',
-		['Engine/DeusExMachina/MakeItFlat.cpp'],
-		LIBS=env['LIBS']+['yade-base',  'Force', 'ParticleParameters'],
+		LIBS=env['LIBS']+['yade-base',   'ParticleParameters', 'CohesiveFrictionalBodyParameters', 'TriaxialCompressionEngine', 'GravityEngines'],
 		CPPPATH=env['CPPPATH']+['Engine/DeusExMachina',
 			'DataClass/PhysicalAction',
 			'$PREFIX/include',
@@ -988,7 +909,6 @@ env.SharedLibrary('HydraulicTest',
 			'MetaInteractingGeometry',
 			'GravityEngines',
 			'yade-serialization',
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -1001,9 +921,6 @@ env.SharedLibrary('HydraulicTest',
 			'AABB',
 			'DistantPersistentSAPCollider',
 			'MetaInteractingGeometry2AABB',
-			'GlobalStiffness',
-			'GlobalStiffnessCounter',
-			'ResultantForceEngine',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',
 			'GlobalStiffnessTimeStepper',
@@ -1011,7 +928,6 @@ env.SharedLibrary('HydraulicTest',
 			'TriaxialStateRecorder',
 			'PositionOrientationRecorder',
 			'HydraulicForceEngine',
-			'MakeItFlat',
 			'TranslationEngine',]),
 
 
@@ -1020,8 +936,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 		LIBS=env['LIBS']+['yade-serialization',
 			'yade-base',		
 			'yade-multimethods',
-			'Force',
-			'Momentum',
 			'RigidBodyParameters'
 			 ]),
 
@@ -1054,8 +968,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 			'yade-serialization',
 			'yade-base',
 			'yade-multimethods',
-			'Force',
-			'Momentum',
 			'Sphere',
 			'RigidBodyParameters'])
 
@@ -1091,7 +1003,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 			    ,'ParticleParameters'
 			    ,'RigidBodyRecorder'
 			    ,'PhysicalActionApplier'
-			    ,'PhysicalActionContainerInitializer'
 			    ,'PhysicalActionContainerReseter'
 			    ,'PhysicalParametersMetaEngine'
 			    ,'PersistentSAPCollider'
@@ -1118,7 +1029,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'MetaInteractingGeometry2AABB'
 				,'ParticleParameters'
 				,'PhysicalActionApplier'
-				,'PhysicalActionContainerInitializer'
 				,'PhysicalActionContainerReseter'
 				,'PhysicalParametersMetaEngine'
 				,'SpatialQuickSortCollider'
@@ -1145,8 +1055,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 			#'yade-base',
 			#'GLDrawInteractingSphere',
 			#'yade-multimethods',
-			#'Force',
-			#'Momentum',
 			#'Sphere',
 			#'RigidBodyParameters',
 			#'InteractingSphere',

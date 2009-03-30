@@ -9,7 +9,6 @@
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
-#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
@@ -47,14 +46,12 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/InteractionHashMap.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 #include<yade/pkg-snow/ElawSnowLayersDeformation.hpp>
 
 #include<yade/extra/Shop.hpp>
@@ -396,11 +393,6 @@ bool SnowVoxelsLoader::generate()
 
 void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
-	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 
 	shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact);
@@ -461,9 +453,6 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	cohesiveFrictionalContactLaw->twist_creep = use_grain_twist_creep;
 	cohesiveFrictionalContactLaw->creep_viscosity = creep_viscosity;
 		
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	// globalStiffnessCounter->sdecGroupMask = 2;
-	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
@@ -522,7 +511,6 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
-	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialStateRecorder);
 	if(use_gravity_engine)
@@ -534,7 +522,6 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(positionIntegrator);
 	//if(!rotationBlocked)
 		rootBody->engines.push_back(orientationIntegrator);
-	//rootBody->engines.push_back(resultantforceEngine);
 	//rootBody->engines.push_back(triaxialstressController);
 	
 		
@@ -548,7 +535,6 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }

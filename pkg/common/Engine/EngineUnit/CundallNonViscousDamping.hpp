@@ -7,14 +7,8 @@ class CundallNonViscousForceDamping : public PhysicalActionDamperUnit{
 		Real damping;
 		CundallNonViscousForceDamping(): damping(0){};
 		virtual void registerAttributes(){PhysicalActionDamperUnit::registerAttributes();REGISTER_ATTRIBUTE(damping);}
-	#ifdef BEX_CONTAINER
-		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
-		FUNCTOR1D(ParticleParameters);
-	#else
-		virtual void go(const shared_ptr<PhysicalAction>&, const shared_ptr<PhysicalParameters>& , const Body*);
-		NEEDS_BEX("Force");
-		FUNCTOR2D(Force,ParticleParameters);
-	#endif
+	virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
+	FUNCTOR1D(ParticleParameters);
 	REGISTER_CLASS_AND_BASE(CundallNonViscousForceDamping,PhysicalActionDamperUnit);
 };
 REGISTER_SERIALIZABLE(CundallNonViscousForceDamping);
@@ -24,14 +18,8 @@ class CundallNonViscousMomentumDamping : public PhysicalActionDamperUnit{
 		Real damping;
 		CundallNonViscousMomentumDamping(): damping(0){};
 		virtual void registerAttributes(){PhysicalActionDamperUnit::registerAttributes();REGISTER_ATTRIBUTE(damping); }
-	#ifdef BEX_CONTAINER
 		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
-		FUNCTOR1D(RigidBodyParameters);
-	#else
-		virtual void go(const shared_ptr<PhysicalAction>&, const shared_ptr<PhysicalParameters>&, const Body*);
-		NEEDS_BEX("Momentum");
-		FUNCTOR2D(Momentum,RigidBodyParameters);
-	#endif
+	FUNCTOR1D(RigidBodyParameters);
 	REGISTER_CLASS_AND_BASE(CundallNonViscousMomentumDamping,PhysicalActionDamperUnit);
 };
 REGISTER_SERIALIZABLE(CundallNonViscousMomentumDamping);

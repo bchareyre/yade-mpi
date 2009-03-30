@@ -18,9 +18,6 @@
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/MetaBody.hpp>
-#include <yade/pkg-common/Force.hpp>
-#include <yade/pkg-common/Momentum.hpp>
-#include <yade/core/PhysicalAction.hpp>
 #include <Wm3Vector3.h>
 #include <yade/lib-base/yadeWm3.hpp>
 
@@ -35,7 +32,7 @@ using namespace std;
 //int compteur1 = 0;
 //int compteur2 = 0;
 
-CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver()
 {
         sdecGroupMask=1;
 
@@ -291,13 +288,8 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 					else if (currentContactPhysics->fusionNumber !=0)
 						currentContactPhysics->Fcap /= (currentContactPhysics->fusionNumber+1);
                                 }
-											#ifdef BEX_CONTAINER
-												ncb->bex.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
-												ncb->bex.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
-											#else
-	                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId1() , actionForce  ->getClassIndex()).get())->force    += currentContactPhysics->Fcap;
-	                                static_cast<Force*>   (ncb->physicalActions->find( (*ii)->getId2() , actionForce  ->getClassIndex()).get())->force    -= currentContactPhysics->Fcap;
-											#endif
+											ncb->bex.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
+											ncb->bex.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
 
 				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
 

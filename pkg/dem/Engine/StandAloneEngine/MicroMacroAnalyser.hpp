@@ -21,17 +21,12 @@
 	This class is using a separate library built from extra/triangulation sources		
  */
 
-class PhysicalAction;
 class KinematicLocalisationAnalyser;
 
 class MicroMacroAnalyser : public StandAloneEngine
 {
 /// Attributes
 	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-		int actionForceIndex;
-		int actionMomentumIndex;
 		std::ofstream ofile;
 		
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;

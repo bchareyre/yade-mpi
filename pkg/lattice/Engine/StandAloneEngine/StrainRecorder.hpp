@@ -13,12 +13,10 @@
 #include <string>
 #include <fstream>
 
-//class PhysicalAction;
 
 class StrainRecorder : public DataRecorder
 {
 	private :
-//		shared_ptr<PhysicalAction> actionForce;
 		std::ofstream ofile; 
 
 	public :

@@ -9,7 +9,6 @@
 #include "TriaxialCompressionEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<boost/lexical_cast.hpp>
@@ -24,7 +23,7 @@ class CohesiveFrictionalRelationships;
 
 CREATE_LOGGER(TriaxialCompressionEngine);
 
-TriaxialCompressionEngine::TriaxialCompressionEngine() : actionForce(new Force), uniaxialEpsilonCurr(strain[1])
+TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(strain[1])
 {
 	translationAxis=TriaxialStressController::normal[wall_bottom_id];
 	translationAxisx=Vector3r(1,0,0);

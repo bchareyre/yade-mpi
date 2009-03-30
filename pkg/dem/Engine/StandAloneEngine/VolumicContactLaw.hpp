@@ -13,17 +13,9 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-class PhysicalAction;
-
 class VolumicContactLaw : public InteractionSolver
 {
 /// Attributes
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-		int actionForceIndex;
-		int actionMomentumIndex;
-		
 	public :
 		int sdecGroupMask;
 		bool momentRotationLaw;
@@ -44,7 +36,6 @@ class VolumicContactLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(VolumicContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

@@ -3,7 +3,6 @@
 
 o=Omega()
 o.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]
 o.engines=[

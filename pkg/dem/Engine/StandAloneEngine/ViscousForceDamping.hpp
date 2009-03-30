@@ -16,15 +16,9 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-class PhysicalAction;
-
 class ViscousForceDamping : public InteractionSolver
 {
 /// Attributes
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-
 	public :
 		
 		Real betaNormal;

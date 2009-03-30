@@ -40,7 +40,6 @@ class LatticeBeamParameters : public PhysicalParameters
 
 
 		// where does it belong, what is it?
-		// a PhysicalAction !
 		Real 			 count
 					,torsionAngle;
 		Quaternionr		 bendingRotation

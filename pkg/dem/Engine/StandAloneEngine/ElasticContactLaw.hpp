@@ -9,7 +9,6 @@
 #pragma once
 
 #include<yade/core/InteractionSolver.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 // only to see whether SCG_SHEAR is defined, may be removed in the future
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -18,7 +17,6 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-class PhysicalAction;
 
 class ElasticContactLaw2: public InteractionSolver{
 	public:
@@ -31,7 +29,6 @@ class ElasticContactLaw2: public InteractionSolver{
 		InteractionSolver::registerAttributes();
 		REGISTER_ATTRIBUTE(isCohesive);
 	}
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(ElasticContactLaw2);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
@@ -42,9 +39,6 @@ class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	int sdecGroupMask;
 	bool momentRotationLaw;
-	#ifndef BEX_CONTAINER
-		int actionForceIndex,actionMomentumIndex;
-	#endif
 	#ifdef SCG_SHEAR
 		bool useShear;
 	#endif
@@ -67,14 +61,6 @@ class ElasticContactLaw : public InteractionSolver
 {
 /// Attributes
 	private :
-	#ifndef BEX_CONTAINER
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-		int actionForceIndex;
-		int actionMomentumIndex;
-		NEEDS_BEX("Force","Momentum");
-	#endif
-		
 	public :
 		int sdecGroupMask;
 		bool momentRotationLaw;

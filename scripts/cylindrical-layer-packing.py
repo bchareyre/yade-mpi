@@ -8,9 +8,7 @@ o=Omega()
 # we will use this in both initializers and engines, so we save it to a temp variable to save typing
 aabbDispatcher=MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 
-o.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer',{'physicalActionNames':['Force','Momentum','GlobalStiffness']}),
-	aabbDispatcher]
+o.initializers=[aabbDispatcher]
 
 o.engines=[
 	StandAloneEngine('PhysicalActionContainerReseter'),

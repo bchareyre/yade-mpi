@@ -25,7 +25,6 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
@@ -35,7 +34,6 @@
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -262,9 +260,6 @@ void RotatingBox::createKinematicBox(shared_ptr<Body>& body, Vector3r position, 
 
 void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4ClosestFeatures");
@@ -320,7 +315,6 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 		rootBody->engines.push_back(kinematic);
 		
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 

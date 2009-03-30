@@ -18,7 +18,6 @@
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <yade/pkg-dem/ContactLaw1.hpp>
 #include <yade/pkg-dem/CL1Relationships.hpp>
-#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>
 
@@ -39,7 +38,6 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
@@ -55,7 +53,6 @@
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
@@ -306,10 +303,6 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<CinemDNCEngine> kinematic = shared_ptr<CinemDNCEngine>(new CinemDNCEngine);
 	kinematic->shearSpeed  = shearSpeed;
 
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -333,14 +326,11 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt=1e-5;
 
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	globalStiffnessCounter->interval = timeStepUpdateInterval;
 
 
 
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
@@ -355,7 +345,6 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 // 	rootBody->engines.push_back(possnap);
 // 	rootBody->engines.push_back(forcesnap);
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 

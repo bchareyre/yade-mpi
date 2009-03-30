@@ -405,37 +405,6 @@ class pyInteractionContainer{
 
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
 
-BASIC_PY_PROXY(pyPhysicalAction,PhysicalAction);
-
-class pyPhysicalActionContainer{
-	public:
-		const shared_ptr<PhysicalActionContainer> proxee;
-		pyPhysicalActionContainer(const shared_ptr<PhysicalActionContainer>& _proxee): proxee(_proxee){}
-		pyPhysicalAction pyGetitem(python::object action_and_id){
-			if(!PySequence_Check(action_and_id.ptr())) throw invalid_argument("Key must be a tuple");
-			if(python::len(action_and_id)!=2) throw invalid_argument("Key must be a 2-tuple: [action-name , body id].");
-			python::extract<string> actionName_(PySequence_GetItem(action_and_id.ptr(),0));
-			python::extract<body_id_t> id_(PySequence_GetItem(action_and_id.ptr(),1));
-			if(!actionName_.check()) throw invalid_argument("Could not extract action-name.");
-			if(!id_.check()) throw invalid_argument("Could not extract body id.");
-			// FIXME: this may be rather slow (at every lookup!)
-			int actionClassIndex=dynamic_pointer_cast<Indexable>(ClassFactory::instance().createShared(actionName_()))->getClassIndex();
-			LOG_DEBUG("Got class index "<<actionClassIndex<<" for "<<actionName_());
-			return pyPhysicalAction(proxee->find(id_(),actionClassIndex));
-		}
-	python::tuple force_get(long id){ Shop::Bex::initCache(); Vector3r f=Shop::Bex::force(id); return python::make_tuple(f[0],f[1],f[2]);}
-	python::tuple momentum_get(long id){ Shop::Bex::initCache(); Vector3r m=Shop::Bex::momentum(id); return python::make_tuple(m[0],m[1],m[2]);}
-	#ifndef BEX_CONTAINER
-		void force_add(long id, python::tuple f){ Shop::Bex::initCache(); Shop::Bex::force(id)+=tuple2vec(f);}
-		void torque_add(long id, python::tuple m){ Shop::Bex::initCache(); Shop::Bex::momentum(id)+=tuple2vec(m);}
-	#else
-		void force_add(long id, python::tuple f){ throw runtime_error("ActionContainer not supported with BexContainer");}
-		void torque_add(long id, python::tuple m){ throw runtime_error("ActionContainer not supported with BexContainer");}
-	#endif
-};
-
-
-#ifdef BEX_CONTAINER
 class pyBexContainer{
 	public:
 		pyBexContainer(){}
@@ -444,8 +413,6 @@ class pyBexContainer{
 		void force_add(long id, python::tuple f){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addForce (id,tuple2vec(f)); }
 		void torque_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addTorque(id,tuple2vec(t));}
 };
-#endif
-
 
 class pyOmega{
 	private:
@@ -502,10 +469,8 @@ class pyOmega{
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
-	#ifdef BEX_CONTAINER
-		unsigned long bexSyncCount_get(){ return OMEGA.getRootBody()->bex.syncCount;}
-		void bexSyncCount_set(unsigned long count){ OMEGA.getRootBody()->bex.syncCount=count;}
-	#endif
+	unsigned long bexSyncCount_get(){ return OMEGA.getRootBody()->bex.syncCount;}
+	void bexSyncCount_set(unsigned long count){ OMEGA.getRootBody()->bex.syncCount=count;}
 
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
@@ -599,11 +564,7 @@ class pyOmega{
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->interactions); }
 	
-	#ifdef BEX_CONTAINER
-		pyBexContainer actions_get(void){return pyBexContainer();}
-	#else
-		pyPhysicalActionContainer actions_get(void){return pyPhysicalActionContainer(OMEGA.getRootBody()->physicalActions); }
-	#endif
+	pyBexContainer actions_get(void){return pyBexContainer();}
 	
 
 	boost::python::list listChildClasses(const string& base){
@@ -633,14 +594,6 @@ class pyOmega{
 		rb->bodies=bc;
 	}
 	string bodyContainer_get(string clss){ return OMEGA.getRootBody()->bodies->getClassName(); }
-	#ifndef BEX_CONTAINER
-		void physicalActionContainer_set(string clss){
-			MetaBody* rb=OMEGA.getRootBody().get();
-			shared_ptr<PhysicalActionContainer> pac=dynamic_pointer_cast<PhysicalActionContainer>(ClassFactory::instance().createShared(clss));
-			rb->physicalActions=pac;
-		}
-		string physicalActionContainer_get(string clss){ return OMEGA.getRootBody()->physicalActions->getClassName(); }
-	#endif
 
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
@@ -700,9 +653,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set)
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set)
-		#ifdef BEX_CONTAINER
-			.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set)
-		#endif
+		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set)
 		;
 	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
@@ -725,21 +676,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
 
-	boost::python::class_<pyPhysicalActionContainer>("ActionContainer",python::init<pyPhysicalActionContainer&>())
-		.def("__getitem__",&pyPhysicalActionContainer::pyGetitem)
-		.def("f",&pyPhysicalActionContainer::force_get)
-		.def("m",&pyPhysicalActionContainer::momentum_get)
-		.def("addF",&pyPhysicalActionContainer::force_add)
-		.def("addT",&pyPhysicalActionContainer::torque_add);
-
-	#ifdef BEX_CONTAINER
 	boost::python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
 		.def("f",&pyBexContainer::force_get)
 		.def("t",&pyBexContainer::torque_get)
 		.def("m",&pyBexContainer::torque_get) // for compatibility with ActionContainer
 		.def("addF",&pyBexContainer::force_add)
 		.def("addT",&pyBexContainer::torque_add);
-	#endif
 
 	boost::python::class_<pyTimingDeltas>("TimingDeltas",python::init<pyTimingDeltas&>())
 		.def("reset",&pyTimingDeltas::reset)
@@ -802,8 +744,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("geom",&pyInteraction::geom_get,&pyInteraction::geom_set)
 		.add_property("id1",&pyInteraction::id1_get)
 		.add_property("id2",&pyInteraction::id2_get);
-
-	BASIC_PY_PROXY_WRAPPER(pyPhysicalAction,"Action");
 
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
 		.def("generate",&pyFileGenerator::generate)

@@ -14,36 +14,13 @@
 #include<yade/core/MetaEngine2D.hpp>
 #include<yade/core/MetaEngine1D.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 
 class Body;
-#ifdef BEX_CONTAINER
 class PhysicalActionApplier: public MetaEngine1D<PhysicalParameters,PhysicalActionApplierUnit,void,TYPELIST_3(const shared_ptr<PhysicalParameters>&,const Body*, MetaBody*)>{
 	public: virtual void action(MetaBody*);
 	REGISTER_CLASS_AND_BASE(PhysicalActionApplier,MetaEngine1D);
 };
 REGISTER_SERIALIZABLE(PhysicalActionApplier);
-#else
-class PhysicalActionApplier :	public MetaEngine2D
-				<
-					PhysicalAction ,					// base classe for dispatch
-					PhysicalParameters,					// base classe for dispatch
-					PhysicalActionApplierUnit,				// class that provides multivirtual call
-					void,							// return type
-					TYPELIST_3(	  const shared_ptr<PhysicalAction>&	// function arguments
-							, const shared_ptr<PhysicalParameters>& 
-							, const Body *
-				    		  )
-				>
-{
-	public :
-		virtual void action(MetaBody*);
-
-	REGISTER_CLASS_NAME(PhysicalActionApplier);
-	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
-};
-REGISTER_SERIALIZABLE(PhysicalActionApplier);
-#endif
 

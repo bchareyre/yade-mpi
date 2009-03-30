@@ -13,12 +13,10 @@
 #include <string>
 #include <fstream>
 
-class PhysicalAction;
 
 class ForceRecorder : public DataRecorder
 {
 	private :
-		shared_ptr<PhysicalAction> actionForce;
 		std::ofstream ofile; 
 
 		bool changed;
@@ -40,7 +38,6 @@ class ForceRecorder : public DataRecorder
 		virtual void postProcessAttributes(bool deserializing);
 		void init();
 	DECLARE_LOGGER;
-	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(ForceRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

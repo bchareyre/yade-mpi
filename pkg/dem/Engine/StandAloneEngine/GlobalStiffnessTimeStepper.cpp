@@ -14,15 +14,13 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/GlobalStiffness.hpp>
 
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN("GlobalStiffnessTimeStepper");
 
-GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships), actionParameterGlobalStiffness(new GlobalStiffness)
+GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships)
 {
 //cerr << "GlobalStiffnessTimeStepper()"  << endl;
-	globalStiffnessClassIndex = actionParameterGlobalStiffness->getClassIndex();
 	sdecGroupMask = 1;
 	timestepSafetyCoefficient = 0.8;
 	computedOnce = false;
@@ -55,15 +53,9 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	
 	// Sphere* sphere = static_cast<Sphere*>(body->geometricalModel.get());
 	
-	#ifdef BEX_CONTAINER
-		Vector3r&  stiffness= stiffnesses[body->getId()];
-		Vector3r& Rstiffness=Rstiffnesses[body->getId()];
-	#else
-		Vector3r& stiffness = (static_cast<GlobalStiffness*>( ncb->physicalActions->find (body->getId(), globalStiffnessClassIndex).get()))->stiffness;
-		Vector3r& Rstiffness = (static_cast<GlobalStiffness*>( ncb->physicalActions->find (body->getId(), globalStiffnessClassIndex).get()))->Rstiffness;
-	#endif
+	Vector3r&  stiffness= stiffnesses[body->getId()];
+	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
 
-	//cerr << "Vector3r& stiffness = (static_cast<GlobalStiffness*>( ncb" << endl;
 	if(! ( /* sphere && */ sdec && stiffness) )
 		return; // not possible to compute!
 	//cerr << "return; // not possible to compute!" << endl;
@@ -137,10 +129,7 @@ bool GlobalStiffnessTimeStepper::isActivated()
 
 void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 {
-
-	#ifdef BEX_CONTAINER
-		computeStiffnesses(ncb);
-	#endif
+	computeStiffnesses(ncb);
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 // 	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
@@ -189,53 +178,50 @@ void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 			string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
 }
 
-#ifdef BEX_CONTAINER
-	void GlobalStiffnessTimeStepper::computeStiffnesses(MetaBody* rb){
-		/* check size */
-		size_t size=stiffnesses.size();
-		if(size<rb->bodies->size()){
-			size=rb->bodies->size();
-			stiffnesses.resize(size); Rstiffnesses.resize(size);
-		}
-		/* reset stored values */
-		memset(stiffnesses[0], 0,sizeof(Vector3r)*size);
-		memset(Rstiffnesses[0],0,sizeof(Vector3r)*size);
-		/* loop copied verbatim from GlobalStiffnessCounter */
-		FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
-			if(!contact->isReal) continue;
+void GlobalStiffnessTimeStepper::computeStiffnesses(MetaBody* rb){
+	/* check size */
+	size_t size=stiffnesses.size();
+	if(size<rb->bodies->size()){
+		size=rb->bodies->size();
+		stiffnesses.resize(size); Rstiffnesses.resize(size);
+	}
+	/* reset stored values */
+	memset(stiffnesses[0], 0,sizeof(Vector3r)*size);
+	memset(Rstiffnesses[0],0,sizeof(Vector3r)*size);
+	FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
+		if(!contact->isReal) continue;
 
-			SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
-			NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
-			// all we need for getting stiffness
-			Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
-			// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
-			// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
-			// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)
-			// or it should have been deleted already. Right? 
-			//ANSWER : some interactions can exist without fn, e.g. distant capillary force, wich does not contribute to the overall stiffness via kn. The test is needed.
-			Real fn = (static_cast<NormalShearInteraction *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
+		SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
+		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
+		// all we need for getting stiffness
+		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
+		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
+		// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
+		// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)
+		// or it should have been deleted already. Right? 
+		//ANSWER : some interactions can exist without fn, e.g. distant capillary force, wich does not contribute to the overall stiffness via kn. The test is needed.
+		Real fn = (static_cast<NormalShearInteraction *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
 
-			if (fn!=0) {
-				//Diagonal terms of the translational stiffness matrix
-				Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
-				diag_stiffness *= kn-ks;
-				diag_stiffness = diag_stiffness + Vector3r(1,1,1)*ks;
+		if (fn!=0) {
+			//Diagonal terms of the translational stiffness matrix
+			Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
+			diag_stiffness *= kn-ks;
+			diag_stiffness = diag_stiffness + Vector3r(1,1,1)*ks;
 
-				//diagonal terms of the rotational stiffness matrix
-				// Vector3r branch1 = currentContactGeometry->normal*currentContactGeometry->radius1;
-				// Vector3r branch2 = currentContactGeometry->normal*currentContactGeometry->radius2;
-				Vector3r diag_Rstiffness =
-					Vector3r(std::pow(normal.Y(),2)+std::pow(normal.Z(),2),
-						std::pow(normal.X(),2)+std::pow(normal.Z(),2),
-						std::pow(normal.X(),2)+std::pow(normal.Y(),2));
-				diag_Rstiffness *= ks;
-				//cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
-				
-				stiffnesses [contact->getId1()]+=diag_stiffness;
-				Rstiffnesses[contact->getId1()]+=diag_Rstiffness*pow(radius1,2);
-				stiffnesses [contact->getId2()]+=diag_stiffness;
-				Rstiffnesses[contact->getId2()]+=diag_Rstiffness*pow(radius2,2);
-			}
+			//diagonal terms of the rotational stiffness matrix
+			// Vector3r branch1 = currentContactGeometry->normal*currentContactGeometry->radius1;
+			// Vector3r branch2 = currentContactGeometry->normal*currentContactGeometry->radius2;
+			Vector3r diag_Rstiffness =
+				Vector3r(std::pow(normal.Y(),2)+std::pow(normal.Z(),2),
+					std::pow(normal.X(),2)+std::pow(normal.Z(),2),
+					std::pow(normal.X(),2)+std::pow(normal.Y(),2));
+			diag_Rstiffness *= ks;
+			//cerr << "diag_Rstifness=" << diag_Rstiffness << endl;
+			
+			stiffnesses [contact->getId1()]+=diag_stiffness;
+			Rstiffnesses[contact->getId1()]+=diag_Rstiffness*pow(radius1,2);
+			stiffnesses [contact->getId2()]+=diag_stiffness;
+			Rstiffnesses[contact->getId2()]+=diag_Rstiffness*pow(radius2,2);
 		}
 	}
-#endif
+}

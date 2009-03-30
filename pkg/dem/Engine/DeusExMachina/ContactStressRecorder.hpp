@@ -13,7 +13,6 @@
 #include <string>
 #include <fstream>
 
-class PhysicalAction;
 class GeometricalModel;
 class TriaxialCompressionEngine;
 // class SampleCapillaryPressureEngine;
@@ -22,7 +21,6 @@ class TriaxialCompressionEngine;
 class ContactStressRecorder : public DataRecorder
 {
 	private :
-		shared_ptr<PhysicalAction> actionForce; // ??? 
 		
 		shared_ptr<GeometricalModel> sphere_ptr;
 		int SpheresClassIndex;

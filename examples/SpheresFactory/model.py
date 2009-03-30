@@ -21,11 +21,10 @@ o.dt=0.0001
 
 ## Initializers 
 o.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	MetaEngine('BoundingVolumeMetaEngine',
 		[EngineUnit('InteractingSphere2AABB'),
 			EngineUnit('InteractingFacet2AABB'),
-			EngineUnit('MetaInteractingGeometry2AABB')])
+			EngineUnit('MetaInteractingGeometry2AABB')]),
 	]
 
 ## Engines 

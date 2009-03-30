@@ -12,13 +12,12 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/filesystem/operations.hpp>
 
 CREATE_LOGGER(ForceRecorder);
 
-ForceRecorder::ForceRecorder () : DataRecorder(), actionForce(new Force)
+ForceRecorder::ForceRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 50;
@@ -69,9 +68,7 @@ bool ForceRecorder::isActivated()
 void ForceRecorder::action(MetaBody * ncb)
 {
 	if (first) init();
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync();
-	#endif
+	ncb->bex.sync();
 
 	Real x=0, y=0, z=0;
 	
@@ -79,11 +76,7 @@ void ForceRecorder::action(MetaBody * ncb)
 	{
 		if(ncb->bodies->exists(i))
 		{
-			#ifdef BEX_CONTAINER
-				Vector3r force=ncb->bex.getForce(i);
-			#else
-				Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
-			#endif
+			Vector3r force=ncb->bex.getForce(i);
 		
 			x+=force[0];
 			y+=force[1];

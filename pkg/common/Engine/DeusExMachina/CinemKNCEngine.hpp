@@ -31,7 +31,6 @@ Nota : not only the positions of walls are updated but also their speeds, which 
 class CinemKNCEngine : public DeusExMachina
 {
 	private :
-		shared_ptr<PhysicalAction> actionForce;
 		shared_ptr<ContactLaw1> myLdc;
 		Real	coeff_dech;	// the engine cares about it
 		Real	alpha	// angle from the lower plate to the left box (trigo wise), the Engine finds itself its value

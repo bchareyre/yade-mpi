@@ -24,13 +24,11 @@
  */
 
 
-class PhysicalAction;
 class TriaxialCompressionEngine;
 
 class TriaxialStateRecorder : public DataRecorder
 {
 	private :
-		//shared_ptr<PhysicalAction> actionForce; // ??? 
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		std::ofstream ofile;
 		

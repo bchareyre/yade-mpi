@@ -15,7 +15,6 @@
 #include <list>
 #include <vector>
 
-//class PhysicalAction;
 
 class NodeRecorder : public DataRecorder
 { // records average position of nodes in a given region

@@ -6,14 +6,11 @@
 #include<yade/core/FileGenerator.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-dem/GlobalStiffness.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 /* Engine encompassing several computations looping over all bodies/interactions
@@ -206,7 +203,6 @@ class BrefcomLaw: public InteractionSolver{
 		BrefcomLaw(): logStrain(false) { Shop::Bex::initCache(); };
 		void action(MetaBody*);
 	protected: 
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_AND_BASE(BrefcomLaw,InteractionSolver);
 	REGISTER_ATTRIBUTES(InteractionSolver,(logStrain));
 	DECLARE_LOGGER;

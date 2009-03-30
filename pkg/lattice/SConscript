@@ -169,7 +169,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-lattice',[
 			'BoundingVolumeMetaEngine',
 			'PhysicalActionApplier',
 			'PhysicalParametersMetaEngine',
-			'PhysicalActionContainerInitializer',
 			'ParticleParameters',
 			'AABB',
 			'Quadrilateral',

@@ -11,11 +11,9 @@
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
-#include<yade/pkg-common/Force.hpp>
 
 
 #define TR {if (Omega::instance().getCurrentIteration()%100==0) TRACE; }
-class PhysicalAction;
 class MetaBody;
 class PhysicalParameters;
 
@@ -28,18 +26,9 @@ class PhysicalParameters;
 class TriaxialStressController : public DeusExMachina 
 {
 	private :
-		//shared_ptr<PhysicalAction> actionParameterForce;
-		//int cachedForceClassIndex;
-		int ForceClassIndex;
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		bool firstRun;
-		inline const Vector3r getForce(MetaBody* rb, body_id_t id){
-			#ifdef BEX_CONTAINER
-				return rb->bex.getForce(id); // needs sync, which is done at the beginning of applyCondition
-			#else
-				return static_cast<Force*>(rb->physicalActions->find(id,ForceClassIndex).get())->force;
-			#endif
-		}
+		inline const Vector3r getForce(MetaBody* rb, body_id_t id){ return rb->bex.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
 		
 		 	
 	public :
@@ -111,7 +100,6 @@ class TriaxialStressController : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
-	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(TriaxialStressController);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

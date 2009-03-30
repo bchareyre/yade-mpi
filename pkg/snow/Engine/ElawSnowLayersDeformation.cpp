@@ -13,14 +13,11 @@
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 
 
-ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 {
 	sdecGroupMask=1;
 	creep_viscosity = 1000.0;

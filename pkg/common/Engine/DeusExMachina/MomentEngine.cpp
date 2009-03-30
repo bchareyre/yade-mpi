@@ -8,13 +8,12 @@
 
 #include"MomentEngine.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
-#include<yade/pkg-common/Momentum.hpp>
 
 
 #include<yade/core/MetaBody.hpp>
 
 
-MomentEngine::MomentEngine() : actionParameterMoment(new Momentum), moment(Vector3r::ZERO)
+MomentEngine::MomentEngine() : moment(Vector3r::ZERO)
 {
 }
 
@@ -40,11 +39,7 @@ void MomentEngine::applyCondition(MetaBody* ncb)
 	{
 		if(ncb->bodies->exists( *ii ))
 		{
-			#ifdef BEX_CONTAINER
-				ncb->bex.addTorque(*ii,moment);
-			#else
-				static_cast<Momentum*>( ncb->physicalActions->find( *ii        , actionParameterMoment->getClassIndex() ).get() )->momentum += moment;
-			#endif
+			ncb->bex.addTorque(*ii,moment);
 		} else {
 			std::cerr << "MomentEngine: body " << *ii << "doesn't exist, cannot apply moment.";
 		}

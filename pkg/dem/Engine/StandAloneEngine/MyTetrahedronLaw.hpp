@@ -25,30 +25,14 @@
  *    tetrahedron's center on direction perpendicular to the acting force.
 */
 
-class PhysicalAction;
-
 class MyTetrahedronLaw : public InteractionSolver
 {
-	private :
-		/// those two are here only because this class needs to access
-		/// the ID number of Force and Momentum
-		///
-		/// those variables are actually not used to store a value of
-		/// Force and Momentum, just to get ID, although normally they are
-		/// used to store this value. 
-		/// 
-		/// I already have a better solution for that.
-		///
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-
 	public :
 		MyTetrahedronLaw();
 		void action(MetaBody*);
 
 	protected :
 		void registerAttributes();
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(MyTetrahedronLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

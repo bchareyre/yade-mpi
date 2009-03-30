@@ -10,14 +10,13 @@
 #include "CinemCNCEngine.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include <yade/lib-miniWm3/Wm3Math.h>
 
 
-CinemCNCEngine::CinemCNCEngine() : actionForce(new Force), leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
+CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
 {
 	prevF_sup=Vector3r(0,0,0);
 	firstRun=true;
@@ -187,11 +186,7 @@ void CinemCNCEngine::computeAlpha()
 
 void CinemCNCEngine::computeDu(MetaBody* ncb)
 {
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync(); Vector3r F_sup=ncb->bex.getForce(id_boxhaut);
-	#else
-		Vector3r& F_sup = dynamic_cast<Force*>(ncb->physicalActions->find(id_boxhaut,actionForce->getClassIndex()) . get() )->force;
-	#endif
+	ncb->bex.sync(); Vector3r F_sup=ncb->bex.getForce(id_boxhaut);
 	
 	if(firstRun)
 	{

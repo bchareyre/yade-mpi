@@ -21,23 +21,18 @@ class Interaction;
 class BodyContainer;
 class MacroMicroElasticRelationships;
 class MetaBody;
-class PhysicalAction;
 
 class GlobalStiffnessTimeStepper : public TimeStepper
 {
 	private :
-	#ifdef BEX_CONTAINER
 		vector<Vector3r> stiffnesses;
 		vector<Vector3r> Rstiffnesses;
-		void computeStiffnesses(MetaBody*); // what GlobalStiffnessCounter used to do
-	#endif
+		void computeStiffnesses(MetaBody*);
 
 		Real		newDt, previousDt;
 		bool		computedSomething,
 				computedOnce;
 		shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
-		shared_ptr<PhysicalAction> actionParameterGlobalStiffness;
-		int globalStiffnessClassIndex;
 
 		void findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb);
 		void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
@@ -60,7 +55,6 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 	protected :
 		virtual void registerAttributes();
 
-	NEEDS_BEX("GlobalStiffness");
 	REGISTER_CLASS_NAME(GlobalStiffnessTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };

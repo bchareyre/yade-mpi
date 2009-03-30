@@ -9,7 +9,6 @@ YADE_PLUGIN("BrefcomTestGen");
 
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -36,12 +35,6 @@ CREATE_LOGGER(BrefcomTestGen);
 void BrefcomTestGen::createEngines(){
 	rootBody->initializers.clear();
 
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
-	rootBody->initializers.push_back(physicalActionInitializer);
-	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);

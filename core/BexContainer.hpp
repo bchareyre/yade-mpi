@@ -10,7 +10,35 @@
 #ifdef YADE_OPENMP
 
 #include<omp.h>
+/*! Container for Body External Variables (bex), typically forces and torques from interactions.
+ * Values should be reset at every iteration by calling BexContainer::reset();
+ * If you want to add your own bex, you need to:
+ *
+ * 	1. Create storage vector
+ * 	2. Create accessor function
+ * 	3. Update the resize function
+ * 	4. Update the reset function
+ * 	5. update the sync function (for the multithreaded implementation)
+ *
+ * This class exists in two flavors: non-parallel and parallel. The parallel one stores
+ * bex increments separately for every thread and sums those when sync() is called.
+ * The reason of this design is that the container is not truly random-access, but rather
+ * is written to everywhere in one phase and read in the next one. Adding to force/torque
+ * marks the container as dirty and sync() must be performed before reading the stored data.
+ * Calling getForce/getTorque when the container is not synchronized throws an exception.
+ *
+ * It is intentional that sync() needs to be called exlicitly, since syncs are expensive and
+ * the programmer should be aware of that. Sync is however performed only if the container
+ * is dirty. Every full sync increments the syncCount variable, that should ideally equal
+ * the number of steps (one per step).
+ *
+ * The number of threads (omp_get_max_threads) may not change once BexContainer is constructed.
+ *
+ * The non-parallel flavor has the same interface, but sync() is no-op and synchronization
+ * is not enforced at all.
+ */
 
+//! This is the parallel flavor of BexContainer
 class BexContainer{
 	private:
 		typedef std::vector<Vector3r> vvector;
@@ -30,7 +58,8 @@ class BexContainer{
 		inline void ensureSynced(){ if(!synced) throw runtime_error("BexContainer not thread-synchronized; call sync() first!"); }
 
 		/*! Function to allow friend classes to get force even if not synced.
-		* Dangerous! The caller must know what it is doing! */
+		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
+		* for a particular body id. */
 		const Vector3r& getForceUnsynced (body_id_t id){ensureSize(id); return _force[id];}
 		const Vector3r& getTorqueUnsynced(body_id_t id){ensureSize(id); return _force[id];}
 		friend class PhysicalActionDamperUnit;
@@ -48,10 +77,9 @@ class BexContainer{
 		const Vector3r& getTorque(body_id_t id)        { ensureSize(id); ensureSynced(); return _torque[id]; }
 		void addTorque(body_id_t id, const Vector3r& f){ ensureSize(id); synced=false;   _torqueData[omp_get_thread_num()][id]+=f;}
 
-		/* Sum contributions from all threads, save to the 0th thread storage.
-		 * Locks globalMutex, since one thread modifies other threads' data.
-		 * Must be called before get* methods are used. Exception is thrown otherwise, since data are not consistent.
-		 */
+		/* Sum contributions from all threads, save to _force&_torque.
+		 * Locks globalMutex, since one thread modifies common data (_force&_torque).
+		 * Must be called before get* methods are used. Exception is thrown otherwise, since data are not consistent. */
 		inline void sync(){
 			if(synced) return;
 			boost::mutex::scoped_lock lock(globalMutex);
@@ -68,8 +96,7 @@ class BexContainer{
 
 		/* Change size of containers (number of bodies).
 		 * Locks globalMutex, since on threads modifies other threads' data.
-		 * Called very rarely (a few times at the beginning of the simulation)
-		 */
+		 * Called very rarely (a few times at the beginning of the simulation). */
 		void resize(size_t newSize){
 			boost::mutex::scoped_lock lock(globalMutex);
 			if(size>=newSize) return; // in case on thread was waiting for resize, but it was already satisfied by another one
@@ -80,7 +107,8 @@ class BexContainer{
 			_force.resize(newSize); _torque.resize(newSize);
 			size=newSize;
 		}
-
+		/*! Reset all data, also reset summay forces/torques and mark the container clean. */
+		// perhaps should be private and friend MetaBody or whatever the only caller should be
 		void reset(){
 			for(int thread=0; thread<nThreads; thread++){
 				memset(_forceData [thread][0], 0,sizeof(Vector3r)*size);
@@ -92,16 +120,7 @@ class BexContainer{
 };
 
 #else
-/* Container for Body External Variables (bex), typically forces and torques from interactions.
- * Values should be reset at every iteration by BexResetter.
- * If you want to add your own bex, there are 4 steps:
- *
- * 	1. Create storage vector
- * 	2. Create accessor function
- * 	3. Update the resize function
- * 	4. Update the reset function
- *
- */
+//! This is the non-parallel flavor of BexContainer
 class BexContainer {
 	private:
 		std::vector<Vector3r> _force;
@@ -131,7 +150,6 @@ class BexContainer {
 			_force.resize(newSize);
 			_torque.resize(newSize);
 			size=newSize;
-			// std::cerr<<"[DEBUG] BexContainer: Resized to "<<size<<std::endl;
 		}
 };
 

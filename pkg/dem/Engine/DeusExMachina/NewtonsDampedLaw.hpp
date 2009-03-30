@@ -38,10 +38,6 @@ class NewtonsDampedLaw : public DeusExMachina
 	public :
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;
-		
-	private :
-		int forceClassIndex, momentumClassIndex;
-				
 	public :
 		virtual	void applyCondition(MetaBody *);		
 		NewtonsDampedLaw();
@@ -49,7 +45,6 @@ class NewtonsDampedLaw : public DeusExMachina
 	protected :
 		virtual void registerAttributes();
 
-	NEEDS_BEX("Force","Momentum");	
 	REGISTER_CLASS_NAME(NewtonsDampedLaw);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

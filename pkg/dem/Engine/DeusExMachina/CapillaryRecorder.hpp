@@ -13,12 +13,10 @@
 #include <string>
 #include <fstream>
 
-class PhysicalAction;
 
 class CapillaryRecorder : public DataRecorder
 {
 	private :
-		shared_ptr<PhysicalAction> actionForce;
 		std::ofstream ofile; 
 
 		bool changed;
@@ -37,7 +35,6 @@ class CapillaryRecorder : public DataRecorder
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(CapillaryRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

@@ -44,13 +44,11 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 
 #include <boost/filesystem/convenience.hpp>
@@ -464,9 +462,6 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 	velocityRecorder-> outputFile 	= velocityRecordFile;
 	velocityRecorder-> interval 	= recordIntervalIter;
 
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -530,7 +525,6 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(forcerec);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }

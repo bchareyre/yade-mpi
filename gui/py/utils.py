@@ -378,7 +378,6 @@ def basicDEMEngines(interPhysics='SimpleElasticRelationships',constitutiveLaw='E
 	engines, however. By default, no gravity is applied.
 	"""
 	O.initializers=[
-		StandAloneEngine('PhysicalActionContainerInitializer'),
 		MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('InteractingFacet2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]
 	O.engines=[

@@ -52,14 +52,12 @@
 //#include<yade/pkg-common/MassSpringBody2RigidBodyLaw.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 
 HangingCloth::HangingCloth () : FileGenerator()
@@ -150,9 +148,6 @@ bool HangingCloth::generate()
 	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
 	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -216,7 +211,6 @@ bool HangingCloth::generate()
 	rootBody->engines.push_back(orientationIntegrator);
 
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 	

@@ -26,10 +26,8 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
@@ -223,9 +221,6 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -291,7 +286,6 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(kinematic);
  	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 

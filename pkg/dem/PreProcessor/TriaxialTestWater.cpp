@@ -22,7 +22,6 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
-#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -60,14 +59,12 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/InteractionHashMap.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include<yade/extra/Shop.hpp>
 
@@ -297,7 +294,6 @@ bool TriaxialTestWater::generate()
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			rootBody->bodies->insert(body);
-			//(resultantforceEngine->subscribedBodies).push_back(body->getId());
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			}
@@ -514,11 +510,6 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	//physicalActionInitializer->physicalActionNames.push_back("StiffnessMatrix");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -586,9 +577,6 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	//stiffnesscounter->sdecGroupMask = 2;
 	//stiffnesscounter->interval = timeStepUpdateInterval;
 	
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	// globalStiffnessCounter->sdecGroupMask = 2;
-	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
@@ -663,7 +651,6 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
-	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	if(water)
 	{
@@ -679,7 +666,6 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	//if(!rotationBlocked)
 	//	rootBody->engines.push_back(orientationIntegrator);
-	//rootBody->engines.push_back(resultantforceEngine);
 	//rootBody->engines.push_back(triaxialstressController);
 	
 		
@@ -689,7 +675,6 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }

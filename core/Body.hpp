@@ -16,7 +16,6 @@
 #include"PhysicalParameters.hpp"
 #include"InteractionContainer.hpp"
 #include"Interaction.hpp"
-#include"PhysicalActionContainer.hpp"
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-serialization/Serializable.hpp>

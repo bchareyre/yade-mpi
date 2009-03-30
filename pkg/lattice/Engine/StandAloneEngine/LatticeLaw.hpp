@@ -14,7 +14,6 @@
 #include<yade/core/BodyContainer.hpp>
 #include <list>
 
-class PhysicalAction;
 
 
 class LatticeLaw : public InteractionSolver

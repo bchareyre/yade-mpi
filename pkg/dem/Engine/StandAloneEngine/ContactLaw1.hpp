@@ -26,15 +26,9 @@ To use it you should also use :
  */
 
 
-class PhysicalAction;
-
 class ContactLaw1 : public InteractionSolver
 {
 /// Attributes
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-
 	public :
 		int sdecGroupMask;
 		Real coeff_dech;	// = kn(unload) / kn(load)

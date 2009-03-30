@@ -1,6 +1,5 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"UniaxialStrainControlledTest.hpp"
-#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
@@ -128,14 +127,9 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 
 void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
 	sumPosForces=sumNegForces=0;
-	#ifdef BEX_CONTAINER
-		rootBody->bex.sync();
-		FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
-		FOREACH(body_id_t id, posIds) sumNegForces-=rootBody->bex.getForce(id)[axis];
-	#else
-		FOREACH(body_id_t id, negIds) sumNegForces+=Shop::Bex::force(id)[axis];
-		FOREACH(body_id_t id, posIds) sumPosForces-=Shop::Bex::force(id)[axis];
-	#endif
+	rootBody->bex.sync();
+	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
+	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->bex.getForce(id)[axis];
 }
 
 /***************************************** USCTGen **************************/
@@ -201,14 +195,11 @@ bool USCTGen::generate(){
 #include<yade/extra/Brefcom.hpp>
 
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -225,7 +216,6 @@ bool USCTGen::generate(){
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
-#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
@@ -237,12 +227,6 @@ bool USCTGen::generate(){
 void USCTGen::createEngines(){
 	rootBody->initializers.clear();
 
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
-	rootBody->initializers.push_back(physicalActionInitializer);
-	
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 		boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 		boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
@@ -294,20 +278,6 @@ void USCTGen::createEngines(){
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 		orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 		rootBody->engines.push_back(orientationIntegrator);
-#if 0
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	globalStiffnessCounter->sdecGroupMask=1023;
-	globalStiffnessCounter->interval=100;
-	globalStiffnessCounter->assumeElasticSpheres=false;
-
-	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
-	globalStiffnessTimeStepper->sdecGroupMask=1023; // BIN 111111111, should always match
-	globalStiffnessTimeStepper->timeStepUpdateInterval=100;
-	globalStiffnessTimeStepper->defaultDt=1e-6;
-	rootBody->engines.push_back(globalStiffnessTimeStepper);
-
-	rootBody->engines.push_back(globalStiffnessCounter);
-#endif
 
 	rootBody->engines.push_back(shared_ptr<BrefcomDamageColorizer>(new BrefcomDamageColorizer));
 

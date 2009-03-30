@@ -35,13 +35,11 @@
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 
 BoxStack::BoxStack () : FileGenerator()
@@ -243,9 +241,6 @@ void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4ClosestFeatures");
@@ -300,7 +295,6 @@ void BoxStack::createActors(shared_ptr<MetaBody>& rootBody)
 //		rootBody->engines.push_back(kinematic);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }

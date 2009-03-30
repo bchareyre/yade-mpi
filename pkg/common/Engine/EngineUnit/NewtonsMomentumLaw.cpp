@@ -10,12 +10,10 @@
 
 #include "NewtonsMomentumLaw.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/Momentum.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/core/MetaBody.hpp>
 
-#ifdef BEX_CONTAINER
-//! Newtons law for both force and momentum
+//! Newtons law for both force and torque
 void NewtonsMomentumLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, MetaBody* rb){
 	body_id_t id=bb->getId();
 	Vector3r f=rb->bex.getForce(id); Vector3r m=rb->bex.getTorque(id);
@@ -32,24 +30,5 @@ void NewtonsMomentumLaw::go(const shared_ptr<PhysicalParameters>& b, const Body*
 		clumpRBP->angularAcceleration+=diagDiv(m,clumpRBP->inertia);
 	}
 }
-#else
-void NewtonsMomentumLaw::go( 	  const shared_ptr<PhysicalAction>& a
-				, const shared_ptr<PhysicalParameters>& b
-				, const Body* bb)
-{
-	Momentum * am = static_cast<Momentum*>(a.get());
-	RigidBodyParameters * rb = static_cast<RigidBodyParameters*>(b.get());
-	
-	//FIXME : should be += and we should add an Engine that reset acceleration at the beginning
-	if(bb->isStandalone()) rb->angularAcceleration=diagDiv(am->momentum,rb->inertia);
-	else if(bb->isClump()) rb->angularAcceleration+=diagDiv(am->momentum,rb->inertia);
-	else { // isClumpMember()
-		const shared_ptr<Body>& clump(Body::byId(bb->clumpId));
-		RigidBodyParameters* clumpRBP=YADE_CAST<RigidBodyParameters*>(clump->physicalParameters.get());
-		/* angularAcceleration is reset by ClumpMemberMover engine */
-		clumpRBP->angularAcceleration+=diagDiv(am->momentum,clumpRBP->inertia);
-	}
-}
-#endif
 
 YADE_PLUGIN();

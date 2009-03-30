@@ -11,27 +11,10 @@
 #include "PhysicalActionDamper.hpp"
 #include<yade/core/MetaBody.hpp>
 
-#ifdef BEX_CONTAINER
 void PhysicalActionDamper::action(MetaBody* ncb){
+	ncb->bex.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		operator()(b->physicalParameters,b.get(),ncb);
 	}
 }
-#else
-void PhysicalActionDamper::action(MetaBody* ncb)
-{
-		shared_ptr<BodyContainer>& bodies = ncb->bodies;
-		PhysicalActionContainer::iterator pai    = ncb->physicalActions->begin();
-		PhysicalActionContainer::iterator paiEnd = ncb->physicalActions->end();
-		for( ; pai!=paiEnd ; ++pai)
-		{
-			shared_ptr<PhysicalAction> action = *pai;
-			int id = pai.getCurrentIndex();
-			// FIXME - solve the problem of Body's id
-			operator()( action , (*bodies)[id]->physicalParameters , (*bodies)[id].get() );
-		}
-}
-#endif
-
-
 YADE_PLUGIN();

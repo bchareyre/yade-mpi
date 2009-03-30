@@ -9,8 +9,6 @@
 #include"NewtonsDampedLaw.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 YADE_PLUGIN("NewtonsDampedLaw");
@@ -25,29 +23,18 @@ void NewtonsDampedLaw::registerAttributes()
 NewtonsDampedLaw::NewtonsDampedLaw()
 {
 	damping = 0.2;
-	forceClassIndex = (new Force)->getClassIndex();
-	momentumClassIndex = (new Momentum)->getClassIndex();
 }
 
 void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 {
-	#ifdef BEX_CONTAINER
-		#ifdef YADE_OPENMP
-			ncb->bex.sync();
-		#endif
-	#endif
+	ncb->bex.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		if (!b->isDynamic) continue;
 		
 		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		unsigned int id = b->getId();
-		#ifdef BEX_CONTAINER
-			const Vector3r& m=ncb->bex.getTorque(id);
-			const Vector3r& f=ncb->bex.getForce(id);
-		#else
-			const Vector3r& m = ( static_cast<Momentum*> ( ncb->physicalActions->find ( id, momentumClassIndex ).get() ) )->momentum;
-			const Vector3r& f = ( static_cast<Force*> ( ncb->physicalActions->find ( id, forceClassIndex ).get() ) )->force;
-		#endif
+		const Vector3r& m=ncb->bex.getTorque(id);
+		const Vector3r& f=ncb->bex.getForce(id);
 
 		Real dt = Omega::instance().getTimeStep();
 

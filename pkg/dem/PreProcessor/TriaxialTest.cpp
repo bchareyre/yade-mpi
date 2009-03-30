@@ -19,10 +19,8 @@
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
-#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
-#include<yade/pkg-dem/MakeItFlat.hpp>
 
 #include<yade/pkg-dem/AveragePositionRecorder.hpp>
 //#include<yade/pkg-dem/ForceRecorder.hpp>
@@ -56,13 +54,11 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 
@@ -166,9 +162,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	isotropicCompaction=false;
 	fixedPorosity = 1;
 	
-	#ifdef BEX_CONTAINER
-		parallel=false;
-	#endif
+	parallel=false;
 
 	
 	
@@ -239,9 +233,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(isotropicCompaction);
 	REGISTER_ATTRIBUTE(fixedPorosity);
 	REGISTER_ATTRIBUTE(fixedBoxDims);
-	#ifdef BEX_CONTAINER
-		REGISTER_ATTRIBUTE(parallel);
-	#endif
+	REGISTER_ATTRIBUTE(parallel);
 }
 
 
@@ -313,7 +305,6 @@ bool TriaxialTest::generate()
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			rootBody->bodies->insert(body);
-			//(resultantforceEngine->subscribedBodies).push_back(body->getId());
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			}
@@ -522,11 +513,6 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 
 void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	//physicalActionInitializer->physicalActionNames.push_back("StiffnessMatrix");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -543,13 +529,11 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
-
-	
-
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
+#if 0
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
@@ -561,36 +545,20 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
-		
 	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
 	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
+#endif	
 
-	//shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	//sdecTimeStepper->sdecGroupMask = 2;
-	//sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-	
-	//shared_ptr<StiffnessMatrixTimeStepper> stiffnessMatrixTimeStepper(new StiffnessMatrixTimeStepper);
-	//stiffnessMatrixTimeStepper->sdecGroupMask = 2;
-	//stiffnessMatrixTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-	
 	globalStiffnessTimeStepper=shared_ptr<GlobalStiffnessTimeStepper>(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	
-	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
-	elasticContactLaw->sdecGroupMask = 2;
-
-	
 	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
 	//stiffnesscounter->sdecGroupMask = 2;
 	//stiffnesscounter->interval = timeStepUpdateInterval;
-	
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	// globalStiffnessCounter->sdecGroupMask = 2;
-	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
@@ -614,8 +582,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
 	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
 	
-	
-
 	
 	// recording global stress
 	if(recordIntervalIter>0){
@@ -642,64 +608,40 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-//	rootBody->engines.push_back(sdecTimeStepper);	
 	rootBody->engines.push_back(boundingVolumeDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	#ifdef BEX_CONTAINER
 	if(parallel){
-		#if 1
-			shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
-				ids->geomDispatcher=interactionGeometryDispatcher;
-				ids->physDispatcher=interactionPhysicsDispatcher;
-				ids->constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
-				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw);
-					see->sdecGroupMask=elasticContactLaw->sdecGroupMask;
-				ids->constLawDispatcher->add(see);
-			rootBody->engines.push_back(ids);
-		#else
-			rootBody->engines.push_back(interactionGeometryDispatcher);
-			rootBody->engines.push_back(interactionPhysicsDispatcher);
-			shared_ptr<ConstitutiveLawDispatcher> cld(new ConstitutiveLawDispatcher);
-				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw);
-					see->sdecGroupMask=elasticContactLaw->sdecGroupMask;
-				cld->add(see);
-			rootBody->engines.push_back(cld);
-		#endif
+		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
+			ids->geomDispatcher=interactionGeometryDispatcher;
+			ids->physDispatcher=interactionPhysicsDispatcher;
+			ids->constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
+			shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw);
+				see->sdecGroupMask=2;
+			ids->constLawDispatcher->add(see);
+		rootBody->engines.push_back(ids);
 	} else {
-	#endif
 		rootBody->engines.push_back(interactionGeometryDispatcher);
 		rootBody->engines.push_back(interactionPhysicsDispatcher);
+		shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
+		elasticContactLaw->sdecGroupMask = 2;
 		rootBody->engines.push_back(elasticContactLaw);
-	#ifdef BEX_CONTAINER
 	}
-	#endif
 	
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
-	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	if(recordIntervalIter>0) rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	
-	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
+	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
+	newton->damping=dampingMomentum;
+	rootBody->engines.push_back(newton);
 	
 	//if (0) rootBody->engines.push_back(shared_ptr<Engine>(new MicroMacroAnalyser));
 	
-	// replaced by PhysicalParameters::blockedDOFs
-	#if 0
-		if(biaxial2dTest){
-			shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
-			makeItFlat->direction=2;
-			makeItFlat->plane_position = (lowerCorner[2]+upperCorner[2])*0.5;
-			makeItFlat->reset_force = false;	
-			rootBody->engines.push_back(makeItFlat);
-		}
-	#endif
-	
 	//if(!rotationBlocked)
 	//	rootBody->engines.push_back(orientationIntegrator);
-	//rootBody->engines.push_back(resultantforceEngine);
 	//rootBody->engines.push_back(triaxialstressController);
 	
 		
@@ -710,7 +652,6 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }

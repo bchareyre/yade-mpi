@@ -9,27 +9,12 @@
 #pragma once
 
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
-#ifdef BEX_CONTAINER
-	class NewtonsMomentumLaw: public PhysicalActionApplierUnit{
-		public:
-			virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
-			FUNCTOR1D(RigidBodyParameters);
-			REGISTER_CLASS_AND_BASE(NewtonsMomentumLaw,PhysicalActionApplierUnit);
-	};
-#else
-class NewtonsMomentumLaw : public PhysicalActionApplierUnit
-{
-	public :
-		virtual void go( 	  const shared_ptr<PhysicalAction>&
-					, const shared_ptr<PhysicalParameters>&
-					, const Body*);
-	
-	NEEDS_BEX("Momentum");
-	FUNCTOR2D(Momentum,RigidBodyParameters);
-	REGISTER_CLASS_NAME(NewtonsMomentumLaw);
-	REGISTER_BASE_CLASS_NAME(PhysicalActionApplierUnit);
+class NewtonsMomentumLaw: public PhysicalActionApplierUnit{
+	public:
+		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
+		FUNCTOR1D(RigidBodyParameters);
+		REGISTER_CLASS_AND_BASE(NewtonsMomentumLaw,PhysicalActionApplierUnit);
 };
-#endif
 REGISTER_SERIALIZABLE(NewtonsMomentumLaw);
 
 

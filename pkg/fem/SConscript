@@ -93,7 +93,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-fem',[
 		LIBS=env['LIBS']+['yade-base',
 			
 			'FEMTetrahedronData',
-			'Force',
 			'ParticleParameters'],
 		CPPPATH=env['CPPPATH']+['$PREFIX/include',
 			'DataClass/PhysicalParameters',
@@ -116,7 +115,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-fem',[
 			'yade-serialization',
 			'yade-base',
 			
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',

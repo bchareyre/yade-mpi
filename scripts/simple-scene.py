@@ -9,8 +9,6 @@ o=Omega() # for advaned folks: this creates default MetaBody as well
 
 ## Initializers are run before the simulation.
 o.initializers=[
-	## Create and reset to zero container of all PhysicalActions that will be used
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
 	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]
@@ -57,21 +55,21 @@ o.engines=[
 	## This MetaEngine acts on all PhysicalActions and selects the right EngineUnit base on type of the PhysicalAction.
 	#
 	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.0}),
+#	DeusExMachina('NewtonsDampedLaw',{'damping':0.0}),
 	#
-#	MetaEngine('PhysicalActionDamper',[
-#		EngineUnit('CundallNonViscousForceDamping',{'damping':0.2}),
-#		EngineUnit('CundallNonViscousMomentumDamping',{'damping':0.2})
-#	]),
+	MetaEngine('PhysicalActionDamper',[
+		EngineUnit('CundallNonViscousForceDamping',{'damping':0.2}),
+		EngineUnit('CundallNonViscousMomentumDamping',{'damping':0.2})
+	]),
 	## Now we have forces and momenta acting on bodies. Newton's law calculates acceleration that corresponds to them.
-#	MetaEngine('PhysicalActionApplier',[
-#		EngineUnit('NewtonsForceLaw'),
-#		EngineUnit('NewtonsMomentumLaw'),
-#	]),
+	MetaEngine('PhysicalActionApplier',[
+		EngineUnit('NewtonsForceLaw'),
+		EngineUnit('NewtonsMomentumLaw'),
+	]),
 	## Acceleration results in velocity change. Integrating the velocity over dt, position of the body will change.
-#	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogPositionIntegrator')]),
+	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogPositionIntegrator')]),
 	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
-#	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
+	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
 ]
 
 

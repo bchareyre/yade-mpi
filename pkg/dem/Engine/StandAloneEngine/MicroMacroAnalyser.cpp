@@ -14,9 +14,6 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 #include <yade/pkg-common/InteractingSphere.hpp>
 
@@ -29,10 +26,8 @@
 
 CREATE_LOGGER(MicroMacroAnalyser);
 
-MicroMacroAnalyser::MicroMacroAnalyser() : StandAloneEngine() , actionForce(new Force) , actionMomentum(new Momentum)
+MicroMacroAnalyser::MicroMacroAnalyser() : StandAloneEngine()
 {
-	actionForceIndex = actionForce->getClassIndex();
-	actionMomentumIndex = actionMomentum->getClassIndex();
 	analyser = shared_ptr<KinematicLocalisationAnalyser> (new KinematicLocalisationAnalyser);
 	analyser->SetConsecutive (true);
 	analyser->SetNO_ZERO_ID (false);

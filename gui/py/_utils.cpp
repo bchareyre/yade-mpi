@@ -194,13 +194,8 @@ Real sumBexTorques(int mask, python::tuple _axis, python::tuple _axisPt){
 	Vector3r axis=tuple2vec(_axis), axisPt=tuple2vec(_axisPt);
 	FOREACH(const shared_ptr<Body> b, *rb->bodies){
 		if(!b->maskOk(mask)) continue;
-		#ifdef BEX_CONTAINER
-			const Vector3r& m=rb->bex.getTorque(b->getId());
-			const Vector3r& f=rb->bex.getForce(b->getId());
-		#else
-			const Vector3r& m=Shop::Bex::momentum(b->getId(),rb.get());
-			const Vector3r& f=Shop::Bex::force(b->getId(),rb.get());
-		#endif
+		const Vector3r& m=rb->bex.getTorque(b->getId());
+		const Vector3r& f=rb->bex.getForce(b->getId());
 		Vector3r r=b->physicalParameters->se3.position-axisPt;
 		ret+=axis.Dot(m+r.Cross(f));
 	}
@@ -219,11 +214,7 @@ Real sumBexForces(int mask, python::tuple _direction){
 	Vector3r direction=tuple2vec(_direction);
 	FOREACH(const shared_ptr<Body> b, *rb->bodies){
 		if(!b->maskOk(mask)) continue;
-		#ifdef BEX_CONTAINER
-			const Vector3r& f=rb->bex.getForce(b->getId());
-		#else
-			const Vector3r& f=Shop::Bex::force(b->getId(),rb.get());
-		#endif
+		const Vector3r& f=rb->bex.getForce(b->getId());
 		ret+=direction.Dot(f);
 	}
 	return ret;

@@ -13,12 +13,10 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Mesh2D.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 
-MassSpringLaw::MassSpringLaw () : InteractionSolver(), actionForce(new Force) , actionMomentum(new Momentum)
+MassSpringLaw::MassSpringLaw () : InteractionSolver()
 {
 }
 
@@ -68,13 +66,8 @@ void MassSpringLaw::action(MetaBody * massSpring)
 			Real e  = (l-l0)/l0;
 			Real relativeVelocity = dir.Dot((p1->velocity-p2->velocity));
 			Vector3r f3 = (e*physics->stiffness + relativeVelocity* ( 1.0 - physics->damping )  )*dir;
-			#ifdef BEX_CONTAINER
-				massSpring->bex.addForce(id1,-f3);
-				massSpring->bex.addForce(id2, f3);
-			#else
-				static_cast<Force*>   ( massSpring->physicalActions->find( id1 , actionForce->getClassIndex() ).get() )->force    -= f3;
-				static_cast<Force*>   ( massSpring->physicalActions->find( id2 , actionForce->getClassIndex() ).get() )->force    += f3;
-			#endif
+			massSpring->bex.addForce(id1,-f3);
+			massSpring->bex.addForce(id2, f3);
 		}
 	}
 	

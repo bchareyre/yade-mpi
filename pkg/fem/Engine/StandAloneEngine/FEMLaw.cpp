@@ -10,7 +10,6 @@
 #include "FEMLaw.hpp"
 #include<yade/pkg-fem/FEMTetrahedronData.hpp>
 #include<yade/pkg-fem/FEMNodeData.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -18,7 +17,7 @@
 using namespace boost::numeric;
 
 
-FEMLaw::FEMLaw() : InteractionSolver() , actionForce(new Force)
+FEMLaw::FEMLaw() : InteractionSolver()
 {
 	nodeGroupMask = 1;
 	tetrahedronGroupMask = 2;
@@ -75,11 +74,7 @@ void FEMLaw::action(MetaBody* fem)
 			Vector3r force = Vector3r(	  fe( i*3     , 0 )
 							, fe( i*3 + 1 , 0 )
 							, fe( i*3 + 2 , 0 ));
-			#ifdef BEX_CONTAINER
-				fem->bex.addForce(femTet->ids[i],force);
-			#else
-				static_cast<Force*>(fem->physicalActions->find( femTet->ids[i] , actionForce ->getClassIndex() ).get() )->force  += force;
-			#endif
+			fem->bex.addForce(femTet->ids[i],force);
 					
 		}
 	}

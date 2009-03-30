@@ -10,13 +10,12 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include <boost/lexical_cast.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 //#include <Wm3Vector3r.hpp>
 
 
-GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEngine(), actionForce(new Force)
+GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEngine()
 {
 }
 
@@ -31,9 +30,7 @@ bool GeometricalModelForceColorizer::isActivated()
 void GeometricalModelForceColorizer::action(MetaBody * ncb)
 {
 	// FIXME the same in GLDrawLatticeBeamState.cpp
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync();
-	#endif
+	ncb->bex.sync();
 
 	BodyContainer* bodies = ncb->bodies.get();
 	
@@ -47,11 +44,7 @@ void GeometricalModelForceColorizer::action(MetaBody * ncb)
 		if(body->isDynamic)
 		{
 			unsigned int i = body -> getId();
-			#ifdef BEX_CONTAINER
-				Vector3r force=ncb->bex.getForce(i);
-			#else
-				Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
-			#endif
+			Vector3r force=ncb->bex.getForce(i);
 			min = std::min( force[0] , std::min( force[1] , std::min( force[2], min ) ) );
 			max = std::max( force[0] , std::max( force[1] , std::max( force[2], max ) ) );
 		}
@@ -67,11 +60,7 @@ void GeometricalModelForceColorizer::action(MetaBody * ncb)
 		{
 			GeometricalModel* gm = body->geometricalModel.get();
 			unsigned int i = body -> getId();
-			#ifdef BEX_CONTAINER
-				Vector3r force=ncb->bex.getForce(i);
-			#else
-				Vector3r force = YADE_CAST<Force*>(ncb->physicalActions->find( i , actionForce->getClassIndex() ) . get() )->force;
-			#endif
+			Vector3r force=ncb->bex.getForce(i);
 
 			gm->diffuseColor[0] = (force[2]-min)/(max-min);
 			gm->diffuseColor[1] = (force[2]-min)/(max-min);

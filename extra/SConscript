@@ -36,13 +36,11 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
          'RigidBodyParameters',
 			'ElasticBodyParameters',
 			'BodyMacroParameters',
-			'Momentum',
-			'Force',
          'AABB']),
 	
 	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop','Tetra']),
 
-	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','GlobalStiffnessTimeStepper','GlobalStiffnessCounter','Brefcom','PositionOrientationRecorder']),
+	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','GlobalStiffnessTimeStepper','Brefcom','PositionOrientationRecorder']),
 
 	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4SpheresContactGeometry']),
 
@@ -65,7 +63,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'GravityEngines',
 			'yade-serialization',
 			'yade-base',	
-			'PhysicalActionContainerInitializer',
 			'PhysicalActionContainerReseter',
 			'InteractionGeometryMetaEngine',
 			'InteractionPhysicsMetaEngine',
@@ -80,7 +77,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'ParticleParameters',
 			'MetaInteractingGeometry',
 			'MetaInteractingGeometry2AABB',
-			'GlobalStiffness',
 			'InteractingSphere2AABB',\
 			'InteractingBox2AABB',
 			'NewtonsMomentumLaw',
@@ -88,8 +84,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'LeapFrogPositionIntegrator',
 			'LeapFrogOrientationIntegrator',
 			'InteractingBox2InteractingSphere4SpheresContactGeometry',
-			'Momentum',
-			'Force',
 			'InteractingSphere2InteractingSphere4SpheresContactGeometry',
 			#'Clump',
 			'yade-multimethods',

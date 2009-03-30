@@ -20,11 +20,7 @@ PhysicalActionContainerReseter::~PhysicalActionContainerReseter()
 
 void PhysicalActionContainerReseter::action(MetaBody* ncb)
 {
-	#ifdef BEX_CONTAINER
-		ncb->bex.reset();
-	#else
-		ncb->physicalActions->reset();
-	#endif
+	ncb->bex.reset();
 }
 
 

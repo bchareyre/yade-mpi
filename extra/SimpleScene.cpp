@@ -6,21 +6,17 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
 #include<yade/pkg-common/NewtonsMomentumLaw.hpp>
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
@@ -46,8 +42,6 @@ bool SimpleScene::generate(){
 	//@
 	/* initializers */
 		rootBody->initializers.clear();
-		//@
-		rootBody->initializers.push_back(shared_ptr<PhysicalActionContainerInitializer>(new PhysicalActionContainerInitializer));
 		//@
 		shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 			boundingVolumeDispatcher->add(new InteractingSphere2AABB);

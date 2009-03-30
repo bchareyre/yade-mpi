@@ -13,10 +13,6 @@
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
-
 
 #include <yade/pkg-common/InteractingSphere.hpp>
 #include "VolumicContactLaw.hpp"
@@ -29,14 +25,11 @@
 //../../YADE/trunk/examples/sphere_100_poly.txt
 
 
-VolumicContactLaw::VolumicContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 //, T1(new TesselationWrapper)
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
-	actionForceIndex = actionForce->getClassIndex();
-	actionMomentumIndex = actionMomentum->getClassIndex();
-	
 }
 
 
@@ -479,17 +472,10 @@ void VolumicContactLaw::action(MetaBody* ncb)
 	
 			Vector3r f				= currentContactPhysics->normalForce + shearForce;
 			
-			#ifdef BEX_CONTAINER
-				ncb->bex.addForce (id1,-f);
-				ncb->bex.addForce (id2,+f);
-				ncb->bex.addTorque(id1,-c1x.Cross(f));
-				ncb->bex.addTorque(id2, c2x.Cross(f));
-			#else
-				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
-				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= c1x.Cross(f);
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += c2x.Cross(f);
-			#endif
+			ncb->bex.addForce (id1,-f);
+			ncb->bex.addForce (id2,+f);
+			ncb->bex.addTorque(id1,-c1x.Cross(f));
+			ncb->bex.addTorque(id2, c2x.Cross(f));
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}

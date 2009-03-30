@@ -9,14 +9,9 @@
 #pragma once
 
 #include<yade/core/InteractionSolver.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 class MassSpringLaw : public InteractionSolver
 {
-	private :
-		shared_ptr<PhysicalAction> actionForce;	
-		shared_ptr<PhysicalAction> actionMomentum;
-
 	public :
 		int springGroupMask;
 		MassSpringLaw ();
@@ -24,7 +19,6 @@ class MassSpringLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(MassSpringLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

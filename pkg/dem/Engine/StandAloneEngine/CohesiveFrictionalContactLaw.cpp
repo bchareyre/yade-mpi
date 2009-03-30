@@ -13,15 +13,12 @@
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 
 Vector3r translation_vect (0.10,0,0);
 
 
-CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver()
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
@@ -255,17 +252,10 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
                 //  cerr << "shearForce " << shearForce << endl;
                 // cerr << "f= " << f << endl;
                 // it will be some macro(	body->physicalActions,	ActionType , bodyId )
-					#ifdef BEX_CONTAINER
-						ncb->bex.addForce (id1, f);
-						ncb->bex.addForce (id2,-f);
-						ncb->bex.addTorque(id1, c1x.Cross(f));
-						ncb->bex.addTorque(id2,-c2x.Cross(f));
-					#else
-                static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-                static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
-                static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
-                static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
-					#endif
+					ncb->bex.addForce (id1, f);
+					ncb->bex.addForce (id2,-f);
+					ncb->bex.addTorque(id1, c1x.Cross(f));
+					ncb->bex.addTorque(id2,-c2x.Cross(f));
 
 /////	/// Moment law					 	 ///
 /////		if(momentRotationLaw /*&& currentContactPhysics->cohesionBroken == false*/ )
@@ -364,13 +354,8 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 	Vector3r moment = moment_twist + moment_bending;
 currentContactPhysics->moment_twist = moment_twist;
 currentContactPhysics->moment_bending = moment_bending;
-			#ifdef BEX_CONTAINER
-				ncb->bex.addTorque(id1,-moment);
-				ncb->bex.addTorque(id2, moment);
-			#else
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= moment;
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += moment;
-			#endif
+			ncb->bex.addTorque(id1,-moment);
+			ncb->bex.addTorque(id2, moment);
 		}
 	/// Moment law	END				 	 ///
 

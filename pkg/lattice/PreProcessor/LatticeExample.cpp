@@ -36,13 +36,11 @@
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include<yade/pkg-common/DisplacementEngine.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/Quadrilateral.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 

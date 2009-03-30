@@ -8,8 +8,6 @@
 
 #include "HydraulicForceEngine.hpp"
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/pkg-common/Force.hpp>
-#include <yade/pkg-common/Momentum.hpp>
 #include<yade/core/MetaBody.hpp>
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <vector>
@@ -18,7 +16,7 @@ long int HFinversion_counter = 0;
 bool HFinverted = false;
 vector<Real> initialPositions;
 
-HydraulicForceEngine::HydraulicForceEngine() : actionParameterForce(new Force), actionParameterMomentum(new Momentum), gravity(Vector3r::ZERO), isActivated(false)
+HydraulicForceEngine::HydraulicForceEngine() : gravity(Vector3r::ZERO), isActivated(false)
 {
 dummyParameter = false;
 }
@@ -73,11 +71,7 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
                     //cerr << "translate it" << endl;
                     if ((static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken == true)
                     {
-                        #ifdef BEX_CONTAINER
-									ncb->bex.addForce(b->getId(),Vector3r(0,5,0));
-								#else
-									static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += Vector3r(0,5,0);
-								#endif
+								ncb->bex.addForce(b->getId(),Vector3r(0,5,0));
                     }
                     // else  b->geometricalModel->diffuseColor= Vector3r(0.5,0.9,0.3);
                 }
@@ -103,14 +97,8 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
                     Vector3r t (mx,my,mz);
                     //f /= -10000;
                     //t *= 0;
-						  #ifdef BEX_CONTAINER
-						  		ncb->bex.addForce(id,f);
-								ncb->bex.addTorque(id,t);
-						  #else
-	                    static_cast<Force*>( ncb->physicalActions->find( id , actionParameterForce->getClassIndex() ).get() )->force += f;
-	                    //cerr << "added force = " << f << endl;
-	                    static_cast<Momentum*>( ncb->physicalActions->find( id , actionParameterMomentum->getClassIndex() ).get() )->momentum += t;
-						  #endif
+						  	ncb->bex.addForce(id,f);
+							ncb->bex.addTorque(id,t);
 
                 }
             }

@@ -8,7 +8,6 @@ print gravity,density,initialSpeed
 
 o=Omega()
 o.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingFacet2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]
 o.engines=[

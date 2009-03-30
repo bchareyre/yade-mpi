@@ -12,12 +12,7 @@ YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomCon
 CREATE_LOGGER(BrefcomGlobalCharacteristics);
 
 void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
-	//Shop::Bex::initCache();
-	#ifdef BEX_CONTAINER
-		rb->bex.sync();
-	#else
-		throw runtime_error("Brefcom can run only with BexContainer");
-	#endif
+	rb->bex.sync();
 
 	// 1. reset volumetric strain (cummulative in the next loop)
 	// 2. get maximum force on a body and sum of all forces (for averaging)
@@ -26,9 +21,7 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	BrefcomPhysParams* bpp(YADE_CAST<BrefcomPhysParams*>(b->physicalParameters.get()));
 		bpp->epsVolumetric=0;
 		bpp->numContacts=0;
-		#ifdef BEX_CONTAINER
-			currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
-		#endif
+		currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
 	}
 	Real meanF=sumF/rb->bodies->size(); 
 
@@ -133,14 +126,10 @@ BrefcomContact::~BrefcomContact(){};
 CREATE_LOGGER(BrefcomLaw);
 
 void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const body_id_t& id2){
-#ifdef BEX_CONTAINER
 	rootBody->bex.addForce(id1,force);
 	rootBody->bex.addForce(id2,-force);
 	rootBody->bex.addTorque(id1,(contGeom->contactPoint-contGeom->pos1).Cross(force));
 	rootBody->bex.addTorque(id2,(contGeom->contactPoint-contGeom->pos2).Cross(-force));
-#else
-	throw runtime_error("Brefcom can run only with BexContainer");
-#endif
 }
 
 CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
@@ -222,7 +211,6 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 		LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
 		return;
 	}
-	// store Fn (and Fs?), for use with GlobalStiffnessCounter?
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
 
 	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;

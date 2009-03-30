@@ -16,12 +16,8 @@
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
-
-ViscousForceDamping::ViscousForceDamping() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum), betaNormal(0.0), betaShear(0.0)
+ViscousForceDamping::ViscousForceDamping() : InteractionSolver() ,betaNormal(0.0), betaShear(0.0)
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
@@ -140,17 +136,10 @@ void ViscousForceDamping::action(Body* body)
 			Vector3r viscousDampingForce	= normalDampingForce + shearDampingForce;
 			
 //	Add forces
-			#ifdef BEX_CONTAINER
-				ncb->bex.addForce (id1,-viscousDampingForce);
-				ncb->bex.addForce (id2,+viscousDampingForce);
-				ncb->bex.addTorque(id1,-c1x.Cross(viscousDampingForce));
-				ncb->bex.addTorque(id2, c2x.Cross(viscousDampingForce));
-			#else
-				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= viscousDampingForce;
-				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += viscousDampingForce;
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(viscousDampingForce);
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(viscousDampingForce);
-			#endif
+			ncb->bex.addForce (id1,-viscousDampingForce);
+			ncb->bex.addForce (id2,+viscousDampingForce);
+			ncb->bex.addTorque(id1,-c1x.Cross(viscousDampingForce));
+			ncb->bex.addTorque(id2, c2x.Cross(viscousDampingForce));
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}
 	}

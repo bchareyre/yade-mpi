@@ -10,15 +10,8 @@
 
 #include<yade/core/DeusExMachina.hpp>
 
-class Force;
-class Momentum;
-
 class HydraulicForceEngine : public DeusExMachina 
 {
-	private	:
-		shared_ptr<Force> actionParameterForce;
-		shared_ptr<Momentum> actionParameterMomentum;
-
 	public :
 		Vector3r gravity;
 		bool isActivated;
@@ -30,7 +23,6 @@ class HydraulicForceEngine : public DeusExMachina
 	
 	protected :
 		virtual void registerAttributes();
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(HydraulicForceEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

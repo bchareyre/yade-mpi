@@ -160,9 +160,6 @@ void printHelp()
 	#ifdef LOG4CXX
 		"   LOG4CXX       configurable logging framework enabled (~/.yade-suffix/logging.conf)"
 	#endif
-	#ifdef BEX_CONTAINER
-		"   BEX_CONTAINER (uses BexContainer instead of PhysicalActionContainer)\n"
-	#endif
 	"\n";
 }
 

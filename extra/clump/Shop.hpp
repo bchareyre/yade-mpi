@@ -86,15 +86,9 @@ class Shop{
 		 */
 		class Bex{
 			public:
-			static int forceIdx,momentumIdx;
 			static void initCache();
-			#ifdef BEX_CONTAINER
-				static const Vector3r& force(body_id_t, MetaBody* mb=NULL);
-				static const Vector3r& momentum(body_id_t, MetaBody* mb=NULL);
-			#else
-				static Vector3r& force(body_id_t, MetaBody* mb=NULL);
-				static Vector3r& momentum(body_id_t, MetaBody* mb=NULL);
-			#endif
+			static const Vector3r& force(body_id_t, MetaBody* mb=NULL);
+			static const Vector3r& momentum(body_id_t, MetaBody* mb=NULL);
 		};
 
 		//! Estimate timestep based on P-wave propagation speed

@@ -11,19 +11,10 @@
 #include"NewtonsForceLaw.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/core/MetaBody.hpp>
 
-#ifdef BEX_CONTAINER
 void NewtonsForceLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, MetaBody* rb){
 	Vector3r f=rb->bex.getForce(bb->getId());
-#else
-void NewtonsForceLaw::go( const shared_ptr<PhysicalAction>& a
-			, const shared_ptr<PhysicalParameters>& b
-			, const Body* bb)
-{
-	const Vector3r& f = YADE_CAST<Force*>(a.get())->force;
-#endif
 	ParticleParameters * p = YADE_CAST<ParticleParameters*>(b.get());
 	
 	// normal behavior of a standalone particle or a clump itself

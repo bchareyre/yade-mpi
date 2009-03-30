@@ -5,7 +5,6 @@
 #include<yade/extra/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/DeusExMachina.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 #ifndef FOREACH
 #define FOREACH BOOST_FOREACH
@@ -54,7 +53,6 @@ class UniaxialStrainSensorPusher: public DeusExMachina{
 		DeusExMachina::registerAttributes();
 		REGISTER_ATTRIBUTE(forces);
 	}
-	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(UniaxialStrainSensorPusher);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 	//DECLARE_LOGGER;
@@ -156,7 +154,6 @@ class UniaxialStrainer: public DeusExMachina {
 		);
 		void prepareRecStream(void){ if(!recordFile.empty()) recStream.open(recordFile.c_str()); }
 		void postProcessAttributes(bool deserializing){ if(deserializing) prepareRecStream(); } 	
-	NEEDS_BEX("Force","Momentum","GlobalStiffness");
 	REGISTER_CLASS_AND_BASE(UniaxialStrainer,DeusExMachina);
 	DECLARE_LOGGER;
 };

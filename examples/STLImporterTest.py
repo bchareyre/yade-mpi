@@ -38,8 +38,6 @@ o.dt=.2*tc
 
 ## Initializers 
 o.initializers=[
-	## Create and reset to zero container of all PhysicalActions that will be used
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
 	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingFacet2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]

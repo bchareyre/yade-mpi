@@ -10,21 +10,15 @@
 
 #include<yade/core/InteractionSolver.hpp>
 
-class PhysicalAction;
 
 class FrictionLessElasticContactLaw : public InteractionSolver
 {
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-
 	public :
 		FrictionLessElasticContactLaw ();
 		void action(MetaBody*);
 
 	protected :
 		 void registerAttributes();
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(FrictionLessElasticContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

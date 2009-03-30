@@ -16,15 +16,12 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 
 
-ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver() , actionForce(new Force) , actionMomentum(new Momentum)
+ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver()
 {
 	sdecGroupMask=1;
 	first=true;
@@ -113,17 +110,10 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 			currentContactPhysics->shearForce      -= currentContactPhysics->ks*shearDisplacement;
 	
 			Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
-			#ifdef BEX_CONTAINER
-				ncb->bex.addForce (id1,-f);
-				ncb->bex.addForce (id2,+f);
-				ncb->bex.addTorque(id1,-c1x.Cross(f));
-				ncb->bex.addTorque(id2, c2x.Cross(f));
-			#else
-				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.Cross(f);
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.Cross(f);
-			#endif
+			ncb->bex.addForce (id1,-f);
+			ncb->bex.addForce (id2,+f);
+			ncb->bex.addTorque(id1,-c1x.Cross(f));
+			ncb->bex.addTorque(id2, c2x.Cross(f));
 	
 	
 	
@@ -219,13 +209,8 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 	
 			//if (normElastic<=normMPlastic)
 			//{
-			#ifdef BEX_CONTAINER
-				ncb->bex.addTorque(id1,-q_n_i*mElastic);
-				ncb->bex.addTorque(id2, q_n_i*mElastic);
-			#else
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= q_n_i*mElastic;
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += q_n_i*mElastic;
-			#endif
+			ncb->bex.addTorque(id1,-q_n_i*mElastic);
+			ncb->bex.addTorque(id2, q_n_i*mElastic);
 	
 			//}  
 			//else

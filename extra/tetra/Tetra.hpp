@@ -7,7 +7,6 @@
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/InteractionSolver.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 #include<yade/pkg-common/Tetrahedron.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -15,9 +14,6 @@
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
 
 #include<Wm3Math.h>
 #include<Wm3Vector3.h>
@@ -135,14 +131,7 @@ REGISTER_SERIALIZABLE(TetraDraw);
 
 class TetraLaw: public InteractionSolver {
 	public:
-		//! @fixme: those two are here only because this class needs to access
-		/// the ID number of Force and Momentum. Those variables are actually not used to store a value of
-		/// Force and Momentum, just to get ID, although normally they are
-		/// used to store this value. I already have a better solution for that.
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-
-		TetraLaw():InteractionSolver(),actionForce(new Force),actionMomentum(new Momentum){};
+		TetraLaw():InteractionSolver(){};
 
 		int sdecGroupMask; // probably unused?!
 
@@ -151,7 +140,6 @@ class TetraLaw: public InteractionSolver {
 		DECLARE_LOGGER;
 	protected:
 		void registerAttributes(){InteractionSolver::registerAttributes(); /* … */ }
-		NEEDS_BEX("Force","Momentum");
 		REGISTER_CLASS_NAME(TetraLaw);
 		REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

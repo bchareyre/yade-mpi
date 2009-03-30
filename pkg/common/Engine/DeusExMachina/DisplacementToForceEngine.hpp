@@ -12,12 +12,9 @@
 #include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-class Force;
-
 class DisplacementToForceEngine : public DeusExMachina
 {
 	private :
-		shared_ptr<Force>	actionParameterForce;
 		Real			target_length_sq,direction,old_direction,oscillations;
 	public :
 		Vector3r		targetForce,targetForceMask;

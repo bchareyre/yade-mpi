@@ -16,7 +16,6 @@
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
-#include<yade/pkg-dem/GlobalStiffnessCounter.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
@@ -40,7 +39,6 @@
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/HydraulicForceEngine.hpp>
-#include<yade/pkg-common/MakeItFlat.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -53,14 +51,12 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/InteractionHashMap.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -355,7 +351,6 @@ bool ModifiedTriaxialTest::generate()
 		createBox(body,center,halfSize,wall_bottom_wire);
 	 	if(wall_bottom) {
 			rootBody->bodies->insert(body);
-			//(resultantforceEngine->subscribedBodies).push_back(body->getId());
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			wallStressRecorder->wall_bottom_id = body->getId();
 			forcerec->startId = body->getId();
@@ -571,12 +566,6 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	velocityRecorder-> outputFile 	= velocityRecordFile;
 	velocityRecorder-> interval 	= recordIntervalIter;
 
-	shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-	physicalActionInitializer->physicalActionNames.push_back("Force");
-	physicalActionInitializer->physicalActionNames.push_back("Momentum");
-	//physicalActionInitializer->physicalActionNames.push_back("StiffnessMatrix");
-	physicalActionInitializer->physicalActionNames.push_back("GlobalStiffness");
-	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
 	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
@@ -631,9 +620,6 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//stiffnesscounter->sdecGroupMask = 2;
 	//stiffnesscounter->interval = timeStepUpdateInterval;
 	
-	shared_ptr<GlobalStiffnessCounter> globalStiffnessCounter(new GlobalStiffnessCounter);
-	globalStiffnessCounter->sdecGroupMask = 2;
-	globalStiffnessCounter->interval = timeStepUpdateInterval;
 	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
@@ -681,23 +667,15 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	//rootBody->engines.push_back(stiffnesscounter);
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
-	rootBody->engines.push_back(globalStiffnessCounter);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(wallStressRecorder);
 	rootBody->engines.push_back(gravityCondition);
 	// replaced by PhysicalParameters::blockedDOFs
-	#if 0
-		if(want_2d){
-	  		shared_ptr<MakeItFlat> makeItFlat(new MakeItFlat);
-			rootBody->engines.push_back(makeItFlat);
-		}
-	#endif
 	rootBody->engines.push_back(actionDampingDispatcher);
 	rootBody->engines.push_back(applyActionDispatcher);
 	rootBody->engines.push_back(positionIntegrator);
 	if(!rotationBlocked)
 		rootBody->engines.push_back(orientationIntegrator);
-	//rootBody->engines.push_back(resultantforceEngine);
 	//rootBody->engines.push_back(triaxialstressController);
 	
 		
@@ -711,7 +689,6 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(physicalActionInitializer);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
 	
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include<yade/core/FileGenerator.hpp>
-#include<yade/core/PhysicalAction.hpp>
 #include<yade/extra/Shop.hpp>
 
 

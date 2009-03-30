@@ -40,11 +40,10 @@ print "Number of spheres: %d" % spheresCount
 
 ## Initializers 
 o.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	MetaEngine('BoundingVolumeMetaEngine',
 		[EngineUnit('InteractingSphere2AABB'),
 			EngineUnit('InteractingFacet2AABB'),
-			EngineUnit('MetaInteractingGeometry2AABB')])
+			EngineUnit('MetaInteractingGeometry2AABB')]),
 	]
 
 ## Engines 

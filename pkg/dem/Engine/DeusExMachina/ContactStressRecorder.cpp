@@ -9,7 +9,6 @@
 #include "ContactStressRecorder.hpp"
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/pkg-common/Force.hpp>
 #include <yade/pkg-common/Sphere.hpp>
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
@@ -25,7 +24,7 @@
 
 CREATE_LOGGER(ContactStressRecorder);
 
-ContactStressRecorder::ContactStressRecorder () : DataRecorder(), actionForce(new Force)
+ContactStressRecorder::ContactStressRecorder () : DataRecorder()
 
 {
 	outputFile = "";

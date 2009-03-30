@@ -12,7 +12,6 @@
 //#include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-dem/BodyMacroParameters.hpp>
-//#include <yade/pkg-common/Force.hpp>
 //#include <yade/pkg-dem/ElasticContactLaw.hpp>
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>

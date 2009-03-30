@@ -12,7 +12,6 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 
 
@@ -24,9 +23,6 @@ CREATE_LOGGER(TriaxialStressController);
 
 TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0]), wall_top_id(wall_id[1]), wall_left_id(wall_id[2]), wall_right_id(wall_id[3]), wall_front_id(wall_id[4]), wall_back_id(wall_id[5])
 {
-	//StiffnessMatrixClassIndex = actionParameterStiffnessMatrix->getClassIndex();
-	shared_ptr<Force> tmpF(new Force);
-	ForceClassIndex=tmpF->getClassIndex();
 	firstRun = true;
 	
 	previousStress = 0;
@@ -197,10 +193,9 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 void TriaxialStressController::applyCondition(MetaBody* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
-	#ifdef BEX_CONTAINER
-		// sync thread storage of BexContainer
-		ncb->bex.sync();
-	#endif
+
+	// sync thread storage of BexContainer
+	ncb->bex.sync();
 	
 	
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -382,9 +377,7 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
  */
 Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
 {
-	#ifdef BEX_CONTAINER
-		ncb->bex.sync();
-	#endif
+	ncb->bex.sync();
 	//compute the mean contact force
 	Real MeanForce = 0.f;
 	long nForce = 0;
@@ -406,7 +399,6 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 	}
 	if (nForce!=0) MeanForce /= nForce;
 
-//	int actionForceIndex = actionForce->getClassIndex();
 
 	if (!maxUnbalanced) {
 		//compute mean Unbalanced Force

@@ -15,7 +15,6 @@
 #include <list>
 #include <vector>
 
-//class PhysicalAction;
 
 class BeamRecorder : public DataRecorder
 { // given a section plane it records all the beams that cross it: their deformation projected

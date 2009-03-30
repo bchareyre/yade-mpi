@@ -42,7 +42,6 @@ public :
 
 const int NB_R_VALUES = 10;
 
-class PhysicalAction;
 class capillarylaw; // fait appel a la classe def plus bas
 class Interaction;
 
@@ -71,10 +70,6 @@ class BodiesMenisciiList
 
 class CapillaryCohesiveLaw : public InteractionSolver
 {
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-		
 	public :
 		int sdecGroupMask;
 		Real CapillaryPressure;
@@ -90,7 +85,6 @@ class CapillaryCohesiveLaw : public InteractionSolver
 	protected : 
 		void registerAttributes();
 		virtual void postProcessAttributes(bool deserializing);
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(CapillaryCohesiveLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

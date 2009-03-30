@@ -18,7 +18,6 @@ sign=-1
 #
 
 O.initializers=[
-	StandAloneEngine('PhysicalActionContainerInitializer'),
 	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
 	]
 O.engines=[

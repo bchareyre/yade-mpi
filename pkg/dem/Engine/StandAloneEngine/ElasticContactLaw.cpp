@@ -13,9 +13,6 @@
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Force.hpp>
-#include<yade/pkg-common/Momentum.hpp>
-#include<yade/core/PhysicalAction.hpp>
 
 #include<yade/extra/Shop.hpp>
 
@@ -46,15 +43,8 @@ void ElasticContactLaw2::action(MetaBody* rb){
 		Shop::applyForceAtContactPoint(force,contGeom->contactPoint,i->getId1(),contGeom->pos1,i->getId2(),contGeom->pos2,rb);
 
 		Vector3r bendAbs; Real torsionAbs; contGeom->bendingTorsionAbs(bendAbs,torsionAbs);
-		#ifdef BEX_CONTAINER
-			rb->bex.addTorque(i->getId1(), contGeom->normal*torsionAbs*ktor+bendAbs*kb);
-			rb->bex.addTorque(i->getId2(),-contGeom->normal*torsionAbs*ktor-bendAbs*kb);
-		#else
-			Shop::Bex::momentum(i->getId1(),rb)+=contGeom->normal*torsionAbs*ktor;
-			Shop::Bex::momentum(i->getId2(),rb)-=contGeom->normal*torsionAbs*ktor;
-			Shop::Bex::momentum(i->getId1(),rb)+=bendAbs*kb;
-			Shop::Bex::momentum(i->getId2(),rb)-=bendAbs*kb;
-		#endif
+		rb->bex.addTorque(i->getId1(), contGeom->normal*torsionAbs*ktor+bendAbs*kb);
+		rb->bex.addTorque(i->getId2(),-contGeom->normal*torsionAbs*ktor-bendAbs*kb);
 	}
 }
 
@@ -62,16 +52,9 @@ void ElasticContactLaw2::action(MetaBody* rb){
 
 
 ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
-#ifndef BEX_CONTAINER
-	, actionForce(new Force) , actionMomentum(new Momentum)
-#endif
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
-	#ifndef BEX_CONTAINER
-		actionForceIndex = actionForce->getClassIndex();
-		actionMomentumIndex = actionMomentum->getClassIndex();
-	#endif
 	#ifdef SCG_SHEAR
 		useShear=false;
 	#endif
@@ -94,9 +77,6 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 	if(!functor) functor=shared_ptr<ef2_Spheres_Elastic_ElasticLaw>(new ef2_Spheres_Elastic_ElasticLaw);
 	functor->momentRotationLaw=momentRotationLaw;
 	functor->sdecGroupMask=sdecGroupMask;
-	#ifndef BEX_CONTAINER
-		functor->actionForceIndex=actionForceIndex; functor->actionMomentumIndex=actionMomentumIndex;
-	#endif
 	#ifdef SCG_SHEAR
 		functor->useShear=useShear;
 	#endif
@@ -158,17 +138,10 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			Vector3r f=currentContactPhysics->normalForce + shearForce;
 			Vector3r _c1x(currentContactGeometry->contactPoint-de1->se3.position),
 				_c2x(currentContactGeometry->contactPoint-de2->se3.position);
-			#ifdef BEX_CONTAINER
-				ncb->bex.addForce (id1,-f);
-				ncb->bex.addForce (id2,+f);
-				ncb->bex.addTorque(id1,-_c1x.Cross(f));
-				ncb->bex.addTorque(id2, _c2x.Cross(f));
-			#else
-				static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForceIndex).get() )->force    -= f;
-				static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForceIndex ).get() )->force    += f;
-				static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentumIndex ).get() )->momentum -= _c1x.Cross(f);
-				static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentumIndex ).get() )->momentum += _c2x.Cross(f);
-			#endif
+			ncb->bex.addForce (id1,-f);
+			ncb->bex.addForce (id2,+f);
+			ncb->bex.addTorque(id1,-_c1x.Cross(f));
+			ncb->bex.addTorque(id2, _c2x.Cross(f));
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }
 

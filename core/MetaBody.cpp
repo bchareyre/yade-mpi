@@ -24,7 +24,6 @@
  * and different type of containers can still be used instead by explicit assignment */
 #include<yade/core/BodyRedirectionVector.hpp>
 #include<yade/core/InteractionVecMap.hpp>
-#include<yade/core/PhysicalActionVectorVector.hpp>
 
 // POSIX-only
 #include<pwd.h>
@@ -36,9 +35,6 @@ bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
 	Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), persistentInteractions(interactions),transientInteractions(interactions)
-	#ifndef BEX_CONTAINER
-	  	,physicalActions(new PhysicalActionVectorVector)
-	#endif
 {	
 	engines.clear();
 	initializers.clear();
@@ -83,8 +79,10 @@ void MetaBody::moveToNextTimeStep()
 {
 	if(needsInitializers){
 		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated()) e->action(this); }
+		bex.resize(bodies->size());
 		needsInitializers=false;
 	}
+	//bex.reset(); // uncomment if PhysicalActionContainerReseter is removed
 	TimingInfo::delta last=TimingInfo::getNow();
 	FOREACH(const shared_ptr<Engine>& e, engines){
 		if(e->isActivated()){

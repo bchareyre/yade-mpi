@@ -17,7 +17,6 @@
 
 
 
-class PhysicalAction;
 
 
 
@@ -51,7 +50,6 @@ class PhysicalAction;
 class TriaxialCompressionEngine : public TriaxialStressController
 {
 	private :
-		shared_ptr<PhysicalAction> actionForce;
 		std::string Phase1End;//used to name output files based on current state
 				
 	public :

@@ -10,20 +10,14 @@
 
 #include<yade/core/StandAloneEngine.hpp>
 
-class PhysicalAction;
-
 class GeometricalModelForceColorizer : public StandAloneEngine
 {
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-	
 	public :
 		GeometricalModelForceColorizer ();
 
 		virtual void action(MetaBody*);
 		virtual bool isActivated();
 	
-	NEEDS_BEX("Force");	
 	REGISTER_CLASS_NAME(GeometricalModelForceColorizer);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };

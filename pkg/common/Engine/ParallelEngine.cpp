@@ -15,7 +15,9 @@ list<string> ParallelEngine::getNeededBex(){
 void ParallelEngine::action(MetaBody* rootBody){
 	// openMP warns if the iteration variable is unsigned...
 	const int size=(int)slaves.size();
-	#pragma omp parallel for
+	#ifdef YADE_OPENMP
+		#pragma omp parallel for
+	#endif
 	for(int i=0; i<size; i++){
 		// run every slave group sequentially
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {

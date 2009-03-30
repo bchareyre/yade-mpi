@@ -15,7 +15,6 @@
 #include <list>
 #include <vector>
 
-//class PhysicalAction;
 
 class MovingSupport : public DataRecorder
 { // given a section plane it deletes all the beams that cross it, and remembers the nodes that they did connect.

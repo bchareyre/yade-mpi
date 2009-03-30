@@ -13,14 +13,11 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-class PhysicalAction;
 
 class ElasticCohesiveLaw : public InteractionSolver
 {
 	private :
 		bool first; // FIXME - remove that!
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
 
 	public :
 		int sdecGroupMask;

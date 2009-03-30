@@ -24,9 +24,7 @@
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/PhysicalActionContainerInitializer.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalActionVectorVector.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Box.hpp>
@@ -162,9 +160,6 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 
 void TestSimpleViscoelastic::createActors(shared_ptr<MetaBody>& rootBody)
 {
-    shared_ptr<PhysicalActionContainerInitializer> physicalActionInitializer(new PhysicalActionContainerInitializer);
-    physicalActionInitializer->physicalActionNames.push_back("Force");
-    physicalActionInitializer->physicalActionNames.push_back("Momentum");
     
     shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
     interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -216,7 +211,6 @@ void TestSimpleViscoelastic::createActors(shared_ptr<MetaBody>& rootBody)
     rootBody->engines.push_back(interactionRecorder);
 
     rootBody->initializers.clear();
-    rootBody->initializers.push_back(physicalActionInitializer);
     rootBody->initializers.push_back(boundingVolumeDispatcher);
 }
 

@@ -13,15 +13,10 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-class PhysicalAction;
 
 class CohesiveFrictionalContactLaw : public InteractionSolver
 {
 /// Attributes
-	private :
-		shared_ptr<PhysicalAction> actionForce;
-		shared_ptr<PhysicalAction> actionMomentum;
-
 	public :
 		int sdecGroupMask;
 		bool momentRotationLaw, erosionActivated, detectBrokenBodies,always_use_moment_law;
@@ -34,7 +29,6 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 
 	protected :
 		void registerAttributes();
-	NEEDS_BEX("Force","Momentum");
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

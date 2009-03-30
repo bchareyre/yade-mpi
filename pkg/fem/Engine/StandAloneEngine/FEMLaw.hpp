@@ -10,13 +10,9 @@
 
 #include<yade/core/InteractionSolver.hpp>
 
-class PhysicalAction;
-
 class FEMLaw : public InteractionSolver
 {
 /// Attributes
-	private :
-		shared_ptr<PhysicalAction> actionForce;
 	public :
 		int	 nodeGroupMask
 			,tetrahedronGroupMask;
@@ -30,7 +26,6 @@ class FEMLaw : public InteractionSolver
 /// Serializtion
 	protected :
 		virtual void registerAttributes();
-	NEEDS_BEX("Force");
 	REGISTER_CLASS_NAME(FEMLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

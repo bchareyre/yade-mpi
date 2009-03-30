@@ -7,7 +7,6 @@ YADE_PLUGIN(/* self-contained in hpp: */ "TetraMold", "TetraBang", "Tetrahedron2
 
 
 #include<yade/core/Interaction.hpp>
-#include<yade/core/PhysicalAction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 
@@ -405,17 +404,10 @@ void TetraLaw::action(MetaBody* rootBody)
 		TRWM3VEC(F);
 		TRWM3VEC((physB->se3.position-contactGeom->contactPoint).Cross(F));
 
-		#ifdef BEX_CONTAINER
-			rootBody->bex.addForce (idA,-F);
-			rootBody->bex.addForce (idB, F);
-			rootBody->bex.addTorque(idA,-(physA->se3.position-contactGeom->contactPoint).Cross(F));
-			rootBody->bex.addTorque(idB, (physA->se3.position-contactGeom->contactPoint).Cross(F));
-		#else
-			static_pointer_cast<Force>(rootBody->physicalActions->find(idA,actionForce->getClassIndex()))->force-=F;
-			static_pointer_cast<Force>(rootBody->physicalActions->find(idB,actionForce->getClassIndex()))->force+=F;
-			static_pointer_cast<Momentum>(rootBody->physicalActions->find(idA,actionMomentum->getClassIndex()))->momentum-=(physA->se3.position-contactGeom->contactPoint).Cross(F);
-			static_pointer_cast<Momentum>(rootBody->physicalActions->find(idB,actionMomentum->getClassIndex()))->momentum+=(physB->se3.position-contactGeom->contactPoint).Cross(F);
-		#endif
+		rootBody->bex.addForce (idA,-F);
+		rootBody->bex.addForce (idB, F);
+		rootBody->bex.addTorque(idA,-(physA->se3.position-contactGeom->contactPoint).Cross(F));
+		rootBody->bex.addTorque(idB, (physA->se3.position-contactGeom->contactPoint).Cross(F));
 	}
 }
 
