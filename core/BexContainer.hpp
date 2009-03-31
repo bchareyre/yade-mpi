@@ -107,14 +107,15 @@ class BexContainer{
 			_force.resize(newSize); _torque.resize(newSize);
 			size=newSize;
 		}
-		/*! Reset all data, also reset summay forces/torques and mark the container clean. */
+		/*! Reset all data, also reset summary forces/torques and mark the container clean. */
 		// perhaps should be private and friend MetaBody or whatever the only caller should be
 		void reset(){
 			for(int thread=0; thread<nThreads; thread++){
 				memset(_forceData [thread][0], 0,sizeof(Vector3r)*size);
 				memset(_torqueData[thread][0],0,sizeof(Vector3r)*size);
 			}
-			memset(_force [0], 0,sizeof(Vector3r)*size); memset(_torque[0], 0,sizeof(Vector3r)*size);
+			memset(_force [0], 0,sizeof(Vector3r)*size);
+			memset(_torque[0], 0,sizeof(Vector3r)*size);
 			synced=true;
 		}
 };

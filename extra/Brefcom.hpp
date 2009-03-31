@@ -96,7 +96,7 @@ class BrefcomContact: public NormalShearInteraction {
 
 
 		static Real solveBeta(const Real c, const Real N);
-		Real computeDmgOverstress(Real epsN,Real dt);
+		Real computeDmgOverstress(Real dt);
 		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
 
 

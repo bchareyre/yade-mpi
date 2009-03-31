@@ -28,7 +28,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('MomentEngine',['Engine/DeusExMachina/MomentEngine.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters']),
 	env.SharedLibrary('ForceEngine',['Engine/DeusExMachina/ForceEngine.cpp'],
-		LIBS=env['LIBS']+['ParticleParameters']),
+		LIBS=env['LIBS']+['ParticleParameters','Shop']),
 	env.SharedLibrary('DisplacementToForceEngine',['Engine/DeusExMachina/DisplacementToForceEngine.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters']),
 	env.SharedLibrary('GravityEngines',['Engine/DeusExMachina/GravityEngines.cpp'],
