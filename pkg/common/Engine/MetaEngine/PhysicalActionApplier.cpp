@@ -10,6 +10,7 @@
 #include<yade/core/MetaBody.hpp>
 
 void PhysicalActionApplier::action(MetaBody* ncb){
+	ncb->bex.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		operator()(b->physicalParameters,b.get(),ncb);
 	}

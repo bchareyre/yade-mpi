@@ -18,6 +18,29 @@ __builtins__.O=Omega()
 #	atexit.register(yade.qt.close)
 #except ImportError: pass
 
+### direct object creation through automatic wrapper functions
+def listChildClassesRecursive(base):
+	ret=O.childClasses(base)
+	for bb in ret:
+		ret2=listChildClassesRecursive(bb)
+		if ret2: ret+=ret2
+	return ret
+# not sure whether __builtins__ is the right place?
+_dd=__builtins__.__dict__
+
+classTranslations={'FileGenerator':'Preprocessor','EngineUnit1D':'EngineUnit','EngineUnit2D':'EngineUnit'}
+for root in ['StandAloneEngine','DeusExMachina','EngineUnit1D','EngineUnit2D','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator','MetaEngine']:
+	root2=root if (root not in classTranslations.keys()) else classTranslations[root]
+	for p in listChildClassesRecursive(root):
+		class argStorage:
+			def __init__(self,_root,_class): self._root,self._class=_root,_class
+			def wrap(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
+		if root=='MetaEngine': _dd[p]=argStorage(root2,p).wrap
+		else:                  _dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,kw) # eval(root2)(p,kw)
+### end wrappers
+
+
+
 # python2.4 workaround (so that quit() works as it does in 2.5)
 if not callable(__builtins__.quit):
 	def _quit(): import sys; sys.exit(0)

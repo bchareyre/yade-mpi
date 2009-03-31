@@ -10,8 +10,8 @@ o=Omega() # for advaned folks: this creates default MetaBody as well
 ## Initializers are run before the simulation.
 o.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
-	]
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+]
 
 ## Engines are called consecutively at each iteration. Their order matters.
 ##
@@ -20,56 +20,56 @@ o.initializers=[
 ## MetaEngines act as dispatchers and based on the type of objects they operate on, different EngineUnits are called.
 o.engines=[
 	## Resets forces and momenta the act on bodies
-	StandAloneEngine('PhysicalActionContainerReseter'),
+	PhysicalActionContainerReseter(),
 	## associates bounding volume - in this case, AxisAlignedBoundingBox (AABB) - to each body.
 	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, Box, or MetaBody (rootBody).
 	## AABBs will be used to detect collisions later, by PersistentSAPCollider
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingBox2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
+	BoundingVolumeMetaEngine([
+		InteractingSphere2AABB(),
+		InteractingBox2AABB(),
+		MetaInteractingGeometry2AABB()
 	]),
 	## Using bounding boxes created by the previous engine, find possible body collisions.
 	## These possible collisions are inserted in Omega.interactions container (MetaBody::transientInteractions in c++).
-	StandAloneEngine('PersistentSAPCollider'),
+	PersistentSAPCollider(),
 	## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
 	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
 	## Note that there is no EngineUnit for box-box collision. They are not implemented.
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-		EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')
+	InteractionGeometryMetaEngine([
+		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
+		InteractingBox2InteractingSphere4SpheresContactGeometry()
 	]),
 	## Create physical information about the interaction.
 	## This may consist in deriving contact rigidity from elastic moduli of each body, for example.
 	## The purpose is that the contact may be "solved" without reference to related bodies,
 	## only with the information contained in contact geometry and physics.
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
+	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
 	## "Solver" of the contact, also called (consitutive) law.
 	## Based on the information in interaction physics and geometry, it applies corresponding forces on bodies in interaction.
-	StandAloneEngine('ElasticContactLaw'),
+	ElasticContactLaw(),
 	## Apply gravity: all bodies will have gravity applied on them.
 	## Note the engine parameter 'gravity', a vector that gives the acceleration.
-	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
+	GravityEngine(gravity=[0,0,-9.81]),
 	## Forces acting on bodies are damped to artificially increase energy dissipation in simulation.
 	## (In this model, the restitution coefficient of interaction is 1, which is not realistic.)
 	## This MetaEngine acts on all PhysicalActions and selects the right EngineUnit base on type of the PhysicalAction.
 	#
 	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
-#	DeusExMachina('NewtonsDampedLaw',{'damping':0.0}),
+	# NewtonsDampedLaw(damping=0.1)
 	#
-	MetaEngine('PhysicalActionDamper',[
-		EngineUnit('CundallNonViscousForceDamping',{'damping':0.2}),
-		EngineUnit('CundallNonViscousMomentumDamping',{'damping':0.2})
+	PhysicalActionDamper([
+		CundallNonViscousForceDamping(damping=0.2),
+		CundallNonViscousMomentumDamping(damping=0.2)
 	]),
 	## Now we have forces and momenta acting on bodies. Newton's law calculates acceleration that corresponds to them.
-	MetaEngine('PhysicalActionApplier',[
-		EngineUnit('NewtonsForceLaw'),
-		EngineUnit('NewtonsMomentumLaw'),
+	PhysicalActionApplier([
+		NewtonsForceLaw(),
+		NewtonsMomentumLaw(),
 	]),
 	## Acceleration results in velocity change. Integrating the velocity over dt, position of the body will change.
-	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogPositionIntegrator')]),
+	PhysicalParametersMetaEngine([LeapFrogPositionIntegrator()]),
 	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
-	MetaEngine('PhysicalParametersMetaEngine',[EngineUnit('LeapFrogOrientationIntegrator')]),
+	PhysicalParametersMetaEngine([LeapFrogOrientationIntegrator()])
 ]
 
 
@@ -97,16 +97,16 @@ if False:
 	# set the isDynamic body attribute
 	b['isDynamic']=False
 	# Assign geometrical model (shape) to the body: a box of given size
-	b.shape=GeometricalModel('Box',{'extents':[.5,.5,.5],'diffuseColor':[1,0,0]})
+	b.shape=Box(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# Assign computational model (mold; may be simplified form of shape) to the body
-	b.mold=InteractingGeometry('InteractingBox',{'extents':[.5,.5,.5],'diffuseColor':[1,0,0]})
+	b.mold=InteractingBox(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# physical parameters:
 	# store mass to a temporary
 	mass=8*.5*.5*.5*2400
 	# * se3 (position & orientation) as 3 position coordinates, then 3 direction axis coordinates and rotation angle
-	b.phys=PhysicalParameters('BodyMacroParameters',{'se3':[0,0,0,1,0,0,0],'mass':mass,'inertia':[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],'young':30e9,'poisson':.3})
+	b.phys=BodyMacroParameters(se3=[0,0,0,1,0,0,0],mass=mass,inertia=[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],young=30e9,poisson=.3)
 	# other information about AABB will be updated during simulation by relevant BoundingVolumeMetaEngine
-	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+	b.bound=AABB(diffuseColor=[0,1,0])
 	# add the body to the simulation
 	o.bodies.append(b)
 

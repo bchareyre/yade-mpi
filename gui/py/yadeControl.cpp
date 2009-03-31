@@ -577,6 +577,13 @@ class pyOmega{
 		return (Omega::instance().isInheritingFrom(child,base));
 	}
 
+	boost::python::list plugins_get(){
+		const map<string,DynlibDescriptor>& plugins=Omega::instance().getDynlibsDescriptor();
+		std::pair<string,DynlibDescriptor> p; boost::python::list ret;
+		FOREACH(p, plugins) ret.append(p.first);
+		return ret;
+	}
+
 	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
 
 	void interactionContainer_set(string clss){
@@ -641,6 +648,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("reset",&pyOmega::reset)
 		.def("labeledEngine",&pyOmega::labeled_engine_get)
 		.def("resetTime",&pyOmega::resetTime)
+		.def("plugins",&pyOmega::plugins_get)
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set)
 		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)
