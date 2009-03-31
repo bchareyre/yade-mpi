@@ -19,7 +19,6 @@
 YADE_PLUGIN("ElasticContactLaw2","ef2_Spheres_Elastic_ElasticLaw","ElasticContactLaw");
 
 ElasticContactLaw2::ElasticContactLaw2(){
-	Shop::Bex::initCache();
 	isCohesive=true;
 }
 

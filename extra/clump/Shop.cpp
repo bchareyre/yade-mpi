@@ -79,14 +79,8 @@ CREATE_LOGGER(Shop);
 
 map<string,boost::any> Shop::defaults;
 
-void Shop::Bex::initCache(){}
-
-const Vector3r& Shop::Bex::force(body_id_t id,MetaBody* rb){  rb->bex.sync();  return rb->bex.getForce(id);}
-const Vector3r& Shop::Bex::momentum(body_id_t id,MetaBody* rb){ rb->bex.sync(); return rb->bex.getTorque(id);}
-
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
- *
- * Shop::Bex::initCache must have been called at some point. */
+ */
 void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, MetaBody* rootBody){
 	rootBody->bex.addForce(id1,force);
 	rootBody->bex.addForce(id2,-force);

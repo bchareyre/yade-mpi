@@ -56,6 +56,8 @@ REGISTER_SERIALIZABLE(SpiralEngine);
  * between last and first values is done).
  * */
 class InterpolatingSpiralEngine: public SpiralEngine{
+	//! holder of interpolation state, should not be touched by the user.
+	size_t _pos;
 	public:
 		//! list of times at which velocities are given; must be increasing
 		vector<Real> times;
@@ -65,12 +67,10 @@ class InterpolatingSpiralEngine: public SpiralEngine{
 		bool wrap;
 		//! axial translation per radian turn (can be negative)
 		Real slope;
-		//! holder of interpolation state, should not be touched by the user.
-		size_t pos;
-		InterpolatingSpiralEngine(): wrap(false), slope(0), pos(0){}
+		InterpolatingSpiralEngine(): _pos(0), wrap(false), slope(0){}
 		virtual void applyCondition(MetaBody* rb);
 	REGISTER_CLASS_AND_BASE(InterpolatingSpiralEngine,SpiralEngine);
-	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(wrap)(slope)(pos));
+	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(wrap)(slope));
 };
 REGISTER_SERIALIZABLE(InterpolatingSpiralEngine);
 

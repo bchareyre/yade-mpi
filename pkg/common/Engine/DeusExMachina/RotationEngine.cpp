@@ -1,13 +1,6 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
-
+// © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
+// © 2004 Janek Kozicki <cosurgi@berlios.de>
+// © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"RotationEngine.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
@@ -22,7 +15,7 @@ YADE_PLUGIN("RotationEngine","SpiralEngine","InterpolatingSpiralEngine");
 
 void InterpolatingSpiralEngine::applyCondition(MetaBody* rb){
 	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;
-	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,pos);
+	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,_pos);
 	linearVelocity=angularVelocity*slope;
 	SpiralEngine::applyCondition(rb);
 }

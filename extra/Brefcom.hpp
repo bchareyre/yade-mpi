@@ -200,7 +200,7 @@ class BrefcomLaw: public InteractionSolver{
 		
 	public:
 		bool logStrain;
-		BrefcomLaw(): logStrain(false) { Shop::Bex::initCache(); };
+		BrefcomLaw(): logStrain(false) { };
 		void action(MetaBody*);
 	protected: 
 	REGISTER_CLASS_AND_BASE(BrefcomLaw,InteractionSolver);

@@ -1,31 +1,46 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// 2004 © Janek Kozicki <cosurgi@berlios.de> 
+// 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
 #pragma once
 
 #include<yade/core/DeusExMachina.hpp>
 
-class ForceEngine : public DeusExMachina 
-{
+class ForceEngine : public DeusExMachina{
 	public :
-		Vector3r		force;
-
-		ForceEngine();
-		virtual ~ForceEngine();
-	
+		Vector3r force;
+		ForceEngine(): force(Vector3r::ZERO){};
+		virtual ~ForceEngine(){};
 		virtual void applyCondition(MetaBody*);
-	
-	protected :
-		virtual void registerAttributes();
-	REGISTER_CLASS_NAME(ForceEngine);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+	REGISTER_CLASS_AND_BASE(ForceEngine,DeusExMachina);
+	REGISTER_ATTRIBUTES(DeusExMachina,(force));
 };
-
 REGISTER_SERIALIZABLE(ForceEngine);
+
+/* Engine for applying force of varying magnitude but constant direction
+ * on subscribed bodies. times and magnitudes must have the same length,
+ * direction (normalized automatically) gives the orientation.
+ *
+ * As usual with interpolating engines: the first magnitude is used before the first
+ * time point, last magnitude is used after the last time point. Wrap specifies whether
+ * time wraps around the last time point to the first time point.
+ */
+class InterpolatingDirectedForceEngine: public ForceEngine{
+	size_t _pos;
+	public:
+		//! Time readings
+		vector<Real> times;
+		//! Force magnitude readings
+		vector<Real> magnitudes;
+		//! Constant force direction (normalized automatically)
+		Vector3r direction;
+		//! wrap to the beginning of the sequence if beyond the last time point
+		bool wrap;
+		InterpolatingDirectedForceEngine(): _pos(0),direction(Vector3r::UNIT_X),wrap(false){};
+		virtual ~InterpolatingDirectedForceEngine(){};
+		virtual void applyCondition(MetaBody*);
+	REGISTER_CLASS_AND_BASE(InterpolatingDirectedForceEngine,ForceEngine);
+	REGISTER_ATTRIBUTES(ForceEngine,(times)(magnitudes)(direction)(wrap));
+};
+REGISTER_SERIALIZABLE(InterpolatingDirectedForceEngine);
 
 

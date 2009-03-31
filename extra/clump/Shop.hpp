@@ -79,17 +79,6 @@ class Shop{
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);
 
-		/*! Cache for class indices for physical actions (body external variables, Bex)
-		 *
-		 * It is necessary to populate the cache by calling initCache(); then supported
-		 * actions can be used like Shop::Bex::force(bodyId)+=someForce and so on.
-		 */
-		class Bex{
-			public:
-			static void initCache();
-			static const Vector3r& force(body_id_t, MetaBody* mb=NULL);
-			static const Vector3r& momentum(body_id_t, MetaBody* mb=NULL);
-		};
 
 		//! Estimate timestep based on P-wave propagation speed
 		static Real PWaveTimeStep(shared_ptr<MetaBody> rb=shared_ptr<MetaBody>());

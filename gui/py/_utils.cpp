@@ -189,7 +189,7 @@ python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Rea
  */
 Real sumBexTorques(int mask, python::tuple _axis, python::tuple _axisPt){
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
-	Shop::Bex::initCache();
+	rb->bex.sync();
 	Real ret=0;
 	Vector3r axis=tuple2vec(_axis), axisPt=tuple2vec(_axisPt);
 	FOREACH(const shared_ptr<Body> b, *rb->bodies){
@@ -208,9 +208,9 @@ Real sumBexTorques(int mask, python::tuple _axis, python::tuple _axisPt){
  *
  */
 Real sumBexForces(int mask, python::tuple _direction){
-	Shop::Bex::initCache();
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
-	Real ret;
+	rb->bex.sync();
+	Real ret=0;
 	Vector3r direction=tuple2vec(_direction);
 	FOREACH(const shared_ptr<Body> b, *rb->bodies){
 		if(!b->maskOk(mask)) continue;

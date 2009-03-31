@@ -1,33 +1,14 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// 2004 © Janek Kozicki <cosurgi@berlios.de> 
+// 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
+
 
 #include"ForceEngine.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/MetaBody.hpp>
+#include<yade/pkg-common/LinearInterpolate.hpp>
+#include<yade/extra/Shop.hpp>
 
-#include<boost/foreach.hpp>
-
-
-ForceEngine::ForceEngine() : force(Vector3r::ZERO)
-{
-}
-
-ForceEngine::~ForceEngine()
-{
-}
-
-
-void ForceEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(force);
-}
-
+YADE_PLUGIN("ForceEngine","InterpolatingDirectedForceEngine");
 
 void ForceEngine::applyCondition(MetaBody* ncb){
 	FOREACH(body_id_t id, subscribedBodies){
@@ -36,4 +17,10 @@ void ForceEngine::applyCondition(MetaBody* ncb){
 	}
 }
 
-YADE_PLUGIN();
+void InterpolatingDirectedForceEngine::applyCondition(MetaBody* rb){
+	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;
+	direction.Normalize(); 
+	force=linearInterpolate<Real>(virtTime,times,magnitudes,_pos)*direction;
+	ForceEngine::applyCondition(rb);
+}
+
