@@ -113,7 +113,7 @@ class AttrAccess{
 					if      (any_cast<string*>(&instance)) { desc.type=AttrAccess::STRING; goto found; }
 					else if (any_cast<bool*>(&instance)) { desc.type=AttrAccess::BOOL; goto found; }
 					else if (any_cast<Real*>(&instance) || any_cast<long double*>(&instance) || any_cast<double*>(&instance) || any_cast<float*>(&instance)) { desc.type=AttrAccess::FLOAT; goto found;}
-					else if (any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance)) {desc.type=AttrAccess::INTEGER; goto found; }
+					else if (any_cast<int*>(&instance) || any_cast<unsigned int*>(&instance) || any_cast<long*>(&instance) || any_cast<unsigned long*>(&instance) || any_cast<long long*>(&instance) || any_cast<unsigned long long*>(&instance)) {desc.type=AttrAccess::INTEGER; goto found; }
 					else if (any_cast<vector<string>*>(&instance)) { desc.type=AttrAccess::SEQ_STRING; goto found; }
 				#if 0
 					else if (any_cast<vector<Vector3r>*>(&instance)) { cerr<<"WWWWWWWWWWWWW"<<endl;}

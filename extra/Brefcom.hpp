@@ -89,6 +89,8 @@ class BrefcomContact: public NormalShearInteraction {
 		bool neverDamage;
 		/*! cummulative plastic strain measure (scalar) on this contact */
 		Real epsPlSum;
+		//! debugging, to see convergence rate
+		static long cummBetaIter, cummBetaCount;
 
 		/*! auxiliary variable for visualization, recalculated in BrefcomLaw at every iteration */
 		// FIXME: Fn and Fs are stored as Vector3r normalForce, shearForce in NormalShearInteraction 
@@ -121,6 +123,9 @@ class BrefcomContact: public NormalShearInteraction {
 			(plTau)
 			(plRateExp)
 			(transStrainCoeff)
+
+			(cummBetaIter)
+			(cummBetaCount)
 
 			(kappaD)
 			(neverDamage)

@@ -134,11 +134,17 @@ void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const b
 
 CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
 
+long BrefcomContact::cummBetaIter=0, BrefcomContact::cummBetaCount=0;
+
 Real BrefcomContact::solveBeta(const Real c, const Real N){
+	#ifdef YADE_DEBUG
+		cummBetaCount++;
+	#endif
 	const int maxIter=20;
 	const Real maxError=1e-12;
 	Real f, ret=0.;
 	for(int i=0; i<maxIter; i++){
+		cummBetaIter++;
 		Real aux=c*exp(N*ret)+exp(ret);
 		f=log(aux);
 		if(fabs(f)<maxError) return ret;
@@ -152,7 +158,7 @@ Real BrefcomContact::solveBeta(const Real c, const Real N){
 Real BrefcomContact::computeDmgOverstress(Real dt){
 	if(dmgStrain>=epsN*omega){ // unloading, no viscous stress
 		dmgStrain=epsN*omega;
-		LOG_DEBUG("Unloading, no viscous overstress");
+		LOG_DEBUG("Elastic/unloading, no viscous overstress");
 		return 0.;
 	}
 	Real c=epsCrackOnset*(1-omega)*pow(dmgTau/dt,dmgRateExp)*pow(epsN*omega-dmgStrain,dmgRateExp-1.);
