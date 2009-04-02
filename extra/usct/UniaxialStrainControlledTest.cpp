@@ -49,9 +49,10 @@ void UniaxialStrainer::init(){
 	assert(originalLength>0 && !isnan(originalLength));
 
 	assert(!isnan(strainRate) || !isnan(absSpeed));
-	if(isnan(strainRate)){ strainRate=absSpeed/originalLength; }
+	if(strainRate==0){ strainRate=absSpeed/originalLength; LOG_INFO("COmputed new strainRate "<<strainRate); }
 
 	initAccelTime_s=initAccelTime>=0 ? initAccelTime : Omega::instance().getTimeStep()*(-initAccelTime);
+	LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<", will be reached after "<<initAccelTime_s<<"s ("<<initAccelTime_s/Omega::instance().getTimeStep()<<" steps).");
 
 	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;
 	 * this will not work if there are foreign bodies in the simulation,
@@ -89,7 +90,8 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	// linearly increase strain to the desired value
 	if(abs(currentStrainRate)<abs(strainRate)){
 		Real t=Omega::instance().getSimulationTime();
-		currentStrainRate=(t/initAccelTime_s)*strainRate;
+		if(initAccelTime_s!=0) currentStrainRate=(t/initAccelTime_s)*strainRate;
+		else currentStrainRate=strainRate;
 	} else currentStrainRate=strainRate;
 	// how much do we move (in total, symmetry handled below)
 	Real dAX=currentStrainRate*originalLength*Omega::instance().getTimeStep();
@@ -250,7 +252,7 @@ void USCTGen::createEngines(){
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
 		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
 		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
-		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1; bmc->expBending=1; bmc->xiShear=.8; bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5; bmc->transStrainCoeff=.5;
+		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1;bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 

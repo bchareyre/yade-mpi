@@ -147,7 +147,8 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
 		fPlot.write("set xlabel '%s'\n"%p)
-		fPlot.write("set datafile missing 'nan'\n"%p)
+		fPlot.write("set grid\n")
+		fPlot.write("set datafile missing 'nan'\n")
 		if title: fPlot.write("set title '%s'\n"%title)
 		fPlot.write("plot "+",".join([" %s using %d:%d title '%s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
 		i+=1

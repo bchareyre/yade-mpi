@@ -222,10 +222,8 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		 * This might be done later, for now hardcode that here. */
 		/* uniaxial tension resistance, bending parameter of the damage evolution law, whear weighting constant for epsT in the strain seminorm (kappa) calculation. Default to NaN so that user gets loudly notified it was not set.
 		
-		expBending is positive if the damage evolution function is concave after fracture onset;
-		reasonable value seems like 4.
 		*/
-		Real sigmaT, expBending, xiShear, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold, transStrainCoeff, dmgTau, dmgRateExp, plTau, plRateExp;
+		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold, dmgTau, dmgRateExp, plTau, plRateExp;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (BrefcomContact::neverDamage=true); defaults to false
@@ -233,8 +231,7 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 
 		BrefcomMakeContact(){
 			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=epsCrackOnset=relDuctility=G_over_E=transStrainCoeff=std::numeric_limits<Real>::signaling_NaN();
-			xiShear=0;
+			sigmaT=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
 			neverDamage=false;
 			cohesiveThresholdIter=-1;
 			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1;
@@ -245,8 +242,6 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
 			(cohesiveThresholdIter)
 			(G_over_E)
-			(expBending)
-			(xiShear)
 			(sigmaT)
 			(neverDamage)
 			(epsCrackOnset)
@@ -256,7 +251,6 @@ class BrefcomMakeContact: public InteractionPhysicsEngineUnit{
 			(plTau)
 			(plRateExp)
 			(omegaThreshold)
-			(transStrainCoeff)
 		);
 
 		FUNCTOR2D(BrefcomPhysParams,BrefcomPhysParams);

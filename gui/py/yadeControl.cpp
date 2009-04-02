@@ -449,7 +449,7 @@ class pyOmega{
 					}
 				}
 			}
-			if(isChildClassOf(e->getClassName(),"InteractionDispatchers")){
+			if(e->getClassName()=="InteractionDispatchers"){
 				shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(e);
 				list<shared_ptr<EngineUnit> > eus;
 				FOREACH(const shared_ptr<EngineUnit>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);

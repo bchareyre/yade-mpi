@@ -82,7 +82,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
 		//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
 
-		if(!neverDamage) { assert(!isnan(sigmaT)); assert(!isnan(xiShear));}
+		if(!neverDamage) { assert(!isnan(sigmaT)); }
 
 		shared_ptr<BrefcomContact> contPhys(new BrefcomContact());
 
@@ -93,9 +93,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		contPhys->crossSection=S12;
 		contPhys->epsCrackOnset=epsCrackOnset;
 		contPhys->epsFracture=relDuctility*epsCrackOnset;
-		contPhys->xiShear=xiShear;
 		contPhys->omegaThreshold=omegaThreshold;
-		contPhys->transStrainCoeff=transStrainCoeff;
 		// inherited from NormalShearInteracion, used in the timestepper
 		contPhys->kn=contPhys->E*contPhys->crossSection;
 		contPhys->ks=contPhys->G*contPhys->crossSection;
@@ -104,7 +102,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
 		else contPhys->isCohesive=false;
 		contPhys->dmgTau=dmgTau;
-		contPhys->dmgRateExp=plRateExp;
+		contPhys->dmgRateExp=dmgRateExp;
 		contPhys->plTau=plTau;
 		contPhys->plRateExp=plRateExp;
 
@@ -201,6 +199,9 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	assert(contGeom->hasShear);
 	//timingDeltas->checkpoint("setup");
 	epsN=contGeom->epsN(); epsT=contGeom->epsT();
+	if(isnan(epsN)){
+		LOG_ERROR("d0="<<contGeom->d0<<", d1,d2="<<contGeom->d1<<","<<contGeom->d2<<"; pos1,pos2="<<contGeom->pos1<<","<<contGeom->pos2);
+	}
 	NNAN(epsN); NNANV(epsT);
 	// already in SpheresContactGeometry:
 	// contGeom->relocateContactPoints(); // allow very large mutual rotations
@@ -345,78 +346,4 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	}
 }
 
-
-/*****************************************************************************************************
- ********************* static versions of damage evolution law and fracture energy integration *******
- *****************************************************************************************************/
-
-#if 0
-/*! Damage evolution law (static version: all parameters are explicitly passed).
- *
- * This function is zero for any eps<=epsCrackOnset (no damage before the material starts cracking),
- * therefore it will be linear-elastic. Between epsCrackOnset and espFracture (complete damage), it
- * is a non-decreasing function (an exp curve in this case, controlled by a single parameter expBending).
- * For any exp>=expFracture, return 1 (complete damage).
- *
- * @param kappaD maximum positive strain so far
- * @param expBending determines whether the function is bent up or down (and how much)
- * @param epsCrackOnsert strain at which material begins to behave non-linearly
- * @param epsFracture strain at which material is fully damaged
- */
-Real BrefcomLaw::damageEvolutionLaw_static(Real kappaD, Real expBending, Real epsCrackOnset, Real epsFracture){
-	//double g(double x, double c, double eps0, double eps1){
-	if(kappaD<epsCrackOnset)return 0;
-	if(kappaD>epsFracture)return 1;
-	return (1/(1-exp(-expBending)))*(1-exp(-expBending*(kappaD-epsCrackOnset)/(epsFracture-epsCrackOnset)));
-}
-/*! Compute fracture energy by numerically integrating damageEvolutionLaw_static, using unitary stiffness.
- *
- * The value returned must be multiplied by E to obtain real fracture energy: Fracture energy
- *    Gf=integral(E*(1-damage(eps))*eps)=E*integral(...) and we compute just the integral(...) part.
- * The integration uses trapezoidal rule. All parameters except steps have the same
- * meaning as for damageEvolutionLaw_static.
- *
- * @param steps Number of subdivision intervals for integration.
- */
-
-Real BrefcomLaw::unitFractureEnergy(double expBending, double epsCrackOnset, double epsFracture, int steps /*=50*/){
-	assert(steps>=10);
-	const double lo=0, hi=epsFracture;
-	double sum=0,stepSize=(hi-lo)/steps,x1,x2;
-	for(int i=0; i<steps; i++){
-		x1=lo+i*stepSize; x2=x1+stepSize;
-		sum+=((1-damageEvolutionLaw_static(x1,expBending,epsCrackOnset,epsFracture))*x1+(1-damageEvolutionLaw_static(x2,expBending,epsCrackOnset,epsFracture))*x2)*.5*stepSize; /* trapezoid rule */
-	}
-	return sum;
-}
-
-/*! Calibrate epsFracture so that the desired fracture energy is obtained, while other parameters are keps constant.
- *
- * The iteration relies on the fact that fractureEnergy is increasing for increasing epsFracture;
- * first we find some strain value eps at which fractureEnergy(eps,...)<Gf<fractureEnergy(2*eps,...),
- * then the interval is bisected until fractureEnergy matches Gf with desired precision.
- *
- * @param Gf the desired fracture energy.
- * @param relEpsilon relative (with regards to Gf) result precision.
- * @param maxIter number of iterations after which we throw exception, since for a reason we don't converge or converge too slowly.
- *
- * Other params have the same meaning as for damageEvolutionLaw_static.
- */
-Real BrefcomLaw::calibrateEpsFracture(double Gf, double E, double expBending, double epsCrackOnset, double epsFractureInit /*=1e-3*/, double relEpsilon /*=1e-3*/, int maxIter /*=1000*/){
-	double E1,E2,Emid,epsLo=epsFractureInit,epsHi=epsFractureInit*2,epsMid,iter=0,Gf_div_E=Gf/E;
-	bool goUp=unitFractureEnergy(expBending,epsCrackOnset,epsHi)<Gf_div_E; // do we double up or down when finding margins?
-	do { epsLo*=goUp?2:.5; epsHi=2*epsLo;
-		E1=unitFractureEnergy(expBending,epsCrackOnset,epsLo); E2=unitFractureEnergy(expBending,epsCrackOnset,epsHi);
-		if((iter++)>maxIter) throw runtime_error("Convergence problem when finding margin values for bisection.");
-	} while(!(E1<Gf_div_E && E2>=Gf_div_E));
-	// now E(epsLo)<Gf_div_E<=E(epsHi); go ahead using interval bisection
-	do {
-		epsMid=.5*(epsLo+epsHi); Emid=unitFractureEnergy(expBending,epsCrackOnset,epsMid);
-		if(Emid<Gf_div_E)epsLo=.5*(epsLo+epsHi);
-		else if(Emid>Gf_div_E)epsHi=.5*(epsLo+epsHi);
-		if((iter++)>maxIter) throw runtime_error("Convergence problem during bisection (relEpsilon too low?).");
-	} while (abs(Emid-Gf_div_E)>relEpsilon*Gf_div_E);
-	return epsMid;
-}
-#endif
 

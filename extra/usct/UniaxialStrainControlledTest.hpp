@@ -110,7 +110,7 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strain, avgStress;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile=""; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  absSpeed=strainRate=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; };
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile=""; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  strainRate=0; absSpeed=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; initAccelTime=-200;};
 		virtual ~UniaxialStrainer(){};
 		REGISTER_ATTRIBUTES(DeusExMachina,
 				(strainRate) 
