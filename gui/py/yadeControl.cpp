@@ -445,9 +445,19 @@ class pyOmega{
 				shared_ptr<MetaEngine> ee=dynamic_pointer_cast<MetaEngine>(e);
 				FOREACH(const shared_ptr<EngineUnit>& f, ee->functorArguments){
 					if(!f->label.empty()){
-						PyGILState_STATE gstate; gstate = PyGILState_Ensure();
-						PyRun_SimpleString(("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')").c_str());
-						PyGILState_Release(gstate);
+						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')").c_str()); PyGILState_Release(gstate);
+					}
+				}
+			}
+			if(isChildClassOf(e->getClassName(),"InteractionDispatchers")){
+				shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(e);
+				list<shared_ptr<EngineUnit> > eus;
+				FOREACH(const shared_ptr<EngineUnit>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<EngineUnit>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<EngineUnit>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<EngineUnit>& eu,eus){
+					if(!eu->label.empty()){
+						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')").c_str()); PyGILState_Release(gstate);
 					}
 				}
 			}
@@ -557,6 +567,16 @@ class pyOmega{
 					if(eu->label==label) return python::object(pyEngineUnit(eu));
 				}
 			}
+			shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(eng);
+			if(ee){
+				list<shared_ptr<EngineUnit> > eus;
+				FOREACH(const shared_ptr<EngineUnit>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<EngineUnit>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<EngineUnit>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<EngineUnit>& eu,eus){
+					if(eu->label==label) return python::object(pyEngineUnit(eu));
+				}
+			}
 		}
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
@@ -607,7 +627,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 
 BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
 	void generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
-	void load(){ ensureAcc(); char tmpnam_str [L_tmpnam]; tmpnam(tmpnam_str); string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); this->generate(xml); pyOmega().load(xml); }
+	void load(){ ensureAcc(); char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(result!=tmpnam_str) throw runtime_error(__FILE__ ": tmpnam(char*) failed!");  string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); this->generate(xml); pyOmega().load(xml); }
 BASIC_PY_PROXY_TAIL;
 
 class pySTLImporter : public STLImporter {

@@ -47,6 +47,11 @@ def reduceData(l):
 			for attr in ['virtPeriod','realPeriod','iterPeriod']:
 				if(plotDataCollector[attr]>0): plotDataCollector[attr]=2*plotDataCollector[attr]
 
+def splitData():
+	"Make all plots discontinuous at this point (adds nan's to all data fields)"
+	addData({})
+
+
 def reverseData():
 	for k in data: data[k].reverse()
 
@@ -84,6 +89,7 @@ def plot():
 		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
 		pylab.legend([_p[0] for _p in plots_p])
 		pylab.xlabel(p)
+		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
 	pylab.show()
 updatePeriod=0
 def periodicUpdate(period):
@@ -141,6 +147,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
 		fPlot.write("set xlabel '%s'\n"%p)
+		fPlot.write("set datafile missing 'nan'\n"%p)
 		if title: fPlot.write("set title '%s'\n"%title)
 		fPlot.write("plot "+",".join([" %s using %d:%d title '%s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
 		i+=1

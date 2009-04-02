@@ -37,29 +37,6 @@ class USCTGen: public FileGenerator {
 };
 REGISTER_SERIALIZABLE(USCTGen);
 
-#if 0
-/* This class applies force on transversal strain sensors from UniaxialStrainer.
- */
-class UniaxialStrainSensorPusher: public DeusExMachina{
-	public:
-		UniaxialStrainSensorPusher(){ Shop::Bex::initCache(); }
-		~UniaxialStrainSensorPusher(){}
-		vector<Vector3r> forces;
-		virtual void applyCondition(MetaBody* mb){
-			assert(subscribedBodies.size()==forces.size());
-			for(size_t i=0; i<subscribedBodies.size(); i++) Shop::Bex::force(subscribedBodies[i])+=forces[i];
-		}
-	void registerAttributes(){	
-		DeusExMachina::registerAttributes();
-		REGISTER_ATTRIBUTE(forces);
-	}
-	REGISTER_CLASS_NAME(UniaxialStrainSensorPusher);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
-	//DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(UniaxialStrainSensorPusher);
-#endif
-
 
 /*! Axial displacing two groups of bodies in the opposite direction with given strain rate.
  *
@@ -79,12 +56,14 @@ class UniaxialStrainer: public DeusExMachina {
 		void init();
 	public:
 		virtual bool isActivated(){return active;}
+		//! strain rate, starting at 0, linearly raising to strainRate
 		Real strainRate,currentStrainRate;
+		//! alternatively, absolute speed of boundary motion can be specified; this is effective only at the beginning and if strainRate is not set; changing absSpeed directly during simulation wil have no effect.
+		Real absSpeed;
 		//! strain at which we will pause simulation; inactive (nan) by default; must be reached from below (in absolute value)
 		Real stopStrain;
 		//! distance of reference bodies in the direction of axis before straining started
 		Real originalLength;
-		vector<Real> originalWidths;
 		//! invert the sense of straining (sharply, without transition) one this value of strain is reached. Not effective if 0.
 		Real limitStrain;
 		//! Flag whether the sense of straining has already been reversed
@@ -103,6 +82,8 @@ class UniaxialStrainer: public DeusExMachina {
 		bool active;
 		//! Number of iterations that will pass without straining activity after stopStrain has been reached (default: 0)
 		long idleIterations;
+		//! Time for strain reaching the requested value (linear interpolation). If negative, the time is dt*(-initAccelTime), where dt is  the timestep at the first iteration.
+		Real initAccelTime, initAccelTime_s /* value always in s, computed from initAccelTime */;
 
 		/** bodies on which straining will be applied (on the positive and negative side of axis) */
 		vector<body_id_t> posIds, negIds;
@@ -129,10 +110,12 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strain, avgStress;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile=""; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; };
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile=""; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  absSpeed=strainRate=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; };
 		virtual ~UniaxialStrainer(){};
 		REGISTER_ATTRIBUTES(DeusExMachina,
 				(strainRate) 
+				(absSpeed)
+				(initAccelTime)
 				(stopStrain) 
 				(active)
 				(idleIterations)
@@ -142,7 +125,6 @@ class UniaxialStrainer: public DeusExMachina {
 				(posIds) 
 				(negIds) 
 				(originalLength) 
-				(originalWidths) 
 				(limitStrain) 
 				(notYetReversed) 
 				(crossSectionArea) 

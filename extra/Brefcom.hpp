@@ -172,8 +172,6 @@ REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
 class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
 	public:
-	/*! Cohesion evolution law (it is 1-funcH here) */
-	Real funcH(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return 1-funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 	/*! Damage evolution law */
 	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
@@ -198,8 +196,6 @@ class BrefcomLaw: public InteractionSolver{
 		MetaBody* rootBody;
 		//! aplly calculated force on both particles (applied in the inverse sense on B)
 		void applyForce(const Vector3r&, const body_id_t&, const body_id_t&);
-		/*! Cohesion evolution law (it is 1-funcH here) */
-		Real funcH(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return 1-funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 		/*! Damage evolution law */
 		Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) const{ return ef2_Spheres_Brefcom_BrefcomLaw::funcG(kappaD,epsCrackOnset,epsFracture,neverDamage); }
 		

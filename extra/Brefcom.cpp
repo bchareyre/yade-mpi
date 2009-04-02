@@ -144,7 +144,9 @@ Real BrefcomContact::solveBeta(const Real c, const Real N){
 	const Real maxError=1e-12;
 	Real f, ret=0.;
 	for(int i=0; i<maxIter; i++){
-		cummBetaIter++;
+		#ifdef YADE_DEBUG
+			cummBetaIter++;
+		#endif
 		Real aux=c*exp(N*ret)+exp(ret);
 		f=log(aux);
 		if(fabs(f)<maxError) return ret;
@@ -166,12 +168,13 @@ Real BrefcomContact::computeDmgOverstress(Real dt){
 	Real deltaDmgStrain=(epsN*omega-dmgStrain)*exp(beta);
 	dmgStrain+=deltaDmgStrain;
 	LOG_DEBUG("deltaDmgStrain="<<deltaDmgStrain<<", viscous overstress "<<(epsN*omega-dmgStrain)*E);
+	/* σN=Kn(εN-εd); dmgOverstress=σN-(1-ω)*Kn*εN=…=Kn(ω*εN-εd) */
 	return (epsN*omega-dmgStrain)*E;
 }
 
 Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt){
 	if(sigmaTNorm<sigmaTYield) return 1.;
-	Real c=/* should this be sigmaT0?? */ sigmaTNorm*pow(plTau/(G*dt),plRateExp)*pow(sigmaTNorm-sigmaTYield,plRateExp-1.);
+	Real c=sigmaTNorm*pow(plTau/(G*dt),plRateExp)*pow(sigmaTNorm-sigmaTYield,plRateExp-1.);
 	Real beta=solveBeta(c,plRateExp);
 	return 1.-exp(beta)*(1-sigmaTYield/sigmaTNorm);
 }

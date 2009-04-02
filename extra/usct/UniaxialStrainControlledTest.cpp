@@ -48,6 +48,11 @@ void UniaxialStrainer::init(){
 	if(isnan(originalLength)) LOG_FATAL("Initial length is NaN!");
 	assert(originalLength>0 && !isnan(originalLength));
 
+	assert(!isnan(strainRate) || !isnan(absSpeed));
+	if(isnan(strainRate)){ strainRate=absSpeed/originalLength; }
+
+	initAccelTime_s=initAccelTime>=0 ? initAccelTime : Omega::instance().getTimeStep()*(-initAccelTime);
+
 	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;
 	 * this will not work if there are foreign bodies in the simulation,
 	 * in which case you must give the value yourself as engine attribute.
@@ -82,7 +87,10 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 	//nothing to do
 	if(posIds.size()==0 || negIds.size()==0) return;
 	// linearly increase strain to the desired value
-	if(abs(currentStrainRate)<abs(strainRate))currentStrainRate+=strainRate*.005; else currentStrainRate=strainRate;
+	if(abs(currentStrainRate)<abs(strainRate)){
+		Real t=Omega::instance().getSimulationTime();
+		currentStrainRate=(t/initAccelTime_s)*strainRate;
+	} else currentStrainRate=strainRate;
 	// how much do we move (in total, symmetry handled below)
 	Real dAX=currentStrainRate*originalLength*Omega::instance().getTimeStep();
 	if(!isnan(stopStrain)){
@@ -114,12 +122,6 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 
 	if(Omega::instance().getCurrentIteration()%10==0) {
 		computeAxialForce(rootBody);
-		#if 0
-			vector<Real> widths;
-			pushTransStrainSensors(rootBody,widths);
-			assert(widths.size()==originalWidths.size());
-			for(size_t i=0; i<widths.size(); i++) avgTransStrain+=(widths[i]/originalWidths[i]-1); avgTransStrain/=widths.size();
-		#endif
 		avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
 		if(!recordFile.empty() && recStream.good()) recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<endl; // <<" "<<avgTransStrain<<endl;
 	}
@@ -284,109 +286,4 @@ void USCTGen::createEngines(){
 }
 
 
-
-
-
-
-
-
-/******************* DEPRECATED *********************/
-
-
-
-
-
-#if 0
-/* Initialize UniaxialStrainSensorPusher so that subscribed bodies and forces are consistent.
- * Apply small forces on those bodies, cap their velocity and reset orientation.
- * Return vector of widths in the direction of sensor pairs.
- */
-void UniaxialStrainer::pushTransStrainSensors(MetaBody* rb, vector<Real>& widths){
-	if(transStrainSensors.size()==0) return;
-	if(!sensorsPusher){
-		int count=0;
-		FOREACH(const shared_ptr<Engine>& e,rb->engines){
-			if(e->getClassName()=="UniaxialStrainSensorPusher"){ count++; sensorsPusher=static_pointer_cast<UniaxialStrainSensorPusher>(e); }
-		}
-		if(count>1) LOG_ERROR("Multiple UniaxialStrainSensorPusher's found, using the last one for transversal strain sensors!");
-		if(count<1) { LOG_ERROR("No UniaxialStrainSensorPusher found, transversal strain sensors will not work!"); return; }
-		sensorsPusher->subscribedBodies.clear();
-		FOREACH(body_id_t id, transStrainSensors) sensorsPusher->subscribedBodies.push_back(id);
-		sensorsPusher->forces.resize(transStrainSensors.size());
-		//TRVAR3(transStrainSensors.size(),sensorsPusher->subscribedBodies.size(),sensorsPusher->forces.size());
-	}
-	assert((sensorsPusher->subscribedBodies.size()==transStrainSensors.size()) && (sensorsPusher->subscribedBodies.size()==sensorsPusher->forces.size()));
-	Real forceMagnitude=.001*abs(avgStress)*transStrainSensorArea;
-	Real maxVelocity=2*abs(strainRate)*originalLength; // move at max 5 × faster than strained ends
-	/* reset orientation to identity and limit velocity */
-	FOREACH(body_id_t id, transStrainSensors){
-		const shared_ptr<Body>& b=Body::byId(id); const shared_ptr<ParticleParameters>& pp=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters);
-		pp->se3.orientation=Quaternionr::IDENTITY;
-		if(pp->velocity.SquaredLength()>pow(maxVelocity,2)){ pp->velocity.Normalize(); pp->velocity*=maxVelocity; }
-	}
-	/* calcuate and store force that will be applied in UniaxialStrainSensorPusher */
-	widths.clear();
-	for(int i=1; i<=(transStrainSensors.size()==2?1:2); i++){
-		int transAxis=(axis+i)%3, perpTransAxis=(i==1?(axis+2)%3:/* i==2 */ (axis+1)%3);
-		Vector3r F; F[axis]=0; F[perpTransAxis]=0; F[transAxis]=forceMagnitude;
-		body_id_t n1=2*(i-1), n2=2*(i-1)+1;
-		sensorsPusher->forces[n1]=+F; sensorsPusher->forces[n2]=-F;
-		const shared_ptr<Body>& lo=Body::byId(transStrainSensors[n1]), hi=Body::byId(transStrainSensors[n2]);
-		Real wd=hi->physicalParameters->se3.position[transAxis]-lo->physicalParameters->se3.position[transAxis]-static_pointer_cast<Box>(hi->geometricalModel)->extents[transAxis]-static_pointer_cast<Box>(lo->geometricalModel)->extents[transAxis];
-		// negative width? Apply no more force, reset velocity to 0
-		if(wd<=0) {
-			/* doesn't work... Why? */
-			//LOG_ERROR("Width is negative, resetting forces and velocities");
-			sensorsPusher->forces[n1]=sensorsPusher->forces[n2]=Vector3r::ZERO;
-			YADE_PTR_CAST<ParticleParameters>(lo->physicalParameters)->velocity=Vector3r::ZERO;
-			YADE_PTR_CAST<ParticleParameters>(hi->physicalParameters)->velocity=Vector3r::ZERO;
-			wd=0;
-		}
-		widths.push_back(wd);
-	}
-}
-
-void UniaxialStrainer::setupTransStrainSensors(){
-	assert(transStrainSensors.size()==0 || transStrainSensors.size()==2 || transStrainSensors.size()==4);
-	if(transStrainSensors.size()==0) return;
-	assert(Omega::instance().getRootBody()->boundingVolume);
-	shared_ptr<AABB> rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getRootBody()->boundingVolume);
-	assert(rbAABB);
-	TRVAR2(rbAABB->center,rbAABB->halfSize);
-	transStrainSensorArea=0;
-	int numCouples=(transStrainSensors.size()==2?1:2);
-	originalWidths.clear();
-	for(int i=1; i<=numCouples; i++){
-		int transAxis=(axis+i)%3, perpTransAxis=(i==1?(axis+2)%3:/* i==2 */ (axis+1)%3);
-		TRVAR3(axis,transAxis,perpTransAxis);
-		originalWidths.push_back(2*rbAABB->halfSize[transAxis]);
-		body_id_t sensId[]={transStrainSensors[2*(i-1)],transStrainSensors[2*(i-1)+1]};
-		// do the same on either side, only positioning will be different
-		FOREACH(body_id_t id, sensId){
-			shared_ptr<Body> b=Body::byId(id);
-			shared_ptr<RigidBodyParameters> rbp=dynamic_pointer_cast<RigidBodyParameters>(b->physicalParameters);
-			shared_ptr<Box> box=dynamic_pointer_cast<Box>(b->geometricalModel);
-			shared_ptr<InteractingBox> iBox=dynamic_pointer_cast<InteractingBox>(b->interactingGeometry);
-			assert(rbp && box && iBox);
-			LOG_DEBUG("Setting up transversal strain sensor, #"<<id);
-			// change box size: axis,transAxis: length_specimen_along_axis)/10; perpTransAxis: width_specimen*1.5
-			Vector3r ext;
-			ext[axis]=ext[transAxis]=.1*rbAABB->halfSize[axis]; ext[perpTransAxis]=1.5*rbAABB->halfSize[perpTransAxis];
-			box->extents=iBox->extents=ext;
-			// reset orientation
-			rbp->se3.orientation=Quaternionr::IDENTITY;
-			// set isDynamic==True, GeometricalMode::wire=true;
-			b->isDynamic=true; box->wire=true;
-			// set position so that it touches AABB of rootBody
-			int sign=(id==sensId[0]?-1:1); // first id goes underneath (pushed in the dir of +transAxis), the other one goes up
-			rbp->se3.position[axis]=rbAABB->center[axis];
-			rbp->se3.position[perpTransAxis]=rbAABB->center[perpTransAxis];
-			rbp->se3.position[transAxis]=rbAABB->center[transAxis]+sign*rbAABB->halfSize[transAxis]+sign*iBox->extents[transAxis];
-			TRVAR2(box->extents,rbp->se3.position);
-			transStrainSensorArea+=(box->extents[axis]*rbAABB->halfSize[perpTransAxis]);
-		}
-	}
-	transStrainSensorArea/=transStrainSensors.size();
-}
-#endif
 
