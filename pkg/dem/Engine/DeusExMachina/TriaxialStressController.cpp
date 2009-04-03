@@ -52,6 +52,11 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	
 	//stiffness = Vector3r::ZERO;
 	max_vel = 0.001;
+	max_vel1 = 0.001;
+	max_vel2 = 0.001;
+	max_vel3 = 0.001;
+
+
 	maxMultiplier = 1.001;
 	finalMaxMultiplier = 1.00001;
 	internalCompaction = true;
@@ -77,6 +82,10 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	//UnbalancedForce = 0;
 	
 	sigma_iso = 0;
+	sigma1 = 0;
+	sigma2 = 0;
+	sigma3 = 0;
+	isTriaxialCompression = true;
 }
 
 TriaxialStressController::~TriaxialStressController()
@@ -118,9 +127,16 @@ void TriaxialStressController::registerAttributes()
 	REGISTER_ATTRIBUTE(depth0);
 	
 	REGISTER_ATTRIBUTE(sigma_iso);
+	REGISTER_ATTRIBUTE(sigma1);
+	REGISTER_ATTRIBUTE(sigma2);
+	REGISTER_ATTRIBUTE(sigma3);
+	REGISTER_ATTRIBUTE(isTriaxialCompression);
 	REGISTER_ATTRIBUTE(maxMultiplier);
 	REGISTER_ATTRIBUTE(finalMaxMultiplier);
 	REGISTER_ATTRIBUTE(max_vel);
+	REGISTER_ATTRIBUTE(max_vel1);
+	REGISTER_ATTRIBUTE(max_vel2);
+	REGISTER_ATTRIBUTE(max_vel3);
 	REGISTER_ATTRIBUTE(previousStress);
 	REGISTER_ATTRIBUTE(previousMultiplier);
 	REGISTER_ATTRIBUTE(internalCompaction);
@@ -164,10 +180,11 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 
 void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel)
 {
-	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce);
+	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce); 
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
 	const bool log=false;
 	if(log) LOG_DEBUG("wall="<<wall<<" actualForce="<<getForce(ncb,wall_id[wall])<<", resultantForce="<<resultantForce<<", translation="<<translation);
+
 	if (translation!=0)
 	{
 	//cerr << "stiffness = " << stiffness[wall];
@@ -195,8 +212,7 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	//cerr << "TriaxialStressController::applyCondition" << endl;
 
 	// sync thread storage of BexContainer
-	ncb->bex.sync();
-	
+	ncb->bex.sync(); 
 	
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
@@ -232,7 +248,19 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 			}
 		}
 		
-		firstRun = false;	
+		// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
+		if (isTriaxialCompression){
+			sigma1 = sigma_iso;
+			sigma2 = sigma_iso;
+			sigma3 = sigma_iso;
+
+			max_vel1 = max_vel;
+			max_vel2 = max_vel;
+			max_vel3 = max_vel;
+		}
+		
+		firstRun = false;
+	
 	}
 	porosity = ( boxVolume - spheresVolume ) /boxVolume;
 
@@ -256,17 +284,26 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 		computeStressStrain(ncb);
 
 	if (!internalCompaction) {
-		Vector3r wallForce (0, sigma_iso*width*depth, 0);
-		if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
-		if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
+		//Vector3r wallForce (0, sigma_iso*width*depth, 0);
+		Vector3r wallForce (0, sigma2*width*depth, 0);
+		//if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
+		//if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
+		if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel2);
+		if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel2);
 		
-		wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
-		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
-		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
+		//wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
+		wallForce = Vector3r(sigma1*height*depth, 0, 0);
+		//if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
+		//if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
+		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel1*width/height);
+		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel1*width/height);
 		
-		wallForce = Vector3r(0, 0, sigma_iso*height*width);
-		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
-		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
+		//wallForce = Vector3r(0, 0, sigma_iso*height*width);
+		wallForce = Vector3r(0, 0, sigma3*height*width);
+		//if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
+		//if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
+		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel3*depth/height);
+		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel3*depth/height);
 	}
 	else //if internal compaction
 	{
@@ -316,13 +353,13 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	Real invXSurface = 1.f/(height*depth);
 	Real invYSurface = 1.f/(width*depth);
 	Real invZSurface = 1.f/(width*height);
-	
-	force[wall_bottom]=getForce(ncb,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface;
-	force[wall_top]=   getForce(ncb,wall_id[wall_top]);    stress[wall_top]=   force[wall_top]   *invYSurface;
-	force[wall_left]=  getForce(ncb,wall_id[wall_left]);   stress[wall_left]=  force[wall_left]  *invXSurface;
-	force[wall_right]= getForce(ncb,wall_id[wall_right]);  stress[wall_right]= force[wall_right] *invXSurface;
-	force[wall_front]= getForce(ncb,wall_id[wall_front]);  stress[wall_front]= force[wall_front] *invZSurface;
-	force[wall_back]=  getForce(ncb,wall_id[wall_back]);   stress[wall_back]=  force[wall_back]  *invZSurface;
+
+ 	force[wall_bottom]=getForce(ncb,wall_id[wall_bottom]); stress[wall_bottom]=force[wall_bottom]*invYSurface;
+	force[wall_top]=   getForce(ncb,wall_id[wall_top]);    stress[wall_top]=force[wall_top]*invYSurface;
+	force[wall_left]=  getForce(ncb,wall_id[wall_left]);   stress[wall_left]=force[wall_left]*invXSurface;
+	force[wall_right]= getForce(ncb,wall_id[wall_right]);  stress[wall_right]= force[wall_right]*invXSurface;
+	force[wall_front]= getForce(ncb,wall_id[wall_front]);  stress[wall_front]=force[wall_front]*invZSurface;
+        force[wall_back]=  getForce(ncb,wall_id[wall_back]);   stress[wall_back]= force[wall_back]*invZSurface;
 
 
  	//cerr << "stresses : " <<  stress[wall_bottom] << " " <<
@@ -424,6 +461,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 		for(  ; bi!=biEnd ; ++bi ) {
 			if ((*bi)->isDynamic) {
 				MaxUnbalanced = std::max(getForce(ncb,(*bi)->getId()).Length(),MaxUnbalanced);
+
 			}
 		}
 		if (MeanForce != 0) MaxUnbalanced = MaxUnbalanced/MeanForce;

@@ -12,7 +12,6 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
-
 #define TR {if (Omega::instance().getCurrentIteration()%100==0) TRACE; }
 class MetaBody;
 class PhysicalParameters;
@@ -75,7 +74,17 @@ class TriaxialStressController : public DeusExMachina
 		Real height, width, depth, height0, width0, depth0;
 		Real thickness;
 		Real sigma_iso;
+		//! The three following parameters allow to perform an external stress control with different stress values for the three space directions.
+		Real sigma1;
+		Real sigma2;
+		Real sigma3;
+		//!"if (isTriaxialCompression)" (true by default) sigma_iso is attributed to sigma1, 2 and 3
+		bool isTriaxialCompression;
 		Real max_vel;
+		//! The three following parameters allow to perform an external stress control with different stress values for the three space directions.
+		Real max_vel1;
+		Real max_vel2;
+		Real max_vel3;
 		Real position_top;
 		Real position_bottom;
 		Real position_right;
@@ -93,7 +102,7 @@ class TriaxialStressController : public DeusExMachina
 		void updateStiffness(MetaBody* ncb);
 		void computeStressStrain(MetaBody* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-    	Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
+    		Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
 
 		DECLARE_LOGGER;
 		

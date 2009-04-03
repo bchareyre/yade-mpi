@@ -327,6 +327,16 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'ElasticContactInteraction',
 			'TriaxialStressController',
 			'Shop']),
+			
+	env.SharedLibrary('ThreeDTriaxialEngine',
+		['Engine/DeusExMachina/ThreeDTriaxialEngine.cpp'],
+		LIBS=env['LIBS']+[
+			'yade-base',
+			#'Force',
+			'ParticleParameters',
+			'ElasticContactInteraction',
+			'TriaxialStressController',
+			'Shop']),
 
 	env.SharedLibrary('GLDrawInteractingMyTetrahedron',
 		['RenderingEngine/GLDrawInteractingMyTetrahedron/GLDrawInteractingMyTetrahedron.cpp'],
