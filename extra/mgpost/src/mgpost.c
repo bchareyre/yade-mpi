@@ -72,7 +72,7 @@ int main(int argc, char **argv)
   }
   
   /* couleurs de groupe */
-  for (c=0;c<6;++c)
+  for (c=0;c<nbcolgrpMaxi;++c)
     strcpy(colorName[c],"Nothing");
 
   strcpy(num_file_format,"%03d");

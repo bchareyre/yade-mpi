@@ -116,7 +116,12 @@ void affichage()
     glTranslatef (-xvec, zvec, -yvec);
     glCallList(repere);
   }
-  
+
+  if (isBiP)
+  {
+	disp_CellBiP();
+  }
+
   if (afftime)
     disp_time();
   

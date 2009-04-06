@@ -28,6 +28,7 @@ void disp_grad_color ();
 void disp_func_name ();
 void disp_points ();
 void disp_boundaries ();
+void disp_CellBiP();
 void disp_obstacles ();
 void disp_shapes ();
 void disp_discrim ();

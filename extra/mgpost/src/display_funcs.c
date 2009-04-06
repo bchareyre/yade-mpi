@@ -44,6 +44,11 @@ void disp_points ()
 
 void disp_boundaries ()
 {
+  if (isBiP)
+  {
+	disp_CellBiP();
+	return;
+  }
   GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
   char txt[128];
   int ii;
@@ -97,6 +102,73 @@ void disp_boundaries ()
   
   glEnable (GL_LIGHTING);
 }
+
+void disp_CellBiP()
+{
+  GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
+  double extendx,extendy;
+  /*unsigned int i;*/
+  
+  glLoadIdentity ();
+  gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+  glRotatef (phi, 1.0f, 0.0f, 0.0f);
+  glRotatef (theta, 0.0f, 0.0f, 1.0f);
+  
+  glLineWidth (1.0f);
+  
+  glDisable (GL_LIGHTING);
+  glColor3f (fg_color.r, fg_color.v, fg_color.b);
+
+  extendx = 0.5 * (hxx+hxy);
+  extendy = 0.5 * (hyx+hyy);
+  
+  glBegin (GL_LINE_LOOP);
+  glVertex3f (-extendx * adim, 0.0f, -extendy * adim);
+  glVertex3f (-extendx * adim, 0.0f, extendy * adim);
+  glVertex3f (extendx * adim, 0.0f, extendy * adim);
+  glVertex3f (extendx * adim, 0.0f, -extendy * adim);
+  glVertex3f (-extendx * adim, 0.0f, -extendy * adim);
+  glEnd();
+ 
+  glEnable (GL_LIGHTING);
+/*
+  
+  for (i = 0; i < nbel; i++)	
+	{ 
+	  glLoadIdentity ();
+	  gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+	  glRotatef (phi, 1.0f, 0.0f, 0.0f);
+	  glRotatef (theta, 0.0f, 0.0f, 1.0f);
+	  glTranslatef ((x[i][state]+hxx) * adim, 0.0f, (y[i][state]+hxy) * adim);
+	  glColor4f(0.5f,0.5f,0.5f,0.1f);
+	  mgbodyselect_plein (i, state);
+	  
+	  glLoadIdentity ();
+	  gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+	  glRotatef (phi, 1.0f, 0.0f, 0.0f);
+	  glRotatef (theta, 0.0f, 0.0f, 1.0f);
+	  glTranslatef ((x[i][state]-hxx) * adim, 0.0f, (y[i][state]-hxy) * adim);
+	  glColor4f(0.5f,0.5f,0.5f,0.1f);
+	  mgbodyselect_plein (i, state);
+	  glLoadIdentity ();
+	  
+	  gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+	  glRotatef (phi, 1.0f, 0.0f, 0.0f);
+	  glRotatef (theta, 0.0f, 0.0f, 1.0f);
+	  glTranslatef ((x[i][state]+hyx) * adim, 0.0f, (y[i][state]+hyy) * adim);
+	  mgbodyselect_plein (i, state);
+	  glLoadIdentity ();
+	  
+	  gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
+	  glRotatef (phi, 1.0f, 0.0f, 0.0f);
+	  glRotatef (theta, 0.0f, 0.0f, 1.0f);
+	  glTranslatef ((x[i][state]-hyx) * adim, 0.0f, (y[i][state]-hyy) * adim);
+	  mgbodyselect_plein (i, state);
+	  
+	}
+	*/
+}
+
 
 void disp_outline () /* Only for spheres */
 {
@@ -524,7 +596,7 @@ void disp_colors ()
       {
       coul = color[i];
       if (!colIsShown[coul]) continue;
-      else if (coul < 0 || coul > 5) continue;
+	  else if (coul < 0 || coul > nbcolgrpMaxi-1 /*5*/) continue;
       glColor4f (rcolor[coul], gcolor[coul], bcolor[coul], alpha_color);
 
       glLoadIdentity ();
@@ -4725,7 +4797,7 @@ void plot_granulo()
   
   nd=0;
   for (i = 0; i < nbel; ++i)
-    if (bdyty[i]==MGP_SPHER)  
+	if (bdyty[i]==MGP_SPHER && radius[i][state]>0.0)  
       {
       d[nd]=2.*radius[i][state];
       passing[nd]=nd;
@@ -4737,7 +4809,7 @@ void plot_granulo()
   graph_position((int)((double)W / 6.0), (int)(5.0 * (double)W / 6.0),
                  (int)((double)H / 6.0), (int)(5.0 * (double)H / 6.0) );
   graph_open();
-  graph_trace_buffer (d, passing, nd, 1, 0);
+  graph_trace_buffer (d, passing, nd, 0, 0);
   graph_close();
   
   free (d);

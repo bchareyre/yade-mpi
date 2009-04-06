@@ -155,6 +155,7 @@ if(with_layers)
 
   nbneighbors = AllocInt (nbbodies, nbtimes);
   neighbor = AllocInt (nbbodies * nbcontacts, nbtimes);
+  //nghty = (unsigned char *) calloc ((size_t) (nbbodies*nbcontacts), sizeof (unsigned char));
   Crot = AllocDouble (nbbodies * nbcontacts, nbtimes);
   Vliq = AllocDouble (nbbodies * nbcontacts, nbtimes);
 

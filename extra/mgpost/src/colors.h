@@ -178,12 +178,13 @@ float valc_rouge = 1.0, valc_bleu = -1.0;
 
 /* Coloration de groupe de grains */
 MGuchar nbcolgrp=0;
-MGuchar colIsShown[6] = {0,0,0,0,0,0};
-char colorName[6][30];
+MGuchar nbcolgrpMaxi = 10;
+MGuchar colIsShown[10] = {0,0,0,0,0,0,0,0,0,0};
+char colorName[10][30];
 
-float rcolor[6]={0., 0., 1., 1., 0., 1.};
-float gcolor[6]={0., 1., 0., 1., 1., 0.};
-float bcolor[6]={1., 0., 0., 0., 1., 1.};
+float rcolor[10]={0., 0., 1., 1., 0., 1., 0.67 , 1.,  0.53, 0.8};
+float gcolor[10]={0., 1., 0., 1., 1., 0., 0.41 , 0.62, 0.5 , 0.8};
+float bcolor[10]={1., 0., 0., 0., 1., 1., 0.95, 0.1,  0.1 , 0.8};
 
 
 #endif

@@ -261,6 +261,7 @@ MGuchar        *dataqty;
 double         *datas;
 
 MGuchar  *bdyty;
+MGuchar  *nghty;
 
 #define MGP_DISKx 0
 #define MGP_SPHER 1
@@ -269,6 +270,7 @@ MGuchar  *bdyty;
 #define MGP_JONCx 4
 #define MGP_POLYE 5
 #define MGP_PICKT 10
+#define MGP_CELLBiP 20
 #define MGP_MURX0 100
 #define MGP_MURX1 101
 #define MGP_MURY0 102
@@ -277,6 +279,10 @@ MGuchar  *bdyty;
 #define MGP_MURZ1 105
 #define MGP_MBR2D 200
 #define MGP_CYLYx 250
+
+MGuchar isBiP = MG_FALSE;
+double BiP_bandwidth = 0.0;
+double hxx,hxy,hyx,hyy;
 
 MGuchar  *bdyclass;
 

@@ -390,7 +390,14 @@ charger_HISfile()
 		
                     i++;
                     nbel++;
-                  }	
+                  }
+				  
+				  if (!strcmp((const char *) token,"CellBiP"))
+				  {
+					fscanf(his_file, "%lf %lf %lf %lf",
+							&hxx,&hxy,&hyx,&hyy);		
+                    isBiP = MG_TRUE;
+				  }	
 		}
 	}
 
@@ -406,11 +413,23 @@ charger_HISfile()
                   if (!strcmp((const char *) token,"dkdk")) 
                   {
                     fscanf(his_file, "%d %d",&ip,&jp);
-                    nbneighbors[ip-dec][0] += 1; 
+                    nbneighbors[ip-dec][0] += 1;
+					//bghty[nbint] == 0;
                     neighbor[nbint][0] = jp-dec+1;
                     fscanf(his_file, "%*f %*f %lf %lf %*f",&Fn[nbint][0],&Ft[nbint][0]);
                     nbint++;
-                  }	
+                  }
+				  /*
+				  if (!strcmp((const char *) token,"dkdkP"))
+				  {
+					fscanf(his_file, "%d %d",&ip,&jp);
+					nbneighbors[ip-dec][0] += 1;
+					//bghty[nbint] == 1;
+					neighbor[nbint][0] = jp-dec+1;
+					fscanf(his_file, "%*f %*f %lf %lf %*f",&Fn[nbint][0],&Ft[nbint][0]);
+					nbint++;
+				  }
+				  */
 		}	
 	}	
         
@@ -481,7 +500,7 @@ charger_geometrie()
       }
       
       if (!strcmp((const char *)node->name, "newcolor")) {
-        if (nbcolgrp < 6) nbcolgrp++;
+		if (nbcolgrp < nbcolgrpMaxi) nbcolgrp++;
         else break;
         strcpy(colorName[nbcolgrp-1],(const char *) xmlGetProp(node, (const xmlChar *) "name"));
         colIsShown[nbcolgrp-1] = MG_TRUE;
