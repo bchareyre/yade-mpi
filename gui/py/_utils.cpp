@@ -176,8 +176,7 @@ python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Rea
     return d;
 }
 
-
-/* Sum moments acting on bodies within mask.
+/*!Sum moments acting on given bodies
  *
  * @param mask is Body::groupMask that must match for a body to be taken in account.
  * @param axis is the direction of axis with respect to which the moment is calculated.
@@ -187,13 +186,13 @@ python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Rea
  * is position relative to axisPt; moment from moment is m; such moment per body is
  * projected onto axis.
  */
-Real sumBexTorques(int mask, python::tuple _axis, python::tuple _axisPt){
+Real sumBexTorques(python::tuple ids, python::tuple _axis, python::tuple _axisPt){
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	rb->bex.sync();
 	Real ret=0;
-	Vector3r axis=tuple2vec(_axis), axisPt=tuple2vec(_axisPt);
-	FOREACH(const shared_ptr<Body> b, *rb->bodies){
-		if(!b->maskOk(mask)) continue;
+	Vector3r axis=tuple2vec(_axis), axisPt=tuple2vec(_axisPt); size_t len=python::len(ids);
+	for(size_t i=0; i<len; i++){
+		const Body* b=(*rb->bodies)[python::extract<int>(ids[i])].get();
 		const Vector3r& m=rb->bex.getTorque(b->getId());
 		const Vector3r& f=rb->bex.getForce(b->getId());
 		Vector3r r=b->physicalParameters->se3.position-axisPt;
@@ -207,14 +206,14 @@ Real sumBexTorques(int mask, python::tuple _axis, python::tuple _axisPt){
  * @param direction direction in which forces are summed
  *
  */
-Real sumBexForces(int mask, python::tuple _direction){
+Real sumBexForces(python::tuple ids, python::tuple _direction){
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	rb->bex.sync();
 	Real ret=0;
-	Vector3r direction=tuple2vec(_direction);
-	FOREACH(const shared_ptr<Body> b, *rb->bodies){
-		if(!b->maskOk(mask)) continue;
-		const Vector3r& f=rb->bex.getForce(b->getId());
+	Vector3r direction=tuple2vec(_direction); size_t len=python::len(ids);
+	for(size_t i=0; i<len; i++){
+		body_id_t id=python::extract<int>(ids[i]);
+		const Vector3r& f=rb->bex.getForce(id);
 		ret+=direction.Dot(f);
 	}
 	return ret;
