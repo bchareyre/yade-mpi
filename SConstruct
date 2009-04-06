@@ -43,6 +43,8 @@ if len(ver)>2: sconsVersion+=float(ver[2])
 ##########################################################################################
 #print sconsVersion
 if sconsVersion<9806.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
+	# sconsVersion<10200.0 
+	# tgzParams=("http://dfn.dl.sourceforge.net/sourceforge/scons/scons-local-1.2.0.d20090223.tar.gz","/scons-local-1.2.0.d20090223")
 	tgzParams=("http://heanet.dl.sourceforge.net/sourceforge/scons/scons-local-1.0.0.tar.gz","/scons-local-1.0.0")
 	newPrefix="./scons-local";
 	newUrl,newDir=tgzParams[0],newPrefix+"/"+tgzParams[1]
@@ -251,7 +253,7 @@ def CheckPython(context):
 		try:
 			#FIXME: once caught, exception disappears along with the actual message of what happened...
 			import distutils.sysconfig as ds
-			context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split())
+			context.env.Append(CPPPATH=ds.get_python_inc(),LIBS=ds.get_config_var('LIBS').split() if ds.get_config_var('LIBS') else None)
 			context.env.Append(LINKFLAGS=ds.get_config_var('LINKFORSHARED').split()+ds.get_config_var('BLDLIBRARY').split())
 			ret=context.TryLink('#include<Python.h>\nint main(int argc, char **argv){Py_Initialize(); Py_Finalize();}\n','.cpp')
 			if not ret: raise RuntimeError
