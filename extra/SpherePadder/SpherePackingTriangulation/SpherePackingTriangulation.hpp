@@ -83,6 +83,13 @@ class SpherePackingTriangulation
   public:
   
     SpherePackingTriangulation();
+	bool has_no_cells() { return (tri.number_of_finite_cells() == 0); }
+	void clear()
+	{
+	tri.clear();
+	volumeAreComputed = false;
+	id_vh_link.clear();
+	}
  
     bool insert_node(Real x, Real y, Real z, unsigned int id, bool isVirtual = false);
   
@@ -94,7 +101,28 @@ class SpherePackingTriangulation
   
     float current_tetrahedron_get_volume();
     void  current_tetrahedron_get_nodes(unsigned int & id1, unsigned int & id2, unsigned int & id3, unsigned int & id4);
-    
+    void  current_tetrahedron_get_circumcenter(Real R1,Real R2,Real R3,Real R4,Real& x, Real& y, Real& z);
+
+// TODO
+/*
+void  current_tetrahedron_get_weighted_circumcenter(R1,R2,R3,R4,&x,&y,&z)
+{
+    const CGAL_Sphere& S0 = cell->vertex(0)->point();
+    const CGAL_Sphere& S1 = cell->vertex(1)->point();
+    const CGAL_Sphere& S2 = cell->vertex(2)->point();
+    const CGAL_Sphere& S3 = cell->vertex(3)->point();
+    Real x,y,z;
+
+    CGAL::weighted_circumcenterC3 (
+                                   S0.point().x(), S0.point().y(), S0.point().z(), S0.weight(),
+                                   S1.point().x(), S1.point().y(), S1.point().z(), S1.weight(),
+                                   S2.point().x(), S2.point().y(), S2.point().z(), S2.weight(),
+                                   S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
+                                   x, y, z
+                                  );
+}
+*/
+
 };
 
 

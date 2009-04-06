@@ -45,7 +45,7 @@ void CellPartition::init(TetraMesh & mesh, double security_factor)
   ksize = (unsigned int)((zmax - zmin) / (security_factor * mesh.mean_segment_length));
   if (ksize < 1) ksize = 1;
   
-  //cerr << "nb cells: " << isize << ", " << jsize << ", " << ksize << endl;
+  cout << "nb cells: " << isize << ", " << jsize << ", " << ksize << endl;
   
   vector<unsigned int> kvec;
   for (unsigned int k = 0 ; k < ksize ; ++k) kvec.push_back(0);
@@ -93,7 +93,11 @@ void CellPartition::add(unsigned int n, double x, double y, double z)
  
   cell[ cellId[current_i][current_j][current_k] ].sphereId.push_back(n);
 }
-   
+
+void CellPartition::add_in_cell(unsigned int n, unsigned int i, unsigned int j, unsigned int k)
+{
+  cell[ cellId[i][j][k] ].sphereId.push_back(n);
+}
 
 void CellPartition::locateCellOf(double x, double y, double z)
 {

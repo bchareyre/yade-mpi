@@ -10,8 +10,6 @@
 
 #include "SpherePadder.hpp"
 
-#define DEBUG
-
 unsigned int           mesh_format;
 vector <unsigned int>  output_format;
 char                   mesh_file_name[100];
@@ -20,7 +18,7 @@ void resume();
 
 int main()
 { 
-#ifdef DEBUG
+#if 1
  
   TetraMesh * mesh = new TetraMesh();
   //mesh->read_gmsh("meshes/cube1194.msh");
@@ -28,14 +26,19 @@ int main()
   //mesh->write_surface_MGP ("cube.mgp");
 
   SpherePadder * padder = new SpherePadder();
-  padder->plugTetraMesh(mesh);
-  //padder->add_spherical_probe(0.7);
-        
-  padder->pad_5();
-  padder->insert_sphere(0.5,0.5,0.5,0.2);
-  padder->place_virtual_spheres();
-  padder->densify();
   
+  padder->plugTetraMesh(mesh);
+  padder->setRadiusRatio(4.0);
+  padder->setMaxOverlapRate(1.0e-4);
+  padder->setVirtualRadiusFactor(100.0);
+  
+  padder->pad_5();
+  padder->place_virtual_spheres();
+  padder->insert_sphere(0.5,0.5,0.5,0.4);
+  padder->densify();
+  padder->detect_overlap ();
+
+  //padder->save_tri_mgpost("triangulation.mgp");
   padder->save_mgpost("mgp.out.001");
   padder->save_Rxyz("spheres.Rxyz");
   return 0;  

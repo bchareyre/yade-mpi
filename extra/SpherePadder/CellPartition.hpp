@@ -39,6 +39,7 @@ class CellPartition
     CellPartition();
     void init(TetraMesh & mesh, double security_factor = 1.0);
     void add(unsigned int n, double x, double y, double z);
+	void add_in_cell(unsigned int n, unsigned int i, unsigned int j, unsigned int k);
     void locateCellOf(double x, double y, double z);
     
     Cell& get_cell   (unsigned int i,unsigned int j,unsigned int k) { return cell[ cellId[i][j][k] ]; }
