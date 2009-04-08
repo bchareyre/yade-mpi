@@ -100,12 +100,12 @@ class PersistentSAPCollider : public Collider
 		bool haveDistantTransient;
 
 		//! minimum number of bodies to run updateIds in parallel secions; if 0 (default for now), never run in parallel
-		long ompBodiesMin;
+		//long ompBodiesMin;
 
 		void registerAttributes(){
 			Collider::registerAttributes();
 			REGISTER_ATTRIBUTE(haveDistantTransient);
-			REGISTER_ATTRIBUTE(ompBodiesMin);
+			//REGISTER_ATTRIBUTE(ompBodiesMin);
 		}
 
 	DECLARE_LOGGER;

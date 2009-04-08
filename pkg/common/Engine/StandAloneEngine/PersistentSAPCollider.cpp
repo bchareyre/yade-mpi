@@ -19,7 +19,7 @@ CREATE_LOGGER(PersistentSAPCollider);
 PersistentSAPCollider::PersistentSAPCollider() : Collider()
 {
 	haveDistantTransient=false;
-	ompBodiesMin=0;
+	//ompBodiesMin=0;
 
 	nbObjects=0;
 	xBounds.clear();
