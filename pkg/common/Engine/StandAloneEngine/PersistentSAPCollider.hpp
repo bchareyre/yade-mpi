@@ -99,9 +99,13 @@ class PersistentSAPCollider : public Collider
 		//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.
 		bool haveDistantTransient;
 
+		//! minimum number of bodies to run updateIds in parallel secions; if 0 (default for now), never run in parallel
+		long ompBodiesMin;
+
 		void registerAttributes(){
 			Collider::registerAttributes();
 			REGISTER_ATTRIBUTE(haveDistantTransient);
+			REGISTER_ATTRIBUTE(ompBodiesMin);
 		}
 
 	DECLARE_LOGGER;

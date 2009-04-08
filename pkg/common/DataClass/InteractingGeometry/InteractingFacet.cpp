@@ -9,7 +9,10 @@
 
 InteractingFacet::InteractingFacet() : InteractingGeometry()
 {
-    createIndex();
+	createIndex();
+	#ifdef FACET_TOPO
+		edgeAdjIds.resize(3,Body::ID_NONE);	
+	#endif
 }
 
 InteractingFacet::~InteractingFacet()
@@ -20,6 +23,9 @@ void InteractingFacet::registerAttributes()
 {
     InteractingGeometry::registerAttributes();
     REGISTER_ATTRIBUTE(vertices);
+	#ifdef FACET_TOPO
+		REGISTER_ATTRIBUTE(edgeAdjIds);
+	#endif
 }
 
 void InteractingFacet::postProcessAttributes(bool deserializing)

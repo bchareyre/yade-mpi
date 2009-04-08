@@ -47,6 +47,7 @@
 
 #include "Exporter.h"
 #include "math.h"
+#include <cstdio>
 
 using namespace vrender ;
 using namespace std ;

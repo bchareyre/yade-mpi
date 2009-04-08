@@ -9,7 +9,7 @@
  */
 class FacetTopologyAnalyzer: public StandAloneEngine{
 	struct VertexData{
-		VertexData(body_id_t _id, int _vertexNo, Vector3r _pos, Real _coord): id(_id), vertexNo(_vertexNo), coord(_coord), pos(_pos){index=3*id+vertexNo; isLowestIndex=true;}
+		VertexData(body_id_t _id, int _vertexNo, Vector3r _pos, Real _coord): id(_id), vertexNo(_vertexNo), coord(_coord), pos(_pos){index=3*id+vertexNo; isLowestIndex=true; vertexId=-1;}
 		//! Facet (body id) that we represent
 		body_id_t id;
 		//! vertex number within this Facet
@@ -24,21 +24,37 @@ class FacetTopologyAnalyzer: public StandAloneEngine{
 		bool isLowestIndex;
 		//! vertices that are "identical" with this one, but have higer indices
 		vector<shared_ptr<VertexData> > nextIdentical;
+		//! id of vertex, once they have id's assigned
+		long vertexId;
 	};
 	struct VertexComparator{
 		bool operator()(const shared_ptr<VertexData>& v1, const shared_ptr<VertexData>& v2){return v1->coord<v2->coord;}
 	};
-
+	struct VertexIndexComparator{
+		bool operator()(const shared_ptr<VertexData>& v1, const shared_ptr<VertexData>& v2){return v1->index<v2->index;}
+	};
+	struct FacetTopology{
+		FacetTopology(body_id_t _id): id(_id){vertices[0]=vertices[1]=vertices[2]=-1;}
+		//! integrized vertices
+		long vertices[3];
+		//! facet id, for back reference
+		body_id_t id;
+	};
+	struct TopologyIndexComparator{
+		bool operator()(const shared_ptr<FacetTopology>& t1, const shared_ptr<FacetTopology>& t2){ return min(t1->vertices[0],min(t1->vertices[1],t1->vertices[2]))<min(t2->vertices[0],min(t2->vertices[1],t2->vertices[2])); }
+	};
 	public:
 		//! Axis along which to do the initial vertex sort
 		Vector3r projectionAxis;
-		//! maximum distance of "identical" vertices, relative to maximum facet size
+		//! maximum distance of "identical" vertices, relative to minimum facet size
 		Real relTolerance;
+		//! how many common edges were identified during last run
+		long commonEdgesFound;
 	void action(MetaBody*); 
-	FacetTopologyAnalyzer(): projectionAxis(Vector3r::UNIT_X), relTolerance(1e-4) {}
+	FacetTopologyAnalyzer(): projectionAxis(Vector3r::UNIT_X), relTolerance(1e-4), commonEdgesFound(0) {}
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(FacetTopologyAnalyzer,StandAloneEngine);
-	REGISTER_ATTRIBUTES(StandAloneEngine, /* none */);
+	REGISTER_ATTRIBUTES(StandAloneEngine, (projectionAxis)(relTolerance));
 };
 REGISTER_SERIALIZABLE(FacetTopologyAnalyzer);
 

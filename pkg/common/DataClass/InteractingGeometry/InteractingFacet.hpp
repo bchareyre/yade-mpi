@@ -9,7 +9,11 @@
 
 
 #include <yade/core/InteractingGeometry.hpp>
+#include<yade/core/Body.hpp>
 
+// define this to have topology information about facets enabled;
+// it is necessary for FacetTopologyAnalyzer
+#define FACET_TOPO
 
 class InteractingFacet : public InteractingGeometry {
     public:
@@ -34,6 +38,10 @@ class InteractingFacet : public InteractingGeometry {
 	Real vl[3];
 	/// Unit vertice vectors
 	Vector3r vu[3];
+	#ifdef FACET_TOPO
+		//! facet id's that are adjacent to respective edges
+		vector<body_id_t> edgeAdjIds;
+	#endif
 
 	protected:
 

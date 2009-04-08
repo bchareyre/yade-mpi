@@ -49,6 +49,7 @@
 #include "Primitive.h"
 #include "SortMethod.h"
 #include "math.h" // fabs
+#include <cstdio>
 
 using namespace vrender ;
 using namespace std;

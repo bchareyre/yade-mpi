@@ -19,6 +19,7 @@ CREATE_LOGGER(PersistentSAPCollider);
 PersistentSAPCollider::PersistentSAPCollider() : Collider()
 {
 	haveDistantTransient=false;
+	ompBodiesMin=0;
 
 	nbObjects=0;
 	xBounds.clear();
@@ -27,7 +28,7 @@ PersistentSAPCollider::PersistentSAPCollider() : Collider()
 	minima.clear();
 	maxima.clear();
 
-	//timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+//	timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
 }
 
 PersistentSAPCollider::~PersistentSAPCollider()
@@ -108,15 +109,22 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	nbObjects=bodies->size();
 
 	// permutation sort of the AABBBounds along the 3 axis performed in a independant manner
-	//#pragma omp parallel sections
-	{
-	//#pragma omp section
-		sortBounds(xBounds, nbObjects);
-	//#pragma omp section
-		sortBounds(yBounds, nbObjects);
-	//#pragma omp section
-		sortBounds(zBounds, nbObjects);
-	}
+	// serial version
+	//if(nbObjects>ompBodiesMin || ompBodiesMin==0){ … }
+	sortBounds(xBounds,nbObjects); sortBounds(yBounds,nbObjects); sortBounds(zBounds,nbObjects);
+	#if 0
+		else {
+			#pragma omp parallel sections
+			{
+			#pragma omp section
+				sortBounds(xBounds, nbObjects);
+			#pragma omp section
+				sortBounds(yBounds, nbObjects);
+			#pragma omp section
+				sortBounds(zBounds, nbObjects);
+			}
+		}
+	#endif
 
 //	timingDeltas->checkpoint("sortBounds");
 }
@@ -167,26 +175,60 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 		// initialization if the field "value" of the xBounds, yBounds, zBounds arrays
 		updateBounds(nbElements);
 
-		// modified quick sort of the xBounds, yBounds, zBounds arrays
+		/* Performance note: such was the timing result on initial step of 8k sphere in triaxial test.
+			the findX, findY, findZ take almost the totality of the time.
+			Parallelizing those is vastly beneficial (almost 3x speed increase, which can be quite sensible as the initial
+			findOverlappingBB is really slow http://yade.wikia.com/wiki/Colliders_performace and is done in 3
+			orthogonal directions. Therefore, it is enabled by default.
+			
+			Now sortX is right before findX etc, in the same openMP section. Beware that timingDeltas will give garbage
+			results if used in parallelized code.
+
+			===
+
+			8k spheres:
+			Name                                                    Count                 Time            Rel. time
+			-------------------------------------------------------------------------------------------------------
+			PersistentSAPCollider                                 1            3568091us              100.00%      
+			  init                                                  1              21178us                0.59%    
+			  sortX                                                 1              33225us                0.93%    
+			  sortY                                                 1              29300us                0.82%    
+			  sortZ                                                 1              28334us                0.79%    
+			  findX                                                 1            1708426us               47.88%    
+			  findY                                                 1             869150us               24.36%    
+			  findZ                                                 1             867378us               24.31%    
+			  TOTAL                                                              3556994us               99.69%    
+
+		*/
+
 		// The first time these arrays are not sorted so it is faster to use such a sort instead
 		// of the permutation we are going to use next
-		std::sort(xBounds.begin(),xBounds.begin()+2*nbElements,AABBBoundComparator());
-		//timingDeltas->checkpoint("sortX");
-		std::sort(yBounds.begin(),yBounds.begin()+2*nbElements,AABBBoundComparator());
-		//timingDeltas->checkpoint("sortY");
-		std::sort(zBounds.begin(),zBounds.begin()+2*nbElements,AABBBoundComparator());
-		//timingDeltas->checkpoint("sortZ");
 
-		// initialize the overlappingBB collection
-		//for(unsigned int j=0;j<nbElements;j++)
-		//	overlappingBB[j].clear(); //attention memoire
-
-		findOverlappingBB(xBounds, nbElements);
-		//timingDeltas->checkpoint("findX");
-		findOverlappingBB(yBounds, nbElements);
-		//timingDeltas->checkpoint("findY");
-		findOverlappingBB(zBounds, nbElements);
-		//timingDeltas->checkpoint("findZ");
+		// do not juse timingDeltas with openMP enabled, results will be garbage
+		#pragma omp parallel sections
+		{
+			#pragma omp section
+			{
+				std::sort(xBounds.begin(),xBounds.begin()+2*nbElements,AABBBoundComparator());
+				//timingDeltas->checkpoint("sortX");
+				findOverlappingBB(xBounds, nbElements);
+				//timingDeltas->checkpoint("findX");
+			}
+			#pragma omp section
+			{
+				std::sort(yBounds.begin(),yBounds.begin()+2*nbElements,AABBBoundComparator());
+				//timingDeltas->checkpoint("sortY");
+				findOverlappingBB(yBounds, nbElements);
+				//timingDeltas->checkpoint("findY");
+			}
+			#pragma omp section
+			{
+				std::sort(zBounds.begin(),zBounds.begin()+2*nbElements,AABBBoundComparator());
+				//timingDeltas->checkpoint("sortZ");
+				findOverlappingBB(zBounds, nbElements);
+				//timingDeltas->checkpoint("findZ");
+			}
+		}
 	}
 	else updateBounds(nbElements);
 }
@@ -240,16 +282,34 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 
 void PersistentSAPCollider::updateBounds(int nbElements)
 {
-	for(int i=0; i < 2*nbElements; i++){
-		if (xBounds[i]->lower) xBounds[i]->value = minima[3*xBounds[i]->id+0];
-		else xBounds[i]->value = maxima[3*xBounds[i]->id+0];
-
-		if (yBounds[i]->lower) yBounds[i]->value = minima[3*yBounds[i]->id+1];
-		else yBounds[i]->value = maxima[3*yBounds[i]->id+1];
-
-		if (zBounds[i]->lower) zBounds[i]->value = minima[3*zBounds[i]->id+2];
-		else zBounds[i]->value = maxima[3*zBounds[i]->id+2];
+	#define _BOUND_UPDATE(bounds,offset) \
+		if (bounds[i]->lower) bounds[i]->value = minima[3*bounds[i]->id+offset]; \
+		else bounds[i]->value = maxima[3*bounds[i]->id+offset];
+	// for small number of bodies, run sequentially
+	#if 0
+	if(nbElements<ompBodiesMin || ompBodiesMin==0){
+	#endif
+		for(int i=0; i < 2*nbElements; i++){
+			_BOUND_UPDATE(xBounds,0);
+			_BOUND_UPDATE(yBounds,1);
+			_BOUND_UPDATE(zBounds,2);
+		}
+	#if 0
 	}
+	else{
+		// parallelize for large number of bodies (not used, updateBounds takes only about 5% of collider time
+		#pragma omp parallel sections
+		{
+			#pragma omp section
+			for(int i=0; i < 2*nbElements; i++){ _BOUND_UPDATE(xBounds,0); }
+			#pragma omp section
+			for(int i=0; i < 2*nbElements; i++){ _BOUND_UPDATE(yBounds,1); }
+			#pragma omp section
+			for(int i=0; i < 2*nbElements; i++){ _BOUND_UPDATE(zBounds,2); }
+		}
+	}
+	#endif
+	#undef _BOUND_UPDATE
 }
 
 

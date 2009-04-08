@@ -48,6 +48,7 @@
 #include <stdexcept>
 #include "VRender.h"
 #include "Exporter.h"
+#include <cstdio>
 
 using namespace vrender ;
 using namespace std ;
