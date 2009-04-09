@@ -20,5 +20,5 @@ if 1:
 		utils.facet([(1,1,0),(1,0,0),(0,1,0)]),
 	])
 	O.step()
-	#assert(O.bodies[0].phys['edgeAdjIds'][1]==1 and O.bodies[1].phys['edgeAdjIds'][0]==1)
+	assert(O.bodies[0].phys['edgeAdjIds'][1]==1 and O.bodies[1].phys['edgeAdjIds'][0]==1)
 	assert(topo['commonEdgesFound']==1)

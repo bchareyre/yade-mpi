@@ -122,6 +122,8 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		timestamp: append numeric time to the basename
 		varData: whether file to plot will be declared as variable or be in-place in the plot expression
 		comment: a user comment (may be multiline) that will be embedded in the control file
+
+		Returns name fo the gnuplot file created.
 	"""
 	import time,bz2
 	vars=data.keys(); vars.sort()
@@ -153,6 +155,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		fPlot.write("plot "+",".join([" %s using %d:%d title '%s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,pp[0],p) for pp in plots_p])+"\n")
 		i+=1
 	fPlot.close()
+	return baseName+'.gnuplot'
 
 
 	

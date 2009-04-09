@@ -3,7 +3,7 @@
 #
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, thread, time
+import os, sys, thread, time,logging
 
 class JobInfo():
 	def __init__(self,num,id,command,log,nSlots):
@@ -67,8 +67,10 @@ parser.add_option('--log',dest='logFormat',help='Format of log files -- must con
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%sys.argv[0][:-6],default=sys.argv[0][:-6],metavar='FILE') ## strip the '-multi' extension
+parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
+parser.add_option('--dry-run',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 opts,args=parser.parse_args()
-logFormat,lineList,maxJobs,nice,executable=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable
+logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun
 
 if len(args)!=2:
 	#print "Exactly two non-option arguments must be specified -- parameter table and script to be run.\n"
@@ -104,8 +106,8 @@ if lineList:
 		return ret
 	useLines0=numRange2List(lineList)
 	for l in useLines0:
-		if l not in availableLines: print "WARNING: skipping unavailable line %d that was requested from the command line."%l
-		elif l==1: print "WARNING: skipping line 1 that should contain variable labels"
+		if l not in availableLines: logging.warn('skipping unavailable line %d that was requested from the command line.'%l)
+		elif l==1: logging.warn("WARNING: skipping line 1 that should contain variable labels")
 		else: useLines+=[l]
 else: useLines=availableLines
 try:
@@ -131,7 +133,7 @@ for i,l in enumerate(useLines):
 		if head=='!EXEC': executable=values[l][col]
 		if head=='!OMP_NUM_THREADS': nSlots=int(values[l][col])
 		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
-	if nSlots>maxJobs: print 'WARNING: job #%d wants %d slots but only %d are available'%(i,nSlots,maxJobs)
+	if nSlots>maxJobs: logging.warning('WARNING: job #%d wants %d slots but only %d are available'%(i,nSlots,maxJobs))
 	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,logFile),logFile,nSlots))
 
 print "Job summary:"
@@ -139,5 +141,36 @@ for job in jobs:
 	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots),job.command
 
 # OK, go now
-runJobs(jobs,maxJobs)
-print 'All jobs finished, bye.'
+if not dryRun: runJobs(jobs,maxJobs)
+
+print 'All jobs finished,',
+if not gnuplotOut:
+	print 'bye.'
+else:
+	print 'assembling gnuplot files…'
+	for job in jobs:
+		for l in file(job.log):
+			if l.startswith('gnuplot '):
+				job.plot=l.split()[1]
+				break
+	preamble,plots='',[]
+	for job in jobs:
+		if not job.plot:
+			# warn here
+			continue
+		for l in file(job.plot):
+			if l.startswith('plot'):
+				# attempt to parse the plot line
+				ll=l.split(' ',1)[1][:-1] # rest of the line, without newline
+				# replace title 'something' with title 'description: something'
+				ll,nn=re.subn(r'title\s+[\'"]([^\'"]*)[\'"]',r'title "'+job.id+r': \1"',ll)
+				if nn==0:
+					logging.error("Plot line in "+job.plot+" not parsed (skipping): "+ll)
+				plots.append(ll)
+				break
+			if not plots: # first plot, copy all preceding lines
+				preamble+=l
+	gp=file(gnuplotOut,'w')
+	gp.write(preamble)
+	gp.write('plot '+','.join(plots))
+	print "Finished writing "+gnuplotOut+", bye."
