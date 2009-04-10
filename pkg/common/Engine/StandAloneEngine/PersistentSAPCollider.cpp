@@ -251,8 +251,6 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 
 /* Note that this function is called only for bodies that actually overlap along some axis */
 void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
-	#pragma omp critical
-	{
 		// look if the pair (id1,id2) already exists in the overlappingBB collection
 		const shared_ptr<Interaction>& interaction=transientInteractions->find(body_id_t(id1),body_id_t(id2));
 		bool found=(bool)interaction;
@@ -279,7 +277,6 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 			//LOG_DEBUG("Erasing interaction #"<<id1<<"=#"<<id2<<" (isReal="<<interaction->isReal<<")");
 			transientInteractions->erase(body_id_t(id1),body_id_t(id2));
 		}
-	}
 }
 
 
@@ -322,7 +319,14 @@ void PersistentSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> 
 		while (i<2*nbElements && !bounds[i]->lower) i++;
 		j=i+1;
 		while (j<2*nbElements && bounds[j]->id!=bounds[i]->id){
-			if (bounds[j]->lower) updateOverlapingBBSet(bounds[i]->id,bounds[j]->id);
+			if (bounds[j]->lower){
+				/* findOverlappingBB is called in parallel for different data at initialization,
+				 * but updateOverlapingBBSet touches shared global data, therefore must be protected by critical section;
+				 * normally updateOverlapingBBSet is also called sequentially from sortBounds, where the critical section
+				 * would penalize performance; therefore we have to protect it from here */
+				#pragma omp critical 
+					updateOverlapingBBSet(bounds[i]->id,bounds[j]->id);
+			}
 			j++;
 		}
 		i++;

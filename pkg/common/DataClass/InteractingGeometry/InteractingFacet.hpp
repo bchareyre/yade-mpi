@@ -41,6 +41,8 @@ class InteractingFacet : public InteractingGeometry {
 	#ifdef FACET_TOPO
 		//! facet id's that are adjacent to respective edges
 		vector<body_id_t> edgeAdjIds;
+		//! angle between normals of this facet and the adjacent facet
+		vector<body_id_t> edgeAdjAngle;
 	#endif
 
 	protected:

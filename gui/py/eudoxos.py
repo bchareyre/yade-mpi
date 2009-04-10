@@ -174,7 +174,7 @@ def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	f.write("SimpleCS 1 thick 1.0 width 1.0\n")
 	# material
 	ph=inters[0].phys
-	f.write("CohInt 1 kn %g ks %g e0 %g ef %g c 0. ksi %g coh %g tanphi %g damchartime %g damrateexp %g d 1.0\n"%(ph['E'],ph['G'],ph['epsCrackOnset'],ph['epsFracture'],ph['xiShear'],ph['undamagedCohesion'],ph['tanFrictionAngle'],ph['dmgTau'],ph['dmgRateExp']))
+	f.write("CohInt 1 kn %g ks %g e0 %g ef %g c 0. ksi %g coh %g tanphi %g damchartime %g damrateexp %g plchartime %g plrateexp %g d 1.0\n"%(ph['E'],ph['G'],ph['epsCrackOnset'],ph['epsFracture'],ph['xiShear'],ph['undamagedCohesion'],ph['tanFrictionAngle'],ph['dmgTau'],ph['dmgRateExp'],ph['plTau'],ph['plRateExp']))
 	# boundary conditions
 	f.write('BoundaryCondition 1 loadTimeFunction 1 prescribedvalue 0.0\n')
 	f.write('BoundaryCondition 2 loadTimeFunction 1 prescribedvalue 1.e-4\n')

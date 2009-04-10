@@ -61,6 +61,7 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 		if(v->vertexId>=0) continue; // already assigned
 	}
 	LOG_DEBUG("Found "<<maxVertexId<<" unique vertices.");
+	commonVerticesFound=maxVertexId;
 	// add FacetTopology for all facets; index within the topo array is the body id
 	vector<shared_ptr<FacetTopology> > topo(rb->bodies->size()); // initialized with the default ctor
 	FOREACH(shared_ptr<VertexData>& v, vv){
@@ -80,21 +81,18 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 		}
 		topo1.push_back(t);
 	}
-	sort(topo1.begin(),topo1.end(),TopologyIndexComparator());
 	size_t nTopo=topo1.size();
 	for(size_t i=0; i<nTopo; i++){
 		size_t j=i;
 		while(++j<nTopo){
 			const shared_ptr<FacetTopology>& ti(topo1[i]), &tj(topo1[j]);
-			LOG_TRACE("Analyzing possibly-adjacent facets #"<<ti->id<<" #"<<tj->id<<" (vertices "<<ti->vertices[0]<<","<<ti->vertices[1]<<","<<ti->vertices[2]<<"; "<<tj->vertices[0]<<","<<ti->vertices[1]<<","<<ti->vertices[2]<<")");
 			vector<size_t> vvv; // array of common vertices
 			for(size_t k=0; k<3; k++){
 				if     (ti->vertices[k]==tj->vertices[0]) vvv.push_back(ti->vertices[k]);
 				else if(ti->vertices[k]==tj->vertices[1]) vvv.push_back(ti->vertices[k]);
 				else if(ti->vertices[k]==tj->vertices[2]) vvv.push_back(ti->vertices[k]);
 			}
-			if(vvv.size()==0) break; // reached end of those that have the lowest-id vertex in common
-			if(vvv.size()==1) continue; // only one edge in common
+			if(vvv.size()<2) continue;
 			assert(vvv.size()!=3); // same coords? nonsense
 			assert(vvv.size()==2);
 			vector<int> edge(2,0);
@@ -112,7 +110,7 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 			}
 			// add adjacency information to the facet itself
 			YADE_PTR_CAST<InteractingFacet>((*rb->bodies)[ti->id]->interactingGeometry)->edgeAdjIds[edge[0]]=tj->id;
-			YADE_PTR_CAST<InteractingFacet>((*rb->bodies)[tj->id]->interactingGeometry)->edgeAdjIds[edge[1]]=tj->id;
+			YADE_PTR_CAST<InteractingFacet>((*rb->bodies)[tj->id]->interactingGeometry)->edgeAdjIds[edge[1]]=ti->id;
 			commonEdgesFound++;
 			LOG_TRACE("Added adjacency information for #"<<ti->id<<"+#"<<tj->id<<" (common edges "<<edge[0]<<"+"<<edge[1]<<")");
 		}

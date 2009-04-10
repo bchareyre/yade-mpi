@@ -13,6 +13,7 @@
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
+
 /* Engine encompassing several computations looping over all bodies/interactions
  *
  * * Compute and store unbalanced force over the whole simulation.

@@ -40,9 +40,6 @@ class FacetTopologyAnalyzer: public StandAloneEngine{
 		//! facet id, for back reference
 		body_id_t id;
 	};
-	struct TopologyIndexComparator{
-		bool operator()(const shared_ptr<FacetTopology>& t1, const shared_ptr<FacetTopology>& t2){ return min(t1->vertices[0],min(t1->vertices[1],t1->vertices[2]))<min(t2->vertices[0],min(t2->vertices[1],t2->vertices[2])); }
-	};
 	public:
 		//! Axis along which to do the initial vertex sort
 		Vector3r projectionAxis;
@@ -50,11 +47,13 @@ class FacetTopologyAnalyzer: public StandAloneEngine{
 		Real relTolerance;
 		//! how many common edges were identified during last run
 		long commonEdgesFound;
+		//! how many common vertices were identified during last run
+		long commonVerticesFound;
 	void action(MetaBody*); 
-	FacetTopologyAnalyzer(): projectionAxis(Vector3r::UNIT_X), relTolerance(1e-4), commonEdgesFound(0) {}
+	FacetTopologyAnalyzer(): projectionAxis(Vector3r::UNIT_X), relTolerance(1e-4), commonEdgesFound(0), commonVerticesFound(0) {}
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(FacetTopologyAnalyzer,StandAloneEngine);
-	REGISTER_ATTRIBUTES(StandAloneEngine, (projectionAxis)(relTolerance));
+	REGISTER_ATTRIBUTES(StandAloneEngine, (projectionAxis)(relTolerance)(commonEdgesFound)(commonVerticesFound));
 };
 REGISTER_SERIALIZABLE(FacetTopologyAnalyzer);
 

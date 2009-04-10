@@ -172,8 +172,9 @@ Real BrefcomContact::computeDmgOverstress(Real dt){
 
 Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt){
 	if(sigmaTNorm<sigmaTYield) return 1.;
-	Real c=sigmaTNorm*pow(plTau/(G*dt),plRateExp)*pow(sigmaTNorm-sigmaTYield,plRateExp-1.);
+	Real c=undamagedCohesion*pow(plTau/(G*dt),plRateExp)*pow(sigmaTNorm-sigmaTYield,plRateExp-1.);
 	Real beta=solveBeta(c,plRateExp);
+	LOG_DEBUG("scaling factor "<<1.-exp(beta)*(1-sigmaTYield/sigmaTNorm));
 	return 1.-exp(beta)*(1-sigmaTYield/sigmaTNorm);
 }
 
