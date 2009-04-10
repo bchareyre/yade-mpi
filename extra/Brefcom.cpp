@@ -151,21 +151,21 @@ Real BrefcomContact::solveBeta(const Real c, const Real N){
 		Real df=(c*N*exp(N*ret)+exp(ret))/aux;
 		ret-=f/df;
 	}
-	LOG_FATAL("No convergence, c="<<c<<", ret="<<ret<<", f="<<f);
+	LOG_FATAL("No convergence after "<<maxIter<<" iters; c="<<c<<", N="<<N<<", ret="<<ret<<", f="<<f);
 	throw runtime_error("ef2_Spheres_Brefcom_BrefcomLaw::solveBeta failed to converge.");
 }
 
 Real BrefcomContact::computeDmgOverstress(Real dt){
 	if(dmgStrain>=epsN*omega){ // unloading, no viscous stress
 		dmgStrain=epsN*omega;
-		LOG_DEBUG("Elastic/unloading, no viscous overstress");
+		LOG_TRACE("Elastic/unloading, no viscous overstress");
 		return 0.;
 	}
 	Real c=epsCrackOnset*(1-omega)*pow(dmgTau/dt,dmgRateExp)*pow(epsN*omega-dmgStrain,dmgRateExp-1.);
 	Real beta=solveBeta(c,dmgRateExp);
 	Real deltaDmgStrain=(epsN*omega-dmgStrain)*exp(beta);
 	dmgStrain+=deltaDmgStrain;
-	LOG_DEBUG("deltaDmgStrain="<<deltaDmgStrain<<", viscous overstress "<<(epsN*omega-dmgStrain)*E);
+	LOG_TRACE("deltaDmgStrain="<<deltaDmgStrain<<", viscous overstress "<<(epsN*omega-dmgStrain)*E);
 	/* σN=Kn(εN-εd); dmgOverstress=σN-(1-ω)*Kn*εN=…=Kn(ω*εN-εd) */
 	return (epsN*omega-dmgStrain)*E;
 }

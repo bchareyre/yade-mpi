@@ -49,7 +49,7 @@ void UniaxialStrainer::init(){
 	assert(originalLength>0 && !isnan(originalLength));
 
 	assert(!isnan(strainRate) || !isnan(absSpeed));
-	if(strainRate==0){ strainRate=absSpeed/originalLength; LOG_INFO("COmputed new strainRate "<<strainRate); }
+	if(strainRate==0){ strainRate=absSpeed/originalLength; LOG_INFO("Computed new strainRate "<<strainRate); }
 
 	initAccelTime_s=initAccelTime>=0 ? initAccelTime : Omega::instance().getTimeStep()*(-initAccelTime);
 	LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<", will be reached after "<<initAccelTime_s<<"s ("<<initAccelTime_s/Omega::instance().getTimeStep()<<" steps).");

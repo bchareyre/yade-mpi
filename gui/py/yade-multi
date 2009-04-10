@@ -68,7 +68,7 @@ parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%sys.argv[0][:-6],default=sys.argv[0][:-6],metavar='FILE') ## strip the '-multi' extension
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
-parser.add_option('--dry-run',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
+parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 opts,args=parser.parse_args()
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun
 
@@ -155,8 +155,8 @@ else:
 				break
 	preamble,plots='',[]
 	for job in jobs:
-		if not job.plot:
-			# warn here
+		if not 'plot' in job.__dict__:
+			print "WARN: No plot found for job "+job.id
 			continue
 		for l in file(job.plot):
 			if l.startswith('plot'):

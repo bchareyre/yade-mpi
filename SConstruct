@@ -394,7 +394,7 @@ if env['debug']: env.Append(CXXFLAGS='-ggdb3',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O2')
 if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
 if env['optimize']:
-	env.Append(CXXFLAGS=Split('-O3 -ffast-math -march=%s'%env['march']),
+	env.Append(CXXFLAGS=Split('-O3 -march=%s'%env['march']),
 		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
 	# NDEBUG is used in /usr/include/assert.h: when defined, asserts() are no-ops
 

@@ -179,7 +179,8 @@ void PersistentSAPCollider::updateIds(unsigned int nbElements)
 			the findX, findY, findZ take almost the totality of the time.
 			Parallelizing those is vastly beneficial (almost 3x speed increase, which can be quite sensible as the initial
 			findOverlappingBB is really slow http://yade.wikia.com/wiki/Colliders_performace and is done in 3
-			orthogonal directions. Therefore, it is enabled by default.
+			orthogonal directions. Therefore, it is enabled by default. updateOverlappingBBSet must be protected by 
+			critical section, since it is called from all threads!
 			
 			Now sortX is right before findX etc, in the same openMP section. Beware that timingDeltas will give garbage
 			results if used in parallelized code.
@@ -250,32 +251,34 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 
 /* Note that this function is called only for bodies that actually overlap along some axis */
 void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
- 	// look if the pair (id1,id2) already exists in the overlappingBB collection
-	const shared_ptr<Interaction>& interaction=transientInteractions->find(body_id_t(id1),body_id_t(id2));
-	bool found=(interaction!=0);//Bruno's Hack
-	// if there is persistent interaction, we will not create transient one!
-	
-	// test if the AABBs of the spheres number "id1" and "id2" are overlapping
-	int offset1=3*id1, offset2=3*id2;
-	const shared_ptr<Body>& b1(Body::byId(body_id_t(id1),rootBody)), b2(Body::byId(body_id_t(id2),rootBody));
-	bool overlap =
-		Collider::mayCollide(b1.get(),b2.get()) &&
-		// AABB collisions: 
-		!(
-			maxima[offset1  ]<minima[offset2  ] || maxima[offset2  ]<minima[offset1  ] || 
-			maxima[offset1+1]<minima[offset2+1] || maxima[offset2+1]<minima[offset1+1] || 
-			maxima[offset1+2]<minima[offset2+2] || maxima[offset2+2]<minima[offset1+2]);
-	// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
-	//if((id1==0 && id2==1) || (id1==1 && id2==0)) LOG_DEBUG("Processing #0 #1");
-	//if(interaction&&!interaction->isReal){ LOG_DEBUG("Unreal interaction #"<<id1<<"=#"<<id2<<" (overlap="<<overlap<<", haveDistantTransient="<<haveDistantTransient<<")");}
-	if(overlap && !found){
-		//LOG_DEBUG("Creating interaction #"<<id1<<"=#"<<id2);
-		transientInteractions->insert(body_id_t(id1),body_id_t(id2));
-	}
-	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
-	else if(!overlap && found && (haveDistantTransient ? !interaction->isReal : true) ){
-		//LOG_DEBUG("Erasing interaction #"<<id1<<"=#"<<id2<<" (isReal="<<interaction->isReal<<")");
-		transientInteractions->erase(body_id_t(id1),body_id_t(id2));
+	#pragma omp critical
+	{
+		// look if the pair (id1,id2) already exists in the overlappingBB collection
+		const shared_ptr<Interaction>& interaction=transientInteractions->find(body_id_t(id1),body_id_t(id2));
+		bool found=(bool)interaction;
+		
+		// test if the AABBs of the spheres number "id1" and "id2" are overlapping
+		int offset1=3*id1, offset2=3*id2;
+		const shared_ptr<Body>& b1(Body::byId(body_id_t(id1),rootBody)), b2(Body::byId(body_id_t(id2),rootBody));
+		bool overlap =
+			Collider::mayCollide(b1.get(),b2.get()) &&
+			// AABB collisions: 
+			!(
+				maxima[offset1  ]<minima[offset2  ] || maxima[offset2  ]<minima[offset1  ] || 
+				maxima[offset1+1]<minima[offset2+1] || maxima[offset2+1]<minima[offset1+1] || 
+				maxima[offset1+2]<minima[offset2+2] || maxima[offset2+2]<minima[offset1+2]);
+		// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
+		//if((id1==0 && id2==1) || (id1==1 && id2==0)) LOG_DEBUG("Processing #0 #1");
+		//if(interaction&&!interaction->isReal){ LOG_DEBUG("Unreal interaction #"<<id1<<"=#"<<id2<<" (overlap="<<overlap<<", haveDistantTransient="<<haveDistantTransient<<")");}
+		if(overlap && !found){
+			//LOG_DEBUG("Creating interaction #"<<id1<<"=#"<<id2);
+			transientInteractions->insert(body_id_t(id1),body_id_t(id2));
+		}
+		// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
+		else if(!overlap && found && (haveDistantTransient ? !interaction->isReal : true) ){
+			//LOG_DEBUG("Erasing interaction #"<<id1<<"=#"<<id2<<" (isReal="<<interaction->isReal<<")");
+			transientInteractions->erase(body_id_t(id1),body_id_t(id2));
+		}
 	}
 }
 
