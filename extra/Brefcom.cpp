@@ -105,6 +105,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 		contPhys->dmgRateExp=dmgRateExp;
 		contPhys->plTau=plTau;
 		contPhys->plRateExp=plRateExp;
+		contPhys->viscApprox=viscApprox;
 
 		interaction->interactionPhysics=contPhys;
 	}
@@ -156,6 +157,14 @@ Real BrefcomContact::solveBeta(const Real c, const Real N){
 }
 
 Real BrefcomContact::computeDmgOverstress(Real dt){
+	if(viscApprox){
+		Real prevDmgStrain=dmgStrain;
+		dmgStrain=max(0.,epsN*omega-dmgOverstress/E);
+		if(dmgStrain<=prevDmgStrain) dmgOverstress=0; // damage doesn't grow, no viscous response
+		else dmgOverstress=epsCrackOnset*E*pow(dmgTau*(dmgStrain-prevDmgStrain)/dt,dmgRateExp);
+		LOG_TRACE("dmgStrain="<<dmgStrain<<", dmgOverstress="<<dmgOverstress);
+		return dmgOverstress;
+	}
 	if(dmgStrain>=epsN*omega){ // unloading, no viscous stress
 		dmgStrain=epsN*omega;
 		LOG_TRACE("Elastic/unloading, no viscous overstress");
@@ -174,7 +183,7 @@ Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYie
 	if(sigmaTNorm<sigmaTYield) return 1.;
 	Real c=undamagedCohesion*pow(plTau/(G*dt),plRateExp)*pow(sigmaTNorm-sigmaTYield,plRateExp-1.);
 	Real beta=solveBeta(c,plRateExp);
-	LOG_DEBUG("scaling factor "<<1.-exp(beta)*(1-sigmaTYield/sigmaTNorm));
+	//LOG_DEBUG("scaling factor "<<1.-exp(beta)*(1-sigmaTYield/sigmaTNorm));
 	return 1.-exp(beta)*(1-sigmaTYield/sigmaTNorm);
 }
 

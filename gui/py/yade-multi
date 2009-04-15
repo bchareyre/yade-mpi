@@ -82,7 +82,7 @@ if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log s
 
 print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d jobs at a time."%(executable,simul,nice,logFormat,maxJobs)
 
-ll=['']+open(table,'r').readlines()
+ll=[re.sub('\s*#.*','',l) for l in ['']+open(table,'r').readlines()] # remove comments
 availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1]) and i>1]
 
 # read actual data
