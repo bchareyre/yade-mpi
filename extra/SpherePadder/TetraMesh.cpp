@@ -238,6 +238,10 @@ int compareInt (const void * a, const void * b)
 
 void TetraMesh::organize ()
 {
+	// Display informations
+	cout << "nb Nodes = " << node.size() << endl;
+	cout << "nb Tetra = " << tetraedre.size() << endl;
+  
     // Translate all nodes in such a manner that all coordinates are > 0
     xtrans = node[0].x;
     ytrans = node[0].y;

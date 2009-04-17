@@ -15,37 +15,67 @@
 #include "SpherePackingTriangulation/SpherePackingTriangulation.hpp"
 #include <time.h>
 #include <set>
+#include <list>
 
-# define BEGIN_FUNCTION(arg) if (trace_functions) cerr << (arg) << "..." << endl << flush
-# define END_FUNCTION        if (trace_functions) cerr << "Done\n" << flush
+# define BEGIN_FUNCTION(arg) if (verbose) cerr << "+--> " << (arg) << endl << flush
+# define END_FUNCTION        if (verbose) cerr << "+-- Done <--+\n\n" << flush
 
-enum SphereType {AT_NODE, AT_SEGMENT, AT_FACE, AT_TETRA_CENTER, AT_TETRA_VERTEX, INSERTED_BY_USER, FROM_TRIANGULATION, VIRTUAL};
+#define FAIL_DET            0x01
+#define FAIL_DELTA          0x02
+#define FAIL_RADIUS         0x04
+#define FAIL_OVERLAP        0x08
+#define FAIL_GAP            0x10
+#define FAIL_RADIUS_RANGE   0x20
+#define FAIL_NaN            0x40
+
+typedef unsigned int id_type; // [0 -> 4,294,967,295] if 32 bits
+enum SphereType
+{
+  AT_NODE,
+  AT_SEGMENT,
+  AT_FACE,
+  AT_TETRA_CENTER,
+  AT_TETRA_VERTEX,
+  INSERTED_BY_USER,
+  FROM_TRIANGULATION,
+  VIRTUAL
+};
+
+struct Criterion
+{
+  bool nb_spheres;
+  bool solid_fraction;
+  id_type nb_spheres_max;
+  double solid_fraction_max;
+  double x,y,z,R;
+};
 
 struct Sphere
 {
-  double        x,y,z,R;
-  SphereType    type; 
-  unsigned int  tetraOwner; // FIXME can be removed ??
+  double     x,y,z,R;
+  SphereType type;
 };
 
 struct Neighbor
 {
-  unsigned int i,j; // FIXME long ?      
+  id_type i,j;
 };
 
 struct neighbor_with_distance
 {
-  unsigned int sphereId;// FIXME long ?
-  double       distance;
+  id_type sphereId;
+  double  distance;
+  bool    priority;
 };
 
 struct tetra_porosity
 {
-  unsigned int id1,id2,id3,id4;// FIXME long ?
-  double volume;
-  double void_volume;
+  id_type id1,id2,id3,id4;
+  double  volume;
+  double  void_volume;
 };
 
+// not used
 class CompareNeighborId
 {
   public:
@@ -61,16 +91,17 @@ class SpherePadder
 {
   protected:
                 
-	vector<vector<unsigned int> > combination;// FIXME long ?
-    SpherePackingTriangulation    triangulation;
-    vector<tetra_porosity>        tetra_porosities;
+	vector<vector<id_type> >    combination;
+    SpherePackingTriangulation  triangulation;
+    vector<tetra_porosity>      tetra_porosities;
+	Criterion                   criterion;
     
-	double       distance_spheres (unsigned int i, unsigned int j);// FIXME long ?
+	double       distance_spheres (id_type i, id_type j); // deprecated
 	double       distance_spheres (Sphere& S1,Sphere& S2);
-	double       squared_distance_centre_spheres(unsigned int i, unsigned int j);
+	double       squared_distance_centre_spheres(id_type i, id_type j); // deprecated
     double       distance_centre_spheres(Sphere& S1, Sphere& S2);
     double       distance_vector3 (double V1[],double V2[]);
-	void         build_sorted_list_of_neighbors(unsigned int sphereId, vector<neighbor_with_distance> & neighbor);
+	void         build_sorted_list_of_neighbors(id_type sphereId, vector<neighbor_with_distance> & neighbor);
 	void         build_sorted_list_of_neighbors(Sphere & S, vector<neighbor_with_distance> & neighbor);
     double       spherical_triangle (double point1[],double point2[],double point3[],double point4[]);
     double       solid_volume_of_tetrahedron(Sphere& S1, Sphere& S2, Sphere& S3, Sphere& S4);
@@ -80,77 +111,86 @@ class SpherePadder
     void         place_at_tetra_centers ();
     void         place_at_tetra_vertexes ();
     void         cancel_overlaps ();
-	unsigned int iter_densify(unsigned int nb_check = 100);
+	unsigned int iter_densify(unsigned int nb_check = 20);
 	void         repack_null_radii();
     
     // some key functions 
-	unsigned int place_fifth_sphere(unsigned int s1, unsigned int s2, unsigned int s3, unsigned int s4, Sphere& S);// FIXME long ?
-	unsigned int place_sphere_4contacts (unsigned int sphereId, unsigned int nb_combi_max = 15);// FIXME long ?
-	unsigned int check_overlaps(Sphere & S, unsigned int excludedId);
+	unsigned int place_fifth_sphere(id_type s1, id_type s2, id_type s3, id_type s4, Sphere& S);
+	unsigned int place_sphere_4contacts (id_type sphereId, unsigned int nb_combi_max = 15);//  (deprecated)
+	unsigned int place_sphere_4contacts (Sphere& S, unsigned int nb_combi_max = 15);
+	unsigned int check_overlaps(Sphere & S, id_type excludedId);
 	
     double       rmin,rmax,rmoy,dr;
     double       ratio; // rmax/rmin
     double       max_overlap_rate;
-    unsigned int n1,n2,n3,n4,n5,n_densify;
-    unsigned int nb_iter_max;
+	id_type      n1,n2,n3,n4,n5,n_densify,nzero;
+	unsigned int max_iter_densify;
+	double       virtual_radius_factor;
 	bool         RadiusDataIsOK,RadiusIsSet;
+	unsigned int zmin;
+	double       gap_max;
         
     TetraMesh *      mesh;
     vector <Sphere>  sphere;
     CellPartition    partition;
-   
-    // FOR ANALYSIS
-    set<Neighbor,CompareNeighborId> neighbor; // pas utilise pour le moment
-    bool probeIsDefined;
-	vector<unsigned int> sphereInProbe;// FIXME long ?
-    double xProbe,yProbe,zProbe,RProbe;
-    ofstream compacity_file;
+	list <id_type>   bounds;
     
-    double compacity_in_probe(unsigned int ninsered);
-    void check_inProbe(unsigned int i);
-    
-    bool trace_functions;
-    void save_granulo(const char* name);
- 
+	bool verbose;
+	bool Must_Stop;
+
   public:
    
     bool meshIsPlugged;
 
+	void ShutUp() { verbose = false; }
+	void Speak()  { verbose = true; }
+	
 	void setRadiusRatio(double r);
 	void setRadiusRange(double min, double max);
 	void setMaxOverlapRate(double r) { max_overlap_rate = fabs(r); }
 	void setVirtualRadiusFactor(double f) {virtual_radius_factor = fabs(f);}
-	void setTargetSolidFraction(double sf)
+	void setMaxNumberOfSpheres(id_type max);
+	void setMaxSolidFractioninProbe(double max, double x, double y,double z, double R);
+
+
+	id_type getNumberOfSpheres()
 	{
-	  // TODO
+	  id_type nb = 0;
+	  for (id_type i = 0 ; i < sphere.size() ; ++i)
+	  {
+		if (sphere[i].type == VIRTUAL || sphere[i].type == INSERTED_BY_USER || sphere[i].R <= 0.0) continue;
+		++nb;
+	  }
+	  return nb;
+	  //return (n1+n2+n3+n4+n5);
 	}
+	double getMeanSolidFraction(double x, double y, double z, double R);
 	
     void plugTetraMesh (TetraMesh * mesh);
     void save_mgpost (const char* name);
 	void save_tri_mgpost (const char* name);
     void save_Rxyz (const char* name);
-        
-    double virtual_radius_factor;
     
     SpherePadder();
 
-	// Check functions (to debug)
+	// Check functions only for debug (very slow!!)
 	void detect_overlap ();
 
 	//! \brief 5-step padding (for details see Jerier et al.)
     void pad_5 ();
 
-    //! \brief Place virtual spheres at boudaries.
+	//! \brief Place virtual spheres at mesh boudaries and modify the position and radius of overlapping spheres in such a way that theu are in contact with the boundary plans.
 	void place_virtual_spheres ();
 
-	// en cours de debuggage
+	//! \brief Make the packing denser by filling void spaces detected by building a Delaunay triangulation (with CGAL)
 	void densify();
 
 	//! \brief Insert a sphere (x,y,z,R) within the packing. Overlapping spheres are cancelled.
-    void insert_sphere(double x, double y, double z, double R);   
+    void insert_sphere(double x, double y, double z, double R);
     
     // FOR ANALYSIS
-    void add_spherical_probe(double Rfact = 1.0);   
+	void save_granulo(const char* name);
+	void rdf (unsigned int Npoint, unsigned int Nrmean);
 };
 
 

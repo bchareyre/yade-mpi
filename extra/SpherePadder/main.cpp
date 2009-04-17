@@ -9,6 +9,7 @@
 *************************************************************************/
 
 #include "SpherePadder.hpp"
+#include <limits.h>
 
 unsigned int           mesh_format;
 vector <unsigned int>  output_format;
@@ -16,37 +17,77 @@ char                   mesh_file_name[100];
 char                   output_file_name[100];
 void resume();
 
-int main()
-{ 
+int main(int argc, char ** argv)
+{
+# if 0
+  cout << "\n           Int Types" << endl;
+  cout << "Size of int types is " <<
+  sizeof(int) << " bytes" << endl;
+  cout << "Signed int min: " << INT_MIN
+  << " max: " << INT_MAX << endl;
+  cout << "Unsigned int min: 0 max: " <<
+  UINT_MAX << endl;
+
+  cout << "\n        Long Int Types" <<
+  endl;
+  cout << "Size of long int types is " <<
+  sizeof(long) << " bytes" << endl;
+  cout << "Signed long min: " << LONG_MIN
+  << " max: " << LONG_MAX << endl;
+  cout << "Unsigned long min: 0 max: " <<
+  ULONG_MAX << endl;
+
+  return 0;
+#endif
+
 #if 1
  
   TetraMesh * mesh = new TetraMesh();
   //mesh->read_gmsh("meshes/cube1194.msh");
-  mesh->read("meshes/test.tetra");
+  //mesh->read("meshes/test.tetra");
+  mesh->read_gmsh("etude_t_vs_ntetra/vincent_1000.msh");
+
   //mesh->write_surface_MGP ("cube.mgp");
 
   SpherePadder * padder = new SpherePadder();
+  //padder->ShutUp();
   
   padder->plugTetraMesh(mesh);
-  padder->setRadiusRatio(4.0);
+  padder->setRadiusRatio(3.0/*atof(argv[2])*/);
   padder->setMaxOverlapRate(1.0e-4);
-  padder->setVirtualRadiusFactor(100.0);
+  padder->setVirtualRadiusFactor(100.0); 
+
+  // ---------
+  time_t start_time = clock();
   
   padder->pad_5();
   padder->place_virtual_spheres();
-  padder->insert_sphere(0.5,0.5,0.5,0.4);
+  //padder->insert_sphere(0.5,0.5,0.5,0.2);
+  
+  //unsigned int nmax = padder->getNumberOfSpheres() * 1.2;
+  //padder->setMaxNumberOfSpheres(nmax);
+  padder->setMaxSolidFractioninProbe(0.6 /*atof(argv[1])*/, 0.5, 0.5,0.5, 0.45);
+  
   padder->densify();
-  padder->detect_overlap ();
 
+  time_t stop_time = clock();
+  float time_used = (float)(stop_time - start_time) / 1000000.0;
+  cout << "Total time used = " << fabs(time_used) << " s" << endl;
+  cout << "nspheres = " << padder->getNumberOfSpheres() << endl;
+  // ---------
+  
+  //padder->detect_overlap ();
   //padder->save_tri_mgpost("triangulation.mgp");
-  padder->save_mgpost("mgp.out.001");
-  padder->save_Rxyz("spheres.Rxyz");
+  //padder->save_mgpost("mgp.out.001");
+  //padder->save_Rxyz("spheres.Rxyz");
+  //padder->rdf(80,8);
+  //padder->save_granulo("granulo.dat");
   return 0;  
 
 #else
   
   char name_with_ext[100];
-  
+
   bool mesh_format_is_defined      = false;
   bool mesh_file_name_is_defined   = false;  
   bool output_file_name_is_defined = false;
