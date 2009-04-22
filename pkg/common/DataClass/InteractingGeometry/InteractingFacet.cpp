@@ -12,7 +12,7 @@ InteractingFacet::InteractingFacet() : InteractingGeometry()
 	createIndex();
 	#ifdef FACET_TOPO
 		edgeAdjIds.resize(3,Body::ID_NONE);	
-		edgeAdjAngle.resize(3,0);
+		edgeAdjHalfAngle.resize(3,0);
 	#endif
 }
 
@@ -26,7 +26,7 @@ void InteractingFacet::registerAttributes()
     REGISTER_ATTRIBUTE(vertices);
 	#ifdef FACET_TOPO
 		REGISTER_ATTRIBUTE(edgeAdjIds);
-		REGISTER_ATTRIBUTE(edgeAdjAngle);
+		REGISTER_ATTRIBUTE(edgeAdjHalfAngle);
 	#endif
 }
 

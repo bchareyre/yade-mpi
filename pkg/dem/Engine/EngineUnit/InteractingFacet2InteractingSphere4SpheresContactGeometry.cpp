@@ -95,7 +95,6 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 	if (bm<icr) // contact with facet's surface
 	{
-		assert(contactFace!=0);
 		penetrationDepth = sphereRadius - L;
 		normal.Normalize();
 	}
@@ -145,6 +144,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 			if(c->isNew){
 				scm->d0=scm->radius1+scm->radius2-penetrationDepth;
 				scm->d1=scm->radius1-.5*penetrationDepth; scm->d2=scm->radius2-.5*penetrationDepth;
+				scm->d0fixup=-scm->radius1-.5*penetrationDepth;
 				// quasi-constants
 				scm->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
 				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));

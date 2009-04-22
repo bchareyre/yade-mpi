@@ -15,11 +15,16 @@ class Dem3DofGeom: public InteractionGeometry {
 		Vector3r contactPoint;
 		//! make strain go to -∞ for length going to zero
 		bool logCompression;
+		//! se3 of both bodies (needed to compute torque from the contact, strains etc). Must be updated at every step.
+		Se3r se31, se32;
+		//! reference radii of particles (for initial contact stiffness computation)
+		Real refR1, refR2;
 
 		// API that needs to be implemented in derived classes
-		virtual Real displacementN(){throw;}
+		virtual Real displacementN();
 		virtual Vector3r displacementT(){throw;}
 		virtual Real slipToDisplacementTMax(Real displacementTMax){throw;}; // plasticity
+		// reference radii, for contact stiffness computation; set to negative for nonsense values
 		// end API
 
 		Real strainN(){
@@ -31,7 +36,7 @@ class Dem3DofGeom: public InteractionGeometry {
 		Real slipToStrainTMax(Real strainTMax){return slipToDisplacementTMax(strainTMax*refLength)/refLength;}
 
 		REGISTER_CLASS_AND_BASE(Dem3DofGeom,InteractionGeometry);
-		REGISTER_ATTRIBUTES(InteractionGeometry,(refLength)(normal)(contactPoint));
+		REGISTER_ATTRIBUTES(InteractionGeometry,(refLength)(normal)(contactPoint)(se31)(se32)(refR1)(refR2));
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom);
 

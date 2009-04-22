@@ -26,9 +26,10 @@ if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a
 		])
 
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
-
-	env.SharedLibrary('Dem3DofGeom_SphereSphere',['DataClass/InteractionGeometry/Dem3DofGeom_SphereSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','yade-opengl']),
-	env.SharedLibrary('Dem3DofGeom_FacetSphere',['DataClass/InteractionGeometry/Dem3DofGeom_FacetSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','InteractingFacet','yade-opengl','Dem3DofGeom_SphereSphere']),
+	
+	env.SharedLibrary('DemXDofGeom',['DataClass/InteractionGeometry/DemXDofGeom.cpp']),
+	env.SharedLibrary('Dem3DofGeom_SphereSphere',['DataClass/InteractionGeometry/Dem3DofGeom_SphereSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','yade-opengl','DemXDofGeom']),
+	env.SharedLibrary('Dem3DofGeom_FacetSphere',['DataClass/InteractionGeometry/Dem3DofGeom_FacetSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','InteractingFacet','yade-opengl','Dem3DofGeom_SphereSphere','DemXDofGeom']),
 
 	env.SharedLibrary('FacetTopologyAnalyzer',['Engine/StandAloneEngine/FacetTopologyAnalyzer.cpp'],LIBS=env['LIBS']+['InteractingFacet']),
 

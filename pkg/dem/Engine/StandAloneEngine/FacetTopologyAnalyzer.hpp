@@ -39,6 +39,11 @@ class FacetTopologyAnalyzer: public StandAloneEngine{
 		long vertices[3];
 		//! facet id, for back reference
 		body_id_t id;
+		long minVertex(){return min(vertices[0],min(vertices[1],vertices[2]));}
+		long maxVertex(){return max(vertices[0],max(vertices[1],vertices[2]));}
+		struct MinVertexComparator{
+			bool operator()(const shared_ptr<FacetTopology>& t1, const shared_ptr<FacetTopology>& t2){ return t1->minVertex()<t2->minVertex();}
+		};
 	};
 	public:
 		//! Axis along which to do the initial vertex sort

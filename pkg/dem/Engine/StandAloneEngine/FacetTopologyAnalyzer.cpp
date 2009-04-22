@@ -40,7 +40,7 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 				abs(vi->pos[2]-vj->pos[2])<=tolerance &&
 				(vi->pos-vj->pos).SquaredLength()<=tolerance*tolerance){
 				// OK, these two vertices touch
-				LOG_TRACE("Vertices "<<vi->id<<"/"<<vi->vertexNo<<" and "<<vj->id<<"/"<<vj->vertexNo<<" close enough.");
+				// LOG_TRACE("Vertices "<<vi->id<<"/"<<vi->vertexNo<<" and "<<vj->id<<"/"<<vj->vertexNo<<" close enough.");
 				// add vertex to the nextIndetical of the one that has lower index; the one that is added will have isLowestIndex=false
 				if(vi->index<vj->index){ vi->nextIdentical.push_back(vj); vj->isLowestIndex=false; }
 				else{                    vj->nextIdentical.push_back(vi); vi->isLowestIndex=false; }
@@ -81,11 +81,18 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 		}
 		topo1.push_back(t);
 	}
+	std::sort(topo1.begin(),topo1.end(),FacetTopology::MinVertexComparator());
 	size_t nTopo=topo1.size();
 	for(size_t i=0; i<nTopo; i++){
 		size_t j=i;
+		const shared_ptr<FacetTopology>& ti(topo1[i]);
+		long tiMaxVertex=ti->maxVertex();
 		while(++j<nTopo){
-			const shared_ptr<FacetTopology>& ti(topo1[i]), &tj(topo1[j]);
+			const shared_ptr<FacetTopology> &tj(topo1[j]);
+			/* since facets are sorted by their min vertex id,
+				we know that it is safe to skip all the rest
+				as soon as max vertex of ti one is smaller than min vertex of tj, as i<=j */
+			if(tj->minVertex()>tiMaxVertex) break;
 			vector<size_t> vvv; // array of common vertices
 			for(size_t k=0; k<3; k++){
 				if     (ti->vertices[k]==tj->vertices[0]) vvv.push_back(ti->vertices[k]);
@@ -93,9 +100,9 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 				else if(ti->vertices[k]==tj->vertices[2]) vvv.push_back(ti->vertices[k]);
 			}
 			if(vvv.size()<2) continue;
-			assert(vvv.size()!=3); // same coords? nonsense
-			assert(vvv.size()==2);
-			vector<int> edge(2,0);
+			assert(vvv.size()!=3 /* same coords? nonsense*/ ); assert(vvv.size()==2);
+			// from here, we know ti and tj are adjacent
+			vector<int> edge(2,0); int &ei(edge[0]),&ej(edge[1]);
 			// identify what edge are we at, for both facets
 			for(int k=0; k<2; k++){
 				for(edge[k]=0; edge[k]<3; edge[k]++){
@@ -109,10 +116,25 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 				}
 			}
 			// add adjacency information to the facet itself
-			YADE_PTR_CAST<InteractingFacet>((*rb->bodies)[ti->id]->interactingGeometry)->edgeAdjIds[edge[0]]=tj->id;
-			YADE_PTR_CAST<InteractingFacet>((*rb->bodies)[tj->id]->interactingGeometry)->edgeAdjIds[edge[1]]=ti->id;
+			InteractingFacet *f1=YADE_CAST<InteractingFacet*>((*rb->bodies)[ti->id]->interactingGeometry.get()), *f2=YADE_CAST<InteractingFacet*>((*rb->bodies)[tj->id]->interactingGeometry.get());
+			f1->edgeAdjIds[ei]=ti->id; f2->edgeAdjIds[ej]=tj->id;
+			// normals are in the sense of vertex rotation (right-hand rule); therefore, if vertices of the adjacent edge are opposite on each facet, normals are in the same direction
+			bool invNormals=(ti->vertices[ei]==tj->vertices[ej]);
+			assert(
+				( invNormals && (ti->vertices[ ei     ]==tj->vertices[ej]) && (ti->vertices[(ei+1)%3]==tj->vertices[(ej+1)%3]) ) ||
+				(!invNormals && (ti->vertices[(ei+1)%3]==tj->vertices[ej]) && (ti->vertices[ ei     ]==tj->vertices[(ej+1)%3]) ));
+			// angle between normals
+			PhysicalParameters *pp1=(*rb->bodies)[ti->id]->physicalParameters.get(), *pp2=(*rb->bodies)[tj->id]->physicalParameters.get();
+			Vector3r n1g=pp1->se3.orientation*f1->nf, n2g=pp2->se3.orientation*f2->nf;
+			//TRVAR2(n1g,n2g);
+			Vector3r contEdge1g=pp1->se3.orientation*(f1->vertices[(ei+1)%3]-f1->vertices[ei]); // vector of the edge of contact in global coords
+			Quaternionr q12; q12.Align(n1g,(invNormals?-1.:1.)*n2g); Real halfAngle; Vector3r axis; q12.ToAxisAngle(axis,halfAngle); halfAngle*=.5;
+			assert(halfAngle>=0 && halfAngle<=Mathr::HALF_PI);
+			if(axis.Dot(contEdge1g)<0 /* convex contact from the side of +n1 */ ) halfAngle*=-1.;
+			f1->edgeAdjHalfAngle[ei]=halfAngle;
+			f2->edgeAdjHalfAngle[ej]=(invNormals ? -halfAngle : halfAngle);
 			commonEdgesFound++;
-			LOG_TRACE("Added adjacency information for #"<<ti->id<<"+#"<<tj->id<<" (common edges "<<edge[0]<<"+"<<edge[1]<<")");
+			LOG_TRACE("Found adjacent #"<<ti->id<<"+#"<<tj->id<<"; common edges "<<ei<<"+"<<ej<<", normals "<<(invNormals?"inversed":"congruent")<<", halfAngle "<<halfAngle<<")");
 		}
 	}
 }

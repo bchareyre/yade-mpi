@@ -1,5 +1,5 @@
 import yade.log
-#yade.log.setLevel('FacetTopologyAnalyzer',yade.log.TRACE)
+yade.log.setLevel('FacetTopologyAnalyzer',yade.log.TRACE)
 
 # Note: FacetTopologyAnalyzer is normally run as an initializer;
 # it is only for testing sake that it is in O.engines here.
@@ -22,6 +22,17 @@ if 1:
 	O.step()
 	assert(O.bodies[0].phys['edgeAdjIds'][1]==1 and O.bodies[1].phys['edgeAdjIds'][0]==1)
 	assert(topo['commonEdgesFound']==1)
+if 1:
+	O.bodies.clear()
+	O.bodies.append([
+		utils.facet([(0,0,0),(1,0,0),(0,1,0)]),
+		utils.facet([(1,1,1),(1,0,0),(0,1,0)]),
+	])
+	O.step()
+	assert(O.bodies[0].phys['edgeAdjIds'][1]==1 and O.bodies[1].phys['edgeAdjIds'][0]==1)
+	assert(topo['commonEdgesFound']==1)
+	assert(abs(O.bodies[0].mold['edgeAdjHalfAngle'][1]-(-5*atan(2/sqrt(2))))<1e-6)
+
 if 1:
 	O.bodies.clear()
 	r=.5 # radius of the sphere

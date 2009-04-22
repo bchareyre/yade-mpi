@@ -174,6 +174,8 @@ class BrefcomPhysParams: public BodyMacroParameters {
 };
 REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
+//#define BREFCOM_DEM3DOF
+
 class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
 	public:
 	/*! Damage evolution law */
@@ -184,7 +186,11 @@ class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
 		bool logStrain;
 		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false){ /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
-	FUNCTOR2D(SpheresContactGeometry,BrefcomContact);
+	#ifdef BREFCOM_DEM3DOF
+		FUNCTOR2D(Dem3DofGeom,BrefcomContact);
+	#else
+		FUNCTOR2D(SpheresContactGeometry,BrefcomContact);
+	#endif
 	REGISTER_CLASS_AND_BASE(ef2_Spheres_Brefcom_BrefcomLaw,ConstitutiveLaw);
 	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain));
 	DECLARE_LOGGER;

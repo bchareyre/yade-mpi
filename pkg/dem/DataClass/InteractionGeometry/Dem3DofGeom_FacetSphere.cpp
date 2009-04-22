@@ -7,7 +7,6 @@ CREATE_LOGGER(Dem3DofGeom_FacetSphere);
 Dem3DofGeom_FacetSphere::~Dem3DofGeom_FacetSphere(){}
 
 void Dem3DofGeom_FacetSphere::setTgPlanePts(const Vector3r& p1new, const Vector3r& p2new){
-	// FIXME: not tested yet
 	TRVAR3(cp1pt,cp2rel,contPtInTgPlane2()-contPtInTgPlane1());	
 	cp1pt=se31.orientation.Conjugate()*(turnPlanePt(p1new,normal,se31.orientation*localFacetNormal)+contactPoint-se31.position);
 	cp2rel=se32.orientation.Conjugate()*Dem3DofGeom_SphereSphere::rollPlanePtToSphere(p2new,effR2,-normal);
@@ -19,6 +18,19 @@ void Dem3DofGeom_FacetSphere::relocateContactPoints(const Vector3r& p1, const Ve
 	if(p2.SquaredLength()>pow(effR2,2)){
 		setTgPlanePts(Vector3r::ZERO,p2-p1);
 	}
+}
+
+Real Dem3DofGeom_FacetSphere::slipToDisplacementTMax(Real displacementTMax){
+	//FIXME: not yet tested
+	// negative or zero: reset shear
+	if(displacementTMax<=0.){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
+	// otherwise
+	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
+	Real currDistSq=(p2-p1).SquaredLength();
+	if(currDistSq<pow(displacementTMax,2)) return 0; // close enough, no slip needed
+	//Vector3r diff=.5*(sqrt(currDistSq)/displacementTMax-1)*(p2-p1); setTgPlanePts(p1+diff,p2-diff);
+	Real scale=displacementTMax/sqrt(currDistSq); setTgPlanePts(scale*p1,scale*p2);
+	return (displacementTMax/scale)*(1-scale);
 }
 
 CREATE_LOGGER(ef2_Facet_Sphere_Dem3DofGeom);
@@ -49,12 +61,29 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 			normal.Normalize();
 		} else { // contact with the edge
 			contactPt+=edgeNormals[edgeMax]*(inCircleR-distMax);
+			bool noVertexContact=false;
 			//TRVAR3(edgeNormals[edgeMax],inCircleR,distMax);
 			// contact with vertex no. edgeMax
-			if (contactPt.Dot(edgeNormals[(edgeMax-1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
+			// FIXME: this is the original version, but why (edgeMax-1)%3? IN that case, edgeNormal to edgeMax would never be tried
+			//    if     (contactPt.Dot(edgeNormals[        (edgeMax-1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
+			if     (contactPt.Dot(edgeNormals[        edgeMax      ])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
 			// contact with vertex no. edgeMax+1
 			else if(contactPt.Dot(edgeNormals[edgeMax=(edgeMax+1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
+			// contact with edge no. edgeMax
+			else noVertexContact=true;
 			normal=contactLine-contactPt;
+			#ifdef FACET_TOPO
+				if(noVertexContact && facet->edgeAdjIds[edgeMax]!=Body::ID_NONE){
+					// find angle between our normal and the facet's normal (still local coords)
+					Quaternionr q; q.Align(facet->nf,normal); Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
+					assert(angle>=0 && angle<=Mathr::PI);
+					if(edgeNormals[edgeMax].Dot(axis)<0) angle*=-1.;
+					bool negFace=normal.Dot(facet->nf)<0; // contact in on the negative facet's face
+					Real halfAngle=(negFace?-1.:1.)*facet->edgeAdjHalfAngle[edgeMax]; 
+					if(halfAngle<0 && angle>halfAngle) return false; // on concave boundary, and if in the other facet's sector, no contact
+					// otherwise the contact will be created
+				}
+			#endif
 			//TRVAR4(contactLine,contactPt,normal,normal.Length());
 			//TRVAR3(se31.orientation*contactLine,se31.position+se31.orientation*contactPt,se31.orientation*normal);
 			penetrationDepth=sphereRadius-normal.Normalize();
@@ -71,6 +100,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 		fs=shared_ptr<Dem3DofGeom_FacetSphere>(new Dem3DofGeom_FacetSphere());
 		c->interactionGeometry=fs;
 		fs->effR2=sphereRadius-penetrationDepth;
+		fs->refR1=-1; fs->refR2=sphereRadius;
 		fs->refLength=fs->effR2;
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=normal;

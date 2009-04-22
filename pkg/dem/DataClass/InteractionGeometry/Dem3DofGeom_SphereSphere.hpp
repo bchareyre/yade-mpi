@@ -13,8 +13,6 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 		void relocateContactPoints();
 		void relocateContactPoints(const Vector3r& tgPlanePt1, const Vector3r& tgPlanePt2);
 	public:
-		//! Positions and orientations of both spheres; must be updated at every iteration by the geom functor
-		Se3r se31, se32;
 		//! relative orientation of the contact point with regards to sphere-local +x axis (quasi-constant)
 		Quaternionr cp1rel, cp2rel;
 		//! shorthands
@@ -37,7 +35,7 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 		Real slipToDisplacementTMax(Real displacementTMax);
 		/********* end API ***********/
 
-	REGISTER_ATTRIBUTES(Dem3DofGeom,(se31)(se32)(effR1)(effR2)(cp1rel)(cp2rel));
+	REGISTER_ATTRIBUTES(Dem3DofGeom,(effR1)(effR2)(cp1rel)(cp2rel));
 	REGISTER_CLASS_AND_BASE(Dem3DofGeom_SphereSphere,Dem3DofGeom);
 	friend class GLDraw_Dem3DofGeom_SphereSphere;
 	friend class ef2_Sphere_Sphere_Dem3DofGeom;

@@ -5,6 +5,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 #include<yade/lib-opengl/GLUtils.hpp>
+#include<yade/pkg-dem/DemXDofGeom.hpp>
 
 
 YADE_PLUGIN("BrefcomMakeContact","BrefcomContact","BrefcomLaw","GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics", "ef2_Spheres_Brefcom_BrefcomLaw" /* ,"BrefcomStiffnessComputer"*/ );
@@ -66,7 +67,11 @@ CREATE_LOGGER(BrefcomMakeContact);
 
 //! @todo Formulas in the following should be verified
 void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
-	const shared_ptr<SpheresContactGeometry>& contGeom=YADE_PTR_CAST<SpheresContactGeometry>(interaction->interactionGeometry);
+	#ifdef BREFCOM_DEM3DOF
+		const Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
+	#else
+		const SpheresContactGeometry* contGeom=YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	#endif
 	assert(contGeom); // for now, don't handle anything other than SpheresContactGeometry
 
 	if(!interaction->isNew && interaction->interactionPhysics){ /* relax */ } 
@@ -78,7 +83,12 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 		Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young); // harmonic Young's modulus average
 		//Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
-		Real S12=Mathr::PI*pow(min(contGeom->radius1,contGeom->radius2),2); // "surface" of interaction
+		#ifdef BREFCOM_DEM3DOF
+			Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
+			Real S12=Mathr::PI*pow(minRad,2); // "surface" of interaction
+		#else
+			Real S12=Mathr::PI*pow(min(contGeom->radius1,contGeom->radius2),2); // "surface" of interaction
+		#endif
 		//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
 		//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
 
@@ -189,7 +199,12 @@ Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYie
 
 void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	//timingDeltas->start();
-	SpheresContactGeometry* contGeom=static_cast<SpheresContactGeometry*>(_geom.get());
+	#ifdef BREFCOM_DEM3DOF
+		Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
+	#else
+		SpheresContactGeometry* contGeom=static_cast<SpheresContactGeometry*>(_geom.get());
+		assert(contGeom->hasShear);
+	#endif
 	BrefcomContact* BC=static_cast<BrefcomContact*>(_phys.get());
 
 	/* kept fully damaged contacts; note that normally the contact is deleted _after_ the BREFCOM_MATERIAL_MODEL,
@@ -206,11 +221,17 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	#define NNAN(a) assert(!isnan(a));
 	#define NNANV(v) assert(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
 
-	assert(contGeom->hasShear);
 	//timingDeltas->checkpoint("setup");
-	epsN=contGeom->epsN(); epsT=contGeom->epsT();
+	#ifdef BREFCOM_DEM3DOF
+		epsN=contGeom->strainN(); epsT=contGeom->strainT();
+	#else
+		epsN=contGeom->epsN(); epsT=contGeom->epsT();
+	#endif
 	if(isnan(epsN)){
-		LOG_ERROR("d0="<<contGeom->d0<<", d1,d2="<<contGeom->d1<<","<<contGeom->d2<<"; pos1,pos2="<<contGeom->pos1<<","<<contGeom->pos2);
+		#ifndef BREFCOM_DEM3DOF
+			LOG_ERROR("d0="<<contGeom->d0<<", d1,d2="<<contGeom->d1<<","<<contGeom->d2<<"; pos1,pos2="<<contGeom->pos1<<","<<contGeom->pos2);
+		#endif
+		throw;
 	}
 	NNAN(epsN); NNANV(epsT);
 	// already in SpheresContactGeometry:
@@ -237,7 +258,11 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
-	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->pos1, I->getId2(), contGeom->pos2, rootBody);
+	#ifdef BREFCOM_DEM3DOF
+		applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, rootBody);
+	#else
+		applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->pos1, I->getId2(), contGeom->pos2, rootBody);
+	#endif
 	//timingDeltas->checkpoint("rest");
 }
 

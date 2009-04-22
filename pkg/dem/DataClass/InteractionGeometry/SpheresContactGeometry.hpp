@@ -49,7 +49,8 @@ class SpheresContactGeometry: public InteractionGeometry{
 		// interaction "radii" and total length; this is _really_ constant throughout the interaction life
 		// d1 is really distance from the sphere1 center to the contact plane, it may not correspond to the sphere radius!
 		// therefore, d1+d2=d0 (distance at which the contact was created)
-		Real d1, d2, d0;
+		// d0fixup is added to d0 when computing normal strain; it should fix problems with sphere-facet interactions never getting enough compressed
+		Real d1, d2, d0, d0fixup;
 		// initial relative orientation, used for bending and torsion computation
 		Quaternionr initRelOri12;
 
@@ -64,7 +65,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 		Vector3r contPt() const {return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
 
 		Real displacementN() const {assert(hasShear); return (pos2-pos1).Length()-d0;}
-		Real epsN() const {return displacementN()*(1./d0);}
+		Real epsN() const {return displacementN()*(1./(d0+d0fixup));}
 		Vector3r displacementT() { assert(hasShear);
 			// enabling automatic relocation decreases overall simulation speed by about 3%
 			// perhaps: bool largeStrains ... ?
@@ -76,11 +77,11 @@ class SpheresContactGeometry: public InteractionGeometry{
 				return contPtInTgPlane2()-contPtInTgPlane1();
 			#endif
 		}
-		Vector3r epsT() {return displacementT()*(1./d0);}
+		Vector3r epsT() {return displacementT()*(1./(d0+d0fixup));}
 	
 		Real slipToDisplacementTMax(Real displacementTMax);
 		//! slip to epsTMax if current epsT is greater; return the relative slip magnitude
-		Real slipToEpsTMax(Real epsTMax){ return (1/d0)*slipToDisplacementTMax(epsTMax*d0);}
+		Real slipToStrainTMax(Real epsTMax){ return (1/d0)*slipToDisplacementTMax(epsTMax*d0);}
 
 		void relocateContactPoints();
 		void relocateContactPoints(const Vector3r& tgPlanePt1, const Vector3r& tgPlanePt2);
@@ -90,7 +91,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Vector3r relRotVector() const;
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),initRelOri12(Quaternionr::IDENTITY){createIndex();
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),d0fixup(0),initRelOri12(Quaternionr::IDENTITY){createIndex();
 		#ifdef SCG_SHEAR
 			shear=Vector3r::ZERO; prevNormal=Vector3r::ZERO /*initialized to proper value by geom functor*/;
 		#endif	
@@ -120,6 +121,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 			(d1)
 			(d2)
 			(d0)
+			(d0fixup)
 			(initRelOri12));
 	REGISTER_CLASS_AND_BASE(SpheresContactGeometry,InteractionGeometry);
 	REGISTER_CLASS_INDEX(SpheresContactGeometry,InteractionGeometry);

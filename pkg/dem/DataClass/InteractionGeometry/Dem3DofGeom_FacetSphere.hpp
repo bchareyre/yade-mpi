@@ -16,7 +16,7 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 		/******* API ********/
 		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
 		virtual Vector3r displacementT(){ relocateContactPoints(); return contPtInTgPlane2()-contPtInTgPlane1(); }
-		virtual Real slipToDisplacementTMax(Real displacementTMax){ LOG_FATAL("Not implemented yet."); throw; }
+		virtual Real slipToDisplacementTMax(Real displacementTMax);
 		/***** end API ******/
 
 		void setTgPlanePts(const Vector3r&, const Vector3r&);
@@ -26,13 +26,11 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	Vector3r cp1pt;
 	//! orientation between +x and the reference contact point (on the sphere) in sphere-local coords
 	Quaternionr cp2rel;
-	//! positions and orientations of both bodies; updated at every iteration
-	Se3r se31, se32;
 	//! unit normal of the facet plane in facet-local coordinates
 	Vector3r localFacetNormal;
 	// effective radius of sphere
 	Real effR2;
-	REGISTER_ATTRIBUTES(Dem3DofGeom,(cp1pt)(cp2rel)(se31)(se32)(localFacetNormal)(effR2) );
+	REGISTER_ATTRIBUTES(Dem3DofGeom,(cp1pt)(cp2rel)(localFacetNormal)(effR2) );
 	REGISTER_CLASS_AND_BASE(Dem3DofGeom_FacetSphere,Dem3DofGeom);
 	DECLARE_LOGGER;
 	friend class GLDraw_Dem3DofGeom_FacetSphere;
