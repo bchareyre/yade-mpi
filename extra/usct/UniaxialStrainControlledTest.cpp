@@ -20,7 +20,7 @@ void UniaxialStrainer::init(){
 	assert(posIds.size()>0);
 	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
-	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id); posCoords.push_back(b->physicalParameters->se3.position[axis]);
+	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); posCoords.push_back(b->physicalParameters->se3.position[axis]);
 		if(blockDisplacements && blockRotations) b->isDynamic=false;
 		else{
 			shared_ptr<PhysicalParameters> &pp=b->physicalParameters;
@@ -28,7 +28,7 @@ void UniaxialStrainer::init(){
 			if(blockRotations) pp->blockedDOFs|=PhysicalParameters::DOF_RXRYRZ;
 		}
 	}
-	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id); negCoords.push_back(b->physicalParameters->se3.position[axis]);
+	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); negCoords.push_back(b->physicalParameters->se3.position[axis]);
 		if(blockDisplacements && blockRotations) b->isDynamic=false;
 		else{
 			shared_ptr<PhysicalParameters> &pp=b->physicalParameters;
@@ -49,10 +49,42 @@ void UniaxialStrainer::init(){
 	assert(originalLength>0 && !isnan(originalLength));
 
 	assert(!isnan(strainRate) || !isnan(absSpeed));
-	if(strainRate==0){ strainRate=absSpeed/originalLength; LOG_INFO("Computed new strainRate "<<strainRate); }
+	if(!isnan(std::numeric_limits<Real>::quiet_NaN())){ LOG_FATAL("NaN's are not properly supported (compiled, with -ffast-math?), which is required."); throw; }
 
-	initAccelTime_s=initAccelTime>=0 ? initAccelTime : Omega::instance().getTimeStep()*(-initAccelTime);
-	LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<", will be reached after "<<initAccelTime_s<<"s ("<<initAccelTime_s/Omega::instance().getTimeStep()<<" steps).");
+	if(isnan(strainRate)){ strainRate=absSpeed/originalLength; LOG_INFO("Computed new strainRate "<<strainRate); }
+	else {absSpeed=strainRate*originalLength;}
+
+	if(!setSpeeds){
+		initAccelTime_s=initAccelTime>=0 ? initAccelTime : Omega::instance().getTimeStep()*(-initAccelTime);
+		LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<", will be reached after "<<initAccelTime_s<<"s ("<<initAccelTime_s/Omega::instance().getTimeStep()<<" steps).");
+	} else {
+		/* set speed such that it is linear on the strained axis; transversal speed is not set, which can perhaps create some problems.
+			Note: all bodies in the simulation will have their speed set, since there is no way to tell which ones are part of the specimen
+			and which are not.
+
+			Speeds will be linearly interpolated beween axis positions p0,p1 and velocities v0,v1.
+		*/
+		initAccelTime_s=0;
+		LOG_INFO("Strain speed will be "<<absSpeed<<", strain rate "<<strainRate<<"; velocities will be set directly at the beginning.");
+		Real p0=axisCoord(negIds[0]), p1=axisCoord(posIds[0]); // limit positions
+		Real v0,v1; // speeds at p0, p1
+		switch(asymmetry){
+			case -1: v0=-absSpeed; v1=0; break;
+			case  0: v0=-absSpeed/2; v1=absSpeed/2; break;
+			case  1: v0=0; v1=absSpeed; break;
+			default: LOG_FATAL("Unknown asymmetry value "<<asymmetry<<" (should be -1,0,1)"); throw;
+		}
+		assert(p1>p0);
+		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+			// skip bodies on the boundary, since those will have their positions updated directly
+			if(std::find(posIds.begin(),posIds.end(),b->id)!=posIds.end() || std::find(negIds.begin(),negIds.end(),b->id)!=negIds.end()) { continue; }
+			Real p=axisCoord(b->id);
+			Real pNormalized=(p-p0)/(p1-p0);
+			YADE_CAST<ParticleParameters*>(b->physicalParameters.get())->velocity[axis]=pNormalized*(v1-v0)+v0;
+		}
+	}
+	stressUpdateInterval=max(1,(int)(2e-5/(abs(strainRate)*Omega::instance().getTimeStep())));
+	LOG_INFO("Stress will be updated every "<<stressUpdateInterval<<" steps.");
 
 	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;
 	 * this will not work if there are foreign bodies in the simulation,
@@ -75,13 +107,10 @@ void UniaxialStrainer::init(){
 		}
 	}
 	assert(crossSectionArea>0);
-	prepareRecStream();
-#if 0
-	setupTransStrainSensors();
-#endif
 }
 
-void UniaxialStrainer::applyCondition(MetaBody* rootBody){
+void UniaxialStrainer::applyCondition(MetaBody* _rootBody){
+	rootBody=_rootBody;
 	if(needsInit) init();
 	// postconditions for initParams
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size() && originalLength>0 && crossSectionArea>0);
@@ -117,19 +146,18 @@ void UniaxialStrainer::applyCondition(MetaBody* rootBody){
 
 	Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
 	strain=axialLength/originalLength-1;
-	if(Omega::instance().getCurrentIteration()%400==0) TRVAR5(dAX,axialLength,originalLength,currentStrainRate,strain);
 
 	// reverse if we're over the limit strain
 	if(notYetReversed && limitStrain!=0 && ((currentStrainRate>0 && strain>limitStrain) || (currentStrainRate<0 && strain<limitStrain))) { currentStrainRate*=-1; notYetReversed=false; LOG_INFO("Reversed strain rate to "<<currentStrainRate); }
 
-	if(Omega::instance().getCurrentIteration()%10==0) {
-		computeAxialForce(rootBody);
+	// update forces and stresses
+	if(Omega::instance().getCurrentIteration()%stressUpdateInterval==0) {
+		computeAxialForce();
 		avgStress=(sumPosForces+sumNegForces)/(2*crossSectionArea); // average nominal stress
-		if(!recordFile.empty() && recStream.good()) recStream<<Omega::instance().getCurrentIteration()<<" "<<strain<<" "<<avgStress<<endl; // <<" "<<avgTransStrain<<endl;
 	}
 }
 
-void UniaxialStrainer::computeAxialForce(MetaBody* rootBody){
+void UniaxialStrainer::computeAxialForce(){
 	sumPosForces=sumNegForces=0;
 	rootBody->bex.sync();
 	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
@@ -220,7 +248,6 @@ bool USCTGen::generate(){
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
-#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>

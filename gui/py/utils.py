@@ -347,21 +347,30 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		o.tags['line']='l!'
 	else:
 		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
-		tableFile,tableLine=tableFileLine.split(':')
+		env=tableFileLine.split(':')
+		tableDesc=None
+		tableFile,tableLine=env[0],env[1]
+		if len(env)>2: tableDesc=env[3]
 		o.tags['line']='l'+tableLine
 		ll=[l.split('#')[0] for l in ['']+open(tableFile).readlines()]; names=ll[1].split(); values=ll[int(tableLine)].split()
 		assert(len(names)==len(values))
+		if 'description' in names: O.tags['description']=values[names.index('description')]
+		else:
+			bangCols=[i for i,h in enumerate(names) if h[-1]=='!']
+			if len(bangCols)==0: bangCols=range(len(headings))
+			for i in range(len(names)):
+				if names[i][-1]=='!': names[i]=names[i][:-1] # strip trailing !
+			O.tags['description']=','.join( names[col]+'='+('%g'%values[col] if isinstance(values[col],float) else str(values[col])) for col in bangCols)
 		for i in range(len(names)):
-			if names[i]=='description': o.tags['description']=values[i]
-			else:
-				if names[i] not in kw.keys():
-					if (not unknownOk) and names[i][0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
-				else: kw.pop(names[i])
-				if names[i][0]!='!':
-					exec('__builtin__.%s=%s'%(names[i],values[i])); tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
+			if names[i]=='description': continue
+			if names[i] not in kw.keys():
+				if (not unknownOk) and names[i][0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
+			else: kw.pop(names[i])
+			if names[i][0]!='!':
+				exec('%s=%s'%(names[i],values[i])) in __builtins__; tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
 	defaults=[]
 	for k in kw.keys():
-		exec("__builtin__.%s=%s"%(k,repr(kw[k])))
+		exec("%s=%s"%(k,repr(kw[k]))) in __builtins__
 		defaults+=["%s=%s"%(k,kw[k])]; dictDefaults[k]=kw[k]
 	o.tags['defaultParams']=",".join(defaults)
 	o.tags['params']=",".join(tagsParams)

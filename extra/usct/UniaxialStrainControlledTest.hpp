@@ -46,13 +46,12 @@ REGISTER_SERIALIZABLE(USCTGen);
  */
 class UniaxialStrainer: public DeusExMachina {
 	private:
+		MetaBody* rootBody;
 		bool idInVector(body_id_t id, const vector<body_id_t>& V){for(size_t i=0; i<V.size(); i++){ if(V[i]==id) return true; }	return false; }  // unused now
-		void computeAxialForce(MetaBody* rootBody);
+		void computeAxialForce();
 
-		ofstream recStream;
-		string recordFile;
 		bool needsInit;
-		Real& axisCoord(body_id_t id){ return Body::byId(id)->physicalParameters->se3.position[axis]; };
+		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->physicalParameters->se3.position[axis]; };
 		void init();
 	public:
 		virtual bool isActivated(){return active;}
@@ -71,6 +70,7 @@ class UniaxialStrainer: public DeusExMachina {
 		Real sumPosForces,sumNegForces;
 		//! crossSection perpendicular to he strained axis, computed from AABB of MetaBody
 		Real crossSectionArea;		//! Apply strain along x (0), y (1) or z(2) axis
+		//! The axis which is strained (0,1,2 for x,y,z)
 		int axis;
 		//! If 0, straining is symmetric for negIds and posIds; for 1 (or -1), only posIds are strained and negIds don't move (or vice versa)
 		int asymmetry;
@@ -84,6 +84,10 @@ class UniaxialStrainer: public DeusExMachina {
 		long idleIterations;
 		//! Time for strain reaching the requested value (linear interpolation). If negative, the time is dt*(-initAccelTime), where dt is  the timestep at the first iteration.
 		Real initAccelTime, initAccelTime_s /* value always in s, computed from initAccelTime */;
+		//! should we set speeds at the beginning directly, instead of increasing strain rate progressively?
+		bool setSpeeds;
+		//! how often to update forces (initialized automatically)
+		int stressUpdateInterval;
 
 		/** bodies on which straining will be applied (on the positive and negative side of axis) */
 		vector<body_id_t> posIds, negIds;
@@ -110,7 +114,7 @@ class UniaxialStrainer: public DeusExMachina {
 		Real strain, avgStress;
 
 		virtual void applyCondition(MetaBody* rootBody);
-		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; /* sensorsPusher=shared_ptr<UniaxialStrainSensorPusher>(); */ recordFile=""; strain=avgStress=/*avgTransStrain=*/0; blockRotations=false; blockDisplacements=false;  strainRate=0; absSpeed=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; initAccelTime=-200;};
+		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; strain=avgStress=0; blockRotations=false; blockDisplacements=false; setSpeeds=false; strainRate=absSpeed=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; initAccelTime=-200;};
 		virtual ~UniaxialStrainer(){};
 		REGISTER_ATTRIBUTES(DeusExMachina,
 				(strainRate) 
@@ -128,14 +132,12 @@ class UniaxialStrainer: public DeusExMachina {
 				(limitStrain) 
 				(notYetReversed) 
 				(crossSectionArea) 
-				(recordFile) 
 				(strain) 
 				(avgStress) 
 				(blockDisplacements) 
 				(blockRotations) 
+				(setSpeeds)
 		);
-		void prepareRecStream(void){ if(!recordFile.empty()) recStream.open(recordFile.c_str()); }
-		void postProcessAttributes(bool deserializing){ if(deserializing) prepareRecStream(); } 	
 	REGISTER_CLASS_AND_BASE(UniaxialStrainer,DeusExMachina);
 	DECLARE_LOGGER;
 };
