@@ -54,8 +54,18 @@ class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 			(useShear)
 		#endif
 	);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ef2_Spheres_Elastic_ElasticLaw);
+
+class ef2_Dem3Dof_Elastic_ElasticLaw: public ConstitutiveLaw{
+	public:
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+		FUNCTOR2D(Dem3DofGeom,ElasticContactInteraction);
+		REGISTER_CLASS_AND_BASE(ef2_Dem3Dof_Elastic_ElasticLaw,ConstitutiveLaw);
+		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
+};
+REGISTER_SERIALIZABLE(ef2_Dem3Dof_Elastic_ElasticLaw);
 
 class ElasticContactLaw : public InteractionSolver
 {
@@ -81,5 +91,6 @@ class ElasticContactLaw : public InteractionSolver
 };
 
 REGISTER_SERIALIZABLE(ElasticContactLaw);
+
 
 

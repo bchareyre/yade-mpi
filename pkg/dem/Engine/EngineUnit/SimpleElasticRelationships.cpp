@@ -16,17 +16,6 @@
 #include<yade/core/MetaBody.hpp>
 
 
-SimpleElasticRelationships::SimpleElasticRelationships()
-{
-
-}
-
-
-void SimpleElasticRelationships::registerAttributes()
-{
-	
-}
-
 
 void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // BodyMacroParameters
 					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters

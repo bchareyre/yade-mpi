@@ -100,7 +100,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	env.SharedLibrary('SimpleElasticRelationships',
 		['Engine/EngineUnit/SimpleElasticRelationships.cpp'],
 		LIBS=env['LIBS']+['SDECLinkPhysics',
-			'SDECLinkGeometry',
 			'ElasticContactInteraction',
 			'SpheresContactGeometry',
 			'BodyMacroParameters',

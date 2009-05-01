@@ -5,6 +5,7 @@ brefcomMaterialModel='../brefcom-mm.hh'
 if os.path.exists('../'+brefcomMaterialModel):
 	print "Will include local file "+brefcomMaterialModel
 	brefcomInclude=['-include',brefcomMaterialModel]
+	Depends('Brefcom.cpp','../../brefcom-mm.hh')
 else:
 	brefcomInclude=['']
 
@@ -44,7 +45,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 
 	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4SpheresContactGeometry','DemXDofGeom']),
 
-	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder','Brefcom']),
+	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder','Brefcom','ConstitutiveLawDispatcher']),
 
 	env.SharedLibrary('SimpleScene',['SimpleScene.cpp'],LIBS=env['LIBS']+['Shop','SimpleElasticRelationships']),
 

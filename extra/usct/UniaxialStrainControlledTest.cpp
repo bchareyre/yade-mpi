@@ -252,6 +252,7 @@ bool USCTGen::generate(){
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
+#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 
 
 
@@ -283,8 +284,10 @@ void USCTGen::createEngines(){
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 
-	shared_ptr<BrefcomLaw> bLaw(new BrefcomLaw);
-	rootBody->engines.push_back(bLaw);
+	shared_ptr<ConstitutiveLawDispatcher> clDisp(new ConstitutiveLawDispatcher);
+		clDisp->add(shared_ptr<ConstitutiveLaw>(new ef2_Spheres_Brefcom_BrefcomLaw));
+	rootBody->engines.push_back(clDisp);
+
 
 	shared_ptr<PhysicalActionDamper> dampingDispatcher(new PhysicalActionDamper);
 		shared_ptr<CundallNonViscousForceDamping> forceDamper(new CundallNonViscousForceDamping);

@@ -28,17 +28,11 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 		/*! Whether we create SpheresContactGeometry with data necessary for (exact) shear computation. By default false */
 		bool hasShear;
 
-	REGISTER_CLASS_NAME(InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
-
+	REGISTER_CLASS_AND_BASE(InteractingSphere2InteractingSphere4SpheresContactGeometry,InteractionGeometryEngineUnit);
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(interactionDetectionFactor)(hasShear));
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
-	
 	// needed for the dispatcher, even if it is symmetric
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
-	
-	protected :
-		virtual void registerAttributes();
 };
-
 REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometry);
 

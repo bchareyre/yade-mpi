@@ -321,7 +321,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	tableFile is a text file (with one value per blank-separated columns)
 	tableLine is number of line where to get the values from
 
-		The format of the file is as follows (commens starting with # and empty lines allowed
+		The format of the file is as follows (commens starting with # and empty lines allowed)
 		
 		name1 name2 … # 0th line
 		val1  val2  … # 1st line
@@ -360,7 +360,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 			if len(bangCols)==0: bangCols=range(len(headings))
 			for i in range(len(names)):
 				if names[i][-1]=='!': names[i]=names[i][:-1] # strip trailing !
-			O.tags['description']=','.join( names[col]+'='+('%g'%values[col] if isinstance(values[col],float) else str(values[col])) for col in bangCols)
+			O.tags['description']=','.join(names[col]+'='+('%g'%values[col] if isinstance(values[col],float) else str(values[col])) for col in bangCols).replace("'",'').replace('"','')
 		for i in range(len(names)):
 			if names[i]=='description': continue
 			if names[i] not in kw.keys():

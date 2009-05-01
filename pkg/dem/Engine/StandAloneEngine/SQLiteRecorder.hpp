@@ -44,15 +44,10 @@ class SQLiteRecorder: public PeriodicEngine {
 		SQLiteRecorder() { /* we always want to save the first state as well */ initRun=true; };
 		~SQLiteRecorder(){ if(con) con->close(); }
 		void init(MetaBody*);
-		virtual void registerAttributes(){
-			PeriodicEngine::registerAttributes();
-			REGISTER_ATTRIBUTE(recorders);
-			REGISTER_ATTRIBUTE(dbFile);
-		}
 		virtual void action(MetaBody*);
+	REGISTER_ATTRIBUTES(PeriodicEngine,(recorders)(dbFile));
+	REGISTER_CLASS_AND_BASE(SQLiteRecorder,PeriodicEngine);
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(SQLiteRecorder);
-	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(SQLiteRecorder);
 

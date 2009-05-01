@@ -17,12 +17,6 @@ InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2In
 	hasShear=false;
 }
 
-void InteractingSphere2InteractingSphere4SpheresContactGeometry::registerAttributes()
-{	
-	REGISTER_ATTRIBUTE(interactionDetectionFactor);
-	REGISTER_ATTRIBUTE(hasShear);
-}
-
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,
 							const Se3r& se31,

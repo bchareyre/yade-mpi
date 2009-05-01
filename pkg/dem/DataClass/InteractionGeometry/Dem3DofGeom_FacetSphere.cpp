@@ -41,6 +41,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 		Vector3r contactLine=se31.orientation.Conjugate()*(se32.position-se31.position);
 		Vector3r normal=facet->nf;
 		Real L=normal.Dot(contactLine); // height/depth of sphere's center from facet's plane
+		if(L<0){normal*=-1; L*=-1;}
 		if(L>sphereRadius && !c->isReal) return false; // sphere too far away from the plane
 
 		Vector3r contactPt=contactLine-L*normal; // projection of sphere's center to facet's plane (preliminary contact point)

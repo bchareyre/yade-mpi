@@ -36,11 +36,9 @@ class InteractionPhysicsEngineUnit : 	public EngineUnit2D
 			   				  ) 
 					>
 {
-	REGISTER_CLASS_NAME(InteractionPhysicsEngineUnit);
-	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
-
+	REGISTER_CLASS_AND_BASE(InteractionPhysicsEngineUnit,EngineUnit2D);
+	REGISTER_ATTRIBUTES(EngineUnit, /* no attributes here */ );
 };
-
 REGISTER_SERIALIZABLE(InteractionPhysicsEngineUnit);
 
 

@@ -11,12 +11,13 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
+#include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 
 #include<yade/extra/Shop.hpp>
 
-YADE_PLUGIN("ElasticContactLaw2","ef2_Spheres_Elastic_ElasticLaw","ElasticContactLaw");
+YADE_PLUGIN("ElasticContactLaw2","ef2_Spheres_Elastic_ElasticLaw","ef2_Dem3Dof_Elastic_ElasticLaw","ElasticContactLaw");
 
 ElasticContactLaw2::ElasticContactLaw2(){
 	isCohesive=true;
@@ -89,6 +90,8 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 	}
 }
 
+
+CREATE_LOGGER(ef2_Spheres_Elastic_ElasticLaw);
 void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb){
 	Real dt = Omega::instance().getTimeStep();
 
@@ -108,6 +111,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			if (contact->isNew) shearForce=Vector3r(0,0,0);
 					
 			Real un=currentContactGeometry->penetrationDepth;
+			TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 			currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
 	
 			#ifdef SCG_SHEAR
@@ -134,13 +138,19 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			}
 			////////// PFC3d SlipModel
 	
-			Vector3r f=currentContactPhysics->normalForce + shearForce;
-			Vector3r _c1x(currentContactGeometry->contactPoint-de1->se3.position),
-				_c2x(currentContactGeometry->contactPoint-de2->se3.position);
-			ncb->bex.addForce (id1,-f);
-			ncb->bex.addForce (id2,+f);
-			ncb->bex.addTorque(id1,-_c1x.Cross(f));
-			ncb->bex.addTorque(id2, _c2x.Cross(f));
+			applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce , currentContactGeometry->contactPoint , id1 , de1->se3.position , id2 , de2->se3.position , ncb);
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }
 
+// same as elasticContactLaw, but using Dem3DofGeom
+void ef2_Dem3Dof_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
+	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
+	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
+	Real displN=geom->displacementN();
+	if(displN>0){contact->isReal=false; return; }
+	phys->normalForce=phys->kn*displN*geom->normal;
+	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
+	Vector3r trialFs=phys->ks*geom->displacementT();
+	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=maxFsSq/(trialFs.SquaredLength());} 
+	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
+}

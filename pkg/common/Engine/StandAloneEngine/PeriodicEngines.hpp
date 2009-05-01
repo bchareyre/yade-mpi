@@ -37,20 +37,17 @@ class PeriodicEngine:  public StandAloneEngine {
 			}
 			return false;
 		}
-	protected:
-		virtual void registerAttributes(){ 
-			StandAloneEngine::registerAttributes();
-			REGISTER_ATTRIBUTE(virtPeriod);
-			REGISTER_ATTRIBUTE(realPeriod);
-			REGISTER_ATTRIBUTE(iterPeriod);
-			REGISTER_ATTRIBUTE(virtLast);
-			REGISTER_ATTRIBUTE(realLast);
-			REGISTER_ATTRIBUTE(iterLast);
-			REGISTER_ATTRIBUTE(nDo);
-			REGISTER_ATTRIBUTE(nDone);
-		}
-	REGISTER_CLASS_NAME(PeriodicEngine);
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_ATTRIBUTES(StandAloneEngine,
+		(virtPeriod)
+		(realPeriod)
+		(iterPeriod)
+		(virtLast)
+		(realLast)
+		(iterLast)
+		(nDo)
+		(nDone)
+	)
+	REGISTER_CLASS_AND_BASE(PeriodicEngine,StandAloneEngine);
 };
 REGISTER_SERIALIZABLE(PeriodicEngine);
 

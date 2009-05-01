@@ -5,7 +5,7 @@
 /*! Abstract base class for representing contact geometry of 2 elements that has 3 degrees of freedom:
  *  normal (1 component) and shear (Vector3r, but in plane perpendicular to the normal)
  */
-class Dem3DofGeom: public InteractionGeometry {
+class Dem3DofGeom: public InteractionGeometry{
 	public:
 		//! some length used to convert displacements to strains
 		Real refLength;

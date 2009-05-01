@@ -23,20 +23,22 @@ started : %s
 finished: %s
 """%(self.id,self.exitStatus,'OK' if self.exitStatus==0 else 'FAILED',self.duration,self.command,time.asctime(time.localtime(self.started)),time.asctime(time.localtime(self.finished))));
 		log.close()
-	def t2hhmmss(self,dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 	def htmlStats(self):
 		ret='<tr>'
 		ret+='<td>%s</td>'%self.id
 		if self.status=='PENDING': ret+='<td bgcolor="grey">(pending)</td>'
-		elif self.status=='RUNNING': ret+='<td bgcolor="yellow">%s</td>'%self.t2hhmmss(time.time()-self.started)
+		elif self.status=='RUNNING': ret+='<td bgcolor="yellow">%s</td>'%t2hhmmss(time.time()-self.started)
 		elif self.status=='DONE': ret+='<td bgcolor="%s">%s</td>'%('green' if self.exitStatus==0 else 'red',self.duration)
 		ret+='<td>%s</td>'%self.command
 		ret+='<td>%d</td>'%self.nSlots
 		ret+='</tr>'
 		return ret
+def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 
 def globalHtmlStats():
-	ret='<h3>Jobs</h3>'
+	t0=min([j.started for j in jobs if j.started!=None])
+	ret='<p>Running %s, since %s.</p>'%(t2hhmmss(time.time()-t0),time.ctime(t0))
+	ret+='<h3>Jobs</h3>'
 	nFailed=len([j for j in jobs if j.status=='DONE' and j.exitStatus!=0])
 	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:green">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
 	return ret
@@ -72,7 +74,7 @@ def runJob(job):
 	job.exitStatus=os.system(job.command)
 	job.finished=time.time()
 	dt=job.finished-job.started;
-	job.duration=job.t2hhmmss(dt)
+	job.duration=t2hhmmss(dt)
 	strStatus='done   ' if job.exitStatus==0 else 'FAILED '
 	job.status='DONE'
 	print "#%d (%s%s) %s (exit status %d), duration %s, log %s"%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,strStatus,job.exitStatus,job.duration,job.log)
@@ -169,7 +171,7 @@ except ValueError:
 		newId=newIdBase; j=1
 		while newId in idStrings.values():
 			newId=newIdBase+'_%d_'%j; j+=1
-		idStrings[i]=newId
+		idStrings[i]=newId.replace("'",'').replace('"','')
 	print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
 
 

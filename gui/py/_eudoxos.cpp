@@ -3,6 +3,12 @@
 #include<yade/extra/boost_python_len.hpp>
 using namespace boost::python;
 using namespace std;
+#ifdef LOG4CXX
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.eudoxos");
+#endif
+
+
+
 # if 0
 Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
@@ -27,6 +33,27 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 	return E/(box[0]*box[1]*box[2]);
 }
 #endif
+
+/* yield surface for the brefcom concrete model; this is used only to make yield surface plot from python, for debugging */
+Real yieldSigmaTMagnitude(Real sigmaN){
+	#ifdef BREFCOM_YIELD_SIGMA_T_MAGNITUDE
+		/* find first suitable interaction */
+		MetaBody* rootBody=Omega::instance().getRootBody().get();
+		shared_ptr<Interaction> I;
+		FOREACH(I, *rootBody->transientInteractions){
+			if(I->isReal) break;
+		}
+		Real nan=std::numeric_limits<Real>::quiet_NaN();
+		if(!I->isReal) {LOG_ERROR("No real interaction found, returning NaN!"); return nan; }
+		BrefcomContact* BC=dynamic_cast<BrefcomContact*>(I->interactionPhysics.get());
+		if(!BC) {LOG_ERROR("Interaction physics is not BrefcomContact instance, returning NaN!"); return nan;}
+		const Real &omega(BC->omega); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle);
+		return BREFCOM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
+	#else
+		LOG_FATAL("Brefcom model not available in this build.");
+		throw;
+	#endif
+}
 
 // copied from _utils.cpp
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])(),extract<double>(t[1])(),extract<double>(t[2])());}
@@ -59,5 +86,6 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxi
 
 BOOST_PYTHON_MODULE(_eudoxos){
 	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
+	def("yieldSigmaTMagnitude",yieldSigmaTMagnitude);
 }
 

@@ -13,11 +13,12 @@
 
 #define SCG_SHEAR
 
-class SpheresContactGeometry: public InteractionGeometry{
+class SpheresContactGeometry: public InteractionGeometry {
 	public:
 		Vector3r normal, // unit vector in the direction from sphere1 center to sphere2 center
 			contactPoint;
-		Real radius1,radius2,penetrationDepth;
+		Real penetrationDepth;
+		Real radius1, radius2;
 
 		#ifdef SCG_SHEAR
 			//! Total value of the current shear. Update the value using updateShear.
@@ -64,7 +65,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 		Vector3r contPtInTgPlane2() const {assert(hasShear); return unrollSpherePtToPlane(ori2*cp2rel,d2,-normal);}
 		Vector3r contPt() const {return contactPoint; /*pos1+(d1/d0)*(pos2-pos1)*/}
 
-		Real displacementN() const {assert(hasShear); return (pos2-pos1).Length()-d0;}
+		Real displacementN() const {assert(hasShear); return (pos2-pos1).Length()-(d0+d0fixup);}
 		Real epsN() const {return displacementN()*(1./(d0+d0fixup));}
 		Vector3r displacementT() { assert(hasShear);
 			// enabling automatic relocation decreases overall simulation speed by about 3%
@@ -91,7 +92,7 @@ class SpheresContactGeometry: public InteractionGeometry{
 
 		Vector3r relRotVector() const;
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0),radius2(0),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),d0fixup(0),initRelOri12(Quaternionr::IDENTITY){createIndex();
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0.),radius2(0.),facetContactFace(0.),hasShear(false),pos1(Vector3r::ZERO),pos2(Vector3r::ZERO),ori1(Quaternionr::IDENTITY),ori2(Quaternionr::IDENTITY),cp1rel(Quaternionr::IDENTITY),cp2rel(Quaternionr::IDENTITY),d1(0),d2(0),d0(0),d0fixup(0),initRelOri12(Quaternionr::IDENTITY){createIndex();
 		#ifdef SCG_SHEAR
 			shear=Vector3r::ZERO; prevNormal=Vector3r::ZERO /*initialized to proper value by geom functor*/;
 		#endif	

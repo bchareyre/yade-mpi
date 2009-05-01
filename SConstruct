@@ -106,7 +106,7 @@ print '@@@ Using profile',profile,'('+optsFile+') @@@'
 # defaults for various profiles
 if profile=='default': defOptions={'debug':1,'variant':'','optimize':0,'openmp':False}
 elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1,'openmp':False}
-else: defOptions={'debug':0,'optimize':0,'variant':profile,'openmp':True}
+else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'openmp':True}
 
 
 opts=Variables(optsFile)

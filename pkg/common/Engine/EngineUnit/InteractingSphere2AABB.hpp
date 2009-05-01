@@ -17,9 +17,8 @@ class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 		void go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*);
 		double aabbEnlargeFactor;
 	FUNCTOR2D(InteractingSphere,AABB);
-	virtual void registerAttributes(){REGISTER_ATTRIBUTE(aabbEnlargeFactor);}
-	REGISTER_CLASS_NAME(InteractingSphere2AABB);
-	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
+	REGISTER_ATTRIBUTES(BoundingVolumeEngineUnit,(aabbEnlargeFactor));
+	REGISTER_CLASS_AND_BASE(InteractingSphere2AABB,BoundingVolumeEngineUnit);
 };
 
 REGISTER_SERIALIZABLE(InteractingSphere2AABB);

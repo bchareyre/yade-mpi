@@ -118,6 +118,8 @@ class BexContainer{
 			memset(_torque[0], 0,sizeof(Vector3r)*size);
 			synced=true;
 		}
+		//! say for how many threads we have allocated space
+		int getNumAllocatedThreads() const {return nThreads;}
 };
 
 #else
@@ -152,6 +154,7 @@ class BexContainer {
 			_torque.resize(newSize);
 			size=newSize;
 		}
+		int getNumAllocatedThreads() const {return 1;}
 };
 
 

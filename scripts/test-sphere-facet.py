@@ -28,12 +28,19 @@ O.engines=[
 		EngineUnit('MetaInteractingGeometry2AABB')
 	]),
 	StandAloneEngine('PersistentSAPCollider',{'haveDistantTransient':True}),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'interactionDetectionFactor':1.4}),
-		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'hasShear':True}),
-	]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-	StandAloneEngine('ElasticContactLaw'),
+#	MetaEngine('InteractionGeometryMetaEngine',[
+#		#EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'interactionDetectionFactor':1.4}),
+#		#EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'hasShear':True}),
+#		ef2_Facet_Sphere_Dem3DofGeom(),
+#	]),
+#	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
+#	#StandAloneEngine('ElasticContactLaw'),
+#	ConstitutiveLawDispatcher([ef2_Dem3Dof_Elastic_ElasticLaw()]),
+	InteractionDispatchers(
+		[ef2_Facet_Sphere_Dem3DofGeom()],
+		[SimpleElasticRelationships()],
+		[ef2_Dem3Dof_Elastic_ElasticLaw()],
+	),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-sign*500],'label':'gravitator'}),
 	DeusExMachina("NewtonsDampedLaw",{'damping':0.8}),
 	StandAloneEngine('PeriodicPythonRunner',{'iterPeriod':4000,'command':'setGravity()'}),
@@ -43,6 +50,7 @@ O.bodies.append([
 	utils.sphere([0,0,sign*.49999],radius=.5,young=1e3,wire=True,density=1),
 ])
 O.miscParams=[Generic('GLDrawSphere',{'glutUse':True})]
+O.timingEnabled=True
 O.saveTmp('init')
 O.dt=1e-4
 
@@ -62,4 +70,11 @@ try:
 	qt.Controller()
 except ImportError: pass
 
-
+if 0:
+	from yade import timing
+	O.run(100000,True)
+	timing.stats()
+	timing.reset()
+	O.loadTmp('init')
+	O.run(100000,True)
+	timing.stats()

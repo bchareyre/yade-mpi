@@ -162,7 +162,7 @@ def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	f.write("Node 1 coords 3 0.0 0.0 0.0 bc 6 1 1 1 1 1 1\n")
 	f.write("Node 2 coords 3 0.0 0.0 0.0 bc 6 1 2 1 1 1 1\n")
 	for b in o.bodies:
-		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
+		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.phys.refPos[0],b.phys.refPos[1],b.phys.refPos[2],b.shape['radius']))
 		if b.id in negIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 1 0 0 0 0 ")
 		elif b.id in posIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 2 0 0 0 0 0")
 		f.write('\n')

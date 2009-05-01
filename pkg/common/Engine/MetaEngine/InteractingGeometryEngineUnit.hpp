@@ -40,8 +40,8 @@ class InteractingGeometryEngineUnit : 	public EngineUnit2D
 			  				  )
 					>
 {	
-	REGISTER_CLASS_NAME(InteractingGeometryEngineUnit);
-	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
+	REGISTER_CLASS_AND_BASE(InteractingGeometryEngineUnit,EngineUnit2D);
+	REGISTER_ATTRIBUTES(EngineUnit,/* no attributes here */);
 };
 
 REGISTER_SERIALIZABLE(InteractingGeometryEngineUnit);

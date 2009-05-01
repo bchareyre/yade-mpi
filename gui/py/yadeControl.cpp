@@ -400,6 +400,7 @@ class pyInteractionContainer{
 			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(!I->isReal) continue; if(i++==n) return pyInteraction(I); }
 			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
 		}
+		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
 };
 
@@ -621,6 +622,13 @@ class pyOmega{
 		rb->bodies=bc;
 	}
 	string bodyContainer_get(string clss){ return OMEGA.getRootBody()->bodies->getClassName(); }
+	#ifdef YADE_OPENMP
+		int numThreads_get(){ return omp_get_max_threads();}
+		void numThreads_set(int n){ int bcn=OMEGA.getRootBody()->bex.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("BexContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
+	#else
+		int numThreads_get(){return 1;}
+		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
+	#endif
 
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
@@ -682,6 +690,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set)
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set)
+		.add_property("numThreads",&pyOmega::numThreads_get,&pyOmega::numThreads_set)
 		;
 	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
@@ -698,6 +707,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
+		.def("__len__",&pyInteractionContainer::len)
 		.def("nth",&pyInteractionContainer::pyNth)
 		.def("clear",&pyInteractionContainer::clear);
 	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())

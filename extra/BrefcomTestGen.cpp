@@ -25,6 +25,7 @@ YADE_PLUGIN("BrefcomTestGen");
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/extra/UniaxialStrainControlledTest.hpp>
@@ -62,8 +63,9 @@ void BrefcomTestGen::createEngines(){
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 
-	shared_ptr<BrefcomLaw> bLaw(new BrefcomLaw);
-	rootBody->engines.push_back(bLaw);
+	shared_ptr<ConstitutiveLawDispatcher> clDisp(new ConstitutiveLawDispatcher);
+		clDisp->add(shared_ptr<ConstitutiveLaw>(new ef2_Spheres_Brefcom_BrefcomLaw));
+	rootBody->engines.push_back(clDisp);
 
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
 	applyActionDispatcher->add(new NewtonsForceLaw);
