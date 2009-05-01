@@ -249,6 +249,9 @@ LatticeExample::LatticeExample() : FileGenerator()
 	movSupp_D_pos=Vector3r(0,0,0);
 	movSupp_D_range=0;
 	movSupp_D_dir=-1;
+
+	fibres_horizontal = false;
+	fibres_vertical = false;
 }
 
 
@@ -441,6 +444,9 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(fibre_bond_torsStiffness_noUnit);  // k_t fibre bond
         REGISTER_ATTRIBUTE(fibre_bond_critCompressStrain);    // E.c fibre bond
         REGISTER_ATTRIBUTE(fibre_bond_critTensileStrain);     // E.l fibre bond
+
+	REGISTER_ATTRIBUTE(fibres_horizontal);
+	REGISTER_ATTRIBUTE(fibres_vertical);
 }
 
 bool LatticeExample::generate()
@@ -1644,11 +1650,61 @@ void LatticeExample::makeFibres()
                 Vector3r cc;
 		Vector3r del;
                 cc[0]=random1()*AGGREGATES_X, cc[1]=random1()*AGGREGATES_Y, cc[2]=((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z));
-                del[0]=random1()-0.5, del[1]=random1()-0.5, del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+
+                //del[0]=random1()-0.5, del[1]=random1()-0.5, del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+
+		if(fibres_horizontal || fibres_vertical)
+		{
+			if(fibres_horizontal)
+			{
+				std::cerr << "fibres_horizontal\n";
+
+				del[0]=0;
+				while(del[0]*del[0] < 0.15) del[0]=random1()-0.5;
+
+				del[1]=(random1()-0.5)*0.2;
+
+				del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+			}
+			else
+			{
+				std::cerr << "fibres_vertical\n";
+
+				del[0]=(random1()-0.5)*0.2;
+
+				del[1]=0;
+				while(del[1]*del[1] < 0.15) del[1]=random1()-0.5;
+
+				del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+			}
+		}
+		else
+		{
+			del[0]=random1()-0.5;
+			del[1]=random1()-0.5;
+			del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+		}
+
 		del.Normalize();
 		del=cellsizeUnit_in_meters * del;
 		fibres.push_back(std::make_pair(cc,del));
         }
+/*
+	   for(int i = 0 ; i < fibre_count ; ++i)
+	   {
+		   Vector3r cc;
+		   Vector3r del;
+		   cc[0]=random1()*AGGREGATES_X, cc[1]=random1()*AGGREGATES_Y, cc[2]=((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z));
+
+		   del[0]=random1()-0.5;
+		   del[1]=random1()-0.5;
+		   del[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+
+		   del.Normalize();
+		   del=cellsizeUnit_in_meters * del;
+		   fibres.push_back(std::make_pair(cc,del));
+	   }
+*/
 
 // repulsion !!
 	for(int frame=0; frame < fibre_balancing_iterations ; ++frame)
@@ -1658,7 +1714,13 @@ void LatticeExample::makeFibres()
 		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
 		{
 			Vector3r d(0,0,0);
-			Vector3r c1 = fibres[i].first + fibres[i].second*beams_per_fibre*0.5;
+
+			////Vector3r c1 = fibres[i].first + fibres[i].second*beams_per_fibre*0.5;
+
+		for(float PART_1 = 0 ; PART_1 <= 1.0 ; PART_1 += 0.2 )
+		{
+			Vector3r c1 = fibres[i].first + fibres[i].second*beams_per_fibre*PART_1;
+
 			//emulate periodic boundary
 			for(int px = -1 ; px < 2 ; ++px )
 			for(int py = -1 ; py < 2 ; ++py )
@@ -1668,7 +1730,14 @@ void LatticeExample::makeFibres()
 				for(unsigned int j = 0 ; j < fibres.size() ; ++j )
 					if(i != j)
 					{
-						Vector3r c2 = fibres[j].first + fibres[j].second*beams_per_fibre*0.5 + PERIODIC_DELTA;
+						////Vector3r c2 = fibres[j].first + fibres[j].second*beams_per_fibre*0.5 + PERIODIC_DELTA;
+
+
+					for(float PART_2 = 0 ; PART_2 <= 1.0 ; PART_2 += 0.2 )
+					{
+						Vector3r c2 = fibres[j].first + fibres[j].second*beams_per_fibre*PART_2 + PERIODIC_DELTA;
+
+
 						Vector3r dir=c1-c2;
 						Real r = dir.Normalize(); // dir is unit vector, r is a distance
 						if(r < cellsizeUnit_in_meters)
@@ -1700,6 +1769,8 @@ void LatticeExample::makeFibres()
 								d += (dir * 1/(r*r))*10;
 						}
 					}
+
+					}
 			}
 			// repulsion from walls.
 			Vector3r MAX(AGGREGATES_X, AGGREGATES_Y, AGGREGATES_Z);
@@ -1712,7 +1783,10 @@ void LatticeExample::makeFibres()
 			}
 			moves.push_back(d);
 		}
-		assert(moves.size() == fibres.size() );
+
+		}
+
+		assert(moves.size() == fibres.size()*6 );
 		Real maxl=0;
 		for(unsigned int i = 0 ; i < moves.size() ; ++i )
 			maxl = std::max(moves[i].Length(),maxl);
@@ -1720,8 +1794,11 @@ void LatticeExample::makeFibres()
 		for(unsigned int i = 0 ; i < moves.size() ; ++i )
 			moves[i] = cellsizeUnit_in_meters*moves[i]/maxl;
 	
-		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
-			fibres[i].first+=moves[i];
+//		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
+//			fibres[i].first+=moves[i];
+		for(unsigned int i = 0 ; i < moves.size() ; ++i )
+			fibres[std::floor(((float)(i))/6.0f)].first+=moves[i];
+
 	
 		for(unsigned int i = 0 ; i < fibres.size() ; ++i )
 		{

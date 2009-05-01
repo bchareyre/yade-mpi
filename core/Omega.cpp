@@ -213,7 +213,7 @@ void Omega::saveSimulationToStream(std::ostream& stream){
 void Omega::loadSimulation(){
 
 	if(Omega::instance().getSimulationFileName().size()==0) throw yadeBadFile("Simulation filename to load has zero length");
-	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw yadeBadFile("Simulation file to load doesn't exist");
+	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw yadeBadFile((std::string("Simulation file to load doesn't exist")+simulationFileName).c_str());
 	
 	LOG_INFO("Loading file " + simulationFileName);
 

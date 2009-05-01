@@ -254,6 +254,10 @@ struct Circle
 
                                  
                 std::vector< std::vector< unsigned int > > connections; // which node is in touch with what beams.
+
+		bool             fibres_horizontal
+				,fibres_vertical;
+
                                 
         public : 
 		LatticeExample();

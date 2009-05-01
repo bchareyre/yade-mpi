@@ -21,6 +21,9 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	glColor3v(gm->diffuseColor);
 	
 	Real len = (static_cast<LineSegment*>(gm.get()))->length;
+	if(len >1.0)
+		return;
+
 	maxLen = std::max(len,maxLen);
 
 	// FIXME - there must be a way to tell this from outside

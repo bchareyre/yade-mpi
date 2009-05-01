@@ -5,6 +5,8 @@
 #include<boost/filesystem/convenience.hpp>
 #include<boost/algorithm/string/join.hpp>
 #include<yade/core/MetaBody.hpp>
+#include<boost/algorithm/string/join.hpp>
+
 using namespace boost;
 CREATE_LOGGER(SQLiteRecorder);
 
