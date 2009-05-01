@@ -20,7 +20,7 @@ LineSegment::~LineSegment ()
 void LineSegment::registerAttributes()
 {
 	GeometricalModel::registerAttributes();
-//	REGISTER_ATTRIBUTE(length); // no need to save it
+	REGISTER_ATTRIBUTE(length);
 }
 
 YADE_PLUGIN();

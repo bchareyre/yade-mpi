@@ -19,10 +19,16 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
+
+
+	LineSegment* lll = dynamic_cast<LineSegment*>(gm.get());
+	if(lll)
+	{
 	
-	Real len = (static_cast<LineSegment*>(gm.get()))->length;
-	if(len >1.0)
-		return;
+	//Real len = (static_cast<LineSegment*>(gm.get()))->length;
+	Real len = lll->length;
+	//if(len >1.0)
+	//	return;
 
 	maxLen = std::max(len,maxLen);
 
@@ -55,6 +61,7 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	{
 		glEnable(GL_LIGHTING);
 		glutSolidCube(1);
+	}
 	}
 }
 

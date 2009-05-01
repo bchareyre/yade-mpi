@@ -35,7 +35,6 @@
 #include<yade/pkg-common/AABB.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 #include<yade/pkg-common/DisplacementEngine.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
@@ -458,8 +457,8 @@ bool LatticeExample::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
+//	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
+//	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	
 	shared_ptr<Body> body;
@@ -1017,7 +1016,7 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, int i, int j)
 	shared_ptr<LatticeBeamParameters> physics(new LatticeBeamParameters);
 	shared_ptr<LineSegment> gBeam(new LineSegment);
 	
-	Real length 			= 1.0; // unspecified for now, calcBeamsPositionOrientationLength will calculate it
+	Real length 			= 1.0; // unspecified for now, calcBeamPositionOrientationLength will calculate it
 	
 	body->isDynamic			= true;
 	
@@ -1037,7 +1036,13 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, int i, int j)
 
 Real LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 {
-	LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+//	LatticeBeamParameters* beam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+
+	LatticeBeamParameters* beam = dynamic_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+	LineSegment* ls = dynamic_cast<LineSegment*>(body->geometricalModel.get());
+	if(beam != 0 && ls != 0)
+	{
+
 	shared_ptr<Body>& bodyA = (*(rootBody->bodies))[beam->id1];
 	shared_ptr<Body>& bodyB = (*(rootBody->bodies))[beam->id2];
 	Se3r& se3A 		= bodyA->physicalParameters->se3;
@@ -1051,6 +1056,7 @@ Real LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	beam->direction 	= dist;
         beam->length            = length;
         beam->initialLength     = length;
+	ls->length = length;	
         
         beam->criticalTensileStrain     = crit_TensileStrain;
         beam->criticalCompressiveStrain = crit_ComprStrain;
@@ -1066,6 +1072,12 @@ Real LatticeExample::calcBeamPositionOrientationLength(shared_ptr<Body>& body)
 	beam->otherDirection	= beam->se3.orientation*Vector3r::UNIT_Y; // any unit vector that is orthogonal to direction.
 
 	return length;
+	}
+	else
+	{
+		std::cerr << body->getId() << " is not a beam, skipping\n";
+		return 10000000;
+	}
 }
 
 void LatticeExample::calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, int otherId, InteractionContainer* ints, int thisId)
@@ -1181,6 +1193,7 @@ BeamRecorder bbbb;
         latticeLaw->ensure2D   = ensure2D;
         latticeLaw->roughEdges = roughEdges;
         latticeLaw->calcTorsion= calculate_Torsion;
+	latticeLaw->tension_compression_different_stiffness = true;	
         
         rootBody->engines.clear();
         rootBody->engines.push_back(boundingVolumeDispatcher);

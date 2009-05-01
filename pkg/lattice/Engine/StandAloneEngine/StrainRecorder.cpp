@@ -57,6 +57,12 @@ void StrainRecorder::action(MetaBody * ncb)
 //	std::cerr << "StrainRecorder quits\n";
 //	return;
 	
+	if(subscribedBodies.size()==0)
+	{
+		std::cerr << "StrainRecorder quits - nothing to record!\n";
+		return;
+	}
+	
 	Real strain_y=0,stress_y=0,stress_s=0;//,stress_nonlocal_y=0;
 	
 	std::vector<unsigned int>::iterator i   = subscribedBodies.begin();
@@ -78,9 +84,10 @@ void StrainRecorder::action(MetaBody * ncb)
 	LatticeNodeParameters* node2 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
 	(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
-	// FIXME - zamiast ?ledzi? tylko dwa punkty (jeden na dole i jeden u góry), to lepiej zaznaczy? dwa obszary punktów i liczy? ?redni? ich po?o?enia,
-	// bo teraz, je?li który? punkt zostanie wykasowany, to nie jest mo?liwe kontynuowanie pomiarów.
-	
+	// FIXME - instead of tracking only two points (one on top, another on bottom), it's better
+	// to mark two regions of points and track their average position. Now if one point is deleted, it's impossible
+	// to continue measurements
+
 	Real 		currentLength = node1->se3.position[1] - node2->se3.position[1];
 	
 	strain_y = (currentLength - initialLength) / initialLength; // odkszta?cenie ca?ej próbki

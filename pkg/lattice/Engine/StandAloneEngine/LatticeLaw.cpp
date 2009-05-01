@@ -44,7 +44,18 @@ bool LatticeLaw::deleteBeam(MetaBody* metaBody , LatticeBeamParameters* beam, Bo
 void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies)
 {
 // FIXME - verify that this updating of length, position, orientation and color is in correct place/plugin
-	LatticeBeamParameters* beam 	  = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+////	LatticeBeamParameters* beam 	  = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
+
+	LatticeBeamParameters* beam 	  = YADE_CAST<LatticeBeamParameters*>(body->physicalParameters.get());
+	if(beam==0 || (!(*(bodies)).exists(beam->id1)) || (!(*(bodies)).exists(beam->id2)))
+	{
+		std::string error(boost::lexical_cast<std::string>(body->getId()) + " is not a beam, but it SHOULD really be a beam, ERROR. You should check if bodies are not renumbered somehow after reloading a simulation. That's probably a container error, that is changing the IDs when not asked to do so.\n");
+		std::cerr << "================\nERROR: ";
+		std::cerr << error;
+		std::cerr << "================\n";
+		throw error;
+	}
+//std::cerr << body->getId() << " " << beam->id1 << " " << beam->id2 << "\n";
 
 	Body* bodyA 			  = (*(bodies))[beam->id1].get();
 	Body* bodyB 			  = (*(bodies))[beam->id2].get();
@@ -334,12 +345,19 @@ void LatticeLaw::action(MetaBody* lattice)
 			static bool first=true;
 			if(first)
 			{
+if(tension_compression_different_stiffness){
 				std::cerr << "\nusing k.b tension=0.6, k.b compression=0.2 !\n/beam->initialLength !\n";
-				//std::cerr << "\nNOT! using k.b tension=0.6, k.b compression=0.2 ! (just a classical formula)\n\n";
+}else{
+				std::cerr << "\nNOT! using k.b tension=0.6, k.b compression=0.2 ! (just a classical formula)\n\n";
+}
 				first=false;
 			}
 
 			Real kb = beam->bendingStiffness;
+
+if(tension_compression_different_stiffness)
+{
+
 			Real Em = beam->criticalTensileStrain/3.0;
 			Real x  = beam->strain();
 			//const Real howmuch = 0.5;
@@ -352,6 +370,7 @@ void LatticeLaw::action(MetaBody* lattice)
 			else if( x < Em )
 				kb = (kb*howmuch+kb)/2.0+x*(kb*howmuch-kb)/(-2.0*Em);
 			// if strain > criticalTensileStrain/2.0 then kb is not changed
+}
 
 			node1->countStiffness += kb/beam->initialLength;
 			node2->countStiffness += kb/beam->initialLength;
@@ -415,6 +434,7 @@ void LatticeLaw::action(MetaBody* lattice)
 			if(body->isDynamic)
 			{
 				node->se3.position      += displacementTotal;
+										// DAMPING: *(1.0 - damping_with_energy_loss_0_to_1);
 			//	node->se3.orientation	+= ;
 			}
 			// FIXME FIXME FIXME FIXME FIXME FIXME FIXME
