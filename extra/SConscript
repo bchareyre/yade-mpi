@@ -41,7 +41,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	
 	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop','Tetra']),
 
-	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','GlobalStiffnessTimeStepper','Brefcom','PositionOrientationRecorder']),
+	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','ConstitutiveLawDispatcher','GlobalStiffnessTimeStepper','Brefcom','PositionOrientationRecorder']),
 
 	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4SpheresContactGeometry','DemXDofGeom']),
 

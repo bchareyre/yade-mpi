@@ -220,6 +220,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 		LIBS=env['LIBS']+['SDECLinkPhysics',
 			'ElasticContactInteraction',
 			'SDECLinkGeometry',
+			'DemXDofGeom',
 			'SpheresContactGeometry',
 			'BodyMacroParameters',
 			'yade-serialization',
