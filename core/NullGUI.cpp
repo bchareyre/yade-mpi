@@ -152,7 +152,12 @@ int NullGUI::loop()
 
 	filesystem::path p(snapshotName);
 	if(filesystem::extension(p)==".gz")
-		p = filesystem::basename(p); // get rid of .gz
+	{
+		std::cerr << "Error: .gz is no longer supported, use .bz2 instead.";
+		exit(1);
+	}
+	if(filesystem::extension(p)==".bz2")
+		p = filesystem::basename(p); // get rid of .bz2
 	snapshotName = filesystem::basename(p); // get rid of .xml
 	if( snapshotInterval != -1 )
 		cerr 	<< "Saving snapshot every " << snapshotInterval*interval << " iterations, \n"
@@ -182,7 +187,7 @@ int NullGUI::loop()
 			//		+ "__dt_" + lexical_cast<string>(Omega::instance().getTimeStep())
 			//		+ "__it_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 
 					+ "_" + lexical_cast<string>(Omega::instance().getCurrentIteration()) 
-					+ (binary?".xml.gz":".xml");
+					+ (binary?".xml.bz2":".xml");
 				cerr << "saving snapshot: " << fileName << "   ...";
 				Omega::instance().saveSimulation(fileName);
 				cerr << " done.\n";
@@ -230,7 +235,7 @@ int NullGUI::gen()
 	if(snapshotName=="none")
 		std::cerr << "filegenerator output name set to \"none\" - using default output name.\n";
 	else
-		f->setFileName(snapshotName + (binary?".xml.gz":".xml"));
+		f->setFileName(snapshotName + (binary?".xml.bz2":".xml"));
 	std::cerr	<< "calling FileGenerator: " << filegen 
 			<< ",\nwith config file: " << file 
 			<< ",\nto generate file: " << f->getFileName() << "\n\n";

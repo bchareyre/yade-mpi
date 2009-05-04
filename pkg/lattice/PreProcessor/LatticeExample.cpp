@@ -86,7 +86,7 @@ LatticeExample::LatticeExample() : FileGenerator()
         
         ensure2D 		 = false;
         roughEdges 		 = false;
-	calculate_Torsion	 = false;
+	calculate_Torsion_3D	 = false;
 	quads			 = false;
         
         region_A_min             = Vector3r(-0.006, 0.096,-1);
@@ -278,7 +278,7 @@ void LatticeExample::registerAttributes()
         
         REGISTER_ATTRIBUTE(ensure2D);
         REGISTER_ATTRIBUTE(roughEdges);
-        REGISTER_ATTRIBUTE(calculate_Torsion);
+        REGISTER_ATTRIBUTE(calculate_Torsion_3D);
         REGISTER_ATTRIBUTE(quads);
         
         REGISTER_ATTRIBUTE(triangularBaseGrid);         //              - triangles
@@ -1192,7 +1192,7 @@ BeamRecorder bbbb;
 	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
         latticeLaw->ensure2D   = ensure2D;
         latticeLaw->roughEdges = roughEdges;
-        latticeLaw->calcTorsion= calculate_Torsion;
+        latticeLaw->calcTorsion= calculate_Torsion_3D;
 	latticeLaw->tension_compression_different_stiffness = true;	
         
         rootBody->engines.clear();

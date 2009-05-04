@@ -50,7 +50,7 @@ class LatticeExample : public FileGenerator
                                 ,useStiffnessSoftening
                                 ,ensure2D
                                 ,roughEdges
-				,calculate_Torsion
+				,calculate_Torsion_3D
 				,quads;
         
         // aggregates
