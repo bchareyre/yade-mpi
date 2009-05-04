@@ -193,8 +193,8 @@ bool LatticeExampleCTData::generate()
 
 #ifdef MINIWM3
 // if Delaunay is not avauilable produce an error message
-	message = "ERROR:\n\nYade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. "
-	+ "Please compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
+	message = "ERROR:\n\nYade was compiled without full installation of wildmagic-dev (Wm3 foundation library), can't use Delaunay. \n"
+	"Please compile yade with full wm3 library installed. Don't forget CPPPATH=/usr/include/wm3 scons parameter.";
 	return false;
 #else
 // create beams, Delaunay
