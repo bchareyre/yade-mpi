@@ -254,7 +254,7 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
 	{
 		updateParameters ( ncb );
-		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
+		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
 	}
 	
 	if ( currentState==STATE_LIMBO && autoStopSimulation )

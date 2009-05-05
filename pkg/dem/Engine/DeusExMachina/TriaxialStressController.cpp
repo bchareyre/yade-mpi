@@ -248,20 +248,17 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 			}
 		}
 		
-		// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
-		if (isTriaxialCompression){
-			sigma1 = sigma_iso;
-			sigma2 = sigma_iso;
-			sigma3 = sigma_iso;
-
-			max_vel1 = max_vel;
-			max_vel2 = max_vel;
-			max_vel3 = max_vel;
-		}
-		
 		firstRun = false;
-	
 	}
+
+	// NOT JUST at the first run, since sigma_iso may be changed
+	// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
+	if (isTriaxialCompression){
+		sigma1=sigma2=sigma3=sigma_iso;
+		max_vel1=max_vel2=max_vel3=max_vel;
+	}
+
+
 	porosity = ( boxVolume - spheresVolume ) /boxVolume;
 
 	position_top = p_top->se3.position.Y();
@@ -284,24 +281,15 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 		computeStressStrain(ncb);
 
 	if (!internalCompaction) {
-		//Vector3r wallForce (0, sigma_iso*width*depth, 0);
 		Vector3r wallForce (0, sigma2*width*depth, 0);
-		//if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel);
-		//if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel);
 		if (wall_bottom_activated) controlExternalStress(wall_bottom, ncb, -wallForce, p_bottom, max_vel2);
 		if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel2);
 		
-		//wallForce = Vector3r(sigma_iso*height*depth, 0, 0);
 		wallForce = Vector3r(sigma1*height*depth, 0, 0);
-		//if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel*width/height);
-		//if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel*width/height);
 		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel1*width/height);
 		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel1*width/height);
 		
-		//wallForce = Vector3r(0, 0, sigma_iso*height*width);
 		wallForce = Vector3r(0, 0, sigma3*height*width);
-		//if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel*depth/height);
-		//if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel*depth/height);
 		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel3*depth/height);
 		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel3*depth/height);
 	}
