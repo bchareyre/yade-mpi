@@ -25,11 +25,9 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 		 * @note This parameter is functionally coupled with InteractinSphere2AABB::aabbEnlargeFactor,
 		 * which will create larger bounding boxes and should be of the same value. */
 		double interactionDetectionFactor;
-		/*! Whether we create SpheresContactGeometry with data necessary for (exact) shear computation. By default false */
-		bool hasShear;
 
 	REGISTER_CLASS_AND_BASE(InteractingSphere2InteractingSphere4SpheresContactGeometry,InteractionGeometryEngineUnit);
-	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(interactionDetectionFactor)(hasShear));
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(interactionDetectionFactor));
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 	// needed for the dispatcher, even if it is symmetric
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);

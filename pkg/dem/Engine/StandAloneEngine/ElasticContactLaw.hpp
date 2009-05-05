@@ -18,22 +18,6 @@
 #include <boost/tuple/tuple.hpp>
 
 
-class ElasticContactLaw2: public InteractionSolver{
-	public:
-	//! this should really be property of the interaction, but for simplicity keep it here now...
-	bool isCohesive;
-	ElasticContactLaw2();
-	virtual ~ElasticContactLaw2();
-	void action(MetaBody*);
-	void registerAttributes(){
-		InteractionSolver::registerAttributes();
-		REGISTER_ATTRIBUTE(isCohesive);
-	}
-	REGISTER_CLASS_NAME(ElasticContactLaw2);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
-};
-REGISTER_SERIALIZABLE(ElasticContactLaw2);
-
 class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 	public:
 	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);

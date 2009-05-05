@@ -28,10 +28,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'yade-base',
 			]),
 
-	env.SharedLibrary('Clump',
-		['clump/Clump.cpp'],
-		LIBS=env['LIBS']+['Shop']),
-
 	env.SharedLibrary('Tetra',['tetra/Tetra.cpp'],LIBS=env['LIBS']+['Tetrahedron',
          'ParticleParameters',
          'RigidBodyParameters',
@@ -45,7 +41,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 
 	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4SpheresContactGeometry','DemXDofGeom']),
 
-	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder','Brefcom','ConstitutiveLawDispatcher']),
+	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder','Brefcom','ConstitutiveLawDispatcher','Dem3DofGeom_SphereSphere']),
 
 	env.SharedLibrary('SimpleScene',['SimpleScene.cpp'],LIBS=env['LIBS']+['Shop','SimpleElasticRelationships']),
 

@@ -77,43 +77,5 @@ void GLDrawSpheresContactGeometry::go(
 		#endif
 	}
 
-	if(sc->hasShear){
-		Vector3r pos1=sc->pos1, pos2=sc->pos2, contPt=sc->contPt();
-		#if 0
-			GLUtils::GLDrawArrow(contPt,contPt+sc->normal*.5*sc->d0); // normal of the contact
-		#endif
-		#if 0
-			//Vector3r contPt=se31.position+(sc->d1/sc->d0)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
-			GLUtils::GLDrawLine(pos1,pos2,Vector3r(.5,.5,.5));
-			Vector3r bend; Real tors;
-			sc->bendingTorsionRel(bend,tors);
-			GLUtils::GLDrawLine(contPt,contPt+10*sc->radius1*(bend+sc->normal*tors),Vector3r(1,0,0));
-		#endif
-		#if 0
-		GLUtils::GLDrawNum(bend[0],contPt-.2*sc->normal*sc->radius1,Vector3r(1,0,0));
-		GLUtils::GLDrawNum(bend[1],contPt,Vector3r(0,1,0));
-		GLUtils::GLDrawNum(bend[2],contPt+.2*sc->normal*sc->radius1,Vector3r(0,0,1));
-		GLUtils::GLDrawNum(tors,contPt+.5*sc->normal*sc->radius2,Vector3r(1,1,0));
-		#endif
-		// sphere center to point on the sphere
-		//GLUtils::GLDrawLine(pos1,pos1+(sc->ori1*sc->cp1rel*Vector3r::UNIT_X*sc->d1),Vector3r(0,.5,1));
-		//GLUtils::GLDrawLine(pos2,pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X*sc->d2),Vector3r(0,1,.5));
-		//TRVAR4(pos1,sc->ori1,pos2,sc->ori2);
-		//TRVAR2(sc->cp2rel,pos2+(sc->ori2*sc->cp2rel*Vector3r::UNIT_X*sc->d2));
-		// contact point to projected points
-		#if 1
-			Vector3r ptTg1=sc->contPtInTgPlane1(), ptTg2=sc->contPtInTgPlane2();
-			//TRVAR3(ptTg1,ptTg2,sc->normal)
-			GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1)); GLUtils::GLDrawLine(pos1,contPt+ptTg1,Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5)); GLUtils::GLDrawLine(pos2,contPt+ptTg2,Vector3r(0,1,.5));
-			// projected shear
-			//GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
-			// 
-			//GLUtils::GLDrawNum(sc->epsN(),contPt,Vector3r(1,1,1));
-		#endif
-	}
-
-
-
 }
 

@@ -139,6 +139,7 @@ void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const b
 }
 #endif
 
+
 CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
 
 long BrefcomContact::cummBetaIter=0, BrefcomContact::cummBetaCount=0;
@@ -295,7 +296,7 @@ bool GLDrawBrefcomContact::colorStrain=false;
 
 void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 	const shared_ptr<BrefcomContact>& BC=static_pointer_cast<BrefcomContact>(ip);
-	const shared_ptr<SpheresContactGeometry>& geom=YADE_PTR_CAST<SpheresContactGeometry>(i->interactionGeometry);
+	const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
 
 	//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
 	Vector3r lineColor=Shop::scalarOnColorScale(1.-BC->relResidualStrength);
@@ -329,11 +330,11 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 		glPopMatrix();
 	}
 
-	const Vector3r& cp=static_pointer_cast<SpheresContactGeometry>(i->interactionGeometry)->contactPoint;
+	const Vector3r& cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
 	if(epsT){
 		Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
 		Real relShear=BC->epsT.Length()/maxShear;
-		Real scale=.5*geom->d0;
+		Real scale=.5*geom->refLength;
 		Vector3r dirShear=BC->epsT; dirShear.Normalize();
 		if(epsTAxes){
 			GLUtils::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));

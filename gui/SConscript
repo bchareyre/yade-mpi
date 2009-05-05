@@ -69,7 +69,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'ConstitutiveLawDispatcher',
 				'InteractionDispatchers',
 				'STLImporter',
-				'ParallelEngine'
+				'ParallelEngine',
+				'Clump'
 			],
 			),
 		env.SharedLibrary('_utils',['py/_utils.cpp'],SHLIBPREFIX='',

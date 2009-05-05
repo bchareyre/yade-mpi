@@ -44,8 +44,6 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 	// multiplied by 2*shrinkFactor. By default shrinkFactor=0.
 	Real shrinkFactor; 
 
-	bool hasShear;
-	
 	protected :
 		virtual void registerAttributes();
 		

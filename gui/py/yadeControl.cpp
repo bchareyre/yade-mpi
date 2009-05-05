@@ -62,6 +62,7 @@
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 #include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Clump.hpp>
 
 using namespace boost;
 using namespace std;
@@ -338,6 +339,16 @@ class pyBodyContainer{
 	}
 	body_id_t insert(pyBody b){return proxee->insert(b.proxee);}
 	python::list insertList(python::list bb){python::list ret; for(int i=0; i<len(bb); i++){ret.append(insert(python::extract<pyBody>(bb[i])()));} return ret;}
+		python::tuple insertClump(python::list bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
+		python::list ids=insertList(bb);
+		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
+		shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
+		clump->isDynamic=true;
+		proxee->insert(clumpAsBody);
+		for(int i=0; i<len(ids); i++){clump->add(python::extract<body_id_t>(ids[i])());}
+		clump->updateProperties(false);
+		return python::make_tuple(clump->getId(),ids);
+	}
 	python::list replace(python::list bb){proxee->clear(); return insertList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
@@ -702,6 +713,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__len__",&pyBodyContainer::length)
 		.def("append",&pyBodyContainer::insert)
 		.def("append",&pyBodyContainer::insertList)
+		.def("appendClumped",&pyBodyContainer::insertClump)
 		.def("clear", &pyBodyContainer::clear)
 		.def("replace",&pyBodyContainer::replace);
 	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())

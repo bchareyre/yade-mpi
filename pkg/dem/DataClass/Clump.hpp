@@ -1,11 +1,5 @@
 // (c) 2007 Vaclav Smilauer <eudoxos@arcig.cz>
  
-/*	To compile this class, you MUST
-		1. use recent version of scons
-		2. say extraModules=yade-extra/clump (this will cause SConscript in this directory to be processed)
-	Any further documentation is in doxygen comments.
-*/
-
 #pragma once
 
 #include<vector>
@@ -59,7 +53,7 @@
 	@todo GravityEngine should be applied to members, not to clump as such?! Still not sure. Perhaps Clumps should have mass and inertia set to zeros so that engines unaware of clumps do not act on it. It would have some private mass and insertia that would be used in NewtonsForceLaw etc for clumps specially...
 
 	@note PersistentSAPCollider bypass Clumps explicitly. This no longer depends on the absence of boundingVolume.
-	@note Clump relies on its id being assigned (as well as id of its components); therefore, only bodies that have already been inserted to the container may be added to Clump which has been itself already added to the container.
+	@note Clump relies on its id being assigned (as well as id of its components); therefore, only bodies that have already been inserted to the container may be added to Clump which has been itself already added to the container. We further requier that clump id is greater than ids of clumped bodies
  
  */
 
@@ -88,61 +82,34 @@ class Clump: public Body {
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Matrix3r& T);
 		//! Recalculate body's inertia tensor in rotated coordinates.
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
-
-	void registerAttributes(){Body::registerAttributes(); REGISTER_ATTRIBUTE(members);}
-	REGISTER_CLASS_NAME(Clump);
-	REGISTER_BASE_CLASS_NAME(Body);
-	// REGISTER_CLASS_INDEX(Clump,Body);
+	REGISTER_ATTRIBUTES(Body,(members));
+	REGISTER_CLASS_AND_BASE(Clump,Body);
 	DECLARE_LOGGER;
 };
-
 REGISTER_SERIALIZABLE(Clump);
 
-/*! Update ::Clump::members positions so that the Clump behaves as a rigid body.
- *
- *
-*/
+/*! Update ::Clump::members positions so that the Clump behaves as a rigid body. */
 class ClumpMemberMover: public DeusExMachina {
 	public:
 		//! Interates over rootBody->bodies and calls Clump::moveSubBodies() for clumps.
 		virtual void applyCondition(MetaBody* rootBody);
 		ClumpMemberMover();
 		virtual ~ClumpMemberMover(){};
-
-	REGISTER_CLASS_NAME(ClumpMemberMover);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
-	// REGISTER_CLASS_INDEX(ClumpMemberMover,PhysicalParametersEngineUnit);
+	REGISTER_CLASS_AND_BASE(ClumpMemberMover,DeusExMachina);
+	REGISTER_ATTRIBUTES(DeusExMachina,/*nothing here*/);
 	DECLARE_LOGGER;
 };
-
 REGISTER_SERIALIZABLE(ClumpMemberMover);
 
 /*! \brief Test some basic clump functionality; show how to use clumps as well. */
 class ClumpTestGen : public FileGenerator {
-	DECLARE_LOGGER;
-	private :
-		//Vector3r	nbTetrahedrons,groundSize,gravity;
-		//Real	minSize,density,maxSize,dampingForce,disorder,dampingMomentum,youngModulus;
-		//int		 timeStepUpdateInterval;
-		//bool		 rotationBlocked;
-		//void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 		void createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii);
-		//shared_ptr<Body> createOneSphere(Vector3r position, Real radius);
-		//void createActors(shared_ptr<MetaBody>& rootBody);
-		//void positionRootBody(shared_ptr<MetaBody>& rootBody);
-		//void calculatePropertiesAndReposition(const shared_ptr<SlumShape>& slum, shared_ptr<ElasticBodyParameters>& rbp, Real density);
-		//void makeTet(shared_ptr<Tetrahedron>& tet, Real radius);
 		shared_ptr<ClumpMemberMover> clumpMover;
 	public :
-		ClumpTestGen (){};
-		~ClumpTestGen (){};
 		bool generate();
-	protected :
-		virtual void postProcessAttributes(bool deserializing){};
-		void registerAttributes(){};
-	REGISTER_CLASS_NAME(ClumpTestGen);
-	REGISTER_BASE_CLASS_NAME(FileGenerator);
+	DECLARE_LOGGER;
+	REGISTER_CLASS_AND_BASE(ClumpTestGen,FileGenerator);
+	REGISTER_ATTRIBUTES(FileGenerator,/*nothing here*/);
 };
-
 REGISTER_SERIALIZABLE(ClumpTestGen);
 

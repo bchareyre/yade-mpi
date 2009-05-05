@@ -5,6 +5,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<cmath>
@@ -81,7 +82,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
 	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
 		if(!i->interactionPhysics) continue;
 		shared_ptr<NormalShearInteraction> bc=dynamic_pointer_cast<NormalShearInteraction>(i->interactionPhysics); if(!bc) continue;
-		shared_ptr<SpheresContactGeometry> geom=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!bc){LOG_ERROR("NormalShearInteraction contact doesn't have SpheresContactGeomety associated?!"); continue;}
+		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!bc){LOG_ERROR("NormalShearInteraction contact doesn't have SpheresContactGeomety associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->physicalParameters->se3.position,bbMin,bbMax), isIn2=isInBB(b2->physicalParameters->se3.position,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -96,7 +97,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
 			//cerr<<"Interaction crosses AABB boundary, weight is "<<weight<<endl;
 			//LOG_DEBUG("Interaction crosses AABB boundary, weight is "<<weight);
 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
-		E+=geom->d0*weight*(.5*bc->kn*pow(geom->epsN(),2)+.5*bc->ks*pow(geom->epsT().Length(),2));
+		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().Length(),2));
 	}
 	return E;
 }

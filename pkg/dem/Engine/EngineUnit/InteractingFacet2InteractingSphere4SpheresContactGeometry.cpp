@@ -18,14 +18,12 @@ CREATE_LOGGER(InteractingFacet2InteractingSphere4SpheresContactGeometry);
 InteractingFacet2InteractingSphere4SpheresContactGeometry::InteractingFacet2InteractingSphere4SpheresContactGeometry() 
 {
 	shrinkFactor=0;
-	hasShear=false;
 }
 
 void InteractingFacet2InteractingSphere4SpheresContactGeometry::registerAttributes()
 {	
     InteractionGeometryEngineUnit::registerAttributes();
     REGISTER_ATTRIBUTE(shrinkFactor);
-    REGISTER_ATTRIBUTE(hasShear);
 }
 
 bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_ptr<InteractingGeometry>& cm1,
@@ -49,7 +47,9 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 	Vector3r normal = facet->nf;
 	Real L = normal.Dot(cl);
+	if (L<0) {normal=-normal; L=-L; }
 
+#if 0
 	int contactFace=0; // temp to save what will be maybe needed for new contact
 	//assert((c->interactionGeometry&&c->isReal)||(!c->interactionGeometry&&!c->isReal));
 	if(c->interactionGeometry){ // contact already exists, use old data here
@@ -64,6 +64,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 		if (L<0) { normal=-normal; L=-L; contactFace=-1;} // new contact on the negative face, reverse and save that information so that since now this contact is always reversed
 		else contactFace=1;
 	}
+#endif
 
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
 	if (L>sphereRadius && !c->isReal)  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
@@ -100,8 +101,6 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	}
 	else
 	{
-		// edge or vertex contact: become indeterminate with respect to face
-		contactFace=0;
 		cp = cp + ne[m]*(icr-bm);
 		if (cp.Dot(ne[(m-1<0)?2:m-1])>icr) // contact with vertex m
 //			cp = facet->vertices[m];
@@ -123,8 +122,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 		if (c->interactionGeometry)
 			scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		else
-			{ scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
-			scm->facetContactFace=contactFace; }
+			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 	  
 		normal = facetAxisT*normal; // in global orientation
 		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 
@@ -135,23 +133,6 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 		if (!c->interactionGeometry)
 			c->interactionGeometry = scm;
-
-		if(hasShear){
-			scm->hasShear=true;
-			// fictive center of the sphere representing the facet in the sphere-sphere contact
-			scm->pos1=scm->contactPoint-(scm->radius1-.5*penetrationDepth)*normal; scm->pos2=se32.position;
-			scm->ori1=se31.orientation; scm->ori2=se32.orientation;
-			if(c->isNew){
-				scm->d0=scm->radius1+scm->radius2-penetrationDepth;
-				scm->d1=scm->radius1-.5*penetrationDepth; scm->d2=scm->radius2-.5*penetrationDepth;
-				scm->d0fixup=-scm->radius1-.5*penetrationDepth;
-				// quasi-constants
-				scm->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
-				scm->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
-				scm->cp1rel.Normalize(); scm->cp2rel.Normalize();
-			}
-			TRVAR2(scm->contPtInTgPlane1(),scm->contPtInTgPlane2());
-		}
 
 		return true;
 	}

@@ -17,7 +17,6 @@ YADE_PLUGIN("BrefcomTestGen");
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
@@ -28,6 +27,7 @@ YADE_PLUGIN("BrefcomTestGen");
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
+#include<yade/pkg-dem/Dem3DofGeom_SphereSphere.hpp>
 #include<yade/extra/UniaxialStrainControlledTest.hpp>
 
 
@@ -51,9 +51,8 @@ void BrefcomTestGen::createEngines(){
 	rootBody->engines.push_back(collider);
 
 	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
-	shared_ptr<InteractingSphere2InteractingSphere4SpheresContactGeometry> is2is4scg(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	is2is4scg->hasShear=true;
-	igeomDispatcher->add(is2is4scg);
+	shared_ptr<ef2_Sphere_Sphere_Dem3DofGeom> ef2ssd3d(new ef2_Sphere_Sphere_Dem3DofGeom);
+	igeomDispatcher->add(ef2ssd3d);
 	rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
@@ -83,11 +82,6 @@ void BrefcomTestGen::createEngines(){
 	shared_ptr<BrefcomDamageColorizer> dmg(new BrefcomDamageColorizer);
 	rootBody->engines.push_back(dmg);
 
-	shared_ptr<PositionOrientationRecorder> rec(new PositionOrientationRecorder);
-	rec->outputFile="/tmp/brefcom-test";
-	rec->interval=500;
-	rec->saveRgb=true;
-	rootBody->engines.push_back(rec);
 #if 0
 	shared_ptr<BrefcomStiffnessCounter> bsc(new BrefcomStiffnessCounter);
 	bsc->interval=100;

@@ -17,38 +17,7 @@
 
 #include<yade/extra/Shop.hpp>
 
-YADE_PLUGIN("ElasticContactLaw2","ef2_Spheres_Elastic_ElasticLaw","ef2_Dem3Dof_Elastic_ElasticLaw","ElasticContactLaw");
-
-ElasticContactLaw2::ElasticContactLaw2(){
-	isCohesive=true;
-}
-
-ElasticContactLaw2::~ElasticContactLaw2(){}
-
-void ElasticContactLaw2::action(MetaBody* rb){
-	Real /* bending stiffness */ kb=1e7, /* torsion stiffness */ ktor=1e8;
-	FOREACH(shared_ptr<Interaction> i, *rb->transientInteractions){
-		if(!i->isReal) continue;
-		shared_ptr<SpheresContactGeometry> contGeom=YADE_PTR_CAST<SpheresContactGeometry>(i->interactionGeometry);
-		shared_ptr<ElasticContactInteraction> contPhys=YADE_PTR_CAST<ElasticContactInteraction>(i->interactionPhysics);
-		assert(contGeom); assert(contPhys);
-		if(!contGeom->hasShear) throw runtime_error("SpheresContactGeometry::hasShear must be true for ElasticContactLaw2");
-		Real Fn=contPhys->kn*contGeom->displacementN(); // scalar normal force; displacementN()>=0 ≡ elongation of the contact
-		if(!isCohesive && contGeom->displacementN()>0){ cerr<<"deleting"<<endl; /* delete the interaction */ i->isReal=false; continue;}
-		contPhys->normalForce=Fn*contGeom->normal;
-		//contGeom->relocateContactPoints();
-		//contGeom->slipToDisplacementTMax(max(0.,(-Fn*contPhys->tangensOfFrictionAngle)/contPhys->ks)); // limit shear displacement -- Coulomb criterion
-		contPhys->shearForce=contPhys->ks*contGeom->displacementT();
-		Vector3r force=contPhys->shearForce+contPhys->normalForce;
-		Shop::applyForceAtContactPoint(force,contGeom->contactPoint,i->getId1(),contGeom->pos1,i->getId2(),contGeom->pos2,rb);
-
-		Vector3r bendAbs; Real torsionAbs; contGeom->bendingTorsionAbs(bendAbs,torsionAbs);
-		rb->bex.addTorque(i->getId1(), contGeom->normal*torsionAbs*ktor+bendAbs*kb);
-		rb->bex.addTorque(i->getId2(),-contGeom->normal*torsionAbs*ktor-bendAbs*kb);
-	}
-}
-
-
+YADE_PLUGIN("ef2_Spheres_Elastic_ElasticLaw","ef2_Dem3Dof_Elastic_ElasticLaw","ElasticContactLaw");
 
 
 ElasticContactLaw::ElasticContactLaw() : InteractionSolver()

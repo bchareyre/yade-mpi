@@ -33,6 +33,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('FacetTopologyAnalyzer',['Engine/StandAloneEngine/FacetTopologyAnalyzer.cpp'],LIBS=env['LIBS']+['InteractingFacet']),
 
+	env.SharedLibrary('Clump',['DataClass/Clump.cpp'],LIBS=env['LIBS']+['Shop']),
 
 	env.SharedLibrary('SQLiteRecorder',
 		['Engine/StandAloneEngine/SQLiteRecorder.cpp'],
@@ -949,7 +950,8 @@ env.SharedLibrary('NewtonsDampedLaw',
 		LIBS=env['LIBS']+['yade-serialization',
 			'yade-base',		
 			'yade-multimethods',
-			'RigidBodyParameters'
+			'RigidBodyParameters',
+			'Clump'
 			 ]),
 
 	env.SharedLibrary('SimpleViscoelasticBodyParameters'
@@ -1049,9 +1051,9 @@ env.SharedLibrary('NewtonsDampedLaw',
 				,'RotationEngine'
 				]),
 
-	env.SharedLibrary('ef2_Spheres_NormalShear_ElasticFrictionalLaw',
-		['Engine/EngineUnit/ef2_Spheres_NormalShear_ElasticFrictionalLaw.cpp'],
-		LIBS=env['LIBS']+['ConstitutiveLawDispatcher','NormalShearInteractions','SpheresContactGeometry']),
+	env.SharedLibrary('ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw',
+		['Engine/EngineUnit/ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw.cpp'],
+		LIBS=env['LIBS']+['ConstitutiveLawDispatcher','NormalShearInteractions','DemXDofGeom']),
 
 	env.SharedLibrary('ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw',
 		['Engine/EngineUnit/ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw.cpp'],

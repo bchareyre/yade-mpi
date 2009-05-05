@@ -1,4 +1,4 @@
-// (c) 2007 Vaclav Smilauer <eudoxos@arcig.cz> 
+// (c) 2007,2009 Vaclav Smilauer <eudoxos@arcig.cz> 
 
 #include"Clump.hpp"
 #include<algorithm>
@@ -60,7 +60,7 @@ Clump::Clump(): Body(){
 /*! @pre Body must be dynamic.
  * @pre Body must not be part or this clump already.
  * @pre Body must have valid (non-NULL) Body::physicalParameters
- * @todo se3 calculation is not tested yet
+ * @pre Body must have id that is smaller than the clump's id (reason: processing order in NewtonsDampedLaw)
  */
 void Clump::add(body_id_t subId){
 	shared_ptr<Body> subBody=Body::byId(subId);
@@ -69,6 +69,7 @@ void Clump::add(body_id_t subId){
 	assert(subBody->isDynamic);
 	assert(physicalParameters);
 	assert(members.count(subId)==0);
+	assert(subId<getId());
 
 	// begin actual setup
 	subBody->clumpId=getId();
@@ -394,12 +395,11 @@ bool ClumpTestGen::generate()
 
 /*! \brief Generate clump of spheres, the result will be inserted into rootBody.
  *
- * To create a clump, first the clump itself needs to be instantiated \em and inserted into rootBody (this will assign an Body::id).
- * In order for this to work, Omega::roootBody must have been assigned; within generators, use Omega::setRootBody for this.
- *
- * The body to add to clump must have been also created and added to the rootBody (so that it has id, again).
- *
- * Finally, call Clump::updateProperties to get physical properties physically right (inertia, position, orientation, mass, ...).
+ * Attention here: clump's id must be greater than id of any of its constituents; therefore
+ *   1. create bodies that will be clumped, add them to bodies (at that moment they get their id) and save their ids in clumpMembers
+ *   2. create (empty) clump and add it to bodies
+ *	  3. add bodies to be clumped to the clump
+ *	  4. call Clump::updateProperties to get physical properties physically right (inertia, position, orientation, mass, ...).
  *
  * @param clumpPos Center of the clump (not necessarily centroid); serves merely as reference for sphere positions.
  * @param relPos Relative positions of individual spheres' centers.
@@ -408,20 +408,19 @@ bool ClumpTestGen::generate()
 void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii)
 {
 	assert(relPos.size()==radii.size());
-	
-	// empty clump	
-	shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
-	shared_ptr<Body> clumpAsBody(static_pointer_cast<Body>(clump));
-	rootBody->bodies->insert(clumpAsBody);
-
-	clump->isDynamic=true;
-	// if subscribedBodies work some day: clumpMover->subscribedBodies.push_back(clump->getId());
-	
+	list<body_id_t> clumpMembers;	
 	for(size_t i=0; i<relPos.size(); i++){
 		shared_ptr<Body> sphere=Shop::sphere(clumpPos+relPos[i],radii[i]);
 		body_id_t lastId=(body_id_t)rootBody->bodies->insert(sphere);
-		clump->add(lastId);
-		LOG_TRACE("Generated clumped sphere #"<<lastId);
+		clumpMembers.push_back(lastId);
+		LOG_TRACE("Generated (not yet) clumped sphere #"<<lastId);
+	}
+	shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
+	shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
+	clump->isDynamic=true;
+	rootBody->bodies->insert(clumpAsBody);
+	FOREACH(body_id_t id, clumpMembers){
+		clump->add(id);
 	}
 	clump->updateProperties(false);
 }

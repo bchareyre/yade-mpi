@@ -8,7 +8,6 @@ using namespace std;
 #endif
 
 
-
 # if 0
 Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
