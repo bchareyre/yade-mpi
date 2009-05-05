@@ -158,9 +158,12 @@ void printHelp()
 		"   YADE_OPENMP   (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.\n"
 	#endif
 	#ifdef LOG4CXX
-		"   LOG4CXX       configurable logging framework enabled (~/.yade-suffix/logging.conf)"
+		"   LOG4CXX       configurable logging framework enabled (~/.yade-suffix/logging.conf)\n"
 	#endif
-	"\n";
+	;
+	if(!isnan(std::numeric_limits<double>::quiet_NaN())) cerr<<
+		"   -ffast-math?  WARNING: NaN's will not work"<<endl;
+
 }
 
 
