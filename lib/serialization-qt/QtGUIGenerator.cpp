@@ -87,6 +87,95 @@ void QtGUIGenerator::reArrange(QWidget * widget)
 	}
 }
 
+std::string sanitize(const std::string num)
+{
+	std::string ret="";
+	int len=num.size();
+	if(len < 7 )
+		return num;
+	// is that a number?
+	try
+	{
+		Real v = boost::lexical_cast<Real>(num);
+	}
+	catch(std::bad_cast&)
+	{
+		return num;
+	}
+	// case .....000001
+	if(num[len-2] == '0' && num[len-3] == '0')
+	{
+		for(int pos=len-4 ; pos>=0 ; --pos)
+		{
+			if(ret.size() != 0 || num[pos] != '0' || num[pos-1] == '.')
+			{
+				ret = num[pos] + ret;
+			}
+		}
+	}
+	else 
+	{// case ....9999998
+		if(num[len-2] == '9' && num[len-3] == '9')
+		{
+			for(int pos=len-4 ; pos>=0 ; --pos)
+			{
+				if(ret.size() != 0 || num[pos] != '9')
+				{
+					if(ret.size() == 0)
+					{
+						ret = (unsigned char)((int)(num[pos])+1);
+					}
+					else
+					{
+						ret = num[pos] + ret;
+					}
+				}
+			}
+		}
+		else
+		{// exponential part e-..
+			if(num[len-3] == '-' && num[len-4] == 'e')
+			{
+				std::string exp =std::string("e-")+num[len-2]+num[len-1];
+				std::string mant="";
+				for(int pos=len-5 ; pos>=0 ; --pos)
+				{
+					mant = num[pos] + mant;
+				}
+				ret=sanitize(mant)+exp;
+			}
+			else
+			{// exponential part e..
+				if(num[len-3] == 'e')
+				{
+					std::string exp =std::string("e")+num[len-2]+num[len-1];
+					std::string mant="";
+					for(int pos=len-4 ; pos>=0 ; --pos)
+					{
+						mant = num[pos] + mant;
+					}
+					ret=sanitize(mant)+exp;
+				}
+				else
+				{
+					return num;
+				}
+			}
+		}
+	}
+	Real a = boost::lexical_cast<Real>(ret);
+	Real b = boost::lexical_cast<Real>(num);
+	if(a-b == 0) // the sanitized number and original numer must be exactly the same
+	{
+		return ret;
+	}
+	else
+	{
+		std::cerr << "INFO: sanitize failed: " << a << " != " << b << "\n";
+		return num; // return original numer, since they are different
+	}
+};
+
 
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 {
@@ -142,7 +231,7 @@ void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 				else
 				{
 					QLineEdit* le = new QLineEdit(widget);
-					le->setText(descriptor->strings[i]);
+					le->setText(sanitize(descriptor->strings[i]));
 					descriptor->widgets.push_back(le);
 					descriptor->types.push_back(AttributeDescriptor::FLOATING);
 				}
