@@ -163,16 +163,24 @@ std::string sanitize(const std::string num)
 			}
 		}
 	}
-	Real a = boost::lexical_cast<Real>(ret);
-	Real b = boost::lexical_cast<Real>(num);
-	if(a-b == 0) // the sanitized number and original numer must be exactly the same
+	try
 	{
-		return ret;
+		Real a = boost::lexical_cast<Real>(ret);
+		Real b = boost::lexical_cast<Real>(num);
+		if(a-b == 0) // the sanitized number and original number must be exactly the same
+		{
+			return ret;
+		}
+		else
+		{
+			std::cerr << "INFO: sanitize failed: " << a << " != " << b << "\n";
+			return num; // return original numer, since they are different
+		}
 	}
-	else
+	catch(std::bad_cast&)
 	{
-		std::cerr << "INFO: sanitize failed: " << a << " != " << b << "\n";
-		return num; // return original numer, since they are different
+		std::cerr << "INFO: sanitize failed: " << ret << " != " << num << "\n";
+		return num; // oops, the number got corrupted somehow
 	}
 };
 
