@@ -19,10 +19,15 @@ class PhysicalActionContainerReseter : public StandAloneEngine
 		virtual ~PhysicalActionContainerReseter();
 		virtual void action(MetaBody*);
 
-	REGISTER_CLASS_NAME(PhysicalActionContainerReseter);
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_CLASS_AND_BASE(PhysicalActionContainerReseter,StandAloneEngine);
 };
-
 REGISTER_SERIALIZABLE(PhysicalActionContainerReseter);
+
+class BexResetter: public StandAloneEngine{
+	public:
+		virtual void action(MetaBody*);
+	REGISTER_CLASS_AND_BASE(BexResetter,StandAloneEngine);
+};
+REGISTER_SERIALIZABLE(BexResetter);
 
 

@@ -20,7 +20,7 @@ o.initializers=[
 ## MetaEngines act as dispatchers and based on the type of objects they operate on, different EngineUnits are called.
 o.engines=[
 	## Resets forces and momenta the act on bodies
-	PhysicalActionContainerReseter(),
+	BexResetter(),
 	## associates bounding volume - in this case, AxisAlignedBoundingBox (AABB) - to each body.
 	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, Box, or MetaBody (rootBody).
 	## AABBs will be used to detect collisions later, by PersistentSAPCollider
@@ -125,6 +125,13 @@ o.dt=.2*utils.PWaveTimeStep()
 ## Save the scene to file, so that it can be loaded later. Supported extension are: .xml, .xml.gz, .xml.bz2.
 o.save('/tmp/a.xml.bz2');
 #o.run(100000); o.wait(); print o.iter/o.realtime,'iterations/sec'
+
+def onBodySelect(id):
+	print "Selected:",id
+	utils.highlightNone()
+	for i in O.interactions.withBody(id):
+		O.bodies[i.id2 if i.id1==id else i.id1].shape['highlight']=True
+		print i.id1,i.id2,i.phys,i.geom
 
 from yade import qt
 qt.Controller()

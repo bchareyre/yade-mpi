@@ -18,7 +18,7 @@ class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit
 	
 	public :
 		virtual void go( 	  const shared_ptr<PhysicalParameters>&
-					, Body*);
+					, Body*, BexContainer& );
 
 	FUNCTOR1D(RigidBodyParameters);	
 	REGISTER_CLASS_NAME(LeapFrogOrientationIntegrator);

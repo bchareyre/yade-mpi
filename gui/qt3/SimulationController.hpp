@@ -79,6 +79,7 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void pbXYZ_clicked();
 		virtual void pbYZX_clicked();
 		virtual void pbZXY_clicked();
+		virtual void pyOnelinerEnter();
 
 
 

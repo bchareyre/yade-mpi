@@ -34,7 +34,7 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		if (!b->isDynamic && !b->isClumpMember()) continue;
 		
 		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-		unsigned int id = b->getId();
+		body_id_t id = b->getId();
 		const Vector3r& m=ncb->bex.getTorque(id);
 		const Vector3r& f=ncb->bex.getForce(id);
 
@@ -92,9 +92,10 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 		Quaternionr q;
 		q.FromAxisAngle ( axis,angle*dt );
 		rb->se3.orientation = q*rb->se3.orientation;
+		if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); rb->se3.orientation=q*rb->se3.orientation; }
 		rb->se3.orientation.Normalize();
 
-		rb->se3.position += rb->velocity*dt;
+		rb->se3.position += rb->velocity*dt + ncb->bex.getMove(id);
 
 		if(b->isClump()) static_cast<Clump*>(b.get())->moveMembers();
 	}

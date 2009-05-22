@@ -67,11 +67,7 @@ CREATE_LOGGER(BrefcomMakeContact);
 
 
 void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
-	#ifdef BREFCOM_DEM3DOF
-		Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
-	#else
-		SpheresContactGeometry* contGeom=YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
-	#endif
+	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
 
 	assert(contGeom); // for now, don't handle anything other than SpheresContactGeometry and Dem3DofGeom
 
@@ -127,19 +123,6 @@ CREATE_LOGGER(BrefcomContact);
 // !! at least one virtual function in the .cpp file
 BrefcomContact::~BrefcomContact(){};
 
-#if 0
-/********************** BrefcomLaw ****************************/
-CREATE_LOGGER(BrefcomLaw);
-
-void BrefcomLaw::applyForce(const Vector3r& force, const body_id_t& id1, const body_id_t& id2){
-	rootBody->bex.addForce(id1,force);
-	rootBody->bex.addForce(id2,-force);
-	rootBody->bex.addTorque(id1,(contGeom->contactPoint-contGeom->pos1).Cross(force));
-	rootBody->bex.addTorque(id2,(contGeom->contactPoint-contGeom->pos2).Cross(-force));
-}
-#endif
-
-
 CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
 
 long BrefcomContact::cummBetaIter=0, BrefcomContact::cummBetaCount=0;
@@ -188,65 +171,52 @@ Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYie
 	return 1.-exp(beta)*(1-sigmaTYield/sigmaTNorm);
 }
 
+Real ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2=1.; /* deactivated if > 0 */
+Real ef2_Spheres_Brefcom_BrefcomLaw::yieldLogSpeed=1.;
+Real ef2_Spheres_Brefcom_BrefcomLaw::yieldEllipseShift=0.;
+
 void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	//timingDeltas->start();
-	#ifdef BREFCOM_DEM3DOF
-		Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
-	#else
-		SpheresContactGeometry* contGeom=static_cast<SpheresContactGeometry*>(_geom.get());
-		assert(contGeom->hasShear);
-	#endif
+	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	BrefcomContact* BC=static_cast<BrefcomContact*>(_phys.get());
 
 	/* kept fully damaged contacts; note that normally the contact is deleted _after_ the BREFCOM_MATERIAL_MODEL,
 	 * i.e. if it is 1.0 here, omegaThreshold is >= 1.0 for sure.
 	 * &&'ing that just to make sure anyway ...
 	 */
-	if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) return;
+	// if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) return;
 
 	// shorthands
-	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(BC->omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau);
+	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(BC->omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
 	/* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& xiShear(BC->xiShear); */
 	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
+	const Real& yieldLogSpeed(ef2_Spheres_Brefcom_BrefcomLaw::yieldLogSpeed); const int& yieldSurfType(ef2_Spheres_Brefcom_BrefcomLaw::yieldSurfType);
+	const Real& yieldEllipseShift(ef2_Spheres_Brefcom_BrefcomLaw::yieldEllipseShift); 
 
-	#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verirfication `"<<#condition<<"' failed!"); throw;}
+	#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); throw;}
 	
 	#define NNAN(a) YADE_VERIFY(!isnan(a));
 	#define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
 
 	//timingDeltas->checkpoint("setup");
-	#ifdef BREFCOM_DEM3DOF
-		epsN=contGeom->strainN(); epsT=contGeom->strainT();
-	#else
-		epsN=contGeom->epsN(); epsT=contGeom->epsT();
-	#endif
+	// if(contGeom->refR1<0) contGeom->refLength=contGeom->refR2; // make facet-sphere contact always at equilibrium when touching exactly (and not the initial distance)
+	epsN=contGeom->strainN(); epsT=contGeom->strainT();
 	if(isnan(epsN)){
-		#ifndef BREFCOM_DEM3DOF
-			LOG_FATAL("d0="<<contGeom->d0<<", d1,d2="<<contGeom->d1<<","<<contGeom->d2<<"; pos1,pos2="<<contGeom->pos1<<","<<contGeom->pos2);
-		#else
-			LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
-		#endif
+		LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
 		throw runtime_error("!! epsN==NaN !!");
 	}
 	NNAN(epsN); NNANV(epsT);
 	// already in SpheresContactGeometry:
 	// contGeom->relocateContactPoints(); // allow very large mutual rotations
 	if(logStrain && epsN<0){
-		#ifndef BREFCOM_DEM3DOF
-			Real epsN0=max(epsN,-.7); // FIXME: ugly hack
-			if(epsN0<-1){
-				LOG_ERROR("epsN0="<<epsN0);
-					LOG_ERROR("d0="<<contGeom->d0<<"; d0fixup="<<contGeom->d0fixup<<"; distance="<<(contGeom->pos1-contGeom->pos2).Length()<<"; displacementN="<<contGeom->displacementN());
-			}
-		#else
-			Real epsN0=epsN;
-		#endif
+		Real epsN0=epsN;
 		epsN=log(epsN0+1); epsT*=epsN/epsN0;
 	}
 	NNAN(epsN); NNANV(epsT);
 	//timingDeltas->checkpoint("geom");
 
 	epsN+=BC->isoPrestress/E;
+	//TRVAR1(epsN);
 	#ifdef BREFCOM_MATERIAL_MODEL
 		BREFCOM_MATERIAL_MODEL
 	#else
@@ -254,10 +224,19 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 		sigmaT=G*epsT;
 	#endif
 	sigmaN-=BC->isoPrestress;
+	if(contGeom->refR1<0 && ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2<=0 && epsN<ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2){
+		/* move Body2 (the sphere) so that minStrain is satisfied */
+		rootBody->bex.addMove(I->getId2(),contGeom->normal*(ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2-epsN)*contGeom->refLength);
+		LOG_TRACE("Moving by "<<contGeom->normal*(ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2-epsN)*contGeom->refLength);
+	}
 	NNAN(kappaD); NNAN(epsCrackOnset); NNAN(epsFracture); NNAN(omega);
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
 	//timingDeltas->checkpoint("material");
-	if(omega>omegaThreshold){
+
+	const int watch1=6300, watch2=6299;
+	#define SHOW(a) if((I->getId1()==watch1 && I->getId2()==watch2) || (I->getId2()==watch1 && I->getId1()==watch2)) cerr<<__FILE__<<":"<<__LINE__<<" "<<a<<endl;
+	SHOW("epsN"<<epsN);
+	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
 		I->isReal=false;
 		const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
 		const shared_ptr<BrefcomPhysParams>& rbp1=YADE_PTR_CAST<BrefcomPhysParams>(body1->physicalParameters), rbp2=YADE_PTR_CAST<BrefcomPhysParams>(body2->physicalParameters);
@@ -269,11 +248,7 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
-	#ifdef BREFCOM_DEM3DOF
-		applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, rootBody);
-	#else
-		applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->pos1, I->getId2(), contGeom->pos2, rootBody);
-	#endif
+	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, rootBody);
 	//timingDeltas->checkpoint("rest");
 }
 

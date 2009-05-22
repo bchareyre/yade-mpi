@@ -62,10 +62,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/InteractionHashMap.hpp>
-
 #include<yade/extra/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
@@ -273,8 +269,6 @@ bool TriaxialTestWater::generate()
 
 	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-
 	shared_ptr<Body> body;
 	
 	
@@ -447,7 +441,6 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= spheresColor;
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -495,7 +488,6 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

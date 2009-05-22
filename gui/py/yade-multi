@@ -3,7 +3,7 @@
 #
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, thread, time,logging
+import os, sys, thread, time, logging, pipes
 
 class JobInfo():
 	def __init__(self,num,id,command,log,nSlots):
@@ -180,6 +180,7 @@ for i,l in enumerate(useLines):
 	logFile=logFormat.replace('%',str(l))
 	if idStrings: logFile=logFile.replace('@',idStrings[l])
 	else: logFile=logFile.replace('@',str(l))
+	logFile=logFile.replace('!','')
 	envVars=[]
 	nSlots=1
 	for col,head in enumerate(headings):
@@ -187,7 +188,7 @@ for i,l in enumerate(useLines):
 		if head=='!OMP_NUM_THREADS': nSlots=int(values[l][col])
 		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if nSlots>maxJobs: logging.warning('WARNING: job #%d wants %d slots but only %d are available'%(i,nSlots,maxJobs))
-	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,logFile),logFile,nSlots))
+	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,pipes.quote(logFile)),logFile,nSlots))
 
 print "Job summary:"
 for job in jobs:
@@ -198,11 +199,17 @@ runHttpStatsServer()
 # OK, go now
 if not dryRun: runJobs(jobs,maxJobs)
 
-print 'All jobs finished,',
+print 'All jobs finished.'
+
+# for easy grepping in logfiles:
+print 'Log files:'
+for job in jobs: print job.log,
+print
+
 if not gnuplotOut:
-	print 'bye.'
+	print 'Bye.'
 else:
-	print 'assembling gnuplot files…'
+	print 'Assembling gnuplot files…'
 	for job in jobs:
 		for l in file(job.log):
 			if l.startswith('gnuplot '):
@@ -228,4 +235,5 @@ else:
 	gp=file(gnuplotOut,'w')
 	gp.write(preamble)
 	gp.write('plot '+','.join(plots))
-	print "Finished writing "+gnuplotOut+", bye."
+	print "gnuplot",gnuplotOut
+	print "Plot written, bye."

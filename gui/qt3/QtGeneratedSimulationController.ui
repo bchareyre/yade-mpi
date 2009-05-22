@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>271</width>
-            <height>629</height>
+            <width>252</width>
+            <height>563</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -184,7 +184,7 @@
                     <property name="minimumSize">
                         <size>
                             <width>0</width>
-                            <height>25</height>
+                            <height>50</height>
                         </size>
                     </property>
                     <property name="text">
@@ -350,50 +350,39 @@
                                 <property name="flat">
                                     <bool>false</bool>
                                 </property>
-                                <widget class="QRadioButton">
+                                <vbox>
                                     <property name="name">
-                                        <cstring>rbTimeStepper</cstring>
+                                        <cstring>unnamed</cstring>
                                     </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="geometry">
-                                        <rect>
-                                            <x>10</x>
-                                            <y>20</y>
-                                            <width>116</width>
-                                            <height>25</height>
-                                        </rect>
-                                    </property>
-                                    <property name="text">
-                                        <string>Time stepper</string>
-                                    </property>
-                                    <property name="buttonGroupId">
-                                        <number>0</number>
-                                    </property>
-                                </widget>
-                                <widget class="QRadioButton">
-                                    <property name="name">
-                                        <cstring>rbFixed</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="geometry">
-                                        <rect>
-                                            <x>10</x>
-                                            <y>50</y>
-                                            <width>116</width>
-                                            <height>25</height>
-                                        </rect>
-                                    </property>
-                                    <property name="text">
-                                        <string>Fixed step</string>
-                                    </property>
-                                    <property name="buttonGroupId">
-                                        <number>2</number>
-                                    </property>
-                                </widget>
+                                    <widget class="QRadioButton">
+                                        <property name="name">
+                                            <cstring>rbTimeStepper</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>Time stepper</string>
+                                        </property>
+                                        <property name="buttonGroupId">
+                                            <number>0</number>
+                                        </property>
+                                    </widget>
+                                    <widget class="QRadioButton">
+                                        <property name="name">
+                                            <cstring>rbFixed</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>Fixed step</string>
+                                        </property>
+                                        <property name="buttonGroupId">
+                                            <number>2</number>
+                                        </property>
+                                    </widget>
+                                </vbox>
                             </widget>
                             <widget class="QFrame" row="2" column="0" rowspan="1" colspan="2">
                                 <property name="name">
@@ -471,6 +460,12 @@
                                                         <verstretch>0</verstretch>
                                                     </sizepolicy>
                                                 </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>40</height>
+                                                    </size>
+                                                </property>
                                                 <property name="text">
                                                     <string></string>
                                                 </property>
@@ -530,6 +525,12 @@
                                                         <horstretch>2</horstretch>
                                                         <verstretch>0</verstretch>
                                                     </sizepolicy>
+                                                </property>
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>0</width>
+                                                        <height>40</height>
+                                                    </size>
                                                 </property>
                                                 <property name="text">
                                                     <string></string>
@@ -725,6 +726,60 @@
                                 </property>
                             </widget>
                         </grid>
+                    </widget>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>TabPage</cstring>
+                        </property>
+                        <attribute name="title">
+                            <string>Python</string>
+                        </attribute>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLineEdit">
+                                <property name="name">
+                                    <cstring>pyOneliner</cstring>
+                                </property>
+                                <property name="font">
+                                    <font>
+                                        <family>Monospace</family>
+                                    </font>
+                                </property>
+                            </widget>
+                            <widget class="QLabel">
+                                <property name="name">
+                                    <cstring>textLabel1_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>(Command output goes to the console, not here)</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>WordBreak|AlignVCenter|AlignRight</set>
+                                </property>
+                                <property name="indent">
+                                    <number>-1</number>
+                                </property>
+                            </widget>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer2</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Vertical</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>20</width>
+                                        <height>191</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </vbox>
                     </widget>
                 </widget>
                 <widget class="QPushButton" row="1" column="1">
@@ -927,6 +982,12 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbZXY_clicked()</slot>
     </connection>
+    <connection>
+        <sender>pyOneliner</sender>
+        <signal>returnPressed()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pyOnelinerEnter()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
@@ -960,6 +1021,7 @@
     <slot>pbXYZ_clicked()</slot>
     <slot>pbYZX_clicked()</slot>
     <slot>pbZXY_clicked()</slot>
+    <slot>pyOnelinerEnter()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

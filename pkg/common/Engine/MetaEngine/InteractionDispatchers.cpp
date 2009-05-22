@@ -40,8 +40,8 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			// and can call go in all cases
 			if(swap){I->swapOrder();}
 			// body pointers must be updated, in case we swapped
-			const shared_ptr<Body>& b1=Body::byId(I->getId1());
-			const shared_ptr<Body>& b2=Body::byId(I->getId2());
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody);
+			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
 
 			assert(I->functorCache.geom);
 			I->isReal=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3, b2->physicalParameters->se3,I);

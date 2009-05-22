@@ -44,8 +44,6 @@
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 
 #include <boost/filesystem/convenience.hpp>
@@ -116,9 +114,6 @@ bool FEMBeam::generate()
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	positionRootBody(rootBody);
 	
-	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 	
 	
 	
@@ -218,7 +213,6 @@ void FEMBeam::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GeometricalModel> gm 	= YADE_PTR_CAST<GeometricalModel>(ClassFactory::instance().createShared("FEMSetGeometry"));
 	gm->diffuseColor 			= Vector3r(1,1,1);
 	gm->wire 				= false;
-	gm->visible 				= true;
 	gm->shadowCaster 			= true;
 	
 	rootBody->interactingGeometry 		= YADE_PTR_CAST<InteractingGeometry>(set);	

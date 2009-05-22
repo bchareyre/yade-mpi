@@ -41,9 +41,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 
 Funnel::Funnel () : FileGenerator()
 {
@@ -102,11 +99,6 @@ bool Funnel::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-////////////////////////////////////
-///////// Container
-	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 		
 ////////////////////////////////////
 ///////// ground
@@ -201,7 +193,6 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -248,7 +239,6 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;

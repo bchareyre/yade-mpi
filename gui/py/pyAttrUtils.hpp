@@ -26,6 +26,7 @@ using namespace boost;
 	string wrappedGetAttrStr(std::string key){ensureFunc();vector<string> a=accessor->getAttrStr(key); string ret("["); FOREACH(string s, a) ret+=s+" "; return ret+"]";} \
 	void wrappedSetAttrStr(std::string key, std::string val){ensureFunc();return accessor->setAttrStr(key,val);} \
 	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} \
+	boost::python::dict wrappedPyDict(){ensureFunc(); return accessor->pyDict();} \
 	bool wrappedPyHasKey(std::string key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();} \
 	
 	
@@ -36,7 +37,7 @@ using namespace boost;
  *
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
-	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey) \
+	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey).def("dict",&cxxClass::wrappedPyDict) \
 	.def("getRaw",&cxxClass::wrappedGetAttrStr).def("setRaw",&cxxClass::wrappedSetAttrStr)
 	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
@@ -158,6 +159,9 @@ class AttrAccess{
 			stringstream voidStream;
 			descriptors[name].archive->deserialize(voidStream,*(descriptors[name].archive),value);
 		}
+
+		//! return dictionary of attributes and their python values (debugging mosly)
+		boost::python::dict pyDict(){boost::python::dict ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret[I->first]=pyGet(I->first); return ret; }
 		//! return python list of keys (attribute names)
 		boost::python::list pyKeys(){boost::python::list ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret.append(I->first); return ret;}
 

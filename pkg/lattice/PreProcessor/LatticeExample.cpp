@@ -457,9 +457,6 @@ bool LatticeExample::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 	
-//	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-//	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-
 	
 	shared_ptr<Body> body;
 	
@@ -890,7 +887,6 @@ bool LatticeExample::createNodeXYZ(shared_ptr<Body>& body, Real x, Real y, Real 
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(1.8,1.8,0.0);
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= false;
 	
         body->geometricalModel          = gSphere;
@@ -948,7 +944,6 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(0.8,0.8,0.8);
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= false;
 	
         body->geometricalModel          = gSphere;
@@ -999,7 +994,6 @@ bool LatticeExample::createQuad(shared_ptr<Body>& quad, int i, int j, Vector3r n
 	physics->velocity		= Vector3r(0,0,0);
 
 	gQuad->diffuseColor		= Vector3r(0.0,0.0,0.0);
-	gQuad->visible			= true;
 	gQuad->wire			= false;
 	gQuad->shadowCaster		= false;
 	
@@ -1026,7 +1020,6 @@ void LatticeExample::createBeam(shared_ptr<Body>& body, int i, int j)
 	gBeam->length			= length;
 	gBeam->diffuseColor		= Vector3r(0.6,0.6,0.6);
 	gBeam->wire			= false;
-	gBeam->visible			= true;
 	gBeam->shadowCaster		= false;
 	
 	body->geometricalModel		= gBeam;
@@ -1242,7 +1235,6 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GeometricalModel> gm = YADE_PTR_CAST<GeometricalModel>(ClassFactory::instance().createShared("LatticeSetGeometry"));
 	gm->diffuseColor 		= Vector3r(1,1,1);
 	gm->wire 			= false;
-	gm->visible 			= true;
 	gm->shadowCaster 		= true;
 	
 	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	

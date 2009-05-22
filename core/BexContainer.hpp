@@ -44,10 +44,12 @@ class BexContainer{
 		typedef std::vector<Vector3r> vvector;
 		std::vector<vvector> _forceData;
 		std::vector<vvector> _torqueData;
-		vvector _force, _torque;
+		std::vector<vvector> _moveData;
+		std::vector<vvector> _rotData;
+		vvector _force, _torque, _move, _rot;
 		size_t size;
 		int nThreads;
-		bool synced;
+		bool synced,moveRotUsed;
 		boost::mutex globalMutex;
 
 		inline void ensureSize(body_id_t id){
@@ -64,10 +66,11 @@ class BexContainer{
 		const Vector3r& getTorqueUnsynced(body_id_t id){ensureSize(id); return _force[id];}
 		friend class PhysicalActionDamperUnit;
 	public:
-		BexContainer(): size(0), synced(true),syncCount(0){
+		BexContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0){
 			nThreads=omp_get_max_threads();
 			for(int i=0; i<nThreads; i++){
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
+				_moveData.push_back(vvector()); _rotData.push_back(vvector());
 			}
 		}
 
@@ -75,7 +78,11 @@ class BexContainer{
 		const Vector3r& getForce(body_id_t id)         { ensureSize(id); ensureSynced(); return _force[id]; }
 		void  addForce(body_id_t id, const Vector3r& f){ ensureSize(id); synced=false;   _forceData[omp_get_thread_num()][id]+=f;}
 		const Vector3r& getTorque(body_id_t id)        { ensureSize(id); ensureSynced(); return _torque[id]; }
-		void addTorque(body_id_t id, const Vector3r& f){ ensureSize(id); synced=false;   _torqueData[omp_get_thread_num()][id]+=f;}
+		void addTorque(body_id_t id, const Vector3r& t){ ensureSize(id); synced=false;   _torqueData[omp_get_thread_num()][id]+=t;}
+		const Vector3r& getMove(body_id_t id)          { ensureSize(id); ensureSynced(); return _move[id]; }
+		void  addMove(body_id_t id, const Vector3r& m) { ensureSize(id); synced=false; moveRotUsed=true; _moveData[omp_get_thread_num()][id]+=m;}
+		const Vector3r& getRot(body_id_t id)           { ensureSize(id); ensureSynced(); return _rot[id]; }
+		void  addRot(body_id_t id, const Vector3r& r)  { ensureSize(id); synced=false; moveRotUsed=true; _rotData[omp_get_thread_num()][id]+=r;}
 
 		/* Sum contributions from all threads, save to _force&_torque.
 		 * Locks globalMutex, since one thread modifies common data (_force&_torque).
@@ -90,6 +97,13 @@ class BexContainer{
 				for(int thread=0; thread<nThreads; thread++){ sumF+=_forceData[thread][id]; sumT+=_torqueData[thread][id];}
 				_force[id]=sumF; _torque[id]=sumT;
 			}
+			if(moveRotUsed){
+				for(long id=0; id<(long)size; id++){
+					Vector3r sumM(Vector3r::ZERO), sumR(Vector3r::ZERO);
+					for(int thread=0; thread<nThreads; thread++){ sumM+=_moveData[thread][id]; sumR+=_rotData[thread][id];}
+					_move[id]=sumM; _rot[id]=sumR;
+				}
+			}
 			synced=true; syncCount++;
 		}
 		unsigned long syncCount; 
@@ -101,10 +115,13 @@ class BexContainer{
 			boost::mutex::scoped_lock lock(globalMutex);
 			if(size>=newSize) return; // in case on thread was waiting for resize, but it was already satisfied by another one
 			for(int thread=0; thread<nThreads; thread++){
-				_forceData [thread].resize(newSize);
-				_torqueData[thread].resize(newSize);
+				_forceData [thread].resize(newSize,Vector3r::ZERO);
+				_torqueData[thread].resize(newSize,Vector3r::ZERO);
+				_moveData[thread].resize(newSize,Vector3r::ZERO);
+				_rotData[thread].resize(newSize,Vector3r::ZERO);
 			}
-			_force.resize(newSize); _torque.resize(newSize);
+			_force.resize(newSize,Vector3r::ZERO); _torque.resize(newSize,Vector3r::ZERO);
+			_move.resize(newSize,Vector3r::ZERO); _rot.resize(newSize,Vector3r::ZERO);
 			size=newSize;
 		}
 		/*! Reset all data, also reset summary forces/torques and mark the container clean. */
@@ -113,13 +130,18 @@ class BexContainer{
 			for(int thread=0; thread<nThreads; thread++){
 				memset(_forceData [thread][0], 0,sizeof(Vector3r)*size);
 				memset(_torqueData[thread][0],0,sizeof(Vector3r)*size);
+				memset(_moveData  [thread][0],0,sizeof(Vector3r)*size);
+				memset(_rotData   [thread][0],0,sizeof(Vector3r)*size);
 			}
 			memset(_force [0], 0,sizeof(Vector3r)*size);
 			memset(_torque[0], 0,sizeof(Vector3r)*size);
-			synced=true;
+			memset(_move  [0], 0,sizeof(Vector3r)*size);
+			memset(_rot   [0], 0,sizeof(Vector3r)*size);
+			synced=true; moveRotUsed=false;
 		}
 		//! say for how many threads we have allocated space
-		int getNumAllocatedThreads() const {return nThreads;}
+		const int& getNumAllocatedThreads() const {return nThreads;}
+		const bool& getMoveRotUsed() const {return moveRotUsed;}
 };
 
 #else
@@ -128,21 +150,30 @@ class BexContainer {
 	private:
 		std::vector<Vector3r> _force;
 		std::vector<Vector3r> _torque;
+		std::vector<Vector3r> _move;
+		std::vector<Vector3r> _rot;
 		size_t size;
 		inline void ensureSize(body_id_t id){ if(size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));}
 		friend class PhysicalActionDamperUnit;
 		const Vector3r& getForceUnsynced (body_id_t id){ return getForce(id);}
 		const Vector3r& getTorqueUnsynced(body_id_t id){ return getForce(id);}
+		bool moveRotUsed;
 	public:
-		BexContainer(): size(0),syncCount(0){}
+		BexContainer(): size(0), moveRotUsed(false), syncCount(0){}
 		const Vector3r& getForce(body_id_t id){ensureSize(id); return _force[id];}
 		void  addForce(body_id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(body_id_t id){ensureSize(id); return _torque[id];}
 		void  addTorque(body_id_t id,const Vector3r& t){ensureSize(id); _torque[id]+=t;}
+		const Vector3r& getMove(body_id_t id){ensureSize(id); return _move[id];}
+		void  addMove(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
+		const Vector3r& getRot(body_id_t id){ensureSize(id); return _rot[id];}
+		void  addRot(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
 		//! Set all bex's to zero
 		void reset(){
-			memset(_force[0], 0,sizeof(Vector3r)*size);
+			memset(_force [0],0,sizeof(Vector3r)*size);
 			memset(_torque[0],0,sizeof(Vector3r)*size);
+			memset(_move  [0],0,sizeof(Vector3r)*size);
+			memset(_rot   [0],0,sizeof(Vector3r)*size);
 		}
 		//! No-op for API compatibility with the threaded version
 		void sync(){return;}
@@ -150,11 +181,14 @@ class BexContainer {
 		/*! Resize the container; this happens automatically,
 		 * but you may want to set the size beforehand to avoid resizes as the simulation grows. */
 		void resize(size_t newSize){
-			_force.resize(newSize);
-			_torque.resize(newSize);
+			_force.resize(newSize,Vector3r::ZERO);
+			_torque.resize(newSize,Vector3r::ZERO);
+			_move.resize(newSize,Vector3r::ZERO);
+			_rot.resize(newSize,Vector3r::ZERO);
 			size=newSize;
 		}
-		int getNumAllocatedThreads() const {return 1;}
+		const int getNumAllocatedThreads() const {return 1;}
+		const bool& getMoveRotUsed() const {return moveRotUsed;}
 };
 
 

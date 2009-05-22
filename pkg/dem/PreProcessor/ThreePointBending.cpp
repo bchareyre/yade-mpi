@@ -48,9 +48,6 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 #include<yade/pkg-common/TranslationEngine.hpp>
 
 #include <boost/filesystem/operations.hpp>
@@ -125,9 +122,6 @@ bool ThreePointBending::generate()
 
 ////////////////////////////////////
 	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-
 	Vector3r min(10000,10000,10000),max(-10000,-10000,-10000);
 
 	// load simulation file, extract spheres and use those
@@ -280,7 +274,6 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;

@@ -11,6 +11,7 @@
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/EngineUnit1D.hpp>
+#include<yade/core/BexContainer.hpp>
 
 /*! \brief
 	Abstract interface for all classes that want to do something depending on PhysicalParameters (works like adding external virtual function)
@@ -25,8 +26,8 @@
 class PhysicalParametersEngineUnit :    public EngineUnit1D
 					<
 		 				void ,
-		 				TYPELIST_2(	  const shared_ptr<PhysicalParameters>&
-								, Body*
+		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+								, Body*, BexContainer&
 			   				  )
 					>
 {	

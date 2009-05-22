@@ -56,10 +56,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/InteractionHashMap.hpp>
-
 #include<yade/extra/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
@@ -251,8 +247,6 @@ bool CohesiveTriaxialTest::generate()
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
-
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
 	
@@ -489,7 +483,6 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 //	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 	gSphere->diffuseColor		= spheresColor;
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -538,7 +531,6 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

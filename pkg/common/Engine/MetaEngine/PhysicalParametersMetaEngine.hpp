@@ -13,14 +13,15 @@
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/core/BexContainer.hpp>
 
 class PhysicalParametersMetaEngine :	public MetaEngine1D
 					<	
 						PhysicalParameters ,
 						PhysicalParametersEngineUnit,
 						void ,
-						TYPELIST_2(	  const shared_ptr<PhysicalParameters>&
-								, Body*
+						TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+								, Body*, BexContainer&
 				  			  )
 					>
 {

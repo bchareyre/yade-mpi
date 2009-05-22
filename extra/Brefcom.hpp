@@ -173,8 +173,6 @@ class BrefcomPhysParams: public BodyMacroParameters {
 };
 REGISTER_SERIALIZABLE(BrefcomPhysParams);
 
-#define BREFCOM_DEM3DOF
-
 class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
 	public:
 	/*! Damage evolution law */
@@ -183,15 +181,18 @@ class ef2_Spheres_Brefcom_BrefcomLaw: public ConstitutiveLaw{
 		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 	}
 		bool logStrain;
-		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false){ /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
+		//! yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log
+		int yieldSurfType;
+		//! scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)
+		static Real yieldLogSpeed;
+		static Real yieldEllipseShift;
+		//! HACK: limit strain on some contacts by moving body #2 in the contact; only if refR1<0 (facet); deactivated if > 0
+		static Real minStrain_moveBody2;
+		ef2_Spheres_Brefcom_BrefcomLaw(): logStrain(false), yieldSurfType(0) { /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
-	#ifdef BREFCOM_DEM3DOF
-		FUNCTOR2D(Dem3DofGeom,BrefcomContact);
-	#else
-		FUNCTOR2D(SpheresContactGeometry,BrefcomContact);
-	#endif
+	FUNCTOR2D(Dem3DofGeom,BrefcomContact);
 	REGISTER_CLASS_AND_BASE(ef2_Spheres_Brefcom_BrefcomLaw,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain));
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ef2_Spheres_Brefcom_BrefcomLaw);

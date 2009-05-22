@@ -19,15 +19,11 @@ class InteractingGeometry;
 class GeometricalModel : public Serializable, public Indexable
 {
 	public :
-		bool		 visible
-				,wire
-				,shadowCaster;
-
+		bool highlight,wire,shadowCaster;
 		Vector3r	diffuseColor;
+		GeometricalModel(): highlight(false),wire(false),shadowCaster(false),diffuseColor(Vector3r(1,1,1)){}
 
-		GeometricalModel(): visible(true),wire(false),shadowCaster(false),diffuseColor(Vector3r(1,1,1)){}
-
-	REGISTER_ATTRIBUTES(/*no base*/,(visible)(wire)(shadowCaster)(diffuseColor));
+	REGISTER_ATTRIBUTES(/*no base*/,(highlight)(wire)(shadowCaster)(diffuseColor));
 	REGISTER_CLASS_AND_BASE(GeometricalModel,Serializable Indexable);
 	REGISTER_INDEX_COUNTER(GeometricalModel);
 };

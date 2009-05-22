@@ -8,8 +8,6 @@
 
 #include"LatticeExampleSimple.hpp"
 #include<yade/core/MetaBody.hpp>
-//#include<yade/pkg-common/InteractionVecSet.hpp>
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -97,9 +95,6 @@ bool LatticeExampleSimple::generate()
 	make_simulation_loop(rootBody);    // make the simulation loop
 	positionRootBody(rootBody); // set global coordinate system, etc.
 	
-// decide what containers to use
-//	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-//	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
 
@@ -294,7 +289,6 @@ bool LatticeExampleSimple::createNodeXYZ(shared_ptr<Body>& body, Vector3r positi
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(0.8,0.8,0.8);
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= false;
 	
         body->geometricalModel          = gSphere;
@@ -329,7 +323,6 @@ void LatticeExampleSimple::createBeam(shared_ptr<Body>& body, int i, int j)
 	gBeam->length			= length;
 	gBeam->diffuseColor		= Vector3r(0.6,0.6,0.6);
 	gBeam->wire			= false;
-	gBeam->visible			= true;
 	gBeam->shadowCaster		= false;
 	
 	body->geometricalModel		= gBeam;
@@ -497,7 +490,6 @@ void LatticeExampleSimple::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	shared_ptr<GeometricalModel> gm = YADE_PTR_CAST<GeometricalModel>(ClassFactory::instance().createShared("LatticeSetGeometry"));
 	gm->diffuseColor 		= Vector3r(1,1,1);
 	gm->wire 			= false;
-	gm->visible 			= true;
 	gm->shadowCaster 		= true;
 
 	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	

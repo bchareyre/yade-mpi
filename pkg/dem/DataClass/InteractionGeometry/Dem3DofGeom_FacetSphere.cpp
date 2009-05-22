@@ -37,60 +37,98 @@ CREATE_LOGGER(ef2_Facet_Sphere_Dem3DofGeom);
 bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
 	InteractingFacet* facet=static_cast<InteractingFacet*>(cm1.get());
 	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
-	// begin facet-local coordinates 
-		Vector3r contactLine=se31.orientation.Conjugate()*(se32.position-se31.position);
-		Vector3r normal=facet->nf;
-		Real L=normal.Dot(contactLine); // height/depth of sphere's center from facet's plane
-		if(L<0){normal*=-1; L*=-1;}
-		if(L>sphereRadius && !c->isReal) return false; // sphere too far away from the plane
 
-		Vector3r contactPt=contactLine-L*normal; // projection of sphere's center to facet's plane (preliminary contact point)
-		const Vector3r* edgeNormals=facet->ne; // array[3] of edge normals (in facet plane)
-		int edgeMax=0; Real distMax=edgeNormals[0].Dot(contactPt);
-		for(int i=1; i<3; i++){
-			Real dist=edgeNormals[i].Dot(contactPt);
-			if(distMax<dist){edgeMax=i; distMax=dist;}
-		}
-		//TRVAR2(distMax,edgeMax);
-		// OK, what's the logic here? Copying from IF2IS4SCG…
-		Real sphereRReduced=shrinkFactor*sphereRadius;
-		Real inCircleR=facet->icr-sphereRReduced;
-		Real penetrationDepth;
-		if(inCircleR<0){inCircleR=facet->icr; sphereRReduced=0;}
-		if(distMax<inCircleR){// contact with facet's surface
-			penetrationDepth=sphereRadius-L;	
-			normal.Normalize();
-		} else { // contact with the edge
-			contactPt+=edgeNormals[edgeMax]*(inCircleR-distMax);
-			bool noVertexContact=false;
-			//TRVAR3(edgeNormals[edgeMax],inCircleR,distMax);
-			// contact with vertex no. edgeMax
-			// FIXME: this is the original version, but why (edgeMax-1)%3? IN that case, edgeNormal to edgeMax would never be tried
-			//    if     (contactPt.Dot(edgeNormals[        (edgeMax-1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
-			if     (contactPt.Dot(edgeNormals[        edgeMax      ])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
-			// contact with vertex no. edgeMax+1
-			else if(contactPt.Dot(edgeNormals[edgeMax=(edgeMax+1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
-			// contact with edge no. edgeMax
-			else noVertexContact=true;
-			normal=contactLine-contactPt;
-			#ifdef FACET_TOPO
-				if(noVertexContact && facet->edgeAdjIds[edgeMax]!=Body::ID_NONE){
-					// find angle between our normal and the facet's normal (still local coords)
-					Quaternionr q; q.Align(facet->nf,normal); Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
-					assert(angle>=0 && angle<=Mathr::PI);
-					if(edgeNormals[edgeMax].Dot(axis)<0) angle*=-1.;
-					bool negFace=normal.Dot(facet->nf)<0; // contact in on the negative facet's face
-					Real halfAngle=(negFace?-1.:1.)*facet->edgeAdjHalfAngle[edgeMax]; 
-					if(halfAngle<0 && angle>halfAngle) return false; // on concave boundary, and if in the other facet's sector, no contact
-					// otherwise the contact will be created
-				}
-			#endif
-			//TRVAR4(contactLine,contactPt,normal,normal.Length());
-			//TRVAR3(se31.orientation*contactLine,se31.position+se31.orientation*contactPt,se31.orientation*normal);
-			penetrationDepth=sphereRadius-normal.Normalize();
-			//TRVAR1(penetrationDepth);
-		}
-	// end facet-local coordinates
+	#if 1
+		/* new code written from scratch, to make sure the algorithm is correct; it is about the same speed 
+			as sega's algo below, but seems more readable to me.
+			The FACET_TOPO thing is still missing here but can be copied literally once it is tested */
+		// begin facet-local coordinates
+			Vector3r cogLine=se31.orientation.Conjugate()*(se32.position-se31.position); // connect centers of gravity
+			//TRVAR4(se31.position,se31.orientation,se32.position,cogLine);
+			Vector3r normal=facet->nf;
+			Real planeDist=normal.Dot(cogLine);
+			if(planeDist<0){normal*=-1; planeDist*=-1; }
+			if(planeDist>sphereRadius && !c->isReal) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
+			Vector3r planarPt=cogLine-planeDist*normal; // project sphere center to the facet plane
+			Real normDotPt[3];
+			Vector3r contactPt(Vector3r::ZERO);
+			for(int i=0; i<3; i++) normDotPt[i]=facet->ne[i].Dot(planarPt-facet->vertices[i]);
+			short w=(normDotPt[0]>0?1:0)+(normDotPt[1]>0?2:0)+(normDotPt[2]>0?4:0);
+			//TRVAR4(planarPt,normDotPt[0],normDotPt[1],normDotPt[2]);
+			//TRVAR2(normal,cogLine);
+			//TRVAR3(facet->vertices[0],facet->vertices[1],facet->vertices[2]);
+			switch(w){
+				case 0: contactPt=planarPt; break; // inside triangle
+				case 1: contactPt=getClosestSegmentPt(planarPt,facet->vertices[0],facet->vertices[1]); break; // +-- (n1)
+				case 2: contactPt=getClosestSegmentPt(planarPt,facet->vertices[1],facet->vertices[2]); break; // -+- (n2)
+				case 4: contactPt=getClosestSegmentPt(planarPt,facet->vertices[2],facet->vertices[0]); break; // --+ (n3)
+				case 3: contactPt=facet->vertices[1]; break; // ++- (v1)
+				case 5: contactPt=facet->vertices[0]; break; // +-+ (v0)
+				case 6: contactPt=facet->vertices[2]; break; // -++ (v2)
+				case 7: throw logic_error("Impossible triangle intersection?"); // +++ (impossible)
+				default: throw logic_error("Nonsense intersection value!");
+			}
+			normal=cogLine-contactPt; // called normal, but it is no longer the facet's normal (for compat)
+			//TRVAR3(normal,contactPt,sphereRadius);
+			if(!c->isReal && normal.SquaredLength()>sphereRadius*sphereRadius) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
+			Real penetrationDepth=sphereRadius-normal.Normalize();
+	#else
+		/* This code was mostly copied from InteractingFacet2InteractinSphere4SpheresContactGeometry */
+		// begin facet-local coordinates 
+			Vector3r contactLine=se31.orientation.Conjugate()*(se32.position-se31.position);
+			Vector3r normal=facet->nf;
+			Real L=normal.Dot(contactLine); // height/depth of sphere's center from facet's plane
+			if(L<0){normal*=-1; L*=-1;}
+			if(L>sphereRadius && !c->isReal) return false; // sphere too far away from the plane
+
+			Vector3r contactPt=contactLine-L*normal; // projection of sphere's center to facet's plane (preliminary contact point)
+			const Vector3r* edgeNormals=facet->ne; // array[3] of edge normals (in facet plane)
+			int edgeMax=0; Real distMax=edgeNormals[0].Dot(contactPt);
+			for(int i=1; i<3; i++){
+				Real dist=edgeNormals[i].Dot(contactPt);
+				if(distMax<dist){edgeMax=i; distMax=dist;}
+			}
+			//TRVAR2(distMax,edgeMax);
+			// OK, what's the logic here? Copying from IF2IS4SCG…
+			Real sphereRReduced=shrinkFactor*sphereRadius;
+			Real inCircleR=facet->icr-sphereRReduced;
+			Real penetrationDepth;
+			if(inCircleR<0){inCircleR=facet->icr; sphereRReduced=0;}
+			if(distMax<inCircleR){// contact with facet's surface
+				penetrationDepth=sphereRadius-L;	
+				normal.Normalize();
+			} else { // contact with the edge
+				contactPt+=edgeNormals[edgeMax]*(inCircleR-distMax);
+				bool noVertexContact=false;
+				//TRVAR3(edgeNormals[edgeMax],inCircleR,distMax);
+				// contact with vertex no. edgeMax
+				// FIXME: this is the original version, but why (edgeMax-1)%3? IN that case, edgeNormal to edgeMax would never be tried
+				//    if     (contactPt.Dot(edgeNormals[        (edgeMax-1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
+				if     (contactPt.Dot(edgeNormals[        edgeMax      ])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
+				// contact with vertex no. edgeMax+1
+				else if(contactPt.Dot(edgeNormals[edgeMax=(edgeMax+1)%3])>inCircleR) contactPt=facet->vu[edgeMax]*(facet->vl[edgeMax]-sphereRReduced);
+				// contact with edge no. edgeMax
+				else noVertexContact=true;
+				normal=contactLine-contactPt;
+				#ifdef FACET_TOPO
+					if(noVertexContact && facet->edgeAdjIds[edgeMax]!=Body::ID_NONE){
+						// find angle between our normal and the facet's normal (still local coords)
+						Quaternionr q; q.Align(facet->nf,normal); Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
+						assert(angle>=0 && angle<=Mathr::PI);
+						if(edgeNormals[edgeMax].Dot(axis)<0) angle*=-1.;
+						bool negFace=normal.Dot(facet->nf)<0; // contact in on the negative facet's face
+						Real halfAngle=(negFace?-1.:1.)*facet->edgeAdjHalfAngle[edgeMax]; 
+						if(halfAngle<0 && angle>halfAngle) return false; // on concave boundary, and if in the other facet's sector, no contact
+						// otherwise the contact will be created
+					}
+				#endif
+				//TRVAR4(contactLine,contactPt,normal,normal.Length());
+				//TRVAR3(se31.orientation*contactLine,se31.position+se31.orientation*contactPt,se31.orientation*normal);
+				penetrationDepth=sphereRadius-normal.Normalize();
+				//TRVAR1(penetrationDepth);
+			}
+		// end facet-local coordinates
+	#endif
 
 	if(penetrationDepth<0 && !c->isReal) return false;
 
@@ -104,7 +142,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 		fs->refR1=-1; fs->refR2=sphereRadius;
 		fs->refLength=fs->effR2;
 		fs->cp1pt=contactPt; // facet-local intial contact point
-		fs->localFacetNormal=normal;
+		fs->localFacetNormal=facet->nf;
 		fs->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		fs->cp2rel.Normalize();
 	}
@@ -112,6 +150,9 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 	fs->normal=normalGlob;
 	fs->contactPoint=se32.position+(-normalGlob)*(sphereRadius-penetrationDepth);
 	if(c->isNew){
+		//TRVAR2(planeDist,planarPt);
+		//TRVAR3(normDotPt[0],normDotPt[1],normDotPt[2]);
+		//TRVAR2(w,contactPt);
 		TRVAR1(penetrationDepth);
 		TRVAR3(fs->refLength,fs->cp1pt,fs->localFacetNormal);
 		TRVAR3(fs->effR2,fs->cp2rel,fs->normal);

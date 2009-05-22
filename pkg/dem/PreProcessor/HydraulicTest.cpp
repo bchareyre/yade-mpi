@@ -47,7 +47,6 @@
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 #include<yade/pkg-common/TranslationEngine.hpp>
 
@@ -93,10 +92,7 @@ bool HydraulicTest::generate()
 	rootBody = shared_ptr<MetaBody> ( new MetaBody );
 	positionRootBody ( rootBody );
 
-////////////////////////////////////
 
-	rootBody->transientInteractions  = shared_ptr<InteractionContainer> ( new InteractionVecSet );
-	rootBody->bodies    = shared_ptr<BodyContainer> ( new BodyRedirectionVector );
 
 /////////////////////////////////////
 /////////////////////////////////////

@@ -1,6 +1,7 @@
 #include "Dem3DofGeom_SphereSphere.hpp"
 
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/core/Omega.hpp>
 YADE_PLUGIN("Dem3DofGeom_SphereSphere","GLDraw_Dem3DofGeom_SphereSphere","ef2_Sphere_Sphere_Dem3DofGeom");
 
 
@@ -163,7 +164,9 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 		ss->refLength=dist;
 		ss->refR1=s1->radius; ss->refR2=s2->radius;
 		Real penetrationDepth=s1->radius+s2->radius-ss->refLength;
-		ss->effR1=s1->radius-.5*penetrationDepth; ss->effR2=s2->radius-.5*penetrationDepth;
+		if(Omega::instance().getCurrentIteration()<=10){
+			ss->effR1=s1->radius-.5*penetrationDepth; ss->effR2=s2->radius-.5*penetrationDepth;
+		} else {ss->effR1=s1->radius; ss->effR2=s2->radius;}
 		// for bending only: ss->initRelOri12=se31.orientation.Conjugate()*se32.orientation;
 		// quasi-constants
 		ss->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);

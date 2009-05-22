@@ -112,19 +112,6 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 	// serial version
 	//if(nbObjects>ompBodiesMin || ompBodiesMin==0){ … }
 	sortBounds(xBounds,nbObjects); sortBounds(yBounds,nbObjects); sortBounds(zBounds,nbObjects);
-	#if 0
-		else {
-			#pragma omp parallel sections
-			{
-			#pragma omp section
-				sortBounds(xBounds, nbObjects);
-			#pragma omp section
-				sortBounds(yBounds, nbObjects);
-			#pragma omp section
-				sortBounds(zBounds, nbObjects);
-			}
-		}
-	#endif
 
 //	timingDeltas->checkpoint("sortBounds");
 }

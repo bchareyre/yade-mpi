@@ -46,9 +46,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 
 SDECMovingWall::SDECMovingWall () : FileGenerator()
 {
@@ -140,11 +137,6 @@ bool SDECMovingWall::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-////////////////////////////////////
-///////// Container
-	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 		
 ////////////////////////////////////
 ///////// ground
@@ -235,7 +227,6 @@ void SDECMovingWall::createGroundSphere(shared_ptr<Body>& body,Real radius, Real
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(0.7,0.7,0.7);
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -284,7 +275,6 @@ void SDECMovingWall::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 // a simple way to have alternating colors per layer
 	gSphere->diffuseColor		= Vector3r(std::sin((float)j),std::cos((float)j),j/nbSpheres[1]);
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -331,7 +321,6 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;

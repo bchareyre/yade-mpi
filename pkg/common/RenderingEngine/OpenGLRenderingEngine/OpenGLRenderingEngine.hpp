@@ -6,6 +6,7 @@
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/MetaEngine1D.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
@@ -30,6 +31,13 @@ class OpenGLRenderingEngine : public RenderingEngine
 		void setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody);
 		long numBodiesWhenRefSe3LastSet,numIterWhenRefSe3LastSet;
 		static bool glutInitDone;
+		static size_t selectBodyLimit;
+		Vector3r viewDirection; // updated from GLViewer regularly
+		Vector3r highlightEmission0;
+		Vector3r highlightEmission1;
+		// normalized saw signal with given periodicity, with values ∈ 〈0,1〉 */
+		Real normSaw(Real t, Real period){ Real xi=(t-period*((int)(t/period)))/period; /* normalized value, (0-1〉 */ return (xi<.5?2*xi:2-2*xi); }
+		Real normSquare(Real t, Real period){ Real xi=(t-period*((int)(t/period)))/period; /* normalized value, (0-1〉 */ return (xi<.5?0:1); }
 
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;

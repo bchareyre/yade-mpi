@@ -19,7 +19,6 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
@@ -90,9 +89,6 @@ bool TestSimpleViscoelastic::generate()
 ////////////////////////////////////
 ///////// Container
 	
-    rootBody->transientInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
-    rootBody->bodies			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-
 ////////////////////////////////////
 ///////// ground
     
@@ -146,7 +142,6 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;
@@ -245,7 +240,6 @@ void TestSimpleViscoelastic::createSphere(shared_ptr<Body>& body, int i)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;

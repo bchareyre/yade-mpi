@@ -15,6 +15,7 @@
 #include <qpushbutton.h>
 #include <qgroupbox.h>
 #include <qradiobutton.h>
+#include <qlineedit.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -27,6 +28,11 @@
 #	ifndef FOREACH
 #		define FOREACH BOOST_FOREACH
 #	endif
+
+#ifdef EMBED_PYTHON
+	#include<boost/python.hpp>
+#endif
+
 
 CREATE_LOGGER(SimulationController);
 
@@ -84,6 +90,10 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
 
+	#ifndef EMBED_PYTHON
+		pyOneliner->setEnabled(false);
+		pyOneliner->setText("Yade compiled without Python");
+	#endif
 }
 
 /* restart timer with SimulationController::refreshTime */
@@ -113,6 +123,27 @@ void SimulationController::pbYZX_clicked()
 void SimulationController::pbZXY_clicked()
 {
 	YadeQtMainWindow::self->adjustCameraInCurrentView(qglviewer::Vec(1,0,0),qglviewer::Vec(0,-1,0));
+};
+
+
+/* enter was pressed in the line-entry;
+   execute the command and make the line empty
+*/
+void SimulationController::pyOnelinerEnter(){
+#ifdef EMBED_PYTHON
+	PyGILState_STATE gstate;
+		gstate = PyGILState_Ensure();
+		try{
+			python::object main=python::import("__main__");
+			python::object global=main.attr("__dict__");
+			python::exec(pyOneliner->text().ascii(),global,global);
+		} catch (const python::error_already_set& e){
+			LOG_ERROR("Error from python...");
+			PyErr_Print();
+		}
+	PyGILState_Release(gstate);
+	pyOneliner->clear();
+#endif
 };
 
 

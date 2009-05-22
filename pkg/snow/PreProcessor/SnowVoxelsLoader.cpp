@@ -50,7 +50,6 @@
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/InteractionHashMap.hpp>
 #include<yade/pkg-snow/ElawSnowLayersDeformation.hpp>
 
@@ -600,7 +599,6 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 
 	gSnowGrain->diffuseColor	= grain->color;
 	gSnowGrain->wire		= false;
-	gSnowGrain->visible		= true;
 	gSnowGrain->shadowCaster	= true;
 	
 	//iSphere->radius			= radius; // already calculated
@@ -649,7 +647,6 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(0.5,0.5,0.5);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

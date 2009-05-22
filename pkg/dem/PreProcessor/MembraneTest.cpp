@@ -53,8 +53,6 @@
 #include<yade/pkg-common/InteractingNode.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
@@ -110,10 +108,6 @@ bool MembraneTest::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-// Containers
-	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 // Nodes
 	float all = (float) (nbX * nbZ);
@@ -250,7 +244,6 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
   gSphere->radius           = radius;
   gSphere->diffuseColor     = Vector3r(0.5,0.5,1.0);
   gSphere->wire             = false;
-  gSphere->visible          = true;
   gSphere->shadowCaster     = true;
         
   iSphere->radius           = radius;
@@ -280,7 +273,6 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
         node->radius                    = 0.5 * membraneThickness;
 	node->diffuseColor		= Vector3r(0.7,0.7,0.7);
 	node->wire			= false;
-	node->visible			= true;
 	node->shadowCaster		= false;
 
         Vector3r position               = Vector3r(i*XLength/(double)nbX,0.0,j*ZLength/(double)nbZ);

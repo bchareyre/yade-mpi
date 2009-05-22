@@ -51,12 +51,19 @@ REGISTER_SERIALIZABLE(GLDraw_Dem3DofGeom_FacetSphere);
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 class ef2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
+	Vector3r getClosestSegmentPt(const Vector3r& P, const Vector3r& A, const Vector3r& B){
+		// algo: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
+		Vector3r BA=B-A;
+		Real u=(P.Dot(BA)-A.Dot(BA))/(BA.SquaredLength());
+		return A+min(1.,max(0.,u))*BA;
+	}
 	public:
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
 			c->swapOrder(); return go(cm2,cm1,se32,se31,c);
 			LOG_ERROR("!! goReverse maybe doesn't work in ef2_Facet_Sphere_Dem3DofGeom. InteractionGeometryMetaEngine should swap interaction members first and call go(...) afterwards.");
 		}
+
 		//! Reduce the facet's size, probably to avoid singularities at common facets' edges (?)
 		Real shrinkFactor;
 		ef2_Facet_Sphere_Dem3DofGeom(): shrinkFactor(0.) {}

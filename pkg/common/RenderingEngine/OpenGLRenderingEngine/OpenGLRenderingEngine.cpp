@@ -3,6 +3,8 @@
 
 #include"OpenGLRenderingEngine.hpp"
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
+#include<yade/lib-opengl/GLUtils.hpp>
+#include<yade/core/Timing.hpp>
 #include<GL/glu.h>
 #include<GL/gl.h>
 #include<GL/glut.h>
@@ -11,6 +13,7 @@ YADE_PLUGIN("OpenGLRenderingEngine");
 CREATE_LOGGER(OpenGLRenderingEngine);
 
 bool OpenGLRenderingEngine::glutInitDone=false;
+size_t OpenGLRenderingEngine::selectBodyLimit=500;
 
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(3){
 	Body_state = false;
@@ -127,12 +130,20 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 	assert(glutInitDone);
 	current_selection = selection;
 
+	// recompute emissive light colors for highlighted bodies
+	Real now=TimingInfo::getNow(/*even if timing is disabled*/true)*1e-9;
+	highlightEmission0[0]=highlightEmission0[1]=highlightEmission0[2]=.8*normSquare(now,1);
+	highlightEmission1[0]=highlightEmission1[1]=highlightEmission0[2]=.5*normSaw(now,2);
+		
+
 	// Draw light source
 	const GLfloat pos[4]	= {Light_position[0],Light_position[1],Light_position[2],1.0};
-	const GLfloat ambientColor[4]	= {0.5,0.5,0.5,1.0};	
+	const GLfloat ambientColor[4]={0.5,0.5,0.5,1.0};	
+	//const GLfloat specularColor[4]={0.5,0.5,0.5,1.0};	
 	glClearColor(Background_color[0],Background_color[1],Background_color[2],1.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
 	glEnable(GL_LIGHT0);
 	glDisable(GL_LIGHTING);
 	glPushMatrix();
@@ -152,16 +163,6 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 	
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispSe3(rootBody);
-
-	// debugging only: show line between spatial and scaled body position
-	#if 0
-		if(scaleDisplacements){
-			glColor3d(1,1,0); glBegin(GL_LINES); 
-			FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-				glVertex3v(b->physicalParameters->se3.position); glVertex3v(b->physicalParameters->dispSe3.position); }
-			glEnd();
-		}
-	#endif
 
 	if (Body_geometrical_model){
 		if (Cast_shadows){	
@@ -357,7 +358,7 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 
 void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){	
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
-	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
+	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
 	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
 		FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
 			if(b->geometricalModel && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
@@ -367,10 +368,33 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 				Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
 				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-				if(current_selection==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
-				geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
-				if(current_selection == b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);}
+				if(current_selection==b->getId() || b->geometricalModel->highlight){
+					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
+					glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+					const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
+					glColor4(h[0],h[1],h[2],.2);
+					glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+
+					geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
+
+					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
+					glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+					glColor3v(Vector3r::ZERO);
+					glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+				} else {
+					geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
+				}
 				glPopMatrix();
+				if(current_selection==b->getId() || b->geometricalModel->highlight){
+					if(!b->boundingVolume || Body_wire || b->geometricalModel->wire) GLUtils::GLDrawInt(b->getId(),se3.position);
+					else {
+						// move the label towards the camera by the bounding box so that it is not hidden inside the body
+						const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=se3.position;
+						Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
+						Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
+						GLUtils::GLDrawInt(b->getId(),se3.position+dr,Vector3r::ONE);
+					}
+				}
 			}
 		}
 	}
@@ -481,6 +505,8 @@ void OpenGLRenderingEngine::registerAttributes()
 
 	REGISTER_ATTRIBUTE(clipPlaneSe3);
 	REGISTER_ATTRIBUTE(clipPlaneActive);
+
+	REGISTER_ATTRIBUTE(selectBodyLimit);
 }
 
 

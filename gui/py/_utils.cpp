@@ -176,6 +176,13 @@ python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Rea
 	d["cs"]=b->cs;
     return d;
 }
+/* reset highlight of all bodies */
+void highlightNone(){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+		if(!b->geometricalModel) continue;
+		b->geometricalModel->highlight=false;
+	}
+}
 
 /*!Sum moments acting on given bodies
  *
@@ -220,6 +227,28 @@ Real sumBexForces(python::tuple ids, python::tuple _direction){
 	return ret;
 }
 
+/* Set wire display of all/some/none bodies depending on the filter. */
+void wireSome(string filter){
+	enum{none,all,noSpheres,unknown};
+	int mode=(filter=="none"?none:(filter=="all"?all:(filter=="noSpheres"?noSpheres:unknown)));
+	if(mode==unknown) { LOG_WARN("Unknown wire filter `"<<filter<<"', using noSpheres instead."); mode=noSpheres; }
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+		if(!b->geometricalModel) return;
+		bool wire;
+		switch(mode){
+			case none: wire=false; break;
+			case all: wire=true; break;
+			case noSpheres: wire=!(bool)(dynamic_pointer_cast<Sphere>(b->geometricalModel)); break;
+			default: throw logic_error("No such case possible");
+		}
+		b->geometricalModel->wire=wire;
+	}
+}
+void wireAll(){wireSome("all");}
+void wireNone(){wireSome("none");}
+void wireNoSpheres(){wireSome("noSpheres");}
+
+
 /* Tell us whether a point lies in polygon given by array of points.
  *  @param xy is the point that is being tested
  *  @param vertices is Numeric.array (or list or tuple) of vertices of the polygon.
@@ -252,6 +281,7 @@ bool pointInsidePolygon(python::tuple xy, python::object vertices){
 	Py_DECREF(vert);
 	return inside;
 }
+
 
 /* Project 3d point into 2d using spiral projection along given axis;
  * the returned tuple is
@@ -302,11 +332,11 @@ BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
 
-	def("PWaveTimeStep",PWaveTimeStep);
-	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers")));
-	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor")));
-	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB")));
-	def("setRefSe3",setRefSe3);
+	def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
+	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers"),"Return coordinates of box enclosing all bodies\n centers: do not take sphere radii in account, only their centroids (default=False)\n cutoff: 0-1 number by which the box will be scaled around its center (default=0)"));
+	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
+	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the AABB=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
+	def("setRefSe3",setRefSe3,"Set reference positions and orientation of all bodies equal to their current ones.");
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));
 	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));
 	def("elasticEnergy",elasticEnergyInAABB);
@@ -320,6 +350,10 @@ BOOST_PYTHON_MODULE(_utils){
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);
 	def("scalarOnColorScale",Shop__scalarOnColorScale);
+	def("highlightNone",highlightNone);
+	def("wireAll",wireAll);
+	def("wireNone",wireNone);
+	def("wireNoSpheres",wireNoSpheres);
 }
 
 

@@ -50,7 +50,6 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, b
 		shared_ptr<Facet> gFacet(new Facet);
 		gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
 		gFacet->wire	    = wire;
-		gFacet->visible	    = true;
 		gFacet->shadowCaster    = true;
 
 		for (int j=0; j<3; ++j)

@@ -19,6 +19,10 @@
 #include<yade/core/Interaction.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/version.hpp>
+#ifdef EMBED_PYTHON
+	#include<boost/python.hpp>
+	using namespace boost;
+#endif
 
 CREATE_LOGGER(GLViewer);
 GLLock::GLLock(GLViewer* _glv):
@@ -246,7 +250,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	/* letters alphabetically */
 	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); }
-	//else if(e->key()==Qt::Key_D) wasDynamic=true;
+	else if(e->key()==Qt::Key_D &&(e->state() & AltButton)){ body_id_t id; if((id=Omega::instance().selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->isDynamic=!b->isDynamic; LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
 	else if (e->key()==Qt::Key_M && selectedName() >= 0){
@@ -354,8 +358,8 @@ void GLViewer::centerScene(){
 	MetaBody* rb=Omega::instance().getRootBody().get();
 	if (!rb) return;
 
-	if(rb->bodies->size()<500){LOG_INFO("Less than 500 bodies, moving possible. Select with shift, press 'm' to move.");}
-	else{LOG_INFO("More than 500 bodies. Moving not possible.");}
+	if(rb->bodies->size()<renderer->selectBodyLimit){LOG_INFO("Less than "+lexical_cast<string>(renderer->selectBodyLimit)+" bodies, moving possible. Select with shift, press 'm' to move.");}
+	else{LOG_INFO("More than "+lexical_cast<string>(renderer->selectBodyLimit)+" (OpenGLRenderingEngine::selectBodyLimit) bodies. Moving not possible.");}
 	Vector3r min,max;	
 	if(rb->boundingVolume){
 		min=rb->boundingVolume->min; max=rb->boundingVolume->max;
@@ -385,9 +389,10 @@ void GLViewer::centerScene(){
 
 void GLViewer::draw()
 {
+	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
 	if(Omega::instance().getRootBody()){
 		int selection = selectedName();
-		if(selection!=-1 && (*(Omega::instance().getRootBody()->bodies)).exists(selection)){
+		if(selection!=-1 && (*(Omega::instance().getRootBody()->bodies)).exists(selection) && isMoving){
 			static int last(-1);
 			if(last == selection) // delay by one redraw, so the body will not jump into 0,0,0 coords
 			{
@@ -421,7 +426,8 @@ void GLViewer::draw()
 }
 
 void GLViewer::drawWithNames(){
-	if(Omega::instance().getRootBody() && Omega::instance().getRootBody()->bodies->size()<500) renderer->renderWithNames(Omega::instance().getRootBody());
+	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
+	if(Omega::instance().getRootBody() && Omega::instance().getRootBody()->bodies->size()<renderer->selectBodyLimit) renderer->renderWithNames(Omega::instance().getRootBody());
 }
 
 // new object selected.
@@ -446,12 +452,25 @@ void GLViewer::postSelection(const QPoint& point)
 		setSelectedName(selection);
 		LOG_DEBUG("New selection "<<selection);
 		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
-		wasDynamic=Body::byId(selection)->isDynamic;
-		Body::byId(selection)->isDynamic = false;
+		//wasDynamic=Body::byId(selection)->isDynamic;
+		//Body::byId(selection)->isDynamic = false;
 		Quaternionr& q = Body::byId(selection)->physicalParameters->se3.orientation;
 		Vector3r&    v = Body::byId(selection)->physicalParameters->se3.position;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
 		Omega::instance().selectedBody = selection;
+		#ifdef EMBED_PYTHON
+			try{
+				PyGILState_STATE gstate;
+					gstate = PyGILState_Ensure();
+					python::object main=python::import("__main__");
+					python::object global=main.attr("__dict__");
+					python::eval(string("onBodySelect("+lexical_cast<string>(selection)+")").c_str(),global,global);
+				PyGILState_Release(gstate);
+				// see https://svn.boost.org/trac/boost/ticket/2781 for exception handling
+			} catch (python::error_already_set const &) {
+				LOG_DEBUG("unable to call onBodySelect. Not defined?");
+			}
+		#endif
 	}
 }
 
@@ -459,9 +478,9 @@ void GLViewer::postSelection(const QPoint& point)
 // if so, then set isDynamic of previous selection, to old value
 void GLViewer::endSelection(const QPoint &point){
 	manipulatedClipPlane=-1;
-	int old = selectedName();
+	//int old = selectedName();
 	QGLViewer::endSelection(point);
-	if(old != -1 && old!=selectedName() && (*(Omega::instance().getRootBody()->bodies)).exists(old)) Body::byId(old)->isDynamic = wasDynamic;
+	// if(old != -1 && old!=selectedName() && (*(Omega::instance().getRootBody()->bodies)).exists(old)) Body::byId(old)->isDynamic = wasDynamic;
 }
 
 qglviewer::Vec GLViewer::displayedSceneCenter(){

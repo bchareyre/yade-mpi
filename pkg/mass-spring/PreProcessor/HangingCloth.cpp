@@ -56,8 +56,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 
 HangingCloth::HangingCloth () : FileGenerator()
@@ -144,10 +142,6 @@ bool HangingCloth::generate()
 	Omega::instance().setTimeStep(0.004);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
-	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -232,7 +226,6 @@ bool HangingCloth::generate()
 	shared_ptr<Mesh2D> mesh2d(new Mesh2D);
 	mesh2d->diffuseColor	= Vector3r(0,0,1);
 	mesh2d->wire		= false;
-	mesh2d->visible		= true;
 	mesh2d->shadowCaster	= false;
 
 	rootBody->geometricalModel			= mesh2d;
@@ -502,7 +495,6 @@ void HangingCloth::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -543,7 +535,6 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;

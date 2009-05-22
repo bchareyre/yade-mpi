@@ -164,7 +164,6 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	gSphere->radius			= r;
 	gSphere->diffuseColor	= color;
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster	= true;
 	
 	iSphere->radius			= r;

@@ -56,9 +56,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
 
@@ -144,11 +141,6 @@ bool DirectShearCis::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-// Container
-	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-		
 
 // Box walls
 	shared_ptr<Body> w1;	// The left one :
@@ -233,7 +225,6 @@ void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	// de quoi avoir des bandes (huit en largeur) de couleur differentes :
 	gSphere->diffuseColor		= ((int)(Mathr::Floor(8*position.X()/width)))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -280,7 +271,6 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,0,0);
 	gBox->wire			= true;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

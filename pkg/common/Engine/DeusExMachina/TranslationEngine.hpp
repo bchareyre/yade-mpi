@@ -9,23 +9,17 @@
 #pragma once
 
 #include<yade/core/DeusExMachina.hpp>
-#include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-class TranslationEngine : public DeusExMachina
-{
-	public :
+class TranslationEngine : public DeusExMachina {
+	public:
 		Real velocity;
 		Vector3r translationAxis;
-		void applyCondition(MetaBody *);
-
-	protected :
-		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
-	REGISTER_CLASS_NAME(TranslationEngine);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+		virtual void applyCondition(MetaBody *);
+		virtual void postProcessAttributes(bool deserializing){ if(deserializing) translationAxis.Normalize(); }
+	REGISTER_ATTRIBUTES(DeusExMachina,(velocity)(translationAxis));
+	REGISTER_CLASS_AND_BASE(TranslationEngine,DeusExMachina);
 };
-
 REGISTER_SERIALIZABLE(TranslationEngine);
 
 

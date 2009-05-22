@@ -17,5 +17,5 @@ PersistentSAPCollider), perf.32k.q.log (32k spheres, SpatialQuickSortCollider) e
 	number.
 2. First iteration on the scene (TriaxialTest and the selected collider) with timings is
    done and timing.stats() printed (appears in the log file).
-3. Another 100 iterations are measured with siming.stats(), after which the test exits.
+3. Another 100 iterations are measured with timing.stats(), after which the test exits.
 

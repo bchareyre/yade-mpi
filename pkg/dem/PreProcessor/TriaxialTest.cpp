@@ -57,9 +57,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 
 #include<yade/extra/Shop.hpp>
@@ -450,7 +447,6 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= spheresColor;
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -498,7 +494,6 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

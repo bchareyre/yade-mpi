@@ -28,7 +28,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'yadeExceptions.cpp',
 			'containers/BodyRedirectionVector.cpp',
 			'containers/BodyAssocVector.cpp',
-			'containers/InteractionVecSet.cpp',
 			'containers/InteractionHashMap.cpp',
 			'containers/InteractionVecMap.cpp',
 			],

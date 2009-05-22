@@ -22,7 +22,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -103,8 +102,6 @@ bool STLImporterTest::generate()
 ////////////////////////////////////
 ///////// Container
 	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 		
 ////////////////////////////////////
 ///////// walls
@@ -207,7 +204,6 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;

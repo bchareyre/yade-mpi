@@ -33,7 +33,6 @@
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -85,14 +84,11 @@ void RotatingBox::registerAttributes()
 
 bool RotatingBox::generate()
 {
-	Omega::instance().setTimeStep(0.01);
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 
 	createActors(rootBody);
 	positionRootBody(rootBody);
 	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	
 	shared_ptr<Body> body;
@@ -122,8 +118,8 @@ bool RotatingBox::generate()
 				createBox(box,i,j,k);
 				rootBody->bodies->insert(box);
  			}
-
-	message="ATTN: please set smaller timestep or it will bounce like crazy.";
+	
+	rootBody->dt=1e-2;
 	return true;
 }
 
@@ -165,7 +161,6 @@ void RotatingBox::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	gBox->extents			= size;
 	gBox->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= size;
@@ -208,7 +203,6 @@ void RotatingBox::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -245,7 +239,6 @@ void RotatingBox::createKinematicBox(shared_ptr<Body>& body, Vector3r position, 
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

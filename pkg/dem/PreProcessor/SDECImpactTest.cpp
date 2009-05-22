@@ -47,8 +47,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
 
 
 #include <boost/filesystem/convenience.hpp>
@@ -191,8 +189,6 @@ bool SDECImpactTest::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
@@ -387,7 +383,6 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= spheresColor;
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -434,7 +429,6 @@ void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;

@@ -413,6 +413,8 @@ class pyInteractionContainer{
 		}
 		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
+		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal && (I->getId1()==id || I->getId2()==id)) ret.append(pyInteraction(I));} return ret;}
+		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(pyInteraction(I));} return ret; }
 };
 
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
@@ -422,8 +424,12 @@ class pyBexContainer{
 		pyBexContainer(){}
 		python::tuple force_get(long id){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r f=rb->bex.getForce(id); return python::make_tuple(f[0],f[1],f[2]); }
 		python::tuple torque_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getTorque(id); return python::make_tuple(m[0],m[1],m[2]);}
+		python::tuple move_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getMove(id); return python::make_tuple(m[0],m[1],m[2]);}
+		python::tuple rot_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getRot(id); return python::make_tuple(m[0],m[1],m[2]);}
 		void force_add(long id, python::tuple f){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addForce (id,tuple2vec(f)); }
 		void torque_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addTorque(id,tuple2vec(t));}
+		void move_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addMove(id,tuple2vec(t));}
+		void rot_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addRot(id,tuple2vec(t));}
 };
 
 class pyOmega{
@@ -596,7 +602,7 @@ class pyOmega{
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->interactions); }
 	
-	pyBexContainer actions_get(void){return pyBexContainer();}
+	pyBexContainer bex_get(void){return pyBexContainer();}
 	
 
 	boost::python::list listChildClasses(const string& base){
@@ -693,7 +699,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set)
 		.add_property("bodies",&pyOmega::bodies_get)
 		.add_property("interactions",&pyOmega::interactions_get)
-		.add_property("actions",&pyOmega::actions_get)
+		.add_property("actions",&pyOmega::bex_get)
+		.add_property("bex",&pyOmega::bex_get)
 		.add_property("tags",&pyOmega::tags_get)
 		.def("childClasses",&pyOmega::listChildClasses)
 		.def("isChildClassOf",&pyOmega::isChildClassOf)
@@ -721,6 +728,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
 		.def("nth",&pyInteractionContainer::pyNth)
+		.def("withBody",&pyInteractionContainer::withBody)
+		.def("withBodyAll",&pyInteractionContainer::withBodyAll)
+		.def("nth",&pyInteractionContainer::pyNth)
 		.def("clear",&pyInteractionContainer::clear);
 	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
@@ -730,8 +740,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("f",&pyBexContainer::force_get)
 		.def("t",&pyBexContainer::torque_get)
 		.def("m",&pyBexContainer::torque_get) // for compatibility with ActionContainer
+		.def("move",&pyBexContainer::move_get)
+		.def("rot",&pyBexContainer::rot_get)
 		.def("addF",&pyBexContainer::force_add)
-		.def("addT",&pyBexContainer::torque_add);
+		.def("addT",&pyBexContainer::torque_add)
+		.def("addMove",&pyBexContainer::move_add)
+		.def("addRot",&pyBexContainer::rot_add);
 
 	boost::python::class_<pyTimingDeltas>("TimingDeltas",python::init<pyTimingDeltas&>())
 		.def("reset",&pyTimingDeltas::reset)

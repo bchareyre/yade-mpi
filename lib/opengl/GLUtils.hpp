@@ -6,6 +6,7 @@
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
+#include<boost/lexical_cast.hpp>
 #include<sstream>
 #include<iomanip>
 #include<string>
@@ -22,6 +23,10 @@ struct GLUtils{
 	static void GLDrawNum(const Real& n, const Vector3r& pos, const Vector3r& color=Vector3r(1,1,1), unsigned precision=3){
 		std::ostringstream oss; oss<<std::setprecision(precision)<< /* "w="<< */ (double)n;
 		GLUtils::GLDrawText(oss.str(),pos,color);
+	}
+
+	static void GLDrawInt(long i, const Vector3r& pos, const Vector3r& color=Vector3r(1,1,1)){
+		GLUtils::GLDrawText(boost::lexical_cast<std::string>(i),pos,color);
 	}
 
 	static void GLDrawText(const std::string& txt, const Vector3r& pos, const Vector3r& color=Vector3r(1,1,1)){

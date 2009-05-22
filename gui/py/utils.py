@@ -76,15 +76,15 @@ def downCast(obj,newClassName):
 	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
 	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
-def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={}):
+def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={},velocity=[0,0,0]):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
 	if not color: color=randomColor()
-	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color,'wire':wire,'visible':True})
+	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color,'wire':wire})
 	s.mold=InteractingGeometry('InteractingSphere',{'radius':radius,'diffuseColor':color})
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
-	pp={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert],'young':young,'poisson':poisson,'frictionAngle':frictionAngle}
+	pp={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert],'young':young,'poisson':poisson,'frictionAngle':frictionAngle, 'velocity':[velocity[0],velocity[1],velocity[2]]}
 	pp.update(physParamsAttr)
 	s.phys=PhysicalParameters(physParamsClass)
 	for k in [attr for attr in pp.keys() if attr in s.phys.keys()]:
@@ -97,7 +97,7 @@ def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,fri
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	if not color: color=randomColor()
-	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color,'wire':wire,'visible':True})
+	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color,'wire':wire})
 	b.mold=InteractingGeometry('InteractingBox',{'extents':extents,'diffuseColor':color})
 	mass=8*extents[0]*extents[1]*extents[2]*density
 
@@ -117,7 +117,7 @@ def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire
 	"""Create default facet with given parameters."""
 	b=Body()
 	if not color: color=randomColor()
-	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire,'visible':True})
+	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire})
 	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
 	center=inscribedCircleCenter(list(vertices[0]),list(vertices[1]),list(vertices[2]))
 	vertices=map(lambda a,b:map(lambda x,y:x-y,a,b),vertices,[center,center,center]) 
@@ -153,7 +153,6 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 			center[axis]=extrema[j][axis]+(j-.5)*thickness
 			walls.append(box(center=center,extents=extents,dynamic=False,**kw))
 			walls[-1].shape['wire']=True
-			walls[-1].shape['visible']=True
 	return walls
 
 
@@ -357,7 +356,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		if 'description' in names: O.tags['description']=values[names.index('description')]
 		else:
 			bangCols=[i for i,h in enumerate(names) if h[-1]=='!']
-			if len(bangCols)==0: bangCols=range(len(headings))
+			if len(bangCols)==0: bangCols=range(len(names))
 			for i in range(len(names)):
 				if names[i][-1]=='!': names[i]=names[i][:-1] # strip trailing !
 			O.tags['description']=','.join(names[col]+'='+('%g'%values[col] if isinstance(values[col],float) else str(values[col])) for col in bangCols).replace("'",'').replace('"','')

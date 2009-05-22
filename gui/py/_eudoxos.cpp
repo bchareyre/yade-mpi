@@ -7,7 +7,6 @@ using namespace std;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.eudoxos");
 #endif
 
-
 # if 0
 Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
@@ -34,7 +33,7 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 #endif
 
 /* yield surface for the brefcom concrete model; this is used only to make yield surface plot from python, for debugging */
-Real yieldSigmaTMagnitude(Real sigmaN){
+Real yieldSigmaTMagnitude(Real sigmaN, int yieldSurfType=0){
 	#ifdef BREFCOM_YIELD_SIGMA_T_MAGNITUDE
 		/* find first suitable interaction */
 		MetaBody* rootBody=Omega::instance().getRootBody().get();
@@ -47,12 +46,15 @@ Real yieldSigmaTMagnitude(Real sigmaN){
 		BrefcomContact* BC=dynamic_cast<BrefcomContact*>(I->interactionPhysics.get());
 		if(!BC) {LOG_ERROR("Interaction physics is not BrefcomContact instance, returning NaN!"); return nan;}
 		const Real &omega(BC->omega); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle);
+		const Real& yieldLogSpeed(ef2_Spheres_Brefcom_BrefcomLaw::yieldLogSpeed); // const int& yieldSurfType(ef2_Spheres_Brefcom_BrefcomLaw::yieldSurfType);
+		const Real& yieldEllipseShift(ef2_Spheres_Brefcom_BrefcomLaw::yieldEllipseShift);
 		return BREFCOM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
 	#else
 		LOG_FATAL("Brefcom model not available in this build.");
 		throw;
 	#endif
 }
+
 
 // copied from _utils.cpp
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])(),extract<double>(t[1])(),extract<double>(t[2])());}

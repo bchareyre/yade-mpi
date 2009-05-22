@@ -45,9 +45,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 
 TetrahedronsTest::TetrahedronsTest () : FileGenerator()
 {
@@ -129,8 +126,6 @@ bool TetrahedronsTest::generate()
 ////////////////////////////////////
 ///////// Container
 	
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 		
 ////////////////////////////////////
 ///////// ground
@@ -193,7 +188,6 @@ void TetrahedronsTest::createTetrahedron(shared_ptr<Body>& body, int i, int j, i
 	makeTet(tet,radius);
 	tet->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	tet->wire			= false;
-	tet->visible			= true;
 	tet->shadowCaster		= false;
 
 	// Vaclav,
@@ -283,7 +277,6 @@ void TetrahedronsTest::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= extents;

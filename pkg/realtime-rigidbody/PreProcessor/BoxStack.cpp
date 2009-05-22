@@ -38,9 +38,6 @@
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionVecSet.hpp>
-
 
 BoxStack::BoxStack () : FileGenerator()
 {
@@ -91,9 +88,6 @@ bool BoxStack::generate()
 	
 	////////////////////////////////////
 
-	rootBody->persistentInteractions	= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionVecSet);
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
 	
@@ -147,7 +141,6 @@ void BoxStack::createBox(shared_ptr<Body>& body, int i, int j, int k)
 	gBox->extents			= size;
 	gBox->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gBox->wire			= false;
-	gBox->visible			= true;
 	gBox->shadowCaster		= true;
 	
 	iBox->extents			= size;
@@ -189,7 +182,6 @@ void BoxStack::createSphere(shared_ptr<Body>& body)
 	gSphere->radius			= radius;
 	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	gSphere->wire			= false;
-	gSphere->visible		= true;
 	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
@@ -226,7 +218,6 @@ void BoxStack::createKinematicBox(shared_ptr<Body>& body, Vector3r position, Vec
 	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,1,1);
 	gBox->wire			= wire;
-	gBox->visible			= true;
 	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;
