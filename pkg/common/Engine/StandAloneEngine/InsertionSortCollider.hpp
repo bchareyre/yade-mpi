@@ -11,9 +11,8 @@ class InteractionContainer;
 	calls checkOverlap which then handles either overlap (by creating interaction if necessary) or its absence (by deleting
 	interaction if it exists and is only potential (!isReal && isNew).
 
-	Note that not all interactions are traversed at one run, therefore an overlap miss also has to check the interaction container.
+	Bodies without bounding volume are ahndle gracefully and never collide.
 
-	For performance reasons, we require all bodies to have boundingVolume.
 
 */
 
@@ -25,12 +24,15 @@ class InsertionSortCollider: public Collider{
 		//! id of the body this bound belongs to
 		body_id_t id;
 		//! is it the minimum (true) or maximum (false) bound?
-		bool isMin;
-		Bound(Real coord_, body_id_t id_, bool isMin_): coord(coord_), id(id_), isMin(isMin_){}
-		//Bound(const Bound& b): coord(b.coord), id(b.id), isMin(b.isMin){}
-		//Bound& operator=(const Bound& b){ coord=b.coord; id=b.id; isMin=b.isMin; cerr<<"!=!"<<endl; return *this;}
+		char type;
+		Bound(Real coord_, body_id_t id_, char type_): coord(coord_), id(id_), type(type_){}
 		bool operator<(const Bound& b) const {return coord<b.coord;}
 		bool operator>(const Bound& b) const {return coord>b.coord;}
+		enum { FLAG_MIN=1, FLAG_BB=2 };
+		inline bool hasBB() const {return type&FLAG_BB;}
+		inline bool isMin() const {return type&FLAG_MIN;}
+		inline void setBB(){type|=FLAG_BB;}
+		inline void setNoBB(){type&=type^FLAG_BB;}
 	};
 	//! storage for bounds
 	std::vector<Bound> XX,YY,ZZ;

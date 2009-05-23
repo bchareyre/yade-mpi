@@ -34,7 +34,6 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 	if((!overlap && !hasInter) || (overlap && hasInter)) return;
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
-		// FIXME: if(!Collider::mayCollide(bi.get(),bj.get())) return;
 		if(!Collider::mayCollide(Body::byId(id1,rb).get(),Body::byId(id2,rb).get())) return;
 		LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
@@ -51,10 +50,11 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer* interactions, MetaBody* rb){
 	long size=v.size();
 	for(long i=0; i<size; i++){
-		Bound viInit=v[i]; long j=i-1;
+		Bound viInit=v[i]; long j=i-1; /* cache hasBB(); otherwise 1% overall performance hit */ bool viInitBB=viInit.hasBB();
 		while(j>=0 && v[j]>viInit){
 			v[j+1]=v[j];
-			handleBoundInversion(viInit.id,v[j].id,interactions,rb);
+			// no collisions without bounding boxes
+			if(viInitBB && v[j].hasBB()) handleBoundInversion(viInit.id,v[j].id,interactions,rb);
 			j--;
 		}
 		v[j+1]=viInit;
@@ -76,6 +76,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 		if(XX.size()!=2*nBodies){
 			LOG_DEBUG("Resize bounds containers from "<<XX.size()<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
+			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
 			if(2*nBodies<XX.size()){ XX.clear(); YY.clear(); ZZ.clear(); }
 			// more than 100 bodies was added, do initial sort again
 			// maybe: should rather depend on ratio of added bodies to those already present...?
@@ -84,9 +85,9 @@ void InsertionSortCollider::action(MetaBody* rb){
 			assert((XX.size()%2)==0);
 			for(size_t id=XX.size()/2; id<nBodies; id++){
 				// add lower and upper bounds; coord is not important, will be updated from bb shortly
-				XX.push_back(Bound(0,id,true)); XX.push_back(Bound(0,id,false));
-				YY.push_back(Bound(0,id,true)); YY.push_back(Bound(0,id,false));
-				ZZ.push_back(Bound(0,id,true)); ZZ.push_back(Bound(0,id,false));
+				XX.push_back(Bound(0,id,0|Bound::FLAG_MIN)); XX.push_back(Bound(0,id,0|0 /* no Bound::FLAG_MIN */));
+				YY.push_back(Bound(0,id,0|Bound::FLAG_MIN)); YY.push_back(Bound(0,id,0|0 /* no Bound::FLAG_MIN */));
+				ZZ.push_back(Bound(0,id,0|Bound::FLAG_MIN)); ZZ.push_back(Bound(0,id,0|0 /* no Bound::FLAG_MIN */));
 			}
 		}
 		if(minima.size()!=3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
@@ -98,16 +99,13 @@ void InsertionSortCollider::action(MetaBody* rb){
 		for(size_t i=0; i<2*nBodies; i++){
 			const body_id_t& idXX=XX[i].id; const body_id_t& idYY=YY[i].id; const body_id_t& idZZ=ZZ[i].id;
 			const shared_ptr<BoundingVolume>& bvXX=Body::byId(idXX,rb)->boundingVolume; const shared_ptr<BoundingVolume>& bvYY=Body::byId(idYY,rb)->boundingVolume; const shared_ptr<BoundingVolume>& bvZZ=Body::byId(idZZ,rb)->boundingVolume;
-			// if(!bvXX){ LOG_FATAL("InsertionSortCollider doesn't handle boundingVolume-less bodies."); throw runtime_error("InsertionSortCollider encountered boundingVolume-less body."); }
-			XX[i].coord=bvXX ? (XX[i].isMin ? bvXX->min[0] : bvXX->max[0]) : Body::byId(idXX,rb)->physicalParameters->se3.position[0];
-			YY[i].coord=bvYY ? (YY[i].isMin ? bvYY->min[1] : bvYY->max[1]) : Body::byId(idYY,rb)->physicalParameters->se3.position[1];
-			ZZ[i].coord=bvZZ ? (ZZ[i].isMin ? bvZZ->min[2] : bvZZ->max[2]) : Body::byId(idZZ,rb)->physicalParameters->se3.position[2];
-			//YY[i].coord=(YY[i].isMin ? Body::byId(YY[i].id,rb)->boundingVolume->min[1] :  Body::byId(YY[i].id,rb)->boundingVolume->max[1]);
-			//ZZ[i].coord=(ZZ[i].isMin ? Body::byId(ZZ[i].id,rb)->boundingVolume->min[2] :  Body::byId(ZZ[i].id,rb)->boundingVolume->max[2]);
+			// copy bounds from boundingVolume if there is one (and call setBB() to mark that), otherwise use position (setNoBB() marks absence of bb)
+			XX[i].coord=bvXX ? (XX[i].setBB(), XX[i].isMin() ? bvXX->min[0] : bvXX->max[0]) : (XX[i].setNoBB(), Body::byId(idXX,rb)->physicalParameters->se3.position[0]);
+			YY[i].coord=bvYY ? (YY[i].setBB(), YY[i].isMin() ? bvYY->min[1] : bvYY->max[1]) : (YY[i].setNoBB(), Body::byId(idYY,rb)->physicalParameters->se3.position[1]);
+			ZZ[i].coord=bvZZ ? (ZZ[i].setBB(), ZZ[i].isMin() ? bvZZ->min[2] : bvZZ->max[2]) : (ZZ[i].setNoBB(), Body::byId(idZZ,rb)->physicalParameters->se3.position[2]);
 			// and for each body, copy its minima and maxima arrays as well
-			if(XX[i].isMin){
+			if(XX[i].isMin()){
 				BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
-				//minima[3*id]=bvXX->min[0]; minima[3*id+1]=bvXX->min[1]; minima[3*id+2]=bvXX->min[2]; maxima[3*id]=bvXX->max[0]; maxima[3*id+1]=bvXX->max[1]; maxima[3*id+2]=bvXX->max[2];
 				if(bvXX) { memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
 				else{ const Vector3r& pos=Body::byId(idXX,rb)->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
 			}
@@ -118,6 +116,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 
 	// sort
 		if(!doInitSort){
+			/* each inversion in insertionSort calls handleBoundInversion, which in turns may add/remove interaction */
 			insertionSort(XX,interactions,rb);
 			insertionSort(YY,interactions,rb);
 			insertionSort(ZZ,interactions,rb);
@@ -132,7 +131,8 @@ void InsertionSortCollider::action(MetaBody* rb){
 			// go through potential aabb collisions, create interactions as necessary
 			for(size_t i=0; i<2*nBodies; i++){
 				// start from the lower bound
-				if(!V[i].isMin) continue;
+				// skip bodies without bbox since we would possibly never meet the upper bound again (std::sort may not be stable) and we don't want to collide those anyway
+				if(!(V[i].isMin() && V[i].hasBB())) continue;
 				const body_id_t& iid=V[i].id;
 				// TRVAR3(i,iid,V[i].coord);
 				// go up until we meet the upper bound
@@ -140,7 +140,8 @@ void InsertionSortCollider::action(MetaBody* rb){
 					// skip bodies with smaller (arbitrary, could be greater as well) id,
 					// since they will detect us when their turn comes
 					const body_id_t& jid=V[j].id;
-					if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
+					if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].isMin()?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
+					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 					handleBoundInversion(iid,jid,interactions,rb);
 				}
 			}
