@@ -10,26 +10,15 @@
 
 #include "Interaction.hpp"
 
-Interaction::Interaction ()
-{
-	// FIXME : -1
-	id1 = 0; 
-	id2 = 0;
-	isNew = true;
-	isReal = false; // maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
-	
+Interaction::Interaction(): id1(0), id2(0){ reset(); }
+Interaction::Interaction(body_id_t newId1,body_id_t newId2): id1(newId1), id2(newId2){ reset(); }
+
+void Interaction::reset(){
+	isNew=true;
+	isReal=false;
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
-
-}
-
-
-Interaction::Interaction(body_id_t newId1,body_id_t newId2) : id1(newId1) , id2(newId2)
-{	
-	isNew = true;
-	isReal = false;
-	isNeighbor = true;//NOTE : TriangulationCollider needs that
-
 	functorCache.geomExists=true;
+	//functorCache.geom=shared_ptr<InteractionGeometryEngineUnit>(); functorCache.phys=shared_ptr<InteractionPhysicsEngineUnit>(); functorCache.constLaw=shared_ptr<ConstitutiveLaw>();
 }
 
 

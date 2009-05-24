@@ -31,7 +31,7 @@ title("SAP vs. QuickSort colliders performance")
 legend(('SAP init','IS init'),'upper left')
 
 ax2=twinx()
-plot(SAP_N,SAPstep,'r-',IS_N,ISstep,'g-',QS_N,QSstep,'g-',QS_N,QSinit,'b-')
+plot(SAP_N,SAPstep,'r-',IS_N,ISstep,'k-',QS_N,QSstep,'g-',QS_N,QSinit,'b-')
 ylabel(u"Linear time per 1 step [s]")
 legend(('SAP step','InsertionSort step','QuickSort step','QuickSort init'),'right')
 grid()

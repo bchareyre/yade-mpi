@@ -21,13 +21,16 @@ class ConstitutiveLaw;
 class Interaction : public Serializable
 {
 	private	:
-		body_id_t id1,id2;	// FIXME  this should be vector<body_id_t> ids;
-
+		body_id_t id1,id2;
 	public :
-		bool isNew;		// FIXME : better to test if InteractionPhysics==0 and remove this flag; we can also remove this flag, if we make another container for PotetntialInteraction with only ids
-		bool isReal;		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
-		bool cycle; // phase flag to mark (for example, SpatialQuickSortCollider mark by it the stale interactions) 
-		bool isNeighbor;	// Has a meaning only with triangulationCollider atm NOTE : TriangulationCollider needs that
+		// FIXME : test if InteractionPhysics==0 and remove this flag; we can also remove this flag, if we make another container for PotetntialInteraction with only ids
+		bool isNew;		
+		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
+		bool isReal;		
+		//! phase flag to mark (for example, SpatialQuickSortCollider mark by it the stale interactions) 
+		bool cycle;      
+		//! NOTE : TriangulationCollider needs this (nothing else)
+		bool isNeighbor;	
 
 		shared_ptr<InteractionGeometry> interactionGeometry;
 		shared_ptr<InteractionPhysics> interactionPhysics;
@@ -44,22 +47,17 @@ class Interaction : public Serializable
 		//! cache functors that are called for this interaction. Currently used by InteractionDispatchers.
 		struct {
 			// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
-			// Therefore, geomExists must be initialized to true first (done in Interaction ctor).
+			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
 			bool geomExists;
 			// shared_ptr's are initialized to NULLs automagically
 			shared_ptr<InteractionGeometryEngineUnit> geom;
 			shared_ptr<InteractionPhysicsEngineUnit> phys;
 			shared_ptr<ConstitutiveLaw> constLaw;
 		} functorCache;
+
+		//! Reset interaction to the intial state (keep only body ids)
+		void reset();
 			
-
-		#if 0
-			//! Whether both bodies involved in interaction satisfies given mask; provide rootBody for faster lookup
-			bool maskBothOK(int mask, MetaBody* rootBody=NULL){return (mask==0) || (Body::byId(id1,rootBody)->maskOK(mask) && Body::byId(id2,rootBody)->maskOK(mask));}
-			//! Whether at least one body in interaction satisfies given mask; provide rootBody for faster lookup
-			bool maskAnyOK(int mask, MetaBody* rootBody=NULL){return (mask==0) || Body::byId(id1,rootBody)->maskOK(mask) || Body::byId(id2,rootBody)->maskOK(mask);}
-		#endif
-
 	REGISTER_ATTRIBUTES(/*no base*/,
 		(id1)
 		(id2)

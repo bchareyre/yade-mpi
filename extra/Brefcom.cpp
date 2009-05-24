@@ -73,7 +73,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 	if(!interaction->isNew && interaction->interactionPhysics){ /* relax */ } 
 	else {
-		interaction->isNew; // just in case
+		interaction->isNew=false; // just in case
 
 		const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
 		const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
@@ -233,15 +233,17 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
 	//timingDeltas->checkpoint("material");
 
-	const int watch1=6300, watch2=6299;
-	#define SHOW(a) if((I->getId1()==watch1 && I->getId2()==watch2) || (I->getId2()==watch1 && I->getId1()==watch2)) cerr<<__FILE__<<":"<<__LINE__<<" "<<a<<endl;
-	SHOW("epsN"<<epsN);
+	//const int watch1=6300, watch2=6299;
+	//#define SHOW(a) if((I->getId1()==watch1 && I->getId2()==watch2) || (I->getId2()==watch1 && I->getId1()==watch2)) cerr<<__FILE__<<":"<<__LINE__<<" "<<a<<endl;
+	//SHOW("epsN"<<epsN);
 	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
-		I->isReal=false;
-		const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
-		const shared_ptr<BrefcomPhysParams>& rbp1=YADE_PTR_CAST<BrefcomPhysParams>(body1->physicalParameters), rbp2=YADE_PTR_CAST<BrefcomPhysParams>(body2->physicalParameters);
-		if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;}
-		LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and has been deleted (isReal="<<I->isReal<<")");
+		rootBody->interactions->requestErase(I->getId1(),I->getId2());
+		if(isCohesive){
+			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
+			const shared_ptr<BrefcomPhysParams>& rbp1=YADE_PTR_CAST<BrefcomPhysParams>(body1->physicalParameters), rbp2=YADE_PTR_CAST<BrefcomPhysParams>(body2->physicalParameters);
+			if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;}
+			LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and will be deleted.");
+		}
 		return;
 	}
 

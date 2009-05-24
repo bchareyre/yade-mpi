@@ -83,7 +83,7 @@ class InteractionContainer : public Serializable
 	public :
 		boost::mutex	drawloopmutex; // FIXME a hack, containers have to be rewritten lock-free.
 
-		InteractionContainer() { interaction.clear(); };
+		InteractionContainer() { };
 		virtual ~InteractionContainer() {};
 
 		virtual bool insert(body_id_t /*id1*/,body_id_t /*id2*/)				{throw;};
@@ -101,13 +101,19 @@ class InteractionContainer : public Serializable
 		virtual shared_ptr<Interaction>& operator[] (unsigned int) {throw;};
 		virtual const shared_ptr<Interaction>& operator[] (unsigned int) const {throw;};
 
+		// std::pair is not handle by yade::serialization, use vector<body_id_t> instead
+		typedef vector<body_id_t> bodyIdPair;
+		// Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state)
+		// and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
+		void requestErase(body_id_t id1, body_id_t id2);
+		list<bodyIdPair> pendingErase;
 	private :
+		// used only during serialization/deserialization
 		vector<shared_ptr<Interaction> > interaction;
-
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(/*no base*/,(interaction));
+	REGISTER_ATTRIBUTES(/*no base*/,(interaction)(pendingErase));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
 

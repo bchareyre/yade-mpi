@@ -11,7 +11,8 @@
 #include <math.h>
 #include <algorithm>
 
-
+YADE_PLUGIN("SpatialQuickSortCollider");
+ 
 SpatialQuickSortCollider::SpatialQuickSortCollider() : Collider()
 {
 	haveDistantTransient=false;
@@ -24,16 +25,19 @@ SpatialQuickSortCollider::~SpatialQuickSortCollider()
 
 void SpatialQuickSortCollider::action(MetaBody* ncb)
 {
-     shared_ptr<BodyContainer> bodies = ncb->bodies;
+	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
+
+	// This collider traverses all interactions at every step, therefore interactions that were reset() will be deleted automatically as needed
+	ncb->interactions->pendingErase.clear();
 
 	size_t nbElements=bodies->size();
-       if (nbElements!=rank.size())
-       {
-	   size_t n = rank.size();
-	   rank.resize(nbElements);
-	   for (; n<nbElements; ++n)
-	       rank[n] = shared_ptr<AABBBound>(new AABBBound);
-       }
+	if (nbElements!=rank.size())
+	{
+		size_t n = rank.size();
+		rank.resize(nbElements);
+		for (; n<nbElements; ++n)
+			rank[n] = shared_ptr<AABBBound>(new AABBBound);
+	}
 
 	Vector3r min,max;
 	shared_ptr<Body> b;

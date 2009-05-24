@@ -44,18 +44,20 @@ class InsertionSortCollider: public Collider{
 	/*! sorting routine; insertion sort is very fast for strongly pre-sorted lists, which is our case
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details
 	*/
-	void insertionSort(std::vector<Bound>& v,InteractionContainer*,MetaBody*);
+	void insertionSort(std::vector<Bound>& v,InteractionContainer*,MetaBody*,bool doCollide=true);
 	void handleBoundInversion(body_id_t,body_id_t,InteractionContainer*,MetaBody*);
 	bool spatialOverlap(body_id_t,body_id_t);
 
 	public:
 	//! axis for the initial sort
 	int sortAxis;
+	//! if true, separate sorting and colliding phase; MUCH slower, but processes all interactions at every step
+	bool sortThenCollide;
 
-	InsertionSortCollider(): sortAxis(0){ /* timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
+	InsertionSortCollider(): sortAxis(0), sortThenCollide(false){ /* timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 	virtual void action(MetaBody*);
 	REGISTER_CLASS_AND_BASE(InsertionSortCollider,Collider);
-	REGISTER_ATTRIBUTES(Collider,(sortAxis));
+	REGISTER_ATTRIBUTES(Collider,(sortAxis)(sortThenCollide));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InsertionSortCollider);

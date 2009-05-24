@@ -13,6 +13,8 @@
 
 
 
+void InteractionContainer::requestErase(body_id_t id1, body_id_t id2){ find(id1,id2)->reset(); bodyIdPair v(0,2); v.push_back(id1); v.push_back(id2); pendingErase.push_back(v); }
+
 void InteractionContainer::preProcessAttributes(bool deserializing)
 {
 	if(deserializing)

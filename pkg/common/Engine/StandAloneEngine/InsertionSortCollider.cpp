@@ -31,7 +31,8 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
 	bool hasInter=(bool)I;
 	// interaction doesn't exist and shouldn't, or it exists and should
-	if((!overlap && !hasInter) || (overlap && hasInter)) return;
+	if(!overlap && !hasInter) return;
+	if(overlap && hasInter){ /* FIXME: should check I->isNew and I->isReal; etc */ return; }
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
 		if(!Collider::mayCollide(Body::byId(id1,rb).get(),Body::byId(id2,rb).get())) return;
@@ -40,21 +41,18 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 		interactions->insert(newI);
 		return;
 	}
-	/* Note: this doesn't cover all disappearing interactions, only those that broke in the sortAxis direction;
-	 	it is only a minor optimization (to be verified) to have it here.
-		The rest of interaction will be deleted at the end of action. */
-	if(!overlap && hasInter){ if(!I->isReal) interactions->erase(id1,id2); return; }
+	if(!overlap && hasInter){ if(!I->isReal && I->isNew) interactions->erase(id1,id2); return; }
 	assert(false); // unreachable
 }
 
-void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer* interactions, MetaBody* rb){
+void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer* interactions, MetaBody* rb, bool doCollide){
 	long size=v.size();
 	for(long i=0; i<size; i++){
 		Bound viInit=v[i]; long j=i-1; /* cache hasBB(); otherwise 1% overall performance hit */ bool viInitBB=viInit.hasBB();
 		while(j>=0 && v[j]>viInit){
 			v[j+1]=v[j];
 			// no collisions without bounding boxes
-			if(viInitBB && v[j].hasBB()) handleBoundInversion(viInit.id,v[j].id,interactions,rb);
+			if(doCollide && viInitBB && v[j].hasBB()) handleBoundInversion(viInit.id,v[j].id,interactions,rb);
 			j--;
 		}
 		v[j+1]=viInit;
@@ -112,19 +110,32 @@ void InsertionSortCollider::action(MetaBody* rb){
 		}
 
 	//timingDeltas->checkpoint("copy");
+
+	// process interactions that the constitutive law asked to be erased
+	FOREACH(const InteractionContainer::bodyIdPair& p, interactions->pendingErase){
+		// remove those that do not overlap spatially anymore
+		if(!spatialOverlap(p[0],p[1])){ interactions->erase(p[0],p[1]); LOG_TRACE("Deleted interaction #"<<p[0]<<"+#"<<p[1]); }
+		else
+		{
+			const shared_ptr<Interaction>& I=interactions->find(p[0],p[1]);
+			if(!I){ LOG_FATAL("Requested deletion of a non-existent interaction #"<<p[0]<<"+#"<<p[1]<<"?!"); throw; }
+			I->reset();
+		}
+	}
+	interactions->pendingErase.clear();
 	
 
 	// sort
-		if(!doInitSort){
+		if(!doInitSort && !sortThenCollide){
 			/* each inversion in insertionSort calls handleBoundInversion, which in turns may add/remove interaction */
-			insertionSort(XX,interactions,rb);
-			insertionSort(YY,interactions,rb);
-			insertionSort(ZZ,interactions,rb);
+			insertionSort(XX,interactions,rb); insertionSort(YY,interactions,rb); insertionSort(ZZ,interactions,rb);
 		}
 		else {
-			std::sort(XX.begin(),XX.end());
-			std::sort(YY.begin(),YY.end());
-			std::sort(ZZ.begin(),ZZ.end());
+			if(doInitSort){
+				std::sort(XX.begin(),XX.end()); std::sort(YY.begin(),YY.end()); std::sort(ZZ.begin(),ZZ.end());
+			} else {
+				insertionSort(XX,interactions,rb,false); insertionSort(YY,interactions,rb,false); insertionSort(ZZ,interactions,rb,false);
+			}
 			// traverse the container along requested axis
 			assert(sortAxis==0 || sortAxis==1 || sortAxis==2);
 			vector<Bound>& V=(sortAxis==0?XX:(sortAxis==1?YY:ZZ));
@@ -137,17 +148,18 @@ void InsertionSortCollider::action(MetaBody* rb){
 				// TRVAR3(i,iid,V[i].coord);
 				// go up until we meet the upper bound
 				for(size_t j=i+1; V[j].id!=iid; j++){
-					// skip bodies with smaller (arbitrary, could be greater as well) id,
-					// since they will detect us when their turn comes
 					const body_id_t& jid=V[j].id;
-					if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].isMin()?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
+					/// FIXME: not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
+					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes
+					// if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].isMin()?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
 					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 					handleBoundInversion(iid,jid,interactions,rb);
 				}
 			}
 		}
 	//timingDeltas->checkpoint("sort&collide");
-
+	
+#if 0
 	// garbage collection once in a while: for interactions that were still real when the bounding boxes separated
 	// the collider would never get to see them again otherwise
 	if(iter%1000==0){
@@ -159,4 +171,5 @@ void InsertionSortCollider::action(MetaBody* rb){
 		FOREACH(const bodyIdPair& p, toBeDeleted){ interactions->erase(p.first,p.second); LOG_TRACE("Deleted interaction #"<<p.first<<"+#"<<p.second); }
 	}
 	//timingDeltas->checkpoint("stale");
+#endif
 }

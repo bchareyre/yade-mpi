@@ -124,7 +124,7 @@ def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire
 	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
 	b.shape.setRaw('vertices',vStr)
 	b.mold.setRaw('vertices',vStr)
-	pp={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle}
+	pp={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle,'inertia':[0,0,0]}
 	pp.update(physParamsAttr)
 	b.phys=PhysicalParameters(physParamsClass)
 	for k in [attr for attr in pp.keys() if attr in b.phys.keys()]:

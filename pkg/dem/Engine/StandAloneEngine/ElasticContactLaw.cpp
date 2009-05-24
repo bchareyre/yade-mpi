@@ -70,7 +70,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			SpheresContactGeometry*    currentContactGeometry= static_cast<SpheresContactGeometry*>(ig.get());
 			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());
 			// delete interaction where spheres don't touch
-			if(currentContactGeometry->penetrationDepth<0){ contact->isReal=false; return; }
+			if(currentContactGeometry->penetrationDepth<0){ ncb->interactions->requestErase(id1,id2); return; }
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id2,ncb)->physicalParameters.get());
@@ -116,7 +116,7 @@ void ef2_Dem3Dof_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
 	Real displN=geom->displacementN();
-	if(displN>0){contact->isReal=false; return; }
+	if(displN>0){rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
 	phys->normalForce=phys->kn*displN*geom->normal;
 	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
