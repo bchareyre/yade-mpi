@@ -23,7 +23,7 @@ void InteractionContainer::preProcessAttributes(bool deserializing)
 	}
 	else
 	{
-		interaction.clear();
+		interaction.clear(); interaction.reserve(this->size());
 		InteractionContainer::iterator i    = this->begin();
 		InteractionContainer::iterator iEnd = this->end();
 		for( ; i!=iEnd ; ++i )

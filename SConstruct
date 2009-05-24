@@ -346,7 +346,7 @@ if not env.GetOption('clean'):
 SCons.Defaults.DefaultEnvironment(tools = [])
 env.Decider('MD5-timestamp')
 env.SetOption('max_drift',5) # cache md5sums of files older than 5 seconds
-SetOption('implicit_cache',1) # cache #include files etc.
+SetOption('implicit_cache',0) # cache #include files etc.
 env.SourceCode(".",None) # skip dotted directories
 SetOption('num_jobs',env['jobs'])
 
@@ -560,5 +560,15 @@ else: env['yadeModules']=libDirs+['core']
 
 # read top-level SConscript file. It is used only so that build_dir is set. This file reads all SConscripts from in yadeModules
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
+
+#################################################################################
+## remove plugins that are in the target dir but will not be installed now
+toInstall=[str(node) for node in env.FindInstalledFiles()]
+for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
+	for f in files:
+		ff=os.path.join(root,f)
+		if ff not in toInstall and not ff.endswith('.pyo'):
+			print "Deleting extra plugin", ff
+			os.remove(ff)
 
 #Progress('.', interval=100, file=sys.stderr)

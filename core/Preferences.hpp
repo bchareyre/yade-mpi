@@ -15,19 +15,13 @@
 
 using namespace std;
 
-class Preferences : public Serializable
-{
+class Preferences : public Serializable{
 	public :
-		int version;	
-		vector<string>	 dynlibDirectories;
-
 		string		 defaultGUILibName;
 		Preferences ();
-
-	REGISTER_ATTRIBUTES(,(version)(dynlibDirectories)(defaultGUILibName));
+	REGISTER_ATTRIBUTES(/* no base class*/,(defaultGUILibName));
 	REGISTER_CLASS_AND_BASE(Preferences,Serializable);
 };
-
 REGISTER_SERIALIZABLE(Preferences);
 
 

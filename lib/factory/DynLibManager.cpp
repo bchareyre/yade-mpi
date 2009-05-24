@@ -26,38 +26,13 @@ CREATE_LOGGER(DynLibManager);
 
 DynLibManager::DynLibManager ()
 {
-	baseDirs.clear();
 	autoUnload = true;
 }
 
 
 DynLibManager::~DynLibManager ()
 {
-	if (autoUnload)
-		unloadAll();
-}
-
-
-void DynLibManager::addBaseDirectory(const string& dir)
-{
-	string tmpDir;
-	if ( dir[dir.size()-1]=='/' || dir[dir.size()-1]=='\\' )
-		tmpDir = dir.substr(0,dir.size()-1);
-	else
-		tmpDir = dir;
-
-	baseDirs.push_back(tmpDir);
-}
-
-
-bool DynLibManager::loadFromDirectoryList (const string& libName )
-{
-	if (libName.empty()) return false;
-	string libFileName = libNameToSystemName(libName);
-	string baseDir = findLibDir(libName);
-	string fullLibName;
-	if (baseDir.length()==0) return load(libFileName,libName);
-	else return load(baseDir+"/"+libFileName,libName);
+	if(autoUnload) unloadAll();
 }
 
 
@@ -159,8 +134,6 @@ bool DynLibManager::error()
 	
 		if (lastError != ERROR_SUCCESS)
 		{
-//			cerr << errMsg << endl;
-//			Omega::printErrorLog(errMsg);
 			lastError_ = errMsg;
 			return true;
 		}
@@ -170,8 +143,6 @@ bool DynLibManager::error()
  		char * error = dlerror();
 		if (error != NULL)  
 		{
-			//cerr << error << endl;
-			//Omega::printErrorLog(error);
 			lastError_ = error;
 		}
 		return (error!=NULL);
@@ -195,8 +166,8 @@ string DynLibManager::systemNameToLibName(const string& name)
 {
 	string libName;
 	if(name.length()<=3){ // this arbitrary value may disappear once the logic below is dumped...
-		LOG_WARN("Filename `"<<name<<"' too short, returning empty string (cross thumbs).");
-		return "";
+		// LOG_WARN("Filename `"<<name<<"' too short, returning empty string (cross thumbs).");
+		return "[Garbage plugin file `"+name+"']";
 	}
 
 	#ifdef WIN32
@@ -206,28 +177,5 @@ string DynLibManager::systemNameToLibName(const string& name)
 	#endif 
 
 	return libName;
-}
-
-
-string DynLibManager::findLibDir(const string& name)
-{
-	string libFileName = libNameToSystemName(name);
-
-	string baseDir;
-	baseDir.clear();
-
-	vector<string>::iterator bdi    = baseDirs.begin();
-	vector<string>::iterator bdiEnd = baseDirs.end();
-	for( ; bdi != bdiEnd ; ++bdi)
-	{
-		filesystem::path name = filesystem::path((*bdi)+"/"+libFileName);
-		if ( filesystem::exists( name ) )
-		{
-			baseDir = (*bdi);
-			break;
-		}
-	}
-
-	return baseDir;
 }
 

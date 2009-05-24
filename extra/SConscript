@@ -1,13 +1,7 @@
+# vim: set filetype=python :
 Import('*')
 
 import os.path, os
-brefcomMaterialModel='../brefcom-mm.hh'
-if os.path.exists('../'+brefcomMaterialModel):
-	print "Will include local file "+brefcomMaterialModel
-	brefcomInclude=['-include',brefcomMaterialModel]
-	Depends('Brefcom.cpp','../../brefcom-mm.hh')
-else:
-	brefcomInclude=['']
 
 env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	env.SharedLibrary('SphericalDEMSimulator',
@@ -37,16 +31,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 	
 	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop','Tetra']),
 
-	env.SharedLibrary('UniaxialStrainControlledTest',['usct/UniaxialStrainControlledTest.cpp'],LIBS=env['LIBS']+['Shop','ConstitutiveLawDispatcher','GlobalStiffnessTimeStepper','Brefcom','PositionOrientationRecorder']),
-
-	env.SharedLibrary('Brefcom',['Brefcom.cpp'],CXXFLAGS=env['CXXFLAGS']+brefcomInclude,LIBS=env['LIBS']+['Shop','InteractingSphere2InteractingSphere4SpheresContactGeometry','DemXDofGeom']),
-
-	env.SharedLibrary('BrefcomTestGen',['BrefcomTestGen.cpp'],LIBS=env['LIBS']+['Shop','UniaxialStrainControlledTest','PositionOrientationRecorder','Brefcom','ConstitutiveLawDispatcher','Dem3DofGeom_SphereSphere']),
-
-	env.SharedLibrary('SimpleScene',['SimpleScene.cpp'],LIBS=env['LIBS']+['Shop','SimpleElasticRelationships']),
-
 	env.SharedLibrary('Shop',
-		['clump/Shop.cpp'],
+		['Shop.cpp'],
 		LIBS=env['LIBS']+[
 			'ElasticContactLaw',
 			'ElasticCohesiveLaw',
@@ -74,7 +60,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 			'ParticleParameters',
 			'MetaInteractingGeometry',
 			'MetaInteractingGeometry2AABB',
-			'InteractingSphere2AABB',\
+			'InteractingSphere2AABB',
 			'InteractingBox2AABB',
 			'NewtonsMomentumLaw',
 			'NewtonsForceLaw',

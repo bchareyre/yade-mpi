@@ -137,8 +137,6 @@ class ClassFactory : public Singleton< ClassFactory >
 		*/
 		bool isFactorable(const type_info& tp,bool& fundamental);
 
-		void addBaseDirectory(const string& dir);
-
 		bool load(const string& name);
 		std::string lastError();
 

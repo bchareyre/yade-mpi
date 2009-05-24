@@ -1,9 +1,51 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
-#pragma once
-#include<yade/extra/Shop.hpp>
 
-#include<yade/core/InteractionSolver.hpp>
-#include<yade/core/FileGenerator.hpp>
+/*
+
+=== HIGH LEVEL OVERVIEW OF CPM ===
+
+Concrete Particle Model (ConcretePM, Cpm) is a set of classes for modelling
+mechanical behavior of concrete. Several classes are needed for Cpm.
+
+1. CpmMat (Cpm material) deriving from BodyMacroParameters, which additionally has
+   some information about damage on the body, cummulative plastic strain etc.
+
+2.	Ip2_CpmMat_CpmMat_CpmPhys is 2-ary functor for creating CpmPhys from CpmMat's of
+	2 bodies that collide. Some parameters of the CpmPhys created are computed from
+	CpmMat's, others are passed as parameters of the functor.
+
+3. CpmPhys (Cpm (interaction)Physics) holds various parameters as well as internal
+   variables of the contact that can change as result of plasticity, damage, viscosity.
+
+4. Law2_Dem3Dof_CpmPhys_Cpm is constitutive law that takes geometry of the interaction
+	(Dem3Dof, which can be either Dem3Dof_SphereSphere or Dem3Dof_FacetSphere) and
+	CpmPhys, computing forces on both bodies and updating contact variables.
+
+	The model itself is defined in the macro CPM_MATERIAL_MODEL, but due to 
+	commercial reasons, those about 30 lines of code cannot be disclosed now and the macro
+	is defined in an external file. The model will be, however, described in enough detail
+	in my thesis (once it is written), along
+	with calibration procedures; it features damage, plasticity and viscosity
+	and is quite tunable (rigidity, poisson's	ratio, compressive/tensile strength
+	ratio, fracture energy, behavior under confinement, rate-dependence).
+
+There are other classes, which are not strictly necessary:
+
+ * CpmGlobalCharacteristics computes a few information about individual bodies based on
+   interactions they are involved in. It is probably quite useless now since volumetricStrain
+	is not used in the constitutive law anymore.
+
+ * GLDrawCpmPhys draws interaction physics (color for damage and a few other); rarely used, though.
+
+ * CpmPhysDamageColorizer changes bodies' colors depending on average damage of their interactions
+   and number of interactions that were already fully broken and have disappeared. This engine
+	contains its own loop (2 loops, more precisely) over all bodies and is run periodically
+	to update colors.
+
+*/
+
+#pragma once
+
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
@@ -13,29 +55,27 @@
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
-
-/* Engine encompassing several computations looping over all bodies/interactions
- *
- * * Compute and store unbalanced force over the whole simulation.
- * * Compute and store volumetric strain for every body.
- *
- * May be extended in the future to compute global stiffness etc as well.
- */
-class CpmGlobalCharacteristics: public PeriodicEngine{
+/* This class holds information associated with each body */
+class CpmMat: public BodyMacroParameters {
 	public:
-		bool useMaxForce; // use maximum unbalanced force instead of mean unbalanced force
-		Real unbalancedForce;
-		void compute(MetaBody* rb, bool useMax=false);
-		virtual void action(MetaBody* rb){compute(rb,useMaxForce);}
-		CpmGlobalCharacteristics(){};
-	REGISTER_ATTRIBUTES(PeriodicEngine,
-		(unbalancedForce)
-		(useMaxForce)
-	);
-	DECLARE_LOGGER;
-	REGISTER_CLASS_AND_BASE(CpmGlobalCharacteristics,PeriodicEngine);
+		//! volumetric strain around this body
+		Real epsVolumetric;
+		//! number of (cohesive) contacts that damaged completely
+		int numBrokenCohesive;
+		//! number of contacts with this body
+		int numContacts;
+		//! average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)
+		Real normDmg;
+		//! plastic strain on contacts already deleted
+		Real epsPlBroken;
+		//! sum of plastic strains normalized by number of contacts
+		Real normEpsPl;
+		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl));
+		REGISTER_CLASS_AND_BASE(CpmMat,BodyMacroParameters);
 };
-REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
+REGISTER_SERIALIZABLE(CpmMat);
+
 
 /*! @brief representation of a single interaction of the CPM type: storage for relevant parameters.
  *
@@ -96,7 +136,7 @@ class CpmPhys: public NormalShearInteraction {
 		static long cummBetaIter, cummBetaCount;
 
 		/*! auxiliary variable for visualization, recalculated in Law2_Dem3DofGeom_CpmPhys_Cpm at every iteration */
-		// FIXME: Fn and Fs are stored as Vector3r normalForce, shearForce in NormalShearInteraction 
+		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormalShearInteraction 
 		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r epsT, sigmaT, Fs;
 
 
@@ -152,50 +192,6 @@ class CpmPhys: public NormalShearInteraction {
 };
 REGISTER_SERIALIZABLE(CpmPhys);
 
-/* This class holds information associated with each body */
-class CpmMat: public BodyMacroParameters {
-	public:
-		//! volumetric strain around this body
-		Real epsVolumetric;
-		//! number of (cohesive) contacts that damaged completely
-		int numBrokenCohesive;
-		//! number of contacts with this body
-		int numContacts;
-		//! average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)
-		Real normDmg;
-		//! plastic strain on contacts already deleted
-		Real epsPlBroken;
-		//! sum of plastic strains normalized by number of contacts
-		Real normEpsPl;
-		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl));
-		REGISTER_CLASS_AND_BASE(CpmMat,BodyMacroParameters);
-};
-REGISTER_SERIALIZABLE(CpmMat);
-
-class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
-	public:
-	/*! Damage evolution law */
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
-		if(kappaD<epsCrackOnset || neverDamage) return 0;
-		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
-	}
-		bool logStrain;
-		//! yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log
-		int yieldSurfType;
-		//! scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)
-		static Real yieldLogSpeed;
-		static Real yieldEllipseShift;
-		//! HACK: limit strain on some contacts by moving body #2 in the contact; only if refR1<0 (facet); deactivated if > 0
-		static Real minStrain_moveBody2;
-		Law2_Dem3DofGeom_CpmPhys_Cpm(): logStrain(false), yieldSurfType(0) { /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
-		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
-	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2));
-	DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
 /*! @brief Convert macroscopic properties to CpmPhys with corresponding parameters.
  *
@@ -248,6 +244,55 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 };
 REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 
+
+
+class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
+	public:
+	/*! Damage evolution law */
+	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
+		if(kappaD<epsCrackOnset || neverDamage) return 0;
+		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
+	}
+		bool logStrain;
+		//! yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log
+		int yieldSurfType;
+		//! scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)
+		static Real yieldLogSpeed;
+		static Real yieldEllipseShift;
+		//! HACK: limit strain on some contacts by moving body #2 in the contact; only if refR1<0 (facet); deactivated if > 0
+		static Real minStrain_moveBody2;
+		Law2_Dem3DofGeom_CpmPhys_Cpm(): logStrain(false), yieldSurfType(0) { /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
+		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+	FUNCTOR2D(Dem3DofGeom,CpmPhys);
+	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2));
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
+
+/* Engine encompassing several computations looping over all bodies/interactions
+ *
+ * * Compute and store unbalanced force over the whole simulation.
+ * * Compute and store volumetric strain for every body.
+ *
+ * May be extended in the future to compute global stiffness etc as well.
+ */
+class CpmGlobalCharacteristics: public PeriodicEngine{
+	public:
+		bool useMaxForce; // use maximum unbalanced force instead of mean unbalanced force
+		Real unbalancedForce;
+		void compute(MetaBody* rb, bool useMax=false);
+		virtual void action(MetaBody* rb){compute(rb,useMaxForce);}
+		CpmGlobalCharacteristics(){};
+	REGISTER_ATTRIBUTES(PeriodicEngine,
+		(unbalancedForce)
+		(useMaxForce)
+	);
+	DECLARE_LOGGER;
+	REGISTER_CLASS_AND_BASE(CpmGlobalCharacteristics,PeriodicEngine);
+};
+REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
+
 class GLDrawCpmPhys: public GLDrawInteractionPhysicsFunctor {
 	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 	virtual ~GLDrawCpmPhys() {};
@@ -260,6 +305,7 @@ class GLDrawCpmPhys: public GLDrawInteractionPhysicsFunctor {
 REGISTER_SERIALIZABLE(GLDrawCpmPhys);
 
 class CpmPhysDamageColorizer: public PeriodicEngine {
+	struct BodyStats{ short nCohLinks; Real dmgSum; Real epsPlSum; BodyStats(): nCohLinks(0), dmgSum(0), epsPlSum(0.){} };
 	public:
 		//! maximum damage over all contacts
 		Real maxOmega;

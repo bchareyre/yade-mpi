@@ -25,7 +25,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'ThreadWorker.cpp',
 			'TimeStepper.cpp',
 			'yade.cpp',
-			'yadeExceptions.cpp',
 			'containers/BodyRedirectionVector.cpp',
 			'containers/BodyAssocVector.cpp',
 			'containers/InteractionHashMap.cpp',

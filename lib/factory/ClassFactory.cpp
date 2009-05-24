@@ -14,11 +14,6 @@
 
 class Factorable;
 
-void ClassFactory::addBaseDirectory(const string& dir)
-{
-	dlm.addBaseDirectory(dir);
-}
-
 bool ClassFactory::registerFactorable( std::string name 			   , CreateFactorableFnPtr create,
 					 CreateSharedFactorableFnPtr createShared, CreatePureCustomFnPtr createPureCustom)
 {
@@ -49,7 +44,7 @@ shared_ptr<Factorable> ClassFactory::createShared( std::string name )
 	FactorableCreatorsMap::const_iterator i = map.find( name );
 	if( i == map.end() )
 	{
-		dlm.loadFromDirectoryList(name);
+		dlm.load(name);
 		if (dlm.isLoaded(name))
 		{
 			if( map.find( name ) == map.end() )
@@ -76,7 +71,7 @@ Factorable* ClassFactory::createPure( std::string name )
 	if( i == map.end() )
 	{
 		//cerr << "------------ going to load something" << endl;
-		dlm.loadFromDirectoryList(name);
+		dlm.load(name);
 		if (dlm.isLoaded(name))
 		{
 			if( map.find( name ) == map.end() )
@@ -105,7 +100,7 @@ void * ClassFactory::createPureCustom( std::string name )
 
 bool ClassFactory::load(const string& name)
 {
-        return dlm.loadFromDirectoryList(name);
+        return dlm.load(name);
 }
 
 string ClassFactory::lastError()

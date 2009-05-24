@@ -36,8 +36,6 @@ class DynLibManager
 		#else	
 		std::map<const std::string, void *> handles;
 		#endif
-
-		vector<string> baseDirs;
 		bool autoUnload;
 
 	public :
@@ -45,8 +43,9 @@ class DynLibManager
 		~DynLibManager ();
 		void addBaseDirectory(const std::string& dir);
 
-		bool load (const std::string& libName, const std::string& libName2);
-		bool loadFromDirectoryList (const std::string& fullLibName);
+		bool load(const std::string& libName, const std::string& libName2);
+		bool load(const std::string& pluginName){return load(libNameToSystemName(pluginName),pluginName);}
+
 
 		bool unload (const string libName);
 		bool isLoaded (const string libName);
@@ -55,7 +54,6 @@ class DynLibManager
 
 		string libNameToSystemName(const string& name);
 		string systemNameToLibName(const string& name);
-		string findLibDir(const string& name);
 		string lastError();
 		DECLARE_LOGGER;
 

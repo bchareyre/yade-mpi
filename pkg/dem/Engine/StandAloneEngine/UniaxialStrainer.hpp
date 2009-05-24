@@ -4,39 +4,11 @@
 #include<limits>
 #include<yade/extra/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
-#include<yade/core/DeusExMachina.hpp>
+#include<yade/core/StandAloneEngine.hpp>
 
 #ifndef FOREACH
 #define FOREACH BOOST_FOREACH
 #endif
-
-class USCTGen: public FileGenerator {
-	private:
-		void createEngines();
-	public:
-		USCTGen(){ axis=1; limitStrain=0; damping=0.2;cohesiveThresholdIter=200;};
-		~USCTGen (){};
-		bool generate();
-		string spheresFile;
-		Real strainRate, limitStrain, damping;
-		int axis;
-		long cohesiveThresholdIter;
-	protected :
-		void registerAttributes(){
-			FileGenerator::registerAttributes();
-			REGISTER_ATTRIBUTE(spheresFile);
-			REGISTER_ATTRIBUTE(axis);
-			REGISTER_ATTRIBUTE(strainRate);
-			REGISTER_ATTRIBUTE(limitStrain);
-			REGISTER_ATTRIBUTE(damping);
-			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
-		}
-	REGISTER_CLASS_NAME(USCTGen);
-	REGISTER_BASE_CLASS_NAME(FileGenerator);
-	DECLARE_LOGGER;
-};
-REGISTER_SERIALIZABLE(USCTGen);
-
 
 /*! Axial displacing two groups of bodies in the opposite direction with given strain rate.
  *
@@ -44,13 +16,12 @@ REGISTER_SERIALIZABLE(USCTGen);
  *
  * This engine should be run once forces on particles have been computed.
  */
-class UniaxialStrainer: public DeusExMachina {
+class UniaxialStrainer: public StandAloneEngine {
 	private:
 		MetaBody* rootBody;
-		bool idInVector(body_id_t id, const vector<body_id_t>& V){for(size_t i=0; i<V.size(); i++){ if(V[i]==id) return true; }	return false; }  // unused now
-		void computeAxialForce();
-
 		bool needsInit;
+
+		void computeAxialForce();
 		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->physicalParameters->se3.position[axis]; };
 		void init();
 	public:
@@ -93,30 +64,13 @@ class UniaxialStrainer: public DeusExMachina {
 		vector<body_id_t> posIds, negIds;
 		/** coordinates of pos/neg bodies in the direction of axis */
 		vector<Real> posCoords,negCoords;
-		#if 0
-		void pushTransStrainSensors(MetaBody* rb, vector<Real>& widths);
-		void setupTransStrainSensors();
-		Real transStrainSensorArea;
-		//! Pointer to ForceEngine that is used for transStrainSensors
-		shared_ptr<UniaxialStrainSensorPusher> sensorsPusher;
-		/** Bodies that act as transversal strain sensors;
-		 * they should have very little mass (light force is applied on them)
-		 * to accurately copy strain of the underlying specimen.
-		 *
-		 * They should be spacially _inside_ the speciment at the beginning (since MetaBody AABB is used
-		 * to calculate crossSection. UniaxialStrainer::init will resize and displace them as needed.
-		 * */
-		vector<body_id_t> transStrainSensors;
-		Real avgTransStrain;
-		#endif
-
 		//! Auxiliary vars (serializable, for recording)
 		Real strain, avgStress;
 
-		virtual void applyCondition(MetaBody* rootBody);
+		virtual void action(MetaBody*);
 		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; strain=avgStress=0; blockRotations=false; blockDisplacements=false; setSpeeds=false; strainRate=absSpeed=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; initAccelTime=-200;};
 		virtual ~UniaxialStrainer(){};
-		REGISTER_ATTRIBUTES(DeusExMachina,
+		REGISTER_ATTRIBUTES(StandAloneEngine,
 				(strainRate) 
 				(absSpeed)
 				(initAccelTime)
@@ -138,7 +92,7 @@ class UniaxialStrainer: public DeusExMachina {
 				(blockRotations) 
 				(setSpeeds)
 		);
-	REGISTER_CLASS_AND_BASE(UniaxialStrainer,DeusExMachina);
+	REGISTER_CLASS_AND_BASE(UniaxialStrainer,StandAloneEngine);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(UniaxialStrainer);

@@ -9,11 +9,9 @@
 *************************************************************************/
 
 #include"Omega.hpp"
-#include"yadeExceptions.hpp"
 #include"MetaBody.hpp"
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
-#include"Preferences.hpp"
 #include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -23,6 +21,7 @@
 #include<cstdlib>
 #include<boost/filesystem/operations.hpp>
 #include<boost/filesystem/convenience.hpp>
+#include<boost/filesystem/exception.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
 #include<boost/version.hpp>
@@ -164,36 +163,33 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
 
-void Omega::scanPlugins(){
-	FOREACH(string dld,preferences->dynlibDirectories) ClassFactory::instance().addBaseDirectory(dld);
-	vector<string> dynlibsList;
-	FOREACH(string si, preferences->dynlibDirectories){
-		filesystem::path directory(si);
-		if(!filesystem::exists(directory)){LOG_ERROR("Nonexistent plugin directory: "<<directory.native_directory_string()<<".");continue; }
-		filesystem::directory_iterator di(directory),diEnd;
-		FOREACH(filesystem::path pth,std::make_pair(di,diEnd)){
-			// node is not a directory and is either regular file or non-dangling symlink; and extension is not ".a"; AND moreover transforming it to library name and back to filename is identity; otherwise the file wouldn't be loaded by the DynLibManager anyway
-			if (!filesystem::is_directory(*di) && filesystem::exists(*di) && filesystem::extension(*di)!=".a" &&
-				ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(pth)))==(pth.leaf())){
-				filesystem::path name(filesystem::basename(pth));
-				if(name.leaf().length()<1) continue; // filter out 0-length filenames
-				string plugin=name.leaf();
-				if(!ClassFactory::instance().load(ClassFactory::instance().systemNameToLibName(plugin))){
-					string err=ClassFactory::instance().lastError();
-					if(err.find(": undefined symbol: ")!=std::string::npos){
-						size_t pos=err.rfind(":");	assert(pos!=std::string::npos);
-						std::string sym(err,pos+2); //2 removes ": " from the beginning
-						int status=0; char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
-						LOG_FATAL(plugin<<": undefined symbol `"<<demangled_sym<<"'"); LOG_FATAL(plugin<<": "<<err); LOG_FATAL("Bailing out.");
-					}
-					else {
-						LOG_FATAL(plugin<<": "<<err<<" ."); /* leave space to not to confuse c++filt */ LOG_FATAL("Bailing out.");
-					}
-					abort();
+void Omega::scanPlugins(string baseDir){
+	try{
+		filesystem::recursive_directory_iterator Iend;
+		for(filesystem::recursive_directory_iterator I(baseDir); I!=Iend; ++I){ 
+			filesystem::path pth=I->path();
+			if(filesystem::is_directory(pth) || ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(pth)))!=(pth.leaf())){ LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<"."); continue; }
+			LOG_DEBUG("Trying "<<pth.leaf());
+			filesystem::path name(filesystem::basename(pth));
+			if(name.leaf().length()<1) continue; // filter out 0-length filenames
+			string plugin=name.leaf();
+			if(!ClassFactory::instance().load(ClassFactory::instance().systemNameToLibName(plugin))){
+				string err=ClassFactory::instance().lastError();
+				if(err.find(": undefined symbol: ")!=std::string::npos){
+					size_t pos=err.rfind(":");	assert(pos!=std::string::npos);
+					std::string sym(err,pos+2); //2 removes ": " from the beginning
+					int status=0; char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
+					LOG_FATAL(plugin<<": undefined symbol `"<<demangled_sym<<"'"); LOG_FATAL(plugin<<": "<<err); LOG_FATAL("Bailing out.");
 				}
+				else {
+					LOG_FATAL(plugin<<": "<<err<<" ."); /* leave space to not to confuse c++filt */ LOG_FATAL("Bailing out.");
+				}
+				abort();
 			}
-			else LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<".");
 		}
+	} catch(filesystem::basic_filesystem_error<filesystem::path>& e) {
+		LOG_FATAL("Error from recursive plugin directory scan (unreadable directory?): "<<e.what());
+		throw;
 	}
 	list<string>& plugins(ClassFactory::instance().pluginClasses);
 	plugins.sort(); plugins.unique();
@@ -205,6 +201,7 @@ void Omega::loadSimulationFromStream(std::istream& stream){
 	resetRootBody();
 	IOFormatManager::loadFromStream("XMLFormatManager",stream,"rootBody",rootBody);
 }
+
 void Omega::saveSimulationToStream(std::ostream& stream){
 	LOG_DEBUG("Saving simulation to stream.");
 	IOFormatManager::saveToStream("XMLFormatManager",stream,"rootBody",rootBody);
@@ -212,8 +209,8 @@ void Omega::saveSimulationToStream(std::ostream& stream){
 
 void Omega::loadSimulation(){
 
-	if(Omega::instance().getSimulationFileName().size()==0) throw yadeBadFile("Simulation filename to load has zero length");
-	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw yadeBadFile((std::string("Simulation file to load doesn't exist")+simulationFileName).c_str());
+	if(Omega::instance().getSimulationFileName().size()==0) throw runtime_error("Empty simulation filename to load.");
+	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw runtime_error("Simulation file to load doesn't exist: "+simulationFileName);
 	
 	LOG_INFO("Loading file " + simulationFileName);
 
@@ -229,16 +226,16 @@ void Omega::loadSimulation(){
 			RenderMutexLock lock; IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
 		}
 		else if(algorithm::starts_with(simulationFileName,":memory:")){
-			if(memSavedSimulations.count(simulationFileName)==0) throw yadeBadFile(("Cannot load nonexistent memory-saved simulation "+simulationFileName).c_str());
+			if(memSavedSimulations.count(simulationFileName)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+simulationFileName);
 			istringstream iss(memSavedSimulations[simulationFileName]);
 			joinSimulationLoop();
 			resetRootBody();
 			RenderMutexLock lock; IOFormatManager::loadFromStream("XMLFormatManager",iss,"rootBody",rootBody);
 		}
-		else throw (yadeBadFile("Extension of file not recognized."));
+		else throw runtime_error("Extension of file to load not recognized "+simulationFileName);
 	}
 
-	if( rootBody->getClassName() != "MetaBody") throw yadeBadFile("Wrong file format (rootBody is not a MetaBody!) ??");
+	if( rootBody->getClassName() != "MetaBody") throw runtime_error("Wrong file format (rootBody is not a MetaBody!?) in "+simulationFileName);
 
 	timeInit();
 
@@ -249,7 +246,7 @@ void Omega::loadSimulation(){
 
 void Omega::saveSimulation(const string name)
 {
-	if(name.size()==0) throw yadeBadFile("Filename with zero length.");
+	if(name.size()==0) throw runtime_error("Name of file to save has zero length.");
 	LOG_INFO("Saving file " << name);
 
 	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.bz2")){
@@ -267,7 +264,7 @@ void Omega::saveSimulation(const string name)
 		memSavedSimulations[name]=oss.str();
 	}
 	else {
-		throw(yadeBadFile(("Filename extension not recognized in `"+name+"'").c_str()));
+		throw runtime_error("Filename extension not recognized in `"+name+"'");
 	}
 }
 

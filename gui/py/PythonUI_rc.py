@@ -34,20 +34,22 @@ for root in ['StandAloneEngine','DeusExMachina','EngineUnit1D','EngineUnit2D','G
 	for p in listChildClassesRecursive(root):
 		class argStorage:
 			def __init__(self,_root,_class): self._root,self._class=_root,_class
-			def wrap(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
-		if root=='MetaEngine': _dd[p]=argStorage(root2,p).wrap
+			def __call__(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
+		if root=='MetaEngine': _dd[p]=argStorage(root2,p)
 		else:                  _dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,kw) # eval(root2)(p,kw)
 ### end wrappers
 
 #### HANDLE RENAMED CLASSES ####
+# if old class name is used, the new object is constructed and a warning is issued about old name being used
 renamed={
+	# renamed 23.5.2009, may be removed in a few months
 	'BrefcomMakeContact':'Ip2_CpmMat_CpmMat_CpmPhys',
 	'BrefcomContact':'CpmPhys',
 	'BrefcomPhysParams':'CpmMat',
 	'ef2_Spheres_Brefcom_BrefcomLaw':'Law2_Dem3DofGeom_CpmPhys_Cpm',
 	'GLDrawBrefcomContact':'GLDrawCpmPhys',
 	'BrefcomDamageColorizer':'CpmPhysDamageColorizer',
-	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics'
+	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics',
 }
 
 for oldName in renamed:

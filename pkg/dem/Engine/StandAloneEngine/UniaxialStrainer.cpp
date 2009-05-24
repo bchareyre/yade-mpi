@@ -1,15 +1,12 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
-#include"UniaxialStrainControlledTest.hpp"
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/AABB.hpp>
-#include<yade/extra/Brefcom.hpp>
+#include"UniaxialStrainer.hpp"
 #include<boost/foreach.hpp>
 
 #include<yade/core/InteractionContainer.hpp>
+#include<yade/pkg-common/ParticleParameters.hpp>
+#include<yade/pkg-common/AABB.hpp>
 
-YADE_PLUGIN("USCTGen","UniaxialStrainer" /*,"UniaxialStrainSensorPusher"*/ );
+YADE_PLUGIN("UniaxialStrainer");
 
 /************************ UniaxialStrainer **********************/
 CREATE_LOGGER(UniaxialStrainer);
@@ -75,6 +72,7 @@ void UniaxialStrainer::init(){
 			default: LOG_FATAL("Unknown asymmetry value "<<asymmetry<<" (should be -1,0,1)"); throw;
 		}
 		assert(p1>p0);
+		// set speeds for particles on the boundary
 		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 			// skip bodies on the boundary, since those will have their positions updated directly
 			if(std::find(posIds.begin(),posIds.end(),b->id)!=posIds.end() || std::find(negIds.begin(),negIds.end(),b->id)!=negIds.end()) { continue; }
@@ -109,7 +107,7 @@ void UniaxialStrainer::init(){
 	assert(crossSectionArea>0);
 }
 
-void UniaxialStrainer::applyCondition(MetaBody* _rootBody){
+void UniaxialStrainer::action(MetaBody* _rootBody){
 	rootBody=_rootBody;
 	if(needsInit) init();
 	// postconditions for initParams
@@ -163,159 +161,4 @@ void UniaxialStrainer::computeAxialForce(){
 	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
 	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->bex.getForce(id)[axis];
 }
-
-/***************************************** USCTGen **************************/
-CREATE_LOGGER(USCTGen);
-
-
-bool USCTGen::generate(){
-	message="";
-	rootBody=Shop::rootBody();
-	//Shop::rootBodyActors(rootBody);
-	createEngines();
-	shared_ptr<UniaxialStrainer> strainer(new UniaxialStrainer);
-	rootBody->engines.push_back(strainer); // updating params later
-	strainer->strainRate=strainRate;
-	strainer->axis=axis;
-	strainer->limitStrain=limitStrain;
-	
-	// load spheres
-	Vector3r minXYZ,maxXYZ;
-	typedef vector<pair<Vector3r,Real> > vecVecReal;
-
-	vecVecReal spheres;
-	if(spheresFile.empty()){ 
-		LOG_INFO("spheresFile empty, loading hardwired Shop::smallSdecXyzData (examples/small.sdec.xyz).");
-		spheres=Shop::loadSpheresSmallSdecXyz(minXYZ,maxXYZ);
-	}
-	else spheres=Shop::loadSpheresFromFile(spheresFile,minXYZ,maxXYZ);
-
-
-	TRVAR2(minXYZ,maxXYZ);
-	// get spheres that are "close enough" to the strained ends
-	for(vecVecReal::iterator I=spheres.begin(); I!=spheres.end(); I++){
-		Vector3r C=I->first;
-		Real r=I->second;
-		shared_ptr<Body> S=Shop::sphere(C,r);
-
-		// replace BodyMacroParameters by CpmMat
-		shared_ptr<BodyMacroParameters> bmp=YADE_PTR_CAST<BodyMacroParameters>(S->physicalParameters);
-		shared_ptr<CpmMat> bpp(new CpmMat);
-		#define _CP(attr) bpp->attr=bmp->attr;
-		_CP(acceleration); _CP(angularVelocity); _CP(blockedDOFs); _CP(frictionAngle); _CP(inertia); _CP(mass); _CP(poisson); _CP(refSe3); _CP(se3); _CP(young); _CP(velocity);
-		#undef _CP
-		S->physicalParameters=bpp;
-
-		body_id_t sId=rootBody->bodies->insert(S);
-
-		Real distFactor=1.2;
-		if (C[axis]-distFactor*r<minXYZ[axis]) {
-			strainer->negIds.push_back(sId);
-			strainer->negCoords.push_back(C[axis]);
-			LOG_DEBUG("NEG inserted #"<<sId<<" with C[axis]="<<C[axis]);
-		}
-		if (C[axis]+distFactor*r>maxXYZ[axis]) {
-			strainer->posIds.push_back(sId);
-			strainer->posCoords.push_back(C[axis]);
-			LOG_DEBUG("POS inserted #"<<sId<<" with C[axis]="<<C[axis]);
-		}
-	}
-
-	return true;
-}
-
-#include<yade/extra/Brefcom.hpp>
-
-#include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/core/MetaBody.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
-#include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/InteractingSphere2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
-#include<yade/pkg-common/NewtonsForceLaw.hpp>
-#include<yade/pkg-common/NewtonsMomentumLaw.hpp>
-#include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
-#include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
-#include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
-
-
-
-void USCTGen::createEngines(){
-	rootBody->initializers.clear();
-
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-		boundingVolumeDispatcher->add(new InteractingSphere2AABB);
-		boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
-		rootBody->initializers.push_back(boundingVolumeDispatcher);
-
-	rootBody->engines.clear();
-
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);
-
-	shared_ptr<PersistentSAPCollider> collider(new PersistentSAPCollider);
-		collider->haveDistantTransient=true;
-		rootBody->engines.push_back(collider);
-
-	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
-		igeomDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-		rootBody->engines.push_back(igeomDispatcher);
-
-	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
-		shared_ptr<Ip2_CpmMat_CpmMat_CpmPhys> bmc(new Ip2_CpmMat_CpmMat_CpmPhys);
-		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
-		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1;bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
-		iphysDispatcher->add(bmc);
-	rootBody->engines.push_back(iphysDispatcher);
-
-	shared_ptr<ConstitutiveLawDispatcher> clDisp(new ConstitutiveLawDispatcher);
-		clDisp->add(shared_ptr<ConstitutiveLaw>(new Law2_Dem3DofGeom_CpmPhys_Cpm));
-	rootBody->engines.push_back(clDisp);
-
-
-	shared_ptr<PhysicalActionDamper> dampingDispatcher(new PhysicalActionDamper);
-		shared_ptr<CundallNonViscousForceDamping> forceDamper(new CundallNonViscousForceDamping);
-		forceDamper->damping = damping;
-		dampingDispatcher->add(forceDamper); //"Force","ParticleParameters","CundallNonViscousForceDamping",actionForceDamping);
-		shared_ptr<CundallNonViscousMomentumDamping> momentumDamper(new CundallNonViscousMomentumDamping);
-		momentumDamper->damping = damping;
-		dampingDispatcher->add(momentumDamper); // "Momentum","RigidBodyParameters","CundallNonViscousMomentumDamping",actionMomentumDamping);
-		rootBody->engines.push_back(dampingDispatcher);
-
-
-
-	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-		applyActionDispatcher->add(new NewtonsForceLaw);
-		applyActionDispatcher->add(new NewtonsMomentumLaw);
-		rootBody->engines.push_back(applyActionDispatcher);
-
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-		positionIntegrator->add(new LeapFrogPositionIntegrator); //DISPATCHER_ADD2(ParticleParameters,LeapFrogPositionIntegrator);
-		rootBody->engines.push_back(positionIntegrator);
-
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-		orientationIntegrator->add(new LeapFrogOrientationIntegrator);
-		rootBody->engines.push_back(orientationIntegrator);
-
-	rootBody->engines.push_back(shared_ptr<CpmPhysDamageColorizer>(new CpmPhysDamageColorizer));
-
-}
-
-
 

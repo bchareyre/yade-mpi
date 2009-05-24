@@ -8,9 +8,5 @@
 
 #include "Preferences.hpp"
 
-
-Preferences::Preferences ()
-{
-	version = 1;
-}
+Preferences::Preferences (){}
 

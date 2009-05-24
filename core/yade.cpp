@@ -99,19 +99,11 @@ sigHandler(int sig){
 
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
-	const char* libDirs[]={"extra","gui","lib","pkg-common","pkg-dem","pkg-fem","pkg-snow","pkg-lattice","pkg-mass-spring","pkg-realtime-rigidbody",NULL /* sentinel */};
 	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
-	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Please tune by hand if needed.");
-	string expLibDir;
-	for(int i=0; libDirs[i]!=NULL; i++) {
-		expLibDir=string(PREFIX "/lib/yade" SUFFIX "/") + libDirs[i];
-		if(!filesystem::exists(expLibDir)) continue; // skip modules that were not built/installed
-		LOG_INFO("Adding plugin directory "<<expLibDir<<".");
-		pref->dynlibDirectories.push_back(expLibDir);
-	}
+	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Tune by hand if needed.");
 	LOG_INFO("Setting GUI: QtGUI.");
 	pref->defaultGUILibName="QtGUI";
-	IOFormatManager::saveToFile("XMLFormatManager",Omega::instance().yadeConfigPath+"/preferences.xml","preferences",pref);
+	IOFormatManager::saveToFile("XMLFormatManager",cfgFile,"preferences",pref);
 }
 
 string findRecoveryCandidate(filesystem::path dir, string start){
@@ -257,7 +249,7 @@ int main(int argc, char *argv[])
 	
 	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins();
+	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX));
 	Omega::instance().init();
 
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";

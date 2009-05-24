@@ -21,7 +21,6 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <unistd.h>
-#include<yade/core/yadeExceptions.hpp>
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<boost/foreach.hpp>
@@ -242,7 +241,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			pbResetSimulation->setDisabled(true);
 			pbOneSimulationStep->setDisabled(true);
 		}
-		catch(yadeError& e)
+		catch(std::runtime_error& e)
 		{
 			Omega::instance().resetRootBody();
 			Omega::instance().setSimulationFileName("");

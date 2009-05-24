@@ -19,7 +19,6 @@
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
-#include<yade/core/yadeExceptions.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
@@ -118,7 +117,7 @@ bool HydraulicTest::generate()
 		{
 			message="Error: cannot load the file that should contain spheres"; return false;
 		}
-		catch ( yadeError& e )
+		catch ( std::runtime_error& e )
 		{
 			message="Error: cannot load the file that should contain spheres"; return false;
 		}

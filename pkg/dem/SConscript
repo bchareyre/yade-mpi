@@ -25,6 +25,15 @@ if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a
 				'CGAL'])
 		])
 
+cpmModel='../brefcom-mm.hh'
+if os.path.exists('../../'+cpmModel):
+	print "Will include local file "+cpmModel
+	cpmInclude=['-include',cpmModel]
+	Depends('ConcretePM.cpp','../../../brefcom-mm.hh')
+else:
+	cpmInclude=['']
+
+
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	
 	env.SharedLibrary('DemXDofGeom',['DataClass/InteractionGeometry/DemXDofGeom.cpp']),
@@ -33,11 +42,19 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('FacetTopologyAnalyzer',['Engine/StandAloneEngine/FacetTopologyAnalyzer.cpp'],LIBS=env['LIBS']+['InteractingFacet']),
 
+	env.SharedLibrary('UniaxialStrainer',['Engine/StandAloneEngine/UniaxialStrainer.cpp'],LIBS=env['LIBS']+['ParticleParameters','AABB']),
+
+	env.SharedLibrary('ConcretePM',['ConcretePM.cpp'],CXXFLAGS=env['CXXFLAGS']+cpmInclude,LIBS=env['LIBS']+['Shop','DemXDofGeom']),
+
 	env.SharedLibrary('Clump',['DataClass/Clump.cpp'],LIBS=env['LIBS']+['Shop']),
 
 	env.SharedLibrary('SQLiteRecorder',
 		['Engine/StandAloneEngine/SQLiteRecorder.cpp'],
 		LIBS=env['LIBS']+['sqlite3x']),
+
+	env.SharedLibrary('SimpleScene',['PreProcessor/SimpleScene.cpp'],LIBS=env['LIBS']+['Shop','SimpleElasticRelationships']),
+
+	env.SharedLibrary('UniaxialStrainerGen',['PreProcessor/UniaxialStrainerGen.cpp'],LIBS=env['LIBS']+['Shop','ConstitutiveLawDispatcher','ConcretePM','Dem3DofGeom_SphereSphere','NewtonsDampedLaw','UniaxialStrainer']),
 
 	env.SharedLibrary('InteractingMyTetrahedron',
 		['DataClass/InteractingGeometry/InteractingMyTetrahedron.cpp']),
