@@ -377,7 +377,7 @@ instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x.replace('/','-')) for 
 # directory for yade-$version.pc
 pcDir=os.path.join('$PREFIX','lib','pkgconfig')
 # will install in the following dirs (needed?)
-instDirs=[os.path.join('$PREFIX','bin')]+instLibDirs+[pcDir]
+instDirs=[os.path.join('$PREFIX','bin')]+instLibDirs # +[pcDir]
 # where are we going to be run - may be different (packaging)
 runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x.replace('/','-')) for x in libDirs]
 
@@ -436,20 +436,6 @@ env.Append(RPATH=runtimeLibDirs)
 env.Append(LIBPATH=instLibDirs) # this is if we link to libs that are installed, which is the case now
 
 
-### this workaround is only needed for scons<=0.96.92, will disappear soon
-###  (env.Install method chokes on no-existing directories)
-if sconsVersion<=9692:
-	## should reside in prepareIncludes or sth similar
-	def createDirs(dirList):
-		for d in dirList:
-			dd=env.subst(d) #d.replace('$PREFIX',env['PREFIX'])
-			if not os.path.exists(dd):
-				print dd
-				os.makedirs(dd)
-			elif not os.path.isdir(dd): raise OSError("Installation directory `%s' is a file?!"%dd)
-	createDirs(instDirs)
-	#createDirs(instIncludeDirs)
-	
 def installHeaders(prefix=None):
 	"""symlink all in-tree headers into  some include directory so that we can build before headers are installed.
 	If prefix is given, headers will be copied there.
@@ -537,6 +523,7 @@ if not env.GetOption('clean'):
 		installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
 		makePkgConfig('$buildDir/yade${SUFFIX}.pc')
 		env.Install(pcDir,'$buildDir/yade${SUFFIX}.pc')
+		#  add pcDir to instDirs if you install pkg-config stuff at some point
 	if not env['haveForeach']:
 		boostDir=buildDir+'/include/yade-'+env['version']+'/boost'
 		foreachLink=boostDir+'/foreach.hpp'
@@ -546,7 +533,7 @@ if not env.GetOption('clean'):
 			if lexists(foreachLink): os.remove(foreachLink) # broken symlink: remove it
 			os.symlink(relpath(foreachLink,foreachTarget),foreachLink)
 		env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
-	installAlias=env.Alias('install',instDirs) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install); include pkgconfig stuff
+	installAlias=env.Alias('install',instDirs) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
 	env.Default([installAlias,'$PREFIX'])
 
 env.Export('env');
