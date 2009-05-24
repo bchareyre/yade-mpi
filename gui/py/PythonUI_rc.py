@@ -39,6 +39,17 @@ for root in ['StandAloneEngine','DeusExMachina','EngineUnit1D','EngineUnit2D','G
 		else:                  _dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,kw) # eval(root2)(p,kw)
 ### end wrappers
 
+#### HANDLE RENAMED CLASSES ####
+renamed={'ef2_Spheres_Brefcom_BrefcomLaw':'ef2_Dem3Dof_Cpm_Cpm'}
+for oldName in renamed:
+	class warnWrap:
+		def __init__(self,_old,_new): self.old,self.new=_old,_new
+		def __call__(self,*args):
+			import warnings; warnings.warn("Class `%s' was renamed to `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
+			return _dd[self.new](*args)
+	_dd[oldName]=warnWrap(oldName,renamed[oldName])
+
+
 
 
 # python2.4 workaround (so that quit() works as it does in 2.5)

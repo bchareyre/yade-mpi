@@ -24,15 +24,10 @@ class InsertionSortCollider: public Collider{
 		//! id of the body this bound belongs to
 		body_id_t id;
 		//! is it the minimum (true) or maximum (false) bound?
-		char type;
-		Bound(Real coord_, body_id_t id_, char type_): coord(coord_), id(id_), type(type_){}
+		struct{ unsigned hasBB:1; unsigned isMin:1; } flags;
+		Bound(Real coord_, body_id_t id_, bool isMin): coord(coord_), id(id_){ flags.isMin=isMin; }
 		bool operator<(const Bound& b) const {return coord<b.coord;}
 		bool operator>(const Bound& b) const {return coord>b.coord;}
-		enum { FLAG_MIN=1, FLAG_BB=2 };
-		inline bool hasBB() const {return type&FLAG_BB;}
-		inline bool isMin() const {return type&FLAG_MIN;}
-		inline void setBB(){type|=FLAG_BB;}
-		inline void setNoBB(){type&=type^FLAG_BB;}
 	};
 	//! storage for bounds
 	std::vector<Bound> XX,YY,ZZ;
