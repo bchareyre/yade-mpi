@@ -7,20 +7,18 @@
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 
+YADE_PLUGIN("Ip2_CpmMat_CpmMat_CpmPhys","CpmPhys","GLDrawCpmPhys","CpmPhysDamageColorizer", "CpmMat", "CpmGlobalCharacteristics", "Law2_Dem3DofGeom_CpmPhys_Cpm");
 
+CREATE_LOGGER(CpmGlobalCharacteristics);
 
-YADE_PLUGIN("BrefcomMakeContact","BrefcomContact"/*,"BrefcomLaw"*/,"GLDrawBrefcomContact","BrefcomDamageColorizer", "BrefcomPhysParams", "BrefcomGlobalCharacteristics", "ef2_Spheres_Brefcom_BrefcomLaw" /* ,"BrefcomStiffnessComputer"*/ );
-
-CREATE_LOGGER(BrefcomGlobalCharacteristics);
-
-void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
+void CpmGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	rb->bex.sync();
 
 	// 1. reset volumetric strain (cummulative in the next loop)
 	// 2. get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-	BrefcomPhysParams* bpp(YADE_CAST<BrefcomPhysParams*>(b->physicalParameters.get()));
+	CpmMat* bpp(YADE_CAST<CpmMat*>(b->physicalParameters.get()));
 		bpp->epsVolumetric=0;
 		bpp->numContacts=0;
 		currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
@@ -32,10 +30,10 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	Real maxContactF=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal) continue;
-		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
+		shared_ptr<CpmPhys> BC=YADE_PTR_CAST<CpmPhys>(I->interactionPhysics); assert(BC);
 		maxContactF=max(maxContactF,max(BC->Fn,BC->Fs.Length()));
-		BrefcomPhysParams* bpp1(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId1())->physicalParameters.get()));
-		BrefcomPhysParams* bpp2(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId2())->physicalParameters.get()));
+		CpmMat* bpp1(YADE_CAST<CpmMat*>(Body::byId(I->getId1())->physicalParameters.get()));
+		CpmMat* bpp2(YADE_CAST<CpmMat*>(Body::byId(I->getId2())->physicalParameters.get()));
 		bpp1->epsVolumetric+=BC->epsN; bpp1->numContacts+=1;
 		bpp2->epsVolumetric+=BC->epsN; bpp2->numContacts+=1;
 	}
@@ -43,9 +41,9 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal) continue;
-		shared_ptr<BrefcomContact> BC=YADE_PTR_CAST<BrefcomContact>(I->interactionPhysics); assert(BC);
-		BrefcomPhysParams* bpp1(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId1())->physicalParameters.get()));
-		BrefcomPhysParams* bpp2(YADE_CAST<BrefcomPhysParams*>(Body::byId(I->getId2())->physicalParameters.get()));
+		shared_ptr<CpmPhys> BC=YADE_PTR_CAST<CpmPhys>(I->interactionPhysics); assert(BC);
+		CpmMat* bpp1(YADE_CAST<CpmMat*>(Body::byId(I->getId1())->physicalParameters.get()));
+		CpmMat* bpp2(YADE_CAST<CpmMat*>(Body::byId(I->getId2())->physicalParameters.get()));
 		Real epsVolAvg=.5*((3./bpp1->numContacts)*bpp1->epsVolumetric+(3./bpp2->numContacts)*bpp2->epsVolumetric);
 		BC->epsTrans=(epsVolAvg-BC->epsN)/2.;
 		//TRVAR5(I->getId1(),I->getId2(),BC->epsTrans,(3./bpp1->numContacts)*bpp1->epsVolumetric,(3./bpp2->numContacts)*bpp2->epsVolumetric);
@@ -53,7 +51,7 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	}
 	#if 0
 		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-			BrefcomPhysParams* bpp(YADE_PTR_CAST<BrefcomPhysParams>(b->physicalParameters.get()));
+			CpmMat* bpp(YADE_PTR_CAST<CpmMat>(b->physicalParameters.get()));
 			bpp->epsVolumeric*=3/bpp->numContacts;
 		}
 	#endif
@@ -62,11 +60,11 @@ void BrefcomGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 }
 
 
-/********************** BrefcomMakeContact ****************************/
-CREATE_LOGGER(BrefcomMakeContact);
+/********************** Ip2_CpmMat_CpmMat_CpmPhys ****************************/
+CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 
 
-void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
+void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
 
 	assert(contGeom); // for now, don't handle anything other than SpheresContactGeometry and Dem3DofGeom
@@ -87,7 +85,7 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 		if(!neverDamage) { assert(!isnan(sigmaT)); }
 
-		shared_ptr<BrefcomContact> contPhys(new BrefcomContact());
+		shared_ptr<CpmPhys> contPhys(new CpmPhys());
 
 		contPhys->E=E12;
 		contPhys->G=E12*G_over_E;
@@ -117,17 +115,17 @@ void BrefcomMakeContact::go(const shared_ptr<PhysicalParameters>& pp1, const sha
 
 
 
-/********************** BrefcomContact ****************************/
-CREATE_LOGGER(BrefcomContact);
+/********************** CpmPhys ****************************/
+CREATE_LOGGER(CpmPhys);
 
 // !! at least one virtual function in the .cpp file
-BrefcomContact::~BrefcomContact(){};
+CpmPhys::~CpmPhys(){};
 
-CREATE_LOGGER(ef2_Spheres_Brefcom_BrefcomLaw);
+CREATE_LOGGER(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
-long BrefcomContact::cummBetaIter=0, BrefcomContact::cummBetaCount=0;
+long CpmPhys::cummBetaIter=0, CpmPhys::cummBetaCount=0;
 
-Real BrefcomContact::solveBeta(const Real c, const Real N){
+Real CpmPhys::solveBeta(const Real c, const Real N){
 	#ifdef YADE_DEBUG
 		cummBetaCount++;
 	#endif
@@ -145,10 +143,10 @@ Real BrefcomContact::solveBeta(const Real c, const Real N){
 		ret-=f/df;
 	}
 	LOG_FATAL("No convergence after "<<maxIter<<" iters; c="<<c<<", N="<<N<<", ret="<<ret<<", f="<<f);
-	throw runtime_error("ef2_Spheres_Brefcom_BrefcomLaw::solveBeta failed to converge.");
+	throw runtime_error("Law2_Dem3DofGeom_CpmPhys_Cpm::solveBeta failed to converge.");
 }
 
-Real BrefcomContact::computeDmgOverstress(Real dt){
+Real CpmPhys::computeDmgOverstress(Real dt){
 	if(dmgStrain>=epsN*omega){ // unloading, no viscous stress
 		dmgStrain=epsN*omega;
 		LOG_TRACE("Elastic/unloading, no viscous overstress");
@@ -163,7 +161,7 @@ Real BrefcomContact::computeDmgOverstress(Real dt){
 	return (epsN*omega-dmgStrain)*E;
 }
 
-Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt){
+Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt){
 	if(sigmaTNorm<sigmaTYield) return 1.;
 	Real c=undamagedCohesion*pow(plTau/(G*dt),plRateExp)*pow(sigmaTNorm-sigmaTYield,plRateExp-1.);
 	Real beta=solveBeta(c,plRateExp);
@@ -171,16 +169,16 @@ Real BrefcomContact::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYie
 	return 1.-exp(beta)*(1-sigmaTYield/sigmaTNorm);
 }
 
-Real ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2=1.; /* deactivated if > 0 */
-Real ef2_Spheres_Brefcom_BrefcomLaw::yieldLogSpeed=1.;
-Real ef2_Spheres_Brefcom_BrefcomLaw::yieldEllipseShift=0.;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2=1.; /* deactivated if > 0 */
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed=1.;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift=0.;
 
-void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
+void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	//timingDeltas->start();
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
-	BrefcomContact* BC=static_cast<BrefcomContact*>(_phys.get());
+	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
-	/* kept fully damaged contacts; note that normally the contact is deleted _after_ the BREFCOM_MATERIAL_MODEL,
+	/* kept fully damaged contacts; note that normally the contact is deleted _after_ the CPM_MATERIAL_MODEL,
 	 * i.e. if it is 1.0 here, omegaThreshold is >= 1.0 for sure.
 	 * &&'ing that just to make sure anyway ...
 	 */
@@ -190,8 +188,8 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(BC->omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
 	/* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& xiShear(BC->xiShear); */
 	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
-	const Real& yieldLogSpeed(ef2_Spheres_Brefcom_BrefcomLaw::yieldLogSpeed); const int& yieldSurfType(ef2_Spheres_Brefcom_BrefcomLaw::yieldSurfType);
-	const Real& yieldEllipseShift(ef2_Spheres_Brefcom_BrefcomLaw::yieldEllipseShift); 
+	const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
+	const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); 
 
 	#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); throw;}
 	
@@ -201,11 +199,13 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 	//timingDeltas->checkpoint("setup");
 	// if(contGeom->refR1<0) contGeom->refLength=contGeom->refR2; // make facet-sphere contact always at equilibrium when touching exactly (and not the initial distance)
 	epsN=contGeom->strainN(); epsT=contGeom->strainT();
-	if(isnan(epsN)){
-		LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
-		throw runtime_error("!! epsN==NaN !!");
-	}
-	NNAN(epsN); NNANV(epsT);
+	#ifdef YADE_DEBUG
+		if(isnan(epsN)){
+			LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
+			throw runtime_error("!! epsN==NaN !!");
+		}
+		NNAN(epsN); NNANV(epsT);
+	#endif
 	// already in SpheresContactGeometry:
 	// contGeom->relocateContactPoints(); // allow very large mutual rotations
 	if(logStrain && epsN<0){
@@ -217,17 +217,17 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 
 	epsN+=BC->isoPrestress/E;
 	//TRVAR1(epsN);
-	#ifdef BREFCOM_MATERIAL_MODEL
-		BREFCOM_MATERIAL_MODEL
+	#ifdef CPM_MATERIAL_MODEL
+		CPM_MATERIAL_MODEL
 	#else
 		sigmaN=E*epsN;
 		sigmaT=G*epsT;
 	#endif
 	sigmaN-=BC->isoPrestress;
-	if(contGeom->refR1<0 && ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2<=0 && epsN<ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2){
+	if(contGeom->refR1<0 && Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2<=0 && epsN<Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2){
 		/* move Body2 (the sphere) so that minStrain is satisfied */
-		rootBody->bex.addMove(I->getId2(),contGeom->normal*(ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2-epsN)*contGeom->refLength);
-		LOG_TRACE("Moving by "<<contGeom->normal*(ef2_Spheres_Brefcom_BrefcomLaw::minStrain_moveBody2-epsN)*contGeom->refLength);
+		rootBody->bex.addMove(I->getId2(),contGeom->normal*(Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2-epsN)*contGeom->refLength);
+		LOG_TRACE("Moving by "<<contGeom->normal*(Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2-epsN)*contGeom->refLength);
 	}
 	NNAN(kappaD); NNAN(epsCrackOnset); NNAN(epsFracture); NNAN(omega);
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
@@ -240,7 +240,7 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		if(isCohesive){
 			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
-			const shared_ptr<BrefcomPhysParams>& rbp1=YADE_PTR_CAST<BrefcomPhysParams>(body1->physicalParameters), rbp2=YADE_PTR_CAST<BrefcomPhysParams>(body2->physicalParameters);
+			const shared_ptr<CpmMat>& rbp1=YADE_PTR_CAST<CpmMat>(body1->physicalParameters), rbp2=YADE_PTR_CAST<CpmMat>(body2->physicalParameters);
 			if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;}
 			LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and will be deleted.");
 		}
@@ -255,24 +255,24 @@ void ef2_Spheres_Brefcom_BrefcomLaw::go(shared_ptr<InteractionGeometry>& _geom, 
 }
 
 
-/********************** GLDrawBrefcomContact ****************************/
+/********************** GLDrawCpmPhys ****************************/
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-CREATE_LOGGER(GLDrawBrefcomContact);
+CREATE_LOGGER(GLDrawCpmPhys);
 
-bool GLDrawBrefcomContact::contactLine=true;
-bool GLDrawBrefcomContact::dmgLabel=true;
-bool GLDrawBrefcomContact::dmgPlane=false;
-bool GLDrawBrefcomContact::epsNLabel=true;
-bool GLDrawBrefcomContact::epsT=false;
-bool GLDrawBrefcomContact::epsTAxes=false;
-bool GLDrawBrefcomContact::normal=false;
-bool GLDrawBrefcomContact::colorStrain=false;
+bool GLDrawCpmPhys::contactLine=true;
+bool GLDrawCpmPhys::dmgLabel=true;
+bool GLDrawCpmPhys::dmgPlane=false;
+bool GLDrawCpmPhys::epsNLabel=true;
+bool GLDrawCpmPhys::epsT=false;
+bool GLDrawCpmPhys::epsTAxes=false;
+bool GLDrawCpmPhys::normal=false;
+bool GLDrawCpmPhys::colorStrain=false;
 
 
-void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-	const shared_ptr<BrefcomContact>& BC=static_pointer_cast<BrefcomContact>(ip);
+void GLDrawCpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	const shared_ptr<CpmPhys>& BC=static_pointer_cast<CpmPhys>(ip);
 	const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
 
 	//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
@@ -328,14 +328,14 @@ void GLDrawBrefcomContact::go(const shared_ptr<InteractionPhysics>& ip, const sh
 
 struct BodyStats{ short nCohLinks; Real dmgSum; Real epsPlSum; BodyStats(): nCohLinks(0), dmgSum(0), epsPlSum(0.){} };
 
-/********************** BrefcomDamageColorizer ****************************/
-void BrefcomDamageColorizer::action(MetaBody* rootBody){
+/********************** CpmPhysDamageColorizer ****************************/
+void CpmPhysDamageColorizer::action(MetaBody* rootBody){
 	//vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
 	//vector<pair<short,
 	vector<BodyStats> bodyStats; bodyStats.resize(rootBody->bodies->size());
 	assert(bodyStats[0].nCohLinks==0); // should be initialized by dfault ctor
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
-		shared_ptr<BrefcomContact> BC=dynamic_pointer_cast<BrefcomContact>(I->interactionPhysics);
+		shared_ptr<CpmPhys> BC=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
 		if(!BC || !BC->isCohesive) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-BC->relResidualStrength); bodyStats[id1].epsPlSum+=BC->epsPlSum;
@@ -347,7 +347,7 @@ void BrefcomDamageColorizer::action(MetaBody* rootBody){
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		body_id_t id=B->getId();
 		// add damaged contacts that have already been deleted
-		BrefcomPhysParams* bpp=dynamic_cast<BrefcomPhysParams*>(B->physicalParameters.get());
+		CpmMat* bpp=dynamic_cast<CpmMat*>(B->physicalParameters.get());
 		if(!bpp) continue;
 		short cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
 		if(cohLinksWhenever>0){

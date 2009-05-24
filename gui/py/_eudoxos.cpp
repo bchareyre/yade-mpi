@@ -14,7 +14,7 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
 		if(!i->interactionPhysics) continue;
-		shared_ptr<BrefcomContact> bc=dynamic_pointer_cast<BrefcomContact>(i->interactionPhysics); if(!bc) continue;
+		shared_ptr<CpmPhys> bc=dynamic_pointer_cast<CpmPhys>(i->interactionPhysics); if(!bc) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->physicalParameters->se3.position,bbMin,bbMax), isIn2=isInBB(b2->physicalParameters->se3.position,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -32,9 +32,9 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 }
 #endif
 
-/* yield surface for the brefcom concrete model; this is used only to make yield surface plot from python, for debugging */
+/* yield surface for the CPM model; this is used only to make yield surface plot from python, for debugging */
 Real yieldSigmaTMagnitude(Real sigmaN, int yieldSurfType=0){
-	#ifdef BREFCOM_YIELD_SIGMA_T_MAGNITUDE
+	#ifdef CPM_YIELD_SIGMA_T_MAGNITUDE
 		/* find first suitable interaction */
 		MetaBody* rootBody=Omega::instance().getRootBody().get();
 		shared_ptr<Interaction> I;
@@ -43,14 +43,14 @@ Real yieldSigmaTMagnitude(Real sigmaN, int yieldSurfType=0){
 		}
 		Real nan=std::numeric_limits<Real>::quiet_NaN();
 		if(!I->isReal) {LOG_ERROR("No real interaction found, returning NaN!"); return nan; }
-		BrefcomContact* BC=dynamic_cast<BrefcomContact*>(I->interactionPhysics.get());
-		if(!BC) {LOG_ERROR("Interaction physics is not BrefcomContact instance, returning NaN!"); return nan;}
+		CpmPhys* BC=dynamic_cast<CpmPhys*>(I->interactionPhysics.get());
+		if(!BC) {LOG_ERROR("Interaction physics is not CpmPhys instance, returning NaN!"); return nan;}
 		const Real &omega(BC->omega); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle);
-		const Real& yieldLogSpeed(ef2_Spheres_Brefcom_BrefcomLaw::yieldLogSpeed); // const int& yieldSurfType(ef2_Spheres_Brefcom_BrefcomLaw::yieldSurfType);
-		const Real& yieldEllipseShift(ef2_Spheres_Brefcom_BrefcomLaw::yieldEllipseShift);
-		return BREFCOM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
+		const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); // const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
+		const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift);
+		return CPM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
 	#else
-		LOG_FATAL("Brefcom model not available in this build.");
+		LOG_FATAL("CPM model not available in this build.");
 		throw;
 	#endif
 }

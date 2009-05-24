@@ -56,14 +56,14 @@ void BrefcomTestGen::createEngines(){
 	rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
-		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
+		shared_ptr<Ip2_CpmMat_CpmMat_CpmPhys> bmc(new Ip2_CpmMat_CpmMat_CpmPhys);
 		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1; bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
 		//bmc->calibratedEpsFracture=.5; /* arbitrary, but large enough */
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 
 	shared_ptr<ConstitutiveLawDispatcher> clDisp(new ConstitutiveLawDispatcher);
-		clDisp->add(shared_ptr<ConstitutiveLaw>(new ef2_Spheres_Brefcom_BrefcomLaw));
+		clDisp->add(shared_ptr<ConstitutiveLaw>(new Law2_Dem3DofGeom_CpmPhys_Cpm));
 	rootBody->engines.push_back(clDisp);
 
 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
@@ -79,7 +79,7 @@ void BrefcomTestGen::createEngines(){
 	orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 	rootBody->engines.push_back(orientationIntegrator);
 
-	shared_ptr<BrefcomDamageColorizer> dmg(new BrefcomDamageColorizer);
+	shared_ptr<CpmPhysDamageColorizer> dmg(new CpmPhysDamageColorizer);
 	rootBody->engines.push_back(dmg);
 
 #if 0

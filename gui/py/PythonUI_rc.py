@@ -40,13 +40,22 @@ for root in ['StandAloneEngine','DeusExMachina','EngineUnit1D','EngineUnit2D','G
 ### end wrappers
 
 #### HANDLE RENAMED CLASSES ####
-renamed={'ef2_Spheres_Brefcom_BrefcomLaw':'ef2_Dem3Dof_Cpm_Cpm'}
+renamed={
+	'BrefcomMakeContact':'Ip2_CpmMat_CpmMat_CpmPhys',
+	'BrefcomContact':'CpmPhys',
+	'BrefcomPhysParams':'CpmMat',
+	'ef2_Spheres_Brefcom_BrefcomLaw':'Law2_Dem3DofGeom_CpmPhys_Cpm',
+	'GLDrawBrefcomContact':'GLDrawCpmPhys',
+	'BrefcomDamageColorizer':'CpmPhysDamageColorizer',
+	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics'
+}
+
 for oldName in renamed:
 	class warnWrap:
 		def __init__(self,_old,_new): self.old,self.new=_old,_new
-		def __call__(self,*args):
+		def __call__(self,*args,**kw):
 			import warnings; warnings.warn("Class `%s' was renamed to `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
-			return _dd[self.new](*args)
+			return _dd[self.new](*args,**kw)
 	_dd[oldName]=warnWrap(oldName,renamed[oldName])
 
 

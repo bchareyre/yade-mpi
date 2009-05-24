@@ -198,9 +198,9 @@ bool USCTGen::generate(){
 		Real r=I->second;
 		shared_ptr<Body> S=Shop::sphere(C,r);
 
-		// replace BodyMacroParameters by BrefcomPhysParams
+		// replace BodyMacroParameters by CpmMat
 		shared_ptr<BodyMacroParameters> bmp=YADE_PTR_CAST<BodyMacroParameters>(S->physicalParameters);
-		shared_ptr<BrefcomPhysParams> bpp(new BrefcomPhysParams);
+		shared_ptr<CpmMat> bpp(new CpmMat);
 		#define _CP(attr) bpp->attr=bmp->attr;
 		_CP(acceleration); _CP(angularVelocity); _CP(blockedDOFs); _CP(frictionAngle); _CP(inertia); _CP(mass); _CP(poisson); _CP(refSe3); _CP(se3); _CP(young); _CP(velocity);
 		#undef _CP
@@ -278,14 +278,14 @@ void USCTGen::createEngines(){
 		rootBody->engines.push_back(igeomDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
-		shared_ptr<BrefcomMakeContact> bmc(new BrefcomMakeContact);
+		shared_ptr<Ip2_CpmMat_CpmMat_CpmPhys> bmc(new Ip2_CpmMat_CpmMat_CpmPhys);
 		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
 		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1;bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;
 		iphysDispatcher->add(bmc);
 	rootBody->engines.push_back(iphysDispatcher);
 
 	shared_ptr<ConstitutiveLawDispatcher> clDisp(new ConstitutiveLawDispatcher);
-		clDisp->add(shared_ptr<ConstitutiveLaw>(new ef2_Spheres_Brefcom_BrefcomLaw));
+		clDisp->add(shared_ptr<ConstitutiveLaw>(new Law2_Dem3DofGeom_CpmPhys_Cpm));
 	rootBody->engines.push_back(clDisp);
 
 
@@ -313,7 +313,7 @@ void USCTGen::createEngines(){
 		orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 		rootBody->engines.push_back(orientationIntegrator);
 
-	rootBody->engines.push_back(shared_ptr<BrefcomDamageColorizer>(new BrefcomDamageColorizer));
+	rootBody->engines.push_back(shared_ptr<CpmPhysDamageColorizer>(new CpmPhysDamageColorizer));
 
 }
 
