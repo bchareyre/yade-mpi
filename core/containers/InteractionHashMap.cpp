@@ -91,6 +91,7 @@ void InteractionHashMap::clear()
 	boost::mutex::scoped_lock lock(drawloopmutex);
 
 	interactions.clear();
+	pendingErase.clear();
 }
 
 

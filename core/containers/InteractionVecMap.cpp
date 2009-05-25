@@ -112,6 +112,7 @@ void InteractionVecMap::clear()
 
 	vecmap.clear();
 	interactions.clear();
+	pendingErase.clear();
 	currentSize=0;
 }
 

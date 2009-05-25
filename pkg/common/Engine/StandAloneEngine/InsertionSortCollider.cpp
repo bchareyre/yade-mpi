@@ -116,7 +116,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 		else
 		{
 			const shared_ptr<Interaction>& I=interactions->find(p[0],p[1]);
-			if(!I){ LOG_WARN("Requested deletion of a non-existent interaction #"<<p[0]<<"+#"<<p[1]<<"?!"); /* LOG_FATAL(…); throw; */ }
+			if(!I){ LOG_FATAL("Requested deletion of a non-existent interaction #"<<p[0]<<"+#"<<p[1]<<"?!"); throw; }
 			I->reset();
 		}
 	}
