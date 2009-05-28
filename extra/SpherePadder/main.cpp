@@ -46,16 +46,17 @@ int main(int argc, char ** argv)
   //mesh->read_gmsh("meshes/cube1194.msh");
   //mesh->read("meshes/test.tetra");
   mesh->read_gmsh("etude_t_vs_ntetra/vincent_1000.msh");
-
+  //mesh->read_inp("meshes/Pit_2_98.inp");
+  
   //mesh->write_surface_MGP ("cube.mgp");
 
   SpherePadder * padder = new SpherePadder();
   //padder->ShutUp();
   
   padder->plugTetraMesh(mesh);
-  padder->setRadiusRatio(3.0/*atof(argv[2])*/);
+  padder->setRadiusRatio(5.0/*atof(argv[2])*/);
   padder->setMaxOverlapRate(1.0e-4);
-  padder->setVirtualRadiusFactor(100.0); 
+  padder->setVirtualRadiusFactor(100.0);
 
   // ---------
   time_t start_time = clock();
@@ -65,21 +66,21 @@ int main(int argc, char ** argv)
   //padder->insert_sphere(0.5,0.5,0.5,0.2);
   
   //unsigned int nmax = padder->getNumberOfSpheres() * 1.2;
-  //padder->setMaxNumberOfSpheres(nmax);
-  padder->setMaxSolidFractioninProbe(0.6 /*atof(argv[1])*/, 0.5, 0.5,0.5, 0.45);
+  //padder->setMaxNumberOfSpheres(1000100);
+  //padder->setMaxSolidFractioninProbe(0.6 /*atof(argv[1])*/, 0.5, 0.5,0.5, 0.45);
   
-  padder->densify();
+  //padder->densify();
 
   time_t stop_time = clock();
   float time_used = (float)(stop_time - start_time) / 1000000.0;
   cout << "Total time used = " << fabs(time_used) << " s" << endl;
-  cout << "nspheres = " << padder->getNumberOfSpheres() << endl;
+  cout << "'Real' number of spheres = " << padder->getNumberOfSpheres() << endl;
   // ---------
   
-  //padder->detect_overlap ();
+  padder->detect_overlap ();
   //padder->save_tri_mgpost("triangulation.mgp");
-  //padder->save_mgpost("mgp.out.001");
-  //padder->save_Rxyz("spheres.Rxyz");
+  padder->save_mgpost("mgp.out.001");
+  padder->save_Rxyz("spheres.Rxyz");
   //padder->rdf(80,8);
   //padder->save_granulo("granulo.dat");
   return 0;  

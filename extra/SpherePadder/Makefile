@@ -1,5 +1,5 @@
 CC      = g++
-CFLAGS  = -O3 -Wall
+CFLAGS  = -fpic -O3 -Wall
 LFLAGS  = -lCGAL -lm
 
 SRC = main.cpp \
@@ -14,6 +14,9 @@ OBJS = $(subst .cpp,.o,$(SRC))
 all: $(OBJS) 
 	$(CC) -o pad $(OBJS) ./SpherePackingTriangulation/SpherePackingTriangulation.o $(LFLAGS)
 
+pymod: $(SRC) SpherePadder_wrapper.cpp
+	$(CC) SpherePadder_wrapper.cpp -shared -o packing.so $(OBJS) ./SpherePackingTriangulation/SpherePackingTriangulation.o -lboost_python -I/usr/include/python2.5 -lCGAL
+
 clean:
 	rm -f *~ \#*\#
 	rm -f *.o
@@ -21,6 +24,7 @@ clean:
 depend:
 	makedepend -- $(CFLAGS) -- *.cpp
 
+# DON'T FORGET TO TYPE make depend AT FIRST COMPILATION 
 # DO NOT DELETE
 
 CellPartition.o: CellPartition.hpp TetraMesh.hpp /usr/include/stdlib.h

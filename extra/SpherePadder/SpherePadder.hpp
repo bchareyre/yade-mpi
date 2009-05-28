@@ -17,8 +17,8 @@
 #include <set>
 #include <list>
 
-# define BEGIN_FUNCTION(arg) if (verbose) cerr << "+--> " << (arg) << endl << flush
-# define END_FUNCTION        if (verbose) cerr << "+-- Done <--+\n\n" << flush
+# define BEGIN_FUNCTION(arg) if (verbose) cout << "+--> " << (arg) << endl << flush
+# define END_FUNCTION        if (verbose) cout << "+-- Done <--+\n\n" << flush
 
 #define FAIL_DET            0x01
 #define FAIL_DELTA          0x02
@@ -120,7 +120,7 @@ class SpherePadder
 	unsigned int place_sphere_4contacts (Sphere& S, unsigned int nb_combi_max = 15);
 	unsigned int check_overlaps(Sphere & S, id_type excludedId);
 	
-    double       rmin,rmax,rmoy,dr;
+    double       rmin,rmax,rmoy;
     double       ratio; // rmax/rmin
     double       max_overlap_rate;
 	id_type      n1,n2,n3,n4,n5,n_densify,nzero;
@@ -145,33 +145,22 @@ class SpherePadder
 	void ShutUp() { verbose = false; }
 	void Speak()  { verbose = true; }
 	
-	void setRadiusRatio(double r);
-	void setRadiusRange(double min, double max);
-	void setMaxOverlapRate(double r) { max_overlap_rate = fabs(r); }
-	void setVirtualRadiusFactor(double f) {virtual_radius_factor = fabs(f);}
-	void setMaxNumberOfSpheres(id_type max);
-	void setMaxSolidFractioninProbe(double max, double x, double y,double z, double R);
+	void setRadiusRatio (double r, double rapp = 0.125);
+	void setRadiusRange (double min, double max);
+	void setMaxOverlapRate (double r) { max_overlap_rate = fabs(r); }
+	void setVirtualRadiusFactor (double f) {virtual_radius_factor = fabs(f);}
+	void setMaxNumberOfSpheres (id_type max);
+	void setMaxSolidFractioninProbe (double max, double x, double y,double z, double R);
 
-
-	id_type getNumberOfSpheres()
-	{
-	  id_type nb = 0;
-	  for (id_type i = 0 ; i < sphere.size() ; ++i)
-	  {
-		if (sphere[i].type == VIRTUAL || sphere[i].type == INSERTED_BY_USER || sphere[i].R <= 0.0) continue;
-		++nb;
-	  }
-	  return nb;
-	  //return (n1+n2+n3+n4+n5);
-	}
-	double getMeanSolidFraction(double x, double y, double z, double R);
+	id_type getNumberOfSpheres ();
+	double getMeanSolidFraction (double x, double y, double z, double R);
 	
     void plugTetraMesh (TetraMesh * mesh);
     void save_mgpost (const char* name);
 	void save_tri_mgpost (const char* name);
     void save_Rxyz (const char* name);
     
-    SpherePadder();
+    SpherePadder ();
 
 	// Check functions only for debug (very slow!!)
 	void detect_overlap ();
@@ -183,13 +172,13 @@ class SpherePadder
 	void place_virtual_spheres ();
 
 	//! \brief Make the packing denser by filling void spaces detected by building a Delaunay triangulation (with CGAL)
-	void densify();
+	void densify ();
 
 	//! \brief Insert a sphere (x,y,z,R) within the packing. Overlapping spheres are cancelled.
-    void insert_sphere(double x, double y, double z, double R);
+    void insert_sphere (double x, double y, double z, double R);
     
     // FOR ANALYSIS
-	void save_granulo(const char* name);
+	void save_granulo (const char* name);
 	void rdf (unsigned int Npoint, unsigned int Nrmean);
 };
 

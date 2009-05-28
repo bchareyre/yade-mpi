@@ -98,6 +98,57 @@ void TetraMesh::read_gmsh (const char* name)
 }
 
 
+void TetraMesh::read_inp (const char* name)
+{
+  ifstream meshFile(name);
+  if(!meshFile)
+  {
+	cerr << "TetraMesh::read_inp, cannot open file " << name << endl;
+	return;
+  }
+  
+  char line[256];
+  
+  meshFile.getline(line,256);
+  while (!meshFile.eof() && line[0] == '*') meshFile.getline(line,256);
+  
+  Node N;
+  unsigned int ID;
+  while (!meshFile.eof() && line[0] != '*')
+  {
+	sscanf(line,"%d, %lf, %lf, %lf",&ID,&N.x,&N.y,&N.z);
+	node.push_back(N);
+	meshFile.getline(line,256);
+  }
+
+  while (!meshFile.eof() && line[0] == '*') meshFile.getline(line,256);
+
+  Tetraedre T;
+  while (!meshFile.eof() && line[0] != '*')
+  {
+	sscanf(line,"%d, %d, %d, %d, %d",&ID,&T.nodeId[0],&T.nodeId[1],&T.nodeId[2],&T.nodeId[3]);
+
+	// nodeId has 0-offset
+	// (0 in C/C++ corresponds to 1 in the file)
+	T.nodeId[0] -= 1;
+	T.nodeId[1] -= 1;
+	T.nodeId[2] -= 1;
+	T.nodeId[3] -= 1;
+
+	ID = ID-1;
+	node[T.nodeId[0]].tetraOwner.push_back(ID);
+	node[T.nodeId[1]].tetraOwner.push_back(ID);
+	node[T.nodeId[2]].tetraOwner.push_back(ID);
+	node[T.nodeId[3]].tetraOwner.push_back(ID);
+
+	tetraedre.push_back(T);
+	meshFile.getline(line,256);
+  }
+  
+  organize ();
+}
+
+
 void TetraMesh::read (const char* name)
 {
     ifstream meshFile(name);
@@ -242,7 +293,8 @@ void TetraMesh::organize ()
 	cout << "nb Nodes = " << node.size() << endl;
 	cout << "nb Tetra = " << tetraedre.size() << endl;
   
-    // Translate all nodes in such a manner that all coordinates are > 0
+    cout << "Translate all nodes in such a manner that all coordinates are > 0" << endl;
+	// (Don't know if it is absolutly necessary)
     xtrans = node[0].x;
     ytrans = node[0].y;
     ztrans = node[0].z;
@@ -262,7 +314,7 @@ void TetraMesh::organize ()
         node[i].z += ztrans;
     }
 
-    // Organize tetraedre nodes in ascending order
+    cout << "Organize tetraedre nodes in ascending order" << endl;
     for (unsigned int i = 0 ; i < tetraedre.size() ; ++i)
     {
         qsort (&(tetraedre[i].nodeId[0]), 4, sizeof(int), compareInt);
@@ -300,6 +352,10 @@ void TetraMesh::organize ()
         tmpFace.push_back(F);
     }
 
+
+// FIXME the following double loop is very slow for large meshes (more than 200 000 tetrahedrons)
+// utiliser le set<Face,cmp_face>
+	cout << "Search for duplicated and boundary faces" << endl;
     face.push_back(tmpFace[0]);
     bool duplicated;
     for (unsigned int i = 1 ; i < tmpFace.size() ; ++i)
@@ -323,9 +379,9 @@ void TetraMesh::organize ()
             face.push_back(tmpFace[i]);
         }
     }
-    tmpFace.clear();             // It should be usefull to free memory before the end of the function
+    tmpFace.clear();  // It should be usefull to save memory before the end of the function
 
-    // Definition of unit vectors normal to the boundary faces
+    cout <<  "Computation of unit vectors normal to the boundary faces" << endl;
     unsigned int n1,n2,n3,n4;
     unsigned int s1,s2,s3,s4;
     Tetraedre current_tetra;
@@ -401,6 +457,8 @@ void TetraMesh::organize ()
         tmpSegment.push_back(S);
     }
 
+// FIXME double loop can be very slow !!!!!
+	cout << "Search for duplicated segments" << endl;
     segment.push_back(tmpSegment[0]);
     for (unsigned int i = 1 ; i < tmpSegment.size() ; ++i)
     {
@@ -429,7 +487,7 @@ void TetraMesh::organize ()
         node[segment[s].nodeId[1]].segmentOwner.push_back(s);
     }
 
-    // Compute length of segments
+    cout << "Compute length of segments" << endl;
     double lx,ly,lz;
     unsigned int id1,id2;
 

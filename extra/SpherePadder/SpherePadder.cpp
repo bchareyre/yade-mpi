@@ -39,21 +39,21 @@ int compareDouble (const void * a, const void * b)
 SpherePadder::SpherePadder()
 {
   vector <id_type> lst;
-  unsigned int nb = 5;
+  id_type nb = 5;
 
-  for (unsigned int i = 0 ; i <= nb ; ++i)
+  for (id_type i = 0 ; i <= nb ; ++i)
   {
-	for (unsigned int j = i+1 ; j <= nb+1 ; ++j)
+	for (id_type j = i+1 ; j <= nb+1 ; ++j)
 	{
-	  for (unsigned int k = j+1 ; k <= nb+2 ; ++k)
+	  for (id_type k = j+1 ; k <= nb+2 ; ++k)
 	  {
-		for (unsigned int l = k+1 ; l <= nb+3 ; ++l)
+		for (id_type l = k+1 ; l <= nb+3 ; ++l)
 		{
 		  lst.clear();
-		  lst.push_back((id_type)i);
-		  lst.push_back((id_type)j);
-		  lst.push_back((id_type)k);
-		  lst.push_back((id_type)l);
+		  lst.push_back (i);
+		  lst.push_back (j);
+		  lst.push_back (k);
+		  lst.push_back (l);
 		  combination.push_back(lst);
 		}
 	  }
@@ -77,7 +77,7 @@ SpherePadder::SpherePadder()
 }
 
 
-void SpherePadder::setRadiusRatio(double r)
+void SpherePadder::setRadiusRatio(double r, double rapp)
 {
   r = fabs(r);
   if (r < 1.0) ratio = 1.0/r;
@@ -85,10 +85,9 @@ void SpherePadder::setRadiusRatio(double r)
   
   if (meshIsPlugged)
   {
-	rmoy = 0.125 * mesh->mean_segment_length; // 1/8 = 0.125
+	rmoy = rapp * mesh->mean_segment_length; // default: rapp = 1/8 = 0.125
 	rmin = (2.0 * rmoy) / (ratio + 1.0);
 	rmax = 2.0 * rmoy - rmin;
-	dr = rmax - rmoy; // FIXME a enlever
 	gap_max = rmin;
 	RadiusDataIsOK = true;
 	if (verbose)
@@ -122,7 +121,7 @@ void SpherePadder::setRadiusRange(double min, double max)
 	rmax = max;
   }
   ratio = rmax/rmin;
-  rmoy = 0.5*(rmin+rmax);
+  rmoy  = 0.5 * (rmin+rmax);
   gap_max = rmin;
   RadiusDataIsOK = true;
   RadiusIsSet = true;
@@ -156,6 +155,17 @@ void SpherePadder::setMaxSolidFractioninProbe(double max, double x, double y,dou
   criterion.R = R;
 }
 
+
+id_type SpherePadder::getNumberOfSpheres()
+{
+  id_type nb = 0;
+  for (id_type i = 0 ; i < sphere.size() ; ++i)
+  {
+	if (sphere[i].type == VIRTUAL || /*sphere[i].type == INSERTED_BY_USER ||*/ sphere[i].R <= 0.0) continue;
+	++nb;
+  }
+  return nb;
+}
 
 void SpherePadder::plugTetraMesh (TetraMesh * pluggedMesh)
 {
@@ -208,7 +218,7 @@ void SpherePadder::pad_5 ()
   if (verbose)
   {
 	cout << "Summary:" << endl;
-	cout << "  Total number of spheres    = " << sphere.size() << endl;
+	cout << "  Total number of spheres    = " << sphere.size()-nzero << endl;
 	cout << "  Number at nodes            = " << n1 << endl;
 	cout << "  Number at segments         = " << n2 << endl;
 	cout << "  Number near faces          = " << n3 << endl;
@@ -282,7 +292,7 @@ void SpherePadder::repack_null_radii() // repack_boundaries
 }
 
 
-unsigned int SpherePadder::iter_densify(unsigned int nb_check)  // iter_MakeDenser
+unsigned int SpherePadder::iter_densify (unsigned int nb_check)  // iter_MakeDenser
 {
   unsigned int nb_added = 0, total_added = 0;
   tetra_porosity P;
@@ -669,7 +679,7 @@ void SpherePadder::place_at_segment_middle ()
     S.z = 0.5 * (z1 + z2);
     S.R = 0.125 * mesh->segment[s].length;
     if (S.R < rmin) S.R = rmin;
-    if (S.R > rmax) S.R = rmoy + dr * (double)rand()/(double)RAND_MAX;
+	if (S.R > rmax) S.R = rmoy + (rmax - rmoy) * (double)rand()/(double)RAND_MAX;
     
     sphere.push_back(S); ++(n2); 
     partition.add(ns,S.x,S.y,S.z);
@@ -984,7 +994,7 @@ unsigned int SpherePadder::place_sphere_4contacts (Sphere& S, unsigned int nb_co
 	if (!failure && S.R >= rmin && S.R <= rmax)
 	{
 	  sphere.push_back(S);
-	  partition.add(ns,S.x,S.y,S.z);//++ns;
+	  partition.add(ns,S.x,S.y,S.z);
 	  return 1;
 	}
   }
@@ -1055,7 +1065,8 @@ unsigned int SpherePadder::place_sphere_4contacts (id_type sphereId, id_type nb_
   return 0;
 }
 
-unsigned int SpherePadder::check_overlaps(Sphere & S, unsigned int excludedId)
+
+unsigned int SpherePadder::check_overlaps(Sphere & S, id_type excludedId)
 {
   id_type id;
   Cell current_cell;
@@ -1082,6 +1093,7 @@ unsigned int SpherePadder::check_overlaps(Sphere & S, unsigned int excludedId)
   return 0;
 }
 
+
 double SpherePadder::distance_vector3 (double V1[],double V2[])
 {
   double D[3];
@@ -1091,7 +1103,7 @@ double SpherePadder::distance_vector3 (double V1[],double V2[])
   return ( sqrt(D[0]*D[0] + D[1]*D[1] + D[2]*D[2]) );
 }
 
-// FIXME review  notations
+
 unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3, id_type s4, Sphere& S)
 {
   double C1[3],C2[3],C3[3],C4[3];
@@ -1107,32 +1119,32 @@ unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3
   // (x-x4)^2 + (y-y4)^2 + (z-z4)^2 = (r+r4)^2   (4)
 
   // (2)-(1)
-  double a = 2.0 * (C1[0] - C2[0]);
-  double b = 2.0 * (C1[1] - C2[1]);
-  double c = 2.0 * (C1[2] - C2[2]);
-  double d = 2.0 * (R1 - R2);
-  double e = (C1[0]*C1[0] + C1[1]*C1[1] + C1[2]*C1[2] - R1*R1) - (C2[0]*C2[0] + C2[1]*C2[1] + C2[2]*C2[2] - R2*R2);
+  double A11 = 2.0 * (C1[0] - C2[0]);
+  double A12 = 2.0 * (C1[1] - C2[1]);
+  double A13 = 2.0 * (C1[2] - C2[2]);
+  double d1 = 2.0 * (R1 - R2);
+  double e1 = (C1[0]*C1[0] + C1[1]*C1[1] + C1[2]*C1[2] - R1*R1) - (C2[0]*C2[0] + C2[1]*C2[1] + C2[2]*C2[2] - R2*R2);
 
   // (3)-(1)
-  double aa = 2.0 * (C1[0] - C3[0]);
-  double bb = 2.0 * (C1[1] - C3[1]);
-  double cc = 2.0 * (C1[2] - C3[2]);
-  double dd = 2.0 * (R1 - R3);
-  double ee = (C1[0]*C1[0] + C1[1]*C1[1] + C1[2]*C1[2] - R1*R1) - (C3[0]*C3[0] + C3[1]*C3[1] + C3[2]*C3[2] - R3*R3);
+  double A21 = 2.0 * (C1[0] - C3[0]);
+  double A22 = 2.0 * (C1[1] - C3[1]);
+  double A23 = 2.0 * (C1[2] - C3[2]);
+  double d2 = 2.0 * (R1 - R3);
+  double e2 = (C1[0]*C1[0] + C1[1]*C1[1] + C1[2]*C1[2] - R1*R1) - (C3[0]*C3[0] + C3[1]*C3[1] + C3[2]*C3[2] - R3*R3);
 
   // (4)-(1)
-  double aaa = 2.0 *(C1[0] - C4[0]);
-  double bbb = 2.0 *(C1[1] - C4[1]);
-  double ccc = 2.0 *(C1[2] - C4[2]);
-  double ddd = 2.0 *(R1 - R4);
-  double eee = (C1[0]*C1[0] + C1[1]*C1[1] + C1[2]*C1[2] - R1*R1) - (C4[0]*C4[0] + C4[1]*C4[1] + C4[2]*C4[2] - R4*R4);
-
+  double A31 = 2.0 *(C1[0] - C4[0]);
+  double A32 = 2.0 *(C1[1] - C4[1]);
+  double A33 = 2.0 *(C1[2] - C4[2]);
+  double d3 = 2.0 *(R1 - R4);
+  double e3 = (C1[0]*C1[0] + C1[1]*C1[1] + C1[2]*C1[2] - R1*R1) - (C4[0]*C4[0] + C4[1]*C4[1] + C4[2]*C4[2] - R4*R4);
+  
   // compute the determinant of matrix A (system AX = B)
-  //      [a  ,  b,  c];    [x]        [e  -  d*r]
-  //  A = [aa ,bb ,cc ];  X=[y]   B(r)=[ee - dd*r]
-  //      [aaa,bbb,ccc];    [z]        [eee-ddd*r]
-
-  double DET = a*(bb*ccc-bbb*cc) - aa*(b*ccc-bbb*c) + aaa*(b*cc-bb*c);
+  //      [A11, A12, A13];    [x]        [e1 - d1*r]
+  //  A = [A21, A22, A23];  X=[y]   B(r)=[e2 - d2*r]
+  //      [A31, A32, A33];    [z]        [e3 - d3*r]
+  
+  double DET = A11*(A22*A33-A32*A23) - A21*(A12*A33-A32*A12) + A31*(A12*A23-A22*A13);
   double R = 0.0;
   double centre[3];
   if (DET != 0.0)
@@ -1142,25 +1154,25 @@ unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3
     //        [a31,a32,a33]  
           
     double inv_DET = 1.0/DET;
-    double a11 =  (bb*ccc-bbb*cc) * inv_DET;
-    double a12 = -(b*ccc-bbb*c)   * inv_DET;
-    double a13 =  (b*cc-bb*c)     * inv_DET;
-    double a21 = -(aa*ccc-aaa*cc) * inv_DET;
-    double a22 =  (a*ccc-aaa*c)   * inv_DET;
-    double a23 = -(a*cc-aa*c)     * inv_DET;
-    double a31 =  (aa*bbb-aaa*bb) * inv_DET;
-    double a32 = -(a*bbb-aaa*b)   * inv_DET;
-    double a33 =  (a*bb-aa*b)     * inv_DET;
+    double a11 =  (A22*A33-A32*A23) * inv_DET;
+    double a12 = -(A12*A33-A32*A13) * inv_DET;
+    double a13 =  (A12*A23-A22*A13) * inv_DET;
+    double a21 = -(A21*A33-A31*A23) * inv_DET;
+    double a22 =  (A11*A33-A31*A13) * inv_DET;
+    double a23 = -(A11*A23-A21*A13) * inv_DET;
+    double a31 =  (A21*A32-A31*A22) * inv_DET;
+    double a32 = -(A11*A32-A31*A12) * inv_DET;
+    double a33 =  (A11*A22-A21*A12) * inv_DET;
 
 	// A^-1 B(r)
-    double xa = -(a11*d + a12*dd + a13*ddd);
-    double xb =  (a11*e + a12*ee + a13*eee);
+    double xa = -(a11*d1 + a12*d2 + a13*d3);
+    double xb =  (a11*e1 + a12*e2 + a13*e3);
 
-    double ya = -(a21*d + a22*dd + a23*ddd);
-    double yb =  (a21*e + a22*ee + a23*eee);
+    double ya = -(a21*d1 + a22*d2 + a23*d3);
+    double yb =  (a21*e1 + a22*e2 + a23*e3);
 
-    double za = -(a31*d + a32*dd + a33*ddd);
-    double zb =  (a31*e + a32*ee + a33*eee);
+    double za = -(a31*d1 + a32*d2 + a33*d3);
+    double zb =  (a31*e1 + a32*e2 + a33*e3);
 	
     // Replace x, y and z in Equation (1) and solve the second order equation A*r^2 + B*r + C = 0
     double A = xa*xa + ya*ya + za*za - 1.0;
@@ -1437,6 +1449,9 @@ unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3
   Cell current_cell;
   double distance_max = -max_overlap_rate * rmin;
   double dist,nx,ny,nz,invnorm;
+
+  vector <neighbor_with_distance>  neighbor;
+  vector <id_type> nid;
   
   for ( unsigned int n = 0 ; n < j_ok.size() ; ++n) //spheres virtuelles
   { 
@@ -1462,6 +1477,8 @@ unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3
 				nx = (sphere[id].x - S.x) * invnorm;
 				ny = (sphere[id].y - S.y) * invnorm;
 				nz = (sphere[id].z - S.z) * invnorm;
+
+				// Place the sphere inside the mesh
 				sphere[id].x -= (0.5 * dist)*nx;
 				sphere[id].y -= (0.5 * dist)*ny;
 				sphere[id].z -= (0.5 * dist)*nz;
@@ -1469,38 +1486,45 @@ unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3
 
 				//Sphere S = sphere[id]; // save
 				//if (!place_sphere_4contacts(id)) sphere[id] = S;
-				vector<neighbor_with_distance>  neighbor;
-				build_sorted_list_of_neighbors(id, neighbor);
-				double radius_max = fabs(neighbor[1].distance+sphere[id].R);
-				double inc = 0.5*max_overlap_rate*rmin;
-				while (sphere[id].R < radius_max)
-				{
-				  sphere[id].x += inc*nx;
-				  sphere[id].y += inc*ny;
-				  sphere[id].z += inc*nz;
-				  sphere[id].R += inc;
-				}
-				
-				
-				// recherche plus proches voisins
-// 				vector<neighbor_with_distance>  neighbor;
+				cout << place_sphere_4contacts(id) << endl;;
+// 				neighbor.clear();
 // 				build_sorted_list_of_neighbors(id, neighbor);
-// 				if ( (sphere[id].R + 0.5*neighbor[1].distance) < rmax)
+// 				unsigned int n = 1;
+// 		
+// 				double radius_max = fabs(neighbor[n].distance+sphere[id].R);
+// 				double inc = 0.5*max_overlap_rate*rmin;
+// 				while (sphere[id].R < radius_max)
 // 				{
-// 				  sphere[id].R += 0.5*neighbor[1].distance;
-// 				  sphere[id].x += (0.5 * neighbor[1].distance)*nx;
-// 				  sphere[id].y += (0.5 * neighbor[1].distance)*ny;
-// 				  sphere[id].z += (0.5 * neighbor[1].distance)*nz;
+// 				  sphere[id].x += inc*nx;
+// 				  sphere[id].y += inc*ny;
+// 				  sphere[id].z += inc*nz;
+// 				  sphere[id].R += inc;
 // 				}
-// 				else
-// 				{
-// 				  double d = rmax-sphere[id].R;
-// 				  sphere[id].R = rmax;
-// 				  sphere[id].x += (0.5 * d)*nx;
-// 				  sphere[id].y += (0.5 * d)*ny;
-// 				  sphere[id].z += (0.5 * d)*nz;
-// 				}
-  				
+				
+				
+				// recherche du plus proches voisins (non virtuel)
+//  				vector<neighbor_with_distance>  neighbor;
+//  				build_sorted_list_of_neighbors(id, neighbor);
+// 				
+//  				if ( (sphere[id].R + 0.5*neighbor[1].distance) < rmax)
+//  				{
+//  				  sphere[id].R += 0.5*neighbor[1].distance;
+//  				  sphere[id].x += (0.5 * neighbor[1].distance)*nx;
+//  				  sphere[id].y += (0.5 * neighbor[1].distance)*ny;
+//  				  sphere[id].z += (0.5 * neighbor[1].distance)*nz;
+//  				}
+//  				else
+//  				{
+//  				  double d = rmax-sphere[id].R;
+//  				  sphere[id].R = rmax;
+//  				  sphere[id].x += (0.5 * d)*nx;
+//  				  sphere[id].y += (0.5 * d)*ny;
+//  				  sphere[id].z += (0.5 * d)*nz;
+//  				}
+
+
+// place_sphere_4contacts(id)	;
+
 				if (sphere[id].R < rmin)
 				{
 				  sphere[id].R = 0.0;

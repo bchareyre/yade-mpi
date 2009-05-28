@@ -43,6 +43,18 @@ struct Face
 	bool normal_swap;
 };
 
+struct cmp_face{
+  inline bool operator()(const Face & f1,const Face & f2){
+    return
+	(
+	   (f1.nodeId[0] < f2.nodeId[0])
+	|| (f1.nodeId[0] == f2.nodeId[0] && f1.nodeId[1] < f2.nodeId[1])
+	|| (f1.nodeId[1] == f2.nodeId[1] && f1.nodeId[2] < f2.nodeId[2])
+	);
+  }
+};
+
+
 struct Tetraedre
 {
 	unsigned int nodeId[4];
@@ -74,6 +86,7 @@ public:
   
   void read      (const char* name);
   void read_gmsh (const char* name);
+  void read_inp  (const char* name);
   void write_surface_MGP (const char* name);
 };
 
