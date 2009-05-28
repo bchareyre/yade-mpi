@@ -990,6 +990,13 @@ env.SharedLibrary('NewtonsDampedLaw',
 		    ,'SpheresContactGeometry'
 		    ])
 
+	,env.SharedLibrary('BasicViscoelasticRelationships'
+		,['Engine/EngineUnit/BasicViscoelasticRelationships.cpp']
+		,LIBS=env['LIBS']+['SimpleViscoelasticBodyParameters'
+		    ,'ViscoelasticInteraction'
+		    ,'SpheresContactGeometry'
+		    ])
+
 	,env.SharedLibrary('ContactLaw1',
 		['Engine/StandAloneEngine/ContactLaw1.cpp'],
 		LIBS=env['LIBS']+['SDECLinkPhysics',
