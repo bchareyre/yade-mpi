@@ -224,11 +224,11 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 		
 		// FIXME: SpheresContactGeometry (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
 		//        the penetration depth, contact point and normal. I couldn't make stimulation to be stable without this.
-		bool old_n = c->isNew;
-		c->isNew=false;
+//FIXME//		bool old_n = c->isNew;
+//FIXME//		c->isNew=false;
 		//ggg.assist=true;
 		bool res = ggg.go(cm1,cm2,se31,se32,c);
-		c->isNew=old_n;
+//FIXME//		c->isNew=old_n;
 		return res;
 
 		//return true;
@@ -429,11 +429,11 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 		
 		// FIXME: SpheresContactGeometry (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
 		//        the penetration depth, contact point and normal. I couldn't make stimulation to be stable without this.
-		bool old_n = c->isNew;
-		c->isNew=false;
+//FIXME//		bool old_n = c->isNew;
+//FIXME//		c->isNew=false;
 		//ggg.assist=true;
 		bool res = ggg.goReverse(cm1,cm2,se31,se32,c);
-		c->isNew=old_n;
+//FIXME//		c->isNew=old_n;
 		return res;
 
 		//return true;
