@@ -408,12 +408,12 @@ class pyInteractionContainer{
 		}
 		/* return nth _real_ iteration from the container (0-based index); this is to facilitate picking random interaction */
 		pyInteraction pyNth(long n){
-			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(!I->isReal) continue; if(i++==n) return pyInteraction(I); }
+			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(!I->isReal()) continue; if(i++==n) return pyInteraction(I); }
 			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
 		}
 		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
-		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal && (I->getId1()==id || I->getId2()==id)) ret.append(pyInteraction(I));} return ret;}
+		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(pyInteraction(I));} return ret;}
 		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(pyInteraction(I));} return ret; }
 };
 

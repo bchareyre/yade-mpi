@@ -192,9 +192,6 @@ bool SDECLinkedSpheres::generate()
 
 				link->interactionGeometry 		= geometry;
 				link->interactionPhysics 		= physics;
-				link->isReal 				= true;
-				link->isNew 				= false;
-				
 				rootBody->persistentInteractions->insert(link);
 			}
 		}

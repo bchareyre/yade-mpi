@@ -414,8 +414,6 @@ void LatticeExampleSimple::calcAxisAngle(LatticeBeamParameters* beam1, BodyConta
 		if( dir2.Dot(beam2->otherDirection) < 0.999999 )
 			angularSpring->initialOffPlaneAngle2   *= -1.0;//, angularSpring->offPlaneSwap2 = true;
 	
-		interaction->isReal			= true;
-		interaction->isNew 			= false;
 		interaction->interactionPhysics 	= angularSpring;
 		ints->insert(interaction);
 	}

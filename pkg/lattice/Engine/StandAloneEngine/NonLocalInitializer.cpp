@@ -106,8 +106,6 @@ bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* 
 			
 			nonLocal->gaussValue 			= std::exp( - std::pow( dist / len , 2) ) / ( len * sqPi );
 			
-			interaction->isReal			= true;
-			interaction->isNew 			= false;
 			interaction->interactionPhysics 	= nonLocal;
 			nonl->insert(interaction);
 			*/

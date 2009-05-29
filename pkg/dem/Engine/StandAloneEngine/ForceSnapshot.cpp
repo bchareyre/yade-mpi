@@ -85,7 +85,7 @@ void ForceSnapshot::action(MetaBody * ncb)
 
 	for( ;ii!=iiEnd;++ii)
 	{
-		if ((*ii)->isReal)
+		if ((*ii)->isReal())
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			body_id_t id1 = contact->getId1();

@@ -96,7 +96,7 @@ Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	// get max force on contacts
 	Real maxContactF=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
-		if(!I->isReal) continue;
+		if(!I->isReal()) continue;
 		shared_ptr<NormalShearInteraction> nsi=YADE_PTR_CAST<NormalShearInteraction>(I->interactionPhysics); assert(nsi);
 		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).Length());
 	}

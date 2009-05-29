@@ -97,9 +97,9 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 	InteractionContainer::iterator I_end = transientInteractions->end();
 	for ( InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I )
 	{
-
-		if ( ( *I )->isReal ) ( *I )->isNew=false;
-		if ( !haveDistantTransient ) ( *I )->isReal=false; // reset this flag, is used later... (??)
+		// FIXME: eudoxos commented out as isReal and isNew is removed...
+		//  if ( ( *I )->isReal ) ( *I )->isNew=false;
+		//  if ( !haveDistantTransient ) ( *I )->isReal=false; // reset this flag, is used later... (??)
 		( *I )->isNeighbor = false;// will be set again just below
 	}
 
@@ -132,7 +132,7 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 		I_end = transientInteractions->end();
 		for ( InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I )
 		{
-			if ( ( ! ( *I )->isNeighbor ) && ( haveDistantTransient ? ! ( *I )->isReal : true ) )
+			if ( ( ! ( *I )->isNeighbor ) && ( haveDistantTransient ? ! ( *I )->isReal() : true ) )
 			{
 				toErase.push_back ( pair<unsigned int,unsigned int> ( ( *I )->getId1() , ( *I )->getId2() ) );
 				//cerr << "to delete " << ( *I )->getId1() << "-" << ( *I )->getId2() << "(isNeighbor=" << ( *I )->isNeighbor<< endl;

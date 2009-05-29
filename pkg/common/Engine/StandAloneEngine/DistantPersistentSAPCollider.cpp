@@ -85,9 +85,8 @@ void DistantPersistentSAPCollider::action(MetaBody* ncb)
 	for( ; ii!=iiEnd ; ++ii)
 	{
 		shared_ptr<Interaction> interaction = *ii;
-		// FIXME : remove this isNew flag and test if interactionPhysic ?
-		if (interaction->isReal) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
-			interaction->isNew = false;
+		//if (interaction->isReal()) // if a interaction was only potential then no geometry was created for it and so this time it is still a new one
+			// interaction->isNew = false;
 		//interaction->isReal = false;
 	}
 	
@@ -200,7 +199,7 @@ bool found = (interaction!=0);//Bruno's Hack
 	if (overlap && !found)
 		transientInteractions->insert(body_id_t(id1),body_id_t(id2));
 	// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
-	else if (!overlap && found && !interaction->isReal)
+	else if (!overlap && found && !interaction->isReal())
 		transientInteractions->erase(body_id_t(id1),body_id_t(id2));//Bruno's hack
 //else if (!overlap && found)
 //		transientInteractions->erase(body_id_t(id1),body_id_t(id2));

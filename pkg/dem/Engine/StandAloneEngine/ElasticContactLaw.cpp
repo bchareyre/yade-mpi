@@ -50,7 +50,7 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 		functor->useShear=useShear;
 	#endif
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
-		if(!I->isReal) continue;
+		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (ConstitutiveLawDispatcher does that already)
 			if(!dynamic_cast<SpheresContactGeometry*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
@@ -77,7 +77,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
-			if (contact->isNew) shearForce=Vector3r(0,0,0);
+			if (contact->isFresh(ncb)) shearForce=Vector3r(0,0,0);
 					
 			Real un=currentContactGeometry->penetrationDepth;
 			TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);

@@ -11,9 +11,8 @@ void ConstitutiveLawDispatcher::action(MetaBody* rootBody){
 	#else
 		FOREACH(shared_ptr<Interaction> I, *rootBody->transientInteractions){
 	#endif
-		if(I->isReal){
-			assert(I->interactionGeometry);
-			assert(I->interactionPhysics);
+		if(I->isReal()){
+			assert(I->interactionGeometry); assert(I->interactionPhysics);
 			operator()(I->interactionGeometry,I->interactionPhysics,I.get(),rootBody);
 		}
 	}

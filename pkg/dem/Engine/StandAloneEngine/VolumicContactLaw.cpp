@@ -209,7 +209,7 @@ void VolumicContactLaw::action(MetaBody* ncb)
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)
+		if ((*ii)->isReal())
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			int id1 = contact->getId1();
@@ -230,7 +230,7 @@ void VolumicContactLaw::action(MetaBody* ncb)
 
 
 
-		if (contact->isNew) // Si on a une nouvelle interpenetration detectée, on initialise 
+		if (contact->isFresh(ncb)) // Si on a une nouvelle interpenetration detectée, on initialise 
 			{
 			shearForce			= Vector3r(0,0,0);
 			currentContactPhysics->previousun=0.0;
@@ -478,6 +478,7 @@ void VolumicContactLaw::action(MetaBody* ncb)
 			ncb->bex.addTorque(id2, c2x.Cross(f));
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
+
 		}
 	}
 

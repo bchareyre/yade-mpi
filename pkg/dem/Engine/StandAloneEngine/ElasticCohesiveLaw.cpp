@@ -49,7 +49,7 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 	InteractionContainer::iterator iiEnd = ncb->persistentInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)
+		if ((*ii)->isReal())
 		{
 			const shared_ptr<Interaction> contact2 = *ii;
 	

@@ -67,7 +67,7 @@ another would be HerzMindlinContactModel
 		contactPhysics->ks = contactPhysics->initialKs;
 		contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 */
-		if( interaction->isNew)
+		if(!interaction->interactionPhysics)
 		{
 			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
 			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());

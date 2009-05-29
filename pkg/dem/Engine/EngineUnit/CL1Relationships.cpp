@@ -62,7 +62,7 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 	
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
-		if(interaction->isNew)
+		if(!interaction->interactionPhysics)
 		{
 //std::cerr << " isNew, id1: " << interaction->getId1() << " id2: " << interaction->getId2()  << "\n";
 			interaction->interactionPhysics = shared_ptr<ContactLaw1Interaction>(new ContactLaw1Interaction());

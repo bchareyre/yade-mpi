@@ -11,8 +11,9 @@
 Collider::Collider(){}
 
 Collider::~Collider(){}
-
 bool Collider::handleExistingInteraction(Interaction* I){
+	throw runtime_error("handleExistingInteraction should not be called");
+#if 0
 	/* logically, we have 4 possibilities
 	 * 1.  real  new → ¬new, keep
 	 * 2.  real ¬new → keep (same as 1.)
@@ -34,8 +35,8 @@ bool Collider::handleExistingInteraction(Interaction* I){
 
 	assert(false); // unreachable
 	return false;
+#endif
 }
-
 bool Collider::mayCollide(const Body* b1, const Body* b2){
 	return 
 		// not yet implemented: only collide if at least one of the bodies is not shadow

@@ -39,7 +39,7 @@ void MassSpringLaw::action(MetaBody * massSpring)
 	for(  ; ii!=iiEnd ; ++ii )
 	{	
 		shared_ptr<Interaction> spring = *ii;
-		if (spring->isReal)
+		if (spring->isReal())
 		{
 			int id1 = spring->getId1();
 			int id2 = spring->getId2();

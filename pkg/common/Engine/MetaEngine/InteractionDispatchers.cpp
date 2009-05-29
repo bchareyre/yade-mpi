@@ -1,16 +1,25 @@
 #include"InteractionDispatchers.hpp"
 
 YADE_PLUGIN("InteractionDispatchers");
+CREATE_LOGGER(InteractionDispatchers);
 
 InteractionDispatchers::InteractionDispatchers(){
 	geomDispatcher=shared_ptr<InteractionGeometryMetaEngine>(new InteractionGeometryMetaEngine);
 	physDispatcher=shared_ptr<InteractionPhysicsMetaEngine>(new InteractionPhysicsMetaEngine);
 	constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
+	alreadyWarnedNoCollider=false;
 }
 
 #define DISPATCH_CACHE
 
 void InteractionDispatchers::action(MetaBody* rootBody){
+	if(rootBody->interactions->pendingErase.size()>0){
+		if(!alreadyWarnedNoCollider){
+			LOG_WARN("Interactions pending erase found, no collider being used?");
+			alreadyWarnedNoCollider=true;
+		}
+		rootBody->interactions->unconditionalErasePending();
+	}
 	#ifdef YADE_OPENMP
 		const long size=rootBody->interactions->size();
 		#pragma omp parallel for
@@ -24,9 +33,9 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
 
 			// we know there is no geometry functor already, take the short path
-			if(!I->functorCache.geomExists) { I->isReal=false; continue; }
+			if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
 			// no interaction geometry for either of bodies; no interaction possible
-			if(!b1_->interactingGeometry || !b2_->interactingGeometry) { I->isReal=false; continue; }
+			if(!b1_->interactingGeometry || !b2_->interactingGeometry) { assert(!I->isReal()); continue; }
 
 			bool swap=false;
 			// InteractionGeometryMetaEngine
@@ -44,8 +53,8 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
 
 			assert(I->functorCache.geom);
-			I->isReal=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3, b2->physicalParameters->se3,I);
-			if(!I->isReal) continue;
+			bool geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3, b2->physicalParameters->se3,I);
+			if(!geomCreated) continue;
 
 			// InteractionPhysicsMetaEngine
 			if(!I->functorCache.phys){
@@ -54,6 +63,9 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			}
 			assert(I->functorCache.phys);
 			I->functorCache.phys->go(b1->physicalParameters,b2->physicalParameters,I);
+			assert(I->interactionPhysics);
+			I->iterMadeReal=rootBody->currentIteration; // mark the interaction as created right now
+
 
 			// ConstitutiveLawDispatcher
 			// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction
@@ -64,15 +76,14 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			}
 		  	assert(I->functorCache.constLaw);
 			I->functorCache.constLaw->go(I->interactionGeometry,I->interactionPhysics,I.get(),rootBody);
-
 		#else
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
 			// InteractionGeometryMetaEngine
-			I->isReal =
+			bool geomCreated =
 				b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
 				geomDispatcher->operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3,I);
-			if(!I->isReal) continue;
+			if(!geomCreated) continue;
 			// InteractionPhysicsMetaEngine
 			// geom may have swapped bodies, get bodies again
 			physDispatcher->operator()(Body::byId(I->getId1(),rootBody)->physicalParameters, Body::byId(I->getId2(),rootBody)->physicalParameters,I);

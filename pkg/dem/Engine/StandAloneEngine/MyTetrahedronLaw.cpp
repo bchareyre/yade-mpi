@@ -35,7 +35,7 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)	// isReal means that InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron returned true
+		if ((*ii)->isReal())	// isReal means that InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron returned true
 					//                or InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron           returned true
 		{
 			const shared_ptr<Interaction>& contact = *ii;
@@ -76,7 +76,6 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 
 					}
 				}
-
 		}
 	}
 }

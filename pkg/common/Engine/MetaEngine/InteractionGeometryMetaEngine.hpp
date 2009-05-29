@@ -34,13 +34,15 @@ class InteractionGeometryMetaEngine :	public MetaEngine2D
 						, false								// disable auto symmetry handling
 					>
 {
+	bool alreadyWarnedNoCollider;
 	public :
 		virtual void action(MetaBody*);
 		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2);
+		InteractionGeometryMetaEngine(): alreadyWarnedNoCollider(false){}
 
-	REGISTER_CLASS_NAME(InteractionGeometryMetaEngine);
-	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
+	REGISTER_CLASS_AND_BASE(InteractionGeometryMetaEngine,MetaEngine2D);
 	REGISTER_ATTRIBUTES(MetaEngine,/* no attributes here*/ );
+	DECLARE_LOGGER;
 };
 
 REGISTER_SERIALIZABLE(InteractionGeometryMetaEngine);

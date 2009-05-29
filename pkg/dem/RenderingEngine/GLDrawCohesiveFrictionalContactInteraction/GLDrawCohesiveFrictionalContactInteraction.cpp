@@ -96,8 +96,8 @@ void GLDrawCohesiveFrictionalContactInteraction::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	if(!i->isReal) return;
-	isReal=i->isReal;
+	if(!i->isReal()) return;
+	isReal=i->isReal();
 
 	CohesiveFrictionalContactInteraction*    ph = static_cast<CohesiveFrictionalContactInteraction*>(ih.get());
 	SpheresContactGeometry*    sc = static_cast<SpheresContactGeometry*>(i->interactionGeometry.get());

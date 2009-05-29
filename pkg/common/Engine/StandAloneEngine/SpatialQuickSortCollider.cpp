@@ -92,7 +92,8 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 				}
 				interaction->cycle=true; 
 				// if interaction !isReal it falls back to the potential state
-				if (!haveDistantTransient && !interaction->isReal) interaction->isNew=true;
+				// FIXME: eudoxos: do nothing here... is that correct?
+				// if (!haveDistantTransient && !interaction->isReal()) interaction->isNew=true;
 			}
 	    }
 	}
@@ -104,18 +105,13 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 		interaction = *ii;
 		if( 
 			// if haveDistantTransient remove interactions deleted by the constitutive law
-				(haveDistantTransient && !interaction->isNew && !interaction->isReal)
+				(haveDistantTransient && !interaction->isReal())
 			// if !haveDistantTransient remove interactions without AABB overlapping
 				|| (!haveDistantTransient && !interaction->cycle) 
 		) { 
 			transientInteractions->erase( interaction->getId1(), interaction->getId2() ); 
 			continue; 
 		}
-		// Once the interaction has been fully created, it is not "new" anymore
-		if(interaction->isReal) interaction->isNew=false;
-		// For non-distant interactions reset isReal (it would be calculated later);
-		// for distant interactions isReal is set/unset by constitutive law
-		if(!haveDistantTransient) interaction->isReal=false;
 	}
 
 }

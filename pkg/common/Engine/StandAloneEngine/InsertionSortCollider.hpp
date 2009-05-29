@@ -9,7 +9,7 @@ class InteractionContainer;
 
 	Insertion sort is used for sorting the bound list that is already pre-sorted from last iteration, where each inversion
 	calls checkOverlap which then handles either overlap (by creating interaction if necessary) or its absence (by deleting
-	interaction if it exists and is only potential (!isReal && isNew).
+	interaction if it is only potential).
 
 	Bodies without bounding volume are ahndle gracefully and never collide.
 
@@ -41,13 +41,16 @@ class InsertionSortCollider: public Collider{
 	*/
 	void insertionSort(std::vector<Bound>& v,InteractionContainer*,MetaBody*,bool doCollide=true);
 	void handleBoundInversion(body_id_t,body_id_t,InteractionContainer*,MetaBody*);
-	bool spatialOverlap(body_id_t,body_id_t);
+	bool spatialOverlap(body_id_t,body_id_t) const;
 
 	public:
 	//! axis for the initial sort
 	int sortAxis;
 	//! if true, separate sorting and colliding phase; MUCH slower, but processes all interactions at every step
+	// This makes the collider non-persistent, not remembering last state
 	bool sortThenCollide;
+	//! Predicate called from loop within InteractionContainer::erasePending
+	bool shouldBeErased(body_id_t id1, body_id_t id2) const { return !spatialOverlap(id1,id2); }
 
 	InsertionSortCollider(): sortAxis(0), sortThenCollide(false){ /* timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 	virtual void action(MetaBody*);

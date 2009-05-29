@@ -48,7 +48,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 			Vector3r normal=facet->nf;
 			Real planeDist=normal.Dot(cogLine);
 			if(planeDist<0){normal*=-1; planeDist*=-1; }
-			if(planeDist>sphereRadius && !c->isReal) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
+			if(planeDist>sphereRadius && !c->isReal()) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
 			Vector3r planarPt=cogLine-planeDist*normal; // project sphere center to the facet plane
 			Real normDotPt[3];
 			Vector3r contactPt(Vector3r::ZERO);
@@ -70,7 +70,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 			}
 			normal=cogLine-contactPt; // called normal, but it is no longer the facet's normal (for compat)
 			//TRVAR3(normal,contactPt,sphereRadius);
-			if(!c->isReal && normal.SquaredLength()>sphereRadius*sphereRadius) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
+			if(!c->isReal() && normal.SquaredLength()>sphereRadius*sphereRadius) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
 			Real penetrationDepth=sphereRadius-normal.Normalize();
 	#else
 		/* This code was mostly copied from InteractingFacet2InteractinSphere4SpheresContactGeometry */
@@ -79,7 +79,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 			Vector3r normal=facet->nf;
 			Real L=normal.Dot(contactLine); // height/depth of sphere's center from facet's plane
 			if(L<0){normal*=-1; L*=-1;}
-			if(L>sphereRadius && !c->isReal) return false; // sphere too far away from the plane
+			if(L>sphereRadius && !c->isReal()) return false; // sphere too far away from the plane
 
 			Vector3r contactPt=contactLine-L*normal; // projection of sphere's center to facet's plane (preliminary contact point)
 			const Vector3r* edgeNormals=facet->ne; // array[3] of edge normals (in facet plane)
@@ -130,7 +130,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 		// end facet-local coordinates
 	#endif
 
-	if(penetrationDepth<0 && !c->isReal) return false;
+	if(penetrationDepth<0 && !c->isReal()) return false;
 
 	shared_ptr<Dem3DofGeom_FacetSphere> fs;
 	Vector3r normalGlob=se31.orientation*normal;
@@ -149,16 +149,6 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 	fs->se31=se31; fs->se32=se32;
 	fs->normal=normalGlob;
 	fs->contactPoint=se32.position+(-normalGlob)*(sphereRadius-penetrationDepth);
-	if(c->isNew){
-		//TRVAR2(planeDist,planarPt);
-		//TRVAR3(normDotPt[0],normDotPt[1],normDotPt[2]);
-		//TRVAR2(w,contactPt);
-		TRVAR1(penetrationDepth);
-		TRVAR3(fs->refLength,fs->cp1pt,fs->localFacetNormal);
-		TRVAR3(fs->effR2,fs->cp2rel,fs->normal);
-		TRVAR2(fs->se31.orientation,fs->se32.orientation);
-		TRVAR2(fs->contPtInTgPlane1(),fs->contPtInTgPlane2());
-	}
 	return true;
 }
 

@@ -68,7 +68,7 @@ another would be HerzMindlinContactModel
 		contactPhysics->ks = contactPhysics->initialKs;
 		contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 */
-		if( interaction->isNew)
+		if(!interaction->interactionPhysics)
 		{
 			interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());
 			CapillaryParameters* contactPhysics = static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());

@@ -202,7 +202,7 @@ TriaxialStressController::ComputeLoveStress ( MetaBody * ncb )
 
  for ( ; ii!=iiEnd ; ++ii )
  {
-	 if ( ( *ii )->isReal )
+	 if ( ( *ii )->isReal() )
 	 {
 		 const shared_ptr<Interaction>& interaction = *ii;
 

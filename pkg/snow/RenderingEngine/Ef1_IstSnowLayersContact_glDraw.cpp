@@ -99,7 +99,7 @@ void Ef1_IstSnowLayersContact_glDraw::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	if(!ip->isReal)
+	if(!ip->isReal())
 		return;
 
 	IstSnowLayersContact* sc = static_cast<IstSnowLayersContact*>(ig.get());

@@ -29,7 +29,7 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_
 	BssSnowGrain* s1=dynamic_cast<BssSnowGrain*>(cm1.get()), *s2=dynamic_cast<BssSnowGrain*>(cm2.get());
 	Vector3r normal=se32.position-se31.position;
 	Real penetrationDepthSq=pow((s1->radius+s2->radius),2) - normal.SquaredLength();
-	if (penetrationDepthSq>0 || c->isReal || assist)
+	if (penetrationDepthSq>0 || c->isReal() || assist)
 	{
 		shared_ptr<SpheresContactGeometry> scm;
 		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);

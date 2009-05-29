@@ -25,13 +25,14 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
 	Vector3r normal=se32.position-se31.position;
 	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.SquaredLength();
-	if (penetrationDepthSq>0 || c->isReal){
+	if (penetrationDepthSq>0 || c->isReal()){
 		shared_ptr<SpheresContactGeometry> scm;
+		bool isNew=c->interactionGeometry;
 		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; }
 
 		#ifdef SCG_SHEAR
-			if(c->isNew) scm->prevNormal=normal; 
+			if(isNew) scm->prevNormal=normal; 
 			else scm->prevNormal=scm->normal;
 		#endif
 

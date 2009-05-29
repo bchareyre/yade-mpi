@@ -17,20 +17,26 @@ typedef int body_id_t;
 class InteractionGeometryEngineUnit;
 class InteractionPhysicsEngineUnit;
 class ConstitutiveLaw;
+class MetaBody;
 
 class Interaction : public Serializable
 {
 	private	:
 		body_id_t id1,id2;
+		//! Step number at which the interaction was fully created (interactionGeometry and interactionPhysics).
+		//! Should be touched only by InteractionPhysicsMetaEngine and InteractionDispatchers, making them friends therefore
+		long iterMadeReal;
+		friend class InteractionPhysicsMetaEngine;
+		friend class InteractionDispatchers;
 	public :
-		// FIXME : test if InteractionPhysics==0 and remove this flag; we can also remove this flag, if we make another container for PotetntialInteraction with only ids
-		bool isNew;		
-		// maybe we can remove this, and check if InteractingGeometry, and InteractionPhysics are empty?
-		bool isReal;		
+		bool isReal() const {return (bool)interactionGeometry && (bool)interactionPhysics;}
+		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
+		bool isFresh(MetaBody* rb);
+
 		//! phase flag to mark (for example, SpatialQuickSortCollider mark by it the stale interactions) 
 		bool cycle;      
 		//! NOTE : TriangulationCollider needs this (nothing else)
-		bool isNeighbor;	
+		bool isNeighbor;
 
 		shared_ptr<InteractionGeometry> interactionGeometry;
 		shared_ptr<InteractionPhysics> interactionPhysics;
@@ -61,8 +67,7 @@ class Interaction : public Serializable
 	REGISTER_ATTRIBUTES(/*no base*/,
 		(id1)
 		(id2)
-		(isNew)
-		(isReal)
+		(iterMadeReal)
 		(interactionGeometry)
 		(interactionPhysics)
 	);

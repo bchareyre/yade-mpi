@@ -16,7 +16,7 @@
  */
 void InteractionPhysicsMetaEngine::explicitAction(shared_ptr<PhysicalParameters>& pp1, shared_ptr<PhysicalParameters>& pp2, shared_ptr<Interaction>& i){
 	// should we throw instead of asserting?
-	assert(i->isReal);
+	assert(i->isReal());
 	operator()(pp1,pp2,i);
 }
 
@@ -32,10 +32,13 @@ void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 	#else
 		FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
 	#endif
-			shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
-			shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
-			if (interaction->isReal)
+			if(interaction->interactionGeometry){
+				shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
+				shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
 				operator()(b1->physicalParameters, b2->physicalParameters, interaction);
+				assert(interaction->interactionPhysics);
+				interaction->iterMadeReal=ncb->currentIteration;
+			}
 		}
 }
 

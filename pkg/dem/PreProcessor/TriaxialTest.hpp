@@ -104,10 +104,13 @@ class TriaxialTest : public FileGenerator
 				,saveAnimationSnapshots
 				,biaxial2dTest
 				//!flag to choose an isotropic compaction until a fixed porosity choosing a same translation speed for the six walls
-				,isotropicCompaction;
+				,isotropicCompaction
+				//! do not create any files during run (.xml, .spheres, wall stress records)
+				,noFiles
+				;
 
-				//! Generate parallel simulation
-				bool parallel;
+				//! Generate faster simulation: use InsertionSortCollider and InteractionDispatchers
+				bool fast;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval

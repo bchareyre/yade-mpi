@@ -90,7 +90,7 @@ void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
     for (  ; ii!=iiEnd ; ++ii )
     {
         //if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
-        if ((*ii)->isReal)
+        if ((*ii)->isReal())
         {
             if (detectBrokenBodies 
 		    /* FIXME - this had no effect. InteractingBox has its isBroken=false too.
@@ -119,8 +119,7 @@ void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
 
             Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
-            if (contact->isNew)
-                shearForce			= Vector3r::ZERO;
+				if (contact->isFresh(ncb)) shearForce			= Vector3r::ZERO;
 
             Real un 				= currentContactGeometry->penetrationDepth;
             Real Fn				= currentContactPhysics->kn*un;
@@ -136,8 +135,9 @@ void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
                 //if (currentContactPhysics->cohesionBroken) {
                 //cerr << "broken" << endl;
 
-                contact->isReal= false;
-                currentContactPhysics->cohesionBroken = true;
+                ncb->interactions->requestErase(contact->getId1(),contact->getId2());
+                // contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
+					 currentContactPhysics->cohesionBroken = true;
                 currentContactPhysics->normalForce = Vector3r::ZERO;
                 currentContactPhysics->shearForce = Vector3r::ZERO;
 

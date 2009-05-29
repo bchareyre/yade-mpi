@@ -51,7 +51,7 @@ void ViscousForceDamping::action(Body* body)
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)
+		if ((*ii)->isReal())
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			int id1 = contact->getId1();
@@ -67,7 +67,7 @@ void ViscousForceDamping::action(Body* body)
 			
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
-			if ( contact->isNew)
+			if ( contact->isFresh(ncb))
 				shearForce			= Vector3r(0,0,0);
 					
 			Real un 				= currentContactGeometry->penetrationDepth;

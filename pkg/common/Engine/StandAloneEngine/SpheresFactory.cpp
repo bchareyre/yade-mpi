@@ -92,7 +92,7 @@ void SpheresFactory::action(MetaBody* ncb)
 			bool is_overlap=false;
 			for( unsigned int i=0, e=bI->probedBodies.size(); i<e; ++i)
 			{
-				if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->isReal)
+				if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry)
 				{
 					is_overlap=true;
 					break;

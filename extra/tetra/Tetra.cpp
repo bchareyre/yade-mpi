@@ -49,7 +49,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	
 	shared_ptr<TetraBang> bang;
 	// depending whether it's a new interaction: create new one, or use the existing one.
-	if (interaction->isNew) bang=shared_ptr<TetraBang>(new TetraBang());
+	if (!interaction->interactionGeometry) bang=shared_ptr<TetraBang>(new TetraBang());
 	else bang=YADE_PTR_CAST<TetraBang>(interaction->interactionGeometry);	
 	interaction->interactionGeometry=bang;
 	
@@ -375,7 +375,7 @@ void TetraLaw::action(MetaBody* rootBody)
 {
 
 	for(InteractionContainer::iterator contactI=rootBody->transientInteractions->begin(); contactI!=rootBody->transientInteractions->end(); ++contactI){
-		if (!(*contactI)->isReal) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
+		if (!(*contactI)->isReal()) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
 		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>((*contactI)->interactionGeometry));
 		if(!contactGeom) continue;
 

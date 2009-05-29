@@ -36,6 +36,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(str
 	previousState=currentState;
 	UnbalancedForce = 1;
 	Key = "";
+	noFiles=false;
 	Phase1End = "Compacted";
 	FinalIterationPhase1 = 0;
 	Iteration = 0;
@@ -89,6 +90,7 @@ void TriaxialCompressionEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(previousSigmaIso);
 	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
 	REGISTER_ATTRIBUTE(Key);
+	REGISTER_ATTRIBUTE(noFiles);
 	REGISTER_ATTRIBUTE(frictionAngleDegree);
 	REGISTER_ATTRIBUTE(epsilonMax);
 	REGISTER_ATTRIBUTE(uniaxialEpsilonCurr);
@@ -112,8 +114,8 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 		height0 = height; depth0 = depth; width0 = width;
 		//compressionActivated = true;
 		wall_bottom_activated=false; wall_top_activated=false;
-		if(currentState==STATE_ISO_UNLOADING){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
-		if(!firstRun) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
+		if(currentState==STATE_ISO_UNLOADING && !noFiles){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
+		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		Phase1End = "Unloaded";
 	}
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){
@@ -122,17 +124,17 @@ void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum next
 		previousSigmaIso=sigma_iso;
 		internalCompaction=false; // unloading will not change grain sizes
 		if (frictionAngleDegree>0) setContactProperties(body, frictionAngleDegree);
-		if(!firstRun) saveSimulation=true;
+		if(!firstRun && !noFiles) saveSimulation=true;
 		Phase1End = "Compacted";
 	}	
 	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING) && nextState==STATE_LIMBO) {
 	//urrentState==STATE_DIE_COMPACTION
 		internalCompaction = false;
 		height0 = height; depth0 = depth; width0 = width;
-		saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
+		if(!noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		// stop simulation here, since nothing will happen from now on
 		Phase1End = (currentState==STATE_ISO_COMPACTION ? "compacted" : "unloaded");
-		Shop::saveSpheresToFile("/tmp/limbo.spheres");
+		if(!noFiles) Shop::saveSpheresToFile("/tmp/limbo.spheres");
 	}
 	else if( nextState==STATE_FIXED_POROSITY_COMPACTION){		
 		internalCompaction = false;
@@ -239,16 +241,19 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 
 	if ( saveSimulation )
 	{
-		string fileName = "./"+ Key + "_" + Phase1End + "_" +
-						  lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
-						  lexical_cast<string> ( currentState ) + ".xml";
-		LOG_INFO ( "saving snapshot: "<<fileName );
-		Omega::instance().saveSimulation ( fileName );
-		fileName="./"+ Key + "_"+Phase1End+"_"+lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
-				 lexical_cast<string> ( currentState ) +".spheres";
-		LOG_INFO ( "saving spheres: "<<fileName );
-		Shop::saveSpheresToFile ( fileName );
+		if(!noFiles){
+			string fileName = "./"+ Key + "_" + Phase1End + "_" +
+							  lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
+							  lexical_cast<string> ( currentState ) + ".xml";
+			LOG_INFO ( "saving snapshot: "<<fileName );
+			Omega::instance().saveSimulation ( fileName );
+			fileName="./"+ Key + "_"+Phase1End+"_"+lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + "_" +
+					 lexical_cast<string> ( currentState ) +".spheres";
+			LOG_INFO ( "saving spheres: "<<fileName );
+			Shop::saveSpheresToFile ( fileName );
+		}
 		saveSimulation = false;
+
 	}
 	
 	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
@@ -333,7 +338,7 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end(); 
 	for(  ; ii!=iiEnd ; ++ii ) {
-		if (!(*ii)->isReal) continue;
+		if (!(*ii)->isReal()) continue;
 		const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);
 		const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId2())]->physicalParameters);		
 		//FIXME - why dynamic_cast fails here?

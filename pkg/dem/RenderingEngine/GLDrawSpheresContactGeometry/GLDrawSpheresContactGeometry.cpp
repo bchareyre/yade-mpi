@@ -62,7 +62,7 @@ void GLDrawSpheresContactGeometry::go(
 			// BUG: would crash with anything else than ElasticContactInteraction; use GLDrawInteractionPhysics for such things
 			/// ElasticContactInteraction* el = static_cast<ElasticContactInteraction*>(ip->interactionPhysics.get());
 			// FIXME - we need a way to give parameters from outside, again.... so curerntly this scale is hardcoded here
-			if( (!ip->isNew) && ip->isReal && ip->interactionPhysics){
+			if( (!ip->isNew) && ip->isReal() && ip->interactionPhysics){
 				Real force = el->normalForce.Length()/600;
 				forceMax = std::max(force,forceMax);
 				Real scale = midMax*(force/forceMax)*0.3;

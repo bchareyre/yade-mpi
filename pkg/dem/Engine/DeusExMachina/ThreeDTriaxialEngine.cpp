@@ -238,7 +238,7 @@ void ThreeDTriaxialEngine::setContactProperties(MetaBody * ncb, Real frictionDeg
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end(); 
 	for(  ; ii!=iiEnd ; ++ii ) {
-		if (!(*ii)->isReal) continue;
+		if (!(*ii)->isReal()) continue;
 		const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);
 		const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId2())]->physicalParameters);		
 		//FIXME - why dynamic_cast fails here?

@@ -36,6 +36,8 @@ PersistentSAPCollider::~PersistentSAPCollider()
 
 }
 
+// template void InteractionContainer::erasePending<PersistentSAPCollider>(const PersistentSAPCollider&);
+
 void PersistentSAPCollider::action(MetaBody* ncb)
 {
 	rootBody=ncb;
@@ -80,25 +82,7 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 
 //	timingDeltas->checkpoint("minMaxUpdate");
 
-	typedef pair<body_id_t,body_id_t> bodyIdPair;
-	list<bodyIdPair> toBeDeleted;
-	FOREACH(const shared_ptr<Interaction>& I,*ncb->transientInteractions){
-		// TODO: this logic will be unitedly in Collider::handleExistingInteraction
-		//
-		// remove interactions deleted by the constitutive law: thay are not new, but nor real either
-		// to make sure, do that only with haveDistantTransient
-		if(haveDistantTransient && !I->isNew && !I->isReal) { toBeDeleted.push_back(bodyIdPair(I->getId1(),I->getId2())); continue; }
-		// Once the interaction has been fully created, it is not "new" anymore
-		if (I->isReal) I->isNew=false;
-		// OTOH if is is now real anymore, it falls back to the potential state
-		if(!haveDistantTransient && !I->isReal) I->isNew=true;
-		// for non-distant interactions, isReal depends on whether there is geometrical overlap; that is calculated later
-		// for distant: if isReal&&!isNew means:
-		// 	the interaction was marked (by the constitutive law) as not real anymore should be deleted
-		if(!haveDistantTransient) I->isReal=false;
-		//if(!I->isReal){LOG_DEBUG("Interaction #"<<I->getId1()<<"=#"<<I->getId2()<<" is not real.");}
-	}
-	FOREACH(const bodyIdPair& p, toBeDeleted){ transientInteractions->erase(p.first,p.second); }
+	ncb->interactions->erasePending(*this);
 
 //	timingDeltas->checkpoint("deleteInvalid");
 	
@@ -236,6 +220,16 @@ void PersistentSAPCollider::sortBounds(vector<shared_ptr<AABBBound> >& bounds, i
 	}
 }
 
+
+bool PersistentSAPCollider::shouldBeErased(body_id_t id1, body_id_t id2) const {
+	// if there is no bbox overlap
+	int offset1=3*id1, offset2=3*id2;
+	return (
+		maxima[offset1  ]<minima[offset2  ] || maxima[offset2  ]<minima[offset1  ] || 
+		maxima[offset1+1]<minima[offset2+1] || maxima[offset2+1]<minima[offset1+1] || 
+		maxima[offset1+2]<minima[offset2+2] || maxima[offset2+2]<minima[offset1+2] );
+}
+
 /* Note that this function is called only for bodies that actually overlap along some axis */
 void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 		// look if the pair (id1,id2) already exists in the overlappingBB collection
@@ -260,7 +254,7 @@ void PersistentSAPCollider::updateOverlapingBBSet(int id1,int id2){
 			transientInteractions->insert(body_id_t(id1),body_id_t(id2));
 		}
 		// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
-		else if(!overlap && found && (haveDistantTransient ? !interaction->isReal : true) ){
+		else if(!overlap && found && (haveDistantTransient ? !interaction->isReal() : true) ){
 			//LOG_DEBUG("Erasing interaction #"<<id1<<"=#"<<id2<<" (isReal="<<interaction->isReal<<")");
 			transientInteractions->erase(body_id_t(id1),body_id_t(id2));
 		}

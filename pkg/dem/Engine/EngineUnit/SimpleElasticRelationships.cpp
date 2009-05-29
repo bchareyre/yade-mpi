@@ -25,7 +25,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 	
 	//if(interactionGeometry)
 	{
-		if( interaction->isNew)
+		if(!interaction->interactionPhysics)
 		{
 			const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>(b1);
 			const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>(b2);

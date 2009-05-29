@@ -40,7 +40,7 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& 
 	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
 	{
 //cerr << "interactionGeometry" << endl;
-		if( interaction->isNew)
+		if(!interaction->interactionPhysics)
 		{
 //cerr << "interaction->isNew" << endl;
 			const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>(b1);

@@ -40,11 +40,7 @@ class MetaEngine2D : public MetaEngine,
 		}
 		/* add functor by its literal name */
 		virtual void add(string euType){
-			shared_ptr<EngineUnitType> eu=dynamic_pointer_cast<EngineUnitType>(ClassFactory::instance().createShared(euType));
-			if(!eu){
-				cerr<<__FILE__<<":"<<__LINE__<<" WARNING! dynamic cast of engine unit "<<euType<<" failed, will use static_cast. Go figure why."<<endl;
-				eu=static_pointer_cast<EngineUnitType>(ClassFactory::instance().createShared(euType));
-			}
+			shared_ptr<EngineUnitType> eu=static_pointer_cast<EngineUnitType>(ClassFactory::instance().createShared(euType));
 			add(eu);
 		}
 

@@ -415,9 +415,6 @@ bool HangingCloth::generate()
 	
 					link->interactionGeometry 		= geometry;
 					link->interactionPhysics 		= physics;
-					link->isReal 				= true;
-					link->isNew 				= false;
-					
 					rootBody->persistentInteractions->insert(link);
 					++linksNum;
 				}
@@ -453,9 +450,6 @@ shared_ptr<Interaction>& HangingCloth::createSpring(const shared_ptr<MetaBody>& 
 
 //	spring->interactionGeometry = geometry;
 	spring->interactionPhysics = physics;
-	spring->isReal = true;
-	spring->isNew = false;
-
 	return spring;
 }
 

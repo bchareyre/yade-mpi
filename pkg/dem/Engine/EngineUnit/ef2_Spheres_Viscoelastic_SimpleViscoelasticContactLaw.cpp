@@ -26,7 +26,8 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	RigidBodyParameters* de2 = YADE_CAST<RigidBodyParameters*>((*bodies)[id2]->physicalParameters.get());
 
 	Vector3r& shearForce 			= phys->shearForce;
-	if (I->isNew) shearForce=Vector3r(0,0,0);
+
+	if (I->isFresh(rootBody)) shearForce=Vector3r(0,0,0);
 
 	Real dt = Omega::instance().getTimeStep();
 

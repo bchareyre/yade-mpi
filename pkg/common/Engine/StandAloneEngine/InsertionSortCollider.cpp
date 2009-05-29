@@ -16,11 +16,11 @@ YADE_PLUGIN("InsertionSortCollider")
 CREATE_LOGGER(InsertionSortCollider);
 
 // return true if bodies bb overlap in all 3 dimensions
-bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2){
+bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2) const {
 	return
-		(minima[3*id1+0]<maxima[3*id2+0]) && (maxima[3*id1+0]>minima[3*id2+0]) &&
-		(minima[3*id1+1]<maxima[3*id2+1]) && (maxima[3*id1+1]>minima[3*id2+1]) &&
-		(minima[3*id1+2]<maxima[3*id2+2]) && (maxima[3*id1+2]>minima[3*id2+2]);
+		(minima[3*id1+0]<=maxima[3*id2+0]) && (maxima[3*id1+0]>=minima[3*id2+0]) &&
+		(minima[3*id1+1]<=maxima[3*id2+1]) && (maxima[3*id1+1]>=minima[3*id2+1]) &&
+		(minima[3*id1+2]<=maxima[3*id2+2]) && (maxima[3*id1+2]>=minima[3*id2+2]);
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
@@ -32,16 +32,16 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 	bool hasInter=(bool)I;
 	// interaction doesn't exist and shouldn't, or it exists and should
 	if(!overlap && !hasInter) return;
-	if(overlap && hasInter){ /* FIXME: should check I->isNew and I->isReal; etc */ return; }
+	if(overlap && hasInter){  return; }
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
 		if(!Collider::mayCollide(Body::byId(id1,rb).get(),Body::byId(id2,rb).get())) return;
-		LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
+		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
 		interactions->insert(newI);
 		return;
 	}
-	if(!overlap && hasInter){ if(!I->isReal && I->isNew) interactions->erase(id1,id2); return; }
+	if(!overlap && hasInter){ if(!I->isReal()) interactions->erase(id1,id2); return; }
 	assert(false); // unreachable
 }
 
@@ -110,6 +110,8 @@ void InsertionSortCollider::action(MetaBody* rb){
 	//timingDeltas->checkpoint("copy");
 
 	// process interactions that the constitutive law asked to be erased
+	interactions->erasePending(*this);
+	#if 0
 	FOREACH(const InteractionContainer::bodyIdPair& p, interactions->pendingErase){
 		// remove those that do not overlap spatially anymore
 		if(!spatialOverlap(p[0],p[1])){ interactions->erase(p[0],p[1]); LOG_TRACE("Deleted interaction #"<<p[0]<<"+#"<<p[1]); }
@@ -121,6 +123,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 		}
 	}
 	interactions->pendingErase.clear();
+	#endif
 	
 
 	// sort
@@ -130,7 +133,16 @@ void InsertionSortCollider::action(MetaBody* rb){
 		}
 		else {
 			if(doInitSort){
-				std::sort(XX.begin(),XX.end()); std::sort(YY.begin(),YY.end()); std::sort(ZZ.begin(),ZZ.end());
+				// the initial sort is in independent in 3 dimensions, may be run in parallel
+				#pragma omp parallel sections
+				{
+					#pragma omp section
+						std::sort(XX.begin(),XX.end());
+					#pragma omp section	
+						std::sort(YY.begin(),YY.end());
+					#pragma omp section
+						std::sort(ZZ.begin(),ZZ.end());
+				}
 			} else {
 				insertionSort(XX,interactions,rb,false); insertionSort(YY,interactions,rb,false); insertionSort(ZZ,interactions,rb,false);
 			}
@@ -156,18 +168,4 @@ void InsertionSortCollider::action(MetaBody* rb){
 			}
 		}
 	//timingDeltas->checkpoint("sort&collide");
-	
-#if 0
-	// garbage collection once in a while: for interactions that were still real when the bounding boxes separated
-	// the collider would never get to see them again otherwise
-	if(iter%1000==0){
-		typedef pair<body_id_t,body_id_t> bodyIdPair;
-		list<bodyIdPair> toBeDeleted;
-		FOREACH(const shared_ptr<Interaction>& I,*interactions){
-			if(!I->isReal && (!I->isNew || !spatialOverlap(I->getId1(),I->getId2()))) toBeDeleted.push_back(bodyIdPair(I->getId1(),I->getId2()));
-		}
-		FOREACH(const bodyIdPair& p, toBeDeleted){ interactions->erase(p.first,p.second); LOG_TRACE("Deleted interaction #"<<p.first<<"+#"<<p.second); }
-	}
-	//timingDeltas->checkpoint("stale");
-#endif
 }

@@ -104,10 +104,6 @@ class CpmPhys: public NormalShearInteraction {
 			/// since the softening law is exponential, this doesn't mean that the contact is fully damaged at this point,
 			/// that happens only asymptotically 
 			epsFracture,
-			//! damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞
-			omegaThreshold,
-			//! weight coefficient for shear strain when computing the strain semi-norm kappaD
-			xiShear,
 			//! characteristic time for damage (if non-positive, the law without rate-dependence is used)
 			dmgTau,
 			//! exponent in the rate-dependent damage evolution
@@ -146,7 +142,7 @@ class CpmPhys: public NormalShearInteraction {
 
 
 
-		CpmPhys(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), xiShear(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
+		CpmPhys(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
 		virtual ~CpmPhys();
 
 		REGISTER_ATTRIBUTES(NormalShearInteraction,
@@ -157,8 +153,6 @@ class CpmPhys: public NormalShearInteraction {
 			(crossSection)
 			(epsCrackOnset)
 			(epsFracture)
-			(omegaThreshold)
-			(xiShear)
 			(dmgTau)
 			(dmgRateExp)
 			(dmgStrain)
@@ -206,7 +200,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 		/* uniaxial tension resistance, bending parameter of the damage evolution law, whear weighting constant for epsT in the strain seminorm (kappa) calculation. Default to NaN so that user gets loudly notified it was not set.
 		
 		*/
-		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, omegaThreshold, dmgTau, dmgRateExp, plTau, plRateExp, isoPrestress;
+		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, dmgTau, dmgRateExp, plTau, plRateExp, isoPrestress;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
 		//! Create contacts that don't receive any damage (CpmPhys::neverDamage=true); defaults to false
@@ -218,7 +212,6 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 			neverDamage=false;
 			cohesiveThresholdIter=-1;
 			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1;
-			omegaThreshold=0.999;
 			isoPrestress=0;
 		}
 
@@ -234,7 +227,6 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 			(dmgRateExp)
 			(plTau)
 			(plRateExp)
-			(omegaThreshold)
 			(isoPrestress)
 		);
 
@@ -258,14 +250,17 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 		int yieldSurfType;
 		//! scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)
 		static Real yieldLogSpeed;
+		//! horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)
 		static Real yieldEllipseShift;
+		//! damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞
+		static Real omegaThreshold;
 		//! HACK: limit strain on some contacts by moving body #2 in the contact; only if refR1<0 (facet); deactivated if > 0
 		static Real minStrain_moveBody2;
 		Law2_Dem3DofGeom_CpmPhys_Cpm(): logStrain(false), yieldSurfType(0) { /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2));
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2)(omegaThreshold));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);

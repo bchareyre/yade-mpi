@@ -189,7 +189,7 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(MetaBody* rb){
 	memset(stiffnesses[0], 0,sizeof(Vector3r)*size);
 	memset(Rstiffnesses[0],0,sizeof(Vector3r)*size);
 	FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
-		if(!contact->isReal) continue;
+		if(!contact->isReal()) continue;
 
 		SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
 		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);

@@ -34,6 +34,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
@@ -159,7 +160,8 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	isotropicCompaction=false;
 	fixedPorosity = 1;
 	
-	parallel=false;
+	fast=false;
+	noFiles=false;
 
 	
 	
@@ -230,7 +232,8 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(isotropicCompaction);
 	REGISTER_ATTRIBUTE(fixedPorosity);
 	REGISTER_ATTRIBUTE(fixedBoxDims);
-	REGISTER_ATTRIBUTE(parallel);
+	REGISTER_ATTRIBUTE(fast);
+	REGISTER_ATTRIBUTE(noFiles);
 }
 
 
@@ -267,8 +270,7 @@ bool TriaxialTest::generate()
 
 	if(importFilename==""){
 		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
-		Real really_radiusMean;
-		if(radiusMean<=0) really_radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
+		if(radiusMean<=0) radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
 		else {
 			bool fixedDims[3];
 			fixedDims[0]=fixedBoxDims.find('x')!=string::npos; fixedDims[1]=fixedBoxDims.find('y')!=string::npos; fixedDims[2]=fixedBoxDims.find('z')!=string::npos;
@@ -278,9 +280,8 @@ bool TriaxialTest::generate()
 			LOG_INFO("Mean radius value of "<<radiusMean<<" requested, scaling "<<nScaled<<" dimensions by "<<boxScaleFactor);
 			dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;
 			upperCorner=lowerCorner+dimensions;
-			really_radiusMean=radiusMean;
 		}
-		message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, really_radiusMean, porosity);
+		message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, radiusMean, porosity);
 	}
 	else {
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
@@ -573,13 +574,14 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	triaxialcompressionEngine->finalMaxMultiplier = finalMaxMultiplier;
 	triaxialcompressionEngine->Key = Key;
+	triaxialcompressionEngine->noFiles=noFiles;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
 	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
 	
 	
 	// recording global stress
-	if(recordIntervalIter>0){
+	if(recordIntervalIter>0 && !noFiles){
 		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
 		triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
 		triaxialStateRecorder-> interval 		= recordIntervalIter;
@@ -604,8 +606,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
-	if(parallel){
+	if(!fast) rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	else rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	if(fast){
 		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
@@ -626,7 +629,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialcompressionEngine);
-	if(recordIntervalIter>0) rootBody->engines.push_back(triaxialStateRecorder);
+	if(recordIntervalIter>0 && !noFiles) rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	
 	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
@@ -714,7 +717,7 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 					" tries while generating sphere number " +
 					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
 	}
-	return "Generated a sample with " + lexical_cast<string>(number) + "spheres inside box of dimensions: (" 
+	return "Generated a sample with " + lexical_cast<string>(number) + " spheres inside box of dimensions: (" 
 			+ lexical_cast<string>(dimensions[0]) + "," 
 			+ lexical_cast<string>(dimensions[1]) + "," 
 			+ lexical_cast<string>(dimensions[2]) + ").";

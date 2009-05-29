@@ -102,6 +102,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		int FinalIterationPhase1, Iteration, testEquilibriumInterval;
 		
 		std::string Key;//A code that is appended to file names to help distinguish between different simulations
+		//! If true, no files will be generated (.xml, .spheres)
+		bool noFiles;
 		// //! Is uniaxial compression currently activated?
 		// bool compressionActivated;
 		//! Auto-switch from isotropic compaction or unloading state (if sigmaLateralConfinement<sigmaIsoCompaction)

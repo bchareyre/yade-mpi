@@ -85,11 +85,12 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		pt2 = se32.position-normal*s->radius;
 
 		shared_ptr<SpheresContactGeometry> scm;
-		if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+		bool isNew=!c->interactionGeometry;
+		if (isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
 
 		#ifdef SCG_SHEAR
-			if(c->isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
+			if(isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
 			else {scm->prevNormal=scm->normal;}
 		#endif
 			
@@ -132,10 +133,11 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		pt2=se32.position+cOnBox_sphere*s->radius;
 		
 		shared_ptr<SpheresContactGeometry> scm;
-		if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+		bool isNew=!c->interactionGeometry;
+		if (isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);	
 		#ifdef SCG_SHEAR
-			if(c->isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
+			if(isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
 			else {scm->prevNormal=scm->normal;}
 		#endif
 		scm->contactPoint = 0.5*(pt1+pt2);
@@ -159,7 +161,6 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const s
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-	assert(c->isNew);
 	c->swapOrder();
 	return go(cm2,cm1,se32,se31,c);
 }

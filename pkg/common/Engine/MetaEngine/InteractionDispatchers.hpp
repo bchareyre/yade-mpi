@@ -6,6 +6,7 @@
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 
 class InteractionDispatchers: public StandAloneEngine {
+	bool alreadyWarnedNoCollider;
 	public:
 		InteractionDispatchers();
 		virtual void action(MetaBody*);
@@ -18,5 +19,6 @@ class InteractionDispatchers: public StandAloneEngine {
 			(physDispatcher)
 			(constLawDispatcher)
 		);
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InteractionDispatchers);

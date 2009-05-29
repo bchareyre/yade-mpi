@@ -86,7 +86,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometryWater::go(		const sh
 
 		// FIXME : remove those uncommented lines
 		shared_ptr<SpheresContactGeometry> scm;
-		if (c->isNew)
+		if (!c->interactionGeometry)
 			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 		else
 			scm = dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
@@ -136,7 +136,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometryWater::go(		const sh
 	shared_ptr<SpheresContactGeometry> scm;
 	//cerr << "scm = " << scm << " | c = " << c << endl;
 	
-	if (c->isNew)
+	if (!c->interactionGeometry)
 	{	//cerr << "c->isNew";
 		scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
 	}

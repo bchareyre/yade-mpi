@@ -129,7 +129,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx',names=['python','log4cxx','binfmt','dummy']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,gl',names=['gl','python','log4cxx','binfmt','CGAL','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -334,6 +334,9 @@ if not env.GetOption('clean'):
 			and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 		if not ok: featureNotOK('python')
 		env.Append(CPPDEFINES=['EMBED_PYTHON'])
+	if 'CGAL' in env['features']:
+		ok=cong.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
+		if not ok: featureNotOK('CGAL')
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 
 	env=conf.Finish()

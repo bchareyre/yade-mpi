@@ -44,7 +44,7 @@ void GLDrawElasticContactInteraction::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-//	if(!i->isReal) return;
+//	if(!i->isReal()) return;
 
 	ElasticContactInteraction*    ph = static_cast<ElasticContactInteraction*>(ih.get());
 	SpheresContactGeometry*    sc = static_cast<SpheresContactGeometry*>(i->interactionGeometry.get());
@@ -76,13 +76,13 @@ void GLDrawElasticContactInteraction::go(
 	glEnd();
 
 // draw normal
-	drawArrow(cp, cp+normal*size*0.9 ,Vector3r(0,i->isReal?1:0.4,0));
+	drawArrow(cp, cp+normal*size*0.9 ,Vector3r(0,i->isReal()?1:0.4,0));
 // draw prevNormal
-//	drawArrow(middle, middle+ph->prevNormal*size*0.9 ,Vector3r(i->isReal?1:0.4,0,0));
+//	drawArrow(middle, middle+ph->prevNormal*size*0.9 ,Vector3r(i->isReal()?1:0.4,0,0));
 // draw shearForce
 	maxLength = std::max(maxLength,ph->shearForce.Length());
 	if(wireFrame) maxLength = 0.0000001;
-	drawArrow(cp, cp+ph->shearForce*size*10.0/maxLength ,Vector3r(0,0,i->isReal?1:0.4));
+	drawArrow(cp, cp+ph->shearForce*size*10.0/maxLength ,Vector3r(0,0,i->isReal()?1:0.4));
 
 // write A,B
 //	drawFlatText(pos1d,std::string("  A ") + boost::lexical_cast<std::string>(b1->getId()));

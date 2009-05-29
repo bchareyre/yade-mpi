@@ -44,7 +44,7 @@ void FrictionLessElasticContactLaw::action(MetaBody * ncb)
 	for( ; ii!=iiEnd; ++ii )
 	{
 		shared_ptr<Interaction> contact = *ii;
-		if (contact->isReal)
+		if (contact->isReal())
 		{
 			int id1 = contact->getId1();
 			int id2 = contact->getId2();

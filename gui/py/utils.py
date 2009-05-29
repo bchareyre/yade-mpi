@@ -224,13 +224,18 @@ def spheresFromFile(filename,scale=1.,wenjieFormat=False,**kw):
 
 def spheresToFile(filename,consider=lambda id: True):
 	"""Save sphere coordinates into ASCII file; the format of the line is: x y z r.
-	Non-spherical bodies are silently skipped."""
+	Non-spherical bodies are silently skipped.
+	
+	Returns number of spheres that were written."""
 	o=Omega()
 	out=open(filename,'w')
+	count=0
 	for b in o.bodies:
 		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
 		out.write('%g\t%g\t%g\t%g\n'%(b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
+		count+=1
 	out.close()
+	return count
 
 def avgNumInteractions(cutoff=0.):
 	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))

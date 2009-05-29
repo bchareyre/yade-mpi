@@ -39,7 +39,7 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::go(
                 if (overlap <= 0.0)
                 {
                         shared_ptr<SpheresContactGeometry> scm;
-                        if (c->isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+                        if (c->interactionGeometry) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
                         else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
         
                         scm->contactPoint = se32.position + proj + (ssls->radius+0.5*overlap)*ccn;

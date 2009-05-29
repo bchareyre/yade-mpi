@@ -702,6 +702,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'Sphere',
 			'AABB',
 			'PersistentSAPCollider',
+			'InsertionSortCollider',
 			'MetaInteractingGeometry2AABB',
 			'TriaxialStressController',
 			'TriaxialCompressionEngine',

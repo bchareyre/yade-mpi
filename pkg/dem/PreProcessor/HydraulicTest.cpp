@@ -23,7 +23,6 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/DistantPersistentSAPCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>

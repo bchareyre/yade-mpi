@@ -16,7 +16,7 @@ void TranslationEngine::applyCondition(MetaBody * ncb){
 	Real dt=Omega::instance().getTimeStep();
 	const int sign = 1; // ?
 	FOREACH(body_id_t id,subscribedBodies){
-		assert(id<bodies->size());
+		assert(id<(body_id_t)bodies->size());
 		if(ParticleParameters* p = dynamic_cast<ParticleParameters*>((*bodies)[id]->physicalParameters.get())){
 			p->se3.position+=sign*dt*velocity*translationAxis;
 			p->velocity=sign*velocity*translationAxis;

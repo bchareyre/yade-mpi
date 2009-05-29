@@ -16,51 +16,46 @@ YADE_PLUGIN("CpmMat","Ip2_CpmMat_CpmMat_CpmPhys","CpmPhys","Law2_Dem3DofGeom_Cpm
 CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 
 void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
+	if(interaction->interactionPhysics) return; 
+
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
+	assert(contGeom);
 
-	assert(contGeom); // for now, don't handle anything other than SpheresContactGeometry and Dem3DofGeom
+	const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
+	const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
 
-	if(!interaction->isNew && interaction->interactionPhysics){ /* relax */ } 
-	else {
-		interaction->isNew=false; // just in case
+	Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young); // harmonic Young's modulus average
+	//Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
+	Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
+	Real S12=Mathr::PI*pow(minRad,2); // "surface" of interaction
+	//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
+	//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
 
-		const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
-		const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
+	if(!neverDamage) { assert(!isnan(sigmaT)); }
 
-		Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young); // harmonic Young's modulus average
-		//Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
-		Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
-		Real S12=Mathr::PI*pow(minRad,2); // "surface" of interaction
-		//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
-		//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
+	shared_ptr<CpmPhys> contPhys(new CpmPhys());
 
-		if(!neverDamage) { assert(!isnan(sigmaT)); }
+	contPhys->E=E12;
+	contPhys->G=E12*G_over_E;
+	contPhys->tanFrictionAngle=tan(.5*(elast1->frictionAngle+elast2->frictionAngle));
+	contPhys->undamagedCohesion=sigmaT;
+	contPhys->crossSection=S12;
+	contPhys->epsCrackOnset=epsCrackOnset;
+	contPhys->epsFracture=relDuctility*epsCrackOnset;
+	// inherited from NormalShearInteracion, used in the timestepper
+	contPhys->kn=contPhys->E*contPhys->crossSection;
+	contPhys->ks=contPhys->G*contPhys->crossSection;
 
-		shared_ptr<CpmPhys> contPhys(new CpmPhys());
+	if(neverDamage) contPhys->neverDamage=true;
+	if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
+	else contPhys->isCohesive=false;
+	contPhys->dmgTau=dmgTau;
+	contPhys->dmgRateExp=dmgRateExp;
+	contPhys->plTau=plTau;
+	contPhys->plRateExp=plRateExp;
+	contPhys->isoPrestress=isoPrestress;
 
-		contPhys->E=E12;
-		contPhys->G=E12*G_over_E;
-		contPhys->tanFrictionAngle=tan(.5*(elast1->frictionAngle+elast2->frictionAngle));
-		contPhys->undamagedCohesion=sigmaT;
-		contPhys->crossSection=S12;
-		contPhys->epsCrackOnset=epsCrackOnset;
-		contPhys->epsFracture=relDuctility*epsCrackOnset;
-		contPhys->omegaThreshold=omegaThreshold;
-		// inherited from NormalShearInteracion, used in the timestepper
-		contPhys->kn=contPhys->E*contPhys->crossSection;
-		contPhys->ks=contPhys->G*contPhys->crossSection;
-
-		if(neverDamage) contPhys->neverDamage=true;
-		if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
-		else contPhys->isCohesive=false;
-		contPhys->dmgTau=dmgTau;
-		contPhys->dmgRateExp=dmgRateExp;
-		contPhys->plTau=plTau;
-		contPhys->plRateExp=plRateExp;
-		contPhys->isoPrestress=isoPrestress;
-
-		interaction->interactionPhysics=contPhys;
-	}
+	interaction->interactionPhysics=contPhys;
 }
 
 
@@ -127,21 +122,15 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2=1.; /* deactivated if > 0 */
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed=1.;
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift=0.;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=0.;
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	//timingDeltas->start();
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
-	/* kept fully damaged contacts; note that normally the contact is deleted _after_ the CPM_MATERIAL_MODEL,
-	 * i.e. if it is 1.0 here, omegaThreshold is >= 1.0 for sure.
-	 * &&'ing that just to make sure anyway ...
-	 */
-	// if(BC->omega>=1.0 && BC->omegaThreshold>=1.0) return;
-
 	// shorthands
-	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(BC->omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
-	/* const Real& transStrainCoeff(BC->transStrainCoeff); const Real& epsTrans(BC->epsTrans); const Real& xiShear(BC->xiShear); */
+	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
 	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 	const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
 	const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); 
@@ -171,12 +160,20 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	//timingDeltas->checkpoint("geom");
 
 	epsN+=BC->isoPrestress/E;
-	//TRVAR1(epsN);
 	#ifdef CPM_MATERIAL_MODEL
 		CPM_MATERIAL_MODEL
 	#else
-		sigmaN=E*epsN;
-		sigmaT=G*epsT;
+		// very simplified version of the constitutive law
+		kappaD=max(max(0,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
+		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
+		sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
+		sigmaT=G*epsT; // trial stress
+		Real yieldSigmaT=max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); // Mohr-Coulomb law with damage
+		if(sigmaT.SquaredLength()>yieldSigmaT*yieldSigmaT){
+			sigmaT*=yieldSigmaT/sigmaT.Length(); // stress return
+			epsPlSum+=rT*contGeom->slipToStrainTMax(rT/G); // adjust strain
+		}
+		relResidualStrength=isCohesive?(kappaD<epsCrackOnset?1.:(1-omega)*(kappaD)/epsCrackOnset):0;
 	#endif
 	sigmaN-=BC->isoPrestress;
 	if(contGeom->refR1<0 && Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2<=0 && epsN<Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2){
@@ -303,7 +300,7 @@ void CpmGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	// get max force on contacts
 	Real maxContactF=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
-		if(!I->isReal) continue;
+		if(!I->isReal()) continue;
 		shared_ptr<CpmPhys> BC=YADE_PTR_CAST<CpmPhys>(I->interactionPhysics); assert(BC);
 		maxContactF=max(maxContactF,max(BC->Fn,BC->Fs.Length()));
 		CpmMat* bpp1(YADE_CAST<CpmMat*>(Body::byId(I->getId1())->physicalParameters.get()));
@@ -314,7 +311,7 @@ void CpmGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	unbalancedForce=(useMaxForce?maxF:meanF)/maxContactF;
 
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
-		if(!I->isReal) continue;
+		if(!I->isReal()) continue;
 		shared_ptr<CpmPhys> BC=YADE_PTR_CAST<CpmPhys>(I->interactionPhysics); assert(BC);
 		CpmMat* bpp1(YADE_CAST<CpmMat*>(Body::byId(I->getId1())->physicalParameters.get()));
 		CpmMat* bpp2(YADE_CAST<CpmMat*>(Body::byId(I->getId2())->physicalParameters.get()));

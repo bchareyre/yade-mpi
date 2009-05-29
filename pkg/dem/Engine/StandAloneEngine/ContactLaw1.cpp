@@ -51,13 +51,13 @@ void ContactLaw1::action(MetaBody* ncb)
     for (  ; ii!=iiEnd ; ++ii )
     {
         //if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
-	if ((*ii)->isReal)
+	if ((*ii)->isReal())
 		{
 		nbreInteracTot++;
 		const shared_ptr<Interaction>& contact = *ii;
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
-// 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal << endl;
+// 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
 		if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 			continue; // skip other groups,
 
@@ -68,7 +68,7 @@ void ContactLaw1::action(MetaBody* ncb)
 
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
-		if (contact->isNew)
+		if (contact->isFresh(ncb))
 			{
 			shearForce			= Vector3r::ZERO;
 			currentContactPhysics->previousun=0.0;
@@ -114,12 +114,13 @@ void ContactLaw1::action(MetaBody* ncb)
                 //currentContactPhysics->SetBreakingState();
 
 
-                contact->isReal= false;
+					 ncb->interactions->requestErase(contact->getId1(),contact->getId2());
+					 // probably not useful anymore
                 currentContactPhysics->normalForce = Vector3r::ZERO;
                 currentContactPhysics->shearForce = Vector3r::ZERO;
 
                 //return;
-                //    } else
+                //    else
                 //    currentContactPhysics->normalForce	= -currentContactPhysics->normalAdhesion*currentContactGeometry->normal;
             	}
             else

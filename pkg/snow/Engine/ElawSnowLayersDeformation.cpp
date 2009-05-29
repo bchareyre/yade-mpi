@@ -41,7 +41,7 @@ void ElawSnowLayersDeformation::action(MetaBody* ncb)
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for (  ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)
+		if ((*ii)->isReal())
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			int id1 = contact->getId1();
@@ -175,7 +175,6 @@ void ElawSnowLayersDeformation::action(MetaBody* ncb)
 			//		}
 			//	}
 			}
-
 		}
 	}
 }

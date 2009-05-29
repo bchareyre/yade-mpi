@@ -24,6 +24,8 @@ python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0]
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])(),extract<double>(t[1])(),extract<double>(t[2])());}
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
+bool ptInAABB(python::tuple p, python::tuple bbMin, python::tuple bbMax){return isInBB(tuple2vec(p),tuple2vec(bbMin),tuple2vec(bbMax));}
+
 /* \todo implement groupMask */
 python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
@@ -120,7 +122,7 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 	vector<Real> cummProj(bins,0.);
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
-		if(!i->isReal) continue;
+		if(!i->isReal()) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
 		if(useBB && !isInBB(b1->physicalParameters->se3.position,bbMin,bbMax) && !isInBB(b2->physicalParameters->se3.position,bbMin,bbMax)) continue;
@@ -143,7 +145,7 @@ python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 	vector<int> bodyNumInta; bodyNumInta.resize(rb->bodies->size(),-1 /* uninitialized */);
 	int maxInta=0;
 	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
-		if(!i->isReal) continue;
+		if(!i->isReal()) continue;
 		const body_id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 		if(useBB && isInBB(b1->physicalParameters->se3.position,bbMin,bbMax)) bodyNumInta[id1]=bodyNumInta[id1]>0?bodyNumInta[id1]+1:1;
 		if(useBB && isInBB(b2->physicalParameters->se3.position,bbMin,bbMax)) bodyNumInta[id2]=bodyNumInta[id2]>0?bodyNumInta[id2]+1:1;
@@ -334,6 +336,7 @@ BOOST_PYTHON_MODULE(_utils){
 
 	def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
 	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers"),"Return coordinates of box enclosing all bodies\n centers: do not take sphere radii in account, only their centroids (default=False)\n cutoff: 0-1 number by which the box will be scaled around its center (default=0)"));
+	def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the AABB=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
 	def("setRefSe3",setRefSe3,"Set reference positions and orientation of all bodies equal to their current ones.");

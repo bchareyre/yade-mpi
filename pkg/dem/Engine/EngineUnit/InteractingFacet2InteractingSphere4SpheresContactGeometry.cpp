@@ -49,25 +49,8 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	Real L = normal.Dot(cl);
 	if (L<0) {normal=-normal; L=-L; }
 
-#if 0
-	int contactFace=0; // temp to save what will be maybe needed for new contact
-	//assert((c->interactionGeometry&&c->isReal)||(!c->interactionGeometry&&!c->isReal));
-	if(c->interactionGeometry){ // contact already exists, use old data here
-		contactFace=YADE_CAST<SpheresContactGeometry*>(c->interactionGeometry.get())->facetContactFace;
-		// determinate contact on negative side: reverse quantities
-		if(contactFace<0){normal=-normal; L=-L;}
-		// indeterminate contact on negative side: set to -1; if edge, will be reset to 0 below
-		else if (contactFace==0 && L<0) { normal=-normal; L=-L; contactFace=-1; }
-		// indeterminate and is on the positive side: set to 1; if edge, will be reset to 0 below
-		else if(contactFace==0 && L>0) {contactFace=1;}
-	} else {
-		if (L<0) { normal=-normal; L=-L; contactFace=-1;} // new contact on the negative face, reverse and save that information so that since now this contact is always reversed
-		else contactFace=1;
-	}
-#endif
-
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
-	if (L>sphereRadius && !c->isReal)  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
+	if (L>sphereRadius && !c->isReal())  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
 
 	Vector3r cp = cl - L*normal;
 	const Vector3r* ne = facet->ne;
@@ -116,7 +99,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	// END everything in facet-local coordinates
 	//
 
-	if (penetrationDepth>0 || c->isReal)
+	if (penetrationDepth>0 || c->isReal())
 	{
 		shared_ptr<SpheresContactGeometry> scm;
 		if (c->interactionGeometry)
@@ -146,7 +129,6 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const
 								const Se3r& se32,
 								const shared_ptr<Interaction>& c)
 {
-	assert(c->isNew);
 	c->swapOrder();
 	//LOG_WARN("Swapped interaction order for "<<c->getId2()<<"&"<<c->getId1());
 	return go(cm2,cm1,se32,se31,c);

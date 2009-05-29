@@ -20,7 +20,7 @@ void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& 
 	ElasticBodyParameters* s2 = static_cast<ElasticBodyParameters*>(b2.get());	
 
 	// the need to calculate this is only when the interaction is new
-	if( interaction->isNew)
+	if(!interaction->interactionPhysics)
 	{
 		boost::shared_ptr<NormalInteraction> sei(new NormalInteraction); // ElasticContactInteraction
 		// BUG?! kn is stiffness [N], young is modulus [N/m²] !!

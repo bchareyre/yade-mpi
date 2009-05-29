@@ -39,10 +39,10 @@ Real yieldSigmaTMagnitude(Real sigmaN, int yieldSurfType=0){
 		MetaBody* rootBody=Omega::instance().getRootBody().get();
 		shared_ptr<Interaction> I;
 		FOREACH(I, *rootBody->transientInteractions){
-			if(I->isReal) break;
+			if(I->isReal()) break;
 		}
 		Real nan=std::numeric_limits<Real>::quiet_NaN();
-		if(!I->isReal) {LOG_ERROR("No real interaction found, returning NaN!"); return nan; }
+		if(!I->isReal()) {LOG_ERROR("No real interaction found, returning NaN!"); return nan; }
 		CpmPhys* BC=dynamic_cast<CpmPhys*>(I->interactionPhysics.get());
 		if(!BC) {LOG_ERROR("Interaction physics is not CpmPhys instance, returning NaN!"); return nan;}
 		const Real &omega(BC->omega); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle);

@@ -28,7 +28,7 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
 					, const shared_ptr<PhysicalParameters>& b2 // SimpleViscoelasticBodyParameters
 					, const shared_ptr<Interaction>& interaction)
 {
-    if( !interaction->isNew ) return;
+    if(interaction->interactionPhysics) return;
 
     SimpleViscoelasticBodyParameters* sdec1 = static_cast<SimpleViscoelasticBodyParameters*>(b1.get());
     SimpleViscoelasticBodyParameters* sdec2 = static_cast<SimpleViscoelasticBodyParameters*>(b2.get());

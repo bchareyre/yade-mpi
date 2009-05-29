@@ -118,7 +118,7 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
         for(  ; ii!=iiEnd ; ++ii ) {
 
-                if ((*ii)->isReal) {//FIXME : test to be removed when using DistantPersistentSAPCollider?
+                if ((*ii)->isReal()) {//FIXME : test to be removed when using DistantPersistentSAPCollider?
 
                         const shared_ptr<Interaction>& interaction = *ii;
                         unsigned int id1 = interaction->getId1();
@@ -268,7 +268,7 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
         for(ii= ncb->transientInteractions->begin(); ii!=iiEnd ; ++ii ) 
 	{	//cerr << "interaction " << ii << endl;
-                if ((*ii)->isReal) 
+                if ((*ii)->isReal()) 
 		{
                         CapillaryParameters* currentContactPhysics	=	static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get());
                         if (currentContactPhysics->meniscus) 
@@ -294,7 +294,7 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
 
                         }
-                }
+					 }
         }
 
 
@@ -317,7 +317,7 @@ void CapillaryCohesiveLaw::checkFusion(MetaBody * ncb)
 	//Reset fusion numbers
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
         InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
-        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal) static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->fusionNumber=0;
+        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->fusionNumber=0;
 	
 	
 	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
@@ -655,7 +655,7 @@ bool BodiesMenisciiList::prepare(Body * body)
         InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
         InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
-                if ((*ii)->isReal) {
+                if ((*ii)->isReal()) {
                 	if (static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);
                 }
         }

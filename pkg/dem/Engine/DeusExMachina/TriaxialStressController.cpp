@@ -154,7 +154,7 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
-		if ((*ii)->isReal)
+		if ((*ii)->isReal())
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
@@ -382,7 +382,7 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for ( ; ii!=iiEnd ; ++ii )
 	{
-		if ( ( *ii )->isReal )
+		if ( ( *ii )->isReal() )
 		{
 			SpheresContactGeometry* contact = static_cast<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() );
 			//      if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
@@ -412,7 +412,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for(  ; ii!=iiEnd ; ++ii ) {
-		if ((*ii)->isReal) {
+		if ((*ii)->isReal()) {
 			const shared_ptr<Interaction>& contact = *ii;
 			Real f = (static_cast<ElasticContactInteraction*> ((contact->interactionPhysics.get()))->normalForce+static_cast<ElasticContactInteraction*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
 			if (f!=0)

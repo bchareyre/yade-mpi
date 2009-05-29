@@ -147,10 +147,10 @@ void printHelp()
 		"   NDEBUG        (heavy optimizations, no assertions and debugging features)\n"
 	#endif
 	#ifdef YADE_OPENMP
-		"   YADE_OPENMP   (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.\n"
+		"   YADE_OPENMP   (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.)\n"
 	#endif
 	#ifdef LOG4CXX
-		"   LOG4CXX       configurable logging framework enabled (~/.yade-suffix/logging.conf)\n"
+		"   LOG4CXX       (configurable logging framework enabled; ~/.yade-" SUFFIX "/logging.conf)\n"
 	#endif
 	;
 	if(!isnan(std::numeric_limits<double>::quiet_NaN())) cerr<<

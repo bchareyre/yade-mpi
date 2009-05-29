@@ -53,7 +53,7 @@ void SimpleViscoelasticSpheresInteractionRecorder::action(MetaBody * ncb)
     for(  ; ii!=iiEnd ; ++ii )
     {
 	const shared_ptr<Interaction>& i = *ii;
-	if ( !i->isReal ) continue;
+	if ( !i->isReal() ) continue;
 	if ( i->interactionGeometry->getClassIndex() != interactionSphere->getClassIndex() ) continue;
 	if ( i->interactionPhysics->getClassIndex() != viscoelasticInteraction->getClassIndex() ) continue;
 

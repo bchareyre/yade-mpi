@@ -156,7 +156,7 @@ void MicroMacroAnalyser::setState ( MetaBody* ncb, unsigned int state, bool save
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
 	for ( ; ii!=iiEnd ; ++ii )
 	{
-		if ( ( *ii )->isReal )
+		if ( ( *ii )->isReal() )
 		{
 			TriaxialState::Contact *c = new TriaxialState::Contact;
 			TS.contacts.push_back ( c );
