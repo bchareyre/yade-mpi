@@ -53,8 +53,12 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
 
 			assert(I->functorCache.geom);
+			bool wasReal=I->isReal();
 			bool geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3, b2->physicalParameters->se3,I);
-			if(!geomCreated) continue;
+			if(!geomCreated){
+				if(wasReal) rootBody->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
+				continue; // in any case don't care about this one anymore
+			}
 
 			// InteractionPhysicsMetaEngine
 			if(!I->functorCache.phys){
@@ -80,10 +84,14 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
 			// InteractionGeometryMetaEngine
+			bool wasReal=I->isReal();
 			bool geomCreated =
 				b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
 				geomDispatcher->operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3,I);
-			if(!geomCreated) continue;
+			if(!geomCreated){
+				if(wasReal) *rootBody->interactions->requestErase(I->getId1(),I->getId2());
+				continue;
+			}
 			// InteractionPhysicsMetaEngine
 			// geom may have swapped bodies, get bodies again
 			physDispatcher->operator()(Body::byId(I->getId1(),rootBody)->physicalParameters, Body::byId(I->getId2(),rootBody)->physicalParameters,I);

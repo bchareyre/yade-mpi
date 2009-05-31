@@ -164,14 +164,14 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 		CPM_MATERIAL_MODEL
 	#else
 		// very simplified version of the constitutive law
-		kappaD=max(max(0,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
+		kappaD=max(max(0.,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
 		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
 		sigmaN=(1-(epsN>0?omega:0))*E*epsN; // damage taken in account in tension only
 		sigmaT=G*epsT; // trial stress
 		Real yieldSigmaT=max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle); // Mohr-Coulomb law with damage
 		if(sigmaT.SquaredLength()>yieldSigmaT*yieldSigmaT){
 			sigmaT*=yieldSigmaT/sigmaT.Length(); // stress return
-			epsPlSum+=rT*contGeom->slipToStrainTMax(rT/G); // adjust strain
+			epsPlSum+=yieldSigmaT*contGeom->slipToStrainTMax(yieldSigmaT/G); // adjust strain
 		}
 		relResidualStrength=isCohesive?(kappaD<epsCrackOnset?1.:(1-omega)*(kappaD)/epsCrackOnset):0;
 	#endif

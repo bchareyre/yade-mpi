@@ -58,14 +58,17 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 		const long size=ncb->transientInteractions->size();
 		#pragma omp parallel for
 		for(long i=0; i<size; i++){
-			const shared_ptr<Interaction>& interaction=(*ncb->transientInteractions)[i];
+			const shared_ptr<Interaction>& I=(*ncb->transientInteractions)[i];
 	#else
-		FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
+		FOREACH(const shared_ptr<Interaction>& I, *ncb->interactions){
 	#endif
-			const shared_ptr<Body>& b1=(*bodies)[interaction->getId1()];
-			const shared_ptr<Body>& b2=(*bodies)[interaction->getId2()];
-			b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
-			operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, interaction);
+			const shared_ptr<Body>& b1=(*bodies)[I->getId1()];
+			const shared_ptr<Body>& b2=(*bodies)[I->getId2()];
+			bool wasReal=I->isReal();
+			if (!b1->interactingGeometry || !b2->interactingGeometry) { assert(!wasReal); continue; } // some bodies do not have interactingGeometry
+			bool geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, I);
+			// reset && erase interaction that existed but now has no geometry anymore
+			if(wasReal && !geomCreated){ ncb->interactions->requestErase(I->getId1(),I->getId2()); }
 	}
 }
 

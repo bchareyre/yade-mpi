@@ -81,7 +81,7 @@ void UniaxialStrainer::init(){
 			YADE_CAST<ParticleParameters*>(b->physicalParameters.get())->velocity[axis]=pNormalized*(v1-v0)+v0;
 		}
 	}
-	stressUpdateInterval=max(1,(int)(2e-5/(abs(strainRate)*Omega::instance().getTimeStep())));
+	stressUpdateInterval=max(1,(int)(1e-5/(abs(strainRate)*Omega::instance().getTimeStep())));
 	LOG_INFO("Stress will be updated every "<<stressUpdateInterval<<" steps.");
 
 	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;

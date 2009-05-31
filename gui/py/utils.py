@@ -4,8 +4,6 @@
 #
 # 2008 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#from yade._utils import *
-
 import math,random
 from yade.wrapper import *
 try: # use psyco if available
@@ -15,16 +13,6 @@ except ImportError: pass
 
 # c++ implementations for performance reasons
 from yade._utils import *
-
-def resetEngineClocks():
-	for e in O.engines: e.execTime=0
-def engineClockStats():
-	tSum=sum([e.execTime for e in O.engines])
-	for e in O.engines:
-		print e.name.ljust(30),(str(e.execTime/1000)+'ms').rjust(15),'%6.2f%%'%(e.execTime*100./tSum)
-	print '='*53
-	print 'TOTAL'.ljust(30),(str(tSum/1000)+'ms').rjust(15),'100.00%'
-
 
 def saveVars(mark='',loadNow=False,**kw):
 	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
@@ -381,44 +369,6 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	dictParams.update(dictDefaults); saveVars('table',**dictParams)
 	return len(tagsParams)
 
-
-def basicDEMEngines(interPhysics='SimpleElasticRelationships',constitutiveLaw='ElasticContactLaw',gravity=None,damping=.4):
-	"""Set basic set of DEM engines and initializers.
-	
-	interPhysics and constitutiveLaw specify class of respective engines to use instead of defaults.
-
-	Gravity can be list or tuple to specify numeric value, it can also be an object that will be inserted into
-	engines, however. By default, no gravity is applied.
-	"""
-	O.initializers=[
-		MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('InteractingFacet2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
-	]
-	O.engines=[
-		StandAloneEngine('PhysicalActionContainerReseter'),
-		MetaEngine('BoundingVolumeMetaEngine',[
-			EngineUnit('InteractingSphere2AABB'),
-			EngineUnit('InteractingBox2AABB'),
-			EngineUnit('InteractingFacet2AABB'),
-			EngineUnit('MetaInteractingGeometry2AABB')
-		]),
-		StandAloneEngine('PersistentSAPCollider'),
-		MetaEngine('InteractionGeometryMetaEngine',[
-			EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-			EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry'),
-			EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')
-		]),
-		MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-		StandAloneEngine('ElasticContactLaw'),
-	]
-	if gravity:
-		if islist(gravity) or istuple(gravity):
-			O.engines=O.engines+[DeusExMachina('GravityEngine',{'gravity':gravity}),]
-		else:
-			O.engines=O.engines+[gravity]
-	O.engines=O.engines+[DeusExMachina('NewtonsDampedLaw',{'damping':damping}),]
-	
-		
-
 def ColorizedVelocityFilter(isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Velocity, m/s'):
     f = DeusExMachina('ColorizedVelocityFilter',{'isFilterActivated':isFilterActivated,'autoScale':autoScale,'minValue':minValue,'maxValue':maxValue,'posX':posX,'posY':posY,'width':width,'height':height,'title':title})
     O.engines+=[f]
@@ -493,5 +443,25 @@ def regularSphereOrthoPack(center,extents,radius,gap,**kw):
 		if doSphere and sqrt(sum([(xyz[i]-center[i])**2 for i in 0,1,2]))>extents: continue
 		ret+=[sphere(xyz,radius=radius,**kw)]
 	return ret
+
+def spheresFromFileUniaxial(filename,areaSections=10,**kw):
+	"""Load spheres from file, but do some additional work useful for uniaxial test:
+	
+	1. Find the dimensions that is the longest (uniaxial loading axis)
+	2. Find the minimum cross-section area of the speciment by examining several (areaSections)
+		sections perpendicular to axis, computing area of the convex hull for each one. This will
+		work also for non-prismatic specimen.
+	3. Find the bodies that are on the negative/positive boundary, to which the straining condition
+		should be applied.
+
+	Returns dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
+	"""
+	ids=spheresFromFile(filename,**kw)
+	mm,mx=aabbExtrema()
+	dim=aabbDim(); axis=dim.index(max(dim))
+	import numpy
+	areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
+	negIds,posIds=negPosExtremeIds(axis=axis)
+	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
 

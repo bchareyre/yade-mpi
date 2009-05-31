@@ -8,6 +8,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/lib-computational-geometry/Hull2d.hpp>
 #include<cmath>
 
 #include<numpy/ndarrayobject.h>
@@ -284,6 +285,38 @@ bool pointInsidePolygon(python::tuple xy, python::object vertices){
 	return inside;
 }
 
+/* Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.
+
+	All spheres that touch the plane are projected as hexagons on their circumference to the plane.
+	Convex hull from this cloud is computed.
+	The area of the hull is returned.
+
+*/
+Real approxSectionArea(Real coord, int axis){
+	std::list<Vector2r> cloud;
+	if(axis<0 || axis>2) throw invalid_argument("Axis must be ∈ {0,1,2}");
+	const int ax1=(axis+1)%3, ax2=(axis+2)%3;
+	const Real sqrt3=sqrt(3);
+	Vector2r mm(-10.,0),mx(0,0);
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+		Sphere* s=dynamic_cast<Sphere*>(b->geometricalModel.get());
+		if(!s) continue;
+		const Vector3r& pos(b->physicalParameters->se3.position); const Real r(s->radius);
+		if((pos[axis]>coord && (pos[axis]-r)>coord) || (pos[axis]<coord && (pos[axis]+r)<coord)) continue;
+		Vector2r c(pos[ax1],pos[ax2]);
+		cloud.push_back(c+Vector2r(r,0)); cloud.push_back(c+Vector2r(-r,0));
+		cloud.push_back(c+Vector2r( r/2., sqrt3*r)); cloud.push_back(c+Vector2r( r/2.,-sqrt3*r));
+		cloud.push_back(c+Vector2r(-r/2., sqrt3*r)); cloud.push_back(c+Vector2r(-r/2.,-sqrt3*r));
+		if(mm[0]==-10.){ mm=c, mx=c;}
+		mm=Vector2r(min(c[0]-r,mm[0]),min(c[1]-r,mm[1]));
+		mx=Vector2r(max(c[0]+r,mx[0]),max(c[1]+r,mx[1]));
+	}
+	if(cloud.size()==0) return 0;
+	ConvexHull2d ch2d(cloud);
+	vector<Vector2r> hull=ch2d();
+	return simplePolygonArea2d(hull);
+}
+
 
 /* Project 3d point into 2d using spiral projection along given axis;
  * the returned tuple is
@@ -338,6 +371,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers"),"Return coordinates of box enclosing all bodies\n centers: do not take sphere radii in account, only their centroids (default=False)\n cutoff: 0-1 number by which the box will be scaled around its center (default=0)"));
 	def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
+	def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the AABB=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
 	def("setRefSe3",setRefSe3,"Set reference positions and orientation of all bodies equal to their current ones.");
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));

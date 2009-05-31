@@ -316,6 +316,7 @@ BASIC_PY_PROXY_HEAD(pyInteraction,Interaction)
 	NONPOD_ATTRIBUTE_ACCESS(geom,pyInteractionGeometry,interactionGeometry);
 	NONPOD_ATTRIBUTE_ACCESS(phys,pyInteractionPhysics,interactionPhysics);
 	/* shorthands */ unsigned id1_get(void){ensureAcc(); return proxee->getId1();} unsigned id2_get(void){ensureAcc(); return proxee->getId2();}
+	bool isReal_get(void){ensureAcc(); return proxee->isReal(); }
 BASIC_PY_PROXY_TAIL;
 
 BASIC_PY_PROXY_HEAD(pyBody,Body)
@@ -807,7 +808,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("phys",&pyInteraction::phys_get,&pyInteraction::phys_set)
 		.add_property("geom",&pyInteraction::geom_get,&pyInteraction::geom_set)
 		.add_property("id1",&pyInteraction::id1_get)
-		.add_property("id2",&pyInteraction::id2_get);
+		.add_property("id2",&pyInteraction::id2_get)
+		.add_property("isReal",&pyInteraction::isReal_get);
 
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
 		.def("generate",&pyFileGenerator::generate)

@@ -210,7 +210,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
 			sigmaT=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
 			neverDamage=false;
-			cohesiveThresholdIter=-1;
+			cohesiveThresholdIter=10;
 			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1;
 			isoPrestress=0;
 		}

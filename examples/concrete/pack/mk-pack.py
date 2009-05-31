@@ -12,7 +12,7 @@ cutoffFlat=3.5
 cutoffRound=2
 
 tt=TriaxialTest(
-	numberOfGrains=500,
+	numberOfGrains=5000,
 	radiusMean=3e-4,
 	# this is just size ratio if radiusMean is specified
 	# if you comment out the line above, it will be the corner (before compaction) and radiusMean will be set accordingly
@@ -44,7 +44,7 @@ O.wait()
 ext=utils.aabbExtrema()
 rSphere=tt['radiusMean']
 
-outFile=tempfile.NamedTemporaryFile(delete=False)
+outFile=tempfile.NamedTemporaryFile(delete=False).name
 
 if cylAxis<0: # box-shaped packing
 	aabbMin,aabbMax=tuple([ext[0][i]+rSphere*cutoffFlat for i in 0,1,2]),tuple([ext[1][i]-rSphere*cutoffFlat for i in 0,1,2])
@@ -67,7 +67,7 @@ else: # cylinger packing
 		return True
 	nSpheres=utils.spheresToFile(outFile,consider=isInCyl)
 
-outFile2='pack-%d-%s.sphere'%(nSpheres,'box' if cylAxis<0 else 'cyl')
+outFile2='pack-%d-%s.spheres'%(nSpheres,'box' if cylAxis<0 else 'cyl')
 shutil.move(outFile,outFile2)
 print nSpheres,'spheres written to',outFile2
 quit()
