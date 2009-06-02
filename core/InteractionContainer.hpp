@@ -104,8 +104,8 @@ class InteractionContainer : public Serializable
 		virtual shared_ptr<Interaction>& operator[] (unsigned int) {throw;};
 		virtual const shared_ptr<Interaction>& operator[] (unsigned int) const {throw;};
 
-		// std::pair is not handle by yade::serialization, use vector<body_id_t> instead
-		typedef vector<body_id_t> bodyIdPair;
+		// std::pair is not handled by yade::serialization, use vector<body_id_t> instead
+		typedef Vector2<body_id_t> bodyIdPair;
 		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state)
 		//! and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
 		void requestErase(body_id_t id1, body_id_t id2);
@@ -134,7 +134,7 @@ class InteractionContainer : public Serializable
 			method which will be called for every interaction.
 		*/
 		template<class T> void erasePending(const T& t){
-			FOREACH(const vector<body_id_t>& p, pendingErase){ if(t.shouldBeErased(p[0],p[1])) erase(p[0],p[1]); }
+			FOREACH(const Vector2<body_id_t>& p, pendingErase){ if(t.shouldBeErased(p[0],p[1])) erase(p[0],p[1]); }
 			pendingErase.clear();
 		}
 	private :

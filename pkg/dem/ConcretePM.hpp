@@ -120,13 +120,15 @@ class CpmPhys: public NormalShearInteraction {
 			isoPrestress;
 		/*! Up to now maximum normal strain (semi-norm), non-decreasing in time. */
 		Real kappaD;
+		//! normal plastic strain (initially zero)
+		Real epsNPl;
 		/*! Transversal strain (perpendicular to the contact axis) */
 		Real epsTrans;
 		/*! if not cohesive, interaction is deleted when distance is greater than zero. */
 		bool isCohesive;
 		/*! the damage evlution function will always return virgin state */
 		bool neverDamage;
-		/*! cummulative plastic strain measure (scalar) on this contact */
+		/*! cummulative shear plastic strain measure (scalar) on this contact */
 		Real epsPlSum;
 		//! debugging, to see convergence rate
 		static long cummBetaIter, cummBetaCount;
@@ -142,7 +144,7 @@ class CpmPhys: public NormalShearInteraction {
 
 
 
-		CpmPhys(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
+		CpmPhys(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsNPl(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
 		virtual ~CpmPhys();
 
 		REGISTER_ATTRIBUTES(NormalShearInteraction,
@@ -165,6 +167,7 @@ class CpmPhys: public NormalShearInteraction {
 			(cummBetaCount)
 
 			(kappaD)
+			(epsNPl)
 			(neverDamage)
 			(epsT)
 			(epsTrans)
@@ -256,11 +259,15 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 		static Real omegaThreshold;
 		//! HACK: limit strain on some contacts by moving body #2 in the contact; only if refR1<0 (facet); deactivated if > 0
 		static Real minStrain_moveBody2;
+		//! Strain at which softening in compression starts (set to 0. (default) or positive value to deactivate)
+		static Real epsSoft;
+		//! Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, 1=no softening, >1=hardening)
+		static Real relKnSoft;
 		Law2_Dem3DofGeom_CpmPhys_Cpm(): logStrain(false), yieldSurfType(0) { /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2)(omegaThreshold));
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2)(omegaThreshold)(epsSoft)(relKnSoft));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);

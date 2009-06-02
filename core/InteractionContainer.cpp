@@ -11,7 +11,7 @@
 #include "InteractionContainer.hpp"
 
 void InteractionContainer::requestErase(body_id_t id1, body_id_t id2){
-	find(id1,id2)->reset(); bodyIdPair v(0,2); v.push_back(id1); v.push_back(id2); 
+	find(id1,id2)->reset(); bodyIdPair v(id1,id2); //v.push_back(id1); v.push_back(id2); 
 	#ifdef YADE_OPENMP
 		boost::mutex::scoped_lock lock(pendingEraseMutex);
 	#endif

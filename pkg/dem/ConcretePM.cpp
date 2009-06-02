@@ -116,13 +116,14 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 }
 
 
-
 /********************** Law2_Dem3DofGeom_CpmPhys_Cpm ****************************/
 
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2=1.; /* deactivated if > 0 */
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed=1.;
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift=0.;
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=0.;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=1.;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft=0.;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft=.5;
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	//timingDeltas->start();
@@ -130,10 +131,12 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
 	// shorthands
-	Real& epsN(BC->epsN); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
+	Real& epsN(BC->epsN); Real& epsNPl(BC->epsNPl); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
 	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
 	const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
 	const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); 
+	const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); 
+	const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
 
 	#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); throw;}
 	

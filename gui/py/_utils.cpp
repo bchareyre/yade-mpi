@@ -316,6 +316,39 @@ Real approxSectionArea(Real coord, int axis){
 	vector<Vector2r> hull=ch2d();
 	return simplePolygonArea2d(hull);
 }
+/* Find all interactions deriving from NormalShearInteraction that cross plane given by a point and normal
+	(the normal may not be normalized in this case, though) and sum forces (both normal and shear) on them.
+	
+	Return a 3-tuple with the components along global x,y,z axes.
+
+	(This could be easily extended to return sum of only normal forces or only of shear forces.)
+*/
+python::tuple forcesOnPlane(python::tuple _planePt, python::tuple _normal){
+	Vector3r ret(Vector3r::ZERO), planePt(tuple2vec(_planePt)), normal(tuple2vec(_normal));
+	MetaBody* rootBody=Omega::instance().getRootBody().get();
+	FOREACH(const shared_ptr<Interaction>&I, *rootBody->interactions){
+		if(!I->isReal()) continue;
+		NormalShearInteraction* nsi=dynamic_cast<NormalShearInteraction*>(I->interactionPhysics.get());
+		if(!nsi) continue;
+		Vector3r pos1,pos2;
+		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
+		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
+		else{ pos1=Body::byId(I->getId1(),rootBody)->physicalParameters->se3.position; pos2=Body::byId(I->getId2(),rootBody)->physicalParameters->se3.position; }
+		Real dot1=(pos1-planePt).Dot(normal), dot2=(pos2-planePt).Dot(normal);
+		if(dot1*dot2>0) continue; // both interaction points on the same side of the plane
+		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;
+		// otherwise, reverse its contribution
+		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
+	}
+	return vec2tuple(ret);
+}
+
+/* Less general than forcesOnPlane, computes force on plane perpendicular to axis, passing through coordinate coord. */
+python::tuple forcesOnCoordPlane(Real coord, int axis){
+	Vector3r planePt(Vector3r::ZERO); planePt[axis]=coord;
+	Vector3r normal(Vector3r::ZERO); normal[axis]=1;
+	return forcesOnPlane(vec2tuple(planePt),vec2tuple(normal));
+}
 
 
 /* Project 3d point into 2d using spiral projection along given axis;
@@ -383,6 +416,8 @@ BOOST_PYTHON_MODULE(_utils){
 	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumBexForces",sumBexForces);
 	def("sumBexTorques",sumBexTorques);
+	def("forcesOnPlane",forcesOnPlane);
+	def("forcesOnCoordPlane",forcesOnCoordPlane);
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);

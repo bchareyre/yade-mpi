@@ -404,42 +404,20 @@ def vmData():
 	l=procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
 	return int(ll[1])
 
-
-
-def xcombine(*seqin):
-	'''returns a generator which returns combinations of argument sequences
-for example xcombine((1,2),(3,4)) returns a generator; calling the next()
-method on the generator will return [1,3], [1,4], [2,3], [2,4] and
-StopIteration exception.  This will not create the whole list of 
-combinations in memory at once.
-
-Source: http://code.activestate.com/recipes/302478/'''
-	def rloop(seqin,comb):
-		'''recursive looping function'''
-		if seqin:				   # any more sequences to process?
-			for item in seqin[0]:
-				newcomb=comb+[item]	 # add next item to current combination
-				# call rloop w/ remaining seqs, newcomb
-				for item in rloop(seqin[1:],newcomb):   
-					yield item		  # seqs and newcomb
-		else:						   # processing last sequence
-			yield comb				  # comb finished, add to list
-	return rloop(seqin,[])
-
-
 def regularSphereOrthoPack(center,extents,radius,gap,**kw):
 	"""Return set of spheres regularly spaced in either a box or sphere centered around center.
 	If extents is a number, it is taken for sphere radius; if it is a sequence, it is 3 extents of the box.
 	Created spheres will have given radius and will be separated by gap space.
 	"""
 	from numpy import arange; from math import sqrt
+	import itertools
 	ret=[]
 	try: # extents is a single number, do sphere
 		doSphere=True; dim=float(extents),float(extents),float(extents)
 	except TypeError: # extents is a list, do box
 		doSphere=False; dim=extents
 	xx,yy,zz=[arange(center[i]-dim[i],center[i]+dim[i],2*radius+gap) for i in 0,1,2]
-	for xyz in xcombine(xx,yy,zz):
+	for xyz in itertools.product(xx,yy,zz):
 		if doSphere and sqrt(sum([(xyz[i]-center[i])**2 for i in 0,1,2]))>extents: continue
 		ret+=[sphere(xyz,radius=radius,**kw)]
 	return ret
@@ -461,7 +439,7 @@ def spheresFromFileUniaxial(filename,areaSections=10,**kw):
 	dim=aabbDim(); axis=dim.index(max(dim))
 	import numpy
 	areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
-	negIds,posIds=negPosExtremeIds(axis=axis)
+	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
 

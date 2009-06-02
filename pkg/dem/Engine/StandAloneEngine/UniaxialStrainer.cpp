@@ -81,7 +81,7 @@ void UniaxialStrainer::init(){
 			YADE_CAST<ParticleParameters*>(b->physicalParameters.get())->velocity[axis]=pNormalized*(v1-v0)+v0;
 		}
 	}
-	stressUpdateInterval=max(1,(int)(1e-5/(abs(strainRate)*Omega::instance().getTimeStep())));
+	stressUpdateInterval=min(1000,max(1,(int)(1e-5/(abs(strainRate)*Omega::instance().getTimeStep()))));
 	LOG_INFO("Stress will be updated every "<<stressUpdateInterval<<" steps.");
 
 	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;
@@ -133,13 +133,17 @@ void UniaxialStrainer::action(MetaBody* _rootBody){
 		}
 	}
 	if(asymmetry==0) dAX*=.5; // apply half on both sides if straining symetrically
-	for(size_t i=0; i<negIds.size(); i++){
-		if(asymmetry==0 || asymmetry==-1 /* for +1, don't move*/) negCoords[i]-=dAX;
-		axisCoord(negIds[i])=negCoords[i]; // update current position
+	if(asymmetry!=1){
+		for(size_t i=0; i<negIds.size(); i++){
+			negCoords[i]-=dAX;
+			axisCoord(negIds[i])=negCoords[i]; // update current position
+		}
 	}
-	for(size_t i=0; i<posIds.size(); i++){
-		if(asymmetry==0 || asymmetry==1 /* for -1, don't move */) posCoords[i]+=dAX;
-		axisCoord(posIds[i])=posCoords[i];
+	if(asymmetry!=-1){
+		for(size_t i=0; i<posIds.size(); i++){
+			posCoords[i]+=dAX;
+			axisCoord(posIds[i])=posCoords[i];
+		}
 	}
 
 	Real axialLength=axisCoord(posIds[0])-axisCoord(negIds[0]);
