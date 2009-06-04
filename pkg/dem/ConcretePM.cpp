@@ -118,54 +118,59 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 
 /********************** Law2_Dem3DofGeom_CpmPhys_Cpm ****************************/
 
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2=1.; /* deactivated if > 0 */
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed=1.;
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift=0.;
+/// yield surface parameters
+int  Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType=2;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed=.1;
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift=0.; // deprecated
+/// compressive plasticity parameters
+// approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft=-3e-3; // deactivated if >=0
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft=.25;
+// >=1. to deactivate (never delete damaged contacts)
 Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=1.;
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft=0.;
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft=.5;
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
-	//timingDeltas->start();
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
 	// shorthands
-	Real& epsN(BC->epsN); Real& epsNPl(BC->epsNPl); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
-	Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
-	const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
-	const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); 
-	const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); 
-	const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
+		Real& epsN(BC->epsN); Real& epsNPl(BC->epsNPl); Vector3r& epsT(BC->epsT); Real& kappaD(BC->kappaD); Real& epsPlSum(BC->epsPlSum); const Real& E(BC->E); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle); const Real& G(BC->G); const Real& crossSection(BC->crossSection); const Real& omegaThreshold(Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold); const Real& epsCrackOnset(BC->epsCrackOnset); Real& relResidualStrength(BC->relResidualStrength); const Real& dt=Omega::instance().getTimeStep();  const Real& epsFracture(BC->epsFracture); const bool& neverDamage(BC->neverDamage); const Real& dmgTau(BC->dmgTau); const Real& plTau(BC->plTau); const bool& isCohesive(BC->isCohesive);
+		Real& omega(BC->omega); Real& sigmaN(BC->sigmaN);  Vector3r& sigmaT(BC->sigmaT); Real& Fn(BC->Fn); Vector3r& Fs(BC->Fs); // for python access
+		const Real& yieldLogSpeed(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed); const int& yieldSurfType(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType);
+		const Real& yieldEllipseShift(Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift); 
+		const Real& epsSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft); 
+		const Real& relKnSoft(Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft); 
 
-	#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); throw;}
-	
-	#define NNAN(a) YADE_VERIFY(!isnan(a));
-	#define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
 
-	//timingDeltas->checkpoint("setup");
-	// if(contGeom->refR1<0) contGeom->refLength=contGeom->refR2; // make facet-sphere contact always at equilibrium when touching exactly (and not the initial distance)
 	epsN=contGeom->strainN(); epsT=contGeom->strainT();
-	#ifdef YADE_DEBUG
-		if(isnan(epsN)){
-			LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
+	
+	// debugging
+		#define YADE_VERIFY(condition) if(!(condition)){LOG_FATAL("Verification `"<<#condition<<"' failed!"); throw;}
+		#define NNAN(a) YADE_VERIFY(!isnan(a));
+		#define NNANV(v) YADE_VERIFY(!isnan(v[0])); assert(!isnan(v[1])); assert(!isnan(v[2]));
+		#ifdef YADE_DEBUG
+			if(isnan(epsN)){
+				LOG_FATAL("refLength="<<contGeom->refLength<<"; pos1="<<contGeom->se31.position<<"; pos2="<<contGeom->se32.position<<"; displacementN="<<contGeom->displacementN());
 			throw runtime_error("!! epsN==NaN !!");
-		}
+			}
+			NNAN(epsN); NNANV(epsT);
+		#endif
 		NNAN(epsN); NNANV(epsT);
-	#endif
-	// already in SpheresContactGeometry:
-	// contGeom->relocateContactPoints(); // allow very large mutual rotations
-	if(logStrain && epsN<0){
-		Real epsN0=epsN;
-		epsN=log(epsN0+1); epsT*=epsN/epsN0;
-	}
-	NNAN(epsN); NNANV(epsT);
-	//timingDeltas->checkpoint("geom");
 
-	epsN+=BC->isoPrestress/E;
+	// constitutive law 
 	#ifdef CPM_MATERIAL_MODEL
+		// complicated version
+		if(epsSoft>=0)	epsN+=BC->isoPrestress/E;
+		else{ // take softening into account for the prestress
+			Real sigmaSoft=E*epsSoft;
+			if(BC->isoPrestress>=sigmaSoft) epsN+=BC->isoPrestress/E; // on the non-softened branch yet
+			// otherwise take the regular and softened branches separately (different moduli)
+			else epsN+=sigmaSoft/E+(BC->isoPrestress-sigmaSoft)/(E*relKnSoft);
+		}
 		CPM_MATERIAL_MODEL
 	#else
+		// simplified public model
+		epsN+=BC->isoPrestress/E;
 		// very simplified version of the constitutive law
 		kappaD=max(max(0.,epsN),kappaD); // internal variable, max positive strain (non-decreasing)
 		omega=isCohesive?funcG(kappaD,epsCrackOnset,epsFracture,neverDamage):1.; // damage variable (non-decreasing, as funcG is also non-decreasing)
@@ -179,18 +184,11 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 		relResidualStrength=isCohesive?(kappaD<epsCrackOnset?1.:(1-omega)*(kappaD)/epsCrackOnset):0;
 	#endif
 	sigmaN-=BC->isoPrestress;
-	if(contGeom->refR1<0 && Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2<=0 && epsN<Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2){
-		/* move Body2 (the sphere) so that minStrain is satisfied */
-		rootBody->bex.addMove(I->getId2(),contGeom->normal*(Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2-epsN)*contGeom->refLength);
-		LOG_TRACE("Moving by "<<contGeom->normal*(Law2_Dem3DofGeom_CpmPhys_Cpm::minStrain_moveBody2-epsN)*contGeom->refLength);
-	}
+
 	NNAN(kappaD); NNAN(epsCrackOnset); NNAN(epsFracture); NNAN(omega);
 	NNAN(sigmaN); NNANV(sigmaT); NNAN(crossSection);
-	//timingDeltas->checkpoint("material");
 
-	//const int watch1=6300, watch2=6299;
-	//#define SHOW(a) if((I->getId1()==watch1 && I->getId2()==watch2) || (I->getId2()==watch1 && I->getId1()==watch2)) cerr<<__FILE__<<":"<<__LINE__<<" "<<a<<endl;
-	//SHOW("epsN"<<epsN);
+	// handle broken contacts
 	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
 		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		if(isCohesive){
@@ -206,7 +204,6 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
 	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, rootBody);
-	//timingDeltas->checkpoint("rest");
 }
 
 

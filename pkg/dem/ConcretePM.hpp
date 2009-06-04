@@ -248,26 +248,23 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
 		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 	}
-		bool logStrain;
 		//! yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log
-		int yieldSurfType;
+		static int yieldSurfType;
 		//! scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)
 		static Real yieldLogSpeed;
 		//! horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)
 		static Real yieldEllipseShift;
 		//! damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞
 		static Real omegaThreshold;
-		//! HACK: limit strain on some contacts by moving body #2 in the contact; only if refR1<0 (facet); deactivated if > 0
-		static Real minStrain_moveBody2;
 		//! Strain at which softening in compression starts (set to 0. (default) or positive value to deactivate)
 		static Real epsSoft;
 		//! Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, 1=no softening, >1=hardening)
 		static Real relKnSoft;
-		Law2_Dem3DofGeom_CpmPhys_Cpm(): logStrain(false), yieldSurfType(0) { /*timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);*/ }
+		Law2_Dem3DofGeom_CpmPhys_Cpm() { }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(logStrain)(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(minStrain_moveBody2)(omegaThreshold)(epsSoft)(relKnSoft));
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(omegaThreshold)(epsSoft)(relKnSoft));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
