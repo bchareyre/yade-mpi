@@ -57,6 +57,18 @@ if 'qt3' not in env['exclude']:
 			env.SharedLibrary('BINFormatManager',['serialization-bin/BINFormatManager.cpp']),
 		])
 
+if 'YADE_OPENGL' in env['CPPDEFINES']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+		env.SharedLibrary('yade-opengl',
+			['opengl/FpsTracker.cpp',
+				'opengl/GLTextLabel.cpp',
+				'opengl/GLWindow.cpp',
+				'opengl/GLWindowsManager.cpp',
+				'opengl/GLUtils.cpp'],
+			LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
+	])
+
+
 
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 
@@ -108,15 +120,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 	env.SharedLibrary('yade-multimethods',
 		['multimethods/Indexable.cpp',
 			'multimethods/MultiMethodsExceptions.cpp']),
-
-	env.SharedLibrary('yade-opengl',
-		['opengl/FpsTracker.cpp',
-			'opengl/GLTextLabel.cpp',
-			'opengl/GLWindow.cpp',
-			'opengl/GLWindowsManager.cpp',
-			'opengl/GLUtils.cpp'],
-		LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
-
 
 	env.SharedLibrary('XMLFormatManager',
 		['serialization-xml/XMLFormatManager.cpp',

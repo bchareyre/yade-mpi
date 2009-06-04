@@ -7,7 +7,6 @@
 *************************************************************************/
 
 #include "ColorScale.hpp"
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 ColorScale::ColorScale () : GeometricalModel()
 {

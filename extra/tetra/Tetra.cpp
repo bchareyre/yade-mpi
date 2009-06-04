@@ -3,14 +3,17 @@
 #include"Tetra.hpp"
 
 YADE_PLUGIN(/* self-contained in hpp: */ "TetraMold", "TetraBang", "Tetrahedron2TetraMold","TetraAABB", 
-	/* some code in cpp (this file): */ "TetraLaw",	 "Tetra2TetraBang","TetraDraw");
+	/* some code in cpp (this file): */ "TetraLaw",	 "Tetra2TetraBang"
+	#ifdef YADE_OPENGL
+		,"TetraDraw"
+	#endif	
+	);
 
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Tetrahedron.hpp>
@@ -411,35 +414,36 @@ void TetraLaw::action(MetaBody* rootBody)
 	}
 }
 
-
-void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>&,bool)
-{
-  	glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
-	glColor3v(cm->diffuseColor);
-	TetraMold* t=static_cast<TetraMold*>(cm.get());
-	if (0) { // wireframe, as for Tetrahedron
-		glDisable(GL_LIGHTING);
-		glBegin(GL_LINES);
-			#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
-				__ONEWIRE(0,1);__ONEWIRE(0,2);__ONEWIRE(0,3);__ONEWIRE(1,2);__ONEWIRE(1,3);__ONEWIRE(2,3);
-			#undef __ONEWIRE
-		glEnd();
-	}
-	else
+#ifdef YADE_OPENGL
+	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>&,bool)
 	{
-		Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
-		glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
-		glBegin(GL_TRIANGLES);
-			#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
-				__ONEFACE(3,0,1);
-				__ONEFACE(0,1,2);
-				__ONEFACE(1,2,3);
-				__ONEFACE(2,3,0);
-			#undef __ONEFACE
-		glEnd();
+		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
+		glColor3v(cm->diffuseColor);
+		TetraMold* t=static_cast<TetraMold*>(cm.get());
+		if (0) { // wireframe, as for Tetrahedron
+			glDisable(GL_LIGHTING);
+			glBegin(GL_LINES);
+				#define __ONEWIRE(a,b) glVertex3v(t->v[a]);glVertex3v(t->v[b])
+					__ONEWIRE(0,1);__ONEWIRE(0,2);__ONEWIRE(0,3);__ONEWIRE(1,2);__ONEWIRE(1,3);__ONEWIRE(2,3);
+				#undef __ONEWIRE
+			glEnd();
+		}
+		else
+		{
+			Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
+			glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
+			glBegin(GL_TRIANGLES);
+				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
+					__ONEFACE(3,0,1);
+					__ONEFACE(0,1,2);
+					__ONEFACE(1,2,3);
+					__ONEFACE(2,3,0);
+				#undef __ONEFACE
+			glEnd();
+		}
 	}
-
-}
+#endif
 
 /*! Calculates tetrahedron inertia relative to the origin (0,0,0), with unit density (scales linearly).
 

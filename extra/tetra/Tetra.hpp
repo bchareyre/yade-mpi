@@ -12,7 +12,6 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
-#include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
 #include<Wm3Math.h>
@@ -112,20 +111,20 @@ class TetraAABB: public BoundingVolumeEngineUnit
 };
 REGISTER_SERIALIZABLE(TetraAABB);
 
+#ifdef YADE_OPENGL
+	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	/*! Draw TetraMold using OpenGL */
+	class TetraDraw: public GLDrawInteractingGeometryFunctor
+	{	
+		public:
+			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
 
-/*! Draw TetraMold using OpenGL */
-
-class TetraDraw: public GLDrawInteractingGeometryFunctor
-{	
-	public:
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
-
-		RENDERS(TetraMold);
-		REGISTER_CLASS_NAME(TetraDraw);
-		REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
-};
-REGISTER_SERIALIZABLE(TetraDraw);
-
+			RENDERS(TetraMold);
+			REGISTER_CLASS_NAME(TetraDraw);
+			REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	};
+	REGISTER_SERIALIZABLE(TetraDraw);
+#endif
 
 /*! Calculate physical response based on penetration configuration given by TetraBang. */
 

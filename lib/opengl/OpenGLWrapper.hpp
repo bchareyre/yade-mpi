@@ -8,6 +8,10 @@
 
 #pragma once
 
+#ifndef YADE_OPENGL
+#error "This build doesn't support openGL. Therefore, this header must not be used."
+#endif
+
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 

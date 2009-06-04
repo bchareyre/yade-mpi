@@ -7,7 +7,6 @@
 *************************************************************************/
 
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include "BshTube.hpp"
 #include <iostream>
 

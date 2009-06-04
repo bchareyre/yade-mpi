@@ -50,7 +50,6 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-common/GLDrawFunctors.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
@@ -292,16 +291,19 @@ class CpmGlobalCharacteristics: public PeriodicEngine{
 };
 REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 
-class GLDrawCpmPhys: public GLDrawInteractionPhysicsFunctor {
-	public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
-	virtual ~GLDrawCpmPhys() {};
-	REGISTER_ATTRIBUTES(/*no base*/,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
-	RENDERS(CpmPhys);
-	REGISTER_CLASS_AND_BASE(GLDrawCpmPhys,GLDrawInteractionPhysicsFunctor);
-	DECLARE_LOGGER;
-	static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
-};
-REGISTER_SERIALIZABLE(GLDrawCpmPhys);
+#ifdef YADE_OPENGL
+	#include<yade/pkg-common/GLDrawFunctors.hpp>
+	class GLDrawCpmPhys: public GLDrawInteractionPhysicsFunctor {
+		public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+		virtual ~GLDrawCpmPhys() {};
+		REGISTER_ATTRIBUTES(/*no base*/,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
+		RENDERS(CpmPhys);
+		REGISTER_CLASS_AND_BASE(GLDrawCpmPhys,GLDrawInteractionPhysicsFunctor);
+		DECLARE_LOGGER;
+		static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
+	};
+	REGISTER_SERIALIZABLE(GLDrawCpmPhys);
+#endif
 
 class CpmPhysDamageColorizer: public PeriodicEngine {
 	struct BodyStats{ short nCohLinks; Real dmgSum; Real epsPlSum; BodyStats(): nCohLinks(0), dmgSum(0), epsPlSum(0.){} };

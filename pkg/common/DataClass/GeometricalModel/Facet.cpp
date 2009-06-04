@@ -7,7 +7,6 @@
 *************************************************************************/
 
 #include "Facet.hpp"
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 Facet::Facet () : GeometricalModel()
 {

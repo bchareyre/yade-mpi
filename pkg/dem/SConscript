@@ -14,10 +14,6 @@ if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a
 				'SDECLinkGeometry',
 				'SpheresContactGeometry',
 				'BodyMacroParameters',
-				'yade-serialization',
-				'yade-base',
-				'GLDrawInteractingSphere',
-				'yade-multimethods',
 				'Sphere',
 				'RigidBodyParameters',
 				'InteractingSphere',
@@ -37,8 +33,8 @@ else:
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	
 	env.SharedLibrary('DemXDofGeom',['DataClass/InteractionGeometry/DemXDofGeom.cpp']),
-	env.SharedLibrary('Dem3DofGeom_SphereSphere',['DataClass/InteractionGeometry/Dem3DofGeom_SphereSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','yade-opengl','DemXDofGeom']),
-	env.SharedLibrary('Dem3DofGeom_FacetSphere',['DataClass/InteractionGeometry/Dem3DofGeom_FacetSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','InteractingFacet','yade-opengl','Dem3DofGeom_SphereSphere','DemXDofGeom']),
+	env.SharedLibrary('Dem3DofGeom_SphereSphere',['DataClass/InteractionGeometry/Dem3DofGeom_SphereSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','DemXDofGeom','yade-opengl' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
+	env.SharedLibrary('Dem3DofGeom_FacetSphere',['DataClass/InteractionGeometry/Dem3DofGeom_FacetSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','InteractingFacet','Dem3DofGeom_SphereSphere','DemXDofGeom','yade-opengl' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
 
 	env.SharedLibrary('FacetTopologyAnalyzer',['Engine/StandAloneEngine/FacetTopologyAnalyzer.cpp'],LIBS=env['LIBS']+['InteractingFacet']),
 
@@ -241,10 +237,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'DemXDofGeom',
 			'SpheresContactGeometry',
 			'BodyMacroParameters',
-			'yade-serialization',
-			'yade-base',
-			'GLDrawInteractingSphere',
-			'yade-multimethods',
 			'Sphere',
 			'RigidBodyParameters']),
 	
@@ -359,34 +351,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'TriaxialStressController',
 			'Shop']),
 
-	env.SharedLibrary('GLDrawInteractingMyTetrahedron',
-		['RenderingEngine/GLDrawInteractingMyTetrahedron/GLDrawInteractingMyTetrahedron.cpp'],
-		LIBS=env['LIBS']+['InteractingMyTetrahedron', 'yade-opengl']),
-
-	env.SharedLibrary('GLDrawCohesiveFrictionalContactInteraction',
-		['RenderingEngine/GLDrawCohesiveFrictionalContactInteraction/GLDrawCohesiveFrictionalContactInteraction.cpp'],
-		LIBS=env['LIBS']+['CohesiveFrictionalContactInteraction','SpheresContactGeometry',
-			'GLDrawElasticContactInteraction',
-			'ElasticContactInteraction',
-			'yade-opengl','$QGLVIEWER_LIB']),
-
-	env.SharedLibrary('GLDrawElasticContactInteraction',
-		['RenderingEngine/GLDrawElasticContactInteraction/GLDrawElasticContactInteraction.cpp'],
-		LIBS=env['LIBS']+['SpheresContactGeometry',
-			'ElasticContactInteraction',
-			'yade-opengl','$QGLVIEWER_LIB']),
-
-	env.SharedLibrary('GLDrawSpheresContactGeometry',
-		['RenderingEngine/GLDrawSpheresContactGeometry/GLDrawSpheresContactGeometry.cpp'],
-		LIBS=env['LIBS']+['SpheresContactGeometry',
-			'ElasticContactInteraction',
-			'yade-opengl','$QGLVIEWER_LIB']),
-
-	env.SharedLibrary('GLDrawSDECLinkGeometry',
-		['RenderingEngine/GLDrawSDECLinkGeometry/GLDrawSDECLinkGeometry.cpp'],
-		LIBS=env['LIBS']+['SDECLinkGeometry',
-			'SDECLinkPhysics',
-			'yade-opengl']),
 
 	env.SharedLibrary('Funnel',
 		['PreProcessor/Funnel.cpp'],
@@ -980,10 +944,6 @@ env.SharedLibrary('NewtonsDampedLaw',
 		,['DataClass/InteractionPhysics/ViscoelasticInteraction.cpp']
 	    ,LIBS=env['LIBS']+['ElasticContactInteraction'])
     
-	,env.SharedLibrary('GLDrawViscoelasticInteraction'
-	    ,['RenderingEngine/GLDrawViscoelasticInteraction/GLDrawViscoelasticInteraction.cpp']
-	    ,LIBS=env['LIBS']+['yade-opengl','ViscoelasticInteraction'])
-
 	,env.SharedLibrary('SimpleViscoelasticRelationships'
 		,['Engine/EngineUnit/SimpleViscoelasticRelationships.cpp']
 		,LIBS=env['LIBS']+['SimpleViscoelasticBodyParameters'
@@ -1112,3 +1072,39 @@ env.SharedLibrary('NewtonsDampedLaw',
 			#chdir='/home/bruno/YADE/trunk_svn/extra/triangulation')
 ])
 
+
+if 'YADE_OPENGL' in env['CPPDEFINES']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
+
+		env.SharedLibrary('GLDrawInteractingMyTetrahedron',
+			['RenderingEngine/GLDrawInteractingMyTetrahedron/GLDrawInteractingMyTetrahedron.cpp'],
+			LIBS=env['LIBS']+['InteractingMyTetrahedron', 'yade-opengl']),
+
+		env.SharedLibrary('GLDrawCohesiveFrictionalContactInteraction',
+			['RenderingEngine/GLDrawCohesiveFrictionalContactInteraction/GLDrawCohesiveFrictionalContactInteraction.cpp'],
+			LIBS=env['LIBS']+['CohesiveFrictionalContactInteraction','SpheresContactGeometry',
+				'GLDrawElasticContactInteraction',
+				'ElasticContactInteraction',
+				'yade-opengl','$QGLVIEWER_LIB']),
+
+		env.SharedLibrary('GLDrawElasticContactInteraction',
+			['RenderingEngine/GLDrawElasticContactInteraction/GLDrawElasticContactInteraction.cpp'],
+			LIBS=env['LIBS']+['SpheresContactGeometry',
+				'ElasticContactInteraction',
+				'yade-opengl','$QGLVIEWER_LIB']),
+
+		env.SharedLibrary('GLDrawSpheresContactGeometry',
+			['RenderingEngine/GLDrawSpheresContactGeometry/GLDrawSpheresContactGeometry.cpp'],
+			LIBS=env['LIBS']+['SpheresContactGeometry',
+				'ElasticContactInteraction',
+				'yade-opengl','$QGLVIEWER_LIB']),
+
+		env.SharedLibrary('GLDrawSDECLinkGeometry',
+			['RenderingEngine/GLDrawSDECLinkGeometry/GLDrawSDECLinkGeometry.cpp'],
+			LIBS=env['LIBS']+['SDECLinkGeometry',
+				'SDECLinkPhysics',
+				'yade-opengl']),
+		env.SharedLibrary('GLDrawViscoelasticInteraction'
+			 ,['RenderingEngine/GLDrawViscoelasticInteraction/GLDrawViscoelasticInteraction.cpp']
+			 ,LIBS=env['LIBS']+['yade-opengl','ViscoelasticInteraction'])
+	])

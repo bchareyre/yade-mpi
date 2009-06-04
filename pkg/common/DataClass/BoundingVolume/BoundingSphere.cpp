@@ -8,10 +8,6 @@
 
 #include "BoundingSphere.hpp"
 
-
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-
-
 BoundingSphere::BoundingSphere () : BoundingVolume()
 {
 	createIndex();

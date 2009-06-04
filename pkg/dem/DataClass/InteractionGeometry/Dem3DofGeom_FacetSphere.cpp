@@ -1,7 +1,11 @@
 #include "Dem3DofGeom_FacetSphere.hpp"
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
-YADE_PLUGIN("Dem3DofGeom_FacetSphere","GLDraw_Dem3DofGeom_FacetSphere","ef2_Facet_Sphere_Dem3DofGeom");
+YADE_PLUGIN("Dem3DofGeom_FacetSphere",
+	#ifdef YADE_OPENGL
+		"GLDraw_Dem3DofGeom_FacetSphere",
+	#endif	
+		"ef2_Facet_Sphere_Dem3DofGeom");
 
 CREATE_LOGGER(Dem3DofGeom_FacetSphere);
 Dem3DofGeom_FacetSphere::~Dem3DofGeom_FacetSphere(){}
@@ -152,46 +156,48 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 	return true;
 }
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/lib-opengl/GLUtils.hpp>
+#ifdef YADE_OPENGL
 
-bool GLDraw_Dem3DofGeom_FacetSphere::normal=false;
-bool GLDraw_Dem3DofGeom_FacetSphere::rolledPoints=false;
-bool GLDraw_Dem3DofGeom_FacetSphere::unrolledPoints=false;
-bool GLDraw_Dem3DofGeom_FacetSphere::shear=false;
-bool GLDraw_Dem3DofGeom_FacetSphere::shearLabel=false;
+	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	#include<yade/lib-opengl/GLUtils.hpp>
 
-void GLDraw_Dem3DofGeom_FacetSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-	Dem3DofGeom_FacetSphere* fs = static_cast<Dem3DofGeom_FacetSphere*>(ig.get());
-	//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
-	const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;
-	const Vector3r& pos1=se31.position; const Vector3r& pos2=se32.position;
-	const Quaternionr& ori1=se31.orientation; const Quaternionr& ori2=se32.orientation;
-	const Vector3r& contPt=fs->contactPoint;
-	
-	if(normal){
-		GLUtils::GLDrawArrow(contPt,contPt+fs->refLength*fs->normal); // normal of the contact
-	}
-	// sphere center to point on the sphere
-	if(rolledPoints){
-		//cerr<<pos1<<" "<<pos1+ori1*fs->cp1pt<<" "<<contPt<<endl;
-		GLUtils::GLDrawLine(pos1+ori1*fs->cp1pt,contPt,Vector3r(0,.5,1));
-		GLUtils::GLDrawLine(pos2,pos2+(ori2*fs->cp2rel*Vector3r::UNIT_X*fs->effR2),Vector3r(0,1,.5));
-	}
-	// contact point to projected points
-	if(unrolledPoints||shear){
-		Vector3r ptTg1=fs->contPtInTgPlane1(), ptTg2=fs->contPtInTgPlane2();
-		if(unrolledPoints){
-			//TRVAR3(ptTg1,ptTg2,ss->normal)
-			GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5)); GLUtils::GLDrawLine(pos2,contPt+ptTg2,Vector3r(0,1,.5));
+	bool GLDraw_Dem3DofGeom_FacetSphere::normal=false;
+	bool GLDraw_Dem3DofGeom_FacetSphere::rolledPoints=false;
+	bool GLDraw_Dem3DofGeom_FacetSphere::unrolledPoints=false;
+	bool GLDraw_Dem3DofGeom_FacetSphere::shear=false;
+	bool GLDraw_Dem3DofGeom_FacetSphere::shearLabel=false;
+
+	void GLDraw_Dem3DofGeom_FacetSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+		Dem3DofGeom_FacetSphere* fs = static_cast<Dem3DofGeom_FacetSphere*>(ig.get());
+		//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
+		const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;
+		const Vector3r& pos1=se31.position; const Vector3r& pos2=se32.position;
+		const Quaternionr& ori1=se31.orientation; const Quaternionr& ori2=se32.orientation;
+		const Vector3r& contPt=fs->contactPoint;
+		
+		if(normal){
+			GLUtils::GLDrawArrow(contPt,contPt+fs->refLength*fs->normal); // normal of the contact
 		}
-		if(shear){
-			GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
-			if(shearLabel) GLUtils::GLDrawNum(fs->displacementT().Length(),contPt,Vector3r(1,1,1));
+		// sphere center to point on the sphere
+		if(rolledPoints){
+			//cerr<<pos1<<" "<<pos1+ori1*fs->cp1pt<<" "<<contPt<<endl;
+			GLUtils::GLDrawLine(pos1+ori1*fs->cp1pt,contPt,Vector3r(0,.5,1));
+			GLUtils::GLDrawLine(pos2,pos2+(ori2*fs->cp2rel*Vector3r::UNIT_X*fs->effR2),Vector3r(0,1,.5));
+		}
+		// contact point to projected points
+		if(unrolledPoints||shear){
+			Vector3r ptTg1=fs->contPtInTgPlane1(), ptTg2=fs->contPtInTgPlane2();
+			if(unrolledPoints){
+				//TRVAR3(ptTg1,ptTg2,ss->normal)
+				GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1));
+				GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5)); GLUtils::GLDrawLine(pos2,contPt+ptTg2,Vector3r(0,1,.5));
+			}
+			if(shear){
+				GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
+				if(shearLabel) GLUtils::GLDrawNum(fs->displacementT().Length(),contPt,Vector3r(1,1,1));
+			}
 		}
 	}
-}
 
-
+#endif
 

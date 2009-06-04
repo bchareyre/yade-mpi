@@ -3,12 +3,14 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/lib-QGLViewer/qglviewer.h>
-#include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/extra/Shop.hpp>
 
-YADE_PLUGIN("CpmMat","Ip2_CpmMat_CpmMat_CpmPhys","CpmPhys","Law2_Dem3DofGeom_CpmPhys_Cpm","CpmGlobalCharacteristics","GLDrawCpmPhys","CpmPhysDamageColorizer");
+YADE_PLUGIN("CpmMat","Ip2_CpmMat_CpmMat_CpmPhys","CpmPhys","Law2_Dem3DofGeom_CpmPhys_Cpm","CpmGlobalCharacteristics",
+	#ifdef YADE_OPENGL
+		"GLDrawCpmPhys",
+	#endif	
+		"CpmPhysDamageColorizer");
 
 
 /********************** Ip2_CpmMat_CpmMat_CpmPhys ****************************/
@@ -206,78 +208,79 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, rootBody);
 }
 
+#ifdef YADE_OPENGL
+	/********************** GLDrawCpmPhys ****************************/
+	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	#include<yade/lib-opengl/GLUtils.hpp>
+	#include<yade/lib-QGLViewer/qglviewer.h>
 
-/********************** GLDrawCpmPhys ****************************/
+	CREATE_LOGGER(GLDrawCpmPhys);
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-
-CREATE_LOGGER(GLDrawCpmPhys);
-
-bool GLDrawCpmPhys::contactLine=true;
-bool GLDrawCpmPhys::dmgLabel=true;
-bool GLDrawCpmPhys::dmgPlane=false;
-bool GLDrawCpmPhys::epsNLabel=true;
-bool GLDrawCpmPhys::epsT=false;
-bool GLDrawCpmPhys::epsTAxes=false;
-bool GLDrawCpmPhys::normal=false;
-bool GLDrawCpmPhys::colorStrain=false;
+	bool GLDrawCpmPhys::contactLine=true;
+	bool GLDrawCpmPhys::dmgLabel=true;
+	bool GLDrawCpmPhys::dmgPlane=false;
+	bool GLDrawCpmPhys::epsNLabel=true;
+	bool GLDrawCpmPhys::epsT=false;
+	bool GLDrawCpmPhys::epsTAxes=false;
+	bool GLDrawCpmPhys::normal=false;
+	bool GLDrawCpmPhys::colorStrain=false;
 
 
-void GLDrawCpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-	const shared_ptr<CpmPhys>& BC=static_pointer_cast<CpmPhys>(ip);
-	const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
+	void GLDrawCpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+		const shared_ptr<CpmPhys>& BC=static_pointer_cast<CpmPhys>(ip);
+		const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
 
-	//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
-	Vector3r lineColor=Shop::scalarOnColorScale(1.-BC->relResidualStrength);
+		//Vector3r lineColor(BC->omega,1-BC->omega,0.0); /* damaged links red, undamaged green */
+		Vector3r lineColor=Shop::scalarOnColorScale(1.-BC->relResidualStrength);
 
-	if(colorStrain) lineColor=Vector3r(
-		min((Real)1.,max((Real)0.,-BC->epsTrans/BC->epsCrackOnset)),
-		min((Real)1.,max((Real)0.,BC->epsTrans/BC->epsCrackOnset)),
-		min((Real)1.,max((Real)0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
+		if(colorStrain) lineColor=Vector3r(
+			min((Real)1.,max((Real)0.,-BC->epsTrans/BC->epsCrackOnset)),
+			min((Real)1.,max((Real)0.,BC->epsTrans/BC->epsCrackOnset)),
+			min((Real)1.,max((Real)0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
 
-	if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
-	if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
-	else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
-	if(BC->omega>0 && dmgPlane){
-		Real halfSize=sqrt(1-BC->relResidualStrength)*.5*.705*sqrt(BC->crossSection);
-		Vector3r midPt=.5*Vector3r(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position);
-		glDisable(GL_CULL_FACE);
-		glPushMatrix();
-			glTranslatev(midPt);
-			Quaternionr q; q.Align(Vector3r::UNIT_Z,geom->normal);
-			Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
-			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			glBegin(GL_POLYGON);
-				glColor3v(lineColor); 
-				glVertex3d(halfSize,0.,0.);
-				glVertex3d(.5*halfSize,.866*halfSize,0.);
-				glVertex3d(-.5*halfSize,.866*halfSize,0.);
-				glVertex3d(-halfSize,0.,0.);
-				glVertex3d(-.5*halfSize,-.866*halfSize,0.);
-				glVertex3d(.5*halfSize,-.866*halfSize,0.);
-			glEnd();
-		glPopMatrix();
-	}
-
-	const Vector3r& cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
-	if(epsT){
-		Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
-		Real relShear=BC->epsT.Length()/maxShear;
-		Real scale=.5*geom->refLength;
-		Vector3r dirShear=BC->epsT; dirShear.Normalize();
-		if(epsTAxes){
-			GLUtils::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));
-			GLUtils::GLDrawLine(cp-Vector3r(0,scale,0),cp+Vector3r(0,scale,0));
-			GLUtils::GLDrawLine(cp-Vector3r(0,0,scale),cp+Vector3r(0,0,scale));
+		if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
+		if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+		else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+		if(BC->omega>0 && dmgPlane){
+			Real halfSize=sqrt(1-BC->relResidualStrength)*.5*.705*sqrt(BC->crossSection);
+			Vector3r midPt=.5*Vector3r(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position);
+			glDisable(GL_CULL_FACE);
+			glPushMatrix();
+				glTranslatev(midPt);
+				Quaternionr q; q.Align(Vector3r::UNIT_Z,geom->normal);
+				Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
+				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+				glBegin(GL_POLYGON);
+					glColor3v(lineColor); 
+					glVertex3d(halfSize,0.,0.);
+					glVertex3d(.5*halfSize,.866*halfSize,0.);
+					glVertex3d(-.5*halfSize,.866*halfSize,0.);
+					glVertex3d(-halfSize,0.,0.);
+					glVertex3d(-.5*halfSize,-.866*halfSize,0.);
+					glVertex3d(.5*halfSize,-.866*halfSize,0.);
+				glEnd();
+			glPopMatrix();
 		}
-		GLUtils::GLDrawArrow(cp,cp+dirShear*relShear*scale,Vector3r(1.,0.,0.));
-		GLUtils::GLDrawLine(cp+dirShear*relShear*scale,cp+dirShear*scale,Vector3r(.3,.3,.3));
 
-		/* normal strain */ GLUtils::GLDrawArrow(cp,cp+geom->normal*(BC->epsN/maxShear),Vector3r(0.,1.,0.));
+		const Vector3r& cp=static_pointer_cast<Dem3DofGeom>(i->interactionGeometry)->contactPoint;
+		if(epsT){
+			Real maxShear=(BC->undamagedCohesion-BC->sigmaN*BC->tanFrictionAngle)/BC->G;
+			Real relShear=BC->epsT.Length()/maxShear;
+			Real scale=.5*geom->refLength;
+			Vector3r dirShear=BC->epsT; dirShear.Normalize();
+			if(epsTAxes){
+				GLUtils::GLDrawLine(cp-Vector3r(scale,0,0),cp+Vector3r(scale,0,0));
+				GLUtils::GLDrawLine(cp-Vector3r(0,scale,0),cp+Vector3r(0,scale,0));
+				GLUtils::GLDrawLine(cp-Vector3r(0,0,scale),cp+Vector3r(0,0,scale));
+			}
+			GLUtils::GLDrawArrow(cp,cp+dirShear*relShear*scale,Vector3r(1.,0.,0.));
+			GLUtils::GLDrawLine(cp+dirShear*relShear*scale,cp+dirShear*scale,Vector3r(.3,.3,.3));
+
+			/* normal strain */ GLUtils::GLDrawArrow(cp,cp+geom->normal*(BC->epsN/maxShear),Vector3r(0.,1.,0.));
+		}
+		//if(normal) GLUtils::GLDrawArrow(cp,cp+geom->normal*.5*BC->equilibriumDist,Vector3r(0.,1.,0.));
 	}
-	//if(normal) GLUtils::GLDrawArrow(cp,cp+geom->normal*.5*BC->equilibriumDist,Vector3r(0.,1.,0.));
-}
-
+#endif
 
 /********************** CpmGlobalCharacteristics ****************************/
 

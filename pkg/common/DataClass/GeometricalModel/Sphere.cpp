@@ -7,7 +7,6 @@
 *************************************************************************/
 
 #include "Sphere.hpp"
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 Sphere::Sphere () : GeometricalModel()
 {

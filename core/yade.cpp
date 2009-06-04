@@ -101,8 +101,12 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 {
 	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
 	LOG_INFO("Creating default configuration file: "<<cfgFile<<". Tune by hand if needed.");
-	LOG_INFO("Setting GUI: QtGUI.");
-	pref->defaultGUILibName="QtGUI";
+	#ifdef YADE_OPENGL
+		pref->defaultGUILibName="QtGUI";
+	#else
+		pref->defaultGUILibName="PythonUI";
+	#endif
+	LOG_INFO("Setting GUI: "<<pref->defaultGUILibName);
 	IOFormatManager::saveToFile("XMLFormatManager",cfgFile,"preferences",pref);
 }
 
@@ -151,6 +155,9 @@ void printHelp()
 	#endif
 	#ifdef LOG4CXX
 		"   LOG4CXX       (configurable logging framework enabled; ~/.yade-" SUFFIX "/logging.conf)\n"
+	#endif
+	#ifdef YADE_OPENGL
+		"   YADE_OPENGL   (3d rendering)\n"
 	#endif
 	;
 	if(!isnan(std::numeric_limits<double>::quiet_NaN())) cerr<<
@@ -268,7 +275,11 @@ int main(int argc, char *argv[])
 	}
 
 	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
-	if(!explicitUI && gui=="PythonUI" && !getenv("TERM")){ LOG_WARN("No $TERM, using QtGUI instead of PythonUI"); gui="QtGUI"; }
+	#ifdef YADE_OPENGL
+		if(!explicitUI && gui=="PythonUI" && !getenv("TERM")){ LOG_WARN("No $TERM, using QtGUI instead of PythonUI"); gui="QtGUI"; }
+	#else
+		if(gui=="QtGUI"){LOG_WARN("openGL-less build, using PythonUI instead of QtGUI"); gui="PythonUI";}
+	#endif
 	if(gui=="QtGUI" && !getenv("DISPLAY")){ LOG_WARN("No $DISPLAY, using PythonUI instead of QtUI"); gui="PythonUI"; }
 		
 	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));

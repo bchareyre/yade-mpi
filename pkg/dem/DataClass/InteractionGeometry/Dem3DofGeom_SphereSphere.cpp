@@ -2,7 +2,11 @@
 
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/core/Omega.hpp>
-YADE_PLUGIN("Dem3DofGeom_SphereSphere","GLDraw_Dem3DofGeom_SphereSphere","ef2_Sphere_Sphere_Dem3DofGeom");
+YADE_PLUGIN("Dem3DofGeom_SphereSphere",
+	#ifdef YADE_OPENGL
+		"GLDraw_Dem3DofGeom_SphereSphere",
+	#endif
+	"ef2_Sphere_Sphere_Dem3DofGeom");
 
 
 Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}
@@ -88,65 +92,62 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 	}
 }
 
+#ifdef YADE_OPENGL
+	#include<yade/lib-opengl/OpenGLWrapper.hpp>
+	#include<yade/lib-opengl/GLUtils.hpp>
+	bool GLDraw_Dem3DofGeom_SphereSphere::normal=false;
+	bool GLDraw_Dem3DofGeom_SphereSphere::rolledPoints=false;
+	bool GLDraw_Dem3DofGeom_SphereSphere::unrolledPoints=false;
+	bool GLDraw_Dem3DofGeom_SphereSphere::shear=false;
+	bool GLDraw_Dem3DofGeom_SphereSphere::shearLabel=false;
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/lib-opengl/GLUtils.hpp>
-
-
-
-bool GLDraw_Dem3DofGeom_SphereSphere::normal=false;
-bool GLDraw_Dem3DofGeom_SphereSphere::rolledPoints=false;
-bool GLDraw_Dem3DofGeom_SphereSphere::unrolledPoints=false;
-bool GLDraw_Dem3DofGeom_SphereSphere::shear=false;
-bool GLDraw_Dem3DofGeom_SphereSphere::shearLabel=false;
-
-void GLDraw_Dem3DofGeom_SphereSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
-	Dem3DofGeom_SphereSphere* ss = static_cast<Dem3DofGeom_SphereSphere*>(ig.get());
-	//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
-	const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;
-	const Vector3r& pos1=se31.position,pos2=se32.position;
-	Vector3r& contPt=ss->contactPoint;
-	
-	if(normal){
-		GLUtils::GLDrawArrow(contPt,contPt+ss->normal*.5*ss->refLength); // normal of the contact
-	}
-	#if 0
-		// never used, since bending/torsion not used
-		//Vector3r contPt=se31.position+(ss->effR1/ss->refLength)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
-		GLUtils::GLDrawLine(pos1,pos2,Vector3r(.5,.5,.5));
-		Vector3r bend; Real tors;
-		ss->bendingTorsionRel(bend,tors);
-		GLUtils::GLDrawLine(contPt,contPt+10*ss->radius1*(bend+ss->normal*tors),Vector3r(1,0,0));
+	void GLDraw_Dem3DofGeom_SphereSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+		Dem3DofGeom_SphereSphere* ss = static_cast<Dem3DofGeom_SphereSphere*>(ig.get());
+		//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
+		const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;
+		const Vector3r& pos1=se31.position,pos2=se32.position;
+		Vector3r& contPt=ss->contactPoint;
+		
+		if(normal){
+			GLUtils::GLDrawArrow(contPt,contPt+ss->normal*.5*ss->refLength); // normal of the contact
+		}
 		#if 0
-			GLUtils::GLDrawNum(bend[0],contPt-.2*ss->normal*ss->radius1,Vector3r(1,0,0));
-			GLUtils::GLDrawNum(bend[1],contPt,Vector3r(0,1,0));
-			GLUtils::GLDrawNum(bend[2],contPt+.2*ss->normal*ss->radius1,Vector3r(0,0,1));
-			GLUtils::GLDrawNum(tors,contPt+.5*ss->normal*ss->radius2,Vector3r(1,1,0));
+			// never used, since bending/torsion not used
+			//Vector3r contPt=se31.position+(ss->effR1/ss->refLength)*(se32.position-se31.position); // must be recalculated to not be unscaled if scaling displacements ...
+			GLUtils::GLDrawLine(pos1,pos2,Vector3r(.5,.5,.5));
+			Vector3r bend; Real tors;
+			ss->bendingTorsionRel(bend,tors);
+			GLUtils::GLDrawLine(contPt,contPt+10*ss->radius1*(bend+ss->normal*tors),Vector3r(1,0,0));
+			#if 0
+				GLUtils::GLDrawNum(bend[0],contPt-.2*ss->normal*ss->radius1,Vector3r(1,0,0));
+				GLUtils::GLDrawNum(bend[1],contPt,Vector3r(0,1,0));
+				GLUtils::GLDrawNum(bend[2],contPt+.2*ss->normal*ss->radius1,Vector3r(0,0,1));
+				GLUtils::GLDrawNum(tors,contPt+.5*ss->normal*ss->radius2,Vector3r(1,1,0));
+			#endif
 		#endif
-	#endif
-	// sphere center to point on the sphere
-	if(rolledPoints){
-		GLUtils::GLDrawLine(pos1,pos1+(ss->ori1*ss->cp1rel*Vector3r::UNIT_X*ss->effR1),Vector3r(0,.5,1));
-		GLUtils::GLDrawLine(pos2,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2),Vector3r(0,1,.5));
-	}
-	//TRVAR4(pos1,ss->ori1,pos2,ss->ori2);
-	//TRVAR2(ss->cp2rel,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2));
-	// contact point to projected points
-	if(unrolledPoints||shear){
-		Vector3r ptTg1=ss->contPtInTgPlane1(), ptTg2=ss->contPtInTgPlane2();
-		if(unrolledPoints){
-			//TRVAR3(ptTg1,ptTg2,ss->normal)
-			GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1)); GLUtils::GLDrawLine(pos1,contPt+ptTg1,Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5)); GLUtils::GLDrawLine(pos2,contPt+ptTg2,Vector3r(0,1,.5));
+		// sphere center to point on the sphere
+		if(rolledPoints){
+			GLUtils::GLDrawLine(pos1,pos1+(ss->ori1*ss->cp1rel*Vector3r::UNIT_X*ss->effR1),Vector3r(0,.5,1));
+			GLUtils::GLDrawLine(pos2,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2),Vector3r(0,1,.5));
 		}
-		if(shear){
-			GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
-			if(shearLabel) GLUtils::GLDrawNum(ss->displacementT().Length(),contPt,Vector3r(1,1,1));
+		//TRVAR4(pos1,ss->ori1,pos2,ss->ori2);
+		//TRVAR2(ss->cp2rel,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2));
+		// contact point to projected points
+		if(unrolledPoints||shear){
+			Vector3r ptTg1=ss->contPtInTgPlane1(), ptTg2=ss->contPtInTgPlane2();
+			if(unrolledPoints){
+				//TRVAR3(ptTg1,ptTg2,ss->normal)
+				GLUtils::GLDrawLine(contPt,contPt+ptTg1,Vector3r(0,.5,1)); GLUtils::GLDrawLine(pos1,contPt+ptTg1,Vector3r(0,.5,1));
+				GLUtils::GLDrawLine(contPt,contPt+ptTg2,Vector3r(0,1,.5)); GLUtils::GLDrawLine(pos2,contPt+ptTg2,Vector3r(0,1,.5));
+			}
+			if(shear){
+				GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
+				if(shearLabel) GLUtils::GLDrawNum(ss->displacementT().Length(),contPt,Vector3r(1,1,1));
+			}
 		}
 	}
-}
-
-CREATE_LOGGER(ef2_Sphere_Sphere_Dem3DofGeom);
+	CREATE_LOGGER(ef2_Sphere_Sphere_Dem3DofGeom);
+#endif
 
 bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());

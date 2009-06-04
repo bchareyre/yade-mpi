@@ -6,7 +6,6 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include "Box.hpp"
 #include <iostream>
 

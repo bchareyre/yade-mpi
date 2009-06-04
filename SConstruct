@@ -129,7 +129,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,gl',names=['gl','python','log4cxx','binfmt','CGAL','dummy']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','binfmt','CGAL','dummy']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -295,7 +295,6 @@ if not env.GetOption('clean'):
 			Exit(1)
 	# check essential libs
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);',autoadd=1)
-	ok&=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
 
 	# gentoo has threaded flavour named differently and it must have precedence over the non-threaded one
 	def CheckLib_maybeMT(conf,lib,header,lang,func): return conf.CheckLibWithHeader(lib+'-mt',['limits.h',header],'c++',func,autoadd=1) or conf.CheckLibWithHeader(lib,['limits.h',header],lang,func,autoadd=1)
@@ -310,10 +309,6 @@ if not env.GetOption('clean'):
 
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
-	if 'qt3' not in env['exclude']:
-		ok&=conf.CheckQt(env['QTDIR'])
-		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
-		env['QGLVIEWER_LIB']='yade-QGLViewer';
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
@@ -322,9 +317,20 @@ if not env.GetOption('clean'):
 		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."%featureName
 		Exit(1)
 	# check "optional" libs
+	if 'openGL' in env['features']:
+		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
+		if not ok: featureNotOK('openGL')
+		env.Append(CPPDEFINES='YADE_OPENGL')
+	if 'qt3' not in env['exclude']:
+		if 'openGL' not in env['features']:
+			print "\nQt3 interface can only be used if openGL is enabled.\nEither add openGL to 'features' or add qt3 to 'exclude'."
+			Exit(1)
+		ok&=conf.CheckQt(env['QTDIR'])
+		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
+		env['QGLVIEWER_LIB']='yade-QGLViewer';
+
 	if 'log4cxx' in env['features']:
 		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
-			#env.Append(CPPDEFINES=[('LOG4CXX','9'])
 		if not ok: featureNotOK('log4cxx')
 		env.Append(CPPDEFINES=['LOG4CXX'])
 	if 'python' in env['features']:
@@ -400,19 +406,6 @@ if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -march=%s'%env['march']),
 		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
 	# NDEBUG is used in /usr/include/assert.h: when defined, asserts() are no-ops
-
-	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
-	# CRASH -ffloat-store
-	# maybe not CRASH?: -fno-math-errno
-	# CRASH?: -fmodulo-sched  
-	#   it is probably --ffast-fath that crashes !!!
-	# gcc-4.1 only: -funsafe-loop-optimizations -Wunsafe-loop-optimizations
-	# sure CRASH: -ftree-vectorize
-	# CRASH (one of them): -fivopts -fgcse-sm -fgcse-las (one of them - not sure which one exactly)
-	# ?: -ftree-loop-linear -ftree-loop-ivcanon
-	## this will fail on non-i386 archs (includeing AMD64)
-	#archFlags=Split('-march=pentium4 -mfpmath=sse,387') #-malign-double')
-	#env.Append(CXXFLAGS=archFlags,LINKFLAGS=archFlags,SHLINKFLAGS=archFlags)
 else:
 	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast'),('YADE_PTR_CAST','dynamic_pointer_cast')])
 
@@ -423,7 +416,6 @@ if env['arcs']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-f
 if env['arcs']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
 
 ### LINKER
-#env['NONPLUGIN_LIBS']=env['LIBS']
 ## libs for all plugins
 # Investigate whether soname is useful for something. Probably not: SHLINKFLAGS=['-Wl,-soname=${TARGET.file},'-rdynamic']
 env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
@@ -435,7 +427,6 @@ env.Append(LINKFLAGS=['-rdynamic'])
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=runtimeLibDirs)
 # find already compiled but not yet installed libraries for linking
-#env.Append(LIBPATH=[os.path.join('#',x) for x in libDirs]	# -floop-optimize2 is a gcc-4.x flag, doesn't exist on previous version
 env.Append(LIBPATH=instLibDirs) # this is if we link to libs that are installed, which is the case now
 
 
@@ -449,7 +440,6 @@ def installHeaders(prefix=None):
 	if not prefix: yadeRoot=buildDir
 	else: yadeRoot=prefix
 	yadeInc=join(yadeRoot,'include','yade-%s'%env['version'],'yade')
-	#print "CALLED, prefix=%s, yadeInc=%s"%(prefix,yadeInc)
 
 	paths = ['.']
 	for root, dirs, files in os.walk('.'):
@@ -467,7 +457,6 @@ def installHeaders(prefix=None):
 			if re.match(r'^.*/('+'|'.join(env['exclude'])+')/',root): continue
 			for f in files:
 				if f.split('.')[-1] in ('hpp','inl','ipp','tpp','h','mcr'):
-					#m=re.match('^\./([^/]*)/.*$',root)
 					m=re.match('^.*?'+sep+'((extra|core)|((gui|lib|pkg)'+sep+'.*?))(|'+sep+'.*)$',root)
 					if not m:
 						print "WARNING: file %s skipped while scanning for headers (no module)"

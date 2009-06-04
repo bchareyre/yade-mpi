@@ -7,11 +7,6 @@
 *************************************************************************/
 
 #include "Mesh2D.hpp"
-
-
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-
-
 #include <iostream>
 
 
