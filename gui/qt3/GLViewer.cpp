@@ -164,7 +164,7 @@ void GLViewer::startClipPlaneManipulation(int planeNo){
 	const Se3r se3(renderer->clipPlaneSe3[planeNo]);
 	manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(se3.position[0],se3.position[1],se3.position[2]),qglviewer::Quaternion(se3.orientation[0],se3.orientation[1],se3.orientation[2],se3.orientation[3]));
 	string grp=strBoundGroup();
-	displayMessage("Manipulating clip plane #"+lexical_cast<string>(planeNo+1)+(grp.empty()?grp:"(bound planes:"+grp+")"));
+	displayMessage("Manipulating clip plane #"+lexical_cast<string>(planeNo+1)+(grp.empty()?grp:" (bound planes:"+grp+")"));
 }
 
 void GLViewer::useDisplayParameters(size_t n){

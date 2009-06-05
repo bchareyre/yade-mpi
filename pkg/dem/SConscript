@@ -40,7 +40,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 
 	env.SharedLibrary('UniaxialStrainer',['Engine/StandAloneEngine/UniaxialStrainer.cpp'],LIBS=env['LIBS']+['ParticleParameters','AABB']),
 
-	env.SharedLibrary('ConcretePM',['ConcretePM.cpp'],CXXFLAGS=env['CXXFLAGS']+cpmInclude,LIBS=env['LIBS']+['Shop','DemXDofGeom']),
+	env.SharedLibrary('ConcretePM',['ConcretePM.cpp'],CXXFLAGS=env['CXXFLAGS']+cpmInclude,LIBS=env['LIBS']+['Shop','DemXDofGeom','$QGLVIEWER_LIB' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
 
 	env.SharedLibrary('Clump',['DataClass/Clump.cpp'],LIBS=env['LIBS']+['Shop']),
 
@@ -119,6 +119,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			'BodyMacroParameters',
 			'RigidBodyParameters',
 			'ParticleParameters',
+			'DemXDofGeom',
 			'InteractionPhysicsMetaEngine']),
 
 	env.SharedLibrary('InteractingBox2InteractingSphere4SpheresContactGeometry',

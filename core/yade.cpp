@@ -154,7 +154,7 @@ void printHelp()
 		"   YADE_OPENMP   (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.)\n"
 	#endif
 	#ifdef LOG4CXX
-		"   LOG4CXX       (configurable logging framework enabled; ~/.yade-" SUFFIX "/logging.conf)\n"
+		"   LOG4CXX       (configurable logging framework enabled; ~/.yade" SUFFIX "/logging.conf)\n"
 	#endif
 	#ifdef YADE_OPENGL
 		"   YADE_OPENGL   (3d rendering)\n"
