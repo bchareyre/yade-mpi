@@ -35,7 +35,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'yade-factory',
 			'yade-loki',
 			'yade-multimethods',
-			'glut',
 			'rt', # realtime lib, for clock_gettime 
 			],
 		)
