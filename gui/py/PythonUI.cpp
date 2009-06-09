@@ -8,7 +8,9 @@
 
 #include"PythonUI.hpp"
 
-#include <X11/Xlib.h>
+#ifdef YADE_OPENGL
+	#include <X11/Xlib.h>
+#endif
 
 using namespace boost;
 
@@ -123,7 +125,9 @@ int PythonUI::run(int argc, char *argv[]) {
 		// LOG_ERROR("Unprocessed non-option argument: `"<<argv[index]<<"'");
 
 	/** thread setup **/
-	XInitThreads();
+	#ifdef YADE_OPENGL
+		XInitThreads();
+	#endif
 	PyEval_InitThreads();
 
 	pythonSession();
