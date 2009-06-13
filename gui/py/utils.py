@@ -404,24 +404,6 @@ def vmData():
 	l=procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
 	return int(ll[1])
 
-def regularSphereOrthoPack(center,extents,radius,gap,**kw):
-	"""Return set of spheres regularly spaced in either a box or sphere centered around center.
-	If extents is a number, it is taken for sphere radius; if it is a sequence, it is 3 extents of the box.
-	Created spheres will have given radius and will be separated by gap space.
-	"""
-	from numpy import arange; from math import sqrt
-	import itertools
-	ret=[]
-	try: # extents is a single number, do sphere
-		doSphere=True; dim=float(extents),float(extents),float(extents)
-	except TypeError: # extents is a list, do box
-		doSphere=False; dim=extents
-	xx,yy,zz=[arange(center[i]-dim[i],center[i]+dim[i],2*radius+gap) for i in 0,1,2]
-	for xyz in itertools.product(xx,yy,zz):
-		if doSphere and sqrt(sum([(xyz[i]-center[i])**2 for i in 0,1,2]))>extents: continue
-		ret+=[sphere(xyz,radius=radius,**kw)]
-	return ret
-
 def spheresFromFileUniaxial(filename,areaSections=10,**kw):
 	"""Load spheres from file, but do some additional work useful for uniaxial test:
 	
