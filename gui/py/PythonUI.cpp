@@ -79,7 +79,7 @@ void PythonUI::pythonSession(){
 	PyGILState_STATE pyState = PyGILState_Ensure();
 		LOG_DEBUG("Got Global Interpreter Lock, good.");
 		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
-		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/gui')");
+		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/py')");
 		PyRun_SimpleString("import yade");
 		PyRun_SimpleString("from __future__ import division");
 

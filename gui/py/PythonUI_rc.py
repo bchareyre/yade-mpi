@@ -122,7 +122,7 @@ try:
 	  | | (_| | |_| |  __/ | |__| (_) | | | \__ \ (_) | |  __/
 	  |_|\__,_|____/ \___|  \____\___/|_| |_|___/\___/|_|\___|
 	""",exit_msg='Bye.'
-		,rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/gui/yade/ipython.py']})
+		,rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/py/yade/ipython.py']})
 
 		ipshell()
 		# save history -- a workaround for atexit handlers not being run (why?)
