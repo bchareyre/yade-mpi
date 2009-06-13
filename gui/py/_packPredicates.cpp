@@ -82,12 +82,42 @@ public:
 	}
 };
 
+/* Oriented hyperboloid predicate (cylinder as special case).
+
+See http://mathworld.wolfram.com/Hyperboloid.html for the parametrization and meaning of symbols
+*/
+class inHyperboloid{
+	Vector3r c1,c2,c12; Real R,a,ht,c;
+public:
+	inHyperboloid(python::tuple _c1, python::tuple _c2, Real _R, Real _r){
+		c1=tuple2vec(_c1); c2=tuple2vec(_c2); R=_R; a=_r;
+		c12=c2-c1; ht=c12.Length();
+		Real uMax=sqrt(pow(R/a,2)-1); c=ht/(2*uMax);
+	}
+	bool operator()(python::tuple _pt, Real pad=0.){
+		Vector3r pt=tuple2vec(_pt);
+		Real v=(pt.Dot(c12)-c1.Dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
+		if((v*ht<0+pad) || (v*ht>ht-pad)) return false; // out of cylinder along the axis
+		Real u=(v-.5)*ht/c; // u from the wolfram parametrization; u is 0 in the center
+		Real rHere=a*sqrt(1+u*u); // pad is taken perpendicular to the axis, not to the surface (inaccurate)
+		Real axisDist=((pt-c1).Cross(pt-c2)).Length()/ht;
+		if(axisDist>rHere-pad) return false;
+		return true;
+	}
+	python::tuple aabb(){
+		// the lazy way
+		return inCylinder(vec2tuple(c1),vec2tuple(c2),R).aabb();
+	}
+};
+
 BOOST_PYTHON_MODULE(_packPredicates){
-	boost::python::class_<inSphere>("inSphere","Sphere predicate.",python::init<python::tuple,Real>("Ctor taking center (as a 3-tuple) and radius"))
+	boost::python::class_<inSphere>("inSphere","Sphere predicate.",python::init<python::tuple,Real>(python::args("center","radius"),"Ctor taking center (as a 3-tuple) and radius"))
 		.def("__call__",&inSphere::operator(),"Tell whether given point lies within this sphere, still having 'pad' space to the solid boundary").def("aabb",&inSphere::aabb,"Return minimum and maximum values for AABB");
-	boost::python::class_<inAlignedBox>("inAlignedBox","Axis-aligned box predicate",python::init<python::tuple,python::tuple>("Ctor taking minumum and maximum points of the box (as 3-tuples)."))
+	boost::python::class_<inAlignedBox>("inAlignedBox","Axis-aligned box predicate",python::init<python::tuple,python::tuple>(python::args("minAABB","maxAABB"),"Ctor taking minumum and maximum points of the box (as 3-tuples)."))
 		.def("__call__",&inAlignedBox::operator(),"Tell whether given point lies within this box, still having 'pad' space to the solid boundary").def("aabb",&inAlignedBox::aabb,"Return minimum and maximum values for AABB");
-	boost::python::class_<inCylinder>("inCylinder","Cylinder predicate",python::init<python::tuple,python::tuple,Real>("Ctor taking centers of the lateral walls (as 3-tuples) and radius."))
+	boost::python::class_<inCylinder>("inCylinder","Cylinder predicate",python::init<python::tuple,python::tuple,Real>(python::args("centerBottom","centerTop","radius"),"Ctor taking centers of the lateral walls (as 3-tuples) and radius."))
 		.def("__call__",&inCylinder::operator(),"Tell whether given point lies within this cylinder, still having 'pad' space to the solid boundary").def("aabb",&inCylinder::aabb,"Return minimum and maximum values for AABB");
+	boost::python::class_<inHyperboloid>("inHyperboloid","Hyperboloid predicate",python::init<python::tuple,python::tuple,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."))
+		.def("__call__",&inHyperboloid::operator(),"Tell whether given point lies within this hyperboloid, still having 'pad' space to the solid boundary\n(not accurate, since distance perpendicular to the axis, not the surface, is taken in account)").def("aabb",&inHyperboloid::aabb,"Return minimum and maximum values for AABB");
 }
 

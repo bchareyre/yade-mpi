@@ -14,7 +14,7 @@ for part in [
 	pack.regularHexa (pack.inAlignedBox((-2,-2,-2),(2,2,2)),radius=1.5*rad,gap=2*gap,color=(1,0,1),**kw), # body,
 	pack.regularOrtho(pack.inCylinder((-1,0,-2),(-1,0,-6),1),radius=rad,gap=gap,color=(0,1,1),**kw), # left leg
 	pack.regularHexa (pack.inCylinder((+1,1,-2.5),(0,3,-5),1),radius=rad,gap=gap,color=(0,1,1),**kw), # right leg
-	pack.regularHexa (pack.inCylinder((+2,0,1),(+6,0,1),1),radius=rad,gap=gap,color=(0,0,1),**kw), # right hand
+	pack.regularHexa (pack.inHyperboloid((+2,0,1),(+6,0,1),1,.5),radius=rad,gap=gap,color=(0,0,1),**kw), # right hand
 	pack.regularOrtho(pack.inCylinder((-2,0,2),(-5,0,4),1),radius=rad,gap=gap,color=(0,0,1),**kw) # left hand
 	]: O.bodies.appendClumped(part)
 
