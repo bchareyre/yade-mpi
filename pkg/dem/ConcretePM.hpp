@@ -306,12 +306,13 @@ REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 #endif
 
 class CpmPhysDamageColorizer: public PeriodicEngine {
-	struct BodyStats{ short nCohLinks; Real dmgSum; Real epsPlSum; BodyStats(): nCohLinks(0), dmgSum(0), epsPlSum(0.){} };
+	struct BodyStats{ int nCohLinks; Real dmgSum; Real epsPlSum; BodyStats(): nCohLinks(0), dmgSum(0.), epsPlSum(0.){} };
 	public:
 		//! maximum damage over all contacts
 		Real maxOmega;
 		CpmPhysDamageColorizer(){maxOmega=0; /* run at the very beginning */ initRun=true;}
 		virtual void action(MetaBody*);
+	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
 	REGISTER_CLASS_AND_BASE(CpmPhysDamageColorizer,PeriodicEngine);
 };

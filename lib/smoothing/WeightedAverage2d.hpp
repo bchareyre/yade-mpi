@@ -47,6 +47,7 @@ struct GridContainer{
 		return ret;
 	}
 	Vector2r cell2xyMid(Vector2i cxy) const { return Vector2r(lo[0]+cellSizes[0]*(.5+cxy[0]),lo[1]+cellSizes[1]*(.5+cxy[1])); }
+	const Vector2i& getSize() const{ return nCells;}
 
 	// add new element to the right cell
 	void add(const T& t, Vector2r xy){Vector2i cxy=xy2cell(xy); grid[cxy[0]][cxy[1]].push_back(t);}
@@ -195,6 +196,18 @@ class pyGaussAverage{
 			}
 			clips.push_back(poly);
 		}
+	}
+	python::tuple data_get(){
+		python::list x,y,val;
+		const Vector2i& dim=sgka->grid->getSize();
+		for(int i=0; i<dim[0]; i++){
+			for(int j=0; j<dim[1]; j++){
+				FOREACH(const Scalar2d& element, sgka->grid->grid[i][j]){
+					x.append(element.pos[0]); y.append(element.pos[1]); val.append(element.val);
+				}
+			}
+		}
+		return python::make_tuple(x,y,val);
 	}
 };
 

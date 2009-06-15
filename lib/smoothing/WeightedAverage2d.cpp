@@ -22,6 +22,7 @@ BOOST_PYTHON_MODULE(WeightedAverage2d)
 		.add_property("stDev",&pyGaussAverage::stDev_get,&pyGaussAverage::stDev_set)
 		.add_property("relThreshold",&pyGaussAverage::relThreshold_get,&pyGaussAverage::relThreshold_set)
 		.add_property("clips",&pyGaussAverage::clips_get,&pyGaussAverage::clips_set)
+		.add_property("data",&pyGaussAverage::data_get)
 	;
 };
 

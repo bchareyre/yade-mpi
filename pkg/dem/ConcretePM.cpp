@@ -49,7 +49,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	contPhys->ks=contPhys->G*contPhys->crossSection;
 
 	if(neverDamage) contPhys->neverDamage=true;
-	if(cohesiveThresholdIter<0 || Omega::instance().getCurrentIteration()<cohesiveThresholdIter) contPhys->isCohesive=true;
+	if(cohesiveThresholdIter<0 || (Omega::instance().getCurrentIteration()<cohesiveThresholdIter)) contPhys->isCohesive=true;
 	else contPhys->isCohesive=false;
 	contPhys->dmgTau=dmgTau;
 	contPhys->dmgRateExp=dmgRateExp;
@@ -192,13 +192,12 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 
 	// handle broken contacts
 	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
-		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		if(isCohesive){
 			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
 			const shared_ptr<CpmMat>& rbp1=YADE_PTR_CAST<CpmMat>(body1->physicalParameters), rbp2=YADE_PTR_CAST<CpmMat>(body2->physicalParameters);
-			if(BC->isCohesive){rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;}
-			LOG_DEBUG("Contact #"<<I->getId1()<<"=#"<<I->getId2()<<" is damaged over thershold ("<<omega<<">"<<omegaThreshold<<") and will be deleted.");
+			rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;
 		}
+		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		return;
 	}
 
@@ -333,6 +332,7 @@ void CpmGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 
 
 /********************** CpmPhysDamageColorizer ****************************/
+CREATE_LOGGER(CpmPhysDamageColorizer);
 void CpmPhysDamageColorizer::action(MetaBody* rootBody){
 	//vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
 	//vector<pair<short,
@@ -344,19 +344,20 @@ void CpmPhysDamageColorizer::action(MetaBody* rootBody){
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-BC->relResidualStrength); bodyStats[id1].epsPlSum+=BC->epsPlSum;
 		bodyStats[id2].nCohLinks++; bodyStats[id2].dmgSum+=(1-BC->relResidualStrength); bodyStats[id2].epsPlSum+=BC->epsPlSum;
-		//bodyDamage[id1].first++; bodyDamage[id2].first++;
-		//bodyDamage[id1].second+=(1-BC->relResidualStrength); bodyDamage[id2].second+=(1-BC->relResidualStrength);
 		maxOmega=max(maxOmega,BC->omega);
 	}
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
-		body_id_t id=B->getId();
+		const body_id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
 		CpmMat* bpp=dynamic_cast<CpmMat*>(B->physicalParameters.get());
 		if(!bpp) continue;
-		short cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
+		int cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
 		if(cohLinksWhenever>0){
 			bpp->normDmg=(bodyStats[id].dmgSum+bpp->numBrokenCohesive)/cohLinksWhenever;
 			bpp->normEpsPl=(bodyStats[id].epsPlSum+bpp->epsPlBroken)/cohLinksWhenever;
+			if(bpp->normDmg>1){
+				LOG_WARN("#"<<id<<" normDmg="<<bpp->normDmg<<" nCohLinks="<<bodyStats[id].nCohLinks<<", numBrokenCohesive="<<bpp->numBrokenCohesive<<", dmgSum="<<bodyStats[id].dmgSum<<", numAllCohLinks"<<cohLinksWhenever);
+			}
 		}
 		else { bpp->normDmg=0; bpp->normEpsPl=0;}
 		B->geometricalModel->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);

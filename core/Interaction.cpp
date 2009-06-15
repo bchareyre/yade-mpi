@@ -12,17 +12,22 @@
 
 #include<yade/core/MetaBody.hpp>
 
-Interaction::Interaction(): id1(0), id2(0){ reset(); }
+Interaction::Interaction(): id1(0), id2(0){ init(); }
 Interaction::Interaction(body_id_t newId1,body_id_t newId2): id1(newId1), id2(newId2){ reset(); }
 
 bool Interaction::isFresh(MetaBody* rb){ return iterMadeReal==rb->currentIteration;}
 
-
-void Interaction::reset(){
+void Interaction::init(){
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
 	iterMadeReal=-1;
 	functorCache.geomExists=true;
 	//functorCache.geom=shared_ptr<InteractionGeometryEngineUnit>(); functorCache.phys=shared_ptr<InteractionPhysicsEngineUnit>(); functorCache.constLaw=shared_ptr<ConstitutiveLaw>();
+}
+
+void Interaction::reset(){
+	interactionGeometry=shared_ptr<InteractionGeometry>();
+	interactionPhysics=shared_ptr<InteractionPhysics>();
+	init();
 }
 
 

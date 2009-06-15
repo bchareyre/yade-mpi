@@ -63,6 +63,8 @@ class Interaction : public Serializable
 
 		//! Reset interaction to the intial state (keep only body ids)
 		void reset();
+		//! common initialization called from both constructor and reset()
+		void init();
 			
 	REGISTER_ATTRIBUTES(/*no base*/,
 		(id1)
