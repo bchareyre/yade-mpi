@@ -982,6 +982,14 @@ env.SharedLibrary('NewtonsDampedLaw',
 	,['Engine/StandAloneEngine/RigidBodyRecorder.cpp']
 	,LIBS=env['LIBS']+['RigidBodyParameters'])
 
+	,env.SharedLibrary('MGPRecorder'
+	,['Engine/StandAloneEngine/MGPRecorder.cpp']
+	,LIBS=env['LIBS']+['RigidBodyParameters','Sphere'])
+
+	,env.SharedLibrary('HistoryRecorder'
+	,['Engine/StandAloneEngine/HistoryRecorder.cpp']
+	,LIBS=env['LIBS']+['RigidBodyParameters','Sphere','Box','SpheresContactGeometry','NormalShearInteractions'])
+
 	,env.SharedLibrary('TestSimpleViscoelastic'
 		,['PreProcessor/TestSimpleViscoelastic.cpp']
 		,LIBS=env['LIBS']+['AABB'

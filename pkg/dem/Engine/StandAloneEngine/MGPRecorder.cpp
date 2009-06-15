@@ -67,6 +67,8 @@ void MGPRecorder::action(MetaBody * ncb)
    for(; bi != biEnd ; ++bi)
    {
      const shared_ptr<Body>& b = *bi;
+	 if (b->isClump()) continue;
+	 
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
      const GeometricalModel* gm   = YADE_CAST<GeometricalModel*>(b->geometricalModel.get());
 
