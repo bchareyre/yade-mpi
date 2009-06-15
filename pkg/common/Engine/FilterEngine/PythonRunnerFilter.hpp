@@ -8,6 +8,7 @@
 #pragma once
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/FilterEngine.hpp>
+#include<Python.h>
 
 // Run python command
 class PythonRunnerFilter: public FilterEngine {

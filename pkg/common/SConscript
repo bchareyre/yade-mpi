@@ -1,5 +1,12 @@
 # vim: set filetype=python :
 Import('*')
+
+if 'EMBED_PYTHON' in env['CPPDEFINES']:
+	env.Install("$PREFIX/lib/yade$SUFFIX/pkg-common",[
+		env.SharedLibrary('PythonRunnerFilter',['Engine/FilterEngine/PythonRunnerFilter.cpp'],LIBS=env['LIBS']+['FilterEngine']),
+	])
+
+
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
 	env.SharedLibrary('ParallelEngine',
@@ -89,8 +96,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['FilterEngine','ColorScale']),
 	env.SharedLibrary('ColorizedTimeFilter',['Engine/FilterEngine/ColorizedTimeFilter.cpp'],
 		LIBS=env['LIBS']+['FilterEngine','ColorScale']),
-	env.SharedLibrary('PythonRunnerFilter',['Engine/FilterEngine/PythonRunnerFilter.cpp'],
-		LIBS=env['LIBS']+['FilterEngine']),
 	env.SharedLibrary('BoundingVolumeMetaEngine',['Engine/MetaEngine/BoundingVolumeMetaEngine.cpp']),
 	env.SharedLibrary('GeometricalModelMetaEngine',['Engine/MetaEngine/GeometricalModelMetaEngine.cpp']),
 	env.SharedLibrary('InteractingGeometryMetaEngine',['Engine/MetaEngine/InteractingGeometryMetaEngine.cpp']),
