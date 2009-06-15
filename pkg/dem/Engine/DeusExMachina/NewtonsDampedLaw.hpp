@@ -35,6 +35,7 @@ NOTE: Cundall damping affected dynamic simulation! See examples/dynamic_simulati
 
 class NewtonsDampedLaw : public DeusExMachina
 {
+	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
 	public :
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;

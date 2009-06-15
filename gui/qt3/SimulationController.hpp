@@ -52,6 +52,8 @@ class SimulationController : public QtGeneratedSimulationController
 		QFrame * scrollViewFrame;
 		QVBoxLayout* scrollViewLayout;
 		void addNewView();
+		void dtIntegerMantissaExponent(int& mantissa, int& exponent);
+
 	
 	public : 
 		void loadSimulationFromFileName(const std::string& fileName,bool center=true);

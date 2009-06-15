@@ -73,6 +73,8 @@ def xFromIntegral(integralValue,x,y):
 	periodIntegral=integral(x,y)
 	numPeriods=floor(integralValue/periodIntegral)
 	xFrac=xFractionalFromIntegral(integralValue-numPeriods*periodIntegral,x,y)
+	#print '### wanted _%g; period=%g; periodIntegral=_%g (numPeriods=%g); rests _%g (xFrac=%g)'%(integralValue,period,periodIntegral,numPeriods,integralValue-numPeriods*periodIntegral,xFrac)
+	#print '### returning %g*%g+%g=%g'%(period,numPeriods,xFrac,period*numPeriods+xFrac)
 	return period*numPeriods+xFrac
 
 def sanitizeInterpolation(x,y,x0,x1):

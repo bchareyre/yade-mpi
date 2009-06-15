@@ -111,20 +111,6 @@ void InsertionSortCollider::action(MetaBody* rb){
 
 	// process interactions that the constitutive law asked to be erased
 	interactions->erasePending(*this);
-	#if 0
-	FOREACH(const InteractionContainer::bodyIdPair& p, interactions->pendingErase){
-		// remove those that do not overlap spatially anymore
-		if(!spatialOverlap(p[0],p[1])){ interactions->erase(p[0],p[1]); LOG_TRACE("Deleted interaction #"<<p[0]<<"+#"<<p[1]); }
-		else
-		{
-			const shared_ptr<Interaction>& I=interactions->find(p[0],p[1]);
-			if(!I){ LOG_FATAL("Requested deletion of a non-existent interaction #"<<p[0]<<"+#"<<p[1]<<"?!"); throw; }
-			I->reset();
-		}
-	}
-	interactions->pendingErase.clear();
-	#endif
-	
 
 	// sort
 		if(!doInitSort && !sortThenCollide){
@@ -134,6 +120,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 		else {
 			if(doInitSort){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel
+				// it seems that there is no time gain running this in parallel, though
 				#pragma omp parallel sections
 				{
 					#pragma omp section
@@ -159,7 +146,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 				// go up until we meet the upper bound
 				for(size_t j=i+1; V[j].id!=iid; j++){
 					const body_id_t& jid=V[j].id;
-					/// FIXME: not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
+					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
 					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes
 					// if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].flags.isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
 					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */

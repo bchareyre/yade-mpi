@@ -86,6 +86,12 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
 	else{ LOG_DEBUG("Not loading simulation in ctor"); }
+
+	int mantissa, exponent;
+	dtIntegerMantissaExponent(mantissa,exponent);
+	sb10PowerSecond->setValue(exponent);
+	sbSecond->setValue(mantissa);
+
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
 
@@ -352,31 +358,27 @@ void SimulationController::bgTimeStepClicked(int i)
 	switch (i)
 	{
 		case 0 : {//Use timeStepper
-			//changeSkipTimeStepper = true;
-			//skipTimeStepper = false;
 			wasUsingTimeStepper=true;
-			//boost::mutex::scoped_lock lock(timeMutex);
 			Omega::instance().skipTimeStepper(false);
 			break;
 			}
 		case 1 : // Try RealTime -- deprecated
-			//changeSkipTimeStepper = true;
-			//skipTimeStepper = true;
-			//wasUsingTimeStepper=false;
 			throw logic_error("RealTime timestep is deprecated and you couldn't click on it!");
 			break;
 		case 2 : {// use fixed time Step
-			//changeSkipTimeStepper = true;
-			//skipTimeStepper = true;
-			//boost::mutex::scoped_lock lock(timeMutex);
 			changeTimeStep = true;
 			wasUsingTimeStepper=false;
 			Omega::instance().skipTimeStepper(true);
 			if(sbSecond->value()==0){ sbSecond->setValue(9); sb10PowerSecond->setValue(sb10PowerSecond->value()-1); }
 			if(sbSecond->value()==10){ sbSecond->setValue(1); sb10PowerSecond->setValue(sb10PowerSecond->value()+1); }
-			Real second = (Real)(sbSecond->value());
-			Real powerSecond = (Real)(sb10PowerSecond->value());
-			Omega::instance().setTimeStep(second*Mathr::Pow(10,powerSecond));
+			int second=(sbSecond->value()), powerSecond = (sb10PowerSecond->value());
+			int exp10,mantissa; dtIntegerMantissaExponent(mantissa,exp10);
+			// only change timestep if the current timestep would have different representation in this integral thing
+			// important so that merely opening the controller doesn't round the existing timestep
+			if((mantissa!=second) || (exp10!=powerSecond)){
+				LOG_DEBUG("Change timestep: current "<<mantissa<<"^"<<exp10<<"; gui "<<second<<"^"<<powerSecond);
+				Omega::instance().setTimeStep((Real)second*Mathr::Pow(10.,(Real)powerSecond));
+			}
 			break;
 		}
 		default: break;
@@ -512,10 +514,13 @@ void SimulationController::doUpdate(){
 	if(rbFixed->isChecked()==usesTimeStepper){ LOG_DEBUG("Checking rbFixed"); rbFixed->setChecked(!usesTimeStepper); }
 	if(rbTimeStepper->isChecked()!=usesTimeStepper){ LOG_DEBUG("Checking rbTimeStepper"); rbTimeStepper->setChecked(usesTimeStepper); }
 
-	Real dt=Omega::instance().getTimeStep();
-	int exp10=floor(log10(dt));
-	sb10PowerSecond->setValue(exp10);
-	sbSecond->setValue((int)(.1+dt/(pow((float)10,exp10)))); // .1: rounding issues
+	int exp10,mantissa; dtIntegerMantissaExponent(mantissa,exp10);
+	sb10PowerSecond->setValue(exp10); sbSecond->setValue(mantissa);
 
 }
 
+void SimulationController::dtIntegerMantissaExponent(int& mantissa, int& exponent){
+	Real dt=Omega::instance().getTimeStep();
+	exponent=floor(log10(dt));
+	mantissa=((int)(.1+dt/(pow((float)10,exponent)))); // .1: rounding issues
+}

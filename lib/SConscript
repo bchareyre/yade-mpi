@@ -2,7 +2,7 @@
 Import('*')
 
 if 'EMBED_PYTHON' in env['CPPDEFINES']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/gui/yade',[
+	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 		env.SharedLibrary('WeightedAverage2d',['smoothing/WeightedAverage2d.cpp'],SHLIBPREFIX='',
 		LIBS=env['LIBS']+['yade-base'])
 	])
