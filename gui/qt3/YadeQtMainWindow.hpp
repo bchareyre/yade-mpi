@@ -31,7 +31,7 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		void saveRendererConfig();
 		
 		void deleteSimulationController();
-		void closeAllChilds();
+		void closeAllChilds(bool closeGL=false);
 		void createView();
 		void closeView(GLViewer*);
 		void closeView(int);
@@ -41,6 +41,7 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		void loadSimulation(string file);
 		void redrawAll(bool force=false);
 		void lookDown(shared_ptr<GLViewer> glv);
+		void showSomeGui();
 
 	protected :
 		shared_ptr<QtGUIPreferences> preferences;
@@ -50,16 +51,17 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		YadeQtMainWindow ();
 		virtual ~YadeQtMainWindow ();
 		static YadeQtMainWindow* self; // retrieve instance pointer form elsewhere
+		bool guiMayDisappear;
 
 		DECLARE_LOGGER;
 	public slots :
 		enum{EVENT_CONTROLLER=QEvent::User+1,EVENT_PLAYER,EVENT_VIEW,EVENT_GENERATOR,EVENT_RESTORE_GLVIEWER_NUM,EVENT_RESTORE_GLVIEWER_STR,EVENT_RESTORE_VIEWER_FILE,EVENT_RESIZE_VIEW};
 		virtual void customEvent(QCustomEvent* e);
 		/* each of player, controller, generator have slots for them being opened and closed: create{Player,Controller,Generator} and the instances are kept in player, controller, generator. */
-		#define __MK_RM_CHILD(Child,child,YadeClass)  virtual void close##Child(){if(child)child=shared_ptr<YadeClass>();} virtual void create##Child(){closeAllChilds(); if(!child){child=shared_ptr<YadeClass>(new YadeClass()); connect(child.get(),SIGNAL(closeSignal()),this,SLOT(close##Child())); child->show();} else {child->show(); child->raise();}}
-		__MK_RM_CHILD(Generator,generator,QtFileGenerator);
-		__MK_RM_CHILD(Player,player,QtSimulationPlayer);
-		__MK_RM_CHILD(Controller,controller,SimulationController);
+		#define __MK_RM_CHILD(Child,child,YadeClass,closeGL)  virtual void close##Child(){if(child)child=shared_ptr<YadeClass>();} virtual void create##Child(){closeAllChilds(closeGL); if(!child){child=shared_ptr<YadeClass>(new YadeClass()); connect(child.get(),SIGNAL(closeSignal()),this,SLOT(close##Child())); child->show();} else {child->show(); child->raise();}}
+		__MK_RM_CHILD(Generator,generator,QtFileGenerator,true);
+		__MK_RM_CHILD(Player,player,QtSimulationPlayer,true);
+		__MK_RM_CHILD(Controller,controller,SimulationController,false);
 		#undef __MK_RM_CHILD
 		virtual void Quit();
 		virtual void closeEvent(QCloseEvent * evt);

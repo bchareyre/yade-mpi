@@ -14,18 +14,22 @@ class YadeQtMainWindow;
 class SimulationController;
 class GLViewer;
 class RenderingEngine;
+class QApplication;
 
 class QtGUI : public FrontEnd
 {
 	private :
 		YadeQtMainWindow  * mainWindow;
+		// run qtApp in separate thread, without parsing args and launching python
 
 	public:	
+		static QApplication* app;
 		static QtGUI *self;
 		bool mainWindowHidden;
 
 	public :
 		QtGUI ();
+		void runNaked();
 		virtual ~QtGUI ();
 		virtual int run(int argc, char *argv[]);
 		void help();

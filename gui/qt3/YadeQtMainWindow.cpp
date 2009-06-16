@@ -27,6 +27,8 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <yade/pkg-common/GravityEngines.hpp>
+#include<yade/gui-qt3/QtGUI.hpp>
+#include<qapplication.h>
 
 
 using namespace std;
@@ -38,6 +40,7 @@ YadeQtMainWindow* YadeQtMainWindow::self=NULL;
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
 	self=this;
+	guiMayDisappear=false;
 
 	QGLFormat format;
 	format.setStencil(TRUE);
@@ -80,15 +83,22 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	startTimer(100);
 }
 
+void YadeQtMainWindow::showSomeGui(){
+	if(controller||player||generator) return;
+	LOG_INFO("Showing main window");
+	this->show();
+}
+
 void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 	#if 1
 	//shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 		//if((rb && rb->bodies->size()>0) ||
 		if(controller || player || generator) {this->hide();}
-		else {this->show(); }
+		else { if(!guiMayDisappear) this->show(); }
 	#endif
 	// update GL views (if any)
 	redrawAll(/*force=*/false);
+	if(guiMayDisappear) { QtGUI::app->processEvents(); }
 }
 
 void YadeQtMainWindow::redrawAll(bool force){
@@ -110,11 +120,12 @@ YadeQtMainWindow::~YadeQtMainWindow()
 	preferences->mainWindowSizeX		= size().width();
 	preferences->mainWindowSizeY		= size().height();
 	IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+	self=NULL;
 }
 
 void YadeQtMainWindow::Quit(){ emit close(); }
 
-void YadeQtMainWindow::closeEvent(QCloseEvent *e){ renderer=shared_ptr<OpenGLRenderingEngine>(); closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e); }
+void YadeQtMainWindow::closeEvent(QCloseEvent *e){ renderer=shared_ptr<OpenGLRenderingEngine>(); closeAllChilds(); YadeQtGeneratedMainWindow::closeEvent(e);  }
 
 void YadeQtMainWindow::ensureRenderer(){
 	if(!renderer){
@@ -215,7 +226,7 @@ void YadeQtMainWindow::closeView(GLViewer* glv){
 			}
 		}
 	}
-	LOG_FATAL("No such view???"<<glv);
+	LOG_ERROR("No such GLView?! "<<glv);
 }
 
 /* Close the last view (default); close the i-th view from the beginning (0=primary) */
@@ -232,8 +243,8 @@ size_t YadeQtMainWindow::viewNo(shared_ptr<GLViewer> g){
 	throw std::invalid_argument("No such view");
 }
 
-void YadeQtMainWindow::closeAllChilds(){
-	while(glViews.size()>0 && glViews[0]!=NULL) { LOG_DEBUG("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);}
+void YadeQtMainWindow::closeAllChilds(bool closeGL){
+	if(closeGL){ while(glViews.size()>0 && glViews[0]!=NULL) { LOG_DEBUG("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);} }
 	if(player) player=shared_ptr<QtSimulationPlayer>();
 	if(controller) controller=shared_ptr<SimulationController>();
 	if(generator) generator=shared_ptr<QtFileGenerator>();

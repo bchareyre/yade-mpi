@@ -70,9 +70,11 @@ if not callable(__builtins__.quit):
 
 def cleanup():
 	try:
-		import yade.qt, time
-		yade.qt.close()
-		while True: time.sleep(.1) # wait to be killed
+		#import yade.qt, time
+		import yade._qt
+		if yade._qt.isActive(): yade._qt.close();
+		#yade.qt.close()
+		#while True: time.sleep(.1) # wait to be killed
 	except ImportError: pass
 
 

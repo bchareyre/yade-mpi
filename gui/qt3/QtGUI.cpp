@@ -10,6 +10,7 @@
 #include"YadeQtMainWindow.hpp"
 #include"GLViewer.hpp"
 #include<boost/algorithm/string.hpp>
+#include<boost/bind.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 //#ifdef HAVE_CONFIG_H
@@ -26,8 +27,9 @@
 #endif
 
 QtGUI* QtGUI::self=NULL;
+QApplication* QtGUI::app=NULL;
 
-QtGUI::QtGUI(){self=this; mainWindowHidden=false;}
+QtGUI::QtGUI(){self=this; mainWindowHidden=false; }
 QtGUI::~QtGUI(){}
 
 CREATE_LOGGER(QtGUI);
@@ -35,6 +37,7 @@ CREATE_LOGGER(QtGUI);
 void QtGUI::help(){
 	cerr<<"Qt3 GUI\n=======\n\t-h to get this help\n"<<endl;
 }
+
 
 int QtGUI::run(int argc, char *argv[])
 {
@@ -64,18 +67,42 @@ int QtGUI::run(int argc, char *argv[])
 		#endif
 	}
 	XInitThreads();
-   QApplication app(argc,argv);
+   app=new QApplication(argc,argv);
 	mainWindow=new YadeQtMainWindow();
 	mainWindow->show();
-	app.setMainWidget(mainWindow);
+	app->setMainWidget(mainWindow);
 	#ifdef EMBED_PYTHON
 		LOG_DEBUG("Launching Python thread now...");
 		//PyEval_InitThreads();
 		boost::thread pyThread(boost::function0<void>(&PythonUI::pythonSession));
 	#endif
-	int res =  app.exec();
-
+	int res =  app->exec();
 	delete mainWindow;
 	return res;
 }
 
+
+void QtGUI::runNaked(){
+	if(!app){ // no app existing yet
+		LOG_INFO("Creating QApplication");
+		XInitThreads();
+	   app=new QApplication(0,NULL);
+		if(!YadeQtMainWindow::self){
+			mainWindow=new YadeQtMainWindow();
+			mainWindow->guiMayDisappear=true;
+			mainWindow->hide();
+			//app->setMainWidget(mainWindow);
+		} else { LOG_ERROR("Main window was there, but not QtGUI::app??"); }
+		boost::thread appThread(boost::bind(&QApplication::exec,app));
+	}
+	//mainWindow->showSomeGui();
+#if 0
+	else if (!YadeQtMainWindow::self){ // app exists and runs, just reopen the main window
+		//LOG_INFO("Recreating main window "<<YadeQtMainWindow::self);
+		//mainWindow=new YadeQtMainWindow();
+		//mainWindow->guiMayDisappear=true;
+		mainWindow->showSomeGui();
+		//app->setMainWidget(mainWindow);
+	}
+#endif
+}
