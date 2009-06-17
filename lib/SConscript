@@ -4,7 +4,12 @@ Import('*')
 if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 		env.SharedLibrary('WeightedAverage2d',['smoothing/WeightedAverage2d.cpp'],SHLIBPREFIX='',
-		LIBS=env['LIBS']+['yade-base'])
+			LIBS=env['LIBS']+['yade-base']),
+	])
+	# do not install this under yade but to the top-level module path (external modules)
+	# say e.g. 'import euclid' (not 'import  yade.euclid')
+	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
+		env.File('euclid.py','py'),
 	])
 
 
