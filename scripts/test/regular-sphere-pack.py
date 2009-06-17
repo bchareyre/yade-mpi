@@ -8,13 +8,14 @@ O.bodies.append(
 	pack.regularHexa(pack.inSphere((0,0,4),2),radius=rad,gap=gap,color=(0,1,0),density=10*rho) # head
 	+[utils.sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),density=rho),utils.sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),density=rho),utils.sphere((0,2.4,4),radius=.4,color=(1,0,0),density=rho)] # eyes and nose
 	+[utils.facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)] # ground
+	+pack.regularHexa(pack.inCylinder((-1,2.2,3.3),(1,2.2,3.3),2*rad),radius=rad,gap=gap/3,color=(0.929,0.412,0.412),density=10*rho) #mouth
 )
 
 for part in [
 	pack.regularHexa (pack.inAlignedBox((-2,-2,-2),(2,2,2)),radius=1.5*rad,gap=2*gap,color=(1,0,1),**kw), # body,
-	pack.regularOrtho(pack.inCylinder((-1,0,-2),(-1,0,-6),1),radius=rad,gap=gap,color=(0,1,1),**kw), # left leg
+	pack.regularOrtho(pack.inEllipsoid((-1,0,-4),(1,1,2)),radius=rad,gap=0,color=(0,1,1),**kw), # left leg
 	pack.regularHexa (pack.inCylinder((+1,1,-2.5),(0,3,-5),1),radius=rad,gap=gap,color=(0,1,1),**kw), # right leg
-	pack.regularHexa (pack.inHyperboloid((+2,0,1),(+6,0,1),1,.5),radius=rad,gap=gap,color=(0,0,1),**kw), # right hand
+	pack.regularHexa (pack.inHyperboloid((+2,0,1),(+6,0,0),1,.5),radius=rad,gap=gap,color=(0,0,1),**kw), # right hand
 	pack.regularOrtho(pack.inCylinder((-2,0,2),(-5,0,4),1),radius=rad,gap=gap,color=(0,0,1),**kw) # left hand
 	]: O.bodies.appendClumped(part)
 

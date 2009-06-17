@@ -110,6 +110,32 @@ public:
 	}
 };
 
+/* Axis-aligned ellipsoid predicate */
+class inEllipsoid{
+	Vector3r c, abc;
+public:
+	inEllipsoid(python::tuple _c, python::tuple _abc)
+		{c=tuple2vec(_c); abc=tuple2vec(_abc);}
+	bool operator()(python::tuple _pt, Real pad=0.){
+		Vector3r pt=tuple2vec(_pt);
+		
+		//Define the ellipsoid X-coordinate of given Y and Z
+		Real x = sqrt((1-pow((pt[1]-c[1]),2)/((abc[1]-pad)*(abc[1]-pad))-pow((pt[2]-c[2]),2)/((abc[2]-pad)*(abc[2]-pad)))*((abc[0]-pad)*(abc[0]-pad)))+c[0]; 
+		Vector3r edgeEllipsoid(x,pt[1],pt[2]); // create a vector of these 3 coordinates
+		
+		if ((pt-c).Length()<=(edgeEllipsoid-c).Length()) { //check whether given coordinates lie inside ellipsoid or not
+			return true;
+		} else {
+			return false;
+		}
+	}
+	python::tuple aabb(){
+		Vector3r& center(c); Vector3r& ABC(abc);
+		return vvec2ttuple(Vector3r(center[0]-ABC[0],center[1]-ABC[1],center[2]-ABC[2]),Vector3r(center[0]+ABC[0],center[1]+ABC[1],center[2]+ABC[2]));
+	}
+};
+
+
 BOOST_PYTHON_MODULE(_packPredicates){
 	boost::python::class_<inSphere>("inSphere","Sphere predicate.",python::init<python::tuple,Real>(python::args("center","radius"),"Ctor taking center (as a 3-tuple) and radius"))
 		.def("__call__",&inSphere::operator(),"Tell whether given point lies within this sphere, still having 'pad' space to the solid boundary").def("aabb",&inSphere::aabb,"Return minimum and maximum values for AABB");
@@ -119,5 +145,7 @@ BOOST_PYTHON_MODULE(_packPredicates){
 		.def("__call__",&inCylinder::operator(),"Tell whether given point lies within this cylinder, still having 'pad' space to the solid boundary").def("aabb",&inCylinder::aabb,"Return minimum and maximum values for AABB");
 	boost::python::class_<inHyperboloid>("inHyperboloid","Hyperboloid predicate",python::init<python::tuple,python::tuple,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."))
 		.def("__call__",&inHyperboloid::operator(),"Tell whether given point lies within this hyperboloid, still having 'pad' space to the solid boundary\n(not accurate, since distance perpendicular to the axis, not the surface, is taken in account)").def("aabb",&inHyperboloid::aabb,"Return minimum and maximum values for AABB");
+	boost::python::class_<inEllipsoid>("inEllipsoid","Ellipsoid predicate",python::init<python::tuple,python::tuple>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."))
+		.def("__call__",&inEllipsoid::operator(),"Tell whether given point lies within this inEllipsoid").def("aabb",&inEllipsoid::aabb,"Return minimum and maximum values for AABB");
 }
 

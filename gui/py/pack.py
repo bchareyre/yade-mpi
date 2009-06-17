@@ -24,7 +24,7 @@ def regularHexa(predicate,radius,gap,**kw):
 	h=a*sqrt(3)/2.
 	mn,mx=predicate.aabb()
 	dim=[mx[i]-mn[i] for i in 0,1,2]
-	ii,jj,kk=[range(0,int(2*dim[0]/a)+1),range(0,int(dim[1]/h)+1),range(0,int(dim[2]/h)+1)]
+	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/h)+1),range(0,int(dim[2]/h)+1)]
 	for i,j,k in itertools.product(ii,jj,kk):
 		x,y,z=mn[0]+radius+i*a,mn[1]+radius+j*h,mn[2]+radius+k*h
 		if j%2==0: x+= a/2. if k%2==0 else -a/2.
