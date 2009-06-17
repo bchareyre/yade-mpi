@@ -88,21 +88,10 @@ void QtGUI::runNaked(){
 		XInitThreads();
 	   app=new QApplication(0,NULL);
 		if(!YadeQtMainWindow::self){
+			YadeQtMainWindow::guiMayDisappear=true;
 			mainWindow=new YadeQtMainWindow();
-			mainWindow->guiMayDisappear=true;
 			mainWindow->hide();
-			//app->setMainWidget(mainWindow);
 		} else { LOG_ERROR("Main window was there, but not QtGUI::app??"); }
 		boost::thread appThread(boost::bind(&QApplication::exec,app));
 	}
-	//mainWindow->showSomeGui();
-#if 0
-	else if (!YadeQtMainWindow::self){ // app exists and runs, just reopen the main window
-		//LOG_INFO("Recreating main window "<<YadeQtMainWindow::self);
-		//mainWindow=new YadeQtMainWindow();
-		//mainWindow->guiMayDisappear=true;
-		mainWindow->showSomeGui();
-		//app->setMainWidget(mainWindow);
-	}
-#endif
 }

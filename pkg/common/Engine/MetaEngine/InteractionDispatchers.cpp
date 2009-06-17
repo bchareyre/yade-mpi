@@ -32,6 +32,9 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
 
+			// go fast if this pair of bodies cannot interact at all
+			if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
+
 			// we know there is no geometry functor already, take the short path
 			if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
 			// no interaction geometry for either of bodies; no interaction possible

@@ -327,6 +327,7 @@ BASIC_PY_PROXY_HEAD(pyBody,Body)
 	unsigned id_get(){ensureAcc(); return proxee->getId();}
 	int mask_get(){ensureAcc(); return proxee->groupMask;}
 	void mask_set(int m){ensureAcc(); proxee->groupMask=m;}
+	bool dynamic_get(){ensureAcc(); return proxee->isDynamic;} void dynamic_set(bool dyn){ensureAcc(); proxee->isDynamic=dyn;}
 	bool isStandalone(){ensureAcc(); return proxee->isStandalone();} bool isClumpMember(){ensureAcc(); return proxee->isClumpMember();} bool isClump(){ensureAcc(); return proxee->isClump();}
 BASIC_PY_PROXY_TAIL;
 
@@ -798,6 +799,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("mold",&pyBody::mold_get,&pyBody::mold_set)
 		.add_property("bound",&pyBody::bound_get,&pyBody::bound_set)
 		.add_property("phys",&pyBody::phys_get,&pyBody::phys_set)
+		.add_property("dynamic",&pyBody::dynamic_get,&pyBody::dynamic_set)
 		.add_property("id",&pyBody::id_get)
 		.add_property("mask",&pyBody::mask_get,&pyBody::mask_set)
 		.add_property("isStandalone",&pyBody::isStandalone)

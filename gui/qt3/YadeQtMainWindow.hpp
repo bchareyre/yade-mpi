@@ -41,7 +41,6 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		void loadSimulation(string file);
 		void redrawAll(bool force=false);
 		void lookDown(shared_ptr<GLViewer> glv);
-		void showSomeGui();
 
 	protected :
 		shared_ptr<QtGUIPreferences> preferences;
@@ -51,7 +50,7 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		YadeQtMainWindow ();
 		virtual ~YadeQtMainWindow ();
 		static YadeQtMainWindow* self; // retrieve instance pointer form elsewhere
-		bool guiMayDisappear;
+		static bool guiMayDisappear;
 
 		DECLARE_LOGGER;
 	public slots :

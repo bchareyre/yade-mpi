@@ -36,11 +36,11 @@ using namespace std;
 CREATE_LOGGER(YadeQtMainWindow);
 
 YadeQtMainWindow* YadeQtMainWindow::self=NULL;
+bool YadeQtMainWindow::guiMayDisappear=false;
 
 YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 {
 	self=this;
-	guiMayDisappear=false;
 
 	QGLFormat format;
 	format.setStencil(TRUE);
@@ -76,17 +76,11 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
 
 	// HACK
-	if(Omega::instance().getSimulationFileName()!="") createController();
+	if(!guiMayDisappear && Omega::instance().getSimulationFileName()!="") createController();
 
 
 	// updates GL views, may also hide/show this window as needed
 	startTimer(100);
-}
-
-void YadeQtMainWindow::showSomeGui(){
-	if(controller||player||generator) return;
-	LOG_INFO("Showing main window");
-	this->show();
 }
 
 void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
