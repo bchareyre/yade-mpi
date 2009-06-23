@@ -83,66 +83,6 @@ void FrictionLessElasticContactLaw::action(MetaBody * ncb)
 			}
 		}
 	}
-
-// 	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
-// 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-// 
-// 	Real dt = Omega::instance().getTimeStep();
-// 
-// 	for( ncb->transientInteractions->gotoFirst() ; ncb->transientInteractions->notAtEnd() ; ncb->transientInteractions->gotoNext() )
-// 	{
-// 		const shared_ptr<Interaction>& contact = ncb->transientInteractions->getCurrent();
-// 		int id1 = contact->getId1();
-// 		int id2 = contact->getId2();
-// 
-// 		BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-// 		BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-// 		SpheresContactGeometry* currentContactGeometry 	= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
-// 		ElasticContactInteraction* currentContactPhysics   	= YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
-// 
-// 		//Vector3r& shearForce 			= currentContactPhysics->shearForce;
-// 
-// 		//if ( contact->isNew)
-// 		//	shearForce			= Vector3r(0,0,0);
-// 
-// 		Real un 				= currentContactGeometry->penetrationDepth;
-// 		currentContactPhysics->normalForce	= currentContactPhysics->kn*un*currentContactGeometry->normal;
-// 
-// 		Vector3r axis;
-// 		Real angle;
-// 
-// 
-// 		//axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-// 		//shearForce 	       -= shearForce.cross(axis);
-// 		//angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-// 		//axis 			= angle*currentContactGeometry->normal;
-// 		//shearForce 	       -= shearForce.cross(axis);
-// 
-// 		//Vector3r x				= currentContactGeometry->contactPoint;
-// 		//Vector3r c1x				= (x - de1->se3.position);
-// 		//Vector3r c2x				= (x - de2->se3.position);
-// 		//Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.cross(c2x)) - (de1->velocity+de1->angularVelocity.cross(c1x));
-// 		//Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
-// 		//Vector3r shearDisplacement		= shearVelocity*dt;
-// 		//shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
-// 
-// 		//Real maxFs = currentContactPhysics->normalForce.squaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-// 		//if( shearForce.squaredLength() > maxFs )
-// 		//{
-// 		//	maxFs = Mathr::sqRoot(maxFs) / shearForce.length();
-// 		//	shearForce *= maxFs;
-// 		//}
-// 
-// 		Vector3r f = currentContactPhysics->normalForce;// + shearForce;
-// 
-// 		static_cast<Force*>   ( ncb->physicalActions->find( id1 , actionForce   ->getClassIndex() ).get() )->force    -= f;
-// 		static_cast<Force*>   ( ncb->physicalActions->find( id2 , actionForce   ->getClassIndex() ).get() )->force    += f;
-// 
-// 		static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum -= c1x.cross(f);
-// 		static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum += c2x.cross(f);
-// 
-// 		//currentContactPhysics->prevNormal = currentContactGeometry->normal;
-// 	}
 }
 
 YADE_PLUGIN();

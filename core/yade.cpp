@@ -42,7 +42,7 @@ using namespace std;
 	#endif
 
 	/* initialization of log4cxx for early logging */
-	__attribute__((constructor(1000))) void initLog4cxx(){
+	__attribute__((constructor/* (1000) ::: can be uncommented for gcc>=4.0 */)) void initLog4cxx(){
 		log4cxx::BasicConfigurator::configure();
 		log4cxx::LoggerPtr localLogger=log4cxx::Logger::getLogger("yade");
 		if(getenv("YADE_DEBUG")){
