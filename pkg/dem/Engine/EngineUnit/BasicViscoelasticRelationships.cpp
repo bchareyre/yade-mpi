@@ -55,25 +55,27 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
     {
         const shared_ptr<Body>& clump = (*((Omega::instance().getRootBody().get())->bodies))[ bdy1->clumpId ];
         RigidBodyParameters* clumpRBP=YADE_CAST<RigidBodyParameters*> ( clump->physicalParameters.get() );
-        m1 = clumpRBP->mass; 
+        m1 = clumpRBP->mass;
+        if (!clump->isDynamic) m1 *= 1.0e6;
     }
     else
-    { m1 = sdec1->mass ; }
+    {  
+        m1 = sdec1->mass ; 
+        if (!bdy1->isDynamic) m1 *= 1.0e6;
+    }
     
     if (bdy2->isClumpMember())
     {
         const shared_ptr<Body>& clump = (*((Omega::instance().getRootBody().get())->bodies))[ bdy2->clumpId ];
         RigidBodyParameters* clumpRBP=YADE_CAST<RigidBodyParameters*> ( clump->physicalParameters.get() );
         m2 = clumpRBP->mass;
+        if (!clump->isDynamic) m2 *= 1.0e6;
     }
     else
-    { m2 = sdec2->mass; }
-
-    if (!bdy1->isDynamic) m1 *= 1e6;
-    if (!bdy2->isDynamic) m2 *= 1e6;
-
-    //cout << "m1 = " << m1 << endl;
-    //cout << "m2 = " << m2 << endl;
+    { 
+        m2 = sdec2->mass; 
+        if (!bdy2->isDynamic) m2 *= 1.0e6;
+    }
 
     contactPhysics->cn *= 2.0 * sqrt(contactPhysics->kn * ((m1 * m2) / (m1 + m2)));
  
