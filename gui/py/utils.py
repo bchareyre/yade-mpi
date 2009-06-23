@@ -424,4 +424,11 @@ def spheresFromFileUniaxial(filename,areaSections=10,**kw):
 	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
-
+def NormalRestitution2DampingRate(en):
+        """Compute the normal damping rate as a function of the normal coefficient of restitution.
+        """
+	if en == 0.0: return 0.999999999
+	if en == 1.0: return 0.0
+	from math import sqrt,log,pi
+	ln_en = math.log(en)
+	return (-ln_en/math.sqrt((math.pow(ln_en,2) + math.pi*math.pi)))
