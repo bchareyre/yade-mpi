@@ -79,7 +79,10 @@ bool InteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<Int
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
 		interaction->interactionGeometry = cf;
-		
+
+		// add void interactionPhysics, even though ClosestFeatures doesn't use it. Interaction::isReal tests its presence, however.
+		interaction->interactionPhysics=shared_ptr<InteractionPhysics>(new InteractionPhysics());
+
 		return true;	
 	}
 
@@ -100,9 +103,10 @@ bool InteractingBox2InteractingSphere4ClosestFeatures::go(		const shared_ptr<Int
 	
 	shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 	cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(pt1,pt2));
+	// add void interactionPhysics, even though ClosestFeatures doesn't use it. Interaction::isReal tests its presence, however.
+	interaction->interactionPhysics=shared_ptr<InteractionPhysics>(new InteractionPhysics());
 	
 	interaction->interactionGeometry = cf;
-	
 	return true;
 }
 

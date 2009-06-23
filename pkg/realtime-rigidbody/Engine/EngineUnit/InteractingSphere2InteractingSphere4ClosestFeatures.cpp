@@ -28,6 +28,9 @@ bool InteractingSphere2InteractingSphere4ClosestFeatures::go(		const shared_ptr<
 		shared_ptr<ClosestFeatures> cf = shared_ptr<ClosestFeatures>(new ClosestFeatures());
 		cf->closestsPoints.push_back(std::pair<Vector3r,Vector3r>(se31.position-v*s1->radius,se32.position+v*s2->radius));
 		c->interactionGeometry = cf;
+		// add void interactionPhysics, even though ClosestFeatures doesn't use it. Interaction::isReal tests its presence, however.
+		c->interactionPhysics=shared_ptr<InteractionPhysics>(new InteractionPhysics());
+
 		return true;
 	}
 	else	
