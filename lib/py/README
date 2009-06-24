@@ -2,3 +2,10 @@ euclid.py:
 	homepage: http://partiallydisassembled.net/euclid.html
 	latest SVN version: http://pyeuclid.googlecode.com/svn/trunk/euclid.py
 	documentation: http://partiallydisassembled.net/euclid/
+
+pygts-0.3.1:
+	homepage: http://pygts.sourceforge.net/
+	documentation: http://pygts.svn.sourceforge.net/viewvc/pygts/doc/gts.html
+	license: GNU GPL v2
+	note: the local version is only the 'gts' directory of the source archive (doc, examples, test ommited). Distutils are not used for building either.
+

@@ -129,7 +129,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','binfmt','CGAL','dummy']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','binfmt','CGAL','dummy','GTS']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -321,6 +321,11 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
 		if not ok: featureNotOK('openGL')
 		env.Append(CPPDEFINES='YADE_OPENGL')
+	if 'GTS' in env['features']:
+		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
+		ok=conf.CheckLibWithHeader('gts','gts.h','c','gts_object_class();',autoadd=1)
+		if not ok: featureNotOK('GTS')
+		env.Append(CPPDEFINES='YADE_GTS')
 	if 'qt3' not in env['exclude']:
 		if 'openGL' not in env['features']:
 			print "\nQt3 interface can only be used if openGL is enabled.\nEither add openGL to 'features' or add qt3 to 'exclude'."
