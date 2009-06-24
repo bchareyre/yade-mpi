@@ -11,6 +11,7 @@ def regularOrtho(predicate,radius,gap,**kw):
 	Created spheres will have given radius and will be separated by gap space."""
 	ret=[]
 	mn,mx=predicate.aabb()
+	if(max([mx[i]-mn[i] for i in 0,1,2])==float('inf')): raise ValueError("AABB of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
 	xx,yy,zz=[arange(mn[i]+radius,mx[i]-radius,2*radius+gap) for i in 0,1,2]
 	for xyz in itertools.product(xx,yy,zz):
 		if predicate(xyz,radius): ret+=[utils.sphere(xyz,radius=radius,**kw)]
@@ -24,6 +25,7 @@ def regularHexa(predicate,radius,gap,**kw):
 	h=a*sqrt(3)/2.
 	mn,mx=predicate.aabb()
 	dim=[mx[i]-mn[i] for i in 0,1,2]
+	if(max(dim)==float('inf')): raise ValueError("AABB of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
 	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/h)+1),range(0,int(dim[2]/h)+1)]
 	for i,j,k in itertools.product(ii,jj,kk):
 		x,y,z=mn[0]+radius+i*a,mn[1]+radius+j*h,mn[2]+radius+k*h

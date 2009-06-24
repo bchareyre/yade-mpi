@@ -521,8 +521,8 @@ class pyOmega{
 		LOG_DEBUG("LOAD!");
 	}
 	void reload(){	load(OMEGA.getSimulationFileName());}
-	void saveTmp(string mark){ save(":memory:"+mark);}
-	void loadTmp(string mark){ load(":memory:"+mark);}
+	void saveTmp(string mark=""){ save(":memory:"+mark);}
+	void loadTmp(string mark=""){ load(":memory:"+mark);}
 	void tmpToFile(string mark, string filename){
 		// FIXME: memSavedSimulations are private, but I don't want to recompile all yade now; move it to public and uncomment these few lines at some point
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
@@ -651,6 +651,8 @@ class pyOmega{
 
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_loadTmp_overloads,loadTmp,0,1);
 
 BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
 	void generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
@@ -684,8 +686,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("load",&pyOmega::load)
 		.def("reload",&pyOmega::reload)
 		.def("save",&pyOmega::save)
-		.def("loadTmp",&pyOmega::loadTmp)
-		.def("saveTmp",&pyOmega::saveTmp)
+		.def("loadTmp",&pyOmega::loadTmp,omega_loadTmp_overloads(python::args("mark")))
+		.def("saveTmp",&pyOmega::saveTmp,omega_saveTmp_overloads(python::args("mark")))
 		.def("tmpToFile",&pyOmega::tmpToFile)
 		.def("saveSpheres",&pyOmega::saveSpheres)
 		.def("run",&pyOmega::run,omega_run_overloads())

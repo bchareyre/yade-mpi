@@ -188,7 +188,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 
 			Omega::instance().loadSimulation(); // expecting throw here.
 			string fullName = string(filesystem::basename(fileName.data()))+string(filesystem::extension(fileName.data()));
-			tlCurrentSimulation->setText(fullName); 
+			//tlCurrentSimulation->setText(fullName); 
 			Omega::instance().createSimulationLoop();
 			
 			pbStartSimulation->setEnabled(true);
@@ -433,6 +433,9 @@ void SimulationController::doUpdate(){
 	char strVirt[64];
 	snprintf(strVirt,64,"virt %02d:%03d.%03dm%03du%03dn",min,sec,msec,misec,nsec);
 	labelSimulTime->setText(string(strVirt));
+
+	string sim=Omega::instance().getSimulationFileName();
+	tlCurrentSimulation->setText(sim.empty() ? "[no file]" : sim); 
 
 	if(Omega::instance().isRunning()){
 		duration = microsec_clock::local_time()-Omega::instance().getMsStartingSimulationTime();

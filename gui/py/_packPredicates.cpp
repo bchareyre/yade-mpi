@@ -202,6 +202,7 @@ Use intersection (& operator) of another predicate with notInNotch to create not
 			normalHalfHt (in constructor): A-C
 			inside: perpendicular to notch edge, points inside the notch (unit vector)
 			normal: perpendicular to inside, perpendicular to both notch planes
+			edge: unit vector in the direction of the edge
 
 		          ↑ distUp        A
 		-------------------------
@@ -213,12 +214,20 @@ Use intersection (& operator) of another predicate with notInNotch to create not
 
 */
 class notInNotch: public Predicate{
-	Vector3r c, inside, normal; Real halfHt;
+	Vector3r c, edge, normal, inside; Real aperture;
 public:
-	notInNotch(python::tuple _c, python::tuple _inside, python::tuple _normalHalfHt){ Vector3r normalHalfHt=tuple2vec(_normalHalfHt); halfHt=normalHalfHt.Normalize(); normal=normalHalfHt; inside=tuple2vec(_inside); inside.Normalize(); c=tuple2vec(_c); }
+	notInNotch(python::tuple _c, python::tuple _edge, python::tuple _normal, Real _aperture){
+		c=tuple2vec(_c);
+		edge=tuple2vec(_edge); edge.Normalize();
+		normal=tuple2vec(_normal); normal-=edge*edge.Dot(normal); normal.Normalize();
+		inside=edge.Cross(normal);
+		aperture=_aperture;
+		// LOG_DEBUG("edge="<<edge<<", normal="<<normal<<", inside="<<inside<<", aperture="<<aperture);
+	}
 	bool operator()(python::tuple _pt, Real pad=0.) const {
 		Vector3r pt=tuple2vec(_pt);
-		Real distUp=normal.Dot(pt-c)-halfHt, distDown=-normal.Dot(pt-c)-halfHt, distInPlane=-inside.Dot(pt-c);
+		Real distUp=normal.Dot(pt-c)-aperture/2, distDown=-normal.Dot(pt-c)-aperture/2, distInPlane=-inside.Dot(pt-c);
+		// LOG_DEBUG("pt="<<pt<<", distUp="<<distUp<<", distDown="<<distDown<<", distInPlane="<<distInPlane);
 		if(distInPlane>=pad) return true;
 		if(distUp     >=pad) return true;
 		if(distDown   >=pad) return true;
@@ -229,7 +238,9 @@ public:
 		return false;
 	}
 	// aabb here doesn't make any sense since we are negated. Return just the center point.
-	python::tuple aabb() const { return vvec2ttuple(c,c); }
+	python::tuple aabb() const {
+		Real inf=std::numeric_limits<Real>::infinity();
+		return vvec2ttuple(Vector3r(-inf,-inf,-inf),Vector3r(inf,inf,inf)); }
 };
 
 
@@ -249,7 +260,7 @@ BOOST_PYTHON_MODULE(_packPredicates){
 	python::class_<inCylinder,python::bases<Predicate> >("inCylinder","Cylinder predicate",python::init<python::tuple,python::tuple,Real>(python::args("centerBottom","centerTop","radius"),"Ctor taking centers of the lateral walls (as 3-tuples) and radius."));
 	python::class_<inHyperboloid,python::bases<Predicate> >("inHyperboloid","Hyperboloid predicate",python::init<python::tuple,python::tuple,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."));
 	python::class_<inEllipsoid,python::bases<Predicate> >("inEllipsoid","Ellipsoid predicate",python::init<python::tuple,python::tuple>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."));
-	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<python::tuple,python::tuple,python::tuple>(python::args("centerPoint","insideNotchVector","orientedHalfAperture"),"Ctor taking point in the symmetry plane, vector pointing inside the notch perpendicular to the edge, vector perpendicular to the edge and to the plane normal, with length equal to half of the aperture.")); 
+	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<python::tuple,python::tuple,python::tuple,Real>(python::args("centerPoint","edge","normal","aperture"),"Ctor taking point in the symmetry plane, vector pointing along the edge, plane normal and aperture size.\nThe side inside the notch is edge×normal.\nNormal is made perpendicular to the edge.\nAll vectors are normalized at construction time.")); 
 
 }
 
