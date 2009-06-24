@@ -101,8 +101,26 @@ def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,fri
 	b['isDynamic']=dynamic
 	return b
 
+def alignedFacetBox(center,extents,wallMask=63,**kw):
+	"""Create axis-aligned box composed of facets, with given center and extents. wallMask determines which walls will be created,
+	in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls.
+	Remaining **kw arguments are passed to utils.facet. The facets are oriented outwards from the box."""
+	mn,mx=[center[i]-extents[i] for i in 0,1,2],[center[i]+extents[i] for i in 0,1,2]
+	def doWall(a,b,c,d):
+		return [facet((a,b,c),**kw),facet((a,c,d),**kw)]
+	ret=[]
+	A,B,C,D=(mn[0],mn[1],mn[2]),(mx[0],mn[1],mn[2]),(mx[0],mx[1],mn[2]),(mn[0],mx[1],mn[2])
+	E,F,G,H=(mn[0],mn[1],mx[2]),(mx[0],mn[1],mx[2]),(mx[0],mx[1],mx[2]),(mn[0],mx[1],mx[2])
+	if wallMask&1:  ret+=doWall(A,D,H,E)
+	if wallMask&2:  ret+=doWall(B,C,G,F)
+	if wallMask&4:  ret+=doWall(A,B,F,E)
+	if wallMask&8:  ret+=doWall(D,H,G,C)
+	if wallMask&16: ret+=doWall(A,D,C,B)
+	if wallMask&32: ret+=doWall(E,F,G,H)
+	return ret
+
 def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={}):
-	"""Create default facet with given parameters."""
+	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()
 	if not color: color=randomColor()
 	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire})
