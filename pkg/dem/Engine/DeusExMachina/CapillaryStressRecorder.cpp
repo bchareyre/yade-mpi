@@ -43,7 +43,10 @@ void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-		ofile.open(outputFile.c_str());
+		//bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
+		ofile.open(outputFile.c_str(), std::ios::app);
+		//if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
+		
 	}
 }
 

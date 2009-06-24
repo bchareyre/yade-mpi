@@ -3,23 +3,23 @@ Import('*')
 
 import os.path,os
 #  Dir('#') expands to the root of the source tree -- that is done by scons
-if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a'):
-	print "Will build VolumetricContactLaw since libTesselationWrapper.a was found."
-	env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
-		env.SharedLibrary('VolumicContactLaw',
-			['Engine/StandAloneEngine/VolumicContactLaw.cpp'],
-			LIBPATH=env['LIBPATH']+['../extra/triangulation'],
-			LIBS=env['LIBS']+['SDECLinkPhysics',
-				'ElasticContactInteraction',
-				'SDECLinkGeometry',
-				'SpheresContactGeometry',
-				'BodyMacroParameters',
-				'Sphere',
-				'RigidBodyParameters',
-				'InteractingSphere',
-				'TesselationWrapper',
-				'CGAL'])
-		])
+#if os.path.exists(Dir('#').abspath+'/extra/triangulation/libTesselationWrapper.a'):
+	#print "Will build VolumetricContactLaw since libTesselationWrapper.a was found."
+	#env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
+		#env.SharedLibrary('VolumicContactLaw',
+			#['Engine/StandAloneEngine/VolumicContactLaw.cpp'],
+			#LIBPATH=env['LIBPATH']+['../extra/triangulation'],
+			#LIBS=env['LIBS']+['SDECLinkPhysics',
+				#'ElasticContactInteraction',
+				#'SDECLinkGeometry',
+				#'SpheresContactGeometry',
+				#'BodyMacroParameters',
+				#'Sphere',
+				#'RigidBodyParameters',
+				#'InteractingSphere',
+				#'TesselationWrapper',
+				#'CGAL'])
+		#])
 
 cpmModel='../brefcom-mm.hh'
 if os.path.exists('../../'+cpmModel):
@@ -313,7 +313,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 			
 			'ElasticContactInteraction',
 			'SpheresContactGeometry',
-			'MacroMicroElasticRelationships',
 			'Sphere',
 			]),
 
@@ -793,7 +792,7 @@ env.SharedLibrary('TriaxialTestWater',
         TriaxialStateRecorder
         CapillaryStressRecorder
         ContactStressRecorder
-        MacroMicroElasticRelationships
+        SimpleElasticRelationshipsWater
         ElasticCriterionTimeStepper
         InteractingSphere
         InteractingBox
@@ -806,6 +805,7 @@ env.SharedLibrary('TriaxialTestWater',
         PhysicalActionContainerReseter
         InteractionGeometryMetaEngine
         InteractionPhysicsMetaEngine
+        InteractingSphere2InteractingSphere4SpheresContactGeometry
         PhysicalActionApplier
         PhysicalParametersMetaEngine
         BoundingVolumeMetaEngine
@@ -815,8 +815,8 @@ env.SharedLibrary('TriaxialTestWater',
         AABB
         PersistentSAPCollider
         MetaInteractingGeometry2AABB
+        InteractingSphere2AABB
 	TriaxialStressController
-	MacroMicroElasticRelationshipsWater
 	TriaxialCompressionEngine
 	GlobalStiffnessTimeStepper''')),
 
@@ -859,21 +859,21 @@ env.SharedLibrary('InteractingBox2InteractingSphere4SpheresContactGeometryWater'
 			'InteractingSphere',
 			'InteractingBox' ]),
 
-env.SharedLibrary('MacroMicroElasticRelationshipsWater',
-		['Engine/EngineUnit/MacroMicroElasticRelationshipsWater.cpp'],
-		LIBS=env['LIBS']+['SDECLinkPhysics',
-			'SDECLinkGeometry',
-			'ElasticContactInteraction',
-			'SpheresContactGeometry',
-			'BodyMacroParameters',
-			'RigidBodyParameters',
-			'ParticleParameters',
-			'InteractionPhysicsMetaEngine',
-			'CapillaryParameters']),
+#env.SharedLibrary('MacroMicroElasticRelationshipsWater',
+		#['Engine/EngineUnit/MacroMicroElasticRelationshipsWater.cpp'],
+		#LIBS=env['LIBS']+['SDECLinkPhysics',
+			#'SDECLinkGeometry',
+			#'ElasticContactInteraction',
+			#'SpheresContactGeometry',
+			#'BodyMacroParameters',
+			#'RigidBodyParameters',
+			#'ParticleParameters',
+			#'InteractionPhysicsMetaEngine',
+			#'CapillaryParameters']),
 
-env.SharedLibrary('InteractingSphere2AABBwater',
-		['Engine/EngineUnit/InteractingSphere2AABBwater.cpp'],
-		LIBS=env['LIBS']+['InteractingSphere', 'AABB', 'BoundingVolumeMetaEngine']),
+#env.SharedLibrary('InteractingSphere2AABBwater',
+		#['Engine/EngineUnit/InteractingSphere2AABBwater.cpp'],
+		#LIBS=env['LIBS']+['InteractingSphere', 'AABB', 'BoundingVolumeMetaEngine']),
 		
 env.SharedLibrary('HydraulicForceEngine',
 		['Engine/DeusExMachina/HydraulicForceEngine.cpp'],
@@ -882,6 +882,15 @@ env.SharedLibrary('HydraulicForceEngine',
 			'DataClass/PhysicalAction',
 			'$PREFIX/include',
 			'DataClass/PhysicalParameters']),
+			
+env.SharedLibrary('SampleCapillaryPressureEngine',
+		['Engine/DeusExMachina/SampleCapillaryPressureEngine.cpp'],
+		LIBS=env['LIBS']+['yade-factory',
+			'yade-base',
+			'CapillaryCohesiveLaw',
+			'ParticleParameters',
+			'ElasticContactInteraction',
+			'TriaxialStressController']),
 			
 env.SharedLibrary('StaticSpheresAttractionEngine',
 		['Engine/DeusExMachina/StaticSpheresAttractionEngine.cpp'],
@@ -1079,7 +1088,19 @@ env.SharedLibrary('NewtonsDampedLaw',
 			#'/home/bruno/YADE/trunk_svn/extra/triangulation/TriaxialState.cpp'],
 			#"make",
 			#chdir='/home/bruno/YADE/trunk_svn/extra/triangulation')
+			
+	env.SharedLibrary('SimpleElasticRelationshipsWater',
+		['Engine/EngineUnit/SimpleElasticRelationshipsWater.cpp'],
+		LIBS=env['LIBS']+['SDECLinkPhysics',
+			'ElasticContactInteraction',
+			'CapillaryParameters',
+			'SpheresContactGeometry',
+			'BodyMacroParameters',
+			'RigidBodyParameters',
+			'ParticleParameters',
+			'InteractionPhysicsMetaEngine']),
 ])
+
 
 
 if 'YADE_OPENGL' in env['CPPDEFINES']:

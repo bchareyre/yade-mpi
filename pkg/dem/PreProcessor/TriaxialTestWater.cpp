@@ -18,7 +18,7 @@
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 // #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
-/////////////#include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
+#include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
@@ -44,6 +44,7 @@
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/InteractingSphere2AABB.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -57,6 +58,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -503,9 +505,17 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	
+	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
+	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
+	
+	shared_ptr<InteractingSphere2InteractingSphere4SpheresContactGeometry> iS2IS4SContactGeometry(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	iS2IS4SContactGeometry->interactionDetectionFactor = distanceFactor;//Detect potential distant interaction (meniscii)
+	
+	interactionGeometryDispatcher->add(iS2IS4SContactGeometry);
 	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+	
+	
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
 //	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
@@ -513,12 +523,16 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW
-/////////////	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationshipsWater);
-/////////////	interactionPhysicsDispatcher->add(ss);
+	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationshipsWater);
+	interactionPhysicsDispatcher->add(ss);
 	
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
+	
+	shared_ptr<InteractingSphere2AABB> interactingSphere2AABB(new InteractingSphere2AABB);
+	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
+	
+	boundingVolumeDispatcher->add(interactingSphere2AABB);
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 

@@ -9,6 +9,7 @@
 //Modifs : Parameters renamed as MeniscusParameters
 //id1/id2 classés pour que id1 soit toujours le plus petit grain, FIXME : angle de mouillage?
 //FIXME : dans triaxialStressController, changer le test de nullité de la force dans updateStiffness
+//FIXME : needs "requestErase" somewhere
 
 
 #include "CapillaryCohesiveLaw.hpp"
