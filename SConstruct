@@ -320,12 +320,12 @@ if not env.GetOption('clean'):
 	if 'openGL' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
 		if not ok: featureNotOK('openGL')
-		env.Append(CPPDEFINES='YADE_OPENGL')
+		env.Append(CPPDEFINES=['YADE_OPENGL'])
 	if 'GTS' in env['features']:
 		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
 		ok=conf.CheckLibWithHeader('gts','gts.h','c','gts_object_class();',autoadd=1)
 		if not ok: featureNotOK('GTS')
-		env.Append(CPPDEFINES='YADE_GTS')
+		env.Append(CPPDEFINES=['YADE_GTS'])
 	if 'qt3' not in env['exclude']:
 		if 'openGL' not in env['features']:
 			print "\nQt3 interface can only be used if openGL is enabled.\nEither add openGL to 'features' or add qt3 to 'exclude'."
