@@ -130,7 +130,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 					#pragma omp section
 						std::sort(ZZ.begin(),ZZ.end());
 				}
-			} else {
+			} else { // sortThenCollide
 				insertionSort(XX,interactions,rb,false); insertionSort(YY,interactions,rb,false); insertionSort(ZZ,interactions,rb,false);
 			}
 			// traverse the container along requested axis
@@ -151,6 +151,19 @@ void InsertionSortCollider::action(MetaBody* rb){
 					// if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].flags.isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
 					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 					handleBoundInversion(iid,jid,interactions,rb);
+					// now we are at the last element, but we still have not met the upper bound of V[i].id
+					// that means that the upper bound is before the upper one; that can only happen if they
+					// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
+					// from V[i] until we meet the upper bound and swap the isMin flag
+					if(j==2*nBodies-1){
+						size_t k=i-1;
+						while(V[k].id!=iid && k>0) k--;
+						assert(V[k].id==iid); // if this fails, we didn't meet the other bound in the downwards sense either; that should never happen
+						assert(!V[k].flags.isMin); // the lower bound should be maximum in this (exceptional) case; we will fix that now
+						V[k].flags.isMin=true; V[i].flags.isMin=false;
+						LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<"(coords: "<<V[k].coord<<" and "<<V[i].coord);
+						break; // would happen anyways
+					}
 				}
 			}
 		}
