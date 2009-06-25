@@ -1,10 +1,49 @@
 
-from numpy import arange; from math import sqrt
-import itertools
+import itertools,warnings
+from numpy import arange
+from math import sqrt
 from yade import utils
 
-# make predicates available from yade.pack
+# for now skip the import, but try in inGtsSurface constructor again, to give error if we really use it
+try:
+	import gts
+except ImportError: pass
+
+
+# make c++ predicates available in this module
 from _packPredicates import *
+
+
+class inGtsSurface(Predicate):
+	"""Predicate for GTS surfaces. Constructed using an already existing surfaces, which must be closed.
+
+		import gts
+		surf=gts.read(open('horse.gts'))
+		inGtsSurface(surf)
+
+	Note: padding is not supported, warning is given and zero used instead.
+	"""
+	def __init__(self,surf):
+		import gts
+		if not surf.is_closed(): raise RuntimeError("Surface for inGtsSurface predicate must be closed.")
+		self.surf=surf
+		inf=float('inf')
+		mn,mx=[inf,inf,inf],[-inf,-inf,-inf]
+		for v in surf.vertices():
+			c=v.coords()
+			mn,mx=[min(mn[i],c[i]) for i in 0,1,2],[max(mx[i],c[i]) for i in 0,1,2]
+		self.mn,self.mx=tuple(mn),tuple(mx)
+	def aabb(self): return self.mn,self.mx
+	def __call__(self,_pt,pad=0.):
+		p=gts.Point(*_pt)
+		if(pad!=0): warnings.warn("Pad distance not supported for GTS surfaces, using 0 instead.")
+		return p.is_inside(self.surf)
+
+def gtsSurface2Facets(surf,**kw):
+	"""Construct facets from given GTS surface. **kw is passed to utils.facet."""
+	return [utils.facet([v.coords() for v in face.vertices()],**kw) for face in surf]
+
+
 
 def regularOrtho(predicate,radius,gap,**kw):
 	"""Return set of spheres in regular orthogonal grid, clipped inside solid given by predicate.

@@ -19,7 +19,7 @@ void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const
 	const Vector3r* ne = facet->ne;
 	const Real& icr = facet->icr;
 
-    glDisable(GL_LIGHTING);
+  //  glDisable(GL_LIGHTING);
 
     // facet
     glBegin(GL_LINE_LOOP);

@@ -71,7 +71,7 @@ PredicateIntersection makeIntersection(const shared_ptr<Predicate>& A, const sha
 class PredicateDifference: public PredicateBoolean{
 	public:
 		PredicateDifference(const shared_ptr<Predicate> _A, const shared_ptr<Predicate> _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return (*A)(pt,pad) && !(*B)(pt,pad);}
+		virtual bool operator()(python::tuple pt,Real pad) const {return (*A)(pt,pad) && !(*B)(pt,-pad);}
 		virtual python::tuple aabb() const { return A->aabb(); }
 };
 PredicateDifference makeDifference(const shared_ptr<Predicate>& A, const shared_ptr<Predicate>& B){ return PredicateDifference(A,B);}
