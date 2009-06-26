@@ -8,8 +8,8 @@ from yade import pack
 import gts
 
 try:
-	surf=gts.read(open('horse.gts'))
-	surf.coarsen(1000) # MUCH faster subsequently if the surface is coarse
+	#surf=gts.read(open('horse.gts')); surf.coarsen(1000); surf.write(open('horse.coarse.gts','w'))
+	surf=gts.read(open('horse.coarse.gts'))
 except IOError:
 	print """horse.gts not found, you need to download input data:
 
