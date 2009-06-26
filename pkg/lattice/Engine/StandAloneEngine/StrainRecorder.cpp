@@ -18,6 +18,7 @@ StrainRecorder::StrainRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 50;
+	only_stress = false;
 	subscribedBodies.clear();
 }
 
@@ -43,6 +44,7 @@ void StrainRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(interval);
 	REGISTER_ATTRIBUTE(subscribedBodies);
 	REGISTER_ATTRIBUTE(initialLength);
+	REGISTER_ATTRIBUTE(only_stress);
 }
 
 

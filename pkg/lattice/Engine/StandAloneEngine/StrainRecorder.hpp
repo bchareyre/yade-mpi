@@ -24,6 +24,7 @@ class StrainRecorder : public DataRecorder
 		unsigned int	 interval;
 		std::vector<unsigned int> subscribedBodies;
 		Real 		 initialLength;
+		bool		 only_stress;
 
 		StrainRecorder ();
 

@@ -43,7 +43,15 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 			      if(beam->longitudalStiffness == 60.0 ) line->diffuseColor = Vector3r(0.0,0.0,0.0); // AGGREGATE
 			      if(beam->longitudalStiffness == 160.0) line->diffuseColor = Vector3r(1.0,1.0,0.35); // STEEL
 
-			      if(beam->longitudalStiffness == 10.0 ) line->diffuseColor = Vector3r(0.0,1.0,0.0); // NON-DESTROY
+			      if(beam->longitudalStiffness == 500.0 ) line->diffuseColor = Vector3r(0.0,1.0,0.0); // NON-DESTROY
+			      
+			      
+//			      if(beam->longitudalStiffness == 0.69999999999999996 ) line->diffuseColor = Vector3r(0.06,0.06,0.06); // BOND  
+//			      if(beam->longitudalStiffness == 1.0 ) line->diffuseColor = Vector3r(0.46,0.46,0.46); // CEMENT   
+//			      if(beam->longitudalStiffness == 3.0 ) line->diffuseColor = Vector3r(0.0,0.0,0.0); // AGGREGATE
+//			      if(beam->longitudalStiffness == 8.0) line->diffuseColor = Vector3r(1.0,1.0,0.35); // STEEL
+//
+//			      if(beam->longitudalStiffness == 10.0 ) line->diffuseColor = Vector3r(0.0,1.0,0.0); // NON-DESTROY
 		}
 	}
 }

@@ -48,13 +48,16 @@ class LatticeExample : public FileGenerator
                                 ,useNonLocalModel
                                 ,useBendTensileSoftening
                                 ,useStiffnessSoftening
+				,ignore_DOFs__better_is_OFF
                                 ,ensure2D
                                 ,roughEdges
 				,calculate_Torsion_3D
-				,quads;
+				,quads
+				,region_single_node_ABCDEF;
         
         // aggregates
                 bool             useAggregates;
+		bool		 no_Agg_outside;
                 Real             aggregatePercent
                                 ,aggregateMeanDiameter
                                 ,aggregateSigmaDiameter
@@ -81,7 +84,7 @@ class LatticeExample : public FileGenerator
 				,fibre_count
 				,beams_per_fibre
 				,fibre_allows
-				,fibre_irregularity_noUnit
+				//,fibre_irregularity_noUnit
 				,fibre_balancing_iterations
                         // MaterialParameters of fibre bond
                                 ,fibre_bond_longStiffness_noUnit      // k_l fibre bond
@@ -117,26 +120,32 @@ struct Circle
 		Vector3r 	 region_A_min
 			 	,region_A_max
 			 	,direction_A
+				,blocked_xyz_A
 				 
 			 	,region_B_min
 			 	,region_B_max
 			 	,direction_B
+				,blocked_xyz_B
 				 
 			 	,region_C_min
 			 	,region_C_max
 			 	,direction_C
+				,blocked_xyz_C
 				 
 			 	,region_D_min
 			 	,region_D_max
 			 	,direction_D
+				,blocked_xyz_D
 				 
 			 	,region_E_min
 			 	,region_E_max
 			 	,direction_E
+				,blocked_xyz_E
 				 
 			 	,region_F_min
 			 	,region_F_max
-			 	,direction_F;
+			 	,direction_F
+				,blocked_xyz_F;
 				 
 						
 		Real		 displacement_A_meters
@@ -198,6 +207,7 @@ struct Circle
 				,nodeRec_E_max
 				,nodeRec_F_min
 				,nodeRec_F_max;
+		bool		 record_only_matrix;
 	// beam recorder
 		
 		Vector3r	 beamRec_A_pos
@@ -273,12 +283,14 @@ struct Circle
                 void createBeam(shared_ptr<Body>& body, int i, int j);
                 Real calcBeamPositionOrientationLength(shared_ptr<Body>& body);
                 bool notDeleted(Vector3r pos);
+                Real deletedArea();
+                Real deletedVolume();
 		bool isDeleted(Vector3r pos, Vector3r min, Vector3r max);
                 void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);
                 void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, int otherId,InteractionContainer* ints, int thisId);
                 bool checkMinimumAngle(BodyRedirectionVector&,shared_ptr<Body>&);
                 bool checkAngle( Vector3r , Vector3r& );
-                void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);
+                void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity,Vector3r blocked_xyz);
                 void regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
                 void nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
                 void modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);

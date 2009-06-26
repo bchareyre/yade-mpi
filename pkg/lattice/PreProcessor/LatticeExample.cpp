@@ -84,39 +84,48 @@ LatticeExample::LatticeExample() : FileGenerator()
         bendingStiffness_noUnit   = 0.6;        // k_b
         torsionalStiffness_noUnit = 0.6;        // k_t
         
-        ensure2D 		 = false;
+        ignore_DOFs__better_is_OFF = true;
+	ensure2D 		 = false;
         roughEdges 		 = false;
 	calculate_Torsion_3D	 = false;
 	quads			 = false;
         
+	region_single_node_ABCDEF = false;
+
         region_A_min             = Vector3r(-0.006, 0.096,-1);
         region_A_max             = Vector3r( 0.16 , 0.16 , 1);
 	direction_A 		 = Vector3r(0,1,0);
+	blocked_xyz_A		 = Vector3r(0,1,1);
 	displacement_A_meters	 = 0.0001;
 	
 	region_B_min 		 = Vector3r(-0.006,-0.006,-1);
 	region_B_max 		 = Vector3r( 0.16 , 0.004, 1);
 	direction_B 		 = Vector3r(0,-1,0);
+	blocked_xyz_B		 = Vector3r(0,1,1);
 	displacement_B_meters	 = 0.0001;
 
 	region_C_min 		 = Vector3r(-0.006, 0.096,-1);
 	region_C_max 		 = Vector3r( 0.16 , 0.16 ,-1);
 	direction_C 		 = Vector3r(0,1,0);
+	blocked_xyz_C		 = Vector3r(0,1,1);
 	displacement_C_meters	 = 0.0001;
 	
 	region_D_min 		 = Vector3r(-0.006,-0.006,-1);
 	region_D_max 		 = Vector3r( 0.16 , 0.004,-1);
         direction_D              = Vector3r(0,-1,0);
+	blocked_xyz_D		 = Vector3r(0,1,1);
         displacement_D_meters    = 0.0001;
         
 	region_E_min 		 = Vector3r(0,0,-1);
 	region_E_max 		 = Vector3r(0,0,-1);
         direction_E              = Vector3r(0,1,0);
+	blocked_xyz_E		 = Vector3r(0,1,1);
         displacement_E_meters    = 0.0;
         
 	region_F_min 		 = Vector3r(0,0,-1);
 	region_F_max 		 = Vector3r(0,0,-1);
         direction_F              = Vector3r(0,1,0);
+	blocked_xyz_F		 = Vector3r(0,1,1);
         displacement_F_meters    = 0.0;
         
         strainRecorder_xz_plane  = -1;
@@ -167,6 +176,7 @@ LatticeExample::LatticeExample() : FileGenerator()
 	CT			 = 1;
 
         useAggregates            = false;
+	no_Agg_outside		 = true;
         aggregatePercent         = 40;
         aggregateMeanDiameter    = cellsizeUnit_in_meters*1;
         aggregateSigmaDiameter   = cellsizeUnit_in_meters*2;
@@ -193,7 +203,7 @@ LatticeExample::LatticeExample() : FileGenerator()
 	fibre_count		 = 0;
 	beams_per_fibre		 = 10;
 	fibre_allows		 = 0.5;
-	fibre_irregularity_noUnit= 5;
+	//fibre_irregularity_noUnit= 5;
 	fibre_balancing_iterations= 300;
         // MaterialParameters of fibre bond
         fibre_bond_longStiffness_noUnit= 0.7;         // k_l fibre bond
@@ -201,7 +211,8 @@ LatticeExample::LatticeExample() : FileGenerator()
         fibre_bond_torsStiffness_noUnit= 0.28;        // k_t fibre bond
         fibre_bond_critCompressStrain  = 100.0;       // E.c fibre bond
         fibre_bond_critTensileStrain   = 50.0;        // E.l fibre bond
-		
+	
+	record_only_matrix = false;
 	nodeRec_A_min=Vector3r(0,0,0);
 	nodeRec_A_max=Vector3r(0,0,0);
 	nodeRec_B_min=Vector3r(0,0,0);
@@ -276,6 +287,7 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(bendingStiffness_noUnit);    // k_b [-]      - default 0.6
         REGISTER_ATTRIBUTE(torsionalStiffness_noUnit);  // k_t [-]      - default 0.6
         
+	REGISTER_ATTRIBUTE(ignore_DOFs__better_is_OFF);
         REGISTER_ATTRIBUTE(ensure2D);
         REGISTER_ATTRIBUTE(roughEdges);
         REGISTER_ATTRIBUTE(calculate_Torsion_3D);
@@ -288,34 +300,42 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(useNonLocalModel);
         REGISTER_ATTRIBUTE(nonLocalL_in_cellsizeUnit);  // l
         
+	REGISTER_ATTRIBUTE(region_single_node_ABCDEF);
+
 	REGISTER_ATTRIBUTE(region_A_min);
 	REGISTER_ATTRIBUTE(region_A_max);
 	REGISTER_ATTRIBUTE(direction_A);
+	REGISTER_ATTRIBUTE(blocked_xyz_A);
 	REGISTER_ATTRIBUTE(displacement_A_meters);
 	
 	REGISTER_ATTRIBUTE(region_B_min);
 	REGISTER_ATTRIBUTE(region_B_max);
 	REGISTER_ATTRIBUTE(direction_B);
+	REGISTER_ATTRIBUTE(blocked_xyz_B);
 	REGISTER_ATTRIBUTE(displacement_B_meters);
 	
 	REGISTER_ATTRIBUTE(region_C_min);
 	REGISTER_ATTRIBUTE(region_C_max);
 	REGISTER_ATTRIBUTE(direction_C);
+	REGISTER_ATTRIBUTE(blocked_xyz_C);
 	REGISTER_ATTRIBUTE(displacement_C_meters);
 	
 	REGISTER_ATTRIBUTE(region_D_min);
         REGISTER_ATTRIBUTE(region_D_max);
         REGISTER_ATTRIBUTE(direction_D);
+	REGISTER_ATTRIBUTE(blocked_xyz_D);
         REGISTER_ATTRIBUTE(displacement_D_meters);
         
 	REGISTER_ATTRIBUTE(region_E_min);
         REGISTER_ATTRIBUTE(region_E_max);
         REGISTER_ATTRIBUTE(direction_E);
+	REGISTER_ATTRIBUTE(blocked_xyz_E);
         REGISTER_ATTRIBUTE(displacement_E_meters);
         
 	REGISTER_ATTRIBUTE(region_F_min);
         REGISTER_ATTRIBUTE(region_F_max);
         REGISTER_ATTRIBUTE(direction_F);
+	REGISTER_ATTRIBUTE(blocked_xyz_F);
         REGISTER_ATTRIBUTE(displacement_F_meters);
         
 	REGISTER_ATTRIBUTE(outputFile);
@@ -329,6 +349,7 @@ void LatticeExample::registerAttributes()
 
 
 	REGISTER_ATTRIBUTE(nodeRecorderFile);
+	REGISTER_ATTRIBUTE(record_only_matrix);
 	REGISTER_ATTRIBUTE(nodeRec_A_min);
 	REGISTER_ATTRIBUTE(nodeRec_A_max);
 	REGISTER_ATTRIBUTE(nodeRec_B_min);
@@ -409,6 +430,7 @@ void LatticeExample::registerAttributes()
         REGISTER_ATTRIBUTE(CT_B_max);
 
         REGISTER_ATTRIBUTE(useAggregates);
+	REGISTER_ATTRIBUTE(no_Agg_outside);
         REGISTER_ATTRIBUTE(aggregatePercent);
         REGISTER_ATTRIBUTE(aggregateMeanDiameter);
         REGISTER_ATTRIBUTE(aggregateSigmaDiameter);
@@ -435,7 +457,7 @@ void LatticeExample::registerAttributes()
 	REGISTER_ATTRIBUTE(fibre_count);
 	REGISTER_ATTRIBUTE(beams_per_fibre);
 	REGISTER_ATTRIBUTE(fibre_allows);
-	REGISTER_ATTRIBUTE(fibre_irregularity_noUnit);
+	//REGISTER_ATTRIBUTE(fibre_irregularity_noUnit);
 	REGISTER_ATTRIBUTE(fibre_balancing_iterations);
         // MaterialParameters of fibre bond
         REGISTER_ATTRIBUTE(fibre_bond_longStiffness_noUnit);  // k_l fibre bond
@@ -799,12 +821,12 @@ bool LatticeExample::generate()
 		}
 	};
         
-        imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters);
-        imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters);
-        imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters);
-        imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters);
-        imposeTranslation(rootBody,region_E_min,region_E_max,direction_E,displacement_E_meters);
-        imposeTranslation(rootBody,region_F_min,region_F_max,direction_F,displacement_F_meters);
+        imposeTranslation(rootBody,region_A_min,region_A_max,direction_A,displacement_A_meters,blocked_xyz_A);
+        imposeTranslation(rootBody,region_B_min,region_B_max,direction_B,displacement_B_meters,blocked_xyz_B);
+        imposeTranslation(rootBody,region_C_min,region_C_max,direction_C,displacement_C_meters,blocked_xyz_C);
+        imposeTranslation(rootBody,region_D_min,region_D_max,direction_D,displacement_D_meters,blocked_xyz_D);
+        imposeTranslation(rootBody,region_E_min,region_E_max,direction_E,displacement_E_meters,blocked_xyz_E);
+        imposeTranslation(rootBody,region_F_min,region_F_max,direction_F,displacement_F_meters,blocked_xyz_F);
 
 	beam_total=bc.size();
         if(useAggregates) addAggregates(rootBody);
@@ -1158,6 +1180,10 @@ BeamRecorder bbbb;
         nodeRecorder   = shared_ptr<NodeRecorder>(new NodeRecorder);
         nodeRecorder->outputFile                = nodeRecorderFile;
         nodeRecorder->interval                  = 10;
+	if(record_only_matrix)
+		nodeRecorder->only_this_stiffness	= longitudalStiffness_noUnit;
+	else
+		nodeRecorder->only_this_stiffness	= -1;
 	if(nodeRec_A_min != nodeRec_A_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_A_min,nodeRec_A_max));
 	if(nodeRec_B_min != nodeRec_B_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_B_min,nodeRec_B_max));
 	if(nodeRec_C_min != nodeRec_C_max) nodeRecorder->regions.push_back(std::make_pair(nodeRec_C_min,nodeRec_C_max));
@@ -1181,10 +1207,15 @@ BeamRecorder bbbb;
 	if(movSupp_D_dir != -1) movingSupport->sections.push_back(std::make_pair(movSupp_D_pos,std::make_pair(movSupp_D_dir,movSupp_D_range)));
  	
 	shared_ptr<LatticeLaw> latticeLaw(new LatticeLaw);
+
         latticeLaw->ensure2D   = ensure2D;
         latticeLaw->roughEdges = roughEdges;
+	latticeLaw->backward_compatible = ignore_DOFs__better_is_OFF;
+
+
         latticeLaw->calcTorsion= calculate_Torsion_3D;
-	latticeLaw->tension_compression_different_stiffness = true;	
+	latticeLaw->tension_compression_different_stiffness = true;
+	latticeLaw->respect_non_destroy = nonDestroy_stiffness;
         
         rootBody->engines.clear();
         rootBody->engines.push_back(boundingVolumeDispatcher);
@@ -1192,7 +1223,6 @@ BeamRecorder bbbb;
         rootBody->engines.push_back(geometricalModelDispatcher);
         rootBody->engines.push_back(strainRecorder);
         rootBody->engines.push_back(measurePoisson);
-	// FIXME - Serialization of nodeRecorder, beamRecorder and movingSupport is not wirking....
         rootBody->engines.push_back(nodeRecorder);
         rootBody->engines.push_back(beamRecorder);
 	rootBody->engines.push_back(movingSupport);
@@ -1242,7 +1272,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 	
  
-void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
+void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement,Vector3r blocked_xyz)
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
  	translationCondition->displacement  = displacement;
@@ -1261,28 +1291,103 @@ void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r 
         
         BodyContainer::iterator bi    = rootBody->bodies->begin();
 	BodyContainer::iterator biEnd = rootBody->bodies->end();
-	for(  ; bi!=biEnd ; ++bi )
+
+	if(region_single_node_ABCDEF)
 	{
-		shared_ptr<Body> b = *bi;
-	
-		if( b->getGroupMask() & nodeGroupMask )
+		Vector3r MIN(min);
+		Vector3r MAX(max);
+		Vector3r center = (MIN+MAX)*0.5;
+		int best=-1;
+		Real dist = (MIN-MAX).Length();
+		Real prev_dist = dist;
+		for(int run=0 ; run < 3 ; ++run )
 		{
-			Vector3r pos = b->physicalParameters->se3.position;
-			if(        pos[0] > min[0] 
-				&& pos[1] > min[1] 
-				&& pos[2] > min[2] 
-				&& pos[0] < max[0] 
-				&& pos[1] < max[1] 
-				&& pos[2] < max[2] 
-				&& (b->getGroupMask() & nodeGroupMask)
-				)
+			center = (MIN+MAX)*0.5;
+			dist = (MIN-MAX).Length();
+			prev_dist = dist;
+			bi    = rootBody->bodies->begin();
+			biEnd = rootBody->bodies->end();
+			for(  ; bi!=biEnd ; ++bi )
 			{
-				b->isDynamic = false;
-				b->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
-				translationCondition->subscribedBodies.push_back(b->getId());
+				shared_ptr<Body> b = *bi;
+			
+				if( b->getGroupMask() & nodeGroupMask )
+				{
+					Vector3r pos = b->physicalParameters->se3.position;
+					if(        pos[0] >= min[0] 
+						&& pos[1] >= min[1] 
+						&& pos[2] >= min[2] 
+						&& pos[0] <= max[0] 
+						&& pos[1] <= max[1] 
+						&& pos[2] <= max[2] 
+						&& (b->getGroupMask() & nodeGroupMask)
+						)
+					{
+					//	b->isDynamic = false;
+						b->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
+					//	translationCondition->subscribedBodies.push_back(b->getId());
+
+						dist = (pos-center).Length();
+						if(dist < prev_dist)
+						{
+							best = b->getId();
+							prev_dist = dist;
+						}
+						if(run == 0)
+						{
+							MIN=pos;
+							MAX=pos;
+							run = 1;
+						}
+						if(run == 1)
+						{
+							MIN=componentMinVector(MIN,pos);
+							MAX=componentMaxVector(MAX,pos);
+						}
+					}
+				}
 			}
 		}
-        }
+		if(best != -1)
+		{
+			std::cerr << "INFO: single node in region, best ID is: " << best << ", dist: " << prev_dist 
+				<< ", at coords: " << (*(rootBody->bodies))[best]->physicalParameters->se3.position << "\n";
+			translationCondition->subscribedBodies.push_back(best);
+			(*(rootBody->bodies))[best]->geometricalModel->diffuseColor = Vector3r(0.0,0.0,3.0);
+			(*(rootBody->bodies))[best]->isDynamic = false;
+			(*(rootBody->bodies))[best]->physicalParameters->setDOFfromVector3r(blocked_xyz);
+		}
+		else
+		{
+			std::cerr << "WARNING: cannot find a single node in this region!\n";
+		}
+	}
+	else
+	{
+		for(  ; bi!=biEnd ; ++bi )
+		{
+			shared_ptr<Body> b = *bi;
+		
+			if( b->getGroupMask() & nodeGroupMask )
+			{
+				Vector3r pos = b->physicalParameters->se3.position;
+				if(        pos[0] >= min[0] 
+					&& pos[1] >= min[1] 
+					&& pos[2] >= min[2] 
+					&& pos[0] <= max[0] 
+					&& pos[1] <= max[1] 
+					&& pos[2] <= max[2] 
+					&& (b->getGroupMask() & nodeGroupMask)
+					)
+				{
+					b->isDynamic = false;
+					b->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
+					translationCondition->subscribedBodies.push_back(b->getId());
+					b->physicalParameters->setDOFfromVector3r(blocked_xyz);
+				}
+			}
+		}
+	}
 }
 
 bool LatticeExample::isDeleted(Vector3r pos, Vector3r min, Vector3r max)
@@ -1296,6 +1401,60 @@ bool LatticeExample::isDeleted(Vector3r pos, Vector3r min, Vector3r max)
 		&& pos[2] < max[2] 
 	      );
 }
+
+Real sectionArea(Vector3r min,Vector3r max,Vector3r box)
+{
+	Vector3r mi = componentMaxVector(Vector3r(0,0,0),min);
+	Vector3r Ma = componentMinVector(box            ,max);
+	if(mi[0]<Ma[0] && mi[1]<Ma[1])
+		return (Ma[0]-mi[0])*(Ma[1]-mi[1]);
+	else
+		return 0;
+}
+
+Real sectionVolu(Vector3r min,Vector3r max,Vector3r box)
+{
+	Vector3r mi = componentMaxVector(Vector3r(0,0,0),min);
+	Vector3r Ma = componentMinVector(box            ,max);
+	if(mi[0]<Ma[0] && mi[1]<Ma[1] && mi[2]<Ma[2])
+		return (Ma[0]-mi[0])*(Ma[1]-mi[1])*(Ma[2]-mi[2]);
+	else
+		return 0;
+}
+
+Real LatticeExample::deletedArea()
+{
+	return
+		  sectionArea(regionDelete_A_min,regionDelete_A_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_B_min,regionDelete_B_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_C_min,regionDelete_C_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_D_min,regionDelete_D_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_E_min,regionDelete_E_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_F_min,regionDelete_F_max,speciemen_size_in_meters)
+
+		+ sectionArea(regionDelete_1_min,regionDelete_1_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_2_min,regionDelete_2_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_3_min,regionDelete_3_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_4_min,regionDelete_4_max,speciemen_size_in_meters)
+        	+ sectionArea(regionDelete_5_min,regionDelete_5_max,speciemen_size_in_meters);
+};
+
+Real LatticeExample::deletedVolume()
+{
+	return
+		  sectionVolu(regionDelete_A_min,regionDelete_A_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_B_min,regionDelete_B_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_C_min,regionDelete_C_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_D_min,regionDelete_D_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_E_min,regionDelete_E_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_F_min,regionDelete_F_max,speciemen_size_in_meters)
+
+		+ sectionVolu(regionDelete_1_min,regionDelete_1_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_2_min,regionDelete_2_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_3_min,regionDelete_3_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_4_min,regionDelete_4_max,speciemen_size_in_meters)
+        	+ sectionVolu(regionDelete_5_min,regionDelete_5_max,speciemen_size_in_meters);
+};
 
 bool LatticeExample::notDeleted(Vector3r pos)
 {
@@ -1422,6 +1581,7 @@ void LatticeExample::modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vect
 
 bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c)
 {
+	// check with circles
         std::vector<Circle>::iterator end=c.end();
         for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
         {
@@ -1431,6 +1591,7 @@ bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c)
                         return true;
         }
 
+	// check with fibres
 	if(fibre_count > 0)
 	{
 		for(int i = 0 ; i < fibre_count ; ++i)
@@ -1452,6 +1613,21 @@ bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c)
 		}
 	}
 
+	// check if it's outside the concrete
+	if(no_Agg_outside)
+	{
+		Real AGGREGATES_X=speciemen_size_in_meters[0];
+	        Real AGGREGATES_Y=speciemen_size_in_meters[1];
+	        Real AGGREGATES_Z=speciemen_size_in_meters[2];
+		for(Real A=std::max(0.0,cc.x-cc.d*0.5) ; A<=std::min(AGGREGATES_X,cc.x+cc.d*0.5) ; A+=cellsizeUnit_in_meters*0.2)
+		for(Real B=std::max(0.0,cc.y-cc.d*0.5) ; B<=std::min(AGGREGATES_Y,cc.y+cc.d*0.5) ; B+=cellsizeUnit_in_meters*0.2)
+		for(Real C=std::max(0.0,cc.z-cc.d*0.5) ; C<=std::min(AGGREGATES_Z,cc.z+cc.d*0.5) ; C+=cellsizeUnit_in_meters*0.2)
+			if(! notDeleted(Vector3r(A,B,C)) )
+			{
+				if( std::pow(cc.x - A,2.0) + std::pow(cc.y - B,2.0) + std::pow(cc.z - C,2.0) < cc.d*cc.d*0.25 )
+					return true;
+			}
+	}
 
         return false;
 };
@@ -1542,14 +1718,36 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 break;
                         }
 		if(AGGREGATES_Z == 0)
-			setProgress((aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y))/(aggregatePercent/100.0));
+			setProgress((aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y - ((no_Agg_outside)?(deletedArea()):(0.0)) ))/(aggregatePercent/100.0));
 		else
-			setProgress((aggsVolumes(c)/(AGGREGATES_X*AGGREGATES_Y*AGGREGATES_Z))/(aggregatePercent/100.0));
+			setProgress((aggsVolumes(c)/(AGGREGATES_X*AGGREGATES_Y*AGGREGATES_Z - ((no_Agg_outside)?(deletedVolume()):(0.0)) ))/(aggregatePercent/100.0));
         }
         //while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
         while( progress() < 1.0 );
 
         std::cerr << "done. " << c.size() << " area: " << aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) << " vol: " << aggsVolumes(c)/(AGGREGATES_X*AGGREGATES_Y*AGGREGATES_Z) << "\n";
+
+/*
+	if(no_Agg_outside)
+	{
+		for(Real A=0 ; A<=AGGREGATES_X ; A+=cellsizeUnit_in_meters*0.3)
+		for(Real B=0 ; B<=AGGREGATES_Y ; B+=cellsizeUnit_in_meters*0.3)
+		for(Real C=0 ; C<=AGGREGATES_Z ; C+=cellsizeUnit_in_meters*0.3)
+			if(! notDeleted(Vector3r(A,B,C)) )
+			{ // remove a circle if it has inside Vector3r(A,B,C)
+				std::vector<int> c_flag;c_flag.clear();c_flag.resize(c.size(),1);
+				for(int i=0;i<c.size();++i)
+					if( std::pow(c[i].x - A,2.0) + std::pow(c[i].y - B,2.0) + std::pow(c[i].z - C,2.0) < c[i].d*c[i].d*0.25 )
+						c_flag[i]=0;
+
+				std::vector<Circle> c_good;c_good.clear();
+				for(int i=0;i<c.size();++i)
+					if(c_flag[i]==1)
+						c_good.push_back(c[i]);
+				c=c_good;
+			}
+	}
+*/
 
         { // set different properties for beams that lie in an aggregate
           // parametrize from above - takes three arguments: 

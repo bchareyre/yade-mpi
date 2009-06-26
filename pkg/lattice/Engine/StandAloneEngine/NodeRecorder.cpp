@@ -23,6 +23,7 @@ NodeRecorder::NodeRecorder () : DataRecorder()
 	// FIXME ...
         nodeGroupMask           = 1;
         beamGroupMask           = 2;
+	only_this_stiffness	= -1;
 }
 
 
@@ -78,6 +79,7 @@ void NodeRecorder::registerAttributes()
 	//REGISTER_ATTRIBUTE(regions);
 	REGISTER_ATTRIBUTE(regions_min);
 	REGISTER_ATTRIBUTE(regions_max);
+	REGISTER_ATTRIBUTE(only_this_stiffness);
 
 //	REGISTER_ATTRIBUTE(first);
 //	REGISTER_ATTRIBUTE(subscribedBodies);
@@ -131,7 +133,40 @@ void NodeRecorder::action(MetaBody * ncb)
 						&& ((*bi)->getGroupMask() & nodeGroupMask)
 					  )
 					{
-						subscribedBodies[region].push_back((*bi)->getId());
+						if(only_this_stiffness > 0)
+						{
+							bool ok;ok=true;
+							// check this node's beams, quite time consuming
+							BodyContainer::iterator bi2    = ncb->bodies->begin();
+							BodyContainer::iterator bi2End = ncb->bodies->end();
+							for(  ; bi2!=bi2End ; ++bi2 )
+							{
+								if( (*bi2)->getGroupMask() & beamGroupMask )
+								{
+									LatticeBeamParameters* beam = dynamic_cast<LatticeBeamParameters*>((*bi2)->physicalParameters.get());
+									if(beam)
+									{
+										if(beam->id1 == (*bi)->getId() || beam->id2 == (*bi)->getId())
+											if(beam->longitudalStiffness != only_this_stiffness)
+											{
+												ok=false;
+												break;
+											}
+									}
+									else
+									{
+										std::cerr << "ERROR: that's not a beam!\n";
+										exit(1);
+									}
+								}
+							}
+							if(ok)
+								subscribedBodies[region].push_back((*bi)->getId());
+						}
+						else
+						{
+							subscribedBodies[region].push_back((*bi)->getId());
+						}
 					}
 				}
 			}
@@ -153,7 +188,19 @@ void NodeRecorder::action(MetaBody * ncb)
 				sum+=(*(ncb->bodies))[*i]->physicalParameters->se3.position;
 				++count;
 				
-				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(0.0,1.0,((float)region)/1.5); // FIXME [1]
+				//(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(((float)((region+3)%5))/5.0,1.0,((float)region)/5.0); // FIXME [1]
+				Vector3r col;
+				switch(region%6)
+				{       //                    0 0 0
+					case 0 : col=Vector3r(0,0,1);break;
+					case 1 : col=Vector3r(0,1,0);break;
+					case 2 : col=Vector3r(0,1,1);break;
+					case 3 : col=Vector3r(1,0,0);break;
+					case 4 : col=Vector3r(1,0,1);break;
+					case 5 : col=Vector3r(1,1,0);break;
+					//                    1 1 1        
+				}
+				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = col; // FIXME [1]
 			}
 		}
 

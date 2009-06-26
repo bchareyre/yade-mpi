@@ -31,6 +31,7 @@ class NodeRecorder : public DataRecorder
 		std::list<std::pair<Vector3r,Vector3r> > regions; // a list of min/max pairs describing each region.
 		std::vector<Vector3r> regions_min;
 		std::vector<Vector3r> regions_max;
+		Real	only_this_stiffness;
 
 		NodeRecorder ();
 

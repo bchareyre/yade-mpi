@@ -18,6 +18,8 @@
 
 LatticeLaw::LatticeLaw() : InteractionSolver()
 {
+//	respect_non_destroy = 500.0;
+	backward_compatible = true;
 }
 
 
@@ -300,8 +302,16 @@ void LatticeLaw::action(MetaBody* lattice)
 			if( deleteBeam(lattice , beam, body) ) // calculates strain
 			{
 //				std::cerr << "one beam deleted\n";
+			
+	if(respect_non_destroy == beam->longitudalStiffness)
+	{
+		std::cerr << "Tried to delete a non-destroy beam, skipping.\n";
+	}
+	else
+	{
 				futureDeletes.push_back(body->getId());
 				continue;
+	}
 			}
 		}
 		
@@ -422,32 +432,118 @@ if(tension_compression_different_stiffness)
 					continue; 
 				}
 			}
-			Vector3r displacementTotal      = 
-				  node->displacementIncremental / node->countIncremental 
-				+ node->displacementAlignmental / node->countStiffness;
+			Vector3r straight_line_movement		= node->displacementIncremental / node->countIncremental;
+			Vector3r elastic_deformation_movement	= node->displacementAlignmental / node->countStiffness;
+
+/////////// No damping
+			Vector3r displacementTotal		= straight_line_movement + elastic_deformation_movement;
+				//  node->displacementIncremental / node->countIncremental 
+				//+ node->displacementAlignmental / node->countStiffness;
+/////////// No damping END
+
+///////////// ZZ
+//			Real DAMPING=0.3;
+//			{
+//				Vector3r sign =  elastic_deformation_movement - node->previousDisplacement;
+//				for(int i=0; i<3; i++)
+//					if(sign[i]<0)
+//						elastic_deformation_movement[i] *= (1.0-DAMPING);
+//			}
+//			Vector3r displacementTotal	= straight_line_movement + elastic_deformation_movement;
+//			node->previousDisplacement	= elastic_deformation_movement;
+///////////// ZZ END
+//
+///////////// ZZ2
+//			Vector3r displacementTotal	= straight_line_movement + elastic_deformation_movement;
+//			Real DAMPING=0.3;
+//			{
+//				for(int i=0; i<3; i++)
+//					if(displacementTotal[i] * node->previousDisplacement[i] < 0)
+//						displacementTotal[i] *= (1.0-DAMPING);
+//			}
+//
+//			node->previousDisplacement	= displacementTotal;
+///////////// ZZ2 END
+//
+///////////// ZZ3
+//			Real DAMPING=0.3;
+//			{
+//				for(int i=0; i<3; i++)
+//					if(elastic_deformation_movement[i] * node->previousDisplacement[i] < 0)
+//						elastic_deformation_movement[i] *= (1.0-DAMPING);
+//			}
+//			Vector3r displacementTotal	= straight_line_movement + elastic_deformation_movement;
+//			node->previousDisplacement	= elastic_deformation_movement;
+///////////// ZZ3 END
+
+			// FIXME - ponder changing names:
+			// 
+			// uniform straight line movement:
+			//  displacementIncremental	(numerator) 
+			//  countIncremental		(denominator)
+			//
+			// elastic deformation:
+			//  displacementAlignmental	(numerator)
+			//  countStiffness		(denominator)
 
 			node->countIncremental		= 0;
 			node->countStiffness            = 0;
 			node->displacementIncremental 	= Vector3r(0.0,0.0,0.0);
 			node->displacementAlignmental   = Vector3r(0.0,0.0,0.0);
 
-			if(body->isDynamic)
+
 			{
-				node->se3.position      += displacementTotal;
-										// DAMPING: *(1.0 - damping_with_energy_loss_0_to_1);
-			//	node->se3.orientation	+= ;
-			}
-			// FIXME FIXME FIXME FIXME FIXME FIXME FIXME
-			else
-			{
-				if(!roughEdges)// FIXME - else move only in x and z directions
+				static bool first1(true);
+				if(first1)
 				{
-					node->se3.position[0]   += displacementTotal[0];
-					node->se3.position[2]   += displacementTotal[2];
+					first1=false;
+					std::cerr << "====== backward_compatible is:" << (int)(backward_compatible) << "\n";
 				}
 			}
-			if(ensure2D)
-				node->se3.position[2] = 0; // ensure 2D
+
+			if(backward_compatible)
+			{
+						if(body->isDynamic)
+						{
+							node->se3.position      += displacementTotal;
+													// DAMPING: *(1.0 - damping_with_energy_loss_0_to_1);
+						//	node->se3.orientation	+= ;
+						}
+						// FIXME FIXME FIXME FIXME FIXME FIXME FIXME [2]
+						else
+						{
+							if(!roughEdges)// FIXME - else move only in x and z directions
+							{
+								node->se3.position[0]   += displacementTotal[0];
+								node->se3.position[2]   += displacementTotal[2];
+								//std::cerr << "zz!\n";
+							}
+						}
+						if(ensure2D)
+							node->se3.position[2] = 0; // ensure 2D
+			}
+			else
+			{
+				static bool first(true);
+				if(first)
+				{
+					first=false;
+					std::cerr << "Using DOFs !\n";
+				}
+				
+				{// FIXED (was FIXME [2]) here is good.
+					if(node->blockedDOFs == PhysicalParameters::DOF_NONE)
+					{
+						node->se3.position      += displacementTotal;
+					}
+					else
+					{
+						if((node->blockedDOFs & PhysicalParameters::DOF_X) == 0) node->se3.position[0] += displacementTotal[0];
+						if((node->blockedDOFs & PhysicalParameters::DOF_Y) == 0) node->se3.position[1] += displacementTotal[1];
+						if((node->blockedDOFs & PhysicalParameters::DOF_Z) == 0) node->se3.position[2] += displacementTotal[2];
+					}
+				}
+			}
 		}
 	}
 	
