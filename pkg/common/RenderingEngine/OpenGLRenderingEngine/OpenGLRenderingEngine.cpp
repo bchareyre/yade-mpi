@@ -16,6 +16,8 @@ bool OpenGLRenderingEngine::glutInitDone=false;
 size_t OpenGLRenderingEngine::selectBodyLimit=500;
 
 OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(3){
+	Show_DOF = false;
+	Show_ID = false;
 	Body_state = false;
 	Body_bounding_volume = false;
 	Body_interacting_geom = false;
@@ -164,6 +166,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispSe3(rootBody);
 
+	if (Show_DOF || Show_ID) renderDOF_ID(rootBody);
 	if (Body_geometrical_model){
 		if (Cast_shadows){	
 			if (Fast_shadow_volume) renderSceneUsingFastShadowVolumes(rootBody,Light_position);
@@ -356,6 +359,47 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 	else shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Light_position);
 }
 
+void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){	
+	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
+	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
+	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
+		FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
+			if(b->geometricalModel && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
+				if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
+				if(!Show_ID && b->physicalParameters->blockedDOFs==0) continue;
+				const Se3r& se3=b->physicalParameters->dispSe3;
+				glPushMatrix();
+				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+				if(current_selection==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
+				{ // write text
+					glColor3f(1.0-Background_color[0],1.0-Background_color[1],1.0-Background_color[2]);
+					unsigned DOF = b->physicalParameters->blockedDOFs;
+					std::string dof = std::string("") 
+					                  + (((DOF & PhysicalParameters::DOF_X )!=0)?"X":" ")
+					                  + (((DOF & PhysicalParameters::DOF_Y )!=0)?"Y":" ")
+					                  + (((DOF & PhysicalParameters::DOF_Z )!=0)?"Z":" ")
+					                  + (((DOF & PhysicalParameters::DOF_RX)!=0)?"RX":"  ")
+					                  + (((DOF & PhysicalParameters::DOF_RY)!=0)?"RY":"  ")
+					                  + (((DOF & PhysicalParameters::DOF_RZ)!=0)?"RZ":"  ");
+					std::string id = boost::lexical_cast<std::string>(b->getId());
+					std::string str("");
+					if(Show_DOF && Show_ID) id += " ";
+					if(Show_ID) str += id;
+					if(Show_DOF) str += dof;
+					glPushMatrix();
+					glRasterPos2i(0,0);
+					for(unsigned int i=0;i<str.length();i++)
+						glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
+					glPopMatrix();
+				}
+				if(current_selection == b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);}
+				glPopMatrix();
+			}
+		}
+	}
+	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
+}
+
 void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){	
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
@@ -487,6 +531,8 @@ void OpenGLRenderingEngine::registerAttributes()
 	
 	REGISTER_ATTRIBUTE(Body_wire);
 
+	REGISTER_ATTRIBUTE(Show_DOF);
+	REGISTER_ATTRIBUTE(Show_ID);
 	REGISTER_ATTRIBUTE(Body_state);
 	REGISTER_ATTRIBUTE(Body_bounding_volume);
 	REGISTER_ATTRIBUTE(Body_interacting_geom);

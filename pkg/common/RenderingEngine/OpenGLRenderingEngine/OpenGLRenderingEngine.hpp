@@ -14,7 +14,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 {	
 	public :
 		Vector3r Light_position,Background_color;
-		bool Body_state,Body_bounding_volume,Body_interacting_geom,Body_geometrical_model,Cast_shadows,Shadow_volumes,Fast_shadow_volume,Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics;
+		bool Show_DOF,Show_ID,Body_state,Body_bounding_volume,Body_interacting_geom,Body_geometrical_model,Cast_shadows,Shadow_volumes,Fast_shadow_volume,Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics;
 		body_id_t current_selection;
 		int Draw_mask;
 
@@ -79,6 +79,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		virtual void renderWithNames(const shared_ptr<MetaBody>& );
 	
 	private :
+		void renderDOF_ID(const shared_ptr<MetaBody>& rootBody);
 		void renderGeometricalModel(const shared_ptr<MetaBody>& rootBody);
 		void renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody);
 		void renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody);

@@ -23,6 +23,13 @@ class PhysicalParameters: public Serializable, public Indexable
 		static const unsigned DOF_ALL=DOF_X|DOF_Y|DOF_Z|DOF_RX|DOF_RY|DOF_RZ; //! shorthand for all DOFs blocked
 		static const unsigned DOF_XYZ=DOF_X|DOF_Y|DOF_Z; //! shorthand for all displacements blocked
 		static const unsigned DOF_RXRYRZ=DOF_RX|DOF_RY|DOF_RZ; //! shorthand for all rotations blocked
+		void setDOFfromVector3r(Vector3r disp,Vector3r rot=Vector3r(0,0,0))
+		{
+			//! set DOFs according to two Vector3r arguments (blocked is when disp[i]==1.0 or rot[i]==1.0)
+			blockedDOFs = ((disp[0]==1.0)?DOF_X :0)|((disp[1]==1.0)?DOF_Y :0)|((disp[2]==1.0)?DOF_Z :0)|
+			              ((rot [0]==1.0)?DOF_RX:0)|((rot [1]==1.0)?DOF_RY:0)|((rot [2]==1.0)?DOF_RZ:0);
+			//Vector3<bool> would be actually better, I'm not checking now if it would work.
+		};
 		static unsigned axisDOF(int axis, bool rotationalDOF=false){return 1<<(axis+(rotationalDOF?3:0));} //! Return DOF_* constant for given axis∈{0,1,2} and rotationalDOF∈{false(default),true}; e.g. axisDOF(0,true)==DOF_RX
 
 	REGISTER_ATTRIBUTES(/*no base*/,(se3)(refSe3)(blockedDOFs));
