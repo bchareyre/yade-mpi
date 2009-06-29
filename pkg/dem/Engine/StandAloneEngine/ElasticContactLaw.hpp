@@ -42,14 +42,20 @@ class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 };
 REGISTER_SERIALIZABLE(ef2_Spheres_Elastic_ElasticLaw);
 
-class ef2_Dem3Dof_Elastic_ElasticLaw: public ConstitutiveLaw{
+/* Constitutive law for linear compression, no tension, and linear plasticity surface.
+
+This class serves also as tutorial and is documented in detail at
+
+	http://yade.wikia.com/wiki/ConstitutiveLawHowto
+*/
+class Law2_Dem3Dof_Elastic_Elastic: public ConstitutiveLaw{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 		FUNCTOR2D(Dem3DofGeom,ElasticContactInteraction);
-		REGISTER_CLASS_AND_BASE(ef2_Dem3Dof_Elastic_ElasticLaw,ConstitutiveLaw);
+		REGISTER_CLASS_AND_BASE(Law2_Dem3Dof_Elastic_Elastic,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
 };
-REGISTER_SERIALIZABLE(ef2_Dem3Dof_Elastic_ElasticLaw);
+REGISTER_SERIALIZABLE(Law2_Dem3Dof_Elastic_Elastic);
 
 class ElasticContactLaw : public InteractionSolver
 {

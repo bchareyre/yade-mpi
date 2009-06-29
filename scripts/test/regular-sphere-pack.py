@@ -50,7 +50,7 @@ O.engines=[
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],
-		[ef2_Dem3Dof_Elastic_ElasticLaw()],
+		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
 	NewtonsDampedLaw(damping=.1)

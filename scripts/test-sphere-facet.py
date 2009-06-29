@@ -35,11 +35,11 @@ O.engines=[
 #	]),
 #	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 #	#StandAloneEngine('ElasticContactLaw'),
-#	ConstitutiveLawDispatcher([ef2_Dem3Dof_Elastic_ElasticLaw()]),
+#	ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic()]),
 	InteractionDispatchers(
 		[ef2_Facet_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],
-		[ef2_Dem3Dof_Elastic_ElasticLaw()],
+		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-sign*500],'label':'gravitator'}),
 	DeusExMachina("NewtonsDampedLaw",{'damping':0.8}),

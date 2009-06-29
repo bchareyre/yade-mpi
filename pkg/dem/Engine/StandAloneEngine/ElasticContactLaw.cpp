@@ -17,7 +17,7 @@
 
 #include<yade/extra/Shop.hpp>
 
-YADE_PLUGIN("ef2_Spheres_Elastic_ElasticLaw","ef2_Dem3Dof_Elastic_ElasticLaw","ElasticContactLaw");
+YADE_PLUGIN("ef2_Spheres_Elastic_ElasticLaw","Law2_Dem3Dof_Elastic_Elastic","ElasticContactLaw");
 
 
 ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
@@ -112,7 +112,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void ef2_Dem3Dof_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
+void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
 	Real displN=geom->displacementN();
@@ -120,6 +120,6 @@ void ef2_Dem3Dof_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 	phys->normalForce=phys->kn*displN*geom->normal;
 	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
-	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=maxFsSq/(trialFs.SquaredLength());} 
+	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));} 
 	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
 }
