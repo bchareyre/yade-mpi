@@ -4,6 +4,7 @@
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
+// #include<yade/gui-py/_utils.hpp> // will be: yade/lib-py/_utils.hpp> at some point
 #include<Wm3Vector3.h>
 
 using namespace boost;
@@ -26,63 +27,88 @@ See scripts/test/regular-sphere-pack.py for an example.
 
 // aux functions
 python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0],v[1],v[2]);}
+python::tuple vec2tuple(const Vector2r& v){return boost::python::make_tuple(v[0],v[1]);}
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
+Vector2r tuple2vec2d(const python::tuple& t){return Vector2r(python::extract<double>(t[0])(),python::extract<double>(t[1])());}
 void ttuple2vvec(const python::tuple& t, Vector3r& v1, Vector3r& v2){ v1=tuple2vec(python::extract<python::tuple>(t[0])()); v2=tuple2vec(python::extract<python::tuple>(t[1])()); }
 python::tuple vvec2ttuple(const Vector3r&v1, const Vector3r&v2){ return python::make_tuple(vec2tuple(v1),vec2tuple(v2)); }
 
-class Predicate{
+struct Predicate{
 	public:
-		virtual bool operator() (python::tuple pt,Real pad=0.) const {throw logic_error("Calling virtual operator() of an abstract class Predicate.");}
-		virtual python::tuple aabb() const {throw logic_error("Calling virtual aabb() of an abstract class Predicate.");}
+		virtual bool operator() (python::tuple pt,Real pad=0.) const = 0;
+		virtual python::tuple aabb() const = 0;
 };
 // make the pad parameter optional
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PredicateCall_overloads,operator(),1,2);
+
+/* Since we want to make Predicate::operator() and Predicate::aabb() callable from c++ on python::object
+with the right virtual method resolution, we have to wrap the class in the following way. See 
+http://www.boost.org/doc/libs/1_38_0/libs/python/doc/tutorial/doc/html/python/exposing.html for documentation
+on exposing virtual methods.
+
+This makes it possible to derive a python class from Predicate, override its aabb() method, for instance,
+and use it in PredicateUnion, which will call the python implementation of aabb() as it should. This
+approach is used in the inGtsSurface class defined in pack.py.
+
+See scripts/test/gts-operators.py for an example.
+
+NOTE: you still have to call base class ctor in your class' ctor derived in python, e.g.
+super(inGtsSurface,self).__init__() so that virtual methods work as expected.
+*/
+struct PredicateWrap: Predicate, python::wrapper<Predicate>{
+	bool operator()(python::tuple pt, Real pad=0.) const { return this->get_override("__call__")(pt,pad);}
+	python::tuple aabb() const { return this->get_override("aabb")(); }
+};
+// make the pad parameter optional
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PredicateWrapCall_overloads,operator(),1,2);
 
 /*********************************************************************************
 ****************** Boolean operations on predicates ******************************
 *********************************************************************************/
 
+const Predicate& obj2pred(python::object obj){ return python::extract<const Predicate&>(obj)();}
+
 class PredicateBoolean: public Predicate{
 	protected:
-		const shared_ptr<Predicate> A,B;
+		const python::object A,B;
 	public:
-		PredicateBoolean(const shared_ptr<Predicate> _A, const shared_ptr<Predicate> _B): A(_A), B(_B){}
-		const shared_ptr<Predicate> getA(){ return A;}
-		const shared_ptr<Predicate> getB(){ return B;}
+		PredicateBoolean(const python::object _A, const python::object _B): A(_A), B(_B){}
+		const python::object getA(){ return A;}
+		const python::object getB(){ return B;}
 };
 
 // http://www.linuxtopia.org/online_books/programming_books/python_programming/python_ch16s03.html
 class PredicateUnion: public PredicateBoolean{
 	public:
-		PredicateUnion(const shared_ptr<Predicate> _A, const shared_ptr<Predicate> _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return (*A)(pt,pad)||(*B)(pt,pad);}
-		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(A->aabb(),minA,maxA); ttuple2vvec(B->aabb(),minB,maxB); return vvec2ttuple(componentMinVector(minA,minB),componentMaxVector(maxA,maxB));}
+		PredicateUnion(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
+		virtual bool operator()(python::tuple pt,Real pad) const {return obj2pred(A)(pt,pad)||obj2pred(B)(pt,pad);}
+		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(obj2pred(A).aabb(),minA,maxA); ttuple2vvec(obj2pred(B).aabb(),minB,maxB); return vvec2ttuple(componentMinVector(minA,minB),componentMaxVector(maxA,maxB));}
 };
-PredicateUnion makeUnion(const shared_ptr<Predicate>& A, const shared_ptr<Predicate>& B){ return PredicateUnion(A,B);}
+PredicateUnion makeUnion(const python::object& A, const python::object& B){ return PredicateUnion(A,B);}
 
 class PredicateIntersection: public PredicateBoolean{
 	public:
-		PredicateIntersection(const shared_ptr<Predicate> _A, const shared_ptr<Predicate> _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return (*A)(pt,pad) && (*B)(pt,pad);}
-		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(A->aabb(),minA,maxA); ttuple2vvec(B->aabb(),minB,maxB); return vvec2ttuple(componentMaxVector(minA,minB),componentMinVector(maxA,maxB));}
+		PredicateIntersection(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
+		virtual bool operator()(python::tuple pt,Real pad) const {return obj2pred(A)(pt,pad) && obj2pred(B)(pt,pad);}
+		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(obj2pred(A).aabb(),minA,maxA); ttuple2vvec(obj2pred(B).aabb(),minB,maxB); return vvec2ttuple(componentMaxVector(minA,minB),componentMinVector(maxA,maxB));}
 };
-PredicateIntersection makeIntersection(const shared_ptr<Predicate>& A, const shared_ptr<Predicate>& B){ return PredicateIntersection(A,B);}
+PredicateIntersection makeIntersection(const python::object& A, const python::object& B){ return PredicateIntersection(A,B);}
 
 class PredicateDifference: public PredicateBoolean{
 	public:
-		PredicateDifference(const shared_ptr<Predicate> _A, const shared_ptr<Predicate> _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return (*A)(pt,pad) && !(*B)(pt,-pad);}
-		virtual python::tuple aabb() const { return A->aabb(); }
+		PredicateDifference(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
+		virtual bool operator()(python::tuple pt,Real pad) const {return obj2pred(A)(pt,pad) && !obj2pred(B)(pt,-pad);}
+		virtual python::tuple aabb() const { return obj2pred(A).aabb(); }
 };
-PredicateDifference makeDifference(const shared_ptr<Predicate>& A, const shared_ptr<Predicate>& B){ return PredicateDifference(A,B);}
+PredicateDifference makeDifference(const python::object& A, const python::object& B){ return PredicateDifference(A,B);}
 
 class PredicateSymmetricDifference: public PredicateBoolean{
 	public:
-		PredicateSymmetricDifference(const shared_ptr<Predicate> _A, const shared_ptr<Predicate> _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {bool inA=(*A)(pt,pad), inB=(*B)(pt,pad); return (inA && !inB) || (!inA && inB);}
-		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(A->aabb(),minA,maxA); ttuple2vvec(B->aabb(),minB,maxB); return vvec2ttuple(componentMinVector(minA,minB),componentMaxVector(maxA,maxB));}
+		PredicateSymmetricDifference(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
+		virtual bool operator()(python::tuple pt,Real pad) const {bool inA=obj2pred(A)(pt,pad), inB=obj2pred(B)(pt,pad); return (inA && !inB) || (!inA && inB);}
+		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(obj2pred(A).aabb(),minA,maxA); ttuple2vvec(obj2pred(B).aabb(),minB,maxB); return vvec2ttuple(componentMinVector(minA,minB),componentMaxVector(maxA,maxB));}
 };
-PredicateSymmetricDifference makeSymmetricDifference(const shared_ptr<Predicate>& A, const shared_ptr<Predicate>& B){ return PredicateSymmetricDifference(A,B);}
+PredicateSymmetricDifference makeSymmetricDifference(const python::object& A, const python::object& B){ return PredicateSymmetricDifference(A,B);}
 
 /*********************************************************************************
 ****************************** Primitive predicates ******************************
@@ -237,7 +263,7 @@ public:
 		// between both notch planes, closer to the edge than pad (distInPlane<pad)
 		return false;
 	}
-	// aabb here doesn't make any sense since we are negated. Return just the center point.
+	// This predicate is not bounded, return infinities
 	python::tuple aabb() const {
 		Real inf=std::numeric_limits<Real>::infinity();
 		return vvec2ttuple(Vector3r(-inf,-inf,-inf),Vector3r(inf,inf,inf)); }
@@ -245,22 +271,24 @@ public:
 
 
 BOOST_PYTHON_MODULE(_packPredicates){
-	python::class_<Predicate, shared_ptr<Predicate> >("Predicate")
-		.def("__call__",&Predicate::operator(),PredicateCall_overloads(python::args("point","padding"),"Tell whether given point lies within this sphere, still having 'pad' space to the solid boundary"))
-		.def("aabb",&Predicate::aabb,"Return minimum and maximum values for AABB")
+	// base predicate class
+	python::class_<PredicateWrap,/* necessary, as methods are pure virtual*/ boost::noncopyable>("Predicate")
+		.def("__call__",python::pure_virtual(&Predicate::operator()))
+		.def("aabb",python::pure_virtual(&Predicate::aabb))
 		.def("__or__",makeUnion).def("__and__",makeIntersection).def("__sub__",makeDifference).def("__xor__",makeSymmetricDifference);
-	python::class_<PredicateBoolean,python::bases<Predicate> >("PredicateBoolean","Boolean operation on 2 predicates (abstract class)",python::no_init)
+	// boolean operations
+	python::class_<PredicateBoolean,python::bases<Predicate>,boost::noncopyable>("PredicateBoolean","Boolean operation on 2 predicates (abstract class)",python::no_init)
 		.add_property("A",&PredicateBoolean::getA).add_property("B",&PredicateBoolean::getB);
-	python::class_<PredicateUnion,python::bases<PredicateBoolean> >("PredicateUnion","Union of 2 predicates",python::init<shared_ptr<Predicate>,shared_ptr<Predicate> >());
-	python::class_<PredicateIntersection,python::bases<PredicateBoolean> >("PredicateIntersection","Intersection of 2 predicates",python::init<shared_ptr<Predicate>,shared_ptr<Predicate> >());
-	python::class_<PredicateDifference,python::bases<PredicateBoolean> >("PredicateDifference","Difference of 2 predicates",python::init<shared_ptr<Predicate>,shared_ptr<Predicate> >());
-	python::class_<PredicateSymmetricDifference,python::bases<PredicateBoolean> >("PredicateSymmetricDifference","SymmetricDifference of 2 predicates",python::init<shared_ptr<Predicate>,shared_ptr<Predicate> >());
+	python::class_<PredicateUnion,python::bases<PredicateBoolean> >("PredicateUnion","Union of 2 predicates",python::init<python::object,python::object>());
+	python::class_<PredicateIntersection,python::bases<PredicateBoolean> >("PredicateIntersection","Intersection of 2 predicates",python::init<python::object,python::object >());
+	python::class_<PredicateDifference,python::bases<PredicateBoolean> >("PredicateDifference","Difference of 2 predicates",python::init<python::object,python::object >());
+	python::class_<PredicateSymmetricDifference,python::bases<PredicateBoolean> >("PredicateSymmetricDifference","SymmetricDifference of 2 predicates",python::init<python::object,python::object >());
+	// primitive predicates
 	python::class_<inSphere,python::bases<Predicate> >("inSphere","Sphere predicate.",python::init<python::tuple,Real>(python::args("center","radius"),"Ctor taking center (as a 3-tuple) and radius"));
 	python::class_<inAlignedBox,python::bases<Predicate> >("inAlignedBox","Axis-aligned box predicate",python::init<python::tuple,python::tuple>(python::args("minAABB","maxAABB"),"Ctor taking minumum and maximum points of the box (as 3-tuples)."));
 	python::class_<inCylinder,python::bases<Predicate> >("inCylinder","Cylinder predicate",python::init<python::tuple,python::tuple,Real>(python::args("centerBottom","centerTop","radius"),"Ctor taking centers of the lateral walls (as 3-tuples) and radius."));
 	python::class_<inHyperboloid,python::bases<Predicate> >("inHyperboloid","Hyperboloid predicate",python::init<python::tuple,python::tuple,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."));
 	python::class_<inEllipsoid,python::bases<Predicate> >("inEllipsoid","Ellipsoid predicate",python::init<python::tuple,python::tuple>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."));
 	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<python::tuple,python::tuple,python::tuple,Real>(python::args("centerPoint","edge","normal","aperture"),"Ctor taking point in the symmetry plane, vector pointing along the edge, plane normal and aperture size.\nThe side inside the notch is edge×normal.\nNormal is made perpendicular to the edge.\nAll vectors are normalized at construction time.")); 
-
 }
 

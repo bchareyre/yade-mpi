@@ -17,13 +17,13 @@ except IOError:
 	gunzip horse.gts.gz
 	"""
 	quit()
-
+print dir(surf)
 if surf.is_closed():
 	pred=pack.inGtsSurface(surf)
 	aabb=pred.aabb()
 	dim0=aabb[1][0]-aabb[0][0]; radius=dim0/30. # get some characteristic dimension, use it for radius
 	O.bodies.append(pack.regularHexa(pred,radius=radius,gap=radius/4.,density=2000))
-	surf.translate(0,0,-(aabb[1][2]-aabb[0][2])) # move surface down so that facets underneath
+	surf.translate(0,0,-(aabb[1][2]-aabb[0][2])) # move surface down so that facets are underneath the falling spheres
 O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
 
 O.engines=[
