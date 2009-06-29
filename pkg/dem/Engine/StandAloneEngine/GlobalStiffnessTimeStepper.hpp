@@ -19,7 +19,7 @@
 
 class Interaction;
 class BodyContainer;
-class MacroMicroElasticRelationships;
+//class MacroMicroElasticRelationships;
 class MetaBody;
 
 class GlobalStiffnessTimeStepper : public TimeStepper
@@ -32,7 +32,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		Real		newDt, previousDt;
 		bool		computedSomething,
 				computedOnce;
-		shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
+		//shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
 
 		void findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb);
 		void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);

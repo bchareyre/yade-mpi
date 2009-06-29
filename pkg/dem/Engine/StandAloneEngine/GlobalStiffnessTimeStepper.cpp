@@ -10,7 +10,7 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
+//#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
@@ -18,7 +18,7 @@
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN("GlobalStiffnessTimeStepper");
 
-GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships)
+GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper()
 {
 //cerr << "GlobalStiffnessTimeStepper()"  << endl;
 	sdecGroupMask = 1;
