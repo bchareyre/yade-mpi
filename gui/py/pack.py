@@ -21,14 +21,17 @@ class inGtsSurface(Predicate):
 		surf=gts.read(open('horse.gts'))
 		inGtsSurface(surf)
 
-	Note: padding is not supported, warning is given and zero used instead.
+	Note: padding is optionally supported by testing 6 points along the axes in the pad distance. This
+	must be enabled in the ctor by saying doSlowPad=True. If it is not enabled and pad is not zero,
+	warning is issued.
 	"""
-	def __init__(self,surf):
+	def __init__(self,surf,doSlowPad=False):
 		# call base class ctor; necessary for virtual methods to work as expected.
 		# see comments in _packPredicates.cpp for struct PredicateWrap.
 		super(inGtsSurface,self).__init__()
 		if not surf.is_closed(): raise RuntimeError("Surface for inGtsSurface predicate must be closed.")
 		self.surf=surf
+		self.doSlowPad=doSlowPad
 		inf=float('inf')
 		mn,mx=[inf,inf,inf],[-inf,-inf,-inf]
 		for v in surf.vertices():
@@ -39,8 +42,11 @@ class inGtsSurface(Predicate):
 	def aabb(self): return self.mn,self.mx
 	def __call__(self,_pt,pad=0.):
 		p=gts.Point(*_pt)
-		if(pad!=0): warnings.warn("Pad distance not supported for GTS surfaces, using 0 instead.")
-		return p.is_inside(self.surf)
+		if not self.doSlowPad:
+			if pad!=0: warnings.warn("Pad distance not supported for GTS surfaces, using 0 instead.")
+			return p.is_inside(self.surf)
+		pp=[gts.Point(_pt[0]-pad,_pt[1],_pt[2]),gts.Point(_pt[0]+pad,_pt[1],_pt[2]),gts.Point(_pt[0],_pt[1]-pad,_pt[2]),gts.Point(_pt[0],_pt[1]+pad,_pt[2]),gts.Point(_pt[0],_pt[1],_pt[2]-pad),gts.Point(_pt[0],_pt[1],_pt[2]+pad)]
+		return p.is_inside(self.surf) and pp[0].is_inside(self.surf) and pp[1].is_inside(self.surf) and pp[2].is_inside(self.surf) and pp[3].is_inside(self.surf) and pp[4].is_inside(self.surf) and pp[5].is_inside(self.surf)
 
 def gtsSurface2Facets(surf,**kw):
 	"""Construct facets from given GTS surface. **kw is passed to utils.facet."""
