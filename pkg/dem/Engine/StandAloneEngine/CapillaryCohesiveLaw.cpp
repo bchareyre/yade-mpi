@@ -175,16 +175,15 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 //                                 R2=currentContactGeometry->radius1;
 //                         }
 
-
                         Real R1 = 0;
-                        R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->        radius1 ) ;
+                        R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->radius1 ) ;
                         Real R2 = 0;
-                        R2=alpha*std::max(currentContactGeometry->radius2,currentContactGeometry->       radius1 ) ;
+                        R2=alpha*std::max(currentContactGeometry->radius2,currentContactGeometry->radius1 ) ;
                         //cerr << "R1 = " << R1 << " R2 = "<< R2 << endl;
 
                         /// intergranular distance
 
-                        Real D =                                alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(                       currentContactGeometry->radius1+ currentContactGeometry->radius2);
+                        Real D = alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(                       currentContactGeometry->radius1+ currentContactGeometry->radius2);
 
 // 			Real intergranularDistance = currentContactGeometry->penetrationDepth;
 			//cerr << "D = " << intergranularDistance << endl;
@@ -261,7 +260,8 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
                         } else if (fusionDetection)
                                 bodiesMenisciiList.remove((*ii));//If the interaction is not real, it should not be in the list
-                }
+		} else if (fusionDetection)
+			bodiesMenisciiList.remove((*ii));//
         }
 
         if (fusionDetection)
@@ -332,14 +332,15 @@ void CapillaryCohesiveLaw::checkFusion(MetaBody * ncb)
 			//cerr << "size = "<<bodiesMenisciiList[i].size() << " empty="<<bodiesMenisciiList[i].empty() <<endl;
 			for ( firstMeniscus=bodiesMenisciiList[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )//FOR EACH MENISCUS ON THIS BODY...
 			{
-				CapillaryParameters* interactionPhysics1 = static_cast<CapillaryParameters*>((*firstMeniscus)->interactionPhysics.get());
+				//if (*firstMeniscus)->isReal();
+				CapillaryParameters* interactionPhysics1 = YADE_CAST<CapillaryParameters*>((*firstMeniscus)->interactionPhysics.get());
 				currentMeniscus = firstMeniscus; ++currentMeniscus;
 				
 				if (i == (*firstMeniscus)->getId1()) angle1=interactionPhysics1->Delta1;//get angle of meniscus1 on body i
 				else angle1=interactionPhysics1->Delta2;
 
 				for ( ;currentMeniscus!= lastMeniscus; ++currentMeniscus) {//... CHECK FUSION WITH ALL OTHER MENISCII ON THE BODY
-					CapillaryParameters* interactionPhysics2 = static_cast<CapillaryParameters*>((*currentMeniscus)->interactionPhysics.get());
+					CapillaryParameters* interactionPhysics2 = YADE_CAST<CapillaryParameters*>((*currentMeniscus)->interactionPhysics.get());
 
 					if (i == (*currentMeniscus)->getId1()) angle2=interactionPhysics2->Delta1;//get angle of meniscus2 on body i
 					else angle2=interactionPhysics2->Delta2;
@@ -348,8 +349,8 @@ void CapillaryCohesiveLaw::checkFusion(MetaBody * ncb)
 
 					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;	
 					
-					Vector3r normalFirstMeniscus = static_cast<SpheresContactGeometry*>((*firstMeniscus)->interactionGeometry.get())->normal;
-					Vector3r normalCurrentMeniscus = static_cast<SpheresContactGeometry*>((*currentMeniscus)->interactionGeometry.get())->normal;
+					Vector3r normalFirstMeniscus = YADE_CAST<SpheresContactGeometry*>((*firstMeniscus)->interactionGeometry.get())->normal;
+					Vector3r normalCurrentMeniscus = YADE_CAST<SpheresContactGeometry*>((*currentMeniscus)->interactionGeometry.get())->normal;
 					
 					//if (i != (*firstMeniscus)->getId1()) normalFirstMeniscus = -normalFirstMeniscus;
 					//if (i != (*currentMeniscus)->getId1()) normalCurrentMeniscus = -normalCurrentMeniscus;
