@@ -368,9 +368,10 @@ SetOption('num_jobs',env['jobs'])
 if env['pretty']:
 	## http://www.scons.org/wiki/HidingCommandLinesInOutput
 	env.Replace(CXXCOMSTR='C ${SOURCES}', # → ${TARGET.file}')
-		SHCXXCOMSTR='C ${SOURCES}',  #→ ${TARGET.file}')
-		SHLINKCOMSTR='L ${TARGET.file}', # → ${TARGET.file}')
-		LINKCOMSTR='L ${TARGET.file}', # → ${TARGET.file}')
+		CCOMSTR='C ${SOURCES}',
+		SHCXXCOMSTR='C ${SOURCES}', 
+		SHLINKCOMSTR='L ${TARGET.file}',
+		LINKCOMSTR='L ${TARGET.file}',
 		INSTALLSTR='⇒ $TARGET',
 		QT_UICCOMSTR='U ${SOURCES}',
 		QT_MOCCOMSTR='M ${SOURCES}')

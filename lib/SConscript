@@ -79,6 +79,11 @@ if 'GTS' in env['features']:
 		env.File('py/pygts-0.3.1/__init__.py'),
 		env.File('py/pygts-0.3.1/pygts.py')
 	])
+	#env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+	#	# the same, but to link the pack module with
+	#	env.SharedLibrary('_gts',['py/pygts-0.3.1/cleanup.c','py/pygts-0.3.1/edge.c','py/pygts-0.3.1/face.c','py/pygts-0.3.1/object.c','py/pygts-0.3.1/point.c','py/pygts-0.3.1/pygts.c','py/pygts-0.3.1/segment.c','py/pygts-0.3.1/surface.c','py/pygts-0.3.1/triangle.c','py/pygts-0.3.1/vertex.c'],CPPDEFINES=env['CPPDEFINES']+['PYGTS_HAS_NUMPY']),
+	#])
+
 
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 

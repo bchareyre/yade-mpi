@@ -269,6 +269,60 @@ public:
 		return vvec2ttuple(Vector3r(-inf,-inf,-inf),Vector3r(inf,inf,inf)); }
 };
 
+#ifdef YADE_GTS
+extern "C" {
+#include<yade/lib-py/pygts.h>
+}
+/* Helper function for inGtsSurface::aabb() */
+static void vertex_aabb(GtsVertex *vertex, pair<Vector3r,Vector3r> *bb)
+{
+	GtsPoint *_p=GTS_POINT(vertex);
+	Vector3r p(_p->x,_p->y,_p->z);
+	bb->first=componentMinVector(bb->first,p);
+	bb->second=componentMaxVector(bb->second,p);
+}
+
+/*
+This class plays tricks getting aroung pyGTS to get GTS objects and cache bb tree to speed
+up point inclusion tests. For this reason, we have to link with _gts.so (see corresponding
+SConscript file), which is at the same time the python module.
+*/
+class inGtsSurface: public Predicate{
+	python::object pySurf; // to hold the reference so that surf is valid
+	GtsSurface *surf;
+	bool is_open, noPad, noPadWarned;
+	GNode* tree;
+public:
+	inGtsSurface(python::object _surf, bool _noPad=false): pySurf(_surf), noPad(_noPad), noPadWarned(false) {
+		if(!pygts_surface_check(_surf.ptr())) throw invalid_argument("Ctor must receive a gts.Surface() instance."); 
+		surf=PYGTS_SURFACE_AS_GTS_SURFACE(PYGTS_SURFACE(_surf.ptr()));
+	 	if(!gts_surface_is_closed(surf)) throw invalid_argument("Surface is not closed.");
+		is_open=gts_surface_volume(surf)<0.;
+		if((tree=gts_bb_tree_surface(surf))==NULL) throw runtime_error("Could not create GTree.");
+	}
+	~inGtsSurface(){g_node_destroy(tree);}
+	python::tuple aabb() const {
+		Real inf=std::numeric_limits<Real>::infinity();
+		pair<Vector3r,Vector3r> bb; bb.first=Vector3r(inf,inf,inf); bb.second=Vector3r(-inf,-inf,-inf);
+		gts_surface_foreach_vertex(surf,(GtsFunc)vertex_aabb,&bb);
+		return vvec2ttuple(bb.first,bb.second);
+	}
+	bool ptCheck(Vector3r pt) const{
+		GtsPoint gp; gp.x=pt[0]; gp.y=pt[1]; gp.z=pt[2];
+		return (bool)gts_point_is_inside_surface(&gp,tree,is_open);
+	}
+	bool operator()(python::tuple _pt, Real pad=0.) const {
+		Vector3r pt=tuple2vec(_pt);
+		if(noPad){
+			if(pad!=0. && noPadWarned) LOG_WARN("inGtsSurface constructed with noPad; requested non-zero pad set to zero.");
+			return ptCheck(pt);
+		}
+		return ptCheck(pt) && ptCheck(pt-Vector3r(pad,0,0)) && ptCheck(pt+Vector3r(pad,0,0)) && ptCheck(pt-Vector3r(0,pad,0))&& ptCheck(pt+Vector3r(0,pad,0)) && ptCheck(pt-Vector3r(0,0,pad))&& ptCheck(pt+Vector3r(0,0,pad));
+	}
+};
+
+#endif
+
 
 BOOST_PYTHON_MODULE(_packPredicates){
 	// base predicate class
@@ -290,5 +344,8 @@ BOOST_PYTHON_MODULE(_packPredicates){
 	python::class_<inHyperboloid,python::bases<Predicate> >("inHyperboloid","Hyperboloid predicate",python::init<python::tuple,python::tuple,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."));
 	python::class_<inEllipsoid,python::bases<Predicate> >("inEllipsoid","Ellipsoid predicate",python::init<python::tuple,python::tuple>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."));
 	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<python::tuple,python::tuple,python::tuple,Real>(python::args("centerPoint","edge","normal","aperture"),"Ctor taking point in the symmetry plane, vector pointing along the edge, plane normal and aperture size.\nThe side inside the notch is edge×normal.\nNormal is made perpendicular to the edge.\nAll vectors are normalized at construction time.")); 
+	#ifdef YADE_GTS
+		python::class_<inGtsSurface,python::bases<Predicate> >("inGtsSurface","GTS surface predicate",python::init<python::object,python::optional<bool> >(python::args("surface","noPad"),"Ctor taking a gts.Surface() instance, which must not be modified during instance lifetime.\nThe optional noPad can disable padding (if set to True), which speeds up calls several times.\nNote: padding checks inclusion of 6 points along +- cardinal directions in the pad distance from given point, which is not exact."));
+	#endif
 }
 

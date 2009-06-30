@@ -36,10 +36,10 @@ bool InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedro
 	
 	shared_ptr<InteractionOfMyTetrahedron> imt;
 	// depending whether it's a new interaction: create new one, or use the existing one.
-	if (c->interactionGeometry)
+	if (!c->interactionGeometry)
 		imt = shared_ptr<InteractionOfMyTetrahedron>(new InteractionOfMyTetrahedron());
 	else
-		imt = YADE_PTR_CAST<InteractionOfMyTetrahedron>(c->interactionGeometry);	
+		imt = YADE_PTR_CAST<InteractionOfMyTetrahedron>(c->interactionGeometry);
 
 	bool isInteracting = false;
 	for(int i=0 ; i<4 ; ++i )
@@ -65,7 +65,6 @@ bool InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedro
 			if( imt->penetrationDepths[i][j] > 0 )
 				isInteracting = true;
 		}
-
 
 	c->interactionGeometry = imt;
 	return isInteracting;

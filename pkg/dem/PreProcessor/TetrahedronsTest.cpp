@@ -153,8 +153,10 @@ bool TetrahedronsTest::generate()
 				setProgress(current++/all);
 			}
 	}
+
+	rootBody->dt=1e-2;
 	
-	message="foo bar "+boost::lexical_cast<std::string>(42);
+	message="";
 	return true;
 }
 
