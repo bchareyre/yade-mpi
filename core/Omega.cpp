@@ -81,6 +81,7 @@ void Omega::reset(){
 void Omega::init(){
 	simulationFileName="";
 	resetRootBody();
+	rootBodyAnother=shared_ptr<MetaBody>(new MetaBody);
 	timeInit();
 }
 

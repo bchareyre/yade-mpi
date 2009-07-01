@@ -403,7 +403,7 @@ void Shop::saveSpheresToFile(string fname){
 		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!intSph) continue;
 		const Vector3r& pos=b->physicalParameters->se3.position;
-		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<" "<<1<<" "<<1<<endl;
+		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
 	}
 	f.close();
 }

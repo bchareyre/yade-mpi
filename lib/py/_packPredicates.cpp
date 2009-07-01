@@ -10,7 +10,7 @@
 using namespace boost;
 using namespace std;
 #ifdef LOG4CXX
-	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.predicates");
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.pack.predicates");
 #endif
 
 /*
@@ -37,6 +37,8 @@ struct Predicate{
 	public:
 		virtual bool operator() (python::tuple pt,Real pad=0.) const = 0;
 		virtual python::tuple aabb() const = 0;
+		python::tuple dim() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return vec2tuple(mx-mn); }
+		python::tuple center() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return vec2tuple(.5*(mn+mx)); }
 };
 // make the pad parameter optional
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PredicateCall_overloads,operator(),1,2);
@@ -329,6 +331,8 @@ BOOST_PYTHON_MODULE(_packPredicates){
 	python::class_<PredicateWrap,/* necessary, as methods are pure virtual*/ boost::noncopyable>("Predicate")
 		.def("__call__",python::pure_virtual(&Predicate::operator()))
 		.def("aabb",python::pure_virtual(&Predicate::aabb))
+		.def("dim",&Predicate::dim)
+		.def("center",&Predicate::center)
 		.def("__or__",makeUnion).def("__and__",makeIntersection).def("__sub__",makeDifference).def("__xor__",makeSymmetricDifference);
 	// boolean operations
 	python::class_<PredicateBoolean,python::bases<Predicate>,boost::noncopyable>("PredicateBoolean","Boolean operation on 2 predicates (abstract class)",python::no_init)

@@ -73,27 +73,21 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 				'Clump'
 			],
 			),
-		env.SharedLibrary('_utils',['py/_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['Shop','ConcretePM']),
-		env.SharedLibrary('_packPredicates',['py/_packPredicates.cpp'],SHLIBPREFIX='',
-			# if we compile with GTS, link to the python module, as inGtsSurface uses some of its symbols.
-			# because the module doesn't have the lib- suffix, we put it directly to SHLINKFLAGS
-			# using the -l: syntax (see man ld) and declare the dependency below
-			SHLINKFLAGS=env['SHLINKFLAGS']+(['-l:$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so'] if 'GTS' in env['features'] else [])),
-		env.SharedLibrary('_eudoxos',['py/_eudoxos.cpp'],SHLIBPREFIX='',CXXFLAGS=env['CXXFLAGS']+([] if not os.path.exists('../../brefcom-mm.hh') else ['-include','../brefcom-mm.hh']),LIBS=env['LIBS']+['Shop','ConcretePM']),
-		env.SharedLibrary('log',['py/log.cpp'],SHLIBPREFIX=''),
+		#env.SharedLibrary('_utils',['py/_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['Shop','ConcretePM']),
+		#env.SharedLibrary('_packPredicates',['py/_packPredicates.cpp'],SHLIBPREFIX='',
+		#	# if we compile with GTS, link to the python module, as inGtsSurface uses some of its symbols.
+		#	# because the module doesn't have the lib- suffix, we put it directly to SHLINKFLAGS
+		#	# using the -l: syntax (see man ld) and declare the dependency below
+		#	SHLINKFLAGS=env['SHLINKFLAGS']+(['-l:$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so'] if 'GTS' in env['features'] else [])),
+		#env.SharedLibrary('_eudoxos',['py/_eudoxos.cpp'],SHLIBPREFIX='',CXXFLAGS=env['CXXFLAGS']+([] if not os.path.exists('../../brefcom-mm.hh') else ['-include','../brefcom-mm.hh']),LIBS=env['LIBS']+['Shop','ConcretePM']),
+		#env.SharedLibrary('log',['py/log.cpp'],SHLIBPREFIX=''),
 		env.File('__init__.py','py'),
-		env.File('utils.py','py'),
-		env.File('eudoxos.py','py'),
 		env.File('runtime.py','py'),
 		env.File('ipython.py','py'),
-		env.File('plot.py','py'),
-		env.File('linterpolation.py','py'),
-		env.File('timing.py','py'),
 		env.File('PythonTCPServer.py','py'),
-		env.File('pack.py','py'),
 	])
-	if os.path.exists('../../brefcom-mm.hh'): Depends('py/_eudoxos.cpp','../../brefcom-mm.hh')
+	#if os.path.exists('../../brefcom-mm.hh'): Depends('py/_eudoxos.cpp','../../brefcom-mm.hh')
 	# see comments for _packPredicates above
-	if 'GTS' in env['features']: env.Depends('_packPredicates.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so')
+	#if 'GTS' in env['features']: env.Depends('_packPredicates.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so')
 
 

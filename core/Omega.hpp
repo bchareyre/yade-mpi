@@ -74,7 +74,10 @@ class Omega : public Singleton<Omega>
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
 		
-		shared_ptr<MetaBody>		 rootBody;
+		shared_ptr<MetaBody>	rootBody;
+
+		shared_ptr<MetaBody>	rootBodyAnother; // used for temporarily running different simulation, in Omega().switchWorld()
+
 		//ptime				 sStartingSimulationTime;
 		ptime				 msStartingSimulationTime;
 		ptime				 msStartingPauseTime;

@@ -524,7 +524,6 @@ class pyOmega{
 	void saveTmp(string mark=""){ save(":memory:"+mark);}
 	void loadTmp(string mark=""){ load(":memory:"+mark);}
 	void tmpToFile(string mark, string filename){
-		// FIXME: memSavedSimulations are private, but I don't want to recompile all yade now; move it to public and uncomment these few lines at some point
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
 		iostreams::filtering_ostream out;
 		if(boost::algorithm::ends_with(filename,".bz2")) out.push(iostreams::bzip2_compressor());
@@ -538,6 +537,7 @@ class pyOmega{
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
 	void resetTime(){ OMEGA.getRootBody()->currentIteration=0; OMEGA.getRootBody()->simulationTime=0; OMEGA.timeInit(); }
+	void switchWorld(){ std::swap(OMEGA.rootBody,OMEGA.rootBodyAnother); }
 
 	void save(std::string fileName){
 		assertRootBody();
@@ -695,6 +695,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("step",&pyOmega::step)
 		.def("wait",&pyOmega::wait)
 		.def("reset",&pyOmega::reset)
+		.def("switchWorld",&pyOmega::switchWorld)
 		.def("labeledEngine",&pyOmega::labeled_engine_get)
 		.def("resetTime",&pyOmega::resetTime)
 		.def("plugins",&pyOmega::plugins_get)

@@ -287,6 +287,8 @@ bool TriaxialTest::generate()
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
 		sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
 	}
+
+	if(thickness<0) thickness=radiusMean;
 	
 	if(boxWalls)
 	{
