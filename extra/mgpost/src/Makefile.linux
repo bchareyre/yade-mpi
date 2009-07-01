@@ -16,8 +16,8 @@
 #  _WITH_PNG  : linked with libpng
 
 CC      =gcc
-CFLAGS  =-Wall -O3 -D_GNU_SOURCE -D_LIBXML2 -D_LINUX -D_WITH_TIFF -D_WITH_PNG
-LIBS    =-lGL -lGLU -lglut -lm -lxml2 -ltiff -lpng -lX11 -lXmu -lXi
+CFLAGS  =-Wall -O3 -D_GNU_SOURCE -D_LIBXML2 -D_LINUX -D_WITH_PNG
+LIBS    =-lGL -lGLU -lglut -lm -lxml2 -lpng -lX11 -lXmu -lXi
 LIBSDIR =-L/usr/X11R6/lib 
 INC_DIR =-I/usr/include/libxml2
 H_FILES =mgpost.h colors.h section.h display_funcs.h dialog.h \
