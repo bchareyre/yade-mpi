@@ -391,6 +391,43 @@ charger_HISfile()
                     i++;
                     nbel++;
                   }
+
+				  if (!strcmp((const char *) token,"polyg"))
+				  {
+					int nbVertex = 0,v;
+					double xnode,ynode;
+					double dist=0.0,Rout=0.0;
+					fscanf(his_file, "%*d %d", &nbVertex);
+
+					dataqty[i]       = 1;
+					datadistrib[i]   = datapos;
+
+					for (v=0;v<nbVertex;++v)
+					{
+					  fscanf(his_file, "%lf %lf",&xnode,&ynode);
+					  dist = sqrt(xnode*xnode+ynode*ynode);
+					  if (dist>Rout) Rout=dist;
+					  datas[datapos++] = xnode;
+					  dataqty[i] += 1;
+					  datas[datapos++] = ynode;
+					  dataqty[i] += 1;
+					}
+					datas[datapos++] = Rout;
+					radius[nbel][0] = Rout;
+
+					fscanf(his_file, "%lf %lf %lf %lf %lf %lf",
+							&x[nbel][0], &y[nbel][0], &rot[nbel][0],
+							&vx[nbel][0], &vy[nbel][0], &vrot[nbel][0]);
+
+
+
+					mode2D      = MG_TRUE;
+					bdyty[i]    = MGP_POLYG;
+					bdyclass[i] = MGP_GRAIN;
+
+					i++;
+					nbel++;
+				  }
 				  
 				  if (!strcmp((const char *) token,"CellBiP"))
 				  {

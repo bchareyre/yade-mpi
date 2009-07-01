@@ -107,7 +107,7 @@ void disp_CellBiP()
 {
   GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
   double extendx,extendy;
-  /*unsigned int i;*/
+  unsigned int i;
   
   glLoadIdentity ();
   gluLookAt (Xcam, Ycam, distance, Xcam, Ycam, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -131,7 +131,7 @@ void disp_CellBiP()
   glEnd();
  
   glEnable (GL_LIGHTING);
-/*
+
   
   for (i = 0; i < nbel; i++)	
 	{ 
@@ -166,7 +166,7 @@ void disp_CellBiP()
 	  mgbodyselect_plein (i, state);
 	  
 	}
-	*/
+	
 }
 
 
@@ -866,7 +866,7 @@ void disp_tensile_compressive_forces_2d ()
 {
   int i, ii, nbtac = 0, current_adh = 0, anta;
   GLdouble Xcam = Xviewp * TRANS_CAM_FACTOR, Ycam = Yviewp * TRANS_CAM_FACTOR;
-  int coul;
+
   float save_valc_bleu, save_valc_rouge;
   double dist;
   double l, ls, lc, sina, cosa;
