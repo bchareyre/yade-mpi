@@ -177,7 +177,7 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=1,radiusStDev=0.,assumedFi
 	O.switchWorld() magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
 	This function therefore should never run in parallel with some code accessing your simulation.
 	"""
-	import sqlite3, os.path, cPickle, time
+	import sqlite3, os.path, cPickle, time, sys
 	from yade import log
 	from math import pi
 	if not dim: dim=predicate.dim()
@@ -198,6 +198,7 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=1,radiusStDev=0.,assumedFi
 			sp.scale(scale)
 			return filterSpherePack(predicate,sp,**kw)
 		print "No suitable packing in database found, running triaxial"
+		sys.stdout.flush()
 	V=(4/3)*pi*radius**3; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
 	##
 	O.switchWorld()
