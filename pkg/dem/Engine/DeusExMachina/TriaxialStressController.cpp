@@ -323,6 +323,13 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
  */
 void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 {
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
+	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
+	PhysicalParameters* p_left  = static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
+	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
+	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
+	PhysicalParameters* p_back  = static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
 	
  	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
  	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
