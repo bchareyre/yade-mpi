@@ -129,7 +129,7 @@ class pyGLViewer{
 		pyGLViewer(size_t _viewNo){init(_viewNo);}
 		python::tuple get_grid(){GLV; return python::make_tuple(glv->drawGridXYZ[0],glv->drawGridXYZ[1],glv->drawGridXYZ[2]);}
 		void set_grid(python::tuple t){GLV; MUTEX; for(int i=0;i<3;i++)glv->drawGridXYZ[i]=python::extract<bool>(t[i])();}
-		#define VEC_GET_SET(property,getter,setter) python::object get_##property(){GLV; return vec2tuple(getter());} void set_##property(python::tuple t){GLV; MUTEX; setter(tuple2vec(t));}
+		#define VEC_GET_SET(property,getter,setter) Vector3r get_##property(){GLV; qglviewer::Vec v=getter(); return Vector3r(v[0],v[1],v[2]); } void set_##property(const Vector3r& t){GLV; MUTEX; setter(qglviewer::Vec(t[0],t[1],t[2]));}
 		VEC_GET_SET(upVector,glv->camera()->upVector,glv->camera()->setUpVector);
 		VEC_GET_SET(lookAt,glv->camera()->position()+glv->camera()->viewDirection,glv->camera()->lookAt);
 		VEC_GET_SET(viewDir,glv->camera()->viewDirection,glv->camera()->setViewDirection);
@@ -142,8 +142,8 @@ class pyGLViewer{
 		void set_orthographic(bool b){GLV; MUTEX; return glv->camera()->setType(b ? qglviewer::Camera::ORTHOGRAPHIC : qglviewer::Camera::PERSPECTIVE);}
 		#define FLOAT_GET_SET(property,getter,setter)void set_##property(Real r){GLV; MUTEX; setter(r);} Real get_##property(){GLV; return getter();}
 		FLOAT_GET_SET(sceneRadius,glv->sceneRadius,glv->setSceneRadius);
-		void fitAABB(python::tuple min, python::tuple max){GLV; MUTEX; glv->camera()->fitBoundingBox(tuple2vec(min),tuple2vec(max));}
-		void fitSphere(python::tuple center,Real radius){GLV; MUTEX; glv->camera()->fitSphere(tuple2vec(center),radius);}
+		void fitAABB(const Vector3r& min, const Vector3r& max){GLV; MUTEX; glv->camera()->fitBoundingBox(qglviewer::Vec(min[0],min[1],min[2]),qglviewer::Vec(max[0],max[1],max[2]));}
+		void fitSphere(const Vector3r& center,Real radius){GLV; MUTEX; glv->camera()->fitSphere(qglviewer::Vec(center[0],center[1],center[2]),radius);}
 		void showEntireScene(){GLV; MUTEX; glv->camera()->showEntireScene();}
 		void center(bool median=false){GLV; MUTEX; if(median)glv->centerMedianQuartile(); else glv->centerScene();}
 		python::tuple get_screenSize(){GLV; return python::make_tuple(glv->width(),glv->height());} void set_screenSize(python::tuple t){GLV; MUTEX; vector<int>* ii=new(vector<int>); ii->push_back(viewNo); ii->push_back(python::extract<int>(t[0])()); ii->push_back(python::extract<int>(t[1])()); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESIZE_VIEW,(void*)ii));}

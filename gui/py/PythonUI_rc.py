@@ -14,9 +14,10 @@ from yade import utils
 __builtins__.O=Omega()
 
 #try:
-#	import yade.qt.atexit
-#	atexit.register(yade.qt.close)
-#except ImportError: pass
+#	from miniWm3Wrap import Vector3_less__double__greater_ as Vector3r
+#	from miniWm3Wrap import Vector2_less__double__greater_ as Vector2r
+#	from miniWm3Wrap import Quaternion_less__double__greater_ as Quaternionr
+#except ImportError: pass 
 
 ### direct object creation through automatic wrapper functions
 def listChildClassesRecursive(base):

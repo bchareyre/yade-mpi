@@ -65,8 +65,7 @@ Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])
  *
  * The code is analogous to AxialGravityEngine and is intended to give initial motion
  * to particles subject to axial compaction to speed up the process. */
-void velocityTowardsAxis(python::tuple _axisPoint, python::tuple _axisDirection, Real timeToAxis, Real subtractDist=0., Real perturbation=0.1){
-	Vector3r axisPoint=tuple2vec(_axisPoint), axisDirection=tuple2vec(_axisDirection);
+void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirection, Real timeToAxis, Real subtractDist=0., Real perturbation=0.1){
 	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getRootBody()->bodies)){
 		if(!b->isDynamic) continue;
 		ParticleParameters* pp=YADE_CAST<ParticleParameters*>(b->physicalParameters.get());

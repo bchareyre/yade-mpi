@@ -29,7 +29,10 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	# say e.g. 'import euclid' (not 'import  yade.euclid')
 	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
 		env.File('euclid.py','py'),
+		# skip this for now
+		#env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['.'])
 	])
+
 
 
 

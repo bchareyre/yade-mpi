@@ -155,13 +155,13 @@ BASIC_PY_PROXY_HEAD(pyPhysicalParameters,PhysicalParameters)
 			throw std::invalid_argument("Invalid  DOF specification `"+s+"', must be ∈{x,y,z,rx,ry,rz}.");
 		}
 	}
-	python::tuple displ_get(){Vector3r ret=proxee->se3.position-proxee->refSe3.position; return python::make_tuple(ret[0],ret[1],ret[2]);}
+	Vector3r displ_get(){return proxee->se3.position-proxee->refSe3.position;}
 	python::tuple rot_get(){Quaternionr relRot=proxee->refSe3.orientation.Conjugate()*proxee->se3.orientation; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); axis*=angle; return python::make_tuple(axis[0],axis[1],axis[2]); }
-	python::tuple pos_get(){const Vector3r& p=proxee->se3.position; return python::make_tuple(p[0],p[1],p[2]);}
-	python::tuple refPos_get(){const Vector3r& p=proxee->refSe3.position; return python::make_tuple(p[0],p[1],p[2]);}
+	Vector3r pos_get(){return proxee->se3.position;}
+	Vector3r refPos_get(){return proxee->refSe3.position;}
 	python::tuple ori_get(){Vector3r axis; Real angle; proxee->se3.orientation.ToAxisAngle(axis,angle); return python::make_tuple(axis[0],axis[1],axis[2],angle);}
-	void pos_set(python::list l){if(python::len(l)!=3) throw invalid_argument("Wrong number of vector3 elements "+lexical_cast<string>(python::len(l))+", should be 3"); proxee->se3.position=Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])());}
-	void refPos_set(python::list l){if(python::len(l)!=3) throw invalid_argument("Wrong number of vector3 elements "+lexical_cast<string>(python::len(l))+", should be 3"); proxee->refSe3.position=Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])());}
+	void pos_set(const Vector3r& p){ proxee->se3.position=p; }
+	void refPos_set(const Vector3r& p){ proxee->refSe3.position=p;}
 	void ori_set(python::list l){if(python::len(l)!=4) throw invalid_argument("Wrong number of quaternion elements "+lexical_cast<string>(python::len(l))+", should be 4"); proxee->se3.orientation=Quaternionr(Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])()),python::extract<double>(l[3])());}
 BASIC_PY_PROXY_TAIL;
 
@@ -428,10 +428,10 @@ class pyBexContainer{
 		python::tuple torque_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getTorque(id); return python::make_tuple(m[0],m[1],m[2]);}
 		python::tuple move_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getMove(id); return python::make_tuple(m[0],m[1],m[2]);}
 		python::tuple rot_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getRot(id); return python::make_tuple(m[0],m[1],m[2]);}
-		void force_add(long id, python::tuple f){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addForce (id,tuple2vec(f)); }
-		void torque_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addTorque(id,tuple2vec(t));}
-		void move_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addMove(id,tuple2vec(t));}
-		void rot_add(long id, python::tuple t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addRot(id,tuple2vec(t));}
+		void force_add(long id, const Vector3r& f){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addForce (id,f); }
+		void torque_add(long id, const Vector3r& t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addTorque(id,t);}
+		void move_add(long id, const Vector3r& t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addMove(id,t);}
+		void rot_add(long id, const Vector3r& t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addRot(id,t);}
 };
 
 class pyOmega{
@@ -663,18 +663,37 @@ class pySTLImporter : public STLImporter {
     public:
 	void py_import(pyBodyContainer bc, unsigned int begin=0, bool noInteractingGeometry=false) { import(bc.proxee,begin,noInteractingGeometry); }
 };
-
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,3);
+
+
+// automatic conversion of Vector3r and 3-tuple
+// this doesn't create any new class in python
+struct custom_Vector3r_to_tuple{
+	static PyObject* convert(Vector3r const& v){
+		return python::incref(python::make_tuple(v[0],v[1],v[2]).ptr());
+	}
+};
+struct custom_Vector3r_from_tuple{
+	custom_Vector3r_from_tuple(){
+		python::converter::registry::push_back(&convertible,&construct,python::type_id<Vector3r>());
+	}
+	static void* convertible(PyObject* obj_ptr){
+		if(!PySequence_Check(obj_ptr) || PySequence_Size(obj_ptr)!=3) return 0;
+		return obj_ptr;
+	}
+	static void construct(PyObject* obj_ptr, python::converter::rvalue_from_python_stage1_data* data){
+		void* storage=((python::converter::rvalue_from_python_storage<Vector3r>*)(data))->storage.bytes;
+		new (storage) Vector3r(python::extract<double>(PySequence_GetItem(obj_ptr,0)),python::extract<double>(PySequence_GetItem(obj_ptr,1)),python::extract<double>(PySequence_GetItem(obj_ptr,2)));
+		data->convertible=storage;
+	}
+};
+
 
 BOOST_PYTHON_MODULE(wrapper)
 {
-	/* http://mail.python.org/pipermail/c++-sig/2004-March/007025.html
-	http://mail.python.org/pipermail/c++-sig/2004-March/007029.html
 
-	UNUSED, deal with boost::python::list instead
-
-	python::class_<std::vector<std::string> >("_vectSs")
-		.def(python::vector_indexing_suite<std::vector<std::string>,true>());   */
+	python::to_python_converter<Vector3r,custom_Vector3r_to_tuple>();
+	custom_Vector3r_from_tuple();
 
 	boost::python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter)

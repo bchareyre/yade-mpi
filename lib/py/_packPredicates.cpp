@@ -30,15 +30,16 @@ python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0]
 python::tuple vec2tuple(const Vector2r& v){return boost::python::make_tuple(v[0],v[1]);}
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
 Vector2r tuple2vec2d(const python::tuple& t){return Vector2r(python::extract<double>(t[0])(),python::extract<double>(t[1])());}
-void ttuple2vvec(const python::tuple& t, Vector3r& v1, Vector3r& v2){ v1=tuple2vec(python::extract<python::tuple>(t[0])()); v2=tuple2vec(python::extract<python::tuple>(t[1])()); }
-python::tuple vvec2ttuple(const Vector3r&v1, const Vector3r&v2){ return python::make_tuple(vec2tuple(v1),vec2tuple(v2)); }
+//void ttuple2vvec(const python::tuple& t, Vector3r& v1, Vector3r& v2){ v1=tuple2vec(python::extract<python::tuple>(t[0])()); v2=tuple2vec(python::extract<python::tuple>(t[1])()); }
+void ttuple2vvec(const python::tuple& t, Vector3r& v1, Vector3r& v2){ v1=python::extract<Vector3r>(t[0])(); v2=python::extract<Vector3r>(t[1])(); }
+python::tuple vvec2ttuple(const Vector3r&v1, const Vector3r&v2){ return python::make_tuple(v1,v2); }
 
 struct Predicate{
 	public:
-		virtual bool operator() (python::tuple pt,Real pad=0.) const = 0;
+		virtual bool operator() (const Vector3r& pt,Real pad=0.) const = 0;
 		virtual python::tuple aabb() const = 0;
-		python::tuple dim() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return vec2tuple(mx-mn); }
-		python::tuple center() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return vec2tuple(.5*(mn+mx)); }
+		Vector3r dim() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return mx-mn; }
+		Vector3r center() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return .5*(mn+mx); }
 };
 // make the pad parameter optional
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(PredicateCall_overloads,operator(),1,2);
@@ -58,7 +59,7 @@ NOTE: you still have to call base class ctor in your class' ctor derived in pyth
 super(inGtsSurface,self).__init__() so that virtual methods work as expected.
 */
 struct PredicateWrap: Predicate, python::wrapper<Predicate>{
-	bool operator()(python::tuple pt, Real pad=0.) const { return this->get_override("__call__")(pt,pad);}
+	bool operator()(const Vector3r& pt, Real pad=0.) const { return this->get_override("__call__")(pt,pad);}
 	python::tuple aabb() const { return this->get_override("aabb")(); }
 };
 // make the pad parameter optional
@@ -83,7 +84,7 @@ class PredicateBoolean: public Predicate{
 class PredicateUnion: public PredicateBoolean{
 	public:
 		PredicateUnion(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return obj2pred(A)(pt,pad)||obj2pred(B)(pt,pad);}
+		virtual bool operator()(const Vector3r& pt,Real pad) const {return obj2pred(A)(pt,pad)||obj2pred(B)(pt,pad);}
 		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(obj2pred(A).aabb(),minA,maxA); ttuple2vvec(obj2pred(B).aabb(),minB,maxB); return vvec2ttuple(componentMinVector(minA,minB),componentMaxVector(maxA,maxB));}
 };
 PredicateUnion makeUnion(const python::object& A, const python::object& B){ return PredicateUnion(A,B);}
@@ -91,7 +92,7 @@ PredicateUnion makeUnion(const python::object& A, const python::object& B){ retu
 class PredicateIntersection: public PredicateBoolean{
 	public:
 		PredicateIntersection(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return obj2pred(A)(pt,pad) && obj2pred(B)(pt,pad);}
+		virtual bool operator()(const Vector3r& pt,Real pad) const {return obj2pred(A)(pt,pad) && obj2pred(B)(pt,pad);}
 		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(obj2pred(A).aabb(),minA,maxA); ttuple2vvec(obj2pred(B).aabb(),minB,maxB); return vvec2ttuple(componentMaxVector(minA,minB),componentMinVector(maxA,maxB));}
 };
 PredicateIntersection makeIntersection(const python::object& A, const python::object& B){ return PredicateIntersection(A,B);}
@@ -99,7 +100,7 @@ PredicateIntersection makeIntersection(const python::object& A, const python::ob
 class PredicateDifference: public PredicateBoolean{
 	public:
 		PredicateDifference(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {return obj2pred(A)(pt,pad) && !obj2pred(B)(pt,-pad);}
+		virtual bool operator()(const Vector3r& pt,Real pad) const {return obj2pred(A)(pt,pad) && !obj2pred(B)(pt,-pad);}
 		virtual python::tuple aabb() const { return obj2pred(A).aabb(); }
 };
 PredicateDifference makeDifference(const python::object& A, const python::object& B){ return PredicateDifference(A,B);}
@@ -107,7 +108,7 @@ PredicateDifference makeDifference(const python::object& A, const python::object
 class PredicateSymmetricDifference: public PredicateBoolean{
 	public:
 		PredicateSymmetricDifference(const python::object _A, const python::object _B): PredicateBoolean(_A,_B){}
-		virtual bool operator()(python::tuple pt,Real pad) const {bool inA=obj2pred(A)(pt,pad), inB=obj2pred(B)(pt,pad); return (inA && !inB) || (!inA && inB);}
+		virtual bool operator()(const Vector3r& pt,Real pad) const {bool inA=obj2pred(A)(pt,pad), inB=obj2pred(B)(pt,pad); return (inA && !inB) || (!inA && inB);}
 		virtual python::tuple aabb() const { Vector3r minA,maxA,minB,maxB; ttuple2vvec(obj2pred(A).aabb(),minA,maxA); ttuple2vvec(obj2pred(B).aabb(),minB,maxB); return vvec2ttuple(componentMinVector(minA,minB),componentMaxVector(maxA,maxB));}
 };
 PredicateSymmetricDifference makeSymmetricDifference(const python::object& A, const python::object& B){ return PredicateSymmetricDifference(A,B);}
@@ -121,11 +122,8 @@ PredicateSymmetricDifference makeSymmetricDifference(const python::object& A, co
 class inSphere: public Predicate {
 	Vector3r center; Real radius;
 public:
-	inSphere(python::tuple _center, Real _radius){center=tuple2vec(_center); radius=_radius;}
-	virtual bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
-		return ((pt-center).Length()-pad<=radius-pad);
-	}
+	inSphere(const Vector3r& _center, Real _radius){center=_center; radius=_radius;}
+	virtual bool operator()(const Vector3r& pt, Real pad=0.) const { return ((pt-center).Length()-pad<=radius-pad); }
 	virtual python::tuple aabb() const {return vvec2ttuple(Vector3r(center[0]-radius,center[1]-radius,center[2]-radius),Vector3r(center[0]+radius,center[1]+radius,center[2]+radius));}
 };
 
@@ -133,9 +131,8 @@ public:
 class inAlignedBox: public Predicate{
 	Vector3r mn, mx;
 public:
-	inAlignedBox(python::tuple _mn, python::tuple _mx){mn=tuple2vec(_mn); mx=tuple2vec(_mx);}
-	virtual bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
+	inAlignedBox(const Vector3r& _mn, const Vector3r& _mx): mn(_mn), mx(_mx) {}
+	virtual bool operator()(const Vector3r& pt, Real pad=0.) const {
 		return
 			mn[0]+pad<=pt[0] && mx[0]-pad>=pt[0] &&
 			mn[1]+pad<=pt[1] && mx[1]-pad>=pt[1] &&
@@ -148,9 +145,8 @@ public:
 class inCylinder: public Predicate{
 	Vector3r c1,c2,c12; Real radius,ht;
 public:
-	inCylinder(python::tuple _c1, python::tuple _c2, Real _radius){c1=tuple2vec(_c1); c2=tuple2vec(_c2); c12=c2-c1; radius=_radius; ht=c12.Length(); }
-	bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
+	inCylinder(const Vector3r& _c1, const Vector3r& _c2, Real _radius){c1=_c1; c2=_c2; c12=c2-c1; radius=_radius; ht=c12.Length(); }
+	bool operator()(const Vector3r& pt, Real pad=0.) const {
 		Real u=(pt.Dot(c12)-c1.Dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
 		if((u*ht<0+pad) || (u*ht>ht-pad)) return false; // out of cylinder along the axis
 		Real axisDist=((pt-c1).Cross(pt-c2)).Length()/ht;
@@ -164,7 +160,7 @@ public:
 			sqrt((pow(A[1]-B[1],2)+pow(A[2]-B[2],2)))/ht,
 			sqrt((pow(A[0]-B[0],2)+pow(A[2]-B[2],2)))/ht,
 			sqrt((pow(A[0]-B[0],2)+pow(A[1]-B[1],2)))/ht);
-		Vector3r mn(min(A[0],B[0]),min(A[1],B[1]),min(A[2],B[2])), mx(max(A[0],B[0]),max(A[1],B[1]),max(A[2],B[2]));
+		Vector3r mn=componentMinVector(A,B), mx=componentMaxVector(A,B);
 		return vvec2ttuple(mn-radius*k,mx+radius*k);
 	}
 };
@@ -176,14 +172,13 @@ See http://mathworld.wolfram.com/Hyperboloid.html for the parametrization and me
 class inHyperboloid: public Predicate{
 	Vector3r c1,c2,c12; Real R,a,ht,c;
 public:
-	inHyperboloid(python::tuple _c1, python::tuple _c2, Real _R, Real _r){
-		c1=tuple2vec(_c1); c2=tuple2vec(_c2); R=_R; a=_r;
+	inHyperboloid(const Vector3r& _c1, const Vector3r& _c2, Real _R, Real _r){
+		c1=_c1; c2=_c2; R=_R; a=_r;
 		c12=c2-c1; ht=c12.Length();
 		Real uMax=sqrt(pow(R/a,2)-1); c=ht/(2*uMax);
 	}
 	// WARN: this is not accurate, since padding is taken as perpendicular to the axis, not the the surface
-	bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
+	bool operator()(const Vector3r& pt, Real pad=0.) const {
 		Real v=(pt.Dot(c12)-c1.Dot(c12))/(ht*ht); // normalized coordinate along the c1--c2 axis
 		if((v*ht<0+pad) || (v*ht>ht-pad)) return false; // out of cylinder along the axis
 		Real u=(v-.5)*ht/c; // u from the wolfram parametrization; u is 0 in the center
@@ -194,7 +189,7 @@ public:
 	}
 	python::tuple aabb() const {
 		// the lazy way
-		return inCylinder(vec2tuple(c1),vec2tuple(c2),R).aabb();
+		return inCylinder(c1,c2,R).aabb();
 	}
 };
 
@@ -202,9 +197,8 @@ public:
 class inEllipsoid: public Predicate{
 	Vector3r c, abc;
 public:
-	inEllipsoid(python::tuple _c, python::tuple _abc) {c=tuple2vec(_c); abc=tuple2vec(_abc);}
-	bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
+	inEllipsoid(const Vector3r& _c, const Vector3r& _abc) {c=_c; abc=_abc;}
+	bool operator()(const Vector3r& pt, Real pad=0.) const {
 		//Define the ellipsoid X-coordinate of given Y and Z
 		Real x = sqrt((1-pow((pt[1]-c[1]),2)/((abc[1]-pad)*(abc[1]-pad))-pow((pt[2]-c[2]),2)/((abc[2]-pad)*(abc[2]-pad)))*((abc[0]-pad)*(abc[0]-pad)))+c[0]; 
 		Vector3r edgeEllipsoid(x,pt[1],pt[2]); // create a vector of these 3 coordinates
@@ -244,16 +238,15 @@ Use intersection (& operator) of another predicate with notInNotch to create not
 class notInNotch: public Predicate{
 	Vector3r c, edge, normal, inside; Real aperture;
 public:
-	notInNotch(python::tuple _c, python::tuple _edge, python::tuple _normal, Real _aperture){
-		c=tuple2vec(_c);
-		edge=tuple2vec(_edge); edge.Normalize();
-		normal=tuple2vec(_normal); normal-=edge*edge.Dot(normal); normal.Normalize();
+	notInNotch(const Vector3r& _c, const Vector3r& _edge, const Vector3r& _normal, Real _aperture){
+		c=_c;
+		edge=_edge; edge.Normalize();
+		normal=_normal; normal-=edge*edge.Dot(normal); normal.Normalize();
 		inside=edge.Cross(normal);
 		aperture=_aperture;
 		// LOG_DEBUG("edge="<<edge<<", normal="<<normal<<", inside="<<inside<<", aperture="<<aperture);
 	}
-	bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
+	bool operator()(const Vector3r& pt, Real pad=0.) const {
 		Real distUp=normal.Dot(pt-c)-aperture/2, distDown=-normal.Dot(pt-c)-aperture/2, distInPlane=-inside.Dot(pt-c);
 		// LOG_DEBUG("pt="<<pt<<", distUp="<<distUp<<", distDown="<<distDown<<", distInPlane="<<distInPlane);
 		if(distInPlane>=pad) return true;
@@ -268,7 +261,8 @@ public:
 	// This predicate is not bounded, return infinities
 	python::tuple aabb() const {
 		Real inf=std::numeric_limits<Real>::infinity();
-		return vvec2ttuple(Vector3r(-inf,-inf,-inf),Vector3r(inf,inf,inf)); }
+		return vvec2ttuple(Vector3r(-inf,-inf,-inf),Vector3r(inf,inf,inf));
+	}
 };
 
 #ifdef YADE_GTS
@@ -309,12 +303,11 @@ public:
 		gts_surface_foreach_vertex(surf,(GtsFunc)vertex_aabb,&bb);
 		return vvec2ttuple(bb.first,bb.second);
 	}
-	bool ptCheck(Vector3r pt) const{
+	bool ptCheck(const Vector3r& pt) const{
 		GtsPoint gp; gp.x=pt[0]; gp.y=pt[1]; gp.z=pt[2];
 		return (bool)gts_point_is_inside_surface(&gp,tree,is_open);
 	}
-	bool operator()(python::tuple _pt, Real pad=0.) const {
-		Vector3r pt=tuple2vec(_pt);
+	bool operator()(const Vector3r& pt, Real pad=0.) const {
 		if(noPad){
 			if(pad!=0. && noPadWarned) LOG_WARN("inGtsSurface constructed with noPad; requested non-zero pad set to zero.");
 			return ptCheck(pt);
@@ -325,8 +318,8 @@ public:
 
 #endif
 
-
 BOOST_PYTHON_MODULE(_packPredicates){
+
 	// base predicate class
 	python::class_<PredicateWrap,/* necessary, as methods are pure virtual*/ boost::noncopyable>("Predicate")
 		.def("__call__",python::pure_virtual(&Predicate::operator()))
@@ -342,12 +335,12 @@ BOOST_PYTHON_MODULE(_packPredicates){
 	python::class_<PredicateDifference,python::bases<PredicateBoolean> >("PredicateDifference","Difference of 2 predicates",python::init<python::object,python::object >());
 	python::class_<PredicateSymmetricDifference,python::bases<PredicateBoolean> >("PredicateSymmetricDifference","SymmetricDifference of 2 predicates",python::init<python::object,python::object >());
 	// primitive predicates
-	python::class_<inSphere,python::bases<Predicate> >("inSphere","Sphere predicate.",python::init<python::tuple,Real>(python::args("center","radius"),"Ctor taking center (as a 3-tuple) and radius"));
-	python::class_<inAlignedBox,python::bases<Predicate> >("inAlignedBox","Axis-aligned box predicate",python::init<python::tuple,python::tuple>(python::args("minAABB","maxAABB"),"Ctor taking minumum and maximum points of the box (as 3-tuples)."));
-	python::class_<inCylinder,python::bases<Predicate> >("inCylinder","Cylinder predicate",python::init<python::tuple,python::tuple,Real>(python::args("centerBottom","centerTop","radius"),"Ctor taking centers of the lateral walls (as 3-tuples) and radius."));
-	python::class_<inHyperboloid,python::bases<Predicate> >("inHyperboloid","Hyperboloid predicate",python::init<python::tuple,python::tuple,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."));
-	python::class_<inEllipsoid,python::bases<Predicate> >("inEllipsoid","Ellipsoid predicate",python::init<python::tuple,python::tuple>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."));
-	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<python::tuple,python::tuple,python::tuple,Real>(python::args("centerPoint","edge","normal","aperture"),"Ctor taking point in the symmetry plane, vector pointing along the edge, plane normal and aperture size.\nThe side inside the notch is edge×normal.\nNormal is made perpendicular to the edge.\nAll vectors are normalized at construction time.")); 
+	python::class_<inSphere,python::bases<Predicate> >("inSphere","Sphere predicate.",python::init<const Vector3r&,Real>(python::args("center","radius"),"Ctor taking center (as a 3-tuple) and radius"));
+	python::class_<inAlignedBox,python::bases<Predicate> >("inAlignedBox","Axis-aligned box predicate",python::init<const Vector3r&,const Vector3r&>(python::args("minAABB","maxAABB"),"Ctor taking minumum and maximum points of the box (as 3-tuples)."));
+	python::class_<inCylinder,python::bases<Predicate> >("inCylinder","Cylinder predicate",python::init<const Vector3r&,const Vector3r&,Real>(python::args("centerBottom","centerTop","radius"),"Ctor taking centers of the lateral walls (as 3-tuples) and radius."));
+	python::class_<inHyperboloid,python::bases<Predicate> >("inHyperboloid","Hyperboloid predicate",python::init<const Vector3r&,const Vector3r&,Real,Real>(python::args("centerBottom","centerTop","radius","skirt"),"Ctor taking centers of the lateral walls (as 3-tuples), radius at bases and skirt (middle radius)."));
+	python::class_<inEllipsoid,python::bases<Predicate> >("inEllipsoid","Ellipsoid predicate",python::init<const Vector3r&,const Vector3r&>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."));
+	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<const Vector3r&,const Vector3r&,const Vector3r&,Real>(python::args("centerPoint","edge","normal","aperture"),"Ctor taking point in the symmetry plane, vector pointing along the edge, plane normal and aperture size.\nThe side inside the notch is edge×normal.\nNormal is made perpendicular to the edge.\nAll vectors are normalized at construction time.")); 
 	#ifdef YADE_GTS
 		python::class_<inGtsSurface,python::bases<Predicate> >("inGtsSurface","GTS surface predicate",python::init<python::object,python::optional<bool> >(python::args("surface","noPad"),"Ctor taking a gts.Surface() instance, which must not be modified during instance lifetime.\nThe optional noPad can disable padding (if set to True), which speeds up calls several times.\nNote: padding checks inclusion of 6 points along +- cardinal directions in the pad distance from given point, which is not exact."));
 	#endif

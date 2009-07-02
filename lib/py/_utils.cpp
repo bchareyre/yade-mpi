@@ -41,7 +41,7 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+(centers?Vector3r::ZERO:rrr));
 	}
 	Vector3r dim=maximum-minimum;
-	return python::make_tuple(vec2tuple(minimum+.5*cutoff*dim),vec2tuple(maximum-.5*cutoff*dim));
+	return python::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(aabbExtrema_overloads,aabbExtrema,0,2);
 
@@ -60,7 +60,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2)
 
 python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()){
 	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(AABB)>0;
-	if(useBB){bbMin=tuple2vec(extract<python::tuple>(AABB[0])());bbMax=tuple2vec(extract<python::tuple>(AABB[1])());}
+	if(useBB){bbMin=extract<Vector3r>(AABB[0])();bbMax=extract<Vector3r>(AABB[1])();}
 	python::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getRootBody()->bodies){
 		if(useBB && !isInBB(b->physicalParameters->se3.position,bbMin,bbMax)) continue;
@@ -81,7 +81,7 @@ void setRefSe3(){
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 
 Real elasticEnergyInAABB(python::tuple AABB){
-	Vector3r bbMin=tuple2vec(extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(extract<python::tuple>(AABB[1])());
+	Vector3r bbMin=extract<Vector3r>(AABB[0])(), bbMax=extract<Vector3r>(AABB[1])();
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
@@ -120,7 +120,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
  */
 python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, python::tuple aabb=python::tuple(), Real minProjLen=1e-6){
 	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=tuple2vec(extract<python::tuple>(aabb[0])());bbMax=tuple2vec(extract<python::tuple>(aabb[1])());}
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
@@ -143,7 +143,7 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,4);
 
 python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=tuple2vec(extract<python::tuple>(aabb[0])());bbMax=tuple2vec(extract<python::tuple>(aabb[1])());}
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
 	const shared_ptr<MetaBody>& rb=Omega::instance().getRootBody();
 	vector<int> bodyNumInta; bodyNumInta.resize(rb->bodies->size(),-1 /* uninitialized */);
 	int maxInta=0;
@@ -165,9 +165,9 @@ python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(bodyNumInteractionsHistogram_overloads,bodyNumInteractionsHistogram,0,1);
 
-python::tuple inscribedCircleCenter(python::list v0, python::list v1, python::list v2)
+Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2)
 {
-	return vec2tuple(Shop::inscribedCircleCenter(Vector3r(python::extract<double>(v0[0]),python::extract<double>(v0[1]),python::extract<double>(v0[2])), Vector3r(python::extract<double>(v1[0]),python::extract<double>(v1[1]),python::extract<double>(v1[2])), Vector3r(python::extract<double>(v2[0]),python::extract<double>(v2[1]),python::extract<double>(v2[2]))));
+	return Shop::inscribedCircleCenter(v0,v1,v2);
 }
 
 python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
@@ -199,11 +199,11 @@ void highlightNone(){
  * is position relative to axisPt; moment from moment is m; such moment per body is
  * projected onto axis.
  */
-Real sumBexTorques(python::tuple ids, python::tuple _axis, python::tuple _axisPt){
+Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	rb->bex.sync();
 	Real ret=0;
-	Vector3r axis=tuple2vec(_axis), axisPt=tuple2vec(_axisPt); size_t len=python::len(ids);
+	size_t len=python::len(ids);
 	for(size_t i=0; i<len; i++){
 		const Body* b=(*rb->bodies)[python::extract<int>(ids[i])].get();
 		const Vector3r& m=rb->bex.getTorque(b->getId());
@@ -219,11 +219,11 @@ Real sumBexTorques(python::tuple ids, python::tuple _axis, python::tuple _axisPt
  * @param direction direction in which forces are summed
  *
  */
-Real sumBexForces(python::tuple ids, python::tuple _direction){
+Real sumBexForces(python::tuple ids, const Vector3r& direction){
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	rb->bex.sync();
 	Real ret=0;
-	Vector3r direction=tuple2vec(_direction); size_t len=python::len(ids);
+	size_t len=python::len(ids);
 	for(size_t i=0; i<len; i++){
 		body_id_t id=python::extract<int>(ids[i]);
 		const Vector3r& f=rb->bex.getForce(id);
@@ -325,8 +325,8 @@ Real approxSectionArea(Real coord, int axis){
 
 	(This could be easily extended to return sum of only normal forces or only of shear forces.)
 */
-python::tuple forcesOnPlane(python::tuple _planePt, python::tuple _normal){
-	Vector3r ret(Vector3r::ZERO), planePt(tuple2vec(_planePt)), normal(tuple2vec(_normal));
+Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
+	Vector3r ret(Vector3r::ZERO);
 	MetaBody* rootBody=Omega::instance().getRootBody().get();
 	FOREACH(const shared_ptr<Interaction>&I, *rootBody->interactions){
 		if(!I->isReal()) continue;
@@ -342,14 +342,14 @@ python::tuple forcesOnPlane(python::tuple _planePt, python::tuple _normal){
 		// otherwise, reverse its contribution
 		ret+=(dot1<0.?1.:-1.)*(nsi->normalForce+nsi->shearForce);
 	}
-	return vec2tuple(ret);
+	return ret;
 }
 
 /* Less general than forcesOnPlane, computes force on plane perpendicular to axis, passing through coordinate coord. */
-python::tuple forcesOnCoordPlane(Real coord, int axis){
+Vector3r forcesOnCoordPlane(Real coord, int axis){
 	Vector3r planePt(Vector3r::ZERO); planePt[axis]=coord;
 	Vector3r normal(Vector3r::ZERO); normal[axis]=1;
-	return forcesOnPlane(vec2tuple(planePt),vec2tuple(normal));
+	return forcesOnPlane(planePt,normal);
 }
 
 
@@ -361,9 +361,8 @@ python::tuple forcesOnCoordPlane(Real coord, int axis){
  * dH_dTheta is the inclination of the spiral (height increase per radian),
  * theta0 is the angle for zero height (by given axis).
  */
-python::tuple spiralProject(python::tuple _pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
+python::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
 	int ax1=(axis+1)%3,ax2=(axis+2)%3;
-	Vector3r pt=tuple2vec(_pt);
 	Real r=sqrt(pow(pt[ax1],2)+pow(pt[ax2],2));
 	Real theta;
 	if(r>Mathr::ZERO_TOLERANCE){
@@ -393,7 +392,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
 // for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
 void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
 
-python::tuple Shop__scalarOnColorScale(Real scalar){ return vec2tuple(Shop::scalarOnColorScale(scalar));}
+//Vector3r Shop__scalarOnColorScale(Real scalar){ return Shop::scalarOnColorScale(scalar);}
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
@@ -423,7 +422,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);
-	def("scalarOnColorScale",Shop__scalarOnColorScale);
+	def("scalarOnColorScale",Shop::scalarOnColorScale);
 	def("highlightNone",highlightNone);
 	def("wireAll",wireAll);
 	def("wireNone",wireNone);
