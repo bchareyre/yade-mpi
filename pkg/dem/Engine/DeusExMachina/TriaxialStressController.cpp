@@ -324,10 +324,10 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 {
 	
-// 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
-// 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
-// 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
-	assert(height>0); assert(width>0); assert(depth>0);
+ 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
+ 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
+ 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() - thickness;
+	//assert(height>0); assert(width>0); assert(depth>0);
 	
 	meanStress = 0;
 	if (height0 == 0) height0 = height;
