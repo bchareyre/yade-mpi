@@ -119,6 +119,7 @@ void TriaxialStressController::registerAttributes()
 	REGISTER_ATTRIBUTE(wall_front_activated);
 	REGISTER_ATTRIBUTE(wall_back_activated);
 	
+	REGISTER_ATTRIBUTE(thickness);
 	REGISTER_ATTRIBUTE(height);
 	REGISTER_ATTRIBUTE(width);
 	REGISTER_ATTRIBUTE(depth);
