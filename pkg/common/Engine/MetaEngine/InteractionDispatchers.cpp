@@ -71,7 +71,8 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			assert(I->functorCache.phys);
 			I->functorCache.phys->go(b1->physicalParameters,b2->physicalParameters,I);
 			assert(I->interactionPhysics);
-			I->iterMadeReal=rootBody->currentIteration; // mark the interaction as created right now
+
+			if(!wasReal) I->iterMadeReal=rootBody->currentIteration; // mark the interaction as created right now
 
 
 			// ConstitutiveLawDispatcher

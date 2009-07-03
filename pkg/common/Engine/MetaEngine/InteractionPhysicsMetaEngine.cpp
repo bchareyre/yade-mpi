@@ -35,9 +35,10 @@ void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 			if(interaction->interactionGeometry){
 				shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 				shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
+				bool hadPhys=interaction->interactionPhysics;
 				operator()(b1->physicalParameters, b2->physicalParameters, interaction);
 				assert(interaction->interactionPhysics);
-				interaction->iterMadeReal=ncb->currentIteration;
+				if(!hadPhys) interaction->iterMadeReal=ncb->currentIteration;
 			}
 		}
 }

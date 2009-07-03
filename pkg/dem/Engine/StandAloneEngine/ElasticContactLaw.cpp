@@ -77,7 +77,8 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
-			if (contact->isFresh(ncb)) shearForce=Vector3r(0,0,0);
+			// no need for this, initialized to Vector3r::ZERO in NormalShearInteraction ctor
+			// if (contact->isFresh(ncb)) shearForce=Vector3r(0,0,0);
 					
 			Real un=currentContactGeometry->penetrationDepth;
 			TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
@@ -93,6 +94,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			#ifdef SCG_SHEAR
 				}
 			#endif
+
 			
 			// PFC3d SlipModel, is using friction angle. CoulombCriterion
 			Real maxFs = currentContactPhysics->normalForce.SquaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
@@ -105,7 +107,6 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 					if(useShear) currentContactGeometry->shear*=ratio;
 				#endif
 			}
-			////////// PFC3d SlipModel
 	
 			applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce , currentContactGeometry->contactPoint , id1 , de1->se3.position , id2 , de2->se3.position , ncb);
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
