@@ -22,7 +22,12 @@ Rock Particle Model (RockPM) is a set of classes for modelling
 mechanical behavior of mining rocks.
 */
 
-
+#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 
@@ -35,3 +40,50 @@ class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
+/* This class holds information associated with each body */
+class RpmMat: public BodyMacroParameters {
+	public:
+		Real normYungConn, normInitLengthConn;
+		RpmMat(): normYungConn(0.) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (normYungConn));
+		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
+};
+REGISTER_SERIALIZABLE(RpmMat);
+
+
+class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
+	private:
+	public:
+		Real sigmaT;
+
+		Ip2_RpmMat_RpmMat_RpmPhys(){
+			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
+			sigmaT=3;
+		}
+
+		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
+		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
+			(sigmaT)
+		);
+
+		FUNCTOR2D(RpmMat,RpmMat);
+		REGISTER_CLASS_AND_BASE(Ip2_RpmMat_RpmMat_RpmPhys,InteractionPhysicsEngineUnit);
+};
+REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
+
+
+class RpmPhys: public NormalShearInteraction {
+	private:
+	public:
+		Real crossSection, E, G;
+
+		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0) { createIndex();}
+		virtual ~RpmPhys();
+
+		REGISTER_ATTRIBUTES(NormalShearInteraction,
+			(E)
+			(G)
+		);
+	REGISTER_CLASS_AND_BASE(RpmPhys,NormalShearInteraction);
+};
+REGISTER_SERIALIZABLE(RpmPhys);
