@@ -77,14 +77,14 @@ void SpherePack::fromList(const python::list& l){
 	size_t len=python::len(l);
 	for(size_t i=0; i<len; i++){
 		const python::tuple& t=python::extract<python::tuple>(l[i]);
-		const Vector3r t0=python::extract<Vector3r>(t[0]);
-		pack.push_back(Sph(t0,python::extract<double>(t[1])));
+		const python::tuple& t1=python::extract<python::tuple>(t[0]);
+		pack.push_back(Sph(tuple2vec(t1),python::extract<double>(t[1])));
 	}
 };
 
 python::list SpherePack::toList() const {
 	python::list ret;
-	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c,s.r));
+	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(vec2tuple(s.c),s.r));
 	return ret;
 };
 

@@ -107,6 +107,8 @@ class TriaxialTest : public FileGenerator
 				,isotropicCompaction
 				//! do not create any files during run (.xml, .spheres, wall stress records)
 				,noFiles
+				// use Facets instead of Boxes for the walls
+				,facetWalls
 				;
 
 				//! Generate faster simulation: use InsertionSortCollider and InteractionDispatchers

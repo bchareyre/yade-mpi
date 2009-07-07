@@ -6,6 +6,7 @@
 
 import math,random
 from yade.wrapper import *
+from miniWm3Wrap import *
 try: # use psyco if available
 	import psyco
 	psyco.full()
@@ -64,41 +65,55 @@ def downCast(obj,newClassName):
 	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
 	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
-def sphere(center,radius,density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={},velocity=[0,0,0]):
+bodiesPhysDefaults={'young':30e9,'poisson':.3,'frictionAngle':.5236}
+
+def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
 	if not color: color=randomColor()
+	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
 	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color,'wire':wire})
 	s.mold=InteractingGeometry('InteractingSphere',{'radius':radius,'diffuseColor':color})
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
-	pp={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert],'young':young,'poisson':poisson,'frictionAngle':frictionAngle, 'velocity':[velocity[0],velocity[1],velocity[2]]}
-	pp.update(physParamsAttr)
-	s.phys=PhysicalParameters(physParamsClass)
-	for k in [attr for attr in pp.keys() if attr in s.phys.keys()]:
-		s.phys[k]=pp[k]
+	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert]})
+	s.phys=PhysicalParameters(physParamsClass,pp)
 	s.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],density=1,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=True,wire=False,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={}):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	if not color: color=randomColor()
+	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
 	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color,'wire':wire})
 	b.mold=InteractingGeometry('InteractingBox',{'extents':extents,'diffuseColor':color})
 	mass=8*extents[0]*extents[1]*extents[2]*density
-
 	V=extents[0]*extents[1]*extents[2]
-	
-	Pp={'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)],'young':young,'poisson':poisson,'frictionAngle':frictionAngle}
-
-	b.phys=PhysicalParameters(physParamsClass)
-	for k in [attr for attr in Pp.keys() if attr in b.phys.keys()]:
-		b.phys[k]=Pp[k]
-
+	pp.update({'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)]})
+	b.phys=PhysicalParameters(physParamsClass,pp)
 	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	b['isDynamic']=dynamic
+	return b
+
+def facet(vertices,dynamic=False,wire=True,color=None,density=1,physParamsClass='BodyMacroParameters',**physParamsAttr):
+	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
+	b=Body()
+	if not color: color=randomColor()
+	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
+	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire})
+	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
+	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
+	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
+	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
+	b.shape.setRaw('vertices',vStr)
+	b.mold.setRaw('vertices',vStr)
+	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
+	b.phys=PhysicalParameters(physParamsClass,pp)
+	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+	b['isDynamic']=dynamic
+	b.mold.postProcessAttributes()
 	return b
 
 def alignedFacetBox(center,extents,wallMask=63,**kw):
@@ -119,26 +134,6 @@ def alignedFacetBox(center,extents,wallMask=63,**kw):
 	if wallMask&32: ret+=doWall(E,F,G,H)
 	return ret
 
-def facet(vertices,young=30e9,poisson=.3,frictionAngle=0.5236,dynamic=False,wire=True,color=None,physParamsClass='BodyMacroParameters',physParamsAttr={}):
-	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
-	b=Body()
-	if not color: color=randomColor()
-	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire})
-	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
-	center=inscribedCircleCenter(list(vertices[0]),list(vertices[1]),list(vertices[2]))
-	vertices=map(lambda a,b:map(lambda x,y:x-y,a,b),vertices,[center,center,center]) 
-	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
-	b.shape.setRaw('vertices',vStr)
-	b.mold.setRaw('vertices',vStr)
-	pp={'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle,'inertia':[0,0,0]}
-	pp.update(physParamsAttr)
-	b.phys=PhysicalParameters(physParamsClass)
-	for k in [attr for attr in pp.keys() if attr in b.phys.keys()]:
-		b.phys[k]=pp[k]
-	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
-	b['isDynamic']=dynamic
-	b.mold.postProcessAttributes()
-	return b
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""return 6 walls that will wrap existing packing;
@@ -450,3 +445,10 @@ def NormalRestitution2DampingRate(en):
 	from math import sqrt,log,pi
 	ln_en = math.log(en)
 	return (-ln_en/math.sqrt((math.pow(ln_en,2) + math.pi*math.pi)))
+
+def xMirror(half):
+	"""Mirror a sequence of 2d points around the x axis (changing sign on the y coord).
+	The sequence should start up and then it will wrap from y downwards (or vice versa).
+	If the last point's x coord is zero, it will not be duplicated."""
+	return list(half)+[(x,-y) for x,y in reversed(half[:-1] if half[-1][0]==0 else half)]
+

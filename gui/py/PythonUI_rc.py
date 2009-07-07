@@ -8,6 +8,7 @@ sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't ne
 # sys.path.insert(0,runtime.prefix+'/lib/yade'+runtime.suffix+'/extra')
 
 from math import *
+from miniWm3Wrap import *
 from yade.wrapper import *
 from yade import runtime
 from yade import utils

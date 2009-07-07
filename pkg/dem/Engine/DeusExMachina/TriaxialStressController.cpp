@@ -77,7 +77,7 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	height0 = 0;
 	width0 = 0;
 	depth0 = 0;
-	thickness = 0;
+	thickness = -1;
 	
 	//UnbalancedForce = 0;
 	
@@ -219,7 +219,7 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	
 	
 
-	if(thickness<=0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->interactingGeometry)->extents.Y();
+	if(thickness<0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->interactingGeometry)->extents.Y();
 
 	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
 	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());

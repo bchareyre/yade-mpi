@@ -383,7 +383,7 @@ else:
 env['PREFIX']=os.path.abspath(env['PREFIX'])
 
 # paths to in-tree SConscript files
-libDirs=['lib','pkg/common','pkg/dem','pkg/fem','pkg/lattice','pkg/mass-spring','pkg/realtime-rigidbody','pkg/snow','extra','gui']
+libDirs=['lib','pkg/common','pkg/dem','pkg/fem','pkg/lattice','pkg/mass-spring','pkg/realtime-rigidbody','pkg/snow','extra','gui','py']
 #libDirs = libDirs + ['pkg/gram'] 
 # BUT: exclude stuff that should be excluded
 libDirs=[x for x in libDirs if not re.match('^.*/('+'|'.join(env['exclude'])+')$',x)]

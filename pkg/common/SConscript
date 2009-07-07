@@ -4,6 +4,7 @@ Import('*')
 if 'EMBED_PYTHON' in env['CPPDEFINES']:
 	env.Install("$PREFIX/lib/yade$SUFFIX/pkg-common",[
 		env.SharedLibrary('PythonRunnerFilter',['Engine/FilterEngine/PythonRunnerFilter.cpp'],LIBS=env['LIBS']+['FilterEngine']),
+		env.SharedLibrary('PeriodicPythonRunner',['Engine/StandAloneEngine/PeriodicPythonRunner.cpp']),
 	])
 
 

@@ -67,7 +67,7 @@
 using namespace boost;
 using namespace std;
 
-#include"pyAttrUtils.hpp"
+#include<yade/gui-py/pyAttrUtils.hpp>
 #include<yade/extra/boost_python_len.hpp>
 
 class RenderingEngine;
@@ -692,8 +692,8 @@ struct custom_Vector3r_from_tuple{
 BOOST_PYTHON_MODULE(wrapper)
 {
 
-	python::to_python_converter<Vector3r,custom_Vector3r_to_tuple>();
-	custom_Vector3r_from_tuple();
+	//python::to_python_converter<Vector3r,custom_Vector3r_to_tuple>();
+	//custom_Vector3r_from_tuple();
 
 	boost::python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter)

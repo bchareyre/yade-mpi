@@ -15,10 +15,10 @@ while True:
 inSph='%s-in.spheres'%sph
 if exists(inSph): print "Using existing initial configuration",inSph
 else:
-	Preprocessor('TriaxialTest').load()
+	TriaxialTest(noFiles=True).load()
 	print "Using new initial configuration in",inSph
 	utils.spheresToFile(inSph)
-Preprocessor('TriaxialTest',{'importFilename':inSph}).load()
+TriaxialTest(importFilename=inSph,noFiles=True).load()
 O.usesTimeStepper=False
 O.dt=utils.PWaveTimeStep()
 #
@@ -26,7 +26,10 @@ O.dt=utils.PWaveTimeStep()
 #
 [e for e in O.engines if e.name=='ElasticContactLaw'][0]['useShear']=True
 if 1:
+	#for i in range(0,100):
+	#	#	O.save('/tmp/a.%03d.xml'%O.iter)
+	#	O.step()
 	O.run(2000,True)
 	utils.spheresToFile(outSph)
 	print "Results saved to",outSph
-	quit()
+	#quit()

@@ -8,21 +8,13 @@ O.bodies.append([
 	utils.sphere([0,0,1],.5000001,dynamic=True,color=(0,0,1))
 ])
 O.engines=[
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingFacet2AABB'),
-	]),
-	StandAloneEngine('PersistentSAPCollider',{'haveDistantTransient':True}),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-	]),
-	MetaEngine('InteractionPhysicsMetaEngine',[
-		EngineUnit('SimpleElasticRelationships')
-	]),
-	DeusExMachina('RotationEngine',{'rotationAxis':[1,1,0],'angularVelocity':.001,'subscribedBodies':[1]}),
-	StandAloneEngine('ElasticContactLaw',{'useShear':False}),
-	StandAloneEngine('PeriodicPythonRunner',{'iterPeriod':10000,'command':'interInfo()'}),
-	#DeusExMachina('NewtonsDampedLaw',{'damping':0})
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	InsertionSortCollider(),
+	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
+	ElasticContactLaw(useShear=False,label='elasticLaw'),
+	PeriodicPythonRunner(iterPeriod=10000,command='interInfo()'),
 ]
 O.miscParams=[
 	Generic('GLDrawSphere',{'glutUse':True})
@@ -47,7 +39,6 @@ O.run(100000,True)
 nIter=O.iter
 print '============= shear ============='
 O.loadTmp('init')
-ecl=[e for e in O.engines if e.name=='ElasticContactLaw'][0]
-ecl['useShear']=True
+elasticLaw['useShear']=True
 O.run(nIter,True)
 quit()

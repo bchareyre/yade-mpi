@@ -39,11 +39,11 @@ class SpheresContactGeometry: public InteractionGeometry {
 		#endif
 
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0.),radius2(0.){createIndex();
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0.),radius2(0.)
 		#ifdef SCG_SHEAR
-			shear=Vector3r::ZERO; prevNormal=Vector3r::ZERO /*initialized to proper value by geom functor*/;
-		#endif	
-		}
+			,shear(Vector3r::ZERO), prevNormal(Vector3r::ZERO) /*initialized to proper value by geom functor*/
+		#endif
+			{ createIndex(); }
 		virtual ~SpheresContactGeometry();
 
 		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);

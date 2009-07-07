@@ -32,6 +32,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/PersistentSAPCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -53,6 +54,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/InteractingFacet.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -162,6 +164,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	
 	fast=false;
 	noFiles=false;
+	facetWalls=false;
 
 	
 	
@@ -234,6 +237,7 @@ void TriaxialTest::registerAttributes()
 	REGISTER_ATTRIBUTE(fixedBoxDims);
 	REGISTER_ATTRIBUTE(fast);
 	REGISTER_ATTRIBUTE(noFiles);
+	REGISTER_ATTRIBUTE(facetWalls);
 }
 
 
@@ -246,6 +250,10 @@ bool TriaxialTest::generate()
 	{
 		message="Biaxial test can be generated only if Z size is more than 8 times smaller than X size";
 		return false;
+	}
+	if(facetWalls && !fast){
+		LOG_WARN("Turning TriaxialTest::fast on, since facetWalls were selected.");
+		fast=true;
 	}
 	
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
@@ -289,6 +297,7 @@ bool TriaxialTest::generate()
 	}
 
 	if(thickness<0) thickness=radiusMean;
+	if(facetWalls) thickness=0;
 	
 	if(boxWalls)
 	{
@@ -465,47 +474,56 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
-	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	body->isDynamic			= false;
+
+
+	shared_ptr<AABB> aabb(new AABB);
+	aabb->diffuseColor		= Vector3r(1,0,0);
+	body->boundingVolume		= aabb;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 0; 
+	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	//physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
 	physics->inertia		= Vector3r(
 							  physics->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
 							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
 							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
 						);
-//	physics->mass			= 0;
+	physics->mass			= 0;
 //	physics->inertia		= Vector3r(0,0,0);
-	physics->se3			= Se3r(position,q);
+	physics->se3.position=position;
 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxPoissonRatio;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
-
-	aabb->diffuseColor		= Vector3r(1,0,0);
-
-	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3r(1,1,1);
-	gBox->wire			= wire;
-	gBox->shadowCaster		= false;
-	
-	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3r(1,1,1);
-
-	body->boundingVolume		= aabb;
-	body->interactingGeometry	= iBox;
-	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
+
+
+	if(!facetWalls){
+		shared_ptr<Box> gBox(new Box);
+		gBox->extents			= extents;
+		gBox->diffuseColor		= Vector3r(1,1,1);
+		gBox->wire			= wire;
+		gBox->shadowCaster		= false;
+		body->geometricalModel		= gBox;
+
+		shared_ptr<InteractingBox> iBox(new InteractingBox);
+		iBox->extents			= extents;
+		iBox->diffuseColor		= Vector3r(1,1,1);
+		body->interactingGeometry	= iBox;
+	} else {
+		int ax0 = extents[0]==0 ? 0 : (extents[1]==0 ? 1 : 2); int ax1=(ax0+1)%3, ax2=(ax0+2)%3;
+		Vector3r corner=position-extents; // "lower right" corner, with 90 degrees
+		Vector3r side1(Vector3r::ZERO); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::ZERO); side2[ax2]=4*extents[ax2];
+		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
+		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
+		shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
+		shared_ptr<Facet> facet(new Facet);
+		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog); facet->vertices.push_back(v[i]-cog);}
+		iFacet->diffuseColor=facet->diffuseColor=Vector3r(1,1,1);
+		facet->wire=true;
+		body->geometricalModel=facet;
+		body->interactingGeometry=iFacet;
+	}
 }
 
 
@@ -513,19 +531,23 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+	if(!facetWalls){
+		interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
+		interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+	} else {
+		interactionGeometryDispatcher->add("ef2_Sphere_Sphere_Dem3DofGeom");
+		interactionGeometryDispatcher->add("ef2_Facet_Sphere_Dem3DofGeom");
+	}
+
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-//	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
-// Unhandled exception: St13runtime_error : Class `SimpleElasticRelationships' could not be cast to required 2D EngineUnit	
 	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationships);
 	interactionPhysicsDispatcher->add(ss);
 	
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
+	boundingVolumeDispatcher->add(facetWalls ? "InteractingFacet2AABB" : "InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
@@ -615,11 +637,15 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
 			ids->constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
-			shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw);
-				see->sdecGroupMask=2;
-			ids->constLawDispatcher->add(see);
+			if(!facetWalls){
+				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw); see->sdecGroupMask=2;
+				ids->constLawDispatcher->add(see);
+			} else {
+				ids->constLawDispatcher->add(shared_ptr<Law2_Dem3Dof_Elastic_Elastic>(new Law2_Dem3Dof_Elastic_Elastic));
+			}
 		rootBody->engines.push_back(ids);
 	} else {
+		assert(!facetWalls);
 		rootBody->engines.push_back(interactionGeometryDispatcher);
 		rootBody->engines.push_back(interactionPhysicsDispatcher);
 		shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
@@ -696,7 +722,7 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 	long tries = 1000; //nb of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
 
-	LOG_INFO("Generating aggregates ...");
+	LOG_INFO("Generating "<<number<<" aggregates ...");
 	
 	long t, i;
 	for (i=0; i<number; ++i) {

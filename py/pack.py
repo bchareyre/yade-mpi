@@ -156,16 +156,16 @@ def filterSpherePack(predicate,spherePack,**kw):
 	dimP,centP=predicate.dim(),predicate.center()
 	dimS,centS=spherePack.dim(),spherePack.center()
 	if dimP[0]>dimS[0] or dimP[1]>dimS[1] or dimP[2]>dimS[2]: warnings.warn("Packing's dimension (%s) doesn't fully contain dimension of the predicate (%s)."%(dimS,dimP))
-	spherePack.translate(tuple([centP[i]-centS[i] for i in 0,1,2]))
+	spherePack.translate(centP-centS)
 	ret=[]
 	for s in spherePack:
 		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 	return ret
 
-def triaxialPack(predicate,radius,dim=None,cropLayers=1,radiusStDev=0.,assumedFinalDensity=.6,memoizeDb=None,**kw):
+def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFinalDensity=.6,memoizeDb=None,**kw):
 	"""Generator of triaxial packing, using TriaxialTest. Radius is radius of spheres, radiusStDev is its standard deviation.
-	By default, all spheres are of the same radius. cropLayers is how many layer of spheres will be added to the computed
-	dimension of the box so that there no (or not so much, at least) boundary effects at the boundaris of the predicate.
+	By default, all spheres are of the same radius. cropLayers is how many layers of spheres will be added to the computed
+	dimension of the box so that there no (or not so much, at least) boundary effects at the boundaries of the predicate.
 	assumedFinalDensity should be OK as it is, it is used to compute necessary number of spheres for the packing.
 
 	The memoizeDb parameter can be passed a file (existent or nonexistent). If the file exists, it will be first looked

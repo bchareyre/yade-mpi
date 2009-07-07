@@ -32,7 +32,7 @@ O.bodies.append(pack.gtsSurface2Facets(surf,color=(1,0,1)))
 # parameters (or parameters that can be scaled to the same one),
 # it will load the packing instead of running the triaxial compaction again.
 # Try running for the second time to see the speed difference!
-O.bodies.append(pack.triaxialPack(pack.inGtsSurface(surf),radius=5e-4,radiusStDev=1e-4,memoizeDb='/tmp/gts-triax-packings.sqlite'))
+O.bodies.append(pack.triaxialPack(pack.inGtsSurface(surf),radius=15e-4,radiusStDev=1e-4,memoizeDb='/tmp/gts-triax-packings.sqlite'))
 # We could also fill the horse with triaxial packing, but have nice approximation, the triaxial would run terribly long,
 # since horse discard most volume of its bounding box
 # Here, we would use a very crude one, however
