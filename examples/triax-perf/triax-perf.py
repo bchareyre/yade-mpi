@@ -12,8 +12,8 @@
 #
 # You have to collect the results by hand from log files.
 #
-utils.readParamsFromTable(parallel=False,noTableOk=True)
-p=Preprocessor('TriaxialTest',{'numberOfGrains':8000,'parallel':parallel}).load()
+utils.readParamsFromTable(fast=False,noTableOk=True)
+p=Preprocessor('TriaxialTest',{'numberOfGrains':8000,'fast':fast}).load()
 O.run(10,True) # filter out initialization
 O.timingEnabled=True
 O.run(1000,True)

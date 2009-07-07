@@ -1,4 +1,4 @@
-!OMP_NUM_THREADS parallel description
+!OMP_NUM_THREADS fast description
 1 False ser1
 2 False ser2
 3 False ser3

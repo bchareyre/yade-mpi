@@ -532,8 +532,10 @@ class pyOmega{
 		LOG_INFO("Saving :memory:"<<mark<<" to "<<filename);
 		out<<OMEGA.memSavedSimulations[":memory:"+mark];
 	}
-
-
+	string tmpToString(string mark){
+		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
+		return OMEGA.memSavedSimulations[":memory:"+mark];
+	}
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
 	void resetTime(){ OMEGA.getRootBody()->currentIteration=0; OMEGA.getRootBody()->simulationTime=0; OMEGA.timeInit(); }
@@ -708,6 +710,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("loadTmp",&pyOmega::loadTmp,omega_loadTmp_overloads(python::args("mark")))
 		.def("saveTmp",&pyOmega::saveTmp,omega_saveTmp_overloads(python::args("mark")))
 		.def("tmpToFile",&pyOmega::tmpToFile)
+		.def("tmpToString",&pyOmega::tmpToString)
 		.def("saveSpheres",&pyOmega::saveSpheres)
 		.def("run",&pyOmega::run,omega_run_overloads())
 		.def("pause",&pyOmega::pause)
