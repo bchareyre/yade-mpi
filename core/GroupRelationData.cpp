@@ -10,17 +10,18 @@
 
 GroupRelationData::GroupRelationData() : ngrp_(2), npar_(0)
 { 
-        initActivator(); 
+  isActivated_ = false;
 }
 
 GroupRelationData::GroupRelationData(unsigned int ngrp) : ngrp_(ngrp), npar_(0)
 { 
-	initActivator();
+  isActivated_ = false;
 }
 
 GroupRelationData::~GroupRelationData() 
 {
   // Free memory for the action table
+/*
   if (act_ != 0)
     {
     for(unsigned int i=0 ; i<ngrp_ ; ++i)
@@ -30,7 +31,8 @@ GroupRelationData::~GroupRelationData()
     delete [] act_;
     act_ = 0;
     }
-  
+  */
+
   // Free memory for each parameter table
   for(unsigned int p=0 ; p<npar_ ; ++p)
     {
@@ -46,6 +48,14 @@ GroupRelationData::~GroupRelationData()
     }
 }
 
+// void GroupRelationData::activate()
+// {
+//   istringstream istr;
+//   istr.str(commands_);
+//   read(istr);
+// }
+
+/*
 bool GroupRelationData::act(unsigned int g1, unsigned int g2) const
 {
   if (g1 < ngrp_ && g2 < ngrp_)
@@ -77,6 +87,7 @@ void GroupRelationData::deactivate(unsigned int g1, unsigned int g2)
   else
     cerr << "@GroupRelationData::deactivate, bad groupMask number" << endl;
 }
+*/
 
 bool GroupRelationData::exists(string name)
 {
@@ -186,6 +197,7 @@ void GroupRelationData::addParameter(string name)
   lpar_.push_back(p);
 }
 
+/*
 void GroupRelationData::initActivator()
 {
   act_ = new bool * [ngrp_];
@@ -199,11 +211,9 @@ void GroupRelationData::initActivator()
     for (unsigned int j = 0 ; j < ngrp_ ; ++j)
       act_[i][j] = true;
 }
+*/
 
 
-// The methods read and write are not used in YADE...
-
-/*
 void GroupRelationData::read(istream & is)
 {
   string token;
@@ -215,13 +225,6 @@ void GroupRelationData::read(istream & is)
       {
       is >> ngrp_;
       if (ngrp_ == 0) cerr << "GroupRelationData::read, ngrp can not be 0" << endl;
-      else initActivator();
-      }
-    else if (token == "noact")
-      { 
-      unsigned int i,j; 
-      is >> i ; is >> j;
-      deactivate(i,j);
       }
     else if (token == "parameter")
       { 
@@ -256,20 +259,15 @@ void GroupRelationData::read(istream & is)
     
     is >> token;
     }
+
+    if (ngrp_ > 0) isActivated_ = true;
 }
 
+/*
 void GroupRelationData::write(ostream & os)
 {
   os << "ngrp " << ngrp_ << endl;
-  
-  for (unsigned int g1=0;g1<ngrp_;++g1)
-    {
-    for (unsigned int g2=0;g2<ngrp_;++g2)  
-      {
-      if (!act_[g1][g2]) os << "noact " << g1 << " " << g2 << endl;
-      }
-    }
-  
+
   mapIdParam::iterator imap = idParam_.begin();
   string parName;
   while (imap != idParam_.end())
@@ -295,3 +293,33 @@ void GroupRelationData::write(ostream & os)
   
 }
 */
+
+void GroupRelationData::preProcessAttributes(bool deserializing)
+{
+  if(deserializing)
+  {
+    //
+  }
+}
+
+
+void GroupRelationData::postProcessAttributes(bool deserializing)
+{
+  if(deserializing)
+  {
+    string cmdstring = "";
+    for (unsigned int i = 0 ; i< commands_.size() ; ++i)
+      cmdstring = cmdstring + commands_[i] + " ";
+
+    istringstream istr;
+    istr.str(cmdstring);
+    
+    cout << istr.str() << endl;
+
+    read(istr);
+  }
+}
+
+
+
+

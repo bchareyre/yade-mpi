@@ -15,7 +15,7 @@
 #include"Engine.hpp"
 #include"DisplayParameters.hpp"
 #include"BexContainer.hpp"
-//#include"groupRelationData.hpp"
+#include"GroupRelationData.hpp"
 
 class MetaBody : public Body
 {
@@ -37,7 +37,7 @@ class MetaBody : public Body
 		//! "hash maps" of display parameters
 		vector<shared_ptr<DisplayParameters> > dispParams;
 
-		//shared_ptr<GroupRelationData>           grpRelationData;
+		shared_ptr<GroupRelationData>           grpRelationData;
 
 		MetaBody();
 
@@ -59,6 +59,7 @@ class MetaBody : public Body
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(Body,
 		(tags)
+		(grpRelationData)
 		(engines)
 		(initializers)
 		(bodies)

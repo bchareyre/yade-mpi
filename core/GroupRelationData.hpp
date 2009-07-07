@@ -8,29 +8,18 @@
 
 #pragma once
 
+#include<yade/lib-serialization/Serializable.hpp>
+
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <map>
 #include <vector>
 
 using namespace std;
 
-//! \brief  Define the visibility and the parameters between groups of elements
+//! \brief  Define the parameters between groupMasks
 //! \author V. Richefeu
-
-// Note that the parameters of this class cannot be serialized yet
-
-
-// bool **act_
-// |
-// +------------------------------------+
-// |     |   1     2     4        ...   |  <---- groupMasks
-// | 1   |   YES   YES   YES      ...   |
-// | 2   |         NO    YES      ...   |
-// | 4   |  (SYM.)       YES      ...   |
-// | ... |                        ...   |
-// +------------------------------------+
-//   ^groupMasks 
 
 
 //  vector <double **> lpar_
@@ -54,21 +43,21 @@ using namespace std;
 //  |     ^groupMasks 
 //  ...
 
-class GroupRelationData
+class GroupRelationData : public Serializable
 {
   typedef map<string ,unsigned int > mapIdParam;
 
 private:
 
-  unsigned int ngrp_;                   // Number of groups
+  unsigned int ngrp_;                   // Number of groupMasks
   unsigned int npar_;                   // Number of parameters
 
   map <string ,unsigned int > idParam_; // Hash table for parameter identifiers
-  bool ** act_;                         // Table of visibility 
   vector <double **> lpar_;             // Table of parameter values
-// FIXME - the following should be better in particular for serialization (?)
-// vector<vector<bool> > act_;
-// vector<vector<vector<double> > > lpar_;
+
+  bool isActivated_;
+  //string commands_;
+  vector<string> commands_;
     
 public:
   
@@ -76,21 +65,8 @@ public:
   GroupRelationData(unsigned int ngrp); 
   ~GroupRelationData();
   
-  //! Return true if the body with groupMask g1 'see' the body with groupMask g2
-  //! \param g1  First groupMask
-  //! \param g2  Second groupMask  
-  bool act(unsigned int g1, unsigned int g2) const;
+  //void activate();
 
-  //! Activate the visibility of the bodies with groupMasks g1 and g2
-  //! \param g1  First groupMask
-  //! \param g2  Second groupMask  
-  void activate(unsigned int g1, unsigned int g2);
-  
-  //! Deactivate the visibility of the groups with groupMasks g1 and g2
-  //! \param g1  First groupMask
-  //! \param g2  Second groupMask
-  void deactivate(unsigned int g1, unsigned int g2);
-  
   //! Return true if the parameter exist
   //! \param name  Parameter name 
   bool exists(string name);
@@ -121,15 +97,15 @@ public:
   //! Add a new parameter
   void addParameter(string name);
   
-  //! 
-  void initActivator();
-  
-// Was used in the code gdm-tk, but not usefull in YADE
-/*
   void read(istream & is);  
   void write(ostream & os);
-*/
-  
 
+  REGISTER_ATTRIBUTES(/*no base*/,(commands_));
+  REGISTER_CLASS_AND_BASE(GroupRelationData,Serializable);
+ 
+  protected : virtual void preProcessAttributes  (bool deserializing);
+  public    : virtual void postProcessAttributes (bool deserializing);
 };
+REGISTER_SERIALIZABLE(GroupRelationData);
+
 
