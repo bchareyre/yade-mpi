@@ -34,7 +34,7 @@ mechanical behavior of mining rocks.
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
-		FUNCTOR2D(Dem3DofGeom,ElasticContactInteraction);
+		FUNCTOR2D(Dem3DofGeom,RpmPhys);
 		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_RockPMPhys_Rpm,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
 };
@@ -68,6 +68,7 @@ class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
 
 		FUNCTOR2D(RpmMat,RpmMat);
 		REGISTER_CLASS_AND_BASE(Ip2_RpmMat_RpmMat_RpmPhys,InteractionPhysicsEngineUnit);
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
 
@@ -75,14 +76,16 @@ REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
 class RpmPhys: public NormalShearInteraction {
 	private:
 	public:
-		Real crossSection, E, G;
+		Real crossSection, E, G,tangensOfFrictionAngle, tanFrictionAngle;
 
-		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0) { createIndex();}
+		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0),tangensOfFrictionAngle(0), tanFrictionAngle(0) { createIndex();}
 		virtual ~RpmPhys();
 
 		REGISTER_ATTRIBUTES(NormalShearInteraction,
 			(E)
 			(G)
+			(tangensOfFrictionAngle)
+			(tanFrictionAngle)
 		);
 	REGISTER_CLASS_AND_BASE(RpmPhys,NormalShearInteraction);
 };
