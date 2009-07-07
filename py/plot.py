@@ -25,6 +25,10 @@ def reset():
 	data={}; plots={}; plotsFilled={}; plotLines={}; needsFullReplot=True; 
 	pylab.close('all')
 
+def resetData():
+	global data
+	data={}
+
 # we could have a yplot class, that would hold: (yspec,...), (Line2d,Line2d,...) ?
 
 

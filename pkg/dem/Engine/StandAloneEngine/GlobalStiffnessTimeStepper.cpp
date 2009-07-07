@@ -128,6 +128,9 @@ bool GlobalStiffnessTimeStepper::isActivated()
 
 void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 {
+	// for some reason, this line is necessary to have correct functioning (no idea _why_)
+	// see scripts/test/compare-identical.py, run with or without active=active.
+	active=active;
 	computeStiffnesses(ncb);
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
