@@ -15,6 +15,8 @@ from _packPredicates import *
 # import SpherePack
 from _packSpheres import *
 
+from miniWm3Wrap import *
+
 class inGtsSurface_py(Predicate):
 	"""This class was re-implemented in c++, but should stay here to serve as reference for implementing
 	Predicates in pure python code. C++ allows us to play dirty tricks in GTS which are not accessible
@@ -73,9 +75,17 @@ def gtsSurface2Facets(surf,**kw):
 
 def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
 	"""Create swept suface (as GTS triangulation) given same-length sequences of points (as 3-tuples).
-	If threshold is given (>0), gts.Surface().cleanup(threshold) will be called before returning, which
-	removes vertices mutually closer than threshold. Can be used to create closed swept surface (revolved), as
-	we don't check for coincident vertices otherwise.
+
+	If threshold is given (>0), then
+
+	* degenerate faces (with edges shorter than threshold) will not be created
+	* gts.Surface().cleanup(threshold) will be called before returning, which merges vertices mutually
+		closer than threshold. In case your pts are closed (last point concident with the first one)
+		this will the surface strip of triangles. If you additionally have capStart==True and capEnd==True,
+		the surface will be closed.
+
+	Note: capStart and capEnd make the most naive polygon triangulation (diagonals) and will perhaps fail
+	for non-convex sections.
 	"""
 	if not len(set([len(pts1) for pts1 in pts]))==1: raise RuntimeError("Polylines must be all of the same length!")
 	vtxs=[[gts.Vertex(x,y,z) for x,y,z in pts1] for pts1 in pts]
@@ -85,12 +95,19 @@ def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
 		for j in range(0,len(vtxs[i])):
 			interSectEdges[i].append(gts.Edge(vtxs[i][j],vtxs[i+1][j]))
 			if j<len(vtxs[i])-1: interSectEdges[i].append(gts.Edge(vtxs[i][j],vtxs[i+1][j+1]))
+	if threshold>0: # replace edges of zero length with None; their faces will be skipped
+		def fixEdges(edges):
+			for i,e in enumerate(edges):
+				if (Vector3(e.v1.x,e.v1.y,e.v1.z)-Vector3(e.v2.x,e.v2.y,e.v2.z)).Length()<threshold: edges[i]=None
+		for ee in sectEdges: fixEdges(ee)
+		for ee in interSectEdges: fixEdges(ee)
 	surf=gts.Surface()
 	for i in range(0,len(vtxs)-1):
 		for j in range(0,len(vtxs[i])-1):
-			newFaces=gts.Face(interSectEdges[i][2*j+1],sectEdges[i+1][j],interSectEdges[i][2*j]),gts.Face(sectEdges[i][j],interSectEdges[i][2*j+2],interSectEdges[i][2*j+1])
-			for face in newFaces:
-				if face.is_ok: surf.add(face)
+			ee1=interSectEdges[i][2*j+1],sectEdges[i+1][j],interSectEdges[i][2*j]
+			ee2=sectEdges[i][j],interSectEdges[i][2*j+2],interSectEdges[i][2*j+1]
+			if None not in ee1: surf.add(gts.Face(interSectEdges[i][2*j+1],sectEdges[i+1][j],interSectEdges[i][2*j]))
+			if None not in ee2: surf.add(gts.Face(sectEdges[i][j],interSectEdges[i][2*j+2],interSectEdges[i][2*j+1]))
 	def doCap(vtx,edg,start):
 		ret=[]
 		eFan=[edg[0]]+[gts.Edge(vtx[i],vtx[0]) for i in range(2,len(vtx))]

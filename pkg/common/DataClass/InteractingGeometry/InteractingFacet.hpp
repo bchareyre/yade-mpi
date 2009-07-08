@@ -45,6 +45,8 @@ class InteractingFacet : public InteractingGeometry {
 		vector<Real> edgeAdjHalfAngle;
 	#endif
 
+	DECLARE_LOGGER;
+
 	protected:
 
 	void registerAttributes(); void postProcessAttributes(bool deserializing);
