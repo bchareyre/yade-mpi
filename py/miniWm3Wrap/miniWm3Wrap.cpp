@@ -6,7 +6,7 @@
 
 #include "__call_policies.pypp.hpp"
 
-#include "/home/vaclav/yade/trunk/py/miniWm3Wrap/miniWm3Wrap-toExpose.hpp"
+#include "miniWm3Wrap-toExpose.hpp"
 
 #include "miniWm3Wrap-funcs.ipp"
 
