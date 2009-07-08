@@ -66,6 +66,7 @@ public:
   ~GroupRelationData();
   
   //void activate();
+  bool isActivated() {return isActivated_;}
 
   //! Return true if the parameter exist
   //! \param name  Parameter name 
