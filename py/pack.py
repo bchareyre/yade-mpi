@@ -88,8 +88,9 @@ def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
 	surf=gts.Surface()
 	for i in range(0,len(vtxs)-1):
 		for j in range(0,len(vtxs[i])-1):
-			surf.add(gts.Face(interSectEdges[i][2*j+1],sectEdges[i+1][j],interSectEdges[i][2*j]))
-			surf.add(gts.Face(sectEdges[i][j],interSectEdges[i][2*j+2],interSectEdges[i][2*j+1]))
+			newFaces=gts.Face(interSectEdges[i][2*j+1],sectEdges[i+1][j],interSectEdges[i][2*j]),gts.Face(sectEdges[i][j],interSectEdges[i][2*j+2],interSectEdges[i][2*j+1])
+			for face in newFaces:
+				if face.is_ok: surf.add(face)
 	def doCap(vtx,edg,start):
 		ret=[]
 		eFan=[edg[0]]+[gts.Edge(vtx[i],vtx[0]) for i in range(2,len(vtx))]
