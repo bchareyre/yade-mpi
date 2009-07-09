@@ -22,6 +22,8 @@ Rock Particle Model (RockPM) is a set of classes for modelling
 mechanical behavior of mining rocks.
 */
 
+#pragma once
+
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
@@ -43,9 +45,12 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 /* This class holds information associated with each body */
 class RpmMat: public BodyMacroParameters {
 	public:
-		Real normYungConn, normInitLengthConn;
-		RpmMat(): normYungConn(0.) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (normYungConn));
+		int exampleNumber; //Number of "stone"
+		bool isDamaged;
+		Real stressCompressMax, stressTensionMax; //Parameters for damaging
+
+		RpmMat(): exampleNumber(0.), isDamaged(false), stressCompressMax(0), stressTensionMax(0) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (exampleNumber) (isDamaged) (stressCompressMax) (stressTensionMax));
 		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(RpmMat);
@@ -76,16 +81,19 @@ REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
 class RpmPhys: public NormalShearInteraction {
 	private:
 	public:
-		Real crossSection, E, G,tangensOfFrictionAngle, tanFrictionAngle;
+		Real crossSection,E,G,tanFrictionAngle,lengthMaxCompression,lengthMaxTension;
+		bool isCohesive;
 
-		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0),tangensOfFrictionAngle(0), tanFrictionAngle(0) { createIndex();}
+		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0), tanFrictionAngle(0), lengthMaxCompression(0), lengthMaxTension(0), isCohesive(false) { createIndex();}
 		virtual ~RpmPhys();
 
 		REGISTER_ATTRIBUTES(NormalShearInteraction,
 			(E)
 			(G)
-			(tangensOfFrictionAngle)
 			(tanFrictionAngle)
+			(isCohesive)
+			(lengthMaxCompression)
+			(lengthMaxTension)
 		);
 	REGISTER_CLASS_AND_BASE(RpmPhys,NormalShearInteraction);
 };

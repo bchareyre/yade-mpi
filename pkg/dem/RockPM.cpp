@@ -16,12 +16,11 @@
 **************************************************************************/
 
 #include"RockPM.hpp"
-#include"yade/pkg-dem/ElasticContactLaw.hpp"
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
+#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<yade/extra/Shop.hpp>
 
 
 YADE_PLUGIN("Law2_Dem3DofGeom_RockPMPhys_Rpm", "RpmMat","Ip2_RpmMat_RpmMat_RpmPhys","RpmPhys");
@@ -37,42 +36,25 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 	
 	Real displN=geom->displacementN();
 	
-	if(displN>0){rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
-	
-	phys->normalForce=phys->kn*displN*geom->normal;
-	
-	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
-	
-	Vector3r trialFs=phys->ks*geom->displacementT();
-	
-	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));} 
-	
-	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
-	
-}
-
-/*
-void Law2_Dem3DofGeom_SimplePhys_Simple::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
-	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
-	
-	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
-	
-	Real displN=geom->displacementN();
-	
-	if(displN>0){rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
-	
-	phys->normalForce=phys->kn*displN*geom->normal;
-	
-	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
-	
-	Vector3r trialFs=phys->ks*geom->displacementT();
-	
-	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));} 
-	
-	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
+	if((displN<=0)){
+/*Normal Interaction*/
+		phys->normalForce=phys->kn*displN*geom->normal;
+		Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tanFrictionAngle,2);
+		Vector3r trialFs=phys->ks*geom->displacementT();
+		if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));} 
+		applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
+/*Normal Interaction_____*/
+		return;
+	} else if ((displN>0)&&(phys->isCohesive)){
+		if (displN<(phys->lengthMaxTension)) {
+			rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+		}
+		rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+	} else {
+		rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;
+	}
 	
 }
-*/
 
 
 CREATE_LOGGER(Ip2_RpmMat_RpmMat_RpmPhys);
@@ -82,7 +64,10 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
 	assert(contGeom);
-
+	
+	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
+	const shared_ptr<RpmMat>& rpm2=YADE_PTR_CAST<RpmMat>(pp2);
+	
 	const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
 	const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
 
@@ -96,6 +81,15 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	contPhys->crossSection=S12;
 	contPhys->kn=contPhys->E*contPhys->crossSection;
 	contPhys->ks=contPhys->G*contPhys->crossSection;
+	
+	contPhys->lengthMaxCompression=S12*(rpm2->stressCompressMax)/(contPhys->kn);
+	contPhys->lengthMaxTension=S12*(rpm2->stressTensionMax)/(contPhys->kn);
+	
+	//If 2 bodies were not damaged previously, and they belong to 1 example (stone), they can be cohesive
+	if ((rpm1->exampleNumber==rpm2->exampleNumber)&&(!(rpm1->isDamaged||rpm2->isDamaged))) {
+		contPhys->isCohesive=true;
+	}
+	
 	interaction->interactionPhysics=contPhys;
 }
 
