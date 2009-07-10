@@ -23,7 +23,7 @@ class TimeStepper : public StandAloneEngine
 
 		TimeStepper();
 		virtual void computeTimeStep(MetaBody* ) { throw; };
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 		virtual void action(MetaBody* b) { computeTimeStep(b);} ;
 		void setActive(bool a, int nb=-1);
 

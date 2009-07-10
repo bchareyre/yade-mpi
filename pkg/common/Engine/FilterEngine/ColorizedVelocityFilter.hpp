@@ -42,7 +42,7 @@ class ColorizedVelocityFilter : public FilterEngine {
 		ColorizedVelocityFilter();
 		virtual ~ColorizedVelocityFilter();
 	
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 		virtual void applyCondition(MetaBody*);
 	
 		virtual void registerAttributes();

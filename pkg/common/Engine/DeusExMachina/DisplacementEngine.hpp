@@ -20,7 +20,7 @@ class DisplacementEngine : public DeusExMachina
 		void applyCondition(MetaBody *);
 		bool active;
 		DisplacementEngine():active(true){};
-		bool isActivated();
+		bool isActivated(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool);

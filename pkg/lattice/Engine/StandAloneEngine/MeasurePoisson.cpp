@@ -52,7 +52,7 @@ void MeasurePoisson::registerAttributes()
 }
 
 
-bool MeasurePoisson::isActivated()
+bool MeasurePoisson::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

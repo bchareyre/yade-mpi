@@ -43,7 +43,7 @@ void AveragePositionRecorder::registerAttributes()
 }
 
 
-bool AveragePositionRecorder::isActivated()
+bool AveragePositionRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

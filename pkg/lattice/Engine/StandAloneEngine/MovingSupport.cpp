@@ -79,7 +79,7 @@ void MovingSupport::registerAttributes()
 }
 
 
-bool MovingSupport::isActivated()
+bool MovingSupport::isActivated(MetaBody*)
 {
 	return true;
 }

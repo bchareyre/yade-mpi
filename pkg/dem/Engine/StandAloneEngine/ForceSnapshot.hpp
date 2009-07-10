@@ -33,7 +33,7 @@ class ForceSnapshot : public DataRecorder
 		ForceSnapshot ();
 		~ForceSnapshot ();
 		virtual void action(MetaBody*);
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

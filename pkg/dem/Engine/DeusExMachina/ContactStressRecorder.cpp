@@ -78,7 +78,7 @@ void ContactStressRecorder::registerAttributes()
 }
 
 
-bool ContactStressRecorder::isActivated()
+bool ContactStressRecorder::isActivated(MetaBody*)
 {
 	return ( ( Omega::instance().getCurrentIteration() % interval == 0 ) && ( ofile ) );
 }

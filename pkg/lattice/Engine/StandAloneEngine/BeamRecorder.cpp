@@ -104,7 +104,7 @@ void BeamRecorder::registerAttributes()
 }
 
 
-bool BeamRecorder::isActivated()
+bool BeamRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

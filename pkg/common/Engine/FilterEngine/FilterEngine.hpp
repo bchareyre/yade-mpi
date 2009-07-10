@@ -17,7 +17,7 @@ class FilterEngine : public DeusExMachina {
 		/// Activation of the filter
 		bool isFilterActivated;
 
-		bool isActivated();
+		bool isActivated(MetaBody*);
 
 		FilterEngine();
 	

@@ -48,7 +48,7 @@ void ForceSnapshot::registerAttributes()
 	REGISTER_ATTRIBUTE(i);
 }
 
-bool ForceSnapshot::isActivated()
+bool ForceSnapshot::isActivated(MetaBody*)
 {
 	vector<int>::const_iterator ii = list_id.begin();
 	vector<int>::const_iterator iiEnd = list_id.end();

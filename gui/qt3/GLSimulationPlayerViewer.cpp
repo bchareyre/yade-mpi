@@ -230,6 +230,7 @@ void GLSimulationPlayerViewer::refreshFilters()
 
 bool GLSimulationPlayerViewer::loadNextRecordedData(){
 	if(xyzNamesIter==xyzNames.end()) return false;
+	MetaBody* rootBody=Omega::instance().getRootBody().get();
 	if(!useSQLite){
 		fileName=*(xyzNamesIter++);
 		iostreams::filtering_istream f; if(boost::algorithm::ends_with(fileName,".bz2")) f.push(iostreams::bzip2_decompressor()); f.push(iostreams::file_source(fileName));
@@ -243,7 +244,7 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 		simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" "+fileName+(doRgb?" (+rgb)":""));
 		if(!f.good()){LOG_FATAL("Snapshot file "<<fileName<<" could not be opened for reading (fatal, ending sequence)?!"); return false;}
 		LOG_TRACE(fileName);
-		size_t nBodies=Omega::instance().getRootBody()->bodies->size();
+		size_t nBodies=rootBody->bodies->size();
 		for(unsigned long id=0; !f.eof() && !f.fail() && id<nBodies; id++){
 			shared_ptr<Body> b=Body::byId(id);
 			if(!b){ LOG_ERROR("Body #"<<id<<" doesn't exist (skipped)!"); continue; }
@@ -286,11 +287,11 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 			if(col_rgb_b>=0) b->geometricalModel->diffuseColor[2]=reader.getdouble(col_rgb_b);
 		}
 		Omega::instance().setCurrentIteration(con->executeint("select iter from 'records' where bodyTable='"+tableName+"';"));
-		Omega::instance().getRootBody()->simulationTime=con->executedouble("select virtTime from 'records' where bodyTable='"+tableName+"';");
+		rootBody->simulationTime=con->executedouble("select virtTime from 'records' where bodyTable='"+tableName+"';");
 		realTime=con->executedouble("select realTime from 'records' where bodyTable='"+tableName+"';");
 		wallClock=con->executedouble("select wallClock from 'records' where bodyTable='"+tableName+"';");
 	}
-	FOREACH(const shared_ptr<FilterEngine>& e, filters) { if(e->isActivated()) e->action(Omega::instance().getRootBody().get()); }
+	FOREACH(const shared_ptr<FilterEngine>& e, filters) { if(e->isActivated(rootBody)) e->action(rootBody); }
 	return true;
 }
 

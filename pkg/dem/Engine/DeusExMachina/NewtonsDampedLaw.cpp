@@ -14,18 +14,6 @@
 
 YADE_PLUGIN("NewtonsDampedLaw");
 
-void NewtonsDampedLaw::registerAttributes()
-{
-	DeusExMachina::registerAttributes(); // register (among other) Engine::label
-	REGISTER_ATTRIBUTE(damping);
-}
-
-
-NewtonsDampedLaw::NewtonsDampedLaw()
-{
-	damping = 0.2;
-}
-
 void NewtonsDampedLaw::cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration){
 	for(int i=0; i<3; i++){
 		angularAcceleration[i]*= 1 - damping*Mathr::Sign ( m[i]*(angularVelocity[i] + (Real) 0.5 *dt*angularAcceleration[i]) );
@@ -70,12 +58,15 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 			// clumpRBP->{acceleration,angularAcceleration} are reset byt Clump::moveMembers, it is ok to just increment here
 			clumpRBP->acceleration+=diffClumpAccel;
 			clumpRBP->angularAcceleration+=diffClumpAngularAccel;
+			maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
 			continue;
 		}
 
 		assert(!b->isClumpMember());
 		// damping: applied to non-clumps only, as clumps members were already damped above
 		if(!b->isClump()) cundallDamp(dt,f,rb->velocity,rb->acceleration,m,rb->angularVelocity,rb->angularAcceleration);
+
+		maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
 
 		// blocking DOFs
 		if(rb->blockedDOFs==0){ /* same as: rb->blockedDOFs==PhysicalParameters::DOF_NONE */

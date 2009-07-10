@@ -49,7 +49,7 @@ void HistoryRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(stateId);
 }
 
-bool HistoryRecorder::isActivated()
+bool HistoryRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0));
 }

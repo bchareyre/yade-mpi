@@ -23,9 +23,9 @@ ColorizedLayerFilter::~ColorizedLayerFilter()
 {
 }
 
-bool ColorizedLayerFilter::isActivated()
+bool ColorizedLayerFilter::isActivated(MetaBody* rootBody)
 {
-	return FilterEngine::isActivated() 
+	return FilterEngine::isActivated(rootBody) 
 		&& ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 

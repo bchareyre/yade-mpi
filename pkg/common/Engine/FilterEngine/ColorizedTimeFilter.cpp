@@ -35,9 +35,9 @@ ColorizedTimeFilter::~ColorizedTimeFilter()
 {
 }
 
-bool ColorizedTimeFilter::isActivated()
+bool ColorizedTimeFilter::isActivated(MetaBody* rootBody)
 {
-	return FilterEngine::isActivated();
+	return FilterEngine::isActivated(rootBody);
 }
 
 void ColorizedTimeFilter::registerAttributes()

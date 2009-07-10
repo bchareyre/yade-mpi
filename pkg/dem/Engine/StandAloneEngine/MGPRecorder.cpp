@@ -45,7 +45,7 @@ void MGPRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(stateId);
 }
 
-bool MGPRecorder::isActivated()
+bool MGPRecorder::isActivated(MetaBody*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }

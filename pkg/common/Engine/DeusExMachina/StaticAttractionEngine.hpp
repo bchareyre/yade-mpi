@@ -18,7 +18,7 @@ class StaticAttractionEngine : public DeusExMachina
 		void applyCondition(MetaBody *);
 		bool active;
 		StaticAttractionEngine() : active(true) {};
-		virtual bool isActivated() { return active; };
+		virtual bool isActivated(MetaBody*) { return active; };
 
 	protected :
 		virtual Real getMaxDisplacement(MetaBody*) {throw "do not use StaticAttractionEngine directly, use derived classes instead.";};

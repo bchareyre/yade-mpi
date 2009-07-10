@@ -35,9 +35,9 @@ ColorizedVelocityFilter::~ColorizedVelocityFilter()
 {
 }
 
-bool ColorizedVelocityFilter::isActivated()
+bool ColorizedVelocityFilter::isActivated(MetaBody* rootBody)
 {
-	return FilterEngine::isActivated();
+	return FilterEngine::isActivated(rootBody);
 }
 
 void ColorizedVelocityFilter::registerAttributes()

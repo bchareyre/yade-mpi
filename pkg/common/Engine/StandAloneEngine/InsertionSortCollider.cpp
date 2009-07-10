@@ -4,6 +4,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
+#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 
 #include<algorithm>
 #include<vector>
@@ -59,12 +60,26 @@ void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer
 	}
 }
 
+#ifdef COLLIDE_STRIDED
+	bool InsertionSortCollider::isActivated(MetaBody* rb){
+		// activated if number of bodies changes (hence need to refresh collision information)
+		// or the time of scheduled run already came, or we were never scheduled yet
+		if(stride<=1) return true;
+		bool ret=XX.size()!=2*rb->bodies->size() || scheduledRun<0 || rb->simulationTime>=scheduledRun;
+		// we wouldn't run in this step; just delete pending interactions
+		// this could be done in ::action, but it would make the call counters not reflect the stride
+		if(!ret) rb->interactions->erasePending(*this);
+		return ret;
+	}
+#endif
+
 void InsertionSortCollider::action(MetaBody* rb){
-	//timingDeltas->start();
+	// timingDeltas->start();
 
 	size_t nBodies=rb->bodies->size();
 	InteractionContainer* interactions=rb->interactions.get();
-
+	
+	// bite: conditions that make it necessary to run collider even if not scheduled are in isActivated
 
 	// pre-conditions
 		// adjust storage size
@@ -88,8 +103,31 @@ void InsertionSortCollider::action(MetaBody* rb){
 		}
 		if(minima.size()!=3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
 		assert(XX.size()==2*rb->bodies->size());
+		#ifdef COLLIDE_STRIDED
+			// get the BoundingVolumeMetaEngine and turn it off; we will call it ourselves
+			if(!boundDispatcher){
+				FOREACH(shared_ptr<Engine>& e, rb->engines){ boundDispatcher=dynamic_pointer_cast<BoundingVolumeMetaEngine>(e); if(boundDispatcher) break; }
+				if(!boundDispatcher){ LOG_FATAL("Unable to locate BoundingVolumeMetaEngine within engines, aborting."); throw runtime_error("Explanation above"); }
+				boundDispatcher->activated=false; // deactive the engine, we will call it ourselves from now (just when needed)
+			}
+		#endif
+	// timingDeltas->checkpoint("init");
 
-	//timingDeltas->checkpoint("setup");
+		#ifdef COLLIDE_STRIDED
+			// FIXME: should be able to adapt stride based on the potential_interaction_count_increase/stride_speedup tradeoff
+			// this depends on the packing density, for instance, maximum velocities/accels etc.
+			if(stride>1 && sweepTimeFactor<1 && sweepVelocity<=0){ LOG_WARN("Stride is "<<stride<<", but no sweeping effective!! Setting stride back to 1."); stride=1; }
+			if(stride>1){
+				//schedule next run
+				scheduledRun=rb->simulationTime+rb->dt*(stride-.5); // -.5 to avoid rounding issues
+				if(sweepTimeFactor>=1) boundDispatcher->sweepTime=rb->dt*stride*sweepTimeFactor;
+				if(sweepVelocity>0) boundDispatcher->sweepDist=rb->dt*stride*sweepVelocity;
+			} else { scheduledRun=-1; boundDispatcher->sweepTime=-1; boundDispatcher->sweepDist=0; }
+			boundDispatcher->action(rb);
+		#endif
+	// timingDeltas->checkpoint("bound");
+
+
 
 	// copy bounds along given axis into our arrays
 		for(size_t i=0; i<2*nBodies; i++){
@@ -107,7 +145,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 			}
 		}
 
-	//timingDeltas->checkpoint("copy");
+	// timingDeltas->checkpoint("copy");
 
 	// process interactions that the constitutive law asked to be erased
 	interactions->erasePending(*this);
@@ -167,5 +205,5 @@ void InsertionSortCollider::action(MetaBody* rb){
 				}
 			}
 		}
-	//timingDeltas->checkpoint("sort&collide");
+	// timingDeltas->checkpoint("sort&collide");
 }

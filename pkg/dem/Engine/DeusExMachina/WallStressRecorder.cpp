@@ -63,7 +63,7 @@ void WallStressRecorder::registerAttributes()
 }
 
 
-bool WallStressRecorder::isActivated()
+bool WallStressRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

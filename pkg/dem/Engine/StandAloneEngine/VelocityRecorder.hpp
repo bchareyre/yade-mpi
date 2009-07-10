@@ -25,7 +25,7 @@ class VelocityRecorder : public DataRecorder
 		VelocityRecorder ();
 		virtual void registerAttributes();
 		virtual void action(MetaBody*);
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

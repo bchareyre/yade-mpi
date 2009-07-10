@@ -86,7 +86,7 @@ void NodeRecorder::registerAttributes()
 }
 
 
-bool NodeRecorder::isActivated()
+bool NodeRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

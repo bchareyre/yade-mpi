@@ -64,7 +64,7 @@ void TriaxialStateRecorder::registerAttributes()
 }
 
 
-bool TriaxialStateRecorder::isActivated()
+bool TriaxialStateRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

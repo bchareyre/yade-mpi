@@ -31,7 +31,7 @@ public :
     ~SimpleViscoelasticSpheresInteractionRecorder();
 
     virtual void action(MetaBody*);
-    bool isActivated();
+    bool isActivated(MetaBody*);
 
 protected :
     virtual void postProcessAttributes(bool deserializing);

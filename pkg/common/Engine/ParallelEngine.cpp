@@ -22,7 +22,7 @@ void ParallelEngine::action(MetaBody* rootBody){
 		// run every slave group sequentially
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {
 			//cerr<<"["<<omp_get_thread_num()<<":"<<e->getClassName()<<"]";
-			if(e->isActivated()) e->action(rootBody);
+			if(e->isActivated(rootBody)) e->action(rootBody);
 		}
 	}
 }

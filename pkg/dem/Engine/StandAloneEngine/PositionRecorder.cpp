@@ -46,7 +46,7 @@ void PositionRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(endId);
 }
 
-bool PositionRecorder::isActivated()
+bool PositionRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

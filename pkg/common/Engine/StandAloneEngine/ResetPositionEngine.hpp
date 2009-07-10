@@ -19,7 +19,7 @@
 class ResetPositionEngine : public PeriodicEngine {
 	public:
 		void action(MetaBody*);
-		bool isActivated() {if (first) return true; else return PeriodicEngine::isActivated();}
+		bool isActivated(MetaBody* rootBody) {if (first) return true; else return PeriodicEngine::isActivated(rootBody);}
 		ResetPositionEngine();
 
 		Real Y_min;

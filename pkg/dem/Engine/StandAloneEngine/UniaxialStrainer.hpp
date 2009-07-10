@@ -25,7 +25,7 @@ class UniaxialStrainer: public StandAloneEngine {
 		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->physicalParameters->se3.position[axis]; };
 		void init();
 	public:
-		virtual bool isActivated(){return active;}
+		virtual bool isActivated(MetaBody*){return active;}
 		//! strain rate, starting at 0, linearly raising to strainRate
 		Real strainRate,currentStrainRate;
 		//! alternatively, absolute speed of boundary motion can be specified; this is effective only at the beginning and if strainRate is not set; changing absSpeed directly during simulation wil have no effect.

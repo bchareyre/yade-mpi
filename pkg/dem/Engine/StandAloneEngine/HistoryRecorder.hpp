@@ -23,7 +23,7 @@ public :
 	HistoryRecorder ();
 	~HistoryRecorder ();
 	virtual void action(MetaBody*);
-	virtual bool isActivated();
+	virtual bool isActivated(MetaBody*);
 
 protected :
 

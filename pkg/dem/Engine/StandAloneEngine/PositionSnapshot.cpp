@@ -44,7 +44,7 @@ void PositionSnapshot::registerAttributes()
 	REGISTER_ATTRIBUTE(i);
 }
 
-bool PositionSnapshot::isActivated()
+bool PositionSnapshot::isActivated(MetaBody*)
 {
 	vector<int>::const_iterator ii = list_id.begin();
 	vector<int>::const_iterator iiEnd = list_id.end();

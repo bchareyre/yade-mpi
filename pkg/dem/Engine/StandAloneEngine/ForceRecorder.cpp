@@ -59,7 +59,7 @@ void ForceRecorder::registerAttributes()
 }
 
 
-bool ForceRecorder::isActivated()
+bool ForceRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

@@ -8,8 +8,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "TimeStepper.hpp"
-#include "StandAloneEngine.hpp"
+#include<yade/core/TimeStepper.hpp>
+#include<yade/core/StandAloneEngine.hpp>
+#include<yade/core/MetaBody.hpp>
 
 TimeStepper::TimeStepper() : StandAloneEngine()
 {	
@@ -18,9 +19,9 @@ TimeStepper::TimeStepper() : StandAloneEngine()
 }
 
 
-bool TimeStepper::isActivated()
+bool TimeStepper::isActivated(MetaBody* mb)
 {
-	return (active && (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0));
+	return (active && (mb->currentIteration % timeStepUpdateInterval == 0));
 }
 
 

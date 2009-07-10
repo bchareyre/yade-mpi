@@ -20,7 +20,7 @@ GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEn
 }
 
 
-bool GeometricalModelForceColorizer::isActivated()
+bool GeometricalModelForceColorizer::isActivated(MetaBody*)
 {
 	return true;
 //	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));

@@ -48,7 +48,7 @@ void StrainRecorder::registerAttributes()
 }
 
 
-bool StrainRecorder::isActivated()
+bool StrainRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

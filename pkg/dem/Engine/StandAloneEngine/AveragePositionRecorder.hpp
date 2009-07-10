@@ -19,7 +19,7 @@ class AveragePositionRecorder : public DataRecorder
 		AveragePositionRecorder ();
 		
 		virtual void action(MetaBody*);
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 	
 		virtual void registerAttributes();
 

@@ -46,7 +46,7 @@ class ColorizedTimeFilter : public FilterEngine {
 		ColorizedTimeFilter();
 		virtual ~ColorizedTimeFilter();
 	
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 		virtual void applyCondition(MetaBody*);
 	
 		virtual void registerAttributes();

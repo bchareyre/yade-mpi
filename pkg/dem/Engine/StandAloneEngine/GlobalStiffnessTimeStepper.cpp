@@ -120,7 +120,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromInteraction(const shared_ptr<In
 
 }
 
-bool GlobalStiffnessTimeStepper::isActivated()
+bool GlobalStiffnessTimeStepper::isActivated(MetaBody*)
 {
 	return (active && ((!computedOnce) || (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0) || (Omega::instance().getCurrentIteration() < (long int) 2) ));
 }

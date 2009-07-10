@@ -38,7 +38,7 @@ void DisplacementEngine::registerAttributes()
 	REGISTER_ATTRIBUTE(active);
 }
 
-bool DisplacementEngine::isActivated()
+bool DisplacementEngine::isActivated(MetaBody*)
 {
    return active;
 }

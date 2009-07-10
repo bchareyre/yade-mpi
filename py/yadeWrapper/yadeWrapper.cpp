@@ -165,7 +165,11 @@ BASIC_PY_PROXY_HEAD(pyPhysicalParameters,PhysicalParameters)
 	void ori_set(python::list l){if(python::len(l)!=4) throw invalid_argument("Wrong number of quaternion elements "+lexical_cast<string>(python::len(l))+", should be 4"); proxee->se3.orientation=Quaternionr(Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])()),python::extract<double>(l[3])());}
 BASIC_PY_PROXY_TAIL;
 
-BASIC_PY_PROXY(pyBoundingVolume,BoundingVolume);
+BASIC_PY_PROXY_HEAD(pyBoundingVolume,BoundingVolume)
+	Vector3r min_get(){return proxee->min;}
+	Vector3r max_get(){return proxee->max;}
+BASIC_PY_PROXY_TAIL;
+
 BASIC_PY_PROXY(pyInteractingGeometry,InteractingGeometry);
 
 struct pyTimingDeltas{
@@ -417,6 +421,7 @@ class pyInteractionContainer{
 		void clear(){proxee->clear();}
 		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(pyInteraction(I));} return ret;}
 		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(pyInteraction(I));} return ret; }
+		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
 };
 
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
@@ -754,6 +759,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
+		.def("countReal",&pyInteractionContainer::countReal)
 		.def("nth",&pyInteractionContainer::pyNth)
 		.def("withBody",&pyInteractionContainer::withBody)
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll)
@@ -813,7 +819,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("displ",&pyPhysicalParameters::displ_get)
 		.add_property("rot",&pyPhysicalParameters::rot_get)
 		;
-	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"BoundingVolume");
+	BASIC_PY_PROXY_WRAPPER(pyBoundingVolume,"BoundingVolume")	
+		.add_property("min",&pyBoundingVolume::min_get)
+		.add_property("max",&pyBoundingVolume::max_get);
 	BASIC_PY_PROXY_WRAPPER(pyInteractionGeometry,"InteractionGeometry");
 	BASIC_PY_PROXY_WRAPPER(pyInteractionPhysics,"InteractionPhysics");
 

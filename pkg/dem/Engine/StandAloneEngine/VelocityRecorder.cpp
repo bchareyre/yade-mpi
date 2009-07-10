@@ -39,7 +39,7 @@ void VelocityRecorder::registerAttributes()
 }
 
 
-bool VelocityRecorder::isActivated()
+bool VelocityRecorder::isActivated(MetaBody*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }

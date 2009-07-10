@@ -19,7 +19,7 @@ class PeriodicEngine:  public StandAloneEngine {
 		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast,nDo,nDone;
 		bool initRun;
 		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0),nDo(-1),nDone(0),initRun(false) { realLast=getClock(); }
-		virtual bool isActivated(){
+		virtual bool isActivated(MetaBody*){
 			Real virtNow=Omega::instance().getSimulationTime();
 			Real realNow=getClock();
 			long iterNow=Omega::instance().getCurrentIteration();
@@ -75,7 +75,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 	Real realLim, virtLim; long iterLim;
 	Real stretchFactor;
 	bool mayStretch;
-	virtual bool isActivated(){
+	virtual bool isActivated(MetaBody* rootBody){
 		assert(stretchFactor>0);
 		if(iterLim==0 && iterPeriod!=0){iterLim=iterPeriod;} else if(iterLim!=0 && iterPeriod==0){iterPeriod=iterLim;}
 		if(realLim==0 && realPeriod!=0){realLim=realPeriod;} else if(realLim!=0 && realPeriod==0){realPeriod=realLim;}
@@ -85,7 +85,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 		mayStretch=((virtPeriod<0 || (stretchFactor>1 ? stretchFactor*virtPeriod<=virtLim : stretchFactor*virtPeriod>=virtLim))
 		&& (realPeriod<0 || (stretchFactor>1 ? stretchFactor*realPeriod<=realLim : stretchFactor*realPeriod>=realLim))
 		&& (iterPeriod<0 || (stretchFactor>1 ? stretchFactor*iterPeriod<=iterLim : stretchFactor*iterPeriod>=iterLim)));
-		return PeriodicEngine::isActivated();
+		return PeriodicEngine::isActivated(rootBody);
 	}
 	protected:
 		void registerAttributes(){ PeriodicEngine::registerAttributes();
@@ -135,7 +135,7 @@ class __attribute__((deprecated)) RangePeriodicEngine: public StandAloneEngine {
 	public :
 		RangePeriodicEngine(): virtTimeLim(-1,0,0),realTimeLim(-1,0,0),iterLim(-1,0,0), lastRealTime(0.),lastVirtTime(0.),lastIter(0),mayDouble(false),mayHalve(false),perhapsInconsistent(true){};
 		virtual void action(MetaBody* b) { throw; }
-		virtual bool isActivated(){
+		virtual bool isActivated(MetaBody* rootBody){
 			if(perhapsInconsistent){ ensureConsistency(virtTimeLim); ensureConsistency(realTimeLim); ensureConsistency(iterLim); perhapsInconsistent=false; }
 
 			mayDouble=((virtTimeLim[0]<0 || 2*virtTimeLim[1]<=virtTimeLim[2]) && (realTimeLim[0]<0 || 2*realTimeLim[1]<=realTimeLim[2]) && (iterLim[0]<0 || 2*iterLim[1]<=iterLim[2]));

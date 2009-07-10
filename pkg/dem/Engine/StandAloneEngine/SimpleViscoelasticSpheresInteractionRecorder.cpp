@@ -39,7 +39,7 @@ void SimpleViscoelasticSpheresInteractionRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(interval);
 }
 
-bool SimpleViscoelasticSpheresInteractionRecorder::isActivated()
+bool SimpleViscoelasticSpheresInteractionRecorder::isActivated(MetaBody*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }

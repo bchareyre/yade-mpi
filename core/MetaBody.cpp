@@ -78,14 +78,14 @@ void MetaBody::postProcessAttributes(bool deserializing)
 void MetaBody::moveToNextTimeStep()
 {
 	if(needsInitializers){
-		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated()) e->action(this); }
+		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated(this)) e->action(this); }
 		bex.resize(bodies->size());
 		needsInitializers=false;
 	}
 	//bex.reset(); // uncomment if PhysicalActionContainerReseter is removed
 	TimingInfo::delta last=TimingInfo::getNow();
 	FOREACH(const shared_ptr<Engine>& e, engines){
-		if(e->isActivated()){
+		if(e->isActivated(this)){
 			e->action(this);
 			if(TimingInfo::enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}

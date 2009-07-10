@@ -39,7 +39,7 @@ void RigidBodyRecorder::registerAttributes()
 	REGISTER_ATTRIBUTE(interval);
 }
 
-bool RigidBodyRecorder::isActivated()
+bool RigidBodyRecorder::isActivated(MetaBody*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }

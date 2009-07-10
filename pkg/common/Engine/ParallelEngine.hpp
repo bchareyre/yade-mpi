@@ -7,7 +7,7 @@ class ParallelEngine: public Engine {
 		ParallelEngine(){};
 		virtual ~ParallelEngine(){};
 		virtual void action(MetaBody*);
-		virtual bool isActivated(){return true;}
+		virtual bool isActivated(MetaBody*){return true;}
 		virtual list<string> getNeededBex();		
 	protected:
 		void registerAttributes(){Engine::registerAttributes(); REGISTER_ATTRIBUTE(slaves); }

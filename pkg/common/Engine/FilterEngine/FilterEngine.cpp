@@ -14,7 +14,7 @@ FilterEngine::FilterEngine() : DeusExMachina(), isFilterActivated(true)
 {
 }
 
-bool FilterEngine::isActivated() 
+bool FilterEngine::isActivated(MetaBody*) 
 {
 	return FilterEngine::isFiltrationActivated && isFilterActivated; 
 }

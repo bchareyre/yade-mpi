@@ -42,9 +42,9 @@ void CapillaryRecorder::registerAttributes()
 }
 
 
-bool CapillaryRecorder::isActivated()
+bool CapillaryRecorder::isActivated(MetaBody* rootBody)
 {
-	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
+	return ((rootBody->currentIteration % interval == 0) && (ofile));
 }
 
 

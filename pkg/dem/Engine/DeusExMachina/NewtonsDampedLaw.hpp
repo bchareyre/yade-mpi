@@ -33,22 +33,17 @@ NOTE: Cundall damping affected dynamic simulation! See examples/dynamic_simulati
  */
 
 
-class NewtonsDampedLaw : public DeusExMachina
-{
+class NewtonsDampedLaw : public DeusExMachina{
 	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
-	public :
+	public:
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;
-	public :
-		virtual	void applyCondition(MetaBody *);		
-		NewtonsDampedLaw();
-	
-	protected :
-		virtual void registerAttributes();
-
-	REGISTER_CLASS_NAME(NewtonsDampedLaw);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+		/// store square of max. velocity, for informative purposes
+		Real maxVelocitySq;
+		virtual void applyCondition(MetaBody *);		
+		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(0){}
+	REGISTER_ATTRIBUTES(DeusExMachina,(damping)(maxVelocitySq));
+	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,DeusExMachina);
 };
-
 REGISTER_SERIALIZABLE(NewtonsDampedLaw);
 

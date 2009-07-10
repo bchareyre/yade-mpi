@@ -30,7 +30,7 @@ class StrainRecorder : public DataRecorder
 
 		virtual void registerAttributes();
 		virtual void action(MetaBody*);
-		virtual bool isActivated();
+		virtual bool isActivated(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

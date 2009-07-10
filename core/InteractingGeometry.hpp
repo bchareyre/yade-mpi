@@ -11,15 +11,16 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
-class BoundingVolume;
-
 // the geometry through which the body will interact:
 // - planet emitting gravity has just radius of influence
 // - magnet has also just volume of influence
 // - for tetrahedrons we can use sphere tree or sweptshpere volume
 //
-// in general we can use it to initialize interaction, and sometimes to terminate it
-// (depending in which container it is stored).
+// in general we can use it to initialize interaction
+
+#define BV_FUNCTOR_CACHE
+
+class BoundingVolumeEngineUnit;
 
 class InteractingGeometry : public Serializable, public Indexable
 {
@@ -27,6 +28,10 @@ class InteractingGeometry : public Serializable, public Indexable
 		InteractingGeometry(){diffuseColor=Vector3r(1,1,1);}
 		Vector3r diffuseColor;	// FIXME - why here? and then - why no
 					// bool wire; even though GeometricalModel has bool wire ?
+
+		#ifdef BV_FUNCTOR_CACHE
+			shared_ptr<BoundingVolumeEngineUnit> boundFunctor;
+		#endif
 	
 /// Serialization
 	REGISTER_ATTRIBUTES(/*no base*/,(diffuseColor));
@@ -34,7 +39,6 @@ class InteractingGeometry : public Serializable, public Indexable
 /// Indexable
 	REGISTER_INDEX_COUNTER(InteractingGeometry);
 };
-
 REGISTER_SERIALIZABLE(InteractingGeometry);
 
 
