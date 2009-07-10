@@ -1,3 +1,6 @@
+#
+# chec kvisually whether swept bounding boxes work as expected
+#
 
 O.bodies.append([
 	utils.facet([[1,0,0],[-1,2,0],[-1,-2,0]]),
@@ -22,15 +25,14 @@ from yade import timing,qt,log
 try:
 	renderer=qt.Renderer()
 	renderer['Body_bounding_volume']=True
+	qt.Controller(); qt.View()
 except ImportError: pass
 
 O.timingEnabled=True
 isc['stride']=3
-isc['sweepDistSafetyFactor']=.1
-isc['sweepTimeSafetyFactor']=.1
+isc['sweepTimeFactor']=1.1
+isc['sweepVelocity']=1000
 #log.setLevel('InsertionSortCollider',log.DEBUG)
 #log.setLevel('BoundingVolumeMetaEngine',log.DEBUG)
 O.saveTmp()
-#O.run(10000,True)
-#timing.stats()
 O.step()
