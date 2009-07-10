@@ -25,6 +25,7 @@ void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
 {
 	ncb->bex.sync();
 	Real dt=Omega::instance().getTimeStep();
+	maxVelocitySq=-1;
 
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		// clump members are non-dynamic; they skip the rest of loop once their forces are properly taken into account, however

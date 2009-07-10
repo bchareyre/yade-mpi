@@ -143,7 +143,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 	env.SharedLibrary('SpheresFactory',['Engine/StandAloneEngine/SpheresFactory.cpp'],
 		LIBS=env['LIBS']+['AABB','InteractingSphere','Facet','Sphere','BodyMacroParameters','InteractionGeometryMetaEngine']),
 	env.SharedLibrary('SpatialQuickSortCollider',['Engine/StandAloneEngine/SpatialQuickSortCollider.cpp']),
-	env.SharedLibrary('InsertionSortCollider',['Engine/StandAloneEngine/InsertionSortCollider.cpp'],LIBS=env['LIBS']+['BoundingVolumeMetaEngine']),
+	env.SharedLibrary('InsertionSortCollider',['Engine/StandAloneEngine/InsertionSortCollider.cpp'],LIBS=env['LIBS']+['BoundingVolumeMetaEngine','NewtonsDampedLaw']),
 	env.SharedLibrary('PersistentSAPCollider',['Engine/StandAloneEngine/PersistentSAPCollider.cpp']),
 	env.SharedLibrary('DistantPersistentSAPCollider',['Engine/StandAloneEngine/DistantPersistentSAPCollider.cpp']),
 	env.SharedLibrary('PhysicalActionContainerReseter',['Engine/StandAloneEngine/PhysicalActionContainerReseter.cpp']),

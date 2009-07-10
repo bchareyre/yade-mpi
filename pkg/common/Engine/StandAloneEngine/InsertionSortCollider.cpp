@@ -5,6 +5,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 
 #include<algorithm>
 #include<vector>
@@ -65,16 +66,31 @@ void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
 		if(stride<=1) return true;
-		bool ret=XX.size()!=2*rb->bodies->size() || scheduledRun<0 || rb->simulationTime>=scheduledRun;
-		// we wouldn't run in this step; just delete pending interactions
-		// this could be done in ::action, but it would make the call counters not reflect the stride
+		if(sweepLength<=0) return true;
+		if(!newton) return true; // we wouldn't be able to find the max velocity
+		bool ret=rb->simulationTime>=scheduledRun ||
+			// if the max velocity is bigger than the one that we used for bb computation last time
+			// and the distance bodies would travel with this bigger velocity since last run (rb->simulationTime-lastRun)
+			// would be the same or greater than the one that would be traveled with the original velocity
+			// over the stride time (scheduledRun-lastRun)
+			(newton->maxVelocitySq<0) || // no valid data about max velocity, run always
+			(sweepVelocity==0 && newton->maxVelocitySq>0) || 
+			(sweepVelocity<sqrt(newton->maxVelocitySq) && rb->simulationTime-lastRun>=(sweepVelocity/sqrt(newton->maxVelocitySq)/* we know maxVelocitySq>0 from the first condition */)*(scheduledRun-lastRun)) ||
+			// number of bodies changed
+			XX.size()!=2*rb->bodies->size() ||
+			// we've never run yet (this should never happen as per if(!newton) above)
+			scheduledRun<0;
+		// we wouldn't run in this step; in that case, just delete pending interactions
+		// this is done in ::action normally, but it would make the call counters not reflect the stride
 		if(!ret) rb->interactions->erasePending(*this);
 		return ret;
 	}
 #endif
 
 void InsertionSortCollider::action(MetaBody* rb){
-	// timingDeltas->start();
+	#ifdef ISC_TIMING
+		timingDeltas->start();
+	#endif
 
 	size_t nBodies=rb->bodies->size();
 	InteractionContainer* interactions=rb->interactions.get();
@@ -107,25 +123,41 @@ void InsertionSortCollider::action(MetaBody* rb){
 			// get the BoundingVolumeMetaEngine and turn it off; we will call it ourselves
 			if(!boundDispatcher){
 				FOREACH(shared_ptr<Engine>& e, rb->engines){ boundDispatcher=dynamic_pointer_cast<BoundingVolumeMetaEngine>(e); if(boundDispatcher) break; }
-				if(!boundDispatcher){ LOG_FATAL("Unable to locate BoundingVolumeMetaEngine within engines, aborting."); throw runtime_error("Explanation above"); }
+				if(!boundDispatcher){ LOG_FATAL("Unable to locate BoundingVolumeMetaEngine within engines, aborting."); abort(); }
 				boundDispatcher->activated=false; // deactive the engine, we will call it ourselves from now (just when needed)
 			}
+			if(sweepLength>0){
+				// get NewtonsDampedLaw, to ask for the maximum velocity value
+				if(!newton){
+					FOREACH(shared_ptr<Engine>& e, rb->engines){ newton=dynamic_pointer_cast<NewtonsDampedLaw>(e); if(newton) break; }
+					if(!newton){ LOG_FATAL("Unable to locate NewtonsDampedLaw within engines, aborting."); abort(); }
+				}
+			}
 		#endif
-	// timingDeltas->checkpoint("init");
+	ISC_CHECKPOINT("init");
 
 		#ifdef COLLIDE_STRIDED
-			// FIXME: should be able to adapt stride based on the potential_interaction_count_increase/stride_speedup tradeoff
-			// this depends on the packing density, for instance, maximum velocities/accels etc.
-			if(stride>1 && sweepTimeFactor<1 && sweepVelocity<=0){ LOG_WARN("Stride is "<<stride<<", but no sweeping effective!! Setting stride back to 1."); stride=1; }
-			if(stride>1){
-				//schedule next run
-				scheduledRun=rb->simulationTime+rb->dt*(stride-.5); // -.5 to avoid rounding issues
-				if(sweepTimeFactor>=1) boundDispatcher->sweepTime=rb->dt*stride*sweepTimeFactor;
-				if(sweepVelocity>0) boundDispatcher->sweepDist=rb->dt*stride*sweepVelocity;
+			if(sweepLength>0){
+				if(newton->maxVelocitySq>=0){ // non-negative, i.e. a really computed value
+					// compute new stride value
+					assert(sweepFactor>1.);
+					sweepVelocity=sqrt(newton->maxVelocitySq)*sweepFactor;
+					if(sweepVelocity>0) {
+						stride=max(1,int((sweepLength/sweepVelocity)/rb->dt));
+						boundDispatcher->sweepDist=rb->dt*(stride-1)*sweepVelocity;
+					} else { // no motion
+						stride=1000; // shouldn't this be some saner value? Infinity? How to decide?
+						boundDispatcher->sweepDist=0; // nothing moves, no need to make bboxes larger
+					}
+					scheduledRun=rb->simulationTime+rb->dt*(stride-.5); // -.5 to avoid rounding issues
+				} else { /* no valid data yet, run next time again */ boundDispatcher->sweepDist=0; stride=1; scheduledRun=rb->simulationTime+rb->dt; }
+				LOG_DEBUG(rb->simulationTime<<"s: stride adapted to "<<stride<<"; sweepVelocity="<<sweepVelocity<<", maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
+				newton->maxVelocitySq=-1; // reset to invalid value again
 			} else { scheduledRun=-1; boundDispatcher->sweepTime=-1; boundDispatcher->sweepDist=0; }
 			boundDispatcher->action(rb);
 		#endif
-	// timingDeltas->checkpoint("bound");
+
+	ISC_CHECKPOINT("bound");
 
 
 
@@ -144,11 +176,11 @@ void InsertionSortCollider::action(MetaBody* rb){
 				else{ const Vector3r& pos=Body::byId(idXX,rb)->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
 			}
 		}
-
-	// timingDeltas->checkpoint("copy");
+	ISC_CHECKPOINT("copy");
 
 	// process interactions that the constitutive law asked to be erased
-	interactions->erasePending(*this);
+		interactions->erasePending(*this);
+	ISC_CHECKPOINT("erase");
 
 	// sort
 		if(!doInitSort && !sortThenCollide){
@@ -159,13 +191,9 @@ void InsertionSortCollider::action(MetaBody* rb){
 			if(doInitSort){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel
 				// it seems that there is no time gain running this in parallel, though
-				#pragma omp parallel sections
 				{
-					#pragma omp section
 						std::sort(XX.begin(),XX.end());
-					#pragma omp section	
 						std::sort(YY.begin(),YY.end());
-					#pragma omp section
 						std::sort(ZZ.begin(),ZZ.end());
 				}
 			} else { // sortThenCollide
@@ -205,5 +233,5 @@ void InsertionSortCollider::action(MetaBody* rb){
 				}
 			}
 		}
-	// timingDeltas->checkpoint("sort&collide");
+	ISC_CHECKPOINT("sort&collide");
 }

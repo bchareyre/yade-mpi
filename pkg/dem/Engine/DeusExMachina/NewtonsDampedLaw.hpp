@@ -38,10 +38,10 @@ class NewtonsDampedLaw : public DeusExMachina{
 	public:
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;
-		/// store square of max. velocity, for informative purposes
+		/// store square of max. velocity, for informative purposes; computed again at every step
 		Real maxVelocitySq;
 		virtual void applyCondition(MetaBody *);		
-		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(0){}
+		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1){}
 	REGISTER_ATTRIBUTES(DeusExMachina,(damping)(maxVelocitySq));
 	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,DeusExMachina);
 };

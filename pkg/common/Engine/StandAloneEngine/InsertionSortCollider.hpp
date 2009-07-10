@@ -15,7 +15,18 @@ class InteractionContainer;
 */
 
 #define COLLIDE_STRIDED
+
+// #define this macro to enable timing whichin this engine
+//#define ISC_TIMING
+
+#ifdef ISC_TIMING
+	#define ISC_CHECKPOINT(cpt) timingDeltas->checkPoint(cpt)
+#else
+	#define ISC_CHECKPOINT(cpt)
+#endif
+
 class BoundingVolumeMetaEngine;
+class NewtonsDampedLaw;
 
 class InsertionSortCollider: public Collider{
 	//! struct for storing bounds of bodies
@@ -33,16 +44,25 @@ class InsertionSortCollider: public Collider{
 	#ifdef COLLIDE_STRIDED
 		// keep this dispatcher and call it ourselves as needed
 		shared_ptr<BoundingVolumeMetaEngine> boundDispatcher;
-		// interval at which we will run; if <=1, we run always (as usual). 0 by default.
+		// we need this to find out about current maxVelocitySq
+		shared_ptr<NewtonsDampedLaw> newton;
+		// interval at which we will run; if 0, we run always (as usual).
 		int stride;
-		// virtual time when we have to run the next time
-		Real scheduledRun;
-		//! If >1 and using stride, sweep time will be multiplied by this number; it should be >=1. to accomodate non-linearities in the system.
-		/// If deactivated (-1 by default), current-velocity-based sweeping will not be enabled.
-		Real sweepTimeFactor;
-		//! If >0 and using stride, all bodies will be swept as if having this velocity.
-		/// It should be the maximum (predicted or measured) velocity increased by some safety margin, otherwise bodies may get out of their AABB. Deactivated (-1) by default.
+		//! virtual time when we were run last time
+		Real lastRun;
+		//! virtual time when we have to run the next time
+		Real scheduledRun; 
+		/// Absolute length that will be added to bounding boxes at each side; it should be something like 1/5 of typical grain radius
+		/// this value is used to adapt stride; if too large, stride will be big, but the ratio of potential-only interactions will be very big, 
+		/// thus slowing down collider & interaction loops significantly (remember: O(addLength^3))
+		/// If non-positive, collider runs always, without stride adaptivity
+		Real sweepLength;
+		//! Current sweeping velocity; computed from maxVelocity*sweepVelocityFactor
 		Real sweepVelocity;
+		//! Overestimation factor for the sweep velocity; must be >=1.0.
+		/// Has no influence on sweepLength, only on the computed stride.
+		/// Default 1.05
+		Real sweepFactor;
 	#endif
 	//! storage for bounds
 	std::vector<Bound> XX,YY,ZZ;
@@ -72,14 +92,18 @@ class InsertionSortCollider: public Collider{
 
 	InsertionSortCollider():
 	#ifdef COLLIDE_STRIDED
-		stride(0), scheduledRun(-1), sweepTimeFactor(-1), sweepVelocity(-1),
+		stride(0), lastRun(-1), scheduledRun(-1), sweepLength(-1), sweepVelocity(-1), sweepFactor(1.05),
 	#endif
-		 sortAxis(0), sortThenCollide(false){ /* timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas); */ }
+		sortAxis(0), sortThenCollide(false){
+			#ifdef ISC_TIMING
+				timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+			#endif 
+		 }
 	virtual void action(MetaBody*);
 	REGISTER_CLASS_AND_BASE(InsertionSortCollider,Collider);
 	REGISTER_ATTRIBUTES(Collider,(sortAxis)(sortThenCollide)
 		#ifdef COLLIDE_STRIDED
-			(stride)(scheduledRun)(sweepTimeFactor)(sweepVelocity)
+			(stride)(lastRun)(scheduledRun)(sweepLength)(sweepFactor)(sweepVelocity)
 		#endif
 	);
 	DECLARE_LOGGER;
