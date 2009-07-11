@@ -1,11 +1,6 @@
 #!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 
-from yade import utils
-
-## Omega
-o=Omega() 
-
 ## PhysicalParameters 
 Density=2400
 frictionAngle=radians(35)
@@ -15,8 +10,8 @@ en = 0.3
 es = 0.3
 
 ## Import wall's geometry
-p=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-imported = utils.import_stl_geometry('baraban.stl',frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters",physParamsAttr={'kn':p['kn'],'cn':p['cn'],'ks':p['ks'],'cs':p['cs']})
+params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
+imported = utils.import_stl_geometry('baraban.stl',frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters",**params) # **params sets kn, cn, ks, cs
 
 ## Spheres
 sphereRadius = 0.2
@@ -31,45 +26,44 @@ for i in xrange(nbSpheres[0]):
             s=utils.sphere([x,y,z],sphereRadius,density=Density,frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters")
             p=utils.getViscoelasticFromSpheresInteraction(s.phys['mass'],tc,en,es)
             s.phys['kn'],s.phys['cn'],s.phys['ks'],s.phys['cs']=p['kn'],p['cn'],p['ks'],p['cs']
-            o.bodies.append(s)
+            O.bodies.append(s)
 
 ## Timestep 
-o.dt=.2*tc
+O.dt=.2*tc
 
 ## Initializers 
-o.initializers=[
+O.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingFacet2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 
 ## Engines 
-o.engines=[
+O.engines=[
 	## Resets forces and momenta the act on bodies
-	StandAloneEngine('PhysicalActionContainerReseter'),
+	BexResetter(),
 	## Associates bounding volume to each body.
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingFacet2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
+	BoundingVolumeMetaEngine([
+		InteractingSphere2AABB(),
+		InteractingFacet2AABB(),
+		MetaInteractingGeometry2AABB()
 	]),
 	## Using bounding boxes find possible body collisions.
-    StandAloneEngine('PersistentSAPCollider'),
+	InsertionSortCollider(),
 	## Create geometry information about each potential collision.
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry')
+	InteractionGeometryMetaEngine([
+		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
+		InteractingFacet2InteractingSphere4SpheresContactGeometry()
 	]),
 	## Create physical information about the interaction.
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleViscoelasticRelationships')]),
+	InteractionPhysicsMetaEngine([SimpleViscoelasticRelationships()]),
     ## Constitutive law
-	MetaEngine('ConstitutiveLawDispatcher',[EngineUnit('ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw')]),
+	ConstitutiveLawDispatcher([ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw()]),
 	## Apply gravity
-	DeusExMachina('GravityEngine',{'gravity':[0,-9.81,0]}),
+	GravityEngine(gravity=[0,-9.81,0]),
 	## Cundall damping must been disabled!
-	DeusExMachina('NewtonsDampedLaw',{'damping':0}),
+	NewtonsDampedLaw(damping=0),
 	## Apply kinematics to walls
-	DeusExMachina('RotationEngine',{'subscribedBodies':imported,'rotationAxis':[0,0,1],'rotateAroundZero':True,'angularVelocity':0.5}),
+	RotationEngine(subscribedBodies=imported,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
 ]
-
-o.saveTmp('init');
-
+O.saveTmp();
+O.step()

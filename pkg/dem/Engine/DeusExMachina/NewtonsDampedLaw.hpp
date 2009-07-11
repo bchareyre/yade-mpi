@@ -7,7 +7,7 @@
 *************************************************************************/
 #pragma once
 
-#include<yade/core/DeusExMachina.hpp>
+#include<yade/core/StandAloneEngine.hpp>
 #include<Wm3Vector3.h>
 
 /*! An engine that can replace the usual series of engines used for integrating the laws of motion.
@@ -33,7 +33,7 @@ NOTE: Cundall damping affected dynamic simulation! See examples/dynamic_simulati
  */
 class RigidBodyParameters;
 
-class NewtonsDampedLaw : public DeusExMachina{
+class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
 	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, RigidBodyParameters* clumpRBP);
 
@@ -42,10 +42,10 @@ class NewtonsDampedLaw : public DeusExMachina{
 		Real damping;
 		/// store square of max. velocity, for informative purposes; computed again at every step
 		Real maxVelocitySq;
-		virtual void applyCondition(MetaBody *);		
+		virtual void action(MetaBody *);		
 		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1){}
-	REGISTER_ATTRIBUTES(DeusExMachina,(damping)(maxVelocitySq));
-	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,DeusExMachina);
+	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq));
+	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,StandAloneEngine);
 };
 REGISTER_SERIALIZABLE(NewtonsDampedLaw);
 

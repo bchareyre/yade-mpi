@@ -37,7 +37,7 @@ void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId
 	maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
 }
 
-void NewtonsDampedLaw::applyCondition ( MetaBody * ncb )
+void NewtonsDampedLaw::action(MetaBody * ncb)
 {
 	ncb->bex.sync();
 	Real dt=Omega::instance().getTimeStep();

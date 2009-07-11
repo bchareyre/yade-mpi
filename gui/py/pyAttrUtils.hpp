@@ -21,13 +21,14 @@ using namespace boost;
  * \param ensureFunc is member function called before every attribute access. It typically would check whether acessor is not NULL, otherwise instantiate it.
  */
 #define ATTR_ACCESS_CXX(accessor,ensureFunc) \
-	boost::python::object wrappedPyGet(std::string key){ensureFunc();return accessor->pyGet(key);} \
-	void wrappedPySet(std::string key,python::object val){ensureFunc(); accessor->pySet(key,val);} \
-	string wrappedGetAttrStr(std::string key){ensureFunc();vector<string> a=accessor->getAttrStr(key); string ret("["); FOREACH(string s, a) ret+=s+" "; return ret+"]";} \
-	void wrappedSetAttrStr(std::string key, std::string val){ensureFunc();return accessor->setAttrStr(key,val);} \
+	boost::python::object wrappedPyGet(const std::string& key){ensureFunc();return accessor->pyGet(key);} \
+	void wrappedPySet(const std::string& key, const python::object& val){ensureFunc(); accessor->pySet(key,val);} \
+	string wrappedGetAttrStr(const std::string& key){ensureFunc();vector<string> a=accessor->getAttrStr(key); string ret("["); FOREACH(string s, a) ret+=s+" "; return ret+"]";} \
+	void wrappedSetAttrStr(const std::string& key, const std::string& val){ensureFunc();return accessor->setAttrStr(key,val);} \
 	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} \
 	boost::python::dict wrappedPyDict(){ensureFunc(); return accessor->pyDict();} \
-	bool wrappedPyHasKey(std::string key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();} \
+	bool wrappedPyHasKey(const std::string& key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();} \
+	python::list wrappedUpdateExisting(const python::dict& d){ python::list ret; ensureFunc(); python::list keys=d.keys(); size_t ll=python::len(keys); for(size_t i=0; i<ll; i++){ string key=python::extract<string>(keys[i]); if(wrappedPyHasKey(key)) accessor->pySet(key,d[keys[i]]); else ret.append(key); } return ret; }
 	
 	
 	//boost::python::object wrappedPyGet_throw(std::string key){ensureFunc(); if(wrappedPyHasKey(key)) return accessor->pyGet(key); PyErr_SetString(PyExc_AttributeError, "No such attribute."); boost::python::throw_error_already_set(); /* make compiler happy*/ return boost::python::object(); }
@@ -38,7 +39,7 @@ using namespace boost;
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
 	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey).def("dict",&cxxClass::wrappedPyDict) \
-	.def("getRaw",&cxxClass::wrappedGetAttrStr).def("setRaw",&cxxClass::wrappedSetAttrStr)
+	.def("getRaw",&cxxClass::wrappedGetAttrStr).def("setRaw",&cxxClass::wrappedSetAttrStr).def("updateExistingKeys",&cxxClass::wrappedUpdateExisting,"Update attributes from given dictionary, but skpping attribues that do not exist in the wrapped class; return list of names of attributes that were not set.")
 	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
 
 	//.def("__getattribute__",&cxxClass::wrappedPyGet_throw)
