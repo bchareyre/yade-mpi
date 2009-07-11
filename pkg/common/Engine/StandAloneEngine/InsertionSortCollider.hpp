@@ -46,12 +46,8 @@ class InsertionSortCollider: public Collider{
 		shared_ptr<BoundingVolumeMetaEngine> boundDispatcher;
 		// we need this to find out about current maxVelocitySq
 		shared_ptr<NewtonsDampedLaw> newton;
-		// interval at which we will run; if 0, we run always (as usual).
+		// interval at which we will run (informative only, is updated automatically)
 		int stride;
-		//! virtual time when we were run last time
-		Real lastRun;
-		//! virtual time when we have to run the next time
-		Real scheduledRun; 
 		/// Absolute length that will be added to bounding boxes at each side; it should be something like 1/5 of typical grain radius
 		/// this value is used to adapt stride; if too large, stride will be big, but the ratio of potential-only interactions will be very big, 
 		/// thus slowing down collider & interaction loops significantly (remember: O(addLength^3))
@@ -63,6 +59,8 @@ class InsertionSortCollider: public Collider{
 		/// Has no influence on sweepLength, only on the computed stride.
 		/// Default 1.05
 		Real sweepFactor;
+		//! maximum distance that the fastest body could have travelled since the last run; if >= sweepLength, we could get out of bboxes and will trigger full run
+		Real fastestBodyMaxDist;
 	#endif
 	//! storage for bounds
 	std::vector<Bound> XX,YY,ZZ;
@@ -92,7 +90,7 @@ class InsertionSortCollider: public Collider{
 
 	InsertionSortCollider():
 	#ifdef COLLIDE_STRIDED
-		stride(0), lastRun(-1), scheduledRun(-1), sweepLength(-1), sweepVelocity(-1), sweepFactor(1.05),
+		stride(0), sweepLength(-1), sweepVelocity(-1), sweepFactor(1.05), fastestBodyMaxDist(-1),
 	#endif
 		sortAxis(0), sortThenCollide(false){
 			#ifdef ISC_TIMING
@@ -103,7 +101,7 @@ class InsertionSortCollider: public Collider{
 	REGISTER_CLASS_AND_BASE(InsertionSortCollider,Collider);
 	REGISTER_ATTRIBUTES(Collider,(sortAxis)(sortThenCollide)
 		#ifdef COLLIDE_STRIDED
-			(stride)(lastRun)(scheduledRun)(sweepLength)(sweepFactor)(sweepVelocity)
+			(stride)(sweepLength)(sweepFactor)(sweepVelocity)(fastestBodyMaxDist)
 		#endif
 	);
 	DECLARE_LOGGER;

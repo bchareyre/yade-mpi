@@ -44,11 +44,13 @@ class Interaction : public Serializable
 		Interaction ();
 		Interaction(body_id_t newId1,body_id_t newId2);
 
-		body_id_t getId1() {return id1;};
-		body_id_t getId2() {return id2;};
+		const body_id_t& getId1() const {return id1;};
+		const body_id_t& getId2() const {return id2;};
 
 		//! swaps order of bodies within the interaction
 		void swapOrder();
+
+		bool operator<(const Interaction& other) const { return getId1()<other.getId1() || (getId1()==other.getId1() && getId2()<other.getId2()); }
 
 		//! cache functors that are called for this interaction. Currently used by InteractionDispatchers.
 		struct {

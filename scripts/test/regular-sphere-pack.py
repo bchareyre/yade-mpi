@@ -16,7 +16,7 @@ has sphere taken off at the back and also a notch) and the body (with cylidrical
 
 rad,gap=.15,.02
 rho=1e3
-kw={'density':rho}
+kw={'density':rho,'frictionAngle':.1}
 
 O.bodies.append(
 	pack.regularHexa(

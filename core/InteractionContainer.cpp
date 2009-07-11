@@ -24,6 +24,12 @@ void InteractionContainer::unconditionalErasePending(){
 }
 
 
+struct compPtrInteraction{
+	bool operator() (const shared_ptr<Interaction>& i1, const shared_ptr<Interaction>& i2) const {
+		return (*i1)<(*i2);
+	}
+};
+
 void InteractionContainer::preProcessAttributes(bool deserializing)
 {
 	if(deserializing)
@@ -37,6 +43,7 @@ void InteractionContainer::preProcessAttributes(bool deserializing)
 		InteractionContainer::iterator iEnd = this->end();
 		for( ; i!=iEnd ; ++i )
 			interaction.push_back(*i);
+		if(serializeSorted) std::sort(interaction.begin(),interaction.end(),compPtrInteraction());
 	}
 }
 

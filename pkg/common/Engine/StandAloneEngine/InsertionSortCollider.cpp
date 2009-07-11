@@ -65,25 +65,16 @@ void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer
 	bool InsertionSortCollider::isActivated(MetaBody* rb){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
-		if(stride<=1) return true;
 		if(sweepLength<=0) return true;
-		if(!newton) return true; // we wouldn't be able to find the max velocity
-		bool ret=rb->simulationTime>=scheduledRun ||
-			// if the max velocity is bigger than the one that we used for bb computation last time
-			// and the distance bodies would travel with this bigger velocity since last run (rb->simulationTime-lastRun)
-			// would be the same or greater than the one that would be traveled with the original velocity
-			// over the stride time (scheduledRun-lastRun)
-			(newton->maxVelocitySq<0) || // no valid data about max velocity, run always
-			(sweepVelocity==0 && newton->maxVelocitySq>0) || 
-			(sweepVelocity<sqrt(newton->maxVelocitySq) && rb->simulationTime-lastRun>=(sweepVelocity/sqrt(newton->maxVelocitySq)/* we know maxVelocitySq>0 from the first condition */)*(scheduledRun-lastRun)) ||
-			// number of bodies changed
-			XX.size()!=2*rb->bodies->size() ||
-			// we've never run yet (this should never happen as per if(!newton) above)
-			scheduledRun<0;
+		if(!newton || newton->maxVelocitySq<0 || sweepVelocity<0) return true; // we wouldn't be able to find the max velocity, or it has not been computed yet, or there were no data available last time
+		if(XX.size()!=2*rb->bodies->size()) return true;
+		if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
+		fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*rb->dt;
+		if(fastestBodyMaxDist>=sweepLength) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
-		if(!ret) rb->interactions->erasePending(*this);
-		return ret;
+		rb->interactions->erasePending(*this);
+		return false;
 	}
 #endif
 
@@ -146,20 +137,16 @@ void InsertionSortCollider::action(MetaBody* rb){
 						stride=max(1,int((sweepLength/sweepVelocity)/rb->dt));
 						boundDispatcher->sweepDist=rb->dt*(stride-1)*sweepVelocity;
 					} else { // no motion
-						stride=1000; // shouldn't this be some saner value? Infinity? How to decide?
 						boundDispatcher->sweepDist=0; // nothing moves, no need to make bboxes larger
 					}
-					scheduledRun=rb->simulationTime+rb->dt*(stride-.5); // -.5 to avoid rounding issues
-				} else { /* no valid data yet, run next time again */ boundDispatcher->sweepDist=0; stride=1; scheduledRun=rb->simulationTime+rb->dt; }
+				} else { /* no valid data yet, run next time again */ boundDispatcher->sweepDist=0; sweepVelocity=-1; stride=1; }
 				LOG_DEBUG(rb->simulationTime<<"s: stride adapted to "<<stride<<"; sweepVelocity="<<sweepVelocity<<", maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
-				newton->maxVelocitySq=-1; // reset to invalid value again
-			} else { scheduledRun=-1; boundDispatcher->sweepTime=-1; boundDispatcher->sweepDist=0; }
+				fastestBodyMaxDist=0; // reset
+			} else { boundDispatcher->sweepTime=-1; boundDispatcher->sweepDist=0; }
 			boundDispatcher->action(rb);
 		#endif
 
 	ISC_CHECKPOINT("bound");
-
-
 
 	// copy bounds along given axis into our arrays
 		for(size_t i=0; i<2*nBodies; i++){
@@ -191,10 +178,14 @@ void InsertionSortCollider::action(MetaBody* rb){
 			if(doInitSort){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel
 				// it seems that there is no time gain running this in parallel, though
+				#pragma omp parallel sections
 				{
-						std::sort(XX.begin(),XX.end());
-						std::sort(YY.begin(),YY.end());
-						std::sort(ZZ.begin(),ZZ.end());
+					#pragma omp section
+						{ std::sort(XX.begin(),XX.end()); }
+					#pragma omp section
+						{ std::sort(YY.begin(),YY.end()); }
+					#pragma omp section
+						{ std::sort(ZZ.begin(),ZZ.end()); }
 				}
 			} else { // sortThenCollide
 				insertionSort(XX,interactions,rb,false); insertionSort(YY,interactions,rb,false); insertionSort(ZZ,interactions,rb,false);
@@ -214,7 +205,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 					const body_id_t& jid=V[j].id;
 					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
 					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes
-					// if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].flags.isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
+					//if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].flags.isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
 					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 					handleBoundInversion(iid,jid,interactions,rb);
 					// now we are at the last element, but we still have not met the upper bound of V[i].id

@@ -30,7 +30,8 @@ yade.log.setLevel('TriaxialCompressionEngine',yade.log.WARN)
 if O.numThreads>1:
 	print "WARNING: You should run single-threaded with OMP_NUM_THREADS=1; interaction order will be probably different otherwise!"
 
-O.load(initFile); O.switchWorld(); O.load(initFile); O.switchWorld()
+for world in 0,1:
+	O.load(initFile); O.interactions.serializeSorted=True; O.switchWorld();
 from hashlib import md5; import difflib,sys
 print "Identical at steps ",
 for i in xrange(0,stopIter/nSteps):

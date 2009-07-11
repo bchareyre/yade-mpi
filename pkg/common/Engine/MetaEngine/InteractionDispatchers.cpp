@@ -22,7 +22,7 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 	}
 	#ifdef YADE_OPENMP
 		const long size=rootBody->interactions->size();
-		#pragma omp parallel for
+		#pragma omp parallel for schedule(guided)
 		for(long i=0; i<size; i++){
 			const shared_ptr<Interaction>& I=(*rootBody->interactions)[i];
 	#else

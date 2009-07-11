@@ -422,6 +422,8 @@ class pyInteractionContainer{
 		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(pyInteraction(I));} return ret;}
 		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(pyInteraction(I));} return ret; }
 		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
+		bool serializeSorted_get(){return proxee->serializeSorted;}
+		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
 };
 
 Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
@@ -763,6 +765,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("nth",&pyInteractionContainer::pyNth)
 		.def("withBody",&pyInteractionContainer::withBody)
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll)
+		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
 		.def("nth",&pyInteractionContainer::pyNth)
 		.def("clear",&pyInteractionContainer::clear);
 	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())

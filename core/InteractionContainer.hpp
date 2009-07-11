@@ -86,7 +86,7 @@ class InteractionContainer : public Serializable
 	public :
 		boost::mutex	drawloopmutex;
 
-		InteractionContainer() { };
+		InteractionContainer(): serializeSorted(false) { };
 		virtual ~InteractionContainer() {};
 
 		virtual bool insert(body_id_t /*id1*/,body_id_t /*id2*/)				{throw;};
@@ -103,6 +103,9 @@ class InteractionContainer : public Serializable
 
 		virtual shared_ptr<Interaction>& operator[] (unsigned int) {throw;};
 		virtual const shared_ptr<Interaction>& operator[] (unsigned int) const {throw;};
+
+		// sort interactions before serializations; useful if comparing XML files from different runs (false by default)
+		bool serializeSorted;
 
 		// std::pair is not handled by yade::serialization, use vector<body_id_t> instead
 		typedef Vector2<body_id_t> bodyIdPair;
@@ -147,7 +150,7 @@ class InteractionContainer : public Serializable
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(/*no base*/,(interaction)(pendingErase));
+	REGISTER_ATTRIBUTES(/*no base*/,(interaction)(pendingErase)(serializeSorted));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
 
