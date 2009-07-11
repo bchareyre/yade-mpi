@@ -1,8 +1,0 @@
-#! /bin/sh
-
-find ../src -name "*.?pp" -exec wc -l {} \; > linesPerFile
-
-
-gawk '{ sum += $1 }; END { print sum }' linesPerFile
-
-rm -rf linesPerFile

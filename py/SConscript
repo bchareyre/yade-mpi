@@ -11,7 +11,9 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			# if we compile with GTS, link to the python module, as inGtsSurface uses some of its symbols.
 			# because the module doesn't have the lib- suffix, we put it directly to SHLINKFLAGS
 			# using the -l: syntax (see man ld) and declare the dependency below
-			SHLINKFLAGS=env['SHLINKFLAGS']+(['-l:$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so'] if 'GTS' in env['features'] else [])),
+			SHLINKFLAGS=env['SHLINKFLAGS']+(['-l:$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so'] if 'GTS' in env['features'] else []),
+			RPATH=env['RPATH']+(['$PREFIX/lib/yade$SUFFIX/py/gts'] if 'GTS' in env['features'] else []),	
+			),
 		env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['Shop']),
 		env.File('utils.py'),
 		env.File('eudoxos.py'),

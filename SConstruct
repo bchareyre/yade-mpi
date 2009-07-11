@@ -370,6 +370,7 @@ if env['pretty']:
 	env.Replace(CXXCOMSTR='C ${SOURCES}', # → ${TARGET.file}')
 		CCOMSTR='C ${SOURCES}',
 		SHCXXCOMSTR='C ${SOURCES}', 
+		SHCCCOMSTR='C ${SOURCES}', 
 		SHLINKCOMSTR='L ${TARGET.file}',
 		LINKCOMSTR='L ${TARGET.file}',
 		INSTALLSTR='⇒ $TARGET',
@@ -555,5 +556,10 @@ for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
 		if ff not in toInstall and not ff.endswith('.pyo'):
 			print "Deleting extra plugin", ff
 			os.remove(ff)
+
+#################################################################################
+#### DOCUMENTATION ##############################################################
+#################################################################################
+env.Install('$PREFIX/share/doc/yade$SUFFIX-doc/',['examples','scripts','doc'])
 
 #Progress('.', interval=100, file=sys.stderr)

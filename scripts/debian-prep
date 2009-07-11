@@ -24,7 +24,7 @@ DEBDATE=`date -R`
 cat <<EOF > debian/changelog
 yade$_VERSION (1) $DISTRIBUTION; urgency=low
 
-  * Mandatory debian changelog entry
+  * Automatic debian changelog entry for yade$_VERSION
 
  -- Václav Šmilauer <eudoxos@arcig.cz>  $DEBDATE
 EOF

@@ -1,5 +1,0 @@
-echo "remember to set damping=0.3"
-
-time ./yade -i YadeQtGUI -f ../data/SDECBenchmark8k.xml -m 8000 -a
-
-# time ./yade -i NullGUI -f ../data/SDECBenchmark8k.xml -m 2000 -pa
