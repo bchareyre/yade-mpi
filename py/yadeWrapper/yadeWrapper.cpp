@@ -262,7 +262,8 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 				bool ok=false;
 				/* FIXME: casting engine unit to the right type via dynamic_cast doesn't work (always unusuccessful),
 				 * do static_cast and if the EngineUnit is of wrong type, it will crash badly immediately. */
-				#define TRY_ADD_FUNCTOR(P,Q) {shared_ptr<P> p(dynamic_pointer_cast<P>(me)); shared_ptr<EngineUnit> eu(euEx().proxee); if(p&&eu){p->add(static_pointer_cast<Q>(eu)); ok=true; }}
+				// #define TRY_ADD_FUNCTOR(P,Q) {shared_ptr<P> p(dynamic_pointer_cast<P>(me)); shared_ptr<EngineUnit> eu(euEx().proxee); if(p&&eu){p->add(static_pointer_cast<Q>(eu)); ok=true; }}
+				#define TRY_ADD_FUNCTOR(P,Q) {shared_ptr<P> p(dynamic_pointer_cast<P>(me)); shared_ptr<Q> eu(dynamic_pointer_cast<Q>(euEx().proxee)); if(p&&eu){p->add(eu); ok=true; }}
 				// shared_ptr<Q> q(dynamic_pointer_cast<Q>(eu)); cerr<<#P<<" "<<#Q<<":"<<(bool)p<<" "<<(bool)q<<endl;
 				TRY_ADD_FUNCTOR(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit);
 				TRY_ADD_FUNCTOR(GeometricalModelMetaEngine,GeometricalModelEngineUnit);

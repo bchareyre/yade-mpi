@@ -44,6 +44,7 @@ class BoundingVolumeEngineUnit : public EngineUnit2D
 			  			  )
 				>
 {	
+	public: virtual ~BoundingVolumeEngineUnit();
 	REGISTER_CLASS_AND_BASE(BoundingVolumeEngineUnit,EngineUnit2D);
 	REGISTER_ATTRIBUTES(EngineUnit,/* no attributes here */);
 };

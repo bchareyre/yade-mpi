@@ -41,7 +41,8 @@ class GeometricalModelEngineUnit : 	public EngineUnit2D
 								, const Body*
 			   				  )
 					>
-{	
+{
+	public: virtual ~GeometricalModelEngineUnit();	
 	REGISTER_CLASS_NAME(GeometricalModelEngineUnit);
 	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
 };

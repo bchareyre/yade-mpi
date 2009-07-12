@@ -36,6 +36,7 @@ class InteractionPhysicsEngineUnit : 	public EngineUnit2D
 			   				  ) 
 					>
 {
+	public: virtual ~InteractionPhysicsEngineUnit();
 	REGISTER_CLASS_AND_BASE(InteractionPhysicsEngineUnit,EngineUnit2D);
 	REGISTER_ATTRIBUTES(EngineUnit, /* no attributes here */ );
 };

@@ -42,6 +42,7 @@ class InteractionGeometryEngineUnit : 	public EngineUnit2D
 			  				  ) 
 					>
 {
+	public: virtual ~InteractionGeometryEngineUnit();
 	REGISTER_CLASS_AND_BASE(InteractionGeometryEngineUnit,EngineUnit2D);
 	REGISTER_ATTRIBUTES(EngineUnit,/* no attributes here */);
 };

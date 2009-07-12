@@ -34,8 +34,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-dem',[
 	
 	env.SharedLibrary('RockPM',['RockPM.cpp'],LIBS=env['LIBS']+['ElasticContactInteraction','Dem3DofGeom_SphereSphere','ElasticContactLaw']),
 	env.SharedLibrary('DemXDofGeom',['DataClass/InteractionGeometry/DemXDofGeom.cpp']),
-	env.SharedLibrary('Dem3DofGeom_SphereSphere',['DataClass/InteractionGeometry/Dem3DofGeom_SphereSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','DemXDofGeom','yade-opengl' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
-	env.SharedLibrary('Dem3DofGeom_FacetSphere',['DataClass/InteractionGeometry/Dem3DofGeom_FacetSphere.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','InteractingSphere','InteractingFacet','Dem3DofGeom_SphereSphere','DemXDofGeom','yade-opengl' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
+	env.SharedLibrary('Dem3DofGeom_SphereSphere',['DataClass/InteractionGeometry/Dem3DofGeom_SphereSphere.cpp'],LIBS=env['LIBS']+['EngineUnits','RigidBodyParameters','InteractingSphere','DemXDofGeom','yade-opengl' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
+	env.SharedLibrary('Dem3DofGeom_FacetSphere',['DataClass/InteractionGeometry/Dem3DofGeom_FacetSphere.cpp'],LIBS=env['LIBS']+['EngineUnits','RigidBodyParameters','InteractingSphere','InteractingFacet','Dem3DofGeom_SphereSphere','DemXDofGeom','yade-opengl' if 'YADE_OPENGL' in env['CPPDEFINES'] else '']),
 
 	env.SharedLibrary('FacetTopologyAnalyzer',['Engine/StandAloneEngine/FacetTopologyAnalyzer.cpp'],LIBS=env['LIBS']+['InteractingFacet']),
 
@@ -978,6 +978,7 @@ env.SharedLibrary('NewtonsDampedLaw',
 		,LIBS=env['LIBS']+['SimpleViscoelasticBodyParameters'
 		    ,'ViscoelasticInteraction'
 		    ,'SpheresContactGeometry'
+			 ,'EngineUnits',
 		    ])
 
 	,env.SharedLibrary('ContactLaw1',

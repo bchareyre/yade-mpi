@@ -30,7 +30,8 @@ class PhysicalParametersEngineUnit :    public EngineUnit1D
 								, Body*, BexContainer&
 			   				  )
 					>
-{	
+{
+	public: virtual ~PhysicalParametersEngineUnit();	
 	REGISTER_CLASS_NAME(PhysicalParametersEngineUnit);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };

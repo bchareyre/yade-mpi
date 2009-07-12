@@ -9,6 +9,7 @@ class ConstitutiveLaw: public EngineUnit2D <
 	>{
 	public:
 		ConstitutiveLaw(){}
+		virtual ~ConstitutiveLaw();
 	REGISTER_CLASS_AND_BASE(ConstitutiveLaw,EngineUnit2D);
 	/*! Convenience functions to get forces/torques quickly. */
 	void addForce (const body_id_t id, const Vector3r& f,MetaBody* rb){rb->bex.addForce (id,f);}

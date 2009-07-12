@@ -39,7 +39,8 @@ class InteractingGeometryEngineUnit : 	public EngineUnit2D
 								, const Body* // with that - functors have all the data they may need
 			  				  )
 					>
-{	
+{
+	public: virtual ~InteractingGeometryEngineUnit();	
 	REGISTER_CLASS_AND_BASE(InteractingGeometryEngineUnit,EngineUnit2D);
 	REGISTER_ATTRIBUTES(EngineUnit,/* no attributes here */);
 };

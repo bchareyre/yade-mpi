@@ -78,7 +78,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,physParams
 	inert=(2./5.)*V*density*radius**2
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert]})
 	s.phys=PhysicalParameters(physParamsClass)
-	s.phys.updateExistingKeys(pp)
+	s.phys.updateExistingAttrs(pp)
 	s.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	s['isDynamic']=dynamic
 	return s
@@ -94,7 +94,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	V=extents[0]*extents[1]*extents[2]
 	pp.update({'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)]})
 	b.phys=PhysicalParameters(physParamsClass)
-	b.phys.updateExistingKeys(pp)
+	b.phys.updateExistingAttrs(pp)
 	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	b['isDynamic']=dynamic
 	return b
@@ -113,7 +113,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,density=1,physParamsClass=
 	b.mold.setRaw('vertices',vStr)
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
 	b.phys=PhysicalParameters(physParamsClass)
-	b.phys.updateExistingKeys(pp)
+	b.phys.updateExistingAttrs(pp)
 	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 	b['isDynamic']=dynamic
 	b.mold.postProcessAttributes()
@@ -291,7 +291,7 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 		pp={'se3':[0,0,0,1,0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle}
 		pp.update(physParamsAttr)
 		b.phys=PhysicalParameters(physParamsClass)
-		b.phys.updateExistingKeys(pp)
+		b.phys.updateExistingAttrs(pp)
 		if not noBoundingVolume:
 			b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
 		o.bodies.append(b)
