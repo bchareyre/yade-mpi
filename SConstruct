@@ -127,7 +127,7 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	BoolVariable('openmp','Compile with openMP parallelization support',defOptions['openmp']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
-	EnumVariable('arcs','Whether to generate or use branch probabilities','',['','gen','use'],{'no':'','0':'','false':''},1),
+	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
 	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','binfmt','CGAL','dummy','GTS']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
@@ -276,13 +276,11 @@ def CheckPythonModule(context,modulename):
 		context.Result(False); return False
 def CheckScientificPython(context): return CheckPythonModule(context,"Scientific")
 def CheckIPython(context): return CheckPythonModule(context,"IPython")
-	
 def CheckCXX(context):
 	context.Message('Checking whether c++ compiler "%s" works...'%env['CXX'])
 	ret=context.TryLink('#include<iostream>\nint main(int argc, char**argv){std::cerr<<std::endl;return 0;}\n','.cpp')
 	context.Result(ret)
 	return ret
-
 
 if not env.GetOption('clean'):
 	conf=env.Configure(custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckIPython':CheckIPython},
@@ -419,8 +417,8 @@ else:
 if env['gprof']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
 env.Prepend(CXXFLAGS=['-pipe','-Wall']) # '-Wc++0x-compat' ## not know to gcc-3.*
 
-if env['arcs']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
-if env['arcs']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
+if env['PGO']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
+if env['PGO']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
 
 ### LINKER
 ## libs for all plugins
@@ -486,28 +484,6 @@ def relpath(pf,pt):
 	while apfl[i]==aptl[i] and i<min(len(apfl),len(aptl))-1: i+=1
 	return sep.join(['..' for j in range(0,len(apfl)-i)]+aptl[i:])
 
-
-def makePkgConfig(fileName):
-	cflags,libs='Cflags: ','Libs: '
-	cflags+=' '+' '.join(env['CXXFLAGS'])
-	for df in env['CPPDEFINES']:
-		if type(df)==tuple: cflags+=' -D%s=%s'%(df[0],df[1])
-		else: cflags+=' -D%s'%df
-	for p in env['CPPPATH']:
-		if p[0]=='#': cflags+=' -I$PREFIX/include/yade$SUFFIX'
-		else: cflags+=' -I%s'%p
-	for l in env['SHLINKFLAGS']:
-		if not l.find('soname')>=0: libs+=' '+l # skip -Wl,soname=...
-	for p in env['RPATH']: libs+=' -Wl,-rpath=%s'%p
-	for p in env['LIBPATH']: libs+=' -L%s'%p
-	pc='Name: Yade\nDescription: Platform for dynamic mechanics\nVersion: %s\n%s\n%s\n'%(env['version'],cflags,libs)
-	pc+='yadeLibDir: $PREFIX/lib/yade$SUFFIX\n'
-	pc=re.sub(r'\bPREFIX\b','runtimePREFIX',pc) # fix prefix paths
-	pc=re.sub(r'\bbuildDir\b','runtimePREFIX',pc) # fix include paths: divert to the installed location
-	pc=env.subst(pc)+'\n'
-	f=file(env.subst(fileName),'w'); f.write(pc); f.close()
-	return None
-
 # 1. symlink all headers to buildDir/include before the actual build
 # 2. (unused now) instruct scons to install (not symlink) all headers to the right place as well
 # 3. set the "install" target as default (if scons is called without any arguments), which triggers build in turn
@@ -518,11 +494,8 @@ if not env.GetOption('clean'):
 	#env.AddPreAction(installAlias,installHeaders)
 	from os.path import join,split,isabs,isdir,exists,lexists,islink,isfile,sep
 	installHeaders() # install to buildDir always
-	if 0: # do not install headers, nor make pkg-config (was never used, I think)
+	if 0: # do not install headers
 		installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
-		makePkgConfig('$buildDir/yade${SUFFIX}.pc')
-		env.Install(pcDir,'$buildDir/yade${SUFFIX}.pc')
-		#  add pcDir to instDirs if you install pkg-config stuff at some point
 	if not env['haveForeach']:
 		boostDir=buildDir+'/include/yade-'+env['version']+'/boost'
 		foreachLink=boostDir+'/foreach.hpp'
@@ -532,8 +505,7 @@ if not env.GetOption('clean'):
 			if lexists(foreachLink): os.remove(foreachLink) # broken symlink: remove it
 			os.symlink(relpath(foreachLink,foreachTarget),foreachLink)
 		env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
-	installAlias=env.Alias('install',instDirs) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
-	env.Default([installAlias,'$PREFIX'])
+	env.Default(env.Alias('install',instDirs)) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
 
 env.Export('env');
 
@@ -558,8 +530,9 @@ for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
 			os.remove(ff)
 
 #################################################################################
-#### DOCUMENTATION ##############################################################
-#################################################################################
+#### DOCUMENTATION
+# must be explicitly requested to be installed, e.g.:
+#    scons /usr/local/share/doc
 env.Install('$PREFIX/share/doc/yade$SUFFIX-doc/',['examples','scripts','doc'])
 
 #Progress('.', interval=100, file=sys.stderr)
