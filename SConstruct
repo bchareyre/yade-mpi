@@ -159,6 +159,17 @@ propagatedEnvVars=['HOME','TERM','DISTCC_HOSTS','LD_PRELOAD','FAKEROOTKEY','LD_L
 for v in propagatedEnvVars:
 	if os.environ.has_key(v): env.Append(ENV={v:os.environ[v]})
 
+# get number of jobs from DEB_BUILD_OPTIONS if defined
+# see http://www.de.debian.org/doc/debian-policy/ch-source.html#s-debianrules-options
+if os.environ.has_key('DEB_BUILD_OPTIONS'):
+	for opt in os.environ['DEB_BUILD_OPTIONS'].split():
+		if opt.startswith('parallel='):
+			j=opt.split('=')[1]
+			print "Setting number of jobs (using DEB_BUILD_OPTIONS) to `%s'"%j
+			env['jobs']=int(j)
+
+
+
 if sconsVersion>9700: opts.FormatOptionHelpText=lambda env,opt,help,default,actual,alias: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 else: opts.FormatOptionHelpText=lambda env,opt,help,default,actual: "%10s: %5s [%s] (%s)\n"%(opt,actual,default,help)
 Help(opts.GenerateHelpText(env))
@@ -521,13 +532,16 @@ env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
 #################################################################################
 ## remove plugins that are in the target dir but will not be installed now
-toInstall=[str(node) for node in env.FindInstalledFiles()]
-for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
-	for f in files:
-		ff=os.path.join(root,f)
-		if ff not in toInstall and not ff.endswith('.pyo'):
-			print "Deleting extra plugin", ff
-			os.remove(ff)
+## only when installing without requesting special path (we would have no way
+## to know what should be installed overall.
+if not COMMAND_LINE_TARGETS:
+	toInstall=[str(node) for node in env.FindInstalledFiles()]
+	for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
+		for f in files:
+			ff=os.path.join(root,f)
+			if ff not in toInstall and not ff.endswith('.pyo'):
+				print "Deleting extra plugin", ff
+				os.remove(ff)
 
 #################################################################################
 #### DOCUMENTATION

@@ -56,13 +56,13 @@ install: build
 	## files VERSION and _VERSION contain snapshot version without/with leading '-' respectively (like svn1113 and -svn1113)
 	### WARNING: !!!! with jobs>1, fakeroot may hang; 2 workarounds:
 	###   (a) use fakeroot-tcp instead of fakeroot
-	###   (b) say jobs=1
+	###   (b) use just 1 job
 	#debug build
-	NO_SCONS_GET_RECENT= scons jobs=4 buildPrefix=debian runtimePREFIX=/usr version=${VERSION} features=GTS,python,log4cxx,openGL openmp=True exclude=realtime-rigidbody,mass-spring,snow,fem PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1 
+	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr version=${VERSION} features=GTS,python,log4cxx,openGL openmp=True exclude=realtime-rigidbody,mass-spring,snow,fem PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1 
 	#optimized build
-	NO_SCONS_GET_RECENT= scons jobs=4 PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
+	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
 	#install platform-independent files (docs, scripts, examples)
-	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/share/doc/yade-${_VERSION}-doc
+	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/share/doc/yade${_VERSION}-doc
 
 
 
