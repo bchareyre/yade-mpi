@@ -9,6 +9,7 @@
 #include"NewtonsDampedLaw.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 
@@ -34,6 +35,7 @@ void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId
 	// clumpRBP->{acceleration,angularAcceleration} are reset byt Clump::moveMembers, it is ok to just increment here
 	clumpRBP->acceleration+=diffClumpAccel;
 	clumpRBP->angularAcceleration+=diffClumpAngularAccel;
+	if(haveBins) velocityBins->binVelSqUse(memberId,VelocityBins::getBodyVelSq(rb));
 	maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
 }
 
@@ -42,6 +44,8 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	ncb->bex.sync();
 	Real dt=Omega::instance().getTimeStep();
 	maxVelocitySq=-1;
+	haveBins=(bool)velocityBins;
+	if(haveBins) velocityBins->binVelSqInitialize();
 
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		// clump members are non-dynamic; they skip the rest of loop once their forces are properly taken into account, however
@@ -67,6 +71,7 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 			rb->angularAcceleration+=dAngAccel;
 		}
 
+		if(haveBins) {velocityBins->binVelSqUse(id,VelocityBins::getBodyVelSq(rb));}
 		maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
 
 		// blocking DOFs
@@ -94,5 +99,7 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 
 		if(b->isClump()) static_cast<Clump*>(b.get())->moveMembers();
 	}
+
+	if(haveBins) velocityBins->binVelSqFinalize();
 }
 

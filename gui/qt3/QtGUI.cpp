@@ -84,9 +84,14 @@ int QtGUI::run(int argc, char *argv[])
 
 void QtGUI::runNaked(){
 	if(!app){ // no app existing yet
+		if(getenv("DISPLAY")==0){
+			LOG_ERROR("$DISPLAY environment var not set, not starting qt3 gui.");
+			return;
+		};
 		LOG_INFO("Creating QApplication");
 		XInitThreads();
-	   app=new QApplication(0,NULL);
+		int argc=0;
+	   app=new QApplication(argc,(char**)NULL);
 		if(!YadeQtMainWindow::self){
 			YadeQtMainWindow::guiMayDisappear=true;
 			mainWindow=new YadeQtMainWindow();

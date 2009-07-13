@@ -1,0 +1,76 @@
+// 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+#pragma once 
+
+#include<yade/core/Interaction.hpp> // for body_id_t
+#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<vector>
+
+class MetaBody;
+
+/* Class for putting bodies to velcoity bins, for optimization
+of collision detection.
+Each bin is characterized by its minimum/maximum velocity. 
+See http://yade.wikia.com/wiki/Insertion_Sort_Collider_Stride#Enhancement_ideas:_velocity_bins for brief design overview.
+*/
+class VelocityBins{
+	public:
+	VelocityBins(int _nBins, Real _refMaxVelSq, Real _binCoeff=10, Real _binOverlap=0.8): refMaxVelSq(_refMaxVelSq), binCoeff(_binCoeff), binOverlap(_binOverlap), maxRefRelStep(0.05), nBins(_nBins), histInterval(200), histLast(-1){};
+	typedef signed char binNo_t;
+	struct Bin{
+		Bin(): binMinVelSq(-1), binMaxVelSq(-1), maxDist(0), currDistSq(0), currMaxVelSq(0), nBodies(0){}
+		// limits for bin memebrship
+		Real binMinVelSq, binMaxVelSq;
+		// maximum distance that body in this bin can travel before it goes out of its swept bbox
+		Real maxDist;
+		// distance so far traveled by the fastest body in this bin (since last setBins)
+		Real currDistSq;
+		// maximum velSq over all bodies in this bin
+		Real currMaxVelSq;
+		// number of bodies in this bin (for informational purposes only)
+		long nBodies;
+	};
+	// bins themselves (their number is nBins)
+	vector<Bin> bins;
+	// each body has its bin number stored here
+	vector<binNo_t> bodyBins;
+	// reference overall maximum velocity (may be different from bins[0].maxVelSq)
+	Real refMaxVelSq;
+	// factor by which maximum velocity in each bin is smaller than in the higer one
+	Real binCoeff;
+	// relative overlap beween bins; body will not be moved from faster bin until its velocity is min*binOverlap; must be <=1
+	Real binOverlap;
+	// maximum relative change of reference max velocity per invocation
+	Real maxRefRelStep;
+	// number of bins; must be >=1 and <=100 (artificial upper limit)
+	size_t nBins;
+	// how often to show histogram, if LOG_DEBUG is enabled;
+	long histInterval, histLast;
+	// Assign bins to all bodies
+	void setBins(MetaBody*, Real currMaxVelSq, Real refSweepLength);
+
+	// Increment maximum per-bin distances and tell whether some bodies may be	already getting out of the swept bbox (in that case, we need to recompute bounding volumes and run the collider)
+	bool incrementDists_shouldCollide(Real dt);
+	
+	/* NOTE: following 3 functions are separated because of multi-threaded operation of NewtonsDampedLaw
+	in that case, every thread must have its own per-bin maximum and binVelSqFinalize will assign the
+	overall maxima to the bins.
+
+	The non-parallel implementation simply resets all Bin::realMaxVelSq, maximize if for each
+	body in that bin and binVelSqFinalize() will not do nothing.
+	*/
+	// reset per-bin max velocities
+	void binVelSqInitialize();
+	// use body max velocity -- called for every body at every step (from NewtonsDampedLaw, normally)
+	void binVelSqUse(body_id_t id, Real velSq);
+	// actually assign max velocities to their respective bins
+	void binVelSqFinalize();
+
+	// get velSq for given body; this should be called from NewtonsDampedLaw as well,
+	// to ensure that the same formulas are used (once we have angularVelocity + AABB span,
+	// for instance
+	static Real getBodyVelSq(RigidBodyParameters* rbp){
+		return rbp->velocity.SquaredLength();
+	}
+
+	DECLARE_LOGGER;
+};

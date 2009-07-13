@@ -46,21 +46,22 @@ class InsertionSortCollider: public Collider{
 		shared_ptr<BoundingVolumeMetaEngine> boundDispatcher;
 		// we need this to find out about current maxVelocitySq
 		shared_ptr<NewtonsDampedLaw> newton;
-		// interval at which we will run (informative only, is updated automatically)
-		int stride;
+		// if False, no type of striding is used
+		// if True, then either sweepLength XOR nBins is set
+		bool strideActive;
 		/// Absolute length that will be added to bounding boxes at each side; it should be something like 1/5 of typical grain radius
 		/// this value is used to adapt stride; if too large, stride will be big, but the ratio of potential-only interactions will be very big, 
 		/// thus slowing down collider & interaction loops significantly (remember: O(addLength^3))
 		/// If non-positive, collider runs always, without stride adaptivity
 		Real sweepLength;
-		//! Current sweeping velocity; computed from maxVelocity*sweepVelocityFactor
-		Real sweepVelocity;
 		//! Overestimation factor for the sweep velocity; must be >=1.0.
 		/// Has no influence on sweepLength, only on the computed stride.
 		/// Default 1.05
 		Real sweepFactor;
 		//! maximum distance that the fastest body could have travelled since the last run; if >= sweepLength, we could get out of bboxes and will trigger full run
 		Real fastestBodyMaxDist;
+		// parameters to be passed to VelocityBins, if nBins>0
+		int nBins; Real binCoeff, binOverlap;
 	#endif
 	//! storage for bounds
 	std::vector<Bound> XX,YY,ZZ;
@@ -90,7 +91,7 @@ class InsertionSortCollider: public Collider{
 
 	InsertionSortCollider():
 	#ifdef COLLIDE_STRIDED
-		stride(0), sweepLength(-1), sweepVelocity(-1), sweepFactor(1.05), fastestBodyMaxDist(-1),
+		strideActive(false), sweepLength(-1), sweepFactor(1.05), fastestBodyMaxDist(-1), nBins(0), binCoeff(5), binOverlap(0.8),
 	#endif
 		sortAxis(0), sortThenCollide(false){
 			#ifdef ISC_TIMING
@@ -101,7 +102,7 @@ class InsertionSortCollider: public Collider{
 	REGISTER_CLASS_AND_BASE(InsertionSortCollider,Collider);
 	REGISTER_ATTRIBUTES(Collider,(sortAxis)(sortThenCollide)
 		#ifdef COLLIDE_STRIDED
-			(stride)(sweepLength)(sweepFactor)(sweepVelocity)(fastestBodyMaxDist)
+			(strideActive)(sweepLength)(sweepFactor)(fastestBodyMaxDist)(nBins)(binCoeff)(binOverlap)
 		#endif
 	);
 	DECLARE_LOGGER;

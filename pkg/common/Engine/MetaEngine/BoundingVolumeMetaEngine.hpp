@@ -16,6 +16,8 @@
 #include<yade/core/BoundingVolume.hpp>
 #include<yade/core/Body.hpp>
 
+class VelocityBins;
+
 class BoundingVolumeMetaEngine :	public MetaEngine2D
 					<	
 						InteractingGeometry,						// base classe for dispatch
@@ -34,19 +36,16 @@ class BoundingVolumeMetaEngine :	public MetaEngine2D
 	public :
 		// selectively turn off this engine (from within the collider, for instance)
 		bool activated;
-		//! if < 0, will set bounding volumes that the bodies (most likely) will not go over within given time interval; otherwise, do not sweep
-		Real sweepTime;
-		//! bounding box will be enlarged by this amount in all 3 dimensions;
-		/// if negative, it is relative size (e.g. -2 will make the bounding box 2 × bigger)
-		/// if positive, it is absolute distance; its will be added in all 6 directions (i.e. dimensions will be enlarged by 2 × this value)
+		//! bounding box will be enlarged by this amount in all 3 dimensions; must be non-negative;
 		Real sweepDist;
-		BoundingVolumeMetaEngine(): activated(true), sweepTime(-1), sweepDist(0) {}
+		BoundingVolumeMetaEngine(): activated(true), sweepDist(0) {}
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*){ return activated; }
+		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(BoundingVolumeMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
-	REGISTER_ATTRIBUTES(MetaEngine,(activated)(sweepTime)(sweepDist));
+	REGISTER_ATTRIBUTES(MetaEngine,(activated)(sweepDist));
 };
 
 REGISTER_SERIALIZABLE(BoundingVolumeMetaEngine);

@@ -955,7 +955,8 @@ env.SharedLibrary('NewtonsDampedLaw',
 			'yade-base',		
 			'yade-multimethods',
 			'RigidBodyParameters',
-			'Clump'
+			'Clump',
+			'VelocityBins'
 			 ]),
 
 	env.SharedLibrary('SimpleViscoelasticBodyParameters'

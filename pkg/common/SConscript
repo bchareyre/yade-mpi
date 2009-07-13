@@ -10,8 +10,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 
 env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 
-	env.SharedLibrary('ParallelEngine',
-		['Engine/ParallelEngine.cpp']),
+	env.SharedLibrary('VelocityBins',['DataClass/VelocityBins.cpp']), # not a plugin
+	env.SharedLibrary('ParallelEngine',['Engine/ParallelEngine.cpp']),
 	env.SharedLibrary('EngineUnits',['Engine/MetaEngine/EngineUnits.cpp']),
 	env.SharedLibrary('AABB',['DataClass/BoundingVolume/AABB.cpp']),
 	env.SharedLibrary('BoundingSphere',['DataClass/BoundingVolume/BoundingSphere.cpp']),

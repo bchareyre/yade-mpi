@@ -5,6 +5,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 
 #include<algorithm>
@@ -65,12 +66,15 @@ void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer
 	bool InsertionSortCollider::isActivated(MetaBody* rb){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
-		if(sweepLength<=0) return true;
-		if(!newton || newton->maxVelocitySq<0 || sweepVelocity<0) return true; // we wouldn't be able to find the max velocity, or it has not been computed yet, or there were no data available last time
+		if(!strideActive) return true;
+		if(!newton || (nBins>=1 && !newton->velocityBins)) return true;
+		if(nBins>=1 && newton->velocityBins->incrementDists_shouldCollide(rb->dt)) return true;
+		if(nBins<=0){
+			if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
+			fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*rb->dt;
+			if(fastestBodyMaxDist>=sweepLength) return true;
+		}
 		if(XX.size()!=2*rb->bodies->size()) return true;
-		if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
-		fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*rb->dt;
-		if(fastestBodyMaxDist>=sweepLength) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
 		rb->interactions->erasePending(*this);
@@ -128,21 +132,37 @@ void InsertionSortCollider::action(MetaBody* rb){
 	ISC_CHECKPOINT("init");
 
 		#ifdef COLLIDE_STRIDED
-			if(sweepLength>0){
-				if(newton->maxVelocitySq>=0){ // non-negative, i.e. a really computed value
-					// compute new stride value
-					assert(sweepFactor>1.);
-					sweepVelocity=sqrt(newton->maxVelocitySq)*sweepFactor;
+			// get us ready for strides
+			if(!strideActive && sweepLength>0){
+				if(newton->maxVelocitySq>=0){ // maxVelocitySq is a really computed value
+					strideActive=true;
+					if(nBins>=1){
+						if(!newton->velocityBins){ newton->velocityBins=shared_ptr<VelocityBins>(new VelocityBins(nBins,newton->maxVelocitySq,binCoeff,binOverlap)); }
+						if(!boundDispatcher->velocityBins) boundDispatcher->velocityBins=newton->velocityBins;
+					}
+				}
+			}
+			if(strideActive){
+				assert(sweepLength>0);
+				if(nBins<=0){
+					// reset bins, in case they were active but are not anymore
+					if(newton->velocityBins) newton->velocityBins=shared_ptr<VelocityBins>(); if(boundDispatcher->velocityBins) boundDispatcher->velocityBins=shared_ptr<VelocityBins>();
+					assert(strideActive); assert(newton->maxVelocitySq>=0); assert(sweepFactor>1.);
+					Real sweepVelocity=sqrt(newton->maxVelocitySq)*sweepFactor; int stride=-1;
 					if(sweepVelocity>0) {
 						stride=max(1,int((sweepLength/sweepVelocity)/rb->dt));
 						boundDispatcher->sweepDist=rb->dt*(stride-1)*sweepVelocity;
 					} else { // no motion
 						boundDispatcher->sweepDist=0; // nothing moves, no need to make bboxes larger
 					}
-				} else { /* no valid data yet, run next time again */ boundDispatcher->sweepDist=0; sweepVelocity=-1; stride=1; }
-				LOG_DEBUG(rb->simulationTime<<"s: stride adapted to "<<stride<<"; sweepVelocity="<<sweepVelocity<<", maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
-				fastestBodyMaxDist=0; // reset
-			} else { boundDispatcher->sweepTime=-1; boundDispatcher->sweepDist=0; }
+					LOG_DEBUG(rb->simulationTime<<"s: stride ≈"<<stride<<"; maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
+					fastestBodyMaxDist=0; // reset
+				} else { // nBins>=1
+					assert(newton->velocityBins); assert(boundDispatcher->velocityBins);
+					// re-bin bodies
+					newton->velocityBins->setBins(rb,newton->maxVelocitySq,sweepLength);
+				}
+			}
 			boundDispatcher->action(rb);
 		#endif
 

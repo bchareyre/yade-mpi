@@ -32,18 +32,22 @@ NOTE: Cundall damping affected dynamic simulation! See examples/dynamic_simulati
  
  */
 class RigidBodyParameters;
+class VelocityBins;
 
 class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
 	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, RigidBodyParameters* clumpRBP);
-
+	bool haveBins;
 	public:
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;
 		/// store square of max. velocity, for informative purposes; computed again at every step
 		Real maxVelocitySq;
+		/// velocity bins (not used if not created)
+		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(MetaBody *);		
 		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1){}
+
 	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq));
 	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,StandAloneEngine);
 };
