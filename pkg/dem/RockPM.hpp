@@ -39,6 +39,7 @@ class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
 		FUNCTOR2D(Dem3DofGeom,RpmPhys);
 		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_RockPMPhys_Rpm,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
+		DECLARE_LOGGER;	
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
@@ -46,11 +47,11 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 class RpmMat: public BodyMacroParameters {
 	public:
 		int exampleNumber; //Number of "stone"
-		bool isDamaged;
+		bool initCohesive;
 		Real stressCompressMax, stressTensionMax; //Parameters for damaging
 
-		RpmMat(): exampleNumber(0.), isDamaged(false), stressCompressMax(0), stressTensionMax(0) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (exampleNumber) (isDamaged) (stressCompressMax) (stressTensionMax));
+		RpmMat(): exampleNumber(0.), initCohesive(false), stressCompressMax(0), stressTensionMax(0) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (exampleNumber) (initCohesive) (stressCompressMax) (stressTensionMax));
 		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(RpmMat);
@@ -59,16 +60,16 @@ REGISTER_SERIALIZABLE(RpmMat);
 class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
 	private:
 	public:
-		Real sigmaT;
+		Real sigmaT, initDistance;
 
 		Ip2_RpmMat_RpmMat_RpmPhys(){
-			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=3;
+			initDistance = 0;
 		}
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
 		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
 			(sigmaT)
+			(initDistance)
 		);
 
 		FUNCTOR2D(RpmMat,RpmMat);
