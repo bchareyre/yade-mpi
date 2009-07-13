@@ -55,21 +55,21 @@ o.engines=[
 	## This MetaEngine acts on all PhysicalActions and selects the right EngineUnit base on type of the PhysicalAction.
 	#
 	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
-	# NewtonsDampedLaw(damping=0.1)
+	NewtonsDampedLaw(damping=0.1)
 	#
-	PhysicalActionDamper([
-		CundallNonViscousForceDamping(damping=0.2),
-		CundallNonViscousMomentumDamping(damping=0.2)
-	]),
-	## Now we have forces and momenta acting on bodies. Newton's law calculates acceleration that corresponds to them.
-	PhysicalActionApplier([
-		NewtonsForceLaw(),
-		NewtonsMomentumLaw(),
-	]),
-	## Acceleration results in velocity change. Integrating the velocity over dt, position of the body will change.
-	PhysicalParametersMetaEngine([LeapFrogPositionIntegrator()]),
-	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
-	PhysicalParametersMetaEngine([LeapFrogOrientationIntegrator()])
+#	PhysicalActionDamper([
+#		CundallNonViscousForceDamping(damping=0.2),
+#		CundallNonViscousMomentumDamping(damping=0.2)
+#	]),
+#	## Now we have forces and momenta acting on bodies. Newton's law calculates acceleration that corresponds to them.
+#	PhysicalActionApplier([
+#		NewtonsForceLaw(),
+#		NewtonsMomentumLaw(),
+#	]),
+#	## Acceleration results in velocity change. Integrating the velocity over dt, position of the body will change.
+#	PhysicalParametersMetaEngine([LeapFrogPositionIntegrator()]),
+#	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
+#	PhysicalParametersMetaEngine([LeapFrogOrientationIntegrator()])
 ]
 
 

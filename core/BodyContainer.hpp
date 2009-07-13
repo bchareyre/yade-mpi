@@ -87,14 +87,14 @@ class BodyContainer : public Serializable
 		virtual bool erase(unsigned int) 				{throw;};
 		virtual bool find(unsigned int , shared_ptr<Body>&) const	{throw;};
 		virtual bool exists(unsigned int id) const 			{throw;};
-		virtual shared_ptr<Body>& operator[](unsigned int)		{throw;};
-		virtual const shared_ptr<Body>& operator[](unsigned int) const	{throw;};
+		virtual shared_ptr<Body>& operator[](unsigned int) {throw;};
+		virtual const shared_ptr<Body>& operator[](unsigned int) const {throw;};
 		
 		typedef BodyContainerIteratorPointer iterator;
 		virtual BodyContainer::iterator begin()				{throw;};
 		virtual BodyContainer::iterator end()				{throw;};
 		
-		virtual unsigned int size() 					{throw;};
+		virtual unsigned int size() const {throw;};
 
 	protected :
 		void setId(shared_ptr<Body>& , unsigned int);

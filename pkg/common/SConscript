@@ -97,7 +97,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['FilterEngine','ColorScale']),
 	env.SharedLibrary('ColorizedTimeFilter',['Engine/FilterEngine/ColorizedTimeFilter.cpp'],
 		LIBS=env['LIBS']+['FilterEngine','ColorScale']),
-	env.SharedLibrary('BoundingVolumeMetaEngine',['Engine/MetaEngine/BoundingVolumeMetaEngine.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','AABB','EngineUnits']),
+	env.SharedLibrary('BoundingVolumeMetaEngine',['Engine/MetaEngine/BoundingVolumeMetaEngine.cpp'],LIBS=env['LIBS']+['RigidBodyParameters','AABB','EngineUnits','VelocityBins']),
 	env.SharedLibrary('GeometricalModelMetaEngine',['Engine/MetaEngine/GeometricalModelMetaEngine.cpp'],LIBS=env['LIBS']+['EngineUnits']),
 	env.SharedLibrary('InteractingGeometryMetaEngine',['Engine/MetaEngine/InteractingGeometryMetaEngine.cpp'],LIBS=env['LIBS']+['EngineUnits']),
 	env.SharedLibrary('PhysicalParametersMetaEngine',['Engine/MetaEngine/PhysicalParametersMetaEngine.cpp'],LIBS=env['LIBS']+['EngineUnits']),

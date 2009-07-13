@@ -4,6 +4,8 @@
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
+#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
+#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 BoundingVolumeEngineUnit::~BoundingVolumeEngineUnit(){};
@@ -12,5 +14,7 @@ InteractingGeometryEngineUnit::~InteractingGeometryEngineUnit(){};
 InteractionGeometryEngineUnit::~InteractionGeometryEngineUnit(){};
 InteractionPhysicsEngineUnit::~InteractionPhysicsEngineUnit(){};
 PhysicalParametersEngineUnit::~PhysicalParametersEngineUnit(){};
+PhysicalActionDamperUnit::~PhysicalActionDamperUnit(){};
+PhysicalActionApplierUnit::~PhysicalActionApplierUnit(){};
 ConstitutiveLaw::~ConstitutiveLaw(){};
 

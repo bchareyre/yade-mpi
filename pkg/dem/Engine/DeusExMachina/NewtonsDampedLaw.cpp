@@ -36,7 +36,11 @@ void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId
 	clumpRBP->acceleration+=diffClumpAccel;
 	clumpRBP->angularAcceleration+=diffClumpAngularAccel;
 	if(haveBins) velocityBins->binVelSqUse(memberId,VelocityBins::getBodyVelSq(rb));
-	maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
+	#ifdef YADE_OPENMP
+		Real& thrMaxVSq=threadMaxVelocitySq[omp_get_thread_num()]; thrMaxVSq=max(thrMaxVSq,rb->velocity.SquaredLength());
+	#else
+		maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
+	#endif
 }
 
 void NewtonsDampedLaw::action(MetaBody * ncb)
@@ -47,59 +51,85 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	haveBins=(bool)velocityBins;
 	if(haveBins) velocityBins->binVelSqInitialize();
 
-	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
-		// clump members are non-dynamic; they skip the rest of loop once their forces are properly taken into account, however
-		if (!b->isDynamic || b->isClumpMember()) continue;
-		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-		const body_id_t& id=b->getId();
-		const Vector3r& m=ncb->bex.getTorque(id); const Vector3r& f=ncb->bex.getForce(id);
-
-		if (b->isStandalone()){
-			rb->acceleration=f/rb->mass;
-			rb->angularAcceleration=diagDiv(m,rb->inertia);
-			cundallDamp(dt,f,rb->velocity,rb->acceleration,m,rb->angularVelocity,rb->angularAcceleration);
-		}
-		else if (b->isClump()){
-			rb->acceleration=rb->angularAcceleration=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
-			FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
-				handleClumpMember(ncb,mm.first,rb);
+	#ifdef YADE_OPENMP
+		FOREACH(Real& thrMaxVSq, threadMaxVelocitySq) { thrMaxVSq=0; }
+		const BodyContainer& bodies=*(ncb->bodies.get());
+		const long size=(long)bodies.size();
+		#pragma omp parallel for schedule(static)
+		for(long _id=0; _id<size; _id++){
+			const shared_ptr<Body>& b(bodies[_id]);
+	#else
+		FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
+	#endif
+			RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
+			const body_id_t& id=b->getId();
+			// clump members are non-dynamic; we only get their velocities here
+			if (!b->isDynamic || b->isClumpMember()){
+				// FIXME: duplicated code from below; awaits https://bugs.launchpad.net/yade/+bug/398089 to be solved
+				if(haveBins) {velocityBins->binVelSqUse(id,VelocityBins::getBodyVelSq(rb));}
+				#ifdef YADE_OPENMP
+					Real& thrMaxVSq=threadMaxVelocitySq[omp_get_thread_num()]; thrMaxVSq=max(thrMaxVSq,rb->velocity.SquaredLength());
+				#else
+					maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
+				#endif
+				continue;
 			}
-			// at this point, forces from clump members are already summed up, this is just for forces applied to clump proper, if there are such
-			Vector3r dLinAccel=f/rb->mass, dAngAccel=diagDiv(m,rb->inertia);
-			cundallDamp(dt,f,rb->velocity,dLinAccel,m,rb->angularVelocity,dAngAccel);
-			rb->acceleration+=dLinAccel;
-			rb->angularAcceleration+=dAngAccel;
-		}
+			const Vector3r& m=ncb->bex.getTorque(id); const Vector3r& f=ncb->bex.getForce(id);
 
-		if(haveBins) {velocityBins->binVelSqUse(id,VelocityBins::getBodyVelSq(rb));}
-		maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
+			if (b->isStandalone()){
+				rb->acceleration=f/rb->mass;
+				rb->angularAcceleration=diagDiv(m,rb->inertia);
+				cundallDamp(dt,f,rb->velocity,rb->acceleration,m,rb->angularVelocity,rb->angularAcceleration);
+			}
+			else if (b->isClump()){
+				rb->acceleration=rb->angularAcceleration=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
+				// sum force on clump memebrs, add them to the clump itself
+				FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
+					handleClumpMember(ncb,mm.first,rb);
+				}
+				// at this point, forces from clump members are already summed up, this is just for forces applied to clump proper, if there are such
+				Vector3r dLinAccel=f/rb->mass, dAngAccel=diagDiv(m,rb->inertia);
+				cundallDamp(dt,f,rb->velocity,dLinAccel,m,rb->angularVelocity,dAngAccel);
+				rb->acceleration+=dLinAccel;
+				rb->angularAcceleration+=dAngAccel;
+			}
 
-		// blocking DOFs
-		if(rb->blockedDOFs==0){ /* same as: rb->blockedDOFs==PhysicalParameters::DOF_NONE */
-			rb->angularVelocity=rb->angularVelocity+dt*rb->angularAcceleration;
-			rb->velocity=rb->velocity+dt*rb->acceleration;
-		} else {
-			if((rb->blockedDOFs & PhysicalParameters::DOF_X)==0) rb->velocity[0]+=dt*rb->acceleration[0];
-			if((rb->blockedDOFs & PhysicalParameters::DOF_Y)==0) rb->velocity[1]+=dt*rb->acceleration[1];
-			if((rb->blockedDOFs & PhysicalParameters::DOF_Z)==0) rb->velocity[2]+=dt*rb->acceleration[2];
-			if((rb->blockedDOFs & PhysicalParameters::DOF_RX)==0) rb->angularVelocity[0]+=dt*rb->angularAcceleration[0];
-			if((rb->blockedDOFs & PhysicalParameters::DOF_RY)==0) rb->angularVelocity[1]+=dt*rb->angularAcceleration[1];
-			if((rb->blockedDOFs & PhysicalParameters::DOF_RZ)==0) rb->angularVelocity[2]+=dt*rb->angularAcceleration[2];
-		}
+			// blocking DOFs
+			if(rb->blockedDOFs==0){ /* same as: rb->blockedDOFs==PhysicalParameters::DOF_NONE */
+				rb->angularVelocity=rb->angularVelocity+dt*rb->angularAcceleration;
+				rb->velocity=rb->velocity+dt*rb->acceleration;
+			} else {
+				if((rb->blockedDOFs & PhysicalParameters::DOF_X)==0) rb->velocity[0]+=dt*rb->acceleration[0];
+				if((rb->blockedDOFs & PhysicalParameters::DOF_Y)==0) rb->velocity[1]+=dt*rb->acceleration[1];
+				if((rb->blockedDOFs & PhysicalParameters::DOF_Z)==0) rb->velocity[2]+=dt*rb->acceleration[2];
+				if((rb->blockedDOFs & PhysicalParameters::DOF_RX)==0) rb->angularVelocity[0]+=dt*rb->angularAcceleration[0];
+				if((rb->blockedDOFs & PhysicalParameters::DOF_RY)==0) rb->angularVelocity[1]+=dt*rb->angularAcceleration[1];
+				if((rb->blockedDOFs & PhysicalParameters::DOF_RZ)==0) rb->angularVelocity[2]+=dt*rb->angularAcceleration[2];
+			}
 
-		Vector3r axis = rb->angularVelocity;
-		Real angle = axis.Normalize();
-		Quaternionr q;
-		q.FromAxisAngle ( axis,angle*dt );
-		rb->se3.orientation = q*rb->se3.orientation;
-		if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); rb->se3.orientation=q*rb->se3.orientation; }
-		rb->se3.orientation.Normalize();
+			// velocities are ready now, save maxima
+				if(haveBins) {velocityBins->binVelSqUse(id,VelocityBins::getBodyVelSq(rb));}
+				#ifdef YADE_OPENMP
+					Real& thrMaxVSq=threadMaxVelocitySq[omp_get_thread_num()]; thrMaxVSq=max(thrMaxVSq,rb->velocity.SquaredLength());
+				#else
+					maxVelocitySq=max(maxVelocitySq,rb->velocity.SquaredLength());
+				#endif
 
-		rb->se3.position += rb->velocity*dt + ncb->bex.getMove(id);
+			Vector3r axis = rb->angularVelocity;
+			Real angle = axis.Normalize();
+			Quaternionr q;
+			q.FromAxisAngle ( axis,angle*dt );
+			rb->se3.orientation = q*rb->se3.orientation;
+			if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); rb->se3.orientation=q*rb->se3.orientation; }
+			rb->se3.orientation.Normalize();
 
-		if(b->isClump()) static_cast<Clump*>(b.get())->moveMembers();
+			rb->se3.position += rb->velocity*dt + ncb->bex.getMove(id);
+
+			if(b->isClump()) static_cast<Clump*>(b.get())->moveMembers();
 	}
-
+	#ifdef YADE_OPENMP
+		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
+	#endif
 	if(haveBins) velocityBins->binVelSqFinalize();
 }
 

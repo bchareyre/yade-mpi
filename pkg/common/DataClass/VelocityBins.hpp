@@ -4,6 +4,9 @@
 #include<yade/core/Interaction.hpp> // for body_id_t
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<vector>
+#ifdef YADE_OPENMP
+	#include<omp.h>
+#endif
 
 class MetaBody;
 
@@ -14,10 +17,14 @@ See http://yade.wikia.com/wiki/Insertion_Sort_Collider_Stride#Enhancement_ideas:
 */
 class VelocityBins{
 	public:
-	VelocityBins(int _nBins, Real _refMaxVelSq, Real _binCoeff=10, Real _binOverlap=0.8): refMaxVelSq(_refMaxVelSq), binCoeff(_binCoeff), binOverlap(_binOverlap), maxRefRelStep(0.05), nBins(_nBins), histInterval(200), histLast(-1){};
+	VelocityBins(int _nBins, Real _refMaxVelSq, Real _binCoeff=10, Real _binOverlap=0.8): refMaxVelSq(_refMaxVelSq), binCoeff(_binCoeff), binOverlap(_binOverlap), maxRefRelStep(100), nBins(_nBins), histInterval(200), histLast(-1){}
 	typedef signed char binNo_t;
 	struct Bin{
-		Bin(): binMinVelSq(-1), binMaxVelSq(-1), maxDist(0), currDistSq(0), currMaxVelSq(0), nBodies(0){}
+		Bin(): binMinVelSq(-1), binMaxVelSq(-1), maxDist(0), currDistSq(0), currMaxVelSq(0), nBodies(0){
+			#ifdef YADE_OPENMP
+				threadMaxVelSq.resize(omp_get_max_threads());
+			#endif
+		};
 		// limits for bin memebrship
 		Real binMinVelSq, binMaxVelSq;
 		// maximum distance that body in this bin can travel before it goes out of its swept bbox
@@ -28,6 +35,9 @@ class VelocityBins{
 		Real currMaxVelSq;
 		// number of bodies in this bin (for informational purposes only)
 		long nBodies;
+		#ifdef YADE_OPENMP
+			vector<Real> threadMaxVelSq;
+		#endif
 	};
 	// bins themselves (their number is nBins)
 	vector<Bin> bins;

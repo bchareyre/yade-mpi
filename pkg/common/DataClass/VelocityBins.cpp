@@ -38,7 +38,7 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 		if(refMaxVelSq<0){ refMaxVelSq=currMaxVelSq; /* first time */}
 		else {
 			// there should be some maximum speed change parameter, so that bins do not change their limits (and therefore bodies, also!) too often, depending on 1 particle going crazy
-			refMaxVelSq=min(max(refMaxVelSq*pow(1-maxRefRelStep,2),currMaxVelSq),refMaxVelSq*pow(1+maxRefRelStep,2));
+			refMaxVelSq=min(max(refMaxVelSq/pow(1+maxRefRelStep,2),currMaxVelSq),refMaxVelSq*pow(1+maxRefRelStep,2));
 			if(refMaxVelSq==0) refMaxVelSq=currMaxVelSq;
 		}
 		LOG_TRACE("new refMaxVel: "<<sqrt(refMaxVelSq));
@@ -86,12 +86,23 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 }
 
 /* non-parallel implementations */
-void VelocityBins::binVelSqInitialize(){ FOREACH(Bin& bin, bins) bin.currMaxVelSq=0; }
-void VelocityBins::binVelSqUse(body_id_t id, Real velSq){
-	#ifdef YADE_OPENMP
-		if(omp_get_thread_num()>0) {LOG_FATAL("VelocityBins do not support multiple openMP threads yet!"); abort(); }
-	#endif
-	Real& maxVelSq(bins[bodyBins[id]].currMaxVelSq);
-	maxVelSq=max(maxVelSq,velSq);
-}
-void VelocityBins::binVelSqFinalize(){}
+#ifdef YADE_OPENMP
+	void VelocityBins::binVelSqInitialize(){ FOREACH(Bin& bin, bins){ FOREACH(Real& vSq, bin.threadMaxVelSq) vSq=0.; }}
+	void VelocityBins::binVelSqUse(body_id_t id, Real velSq){
+		Real& maxVelSq(bins[bodyBins[id]].threadMaxVelSq[omp_get_thread_num()]);
+		maxVelSq=max(maxVelSq,velSq);
+	}
+	void VelocityBins::binVelSqFinalize(){
+		FOREACH(Bin& bin, bins){
+			bin.currMaxVelSq=0;
+			FOREACH(const Real& vSq, bin.threadMaxVelSq) bin.currMaxVelSq=max(bin.currMaxVelSq,vSq);
+		}
+	}
+#else
+	void VelocityBins::binVelSqInitialize(){ FOREACH(Bin& bin, bins) bin.currMaxVelSq=0; }
+	void VelocityBins::binVelSqUse(body_id_t id, Real velSq){
+		Real& maxVelSq(bins[bodyBins[id]].currMaxVelSq);
+		maxVelSq=max(maxVelSq,velSq);
+	}
+	void VelocityBins::binVelSqFinalize(){}
+#endif

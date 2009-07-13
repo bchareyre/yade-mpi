@@ -9,6 +9,9 @@
 
 #include<yade/core/StandAloneEngine.hpp>
 #include<Wm3Vector3.h>
+#ifdef YADE_OPENMP
+	#include<omp.h>
+#endif
 
 /*! An engine that can replace the usual series of engines used for integrating the laws of motion.
 
@@ -43,10 +46,17 @@ class NewtonsDampedLaw : public StandAloneEngine{
 		Real damping;
 		/// store square of max. velocity, for informative purposes; computed again at every step
 		Real maxVelocitySq;
+		#ifdef YADE_OPENMP
+			vector<Real> threadMaxVelocitySq;
+		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(MetaBody *);		
-		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1){}
+		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1){
+			#ifdef YADE_OPENMP
+				threadMaxVelocitySq.resize(omp_get_max_threads());
+			#endif
+		}
 
 	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq));
 	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,StandAloneEngine);

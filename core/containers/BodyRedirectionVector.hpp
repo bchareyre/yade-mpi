@@ -55,7 +55,7 @@ class BodyRedirectionVector : public BodyContainer
 		virtual BodyContainer::iterator begin();
 	        virtual BodyContainer::iterator end();
 		
-		virtual unsigned int size();
+		virtual unsigned int size() const;
 
 	// serialization of this class...
 	REGISTER_CLASS_NAME(BodyRedirectionVector);

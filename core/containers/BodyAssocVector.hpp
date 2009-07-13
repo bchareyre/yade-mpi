@@ -60,7 +60,7 @@ class BodyAssocVector : public BodyContainer
 		virtual BodyContainer::iterator begin();
         	virtual BodyContainer::iterator end();
 
-		virtual unsigned int size();
+		virtual unsigned int size() const;
 
 	REGISTER_CLASS_NAME(BodyAssocVector);
 	REGISTER_BASE_CLASS_NAME(BodyContainer);

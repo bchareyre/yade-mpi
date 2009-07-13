@@ -255,7 +255,7 @@ BodyContainer::iterator BodyRedirectionVector::end()
 // }
 // 
 
-unsigned int BodyRedirectionVector::size()
+unsigned int BodyRedirectionVector::size() const
 {
 	return bodies.size();
 }

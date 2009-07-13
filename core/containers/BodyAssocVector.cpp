@@ -210,7 +210,7 @@ BodyContainer::iterator BodyAssocVector::end()
 // }
 // 
 
-unsigned int BodyAssocVector::size()
+unsigned int BodyAssocVector::size() const
 {
 	return bodies.size();
 }
