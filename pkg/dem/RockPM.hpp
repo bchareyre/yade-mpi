@@ -47,11 +47,16 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 class RpmMat: public BodyMacroParameters {
 	public:
 		int exampleNumber; //Number of "stone"
-		bool initCohesive;
+		bool initCohesive, isDamaged;
 		Real stressCompressMax, stressTensionMax; //Parameters for damaging
 
-		RpmMat(): exampleNumber(0.), initCohesive(false), stressCompressMax(0), stressTensionMax(0) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (exampleNumber) (initCohesive) (stressCompressMax) (stressTensionMax));
+		RpmMat(): exampleNumber(0.), initCohesive(false), isDamaged(false), stressCompressMax(0), stressTensionMax(0) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, 
+			(exampleNumber)
+			(initCohesive)
+			(isDamaged)
+			(stressCompressMax)
+			(stressTensionMax));
 		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(RpmMat);

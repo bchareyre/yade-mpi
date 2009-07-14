@@ -34,7 +34,20 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
 
-	Real displN=geom->displacementN();
+	Real displN=geom->displacementN();	
+	const shared_ptr<Body>& body1=Body::byId(contact->getId1(),rootBody);
+	const shared_ptr<Body>& body2=Body::byId(contact->getId2(),rootBody);
+	assert(body1);
+	assert(body2);
+	const shared_ptr<RpmMat>& rbp1=YADE_PTR_CAST<RpmMat>(body1->physicalParameters);
+	const shared_ptr<RpmMat>& rbp2=YADE_PTR_CAST<RpmMat>(body2->physicalParameters);
+
+	//check, whether one of bodies is damaged
+	if ((rbp1->isDamaged) || (rbp2->isDamaged)) {
+		phys->isCohesive = false;
+	}
+				
+				
 	if(displN<=0){
 		/*Normal Interaction*/
 		phys->normalForce=phys->kn*displN*geom->normal;
@@ -43,14 +56,24 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));} 
 		applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
 		/*Normal Interaction_____*/
+		
 		if ((phys->isCohesive)&&(displN<(-phys->lengthMaxCompression))) {
-			LOG_WARN(displN<<"____"<<phys->normalForce);
+			//LOG_WARN(displN<<"__COMRESS!!!__");
+			phys->isCohesive = false;
+			rbp1->isDamaged=true;
+			rbp2->isDamaged=true;
 		}
 	} else {
 		if (phys->isCohesive) {
 			phys->normalForce=phys->kn*displN*geom->normal;
-			//LOG_WARN(displN<<"____"<<phys->normalForce);
-			applyForceAtContactPoint(phys->normalForce,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
+			if (displN>(phys->lengthMaxTension)) {
+				//LOG_WARN(displN<<"__TENSION!!!__");
+				phys->isCohesive = false;
+				rbp1->isDamaged=true;
+				rbp2->isDamaged=true;
+			} else {
+				applyForceAtContactPoint(phys->normalForce,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
+			}
 			return;
 		} else {
 			rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
