@@ -4,23 +4,6 @@ Import('*')
 import os.path, os
 
 env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
-	env.SharedLibrary('SphericalDEMSimulator',
-		['spherical-dem-simulator/PersistentAloneSAPCollider.cpp',
-			'spherical-dem-simulator/SphericalDEMSimulator.cpp'],
-		LIBS=env['LIBS']+['yade-base',
-			'MacroMicroElasticRelationships',
-			'BodyMacroParameters',
-			'CundallNonViscousDamping',
-			'CundallNonViscousDamping',
-			'PhysicalActionDamper',
-			'InteractionPhysicsMetaEngine',
-			'GravityEngines',
-			'Sphere',
-			'yade-multimethods',
-			'yade-factory',
-			'yade-serialization',
-			'yade-base',
-			]),
 
 	env.SharedLibrary('Tetra',['tetra/Tetra.cpp'],LIBS=env['LIBS']+['Tetrahedron',
          'ParticleParameters',

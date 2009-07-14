@@ -196,7 +196,9 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 		if(isCohesive){
 			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
 			const shared_ptr<CpmMat>& rbp1=YADE_PTR_CAST<CpmMat>(body1->physicalParameters), rbp2=YADE_PTR_CAST<CpmMat>(body2->physicalParameters);
-			rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum;
+			// nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/
+			#pragma omp critical
+			{ rbp1->numBrokenCohesive+=1; rbp2->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; rbp2->epsPlBroken+=epsPlSum; }
 		}
 		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		return;
