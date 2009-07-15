@@ -14,6 +14,7 @@ except ImportError: pass
 from _packPredicates import *
 # import SpherePack
 from _packSpheres import *
+from _packObb import *
 
 from miniWm3Wrap import *
 
@@ -61,9 +62,13 @@ class inGtsSurface_py(Predicate):
 
 class inSpace(Predicate):
 	"""Predicate returning True for any points, with infinite bounding box."""
+	def __init__(self, _center=Vector3.ZERO): self._center=_center
 	def aabb(self):
-		inf=float('inf'); return [-inf,-inf,-inf],[inf,inf,inf]
-	def __call__(self,pt): return True
+		inf=float('inf'); return Vector3(-inf,-inf,-inf),Vector3(inf,inf,inf)
+	def center(self): return self._center
+	def dim(self):
+		inf=float('inf'); return Vector3(inf,inf,inf)
+	def __call__(self,pt,pad): return True
 
 #####
 ## surface construction and manipulation
@@ -121,16 +126,21 @@ def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
 	if threshold>0: surf.cleanup(threshold)
 	return surf
 
-import euclid
+def gtsSurfaceBestFitOBB(surf):
+	"""Return (Vector3 center, Vector3 halfSize, Quaternion orientation) describing
+	best-fit oriented bounding box (OBB) for the given surface. See cloudBestFitOBB
+	for details."""
+	pts=[Vector3(v.x,v.y,v.z) for v in surf.vertices()]
+	return cloudBestFitOBB(tuple(pts))
 
-def revolutionSurfaceMeridians(sects,angles,origin=euclid.Vector3(0,0,0),orientation=euclid.Quaternion()):
+def revolutionSurfaceMeridians(sects,angles,origin=Vector3.ZERO,orientation=Quaternion.IDENTITY):
 	"""Revolution surface given sequences of 2d points and sequence of corresponding angles,
 	returning sequences of 3d points representing meridian sections of the revolution surface.
 	The 2d sections are turned around z-axis, but they can be transformed
 	using the origin and orientation arguments to give arbitrary orientation."""
 	import math
 	def toGlobal(x,y,z):
-		return tuple(origin+orientation*(euclid.Vector3(x,y,z)))
+		return tuple(origin+orientation*(Vector3(x,y,z)))
 	return [[toGlobal(x2d*math.cos(angles[i]),x2d*math.sin(angles[i]),y2d) for x2d,y2d in sects[i]] for i in range(0,len(sects))]
 
 ########
@@ -180,7 +190,7 @@ def filterSpherePack(predicate,spherePack,**kw):
 		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 	return ret
 
-def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFinalDensity=.6,memoizeDb=None,**kw):
+def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFinalDensity=.6,memoizeDb=None,useOBB=True,**kw):
 	"""Generator of triaxial packing, using TriaxialTest. Radius is radius of spheres, radiusStDev is its standard deviation.
 	By default, all spheres are of the same radius. cropLayers is how many layers of spheres will be added to the computed
 	dimension of the box so that there no (or not so much, at least) boundary effects at the boundaries of the predicate.
@@ -192,14 +202,24 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 	the remaining ones, the one with the least spheres will be loaded and returned. If no suitable packing is found, it
 	is generated as usually, but saved into the database for later use.
 
+	useOBB is effective only if a inGtsSurface predicate is given. If true (default), oriented bounding box will be
+	computed first; it can reduce substantially number of spheres for the triaxial compression (like 10× depending on
+	how much asymmetric the body is), see scripts/test/gts-triax-pack-obb.py.
+
 	O.switchWorld() magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
 	This function therefore should never run in parallel with some code accessing your simulation.
 	"""
 	import sqlite3, os.path, cPickle, time, sys
 	from yade import log
 	from math import pi
-	if not dim: dim=predicate.dim()
-	if max(dim)==float('inf'): raise RuntimeError("Infinite predicate and no dimension of packing requested.")
+	if type(predicate)==inGtsSurface and useOBB:
+		center,dim,orientation=gtsSurfaceBestFitOBB(predicate.surf)
+		dim*=2 # gtsSurfaceBestFitOBB returns halfSize
+	else:
+		if not dim: dim=predicate.dim()
+		if max(dim)==float('inf'): raise RuntimeError("Infinite predicate and no dimension of packing requested.")
+		center=predicate.center()
+		orientation=None
 	fullDim=tuple([dim[i]+4*cropLayers*radius for i in 0,1,2])
 	if(memoizeDb and os.path.exists(memoizeDb)):
 		# find suitable packing and return it directly
@@ -213,8 +233,10 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 			print "Found suitable packing in database (radius=%g±%g,N=%g,dim=%g×%g×%g,scale=%g), created %s"%(R,rDev,NN,X,Y,Z,scale,time.asctime(time.gmtime(timestamp)))
 			c.execute('select pack from packings where timestamp=?',(timestamp,))
 			sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
-			sp.scale(scale)
+			sp.scale(scale);
+			if orientation: sp.rotate(*orientation.ToAxisAngle())
 			return filterSpherePack(predicate,sp,**kw)
+			#return filterSpherePack(inSpace(predicate.center()),sp,**kw)
 		print "No suitable packing in database found, running triaxial"
 		sys.stdout.flush()
 	V=(4/3)*pi*radius**3; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
@@ -256,11 +278,12 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 			c=conn.cursor()
 			c.execute('create table packings (radius real, radiusStDev real, dimx real, dimy real, dimz real, N integer, timestamp real, pack blob)')
 		c=conn.cursor()
-		packBlob=buffer(cPickle.dumps(sp.toList(),cPickle.HIGHEST_PROTOCOL))
+		packBlob=buffer(cPickle.dumps(sp.toList_pointsAsTuples(),cPickle.HIGHEST_PROTOCOL))
 		c.execute('insert into packings values (?,?,?,?,?,?,?,?)',(radius,radiusStDev,fullDim[0],fullDim[1],fullDim[2],len(sp),time.time(),packBlob,))
 		c.close()
 		conn.commit()
 		print "Packing saved to the database",memoizeDb
+	if orientation: sp.rotate(*orientation.ToAxisAngle())
 	return filterSpherePack(predicate,sp,**kw)
 
 

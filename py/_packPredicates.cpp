@@ -314,6 +314,7 @@ public:
 		}
 		return ptCheck(pt) && ptCheck(pt-Vector3r(pad,0,0)) && ptCheck(pt+Vector3r(pad,0,0)) && ptCheck(pt-Vector3r(0,pad,0))&& ptCheck(pt+Vector3r(0,pad,0)) && ptCheck(pt-Vector3r(0,0,pad))&& ptCheck(pt+Vector3r(0,0,pad));
 	}
+	python::object surface() const {return pySurf;}
 };
 
 #endif
@@ -342,7 +343,8 @@ BOOST_PYTHON_MODULE(_packPredicates){
 	python::class_<inEllipsoid,python::bases<Predicate> >("inEllipsoid","Ellipsoid predicate",python::init<const Vector3r&,const Vector3r&>(python::args("centerPoint","abc"),"Ctor taking center of the ellipsoid (3-tuple) and its 3 radii (3-tuple)."));
 	python::class_<notInNotch,python::bases<Predicate> >("notInNotch","Outside of infinite, rectangle-shaped notch predicate",python::init<const Vector3r&,const Vector3r&,const Vector3r&,Real>(python::args("centerPoint","edge","normal","aperture"),"Ctor taking point in the symmetry plane, vector pointing along the edge, plane normal and aperture size.\nThe side inside the notch is edge×normal.\nNormal is made perpendicular to the edge.\nAll vectors are normalized at construction time.")); 
 	#ifdef YADE_GTS
-		python::class_<inGtsSurface,python::bases<Predicate> >("inGtsSurface","GTS surface predicate",python::init<python::object,python::optional<bool> >(python::args("surface","noPad"),"Ctor taking a gts.Surface() instance, which must not be modified during instance lifetime.\nThe optional noPad can disable padding (if set to True), which speeds up calls several times.\nNote: padding checks inclusion of 6 points along +- cardinal directions in the pad distance from given point, which is not exact."));
+		python::class_<inGtsSurface,python::bases<Predicate> >("inGtsSurface","GTS surface predicate",python::init<python::object,python::optional<bool> >(python::args("surface","noPad"),"Ctor taking a gts.Surface() instance, which must not be modified during instance lifetime.\nThe optional noPad can disable padding (if set to True), which speeds up calls several times.\nNote: padding checks inclusion of 6 points along +- cardinal directions in the pad distance from given point, which is not exact."))
+			.add_property("surf",&inGtsSurface::surface,"The associated gts.Surface object.");
 	#endif
 }
 

@@ -288,7 +288,7 @@ bool Omega::timeStepperActive(){
 bool Omega::containTimeStepper(){
 	if(!rootBody) return false;
 	FOREACH(const shared_ptr<Engine>& e, rootBody->engines){
-		if (isInheritingFrom(e->getClassName(),"TimeStepper")) return true;
+		if (e && isInheritingFrom(e->getClassName(),"TimeStepper")) return true;
 	}
 	return false;
 }

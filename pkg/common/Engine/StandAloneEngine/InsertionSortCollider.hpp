@@ -49,6 +49,7 @@ class InsertionSortCollider: public Collider{
 		// if False, no type of striding is used
 		// if True, then either sweepLength XOR nBins is set
 		bool strideActive;
+		public:
 		/// Absolute length that will be added to bounding boxes at each side; it should be something like 1/5 of typical grain radius
 		/// this value is used to adapt stride; if too large, stride will be big, but the ratio of potential-only interactions will be very big, 
 		/// thus slowing down collider & interaction loops significantly (remember: O(addLength^3))
@@ -63,6 +64,7 @@ class InsertionSortCollider: public Collider{
 		// parameters to be passed to VelocityBins, if nBins>0
 		int nBins; Real binCoeff, binOverlap;
 	#endif
+	private:
 	//! storage for bounds
 	std::vector<Bound> XX,YY,ZZ;
 	//! storage for bb maxima and minima

@@ -17,6 +17,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 			RPATH=env['RPATH']+(['$runtimePREFIX/lib/yade$SUFFIX/py/gts'] if 'GTS' in env['features'] else []),	
 			),
 		env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['Shop']),
+		env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
 		env.File('utils.py'),
 		env.File('eudoxos.py'),
 		env.File('plot.py'),

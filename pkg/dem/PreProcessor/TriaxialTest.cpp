@@ -626,8 +626,10 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
+	rootBody->engines.push_back(collider);
 	if(fast){
+		collider->sweepLength=.05*radiusMean;
 		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;

@@ -17,8 +17,7 @@ thetas=arange(0,pi/2,pi/24)
 # without these transformation, it would look a little simpler:
 # 	pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+2e-3*theta) for pt in poly] for theta in thetas],thetas
 #
-import euclid
-pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+2e-3*theta) for pt in poly] for theta in thetas],thetas,origin=euclid.Vector3(0,0,.1),orientation=euclid.Quaternion().new_rotate_axis(pi/4,euclid.Vector3(1,1,0)))
+pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+2e-3*theta) for pt in poly] for theta in thetas],thetas,origin=Vector3(0,0,.1),orientation=Quaternion((1,1,0),pi/4))
 # connect meridians to make surfaces
 # caps will close it at the beginning and the end
 # threshold will merge points closer than 1e-4; this is important: we want it to be closed for filling
@@ -32,7 +31,7 @@ O.bodies.append(pack.gtsSurface2Facets(surf,color=(1,0,1)))
 # parameters (or parameters that can be scaled to the same one),
 # it will load the packing instead of running the triaxial compaction again.
 # Try running for the second time to see the speed difference!
-O.bodies.append(pack.triaxialPack(pack.inGtsSurface(surf),radius=15e-4,radiusStDev=1e-4,memoizeDb='/tmp/gts-triax-packings.sqlite'))
+O.bodies.append(pack.triaxialPack(pack.inGtsSurface(surf),radius=1e-4,radiusStDev=1e-4,memoizeDb='/tmp/gts-triax-packings.sqlite'))
 # We could also fill the horse with triaxial packing, but have nice approximation, the triaxial would run terribly long,
 # since horse discard most volume of its bounding box
 # Here, we would use a very crude one, however

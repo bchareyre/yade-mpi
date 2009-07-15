@@ -36,6 +36,7 @@ struct SpherePack{
 	// I/O
 	void fromList(const python::list& l);
 	python::list toList() const;
+	python::list toList_pointsAsTuples() const;
 	void fromFile(const string file);
 	void toFile(const string file) const;
 	void fromSimulation();
@@ -77,12 +78,22 @@ void SpherePack::fromList(const python::list& l){
 	size_t len=python::len(l);
 	for(size_t i=0; i<len; i++){
 		const python::tuple& t=python::extract<python::tuple>(l[i]);
-		const python::tuple& t1=python::extract<python::tuple>(t[0]);
-		pack.push_back(Sph(tuple2vec(t1),python::extract<double>(t[1])));
+		python::extract<python::tuple> tup(t[0]);
+		if(tup.check()) { pack.push_back(Sph(tuple2vec(tup()),python::extract<double>(t[1]))); continue;}
+		python::extract<Vector3r> vec(t[0]);
+		if(vec.check()) { pack.push_back(Sph(vec(),python::extract<double>(t[1]))); continue; }
+		PyErr_SetString(PyExc_TypeError, "List elements must be (tuple or Vector3, float)!");
+		python::throw_error_already_set();
 	}
 };
 
 python::list SpherePack::toList() const {
+	python::list ret;
+	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c,s.r));
+	return ret;
+};
+
+python::list SpherePack::toList_pointsAsTuples() const {
 	python::list ret;
 	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(vec2tuple(s.c),s.r));
 	return ret;
@@ -120,6 +131,7 @@ BOOST_PYTHON_MODULE(_packSpheres){
 	python::class_<SpherePack>("SpherePack","Set of spheres as centers and radii",python::init<python::optional<python::list> >(python::args("list"),"Empty constructor, optionally taking list [ ((cx,cy,cz),r), … ] for initial data." ))
 		.def("add",&SpherePack::add,"Add single sphere to packing, given center as 3-tuple and radius")
 		.def("toList",&SpherePack::toList,"Return packing data as python list.")
+		.def("toList_pointsAsTuples",&SpherePack::toList_pointsAsTuples,"Return packing data as python list, but using only pure-python data types (3-tuples instead of Vector3) (for pickling with cPickle)")
 		.def("fromList",&SpherePack::fromList,"Make packing from given list, same format as for constructor. Discards current data.")
 		.def("load",&SpherePack::fromFile,"Load packing from external text file (current data will be discarded).")
 		.def("save",&SpherePack::toFile,"Save packing to external text file (will be overwritten).")
