@@ -46,11 +46,11 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 		for(size_t i=0; i<nBins; i++){
 			Bin& bin=bins[i];
 			// 0th bin (fastest) has maximum the current maximum; slowest bin has minimum 0.
-			bin.binMaxVelSq=(i==0       ? currMaxVelSq : refMaxVelSq/pow(binCoeff*binCoeff,i));
-			bin.binMinVelSq=(i==nBins-1 ? 0.           : refMaxVelSq/pow(binCoeff*binCoeff,i+1));
+			bin.binMaxVelSq=(i==0       ? currMaxVelSq : refMaxVelSq/pow(binCoeff*binCoeff,(int)i));
+			bin.binMinVelSq=(i==nBins-1 ? 0.           : refMaxVelSq/pow(binCoeff*binCoeff,(int)(i+1)));
 			bin.maxDist=(i==0 ?
 				(refMaxVelSq==0 ? 0: sqrt(currMaxVelSq/refMaxVelSq)*abs(refSweepLength)) :
-				abs(refSweepLength)/pow(binCoeff,i)
+				abs(refSweepLength)/pow(binCoeff,(int)i)
 			);
 			bin.currDistSq=0; bin.currMaxVelSq=0; bin.nBodies=0;
 		}
