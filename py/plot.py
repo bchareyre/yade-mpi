@@ -78,9 +78,14 @@ def addData(d):
 		if name in d: data[name].append(d[name]) #numpy.append(data[name],[d[name]],1)
 		else: data[name].append(nan)
 
-def fillNonSequence(o):
-	if o.__class__==tuple().__class__ or o.__class__==list().__class__: return o
+def addPointTypeSpecifier(o):
+	"""Add point type specifier to simple variable name"""
+	if type(o) in [tuple,list]: return o
 	else: return (o,'')
+def tuplifyYAxis(pp):
+	"""convert one variable to a 1-tuple"""
+	if type(pp) in [tuple,list]: return pp
+	else: return (pp,)
 
 def show(): plot()
 
@@ -88,10 +93,22 @@ def plot():
 	pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
 	for p in plots:
 		pylab.figure()
-		plots_p=[fillNonSequence(o) for o in plots[p]]
+		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		plotsFilled[p]=plots_p
-		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p],[]))
-		pylab.legend([_p[0] for _p in plots_p])
+		plots_p_y1,plots_p_y2=[],[]; y1=True
+		for d in plots_p:
+			if d[0]=='|||':
+				y1=False; continue
+			if y1: plots_p_y1.append(d)
+			else: plots_p_y2.append(d)
+		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y1],[]))
+		pylab.legend([_p[0] for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
+		pylab.ylabel(','.join([_p[0] for _p in plots_p_y1]))
+		if len(plots_p_y2)>0:
+			pylab.twinx()
+			plotLines[p]+=[pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y2],[]))]
+			pylab.legend([_p[0] for _p in plots_p_y2],loc='upper right')
+			pylab.ylabel(','.join([_p[0] for _p in plots_p_y2]))
 		pylab.xlabel(p)
 		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
 	pylab.show()

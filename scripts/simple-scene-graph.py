@@ -57,7 +57,7 @@ import yade.plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)
 ## 2. z_sph and v_sph (rendered as green triangles, 'g^') as function of t
-yade.plot.plots={'i':('t'),'t':('z_sph',('v_sph','g^'))}
+yade.plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'))}
 
 ## static var to specify max number of samples we want to have (1000 is default, no change)
 # yade.plot.maxDataLen=1000
@@ -79,3 +79,4 @@ print """Now, you can say
 to see figures.
 """
 import yade.plot as yp
+yp.plot()
