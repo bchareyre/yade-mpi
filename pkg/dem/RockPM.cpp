@@ -92,7 +92,7 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
 	
 	assert(contGeom);
-	
+	//LOG_WARN(Omega::instance().getCurrentIteration());
 	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
 	const shared_ptr<RpmMat>& rpm2=YADE_PTR_CAST<RpmMat>(pp2);
 	
