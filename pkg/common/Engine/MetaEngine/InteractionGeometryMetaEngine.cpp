@@ -45,12 +45,9 @@ shared_ptr<Interaction> InteractionGeometryMetaEngine::explicitAction(const shar
 void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 {
 	// Erase interaction that were requested for erase, but not processed by the collider, if any (and warn once about that, as it is suspicious)
-	if(ncb->interactions->pendingErase.size()>0){
-		if(!alreadyWarnedNoCollider){
-			LOG_WARN("Interactions pending erase found, no collider being used?");
-			alreadyWarnedNoCollider=true;
-		}
-		ncb->interactions->unconditionalErasePending();
+	if(ncb->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
+		LOG_WARN("Interactions pending erase found, no collider being used?");
+		alreadyWarnedNoCollider=true;
 	}
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

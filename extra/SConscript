@@ -10,7 +10,9 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
          'RigidBodyParameters',
 			'ElasticBodyParameters',
 			'BodyMacroParameters',
-         'AABB']),
+         'AABB',
+			'EngineUnits',
+			]),
 	
 	env.SharedLibrary('TetraTestGen',['tetra/TetraTestGen.cpp'],LIBS=env['LIBS']+['Shop','Tetra']),
 

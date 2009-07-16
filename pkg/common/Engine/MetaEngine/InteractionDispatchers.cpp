@@ -3,22 +3,36 @@
 YADE_PLUGIN("InteractionDispatchers");
 CREATE_LOGGER(InteractionDispatchers);
 
+// #define IDISP_TIMING
+
+#ifdef IDISP_TIMING
+	#define IDISP_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)
+#else
+	#define IDISP_CHECKPOINT(cpt)
+#endif
+
+
+
+
 InteractionDispatchers::InteractionDispatchers(){
 	geomDispatcher=shared_ptr<InteractionGeometryMetaEngine>(new InteractionGeometryMetaEngine);
 	physDispatcher=shared_ptr<InteractionPhysicsMetaEngine>(new InteractionPhysicsMetaEngine);
 	constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
 	alreadyWarnedNoCollider=false;
+	#ifdef IDISP_TIMING
+		timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+	#endif
 }
 
 #define DISPATCH_CACHE
 
 void InteractionDispatchers::action(MetaBody* rootBody){
-	if(rootBody->interactions->pendingErase.size()>0){
-		if(!alreadyWarnedNoCollider){
-			LOG_WARN("Interactions pending erase found, no collider being used?");
-			alreadyWarnedNoCollider=true;
-		}
-		rootBody->interactions->unconditionalErasePending();
+	#ifdef IDISP_TIMING
+		timingDeltas->start();
+	#endif
+	if(rootBody->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
+		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
+		alreadyWarnedNoCollider=true;
 	}
 	#ifdef YADE_OPENMP
 		const long size=rootBody->interactions->size();
@@ -29,6 +43,7 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 		FOREACH(shared_ptr<Interaction> I, *rootBody->interactions){
 	#endif
 		#ifdef DISPATCH_CACHE
+
 			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
 
@@ -63,6 +78,7 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 				continue; // in any case don't care about this one anymore
 			}
 
+
 			// InteractionPhysicsMetaEngine
 			if(!I->functorCache.phys){
 				I->functorCache.phys=physDispatcher->getFunctor2D(b1->physicalParameters,b2->physicalParameters,swap);
@@ -73,7 +89,6 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			assert(I->interactionPhysics);
 
 			if(!wasReal) I->iterMadeReal=rootBody->currentIteration; // mark the interaction as created right now
-
 
 			// ConstitutiveLawDispatcher
 			// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction

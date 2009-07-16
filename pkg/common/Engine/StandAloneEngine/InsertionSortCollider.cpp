@@ -132,15 +132,9 @@ void InsertionSortCollider::action(MetaBody* rb){
 	ISC_CHECKPOINT("init");
 
 		#ifdef COLLIDE_STRIDED
-			// get us ready for strides
-			if(!strideActive && sweepLength>0){
-				if(newton->maxVelocitySq>=0){ // maxVelocitySq is a really computed value
-					strideActive=true;
-					if(nBins>=1){
-						if(!newton->velocityBins){ newton->velocityBins=shared_ptr<VelocityBins>(new VelocityBins(nBins,newton->maxVelocitySq,binCoeff,binOverlap)); }
-						if(!boundDispatcher->velocityBins) boundDispatcher->velocityBins=newton->velocityBins;
-					}
-				}
+			// get us ready for strides, if they were deactivated
+			if(!strideActive && sweepLength>0 && newton->maxVelocitySq>=0){ // maxVelocitySq is a really computed value
+				strideActive=true;
 			}
 			if(strideActive){
 				assert(sweepLength>0);
@@ -158,7 +152,10 @@ void InsertionSortCollider::action(MetaBody* rb){
 					LOG_DEBUG(rb->simulationTime<<"s: stride ≈"<<stride<<"; maxVelocity="<<sqrt(newton->maxVelocitySq)<<", sweepDist="<<boundDispatcher->sweepDist);
 					fastestBodyMaxDist=0; // reset
 				} else { // nBins>=1
-					assert(newton->velocityBins); assert(boundDispatcher->velocityBins);
+					if(!newton->velocityBins){ newton->velocityBins=shared_ptr<VelocityBins>(new VelocityBins(nBins,newton->maxVelocitySq,binCoeff,binOverlap)); }
+					if(!boundDispatcher->velocityBins) boundDispatcher->velocityBins=newton->velocityBins;
+					newton->velocityBins->nBins=nBins; newton->velocityBins->binCoeff=binCoeff; newton->velocityBins->binOverlap=binOverlap; // update things 
+					boundDispatcher->sweepDist=0;
 					// re-bin bodies
 					newton->velocityBins->setBins(rb,newton->maxVelocitySq,sweepLength);
 				}

@@ -21,6 +21,8 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
+#define ISDYNAMIC_REDEFINED
+
 class MetaBody;
 
 /*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.

@@ -19,6 +19,10 @@ class PhysicalParameters: public Serializable, public Indexable
 		bool isDisplayed; //! False if the body is not displayed in this cycle (clipped, for instance)
 
 		unsigned blockedDOFs; //! Bitmask for degrees of freedom where velocity will be always zero, regardless of applied forces
+
+		// mutex for updating the parameters from within the interaction loop
+		boost::mutex updateMutex;
+
 		enum {DOF_NONE=0,DOF_X=1,DOF_Y=2,DOF_Z=4,DOF_RX=8,DOF_RY=16,DOF_RZ=32};
 		static const unsigned DOF_ALL=DOF_X|DOF_Y|DOF_Z|DOF_RX|DOF_RY|DOF_RZ; //! shorthand for all DOFs blocked
 		static const unsigned DOF_XYZ=DOF_X|DOF_Y|DOF_Z; //! shorthand for all displacements blocked

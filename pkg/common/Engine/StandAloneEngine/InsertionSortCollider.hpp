@@ -20,7 +20,7 @@ class InteractionContainer;
 //#define ISC_TIMING
 
 #ifdef ISC_TIMING
-	#define ISC_CHECKPOINT(cpt) timingDeltas->checkPoint(cpt)
+	#define ISC_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)
 #else
 	#define ISC_CHECKPOINT(cpt)
 #endif

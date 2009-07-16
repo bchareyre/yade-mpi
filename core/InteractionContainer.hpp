@@ -14,6 +14,7 @@
 #include<boost/thread/mutex.hpp>
 #include<iostream>
 #include<boost/range.hpp>
+#include<omp.h>
 
 // BOOST_FOREACH compatibility
 #ifndef FOREACH
@@ -86,7 +87,11 @@ class InteractionContainer : public Serializable
 	public :
 		boost::mutex	drawloopmutex;
 
-		InteractionContainer(): serializeSorted(false) { };
+		InteractionContainer(): serializeSorted(false) {
+			#ifdef YADE_OPENMP
+				threadsPendingErase.resize(omp_get_max_threads());
+			#endif
+		}
 		virtual ~InteractionContainer() {};
 
 		virtual bool insert(body_id_t /*id1*/,body_id_t /*id2*/)				{throw;};
@@ -117,6 +122,9 @@ class InteractionContainer : public Serializable
 			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you)
 			If there is, at one point, a multi-threaded collider, pendingEraseMutex should be moved to the public part and used from there as well.
 		*/
+		#ifdef YADE_OPENMP
+			vector<list<bodyIdPair> > threadsPendingErase;
+		#endif
 		list<bodyIdPair> pendingErase;
 		/*! Erase all pending interactions unconditionally.
 
@@ -126,7 +134,7 @@ class InteractionContainer : public Serializable
 
 			This function doesn't lock pendingEraseMutex, as it is (supposedly) called from no-parallel sections only once per iteration
 		*/
-		void unconditionalErasePending();
+		int unconditionalErasePending();
 		/*! Traverse all pending interactions and erase them if the (T*)->shouldBeErased(id1,id2) return true
 			and keep it if it return false; finally, pendingErase will be clear()'ed.
 
@@ -135,16 +143,23 @@ class InteractionContainer : public Serializable
 				bool shouldBeErased(body_id_t, body_id_t) const
 
 			method which will be called for every interaction.
+
+			Returns number of interactions, have they been erased or not (this is useful to check if there were some erased, after traversing those)
 		*/
-		template<class T> void erasePending(const T& t){
-			FOREACH(const Vector2<body_id_t>& p, pendingErase){ if(t.shouldBeErased(p[0],p[1])) erase(p[0],p[1]); }
-			pendingErase.clear();
+		template<class T> int erasePending(const T& t){
+			int ret=0;
+			#ifdef YADE_OPENMP
+				// shadow the this->pendingErase by the local variable, to share the code
+				FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
+			#endif
+					FOREACH(const Vector2<body_id_t>& p, pendingErase){ ret++; if(t.shouldBeErased(p[0],p[1])) erase(p[0],p[1]); }
+					pendingErase.clear();
+			#ifdef YADE_OPENMP
+				}
+			#endif
+			return ret;
 		}
 	private :
-		#ifdef YADE_OPENMP
-			// This is used only from within requestErase() for now, therefore it can be private
-			boost::mutex pendingEraseMutex;
-		#endif
 		// used only during serialization/deserialization
 		vector<shared_ptr<Interaction> > interaction;
 	protected :
