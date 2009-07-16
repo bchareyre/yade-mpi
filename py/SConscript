@@ -30,6 +30,9 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 
 	# 3rd party modules:
 	# ==================
+	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
+		env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/'])
+	])
 
 
 
