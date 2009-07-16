@@ -30,11 +30,6 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 
 	# 3rd party modules:
 	# ==================
-	# do not install them under yade but to the top-level module path; say e.g. 'import euclid' (not 'import yade.euclid')
-	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
-		env.File('euclid.py'),
-		env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/'])
-	])
 
 
 
