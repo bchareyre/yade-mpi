@@ -106,9 +106,56 @@ class TriaxialStressController : public DeusExMachina
 
 		DECLARE_LOGGER;
 		
-	
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,
+		(stiffnessUpdateInterval)
+		(radiusControlInterval)
+		(computeStressStrainInterval)
+		(wallDamping)
+		//	(force)
+		
+		//(UnbalancedForce)
+		(stiffness)
+		(wall_bottom_id)
+		(wall_top_id)
+		(wall_left_id)
+		(wall_right_id)
+		(wall_front_id)
+		(wall_back_id)
+		//	(wall_id)
+		(wall_bottom_activated)
+		(wall_top_activated)
+		(wall_left_activated)
+		(wall_right_activated)
+		(wall_front_activated)
+		(wall_back_activated)
+		
+		(thickness)
+		(height)
+		(width)
+		(depth)
+		(height0)
+		(width0)
+		(depth0)
+		
+		(sigma_iso)
+		(sigma1)
+		(sigma2)
+		(sigma3)
+		(isTriaxialCompression)
+		(maxMultiplier)
+		(finalMaxMultiplier)
+		(max_vel)
+		(max_vel1)
+		(max_vel2)
+		(max_vel3)
+		(previousStress)
+		(previousMultiplier)
+		(internalCompaction)
+
+		// needed for access from python
+		(meanStress)
+		(volumetricStrain)
+	);
 	REGISTER_CLASS_NAME(TriaxialStressController);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

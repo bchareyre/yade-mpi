@@ -28,12 +28,6 @@ ElasticCriterionTimeStepper::~ElasticCriterionTimeStepper()
 }
 
 
-void ElasticCriterionTimeStepper::registerAttributes()
-{
-	TimeStepper::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-}
-
 
 void ElasticCriterionTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
 {

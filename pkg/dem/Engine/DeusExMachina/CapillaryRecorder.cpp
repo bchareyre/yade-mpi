@@ -33,14 +33,6 @@ void CapillaryRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void CapillaryRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(bigBallId);
-}
-
 
 bool CapillaryRecorder::isActivated(MetaBody* rootBody)
 {

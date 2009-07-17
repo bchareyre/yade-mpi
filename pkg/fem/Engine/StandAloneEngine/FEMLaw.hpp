@@ -24,8 +24,7 @@ class FEMLaw : public InteractionSolver
 		void action(MetaBody*);
 
 /// Serializtion
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(nodeGroupMask)(tetrahedronGroupMask));
 	REGISTER_CLASS_NAME(FEMLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

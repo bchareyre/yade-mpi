@@ -37,10 +37,9 @@ class MovingSupport : public DataRecorder
 
 		MovingSupport ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
-
+	REGISTER_ATTRIBUTES(DataRecorder,/*(sections)*/(sections_midpoints)(sections_halflength)(sections_directions)/*(first)(subscribedBodies)*/);
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);

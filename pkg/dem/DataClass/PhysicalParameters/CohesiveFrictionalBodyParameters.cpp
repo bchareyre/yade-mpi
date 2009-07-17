@@ -19,11 +19,4 @@ CohesiveFrictionalBodyParameters::~CohesiveFrictionalBodyParameters()
 {
 }
 
-void CohesiveFrictionalBodyParameters::registerAttributes()
-{
-	BodyMacroParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(isCohesive);
-	REGISTER_ATTRIBUTE(isBroken);
-}
-
 YADE_PLUGIN();

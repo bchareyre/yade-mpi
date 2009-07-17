@@ -89,29 +89,6 @@ void ThreePointBending::postProcessAttributes(bool)
 }
 
 
-void ThreePointBending::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	
-	REGISTER_ATTRIBUTE(yadeFileWithSpheres);
-
-	REGISTER_ATTRIBUTE(pistonVelocity);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-	
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	
-	REGISTER_ATTRIBUTE(linkKn);
-	REGISTER_ATTRIBUTE(linkKs);
-	REGISTER_ATTRIBUTE(linkMaxNormalForce);
-	REGISTER_ATTRIBUTE(linkMaxShearForce);
-}
-
 
 bool ThreePointBending::generate()
 {

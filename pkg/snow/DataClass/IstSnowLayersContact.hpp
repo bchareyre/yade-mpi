@@ -11,9 +11,7 @@ class IstSnowLayersContact : public SpheresContactGeometry
 		IstSnowLayersContact();
 		virtual ~IstSnowLayersContact();
 
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(SpheresContactGeometry,/* */);
 	REGISTER_CLASS_NAME(IstSnowLayersContact);
 	REGISTER_BASE_CLASS_NAME(SpheresContactGeometry);
 	REGISTER_CLASS_INDEX(IstSnowLayersContact,SpheresContactGeometry);

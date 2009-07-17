@@ -22,7 +22,7 @@ class FixedPositionEngine : public DeusExMachina {
 		FixedPositionEngine();
 	protected:
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(fixedPosition)(mask));
 	REGISTER_CLASS_NAME(FixedPositionEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

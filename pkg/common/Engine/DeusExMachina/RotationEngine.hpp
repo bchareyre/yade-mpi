@@ -23,7 +23,7 @@ class RotationEngine : public DeusExMachina
 		void applyCondition(MetaBody * );
 
 	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(angularVelocity)(rotationAxis)(rotateAroundZero)(zeroPoint));
 	REGISTER_CLASS_NAME(RotationEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

@@ -20,13 +20,4 @@ BssSweptSphereLineSegment::~BssSweptSphereLineSegment ()
 {		
 }
 
-void BssSweptSphereLineSegment::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-        REGISTER_ATTRIBUTE(length);
-        REGISTER_ATTRIBUTE(position);
-        REGISTER_ATTRIBUTE(orientation);
-}
-
 YADE_PLUGIN("BssSweptSphereLineSegment");

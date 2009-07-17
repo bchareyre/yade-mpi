@@ -18,11 +18,4 @@ Facet::~Facet ()
 {
 }
 
-
-void Facet::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(vertices);
-}
-
 YADE_PLUGIN();

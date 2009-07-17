@@ -22,12 +22,6 @@ SimpleElasticRelationshipsWater::SimpleElasticRelationshipsWater()
 }
 
 
-void SimpleElasticRelationshipsWater::registerAttributes()
-{
-	
-}
-
-
 
 
 void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& b1 //BodyMacroParameters

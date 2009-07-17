@@ -17,8 +17,7 @@ class InteractingNode : public InteractingGeometry
 		virtual ~InteractingNode ();
 
 /// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractingGeometry,/* */);
 	REGISTER_CLASS_NAME(InteractingNode);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
 

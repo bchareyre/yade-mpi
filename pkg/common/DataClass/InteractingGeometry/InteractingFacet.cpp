@@ -22,15 +22,6 @@ InteractingFacet::~InteractingFacet()
 {
 }
 
-void InteractingFacet::registerAttributes()
-{
-    InteractingGeometry::registerAttributes();
-    REGISTER_ATTRIBUTE(vertices);
-	#ifdef FACET_TOPO
-		REGISTER_ATTRIBUTE(edgeAdjIds);
-		REGISTER_ATTRIBUTE(edgeAdjHalfAngle);
-	#endif
-}
 
 void InteractingFacet::postProcessAttributes(bool deserializing)
 {

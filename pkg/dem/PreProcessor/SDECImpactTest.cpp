@@ -124,61 +124,6 @@ SDECImpactTest::~SDECImpactTest ()
 }
 
 
-void SDECImpactTest::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-//	REGISTER_ATTRIBUTE(lowerCorner);
-//	REGISTER_ATTRIBUTE(upperCorner);
-//	REGISTER_ATTRIBUTE(thickness);
-	REGISTER_ATTRIBUTE(importFilename);
-	REGISTER_ATTRIBUTE(boxWalls);
-
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-
-	REGISTER_ATTRIBUTE(boxYoungModulus);
-	REGISTER_ATTRIBUTE(boxPoissonRatio);
-	REGISTER_ATTRIBUTE(boxFrictionDeg);
-
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-//	REGISTER_ATTRIBUTE(wall_top);
-//	REGISTER_ATTRIBUTE(wall_bottom);
-//	REGISTER_ATTRIBUTE(wall_1);
-//	REGISTER_ATTRIBUTE(wall_2);
-//	REGISTER_ATTRIBUTE(wall_3);
-//	REGISTER_ATTRIBUTE(wall_4);
-//	REGISTER_ATTRIBUTE(wall_top_wire);
-//	REGISTER_ATTRIBUTE(wall_bottom_wire);
-//	REGISTER_ATTRIBUTE(wall_1_wire);
-//	REGISTER_ATTRIBUTE(wall_2_wire);
-//	REGISTER_ATTRIBUTE(wall_3_wire);
-//	REGISTER_ATTRIBUTE(wall_4_wire);
-//	REGISTER_ATTRIBUTE(spheresColor);
-//	REGISTER_ATTRIBUTE(spheresRandomColor);
-//	REGISTER_ATTRIBUTE(recordBottomForce);
-	REGISTER_ATTRIBUTE(forceRecordFile);
-//	REGISTER_ATTRIBUTE(recordAveragePositions);
-	REGISTER_ATTRIBUTE(positionRecordFile);
-	REGISTER_ATTRIBUTE(velocityRecordFile)
-	REGISTER_ATTRIBUTE(recordIntervalIter);
-
-//	REGISTER_ATTRIBUTE(gravity);
-	
-	REGISTER_ATTRIBUTE(bigBall);
-	REGISTER_ATTRIBUTE(bigBallRadius);
-	REGISTER_ATTRIBUTE(bigBallDensity);
-	REGISTER_ATTRIBUTE(bigBallDropTimeSeconds);
-	REGISTER_ATTRIBUTE(bigBallFrictDeg);
-	REGISTER_ATTRIBUTE(bigBallYoungModulus);
-	REGISTER_ATTRIBUTE(bigBallPoissonRatio);
-	REGISTER_ATTRIBUTE(bigBallDropHeight);
-
-}
 
 
 bool SDECImpactTest::generate()

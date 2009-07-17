@@ -24,12 +24,6 @@ void FixedOrientationEngine::postProcessAttributes(bool deserializing)
 }
 
 
-void FixedOrientationEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(fixedOrientation);
-}
-
 
 void FixedOrientationEngine::applyCondition(MetaBody * ncb)
 {

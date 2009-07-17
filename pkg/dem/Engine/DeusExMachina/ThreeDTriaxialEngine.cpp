@@ -83,44 +83,6 @@ ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 //}
 
 
-void ThreeDTriaxialEngine::registerAttributes()
-{
-	TriaxialStressController::registerAttributes();
-	REGISTER_ATTRIBUTE(strainRate1);
-	REGISTER_ATTRIBUTE(currentStrainRate1);
-	REGISTER_ATTRIBUTE(strainRate2);
-	REGISTER_ATTRIBUTE(currentStrainRate2);
-	REGISTER_ATTRIBUTE(strainRate3);
-	REGISTER_ATTRIBUTE(currentStrainRate3);
-	//REGISTER_ATTRIBUTE(Phase1);
-	REGISTER_ATTRIBUTE(UnbalancedForce);
-	REGISTER_ATTRIBUTE(StabilityCriterion);
-	//REGISTER_ATTRIBUTE(translationAxis);
-	//REGISTER_ATTRIBUTE(compressionActivated);
-	//REGISTER_ATTRIBUTE(autoCompressionActivation);
-	//REGISTER_ATTRIBUTE(autoStopSimulation);
-	REGISTER_ATTRIBUTE(testEquilibriumInterval);
-	//REGISTER_ATTRIBUTE(currentState);
-	//REGISTER_ATTRIBUTE(previousState);
-	//REGISTER_ATTRIBUTE(sigmaIsoCompaction);
-	//REGISTER_ATTRIBUTE(previousSigmaIso);
-	//REGISTER_ATTRIBUTE(sigmaLateralConfinement);
-	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(frictionAngleDegree);
-	REGISTER_ATTRIBUTE(updateFrictionAngle);
-	//REGISTER_ATTRIBUTE(epsilonMax);
-	REGISTER_ATTRIBUTE(uniaxialEpsilonCurr);
- 	//REGISTER_ATTRIBUTE(isotropicCompaction);
- 	REGISTER_ATTRIBUTE(spheresVolume);
- 	//REGISTER_ATTRIBUTE(fixedPorosity);
-	REGISTER_ATTRIBUTE(stressControl_1);
-	REGISTER_ATTRIBUTE(stressControl_2);
-	REGISTER_ATTRIBUTE(stressControl_3);
-	REGISTER_ATTRIBUTE(sigma1);
-	REGISTER_ATTRIBUTE(sigma2);
-	REGISTER_ATTRIBUTE(sigma3);
-}
-
 
 
 void ThreeDTriaxialEngine::applyCondition ( MetaBody * ncb )

@@ -37,16 +37,6 @@ void StrainRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void StrainRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(subscribedBodies);
-	REGISTER_ATTRIBUTE(initialLength);
-	REGISTER_ATTRIBUTE(only_stress);
-}
-
 
 bool StrainRecorder::isActivated(MetaBody*)
 {

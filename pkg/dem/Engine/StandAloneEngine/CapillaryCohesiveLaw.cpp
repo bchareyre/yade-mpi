@@ -61,15 +61,6 @@ void CapillaryCohesiveLaw::postProcessAttributes(bool deserializing){
   capillary->fill("M(r=10)");
 }
 
-void CapillaryCohesiveLaw::registerAttributes()
-{
-        InteractionSolver::registerAttributes();
-        REGISTER_ATTRIBUTE(sdecGroupMask);
-        REGISTER_ATTRIBUTE(CapillaryPressure);
-        REGISTER_ATTRIBUTE(fusionDetection);
-        REGISTER_ATTRIBUTE(binaryFusion);
-
-}
 
 MeniscusParameters::MeniscusParameters()
 {
@@ -702,10 +693,11 @@ void BodiesMenisciiList::display()
 			//cerr << "size = "<<interactionsOnBody[i].size() << " empty="<<interactionsOnBody[i].empty() <<endl;
 			for ( firstMeniscus=interactionsOnBody[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )
 			{
-				if ( *firstMeniscus )
+				if ( *firstMeniscus ){
 					if ( firstMeniscus->get() )
 						cerr << "(" << ( *firstMeniscus )->getId1() << ", " << ( *firstMeniscus )->getId2() <<") ";
 					else cerr << "(void)";
+				}
 			}
 			cerr << endl;
 		}

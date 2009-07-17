@@ -101,12 +101,7 @@ class PersistentSAPCollider : public Collider
 
 		bool shouldBeErased(body_id_t, body_id_t) const;
 
-		void registerAttributes(){
-			Collider::registerAttributes();
-			REGISTER_ATTRIBUTE(haveDistantTransient);
-			//REGISTER_ATTRIBUTE(ompBodiesMin);
-		}
-
+	REGISTER_ATTRIBUTES(Collider,(haveDistantTransient));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(PersistentSAPCollider);
 	REGISTER_BASE_CLASS_NAME(Collider);

@@ -18,10 +18,4 @@ InteractingBox::~InteractingBox ()
 {		
 }
 
-void InteractingBox::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(extents);
-}
-
 YADE_PLUGIN();

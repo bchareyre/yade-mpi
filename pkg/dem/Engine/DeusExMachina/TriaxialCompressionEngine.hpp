@@ -121,16 +121,13 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)
 		void setContactProperties(MetaBody * body, Real frictionAngle);
 
-
-		DECLARE_LOGGER;
-		
-
 	protected :
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
-		
+	REGISTER_ATTRIBUTES(TriaxialStressController,(strainRate)(currentStrainRate)/*(Phase1)*/(UnbalancedForce)(StabilityCriterion)(translationAxis)/*(compressionActivated)*/(autoCompressionActivation)(autoStopSimulation)(testEquilibriumInterval)(currentState)(previousState)(sigmaIsoCompaction)(previousSigmaIso)(sigmaLateralConfinement)(Key)(noFiles)(frictionAngleDegree)(epsilonMax)(uniaxialEpsilonCurr)(isotropicCompaction)(spheresVolume)(fixedPorosity));
+
 	REGISTER_CLASS_NAME(TriaxialCompressionEngine);
 	REGISTER_BASE_CLASS_NAME(TriaxialStressController);
+	DECLARE_LOGGER;
 };
 
 REGISTER_SERIALIZABLE(TriaxialCompressionEngine);

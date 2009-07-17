@@ -23,11 +23,5 @@ FEMSetParameters::~FEMSetParameters()
 }
 
 
-void FEMSetParameters::registerAttributes()
-{
-	PhysicalParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(nodeGroupMask);
-	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
-}
 
 YADE_PLUGIN();

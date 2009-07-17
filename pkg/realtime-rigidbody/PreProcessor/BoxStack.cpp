@@ -61,22 +61,6 @@ BoxStack::~BoxStack ()
 }
 
 
-void BoxStack::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbBoxes);
-	REGISTER_ATTRIBUTE(boxSize);
-	REGISTER_ATTRIBUTE(boxDensity);
-//	REGISTER_ATTRIBUTE(kinematicBullet);
-	REGISTER_ATTRIBUTE(bulletSize);
-	REGISTER_ATTRIBUTE(bulletDensity);
-	REGISTER_ATTRIBUTE(bulletPosition);
-	REGISTER_ATTRIBUTE(bulletVelocity);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-}
-
 
 bool BoxStack::generate()
 {

@@ -62,24 +62,6 @@ RotatingBox::~RotatingBox ()
 }
 
 
-void RotatingBox::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbSpheres);
-	REGISTER_ATTRIBUTE(nbBoxes);
-	REGISTER_ATTRIBUTE(minSize);
-	REGISTER_ATTRIBUTE(maxSize);
-	REGISTER_ATTRIBUTE(densityBox);
-	REGISTER_ATTRIBUTE(densitySphere);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(isRotating);
-	REGISTER_ATTRIBUTE(rotationSpeed);
-	REGISTER_ATTRIBUTE(rotationAxis);
-	REGISTER_ATTRIBUTE(middleWireFrame);
-//	REGISTER_ATTRIBUTE(disorder);
-}
 
 
 bool RotatingBox::generate()

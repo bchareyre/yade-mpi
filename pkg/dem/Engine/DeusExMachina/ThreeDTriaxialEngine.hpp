@@ -86,10 +86,7 @@ class ThreeDTriaxialEngine : public TriaxialStressController
 		DECLARE_LOGGER;
 		
 
-	protected :
-		//virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
-		
+	REGISTER_ATTRIBUTES(TriaxialStressController,(strainRate1)(currentStrainRate1)(strainRate2)(currentStrainRate2)(strainRate3)(currentStrainRate3)/*(Phase1)*/(UnbalancedForce)(StabilityCriterion)/*(translationAxis)(compressionActivated)(autoCompressionActivation)(autoStopSimulation)*/(testEquilibriumInterval)/*(currentState)(previousState)(sigmaIsoCompaction)(previousSigmaIso)(sigmaLateralConfinement)*/(Key)(frictionAngleDegree)(updateFrictionAngle)	/*(epsilonMax)*/ (uniaxialEpsilonCurr)/*(isotropicCompaction)*/(spheresVolume)/*(fixedPorosity)*/(stressControl_1)(stressControl_2)(stressControl_3)(sigma1)(sigma2)(sigma3));
 	REGISTER_CLASS_NAME(ThreeDTriaxialEngine);
 	REGISTER_BASE_CLASS_NAME(TriaxialStressController);
 };

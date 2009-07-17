@@ -17,15 +17,5 @@ SimpleViscoelasticBodyParameters::~SimpleViscoelasticBodyParameters()
 {
 }
 
-void SimpleViscoelasticBodyParameters::registerAttributes()
-{
-	RigidBodyParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(kn);
-	REGISTER_ATTRIBUTE(ks);
-	REGISTER_ATTRIBUTE(cn);
-	REGISTER_ATTRIBUTE(cs);
-	REGISTER_ATTRIBUTE(frictionAngle);
-}
-
 YADE_PLUGIN();
 

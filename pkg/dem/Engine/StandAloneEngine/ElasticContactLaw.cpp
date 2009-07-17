@@ -30,15 +30,6 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 }
 
 
-void ElasticContactLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-	#ifdef SCG_SHEAR
-		REGISTER_ATTRIBUTE(useShear);
-	#endif
-}
 
 
 void ElasticContactLaw::action(MetaBody* rootBody)

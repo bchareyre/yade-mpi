@@ -27,18 +27,11 @@ CL1Relationships::CL1Relationships()
 }
 
 
-void CL1Relationships::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(betaR);
-	REGISTER_ATTRIBUTE(setCohesionNow);
-	REGISTER_ATTRIBUTE(setCohesionOnNewContacts);	
-}
-
 
 //
 //
 //
-/// Big WHAT THE FUCK? this code below is duplicated THREE times due to some weird IFs !
+/// Big WHAT THE ....? this code below is duplicated THREE times due to some weird IFs !
 /// need to FIXME that.
 /// but from all my testing it works currently. / janek
 //

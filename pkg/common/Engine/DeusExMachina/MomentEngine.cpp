@@ -22,12 +22,6 @@ MomentEngine::~MomentEngine()
 }
 
 
-void MomentEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(moment);
-}
-
 
 void MomentEngine::applyCondition(MetaBody* ncb)
 {

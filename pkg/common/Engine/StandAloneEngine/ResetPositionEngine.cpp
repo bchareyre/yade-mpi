@@ -24,14 +24,6 @@ ResetPositionEngine::ResetPositionEngine(){
 
 void ResetPositionEngine::postProcessAttributes(bool deserializing){}
 
-void ResetPositionEngine::registerAttributes(){
-	PeriodicEngine::registerAttributes(); // for subscribedBodies
-	REGISTER_ATTRIBUTE(Y_min);
-	REGISTER_ATTRIBUTE(subscribedBodies);
-	REGISTER_ATTRIBUTE(initial_positions);
-	REGISTER_ATTRIBUTE(fileName);
-}
-
 
 void ResetPositionEngine::action(MetaBody * ncb)
 {

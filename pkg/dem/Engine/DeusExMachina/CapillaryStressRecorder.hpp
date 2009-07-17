@@ -39,11 +39,10 @@ class CapillaryStressRecorder : public DataRecorder
 
 		CapillaryStressRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
-		DECLARE_LOGGER;
-
+	DECLARE_LOGGER;
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)/*(wall_bottom_id)(wall_top_id)(wall_left_id)(wall_right_id)(wall_front_id)(wall_back_id)(height)(width)(depth)(thickness)(upperCorner)(lowerCorner)	*/);
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(CapillaryStressRecorder);

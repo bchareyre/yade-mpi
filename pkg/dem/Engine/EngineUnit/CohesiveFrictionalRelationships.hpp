@@ -28,13 +28,10 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsEngineUnit
 		int cohesionDefinitionIteration;
 		long iter;//REMOVE THIS
 
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,(normalCohesion)(shearCohesion)(setCohesionNow)(setCohesionOnNewContacts));
 	FUNCTOR2D(CohesiveFrictionalBodyParameters,CohesiveFrictionalBodyParameters);
 	REGISTER_CLASS_NAME(CohesiveFrictionalRelationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
-
 };
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalRelationships);

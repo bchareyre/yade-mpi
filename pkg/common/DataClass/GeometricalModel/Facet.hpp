@@ -11,17 +11,14 @@
 #include<yade/core/GeometricalModel.hpp>
 
 class Facet : public GeometricalModel {
-    public :
+	public :
 	vector<Vector3r> vertices;
-
 	Facet ();
 	virtual ~Facet ();
 
-    protected :
-	    void registerAttributes();
-    REGISTER_CLASS_NAME(Facet);
-    REGISTER_BASE_CLASS_NAME(GeometricalModel);
-    REGISTER_CLASS_INDEX(Facet,GeometricalModel);
+	REGISTER_ATTRIBUTES(GeometricalModel,(vertices))
+	REGISTER_CLASS_AND_BASE(Facet,GeometricalModel);
+	REGISTER_CLASS_INDEX(Facet,GeometricalModel);
 };
 
 REGISTER_SERIALIZABLE(Facet);

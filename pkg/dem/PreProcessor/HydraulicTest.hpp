@@ -47,7 +47,7 @@ class HydraulicTest : public FileGenerator
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(yadeFileWithSpheres)(file)(radius));
 	REGISTER_CLASS_NAME(HydraulicTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

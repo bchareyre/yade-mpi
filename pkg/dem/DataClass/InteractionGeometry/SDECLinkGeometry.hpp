@@ -25,10 +25,7 @@ class __attribute__((__deprecated__)) SDECLinkGeometry : public InteractionGeome
 				,radius2;
 
 		Vector3r	normal;			// new unit normal of the contact plane.
-
-	protected :
-		void registerAttributes();
-
+	REGISTER_ATTRIBUTES(InteractionGeometry,(radius1)(radius2));
 	REGISTER_CLASS_NAME(SDECLinkGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 

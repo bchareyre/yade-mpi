@@ -34,9 +34,7 @@ class ContactLaw1Interaction : public ElasticContactInteraction
 		ContactLaw1Interaction();
 		virtual ~ContactLaw1Interaction();
 		void SetBreakingState ();
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(ElasticContactInteraction,(unMax)(previousun)(previousFn)(initialOrientation1)(initialOrientation2)(orientationToContact1)(orientationToContact2)(currentContactOrientation)(initialContactOrientation)(initialPosition1)(initialPosition2)(forMaxMoment)(kr));
 	REGISTER_CLASS_NAME(ContactLaw1Interaction);
 	REGISTER_BASE_CLASS_NAME(ElasticContactInteraction);
 

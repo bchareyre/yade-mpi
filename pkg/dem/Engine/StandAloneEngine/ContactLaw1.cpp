@@ -28,15 +28,6 @@ ContactLaw1::ContactLaw1() : InteractionSolver()
 }
 
 
-void ContactLaw1::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-	REGISTER_ATTRIBUTE(coeff_dech);
-	REGISTER_ATTRIBUTE(momentAlwaysElastic);
-}
-
 
 void ContactLaw1::action(MetaBody* ncb)
 {

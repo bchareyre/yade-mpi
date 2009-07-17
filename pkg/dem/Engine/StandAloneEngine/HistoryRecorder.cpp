@@ -41,13 +41,6 @@ void HistoryRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void HistoryRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputBase);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(stateId);
-}
 
 bool HistoryRecorder::isActivated(MetaBody*)
 {

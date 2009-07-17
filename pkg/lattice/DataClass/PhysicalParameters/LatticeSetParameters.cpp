@@ -28,13 +28,5 @@ LatticeSetParameters::~LatticeSetParameters()
 }
 
 
-void LatticeSetParameters::registerAttributes()
-{
-        PhysicalParameters::registerAttributes();
-        REGISTER_ATTRIBUTE(nodeGroupMask);
-        REGISTER_ATTRIBUTE(beamGroupMask);
-        REGISTER_ATTRIBUTE(useBendTensileSoftening);
-        REGISTER_ATTRIBUTE(useStiffnessSoftening);
-}
  
 YADE_PLUGIN();

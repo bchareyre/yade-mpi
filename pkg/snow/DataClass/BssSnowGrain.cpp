@@ -8,12 +8,6 @@ BssSnowGrain::BssSnowGrain():InteractingSphere()
 	createIndex();
 };
 
-void BssSnowGrain::registerAttributes()
-{
-	InteractingSphere::registerAttributes();
-	REGISTER_ATTRIBUTE(m_copy);
-}
-
 BssSnowGrain::BssSnowGrain(BshSnowGrain* grain, Real one_voxel_in_meters_is)
 {
 	createIndex();

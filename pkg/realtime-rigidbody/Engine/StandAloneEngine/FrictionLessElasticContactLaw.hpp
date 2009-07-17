@@ -17,8 +17,7 @@ class FrictionLessElasticContactLaw : public InteractionSolver
 		FrictionLessElasticContactLaw ();
 		void action(MetaBody*);
 
-	protected :
-		 void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,/* */);
 	REGISTER_CLASS_NAME(FrictionLessElasticContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

@@ -46,21 +46,4 @@ ContactLaw1Interaction::~ContactLaw1Interaction()
 // }
 
 
-void ContactLaw1Interaction::registerAttributes()
-{
-	ElasticContactInteraction::registerAttributes();
-	REGISTER_ATTRIBUTE(unMax);
-	REGISTER_ATTRIBUTE(previousun);
-	REGISTER_ATTRIBUTE(previousFn);
-	REGISTER_ATTRIBUTE(initialOrientation1);
-	REGISTER_ATTRIBUTE(initialOrientation2);
-	REGISTER_ATTRIBUTE(orientationToContact1);
-	REGISTER_ATTRIBUTE(orientationToContact2);
-	REGISTER_ATTRIBUTE(currentContactOrientation);
-	REGISTER_ATTRIBUTE(initialContactOrientation);
-	REGISTER_ATTRIBUTE(initialPosition1);
-	REGISTER_ATTRIBUTE(initialPosition2);
-	REGISTER_ATTRIBUTE(forMaxMoment);
-	REGISTER_ATTRIBUTE(kr);
-}
 YADE_PLUGIN();

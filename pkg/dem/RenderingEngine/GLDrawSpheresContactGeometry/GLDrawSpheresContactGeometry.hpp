@@ -17,7 +17,6 @@ class GLDrawSpheresContactGeometry : public GLDrawInteractionGeometryFunctor{
 	public :
 		GLDrawSpheresContactGeometry(): midMax(0), forceMax(0){}
 		virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
-		//	virtual void registerAttributes();
 
 	DECLARE_LOGGER;
 	RENDERS(SpheresContactGeometry);

@@ -51,7 +51,7 @@ class SDECLinkedSpheres : public FileGenerator
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(minRadius)(maxRadius)(density)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(dampingForce)(dampingMomentum)(momentRotationLaw)(gravity)(disorder)(spacing)(supportSize)(support1)(support2)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(SDECLinkedSpheres);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

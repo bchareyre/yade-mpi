@@ -41,8 +41,7 @@ class RotatingBox : public FileGenerator
 		~RotatingBox ();
 		virtual bool generate();
 	
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(nbBoxes)(minSize)(maxSize)(densityBox)(densitySphere)(gravity)(dampingForce)(dampingMomentum)(isRotating)(rotationSpeed)(rotationAxis)(middleWireFrame));
 	REGISTER_CLASS_NAME(RotatingBox);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

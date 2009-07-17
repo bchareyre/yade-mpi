@@ -27,14 +27,9 @@ class SimpleViscoelasticBodyParameters : public RigidBodyParameters {
 	
 		SimpleViscoelasticBodyParameters();
 		virtual ~SimpleViscoelasticBodyParameters();
-
-	protected :
-		/// Serialization
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(RigidBodyParameters,(kn)(ks)(cn)(cs)(frictionAngle));
 	REGISTER_CLASS_NAME(SimpleViscoelasticBodyParameters);
 	REGISTER_BASE_CLASS_NAME(RigidBodyParameters);
-	
-/// Indexable	
 	REGISTER_CLASS_INDEX(SimpleViscoelasticBodyParameters,RigidBodyParameters);
 };
 

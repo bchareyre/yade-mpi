@@ -12,25 +12,14 @@
 #include<yade/core/GeometricalModel.hpp>
 
 
-class Box : public GeometricalModel
-{
-	public :
+class Box: public GeometricalModel{
+	public:
 		Vector3r extents;
-
-		Box ();
-		virtual ~Box ();
-	
-/// Serialization
-	
-	REGISTER_CLASS_NAME(Box);
-	REGISTER_BASE_CLASS_NAME(GeometricalModel);
-
-	public : void registerAttributes();
-	
-/// Indexable
-	
+		Box();
+		virtual ~Box();
+	REGISTER_ATTRIBUTES(GeometricalModel,(extents));
+	REGISTER_CLASS_AND_BASE(Box,GeometricalModel);
 	REGISTER_CLASS_INDEX(Box,GeometricalModel);
-
 };
 
 REGISTER_SERIALIZABLE(Box);

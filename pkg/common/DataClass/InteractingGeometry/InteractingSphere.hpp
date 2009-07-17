@@ -18,13 +18,9 @@ class InteractingSphere : public InteractingGeometry
 		InteractingSphere ();
 		virtual ~InteractingSphere ();
 
-/// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractingGeometry,(radius));
 	REGISTER_CLASS_NAME(InteractingSphere);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
-
-/// Indexable
 	REGISTER_CLASS_INDEX(InteractingSphere,InteractingGeometry);
 };
 

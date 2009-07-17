@@ -1,4 +1,4 @@
-// 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
+// 2007,2008,2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include<sstream>
 #include<boost/any.hpp>
 #include<map>
@@ -16,60 +16,48 @@
 using namespace std;
 using namespace boost;
 
-/*! Define inline proxy functions that access attributes of some object associated with this class.
- * \param accessor is an shared_ptr<AttrAccess> (or AttrAccess*), properly initialized and associated with the object of your choice
- * \param ensureFunc is member function called before every attribute access. It typically would check whether acessor is not NULL, otherwise instantiate it.
+/*! Define proxy functions that access attributes of the proxee object associated with this class.
  */
-#define ATTR_ACCESS_CXX(accessor,ensureFunc) \
-	boost::python::object wrappedPyGet(const std::string& key){ensureFunc();return accessor->pyGet(key);} \
-	void wrappedPySet(const std::string& key, const python::object& val){ensureFunc(); accessor->pySet(key,val);} \
-	string wrappedGetAttrStr(const std::string& key){ensureFunc();vector<string> a=accessor->getAttrStr(key); string ret("["); FOREACH(string s, a) ret+=s+" "; return ret+"]";} \
-	void wrappedSetAttrStr(const std::string& key, const std::string& val){ensureFunc();return accessor->setAttrStr(key,val);} \
-	boost::python::list wrappedPyKeys(){ensureFunc(); return accessor->pyKeys();} \
-	boost::python::dict wrappedPyDict(){ensureFunc(); return accessor->pyDict();} \
-	bool wrappedPyHasKey(const std::string& key){ensureFunc(); return accessor->descriptors.find(key)!=accessor->descriptors.end();} \
-	python::list wrappedUpdateExistingAttrs(const python::dict& d){ python::list ret; ensureFunc(); python::list keys=d.keys(); size_t ll=python::len(keys); for(size_t i=0; i<ll; i++){ string key=python::extract<string>(keys[i]); if(wrappedPyHasKey(key)) accessor->pySet(key,d[keys[i]]); else ret.append(key); } return ret; } \
-	void wrappedUpdateAttrs(const python::dict& d){ ensureFunc(); python::list keys=d.keys(); size_t ll=python::len(keys); for(size_t i=0; i<ll; i++){ string key=python::extract<string>(keys[i]); accessor->pySet(key,d[keys[i]]); } }
+#define ATTR_ACCESS_CXX() \
+	python::object wrappedPyGetAttr2(const string& key) const {return proxee->pyGetAttr(key);}\
+	void wrappedPySetAttr2(const string& key, const python::object& value){proxee->pySetAttr(key,value);}\
+	python::list wrappedPyKeys2() const {return proxee->pyKeys();}\
+	bool wrappedPyHasKey2(const string& key) const {return proxee->pyHasKey(key);}\
+	python::dict wrappedPyDict2() const {return proxee->pyDict();}  \
+	python::list wrappedUpdateExistingAttrs2(const python::dict& d){ python::list ret; python::list l=d.items(); size_t ll=python::len(l); for(size_t i=0; i<ll; i++){ python::tuple t=python::extract<python::tuple>(l[i]); string key=python::extract<string>(t[0]); if(wrappedPyHasKey2(key)) wrappedPySetAttr2(key,t[1]); else ret.append(t[0]); } return ret; } \
+	void wrappedUpdateAttrs2(const python::dict& d){ python::list l=d.items(); size_t ll=python::len(l); for(size_t i=0; i<ll; i++){ python::tuple t=python::extract<python::tuple>(l[i]); string key=python::extract<string>(t[0]); wrappedPySetAttr2(key,t[1]); } }
 	
-	
-	//boost::python::object wrappedPyGet_throw(std::string key){ensureFunc(); if(wrappedPyHasKey(key)) return accessor->pyGet(key); PyErr_SetString(PyExc_AttributeError, "No such attribute."); boost::python::throw_error_already_set(); /* make compiler happy*/ return boost::python::object(); }
-
 
 /*! Python special functions complementing proxies defined by ATTR_ACCESS_CXX, to be used with boost::python::class_<>.
  *
  * They define python special functions that support dictionary operations on this object and calls proxies for them. */
 #define ATTR_ACCESS_PY(cxxClass) \
-	def("__getitem__",&cxxClass::wrappedPyGet).def("__setitem__",&cxxClass::wrappedPySet).def("keys",&cxxClass::wrappedPyKeys).def("has_key",&cxxClass::wrappedPyHasKey).def("dict",&cxxClass::wrappedPyDict) \
-	.def("getRaw",&cxxClass::wrappedGetAttrStr).def("setRaw",&cxxClass::wrappedSetAttrStr).def("updateExistingAttrs",&cxxClass::wrappedUpdateExistingAttrs,"Update attributes from given dictionary, but skpping attribues that do not exist in the wrapped class; return list of names of attributes that were not set.").def("updateAttrs",&cxxClass::wrappedUpdateAttrs,"Update attributes from given dictionary; all attributes must exist.")
-	//def("__getattr__",&cxxClass::wrappedPyGet).def("__setattr__",&cxxClass::wrappedPySet).def("attrs",&cxxClass::wrappedPyKeys)
-
-	//.def("__getattribute__",&cxxClass::wrappedPyGet_throw)
+	def("__getitem__",&cxxClass::wrappedPyGetAttr2).def("__setitem__",&cxxClass::wrappedPySetAttr2).def("keys",&cxxClass::wrappedPyKeys2).def("has_key",&cxxClass::wrappedPyHasKey2).def("dict",&cxxClass::wrappedPyDict2).def("updateExistingAttrs",&cxxClass::wrappedUpdateExistingAttrs2).def("updateAttrs",&cxxClass::wrappedUpdateAttrs2)
 
 #define BASIC_PY_PROXY_HEAD(pyClass,yadeClass) \
-class pyClass{shared_ptr<AttrAccess> accessor; \
+class pyClass{ \
 	private: void init(string clss){ proxee=dynamic_pointer_cast<yadeClass>(ClassFactory::instance().createShared(clss.empty()? #yadeClass : clss)); if(!proxee) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to `"+#yadeClass+"'"); } \
 	public: shared_ptr<yadeClass> proxee; \
-		void ensureAcc(void){ if(!proxee) throw runtime_error(string("No proxied `")+#yadeClass+"'."); if(!accessor) accessor=shared_ptr<AttrAccess>(new AttrAccess(proxee));} \
-		pyClass(string clss="", python::dict attrs=python::dict()){ init(clss); python::list l=attrs.items(); int len=PySequence_Size(l.ptr()); for(int i=0; i<len; i++){ python::extract<python::tuple> t(l[i]); python::extract<string> keyEx(t()[0]); if(!keyEx.check()) throw invalid_argument("Attribute keys must be strings."); wrappedPySet(keyEx(),t()[1]); } } \
+		/* void ensureProxee(){ if(!proxee) throw runtime_error(string("No proxied `")+#yadeClass+"' (programming error, please report!)"); } */ \
+		pyClass(string clss="", python::dict attrs=python::dict()){ init(clss); python::list l=attrs.items(); int len=PySequence_Size(l.ptr()); for(int i=0; i<len; i++){ python::extract<python::tuple> t(l[i]); python::extract<string> keyEx(t()[0]); if(!keyEx.check()) throw invalid_argument("Attribute keys must be strings."); wrappedPySetAttr2(keyEx(),t()[1]); } } \
 		pyClass(const shared_ptr<yadeClass>& _proxee): proxee(_proxee) {} \
-		std::string pyStr(void){ ensureAcc(); return string(proxee->getClassName()==#yadeClass ? "<"+proxee->getClassName()+">" : "<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
-		string className(void){ ensureAcc(); return proxee->getClassName(); } \
-		void postProcessAttributes(void){ensureAcc(); static_pointer_cast<Serializable>(proxee)->/*__HACK__D@_N@T_ABUSE_*/postProcessAttributes(/*deserializing*/ true); } \
-		ATTR_ACCESS_CXX(accessor,ensureAcc);
+		std::string pyStr(void){ return string(proxee->getClassName()==#yadeClass ? "<"+proxee->getClassName()+">" : "<"+proxee->getClassName()+" "+ #yadeClass +">"); } \
+		string className(void){ return proxee->getClassName(); } \
+		void postProcessAttributes(void){ static_pointer_cast<Serializable>(proxee)->postProcessAttributes(/*deserializing*/ true); } \
+		ATTR_ACCESS_CXX();
 
 #define BASIC_PY_PROXY_TAIL };
 /*! Basic implementation of python proxy class that provides:
  * 1. constructor with (optional) class name and (optional) dictionary of attributes
  * 2. copy constructor from another proxy class
  * 3. className() returning proxy class name as string 
- * 4. ensureAcc() that makes sure we have proxy _and_ attribute access things ready
  */
 #define BASIC_PY_PROXY(pyClass,yadeClass) BASIC_PY_PROXY_HEAD(pyClass,yadeClass) BASIC_PY_PROXY_TAIL
 
 /* Read-write access to some attribute that is not basic-serializable, i.e. must be exported as instance.attribute (not instance['attribute']. That attribute is wrapped in given python class before it is returned. */
 #define NONPOD_ATTRIBUTE_ACCESS(pyName,pyClass,yadeName) \
-	python::object pyName##_get(void){ensureAcc(); return proxee->yadeName ? python::object(pyClass(proxee->yadeName)) : python::object(); } \
-	void pyName##_set(pyClass proxy){ensureAcc(); proxee->yadeName=proxy.proxee; }
+	python::object pyName##_get(void){ return proxee->yadeName ? python::object(pyClass(proxee->yadeName)) : python::object(); } \
+	void pyName##_set(pyClass proxy){ proxee->yadeName=proxy.proxee; }
 /*! Boost.python's definition of python object corresponding to BASIC_PY_PROXY */
 #define BASIC_PY_PROXY_WRAPPER(pyClass,pyName)  \
 	boost::python::class_<pyClass>(pyName,python::init<python::optional<string,python::dict> >()) \
@@ -78,8 +66,8 @@ class pyClass{shared_ptr<AttrAccess> accessor; \
 	.add_property("name",&pyClass::className) \
 	.def("postProcessAttributes",&pyClass::postProcessAttributes)
 
-
-
+/********** THE FOLLOWING CAN BE DELETED AFTER A FEW WEEKS (17.7.2009) *********/
+#if 0
 /*! Helper class for accessing registered attributes through the serialization interface.
  *
  * 4 possible types of attributes are supported: bool, string, number and arrays (homogeneous) of any of them.
@@ -138,7 +126,7 @@ class AttrAccess{
 		}
 		
 		//! Return serialized attribute by its name, as vector of strings
-		vector<string> getAttrStr(string name){
+		vector<string> getAttrStr(const string& name) {
 			vector<string> ret;
 			shared_ptr<Archive> arch=descriptors[name].archive;
 			stringstream stream;
@@ -147,29 +135,29 @@ class AttrAccess{
 			return ret;
 		}
 		//! name, values and types of given attribute, on one line as string
-		string dumpAttr(string name){
+		string dumpAttr(const string& name) {
 			string vals,types; AttrDesc desc=descriptors[name]; vector<string> values=getAttrStr(name);
 			for(size_t i=0; i<values.size(); i++) vals+=(i>0?" ":"")+values[i];
 			string typeDesc(desc.type==BOOL?"BOOL":(desc.type==STRING?"STRING":(desc.type==FLOAT?"FLOAT":(desc.type==INTEGER?"INTEGER":(desc.type==SEQ_FLOAT?"SEQ_FLOAT":(desc.type==SEQ_STRING?"SEQ_STRING":(desc.type==VEC_VEC?"VEC_VEC":"<unknown>")))))));
 			return name+" =\t"+vals+"\t ("+typeDesc+")";
 		}
 		//! call dumpAttr for all attributes (used for debugging)
-		string dumpAttrs(){ string ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++) ret+=dumpAttr(I->first)+"\n"; return ret;}
+		string dumpAttrs() { string ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++) ret+=dumpAttr(I->first)+"\n"; return ret;}
 		//! set attribute by name from its serialized value
-		void setAttrStr(string name, string value){
+		void setAttrStr(const string& name, const string& value){
 			LOG_DEBUG("Will set `"<<name<<"' to `"<<value<<"'.");
 			stringstream voidStream;
 			descriptors[name].archive->deserialize(voidStream,*(descriptors[name].archive),value);
 		}
 
 		//! return dictionary of attributes and their python values (debugging mosly)
-		boost::python::dict pyDict(){boost::python::dict ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret[I->first]=pyGet(I->first); return ret; }
+		boost::python::dict pyDict() {boost::python::dict ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret[I->first]=pyGet(I->first); return ret; }
 		//! return python list of keys (attribute names)
-		boost::python::list pyKeys(){boost::python::list ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret.append(I->first); return ret;}
+		boost::python::list pyKeys() {boost::python::list ret; for(DescriptorMap::iterator I=descriptors.begin();I!=descriptors.end();I++)ret.append(I->first); return ret;}
 
 
 		//! return attribute value as python object
-		boost::python::object pyGet(std::string key){
+		boost::python::object pyGet(const string& key) {
 			DescriptorMap::iterator I=descriptors.find(key);
 			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
 			vector<string> raw=getAttrStr(key);
@@ -193,7 +181,7 @@ class AttrAccess{
 			}
 		}
 		//! set attribute value from python object
-		void pySet(std::string key, python::object val){
+		void pySet(const string& key, const python::object& val){
 			DescriptorMap::iterator I=descriptors.find(key);
 			if(I==descriptors.end()) throw std::invalid_argument(string("Invalid key: `")+key+"'.");
 			#define SAFE_EXTRACT(from,to,type) python::extract<type> to(from); if(!to.check()) throw invalid_argument(string("Could not extract type ")+#type);
@@ -222,4 +210,4 @@ class AttrAccess{
 };
 
 CREATE_LOGGER(AttrAccess);
-
+#endif

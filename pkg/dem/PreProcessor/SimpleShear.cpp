@@ -101,28 +101,6 @@ void SimpleShear::postProcessAttributes(bool)
 }
 
 
-void SimpleShear::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(filename);
-	REGISTER_ATTRIBUTE(gravity);
-// 	REGISTER_ATTRIBUTE(nBilles);
-// 	REGISTER_ATTRIBUTE(porosite);
-	REGISTER_ATTRIBUTE(thickness);
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(profondeur);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(boxYoungModulus);
-	REGISTER_ATTRIBUTE(boxPoissonRatio);
-	REGISTER_ATTRIBUTE(shearSpeed);
-	REGISTER_ATTRIBUTE(gravApplied);
-	REGISTER_ATTRIBUTE(shearApplied);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval );
-}
 
 
 bool SimpleShear::generate()

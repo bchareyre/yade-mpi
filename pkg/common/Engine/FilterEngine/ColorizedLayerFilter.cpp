@@ -29,16 +29,6 @@ bool ColorizedLayerFilter::isActivated(MetaBody* rootBody)
 		&& ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void ColorizedLayerFilter::registerAttributes()
-{
-	FilterEngine::registerAttributes();
-	REGISTER_ATTRIBUTE(near);
-	REGISTER_ATTRIBUTE(normal);
-	REGISTER_ATTRIBUTE(thickness);
-	REGISTER_ATTRIBUTE(diffuseColor);
-	REGISTER_ATTRIBUTE(interval);
-}
-
 void ColorizedLayerFilter::postProcessAttributes(bool deserializing)
 {
 	if (deserializing){

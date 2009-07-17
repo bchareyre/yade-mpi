@@ -38,19 +38,6 @@ void MeasurePoisson::postProcessAttributes(bool deserializing)
 }
 
 
-void MeasurePoisson::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(horizontal);
-	REGISTER_ATTRIBUTE(vertical);
-	REGISTER_ATTRIBUTE(bottom);
-	REGISTER_ATTRIBUTE(upper);
-	REGISTER_ATTRIBUTE(left);
-	REGISTER_ATTRIBUTE(right);
-}
-
 
 bool MeasurePoisson::isActivated(MetaBody*)
 {

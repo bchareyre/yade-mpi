@@ -44,12 +44,12 @@ class ContactStressRecorder : public DataRecorder
 
 		ContactStressRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(DataRecorder,( outputFile )( interval )( wall_bottom_id )( wall_top_id )( wall_left_id )( wall_right_id )( wall_front_id )( wall_back_id )( height )( width )( depth )( thickness )( upperCorner )( lowerCorner ));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(ContactStressRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);

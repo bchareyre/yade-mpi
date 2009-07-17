@@ -87,14 +87,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 		&& (iterPeriod<0 || (stretchFactor>1 ? stretchFactor*iterPeriod<=iterLim : stretchFactor*iterPeriod>=iterLim)));
 		return PeriodicEngine::isActivated(rootBody);
 	}
-	protected:
-		void registerAttributes(){ PeriodicEngine::registerAttributes();
-			REGISTER_ATTRIBUTE(realLim);
-			REGISTER_ATTRIBUTE(virtLim);
-			REGISTER_ATTRIBUTE(iterLim);
-			REGISTER_ATTRIBUTE(mayStretch);
-			REGISTER_ATTRIBUTE(stretchFactor);
-		}
+	REGISTER_ATTRIBUTES(PeriodicEngine,(realLim)(virtLim)(iterLim)(mayStretch)(stretchFactor));
 	REGISTER_CLASS_NAME(StretchPeriodicEngine);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 };
@@ -153,17 +146,7 @@ class __attribute__((deprecated)) RangePeriodicEngine: public StandAloneEngine {
 				return true;
 			} else return false;
 		}
-		virtual void registerAttributes(){
-			StandAloneEngine::registerAttributes();
-			REGISTER_ATTRIBUTE(virtTimeLim);
-			REGISTER_ATTRIBUTE(realTimeLim);
-			REGISTER_ATTRIBUTE(iterLim);
-			REGISTER_ATTRIBUTE(lastRealTime);
-			REGISTER_ATTRIBUTE(lastVirtTime);
-			REGISTER_ATTRIBUTE(lastIter);
-			REGISTER_ATTRIBUTE(mayDouble);
-			REGISTER_ATTRIBUTE(mayHalve);
-		}
+		REGISTER_ATTRIBUTES(StandAloneEngine,(virtTimeLim)(realTimeLim)(iterLim)(lastRealTime)(lastVirtTime)(lastIter)(mayDouble)(mayHalve));
 	protected :
 		virtual void postProcessAttributes(bool deserializing){}
 	DECLARE_LOGGER;

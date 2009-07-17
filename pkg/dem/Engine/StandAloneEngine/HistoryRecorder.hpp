@@ -28,9 +28,9 @@ public :
 protected :
 
 	virtual void postProcessAttributes(bool deserializing);
-	virtual void registerAttributes();
 	REGISTER_CLASS_NAME(HistoryRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
+	REGISTER_ATTRIBUTES(DataRecorder,(outputBase)(interval)(stateId));
 };
 
 REGISTER_SERIALIZABLE(HistoryRecorder);

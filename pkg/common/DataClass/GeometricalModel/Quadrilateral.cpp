@@ -29,22 +29,6 @@ Quadrilateral::Quadrilateral(int p1,int p2,int p3,int p4,MetaBody* mb) : Geometr
 	#undef Q
 }
 
-Quadrilateral::~Quadrilateral()
-{
-}
-
-void Quadrilateral::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(n1);
-	REGISTER_ATTRIBUTE(n2);
-	REGISTER_ATTRIBUTE(n3);
-	REGISTER_ATTRIBUTE(n4);
-	
-	REGISTER_ATTRIBUTE(i1);
-	REGISTER_ATTRIBUTE(i2);
-	REGISTER_ATTRIBUTE(i3);
-	REGISTER_ATTRIBUTE(i4);
-}
+Quadrilateral::~Quadrilateral(){}
 
 YADE_PLUGIN();

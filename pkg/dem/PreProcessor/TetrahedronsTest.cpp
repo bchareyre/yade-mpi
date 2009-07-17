@@ -98,24 +98,6 @@ void TetrahedronsTest::postProcessAttributes(bool)
 }
 
 
-void TetrahedronsTest::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbTetrahedrons);
-	REGISTER_ATTRIBUTE(minSize);
-	REGISTER_ATTRIBUTE(maxSize);
-	REGISTER_ATTRIBUTE(youngModulus);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(groundSize);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
-	//REGISTER_ATTRIBUTE(timeStepUpdateInterval); // not used. But you may want to use it....
-}
-
-
 bool TetrahedronsTest::generate()
 {
 	Omega::instance().setTimeStep(0.04);

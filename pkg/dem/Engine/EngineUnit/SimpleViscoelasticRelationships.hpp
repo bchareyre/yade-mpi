@@ -22,9 +22,7 @@ class SimpleViscoelasticRelationships : public InteractionPhysicsEngineUnit
 					const shared_ptr<PhysicalParameters>& b2,
 					const shared_ptr<Interaction>& interaction);
 
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,/* */)
 	FUNCTOR2D(SimpleViscoelasticBodyParameters,SimpleViscoelasticBodyParameters);
 	REGISTER_CLASS_NAME(SimpleViscoelasticRelationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
@@ -32,5 +30,4 @@ class SimpleViscoelasticRelationships : public InteractionPhysicsEngineUnit
 };
 
 REGISTER_SERIALIZABLE(SimpleViscoelasticRelationships);
-
 

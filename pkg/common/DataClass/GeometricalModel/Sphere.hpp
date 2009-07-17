@@ -18,10 +18,8 @@ class Sphere : public GeometricalModel
 		Sphere ();
 		virtual ~Sphere ();
 
-	protected :
-		void registerAttributes();
-	REGISTER_CLASS_NAME(Sphere);
-	REGISTER_BASE_CLASS_NAME(GeometricalModel);
+	REGISTER_ATTRIBUTES(GeometricalModel,(radius));
+	REGISTER_CLASS_AND_BASE(Sphere,GeometricalModel);
 	REGISTER_CLASS_INDEX(Sphere,GeometricalModel);
 };
 

@@ -96,7 +96,7 @@ std::string sanitize(const std::string num)
 	// is that a number?
 	try
 	{
-		Real v = boost::lexical_cast<Real>(num);
+		boost::lexical_cast<Real>(num);
 	}
 	catch(std::bad_cast&)
 	{

@@ -41,30 +41,6 @@ CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontb
 }
 
 
-void CinemCNCEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(shearSpeed);
-	REGISTER_ATTRIBUTE(gammalim);
-	REGISTER_ATTRIBUTE(prevF_sup);
-	REGISTER_ATTRIBUTE(firstRun);
-	REGISTER_ATTRIBUTE(id_boxhaut);
-	REGISTER_ATTRIBUTE(id_boxbas);
-	REGISTER_ATTRIBUTE(id_boxleft);
-	REGISTER_ATTRIBUTE(id_boxright);
-	REGISTER_ATTRIBUTE(id_boxfront);
-	REGISTER_ATTRIBUTE(id_boxback);
-	REGISTER_ATTRIBUTE(Y0);
-	REGISTER_ATTRIBUTE(F_0);
-	REGISTER_ATTRIBUTE(k);
-	REGISTER_ATTRIBUTE(max_vel);
-	REGISTER_ATTRIBUTE(wallDamping);
-	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(LOG);
-	REGISTER_ATTRIBUTE(coeff_dech);
-}
-
-
 void CinemCNCEngine::applyCondition(Body * body)
 {
 	if(LOG)	cout << "debut applyCondi !!" << endl;

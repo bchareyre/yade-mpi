@@ -33,20 +33,5 @@ LatticeBeamAngularSpring::~LatticeBeamAngularSpring()
 
 }
 
-void LatticeBeamAngularSpring::registerAttributes()
-{
-	InteractionPhysics::registerAttributes();
-	REGISTER_ATTRIBUTE(initialPlaneAngle);
-//	REGISTER_ATTRIBUTE(planeAngle); // FIXME - can be calculated after deserialization
-	REGISTER_ATTRIBUTE(lastCrossProduct);
-	REGISTER_ATTRIBUTE(planeSwap180);
-	REGISTER_ATTRIBUTE(initialOffPlaneAngle1);
-	REGISTER_ATTRIBUTE(initialOffPlaneAngle2);
-	REGISTER_ATTRIBUTE(lastOffPlaneAngleDifference1);
-	REGISTER_ATTRIBUTE(lastOffPlaneAngleDifference2);
-	REGISTER_ATTRIBUTE(swirl1);
-	REGISTER_ATTRIBUTE(swirl2);
-//	REGISTER_ATTRIBUTE(offPlaneAngle); // FIXME - can be calculated after deserialization
-}
 
 YADE_PLUGIN();

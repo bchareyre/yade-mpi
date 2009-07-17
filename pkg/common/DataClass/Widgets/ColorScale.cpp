@@ -24,15 +24,4 @@ ColorScale::~ColorScale ()
 }
 
 
-void ColorScale::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(posX);
-	REGISTER_ATTRIBUTE(posY);
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(title);
-}
-
-
 YADE_PLUGIN();

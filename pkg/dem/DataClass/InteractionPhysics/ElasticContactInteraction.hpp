@@ -18,15 +18,7 @@ class ElasticContactInteraction: public NormalShearInteraction
 
 		ElasticContactInteraction();
 		virtual ~ElasticContactInteraction();
-	protected :
-		virtual void registerAttributes();
-// {
-// 			NormalShearInteraction::registerAttributes();
-// 			REGISTER_ATTRIBUTE(prevNormal);
-// 			REGISTER_ATTRIBUTE(initialKn);
-// 			REGISTER_ATTRIBUTE(initialKs);
-// 			REGISTER_ATTRIBUTE(tangensOfFrictionAngle);
-// 		}
+	REGISTER_ATTRIBUTES(NormalShearInteraction,(prevNormal)/*(initialKn)(initialKs)*/(tangensOfFrictionAngle));
 	REGISTER_CLASS_NAME(ElasticContactInteraction);
 	REGISTER_BASE_CLASS_NAME(NormalShearInteraction);
 	REGISTER_CLASS_INDEX(ElasticContactInteraction,NormalShearInteraction);

@@ -31,8 +31,19 @@ class LatticeBeamAngularSpring : public InteractionPhysics
 		virtual ~LatticeBeamAngularSpring();
 
 /// Serialization
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionPhysics,
+		(initialPlaneAngle)
+		// (planeAngle) // FIXME - can be calculated after deserialization
+		(lastCrossProduct)
+		(planeSwap180)
+		(initialOffPlaneAngle1)
+		(initialOffPlaneAngle2)
+		(lastOffPlaneAngleDifference1)
+		(lastOffPlaneAngleDifference2)
+		(swirl1)
+		(swirl2)
+		//	(offPlaneAngle) // FIXME - can be calculated after deserialization
+	);
 	REGISTER_CLASS_NAME(LatticeBeamAngularSpring);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 	

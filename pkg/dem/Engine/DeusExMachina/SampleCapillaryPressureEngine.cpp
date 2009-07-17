@@ -49,20 +49,6 @@ SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 {
 }
 
-void SampleCapillaryPressureEngine::registerAttributes()
-{
-	TriaxialStressController::registerAttributes();
-	REGISTER_ATTRIBUTE(PressureVariation);
-	REGISTER_ATTRIBUTE(Pressure);
- 	REGISTER_ATTRIBUTE(UnbalancedForce);
-	REGISTER_ATTRIBUTE(StabilityCriterion);
-	REGISTER_ATTRIBUTE(SigmaPrecision);
-	REGISTER_ATTRIBUTE(pressureVariationActivated);
-	REGISTER_ATTRIBUTE(fusionDetection);
-	REGISTER_ATTRIBUTE(binaryFusion);
-	REGISTER_ATTRIBUTE(pressureIntervalRec);
-
-}
 
 void SampleCapillaryPressureEngine::updateParameters(MetaBody * ncb)
 {

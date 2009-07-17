@@ -27,13 +27,6 @@ HydraulicForceEngine::~HydraulicForceEngine()
 }
 
 
-void HydraulicForceEngine::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(isActivated);
-	REGISTER_ATTRIBUTE(dummyParameter);
-}
-
 
 void HydraulicForceEngine::applyCondition(MetaBody* ncb)
 {

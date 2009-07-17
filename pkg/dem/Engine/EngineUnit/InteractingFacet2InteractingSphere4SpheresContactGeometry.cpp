@@ -20,12 +20,6 @@ InteractingFacet2InteractingSphere4SpheresContactGeometry::InteractingFacet2Inte
 	shrinkFactor=0;
 }
 
-void InteractingFacet2InteractingSphere4SpheresContactGeometry::registerAttributes()
-{	
-    InteractionGeometryEngineUnit::registerAttributes();
-    REGISTER_ATTRIBUTE(shrinkFactor);
-}
-
 bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,
 							const Se3r& se31,

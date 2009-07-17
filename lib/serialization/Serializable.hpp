@@ -19,17 +19,20 @@
 #	include<memory>
 	using std::shared_ptr;
 #endif
-#include <boost/type_traits.hpp>
-#include <boost/lexical_cast.hpp>
+#ifdef EMBED_PYTHON
+	#include<boost/python.hpp>
+#endif
+#include<boost/type_traits.hpp>
+#include<boost/lexical_cast.hpp>
 #include<boost/preprocessor.hpp>
-#include <list>
-#include <map>
-#include <string>
-#include <vector>
-#include <iostream>
+#include<list>
+#include<map>
+#include<string>
+#include<vector>
+#include<iostream>
 #include<yade/lib-factory/Factorable.hpp>
-#include "SerializationExceptions.hpp"
-#include "Archive.hpp"
+#include"SerializationExceptions.hpp"
+#include"Archive.hpp"
 
 using namespace boost;
 using namespace std;
@@ -38,7 +41,7 @@ using namespace ArchiveTypes;
 #define DECLARE_POINTER_TO_MY_CUSTOM_CLASS(Type,attribute,any)		\
 	Type * attribute=any_cast< Type * >(any);
 
-#define REGISTER_ATTRIBUTE(attribute)                                   \
+#define REGISTER_ATTRIBUTE_(attribute)                                   \
                 registerAttribute( #attribute, attribute );
 
 
@@ -52,7 +55,37 @@ namespace{
 //! create member function that register attributes; must be parenthesized, without commas: (attr1) (attr2) (attr3) ...
 //#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
 //! Same as REGISTER_ATTRIBUTES, but with first argument of base class, of which registerAttributes will be called first
-#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs) }
+#ifndef EMBED_PYTHON
+	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs); }
+#else
+	#include<boost/python.hpp>
+
+	namespace{
+		boost::python::object pyGetAttr(const std::string& key){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); /*never reached; avoids warning*/ throw; }
+		void pySetAttr(const std::string& key, const boost::python::object& value){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
+		boost::python::list pyKeys(){ return boost::python::list();}
+		bool pyHasKey(const std::string& key) { return false; }
+		boost::python::dict pyDict() { return boost::python::dict(); }
+	};
+
+	#define _PYGET_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) return boost::python::object(z);
+	#define _PYSET_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) {z=boost::python::extract<typeof(z)>(value); return; }
+	#define _PYKEYS_ATTR(x,y,z) ret.append(BOOST_PP_STRINGIZE(z));
+	#define _PYHASKEY_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) return true;
+	#define _PYDICT_ATTR(x,y,z) ret[BOOST_PP_STRINGIZE(z)]=boost::python::object(z);
+	#define PYGET_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs)
+	#define PYSET_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs)
+	#define PYKEYS_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs)
+	#define PYHASKEY_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs)
+	#define PYDICT_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs)
+
+	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs); } \
+		public: boost::python::object pyGetAttr(const std::string& key) const{ PYGET_MANY(attrs); return baseClass::pyGetAttr(key); } \
+		void pySetAttr(const std::string& key, const boost::python::object& value){ PYSET_MANY(attrs); baseClass::pySetAttr(key,value); } \
+		boost::python::list pyKeys() const { boost::python::list ret; PYKEYS_MANY(attrs); ret.extend(baseClass::pyKeys()); return ret; } \
+		bool pyHasKey(const std::string& key) const { PYHASKEY_MANY(attrs); return baseClass::pyHasKey(key); } \
+		boost::python::dict pyDict() const { boost::python::dict ret; PYDICT_MANY(attrs); ret.update(baseClass::pyDict()); return ret; }
+#endif
 
 
 // for both fundamental and non-fundamental cases
@@ -86,6 +119,14 @@ class Serializable : public Factorable
 		virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
 
 		virtual void postProcessAttributes(bool /*deserializing*/) {};
+
+	#ifdef EMBED_PYTHON
+		virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
+		virtual void pySetAttr(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
+		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
+		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
+		virtual boost::python::dict pyDict() const { return ::pyDict(); }
+	#endif
 
 	private :
 		Archives				archives;

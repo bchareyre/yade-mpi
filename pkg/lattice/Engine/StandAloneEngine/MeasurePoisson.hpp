@@ -29,10 +29,10 @@ class MeasurePoisson : public DataRecorder
 		
 		MeasurePoisson ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(horizontal)(vertical)(bottom)(upper)(left)(right));
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(MeasurePoisson);

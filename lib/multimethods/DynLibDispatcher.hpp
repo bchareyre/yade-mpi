@@ -169,9 +169,9 @@ class DynLibDispatcher
 			
 // 			virtual void registerAttributes()
 // 			{
-// 				REGISTER_ATTRIBUTE(functorNames);
+// 				REGISTER_ATTRIBUTE_(functorNames);
 // 				if(functors.size() != 0)
-// 					REGISTER_ATTRIBUTE(functors);
+// 					REGISTER_ATTRIBUTE_(functors);
 // 			}
 			
  	public  : DynLibDispatcher()

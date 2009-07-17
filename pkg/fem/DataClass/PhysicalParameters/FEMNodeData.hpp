@@ -22,8 +22,7 @@ class FEMNodeData : public ParticleParameters
 		virtual ~FEMNodeData();
 
 /// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(ParticleParameters,(initialPosition));
 	REGISTER_CLASS_NAME(FEMNodeData);
 	REGISTER_BASE_CLASS_NAME(ParticleParameters);
 	

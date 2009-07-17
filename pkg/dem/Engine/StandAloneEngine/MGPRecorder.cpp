@@ -37,14 +37,6 @@ void MGPRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void MGPRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputBase);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(stateId);
-}
-
 bool MGPRecorder::isActivated(MetaBody*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));

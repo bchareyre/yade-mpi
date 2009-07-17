@@ -100,7 +100,7 @@ class TetrahedronsTest : public FileGenerator
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(nbTetrahedrons)(minSize)(maxSize)(youngModulus)(gravity)(density)(disorder)(groundSize)(dampingForce)(dampingMomentum)(rotationBlocked));
 	REGISTER_CLASS_NAME(TetrahedronsTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

@@ -135,46 +135,6 @@ SnowVoxelsLoader::~SnowVoxelsLoader ()
 {
 }
 
-void SnowVoxelsLoader::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(voxel_binary_data_file);
-// that was for integrating snow-read with this preprocessor, but for now it's not integrated. snow-read does the conversion separately
-//	REGISTER_ATTRIBUTE(voxel_txt_dir);
-//	REGISTER_ATTRIBUTE(voxel_caxis_file);
-//	REGISTER_ATTRIBUTE(voxel_colors_file);
-	REGISTER_ATTRIBUTE(grain_binary_data_file);
-	REGISTER_ATTRIBUTE(one_voxel_in_meters_is);
-	REGISTER_ATTRIBUTE(layer_distance_voxels);
-	REGISTER_ATTRIBUTE(angle_increment_radians);
-	REGISTER_ATTRIBUTE(skip_small_grains);
-
-	REGISTER_ATTRIBUTE(shearCohesion);
-	REGISTER_ATTRIBUTE(normalCohesion);
-        REGISTER_ATTRIBUTE(creep_viscosity)
-	REGISTER_ATTRIBUTE(use_grain_shear_creep);
-	REGISTER_ATTRIBUTE(use_grain_twist_creep);
-	REGISTER_ATTRIBUTE(enable_layers_creep);
-	REGISTER_ATTRIBUTE(layers_creep_viscosity);
-	REGISTER_ATTRIBUTE(sigma_iso);
-	REGISTER_ATTRIBUTE(setCohesionOnNewContacts);
-
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(boxYoungModulus);
-	REGISTER_ATTRIBUTE(boxPoissonRatio);
-	REGISTER_ATTRIBUTE(boxFrictionDeg);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(use_gravity_engine);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-
-	REGISTER_ATTRIBUTE(WallStressRecordFile);
-	
-}
-
 bool SnowVoxelsLoader::load_voxels()
 {
 	if(grain_binary_data_file !="" && boost::filesystem::exists(grain_binary_data_file))

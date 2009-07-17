@@ -42,7 +42,7 @@ class SDECLinkPhysics : public InteractionPhysics
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionPhysics,(initialKn)(initialKs)(initialEquilibriumDistance)(knMax)(ksMax)(heta));
 	REGISTER_CLASS_NAME(SDECLinkPhysics);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 

@@ -17,10 +17,5 @@ LineSegment::~LineSegment ()
 {		
 }
 
-void LineSegment::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(length);
-}
 
 YADE_PLUGIN();

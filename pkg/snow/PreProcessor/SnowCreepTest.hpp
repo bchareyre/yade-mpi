@@ -127,8 +127,83 @@ class SnowCreepTest : public FileGenerator
 		~SnowCreepTest ();
 		bool generate();
 	
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,
+		(lowerCorner)
+		(upperCorner)
+	//.	(thickness)
+	//.	(importFilename)
+		//(nlayers)
+		//(boxWalls)
+	//.	(internalCompaction)
+	//.	(maxMultiplier)
+	//.	(finalMaxMultiplier)
+
+		(sphereYoungModulus)
+		(spherePoissonRatio)
+		(sphereFrictionDeg)
+
+				(normalCohesion)
+			(shearCohesion)
+
+			(setCohesionOnNewContacts)
+
+		(boxYoungModulus)
+		(boxPoissonRatio)
+		(boxFrictionDeg)
+
+		(density)
+		(defaultDt)
+		(dampingForce)
+		(dampingMomentum)
+	//.	(rotationBlocked)
+	//.	(timeStepUpdateInterval)
+	//.	(timeStepOutputInterval)
+	//.	(wallStiffnessUpdateInterval)
+	//.	(radiusControlInterval)
+		(numberOfGrains)
+	//.	(radiusDeviation)
+	//.	(strainRate)
+	//.	(StabilityCriterion)
+	//.	(autoCompressionActivation)
+	//	(wall_top)
+	//	(wall_bottom)
+	//	(wall_1)
+	//	(wall_2)
+	//	(wall_3)
+	//	(wall_4)
+	//	(wall_top_wire)
+	//	(wall_bottom_wire)
+	//	(wall_1_wire)
+	//	(wall_2_wire)
+	//	(wall_3_wire)
+	//	(wall_4_wire)
+	//	(spheresColor)
+	//	(spheresRandomColor)
+	//.	(recordBottomForce)
+	//.	(forceRecordFile)
+	//	(recordAveragePositions)
+	//.	(positionRecordFile)
+	//.	(velocityRecordFile)
+	//.	(recordIntervalIter)
+	//.	(saveAnimationSnapshots)
+	//.	(AnimationSnapshotsBaseName)
+		(WallStressRecordFile)
+
+	//	(gravity)
+		
+		//(bigBall)
+		//(bigBallRadius)
+		//(bigBallDensity)
+		//(bigBallDropTimeSeconds)
+		//(bigBallFrictDeg)
+		//(bigBallYoungModulus)
+		//(bigBallPoissonRatio)
+		//(bigBallDropHeight)
+
+			(sigma_iso)
+
+		 (creep_viscosity)
+	);
 	REGISTER_CLASS_NAME(SnowCreepTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

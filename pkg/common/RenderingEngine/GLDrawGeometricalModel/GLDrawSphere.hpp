@@ -32,8 +32,7 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};
-		virtual void registerAttributes(){REGISTER_ATTRIBUTE(glutUse); REGISTER_ATTRIBUTE(glutNormalize); REGISTER_ATTRIBUTE(glutSlices); REGISTER_ATTRIBUTE(glutStacks); }
-		
+	REGISTER_ATTRIBUTES(/*nothing*/,(glutUse)(glutNormalize)(glutSlices)(glutStacks));
 	RENDERS(Sphere);
 	REGISTER_CLASS_NAME(GLDrawSphere);
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);

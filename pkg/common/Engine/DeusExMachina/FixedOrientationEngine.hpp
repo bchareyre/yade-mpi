@@ -22,7 +22,7 @@ class FixedOrientationEngine : public DeusExMachina
 
 	protected :
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(fixedOrientation));
 	REGISTER_CLASS_NAME(FixedOrientationEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

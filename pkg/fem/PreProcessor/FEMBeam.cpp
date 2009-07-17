@@ -90,23 +90,6 @@ FEMBeam::~FEMBeam ()
 }
 
 
-void FEMBeam::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(femTxtFile);
-	REGISTER_ATTRIBUTE(gravity);
-	
-	REGISTER_ATTRIBUTE(regionMin1);
-	REGISTER_ATTRIBUTE(regionMax1);
-	REGISTER_ATTRIBUTE(translationAxis1);
-	REGISTER_ATTRIBUTE(velocity1);
-	
-	REGISTER_ATTRIBUTE(regionMin2);
-	REGISTER_ATTRIBUTE(regionMax2);
-	REGISTER_ATTRIBUTE(translationAxis2);
-	REGISTER_ATTRIBUTE(velocity2);
-}
-
 
 bool FEMBeam::generate()
 {

@@ -76,7 +76,7 @@ class DirectShearCis : public FileGenerator
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(filename)(gravity)/*(nBilles)(porosite)*/(thickness)(width)(height)(profondeur)(density)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(boxYoungModulus)(boxPoissonRatio)(shearSpeed)(gravApplied)(shearApplied)(dampingForce)(dampingMomentum)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(DirectShearCis);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

@@ -20,12 +20,4 @@ BcpConnection::~BcpConnection()
 {
 }
 
-
-void BcpConnection::registerAttributes()
-{
-	SimpleViscoelasticBodyParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(id1);
-	REGISTER_ATTRIBUTE(id2);
-}
-
 YADE_PLUGIN("BcpConnection");

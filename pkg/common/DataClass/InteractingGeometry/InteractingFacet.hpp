@@ -47,9 +47,12 @@ class InteractingFacet : public InteractingGeometry {
 
 	DECLARE_LOGGER;
 
-	protected:
-
-	void registerAttributes(); void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(InteractingGeometry,(vertices)
+		#ifdef FACET_TOPO
+			(edgeAdjIds)(edgeAdjHalfAngle)
+		#endif
+	);
+	protected: void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(InteractingFacet);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
 

@@ -366,3 +366,4 @@ void CpmPhysDamageColorizer::action(MetaBody* rootBody){
 		B->geometricalModel->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);
 	}
 }
+

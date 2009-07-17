@@ -33,9 +33,8 @@ class Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact : public Interactio
 	FUNCTOR2D(BssSnowGrain,BssSnowGrain);
 	
 	DEFINE_FUNCTOR_ORDER_2D(BssSnowGrain,BssSnowGrain);
-	
-	protected :
-		virtual void registerAttributes();
+
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,/* */);
 };
 
 REGISTER_SERIALIZABLE(Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact);

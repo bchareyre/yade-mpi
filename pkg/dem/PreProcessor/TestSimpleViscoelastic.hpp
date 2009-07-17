@@ -57,8 +57,7 @@ class TestSimpleViscoelastic : public FileGenerator {
 	bool generate();
 
 	virtual void postProcessAttributes(bool deserializing);
-	void registerAttributes();
-
+	REGISTER_ATTRIBUTES(FileGenerator,(tc)(en)(es)(frictionAngle)(R)(density)(nbSpheres)(h)(velocity)(angular_vel)(rotationBlocked)(gravity)(groundSize)(outputBase)(interval));
 	REGISTER_CLASS_NAME(TestSimpleViscoelastic);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

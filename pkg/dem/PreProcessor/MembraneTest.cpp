@@ -84,23 +84,6 @@ void MembraneTest::postProcessAttributes(bool)
 }
 
 
-void MembraneTest::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbX);
-	REGISTER_ATTRIBUTE(nbZ);
-	REGISTER_ATTRIBUTE(XLength);
-	REGISTER_ATTRIBUTE(ZLength);
-	REGISTER_ATTRIBUTE(bigBallRadius);
-	REGISTER_ATTRIBUTE(membraneThickness);
-	REGISTER_ATTRIBUTE(tc);
-	REGISTER_ATTRIBUTE(en);
-	REGISTER_ATTRIBUTE(es);
-	REGISTER_ATTRIBUTE(frictionAngle);
-	REGISTER_ATTRIBUTE(gravity);
-}
-
-
 bool MembraneTest::generate()
 {
 	Omega::instance().setTimeStep(0.04);

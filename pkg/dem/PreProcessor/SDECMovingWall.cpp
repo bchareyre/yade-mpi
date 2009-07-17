@@ -95,40 +95,6 @@ void SDECMovingWall::postProcessAttributes(bool)
 }
 
 
-void SDECMovingWall::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbSpheres);
-	REGISTER_ATTRIBUTE(minRadius);
-	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(spheresHeight);
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(groundSize);
-	REGISTER_ATTRIBUTE(groundPosition);
-	REGISTER_ATTRIBUTE(wallSize);
-	REGISTER_ATTRIBUTE(wallPosition);
-	REGISTER_ATTRIBUTE(wallVelocity);
-	REGISTER_ATTRIBUTE(wallTranslationAxis);
-	REGISTER_ATTRIBUTE(side1Size);
-	REGISTER_ATTRIBUTE(side1Position);
-	REGISTER_ATTRIBUTE(side1wire);
-	REGISTER_ATTRIBUTE(side2Size);
-	REGISTER_ATTRIBUTE(side2Position);
-	REGISTER_ATTRIBUTE(side2wire);
-	REGISTER_ATTRIBUTE(side3Size);
-	REGISTER_ATTRIBUTE(side3Position);
-	REGISTER_ATTRIBUTE(side3wire);
-       	REGISTER_ATTRIBUTE(useSpheresAsGround);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-}
 
 
 bool SDECMovingWall::generate()

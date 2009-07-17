@@ -35,10 +35,18 @@ class NodeRecorder : public DataRecorder
 
 		NodeRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
-
+	REGISTER_ATTRIBUTES(DataRecorder,
+		(outputFile)
+		(interval)
+		//(regions)
+		(regions_min)
+		(regions_max)
+		(only_this_stiffness)
+		//	(first)
+		//	(subscribedBodies)
+	);
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);

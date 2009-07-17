@@ -32,7 +32,7 @@ class InteractingGeometry : public Serializable, public Indexable
 		#ifdef BV_FUNCTOR_CACHE
 			shared_ptr<BoundingVolumeEngineUnit> boundFunctor;
 		#endif
-	
+
 /// Serialization
 	REGISTER_ATTRIBUTES(/*no base*/,(diffuseColor));
 	REGISTER_CLASS_AND_BASE(InteractingGeometry,Serializable Indexable);

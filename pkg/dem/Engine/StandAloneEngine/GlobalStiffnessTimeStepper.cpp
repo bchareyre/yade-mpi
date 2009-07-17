@@ -35,16 +35,6 @@ GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper()
 }
 
 
-void GlobalStiffnessTimeStepper::registerAttributes()
-{
-	TimeStepper::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(defaultDt);
-	REGISTER_ATTRIBUTE(previousDt);
-	REGISTER_ATTRIBUTE(timestepSafetyCoefficient);
-	REGISTER_ATTRIBUTE(computedOnce);
-}
-
 
 void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb)
 {

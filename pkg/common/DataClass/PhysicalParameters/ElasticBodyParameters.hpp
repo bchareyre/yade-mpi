@@ -21,12 +21,9 @@ class ElasticBodyParameters : public RigidBodyParameters
 		ElasticBodyParameters ();
 		virtual ~ElasticBodyParameters ();
 
-/// Serialization
+	REGISTER_ATTRIBUTES(RigidBodyParameters,(young));
 	REGISTER_CLASS_NAME(ElasticBodyParameters);
 	REGISTER_BASE_CLASS_NAME(RigidBodyParameters);
-
-	public : void registerAttributes();
-
 /// Indexable
 	REGISTER_CLASS_INDEX(ElasticBodyParameters,RigidBodyParameters);
 };

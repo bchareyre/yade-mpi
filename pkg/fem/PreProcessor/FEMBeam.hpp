@@ -45,10 +45,7 @@ class FEMBeam : public FileGenerator
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
 		void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity);
-
-	protected :
-		void registerAttributes();
-
+	REGISTER_ATTRIBUTES(FileGenerator,(femTxtFile)(gravity)(regionMin1)(regionMax1)(translationAxis1)(velocity1)(regionMin2)(regionMax2)(translationAxis2)(velocity2));
 	REGISTER_CLASS_NAME(FEMBeam);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

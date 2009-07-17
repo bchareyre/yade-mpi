@@ -52,8 +52,8 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 	};
 	public : void registerAttributes()
 	{
-		REGISTER_ATTRIBUTE(first);
-		REGISTER_ATTRIBUTE(second);
+		REGISTER_ATTRIBUTE_(first);
+		REGISTER_ATTRIBUTE_(second);
 	};
 	public : void deserialize(any& a)
 	{
@@ -155,7 +155,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 > > : public Serializabl
 	public 	: virtual string getClassName() const {return myName();};
 	public : void registerAttributes()
 	{
-		REGISTER_ATTRIBUTE(first);
+		REGISTER_ATTRIBUTE_(first);
 	};
 	public : void deserialize(any& a)
 	{
@@ -249,8 +249,8 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > > : p
 	public 	: virtual string getClassName() const {return myName();};
 	public : void registerAttributes()
 	{
-		REGISTER_ATTRIBUTE(first);
-		REGISTER_ATTRIBUTE(second);
+		REGISTER_ATTRIBUTE_(first);
+		REGISTER_ATTRIBUTE_(second);
 	};
 	public : void deserialize(any& a)
 	{
@@ -351,9 +351,9 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 	public 	: virtual string getClassName() const {return myName();};
 	public : void registerAttributes()
 	{
-		REGISTER_ATTRIBUTE(first);
-		REGISTER_ATTRIBUTE(second);
-		REGISTER_ATTRIBUTE(third);
+		REGISTER_ATTRIBUTE_(first);
+		REGISTER_ATTRIBUTE_(second);
+		REGISTER_ATTRIBUTE_(third);
 	};
 	public : void deserialize(any& a)
 	{
@@ -460,10 +460,10 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 	public 	: virtual string getClassName() const {return myName();};	//
 	public : void registerAttributes()				//
 	{								//
-		REGISTER_ATTRIBUTE(first);
-		REGISTER_ATTRIBUTE(second);
-		REGISTER_ATTRIBUTE(third);
-		REGISTER_ATTRIBUTE(fourth);
+		REGISTER_ATTRIBUTE_(first);
+		REGISTER_ATTRIBUTE_(second);
+		REGISTER_ATTRIBUTE_(third);
+		REGISTER_ATTRIBUTE_(fourth);
 	};								//
 	public : void deserialize(any& a)				//
 	{								//
@@ -577,11 +577,11 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 	public 	: virtual string getClassName() const {return myName();};	//
 	public : void registerAttributes()				//
 	{								//
-		REGISTER_ATTRIBUTE(first);
-		REGISTER_ATTRIBUTE(second);
-		REGISTER_ATTRIBUTE(third);
-		REGISTER_ATTRIBUTE(fourth);
-		REGISTER_ATTRIBUTE(fifth);
+		REGISTER_ATTRIBUTE_(first);
+		REGISTER_ATTRIBUTE_(second);
+		REGISTER_ATTRIBUTE_(third);
+		REGISTER_ATTRIBUTE_(fourth);
+		REGISTER_ATTRIBUTE_(fifth);
 	};								//
 	public : void deserialize(any& a)				//
 	{								//

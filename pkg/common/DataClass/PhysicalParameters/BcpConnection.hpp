@@ -24,8 +24,7 @@ class BcpConnection : public SimpleViscoelasticBodyParameters
 		virtual ~BcpConnection();
 
 /// Serializable
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(SimpleViscoelasticBodyParameters,(id1)(id2));
 	REGISTER_CLASS_NAME(BcpConnection);
 	REGISTER_BASE_CLASS_NAME(SimpleViscoelasticBodyParameters);
 

@@ -144,26 +144,4 @@ Real LatticeBeamParameters::strain()
         }
 }
 
-void LatticeBeamParameters::registerAttributes()
-{
-	PhysicalParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(id1);
-	REGISTER_ATTRIBUTE(id2);
-	
-	REGISTER_ATTRIBUTE(initialLength);
-	REGISTER_ATTRIBUTE(length); // FIXME - can be calculated after deserialization
-	
-	REGISTER_ATTRIBUTE(direction); // FIXME - can be calculated after deserialization
-	REGISTER_ATTRIBUTE(otherDirection); // this must be saved!
-	
-	REGISTER_ATTRIBUTE(criticalTensileStrain);
-	REGISTER_ATTRIBUTE(criticalCompressiveStrain);
-
-	REGISTER_ATTRIBUTE(longitudalStiffness);
-	REGISTER_ATTRIBUTE(bendingStiffness);
-	REGISTER_ATTRIBUTE(torsionalStiffness);
-
-	REGISTER_ATTRIBUTE(se3Displacement);
-}
-
 YADE_PLUGIN();

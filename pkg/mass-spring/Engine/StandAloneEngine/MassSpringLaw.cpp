@@ -21,11 +21,6 @@ MassSpringLaw::MassSpringLaw () : InteractionSolver()
 }
 
 
-void MassSpringLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(springGroupMask);
-}
 
 
 void MassSpringLaw::action(MetaBody * massSpring)

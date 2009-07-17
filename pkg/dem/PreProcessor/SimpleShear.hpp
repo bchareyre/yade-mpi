@@ -77,7 +77,7 @@ class SimpleShear : public FileGenerator
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(filename)(gravity)(thickness)(width)(height)(profondeur)(density)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(boxYoungModulus)(boxPoissonRatio)(shearSpeed)(gravApplied)(shearApplied)(timeStepUpdateInterval)/*(nBilles)(porosite)*/);
 	REGISTER_CLASS_NAME(SimpleShear);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

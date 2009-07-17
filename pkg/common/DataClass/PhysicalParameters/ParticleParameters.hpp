@@ -27,8 +27,7 @@ class ParticleParameters : public PhysicalParameters
 		virtual ~ParticleParameters();
 
 /// Serializable
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(PhysicalParameters,(mass)(velocity));
 	REGISTER_CLASS_NAME(ParticleParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 

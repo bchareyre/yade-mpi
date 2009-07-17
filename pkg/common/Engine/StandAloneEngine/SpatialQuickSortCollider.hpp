@@ -42,11 +42,7 @@ class SpatialQuickSortCollider : public Collider {
 	//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.
 	bool haveDistantTransient;
 
-	void registerAttributes() {
-		Collider::registerAttributes();
-		REGISTER_ATTRIBUTE(haveDistantTransient);
-	}
-
+	REGISTER_ATTRIBUTES(Collider,(haveDistantTransient));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(SpatialQuickSortCollider);
 	REGISTER_BASE_CLASS_NAME(Collider);

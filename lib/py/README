@@ -4,3 +4,9 @@ pygts-0.3.1:
 	license: GNU GPL v2
 	note: the local version is only the 'gts' directory of the source archive (doc, examples, test ommited). Distutils are not used for building either.
 
+boost-python-indexing-suite-v2-noSymlinkHeaders:
+	homepage: http://www.language-binding.net/pyplusplus/pyplusplus.html (part of Py++-1.0.0)
+	documentation: http://www.language-binding.net/pyplusplus/documentation/indexing_suite_v2.html.html
+	license: Boost software license 1.0
+	note: only headers and a few .cpp files making up the indexing suite are copied here
+

@@ -33,14 +33,6 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 }
 
 
-void VolumicContactLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-// 	REGISTER_ATTRIBUTE(compacite_init);
-}
-
 
 
 // void VolumicContactLaw::speedTest(MetaBody* ncb)

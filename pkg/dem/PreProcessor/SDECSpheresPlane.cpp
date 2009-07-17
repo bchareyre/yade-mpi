@@ -81,27 +81,6 @@ void SDECSpheresPlane::postProcessAttributes(bool)
 }
 
 
-void SDECSpheresPlane::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbSpheres);
-	REGISTER_ATTRIBUTE(minRadius);
-	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(spheresHeight);
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(groundSize);
-	REGISTER_ATTRIBUTE(useSpheresAsGround);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-}
-
 
 bool SDECSpheresPlane::generate()
 {

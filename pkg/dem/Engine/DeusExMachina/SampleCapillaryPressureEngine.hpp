@@ -52,9 +52,7 @@ class SampleCapillaryPressureEngine : public TriaxialStressController
 		virtual void applyCondition(MetaBody * ncb);
 		void updateParameters(MetaBody * ncb);
 		
-
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(TriaxialStressController,(PressureVariation)(Pressure)(UnbalancedForce)(StabilityCriterion)(SigmaPrecision)(pressureVariationActivated)(fusionDetection)(binaryFusion)(pressureIntervalRec));
 	REGISTER_CLASS_NAME(SampleCapillaryPressureEngine);
 	REGISTER_BASE_CLASS_NAME(TriaxialStressController);
 };

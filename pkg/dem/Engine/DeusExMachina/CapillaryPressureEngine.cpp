@@ -27,13 +27,6 @@ CapillaryPressureEngine::~CapillaryPressureEngine()
 {
 }
 
-void CapillaryPressureEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(PressureVariation);
-	REGISTER_ATTRIBUTE(Pressure);
-
-}
 
 
 void CapillaryPressureEngine::applyCondition(MetaBody * rootBody)

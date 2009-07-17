@@ -25,13 +25,6 @@ bool TimeStepper::isActivated(MetaBody* mb)
 }
 
 
-void TimeStepper::registerAttributes()
-{
-	StandAloneEngine::registerAttributes();
-	REGISTER_ATTRIBUTE(active);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-}
-
 
 void TimeStepper::setActive(bool a, int nb)
 {

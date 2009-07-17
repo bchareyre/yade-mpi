@@ -37,7 +37,7 @@ class ForceSnapshot : public DataRecorder
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(list_id)(i));
 	REGISTER_CLASS_NAME(ForceSnapshot);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

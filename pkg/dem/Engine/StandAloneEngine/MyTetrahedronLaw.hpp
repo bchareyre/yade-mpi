@@ -31,10 +31,9 @@ class MyTetrahedronLaw : public InteractionSolver
 		MyTetrahedronLaw();
 		void action(MetaBody*);
 
-	protected :
-		void registerAttributes();
 	REGISTER_CLASS_NAME(MyTetrahedronLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_ATTRIBUTES(InteractionSolver,/* */);
 };
 
 REGISTER_SERIALIZABLE(MyTetrahedronLaw);

@@ -18,18 +18,5 @@ InteractingMyTetrahedron::~InteractingMyTetrahedron ()
 {
 }
 
-void InteractingMyTetrahedron::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(c1);
-	REGISTER_ATTRIBUTE(c2);
-	REGISTER_ATTRIBUTE(c3);
-	REGISTER_ATTRIBUTE(c4);
-	REGISTER_ATTRIBUTE(r1);
-	REGISTER_ATTRIBUTE(r2);
-	REGISTER_ATTRIBUTE(r3);
-	REGISTER_ATTRIBUTE(r4);
-}
-
 
 YADE_PLUGIN();

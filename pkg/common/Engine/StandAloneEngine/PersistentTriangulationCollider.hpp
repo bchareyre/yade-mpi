@@ -113,13 +113,7 @@ class PersistentTriangulationCollider : public Collider
 		//! this flag is used to check if the packing has been triangulated
 		bool isTriangulated;
 
-		void registerAttributes(){
-			Collider::registerAttributes();
-			REGISTER_ATTRIBUTE(noTransientIfPersistentExists);
-			REGISTER_ATTRIBUTE(haveDistantTransient);
-		}
-
-
+	REGISTER_ATTRIBUTES(Collider,(noTransientIfPersistentExists)(haveDistantTransient));
 	REGISTER_CLASS_NAME(PersistentTriangulationCollider);
 	REGISTER_BASE_CLASS_NAME(Collider);
 

@@ -19,16 +19,10 @@ class BoundingSphere : public BoundingVolume
 		BoundingSphere();
 		virtual ~BoundingSphere();
 
-/// Serialization
-		void registerAttributes();
-
-	REGISTER_CLASS_NAME(BoundingSphere);
-	REGISTER_BASE_CLASS_NAME(BoundingVolume);
-	
-/// Indexable
+	REGISTER_ATTRIBUTES(BoundingVolume,(radius)(center));
+	REGISTER_CLASS_AND_BASE(BoundingSphere,BoundingVolume);
 	REGISTER_CLASS_INDEX(BoundingSphere,BoundingVolume);
 };
-
 REGISTER_SERIALIZABLE(BoundingSphere);
 
 

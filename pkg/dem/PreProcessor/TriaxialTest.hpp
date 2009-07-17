@@ -150,8 +150,60 @@ class TriaxialTest : public FileGenerator
 		~TriaxialTest ();
 		bool generate();
 	
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,
+		(lowerCorner)
+		(upperCorner)
+		(thickness)
+		(importFilename)
+		(outputFileName)
+		//(nlayers)
+		//(boxWalls)
+		(internalCompaction)
+		(biaxial2dTest)
+		(maxMultiplier)
+		(finalMaxMultiplier)
+		(radiusStdDev)
+		(radiusMean)
+
+		(sphereYoungModulus)
+		(spherePoissonRatio)
+		(sphereFrictionDeg)
+		(compactionFrictionDeg)
+		(boxYoungModulus)
+		(boxPoissonRatio)
+		(boxFrictionDeg)
+
+		(density)
+		(defaultDt)
+		(dampingForce)
+		(dampingMomentum)
+		(rotationBlocked)
+		(timeStepUpdateInterval)
+		(timeStepOutputInterval)
+		(wallStiffnessUpdateInterval)
+		(radiusControlInterval)
+		(numberOfGrains)
+		(strainRate)
+		(maxWallVelocity)
+		(StabilityCriterion)
+		(autoCompressionActivation)
+		(autoUnload)
+		(autoStopSimulation)
+		(recordIntervalIter)
+		(saveAnimationSnapshots)
+		(AnimationSnapshotsBaseName)
+		(WallStressRecordFile)
+		(wallOversizeFactor)
+		(sigmaIsoCompaction)
+		(sigmaLateralConfinement)
+		(Key)
+		(isotropicCompaction)
+		(fixedPorosity)
+		(fixedBoxDims)
+		(fast)
+		(noFiles)
+		(facetWalls)
+	);
 	REGISTER_CLASS_NAME(TriaxialTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;

@@ -20,8 +20,7 @@ class SpringPhysics : public InteractionPhysics
 		SpringPhysics();
 		virtual ~SpringPhysics();
 
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionPhysics,(stiffness)(damping)(initialLength));
 	REGISTER_CLASS_NAME(SpringPhysics);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
 

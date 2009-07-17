@@ -22,17 +22,10 @@ class BshTube : public GeometricalModel
 		BshTube ();
 		virtual ~BshTube ();
 	
-/// Serialization
-	
 	REGISTER_CLASS_NAME(BshTube);
 	REGISTER_BASE_CLASS_NAME(GeometricalModel);
-
-	public : void registerAttributes();
-	
-/// Indexable
-	
+	REGISTER_ATTRIBUTES(GeometricalModel,(radius)(half_height));
 	REGISTER_CLASS_INDEX(BshTube,GeometricalModel);
-
 };
 
 REGISTER_SERIALIZABLE(BshTube);

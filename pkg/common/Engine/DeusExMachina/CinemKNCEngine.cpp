@@ -37,30 +37,6 @@ CinemKNCEngine::CinemKNCEngine() : leftbox(new Body), rightbox(new Body), frontb
 }
 
 
-void CinemKNCEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(shearSpeed);
-	REGISTER_ATTRIBUTE(gammalim);
-	REGISTER_ATTRIBUTE(prevF_sup);
-	REGISTER_ATTRIBUTE(firstRun);
-	REGISTER_ATTRIBUTE(id_boxhaut);
-	REGISTER_ATTRIBUTE(id_boxbas);
-	REGISTER_ATTRIBUTE(id_boxleft);
-	REGISTER_ATTRIBUTE(id_boxright);
-	REGISTER_ATTRIBUTE(id_boxfront);
-	REGISTER_ATTRIBUTE(id_boxback);
-	REGISTER_ATTRIBUTE(Y0);
-	REGISTER_ATTRIBUTE(F_0);
-	REGISTER_ATTRIBUTE(KnC);
-	REGISTER_ATTRIBUTE(max_vel);
-	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(LOG);
-	REGISTER_ATTRIBUTE(coeff_dech);
-	REGISTER_ATTRIBUTE(wallDamping);
-}
-
-
 void CinemKNCEngine::applyCondition(Body * body)
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;

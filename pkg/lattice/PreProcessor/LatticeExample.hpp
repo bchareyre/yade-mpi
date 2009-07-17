@@ -296,10 +296,205 @@ struct Circle
                 void modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);
 		void makeFibres();
 
-                virtual void registerAttributes();
                 REGISTER_CLASS_NAME(LatticeExample);
 		REGISTER_BASE_CLASS_NAME(FileGenerator);
 
+	REGISTER_ATTRIBUTES(FileGenerator,
+		(speciemen_size_in_meters) 	// size
+		(cellsizeUnit_in_meters)	// g [m]  	- cell size
+		(minAngle_betweenBeams_deg) 	// a [deg] 	- min angle
+			  (disorder_in_cellsizeUnit)   // s [-]        - disorder 
+			  (maxLength_in_cellsizeUnit)  // r [-]        - max beam length
+		(use_Delaunay)
+			  
+			  (crit_TensileStrain)         // E_min [%]    - default 0.02 %
+			  (crit_ComprStrain)           // E_max [%]    - default 0.2 %
+			  (longitudalStiffness_noUnit) // k_l [-]      - default 1.0
+			  (bendingStiffness_noUnit)    // k_b [-]      - default 0.6
+			  (torsionalStiffness_noUnit)  // k_t [-]      - default 0.6
+			  
+		(ignore_DOFs__better_is_OFF)
+			  (ensure2D)
+			  (roughEdges)
+			  (calculate_Torsion_3D)
+			  (quads)
+			  
+			  (triangularBaseGrid)         //              - triangles
+			  (triangularBaseGrid3D)       //              - triangles 3d
+			  (useBendTensileSoftening)
+			  (useStiffnessSoftening)
+			  (useNonLocalModel)
+			  (nonLocalL_in_cellsizeUnit)  // l
+			  
+		(region_single_node_ABCDEF)
+
+		(region_A_min)
+		(region_A_max)
+		(direction_A)
+		(blocked_xyz_A)
+		(displacement_A_meters)
+		
+		(region_B_min)
+		(region_B_max)
+		(direction_B)
+		(blocked_xyz_B)
+		(displacement_B_meters)
+		
+		(region_C_min)
+		(region_C_max)
+		(direction_C)
+		(blocked_xyz_C)
+		(displacement_C_meters)
+		
+		(region_D_min)
+			  (region_D_max)
+			  (direction_D)
+		(blocked_xyz_D)
+			  (displacement_D_meters)
+			  
+		(region_E_min)
+			  (region_E_max)
+			  (direction_E)
+		(blocked_xyz_E)
+			  (displacement_E_meters)
+			  
+		(region_F_min)
+			  (region_F_max)
+			  (direction_F)
+		(blocked_xyz_F)
+			  (displacement_F_meters)
+			  
+		(outputFile)
+			  (strainRecorder_xz_plane)
+			  (strainRecorder_node1)
+			  (strainRecorder_node2)
+
+			  (poissonFile)
+			  (measurePoisson_node3)
+			  (measurePoisson_node4)
+
+
+		(nodeRecorderFile)
+		(record_only_matrix)
+		(nodeRec_A_min)
+		(nodeRec_A_max)
+		(nodeRec_B_min)
+		(nodeRec_B_max)
+		(nodeRec_C_min)
+		(nodeRec_C_max)
+		(nodeRec_D_min)
+		(nodeRec_D_max)
+		(nodeRec_E_min)
+		(nodeRec_E_max)
+		(nodeRec_F_min)
+		(nodeRec_F_max)
+		
+		(beamRecorderFile)
+		(beamRec_A_dir)
+		(beamRec_A_pos)
+		(beamRec_A_range)
+		(beamRec_B_dir)
+		(beamRec_B_pos)
+		(beamRec_B_range)
+		(beamRec_C_dir)
+		(beamRec_C_pos)
+		(beamRec_C_range)
+		(beamRec_D_dir)
+		(beamRec_D_pos)
+		(beamRec_D_range)
+		(beamRec_E_dir)
+		(beamRec_E_pos)
+		(beamRec_E_range)
+
+		(movSupp_A_dir)
+		(movSupp_A_pos)
+		(movSupp_A_range)
+		(movSupp_B_dir)
+		(movSupp_B_pos)
+		(movSupp_B_range)
+		(movSupp_C_dir)
+		(movSupp_C_pos)
+		(movSupp_C_range)
+		(movSupp_D_dir)
+		(movSupp_D_pos)
+		(movSupp_D_range)
+
+			  (regionDelete_A_min)
+			  (regionDelete_A_max)
+			  (regionDelete_B_min)
+			  (regionDelete_B_max)
+			  (regionDelete_C_min)
+			  (regionDelete_C_max)
+			  (regionDelete_D_min)
+			  (regionDelete_D_max)
+			  (regionDelete_E_min)
+			  (regionDelete_E_max)
+			  (regionDelete_F_min)
+			  (regionDelete_F_max)
+
+			  (regionDelete_1_min)
+			  (regionDelete_1_max)
+			  (regionDelete_2_min)
+			  (regionDelete_2_max)
+			  (regionDelete_3_min)
+			  (regionDelete_3_max)
+			  (regionDelete_4_min)
+			  (regionDelete_4_max)
+			  (regionDelete_5_min)
+			  (regionDelete_5_max)
+
+			  (nonDestroy_A_min)
+			  (nonDestroy_A_max)
+			  (nonDestroy_B_min)
+			  (nonDestroy_B_max)
+			  (nonDestroy_stiffness)
+			 
+		(CT)
+		(CT_A_min)
+			  (CT_A_max)
+			  (CT_B_min)
+			  (CT_B_max)
+
+			  (useAggregates)
+		(no_Agg_outside)
+			  (aggregatePercent)
+			  (aggregateMeanDiameter)
+			  (aggregateSigmaDiameter)
+			  (aggregateMinDiameter)
+			  (aggregateMaxDiameter)
+			  // MaterialParameters of aggregate
+			  (agg_longStiffness_noUnit)
+			  (agg_bendStiffness_noUnit)
+			  (agg_torsStiffness_noUnit)
+			  (agg_critCompressStrain)
+			  (agg_critTensileStrain)
+			  // MaterialParameters of bond
+			  (bond_longStiffness_noUnit)
+			  (bond_bendStiffness_noUnit)
+			  (bond_torsStiffness_noUnit)
+			  (bond_critCompressStrain)
+			  (bond_critTensileStrain)
+			  // MaterialParameters of steel fibres
+			  (fibre_longStiffness_noUnit)      // k_l fibre
+			  (fibre_bendStiffness_noUnit)      // k_b fibre
+			  (fibre_torsStiffness_noUnit)      // k_t fibre
+			  (fibre_critCompressStrain)        // E.c fibre
+			  (fibre_critTensileStrain)         // E.l fibre
+		(fibre_count)
+		(beams_per_fibre)
+		(fibre_allows)
+		//(fibre_irregularity_noUnit)
+		(fibre_balancing_iterations)
+			  // MaterialParameters of fibre bond
+			  (fibre_bond_longStiffness_noUnit)  // k_l fibre bond
+			  (fibre_bond_bendStiffness_noUnit)  // k_b fibre bond
+			  (fibre_bond_torsStiffness_noUnit)  // k_t fibre bond
+			  (fibre_bond_critCompressStrain)    // E.c fibre bond
+			  (fibre_bond_critTensileStrain)     // E.l fibre bond
+
+		(fibres_horizontal)
+		(fibres_vertical)
+);
 };
 
 REGISTER_SERIALIZABLE(LatticeExample);

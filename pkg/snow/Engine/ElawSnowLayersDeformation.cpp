@@ -24,13 +24,6 @@ ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 }
 
 
-void ElawSnowLayersDeformation::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(creep_viscosity);
-}
-
 void ElawSnowLayersDeformation::action(MetaBody* ncb)
 {
 	//return;

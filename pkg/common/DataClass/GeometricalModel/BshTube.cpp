@@ -8,7 +8,6 @@
 
 
 #include "BshTube.hpp"
-#include <iostream>
 
 BshTube::BshTube () : GeometricalModel()
 {		
@@ -18,14 +17,6 @@ BshTube::BshTube () : GeometricalModel()
 
 BshTube::~BshTube ()
 {		
-}
-
-
-void BshTube::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-        REGISTER_ATTRIBUTE(half_height);
 }
 
 YADE_PLUGIN("BshTube");

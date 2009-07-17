@@ -55,28 +55,6 @@ void ContactStressRecorder::postProcessAttributes ( bool deserializing )
 }
 
 
-void ContactStressRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE ( outputFile );
-	REGISTER_ATTRIBUTE ( interval );
-
-	REGISTER_ATTRIBUTE ( wall_bottom_id );
-	REGISTER_ATTRIBUTE ( wall_top_id );
-	REGISTER_ATTRIBUTE ( wall_left_id );
-	REGISTER_ATTRIBUTE ( wall_right_id );
-	REGISTER_ATTRIBUTE ( wall_front_id );
-	REGISTER_ATTRIBUTE ( wall_back_id );
-
-	REGISTER_ATTRIBUTE ( height );
-	REGISTER_ATTRIBUTE ( width );
-	REGISTER_ATTRIBUTE ( depth );
-	REGISTER_ATTRIBUTE ( thickness );
-	REGISTER_ATTRIBUTE ( upperCorner );
-	REGISTER_ATTRIBUTE ( lowerCorner );
-
-}
-
 
 bool ContactStressRecorder::isActivated(MetaBody*)
 {

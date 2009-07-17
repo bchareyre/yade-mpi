@@ -23,10 +23,7 @@ class FEMSetParameters : public PhysicalParameters
 /// Serializable
 	REGISTER_CLASS_NAME(FEMSetParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
-
-/// Indexable
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(PhysicalParameters,(nodeGroupMask)(tetrahedronGroupMask));
 	REGISTER_CLASS_INDEX(FEMSetParameters,PhysicalParameters);
 
 };

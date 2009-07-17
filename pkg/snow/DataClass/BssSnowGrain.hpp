@@ -54,8 +54,9 @@ class BssSnowGrain : public InteractingSphere
 		BssSnowGrain();
 		BssSnowGrain(BshSnowGrain* grain, Real one_voxel_in_meters_is);
 	
-	protected :
-		void registerAttributes();
+	// FIXME: BssSnowGrain has no copy-constructor; will be inaccessible from python
+	// REGISTER_ATTRIBUTES(InteractingSphere,(m_copy));
+	virtual void registerAttributes(){ InteractingSphere::registerAttributes(); REGISTER_ATTRIBUTE_(m_copy); }
 	REGISTER_CLASS_NAME(BssSnowGrain);
 	REGISTER_BASE_CLASS_NAME(InteractingSphere);
 	REGISTER_CLASS_INDEX(BssSnowGrain,InteractingSphere);

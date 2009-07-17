@@ -24,7 +24,7 @@ class DisplacementEngine : public DeusExMachina
 
 	protected :
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(displacement)(translationAxis)(active));
 	REGISTER_CLASS_NAME(DisplacementEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

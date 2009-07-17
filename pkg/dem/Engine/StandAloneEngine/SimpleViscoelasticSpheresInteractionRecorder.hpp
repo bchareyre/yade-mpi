@@ -35,7 +35,7 @@ public :
 
 protected :
     virtual void postProcessAttributes(bool deserializing);
-    void registerAttributes();
+	 REGISTER_ATTRIBUTES(DataRecorder,(outputBase)(interval));
     REGISTER_CLASS_NAME(SimpleViscoelasticSpheresInteractionRecorder);
     REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

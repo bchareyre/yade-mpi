@@ -23,8 +23,7 @@ class StaticAttractionEngine : public DeusExMachina
 	protected :
 		virtual Real getMaxDisplacement(MetaBody*) {throw "do not use StaticAttractionEngine directly, use derived classes instead.";};
 		virtual bool doesItApplyToThisBody(Body*) {throw "do not use StaticAttractionEngine directly, use derived classes instead.";};
-
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(active));
 	REGISTER_CLASS_NAME(StaticAttractionEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

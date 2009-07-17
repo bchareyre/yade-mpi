@@ -17,11 +17,5 @@ InteractingSphere::~InteractingSphere ()
 {
 }
 
-void InteractingSphere::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-}
-
 
 YADE_PLUGIN();

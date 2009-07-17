@@ -29,7 +29,7 @@ class PositionRecorder : public DataRecorder
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(startId)(endId));
 	REGISTER_CLASS_NAME(PositionRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

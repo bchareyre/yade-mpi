@@ -20,11 +20,9 @@ class LineSegment : public GeometricalModel
 		virtual ~LineSegment ();
 	
 /// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(GeometricalModel,(length));
 	REGISTER_CLASS_NAME(LineSegment);
 	REGISTER_BASE_CLASS_NAME(GeometricalModel);
-	
 /// Indexable
 	REGISTER_CLASS_INDEX(LineSegment,GeometricalModel);
 

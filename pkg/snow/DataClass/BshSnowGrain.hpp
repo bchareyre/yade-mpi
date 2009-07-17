@@ -21,10 +21,7 @@ class Grrrr : public Serializable
 		Grrrr(){};
 		Grrrr(std::vector<Vector3r>& g):grr(g){};
 	protected :
-		void registerAttributes()
-		{
-			REGISTER_ATTRIBUTE(grr);
-		}
+		REGISTER_ATTRIBUTES(/* */, (grr));
 	REGISTER_CLASS_NAME(Grrrr);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
@@ -93,7 +90,16 @@ class BshSnowGrain : public GeometricalModel
 		}
 	
 	protected :
-		void registerAttributes();
+		REGISTER_ATTRIBUTES(GeometricalModel,
+			(center)
+			(c_axis)
+			(start)
+			(end)
+			(color)
+			(selection)
+			(layer_distance)
+			(gr_gr) // slices
+		);
 		void preProcessAttributes(bool loading)
 		{
 			if(!loading)

@@ -28,14 +28,6 @@ CohesiveFrictionalRelationships::CohesiveFrictionalRelationships()
 }
 
 
-void CohesiveFrictionalRelationships::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(normalCohesion);
-	REGISTER_ATTRIBUTE(shearCohesion);
-	REGISTER_ATTRIBUTE(setCohesionNow);
-	REGISTER_ATTRIBUTE(setCohesionOnNewContacts);	
-}
-
 
 //
 //

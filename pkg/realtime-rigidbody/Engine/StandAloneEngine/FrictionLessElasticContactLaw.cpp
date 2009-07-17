@@ -26,10 +26,6 @@ FrictionLessElasticContactLaw::FrictionLessElasticContactLaw () : InteractionSol
 }
 
 
-void FrictionLessElasticContactLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-}
 
 
 void FrictionLessElasticContactLaw::action(MetaBody * ncb)

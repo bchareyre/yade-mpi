@@ -20,8 +20,7 @@ class SpringGeometry : public InteractionGeometry
 		SpringGeometry();
 		virtual ~SpringGeometry();
 	
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionGeometry,(p1)(p2));
 	REGISTER_CLASS_NAME(SpringGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometry);
 

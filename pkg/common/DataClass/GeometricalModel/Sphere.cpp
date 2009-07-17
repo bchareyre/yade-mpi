@@ -19,10 +19,4 @@ Sphere::~Sphere ()
 }
 
 
-void Sphere::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-}
-
 YADE_PLUGIN();

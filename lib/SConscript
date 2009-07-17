@@ -7,6 +7,9 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.SharedLibrary('WeightedAverage2d',['smoothing/WeightedAverage2d.cpp'],SHLIBPREFIX='',
 			LIBS=env['LIBS']+['yade-base']),
 	])
+	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
+		env.SharedLibrary('boost_python_indexing_suite_v2',['py/boost-python-indexing-suite-v2-noSymlinkHeaders/indexing_slice.cpp','py/boost-python-indexing-suite-v2-noSymlinkHeaders/python_iterator.cpp'])
+	])
 
 
 if 'qt3' not in env['exclude']:

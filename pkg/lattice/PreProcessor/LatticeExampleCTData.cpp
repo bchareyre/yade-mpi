@@ -68,34 +68,6 @@ LatticeExampleCTData::~LatticeExampleCTData()
 
 }
 
-
-void LatticeExampleCTData::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-
-	// mesh generation
-	REGISTER_ATTRIBUTE(speciemen_size_in_meters);     // size
-	REGISTER_ATTRIBUTE(cell_size_in_meters);          // g [m]        - cell size
-	REGISTER_ATTRIBUTE(disorder_in_cellsize_unit);    // s [-]        - disorder 
-
-// we can hide this parameter, because it's less important, just comment this line
-	REGISTER_ATTRIBUTE(max_rod_length_in_cellsize_unit);
-
-	// MaterialParameters of cement matrix
-	REGISTER_ATTRIBUTE(crit_tensile_strain);           // E_min [%]    - default 0.02 %
-	REGISTER_ATTRIBUTE(crit_compr_strain);             // E_max [%]    - default 0.2 %
-	REGISTER_ATTRIBUTE(longitudal_stiffness_no_unit); // k_l [-]      - default 1.0
-	REGISTER_ATTRIBUTE(bending_stiffness_no_unit);    // k_b [-]      - default 0.6
-	REGISTER_ATTRIBUTE(torsional_stiffness_no_unit);  // k_t [-]      - default 0.6
-
-	// conditions - displacement of top & bottom
-	REGISTER_ATTRIBUTE(smooth_edges_displacement);
-	REGISTER_ATTRIBUTE(y_top_bottom_displ_in_meters);
-
-	//CT data file name
-	REGISTER_ATTRIBUTE(ct_data_file_name);
-}
-
 bool LatticeExampleCTData::generate()
 {
 	vector<vector<vector<unsigned char> > > ct_data;

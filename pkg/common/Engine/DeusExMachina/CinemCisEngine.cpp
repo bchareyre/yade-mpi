@@ -24,15 +24,6 @@ CinemCisEngine::CinemCisEngine()
 }
 
 
-void CinemCisEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(shearSpeed);
-	REGISTER_ATTRIBUTE(rotationAxis);
-	REGISTER_ATTRIBUTE(theta);
-	REGISTER_ATTRIBUTE(thetalim);
-	REGISTER_ATTRIBUTE(id_boxhaut);
-}
 
 
 void CinemCisEngine::applyCondition(MetaBody * body)

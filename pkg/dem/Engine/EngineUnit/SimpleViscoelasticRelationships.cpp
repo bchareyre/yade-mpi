@@ -19,10 +19,6 @@ SimpleViscoelasticRelationships::SimpleViscoelasticRelationships()
 }
 
 
-void SimpleViscoelasticRelationships::registerAttributes()
-{
-}
-
 
 void SimpleViscoelasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // SimpleViscoelasticBodyParameters
 					, const shared_ptr<PhysicalParameters>& b2 // SimpleViscoelasticBodyParameters

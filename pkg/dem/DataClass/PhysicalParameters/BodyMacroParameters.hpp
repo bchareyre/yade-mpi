@@ -27,9 +27,7 @@ class BodyMacroParameters : public ElasticBodyParameters
 /// Serialization
 	REGISTER_CLASS_NAME(BodyMacroParameters);
 	REGISTER_BASE_CLASS_NAME(ElasticBodyParameters);
-
-	public : void registerAttributes();
-
+	REGISTER_ATTRIBUTES(ElasticBodyParameters,(poisson)(frictionAngle));
 /// Indexable
 	REGISTER_CLASS_INDEX(BodyMacroParameters,ElasticBodyParameters);
 };

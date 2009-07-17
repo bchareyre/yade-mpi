@@ -20,10 +20,5 @@ NonLocalDependency::~NonLocalDependency()
 
 }
 
-void NonLocalDependency::registerAttributes()
-{
-	InteractionPhysics::registerAttributes();
-	REGISTER_ATTRIBUTE(gaussValue);
-}
 
 YADE_PLUGIN();

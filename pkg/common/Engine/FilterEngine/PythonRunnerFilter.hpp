@@ -22,9 +22,7 @@ class PythonRunnerFilter: public FilterEngine {
 				PyRun_SimpleString(command.c_str()); 
 			PyGILState_Release(gstate);
 		}
-		virtual void registerAttributes(){ FilterEngine::registerAttributes(); REGISTER_ATTRIBUTE(command); }
-	protected :
-		virtual void postProcessAttributes(bool deserializing){}
+	REGISTER_ATTRIBUTES(FilterEngine,(command));
 	REGISTER_CLASS_NAME(PythonRunnerFilter);
 	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };

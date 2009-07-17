@@ -49,8 +49,8 @@ class ColorizedTimeFilter : public FilterEngine {
 		virtual bool isActivated(MetaBody*);
 		virtual void applyCondition(MetaBody*);
 	
-		virtual void registerAttributes();
-		DECLARE_LOGGER;
+	DECLARE_LOGGER;
+	REGISTER_ATTRIBUTES(FilterEngine,(point)(normal)(autoScale)(onlyDynamic)(minValue)(maxValue)(posX)(posY)(width)(height)(title));
 	REGISTER_CLASS_NAME(ColorizedTimeFilter);
 	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };

@@ -28,7 +28,7 @@ void SpiralEngine::applyCondition(MetaBody* rb){
 	angleTurned+=angularVelocity*dt;
 	shared_ptr<BodyContainer> bodies = rb->bodies;
 	FOREACH(body_id_t id,subscribedBodies){
-		assert(id<bodies->size());
+		assert(id<(body_id_t)bodies->size());
 		Body* b=Body::byId(id,rb).get();
 		ParticleParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		assert(rbp);
@@ -48,14 +48,6 @@ RotationEngine::RotationEngine()
 }
 
 
-void RotationEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(angularVelocity);
-	REGISTER_ATTRIBUTE(rotationAxis);
-	REGISTER_ATTRIBUTE(rotateAroundZero);
-	REGISTER_ATTRIBUTE(zeroPoint);
-}
 
 void RotationEngine::applyCondition(MetaBody *ncb)
 {

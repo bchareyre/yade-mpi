@@ -45,11 +45,9 @@ class InteractingMyTetrahedron : public InteractingGeometry
 		virtual ~InteractingMyTetrahedron ();
 
 /// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractingGeometry,(c1)(c2)(c3)(c4)(r1)(r2)(r3)(r4));
 	REGISTER_CLASS_NAME(InteractingMyTetrahedron);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
-
 /// Indexable
 	REGISTER_CLASS_INDEX(InteractingMyTetrahedron,InteractingGeometry);
 };

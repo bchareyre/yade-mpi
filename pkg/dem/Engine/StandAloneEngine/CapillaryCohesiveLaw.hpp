@@ -81,9 +81,7 @@ class CapillaryCohesiveLaw : public InteractionSolver
 						
 		CapillaryCohesiveLaw();
 		void action(MetaBody * ncb);
-
-	protected : 
-		void registerAttributes();
+		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(CapillaryPressure)(fusionDetection)(binaryFusion));
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(CapillaryCohesiveLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);

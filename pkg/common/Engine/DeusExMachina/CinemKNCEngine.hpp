@@ -79,9 +79,8 @@ class CinemKNCEngine : public DeusExMachina
 		string Key;
 		
 
-
+	REGISTER_ATTRIBUTES(DeusExMachina,(shearSpeed)(gammalim)(prevF_sup)(firstRun)(id_boxhaut)(id_boxbas)(id_boxleft)(id_boxright)(id_boxfront)(id_boxback)(Y0)(F_0)(KnC)(max_vel)(Key)(LOG)(coeff_dech)(wallDamping));
 	protected :
-		void registerAttributes();
 		void letMove(Body* body);
 		void computeDu(MetaBody* ncb);
 		void stopMovement();		// to cancel all the velocities when gammalim is reached

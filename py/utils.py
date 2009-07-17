@@ -108,9 +108,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,density=1,physParamsClass=
 	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	vStr='['+' '.join(['{%g %g %g}'%(v[0],v[1],v[2]) for v in vertices])+']'
-	b.shape.setRaw('vertices',vStr)
-	b.mold.setRaw('vertices',vStr)
+	b.shape['vertices']=vertices;	b.mold['vertices']=vertices
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
 	b.phys=PhysicalParameters(physParamsClass)
 	b.phys.updateExistingAttrs(pp)

@@ -19,9 +19,7 @@ class SimpleElasticRelationshipsWater : public InteractionPhysicsEngineUnit
 					const shared_ptr<PhysicalParameters>& b2,
 					const shared_ptr<Interaction>& interaction);
 
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,/* */);
 	FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
 	REGISTER_CLASS_NAME(SimpleElasticRelationshipsWater);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);

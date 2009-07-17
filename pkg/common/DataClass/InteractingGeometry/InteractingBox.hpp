@@ -20,9 +20,7 @@ class InteractingBox : public InteractingGeometry
 		InteractingBox ();
 		virtual ~InteractingBox ();	
 	
-	protected :
-		void registerAttributes();
-	
+	REGISTER_ATTRIBUTES(InteractingGeometry,(extents));
 	REGISTER_CLASS_INDEX(InteractingBox,InteractingGeometry);
 	REGISTER_CLASS_NAME(InteractingBox);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);

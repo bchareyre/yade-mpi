@@ -29,9 +29,7 @@ class Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry : public Interact
 	
 	//FIXME: what is this good for?!
 	DEFINE_FUNCTOR_ORDER_2D(BssSnowGrain,BssSnowGrain);
-	
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,/* */);
 };
 
 REGISTER_SERIALIZABLE(Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);

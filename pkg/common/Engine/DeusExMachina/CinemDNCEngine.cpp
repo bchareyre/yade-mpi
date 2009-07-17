@@ -24,17 +24,6 @@ CinemDNCEngine::CinemDNCEngine()
 }
 
 
-void CinemDNCEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(shearSpeed);
-	REGISTER_ATTRIBUTE(rotationAxis);
-	REGISTER_ATTRIBUTE(theta);
-	REGISTER_ATTRIBUTE(thetalim);
-	REGISTER_ATTRIBUTE(id_boxhaut);
-}
-
-
 void CinemDNCEngine::applyCondition(MetaBody * body)
 {
 	if(theta<=thetalim)

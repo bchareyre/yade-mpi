@@ -37,14 +37,6 @@ void PositionRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void PositionRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(startId);
-	REGISTER_ATTRIBUTE(endId);
-}
 
 bool PositionRecorder::isActivated(MetaBody*)
 {

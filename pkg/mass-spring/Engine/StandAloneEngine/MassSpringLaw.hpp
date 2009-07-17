@@ -17,8 +17,7 @@ class MassSpringLaw : public InteractionSolver
 		MassSpringLaw ();
 		void action(MetaBody*);
 
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(springGroupMask));
 	REGISTER_CLASS_NAME(MassSpringLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

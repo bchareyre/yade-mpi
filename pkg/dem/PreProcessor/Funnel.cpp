@@ -73,26 +73,6 @@ void Funnel::postProcessAttributes(bool)
 }
 
 
-void Funnel::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbSpheres);
-	REGISTER_ATTRIBUTE(minRadius);
-	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(groundSize);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-}
-
-
 bool Funnel::generate()
 {
 	rootBody = shared_ptr<MetaBody>(new MetaBody);

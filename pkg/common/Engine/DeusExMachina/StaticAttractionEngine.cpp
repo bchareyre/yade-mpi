@@ -9,11 +9,6 @@
 #include"StaticAttractionEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 
-void StaticAttractionEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(active);
-}
 
 /*! \brief Compress stuff faster and better!
  *

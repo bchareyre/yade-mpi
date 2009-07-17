@@ -27,15 +27,6 @@ ViscousForceDamping::ViscousForceDamping() : InteractionSolver() ,betaNormal(0.0
 }
 
 
-void ViscousForceDamping::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-	REGISTER_ATTRIBUTE(betaNormal);
-	REGISTER_ATTRIBUTE(betaShear);
-}
-
 
 //FIXME : remove bool first !!!!!
 void ViscousForceDamping::action(Body* body)

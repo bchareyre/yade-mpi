@@ -25,8 +25,7 @@ class Tetrahedron : public GeometricalModel
 		void dump(void) const{std::cerr<<"["; for(int i=0; i<4; i++){ std::cerr<<"("; for(int j=0; j<3; j++) std::cerr<<v[i][j]<<","; std::cerr<<")";} std::cerr<<"]"<<std::endl;}
 		virtual ~Tetrahedron();
 
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(GeometricalModel,(v));
 	REGISTER_CLASS_NAME(Tetrahedron);
 	REGISTER_BASE_CLASS_NAME(GeometricalModel);
 	REGISTER_CLASS_INDEX(Tetrahedron,GeometricalModel);

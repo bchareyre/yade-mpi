@@ -40,13 +40,6 @@ void ForceSnapshot::postProcessAttributes(bool deserializing)
 }
 
 
-void ForceSnapshot::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(list_id);
-	REGISTER_ATTRIBUTE(i);
-}
 
 bool ForceSnapshot::isActivated(MetaBody*)
 {

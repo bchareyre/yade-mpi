@@ -55,14 +55,6 @@ void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void TriaxialStateRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(porosity);
-}
-
 
 bool TriaxialStateRecorder::isActivated(MetaBody*)
 {

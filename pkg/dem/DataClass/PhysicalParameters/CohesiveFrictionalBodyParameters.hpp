@@ -27,9 +27,7 @@ class CohesiveFrictionalBodyParameters : public BodyMacroParameters
 /// Serialization
 	REGISTER_CLASS_NAME(CohesiveFrictionalBodyParameters);
 	REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
-
-	public : void registerAttributes();
-
+	REGISTER_ATTRIBUTES(BodyMacroParameters,(isBroken)(isCohesive));
 /// Indexable
 	REGISTER_CLASS_INDEX(CohesiveFrictionalBodyParameters,BodyMacroParameters);
 };

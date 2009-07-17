@@ -26,8 +26,8 @@ class ElasticCohesiveLaw : public InteractionSolver
 		ElasticCohesiveLaw();
 		void action(MetaBody*);
 
-	protected : 
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw));
+
 	REGISTER_CLASS_NAME(ElasticCohesiveLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 

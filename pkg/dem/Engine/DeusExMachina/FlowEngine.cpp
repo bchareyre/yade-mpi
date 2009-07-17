@@ -25,14 +25,6 @@ FlowEngine::~FlowEngine()
 }
 
 
-void FlowEngine::registerAttributes()
-{
-// 	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(isActivated);
-	REGISTER_ATTRIBUTE(dummyParameter);
-}
-
-
 void FlowEngine::applyCondition(MetaBody* ncb)
 {
 

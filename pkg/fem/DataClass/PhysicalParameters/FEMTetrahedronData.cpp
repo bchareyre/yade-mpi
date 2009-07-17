@@ -23,11 +23,6 @@ FEMTetrahedronData::~FEMTetrahedronData()
 }
 
 
-void FEMTetrahedronData::registerAttributes()
-{
-	PhysicalParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(ids);
-}
 
 void FEMTetrahedronData::calcKeMatrix(MetaBody* femBody)
 {

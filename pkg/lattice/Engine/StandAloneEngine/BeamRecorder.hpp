@@ -36,13 +36,23 @@ class BeamRecorder : public DataRecorder
 
 		BeamRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(DataRecorder,
+		(outputFile)
+		(interval)
+		//	(sections)
+		(sections_midpoints)
+		(sections_halflength)
+		(sections_directions)
+
+		//	(first)
+		//	(subscribedBodies)
+	);
 	REGISTER_CLASS_NAME(BeamRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

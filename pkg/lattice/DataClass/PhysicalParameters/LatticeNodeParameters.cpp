@@ -23,9 +23,5 @@ LatticeNodeParameters::~LatticeNodeParameters()
 
 }
 
-void LatticeNodeParameters::registerAttributes()
-{
-	PhysicalParameters::registerAttributes();
-}
 
 YADE_PLUGIN();

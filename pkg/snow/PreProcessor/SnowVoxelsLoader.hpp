@@ -126,8 +126,42 @@ class SnowVoxelsLoader : public FileGenerator
 		void create_grain(shared_ptr<Body>& body, Vector3r position, bool dynamic , boost::shared_ptr<BshSnowGrain> grain);
 		void create_box(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire);
 	
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,
+		(voxel_binary_data_file)
+		// that was for integrating snow-read with this preprocessor, but for now it's not integrated. snow-read does the conversion separately
+		//	(voxel_txt_dir)
+		//	(voxel_caxis_file)
+		//	(voxel_colors_file)
+		(grain_binary_data_file)
+		(one_voxel_in_meters_is)
+		(layer_distance_voxels)
+		(angle_increment_radians)
+		(skip_small_grains)
+
+		(shearCohesion)
+		(normalCohesion)
+			  (creep_viscosity)
+		(use_grain_shear_creep)
+		(use_grain_twist_creep)
+		(enable_layers_creep)
+		(layers_creep_viscosity)
+		(sigma_iso)
+		(setCohesionOnNewContacts)
+
+		(sphereYoungModulus)
+		(spherePoissonRatio)
+		(sphereFrictionDeg)
+		(boxYoungModulus)
+		(boxPoissonRatio)
+		(boxFrictionDeg)
+		(density)
+		(use_gravity_engine)
+		(gravity)
+		(dampingForce)
+		(dampingMomentum)
+
+		(WallStressRecordFile)
+	);
 	REGISTER_CLASS_NAME(SnowVoxelsLoader);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

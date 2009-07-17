@@ -29,8 +29,5 @@ void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& 
 	}	
 };
 
-void ElasticBodySimpleRelationship::registerAttributes()
-{
-};
 
 YADE_PLUGIN();

@@ -25,6 +25,7 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.File('timing.py'),
 		env.File('pack.py'),
 		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['XMLFormatManager','yade-factory','yade-serialization','Shop','BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','STLImporter','ParallelEngine','Clump'],),
+		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['boost_python_indexing_suite_v2'])
 	])
 	if 'GTS' in env['features']: env.Depends('_packPredicates.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so')
 

@@ -19,11 +19,4 @@ BodyMacroParameters::~BodyMacroParameters()
 {
 }
 
-void BodyMacroParameters::registerAttributes()
-{
-	ElasticBodyParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(poisson);
-	REGISTER_ATTRIBUTE(frictionAngle);
-}
-
 YADE_PLUGIN();

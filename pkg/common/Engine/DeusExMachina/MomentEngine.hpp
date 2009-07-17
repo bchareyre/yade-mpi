@@ -20,9 +20,7 @@ class MomentEngine : public DeusExMachina
 		virtual ~MomentEngine();
 	
 		virtual void applyCondition(MetaBody*);
-	
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(moment));
 	REGISTER_CLASS_NAME(MomentEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

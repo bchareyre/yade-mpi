@@ -25,8 +25,7 @@ class RigidBodyParameters : public ParticleParameters
 		virtual ~RigidBodyParameters ();
 
 /// Serialization										///
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(ParticleParameters,(inertia)(angularVelocity));
 	REGISTER_CLASS_NAME(RigidBodyParameters);
 	REGISTER_BASE_CLASS_NAME(ParticleParameters);
 	

@@ -36,8 +36,7 @@ class LatticeSetParameters : public PhysicalParameters
                 virtual ~LatticeSetParameters();
 
 /// Serializable
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(PhysicalParameters,(nodeGroupMask)(beamGroupMask)(useBendTensileSoftening)(useStiffnessSoftening));
 	REGISTER_CLASS_NAME(LatticeSetParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 

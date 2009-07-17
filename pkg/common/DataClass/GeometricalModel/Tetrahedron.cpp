@@ -30,10 +30,4 @@ Tetrahedron::~Tetrahedron()
 {
 }
 
-void Tetrahedron::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	// FIXME
-	REGISTER_ATTRIBUTE(v);
-}
 YADE_PLUGIN();

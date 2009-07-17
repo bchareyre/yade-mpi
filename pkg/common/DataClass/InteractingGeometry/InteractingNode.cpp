@@ -17,10 +17,5 @@ InteractingNode::~InteractingNode ()
 {
 }
 
-void InteractingNode::registerAttributes()
-{
-	InteractingGeometry::registerAttributes();
-}
-
 
 YADE_PLUGIN("InteractingNode");

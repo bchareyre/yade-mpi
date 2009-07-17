@@ -86,7 +86,7 @@ class SDECImpactTest : public FileGenerator
 		bool generate();
 	
 	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,/*(lowerCorner)(upperCorner)(thickness)*/(importFilename)(boxWalls)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(boxYoungModulus)(boxPoissonRatio)(boxFrictionDeg)(density)(dampingForce)(dampingMomentum)(rotationBlocked)(timeStepUpdateInterval)/*(wall_top)(wall_bottom)(wall_1)(wall_2)(wall_3)(wall_4)(wall_top_wire)(wall_bottom_wire)(wall_1_wire)(wall_2_wire)(wall_3_wire)(wall_4_wire)(spheresColor)(spheresRandomColor)(recordBottomForce)(recordAveragePositions)(gravity)*/(forceRecordFile)(positionRecordFile)(velocityRecordFile)(recordIntervalIter)(bigBall)(bigBallRadius)(bigBallDensity)(bigBallDropTimeSeconds)(bigBallFrictDeg)(bigBallYoungModulus)(bigBallPoissonRatio)(bigBallDropHeight));
 	REGISTER_CLASS_NAME(SDECImpactTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

@@ -26,8 +26,8 @@ class ColorizedLayerFilter : public FilterEngine {
 		virtual bool isActivated(MetaBody*);
 		virtual void applyCondition(MetaBody*);
 	
-		virtual void registerAttributes();
 		virtual void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(FilterEngine,(near)(normal)(thickness)(diffuseColor)(interval));
 	REGISTER_CLASS_NAME(ColorizedLayerFilter);
 	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };

@@ -27,8 +27,7 @@ class TimeStepper : public StandAloneEngine
 		virtual void action(MetaBody* b) { computeTimeStep(b);} ;
 		void setActive(bool a, int nb=-1);
 
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(StandAloneEngine,(active)(timeStepUpdateInterval));
 	REGISTER_CLASS_AND_BASE(TimeStepper,StandAloneEngine);
 };
 

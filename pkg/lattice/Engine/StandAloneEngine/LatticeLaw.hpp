@@ -31,18 +31,16 @@ class LatticeLaw : public InteractionSolver
 		LatticeLaw();
 		virtual ~LatticeLaw();
 		void action(MetaBody*);
-		void registerAttributes()
-		{
-			REGISTER_ATTRIBUTE(roughEdges);
-			REGISTER_ATTRIBUTE(ensure2D);
-			REGISTER_ATTRIBUTE(calcTorsion);
-			REGISTER_ATTRIBUTE(backward_compatible);
-			REGISTER_ATTRIBUTE(tension_compression_different_stiffness);
-			REGISTER_ATTRIBUTE(respect_non_destroy);
+		REGISTER_ATTRIBUTES(InteractionSolver,
+			(roughEdges)
+			(ensure2D)
+			(calcTorsion)
+			(backward_compatible)
+			(tension_compression_different_stiffness)
+			(respect_non_destroy)
 			// must go to derived class
-			//REGISTER_ATTRIBUTE(nonlocal);
-		};
-
+			//(nonlocal)
+		);
 /// Serializtion
 	REGISTER_CLASS_NAME(LatticeLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);

@@ -40,21 +40,6 @@ bool ColorizedVelocityFilter::isActivated(MetaBody* rootBody)
 	return FilterEngine::isActivated(rootBody);
 }
 
-void ColorizedVelocityFilter::registerAttributes()
-{
-	FilterEngine::registerAttributes();
-	REGISTER_ATTRIBUTE(autoScale);
-	REGISTER_ATTRIBUTE(onlyDynamic);
-	REGISTER_ATTRIBUTE(minValue);
-	REGISTER_ATTRIBUTE(maxValue);
-
-	REGISTER_ATTRIBUTE(posX);
-	REGISTER_ATTRIBUTE(posY);
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(title);
-}
-
 void ColorizedVelocityFilter::applyCondition(MetaBody* ncb)
 {
 

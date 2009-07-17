@@ -38,13 +38,12 @@ class FEMTetrahedronData : public PhysicalParameters
 		virtual ~FEMTetrahedronData();
 
 /// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(PhysicalParameters,(ids));
 	REGISTER_CLASS_NAME(FEMTetrahedronData);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 	
 /// Indexable
-	REGISTER_CLASS_INDEX(FEMTetrahedronData,RigidBodyParameters);
+	REGISTER_CLASS_INDEX(FEMTetrahedronData,RigidBodyParameters); // FIXME: should be PhysicalParameters?
 
 };
 

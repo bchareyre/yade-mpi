@@ -34,7 +34,7 @@ public :
 
 protected :
     virtual void postProcessAttributes(bool deserializing);
-    void registerAttributes();
+	 REGISTER_ATTRIBUTES(DataRecorder,(outputBase)(interval)(stateId));
     REGISTER_CLASS_NAME(MGPRecorder);
     REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

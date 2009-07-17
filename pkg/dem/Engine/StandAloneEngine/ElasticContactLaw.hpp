@@ -73,9 +73,11 @@ class ElasticContactLaw : public InteractionSolver
 
 		shared_ptr<ef2_Spheres_Elastic_ElasticLaw> functor;
 
-	protected :
-		void registerAttributes();
-
+	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)
+		#ifdef SCG_SHEAR
+			(useShear)
+		#endif
+	);
 	REGISTER_CLASS_NAME(ElasticContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

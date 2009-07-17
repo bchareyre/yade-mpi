@@ -92,60 +92,6 @@ TriaxialStressController::~TriaxialStressController()
 {	
 }
 
-void TriaxialStressController::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(stiffnessUpdateInterval);
-	REGISTER_ATTRIBUTE(radiusControlInterval);
-	REGISTER_ATTRIBUTE(computeStressStrainInterval);
-	REGISTER_ATTRIBUTE(wallDamping);
-//	REGISTER_ATTRIBUTE(force);
-	
-	//REGISTER_ATTRIBUTE(UnbalancedForce);
-	
-	REGISTER_ATTRIBUTE(stiffness);
- 	REGISTER_ATTRIBUTE(wall_bottom_id);
- 	REGISTER_ATTRIBUTE(wall_top_id);
- 	REGISTER_ATTRIBUTE(wall_left_id);
- 	REGISTER_ATTRIBUTE(wall_right_id);
- 	REGISTER_ATTRIBUTE(wall_front_id);
- 	REGISTER_ATTRIBUTE(wall_back_id);
-//	REGISTER_ATTRIBUTE(wall_id);
-	
-	REGISTER_ATTRIBUTE(wall_bottom_activated);
-	REGISTER_ATTRIBUTE(wall_top_activated);
-	REGISTER_ATTRIBUTE(wall_left_activated);
-	REGISTER_ATTRIBUTE(wall_right_activated);
-	REGISTER_ATTRIBUTE(wall_front_activated);
-	REGISTER_ATTRIBUTE(wall_back_activated);
-	
-	REGISTER_ATTRIBUTE(thickness);
-	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(depth);
-	REGISTER_ATTRIBUTE(height0);
-	REGISTER_ATTRIBUTE(width0);
-	REGISTER_ATTRIBUTE(depth0);
-	
-	REGISTER_ATTRIBUTE(sigma_iso);
-	REGISTER_ATTRIBUTE(sigma1);
-	REGISTER_ATTRIBUTE(sigma2);
-	REGISTER_ATTRIBUTE(sigma3);
-	REGISTER_ATTRIBUTE(isTriaxialCompression);
-	REGISTER_ATTRIBUTE(maxMultiplier);
-	REGISTER_ATTRIBUTE(finalMaxMultiplier);
-	REGISTER_ATTRIBUTE(max_vel);
-	REGISTER_ATTRIBUTE(max_vel1);
-	REGISTER_ATTRIBUTE(max_vel2);
-	REGISTER_ATTRIBUTE(max_vel3);
-	REGISTER_ATTRIBUTE(previousStress);
-	REGISTER_ATTRIBUTE(previousMultiplier);
-	REGISTER_ATTRIBUTE(internalCompaction);
-
-	// needed for access from python
-	REGISTER_ATTRIBUTE(meanStress);
-	REGISTER_ATTRIBUTE(volumetricStrain);
-}
 
 void TriaxialStressController::updateStiffness (MetaBody * ncb)
 {

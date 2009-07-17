@@ -44,7 +44,7 @@ class MicroMacroAnalyser : public StandAloneEngine
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(StandAloneEngine,(interval)(outputFile));
 	REGISTER_CLASS_NAME(MicroMacroAnalyser);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
 };

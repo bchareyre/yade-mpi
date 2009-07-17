@@ -29,6 +29,7 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 					
 	REGISTER_CLASS_NAME(InteractingFacet2InteractingSphere4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(shrinkFactor));
 
 	DECLARE_LOGGER;
 
@@ -43,10 +44,6 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 	// tile, with a gap between the separate tiles equal to the sphere's radius
 	// multiplied by 2*shrinkFactor. By default shrinkFactor=0.
 	Real shrinkFactor; 
-
-	protected :
-		virtual void registerAttributes();
-		
 };
 
 REGISTER_SERIALIZABLE(InteractingFacet2InteractingSphere4SpheresContactGeometry);

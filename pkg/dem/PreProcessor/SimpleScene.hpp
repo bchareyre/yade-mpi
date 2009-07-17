@@ -8,8 +8,7 @@ class SimpleScene: public FileGenerator {
 		SimpleScene(){};
 		~SimpleScene (){};
 		virtual bool generate();
-	protected :
-		void registerAttributes(){ FileGenerator::registerAttributes(); }
+	REGISTER_ATTRIBUTES(FileGenerator,/* */);
 	REGISTER_CLASS_NAME(SimpleScene);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 	DECLARE_LOGGER;

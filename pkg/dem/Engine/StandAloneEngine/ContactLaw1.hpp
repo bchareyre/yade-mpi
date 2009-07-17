@@ -37,9 +37,7 @@ class ContactLaw1 : public InteractionSolver
 	
 		ContactLaw1();
 		void action(MetaBody*);
-
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
 	REGISTER_CLASS_NAME(ContactLaw1);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

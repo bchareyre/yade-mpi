@@ -10,6 +10,7 @@ sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't ne
 from math import *
 from miniWm3Wrap import *
 from yade.wrapper import *
+from yade._customConverters import *
 from yade import runtime
 from yade import utils
 __builtins__.O=Omega()

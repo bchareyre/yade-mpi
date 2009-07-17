@@ -118,9 +118,6 @@ Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::Ef2_BssSnowGrain_BssSnow
 {
 }
 
-void Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::registerAttributes()
-{	
-}
 
 bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,

@@ -519,42 +519,6 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 }
 
 
-void OpenGLRenderingEngine::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(scaleDisplacements);
-	REGISTER_ATTRIBUTE(displacementScale);
-	REGISTER_ATTRIBUTE(scaleRotations);
-	REGISTER_ATTRIBUTE(rotationScale);
-
-	REGISTER_ATTRIBUTE(Light_position);
-	REGISTER_ATTRIBUTE(Background_color);
-	
-	REGISTER_ATTRIBUTE(Body_wire);
-
-	REGISTER_ATTRIBUTE(Show_DOF);
-	REGISTER_ATTRIBUTE(Show_ID);
-	REGISTER_ATTRIBUTE(Body_state);
-	REGISTER_ATTRIBUTE(Body_bounding_volume);
-	REGISTER_ATTRIBUTE(Body_interacting_geom);
-	REGISTER_ATTRIBUTE(Body_geometrical_model);
-	
-	REGISTER_ATTRIBUTE(Interaction_wire);
-	REGISTER_ATTRIBUTE(Interaction_geometry);
-	REGISTER_ATTRIBUTE(Interaction_physics);
-	
-	REGISTER_ATTRIBUTE(Draw_mask);
-	REGISTER_ATTRIBUTE(Draw_inside);
-
-	REGISTER_ATTRIBUTE(Cast_shadows);
-	REGISTER_ATTRIBUTE(Shadow_volumes);
-	REGISTER_ATTRIBUTE(Fast_shadow_volume);
-
-	REGISTER_ATTRIBUTE(clipPlaneSe3);
-	REGISTER_ATTRIBUTE(clipPlaneActive);
-
-	REGISTER_ATTRIBUTE(selectBodyLimit);
-}
-
 
 void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	if(!deserializing) return;

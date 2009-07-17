@@ -23,8 +23,8 @@ for i in range(0,100):
 	O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),velocity=[random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1)]))
 
 O.miscParams=[Generic('GLDrawSphere',{'glutUse':True})]
-O.saveTmp('init')
 O.dt=1e-4
+O.saveTmp('init')
 
 
 from yade import log

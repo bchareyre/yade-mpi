@@ -15,10 +15,6 @@
 #include <boost/filesystem/convenience.hpp>
 
 
-void FEMSetTextLoader::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(fileName);
-}
 
 void FEMSetTextLoader::go(	  const shared_ptr<PhysicalParameters>& par
 					, Body* body)

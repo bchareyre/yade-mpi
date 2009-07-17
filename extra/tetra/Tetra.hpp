@@ -31,9 +31,8 @@ class TetraMold: public InteractingGeometry{
 		TetraMold(Vector3r v0, Vector3r v1, Vector3r v2, Vector3r v3){createIndex(); v.resize(4); v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3; }
 		virtual ~TetraMold (){};
 	protected:
-		void registerAttributes(){InteractingGeometry::registerAttributes(); REGISTER_ATTRIBUTE(v);}
-		REGISTER_CLASS_NAME(TetraMold);
-		REGISTER_BASE_CLASS_NAME(InteractingGeometry);
+		REGISTER_ATTRIBUTES(InteractingGeometry,(v));
+		REGISTER_CLASS_AND_BASE(TetraMold,InteractingGeometry);
 		REGISTER_CLASS_INDEX(TetraMold,InteractingGeometry);
 };
 REGISTER_SERIALIZABLE(TetraMold);
@@ -55,15 +54,9 @@ class TetraBang: public InteractionGeometry{
 		TetraBang(): InteractionGeometry(){};
 		virtual ~TetraBang(){};
 	protected:
-		void registerAttributes(){ InteractionGeometry::registerAttributes();
-			REGISTER_ATTRIBUTE(penetrationVolume); REGISTER_ATTRIBUTE(equivalentCrossSection);
-			REGISTER_ATTRIBUTE(contactPoint); REGISTER_ATTRIBUTE(normal);
-			REGISTER_ATTRIBUTE(equivalentPenetrationDepth);
-			REGISTER_ATTRIBUTE(maxPenetrationDepthA); REGISTER_ATTRIBUTE(maxPenetrationDepthB);
-		}
+		REGISTER_ATTRIBUTES(InteractionGeometry,(penetrationVolume)(equivalentCrossSection)(contactPoint)(normal)(equivalentPenetrationDepth)(maxPenetrationDepthA)(maxPenetrationDepthB));
 		FUNCTOR2D(TetraMold,TetraMold);
-		REGISTER_CLASS_NAME(TetraBang);
-		REGISTER_BASE_CLASS_NAME(InteractionGeometry);
+		REGISTER_CLASS_AND_BASE(TetraBang,InteractionGeometry);
 };
 REGISTER_SERIALIZABLE(TetraBang);
 
@@ -136,11 +129,10 @@ class TetraLaw: public InteractionSolver {
 
 		void action(MetaBody*);
 
-		DECLARE_LOGGER;
-	protected:
-		void registerAttributes(){InteractionSolver::registerAttributes(); /* … */ }
-		REGISTER_CLASS_NAME(TetraLaw);
-		REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	DECLARE_LOGGER;
+	REGISTER_ATTRIBUTES(InteractionSolver,/* nothing*/);
+	REGISTER_CLASS_NAME(TetraLaw);
+	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 REGISTER_SERIALIZABLE(TetraLaw);
 

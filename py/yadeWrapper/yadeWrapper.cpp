@@ -18,8 +18,6 @@
 #include<boost/foreach.hpp>
 #include<boost/algorithm/string.hpp>
 
-// [boost1.34] #include<boost/python/stl_iterator.hpp>
-
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<yade/core/Omega.hpp>
@@ -206,7 +204,7 @@ void anyEngines_set(vector<shared_ptr<Engine> >&, python::object);
 BASIC_PY_PROXY_HEAD(pyParallelEngine,ParallelEngine)
 	pyParallelEngine(python::list slaves){init("ParallelEngine"); slaves_set(slaves);}
 	void slaves_set(python::list slaves){
-		ensureAcc(); shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
+		shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
 		int len=python::len(slaves);
 		me->slaves=ParallelEngine::slaveContainer(); // empty the container
 		for(int i=0; i<len; i++){
@@ -220,7 +218,7 @@ BASIC_PY_PROXY_HEAD(pyParallelEngine,ParallelEngine)
 		}
 	}
 	python::list slaves_get(void){	
-		ensureAcc(); shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
+		shared_ptr<ParallelEngine> me=dynamic_pointer_cast<ParallelEngine>(proxee); if(!me) throw runtime_error("Proxied class not a ParallelEngine. (WTF?)");
 		python::list ret;
 		FOREACH(vector<shared_ptr<Engine > >& grp, me->slaves){
 			python::list rret=anyEngines_get(grp);
@@ -240,7 +238,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 		// additional constructor
 		pyMetaEngine(string clss, python::list functors){init(clss); functors_set(functors);}
 		python::list functors_get(void){
-			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine (?!)"); python::list ret;
+			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine (?!)"); python::list ret;
 			/* garbage design: functorArguments are instances of EngineUnits, but they may not be present; therefore, only use them if they exist; our pyMetaEngine, however, will always have both names and EnguneUnit objects in the same count */
 			for(size_t i=0; i<me->functorNames.size(); i++){
 				shared_ptr<EngineUnit> eu;
@@ -255,7 +253,7 @@ BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
 			return ret;
 		}
 		void functors_set(python::list ftrs){
-			ensureAcc(); shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (?!)");
+			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (?!)");
 			me->clear(); int len=python::len(ftrs);
 			for(int i=0; i<len; i++){
 				python::extract<pyEngineUnit> euEx(ftrs[i]); if(!euEx.check()) throw invalid_argument("Unable to extract type EngineUnit from sequence.");
@@ -297,6 +295,7 @@ BASIC_PY_PROXY_TAIL;
 python::list anyEngines_get(const vector<shared_ptr<Engine> >& engContainer){
 	python::list ret; 
 	FOREACH(const shared_ptr<Engine>& eng, engContainer){
+		if(!eng) ret.append(python::object());
 		#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
 		APPEND_ENGINE_IF_POSSIBLE(InteractionDispatchers,pyInteractionDispatchers); APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina); APPEND_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine); 
 		throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine, DeusExMachina and ParallelEngine are supported)");
@@ -320,8 +319,8 @@ void anyEngines_set(vector<shared_ptr<Engine> >& engContainer, python::object eg
 BASIC_PY_PROXY_HEAD(pyInteraction,Interaction)
 	NONPOD_ATTRIBUTE_ACCESS(geom,pyInteractionGeometry,interactionGeometry);
 	NONPOD_ATTRIBUTE_ACCESS(phys,pyInteractionPhysics,interactionPhysics);
-	/* shorthands */ unsigned id1_get(void){ensureAcc(); return proxee->getId1();} unsigned id2_get(void){ensureAcc(); return proxee->getId2();}
-	bool isReal_get(void){ensureAcc(); return proxee->isReal(); }
+	/* shorthands */ unsigned id1_get(void){ return proxee->getId1();} unsigned id2_get(void){ return proxee->getId2();}
+	bool isReal_get(void){ return proxee->isReal(); }
 BASIC_PY_PROXY_TAIL;
 
 BASIC_PY_PROXY_HEAD(pyBody,Body)
@@ -329,11 +328,11 @@ BASIC_PY_PROXY_HEAD(pyBody,Body)
 	NONPOD_ATTRIBUTE_ACCESS(mold,pyInteractingGeometry,interactingGeometry);
 	NONPOD_ATTRIBUTE_ACCESS(bound,pyBoundingVolume,boundingVolume);
 	NONPOD_ATTRIBUTE_ACCESS(phys,pyPhysicalParameters,physicalParameters);
-	unsigned id_get(){ensureAcc(); return proxee->getId();}
-	int mask_get(){ensureAcc(); return proxee->groupMask;}
-	void mask_set(int m){ensureAcc(); proxee->groupMask=m;}
-	bool dynamic_get(){ensureAcc(); return proxee->isDynamic;} void dynamic_set(bool dyn){ensureAcc(); proxee->isDynamic=dyn;}
-	bool isStandalone(){ensureAcc(); return proxee->isStandalone();} bool isClumpMember(){ensureAcc(); return proxee->isClumpMember();} bool isClump(){ensureAcc(); return proxee->isClump();}
+	unsigned id_get(){ return proxee->getId();}
+	int mask_get(){return proxee->groupMask;}
+	void mask_set(int m){ proxee->groupMask=m;}
+	bool dynamic_get(){ return proxee->isDynamic;} void dynamic_set(bool dyn){ proxee->isDynamic=dyn;}
+	bool isStandalone(){ return proxee->isStandalone();} bool isClumpMember(){ return proxee->isClumpMember();} bool isClump(){ return proxee->isClump();}
 BASIC_PY_PROXY_TAIL;
 
 class pyBodyContainer{
@@ -665,8 +664,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_loadTmp_overloads,loadTmp,0,1);
 
 BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
-	void generate(string outFile){ensureAcc(); proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
-	void load(){ ensureAcc(); char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(result!=tmpnam_str) throw runtime_error(__FILE__ ": tmpnam(char*) failed!");  string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); this->generate(xml); pyOmega().load(xml); }
+	void generate(string outFile){ proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
+	void load(){  char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(result!=tmpnam_str) throw runtime_error(__FILE__ ": tmpnam(char*) failed!");  string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); this->generate(xml); pyOmega().load(xml); }
 BASIC_PY_PROXY_TAIL;
 
 class pySTLImporter : public STLImporter {
@@ -676,35 +675,9 @@ class pySTLImporter : public STLImporter {
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,3);
 
 
-// automatic conversion of Vector3r and 3-tuple
-// this doesn't create any new class in python
-struct custom_Vector3r_to_tuple{
-	static PyObject* convert(Vector3r const& v){
-		return python::incref(python::make_tuple(v[0],v[1],v[2]).ptr());
-	}
-};
-struct custom_Vector3r_from_tuple{
-	custom_Vector3r_from_tuple(){
-		python::converter::registry::push_back(&convertible,&construct,python::type_id<Vector3r>());
-	}
-	static void* convertible(PyObject* obj_ptr){
-		if(!PySequence_Check(obj_ptr) || PySequence_Size(obj_ptr)!=3) return 0;
-		return obj_ptr;
-	}
-	static void construct(PyObject* obj_ptr, python::converter::rvalue_from_python_stage1_data* data){
-		void* storage=((python::converter::rvalue_from_python_storage<Vector3r>*)(data))->storage.bytes;
-		new (storage) Vector3r(python::extract<double>(PySequence_GetItem(obj_ptr,0)),python::extract<double>(PySequence_GetItem(obj_ptr,1)),python::extract<double>(PySequence_GetItem(obj_ptr,2)));
-		data->convertible=storage;
-	}
-};
-
 
 BOOST_PYTHON_MODULE(wrapper)
 {
-
-	//python::to_python_converter<Vector3r,custom_Vector3r_to_tuple>();
-	//custom_Vector3r_from_tuple();
-
 	boost::python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter)
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set)

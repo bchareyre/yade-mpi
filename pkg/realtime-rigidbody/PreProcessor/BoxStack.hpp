@@ -31,8 +31,6 @@ class BoxStack : public FileGenerator
 		BoxStack ();
 		virtual ~BoxStack ();
 
-		virtual void registerAttributes();
-		
 		virtual bool generate();
 
 	private :
@@ -41,7 +39,7 @@ class BoxStack : public FileGenerator
 		void createBox(shared_ptr<Body>& body, int i, int j, int k);
 		void createActors(shared_ptr<MetaBody>& rootBody);
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
-
+	REGISTER_ATTRIBUTES(FileGenerator,(nbBoxes)(boxSize)(boxDensity)(bulletSize)(bulletDensity)(bulletPosition)(bulletVelocity)(gravity)(dampingForce)(dampingMomentum));
 	REGISTER_CLASS_NAME(BoxStack);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 

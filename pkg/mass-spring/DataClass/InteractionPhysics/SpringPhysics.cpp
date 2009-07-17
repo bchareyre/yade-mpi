@@ -17,11 +17,5 @@ SpringPhysics::~SpringPhysics()
 {
 }
 
-void SpringPhysics::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(stiffness);
-	REGISTER_ATTRIBUTE(damping);
-	REGISTER_ATTRIBUTE(initialLength);
-}
 
 YADE_PLUGIN();

@@ -30,12 +30,6 @@ FEMLaw::~FEMLaw()
 }
 
 
-void FEMLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(nodeGroupMask);
-	REGISTER_ATTRIBUTE(tetrahedronGroupMask);
-}
 
 
 void FEMLaw::action(MetaBody* fem)

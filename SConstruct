@@ -469,6 +469,7 @@ def installHeaders(prefix=None):
 				except ValueError: pass
 			# exclude non-lib directories (like doc, scripts, ...)
 			if not re.match(r'\.[/\\](core|lib|pkg|gui|extra)[/\\]?.*',root): continue
+			if 'noSymlinkHeaders' in root: continue
 			# exclude headers from excluded stuff
 			if re.match(r'^.*/('+'|'.join(env['exclude'])+')/',root): continue
 			for f in files:
@@ -507,15 +508,16 @@ if not env.GetOption('clean'):
 	installHeaders() # install to buildDir always
 	if 0: # do not install headers
 		installHeaders(env.subst('$PREFIX')) # install to $PREFIX if specifically requested: like "scons /usr/local/include"
+	boostDir=buildDir+'/include/yade-'+env['version']+'/boost'
+	if not exists(boostDir): os.makedirs(boostDir)
+	def mkSymlink(link,target):
+		if not exists(link):
+			if lexists(link): os.remove(link) # remove dangling symlink
+			os.symlink(relpath(link,target),link)
 	if not env['haveForeach']:
-		boostDir=buildDir+'/include/yade-'+env['version']+'/boost'
-		foreachLink=boostDir+'/foreach.hpp'
-		foreachTarget='extra/foreach.hpp_local'
-		if not exists(boostDir): os.makedirs(boostDir)
-		if not exists(foreachLink): 
-			if lexists(foreachLink): os.remove(foreachLink) # broken symlink: remove it
-			os.symlink(relpath(foreachLink,foreachTarget),foreachLink)
-		env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
+		mkSymlink(boostDir+'/foreach.hpp','extra/foreach.hpp_local')
+	mkSymlink(boostDir+'/python','lib/py/boost-python-indexing-suite-v2-noSymlinkHeaders')
+	#env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
 	env.Default(env.Alias('install',instDirs)) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
 
 env.Export('env');

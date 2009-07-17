@@ -60,26 +60,6 @@ TestSimpleViscoelastic::~TestSimpleViscoelastic()
 void TestSimpleViscoelastic::postProcessAttributes(bool)
 {}
 
-void TestSimpleViscoelastic::registerAttributes()
-{
-    FileGenerator::registerAttributes();
-    REGISTER_ATTRIBUTE(tc);
-    REGISTER_ATTRIBUTE(en);
-    REGISTER_ATTRIBUTE(es);
-    REGISTER_ATTRIBUTE(frictionAngle);
-    REGISTER_ATTRIBUTE(R);
-    REGISTER_ATTRIBUTE(density);
-    REGISTER_ATTRIBUTE(nbSpheres);
-    REGISTER_ATTRIBUTE(h);
-    REGISTER_ATTRIBUTE(velocity);
-    REGISTER_ATTRIBUTE(angular_vel);
-    REGISTER_ATTRIBUTE(rotationBlocked);
-    REGISTER_ATTRIBUTE(gravity);
-    REGISTER_ATTRIBUTE(groundSize);
-    REGISTER_ATTRIBUTE(outputBase);
-    REGISTER_ATTRIBUTE(interval);
-}
-
 bool TestSimpleViscoelastic::generate()
 {
     rootBody = shared_ptr<MetaBody>(new MetaBody);

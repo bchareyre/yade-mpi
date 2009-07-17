@@ -34,13 +34,10 @@ class CL1Relationships : public InteractionPhysicsEngineUnit
 		int cohesionDefinitionIteration;
 		long iter;//REMOVE THIS
 
-	protected :
-		virtual void registerAttributes();
-
 	FUNCTOR2D(CohesiveFrictionalBodyParameters,CohesiveFrictionalBodyParameters);
 	REGISTER_CLASS_NAME(CL1Relationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsEngineUnit);
-
+	REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,(betaR)(setCohesionNow)(setCohesionOnNewContacts));
 };
 
 REGISTER_SERIALIZABLE(CL1Relationships);

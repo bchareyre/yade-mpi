@@ -39,11 +39,10 @@ class JumpChangeSe3: public DeusExMachina {
 		}
 		Se3r deltaSe3;
 		bool setVelocities; /* should be bool, but serializer breaks on that */
-	protected:
-		virtual void registerAttributes(){DeusExMachina::registerAttributes();REGISTER_ATTRIBUTE(deltaSe3);REGISTER_ATTRIBUTE(setVelocities);}
-		REGISTER_CLASS_NAME(JumpChangeSe3);
-		REGISTER_BASE_CLASS_NAME(DeusExMachina);
-		DECLARE_LOGGER;
+	REGISTER_ATTRIBUTES(DeusExMachina,(deltaSe3)(setVelocities));
+	REGISTER_CLASS_NAME(JumpChangeSe3);
+	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(JumpChangeSe3);
 	

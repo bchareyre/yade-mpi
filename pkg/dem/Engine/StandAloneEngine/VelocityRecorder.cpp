@@ -31,13 +31,6 @@ void VelocityRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void VelocityRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-}
-
 
 bool VelocityRecorder::isActivated(MetaBody*)
 {

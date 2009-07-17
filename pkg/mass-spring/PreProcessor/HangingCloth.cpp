@@ -102,41 +102,6 @@ void HangingCloth::postProcessAttributes(bool)
 }
 
 
-void HangingCloth::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(width);
-	REGISTER_ATTRIBUTE(height);
-	REGISTER_ATTRIBUTE(springStiffness);
-	REGISTER_ATTRIBUTE(springDamping);
-	//REGISTER_ATTRIBUTE(particleDamping); 	// FIXME - ignored - delete it, or start using it
-	REGISTER_ATTRIBUTE(clothMass);
-	REGISTER_ATTRIBUTE(cellSize);
-	REGISTER_ATTRIBUTE(fixPoint1);
-	REGISTER_ATTRIBUTE(fixPoint2);
-	REGISTER_ATTRIBUTE(fixPoint3);
-	REGISTER_ATTRIBUTE(fixPoint4);
-	REGISTER_ATTRIBUTE(ground);
-	
-	// spheres
-	//REGISTER_ATTRIBUTE(nbSpheres);
-	//REGISTER_ATTRIBUTE(minRadius);
-	//REGISTER_ATTRIBUTE(maxRadius);
-	//rEGISTER_ATTRIBUTE(density); 		
-	//REGISTER_ATTRIBUTE(disorder);
-	//REGISTER_ATTRIBUTE(spacing);		
-	
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	//REGISTER_ATTRIBUTE(linkSpheres);
-
-//	REGISTER_ATTRIBUTE(sphereYoungModulus);
-//	REGISTER_ATTRIBUTE(spherePoissonRatio);
-//	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-}
-
-
 bool HangingCloth::generate()
 {
 	Omega::instance().setTimeStep(0.004);

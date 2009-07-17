@@ -11,9 +11,9 @@
 #include<yade/core/GeometricalModel.hpp>
 
 class ColorScale : public GeometricalModel {
-    public :
-    Real posX,posY;
-    Real width,height;
+   public :
+   Real posX,posY;
+   Real width,height;
 	string title;
 
 	vector<Vector3r> colors;
@@ -22,11 +22,10 @@ class ColorScale : public GeometricalModel {
 	ColorScale ();
 	virtual ~ColorScale ();
 
-    protected :
-	    void registerAttributes();
-    REGISTER_CLASS_NAME(ColorScale);
-    REGISTER_BASE_CLASS_NAME(GeometricalModel);
-    REGISTER_CLASS_INDEX(ColorScale,GeometricalModel);
+	REGISTER_ATTRIBUTES(GeometricalModel,(posX)(posY)(width)(height)(title));
+   REGISTER_CLASS_NAME(ColorScale);
+   REGISTER_BASE_CLASS_NAME(GeometricalModel);
+   REGISTER_CLASS_INDEX(ColorScale,GeometricalModel);
 };
 
 REGISTER_SERIALIZABLE(ColorScale);

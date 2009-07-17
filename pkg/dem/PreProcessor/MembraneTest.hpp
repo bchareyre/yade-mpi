@@ -36,7 +36,7 @@ class MembraneTest : public FileGenerator
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(nbX)(nbZ)(XLength)(ZLength)(bigBallRadius)(membraneThickness)(tc)(en)(es)(frictionAngle)(gravity));
 	REGISTER_CLASS_NAME(MembraneTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

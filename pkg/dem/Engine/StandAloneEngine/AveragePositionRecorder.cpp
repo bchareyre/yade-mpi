@@ -35,13 +35,6 @@ void AveragePositionRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void AveragePositionRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-}
-
 
 bool AveragePositionRecorder::isActivated(MetaBody*)
 {

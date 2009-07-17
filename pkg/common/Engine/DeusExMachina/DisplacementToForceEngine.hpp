@@ -28,7 +28,7 @@ class DisplacementToForceEngine : public DeusExMachina
 
 	protected :
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(displacement)(translationAxis)(targetForce)(targetForceMask));
 	REGISTER_CLASS_NAME(DisplacementToForceEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

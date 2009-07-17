@@ -89,19 +89,6 @@ void BeamRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void BeamRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-//	REGISTER_ATTRIBUTE(sections);
-	REGISTER_ATTRIBUTE(sections_midpoints);
-	REGISTER_ATTRIBUTE(sections_halflength);
-	REGISTER_ATTRIBUTE(sections_directions);
-
-//	REGISTER_ATTRIBUTE(first);
-//	REGISTER_ATTRIBUTE(subscribedBodies);
-}
 
 
 bool BeamRecorder::isActivated(MetaBody*)

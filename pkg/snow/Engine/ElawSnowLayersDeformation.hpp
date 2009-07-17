@@ -24,8 +24,7 @@ class ElawSnowLayersDeformation : public InteractionSolver
 		ElawSnowLayersDeformation();
 		void action(MetaBody*);
 
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(creep_viscosity));
 	REGISTER_CLASS_NAME(ElawSnowLayersDeformation);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

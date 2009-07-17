@@ -8,8 +8,3 @@ IstSnowLayersContact::IstSnowLayersContact()
 IstSnowLayersContact::~IstSnowLayersContact()
 {}
 		
-void IstSnowLayersContact::registerAttributes()
-{
-	SpheresContactGeometry::registerAttributes();
-}
-

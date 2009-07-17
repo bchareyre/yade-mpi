@@ -24,14 +24,10 @@ class CapillaryParameters : public ElasticContactInteraction
 				
 		CapillaryParameters();
 		virtual ~CapillaryParameters();
-		
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(ElasticContactInteraction,(Vmeniscus)(CapillaryPressure)(Fcap)(Delta1)(Delta2)(meniscus)(fusionNumber));
 	REGISTER_CLASS_NAME(CapillaryParameters);
 	REGISTER_BASE_CLASS_NAME(ElasticContactInteraction);
 // 	REGISTER_CLASS_INDEX(CapillaryParameters,ElasticContactInteraction);
-
 };
 
 REGISTER_SERIALIZABLE(CapillaryParameters);

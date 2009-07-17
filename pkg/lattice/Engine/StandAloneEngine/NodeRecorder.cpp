@@ -71,19 +71,6 @@ void NodeRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void NodeRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	//REGISTER_ATTRIBUTE(regions);
-	REGISTER_ATTRIBUTE(regions_min);
-	REGISTER_ATTRIBUTE(regions_max);
-	REGISTER_ATTRIBUTE(only_this_stiffness);
-
-//	REGISTER_ATTRIBUTE(first);
-//	REGISTER_ATTRIBUTE(subscribedBodies);
-}
 
 
 bool NodeRecorder::isActivated(MetaBody*)

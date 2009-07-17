@@ -37,11 +37,6 @@ MicroMacroAnalyser::MicroMacroAnalyser() : StandAloneEngine()
 }
 
 
-void MicroMacroAnalyser::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(outputFile);
-}
 
 void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 {

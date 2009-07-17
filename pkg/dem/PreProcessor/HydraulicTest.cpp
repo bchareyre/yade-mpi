@@ -73,16 +73,6 @@ void HydraulicTest::postProcessAttributes(bool)
 }
 
 
-void HydraulicTest::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	
-	REGISTER_ATTRIBUTE(yadeFileWithSpheres);
-	REGISTER_ATTRIBUTE(file);
-	REGISTER_ATTRIBUTE(radius);
-	//REGISTER_ATTRIBUTE(outputFileName);
-	//REGISTER_ATTRIBUTE(serializationDynlib);
-}
 
 
 bool HydraulicTest::generate()

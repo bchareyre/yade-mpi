@@ -41,8 +41,8 @@ class Funnel : public FileGenerator
 		bool generate();
 
 	protected :
-		void registerAttributes();
 		virtual void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(minRadius)(maxRadius)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(gravity)(density)(disorder)(groundSize)(dampingForce)(dampingMomentum)(rotationBlocked)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(Funnel);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 

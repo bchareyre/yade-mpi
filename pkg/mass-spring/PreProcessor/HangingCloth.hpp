@@ -59,8 +59,36 @@ class HangingCloth : public FileGenerator
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,
+		(width)
+		(height)
+		(springStiffness)
+		(springDamping)
+		(clothMass)
+		(cellSize)
+		(fixPoint1)
+		(fixPoint2)
+		(fixPoint3)
+		(fixPoint4)
+		(ground)
+		
+		// spheres
+		//(nbSpheres)
+		//(minRadius)
+		//(maxRadius)
+		//(density) 		
+		//(disorder)
+		//(spacing)		
+		
+		(gravity)
+		(dampingForce)
+		(dampingMomentum)
+		//(linkSpheres)
 
+		//	(sphereYoungModulus)
+		//	(spherePoissonRatio)
+		//	(sphereFrictionDeg)
+	);
 	REGISTER_CLASS_NAME(HangingCloth);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

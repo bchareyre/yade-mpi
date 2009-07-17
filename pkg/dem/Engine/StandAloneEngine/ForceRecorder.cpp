@@ -49,15 +49,6 @@ void ForceRecorder::init()
 	ofile.open(outputFile.c_str());
 }
 
-void ForceRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(startId);
-	REGISTER_ATTRIBUTE(endId);
-}
-
 
 bool ForceRecorder::isActivated(MetaBody*)
 {

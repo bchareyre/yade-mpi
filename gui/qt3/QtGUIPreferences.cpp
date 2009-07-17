@@ -12,14 +12,3 @@ QtGUIPreferences::QtGUIPreferences ()
 {
 	version = 1;
 }
-
-
-void QtGUIPreferences::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(version);
-	REGISTER_ATTRIBUTE(mainWindowPositionX);
-	REGISTER_ATTRIBUTE(mainWindowPositionY);
-	REGISTER_ATTRIBUTE(mainWindowSizeX);
-	REGISTER_ATTRIBUTE(mainWindowSizeY);
-}
-

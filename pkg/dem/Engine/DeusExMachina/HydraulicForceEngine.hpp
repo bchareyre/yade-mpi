@@ -21,8 +21,7 @@ class HydraulicForceEngine : public DeusExMachina
 	
 		virtual void applyCondition(MetaBody*);
 	
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(DeusExMachina,(gravity)(isActivated)(dummyParameter));
 	REGISTER_CLASS_NAME(HydraulicForceEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

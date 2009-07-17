@@ -17,13 +17,6 @@ BoundingSphere::~BoundingSphere ()
 {
 }
 
-void BoundingSphere::registerAttributes() // FIXME - remove that function, dispatcher shoul take care of that
-{
-	BoundingVolume::registerAttributes();
-	REGISTER_ATTRIBUTE(radius);
-	REGISTER_ATTRIBUTE(center);
-}
-
 // void BoundingSphere::update(Se3r& se3)
 // {
 // 	Vector3r v(radius,radius,radius);

@@ -30,8 +30,7 @@ class ViscousForceDamping : public InteractionSolver
 		ViscousForceDamping();
 		void action(Body* body);
 
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(betaNormal)(betaShear));
 	REGISTER_CLASS_NAME(ViscousForceDamping);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

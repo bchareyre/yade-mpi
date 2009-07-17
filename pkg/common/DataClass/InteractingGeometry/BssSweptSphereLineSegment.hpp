@@ -23,14 +23,10 @@ class BssSweptSphereLineSegment : public InteractingGeometry
                 BssSweptSphereLineSegment ();
                 virtual ~BssSweptSphereLineSegment ();	
 	
-	protected :
-		void registerAttributes();
-	
-        REGISTER_CLASS_INDEX(BssSweptSphereLineSegment,InteractingGeometry);
-        REGISTER_CLASS_NAME(BssSweptSphereLineSegment);
+	REGISTER_ATTRIBUTES(InteractingGeometry,(radius)(length)(position)(orientation));
+	REGISTER_CLASS_INDEX(BssSweptSphereLineSegment,InteractingGeometry);
+	REGISTER_CLASS_NAME(BssSweptSphereLineSegment);
 	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
-
-
 };
 
 REGISTER_SERIALIZABLE(BssSweptSphereLineSegment);

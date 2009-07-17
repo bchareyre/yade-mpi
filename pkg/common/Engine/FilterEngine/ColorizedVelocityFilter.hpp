@@ -45,8 +45,8 @@ class ColorizedVelocityFilter : public FilterEngine {
 		virtual bool isActivated(MetaBody*);
 		virtual void applyCondition(MetaBody*);
 	
-		virtual void registerAttributes();
-		DECLARE_LOGGER;
+	DECLARE_LOGGER;
+	REGISTER_ATTRIBUTES(FilterEngine,(autoScale)(onlyDynamic)(minValue)(maxValue)(posX)(posY)(width)(height)(title));
 	REGISTER_CLASS_NAME(ColorizedVelocityFilter);
 	REGISTER_BASE_CLASS_NAME(FilterEngine);
 };

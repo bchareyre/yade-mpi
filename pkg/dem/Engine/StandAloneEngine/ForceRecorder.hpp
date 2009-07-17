@@ -30,13 +30,13 @@ class ForceRecorder : public DataRecorder
 
 		ForceRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 		void init();
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(startId)(endId));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(ForceRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);

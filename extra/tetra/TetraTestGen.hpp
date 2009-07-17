@@ -14,9 +14,8 @@ class TetraTestGen: public FileGenerator {
 		bool generate();
 	protected :
 		virtual void postProcessAttributes(bool deserializing){};
-		void registerAttributes(){FileGenerator::registerAttributes(); REGISTER_ATTRIBUTE(gridSize);}
-		REGISTER_CLASS_NAME(TetraTestGen);
-		REGISTER_BASE_CLASS_NAME(FileGenerator);
+		REGISTER_ATTRIBUTES(FileGenerator,(gridSize));
+		REGISTER_CLASS_AND_BASE(TetraTestGen,FileGenerator);
 };
 REGISTER_SERIALIZABLE(TetraTestGen);
 

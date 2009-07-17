@@ -25,8 +25,7 @@ class Quadrilateral : public GeometricalModel
 		Quadrilateral(int p1,int p2,int p3,int p4,MetaBody* mb);
 		virtual ~Quadrilateral();
 
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(GeometricalModel,(n1)(n2)(n3)(n4)(i1)(i2)(i3)(i4));
 	REGISTER_CLASS_NAME(Quadrilateral);
 	REGISTER_BASE_CLASS_NAME(GeometricalModel);
 	REGISTER_CLASS_INDEX(Quadrilateral,GeometricalModel);

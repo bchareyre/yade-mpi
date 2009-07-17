@@ -56,7 +56,25 @@ class LatticeBeamParameters : public PhysicalParameters
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(PhysicalParameters,
+		(id1)
+		(id2)
+		
+		(initialLength)
+		(length) // FIXME - can be calculated after deserialization
+		
+		(direction) // FIXME - can be calculated after deserialization
+		(otherDirection) // this must be saved!
+		
+		(criticalTensileStrain)
+		(criticalCompressiveStrain)
+
+		(longitudalStiffness)
+		(bendingStiffness)
+		(torsionalStiffness)
+
+		(se3Displacement)
+	);
 	REGISTER_CLASS_NAME(LatticeBeamParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 	

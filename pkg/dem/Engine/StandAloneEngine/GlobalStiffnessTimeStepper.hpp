@@ -51,10 +51,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		virtual bool isActivated(MetaBody*);
 		DECLARE_LOGGER;
 
-
-	protected :
-		virtual void registerAttributes();
-
+	REGISTER_ATTRIBUTES(TimeStepper,(sdecGroupMask)(defaultDt)(previousDt)(timestepSafetyCoefficient)(computedOnce));
 	REGISTER_CLASS_NAME(GlobalStiffnessTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };

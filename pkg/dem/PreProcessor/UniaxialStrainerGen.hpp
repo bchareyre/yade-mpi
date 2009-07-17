@@ -21,16 +21,7 @@ class UniaxialStrainerGen: public FileGenerator {
 		Real strainRate, limitStrain, damping;
 		int axis;
 		long cohesiveThresholdIter;
-	protected :
-		void registerAttributes(){
-			FileGenerator::registerAttributes();
-			REGISTER_ATTRIBUTE(spheresFile);
-			REGISTER_ATTRIBUTE(axis);
-			REGISTER_ATTRIBUTE(strainRate);
-			REGISTER_ATTRIBUTE(limitStrain);
-			REGISTER_ATTRIBUTE(damping);
-			REGISTER_ATTRIBUTE(cohesiveThresholdIter);
-		}
+	REGISTER_ATTRIBUTES(FileGenerator,(spheresFile)(axis)(strainRate)(limitStrain)(damping)(cohesiveThresholdIter));
 	REGISTER_CLASS_AND_BASE(UniaxialStrainerGen,FileGenerator);
 	DECLARE_LOGGER;
 };

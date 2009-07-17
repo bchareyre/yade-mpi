@@ -47,10 +47,10 @@ class TriaxialStateRecorder : public DataRecorder
 
 		TriaxialStateRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
-		DECLARE_LOGGER;
+	DECLARE_LOGGER;
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(porosity));
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

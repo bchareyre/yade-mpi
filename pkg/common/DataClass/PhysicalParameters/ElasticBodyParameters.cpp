@@ -17,10 +17,4 @@ ElasticBodyParameters::~ElasticBodyParameters()
 {
 }
 
-void ElasticBodyParameters::registerAttributes()
-{
-	RigidBodyParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(young);
-}
-
 YADE_PLUGIN();

@@ -37,9 +37,9 @@ class CinemDNCEngine : public DeusExMachina
 
 
 	protected :
-		void registerAttributes();
 		void applyRotTranslation(MetaBody *);	// to let move (rotation combined with translation) the lateral walls
 		void applyTranslation(MetaBody *);	// to let move (translation) the upper wall
+	REGISTER_ATTRIBUTES(DeusExMachina,(shearSpeed)(rotationAxis)(theta)(thetalim)(id_boxhaut));
 	REGISTER_CLASS_NAME(CinemDNCEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

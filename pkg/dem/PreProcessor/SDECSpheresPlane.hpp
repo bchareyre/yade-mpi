@@ -47,7 +47,7 @@ class SDECSpheresPlane : public FileGenerator
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(minRadius)(maxRadius)(spheresHeight)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(gravity)(density)(disorder)(groundSize)(useSpheresAsGround)(dampingForce)(dampingMomentum)(rotationBlocked)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(SDECSpheresPlane);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

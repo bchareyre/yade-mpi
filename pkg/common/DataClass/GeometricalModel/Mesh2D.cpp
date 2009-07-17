@@ -42,13 +42,6 @@ void Mesh2D::postProcessAttributes(bool deserializing)
 }
 
 
-void Mesh2D::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(vertices);
-	REGISTER_ATTRIBUTE(edges);
-	REGISTER_ATTRIBUTE(faces);
-}
 
 
 

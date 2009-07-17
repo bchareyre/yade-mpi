@@ -21,9 +21,7 @@ class PeriodicPythonRunner: public StretchPeriodicEngine {
 				PyRun_SimpleString(command.c_str()); // this is suboptimal, since it has to be parsed at every execution; critical?
 			PyGILState_Release(gstate);
 		}
-		virtual void registerAttributes(){ StretchPeriodicEngine::registerAttributes(); REGISTER_ATTRIBUTE(command); }
-	protected :
-		virtual void postProcessAttributes(bool deserializing){}
+	REGISTER_ATTRIBUTES(StretchPeriodicEngine,(command));
 	REGISTER_CLASS_NAME(PeriodicPythonRunner);
 	REGISTER_BASE_CLASS_NAME(StretchPeriodicEngine);
 };

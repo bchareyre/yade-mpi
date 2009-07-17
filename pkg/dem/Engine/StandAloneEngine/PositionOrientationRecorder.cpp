@@ -26,12 +26,6 @@ PositionOrientationRecorder::PositionOrientationRecorder () : DataRecorder(){
 }
 PositionOrientationRecorder::~PositionOrientationRecorder (){}
 void PositionOrientationRecorder::postProcessAttributes(bool deserializing){if(deserializing) {}}
-void PositionOrientationRecorder::registerAttributes(){
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(interval);
-	REGISTER_ATTRIBUTE(saveRgb);
-}
 
 void PositionOrientationRecorder::action(MetaBody * ncb){
 	if( Omega::instance().getCurrentIteration() % interval == 0 ){

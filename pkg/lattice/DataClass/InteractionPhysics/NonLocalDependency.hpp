@@ -20,16 +20,12 @@ class NonLocalDependency : public InteractionPhysics
 		virtual ~NonLocalDependency();
 
 /// Serialization
-	protected :
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionPhysics,(gaussValue));
 	REGISTER_CLASS_NAME(NonLocalDependency);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysics);
-	
 /// Indexable
 	REGISTER_CLASS_INDEX(NonLocalDependency,InteractionPhysics);
-
 };
-
 REGISTER_SERIALIZABLE(NonLocalDependency);
 
 

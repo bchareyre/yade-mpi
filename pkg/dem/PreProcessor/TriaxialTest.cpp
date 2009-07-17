@@ -179,63 +179,6 @@ TriaxialTest::~TriaxialTest ()
 }
 
 
-void TriaxialTest::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(lowerCorner);
-	REGISTER_ATTRIBUTE(upperCorner);
-	REGISTER_ATTRIBUTE(thickness);
-	REGISTER_ATTRIBUTE(importFilename);
-	REGISTER_ATTRIBUTE(outputFileName);
-	//REGISTER_ATTRIBUTE(nlayers);
-	//REGISTER_ATTRIBUTE(boxWalls);
-	REGISTER_ATTRIBUTE(internalCompaction);
-	REGISTER_ATTRIBUTE(biaxial2dTest);
-	REGISTER_ATTRIBUTE(maxMultiplier);
-	REGISTER_ATTRIBUTE(finalMaxMultiplier);
-	REGISTER_ATTRIBUTE(radiusStdDev);
-	REGISTER_ATTRIBUTE(radiusMean);
-
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(compactionFrictionDeg);
-	REGISTER_ATTRIBUTE(boxYoungModulus);
-	REGISTER_ATTRIBUTE(boxPoissonRatio);
-	REGISTER_ATTRIBUTE(boxFrictionDeg);
-
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(defaultDt);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(rotationBlocked);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-	REGISTER_ATTRIBUTE(timeStepOutputInterval);
-	REGISTER_ATTRIBUTE(wallStiffnessUpdateInterval);
-	REGISTER_ATTRIBUTE(radiusControlInterval);
-	REGISTER_ATTRIBUTE(numberOfGrains);
-	REGISTER_ATTRIBUTE(strainRate);
-	REGISTER_ATTRIBUTE(maxWallVelocity);
-	REGISTER_ATTRIBUTE(StabilityCriterion);
-	REGISTER_ATTRIBUTE(autoCompressionActivation);
-	REGISTER_ATTRIBUTE(autoUnload);
-	REGISTER_ATTRIBUTE(autoStopSimulation);
-	REGISTER_ATTRIBUTE(recordIntervalIter);
-	REGISTER_ATTRIBUTE(saveAnimationSnapshots);
-	REGISTER_ATTRIBUTE(AnimationSnapshotsBaseName);
-	REGISTER_ATTRIBUTE(WallStressRecordFile);
-	REGISTER_ATTRIBUTE(wallOversizeFactor);
-	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
-	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
-	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(isotropicCompaction);
-	REGISTER_ATTRIBUTE(fixedPorosity);
-	REGISTER_ATTRIBUTE(fixedBoxDims);
-	REGISTER_ATTRIBUTE(fast);
-	REGISTER_ATTRIBUTE(noFiles);
-	REGISTER_ATTRIBUTE(facetWalls);
-}
-
 
 bool TriaxialTest::generate()
 {

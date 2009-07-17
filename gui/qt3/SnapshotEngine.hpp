@@ -25,17 +25,8 @@ class SnapshotEngine: public PeriodicEngine{
 		int msecSleep;
 	SnapshotEngine():counter(0),viewNo(0),ignoreErrors(true),msecSleep(0){}
 	virtual void action(MetaBody*);
-	void registerAttributes(){	
-		PeriodicEngine::registerAttributes();
-		REGISTER_ATTRIBUTE(fileBase);
-		REGISTER_ATTRIBUTE(counter);
-		REGISTER_ATTRIBUTE(viewNo);
-		REGISTER_ATTRIBUTE(ignoreErrors);
-		REGISTER_ATTRIBUTE(savedSnapshots);
-		REGISTER_ATTRIBUTE(msecSleep);
-	}
+	REGISTER_ATTRIBUTES(PeriodicEngine,(fileBase)(counter)(viewNo)(ignoreErrors)(savedSnapshots)(msecSleep));
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(SnapshotEngine);
-	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
+	REGISTER_CLASS_AND_BASE(SnapshotEngine,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(SnapshotEngine);

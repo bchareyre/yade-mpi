@@ -5,19 +5,6 @@
 // the sample was 10.4mm hight
 
 
-void BshSnowGrain::registerAttributes()
-{
-	GeometricalModel::registerAttributes();
-	REGISTER_ATTRIBUTE(center);
-	REGISTER_ATTRIBUTE(c_axis);
-	REGISTER_ATTRIBUTE(start);
-	REGISTER_ATTRIBUTE(end);
-	REGISTER_ATTRIBUTE(color);
-	REGISTER_ATTRIBUTE(selection);
-	REGISTER_ATTRIBUTE(layer_distance);
-	REGISTER_ATTRIBUTE(gr_gr); // slices
-}
-
 BshSnowGrain::BshSnowGrain(const T_DATA& dat,Vector3r c_ax,int SELECTION,Vector3r col, Real one_voxel_in_meters_is,Real layer_distance_voxels,Real angle_increment) : GeometricalModel()
 {
 	createIndex();

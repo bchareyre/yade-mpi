@@ -32,12 +32,6 @@ void RigidBodyRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-void RigidBodyRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputBase);
-	REGISTER_ATTRIBUTE(interval);
-}
 
 bool RigidBodyRecorder::isActivated(MetaBody*)
 {

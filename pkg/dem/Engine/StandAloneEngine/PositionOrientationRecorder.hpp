@@ -32,7 +32,7 @@ class PositionOrientationRecorder : public DataRecorder
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(saveRgb));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(PositionOrientationRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);

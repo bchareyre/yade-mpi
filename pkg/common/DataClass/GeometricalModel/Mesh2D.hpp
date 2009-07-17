@@ -23,16 +23,10 @@ class Edge : public Serializable
 
 	protected :
 		virtual void postProcessAttributes(bool) {};
-		void registerAttributes()
-		{
-			REGISTER_ATTRIBUTE(first);
-			REGISTER_ATTRIBUTE(second);
-		};
+	REGISTER_ATTRIBUTES(Serializable,(first)(second));
 	REGISTER_CLASS_NAME(Edge);
 	REGISTER_BASE_CLASS_NAME(Serializable);
-
 };
-
 REGISTER_SERIALIZABLE_FUNDAMENTAL(Edge);
 
 class Mesh2D : public GeometricalModel
@@ -53,7 +47,7 @@ class Mesh2D : public GeometricalModel
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(GeometricalModel,(vertices)(edges)(faces));
 	REGISTER_CLASS_NAME(Mesh2D);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 

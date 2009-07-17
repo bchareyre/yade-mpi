@@ -33,20 +33,6 @@ CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver
 }
 
 
-void CohesiveFrictionalContactLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-	REGISTER_ATTRIBUTE(erosionActivated);
-	REGISTER_ATTRIBUTE(detectBrokenBodies);
-	REGISTER_ATTRIBUTE(always_use_moment_law);
-	
-	REGISTER_ATTRIBUTE(shear_creep);
-	REGISTER_ATTRIBUTE(twist_creep);
-	REGISTER_ATTRIBUTE(creep_viscosity);
-}
-
 void out(Quaternionr q)
 {
 	Vector3r axis;

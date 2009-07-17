@@ -24,16 +24,4 @@ CapillaryParameters::~CapillaryParameters()
 // 
 // }
 
-void CapillaryParameters::registerAttributes()
-{
-	ElasticContactInteraction::registerAttributes();
-	REGISTER_ATTRIBUTE(Vmeniscus);
-	REGISTER_ATTRIBUTE(CapillaryPressure);
-	REGISTER_ATTRIBUTE(Fcap);
-	REGISTER_ATTRIBUTE(Delta1);
-	REGISTER_ATTRIBUTE(Delta2);
-	REGISTER_ATTRIBUTE(meniscus);
-	REGISTER_ATTRIBUTE(fusionNumber);
-}
-
 

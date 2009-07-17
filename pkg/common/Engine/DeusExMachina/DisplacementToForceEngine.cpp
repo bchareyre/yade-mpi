@@ -38,15 +38,6 @@ void DisplacementToForceEngine::postProcessAttributes(bool deserializing)
 }
 
 
-void DisplacementToForceEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(displacement);
-	REGISTER_ATTRIBUTE(translationAxis);
-	REGISTER_ATTRIBUTE(targetForce);
-	REGISTER_ATTRIBUTE(targetForceMask);
-}
-
 
 void DisplacementToForceEngine::applyCondition(MetaBody * ncb)
 {

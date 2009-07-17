@@ -137,8 +137,84 @@ class TriaxialTestWater : public FileGenerator
 		~TriaxialTestWater ();
 		bool generate();
 	
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,
+		(lowerCorner)
+		(upperCorner)
+		(thickness)
+		(importFilename)
+		(outputFileName)
+		//(nlayers)
+		//(boxWalls)
+		(internalCompaction)
+		(maxMultiplier)
+		(finalMaxMultiplier)
+
+		(sphereYoungModulus)
+		(spherePoissonRatio)
+		(sphereFrictionDeg)
+		(compactionFrictionDeg)
+		(boxYoungModulus)
+		(boxPoissonRatio)
+		(boxFrictionDeg)
+
+		(density)
+		(defaultDt)
+		(dampingForce)
+		(dampingMomentum)
+		(rotationBlocked)
+		(timeStepUpdateInterval)
+		(timeStepOutputInterval)
+		(wallStiffnessUpdateInterval)
+		(radiusControlInterval)
+		(numberOfGrains)
+		(Rdispersion)
+		(strainRate)
+		(maxWallVelocity)
+		(StabilityCriterion)
+		(autoCompressionActivation)
+	//	(wall_top)
+	//	(wall_bottom)
+	//	(wall_1)
+	//	(wall_2)
+	//	(wall_3)
+	//	(wall_4)
+	//	(wall_top_wire)
+	//	(wall_bottom_wire)
+	//	(wall_1_wire)
+	//	(wall_2_wire)
+	//	(wall_3_wire)
+	//	(wall_4_wire)
+	//	(spheresColor)
+	//	(spheresRandomColor)
+		(recordIntervalIter)
+		(saveAnimationSnapshots)
+		(AnimationSnapshotsBaseName)
+		(WallStressRecordFile)
+	// 	(capillaryStressRecordFile)
+		(contactStressRecordFile)
+
+		(wallOversizeFactor)
+
+	//	(gravity)
+		
+		//(bigBall)
+		//(bigBallRadius)
+		//(bigBallDensity)
+		//(bigBallDropTimeSeconds)
+		//(bigBallFrictDeg)
+		//(bigBallYoungModulus)
+		//(bigBallPoissonRatio)
+		//(bigBallDropHeight)
+		//(sigma_iso)
+		(sigmaIsoCompaction)
+		(sigmaLateralConfinement)
+		(Key)
+		
+		(water)
+		(CapillaryPressure)
+		(fusionDetection)
+		(binaryFusion)
+	);
 	REGISTER_CLASS_NAME(TriaxialTestWater);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

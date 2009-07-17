@@ -23,12 +23,4 @@ ParticleParameters::~ParticleParameters()
 {
 }
 
-
-void ParticleParameters::registerAttributes()
-{
-	PhysicalParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(mass);
-	REGISTER_ATTRIBUTE(velocity);
-}
-
 YADE_PLUGIN();

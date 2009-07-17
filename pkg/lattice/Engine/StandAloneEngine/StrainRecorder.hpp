@@ -28,16 +28,15 @@ class StrainRecorder : public DataRecorder
 
 		StrainRecorder ();
 
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(subscribedBodies)(initialLength)(only_stress));
 	REGISTER_CLASS_NAME(StrainRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };
-
 REGISTER_SERIALIZABLE(StrainRecorder);
 
 

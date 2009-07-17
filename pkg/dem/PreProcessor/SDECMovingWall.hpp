@@ -62,8 +62,7 @@ class SDECMovingWall : public FileGenerator
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
-
+	REGISTER_ATTRIBUTES(FileGenerator,(nbSpheres)(minRadius)(maxRadius)(spheresHeight)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(gravity)(density)(disorder)(groundSize)(groundPosition)(wallSize)(wallPosition)(wallVelocity)(wallTranslationAxis)(side1Size)(side1Position)(side1wire)(side2Size)(side2Position)(side2wire)(side3Size)(side3Position)(side3wire)(useSpheresAsGround)(dampingForce)(dampingMomentum)(rotationBlocked)(timeStepUpdateInterval));
 	REGISTER_CLASS_NAME(SDECMovingWall);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

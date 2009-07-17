@@ -33,7 +33,7 @@ class ResetPositionEngine : public PeriodicEngine {
 		DECLARE_LOGGER;
 	protected:
 		virtual void postProcessAttributes(bool);
-		virtual void registerAttributes();
+	REGISTER_ATTRIBUTES(PeriodicEngine,(Y_min)(subscribedBodies)(initial_positions)(fileName));
 	REGISTER_CLASS_NAME(ResetPositionEngine);
 	REGISTER_BASE_CLASS_NAME(PeriodicEngine);
 	private:

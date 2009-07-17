@@ -71,34 +71,6 @@ void TriaxialCompressionEngine::postProcessAttributes(bool deserializing)
 }
 
 
-void TriaxialCompressionEngine::registerAttributes()
-{
-	TriaxialStressController::registerAttributes();
-	REGISTER_ATTRIBUTE(strainRate);
-	REGISTER_ATTRIBUTE(currentStrainRate);
-	//REGISTER_ATTRIBUTE(Phase1);
-	REGISTER_ATTRIBUTE(UnbalancedForce);
-	REGISTER_ATTRIBUTE(StabilityCriterion);
-	REGISTER_ATTRIBUTE(translationAxis);
-	//REGISTER_ATTRIBUTE(compressionActivated);
-	REGISTER_ATTRIBUTE(autoCompressionActivation);
-	REGISTER_ATTRIBUTE(autoStopSimulation);
-	REGISTER_ATTRIBUTE(testEquilibriumInterval);
-	REGISTER_ATTRIBUTE(currentState);
-	REGISTER_ATTRIBUTE(previousState);
-	REGISTER_ATTRIBUTE(sigmaIsoCompaction);
-	REGISTER_ATTRIBUTE(previousSigmaIso);
-	REGISTER_ATTRIBUTE(sigmaLateralConfinement);
-	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(noFiles);
-	REGISTER_ATTRIBUTE(frictionAngleDegree);
-	REGISTER_ATTRIBUTE(epsilonMax);
-	REGISTER_ATTRIBUTE(uniaxialEpsilonCurr);
- 	REGISTER_ATTRIBUTE(isotropicCompaction);
- 	REGISTER_ATTRIBUTE(spheresVolume);
- 	REGISTER_ATTRIBUTE(fixedPorosity);
-}
-
 void TriaxialCompressionEngine::doStateTransition(MetaBody * body, stateNum nextState){
 
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){

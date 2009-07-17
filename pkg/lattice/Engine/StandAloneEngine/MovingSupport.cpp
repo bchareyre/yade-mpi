@@ -66,17 +66,6 @@ void MovingSupport::postProcessAttributes(bool deserializing)
 }
 
 
-void MovingSupport::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-//	REGISTER_ATTRIBUTE(sections);
-	REGISTER_ATTRIBUTE(sections_midpoints);
-	REGISTER_ATTRIBUTE(sections_halflength);
-	REGISTER_ATTRIBUTE(sections_directions);
-
-//	REGISTER_ATTRIBUTE(first);
-//	REGISTER_ATTRIBUTE(subscribedBodies);
-}
 
 
 bool MovingSupport::isActivated(MetaBody*)

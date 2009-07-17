@@ -36,13 +36,6 @@ void PositionSnapshot::postProcessAttributes(bool deserializing)
 }
 
 
-void PositionSnapshot::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputFile);
-	REGISTER_ATTRIBUTE(list_id);
-	REGISTER_ATTRIBUTE(i);
-}
 
 bool PositionSnapshot::isActivated(MetaBody*)
 {

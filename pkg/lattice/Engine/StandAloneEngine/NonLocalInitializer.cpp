@@ -22,12 +22,6 @@ NonLocalInitializer::~NonLocalInitializer ()
 {
 }
 
-void NonLocalInitializer::registerAttributes()
-{
-	StandAloneEngine::registerAttributes();
-	REGISTER_ATTRIBUTE(range);
-}
-
 bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* bodies, void* nonl)
 //void NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* bodies, InteractionContainer* nonl)
 //bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* bodies,//std::list<std::list<LatticeSetParameters::NonLocalInteraction> >

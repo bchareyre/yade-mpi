@@ -86,28 +86,6 @@ void SDECLinkedSpheres::postProcessAttributes(bool)
 }
 
 
-void SDECLinkedSpheres::registerAttributes()
-{
-	FileGenerator::registerAttributes();
-	REGISTER_ATTRIBUTE(nbSpheres);
-	REGISTER_ATTRIBUTE(minRadius);
-	REGISTER_ATTRIBUTE(maxRadius);
-	REGISTER_ATTRIBUTE(density);
-	REGISTER_ATTRIBUTE(sphereYoungModulus);
-	REGISTER_ATTRIBUTE(spherePoissonRatio);
-	REGISTER_ATTRIBUTE(sphereFrictionDeg);
-	REGISTER_ATTRIBUTE(dampingForce);
-	REGISTER_ATTRIBUTE(dampingMomentum);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-	REGISTER_ATTRIBUTE(gravity);
-	REGISTER_ATTRIBUTE(disorder);
-	REGISTER_ATTRIBUTE(spacing);
-	REGISTER_ATTRIBUTE(supportSize);
-	REGISTER_ATTRIBUTE(support1);
-	REGISTER_ATTRIBUTE(support2);
-	REGISTER_ATTRIBUTE(timeStepUpdateInterval);
-}
-
 
 bool SDECLinkedSpheres::generate()
 {

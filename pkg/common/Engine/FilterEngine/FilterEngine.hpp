@@ -21,13 +21,7 @@ class FilterEngine : public DeusExMachina {
 
 		FilterEngine();
 	
-		void registerAttributes()
-		{
-//			REGISTER_ATTRIBUTE(isFiltrationActivated);
-			REGISTER_ATTRIBUTE(isFilterActivated);
-		}
-
-	protected :
+	REGISTER_ATTRIBUTES(FilterEngine,(isFilterActivated));
 	REGISTER_CLASS_NAME(FilterEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

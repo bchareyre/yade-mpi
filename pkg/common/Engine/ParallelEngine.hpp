@@ -9,8 +9,7 @@ class ParallelEngine: public Engine {
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*){return true;}
 		virtual list<string> getNeededBex();		
-	protected:
-		void registerAttributes(){Engine::registerAttributes(); REGISTER_ATTRIBUTE(slaves); }
+	REGISTER_ATTRIBUTES(Engine,(slaves));
 	REGISTER_CLASS_NAME(ParallelEngine);
 	REGISTER_BASE_CLASS_NAME(Engine);
 };

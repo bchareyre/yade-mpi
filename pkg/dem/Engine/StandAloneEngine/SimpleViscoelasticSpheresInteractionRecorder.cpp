@@ -32,12 +32,6 @@ void SimpleViscoelasticSpheresInteractionRecorder::postProcessAttributes(bool de
 }
 
 
-void SimpleViscoelasticSpheresInteractionRecorder::registerAttributes()
-{
-	DataRecorder::registerAttributes();
-	REGISTER_ATTRIBUTE(outputBase);
-	REGISTER_ATTRIBUTE(interval);
-}
 
 bool SimpleViscoelasticSpheresInteractionRecorder::isActivated(MetaBody*)
 {

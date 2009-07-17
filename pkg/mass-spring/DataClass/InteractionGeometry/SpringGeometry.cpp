@@ -17,10 +17,5 @@ SpringGeometry::~SpringGeometry()
 {
 }
 
-void SpringGeometry::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(p1);
-	REGISTER_ATTRIBUTE(p2);
-}
 
 YADE_PLUGIN();

@@ -27,9 +27,5 @@ ClosestFeatures::~ClosestFeatures ()
 // 
 // }
 // 
-// void ClosestFeatures::registerAttributes()
-// {
-// 
-// }
 
 YADE_PLUGIN();

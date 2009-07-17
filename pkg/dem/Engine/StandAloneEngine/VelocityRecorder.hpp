@@ -23,12 +23,12 @@ class VelocityRecorder : public DataRecorder
 		std::string outputFile;
 		unsigned int interval;
 		VelocityRecorder ();
-		virtual void registerAttributes();
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval));
 	REGISTER_CLASS_NAME(VelocityRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 };

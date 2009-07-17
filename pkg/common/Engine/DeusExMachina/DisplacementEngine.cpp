@@ -14,29 +14,10 @@ void DisplacementEngine::postProcessAttributes(bool deserializing)
 	if(deserializing)
 	{
 		translationAxis.Normalize();
-
-	/*	
-		if(displacement==0)
-			displacement=6e-9;
-		else
-			displacement=0;
-			//displacement=3e-8;
-		
-		//displacement *= 20.0;
-	*/
-	//	std::cerr << "displacement 0.00000000375*2: " << displacement << "\n";
 		std::cerr << "displacement: " << displacement << "\n";
 	}
 }
 
-
-void DisplacementEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(displacement);
-	REGISTER_ATTRIBUTE(translationAxis);
-	REGISTER_ATTRIBUTE(active);
-}
 
 bool DisplacementEngine::isActivated(MetaBody*)
 {

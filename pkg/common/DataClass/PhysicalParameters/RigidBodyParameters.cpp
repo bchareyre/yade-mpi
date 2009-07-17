@@ -22,11 +22,4 @@ RigidBodyParameters::~RigidBodyParameters()
 {
 }
 
-void RigidBodyParameters::registerAttributes()
-{
-	ParticleParameters::registerAttributes();
-	REGISTER_ATTRIBUTE(inertia);
-	REGISTER_ATTRIBUTE(angularVelocity);
-}
-
 YADE_PLUGIN();

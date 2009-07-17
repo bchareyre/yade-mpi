@@ -12,9 +12,6 @@
 #include<yade/core/Omega.hpp>
 
 
-void Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::registerAttributes()
-{	
-}
 
 bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,

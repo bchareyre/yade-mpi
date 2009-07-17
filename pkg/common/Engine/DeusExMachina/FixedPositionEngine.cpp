@@ -17,12 +17,6 @@ FixedPositionEngine::FixedPositionEngine(){
 
 void FixedPositionEngine::postProcessAttributes(bool deserializing){}
 
-void FixedPositionEngine::registerAttributes(){
-	DeusExMachina::registerAttributes(); // for subscribedBodies
-	REGISTER_ATTRIBUTE(fixedPosition);
-	REGISTER_ATTRIBUTE(mask);
-}
-
 
 void FixedPositionEngine::applyCondition(MetaBody * ncb){
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

@@ -26,13 +26,6 @@ MacroMicroElasticRelationships::MacroMicroElasticRelationships()
 }
 
 
-void MacroMicroElasticRelationships::registerAttributes()
-{
-	REGISTER_ATTRIBUTE(alpha);
-	REGISTER_ATTRIBUTE(beta);
-	REGISTER_ATTRIBUTE(gamma);
-}
-
 
 void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // BodyMacroParameters
 					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters

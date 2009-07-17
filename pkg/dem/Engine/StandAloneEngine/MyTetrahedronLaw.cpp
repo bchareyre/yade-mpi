@@ -18,11 +18,6 @@ MyTetrahedronLaw::MyTetrahedronLaw() : InteractionSolver()
 }
 
 
-void MyTetrahedronLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	// ...
-}
 
 
 void MyTetrahedronLaw::action(MetaBody* ncb)

@@ -11,14 +11,6 @@
 #include <yade/pkg-common/Sphere.hpp>
 #include <yade/core/MetaBody.hpp>
 
-void StaticSpheresAttractionEngine::registerAttributes()
-{
-	StaticAttractionEngine::registerAttributes();
-	// REGISTER_ATTRIBUTE(applies_to_what);
-	// REGISTER_ATTRIBUTE(divide_radius);
-	REGISTER_ATTRIBUTE(max_displacement);
-}
-
 Real StaticSpheresAttractionEngine::getMaxDisplacement(MetaBody* ncb)
 {
 	// calculation based on max normal force - FIXME not working satifactionary, currently

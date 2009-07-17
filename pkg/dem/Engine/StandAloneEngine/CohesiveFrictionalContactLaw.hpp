@@ -27,8 +27,7 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 		CohesiveFrictionalContactLaw();
 		void action(MetaBody*);
 
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(erosionActivated)(detectBrokenBodies)(always_use_moment_law)(shear_creep)(twist_creep)(creep_viscosity));
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };

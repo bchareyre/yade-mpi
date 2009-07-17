@@ -26,7 +26,7 @@ int InteractionContainer::unconditionalErasePending(){
 		// shadow this->pendingErase by the local variable, to share code
 		FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
 	#endif
-			if(pendingErase.size()>0){
+			if(!pendingErase.empty()){
 				FOREACH(const bodyIdPair& p, pendingErase){ ret++; erase(p[0],p[1]); }
 				pendingErase.clear();
 			}

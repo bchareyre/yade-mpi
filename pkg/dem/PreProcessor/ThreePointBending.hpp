@@ -45,7 +45,7 @@ class ThreePointBending : public FileGenerator
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(FileGenerator,(yadeFileWithSpheres)(pistonVelocity)(dampingForce)(dampingMomentum)(timeStepUpdateInterval)(momentRotationLaw)(sphereYoungModulus)(spherePoissonRatio)(sphereFrictionDeg)(linkKn)(linkKs)(linkMaxNormalForce)(linkMaxShearForce));
 	REGISTER_CLASS_NAME(ThreePointBending);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);
 };

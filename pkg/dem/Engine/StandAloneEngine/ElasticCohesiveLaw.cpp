@@ -29,14 +29,6 @@ ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver()
 }
 
 
-void ElasticCohesiveLaw::registerAttributes()
-{
-	InteractionSolver::registerAttributes();
-	REGISTER_ATTRIBUTE(sdecGroupMask);
-	REGISTER_ATTRIBUTE(momentRotationLaw);
-}
-
-
 void ElasticCohesiveLaw::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

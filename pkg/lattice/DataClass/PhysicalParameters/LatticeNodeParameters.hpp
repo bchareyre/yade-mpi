@@ -23,8 +23,7 @@ class LatticeNodeParameters : public PhysicalParameters
 		virtual ~LatticeNodeParameters();
 
 /// Serialization
-	protected :
-		void registerAttributes();
+	REGISTER_ATTRIBUTES(PhysicalParameters,/* */);
 	REGISTER_CLASS_NAME(LatticeNodeParameters);
 	REGISTER_BASE_CLASS_NAME(PhysicalParameters);
 	

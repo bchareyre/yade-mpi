@@ -21,8 +21,6 @@ class AveragePositionRecorder : public DataRecorder
 		virtual void action(MetaBody*);
 		virtual bool isActivated(MetaBody*);
 	
-		virtual void registerAttributes();
-
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 
@@ -32,7 +30,7 @@ class AveragePositionRecorder : public DataRecorder
 		unsigned int interval;
 	private : 
 		std::ofstream ofile;
-	
+	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval));
 	REGISTER_CLASS_NAME(AveragePositionRecorder);
 	REGISTER_BASE_CLASS_NAME(DataRecorder);
 
