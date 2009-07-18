@@ -38,6 +38,7 @@ using namespace boost;
 class pyClass{ \
 	private: void init(string clss){ proxee=dynamic_pointer_cast<yadeClass>(ClassFactory::instance().createShared(clss.empty()? #yadeClass : clss)); if(!proxee) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to `"+#yadeClass+"'"); } \
 	public: shared_ptr<yadeClass> proxee; \
+		typedef yadeClass wrappedClass; \
 		/* void ensureProxee(){ if(!proxee) throw runtime_error(string("No proxied `")+#yadeClass+"' (programming error, please report!)"); } */ \
 		pyClass(string clss="", python::dict attrs=python::dict()){ init(clss); python::list l=attrs.items(); int len=PySequence_Size(l.ptr()); for(int i=0; i<len; i++){ python::extract<python::tuple> t(l[i]); python::extract<string> keyEx(t()[0]); if(!keyEx.check()) throw invalid_argument("Attribute keys must be strings."); wrappedPySetAttr2(keyEx(),t()[1]); } } \
 		pyClass(const shared_ptr<yadeClass>& _proxee): proxee(_proxee) {} \
@@ -60,7 +61,7 @@ class pyClass{ \
 	void pyName##_set(pyClass proxy){ proxee->yadeName=proxy.proxee; }
 /*! Boost.python's definition of python object corresponding to BASIC_PY_PROXY */
 #define BASIC_PY_PROXY_WRAPPER(pyClass,pyName)  \
-	boost::python::class_<pyClass>(pyName,python::init<python::optional<string,python::dict> >()) \
+	boost::python::class_<pyClass /*, shared_ptr<pyClass::wrappedClass> --- see http://wiki.python.org/moin/boost.python/PointersAndSmartPointers */ >(pyName,python::init<python::optional<string,python::dict> >()) \
 	.ATTR_ACCESS_PY(pyClass) \
 	.def("__str__",&pyClass::pyStr).def("__repr__",&pyClass::pyStr) \
 	.add_property("name",&pyClass::className) \

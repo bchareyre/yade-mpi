@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 	bool useGdb=true;
 	
 	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
-	while(coreOptions && (ch=getopt(argc,argv,"hnN:wC:cxvS:"))!=-1)
+	while(coreOptions && (ch=getopt(argc,argv,"+hnN:wC:cxvS:"))!=-1)
 		switch(ch){
 			case 'h': printHelp(); return 1;
 			case 'n': gui="NullGUI"; explicitUI=true; break;
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
 			case 'v': verbose+=1; break;
 			case 'S': simulationFileName=optarg; break;
 			case '-': coreOptions=false; break;
-			default: printHelp(); return 1;
+			default: simulationFileName=optarg; coreOptions=false; break; // printHelp(); return 1;
 		}
 	// save original options
 	Omega::instance().origArgv=argv; Omega::instance().origArgc=argc;

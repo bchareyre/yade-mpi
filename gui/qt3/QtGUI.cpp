@@ -42,7 +42,7 @@ void QtGUI::help(){
 int QtGUI::run(int argc, char *argv[])
 {
 	int ch;
-	while( ( ch = getopt(argc,argv,"hw") ) != -1)
+	while( ( ch = getopt(argc,argv,"+hw") ) != -1)
 		switch(ch){
 			case 'w'	: mainWindowHidden=true; break;
 			case 'h' : help(); return 0; break;

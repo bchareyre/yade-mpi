@@ -102,7 +102,7 @@ void PythonUI::pythonSession(){
 
 int PythonUI::run(int argc, char *argv[]) {
 	int ch;
-	while((ch=getopt(argc,argv,"hns:x"))!=-1){
+	while((ch=getopt(argc,argv,"+hns:x"))!=-1){
 		switch(ch){
 			case 'h': help(); return 1; break;
 			case 's': runScript=string(optarg); break;

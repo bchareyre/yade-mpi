@@ -1,3 +1,6 @@
-you can download documentation from yade homepage on berlios.de
+To generate documentation (dpxygen for c++ and epydoc for python classes), run
 
-and you can generate a reference with doxygen
+	doxygen Doxyfile
+	yade-* yade-epydoc.py
+
+or more documentation, go to http://yade.wikia.com
