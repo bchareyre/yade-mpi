@@ -78,6 +78,13 @@ if 'GTS' in env['features']:
 		env.File('py/pygts-0.3.1/__init__.py'),
 		env.File('py/pygts-0.3.1/pygts.py')
 	])
+	#
+	# the _packPredicates module needs to link to us, but linker by defaults looks for lib*.so files
+	# Therefore we will create symlink with that name (in lib/ rather than py/gts, so that it is in the RPATH
+	# without further modifications). If the file were copied (installed 2 times), static data would be
+	# created twice and it would break python type identification (among other things).
+	#
+	env.Command('$PREFIX/lib/yade$SUFFIX/lib/lib_gts__python-module.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so','ln -s -f ../py/gts/_gts.so $TARGET')
 
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 

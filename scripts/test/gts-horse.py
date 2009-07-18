@@ -5,19 +5,23 @@ which can further be either filled with packing (if used as predicate) or conver
 to facets representing the surface."""
 
 from yade import pack
-import gts
+import gts, os.path
 
-try:
-	#surf=gts.read(open('horse.gts')); surf.coarsen(1000); surf.write(open('horse.coarse.gts','w'))
-	surf=gts.read(open('horse.coarse.gts'))
-except IOError:
-	print """horse.gts not found, you need to download input data:
+# coarsen the original horse if we have it
+# do nothing if we have the coarsened horse already
+if not os.path.exists('horse.coarse.gts'):
+	if os.path.exists('horse.gts'):
+		surf=gts.read(open('horse.gts')); surf.coarsen(1000); surf.write(open('horse.coarse.gts','w'))
+	else:
+		print """horse.gts not found, you need to download input data:
 
-	wget http://gts.sourceforge.net/samples/horse.gts.gz
-	gunzip horse.gts.gz
-	"""
-	quit()
-print dir(surf)
+		wget http://gts.sourceforge.net/samples/horse.gts.gz
+		gunzip horse.gts.gz
+		"""
+		quit()
+
+surf=gts.read(open('horse.coarse.gts'))
+
 if surf.is_closed():
 	pred=pack.inGtsSurface(surf)
 	aabb=pred.aabb()

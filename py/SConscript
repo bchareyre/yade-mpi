@@ -8,13 +8,8 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.SharedLibrary('log',['log.cpp'],SHLIBPREFIX=''),
 		env.SharedLibrary('_utils',['_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['Shop','ConcretePM']),
 		env.SharedLibrary('_packPredicates',['_packPredicates.cpp'],SHLIBPREFIX='',
-			# if we compile with GTS, link to the python module, as inGtsSurface uses some of its symbols.
-			# because the module doesn't have the lib- suffix, we put it directly to SHLINKFLAGS
-			# using the -l: syntax (see man ld); we further have to add a special LIBDIR (for link-time lookup)
-			# and RPATH (for run-time lookup)
-			SHLINKFLAGS=env['SHLINKFLAGS']+(['-l:_gts.so'] if 'GTS' in env['features'] else []),
-			LIBPATH=env['LIBPATH']+(['$PREFIX/lib/yade$SUFFIX/py/gts'] if 'GTS' in env['features'] else []),
-			RPATH=env['RPATH']+(['$runtimePREFIX/lib/yade$SUFFIX/py/gts'] if 'GTS' in env['features'] else []),	
+			# link to the symlink to the python module (created in lib/SConstruct; see explanation there)
+			LIBS=env['LIBS']+(['_gts__python-module'] if 'GTS' in env['features'] else []),
 			),
 		env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['Shop']),
 		env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
@@ -27,7 +22,6 @@ if 'EMBED_PYTHON' in env['CPPDEFINES']:
 		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['XMLFormatManager','yade-factory','yade-serialization','Shop','BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','STLImporter','ParallelEngine','Clump'],),
 		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['boost_python_indexing_suite_v2'])
 	])
-	if 'GTS' in env['features']: env.Depends('_packPredicates.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so')
 
 	# 3rd party modules:
 	# ==================

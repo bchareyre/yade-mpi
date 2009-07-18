@@ -541,7 +541,8 @@ if not COMMAND_LINE_TARGETS:
 	for root,dirs,files in os.walk(env.subst('$PREFIX/lib/yade${SUFFIX}')):
 		for f in files:
 			ff=os.path.join(root,f)
-			if ff not in toInstall and not ff.endswith('.pyo'):
+			# do not delete python-optimized files and symbolic links (lib_gts__python-module.so, for instance)
+			if ff not in toInstall and not ff.endswith('.pyo') and not os.path.islink(ff):
 				print "Deleting extra plugin", ff
 				os.remove(ff)
 
