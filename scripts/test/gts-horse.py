@@ -33,7 +33,7 @@ O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
 O.engines=[
 	BexResetter(),
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
-	InsertionSortCollider(),
+	InsertionSortCollider(label='collider'),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],
@@ -42,6 +42,12 @@ O.engines=[
 	GravityEngine(gravity=[0,0,-1e4]),
 	NewtonsDampedLaw(damping=.1)
 ]
-
+#collider['sweepLength']=.2*dim0/30.
+#collider['nBins']=10
+#collider['binCoeff']=2
 O.dt=1.5*utils.PWaveTimeStep()
 O.saveTmp()
+O.timingEnabled=True
+from yade import timing
+O.run(10000,True)
+timing.stats()
