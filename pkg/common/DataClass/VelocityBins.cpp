@@ -11,11 +11,14 @@
 CREATE_LOGGER(VelocityBins);
 
 bool VelocityBins::incrementDists_shouldCollide(Real dt){
+	// const shared_ptr<Body>& b=Body::byId(0); LOG_INFO("Body #0: z off "<<b->physicalParameters->se3.position[2]-b->physicalParameters->refSe3.position[2]<<", velocity "<<static_pointer_cast<RigidBodyParameters>(b->physicalParameters)->velocity[2]);
 	int i=0;
 	FOREACH(Bin& bin, bins){
-		bin.currDistSq+=dt*dt*bin.currMaxVelSq; i++;
-		if(bin.currDistSq>pow(bin.maxDist,2)){
-			LOG_TRACE("Collide: bin"<<i<<": max dist "<<bin.maxDist<<", current "<<sqrt(bin.currDistSq));
+		// NOTE: this mimics the integration scheme of NewtonsDampedLaw
+		// if you use different integration method, it must be changed (or the infrastructure somehow modified to allow for that)
+		bin.currDist+=dt*sqrt(bin.currMaxVelSq); i++;
+		if(bin.currDist>bin.maxDist){
+			LOG_TRACE("Collide: bin"<<i<<": max dist "<<bin.maxDist<<", current "<<bin.currDist);
 			return true;
 		}
 	}
@@ -38,7 +41,8 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 		if(refMaxVelSq<0){ refMaxVelSq=currMaxVelSq; /* first time */}
 		else {
 			// there should be some maximum speed change parameter, so that bins do not change their limits (and therefore bodies, also!) too often, depending on 1 particle going crazy
-			refMaxVelSq=min(max(refMaxVelSq/pow(1+maxRefRelStep,2),currMaxVelSq),refMaxVelSq*pow(1+maxRefRelStep,2));
+			if(maxRefRelStep>0) refMaxVelSq=min(max(refMaxVelSq/pow(1+maxRefRelStep,2),currMaxVelSq),refMaxVelSq*pow(1+maxRefRelStep,2));
+			else refMaxVelSq=currMaxVelSq;
 			if(refMaxVelSq==0) refMaxVelSq=currMaxVelSq;
 		}
 		LOG_TRACE("new refMaxVel: "<<sqrt(refMaxVelSq));
@@ -52,7 +56,7 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 				(refMaxVelSq==0 ? 0: refSweepLength) :
 				refSweepLength/pow(binCoeff,(int)i)
 			);
-			bin.currDistSq=0; bin.currMaxVelSq=0; bin.nBodies=0;
+			bin.currDist=0; bin.currMaxVelSq=0; bin.nBodies=0;
 		}
 	long moveFaster=0, moveSlower=0;
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){

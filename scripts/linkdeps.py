@@ -17,7 +17,7 @@ def getModule(dir):
 def walkSourceFiles():
 	ret=[]
 	for root, dirs, files in os.walk(srcRoot,topdown=True):
-		for d in ('.svn','mgpost','SpherePadder','QGLViewer','triangulation','sqlite3x','miniWm3'):
+		for d in ('.svn','mgpost','SpherePadder','QGLViewer','triangulation','sqlite3x','miniWm3','py'):
 			try: dirs.remove(d)
 			except ValueError: pass
 		for f in files:

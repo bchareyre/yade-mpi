@@ -17,10 +17,10 @@ See http://yade.wikia.com/wiki/Insertion_Sort_Collider_Stride#Enhancement_ideas:
 */
 class VelocityBins{
 	public:
-	VelocityBins(int _nBins, Real _refMaxVelSq, Real _binCoeff=10, Real _binOverlap=0.8): refMaxVelSq(_refMaxVelSq), binCoeff(_binCoeff), binOverlap(_binOverlap), maxRefRelStep(100), nBins(_nBins), histInterval(200), histLast(-1){}
+	VelocityBins(int _nBins, Real _refMaxVelSq, Real _binCoeff=10, Real _binOverlap=0.8): refMaxVelSq(_refMaxVelSq), binCoeff(_binCoeff), binOverlap(_binOverlap), maxRefRelStep(-1), nBins(_nBins), histInterval(200), histLast(-1){}
 	typedef signed char binNo_t;
 	struct Bin{
-		Bin(): binMinVelSq(-1), binMaxVelSq(-1), maxDist(0), currDistSq(0), currMaxVelSq(0), nBodies(0){
+		Bin(): binMinVelSq(-1), binMaxVelSq(-1), maxDist(0), currDist(0), currMaxVelSq(0), nBodies(0){
 			#ifdef YADE_OPENMP
 				threadMaxVelSq.resize(omp_get_max_threads());
 			#endif
@@ -30,7 +30,7 @@ class VelocityBins{
 		// maximum distance that body in this bin can travel before it goes out of its swept bbox
 		Real maxDist;
 		// distance so far traveled by the fastest body in this bin (since last setBins)
-		Real currDistSq;
+		Real currDist;
 		// maximum velSq over all bodies in this bin
 		Real currMaxVelSq;
 		// number of bodies in this bin (for informational purposes only)
@@ -49,7 +49,7 @@ class VelocityBins{
 	Real binCoeff;
 	// relative overlap beween bins; body will not be moved from faster bin until its velocity is min*binOverlap; must be <=1
 	Real binOverlap;
-	// maximum relative change of reference max velocity per invocation
+	// maximum relative change of reference max velocity per invocation (if <0, disabled; this is the default)
 	Real maxRefRelStep;
 	// number of bins; must be >=1 and <=100 (artificial upper limit)
 	size_t nBins;
