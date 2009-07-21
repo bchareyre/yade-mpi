@@ -38,6 +38,19 @@ for part in [
 	pack.regularOrtho(pack.inCylinder((-2,0,2),(-5,0,4),1),radius=rad,gap=gap,color=(0,0,1),**kw) # left hand
 	]: O.bodies.appendClumped(part)
 
+
+kwBoxes={'frictionAngle':0.5,'color':[1,0,0],'wire':False,'dynamic':False}
+q1 = Quaternion(Vector3(0,0,1),(3.14159/3))
+o1,o_angl = q1.ToAxisAngle()
+O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
+q1 = Quaternion(Vector3(0,0,1),(3.14159/2))
+o1,o_angl = q1.ToAxisAngle()
+O.bodies.append(utils.facetBox((0,12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
+q1 = Quaternion(Vector3(0,0,1),(3.14159))
+o1,o_angl = q1.ToAxisAngle()
+O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
+
+
 try:
 	from yade import qt
 	qt.Controller()

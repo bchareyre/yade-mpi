@@ -65,16 +65,19 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		}
 	} else {
 		if (phys->isCohesive) {
-			phys->normalForce=phys->kn*displN*geom->normal;
 			if (displN>(phys->lengthMaxTension)) {
 				//LOG_WARN(displN<<"__TENSION!!!__");
 				phys->isCohesive = false;
 				rbp1->isDamaged=true;
 				rbp2->isDamaged=true;
+				return;
 			} else {
-				applyForceAtContactPoint(phys->normalForce,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
+				phys->normalForce=phys->kn*displN*geom->normal;
+				Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tanFrictionAngle,2);
+				Vector3r trialFs=phys->ks*geom->displacementT();
+				if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));} 
+				applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,rootBody);
 			}
-			return;
 		} else {
 			rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
 			return;
@@ -90,7 +93,7 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	if(interaction->interactionPhysics) return; 
 
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
-	
+	Omega& OO=Omega::instance();
 	assert(contGeom);
 	//LOG_WARN(Omega::instance().getCurrentIteration());
 	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
@@ -117,9 +120,9 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	
 	initDistance = contGeom->displacementN();
 
-	if ((rpm1->exampleNumber==rpm2->exampleNumber)&&(initDistance<(contPhys->lengthMaxTension))&&(initCohesive)) {
+	if ((rpm1->exampleNumber==rpm2->exampleNumber)&&(initDistance<(contPhys->lengthMaxTension))&&(initCohesive)&&(OO.getCurrentIteration()==0)) {
 		contPhys->isCohesive=true;
-		//LOG_WARN("InitDistance="<<initDistance);
+		//LOG_WARN("InitDistance="<<initDistance<<"  "<<rpm1->exampleNumber<<"  "<<rpm2->exampleNumber<<" "<<OO.getCurrentIteration());
 		//LOG_WARN("lengthMaxCompression="<<contPhys->lengthMaxCompression);
 		//LOG_WARN("lengthMaxTension="<<contPhys->lengthMaxTension);
 	}
