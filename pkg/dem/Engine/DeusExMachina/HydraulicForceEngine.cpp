@@ -22,9 +22,16 @@
 
 vector<Real> initialPositions;
 
-HydraulicForceEngine::HydraulicForceEngine() : gravity(Vector3r::ZERO), isActivated(false)
+HydraulicForceEngine::HydraulicForceEngine() : gravity(Vector3r::ZERO), isActivated(true)
 {
-dummyParameter = false;
+	dummyParameter = false;
+	HFinverted = false;
+	savePositions = 1;
+	outputFile "positions.dat";
+	inputFile "forces.dat";
+	HFinversion_counter = 1000;
+	forceFactor = 1;
+
 
 }
 
