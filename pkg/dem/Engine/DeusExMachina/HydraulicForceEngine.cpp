@@ -27,8 +27,8 @@ HydraulicForceEngine::HydraulicForceEngine() : gravity(Vector3r::ZERO), isActiva
 	dummyParameter = false;
 	HFinverted = false;
 	savePositions = 1;
-	outputFile "positions.dat";
-	inputFile "forces.dat";
+	outputFile = "positions.dat";
+	inputFile = "forces.dat";
 	HFinversion_counter = 1000;
 	forceFactor = 1;
 
