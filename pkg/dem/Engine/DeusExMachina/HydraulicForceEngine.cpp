@@ -97,7 +97,7 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
 	    ofstream ofile (outputFile.c_str());
             
             //cerr << "r = " << R << endl;
-		#define USELINENUMBERSFORID
+	    //#define USELINENUMBERSFORID
             if (file.is_open())
             {
 		file >> realID >> temp >> temp>> temp>> temp>> temp>> temp;
