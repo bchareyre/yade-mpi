@@ -49,6 +49,8 @@ env.Install('$PREFIX/lib/yade$SUFFIX/pkg-common',[
 		LIBS=env['LIBS']+['ParticleParameters']),
 	env.SharedLibrary('CinemDNCEngine',['Engine/DeusExMachina/CinemDNCEngine.cpp'],
 		LIBS=env['LIBS']+['ParticleParameters','RigidBodyParameters']),
+	env.SharedLibrary('PressTestEngine',['Engine/DeusExMachina/PressTestEngine.cpp'],
+		LIBS=env['LIBS']+['TranslationEngine']),
 
 	env.SharedLibrary('CinemCNCEngine',
 		['Engine/DeusExMachina/CinemCNCEngine.cpp'],
