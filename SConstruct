@@ -179,10 +179,11 @@ Help(opts.GenerateHelpText(env))
 ################# BUILD DIRECTORY #########
 ###########################################
 import yadeSCons
-##ALL generated stuff should go here - therefore we must determine it very early!!
+## ALL generated stuff should go here - therefore we must determine it very early!!
 env['realVersion']=yadeSCons.getRealVersion()
 if not env.has_key('version'):
 	env['version']=env['realVersion']
+if not env['realVersion']: env['realVersion']=env['version']
 
 env['SUFFIX']='-'+env['version']+env['variant']
 print "Yade version is `%s', installed files will be suffixed with `%s'."%(env['version'],env['SUFFIX'])

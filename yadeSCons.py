@@ -12,7 +12,7 @@ def getRealVersion():
 		for l in os.popen("LC_ALL=C bzr version-info 2>/dev/null").readlines():
 			m=re.match(r'revno: ([0-9]+)',l)
 			if m: return 'bzr'+m.group(1)
-	return '<unknown>'
+	return None
 
 
 class Plugin:
