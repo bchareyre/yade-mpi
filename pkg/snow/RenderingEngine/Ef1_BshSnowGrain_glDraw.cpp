@@ -15,7 +15,7 @@
 
 inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
 
-void triangle(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
+void triangle_bsh(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
 {
 	glNormal3v(n);
 	glVertex3v(a);
@@ -89,7 +89,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 				Vector3r c(get<2>(f[i]));
 				Vector3r n(get<3>(f[i]));
 				// plot the triangular face
-				triangle(a,b,c,n);
+				triangle_bsh(a,b,c,n);
 				if(current - 1 == Omega::instance().isoSec && !surface)
 				{
 					// plot the depth tetrahedron
@@ -99,9 +99,9 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 					Vector3r N2((Z - c).Cross(c - a));
 					Vector3r N3((Z - b).Cross(b - c));
 					
-					triangle(b,a,Z,N1);
-					triangle(a,c,Z,N2);
-					triangle(c,b,Z,N3);
+					triangle_bsh(b,a,Z,N1);
+					triangle_bsh(a,c,Z,N2);
+					triangle_bsh(c,b,Z,N3);
 					
 					// plot the parallelepiped top-face at the half depth
 					Real depth2 = depth*0.5;
@@ -109,7 +109,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 					Vector3r A(a+N);
 					Vector3r B(b+N);
 					Vector3r C(c+N);
-					triangle(A,B,C,n);
+					triangle_bsh(A,B,C,n);
 				}
 			}
 		}
@@ -393,5 +393,4 @@ if(!surface)
 
 }
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("Ef1_BshSnowGrain_glDraw");

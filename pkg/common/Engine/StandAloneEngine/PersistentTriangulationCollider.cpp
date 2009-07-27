@@ -14,11 +14,12 @@
 #include<yade/core/BodyContainer.hpp>
 #include<limits>
 #include<utility>
-#include <vector>
+#include<vector>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include"TesselationWrapper.h"
+#include<yade/extra/TesselationWrapper.h>
 
+YADE_REQUIRE_FEATURE(CGAL)
 
 PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 {
@@ -150,4 +151,4 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("PersistentTriangulationCollider");

@@ -15,4 +15,4 @@ void PhysicalActionApplier::action(MetaBody* ncb){
 		operator()(b->physicalParameters,b.get(),ncb);
 	}
 }
-YADE_PLUGIN();
+YADE_PLUGIN("PhysicalActionApplier");

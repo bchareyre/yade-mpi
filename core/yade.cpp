@@ -8,7 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	#include<Python.h>
 	extern int Py_OptimizeFlag;
 #endif
@@ -63,7 +63,7 @@ void warnOnceHandler(int sig){
 void
 sigHandler(int sig){
 	switch(sig){
-	#ifdef EMBED_PYTHON
+	#ifdef YADE_PYTHON
 		case SIGINT:
 			LOG_DEBUG("Finalizing Python...");
 			Py_Finalize();
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
 	 * which locks renderMutex, calls instance() in turn, but since not constructed yet,
 	 * instance() → Omega::Omega → init → resetRootBody → lock renderMutex → deadlock */
 	Omega::instance().init();
-	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine 0.12.x, beta, SVN snapshot.";
+	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine, version " YADE_VERSION;
 
 	// This makes boost stop bitching about dot-files and other files that may not exist on MS-DOS 3.3;
 	// see http://www.boost.org/libs/filesystem/doc/portability_guide.htm#recommendations for what all they consider bad.
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
 	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
 
 
-	#ifdef EMBED_PYTHON
+	#ifdef YADE_PYTHON
 		/* see http://www.python.org/dev/peps/pep-0311 for threading with Python embedded */
 		LOG_DEBUG("Initializing Python...");
 		Py_OptimizeFlag=1;
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
 	
 	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX));
+	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/plugins" ));
 	Omega::instance().init();
 
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
  	// for(int i=0;i<argc; i++)cerr<<"Argument "<<i<<": "<<argv[i]<<endl;
 	int ok = frontEnd->run(argc,argv);
 
-	#ifdef EMBED_PYTHON
+	#ifdef YADE_PYTHON
 		/* pyFinalize crashes with boost:python<=1.35
 		 * http://www.boost.org/libs/python/todo.html#pyfinalize-safety has explanation 
 		 * once this is fixed, you should remove workaround that saves history from ipython session in gui/py/PythonUI_rc.py:63

@@ -19,7 +19,7 @@
 #include<yade/core/Interaction.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/version.hpp>
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	#include<boost/python.hpp>
 	using namespace boost;
 #endif
@@ -458,7 +458,7 @@ void GLViewer::postSelection(const QPoint& point)
 		Vector3r&    v = Body::byId(selection)->physicalParameters->se3.position;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
 		Omega::instance().selectedBody = selection;
-		#ifdef EMBED_PYTHON
+		#ifdef YADE_PYTHON
 			try{
 				PyGILState_STATE gstate;
 					gstate = PyGILState_Ensure();

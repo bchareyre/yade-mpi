@@ -15,13 +15,13 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/DisplacementEngine.hpp>
-#include"LatticeLaw.hpp"
-#include"LatticeSetParameters.hpp"
-#include"LatticeInteractingGeometry.hpp"
-#include"LatticeNodeParameters.hpp"
-#include"LatticeBeamParameters.hpp"
-#include"LineSegment.hpp"
-#include"LatticeBeamAngularSpring.hpp"
+#include<yade/pkg-lattice/LatticeLaw.hpp>
+#include<yade/pkg-lattice/LatticeSetParameters.hpp>
+#include<yade/pkg-lattice/LatticeInteractingGeometry.hpp>
+#include<yade/pkg-lattice/LatticeNodeParameters.hpp>
+#include<yade/pkg-lattice/LatticeBeamParameters.hpp>
+#include<yade/pkg-lattice/LineSegment.hpp>
+#include<yade/pkg-lattice/LatticeBeamAngularSpring.hpp>
 
 // Delaunay
 #ifndef MINIWM3
@@ -287,7 +287,7 @@ void LatticeExampleCTData::create_angular_springs(int totalNodesCount,shared_ptr
 		if( ! ( body->getGroupMask() & beamGroupMask ) )
 			continue; // skip non-beams
 
-		calcBeamAngles(body,rootBody->bodies.get(),rootBody->persistentInteractions.get(),connections);
+		calcBeamAngles(body,rootBody->bodies.get(),rootBody->interactions.get(),connections);
 	}
 }
 
@@ -552,5 +552,4 @@ void LatticeExampleCTData::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vec
 	}
 }
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("LatticeExampleCTData");

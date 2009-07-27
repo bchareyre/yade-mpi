@@ -144,4 +144,4 @@ Real LatticeBeamParameters::strain()
         }
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("LatticeBeamParameters");

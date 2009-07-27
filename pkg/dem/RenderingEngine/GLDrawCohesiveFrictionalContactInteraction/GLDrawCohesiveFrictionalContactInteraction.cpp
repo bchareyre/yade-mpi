@@ -245,4 +245,5 @@ if(wireFrame)
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawCohesiveFrictionalContactInteraction");
+YADE_REQUIRE_FEATURE(OPENGL)

@@ -288,4 +288,5 @@ void GLDrawBoxShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const sh
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawBoxShadowVolume");
+YADE_REQUIRE_FEATURE(OPENGL)

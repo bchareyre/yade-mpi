@@ -82,4 +82,5 @@ void GLDrawMesh2D::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 	}
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawMesh2D");
+YADE_REQUIRE_FEATURE(OPENGL)

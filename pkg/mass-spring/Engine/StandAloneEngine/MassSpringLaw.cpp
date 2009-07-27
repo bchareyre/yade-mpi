@@ -26,11 +26,11 @@ MassSpringLaw::MassSpringLaw () : InteractionSolver()
 void MassSpringLaw::action(MetaBody * massSpring)
 {
 	shared_ptr<BodyContainer>& bodies = massSpring->bodies;
-	shared_ptr<InteractionContainer>& persistentInteractions = massSpring->persistentInteractions;
+	shared_ptr<InteractionContainer>& interactions = massSpring->interactions;
 	
 
-	InteractionContainer::iterator ii    = persistentInteractions->begin();
-	InteractionContainer::iterator iiEnd = persistentInteractions->end();
+	InteractionContainer::iterator ii    = interactions->begin();
+	InteractionContainer::iterator iiEnd = interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{	
 		shared_ptr<Interaction> spring = *ii;
@@ -68,4 +68,4 @@ void MassSpringLaw::action(MetaBody * massSpring)
 	
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("MassSpringLaw");

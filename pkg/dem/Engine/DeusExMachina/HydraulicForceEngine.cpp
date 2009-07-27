@@ -17,7 +17,7 @@
 #include <yade/core/MetaBody.hpp>
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <vector>
-#include <yade/extra/Shop.hpp>
+#include <yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 vector<Real> initialPositions;
@@ -176,4 +176,4 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
     }
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("HydraulicForceEngine");

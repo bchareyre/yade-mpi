@@ -1,4 +1,3 @@
-#include<yade/gui-py/pyAttrUtils.hpp>
 #include<yade/gui-qt3/YadeQtMainWindow.hpp>
 #include<boost/python.hpp>
 #include<yade/pkg-common/OpenGLRenderingEngine.hpp>
@@ -16,10 +15,6 @@ log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.QtGUI-python");
 
 using namespace boost::python;
 
-BASIC_PY_PROXY_HEAD(pyOpenGLRenderingEngine,OpenGLRenderingEngine)
-	void setRefSe3(){ proxee->setBodiesRefSe3(Omega::instance().getRootBody()); }
-BASIC_PY_PROXY_TAIL;
-
 #include<yade/gui-qt3/QtGUI.hpp>
 bool qtGuiIsActive(){return (bool)YadeQtMainWindow::self; }
 void qtGuiActivate(){
@@ -32,7 +27,8 @@ YadeQtMainWindow* ensuredMainWindow(){if(!qtGuiIsActive()){qtGuiActivate(); whil
 
 void centerViews(void){ensuredMainWindow()->centerViews();}
 void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
-pyOpenGLRenderingEngine ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return pyOpenGLRenderingEngine(ensuredMainWindow()->renderer);}
+shared_ptr<OpenGLRenderingEngine> ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return ensuredMainWindow()->renderer;}
+void OpenGLRenderingEngine_setBodiesRefSe3(const shared_ptr<OpenGLRenderingEngine>& self){ self->setBodiesRefSe3(Omega::instance().getRootBody()); }
 
 #define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
 POST_SYNTH_EVENT(PLAYER,player);
@@ -180,8 +176,8 @@ BOOST_PYTHON_MODULE(_qt){
 	def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook","startWait")));
 	def("views",getAllViews);
 
-	BASIC_PY_PROXY_WRAPPER(pyOpenGLRenderingEngine,"GLRenderer")
-		.def("setRefSe3",&pyOpenGLRenderingEngine::setRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
+	python::class_<OpenGLRenderingEngine, shared_ptr<OpenGLRenderingEngine>, python::bases<Serializable>, noncopyable>("OpenGLRenderingEngine")
+		.def("setRefSe3",&OpenGLRenderingEngine_setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
 
 	boost::python::class_<pyGLViewer>("GLViewer")
 		.def(python::init<unsigned>())

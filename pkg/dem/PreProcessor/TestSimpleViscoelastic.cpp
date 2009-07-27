@@ -6,14 +6,14 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #include "TestSimpleViscoelastic.hpp"
-#include <yade/extra/Shop.hpp>
+#include <yade/pkg-dem/Shop.hpp>
 #include <yade/core/Body.hpp>
 #include <yade/core/MetaBody.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>

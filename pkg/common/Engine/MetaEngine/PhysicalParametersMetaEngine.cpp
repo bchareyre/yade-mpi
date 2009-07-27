@@ -28,4 +28,4 @@ void PhysicalParametersMetaEngine::action(MetaBody* ncb)
  	operator()(ncb->physicalParameters,ncb,ncb->bex);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("PhysicalParametersMetaEngine");

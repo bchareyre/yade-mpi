@@ -1,160 +1,76 @@
 # vim: set filetype=python :
 Import('*')
+linkPlugins=env['linkPlugins']
 import os.path 
 
-if 'EMBED_PYTHON' in env['CPPDEFINES']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
-		env.SharedLibrary('WeightedAverage2d',['smoothing/WeightedAverage2d.cpp'],SHLIBPREFIX='',
-			LIBS=env['LIBS']+['yade-base']),
-	])
-	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
-		env.SharedLibrary('boost_python_indexing_suite_v2',['py/boost-python-indexing-suite-v2-noSymlinkHeaders/indexing_slice.cpp','py/boost-python-indexing-suite-v2-noSymlinkHeaders/python_iterator.cpp'])
-	])
-
+# will switch according to scons configuration to one or another
+def yadeStaticOrSharedLib(*args,**kw):
+	return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.SharedLibrary(*args,**kw))
+	#return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary(*args,**kw))
 
 if 'qt3' not in env['exclude']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-		env.SharedLibrary('yade-serialization-qt',
-			['serialization-qt/QtGUIGenerator.cpp'],
-			LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
-		env.SharedLibrary('yade-QGLViewer',Split('''
-				QGLViewer/VRenderInterface_Qt3.ui
-				QGLViewer/ImageInterface_Qt3.ui
-				QGLViewer/qglviewer.cpp 
-				QGLViewer/camera.cpp 
-				QGLViewer/manipulatedFrame.cpp 
-				QGLViewer/manipulatedCameraFrame.cpp 
-				QGLViewer/frame.cpp 
-				QGLViewer/saveSnapshot.cpp 
-				QGLViewer/constraint.cpp 
-				QGLViewer/keyFrameInterpolator.cpp 
-				QGLViewer/mouseGrabber.cpp 
-				QGLViewer/quaternion.cpp 
-				QGLViewer/vec.cpp
-				QGLViewer/VRender/BackFaceCullingOptimizer.cpp 
-				QGLViewer/VRender/BSPSortMethod.cpp 
-				QGLViewer/VRender/EPSExporter.cpp 
-				QGLViewer/VRender/Exporter.cpp 
-				QGLViewer/VRender/FIGExporter.cpp 
-				QGLViewer/VRender/gpc.cpp 
-				QGLViewer/VRender/ParserGL.cpp 
-				QGLViewer/VRender/Primitive.cpp 
-				QGLViewer/VRender/PrimitivePositioning.cpp 
-				QGLViewer/VRender/TopologicalSortMethod.cpp 
-				QGLViewer/VRender/VisibilityOptimizer.cpp 
-				QGLViewer/VRender/Vector2.cpp 
-				QGLViewer/VRender/Vector3.cpp 
-				QGLViewer/VRender/NVector3.cpp 
-				QGLViewer/VRender/VRender.cpp
-				'''),
-				# we want to REALLY optimize this, even in debug builds of yade; and suppress all warnings also
-				CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0','-w'],
-				# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
-				# since the generated header is #include'd "...", it looks for it in the original dir
-				# no idea why this _does_ work with gui/qt3. Go figure.
-				CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
-			),
-		])
-
-	if 'binfmt' in env['features']:
-		env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-			env.SharedLibrary('BINFormatManager',['serialization-bin/BINFormatManager.cpp']),
-		])
-
+	yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
+	yadeStaticOrSharedLib('yade-QGLViewer',Split('''
+		QGLViewer/VRenderInterface_Qt3.ui
+		QGLViewer/ImageInterface_Qt3.ui
+		QGLViewer/qglviewer.cpp 
+		QGLViewer/camera.cpp 
+		QGLViewer/manipulatedFrame.cpp 
+		QGLViewer/manipulatedCameraFrame.cpp 
+		QGLViewer/frame.cpp 
+		QGLViewer/saveSnapshot.cpp 
+		QGLViewer/constraint.cpp 
+		QGLViewer/keyFrameInterpolator.cpp 
+		QGLViewer/mouseGrabber.cpp 
+		QGLViewer/quaternion.cpp 
+		QGLViewer/vec.cpp
+		QGLViewer/VRender/BackFaceCullingOptimizer.cpp 
+		QGLViewer/VRender/BSPSortMethod.cpp 
+		QGLViewer/VRender/EPSExporter.cpp 
+		QGLViewer/VRender/Exporter.cpp 
+		QGLViewer/VRender/FIGExporter.cpp 
+		QGLViewer/VRender/gpc.cpp 
+		QGLViewer/VRender/ParserGL.cpp 
+		QGLViewer/VRender/Primitive.cpp 
+		QGLViewer/VRender/PrimitivePositioning.cpp 
+		QGLViewer/VRender/TopologicalSortMethod.cpp 
+		QGLViewer/VRender/VisibilityOptimizer.cpp 
+		QGLViewer/VRender/Vector2.cpp 
+		QGLViewer/VRender/Vector3.cpp 
+		QGLViewer/VRender/NVector3.cpp 
+		QGLViewer/VRender/VRender.cpp
+		'''),
+		# we want to REALLY optimize this, even in debug builds of yade; and suppress all warnings also
+		CXXFLAGS=[x for x in env['CXXFLAGS'] if x not in ['-ggdb3','-g','-pg'] ]+['-O3','-g0','-w'],
+		# HACK: uic generates files in the buildDir, but gcc is invoked on files in the original dir;
+		# since the generated header is #include'd "...", it looks for it in the original dir
+		# no idea why this _does_ work with gui/qt3. Go figure.
+		CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
+	)
 if 'YADE_OPENGL' in env['CPPDEFINES']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-		env.SharedLibrary('yade-opengl',
-			['opengl/FpsTracker.cpp',
-				'opengl/GLTextLabel.cpp',
-				'opengl/GLWindow.cpp',
-				'opengl/GLWindowsManager.cpp',
-				'opengl/GLUtils.cpp'],
-			LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
-	])
+	yadeStaticOrSharedLib('yade-opengl',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp'],LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
 
-if 'GTS' in env['features']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/py/gts',[
-		env.SharedLibrary('_gts',['py/pygts-0.3.1/cleanup.c','py/pygts-0.3.1/edge.c','py/pygts-0.3.1/face.c','py/pygts-0.3.1/object.c','py/pygts-0.3.1/point.c','py/pygts-0.3.1/pygts.c','py/pygts-0.3.1/segment.c','py/pygts-0.3.1/surface.c','py/pygts-0.3.1/triangle.c','py/pygts-0.3.1/vertex.c'],SHLIBPREFIX='',CPPDEFINES=env['CPPDEFINES']+['PYGTS_HAS_NUMPY']),
-		env.File('py/pygts-0.3.1/__init__.py'),
-		env.File('py/pygts-0.3.1/pygts.py')
-	])
-	#
-	# the _packPredicates module needs to link to us, but linker by defaults looks for lib*.so files
-	# Therefore we will create symlink with that name (in lib/ rather than py/gts, so that it is in the RPATH
-	# without further modifications). If the file were copied (installed 2 times), static data would be
-	# created twice and it would break python type identification (among other things).
-	#
-	env.Command('$PREFIX/lib/yade$SUFFIX/lib/lib_gts__python-module.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so','ln -s -f ../py/gts/_gts.so $TARGET')
+yadeStaticOrSharedLib('yade-base',['base/yadeWm3Extra.cpp'],LIBS=env['LIBS']),
+yadeStaticOrSharedLib('yade-computational-geometry',['computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp'],LIBS=env['LIBS']+['yade-base']),
+yadeStaticOrSharedLib('yade-factory',['factory/ClassFactory.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp']),
+yadeStaticOrSharedLib('yade-multimethods',['multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp']),
+yadeStaticOrSharedLib('XMLFormatManager',['serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp'],LIBS=env['LIBS']+['yade-base','yade-serialization']),
+yadeStaticOrSharedLib('yade-serialization',['serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp'],LIBS=env['LIBS']+['yade-base','yade-factory']),
 
+# for now, keep this is as a shared lib, since it depends on things from pkg (shouldn't be the case, though...)
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-
-	env.SharedLibrary('yade-base',
-		['base/yadeWm3Extra.cpp'],
-		LIBS=env['LIBS']),
-
-	env.SharedLibrary('miniWm3',
-		['miniWm3/Wm3Math.cpp',
-			'miniWm3/Wm3Matrix3.cpp',
-			'miniWm3/Wm3Quaternion.cpp',
-			'miniWm3/Wm3Vector3.cpp',
-			'miniWm3/Wm3Matrix2.cpp',
-			'miniWm3/Wm3Matrix4.cpp',
-			'miniWm3/Wm3Vector2.cpp',
-			'miniWm3/Wm3Vector4.cpp',
-			'miniWm3/Wm3Memory.cpp',
-			'miniWm3/Wm3String.cpp',
-			'miniWm3/Wm3System.cpp'],
-		# miniWm3 cannot link with itself, filter it out.
-		LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
-		# miniWm3 will be always optimized and without debugging info, even in debug builds; suppress all warnings
-		CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w']),
-
-		env.SharedLibrary('sqlite3x',Split('''
-			sqlite3x/sqlite3x_command.cpp
-			sqlite3x/sqlite3x_connection.cpp
-			sqlite3x/sqlite3x_cursor.cpp
-			sqlite3x/sqlite3x_exception.cpp
-			sqlite3x/sqlite3x_settings_db.cpp
-			sqlite3x/sqlite3x_transaction.cpp'''),LIBS='sqlite3',CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),
-
-	env.SharedLibrary('yade-computational-geometry',
-		['computational-geometry/Distances2D.cpp',
-			'computational-geometry/Distances3D.cpp',
-			'computational-geometry/Intersections2D.cpp',
-			'computational-geometry/Intersections3D.cpp',
-			'computational-geometry/MarchingCube.cpp'],
-		LIBS=env['LIBS']+['yade-base']),
-
-	env.SharedLibrary('yade-factory',
-		['factory/ClassFactory.cpp',
-			'factory/DynLibManager.cpp',
-			'factory/FactoryExceptions.cpp']),
-
-	env.SharedLibrary('yade-loki',
-		['loki/_dummySourceFile.cpp']),
-
-	env.SharedLibrary('yade-multimethods',
-		['multimethods/Indexable.cpp',
-			'multimethods/MultiMethodsExceptions.cpp']),
-
-	env.SharedLibrary('XMLFormatManager',
-		['serialization-xml/XMLFormatManager.cpp',
-			'serialization-xml/XMLSaxParser.cpp'],
-		LIBS=env['LIBS']+['yade-base','yade-serialization']), #,'BINFormatManager']),
-
-	env.SharedLibrary('yade-serialization',
-		['serialization/Archive.cpp',
-			'serialization/IOFormatManager.cpp',
-			'serialization/IOManagerExceptions.cpp',
-			'serialization/FormatChecker.cpp',
-			'serialization/Serializable.cpp',
-			'serialization/SerializableSingleton.cpp',
-			'serialization/SerializationExceptions.cpp'],
-		LIBS=env['LIBS']+['yade-base','yade-factory']),
-
-	env.SharedLibrary('STLImporter',
-		['import/STLReader.cpp', 'import/STLImporter.cpp'],
-		LIBS=env['LIBS']+['Facet','InteractingFacet','Shop']),
-
+	env.SharedLibrary('STLImporter',['import/STLReader.cpp', 'import/STLImporter.cpp'],LIBS=linkPlugins(['Facet','InteractingFacet','Shop'])
+		),
 ])
 
+#######################
+###### 3rd party libs
+#######################
+
+yadeStaticOrSharedLib('miniWm3',
+	env.Combine('miniWm3.cpp',['miniWm3/Wm3Math.cpp','miniWm3/Wm3Matrix3.cpp','miniWm3/Wm3Quaternion.cpp','miniWm3/Wm3Vector3.cpp','miniWm3/Wm3Matrix2.cpp','miniWm3/Wm3Matrix4.cpp','miniWm3/Wm3Vector2.cpp','miniWm3/Wm3Vector4.cpp','miniWm3/Wm3Memory.cpp','miniWm3/Wm3String.cpp','miniWm3/Wm3System.cpp']),
+	# miniWm3 cannot link with itself, filter it out.
+	LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
+	# miniWm3 will be always optimized and without debugging info, even in debug builds; suppress all warnings
+	CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w']),
+yadeStaticOrSharedLib('sqlite3x',Split('sqlite3x/sqlite3x_command.cpp sqlite3x/sqlite3x_connection.cpp sqlite3x/sqlite3x_cursor.cpp sqlite3x/sqlite3x_exception.cpp sqlite3x/sqlite3x_settings_db.cpp	sqlite3x/sqlite3x_transaction.cpp'),LIBS='sqlite3',CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),

@@ -121,4 +121,4 @@ another would be HerzMindlinContactModel
 		}
 	}
 };
-YADE_PLUGIN();
+YADE_PLUGIN("MacroMicroElasticRelationships");

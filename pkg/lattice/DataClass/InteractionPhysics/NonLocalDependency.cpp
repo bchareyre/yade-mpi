@@ -21,4 +21,4 @@ NonLocalDependency::~NonLocalDependency()
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("NonLocalDependency");

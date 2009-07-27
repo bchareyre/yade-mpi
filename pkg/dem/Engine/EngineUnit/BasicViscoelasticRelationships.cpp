@@ -99,4 +99,4 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
     contactPhysics->prevNormal = Vector3r(0,0,0);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("BasicViscoelasticRelationships");

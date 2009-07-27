@@ -93,7 +93,7 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 	}
 	int limit = Omega::instance().isoSec;
 
-	InteractionContainer* interactions = Omega::instance().getRootBody()->persistentInteractions.get();
+	InteractionContainer* interactions = Omega::instance().getRootBody()->interactions.get();
 	BodyContainer* bodies = Omega::instance().getRootBody()->bodies.get();
 
 	InteractionContainer::iterator angles     = interactions->begin();
@@ -199,4 +199,5 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawLatticeInteractingGeometry");
+YADE_REQUIRE_FEATURE(OPENGL)

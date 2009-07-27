@@ -7,7 +7,7 @@
 *************************************************************************/
 #pragma once
 //#include <yade/core/InteractionPhysics.hpp>
-#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 class CapillaryParameters : public ElasticContactInteraction
 {

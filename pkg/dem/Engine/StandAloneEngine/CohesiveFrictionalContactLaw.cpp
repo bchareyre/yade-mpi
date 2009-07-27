@@ -15,7 +15,7 @@
 #include<yade/core/MetaBody.hpp>
 
 
-Vector3r translation_vect (0.10,0,0);
+Vector3r translation_vect_ (0.10,0,0);
 
 
 CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver()
@@ -362,7 +362,7 @@ currentContactPhysics->moment_bending = moment_bending;
                 if ((static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken == true)
                 {
                     if (b->isDynamic)
-                        (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->se3.position += translation_vect;
+                        (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->se3.position += translation_vect_;
                     b->isDynamic = false;
                     b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
 
@@ -377,4 +377,4 @@ currentContactPhysics->moment_bending = moment_bending;
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("CohesiveFrictionalContactLaw");

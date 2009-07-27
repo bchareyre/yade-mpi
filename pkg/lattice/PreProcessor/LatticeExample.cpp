@@ -34,7 +34,7 @@
 
 #include<yade/pkg-common/AABB.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
 
 #include<yade/pkg-common/DisplacementEngine.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
@@ -600,7 +600,7 @@ bool LatticeExample::generate()
 			if( ! ( body->getGroupMask() & beamGroupMask ) )
 				continue; // skip non-beams
 				
-			calcBeamAngles(body,rootBody->bodies.get(),rootBody->persistentInteractions.get());
+			calcBeamAngles(body,rootBody->bodies.get(),rootBody->interactions.get());
                 }
         }
 	
@@ -1915,4 +1915,4 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("LatticeExample");

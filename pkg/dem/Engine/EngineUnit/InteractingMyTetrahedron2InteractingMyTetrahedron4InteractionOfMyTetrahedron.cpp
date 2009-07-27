@@ -90,4 +90,4 @@ bool InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedro
 	return isInteracting;
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron");

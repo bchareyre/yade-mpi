@@ -30,4 +30,4 @@ void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& 
 };
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("ElasticBodySimpleRelationship");

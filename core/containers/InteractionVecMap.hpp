@@ -1,4 +1,5 @@
 // 2008 © Sergei Dorofeenko <sega@users.berlios.de>
+#pragma once
 
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/core/Interaction.hpp>

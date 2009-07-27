@@ -35,6 +35,6 @@ class ViscousForceDamping : public InteractionSolver
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 };
 
-REGISTER_SERIALIZABLE(ViscousForceDamping,false);
+REGISTER_SERIALIZABLE(ViscousForceDamping);
 
 

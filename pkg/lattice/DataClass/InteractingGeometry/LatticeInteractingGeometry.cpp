@@ -19,4 +19,4 @@ LatticeInteractingGeometry::~LatticeInteractingGeometry ()
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("LatticeInteractingGeometry");

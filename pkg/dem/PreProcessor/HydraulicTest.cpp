@@ -44,7 +44,7 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
 
 #include<yade/pkg-common/TranslationEngine.hpp>
 
@@ -192,7 +192,7 @@ bool HydraulicTest::generate()
 
 /////////////////////////////////////
 
-//  rootBody->persistentInteractions->clear();
+//  rootBody->interactions->clear();
 //
 //  shared_ptr<Body> bodyA;
 //
@@ -243,14 +243,14 @@ bool HydraulicTest::generate()
 //     link->isReal     = true;
 //     link->isNew     = false;
 //
-//     rootBody->persistentInteractions->insert(link);
+//     rootBody->interactions->insert(link);
 //    }*/
 //    }
 //   }
 //  }
 
 	/* message="total number of permament links created: "
-	  + lexical_cast<string>(rootBody->persistentInteractions->size())
+	  + lexical_cast<string>(rootBody->interactions->size())
 	  + "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!";
 	*/
 	rootBody->engines= metaBodyWithSpheres->engines; //Andrea put his dirty hands here!!
@@ -315,4 +315,4 @@ bool HydraulicTest::inside(Vector3r pos)
 	return true;
 };
 
-YADE_PLUGIN();
+YADE_PLUGIN("HydraulicTest");

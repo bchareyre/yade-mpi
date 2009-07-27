@@ -76,4 +76,4 @@ void FEMLaw::action(MetaBody* fem)
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("FEMLaw");

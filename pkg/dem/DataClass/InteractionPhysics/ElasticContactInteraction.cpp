@@ -10,6 +10,5 @@ ElasticContactInteraction::~ElasticContactInteraction()
 {
 }
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("ElasticContactInteraction");
 //YADE_PLUGIN("ElasticContactInteraction");

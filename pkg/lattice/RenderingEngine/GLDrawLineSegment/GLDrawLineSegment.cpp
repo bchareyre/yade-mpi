@@ -65,4 +65,5 @@ void GLDrawLineSegment::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	}
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawLineSegment");
+YADE_REQUIRE_FEATURE(OPENGL)

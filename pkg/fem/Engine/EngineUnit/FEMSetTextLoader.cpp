@@ -128,4 +128,4 @@ void FEMSetTextLoader::createTetrahedron(  const MetaBody* rootBody
 	body->physicalParameters	= physics;
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("FEMSetTextLoader");

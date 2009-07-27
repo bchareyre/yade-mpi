@@ -24,4 +24,4 @@ ColorScale::~ColorScale ()
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("ColorScale");

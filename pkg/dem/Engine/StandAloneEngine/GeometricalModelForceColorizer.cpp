@@ -82,4 +82,4 @@ void GeometricalModelForceColorizer::action(MetaBody * ncb)
 		
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GeometricalModelForceColorizer");

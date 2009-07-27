@@ -123,7 +123,7 @@ bool SDECLinkedSpheres::generate()
 	
 /////////////////////////////////////
 
-	rootBody->persistentInteractions->clear();
+	rootBody->interactions->clear();
 	
 	shared_ptr<Body> bodyA;
 
@@ -170,13 +170,13 @@ bool SDECLinkedSpheres::generate()
 
 				link->interactionGeometry 		= geometry;
 				link->interactionPhysics 		= physics;
-				rootBody->persistentInteractions->insert(link);
+				rootBody->interactions->insert(link);
 			}
 		}
 	}
 	
 	message="total number of permament links created: " 
-		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
+		+ lexical_cast<string>(rootBody->interactions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"
 		+"\nWARNING: interactions will not generate any force since we use SpheresContactGeometry instead of SDECLinkGeometry now.";
 	return true;
@@ -367,4 +367,4 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("SDECLinkedSpheres");

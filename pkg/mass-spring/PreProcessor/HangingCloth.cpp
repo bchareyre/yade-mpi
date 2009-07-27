@@ -198,7 +198,7 @@ bool HangingCloth::generate()
 	rootBody->boundingVolume			= aabb;
 	rootBody->physicalParameters	= physics2;
 
-	rootBody->persistentInteractions->clear();
+	rootBody->interactions->clear();
 
 // make mesh
 	
@@ -251,9 +251,9 @@ bool HangingCloth::generate()
 			mesh2d->edges.push_back(Edge(offset(i,j),offset(i,j+1)));
 			mesh2d->edges.push_back(Edge(offset(i,j+1),offset(i+1,j)));
 
-			rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,j),offset(i+1,j)));
-			rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,j),offset(i,j+1)));
-			rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,j+1),offset(i+1,j)));
+			rootBody->interactions->insert(createSpring(rootBody,offset(i,j),offset(i+1,j)));
+			rootBody->interactions->insert(createSpring(rootBody,offset(i,j),offset(i,j+1)));
+			rootBody->interactions->insert(createSpring(rootBody,offset(i,j+1),offset(i+1,j)));
 
 			vector<int> face1,face2;
 			face1.push_back(offset(i,j));
@@ -271,14 +271,14 @@ bool HangingCloth::generate()
 	for(int i=0;i<width-1;i++)
 	{
 		mesh2d->edges.push_back(Edge(offset(i,height-1),offset(i+1,height-1)));
-		rootBody->persistentInteractions->insert(createSpring(rootBody,offset(i,height-1),offset(i+1,height-1)));
+		rootBody->interactions->insert(createSpring(rootBody,offset(i,height-1),offset(i+1,height-1)));
 
 	}
 
 	for(int j=0;j<height-1;j++)
 	{
 		mesh2d->edges.push_back(Edge(offset(width-1,j),offset(width-1,j+1)));
-		rootBody->persistentInteractions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
+		rootBody->interactions->insert(createSpring(rootBody,offset(width-1,j),offset(width-1,j+1)));
 	}
 
 	if (fixPoint1)
@@ -380,7 +380,7 @@ bool HangingCloth::generate()
 	
 					link->interactionGeometry 		= geometry;
 					link->interactionPhysics 		= physics;
-					rootBody->persistentInteractions->insert(link);
+					rootBody->interactions->insert(link);
 					++linksNum;
 				}
 			}
@@ -505,4 +505,4 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->physicalParameters	= physics;
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("HangingCloth");

@@ -16,11 +16,13 @@
 
 class Body;
 
-class Engine : public Serializable
-{
-	public :
-		string label; /* user-definable label, to convenienty retrieve this particular engine instance even if multiple engines of the same type exist */
-		TimingInfo timingInfo; // hihg-level profiling information; not serializable
+class Engine: public Serializable{
+	public:
+		//! user-definable label, to convenienty retrieve this particular engine instance even if multiple engines of the same type exist
+		string label;
+		//! high-level profiling information; not serializable
+		TimingInfo timingInfo; 
+		//! precise profiling information (timing of fragments of the engine)
 		shared_ptr<TimingDeltas> timingDeltas;
 		Engine() {};
 		virtual ~Engine() {};

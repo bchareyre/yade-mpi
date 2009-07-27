@@ -20,4 +20,5 @@ void GLDrawAABB::go(const shared_ptr<BoundingVolume>& bv)
 	glutWireCube(1);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawAABB");
+YADE_REQUIRE_FEATURE(OPENGL)

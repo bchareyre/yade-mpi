@@ -18,4 +18,4 @@ InteractingBox::~InteractingBox ()
 {		
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingBox");

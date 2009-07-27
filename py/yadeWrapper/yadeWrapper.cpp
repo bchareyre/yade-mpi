@@ -8,8 +8,10 @@
 
 
 #include<boost/python.hpp>
+#include <boost/python/raw_function.hpp>
 #include<boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include<boost/bind.hpp>
+#include<boost/lambda/bind.hpp>
 #include<boost/thread/thread.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
@@ -59,13 +61,12 @@
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 
 using namespace boost;
 using namespace std;
 
-#include<yade/gui-py/pyAttrUtils.hpp>
 #include<yade/extra/boost_python_len.hpp>
 
 class RenderingEngine;
@@ -74,13 +75,13 @@ class RenderingEngine;
 	
 	A regular class (not Omega) is instantiated like this:
 
-		RootClass('optional class name as quoted string',{optional dictionary of attributes})
+		RootClass('optional class name as quoted string',attribute1=value1,attribute2=value2,...)
 		
 	if class name is not given, the RootClass itself is instantiated
 
 		p=PhysicalParameters() # p is now instance of PhysicalParameters
 		p=PhysicalParameters('RigidBodyParameters') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
-		p=PhysicalParameters('RigidBodyParameters',{'mass':100,'se3':[1,1,2,1,0,0,0]}) # convenience constructor
+		p=PhysicalParameters('RigidBodyParameters',mass=100,se3=(Vector3(1,1,2),Quaternion.IDENTITY)) # convenience constructor
 
 	The last statement is equivalent to:
 
@@ -96,8 +97,8 @@ class RenderingEngine;
 	Those attributes that are not fundamental types (strings, numbers, booleans, se3, vectors, quaternions, arrays of numbers, arrays of strings) can be accessed only through explicit python data members, for example:
 		
 		b=Body()
-		b.mold=InteractingGeometry("InteractingSphere",{'radius':1})
-		b.shape=GeometricalModel("Sphere",{'radius':1})
+		b.mold=InteractingGeometry("InteractingSphere",radius=1)
+		b.shape=GeometricalModel("Sphere",radius=1)
 		b.mold # will give you the interactingGeometry of body
 	
 	Instances can be queried about attributes and data members they have:
@@ -114,90 +115,15 @@ class RenderingEngine;
 		m=MetaEntine('class name as string')
 		m.functors=[list of engine units]
 
-	It is your responsibility to pass the right engineUnits, otherwise crash will results. There is currently no way I know of to prevent that. 
-
-*/
-
-/*
-TODO:
-	1. PhysicalActionContainer (constructor with actionName) with iteration
-	2. from yadeControl import Omega as _Omega, inherit from that and add other convenience functions
 */
 
 #ifdef LOG4CXX
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
 #endif
 
+
+#if 0
 BASIC_PY_PROXY(pyGeneric,Serializable);
-
-BASIC_PY_PROXY(pyInteractionGeometry,InteractionGeometry);
-BASIC_PY_PROXY(pyInteractionPhysics,InteractionPhysics);
-
-BASIC_PY_PROXY(pyGeometricalModel,GeometricalModel);
-BASIC_PY_PROXY_HEAD(pyPhysicalParameters,PhysicalParameters)
-	python::list blockedDOFs_get(){
-		python::list ret;
-		#define _SET_DOF(DOF_ANY,str) if((proxee->blockedDOFs & PhysicalParameters::DOF_ANY)!=0) ret.append(str);
-		_SET_DOF(DOF_X,"x"); _SET_DOF(DOF_Y,"y"); _SET_DOF(DOF_Z,"z"); _SET_DOF(DOF_RX,"rx"); _SET_DOF(DOF_RY,"ry"); _SET_DOF(DOF_RZ,"rz");
-		#undef _SET_DOF
-		return ret;
-	}
-	void blockedDOFs_set(python::list l){
-		proxee->blockedDOFs=PhysicalParameters::DOF_NONE;
-		int len=python::len(l);
-		for(int i=0; i<len; i++){
-			string s=python::extract<string>(l[i])();
-			#define _GET_DOF(DOF_ANY,str) if(s==str) { proxee->blockedDOFs|=PhysicalParameters::DOF_ANY; continue; }
-			_GET_DOF(DOF_X,"x"); _GET_DOF(DOF_Y,"y"); _GET_DOF(DOF_Z,"z"); _GET_DOF(DOF_RX,"rx"); _GET_DOF(DOF_RY,"ry"); _GET_DOF(DOF_RZ,"rz");
-			#undef _GET_DOF
-			throw std::invalid_argument("Invalid  DOF specification `"+s+"', must be ∈{x,y,z,rx,ry,rz}.");
-		}
-	}
-	Vector3r displ_get(){return proxee->se3.position-proxee->refSe3.position;}
-	python::tuple rot_get(){Quaternionr relRot=proxee->refSe3.orientation.Conjugate()*proxee->se3.orientation; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); axis*=angle; return python::make_tuple(axis[0],axis[1],axis[2]); }
-	Vector3r pos_get(){return proxee->se3.position;}
-	Vector3r refPos_get(){return proxee->refSe3.position;}
-	python::tuple ori_get(){Vector3r axis; Real angle; proxee->se3.orientation.ToAxisAngle(axis,angle); return python::make_tuple(axis[0],axis[1],axis[2],angle);}
-	void pos_set(const Vector3r& p){ proxee->se3.position=p; }
-	void refPos_set(const Vector3r& p){ proxee->refSe3.position=p;}
-	void ori_set(python::list l){if(python::len(l)!=4) throw invalid_argument("Wrong number of quaternion elements "+lexical_cast<string>(python::len(l))+", should be 4"); proxee->se3.orientation=Quaternionr(Vector3r(python::extract<double>(l[0])(),python::extract<double>(l[1])(),python::extract<double>(l[2])()),python::extract<double>(l[3])());}
-BASIC_PY_PROXY_TAIL;
-
-BASIC_PY_PROXY_HEAD(pyBoundingVolume,BoundingVolume)
-	Vector3r min_get(){return proxee->min;}
-	Vector3r max_get(){return proxee->max;}
-BASIC_PY_PROXY_TAIL;
-
-BASIC_PY_PROXY(pyInteractingGeometry,InteractingGeometry);
-
-struct pyTimingDeltas{
-	shared_ptr<TimingDeltas> proxee;
-	pyTimingDeltas(shared_ptr<TimingDeltas> td){proxee=td;}
-	python::list data_get(){
-		python::list ret;
-		for(size_t i=0; i<proxee->data.size(); i++){
-			ret.append(python::make_tuple(proxee->labels[i],proxee->data[i].nsec,proxee->data[i].nExec));
-		}
-		return ret;
-	}
-	void reset(){proxee->data.clear(); proxee->labels.clear();}
-};
-
-#define PY_PROXY_TIMING \
-	TimingInfo::delta execTime_get(void){return proxee->timingInfo.nsec;} void execTime_set(TimingInfo::delta t){proxee->timingInfo.nsec=t;} \
-	long execCount_get(void){return proxee->timingInfo.nExec;} void execCount_set(long n){proxee->timingInfo.nExec=n;} \
-	python::object timingDeltas_get(void){return proxee->timingDeltas?python::object(pyTimingDeltas(proxee->timingDeltas)):python::object();}
-
-
-BASIC_PY_PROXY_HEAD(pyDeusExMachina,DeusExMachina)
-	PY_PROXY_TIMING
-BASIC_PY_PROXY_TAIL;
-
-BASIC_PY_PROXY_HEAD(pyStandAloneEngine,StandAloneEngine)
-	PY_PROXY_TIMING
-BASIC_PY_PROXY_TAIL;
-	
-
 python::list anyEngines_get(const vector<shared_ptr<Engine> >&);
 void anyEngines_set(vector<shared_ptr<Engine> >&, python::object);
 
@@ -227,135 +153,31 @@ BASIC_PY_PROXY_HEAD(pyParallelEngine,ParallelEngine)
 		return ret;
 	}
 BASIC_PY_PROXY_TAIL;
-
-
-BASIC_PY_PROXY_HEAD(pyEngineUnit,EngineUnit)
-	python::list bases_get(void){ python::list ret; vector<string> t=proxee->getFunctorTypes(); for(size_t i=0; i<t.size(); i++) ret.append(t[i]); return ret; }
-	python::object timingDeltas_get(){return proxee->timingDeltas?python::object(pyTimingDeltas(proxee->timingDeltas)):python::object();}
-BASIC_PY_PROXY_TAIL;
-
-BASIC_PY_PROXY_HEAD(pyMetaEngine,MetaEngine)
-		// additional constructor
-		pyMetaEngine(string clss, python::list functors){init(clss); functors_set(functors);}
-		python::list functors_get(void){
-			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine (?!)"); python::list ret;
-			/* garbage design: functorArguments are instances of EngineUnits, but they may not be present; therefore, only use them if they exist; our pyMetaEngine, however, will always have both names and EnguneUnit objects in the same count */
-			for(size_t i=0; i<me->functorNames.size(); i++){
-				shared_ptr<EngineUnit> eu;
-				string functorName(*(me->functorNames[i].rbegin()));
-				if(i<=me->functorArguments.size()){ /* count i-th list member */ size_t j=0;
-					for(list<shared_ptr<EngineUnit> >::iterator I=me->functorArguments.begin(); I!=me->functorArguments.end(); I++, j++) { if(j==i) { eu=(*I); break;}}
-				}
-				if(!eu) /* either list was shorter or empty pointer in the functorArguments list */ { eu=dynamic_pointer_cast<EngineUnit>(ClassFactory::instance().createShared(functorName)); if(!eu) throw runtime_error("Unable to construct `"+string(*(me->functorNames[i].rbegin()))+"' EngineUnit"); }
-				assert(eu);
-				ret.append(pyEngineUnit(eu));
-			}
-			return ret;
-		}
-		void functors_set(python::list ftrs){
-			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(proxee); if(!me) throw runtime_error("Proxied class not a MetaEngine. (?!)");
-			me->clear(); int len=python::len(ftrs);
-			for(int i=0; i<len; i++){
-				python::extract<pyEngineUnit> euEx(ftrs[i]); if(!euEx.check()) throw invalid_argument("Unable to extract type EngineUnit from sequence.");
-				bool ok=false;
-				/* FIXME: casting engine unit to the right type via dynamic_cast doesn't work (always unusuccessful),
-				 * do static_cast and if the EngineUnit is of wrong type, it will crash badly immediately. */
-				// #define TRY_ADD_FUNCTOR(P,Q) {shared_ptr<P> p(dynamic_pointer_cast<P>(me)); shared_ptr<EngineUnit> eu(euEx().proxee); if(p&&eu){p->add(static_pointer_cast<Q>(eu)); ok=true; }}
-				#define TRY_ADD_FUNCTOR(P,Q) {shared_ptr<P> p(dynamic_pointer_cast<P>(me)); shared_ptr<Q> eu(dynamic_pointer_cast<Q>(euEx().proxee)); if(p&&eu){p->add(eu); ok=true; }}
-				// shared_ptr<Q> q(dynamic_pointer_cast<Q>(eu)); cerr<<#P<<" "<<#Q<<":"<<(bool)p<<" "<<(bool)q<<endl;
-				TRY_ADD_FUNCTOR(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit);
-				TRY_ADD_FUNCTOR(GeometricalModelMetaEngine,GeometricalModelEngineUnit);
-				TRY_ADD_FUNCTOR(InteractingGeometryMetaEngine,InteractingGeometryEngineUnit);
-				TRY_ADD_FUNCTOR(InteractionGeometryMetaEngine,InteractionGeometryEngineUnit);
-				TRY_ADD_FUNCTOR(InteractionPhysicsMetaEngine,InteractionPhysicsEngineUnit);
-				TRY_ADD_FUNCTOR(PhysicalParametersMetaEngine,PhysicalParametersEngineUnit);
-				TRY_ADD_FUNCTOR(PhysicalActionDamper,PhysicalActionDamperUnit);
-				TRY_ADD_FUNCTOR(PhysicalActionApplier,PhysicalActionApplierUnit);
-				TRY_ADD_FUNCTOR(ConstitutiveLawDispatcher,ConstitutiveLaw);
-				if(!ok) throw runtime_error(string("Unable to cast to suitable MetaEngine type when adding functor (MetaEngine: ")+me->getClassName()+", functor: "+euEx().proxee->getClassName()+")");
-				#undef TRY_ADD_FUNCTOR
-			}
-		}
-	PY_PROXY_TIMING
-BASIC_PY_PROXY_TAIL;
-
-BASIC_PY_PROXY_HEAD(pyInteractionDispatchers,InteractionDispatchers)
-	pyInteractionDispatchers(python::list geomFunctors, python::list physFunctors, python::list constLawFunctors){
-		init("InteractionDispatchers");
-		pyMetaEngine(proxee->geomDispatcher).functors_set(geomFunctors);
-		pyMetaEngine(proxee->physDispatcher).functors_set(physFunctors);
-		pyMetaEngine(proxee->constLawDispatcher).functors_set(constLawFunctors);
-	}
-	pyMetaEngine geomDispatcher_get(void){ return pyMetaEngine(proxee->geomDispatcher);}
-	pyMetaEngine physDispatcher_get(void){ return pyMetaEngine(proxee->physDispatcher);}
-	pyMetaEngine constLawDispatcher_get(void){ return pyMetaEngine(proxee->constLawDispatcher);}
-	PY_PROXY_TIMING
-BASIC_PY_PROXY_TAIL;
-
-python::list anyEngines_get(const vector<shared_ptr<Engine> >& engContainer){
-	python::list ret; 
-	FOREACH(const shared_ptr<Engine>& eng, engContainer){
-		if(!eng) ret.append(python::object());
-		#define APPEND_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) { ret.append(pyEngineType(e)); continue; } }
-		APPEND_ENGINE_IF_POSSIBLE(InteractionDispatchers,pyInteractionDispatchers); APPEND_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine); APPEND_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine); APPEND_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina); APPEND_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine); 
-		throw std::runtime_error("Unknown engine type: `"+eng->getClassName()+"' (only MetaEngine, StandAloneEngine, DeusExMachina and ParallelEngine are supported)");
-	}
-	return ret;
-}
-
-void anyEngines_set(vector<shared_ptr<Engine> >& engContainer, python::object egs){
-	int len=python::len(egs);
-	//const shared_ptr<MetaBody>& rootBody=OMEGA.getRootBody(); rootBody->engines.clear();
-	engContainer.clear();
-	for(int i=0; i<len; i++){
-		#define PUSH_BACK_ENGINE_IF_POSSIBLE(pyEngineType) if(python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)).check()){ pyEngineType e=python::extract<pyEngineType>(PySequence_GetItem(egs.ptr(),i)); engContainer.push_back(e.proxee); /* cerr<<"added "<<e.pyStr()<<", a "<<#pyEngineType<<endl; */ continue; }
-		PUSH_BACK_ENGINE_IF_POSSIBLE(pyStandAloneEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyMetaEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyDeusExMachina); PUSH_BACK_ENGINE_IF_POSSIBLE(pyParallelEngine); PUSH_BACK_ENGINE_IF_POSSIBLE(pyInteractionDispatchers);
-		throw std::runtime_error("Encountered unknown engine type (unable to extract from python object)");
-	}
-}
-
-
-
-BASIC_PY_PROXY_HEAD(pyInteraction,Interaction)
-	NONPOD_ATTRIBUTE_ACCESS(geom,pyInteractionGeometry,interactionGeometry);
-	NONPOD_ATTRIBUTE_ACCESS(phys,pyInteractionPhysics,interactionPhysics);
-	/* shorthands */ unsigned id1_get(void){ return proxee->getId1();} unsigned id2_get(void){ return proxee->getId2();}
-	bool isReal_get(void){ return proxee->isReal(); }
-BASIC_PY_PROXY_TAIL;
-
-BASIC_PY_PROXY_HEAD(pyBody,Body)
-	NONPOD_ATTRIBUTE_ACCESS(shape,pyGeometricalModel,geometricalModel);
-	NONPOD_ATTRIBUTE_ACCESS(mold,pyInteractingGeometry,interactingGeometry);
-	NONPOD_ATTRIBUTE_ACCESS(bound,pyBoundingVolume,boundingVolume);
-	NONPOD_ATTRIBUTE_ACCESS(phys,pyPhysicalParameters,physicalParameters);
-	unsigned id_get(){ return proxee->getId();}
-	int mask_get(){return proxee->groupMask;}
-	void mask_set(int m){ proxee->groupMask=m;}
-	bool dynamic_get(){ return proxee->isDynamic;} void dynamic_set(bool dyn){ proxee->isDynamic=dyn;}
-	bool isStandalone(){ return proxee->isStandalone();} bool isClumpMember(){ return proxee->isClumpMember();} bool isClump(){ return proxee->isClump();}
-BASIC_PY_PROXY_TAIL;
+#endif
 
 class pyBodyContainer{
 	public:
 	const shared_ptr<BodyContainer> proxee;
 	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
-	pyBody pyGetitem(unsigned id){
-		if(id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return pyBody(); }
-		else return pyBody(proxee->operator[](id));
+	shared_ptr<Body> pyGetitem(body_id_t id){
+		if((size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
+		else return (*proxee)[id];
 	}
-	body_id_t insert(pyBody b){return proxee->insert(b.proxee);}
-	python::list insertList(python::list bb){python::list ret; for(int i=0; i<len(bb); i++){ret.append(insert(python::extract<pyBody>(bb[i])()));} return ret;}
-		python::tuple insertClump(python::list bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
-		python::list ids=insertList(bb);
+	body_id_t insert(shared_ptr<Body> b){ return proxee->insert(b); }
+	vector<body_id_t> insertList(vector<shared_ptr<Body> > bb){
+		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(insert(b));} return ret;
+	}
+	python::tuple insertClump(vector<shared_ptr<Body> > bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
+		vector<body_id_t> ids(insertList(bb));
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
 		shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
 		clump->isDynamic=true;
 		proxee->insert(clumpAsBody);
-		for(int i=0; i<len(ids); i++){clump->add(python::extract<body_id_t>(ids[i])());}
+		FOREACH(body_id_t id, ids) clump->add(id);
 		clump->updateProperties(false);
 		return python::make_tuple(clump->getId(),ids);
 	}
-	python::list replace(python::list bb){proxee->clear(); return insertList(bb);}
+	vector<body_id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return insertList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
 };
@@ -394,8 +216,8 @@ class pyInteractionIterator{
 	public:
 	pyInteractionIterator(const shared_ptr<InteractionContainer>& ic){ I=ic->begin(); Iend=ic->end(); }
 	pyInteractionIterator pyIter(){return *this;}
-	pyInteraction pyNext(){ if(!(I!=Iend)){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
-		InteractionContainer::iterator ret=I; ++I; return pyInteraction(*ret); }
+	shared_ptr<Interaction> pyNext(){ if(!(I!=Iend)){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
+		InteractionContainer::iterator ret=I; ++I; return *ret; }
 };
 
 class pyInteractionContainer{
@@ -403,42 +225,43 @@ class pyInteractionContainer{
 		const shared_ptr<InteractionContainer> proxee;
 		pyInteractionContainer(const shared_ptr<InteractionContainer>& _proxee): proxee(_proxee){}
 		pyInteractionIterator pyIter(){return pyInteractionIterator(proxee);}
-		pyInteraction pyGetitem(python::object id12){
-			if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
-			if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
-			python::extract<body_id_t> id1_(PySequence_GetItem(id12.ptr(),0)), id2_(PySequence_GetItem(id12.ptr(),1));
-			if(!id1_.check()) throw invalid_argument("Could not extract id1");
-			if(!id2_.check()) throw invalid_argument("Could not extract id2");
-			shared_ptr<Interaction> i=proxee->find(id1_(),id2_());
-			if(i) return pyInteraction(i); else throw invalid_argument("No such interaction.");
+		shared_ptr<Interaction> pyGetitem(vector<body_id_t> id12){
+			//if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
+			//if(python::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
+			if(id12.size()==2){
+				shared_ptr<Interaction> i=proxee->find(id12[0],id12[1]);
+				if(i) return i; else throw invalid_argument("No such interaction.");
+			}
+			else if(id12.size()==1){ return (*proxee)[id12[0]];}
+			else throw invalid_argument("2 integers (id1,id2) or 1 integer (nth) required.");
 		}
 		/* return nth _real_ iteration from the container (0-based index); this is to facilitate picking random interaction */
-		pyInteraction pyNth(long n){
-			long i=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(!I->isReal()) continue; if(i++==n) return pyInteraction(I); }
+		shared_ptr<Interaction> pyNth(long n){
+			long i=0; FOREACH(shared_ptr<Interaction> I, *proxee){ if(!I->isReal()) continue; if(i++==n) return I; }
 			throw invalid_argument(string("Interaction number out of range (")+lexical_cast<string>(n)+">="+lexical_cast<string>(i)+").");
 		}
 		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
-		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(pyInteraction(I));} return ret;}
-		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(pyInteraction(I));} return ret; }
+		python::list withBody(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal() && (I->getId1()==id || I->getId2()==id)) ret.append(I);} return ret;}
+		python::list withBodyAll(long id){ python::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->getId1()==id || I->getId2()==id) ret.append(I);} return ret; }
 		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
 };
 
-Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
 
 class pyBexContainer{
+		shared_ptr<MetaBody> rb;
 	public:
-		pyBexContainer(){}
-		python::tuple force_get(long id){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r f=rb->bex.getForce(id); return python::make_tuple(f[0],f[1],f[2]); }
-		python::tuple torque_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getTorque(id); return python::make_tuple(m[0],m[1],m[2]);}
-		python::tuple move_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getMove(id); return python::make_tuple(m[0],m[1],m[2]);}
-		python::tuple rot_get(long id){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.sync(); Vector3r m=rb->bex.getRot(id); return python::make_tuple(m[0],m[1],m[2]);}
-		void force_add(long id, const Vector3r& f){  MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addForce (id,f); }
-		void torque_add(long id, const Vector3r& t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addTorque(id,t);}
-		void move_add(long id, const Vector3r& t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addMove(id,t);}
-		void rot_add(long id, const Vector3r& t){ MetaBody* rb=Omega::instance().getRootBody().get(); rb->bex.addRot(id,t);}
+		pyBexContainer(){ rb=Omega::instance().getRootBody(); }
+		Vector3r force_get(long id){  rb->bex.sync(); return rb->bex.getForce(id); }
+		Vector3r torque_get(long id){ rb->bex.sync(); return rb->bex.getTorque(id); }
+		Vector3r move_get(long id){   rb->bex.sync(); return rb->bex.getMove(id); }
+		Vector3r rot_get(long id){    rb->bex.sync(); return rb->bex.getRot(id); }
+		void force_add(long id, const Vector3r& f){  rb->bex.addForce (id,f); }
+		void torque_add(long id, const Vector3r& t){ rb->bex.addTorque(id,t);}
+		void move_add(long id, const Vector3r& t){   rb->bex.addMove(id,t);}
+		void rot_add(long id, const Vector3r& t){    rb->bex.addRot(id,t);}
 };
 
 class pyOmega{
@@ -494,7 +317,6 @@ class pyOmega{
 	long iter(){ return OMEGA.getCurrentIteration();}
 	double simulationTime(){return OMEGA.getSimulationTime();}
 	double realTime(){ return OMEGA.getComputationTime(); }
-	// long realTime(){return OMEGA(get...);}
 	double dt_get(){return OMEGA.getTimeStep();}
 	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt);}
 
@@ -533,7 +355,7 @@ class pyOmega{
 	void tmpToFile(string mark, string filename){
 		if(OMEGA.memSavedSimulations.count(":memory:"+mark)==0) throw runtime_error("No memory-saved simulation named "+mark);
 		iostreams::filtering_ostream out;
-		if(boost::algorithm::ends_with(filename,".bz2")) out.push(iostreams::bzip2_compressor());
+		if(algorithm::ends_with(filename,".bz2")) out.push(iostreams::bzip2_compressor());
 		out.push(iostreams::file_sink(filename));
 		if(!out.good()) throw runtime_error("Error while opening file `"+filename+"' for writing.");
 		LOG_INFO("Saving :memory:"<<mark<<" to "<<filename);
@@ -560,40 +382,31 @@ class pyOmega{
 	python::list miscParams_get(){
 		python::list ret;
 		FOREACH(shared_ptr<Serializable>& s, OMEGA.getRootBody()->miscParams){
-			ret.append(pyGeneric(s));
+			ret.append(s);
 		}
 		return ret;
 	}
 
-	void miscParams_set(python::list l){
-		int len=python::len(l);
+	void miscParams_set(vector<shared_ptr<Serializable> > ss){
 		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getRootBody()->miscParams;
 		miscParams.clear();
-		for(int i=0; i<len; i++){
-			if(python::extract<pyGeneric>(PySequence_GetItem(l.ptr(),i)).check()){ pyGeneric g=python::extract<pyGeneric>(PySequence_GetItem(l.ptr(),i)); miscParams.push_back(g.proxee); }
-			else throw std::invalid_argument("Unable to extract `Generic' from item #"+lexical_cast<string>(i)+".");
+		FOREACH(shared_ptr<Serializable> s, ss){
+			miscParams.push_back(s);
 		}
 	}
 
-	python::list engines_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->engines);}
-	void engines_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->engines,egs); mapLabeledEntitiesToVariables(); }
-	python::list initializers_get(void){assertRootBody(); return anyEngines_get(OMEGA.getRootBody()->initializers);}
-	void initializers_set(python::object egs){assertRootBody(); anyEngines_set(OMEGA.getRootBody()->initializers,egs); OMEGA.getRootBody()->needsInitializers=true; }
+	vector<shared_ptr<Engine> > engines_get(void){assertRootBody(); return OMEGA.getRootBody()->engines;}
+	void engines_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getRootBody()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getRootBody()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
+	vector<shared_ptr<Engine> > initializers_get(void){assertRootBody(); return OMEGA.getRootBody()->initializers;}
+	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getRootBody()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getRootBody()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getRootBody()->needsInitializers=true; }
 
 	python::object labeled_engine_get(string label){
 		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getRootBody()->engines){
-			if(eng->label==label){
-				#define RETURN_ENGINE_IF_POSSIBLE(engineType,pyEngineType) { shared_ptr<engineType> e=dynamic_pointer_cast<engineType>(eng); if(e) return python::object(pyEngineType(e)); }
-				RETURN_ENGINE_IF_POSSIBLE(MetaEngine,pyMetaEngine);
-				RETURN_ENGINE_IF_POSSIBLE(StandAloneEngine,pyStandAloneEngine);
-				RETURN_ENGINE_IF_POSSIBLE(DeusExMachina,pyDeusExMachina);
-				RETURN_ENGINE_IF_POSSIBLE(ParallelEngine,pyParallelEngine);
-				throw std::runtime_error("Unable to cast engine to MetaEngine, StandAloneEngine, DeusExMachina or ParallelEngine? ??");
-			}
+			if(eng->label==label){ return python::object(eng); }
 			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(eng);
 			if(me){
 				FOREACH(const shared_ptr<EngineUnit>& eu, me->functorArguments){
-					if(eu->label==label) return python::object(pyEngineUnit(eu));
+					if(eu->label==label) return python::object(eu);
 				}
 			}
 			shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(eng);
@@ -603,7 +416,7 @@ class pyOmega{
 				FOREACH(const shared_ptr<EngineUnit>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<EngineUnit>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<EngineUnit>& eu,eus){
-					if(eu->label==label) return python::object(pyEngineUnit(eu));
+					if(eu->label==label) return python::object(eu);
 				}
 			}
 		}
@@ -616,8 +429,8 @@ class pyOmega{
 	pyBexContainer bex_get(void){return pyBexContainer();}
 	
 
-	boost::python::list listChildClasses(const string& base){
-		boost::python::list ret;
+	python::list listChildClasses(const string& base){
+		python::list ret;
 		for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
 		return ret;
 	}
@@ -626,9 +439,9 @@ class pyOmega{
 		return (Omega::instance().isInheritingFrom(child,base));
 	}
 
-	boost::python::list plugins_get(){
+	python::list plugins_get(){
 		const map<string,DynlibDescriptor>& plugins=Omega::instance().getDynlibsDescriptor();
-		std::pair<string,DynlibDescriptor> p; boost::python::list ret;
+		std::pair<string,DynlibDescriptor> p; python::list ret;
 		FOREACH(p, plugins) ret.append(p.first);
 		return ret;
 	}
@@ -663,11 +476,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_loadTmp_overloads,loadTmp,0,1);
 
-BASIC_PY_PROXY_HEAD(pyFileGenerator,FileGenerator)
-	void generate(string outFile){ proxee->setFileName(outFile); proxee->setSerializationLibrary("XMLFormatManager"); bool ret=proxee->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<proxee->message); if(ret==false) throw runtime_error("Generator reported error: "+proxee->message); };
-	void load(){  char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(result!=tmpnam_str) throw runtime_error(__FILE__ ": tmpnam(char*) failed!");  string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); this->generate(xml); pyOmega().load(xml); }
-BASIC_PY_PROXY_TAIL;
-
 class pySTLImporter : public STLImporter {
     public:
 	void py_import(pyBodyContainer bc, unsigned int begin=0, bool noInteractingGeometry=false) { import(bc.proxee,begin,noInteractingGeometry); }
@@ -676,9 +484,111 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,
 
 
 
+
+/*****************************************************************************
+********** New helper functions 
+****/
+void Serializable_updateAttrs(const shared_ptr<Serializable>& self, const python::dict& d){
+	python::list l=d.items(); size_t ll=python::len(l);
+	for(size_t i=0; i<ll; i++){
+		python::tuple t=python::extract<python::tuple>(l[i]); string key=python::extract<string>(t[0]); self->pySetAttr(key,t[1]);
+	}
+}
+python::list Serializable_updateExistingAttrs(const shared_ptr<Serializable>& self, const python::dict& d){
+	python::list ret; python::list l=d.items(); size_t ll=python::len(l);
+	for(size_t i=0; i<ll; i++){
+		python::tuple t=python::extract<python::tuple>(l[i]); string key=python::extract<string>(t[0]);
+		if(self->pyHasKey(key)) self->pySetAttr(key,t[1]); else ret.append(t[0]);
+	}
+	return ret; 
+}
+
+std::string Serializable_pyStr(const shared_ptr<Serializable>& self) {
+	std::string nameThis=self->getClassName(),nameRoot=self->pyRootClassName();
+	if(nameThis==nameRoot) return "<"+nameRoot+">";
+	else return "<"+nameThis+" "+nameRoot+">";
+}
+
+python::list TimingDeltas_pyData(const shared_ptr<TimingDeltas> self){
+	python::list ret;
+	for(size_t i=0; i<self->data.size(); i++){ ret.append(python::make_tuple(self->labels[i],self->data[i].nsec,self->data[i].nExec));}
+	return ret;
+}
+
+TimingInfo::delta Engine_timingInfo_nsec_get(const shared_ptr<Engine>& e){return e->timingInfo.nsec;}; void Engine_timingInfo_nsec_set(const shared_ptr<Engine>& e, TimingInfo::delta d){ e->timingInfo.nsec=d;}
+long Engine_timingInfo_nExec_get(const shared_ptr<Engine>& e){return e->timingInfo.nExec;}; void Engine_timingInfo_nExec_set(const shared_ptr<Engine>& e, long d){ e->timingInfo.nExec=d;}
+
+template <typename T>
+shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::dict& d){
+	if(python::len(t)>1) throw runtime_error("Zero or one (and not more) non-keyword string argument required");
+	string clss;
+	if(python::len(t)==1){
+		python::extract<string> clss_(t[0]); if(!clss_.check()) throw runtime_error("First argument (if given) must be a string.");
+		clss=clss_();
+	}
+	shared_ptr<T> instance;
+	if(clss.empty()){ instance=shared_ptr<T>(new T); }
+	else{
+		instance=dynamic_pointer_cast<T>(ClassFactory::instance().createShared(clss));
+		if(!instance) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to type `"+typeid(T).name()+"'");
+	}
+	Serializable_updateAttrs(instance,d);
+	return instance;
+}
+
+// FIXME: those could be moved to the c++ classes themselves, right?
+template<typename DispatcherT, typename functorT>
+shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<functorT> >& functors){
+	shared_ptr<DispatcherT> instance(new DispatcherT);
+	FOREACH(shared_ptr<functorT> functor,functors) instance->add(functor);
+	return instance;
+}
+
+// FIXME: this one as well
+shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryEngineUnit> >& gff, const std::vector<shared_ptr<InteractionPhysicsEngineUnit> >& pff, const std::vector<shared_ptr<ConstitutiveLaw> >& cff){
+	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
+	FOREACH(shared_ptr<InteractionGeometryEngineUnit> gf, gff) instance->geomDispatcher->add(gf);
+	FOREACH(shared_ptr<InteractionPhysicsEngineUnit> pf, pff) instance->physDispatcher->add(pf);
+	FOREACH(shared_ptr<ConstitutiveLaw> cf, cff) instance->constLawDispatcher->add(cf);
+	return instance;
+}
+// injected methods
+Vector3r PhysicalParameters_displ_get(const shared_ptr<PhysicalParameters>& pp){return pp->se3.position-pp->refSe3.position;}
+Vector3r PhysicalParameters_rot_get  (const shared_ptr<PhysicalParameters>& pp){Quaternionr relRot=pp->refSe3.orientation.Conjugate()*pp->se3.orientation; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); return axis*angle;  }
+Vector3r PhysicalParameters_pos_get(const shared_ptr<PhysicalParameters>& pp){return pp->se3.position;}
+Quaternionr PhysicalParameters_ori_get(const shared_ptr<PhysicalParameters>& pp){return pp->se3.orientation;}
+Vector3r PhysicalParameters_refPos_get(const shared_ptr<PhysicalParameters>& pp){return pp->refSe3.position;}
+void PhysicalParameters_pos_set(const shared_ptr<PhysicalParameters>& pp, const Vector3r& p){ pp->se3.position=p; }
+void PhysicalParameters_refPos_set(const shared_ptr<PhysicalParameters>& pp, const Vector3r& p){ pp->refSe3.position=p; }
+void PhysicalParameters_ori_set(const shared_ptr<PhysicalParameters>& pp, const Quaternionr& p){ pp->se3.orientation=p; }
+
+long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
+long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
+
+void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
+void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(result!=tmpnam_str) throw runtime_error(__FILE__ ": tmpnam(char*) failed!");  string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
+
+// many thanks to http://markmail.org/message/s4ksg6nfspw2wxwd
+namespace boost { namespace python { namespace detail {
+	template <class F> struct raw_constructor_dispatcher{
+		raw_constructor_dispatcher(F f): f(make_constructor(f)) {}
+		PyObject* operator()(PyObject* args, PyObject* keywords)
+		{
+			 borrowed_reference_t* ra = borrowed_reference(args); object a(ra);
+			 return incref(object(f(object(a[0]),object(a.slice(1,len(a))),keywords ? dict(borrowed_reference(keywords)) : dict())).ptr() );
+		}
+		private: object f;
+	};
+	}
+	template <class F> object raw_constructor(F f, std::size_t min_args = 0){
+		return detail::make_raw_function(objects::py_function(detail::raw_constructor_dispatcher<F>(f),mpl::vector2<void, object>(),min_args+1,(std::numeric_limits<unsigned>::max)()));
+	}
+}} // namespace boost::python
+
+
 BOOST_PYTHON_MODULE(wrapper)
 {
-	boost::python::class_<pyOmega>("Omega")
+	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter)
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set)
 		.add_property("time",&pyOmega::simulationTime)
@@ -718,12 +628,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set)
 		.add_property("numThreads",&pyOmega::numThreads_get,&pyOmega::numThreads_set)
 		;
-	boost::python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
+	python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
 		.def("__setitem__",&pyTags::setItem)
 		.def("keys",&pyTags::keys);
 	
-	boost::python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
+	python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
 		.def("__len__",&pyBodyContainer::length)
 		.def("append",&pyBodyContainer::insert)
@@ -731,7 +641,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("appendClumped",&pyBodyContainer::insertClump)
 		.def("clear", &pyBodyContainer::clear)
 		.def("replace",&pyBodyContainer::replace);
-	boost::python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
+	python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
@@ -742,11 +652,11 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
 		.def("nth",&pyInteractionContainer::pyNth)
 		.def("clear",&pyInteractionContainer::clear);
-	boost::python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
+	python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
 
-	boost::python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
+	python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
 		.def("f",&pyBexContainer::force_get)
 		.def("t",&pyBexContainer::torque_get)
 		.def("m",&pyBexContainer::torque_get) // for compatibility with ActionContainer
@@ -757,12 +667,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("addMove",&pyBexContainer::move_add)
 		.def("addRot",&pyBexContainer::rot_add);
 
-	boost::python::class_<pyTimingDeltas>("TimingDeltas",python::init<pyTimingDeltas&>())
-		.def("reset",&pyTimingDeltas::reset)
-		.add_property("data",&pyTimingDeltas::data_get);
-
-	#define TIMING_PROPS(class) .add_property("execTime",&class::execTime_get,&class::execTime_set).add_property("execCount",&class::execCount_get,&class::execCount_set).add_property("timingDeltas",&class::timingDeltas_get)
-
+// keep for a while for reference, to make sure everything is wrapped as it was before
+#if 0
 	BASIC_PY_PROXY_WRAPPER(pyStandAloneEngine,"StandAloneEngine")
 		TIMING_PROPS(pyStandAloneEngine);
 	BASIC_PY_PROXY_WRAPPER(pyMetaEngine,"MetaEngine")
@@ -826,12 +732,101 @@ BOOST_PYTHON_MODULE(wrapper)
 	BASIC_PY_PROXY_WRAPPER(pyFileGenerator,"Preprocessor")
 		.def("generate",&pyFileGenerator::generate)
 		.def("load",&pyFileGenerator::load);
+#endif
 
-	boost::python::class_<pySTLImporter>("STLImporter")
+	python::class_<pySTLImporter>("STLImporter")
 	    .def("open",&pySTLImporter::open)
 	    .add_property("number_of_facets",&pySTLImporter::number_of_facets)
 	    .def_readwrite("wire",&pySTLImporter::wire)
 	    .def("import_geometry",&pySTLImporter::py_import,STLImporter_import_overloads());
+
+//////////////////////////////////////////////////////////////
+///////////// proxyless wrappers 
+
+	/* TODO: bases for functors; functors for dispatchers; ParallelEngine (?) */
+
+	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
+		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable_pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes)
+		.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys).
+		def("updateAttrs",&Serializable_updateAttrs).def("updateExistingAttrs",&Serializable_updateExistingAttrs)
+		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
+		;
+	python::class_<Engine, shared_ptr<Engine>, python::bases<Serializable>, noncopyable >("Engine",python::no_init)
+		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
+		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
+		.def_readonly("timingDeltas",&Engine::timingDeltas);
+	python::class_<StandAloneEngine,shared_ptr<StandAloneEngine>, python::bases<Engine>, noncopyable>("StandAloneEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Engine>));
+	python::class_<DeusExMachina,shared_ptr<DeusExMachina>, python::bases<Engine>, noncopyable>("DeusExMachina").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Engine>));
+	python::class_<EngineUnit, shared_ptr<EngineUnit>, python::bases<Serializable>, noncopyable >("EngineUnit")
+		.def_readonly("timingDeltas",&EngineUnit::timingDeltas)
+		.add_property("bases",&EngineUnit::getFunctorTypes);
+	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas_pyData).def("reset",&TimingDeltas::reset);
+
+	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers").def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists));
+	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Engine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>));
+		EXPOSE_DISPATCHER(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit)
+		EXPOSE_DISPATCHER(GeometricalModelMetaEngine,GeometricalModelEngineUnit)
+		EXPOSE_DISPATCHER(InteractingGeometryMetaEngine,InteractingGeometryEngineUnit)
+		EXPOSE_DISPATCHER(InteractionGeometryMetaEngine,InteractionGeometryEngineUnit)
+		EXPOSE_DISPATCHER(InteractionPhysicsMetaEngine,InteractionPhysicsEngineUnit)
+		EXPOSE_DISPATCHER(PhysicalParametersMetaEngine,PhysicalParametersEngineUnit)
+		EXPOSE_DISPATCHER(PhysicalActionDamper,PhysicalActionDamperUnit)
+		EXPOSE_DISPATCHER(PhysicalActionApplier,PhysicalActionApplierUnit)
+		EXPOSE_DISPATCHER(ConstitutiveLawDispatcher,ConstitutiveLaw)
+	#undef EXPOSE_DISPATCHER
+
+	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<EngineUnit>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
+		EXPOSE_FUNCTOR(BoundingVolumeEngineUnit)
+		EXPOSE_FUNCTOR(GeometricalModelEngineUnit)
+		EXPOSE_FUNCTOR(InteractingGeometryEngineUnit)
+		EXPOSE_FUNCTOR(InteractionGeometryEngineUnit)
+		EXPOSE_FUNCTOR(InteractionPhysicsEngineUnit)
+		EXPOSE_FUNCTOR(PhysicalParametersEngineUnit)
+		EXPOSE_FUNCTOR(PhysicalActionDamperUnit)
+		EXPOSE_FUNCTOR(PhysicalActionApplierUnit)
+		EXPOSE_FUNCTOR(ConstitutiveLaw)
+	#undef EXPOSE_FUNCTOR
+
+		
+	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>))
+	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
+
+	EXPOSE_CXX_CLASS(Body)
+		.def_readwrite("shape",&Body::geometricalModel)
+		.def_readwrite("mold",&Body::interactingGeometry)
+		.def_readwrite("bound",&Body::boundingVolume)
+		.def_readwrite("phys",&Body::physicalParameters)
+		.def_readwrite("dynamic",&Body::isDynamic)
+		.def_readonly("id",&Body::id)
+		.def_readwrite("mask",&Body::groupMask)
+		.add_property("isStandalone",&Body::isStandalone)
+		.add_property("isClumpMember",&Body::isClumpMember)
+		.add_property("isClump",&Body::isClump);
+	EXPOSE_CXX_CLASS(InteractingGeometry);
+	EXPOSE_CXX_CLASS(GeometricalModel);
+	EXPOSE_CXX_CLASS(BoundingVolume);
+	EXPOSE_CXX_CLASS(PhysicalParameters)
+		.add_property("blockedDOFs",&PhysicalParameters::blockedDOFs_vec_get,&PhysicalParameters::blockedDOFs_vec_set)
+		.add_property("pos",&PhysicalParameters_pos_get,&PhysicalParameters_pos_set)
+		.add_property("ori",&PhysicalParameters_ori_get,&PhysicalParameters_ori_set)
+		.add_property("refPos",&PhysicalParameters_refPos_get,&PhysicalParameters_refPos_set)
+		.add_property("displ",&PhysicalParameters_displ_get)
+		.add_property("rot",&PhysicalParameters_rot_get);
+	// interaction
+	EXPOSE_CXX_CLASS(Interaction)
+		.def_readwrite("phys",&Interaction::interactionPhysics)
+		.def_readwrite("geom",&Interaction::interactionGeometry)
+		.add_property("id1",&Interaction_getId1)
+		.add_property("id2",&Interaction_getId2)
+		.add_property("isReal",&Interaction::isReal);
+	EXPOSE_CXX_CLASS(InteractionPhysics);
+	EXPOSE_CXX_CLASS(InteractionGeometry);
+	EXPOSE_CXX_CLASS_RENAMED(FileGenerator,Preprocessor)
+		.def("generate",&FileGenerator_generate)
+		.def("load",&FileGenerator_load);
+
+	// containers & iterators
+	// BodyContainer
 	
 }
 

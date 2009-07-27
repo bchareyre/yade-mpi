@@ -7,7 +7,7 @@
 #include<boost/serialization/vector.hpp>
 #include<boost/serialization/shared_ptr.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include"BshSnowGrain.hpp"
+#include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<boost/tuple/tuple.hpp>
 
 struct depth_one

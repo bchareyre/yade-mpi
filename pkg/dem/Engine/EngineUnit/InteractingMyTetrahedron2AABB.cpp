@@ -43,4 +43,4 @@ void InteractingMyTetrahedron2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	aabb->max = max;	
 }
 	
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingMyTetrahedron2AABB");

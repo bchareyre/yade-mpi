@@ -4,7 +4,7 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 YADE_PLUGIN("CpmMat","Ip2_CpmMat_CpmMat_CpmPhys","CpmPhys","Law2_Dem3DofGeom_CpmPhys_Cpm","CpmGlobalCharacteristics",
 	#ifdef YADE_OPENGL
@@ -214,7 +214,6 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	/********************** GLDrawCpmPhys ****************************/
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	#include<yade/lib-opengl/GLUtils.hpp>
-	#include<yade/lib-QGLViewer/qglviewer.h>
 
 	CREATE_LOGGER(GLDrawCpmPhys);
 

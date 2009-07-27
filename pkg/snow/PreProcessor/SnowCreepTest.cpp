@@ -56,10 +56,10 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionHashMap.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
+#include<yade/core/InteractionHashMap.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -80,7 +80,7 @@ using namespace std;
 
 typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
+string GenerateCloud_snow(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
 SnowCreepTest::SnowCreepTest () : FileGenerator()
@@ -289,7 +289,7 @@ bool SnowCreepTest::generate()
 	
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
+	else message=GenerateCloud_snow(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -662,7 +662,7 @@ void SnowCreepTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
+string GenerateCloud_snow(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
 	static StdGenerator generator;
@@ -709,4 +709,4 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("SnowCreepTest");

@@ -10,6 +10,7 @@
 #include<GL/glut.h>
 
 YADE_PLUGIN("OpenGLRenderingEngine");
+YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(OpenGLRenderingEngine);
 
 bool OpenGLRenderingEngine::glutInitDone=false;

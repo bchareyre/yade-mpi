@@ -58,7 +58,7 @@
 
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 
 #include <boost/filesystem/convenience.hpp>
@@ -693,4 +693,4 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("TriaxialTest");

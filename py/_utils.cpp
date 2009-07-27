@@ -1,4 +1,4 @@
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/core/MetaBody.hpp>

@@ -114,8 +114,8 @@ void LatticeLaw::action(MetaBody* lattice)
 
 	BodyContainer* bodies = lattice->bodies.get();
 
-	InteractionContainer::iterator angles     = lattice->persistentInteractions->begin();
-	InteractionContainer::iterator angles_end = lattice->persistentInteractions->end();
+	InteractionContainer::iterator angles     = lattice->interactions->begin();
+	InteractionContainer::iterator angles_end = lattice->interactions->end();
 
 	{ // 'B' calculate how many neighbors each beam currently has
 		for(  ; angles != angles_end; ++angles )
@@ -130,8 +130,8 @@ void LatticeLaw::action(MetaBody* lattice)
 		}
 	}
 	{ // calculate new angles between beams
-		angles     = lattice->persistentInteractions->begin();
-		angles_end = lattice->persistentInteractions->end();
+		angles     = lattice->interactions->begin();
+		angles_end = lattice->interactions->end();
 		for(  ; angles != angles_end; ++angles )
 		{
 			if( 	   bodies->exists( (*angles)->getId1() )
@@ -711,4 +711,4 @@ if(tension_compression_different_stiffness)
 
 */
 
-YADE_PLUGIN();
+YADE_PLUGIN("LatticeLaw");

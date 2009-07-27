@@ -87,4 +87,4 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 	for(int i=0,e=subscribedBodies.size(); i<e; ++i)
 		os << ini_pos[i][0]<< '\t' << ini_pos[i][1]<< '\t' << ini_pos[i][2]<< std::endl;
 }
-YADE_PLUGIN();
+YADE_PLUGIN("ResetPositionEngine");

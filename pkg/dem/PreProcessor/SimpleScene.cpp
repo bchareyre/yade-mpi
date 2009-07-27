@@ -1,5 +1,5 @@
 #include"SimpleScene.hpp"
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 #include<yade/pkg-common/InteractingBox2AABB.hpp>

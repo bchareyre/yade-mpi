@@ -25,4 +25,4 @@ void InteractingGeometryMetaEngine::action(MetaBody* ncb)
 		operator()(ncb->geometricalModel,ncb->interactingGeometry,ncb->physicalParameters->se3,ncb);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingGeometryMetaEngine");

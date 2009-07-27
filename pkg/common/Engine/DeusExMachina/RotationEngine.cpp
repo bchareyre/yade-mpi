@@ -6,7 +6,7 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include<yade/pkg-common/LinearInterpolate.hpp>
 

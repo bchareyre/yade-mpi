@@ -26,6 +26,7 @@
 
 
 #include<yade/lib-loki/Singleton.hpp>
+#include<boost/preprocessor/cat.hpp>
 
 
 #include "FactoryExceptions.hpp"
@@ -159,5 +160,7 @@ class ClassFactory : public Singleton< ClassFactory >
  * 	1. Visibility must be set to "internal" (or "protected") so that other plugins' init will not shadow this one and all of them get properly executed.
  * 	2. The function must be enclosed in its own anonymous namespace, otherwise there will be clashes (liker errors) if more files with YADE_PLUGIN are linked together.
  */
-#define YADE_PLUGIN(...) namespace{ __attribute__((constructor)) __attribute__((visibility("internal"))) void registerThisPluginClasses(void){ const char* info[]={__FILE__ , ##__VA_ARGS__ , NULL}; ClassFactory::instance().registerPluginClasses(info);} }
+#define YADE_PLUGIN(...) namespace{ __attribute__((constructor)) __attribute__((visibility("internal"))) void BOOST_PP_CAT(registerThisPluginClasses,__COUNTER__) (void){ const char* info[]={__FILE__ , ##__VA_ARGS__ , NULL}; ClassFactory::instance().registerPluginClasses(info);} }
+//! Macro informing build file generator what features that particular file depends on. Has no effect at compile-time. Can be specified multiple times within a single (.cpp) file
+#define YADE_REQUIRE_FEATURE(feature)
 

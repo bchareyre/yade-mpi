@@ -6,7 +6,7 @@
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/LinearInterpolate.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 YADE_PLUGIN("ForceEngine","InterpolatingDirectedForceEngine");
 

@@ -466,4 +466,4 @@ bool InteractingBox2InteractingBox4ClosestFeatures::testSeparatingAxis(Real expr
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingBox2InteractingBox4ClosestFeatures");

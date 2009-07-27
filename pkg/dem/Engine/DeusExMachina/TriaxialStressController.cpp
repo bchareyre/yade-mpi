@@ -411,4 +411,4 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 	}
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("TriaxialStressController");

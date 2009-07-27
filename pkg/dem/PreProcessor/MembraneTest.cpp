@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include <boost/lexical_cast.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include "MembraneTest.hpp"
 

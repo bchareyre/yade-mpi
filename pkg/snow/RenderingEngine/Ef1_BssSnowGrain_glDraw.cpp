@@ -20,7 +20,7 @@ void triangle(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
 	glVertex3v(c);
 }
 
-void quad(Vector3r a,Vector3r b, Vector3r c, Vector3r d,Vector3r n)
+void quad_bsh(Vector3r a,Vector3r b, Vector3r c, Vector3r d,Vector3r n)
 {
 	glNormal3v(n);
 	glVertex3v(a);
@@ -96,9 +96,9 @@ void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, cons
 				Vector3r N2((C - c).Cross(c - a));
 				Vector3r N3((B - b).Cross(b - c));
 				
-				quad(b,a,A,B,N1);
-				quad(a,c,C,A,N2);
-				quad(c,b,B,C,N3);
+				quad_bsh(b,a,A,B,N1);
+				quad_bsh(a,c,C,A,N2);
+				quad_bsh(c,b,B,C,N3);
 			}
 		glEnd();
 		glShadeModel(GL_SMOOTH);
@@ -179,6 +179,5 @@ void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, cons
 }
 
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("Ef1_BssSnowGrain_glDraw");
 

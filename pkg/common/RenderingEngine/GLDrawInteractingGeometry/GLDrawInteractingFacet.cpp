@@ -50,4 +50,5 @@ void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const
     glEnd();
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawInteractingFacet");
+YADE_REQUIRE_FEATURE(OPENGL)

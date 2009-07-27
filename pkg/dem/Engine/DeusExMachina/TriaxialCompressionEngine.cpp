@@ -13,7 +13,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/lambda/lambda.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
@@ -327,5 +327,4 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 
  
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("TriaxialCompressionEngine");

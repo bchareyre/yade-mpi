@@ -64,4 +64,5 @@ void GLDrawColorScale::go(const shared_ptr<GeometricalModel>& gm, const shared_p
 	glMatrixMode(GL_MODELVIEW);	
 
 }
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawColorScale");
+YADE_REQUIRE_FEATURE(OPENGL)

@@ -20,6 +20,9 @@
 #include "/home/jf/YADE/trunk/extra/triangulation/TesselationWrapper.h"
 #include <time.h>
 
+YADE_REQUIRE_FEATURE(NONSENSE__THIS_PLUGIN_WILL_NEVER_BE_BUILT_UNLESS_YOU_REMOVE_ABSOLUTE_PATHS_FROM_INCLUDES!!)
+
+
 //  ../../YADE/trunk/examples/sphere_15.txt
 //  ../../YADE/trunk/examples/sphere_33_mono.txt
 //../../YADE/trunk/examples/sphere_100_poly.txt
@@ -631,4 +634,4 @@ void VolumicContactLaw::action(MetaBody* ncb)
 }
 
  
-YADE_PLUGIN();
+YADE_PLUGIN("VolumicContactLaw");

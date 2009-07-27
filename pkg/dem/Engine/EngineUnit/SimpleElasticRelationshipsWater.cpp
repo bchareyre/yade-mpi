@@ -110,4 +110,4 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& 
 // 		}
 // 	}
 };
-YADE_PLUGIN();
+YADE_PLUGIN("SimpleElasticRelationshipsWater");

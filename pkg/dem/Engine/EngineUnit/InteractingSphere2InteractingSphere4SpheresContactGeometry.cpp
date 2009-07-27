@@ -60,4 +60,4 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::goReverse(	cons
 	return go(cm1,cm2,se31,se32,c);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingSphere2InteractingSphere4SpheresContactGeometry");

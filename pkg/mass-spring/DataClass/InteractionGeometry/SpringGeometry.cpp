@@ -18,4 +18,4 @@ SpringGeometry::~SpringGeometry()
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("SpringGeometry");

@@ -204,4 +204,4 @@ void NodeRecorder::action(MetaBody * ncb)
 	// GLDrawSomething can just put a getClassName()
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("NodeRecorder");

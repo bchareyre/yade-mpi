@@ -35,4 +35,4 @@ void FEMTetrahedronStiffness::go(	  const shared_ptr<PhysicalParameters>& par
 	}
 	
 }
-YADE_PLUGIN();
+YADE_PLUGIN("FEMTetrahedronStiffness");

@@ -19,7 +19,7 @@
 #	include<memory>
 	using std::shared_ptr;
 #endif
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	#include<boost/python.hpp>
 #endif
 #include<boost/type_traits.hpp>
@@ -55,7 +55,7 @@ namespace{
 //! create member function that register attributes; must be parenthesized, without commas: (attr1) (attr2) (attr3) ...
 //#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
 //! Same as REGISTER_ATTRIBUTES, but with first argument of base class, of which registerAttributes will be called first
-#ifndef EMBED_PYTHON
+#ifndef YADE_PYTHON
 	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs); }
 #else
 	#include<boost/python.hpp>
@@ -120,12 +120,14 @@ class Serializable : public Factorable
 
 		virtual void postProcessAttributes(bool /*deserializing*/) {};
 
-	#ifdef EMBED_PYTHON
+	#ifdef YADE_PYTHON
 		virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
 		virtual void pySetAttr(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
+		// override for root classes only (those which have distinct python wrappers
+		virtual std::string pyRootClassName() const { return std::string("Serializable"); }
 	#endif
 
 	private :

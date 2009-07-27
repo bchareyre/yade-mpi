@@ -52,7 +52,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 
 ThreePointBending::ThreePointBending () : FileGenerator()
@@ -136,7 +136,7 @@ bool ThreePointBending::generate()
 	
 /////////////////////////////////////
 
-	rootBody->persistentInteractions->clear();
+	rootBody->interactions->clear();
 	
 	shared_ptr<Body> bodyA;
 
@@ -177,7 +177,7 @@ bool ThreePointBending::generate()
 
 				link->interactionGeometry 		= geometry;
 				link->interactionPhysics 		= physics;
-				rootBody->persistentInteractions->insert(link);
+				rootBody->interactions->insert(link);
 			}
 		}
 	}
@@ -212,7 +212,7 @@ bool ThreePointBending::generate()
 
 	
 	message="total number of permament links created: " 
-		+ lexical_cast<string>(rootBody->persistentInteractions->size()) 
+		+ lexical_cast<string>(rootBody->interactions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"+
 		+"\nWARNING: The results are meaningless, since ElasticCohesiveLaw works only with (unused) SDECLinkGeometry.";
 	return true;
@@ -354,4 +354,4 @@ void ThreePointBending::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("ThreePointBending");

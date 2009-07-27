@@ -52,4 +52,4 @@ CohesiveFrictionalContactInteraction::~CohesiveFrictionalContactInteraction()
 // }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("CohesiveFrictionalContactInteraction");

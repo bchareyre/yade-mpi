@@ -19,10 +19,11 @@
 
 #include "MicroMacroAnalyser.hpp"
 
-#include "TesselationWrapper.h"
+#include<yade/extra/TesselationWrapper.h>
+#include<yade/extra/KinematicLocalisationAnalyser.hpp>
+#include<yade/extra/TriaxialState.h>
 
-#include "KinematicLocalisationAnalyser.hpp"
-#include "TriaxialState.h"
+YADE_REQUIRE_FEATURE(CGAL)
 
 CREATE_LOGGER(MicroMacroAnalyser);
 
@@ -224,4 +225,4 @@ void MicroMacroAnalyser::setState ( MetaBody* ncb, unsigned int state, bool save
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("MicroMacroAnalyser");

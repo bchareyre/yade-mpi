@@ -233,4 +233,5 @@ void GLDrawLatticeSetGeometry::go(const shared_ptr<GeometricalModel>& gm, const 
 //	std::cerr << "GLDrawLatticeSetGeometry\n";
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawLatticeSetGeometry");
+YADE_REQUIRE_FEATURE(OPENGL)

@@ -10,7 +10,7 @@
 #pragma once
 
 
-#include "RigidBodyParameters.hpp"
+#include<yade/pkg-common/RigidBodyParameters.hpp>
 
 
 class ElasticBodyParameters : public RigidBodyParameters

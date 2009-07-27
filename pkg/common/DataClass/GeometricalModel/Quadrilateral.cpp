@@ -31,4 +31,4 @@ Quadrilateral::Quadrilateral(int p1,int p2,int p3,int p4,MetaBody* mb) : Geometr
 
 Quadrilateral::~Quadrilateral(){}
 
-YADE_PLUGIN();
+YADE_PLUGIN("Quadrilateral");

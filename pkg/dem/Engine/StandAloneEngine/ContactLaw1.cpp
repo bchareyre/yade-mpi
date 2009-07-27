@@ -310,4 +310,4 @@ void ContactLaw1::action(MetaBody* ncb)
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("ContactLaw1");

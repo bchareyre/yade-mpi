@@ -23,4 +23,4 @@ ParticleParameters::~ParticleParameters()
 {
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("ParticleParameters");

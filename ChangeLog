@@ -652,7 +652,7 @@ r.1067 (Vaclav)
 
 r.1066 (Vaclav)
   1. Clump code cleanup
-  2. Python may now be embedded in yade: (i) SConscruct checks for it and #defines EMBED_PYTHON if present. (ii) main sets up the interpreter. One disadvantage is that Python runs in its own thread, so pressing ^C during simulation doesn't quit yade (^\ still works).
+  2. Python may now be embedded in yade: (i) SConscruct checks for it and #defines YADE_PYTHON if present. (ii) main sets up the interpreter. One disadvantage is that Python runs in its own thread, so pressing ^C during simulation doesn't quit yade (^\ still works).
   3. New class PythonRecorder that evaluates arbitrary expression when activated.
   4. Pyade interface that makes it possible to retrieve some values from yade in Python. For example, you can now record body #5 z-velocity and z-angularVelocity every 10 iterations by setting PythonRecorder::expression="if (S.i%10==0): print B[5].v[2],B[5].w[2]". Retrievable attributes are documented in the source (or the Doxygen documentation).
   - The python stuff is not very logically still in yade-extra/clump, which has become my playground. Once it matures and someone want it, it may move. Let me know it you find it useful.

@@ -80,5 +80,5 @@ void GLDrawTube::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Phy
 	}
 }
 
-
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawTube");
+YADE_REQUIRE_FEATURE(OPENGL)

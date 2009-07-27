@@ -11,7 +11,7 @@
 #pragma once
 
 // qt3 sucks
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	#ifdef QT_MOC_CPP
 		#undef slots
 		#include<Python.h>

@@ -24,4 +24,4 @@ FEMSetParameters::~FEMSetParameters()
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("FEMSetParameters");

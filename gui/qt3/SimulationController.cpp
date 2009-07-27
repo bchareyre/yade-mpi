@@ -28,7 +28,7 @@
 #		define FOREACH BOOST_FOREACH
 #	endif
 
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	#include<boost/python.hpp>
 #endif
 
@@ -95,7 +95,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
 
-	#ifndef EMBED_PYTHON
+	#ifndef YADE_PYTHON
 		pyOneliner->setEnabled(false);
 		pyOneliner->setText("Yade compiled without Python");
 	#endif
@@ -135,7 +135,7 @@ void SimulationController::pbZXY_clicked()
    execute the command and make the line empty
 */
 void SimulationController::pyOnelinerEnter(){
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	PyGILState_STATE gstate;
 		gstate = PyGILState_Ensure();
 		try{

@@ -224,10 +224,10 @@ class DynLibDispatcher
 			{
 				executor = dynamic_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
 				if (!executor){ //dynamic_cast_failed for some reason so try with static_cast
-					// cerr<<__FILE__<<":"<<__LINE__<<" ERROR dynamic_casting executor of type "<<libName<<", using static_cast. WHY?"<<endl;
+					cerr<<__FILE__<<":"<<__LINE__<<" ERROR dynamic_casting executor of type "<<libName<<", using static_cast (WHY?)"<<endl;
+					//abort();
 					executor = static_pointer_cast<Executor>(ClassFactory::instance().createShared(libName));
 				}
-				else cerr<<"COOL! Dynamic cast of type "<<libName<<" successful!"<<endl;
 			}
 			catch (FactoryCantCreate& fe)
 			{

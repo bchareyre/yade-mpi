@@ -90,4 +90,4 @@ void WallStressRecorder::action(MetaBody * ncb)
 	
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("WallStressRecorder");

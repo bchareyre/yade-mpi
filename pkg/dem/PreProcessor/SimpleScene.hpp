@@ -1,6 +1,6 @@
 #pragma once
 #include<yade/core/FileGenerator.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 
 class SimpleScene: public FileGenerator {

@@ -43,4 +43,5 @@ void GLDrawClosestFeatures::go(
 	glEnd();
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawClosestFeatures");
+YADE_REQUIRE_FEATURE(OPENGL)

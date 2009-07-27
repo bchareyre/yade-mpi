@@ -24,4 +24,4 @@ BoundingSphere::~BoundingSphere ()
 // 	min = center-v;
 // 	max = center+v;	
 // }
-YADE_PLUGIN();
+YADE_PLUGIN("BoundingSphere");

@@ -2,7 +2,7 @@
 #pragma once
 #include<fstream>
 #include<limits>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/StandAloneEngine.hpp>
 

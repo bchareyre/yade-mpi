@@ -6,6 +6,8 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
+#include<vector>
+#include<string>
 
 class PhysicalParameters: public Serializable, public Indexable
 {
@@ -35,6 +37,8 @@ class PhysicalParameters: public Serializable, public Indexable
 			//Vector3<bool> would be actually better, I'm not checking now if it would work.
 		};
 		static unsigned axisDOF(int axis, bool rotationalDOF=false){return 1<<(axis+(rotationalDOF?3:0));} //! Return DOF_* constant for given axis∈{0,1,2} and rotationalDOF∈{false(default),true}; e.g. axisDOF(0,true)==DOF_RX
+		std::vector<std::string> blockedDOFs_vec_get() const;
+		void blockedDOFs_vec_set(const std::vector<std::string>& dofs);
 
 	REGISTER_ATTRIBUTES(/*no base*/,(se3)(refSe3)(blockedDOFs));
 	REGISTER_CLASS_AND_BASE(PhysicalParameters,Serializable Indexable);

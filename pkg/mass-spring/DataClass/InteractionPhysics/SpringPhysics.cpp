@@ -18,4 +18,4 @@ SpringPhysics::~SpringPhysics()
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("SpringPhysics");

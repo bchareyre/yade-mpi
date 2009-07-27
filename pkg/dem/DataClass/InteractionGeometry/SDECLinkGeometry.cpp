@@ -19,4 +19,4 @@ SDECLinkGeometry::~SDECLinkGeometry()
 {
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("SDECLinkGeometry");

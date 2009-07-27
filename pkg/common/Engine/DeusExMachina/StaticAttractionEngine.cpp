@@ -75,5 +75,4 @@ void StaticAttractionEngine::applyCondition(MetaBody * ncb)
 			(*bi)->physicalParameters->se3.position+=moves[i++];
 }
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("StaticAttractionEngine");

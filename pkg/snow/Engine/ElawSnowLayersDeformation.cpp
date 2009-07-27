@@ -172,5 +172,4 @@ void ElawSnowLayersDeformation::action(MetaBody* ncb)
 	}
 }
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("ElawSnowLayersDeformation");

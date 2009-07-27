@@ -130,4 +130,4 @@ bool InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron::goRever
 	return isInteracting;
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron");

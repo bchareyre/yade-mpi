@@ -11,7 +11,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 using namespace boost;
 using namespace std;

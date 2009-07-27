@@ -8,4 +8,4 @@
 #include "Box.hpp"
 Box::Box () : GeometricalModel() { createIndex(); }
 Box::~Box (){}
-YADE_PLUGIN();
+YADE_PLUGIN("Box");

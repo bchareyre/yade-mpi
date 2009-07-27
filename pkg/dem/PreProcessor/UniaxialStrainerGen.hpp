@@ -1,7 +1,7 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 
 #pragma once
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/pkg-dem/UniaxialStrainer.hpp>
 

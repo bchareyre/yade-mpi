@@ -26,4 +26,4 @@ void TranslationEngine::applyCondition(MetaBody * ncb){
 	}
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("TranslationEngine");

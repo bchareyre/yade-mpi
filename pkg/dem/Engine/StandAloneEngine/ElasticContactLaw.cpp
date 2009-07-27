@@ -15,8 +15,6 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 
-#include<yade/extra/Shop.hpp>
-
 YADE_PLUGIN("ef2_Spheres_Elastic_ElasticLaw","Law2_Dem3Dof_Elastic_Elastic","ElasticContactLaw");
 
 

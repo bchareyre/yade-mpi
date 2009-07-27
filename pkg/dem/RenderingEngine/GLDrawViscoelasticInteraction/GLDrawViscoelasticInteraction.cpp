@@ -35,4 +35,5 @@ void GLDrawViscoelasticInteraction::go(
 	glPopMatrix();
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawViscoelasticInteraction");
+YADE_REQUIRE_FEATURE(OPENGL)

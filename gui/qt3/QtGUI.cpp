@@ -21,7 +21,7 @@
 //#endif
 #include <qapplication.h>
 
-#ifdef EMBED_PYTHON
+#ifdef YADE_PYTHON
 	#include<yade/gui-py/PythonUI.hpp>
 	#include<boost/thread.hpp>
 #endif
@@ -52,13 +52,13 @@ int QtGUI::run(int argc, char *argv[])
 		if(boost::algorithm::ends_with(string(argv[optind]),string(".xml")) ||
 			boost::algorithm::ends_with(string(argv[optind]),string(".xml.gz")) ||
 			boost::algorithm::ends_with(string(argv[optind]),string(".xml.bz2"))) Omega::instance().setSimulationFileName(string(argv[optind]));
-		#ifdef EMBED_PYTHON
+		#ifdef YADE_PYTHON
 		else if(boost::algorithm::ends_with(string(argv[optind]),string(".py"))) PythonUI::runScript=string(argv[optind]);
 		#endif
 		else optind--;
 	}
 	for (int index=optind+1; index<argc; index++) {
-		#ifdef EMBED_PYTHON
+		#ifdef YADE_PYTHON
 			LOG_DEBUG("Adding script parameter `"<<argv[index]<<"' from the command line.");
 			PythonUI::scriptArgs.push_back(string(argv[index]));
 			if(PythonUI::runScript.empty()) LOG_WARN("Got parameter `"<<argv[index]<<"', but no .py script to be run!");
@@ -71,7 +71,7 @@ int QtGUI::run(int argc, char *argv[])
 	mainWindow=new YadeQtMainWindow();
 	mainWindow->show();
 	app->setMainWidget(mainWindow);
-	#ifdef EMBED_PYTHON
+	#ifdef YADE_PYTHON
 		LOG_DEBUG("Launching Python thread now...");
 		//PyEval_InitThreads();
 		boost::thread pyThread(boost::function0<void>(&PythonUI::pythonSession));

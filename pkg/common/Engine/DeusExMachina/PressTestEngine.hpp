@@ -16,7 +16,7 @@
 **************************************************************************/
 
 #pragma once
-#include"TranslationEngine.hpp"
+#include<yade/pkg-common/TranslationEngine.hpp>
 #include<yade/core/DeusExMachina.hpp>
 
 class PressTestEngine: public TranslationEngine{

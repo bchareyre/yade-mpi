@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #include "STLImporter.hpp"
-#include <yade/extra/Shop.hpp>
+#include <yade/pkg-dem/Shop.hpp>
 
 CREATE_LOGGER(STLImporter);
 

@@ -29,4 +29,5 @@ class TimingDeltas{
 			TimingInfo::delta now=TimingInfo::getNow();
 			data[i].nExec+=1; data[i].nsec+=now-last; last=now; i++;
 		}
+		void reset(){ data.clear(); labels.clear(); }
 };

@@ -50,4 +50,4 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 // 	firsts[id] = false;
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("LeapFrogOrientationIntegrator");

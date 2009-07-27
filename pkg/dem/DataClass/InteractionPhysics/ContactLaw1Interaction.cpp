@@ -46,4 +46,4 @@ ContactLaw1Interaction::~ContactLaw1Interaction()
 // }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("ContactLaw1Interaction");

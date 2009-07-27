@@ -62,7 +62,7 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -84,7 +84,7 @@ using namespace std;
 
 typedef pair<Vector3r, Real> BasicSphere;
 //! generate a list of non-overlapping spheres
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
+string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
 TriaxialTestWater::TriaxialTestWater () : FileGenerator()
@@ -296,7 +296,7 @@ bool TriaxialTestWater::generate()
 	
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, Rdispersion, 0.75);
+	else message+=GenerateCloud_water(sphere_list, lowerCorner, upperCorner, numberOfGrains, Rdispersion, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -628,7 +628,7 @@ void TriaxialTestWater::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
+string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
 	static StdGenerator generator;
@@ -682,4 +682,4 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("TriaxialTestWater");

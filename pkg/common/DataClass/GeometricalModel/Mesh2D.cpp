@@ -47,4 +47,4 @@ void Mesh2D::postProcessAttributes(bool deserializing)
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("Mesh2D");

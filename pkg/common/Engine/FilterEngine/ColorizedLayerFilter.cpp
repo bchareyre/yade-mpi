@@ -53,4 +53,4 @@ void ColorizedLayerFilter::applyCondition(MetaBody* ncb)
 	}
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("ColorizedLayerFilter");

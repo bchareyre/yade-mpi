@@ -1,4 +1,5 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz>
+#pragma once
 
 #include<vector>
 #include<iostream>

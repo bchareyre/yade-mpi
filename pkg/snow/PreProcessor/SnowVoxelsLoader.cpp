@@ -49,11 +49,11 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
-#include<yade/pkg-common/InteractionHashMap.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
+#include<yade/core/InteractionHashMap.hpp>
 #include<yade/pkg-snow/ElawSnowLayersDeformation.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include<boost/filesystem/convenience.hpp>
 #include<boost/lexical_cast.hpp>
@@ -68,8 +68,7 @@
 //#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp>
 //#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("SnowVoxelsLoader");
 SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 {
 	voxel_binary_data_file = "/home/janek/32-Snow-white/20-Programy/31-SNOW-read-data/RESULT.bz2";

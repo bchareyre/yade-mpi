@@ -18,4 +18,5 @@ void GLDrawBoundingSphere::go(const shared_ptr<BoundingVolume>& bv)
 	glutWireSphere(s->radius,10,10);
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawBoundingSphere");
+YADE_REQUIRE_FEATURE(OPENGL)

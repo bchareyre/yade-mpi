@@ -31,15 +31,20 @@ def listChildClassesRecursive(base):
 # not sure whether __builtins__ is the right place?
 _dd=__builtins__.__dict__
 
-classTranslations={'FileGenerator':'Preprocessor','EngineUnit1D':'EngineUnit','EngineUnit2D':'EngineUnit'}
-for root in ['StandAloneEngine','DeusExMachina','EngineUnit1D','EngineUnit2D','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator','MetaEngine']:
+classTranslations={'FileGenerator':'Preprocessor'}
+for root in [
+	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
+		# functors
+		'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw'
+	]:
 	root2=root if (root not in classTranslations.keys()) else classTranslations[root]
 	for p in listChildClassesRecursive(root):
-		class argStorage:
-			def __init__(self,_root,_class): self._root,self._class=_root,_class
-			def __call__(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
-		if root=='MetaEngine': _dd[p]=argStorage(root2,p)
-		else:                  _dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,kw) # eval(root2)(p,kw)
+		#class argStorage:
+		#	def __init__(self,_root,_class): self._root,self._class=_root,_class
+		#	def __call__(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
+		#if root=='MetaEngine': _dd[p]=argStorage(root2,p)
+		_dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,**kw) # eval(root2)(p,kw)
+_dd['Generic']=yade.wrapper.__dict__["Serializable"]
 ### end wrappers
 
 #### HANDLE RENAMED CLASSES ####

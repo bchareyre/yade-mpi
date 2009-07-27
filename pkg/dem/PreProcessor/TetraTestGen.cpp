@@ -1,10 +1,10 @@
 
 #include<yade/core/MetaBody.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include"TetraTestGen.hpp"
 
-#include"Tetra.hpp"
+#include<yade/pkg-dem/Tetra.hpp>
 
 YADE_PLUGIN("TetraTestGen");
 

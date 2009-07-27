@@ -37,8 +37,8 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 
 /// Permanents Links													///
 
-	InteractionContainer::iterator ii    = ncb->persistentInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->persistentInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal())
@@ -230,4 +230,4 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("ElasticCohesiveLaw");

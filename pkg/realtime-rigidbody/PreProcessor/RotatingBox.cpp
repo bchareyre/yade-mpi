@@ -32,7 +32,7 @@
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
 
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -317,4 +317,4 @@ void RotatingBox::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("RotatingBox");

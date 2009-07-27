@@ -56,7 +56,7 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
@@ -77,7 +77,7 @@ using namespace std;
 
 typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
+string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity);
 
 
 CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
@@ -281,7 +281,7 @@ bool CohesiveTriaxialTest::generate()
 	
 	vector<BasicSphere> sphere_list;
 	if(importFilename!="") sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
-	else message=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
+	else message=GenerateCloud_cohesive(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusDeviation, 0.75);
 	
 	vector<BasicSphere>::iterator it = sphere_list.begin();
 	vector<BasicSphere>::iterator it_end = sphere_list.end();
@@ -650,7 +650,7 @@ void CohesiveTriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 
-string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
+string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
 	static StdGenerator generator;
@@ -697,4 +697,4 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("CohesiveTriaxialTest");

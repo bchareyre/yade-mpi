@@ -58,7 +58,7 @@ class MetaInteractingGeometry2AABB; */
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 
-#include<yade/extra/Tetra.hpp>
+#include<yade/pkg-dem/Tetra.hpp>
 
 
 #define _SPEC_CAST(orig,cast) template<> void Shop::setDefault<orig>(string key, orig val){setDefault(key,cast(val));}

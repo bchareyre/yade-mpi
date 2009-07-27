@@ -1,7 +1,7 @@
 Import('*')
 env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 	env.Program('yade',
-		['Body.cpp',
+		env.Combine('core.cpp',['Body.cpp',
 			'BodyContainer.cpp',
 			'BoundingVolume.cpp',
 			'Collider.cpp',
@@ -29,13 +29,20 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'containers/BodyAssocVector.cpp',
 			'containers/InteractionHashMap.cpp',
 			'containers/InteractionVecMap.cpp',
-			],
-		LIBS=env['LIBS']+['yade-base',
+			]),
+		LIBS=env['LIBS']+[
+			'yade-base',
 			'yade-serialization',
 			'yade-factory',
-			'yade-loki',
 			'yade-multimethods',
+			'yade-computational-geometry',
+			'sqlite3x',
+			'XMLFormatManager',
+			'miniWm3',
+			'STLImporter',
 			'rt', # realtime lib, for clock_gettime 
-			],
+			]+
+			['$QGLVIEWER_LIB','yade-opengl'] if 'YADE_OPENGL' in env['CPPDEFINES'] else [],
+		CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['realVersion']+'\\"'),]
 		)
 ])

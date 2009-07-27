@@ -41,4 +41,5 @@ void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Ph
 		glEnd();
     }
 }
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawFacet");
+YADE_REQUIRE_FEATURE(OPENGL)

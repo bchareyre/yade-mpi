@@ -32,4 +32,4 @@ void InteractingBox2AABB::go(	const shared_ptr<InteractingGeometry>& cm,
 	aabb->max = aabb->center+aabb->halfSize;
 }
 	
-YADE_PLUGIN();
+YADE_PLUGIN("InteractingBox2AABB");

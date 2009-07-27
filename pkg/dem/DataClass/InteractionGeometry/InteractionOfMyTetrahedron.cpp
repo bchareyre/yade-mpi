@@ -18,4 +18,4 @@ InteractionOfMyTetrahedron::~InteractionOfMyTetrahedron ()
 {
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("InteractionOfMyTetrahedron");

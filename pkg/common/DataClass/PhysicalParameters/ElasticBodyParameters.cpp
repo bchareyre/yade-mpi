@@ -17,4 +17,4 @@ ElasticBodyParameters::~ElasticBodyParameters()
 {
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("ElasticBodyParameters");

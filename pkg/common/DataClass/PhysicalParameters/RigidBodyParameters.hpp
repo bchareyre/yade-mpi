@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include "ParticleParameters.hpp"
-#include <Wm3Matrix3.h>
+#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
 class RigidBodyParameters : public ParticleParameters

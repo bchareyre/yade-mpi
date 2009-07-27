@@ -72,14 +72,14 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,physParams
 	s=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	s.shape=GeometricalModel('Sphere',{'radius':radius,'diffuseColor':color,'wire':wire})
-	s.mold=InteractingGeometry('InteractingSphere',{'radius':radius,'diffuseColor':color})
+	s.shape=GeometricalModel('Sphere',radius=radius,diffuseColor=color,wire=wire)
+	s.mold=InteractingGeometry('InteractingSphere',radius=radius,diffuseColor=color)
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert]})
 	s.phys=PhysicalParameters(physParamsClass)
 	s.phys.updateExistingAttrs(pp)
-	s.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+	s.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 	s['isDynamic']=dynamic
 	return s
 
@@ -88,14 +88,14 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.shape=GeometricalModel('Box',{'extents':extents,'diffuseColor':color,'wire':wire})
-	b.mold=InteractingGeometry('InteractingBox',{'extents':extents,'diffuseColor':color})
+	b.shape=GeometricalModel('Box',extents=extents,diffuseColor=color,wire=wire)
+	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color)
 	mass=8*extents[0]*extents[1]*extents[2]*density
 	V=extents[0]*extents[1]*extents[2]
 	pp.update({'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)]})
 	b.phys=PhysicalParameters(physParamsClass)
 	b.phys.updateExistingAttrs(pp)
-	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 	b['isDynamic']=dynamic
 	return b
 
@@ -104,17 +104,17 @@ def facet(vertices,dynamic=False,wire=True,color=None,density=1,physParamsClass=
 	b=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.shape=GeometricalModel('Facet',{'diffuseColor':color,'wire':wire})
-	b.mold=InteractingGeometry('InteractingFacet',{'diffuseColor':color})
+	b.shape=GeometricalModel('Facet',diffuseColor=color,wire=wire)
+	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color)
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
 	b.shape['vertices']=vertices;	b.mold['vertices']=vertices
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
 	b.phys=PhysicalParameters(physParamsClass)
 	b.phys.updateExistingAttrs(pp)
-	b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 	b['isDynamic']=dynamic
-	b.mold.postProcessAttributes()
+	b.mold.postProcessAttributes(True)
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
@@ -321,7 +321,7 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 		b.phys=PhysicalParameters(physParamsClass)
 		b.phys.updateExistingAttrs(pp)
 		if not noBoundingVolume:
-			b.bound=BoundingVolume('AABB',{'diffuseColor':[0,1,0]})
+			b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 		o.bodies.append(b)
 	imp.import_geometry(o.bodies,begin,noInteractingGeometry)
 	imported=range(begin,begin+imp.number_of_facets)
@@ -413,17 +413,17 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	return len(tagsParams)
 
 def ColorizedVelocityFilter(isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Velocity, m/s'):
-    f = DeusExMachina('ColorizedVelocityFilter',{'isFilterActivated':isFilterActivated,'autoScale':autoScale,'minValue':minValue,'maxValue':maxValue,'posX':posX,'posY':posY,'width':width,'height':height,'title':title})
+    f = DeusExMachina('ColorizedVelocityFilter',isFilterActivated=isFilterActivated,autoScale=autoScale,minValue=minValue,maxValue=maxValue,posX=posX,posY=posY,width=width,height=height,title=title)
     O.engines+=[f]
     return f
 
 def ColorizedTimeFilter(point=[0,0,0],normal=[0,1,0],isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Time, m/s'):
-    f = DeusExMachina('ColorizedTimeFilter',{'point':point,'normal':normal,'isFilterActivated':isFilterActivated,'autoScale':autoScale,'minValue':minValue,'maxValue':maxValue,'posX':posX,'posY':posY,'width':width,'height':height,'title':title})
+    f = DeusExMachina('ColorizedTimeFilter',point=point,normal=normal,isFilterActivated=isFilterActivated,autoScale=autoScale,minValue=minValue,maxValue=maxValue,posX=posX,posY=posY,width=width,height=height,title=title)
     O.engines+=[f]
     return f
 
 def PythonRunnerFilter(command='pass',isFilterActivated=True):
-    f = DeusExMachina('PythonRunnerFilter',{'command':command,'isFilterActivated':isFilterActivated})
+    f = DeusExMachina('PythonRunnerFilter',command=command,isFilterActivated=isFilterActivated)
     O.engines+=[f]
     return f
 

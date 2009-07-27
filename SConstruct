@@ -129,10 +129,11 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','binfmt','CGAL','dummy','GTS']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','CGAL','dummy','GTS']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
+	EnumVariable('linkStrategy','How to link plugins together','per-class',['per-class','per-pkg[broken]','monolithic','static[broken]']),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
@@ -177,23 +178,11 @@ Help(opts.GenerateHelpText(env))
 ###########################################
 ################# BUILD DIRECTORY #########
 ###########################################
-
+import yadeSCons
 ##ALL generated stuff should go here - therefore we must determine it very early!!
-
+env['realVersion']=yadeSCons.getRealVersion()
 if not env.has_key('version'):
-	"Attempts to get yade version from RELEASE file if it exists or from svn."
-	if os.path.exists('RELEASE'):
-		env['version']=file('RELEASE').readline().strip()
-	if not env.has_key('version'):
-		for l in os.popen("LC_ALL=C bzr version-info 2>/dev/null").readlines():
-			m=re.match(r'revno: ([0-9]+)',l)
-			if m: env['version']='bzr'+m.group(1)
-	if not env.has_key('version'):
-		for l in os.popen("LC_ALL=C svn info").readlines():
-			m=re.match(r'Revision: ([0-9]+)',l)
-			if m: env['version']='svn'+m.group(1)
-	if not env.has_key('version'):
-		env['version']='unknown'
+	env['version']=env['realVersion']
 
 env['SUFFIX']='-'+env['version']+env['variant']
 print "Yade version is `%s', installed files will be suffixed with `%s'."%(env['version'],env['SUFFIX'])
@@ -312,10 +301,11 @@ if not env.GetOption('clean'):
 	ok&=CheckLib_maybeMT(conf,'boost_filesystem','boost/filesystem/path.hpp','c++','boost::filesystem::path();')
 	ok&=CheckLib_maybeMT(conf,'boost_iostreams','boost/iostreams/device/file.hpp','c++','boost::iostreams::file_sink("");')
 	ok&=CheckLib_maybeMT(conf,'boost_regex','boost/regex.hpp','c++','boost::regex("");')
+	ok&=CheckLib_maybeMT(conf,'boost_serialization','boost/archive/archive_exception.hpp','c++','try{} catch (const boost::archive::archive_exception& e) {};')
+	ok&=CheckLib_maybeMT(conf,'boost_program_options','boost/program_options.hpp','c++','boost::program_options::options_description o;')
 	env['haveForeach']=conf.CheckCXXHeader('boost/foreach.hpp','<>')
 	if not env['haveForeach']: print "(OK, local version will be used instead)"
-	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=0)
-
+	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=1)
 	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
 
@@ -353,7 +343,7 @@ if not env.GetOption('clean'):
 			and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
 			and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 		if not ok: featureNotOK('python')
-		env.Append(CPPDEFINES=['EMBED_PYTHON'])
+		env.Append(CPPDEFINES=['YADE_PYTHON'])
 	if 'CGAL' in env['features']:
 		ok=cong.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		if not ok: featureNotOK('CGAL')
@@ -392,22 +382,11 @@ else:
 ## PREFIX must be absolute path. Why?!
 env['PREFIX']=os.path.abspath(env['PREFIX'])
 
-# paths to in-tree SConscript files
-libDirs=['lib','pkg/common','pkg/dem','pkg/fem','pkg/lattice','pkg/mass-spring','pkg/realtime-rigidbody','pkg/snow','extra','gui','py']
-#libDirs = libDirs + ['pkg/gram'] 
-# BUT: exclude stuff that should be excluded
-libDirs=[x for x in libDirs if not re.match('^.*/('+'|'.join(env['exclude'])+')$',x)]
+libDirs=('extra','gui','lib','py','plugins')
 # where are we going to be installed... pkg/dem becomes pkg-dem
-instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x.replace('/','-')) for x in libDirs]
-# directory for yade-$version.pc
-pcDir=os.path.join('$PREFIX','lib','pkgconfig')
-# will install in the following dirs (needed?)
-instDirs=[os.path.join('$PREFIX','bin')]+instLibDirs # +[pcDir]
+instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x) for x in libDirs]
 # where are we going to be run - may be different (packaging)
-runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x.replace('/','-')) for x in libDirs]
-
-## not used for now...
-#instIncludeDirs=['yade-core']+[os.path.join('$PREFIX','include','yade',string.split(x,os.path.sep)[-1]) for x in libDirs]
+runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x) for x in libDirs]
 
 
 ### PREPROCESSOR FLAGS
@@ -516,20 +495,41 @@ if not env.GetOption('clean'):
 			os.symlink(relpath(link,target),link)
 	if not env['haveForeach']:
 		mkSymlink(boostDir+'/foreach.hpp','extra/foreach.hpp_local')
-	mkSymlink(boostDir+'/python','lib/py/boost-python-indexing-suite-v2-noSymlinkHeaders')
+	mkSymlink(boostDir+'/python','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')
 	#env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
-	env.Default(env.Alias('install',instDirs)) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
+	env.Default(env.Alias('install',['$PREFIX/bin','$PREFIX/lib'])) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
 
 env.Export('env');
 
-if env.has_key('extraModules'):
-	env['yadeModules']=env['extraModules']+libDirs+['core']
-	env.Append(LIBPATH=[os.path.join('#',x) for x in env['extraModules']])
-else: env['yadeModules']=libDirs+['core']
+######
+### combining builder
+#####
+# http://www.scons.org/wiki/CombineBuilder
+import SCons.Action
+import SCons.Builder
+def combiner_build(target, source, env):
+	"""generate a file, that's including all sources"""
+	out=""
+	for src in source: out+="#include \"%s\"\n"%src.abspath
+	open(str(target[0]),'w').write(out)
+	return 0
+env.Append(BUILDERS = {'Combine': env.Builder(action = SCons.Action.Action(combiner_build, "> $TARGET"),target_factory = env.fs.File,)})
 
-#env['yadeModules']=['lib','core','extra']
+import yadeSCons
+allPlugs=yadeSCons.scanAllPlugins(None)
+buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['linkStrategy'])
+def linkPlugins(plugins):
+	"""Given list of plugins we need to link to, return list of real libraries that we should link to."""
+	ret=set()
+	for p in plugins:
+		ret.add(buildPlugs[p].obj)
+	return list(ret)
 
-# read top-level SConscript file. It is used only so that build_dir is set. This file reads all SConscripts from in yadeModules
+env['linkPlugins']=linkPlugins
+
+yadeSCons.buildPluginLibs(env,buildPlugs)
+
+# read top-level SConscript file. It is used only so that build_dir is set. This file reads all necessary SConscripts
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)
 
 #################################################################################

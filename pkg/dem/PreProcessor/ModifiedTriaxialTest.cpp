@@ -10,6 +10,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+YADE_REQUIRE_FEATURE(CGAL)
+
 #include "ModifiedTriaxialTest.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
@@ -38,7 +40,7 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/HydraulicForceEngine.hpp>
+#include<yade/pkg-dem/HydraulicForceEngine.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -689,4 +691,4 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("ModifiedTriaxialTest");

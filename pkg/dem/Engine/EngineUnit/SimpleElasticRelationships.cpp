@@ -82,4 +82,4 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 	}
 	throw runtime_error("SimpleElasticRelationships currently fails for non-SpheresContactGeometry geometry!");
 };
-YADE_PLUGIN();
+YADE_PLUGIN("SimpleElasticRelationships");

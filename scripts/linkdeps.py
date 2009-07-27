@@ -33,10 +33,10 @@ for dir,f in sources:
 		if 'YADE_PLUGIN' in l and getModule(dir) not in ('core',): plugins.add(f.split('.')[0])
 
 maxIncludeLevel=4
-def grepInc(path,f,level=0):
+def grepCpp(path,f,level=0):
 	fullF=path+sep+f; baseName=f.split('.')[0]
-	deps=set()
-	if level==maxIncludeLevel: return set()
+	linkDeps,featureDeps=set(),set()
+	if level==maxIncludeLevel: return set(),set()
 	#print path,f
 	for l in open(fullF):
 		m=re.match('^#include<yade/([^/]*)/(.*)>.*$',l)
@@ -44,7 +44,7 @@ def grepInc(path,f,level=0):
 			incMod=m.group(1); incHead=m.group(2); baseName=incHead.split('.')[0]; assert(len(incHead.split('.'))==2)
 			if incMod=='core': continue
 			#if baseName not in plugins: print f,incHead
-			deps.add(incHead.split('.')[0])
+			linkDeps.add(incHead.split('.')[0])
 			continue
 		m=re.match('^#include\s*"([^/]*)".*$',l)
 		if m:
@@ -54,11 +54,40 @@ def grepInc(path,f,level=0):
 				pass
 			else:
 				if m.group(1).split('.')[0] not in plugins or incBaseName==baseName:
-					deps.update(grepInc(path,m.group(1),level=level+1))
-	return deps
-#for dir,f in [('./pkg/common/Engine/DeusExMachina','JumpChangeSe3.cpp'),]: #sources:
+					linkDeps.update(grepCpp(path,m.group(1),level=level+1)[0])
+			continue
+		m=re.match('^YADE_REQUIRE_FEATURE\((.*)\).*',l)
+		if m:
+			featureDeps.add(m.group(1))
+	return linkDeps,featureDeps
+pluginLinks,pluginFeats,pluginSrcs={},{},{}
 for dir,f in sources:
 	if getModule(dir) in ('core',): continue
-	d=grepInc(dir,f)
-	print f ,' '.join(d)
+	if not getModule(dir).startswith('pkg'): continue
+	link,feats=grepCpp(dir,f)
+	plugin='.'.join(f.split('.')[:-1])
+	pluginLinks[plugin],pluginFeats[plugin],pluginSrcs[plugin]=link,feats,dir+'/'+f
+import shelve
+cache=shelve.open('linkdeps.cache')
+cache['pluginLinks'],cache['pluginFeats'],cache['pluginSrcs']=pluginLinks,pluginFeats,pluginSrcs
+pluginLinks,pluginFeats,pluginSrcs=cache['pluginLinks'],cache['pluginFeats'],cache['pluginSrcs']
+pluginObjs={}
+for p in pluginLinks.keys(): pluginObjs[p]='packages'
+cache.close()
+
+def getPluginLibs(plugin):
+	libs=set()
+	myObj=pluginObjs[plugin]
+	for lib in pluginLinks[plugin]:
+		if pluginObjs[plugin]==myObj: continue
+		try:
+			libs.add(pluginObjs[lib])
+		except KeyError:
+			print 'WARNING: plugin %s, missing lib %s'%(plugin,lib)
+	return libs
+allLibs=set();
+for p in pluginSrcs.keys(): allLibs.update(getPluginLibs(p))
+print "\tenv.SharedLibrary('packages',Split('"+' '.join(pluginSrcs.values())+"'),LIBS=env['LIBS']+Split('"+' '.join(allLibs)+"'),CXXFLAGS=env['CXXFLAGS']+['--combine'])"
+#print plugin,' '.join(feats)
+#print f ,' '.join(feats)
 

@@ -34,7 +34,7 @@
 bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
-	Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), persistentInteractions(interactions),transientInteractions(interactions)
+	Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), transientInteractions(interactions)
 {	
 	engines.clear();
 	initializers.clear();

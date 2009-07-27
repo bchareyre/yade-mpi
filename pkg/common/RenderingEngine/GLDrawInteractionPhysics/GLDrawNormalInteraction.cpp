@@ -39,4 +39,5 @@ void GLDrawNormalInteraction::go(
 	glPopMatrix();
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawNormalInteraction");
+YADE_REQUIRE_FEATURE(OPENGL)

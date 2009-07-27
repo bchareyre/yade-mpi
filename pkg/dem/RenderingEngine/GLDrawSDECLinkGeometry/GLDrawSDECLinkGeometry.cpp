@@ -81,4 +81,5 @@ void GLDrawSDECLinkGeometry::go(
 	}
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("GLDrawSDECLinkGeometry");
+YADE_REQUIRE_FEATURE(OPENGL)

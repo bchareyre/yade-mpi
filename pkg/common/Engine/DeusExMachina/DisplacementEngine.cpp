@@ -76,4 +76,4 @@ void DisplacementEngine::applyCondition(MetaBody * ncb)
 
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("DisplacementEngine");

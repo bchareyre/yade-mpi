@@ -45,4 +45,4 @@ void LeapFrogPositionIntegrator::go(const shared_ptr<PhysicalParameters>& b
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("LeapFrogPositionIntegrator");

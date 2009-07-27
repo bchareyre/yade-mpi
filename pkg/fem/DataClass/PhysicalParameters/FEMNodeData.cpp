@@ -21,4 +21,4 @@ FEMNodeData::~FEMNodeData()
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("FEMNodeData");

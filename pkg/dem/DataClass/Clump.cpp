@@ -332,7 +332,7 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
  **************************************************************************************/
 
 #include<yade/core/MetaBody.hpp>
-#include<yade/extra/Shop.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 
 bool ClumpTestGen::generate()
 {

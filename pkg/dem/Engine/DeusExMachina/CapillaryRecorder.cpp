@@ -106,4 +106,4 @@ static_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get())
 	
 }
 
-YADE_PLUGIN();
+YADE_PLUGIN("CapillaryRecorder");

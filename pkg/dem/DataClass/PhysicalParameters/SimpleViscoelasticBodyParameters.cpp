@@ -17,5 +17,4 @@ SimpleViscoelasticBodyParameters::~SimpleViscoelasticBodyParameters()
 {
 }
 
-YADE_PLUGIN();
-
+YADE_PLUGIN("SimpleViscoelasticBodyParameters");

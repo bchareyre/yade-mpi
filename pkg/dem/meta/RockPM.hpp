@@ -48,16 +48,15 @@ class RpmMat: public BodyMacroParameters {
 	public:
 		int exampleNumber; //Number of "stone"
 		bool initCohesive, isDamaged;
-		Real stressCompressMax, Brittleness, G_over_E; //Parameters for damaging
-		
-		RpmMat(): exampleNumber(0.), initCohesive(false), isDamaged(false), stressCompressMax(0), Brittleness(0), G_over_E(1) {createIndex();};
+		Real stressCompressMax, stressTensionMax; //Parameters for damaging
+
+		RpmMat(): exampleNumber(0.), initCohesive(false), isDamaged(false), stressCompressMax(0), stressTensionMax(0) {createIndex();};
 		REGISTER_ATTRIBUTES(BodyMacroParameters, 
 			(exampleNumber)
 			(initCohesive)
 			(isDamaged)
 			(stressCompressMax)
-			(Brittleness)
-			(G_over_E));
+			(stressTensionMax));
 		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(RpmMat);
@@ -66,7 +65,7 @@ REGISTER_SERIALIZABLE(RpmMat);
 class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
 	private:
 	public:
-		Real initDistance;
+		Real sigmaT, initDistance;
 
 		Ip2_RpmMat_RpmMat_RpmPhys(){
 			initDistance = 0;
@@ -74,6 +73,7 @@ class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
 
 		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
 		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
+			(sigmaT)
 			(initDistance)
 		);
 
@@ -88,13 +88,9 @@ class RpmPhys: public NormalShearInteraction {
 	private:
 	public:
 		Real crossSection,E,G,tanFrictionAngle,lengthMaxCompression,lengthMaxTension;
-		Real omega, Fn, sigmaN, epsN;
-		Vector3r epsT, sigmaT, Fs;
-		 
-
 		bool isCohesive;
 
-		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0), tanFrictionAngle(0), lengthMaxCompression(0), lengthMaxTension(0), isCohesive(false) { createIndex(); epsT=Vector3r::ZERO; omega=0; Fn=0; Fs=Vector3r::ZERO;}
+		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0), tanFrictionAngle(0), lengthMaxCompression(0), lengthMaxTension(0), isCohesive(false) { createIndex();}
 		virtual ~RpmPhys();
 
 		REGISTER_ATTRIBUTES(NormalShearInteraction,

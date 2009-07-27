@@ -51,4 +51,4 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	aabb->max = max;
 }
 	
-YADE_PLUGIN();
+YADE_PLUGIN("MetaInteractingGeometry2AABB");

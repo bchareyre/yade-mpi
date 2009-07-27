@@ -6,15 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "STLImporterTest.hpp"
-#include <yade/pkg-common/SpatialQuickSortCollider.hpp>
-#include <yade/lib-import/STLImporter.hpp>
+#include"STLImporterTest.hpp"
+#include<yade/pkg-common/SpatialQuickSortCollider.hpp>
+#include<yade/lib-import/STLImporter.hpp>
+#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BodyRedirectionVector.hpp>
+#include<yade/core/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -288,4 +290,4 @@ void STLImporterTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-YADE_PLUGIN();
+YADE_PLUGIN("STLImporterTest");
