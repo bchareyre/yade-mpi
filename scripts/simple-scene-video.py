@@ -20,7 +20,7 @@ o.engines=[
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 	StandAloneEngine('ElasticContactLaw'),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.2})
+	NewtonsDampedLaw(damping=.2)
 ]
 from yade import utils
 o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))

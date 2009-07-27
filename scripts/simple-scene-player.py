@@ -20,7 +20,7 @@ o.engines=[
 	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
 	StandAloneEngine('ElasticContactLaw'),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.2}),
+	NewtonsDampedLaw(damping=.2),
 	###
 	### NOTE this extra engine.
 	###

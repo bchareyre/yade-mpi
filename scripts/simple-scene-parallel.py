@@ -36,7 +36,7 @@ o.engines=[
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)
 	StandAloneEngine('ElasticContactLaw'),
 	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.2})
+	NewtonsDampedLaw(damping=.2)
 ]
 
 from yade import utils
