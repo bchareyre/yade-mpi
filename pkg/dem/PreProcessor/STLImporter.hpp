@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #pragma once
-#include <yade/pkg-common/Facet.hpp>
-#include <yade/pkg-common/InteractingFacet.hpp>
-#include "STLReader.hpp"
+#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/lib-import/STLReader.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyContainer.hpp>
 

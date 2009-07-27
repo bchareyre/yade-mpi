@@ -8,7 +8,7 @@
 
 #include"STLImporterTest.hpp"
 #include<yade/pkg-common/SpatialQuickSortCollider.hpp>
-#include<yade/lib-import/STLImporter.hpp>
+#include<yade/pkg-dem/STLImporter.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/core/Body.hpp>

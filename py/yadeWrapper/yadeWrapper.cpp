@@ -8,7 +8,7 @@
 
 
 #include<boost/python.hpp>
-#include <boost/python/raw_function.hpp>
+#include<boost/python/raw_function.hpp>
 #include<boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include<boost/bind.hpp>
 #include<boost/lambda/bind.hpp>
@@ -25,7 +25,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/FileGenerator.hpp>
 
-#include<yade/lib-import/STLImporter.hpp>
+#include<yade/pkg-dem/STLImporter.hpp>
 
 #include<yade/core/MetaEngine.hpp>
 #include<yade/core/MetaEngine1D.hpp>

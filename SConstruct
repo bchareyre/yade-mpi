@@ -526,8 +526,7 @@ def linkPlugins(plugins):
 	return list(ret)
 
 env['linkPlugins']=linkPlugins
-
-yadeSCons.buildPluginLibs(env,buildPlugs)
+env['buildPlugs']=buildPlugs
 
 # read top-level SConscript file. It is used only so that build_dir is set. This file reads all necessary SConscripts
 env.SConscript(dirs=['.'],build_dir=buildDir,duplicate=0)

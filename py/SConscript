@@ -27,8 +27,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 		env.File('linterpolation.py'),
 		env.File('timing.py'),
 		env.File('pack.py'),
-		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['XMLFormatManager','yade-factory','yade-serialization','STLImporter',
-			linkPlugins(['Shop','BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump'])
+		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['XMLFormatManager','yade-factory','yade-serialization',linkPlugins(['Shop','BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',])
 			],),
 		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['boost_python_indexing_suite_v2']+linkPlugins(Split("BoundingVolumeEngineUnit GeometricalModelEngineUnit InteractingGeometryEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit PhysicalParametersEngineUnit PhysicalActionDamperUnit PhysicalActionApplierUnit ConstitutiveLaw")))
 	])

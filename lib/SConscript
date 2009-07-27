@@ -59,8 +59,7 @@ yadeStaticOrSharedLib('yade-serialization',['serialization/Archive.cpp','seriali
 
 # for now, keep this is as a shared lib, since it depends on things from pkg (shouldn't be the case, though...)
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-	env.SharedLibrary('STLImporter',['import/STLReader.cpp', 'import/STLImporter.cpp'],LIBS=linkPlugins(['Facet','InteractingFacet','Shop'])
-		),
+	env.SharedLibrary('STLImporter',['import/STLReader.cpp']),
 ])
 
 #######################
