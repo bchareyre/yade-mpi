@@ -5,8 +5,9 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include "STLImporter.hpp"
-#include <yade/pkg-dem/Shop.hpp>
+#include"STLImporter.hpp"
+#include<yade/pkg-dem/Shop.hpp>
+#include<yade/lib-import/STLReader.hpp>
 
 CREATE_LOGGER(STLImporter);
 
@@ -20,8 +21,9 @@ bool STLImporter::open(const char* filename)
 {
     vector<double> vtmp, ntmp;
     vector<int>  etmp, ftmp;
-    STLReader::tolerance = Math<Real>::ZERO_TOLERANCE;
     STLReader reader;
+	 reader.tolerance=Math<Real>::ZERO_TOLERANCE;
+
     if(!reader.open(filename, back_inserter(vtmp), back_inserter(etmp), back_inserter(ftmp), back_inserter(ntmp))) 
 	{
 		LOG_ERROR("Can't open file: " << filename);

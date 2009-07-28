@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "FEMTetrahedronData.hpp"
-#include "FEMNodeData.hpp"
+#include"FEMTetrahedronData.hpp"
+#include<yade/pkg-fem/FEMNodeData.hpp>
 
 
 FEMTetrahedronData::FEMTetrahedronData() : PhysicalParameters()

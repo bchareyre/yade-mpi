@@ -1,3 +1,4 @@
+YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 #include <boost/bind.hpp>
 #include "VoxelEnvelope.hpp"
 

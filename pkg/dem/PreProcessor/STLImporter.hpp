@@ -8,9 +8,9 @@
 #pragma once
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
-#include<yade/lib-import/STLReader.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyContainer.hpp>
+
 
 class STLImporter {
     public:

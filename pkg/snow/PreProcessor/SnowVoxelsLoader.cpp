@@ -68,6 +68,17 @@
 //#include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp>
 //#include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
 
+/* this is a little hack; all those files are not picked up by the source
+scanner since they have YADE_REQUIRE_FEATURE(some nonsense) inside.
+Sorry for that. */
+#include"Voxel/Config.cpp"
+#include"Voxel/DataSurface.cpp"
+#include"Voxel/DataVoxel.cpp"
+#include"Voxel/GrainSurface.cpp"
+#include"Voxel/SafeVectors3.cpp"
+#include"Voxel/VoxelEnvelope.cpp"
+
+
 YADE_PLUGIN("SnowVoxelsLoader");
 SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 {

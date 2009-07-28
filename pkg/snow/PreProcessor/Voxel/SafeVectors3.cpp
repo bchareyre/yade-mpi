@@ -1,3 +1,4 @@
+YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 #include "SafeVectors3.hpp"
 
 SafeVectors3::SafeVectors3(int size,std::string myname,std::string fname,bool has_id) : m_myname(myname)

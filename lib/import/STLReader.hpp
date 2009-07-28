@@ -25,7 +25,7 @@ class STLReader {
 	template<class OutV, class OutE, class OutF, class OutN>
 	    bool open(const char* filename, OutV vertices, OutE edges, OutF facets, OutN normals);
 	
-	static float tolerance;
+	float tolerance;
     
     protected:
 	template<class OutV, class OutE, class OutF, class OutN>
@@ -47,12 +47,14 @@ class STLReader {
 	};
 
 	class IsDifferent {
+		float tolerance;
 	    public:
+		IsDifferent(float _tolerance): tolerance(_tolerance){}
 		bool operator() (const Vrtx& v1, const Vrtx& v2)
 		{
-		    if ( std::abs(v1[0]-v2[0])<STLReader::tolerance 
-			    && std::abs(v1[1]-v2[1])<STLReader::tolerance 
-			    && std::abs(v1[2]-v2[2])<STLReader::tolerance ) 
+		    if ( std::abs(v1[0]-v2[0])<tolerance 
+			    && std::abs(v1[1]-v2[1])<tolerance 
+			    && std::abs(v1[2]-v2[2])<tolerance ) 
 			return false;
 		    return true;
 		}
@@ -127,7 +129,7 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
 	{
 	    (normals++) = n[i];
 	    bool is_different=true;
-	    IsDifferent isd;
+	    IsDifferent isd(tolerance);
 	    int j=0;
 	    for(int ej=vcs.size(); j<ej; ++j) 
 		if ( !(is_different = isd(v[i],vcs[j])) ) break;
@@ -193,7 +195,7 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
 	{
 	    (normals++) = n[i];
 	    bool is_different=true;
-	    IsDifferent isd;
+	    IsDifferent isd(tolerance);
 	    int j=0;
 	    for(int ej=vcs.size(); j<ej; ++j) 
 		if ( !(is_different = isd(v[i],vcs[j])) ) break;

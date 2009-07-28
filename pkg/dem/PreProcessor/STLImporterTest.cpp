@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+
 #include"STLImporterTest.hpp"
 #include<yade/pkg-common/SpatialQuickSortCollider.hpp>
 #include<yade/pkg-dem/STLImporter.hpp>

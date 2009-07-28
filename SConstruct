@@ -352,6 +352,10 @@ if not env.GetOption('clean'):
 
 	env=conf.Finish()
 
+	if os.path.exists('../brefcom-mm.hh'):
+		print "Will use full CPM model in ../brefcom-mm.hh"
+		env.Append(CPPDEFINES='YADE_CPM_FULL_MODEL_AVAILABLE')
+
 ##########################################################################################
 ############# BUILDING ###################################################################
 ##########################################################################################

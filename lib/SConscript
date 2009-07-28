@@ -9,7 +9,9 @@ def yadeStaticOrSharedLib(*args,**kw):
 	#return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary(*args,**kw))
 
 if 'qt3' not in env['exclude']:
-	yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],LIBS=env['LIBS']+['yade-base','XMLFormatManager']),
+	yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],
+		#LIBS=env['LIBS']+['yade-suypportbase','XMLFormatManager']),
+		LIBS=['yade-support']),
 	yadeStaticOrSharedLib('yade-QGLViewer',Split('''
 		QGLViewer/VRenderInterface_Qt3.ui
 		QGLViewer/ImageInterface_Qt3.ui
@@ -50,17 +52,13 @@ if 'qt3' not in env['exclude']:
 if 'YADE_OPENGL' in env['CPPDEFINES']:
 	yadeStaticOrSharedLib('yade-opengl',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp'],LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
 
-yadeStaticOrSharedLib('yade-base',['base/yadeWm3Extra.cpp'],LIBS=env['LIBS']),
-yadeStaticOrSharedLib('yade-computational-geometry',['computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp'],LIBS=env['LIBS']+['yade-base']),
-yadeStaticOrSharedLib('yade-factory',['factory/ClassFactory.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp']),
-yadeStaticOrSharedLib('yade-multimethods',['multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp']),
-yadeStaticOrSharedLib('XMLFormatManager',['serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp'],LIBS=env['LIBS']+['yade-base','yade-serialization']),
-yadeStaticOrSharedLib('yade-serialization',['serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp'],LIBS=env['LIBS']+['yade-base','yade-factory']),
-
-# for now, keep this is as a shared lib, since it depends on things from pkg (shouldn't be the case, though...)
-env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
-	env.SharedLibrary('STLImporter',['import/STLReader.cpp']),
-])
+yadeStaticOrSharedLib('yade-support',[
+	'base/yadeWm3Extra.cpp',
+	'computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp',
+	'factory/ClassFactory.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
+	'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
+	'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp',
+	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp'])
 
 #######################
 ###### 3rd party libs

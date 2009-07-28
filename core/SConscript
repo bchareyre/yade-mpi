@@ -31,15 +31,9 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'containers/InteractionVecMap.cpp',
 			]),
 		LIBS=env['LIBS']+[
-			'yade-base',
-			'yade-serialization',
-			'yade-factory',
-			'yade-multimethods',
-			'yade-computational-geometry',
+			'yade-support',
 			'sqlite3x',
-			'XMLFormatManager',
 			'miniWm3',
-			'STLImporter',
 			'rt', # realtime lib, for clock_gettime 
 			]+
 			['$QGLVIEWER_LIB','yade-opengl'] if 'YADE_OPENGL' in env['CPPDEFINES'] else [],

@@ -1,3 +1,4 @@
+YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 #include "GrainSurface.hpp"
 #include "Config.hpp"
 

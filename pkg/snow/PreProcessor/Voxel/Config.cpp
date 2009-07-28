@@ -1,3 +1,4 @@
+YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 #include "Config.hpp"
 #include <GL/glut.h>
 #include <iostream>

@@ -7,6 +7,10 @@ using namespace std;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.eudoxos");
 #endif
 
+#ifdef YADE_CPM_FULL_MODEL_AVAILABLE
+	#include"../../brefcom-mm.hh"
+#endif
+
 # if 0
 Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
