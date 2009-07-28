@@ -283,7 +283,7 @@ class pyOmega{
 			OMEGA.createSimulationLoop();
 		}
 	};
-	/* Create variables in python's __builtin__ namespace that correspond to labeled objects. At this moment, only engines can be labeled. */
+	/* Create variables in python's __builtin__ namespace that correspond to labeled objects. At this moment, only engines and functors can be labeled (not bodies etc). */
 	void mapLabeledEntitiesToVariables(){
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getRootBody()->engines){
 			if(!e->label.empty()){
@@ -486,8 +486,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(STLImporter_import_overloads,py_import,1,
 
 
 /*****************************************************************************
-********** New helper functions 
-****/
+********** New helper functions */
 void Serializable_updateAttrs(const shared_ptr<Serializable>& self, const python::dict& d){
 	python::list l=d.items(); size_t ll=python::len(l);
 	for(size_t i=0; i<ll; i++){
@@ -757,13 +756,14 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readonly("timingDeltas",&Engine::timingDeltas);
 	python::class_<StandAloneEngine,shared_ptr<StandAloneEngine>, python::bases<Engine>, noncopyable>("StandAloneEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Engine>));
 	python::class_<DeusExMachina,shared_ptr<DeusExMachina>, python::bases<Engine>, noncopyable>("DeusExMachina").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Engine>));
-	python::class_<EngineUnit, shared_ptr<EngineUnit>, python::bases<Serializable>, noncopyable >("EngineUnit")
+	python::class_<EngineUnit, shared_ptr<EngineUnit>, python::bases<Serializable>, noncopyable >("EngineUnit",python::no_init)
 		.def_readonly("timingDeltas",&EngineUnit::timingDeltas)
 		.add_property("bases",&EngineUnit::getFunctorTypes);
+	python::class_<MetaEngine, shared_ptr<MetaEngine>, python::bases<Engine>, noncopyable>("MetaEngine",python::no_init);
 	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas_pyData).def("reset",&TimingDeltas::reset);
 
 	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers").def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists));
-	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Engine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>));
+	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<MetaEngine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>));
 		EXPOSE_DISPATCHER(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit)
 		EXPOSE_DISPATCHER(GeometricalModelMetaEngine,GeometricalModelEngineUnit)
 		EXPOSE_DISPATCHER(InteractingGeometryMetaEngine,InteractingGeometryEngineUnit)
@@ -824,9 +824,5 @@ BOOST_PYTHON_MODULE(wrapper)
 	EXPOSE_CXX_CLASS_RENAMED(FileGenerator,Preprocessor)
 		.def("generate",&FileGenerator_generate)
 		.def("load",&FileGenerator_load);
-
-	// containers & iterators
-	// BodyContainer
-	
 }
 

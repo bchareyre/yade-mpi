@@ -235,7 +235,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 						assert(V[k].id==iid); // if this fails, we didn't meet the other bound in the downwards sense either; that should never happen
 						assert(!V[k].flags.isMin); // the lower bound should be maximum in this (exceptional) case; we will fix that now
 						V[k].flags.isMin=true; V[i].flags.isMin=false;
-						LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<"(coords: "<<V[k].coord<<" and "<<V[i].coord);
+						LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<" (coords: "<<V[k].coord<<" and "<<V[i].coord<<")");
 						break; // would happen anyways
 					}
 				}

@@ -307,7 +307,9 @@ if not env.GetOption('clean'):
 	env['haveForeach']=conf.CheckCXXHeader('boost/foreach.hpp','<>')
 	if not env['haveForeach']: print "(OK, local version will be used instead)"
 	ok&=conf.CheckLibWithHeader('sqlite3','sqlite3.h','c++','sqlite3_close(0L);',autoadd=1)
-	if not env['useMiniWm3']: ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
+	if not env['useMiniWm3']:
+		conf.env.Append(CPPPATH='/usr/include/wm3') # packaged version
+		ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
 
 	if not ok:
