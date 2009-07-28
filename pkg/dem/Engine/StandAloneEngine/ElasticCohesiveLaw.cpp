@@ -10,7 +10,7 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
+//#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 
 
@@ -53,7 +53,7 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 			BodyMacroParameters* de1			= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2			= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 			SDECLinkPhysics* currentContactPhysics		= YADE_CAST<SDECLinkPhysics*>(contact2->interactionPhysics.get());
-			SDECLinkGeometry* currentContactGeometry	= YADE_CAST<SDECLinkGeometry*>(contact2->interactionGeometry.get());
+			SpheresContactGeometry* currentContactGeometry	= YADE_CAST<SpheresContactGeometry*>(contact2->interactionGeometry.get());
 			if((!currentContactPhysics)||(!currentContactGeometry)) continue;
 	
 			Real un 					= currentContactPhysics->equilibriumDistance-(de2->se3.position-de1->se3.position).Length();

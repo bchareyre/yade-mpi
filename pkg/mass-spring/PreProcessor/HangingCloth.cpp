@@ -47,7 +47,7 @@
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp>
+//#include<yade/pkg-dem/SDECLinkGeometry.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 //#include<yade/pkg-common/MassSpringBody2RigidBodyLaw.hpp>
 
@@ -365,7 +365,7 @@ bool HangingCloth::generate()
 				if ( a && b && as && bs && (a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 				{
 					shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
-					shared_ptr<SDECLinkGeometry>		geometry(new SDECLinkGeometry);
+					shared_ptr<SpheresContactGeometry>		geometry(new SpheresContactGeometry);
 					shared_ptr<SDECLinkPhysics>	physics(new SDECLinkPhysics);
 					
 					geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;

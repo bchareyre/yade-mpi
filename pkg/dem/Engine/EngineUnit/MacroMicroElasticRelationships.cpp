@@ -11,8 +11,8 @@
 #include"MacroMicroElasticRelationships.hpp"
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
-#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
+//#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
+//#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/Tetra.hpp>
 #include<yade/core/Omega.hpp>
@@ -111,6 +111,7 @@ another would be HerzMindlinContactModel
 	}
 	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
 	{
+#if 0
 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
 		if (sdecLinkGeometry)
 		{		
@@ -120,7 +121,9 @@ another would be HerzMindlinContactModel
 			linkPhysics->ks 			= linkPhysics->initialKs;
 			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
 		}
-		else if(dynamic_cast<TetraBang*>(interaction->interactionGeometry.get()) && !interaction->interactionPhysics){
+		else
+#endif			
+		if(dynamic_cast<TetraBang*>(interaction->interactionGeometry.get()) && !interaction->interactionPhysics){
 			// TetraLaw doesn't use InteractionPhysics anyway, it accesses bodies' parameters directly
 			interaction->interactionPhysics=shared_ptr<InteractionPhysics>(new InteractionPhysics);
 		}

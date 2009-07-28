@@ -9,8 +9,8 @@
 #include"CL1Relationships.hpp"
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ContactLaw1Interaction.hpp>
-#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
-#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
+// #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
+// #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -173,6 +173,7 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 		}	
 		
 	}
+#if 0
 	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
 	{
 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
@@ -185,5 +186,6 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
 		}
 	}
+#endif
 };
 YADE_PLUGIN("CL1Relationships");
