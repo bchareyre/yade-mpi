@@ -10,10 +10,11 @@ YADE_PLUGIN("TetraTestGen");
 
 bool TetraTestGen::generate()
 {
-	//Shop::setDefault("param_pythonRunExpr",string("if S.i%50==0 and S.i<1000 and S.i>500:\n\tprint S.i,len(S.sel),B[1].x, B[1].E"));
+	Shop::setDefault<int>("param_timeStepUpdateInterval",-1);
 
 	rootBody=Shop::rootBody();
 	Shop::rootBodyActors(rootBody);
+	rootBody->dt=1e-5;
 	
 	#if 0
 	shared_ptr<MetaBody> oldRootBody=Omega::instance().getRootBody();

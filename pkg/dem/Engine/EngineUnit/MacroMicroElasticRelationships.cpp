@@ -14,6 +14,7 @@
 #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
 #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-dem/Tetra.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 
@@ -118,6 +119,10 @@ another would be HerzMindlinContactModel
 			linkPhysics->kn 			= linkPhysics->initialKn;
 			linkPhysics->ks 			= linkPhysics->initialKs;
 			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
+		}
+		else if(dynamic_cast<TetraBang*>(interaction->interactionGeometry.get()) && !interaction->interactionPhysics){
+			// TetraLaw doesn't use InteractionPhysics anyway, it accesses bodies' parameters directly
+			interaction->interactionPhysics=shared_ptr<InteractionPhysics>(new InteractionPhysics);
 		}
 	}
 };
