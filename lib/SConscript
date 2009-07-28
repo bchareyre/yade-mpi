@@ -50,15 +50,15 @@ if 'qt3' not in env['exclude']:
 		CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
 	)
 if 'YADE_OPENGL' in env['CPPDEFINES']:
-	yadeStaticOrSharedLib('yade-opengl',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp'],LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
+	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','$QGLVIEWER_LIB']),
 
-yadeStaticOrSharedLib('yade-support',[
+yadeStaticOrSharedLib('yade-support',env.Combine('yade-support.cpp',[
 	'base/yadeWm3Extra.cpp',
 	'computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp',
 	'factory/ClassFactory.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
 	'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 	'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp',
-	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp'])
+	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp']))
 
 #######################
 ###### 3rd party libs

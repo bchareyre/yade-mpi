@@ -12,7 +12,6 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
-#define TR {if (Omega::instance().getCurrentIteration()%100==0) TRACE; }
 class MetaBody;
 class PhysicalParameters;
 

@@ -11,7 +11,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 
-#include <boost/numeric/ublas/matrix.hpp>
+#include<boost/numeric/ublas/matrix.hpp>
 
 #include <vector>
 
