@@ -26,7 +26,7 @@ class Config
 		std::string	m_file_basename;
 		int		m_start;
 		int		m_end;
-		int		m_digits;
+		unsigned int	m_digits;
 		int		m_grains;
 		int		m_display_steps;
 		std::set<int>	m_selection;
@@ -75,7 +75,7 @@ class Config
 		std::string	file_basename(){return m_file_basename;};
 		int		start(){return m_start;};
 		int		end(){return m_end;};
-		int		digits(){return m_digits;};
+		unsigned int	digits(){return m_digits;};
 		int		grains(){return m_grains;};
 
 		int		display_steps(){return m_display_steps;};

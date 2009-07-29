@@ -23,7 +23,8 @@ class MovingSupport;
 class LatticeExample : public FileGenerator
 {
 	private :
-		int 		nodeGroupMask,beamGroupMask,quadGroupMask;
+		int 		 nodeGroupMask,beamGroupMask,quadGroupMask
+				,fibreGroupMask,aggGroupMask,fibreBondGroupMask,bondGroupMask;
 		
 	// mesh generation	
 		Vector3r 	 speciemen_size_in_meters 	// size
@@ -109,7 +110,8 @@ struct Circle
 {
         float x,y,z,d;
 };
-		bool overlaps(Circle& cc,std::vector<Circle>& c);
+		bool overlaps(Circle& cc,std::vector<Circle>& c,bool no_self_overlap=false,float threshold=1.1);
+		int overlapCount(std::vector<Circle>& c,float);
 		int aggInside(Vector3r& a,Vector3r& b,std::vector<Circle>& c, Real cellsizeUnit_in_meters);
 		float aggsAreas(std::vector<Circle>& c);
 		float aggsVolumes(std::vector<Circle>& c);

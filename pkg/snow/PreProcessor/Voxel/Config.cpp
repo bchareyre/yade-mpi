@@ -5,7 +5,6 @@ YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 namespace po = boost::program_options;
 
 Config::Config(int argc, char** argv) : 
-	opts("Snow data reader options"), 
 	m_draw_with_names(false),
 	m_display_selection(false),
 	m_time_draw_limit(true),
@@ -13,7 +12,8 @@ Config::Config(int argc, char** argv) :
 	m_draw_backfaces(false),
 	m_draw_surface_or_contact_or_all(2),
 	m_auto_center(false),
-	m_transparency(false)
+	m_transparency(false),
+	opts("Snow data reader options")
 {
 	opts.add_options()
 		("help,h","display this help.")
@@ -27,7 +27,7 @@ Config::Config(int argc, char** argv) :
 			"start slice number to be loaded.")
 		(",e",po::value<int>(&m_end)->default_value(610),
 			"end slice number to be loaded.")
-		(",n",po::value<int>(&m_digits)->default_value(4),
+		(",n",po::value<unsigned int>(&m_digits)->default_value(4),
 			"number of digits in slice name eg. four is: _0000.txt.")
 		(",g",po::value<int>(&m_grains)->default_value(120),
 			"number of grains the sample.")

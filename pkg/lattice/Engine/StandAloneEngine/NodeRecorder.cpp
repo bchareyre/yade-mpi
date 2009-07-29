@@ -176,7 +176,7 @@ void NodeRecorder::action(MetaBody * ncb)
 				++count;
 				
 				//(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = Vector3r(((float)((region+3)%5))/5.0,1.0,((float)region)/5.0); // FIXME [1]
-				Vector3r col;
+				Vector3r col(0,0,0);
 				switch(region%6)
 				{       //                    0 0 0
 					case 0 : col=Vector3r(0,0,1);break;

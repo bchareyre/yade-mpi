@@ -148,9 +148,9 @@ void DataVoxel::load(Config& c)
 int  DataVoxel::volume_of_grain_id(const t_voxel_data& data, int GRAIN_ID)
 {
 	int result=0;
-	for(int i = 0 ; i < data.size() ; ++i)
-		for( int x = 0 ; x < data[i].size() ; ++x)
-			for( int y = 0 ; y < data[i][x].size() ; ++y)
+	for(size_t i = 0 ; i < data.size() ; ++i)
+		for( size_t x = 0 ; x < data[i].size() ; ++x)
+			for( size_t y = 0 ; y < data[i][x].size() ; ++y)
 				if(data[i][x][y] == GRAIN_ID)
 					++result;
 	return result;
@@ -234,18 +234,18 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 		{
 			// clean this one off
 			std::cerr << "grain " << id << " too small - removing\n";
-			for(int i = 0 ; i < m_voxel_data.size() ; ++i)
-				for( int x = 0 ; x < m_voxel_data[i].size() ; ++x)
-					for( int y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
+			for(size_t i = 0 ; i < m_voxel_data.size() ; ++i)
+				for( size_t x = 0 ; x < m_voxel_data[i].size() ; ++x)
+					for( size_t y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
 						if(m_voxel_data[i][x][y] == id)
 							m_voxel_data[i][x][y] = 0;
 		}
 	}
 
 	needs_to_be_checked.clear();
-	for(int i = 0 ; i < m_voxel_data.size() ; ++i)
-		for( int x = 0 ; x < m_voxel_data[i].size() ; ++x)
-			for( int y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
+	for(size_t i = 0 ; i < m_voxel_data.size() ; ++i)
+		for( size_t x = 0 ; x < m_voxel_data[i].size() ; ++x)
+			for( size_t y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
 				if(m_voxel_data[i][x][y] != experimental[i][x][y] && m_voxel_data[i][x][y] == 0)
 					needs_to_be_checked.push_back(Vector3<int>(i,x,y));
 
@@ -271,7 +271,7 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 			}
 		}
 		last_checked = checked_end;
-		for(int D = 0 ; D < needs_to_be_checked.size() ; ++D)
+		for(size_t D = 0 ; D < needs_to_be_checked.size() ; ++D)
 		{
 			if(checked[D] != 0)
 				continue;
@@ -288,7 +288,7 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 				m_voxel_data[i  ][x  ][y-1] != 0
 			)
 			{
-				for(int ZZ = 0 ; ZZ < s.size() ; ++ZZ) 
+				for(size_t ZZ = 0 ; ZZ < s.size() ; ++ZZ) 
 					s[ZZ] = 0;
 
 				if(m_voxel_data[i+1][x  ][y  ] != 0){ s[m_voxel_data[i+1][x  ][y  ]] += 1; };
@@ -300,7 +300,7 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 
 				int max_id=0;
 				int max_contact = 0;
-				for(int ZZ = 0 ; ZZ < s.size() ; ++ZZ)
+				for(size_t ZZ = 0 ; ZZ < s.size() ; ++ZZ)
 				{
 					if(s[ZZ] > max_contact)
 					{
@@ -338,13 +338,13 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 	{// change owners due to overhelming contact surface
 		std::vector<int>  surfaces;
 		surfaces.resize(config.grains()+10,0);
-		for(int ZZ = 0 ; ZZ < surfaces.size() ; ++ZZ) 
+		for(size_t ZZ = 0 ; ZZ < surfaces.size() ; ++ZZ) 
 			surfaces[ZZ] = 0;
 		int total_surface = 0;
 
-		for(int i = 0 ; i < m_voxel_data.size() ; ++i)
-			for( int x = 0 ; x < m_voxel_data[i].size() ; ++x)
-				for( int y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
+		for(size_t i = 0 ; i < m_voxel_data.size() ; ++i)
+			for( size_t x = 0 ; x < m_voxel_data[i].size() ; ++x)
+				for( size_t y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
 					if(m_voxel_data[i][x][y] == id)
 					{
 						// calculate surface of this grain, and surface of contact with other grains
@@ -363,9 +363,9 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 					}
 		int max_id=0;
 		int max_contact = 0;
-		for(int ZZ = 1 ; ZZ < surfaces.size() ; ++ZZ)
+		for(size_t ZZ = 1 ; ZZ < surfaces.size() ; ++ZZ)
 		{
-			if(surfaces[ZZ] > max_contact && ZZ != id)
+			if(surfaces[ZZ] > max_contact && ZZ != (unsigned int)(id))
 			{
 				max_id = ZZ;
 				max_contact = surfaces[max_id];
@@ -376,9 +376,9 @@ void DataVoxel::final(const t_voxel_data& experimental,const t_voxel_data& clean
 			std::cerr << "grain " << id << " has contact with grain "<< max_id <<" bigger than 0.3 of its total surface ( " << max_contact << "/" << total_surface << " = "<<100*max_contact/total_surface<<" \% ) - removing\n";
 			// clean this one off
 			removed.insert(max_id);
-			for(int i = 0 ; i < m_voxel_data.size() ; ++i)
-				for( int x = 0 ; x < m_voxel_data[i].size() ; ++x)
-					for( int y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
+			for(size_t i = 0 ; i < m_voxel_data.size() ; ++i)
+				for( size_t x = 0 ; x < m_voxel_data[i].size() ; ++x)
+					for( size_t y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
 						if(m_voxel_data[i][x][y] == id)
 							m_voxel_data[i][x][y] = max_id;
 		}
@@ -398,13 +398,13 @@ void DataVoxel::cut_off_junk(const t_voxel_data& other,std::set<int> grains,cons
 		boost::mutex::scoped_lock scoped_lock(m_voxel_mutex);
 		// first resize to other's size
 		m_voxel_data.resize(other.size());
-		for(int i = 0 ; i < m_voxel_data.size() ; ++i)
+		for(size_t i = 0 ; i < m_voxel_data.size() ; ++i)
 		{
 			m_voxel_data[i].resize(other[0].size());
-			for( int x = 0 ; x < m_voxel_data[i].size() ; ++x)
+			for( size_t x = 0 ; x < m_voxel_data[i].size() ; ++x)
 			{
 				m_voxel_data[i][x].resize(other[0][0].size() , 0);
-				for( int y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
+				for( size_t y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
 					m_voxel_data[i][x][y] = 0;
 			}
 		}
@@ -668,13 +668,13 @@ void DataVoxel::simple_volume_finder(const t_voxel_data& other,Config& config,st
 		boost::mutex::scoped_lock scoped_lock(m_voxel_mutex);
 		// first resize to other's size
 		m_voxel_data.resize(other.size());
-		for(int i = 0 ; i < m_voxel_data.size() ; ++i)
+		for(size_t i = 0 ; i < m_voxel_data.size() ; ++i)
 		{
 			m_voxel_data[i].resize(other[0].size());
-			for( int x = 0 ; x < m_voxel_data[i].size() ; ++x)
+			for( size_t x = 0 ; x < m_voxel_data[i].size() ; ++x)
 			{
 				m_voxel_data[i][x].resize(other[0][0].size() , 0);
-				for( int y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
+				for( size_t y = 0 ; y < m_voxel_data[i][x].size() ; ++y)
 					m_voxel_data[i][x][y] = 0;
 			}
 		}

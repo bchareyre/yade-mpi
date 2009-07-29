@@ -18,7 +18,7 @@ class LatticeBeamParameters : public PhysicalParameters
 		Real                     strain_;
 	public :
 		// element
-		unsigned int             id1
+		int                      id1
 					,id2;
 		// state		
 		Real  			 initialLength

@@ -20,7 +20,7 @@ SafeVectors3::SafeVectors3(int size,std::string myname,std::string fname,bool ha
 	std::cerr << myname << " file loaded\n";
 }
 
-Vector3r SafeVectors3::operator[](int i)const
+Vector3r SafeVectors3::operator[](size_t i)const
 {
 	if(i>=0 && i<m_data.size()) {
 		return m_data[i];

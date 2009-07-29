@@ -3,13 +3,13 @@ YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 #include "VoxelEnvelope.hpp"
 
 VoxelEnvelope::VoxelEnvelope(Config& c, std::string name) : 
-	m_data_voxel(), 
-	m_axes(c.grains(),"c axes",c.axis_file(),true), 
-	m_colors(c.grains(),"colors",c.color_file(),false),
 	m_centers_calculated(false),
 	m_grain_voxel_surfaces_calculated(false),
 	m_bad_grain_count(""),
-	m_myname(name)
+	m_myname(name),
+	m_data_voxel(), 
+	m_axes(c.grains(),"c axes",c.axis_file(),true), 
+	m_colors(c.grains(),"colors",c.color_file(),false)
 {
 	m_centers.clear();
 }

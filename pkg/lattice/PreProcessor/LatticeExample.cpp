@@ -59,6 +59,10 @@ LatticeExample::LatticeExample() : FileGenerator()
         nodeGroupMask           = 1;
         beamGroupMask           = 2;
 	quadGroupMask		= 4;
+	fibreGroupMask		= 8;
+	aggGroupMask		= 16;
+	fibreBondGroupMask	= 32;
+	bondGroupMask		= 64;
         
         speciemen_size_in_meters = Vector3r(0.1,0.1,0.0001);
         cellsizeUnit_in_meters   = 0.01;//0.003;
@@ -176,7 +180,7 @@ LatticeExample::LatticeExample() : FileGenerator()
 	CT			 = 1;
 
         useAggregates            = false;
-	no_Agg_outside		 = true;
+	no_Agg_outside		 = false;
         aggregatePercent         = 40;
         aggregateMeanDiameter    = cellsizeUnit_in_meters*1;
         aggregateSigmaDiameter   = cellsizeUnit_in_meters*2;
@@ -274,6 +278,9 @@ LatticeExample::~LatticeExample()
 
 bool LatticeExample::generate()
 {
+	no_Agg_outside = false;
+	std::cerr << "no_Agg_outside parameter is not used.\n";
+
 	fibres_total=0;
 	matrix_total=0;
 	beam_total=0;
@@ -393,6 +400,7 @@ bool LatticeExample::generate()
 					}
 				}
 			}
+			setStatus("Delaunay 2d... done");
 		}
 		else
 		{
@@ -420,6 +428,7 @@ bool LatticeExample::generate()
 					}
 				}
 			}
+			setStatus("Delaunay 3d... done");
 		}
 
 	}
@@ -482,6 +491,7 @@ bool LatticeExample::generate()
 	} // beams are created
 
 
+	setStatus("strain recorder nodes...");
         { // subscribe two nodes, that are monitored by strain recoder to get a measure of length
                 bi    = rootBody->bodies->begin();
                 biEnd = rootBody->bodies->end();
@@ -506,6 +516,7 @@ bool LatticeExample::generate()
                 measurePoisson->upper  =node2Id; // upper
         }
         
+	setStatus("poisson recorder nodes...");
         { // subscribe two nodes, that are monitored by MeasurePoisson to get a measure of poisson
                 bi    = rootBody->bodies->begin();
                 biEnd = rootBody->bodies->end();
@@ -532,9 +543,15 @@ bool LatticeExample::generate()
 
         bi    = bc.begin();
         biEnd = bc.end();
-        for(  ; bi!=biEnd ; ++bi )  // loop over all newly created beams ...
+	float all_bodies = bc.size();
+	setStatus("Copy beam data...");
+        for( int curr=0 ; bi!=biEnd ; ++bi,++curr )  // loop over all newly created beams ...
         {
-		if(shouldTerminate()) return false;
+		if(curr % 100 == 0)
+		{
+			if(shouldTerminate()) return false;
+			setProgress((float)(curr)/(float)(all_bodies));
+		}
 
                 shared_ptr<Body> b = *bi;
                 rootBody->bodies->insert(b); // .. to insert them into rootBody
@@ -559,16 +576,22 @@ bool LatticeExample::generate()
         measurePoisson->vertical                =   (*(rootBody->bodies))[subscribedBodies[1]]->physicalParameters->se3.position[1] 
                                                   - (*(rootBody->bodies))[subscribedBodies[0]]->physicalParameters->se3.position[1];
                 
+	setStatus("Find neighbours...");
         { // remember what node is in contact with what beams
                 //    node                   beams
 		connections.resize(totalNodesCount);
 		
 		bi    = rootBody->bodies->begin();
 		biEnd = rootBody->bodies->end();
+		float all_bodies = rootBody->bodies->size();
 		
-		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+		for( int curr=0 ; bi!=biEnd ; ++bi,++curr )  // loop over all beams
 		{
-			if(shouldTerminate()) return false;
+			if(curr % 100 == 0)
+			{
+				if(shouldTerminate()) return false;
+				setProgress((float)(curr)/(float)(all_bodies));
+			}
 
 			Body* body = (*bi).get();
 			if( ! ( body->getGroupMask() & beamGroupMask ) )
@@ -585,17 +608,14 @@ bool LatticeExample::generate()
 		bi    = rootBody->bodies->begin();
 		biEnd = rootBody->bodies->end();
 		float all_bodies = rootBody->bodies->size();
-		int current = 0;
-		for(  ; bi!=biEnd ; ++bi )  // loop over all beams
+		for( int curr=0 ; bi!=biEnd ; ++bi,++curr )  // loop over all beams
 		{
-			if(shouldTerminate()) return false;
-
-			if( ++current % 100 == 0 )
+			if(curr % 100 == 0)
 			{
-				//cerr << "angular springs: " << current << " , " << ((static_cast<float>(current)/all_bodies)*100.0) << " %\n";
-				setProgress(((float)(current)/all_bodies));
+				if(shouldTerminate()) return false;
+				setProgress((float)(curr)/(float)(all_bodies));
 			}
-				
+
 			Body* body = (*bi).get();
 			if( ! ( body->getGroupMask() & beamGroupMask ) )
 				continue; // skip non-beams
@@ -1377,18 +1397,30 @@ void LatticeExample::modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vect
         }
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c)
+int LatticeExample::overlapCount(std::vector<Circle>& c,float threshold)
+{
+	int res=0;
+	for(size_t i=0 ; i<c.size() ; ++i)
+		if(overlaps(c[i],c,true,threshold))
+			++res;
+	return res;
+};
+
+bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c,bool no_self_overlap,float threshold)
 {
 	// check with circles
         std::vector<Circle>::iterator end=c.end();
         for(std::vector<Circle>::iterator i=c.begin();i!=end;++i)
         {
                 float dist2 = std::pow(i->x - cc.x ,2)+std::pow(i->y - cc.y,2)+std::pow(i->z - cc.z,2);
-                float r2    = std::pow( 1.1*(i->d+cc.d)/2.0 ,2); // FIXME - 1.1 is hardcoded. van Mier's min distance is 1.1*(D1+D2)/2
+
+		if(no_self_overlap && (dist2 == 0) && ((i->x==cc.x) && (i->y==cc.y) && (i->z==cc.z) && (i->d==cc.d)))
+			continue;
+
+                float r2    = std::pow( threshold*(i->d+cc.d)/2.0 ,2); // FIXME - 1.1 is hardcoded. van Mier's min distance is 1.1*(D1+D2)/2
                 if(dist2<r2)
                         return true;
         }
@@ -1416,20 +1448,20 @@ bool LatticeExample::overlaps(Circle& cc,std::vector<Circle>& c)
 	}
 
 	// check if it's outside the concrete
-	if(no_Agg_outside)
-	{
-		Real AGGREGATES_X=speciemen_size_in_meters[0];
-	        Real AGGREGATES_Y=speciemen_size_in_meters[1];
-	        Real AGGREGATES_Z=speciemen_size_in_meters[2];
-		for(Real A=std::max(0.0,cc.x-cc.d*0.5) ; A<=std::min(AGGREGATES_X,cc.x+cc.d*0.5) ; A+=cellsizeUnit_in_meters*0.2)
-		for(Real B=std::max(0.0,cc.y-cc.d*0.5) ; B<=std::min(AGGREGATES_Y,cc.y+cc.d*0.5) ; B+=cellsizeUnit_in_meters*0.2)
-		for(Real C=std::max(0.0,cc.z-cc.d*0.5) ; C<=std::min(AGGREGATES_Z,cc.z+cc.d*0.5) ; C+=cellsizeUnit_in_meters*0.2)
-			if(! notDeleted(Vector3r(A,B,C)) )
-			{
-				if( std::pow(cc.x - A,2.0) + std::pow(cc.y - B,2.0) + std::pow(cc.z - C,2.0) < cc.d*cc.d*0.25 )
-					return true;
-			}
-	}
+//	if(no_Agg_outside)
+//	{
+//		Real AGGREGATES_X=speciemen_size_in_meters[0];
+//	        Real AGGREGATES_Y=speciemen_size_in_meters[1];
+//	        Real AGGREGATES_Z=speciemen_size_in_meters[2];
+//		for(Real A=std::max(0.0,cc.x-cc.d*0.5) ; A<=std::min(AGGREGATES_X,cc.x+cc.d*0.5) ; A+=cellsizeUnit_in_meters*0.2)
+//		for(Real B=std::max(0.0,cc.y-cc.d*0.5) ; B<=std::min(AGGREGATES_Y,cc.y+cc.d*0.5) ; B+=cellsizeUnit_in_meters*0.2)
+//		for(Real C=std::max(0.0,cc.z-cc.d*0.5) ; C<=std::min(AGGREGATES_Z,cc.z+cc.d*0.5) ; C+=cellsizeUnit_in_meters*0.2)
+//			if(! notDeleted(Vector3r(A,B,C)) )
+//			{
+//				if( std::pow(cc.x - A,2.0) + std::pow(cc.y - B,2.0) + std::pow(cc.z - C,2.0) < cc.d*cc.d*0.25 )
+//					return true;
+//			}
+//	}
 
         return false;
 };
@@ -1505,15 +1537,21 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 	setStatus(  "generating aggregates...");
         do
         {
-		if(shouldTerminate()) return;
+		if(shouldTerminate())
+		{
+			setTerminate(false);
+			break;
+		}
 
                 Circle cc;
                 cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y, cc.z=AGGREGATES_Z==0?0:random1()*AGGREGATES_Z;
                 do { cc.d=randomN(); } while (cc.d>=MAX_DIAMETER || cc.d<=MIN_DIAMETER);
                 for(int i=0 ; i<1000 ; ++i)
+		/* IGNORE OVERLAPPING FOR NOW, just add as much as we need to!
                         if(overlaps(cc,c))
                                 cc.x=random1()*AGGREGATES_X, cc.y=random1()*AGGREGATES_Y, cc.z=AGGREGATES_Z==0?0:random1()*AGGREGATES_Z;
                         else
+		*/
                         {
                                 c.push_back(cc);
                 //              std::cerr << cc.x << " " << cc.y << " " << cc.d << "\n";
@@ -1526,6 +1564,139 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
         }
         //while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
         while( progress() < 1.0 );
+        
+	
+	std::cerr << "placing aggregates with repulsion ... ";
+	setStatus(   "aggregates repulsion ...");
+	setProgress(0);
+
+	int overlap_count;
+	overlap_count=overlapCount(c,1.05);
+	int begin_overlap_count = overlap_count;
+
+// repulsion !!
+	for( ; overlap_count > 0 ; )
+	{
+		overlap_count=overlapCount(c,1.05);
+
+		setStatus(std::string("repulsion ")+boost::lexical_cast<std::string>(overlap_count));
+		setProgress(1.0 - (float)(overlap_count)/(float)(begin_overlap_count));
+
+		std::vector<Vector3r > moves;
+		moves.clear();
+		for(unsigned int i = 0 ; i < c.size() ; ++i )
+		{
+			Vector3r d(0,0,0);
+
+			Vector3r c1(c[i].x,c[i].y,c[i].z);
+
+			//emulate periodic boundary
+			for(int px = -1 ; px < 2 ; ++px )
+			for(int py = -1 ; py < 2 ; ++py )
+			for(int pz = ((AGGREGATES_Z==0)?0:-1) ; pz < ((AGGREGATES_Z==0)?1:2) ; ++pz )
+			{
+				Vector3r PERIODIC_DELTA(px*AGGREGATES_X,py*AGGREGATES_Y,pz*AGGREGATES_Z);
+				for(unsigned int j = 0 ; j < fibres.size() ; ++j )
+					if(i != j)
+					{
+						Vector3r c2 = Vector3r(c[j].x, c[j].y, c[j].z) + PERIODIC_DELTA;
+
+						Vector3r dir=c1-c2;
+						Real r = dir.Normalize(); // dir is unit vector, r is a distance
+						if(r < cellsizeUnit_in_meters)
+						{
+							r=cellsizeUnit_in_meters;
+							dir[0]=random1()-0.5, dir[1]=random1()-0.5, dir[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+							dir.Normalize();
+						}
+						d += dir * 1/(r*r);
+
+						// strong repulsion when they are intersecting
+						if(2*r < (c[i].d+c[j].d)*1.1)
+							d += (dir * 1/(r*r))*10;
+					}
+			}
+
+			// repulsion from walls.
+			Vector3r MAX(AGGREGATES_X, AGGREGATES_Y, AGGREGATES_Z);
+			for(int I=0 ; I<((AGGREGATES_Z==0)?2:3) ; ++I)
+			{
+				if(c1[I] > 0 && c1[I] < MAX[I])
+					d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
+				//else
+				//	std::cerr << "fibre " << i << " is escaping\n";
+			}
+
+			// check with fibres
+			if(fibre_count > 0)
+			{
+				for(int I = 0 ; I < fibre_count ; ++I)
+				{
+					Vector3r pos = fibres[I].first;
+					Vector3r del = fibres[I].second;
+					for(int J = 0 ; J < beams_per_fibre ; ++J)
+					{
+						Vector3r c2(
+							pos[0] + 1.0*J*del[0],
+							pos[1] + 1.0*J*del[1],
+							pos[2] + 1.0*J*del[2] );
+						
+						Vector3r dir=c1-c2;
+						
+						Real r = dir.Normalize(); // dir is unit vector, r is a distance
+						if(r < cellsizeUnit_in_meters)
+						{
+							r=cellsizeUnit_in_meters;
+							dir[0]=random1()-0.5, dir[1]=random1()-0.5, dir[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
+							dir.Normalize();
+						}
+						d += dir * 1/(r*r);
+
+						// strong repulsion when they are intersecting
+						if(2*r < (c[i].d)*1.1)
+							d += (dir * 1/(r*r))*10;
+					}
+				}
+			}
+
+			moves.push_back(d);
+		}
+
+		assert(moves.size() == c.size() );
+		Real maxl=0;
+		for(unsigned int i = 0 ; i < moves.size() ; ++i )
+			maxl = std::max(moves[i].Length(),maxl);
+		for(unsigned int i = 0 ; i < moves.size() ; ++i )
+			moves[i] = cellsizeUnit_in_meters*moves[i]/maxl;
+	
+		for(unsigned int i = 0 ; i < moves.size() ; ++i )
+		{
+			c[std::floor(((float)(i)))].x+=moves[i][0];
+			c[std::floor(((float)(i)))].y+=moves[i][1];
+			c[std::floor(((float)(i)))].z+=moves[i][2];
+		}
+	
+		for(unsigned int i = 0 ; i < c.size() ; ++i )
+		{
+			Vector3r c1(c[i].x, c[i].y, c[i].z);
+			if(   c1[0] < 0 
+			   || c1[1] < 0 
+			   || c1[2] < 0
+			   || c1[0] > AGGREGATES_X
+			   || c1[1] > AGGREGATES_Y
+			   || c1[2] > AGGREGATES_Z)
+			{
+				std::cerr << "aggregate: putting again randomly\n";
+				c[i].x = random1()*AGGREGATES_X;
+				c[i].y = random1()*AGGREGATES_Y;
+				c[i].z = ((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z));
+			}
+		}
+		
+	//std::cerr << "frame= " << frame++ << "\n";
+
+		if(shouldTerminate()) return;
+	}
 
         std::cerr << "done. " << c.size() << " area: " << aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) << " vol: " << aggsVolumes(c)/(AGGREGATES_X*AGGREGATES_Y*AGGREGATES_Z) << "\n";
 
@@ -1568,7 +1739,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                         Body* body = (*bi).get();
                         if( ! ( body->getGroupMask() & beamGroupMask ) )
                                 continue; // skip non-beams
-
+			
                         LatticeBeamParameters* beam     = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());
                         int ovv = aggInside(     (*(rootBody->bodies))[beam->id1]->physicalParameters->se3.position
                                                 ,(*(rootBody->bodies))[beam->id2]->physicalParameters->se3.position
@@ -1580,6 +1751,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 beam->torsionalStiffness        = agg_torsStiffness_noUnit;
                                 beam->criticalTensileStrain     = agg_critTensileStrain;
                                 beam->criticalCompressiveStrain = agg_critCompressStrain;
+			
+				body->groupMask = beamGroupMask + aggGroupMask;
                 
 //                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
 //                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.2,0.0);
@@ -1591,6 +1764,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
                                 beam->torsionalStiffness	= bond_torsStiffness_noUnit;
                                 beam->criticalTensileStrain     = bond_critTensileStrain;
                                 beam->criticalCompressiveStrain = bond_critCompressStrain;
+                
+				body->groupMask = beamGroupMask + bondGroupMask;
                 
 //                                (*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
 //                                (*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(0.6,0.6,0.0);
@@ -1635,6 +1810,8 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 // new method - equally balance fibres over volume using repulsion
 void LatticeExample::makeFibres()
 {
+	setStatus("balancing fibres...");
+	std::cerr << "fibres: ";
 	fibres.clear();
 
         Real AGGREGATES_X=speciemen_size_in_meters[0];
@@ -1781,8 +1958,8 @@ void LatticeExample::makeFibres()
 			{
 				if(c1[I] > 0 && c1[I] < MAX[I])
 					d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
-				else
-					std::cerr << "fibre " << i << " is escaping\n";
+				//else
+				//	std::cerr << "fibre " << i << " is escaping\n";
 			}
 			moves.push_back(d);
 		}
@@ -1812,13 +1989,21 @@ void LatticeExample::makeFibres()
 			   || c1[0] > AGGREGATES_X
 			   || c1[1] > AGGREGATES_Y
 			   || c1[2] > AGGREGATES_Z)
-				std::cerr << "putting again randomly\n", fibres[i].first = Vector3r(random1()*AGGREGATES_X, random1()*AGGREGATES_Y, ((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z)));
+			{
+				//std::cerr << "putting again randomly\n";
+				fibres[i].first = Vector3r(random1()*AGGREGATES_X, random1()*AGGREGATES_Y, ((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z)));
+			}
 		}
 		
 	//std::cerr << "frame= " << frame++ << "\n";
-		setStatus("balancing fibres...");
+
+		if(shouldTerminate()) return;
 		setProgress(1.0*frame/(1.0*fibre_balancing_iterations));
+		if( (int)(progress() * 10.0)%10==0)
+			std::cerr << (int)(progress() * 10.0) << "...";
+
 	}
+	std::cerr << "\n";
 
 /*
 	for(unsigned int i = 0 ; i < fibres.size() ; ++i )
@@ -1900,6 +2085,8 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 //                        	(*(rootBody->bodies))[beam->id1]->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
 //                        	(*(rootBody->bodies))[beam->id2]->geometricalModel->diffuseColor = Vector3r(2.0,2.0,0.0);
 				
+				body->groupMask = beamGroupMask + fibreGroupMask;
+
 				fibres_total+=1.0;
 			}
 			if(fibreNodes==1) // bond
@@ -1909,6 +2096,9 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
                                 beam->torsionalStiffness	= fibre_bond_torsStiffness_noUnit;
                                 beam->criticalTensileStrain     = fibre_bond_critTensileStrain;
                                 beam->criticalCompressiveStrain = fibre_bond_critCompressStrain;
+				
+				body->groupMask = beamGroupMask + fibreBondGroupMask;
+
 			}
                 }
         }

@@ -25,6 +25,6 @@ class SafeVectors3
 		SafeVectors3() : m_myname("undefined") {};
 		SafeVectors3(int size,std::string myname,std::string fname,bool has_id);
 		SafeVectors3(int size,std::string myname):m_myname(myname){m_data.resize(size+1,Vector3r(0,0,0));};
-		Vector3r operator[](int i)const;
+		Vector3r operator[](size_t i)const;
 };
 

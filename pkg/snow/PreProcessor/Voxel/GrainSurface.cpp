@@ -187,7 +187,7 @@ void GrainSurface::plot_sides(t_visibility& vis,t_coord A,t_coord B,t_coord min_
 	short int       draw_what_surfaces    = config.draw_surface_or_contact_or_all();
 	int             DD                    = config.display_steps();
 	float           d2                    = DD*0.5;	
-	int             CC;
+	int             CC(0);
 	bool            bottom=false;
 	switch(side)
 	{
@@ -224,7 +224,7 @@ void GrainSurface::plot_sides(t_visibility& vis,t_coord A,t_coord B,t_coord min_
 							if(!config.display_selection())
 								config.light_selection(m_own_id);
 						}
-						int i,x,y;
+						int i(0),x(0),y(0);
 						switch(side)
 						{
 							case I_BOT : 
