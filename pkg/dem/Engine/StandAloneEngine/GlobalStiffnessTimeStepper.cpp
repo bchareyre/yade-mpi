@@ -9,6 +9,7 @@
 #include"GlobalStiffnessTimeStepper.hpp"
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/DemXDofGeom.hpp>
 //#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -183,10 +184,10 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(MetaBody* rb){
 	FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
 		if(!contact->isReal()) continue;
 
-		SpheresContactGeometry* geom=YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get()); assert(geom);
+		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(contact->interactionGeometry.get()); assert(geom);
 		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
 		// all we need for getting stiffness
-		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->radius1; Real& radius2=geom->radius2;
+		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->refR1; Real& radius2=geom->refR2;
 		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
 		// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
 		// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)

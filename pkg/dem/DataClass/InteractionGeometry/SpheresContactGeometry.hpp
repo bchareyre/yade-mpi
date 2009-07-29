@@ -6,6 +6,7 @@
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-dem/DemXDofGeom.hpp>
 /*! Class representing geometry of two spheres in contact.
  *
  * The code under SCG_SHEAR is experimental and is used only if ElasticContactLaw::useShear is explicitly true
@@ -13,12 +14,12 @@
 
 #define SCG_SHEAR
 
-class SpheresContactGeometry: public InteractionGeometry {
+class SpheresContactGeometry: public GenericSpheresContact {
 	public:
-		Vector3r normal, // unit vector in the direction from sphere1 center to sphere2 center
-			contactPoint;
+		Vector3r& normal; // unit vector in the direction from sphere1 center to sphere2 center
+		Vector3r contactPoint;
 		Real penetrationDepth;
-		Real radius1, radius2;
+		Real &radius1, &radius2;
 
 		#ifdef SCG_SHEAR
 			//! Total value of the current shear. Update the value using updateShear.
@@ -39,7 +40,7 @@ class SpheresContactGeometry: public InteractionGeometry {
 		#endif
 
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),radius1(0.),radius2(0.)
+		SpheresContactGeometry():contactPoint(Vector3r::ZERO),normal(GenericSpheresContact::normal),radius1(GenericSpheresContact::refR1),radius2(GenericSpheresContact::refR2)
 		#ifdef SCG_SHEAR
 			,shear(Vector3r::ZERO), prevNormal(Vector3r::ZERO) /*initialized to proper value by geom functor*/
 		#endif
