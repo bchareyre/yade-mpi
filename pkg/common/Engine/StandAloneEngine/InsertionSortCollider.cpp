@@ -216,20 +216,35 @@ void InsertionSortCollider::action(MetaBody* rb){
 				// skip bodies without bbox since we would possibly never meet the upper bound again (std::sort may not be stable) and we don't want to collide those anyway
 				if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 				const body_id_t& iid=V[i].id;
+				/* If std::sort swaps equal min/max bounds, there are 2 cases distinct cases to handle:
+
+					1. i is inside V, j gets to the end of V (since it loops till the maxbound is found)
+						here, we swap min/max to get the in the right order and continue with the loop over i;
+						next time this j-bound is handled (with a different i, for sure), it will be OK.
+					2. i is at the end of V, therefore (j=i+1)==2*nBodies, therefore V[j] doesn't exist (past the end)
+						here, we can just check for that and break the loop if it happens.
+						It is the last i that we process, nothing will come after.
+
+					NOTE: XX,YY,ZZ containers don't guarantee that i_min<i_max. This is needed only here and is
+						handled only for the sortAxis. Functionality-wise, this has no impact on further collision
+						detection, though.
+				*/
 				// TRVAR3(i,iid,V[i].coord);
 				// go up until we meet the upper bound
-				for(size_t j=i+1; V[j].id!=iid; j++){
+				for(size_t j=i+1; V[j].id!=iid && /* handle case 2. of swapped min/max */ j<2*nBodies; j++){
 					const body_id_t& jid=V[j].id;
 					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
 					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes
 					//if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].flags.isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
+					// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
+					if(!V[j].flags.isMin) continue;
 					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 					handleBoundInversion(iid,jid,interactions,rb);
 					// now we are at the last element, but we still have not met the upper bound of V[i].id
 					// that means that the upper bound is before the upper one; that can only happen if they
 					// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
 					// from V[i] until we meet the upper bound and swap the isMin flag
-					if(j==2*nBodies-1){
+					if(j==2*nBodies-1){ /* handle case 1. of swapped min/max */
 						size_t k=i-1;
 						while(V[k].id!=iid && k>0) k--;
 						assert(V[k].id==iid); // if this fails, we didn't meet the other bound in the downwards sense either; that should never happen
