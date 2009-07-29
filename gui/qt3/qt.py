@@ -22,6 +22,7 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	See makePlayerVideo for more documentation.
 	"""
 	import os
+	from yade import utils
 	# create primary view if none
 	if len(views())==0: View()
 	# remove existing SnaphotEngines

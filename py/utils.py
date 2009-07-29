@@ -331,14 +331,29 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 		o.bodies[i].shape['diffuseColor']=color
 	return imported
 
-def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
-	import pygst,sys,gobject,os
+def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
+	"""Create .ogg video from external image files.
+	
+	@param frameSpec If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order.
+	@param out file to save video into
+	@param renameNotOverwrite if True, existing same-named video file will have ~[number] appended; will be overwritten otherwise.
+	@param fps Frames per second.
+	"""
+	import pygst,sys,gobject,os,tempfile,shutil
 	pygst.require("0.10")
 	import gst
 	if renameNotOverwrite and os.path.exists(out):
 		i=0;
 		while(os.path.exists(out+"~%d"%i)): i+=1
 		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
+	if frameSpec.__class__==list or frameSpec.__class__==tuple:
+		# create a new common prefix, symlink given files to prefix-%05d.png in their order, adjust wildcard, go ahead.
+		tmpDir=tempfile.mkdtemp()
+		for no,frame in enumerate(frameSpec):
+			os.symlink(frame,os.path.join(tmpDir,'%07d'%no))
+		wildcard=os.path.join(tmpDir,'%07d')
+	else:
+		tmpDir=None; wildcard=frameSpec
 	print "Encoding video from %s to %s"%(wildcard,out)
 	pipeline=gst.parse_launch('multifilesrc location="%s" index=0 caps="image/png,framerate=\(fraction\)%d/1" ! pngdec ! ffmpegcolorspace ! theoraenc sharpness=2 quality=63 ! oggmux ! filesink location="%s"'%(wildcard,fps,out))
 	bus=pipeline.get_bus()
@@ -348,6 +363,9 @@ def encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=24):
 	pipeline.set_state(gst.STATE_PLAYING)
 	mainloop.run()
 	pipeline.set_state(gst.STATE_NULL); pipeline.get_state()
+	# remove symlinked frames, if any
+	if tmpDir: shutil.rmtree(tmpDir)
+
 
 def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw):
 	"""

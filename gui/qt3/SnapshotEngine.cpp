@@ -12,7 +12,14 @@ void SnapshotEngine::action(MetaBody* rb){
 	ostringstream fss; fss<<fileBase<<setw(4)<<setfill('0')<<counter++<<".png";
 	LOG_DEBUG("GL view #"<<viewNo<<" → "<<fss.str())
 	glv->setSnapshotFormat("PNG");
-	glv->saveSnapshot(QString(fss.str()),/*overwrite*/ true);
+	glv->nextFrameSnapshotFilename=fss.str();
+	// wait for the renderer to save the frame (will happen at next postDraw)
+	timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=10000000; /* 10 ms */
+	long waiting=0;
+	while(!glv->nextFrameSnapshotFilename.empty()){
+		nanosleep(&t1,&t2);
+		if(((++waiting) % 1000)==0) LOG_WARN("Already waiting "<<waiting/100<<"s for snapshot to be saved. Something went wrong?");
+	}
 	savedSnapshots.push_back(fss.str());
 	usleep((long)(msecSleep*1000));
 }

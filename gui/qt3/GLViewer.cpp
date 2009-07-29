@@ -606,6 +606,12 @@ void GLViewer::postDraw(){
 		}
 	}
 	QGLViewer::postDraw();
+	if(!nextFrameSnapshotFilename.empty()){
+		// save the snapshot
+		saveSnapshot(QString(nextFrameSnapshotFilename),/*overwrite*/ true);
+		// notify the caller that it is done already (probably not an atomic op :-|, though)
+		nextFrameSnapshotFilename.clear();
+	}
 }
 
 string GLViewer::getRealTimeString(){

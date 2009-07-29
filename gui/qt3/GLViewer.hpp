@@ -89,6 +89,10 @@ class GLViewer : public QGLViewer
 		void initFromDOMElement(const QDomElement& element);
 		int viewId;
 
+		// if defined, snapshot will be saved to this file right after being drawn and the string will be reset.
+		// this way the caller will be notified of the frame being saved successfully.
+		string nextFrameSnapshotFilename;
+
 		boost::posix_time::ptime getLastUserEvent();
 
 
