@@ -22,19 +22,17 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	See makePlayerVideo for more documentation.
 	"""
 	import os
-	from yade import utils,wrapper
-	o=wrapper.Omega()
 	# create primary view if none
 	if len(views())==0: View()
 	# remove existing SnaphotEngines
-	se=wrapper.StandAloneEngine('SnapshotEngine',{'iterPeriod':iterPeriod,'realPeriod':realPeriod,'virtPeriod':virtPeriod,'fileBase':os.tmpnam(),'ignoreErrors':False,'viewNo':viewNo,'msecSleep':msecSleep})
-	origEngines=o.engines; o.engines=[e for e in o.engines if e.name!='SnapshotEngine']+[se]
-	o.run(); o.wait();
+	se=SnapshotEngine(iterPeriod=iterPeriod,realPeriod=realPeriod,virtPeriod=virtPeriod,fileBase=os.tmpnam(),ignoreErrors=False,viewNo=viewNo,msecSleep=msecSleep)
+	origEngines=O.engines; O.engines=[e for e in O.engines if e.name!='SnapshotEngine']+[se]
+	O.run(); O.wait();
 	wildcard=se['fileBase']+'%04d.png'
 	print "Number of frames:",len(se['savedSnapshots'])
 	utils.encodeVideoFromFrames(wildcard,output,renameNotOverwrite=True,fps=fps)
 	for f in se['savedSnapshots']: os.remove(f)
-	o.engines=origEngines
+	O.engines=origEngines
 
 
 def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None,startWait=False):

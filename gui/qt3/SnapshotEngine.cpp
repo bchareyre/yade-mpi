@@ -2,6 +2,7 @@
 #include<sstream>
 #include<iomanip>
 CREATE_LOGGER(SnapshotEngine);
+YADE_PLUGIN("SnapshotEngine");
 void SnapshotEngine::action(MetaBody* rb){
 	shared_ptr<GLViewer> glv;
 	if(!YadeQtMainWindow::self || ((size_t)viewNo>=YadeQtMainWindow::self->glViews.size()) || !(glv=YadeQtMainWindow::self->glViews[viewNo])){
@@ -15,4 +16,3 @@ void SnapshotEngine::action(MetaBody* rb){
 	savedSnapshots.push_back(fss.str());
 	usleep((long)(msecSleep*1000));
 }
-

@@ -256,7 +256,9 @@ int main(int argc, char *argv[])
 	
 	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
-	LOG_INFO("Loading plugins"); Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/plugins" ));
+	LOG_INFO("Loading plugins");
+		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/plugins" ));
+		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/gui" ));
 	Omega::instance().init();
 
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";

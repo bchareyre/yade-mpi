@@ -1,5 +1,4 @@
 #pragma once
-#include<yade/core/StandAloneEngine.hpp>
 #include<yade/gui-qt3/GLViewer.hpp>
 #include<yade/gui-qt3/YadeQtMainWindow.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
