@@ -1515,21 +1515,26 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 {
         // first make a list of circles
         std::vector<Circle> c;
+        std::vector<int> penalty;
 
         Real AGGREGATES_X=speciemen_size_in_meters[0];
         Real AGGREGATES_Y=speciemen_size_in_meters[1];
         Real AGGREGATES_Z=speciemen_size_in_meters[2];
 	if(AGGREGATES_Z < cellsizeUnit_in_meters )
 		AGGREGATES_Z = 0.0;
-        Real MAX_DIAMETER  =aggregateMaxDiameter;
-        Real MIN_DIAMETER  =aggregateMinDiameter;
-        Real MEAN_DIAMETER =aggregateMeanDiameter;
-        Real SIGMA_DIAMETER=aggregateSigmaDiameter;
 
         typedef boost::minstd_rand StdGenerator;
         static StdGenerator generator;
         static boost::variate_generator<StdGenerator&, boost::uniform_real<> >
                 random1(generator, boost::uniform_real<>(0,1));
+///////////////////////////////////////////////////////////////
+/////// stage 2 ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+        Real MAX_DIAMETER  =aggregateMaxDiameter;
+        Real MIN_DIAMETER  =aggregateMinDiameter;
+        Real MEAN_DIAMETER =aggregateMeanDiameter;
+        Real SIGMA_DIAMETER=aggregateSigmaDiameter;
         static boost::variate_generator<StdGenerator&, boost::normal_distribution<> > 
                 randomN(generator, boost::normal_distribution<>(MEAN_DIAMETER,SIGMA_DIAMETER));
 
@@ -1564,22 +1569,36 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
         }
         //while(aggregatePercent/100.0 > aggsAreas(c)/(AGGREGATES_X*AGGREGATES_Y) );
         while( progress() < 1.0 );
-        
-	
+
 	std::cerr << "placing aggregates with repulsion ... ";
 	setStatus(   "aggregates repulsion ...");
 	setProgress(0);
+	penalty.clear();
+	penalty.resize(c.size(),0);
 
+///////////////////////////////////////////////////////////////
+/////// stage 3 ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+        
+	
 	int overlap_count;
 	overlap_count=overlapCount(c,1.05);
-	int begin_overlap_count = overlap_count;
+	int begin_overlap_count(overlap_count);
 
 // repulsion !!
 	for( ; overlap_count > 0 ; )
 	{
 		overlap_count=overlapCount(c,1.05);
 
-		setStatus(std::string("repulsion ")+boost::lexical_cast<std::string>(overlap_count));
+		int last_overlap( ((int)(overlap_count)/10)*10+10 );
+		if(overlap_count <= last_overlap - 10)
+		{
+			//setStatus(std::string("repulsion ")+boost::lexical_cast<std::string>(overlap_count));
+			last_overlap = ((int)(overlap_count)/10)*10;
+			std::cerr << " . " << last_overlap;
+			if(last_overlap <= 11)
+				last_overlap = 11;
+		}
 		setProgress(1.0 - (float)(overlap_count)/(float)(begin_overlap_count));
 
 		std::vector<Vector3r > moves;
@@ -1591,12 +1610,13 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 			Vector3r c1(c[i].x,c[i].y,c[i].z);
 
 			//emulate periodic boundary
-			for(int px = -1 ; px < 2 ; ++px )
-			for(int py = -1 ; py < 2 ; ++py )
-			for(int pz = ((AGGREGATES_Z==0)?0:-1) ; pz < ((AGGREGATES_Z==0)?1:2) ; ++pz )
+			//for(int px = -1 ; px < 2 ; ++px )
+			//for(int py = -1 ; py < 2 ; ++py )
+			//for(int pz = ((AGGREGATES_Z==0)?0:-1) ; pz < ((AGGREGATES_Z==0)?1:2) ; ++pz )
+			int px(0),py(0),pz(0);
 			{
 				Vector3r PERIODIC_DELTA(px*AGGREGATES_X,py*AGGREGATES_Y,pz*AGGREGATES_Z);
-				for(unsigned int j = 0 ; j < fibres.size() ; ++j )
+				for(unsigned int j = 0 ; j < c.size() ; ++j )
 					if(i != j)
 					{
 						Vector3r c2 = Vector3r(c[j].x, c[j].y, c[j].z) + PERIODIC_DELTA;
@@ -1609,11 +1629,16 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 							dir[0]=random1()-0.5, dir[1]=random1()-0.5, dir[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
 							dir.Normalize();
 						}
-						d += dir * 1/(r*r);
+						// weak distance repulsion
+						d += dir * 1/(r*r)*0.3;
 
 						// strong repulsion when they are intersecting
-						if(2*r < (c[i].d+c[j].d)*1.1)
-							d += (dir * 1/(r*r))*10;
+						if(2*r < (c[i].d+c[j].d)*1.11)
+						{
+							d += (dir * 1/(r*r))*3;
+							++penalty[i];
+							++penalty[j];
+						}
 					}
 			}
 
@@ -1621,10 +1646,14 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 			Vector3r MAX(AGGREGATES_X, AGGREGATES_Y, AGGREGATES_Z);
 			for(int I=0 ; I<((AGGREGATES_Z==0)?2:3) ; ++I)
 			{
-				if(c1[I] > 0 && c1[I] < MAX[I])
-					d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
-				//else
-				//	std::cerr << "fibre " << i << " is escaping\n";
+				//if(c1[I] > 0 && c1[I] < MAX[I])
+				//	d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
+
+				if(c1[I] > 0 && c1[I] < c[i].d*0.5 )
+					d[I] += (1/(c1[I]*c1[I]));
+				else
+				if(c1[I] < MAX[I] && c1[I] > MAX[I]-c[i].d*0.5)
+					d[I] += (-1/((MAX[I]-c1[I])*(MAX[I]-c1[I])));
 			}
 
 			// check with fibres
@@ -1650,11 +1679,15 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 							dir[0]=random1()-0.5, dir[1]=random1()-0.5, dir[2]=((AGGREGATES_Z==0)?(0):(random1()-0.5));
 							dir.Normalize();
 						}
-						d += dir * 1/(r*r);
+						// weak repulnsion
+						d += (dir * 1/(r*r))*(0.1/beams_per_fibre);
 
 						// strong repulsion when they are intersecting
-						if(2*r < (c[i].d)*1.1)
-							d += (dir * 1/(r*r))*10;
+						if(2*r < (c[i].d)*1.11)
+						{
+							d += (dir * 1/(r*r));
+							++penalty[i];
+						}
 					}
 				}
 			}
@@ -1667,7 +1700,7 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 		for(unsigned int i = 0 ; i < moves.size() ; ++i )
 			maxl = std::max(moves[i].Length(),maxl);
 		for(unsigned int i = 0 ; i < moves.size() ; ++i )
-			moves[i] = cellsizeUnit_in_meters*moves[i]/maxl;
+			moves[i] = cellsizeUnit_in_meters*0.3*moves[i]/(maxl==0?1:maxl);
 	
 		for(unsigned int i = 0 ; i < moves.size() ; ++i )
 		{
@@ -1684,12 +1717,28 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 			   || c1[2] < 0
 			   || c1[0] > AGGREGATES_X
 			   || c1[1] > AGGREGATES_Y
-			   || c1[2] > AGGREGATES_Z)
+			   || c1[2] > AGGREGATES_Z
+			   || penalty[i] > (beams_per_fibre+10)*1500)
 			{
-				std::cerr << "aggregate: putting again randomly\n";
-				c[i].x = random1()*AGGREGATES_X;
-				c[i].y = random1()*AGGREGATES_Y;
-				c[i].z = ((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z));
+				//std::cerr << "aggregate: putting again randomly ";
+				float limit(1.31);
+				int count(0);
+				do
+				{
+					//std::cerr << ".";
+					c[i].x = random1()*AGGREGATES_X;
+					c[i].y = random1()*AGGREGATES_Y;
+					c[i].z = ((AGGREGATES_Z==0)?(0):(random1()*AGGREGATES_Z));
+					++count;
+					if(count>1000 && limit > 0.85)
+					{
+						limit -= 0.02;
+						count=0;
+						//std::cerr << "\nlimit set to: " << limit << " ";
+					}
+				} while(overlaps(c[i],c,true,limit));
+				penalty[i]=0;
+				//std::cerr << "\n";
 			}
 		}
 		
@@ -1810,10 +1859,6 @@ void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
 // new method - equally balance fibres over volume using repulsion
 void LatticeExample::makeFibres()
 {
-	setStatus("balancing fibres...");
-	std::cerr << "fibres: ";
-	fibres.clear();
-
         Real AGGREGATES_X=speciemen_size_in_meters[0];
         Real AGGREGATES_Y=speciemen_size_in_meters[1];
         Real AGGREGATES_Z=speciemen_size_in_meters[2];
@@ -1824,6 +1869,14 @@ void LatticeExample::makeFibres()
         static StdGenerator generator;
         static boost::variate_generator<StdGenerator&, boost::uniform_real<> >
                 random1(generator, boost::uniform_real<>(0,1));
+
+///////////////////////////////////////////////////////////////
+/////// stage 0 ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+	setStatus("balancing fibres...");
+	std::cerr << "fibres: ";
+	fibres.clear();
 
 	for(int i = 0 ; i < fibre_count ; ++i)
         {
@@ -1885,6 +1938,9 @@ void LatticeExample::makeFibres()
 		   fibres.push_back(std::make_pair(cc,del));
 	   }
 */
+///////////////////////////////////////////////////////////////
+/////// stage 1 ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 
 // repulsion !!
 	for(int frame=0; frame < fibre_balancing_iterations ; ++frame)
@@ -1902,9 +1958,10 @@ void LatticeExample::makeFibres()
 			Vector3r c1 = fibres[i].first + fibres[i].second*beams_per_fibre*PART_1;
 
 			//emulate periodic boundary
-			for(int px = -1 ; px < 2 ; ++px )
-			for(int py = -1 ; py < 2 ; ++py )
-			for(int pz = ((AGGREGATES_Z==0)?0:-1) ; pz < ((AGGREGATES_Z==0)?1:2) ; ++pz )
+			//for(int px = -1 ; px < 2 ; ++px )
+			//for(int py = -1 ; py < 2 ; ++py )
+			//for(int pz = ((AGGREGATES_Z==0)?0:-1) ; pz < ((AGGREGATES_Z==0)?1:2) ; ++pz )
+			int px(0),py(0),pz(0);
 			{
 				Vector3r PERIODIC_DELTA(px*AGGREGATES_X,py*AGGREGATES_Y,pz*AGGREGATES_Z);
 				for(unsigned int j = 0 ; j < fibres.size() ; ++j )
@@ -1956,10 +2013,14 @@ void LatticeExample::makeFibres()
 			Vector3r MAX(AGGREGATES_X, AGGREGATES_Y, AGGREGATES_Z);
 			for(int I=0 ; I<((AGGREGATES_Z==0)?2:3) ; ++I)
 			{
-				if(c1[I] > 0 && c1[I] < MAX[I])
-					d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
-				//else
-				//	std::cerr << "fibre " << i << " is escaping\n";
+				//if(c1[I] > 0 && c1[I] < MAX[I])
+				//	d[I] += (1/(c1[I]*c1[I]) - 1/((MAX[I]-c1[I])*(MAX[I]-c1[I])))*0.5;
+				
+				if(c1[I] > 0 && c1[I] < beams_per_fibre*cellsizeUnit_in_meters*0.2 )
+					d[I] += (1/(c1[I]*c1[I]));
+				else
+				if(c1[I] < MAX[I] && c1[I] > MAX[I]-beams_per_fibre*cellsizeUnit_in_meters*0.2)
+					d[I] += (-1/((MAX[I]-c1[I])*(MAX[I]-c1[I])));
 			}
 			moves.push_back(d);
 		}
@@ -1999,8 +2060,11 @@ void LatticeExample::makeFibres()
 
 		if(shouldTerminate()) return;
 		setProgress(1.0*frame/(1.0*fibre_balancing_iterations));
-		if( (int)(progress() * 10.0)%10==0)
-			std::cerr << (int)(progress() * 10.0) << "...";
+		int last_progress(0);
+		if(last_progress == 0)
+			std::cerr << "0% ";
+		if( progress()*10 > last_progress )
+			std::cerr << "... " << ++last_progress << "0% ";
 
 	}
 	std::cerr << "\n";
