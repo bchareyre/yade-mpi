@@ -7,19 +7,19 @@
 *************************************************************************/
 
 #include"QtGUI.hpp"
-#include"YadeQtMainWindow.hpp"
-#include"GLViewer.hpp"
+#include<yade/gui-qt3/YadeQtMainWindow.hpp>
+#include<yade/gui-qt3/GLViewer.hpp>
 #include<boost/algorithm/string.hpp>
 #include<boost/bind.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
+#include<boost/filesystem/operations.hpp>
+#include<boost/filesystem/convenience.hpp>
 //#ifdef HAVE_CONFIG_H
 //	#include <config.h>
 //#endif
 //#ifdef Q_WS_X11
-	#include <X11/Xlib.h>
+	#include<X11/Xlib.h>
 //#endif
-#include <qapplication.h>
+#include<qapplication.h>
 
 #ifdef YADE_PYTHON
 	#include<yade/gui-py/PythonUI.hpp>

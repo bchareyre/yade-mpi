@@ -11,7 +11,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/lib-factory/Factorable.hpp>
 #include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
-#include <QtGeneratedSimulationPlayer.h>
+#include"QtGeneratedSimulationPlayer.h"
 #include<qlayout.h>
 #include<qframe.h>
 #include<qscrollview.h>
