@@ -1,30 +1,24 @@
 #!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
-
-o=Omega()
+o=Omega() 
 o.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
-	]
+		BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+]
 o.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingBox2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
-	]),
-	StandAloneEngine('PersistentSAPCollider'),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-		EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')
-	]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-	StandAloneEngine('ElasticContactLaw'),
-	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
+	BexResetter(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+	InsertionSortCollider(),
+	InteractionDispatchers(
+		[InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()],
+		[SimpleElasticRelationships()],
+		[ef2_Spheres_Elastic_ElasticLaw()]
+	),
+	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonsDampedLaw(damping=.2),
 	###
 	### NOTE this extra engine.
 	###
-	StandAloneEngine('SQLiteRecorder',{'recorders':['se3','rgb'],'dbFile':'/tmp/player.sqlite','iterPeriod':50})
+	SQLiteRecorder(recorders=['se3','rgb'],dbFile='/tmp/player.sqlite',iterPeriod=50)
 ]
 from yade import utils
 o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
