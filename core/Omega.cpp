@@ -72,6 +72,23 @@ Real Omega::getComputationTime(){ return (microsec_clock::local_time()-msStartin
 time_duration Omega::getComputationDuration(){return microsec_clock::local_time()-msStartingSimulationTime-simulationPauseDuration;}
 
 
+void Omega::initTemps(){
+	char dirTemplate[]="/tmp/yade-XXXXXX";
+	tmpFileDir=mkdtemp(dirTemplate);
+	tmpFileCounter=0;
+}
+
+void Omega::cleanupTemps(){
+	filesystem::path tmpPath(tmpFileDir);
+	filesystem::remove_all(tmpPath);
+}
+
+std::string Omega::tmpFilename(){
+	if(tmpFileDir.empty()) throw runtime_error("tmpFileDir empty; Omega::initTemps not yet called()?");
+	boost::mutex::scoped_lock lock(tmpFileCounterMutex);
+	return tmpFileDir+lexical_cast<string>(tmpFileCounter++);
+}
+
 void Omega::reset(){
 	//finishSimulationLoop();
 	joinSimulationLoop();

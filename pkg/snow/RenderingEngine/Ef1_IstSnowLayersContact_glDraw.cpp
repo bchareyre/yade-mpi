@@ -229,7 +229,7 @@ void Ef1_IstSnowLayersContact_glDraw::go(
 
 
 /*
-	if(!(id1 == (int)(Omega::instance().selectedBody) || id2 == (int)(Omega::instance().selectedBody)))
+	if(!(id1 == (int)(Omega::instance().getRootBody()->selectedBody) || id2 == (int)(Omega::instance().getRootBody()->selectedBody)))
 		return;
 
 	assert(Omega::instance().getRootBody()->bodies->exists(id1));

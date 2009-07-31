@@ -83,7 +83,12 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
 	string snapBase2(snapBase);
-	if(snapBase2.empty()){ char tmpnam_str [L_tmpnam]; char* ret=tmpnam(tmpnam_str); if(ret!=tmpnam_str) throw runtime_error("tmpnam failed."); snapBase2=tmpnam_str; LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots."); }
+	if(snapBase2.empty()){
+		char tmpl[]="/tmp/yade-player-XXXXXX";
+		snapBase2=mkdtemp(tmpl);
+		snapBase2+="/frame-";
+		LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots.");
+	}
 	glv->stride=stride;
 	glv->load(savedSim); // Omega locks rendering here for us
 	glv->saveSnapShots=true;

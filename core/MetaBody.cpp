@@ -46,6 +46,7 @@ MetaBody::MetaBody() :
 	stopAtVirtTime=0; // not yet implemented either
 	isDynamic=false;
 	dt=1e-8;
+	selectedBody=-1;
 
 	// fill default tags
 	struct passwd* pw;

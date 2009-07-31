@@ -30,7 +30,7 @@ o.wait()
 
 def setWire():
 	o=Omega()
-	for b in o.bodies: b.shape['wire']=True
+	for b in o.bodies: b.shape['wire']=False
 # you could have saved the viewer state by using Alt-S in the view...
 from yade import qt
 qt.makePlayerVideo('/tmp/player.sqlite','/tmp/player.ogg','/tmp/qglviewerState.xml',stride=10,fps=12,postLoadHook='setWire()')

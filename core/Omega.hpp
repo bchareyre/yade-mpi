@@ -88,11 +88,14 @@ class Omega : public Singleton<Omega>
 
 		map<string,string> memSavedSimulations;
 
+		boost::mutex tmpFileCounterMutex;
+		long tmpFileCounter;
+		std::string tmpFileDir;
+
 	public :
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
 		string 				 yadeVersionName;	// FIXME - public ?
-		body_id_t			 selectedBody;
 	
 		// FIXME this is a hack. See  GLViewer:86
 		// problem is that currently there is no way to transmit arguments between UI and GLDraw* methods.
@@ -158,6 +161,11 @@ class Omega : public Singleton<Omega>
 		
 		void init();
 		void timeInit();
+
+		void initTemps();
+		void cleanupTemps();
+		//! Return unique temporary filename. May be deleted by the user; if not, will be deleted at shutdown.
+		string tmpFilename();
 
 		void reset();
 

@@ -565,7 +565,7 @@ long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId
 long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
 
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
-void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(result!=tmpnam_str) throw runtime_error(__FILE__ ": tmpnam(char*) failed!");  string xml(tmpnam_str+string(".xml.bz2")); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
+void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
 
 // many thanks to http://markmail.org/message/s4ksg6nfspw2wxwd
 namespace boost { namespace python { namespace detail {

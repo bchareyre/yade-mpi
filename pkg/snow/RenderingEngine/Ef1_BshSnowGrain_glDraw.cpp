@@ -171,7 +171,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 /*
 	// plot depth tetrahedron of selected surface
 
-//	int me = (int)(Omega::instance().selectedBody);
+//	int me = (int)(Omega::instance().getRootBody()->selectedBody);
 //	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
 //	{
 //		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
@@ -224,7 +224,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //	std::vector<Vector3r> me_inside;me_inside.clear();
 //	std::vector<Vector3r> oth_inside;oth_inside.clear();
 
-	int me = (int)(Omega::instance().selectedBody);
+	int me = (int)(Omega::instance().getRootBody()->selectedBody);
 	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
 	{
 		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
@@ -277,7 +277,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 			if(gr->slices[0][0] == m->slices[0][0])
 			{
 				std::cerr << "got body " << me << "\n";
-				int other=(int)(Omega::instance().selectedBody);
+				int other=(int)(Omega::instance().getRootBody()->selectedBody);
 				if(other > 0 && other < Omega::instance().getRootBody()->bodies->size())
 				{
 				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
@@ -317,7 +317,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	// check current grain insides
 //if(!surface)
 //{
-//	int me = (int)(Omega::instance().selectedBody);
+//	int me = (int)(Omega::instance().getRootBody()->selectedBody);
 //	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
 //	{
 //		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
@@ -345,7 +345,7 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 if(!surface)
 {
 //	glBegin(GL_POINTS);
-	int me = (int)(Omega::instance().selectedBody);
+	int me = (int)(Omega::instance().getRootBody()->selectedBody);
 	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
 	{
 		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());

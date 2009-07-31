@@ -191,24 +191,24 @@ void GLViewer::saveDisplayParameters(size_t n){
 
 string GLViewer::getState(){
 	QString origStateFileName=stateFileName();
-	char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(!result) throw runtime_error("Failure getting temporary filename.");
-	setStateFileName(tmpnam_str); saveStateToFile(); setStateFileName(origStateFileName);
-	LOG_DEBUG("State saved to temp file "<<tmpnam_str);
+	string tmpFile=Omega::instance().tmpFilename();
+	setStateFileName(tmpFile); saveStateToFile(); setStateFileName(origStateFileName);
+	LOG_DEBUG("State saved to temp file "<<tmpFile);
 	// read tmp file contents and return it as string
 	// this will replace all whitespace by space (nowlines will disappear, which is what we want)
-	ifstream in(tmpnam_str); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
-	boost::filesystem::remove(boost::filesystem::path(tmpnam_str));
+	ifstream in(tmpFile.c_str()); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
+	boost::filesystem::remove(boost::filesystem::path(tmpFile));
 	return ret;
 }
 
 void GLViewer::setState(string state){
-	char tmpnam_str [L_tmpnam]; char* result=tmpnam(tmpnam_str); if(!result) throw runtime_error("Failure getting temporary filename.");
-	std::ofstream out(tmpnam_str);
-	if(!out.good()){ LOG_ERROR("Error opening temp file `"<<tmpnam_str<<"', loading aborted."); return; }
+	string tmpFile=Omega::instance().tmpFilename();
+	std::ofstream out(tmpFile.c_str());
+	if(!out.good()){ LOG_ERROR("Error opening temp file `"<<tmpFile<<"', loading aborted."); return; }
 	out<<state; out.close();
-	LOG_DEBUG("Will load state from temp file "<<tmpnam_str);
-	QString origStateFileName=stateFileName(); setStateFileName(tmpnam_str); restoreStateFromFile(); setStateFileName(origStateFileName);
-	boost::filesystem::remove(boost::filesystem::path(tmpnam_str));
+	LOG_DEBUG("Will load state from temp file "<<tmpFile);
+	QString origStateFileName=stateFileName(); setStateFileName(tmpFile); restoreStateFromFile(); setStateFileName(origStateFileName);
+	boost::filesystem::remove(boost::filesystem::path(tmpFile));
 }
 
 void GLViewer::keyPressEvent(QKeyEvent *e)
@@ -250,7 +250,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	/* letters alphabetically */
 	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getRootBody()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); }
-	else if(e->key()==Qt::Key_D &&(e->state() & AltButton)){ body_id_t id; if((id=Omega::instance().selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->isDynamic=!b->isDynamic; LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic?"":"NOT")<<" dynamic"); } }
+	else if(e->key()==Qt::Key_D &&(e->state() & AltButton)){ body_id_t id; if((id=Omega::instance().getRootBody()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->isDynamic=!b->isDynamic; LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
 	else if (e->key()==Qt::Key_M && selectedName() >= 0){
@@ -439,7 +439,7 @@ void GLViewer::postSelection(const QPoint& point)
 	if(selection<0){
 		if(isMoving){
 			displayMessage("Moving finished"); mouseMovesCamera(); isMoving=false;
-			Omega::instance().selectedBody = -1;
+			Omega::instance().getRootBody()->selectedBody = -1;
 		}
 		return;
 	}
@@ -457,7 +457,7 @@ void GLViewer::postSelection(const QPoint& point)
 		Quaternionr& q = Body::byId(selection)->physicalParameters->se3.orientation;
 		Vector3r&    v = Body::byId(selection)->physicalParameters->se3.position;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
-		Omega::instance().selectedBody = selection;
+		Omega::instance().getRootBody()->selectedBody = selection;
 		#ifdef YADE_PYTHON
 			try{
 				PyGILState_STATE gstate;

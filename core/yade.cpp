@@ -261,6 +261,8 @@ int main(int argc, char *argv[])
 		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/gui" ));
 	Omega::instance().init();
 
+	// make directory for temporaries
+	Omega::instance().initTemps();
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";
 
 	// recovery file pattern
@@ -289,6 +291,8 @@ int main(int argc, char *argv[])
  	// for(int i=0;i<argc; i++)cerr<<"Argument "<<i<<": "<<argv[i]<<endl;
 	int ok = frontEnd->run(argc,argv);
 
+	// remove all remaining temporary files
+	Omega::instance().cleanupTemps();
 	#ifdef YADE_PYTHON
 		/* pyFinalize crashes with boost:python<=1.35
 		 * http://www.boost.org/libs/python/todo.html#pyfinalize-safety has explanation 
