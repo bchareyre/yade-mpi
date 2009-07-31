@@ -10,7 +10,16 @@
 
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/core/Interaction.hpp>
-#include<ext/hash_map>
+
+
+#if __GNUC__<4 || (__GNUC__==4 && __GNUC_MINOR__<=2)
+	// use this in gcc<=4.2
+	// see also the corresponding IHashMap typedef below
+	#include<ext/hash_map>
+#else
+	#include<tr1/unordered_map>
+#endif
+
 #include<vector>
 
 using namespace std;
@@ -35,7 +44,11 @@ struct hashPair
 	}
 };
 
-typedef hash_map<pair<body_id_t,body_id_t>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
+#if __GNUC__<4 || (__GNUC__==4 && __GNUC_MINOR__<=2)
+	typedef hash_map<pair<body_id_t,body_id_t>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
+#else
+	typedef tr1::unordered_map<pair<body_id_t,body_id_t>, shared_ptr<Interaction>, hashPair, eqPair > IHashMap;
+#endif
 
 class InteractionHashMap : public InteractionContainer
 {

@@ -30,6 +30,9 @@ void FlowEngine::applyCondition(MetaBody* ncb)
 	if (!isActivated) return;
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	FOREACH(const shared_ptr<Body>& b, *bodies){
+		// to avoid warning:
+		b->physicalParameters; 
+
 		// clump members are non-dynamic; they skip the rest of loop once their forces are properly taken into account, however
 		//if (!b->isDynamic && !b->isClumpMember()) continue;
 		
