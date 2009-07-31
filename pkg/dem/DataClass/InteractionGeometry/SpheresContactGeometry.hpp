@@ -40,7 +40,7 @@ class SpheresContactGeometry: public GenericSpheresContact {
 		#endif
 
 
-		SpheresContactGeometry():contactPoint(Vector3r::ZERO),normal(GenericSpheresContact::normal),radius1(GenericSpheresContact::refR1),radius2(GenericSpheresContact::refR2)
+		SpheresContactGeometry():normal(GenericSpheresContact::normal),contactPoint(Vector3r::ZERO),radius1(GenericSpheresContact::refR1),radius2(GenericSpheresContact::refR2)
 		#ifdef SCG_SHEAR
 			,shear(Vector3r::ZERO), prevNormal(Vector3r::ZERO) /*initialized to proper value by geom functor*/
 		#endif

@@ -158,10 +158,11 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 					     B=b1->id2,
 					     C=b2->id1,
 					     D=b2->id2;
-				if( !(A!=B && A!=C && B!=C) )
+				if( !(A!=B && A!=C && B!=C) ){
 					if( A==B )	A=D;
 					else if(A==C)	A=D;
 					else if(B==C)	B=D;
+				}
 
 				if(wire && (damaged.size()>static_cast<unsigned int>(std::max((*angles)->getId1(),(*angles)->getId2()))) && (damaged[(*angles)->getId1()]>=limit && damaged[(*angles)->getId2()]>=limit))
 				{

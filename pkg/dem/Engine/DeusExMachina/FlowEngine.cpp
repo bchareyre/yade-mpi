@@ -27,33 +27,26 @@ FlowEngine::~FlowEngine()
 
 void FlowEngine::applyCondition(MetaBody* ncb)
 {
-
-    if (isActivated)
-    {
-        shared_ptr<BodyContainer>& bodies = ncb->bodies;
-
-
-
-	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
+	if (!isActivated) return;
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	FOREACH(const shared_ptr<Body>& b, *bodies){
 		// clump members are non-dynamic; they skip the rest of loop once their forces are properly taken into account, however
 		//if (!b->isDynamic && !b->isClumpMember()) continue;
 		
-		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		///Access data (examples)
-		const body_id_t& id=b->getId();
-		Real vx = rb->velocity[0];
-		Real rx = rb->angularVelocity[0];
-		Real x = rb->se3.position[0];
+		#if 0
+			RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
+			const body_id_t& id=b->getId();
+			Real vx = rb->velocity[0];
+			Real rx = rb->angularVelocity[0];
+			Real x = rb->se3.position[0];
+		#endif
 	}
-
 	///Compute flow and and forces here
 
 	
 	
 	
-	
-	
-		
 	
 	
 	///End Compute flow and and forces
@@ -74,8 +67,6 @@ void FlowEngine::applyCondition(MetaBody* ncb)
 		//ncb->bex.addTorque(id,t);
 
 	}
-	
-    }
 }
 
 YADE_PLUGIN("FlowEngine");
