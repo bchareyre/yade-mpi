@@ -29,14 +29,14 @@ class PressTestEngine: public TranslationEngine{
 	public:
 		enum motionDirection {forward, backward, stop};
 		motionDirection curentDirection;
-		Real currentVerticalForce, maxVerticalForce, minimalForce;
+		Real currentVerticalForce, maxVerticalForce, minimalForce, predictedForce, minimalPredictedForce;
 		long int numberIterationAfterDestruction, currentIterationAfterDestruction;
 		int pressVelocityForw2Back;
 		PressTestEngine(): curentDirection(forward), currentVerticalForce(0), maxVerticalForce(0), currentIterationAfterDestruction(0), pressVelocityForw2Back(25) {};
 		virtual ~PressTestEngine(){};
 		virtual void applyCondition(MetaBody*);
 	REGISTER_CLASS_AND_BASE(PressTestEngine,TranslationEngine);
-	REGISTER_ATTRIBUTES(TranslationEngine, (numberIterationAfterDestruction));
+	REGISTER_ATTRIBUTES(TranslationEngine, (numberIterationAfterDestruction) (predictedForce));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(PressTestEngine);

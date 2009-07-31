@@ -26,10 +26,11 @@ void PressTestEngine::applyCondition(MetaBody * ncb){
 			FOREACH(body_id_t id, subscribedBodies){
 				assert(ncb->bodies->exists(id));
 				currentVerticalForce = ncb->bex.getForce(id)[2]; //Define current vertical force
-				minimalForce = maxVerticalForce*0.1;						 //Define minimal edge of te force (10% from Maximal)
+				minimalForce = maxVerticalForce*0.1;						 //Define minimal edge of the force (10% from Maximal)
+				minimalPredictedForce = predictedForce*0.1;			 //Define minimal edge of the Predicted force (10% from Predicted)
 				if (currentVerticalForce > maxVerticalForce) {	 //Force increasing. Press is working normally
 					maxVerticalForce = currentVerticalForce;
-				} else if ((currentVerticalForce<=(minimalForce))&&(maxVerticalForce !=0)) {
+				} else if ((currentVerticalForce<=(minimalForce))&&(maxVerticalForce>minimalPredictedForce)) {
 					/*
 					 * Force is decreased lower, than minimal. The body seems "cracked".
 					 * Starting the countdown

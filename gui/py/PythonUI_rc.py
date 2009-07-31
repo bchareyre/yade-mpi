@@ -126,7 +126,8 @@ try:
 	else:
 		sys.argv[0]='<embedded python interpreter>'
 		from IPython.Shell import IPShellEmbed
-		ipshell = IPShellEmbed(banner=r"""__   __    ____          ____                      _      
+		ipshell = IPShellEmbed(banner=r"""
+	__   __    ____          ____                      _      
 	\ \ / /_ _|  _ \  ___   / ___|___  _ __  ___  ___ | | ___ 
 	 \ V / _` | | | |/ _ \ | |   / _ \| '_ \/ __|/ _ \| |/ _ \ 
 	  | | (_| | |_| |  __/ | |__| (_) | | | \__ \ (_) | |  __/
