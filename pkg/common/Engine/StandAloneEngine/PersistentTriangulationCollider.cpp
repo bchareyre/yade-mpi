@@ -151,4 +151,4 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 
 }
 
-YADE_PLUGIN("PersistentTriangulationCollider");
+YADE_PLUGIN((PersistentTriangulationCollider));

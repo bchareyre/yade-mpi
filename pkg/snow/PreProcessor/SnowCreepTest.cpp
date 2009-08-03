@@ -709,4 +709,4 @@ string GenerateCloud_snow(vector<BasicSphere>& sphere_list, Vector3r lowerCorner
 
 
 
-YADE_PLUGIN("SnowCreepTest");
+YADE_PLUGIN((SnowCreepTest));

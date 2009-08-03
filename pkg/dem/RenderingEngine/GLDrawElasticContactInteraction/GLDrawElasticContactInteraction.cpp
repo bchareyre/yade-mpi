@@ -90,5 +90,5 @@ void GLDrawElasticContactInteraction::go(
 
 }
 
-YADE_PLUGIN("GLDrawElasticContactInteraction");
+YADE_PLUGIN((GLDrawElasticContactInteraction));
 YADE_REQUIRE_FEATURE(OPENGL)

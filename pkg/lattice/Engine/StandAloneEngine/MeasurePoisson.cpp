@@ -100,4 +100,4 @@ void MeasurePoisson::action(MetaBody * ncb)
 	 
 }
 
-YADE_PLUGIN("MeasurePoisson");
+YADE_PLUGIN((MeasurePoisson));

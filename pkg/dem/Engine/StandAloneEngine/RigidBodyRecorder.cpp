@@ -97,4 +97,4 @@ void RigidBodyRecorder::action(MetaBody * ncb)
     }
 }
 
-YADE_PLUGIN("RigidBodyRecorder");
+YADE_PLUGIN((RigidBodyRecorder));

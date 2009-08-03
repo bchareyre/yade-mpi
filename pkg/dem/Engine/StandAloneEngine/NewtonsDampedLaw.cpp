@@ -13,8 +13,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 
-YADE_PLUGIN("NewtonsDampedLaw");
-
+YADE_PLUGIN((NewtonsDampedLaw));
 void NewtonsDampedLaw::cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration){
 	for(int i=0; i<3; i++){
 		angularAcceleration[i]*= 1 - damping*Mathr::Sign ( m[i]*(angularVelocity[i] + (Real) 0.5 *dt*angularAcceleration[i]) );

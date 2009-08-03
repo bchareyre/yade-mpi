@@ -1,11 +1,11 @@
 #include "Dem3DofGeom_FacetSphere.hpp"
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
-YADE_PLUGIN("Dem3DofGeom_FacetSphere",
+YADE_PLUGIN((Dem3DofGeom_FacetSphere)
 	#ifdef YADE_OPENGL
-		"GLDraw_Dem3DofGeom_FacetSphere",
+		(GLDraw_Dem3DofGeom_FacetSphere)
 	#endif	
-		"ef2_Facet_Sphere_Dem3DofGeom");
+		(ef2_Facet_Sphere_Dem3DofGeom));
 
 CREATE_LOGGER(Dem3DofGeom_FacetSphere);
 Dem3DofGeom_FacetSphere::~Dem3DofGeom_FacetSphere(){}

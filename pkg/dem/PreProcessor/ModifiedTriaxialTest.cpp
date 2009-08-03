@@ -691,4 +691,4 @@ string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vec
 
 
 
-YADE_PLUGIN("ModifiedTriaxialTest");
+YADE_PLUGIN((ModifiedTriaxialTest));

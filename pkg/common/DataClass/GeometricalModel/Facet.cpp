@@ -18,4 +18,5 @@ Facet::~Facet ()
 {
 }
 
-YADE_PLUGIN("Facet");
+YADE_PLUGIN((Facet));
+

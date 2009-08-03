@@ -6,7 +6,6 @@
 #include<unistd.h>
 #include<list>
 
-
 #include<boost/python.hpp>
 #include<boost/python/raw_function.hpp>
 #include<boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -19,6 +18,8 @@
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
 #include<boost/algorithm/string.hpp>
+
+
 
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
@@ -470,7 +471,14 @@ class pyOmega{
 		int numThreads_get(){return 1;}
 		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
 	#endif
-
+	#ifdef YADE_BOOST_SERIALIZATION
+	void saveXML(string filename){
+		std::ofstream ofs(filename.c_str());
+		boost::archive::xml_oarchive oa(ofs);
+		shared_ptr<MetaBody> YadeSimulation=OMEGA.getRootBody();
+		oa << YadeSimulation;
+	}
+	#endif
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
@@ -503,9 +511,7 @@ python::list Serializable_updateExistingAttrs(const shared_ptr<Serializable>& se
 }
 
 std::string Serializable_pyStr(const shared_ptr<Serializable>& self) {
-	std::string nameThis=self->getClassName(),nameRoot=self->pyRootClassName();
-	if(nameThis==nameRoot) return "<"+nameRoot+">";
-	else return "<"+nameThis+" "+nameRoot+">";
+	return "<"+self->getClassName()+" instance at "+lexical_cast<string>(self.get())+">";
 }
 
 python::list TimingDeltas_pyData(const shared_ptr<TimingDeltas> self){
@@ -626,6 +632,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
+		#ifdef YADE_BOOST_SERIALIZATION
+			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
+		#endif
 		;
 	python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)

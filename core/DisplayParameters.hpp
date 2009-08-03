@@ -21,7 +21,7 @@ class DisplayParameters: public Serializable{
 		void setValue(std::string displayType, std::string value){assert(values.size()==displayTypes.size()); vector<string>::iterator I=std::find(displayTypes.begin(),displayTypes.end(),displayType); if(I==displayTypes.end()){displayTypes.push_back(displayType); values.push_back(value);} else {values[std::distance(displayTypes.begin(),I)]=value;};}
 	DisplayParameters(){}
 	virtual ~DisplayParameters(){}
-	REGISTER_ATTRIBUTES(/*no base*/,(displayTypes)(values));
+	REGISTER_ATTRIBUTES(Serializable,(displayTypes)(values));
 	REGISTER_CLASS_AND_BASE(DisplayParameters,Serializable);
 };
 REGISTER_SERIALIZABLE(DisplayParameters);

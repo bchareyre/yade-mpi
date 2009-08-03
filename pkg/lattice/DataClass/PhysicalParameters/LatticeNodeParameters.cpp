@@ -24,4 +24,4 @@ LatticeNodeParameters::~LatticeNodeParameters()
 }
 
 
-YADE_PLUGIN("LatticeNodeParameters");
+YADE_PLUGIN((LatticeNodeParameters));

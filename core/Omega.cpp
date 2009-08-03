@@ -217,6 +217,7 @@ void Omega::scanPlugins(string baseDir){
 void Omega::loadSimulationFromStream(std::istream& stream){
 	LOG_DEBUG("Loading simulation from stream.");
 	resetRootBody();
+	RenderMutexLock lock;
 	IOFormatManager::loadFromStream("XMLFormatManager",stream,"rootBody",rootBody);
 }
 
@@ -231,7 +232,6 @@ void Omega::loadSimulation(){
 	if(!filesystem::exists(simulationFileName) && !algorithm::starts_with(simulationFileName,":memory")) throw runtime_error("Simulation file to load doesn't exist: "+simulationFileName);
 	
 	LOG_INFO("Loading file " + simulationFileName);
-
 	{
 		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 			joinSimulationLoop(); // stop current simulation if running

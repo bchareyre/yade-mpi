@@ -88,7 +88,7 @@ class Body : public Serializable
 
 		// Serialization
 	protected:
-		REGISTER_ATTRIBUTES(/*no base*/,
+		REGISTER_ATTRIBUTES(Serializable,
 			(id)
 			(groupMask)
 			(isDynamic)

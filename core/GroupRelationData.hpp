@@ -101,7 +101,7 @@ public:
   void read(istream & is);  
   void write(ostream & os);
 
-  REGISTER_ATTRIBUTES(/*no base*/,(commands_));
+  REGISTER_ATTRIBUTES(Serializable,(commands_));
   REGISTER_CLASS_AND_BASE(GroupRelationData,Serializable);
  
   protected : virtual void preProcessAttributes  (bool deserializing);

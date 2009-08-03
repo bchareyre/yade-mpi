@@ -3,8 +3,7 @@
 #include"Clump.hpp"
 #include<algorithm>
 
-YADE_PLUGIN("Clump","ClumpMemberMover","ClumpTestGen");
-
+YADE_PLUGIN((Clump)(ClumpMemberMover)(ClumpTestGen));
 CREATE_LOGGER(Clump);
 CREATE_LOGGER(ClumpMemberMover);
 CREATE_LOGGER(ClumpTestGen);

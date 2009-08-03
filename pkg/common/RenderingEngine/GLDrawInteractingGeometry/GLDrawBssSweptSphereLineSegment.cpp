@@ -69,5 +69,5 @@ void GLDrawBssSweptSphereLineSegment::go(const shared_ptr<InteractingGeometry>& 
 
 
 
-YADE_PLUGIN("GLDrawBssSweptSphereLineSegment");
+YADE_PLUGIN((GLDrawBssSweptSphereLineSegment));
 YADE_REQUIRE_FEATURE(OPENGL)

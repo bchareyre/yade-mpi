@@ -602,5 +602,4 @@ Real BshSnowGrain::calc_depth(size_t I)
 	return depth;
 }
 
-YADE_PLUGIN("BshSnowGrain","Grrrr");
-
+YADE_PLUGIN((BshSnowGrain)(Grrrr));

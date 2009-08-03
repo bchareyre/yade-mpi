@@ -35,4 +35,4 @@ void ParticleSet2Mesh2D::go(	  const shared_ptr<PhysicalParameters>&
 	}
 }
 	
-YADE_PLUGIN("ParticleSet2Mesh2D");
+YADE_PLUGIN((ParticleSet2Mesh2D));

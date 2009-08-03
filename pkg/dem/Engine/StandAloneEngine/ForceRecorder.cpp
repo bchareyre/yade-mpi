@@ -84,4 +84,4 @@ void ForceRecorder::action(MetaBody * ncb)
 		
 }
 
-YADE_PLUGIN("ForceRecorder");
+YADE_PLUGIN((ForceRecorder));

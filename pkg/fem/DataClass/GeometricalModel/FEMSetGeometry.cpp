@@ -21,4 +21,4 @@ FEMSetGeometry::~FEMSetGeometry()
 }
 
 
-YADE_PLUGIN("FEMSetGeometry");
+YADE_PLUGIN((FEMSetGeometry));

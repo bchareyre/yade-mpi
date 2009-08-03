@@ -34,4 +34,4 @@ void ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment::go(	co
   
 }
 	
-YADE_PLUGIN("ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment");
+YADE_PLUGIN((ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment));

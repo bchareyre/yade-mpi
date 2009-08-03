@@ -39,5 +39,5 @@ void GLDrawParticleState::go(const shared_ptr<PhysicalParameters>& pp)
 	glEnd();
 }
 
-YADE_PLUGIN("GLDrawParticleState");
+YADE_PLUGIN((GLDrawParticleState));
 YADE_REQUIRE_FEATURE(OPENGL)

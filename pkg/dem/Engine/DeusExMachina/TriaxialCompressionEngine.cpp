@@ -327,4 +327,4 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 
  
 
-YADE_PLUGIN("TriaxialCompressionEngine");
+YADE_PLUGIN((TriaxialCompressionEngine));

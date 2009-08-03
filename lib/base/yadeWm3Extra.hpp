@@ -122,22 +122,41 @@ void quaternionToAxes(const Quaternionr& q, Vector3r& axis1, Vector3r& axis2, Ve
 void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real threshold=1e-6f);
 void quaterniontoGLMatrix(const Quaternionr& q, Real m[16]);
 
-
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-
+#include<boost/serialization/nvp.hpp>
 
 namespace boost {
 namespace serialization {
 
 template<class Archive>
+void serialize(Archive & ar, Vector2r & g, const unsigned int version){
+	Real &x=g[0], &y=g[1];
+	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y);
+}
+
+template<class Archive>
+void serialize(Archive & ar, Vector2<int> & g, const unsigned int version){
+	int &x=g[0], &y=g[1];
+	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y);
+}
+
+template<class Archive>
 void serialize(Archive & ar, Vector3r & g, const unsigned int version)
 {
-    ar & g[0];
-    ar & g[1];
-    ar & g[2];
+	Real &x=g[0], &y=g[1], &z=g[2];
+	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
+}
+
+template<class Archive>
+void serialize(Archive & ar, Quaternionr & g, const unsigned int version)
+{
+	Real &x=g[0], &y=g[1], &z=g[2], &w=g[2];
+	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z) & BOOST_SERIALIZATION_NVP(w);
+}
+
+template<class Archive>
+void serialize(Archive & ar, Se3r & g, const unsigned int version){
+	Vector3r& position=g.position; Quaternionr& orientation=g.orientation;
+	ar & BOOST_SERIALIZATION_NVP(position) & BOOST_SERIALIZATION_NVP(orientation);
 }
 
 } // namespace serialization

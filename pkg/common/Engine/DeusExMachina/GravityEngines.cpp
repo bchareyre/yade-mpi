@@ -10,8 +10,7 @@
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 
-YADE_PLUGIN("GravityEngine","CentralGravityEngine","AxialGravityEngine");
-
+YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine));
 
 void GravityEngine::applyCondition(MetaBody* ncb){
 	/* skip bodies that are within a clump;

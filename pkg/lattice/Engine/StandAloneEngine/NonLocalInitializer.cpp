@@ -179,4 +179,4 @@ void NonLocalInitializer::action(MetaBody * rootBody)
 //	cerr << "number of beams: " << total << "\n";
 }
 
-YADE_PLUGIN("NonLocalInitializer");
+YADE_PLUGIN((NonLocalInitializer));

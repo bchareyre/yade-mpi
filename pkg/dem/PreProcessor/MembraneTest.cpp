@@ -352,4 +352,4 @@ void MembraneTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 
-YADE_PLUGIN("MembraneTest");
+YADE_PLUGIN((MembraneTest));

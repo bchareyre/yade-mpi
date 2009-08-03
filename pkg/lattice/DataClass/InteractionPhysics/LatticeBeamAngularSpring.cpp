@@ -34,4 +34,4 @@ LatticeBeamAngularSpring::~LatticeBeamAngularSpring()
 }
 
 
-YADE_PLUGIN("LatticeBeamAngularSpring");
+YADE_PLUGIN((LatticeBeamAngularSpring));

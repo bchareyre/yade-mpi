@@ -261,4 +261,4 @@ unsigned int BodyRedirectionVector::size() const
 }
 
 
-// YADE_PLUGIN("BodyRedirectionVector");
+// YADE_PLUGIN((BodyRedirectionVector));

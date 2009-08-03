@@ -20,4 +20,4 @@ BssSweptSphereLineSegment::~BssSweptSphereLineSegment ()
 {		
 }
 
-YADE_PLUGIN("BssSweptSphereLineSegment");
+YADE_PLUGIN((BssSweptSphereLineSegment));

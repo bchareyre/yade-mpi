@@ -448,4 +448,4 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 
 }
 
-YADE_PLUGIN("Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact");
+YADE_PLUGIN((Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact));

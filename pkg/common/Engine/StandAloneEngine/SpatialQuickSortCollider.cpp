@@ -11,8 +11,8 @@
 #include <math.h>
 #include <algorithm>
 
-YADE_PLUGIN("SpatialQuickSortCollider");
- 
+YADE_PLUGIN((SpatialQuickSortCollider));
+
 SpatialQuickSortCollider::SpatialQuickSortCollider() : Collider()
 {
 	haveDistantTransient=false;

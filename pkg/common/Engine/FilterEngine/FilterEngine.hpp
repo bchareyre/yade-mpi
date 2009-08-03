@@ -20,10 +20,8 @@ class FilterEngine : public DeusExMachina {
 		bool isActivated(MetaBody*);
 
 		FilterEngine();
-	
-	REGISTER_ATTRIBUTES(FilterEngine,(isFilterActivated));
-	REGISTER_CLASS_NAME(FilterEngine);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+	REGISTER_ATTRIBUTES(DeusExMachina,(isFilterActivated));
+	REGISTER_CLASS_AND_BASE(FilterEngine,DeusExMachina);
 };
 REGISTER_SERIALIZABLE(FilterEngine);
 

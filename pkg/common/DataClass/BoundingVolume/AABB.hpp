@@ -20,15 +20,11 @@ class AABB : public BoundingVolume
 		virtual ~AABB();
 	
 /// Serialization
-	
-	REGISTER_CLASS_NAME(AABB);	
-	REGISTER_BASE_CLASS_NAME(BoundingVolume);
-
+	REGISTER_CLASS_AND_BASE(AABB,BoundingVolume);	
+	REGISTER_ATTRIBUTES(BoundingVolume,/* no attributes */);
 /// Indexable
-	
 	REGISTER_CLASS_INDEX(AABB,BoundingVolume);
 };
-
 REGISTER_SERIALIZABLE(AABB);
 
 

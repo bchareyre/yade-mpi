@@ -1,6 +1,6 @@
 #include"ParallelEngine.hpp"
 //#include<omp.h> // needed for omp_get_thread_num() (debugging)
-YADE_PLUGIN("ParallelEngine");
+YADE_PLUGIN((ParallelEngine));
 list<string> ParallelEngine::getNeededBex(){
 	list<string> ret;
 	FOREACH(const vector<shared_ptr<Engine> >& ve, slaves){

@@ -2,11 +2,11 @@
 
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/core/Omega.hpp>
-YADE_PLUGIN("Dem3DofGeom_SphereSphere",
+YADE_PLUGIN((Dem3DofGeom_SphereSphere)
 	#ifdef YADE_OPENGL
-		"GLDraw_Dem3DofGeom_SphereSphere",
+		(GLDraw_Dem3DofGeom_SphereSphere)
 	#endif
-	"ef2_Sphere_Sphere_Dem3DofGeom");
+	(ef2_Sphere_Sphere_Dem3DofGeom));
 
 
 Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}

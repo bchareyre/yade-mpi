@@ -118,4 +118,4 @@ void StrainRecorder::action(MetaBody * ncb)
 	 
 }
 
-YADE_PLUGIN("StrainRecorder");
+YADE_PLUGIN((StrainRecorder));

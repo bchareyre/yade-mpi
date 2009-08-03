@@ -216,4 +216,4 @@ unsigned int BodyAssocVector::size() const
 }
 
 
-YADE_PLUGIN("BodyAssocVector");
+YADE_PLUGIN((BodyAssocVector));

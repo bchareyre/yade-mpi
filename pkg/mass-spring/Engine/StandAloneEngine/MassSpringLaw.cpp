@@ -68,4 +68,4 @@ void MassSpringLaw::action(MetaBody * massSpring)
 	
 }
 
-YADE_PLUGIN("MassSpringLaw");
+YADE_PLUGIN((MassSpringLaw));

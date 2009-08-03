@@ -26,11 +26,33 @@
 
 
 #include<yade/lib-loki/Singleton.hpp>
-#include<boost/preprocessor/cat.hpp>
+#include<boost/preprocessor.hpp>
 
 
 #include "FactoryExceptions.hpp"
 #include "DynLibManager.hpp"
+
+/*! define the following macro to enable experimenta boost::serialization support
+	Slows the compilation down about 10×, and doesn't work.
+	Python wrapper defines O.saveXML('file.xml') to try it out.
+*/
+// #define YADE_BOOST_SERIALIZATION
+
+#ifdef YADE_BOOST_SERIALIZATION
+	//#include<boost/archive/binary_oarchive.hpp>
+	//#include<boost/archive/binary_iarchive.hpp>
+	#include<boost/archive/xml_oarchive.hpp>
+	#include<boost/archive/xml_iarchive.hpp>
+
+	#include<boost/serialization/export.hpp> // must come after all supported archive types
+
+	#include<boost/serialization/base_object.hpp>
+	#include<boost/serialization/shared_ptr.hpp>
+	#include<boost/serialization/list.hpp>
+	#include<boost/serialization/vector.hpp>
+	#include<boost/serialization/map.hpp>
+	#include<boost/serialization/nvp.hpp>
+#endif
 
 
 #define REGISTER_FACTORABLE(name) 						\
@@ -154,13 +176,20 @@ class ClassFactory : public Singleton< ClassFactory >
 };
 
 
-/*! Macro defining what classes can be found in this plugin -- must always be used in the respective .cpp file. If left empty, filename will be used to deduce that.
+/*! Macro defining what classes can be found in this plugin -- must always be used in the respective .cpp file.
  *
- * Note:
- * 	1. Visibility must be set to "internal" (or "protected") so that other plugins' init will not shadow this one and all of them get properly executed.
- * 	2. The function must be enclosed in its own anonymous namespace, otherwise there will be clashes (liker errors) if more files with YADE_PLUGIN are linked together.
+ * Note: __COUNTER__ generates unique function name for each plugin. This avoids name clashes, even if multiple .cpp files
+ * are compiled into one plugin.
  */
-#define YADE_PLUGIN(...) namespace{ __attribute__((constructor)) __attribute__((visibility("internal"))) void BOOST_PP_CAT(registerThisPluginClasses,__COUNTER__) (void){ const char* info[]={__FILE__ , ##__VA_ARGS__ , NULL}; ClassFactory::instance().registerPluginClasses(info);} }
+
+#ifdef YADE_BOOST_SERIALIZATION
+	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z);
+#else
+	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z)
+#endif
+
+#define _YADE_PLUGIN_REPEAT(x,y,z) BOOST_PP_STRINGIZE(z),
+#define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor)) void BOOST_PP_CAT(registerThisPluginClasses,__COUNTER__) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
 //! Macro informing build file generator what features that particular file depends on. Has no effect at compile-time. Can be specified multiple times within a single (.cpp) file
 #define YADE_REQUIRE_FEATURE(feature)
 

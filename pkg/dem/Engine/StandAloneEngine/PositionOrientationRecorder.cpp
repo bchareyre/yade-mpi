@@ -54,4 +54,4 @@ void PositionOrientationRecorder::action(MetaBody * ncb){
 }
 
 
-YADE_PLUGIN("PositionOrientationRecorder");
+YADE_PLUGIN((PositionOrientationRecorder));

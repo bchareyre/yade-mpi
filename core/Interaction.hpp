@@ -68,7 +68,7 @@ class Interaction : public Serializable
 		//! common initialization called from both constructor and reset()
 		void init();
 			
-	REGISTER_ATTRIBUTES(/*no base*/,
+	REGISTER_ATTRIBUTES(Serializable,
 		(id1)
 		(id2)
 		(iterMadeReal)

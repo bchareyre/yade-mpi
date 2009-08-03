@@ -711,4 +711,4 @@ if(tension_compression_different_stiffness)
 
 */
 
-YADE_PLUGIN("LatticeLaw");
+YADE_PLUGIN((LatticeLaw));

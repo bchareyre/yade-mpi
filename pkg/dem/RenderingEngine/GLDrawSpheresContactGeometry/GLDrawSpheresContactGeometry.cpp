@@ -14,7 +14,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 
-YADE_PLUGIN("GLDrawSpheresContactGeometry");
+YADE_PLUGIN((GLDrawSpheresContactGeometry));
 YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(GLDrawSpheresContactGeometry);
 

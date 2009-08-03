@@ -18,8 +18,7 @@
 	#include <Wm3Plane3.h>
 #endif
 
-YADE_PLUGIN("Ef1_IstSnowLayersContact_glDraw");
-
+YADE_PLUGIN((Ef1_IstSnowLayersContact_glDraw));
 /*
 /// all points must share the same plane!
 std::vector<Vector3r> find_boundary(std::vector<Vector3r> points)

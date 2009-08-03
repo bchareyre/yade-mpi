@@ -2,8 +2,7 @@
 #include"ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw.hpp"
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
-YADE_PLUGIN("ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw");
-
+YADE_PLUGIN((ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw));
 void ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(_geom.get());
 	NormalShearInteraction* phys=static_cast<NormalShearInteraction*>(_phys.get());

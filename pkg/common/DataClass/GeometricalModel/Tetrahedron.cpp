@@ -30,4 +30,5 @@ Tetrahedron::~Tetrahedron()
 {
 }
 
-YADE_PLUGIN("Tetrahedron");
+YADE_PLUGIN((Tetrahedron));
+

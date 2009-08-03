@@ -13,7 +13,7 @@ class NormalInteraction:public InteractionPhysics {
 		Vector3r normalForce;
 		NormalInteraction(): normalForce(Vector3r::ZERO) {createIndex(); }
 		virtual ~NormalInteraction();
-	REGISTER_ATTRIBUTES(/*no base class attributes*/,(kn)(normalForce));
+	REGISTER_ATTRIBUTES(Serializable,(kn)(normalForce));
 	REGISTER_CLASS_AND_BASE(NormalInteraction,InteractionPhysics);
 	REGISTER_CLASS_INDEX(NormalInteraction,InteractionPhysics);
 };

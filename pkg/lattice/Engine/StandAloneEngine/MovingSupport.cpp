@@ -210,4 +210,4 @@ void MovingSupport::action(MetaBody * ncb)
 	 
 }
 
-YADE_PLUGIN("MovingSupport");
+YADE_PLUGIN((MovingSupport));

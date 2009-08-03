@@ -17,13 +17,12 @@ class MetaInteractingGeometry : public InteractingGeometry
 		virtual ~MetaInteractingGeometry ();
 
 /// Serialization
-	REGISTER_CLASS_NAME(MetaInteractingGeometry);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
-	
+	REGISTER_CLASS_AND_BASE(MetaInteractingGeometry,InteractingGeometry);
+	// FIXME: if this class is registered, MetaBody then has "abstract" InteractingGeometry, which fails in the functor (??)
+	REGISTER_ATTRIBUTES(InteractingGeometry,/* no attributes */);
 /// Indexable
 	REGISTER_CLASS_INDEX(MetaInteractingGeometry,InteractingGeometry);
 };
 
 REGISTER_SERIALIZABLE(MetaInteractingGeometry);
-
 

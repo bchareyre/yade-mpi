@@ -19,4 +19,5 @@ BshTube::~BshTube ()
 {		
 }
 
-YADE_PLUGIN("BshTube");
+YADE_PLUGIN((BshTube));
+

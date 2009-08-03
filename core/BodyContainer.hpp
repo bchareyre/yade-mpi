@@ -105,7 +105,7 @@ class BodyContainer : public Serializable
 	private :
 		vector<shared_ptr<Body> > body; 
 	public :
-		REGISTER_ATTRIBUTES(/*no base*/,(body));
+		REGISTER_ATTRIBUTES(Serializable,(body));
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);

@@ -21,7 +21,7 @@ class Grrrr : public Serializable
 		Grrrr(){};
 		Grrrr(std::vector<Vector3r>& g):grr(g){};
 	protected :
-		REGISTER_ATTRIBUTES(/* */, (grr));
+		REGISTER_ATTRIBUTES(Serializable, (grr));
 	REGISTER_CLASS_NAME(Grrrr);
 	REGISTER_BASE_CLASS_NAME(Serializable);
 };
@@ -76,9 +76,9 @@ class BshSnowGrain : public GeometricalModel
 		Real calc_depth(size_t);
 		bool is_point_orthogonally_projected_on_triangle(Vector3r& a,Vector3r& b,Vector3r c,Vector3r& N,Vector3r& P,Real point_plane_distance = 0.0);
 
-		friend class boost::serialization::access;
+		// friend class boost::serialization::access;
 		template<class Archive>
-		void serialize(Archive & ar, unsigned int version)
+		void serialize_REMOVED(Archive & ar, unsigned int version)
 		{
 			//boost::mutex::scoped_lock scoped_lock(m_voxel_envelope_mutex);
 			ar & layer_distance;

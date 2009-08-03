@@ -26,4 +26,4 @@ void GeometricalModelMetaEngine::action(MetaBody* ncb)
 	 	operator()(ncb->physicalParameters,ncb->geometricalModel,ncb);
 }
 
-YADE_PLUGIN("GeometricalModelMetaEngine");
+YADE_PLUGIN((GeometricalModelMetaEngine));

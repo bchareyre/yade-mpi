@@ -18,4 +18,4 @@ InteractingNode::~InteractingNode ()
 }
 
 
-YADE_PLUGIN("InteractingNode");
+YADE_PLUGIN((InteractingNode));

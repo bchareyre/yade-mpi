@@ -28,4 +28,4 @@ void FixedPositionEngine::applyCondition(MetaBody * ncb){
 	}
 }
 
-YADE_PLUGIN("FixedPositionEngine");
+YADE_PLUGIN((FixedPositionEngine));

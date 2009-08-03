@@ -634,4 +634,4 @@ void VolumicContactLaw::action(MetaBody* ncb)
 }
 
  
-YADE_PLUGIN("VolumicContactLaw");
+YADE_PLUGIN((VolumicContactLaw));

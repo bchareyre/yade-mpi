@@ -30,4 +30,4 @@ void SDECLinkPhysics::postProcessAttributes(bool deserializing)
 }
 
 
-YADE_PLUGIN("SDECLinkPhysics");
+YADE_PLUGIN((SDECLinkPhysics));

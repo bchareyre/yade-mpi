@@ -134,4 +134,4 @@ void ElasticCriterionTimeStepper::computeTimeStep(MetaBody* ncb)
 	}
 }
 
-YADE_PLUGIN("ElasticCriterionTimeStepper");
+YADE_PLUGIN((ElasticCriterionTimeStepper));

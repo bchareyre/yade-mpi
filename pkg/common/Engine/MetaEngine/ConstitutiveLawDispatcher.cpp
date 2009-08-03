@@ -1,7 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #include "ConstitutiveLawDispatcher.hpp"
-YADE_PLUGIN("ConstitutiveLawDispatcher");
-
+YADE_PLUGIN((ConstitutiveLawDispatcher));
 void ConstitutiveLawDispatcher::action(MetaBody* rootBody){
 	#ifdef YADE_OPENMP
 		const long size=rootBody->transientInteractions->size();

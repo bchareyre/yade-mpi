@@ -87,4 +87,4 @@ void MGPRecorder::action(MetaBody * ncb)
 
 }
 
-YADE_PLUGIN("MGPRecorder");
+YADE_PLUGIN((MGPRecorder));

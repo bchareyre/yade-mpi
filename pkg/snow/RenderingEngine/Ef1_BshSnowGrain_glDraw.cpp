@@ -393,4 +393,4 @@ if(!surface)
 
 }
 
-YADE_PLUGIN("Ef1_BshSnowGrain_glDraw");
+YADE_PLUGIN((Ef1_BshSnowGrain_glDraw));

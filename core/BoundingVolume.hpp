@@ -26,7 +26,7 @@ class BoundingVolume : public Serializable, public Indexable
 				,max;			/// Maximum of the bounding volume
 		BoundingVolume(): diffuseColor(Vector3r(1,1,1)), min(Vector3r(0,0,0)), max(Vector3r(0,0,0)) {}
 
-	REGISTER_ATTRIBUTES(/*no base*/,(diffuseColor));
+	REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
 	REGISTER_CLASS_AND_BASE(BoundingVolume,Serializable Indexable);
 	REGISTER_INDEX_COUNTER(BoundingVolume);
 };

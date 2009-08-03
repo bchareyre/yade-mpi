@@ -16,8 +16,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
-YADE_PLUGIN("GlobalStiffnessTimeStepper");
-
+YADE_PLUGIN((GlobalStiffnessTimeStepper));
 GlobalStiffnessTimeStepper::GlobalStiffnessTimeStepper() : TimeStepper()
 {
 //cerr << "GlobalStiffnessTimeStepper()"  << endl;

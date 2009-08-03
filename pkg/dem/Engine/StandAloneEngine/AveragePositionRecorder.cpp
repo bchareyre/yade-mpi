@@ -73,4 +73,4 @@ void AveragePositionRecorder::action(MetaBody * ncb)
 }
 
 
-YADE_PLUGIN("AveragePositionRecorder");
+YADE_PLUGIN((AveragePositionRecorder));

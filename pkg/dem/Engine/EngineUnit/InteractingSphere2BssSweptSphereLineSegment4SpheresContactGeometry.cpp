@@ -79,4 +79,4 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::goRever
 	return isInteracting;
 }
 
-YADE_PLUGIN("InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry");
+YADE_PLUGIN((InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry));

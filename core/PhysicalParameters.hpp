@@ -40,7 +40,7 @@ class PhysicalParameters: public Serializable, public Indexable
 		std::vector<std::string> blockedDOFs_vec_get() const;
 		void blockedDOFs_vec_set(const std::vector<std::string>& dofs);
 
-	REGISTER_ATTRIBUTES(/*no base*/,(se3)(refSe3)(blockedDOFs));
+	REGISTER_ATTRIBUTES(Serializable,(se3)(refSe3)(blockedDOFs));
 	REGISTER_CLASS_AND_BASE(PhysicalParameters,Serializable Indexable);
 	REGISTER_INDEX_COUNTER(PhysicalParameters);
 };

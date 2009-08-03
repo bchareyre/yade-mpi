@@ -167,4 +167,4 @@ unsigned int InteractionHashMap::size()
 {
 	return interactions.size();
 }
-YADE_PLUGIN("InteractionHashMap");
+YADE_PLUGIN((InteractionHashMap));

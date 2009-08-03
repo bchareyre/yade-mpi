@@ -34,7 +34,7 @@
 bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
-	Body(),bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), transientInteractions(interactions)
+	Body(), bodies(new BodyRedirectionVector), interactions(new InteractionVecMap), transientInteractions(interactions)
 {	
 	engines.clear();
 	initializers.clear();
@@ -47,6 +47,8 @@ MetaBody::MetaBody() :
 	isDynamic=false;
 	dt=1e-8;
 	selectedBody=-1;
+	// FIXME: move MetaInteractingGeometry to core and create it here right away
+	// interactingGeometry=shared_ptr<InteractingGeometry>(new MetaInteractingGeometry);
 
 	// fill default tags
 	struct passwd* pw;

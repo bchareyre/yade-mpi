@@ -315,4 +315,4 @@ bool HydraulicTest::inside(Vector3r pos)
 	return true;
 };
 
-YADE_PLUGIN("HydraulicTest");
+YADE_PLUGIN((HydraulicTest));

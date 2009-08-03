@@ -56,4 +56,4 @@ void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 
 
 
-YADE_PLUGIN("BoundingVolumeMetaEngine");
+YADE_PLUGIN((BoundingVolumeMetaEngine));

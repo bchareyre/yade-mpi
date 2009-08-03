@@ -79,7 +79,8 @@ Sorry for that. */
 #include"Voxel/VoxelEnvelope.cpp"
 
 
-YADE_PLUGIN("SnowVoxelsLoader");
+YADE_PLUGIN((SnowVoxelsLoader));
+
 SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 {
 	voxel_binary_data_file = "/home/janek/32-Snow-white/20-Programy/31-SNOW-read-data/RESULT.bz2";

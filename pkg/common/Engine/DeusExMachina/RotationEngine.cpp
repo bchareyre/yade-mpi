@@ -10,8 +10,7 @@
 
 #include<yade/pkg-common/LinearInterpolate.hpp>
 
-YADE_PLUGIN("RotationEngine","SpiralEngine","InterpolatingSpiralEngine");
-
+YADE_PLUGIN((RotationEngine)(SpiralEngine)(InterpolatingSpiralEngine));
 
 void InterpolatingSpiralEngine::applyCondition(MetaBody* rb){
 	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;

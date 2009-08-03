@@ -34,6 +34,9 @@
 #include"SerializationExceptions.hpp"
 #include"Archive.hpp"
 
+
+
+
 using namespace boost;
 using namespace std;
 using namespace ArchiveTypes;
@@ -50,13 +53,22 @@ namespace{
 	void registerAttributes(){}
 };
 
-#define _REGISTER_ATTRIBUTES_BODY(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
-#define REGISTER_ATTRIBUTES_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_BODY,~,attrs)
+#ifdef YADE_BOOST_SERIALIZATION
+	#define _REGISTER_BOOST_ATTRIBUTES_REPEAT(x,y,z) ar & BOOST_SERIALIZATION_NVP(z);
+	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
+		friend class boost::serialization::access; private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ preProcessAttributes(ArchiveT::is_loading::value); ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass); BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) postProcessAttributes(ArchiveT::is_loading::value); }
+#else
+	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
+#endif
+
+
+
+#define _REGISTER_ATTRIBUTES_REPEAT(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
 //! create member function that register attributes; must be parenthesized, without commas: (attr1) (attr2) (attr3) ...
 //#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
 //! Same as REGISTER_ATTRIBUTES, but with first argument of base class, of which registerAttributes will be called first
 #ifndef YADE_PYTHON
-	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs); }
+	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
 #else
 	#include<boost/python.hpp>
 
@@ -73,18 +85,13 @@ namespace{
 	#define _PYKEYS_ATTR(x,y,z) ret.append(BOOST_PP_STRINGIZE(z));
 	#define _PYHASKEY_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) return true;
 	#define _PYDICT_ATTR(x,y,z) ret[BOOST_PP_STRINGIZE(z)]=boost::python::object(z);
-	#define PYGET_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs)
-	#define PYSET_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs)
-	#define PYKEYS_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs)
-	#define PYHASKEY_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs)
-	#define PYDICT_MANY(attrs) BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs)
 
-	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); REGISTER_ATTRIBUTES_MANY(attrs); } \
-		public: boost::python::object pyGetAttr(const std::string& key) const{ PYGET_MANY(attrs); return baseClass::pyGetAttr(key); } \
-		void pySetAttr(const std::string& key, const boost::python::object& value){ PYSET_MANY(attrs); baseClass::pySetAttr(key,value); } \
-		boost::python::list pyKeys() const { boost::python::list ret; PYKEYS_MANY(attrs); ret.extend(baseClass::pyKeys()); return ret; } \
-		bool pyHasKey(const std::string& key) const { PYHASKEY_MANY(attrs); return baseClass::pyHasKey(key); } \
-		boost::python::dict pyDict() const { boost::python::dict ret; PYDICT_MANY(attrs); ret.update(baseClass::pyDict()); return ret; }
+	#define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
+		public: boost::python::object pyGetAttr(const std::string& key) const{ BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } \
+		void pySetAttr(const std::string& key, const boost::python::object& value){  BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); baseClass::pySetAttr(key,value); } \
+		boost::python::list pyKeys() const { boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; } \
+		bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); return baseClass::pyHasKey(key); } \
+		boost::python::dict pyDict() const { boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; }
 #endif
 
 
@@ -92,6 +99,7 @@ namespace{
 #define REGISTER_SERIALIZABLE_GENERIC(name,isFundamental) 						\
 	REGISTER_FACTORABLE(name);								\
 	REGISTER_SERIALIZABLE_DESCRIPTOR(name,name,SerializableTypes::SERIALIZABLE,isFundamental);
+
 // implied non-fundamental
 #define REGISTER_SERIALIZABLE(name) REGISTER_SERIALIZABLE_GENERIC(name,false)
 // explicit fundamental
@@ -115,10 +123,13 @@ class Serializable : public Factorable
 		bool containsOnlyFundamentals();
 		Archives& getArchives() 	{ return archives; };
 		
-		virtual void serialize(any& )	{ throw SerializableError(SerializationExceptions::SetFunctionNotDeclared); };
-		virtual void deserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
+		virtual void yadeSerialize(any& )	{ throw SerializableError(SerializationExceptions::SetFunctionNotDeclared); };
+		virtual void yadeDeserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
 
 		virtual void postProcessAttributes(bool /*deserializing*/) {};
+
+		// harmless even if boost::serialization is not used
+		template <class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ };
 
 	#ifdef YADE_PYTHON
 		virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
@@ -126,8 +137,6 @@ class Serializable : public Factorable
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
-		// override for root classes only (those which have distinct python wrappers
-		virtual std::string pyRootClassName() const { return std::string("Serializable"); }
 	#endif
 
 	private :

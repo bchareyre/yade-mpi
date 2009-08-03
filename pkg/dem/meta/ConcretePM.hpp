@@ -296,7 +296,7 @@ REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 	class GLDrawCpmPhys: public GLDrawInteractionPhysicsFunctor {
 		public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		virtual ~GLDrawCpmPhys() {};
-		REGISTER_ATTRIBUTES(/*no base*/,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
+		REGISTER_ATTRIBUTES(Serializable,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
 		RENDERS(CpmPhys);
 		REGISTER_CLASS_AND_BASE(GLDrawCpmPhys,GLDrawInteractionPhysicsFunctor);
 		DECLARE_LOGGER;

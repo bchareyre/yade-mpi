@@ -81,4 +81,4 @@ void FrictionLessElasticContactLaw::action(MetaBody * ncb)
 	}
 }
 
-YADE_PLUGIN("FrictionLessElasticContactLaw");
+YADE_PLUGIN((FrictionLessElasticContactLaw));

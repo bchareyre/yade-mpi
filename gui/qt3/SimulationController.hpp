@@ -57,6 +57,7 @@ class SimulationController : public QtGeneratedSimulationController
 	
 	public : 
 		void loadSimulationFromFileName(const std::string& fileName,bool center=true);
+		void deactivateControlsWhenLoading();
 		bool changeSkipTimeStepper,skipTimeStepper,changeTimeStep,wasUsingTimeStepper;
 		SimulationController (QWidget * parent=NULL);
 		virtual ~SimulationController () {}; 

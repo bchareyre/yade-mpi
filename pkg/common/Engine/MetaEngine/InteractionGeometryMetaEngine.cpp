@@ -69,4 +69,4 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 	}
 }
 
-YADE_PLUGIN("InteractionGeometryMetaEngine");
+YADE_PLUGIN((InteractionGeometryMetaEngine));

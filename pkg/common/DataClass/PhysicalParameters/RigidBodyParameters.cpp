@@ -22,4 +22,4 @@ RigidBodyParameters::~RigidBodyParameters()
 {
 }
 
-YADE_PLUGIN("RigidBodyParameters");
+YADE_PLUGIN((RigidBodyParameters));

@@ -20,6 +20,9 @@ const body_id_t Body::ID_NONE=body_id_t(-1);
 const shared_ptr<Body>& Body::byId(body_id_t _id, MetaBody* rb){return (*((rb?rb:Omega::instance().getRootBody().get())->bodies))[_id];}
 const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<MetaBody> rb){return (*(rb->bodies))[_id];}
 
+#ifdef YADE_BOOST_SERIALIZATION
+	BOOST_CLASS_EXPORT(Body);
+#endif
 
 // we must initialize id = 0, otherwise BodyContainer will crash.
 Body::Body () : 

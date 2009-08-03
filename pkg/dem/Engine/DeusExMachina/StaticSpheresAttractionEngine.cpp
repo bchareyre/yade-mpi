@@ -52,4 +52,4 @@ bool StaticSpheresAttractionEngine::doesItApplyToThisBody(Body* b)
 };
 
 
-YADE_PLUGIN("StaticSpheresAttractionEngine");
+YADE_PLUGIN((StaticSpheresAttractionEngine));

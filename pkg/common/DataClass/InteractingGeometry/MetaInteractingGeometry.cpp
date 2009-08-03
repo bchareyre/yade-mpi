@@ -17,4 +17,4 @@ MetaInteractingGeometry::~MetaInteractingGeometry ()
 {
 }
 
-YADE_PLUGIN("MetaInteractingGeometry");
+YADE_PLUGIN((MetaInteractingGeometry));

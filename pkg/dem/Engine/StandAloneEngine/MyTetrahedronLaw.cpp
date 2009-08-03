@@ -76,4 +76,4 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 }
 
 
-YADE_PLUGIN("MyTetrahedronLaw");
+YADE_PLUGIN((MyTetrahedronLaw));

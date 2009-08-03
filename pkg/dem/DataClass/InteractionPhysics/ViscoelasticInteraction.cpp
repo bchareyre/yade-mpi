@@ -18,4 +18,4 @@ ViscoelasticInteraction::~ViscoelasticInteraction()
 {
 }
 
-YADE_PLUGIN("ViscoelasticInteraction");
+YADE_PLUGIN((ViscoelasticInteraction));

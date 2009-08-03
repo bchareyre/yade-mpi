@@ -128,15 +128,19 @@ class BexContainer{
 		// perhaps should be private and friend MetaBody or whatever the only caller should be
 		void reset(){
 			for(int thread=0; thread<nThreads; thread++){
-				memset(_forceData [thread][0], 0,sizeof(Vector3r)*size);
+				memset(_forceData [thread][0],0,sizeof(Vector3r)*size);
 				memset(_torqueData[thread][0],0,sizeof(Vector3r)*size);
-				memset(_moveData  [thread][0],0,sizeof(Vector3r)*size);
-				memset(_rotData   [thread][0],0,sizeof(Vector3r)*size);
+				if(moveRotUsed){
+					memset(_moveData  [thread][0],0,sizeof(Vector3r)*size);
+					memset(_rotData   [thread][0],0,sizeof(Vector3r)*size);
+				}
 			}
 			memset(_force [0], 0,sizeof(Vector3r)*size);
 			memset(_torque[0], 0,sizeof(Vector3r)*size);
-			memset(_move  [0], 0,sizeof(Vector3r)*size);
-			memset(_rot   [0], 0,sizeof(Vector3r)*size);
+			if(moveRotUsed){
+				memset(_move  [0], 0,sizeof(Vector3r)*size);
+				memset(_rot   [0], 0,sizeof(Vector3r)*size);
+			}
 			synced=true; moveRotUsed=false;
 		}
 		//! say for how many threads we have allocated space
@@ -172,8 +176,11 @@ class BexContainer {
 		void reset(){
 			memset(_force [0],0,sizeof(Vector3r)*size);
 			memset(_torque[0],0,sizeof(Vector3r)*size);
-			memset(_move  [0],0,sizeof(Vector3r)*size);
-			memset(_rot   [0],0,sizeof(Vector3r)*size);
+			if(moveRotUsed){
+				memset(_move  [0],0,sizeof(Vector3r)*size);
+				memset(_rot   [0],0,sizeof(Vector3r)*size);
+				moveRotUsed=False;
+			}
 		}
 		//! No-op for API compatibility with the threaded version
 		void sync(){return;}

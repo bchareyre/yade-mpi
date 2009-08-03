@@ -158,4 +158,4 @@ void ColorizedTimeFilter::initialize(MetaBody* ncb)
 }
 
 
-YADE_PLUGIN("ColorizedTimeFilter");
+YADE_PLUGIN((ColorizedTimeFilter));

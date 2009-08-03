@@ -19,7 +19,7 @@ class Preferences : public Serializable{
 	public :
 		string		 defaultGUILibName;
 		Preferences ();
-	REGISTER_ATTRIBUTES(/* no base class*/,(defaultGUILibName));
+	REGISTER_ATTRIBUTES(Serializable,(defaultGUILibName));
 	REGISTER_CLASS_AND_BASE(Preferences,Serializable);
 };
 REGISTER_SERIALIZABLE(Preferences);

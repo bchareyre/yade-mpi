@@ -63,4 +63,4 @@ void Ef2_BssSnowGrain_AABB_makeAABB::go(const shared_ptr<InteractingGeometry>& c
 */
 }
 	
-YADE_PLUGIN("Ef2_BssSnowGrain_AABB_makeAABB");
+YADE_PLUGIN((Ef2_BssSnowGrain_AABB_makeAABB));

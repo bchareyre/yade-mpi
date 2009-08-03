@@ -243,5 +243,5 @@ void GLDrawSphere::clearGlMatrix()
 	glLoadMatrixf(modelview);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-YADE_PLUGIN("GLDrawSphere");
+YADE_PLUGIN((GLDrawSphere));
 YADE_REQUIRE_FEATURE(OPENGL)

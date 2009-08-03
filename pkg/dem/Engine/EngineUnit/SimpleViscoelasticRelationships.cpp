@@ -47,4 +47,4 @@ void SimpleViscoelasticRelationships::go(	  const shared_ptr<PhysicalParameters>
 
 }
 
-YADE_PLUGIN("SimpleViscoelasticRelationships");
+YADE_PLUGIN((SimpleViscoelasticRelationships));

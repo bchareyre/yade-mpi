@@ -159,7 +159,7 @@ void IOFormatManager::deserializeCustomClass(istream& stream, Archive& ac, const
 
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->deserialize(stream, *tmpAc, str);
-	s->deserialize(ac.getAddress());
+	s->yadeDeserialize(ac.getAddress());
 
 	ac.markProcessed();
 }
@@ -167,7 +167,7 @@ void IOFormatManager::deserializeCustomClass(istream& stream, Archive& ac, const
 void IOFormatManager::serializeCustomClass(ostream& stream, Archive& ac,int depth)
 {
 	shared_ptr<Serializable> s = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
-	s->serialize(ac.getAddress());
+	s->yadeSerialize(ac.getAddress());
 	shared_ptr<Archive> tmpAc = Archive::create(ac.getName(),*s);
 	tmpAc->serialize(stream,*tmpAc,depth);
 	ac.markProcessed();
@@ -220,7 +220,7 @@ void IOFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,
 	for(;si!=siEnd;++si,++arci)
 		(*arci)->deserialize(stream,*(*arci),(*si));
 
-	s->deserialize(ac.getAddress());
+	s->yadeDeserialize(ac.getAddress());
 	s->unregisterSerializableAttributes(true); // FIXME - make sure that it was a mistake that this line WAS MISSING.
 	ac.markProcessed();
 }
@@ -229,7 +229,7 @@ void IOFormatManager::deserializeCustomFundamental(istream& stream, Archive& ac,
 void IOFormatManager::serializeCustomFundamental(ostream& stream, Archive& ac,int depth)
 {
 	shared_ptr<Serializable> ss = YADE_PTR_CAST<Serializable>(ClassFactory::instance().createShared(ac.getSerializableClassName()));
-	ss->serialize(ac.getAddress());
+	ss->yadeSerialize(ac.getAddress());
 	ss->registerSerializableAttributes(false);
 	Serializable::Archives archives = ss->getArchives();
 	Serializable::Archives::iterator archi = archives.begin();

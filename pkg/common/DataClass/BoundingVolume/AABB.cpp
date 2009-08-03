@@ -16,4 +16,5 @@ AABB::~AABB ()
 {
 }
 
-YADE_PLUGIN("AABB");
+YADE_PLUGIN((AABB));
+

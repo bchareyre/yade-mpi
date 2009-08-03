@@ -505,4 +505,4 @@ void HangingCloth::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->physicalParameters	= physics;
 }
 
-YADE_PLUGIN("HangingCloth");
+YADE_PLUGIN((HangingCloth));

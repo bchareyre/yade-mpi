@@ -29,4 +29,4 @@ LatticeSetParameters::~LatticeSetParameters()
 
 
  
-YADE_PLUGIN("LatticeSetParameters");
+YADE_PLUGIN((LatticeSetParameters));

@@ -314,4 +314,4 @@ void PersistentSAPCollider::findOverlappingBB(std::vector<shared_ptr<AABBBound> 
 	}
 }
 
-YADE_PLUGIN("PersistentSAPCollider");
+YADE_PLUGIN((PersistentSAPCollider));

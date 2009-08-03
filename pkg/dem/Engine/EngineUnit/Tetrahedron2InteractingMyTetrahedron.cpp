@@ -32,4 +32,4 @@ void Tetrahedron2InteractingMyTetrahedron::go(	const shared_ptr<GeometricalModel
 	it->r4 = it->c4.Length();
 }
 	
-YADE_PLUGIN("Tetrahedron2InteractingMyTetrahedron");
+YADE_PLUGIN((Tetrahedron2InteractingMyTetrahedron));

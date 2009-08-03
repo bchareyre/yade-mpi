@@ -6,8 +6,7 @@
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
-YADE_PLUGIN("UniaxialStrainer");
-
+YADE_PLUGIN((UniaxialStrainer));
 /************************ UniaxialStrainer **********************/
 CREATE_LOGGER(UniaxialStrainer);
 

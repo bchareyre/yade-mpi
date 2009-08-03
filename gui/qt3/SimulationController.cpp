@@ -151,7 +151,6 @@ void SimulationController::pyOnelinerEnter(){
 #endif
 };
 
-
 void SimulationController::pbLoadClicked()
 {
 	pbStopClicked();
@@ -173,9 +172,10 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 {
 	assert(filesystem::exists(fileName) || fileName.find(":memory:")==(size_t)0);
 
+		deactivateControlsWhenLoading();
+
 		Omega::instance().finishSimulationLoop();
 		Omega::instance().joinSimulationLoop();
-
 
 		bool keepTimeStepperSettings=Omega::instance().getSimulationFileName()==fileName;
 		Real prevDt=Omega::instance().getTimeStep();
@@ -207,34 +207,8 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 			else {
 				LOG_DEBUG("New simulation loaded, timestepper is "<<(Omega::instance().timeStepperActive()?"":"NOT ")<<"being used (as per XML).");
 			}
-
-			//rbTimeStepper->setEnabled(Omega::instance().containTimeStepper());
-			//LOG_DEBUG("(Un)checking rbTimeStepper and rbFixed.");
-			//rbTimeStepper->setChecked(Omega::instance().timeStepperActive());
-			//rbFixed->setChecked(!Omega::instance().timeStepperActive());
-
-			#if 0
-			Real dt=Omega::instance().getTimeStep();
-			int exp10=(int)floor(log10(dt));
-			sbSecond->setValue((int)(dt/(pow(10.,exp10)))); // we may lose quite some precision here :-(
-			sb10PowerSecond->setValue(exp10);
-
-			changeSkipTimeStepper = true;
-			if (Omega::instance().containTimeStepper())
-			{
-				rbTimeStepper->setEnabled(true);
-				rbTimeStepper->setChecked(useTimeStepperIfPresent);
-				wasUsingTimeStepper = useTimeStepperIfPresent;
-			}
-			else
-			{
-				rbTimeStepper->setEnabled(false);
-				rbFixed->setChecked(true);
-				wasUsingTimeStepper = false;
-			}
-			skipTimeStepper=!wasUsingTimeStepper;
-			#endif
-		} 
+		}
+		 
 		catch(SerializableError& e) // catching it...
 		{
 			Omega::instance().resetRootBody();
@@ -415,8 +389,37 @@ void SimulationController::sbRefreshValueChanged(int v)
 	restartTimer();
 }
 
+void SimulationController::deactivateControlsWhenLoading(){
+	labelSimulTime->setText(string(""));
+	labelRealTime->setText(string(""));
+	labelIter->setText(string(""));
+	labelStep->setText(string(""));
+	labelEstimationTime->setText(string(""));
+	labelStopAtIter->setText(string(""));
+	tlCurrentSimulation->setText("[loading]");
+	pbStartSimulation->setEnabled(false);
+	pbStopSimulation->setEnabled(false);
+	pbResetSimulation->setEnabled(false);
+	pbOneSimulationStep->setEnabled(false);
+	rbFixed->setEnabled(false);
+	rbTimeStepper->setEnabled(false);
+	sbSecond->setEnabled(false);
+	sb10PowerSecond->setEnabled(false);
+}
+
 
 void SimulationController::doUpdate(){
+	#if BOOST_VERSION<103500
+		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex);
+		if(!lock.locked()){
+	#else
+		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,boost::defer_lock);
+		if(!lock.owns_lock()){
+	#endif
+		deactivateControlsWhenLoading();
+		return;
+	}
+	// if we got the lock, update controls as normally
 
 	Real simulationTime = Omega::instance().getSimulationTime();
 
@@ -454,40 +457,30 @@ void SimulationController::doUpdate(){
 		labelRealTime->setText(string(strReal));
         
 	}
-    // update iterations per second - only one in a while (iterPerSec_TTL_ms)
-    // does someone need to display that with more precision than integer?
-    long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
-    if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
-        iterPerSec=(1000.*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
-        iterPerSec_LastIter=Omega::instance().getCurrentIteration();
-        iterPerSec_LastLocalTime=microsec_clock::local_time();
-    }
-    char strIter[64];
-    /* print 0 instead of bogus values (at startup) */
-    snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.);
-    labelIter->setText(strIter);
+	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
+	// does someone need to display that with more precision than integer?
+	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
+	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
+		iterPerSec=(1000.*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
+		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+		iterPerSec_LastLocalTime=microsec_clock::local_time();
+	}
+	char strIter[64];
+	/* print 0 instead of bogus values (at startup) */
+	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.);
+	labelIter->setText(strIter);
 
-    // update estimation time
-    char strEstimation[64];
-    if (Omega::instance().getRootBody()->stopAtIteration>0 && iterPerSec>0 ) 
-        estimation=duration+time_duration(seconds((Omega::instance().getRootBody()->stopAtIteration-Omega::instance().getCurrentIteration())/iterPerSec));
-    snprintf(strEstimation,64,"estimation %02d:%02d:%02d",estimation.hours(),estimation.minutes(),estimation.seconds());
-    labelEstimationTime->setText(strEstimation);
+   // update estimation time
+	char strEstimation[64];
+	if (Omega::instance().getRootBody()->stopAtIteration>0 && iterPerSec>0 ) estimation=duration+time_duration(seconds((Omega::instance().getRootBody()->stopAtIteration-Omega::instance().getCurrentIteration())/iterPerSec));
+	snprintf(strEstimation,64,"estimation %02d:%02d:%02d",estimation.hours(),estimation.minutes(),estimation.seconds());
+ 	labelEstimationTime->setText(strEstimation);
 
-    char strStopAtIter[64];
-    snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getRootBody()->stopAtIteration);
-    labelStopAtIter->setText(strStopAtIter);
-
-	//boost::mutex::scoped_lock lock(timeMutex);
-
-	//if (changeSkipTimeStepper) Omega::instance().skipTimeStepper(skipTimeStepper);
-	//if (changeTimeStep) {
-	//	// wrap the mantissa around
-	//} else {
-	//}
+	char strStopAtIter[64];
+	snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getRootBody()->stopAtIteration);
+	labelStopAtIter->setText(strStopAtIter);
 
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
-
 
 	char strStep[64];
 	snprintf(strStep,64,"step %g",(double)Omega::instance().getTimeStep());
@@ -509,6 +502,7 @@ void SimulationController::doUpdate(){
 	pbStopSimulation->setEnabled(hasSimulation && isRunning);
 	pbResetSimulation->setEnabled(hasSimulation && hasFileName);
 	pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
+	rbFixed->setEnabled(true);
 	rbTimeStepper->setEnabled(hasTimeStepper);
 	sbSecond->setEnabled(!usesTimeStepper);
 	sb10PowerSecond->setEnabled(!usesTimeStepper);

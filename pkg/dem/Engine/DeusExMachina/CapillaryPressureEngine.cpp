@@ -48,4 +48,4 @@ void CapillaryPressureEngine::applyCondition(MetaBody * rootBody)
 	
 }
 
-YADE_PLUGIN("CapillaryPressureEngine");
+YADE_PLUGIN((CapillaryPressureEngine));

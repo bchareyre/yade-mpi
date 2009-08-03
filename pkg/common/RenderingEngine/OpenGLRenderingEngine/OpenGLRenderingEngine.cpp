@@ -9,7 +9,7 @@
 #include<GL/gl.h>
 #include<GL/glut.h>
 
-YADE_PLUGIN("OpenGLRenderingEngine");
+YADE_PLUGIN((OpenGLRenderingEngine));
 YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(OpenGLRenderingEngine);
 

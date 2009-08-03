@@ -17,4 +17,4 @@ void PhysicalActionDamper::action(MetaBody* ncb){
 		operator()(b->physicalParameters,b.get(),ncb);
 	}
 }
-YADE_PLUGIN("PhysicalActionDamper");
+YADE_PLUGIN((PhysicalActionDamper));

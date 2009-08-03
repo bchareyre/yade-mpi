@@ -128,4 +128,4 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const
 	return go(cm2,cm1,se32,se31,c);
 }
 
-YADE_PLUGIN("InteractingFacet2InteractingSphere4SpheresContactGeometry");
+YADE_PLUGIN((InteractingFacet2InteractingSphere4SpheresContactGeometry));

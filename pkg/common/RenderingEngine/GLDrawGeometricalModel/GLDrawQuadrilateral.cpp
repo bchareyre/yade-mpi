@@ -214,5 +214,5 @@ void GLDrawQuadrilateral::calculateStrainQuadrilateral(
 	y = X[1];
 };
 
-YADE_PLUGIN("GLDrawQuadrilateral");
+YADE_PLUGIN((GLDrawQuadrilateral));
 YADE_REQUIRE_FEATURE(OPENGL)

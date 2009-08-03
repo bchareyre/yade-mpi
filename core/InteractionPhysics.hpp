@@ -17,7 +17,7 @@ class InteractionPhysics : public Serializable, public Indexable
 	REGISTER_CLASS_NAME(InteractionPhysics);
 	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
 	REGISTER_INDEX_COUNTER(InteractionPhysics);
-	REGISTER_ATTRIBUTES(/* no base for attributes */,/* no attributes either */);
+	REGISTER_ATTRIBUTES(Serializable,/* no attributes either */);
 };
 REGISTER_SERIALIZABLE(InteractionPhysics);
 

@@ -93,4 +93,4 @@ void SimpleViscoelasticSpheresInteractionRecorder::action(MetaBody * ncb)
     }
 }
 
-YADE_PLUGIN("SimpleViscoelasticSpheresInteractionRecorder");
+YADE_PLUGIN((SimpleViscoelasticSpheresInteractionRecorder));

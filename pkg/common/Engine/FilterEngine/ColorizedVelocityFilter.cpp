@@ -155,4 +155,4 @@ void ColorizedVelocityFilter::initialize(MetaBody* ncb)
 }
 
 
-YADE_PLUGIN("ColorizedVelocityFilter");
+YADE_PLUGIN((ColorizedVelocityFilter));

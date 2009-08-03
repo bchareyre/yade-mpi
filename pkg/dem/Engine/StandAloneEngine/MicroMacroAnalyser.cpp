@@ -225,4 +225,4 @@ void MicroMacroAnalyser::setState ( MetaBody* ncb, unsigned int state, bool save
 
 
 
-YADE_PLUGIN("MicroMacroAnalyser");
+YADE_PLUGIN((MicroMacroAnalyser));

@@ -20,4 +20,4 @@ void InteractingSphere2AABB::go(const shared_ptr<InteractingGeometry>& cm, share
 	aabb->max = aabb->center+aabb->halfSize;	
 }
 	
-YADE_PLUGIN("InteractingSphere2AABB");
+YADE_PLUGIN((InteractingSphere2AABB));

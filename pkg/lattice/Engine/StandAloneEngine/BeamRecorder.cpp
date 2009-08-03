@@ -193,4 +193,4 @@ void BeamRecorder::action(MetaBody * ncb)
 	 
 }
 
-YADE_PLUGIN("BeamRecorder");
+YADE_PLUGIN((BeamRecorder));

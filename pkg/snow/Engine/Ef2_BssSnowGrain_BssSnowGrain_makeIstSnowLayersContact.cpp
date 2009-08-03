@@ -450,4 +450,4 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const sh
 //	return result;
 }
 
-YADE_PLUGIN("Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact");
+YADE_PLUGIN((Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact));

@@ -230,4 +230,4 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 }
 
 
-YADE_PLUGIN("ElasticCohesiveLaw");
+YADE_PLUGIN((ElasticCohesiveLaw));

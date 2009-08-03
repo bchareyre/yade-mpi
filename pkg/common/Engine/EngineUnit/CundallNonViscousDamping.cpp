@@ -4,8 +4,7 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include"CundallNonViscousDamping.hpp"
 
-YADE_PLUGIN("CundallNonViscousForceDamping","CundallNonViscousMomentumDamping");
-
+YADE_PLUGIN((CundallNonViscousForceDamping)(CundallNonViscousMomentumDamping));
 //! damping of force, for bodies that have only ParticleParameters
 void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, MetaBody* rb){
 	if(body->isClump()) return;

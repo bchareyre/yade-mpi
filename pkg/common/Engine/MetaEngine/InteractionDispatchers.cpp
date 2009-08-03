@@ -1,6 +1,6 @@
 #include"InteractionDispatchers.hpp"
 
-YADE_PLUGIN("InteractionDispatchers");
+YADE_PLUGIN((InteractionDispatchers));
 CREATE_LOGGER(InteractionDispatchers);
 
 // #define IDISP_TIMING

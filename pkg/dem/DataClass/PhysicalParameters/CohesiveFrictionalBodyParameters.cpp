@@ -19,4 +19,4 @@ CohesiveFrictionalBodyParameters::~CohesiveFrictionalBodyParameters()
 {
 }
 
-YADE_PLUGIN("CohesiveFrictionalBodyParameters");
+YADE_PLUGIN((CohesiveFrictionalBodyParameters));

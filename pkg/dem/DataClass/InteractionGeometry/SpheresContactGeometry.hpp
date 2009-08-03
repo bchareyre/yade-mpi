@@ -49,7 +49,7 @@ class SpheresContactGeometry: public GenericSpheresContact {
 
 		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
 
-	REGISTER_ATTRIBUTES(/* no attributes from base class */,
+	REGISTER_ATTRIBUTES(Serializable,
 			(normal)
 			(contactPoint)
 			(radius1)

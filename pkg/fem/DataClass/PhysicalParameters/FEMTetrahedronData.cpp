@@ -183,4 +183,4 @@ void FEMTetrahedronData::localCalcKeMatrix( ublas::matrix<Real>& coord )
 	damping = Damp * mass ;
 }
 
-YADE_PLUGIN("FEMTetrahedronData");
+YADE_PLUGIN((FEMTetrahedronData));

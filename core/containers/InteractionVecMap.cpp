@@ -196,4 +196,4 @@ unsigned int InteractionVecMap::size()
 	return currentSize;
 }
 
-// YADE_PLUGIN("InteractionVecMap");
+// YADE_PLUGIN((InteractionVecMap));

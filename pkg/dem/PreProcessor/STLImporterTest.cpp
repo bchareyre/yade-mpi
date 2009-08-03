@@ -291,4 +291,4 @@ void STLImporterTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 
-YADE_PLUGIN("STLImporterTest");
+YADE_PLUGIN((STLImporterTest));

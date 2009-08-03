@@ -188,4 +188,4 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 	}
 #endif
 };
-YADE_PLUGIN("CL1Relationships");
+YADE_PLUGIN((CL1Relationships));

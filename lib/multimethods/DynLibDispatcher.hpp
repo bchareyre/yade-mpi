@@ -460,8 +460,10 @@ class DynLibDispatcher
 		  {
 			index1 = base1->getClassIndex();
 			index2 = base2->getClassIndex();
-			assert( index1 >= 0 && (unsigned int)( index1 ) < callBacks.size() &&
-				index2 >= 0 && (unsigned int)( index2 ) < callBacks[index1].size() );
+			assert( index1 >= 0 ); 
+			assert( index2 >= 0 ); 
+			assert((unsigned int)( index1 ) < callBacks.size());
+			assert((unsigned int)( index2 ) < callBacks.size());
 				
 			if(callBacks[index1][index2])
 				return true;

@@ -4,8 +4,7 @@
 
 #include "SpheresContactGeometry.hpp"
 #include<yade/core/Omega.hpp>
-YADE_PLUGIN("SpheresContactGeometry");
-
+YADE_PLUGIN((SpheresContactGeometry));
 // At least one virtual method must be in the .cpp file (!!!)
 SpheresContactGeometry::~SpheresContactGeometry(){};
 

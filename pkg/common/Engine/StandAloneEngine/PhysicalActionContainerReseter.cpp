@@ -9,8 +9,7 @@
 #include"PhysicalActionContainerReseter.hpp"
 #include<yade/core/MetaBody.hpp>
 
-YADE_PLUGIN("PhysicalActionContainerReseter","BexResetter");
-
+YADE_PLUGIN((PhysicalActionContainerReseter)(BexResetter));
 PhysicalActionContainerReseter::PhysicalActionContainerReseter(){}
 PhysicalActionContainerReseter::~PhysicalActionContainerReseter(){} 
 void PhysicalActionContainerReseter::action(MetaBody* ncb){ ncb->bex.reset(); }

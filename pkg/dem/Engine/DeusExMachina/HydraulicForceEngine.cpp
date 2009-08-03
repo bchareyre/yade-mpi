@@ -176,4 +176,4 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
     }
 }
 
-YADE_PLUGIN("HydraulicForceEngine");
+YADE_PLUGIN((HydraulicForceEngine));

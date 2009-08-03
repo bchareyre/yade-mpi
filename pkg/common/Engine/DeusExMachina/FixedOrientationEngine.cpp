@@ -47,4 +47,4 @@ void FixedOrientationEngine::applyCondition(MetaBody * ncb)
 //	}
 }
 
-YADE_PLUGIN("FixedOrientationEngine");
+YADE_PLUGIN((FixedOrientationEngine));

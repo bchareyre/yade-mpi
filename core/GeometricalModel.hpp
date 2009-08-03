@@ -23,7 +23,7 @@ class GeometricalModel : public Serializable, public Indexable
 		Vector3r	diffuseColor;
 		GeometricalModel(): highlight(false),wire(false),shadowCaster(false),diffuseColor(Vector3r(1,1,1)){}
 
-	REGISTER_ATTRIBUTES(/*no base*/,(highlight)(wire)(shadowCaster)(diffuseColor));
+	REGISTER_ATTRIBUTES(Serializable,(highlight)(wire)(shadowCaster)(diffuseColor));
 	REGISTER_CLASS_AND_BASE(GeometricalModel,Serializable Indexable);
 	REGISTER_INDEX_COUNTER(GeometricalModel);
 };

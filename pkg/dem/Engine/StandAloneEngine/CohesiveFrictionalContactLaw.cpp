@@ -377,4 +377,4 @@ currentContactPhysics->moment_bending = moment_bending;
 
 }
 
-YADE_PLUGIN("CohesiveFrictionalContactLaw");
+YADE_PLUGIN((CohesiveFrictionalContactLaw));

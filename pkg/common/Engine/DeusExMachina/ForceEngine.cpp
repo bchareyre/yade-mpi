@@ -8,8 +8,7 @@
 #include<yade/pkg-common/LinearInterpolate.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-YADE_PLUGIN("ForceEngine","InterpolatingDirectedForceEngine");
-
+YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
 void ForceEngine::applyCondition(MetaBody* ncb){
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(ncb->bodies->exists(id));

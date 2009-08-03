@@ -4,8 +4,7 @@
 #include<yade/core/Body.hpp>
 
 CREATE_LOGGER(FacetTopologyAnalyzer);
-YADE_PLUGIN("FacetTopologyAnalyzer");
-
+YADE_PLUGIN((FacetTopologyAnalyzer));
 #ifndef FACET_TOPO
 void FacetTopologyAnalyzer::action(MetaBody* rb){
 	throw runtime_error("FACET_TOPO was not enabled in InteractingFacet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.");

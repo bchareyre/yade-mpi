@@ -19,4 +19,5 @@ Sphere::~Sphere ()
 }
 
 
-YADE_PLUGIN("Sphere");
+YADE_PLUGIN((Sphere));
+

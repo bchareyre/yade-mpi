@@ -33,8 +33,7 @@
 
 
 
-YADE_PLUGIN("SimpleScene");
-
+YADE_PLUGIN((SimpleScene));
 bool SimpleScene::generate(){
 	message="";
 	//@

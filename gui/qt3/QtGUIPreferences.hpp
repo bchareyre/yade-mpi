@@ -23,7 +23,7 @@ class QtGUIPreferences : public Serializable
 		QtGUIPreferences ();
 
 /// Serialization										///
-	REGISTER_ATTRIBUTES(/* nothing */,(version)(mainWindowPositionX)(mainWindowPositionY)(mainWindowSizeX)(mainWindowSizeY));
+	REGISTER_ATTRIBUTES(Serializable,(version)(mainWindowPositionX)(mainWindowPositionY)(mainWindowSizeX)(mainWindowSizeY));
 	REGISTER_CLASS_AND_BASE(QtGUIPreferences,Serializable);
 };
 REGISTER_SERIALIZABLE(QtGUIPreferences);

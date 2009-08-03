@@ -18,4 +18,4 @@ LineSegment::~LineSegment ()
 }
 
 
-YADE_PLUGIN("LineSegment");
+YADE_PLUGIN((LineSegment));

@@ -22,7 +22,7 @@ class EngineUnit : public Serializable
 	// label to be able to retrieve an engine unit by its label
 	string label; 
 	REGISTER_CLASS_AND_BASE(EngineUnit,Serializable);
-	REGISTER_ATTRIBUTES(/* no base class attributes */,(label));
+	REGISTER_ATTRIBUTES(Serializable,(label));
 };
 
 REGISTER_SERIALIZABLE(EngineUnit);

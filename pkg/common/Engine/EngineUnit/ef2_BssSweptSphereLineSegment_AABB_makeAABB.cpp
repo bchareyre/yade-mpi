@@ -25,4 +25,4 @@ void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<Interacti
         aabb->max = aabb->center + aabb->halfSize; 
 }
 	
-YADE_PLUGIN("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
+YADE_PLUGIN((ef2_BssSweptSphereLineSegment_AABB_makeAABB));

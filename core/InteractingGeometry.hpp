@@ -34,11 +34,10 @@ class InteractingGeometry : public Serializable, public Indexable
 		#endif
 
 /// Serialization
-	REGISTER_ATTRIBUTES(/*no base*/,(diffuseColor));
+	REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
 	REGISTER_CLASS_AND_BASE(InteractingGeometry,Serializable Indexable);
 /// Indexable
 	REGISTER_INDEX_COUNTER(InteractingGeometry);
 };
 REGISTER_SERIALIZABLE(InteractingGeometry);
-
 

@@ -19,4 +19,4 @@ BodyMacroParameters::~BodyMacroParameters()
 {
 }
 
-YADE_PLUGIN("BodyMacroParameters");
+YADE_PLUGIN((BodyMacroParameters));

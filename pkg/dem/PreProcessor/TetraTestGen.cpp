@@ -6,8 +6,7 @@
 
 #include<yade/pkg-dem/Tetra.hpp>
 
-YADE_PLUGIN("TetraTestGen");
-
+YADE_PLUGIN((TetraTestGen));
 bool TetraTestGen::generate()
 {
 	Shop::setDefault<int>("param_timeStepUpdateInterval",-1);

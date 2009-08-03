@@ -92,7 +92,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	
 	protected :
 		void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(/* no base*/,(scaleDisplacements)(displacementScale)(scaleRotations)(rotationScale)(Light_position)(Background_color)(Body_wire)(Show_DOF)(Show_ID)(Body_state)(Body_bounding_volume)(Body_interacting_geom)(Body_geometrical_model)(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(Cast_shadows)(Shadow_volumes)(Fast_shadow_volume)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit));
+	REGISTER_ATTRIBUTES(Serializable,(scaleDisplacements)(displacementScale)(scaleRotations)(rotationScale)(Light_position)(Background_color)(Body_wire)(Show_DOF)(Show_ID)(Body_state)(Body_bounding_volume)(Body_interacting_geom)(Body_geometrical_model)(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(Cast_shadows)(Shadow_volumes)(Fast_shadow_volume)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit));
 	REGISTER_CLASS_AND_BASE(OpenGLRenderingEngine,RenderingEngine);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderingEngine);

@@ -165,7 +165,7 @@ class InteractionContainer : public Serializable
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(/*no base*/,(interaction)(pendingErase)(serializeSorted));
+	REGISTER_ATTRIBUTES(Serializable,(interaction)(pendingErase)(serializeSorted));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
 

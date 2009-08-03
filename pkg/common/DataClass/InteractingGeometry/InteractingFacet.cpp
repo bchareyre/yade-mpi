@@ -42,4 +42,4 @@ void InteractingFacet::postProcessAttributes(bool deserializing)
 		icr = e[0].Length()*ne[0].Dot(e[2])/p;
 	}
 }
-YADE_PLUGIN("InteractingFacet");
+YADE_PLUGIN((InteractingFacet));

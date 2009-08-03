@@ -682,4 +682,4 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 
 
 
-YADE_PLUGIN("TriaxialTestWater");
+YADE_PLUGIN((TriaxialTestWater));

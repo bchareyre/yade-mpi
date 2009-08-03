@@ -2,8 +2,7 @@
 #include"Se3Interpolator.hpp"
 #include<yade/pkg-common/PeriodicEngines.hpp>
 
-YADE_PLUGIN("Se3Interpolator")
-CREATE_LOGGER(Se3Interpolator);
+YADE_PLUGIN((Se3Interpolator))CREATE_LOGGER(Se3Interpolator);
 
 void Se3Interpolator::applyCondition(MetaBody* mb){
 	assert(subscribedBodies.size()==1);

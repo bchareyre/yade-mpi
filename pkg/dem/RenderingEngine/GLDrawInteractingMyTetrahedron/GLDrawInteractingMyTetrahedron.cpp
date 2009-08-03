@@ -36,5 +36,5 @@ void GLDrawInteractingMyTetrahedron::go(const shared_ptr<InteractingGeometry>& c
 	}
 }
 
-YADE_PLUGIN("GLDrawInteractingMyTetrahedron");
+YADE_PLUGIN((GLDrawInteractingMyTetrahedron));
 YADE_REQUIRE_FEATURE(OPENGL)

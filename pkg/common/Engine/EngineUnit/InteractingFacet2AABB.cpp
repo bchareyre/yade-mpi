@@ -31,4 +31,4 @@ void InteractingFacet2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 	aabb->center = aabb->min + aabb->halfSize;
 }
 	
-YADE_PLUGIN("InteractingFacet2AABB");
+YADE_PLUGIN((InteractingFacet2AABB));

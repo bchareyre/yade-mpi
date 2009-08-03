@@ -84,4 +84,4 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const 
 	return result;
 }
 
-YADE_PLUGIN("Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry");
+YADE_PLUGIN((Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry));

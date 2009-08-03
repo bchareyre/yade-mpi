@@ -92,6 +92,9 @@ class Omega : public Singleton<Omega>
 		long tmpFileCounter;
 		std::string tmpFileDir;
 
+		// to avoid accessing simulation when it is being loaded (should avoid crashes with the UI)
+		boost::mutex loadingSimulationMutex;
+
 	public :
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean

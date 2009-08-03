@@ -11,6 +11,10 @@
 #include "BodyContainer.hpp"
 #include "Body.hpp"
 
+#ifdef YADE_BOOST_SERIALIZATION
+	BOOST_CLASS_EXPORT(BodyContainer);
+#endif
+
 
 BodyContainer::BodyContainer()
 { 
