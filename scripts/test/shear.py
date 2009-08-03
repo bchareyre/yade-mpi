@@ -17,7 +17,7 @@ O.engines=[
 	PeriodicPythonRunner(iterPeriod=10000,command='interInfo()'),
 ]
 O.miscParams=[
-	Generic('GLDrawSphere',{'glutUse':True})
+	GLDrawSphere(glutUse=True)
 ]
 
 O.dt=1e-8

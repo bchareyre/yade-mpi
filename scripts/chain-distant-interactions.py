@@ -3,21 +3,21 @@
 
 o=Omega()
 o.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
+	BoundingVolumeMetaEngine([
+		InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()
 	]
 o.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('MetaInteractingGeometry2AABB')
-	]),
-	StandAloneEngine('PersistentSAPCollider',{'haveDistantTransient':True}),
-	MetaEngine('InteractionGeometryMetaEngine',[EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True}),]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-	StandAloneEngine('ElasticContactLaw2',{'isCohesive':True}),
-	#DeusExMachina('MomentEngine',{'subscribedBodies':[1],'moment':[0,1000,0]}),
-	DeusExMachina('GravityEngine',{'gravity':[0,0,-1e2]}),
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.2})
+	BexResetter(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+	InsertionSortCollider(),
+	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(hasShear=True)]),
+	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	ElasticContactLaw(isCohesive=True),
+	MomentEngine(subscribedBodies=[1],moment=(0,1000,0)),
+	GravityEngine(gravity=(0,0,1e-2)),
+	NewtonsDampedLaw(damping=0.2)
 ]
-o.miscParams=[Generic('GLDrawSphere',{'glutUse':True})]
+o.miscParams=[GLDrawSphere(glutUse=True)]
 
 from yade import utils
 from math import *

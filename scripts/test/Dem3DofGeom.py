@@ -5,24 +5,24 @@ O.bodies.append([
 	utils.sphere([-1,0,2],1,dynamic=True,color=(1,0,0),wire=True),
 ])
 O.engines=[
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingFacet2AABB'),
+	BoundingVolumeMetaEngine([
+		InteractingSphere2AABB(),
+		InteractingFacet2AABB()
 	]),
-	StandAloneEngine('PersistentSAPCollider'),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('ef2_Sphere_Sphere_Dem3DofGeom'),
-		EngineUnit('ef2_Facet_Sphere_Dem3DofGeom')
+	PersistentSAPCollider(),
+	InteractionGeometryMetaEngine([
+		ef2_Sphere_Sphere_Dem3DofGeom(),
+		ef2_Facet_Sphere_Dem3DofGeom()
 	]),
-	#DeusExMachina('GravityEngine',{'gravity':[0,0,-10]}),
-	DeusExMachina('RotationEngine',{'rotationAxis':[0,1,0],'angularVelocity':10,'subscribedBodies':[1]}),
-	DeusExMachina('TranslationEngine',{'translationAxis':[1,0,0],'velocity':10,'subscribedBodies':[1]}),
-	#DeusExMachina('NewtonsDampedLaw')
+	#GravityEngine(gravity=(0,0,-10))
+	RotationEngine(rotationAxis=[0,1,0],angularVelocity=10,subscribedBodies=[1]),
+	TranslationEngine(translationAxis=[1,0,0],velocity=10,subscribedBodies=[1]),
+	#NewtonsDampedLaw()
 ]
 O.miscParams=[
-	Generic('GLDraw_Dem3DofGeom_SphereSphere',{'normal':True,'rolledPoints':True,'unrolledPoints':True,'shear':True,'shearLabel':True}),
-	Generic('GLDraw_Dem3DofGeom_FacetSphere',{'normal':False,'rolledPoints':True,'unrolledPoints':True,'shear':True,'shearLabel':True}),
-	Generic('GLDrawSphere',{'glutUse':True})
+	GLDraw_Dem3DofGeom_SphereSphere(normal=True,rolledPoints=True,unrolledPoints=True,shear=True,shearLabel=True),
+	GLDraw_Dem3DofGeom_FacetSphere(normal=False,rolledPoints=True,unrolledPoints=True,shear=True,shearLabel=True),
+	GLDrawSphere(glutUse=True)
 ]
 
 try:

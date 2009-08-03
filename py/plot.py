@@ -154,6 +154,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		Returns name fo the gnuplot file created.
 	"""
 	import time,bz2
+	if len(data.keys())==0: raise RuntimeError("No data for plotting were saved.")
 	vars=data.keys(); vars.sort()
 	lData=len(data[vars[0]])
 	if timestamp: baseName+=time.strftime('_%Y%m%d_%H:%M')

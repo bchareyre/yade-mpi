@@ -15,36 +15,34 @@ from yade import runtime
 from yade import utils
 __builtins__.O=Omega()
 
-#try:
-#	from miniWm3Wrap import Vector3_less__double__greater_ as Vector3r
-#	from miniWm3Wrap import Vector2_less__double__greater_ as Vector2r
-#	from miniWm3Wrap import Quaternion_less__double__greater_ as Quaternionr
-#except ImportError: pass 
-
 ### direct object creation through automatic wrapper functions
 def listChildClassesRecursive(base):
-	ret=O.childClasses(base)
+	ret=set(O.childClasses(base)); ret2=set()
 	for bb in ret:
-		ret2=listChildClassesRecursive(bb)
-		if ret2: ret+=ret2
-	return ret
+		ret2|=listChildClassesRecursive(bb)
+	return ret | ret2
 # not sure whether __builtins__ is the right place?
 _dd=__builtins__.__dict__
+_allClasses=set(listChildClassesRecursive('Serializable'))
+_proxiedClasses=set()
+_classTranslations={'FileGenerator':'Preprocessor'}
 
-classTranslations={'FileGenerator':'Preprocessor'}
 for root in [
 	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
 		# functors
 		'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw'
 	]:
-	root2=root if (root not in classTranslations.keys()) else classTranslations[root]
+	root2=root if (root not in _classTranslations.keys()) else _classTranslations[root]
 	for p in listChildClassesRecursive(root):
 		#class argStorage:
 		#	def __init__(self,_root,_class): self._root,self._class=_root,_class
 		#	def __call__(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
 		#if root=='MetaEngine': _dd[p]=argStorage(root2,p)
 		_dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,**kw) # eval(root2)(p,kw)
-_dd['Generic']=yade.wrapper.__dict__["Serializable"]
+		_proxiedClasses.add(p)
+#_dd['Generic']=yade.wrapper.Serializable
+for p in _allClasses-_proxiedClasses: # wrap classes that don't derive from any specific root class, just from Serializable
+	_dd[p]=lambda __p_=p,**kw: yade.wrapper.Serializable(__p_,**kw)
 ### end wrappers
 
 #### HANDLE RENAMED CLASSES ####
@@ -67,7 +65,6 @@ for oldName in renamed:
 			import warnings; warnings.warn("Class `%s' was renamed to `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
 			return _dd[self.new](*args,**kw)
 	_dd[oldName]=warnWrap(oldName,renamed[oldName])
-
 
 
 

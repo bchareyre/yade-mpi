@@ -1,5 +1,5 @@
-# 2009 Václav Šmilauer <eudoxos@arcig.cz>
 # encoding: utf-8
+# 2009 Václav Šmilauer <eudoxos@arcig.cz>
 
 # script showing how to use InterpolatingDirectedForceEngine,
 # simply pushing one free sphere agains a fixed one with varying force
@@ -15,13 +15,13 @@ maxMag=1e10 # maximum magnitude of applied force
 magnitudes=[.5*maxMag*(sin(t*(freq*2*pi))+1) for t in times] # generate points on sine wave over 1 period, but shifted up to be ∈(0,2)
 
 O.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),]),
-	StandAloneEngine('PersistentSAPCollider'),
+	BexResetter(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB()]),
+	InsertionSortCollider(),
 	InteractionDispatchers(
-		[EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry')],
-		[EngineUnit('SimpleElasticRelationships')],
-		[EngineUnit('ef2_Spheres_Elastic_ElasticLaw'),]
+		[InteractingSphere2InteractingSphere4SpheresContactGeometry()],
+		[SimpleElasticRelationships()],
+		[ef2_Spheres_Elastic_ElasticLaw()]
 	),
 	# subscribedBodies: what bodies is force applied to
 	# direction: direction of the force (normalized automatically), constant
@@ -29,11 +29,11 @@ O.engines=[
 	# times: time points at which magnitudes are defined
 	# wrap: continue from t0 once t_last is reached
 	# label: automatically defines python variable of that name pointing to this engine
-	DeusExMachina('InterpolatingDirectedForceEngine',{'subscribedBodies':[1],'direction':[0,0,-1],'magnitudes':magnitudes,'times':times,'wrap':True,'label':'forcer'}),
+	InterpolatingDirectedForceEngine(subscribedBodies=[1],direction=[0,0,-1],magnitudes=magnitudes,times=times,wrap=True,label='forcer'),
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.01}),
+	NewtonsDampedLaw(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)
-	StandAloneEngine('PeriodicPythonRunner',{'iterPeriod':50,'command':'myAddPlotData()','label':'plotDataCollector'})
+	PeriodicPythonRunner(iterPeriod=50,command='myAddPlotData()',label='plotDataCollector')
 ]
 
 O.bodies.append([
@@ -49,7 +49,7 @@ import yade.plot as yp
 def myAddPlotData():
 	yp.addData({'t':O.time,'F_applied':forcer['force'],'supportReaction':O.actions.f(0)[2]})
 
-O.saveTmp('init')
+O.saveTmp()
 
 # try open 3d view, if not running in pure console mode
 try:

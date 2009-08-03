@@ -5,38 +5,31 @@
 ##
 
 from math import *
-o=Omega()
-o.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
+O.initializers=[
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()])
 	]
-o.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingBox2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
+O.engines=[
+	BexResetter(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()]),
+	InsertionSortCollider(),
+	InteractionGeometryMetaEngine([
+		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
+		InteractingFacet2InteractingSphere4SpheresContactGeometry(),
 	]),
-	StandAloneEngine('PersistentSAPCollider'),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'interactionDetectionFactor':1.4}),
-		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'shrinkFactor':0.}),
-	]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-	StandAloneEngine('ElasticContactLaw'),
-	#DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
-	DeusExMachina('RotationEngine',{'subscribedBodies':[1],'rotationAxis':[1,0,0],'angularVelocity':.01}),
-	#DeusExMachina('RotationEngine',{'subscribedBodies':[0],'rotationAxis':[1,1,1],'angularVelocity':-.02}),
-	DeusExMachina("NewtonsDampedLaw",{'damping':0.2})
+	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	ElasticContactLaw(),
+	RotationEngine(subscribedBodies=[1],rotationAxis=[1,0,0],angularVelocity=.01),
+	NewtonsDampedLaw(damping=0.2)
 ]
 from yade import utils
 scale=.1
-o.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],dynamic=False,color=[1,0,0],young=30e9,poisson=.3))
-o.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],young=30e9,poisson=.3,density=2400,wire=True,dynamic=False))
-o.miscParams=[Generic('GLDrawSphere',{'glutUse':True})]
+O.bodies.append(utils.facet([[scale,0,0],[-scale,-scale,0],[-scale,scale,0]],dynamic=False,color=[1,0,0],young=30e9,poisson=.3))
+O.bodies.append(utils.sphere([0,0,.99*scale],1*scale,color=[0,1,0],young=30e9,poisson=.3,density=2400,wire=True,dynamic=False))
+O.miscParams=[GLDrawSphere(glutUse=True)]
 
-o.dt=.8*utils.PWaveTimeStep()
+O.dt=.8*utils.PWaveTimeStep()
 from yade import qt
 renderer=qt.Renderer()
 renderer['Interaction_geometry']=True
 qt.Controller()
-o.step(); o.step(); o.step()
+O.step(); O.step(); O.step()

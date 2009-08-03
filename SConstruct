@@ -60,7 +60,6 @@ if sconsVersion<9806.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
 	if os.path.exists(newDir):
 		Exit(os.execv(newPrefix+"/scons.py",[newPrefix+'/scons.py']+sys.argv[1:]))
 
-
 ##########################################################################################
 ############# OPTIONS ####################################################################
 ##########################################################################################
@@ -150,7 +149,6 @@ opts.AddVariables(
 )
 opts.Update(env)
 opts.Save(optsFile,env)
-
 
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})

@@ -18,40 +18,28 @@ sign=-1
 #
 
 O.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
 	]
 O.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingBox2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
-	]),
-	StandAloneEngine('PersistentSAPCollider',{'haveDistantTransient':True}),
-#	MetaEngine('InteractionGeometryMetaEngine',[
-#		#EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry',{'hasShear':True,'interactionDetectionFactor':1.4}),
-#		#EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'hasShear':True}),
-#		ef2_Facet_Sphere_Dem3DofGeom(),
-#	]),
-#	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
-#	#StandAloneEngine('ElasticContactLaw'),
-#	ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic()]),
+	BexResetter(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Facet_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
-	DeusExMachina('GravityEngine',{'gravity':[0,0,-sign*500],'label':'gravitator'}),
-	DeusExMachina("NewtonsDampedLaw",{'damping':0.8}),
-	StandAloneEngine('PeriodicPythonRunner',{'iterPeriod':4000,'command':'setGravity()'}),
+	GravityEngine(gravity=(0,0,-10),label='gravitator'),
+	NewtonsDampedLaw(damping=.3),
+	PeriodicPythonRunner(iterPeriod=4000,command='setGravity()'),
 	]
 O.bodies.append([
 	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
 	utils.sphere([0,0,sign*.49999],radius=.5,young=1e3,wire=True,density=1),
 ])
-O.miscParams=[Generic('GLDrawSphere',{'glutUse':True})]
+O.miscParams=[GLDrawSphere(glutUse=True)]
 O.timingEnabled=True
-O.saveTmp('init')
+O.saveTmp()
 O.dt=1e-4
 
 def setGravity():
@@ -75,6 +63,6 @@ if 0:
 	O.run(100000,True)
 	timing.stats()
 	timing.reset()
-	O.loadTmp('init')
+	O.loadTmp()
 	O.run(100000,True)
 	timing.stats()

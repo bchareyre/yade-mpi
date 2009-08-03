@@ -1,11 +1,13 @@
 # -*- encoding=utf-8 -*-
 
-o=Omega()
+#
+# FIXME: ParallelEngine is not currently wrapped in python
+#
 
-o.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')])
+O.initializers=[
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
 	]
-o.engines=[
+O.engines=[
 	# physical actions will not be needed until the contact law comes in;
 	# therefore it can run in parallel with the AABB engines and collider;
 	# but since collider depends on AABBs, they will run sequentially, one after another
@@ -23,25 +25,24 @@ o.engines=[
 	#  implementation of openMP in gcc: http://gcc.gnu.org/projects/gomp/
 	#
 	ParallelEngine([
-		StandAloneEngine('PhysicalActionContainerReseter'),
+		BexResetter(),
 		[
-			MetaEngine('BoundingVolumeMetaEngine',[EngineUnit('InteractingSphere2AABB'),EngineUnit('InteractingBox2AABB'),EngineUnit('MetaInteractingGeometry2AABB')]),
-			StandAloneEngine('PersistentSAPCollider'),
+			BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+			InsertionSortCollider(),
 		]
 	]),
-	# interaction physics depends on interaction geometry
-	MetaEngine('InteractionGeometryMetaEngine',[EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),EngineUnit('InteractingBox2InteractingSphere4SpheresContactGeometry')]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('SimpleElasticRelationships')]),
+	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
 	# the rest must also be run sequentially
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)
-	StandAloneEngine('ElasticContactLaw'),
-	DeusExMachina('GravityEngine',{'gravity':[0,0,-9.81]}),
+	ElasticContactLaw(),
+	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonsDampedLaw(damping=.2)
 ]
 
 from yade import utils
-o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
-o.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
-o.dt=.5*utils.PWaveTimeStep()
+O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
+O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
+O.dt=.5*utils.PWaveTimeStep()
 
 #o.run(100000); o.wait(); print o.iter/o.realtime,"iterations/sec"
