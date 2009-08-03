@@ -465,8 +465,8 @@ def vmData():
 	l=procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
 	return int(ll[1])
 
-def spheresFromFileUniaxial(filename,areaSections=10,**kw):
-	"""Load spheres from file, but do some additional work useful for uniaxial test:
+def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
+	"""Get some data about the current packing useful for uniaxial test:
 	
 	1. Find the dimensions that is the longest (uniaxial loading axis)
 	2. Find the minimum cross-section area of the speciment by examining several (areaSections)
@@ -475,9 +475,13 @@ def spheresFromFileUniaxial(filename,areaSections=10,**kw):
 	3. Find the bodies that are on the negative/positive boundary, to which the straining condition
 		should be applied.
 
+	@param filename if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
+	@param areaSection number of section that will be used to estimate cross-section
+
 	Returns dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
 	"""
-	ids=spheresFromFile(filename,**kw)
+	if filename: ids=spheresFromFile(filename,**kw)
+	else: ids=[b.id for b in O.bodies]
 	mm,mx=aabbExtrema()
 	dim=aabbDim(); axis=dim.index(max(dim))
 	import numpy
