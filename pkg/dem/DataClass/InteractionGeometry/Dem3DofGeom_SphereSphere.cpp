@@ -162,7 +162,8 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 		ss=shared_ptr<Dem3DofGeom_SphereSphere>(new Dem3DofGeom_SphereSphere());
 		c->interactionGeometry=ss;
 		// constants
-		ss->refLength=dist;
+		if(distanceFactor>1) ss->refLength=dist;
+		else ss->refLength=s1->radius+s2->radius;
 		ss->refR1=s1->radius; ss->refR2=s2->radius;
 		Real penetrationDepth=s1->radius+s2->radius-ss->refLength;
 		if(Omega::instance().getCurrentIteration()<=10){

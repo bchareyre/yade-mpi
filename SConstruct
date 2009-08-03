@@ -405,7 +405,7 @@ if env['QUAD_PRECISION']: env.Append(CPPDEFINES='QUAD_PRECISION')
 
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb2',CPPDEFINES=['YADE_DEBUG'])
-else: env.Append(CXXFLAGS='-O2')
+else: env.Append(CXXFLAGS='-O3')
 if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -march=%s'%env['march']),

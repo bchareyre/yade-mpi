@@ -177,9 +177,8 @@ class ClassFactory : public Singleton< ClassFactory >
 
 
 /*! Macro defining what classes can be found in this plugin -- must always be used in the respective .cpp file.
- *
- * Note: __COUNTER__ generates unique function name for each plugin. This avoids name clashes, even if multiple .cpp files
- * are compiled into one plugin.
+ * A function registerThisPluginClasses_FirstPluginName is generated at every occurence. The identifier should
+ * be unique and avoids use of __COUNTER__ which didn't appear in gcc until 4.3.
  */
 
 #ifdef YADE_BOOST_SERIALIZATION
@@ -189,7 +188,7 @@ class ClassFactory : public Singleton< ClassFactory >
 #endif
 
 #define _YADE_PLUGIN_REPEAT(x,y,z) BOOST_PP_STRINGIZE(z),
-#define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor)) void BOOST_PP_CAT(registerThisPluginClasses,__COUNTER__) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
+#define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor)) void BOOST_PP_CAT(registerThisPluginClasses_,BOOST_PP_SEQ_HEAD(plugins)) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
 //! Macro informing build file generator what features that particular file depends on. Has no effect at compile-time. Can be specified multiple times within a single (.cpp) file
 #define YADE_REQUIRE_FEATURE(feature)
 
