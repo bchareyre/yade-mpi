@@ -76,7 +76,7 @@ area_25,area_50,area_75=utils.approxSectionArea(coord_25,axis),utils.approxSecti
 
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(aabbEnlargeFactor=intRadius),MetaInteractingGeometry2AABB()]),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(aabbEnlargeFactor=intRadius,label='is2aabb'),MetaInteractingGeometry2AABB()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(distanceFactor=intRadius,label='ss2d3dg')],
@@ -114,6 +114,10 @@ def initTest():
 		renderer['displacementScale']=(1000,1000,1000) if mode=='tension' else (100,100,100)
 	except ImportError: pass
 	print "init done, will now run."
+	O.step(); O.step(); # to create initial contacts
+	# now reset the interaction radius and go ahead
+	ss2d3dg['distanceFactor']=1.
+	is2aabb['aabbEnlargeFactor']=1.
 	O.run()
 
 def stopIfDamaged():
