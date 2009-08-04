@@ -31,6 +31,10 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 			),
 		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['boost_python_indexing_suite_v2']+linkPlugins(Split("BoundingVolumeEngineUnit GeometricalModelEngineUnit InteractingGeometryEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit PhysicalParametersEngineUnit PhysicalActionDamperUnit PhysicalActionApplierUnit ConstitutiveLaw")))
 	])
+	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
+		env.File('__init__.py','tests'),
+		env.File('wrapper.py','tests')
+	])
 
 	# 3rd party modules:
 	# ==================

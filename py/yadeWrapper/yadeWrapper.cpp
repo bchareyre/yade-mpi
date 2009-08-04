@@ -688,8 +688,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
 		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
 		.def_readonly("timingDeltas",&Engine::timingDeltas);
-	python::class_<StandAloneEngine,shared_ptr<StandAloneEngine>, python::bases<Engine>, noncopyable>("StandAloneEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Engine>));
-	python::class_<DeusExMachina,shared_ptr<DeusExMachina>, python::bases<Engine>, noncopyable>("DeusExMachina").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Engine>));
+	python::class_<StandAloneEngine,shared_ptr<StandAloneEngine>, python::bases<Engine>, noncopyable>("StandAloneEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<StandAloneEngine>));
+	python::class_<DeusExMachina,shared_ptr<DeusExMachina>, python::bases<Engine>, noncopyable>("DeusExMachina").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<DeusExMachina>));
 	python::class_<EngineUnit, shared_ptr<EngineUnit>, python::bases<Serializable>, noncopyable >("EngineUnit",python::no_init)
 		.def_readonly("timingDeltas",&EngineUnit::timingDeltas)
 		.add_property("bases",&EngineUnit::getFunctorTypes);
