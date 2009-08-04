@@ -764,7 +764,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("isReal",&Interaction::isReal);
 	EXPOSE_CXX_CLASS(InteractionPhysics);
 	EXPOSE_CXX_CLASS(InteractionGeometry);
-	EXPOSE_CXX_CLASS_RENAMED(FileGenerator,Preprocessor)
+	EXPOSE_CXX_CLASS(FileGenerator)
 		.def("generate",&FileGenerator_generate)
 		.def("load",&FileGenerator_load);
 }

@@ -123,8 +123,8 @@ class Serializable : public Factorable
 		bool containsOnlyFundamentals();
 		Archives& getArchives() 	{ return archives; };
 		
-		virtual void yadeSerialize(any& )	{ throw SerializableError(SerializationExceptions::SetFunctionNotDeclared); };
-		virtual void yadeDeserialize(any& ) { throw SerializableError(SerializationExceptions::GetFunctionNotDeclared); };
+		virtual void yadeSerialize(any& a)	{ throw SerializableError((SerializationExceptions::SetFunctionNotDeclared+string(" for type ")+a.type().name()).c_str()); };
+		virtual void yadeDeserialize(any& a) { throw SerializableError((SerializationExceptions::GetFunctionNotDeclared+string(" for type ")+a.type().name()).c_str()); };
 
 		virtual void postProcessAttributes(bool /*deserializing*/) {};
 

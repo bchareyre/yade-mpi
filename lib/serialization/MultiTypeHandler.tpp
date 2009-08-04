@@ -55,7 +55,7 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 		REGISTER_ATTRIBUTE_(first);
 		REGISTER_ATTRIBUTE_(second);
 	};
-	public : void deserialize(any& a)
+	public : void yadeDeserialize(any& a)
 	{
 		std::pair< ContainedType1 , ContainedType2 > * multiType
 			= any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
@@ -64,7 +64,7 @@ class MultiTypeSerializer< std::pair< ContainedType1 , ContainedType2 > > : publ
 		multiType->second	= second;
 	};
 
-	public : void serialize(any& a)
+	public : void yadeSerialize(any& a)
 	{
 		std::pair< ContainedType1 , ContainedType2 > * multiType
 			= any_cast< std::pair< ContainedType1 , ContainedType2 > * >(a);
@@ -157,14 +157,14 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 > > : public Serializabl
 	{
 		REGISTER_ATTRIBUTE_(first);
 	};
-	public : void deserialize(any& a)
+	public : void yadeDeserialize(any& a)
 	{
 		boost::tuple< ContainedType1 > * multiType
 			= any_cast< boost::tuple< ContainedType1 > * >(a);
 
 		multiType->get<0>()	= first;
 	};
-	public : void serialize(any& a)
+	public : void yadeSerialize(any& a)
 	{
 		boost::tuple< ContainedType1 > * multiType
 			= any_cast< boost::tuple< ContainedType1 > * >(a);
@@ -252,7 +252,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > > : p
 		REGISTER_ATTRIBUTE_(first);
 		REGISTER_ATTRIBUTE_(second);
 	};
-	public : void deserialize(any& a)
+	public : void yadeDeserialize(any& a)
 	{
 		boost::tuple< ContainedType1 , ContainedType2 > * multiType
 			= any_cast< boost::tuple< ContainedType1 , ContainedType2 > * >(a);
@@ -260,7 +260,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 > > : p
 		multiType->get<0>()	= first;
 		multiType->get<1>()	= second;
 	};
-	public : void serialize(any& a)
+	public : void yadeSerialize(any& a)
 	{
 		boost::tuple< ContainedType1 , ContainedType2 > * multiType
 			= any_cast< boost::tuple< ContainedType1 , ContainedType2 > * >(a);
@@ -355,7 +355,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		REGISTER_ATTRIBUTE_(second);
 		REGISTER_ATTRIBUTE_(third);
 	};
-	public : void deserialize(any& a)
+	public : void yadeDeserialize(any& a)
 	{
 		boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > * multiType
 			= any_cast< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > * >(a);
@@ -364,7 +364,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		multiType->get<1>()	= second;
 		multiType->get<2>()	= third;
 	};
-	public : void serialize(any& a)
+	public : void yadeSerialize(any& a)
 	{
 		boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > * multiType
 			= any_cast< boost::tuple< ContainedType1 , ContainedType2 , ContainedType3 > * >(a);
@@ -465,7 +465,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		REGISTER_ATTRIBUTE_(third);
 		REGISTER_ATTRIBUTE_(fourth);
 	};								//
-	public : void deserialize(any& a)				//
+	public : void yadeDeserialize(any& a)				//
 	{								//
 		boost::tuple			< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > * multiType
 		= any_cast< boost::tuple	< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > * >(a);
@@ -475,7 +475,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		multiType->get<2>()	= third;
 		multiType->get<3>()	= fourth;
 	};								//
-	public : void serialize(any& a)					//
+	public : void yadeSerialize(any& a)					//
 	{								//
 		boost::tuple			< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > * multiType
 		= any_cast< boost::tuple	< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 > * >(a);
@@ -583,7 +583,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		REGISTER_ATTRIBUTE_(fourth);
 		REGISTER_ATTRIBUTE_(fifth);
 	};								//
-	public : void deserialize(any& a)				//
+	public : void yadeDeserialize(any& a)				//
 	{								//
 		boost::tuple			< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > * multiType
 		= any_cast< boost::tuple	< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > * >(a);
@@ -594,7 +594,7 @@ class MultiTypeSerializer< boost::tuple< ContainedType1 , ContainedType2 , Conta
 		multiType->get<3>()	= fourth;
 		multiType->get<4>()	= fifth;
 	};								//
-	public : void serialize(any& a)					//
+	public : void yadeSerialize(any& a)					//
 	{								//
 		boost::tuple			< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > * multiType
 		= any_cast< boost::tuple	< ContainedType1 , ContainedType2 , ContainedType3 , ContainedType4 , ContainedType5 > * >(a);

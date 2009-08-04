@@ -28,7 +28,7 @@ quit()
 
 runGenerator="""
 #generated file
-Preprocessor('%%s'%%s).generate('%s')
+FileGenerator('%%s'%%s).generate('%s')
 quit()
 """%(simulFile)
 
@@ -44,7 +44,10 @@ def crashProofRun(cmd,quiet=True):
 	msg=''
 	if os.path.exists(msgFile): msg=open(msgFile,'r').readlines()[0]
 	if retval==0: return True,msg,pout
-	else: return False,msg,pout
+	else:
+		# handle crash at exit :-(
+		if 'main: Yade: normal exit.' in pout: return True,msg,pout
+		return False,msg,pout
 
 reports=[]
 summary=[]
@@ -58,7 +61,7 @@ o=Omega()
 for pp in o.childClasses('FileGenerator'):
 	if pp in broken:
 		summary.append(pp,'skipped (broken)','');
-	params='' if pp not in genParams else (",{"+",".join(["'%s':%s"%(k,repr(genParams[pp][k])) for k in genParams[pp]])+"}")
+	params='' if pp not in genParams else (","+",".join(["%s=%s"%(k,repr(genParams[pp][k])) for k in genParams[pp]]))
 	ok1,msg1,out1=crashProofRun(runGenerator%(pp,params))
 	if not ok1:
 		reports.append([pp,'generator CRASH',out1]); summary.append([pp,'generator CRASH'])

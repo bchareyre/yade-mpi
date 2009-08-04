@@ -28,8 +28,6 @@ _proxyNamespace=__builtins__.__dict__
 _allSerializables=set(listChildClassesRecursive('Serializable'))
 # classes that cannot be instantiated in python directly, and will have no properties generated for them
 _noPropsClasses=set(['InteractionContainer','BodyContainer','EngineUnit','Engine','MetaEngine'])
-# We call some classes differently in python than in c++
-_classTranslations={'FileGenerator':'Preprocessor'}
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
 	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
@@ -40,10 +38,9 @@ _proxiedClasses=set()
 
 if 1:
 	# create types for all classes that yade defines: first those deriving from some root classes
-	for root0 in _pyRootClasses:
-		root=root0 if (root0 not in _classTranslations.keys()) else _classTranslations[root0]
+	for root in _pyRootClasses:
 		rootType=yade.wrapper.__dict__[root]
-		for p in listChildClassesRecursive(root0):
+		for p in listChildClassesRecursive(root):
 			_proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 			_proxiedClasses.add(p)
 	# create types for classes that derive just from Serializable
@@ -52,17 +49,14 @@ if 1:
 	## NOTE: this will not work if the object is returned from c++; seems to be more confusing than doing any good; disabling for now.
 	if 0:
 		# create class properties for yade serializable attributes, i.e. access object['attribute'] as object.attribute
-		for c0 in _allSerializables-_noPropsClasses:
-			c=c0 if (c0 not in _classTranslations.keys()) else _classTranslations[c0]
+		for c in _allSerializables-_noPropsClasses:
 			cls=eval(c) # ugly: create instance; better lookup some namespace (builtins? globals?)
 			for k in cls().keys(): # must be instantiated so that attributes can be retrieved
 				setattr(cls,k,property(lambda self,__k_=k:self.__getitem__(__k_),lambda self,val,__k_=k:self.__setitem__(__k_,val)))
 else:
 	# old code, can be removed at some point
-	for root0 in _pyRootClasses:
-		root=root0 if (root0 not in _classTranslations.keys()) else _classTranslations[root0]
-		for p in listChildClassesRecursive(root0):
-			if root=='Preprocessor': print root,p
+	for root in _pyRootClasses:
+		for p in listChildClassesRecursive(root):
 			_proxyNamespace[p]=lambda __r_=root,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,**kw)
 			_proxiedClasses.add(p)
 	# wrap classes that don't derive from any specific root class, have no proxy and need it
@@ -81,6 +75,8 @@ renamed={
 	'GLDrawBrefcomContact':'GLDrawCpmPhys',
 	'BrefcomDamageColorizer':'CpmPhysDamageColorizer',
 	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics',
+	# renamed back to comply with the c++ name, 4.8.2009
+	'Preprocessor':'FileGenerator'
 }
 
 for oldName in renamed:
