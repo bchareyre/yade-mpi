@@ -21,28 +21,58 @@ def listChildClassesRecursive(base):
 	for bb in ret:
 		ret2|=listChildClassesRecursive(bb)
 	return ret | ret2
-# not sure whether __builtins__ is the right place?
-_dd=__builtins__.__dict__
-_allClasses=set(listChildClassesRecursive('Serializable'))
-_proxiedClasses=set()
-_classTranslations={'FileGenerator':'Preprocessor'}
 
-for root in [
+# not sure whether __builtins__ is the right place?
+_proxyNamespace=__builtins__.__dict__
+# all classes that we want to handle at this point
+_allSerializables=set(listChildClassesRecursive('Serializable'))
+# classes that cannot be instantiated in python directly, and will have no properties generated for them
+_noPropsClasses=set(['InteractionContainer','BodyContainer','EngineUnit','Engine','MetaEngine'])
+# We call some classes differently in python than in c++
+_classTranslations={'FileGenerator':'Preprocessor'}
+# classes that have special wrappers; only the most-bottom ones
+_pyRootClasses=set([
 	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
-		# functors
-		'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw'
-	]:
-	root2=root if (root not in _classTranslations.keys()) else _classTranslations[root]
+	'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw'])
+# classes for which proxies were already created
+_proxiedClasses=set()
+
+# create types for all classes that yade defines: first those deriving from some root classes
+for root0 in _pyRootClasses:
+	root=root0 if (root0 not in _classTranslations.keys()) else _classTranslations[root0]
+	rootType=yade.wrapper.__dict__[root]
 	for p in listChildClassesRecursive(root):
-		#class argStorage:
-		#	def __init__(self,_root,_class): self._root,self._class=_root,_class
-		#	def __call__(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
-		#if root=='MetaEngine': _dd[p]=argStorage(root2,p)
-		_dd[p]=lambda __r_=root2,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,**kw) # eval(root2)(p,kw)
+		_proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 		_proxiedClasses.add(p)
-#_dd['Generic']=yade.wrapper.Serializable
-for p in _allClasses-_proxiedClasses: # wrap classes that don't derive from any specific root class, just from Serializable
-	_dd[p]=lambda __p_=p,**kw: yade.wrapper.Serializable(__p_,**kw)
+# create types for classes that derive just from Serializable
+for p in _allSerializables-_proxiedClasses-_pyRootClasses:
+	_proxyNamespace[p]=type(p,(Serializable,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
+# create class properties for yade serializable attributes, i.e. access object['attribute'] as object.attribute
+for c0 in _allSerializables-_noPropsClasses:
+	c=c0 if (c0 not in _classTranslations.keys()) else _classTranslations[c0]
+	cls=eval(c) # ugly: create instance; better lookup some namespace (builtins? globals?)
+	for k in cls().keys(): # must be instantiated so that attributes can be retrieved
+		setattr(cls,k,property(lambda self,__k_=k:self.__getitem__(__k_),lambda self,val,__k_=k:self.__setitem__(__k_,val)))
+
+
+
+### deprecated code, may be removed in 2010 ;-)
+if 0:
+	for root0 in _pyRootClasses:
+		root=root0 if (root0 not in _classTranslations.keys()) else _classTranslations[root0]
+		for p in listChildClassesRecursive(root):
+			#class argStorage:
+			#	def __init__(self,_root,_class): self._root,self._class=_root,_class
+			#	def __call__(self,*args): return yade.wrapper.__dict__[self._root](self._class,*args)
+			#if root=='MetaEngine': _proxyNamespace[p]=argStorage(root2,p)
+			_proxyNamespace[p]=lambda __r_=root,__p_=p,**kw : yade.wrapper.__dict__[__r_](__p_,**kw) # eval(root2)(p,kw)
+			_proxiedClasses.add(p)
+	# wrap classes that don't derive from any specific root class, have no proxy and need it
+	for p in _allSerializables-_proxiedClasses-pyRootClasses:
+		_proxyNamespace[p]=lambda __p_=p,**kw: yade.wrapper.Serializable(__p_,**kw)
+
+	for p in _allSerializables-_proxiedClasses-pyRootClasses:
+		_proxyNamespace[p]=lambda __p_=p,**kw: yade.wrapper.Serializable(__p_,**kw)
 ### end wrappers
 
 #### HANDLE RENAMED CLASSES ####
@@ -63,8 +93,8 @@ for oldName in renamed:
 		def __init__(self,_old,_new): self.old,self.new=_old,_new
 		def __call__(self,*args,**kw):
 			import warnings; warnings.warn("Class `%s' was renamed to `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
-			return _dd[self.new](*args,**kw)
-	_dd[oldName]=warnWrap(oldName,renamed[oldName])
+			return _proxyNamespace[self.new](*args,**kw)
+	_proxyNamespace[oldName]=warnWrap(oldName,renamed[oldName])
 
 
 

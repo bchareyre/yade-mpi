@@ -25,11 +25,10 @@ O.engines=[
 	#  implementation of openMP in gcc: http://gcc.gnu.org/projects/gomp/
 	#
 	ParallelEngine([
+		# BexResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
 		BexResetter(),
-		[
-			BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
-			InsertionSortCollider(),
-		]
+		# Engines within the group will be run serially, however
+		[BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),	PersistentSAPCollider(),]
 	]),
 	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
 	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
@@ -44,5 +43,5 @@ from yade import utils
 O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
 O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
 O.dt=.5*utils.PWaveTimeStep()
-
+O.saveTmp()
 #o.run(100000); o.wait(); print o.iter/o.realtime,"iterations/sec"
