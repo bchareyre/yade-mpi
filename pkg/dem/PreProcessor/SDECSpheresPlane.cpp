@@ -22,7 +22,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
@@ -327,7 +327,7 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(sdecTimeStepper);
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
-	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new ElasticContactLaw));

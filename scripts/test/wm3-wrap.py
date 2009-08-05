@@ -6,8 +6,8 @@ list(x2)
 tuple(x2)
 # operations and operators
 x+y+z==one
-x.Dot(y)==z
-x.Cross(y)==0
+x.Dot(y)==0
+x.Cross(y)==z
 # methods
 one.Length()
 

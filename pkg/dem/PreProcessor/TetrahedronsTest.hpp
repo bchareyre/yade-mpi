@@ -24,7 +24,7 @@
  *  - with class InteractingMyTetrahedron2AABB registered in TetrahedronsTest inside an MetaEngine called
  *     boundigVolumeDispatcher yade will automatically create AABB from InteractingMyTetrahedron
  *
- *  - with AABB available, the PersistentSAPCollider will be able to detect that two bodies are interacting
+ *  - with AABB available, the InsertionSortCollider will be able to detect that two bodies are interacting
  *
  *  - if interaction is detected, an appropriate EngineUnit will be called, in
  *    this small example I have just two of them:

@@ -6,7 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "DistantPersistentSAPCollider.hpp"
+YADE_REQUIRE_FEATURE(Say goodbye to this piece of crappy code!)
+
+#include"DistantPersistentSAPCollider.hpp"
 #include<yade/core/Body.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/BodyContainer.hpp>

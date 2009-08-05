@@ -8,6 +8,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+YADE_REQUIRE_FEATURE(Say goodbye to this piece of crappy code!)
+
 #include"PersistentSAPCollider.hpp"
 #include<yade/core/Body.hpp>
 #include<yade/core/MetaBody.hpp>

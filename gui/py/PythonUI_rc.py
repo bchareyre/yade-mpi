@@ -76,14 +76,15 @@ renamed={
 	'BrefcomDamageColorizer':'CpmPhysDamageColorizer',
 	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics',
 	# renamed back to comply with the c++ name, 4.8.2009
-	'Preprocessor':'FileGenerator'
+	'Preprocessor':'FileGenerator',
+	'PersistentSAPCollider':'InsertionSortCollider',
 }
 
 for oldName in renamed:
 	class warnWrap:
 		def __init__(self,_old,_new): self.old,self.new=_old,_new
 		def __call__(self,*args,**kw):
-			import warnings; warnings.warn("Class `%s' was renamed to `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
+			import warnings; warnings.warn("Class `%s' was renamed to (or replaced by) `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=3);
 			return _proxyNamespace[self.new](*args,**kw)
 	_proxyNamespace[oldName]=warnWrap(oldName,renamed[oldName])
 

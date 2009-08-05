@@ -21,7 +21,7 @@
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
@@ -166,7 +166,7 @@ void TestSimpleViscoelastic::createActors(shared_ptr<MetaBody>& rootBody)
     rootBody->engines.clear();
     rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
     rootBody->engines.push_back(boundingVolumeDispatcher);	
-    rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+    rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
     rootBody->engines.push_back(interactionGeometryDispatcher);
     rootBody->engines.push_back(interactionPhysicsDispatcher);
     rootBody->engines.push_back(constitutiveLaw);

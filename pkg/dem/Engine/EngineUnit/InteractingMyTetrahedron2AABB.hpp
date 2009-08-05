@@ -13,7 +13,7 @@
  * \brief This class exists for the sole purpose of creating AABB
  * (AxisAligneBoundingBox) from class InteractingMyTetrahedron
  *
- * AABB is used by class PersistentSAPCollider to detect possible interaction between two
+ * AABB is used by class InsertionSortCollider to detect possible interaction between two
  * bodies. Once you write this class for your InteractingGeometry, interactions
  * will be automatically detected and created for you.
  *

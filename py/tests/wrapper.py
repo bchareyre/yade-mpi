@@ -1,5 +1,13 @@
 import unittest
 from yade.wrapper import *
+from miniWm3Wrap import *
+from yade._customConverters import *
+from math import *
+
+"""
+This test module covers python/c++ transitions, for both classes deriving from Serializable,
+but also for other classes that we wrap (like Wm3).
+"""
 
 # copied from PythonUI_rc, should be in some common place (utils? runtime?)
 def listChildClassesRecursive(base):
@@ -54,14 +62,64 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
 		self.assert_(id.constLawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
 	def testParallelEngineCtor(self):
-		pass
-	## test what shold fail:
-	## passing wrong EngineUnit type to a dispatcher
-	## reading/writing non-existent attribute
-
-def run():
-	suite=unittest.TestLoader().loadTestsFromTestCase(TestObjectInstantiation)
-	unittest.TextTestRunner(verbosity=2).run(suite)
+		pe=ParallelEngine([InsertionSortCollider(),[BoundingVolumeMetaEngine(),BexResetter()]])
+		self.assert_(pe.slaves[0].name=='InsertionSortCollider')
+		self.assert_(len(pe.slaves[1])==2)
+		pe.slaves=[]
+		self.assert_(len(pe.slaves)==0)
+	##		
+	## testing incorrect operations that should raise exceptions
+	##
+	def testWrongFunctorType(self):
+		# dispatchers accept only correct functors
+		self.assertRaises(TypeError,lambda: ConstitutiveLawDispatcher([InteractingSphere2AABB()]))
+	def testInvalidAttr(self):
+		# accessing invalid attributes raises KeyError
+		self.assertRaises(KeyError,lambda: Sphere(attributeThatDoesntExist=42))
+		self.assertRaises(KeyError,lambda: Sphere()['attributeThatDoesntExist'])
 	
-
+class TestWm3Wrapper(unittest.TestCase):
+	def assertVQAlmostEqual(self,v1,v2):
+		"floating-point comparison of vectors/quaterions"
+		self.assertEqual(len(v1),len(v2));
+		for i in range(len(v1)): self.assertAlmostEqual(v1[i],v2[i],msg='Component '+str(i)+' of '+str(v1)+' and '+str(v2))
+	def testVector2(self):
+		v=Vector2(1,2); v2=Vector2(3,4)
+		self.assert_(v+v2==Vector2(4,6))
+		self.assert_(Vector2.UNIT_X.Dot(Vector2.UNIT_Y)==0)
+		self.assert_(Vector2.ZERO.Length()==0)
+	def testVector3(self):
+		v=Vector3(3,4,5); v2=Vector3(3,4,5)
+		self.assert_(v[0]==3 and v[1]==4 and v[2]==5)
+		self.assert_(v.SquaredLength()==50)
+		self.assert_(v==(3,4,5)) # comparison with list/tuple
+		self.assert_(v==[3,4,5])
+		self.assert_(v==v2)
+		x,y,z,one=Vector3.UNIT_X,Vector3.UNIT_Y,Vector3.UNIT_Z,Vector3.ONE
+		self.assert_(x+y+z==one)
+		self.assert_(x.Dot(y)==0)
+		self.assert_(x.Cross(y)==z)
+	def testQuaternion(self):
+		# construction
+		q1=Quaternion((0,0,1),pi/2)
+		q2=Quaternion(Vector3(0,0,1),pi/2)
+		q1==q2
+		x,y,z,one=Vector3.UNIT_X,Vector3.UNIT_Y,Vector3.UNIT_Z,Vector3.ONE
+		self.assertVQAlmostEqual(q1*x,y)
+		self.assertVQAlmostEqual(q1*q1*x,-x)
+		self.assertVQAlmostEqual(q1*q1.Conjugate(),Quaternion.IDENTITY)
+		self.assertVQAlmostEqual(q1.ToAxisAngle()[0],(0,0,1))
+		self.assertAlmostEqual(q1.ToAxisAngle()[1],pi/2)
+	# not really wm3 thing, but closely related
+	def testSe3Conversion(self):
+		pp=PhysicalParameters()
+		pp['se3']=(Vector3.ZERO,Quaternion.IDENTITY)
+		self.assert_(pp['se3'][0]==Vector3.ZERO)
+		self.assert_(pp['se3'][1]==Quaternion.IDENTITY)
+		pp['se3']=((1,2,3),Quaternion((1,1,1),pi/4))
+		self.assert_(pp['se3'][0]==(1,2,3))
+		self.assert_(pp['se3'][0]==pp.pos)
+		self.assert_(pp['se3'][1]==Quaternion((1,1,1),pi/4))
+		self.assert_(pp['se3'][1]==pp.ori)
 		
+	

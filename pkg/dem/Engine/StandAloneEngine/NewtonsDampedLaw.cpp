@@ -94,10 +94,13 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 			}
 
 			// blocking DOFs
-			if(rb->blockedDOFs==0){ /* same as: rb->blockedDOFs==PhysicalParameters::DOF_NONE */
+			if(rb->blockedDOFs==PhysicalParameters::DOF_NONE){
 				rb->angularVelocity=rb->angularVelocity+dt*rb->angularAcceleration;
 				rb->velocity=rb->velocity+dt*rb->acceleration;
+			} else if(rb->blockedDOFs==PhysicalParameters::DOF_ALL){
+				/* do nothing */
 			} else {
+				// handle more complicated cases here
 				if((rb->blockedDOFs & PhysicalParameters::DOF_X)==0) rb->velocity[0]+=dt*rb->acceleration[0];
 				if((rb->blockedDOFs & PhysicalParameters::DOF_Y)==0) rb->velocity[1]+=dt*rb->acceleration[1];
 				if((rb->blockedDOFs & PhysicalParameters::DOF_Z)==0) rb->velocity[2]+=dt*rb->acceleration[2];

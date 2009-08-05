@@ -31,7 +31,7 @@ o.engines=[
 	]),
 	## Using bounding boxes created by the previous engine, find possible body collisions.
 	## These possible collisions are inserted in Omega.interactions container (MetaBody::transientInteractions in c++).
-	PersistentSAPCollider(),
+	InsertionSortCollider(),
 	## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
 	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
 	## Note that there is no EngineUnit for box-box collision. They are not implemented.

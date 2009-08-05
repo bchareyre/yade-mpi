@@ -27,7 +27,7 @@
 
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 
@@ -310,7 +310,7 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);	
-	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
         rootBody->engines.push_back(constitutiveLaw);

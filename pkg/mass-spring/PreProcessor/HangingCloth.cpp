@@ -23,7 +23,7 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/core/MetaBody.hpp>
 //#include<yade/pkg-common/FrictionLessElasticContactLaw.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 //#include<yade/pkg-common/MassSpringBody2RigidBodyLaw.hpp>
 
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -157,7 +157,7 @@ bool HangingCloth::generate()
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
 	rootBody->engines.push_back(geometricalModelDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(explicitMassSpringConstitutiveLaw);
@@ -181,6 +181,7 @@ bool HangingCloth::generate()
 	physics2->se3		= Se3r(Vector3r(0,0,0),q);
 
 	rootBody->isDynamic	= false;
+	rootBody->dt=1e-2;
 
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	set->diffuseColor	= Vector3r(0,0,1);

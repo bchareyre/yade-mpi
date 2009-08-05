@@ -8,6 +8,8 @@
 
 #pragma once
 
+#error PersistentSAPCollider is forbidden
+
 #include<yade/core/Collider.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include <list>

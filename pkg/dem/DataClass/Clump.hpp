@@ -52,7 +52,7 @@
 
 	@todo GravityEngine should be applied to members, not to clump as such?! Still not sure. Perhaps Clumps should have mass and inertia set to zeros so that engines unaware of clumps do not act on it. It would have some private mass and insertia that would be used in NewtonsForceLaw etc for clumps specially...
 
-	@note PersistentSAPCollider bypass Clumps explicitly. This no longer depends on the absence of boundingVolume.
+	@note Collider::mayCollide (should be used by all colliders) bypasses Clumps explicitly. This no longer depends on the absence of boundingVolume.
 	@note Clump relies on its id being assigned (as well as id of its components); therefore, only bodies that have already been inserted to the container may be added to Clump which has been itself already added to the container. We further requier that clump id is greater than ids of clumped bodies
  
  */

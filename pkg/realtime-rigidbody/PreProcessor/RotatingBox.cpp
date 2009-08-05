@@ -14,7 +14,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/RotationEngine.hpp>
 
@@ -278,7 +278,7 @@ void RotatingBox::createActors(shared_ptr<MetaBody>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new PersistentSAPCollider));
+	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new FrictionLessElasticContactLaw));
 	rootBody->engines.push_back(gravityCondition);

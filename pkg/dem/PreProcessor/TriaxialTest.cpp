@@ -30,7 +30,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>

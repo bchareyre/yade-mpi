@@ -16,7 +16,7 @@
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
@@ -95,8 +95,7 @@ void UniaxialStrainerGen::createEngines(){
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
 
-	shared_ptr<PersistentSAPCollider> collider(new PersistentSAPCollider);
-		collider->haveDistantTransient=true;
+	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 		rootBody->engines.push_back(collider);
 
 	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);

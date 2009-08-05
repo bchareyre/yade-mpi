@@ -29,7 +29,7 @@
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
-#include<yade/pkg-common/PersistentSAPCollider.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
 
 
 
@@ -56,7 +56,7 @@ bool SimpleScene::generate(){
 		// use boundingVolumeDispatcher that we defined above
 		rootBody->engines.push_back(boundingVolumeDispatcher);
 		//@
-		shared_ptr<PersistentSAPCollider> collider(new PersistentSAPCollider);
+		shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 			rootBody->engines.push_back(collider);
 		//@
 		shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
