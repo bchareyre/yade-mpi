@@ -32,7 +32,8 @@ CREATE_LOGGER(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
-
+	//geom->distanceFactor=1.1;
+	
 	Real displN=geom->displacementN();
 	const Real& crossSection=phys->crossSection;
 	
@@ -126,7 +127,7 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	
 	const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
 	const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
-	long cohesiveThresholdIter=1000;
+	long cohesiveThresholdIter=10;
 	
 	bool initCohesive = rpm1->initCohesive*rpm2->initCohesive;
 	

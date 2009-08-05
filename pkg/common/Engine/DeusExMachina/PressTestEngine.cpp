@@ -42,7 +42,7 @@ void PressTestEngine::applyCondition(MetaBody * ncb){
 						 */ 
 						curentDirection=backward;
 						TranslationEngine::velocity *= -pressVelocityForw2Back;
-						currentIterationAfterDestruction = (Omega::instance().getCurrentIteration())/pressVelocityForw2Back;
+						currentIterationAfterDestruction = (Omega::instance().getCurrentIteration())/pressVelocityForw2Back*riseUpPressHigher;
 					}
 				}  else if (((currentIterationAfterDestruction!=0)&&(maxVerticalForce !=0))) {
 					/*
