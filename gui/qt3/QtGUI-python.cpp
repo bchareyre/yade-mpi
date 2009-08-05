@@ -20,7 +20,10 @@ bool qtGuiIsActive(){return (bool)YadeQtMainWindow::self; }
 void qtGuiActivate(){
 	if(qtGuiIsActive()) return;
 	QtGUI* gui=new QtGUI();
-	gui->runNaked();
+	if(!gui->checkDisplay(/* quiet */ false) || !gui->runNaked()){
+		PyErr_SetString(PyExc_ImportError,"Qt3 GUI could not be activated.");
+		python::throw_error_already_set();
+	}
 }
 
 YadeQtMainWindow* ensuredMainWindow(){if(!qtGuiIsActive()){qtGuiActivate(); while(!YadeQtMainWindow::self) usleep(50000); } /* throw runtime_error("No instance of YadeQtMainWindow");*/ return YadeQtMainWindow::self; }

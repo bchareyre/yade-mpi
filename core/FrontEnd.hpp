@@ -20,10 +20,11 @@ class FrontEnd : public Factorable
 		virtual ~FrontEnd ();
 
 		virtual int run(int , char * []) { return -1;};
+		// called before actually invoking it
+		virtual bool available(){return false;}
 
 	REGISTER_CLASS_AND_BASE(FrontEnd,Factorable);
 };
-
 REGISTER_FACTORABLE(FrontEnd);
 
 

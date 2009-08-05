@@ -29,7 +29,11 @@ class QtGUI : public FrontEnd
 
 	public :
 		QtGUI ();
-		void runNaked();
+		// run the QtGUI without showing the main window (called from python when importing yade.qt; yade.qt.Controller() will then show just the Controller and so on)
+		bool runNaked();
+		// try to open the X display, return false if fails; optionally display error to the log.
+		bool checkDisplay(bool quiet=true);
+		virtual bool available(){return checkDisplay();}
 		virtual ~QtGUI ();
 		virtual int run(int argc, char *argv[]);
 		void help();

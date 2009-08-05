@@ -22,7 +22,8 @@ class PythonUI: public FrontEnd
 		static bool stopAfter;
 		static bool nonInteractive;
 		static vector<string> scriptArgs;
-	
+
+	virtual bool available(){return true;}
 	REGISTER_CLASS_NAME(PythonUI);
 	REGISTER_BASE_CLASS_NAME(FrontEnd);
 	DECLARE_LOGGER;

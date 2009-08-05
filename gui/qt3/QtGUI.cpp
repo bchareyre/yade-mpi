@@ -81,12 +81,17 @@ int QtGUI::run(int argc, char *argv[])
 	return res;
 }
 
+bool QtGUI::checkDisplay(bool quiet){
+	bool ret=(XOpenDisplay(NULL)!=0);
+	if(!ret) LOG_ERROR("Unable to open display `"<<getenv("DISPLAY")<<"'.");
+	return ret;
+}
 
-void QtGUI::runNaked(){
+bool QtGUI::runNaked(){
 	if(!app){ // no app existing yet
 		if(getenv("DISPLAY")==0){
 			LOG_ERROR("$DISPLAY environment var not set, not starting qt3 gui.");
-			return;
+			return false;
 		};
 		LOG_INFO("Creating QApplication");
 		XInitThreads();
@@ -99,4 +104,5 @@ void QtGUI::runNaked(){
 		} else { LOG_ERROR("Main window was there, but not QtGUI::app??"); }
 		boost::thread appThread(boost::bind(&QApplication::exec,app));
 	}
+	return true;
 }

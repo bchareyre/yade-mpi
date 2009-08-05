@@ -278,15 +278,23 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	// handle this a little more inteligently, use FrontEnd::available to chec kif the GUI will really run (QtGUi without DISPLAY and similar)
 	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
 	#ifdef YADE_OPENGL
 		if(!explicitUI && gui=="PythonUI" && !getenv("TERM")){ LOG_WARN("No $TERM, using QtGUI instead of PythonUI"); gui="QtGUI"; }
 	#else
 		if(gui=="QtGUI"){LOG_WARN("openGL-less build, using PythonUI instead of QtGUI"); gui="PythonUI";}
 	#endif
+	if(string(getenv("DISPLAY")).empty()) unsetenv("DISPLAY"); // empty $DISPLAY is no display
 	if(gui=="QtGUI" && !getenv("DISPLAY")){ LOG_WARN("No $DISPLAY, using PythonUI instead of QtUI"); gui="PythonUI"; }
-		
-	shared_ptr<FrontEnd> frontEnd = dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
+	shared_ptr<FrontEnd> frontEnd;
+	try{
+		frontEnd=dynamic_pointer_cast<FrontEnd>(ClassFactory::instance().createShared(gui));
+		if(!frontEnd){ LOG_FATAL("Selected class `"<<gui<<"' is not an UI."); exit(1);}
+	} catch (FactoryError& e){
+		LOG_FATAL("Unable to create UI `"<<gui<<"', got error: "<<e.what());
+		exit(1);
+	}
 	
  	// for(int i=0;i<argc; i++)cerr<<"Argument "<<i<<": "<<argv[i]<<endl;
 	int ok = frontEnd->run(argc,argv);

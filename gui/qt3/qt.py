@@ -2,8 +2,8 @@
 from _qt import *
 
 if not isActive():
+	# will raise ImportError if the GUI could not be activated for some reason
 	activate()
-#	# raise ImportError("The Qt gui is not being used (run with -N QtGUI).")
 
 
 
