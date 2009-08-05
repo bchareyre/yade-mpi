@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
+#include<boost/version.hpp>
 #include<boost/foreach.hpp>
 #	ifndef FOREACH
 #		define FOREACH BOOST_FOREACH
