@@ -74,13 +74,14 @@ bool STLReader::open(const char* filename, OutV vertices, OutE edges, OutF facet
     fseek(fp, 0, SEEK_END);
     int file_size = ftell(fp);
     int facenum;
+	 int res;
     /* Check for binary or ASCII file */
     fseek(fp, STL_LABEL_SIZE, SEEK_SET);
-    fread(&facenum, sizeof(int), 1, fp);
+    res=fread(&facenum, sizeof(int), 1, fp);
     int expected_file_size=STL_LABEL_SIZE + 4 + (sizeof(short)+4*sizeof(float) )*facenum ;
     if(file_size ==  expected_file_size) binary = true;
     unsigned char tmpbuf[128];
-    fread(tmpbuf,sizeof(tmpbuf),1,fp);
+    res=fread(tmpbuf,sizeof(tmpbuf),1,fp);
     for(size_t i = 0; i < sizeof(tmpbuf); i++)
       {
 	if(tmpbuf[i] > 127)
@@ -173,8 +174,9 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
     }
 
     int facenum;
+	 int res;
     fseek(fp, STL_LABEL_SIZE, SEEK_SET);
-    fread(&facenum, sizeof(int), 1, fp);
+    res=fread(&facenum, sizeof(int), 1, fp);
     
     vector<Vrtx> vcs;
     set<pair<int,int> > egs;
@@ -185,9 +187,9 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
       short attr;
       float n[3];
       Vrtx v[3];
-      fread(&n,3*sizeof(float),1,fp);
-      fread(&v,sizeof(Vrtx),3,fp);
-      fread(&attr,sizeof(short),1,fp);
+      res=fread(&n,3*sizeof(float),1,fp);
+      res=fread(&v,sizeof(Vrtx),3,fp);
+      res=fread(&attr,sizeof(short),1,fp);
 
       //FIXME: Убрать дублирование кода с open_ascii
       int vid[3];

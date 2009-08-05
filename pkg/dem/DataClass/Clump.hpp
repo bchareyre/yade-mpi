@@ -5,15 +5,9 @@
 #include<vector>
 #include<map>
 #include<yade/core/Body.hpp>
-#include<yade/core/MetaBody.hpp>
-#include<yade/core/FileGenerator.hpp>
-#include<yade/core/DeusExMachina.hpp>
-#include<yade/lib-factory/Factorable.hpp>
-#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/AABB.hpp>
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/core/DeusExMachina.hpp>
 
 
 /*! Body representing clump (rigid aggregate) composed by other existing bodies.
@@ -88,6 +82,7 @@ class Clump: public Body {
 };
 REGISTER_SERIALIZABLE(Clump);
 
+
 /*! Update ::Clump::members positions so that the Clump behaves as a rigid body. */
 class ClumpMemberMover: public DeusExMachina {
 	public:
@@ -100,16 +95,4 @@ class ClumpMemberMover: public DeusExMachina {
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ClumpMemberMover);
-
-/*! \brief Test some basic clump functionality; show how to use clumps as well. */
-class ClumpTestGen : public FileGenerator {
-		void createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii);
-		shared_ptr<ClumpMemberMover> clumpMover;
-	public :
-		bool generate();
-	DECLARE_LOGGER;
-	REGISTER_CLASS_AND_BASE(ClumpTestGen,FileGenerator);
-	REGISTER_ATTRIBUTES(FileGenerator,/*nothing here*/);
-};
-REGISTER_SERIALIZABLE(ClumpTestGen);
 

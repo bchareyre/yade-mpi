@@ -62,7 +62,9 @@ void warnOnceHandler(int sig){
 
 void
 sigHandler(int sig){
-	int res;
+	#ifdef YADE_DEBUG
+		int res;
+	#endif
 	switch(sig){
 	#ifdef YADE_PYTHON
 		case SIGINT:
