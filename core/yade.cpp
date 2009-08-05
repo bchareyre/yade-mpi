@@ -62,6 +62,7 @@ void warnOnceHandler(int sig){
 
 void
 sigHandler(int sig){
+	int res;
 	switch(sig){
 	#ifdef YADE_PYTHON
 		case SIGINT:
@@ -77,7 +78,7 @@ sigHandler(int sig){
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			int res=std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			res=std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			raise(sig); // reemit signal after exiting gdb
 			break;
