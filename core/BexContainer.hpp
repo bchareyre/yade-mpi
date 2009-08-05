@@ -179,7 +179,7 @@ class BexContainer {
 			if(moveRotUsed){
 				memset(_move  [0],0,sizeof(Vector3r)*size);
 				memset(_rot   [0],0,sizeof(Vector3r)*size);
-				moveRotUsed=False;
+				moveRotUsed=false;
 			}
 		}
 		//! No-op for API compatibility with the threaded version
