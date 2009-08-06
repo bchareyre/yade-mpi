@@ -446,6 +446,16 @@ class pyOmega{
 		oa << YadeSimulation;
 	}
 	#endif
+	void periodicCell_set(python::tuple& t){
+		if(python::len(t)==2){ OMEGA.getRootBody()->cellMin=python::extract<Vector3r>(t[0]); OMEGA.getRootBody()->cellMax=python::extract<Vector3r>(t[1]); OMEGA.getRootBody()->isPeriodic=true; }
+		else if (python::len(t)==0) {OMEGA.getRootBody()->isPeriodic=false; }
+		else throw invalid_argument("Must pass either 2 Vector3's to set periodic cell,  or () to disable periodicity (got "+lexical_cast<string>(python::len(t))+" instead).");
+	}
+	python::tuple periodicCell_get(){
+		vector<Vector3r> ret;
+		if(OMEGA.getRootBody()->isPeriodic){ return python::make_tuple(OMEGA.getRootBody()->cellMin,OMEGA.getRootBody()->cellMax); }
+		return python::make_tuple();
+	}
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
@@ -562,6 +572,7 @@ void PhysicalParameters_ori_set(const shared_ptr<PhysicalParameters>& pp, const 
 
 long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
 long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
+python::tuple Interaction_getCellDist(const shared_ptr<Interaction>& i){ return python::make_tuple(i->cellDist[0],i->cellDist[1],i->cellDist[2]); }
 
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
 void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
@@ -625,6 +636,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
+		.add_property("periodicCell",&pyOmega::periodicCell_get,&pyOmega::periodicCell_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.");
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
 		#endif
@@ -761,7 +773,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readwrite("geom",&Interaction::interactionGeometry)
 		.add_property("id1",&Interaction_getId1)
 		.add_property("id2",&Interaction_getId2)
-		.add_property("isReal",&Interaction::isReal);
+		.add_property("isReal",&Interaction::isReal)
+		.add_property("cellDist",&Interaction_getCellDist);
 	EXPOSE_CXX_CLASS(InteractionPhysics);
 	EXPOSE_CXX_CLASS(InteractionGeometry);
 	EXPOSE_CXX_CLASS(FileGenerator)

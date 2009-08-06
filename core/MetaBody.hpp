@@ -51,6 +51,8 @@ class MetaBody : public Body
 		long stopAtIteration;
 		Real stopAtVirtTime;
 		Real stopAtRealTime;
+		Vector3r cellMin, cellMax;
+		bool isPeriodic;
 
 		bool needsInitializers;
 		// for GL selection
@@ -70,6 +72,9 @@ class MetaBody : public Body
 		(currentIteration)
 		(simulationTime)
 		(stopAtIteration)
+		(cellMin)
+		(cellMax)
+		(isPeriodic)
 	);
 	REGISTER_CLASS_AND_BASE(MetaBody,Body);
 };

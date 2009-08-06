@@ -262,6 +262,7 @@ int main(int argc, char *argv[])
 	LOG_INFO("Loading plugins");
 		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/plugins" ));
 		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/gui" ));
+		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/extra" ));
 	Omega::instance().init();
 
 	// make directory for temporaries

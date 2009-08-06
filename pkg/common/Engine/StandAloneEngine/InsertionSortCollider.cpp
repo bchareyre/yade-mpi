@@ -76,7 +76,7 @@ void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer
 		if(XX.size()!=2*rb->bodies->size()) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
-		rb->interactions->erasePending(*this);
+		rb->interactions->erasePending(*this,rb);
 		return false;
 	}
 #endif
@@ -182,7 +182,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 	ISC_CHECKPOINT("copy");
 
 	// process interactions that the constitutive law asked to be erased
-		interactions->erasePending(*this);
+		interactions->erasePending(*this,rb);
 	ISC_CHECKPOINT("erase");
 
 	// sort

@@ -84,7 +84,7 @@ void PersistentSAPCollider::action(MetaBody* ncb)
 
 //	timingDeltas->checkpoint("minMaxUpdate");
 
-	ncb->interactions->erasePending(*this);
+	ncb->interactions->erasePending(*this,ncb);
 
 //	timingDeltas->checkpoint("deleteInvalid");
 	

@@ -47,6 +47,7 @@ MetaBody::MetaBody() :
 	isDynamic=false;
 	dt=1e-8;
 	selectedBody=-1;
+	isPeriodic=false;
 	// FIXME: move MetaInteractingGeometry to core and create it here right away
 	// interactingGeometry=shared_ptr<InteractingGeometry>(new MetaInteractingGeometry);
 

@@ -146,13 +146,13 @@ class InteractionContainer : public Serializable
 
 			Returns number of interactions, have they been erased or not (this is useful to check if there were some erased, after traversing those)
 		*/
-		template<class T> int erasePending(const T& t){
+		template<class T> int erasePending(const T& t, MetaBody* rb){
 			int ret=0;
 			#ifdef YADE_OPENMP
 				// shadow the this->pendingErase by the local variable, to share the code
 				FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
 			#endif
-					FOREACH(const Vector2<body_id_t>& p, pendingErase){ ret++; if(t.shouldBeErased(p[0],p[1])) erase(p[0],p[1]); }
+					FOREACH(const Vector2<body_id_t>& p, pendingErase){ ret++; if(t.shouldBeErased(p[0],p[1],rb)) erase(p[0],p[1]); }
 					pendingErase.clear();
 			#ifdef YADE_OPENMP
 				}

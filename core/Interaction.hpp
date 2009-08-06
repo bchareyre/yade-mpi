@@ -38,6 +38,10 @@ class Interaction : public Serializable
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 
+		//! relative distance between bodies, given in (MetaBody::cellMax-MetaBody::cellMin) units
+		//! Position of id1 must be incremented by that distance so that there is spatial interaction 
+		Vector3<int> cellDist;
+
 		shared_ptr<InteractionGeometry> interactionGeometry;
 		shared_ptr<InteractionPhysics> interactionPhysics;
 
@@ -74,6 +78,7 @@ class Interaction : public Serializable
 		(iterMadeReal)
 		(interactionGeometry)
 		(interactionPhysics)
+		(cellDist)
 	);
 	REGISTER_CLASS_AND_BASE(Interaction,Serializable);
 };
