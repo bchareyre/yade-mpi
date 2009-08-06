@@ -20,7 +20,7 @@
 #include<yade/core/DeusExMachina.hpp>
 
 class PressTestEngine: public TranslationEngine{
-	/*
+	/**
 	 * This class simulates the simple press work
 	 * When the press "cracks" the solid brittle material,
 	 * it returns back to the initial position 
@@ -32,7 +32,17 @@ class PressTestEngine: public TranslationEngine{
 		Real currentVerticalForce, maxVerticalForce, minimalForce, predictedForce, minimalPredictedForce, riseUpPressHigher;
 		long int numberIterationAfterDestruction, currentIterationAfterDestruction;
 		int pressVelocityForw2Back;
-		PressTestEngine(): curentDirection(forward), currentVerticalForce(0), maxVerticalForce(0), currentIterationAfterDestruction(0), pressVelocityForw2Back(25), riseUpPressHigher(1){};
+		PressTestEngine(): 
+			curentDirection(forward), 
+			currentVerticalForce(0), 
+			maxVerticalForce(0), 
+			minimalForce(0), 
+			predictedForce(0), 
+			minimalPredictedForce(0),
+			riseUpPressHigher(1),
+			numberIterationAfterDestruction (0),
+			currentIterationAfterDestruction(0), 
+			pressVelocityForw2Back(25) {};
 		virtual ~PressTestEngine(){};
 		virtual void applyCondition(MetaBody*);
 	REGISTER_CLASS_AND_BASE(PressTestEngine,TranslationEngine);

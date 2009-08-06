@@ -14,7 +14,7 @@
 *    You should have received a copy of the GNU General Public License   *
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>*
 **************************************************************************/
-/*
+/**
 
 === HIGH LEVEL OVERVIEW OF RockPM ===
 
@@ -43,14 +43,20 @@ class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
-/* This class holds information associated with each body */
+/** This class holds information associated with each body */
 class RpmMat: public BodyMacroParameters {
 	public:
-		int exampleNumber; //Number of "stone"
+		int exampleNumber; ///<Number of "stone"
 		bool initCohesive, isDamaged;
-		Real stressCompressMax, Brittleness, G_over_E; //Parameters for damaging
+		Real stressCompressMax, Brittleness, G_over_E; ///<Parameters for damaging
 		
-		RpmMat(): exampleNumber(0.), initCohesive(false), isDamaged(false), stressCompressMax(0), Brittleness(0), G_over_E(1) {createIndex();};
+		RpmMat(): 
+			exampleNumber(0.), 
+			initCohesive(false), 
+			isDamaged(false), 
+			stressCompressMax(0), 
+			Brittleness(0), 
+			G_over_E(1) {createIndex();};
 		REGISTER_ATTRIBUTES(BodyMacroParameters, 
 			(exampleNumber)
 			(initCohesive)
@@ -94,7 +100,14 @@ class RpmPhys: public NormalShearInteraction {
 
 		bool isCohesive;
 
-		RpmPhys(): NormalShearInteraction(),crossSection(0),E(0),G(0), tanFrictionAngle(0), lengthMaxCompression(0), lengthMaxTension(0), isCohesive(false) { createIndex(); epsT=Vector3r::ZERO; omega=0; Fn=0; Fs=Vector3r::ZERO;}
+		RpmPhys(): NormalShearInteraction(),
+			crossSection(0),
+			E(0),
+			G(0), 
+			tanFrictionAngle(0), 
+			lengthMaxCompression(0), 
+			lengthMaxTension(0), 
+			isCohesive(false) { createIndex(); epsT=Vector3r::ZERO; omega=0; Fn=0; Fs=Vector3r::ZERO;}
 		virtual ~RpmPhys();
 
 		REGISTER_ATTRIBUTES(NormalShearInteraction,

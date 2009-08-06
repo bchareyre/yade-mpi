@@ -57,13 +57,13 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 	const shared_ptr<RpmMat>& rbp1=YADE_PTR_CAST<RpmMat>(body1->physicalParameters);
 	const shared_ptr<RpmMat>& rbp2=YADE_PTR_CAST<RpmMat>(body2->physicalParameters);
 	
-	//check, whether one of bodies is damaged
+	///check, whether one of bodies is damaged
 	if ((rbp1->isDamaged) || (rbp2->isDamaged)) {
 		phys->isCohesive = false;
 	}
 
 	if(displN<=0){
-		/*Normal Interaction*/
+		/**Normal Interaction*/
 		epsN=geom->strainN();
 		epsT=geom->strainT();
 		
@@ -73,7 +73,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		
 		sigmaT=G*epsT;
 
-		/*Check, whether the shear stress more, than normal force multiplicated to tanFrictionAngle*/
+		/**Check, whether the shear stress more, than normal force multiplicated to tanFrictionAngle*/
 		
 		Real maxFsSq = phys->normalForce.SquaredLength()*phys->tanFrictionAngle*phys->tanFrictionAngle;
 		if(sigmaT.SquaredLength()>maxFsSq) {
@@ -84,7 +84,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		phys->shearForce = Fs;
 
 		applyForceAtContactPoint(phys->normalForce + phys->shearForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
-		/*Normal Interaction_____*/
+		/**Normal Interaction_____*/
 		if ((phys->isCohesive)&&(displN<(-phys->lengthMaxCompression))) {
 			//LOG_WARN(displN<<"__COMRESS!!!__");
 			phys->isCohesive = false;
