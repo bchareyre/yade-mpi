@@ -43,7 +43,9 @@ class PeriodicInsertionSortCollider: public Collider{
 	void insertionSort(VecBounds& v,InteractionContainer*,MetaBody*,bool doCollide=true);
 	void handleBoundInversion(body_id_t,body_id_t,InteractionContainer*,MetaBody*);
 	bool spatialOverlap(body_id_t,body_id_t, MetaBody*, Vector3<int>&) const;
-	static Real cellWrap(Real,Real,Real,long&);
+	static Real cellWrap(const Real, const Real, const Real, int&);
+	static Real cellWrapRel(const Real, const Real, const Real);
+
 
 	public:
 	//! axis for the initial sort

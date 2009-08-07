@@ -66,6 +66,7 @@ class GLViewer : public QGLViewer
 		virtual void draw();
 		virtual void drawWithNames();
 		void centerScene();
+		void centerPeriodic();
 		void mouseMovesCamera();
 		void mouseMovesManipulatedFrame(qglviewer::Constraint* c=NULL);
 		void resetManipulation();

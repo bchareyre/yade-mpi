@@ -10,15 +10,15 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	GravityEngine(gravity=[0,0,-10]),
-	NewtonsDampedLaw(damping=.1)
+	TranslationEngine(translationAxis=(1,0,0),velocity=10,subscribedBodies=[0]),
+	NewtonsDampedLaw(damping=.4)
 ]
-O.bodies.append(utils.sphere([0,0,2],1,dynamic=False,density=1000))
-O.bodies.append(utils.sphere([0,0,3],1,density=1000))
+O.bodies.append(utils.sphere([-4,0,11],2,dynamic=False,density=1000))
+O.bodies.append(utils.sphere([0,-1,5.5],2,density=1000))
+O.bodies.append(utils.sphere([0,2,5.5],2,density=2000))
 O.periodicCell=((-5,-5,0),(5,5,10))
-O.dt=utils.PWaveTimeStep()
+O.dt=.1*utils.PWaveTimeStep()
 O.saveTmp()
 from yade import qt
 qt.Controller()
 qt.View()
-O.run(17)
-

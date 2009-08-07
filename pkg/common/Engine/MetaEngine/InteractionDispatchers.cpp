@@ -34,6 +34,7 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;
 	}
+	Vector3r cellSize; if(rootBody->isPeriodic) cellSize=rootBody->cellMax-rootBody->cellMin;
 	#ifdef YADE_OPENMP
 		const long size=rootBody->interactions->size();
 		#pragma omp parallel for schedule(guided)
@@ -72,7 +73,12 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 
 			assert(I->functorCache.geom);
 			bool wasReal=I->isReal();
-			bool geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3, b2->physicalParameters->se3,I);
+			bool geomCreated;
+			if(!rootBody->isPeriodic) geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3, b2->physicalParameters->se3,I);
+			else{ // handle periodicity
+				Se3r se32=b2->physicalParameters->se3; se32.position+=Vector3r(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
+				geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3,se32,I);
+			}
 			if(!geomCreated){
 				if(wasReal) rootBody->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
 				continue; // in any case don't care about this one anymore

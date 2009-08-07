@@ -230,7 +230,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 				*/
 				// TRVAR3(i,iid,V[i].coord);
 				// go up until we meet the upper bound
-				for(size_t j=i+1; V[j].id!=iid && /* handle case 2. of swapped min/max */ j<2*nBodies; j++){
+				for(size_t j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
 					const body_id_t& jid=V[j].id;
 					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
 					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes

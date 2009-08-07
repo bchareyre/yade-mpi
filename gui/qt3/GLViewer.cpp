@@ -323,6 +323,18 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 	else if(e->key()!=Qt::Key_Escape && e->key()!=Qt::Key_Space) QGLViewer::keyPressEvent(e);
 	updateGL();
 }
+/* Center the scene such that periodic cell is contained in the view */
+void GLViewer::centerPeriodic(){
+	MetaBody* rb=Omega::instance().getRootBody().get();
+	assert(rb->isPeriodic);
+	Vector3r center=.5*(rb->cellMin+rb->cellMax);
+	Vector3r halfSize=.5*(rb->cellMax-rb->cellMin);
+	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2]));
+	LOG_DEBUG("Periodic scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
+	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
+	setSceneRadius(radius*1.5);
+	showEntireScene();
+}
 
 /* Calculate medians for x, y and z coordinates of all bodies;
  *then set scene center to median position and scene radius to 2*inter-quartile distance.
@@ -332,6 +344,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
  * "central" (where most bodies is) part very small or even invisible.
  */
 void GLViewer::centerMedianQuartile(){
+	if(Omega::instance().getRootBody()->isPeriodic){ centerPeriodic(); return; }
 	long nBodies=Omega::instance().getRootBody()->bodies->size();
 	if(nBodies<4) {
 		LOG_INFO("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
@@ -357,6 +370,7 @@ void GLViewer::centerMedianQuartile(){
 void GLViewer::centerScene(){
 	MetaBody* rb=Omega::instance().getRootBody().get();
 	if (!rb) return;
+	if(rb->isPeriodic){ centerPeriodic(); return; }
 
 	if(rb->bodies->size()<renderer->selectBodyLimit){LOG_INFO("Less than "+lexical_cast<string>(renderer->selectBodyLimit)+" bodies, moving possible. Select with shift, press 'm' to move.");}
 	else{LOG_INFO("More than "+lexical_cast<string>(renderer->selectBodyLimit)+" (OpenGLRenderingEngine::selectBodyLimit) bodies. Moving not possible.");}

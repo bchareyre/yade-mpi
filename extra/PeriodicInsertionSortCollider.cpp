@@ -18,34 +18,33 @@ using namespace std;
 YADE_PLUGIN((PeriodicInsertionSortCollider))
 CREATE_LOGGER(PeriodicInsertionSortCollider);
 
-Real PeriodicInsertionSortCollider::cellWrap(const Real x, const Real x0, const Real x1, long& period){
+Real PeriodicInsertionSortCollider::cellWrap(const Real x, const Real x0, const Real x1, int& period){
 	Real xNorm=(x-x0)/(x1-x0);
-	period=(long)floor(xNorm); // FIXME: some people say this is very slow
+	period=(int)floor(xNorm); // FIXME: some people say this is very slow
 	return x0+(xNorm-period)*(x1-x0);
+}
+
+Real PeriodicInsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real x1){
+	Real xNorm=(x-x0)/(x1-x0);
+	return (xNorm-floor(xNorm))*(x1-x0);
 }
 
 
 // return true if bodies bb overlap in all 3 dimensions
 bool PeriodicInsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2,MetaBody* rb, Vector3<int>& periods) const {
-	assert(id1!=id2) // programming error, or weird bodies (too large?)
+	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){
 		Real dim=rb->cellMax[axis]-rb->cellMin[axis];
-		// wrap all 4 numbers to the period starting and the most minimal number
-		#if 0
-			Real mn=min(minima[3*id1+axis],minima[3*id2+axis])-0.001*dim; // avoid rounding issues
-			Real mx=max(maxima[3*id1+axis],maxima[3*id2+axis]);
-			TRVAR2(mn,mx);
-		#endif
 		// too big bodies in interaction
 		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
 		// different way: find body of which when taken as period start will make the gap smaller
-		long p;
-		Real mn1w=cellWrap(minima[3*id1+axis],0,dim,p), mn2w=cellWrap(minima[3*id2+axis],0,dim,p);
-		Real wMn=(abs(mn2w-mn1w)<dim/2 ? mn1w : mn2w) -/*avoid rounding issues*/1e-4*dim; /* selected wrap base */
+		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
+		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
 		//TRVAR3(id1,id2,axis);
 		//TRVAR4(minima[3*id1+axis],maxima[3*id1+axis],minima[3*id2+axis],maxima[3*id2+axis]);
-		//TRVAR3(mn1w,mn2w,wMn);
-		long pmn1,pmx1,pmn2,pmx2;
+		//TRVAR2(cellWrapRel(m1,m2,m2+dim),cellWrapRel(m2,m1,m1+dim));
+		//TRVAR3(m1,m2,wMn);
+		int pmn1,pmx1,pmn2,pmx2;
 		Real mn1=cellWrap(minima[3*id1+axis],wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
 		Real mn2=cellWrap(minima[3*id2+axis],wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
 		//TRVAR4(mn1,mx1,mn2,mx2);
@@ -93,16 +92,17 @@ void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionConta
 			long i_1=v.norm(i-1), loIdx_1=v.norm(loIdx-1);
 			// fast test, if the first pair is inverted
 			if(v[i].coord<v[i_1].coord-(i_1==loIdx_1 ? v.cellDim : 0) ){
-				// v.dump(cerr);
+				//v.dump(cerr);
+				if(i==loIdx && v[i].coord<v.cellMin){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 				hadInversion=true; Bound vi=v[i]; int j; const bool viBB=vi.flags.hasBB;
 				for(j=i_1; vi.coord<v[j].coord-(j==v.norm(loIdx-1) ? v.cellDim : 0); j=v.norm(j-1)) {
 					//{ Bound vj1=v[v.norm(j+1)]; v[v.norm(j+1)]=vi;
 					//v[v.norm(j+1)]=vj1; }
-					long j1=v.norm(j+1); // j2=v.norm(j+2);
-					//LOG_TRACE("Inversion of i="<<i<<"(#"<<vi.id<<" @ "<<vi.coord<<") j="<<j<<"(#"<<v[j].id<<" @ "<<v[j].coord<<"); j1="<<j1<<", j2="<<j2); v.dump(cerr);
+					long j1=v.norm(j+1);
+					//LOG_TRACE("Inversion of i="<<i<<"(#"<<vi.id<<" @ "<<vi.coord<<") j="<<j<<"(#"<<v[j].id<<" @ "<<v[j].coord<<"); j1="<<j1); v.dump(cerr);
 					v[j1]=v[j];
 					//if(v[j1].coord>v.cellMax && j2==loIdx){ v[j1].period+=1; v[j1].coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
-					if(j1==loIdx) { assert(v[j1].coord>v.cellMax); v[j1].period+=1; v[j1].coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
+					if(j1==loIdx) { assert(v[j1].coord>=v.cellMax); v[j1].period+=1; v[j1].coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
 					else if (vi.coord<v.cellMin && j==loIdx){ vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 					if(doCollide && viBB && v[j].flags.hasBB) handleBoundInversion(vi.id,v[j].id,interactions,rb);
 					//v.dump(cerr);
@@ -163,6 +163,13 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 			XX[i].coord=((XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (Body::byId(idXX,rb)->physicalParameters->se3.position[0])) - XX.cellDim*XX[i].period;
 			YY[i].coord=((YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (Body::byId(idYY,rb)->physicalParameters->se3.position[1])) - YY.cellDim*YY[i].period;
 			ZZ[i].coord=((ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (Body::byId(idZZ,rb)->physicalParameters->se3.position[2])) - ZZ.cellDim*ZZ[i].period;
+			// PERI: at the initial step, fix periods of bodies
+			// doInitSort is also called when bodies are just added; changing the period should not have influence here, though.
+			if(doInitSort){
+				if(XX[i].coord<XX.cellMin || XX[i].coord>=XX.cellMax) XX[i].coord=cellWrap(XX[i].coord,XX.cellMin,XX.cellMax,XX[i].period);
+				if(YY[i].coord<XX.cellMin || YY[i].coord>=YY.cellMax) YY[i].coord=cellWrap(YY[i].coord,YY.cellMin,YY.cellMax,YY[i].period);
+				if(ZZ[i].coord<ZZ.cellMin || ZZ[i].coord>=ZZ.cellMax) ZZ[i].coord=cellWrap(ZZ[i].coord,ZZ.cellMin,ZZ.cellMax,ZZ[i].period);
+			}
 			// and for each body, copy its minima and maxima arrays as well
 			if(XX[i].flags.isMin){
 				BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
@@ -171,15 +178,15 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 				}  
 				else{ const Vector3r& pos=Body::byId(idXX,rb)->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
 				// PERI: add periods, but such that both minimum and maximum is within the cell!
-				Vector3r period(XX[i].period*XX.cellDim,YY[i].period*YY.cellDim,ZZ[i].period*ZZ.cellDim);
-				*(Vector3r*)(&minima[3*idXX])+=period; *(Vector3r*)(&maxima[3*idXX])+=period; //ugh
+				//Vector3r period(XX[i].period*XX.cellDim,YY[i].period*YY.cellDim,ZZ[i].period*ZZ.cellDim);
+				//*(Vector3r*)(&minima[3*idXX])+=period; *(Vector3r*)(&maxima[3*idXX])+=period; //ugh
 			}
 		}
 
 	// process interactions that the constitutive law asked to be erased
 		interactions->erasePending(*this,rb);
-	LOG_DEBUG("Step "<<Omega::instance().getCurrentIteration());
-	ZZ.dump(cerr);
+	//LOG_TRACE("Step "<<Omega::instance().getCurrentIteration());
+	//ZZ.dump(cerr);
 	// XX.dump(cerr); YY.dump(cerr); ZZ.dump(cerr);
 
 	// sort
@@ -188,13 +195,10 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 			insertionSort(XX,interactions,rb); insertionSort(YY,interactions,rb); insertionSort(ZZ,interactions,rb);
 		}
 		else {
-			if(doInitSort){
-				// the initial sort is in independent in 3 dimensions, may be run in parallel
-				// it seems that there is no time gain running this in parallel, though
-				 std::sort(XX.vec.begin(),XX.vec.end()); std::sort(YY.vec.begin(),YY.vec.end()); std::sort(ZZ.vec.begin(),ZZ.vec.end());
-			} else { // sortThenCollide
-				insertionSort(XX,interactions,rb,false); insertionSort(YY,interactions,rb,false); insertionSort(ZZ,interactions,rb,false);
-			}
+			// the initial sort is in independent in 3 dimensions, may be run in parallel
+			// it seems that there is no time gain running this in parallel, though
+			 std::sort(XX.vec.begin(),XX.vec.end()); std::sort(YY.vec.begin(),YY.vec.end()); std::sort(ZZ.vec.begin(),ZZ.vec.end());
+
 			// traverse the container along requested axis
 			assert(sortAxis==0 || sortAxis==1 || sortAxis==2);
 			VecBounds& V=(sortAxis==0?XX:(sortAxis==1?YY:ZZ));
@@ -219,7 +223,7 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 				*/
 				// TRVAR3(i,iid,V[i].coord);
 				// go up until we meet the upper bound
-				for(size_t j=i+1; V[j].id!=iid && /* handle case 2. of swapped min/max */ j<2*(size_t)nBodies; j++){
+				for(size_t j=i+1; /* handle case 2. of swapped min/max */ j<2*(size_t)nBodies && V[j].id!=iid; j++){
 					const body_id_t& jid=V[j].id;
 					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
 					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes

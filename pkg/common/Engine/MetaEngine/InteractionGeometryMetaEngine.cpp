@@ -51,6 +51,7 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 	}
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	Vector3r cellSize; if(ncb->isPeriodic) cellSize=ncb->cellMax-ncb->cellMin;
 	#ifdef YADE_OPENMP
 		const long size=ncb->transientInteractions->size();
 		#pragma omp parallel for
@@ -63,7 +64,13 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 			const shared_ptr<Body>& b2=(*bodies)[I->getId2()];
 			bool wasReal=I->isReal();
 			if (!b1->interactingGeometry || !b2->interactingGeometry) { assert(!wasReal); continue; } // some bodies do not have interactingGeometry
-			bool geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, I);
+			bool geomCreated;
+			if(!ncb->isPeriodic){
+				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, I);
+			} else{
+				Se3r se32=b2->physicalParameters->se3; se32.position+=Vector3r(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
+				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, se32, I);
+			}
 			// reset && erase interaction that existed but now has no geometry anymore
 			if(wasReal && !geomCreated){ ncb->interactions->requestErase(I->getId1(),I->getId2()); }
 	}

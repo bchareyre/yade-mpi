@@ -39,6 +39,13 @@ class OpenGLRenderingEngine : public RenderingEngine
 		Real normSaw(Real t, Real period){ Real xi=(t-period*((int)(t/period)))/period; /* normalized value, (0-1〉 */ return (xi<.5?2*xi:2-2*xi); }
 		Real normSquare(Real t, Real period){ Real xi=(t-period*((int)(t/period)))/period; /* normalized value, (0-1〉 */ return (xi<.5?0:1); }
 
+		//! wrap number to interval x0…x1
+		Real wrapCell(const Real x, const Real x0, const Real x1);
+		//! wrap point to inside MetaBody's cell (identity if !MetaBody::isPeriodic)
+		Vector3r wrapCellPt(const Vector3r& pt, MetaBody* rb);
+		void drawPeriodicCell(MetaBody*);
+
+
 	private :
 		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
 		DynLibDispatcher< InteractionPhysics  , GLDrawInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;

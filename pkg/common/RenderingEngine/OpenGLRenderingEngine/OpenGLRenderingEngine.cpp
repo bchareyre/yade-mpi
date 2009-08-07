@@ -109,16 +109,28 @@ void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody
 	numBodiesWhenRefSe3LastSet=rootBody->bodies->size();
 	numIterWhenRefSe3LastSet=Omega::instance().getCurrentIteration();
 }
+/* mostly copied from PeriodicInsertionSortCollider
+ 	FIXME: common implementation somewhere */
+
+Real OpenGLRenderingEngine::wrapCell(const Real x, const Real x0, const Real x1){
+	Real xNorm=(x-x0)/(x1-x0);
+	return x0+(xNorm-floor(xNorm))*(x1-x0);
+}
+Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, MetaBody* rb){
+	if(!rb->isPeriodic) return pt;
+	return Vector3r(wrapCell(pt[0],rb->cellMin[0],rb->cellMax[0]),wrapCell(pt[1],rb->cellMin[1],rb->cellMax[1]),wrapCell(pt[2],rb->cellMin[2],rb->cellMax[2]));
+}
 
 void OpenGLRenderingEngine::setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b->physicalParameters) continue;
 		const Se3r& se3=b->physicalParameters->se3; const Se3r& refSe3=b->physicalParameters->refSe3; Se3r& dispSe3=b->physicalParameters->dispSe3;
-		b->physicalParameters->isDisplayed=!pointClipped(se3.position);
+		Vector3r posCell=wrapCellPt(se3.position,rootBody.get());
+		b->physicalParameters->isDisplayed=!pointClipped(posCell);
 		// if no scaling, return quickly
-		if(!(scaleDisplacements||scaleRotations)){ b->physicalParameters->dispSe3=b->physicalParameters->se3; continue; }
+		if(!(scaleDisplacements||scaleRotations||rootBody->isPeriodic)){ b->physicalParameters->dispSe3=b->physicalParameters->se3; continue; }
 		// apply scaling
-		dispSe3.position=(scaleDisplacements ? diagMult(displacementScale,se3.position-refSe3.position)+refSe3.position : se3.position );
+		dispSe3.position=(scaleDisplacements ? diagMult(displacementScale,se3.position-refSe3.position)+wrapCellPt(refSe3.position,rootBody.get()) : posCell );
 		if(scaleRotations){
 			Quaternionr relRot=refSe3.orientation.Conjugate()*se3.orientation;
 			Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle);
@@ -127,6 +139,18 @@ void OpenGLRenderingEngine::setBodiesDispSe3(const shared_ptr<MetaBody>& rootBod
 		} else {dispSe3.orientation=se3.orientation;}
 	}
 }
+// draw periodic cell, if active
+void OpenGLRenderingEngine::drawPeriodicCell(MetaBody* rootBody){
+	if(!rootBody->isPeriodic) return;
+	glPushMatrix();
+		glColor3v(Vector3r(1,1,0));
+		Vector3r cent=.5*(rootBody->cellMin+rootBody->cellMax); Vector3r size=rootBody->cellMax-rootBody->cellMin;
+		glTranslate(cent[0],cent[1],cent[2]); glScale(size[0],size[1],size[2]);
+		glutWireCube(1);
+	glPopMatrix();
+}
+
+
 
 void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id_t selection	/*FIXME: not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
@@ -166,6 +190,8 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 	
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
 	setBodiesDispSe3(rootBody);
+
+	drawPeriodicCell(rootBody.get());
 
 	if (Show_DOF || Show_ID) renderDOF_ID(rootBody);
 	if (Body_geometrical_model){
@@ -401,49 +427,78 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){
 	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
 }
 
-void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){	
+void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
-	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
-		FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
-			if(b->geometricalModel && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
-				if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
-				const Se3r& se3=b->physicalParameters->dispSe3;
-				glPushMatrix();
-				Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
-				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-				if(current_selection==b->getId() || b->geometricalModel->highlight){
-					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-					const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
-					glColor4(h[0],h[1],h[2],.2);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
+	if(!Draw_inside) return;
+	FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
+		if(!b->geometricalModel || (!((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0))) continue;
+		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
+		const Se3r& se3=b->physicalParameters->dispSe3;
+		glPushMatrix();
+		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
+		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+		if(current_selection==b->getId() || b->geometricalModel->highlight){
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
+			glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+			const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
+			glColor4(h[0],h[1],h[2],.2);
+			glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 
-					geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
+			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
 
-					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-					glColor3v(Vector3r::ZERO);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-				} else {
-					geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
-				}
-				glPopMatrix();
-				if(current_selection==b->getId() || b->geometricalModel->highlight){
-					if(!b->boundingVolume || Body_wire || b->geometricalModel->wire) GLUtils::GLDrawInt(b->getId(),se3.position);
-					else {
-						// move the label towards the camera by the bounding box so that it is not hidden inside the body
-						const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=se3.position;
-						Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
-						Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
-						GLUtils::GLDrawInt(b->getId(),se3.position+dr,Vector3r::ONE);
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
+			glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+			glColor3v(Vector3r::ZERO);
+			glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+		} else {
+			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
+		}
+		glPopMatrix();
+		if(current_selection==b->getId() || b->geometricalModel->highlight){
+			if(!b->boundingVolume || Body_wire || b->geometricalModel->wire) GLUtils::GLDrawInt(b->getId(),se3.position);
+			else {
+				// move the label towards the camera by the bounding box so that it is not hidden inside the body
+				const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=se3.position;
+				Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
+				Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
+				GLUtils::GLDrawInt(b->getId(),se3.position+dr,Vector3r::ONE);
+			}
+		}
+		// if the body goes over the cell margin, draw it in all other positions with wire
+		if(b->boundingVolume && rootBody->isPeriodic){
+			const Vector3r& cellMin(rootBody->cellMin); const Vector3r& cellMax(rootBody->cellMax); Vector3r cellSize=cellMax-cellMin;
+			Vector3<int> bodyPer,minPer,maxPer;
+			for(int i=0; i<3; i++){
+				bodyPer[i]=(int)floor((b->physicalParameters->se3.position[i]-cellMin[i])/cellSize[i]);
+				minPer[i]=(int)floor((b->boundingVolume->min[i]-cellMin[i])/cellSize[i]);
+				maxPer[i]=(int)floor((b->boundingVolume->max[i]-cellMin[i])/cellSize[i]);
+				//assert(bodyPer[i]<=maxPer[i]); assert(bodyPer[i]>=minPer[i]);
+			}
+			/* m is bitmask from 3 couples (0…64=2^6) */
+			for(int m=0; m<64; m++){
+				// any mask containing 00 couple is invalid
+				if((!(m&1) && (!(m&2))) || (!(m&4) && (!(m&8))) || (!(m&16) && (!(m&32)))) continue;
+				Vector3r pt(se3.position);
+				bool isInside=false;
+				for(int j=0; j<3; j++){
+					if(m&(1<<(2*j))) {
+						if(m&(1<<(2*j+1))) { if(bodyPer[j]>=maxPer[j]) {isInside=true; break; } pt[j]-=cellSize[j]; }
+						else { if(bodyPer[j]<=minPer[j]){ isInside=true; break; } pt[j]+=cellSize[j]; }
 					}
 				}
+				if(isInside) continue;
+				if(pt==se3.position) continue; // shouldn't happen, but it happens :-(
+				glPushMatrix();
+					glTranslatev(pt);
+					glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+					geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,/*Body_wire*/ true);
+				glPopMatrix();
 			}
 		}
 	}
-	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
 }
 
 
@@ -509,10 +564,10 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		const Se3r& se3=b->physicalParameters->dispSe3;
 		if(b->interactingGeometry && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
 			glPushMatrix();
-			Real angle;	Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
-			glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			interactingGeometryDispatcher(b->interactingGeometry,b->physicalParameters,Body_wire);
+				Real angle;	Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
+				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+				interactingGeometryDispatcher(b->interactingGeometry,b->physicalParameters,Body_wire);
 			glPopMatrix();
 		}
 	}
