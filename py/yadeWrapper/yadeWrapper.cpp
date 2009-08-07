@@ -232,6 +232,8 @@ class pyBexContainer{
 		void rot_add(long id, const Vector3r& t){    rb->bex.addRot(id,t);}
 };
 
+void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
+
 class pyOmega{
 	private:
 		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
@@ -456,10 +458,15 @@ class pyOmega{
 		if(OMEGA.getRootBody()->isPeriodic){ return python::make_tuple(OMEGA.getRootBody()->cellMin,OMEGA.getRootBody()->cellMax); }
 		return python::make_tuple();
 	}
+	void exitNoBacktrace(int status=0){
+		signal(SIGSEGV,termHandler); /* unset the handler that runs gdb and prints backtrace */
+		exit(status);
+	}
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_loadTmp_overloads,loadTmp,0,1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_exitNoBacktrace_overloads,exitNoBacktrace,0,1);
 
 class pySTLImporter : public STLImporter {
     public:
@@ -636,7 +643,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
-		.add_property("periodicCell",&pyOmega::periodicCell_get,&pyOmega::periodicCell_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.");
+		.add_property("periodicCell",&pyOmega::periodicCell_get,&pyOmega::periodicCell_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.")
+		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads(python::args("status"),"Disable our SEGV handler and exit."))
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
 		#endif

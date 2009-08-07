@@ -14,6 +14,7 @@ from yade._customConverters import *
 from yade import runtime
 from yade import utils
 __builtins__.O=Omega()
+sys.exit=O.exitNoBacktrace
 
 ### direct object creation through automatic wrapper functions
 def listChildClassesRecursive(base):

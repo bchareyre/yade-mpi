@@ -4,6 +4,74 @@
 #include<yade/core/Collider.hpp>
 class InteractionContainer;
 
+/*! Collider with periodic boundary conditions.
+
+This colider is based on the code of InsertionSortCollider and it should be,
+at some point, integrated back into its code (given that the performance impact
+is negligible, which I think might be true).
+
+Use
+===
+* scripts/test/periodic-simple.py
+* In the future, triaxial compression working by growing/shrinking the cell should be implemented.
+
+Architecture
+============
+Bounding boxes carry information about period in which they are. Their container (VecBounds)
+holds position of where the space wraps. The sorting algorithm is changed in such way that
+periods are changed when body crosses cell boundary.
+
+Interaction::cellDist holds information about relative cell coordinates of the 2nd body
+relative to the 1st one. Dispatchers (InteractionGeometryMetaEngine and InteractionDispatchers)
+use this information to pass modified position of the 2nd body to InteractionGeometryEngineUnits.
+Since properly behaving InteractionGeometryEngineUnit's and ConstitutiveLaw's do not take positions
+directly from Body::physicalParameters, the interaction is computed with the periodic positions.
+
+Positions of bodies (in the sense of Body::physicalParameters) are not wrapped to the periodic cell,
+they can be anywhere (but not "too far" in the sense of int overflow).
+
+Since Interaction::cellDists holds cell coordinates, it is possible to change the cell boundaries
+at runtime. This should make it easy to implement some stress control on the top.
+
+Clumps do not interfere with periodicity in any way.
+
+Rendering
+---------
+OpenGLRenderingEngine renders GeometricalModel at all periodic positions that touch the
+periodic cell (i.e. BoundingVolume crosses its boundary).
+
+Periodicity control
+===================
+c++:
+	MetaBody::isPeriodic, MetaBody::cellMin, MetaBody::cellMax
+python:
+	O.periodicCell=((0,0,0),(10,10,10)  # activates periodic boundary
+	O.periodicCell=() # deactivates periodic boundary
+
+Requirements
+============
+* No body can have AABB larger than about .499*cellSize. This is currently not checked, only asserted.
+* Constitutive law must not get body positions from Body::physicalParameters.
+	If it does, it uses Interaction::cellDist to compute periodic position.
+	Dem3Dof family of Ig2 functors and Law2_* engines are known to behave well.
+* No body can get further away than MAXINT periods. It will do horrible things if there is overflow.
+
+Possible performance improvements & bugs
+========================================
+This collider was not at all tuned to give decent performance (yet?)
+
+* We don't enforce that bounding boxes are inside the cell; that means that every 
+	spatialOverlap call has to wrap values, and that is probably quite slow.
+* PeriodicInsertionSortCollider::{cellWrap,cellWrapRel} OpenGLRenderingEngine::{wrapCell,wrapCellPt} Shop::PeriodicWrap
+	are all very similar functions. They should be put into separate header and included from all those places.
+* The aforementioned functions might not be the fastest implementations. In particular, I heard that (int) is
+	rather low-performance for making conversion of floating-point to integer.
+* Until this code is integrated with plain InsertionSortCollider, it will not support striding via VelocityBins
+	Those 2 features are orthogonal, the integration shouldn't be diffucult.
+
+
+*/
+
 class PeriodicInsertionSortCollider: public Collider{
 	//! struct for storing bounds of bodies
 	struct Bound{
