@@ -396,6 +396,7 @@ void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop:
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
+Vector3r Shop__totalForceInVolume(){return Shop::totalForceInVolume();}
 
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
@@ -419,6 +420,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("sumBexTorques",sumBexTorques);
 	def("forcesOnPlane",forcesOnPlane);
 	def("forcesOnCoordPlane",forcesOnCoordPlane);
+	def("totalForceInVolume",Shop__totalForceInVolume);
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);

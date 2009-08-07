@@ -94,6 +94,7 @@ class Shop{
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, MetaBody* _rb=NULL);
 		static Real kineticEnergy(MetaBody* _rb=NULL);
+		static Vector3r totalForceInVolume(MetaBody *_rb=NULL);
 
 		//! create transientInteraction between 2 bodies, using existing MetaEngine in Omega
 		static shared_ptr<Interaction> createExplicitInteraction(body_id_t id1, body_id_t id2);

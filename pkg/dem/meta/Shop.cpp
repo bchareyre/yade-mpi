@@ -60,6 +60,11 @@ class MetaInteractingGeometry2AABB; */
 
 #include<yade/pkg-dem/Tetra.hpp>
 
+#include<boost/foreach.hpp>
+#ifndef FOREACH
+	#define FOREACH BOOST_FOREACH
+#endif
+
 
 #define _SPEC_CAST(orig,cast) template<> void Shop::setDefault<orig>(string key, orig val){setDefault(key,cast(val));}
 _SPEC_CAST(const char*,string);
@@ -79,6 +84,24 @@ void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contP
 	rootBody->bex.addTorque(id2,-(contPt-pos2).Cross(force));
 }
 
+
+/*! Compute sum of forces in the whole simulation.
+
+Designed for being used with periodic cell, where diving the resulting components by
+areas of the cell will give average stress in that direction.
+
+Requires all .isReal() interaction to have interactionPhysics deriving from NormalShearInteraction.
+*/
+Vector3r Shop::totalForceInVolume(MetaBody* _rb){
+	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
+	Vector3r ret(Vector3r::ZERO);
+	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
+		if(!I->isReal()) continue;
+		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
+		ret+=Vector3r(abs(nsi->normalForce[0]+nsi->shearForce[0]),abs(nsi->normalForce[1]+nsi->shearForce[1]),abs(nsi->normalForce[2]+nsi->shearForce[2]));
+	}
+	return ret;
+}
 
 Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
