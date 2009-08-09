@@ -153,7 +153,9 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
 	Vector3r normal=se32.position-se31.position;
 	Real penetrationDepthSq=pow(distanceFactor*(s1->radius+s2->radius),2)-normal.SquaredLength();
-	if (penetrationDepthSq<0 && !c->isReal()) return false;
+	if (penetrationDepthSq<0 && !c->isReal()){
+		return false;
+	}
 
 	Real dist=normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */
 	shared_ptr<Dem3DofGeom_SphereSphere> ss;

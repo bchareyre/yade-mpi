@@ -292,7 +292,7 @@ void SimulationController::cbSyncToggled(bool b)
 void SimulationController::timerEvent( QTimerEvent* )
 {
 	doUpdate(); /* update the controller, like iteration number etc */
-	if(hasSimulation && (Omega::instance().isRunning() || syncRunning || lastRenderedIteration!=Omega::instance().getCurrentIteration()))
+	if(hasSimulation) // && (Omega::instance().isRunning() || syncRunning || lastRenderedIteration!=Omega::instance().getCurrentIteration()))
 	{
 		/* update GLViews */
 		YadeQtMainWindow::self->redrawAll(true);

@@ -12,8 +12,8 @@
 
 #include<yade/core/MetaBody.hpp>
 
-Interaction::Interaction(): id1(0), id2(0){ init(); }
-Interaction::Interaction(body_id_t newId1,body_id_t newId2): id1(newId1), id2(newId2){ reset(); }
+Interaction::Interaction(): id1(0), id2(0), cellDist(Vector3<int>(0,0,0)) { init(); }
+Interaction::Interaction(body_id_t newId1,body_id_t newId2): id1(newId1), id2(newId2), cellDist(Vector3<int>(0,0,0)){ reset(); }
 
 bool Interaction::isFresh(MetaBody* rb){ return iterMadeReal==rb->currentIteration;}
 
@@ -21,7 +21,6 @@ void Interaction::init(){
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
 	iterMadeReal=-1;
 	functorCache.geomExists=true;
-	cellDist=Vector3<int>(0,0,0);
 	//functorCache.geom=shared_ptr<InteractionGeometryEngineUnit>(); functorCache.phys=shared_ptr<InteractionPhysicsEngineUnit>(); functorCache.constLaw=shared_ptr<ConstitutiveLaw>();
 }
 

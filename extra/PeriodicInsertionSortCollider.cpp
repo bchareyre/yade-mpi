@@ -12,48 +12,77 @@
 #include<algorithm>
 #include<vector>
 #include<boost/static_assert.hpp>
+#include<stdexcept>
 
 using namespace std;
 
 YADE_PLUGIN((PeriodicInsertionSortCollider))
 CREATE_LOGGER(PeriodicInsertionSortCollider);
 
+// return floating value wrapped between x0 and x1 and saving period number to period
 Real PeriodicInsertionSortCollider::cellWrap(const Real x, const Real x0, const Real x1, int& period){
 	Real xNorm=(x-x0)/(x1-x0);
-	period=(int)floor(xNorm); // FIXME: some people say this is very slow
+	period=(int)floor(xNorm); // some people say this is very slow; probably optimized by gcc, however (google suggests)
 	return x0+(xNorm-period)*(x1-x0);
 }
 
+// return coordinate wrapped to x0…x1, relative to x0; don't care about period
 Real PeriodicInsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real x1){
 	Real xNorm=(x-x0)/(x1-x0);
 	return (xNorm-floor(xNorm))*(x1-x0);
 }
 
 
-// return true if bodies bb overlap in all 3 dimensions
+/* Performance hint
+	================
+
+	Since this function is called (most the time) from insertionSort,
+	we actually already know what is the overlap status in that one dimension, including
+	periodicity information; both values could be passed down as a parameters, avoiding 1 of 3 loops here.
+	We do some floats math here, so the speedup could noticeable; doesn't concertn the non-periodic variant,
+	where it is only plain comparisons taking place.
+
+	In the same way, handleBoundInversion is passed only id1 and id2, but again insertionSort already knows in which sense
+	the inversion happens; if the boundaries get apart (min getting up over max), it wouldn't have to check for overlap
+	at all, for instance.
+*/
+//! return true if bodies bb overlap in all 3 dimensions
 bool PeriodicInsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2,MetaBody* rb, Vector3<int>& periods) const {
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){
 		Real dim=rb->cellMax[axis]-rb->cellMin[axis];
 		// too big bodies in interaction
 		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
-		// different way: find body of which when taken as period start will make the gap smaller
+		// find body of which when taken as period start will make the gap smaller
 		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
 		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
-		//TRVAR3(id1,id2,axis);
-		//TRVAR4(minima[3*id1+axis],maxima[3*id1+axis],minima[3*id2+axis],maxima[3*id2+axis]);
-		//TRVAR2(cellWrapRel(m1,m2,m2+dim),cellWrapRel(m2,m1,m1+dim));
-		//TRVAR3(m1,m2,wMn);
+		#ifdef PISC_DEBUG
+		if(watchIds(id1,id2)){
+			TRVAR3(id1,id2,axis);
+			TRVAR4(minima[3*id1+axis],maxima[3*id1+axis],minima[3*id2+axis],maxima[3*id2+axis]);
+			TRVAR2(cellWrapRel(m1,m2,m2+dim),cellWrapRel(m2,m1,m1+dim));
+			TRVAR3(m1,m2,wMn);
+		}
+		#endif
 		int pmn1,pmx1,pmn2,pmx2;
 		Real mn1=cellWrap(minima[3*id1+axis],wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
 		Real mn2=cellWrap(minima[3*id2+axis],wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
-		//TRVAR4(mn1,mx1,mn2,mx2);
-		//TRVAR4(pmn1,pmx1,pmn2,pmx2);
-		assert(pmn1==pmx1); assert(pmn2==pmx2);
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)){
+				TRVAR4(mn1,mx1,mn2,mx2);
+				TRVAR4(pmn1,pmx1,pmn2,pmx2);
+			}
+		#endif
+		if((pmn1!=pmx1) || (pmn2!=pmx2)){
+			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size!");
+			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
+		}
 		periods[axis]=(int)(pmn1-pmn2);
 		if(!(mn1<=mx2 && mx1 >= mn2)) return false;
 	}
-	//LOG_TRACE("Returning true for #"<<id1<<"+#"<<id2<<", periods "<<periods);
+	#ifdef PISC_DEBUG
+		if(watchIds(id1,id2)) LOG_INFO("Overlap #"<<id1<<"+#"<<id2<<", periods "<<periods);
+	#endif
 	return true;
 }
 
@@ -65,15 +94,24 @@ void PeriodicInsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_
 	// existing interaction?
 	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
 	bool hasInter=(bool)I;
+	#ifdef PISC_DEBUG
+		if(watchIds(id1,id2)) LOG_INFO("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
+	#endif
 	// interaction doesn't exist and shouldn't, or it exists and should
 	if(!overlap && !hasInter) return;
 	if(overlap && hasInter){  return; }
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)) LOG_INFO("Attemtping collision of #"<<id1<<"+#"<<id2);
+		#endif
 		if(!Collider::mayCollide(Body::byId(id1,rb).get(),Body::byId(id2,rb).get())) return;
 		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
 		newI->cellDist=periods;
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)) LOG_INFO("Created intr #"<<id1<<"+#"<<id2<<", periods="<<periods);
+		#endif
 		interactions->insert(newI);
 		return;
 	}
@@ -81,6 +119,50 @@ void PeriodicInsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_
 	assert(false); // unreachable
 }
 
+void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, MetaBody*rb, bool doCollide){
+	long &loIdx=v.loIdx; const long &size=v.size;
+	for(long _i=0; _i<size; _i++){
+		const long i=v.norm(_i);
+		const long i_1=v.norm(i-1);
+		//switch period of (i) if the coord is below the lower edge cooridnate-wise and just above the split
+		if(i==loIdx && v[i].coord<v.cellMin){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+		// coordinate of v[i] used to check inversions
+		// if crossing the split, adjust by cellDim;
+		// if we get below the loIdx however, the v[i].coord will have been adjusted already, no need to do that here
+		const Real iCmpCoord=v[i].coord+(i==loIdx ? v.cellDim : 0); 
+		// no inversion
+		if(v[i_1].coord<=iCmpCoord) continue;
+		// vi is the copy that will travel down the list, while other elts go up
+		// if will be placed in the list only at the end, to avoid extra copying
+		int j=i_1; Bound vi=v[i];  const bool viHasBB=vi.flags.hasBB;
+		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
+			long j1=v.norm(j+1);
+			if (v[j].coord>v.cellMax+v.cellDim){
+				// this condition is not strictly necessary, but the loop of insertionSort would have to run more times.
+				// Since size of particle is required to be < .5*cellDim, this would mean simulation explosion anyway
+				LOG_FATAL("Body #"<<v[j].id<<" going faster than 1 cell in one step? Not handled.");
+				throw runtime_error(__FILE__ ": body mmoving too fast (skipped 1 cell).");
+			}
+			Bound& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
+			vNew=v[j];
+			// inversions close the the split need special care
+			if(j==loIdx && vi.coord<v.cellMin) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
+			if(doCollide && viHasBB && v[j].flags.hasBB){
+				if(vi.id==vNew.id){ // BUG!!
+					LOG_FATAL("Inversion of body's #"<<vi.id<<" boundary with its other boundary.");
+					throw runtime_error(__FILE__ "Body's boundary metting its opposite boundary.");
+				}
+				handleBoundInversion(vi.id,vNew.id,interactions,rb);
+			}
+			j=v.norm(j-1);
+		}
+		v[v.norm(j+1)]=vi;
+	}
+}
+
+// old code, can be removed later
+#if 0
 void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, MetaBody* rb, bool doCollide){
 	// It seems that due to wrapping, it is not predetermined, how many times should we traverse the container
 	// We therefore add one blank traversal at the end that finds no inversions; then stop
@@ -89,9 +171,9 @@ void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionConta
 		hadInversion=false;
 		long cnt=0; //loIdx
 		for(long i=v.norm(loIdx-1); cnt++<size; i=v.norm(i-1)){
-			long i_1=v.norm(i-1), loIdx_1=v.norm(loIdx-1);
+			long i_1=v.norm(i-1);
 			// fast test, if the first pair is inverted
-			if(v[i].coord<v[i_1].coord-(i_1==loIdx_1 ? v.cellDim : 0) ){
+			if(v[i].coord<v[i_1].coord-(i_1==v.norm(loIdx-1) ? v.cellDim : 0) ){
 				//v.dump(cerr);
 				if(i==loIdx && v[i].coord<v.cellMin){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 				hadInversion=true; Bound vi=v[i]; int j; const bool viBB=vi.flags.hasBB;
@@ -104,7 +186,21 @@ void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionConta
 					//if(v[j1].coord>v.cellMax && j2==loIdx){ v[j1].period+=1; v[j1].coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
 					if(j1==loIdx) { assert(v[j1].coord>=v.cellMax); v[j1].period+=1; v[j1].coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
 					else if (vi.coord<v.cellMin && j==loIdx){ vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
-					if(doCollide && viBB && v[j].flags.hasBB) handleBoundInversion(vi.id,v[j].id,interactions,rb);
+					if(doCollide && viBB && v[j].flags.hasBB){
+						if(vi.id==v[j].id){ // BUG!!
+							ofstream of("/tmp/dump");
+							Omega::instance().saveSimulation("/tmp/dump.xml");
+							v.dump(of);
+							LOG_FATAL("Inversion of a body's boundary with itself, id="<<vi.id);
+							body_id_t id=vi.id;
+							TRVAR4(vi.coord,vi.id,vi.period,vi.flags.isMin);
+							TRVAR4(v[j].coord,v[j].id,v[j].period,v[j].flags.isMin);
+							TRVAR2(*(Vector3r*)(&minima[3*id]),*(Vector3r*)(&maxima[3*id]));
+							TRVAR3(i,j,v.loIdx);
+							abort();
+						}
+						handleBoundInversion(vi.id,v[j].id,interactions,rb);
+					}
 					//v.dump(cerr);
 				}
 				v[v.norm(j+1)]=vi;
@@ -113,12 +209,13 @@ void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionConta
 		}
 	}
 }
+#endif
 
 void PeriodicInsertionSortCollider::VecBounds::update(MetaBody* rb, int axis){
 	assert(axis>=0 && axis<3);
 	if(!rb->isPeriodic){
 		// maybe just set cell from -inf to +inf and go ahead?
-		LOG_FATAL("MetaBody::isPeriodic is false, unable to continue!"); throw;
+		LOG_FATAL("MetaBody::isPeriodic is false, unable to continue!"); throw runtime_error("Non-periodic MetaBody for periodic collider.");
 	}
 	cellMin=rb->cellMin[axis]; cellMax=rb->cellMax[axis]; cellDim=cellMax-cellMin;
 	size=vec.size();
@@ -151,7 +248,7 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 		}
 		if(minima.size()!=3*(size_t)nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
 		assert(XX.vec.size()==2*rb->bodies->size());
-		//PERI: copy periodiciy information
+		//PERI: copy periodicity information
 		XX.update(rb,0); YY.update(rb,1); ZZ.update(rb,2);
 
 	// copy bounds along given axis into our arrays
@@ -177,17 +274,11 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 					memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); // ⇐ faster than 6 assignments
 				}  
 				else{ const Vector3r& pos=Body::byId(idXX,rb)->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
-				// PERI: add periods, but such that both minimum and maximum is within the cell!
-				//Vector3r period(XX[i].period*XX.cellDim,YY[i].period*YY.cellDim,ZZ[i].period*ZZ.cellDim);
-				//*(Vector3r*)(&minima[3*idXX])+=period; *(Vector3r*)(&maxima[3*idXX])+=period; //ugh
 			}
 		}
 
 	// process interactions that the constitutive law asked to be erased
 		interactions->erasePending(*this,rb);
-	//LOG_TRACE("Step "<<Omega::instance().getCurrentIteration());
-	//ZZ.dump(cerr);
-	// XX.dump(cerr); YY.dump(cerr); ZZ.dump(cerr);
 
 	// sort
 		if(!doInitSort){
@@ -223,7 +314,8 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 				*/
 				// TRVAR3(i,iid,V[i].coord);
 				// go up until we meet the upper bound
-				for(size_t j=i+1; /* handle case 2. of swapped min/max */ j<2*(size_t)nBodies && V[j].id!=iid; j++){
+				size_t cnt=0;
+				for(size_t j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
 					const body_id_t& jid=V[j].id;
 					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
 					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes
@@ -236,6 +328,11 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 					// that means that the upper bound is before the upper one; that can only happen if they
 					// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
 					// from V[i] until we meet the upper bound and swap the isMin flag
+
+					// PERI: this can happen if each boundary wraps to different period. That is OK.
+					// PERI: this should however be somehow distinguished from the case that they are in the same period...
+					// PERI: perhaps check that when periods are assigned and add some hair distance to the maximum...?
+					#if 0
 					if(j==2*(size_t)nBodies-1){ /* handle case 1. of swapped min/max */
 						size_t k=i-1;
 						while(V[k].id!=iid && k>0) k--;
@@ -245,6 +342,8 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 						LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<" (coords: "<<V[k].coord<<" and "<<V[i].coord<<")");
 						break; // would happen anyways
 					}
+					#endif
+					if(cnt++>2*(size_t)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
 				}
 			}
 		}

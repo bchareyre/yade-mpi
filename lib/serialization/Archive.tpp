@@ -48,13 +48,17 @@ bool isFundamental(Type& )
 			typeid(Type)==typeid(Vector2f)		||
 			typeid(Type)==typeid(Vector2d)		||
 			typeid(Type)==typeid(Vector2<long double>)		||
-			typeid(Type)==typeid(Vector2<signed int>)		||
+			typeid(Type)==typeid(Vector2<signed int>)	  		||
 			typeid(Type)==typeid(Vector2<unsigned int>)		||
 			typeid(Type)==typeid(Vector2<signed long>)		||
 			typeid(Type)==typeid(Vector2<unsigned long>)		||
 			typeid(Type)==typeid(Vector3f)		||
 			typeid(Type)==typeid(Vector3d)		||
 			typeid(Type)==typeid(Vector3<long double>)		||
+			typeid(Type)==typeid(Vector3<signed int>)			||
+			typeid(Type)==typeid(Vector3<unsigned int>)		||
+			typeid(Type)==typeid(Vector3<signed long>)		||
+			typeid(Type)==typeid(Vector3<unsigned long>)		||
 			typeid(Type)==typeid(Vector4f)		||
 			typeid(Type)==typeid(Vector4d)		||
 			typeid(Type)==typeid(Vector4<long double>)		||

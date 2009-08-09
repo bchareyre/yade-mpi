@@ -38,8 +38,14 @@ class Interaction : public Serializable
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 
-		//! relative distance between bodies, given in (MetaBody::cellMax-MetaBody::cellMin) units
-		//! Position of id1 must be incremented by that distance so that there is spatial interaction 
+		/*! relative distance between bodies, given in (MetaBody::cellMax-MetaBody::cellMin) units
+			Position of id1 must be incremented by that distance so that there is spatial interaction 
+
+			NOTE (tricky): cellDist must survive Interaction::reset(), it is only initialized in ctor
+			Interaction that was cancelled by the constitutive law, was reset() and became only potential
+			must have the priod information if the geometric functor again makes it real. Good to know after
+			few days of debugging that :-)
+		*/
 		Vector3<int> cellDist;
 
 		shared_ptr<InteractionGeometry> interactionGeometry;

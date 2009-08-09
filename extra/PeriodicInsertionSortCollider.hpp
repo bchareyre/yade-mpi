@@ -17,9 +17,9 @@ Use
 
 Architecture
 ============
-Bounding boxes carry information about period in which they are. Their container (VecBounds)
-holds position of where the space wraps. The sorting algorithm is changed in such way that
-periods are changed when body crosses cell boundary.
+Values from bounding boxes are added information about period in which they are.
+Their container (VecBounds) holds position of where the space wraps.
+The sorting algorithm is changed in such way that periods are changed when body crosses cell boundary.
 
 Interaction::cellDist holds information about relative cell coordinates of the 2nd body
 relative to the 1st one. Dispatchers (InteractionGeometryMetaEngine and InteractionDispatchers)
@@ -27,8 +27,8 @@ use this information to pass modified position of the 2nd body to InteractionGeo
 Since properly behaving InteractionGeometryEngineUnit's and ConstitutiveLaw's do not take positions
 directly from Body::physicalParameters, the interaction is computed with the periodic positions.
 
-Positions of bodies (in the sense of Body::physicalParameters) are not wrapped to the periodic cell,
-they can be anywhere (but not "too far" in the sense of int overflow).
+Positions of bodies (in the sense of Body::physicalParameters) and their natural bboxes are not wrapped
+to the periodic cell, they can be anywhere (but not "too far" in the sense of int overflow).
 
 Since Interaction::cellDists holds cell coordinates, it is possible to change the cell boundaries
 at runtime. This should make it easy to implement some stress control on the top.
@@ -40,6 +40,8 @@ Rendering
 OpenGLRenderingEngine renders GeometricalModel at all periodic positions that touch the
 periodic cell (i.e. BoundingVolume crosses its boundary).
 
+It seems to affect body selection somehow, but that is perhaps not related at all.
+
 Periodicity control
 ===================
 c++:
@@ -50,27 +52,28 @@ python:
 
 Requirements
 ============
-* No body can have AABB larger than about .499*cellSize. This is currently not checked, only asserted.
-* Constitutive law must not get body positions from Body::physicalParameters.
+* No body can have AABB larger than about .499*cellSize. Exception is thrown if that is false.
+* Constitutive law must not get body positions from Body::physicalParameters directly.
 	If it does, it uses Interaction::cellDist to compute periodic position.
 	Dem3Dof family of Ig2 functors and Law2_* engines are known to behave well.
-* No body can get further away than MAXINT periods. It will do horrible things if there is overflow.
+* No body can get further away than MAXINT periods. It will do horrible things if there is overflow. Not checked at the moment.
+* Body cannot move over distance > cellSize in one step. Since body size is limited as well, that would mean simulation explosion.
+	Exception is thrown if the movement is upwards. If downwards, it is not handled at all.
 
 Possible performance improvements & bugs
 ========================================
-This collider was not at all tuned to give decent performance (yet?)
 
-* We don't enforce that bounding boxes are inside the cell; that means that every 
-	spatialOverlap call has to wrap values, and that is probably quite slow.
 * PeriodicInsertionSortCollider::{cellWrap,cellWrapRel} OpenGLRenderingEngine::{wrapCell,wrapCellPt} Shop::PeriodicWrap
 	are all very similar functions. They should be put into separate header and included from all those places.
-* The aforementioned functions might not be the fastest implementations. In particular, I heard that (int) is
-	rather low-performance for making conversion of floating-point to integer.
+
 * Until this code is integrated with plain InsertionSortCollider, it will not support striding via VelocityBins
 	Those 2 features are orthogonal, the integration shouldn't be diffucult.
 
-
 */
+
+// #define to turn on some tracing information
+// all code under this can be probably removed at some point, when the collider will have been tested thoroughly
+// #define PISC_DEBUG
 
 class PeriodicInsertionSortCollider: public Collider{
 	//! struct for storing bounds of bodies
@@ -113,13 +116,20 @@ class PeriodicInsertionSortCollider: public Collider{
 	bool spatialOverlap(body_id_t,body_id_t, MetaBody*, Vector3<int>&) const;
 	static Real cellWrap(const Real, const Real, const Real, int&);
 	static Real cellWrapRel(const Real, const Real, const Real);
+	#ifdef PISC_DEBUG
+		bool watchIds(body_id_t id1, body_id_t id2) const { body_id_t i1=2,i2=14; return ((id1==i1)&&(id2==i2))||((id1==i2)&&(id2==i1)); }
+	#endif
 
 
 	public:
 	//! axis for the initial sort
 	int sortAxis;
 	//! Predicate called from loop within InteractionContainer::erasePending
-	bool shouldBeErased(body_id_t id1, body_id_t id2, MetaBody* rb) const { Vector3<int> foo; return !spatialOverlap(id1,id2,rb,foo); }
+	bool shouldBeErased(body_id_t id1, body_id_t id2, MetaBody* rb) const { Vector3<int> foo;
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)) LOG_INFO("Requesting erase of #"<<id1<<"+#"<<id2<<", result: "<<!spatialOverlap(id1,id2,rb,foo));
+		#endif
+		return !spatialOverlap(id1,id2,rb,foo); }
 
 	PeriodicInsertionSortCollider(): sortAxis(0) { }
 	virtual void action(MetaBody*);
