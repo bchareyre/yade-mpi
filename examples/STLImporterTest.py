@@ -15,8 +15,8 @@ imported = utils.import_stl_geometry('baraban.stl',frictionAngle=frictionAngle,p
 
 ## Spheres
 sphereRadius = 0.2
-#nbSpheres = (10,10,10)
-nbSpheres = (5,5,5)
+nbSpheres = (10,10,10)
+#nbSpheres = (5,5,5)
 for i in xrange(nbSpheres[0]):
     for j in xrange(nbSpheres[1]):
         for k in xrange(nbSpheres[2]):
@@ -65,5 +65,9 @@ O.engines=[
 	## Apply kinematics to walls
 	RotationEngine(subscribedBodies=imported,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
 ]
-O.saveTmp();
-O.step()
+
+from yade import qt
+#qt.Controller()
+qt.View()
+O.run()
+

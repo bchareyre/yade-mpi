@@ -327,7 +327,7 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 	imported=range(begin,begin+imp.number_of_facets)
 	for i in imported:
 		if not noInteractingGeometry:
-			o.bodies[i].mold.postProcessAttributes()
+			o.bodies[i].mold.postProcessAttributes(True)
 		o.bodies[i].shape['diffuseColor']=color
 	return imported
 

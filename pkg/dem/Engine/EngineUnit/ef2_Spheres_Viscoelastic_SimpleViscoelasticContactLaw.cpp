@@ -19,6 +19,11 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	int id1 = I->getId1();
 	int id2 = I->getId2();
 	
+	if (geom->penetrationDepth<0) {
+		rootBody->interactions->requestErase(id1,id2);
+		return;
+	}
+
 	shared_ptr<BodyContainer>& bodies = rootBody->bodies;
 
 	RigidBodyParameters* de1 = YADE_CAST<RigidBodyParameters*>((*bodies)[id1]->physicalParameters.get());
@@ -51,7 +56,7 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	Vector3r shearVelocity			= relativeVelocity-normalVelocity*geom->normal;
 	shearForce 			       -= (phys->ks*dt+phys->cs)*shearVelocity;
 
-	phys->normalForce = ( phys->kn * std::max(geom->penetrationDepth,(Real) 0) - phys->cn * normalVelocity ) * geom->normal;
+	phys->normalForce = ( phys->kn * geom->penetrationDepth - phys->cn * normalVelocity ) * geom->normal;
 	phys->prevNormal = geom->normal;
 
 	Real maxFs = phys->normalForce.SquaredLength() * std::pow(phys->tangensOfFrictionAngle,2);

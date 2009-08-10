@@ -35,37 +35,48 @@ print "Number of spheres: %d" % spheresCount
 
 ## Initializers 
 o.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',
-		[EngineUnit('InteractingSphere2AABB'),
-			EngineUnit('InteractingFacet2AABB'),
-			EngineUnit('MetaInteractingGeometry2AABB')]),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 
 ## Engines 
 o.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingFacet2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
+	## Resets forces and momenta the act on bodies
+	BexResetter(),
+
+	## Associates bounding volume to each body.
+	BoundingVolumeMetaEngine([
+		InteractingSphere2AABB(),
+		InteractingFacet2AABB(),
+		MetaInteractingGeometry2AABB()
 	]),
-	StandAloneEngine('PersistentSAPCollider'),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry')
+
+	## Using bounding boxes find possible body collisions.
+	InsertionSortCollider(),
+
+	## Create geometry information about each potential collision.
+	InteractionGeometryMetaEngine([
+		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
+		InteractingFacet2InteractingSphere4SpheresContactGeometry()
 	]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('MacroMicroElasticRelationships')]),
-	StandAloneEngine('ElasticContactLaw'),
-	DeusExMachina('GravityEngine',{'gravity':[0,-9.81,0]}),
+
+	## Create physical information about the interaction.
+	InteractionPhysicsMetaEngine([MacroMicroElasticRelationships()]),
+
+    ## Constitutive law
+	ElasticContactLaw(),
+
+	## Apply gravity
+	GravityEngine(gravity=[0,-9.81,0]),
 
 	## NOTE: Non zero Cundall damping affected a dynamic simulation!
-	DeusExMachina('NewtonsDampedLaw',{'damping':0}),
+	NewtonsDampedLaw(damping=0.3),
 
+	## Apply kinematics to walls
     ## angularVelocity = 0.73 rad/sec = 7 rpm
-    DeusExMachina('RotationEngine',{'subscribedBodies':walls,'rotationAxis':[0,0,1],'rotateAroundZero':True,'angularVelocity':0.73}),
+	RotationEngine(subscribedBodies=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
 ]
 
-o.miscParams=[Generic('GLDrawSphere',{'glutUse':True})]
+o.miscParams=[GLDrawSphere(glutUse=True)]
 
 for b in o.bodies:
     if b.shape.name=='Sphere':
@@ -78,5 +89,7 @@ o.saveTmp('init');
 from yade import qt
 renderer=qt.Renderer()
 renderer['Body_wire']=True
-qt.Controller()
+#qt.Controller()
+qt.View()
+O.run()
 

@@ -45,35 +45,41 @@ o.dt=0.0001
 
 ## Initializers 
 o.initializers=[
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingFacet2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')]),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 
 ## Engines 
 o.engines=[
-	StandAloneEngine('PhysicalActionContainerReseter'),
-	MetaEngine('BoundingVolumeMetaEngine',[
-		EngineUnit('InteractingSphere2AABB'),
-		EngineUnit('InteractingFacet2AABB'),
-		EngineUnit('MetaInteractingGeometry2AABB')
+	## Resets forces and momenta the act on bodies
+	BexResetter(),
+
+	## Associates bounding volume to each body.
+	BoundingVolumeMetaEngine([
+		InteractingSphere2AABB(),
+		InteractingFacet2AABB(),
+		MetaInteractingGeometry2AABB()
 	]),
-	StandAloneEngine('PersistentSAPCollider'),
-	MetaEngine('InteractionGeometryMetaEngine',[
-		EngineUnit('InteractingSphere2InteractingSphere4SpheresContactGeometry'),
-		EngineUnit('InteractingFacet2InteractingSphere4SpheresContactGeometry',{'shrinkFactor':shrinkFactor})
+	## Using bounding boxes find possible body collisions.
+	InsertionSortCollider(),
+	## Create geometry information about each potential collision.
+	InteractionGeometryMetaEngine([
+		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
+		InteractingFacet2InteractingSphere4SpheresContactGeometry()
 	]),
-	MetaEngine('InteractionPhysicsMetaEngine',[EngineUnit('MacroMicroElasticRelationships')]),
-	StandAloneEngine('ElasticContactLaw'),
-	DeusExMachina('GravityEngine',{'gravity':[0,-9.81,0]}),
-	DeusExMachina('NewtonsDampedLaw',{'damping':0.3}),
+	## Create physical information about the interaction.
+	InteractionPhysicsMetaEngine([MacroMicroElasticRelationships()]),
+    ## Constitutive law
+	ElasticContactLaw(),
+	## Apply gravity
+	GravityEngine(gravity=[0,-9.81,0]),
+	## Motion equation
+	NewtonsDampedLaw(damping=0.3),
 	## Apply kinematics to rod
-	DeusExMachina('TranslationEngine',{'subscribedBodies':range(rod),'translationAxis':[0,-1,0],'velocity':0.075}),
+	TranslationEngine(subscribedBodies=rod,translationAxis=[0,-1,0],velocity=0.075),
 	## Save force on rod
-	StandAloneEngine('ForceRecorder',{'startId':0,'endId':rod-1,'outputFile':'force-'+mesh+'.dat','interval':50}),	
+	ForceRecorder(startId=0,endId=len(rod)-1,outputFile='force-'+mesh+'.dat',interval=50),	
 	## Save positions
-	StandAloneEngine('SQLiteRecorder',{'recorders':['se3'],'dbFile':'positions-'+mesh+'.sqlite','iterPeriod':100})
+	SQLiteRecorder(recorders=['se3'],dbFile='positions-'+mesh+'.sqlite',iterPeriod=100)
 
 ]
 
