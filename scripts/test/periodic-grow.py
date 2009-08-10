@@ -32,7 +32,7 @@ for i in range(0,250):
 	step=(mx-mn); step=Vector3(.002*step[0],.002*step[1],.002*step[2])
 	O.periodicCell=mn+step,mx-step
 	if (i%10==0):
-		F=utils.totalForceInVolume()
+		F,stiff=utils.totalForceInVolume()
 		dim=mx-mn; A=Vector3(dim[1]*dim[2],dim[0]*dim[2],dim[0]*dim[1])
 		avgStress=sum([F[i]/A[i] for i in 0,1,2])/3.
 		print 'strain',(cubeSize-dim[0])/cubeSize,'avg. stress ',avgStress,'unbalanced ',utils.unbalancedForce()

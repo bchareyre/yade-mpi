@@ -462,6 +462,7 @@ class pyOmega{
 		signal(SIGSEGV,termHandler); /* unset the handler that runs gdb and prints backtrace */
 		exit(status);
 	}
+	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getRootBody().get()); }
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
@@ -648,6 +649,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
 		#endif
+		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
 		;
 	python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)

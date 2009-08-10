@@ -396,7 +396,7 @@ void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop:
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
-Vector3r Shop__totalForceInVolume(){return Shop::totalForceInVolume();}
+python::tuple Shop__totalForceInVolume(){Real stiff; Vector3r ret=Shop::totalForceInVolume(stiff); return python::make_tuple(ret,stiff); }
 
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
@@ -420,7 +420,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("sumBexTorques",sumBexTorques);
 	def("forcesOnPlane",forcesOnPlane);
 	def("forcesOnCoordPlane",forcesOnCoordPlane);
-	def("totalForceInVolume",Shop__totalForceInVolume);
+	def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
 	def("createInteraction",Shop__createExplicitInteraction);
 	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
 	def("pointInsidePolygon",pointInsidePolygon);

@@ -59,7 +59,7 @@ yadeStaticOrSharedLib('yade-support',env.Combine('yade-support.cpp',[
 	'factory/ClassFactory.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
 	'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 	'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp',
-	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp']))
+	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp']),LIBS=['dl'])
 
 #######################
 ###### 3rd party libs

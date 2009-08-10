@@ -4,7 +4,9 @@
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<Python.h>
+#ifdef YADE_PYTHON
+	#include<Python.h>
+#endif
 
 /* Engine interpolating between starting (current) and goal (given) se3, both position and orientation.
  *

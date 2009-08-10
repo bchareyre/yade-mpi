@@ -18,7 +18,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 			LIBS=env['LIBS']+(['_gts__python-module'] if 'GTS' in env['features'] else []),
 			),
 		env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
-			linkPlugins(['Shop']),
+			linkPlugins(['Shop','SpherePack']),
 			]),
 		env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
 		env.File('utils.py'),

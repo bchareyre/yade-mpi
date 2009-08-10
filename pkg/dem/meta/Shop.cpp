@@ -85,22 +85,25 @@ void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contP
 }
 
 
-/*! Compute sum of forces in the whole simulation.
+/*! Compute sum of forces in the whole simulation and averages stiffness.
 
 Designed for being used with periodic cell, where diving the resulting components by
 areas of the cell will give average stress in that direction.
 
 Requires all .isReal() interaction to have interactionPhysics deriving from NormalShearInteraction.
 */
-Vector3r Shop::totalForceInVolume(MetaBody* _rb){
+Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, MetaBody* _rb){
 	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
-	Vector3r ret(Vector3r::ZERO);
+	Vector3r force(Vector3r::ZERO); Real stiff=0; long n=0;
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
 		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
-		ret+=Vector3r(abs(nsi->normalForce[0]+nsi->shearForce[0]),abs(nsi->normalForce[1]+nsi->shearForce[1]),abs(nsi->normalForce[2]+nsi->shearForce[2]));
+		force+=Vector3r(abs(nsi->normalForce[0]+nsi->shearForce[0]),abs(nsi->normalForce[1]+nsi->shearForce[1]),abs(nsi->normalForce[2]+nsi->shearForce[2]));
+		stiff+=(1/3.)*nsi->kn+(2/3.)*nsi->ks; // count kn in one direction and ks in the other two
+		n++;
 	}
-	return ret;
+	avgIsoStiffness= n>0 ? (1./n)*stiff : -1;
+	return force;
 }
 
 Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
@@ -1166,4 +1169,5 @@ Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period){
 	if(period) *period=(long)floor(xNorm);
 	return x0+xxNorm*(x1-x0);
 }
+
 
