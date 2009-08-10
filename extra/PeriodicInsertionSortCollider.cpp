@@ -388,7 +388,7 @@ void PeriIsoCompressor::action(MetaBody* rb){
 	for(int axis=0; axis<3; axis++){
 		// Δσ=ΔεE=(Δl/l)×(l×K/A) ↔ Δl=Δσ×A/K
 		// FIXME: either NormalShearInteraction::{kn,ks} is computed wrong or we have dimensionality problem here
-		// FIXME: that is why the fixup 1e-2 is needed here
+		// FIXME: that is why the fixup 1e-4 is needed here
 		// FIXME: or perhaps maxDisplaPerStep=1e-2*charLen is too big??
 		cellGrow[axis]=1e-4*(sigma[axis]-sigmaGoal)*cellArea[axis]/(avgStiffness>0?avgStiffness:1);
 		if(abs(cellGrow[axis])>maxDisplPerStep) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxDisplPerStep;

@@ -11,6 +11,7 @@ class GenericSpheresContact: public InteractionGeometry{
 	public:
 		Vector3r normal;
 		Real refR1, refR2;
+	virtual ~GenericSpheresContact(); // vtable
 };
 
 /*! Abstract base class for representing contact geometry of 2 elements that has 3 degrees of freedom:

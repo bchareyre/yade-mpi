@@ -195,26 +195,13 @@ bool TriaxialTest::generate()
 		fast=true;
 	}
 	
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
-	positionRootBody(rootBody);
-
-	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
-
-	//rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
-
-	createActors(rootBody);
-
 	shared_ptr<Body> body;
-
-
 
 	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size;
 	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
 	 */
 	Real porosity=.75;
-	
 	vector<BasicSphere> sphere_list;
-
 	if(importFilename==""){
 		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
 		if(radiusMean<=0) radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
@@ -234,6 +221,12 @@ bool TriaxialTest::generate()
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
 		sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
 	}
+
+	// setup rootBody here, since radiusMean is now at its true value (if it was negative)
+	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	positionRootBody(rootBody);
+	createActors(rootBody);
+
 
 	if(thickness<0) thickness=radiusMean;
 	if(facetWalls) thickness=0;
