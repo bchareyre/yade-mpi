@@ -414,7 +414,7 @@ void SimulationController::doUpdate(){
 		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex);
 		if(!lock.locked()){
 	#else
-		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,boost::defer_lock);
+		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,boost::try_to_lock);
 		if(!lock.owns_lock()){
 	#endif
 		deactivateControlsWhenLoading();

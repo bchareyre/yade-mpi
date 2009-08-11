@@ -25,37 +25,29 @@
 #endif
 
 CREATE_LOGGER(GLViewer);
-GLLock::GLLock(GLViewer* _glv):
-/* 
- * try: doneCurrent; glFlush; glSwapBuffers after paintGL
- */
-#if BOOST_VERSION<103500
-	boost::try_mutex::scoped_try_lock(Omega::instance().renderMutex,true), glv(_glv){
-		glv->makeCurrent();
-	}
-#else
-	boost::try_mutex::scoped_try_lock(Omega::instance().renderMutex), glv(_glv){
-		glv->makeCurrent();
-	}
-#endif
 
-GLLock::~GLLock(){ glv->doneCurrent();}
+GLLock::GLLock(GLViewer* _glv): boost::try_mutex::scoped_lock(Omega::instance().renderMutex), glv(_glv){
+	glv->makeCurrent();
+}
+GLLock::~GLLock(){ glv->doneCurrent(); }
+
 
 void GLViewer::updateGL(void){/*GLLock lock(this); */QGLViewer::updateGL();}
 
+/* additionally try: doneCurrent; glFlush; glSwapBuffers after paintGL */
 void GLViewer::paintGL(void){
 	/* paintGL encapsulated preDraw, draw and postDraw within QGLViewer. If the mutex cannot be locked,
 	 * we just return without repainting */
+	boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex);
 	#if BOOST_VERSION<103500
-		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex);
-		if(lock.locked()){
+		if(lock.locked())
 	#else
-		boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,boost::defer_lock);
-		if(lock.owns_lock()){
+		if(lock.owns_lock())
 	#endif
+		{
 			this->makeCurrent();
 			QGLViewer::paintGL();
-	}
+		}
 	this->doneCurrent();
 }
 
@@ -344,15 +336,16 @@ void GLViewer::centerPeriodic(){
  * "central" (where most bodies is) part very small or even invisible.
  */
 void GLViewer::centerMedianQuartile(){
-	if(Omega::instance().getRootBody()->isPeriodic){ centerPeriodic(); return; }
-	long nBodies=Omega::instance().getRootBody()->bodies->size();
+	MetaBody* rb=Omega::instance().getRootBody().get();
+	if(rb->isPeriodic){ centerPeriodic(); return; }
+	long nBodies=rb->bodies->size();
 	if(nBodies<4) {
 		LOG_INFO("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
 		return centerScene();
 	}
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		for(int i=0; i<3; i++) coords[i].push_back(b->physicalParameters->se3.position[i]);
 	}
 	Vector3r median,interQuart;
@@ -394,7 +387,7 @@ void GLViewer::centerScene(){
 	LOG_DEBUG("Got scene box min="<<min<<" and max="<<max);
 	Vector3r center = (max+min)*0.5;
 	Vector3r halfSize = (max-min)*0.5;
-	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2])); if(radius==0) radius=1;
+	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2])); if(radius<=0) radius=1;
 	LOG_DEBUG("Scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
 	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
 	setSceneRadius(radius*1.5);

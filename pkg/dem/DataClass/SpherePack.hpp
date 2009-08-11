@@ -58,6 +58,10 @@ public:
 	// random generation
 	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, size_t num, bool periodic=false);
 
+	// periodic repetition
+	void cellRepeat(Vector3<int> count);
+	void cellFillVolume(Vector3r volume);
+
 	// spatial characteristics
 	Vector3r dim() const {Vector3r mn,mx; aabb(mn,mx); return mx-mn;}
 	#ifdef YADE_PYTHON

@@ -112,7 +112,13 @@ class GLViewer : public QGLViewer
 		virtual void mousePressEvent(QMouseEvent *e);
 };
 
-class GLLock: public boost::try_mutex::scoped_try_lock{
+/*! Get unconditional lock on a GL view.
+
+Use if you need to manipulate GL context in some way.
+The ctor doesn't return until the lock has been acquired
+and the lock is released when the GLLock object is desctructed;
+*/
+class GLLock: public boost::try_mutex::scoped_lock{
 	GLViewer* glv;
 	public:
 		GLLock(GLViewer* _glv);

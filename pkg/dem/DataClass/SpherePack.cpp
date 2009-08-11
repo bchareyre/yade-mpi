@@ -111,3 +111,28 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	return pack.size();
 }
 
+void SpherePack::cellFillVolume(Vector3r vol){
+	Vector3<int> count;
+	for(int i=0; i<3; i++) count[i]=(int)(ceil(vol[i]/cellSize[i]));
+	cellRepeat(count);
+}
+
+void SpherePack::cellRepeat(Vector3<int> count){
+	if(cellSize==Vector3r::ZERO){ throw std::runtime_error("cellRepeat cannot be used on non-periodic packing."); }
+	if(count[0]<=0 || count[1]<=0 || count[2]<=0){ throw std::invalid_argument("Repeat count components must be positive."); }
+	size_t origSize=pack.size();
+	pack.reserve(origSize*count[0]*count[1]*count[2]);
+	for(int i=0; i<count[0]; i++){
+		for(int j=0; j<count[1]; j++){
+			for(int k=0; k<count[2]; j++){
+				if((i==0) && (j==0) && (k==0)) continue; // original cell
+				Vector3r off(cellSize[0]*i,cellSize[1]*j,cellSize[2]*k);
+				for(size_t l=0; l<origSize; l++){
+					const Sph& s=pack[l]; pack.push_back(Sph(s.c+off,s.r));
+				}
+			}
+		}
+	}
+	cellSize=Vector3r(cellSize[0]*count[0],cellSize[1]*count[1],cellSize[2]*count[2]);
+}
+
