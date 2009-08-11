@@ -25,3 +25,13 @@ from yade import qt; qt.Controller(); qt.View()
 O.run()
 O.wait()
 timing.stats()
+
+# now take that packing and pad some larger volume with it
+sp=pack.SpherePack()
+sp.fromSimulation() # take spheres from simulation; cellSize is set as well
+O.reset()
+print sp.cellSize
+sp.cellFill((30,30,30))
+print sp.cellSize
+for s in sp:
+	O.bodies.append(utils.sphere(s[0],s[1]))

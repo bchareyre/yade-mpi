@@ -16,7 +16,7 @@ BOOST_PYTHON_MODULE(_packSpheres){
 		.def("dim",&SpherePack::dim,"Return dimensions of the packing in terms of aabb(), as a 3-tuple.")
 		.def("center",&SpherePack::midPt,"Return coordinates of the bounding box center.")
 		.def_readonly("cellSize",&SpherePack::cellSize,"Size of periodic cell; is Vector3(0,0,0) if not periodic.")
-		.def("cellFillVolume",&SpherePack::cellFillVolume,"Repeat the packing (if periodic) so that the results has dim() >= given size. The packing retains periodicity, but changes cellSize. Raises exception for non-periodic packing.")
+		.def("cellFill",&SpherePack::cellFill,"Repeat the packing (if periodic) so that the results has dim() >= given size. The packing retains periodicity, but changes cellSize. Raises exception for non-periodic packing.")
 		.def("cellRepeat",&SpherePack::cellRepeat,"Repeat the packing given number of times in each dimension. Periodicity is retained, cellSize changes. Raises exception for non-periodic packing.")
 		.def("relDensity",&SpherePack::relDensity,"Relative packing density, measured as sum of spheres' volumes / aabb volume.\n(Sphere overlaps are ignored.)")
 		.def("translate",&SpherePack::translate,"Translate all spheres by given vector.")

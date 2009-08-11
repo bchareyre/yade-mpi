@@ -77,6 +77,7 @@ void SpherePack::fromSimulation() {
 		if(!intSph) continue;
 		pack.push_back(Sph(b->physicalParameters->se3.position,intSph->radius));
 	}
+	if(rootBody->isPeriodic) cellSize=rootBody->cellMax-rootBody->cellMin;
 }
 
 long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, size_t num, bool periodic){
@@ -111,7 +112,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	return pack.size();
 }
 
-void SpherePack::cellFillVolume(Vector3r vol){
+void SpherePack::cellFill(Vector3r vol){
 	Vector3<int> count;
 	for(int i=0; i<3; i++) count[i]=(int)(ceil(vol[i]/cellSize[i]));
 	cellRepeat(count);
@@ -124,7 +125,7 @@ void SpherePack::cellRepeat(Vector3<int> count){
 	pack.reserve(origSize*count[0]*count[1]*count[2]);
 	for(int i=0; i<count[0]; i++){
 		for(int j=0; j<count[1]; j++){
-			for(int k=0; k<count[2]; j++){
+			for(int k=0; k<count[2]; k++){
 				if((i==0) && (j==0) && (k==0)) continue; // original cell
 				Vector3r off(cellSize[0]*i,cellSize[1]*j,cellSize[2]*k);
 				for(size_t l=0; l<origSize; l++){

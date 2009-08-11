@@ -60,7 +60,7 @@ public:
 
 	// periodic repetition
 	void cellRepeat(Vector3<int> count);
-	void cellFillVolume(Vector3r volume);
+	void cellFill(Vector3r volume);
 
 	// spatial characteristics
 	Vector3r dim() const {Vector3r mn,mx; aabb(mn,mx); return mx-mn;}
