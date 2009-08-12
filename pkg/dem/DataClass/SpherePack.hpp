@@ -1,5 +1,7 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 
+#pragma once
+
 #include<vector>
 #include<string>	
 using namespace std; // sorry

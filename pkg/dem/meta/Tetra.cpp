@@ -373,16 +373,17 @@ CREATE_LOGGER(TetraLaw);
 
 /*! Apply forces on tetrahedra in collision based on geometric configuration provided by Tetra2TetraBang.
  *
+ * DO NOT USE, probably doesn't work.
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
 void TetraLaw::action(MetaBody* rootBody)
 {
-
-	for(InteractionContainer::iterator contactI=rootBody->transientInteractions->begin(); contactI!=rootBody->transientInteractions->end(); ++contactI){
-		if (!(*contactI)->isReal()) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
-		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>((*contactI)->interactionGeometry));
+	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+		// normally, we would test isReal(), but TetraLaw doesn't use interactionPhysics at all
+		if (!I->interactionGeometry) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
+		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>(I->interactionGeometry));
 		if(!contactGeom) continue;
 
-		const body_id_t idA=(*contactI)->getId1(), idB=(*contactI)->getId2();
+		const body_id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 			
 		if(!(A->getGroupMask()&B->getGroupMask()&sdecGroupMask)) continue; // no bits overlap in masks, skip this one

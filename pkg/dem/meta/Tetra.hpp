@@ -161,7 +161,6 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 
 REGISTER_SERIALIZABLE(Tetra2TetraBang);
 
-
 // Miscillaneous functions
 //! Tetrahedron's volume.
 /// http://en.wikipedia.org/wiki/Tetrahedron#Surface_area_and_volume

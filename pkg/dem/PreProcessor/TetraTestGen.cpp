@@ -2,6 +2,14 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
+#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
+#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/InsertionSortCollider.hpp>
+#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
+#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+
 #include"TetraTestGen.hpp"
 
 #include<yade/pkg-dem/Tetra.hpp>
@@ -12,7 +20,27 @@ bool TetraTestGen::generate()
 	Shop::setDefault<int>("param_timeStepUpdateInterval",-1);
 
 	rootBody=Shop::rootBody();
-	Shop::rootBodyActors(rootBody);
+
+	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	boundingVolumeDispatcher->add(new TetraAABB);
+	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
+	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->engines.clear();
+	rootBody->engines.push_back(shared_ptr<Engine>(new BexResetter));
+	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
+	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	interactionGeometryDispatcher->add(new Tetra2TetraBang);
+	rootBody->engines.push_back(interactionGeometryDispatcher);
+	// do not add any InteractionPhysicsMetaEngine
+	shared_ptr<TetraLaw> constitutiveLaw(new TetraLaw);
+	rootBody->engines.push_back(constitutiveLaw);
+
+	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
+	gravityCondition->gravity=Vector3r(0,0,-9.81);
+	rootBody->engines.push_back(gravityCondition);
+	rootBody->engines.push_back(shared_ptr<Engine>(new NewtonsDampedLaw));
+
 	rootBody->dt=1e-5;
 	
 	#if 0

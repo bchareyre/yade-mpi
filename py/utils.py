@@ -67,12 +67,12 @@ def downCast(obj,newClassName):
 
 bodiesPhysDefaults={'young':30e9,'poisson':.3,'frictionAngle':.5236}
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	s=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	s.shape=GeometricalModel('Sphere',radius=radius,diffuseColor=color,wire=wire)
+	s.shape=GeometricalModel('Sphere',radius=radius,diffuseColor=color,wire=wire,highlight=highlight)
 	s.mold=InteractingGeometry('InteractingSphere',radius=radius,diffuseColor=color)
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
@@ -83,12 +83,12 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,physParams
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,highlight=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.shape=GeometricalModel('Box',extents=extents,diffuseColor=color,wire=wire)
+	b.shape=GeometricalModel('Box',extents=extents,diffuseColor=color,wire=wire,highlight=highlight)
 	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color)
 	mass=8*extents[0]*extents[1]*extents[2]*density
 	V=extents[0]*extents[1]*extents[2]
@@ -99,12 +99,12 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b['isDynamic']=dynamic
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,density=1,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.shape=GeometricalModel('Facet',diffuseColor=color,wire=wire)
+	b.shape=GeometricalModel('Facet',diffuseColor=color,wire=wire,highlight=highlight)
 	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color)
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
