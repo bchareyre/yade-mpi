@@ -190,7 +190,7 @@ def filterSpherePack(predicate,spherePack,**kw):
 		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 	return ret
 
-def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFinalDensity=.6,memoizeDb=None,useOBB=True,**kw):
+def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFinalDensity=.6,spheresInCell=0,memoizeDb=None,useOBB=True,**kw):
 	"""Generator of triaxial packing, using TriaxialTest. Radius is radius of spheres, radiusStDev is its standard deviation.
 	By default, all spheres are of the same radius. cropLayers is how many layers of spheres will be added to the computed
 	dimension of the box so that there no (or not so much, at least) boundary effects at the boundaries of the predicate.
@@ -212,6 +212,7 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 	import sqlite3, os.path, cPickle, time, sys
 	from yade import log
 	from math import pi
+	wantPeri=(spheresInCell>0)
 	if type(predicate)==inGtsSurface and useOBB:
 		center,dim,orientation=gtsSurfaceBestFitOBB(predicate.surf)
 		dim*=2 # gtsSurfaceBestFitOBB returns halfSize
@@ -220,66 +221,72 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 		if max(dim)==float('inf'): raise RuntimeError("Infinite predicate and no dimension of packing requested.")
 		center=predicate.center()
 		orientation=None
-	fullDim=tuple([dim[i]+4*cropLayers*radius for i in 0,1,2])
+	if not wantPeri: fullDim=tuple([dim[i]+4*cropLayers*radius for i in 0,1,2])
+	else: fullDim=dim
 	if(memoizeDb and os.path.exists(memoizeDb)):
 		# find suitable packing and return it directly
 		conn=sqlite3.connect(memoizeDb); c=conn.cursor();
-		c.execute('select radius,radiusStDev,dimx,dimy,dimz,N,timestamp from packings order by N')
+		c.execute('select radius,radiusStDev,dimx,dimy,dimz,N,timestamp,periodic from packings order by N')
 		for row in c:
-			R,rDev,X,Y,Z,NN,timestamp=row[0:7]; scale=radius/R
+			R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=radius/R
 			rDev*=scale; X*=scale; Y*=scale; Z*=scale
-			if (radiusStDev==0 and rDev!=0) or (radiusStDev==0 and rDev!=0) or (radiusStDev!=0 and abs((rDev-radiusStDev)/radiusStDev)>1e-2): continue # not suitable, standard deviation differs too much
-			if X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]: continue # not suitable, not large enough
-			print "Found suitable packing in database (radius=%g±%g,N=%g,dim=%g×%g×%g,scale=%g), created %s"%(R,rDev,NN,X,Y,Z,scale,time.asctime(time.gmtime(timestamp)))
+			print "Considering packing (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
+			if (radiusStDev==0 and rDev!=0) or (radiusStDev==0 and rDev!=0) or (radiusStDev!=0 and abs((rDev-radiusStDev)/radiusStDev)>1e-2): continue # radius fuzz differs too much
+			if isPeri and wantPeri:
+				if spheresInCell>NN: continue
+				if abs((fullDim[1]/fullDim[0])/(dimy/dimx)-1)>0.2 or abs((fullDim[2]/fullDim[0])/(dimz/dimx)-1)>0.2: continue # proportions differing too much
+			else:
+				if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): continue # not large enough
+			print "Found suitable packing in database (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp)))
 			c.execute('select pack from packings where timestamp=?',(timestamp,))
 			sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
 			sp.scale(scale);
 			if orientation: sp.rotate(*orientation.ToAxisAngle())
 			return filterSpherePack(predicate,sp,**kw)
-			#return filterSpherePack(inSpace(predicate.center()),sp,**kw)
 		print "No suitable packing in database found, running triaxial"
 		sys.stdout.flush()
-	V=(4/3)*pi*radius**3; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
-	##
-	O.switchWorld()
-	##
-	TriaxialTest(
-		numberOfGrains=int(N),
-		radiusMean=radius,
-		# this is just size ratio if radiusMean is specified
-		# if you comment out the line above, it will be the corner (before compaction) and radiusMean will be set accordingly
-		upperCorner=fullDim,
-		radiusStdDev=radiusStDev,
-		## no need to touch any the following, I think
-		noFiles=True,
-		lowerCorner=[0,0,0],
-		sigmaIsoCompaction=1e7,
-		sigmaLateralConfinement=1e3,
-		StabilityCriterion=.05,
-		strainRate=.2,
-		fast=True,
-		thickness=-1, # will be set to sphere radius if negative
-		maxWallVelocity=.1,
-		wallOversizeFactor=1.5,
-		autoUnload=True, # unload after isotropic compaction
-		autoCompressionActivation=False # stop once unloaded
-	).load()
-	log.setLevel('TriaxialCompressionEngine',log.WARN)
-	O.run(); O.wait()
-	sp=SpherePack(); sp.fromSimulation()
-	##
-	O.switchWorld()
-	##
+	O.switchWorld() ### !!
+	if wantPeri:
+		from yade.wrapper import *
+		#O.reset() # doesn't (shouldn't) affect the original simulation
+		sp=SpherePack()
+		cloudPorosity=0.25 # assume this number for the initial cloud (can be underestimated)
+		beta,gamma=fullDim[1]/fullDim[0],fullDim[2]/fullDim[0] # ratios β=y₀/x₀, γ=z₀/x₀
+		N100=spheresInCell/cloudPorosity # number of spheres for cell being filled by spheres without porosity
+		x1=radius*(1/(beta*gamma)*N100*(4/3.)*pi)**(1/3.)
+		y1,z1=beta*x1,gamma*x1
+		O.periodicCell=((0,0,0),(x1,y1,z1))
+		print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.periodicCell
+		num=sp.makeCloud(O.periodicCell[0],O.periodicCell[1],radius,radiusStDev,spheresInCell,True)
+		O.engines=[BexResetter(),BoundingVolumeMetaEngine([InteractingSphere2AABB()]),PeriodicInsertionSortCollider(),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[100e9,1e9],maxUnbalanced=1e-2,doneHook='O.pause();'),NewtonsDampedLaw(damping=.6)]
+		for s in sp: O.bodies.append(utils.sphere(s[0],s[1],density=1000))
+		O.dt=utils.PWaveTimeStep()
+		#for i in range(10): O.step()
+		O.run(); O.wait()
+		sp=SpherePack(); sp.fromSimulation()
+		sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]))
+	else:
+		V=(4/3)*pi*radius**3; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
+		TriaxialTest(
+			numberOfGrains=int(N),radiusMean=radius,radiusStdDev=radiusStDev,
+			# upperCorner is just size ratio, if radiusMean is specified
+			upperCorner=fullDim,
+			## no need to touch any the following
+			noFiles=True,lowerCorner=[0,0,0],sigmaIsoCompaction=1e7,sigmaLateralConfinement=1e3,StabilityCriterion=.05,strainRate=.2,fast=True,thickness=-1,maxWallVelocity=.1,wallOversizeFactor=1.5,autoUnload=True,autoCompressionActivation=False).load()
+		log.setLevel('TriaxialCompressionEngine',log.WARN)
+		O.run(); O.wait()
+		sp=SpherePack(); sp.fromSimulation()
+	O.switchWorld() ### !!
 	if(memoizeDb):
 		if os.path.exists(memoizeDb):
 			conn=sqlite3.connect(memoizeDb)
 		else:
 			conn=sqlite3.connect(memoizeDb)
 			c=conn.cursor()
-			c.execute('create table packings (radius real, radiusStDev real, dimx real, dimy real, dimz real, N integer, timestamp real, pack blob)')
+			c.execute('create table packings (radius real, radiusStDev real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)')
 		c=conn.cursor()
 		packBlob=buffer(cPickle.dumps(sp.toList_pointsAsTuples(),cPickle.HIGHEST_PROTOCOL))
-		c.execute('insert into packings values (?,?,?,?,?,?,?,?)',(radius,radiusStDev,fullDim[0],fullDim[1],fullDim[2],len(sp),time.time(),packBlob,))
+		c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,radiusStDev,fullDim[0],fullDim[1],fullDim[2],len(sp),time.time(),wantPeri,packBlob,))
 		c.close()
 		conn.commit()
 		print "Packing saved to the database",memoizeDb

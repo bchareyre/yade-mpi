@@ -215,7 +215,12 @@ void InsertionSortCollider::action(MetaBody* rb){
 				// skip bodies without bbox since we would possibly never meet the upper bound again (std::sort may not be stable) and we don't want to collide those anyway
 				if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 				const body_id_t& iid=V[i].id;
-				/* If std::sort swaps equal min/max bounds, there are 2 cases distinct cases to handle:
+				/* NOTE: no longer applicable, since operator< behaves specially for same ids and coords
+					NOTE: reported in https://bugs.launchpad.net/yade/+bug/402098
+					NOTE: remove next comment once the operator< solutions is verified to work
+
+				
+					If std::sort swaps equal min/max bounds, there are 2 cases distinct cases to handle:
 
 					1. i is inside V, j gets to the end of V (since it loops till the maxbound is found)
 						here, we swap min/max to get the in the right order and continue with the loop over i;
@@ -239,19 +244,23 @@ void InsertionSortCollider::action(MetaBody* rb){
 					if(!V[j].flags.isMin) continue;
 					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
 					handleBoundInversion(iid,jid,interactions,rb);
-					// now we are at the last element, but we still have not met the upper bound of V[i].id
-					// that means that the upper bound is before the upper one; that can only happen if they
-					// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
-					// from V[i] until we meet the upper bound and swap the isMin flag
-					if(j==2*nBodies-1){ /* handle case 1. of swapped min/max */
-						size_t k=i-1;
-						while(V[k].id!=iid && k>0) k--;
-						assert(V[k].id==iid); // if this fails, we didn't meet the other bound in the downwards sense either; that should never happen
-						assert(!V[k].flags.isMin); // the lower bound should be maximum in this (exceptional) case; we will fix that now
-						V[k].flags.isMin=true; V[i].flags.isMin=false;
-						LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<" (coords: "<<V[k].coord<<" and "<<V[i].coord<<")");
-						break; // would happen anyways
-					}
+					// no longer applicable since operator< gives minimum as smaller in case of same id and same coords
+					#if 0
+						// now we are at the last element, but we still have not met the upper bound of V[i].id
+						// that means that the upper bound is before the upper one; that can only happen if they
+						// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
+						// from V[i] until we meet the upper bound and swap the isMin flag
+						if(j==2*nBodies-1){ /* handle case 1. of swapped min/max */
+							size_t k=i-1;
+							while(V[k].id!=iid && k>0) k--;
+							assert(V[k].id==iid); // if this fails, we didn't meet the other bound in the downwards sense either; that should never happen
+							assert(!V[k].flags.isMin); // the lower bound should be maximum in this (exceptional) case; we will fix that now
+							V[k].flags.isMin=true; V[i].flags.isMin=false;
+							LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<" (coords: "<<V[k].coord<<" and "<<V[i].coord<<")");
+							break; // would happen anyways
+						}
+					#endif
+					assert(j<2*nBodies-1);
 				}
 			}
 		}

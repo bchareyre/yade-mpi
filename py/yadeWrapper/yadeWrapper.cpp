@@ -304,6 +304,8 @@ class pyOmega{
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		OMEGA.startSimulationLoop();
+		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
+		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
 		LOG_DEBUG("RUN"<<((OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}

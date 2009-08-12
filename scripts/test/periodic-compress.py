@@ -16,22 +16,23 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
-	PeriIsoCompressor(charLen=.1,stresses=[50e9,1e8],doneHook="print 'FINISHED'; O.pause() "),
+	PeriIsoCompressor(charLen=.5,stresses=[50e9,1e8],doneHook="print 'FINISHED'; O.pause() "),
 	NewtonsDampedLaw(damping=.4)
 ]
 O.dt=utils.PWaveTimeStep()
 O.saveTmp()
+print O.periodicCell
 from yade import qt; qt.Controller(); qt.View()
 O.run()
 O.wait()
 timing.stats()
 
 # now take that packing and pad some larger volume with it
-sp=pack.SpherePack()
-sp.fromSimulation() # take spheres from simulation; cellSize is set as well
-O.reset()
-print sp.cellSize
-sp.cellFill((30,30,30))
-print sp.cellSize
-for s in sp:
-	O.bodies.append(utils.sphere(s[0],s[1]))
+#sp=pack.SpherePack()
+#sp.fromSimulation() # take spheres from simulation; cellSize is set as well
+#O.reset()
+#print sp.cellSize
+#sp.cellFill((30,30,30))
+#print sp.cellSize
+#for s in sp:
+#	O.bodies.append(utils.sphere(s[0],s[1]))

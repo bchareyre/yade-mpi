@@ -77,7 +77,7 @@ void SpherePack::fromSimulation() {
 		if(!intSph) continue;
 		pack.push_back(Sph(b->physicalParameters->se3.position,intSph->radius));
 	}
-	if(rootBody->isPeriodic) cellSize=rootBody->cellMax-rootBody->cellMin;
+	if(rootBody->isPeriodic) { cellSize=rootBody->cellMax-rootBody->cellMin; }
 }
 
 long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, size_t num, bool periodic){
@@ -89,7 +89,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	for(size_t i=0; i<num; i++) {
 		size_t t;
 		for(t=0; t<maxTry; ++t){
-			Real r=(rnd()-.5)*rRelFuzz+rMean; Vector3r c;
+			Real r=(rnd()-.5)*rRelFuzz*rMean+rMean; Vector3r c;
 			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
 			else { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
 			size_t packSize=pack.size(); bool overlap=false;

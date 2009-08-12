@@ -72,6 +72,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+#include<yade/pkg-dem/SpherePack.hpp>
+
 //#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 
 
@@ -201,7 +203,7 @@ bool TriaxialTest::generate()
 	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
 	 */
 	Real porosity=.75;
-	vector<BasicSphere> sphere_list;
+	SpherePack sphere_pack;
 	if(importFilename==""){
 		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
 		if(radiusMean<=0) radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
@@ -215,11 +217,17 @@ bool TriaxialTest::generate()
 			dimensions[0]*=fixedDims[0]?1.:boxScaleFactor; dimensions[1]*=fixedDims[1]?1.:boxScaleFactor; dimensions[2]*=fixedDims[2]?1.:boxScaleFactor;
 			upperCorner=lowerCorner+dimensions;
 		}
-		message+=GenerateCloud(sphere_list, lowerCorner, upperCorner, numberOfGrains, radiusStdDev, radiusMean, porosity);
+		long num=sphere_pack.makeCloud(lowerCorner,upperCorner,radiusMean,radiusStdDev,numberOfGrains);
+		message+="Generated a sample with " + lexical_cast<string>(num) + " spheres inside box of dimensions: ("
+			+ lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + "," 
+			+ lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + "," 
+			+ lexical_cast<string>(upperCorner[2]-lowerCorner[2]) + ").";
+		
 	}
 	else {
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
-		sphere_list=Shop::loadSpheresFromFile(importFilename,lowerCorner,upperCorner);
+		sphere_pack.fromFile(importFilename);
+		sphere_pack.aabb(lowerCorner,upperCorner);
 	}
 
 	// setup rootBody here, since radiusMean is now at its true value (if it was negative)
@@ -333,11 +341,11 @@ bool TriaxialTest::generate()
 			 
 	}
 
-	vector<BasicSphere>::iterator it = sphere_list.begin();
-	vector<BasicSphere>::iterator it_end = sphere_list.end();
-	FOREACH(const BasicSphere& it, sphere_list){
-		LOG_DEBUG("sphere (" << it.first << " " << it.second << ")");
-		createSphere(body,it.first,it.second,false,true);
+	size_t imax=sphere_pack.pack.size();
+	for(size_t i=0; i<imax; i++){
+		const SpherePack::Sph& sp(sphere_pack.pack[i]);
+		LOG_DEBUG("sphere (" << sp.c << " " << sp.r << ")");
+		createSphere(body,sp.c,sp.r,false,true);
 		if(biaxial2dTest){ body->physicalParameters->blockedDOFs=PhysicalParameters::DOF_Z; }
 		rootBody->bodies->insert(body);
 	}	
@@ -641,8 +649,8 @@ void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 	= physics;
 	
 }
-
-
+// 0xdeadc0de, superseded by SpherePack::makeCloud
+#if 0
 string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real mean_radius, Real porosity)
 {
 	typedef boost::minstd_rand StdGenerator;
@@ -684,7 +692,7 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 			+ lexical_cast<string>(dimensions[1]) + "," 
 			+ lexical_cast<string>(dimensions[2]) + ").";
 }
-
+#endif
 
 
 YADE_PLUGIN((TriaxialTest));

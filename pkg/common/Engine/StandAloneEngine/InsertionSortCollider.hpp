@@ -38,8 +38,15 @@ class InsertionSortCollider: public Collider{
 		//! is it the minimum (true) or maximum (false) bound?
 		struct{ unsigned hasBB:1; unsigned isMin:1; } flags;
 		Bound(Real coord_, body_id_t id_, bool isMin): coord(coord_), id(id_){ flags.isMin=isMin; }
-		bool operator<(const Bound& b) const {return coord<b.coord;}
-		bool operator>(const Bound& b) const {return coord>b.coord;}
+		bool operator<(const Bound& b) const {
+			/* handle special case of zero-width bodies, which could otherwise get min/max swapped in the unstable std::sort */
+			if(id==b.id && coord==b.coord) return flags.isMin;
+			return coord<b.coord;
+		}
+		bool operator>(const Bound& b) const {
+			if(id==b.id && coord==b.coord) return b.flags.isMin;
+			return coord>b.coord;
+		}
 	};
 	#ifdef COLLIDE_STRIDED
 		// keep this dispatcher and call it ourselves as needed

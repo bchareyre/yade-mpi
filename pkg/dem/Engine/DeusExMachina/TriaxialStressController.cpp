@@ -148,6 +148,8 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 	previousTranslation[wall] = (1-wallDamping)*translation*normal[wall] + 0.8*previousTranslation[wall];// formula for "steady-flow" evolution with fluctuations
 	//cerr << "translation = " << previousTranslation[wall] << endl;
 	p->se3.position += previousTranslation[wall];
+	// this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
+	static_cast<RigidBodyParameters*>(p)->velocity=previousTranslation[wall]/ncb->dt;
 	if(log)TRVAR2(previousTranslation,p->se3.position);
 }
 

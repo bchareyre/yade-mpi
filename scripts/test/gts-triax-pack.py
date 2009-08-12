@@ -2,9 +2,9 @@ from numpy import arange
 from yade import pack
 import pylab
 # define the section shape as polygon in 2d; repeat first point at the end to close the polygon
-poly=((2e-3,1e-2),(1e-2,5e-3),(1.5e-2,-5e-3),(2e-3,-1e-2),(2e-3,1e-2))
+poly=((1e-2,5e-2),(5e-2,2e-2),(7e-2,-2e-2),(1e-2,-5e-2),(1e-2,5e-2))
 # show us the meridian shape
-pylab.plot(*zip(*poly)); pylab.xlim(xmin=0); pylab.grid(); pylab.title('Meridian of the revolution surface\n(close to continue)'); pylab.gca().set_aspect(aspect='equal',adjustable='box'); pylab.show()
+#pylab.plot(*zip(*poly)); pylab.xlim(xmin=0); pylab.grid(); pylab.title('Meridian of the revolution surface\n(close to continue)'); pylab.gca().set_aspect(aspect='equal',adjustable='box'); pylab.show()
 # angles at which we want this polygon to appear
 thetas=arange(0,pi/2,pi/24)
 # create 3d points from the 2d ones, turning the 2d meridian around the +y axis
@@ -17,7 +17,7 @@ thetas=arange(0,pi/2,pi/24)
 # without these transformation, it would look a little simpler:
 # 	pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+2e-3*theta) for pt in poly] for theta in thetas],thetas
 #
-pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+2e-3*theta) for pt in poly] for theta in thetas],thetas,origin=Vector3(0,0,.1),orientation=Quaternion((1,1,0),pi/4))
+pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+1e-2*theta) for pt in poly] for theta in thetas],thetas,origin=Vector3(0,-.05,.1),orientation=Quaternion((1,1,0),pi/4))
 # connect meridians to make surfaces
 # caps will close it at the beginning and the end
 # threshold will merge points closer than 1e-4; this is important: we want it to be closed for filling
@@ -31,12 +31,18 @@ O.bodies.append(pack.gtsSurface2Facets(surf,color=(1,0,1)))
 # parameters (or parameters that can be scaled to the same one),
 # it will load the packing instead of running the triaxial compaction again.
 # Try running for the second time to see the speed difference!
-O.bodies.append(pack.triaxialPack(pack.inGtsSurface(surf),radius=1e-4,radiusStDev=1e-4,memoizeDb='/tmp/gts-triax-packings.sqlite'))
+memoizeDb='/tmp/gts-triax-packings.sqlite'
+O.bodies.append(pack.triaxialPack(pack.inGtsSurface(surf),radius=5e-3,radiusStDev=1e-4,memoizeDb=memoizeDb))
 # We could also fill the horse with triaxial packing, but have nice approximation, the triaxial would run terribly long,
 # since horse discard most volume of its bounding box
 # Here, we would use a very crude one, however
-if 0:
+if 1:
 	import gts
 	horse=gts.read(open('horse.coarse.gts'))
-	horse.scale(.1)
-	O.bodies.append(pack.triaxialPack(pack.inGtsSurface(horse),radius=5e-4))
+	#horse.scale(.25,.25,.25)
+	O.bodies.append(pack.gtsSurface2Facets(horse))
+	O.bodies.append(pack.triaxialPack(pack.inGtsSurface(horse),radius=5e-3,memoizeDb=memoizeDb))
+	## NB: periodic triaxial doesn't work yet
+	#horse.translate(0,.2,0)
+	#O.bodies.append(pack.gtsSurface2Facets(horse))
+	#O.bodies.append(pack.triaxialPack(pack.inGtsSurface(horse),radius=1,spheresInCell=2000))#,memoizeDb=memoizeDb))

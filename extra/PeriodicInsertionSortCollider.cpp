@@ -329,9 +329,6 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 					// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
 					// from V[i] until we meet the upper bound and swap the isMin flag
 
-					// PERI: this can happen if each boundary wraps to different period. That is OK.
-					// PERI: this should however be somehow distinguished from the case that they are in the same period...
-					// PERI: perhaps check that when periods are assigned and add some hair distance to the maximum...?
 					#if 0
 					if(j==2*(size_t)nBodies-1){ /* handle case 1. of swapped min/max */
 						size_t k=i-1;
@@ -363,12 +360,18 @@ void PeriIsoCompressor::action(MetaBody* rb){
 	if(!rb->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
 	if(state>=stresses.size()) return;
 	// initialize values
-	if(charLen<0){
+	if(charLen<=0){
 		BoundingVolume* bv=Body::byId(0,rb)->boundingVolume.get();
 		if(!bv){ LOG_FATAL("No charLen defined and body #0 has no boundingVolume"); throw; }
 		const Vector3r sz=bv->max-bv->min;
 		charLen=(sz[0]+sz[1]+sz[2])/3.;
 		LOG_INFO("No charLen defined, taking avg bbox size of body #0 = "<<charLen);
+	}
+	if(maxSpan<=0){
+		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+			if(!b->boundingVolume) continue;
+			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->boundingVolume->max[i]-b->boundingVolume->min[i]);
+		}
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
 	const long& step=rb->currentIteration;
@@ -392,6 +395,7 @@ void PeriIsoCompressor::action(MetaBody* rb){
 		// FIXME: or perhaps maxDisplaPerStep=1e-2*charLen is too big??
 		cellGrow[axis]=1e-4*(sigma[axis]-sigmaGoal)*cellArea[axis]/(avgStiffness>0?avgStiffness:1);
 		if(abs(cellGrow[axis])>maxDisplPerStep) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxDisplPerStep;
+		cellGrow[axis]=max(cellGrow[axis],-(cellSize[0]-2.1*maxSpan));
 		// crude way of predicting sigma, for steps when it is not computed from intrs
 		if(avgStiffness>0) sigma[axis]-=cellGrow[axis]*avgStiffness;
 		if(abs((sigma[axis]-sigmaGoal)/sigmaGoal)>5e-3) allStressesOK=false;
@@ -409,7 +413,7 @@ void PeriIsoCompressor::action(MetaBody* rb){
 				#ifdef YADE_PYTHON
 					if(!doneHook.empty()){ LOG_DEBUG("Running doneHook: "<<doneHook); PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString(doneHook.c_str()); PyGILState_Release(gstate); }
 				#endif
-			} else { LOG_INFO("Loading to "<<sigmaGoal<<" done, starting going to "<<stresses[state]<<" now"); }
+			} else { LOG_INFO("Loaded to "<<sigmaGoal<<" done, going to "<<stresses[state]<<" now"); }
 		} else {
 			if((step%globalUpdateInt)==0) LOG_DEBUG("Stress="<<sigma<<", goal="<<sigmaGoal<<", unbalanced="<<currUnbalanced);
 		}

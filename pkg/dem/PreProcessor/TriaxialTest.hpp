@@ -141,8 +141,11 @@ class TriaxialTest : public FileGenerator
 		void positionRootBody(shared_ptr<MetaBody>& rootBody);
 
 		typedef pair<Vector3r, Real> BasicSphere;
+	//	0xdeadc0de
+	#if 0
 		//! generate a list of non-overlapping spheres
 		string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real mean_radius, Real porosity);
+	#endif
 
 	
 	public : 

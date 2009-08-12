@@ -51,7 +51,7 @@ void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 	}
-	operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->physicalParameters->se3,ncb);
+	if(ncb->physicalParameters && ncb->boundingVolume && ncb->interactingGeometry) operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->physicalParameters->se3,ncb);
 }
 
 
