@@ -462,8 +462,12 @@ class DynLibDispatcher
 			index2 = base2->getClassIndex();
 			assert( index1 >= 0 ); 
 			assert( index2 >= 0 ); 
+			#if 0 
+				if((unsigned)index1>=callBacks.size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base1->getClassName()<<" (index=="<<index1<<", callBacks.size()=="<<callBacks.size()<<endl;
+				if((unsigned)index2>=callBacks[index2].size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base2->getClassName()<<" (index=="<<index2<<", callBacks[index1].size()=="<<callBacks[index1].size()<<endl;
+			#endif
 			assert((unsigned int)( index1 ) < callBacks.size());
-			assert((unsigned int)( index2 ) < callBacks.size());
+			assert((unsigned int)( index2 ) < callBacks[index1].size());
 				
 			if(callBacks[index1][index2])
 				return true;

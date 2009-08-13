@@ -72,6 +72,7 @@ class CpmMat: public BodyMacroParameters {
 		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.) {createIndex();};
 		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl));
 		REGISTER_CLASS_AND_BASE(CpmMat,BodyMacroParameters);
+		REGISTER_CLASS_INDEX(CpmMat,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(CpmMat);
 
@@ -185,6 +186,7 @@ class CpmPhys: public NormalShearInteraction {
 		);
 	REGISTER_CLASS_AND_BASE(CpmPhys,NormalShearInteraction);
 	DECLARE_LOGGER;
+	REGISTER_CLASS_INDEX(CpmPhys,NormalShearInteraction);
 };
 REGISTER_SERIALIZABLE(CpmPhys);
 

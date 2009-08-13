@@ -65,6 +65,7 @@ class RpmMat: public BodyMacroParameters {
 			(Brittleness)
 			(G_over_E));
 		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
+		REGISTER_CLASS_INDEX(RpmMat,BodyMacroParameters);
 };
 REGISTER_SERIALIZABLE(RpmMat);
 
@@ -119,5 +120,6 @@ class RpmPhys: public NormalShearInteraction {
 			(lengthMaxTension)
 		);
 	REGISTER_CLASS_AND_BASE(RpmPhys,NormalShearInteraction);
+	REGISTER_CLASS_INDEX(RpmPhys,NormalShearInteraction);
 };
 REGISTER_SERIALIZABLE(RpmPhys);

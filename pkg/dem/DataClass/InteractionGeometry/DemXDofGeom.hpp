@@ -32,7 +32,7 @@ class Dem3DofGeom: public GenericSpheresContact{
 		//! reference radii of particles (for initial contact stiffness computation)
 		Real &refR1, &refR2;
 
-		Dem3DofGeom(): normal(GenericSpheresContact::normal), refR1(GenericSpheresContact::refR1), refR2(GenericSpheresContact::refR2) {}
+		Dem3DofGeom(): normal(GenericSpheresContact::normal), refR1(GenericSpheresContact::refR1), refR2(GenericSpheresContact::refR2) { createIndex(); }
 
 		// API that needs to be implemented in derived classes
 		virtual Real displacementN();
@@ -50,6 +50,7 @@ class Dem3DofGeom: public GenericSpheresContact{
 		Real slipToStrainTMax(Real strainTMax){return slipToDisplacementTMax(strainTMax*refLength)/refLength;}
 
 		REGISTER_CLASS_AND_BASE(Dem3DofGeom,InteractionGeometry);
+		REGISTER_CLASS_INDEX(Dem3DofGeom,InteractionGeometry);
 		REGISTER_ATTRIBUTES(InteractionGeometry,(refLength)(normal)(contactPoint)(se31)(se32)(refR1)(refR2));
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom);
