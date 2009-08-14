@@ -1,5 +1,54 @@
 vim:syntax=changelog
 
+2009-08-?? Václav Šmilauer <eudoxos@arcig.cz> revision 19??
+
+	* RELEASE: 0.20.0
+
+	* overall: 
+		- fix many crashers, including synchronization with openGL, GUI and python
+		- generate documentation for both python and c++ classes/functions automatically (http://yade.wikia.com/wiki/Reference_documentation)
+		- move away from SVN repository at berlios.de to bzr at http://www.launchpad.net/yade; bug tracking and other launchpad features are being used; mailing lists migrated to launchpad
+
+	* functionality enhancements (apart from performance-oriented changes):
+		- Facets (arbitrary triangulation elements) interacting with spheres, allowing to triangulate any surface
+		- support for GTS-compatible triangulated surfaces both as predicates and facet-triangulated simulation elements
+		- non-incremental sphere-sphere and sphere-facet contact geometry classes (Dem3DofGeom)
+		- ConstitutiveLawDispatcher, for having multiple constitutive laws operating on different interactions
+		- schedule to run multiple jobs at time, with different parameters (yade-multi, http://yade.wikia.com/wiki/ScriptParametricStudy)
+		- added PhysicalParameters::blockedDOFs
+		- periodic boundary conditions
+		- interaction logic cleaned up
+		- sphere packing generators (orthogonal, hexagonal, loose random, triaxially compacted; periodic coming soon)
+		- geometry predicates to clip packing, including boolean operations on predicates
+		- infrastructure for regression tests
+
+	* performance:
+		- consistent openMP support throughout the code (InteractionDispatchers, NewtonsDampedLaw, BexContainer) (http://yade.wikia.com/wiki/Performance_Tuning#openMP)
+		- InsertionSortCollider (PersistentSAPCollide removed) (http://yade.wikia.com/wiki/Colliders_performace)
+		- InteractionDispatchers that reduce number of loops over interactions to one (http://yade.wikia.com/wiki/Performance_Tuning#InteractionDispatchers)
+		- new fast container for interactions (InteractionVecMap) (http://yade.wikia.com/wiki/Performance_Tuning#Containers)
+		- caching dispatchers, avoiding repetitive multivirtual call resolution (http://yade.wikia.com/wiki/Performance_Tuning#Dispatcher_cache)
+		- runtime profiling information (http://yade.wikia.com/wiki/Speed_profiling_using_TimingInfo_and_TimingDeltas_classes)
+		- avoid running collision detection at every step (http://yade.wikia.com/wiki/Insertion_Sort_Collider_Stride)
+		- vector and quaternion classes are wrapped in python automatically (faster, avoids hand-written wrappers)
+		- removed many python proxy classes, resulting in big speedup of python (e.g. 40 × for some operations)
+
+	* building:
+		- yade can be optionally with one single plugin containing all packages. Speeds up full compilation considerably and reduces binary size several times.
+		- files in pkg/* are picked up automatically by the build system, including linking flags
+		- do not install headers, only plugins
+		- fix debian-package builds and document the procedure (http://yade.wikia.com/wiki/DebianPackages), special package for docs
+		- fix all (or most) compile-time warnings
+		- create new top-level py/ directory for python
+
+	* python:
+		- use natural syntax for class instance construction with attributes
+		- run telnet server to make yade accessible while running (from localhost only)
+		- save any python variables within the XML file, which will be resurrected next time (utils.saveVars, utils.loadVars)
+		- support saving simulation to memory temporarily
+		- functions from creating video from simulation (via snapshots, either during simulation or in the player)
+
+
 2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1579
 
 	* RELEASE: 0.12.1
