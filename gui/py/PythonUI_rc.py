@@ -76,9 +76,9 @@ renamed={
 	'GLDrawBrefcomContact':'GLDrawCpmPhys',
 	'BrefcomDamageColorizer':'CpmPhysDamageColorizer',
 	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics',
-	# renamed back to comply with the c++ name, 4.8.2009
-	'Preprocessor':'FileGenerator',
+	'Preprocessor':'FileGenerator', # renamed back to comply with the c++ name, 4.8.2009
 	'PersistentSAPCollider':'InsertionSortCollider',
+	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
 for oldName in renamed:
