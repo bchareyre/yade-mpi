@@ -20,7 +20,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'PhysicalParameters.cpp',
 			'Preferences.cpp',
 			'SimulationFlow.cpp',
-			'StandAloneSimulator.cpp',
 			'ThreadRunner.cpp',
 			'ThreadWorker.cpp',
 			'TimeStepper.cpp',
