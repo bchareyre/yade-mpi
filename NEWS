@@ -48,6 +48,10 @@ vim:syntax=changelog
 		- support saving simulation to memory temporarily
 		- functions from creating video from simulation (via snapshots, either during simulation or in the player)
 
+	* Documentation:
+		- Structurized content added http://yade.wikia.com/wiki/Structurized_content
+		- FAQ start to implement http://yade.wikia.com/wiki/FAQ
+
 
 2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1579
 
