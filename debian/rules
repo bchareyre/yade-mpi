@@ -75,7 +75,8 @@ binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+## check added by eudoxos
+binary-arch: build install check
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs ChangeLog
