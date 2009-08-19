@@ -5,6 +5,7 @@
 #include<vector>
 #include<unistd.h>
 #include<list>
+#include<signal.h>
 
 #include<boost/python.hpp>
 #include<boost/python/raw_function.hpp>
