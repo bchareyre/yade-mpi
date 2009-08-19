@@ -137,7 +137,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL',names=['openGL','python','log4cxx','CGAL','dummy','GTS']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL,GTS',names=['openGL','python','log4cxx','CGAL','dummy','GTS']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -172,7 +172,7 @@ for v in propagatedEnvVars:
 if os.environ.has_key('DEB_BUILD_OPTIONS'):
 	for opt in os.environ['DEB_BUILD_OPTIONS'].split():
 		if opt.startswith('parallel='):
-			j=opt.split('=')[1]
+			j=opt.split('=')[1].split(',')[0] # there was a case of 5, in hardy...
 			print "Setting number of jobs (using DEB_BUILD_OPTIONS) to `%s'"%j
 			env['jobs']=int(j)
 
@@ -406,7 +406,7 @@ libDirs=('extra','gui','lib','py','plugins')
 instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x) for x in libDirs]
 ## runtime library search directories; there can be up to 2 levels of libs, so we do in in quite a crude way here:
 ## FIXME: find some better way to do that?
-runtimeLibDirs=[os.path.join(r"'$$$$ORIGIN'/../",x) for x in libDirs]+[os.path.join(r"'$$$$ORIGIN'/../../",x) for x in libDirs]
+runtimeLibDirs=[os.path.join(r"'$$$$ORIGIN'/../",x) for x in libDirs]+[os.path.join(r"'$$$$ORIGIN'/../../",x) for x in libDirs]+["'$$$$ORIGIN'/../lib/yade$SUFFIX/lib"]
 
 
 ### PREPROCESSOR FLAGS
