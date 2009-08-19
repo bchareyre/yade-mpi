@@ -178,10 +178,10 @@ Help(opts.GenerateHelpText(env))
 ###########################################
 import yadeSCons
 ## ALL generated stuff should go here - therefore we must determine it very early!!
-env['realVersion']=yadeSCons.getRealVersion()
 if not env.has_key('version'):
+	env['realVersion']=yadeSCons.getRealVersion()
 	env['version']=env['realVersion']
-if not env['realVersion']: env['realVersion']=env['version']
+if not env.has_key('realVersion') or not env['realVersion']: env['realVersion']=env['version']
 
 env['SUFFIX']='-'+env['version']+env['variant']
 print "Yade version is `%s', installed files will be suffixed with `%s'."%(env['version'],env['SUFFIX'])
@@ -395,8 +395,9 @@ env['PREFIX']=os.path.abspath(env['PREFIX'])
 libDirs=('extra','gui','lib','py','plugins')
 # where are we going to be installed... pkg/dem becomes pkg-dem
 instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x) for x in libDirs]
-# where are we going to be run - may be different (packaging)
-runtimeLibDirs=[os.path.join('$runtimePREFIX','lib','yade$SUFFIX',x) for x in libDirs]
+## runtime library search directories; there can be up to 2 levels of libs, so we do in in quite a crude way here:
+## FIXME: find some better way to do that?
+runtimeLibDirs=[os.path.join(r"'$$$$ORIGIN'/../",x) for x in libDirs]+[os.path.join(r"'$$$$ORIGIN'/../../",x) for x in libDirs]
 
 
 ### PREPROCESSOR FLAGS

@@ -79,14 +79,15 @@ void PythonUI::pythonSession(){
 	PyGILState_STATE pyState = PyGILState_Ensure();
 		LOG_DEBUG("Got Global Interpreter Lock, good.");
 		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
-		PyRun_SimpleString("import sys; sys.path.insert(0,'" PREFIX "/lib/yade" SUFFIX "/py')");
+		string prefix=getenv("YADE_PREFIX")?getenv("YADE_PREFIX"):PREFIX;
+		PyRun_SimpleString(("import sys; sys.path.insert(0,'"+prefix+"/lib/yade" SUFFIX "/py')").c_str());
 		PyRun_SimpleString("import yade");
 		PyRun_SimpleString("from __future__ import division");
 
 		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
 		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())
 			// wrap those in python::handle<> ??
-			PYTHON_DEFINE_STRING("prefix",PREFIX);
+			PYTHON_DEFINE_STRING("prefix",prefix);
 			PYTHON_DEFINE_STRING("suffix",SUFFIX);
 			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
 			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
@@ -96,7 +97,7 @@ void PythonUI::pythonSession(){
 			{ ostringstream oss; oss<<"yade.runtime.argv=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
-		execScript(PREFIX "/lib/yade" SUFFIX "/gui/PythonUI_rc.py");
+		execScript((prefix+"/lib/yade" SUFFIX "/gui/PythonUI_rc.py").c_str());
 	PyGILState_Release(pyState);
 }
 

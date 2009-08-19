@@ -182,16 +182,18 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 }
 
 void Omega::scanPlugins(string baseDir){
+	// silently skip non-existent plugin directories
+	if(!filesystem::exists(baseDir)) return;
 	try{
 		filesystem::recursive_directory_iterator Iend;
 		for(filesystem::recursive_directory_iterator I(baseDir); I!=Iend; ++I){ 
 			filesystem::path pth=I->path();
-			if(filesystem::is_directory(pth) || ClassFactory::instance().libNameToSystemName(ClassFactory::instance().systemNameToLibName(filesystem::basename(pth)))!=(pth.leaf())){ LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<"."); continue; }
+			if(filesystem::is_directory(pth) || !algorithm::starts_with(pth.leaf(),"lib") || !algorithm::ends_with(pth.leaf(),".so")) { LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<"."); continue; }
 			LOG_DEBUG("Trying "<<pth.leaf());
 			filesystem::path name(filesystem::basename(pth));
 			if(name.leaf().length()<1) continue; // filter out 0-length filenames
 			string plugin=name.leaf();
-			if(!ClassFactory::instance().load(ClassFactory::instance().systemNameToLibName(plugin))){
+			if(!ClassFactory::instance().load(pth.string())){
 				string err=ClassFactory::instance().lastError();
 				if(err.find(": undefined symbol: ")!=std::string::npos){
 					size_t pos=err.rfind(":");	assert(pos!=std::string::npos);

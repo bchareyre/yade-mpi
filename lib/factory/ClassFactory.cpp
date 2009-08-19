@@ -108,16 +108,6 @@ string ClassFactory::lastError()
         return dlm.lastError();
 }
 
-string ClassFactory::libNameToSystemName(const string& name)
-{
-        return dlm.libNameToSystemName(name);
-}
-
-string ClassFactory::systemNameToLibName(const string& name)
-{
-	return dlm.systemNameToLibName(name);
-}
-
 
 void ClassFactory::registerPluginClasses(const char* fileAndClasses[]){
 	assert(fileAndClasses[0]!=NULL); // must be file name

@@ -165,6 +165,9 @@ void printHelp()
 	;
 	if(!isnan(std::numeric_limits<double>::quiet_NaN())) cerr<<
 		"   -ffast-math?  WARNING: NaN's will not work"<<endl;
+	if(getenv("YADE_PREFIX")){
+		cerr<<"\n** Using env variable YADE_PREFIX="<<getenv("YADE_PREFIX")<<" instead of compiled-in PREFIX="<<PREFIX<<" **\n";
+	}
 
 }
 
@@ -260,9 +263,18 @@ int main(int argc, char *argv[])
 	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
 
 	LOG_INFO("Loading plugins");
+
+	// set YADE_PREFIX to use prefix different from the one compiled-in; used for testing deb package when not installed
+	if(!getenv("YADE_PREFIX")){
 		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/plugins" ));
 		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/gui" ));
 		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/extra" ));
+	} else {
+		string otherPREFIX(getenv("YADE_PREFIX"));
+		Omega::instance().scanPlugins(otherPREFIX+"/lib/yade" SUFFIX "/plugins");
+		Omega::instance().scanPlugins(otherPREFIX+"/lib/yade" SUFFIX "/gui");
+		Omega::instance().scanPlugins(otherPREFIX+"/lib/yade" SUFFIX "/extra");
+	}
 	Omega::instance().init();
 
 	// make directory for temporaries

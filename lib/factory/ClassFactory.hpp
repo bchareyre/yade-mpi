@@ -160,14 +160,11 @@ class ClassFactory : public Singleton< ClassFactory >
 		*/
 		bool isFactorable(const type_info& tp,bool& fundamental);
 
-		bool load(const string& name);
+		bool load(const string& fullFileName);
 		std::string lastError();
 
 		void registerPluginClasses(const char* fileAndClasses[]);
 		list<string> pluginClasses;
-
-		string libNameToSystemName(const string& name);
-		string systemNameToLibName(const string& name);
 
 		virtual string getClassName() const { return "Factorable"; };
 		virtual string getBaseClassName(int ) const { return "";};

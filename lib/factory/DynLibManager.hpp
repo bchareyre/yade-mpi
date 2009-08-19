@@ -9,14 +9,7 @@
 
 #pragma once
 
-#ifdef WIN32
-	#define OS "Windows"
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h> 
-#else
-	#include <dlfcn.h>
-	#define OS "Linux"
-#endif
+#include <dlfcn.h>
 
 #include <string>
 #include <iostream>
@@ -31,11 +24,7 @@ using namespace std;
 class DynLibManager 
 {
 	private :
-		#ifdef WIN32
-		std::map<const std::string, HINSTANCE> handles;	
-		#else	
 		std::map<const std::string, void *> handles;
-		#endif
 		bool autoUnload;
 
 	public :
@@ -43,17 +32,13 @@ class DynLibManager
 		~DynLibManager ();
 		void addBaseDirectory(const std::string& dir);
 
-		bool load(const std::string& libName, const std::string& libName2);
-		bool load(const std::string& pluginName){return load(libNameToSystemName(pluginName),pluginName);}
+		bool load(const std::string& libName);
 
-
-		bool unload (const string libName);
-		bool isLoaded (const string libName);
+		bool unload (const string& libName);
+		bool isLoaded (const string& libName);
 		bool unloadAll ();
 		void setAutoUnload ( bool enabled );
 
-		string libNameToSystemName(const string& name);
-		string systemNameToLibName(const string& name);
 		string lastError();
 		DECLARE_LOGGER;
 

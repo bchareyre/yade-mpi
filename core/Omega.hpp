@@ -99,7 +99,7 @@ class Omega : public Singleton<Omega>
 		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
 		string 				 yadeVersionName;	// FIXME - public ?
-	
+
 		// FIXME this is a hack. See  GLViewer:86
 		// problem is that currently there is no way to transmit arguments between UI and GLDraw* methods.
 		// Omega will be deleted anyway, so, uh.. I am polluting it now :/
