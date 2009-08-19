@@ -64,6 +64,12 @@ if sconsVersion<9806.0 and not os.environ.has_key('NO_SCONS_GET_RECENT'):
 ############# OPTIONS ####################################################################
 ##########################################################################################
 
+### hardy compatibility (may be removed at some later point probably)
+### used only when building debian package, since at that point auto download of newer scons is disabled
+if 'Variables' not in dir():
+	Variables=Options
+	BoolVariable,ListVariable,EnumVariable=BoolOption,ListOption,EnumOption
+
 env=Environment(tools=['default'])
 profileFile='scons.current-profile'
 
@@ -109,6 +115,9 @@ else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'openmp':True}
 
 
 opts=Variables(optsFile)
+## compatibility hack again
+if 'AddVariables' not in dir(opts): opts.AddVariables=opts.AddOptions
+
 #
 # The convention now is, that
 #  1. CAPITALIZED options are
