@@ -6,6 +6,7 @@
 #include"QtSimulationPlayer.hpp"
 
 #include<qapplication.h>
+#include<qcolor.h>
 
 #include<cstdio>
 
@@ -156,6 +157,7 @@ class pyGLViewer{
 		void useDisplayParameters(size_t n){GLV; MUTEX; glv->useDisplayParameters(n);}
 		string get_timeDisp(){GLV; const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}
 		void set_timeDisp(string s){GLV; MUTEX; int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
+		void set_bgColor(const Vector3r& c){ QColor cc(255*c[0],255*c[1],255*c[2]); GLV; MUTEX; glv->setBackgroundColor(cc);} Vector3r get_bgColor(){ GLV; MUTEX; QColor c(glv->backgroundColor()); return Vector3r(c.red()/255.,c.green()/255.,c.blue()/255.);}
 		#undef MUTEX
 		#undef GLV
 };
@@ -201,6 +203,7 @@ BOOST_PYTHON_MODULE(_qt){
 		.add_property("ortho",&pyGLViewer::get_orthographic,&pyGLViewer::set_orthographic)
 		.add_property("screenSize",&pyGLViewer::get_screenSize,&pyGLViewer::set_screenSize)
 		.add_property("timeDisp",&pyGLViewer::get_timeDisp,&pyGLViewer::set_timeDisp)
+		// .add_property("bgColor",&pyGLViewer::get_bgColor,&pyGLViewer::set_bgColor) // useless: OpenGLRenderingEngine::Background_color is used via openGL directly, bypassing QGLViewer background property
 		.def("fitAABB",&pyGLViewer::fitAABB)
 		.def("fitSphere",&pyGLViewer::fitSphere)
 		.def("showEntireScene",&pyGLViewer::showEntireScene)

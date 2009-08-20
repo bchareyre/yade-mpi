@@ -10,7 +10,7 @@ bzr checkout --lightweight lp:yade trunk
 cd trunk; scripts/debian-prep jaunty; cd .. # distro not important here
 dpkg-source -b -I trunk
 DSC=yade-`cat trunk/VERSION`_1.dsc
-for DIST in hardy jaunty karmic lenny squeeze; do
+for DIST in lenny squeeze hardy jaunty karmic; do
 	echo ======================================================================================================
 	echo ============================================= TESTING $DIST ==========================================
 	echo ======================================================================================================

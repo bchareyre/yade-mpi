@@ -118,6 +118,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 	// register from-python converter and to-python converter
 	custom_vector_from_seq<int>(); to_python_converter<std::vector<int>, custom_vector_to_list<int> >();
 	custom_vector_from_seq<Real>(); to_python_converter<std::vector<Real>, custom_vector_to_list<Real> >();
+	custom_vector_from_seq<Se3r>(); to_python_converter<std::vector<Se3r>, custom_vector_to_list<Se3r> >();
 	custom_vector_from_seq<Vector3r>(); to_python_converter<std::vector<Vector3r>, custom_vector_to_list<Vector3r> >();
 	custom_vector_from_seq<std::string>(); to_python_converter<std::vector<std::string>, custom_vector_to_list<std::string> >();
 	custom_vector_from_seq<shared_ptr<Body> >(); to_python_converter<std::vector<shared_ptr<Body> >, custom_vector_to_list<shared_ptr<Body> > >();
