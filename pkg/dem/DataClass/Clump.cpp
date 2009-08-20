@@ -18,8 +18,8 @@ CREATE_LOGGER(ClumpMemberMover);
 ClumpMemberMover::ClumpMemberMover(){/*createIndex();*/ }
 
 /*! We only call clump's method, since it belongs there logically. It makes encapsulation of private members nicer, too.
- * @param pp passed by the dispatcher
- * @param clump passed by the dispatcher
+ * _param pp passed by the dispatcher
+ * _param clump passed by the dispatcher
  */
 void ClumpMemberMover::applyCondition(MetaBody* rootBody){
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){

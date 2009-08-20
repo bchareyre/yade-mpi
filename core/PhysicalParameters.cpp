@@ -14,7 +14,7 @@ std::vector<std::string> PhysicalParameters::blockedDOFs_vec_get() const {
 	#undef _SET_DOF
 	return ret;
 }
-void PhysicalParameters::blockedDOFs_vec_set(const std::vector<string>& dofs){
+void PhysicalParameters::blockedDOFs_vec_set(const std::vector<std::string>& dofs){
 	FOREACH(const std::string s, dofs){
 		#define _GET_DOF(DOF_ANY,str) if(s==str) { blockedDOFs|=PhysicalParameters::DOF_ANY; continue; }
 		_GET_DOF(DOF_X,"x"); _GET_DOF(DOF_Y,"y"); _GET_DOF(DOF_Z,"z"); _GET_DOF(DOF_RX,"rx"); _GET_DOF(DOF_RY,"ry"); _GET_DOF(DOF_RZ,"rz");

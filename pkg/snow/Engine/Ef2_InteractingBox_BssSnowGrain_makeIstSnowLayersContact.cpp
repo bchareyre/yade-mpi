@@ -249,16 +249,16 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)
 {
-///	bool result = go(cm2,cm1,se32,se31,c);
-///	if(result)
-///	{
-///		shared_ptr<SpheresContactGeometry> scm;
-///		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
-///		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
-///		scm->normal *= -1.0;
-///		std::swap(scm->radius1,scm->radius2);
-///	}
-///	return result;
+//	bool result = go(cm2,cm1,se32,se31,c);
+//	if(result)
+//	{
+//		shared_ptr<SpheresContactGeometry> scm;
+//		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+//		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
+//		scm->normal *= -1.0;
+//		std::swap(scm->radius1,scm->radius2);
+//	}
+//	return result;
 
 
 	//InteractingBox* m1=static_cast<InteractingBox*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());

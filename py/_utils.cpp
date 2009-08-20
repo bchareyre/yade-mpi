@@ -191,7 +191,8 @@ void highlightNone(){
 
 /*!Sum moments acting on given bodies
  *
- * @param mask is Body::groupMask that must match for a body to be taken in account.
+ * @param ids is the calculated bodies ids
+ * param mask is Body::groupMask that must match for a body to be taken in account.
  * @param axis is the direction of axis with respect to which the moment is calculated.
  * @param axisPt is a point on the axis.
  *

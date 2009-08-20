@@ -354,7 +354,7 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 }
 
 /*!
-    \fn TriaxialStressController::ComputeUnbalancedForce()
+    \fn TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
  */
 Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
 {

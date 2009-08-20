@@ -77,12 +77,13 @@ bool ClumpTestGen::generate()
  * Attention here: clump's id must be greater than id of any of its constituents; therefore
  *   1. create bodies that will be clumped, add them to bodies (at that moment they get their id) and save their ids in clumpMembers
  *   2. create (empty) clump and add it to bodies
- *	  3. add bodies to be clumped to the clump
- *	  4. call Clump::updateProperties to get physical properties physically right (inertia, position, orientation, mass, ...).
+ *   3. add bodies to be clumped to the clump
+ *   4. call Clump::updateProperties to get physical properties physically right (inertia, position, orientation, mass, ...).
  *
  * @param clumpPos Center of the clump (not necessarily centroid); serves merely as reference for sphere positions.
  * @param relPos Relative positions of individual spheres' centers.
  * @param radii Radii of composing spheres. Must have the same length as relPos.
+ * @param rootBody clumpedBodies.
  */
 void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii)
 {

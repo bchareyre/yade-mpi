@@ -102,7 +102,7 @@ void YadeQtMainWindow::redrawAll(bool force){
 	}
 }
 
-void YadeQtMainWindow::loadSimulation(string file){createController(); while(!(bool)(controller)) usleep(50000); controller->loadSimulationFromFileName(file); lookDown(glViews[0]);}
+void YadeQtMainWindow::loadSimulation(std::string file){createController(); while(!(bool)(controller)) usleep(50000); controller->loadSimulationFromFileName(file); lookDown(glViews[0]);}
 void YadeQtMainWindow::centerViews(){FOREACH(const shared_ptr<GLViewer>& glv,glViews){ if(glv){ glv->centerScene();}}}
 
 
