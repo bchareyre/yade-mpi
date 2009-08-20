@@ -15,7 +15,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 			]),
 		env.SharedLibrary('_packPredicates',['_packPredicates.cpp'],SHLIBPREFIX='',
 			# link to the symlink to the python module (created in lib/SConstruct; see explanation there)
-			LIBS=env['LIBS']+(['_gts__python-module'] if 'GTS' in env['features'] else []),
+			LIBS=env['LIBS']+(['_gts__python-module'] if 'YADE_GTS' in env['CPPDEFINES'] else []),
 			),
 		env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
 			linkPlugins(['Shop','SpherePack']),
@@ -43,7 +43,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 		env.SharedLibrary('boost_python_indexing_suite_v2',['3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders/indexing_slice.cpp','3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders/python_iterator.cpp'])
 	])
 
-	if 'GTS' in env['features']:
+	if 'YADE_GTS' in env['CPPDEFINES']:
 		env.Install('$PREFIX/lib/yade$SUFFIX/py/gts',[
 			env.SharedLibrary('_gts',['3rd-party/pygts-0.3.1/cleanup.c','3rd-party/pygts-0.3.1/edge.c','3rd-party/pygts-0.3.1/face.c','3rd-party/pygts-0.3.1/object.c','3rd-party/pygts-0.3.1/point.c','3rd-party/pygts-0.3.1/pygts.c','3rd-party/pygts-0.3.1/segment.c','3rd-party/pygts-0.3.1/surface.c','3rd-party/pygts-0.3.1/triangle.c','3rd-party/pygts-0.3.1/vertex.c'],SHLIBPREFIX='',CPPDEFINES=env['CPPDEFINES']+['PYGTS_HAS_NUMPY']),
 			env.File('3rd-party/pygts-0.3.1/__init__.py'),

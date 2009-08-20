@@ -17,4 +17,4 @@ for DIST in lenny squeeze hardy jaunty karmic; do
 	sudo pbuilder --build --basetgz $BASETGZ --debbuildopts "-j5 -Zlzma" $DSC  || FAILED="$FAILED $DIST"
 done
 rm -rf $TMP
-if [ '$FAILED' ]; then echo "Build failed for $FAILED"; exit 1; fi
+if [ '$FAILED' ]; then echo "***************** Build failed for $FAILED"; exit 1; fi
