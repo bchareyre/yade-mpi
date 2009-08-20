@@ -11,6 +11,9 @@ cd trunk; scripts/debian-prep jaunty; cd .. # distro not important here
 dpkg-source -b -I trunk
 DSC=yade-`cat trunk/VERSION`_1.dsc
 for DIST in hardy jaunty karmic lenny squeeze; do
+	echo ======================================================================================================
+	echo ============================================= TESTING $DIST ==========================================
+	echo ======================================================================================================
 	BASETGZ=/var/cache/pbuilder/$DIST.tgz
 	sudo pbuilder --build --basetgz $BASETGZ --debbuildopts "-j5 -Zlzma" $DSC
 done

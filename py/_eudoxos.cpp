@@ -3,7 +3,7 @@
 #include<yade/extra/boost_python_len.hpp>
 using namespace boost::python;
 using namespace std;
-#ifdef LOG4CXX
+#ifdef YADE_LOG4CXX
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.eudoxos");
 #endif
 

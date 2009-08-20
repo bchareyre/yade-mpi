@@ -7,7 +7,7 @@ class PythonUI: public FrontEnd
 {
 	private:
 		void help();
-		static void execScript(string);
+		static int execScript(string);
 		static struct termios tios,tios_orig;
 		static void termSetup();
 		static void termRestore();

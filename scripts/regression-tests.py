@@ -3,7 +3,13 @@ Run all defined regression tests, then exit.
 Exit status is 0 on success and nonzero on failure.
 """
 import yade.tests
-result=yade.tests.testAll()
+try:
+	result=yade.tests.testAll()
+except:
+	print "*********************** UNEXPECTED EXCEPTION WHILE RUNNING TESTS ******************"
+	print "****************** please report bug"
+	print "******************",sys.exc_info()[0]
+	sys.exit(2)
 if result.wasSuccessful():
 	print "*** ALL TESTS PASSED ***"
 else:

@@ -10,7 +10,7 @@
  * Some other macros will be very likely added, to allow for easy variable tracing etc. Suggestions welcome.
  *
  * All of user macros should come in 2 flavors, depending on whether we use log4cxx or not (backward compatibility).
- * The default is not to use it, unless the preprocessor macro LOG4CXX is defined. In that case, you want to #include
+ * The default is not to use it, unless the preprocessor macro YADE_LOG4CXX is defined. In that case, you want to #include
  * yade-core/logging.h and link with log4cxx.
  *
  * TODO:
@@ -24,7 +24,7 @@
  *
  */
 
-#ifdef LOG4CXX
+#ifdef YADE_LOG4CXX
 
 #	include<log4cxx/logger.h>
 #	include<log4cxx/basicconfigurator.h>

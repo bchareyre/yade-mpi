@@ -19,7 +19,7 @@
 
 using namespace boost::python;
 
-#ifdef LOG4CXX
+#ifdef YADE_LOG4CXX
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.utils");
 #endif
 

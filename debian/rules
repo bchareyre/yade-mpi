@@ -58,7 +58,7 @@ install: build
 	###   (a) use fakeroot-tcp instead of fakeroot
 	###   (b) use just 1 job
 	#debug build
-	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr version=${VERSION} pretty=0 linkStrategy=monolithic features=GTS,python,log4cxx,openGL openmp=True exclude=realtime-rigidbody,mass-spring,snow,fem PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1 
+	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr version=${VERSION} pretty=0 linkStrategy=monolithic features=gts,python,log4cxx,opengl,openmp exclude=realtime-rigidbody,mass-spring,snow,fem PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 debug=1 
 	#optimized build
 	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
 	#install platform-independent files (docs, scripts, examples)
@@ -67,8 +67,8 @@ install: build
 check: install
 	dh_testdir
 	dh_testroot
-	LD_PRELOAD= LD_LIBRARY_PATH=debian/yade${_VERSION}-dbg/usr/lib/yade${_VERSION}-dbg/lib YADE_PREFIX=debian/yade${_VERSION}-dbg/usr debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg -x -N PythonUI -- -n -x scripts/regression-tests.py 
-	LD_PRELOAD= LD_LIBRARY_PATH=debian/yade${_VERSION}/usr/lib/yade${_VERSION}/lib YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} -x -N PythonUI -- -n -x scripts/regression-tests.py 
+	LD_PRELOAD= YADE_PREFIX=debian/yade${_VERSION}-dbg/usr debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg -x -N PythonUI -- -n -x scripts/regression-tests.py 
+	LD_PRELOAD= YADE_PREFIX=debian/yade${_VERSION}/usr debian/yade${_VERSION}/usr/bin/yade${_VERSION} -x -N PythonUI -- -n -x scripts/regression-tests.py 
 
 # Build architecture-independent files here.
 binary-indep: build install

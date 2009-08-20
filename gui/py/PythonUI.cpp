@@ -39,15 +39,17 @@ void PythonUI::help(){
 ";
 }
 
-void PythonUI::execScript(string script){
+int PythonUI::execScript(string script){
 	LOG_DEBUG("Python will now run file `"<<script<<"'.");
 	FILE* scriptFILE=fopen(script.c_str(),"r");
 	if(scriptFILE){
-		PyRun_SimpleFile(scriptFILE,script.c_str());
+		int ret=PyRun_SimpleFile(scriptFILE,script.c_str());
+		return ret;
 	}
 	else{
 		string strerr(strerror(errno));
 		LOG_ERROR("Unable to open file `"<<script<<"': "<<strerr<<".");
+		return -1;
 	}
 }
 
@@ -97,7 +99,8 @@ void PythonUI::pythonSession(){
 			{ ostringstream oss; oss<<"yade.runtime.argv=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }
 		#undef PYTHON_DEFINE_STRING
 		#undef PYTHON_DEFINE_BOOL
-		execScript((prefix+"/lib/yade" SUFFIX "/gui/PythonUI_rc.py").c_str());
+		int ret=execScript((prefix+"/lib/yade" SUFFIX "/gui/PythonUI_rc.py").c_str());
+		if(ret!=0){ LOG_FATAL("Error executing PythonUI_rc.py, aborting! Please report bug."); abort(); }
 	PyGILState_Release(pyState);
 }
 

@@ -137,7 +137,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,openGL,GTS',names=['openGL','python','log4cxx','CGAL','dummy','GTS']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -320,7 +320,6 @@ if not env.GetOption('clean'):
 		conf.env.Append(CPPPATH='/usr/include/wm3') # packaged version
 		ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
 
-
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
@@ -328,17 +327,15 @@ if not env.GetOption('clean'):
 		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."%featureName
 		Exit(1)
 	# check "optional" libs
-	if 'openGL' in env['features']:
+	if 'opengl' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
 		if not ok: featureNotOK('openGL')
-		env.Append(CPPDEFINES=['YADE_OPENGL'])
-	if 'GTS' in env['features']:
+	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
 		ok=conf.CheckLibWithHeader('gts','gts.h','c','gts_object_class();',autoadd=1)
-		if not ok: featureNotOK('GTS')
-		env.Append(CPPDEFINES=['YADE_GTS'])
+		if not ok: featureNotOK('gts')
 	if 'qt3' not in env['exclude']:
-		if 'openGL' not in env['features']:
+		if 'opengl' not in env['features']:
 			print "\nQt3 interface can only be used if openGL is enabled.\nEither add openGL to 'features' or add qt3 to 'exclude'."
 			Exit(1)
 		ok&=conf.CheckQt(env['QTDIR'])
@@ -348,18 +345,18 @@ if not env.GetOption('clean'):
 	if 'log4cxx' in env['features']:
 		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
 		if not ok: featureNotOK('log4cxx')
-		env.Append(CPPDEFINES=['LOG4CXX'])
 	if 'python' in env['features']:
 		ok=(conf.CheckPython()
 			and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
 			and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
 			and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 		if not ok: featureNotOK('python')
-		env.Append(CPPDEFINES=['YADE_PYTHON'])
-	if 'CGAL' in env['features']:
+	if 'cgal' in env['features']:
 		ok=cong.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
-		if not ok: featureNotOK('CGAL')
+		if not ok: featureNotOK('cgal')
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
+
+	env.Append(CPPDEFINES=['YADE_'+f.upper() for f in env['features']])
 
 	env=conf.Finish()
 
@@ -405,9 +402,10 @@ libDirs=('extra','gui','lib','py','plugins')
 # where are we going to be installed... pkg/dem becomes pkg-dem
 instLibDirs=[os.path.join('$PREFIX','lib','yade$SUFFIX',x) for x in libDirs]
 ## runtime library search directories; there can be up to 2 levels of libs, so we do in in quite a crude way here:
-## FIXME: find some better way to do that?
-runtimeLibDirs=[os.path.join(r"'$$$$ORIGIN'/../",x) for x in libDirs]+[os.path.join(r"'$$$$ORIGIN'/../../",x) for x in libDirs]+["'$$$$ORIGIN'/../lib/yade$SUFFIX/lib"]
-
+## FIXME: use syntax as shown here: http://www.scons.org/wiki/UsingOrigin
+relLibDirs=['../'+x for x in libDirs]+['../../'+x for x in libDirs]+[env.subst('../lib/yade$SUFFIX/lib')]
+runtimeLibDirs=[env.Literal('\\$$ORIGIN/'+x) for x in relLibDirs]
+#runtimeLibDirs=[os.path.join(r"'$$$$ORIGIN'/../",x) for x in libDirs]+[os.path.join(r"'$$$$ORIGIN'/../../",x) for x in libDirs]+["'$$$$ORIGIN'/../lib/yade$SUFFIX/lib"]
 
 ### PREPROCESSOR FLAGS
 env.Append(CPPDEFINES=[('SUFFIX',r'\"$SUFFIX\"'),('PREFIX',r'\"$runtimePREFIX\"')])
@@ -416,7 +414,7 @@ if env['QUAD_PRECISION']: env.Append(CPPDEFINES='QUAD_PRECISION')
 ### COMPILER
 if env['debug']: env.Append(CXXFLAGS='-ggdb2',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O3')
-if env['openmp']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
+if 'openmp' in env['features']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
 if env['optimize']:
 	env.Append(CXXFLAGS=Split('-O3 -march=%s'%env['march']),
 		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
@@ -425,20 +423,17 @@ else:
 	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast'),('YADE_PTR_CAST','dynamic_pointer_cast')])
 
 if env['gprof']: env.Append(CXXFLAGS=['-pg'],LINKFLAGS=['-pg'],SHLINKFLAGS=['-pg'])
-env.Prepend(CXXFLAGS=['-pipe','-Wall']) # '-Wc++0x-compat' ## not know to gcc-3.*
+env.Prepend(CXXFLAGS=['-pipe','-Wall'])
 
 if env['PGO']=='gen': env.Append(CXXFLAGS=['-fprofile-generate'],LINKFLAGS=['-fprofile-generate'])
 if env['PGO']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofile-use'])
 
 ### LINKER
 ## libs for all plugins
-# Investigate whether soname is useful for something. Probably not: SHLINKFLAGS=['-Wl,-soname=${TARGET.file},'-rdynamic']
 env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
 
-#env.Append(LIBS=['yade-core']); env.Append(SHLINKFLAGS=['-Wl,--no-undefined']);
-
-# if this is not present, vtables & typeinfos for classes in yade binary itself are not exported; breaks plugin loading
-env.Append(LINKFLAGS=['-rdynamic']) 
+# if this is not present, vtables & typeinfos for classes in yade binary itself would not be exported, plugins wouldn't work
+env.Append(LINKFLAGS=['-rdynamic','-z','origin']) 
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=runtimeLibDirs)
 # find already compiled but not yet installed libraries for linking

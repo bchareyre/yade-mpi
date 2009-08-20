@@ -75,7 +75,7 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 		// LOG_TRACE("#"<<b->getId()<<": vel="<<sqrt(velSq)<<", bin "<<(int)newBin);
 		bins[newBin].nBodies+=1;
 	}
-	#ifdef LOG4CXX
+	#ifdef YADE_LOG4CXX
 		// if debugging output
 		if(logger->isDebugEnabled() && (rootBody->currentIteration-histLast>=histInterval || histLast<0)){
 			histLast=rootBody->currentIteration;

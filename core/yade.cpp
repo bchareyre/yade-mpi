@@ -31,7 +31,7 @@
 
 using namespace std;
 
-#ifdef LOG4CXX
+#ifdef YADE_LOG4CXX
 	// provides parent logger for everybody
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade");
 
@@ -156,11 +156,14 @@ void printHelp()
 	#ifdef YADE_OPENMP
 		"   YADE_OPENMP   (supports openMP; set OMP_NUM_THREADS env. var to control parallelism.)\n"
 	#endif
-	#ifdef LOG4CXX
-		"   LOG4CXX       (configurable logging framework enabled; ~/.yade" SUFFIX "/logging.conf)\n"
+	#ifdef YADE_LOG4CXX
+		"   YADE_LOG4CXX  (configurable logging framework enabled; ~/.yade" SUFFIX "/logging.conf)\n"
 	#endif
 	#ifdef YADE_OPENGL
 		"   YADE_OPENGL   (3d rendering)\n"
+	#endif
+	#ifdef YADE_PYTHON
+		"   YADE_PYTHON   (python scripting support)\n"
 	#endif
 	;
 	if(!isnan(std::numeric_limits<double>::quiet_NaN())) cerr<<
@@ -211,7 +214,7 @@ int main(int argc, char *argv[])
 	// reset getopt globals for next processing in frontends
 	optind=0; opterr=0;
 
-	#ifdef LOG4CXX
+	#ifdef YADE_LOG4CXX
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
 		if(filesystem::exists(logConf)){

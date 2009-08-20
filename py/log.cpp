@@ -4,7 +4,7 @@
 using namespace boost;
 enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 
-#ifdef LOG4CXX
+#ifdef YADE_LOG4CXX
 	#include<log4cxx/logmanager.h>
 
 	void logSetLevel(std::string loggerName,int level){
