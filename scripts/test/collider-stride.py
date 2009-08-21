@@ -29,9 +29,8 @@ try:
 except ImportError: pass
 
 O.timingEnabled=True
-isc['stride']=3
-isc['sweepTimeFactor']=1.1
-isc['sweepVelocity']=1000
+isc['sweepLength']=.1
+isc['nBins']=5
 #log.setLevel('InsertionSortCollider',log.DEBUG)
 #log.setLevel('BoundingVolumeMetaEngine',log.DEBUG)
 O.saveTmp()

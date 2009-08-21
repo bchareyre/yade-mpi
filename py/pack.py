@@ -225,7 +225,7 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 	from yade import log
 	from math import pi
 	wantPeri=(spheresInCell>0)
-	if type(predicate)==inGtsSurface and useOBB:
+	if 'inGtsSurface' in dir() and type(predicate)==inGtsSurface and useOBB:
 		center,dim,orientation=gtsSurfaceBestFitOBB(predicate.surf)
 		dim*=2 # gtsSurfaceBestFitOBB returns halfSize
 	else:
