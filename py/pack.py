@@ -5,6 +5,19 @@ from numpy import arange
 from math import sqrt
 from yade import utils
 
+from miniWm3Wrap import *
+from yade.wrapper import *
+
+## compatibility hack for python 2.5 (21/8/2009)
+## can be safely removed at some point
+if 'product' not in dir(itertools):
+	def product(*args, **kwds):
+		"http://docs.python.org/library/itertools.html#itertools.product"
+		pools = map(tuple, args) * kwds.get('repeat', 1); result = [[]]
+		for pool in pools: result = [x+[y] for x in result for y in pool]
+		for prod in result: yield tuple(prod)
+	itertools.product=product
+
 # for now skip the import, but try in inGtsSurface constructor again, to give error if we really use it
 try:
 	import gts
@@ -16,7 +29,6 @@ from _packPredicates import *
 from _packSpheres import *
 from _packObb import *
 
-from miniWm3Wrap import *
 
 class inGtsSurface_py(Predicate):
 	"""This class was re-implemented in c++, but should stay here to serve as reference for implementing
@@ -247,7 +259,6 @@ def triaxialPack(predicate,radius,dim=None,cropLayers=0,radiusStDev=0.,assumedFi
 		sys.stdout.flush()
 	O.switchWorld() ### !!
 	if wantPeri:
-		from yade.wrapper import *
 		#O.reset() # doesn't (shouldn't) affect the original simulation
 		sp=SpherePack()
 		cloudPorosity=0.25 # assume this number for the initial cloud (can be underestimated)
