@@ -33,6 +33,7 @@ class Dem3DofGeom: public GenericSpheresContact{
 		Real &refR1, &refR2;
 
 		Dem3DofGeom(): normal(GenericSpheresContact::normal), refR1(GenericSpheresContact::refR1), refR2(GenericSpheresContact::refR2) { createIndex(); }
+		virtual ~Dem3DofGeom();
 
 		// API that needs to be implemented in derived classes
 		virtual Real displacementN();

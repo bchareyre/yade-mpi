@@ -548,6 +548,10 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 	FOREACH(shared_ptr<ConstitutiveLaw> cf, cff) instance->constLawDispatcher->add(cf);
 	return instance;
 }
+
+template<typename someIndexable>
+int Indexable_getClassIndex(const shared_ptr<someIndexable> i){return i->getClassIndex();}
+
 // ParallelEngine
 void ParallelEngine_slaves_set(shared_ptr<ParallelEngine> self, const python::list& slaves){
 	int len=python::len(slaves);
@@ -730,7 +734,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
 		.add_property("slaves",&ParallelEngine_slaves_get,&ParallelEngine_slaves_set);
 
-	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<MetaEngine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>);
+	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<MetaEngine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>).def("dump",&DispatcherT::dump);
 		EXPOSE_DISPATCHER(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit)
 		EXPOSE_DISPATCHER(GeometricalModelMetaEngine,GeometricalModelEngineUnit)
 		EXPOSE_DISPATCHER(InteractingGeometryMetaEngine,InteractingGeometryEngineUnit)
@@ -788,8 +792,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("id2",&Interaction_getId2)
 		.add_property("isReal",&Interaction::isReal)
 		.add_property("cellDist",&Interaction_getCellDist);
-	EXPOSE_CXX_CLASS(InteractionPhysics);
-	EXPOSE_CXX_CLASS(InteractionGeometry);
+	EXPOSE_CXX_CLASS(InteractionPhysics).add_property("classIndex",&Indexable_getClassIndex<InteractionPhysics>);
+	EXPOSE_CXX_CLASS(InteractionGeometry).add_property("classIndex",&Indexable_getClassIndex<InteractionGeometry>);
 	EXPOSE_CXX_CLASS(FileGenerator)
 		.def("generate",&FileGenerator_generate)
 		.def("load",&FileGenerator_load);

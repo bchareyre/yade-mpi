@@ -31,6 +31,7 @@ class MetaEngine2D : public MetaEngine,
 				>
 {
 	public :
+		void dump(){ DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),EngineUnitType,EngineUnitReturnType,EngineUnitArguments,autoSymmetry>::dumpDispatchMatrix2D(std::cerr); }
 		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
 		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
 		/* add functor by shared pointer */

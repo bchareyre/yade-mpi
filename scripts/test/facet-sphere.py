@@ -5,7 +5,7 @@
 O.engines=[
 	BexResetter(),
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB()]),
-	PersistentSAPCollider(),
+	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Facet_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],
@@ -24,17 +24,17 @@ for i in range(0,100):
 
 O.miscParams=[GLDrawSphere(glutUse=True)]
 O.dt=1e-4
+O.run()
 O.saveTmp('init')
-
 
 from yade import log
 #log.setLevel("ef2_Facet_Sphere_Dem3DofGeom",log.TRACE)
-try:
+if 0:
 	from yade import qt
 	renderer=qt.Renderer()
 	renderer['Interaction_geometry']=True
 	qt.Controller()
-except ImportError: pass
+#except ImportError: pass
 
 
 if 1:

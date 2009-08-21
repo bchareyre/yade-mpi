@@ -68,7 +68,7 @@ QtFileGenerator::~QtFileGenerator()
 }
 
 
-void QtFileGenerator::setGeneratorName(string n)
+void QtFileGenerator::setGeneratorName(std::string n)
 {
 	for(int i=0 ; i<cbGeneratorName->count() ; ++i)
 	{

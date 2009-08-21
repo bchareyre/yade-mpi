@@ -98,7 +98,7 @@ void GLSimulationPlayerViewer::animate(){
 	updateGL();
 }
 
-void GLSimulationPlayerViewer::load(const string& fileName, bool fromFile)
+void GLSimulationPlayerViewer::load(const std::string& fileName, bool fromFile)
 {
 	frameNumber=0;
 	setSnapshotCounter(0);

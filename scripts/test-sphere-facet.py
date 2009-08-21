@@ -42,6 +42,11 @@ O.timingEnabled=True
 O.saveTmp()
 O.dt=1e-4
 
+O.engines[3].constLawDispatcher.dump()
+#print Dem3DofGeom_SphereSphere().classIndex
+#print Dem3DofGeom_FacetSphere().classIndex
+#print Dem3DofGeom().classIndex
+
 def setGravity():
 	gz=gravitator["gravity"][2]
 	gravitator["gravity"]=[0,0,1.05*gz]

@@ -30,6 +30,7 @@ class MetaEngine1D : public MetaEngine,
 {
 
 	public :
+		void dump(){ DynLibDispatcher<TYPELIST_1(baseClass),EngineUnitType,EngineUnitReturnType,EngineUnitArguments,autoSymmetry>::dumpDispatchMatrix1D(std::cerr); }
 		virtual void add(EngineUnitType* eu){ add(shared_ptr<EngineUnitType>(eu)); }
 		virtual void add(shared_ptr<EngineUnitType> eu){
 			storeFunctorName(eu->get1DFunctorType1(),eu->getClassName(),eu);

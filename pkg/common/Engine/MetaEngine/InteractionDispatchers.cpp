@@ -101,6 +101,11 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			// would not have interactionGeometry and interactionPhysics yet.
 			if(!I->functorCache.constLaw){
 				I->functorCache.constLaw=constLawDispatcher->getFunctor2D(I->interactionGeometry,I->interactionPhysics,swap);
+				if(!I->functorCache.constLaw){
+					LOG_FATAL("getFunctor2D returned empty functor for  #"<<I->getId1()<<"+"<<I->getId2()<<", types "<<I->interactionGeometry->getClassName()<<"="<<I->interactionGeometry->getClassIndex()<<" and "<<I->interactionPhysics->getClassName()<<"="<<I->interactionPhysics->getClassIndex());
+					//abort();
+					exit(1);
+				}
 				assert(!swap); // reverse call would make no sense, as the arguments are of different types
 			}
 		  	assert(I->functorCache.constLaw);

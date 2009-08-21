@@ -21,9 +21,10 @@
 #include<yade/lib-loki/NullType.hpp>
 
 
-#include <vector>
-#include <list>
-#include <string>
+#include<vector>
+#include<list>
+#include<string>
+#include<ostream>
 
 
 using namespace std;
@@ -456,6 +457,21 @@ class DynLibDispatcher
 		}
 	
 	
+		std::ostream& dumpDispatchMatrix2D(std::ostream& out){
+			for(size_t i=0; i<callBacks.size(); i++){
+				for(size_t j=0; j<callBacks.size(); j++){
+					if(callBacks[i][j]) out<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
+				}
+			}
+			return out;
+		}
+		std::ostream& dumpDispatchMatrix1D(std::ostream& out){
+			for(size_t i=0; i<callBacks.size(); i++){
+					if(callBacks[i]) out<<i<<" -> "<<callBacks[i]->getClassName()<<std::endl;
+			}
+			return out;
+		}
+
 		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
 		  {
 			index1 = base1->getClassIndex();
@@ -468,59 +484,59 @@ class DynLibDispatcher
 			#endif
 			assert((unsigned int)( index1 ) < callBacks.size());
 			assert((unsigned int)( index2 ) < callBacks[index1].size());
+			//#define _DISP_TRACE(msg) cerr<<"@DT@"<<__LINE__<<" "<<a<<endl;
+			#define _DISP_TRACE(msg)
+			_DISP_TRACE("arg1: "<<base1->getClassName()<<"="<<index1<<"; arg2: "<<base2->getClassName()<<"="<<index2)
 				
-			if(callBacks[index1][index2])
+			if(callBacks[index1][index2]){
+				_DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName());
 				return true;
+			}
 
-			int depth1=1;
-			int depth2=1;
-			int index1_tmp = base1->getBaseClassIndex(depth1);
-			int index2_tmp = base2->getBaseClassIndex(depth2);
-			
-			if( index1_tmp == -1 )
-			{
-				while(1)
-				{
-					if(index2_tmp == -1)
+			int depth1=1, depth2=1;
+			int index1_tmp=base1->getBaseClassIndex(depth1), index2_tmp = base2->getBaseClassIndex(depth2);
+			_DISP_TRACE("base classes: "<<base1->getBaseClassName()<<"="<<index1_tmp<<", "<<base2->getBaseClassName()<<"="<<index2_tmp);
+			if(index1_tmp == -1) {
+				while(1){
+					if(index2_tmp == -1){
+						_DISP_TRACE("Returning FALSE");
 						return false;
-					else
-					{	if(callBacks[index1][index2_tmp]) // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.  - this should be a separate function to resize stuff
-						{ 
-							callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
-							callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
-//							index2 = index2_tmp;
-							return true;
-						}
-						else
-							index2_tmp = base2->getBaseClassIndex(++depth2);
 					}
+					if(callBacks[index1][index2_tmp]){ // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.  - this should be a separate function to resize stuff
+						callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
+						callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
+//						index2 = index2_tmp;
+						_DISP_TRACE("Found callback ["<<index1<<"]["<<index2_tmp<<"] → "<<callBacks[index1][index2_tmp]->getClassName());
+						return true;
+					}
+					index2_tmp = base2->getBaseClassIndex(++depth2);
+					_DISP_TRACE("index2_tmp="<<index2_tmp<<" (pushed up)");
 				}
 			}
-			else if( index2_tmp == -1 )
-			{
-				while(1)
-				{
-					if(index1_tmp == -1)
-						return false;
-					else
-					{
-						if(callBacks[index1_tmp][index2    ])
-						{
-							callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
-							callBacks    [index1][index2] = callBacks    [index1_tmp][index2];
-//							index1 = index1_tmp;
-							return true;
-						}
-						else
-							index1_tmp = base1->getBaseClassIndex(++depth1);
+			else if(index2_tmp == -1) {
+				while(1){
+					if(index1_tmp == -1){
+						_DISP_TRACE("Returning FALSE");
+						 return false;
 					}
+					if(callBacks[index1_tmp][index2]){
+						callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
+						callBacks    [index1][index2] = callBacks    [index1_tmp][index2];
+//						index1 = index1_tmp;
+						_DISP_TRACE("Found callback ["<<index1_tmp<<"]["<<index2<<"] → "<<callBacks[index1_tmp][index2]->getClassName());
+						return true;
+					}
+					index1_tmp = base1->getBaseClassIndex(++depth1);
+					_DISP_TRACE("index1_tmp="<<index1_tmp<<" (pushed up)");
 				}
 			}
-			else if( index1_tmp != -1 && index2_tmp != -1 )
-				throw std::runtime_error("DynLibDispatcher: ambiguous or undefined dispatch for 2d multivirtual function, classes: "+base1->getClassName()+" "+base2->getClassName());
-			
-			return false;
-		  };
+			//else if( index1_tmp != -1 && index2_tmp != -1 )
+			_DISP_TRACE("UNDEFINED/AMBIGUOUS, dumping dispatch matrix");
+			dumpDispatchMatrix2D(cerr);
+			_DISP_TRACE("end matrix dump.")
+			throw std::runtime_error("DynLibDispatcher: ambiguous or undefined dispatch for 2d multivirtual function, classes: "+base1->getClassName()+" "+base2->getClassName());
+			//return false;
+		};
 
 		
 // add multivirtual function to 3D

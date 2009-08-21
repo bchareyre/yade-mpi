@@ -11,7 +11,7 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	Vector3r contPtInTgPlane2() const { return Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(se32.orientation*cp2rel,effR2,-normal);}
 
 	public:
-		Dem3DofGeom_FacetSphere(){createIndex();}
+		Dem3DofGeom_FacetSphere(){ createIndex();}
 		virtual ~Dem3DofGeom_FacetSphere();
 		/******* API ********/
 		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
@@ -32,6 +32,7 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	Real effR2;
 	REGISTER_ATTRIBUTES(Dem3DofGeom,(cp1pt)(cp2rel)(localFacetNormal)(effR2) );
 	REGISTER_CLASS_AND_BASE(Dem3DofGeom_FacetSphere,Dem3DofGeom);
+	REGISTER_CLASS_INDEX(Dem3DofGeom_FacetSphere,Dem3DofGeom);
 	DECLARE_LOGGER;
 	friend class GLDraw_Dem3DofGeom_FacetSphere;
 	friend class ef2_Facet_Sphere_Dem3DofGeom;

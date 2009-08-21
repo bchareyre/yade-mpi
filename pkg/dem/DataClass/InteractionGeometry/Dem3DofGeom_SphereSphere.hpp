@@ -17,8 +17,8 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 		Quaternionr cp1rel, cp2rel;
 		//! shorthands
 		const Vector3r &pos1; const Quaternionr &ori1; const Vector3r &pos2; const Quaternionr &ori2;
-		Dem3DofGeom_SphereSphere(): pos1(se31.position), ori1(se31.orientation), pos2(se32.position), ori2(se32.orientation){createIndex();}
-		~Dem3DofGeom_SphereSphere();
+		Dem3DofGeom_SphereSphere(): pos1(se31.position), ori1(se31.orientation), pos2(se32.position), ori2(se32.orientation){ createIndex(); }
+		virtual ~Dem3DofGeom_SphereSphere();
 		//! effective radii of spheres for this interaction; can be smaller/larger than actual radii, but quasi-constant throughout the interaction life
 		Real effR1, effR2;
 		
@@ -37,6 +37,7 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 
 	REGISTER_ATTRIBUTES(Dem3DofGeom,(effR1)(effR2)(cp1rel)(cp2rel));
 	REGISTER_CLASS_AND_BASE(Dem3DofGeom_SphereSphere,Dem3DofGeom);
+	REGISTER_CLASS_INDEX(Dem3DofGeom_SphereSphere,Dem3DofGeom);
 	friend class GLDraw_Dem3DofGeom_SphereSphere;
 	friend class ef2_Sphere_Sphere_Dem3DofGeom;
 };
