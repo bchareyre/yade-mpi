@@ -760,6 +760,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		
 	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>))
 	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
+	// expose indexable class, with access to the index
+	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("classIndex",&Indexable_getClassIndex<className>)
 
 	EXPOSE_CXX_CLASS(Body)
 		.def_readwrite("shape",&Body::geometricalModel)
@@ -772,12 +774,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("isStandalone",&Body::isStandalone)
 		.add_property("isClumpMember",&Body::isClumpMember)
 		.add_property("isClump",&Body::isClump);
-	EXPOSE_CXX_CLASS(InteractingGeometry);
-	EXPOSE_CXX_CLASS(GeometricalModel);
-	EXPOSE_CXX_CLASS(BoundingVolume)
+	EXPOSE_CXX_CLASS_IX(InteractingGeometry);
+	EXPOSE_CXX_CLASS_IX(GeometricalModel);
+	EXPOSE_CXX_CLASS_IX(BoundingVolume)
 		.def_readonly("min",&BoundingVolume::min)
 		.def_readonly("max",&BoundingVolume::max);
-	EXPOSE_CXX_CLASS(PhysicalParameters)
+	EXPOSE_CXX_CLASS_IX(PhysicalParameters)
 		.add_property("blockedDOFs",&PhysicalParameters::blockedDOFs_vec_get,&PhysicalParameters::blockedDOFs_vec_set)
 		.add_property("pos",&PhysicalParameters_pos_get,&PhysicalParameters_pos_set)
 		.add_property("ori",&PhysicalParameters_ori_get,&PhysicalParameters_ori_set)
@@ -792,8 +794,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("id2",&Interaction_getId2)
 		.add_property("isReal",&Interaction::isReal)
 		.add_property("cellDist",&Interaction_getCellDist);
-	EXPOSE_CXX_CLASS(InteractionPhysics).add_property("classIndex",&Indexable_getClassIndex<InteractionPhysics>);
-	EXPOSE_CXX_CLASS(InteractionGeometry).add_property("classIndex",&Indexable_getClassIndex<InteractionGeometry>);
+	EXPOSE_CXX_CLASS_IX(InteractionPhysics);
+	EXPOSE_CXX_CLASS_IX(InteractionGeometry);
 	EXPOSE_CXX_CLASS(FileGenerator)
 		.def("generate",&FileGenerator_generate)
 		.def("load",&FileGenerator_load);

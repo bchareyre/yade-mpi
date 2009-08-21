@@ -42,10 +42,15 @@ O.timingEnabled=True
 O.saveTmp()
 O.dt=1e-4
 
+print '** virgin dispatch matrix:'
 O.engines[3].constLawDispatcher.dump()
-#print Dem3DofGeom_SphereSphere().classIndex
-#print Dem3DofGeom_FacetSphere().classIndex
-#print Dem3DofGeom().classIndex
+print '** class indices'
+for c in 'Dem3DofGeom','Dem3DofGeom_FacetSphere','Dem3DofGeom_SphereSphere':
+	print eval(c)().classIndex,c
+O.run(1000,True)
+print '** used dispatch matrix'
+O.engines[3].constLawDispatcher.dump()
+
 
 def setGravity():
 	gz=gravitator["gravity"][2]

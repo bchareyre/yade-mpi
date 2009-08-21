@@ -456,86 +456,130 @@ class DynLibDispatcher
 			return callBacks[ix1][ix2];
 		}
 	
-	
-		std::ostream& dumpDispatchMatrix2D(std::ostream& out){
+		std::ostream& dumpDispatchMatrix2D(std::ostream& out, const string& prefix=""){
 			for(size_t i=0; i<callBacks.size(); i++){
 				for(size_t j=0; j<callBacks.size(); j++){
-					if(callBacks[i][j]) out<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
+					if(callBacks[i][j]) out<<prefix<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
 				}
 			}
 			return out;
 		}
-		std::ostream& dumpDispatchMatrix1D(std::ostream& out){
+		std::ostream& dumpDispatchMatrix1D(std::ostream& out, const string& prefix=""){
 			for(size_t i=0; i<callBacks.size(); i++){
-					if(callBacks[i]) out<<i<<" -> "<<callBacks[i]->getClassName()<<std::endl;
+					if(callBacks[i]) out<<prefix<<i<<" -> "<<callBacks[i]->getClassName()<<std::endl;
 			}
 			return out;
 		}
 
 		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
 		  {
-			index1 = base1->getClassIndex();
-			index2 = base2->getClassIndex();
-			assert( index1 >= 0 ); 
-			assert( index2 >= 0 ); 
-			#if 0 
-				if((unsigned)index1>=callBacks.size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base1->getClassName()<<" (index=="<<index1<<", callBacks.size()=="<<callBacks.size()<<endl;
-				if((unsigned)index2>=callBacks[index2].size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base2->getClassName()<<" (index=="<<index2<<", callBacks[index1].size()=="<<callBacks[index1].size()<<endl;
-			#endif
-			assert((unsigned int)( index1 ) < callBacks.size());
-			assert((unsigned int)( index2 ) < callBacks[index1].size());
-			//#define _DISP_TRACE(msg) cerr<<"@DT@"<<__LINE__<<" "<<a<<endl;
+			//#define _DISP_TRACE(msg) cerr<<"@DT@"<<__LINE__<<" "<<msg<<endl;
 			#define _DISP_TRACE(msg)
+			index1=base1->getClassIndex(); index2 = base2->getClassIndex();
+			assert(index1>=0); assert(index2>=0); 
+			assert((unsigned int)(index1)<callBacks.size()); assert((unsigned int)(index2)<callBacks[index1].size());
 			_DISP_TRACE("arg1: "<<base1->getClassName()<<"="<<index1<<"; arg2: "<<base2->getClassName()<<"="<<index2)
-				
-			if(callBacks[index1][index2]){
-				_DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName());
-				return true;
-			}
+			#define _FIX_2D_DISPATCHES
+			#ifdef _FIX_2D_DISPATCHES
+				/* This is python pseudocode for the algorithm:
 
-			int depth1=1, depth2=1;
-			int index1_tmp=base1->getBaseClassIndex(depth1), index2_tmp = base2->getBaseClassIndex(depth2);
-			_DISP_TRACE("base classes: "<<base1->getBaseClassName()<<"="<<index1_tmp<<", "<<base2->getBaseClassName()<<"="<<index2_tmp);
-			if(index1_tmp == -1) {
-				while(1){
-					if(index2_tmp == -1){
-						_DISP_TRACE("Returning FALSE");
-						return false;
+					def ff(x,sum): print x,sum-x,sum
+					for dist in range(0,5):
+						for ix1 in range(0,dist+1): ff(ix1,dist)
+
+					Increase depth sum from 0 up and look for possible matches, of which sum of distances beween the argument and the declared functor arg type equals depth.
+					
+					Two matches are considered euqally good (ambiguous) if they have the same depth. That raises exception.
+
+					If both indices are negative (reached the top of hierarchy for that indexable type) and nothing has been found for given depth, raise exception (undefined dispatch).
+
+					FIXME: by the original design, callBacks don't distinguish between dispatch that was already looked for,
+					but is undefined and dispatch that was never looked for before. This means that there can be lot of useless lookups;
+					e.g. if MetaInteractingGeometry2AABB is not in BoundingVoumeMetaEngine, it is looked up at every step.
+
+				*/
+				if(callBacks[index1][index2]){ _DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName()); return true; }
+				int foundIx1,foundIx2; int maxDp1=-1, maxDp2=-1;
+				// if(base1->getBaseClassIndex(0)<0) maxDp1=0; if(base2->getBaseClassIndex(0)<0) maxDp2=0;
+				for(int dist=1; ; dist++){
+					bool distTooBig=true;
+					foundIx1=foundIx2=-1; // found no dispatch at this depth yet
+					for(int dp1=0; dp1<=dist; dp1++){
+						int dp2=dist-dp1;
+						if((maxDp1>=0 && dp1>maxDp1) || (maxDp2>=0 && dp2>maxDp2)) continue;
+						_DISP_TRACE(" Trying indices with depths "<<dp1<<" and "<<dp2<<", dist="<<dist);
+						int ix1=dp1>0?base1->getBaseClassIndex(dp1):index1, ix2=dp2>0?base2->getBaseClassIndex(dp2):index2;
+						if(ix1<0) maxDp1=dp1; if(ix2<0) maxDp2=dp2;
+						if(ix1<0 || ix2<0) continue; // hierarchy height exceeded in either dimension
+						distTooBig=false;
+						if(callBacks[ix1][ix2]){
+							if(foundIx1!=-1 && callBacks[foundIx1][foundIx2]!=callBacks[ix1][ix2]){ // we found a callback, but there already was one at this distance and it was different from the current one
+								cerr<<__FILE__<<":"<<__LINE__<<": ambiguous 2d dispatch ("<<"arg1="<<base1->getClassName()<<", arg2="<<base2->getClassName()<<", distance="<<dist<<"), dispatch matrix:"<<endl;
+								dumpDispatchMatrix2D(cerr,"AMBIGUOUS: "); throw runtime_error("Ambiguous dispatch.");
+							}
+							foundIx1=ix1; foundIx2=ix2;
+							callBacks[index1][index2]=callBacks[ix1][ix2]; callBacksInfo[index1][index2]=callBacksInfo[ix1][ix2];
+							_DISP_TRACE("Found callback ["<<ix1<<"]["<<ix2<<"] → "<<callBacks[ix1][ix2]->getClassName());
+						}
 					}
-					if(callBacks[index1][index2_tmp]){ // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.  - this should be a separate function to resize stuff
-						callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
-						callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
-//						index2 = index2_tmp;
-						_DISP_TRACE("Found callback ["<<index1<<"]["<<index2_tmp<<"] → "<<callBacks[index1][index2_tmp]->getClassName());
-						return true;
-					}
-					index2_tmp = base2->getBaseClassIndex(++depth2);
-					_DISP_TRACE("index2_tmp="<<index2_tmp<<" (pushed up)");
+					if(foundIx1!=-1) return true;
+					if(distTooBig){ _DISP_TRACE("Undefined dispatch, dist="<<dist); return false; /* undefined dispatch */ }
 				}
-			}
-			else if(index2_tmp == -1) {
-				while(1){
-					if(index1_tmp == -1){
-						_DISP_TRACE("Returning FALSE");
-						 return false;
-					}
-					if(callBacks[index1_tmp][index2]){
-						callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
-						callBacks    [index1][index2] = callBacks    [index1_tmp][index2];
-//						index1 = index1_tmp;
-						_DISP_TRACE("Found callback ["<<index1_tmp<<"]["<<index2<<"] → "<<callBacks[index1_tmp][index2]->getClassName());
-						return true;
-					}
-					index1_tmp = base1->getBaseClassIndex(++depth1);
-					_DISP_TRACE("index1_tmp="<<index1_tmp<<" (pushed up)");
+			#else
+				#if 0 
+					if((unsigned)index1>=callBacks.size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base1->getClassName()<<" (index=="<<index1<<", callBacks.size()=="<<callBacks.size()<<endl;
+					if((unsigned)index2>=callBacks[index2].size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base2->getClassName()<<" (index=="<<index2<<", callBacks[index1].size()=="<<callBacks[index1].size()<<endl;
+				#endif
+					
+				if(callBacks[index1][index2]){
+					_DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName());
+					return true;
 				}
-			}
-			//else if( index1_tmp != -1 && index2_tmp != -1 )
-			_DISP_TRACE("UNDEFINED/AMBIGUOUS, dumping dispatch matrix");
-			dumpDispatchMatrix2D(cerr);
-			_DISP_TRACE("end matrix dump.")
-			throw std::runtime_error("DynLibDispatcher: ambiguous or undefined dispatch for 2d multivirtual function, classes: "+base1->getClassName()+" "+base2->getClassName());
-			//return false;
+
+				int depth1=1, depth2=1;
+				int index1_tmp=base1->getBaseClassIndex(depth1), index2_tmp = base2->getBaseClassIndex(depth2);
+				_DISP_TRACE("base classes: "<<base1->getBaseClassName()<<"="<<index1_tmp<<", "<<base2->getBaseClassName()<<"="<<index2_tmp);
+				if(index1_tmp == -1) {
+					while(1){
+						if(index2_tmp == -1){
+							_DISP_TRACE("Returning FALSE");
+							return false;
+						}
+						if(callBacks[index1][index2_tmp]){ // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.  - this should be a separate function to resize stuff
+							callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
+							callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
+	//						index2 = index2_tmp;
+							_DISP_TRACE("Found callback ["<<index1<<"]["<<index2_tmp<<"] → "<<callBacks[index1][index2_tmp]->getClassName());
+							return true;
+						}
+						index2_tmp = base2->getBaseClassIndex(++depth2);
+						_DISP_TRACE("index2_tmp="<<index2_tmp<<" (pushed up)");
+					}
+				}
+				else if(index2_tmp == -1) {
+					while(1){
+						if(index1_tmp == -1){
+							_DISP_TRACE("Returning FALSE");
+							 return false;
+						}
+						if(callBacks[index1_tmp][index2]){
+							callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
+							callBacks    [index1][index2] = callBacks    [index1_tmp][index2];
+	//						index1 = index1_tmp;
+							_DISP_TRACE("Found callback ["<<index1_tmp<<"]["<<index2<<"] → "<<callBacks[index1_tmp][index2]->getClassName());
+							return true;
+						}
+						index1_tmp = base1->getBaseClassIndex(++depth1);
+						_DISP_TRACE("index1_tmp="<<index1_tmp<<" (pushed up)");
+					}
+				}
+				//else if( index1_tmp != -1 && index2_tmp != -1 )
+				_DISP_TRACE("UNDEFINED/AMBIGUOUS, dumping dispatch matrix");
+				dumpDispatchMatrix2D(cerr);
+				_DISP_TRACE("end matrix dump.")
+				throw std::runtime_error("DynLibDispatcher: ambiguous or undefined dispatch for 2d multivirtual function, classes: "+base1->getClassName()+" "+base2->getClassName());
+				//return false;
+			#endif
 		};
 
 		
