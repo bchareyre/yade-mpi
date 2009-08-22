@@ -135,6 +135,13 @@ class InteractionContainer : public Serializable
 			This function doesn't lock pendingEraseMutex, as it is (supposedly) called from no-parallel sections only once per iteration
 		*/
 		int unconditionalErasePending();
+
+		/*! Clear the list of interaction pending erase: all interactions queued for considering erasing them
+		will be dropped; useful for colliders that handle that by themselves, without needing the hint;
+		with openMP, it would not be enough to call pendingErase->clear(), this helper function 
+		does it for all threads. Use this only if you understand this explanation. */
+		void clearPendingErase();
+
 		/*! Traverse all pending interactions and erase them if the (T*)->shouldBeErased(id1,id2) return true
 			and keep it if it return false; finally, pendingErase will be clear()'ed.
 

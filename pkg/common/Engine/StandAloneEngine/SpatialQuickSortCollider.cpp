@@ -28,7 +28,7 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	// This collider traverses all interactions at every step, therefore interactions that were reset() will be deleted automatically as needed
-	ncb->interactions->pendingErase.clear();
+	ncb->interactions->clearPendingErase();
 
 	size_t nbElements=bodies->size();
 	if (nbElements!=rank.size())

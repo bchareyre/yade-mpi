@@ -152,7 +152,7 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
 	Vector3r normal=se32.position-se31.position;
-	Real penetrationDepthSq=pow(distanceFactor*(s1->radius+s2->radius),2)-normal.SquaredLength();
+	Real penetrationDepthSq=pow((distFactor>0?distFactor:1.)*(s1->radius+s2->radius),2)-normal.SquaredLength();
 	if (penetrationDepthSq<0 && !c->isReal()){
 		return false;
 	}
@@ -164,7 +164,7 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 		ss=shared_ptr<Dem3DofGeom_SphereSphere>(new Dem3DofGeom_SphereSphere());
 		c->interactionGeometry=ss;
 		// constants
-		if(distanceFactor>1) ss->refLength=dist;
+		if(distFactor>0) ss->refLength=dist;
 		else ss->refLength=s1->radius+s2->radius;
 		ss->refR1=s1->radius; ss->refR2=s2->radius;
 		Real penetrationDepth=s1->radius+s2->radius-ss->refLength;

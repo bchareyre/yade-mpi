@@ -55,6 +55,9 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 
 	specimenLength=.2,
 	sphereRadius=3.5e-3,
+
+	# isotropic confinement (should be negative)
+	isoPrestress=0,
 )
 
 if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description']
@@ -63,7 +66,7 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-spheres=pack.triaxialPack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.2*specimenLength),radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',young=young,poisson=poisson,frictionAngle=frictionAngle,physParamsClass='CpmMat',density=density)
+spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.2*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',young=young,poisson=poisson,frictionAngle=frictionAngle,physParamsClass='CpmMat',density=density)
 O.bodies.append(spheres)
 bb=utils.uniaxialTestFeatures()
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
@@ -79,8 +82,8 @@ O.engines=[
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(aabbEnlargeFactor=intRadius,label='is2aabb'),MetaInteractingGeometry2AABB()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
-		[ef2_Sphere_Sphere_Dem3DofGeom(distanceFactor=intRadius,label='ss2d3dg')],
-		[Ip2_CpmMat_CpmMat_CpmPhys(sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E)],
+		[ef2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
+		[Ip2_CpmMat_CpmMat_CpmPhys(sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress)],
 		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
 	),
 	NewtonsDampedLaw(damping=damping,label='damper'),
@@ -91,7 +94,8 @@ O.engines=[
 ]
 O.miscParams=[GLDrawCpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 
-plot.plots={'eps':('sigma','sigma.25','sigma.50','sigma.75')}
+# plot stresses in ¼, ½ and ¾ if desired as well; too crowded in the graph that includes confinement, though
+plot.plots={'eps':('sigma',)} #'sigma.25','sigma.50','sigma.75')}
 plot.maxDataLen=4000
 
 O.saveTmp('initial');
@@ -116,8 +120,8 @@ def initTest():
 	print "init done, will now run."
 	O.step(); O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
-	ss2d3dg['distanceFactor']=1.
-	is2aabb['aabbEnlargeFactor']=1.
+	ss2d3dg['distFactor']=-1.
+	is2aabb['aabbEnlargeFactor']=-1.
 	O.run()
 
 def stopIfDamaged():
@@ -129,7 +133,7 @@ def stopIfDamaged():
 	if extremum==0: return
 	print O.tags['id'],mode,strainer['strain'],sigma[-1]
 	import sys;	sys.stdout.flush()
-	if abs(sigma[-1]/extremum)<minMaxRatio:
+	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer['strain'])>5e-3:
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
 			print "Damaged, switching to compression... "; O.pause()
@@ -149,16 +153,15 @@ def stopIfDamaged():
 			sys.exit(0)
 		
 def addPlotData():
-	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer['strain'],'sigma':strainer['avgStress'],
-		'sigma.25':utils.forcesOnCoordPlane(coord_25,axis)[axis]/area_25,
-		'sigma.50':utils.forcesOnCoordPlane(coord_50,axis)[axis]/area_50,
-		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75,
+	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer['strain'],'sigma':strainer['avgStress']+isoPrestress,
+		'sigma.25':utils.forcesOnCoordPlane(coord_25,axis)[axis]/area_25+isoPrestress,
+		'sigma.50':utils.forcesOnCoordPlane(coord_50,axis)[axis]/area_50+isoPrestress,
+		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,
 		})
 
-
-
 initTest()
-#while True: time.sleep(1)
+# sleep forever if run by yade-multi, exit is called from stopIfDamaged
+if os.environ.has_key('PARAM_TABLE'): time.sleep(1e12)
 
 
 

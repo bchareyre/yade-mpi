@@ -1,21 +1,28 @@
-This example tests performance of PersistentSAPCollider and SpatialQuickSortCollider
-and was basis for http://yade.wikia.com/wiki/Colliders_performace .
+This example tests performance of InsertionSortCollider (with and without stride) and
+SpatialQuickSortCollider and was basis for http://yade.wikia.com/wiki/Colliders_performace,
+which features now-removed PersistentSAPCollider as well.
 
 To run the test, say:
 
  yade-trunk-multi perf.table perf.py
 
-It will take time to finish. To get graphs from the generated log files, say
+It will take time to finish. To collet results and get graphs from the generated log files, say
 
  python mkGraph.py *.log
 
-To see other results, log files are named like perf.64k.log (64k spheres with
-PersistentSAPCollider), perf.32k.q.log (32k spheres, SpatialQuickSortCollider) etc.
+To see other results, log files are named like perf.64k.q.log (64k spheres with
+SpatialQuickSortCollider), perf.32k.i.log (32k spheres, InsertionSortCollider),
+perf.40k.is.log (InsertionSortCollider with stride) etc.
 
 1. File with nSpheres spheres (loose packing) is generated first, it if doesn't exist yet.
    This can take a few minutes, but is done only the first time for the particular sphere
 	number.
+
 2. First iteration on the scene (TriaxialTest and the selected collider) with timings is
    done and timing.stats() printed (appears in the log file).
+
 3. Another 100 iterations are measured with timing.stats(), after which the test exits.
+
+(Note: InsertionSortCollider with stride is currently commented out in the table,
+as striding is not effective until later during the simulation.)
 

@@ -264,7 +264,7 @@ def spheresToFile(filename,consider=lambda id: True):
 	count=0
 	for b in o.bodies:
 		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
-		out.write('%g\t%g\t%g\t%g\n'%(b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
+		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape['radius']))
 		count+=1
 	out.close()
 	return count
@@ -376,9 +376,10 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 
 		The format of the file is as follows (commens starting with # and empty lines allowed)
 		
-		name1 name2 … # 0th line
-		val1  val2  … # 1st line
-		val2  val2  … # 2nd line
+		# commented lines allowed anywhere
+		name1 name2 … # first non-blank line are column headings
+		val1  val2  … # 1st parameter set
+		val2  val2  … # 2nd 
 		…
 
 	The name `description' is special and is assigned to Omega().tags['description']
@@ -394,7 +395,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	o=Omega()
 	tagsParams=[]
 	dictDefaults,dictParams={},{}
-	import os, __builtin__
+	import os, __builtin__,re
 	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
 		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
 		o.tags['line']='l!'
@@ -405,7 +406,12 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		tableFile,tableLine=env[0],env[1]
 		if len(env)>2: tableDesc=env[3]
 		o.tags['line']='l'+tableLine
-		ll=[l.split('#')[0] for l in ['']+open(tableFile).readlines()]; names=ll[1].split(); values=ll[int(tableLine)].split()
+		# the empty '#' line to make line number 1-based
+		ll=[l for l in ['#']+open(tableFile).readlines()]; values=ll[int(tableLine)].split('#')[0].split()
+		names=None
+		for l in ll:
+			if not re.match(r'^\s*(#.*)?$',l): names=l.split(); break
+		if not names: raise RuntimeError("No non-blank line (colum headings) found.");
 		assert(len(names)==len(values))
 		if 'description' in names: O.tags['description']=values[names.index('description')]
 		else:

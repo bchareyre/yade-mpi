@@ -124,11 +124,12 @@ if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log s
 print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d jobs at a time."%(executable,simul,nice,logFormat,maxJobs)
 
 ll=[re.sub('\s*#.*','',l) for l in ['']+open(table,'r').readlines()] # remove comments
-availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1]) and i>1]
-
+availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1])]
+# first non-blank line are column headings
+headings=ll[availableLines[0]].split()
+availableLines=availableLines[1:]
 # read actual data
 values={}
-headings=ll[1].split()
 for l in availableLines:
 	val={}
 	for i in range(len(headings)):
@@ -185,7 +186,8 @@ for i,l in enumerate(useLines):
 	nSlots=1
 	for col,head in enumerate(headings):
 		if head=='!EXEC': executable=values[l][col]
-		if head=='!OMP_NUM_THREADS': nSlots=int(values[l][col])
+		if head=='!OMP_NUM_THREADS':
+			nSlots=int(values[l][col]); maxCpu=getNumCores()
 		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if nSlots>maxJobs: logging.warning('WARNING: job #%d wants %d slots but only %d are available'%(i,nSlots,maxJobs))
 	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,pipes.quote(logFile)),logFile,nSlots))

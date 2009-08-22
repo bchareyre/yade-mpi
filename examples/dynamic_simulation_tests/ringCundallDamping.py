@@ -80,7 +80,7 @@ o.miscParams=[GLDrawSphere(glutUse=True)]
 
 for b in o.bodies:
     if b.shape.name=='Sphere':
-        b.phys['blockedDOFs']=4 # blocked movement along Z
+        b.phys.blockedDOFs=['z'] # blocked movement along Z
 
 o.dt=0.2*utils.PWaveTimeStep()
 

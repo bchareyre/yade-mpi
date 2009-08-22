@@ -3,8 +3,8 @@
 from yade import timing,log
 import os.path
 loadFrom='/tmp/triax.xml'
-if not os.path.exists(loadFrom):
-	TriaxialTest(numberOfGrains=20000,fast=True,noFiles=True).generate(loadFrom)
+#if not os.path.exists(loadFrom):
+TriaxialTest(numberOfGrains=2000,fast=True,noFiles=True).generate(loadFrom)
 O.load(loadFrom)
 log.setLevel('TriaxialCompressionEngine',log.WARN) # shut up
 log.setLevel('InsertionSortCollider',log.DEBUG)
@@ -15,9 +15,9 @@ newton=utils.typedEngine('NewtonsDampedLaw')
 # use striding; say "if 0:" to disable striding and compare to regular runs
 if 1:
 	# length by which bboxes will be made larger
-	collider['sweepLength']=0.05*O.bodies[100].shape['radius']
+	collider['sweepLength']=.2*O.bodies[100].shape['radius']
 	# if this is enabled, bboxes will be enlarged based on velocity bin for each body
-	if 0:
+	if 1:
 		collider['nBins']=3
 		collider['binCoeff']=10
 		log.setLevel('VelocityBins',log.DEBUG)

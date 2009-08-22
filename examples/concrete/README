@@ -1,0 +1,10 @@
+uniax.py shows uniaxiax tension/compression test on concrete specimen with
+optional confinement.
+
+Run using yade-multi and confined.table (see comments in that file) to run
+simulation with different confinement values.
+
+Run plain uniax.py to get one unconfined tension/compression simulation.
+Type yade.plot.plot() to see strain/stress plot during the simulation.
+
+See comments at the beginning of uniax.py for more information.

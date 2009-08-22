@@ -61,14 +61,14 @@ class ef2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
 	public:
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>&, const shared_ptr<InteractingGeometry>&, const Se3r&, const Se3r&, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
-		//! Factor of sphere radius such that sphere "touch" if their centers are not further than distanceFactor*(r1+r2); defaults to 1.
-		//! If >1, equilibrium distance is the one when spheres get into initial contact; it is the sum of their radii otherwise.
-		Real distanceFactor;
-		ef2_Sphere_Sphere_Dem3DofGeom(): distanceFactor(1.) {}
+		//! Factor of sphere radius such that sphere "touch" if their centers are not further than distFactor*(r1+r2);
+		//! if negative, equilibrium distance is the sum of the sphere's radii, which is the default.
+		Real distFactor;
+		ef2_Sphere_Sphere_Dem3DofGeom(): distFactor(-1.) {}
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 	REGISTER_CLASS_AND_BASE(ef2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryEngineUnit);
-	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(distanceFactor));
+	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(distFactor));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ef2_Sphere_Sphere_Dem3DofGeom);

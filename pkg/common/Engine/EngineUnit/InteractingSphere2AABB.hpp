@@ -13,7 +13,7 @@
 class InteractingSphere2AABB : public BoundingVolumeEngineUnit
 {
 	public :
-		InteractingSphere2AABB(): aabbEnlargeFactor(1.) {}
+		InteractingSphere2AABB(): aabbEnlargeFactor(-1.) {}
 		void go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*);
 		double aabbEnlargeFactor;
 	FUNCTOR2D(InteractingSphere,AABB);

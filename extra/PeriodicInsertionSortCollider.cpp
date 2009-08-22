@@ -137,7 +137,9 @@ void PeriodicInsertionSortCollider::insertionSort(VecBounds& v, InteractionConta
 		int j=i_1; Bound vi=v[i];  const bool viHasBB=vi.flags.hasBB;
 		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
 			long j1=v.norm(j+1);
-			if (v[j].coord>v.cellMax+v.cellDim){
+			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
+			// this can happen without any side-effects
+			if (false && v[j].coord>v.cellMax+v.cellDim){
 				// this condition is not strictly necessary, but the loop of insertionSort would have to run more times.
 				// Since size of particle is required to be < .5*cellDim, this would mean simulation explosion anyway
 				LOG_FATAL("Body #"<<v[j].id<<" going faster than 1 cell in one step? Not handled.");

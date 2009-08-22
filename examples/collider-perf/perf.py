@@ -1,12 +1,14 @@
 
-utils.readParamsFromTable(nSpheres=8000,collider='PersistentSAPCollider',noTableOk=True)
+utils.readParamsFromTable(nSpheres=8000,collider='InsertionSortCollider',noTableOk=True)
 # name of file containing sphere packing with given number of spheres
 spheresFile="packing-%dk.spheres"%(nSpheres/1000)
+
+fast='@stride' in collider
 
 import os
 if not os.path.exists(spheresFile):
 	print "Generating packing"
-	p=Preprocessor('TriaxialTest',{'numberOfGrains':nSpheres,'radiusMean':1e-3,'lowerCorner':[0,0,0],'upperCorner':[1,1,1]})
+	p=TriaxialTest(numberOfGrains=nSpheres,radiusMean=1e-3,lowerCorner=[0,0,0],upperCorner=[1,1,1],noFiles=True)
 	p.load()
 	utils.spheresToFile(spheresFile)
 	O.reset()
@@ -16,15 +18,16 @@ else: print "Packing found (%s), using it."%spheresFile
 from yade import timing
 O.timingEnabled=True
 
-p=Preprocessor('TriaxialTest',{'importFilename':spheresFile}).load()
+TriaxialTest(importFilename=spheresFile,fast=fast,noFiles=True).load()
 O.dt=utils.PWaveTimeStep()
-utils.replaceCollider(StandAloneEngine(collider))
+isc=O.engines[2]
+isc['sweepLength']=1e-1
 
-mem0=utils.vmData()
+if not fast: utils.replaceCollider(StandAloneEngine(collider))
+
 O.step()
 timing.stats()
-print 'Extra memory:',utils.vmData()-mem0,'kB'
 timing.reset()
-O.run(100,True)
+O.run(200,True)
 timing.stats()
 quit()
