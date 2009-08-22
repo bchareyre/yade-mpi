@@ -151,7 +151,7 @@ class pyBodyContainer{
 
 		*/
 		#if BOOST_VERSION<103500
-			boost::mutex::scoped_lock lock(Omega::instance().renderMutex,true); // acquire lock on the mutex (true)
+			boost::try_mutex::scoped_try_lock lock(Omega::instance().renderMutex,true); // acquire lock on the mutex (true)
 		#else
 			boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
 		#endif
