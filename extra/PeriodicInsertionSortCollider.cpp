@@ -380,7 +380,7 @@ void PeriIsoCompressor::action(MetaBody* rb){
 	const long& step=rb->currentIteration;
 	Vector3r cellSize=rb->cellMax-rb->cellMin; //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
-	Real minSize=min(cellSize[0],min(cellSize[1],cellSize[2]));
+	Real minSize=min(cellSize[0],min(cellSize[1],cellSize[2])), maxSize=max(cellSize[0],max(cellSize[1],cellSize[2]));
 	if(minSize<2.1*maxSpan){ throw runtime_error("Minimum cell size is smaller than 2.1*span_of_the_biggest_body! (periodic collider requirement)"); }
 	if(((step%globalUpdateInt)==0) || avgStiffness<0 || sigma[0]<0 || sigma[1]<0 || sigma[2]<0){
 		Vector3r sumForces=Shop::totalForceInVolume(avgStiffness,rb);
@@ -393,13 +393,14 @@ void PeriIsoCompressor::action(MetaBody* rb){
 	// is the stress condition satisfied in all directions?
 	bool allStressesOK=true;
 	if(keepProportions){ // the same algo as below, but operating on quantitites averaged over all dimensions
-		Real sigAvg=(sigma[0]+sigma[1]+sigma[2])/3., avgArea=(cellArea[0]+cellArea[1]+cellArea[2])/3.;
-		Real grow=1e-4*(sigAvg-sigmaGoal)*avgArea/(avgStiffness>0?avgStiffness:1);
-		if(abs(grow)>maxDisplPerStep) grow=Mathr::Sign(grow)*maxDisplPerStep;
-		grow=max(grow,-(minSize-2.1*maxSpan));
-		if(avgStiffness>0) { sigma-=(grow*avgStiffness)*Vector3r::ONE; sigAvg-=grow*avgStiffness; }
+		Real sigAvg=(sigma[0]+sigma[1]+sigma[2])/3., avgArea=(cellArea[0]+cellArea[1]+cellArea[2])/3., avgSize=(cellSize[0]+cellSize[1]+cellSize[2])/3.;
+		Real avgGrow=1e-4*(sigAvg-sigmaGoal)*avgArea/(avgStiffness>0?avgStiffness:1);
+		Real maxToAvg=maxSize/avgSize;
+		if(abs(maxToAvg*avgGrow)>maxDisplPerStep) avgGrow=Mathr::Sign(avgGrow)*maxDisplPerStep/maxToAvg;
+		avgGrow=max(avgGrow,-(minSize-2.1*maxSpan)/maxToAvg);
+		if(avgStiffness>0) { sigma-=(avgGrow*avgStiffness)*Vector3r::ONE; sigAvg-=avgGrow*avgStiffness; }
 		if(abs((sigAvg-sigmaGoal)/sigmaGoal)>5e-3) allStressesOK=false;
-		cellGrow=Vector3r(grow,grow,grow);
+		cellGrow=(avgGrow/avgSize)*cellSize;
 	}
 	else{ // handle each dimension separately
 		for(int axis=0; axis<3; axis++){

@@ -272,7 +272,7 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 			if (rRelFuzz==0 and rDev!=0) or (rRelFuzz==0 and rDev!=0) or (rRelFuzz!=0 and abs((rDev-rRelFuzz)/rRelFuzz)>1e-2): memoDbgMsg("REJECT: radius fuzz differs too much (%g, %g desired)"%(rDev,rRelFuzz)); continue # radius fuzz differs too much
 			if isPeri and wantPeri:
 				if spheresInCell>NN: memoDbgMsg("REJECT: Number of spheres in the packing too small"); continue
-				if abs((fullDim[1]/fullDim[0])/(Y/X)-1)>0.3 or abs((fullDim[2]/fullDim[0])/(Z/X)-1)>0.3: memoDbgMsg("REJECT: proportions differ too much from what is desired."); continue
+				if abs((y1/x1)/(Y/X)-1)>0.3 or abs((z1/x1)/(Z/X)-1)>0.3: memoDbgMsg("REJECT: proportions (y/x=%g, z/x=%g) differ too much from what is desired (%g, %g)."%(Y/X,Z/X,y1/x1,z1/x1)); continue
 			else:
 				if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): memoDbgMsg("REJECT: not large enough"); continue # not large enough
 			memoDbgMsg("ACCEPTED");
@@ -294,11 +294,12 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.periodicCell
 		#print x1,y1,z1,radius,rRelFuzz
 		num=sp.makeCloud(O.periodicCell[0],O.periodicCell[1],radius,rRelFuzz,spheresInCell,True)
-		O.engines=[BexResetter(),BoundingVolumeMetaEngine([InteractingSphere2AABB()]),PeriodicInsertionSortCollider(),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[100e9,1e9],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5),NewtonsDampedLaw(damping=.6)]
+		O.engines=[BexResetter(),BoundingVolumeMetaEngine([InteractingSphere2AABB()]),PeriodicInsertionSortCollider(),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[100e9,1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonsDampedLaw(damping=.6)]
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1],density=1000))
 		O.dt=utils.PWaveTimeStep()
 		O.run(); O.wait()
 		sp=SpherePack(); sp.fromSimulation()
+		#print 'Resulting cellSize',sp.cellSize,'proportions',sp.cellSize[1]/sp.cellSize[0],sp.cellSize[2]/sp.cellSize[0]
 		# repetition to the required cell size will be done below, after memoizing the result
 	else:
 		assumedFinalDensity=0.6
@@ -328,7 +329,9 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 		conn.commit()
 		print "Packing saved to the database",memoizeDb
 	if wantPeri: sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2]))
-	if orientation: sp.rotate(*orientation.ToAxisAngle())
+	if orientation:
+		sp.cellSize=(0,0,0); # reset periodicity to avoid warning when rotating periodic packing
+		sp.rotate(*orientation.ToAxisAngle())
 	return filterSpherePack(predicate,sp,**kw)
 
 # compatibility with the deprecated name, can be removed in the future
