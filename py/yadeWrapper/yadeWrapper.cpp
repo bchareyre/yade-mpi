@@ -19,6 +19,7 @@
 #include<boost/python.hpp>
 #include<boost/foreach.hpp>
 #include<boost/algorithm/string.hpp>
+#include<boost/version.hpp>
 
 
 
@@ -70,6 +71,7 @@ using namespace boost;
 using namespace std;
 
 #include<yade/extra/boost_python_len.hpp>
+
 
 class RenderingEngine;
 
@@ -148,7 +150,11 @@ class pyBodyContainer{
 			#12 0x00007f0908adfb84 in OpenGLRenderingEngine::render (this=0x77f1240, rootBody=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine.cpp:232
 
 		*/
-		boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
+		#if BOOST_VERSION<103500
+			boost::mutex::scoped_lock lock(Omega::instance().renderMutex,true); // acquire lock on the mutex (true)
+		#else
+			boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
+		#endif
 		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(insert(b));} return ret;
 	}
 	python::tuple insertClump(vector<shared_ptr<Body> > bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
