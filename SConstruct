@@ -109,9 +109,9 @@ profile=env['profile']
 print '@@@ Using profile',profile,'('+optsFile+') @@@'
 
 # defaults for various profiles
-if profile=='default': defOptions={'debug':1,'variant':'','optimize':0,'openmp':False}
-elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1,'openmp':False}
-else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'openmp':True}
+if profile=='default': defOptions={'debug':1,'variant':'','optimize':0}
+elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1}
+else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile}
 
 
 opts=Variables(optsFile)
@@ -133,7 +133,6 @@ opts.AddVariables(
 	BoolVariable('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
-	BoolVariable('openmp','Compile with openMP parallelization support',defOptions['openmp']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
