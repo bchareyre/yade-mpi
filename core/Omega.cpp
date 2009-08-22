@@ -100,6 +100,7 @@ void Omega::init(){
 	resetRootBody();
 	rootBodyAnother=shared_ptr<MetaBody>(new MetaBody);
 	timeInit();
+	createSimulationLoop();
 }
 
 void Omega::timeInit(){
@@ -124,6 +125,7 @@ void Omega::spawnSingleSimulationLoop(){
 
 
 void Omega::startSimulationLoop(){
+	if(!simulationLoop){ LOG_ERROR("No Omega::simulationLoop? Creating one (please report bug)."); createSimulationLoop(); }
 	if (simulationLoop && !simulationLoop->looping()){
 		simulationPauseDuration += microsec_clock::local_time()-msStartingPauseTime;
 		simulationLoop->start();

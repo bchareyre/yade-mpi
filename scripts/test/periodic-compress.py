@@ -1,4 +1,4 @@
-O.periodicCell=(0,0,0),(20,20,20)
+O.periodicCell=(0,0,0),(20,20,10)
 from yade import pack,log,timing
 p=pack.SpherePack()
 p.makeCloud(O.periodicCell[0],O.periodicCell[1],1,.5,700,True)
@@ -16,7 +16,7 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
-	PeriIsoCompressor(charLen=.5,stresses=[50e9,1e8],doneHook="print 'FINISHED'; O.pause() "),
+	PeriIsoCompressor(charLen=.5,stresses=[50e9,1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
 	NewtonsDampedLaw(damping=.4)
 ]
 O.dt=utils.PWaveTimeStep()

@@ -74,7 +74,7 @@ bool PeriodicInsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2,
 			}
 		#endif
 		if((pmn1!=pmx1) || (pmn2!=pmx2)){
-			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size!");
+			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=mn1?mx1:mx2)<<")");
 			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
 		}
 		periods[axis]=(int)(pmn1-pmn2);
@@ -372,11 +372,14 @@ void PeriIsoCompressor::action(MetaBody* rb){
 			if(!b->boundingVolume) continue;
 			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->boundingVolume->max[i]-b->boundingVolume->min[i]);
 		}
+		
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
 	const long& step=rb->currentIteration;
 	Vector3r cellSize=rb->cellMax-rb->cellMin; //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
+	Real minSize=min(cellSize[0],min(cellSize[1],cellSize[2]));
+	if(minSize<2.1*maxSpan){ throw runtime_error("Minimum cell size is smaller than 2.1*span_of_the_biggest_body! (periodic collider requirement)"); }
 	if(((step%globalUpdateInt)==0) || avgStiffness<0 || sigma[0]<0 || sigma[1]<0 || sigma[2]<0){
 		Vector3r sumForces=Shop::totalForceInVolume(avgStiffness,rb);
 		sigma=Vector3r(sumForces[0]/cellArea[0],sumForces[1]/cellArea[1],sumForces[2]/cellArea[2]);
@@ -387,18 +390,28 @@ void PeriIsoCompressor::action(MetaBody* rb){
 	Vector3r cellGrow(Vector3r::ZERO);
 	// is the stress condition satisfied in all directions?
 	bool allStressesOK=true;
-	Vector3r cg_;
-	for(int axis=0; axis<3; axis++){
-		// Δσ=ΔεE=(Δl/l)×(l×K/A) ↔ Δl=Δσ×A/K
-		// FIXME: either NormalShearInteraction::{kn,ks} is computed wrong or we have dimensionality problem here
-		// FIXME: that is why the fixup 1e-4 is needed here
-		// FIXME: or perhaps maxDisplaPerStep=1e-2*charLen is too big??
-		cellGrow[axis]=1e-4*(sigma[axis]-sigmaGoal)*cellArea[axis]/(avgStiffness>0?avgStiffness:1);
-		if(abs(cellGrow[axis])>maxDisplPerStep) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxDisplPerStep;
-		cellGrow[axis]=max(cellGrow[axis],-(cellSize[0]-2.1*maxSpan));
-		// crude way of predicting sigma, for steps when it is not computed from intrs
-		if(avgStiffness>0) sigma[axis]-=cellGrow[axis]*avgStiffness;
-		if(abs((sigma[axis]-sigmaGoal)/sigmaGoal)>5e-3) allStressesOK=false;
+	if(keepProportions){ // the same algo as below, but operating on quantitites averaged over all dimensions
+		Real sigAvg=(sigma[0]+sigma[1]+sigma[2])/3., avgArea=(cellArea[0]+cellArea[1]+cellArea[2])/3.;
+		Real grow=1e-4*(sigAvg-sigmaGoal)*avgArea/(avgStiffness>0?avgStiffness:1);
+		if(abs(grow)>maxDisplPerStep) grow=Mathr::Sign(grow)*maxDisplPerStep;
+		grow=max(grow,-(minSize-2.1*maxSpan));
+		if(avgStiffness>0) { sigma-=(grow*avgStiffness)*Vector3r::ONE; sigAvg-=grow*avgStiffness; }
+		if(abs((sigAvg-sigmaGoal)/sigmaGoal)>5e-3) allStressesOK=false;
+		cellGrow=Vector3r(grow,grow,grow);
+	}
+	else{ // handle each dimension separately
+		for(int axis=0; axis<3; axis++){
+			// Δσ=ΔεE=(Δl/l)×(l×K/A) ↔ Δl=Δσ×A/K
+			// FIXME: either NormalShearInteraction::{kn,ks} is computed wrong or we have dimensionality problem here
+			// FIXME: that is why the fixup 1e-4 is needed here
+			// FIXME: or perhaps maxDisplaPerStep=1e-2*charLen is too big??
+			cellGrow[axis]=1e-4*(sigma[axis]-sigmaGoal)*cellArea[axis]/(avgStiffness>0?avgStiffness:1);
+			if(abs(cellGrow[axis])>maxDisplPerStep) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxDisplPerStep;
+			cellGrow[axis]=max(cellGrow[axis],-(cellSize[axis]-2.1*maxSpan));
+			// crude way of predicting sigma, for steps when it is not computed from intrs
+			if(avgStiffness>0) sigma[axis]-=cellGrow[axis]*avgStiffness;
+			if(abs((sigma[axis]-sigmaGoal)/sigmaGoal)>5e-3) allStressesOK=false;
+		}
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
 	rb->cellMin-=.5*cellGrow; rb->cellMax+=.5*cellGrow;

@@ -166,9 +166,11 @@ class PeriIsoCompressor: public StandAloneEngine{
 	size_t state;
 	//! python command to be run when reaching the last specified stress
 	string doneHook;
+	//! whether to exactly keep proportions of the cell
+	bool keepProportions;
 	void action(MetaBody*);
-	PeriIsoCompressor(): avgStiffness(-1), maxDisplPerStep(-1), sumForces(Vector3r::ZERO), sigma(Vector3r::ZERO), charLen(-1), maxSpan(-1), maxUnbalanced(1e-4), currUnbalanced(-1), globalUpdateInt(100), state(0){}
-	REGISTER_ATTRIBUTES(StandAloneEngine,(stresses)(charLen)(maxUnbalanced)(globalUpdateInt)(state)(doneHook)(maxSpan));
+	PeriIsoCompressor(): avgStiffness(-1), maxDisplPerStep(-1), sumForces(Vector3r::ZERO), sigma(Vector3r::ZERO), charLen(-1), maxSpan(-1), maxUnbalanced(1e-4), currUnbalanced(-1), globalUpdateInt(20), state(0), keepProportions(true){}
+	REGISTER_ATTRIBUTES(StandAloneEngine,(stresses)(charLen)(maxUnbalanced)(globalUpdateInt)(state)(doneHook)(maxSpan)(keepProportions));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(PeriIsoCompressor,StandAloneEngine);
 };

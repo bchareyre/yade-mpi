@@ -83,8 +83,11 @@ public:
 
 	// transformations
 	void translate(const Vector3r& shift){ FOREACH(Sph& s, pack) s.c+=shift; }
-	void rotate(const Vector3r& axis, Real angle){ Vector3r mid=midPt(); Quaternionr q(axis,angle); FOREACH(Sph& s, pack) s.c=q*(s.c-mid)+mid; }
-	void scale(Real scale){ Vector3r mid=midPt(); FOREACH(Sph& s, pack) {s.c=scale*(s.c-mid)+mid; s.r*=abs(scale); } }
+	void rotate(const Vector3r& axis, Real angle){
+		if(cellSize!=Vector3r::ZERO) { LOG_WARN("Periodicity reset when rotating periodic packing."); cellSize=Vector3r::ZERO; }
+		Vector3r mid=midPt(); Quaternionr q(axis,angle); FOREACH(Sph& s, pack) s.c=q*(s.c-mid)+mid;
+	}
+	void scale(Real scale){ Vector3r mid=midPt(); cellSize*=scale; FOREACH(Sph& s, pack) {s.c=scale*(s.c-mid)+mid; s.r*=abs(scale); } }
 
 	// iteration 
 	#ifdef YADE_PYTHON

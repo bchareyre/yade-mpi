@@ -134,6 +134,21 @@ class pyBodyContainer{
 	}
 	body_id_t insert(shared_ptr<Body> b){ return proxee->insert(b); }
 	vector<body_id_t> insertList(vector<shared_ptr<Body> > bb){
+		/* prevent crash when adding lots of bodies (not clear why it happens exactly, bt is like this:
+
+			#3  <signal handler called>
+			#4  0x000000000052483f in boost::detail::atomic_increment (pw=0x8089) at /usr/include/boost/detail/sp_counted_base_gcc_x86.hpp:66
+			#5  0x00000000005248b3 in boost::detail::sp_counted_base::add_ref_copy (this=0x8081) at /usr/include/boost/detail/sp_counted_base_gcc_x86.hpp:133
+			#6  0x00000000005249ca in shared_count (this=0x7fff2e44db48, r=@0x7f08ffd692b8) at /usr/include/boost/detail/shared_count.hpp:227
+			#7  0x00000000005258e3 in shared_ptr (this=0x7fff2e44db40) at /usr/include/boost/shared_ptr.hpp:165
+			#8  0x0000000000505cff in BodyRedirectionVectorIterator::getValue (this=0x846f040) at /home/vaclav/yade/trunk/core/containers/BodyRedirectionVector.cpp:47
+			#9  0x00007f0908af41ce in BodyContainerIteratorPointer::operator* (this=0x7fff2e44db60) at /home/vaclav/yade/build-trunk/include/yade-trunk/yade/core/BodyContainer.hpp:63
+			#10 0x00007f0908af420a in boost::foreach_detail_::deref<BodyContainer, mpl_::bool_<false> > (cur=@0x7fff2e44db60) at /usr/include/boost/foreach.hpp:750
+			#11 0x00007f0908adc5a9 in OpenGLRenderingEngine::renderGeometricalModel (this=0x77f1240, rootBody=@0x1f49220) at pkg/common/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine.cpp:441
+			#12 0x00007f0908adfb84 in OpenGLRenderingEngine::render (this=0x77f1240, rootBody=@0x1f49220, selection=-1) at pkg/common/RenderingEngine/OpenGLRenderingEngine/OpenGLRenderingEngine.cpp:232
+
+		*/
+		boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
 		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(insert(b));} return ret;
 	}
 	python::tuple insertClump(vector<shared_ptr<Body> > bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
@@ -340,6 +355,7 @@ class pyOmega{
 	}
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
+	void resetThisWorld(){Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; OMEGA.resetRootBody(); OMEGA.createSimulationLoop();}
 	void resetTime(){ OMEGA.getRootBody()->currentIteration=0; OMEGA.getRootBody()->simulationTime=0; OMEGA.timeInit(); }
 	void switchWorld(){ std::swap(OMEGA.rootBody,OMEGA.rootBodyAnother); }
 
@@ -631,7 +647,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("pause",&pyOmega::pause,"Stop simulation execution.\n(may be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
-		.def("reset",&pyOmega::reset,"Reset simulation completely.")
+		.def("reset",&pyOmega::reset,"Reset simulations completely (including another world!).")
+		.def("resetThisWorld",&pyOmega::resetThisWorld,"Reset current world.")
 		.def("switchWorld",&pyOmega::switchWorld,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchWorld(); [b still refers to the body in the first simulation here])")
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n For example: \n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider['nBins']=5 ## collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")

@@ -115,6 +115,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 void SpherePack::cellFill(Vector3r vol){
 	Vector3<int> count;
 	for(int i=0; i<3; i++) count[i]=(int)(ceil(vol[i]/cellSize[i]));
+	LOG_DEBUG("Filling volume "<<vol<<" with cell "<<cellSize<<", repeat counts are "<<count);
 	cellRepeat(count);
 }
 
