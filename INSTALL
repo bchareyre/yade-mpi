@@ -7,12 +7,11 @@ Go to http://yade.wikia.com/wiki/Installation for up-to-date sources.
 
 Latest SVN snapshot
 ===================
-If you want to look at the latest yade version from subversion (sometimes not
-working), you can download it using one of the ways shown below:
+If you want to look at the latest yade version from Launchpad, 
+you can download it using one of the ways shown below:
 
-	svn checkout svn://svn.berlios.de/yade/trunk/
-	svn checkout http://svn.berlios.de/svnroot/repos/yade/trunk
-	svn checkout https://svn.berlios.de/svnroot/repos/yade/trunk
+	bzr checkout lp:yade
+
 
 Which one of those above will work depends on your network and firewall
 configuration.
@@ -66,13 +65,14 @@ http://yade.wikia.com/wiki/Installation_of_yade_on_gentoo is more detailed)
 
 Debian/Ubuntu
 -------------
-Install dependencies:
+Install dependencies (9.04, Jaunty):
 
-	sudo aptitude install scons libqt3-mt-dev qt3-dev-tools freeglut3-dev \
-	libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \
-	libboost-regex-dev fakeroot dpkg-dev build-essential g++ \
-	libboost-iostreams-dev liblog4cxx9-dev python-dev libboost-python-dev ipython \
-	python-matplotlib libsqlite3-dev
+sudo aptitude install scons libqt3-mt-dev qt3-dev-tools freeglut3-dev \  
+libboost-date-time-dev libboost-filesystem-dev libboost-thread-dev \  
+libboost-regex-dev fakeroot dpkg-dev build-essential g++ \  
+libboost-iostreams-dev liblog4cxx10-dev python-dev libboost-python-dev ipython \  
+python-matplotlib libsqlite3-dev python-numeric python-tk gnuplot doxygen python-pygraphviz
+
 
 Then run scons as per above.
 
