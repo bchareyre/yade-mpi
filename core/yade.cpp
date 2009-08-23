@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 	#else
 		if(gui=="QtGUI"){LOG_WARN("openGL-less build, using PythonUI instead of QtGUI"); gui="PythonUI";}
 	#endif
-	if(string(getenv("DISPLAY")).empty()) unsetenv("DISPLAY"); // empty $DISPLAY is no display
+	if(getenv("DISPLAY") && string(getenv("DISPLAY")).empty()) unsetenv("DISPLAY"); // empty $DISPLAY is no display
 	if(gui=="QtGUI" && !getenv("DISPLAY")){ LOG_WARN("No $DISPLAY, using PythonUI instead of QtUI"); gui="PythonUI"; }
 	shared_ptr<FrontEnd> frontEnd;
 	try{
