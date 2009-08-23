@@ -7,6 +7,7 @@ pygts-0.3.1:
 boost-python-indexing-suite-v2-noSymlinkHeaders:
 	homepage: http://www.language-binding.net/pyplusplus/pyplusplus.html (part of Py++-1.0.0)
 	documentation: http://www.language-binding.net/pyplusplus/documentation/indexing_suite_v2.html.html
+	source: https://pygccxml.svn.sourceforge.net/svnroot/pygccxml/pyplusplus_dev/indexing_suite_v2 revision 1755
 	license: Boost software license 1.0
-	note: only headers and a few .cpp files making up the indexing suite are copied here
+	note: only headers are copied here
 

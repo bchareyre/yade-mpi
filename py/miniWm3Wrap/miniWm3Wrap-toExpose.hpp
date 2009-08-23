@@ -1,6 +1,6 @@
 #include<base/yadeWm3.hpp>
 #include<base/yadeWm3Extra.hpp>
-#include<boost/lexical_cast.hpp>
+//#include<boost/lexical_cast.hpp>
 #include<string>
 
 // define python names for these classes

@@ -29,7 +29,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 		env.File('pack.py'),
 		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',])
 			),
-		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['boost_python_indexing_suite_v2']+linkPlugins(Split("BoundingVolumeEngineUnit GeometricalModelEngineUnit InteractingGeometryEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit PhysicalParametersEngineUnit PhysicalActionDamperUnit PhysicalActionApplierUnit ConstitutiveLaw")))
+		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundingVolumeEngineUnit GeometricalModelEngineUnit InteractingGeometryEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit PhysicalParametersEngineUnit PhysicalActionDamperUnit PhysicalActionApplierUnit ConstitutiveLaw")))
 	])
 	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
 		env.File('__init__.py','tests'),
@@ -40,7 +40,6 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 	# ==================
 	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
 		env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/']),
-		env.SharedLibrary('boost_python_indexing_suite_v2',['3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders/indexing_slice.cpp','3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders/python_iterator.cpp'])
 	])
 
 	if 'YADE_GTS' in env['CPPDEFINES']:

@@ -525,7 +525,7 @@ void GLViewer::postDraw(){
 	if(drawScale){
 		Real segmentSize=scaleStep;
 		qglviewer::Vec screenDxDy[3]; // dx,dy for x,y,z scale segments
-		int extremalDxDy[2];
+		int extremalDxDy[2]={0,0};
 		for(int axis=0; axis<3; axis++){
 			qglviewer::Vec delta(0,0,0); delta[axis]=segmentSize;
 			qglviewer::Vec center=displayedSceneCenter();

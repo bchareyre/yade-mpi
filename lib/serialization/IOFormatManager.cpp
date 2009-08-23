@@ -10,9 +10,16 @@
 
 #include "IOFormatManager.hpp"
 #include "Serializable.hpp"
-#include <boost/spirit.hpp>
 
-using namespace boost::spirit;
+#include<boost/version.hpp>
+#if BOOST_VERSION<103600
+	#include <boost/spirit.hpp>
+	using namespace boost::spirit;
+#else
+	#include<boost/spirit/include/classic.hpp>
+	using namespace boost::spirit::classic;
+#endif
+
 
 
 int IOFormatManager::format;

@@ -122,6 +122,9 @@ void quaternionToAxes(const Quaternionr& q, Vector3r& axis1, Vector3r& axis2, Ve
 void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real threshold=1e-6f);
 void quaterniontoGLMatrix(const Quaternionr& q, Real m[16]);
 
+// gccxml chokes on the boost::serialization code; this part is not needed if wrapping miniWm3 anyway
+#ifndef __GCCXML__
+
 #include<boost/serialization/nvp.hpp>
 
 namespace boost {
@@ -161,6 +164,8 @@ void serialize(Archive & ar, Se3r & g, const unsigned int version){
 
 } // namespace serialization
 } // namespace boost
+
+#endif /* __GCCXML */
 
 #if 0
 #include<yade/lib-QGLViewer/qglviewer.h>

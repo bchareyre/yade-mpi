@@ -1,8 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #include<boost/python.hpp>
-#include<boost/python/suite/indexing/container_suite.hpp>
-#include<boost/python/suite/indexing/vector.hpp>
+#include<indexing_suite/container_suite.hpp>
+#include<indexing_suite/vector.hpp>
 #include<boost/python/class.hpp>
 #include<boost/python/module.hpp>
 #include<boost/foreach.hpp>
