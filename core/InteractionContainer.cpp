@@ -25,8 +25,10 @@ void InteractionContainer::clearPendingErase(){
 		FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
 			pendingErase.clear();
 		}
+	#else
+		pendingErase.clear();
 	#endif
-	pendingErase.clear();
+	
 }
 
 int InteractionContainer::unconditionalErasePending(){

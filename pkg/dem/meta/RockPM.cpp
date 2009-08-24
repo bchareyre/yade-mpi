@@ -96,9 +96,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		if (phys->isCohesive) {
 			if (displN>(phys->lengthMaxTension)) {
 				//LOG_WARN(displN<<"__TENSION!!!__");
-				phys->isCohesive = false;
-				rbp1->isDamaged=true;
-				rbp2->isDamaged=true;
+				rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
 				return; 
 			} else {
 				phys->normalForce=phys->kn*displN*geom->normal;
