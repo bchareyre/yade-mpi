@@ -1,8 +1,15 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
+
+// this is not currently used, but can be enabled if needed
+// probably breaks compilation for older (like <=1.35 or so)
+// boost::python
+#if 0
+	#include<indexing_suite/container_suite.hpp>
+	#include<indexing_suite/vector.hpp>
+#endif
+
 #include<boost/python.hpp>
-#include<indexing_suite/container_suite.hpp>
-#include<indexing_suite/vector.hpp>
 #include<boost/python/class.hpp>
 #include<boost/python/module.hpp>
 #include<boost/foreach.hpp>
