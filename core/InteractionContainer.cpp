@@ -23,9 +23,10 @@ void InteractionContainer::requestErase(body_id_t id1, body_id_t id2){
 void InteractionContainer::clearPendingErase(){
 	#ifdef YADE_OPENMP
 		FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
-	#endif
 			pendingErase.clear();
 		}
+	#endif
+	pendingErase.clear();
 }
 
 int InteractionContainer::unconditionalErasePending(){
