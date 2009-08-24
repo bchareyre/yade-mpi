@@ -4,6 +4,10 @@
 # The install is maximal: you will get almost all YADE functionality, even if you dont need it
 # Please, copy this script to the empty directory and start it.
 # 
+# WARNING: this will install on your machine the version, that may not work for you
+# for a while. It can happen because of some "working" commits to the repository.
+# If it happens, wait a little bit and try again. Or contact us through mailing list.
+# 
 
 
 BASEDIR='.'
