@@ -263,7 +263,7 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 		conn=sqlite3.connect(memoizeDb); c=conn.cursor();
 		try:
 			c.execute('select radius,rRelFuzz,dimx,dimy,dimz,N,timestamp,periodic from packings order by N')
-		except OperationalError:
+		except sqlite3.OperationalError:
 			raise RuntimeError("ERROR: database",memoizeDb," not compatible with randomDensePack (deprecated format or not db created by randomDensePack)")
 		for row in c:
 			R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=radius/R
