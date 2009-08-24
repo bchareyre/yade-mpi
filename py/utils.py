@@ -489,7 +489,7 @@ def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
 	if filename: ids=spheresFromFile(filename,**kw)
 	else: ids=[b.id for b in O.bodies]
 	mm,mx=aabbExtrema()
-	dim=aabbDim(); axis=dim.index(max(dim))
+	dim=aabbDim(); axis=list(dim).index(max(dim)) # list(dim) for compat with python 2.5 which didn't have index defined for tuples yet (appeared in 2.6 first)
 	import numpy
 	areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
 	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
