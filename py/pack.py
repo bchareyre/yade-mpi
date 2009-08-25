@@ -251,9 +251,10 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 		beta,gamma=fullDim[1]/fullDim[0],fullDim[2]/fullDim[0] # ratios β=y₀/x₀, γ=z₀/x₀
 		N100=spheresInCell/cloudPorosity # number of spheres for cell being filled by spheres without porosity
 		x1=radius*(1/(beta*gamma)*N100*(4/3.)*pi)**(1/3.)
-		y1,z1=beta*x1,gamma*x1
+		y1,z1=beta*x1,gamma*x1; vol0=x1*y1*z1
 		maxR=radius*(1+rRelFuzz)
-		x1=max(x1,8*maxR); y1=max(y1,8*maxR); z1=max(z1,8*maxR) # this might make the packing looser, oh well...
+		x1=max(x1,8*maxR); y1=max(y1,8*maxR); z1=max(z1,8*maxR); vol1=x1*y1*z1
+		N100*=vol1/vol0 # volume might have been increased, increase number of spheres to keep porosity the same
 	if(memoizeDb and os.path.exists(memoizeDb)):
 		if memoDbg:
 			def memoDbgMsg(s): print s
@@ -264,7 +265,7 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 		try:
 			c.execute('select radius,rRelFuzz,dimx,dimy,dimz,N,timestamp,periodic from packings order by N')
 		except sqlite3.OperationalError:
-			raise RuntimeError("ERROR: database",memoizeDb," not compatible with randomDensePack (deprecated format or not db created by randomDensePack)")
+			raise RuntimeError("ERROR: database `"+memoizeDb+"' not compatible with randomDensePack (corrupt, deprecated format or not a db created by randomDensePack)")
 		for row in c:
 			R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=radius/R
 			rDev*=scale; X*=scale; Y*=scale; Z*=scale

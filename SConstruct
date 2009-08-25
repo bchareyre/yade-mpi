@@ -151,7 +151,7 @@ opts.AddVariables(
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
-	BoolVariable('pretty',"Don't show compiler command line (like the Linux kernel)",1),
+	BoolVariable('pretty',"Don't show commands being run, only what files are being compiled/linked/installed",1),
 	BoolVariable('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
@@ -327,15 +327,15 @@ if not env.GetOption('clean'):
 		Exit(1)
 	# check "optional" libs
 	if 'opengl' in env['features']:
-		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c','glutGetModifiers();',autoadd=1)
-		if not ok: featureNotOK('openGL')
+		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
+		if not ok: featureNotOK('opengl')
 	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
-		ok=conf.CheckLibWithHeader('gts','gts.h','c','gts_object_class();',autoadd=1)
+		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)
 		if not ok: featureNotOK('gts')
 	if 'qt3' not in env['exclude']:
 		if 'opengl' not in env['features']:
-			print "\nQt3 interface can only be used if openGL is enabled.\nEither add openGL to 'features' or add qt3 to 'exclude'."
+			print "\nQt3 interface can only be used if opengl is enabled.\nEither add opengl to 'features' or add qt3 to 'exclude'."
 			Exit(1)
 		ok&=conf.CheckQt(env['QTDIR'])
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
