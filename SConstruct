@@ -188,6 +188,7 @@ import yadeSCons
 ## ALL generated stuff should go here - therefore we must determine it very early!!
 if not env.has_key('version'):
 	env['realVersion']=yadeSCons.getRealVersion()
+	if not env['realVersion']: env['realVersion']='unknown'
 	env['version']=env['realVersion']
 if not env.has_key('realVersion') or not env['realVersion']: env['realVersion']=env['version']
 
