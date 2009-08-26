@@ -1,3 +1,9 @@
+NOTE: this changelog is no longer maintained as of 8/2009,
+go to http://bazaar.launchpad.net/~yade-dev/yade/trunk/changes
+for complete history or use bzr log on your local checkout/branch.
+
+---
+
 2008-08-20 Janek Kozicki <cosurgi@gmail.com> revision 1480
 
 	* ChangeLog: New ChangeLog format. Please use this format in your
