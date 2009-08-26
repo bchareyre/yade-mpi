@@ -29,6 +29,8 @@
 #include"FrontEnd.hpp"
 #include"Preferences.hpp"
 
+// #define YADE_HUP_EMERGENCY_SAVE
+
 using namespace std;
 
 #ifdef YADE_LOG4CXX
@@ -85,6 +87,8 @@ sigHandler(int sig){
 			raise(sig); // reemit signal after exiting gdb
 			break;
 	#endif
+
+	#ifdef YADE_HUP_EMERGENCY_SAVE
 	case SIGHUP:
 		signal(SIGHUP,SIG_DFL);
 		LOG_INFO("Received SIGHUP.");
@@ -96,6 +100,8 @@ sigHandler(int sig){
 		} else LOG_INFO("Nothing to save.");
 		LOG_INFO("Emergency exit.");
 		exit(1);
+	#endif
+
 	}
 }
 
@@ -113,18 +119,20 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 	IOFormatManager::saveToFile("XMLFormatManager",cfgFile,"preferences",pref);
 }
 
-string findRecoveryCandidate(filesystem::path dir, string start){
-#if BOOST_VERSION > 103400
-	if(!filesystem::exists(dir)) return false;
-	filesystem::directory_iterator end;
-	for(filesystem::directory_iterator I(dir); I!=end; ++I){
-		if(filesystem::is_regular(I->status()) && I->path().leaf().find(start)==0 ){
-			return (I->path()).string();
+#ifdef YADE_HUP_EMERGENCY_SAVE
+	string findRecoveryCandidate(filesystem::path dir, string start){
+	#if BOOST_VERSION > 103400
+		if(!filesystem::exists(dir)) return false;
+		filesystem::directory_iterator end;
+		for(filesystem::directory_iterator I(dir); I!=end; ++I){
+			if(filesystem::is_regular(I->status()) && I->path().leaf().find(start)==0 ){
+				return (I->path()).string();
+			}
 		}
+	#endif
+		return "";
 	}
 #endif
-	return "";
-}
 
 void printHelp()
 {
@@ -284,18 +292,20 @@ int main(int argc, char *argv[])
 	Omega::instance().initTemps();
 	Omega::instance().setSimulationFileName(simulationFileName); //init() resets to "";
 
-	// recovery file pattern
-	Omega::instance().recoveryFilename=(yadeConfigPath/"recovery-pid").string()+lexical_cast<string>(getpid())+".xml";
-	signal(SIGHUP,sigHandler);
+	#ifdef YADE_HUP_EMERGENCY_SAVE
+		// recovery file pattern
+		Omega::instance().recoveryFilename=(yadeConfigPath/"recovery-pid").string()+lexical_cast<string>(getpid())+".xml";
+		signal(SIGHUP,sigHandler);
 
-	string recoveryCandidate=findRecoveryCandidate(/* directory */ yadeConfigPath, /* beginning of the filename */ "recovery-pid");
-	if(!recoveryCandidate.empty()){
-		if(!simulationFileName.empty()) LOG_WARN("Skipping recovery of `"<<recoveryCandidate<<"', since the file `"<<simulationFileName<<"' was given on the command-line.")
-		else {
-			LOG_INFO("Will recover simulation from `"<<recoveryCandidate<<"'.");
-			Omega::instance().setSimulationFileName(recoveryCandidate);
+		string recoveryCandidate=findRecoveryCandidate(/* directory */ yadeConfigPath, /* beginning of the filename */ "recovery-pid");
+		if(!recoveryCandidate.empty()){
+			if(!simulationFileName.empty()) LOG_WARN("Skipping recovery of `"<<recoveryCandidate<<"', since the file `"<<simulationFileName<<"' was given on the command-line.")
+			else {
+				LOG_INFO("Will recover simulation from `"<<recoveryCandidate<<"'.");
+				Omega::instance().setSimulationFileName(recoveryCandidate);
+			}
 		}
-	}
+	#endif
 
 	// handle this a little more inteligently, use FrontEnd::available to chec kif the GUI will really run (QtGUi without DISPLAY and similar)
 	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
