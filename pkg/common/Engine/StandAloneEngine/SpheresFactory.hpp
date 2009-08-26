@@ -106,7 +106,6 @@ private:
 			(frictionAngle)
 			(color))
 	REGISTER_CLASS_AND_BASE(SpheresFactory, StandAloneEngine);
-
 };
 REGISTER_SERIALIZABLE(SpheresFactory);
 
