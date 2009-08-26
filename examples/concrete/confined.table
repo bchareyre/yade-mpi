@@ -1,0 +1,20 @@
+#
+# Use this table with yade-multi like this:
+#
+#   yade-version-multi --gnuplot confined.gnuplot confined.table uniax.py
+#
+# and watch http://localhost:9080 while it runs
+#
+# OMP_NUM_THREADS: number of threads to use (bang at the beginning: passed as environment variable)
+# isoPrestress: confinement (bang at the end = parameter and value will appear in the job id)
+# doModes: run both tension&compression only in the unconfined case, otherwise just compression
+#
+
+!OMP_NUM_THREADS isoPrestress! doModes
+4      0 3 
+4  -20e6 2
+4  -50e6 2
+4 -100e6 2
+4 -200e6 2
+4 -400e6 2
+
