@@ -142,28 +142,6 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	if wallMask&32: ret+=doWall(E,F,G,H)
 	return ret
 	
-	'''
-	mn,mx=[center[i]-extents[i] for i in 0,1,2],[center[i]+extents[i] for i in 0,1,2]
-	def doWall(a,b,c,d):
-		return [facet((a,b,c),**kw),facet((a,c,d),**kw)]
-	ret=[]
-	qTemp = Quaternion(Vector3(orientation[0],orientation[1],orientation[2]),orientation[3])
-	A=qTemp.Rotate(Vector3(mn[0],mn[1],mn[2]))
-	B=qTemp.Rotate(Vector3(mx[0],mn[1],mn[2]))
-	C=qTemp.Rotate(Vector3(mx[0],mx[1],mn[2]))
-	D=qTemp.Rotate(Vector3(mn[0],mx[1],mn[2]))
-	E=qTemp.Rotate(Vector3(mn[0],mn[1],mx[2]))
-	F=qTemp.Rotate(Vector3(mx[0],mn[1],mx[2]))
-	G=qTemp.Rotate(Vector3(mx[0],mx[1],mx[2]))
-	H=qTemp.Rotate(Vector3(mn[0],mx[1],mx[2]))
-	if wallMask&1:  ret+=doWall(A,D,H,E)
-	if wallMask&2:  ret+=doWall(B,C,G,F)
-	if wallMask&4:  ret+=doWall(A,B,F,E)
-	if wallMask&8:  ret+=doWall(D,H,G,C)
-	if wallMask&16: ret+=doWall(A,D,C,B)
-	if wallMask&32: ret+=doWall(E,F,G,H)
-	return ret
-	'''
 	
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):

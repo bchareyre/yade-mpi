@@ -32,7 +32,6 @@ CREATE_LOGGER(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
-	//geom->distanceFactor=1.1;
 	
 	Real displN=geom->displacementN();
 	const Real& crossSection=phys->crossSection;
@@ -57,10 +56,6 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 	const shared_ptr<RpmMat>& rbp1=YADE_PTR_CAST<RpmMat>(body1->physicalParameters);
 	const shared_ptr<RpmMat>& rbp2=YADE_PTR_CAST<RpmMat>(body2->physicalParameters);
 	
-	///check, whether one of bodies is damaged
-	if ((rbp1->isDamaged) || (rbp2->isDamaged)) {
-		phys->isCohesive = false;
-	}
 
 	if(displN<=0){
 		/**Normal Interaction*/
@@ -84,26 +79,35 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		phys->shearForce = Fs;
 
 		applyForceAtContactPoint(phys->normalForce + phys->shearForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
-		/**Normal Interaction_____*/
+		/**Normal Interaction*/
 		if ((phys->isCohesive)&&(displN<(-phys->lengthMaxCompression))) {
-			//LOG_WARN(displN<<"__COMRESS!!!__");
 			phys->isCohesive = false;
-			rbp1->isDamaged=true;
-			rbp2->isDamaged=true;
 		}
 		return;
 	} else {
+		/**If spheres do not touch, check, whether they are cohesive*/
 		if (phys->isCohesive) {
+			/**If the distance 
+			 * between spheres more than critical and they are cohesive,
+			 * we delete the interaction
+			 * Destruction.
+			 **/
 			if (displN>(phys->lengthMaxTension)) {
-				//LOG_WARN(displN<<"__TENSION!!!__");
 				rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
 				return; 
 			} else {
+			/**If the distance 
+			 * between spheres less than critical and they are cohesive,
+			 * we aply additional forces to keep particles together.
+			 **/
 				phys->normalForce=phys->kn*displN*geom->normal;
 				applyForceAtContactPoint(phys->normalForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
 				return;
 			}
 		} else {
+			/**
+			 * Delete interactions
+			 */ 
 			rootBody->interactions->requestErase(contact->getId1(),contact->getId2());
 			return;
 		}
