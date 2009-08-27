@@ -48,14 +48,15 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 	Real& Fn=phys->Fn;
 	Vector3r& Fs=phys->Fs;
 	
-	
+	/*
+	*************Blocked for a while
 	const shared_ptr<Body>& body1=Body::byId(contact->getId1(),rootBody);
 	const shared_ptr<Body>& body2=Body::byId(contact->getId2(),rootBody);
 	assert(body1);
 	assert(body2);
 	const shared_ptr<RpmMat>& rbp1=YADE_PTR_CAST<RpmMat>(body1->physicalParameters);
 	const shared_ptr<RpmMat>& rbp2=YADE_PTR_CAST<RpmMat>(body2->physicalParameters);
-	
+	*/
 
 	if(displN<=0){
 		/**Normal Interaction*/
