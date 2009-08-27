@@ -22,7 +22,7 @@ cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g"
 ## debian/changelog
 DEBDATE=`date -R`
 cat <<EOF > debian/changelog
-yade$_VERSION (1) $DISTRIBUTION; urgency=low
+yade$_VERSION (1~$DISTRIBUTION) $DISTRIBUTION; urgency=low
 
   * Automatic debian changelog entry for yade$_VERSION
 
