@@ -32,7 +32,7 @@ pts+=[pts[0]]
 # make the second contour, just shifted by millDp; ppts contains both
 ppts=[pts,[p+Vector3(millDp,0,0) for p in pts]]
 mill=pack.sweptPolylines2gtsSurface(ppts,threshold=.01*min(dTheta*millRad,bumpHt))#,capStart=True,capEnd=True)
-millIds=O.bodies.append(pack.gtsSurface2Facets(mill,color=(1,0,1))) # add triangles, save their ids
+millIds=O.bodies.append(pack.gtsSurface2Facets(mill,color=(1,0,1),wire=False)) # add triangles, save their ids
 # make the caps less comfortably, but looking better as two triangle couples over the mill
 mrs2=millRad*sqrt(2)
 cap1,cap2=[Vector3(0,0,mrs2),Vector3(0,-mrs2,0),Vector3(0,0,-mrs2)],[Vector3(0,0,mrs2),Vector3(0,0,-mrs2),Vector3(0,mrs2,0)] # 2 triangles at every side
@@ -70,5 +70,5 @@ O.saveTmp()
 from yade import qt
 v=qt.View()
 v.eyePosition=(3,.8,.96); v.upVector=(-.4,-.4,.8); v.viewDir=(-.9,-.25,-.3); v.axes=True; v.sceneRadius=1.9
-O.run(10000); O.wait()
+O.run(20000); O.wait()
 utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/mill.ogg',fps=30)

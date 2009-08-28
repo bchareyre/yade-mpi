@@ -12,11 +12,11 @@
 #error "This build doesn't support openGL. Therefore, this header must not be used."
 #endif
 
-#include <Wm3Vector3.h>
+#include<Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-#include <GL/gl.h>
-#include <GL/glut.h>
+#include<GL/gl.h>
+#include<GL/glut.h>
 
 template <bool> struct static_assert_;
 template <> struct static_assert_<true> {};
@@ -264,6 +264,7 @@ template< > inline void glRect< short >			(short	x1,short  y1,short x2,short y2 
 template< > inline void glMaterial< float >			( GLenum face, GLenum pname, float param )			{	glMaterialf(face,pname,param);		};
 template< > inline void glMaterial< double >			( GLenum face, GLenum pname, double param )			{	glMaterialf(face,pname,param);		};
 template< > inline void glMaterial< int >			( GLenum face, GLenum pname, int param )			{	glMateriali(face,pname,param);		};
+template< > inline void glMaterialv< Vector3<double> >	( GLenum face, GLenum pname, const Vector3<double> params )	{	Vector3f _p(params[0],params[1],params[2]); glMaterialfv(face,pname,_p);	};
 template< > inline void glMaterialv< Vector3<float> >		( GLenum face, GLenum pname, const Vector3<float> params )	{	glMaterialfv(face,pname,params);	};
 template< > inline void glMaterialv< Vector3<int> >		( GLenum face, GLenum pname, const Vector3<int> params )	{	glMaterialiv(face,pname,params);	};
 

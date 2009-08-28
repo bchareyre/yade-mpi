@@ -170,6 +170,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 	glClearColor(Background_color[0],Background_color[1],Background_color[2],1.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
+	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1); // important: do lighting calculations on both sides of polygons
 	//glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
 	glEnable(GL_LIGHT0);
 	glDisable(GL_LIGHTING);

@@ -172,6 +172,12 @@ python::list getAllViews(){
 	return ret;
 };
 
+pyGLViewer getPlayerView(){
+	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
+	if(!player) throw runtime_error("Player is not active, unable to get its view");
+	return pyGLViewer(0);
+}
+
 
 BOOST_PYTHON_MODULE(_qt){
 	def("Generator",evtGENERATOR,"Start simulation generator");
@@ -185,6 +191,7 @@ BOOST_PYTHON_MODULE(_qt){
 	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI from within python.");
 	def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook","startWait")));
 	def("views",getAllViews);
+	def("getPlayerView",getPlayerView,"Get the 3d view of the player (raises exception if player not active)");
 
 	python::class_<OpenGLRenderingEngine, shared_ptr<OpenGLRenderingEngine>, python::bases<Serializable>, noncopyable>("OpenGLRenderingEngine")
 		.def("setRefSe3",&OpenGLRenderingEngine_setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");

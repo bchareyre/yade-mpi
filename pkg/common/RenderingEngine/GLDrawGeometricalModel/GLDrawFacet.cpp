@@ -29,12 +29,12 @@ void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Ph
     }
     else
     {
-		glDisable(GL_CULL_FACE);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
-		//glBegin(GL_TRIANGLES);
-		glEnable(GL_LIGHTING);
-		glBegin(GL_POLYGON);
-			glColor3v(gm->diffuseColor); 
+		glDisable(GL_CULL_FACE); 
+  		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,gm->diffuseColor); glColor3v(gm->diffuseColor); // one of those necessary as well
+		glEnable(GL_LIGHTING); // important
+		Vector3r normal=(facet->vertices[1]-facet->vertices[0]).Cross(facet->vertices[2]-facet->vertices[1]); normal.Normalize();
+		glBegin(GL_TRIANGLES);
+			glNormal3v(normal); // this makes every triangle different WRT the light direction; important!
 			glVertex3v(facet->vertices[0]);
 			glVertex3v(facet->vertices[1]);
 			glVertex3v(facet->vertices[2]);
