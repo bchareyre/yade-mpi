@@ -13,11 +13,9 @@
 #  _LINUX     : compil on linux OS
 #  _WITH_TIFF : linked with libtiff
 
-CC      =gcc-3.3
-CFLAGS  =-Wall -O3 -D_FR -D_GNU_SOURCE -D_LIBXML2 -D_MACOSX -D_WITH_TIFF -fno-common
-#LIBS    =-lGL -lGLU -lglut -lm -lxml2 -ltiff -lX11 -lXmu -lXi
-LIBS    = -lxml2 -ltiff
-#LIBSDIR =-L/usr/X11R6/lib -L/sw/lib
+CC      =gcc
+CFLAGS  =-Wall -O3 -D_FR -D_GNU_SOURCE -D_LIBXML2 -D_MACOSX -fno-common
+LIBS    = -lxml2 
 LIBSDIR =-L/usr/lib -L/sw/lib
 INC_DIR =-I/usr/include/libxml2 -I/sw/include
 H_FILES =mgpost.h colors.h section.h display_funcs.h \
