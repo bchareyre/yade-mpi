@@ -5,9 +5,16 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/core/Timing.hpp>
-#include<GL/glu.h>
-#include<GL/gl.h>
-#include<GL/glut.h>
+
+#ifdef __APPLE__
+#  include <OpenGL/glu.h>
+#  include <OpenGL/gl.h>
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glu.h>
+#  include <GL/gl.h>
+#  include <GL/glut.h>
+#endif
 
 YADE_PLUGIN((OpenGLRenderingEngine));
 YADE_REQUIRE_FEATURE(OPENGL)

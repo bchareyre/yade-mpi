@@ -1,6 +1,12 @@
 YADE_REQUIRE_FEATURE(COMPILED_BY_INCLUDE_FROM_SnowVoxelsLoader.cpp)
 #include "Config.hpp"
-#include <GL/glut.h>
+
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
+#endif
+
 #include <iostream>
 namespace po = boost::program_options;
 

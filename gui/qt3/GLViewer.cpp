@@ -12,7 +12,13 @@
 #include"QtGUI.hpp"
 #include"YadeCamera.hpp"
 #include"YadeQtMainWindow.hpp"
-#include<GL/glut.h>
+
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/glut.h>
+#endif
+
 #include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Body.hpp>

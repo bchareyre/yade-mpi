@@ -17,6 +17,10 @@
 #include"BexContainer.hpp"
 #include"GroupRelationData.hpp"
 
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX 255 
+#endif
+
 class MetaBody : public Body
 {
 	public :

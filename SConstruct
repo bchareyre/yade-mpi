@@ -145,6 +145,7 @@ opts.AddVariables(
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
+	#('CXX','The c++ compiler','g++-4.2'),# FIXME, VR sorry for macosx port 
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
@@ -329,6 +330,7 @@ if not env.GetOption('clean'):
 	# check "optional" libs
 	if 'opengl' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
+		#if not ok: ok=conf.CheckLibWithHeader('glut','GLUT/glut.h','c++','glutGetModifiers();',autoadd=1)
 		if not ok: featureNotOK('opengl')
 	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
@@ -433,7 +435,13 @@ if env['PGO']=='use': env.Append(CXXFLAGS=['-fprofile-use'],LINKFLAGS=['-fprofil
 env.Append(LIBS=[],SHLINKFLAGS=['-rdynamic'])
 
 # if this is not present, vtables & typeinfos for classes in yade binary itself would not be exported, plugins wouldn't work
-env.Append(LINKFLAGS=['-rdynamic','-z','origin']) 
+if env['PLATFORM']=='darwin': 
+	print 'darwin platform'
+	#env.Append(LINKFLAGS=['-Z']) # ?? FIXME
+	env.Append(FRAMEWORKS=['CoreServices','Carbon'])
+else:
+	env.Append(LINKFLAGS=['-rdynamic','-z','origin']) 
+
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=runtimeLibDirs)
 # find already compiled but not yet installed libraries for linking
