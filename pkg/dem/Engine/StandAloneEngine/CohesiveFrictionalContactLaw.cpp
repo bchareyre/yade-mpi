@@ -238,10 +238,10 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
                 //  cerr << "shearForce " << shearForce << endl;
                 // cerr << "f= " << f << endl;
                 // it will be some macro(	body->physicalActions,	ActionType , bodyId )
-					ncb->bex.addForce (id1, f);
-					ncb->bex.addForce (id2,-f);
-					ncb->bex.addTorque(id1, c1x.Cross(f));
-					ncb->bex.addTorque(id2,-c2x.Cross(f));
+					ncb->bex.addForce (id1,-f);
+					ncb->bex.addForce (id2, f);
+					ncb->bex.addTorque(id1,-c1x.Cross(f));
+					ncb->bex.addTorque(id2, c2x.Cross(f));
 
 /////	/// Moment law					 	 ///
 /////		if(momentRotationLaw /*&& currentContactPhysics->cohesionBroken == false*/ )
