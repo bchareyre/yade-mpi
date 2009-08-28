@@ -53,10 +53,11 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 		Fs=sigmaT*crossSection;
 		phys->shearForce = Fs;
 
-		applyForceAtContactPoint(phys->normalForce + phys->shearForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
 		/**Normal Interaction*/
+		applyForceAtContactPoint(phys->normalForce + phys->shearForce, geom->contactPoint, contact->getId1(), geom->se31.position, contact->getId2(), geom->se32.position, rootBody);
+		
 		if ((phys->isCohesive)&&(displN<(-phys->lengthMaxCompression))) {
-			phys->isCohesive = false;
+			phys->isCohesive = false;					///Destruction
 		}
 		return;
 	} else {
