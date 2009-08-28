@@ -7,13 +7,16 @@ struct TimingInfo{
 	long nExec;
 	delta nsec;
 	TimingInfo():nExec(0),nsec(0){}
-	static delta getNow(bool evenIfDisabled=false){ 
-		if(!enabled && !evenIfDisabled) return 0L; struct timespec ts; 
+	static delta getNow(bool evenIfDisabled=false)
+	{ 
 #ifdef __APPLE__
+		std::cerr << "Warning: Time profiling should not be performed." << std::endl;
+		return 0L;
 #else
+		if(!enabled && !evenIfDisabled) return 0L; struct timespec ts; 
 		clock_gettime(CLOCK_MONOTONIC,&ts); 
+		return delta(1e9*ts.tv_sec+ts.tv_nsec);		
 #endif
-		return delta(1e9*ts.tv_sec+ts.tv_nsec);
 	}
 	static bool enabled;
 };
