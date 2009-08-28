@@ -1,20 +1,3 @@
-/*************************************************************************
-*    Copyright (C) 2009 Anton Gladkyy gladky.anton@gmail.com             *
-*                                                                        *
-*    This program is free software: you can redistribute it and/or modify*
-*    it under the terms of the GNU General Public License as published by*
-*    the Free Software Foundation, either version 3 of the License, or   *
-*    (at your option) any later version.                                 *
-*                                                                        *
-*    This program is distributed in the hope that it will be useful,     *
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of      *
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       *
-*    GNU General Public License for more details.                        *
-*                                                                        *
-*    You should have received a copy of the GNU General Public License   *
-*    along with this program.  If not, see <http://www.gnu.org/licenses/>*
-**************************************************************************/
-
 #include"RockPM.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
@@ -48,15 +31,6 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 	Real& Fn=phys->Fn;
 	Vector3r& Fs=phys->Fs;
 	
-	/*
-	*************Blocked for a while
-	const shared_ptr<Body>& body1=Body::byId(contact->getId1(),rootBody);
-	const shared_ptr<Body>& body2=Body::byId(contact->getId2(),rootBody);
-	assert(body1);
-	assert(body2);
-	const shared_ptr<RpmMat>& rbp1=YADE_PTR_CAST<RpmMat>(body1->physicalParameters);
-	const shared_ptr<RpmMat>& rbp2=YADE_PTR_CAST<RpmMat>(body2->physicalParameters);
-	*/
 
 	if(displN<=0){
 		/**Normal Interaction*/
@@ -153,9 +127,6 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 
 	if ((rpm1->exampleNumber==rpm2->exampleNumber)&&(initDistance<(contPhys->lengthMaxTension))&&(initCohesive)&&(OO.getCurrentIteration()<=cohesiveThresholdIter)) {
 		contPhys->isCohesive=true;
-		//LOG_WARN("InitDistance="<<initDistance<<"  "<<rpm1->exampleNumber<<"  "<<rpm2->exampleNumber<<" "<<OO.getCurrentIteration());
-		//LOG_WARN("lengthMaxCompression="<<contPhys->lengthMaxCompression);
-		//LOG_WARN("lengthMaxTension="<<contPhys->lengthMaxTension);
 	}
 
 	
