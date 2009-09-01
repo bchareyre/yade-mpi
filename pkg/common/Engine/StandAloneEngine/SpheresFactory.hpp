@@ -69,6 +69,9 @@ public:
 	/// @brief Color.
 	Vector3r color;
 
+	/// @brief python's function for a spheres creation
+	string pySpheresCreator;
+
 private:
 	/// @brief Pointer to Collider.
 	/// It is necessary in order to probe the bounding volume for new sphere.
@@ -104,6 +107,7 @@ private:
 			(poisson)
 			(density)
 			(frictionAngle)
+			(pySpheresCreator)
 			(color))
 	REGISTER_CLASS_AND_BASE(SpheresFactory, StandAloneEngine);
 };

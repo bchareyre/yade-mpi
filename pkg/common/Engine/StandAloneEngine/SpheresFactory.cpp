@@ -14,9 +14,10 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include"SpheresFactory.hpp"
+#include<sstream>
 
 YADE_PLUGIN((SpheresFactory));
-
+YADE_REQUIRE_FEATURE(PYTHON)
 CREATE_LOGGER(SpheresFactory);
 
 namespace {
@@ -43,6 +44,7 @@ SpheresFactory::SpheresFactory()
 	density 	= 2400;
 	first_run = true;
 	color=Vector3r(0.8,0.8,0.8);
+	pySpheresCreator="";
 }
 
 SpheresFactory::~SpheresFactory()
@@ -102,8 +104,20 @@ void SpheresFactory::action(MetaBody* ncb)
 			}
 			if (is_overlap) continue;
 		}
-		ncb->bodies->insert(sphere);
-		bI->action(ncb);
+		if (pySpheresCreator!="")
+		{
+			ostringstream command;
+			command << pySpheresCreator << "((" << position[0] << ',' << position[1] << ',' << position[2] << ")," << r << ')';
+			PyGILState_STATE gstate;
+				gstate = PyGILState_Ensure();
+				PyRun_SimpleString(command.str().c_str()); 
+			PyGILState_Release(gstate);
+		}
+		else
+		{
+			ncb->bodies->insert(sphere);
+		}
+		//bI->action(ncb);
 		return;
 	}
 	LOG_WARN("Can't placing sphere during " << maxAttempts << " attemps.");
