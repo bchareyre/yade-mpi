@@ -69,7 +69,7 @@ class InsertionSortCollider: public Collider{
 		//! maximum distance that the fastest body could have travelled since the last run; if >= sweepLength, we could get out of bboxes and will trigger full run
 		Real fastestBodyMaxDist;
 		// parameters to be passed to VelocityBins, if nBins>0
-		int nBins; Real binCoeff, binOverlap;
+		int nBins; Real binCoeff, binOverlap, maxRefRelStep; long histInterval; // this last one is debugging-only
 	#endif
 	private:
 	//! storage for bounds
@@ -102,7 +102,7 @@ class InsertionSortCollider: public Collider{
 
 	InsertionSortCollider():
 	#ifdef COLLIDE_STRIDED
-		strideActive(false), sweepLength(-1), sweepFactor(1.05), fastestBodyMaxDist(-1), nBins(0), binCoeff(5), binOverlap(0.8),
+		strideActive(false), sweepLength(-1), sweepFactor(1.05), fastestBodyMaxDist(-1), nBins(0), binCoeff(5), binOverlap(0.8), maxRefRelStep(.3), histInterval(100),
 	#endif
 		sortAxis(0), sortThenCollide(false){
 			#ifdef ISC_TIMING
@@ -113,7 +113,7 @@ class InsertionSortCollider: public Collider{
 	REGISTER_CLASS_AND_BASE(InsertionSortCollider,Collider);
 	REGISTER_ATTRIBUTES(Collider,(sortAxis)(sortThenCollide)
 		#ifdef COLLIDE_STRIDED
-			(strideActive)(sweepLength)(sweepFactor)(fastestBodyMaxDist)(nBins)(binCoeff)(binOverlap)
+			(strideActive)(sweepLength)(sweepFactor)(fastestBodyMaxDist)(nBins)(binCoeff)(binOverlap)(maxRefRelStep)(histInterval)
 		#endif
 	);
 	DECLARE_LOGGER;

@@ -41,7 +41,14 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 		if(refMaxVelSq<0){ refMaxVelSq=currMaxVelSq; /* first time */}
 		else {
 			// there should be some maximum speed change parameter, so that bins do not change their limits (and therefore bodies, also!) too often, depending on 1 particle going crazy
-			if(maxRefRelStep>0) refMaxVelSq=min(max(refMaxVelSq/pow(1+maxRefRelStep,2),currMaxVelSq),refMaxVelSq*pow(1+maxRefRelStep,2));
+			if(maxRefRelStep>0){
+				Real limVelSq=pow(sqrt(refMaxVelSq)+(sqrt(currMaxVelSq)-sqrt(refMaxVelSq))*maxRefRelStep,2);
+				// LOG_INFO("limVel="<<sqrt(limVelSq)<<",currMaxVel="<<sqrt(currMaxVelSq)<<",refMaxVel="<<sqrt(refMaxVelSq));
+				if(currMaxVelSq>refMaxVelSq) refMaxVelSq=min(limVelSq,currMaxVelSq);
+				else refMaxVelSq=max(limVelSq,currMaxVelSq);
+				// LOG_INFO("new refMaxVelSq="<<sqrt(refMaxVelSq));
+			}
+			//}refMaxVelSq=min(max(refMaxVelSq/pow(1+maxRefRelStep,2),currMaxVelSq),refMaxVelSq*pow(1+maxRefRelStep,2));
 			else refMaxVelSq=currMaxVelSq;
 			if(refMaxVelSq==0) refMaxVelSq=currMaxVelSq;
 		}

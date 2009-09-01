@@ -174,8 +174,9 @@ void InsertionSortCollider::action(MetaBody* rb){
 				} else { // nBins>=1
 					if(!newton->velocityBins){ newton->velocityBins=shared_ptr<VelocityBins>(new VelocityBins(nBins,newton->maxVelocitySq,binCoeff,binOverlap)); }
 					if(!boundDispatcher->velocityBins) boundDispatcher->velocityBins=newton->velocityBins;
-					newton->velocityBins->nBins=nBins; newton->velocityBins->binCoeff=binCoeff; newton->velocityBins->binOverlap=binOverlap; // update things 
-					boundDispatcher->sweepDist=0;
+					// update things:
+					newton->velocityBins->nBins=nBins; newton->velocityBins->binCoeff=binCoeff; newton->velocityBins->binOverlap=binOverlap; newton->velocityBins->maxRefRelStep=maxRefRelStep; newton->velocityBins->histInterval=histInterval;  
+					boundDispatcher->sweepDist=0; // not used with bins at all
 					// re-bin bodies
 					newton->velocityBins->setBins(rb,newton->maxVelocitySq,sweepLength);
 				}

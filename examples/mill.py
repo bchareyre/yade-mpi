@@ -1,4 +1,12 @@
 # encoding: utf-8
+"""
+Small showcase posted at http://www.youtube.com/watch?v=KUv26xlh89I,
+in response to pfc3d's http://www.youtube.com/watch?v=005rdDBoe4w.
+Physical correctness is not the focus, the geometry and similar look is.
+
+You can take this file as instruction on how to build parametric surfaces,
+and how to make videos as well.
+"""
 from yade import pack
 from numpy import linspace
 # geometry parameters

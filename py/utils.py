@@ -312,10 +312,10 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	"""Create .ogg video from external image files.
 	
-	@param frameSpec If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order.
-	@param out file to save video into
-	@param renameNotOverwrite if True, existing same-named video file will have ~[number] appended; will be overwritten otherwise.
-	@param fps Frames per second.
+	@param frameSpec: If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order. B{Warning:} GStreamer is picky about the wildcard; if you pass a wrong one, if will not complain, but silently stall.
+	@param out: file to save video into
+	@param renameNotOverwrite: if True, existing same-named video file will have ~[number] appended; will be overwritten otherwise.
+	@param fps: Frames per second.
 	"""
 	import pygst,sys,gobject,os,tempfile,shutil
 	pygst.require("0.10")
@@ -452,17 +452,19 @@ def vmData():
 def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
 	"""Get some data about the current packing useful for uniaxial test:
 	
-	1. Find the dimensions that is the longest (uniaxial loading axis)
-	2. Find the minimum cross-section area of the speciment by examining several (areaSections)
-		sections perpendicular to axis, computing area of the convex hull for each one. This will
-		work also for non-prismatic specimen.
-	3. Find the bodies that are on the negative/positive boundary, to which the straining condition
-		should be applied.
+		1. Find the dimensions that is the longest (uniaxial loading axis)
 
-	@param filename if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
-	@param areaSection number of section that will be used to estimate cross-section
+		2. Find the minimum cross-section area of the speciment by examining several (areaSections)
+			sections perpendicular to axis, computing area of the convex hull for each one. This will
+			work also for non-prismatic specimen.
 
-	Returns dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
+		3. Find the bodies that are on the negative/positive boundary, to which the straining condition
+			should be applied.
+
+	@param filename: if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
+	@param areaSection: number of section that will be used to estimate cross-section
+
+	@return: dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
 	"""
 	if filename: ids=spheresFromFile(filename,**kw)
 	else: ids=[b.id for b in O.bodies]

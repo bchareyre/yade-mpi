@@ -87,11 +87,12 @@ void MetaBody::moveToNextTimeStep()
 		needsInitializers=false;
 	}
 	//bex.reset(); // uncomment if PhysicalActionContainerReseter is removed
-	TimingInfo::delta last=TimingInfo::getNow();
+	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
+	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
 	FOREACH(const shared_ptr<Engine>& e, engines){
 		if(e->isActivated(this)){
 			e->action(this);
-			if(TimingInfo::enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
+			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
 	}
 }
