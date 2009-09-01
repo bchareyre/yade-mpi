@@ -4,7 +4,6 @@
 ## PhysicalParameters 
 Density=2400
 frictionAngle=radians(35)
-sphereRadius=0.05
 tc = 0.001
 en = 0.3
 es = 0.3

@@ -16,6 +16,10 @@ class Collider : public StandAloneEngine
 	public :
 		Collider();
 		virtual ~Collider();
+		/*! To probe the BoundingVolume on a bodies presense.
+		 *
+		 * Returns true, if the BoundingVolume contains a bodies, otherwise it returns false.
+		 */
 		virtual  bool probeBoundingVolume(const BoundingVolume&){throw;}
 		/*! Tell whether given bodies may interact, for other than spatial reasons.
 		 *

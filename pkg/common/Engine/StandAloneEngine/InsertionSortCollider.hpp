@@ -98,6 +98,8 @@ class InsertionSortCollider: public Collider{
 		virtual bool isActivated(MetaBody*);
 	#endif
 
+	bool probeBoundingVolume(const BoundingVolume&);
+
 	InsertionSortCollider():
 	#ifdef COLLIDE_STRIDED
 		strideActive(false), sweepLength(-1), sweepFactor(1.05), fastestBodyMaxDist(-1), nBins(0), binCoeff(5), binOverlap(0.8),
