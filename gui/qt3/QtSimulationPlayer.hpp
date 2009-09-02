@@ -52,7 +52,9 @@ class QtSimulationPlayer : public QtGeneratedSimulationPlayer, public Factorable
 		virtual void pbApplyClicked();
 		
 		virtual void cbAllowFiltrationToggled(bool b);
-        virtual void pbRefreshFiltersClicked();
+      virtual void pbRefreshFiltersClicked();
+		virtual void onFrameSliderValueChanged(int value);
+		virtual void onTakeShotButtonPressed();
 		
 	protected:
 		void closeEvent(QCloseEvent *);

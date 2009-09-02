@@ -25,6 +25,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/pkg-common/FilterEngine.hpp>
 #include<qspinbox.h>
+#include<qslider.h>
 #include"QtSimulationPlayer.hpp"
 
 
@@ -152,7 +153,7 @@ void GLSimulationPlayerViewer::load(const std::string& fileName, bool fromFile)
 			if(dIter->leaf().find(inputBaseName)!=0 || filesystem::extension(*dIter)==".rgb" || algorithm::ends_with(dIter->string(),".rgb.bz2") || filesystem::is_directory(*dIter) || !filesystem::exists(*dIter)) continue;
 			xyzNames.push_back(dIter->string());
 		}
-		xyzNames.sort();
+		std::sort(xyzNames.begin(),xyzNames.end());
 	} else { /* load from sqlite database */
 		LOG_INFO("Opening sqlite database `"<<fileName<<"'");
 		con=shared_ptr<sqlite3x::sqlite3_connection>(new sqlite3x::sqlite3_connection(fileName));
@@ -161,8 +162,8 @@ void GLSimulationPlayerViewer::load(const std::string& fileName, bool fromFile)
 		simPlayer->pushMessage("Database OK, loading simulation...");
 		// load simulation
 		string xml=con->executestring("select simulationXML from 'meta';");
-		simPlayer->pushMessage("Simulation loaded.");
 		istringstream xmlStream(xml); Omega::instance().loadSimulationFromStream(xmlStream);
+		simPlayer->pushMessage("Simulation loaded.");
 		{
 			sqlite3x::sqlite3_command cmd(*con,"select bodyTable,iter from 'records' ORDER BY iter;");
 			sqlite3x::sqlite3_cursor reader=cmd.executecursor();
@@ -174,7 +175,7 @@ void GLSimulationPlayerViewer::load(const std::string& fileName, bool fromFile)
 				maxIter=reader.getint(1);
 			}
 			Omega::instance().getRootBody()->stopAtIteration=maxIter;
-			LOG_INFO("Setting stopAtIter="<<maxIter);
+			LOG_DEBUG("Setting stopAtIter="<<maxIter);
 		}
 	}
 	/* Filters */
@@ -182,7 +183,7 @@ void GLSimulationPlayerViewer::load(const std::string& fileName, bool fromFile)
 
 	/* strided access is common for both db and file access */
 	if(stride>1){
-		list<string> xyz2;
+		vector<string> xyz2;
 		long i=stride-1;
 		FOREACH(string f,xyzNames){
 			if(i++<stride-1) continue;
@@ -192,7 +193,8 @@ void GLSimulationPlayerViewer::load(const std::string& fileName, bool fromFile)
 		xyzNames=xyz2;
 	}
 	simPlayer->pushMessage("Found "+lexical_cast<string>(xyzNames.size())+" states to process.");
-	xyzNamesIter=xyzNames.begin();
+	simPlayer->frameSlider->setMinValue(0); simPlayer->frameSlider->setMaxValue(xyzNames.size()-1);
+	xyzNamesPos=0;
 	simPlayer->enableControls(true);
 	updateGL();
 }
@@ -209,7 +211,7 @@ void GLSimulationPlayerViewer::reset()
 {
 	frameNumber=0;
 	setSnapshotCounter(0);
-	xyzNamesIter=xyzNames.begin();
+	xyzNamesPos=0;
 	loadNextRecordedData();
 	frameNumber++;
 	updateGL();
@@ -229,10 +231,14 @@ void GLSimulationPlayerViewer::refreshFilters()
 
 
 bool GLSimulationPlayerViewer::loadNextRecordedData(){
-	if(xyzNamesIter==xyzNames.end()) return false;
+	return loadRecordedData(xyzNamesPos++);
+}
+
+bool GLSimulationPlayerViewer::loadRecordedData(size_t pos){
+	if(pos>xyzNames.size()-1) return false;
 	MetaBody* rootBody=Omega::instance().getRootBody().get();
 	if(!useSQLite){
-		fileName=*(xyzNamesIter++);
+		fileName=xyzNames[pos];
 		iostreams::filtering_istream f; if(boost::algorithm::ends_with(fileName,".bz2")) f.push(iostreams::bzip2_decompressor()); f.push(iostreams::file_source(fileName));
 		// strip .bz2 from the filename
 		if(boost::algorithm::ends_with(fileName,".bz2")) algorithm::replace_last(fileName,".bz2","");
@@ -259,7 +265,7 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 		}
 		Omega::instance().setCurrentIteration(atoi(fileName.substr(fileName.rfind('_')+1).c_str()));
 	} else {
-		string tableName=*(xyzNamesIter++);
+		string tableName=xyzNames[pos];
 		simPlayer->pushMessage(lexical_cast<string>(frameNumber)+"/"+lexical_cast<string>(xyzNames.size())+" "+tableName);
 		sqlite3x::sqlite3_command cmd(*con,"select * from '"+tableName+"';");
 		sqlite3x::sqlite3_cursor reader=cmd.executecursor();
@@ -271,8 +277,9 @@ bool GLSimulationPlayerViewer::loadNextRecordedData(){
 			ASSIGN_COL(id) else ASSIGN_COL(se3_x) else ASSIGN_COL(se3_y) else ASSIGN_COL(se3_z) else ASSIGN_COL(se3_ori0) else ASSIGN_COL(se3_ori1) else ASSIGN_COL(se3_ori2) else ASSIGN_COL(se3_ori3) else ASSIGN_COL(rgb_r) else ASSIGN_COL(rgb_g) else ASSIGN_COL(rgb_b) else LOG_ERROR("Unhandled column name: '"<<col<<"'");
 		}
 		assert(col_id>=0);
+		MetaBody* rb=Omega::instance().getRootBody().get();
 		while(reader.step()){
-			const shared_ptr<Body>& b=Body::byId(reader.getint(col_id));
+			const shared_ptr<Body>& b=Body::byId(reader.getint(col_id),rb);
 			Se3r& se3=b->physicalParameters->se3;
 			if(col_se3_x>=0) se3.position[0]=reader.getdouble(col_se3_x);
 			if(col_se3_y>=0) se3.position[1]=reader.getdouble(col_se3_y);

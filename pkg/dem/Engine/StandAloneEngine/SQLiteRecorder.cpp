@@ -28,7 +28,12 @@ void SQLiteRecorder::init(MetaBody* rootBody){
 	con->executenonquery("PRAGMA synchronous = OFF");
 	// create supertable (only if the db is empty)
 	if(0==con->executeint("select count(*) from sqlite_master where name='meta';")){
+		shared_ptr<InteractionContainer> intrs;
+		if(!saveInteractions){
+			intrs=rootBody->interactions; rootBody->interactions=shared_ptr<InteractionContainer>();
+		}
 		LOG_DEBUG("Saving simulation to stream"); ostringstream out; Omega::instance().saveSimulationToStream(out);
+		if(!saveInteractions){ rootBody->interactions=intrs; }
 		con->executenonquery("create table meta (simulationXML STRING,maxIter INTEGER)");
 		LOG_DEBUG("Inserting simulation XML into the table 'meta'");
 		{ sqlite3x::sqlite3_command cmd(*con,"insert into meta values (?,-1)"); cmd.bind(1,out.str()); cmd.executenonquery(); }

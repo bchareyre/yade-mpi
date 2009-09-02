@@ -41,9 +41,10 @@ class GLSimulationPlayerViewer: public GLViewer {
 		int frameNumber;
 		int stride;
  		bool loadNextRecordedData();
+ 		bool loadRecordedData(size_t pos);
  		//! filenames or table names (if useSQLite)
- 		list<string> xyzNames;
- 		list<string>::iterator xyzNamesIter;
+ 		vector<string> xyzNames;
+ 		size_t xyzNamesPos;
 		vector< shared_ptr< FilterEngine > > filters;
 	public :
 		GLSimulationPlayerViewer(QWidget* parent,shared_ptr<OpenGLRenderingEngine> renderer);

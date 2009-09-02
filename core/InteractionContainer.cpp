@@ -65,10 +65,12 @@ void InteractionContainer::preProcessAttributes(bool deserializing)
 		interaction.clear(); interaction.reserve(this->size());
 		InteractionContainer::iterator i    = this->begin();
 		InteractionContainer::iterator iEnd = this->end();
-		for( ; i!=iEnd ; ++i )
-			interaction.push_back(*i);
+		for( ; i!=iEnd ; ++i ){
+			if((*i)->interactionGeometry || (*i)->interactionPhysics) interaction.push_back(*i);
+		}
 		if(serializeSorted) std::sort(interaction.begin(),interaction.end(),compPtrInteraction());
-		#ifdef YADE_OPENMP
+		// since requestErase'd interactions have no interaction physics/geom, they were not saved anyway
+		#if 0 // ifdef YADE_OPENMP
 			// copy per-thread erasable pairs to the global attribute that will be serialized
 			FOREACH(const list<bodyIdPair>& threadPendingErase, threadsPendingErase){ pendingErase.insert(pendingErase.end(),threadPendingErase.begin(),threadPendingErase.end()); }
 		#endif
@@ -86,10 +88,12 @@ void InteractionContainer::postProcessAttributes(bool deserializing)
 		for( ; it != itEnd ; ++it)
 			this->insert(*it);
 		interaction.clear();
-		#ifdef YADE_OPENMP
+		#if 0 // ifdef YADE_OPENMP
 			// copy global deserialized pairs to be erased to the list of thread #0
 			threadsPendingErase[0].insert(threadsPendingErase[0].end(),pendingErase.begin(),pendingErase.end());
 		#endif
+		// forc compatibility, if the list was saved
+		pendingErase.clear();
 	}
 	else
 	{

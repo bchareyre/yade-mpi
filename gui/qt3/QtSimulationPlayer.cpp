@@ -16,6 +16,7 @@
 #include <qspinbox.h>
 #include<qlabel.h>
 #include<qstring.h>
+#include<qslider.h>
 
 #include<yade/gui-qt3/YadeQtMainWindow.hpp>
 CREATE_LOGGER(QtSimulationPlayer);
@@ -49,6 +50,8 @@ QtSimulationPlayer::QtSimulationPlayer() : QtGeneratedSimulationPlayer(){
 	scrollViewFrame->resize(s.width(),s.height());
 	guiGen.buildGUI(YadeQtMainWindow::self->renderer,scrollViewFrame);
 	scrollView->addChild(scrollViewFrame);
+	frameSlider->setMinValue(0);
+	frameSlider->setMaxValue(0);
 }
 QtSimulationPlayer::~QtSimulationPlayer(){
 	if(glSimulationPlayerViewer) delete glSimulationPlayerViewer;
@@ -66,6 +69,33 @@ void QtSimulationPlayer::pbApplyClicked()
 {
 	guiGen.deserialize(YadeQtMainWindow::self->renderer);
 	YadeQtMainWindow::self->redrawAll(true);
+}
+
+void QtSimulationPlayer::onFrameSliderValueChanged(int value){
+	LOG_INFO("Will load state #"<<value<<" now.");
+	glSimulationPlayerViewer->loadRecordedData(value);
+	glSimulationPlayerViewer->updateGL();
+}
+
+void QtSimulationPlayer::onTakeShotButtonPressed(){
+	GLSimulationPlayerViewer* glpv=glSimulationPlayerViewer;
+	glpv->setSnapshotFormat("PNG");
+	string snapBase=string(leOutputDirectory->text().ascii())+"/"+leOutputBaseName->text().ascii(); int counter=0;
+	string snapName;
+	do{
+		ostringstream fss; fss<<snapBase<<"-single-"<<setw(4)<<setfill('0')<<counter++<<".png";
+		snapName=fss.str();
+	} while(filesystem::exists(snapName));
+	LOG_INFO("Taking snapshot into "<<snapName);
+	glpv->nextFrameSnapshotFilename=snapName;
+	glpv->updateGL();
+	// wait for the renderer to save the frame (will happen at next postDraw)
+	timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=10000000; /* 10 ms */
+	long waiting=0;
+	while(!glpv->nextFrameSnapshotFilename.empty()){
+		nanosleep(&t1,&t2);
+		if(((++waiting) % 1000)==0) LOG_WARN("Already waiting "<<waiting/100<<"s for snapshot to be saved. Something went wrong?");
+	}
 }
 
 void QtSimulationPlayer::pbInputConfigFileClicked(){

@@ -39,13 +39,17 @@ class SQLiteRecorder: public PeriodicEngine {
 		shared_ptr<sqlite3x::sqlite3_connection> con;
 	public:
 		enum {REC_SE3=0,REC_RGB,REC_SENTINEL};
+		//! List of recorders that will be used
 		vector<string> recorders;
+		//! If false (default), interactions will not be saved to the initial XML inside the database
+		bool saveInteractions;
+		//! Filename of the database to save to
 		string dbFile;
-		SQLiteRecorder() { /* we always want to save the first state as well */ initRun=true; };
+		SQLiteRecorder(): saveInteractions(false) { /* we always want to save the first state as well */ initRun=true; };
 		~SQLiteRecorder(){ if(con) con->close(); }
 		void init(MetaBody*);
 		virtual void action(MetaBody*);
-	REGISTER_ATTRIBUTES(PeriodicEngine,(recorders)(dbFile));
+	REGISTER_ATTRIBUTES(PeriodicEngine,(recorders)(dbFile)(saveInteractions));
 	REGISTER_CLASS_AND_BASE(SQLiteRecorder,PeriodicEngine);
 	DECLARE_LOGGER;
 };
