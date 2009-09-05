@@ -27,6 +27,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 		env.File('linterpolation.py'),
 		env.File('timing.py'),
 		env.File('pack.py'),
+		env.File('export.py'),
 		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',])
 			),
 		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundingVolumeEngineUnit GeometricalModelEngineUnit InteractingGeometryEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit PhysicalParametersEngineUnit PhysicalActionDamperUnit PhysicalActionApplierUnit ConstitutiveLaw")))
