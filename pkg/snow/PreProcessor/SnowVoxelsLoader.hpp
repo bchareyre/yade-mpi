@@ -132,7 +132,7 @@ class SnowVoxelsLoader : public FileGenerator
 		//	(voxel_txt_dir)
 		//	(voxel_caxis_file)
 		//	(voxel_colors_file)
-		(grain_binary_data_file)
+	//	(grain_binary_data_file)
 		(one_voxel_in_meters_is)
 		(layer_distance_voxels)
 		(angle_increment_radians)

@@ -28,16 +28,27 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 	if(result)
 	{
 		//InteractingBox* s1=static_cast<InteractingBox*>(cm1.get()), *s2=static_cast<BssSnowGrain*>(cm2.get());
-				InteractingBox* s1=dynamic_cast<InteractingBox*>(cm1.get());BssSnowGrain *s2=dynamic_cast<BssSnowGrain*>(cm2.get());
+		if(cm1->getClassName() != std::string("InteractingBox") || cm2->getClassName() != std::string("BssSnowGrain"))
+		{
+			std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+			std::cerr << "whooooooooops =22=\n";
+			return false;
+		}
+				InteractingBox* s1=static_cast<InteractingBox*>(cm1.get());
+				BssSnowGrain *s2=static_cast<BssSnowGrain*>(cm2.get());
 				if(s1==0 || s2==0)
 				{
-					std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; 
+					std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+					std::cerr << "whooooooooops =2= " << __FILE__ << "\n"; 
 					return false;
 				}
 			
 		shared_ptr<SpheresContactGeometry> scm;
 		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
-		else { std::cerr << "whooooooooops!" << __FILE__ << "\n"; }
+		else 
+		{ 
+			std::cerr << "whooooooooops =3= " << __FILE__ << "\n";
+		}
 
 //	std::cerr << __FILE__ << " " << scm->getClassName() << "\n";
 		
@@ -76,7 +87,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	cons
 	{
 		shared_ptr<SpheresContactGeometry> scm;
 		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
-		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
+		else { std::cerr << "whooooooooops =4= " << __FILE__ << "\n"; return false; }
 		scm->normal *= -1.0;
 		std::swap(scm->radius1,scm->radius2);
 	}

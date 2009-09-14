@@ -8,8 +8,8 @@
 #include<boost/serialization/vector.hpp>
 #include<boost/serialization/shared_ptr.hpp>
 #include<boost/tuple/tuple.hpp>
-#include <boost/thread.hpp>
-
+#include<boost/thread.hpp>
+#include<boost/serialization/export.hpp> 
 
 typedef std::vector< std::vector<std::vector<unsigned char> > > T_DATA;
 
@@ -125,4 +125,6 @@ class BshSnowGrain : public GeometricalModel
 };
 
 REGISTER_SERIALIZABLE(BshSnowGrain);
+
+BOOST_CLASS_EXPORT(BshSnowGrain) 
 

@@ -59,10 +59,18 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 	//InteractingBox* m1=static_cast<InteractingBox*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());
 	//std::cerr << "------------------- " << __FILE__ << "\n";
 
-				InteractingBox* m1=dynamic_cast<InteractingBox*>(cm1.get()); BssSnowGrain *m2=dynamic_cast<BssSnowGrain*>(cm2.get());
+	if(cm1->getClassName() != std::string("InteractingBox") || cm2->getClassName() != std::string("BssSnowGrain"))
+	{
+		std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+		std::cerr << "whooooooooops =66=\n";
+		return false;
+	}
+				InteractingBox* m1=static_cast<InteractingBox*>(cm1.get());
+				BssSnowGrain *m2=static_cast<BssSnowGrain*>(cm2.get());
 				if(m1==0 || m2==0)
 				{
-					std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; 
+					std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+					std::cerr << "whooooooooops =6= " << __FILE__ << "\n"; 
 					return false;
 				}
 
@@ -227,6 +235,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 //FIXME//		bool old_n = c->isNew;
 //FIXME//		c->isNew=false;
 		//ggg.assist=true;
+///////////////??????		c->init();
 		bool res = ggg.go(cm1,cm2,se31,se32,c);
 //FIXME//		c->isNew=old_n;
 		return res;
@@ -264,10 +273,18 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 	//InteractingBox* m1=static_cast<InteractingBox*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());
 ////	std::cerr << "----- reverse ----- " << __FILE__ << "\n";
 
-				InteractingBox* m2=dynamic_cast<InteractingBox*>(cm2.get()); BssSnowGrain *m1=dynamic_cast<BssSnowGrain*>(cm1.get());
+	if(cm1->getClassName() != std::string("BssSnowGrain") || cm2->getClassName() != std::string("InteractingBox"))
+	{
+		std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+		std::cerr << "whooooooooops =11=\n";
+		return false;
+	}
+				InteractingBox* m2=static_cast<InteractingBox*>(cm2.get());
+				BssSnowGrain *m1=static_cast<BssSnowGrain*>(cm1.get());
 				if(m1==0 || m2==0)
 				{
-					std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; 
+					std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+					std::cerr << "\n whooooooooops =1= " << __FILE__ << "\n"; 
 					return false;
 				}
 

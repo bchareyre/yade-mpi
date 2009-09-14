@@ -23,7 +23,20 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_
 //	std::cerr << "------------------- " << __FILE__ << "\n";
 //	return result;
 
-	BssSnowGrain* s1=dynamic_cast<BssSnowGrain*>(cm1.get()), *s2=dynamic_cast<BssSnowGrain*>(cm2.get());
+	if(cm1->getClassName() != std::string("BssSnowGrain") || cm2->getClassName() != std::string("BssSnowGrain"))
+	{
+		std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+		std::cerr << "whooooooooops =99=\n";
+		return false;
+	}
+	BssSnowGrain* s1=static_cast<BssSnowGrain*>(cm1.get());
+	BssSnowGrain* s2=static_cast<BssSnowGrain*>(cm2.get());
+	if(s1==0 || s2==0)
+	{
+		std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
+		std::cerr << "whooooooooops =9=\n";
+		return false;
+	}
 	Vector3r normal=se32.position-se31.position;
 	Real penetrationDepthSq=pow((s1->radius+s2->radius),2) - normal.SquaredLength();
 	if (penetrationDepthSq>0 || c->isReal() || assist)
@@ -77,7 +90,7 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const 
 	{
 		shared_ptr<SpheresContactGeometry> scm;
 		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
-		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
+		else { std::cerr << "whooooooooops =5= " << __FILE__ << "\n"; return false; }
 		scm->normal *= -1.0;
 		std::swap(scm->radius1,scm->radius2);
 	}

@@ -87,7 +87,7 @@ SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 //	voxel_txt_dir = "";
 //	voxel_caxis_file = "";
 //	voxel_colors_file = "";
-	grain_binary_data_file = "grain_binary.bz2";
+	grain_binary_data_file = "grain_binary--NOT-USED-NOW.bz2";
 	
 	sphereYoungModulus	= 15000000.0;
 	spherePoissonRatio	= 0.5;
@@ -148,18 +148,18 @@ SnowVoxelsLoader::~SnowVoxelsLoader ()
 
 bool SnowVoxelsLoader::load_voxels()
 {
-	if(grain_binary_data_file !="" && boost::filesystem::exists(grain_binary_data_file))
-	{
-		std::cerr << "no need to load voxels - grain binary file exists\n";
-		std::cerr << "loading " << grain_binary_data_file << " ...";
-			boost::iostreams::filtering_istream ifs;
-			ifs.push(boost::iostreams::bzip2_decompressor());
-			ifs.push(boost::iostreams::file_source(grain_binary_data_file));
-		//std::ifstream ifs(m_config.load_file());
-		boost::archive::binary_iarchive ia(ifs);
-		ia >> m_grains;
-		return true;
-	}
+//	if(grain_binary_data_file !="" && boost::filesystem::exists(grain_binary_data_file))
+//	{
+//		std::cerr << "no need to load voxels - grain binary file exists\n";
+//		std::cerr << "loading " << grain_binary_data_file << " ...";
+//			boost::iostreams::filtering_istream ifs;
+//			ifs.push(boost::iostreams::bzip2_decompressor());
+//			ifs.push(boost::iostreams::file_source(grain_binary_data_file));
+//		//std::ifstream ifs(m_config.load_file());
+//		boost::archive::binary_iarchive ia(ifs);
+//		ia >> m_grains;
+//		return true;
+//	}
 
 	if(voxel_binary_data_file != "" && boost::filesystem::exists(voxel_binary_data_file))
 	{
@@ -233,17 +233,17 @@ bool SnowVoxelsLoader::generate()
 		
 		std::cerr << "\n======= total skipped grains: " << ((int)(skip_total)) << "\n";
 
-		std::cerr << "saving "<< grain_binary_data_file << " ...";
-		boost::iostreams::filtering_ostream ofs;
-		ofs.push(boost::iostreams::bzip2_compressor());
-		ofs.push(boost::iostreams::file_sink(grain_binary_data_file));
-		boost::archive::binary_oarchive oa(ofs);
-#if BOOST_VERSION >= 103500
-		oa << m_grains;
-#else
-		const std::vector<boost::shared_ptr<BshSnowGrain> > tmp(m_grains);
-		oa << tmp;
-#endif
+//		std::cerr << "saving "<< grain_binary_data_file << " ...";
+//		boost::iostreams::filtering_ostream ofs;
+//		ofs.push(boost::iostreams::bzip2_compressor());
+//		ofs.push(boost::iostreams::file_sink(grain_binary_data_file));
+//		boost::archive::binary_oarchive oa(ofs);
+////#if BOOST_VERSION >= 103500
+//		oa << m_grains;
+//#else
+//		const std::vector<boost::shared_ptr<BshSnowGrain> > tmp(m_grains);
+//		oa << tmp;
+//#endif
 		std::cerr << " finished\n";
 	}
 	
