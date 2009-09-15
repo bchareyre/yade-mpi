@@ -136,7 +136,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','mass-spring','realtime-rigidbody','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts','vtk']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -327,6 +327,9 @@ if not env.GetOption('clean'):
 		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."%featureName
 		Exit(1)
 	# check "optional" libs
+	if 'vtk' in env['features']:
+		ok=conf.CheckLibWithHeader('vtkHybrid','vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
+		if not ok: featureNotOK('vtk')
 	if 'opengl' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
 		# TODO ok=True for darwin platform where openGL (and glut) is native

@@ -111,7 +111,7 @@ class VTKWriter:
 		piece.appendChild(cell_data)
 
 		# Write to file and exit
-		outFile = open(self.baseName+'-%04d'%self.snapCount+'.vtu', 'w')
+		outFile = open(self.baseName+'%04d'%self.snapCount+'.vtu', 'w')
 #		xml.dom.ext.PrettyPrint(doc, file)
 		doc.writexml(outFile, newl='\n')
 		outFile.close()
