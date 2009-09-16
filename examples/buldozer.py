@@ -1,0 +1,71 @@
+### Simpificated buldozer simulation
+from yade import utils
+from numpy import linspace
+from numpy import arange
+import gts
+import itertools
+from yade import pack
+
+
+###Initial Data
+numKnifeParts = 10
+radiusKnife=1
+lengthKnife=2
+radiusSph = 0.05
+numBoxes = Vector3(8,5,2)
+gapBetweenBoxes = 0.05
+sizeBox = (lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes)/numBoxes[1]
+
+
+### Creating the Buldozer Knife
+### from facets, using GTS
+Knife=[]
+for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
+	Knife.append(Vector3(radiusKnife*cos(i),0,radiusKnife*sin(i)))
+	
+KnifeP=[Knife,[p+Vector3(0,lengthKnife,0) for p in Knife]]
+KnifePoly=pack.sweptPolylines2gtsSurface(KnifeP,threshold=1e-4)
+KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False))
+O.bodies.append(utils.facetBox((0,0,radiusKnife),(lengthKnife*3,lengthKnife*3,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
+
+
+### Creating the material for buldozer
+colorsph1=Vector3(120,234,150);
+colorsph2=Vector3(0,0,1);
+
+colorsph1.Normalize();
+colorsph2.Normalize();
+colorSph=colorsph1
+for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
+	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))
+	if (colorSph==colorsph1):
+		colorSph=colorsph2
+	else:
+		colorSph=colorsph1
+
+
+
+O.dt=2*utils.PWaveTimeStep() # We do not need now a high accuracy
+O.engines=[
+	BexResetter(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	InsertionSortCollider(),
+	InteractionDispatchers(
+		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
+		[SimpleElasticRelationships()],
+		[Law2_Dem3Dof_Elastic_Elastic()],
+	),
+	GravityEngine(gravity=(0,0,-9.8)),
+	TranslationEngine(translationAxis=[1,0,0],velocity=5,subscribedBodies=KnifeIDs), # Buldozer motion
+	NewtonsDampedLaw(damping=.3),
+]
+
+O.saveTmp()
+from yade import qt
+qt.Controller()
+qt.View()
+r=qt.Renderer()
+r['Light_position']=Vector3(0,0,50)
+O.run()
+qt.makeSimulationVideo('/tmp/buldozer.ogg',iterPeriod=1000,fps=30)
+
