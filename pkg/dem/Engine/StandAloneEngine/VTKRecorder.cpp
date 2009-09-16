@@ -2,6 +2,7 @@
 #include<vtkCellArray.h>
 #include<vtkPoints.h>
 #include<vtkPointData.h>
+#include<vtkCellData.h>
 #include<vtkSmartPointer.h>
 #include<vtkFloatArray.h>
 #include<vtkUnstructuredGrid.h>
@@ -38,6 +39,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 	FOREACH(string& rec, recorders){
 		if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="facets") recActive[REC_FACETS]=true;
+		else if(rec=="colors") recActive[REC_COLORS]=true;
 		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, facets). Ignored.");
 	}
 
@@ -46,9 +48,15 @@ void VTKRecorder::action(MetaBody* rootBody)
 	vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
 	radii->SetNumberOfComponents(1);
 	radii->SetName("Radii");
+	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
+	spheresColors->SetNumberOfComponents(3);
+	spheresColors->SetName("Colors");
 
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
+	vtkSmartPointer<vtkFloatArray> facetsColors = vtkSmartPointer<vtkFloatArray>::New();
+	facetsColors->SetNumberOfComponents(3);
+	facetsColors->SetName("Colors");
 
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if (recActive[REC_SPHERES])
@@ -61,6 +69,12 @@ void VTKRecorder::action(MetaBody* rootBody)
 				pid[0] = spheresPos->InsertNextPoint(pos[0], pos[1], pos[2]);
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
+				if (recActive[REC_COLORS])
+				{
+					const Vector3r& color = sphere->diffuseColor;
+					float c[3] = {color[0],color[1],color[2]};
+					spheresColors->InsertNextTupleValue(c);
+				}
 				continue;
 			}
 		}
@@ -80,6 +94,12 @@ void VTKRecorder::action(MetaBody* rootBody)
 					tri->GetPointIds()->SetId(i,nbPoints+i);
 				}
 				facetsCells->InsertNextCell(tri);
+				if (recActive[REC_COLORS])
+				{
+					const Vector3r& color = facet->diffuseColor;
+					float c[3] = {color[0],color[1],color[2]};
+					facetsColors->InsertNextTupleValue(c);
+				}
 				continue;
 			}
 		}
@@ -91,6 +111,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 		spheresUg->SetPoints(spheresPos);
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
+		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		string fn=fileName+"spheres."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
 		writer->SetFileName(fn.c_str());
@@ -102,6 +123,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 		vtkSmartPointer<vtkUnstructuredGrid> facetsUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		facetsUg->SetPoints(facetsPos);
 		facetsUg->SetCells(VTK_TRIANGLE, facetsCells);
+		if (recActive[REC_COLORS]) facetsUg->GetCellData()->AddArray(facetsColors);
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		string fn=fileName+"facets."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
 		writer->SetFileName(fn.c_str());
