@@ -145,6 +145,7 @@ opts.AddVariables(
 	('CPPPATH', 'Additional paths for the C preprocessor (whitespace separated)',None,None,Split),
 	('LIBPATH','Additional paths for the linker (whitespace separated)',None,None,Split),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,Split),
+	('VTKINCDIR','Directories where to look for VTK headers',['/usr/include/vtk','/usr/include/vtk-5.0'],None,Split),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
@@ -328,7 +329,7 @@ if not env.GetOption('clean'):
 		Exit(1)
 	# check "optional" libs
 	if 'vtk' in env['features']:
-		conf.env.Append(CPPPATH='/usr/include/vtk-5.0') 
+		conf.env.Append(CPPPATH=env['VTKINCDIR']) 
 		ok=conf.CheckLibWithHeader('vtkHybrid','vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		if not ok: featureNotOK('vtk')
 	if 'opengl' in env['features']:
