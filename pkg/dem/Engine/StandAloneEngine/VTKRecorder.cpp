@@ -8,7 +8,7 @@
 #include<vtkUnstructuredGrid.h>
 #include<vtkXMLUnstructuredGridWriter.h>
 #include<vtkXMLMultiBlockDataWriter.h>
-#include<vtkMultiBlockDataSet.h>
+//#include<vtkMultiBlockDataSet.h>
 #include<vtkTriangle.h>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
