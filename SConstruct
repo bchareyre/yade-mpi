@@ -328,6 +328,7 @@ if not env.GetOption('clean'):
 		Exit(1)
 	# check "optional" libs
 	if 'vtk' in env['features']:
+		conf.env.Append(CPPPATH='/usr/include/vtk') 
 		ok=conf.CheckLibWithHeader('vtkHybrid','vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		if not ok: featureNotOK('vtk')
 	if 'opengl' in env['features']:
