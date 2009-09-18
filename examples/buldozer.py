@@ -11,8 +11,9 @@ from yade import pack
 numKnifeParts = 10
 radiusKnife=1
 lengthKnife=2
+buldozerHeight=1.2
 radiusSph = 0.05
-numBoxes = Vector3(8,5,2)
+numBoxes = Vector3(15,5,2)
 gapBetweenBoxes = 0.05
 sizeBox = (lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes)/numBoxes[1]
 
@@ -22,16 +23,26 @@ sizeBox = (lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes)/numBoxes[1]
 Knife=[]
 for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
 	Knife.append(Vector3(radiusKnife*cos(i),0,radiusKnife*sin(i)))
+
 	
 KnifeP=[Knife,[p+Vector3(0,lengthKnife,0) for p in Knife]]
 KnifePoly=pack.sweptPolylines2gtsSurface(KnifeP,threshold=1e-4)
 KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False))
-O.bodies.append(utils.facetBox((0,0,radiusKnife),(lengthKnife*3,lengthKnife*3,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
+
+
+KnifeIDs+=O.bodies.append(utils.facetBox((-lengthKnife/2-radiusKnife,lengthKnife/2,-radiusKnife+buldozerHeight/2),(lengthKnife/2,lengthKnife/2,buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
+
+KnifeIDs+=O.bodies.append(utils.facetBox((-lengthKnife/2-radiusKnife-lengthKnife/4.,lengthKnife/2,-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
+
+
+O.bodies.append(utils.facetBox((0,lengthKnife/2,radiusKnife),(lengthKnife*4,lengthKnife*4,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
+
+
 
 
 ### Creating the material for buldozer
 colorsph1=Vector3(120,234,150);
-colorsph2=Vector3(0,0,1);
+colorsph2=Vector3(1,1,0);
 
 colorsph1.Normalize();
 colorsph2.Normalize();
@@ -58,6 +69,7 @@ O.engines=[
 	GravityEngine(gravity=(0,0,-9.8)),
 	TranslationEngine(translationAxis=[1,0,0],velocity=5,subscribedBodies=KnifeIDs), # Buldozer motion
 	NewtonsDampedLaw(damping=.3),
+	SnapshotEngine(iterPeriod=1600,fileBase='/tmp/buldozer-',viewNo=0,label='snapshooter'),
 ]
 
 O.saveTmp()
@@ -66,6 +78,6 @@ qt.Controller()
 qt.View()
 r=qt.Renderer()
 r['Light_position']=Vector3(0,0,50)
-O.run()
-qt.makeSimulationVideo('/tmp/buldozer.ogg',iterPeriod=1000,fps=30)
+O.run(1500000); O.wait()
+utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/buldozer.ogg',fps=30)
 
