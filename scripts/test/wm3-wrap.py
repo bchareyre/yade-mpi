@@ -1,5 +1,5 @@
 # constructors, constants as static objects
-x,y,z,one=Vector3.UNIT_X,Vector3.UNIT_Y,Vector3.UNIT_Z,Vector3.ONE
+x,y,z,one=Vector3().UNIT_X,Vector3().UNIT_Y,Vector3().UNIT_Z,Vector3().ONE
 x2=Vector3(x)
 # conversions to sequence types
 list(x2)

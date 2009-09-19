@@ -317,11 +317,10 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Quaternion_exposer.def( bp::self == bp::self );
         Quaternion_exposer.def( bp::self > bp::self );
         Quaternion_exposer.def( bp::self >= bp::self );
-        Quaternion_exposer.def_readonly( "IDENTITY", Wm3::Quaternion< double >::IDENTITY );
-        Quaternion_exposer.def_readonly( "ZERO", Wm3::Quaternion< double >::ZERO );
         Quaternion_exposer.def( bp::self * bp::other< Wm3::Vector3< double > >() );
         Quaternion_exposer.def( bp::self_ns::str( bp::self ) );
         Quaternion_exposer.def("__len__",&::Quaternion_len).staticmethod("__len__").def("__setitem__",&::Quaternion_set_item).def("__getitem__",&::Quaternion_get_item).def("__str__",&::Quaternion_str).def("__repr__",&::Quaternion_str);
+        Quaternion_exposer.add_property("ZERO",::Quaternionr_ZERO).add_property("IDENTITY",::Quaternionr_IDENTITY);
     }
 
     { //::Wm3::Vector2< double >
@@ -495,15 +494,12 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Vector2_exposer.def( bp::self == bp::self );
         Vector2_exposer.def( bp::self > bp::self );
         Vector2_exposer.def( bp::self >= bp::self );
-        Vector2_exposer.def_readonly( "ONE", Wm3::Vector2< double >::ONE );
-        Vector2_exposer.def_readonly( "UNIT_X", Wm3::Vector2< double >::UNIT_X );
-        Vector2_exposer.def_readonly( "UNIT_Y", Wm3::Vector2< double >::UNIT_Y );
-        Vector2_exposer.def_readonly( "ZERO", Wm3::Vector2< double >::ZERO );
         Vector2_exposer.staticmethod( "ComputeExtremes" );
         Vector2_exposer.staticmethod( "GenerateOrthonormalBasis" );
         Vector2_exposer.staticmethod( "Orthonormalize" );
         Vector2_exposer.def( bp::other< Real >() * bp::self );
         Vector2_exposer.def("__len__",&::Vector2_len)   .staticmethod("__len__").def("__setitem__",&::Vector2_set_item)   .def("__getitem__",&::Vector2_get_item)   .def("__str__",&::Vector2_str)   .def("__repr__",&::Vector2_str);
+        Vector2_exposer.add_property("ZERO",::Vector2r_ZERO).add_property("UNIT_X",::Vector2r_UNIT_X).add_property("UNIT_Y",::Vector2r_UNIT_Y).add_property("ONE",::Vector2r_ONE);
     }
 
     { //::Wm3::Vector3< double >
@@ -689,16 +685,12 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Vector3_exposer.def( bp::self == bp::self );
         Vector3_exposer.def( bp::self > bp::self );
         Vector3_exposer.def( bp::self >= bp::self );
-        Vector3_exposer.def_readonly( "ONE", Wm3::Vector3< double >::ONE );
-        Vector3_exposer.def_readonly( "UNIT_X", Wm3::Vector3< double >::UNIT_X );
-        Vector3_exposer.def_readonly( "UNIT_Y", Wm3::Vector3< double >::UNIT_Y );
-        Vector3_exposer.def_readonly( "UNIT_Z", Wm3::Vector3< double >::UNIT_Z );
-        Vector3_exposer.def_readonly( "ZERO", Wm3::Vector3< double >::ZERO );
         Vector3_exposer.staticmethod( "ComputeExtremes" );
         Vector3_exposer.staticmethod( "GenerateOrthonormalBasis" );
         Vector3_exposer.staticmethod( "Orthonormalize" );
         Vector3_exposer.def( bp::self_ns::str( bp::self ) );
         Vector3_exposer.def("__len__",&::Vector3_len)   .staticmethod("__len__").def("__setitem__",&::Vector3_set_item)   .def("__getitem__",&::Vector3_get_item)   .def("__str__",&::Vector3_str)   .def("__repr__",&::Vector3_str);
+        Vector3_exposer.add_property("ZERO",::Vector3r_ZERO).add_property("UNIT_X",::Vector3r_UNIT_X).add_property("UNIT_Y",::Vector3r_UNIT_Y).add_property("UNIT_Z",::Vector3r_UNIT_Z).add_property("ONE",::Vector3r_ONE);
     }
 
     { //::componentMaxVector

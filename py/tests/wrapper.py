@@ -86,8 +86,8 @@ class TestWm3Wrapper(unittest.TestCase):
 	def testVector2(self):
 		v=Vector2(1,2); v2=Vector2(3,4)
 		self.assert_(v+v2==Vector2(4,6))
-		self.assert_(Vector2.UNIT_X.Dot(Vector2.UNIT_Y)==0)
-		self.assert_(Vector2.ZERO.Length()==0)
+		self.assert_(Vector2().UNIT_X.Dot(Vector2().UNIT_Y)==0)
+		self.assert_(Vector2().ZERO.Length()==0)
 	def testVector3(self):
 		v=Vector3(3,4,5); v2=Vector3(3,4,5)
 		self.assert_(v[0]==3 and v[1]==4 and v[2]==5)
@@ -95,7 +95,7 @@ class TestWm3Wrapper(unittest.TestCase):
 		self.assert_(v==(3,4,5)) # comparison with list/tuple
 		self.assert_(v==[3,4,5])
 		self.assert_(v==v2)
-		x,y,z,one=Vector3.UNIT_X,Vector3.UNIT_Y,Vector3.UNIT_Z,Vector3.ONE
+		x,y,z,one=Vector3().UNIT_X,Vector3().UNIT_Y,Vector3().UNIT_Z,Vector3().ONE
 		self.assert_(x+y+z==one)
 		self.assert_(x.Dot(y)==0)
 		self.assert_(x.Cross(y)==z)
@@ -104,18 +104,18 @@ class TestWm3Wrapper(unittest.TestCase):
 		q1=Quaternion((0,0,1),pi/2)
 		q2=Quaternion(Vector3(0,0,1),pi/2)
 		q1==q2
-		x,y,z,one=Vector3.UNIT_X,Vector3.UNIT_Y,Vector3.UNIT_Z,Vector3.ONE
+		x,y,z,one=Vector3().UNIT_X,Vector3().UNIT_Y,Vector3().UNIT_Z,Vector3().ONE
 		self.assertVQAlmostEqual(q1*x,y)
 		self.assertVQAlmostEqual(q1*q1*x,-x)
-		self.assertVQAlmostEqual(q1*q1.Conjugate(),Quaternion.IDENTITY)
+		self.assertVQAlmostEqual(q1*q1.Conjugate(),Quaternion().IDENTITY)
 		self.assertVQAlmostEqual(q1.ToAxisAngle()[0],(0,0,1))
 		self.assertAlmostEqual(q1.ToAxisAngle()[1],pi/2)
 	# not really wm3 thing, but closely related
 	def testSe3Conversion(self):
 		pp=PhysicalParameters()
-		pp['se3']=(Vector3.ZERO,Quaternion.IDENTITY)
-		self.assert_(pp['se3'][0]==Vector3.ZERO)
-		self.assert_(pp['se3'][1]==Quaternion.IDENTITY)
+		pp['se3']=(Vector3().ZERO,Quaternion().IDENTITY)
+		self.assert_(pp['se3'][0]==Vector3().ZERO)
+		self.assert_(pp['se3'][1]==Quaternion().IDENTITY)
 		pp['se3']=((1,2,3),Quaternion((1,1,1),pi/4))
 		self.assert_(pp['se3'][0]==(1,2,3))
 		self.assert_(pp['se3'][0]==pp.pos)

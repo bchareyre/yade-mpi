@@ -17,6 +17,15 @@ int Vector3_len(){return 3;}
 int Quaternion_len(){return 4;}
 #undef IDX_CHECK
 
+#if 1
+	// workarounds for static methods; disabled for now, see comment in miniWm3Wrap-generate.py
+	#define _WORKAROUND(clss,member) clss clss##_##member(const clss& self){return clss::member;}
+	_WORKAROUND(Vector2r,ONE); _WORKAROUND(Vector2r,UNIT_X); _WORKAROUND(Vector2r,UNIT_Y); _WORKAROUND(Vector2r,ZERO);
+	_WORKAROUND(Vector3r,ONE); _WORKAROUND(Vector3r,UNIT_X); _WORKAROUND(Vector3r,UNIT_Y); _WORKAROUND(Vector3r,UNIT_Z); _WORKAROUND(Vector3r,ZERO);
+	_WORKAROUND(Quaternionr,IDENTITY); _WORKAROUND(Quaternionr,ZERO);
+	#undef _WORKAROUND
+#endif
+
 // automagic converter from tuple to Vector3r
 struct custom_Vector3r_from_tuple{
 	custom_Vector3r_from_tuple(){

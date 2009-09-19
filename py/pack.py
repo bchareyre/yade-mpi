@@ -74,7 +74,7 @@ class inGtsSurface_py(Predicate):
 
 class inSpace(Predicate):
 	"""Predicate returning True for any points, with infinite bounding box."""
-	def __init__(self, _center=Vector3.ZERO): self._center=_center
+	def __init__(self, _center=Vector3().ZERO): self._center=_center
 	def aabb(self):
 		inf=float('inf'); return Vector3(-inf,-inf,-inf),Vector3(inf,inf,inf)
 	def center(self): return self._center
@@ -145,7 +145,7 @@ def gtsSurfaceBestFitOBB(surf):
 	pts=[Vector3(v.x,v.y,v.z) for v in surf.vertices()]
 	return cloudBestFitOBB(tuple(pts))
 
-def revolutionSurfaceMeridians(sects,angles,origin=Vector3.ZERO,orientation=Quaternion.IDENTITY):
+def revolutionSurfaceMeridians(sects,angles,origin=Vector3().ZERO,orientation=Quaternion().IDENTITY):
 	"""Revolution surface given sequences of 2d points and sequence of corresponding angles,
 	returning sequences of 3d points representing meridian sections of the revolution surface.
 	The 2d sections are turned around z-axis, but they can be transformed

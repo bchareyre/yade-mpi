@@ -388,6 +388,12 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		o.tags['line']='l'+tableLine
 		# the empty '#' line to make line number 1-based
 		ll=[l for l in ['#']+open(tableFile).readlines()]; values=ll[int(tableLine)].split('#')[0].split()
+		for i in range(0,len(values)):
+			lineNo=int(tableLine)-1
+			while values[i]=='=':
+				values[i]=ll[lineNo].split('#')[0].split()[i]
+				if lineNo==0: raise RuntimeError("the = specifier doesn't refer to a value at some previous line.")
+				lineNo-=1
 		names=None
 		for l in ll:
 			if not re.match(r'^\s*(#.*)?$',l): names=l.split(); break
@@ -404,7 +410,9 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 			if names[i]=='description': continue
 			if names[i] not in kw.keys():
 				if (not unknownOk) and names[i][0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
-			else: kw.pop(names[i])
+			else:
+				if values[i]!='*': kw.pop(names[i])
+				else: continue
 			if names[i][0]!='!':
 				exec('%s=%s'%(names[i],values[i])) in __builtins__; tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
 	defaults=[]
