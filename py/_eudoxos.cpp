@@ -1,6 +1,7 @@
 #include<yade/pkg-dem/ConcretePM.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
+#include<yade/pkg-dem/Shop.hpp>
 using namespace boost::python;
 using namespace std;
 #ifdef YADE_LOG4CXX
@@ -86,10 +87,66 @@ void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirectio
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,5);
 
+/* Compute σxx,σyy,σxy stresses over all spheres, in plane passing through given axis,
+	which will be coincident with the y axis in the 2d projection.
+	Not sure how much is this function useful... */
+std::vector<Vector3r> spiralSphereStresses2d(Real dH_dTheta,const int axis=2){
+	MetaBody* rb=Omega::instance().getRootBody().get();
+	vector<Vector3r> ret(rb->bodies->size(),Vector3r::ZERO);
+	int ax1=(axis+1)%3,ax2=(axis+2)%3;
+	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
+		if(!I->isReal()) continue;
+		CpmPhys* phys=YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
+		// get force in this interaction, project it to the plane we need
+		Vector3r force=phys->normalForce+phys->shearForce;
+		Vector3r y2dIn3d(Vector3r::ZERO); y2dIn3d[axis]=1.;
+		Vector3r x2dIn3d(geom->contactPoint); x2dIn3d[axis]=0.; x2dIn3d.Normalize();
+		//Vector3r planeNormal=(x2dIn3d).Cross(y2dIn3d); planeNormal.Normalize(); force-=force.Dot(planeNormal)*planeNormal;
+		// get contact point in 2d
+		Vector2r C; Real theta;
+		boost::tie(C[0],C[1],theta)=Shop::spiralProject(geom->contactPoint,dH_dTheta,axis);
+		// get force in 2d (ff is already projected to the plane)
+		Vector2r _ff(force.Dot(x2dIn3d),force.Dot(y2dIn3d));
+		// get positions in 2d (height relative to C, as particle's position could wrap to other spiral period than the contact point, which we don't want here.
+		const Vector3r& aa(geom->se31.position); const Vector3r& bb(geom->se32.position);
+		Vector2r pos[]={Vector2r(sqrt(pow(aa[ax1],2)+pow(aa[ax2],2)),C[1]+(aa[axis]-geom->contactPoint[axis])),Vector2r(sqrt(pow(bb[ax1],2)+pow(bb[ax2],2)),C[1]+(bb[axis]-geom->contactPoint[axis]))};
+		Vector2r ff[]={_ff,-_ff}; body_id_t ids[]={I->getId1(),I->getId2()};
+		for(int i=0; i<2; i++){
+			// signs of tension/compression along the respective axes
+			//Vector2r sgn(pos[i][0]<C[0]?1.:-1.,pos[i][1]<C[1]?1.:-1.);
+			int sgn=(C-pos[i]).Dot(ff[i])>0?1:-1; // force in the same direction as vector away from particle: tension (positive)
+			ret[ids[i]][0]+=.5*sgn*abs(ff[i][0])/phys->crossSection; ret[ids[i]][1]+=.5*sgn*abs(ff[i][1])/phys->crossSection;
+			// divide by the length
+			Real torque=(pos[i]-C)[0]*ff[i][1]-(pos[i]-C)[1]*ff[i][0];
+			ret[ids[i]][2]+=.5*torque/phys->crossSection;
+		}
+	}
+	return ret;
+}
+
+std::vector<Real> particleConfinement(){
+	MetaBody* rb=Omega::instance().getRootBody().get();
+	vector<Real> ret(rb->bodies->size(),0.);
+	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
+		if(!I->isReal()) continue;
+		CpmPhys* phys=YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
+		Vector3r f[]={phys->normalForce,-phys->normalForce}; Vector3r pos[]={geom->se31.position,geom->se32.position}; body_id_t ids[]={I->getId1(),I->getId2()};
+		Real stress=phys->normalForce.Length()/phys->crossSection;
+		for(int i=0; i<2; i++){
+			int sgn=(geom->contactPoint-pos[i]).Dot(f[i])>0?1:-1;
+			ret[ids[i]]+=sgn*stress;
+		}
+	}
+	return ret;
+}
 
 
 BOOST_PYTHON_MODULE(_eudoxos){
 	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
 	def("yieldSigmaTMagnitude",yieldSigmaTMagnitude);
+	def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
+	def("particleConfinement",particleConfinement);
 }
 

@@ -117,9 +117,9 @@ struct WeightedAverage{
  *
  */
 template<typename T, typename Tvalue>
-struct SymmGaussianKernelAverage: public WeightedAverage<T,Tvalue> {
+struct SymmGaussianDistributionAverage: public WeightedAverage<T,Tvalue> {
 	Real stDev, relThreshold;
-	SymmGaussianKernelAverage(const shared_ptr<GridContainer<T> >& _grid, Real _stDev, Real _relThreshold=3): WeightedAverage<T,Tvalue>(_grid), stDev(_stDev), relThreshold(_relThreshold){}
+	SymmGaussianDistributionAverage(const shared_ptr<GridContainer<T> >& _grid, Real _stDev, Real _relThreshold=3): WeightedAverage<T,Tvalue>(_grid), stDev(_stDev), relThreshold(_relThreshold){}
 	virtual Real getWeight(const Vector2r& meanPt, const T& e){	
 		Vector2r pos=getPosition(e);
 		Real rSq=pow(meanPt[0]-pos[0],2)+pow(meanPt[1]-pos[1],2);
@@ -129,15 +129,15 @@ struct SymmGaussianKernelAverage: public WeightedAverage<T,Tvalue> {
 	virtual vector<Vector2i> filterCells(const Vector2r& refPt){return WeightedAverage<T,Tvalue>::grid->circleFilter(refPt,stDev*relThreshold);}
 };
 
-/* Class for doing template specialization of gaussian kernel average on SGKA_Scalar2d and for testing */
+/* Class for doing template specialization of gaussian kernel average on SGDA_Scalar2d and for testing */
 struct Scalar2d{
 	Vector2r pos;
 	Real val;
 };
 
 /* Final specialization; it only needs to define getValue and getPosition -- these functions contain knowledge about the element class itself */
-struct SGKA_Scalar2d: public SymmGaussianKernelAverage<Scalar2d,Real>{
-	SGKA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): SymmGaussianKernelAverage<Scalar2d,Real>(_grid,_stDev,_relThreshold){}
+struct SGDA_Scalar2d: public SymmGaussianDistributionAverage<Scalar2d,Real>{
+	SGDA_Scalar2d(const shared_ptr<GridContainer<Scalar2d> >& _grid, Real _stDev, Real _relThreshold=3): SymmGaussianDistributionAverage<Scalar2d,Real>(_grid,_stDev,_relThreshold){}
 	virtual Real getValue(const Scalar2d& dp){return (Real)dp.val;}
 	virtual Vector2r getPosition(const Scalar2d& dp){return dp.pos;}
 };
@@ -155,13 +155,13 @@ class pyGaussAverage{
 	//struct Scalar2d{Vector2r pos; Real val;};
 	Vector2r tuple2vec2r(const python::tuple& t){return Vector2r(python::extract<Real>(t[0])(),python::extract<Real>(t[1])());}
 	Vector2i tuple2vec2i(const python::tuple& t){return Vector2i(python::extract<int>(t[0])(),python::extract<int>(t[1])());}
-	shared_ptr<SGKA_Scalar2d> sgka;
+	shared_ptr<SGDA_Scalar2d> sgka;
 	struct Poly2d{vector<Vector2r> vertices; bool inclusive;};
 	vector<Poly2d> clips;
 	public:
 	pyGaussAverage(python::tuple lo, python::tuple hi, python::tuple nCells, Real stDev){
 		shared_ptr<GridContainer<Scalar2d> > g(new GridContainer<Scalar2d>(tuple2vec2r(lo),tuple2vec2r(hi),tuple2vec2i(nCells)));
-		sgka=shared_ptr<SGKA_Scalar2d>(new SGKA_Scalar2d(g,stDev));
+		sgka=shared_ptr<SGDA_Scalar2d>(new SGDA_Scalar2d(g,stDev));
 	}
 	bool pointInsidePolygon(const Vector2r&,const vector<Vector2r>&);
 	bool ptIsClipped(const Vector2r& pt){

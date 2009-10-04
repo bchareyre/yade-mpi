@@ -8,7 +8,7 @@
 #pragma once
 
 
-#include <yade/core/InteractingGeometry.hpp>
+#include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/Body.hpp>
 
 // define this to have topology information about facets enabled;

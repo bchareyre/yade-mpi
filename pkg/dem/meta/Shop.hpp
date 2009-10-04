@@ -83,6 +83,9 @@ class Shop{
 		//! Estimate timestep based on P-wave propagation speed
 		static Real PWaveTimeStep(shared_ptr<MetaBody> rb=shared_ptr<MetaBody>());
 
+		//! return 2d coordinates of a 3d point within plane defined by rotation axis and inclination of spiral, wrapped to the 0th period
+		static boost::tuple<Real, Real, Real> spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0);
+
 		//! Calculate inscribed circle center of trianlge
 		static Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
 

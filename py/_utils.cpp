@@ -7,6 +7,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
+#include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/lib-computational-geometry/Hull2d.hpp>
 #include<cmath>
@@ -214,9 +215,9 @@ Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axis
 	}
 	return ret;
 }
-/* Sum forces actiong on bodies within mask.
+/* Sum forces acting on bodies within mask.
  *
- * @param mask groupMask of matching bodies
+ * @param ids list of ids
  * @param direction direction in which forces are summed
  *
  */
@@ -229,6 +230,17 @@ Real sumBexForces(python::tuple ids, const Vector3r& direction){
 		body_id_t id=python::extract<int>(ids[i]);
 		const Vector3r& f=rb->bex.getForce(id);
 		ret+=direction.Dot(f);
+	}
+	return ret;
+}
+
+/* Sum force acting on facets given by their ids in the sense of their respective normals. */
+Real sumFacetNormalForces(vector<body_id_t> ids){
+	shared_ptr<MetaBody> rb=Omega::instance().getRootBody(); rb->bex.sync();
+	Real ret=0;
+	FOREACH(const body_id_t id, ids){
+		InteractingFacet* f=YADE_CAST<InteractingFacet*>(Body::byId(id,rb)->interactingGeometry.get());
+		ret+=rb->bex.getForce(id).Dot(f->nf);
 	}
 	return ret;
 }
@@ -354,41 +366,12 @@ Vector3r forcesOnCoordPlane(Real coord, int axis){
 }
 
 
-/* Project 3d point into 2d using spiral projection along given axis;
- * the returned tuple is
- * 	
- *  ( (height relative to the spiral, distance from axis), theta )
- *
- * dH_dTheta is the inclination of the spiral (height increase per radian),
- * theta0 is the angle for zero height (by given axis).
- */
 python::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
-	int ax1=(axis+1)%3,ax2=(axis+2)%3;
-	Real r=sqrt(pow(pt[ax1],2)+pow(pt[ax2],2));
-	Real theta;
-	if(r>Mathr::ZERO_TOLERANCE){
-		theta=acos(pt[ax1]/r);
-		if(pt[ax2]<0) theta=Mathr::TWO_PI-theta;
-	}
-	else theta=0;
-	Real hRef=dH_dTheta*(theta-theta0);
-	long period;
-	if(isnan(periodStart)){
-		Real h=Shop::periodicWrap(pt[axis]-hRef,hRef-Mathr::PI*dH_dTheta,hRef+Mathr::PI*dH_dTheta,&period);
-		return python::make_tuple(python::make_tuple(r,h),theta);
-	}
-	else{
-		// Real hPeriodStart=(periodStart-theta0)*dH_dTheta;
-		//TRVAR4(hPeriodStart,periodStart,theta0,theta);
-		//Real h=Shop::periodicWrap(pt[axis]-hRef,hPeriodStart,hPeriodStart+2*Mathr::PI*dH_dTheta,&period);
-		theta=Shop::periodicWrap(theta,periodStart,periodStart+2*Mathr::PI,&period);
-		Real h=pt[axis]-hRef+period*2*Mathr::PI*dH_dTheta;
-		//TRVAR3(pt[axis],pt[axis]-hRef,period);
-		//TRVAR2(h,theta);
-		return python::make_tuple(python::make_tuple(r,h),theta);
-	}
+	Real r,h,theta;
+	boost::tie(r,h,theta)=Shop::spiralProject(pt,dH_dTheta,axis,periodStart,theta0);
+	return python::make_tuple(python::make_tuple(r,h),theta);
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
+//BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
 
 // for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
 void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
@@ -419,11 +402,12 @@ BOOST_PYTHON_MODULE(_utils){
 	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumBexForces",sumBexForces);
 	def("sumBexTorques",sumBexTorques);
+	def("sumFacetNormalForces",sumFacetNormalForces);
 	def("forcesOnPlane",forcesOnPlane);
 	def("forcesOnCoordPlane",forcesOnCoordPlane);
 	def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
 	def("createInteraction",Shop__createExplicitInteraction);
-	def("spiralProject",spiralProject,spiralProject_overloads(args("axis","periodStart","theta0")));
+	def("spiralProject",spiralProject,(python::arg("pt"),python::arg("dH_dTheta"),python::arg("axis")=2,python::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),python::arg("theta0")=0));
 	def("pointInsidePolygon",pointInsidePolygon);
 	def("scalarOnColorScale",Shop::scalarOnColorScale);
 	def("highlightNone",highlightNone);

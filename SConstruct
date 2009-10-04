@@ -330,7 +330,8 @@ if not env.GetOption('clean'):
 	# check "optional" libs
 	if 'vtk' in env['features']:
 		conf.env.Append(CPPPATH=env['VTKINCDIR']) 
-		ok=conf.CheckLibWithHeader('vtkHybrid','vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
+		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
+		env.Append(LIBS='vtkHybrid')
 		if not ok: featureNotOK('vtk')
 	if 'opengl' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
