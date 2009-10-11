@@ -68,6 +68,8 @@ else:
 #### HANDLE RENAMED CLASSES ####
 # if old class name is used, the new object is constructed and a warning is issued about old name being used
 renamed={
+	# renamed 10.10.2009
+	'CpmPhysDamageColorizer':'CpmStateUpdater',
 	# renamed 23.5.2009, may be removed in a few months
 	'BrefcomMakeContact':'Ip2_CpmMat_CpmMat_CpmPhys',
 	'BrefcomContact':'CpmPhys',

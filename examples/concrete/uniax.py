@@ -87,7 +87,7 @@ O.engines=[
 		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
 	),
 	NewtonsDampedLaw(damping=damping,label='damper'),
-	CpmPhysDamageColorizer(realPeriod=1),
+	CpmStateUpdater(realPeriod=1),
 	UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	PeriodicPythonRunner(virtPeriod=3e-5/strainRateTension,realLim=5,command='addPlotData()',label='plotDataCollector'),
 	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
