@@ -4,7 +4,7 @@
 
 class VTKRecorder: public PeriodicEngine {
 	public:
-		enum {REC_SPHERES=0,REC_FACETS,REC_COLORS,REC_CPM_DAMAGE,REC_SENTINEL};
+		enum {REC_SPHERES=0,REC_FACETS,REC_COLORS,REC_CPM,REC_SENTINEL};
 		//! A stuff to record: spheres,facets,colors 
 		vector<string> recorders;
 		string fileName;

@@ -125,21 +125,8 @@ std::vector<Vector3r> spiralSphereStresses2d(Real dH_dTheta,const int axis=2){
 	return ret;
 }
 
-std::vector<Real> particleConfinement(){
-	MetaBody* rb=Omega::instance().getRootBody().get();
-	vector<Real> ret(rb->bodies->size(),0.);
-	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
-		if(!I->isReal()) continue;
-		CpmPhys* phys=YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
-		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
-		Vector3r f[]={phys->normalForce,-phys->normalForce}; Vector3r pos[]={geom->se31.position,geom->se32.position}; body_id_t ids[]={I->getId1(),I->getId2()};
-		Real stress=phys->normalForce.Length()/phys->crossSection;
-		for(int i=0; i<2; i++){
-			int sgn=(geom->contactPoint-pos[i]).Dot(f[i])>0?1:-1;
-			ret[ids[i]]+=sgn*stress;
-		}
-	}
-	return ret;
+void particleConfinement(){
+	CpmStateUpdater::update();
 }
 
 

@@ -234,13 +234,19 @@ Real sumBexForces(python::tuple ids, const Vector3r& direction){
 	return ret;
 }
 
-/* Sum force acting on facets given by their ids in the sense of their respective normals. */
-Real sumFacetNormalForces(vector<body_id_t> ids){
+/* Sum force acting on facets given by their ids in the sense of their respective normals.
+   If axis is given, it will sum forces perpendicular to given axis only (not the the facet normals).
+*/
+Real sumFacetNormalForces(vector<body_id_t> ids, int axis=-1){
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody(); rb->bex.sync();
 	Real ret=0;
 	FOREACH(const body_id_t id, ids){
 		InteractingFacet* f=YADE_CAST<InteractingFacet*>(Body::byId(id,rb)->interactingGeometry.get());
-		ret+=rb->bex.getForce(id).Dot(f->nf);
+		if(axis<0) ret+=rb->bex.getForce(id).Dot(f->nf);
+		else {
+			Vector3r ff=rb->bex.getForce(id); ff[axis]=0;
+			ret+=ff.Dot(f->nf);
+		}
 	}
 	return ret;
 }
@@ -402,7 +408,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumBexForces",sumBexForces);
 	def("sumBexTorques",sumBexTorques);
-	def("sumFacetNormalForces",sumFacetNormalForces);
+	def("sumFacetNormalForces",sumFacetNormalForces,(python::arg("axis")=-1));
 	def("forcesOnPlane",forcesOnPlane);
 	def("forcesOnCoordPlane",forcesOnCoordPlane);
 	def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");

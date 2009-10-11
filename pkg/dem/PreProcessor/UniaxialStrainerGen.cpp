@@ -117,7 +117,7 @@ void UniaxialStrainerGen::createEngines(){
 		newton->damping=damping;
 	rootBody->engines.push_back(newton);
 
-	rootBody->engines.push_back(shared_ptr<CpmPhysDamageColorizer>(new CpmPhysDamageColorizer));
+	rootBody->engines.push_back(shared_ptr<CpmStateUpdater>(new CpmStateUpdater));
 
 }
 

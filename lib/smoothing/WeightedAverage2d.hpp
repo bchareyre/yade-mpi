@@ -32,6 +32,8 @@ struct GridContainer{
 		Vector2r cellSizes;
 		Vector2i nCells;
 	public:
+		Vector2r getLo(){return lo;}
+		Vector2r getHi(){return hi;}
 		vector<vector<vector<T> > > grid;
 	/* construct grid from lower left corner, upper right corner and number of cells in each direction */
 	GridContainer(Vector2r _lo, Vector2r _hi, Vector2i _nCells): lo(_lo), hi(_hi), nCells(_nCells){
@@ -155,13 +157,13 @@ class pyGaussAverage{
 	//struct Scalar2d{Vector2r pos; Real val;};
 	Vector2r tuple2vec2r(const python::tuple& t){return Vector2r(python::extract<Real>(t[0])(),python::extract<Real>(t[1])());}
 	Vector2i tuple2vec2i(const python::tuple& t){return Vector2i(python::extract<int>(t[0])(),python::extract<int>(t[1])());}
-	shared_ptr<SGDA_Scalar2d> sgka;
+	shared_ptr<SGDA_Scalar2d> sgda;
 	struct Poly2d{vector<Vector2r> vertices; bool inclusive;};
 	vector<Poly2d> clips;
 	public:
 	pyGaussAverage(python::tuple lo, python::tuple hi, python::tuple nCells, Real stDev){
 		shared_ptr<GridContainer<Scalar2d> > g(new GridContainer<Scalar2d>(tuple2vec2r(lo),tuple2vec2r(hi),tuple2vec2i(nCells)));
-		sgka=shared_ptr<SGDA_Scalar2d>(new SGDA_Scalar2d(g,stDev));
+		sgda=shared_ptr<SGDA_Scalar2d>(new SGDA_Scalar2d(g,stDev));
 	}
 	bool pointInsidePolygon(const Vector2r&,const vector<Vector2r>&);
 	bool ptIsClipped(const Vector2r& pt){
@@ -171,10 +173,11 @@ class pyGaussAverage{
 		}
 		return false;
 	}
-	bool addPt(Real val, python::tuple pos){Scalar2d d; d.pos=tuple2vec2r(pos); if(ptIsClipped(d.pos)) return false; d.val=val; sgka->grid->add(d,d.pos); return true; } 
-	Real avg(python::tuple _pt){Vector2r pt=tuple2vec2r(_pt); if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgka->computeAverage(pt);}
-	Real stDev_get(){return sgka->stDev;} void stDev_set(Real s){sgka->stDev=s;}
-	Real relThreshold_get(){return sgka->relThreshold;} void relThreshold_set(Real rt){sgka->relThreshold=rt;}
+	bool addPt(Real val, python::tuple pos){Scalar2d d; d.pos=tuple2vec2r(pos); if(ptIsClipped(d.pos)) return false; d.val=val; sgda->grid->add(d,d.pos); return true; } 
+	Real avg(python::tuple _pt){Vector2r pt=tuple2vec2r(_pt); if(ptIsClipped(pt)) return std::numeric_limits<Real>::quiet_NaN(); return sgda->computeAverage(pt);}
+	Real stDev_get(){return sgda->stDev;} void stDev_set(Real s){sgda->stDev=s;}
+	Real relThreshold_get(){return sgda->relThreshold;} void relThreshold_set(Real rt){sgda->relThreshold=rt;}
+	python::tuple aabb_get(){return python::make_tuple(sgda->grid->getLo(),sgda->grid->getHi());}
 	python::list clips_get(){
 		python::list ret;
 		FOREACH(const Poly2d& poly, clips){
@@ -199,10 +202,10 @@ class pyGaussAverage{
 	}
 	python::tuple data_get(){
 		python::list x,y,val;
-		const Vector2i& dim=sgka->grid->getSize();
+		const Vector2i& dim=sgda->grid->getSize();
 		for(int i=0; i<dim[0]; i++){
 			for(int j=0; j<dim[1]; j++){
-				FOREACH(const Scalar2d& element, sgka->grid->grid[i][j]){
+				FOREACH(const Scalar2d& element, sgda->grid->grid[i][j]){
 					x.append(element.pos[0]); y.append(element.pos[1]); val.append(element.val);
 				}
 			}

@@ -37,7 +37,7 @@ There are other classes, which are not strictly necessary:
 
  * GLDrawCpmPhys draws interaction physics (color for damage and a few other); rarely used, though.
 
- * CpmPhysDamageColorizer changes bodies' colors depending on average damage of their interactions
+ * CpmStateUpdater changes bodies' colors depending on average damage of their interactions
    and number of interactions that were already fully broken and have disappeared. This engine
 	contains its own loop (2 loops, more precisely) over all bodies and is run periodically
 	to update colors.
@@ -69,8 +69,10 @@ class CpmMat: public BodyMacroParameters {
 		Real epsPlBroken;
 		//! sum of plastic strains normalized by number of contacts
 		Real normEpsPl;
-		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl));
+		//! averaged stress on the particle
+		Real avgStress; 
+		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), avgStress(0.) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (avgStress));
 		REGISTER_CLASS_AND_BASE(CpmMat,BodyMacroParameters);
 		REGISTER_CLASS_INDEX(CpmMat,BodyMacroParameters);
 };
@@ -263,6 +265,10 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 		static Real relKnSoft;
 		Law2_Dem3DofGeom_CpmPhys_Cpm() { }
 		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+		// utility functions
+		//! Update avgStress on all bodies (called from VTKRecorder and yade.eudoxos.particleConfinement)
+		//! Might be anywhere else as well (static method)
+		static void updateBodiesState(MetaBody*);
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
 	REGISTER_ATTRIBUTES(ConstitutiveLaw,(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(omegaThreshold)(epsSoft)(relKnSoft));
@@ -270,6 +276,8 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
+//deprecated code
+#if 0
 /* Engine encompassing several computations looping over all bodies/interactions
  *
  * * Compute and store unbalanced force over the whole simulation.
@@ -292,6 +300,7 @@ class CpmGlobalCharacteristics: public PeriodicEngine{
 	REGISTER_CLASS_AND_BASE(CpmGlobalCharacteristics,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
+#endif
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
@@ -307,16 +316,17 @@ REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 	REGISTER_SERIALIZABLE(GLDrawCpmPhys);
 #endif
 
-class CpmPhysDamageColorizer: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; Real dmgSum; Real epsPlSum; BodyStats(): nCohLinks(0), dmgSum(0.), epsPlSum(0.){} };
+class CpmStateUpdater: public PeriodicEngine {
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum, avgStress; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), avgStress(0.) {} };
 	public:
 		//! maximum damage over all contacts
-		Real maxOmega;
-		CpmPhysDamageColorizer(){maxOmega=0; /* run at the very beginning */ initRun=true;}
-		virtual void action(MetaBody*);
+		static Real maxOmega;
+		CpmStateUpdater(){maxOmega=0; /* run at the very beginning */ initRun=true;}
+		virtual void action(MetaBody* rb){ update(rb); }
+		static void update(MetaBody* rb=NULL);
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
-	REGISTER_CLASS_AND_BASE(CpmPhysDamageColorizer,PeriodicEngine);
+	REGISTER_CLASS_AND_BASE(CpmStateUpdater,PeriodicEngine);
 };
-REGISTER_SERIALIZABLE(CpmPhysDamageColorizer);
+REGISTER_SERIALIZABLE(CpmStateUpdater);
 

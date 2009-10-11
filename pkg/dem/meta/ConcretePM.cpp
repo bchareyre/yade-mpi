@@ -10,7 +10,7 @@ YADE_PLUGIN((CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhy
 	#ifdef YADE_OPENGL
 		(GLDrawCpmPhys)
 	#endif	
-		(CpmPhysDamageColorizer));
+		(CpmStateUpdater));
 
 
 /********************** Ip2_CpmMat_CpmMat_CpmPhys ****************************/
@@ -134,6 +134,7 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=1.;
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
 	#include"../../../../brefcom-mm.hh"
 #endif
+
 
 void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
@@ -289,7 +290,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 #endif
 
 /********************** CpmGlobalCharacteristics ****************************/
-
+/*** DEPRECATED ***/
+#if 0
 CREATE_LOGGER(CpmGlobalCharacteristics);
 void CpmGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 	rb->bex.sync();
@@ -336,28 +338,42 @@ void CpmGlobalCharacteristics::compute(MetaBody* rb, bool useMaxForce){
 		}
 	#endif
 }
+#endif
 
+/********************** CpmStateUpdater ****************************/
+CREATE_LOGGER(CpmStateUpdater);
+Real CpmStateUpdater::maxOmega=0.;
 
-/********************** CpmPhysDamageColorizer ****************************/
-CREATE_LOGGER(CpmPhysDamageColorizer);
-void CpmPhysDamageColorizer::action(MetaBody* rootBody){
-	//vector<pair<short,Real> > bodyDamage; /* number of cohesive interactions per body; cummulative damage of interactions */
-	//vector<pair<short,
+void CpmStateUpdater::update(MetaBody* _rootBody){
+	MetaBody *rootBody=_rootBody?_rootBody:Omega::instance().getRootBody().get();
 	vector<BodyStats> bodyStats; bodyStats.resize(rootBody->bodies->size());
 	assert(bodyStats[0].nCohLinks==0); // should be initialized by dfault ctor
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
-		shared_ptr<CpmPhys> BC=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
-		if(!BC || !BC->isCohesive) continue;
+		if(!I->isReal()) continue;
+		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
+		if(!phys) continue;
 		const body_id_t id1=I->getId1(), id2=I->getId2();
-		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-BC->relResidualStrength); bodyStats[id1].epsPlSum+=BC->epsPlSum;
-		bodyStats[id2].nCohLinks++; bodyStats[id2].dmgSum+=(1-BC->relResidualStrength); bodyStats[id2].epsPlSum+=BC->epsPlSum;
-		maxOmega=max(maxOmega,BC->omega);
+		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
+		
+		Vector3r f[]={phys->normalForce,-phys->normalForce}; const Vector3r pos[]={geom->se31.position,geom->se32.position}; const body_id_t ids[]={id1,id2};
+		Real stress=phys->normalForce.Length()/phys->crossSection;
+		for(int i=0; i<2; i++){
+			int sgn=(geom->contactPoint-pos[i]).Dot(f[i])>0?1:-1;
+			bodyStats[ids[i]].avgStress+=sgn*stress;
+			bodyStats[ids[i]].nLinks++;
+		}
+
+		if(!phys->isCohesive) continue;
+		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-phys->relResidualStrength); bodyStats[id1].epsPlSum+=phys->epsPlSum;
+		bodyStats[id2].nCohLinks++; bodyStats[id2].dmgSum+=(1-phys->relResidualStrength); bodyStats[id2].epsPlSum+=phys->epsPlSum;
+		maxOmega=max(maxOmega,phys->omega);
 	}
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		const body_id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
 		CpmMat* bpp=dynamic_cast<CpmMat*>(B->physicalParameters.get());
 		if(!bpp) continue;
+		bpp->avgStress=bodyStats[id].avgStress/bodyStats[id].nLinks;
 		int cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
 		if(cohLinksWhenever>0){
 			bpp->normDmg=(bodyStats[id].dmgSum+bpp->numBrokenCohesive)/cohLinksWhenever;

@@ -44,7 +44,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 		if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="facets") recActive[REC_FACETS]=true;
 		else if(rec=="colors") recActive[REC_COLORS]=true;
-		else if(rec=="cpmDamage") recActive[REC_CPM_DAMAGE]=true;
+		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, facets, colors, cpmDamage). Ignored.");
 	}
 
@@ -56,9 +56,14 @@ void VTKRecorder::action(MetaBody* rootBody)
 	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
 	spheresColors->SetNumberOfComponents(3);
 	spheresColors->SetName("Colors");
-	vtkSmartPointer<vtkFloatArray> damage = vtkSmartPointer<vtkFloatArray>::New();
-	damage->SetNumberOfComponents(1);
-	damage->SetName("cpmDamage");
+
+	if(recActive[REC_CPM]) CpmStateUpdater::update(rootBody);
+	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
+	cpmDamage->SetNumberOfComponents(1);
+	cpmDamage->SetName("cpmDamage");
+	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
+	cpmStress->SetNumberOfComponents(1);
+	cpmStress->SetName("cpmStress");
 
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
@@ -84,8 +89,9 @@ void VTKRecorder::action(MetaBody* rootBody)
 					float c[3] = {color[0],color[1],color[2]};
 					spheresColors->InsertNextTupleValue(c);
 				}
-				if (recActive[REC_CPM_DAMAGE]) {
-					damage->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->physicalParameters)->normDmg);
+				if (recActive[REC_CPM]) {
+					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->physicalParameters)->normDmg);
+					cpmStress->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->physicalParameters)->avgStress);
 				}
 				continue;
 			}
@@ -127,7 +133,10 @@ void VTKRecorder::action(MetaBody* rootBody)
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
-		if (recActive[REC_CPM_DAMAGE]) spheresUg->GetPointData()->AddArray(damage);
+		if (recActive[REC_CPM]) {
+			spheresUg->GetPointData()->AddArray(cpmDamage);
+			spheresUg->GetPointData()->AddArray(cpmStress);
+		}
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
 		string fn=fileName+"spheres."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
