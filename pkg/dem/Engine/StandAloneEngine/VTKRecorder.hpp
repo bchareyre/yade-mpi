@@ -4,11 +4,14 @@
 
 class VTKRecorder: public PeriodicEngine {
 	public:
-		enum {REC_SPHERES=0,REC_FACETS,REC_COLORS,REC_CPM,REC_SENTINEL};
+		enum {REC_SPHERES=0,REC_FACETS,REC_COLORS,REC_CPM,REC_INTR,REC_VELOCITY,REC_SENTINEL};
 		//! A stuff to record: spheres,facets,colors 
 		vector<string> recorders;
 		string fileName;
+		//! turn on compression of the output XML files
 		bool compress;
+		//! skip interactions with facets
+		bool skipFacetIntr;
 		VTKRecorder(); 
 		~VTKRecorder();
 		void init(MetaBody*);

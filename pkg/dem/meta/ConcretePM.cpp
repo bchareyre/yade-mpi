@@ -355,14 +355,15 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
 		
-		Vector3r f[]={phys->normalForce,-phys->normalForce}; const Vector3r pos[]={geom->se31.position,geom->se32.position}; const body_id_t ids[]={id1,id2};
-		Real stress=phys->normalForce.Length()/phys->crossSection;
-		for(int i=0; i<2; i++){
-			int sgn=(geom->contactPoint-pos[i]).Dot(f[i])>0?1:-1;
-			bodyStats[ids[i]].avgStress+=sgn*stress;
-			bodyStats[ids[i]].nLinks++;
+		Vector3r stress=(1./phys->crossSection)*phys->normalForce;
+		const Vector3r& p1(geom->se31.position); const Vector3r& cp(geom->contactPoint);
+		for(int i=0; i<3; i++){
+			stress[i]*=cp[i]>p1[i] ? 1. : -1.;
 		}
-
+		bodyStats[id1].avgStress+=stress;
+		bodyStats[id2].avgStress+=stress;
+		bodyStats[id1].nLinks++; bodyStats[id2].nLinks++;
+		
 		if(!phys->isCohesive) continue;
 		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-phys->relResidualStrength); bodyStats[id1].epsPlSum+=phys->epsPlSum;
 		bodyStats[id2].nCohLinks++; bodyStats[id2].dmgSum+=(1-phys->relResidualStrength); bodyStats[id2].epsPlSum+=phys->epsPlSum;
