@@ -11,6 +11,7 @@
 //#include<vtkXMLMultiBlockDataWriter.h>
 //#include<vtkMultiBlockDataSet.h>
 #include<vtkTriangle.h>
+#include<vtkLine.h>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>
@@ -26,6 +27,7 @@ VTKRecorder::VTKRecorder()
 	/* we always want to save the first state as well */ 
 	initRun=true; 
 	compress=false;
+	skipFacetIntr=true;
 }
 
 VTKRecorder::~VTKRecorder()
@@ -42,12 +44,17 @@ void VTKRecorder::action(MetaBody* rootBody)
 	vector<bool> recActive(REC_SENTINEL,false);
 	FOREACH(string& rec, recorders){
 		if(rec=="spheres") recActive[REC_SPHERES]=true;
+		else if(rec=="velocity") recActive[REC_VELOCITY]=true;
 		else if(rec=="facets") recActive[REC_FACETS]=true;
 		else if(rec=="colors") recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, facets, colors, cpmDamage). Ignored.");
+		// else if(rec=="intr") recActive[REC_INTR]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm). Ignored.");
 	}
+	// cpm needs interactions
+	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
 
+	// spheres
 	vtkSmartPointer<vtkPoints> spheresPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> spheresCells = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
@@ -56,21 +63,56 @@ void VTKRecorder::action(MetaBody* rootBody)
 	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
 	spheresColors->SetNumberOfComponents(3);
 	spheresColors->SetName("Colors");
+	vtkSmartPointer<vtkFloatArray> spheresVelocity = vtkSmartPointer<vtkFloatArray>::New();
+	spheresVelocity->SetNumberOfComponents(3);
+	spheresVelocity->SetName("velocity");
 
-	if(recActive[REC_CPM]) CpmStateUpdater::update(rootBody);
-	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
-	cpmDamage->SetNumberOfComponents(1);
-	cpmDamage->SetName("cpmDamage");
-	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
-	cpmStress->SetNumberOfComponents(1);
-	cpmStress->SetName("cpmStress");
-
+	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> facetsCells = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkFloatArray> facetsColors = vtkSmartPointer<vtkFloatArray>::New();
 	facetsColors->SetNumberOfComponents(3);
 	facetsColors->SetName("Colors");
 
+	// interactions
+	vtkSmartPointer<vtkPoints> intrBodyPos = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkCellArray> intrCells = vtkSmartPointer<vtkCellArray>::New();
+	vtkSmartPointer<vtkFloatArray> intrForceN = vtkSmartPointer<vtkFloatArray>::New();
+	intrForceN->SetNumberOfComponents(1);
+	intrForceN->SetName("forceN");
+
+	// extras for CPM
+	if(recActive[REC_CPM]) CpmStateUpdater::update(rootBody);
+	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
+	cpmDamage->SetNumberOfComponents(1);
+	cpmDamage->SetName("cpmDamage");
+	vtkSmartPointer<vtkFloatArray> cpmStress = vtkSmartPointer<vtkFloatArray>::New();
+	cpmStress->SetNumberOfComponents(3);
+	cpmStress->SetName("cpmStress");
+
+	if(recActive[REC_INTR]){
+		// save body positions, referenced by ids by vtkLine
+		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+			const Vector3r& pos=b->physicalParameters->se3.position;
+			intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
+		}
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+			if(!I->isReal()) continue;
+			//const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(i->interactionPhysics.get());
+			if(skipFacetIntr){
+				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId1())->geometricalModel.get()))) continue;
+				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId2())->geometricalModel.get()))) continue;
+			}
+			vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+			line->GetPointIds()->SetId(0,I->getId1());
+			line->GetPointIds()->SetId(1,I->getId2());
+			intrCells->InsertNextCell(line);
+			if(recActive[REC_CPM]){
+				const CpmPhys* phys = YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
+				intrForceN->InsertNextValue(phys->Fn);
+			}
+		}
+	}
 
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if (recActive[REC_SPHERES])
@@ -89,9 +131,14 @@ void VTKRecorder::action(MetaBody* rootBody)
 					float c[3] = {color[0],color[1],color[2]};
 					spheresColors->InsertNextTupleValue(c);
 				}
+				if(recActive[REC_VELOCITY]){
+					spheresVelocity->InsertNextTupleValue((float*)(&(YADE_CAST<ParticleParameters*>(b->physicalParameters.get()))->velocity));
+				}
 				if (recActive[REC_CPM]) {
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->physicalParameters)->normDmg);
-					cpmStress->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->physicalParameters)->avgStress);
+					const Vector3r& ss=YADE_PTR_CAST<CpmMat>(b->physicalParameters)->avgStress;
+					float s[3]={ss[0],ss[1],ss[2]};
+					cpmStress->InsertNextTupleValue(s);
 				}
 				continue;
 			}
@@ -133,6 +180,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
+		if (recActive[REC_VELOCITY]) spheresUg->GetPointData()->AddArray(spheresVelocity);
 		if (recActive[REC_CPM]) {
 			spheresUg->GetPointData()->AddArray(cpmDamage);
 			spheresUg->GetPointData()->AddArray(cpmStress);
@@ -155,6 +203,19 @@ void VTKRecorder::action(MetaBody* rootBody)
 		string fn=fileName+"facets."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
 		writer->SetFileName(fn.c_str());
 		writer->SetInput(facetsUg);
+		writer->Write();	
+	}
+	if (recActive[REC_INTR])
+	{
+		vtkSmartPointer<vtkUnstructuredGrid> intrUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		intrUg->SetPoints(intrBodyPos);
+		intrUg->SetCells(VTK_LINE, intrCells);
+		if (recActive[REC_CPM]) intrUg->GetCellData()->AddArray(intrForceN);
+		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+		if(compress) writer->SetCompressor(compressor);
+		string fn=fileName+"intrs."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
+		writer->SetFileName(fn.c_str());
+		writer->SetInput(intrUg);
 		writer->Write();	
 	}
 
