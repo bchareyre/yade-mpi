@@ -37,7 +37,13 @@ def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 
 def globalHtmlStats():
 	t0=min([j.started for j in jobs if j.started!=None])
-	ret='<p>Running %s, since %s.</p>'%(t2hhmmss(time.time()-t0),time.ctime(t0))
+	unfinished=len([j for j in jobs if j.status!='DONE'])
+	if unfinished:
+		ret='<p>Running for %s, since %s.</p>'%(t2hhmmss(time.time()-t0),time.ctime(t0))
+	else:
+		failed=len([j for j in jobs if j.exitStatus!=0])
+		lastFinished=max([j.finished for j in jobs])
+		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s'%('red' if failed else 'green',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
 	ret+='<h3>Jobs</h3>'
 	nFailed=len([j for j in jobs if j.status=='DONE' and j.exitStatus!=0])
 	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:green">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
@@ -57,6 +63,8 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		for j in jobs:
 			self.wfile.write(j.htmlStats())
 		self.wfile.write('</TABLE></BODY></HTML>')
+		global httpLastServe
+		httpLastServe=time.time()
 		return
 	def log_request(self,req): pass
 def runHttpStatsServer():
@@ -103,15 +111,16 @@ import sys,re,optparse
 def getNumCores(): return len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
 
 parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py\n\n  %prog runs yade simulation multiple times with different parameters.\n  See http://yade.wikia.com/wiki/ScriptParametricStudy for details.')
-parser.add_option('-j',dest='maxJobs',type='int',help="Maximum number of simultaneous jobs to run (default: number of cores, i.e. %d)"%getNumCores(),metavar='NUM',default=getNumCores())
+parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous jobs to run (default: number of cores, i.e. %d)"%getNumCores(),metavar='NUM',default=getNumCores())
 parser.add_option('--log',dest='logFormat',help='Format of log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%sys.argv[0][:-6],default=sys.argv[0][:-6],metavar='FILE') ## strip the '-multi' extension
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
+parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
 opts,args=parser.parse_args()
-logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun
+logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait
 
 if len(args)!=2:
 	#print "Exactly two non-option arguments must be specified -- parameter table and script to be run.\n"
@@ -196,12 +205,13 @@ print "Job summary:"
 for job in jobs:
 	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots),job.command
 
+httpLastServe=0
 runHttpStatsServer()
 
 # OK, go now
 if not dryRun: runJobs(jobs,maxJobs)
 
-print 'All jobs finished.'
+print 'All jobs finished, total time ',t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None]))
 
 # for easy grepping in logfiles:
 print 'Log files:'
@@ -239,3 +249,7 @@ else:
 	gp.write('plot '+','.join(plots))
 	print "gnuplot",gnuplotOut
 	print "Plot written, bye."
+if httpWait and time.time()-httpLastServe<10:
+	print "(continue serving http until no longer requested  as per --http-wait)"
+	while time.time()-httpLastServe<10:
+		time.sleep(1)

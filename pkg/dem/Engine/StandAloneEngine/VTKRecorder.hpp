@@ -12,6 +12,8 @@ class VTKRecorder: public PeriodicEngine {
 		bool compress;
 		//! skip interactions with facets
 		bool skipFacetIntr;
+		//! skip non-dynamic spheres (not facets)
+		bool skipNondynamic;
 		VTKRecorder(); 
 		~VTKRecorder();
 		void init(MetaBody*);
