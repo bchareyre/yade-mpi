@@ -355,7 +355,7 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
 		
-		Vector3r stress=(1./phys->crossSection)*phys->normalForce;
+		Vector3r stress=(1./phys->crossSection)*(phys->normalForce+phys->shearForce);
 		const Vector3r& p1(geom->se31.position); const Vector3r& cp(geom->contactPoint);
 		for(int i=0; i<3; i++){
 			stress[i]*=cp[i]>p1[i] ? 1. : -1.;
@@ -374,7 +374,7 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 		// add damaged contacts that have already been deleted
 		CpmMat* bpp=dynamic_cast<CpmMat*>(B->physicalParameters.get());
 		if(!bpp) continue;
-		bpp->avgStress=bodyStats[id].avgStress/bodyStats[id].nLinks;
+		bpp->avgStress=bodyStats[id].avgStress; // /bodyStats[id].nLinks;
 		int cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
 		if(cohLinksWhenever>0){
 			bpp->normDmg=(bodyStats[id].dmgSum+bpp->numBrokenCohesive)/cohLinksWhenever;

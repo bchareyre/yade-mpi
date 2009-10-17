@@ -148,7 +148,6 @@ opts.AddVariables(
 	('LIBPATH','Additional paths for the linker (colon-separated)',None,None,colonSplit),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,colonSplit),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None,None,colonSplit),
-	('VTKINCDIR','Directories where to look for VTK headers',['/usr/include/vtk','/usr/include/vtk-5.0'],None,colonSplit),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
@@ -246,6 +245,7 @@ def CheckQt(context, qtdirs):
 	"Attempts to localize qt3 installation in given qtdirs. Sets necessary variables if found and returns True; otherwise returns False."
 	# make sure they exist and save them for restoring if a test fails
 	origs={'LIBS':context.env['LIBS'],'LIBPATH':context.env['LIBPATH'],'CPPPATH':context.env['CPPPATH']}
+	qtdirs=qtdirs[0].split()
 	for qtdir in qtdirs:
 		context.Message( 'Checking for qt-mt in '+qtdir+'... ' )
 		context.env['QTDIR']=qtdir
@@ -328,15 +328,15 @@ if not env.GetOption('clean'):
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
 		Exit(1)
-	def featureNotOK(featureName):
+	def featureNotOK(featureName,note=None):
 		print "\nERROR: Unable to compile with optional feature `%s'.\n\nIf you are sure, remove it from features (scons features=featureOne,featureTwo for example) and build again."%featureName
+		if note: print "Note:",note
 		Exit(1)
 	# check "optional" libs
 	if 'vtk' in env['features']:
-		conf.env.Append(CPPPATH=env['VTKINCDIR']) 
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
-		if not ok: featureNotOK('vtk')
+		if not ok: featureNotOK('vtk',note="You might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
 	if 'opengl' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
 		# TODO ok=True for darwin platform where openGL (and glut) is native
@@ -350,6 +350,9 @@ if not env.GetOption('clean'):
 			print "\nQt3 interface can only be used if opengl is enabled.\nEither add opengl to 'features' or add qt3 to 'exclude'."
 			Exit(1)
 		ok&=conf.CheckQt(env['QTDIR'])
+		if not ok:
+			print "ERROR: Qt3 library not found. Add qt3 to the 'exclude' list (opengl will be skipped as well)"
+			Exit(1)
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 		env['QGLVIEWER_LIB']='yade-QGLViewer';
 
