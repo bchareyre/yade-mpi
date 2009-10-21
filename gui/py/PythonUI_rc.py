@@ -110,8 +110,9 @@ def cleanup():
 
 ## run the TCP server
 import yade.PythonTCPServer
-srv=yade.PythonTCPServer.PythonTCPServer(minPort=9000)
+srv=yade.PythonTCPServer.GenericTCPServer(handler=yade.PythonTCPServer.PythonConsoleSocketEmulator,title='TCP python prompt',cookie=True,minPort=9000)
 yade.runtime.cookie=srv.server.cookie
+info=yade.PythonTCPServer.GenericTCPServer(handler=yade.PythonTCPServer.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 sys.stdout.flush()
 runtime.argv=[runtime.script]+runtime.argv
 sys.argv=runtime.argv # could be [] as well

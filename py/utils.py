@@ -387,7 +387,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		if len(env)>2: tableDesc=env[3]
 		o.tags['line']='l'+tableLine
 		# the empty '#' line to make line number 1-based
-		ll=[l for l in ['#']+open(tableFile).readlines()]; values=ll[int(tableLine)].split('#')[0].split()
+		ll=[l for l in ['#']+open(tableFile).readlines()]; values=ll[int(tableLine)][:-1].split('#')[0].split()
 		for i in range(0,len(values)):
 			lineNo=int(tableLine)-1
 			while values[i]=='=':

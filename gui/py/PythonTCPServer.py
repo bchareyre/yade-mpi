@@ -3,6 +3,17 @@ import sys,time
 
 from yade.wrapper import *
 
+class InfoSocketProvider(SocketServer.BaseRequestHandler):
+	"""Class providing dictionary of important simulation information,
+	without authenticating the access"""
+	def handle(self):
+		import pickle, os
+		O=Omega()
+		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,realtime=O.realtime,time=O.time,id=O.tags['id'] if O.tags.has_key('id') else None,threads=os.environ['OMP_NUM_THREADS'] if os.environ.has_key('OMP_NUM_THREADS') else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
+		print 'returning', ret
+		self.request.send(pickle.dumps(ret))
+		
+
 class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 	def setup(self):
 		if not self.client_address[0].startswith('127.0.0'):
@@ -61,8 +72,8 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 		print self.client_address, 'disconnected!'
 		self.request.send('\nBye ' + str(self.client_address) + '\n')
 
-class PythonTCPServer:
-	def __init__(self,minPort=9000,host='',maxPort=65536,background=True):
+class GenericTCPServer:
+	def __init__(self,handler,title,cookie=True,minPort=9000,host='',maxPort=65536,background=True):
 		import socket, random
 		self.port=-1
 		self.host=host
@@ -70,11 +81,14 @@ class PythonTCPServer:
 		if maxPort==None: maxPort=minPort
 		while self.port==-1 and tryPort<=maxPort:
 			try:
-				self.server=SocketServer.ThreadingTCPServer((host,tryPort),PythonConsoleSocketEmulator)
+				self.server=SocketServer.ThreadingTCPServer((host,tryPort),handler)
 				self.port=tryPort
-				self.server.cookie=''.join([i for i in random.sample('yadesucks',6)])
-				print "Python TCP server listening on %s:%d, auth cookie is `%s'"%(host if host else 'localhost',self.port,self.server.cookie)
-				self.server.authenticated=[]
+				if cookie:
+					self.server.cookie=''.join([i for i in random.sample('yadesucks',6)])
+					self.server.authenticated=[]
+					print title,"on %s:%d, auth cookie `%s'"%(host if host else 'localhost',self.port,self.server.cookie)
+				else:
+					print title,"on %s:%d"%(host if host else 'localhost',self.port)
 				if background:
 					import thread; thread.start_new_thread(self.server.serve_forever,())
 				else: self.server.serve_forever()
@@ -82,7 +96,8 @@ class PythonTCPServer:
 				tryPort+=1
 		if self.port==-1: raise RuntimeError("No free port to listen on in range %d-%d"%(minPort,maxPort))
 
+
 if __name__=='__main__':
-	p=PythonTCPServer(background=False)
+	p=GenericTCPServer(PythonConsoleSocketEmulator,'Python TCP server',background=False)
 	#while True: time.sleep(2)
 

@@ -7,7 +7,7 @@ Experimental, interface may change (even drastically).
 
 """
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 #matplotlib.use('GTKCairo')
 #matplotlib.use('QtAgg')
 matplotlib.rc('axes',grid=True) # put grid in all figures
