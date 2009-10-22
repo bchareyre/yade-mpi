@@ -578,7 +578,7 @@ if not COMMAND_LINE_TARGETS:
 		for f in files:
 			ff=os.path.join(root,f)
 			# do not delete python-optimized files and symbolic links (lib_gts__python-module.so, for instance)
-			if ff not in toInstall and not ff.endswith('.pyo') and not os.path.islink(ff):
+			if ff not in toInstall and not ff.endswith('.pyo') and not os.path.islink(ff) and not os.path.basename(ff).startswith('.nfs'):
 				print "Deleting extra plugin", ff
 				os.remove(ff)
 

@@ -10,7 +10,6 @@ class InfoSocketProvider(SocketServer.BaseRequestHandler):
 		import pickle, os
 		O=Omega()
 		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,realtime=O.realtime,time=O.time,id=O.tags['id'] if O.tags.has_key('id') else None,threads=os.environ['OMP_NUM_THREADS'] if os.environ.has_key('OMP_NUM_THREADS') else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
-		print 'returning', ret
 		self.request.send(pickle.dumps(ret))
 		
 

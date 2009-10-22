@@ -29,7 +29,7 @@ void SpiralEngine::applyCondition(MetaBody* rb){
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)bodies->size());
 		Body* b=Body::byId(id,rb).get();
-		ParticleParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
+		RigidBodyParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		assert(rbp);
 		// translation
 		rbp->se3.position+=dt*linearVelocity*axis;
@@ -37,6 +37,11 @@ void SpiralEngine::applyCondition(MetaBody* rb){
 		rbp->se3.position=q*(rbp->se3.position-axisPt)+axisPt;
 		rbp->se3.orientation=q*rbp->se3.orientation;
 		rbp->se3.orientation.Normalize(); // to make sure
+		// bug: https://bugs.launchpad.net/yade/+bug/398089; since subscribed bodies are not dynamic (assumption), we have to set theri velocities here as well;
+		// otherwise, their displacement will be missed in NewtonsDampedLaw and when using velocityBins, they will have no influence;
+		// that can cause interactions to be missed, for example
+		rbp->velocity=linearVelocity*axis+angularVelocity*axis.Cross(rbp->se3.position-axisPt); // check this...
+		rbp->angularVelocity=angularVelocity*axis;
 	}
 }
 
