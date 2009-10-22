@@ -306,6 +306,24 @@ bool pointInsidePolygon(python::tuple xy, python::object vertices){
 	return inside;
 }
 
+#if 0
+/* Compute convex hull of given points, given as python list of Vector2 */
+python::list convexHull2d(const python::list& pts){
+	size_t l=python::len(pts);
+	python::list ret;
+	std::list<Vector2r> pts2;
+	for(size_t i=0; i<l; i++){
+		pts2.push_back(python::extract<Vector2r>(pts[i]));
+		cerr<<*pts2.rbegin()<<endl;
+	}
+	ConvexHull2d ch2d(pts2);
+	vector<Vector2r> hull=ch2d();
+	FOREACH(const Vector2r& v, hull) ret.append(v);
+	cout<<pts2.size()<<" "<<hull.size()<<"@@@"<<endl;
+	return ret;
+}
+#endif 
+
 /* Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.
 
 	All spheres that touch the plane are projected as hexagons on their circumference to the plane.
@@ -318,7 +336,7 @@ Real approxSectionArea(Real coord, int axis){
 	if(axis<0 || axis>2) throw invalid_argument("Axis must be ∈ {0,1,2}");
 	const int ax1=(axis+1)%3, ax2=(axis+2)%3;
 	const Real sqrt3=sqrt(3);
-	Vector2r mm(-10.,0),mx(0,0);
+	Vector2r mm,mx; int i=0;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		Sphere* s=dynamic_cast<Sphere*>(b->geometricalModel.get());
 		if(!s) continue;
@@ -328,7 +346,7 @@ Real approxSectionArea(Real coord, int axis){
 		cloud.push_back(c+Vector2r(r,0)); cloud.push_back(c+Vector2r(-r,0));
 		cloud.push_back(c+Vector2r( r/2., sqrt3*r)); cloud.push_back(c+Vector2r( r/2.,-sqrt3*r));
 		cloud.push_back(c+Vector2r(-r/2., sqrt3*r)); cloud.push_back(c+Vector2r(-r/2.,-sqrt3*r));
-		if(mm[0]==-10.){ mm=c, mx=c;}
+		if(i++==0){ mm=c, mx=c;}
 		mm=Vector2r(min(c[0]-r,mm[0]),min(c[1]-r,mm[1]));
 		mx=Vector2r(max(c[0]+r,mx[0]),max(c[1]+r,mx[1]));
 	}
@@ -397,6 +415,9 @@ BOOST_PYTHON_MODULE(_utils){
 	def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
+	#if 0
+		def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
+	#endif
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the AABB=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
 	def("setRefSe3",setRefSe3,"Set reference positions and orientation of all bodies equal to their current ones.");
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));

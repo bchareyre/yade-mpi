@@ -69,10 +69,10 @@ class CpmMat: public BodyMacroParameters {
 		Real epsPlBroken;
 		//! sum of plastic strains normalized by number of contacts
 		Real normEpsPl;
-		//! averaged stress on the particle
-		Vector3r avgStress; 
-		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), avgStress(Vector3r::ZERO) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (avgStress));
+		//! stresses on the particle
+		Vector3r sigma,tau;
+		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {createIndex();};
+		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
 		REGISTER_CLASS_AND_BASE(CpmMat,BodyMacroParameters);
 		REGISTER_CLASS_INDEX(CpmMat,BodyMacroParameters);
 };
@@ -317,7 +317,7 @@ REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 #endif
 
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r avgStress; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), avgStress(Vector3r::ZERO) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {} };
 	public:
 		//! maximum damage over all contacts
 		static Real maxOmega;

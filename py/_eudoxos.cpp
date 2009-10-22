@@ -87,6 +87,8 @@ void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirectio
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,5);
 
+// integrated in CpmStateUpdater
+#if 0
 /* Compute σxx,σyy,σxy stresses over all spheres, in plane passing through given axis,
 	which will be coincident with the y axis in the 2d projection.
 	Not sure how much is this function useful... */
@@ -124,7 +126,7 @@ std::vector<Vector3r> spiralSphereStresses2d(Real dH_dTheta,const int axis=2){
 	}
 	return ret;
 }
-
+#endif
 void particleConfinement(){
 	CpmStateUpdater::update();
 }
@@ -133,7 +135,7 @@ void particleConfinement(){
 BOOST_PYTHON_MODULE(_eudoxos){
 	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
 	def("yieldSigmaTMagnitude",yieldSigmaTMagnitude);
-	def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
+	// def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
 	def("particleConfinement",particleConfinement);
 }
 

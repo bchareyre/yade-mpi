@@ -8,7 +8,7 @@ import os, sys, thread, time, logging, pipes
 class JobInfo():
 	def __init__(self,num,id,command,log,nSlots):
 		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
-		self.command=command; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots
+		self.command=command; self.num=num; self.log=log; self.id=id; self.nSlots=nSlots; self.infoSocket=None
 		self.status='PENDING'
 		self.threadNum=None
 	def saveInfo(self):
@@ -23,14 +23,41 @@ started : %s
 finished: %s
 """%(self.id,self.exitStatus,'OK' if self.exitStatus==0 else 'FAILED',self.duration,self.command,time.asctime(time.localtime(self.started)),time.asctime(time.localtime(self.finished))));
 		log.close()
+	def getInfoDict(self):
+		if self.status!='RUNNING': return None
+		if not self.infoSocket:
+			for l in open(self.log,'r'):
+				if not l.startswith('TCP info provider on'): continue
+				hostPort=l[:-1].split()[4].split(':')
+				self.infoSocket=hostPort[0],int(hostPort[1])
+		if not self.infoSocket:
+			return None
+		import socket,pickle
+		s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+		s.connect(self.infoSocket)
+		data=s.recv(2048)
+		s.close()
+		return pickle.loads(data)
+
 	def htmlStats(self):
 		ret='<tr>'
 		ret+='<td>%s</td>'%self.id
 		if self.status=='PENDING': ret+='<td bgcolor="grey">(pending)</td>'
 		elif self.status=='RUNNING': ret+='<td bgcolor="yellow">%s</td>'%t2hhmmss(time.time()-self.started)
-		elif self.status=='DONE': ret+='<td bgcolor="%s">%s</td>'%('green' if self.exitStatus==0 else 'red',self.duration)
-		ret+='<td>%s</td>'%self.command
+		elif self.status=='DONE': ret+='<td bgcolor="%s">%s</td>'%('lime' if self.exitStatus==0 else 'red',self.duration)
+		info=self.getInfoDict()
+		if info:
+			ret+='<td>'
+			if info['stopAtIter']>0:
+				ret+='<nobr>%2.2f%% done</nobr><br/><nobr>step %d/%d</nobr>'%(info['iter']*100./info['stopAtIter'],info['iter'],info['stopAtIter'])
+			else: ret+='<nobr>step %d</nobr>'%(info['iter'])
+			if info['realtime']!=0: ret+='<br/><nobr>avg %g/sec</nobr>'%(info['iter']/info['realtime'])
+			ret+='<br/><nobr>%d bodies</nobr><br/><nobr>%d intrs</nobr>'%(info['numBodies'],info['numIntrs'])
+			ret+='</td>'
+		else:
+			ret+='<td> </td>'
 		ret+='<td>%d</td>'%self.nSlots
+		ret+='<td>%s</td>'%self.command
 		ret+='</tr>'
 		return ret
 def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
@@ -38,15 +65,19 @@ def t2hhmmss(dt): return '%02d:%02d:%02d'%(dt//3600,(dt%3600)//60,(dt%60))
 def globalHtmlStats():
 	t0=min([j.started for j in jobs if j.started!=None])
 	unfinished=len([j for j in jobs if j.status!='DONE'])
+	usedSlots=sum([j.nSlots for j in jobs if j.status=='RUNNING'])
+	global maxJobs
 	if unfinished:
 		ret='<p>Running for %s, since %s.</p>'%(t2hhmmss(time.time()-t0),time.ctime(t0))
 	else:
 		failed=len([j for j in jobs if j.exitStatus!=0])
 		lastFinished=max([j.finished for j in jobs])
-		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s'%('red' if failed else 'green',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
+		ret='<p><span style="background-color:%s">Finished</span>, idle for %s, running time %s since %s.</p>'%('red' if failed else 'lime',t2hhmmss(time.time()-lastFinished),t2hhmmss(sum([j.finished-j.started for j in jobs if j.started is not None])),time.ctime(t0))
+	ret+='<p>Pid %d</p>'%(os.getpid())
+	ret+='<p>%d slots available, %d used, %d free.</p>'%(maxJobs,usedSlots,maxJobs-usedSlots)
 	ret+='<h3>Jobs</h3>'
 	nFailed=len([j for j in jobs if j.status=='DONE' and j.exitStatus!=0])
-	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:green">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
+	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:lime">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
 	return ret
 
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
@@ -57,9 +88,9 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		self.send_header('Content-type','text/html')
 		self.send_header('refresh','5')
 		self.end_headers()
-		self.wfile.write('<HTML><TITLE>Yade-multi overview</TITLE><BODY>')
+		self.wfile.write('<HTML><TITLE>Yade-multi at %s overview</TITLE><BODY>'%(socket.gethostname()))
 		self.wfile.write(globalHtmlStats())
-		self.wfile.write('<TABLE border=1><tr><th>id</th><th>status</th><th>command</th><th>slots</th></tr>')
+		self.wfile.write('<TABLE border=1><tr><th>id</th><th>status</th><th>info</th><th>slots</th><th>command</th></tr>')
 		for j in jobs:
 			self.wfile.write(j.htmlStats())
 		self.wfile.write('</TABLE></BODY></HTML>')
@@ -105,14 +136,22 @@ def runJobs(jobs,numSlots):
 				thread.start_new_thread(runJob,(j,))
 				break
 		time.sleep(.5)
+		sys.stdout.flush()
 
 
-import sys,re,optparse
-def getNumCores(): return len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
+import sys,re,optparse,os
+def getNumCores():
+	nCpu=len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
+	if os.environ.has_key("OMP_NUM_THREADS"): return min(int(os.environ['OMP_NUM_THREADS']),nCpu)
+	return nCpu
+numCores=getNumCores()
 
 parser=optparse.OptionParser(usage='%prog [options] TABLE SIMULATION.py\n\n  %prog runs yade simulation multiple times with different parameters.\n  See http://yade.wikia.com/wiki/ScriptParametricStudy for details.')
-parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous jobs to run (default: number of cores, i.e. %d)"%getNumCores(),metavar='NUM',default=getNumCores())
-parser.add_option('--log',dest='logFormat',help='Format of log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
+parser.add_option('-j','--jobs',dest='maxJobs',type='int',help="Maximum number of simultaneous threads to run (default: number of cores, further limited by OMP_NUM_THREADS if set by the environment: %d)"%numCores,metavar='NUM',default=numCores)
+parser.add_option('--job-threads',dest='defaultThreads',type='int',help="Default number of threads for one job; can be overridden by per-job OMP_NUM_THREADS. Defaults to allocate all available cores (%d) for each job."%numCores,metavar='NUM',default=numCores)
+parser.add_option('--force-threads',action='store_true',dest='forceThreads')
+parser.add_option('--log',dest='logFormat',help='Format of job log files -- must contain a % or @, which will be replaced by line number or by description column respectively (default: SIMULATION.@.log)',metavar='FORMAT')
+parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-multi itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
 parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%sys.argv[0][:-6],default=sys.argv[0][:-6],metavar='FILE') ## strip the '-multi' extension
@@ -120,7 +159,11 @@ parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
 opts,args=parser.parse_args()
-logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait
+logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
+
+if globalLog:
+	sys.stderr=open(globalLog,"w")
+	sys.stdout=sys.stderr
 
 if len(args)!=2:
 	#print "Exactly two non-option arguments must be specified -- parameter table and script to be run.\n"
@@ -192,18 +235,26 @@ for i,l in enumerate(useLines):
 	else: logFile=logFile.replace('@',str(l))
 	logFile=logFile.replace('!','')
 	envVars=[]
-	nSlots=1
+	nSlots=opts.defaultThreads
 	for col,head in enumerate(headings):
 		if head=='!EXEC': executable=values[l][col]
 		if head=='!OMP_NUM_THREADS':
 			nSlots=int(values[l][col]); maxCpu=getNumCores()
+			continue
 		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
-	if nSlots>maxJobs: logging.warning('WARNING: job #%d wants %d slots but only %d are available'%(i,nSlots,maxJobs))
-	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,' '.join(envVars),nice,executable,simul,pipes.quote(logFile)),logFile,nSlots))
+	if nSlots>maxJobs:
+		if opts.forceThreads:
+			logging.info('Forcing job #%d to use only %d slots (max available) instead of %d requested'%(i,maxJobs,nSlots))
+			nSlots=maxJobs
+		else:
+			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
+	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d OMP_NUM_THREADS=%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,nSlots,' '.join(envVars),nice,executable,simul,pipes.quote(logFile)),logFile,nSlots))
 
 print "Job summary:"
 for job in jobs:
 	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots),job.command
+print "Master process pid",os.getpid()
+sys.stdout.flush()
 
 httpLastServe=0
 runHttpStatsServer()

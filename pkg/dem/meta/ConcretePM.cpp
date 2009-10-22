@@ -357,11 +357,13 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 		
 		Vector3r stress=(1./phys->crossSection)*(phys->normalForce+phys->shearForce);
 		const Vector3r& p1(geom->se31.position); const Vector3r& cp(geom->contactPoint);
+		// force towards the body is negative, away from it is positive (compression/tension)
 		for(int i=0; i<3; i++){
 			stress[i]*=cp[i]>p1[i] ? 1. : -1.;
 		}
-		bodyStats[id1].avgStress+=stress;
-		bodyStats[id2].avgStress+=stress;
+		bodyStats[id1].sigma+=stress; bodyStats[id2].sigma+=stress;
+		bodyStats[id1].tau+=stress.Cross(cp-geom->se31.position);
+		bodyStats[id2].tau+=stress.Cross(cp-geom->se32.position);
 		bodyStats[id1].nLinks++; bodyStats[id2].nLinks++;
 		
 		if(!phys->isCohesive) continue;
@@ -374,7 +376,8 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 		// add damaged contacts that have already been deleted
 		CpmMat* bpp=dynamic_cast<CpmMat*>(B->physicalParameters.get());
 		if(!bpp) continue;
-		bpp->avgStress=bodyStats[id].avgStress; // /bodyStats[id].nLinks;
+		bpp->sigma=bodyStats[id].sigma;
+		bpp->tau=bodyStats[id].tau;
 		int cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
 		if(cohLinksWhenever>0){
 			bpp->normDmg=(bodyStats[id].dmgSum+bpp->numBrokenCohesive)/cohLinksWhenever;

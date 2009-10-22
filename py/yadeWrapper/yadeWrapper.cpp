@@ -177,7 +177,7 @@ class pyTags{
 	public:
 		pyTags(const shared_ptr<MetaBody> _mb): mb(_mb){}
 		const shared_ptr<MetaBody> mb;
-		bool hasKey(string key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
+		bool hasKey(const string& key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
 		string getItem(string key){
 			FOREACH(string& val, mb->tags){
 				if(algorithm::starts_with(val,key+"=")){ string val1(val); algorithm::erase_head(val1,key.size()+1); algorithm::replace_all(val1,"~"," "); return val1;}
@@ -684,7 +684,8 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
 		.def("__setitem__",&pyTags::setItem)
-		.def("keys",&pyTags::keys);
+		.def("keys",&pyTags::keys)
+		.def("has_key",&pyTags::hasKey);
 	python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
 		.def("__len__",&pyBodyContainer::length)
