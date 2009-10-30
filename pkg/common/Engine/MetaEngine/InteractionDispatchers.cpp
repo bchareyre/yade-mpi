@@ -90,7 +90,10 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 				I->functorCache.phys=physDispatcher->getFunctor2D(b1->physicalParameters,b2->physicalParameters,swap);
 				assert(!swap); // InteractionPhysicsEngineUnits are symmetric
 			}
-			assert(I->functorCache.phys);
+			//assert(I->functorCache.phys);
+			if(!I->functorCache.phys){
+				throw std::runtime_error("Undefined or ambiguous InteractionPhysics dispatch for types "+b1->physicalParameters->getClassName()+" and "+b2->physicalParameters->getClassName()+".");
+			}
 			I->functorCache.phys->go(b1->physicalParameters,b2->physicalParameters,I);
 			assert(I->interactionPhysics);
 
