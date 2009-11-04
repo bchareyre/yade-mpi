@@ -137,11 +137,11 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	G=qTemp.Rotate(Vector3(mx[0],mx[1],mx[2]))+center
 	H=qTemp.Rotate(Vector3(mn[0],mx[1],mx[2]))+center
 	if wallMask&1:  ret+=doWall(A,D,H,E)
-	if wallMask&2:  ret+=doWall(B,C,G,F)
-	if wallMask&4:  ret+=doWall(A,B,F,E)
-	if wallMask&8:  ret+=doWall(D,H,G,C)
-	if wallMask&16: ret+=doWall(A,D,C,B)
-	if wallMask&32: ret+=doWall(E,F,G,H)
+	if wallMask&2:  ret+=doWall(B,F,G,C)
+	if wallMask&4:  ret+=doWall(A,E,F,B)
+	if wallMask&8:  ret+=doWall(D,C,G,H)
+	if wallMask&16: ret+=doWall(A,B,C,D)
+	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
 	
 	
