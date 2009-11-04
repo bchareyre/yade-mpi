@@ -80,7 +80,7 @@ area_25,area_50,area_75=utils.approxSectionArea(coord_25,axis),utils.approxSecti
 O.engines=[
 	BexResetter(),
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(aabbEnlargeFactor=intRadius,label='is2aabb'),MetaInteractingGeometry2AABB()]),
-	InsertionSortCollider(),
+	InsertionSortCollider(sweepLength=.05*sphereRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
 		[Ip2_CpmMat_CpmMat_CpmPhys(sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress)],

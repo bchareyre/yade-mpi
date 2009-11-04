@@ -34,10 +34,15 @@ finished: %s
 			return None
 		import socket,pickle
 		s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+		s.settimeout(2)
 		s.connect(self.infoSocket)
-		data=s.recv(2048)
-		s.close()
-		return pickle.loads(data)
+		try:
+			data=s.recv(2048)
+			s.close()
+			return pickle.loads(data)
+		except socket.timeout:
+			s.close()
+			return None
 
 	def htmlStats(self):
 		ret='<tr>'
@@ -55,7 +60,7 @@ finished: %s
 			ret+='<br/><nobr>%d bodies</nobr><br/><nobr>%d intrs</nobr>'%(info['numBodies'],info['numIntrs'])
 			ret+='</td>'
 		else:
-			ret+='<td> </td>'
+			ret+='<td> (no info) </td>'
 		ret+='<td>%d</td>'%self.nSlots
 		ret+='<td>%s</td>'%self.command
 		ret+='</tr>'
