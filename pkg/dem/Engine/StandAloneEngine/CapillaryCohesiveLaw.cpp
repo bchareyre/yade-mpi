@@ -230,6 +230,7 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
                                         if (fusionDetection)
                                                 bodiesMenisciiList.remove((*ii));
                                         currentContactPhysics->meniscus = false;
+					ncb->interactions->requestErase(id1,id2);
                                         //cerr <<"currentContactPhysics->meniscus = false;"<<endl;
                                 }
 

@@ -14,6 +14,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
+#include<yade/core/MetaBody.hpp>
 
 YADE_PLUGIN((ef2_Spheres_Elastic_ElasticLaw)(Law2_Dem3Dof_Elastic_Elastic)(ElasticContactLaw));
 
@@ -24,6 +25,7 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 	#ifdef SCG_SHEAR
 		useShear=false;
 	#endif
+	neverErase = false;
 }
 
 
@@ -43,22 +45,32 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 			// these checks would be redundant in the functor (ConstitutiveLawDispatcher does that already)
 			if(!dynamic_cast<SpheresContactGeometry*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
 		#endif
-		functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
+			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody, neverErase);
 	}
 }
 
 
 CREATE_LOGGER(ef2_Spheres_Elastic_ElasticLaw);
-void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb){
+void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb, bool neverErase){
 	Real dt = Omega::instance().getTimeStep();
 
 			int id1 = contact->getId1(), id2 = contact->getId2();
 			// FIXME: mask handling should move to ConstitutiveLaw itself, outside the functors
 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
 			SpheresContactGeometry*    currentContactGeometry= static_cast<SpheresContactGeometry*>(ig.get());
-			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());
-			// delete interaction where spheres don't touch
-			if(currentContactGeometry->penetrationDepth<0){ ncb->interactions->requestErase(id1,id2); return; }
+			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());			
+			
+			// delete interaction where spheres don't touch (or are "far enough" with respect to interactionDeletionFactor)
+			if(currentContactGeometry->penetrationDepth <0)
+			{
+				if (neverErase) {
+					currentContactPhysics->shearForce = Vector3r::ZERO;
+					currentContactPhysics->normalForce = Vector3r::ZERO;}
+				else 	ncb->interactions->requestErase(id1,id2);
+				return;
+			}
+				
+				
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id2,ncb)->physicalParameters.get());

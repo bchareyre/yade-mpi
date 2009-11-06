@@ -487,6 +487,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
 	elasticContactLaw->sdecGroupMask = 2;
+	elasticContactLaw->neverErase = true;
 
 	// capillary
 	shared_ptr<CapillaryCohesiveLaw> capillaryCohesiveLaw(new CapillaryCohesiveLaw); 

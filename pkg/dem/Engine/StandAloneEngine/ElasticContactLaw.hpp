@@ -20,9 +20,10 @@
 
 class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 	public:
-	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody, bool neverErase=false);
 	int sdecGroupMask;
-	bool momentRotationLaw;
+	bool momentRotationLaw;	
+	
 	#ifdef SCG_SHEAR
 		bool useShear;
 	#endif
@@ -67,13 +68,17 @@ class ElasticContactLaw : public InteractionSolver
 		#ifdef SCG_SHEAR
 			bool useShear;
 		#endif
+			
+		/*! Turn this true if another law is taking care of removing interaction.
+		 */
+		bool neverErase;
 	
 		ElasticContactLaw();
 		void action(MetaBody*);
 
 		shared_ptr<ef2_Spheres_Elastic_ElasticLaw> functor;
 
-	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)
+		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR
 			(useShear)
 		#endif
