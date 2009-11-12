@@ -311,6 +311,53 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 		o.bodies[i].shape['diffuseColor']=color
 	return imported
 
+
+def import_mesh_geometry(meshfile="file.mesh",**kw):
+	""" Imports geometry from mesh file and creates facets.
+	Remaining **kw arguments are passed to utils.facet; 
+	mesh files can be easily created with GMSH http://www.geuz.org/gmsh/
+	Example added to scripts/test/regular-sphere-pack.py"""
+	infile = open(meshfile,"r")
+	lines = infile.readlines()
+	infile.close()
+
+	nodelistVector3=[]
+	numNodes = int(lines[4].split()[0])
+	for i in range(numNodes):
+		nodelistVector3.append(Vector3(0.0,0.0,0.0))
+	id = 0
+	for line in lines[5:numNodes+5]:
+		data = line.split()
+		X = float(data[0])
+		Y = float(data[1])
+		Z = float(data[2])
+		nodelistVector3[id] = Vector3(X,Y,Z)
+		id += 1
+	numTriangles = int(lines[numNodes+6].split()[0])
+	triList = []
+	for i in range(numTriangles):
+		triList.append([0,0,0,0])
+	 
+	tid = 0
+	for line in lines[numNodes+7:numNodes+7+numTriangles]:
+		data = line.split()
+		id1 = int(data[0])-1
+		id2 = int(data[1])-1
+		id3 = int(data[2])-1
+		triList[tid][0] = tid
+		triList[tid][1] = id1
+		triList[tid][2] = id2
+		triList[tid][3] = id3
+		tid += 1
+		ret=[]
+	for i in triList:
+		a=nodelistVector3[i[1]]
+		b=nodelistVector3[i[2]]
+		c=nodelistVector3[i[3]]
+		ret.append(facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
+	return ret
+
+
 def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	"""Create .ogg video from external image files.
 	

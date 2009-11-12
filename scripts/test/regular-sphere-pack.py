@@ -50,10 +50,13 @@ q1 = Quaternion(Vector3(0,0,1),(3.14159))
 o1,o_angl = q1.ToAxisAngle()
 O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
 
+kwMeshes={'frictionAngle':0.5,'color':[1,1,0],'wire':True,'dynamic':False}
+O.bodies.append(utils.import_mesh_geometry('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
 try:
 	from yade import qt
 	qt.Controller()
+	qt.View()
 except ImportError: pass
 
 O.engines=[
