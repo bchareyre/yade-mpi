@@ -3,6 +3,12 @@
 #
 # I doubt there functions will be useful for anyone besides me.
 #
+"""Miscillaneous functions that are not believed to be generally usable,
+therefore kept in my "private" module here.
+
+They comprise notably oofem export and various CPM-related functions.
+"""
+
 from yade.wrapper import *
 from math import *
 from yade._eudoxos import * ## c++ implementations

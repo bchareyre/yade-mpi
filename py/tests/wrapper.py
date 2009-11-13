@@ -1,13 +1,16 @@
+# 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+
+"""
+This test module covers python/c++ transitions, for both classes deriving from Serializable,
+but also for other classes that we wrap (like Wm3).
+"""
+
 import unittest
 from yade.wrapper import *
 from miniWm3Wrap import *
 from yade._customConverters import *
 from math import *
 
-"""
-This test module covers python/c++ transitions, for both classes deriving from Serializable,
-but also for other classes that we wrap (like Wm3).
-"""
 
 # copied from PythonUI_rc, should be in some common place (utils? runtime?)
 def listChildClassesRecursive(base):

@@ -1,3 +1,7 @@
+# encoding: utf-8
+# 2008 © Václav Šmilauer <eudoxos@arcig.cz>
+"""Access/manipulation of the qt3-based yade gui."""
+
 # import module parts in c++ 
 from _qt import *
 

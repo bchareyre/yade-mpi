@@ -1,3 +1,5 @@
+# 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+"""All defined functionality tests for yade."""
 import unittest 
 
 # add any new test suites to the list here, so that they are picked up by testAll

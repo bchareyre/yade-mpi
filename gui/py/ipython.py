@@ -4,6 +4,8 @@
 #
 # Therefore, it is execfile'd at ipython startup
 #
+"""Yade-specific command-line completion hooks for in ipython (experimental)"""
+
 def yade_completers(self, event):
 	# this should parse the incomplete line and return only the object that pertains to this ['
 	# it will work fine in cases like b['clum<TAB> if b is a Body, but not in b['id']+b2['id

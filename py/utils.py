@@ -2,7 +2,12 @@
 #
 # utility functions for yade
 #
-# 2008 © Václav Šmilauer <eudoxos@arcig.cz>
+# 2008-2009 © Václav Šmilauer <eudoxos@arcig.cz>
+
+"""Heap of functions that don't (yet) fit anywhere else.
+
+Devs: please DO NOT ADD more functions here, it is getting too crowded!
+"""
 
 import math,random
 from yade.wrapper import *
@@ -533,8 +538,7 @@ def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
 def NormalRestitution2DampingRate(en):
-        """Compute the normal damping rate as a function of the normal coefficient of restitution.
-        """
+	"""Compute the normal damping rate as a function of the normal coefficient of restitution. """
 	if en == 0.0: return 0.999999999
 	if en == 1.0: return 0.0
 	from math import sqrt,log,pi

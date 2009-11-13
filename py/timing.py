@@ -1,4 +1,10 @@
 # encoding: utf-8
+# 2008 © Václav Šmilauer <eudoxos@arcig.cz>
+"""Functions for accessing timing information stored in engines and functors.
+See https://yade.hmg.inpg.fr/index.php/Speed_profiling_using_TimingInfo_and_TimingDeltas_classes
+for more details on usage."""
+
+
 def _resetEngine(e):
 	if e.timingDeltas: e.timingDeltas.reset()
 	if e.__class__.__name__=='EngineUnit': return
@@ -9,6 +15,7 @@ def _resetEngine(e):
 	e.execTime,e.execCount=0,0
 
 def reset():
+	"Zero all timing data."
 	for e in O.engines: _resetEngine(e)
 
 _statCols={'label':40,'count':20,'time':20,'relTime':20}
@@ -58,6 +65,28 @@ def _engines_stats(engines,totalTime,level):
 	return lines
 
 def stats():
+	"""Print summary table of timing information from engines and functors. Absolute times as well as percentages are given. Sample output::
+	
+		Name                                                    Count                 Time            Rel. time
+		-------------------------------------------------------------------------------------------------------
+		PhysicalActionContainerReseter                      400               9449μs                0.01%      
+		BoundingVolumeMetaEngine                            400            1171770μs                1.15%      
+		PersistentSAPCollider                               400            9433093μs                9.24%      
+		InteractionGeometryMetaEngine                       400           15177607μs               14.87%      
+		InteractionPhysicsMetaEngine                        400            9518738μs                9.33%      
+		ConstitutiveLawDispatcher                           400           64810867μs               63.49%      
+		  ef2_Spheres_Brefcom_BrefcomLaw                                                                       
+			 setup                                           4926145            7649131μs               15.25%  
+			 geom                                            4926145           23216292μs               46.28%  
+			 material                                        4926145            8595686μs               17.14%  
+			 rest                                            4926145           10700007μs               21.33%  
+			 TOTAL                                                             50161117μs              100.00%  
+		"damper"                                            400            1866816μs                1.83%      
+		"strainer"                                          400              21589μs                0.02%      
+		"plotDataCollector"                                 160              64284μs                0.06%      
+		"damageChecker"                                       9               3272μs                0.00%      
+		TOTAL                                                            102077490μs              100.00%      
+	"""
 	print 'Name'.ljust(_statCols['label'])+' '+'Count'.rjust(_statCols['count'])+' '+'Time'.rjust(_statCols['time'])+' '+'Rel. time'.rjust(_statCols['relTime'])
 	print '-'*(sum([_statCols[k] for k in _statCols])+len(_statCols)-1)
 	_engines_stats(O.engines,sum([e.execTime for e in O.engines]),0)

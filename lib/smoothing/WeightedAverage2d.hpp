@@ -52,7 +52,7 @@ struct GridContainer{
 	const Vector2i& getSize() const{ return nCells;}
 
 	// add new element to the right cell
-	void add(const T& t, Vector2r xy){Vector2i cxy=xy2cell(xy); grid[cxy[0]][cxy[1]].push_back(t);}
+	void add(const T& t, Vector2r xy){bool inGrid; Vector2i cxy=xy2cell(xy,&inGrid); if(!inGrid){ if(cxy[0]<0) cxy[0]=0; if(cxy[0]>=nCells[0]) cxy[0]=nCells[0]-1; if(cxy[1]<0) cxy[1]=0; if(cxy[1]>=nCells[1]) cxy[1]=nCells[1]-1; } grid[cxy[0]][cxy[1]].push_back(t);}
 
 	/* Filters: return list of cells, based on some spatial criterion: rectangle, ellipse, circle (add more if you need that) */
 	vector<Vector2i> rectangleFilter(Vector2r bbLo, Vector2r bbHi) const {
@@ -161,9 +161,10 @@ class pyGaussAverage{
 	struct Poly2d{vector<Vector2r> vertices; bool inclusive;};
 	vector<Poly2d> clips;
 	public:
-	pyGaussAverage(python::tuple lo, python::tuple hi, python::tuple nCells, Real stDev){
+	pyGaussAverage(python::tuple lo, python::tuple hi, python::tuple nCells, Real stDev, Real relThreshold=3.){
 		shared_ptr<GridContainer<Scalar2d> > g(new GridContainer<Scalar2d>(tuple2vec2r(lo),tuple2vec2r(hi),tuple2vec2i(nCells)));
 		sgda=shared_ptr<SGDA_Scalar2d>(new SGDA_Scalar2d(g,stDev));
+		sgda->relThreshold=relThreshold;
 	}
 	bool pointInsidePolygon(const Vector2r&,const vector<Vector2r>&);
 	bool ptIsClipped(const Vector2r& pt){

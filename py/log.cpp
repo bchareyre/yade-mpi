@@ -45,6 +45,7 @@ enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 #endif
 
 BOOST_PYTHON_MODULE(log){
+	python::scope().attr("__doc__") = "Acess and manipulation of log4cxx loggers.";
 	python::def("setLevel",logSetLevel,"Set minimum severity level (constants TRACE,DEBUG,INFO,WARN,ERROR,FATAL) for given logger\nleading 'yade.' will be appended automatically to the logger name; if logger is '', the root logger 'yade' will be operated on.");
 	python::scope().attr("TRACE")=(int)ll_TRACE;
 	python::scope().attr("DEBUG")=(int)ll_DEBUG;

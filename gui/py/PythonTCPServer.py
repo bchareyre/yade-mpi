@@ -1,3 +1,11 @@
+# encoding: utf-8
+# 2008-2009 © Václav Šmilauer <eudoxos@arcig.cz>
+"""
+Remote connections to yade: authenticated python command-line over telnet and anonymous socket for getting some read-only information about current simulation.
+
+These classes are used internally in gui/py/PythonUI_rc.py and are not intended for direct use.
+"""
+
 import SocketServer
 import sys,time
 
@@ -5,7 +13,7 @@ from yade.wrapper import *
 
 class InfoSocketProvider(SocketServer.BaseRequestHandler):
 	"""Class providing dictionary of important simulation information,
-	without authenticating the access"""
+	without authenticating the access."""
 	def handle(self):
 		import pickle, os
 		O=Omega()
@@ -14,6 +22,11 @@ class InfoSocketProvider(SocketServer.BaseRequestHandler):
 		
 
 class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
+	"""Class emulating python command-line over a socket connection.
+
+	The connection is authenticated by requiring a cookie.
+	Only connections from localhost (127.0.0.*) are allowed.
+	"""
 	def setup(self):
 		if not self.client_address[0].startswith('127.0.0'):
 			print "TCP Connection from non-127.0.0.* address %s rejected"%self.client_address[0]
@@ -72,6 +85,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 		self.request.send('\nBye ' + str(self.client_address) + '\n')
 
 class GenericTCPServer:
+	"Base class for socket server, handling port allocation, initial logging and thead backgrounding."
 	def __init__(self,handler,title,cookie=True,minPort=9000,host='',maxPort=65536,background=True):
 		import socket, random
 		self.port=-1

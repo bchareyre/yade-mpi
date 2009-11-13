@@ -634,6 +634,7 @@ namespace boost { namespace python { namespace detail {
 
 BOOST_PYTHON_MODULE(wrapper)
 {
+	python::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")

@@ -1,5 +1,18 @@
 # encoding: utf-8
-#
+# 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+"""
+Creating packings and filling volumes defined by boundary representation or constructive solid geometry.
+
+For examples, see
+	- scripts/test/gts-horse.py
+	- scripts/test/gts-operators.py
+	- scripts/test/gts-random-pack-obb.py
+	- scripts/test/gts-random-pack.py
+	- scripts/test/pack-cloud.py
+	- scripts/test/pack-predicates.py
+	- scripts/test/regular-sphere-pack.py
+"""
+
 import itertools,warnings
 from numpy import arange
 from math import sqrt
