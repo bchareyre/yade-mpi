@@ -189,16 +189,27 @@ void InsertionSortCollider::action(MetaBody* rb){
 	// copy bounds along given axis into our arrays
 		for(size_t i=0; i<2*nBodies; i++){
 			const body_id_t& idXX=XX[i].id; const body_id_t& idYY=YY[i].id; const body_id_t& idZZ=ZZ[i].id;
-			const shared_ptr<BoundingVolume>& bvXX=Body::byId(idXX,rb)->boundingVolume; const shared_ptr<BoundingVolume>& bvYY=Body::byId(idYY,rb)->boundingVolume; const shared_ptr<BoundingVolume>& bvZZ=Body::byId(idZZ,rb)->boundingVolume;
-			// copy bounds from boundingVolume if there is one, otherwise use position; store what was used in the flags.hasBB bit
-			XX[i].coord=(XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (Body::byId(idXX,rb)->physicalParameters->se3.position[0]);
-			YY[i].coord=(YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (Body::byId(idYY,rb)->physicalParameters->se3.position[1]);
-			ZZ[i].coord=(ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (Body::byId(idZZ,rb)->physicalParameters->se3.position[2]);
+			const shared_ptr<Body>& bXX=Body::byId(idXX,rb); const shared_ptr<Body>& bYY=Body::byId(idYY,rb); const shared_ptr<Body>& bZZ=Body::byId(idZZ,rb);
+			if(bXX){
+				const shared_ptr<BoundingVolume>& bvXX=bXX->boundingVolume;
+				XX[i].coord=(XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (bXX->physicalParameters->se3.position[0]);
+			} else { XX[i].flags.hasBB=false; /* XX[i].coord=0; */ }
+			if(bYY){
+				const shared_ptr<BoundingVolume>& bvYY=bYY->boundingVolume;
+				YY[i].coord=(YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (bYY->physicalParameters->se3.position[1]);
+			} else { YY[i].flags.hasBB=false; /* YY[i].coord=0; */ }
+			if(bZZ){
+				const shared_ptr<BoundingVolume>& bvZZ=bZZ->boundingVolume;
+				ZZ[i].coord=(ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (bZZ->physicalParameters->se3.position[2]);
+			} else { ZZ[i].flags.hasBB=false; /* ZZ[i].coord=0; */ }
 			// and for each body, copy its minima and maxima arrays as well
 			if(XX[i].flags.isMin){
 				BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
-				if(bvXX) { memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
-				else{ const Vector3r& pos=Body::byId(idXX,rb)->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
+				if(bXX){
+					const shared_ptr<BoundingVolume>& bvXX=bXX->boundingVolume;
+					if(bvXX) { memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
+					else{ const Vector3r& pos=bXX->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
+				} else { memset(&minima[3*idXX],0,3*sizeof(Real)); memset(&maxima[3*idXX],0,3*sizeof(Real)); }
 			}
 		}
 	ISC_CHECKPOINT("copy");

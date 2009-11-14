@@ -29,6 +29,7 @@ void SpiralEngine::applyCondition(MetaBody* rb){
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)bodies->size());
 		Body* b=Body::byId(id,rb).get();
+		if(!b) continue;
 		RigidBodyParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		assert(rbp);
 		// translation

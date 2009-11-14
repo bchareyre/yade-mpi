@@ -93,7 +93,7 @@ class InsertionSortCollider: public Collider{
 	// This makes the collider non-persistent, not remembering last state
 	bool sortThenCollide;
 	//! Predicate called from loop within InteractionContainer::erasePending
-	bool shouldBeErased(body_id_t id1, body_id_t id2, MetaBody*) const { return !spatialOverlap(id1,id2); }
+	bool shouldBeErased(body_id_t id1, body_id_t id2, MetaBody* rb) const { return !spatialOverlap(id1,id2); }
 	#ifdef COLLIDE_STRIDED
 		virtual bool isActivated(MetaBody*);
 	#endif

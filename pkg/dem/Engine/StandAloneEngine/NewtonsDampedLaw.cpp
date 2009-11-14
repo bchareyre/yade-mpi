@@ -60,6 +60,7 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	#else
 		FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 	#endif
+			if(!b) continue;
 			RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 			const body_id_t& id=b->getId();
 			// clump members are non-dynamic; we only get their velocities here

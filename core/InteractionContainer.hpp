@@ -113,19 +113,19 @@ class InteractionContainer : public Serializable
 		bool serializeSorted;
 
 		// std::pair is not handled by yade::serialization, use vector<body_id_t> instead
-		typedef Vector2<body_id_t> bodyIdPair;
 		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state)
 		//! and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
-		void requestErase(body_id_t id1, body_id_t id2);
-		/*! List of pairs of interactions that will be (maybe) erased by the collider;
+		void requestErase(body_id_t id1, body_id_t id2, bool force=false);
+		/*! List of pairs of interactions that will be (maybe) erased by the collider; if force==true, they will be deleted unconditionally.
 			
 			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you)
 			If there is, at one point, a multi-threaded collider, pendingEraseMutex should be moved to the public part and used from there as well.
 		*/
+		struct IdsForce{ body_id_t id1; body_id_t id2; bool force; };
 		#ifdef YADE_OPENMP
-			vector<list<bodyIdPair> > threadsPendingErase;
+			vector<list<IdsForce> > threadsPendingErase;
 		#endif
-		list<bodyIdPair> pendingErase;
+		list<IdsForce> pendingErase;
 		/*! Erase all pending interactions unconditionally.
 
 			This should be called only in rare cases that collider is not used but still interactions should be erased.
@@ -157,9 +157,12 @@ class InteractionContainer : public Serializable
 			int ret=0;
 			#ifdef YADE_OPENMP
 				// shadow the this->pendingErase by the local variable, to share the code
-				FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
+				FOREACH(list<IdsForce>& pendingErase, threadsPendingErase){
 			#endif
-					FOREACH(const Vector2<body_id_t>& p, pendingErase){ ret++; if(t.shouldBeErased(p[0],p[1],rb)) erase(p[0],p[1]); }
+					FOREACH(const IdsForce& p, pendingErase){
+						ret++;
+						if(p.force || t.shouldBeErased(p.id1,p.id2,rb)) erase(p.id1,p.id2);
+					}
 					pendingErase.clear();
 			#ifdef YADE_OPENMP
 				}
@@ -172,7 +175,7 @@ class InteractionContainer : public Serializable
 	protected :
 		virtual void preProcessAttributes(bool deserializing);
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(Serializable,(interaction)(pendingErase)(serializeSorted));
+	REGISTER_ATTRIBUTES(Serializable,(interaction)(serializeSorted));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
 

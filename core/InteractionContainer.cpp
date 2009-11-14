@@ -11,8 +11,8 @@
 #include "InteractionContainer.hpp"
 #include<omp.h>
 
-void InteractionContainer::requestErase(body_id_t id1, body_id_t id2){
-	find(id1,id2)->reset(); bodyIdPair v(id1,id2);
+void InteractionContainer::requestErase(body_id_t id1, body_id_t id2, bool force){
+	find(id1,id2)->reset(); IdsForce v={id1,id2,force};
 	#ifdef YADE_OPENMP
 		threadsPendingErase[omp_get_thread_num()].push_back(v);
 	#else
@@ -22,7 +22,7 @@ void InteractionContainer::requestErase(body_id_t id1, body_id_t id2){
 
 void InteractionContainer::clearPendingErase(){
 	#ifdef YADE_OPENMP
-		FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
+		FOREACH(list<IdsForce>& pendingErase, threadsPendingErase){
 			pendingErase.clear();
 		}
 	#else
@@ -35,10 +35,10 @@ int InteractionContainer::unconditionalErasePending(){
 	int ret=0;
 	#ifdef YADE_OPENMP
 		// shadow this->pendingErase by the local variable, to share code
-		FOREACH(list<bodyIdPair>& pendingErase, threadsPendingErase){
+		FOREACH(list<IdsForce>& pendingErase, threadsPendingErase){
 	#endif
 			if(!pendingErase.empty()){
-				FOREACH(const bodyIdPair& p, pendingErase){ ret++; erase(p[0],p[1]); }
+				FOREACH(const IdsForce& p, pendingErase){ ret++; erase(p.id1,p.id2); }
 				pendingErase.clear();
 			}
 	#ifdef YADE_OPENMP

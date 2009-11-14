@@ -20,6 +20,7 @@ void GravityEngine::applyCondition(MetaBody* ncb){
 	 * The choice is to skip (b->isClumpMember()) or (b->isClump()). We rather skip members,
 	 * since that will apply smaller number of forces. */
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
+		if(!b) continue;
 		if(b->isClumpMember()) continue;
 		shared_ptr<ParticleParameters> p=YADE_PTR_CAST<ParticleParameters>(b->physicalParameters);
 		if(p!=0) //not everything derives from ParticleParameters; this line was    assert(p); - Janek

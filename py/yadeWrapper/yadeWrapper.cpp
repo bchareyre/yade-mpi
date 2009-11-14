@@ -170,6 +170,14 @@ class pyBodyContainer{
 	vector<body_id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return insertList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
+	bool fastErase(body_id_t id){ return proxee->erase(id); }
+	bool erase(body_id_t id){
+		const shared_ptr<InteractionContainer> interactions(Omega::instance().getRootBody()->interactions);
+		FOREACH(const shared_ptr<Interaction>& I, *interactions){
+			if(I->getId1()==id || I->getId2()==id) { interactions->requestErase(I->getId1(),I->getId2(),/*force*/ true); /* cerr<<"RequestErase'd intr #"<<I->getId1()<<"+#"<<I->getId2()<<endl;*/ }
+		}
+		return proxee->erase(id);
+	}
 };
 
 
@@ -690,22 +698,23 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
 		.def("__len__",&pyBodyContainer::length)
-		.def("append",&pyBodyContainer::insert)
-		.def("append",&pyBodyContainer::insertList)
-		.def("appendClumped",&pyBodyContainer::insertClump)
-		.def("clear", &pyBodyContainer::clear)
+		.def("append",&pyBodyContainer::insert,"Append one Body instance, return its id.")
+		.def("append",&pyBodyContainer::insertList,"Append list of Body instance, return list of ids")
+		.def("appendClumped",&pyBodyContainer::insertClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids")
+		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
+		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; deletes all interactions of this body as well (entails loop over all itrs)")
+		.def("fastErase", &pyBodyContainer::fastErase,"Erase body unconditionally, without checking its involvment in interactions.")
 		.def("replace",&pyBodyContainer::replace);
 	python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
-		.def("countReal",&pyInteractionContainer::countReal)
-		.def("nth",&pyInteractionContainer::pyNth)
-		.def("withBody",&pyInteractionContainer::withBody)
-		.def("withBodyAll",&pyInteractionContainer::withBodyAll)
+		.def("countReal",&pyInteractionContainer::countReal,"Return number of interactions that are \"real\", i.e. they have phys and geom.")
+		.def("nth",&pyInteractionContainer::pyNth,"Return n-th interaction from the container (usable for picking random interaction).")
+		.def("withBody",&pyInteractionContainer::withBody,"Return list of real interactions of given body.")
+		.def("withBodyAll",&pyInteractionContainer::withBodyAll,"Return list of all (real as well as non-real) interactions of given body.")
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
-		.def("nth",&pyInteractionContainer::pyNth)
-		.def("clear",&pyInteractionContainer::clear);
+		.def("clear",&pyInteractionContainer::clear,"Remove all interactions");
 	python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);

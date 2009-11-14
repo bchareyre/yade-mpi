@@ -48,6 +48,9 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
 
+			#ifndef NDEBUG
+				if(!b1_ || !b2_){ LOG_ERROR("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); rootBody->interactions->requestErase(I->getId1(),I->getId2()); continue; }
+			#endif
 			// go fast if this pair of bodies cannot interact at all
 			if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
 

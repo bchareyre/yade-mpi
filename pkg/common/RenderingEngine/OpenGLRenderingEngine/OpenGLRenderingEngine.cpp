@@ -89,7 +89,7 @@ void OpenGLRenderingEngine::initgl(){
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b->geometricalModel) continue;
+		if(!b || !b->geometricalModel) continue;
 		glPushMatrix();
 		const Se3r& se3=b->physicalParameters->se3;
 		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
@@ -112,7 +112,7 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 
 void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b->physicalParameters) b->physicalParameters->refSe3=b->physicalParameters->se3;
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b && b->physicalParameters) b->physicalParameters->refSe3=b->physicalParameters->se3;
 	numBodiesWhenRefSe3LastSet=rootBody->bodies->size();
 	numIterWhenRefSe3LastSet=Omega::instance().getCurrentIteration();
 }
@@ -130,7 +130,7 @@ Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, MetaBody* rb){
 
 void OpenGLRenderingEngine::setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b->physicalParameters) continue;
+		if(!b || !b->physicalParameters) continue;
 		const Se3r& se3=b->physicalParameters->se3; const Se3r& refSe3=b->physicalParameters->refSe3; Se3r& dispSe3=b->physicalParameters->dispSe3;
 		Vector3r posCell=wrapCellPt(se3.position,rootBody.get());
 		b->physicalParameters->isDisplayed=!pointClipped(posCell);
@@ -392,7 +392,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position){	
 	if (!rootBody->geometricalModel){
 		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-			if(!b->physicalParameters->isDisplayed) continue;
+			if(!b || !b->physicalParameters->isDisplayed) continue;
 			if (b->geometricalModel->shadowCaster && ( (b->getGroupMask() & Draw_mask) || b->getGroupMask()==0 ))
 				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,Light_position);
 		}
@@ -405,6 +405,7 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
 	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
 		FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
+			if(!b) continue;
 			if(b->geometricalModel && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
 				if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 				if(!Show_ID && b->physicalParameters->blockedDOFs==0) continue;
@@ -447,6 +448,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
 	if(!Draw_inside) return;
 	FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
+		if(!b) continue;
 		if(!b->geometricalModel || (!((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0))) continue;
 		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 		const Se3r& se3=b->physicalParameters->dispSe3;
@@ -545,6 +547,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 
 void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody){	
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(!b) continue;
 		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 		if(b->physicalParameters && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
 			glPushMatrix(); stateDispatcher(b->physicalParameters); glPopMatrix();
@@ -556,6 +559,7 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody){
 
 void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody){	
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(!b) continue;
 		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 		if(b->boundingVolume && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
 			glPushMatrix(); boundingVolumeDispatcher(b->boundingVolume); glPopMatrix();
@@ -574,6 +578,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		glEnable(GL_CLIP_PLANE0);
 	#endif
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(!b) continue;
 		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
 		const Se3r& se3=b->physicalParameters->dispSe3;
 		if(b->interactingGeometry && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){

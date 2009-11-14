@@ -107,7 +107,7 @@ unsigned int BodyRedirectionVector::insert(shared_ptr<Body>& b)
 //			tmpViiEnd = bodies.end();
 //			for( ; tmpVii != tmpViiEnd ; ++tmpVii )
 //				if(newPosition == (*tmpVii)->getId() )
-			if( (indexes.size() > newPosition)  && (indexes[newPosition] != -1) )
+			if((indexes.size() > newPosition)  && exists(newPosition))
 					newUsed = true;
 		}
 		//cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break transientInteractions for this body!\n";
@@ -151,7 +151,10 @@ bool BodyRedirectionVector::erase(unsigned int id)
 //			return true;
 //		}
 //	return false;
-
+	if(!exists(id)) return false;
+	bodies[indexes[id]]=shared_ptr<Body>();
+	return true;
+#if 0
 	long int deleted = indexes[id];
 	if( deleted != -1 )
 	{
@@ -170,12 +173,13 @@ bool BodyRedirectionVector::erase(unsigned int id)
 	}
 	else
 		return false;
+#endif
 }
 
 
 bool BodyRedirectionVector::exists(unsigned int id) const
 {
-        return id<indexes.size() && (indexes[id] != -1);
+        return id<indexes.size() && (indexes[id] != -1) && (bool)bodies[indexes[id]];
 }
 
 bool BodyRedirectionVector::find(unsigned int id , shared_ptr<Body>& b) const

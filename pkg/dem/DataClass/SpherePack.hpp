@@ -4,6 +4,7 @@
 
 #include<vector>
 #include<string>	
+#include<limits>
 using namespace std; // sorry
 
 #ifdef YADE_PYTHON
