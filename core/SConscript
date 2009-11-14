@@ -26,7 +26,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'yade.cpp',
 			'containers/BodyRedirectionVector.cpp',
 			'containers/BodyVector.cpp',
-			'containers/InteractionHashMap.cpp',
 			'containers/InteractionVecMap.cpp',
 			]),
 		LIBS=env['LIBS']+[

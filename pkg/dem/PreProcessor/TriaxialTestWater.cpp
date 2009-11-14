@@ -185,7 +185,6 @@ bool TriaxialTestWater::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-	//rootBody->transientInteractions		= shared_ptr<InteractionContainer>(new InteractionHashMap);
 
 	shared_ptr<Body> body;
 	

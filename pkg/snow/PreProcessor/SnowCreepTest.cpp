@@ -57,7 +57,6 @@
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/core/BodyRedirectionVector.hpp>
-#include<yade/core/InteractionHashMap.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 
