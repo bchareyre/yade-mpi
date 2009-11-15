@@ -81,7 +81,8 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	#endif
 
 	// HACK
-	if(!guiMayDisappear && Omega::instance().getSimulationFileName()!="") createController();
+	// if(!guiMayDisappear && Omega::instance().getSimulationFileName()!="") createController();
+	if(!guiMayDisappear) createController();
 
 
 	// updates GL views, may also hide/show this window as needed

@@ -417,7 +417,7 @@ void TetraLaw::action(MetaBody* rootBody)
 
 #ifdef YADE_OPENGL
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>&,bool)
+	void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 		glColor3v(cm->diffuseColor);

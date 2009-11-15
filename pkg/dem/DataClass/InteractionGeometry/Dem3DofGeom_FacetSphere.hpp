@@ -34,22 +34,22 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	REGISTER_CLASS_AND_BASE(Dem3DofGeom_FacetSphere,Dem3DofGeom);
 	REGISTER_CLASS_INDEX(Dem3DofGeom_FacetSphere,Dem3DofGeom);
 	DECLARE_LOGGER;
-	friend class GLDraw_Dem3DofGeom_FacetSphere;
+	friend class Gl1_Dem3DofGeom_FacetSphere;
 	friend class ef2_Facet_Sphere_Dem3DofGeom;
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom_FacetSphere);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class GLDraw_Dem3DofGeom_FacetSphere:public GLDrawInteractionGeometryFunctor{
+	class Gl1_Dem3DofGeom_FacetSphere:public GLDrawInteractionGeometryFunctor{
 		public:
 			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 			static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
 		RENDERS(Dem3DofGeom_FacetSphere);
-		REGISTER_CLASS_AND_BASE(GLDraw_Dem3DofGeom_FacetSphere,GLDrawInteractionGeometryFunctor);
+		REGISTER_CLASS_AND_BASE(Gl1_Dem3DofGeom_FacetSphere,GLDrawInteractionGeometryFunctor);
 		REGISTER_ATTRIBUTES(GLDrawInteractionGeometryFunctor, (normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel) );
 	};
-	REGISTER_SERIALIZABLE(GLDraw_Dem3DofGeom_FacetSphere);
+	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_FacetSphere);
 #endif
 
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>

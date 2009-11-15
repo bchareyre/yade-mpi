@@ -152,6 +152,10 @@ void SimulationController::pyOnelinerEnter(){
 #endif
 };
 
+void SimulationController::pbGenerate_clicked(){
+	YadeQtMainWindow::self->createGenerator();
+}
+
 void SimulationController::pbLoadClicked()
 {
 	pbStopClicked();
@@ -269,7 +273,7 @@ void SimulationController::pbSaveClicked()
 void SimulationController::pbNewViewClicked() {	addNewView(); }
 void SimulationController::addNewView(){ YadeQtMainWindow::self->createView(); }
 void SimulationController::pbCenterSceneClicked() { YadeQtMainWindow::self->centerViews(); }
-void SimulationController::closeEvent(QCloseEvent *){ /* switch to async run if running */ if(syncRunning) cbSyncToggled(false); emit closeSignal(); }
+void SimulationController::closeEvent(QCloseEvent *){ /* switch to async run if running */ if(syncRunning) cbSyncToggled(false); YadeQtMainWindow::self->Quit(); emit closeSignal(); }
 void SimulationController::pbStopClicked() { Omega::instance().stopSimulationLoop(); syncRunning=false; }
 void SimulationController::pbOneSimulationStepClicked(){pbStopClicked();Omega::instance().spawnSingleSimulationLoop();}
 void SimulationController::pbReferenceClicked() {if(YadeQtMainWindow::self->renderer) YadeQtMainWindow::self->renderer->setBodiesRefSe3(Omega::instance().getRootBody());}

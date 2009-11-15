@@ -28,6 +28,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 
 #include<yade/core/Body.hpp>
+#include<yade/core/BodyVector.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>

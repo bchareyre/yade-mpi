@@ -39,19 +39,20 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 	#ifdef SCG_SHEAR
 		functor->useShear=useShear;
 	#endif
+	functor->neverErase=neverErase;
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (ConstitutiveLawDispatcher does that already)
 			if(!dynamic_cast<SpheresContactGeometry*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
 		#endif
-			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody, neverErase);
+			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
 	}
 }
 
 
 CREATE_LOGGER(ef2_Spheres_Elastic_ElasticLaw);
-void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb, bool neverErase){
+void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb){
 	Real dt = Omega::instance().getTimeStep();
 
 			int id1 = contact->getId1(), id2 = contact->getId2();

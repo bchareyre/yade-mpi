@@ -81,7 +81,7 @@ void GLDrawLatticeInteractingGeometry::damagedNeighbor(unsigned int a)
 	//(*(bodies))[A]->geometricalModel->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0);
 };
 
-void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
+void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>& gm, const shared_ptr<PhysicalParameters>&,bool wire, const GLViewInfo&)
 {
 //	return;
 

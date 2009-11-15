@@ -12,6 +12,7 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
+#include<limits>
 
 
 void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
@@ -20,9 +21,9 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 						, const Body* body )
 {
 	AABB* aabb = static_cast<AABB*>(bv.get());
-	
-	Vector3r max(-Mathr::MAX_REAL,-Mathr::MAX_REAL,-Mathr::MAX_REAL);
-	Vector3r min( Mathr::MAX_REAL, Mathr::MAX_REAL, Mathr::MAX_REAL);
+	const Real& inf=std::numeric_limits<Real>::infinity();
+	Vector3r mx(-inf,-inf,-inf);
+	Vector3r mn(inf,inf,inf);
 	
 	const MetaBody * ncb = YADE_CAST<const MetaBody*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -34,21 +35,23 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 		shared_ptr<Body> b = *bi;
 		if(b->boundingVolume)
 		{
-	 		max = componentMaxVector(max,b->boundingVolume->max);
- 			min = componentMinVector(min,b->boundingVolume->min);
+			for(int i=0; i<3; i++){
+				if(!isinf(b->boundingVolume->max[i])) mx[i]=max(mx[i],b->boundingVolume->max[i]);
+				if(!isinf(b->boundingVolume->min[i])) mn[i]=min(mn[i],b->boundingVolume->min[i]);
+			}
 		} 
 		else
 		{
-	 		max = componentMaxVector(max,b->physicalParameters->se3.position);
- 			min = componentMinVector(min,b->physicalParameters->se3.position);
+	 		mx=componentMaxVector(mx,b->physicalParameters->se3.position);
+ 			mn=componentMinVector(mn,b->physicalParameters->se3.position);
 		}
 	}
 	
-	aabb->center = (max+min)*0.5;
-	aabb->halfSize = (max-min)*0.5;
+	aabb->center = (mx+mn)*0.5;
+	aabb->halfSize = (mx-mn)*0.5;
 	
-	aabb->min = min;
-	aabb->max = max;
+	aabb->min = mn;
+	aabb->max = mx;
 }
 	
 YADE_PLUGIN((MetaInteractingGeometry2AABB));

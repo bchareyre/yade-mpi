@@ -19,10 +19,27 @@ vector<Vector3r> GLDrawInteractingSphere::faces;
 
 bool GLDrawInteractingSphere::first = true;
 
+bool GLDrawInteractingSphere::wire=false;
+bool GLDrawInteractingSphere::glutUse=false;
+bool GLDrawInteractingSphere::glutNormalize=true;
+int  GLDrawInteractingSphere::glutSlices=12;
+int  GLDrawInteractingSphere::glutStacks=6;
+
 GLDrawInteractingSphere::GLDrawInteractingSphere(){first=true;};
 
-void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool wire)
+void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool wire2, const GLViewInfo&)
 {
+	if(glutUse){
+		Real r=(static_cast<InteractingSphere*>(cm.get()))->radius;
+		glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
+		glColor3v(cm->diffuseColor);
+		if(glutNormalize)	glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
+		 	if (wire || wire2) glutWireSphere(r,glutSlices,glutStacks);
+			else glutSolidSphere(r,glutSlices,glutStacks);
+		if(glutNormalize) glPopAttrib();
+		return;
+	}
+
 	//first=true;
 	
 	if (first)

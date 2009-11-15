@@ -51,6 +51,7 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Wall.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -163,6 +164,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	fast=false;
 	noFiles=false;
 	facetWalls=false;
+	wallWalls=false;
 
 	
 	
@@ -192,10 +194,11 @@ bool TriaxialTest::generate()
 		message="Biaxial test can be generated only if Z size is more than 8 times smaller than X size";
 		return false;
 	}
-	if(facetWalls && !fast){
-		LOG_WARN("Turning TriaxialTest::fast on, since facetWalls were selected.");
+	if((facetWalls||wallWalls) && !fast){
+		LOG_WARN("Turning TriaxialTest::fast on, since facetWalls or wallWalls were selected.");
 		fast=true;
 	}
+	if(facetWalls&&wallWalls){ LOG_WARN("Turning TriaxialTest::facetWalls off, since wallWalls were selected as well."); }
 	
 	shared_ptr<Body> body;
 
@@ -237,7 +240,7 @@ bool TriaxialTest::generate()
 
 
 	if(thickness<0) thickness=radiusMean;
-	if(facetWalls) thickness=0;
+	if(facetWalls || wallWalls) thickness=0;
 	
 	if(boxWalls)
 	{
@@ -438,7 +441,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->physicalParameters	= physics;
 
 
-	if(!facetWalls){
+	if(!facetWalls && !wallWalls){
 		shared_ptr<Box> gBox(new Box);
 		gBox->extents			= extents;
 		gBox->diffuseColor		= Vector3r(1,1,1);
@@ -450,8 +453,10 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		iBox->extents			= extents;
 		iBox->diffuseColor		= Vector3r(1,1,1);
 		body->interactingGeometry	= iBox;
-	} else {
-		int ax0 = extents[0]==0 ? 0 : (extents[1]==0 ? 1 : 2); int ax1=(ax0+1)%3, ax2=(ax0+2)%3;
+	}
+	// guess the orientation
+	int ax0 = extents[0]==0 ? 0 : (extents[1]==0 ? 1 : 2); int ax1=(ax0+1)%3, ax2=(ax0+2)%3;
+	if(facetWalls){
 		Vector3r corner=position-extents; // "lower right" corner, with 90 degrees
 		Vector3r side1(Vector3r::ZERO); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::ZERO); side2[ax2]=4*extents[ax2];
 		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
@@ -464,6 +469,13 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		body->geometricalModel=facet;
 		body->interactingGeometry=iFacet;
 	}
+	if(wallWalls){
+		shared_ptr<Wall> wall(new Wall);
+		wall->sense=0; // interact from both sides, since unspecified here
+		wall->axis=ax0;
+		// Wall has no geometricalModel, skip assignment to body->geometricalModel
+		body->interactingGeometry=wall;
+	}
 }
 
 
@@ -471,12 +483,13 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
-	if(!facetWalls){
+	if(!facetWalls && !wallWalls){
 		interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
 		interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 	} else {
 		interactionGeometryDispatcher->add("ef2_Sphere_Sphere_Dem3DofGeom");
 		interactionGeometryDispatcher->add("ef2_Facet_Sphere_Dem3DofGeom");
+		interactionGeometryDispatcher->add("ef2_Wall_Sphere_Dem3DofGeom");
 	}
 
 
@@ -487,7 +500,9 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 		
 	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add(facetWalls ? "InteractingFacet2AABB" : "InteractingBox2AABB");
+	boundingVolumeDispatcher->add("InteractingBox2AABB");
+	boundingVolumeDispatcher->add("InteractingFacet2AABB");
+	boundingVolumeDispatcher->add("Wall2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
@@ -579,7 +594,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
 			ids->constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
-			if(!facetWalls){
+			if(!facetWalls && !wallWalls){
 				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw); see->sdecGroupMask=2;
 				ids->constLawDispatcher->add(see);
 			} else {

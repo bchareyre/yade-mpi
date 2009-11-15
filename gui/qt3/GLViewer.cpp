@@ -506,6 +506,11 @@ float GLViewer::displayedSceneRadius(){
 
 void GLViewer::postDraw(){
 	Real wholeDiameter=QGLViewer::camera()->sceneRadius()*2;
+
+	renderer->viewInfo.sceneRadius=QGLViewer::camera()->sceneRadius();
+	qglviewer::Vec c=QGLViewer::camera()->sceneCenter();
+	renderer->viewInfo.sceneCenter=Vector3r(c[0],c[1],c[2]);
+
 	Real dispDiameter=min(wholeDiameter,max((Real)displayedSceneRadius()*2,wholeDiameter/1e3)); // limit to avoid drawing 1e5 lines with big zoom level
 	//qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
 	Real gridStep=pow(10,(floor(log10(dispDiameter)-.7)));

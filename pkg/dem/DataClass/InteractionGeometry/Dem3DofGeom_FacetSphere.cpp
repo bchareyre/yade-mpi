@@ -1,9 +1,10 @@
+// © Václav Šmilauer <eudoxos@arcig.cz>
 #include "Dem3DofGeom_FacetSphere.hpp"
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 YADE_PLUGIN((Dem3DofGeom_FacetSphere)
 	#ifdef YADE_OPENGL
-		(GLDraw_Dem3DofGeom_FacetSphere)
+		(Gl1_Dem3DofGeom_FacetSphere)
 	#endif	
 		(ef2_Facet_Sphere_Dem3DofGeom));
 
@@ -161,13 +162,13 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	#include<yade/lib-opengl/GLUtils.hpp>
 
-	bool GLDraw_Dem3DofGeom_FacetSphere::normal=false;
-	bool GLDraw_Dem3DofGeom_FacetSphere::rolledPoints=false;
-	bool GLDraw_Dem3DofGeom_FacetSphere::unrolledPoints=false;
-	bool GLDraw_Dem3DofGeom_FacetSphere::shear=false;
-	bool GLDraw_Dem3DofGeom_FacetSphere::shearLabel=false;
+	bool Gl1_Dem3DofGeom_FacetSphere::normal=false;
+	bool Gl1_Dem3DofGeom_FacetSphere::rolledPoints=false;
+	bool Gl1_Dem3DofGeom_FacetSphere::unrolledPoints=false;
+	bool Gl1_Dem3DofGeom_FacetSphere::shear=false;
+	bool Gl1_Dem3DofGeom_FacetSphere::shearLabel=false;
 
-	void GLDraw_Dem3DofGeom_FacetSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_Dem3DofGeom_FacetSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_FacetSphere* fs = static_cast<Dem3DofGeom_FacetSphere*>(ig.get());
 		//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
 		const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;

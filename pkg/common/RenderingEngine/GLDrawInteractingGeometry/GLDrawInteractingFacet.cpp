@@ -12,7 +12,7 @@
 
 
 
-void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool)
+void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool,const GLViewInfo&)
 {   
     InteractingFacet* facet = static_cast<InteractingFacet*>(cm.get());
     const vector<Vector3r>& vertices = facet->vertices;

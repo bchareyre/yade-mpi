@@ -33,6 +33,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		static bool glutInitDone;
 		static size_t selectBodyLimit;
 		Vector3r viewDirection; // updated from GLViewer regularly
+		GLViewInfo viewInfo; // update from GLView regularly
 		Vector3r highlightEmission0;
 		Vector3r highlightEmission1;
 		// normalized saw signal with given periodicity, with values ∈ 〈0,1〉 */
@@ -52,7 +53,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 		DynLibDispatcher< PhysicalParameters  , GLDrawStateFunctor,               void , TYPELIST_1(const shared_ptr<PhysicalParameters>&) > stateDispatcher;
 		DynLibDispatcher< BoundingVolume      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-		DynLibDispatcher< InteractingGeometry , GLDrawInteractingGeometryFunctor, void , TYPELIST_3(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool) > interactingGeometryDispatcher;
+		DynLibDispatcher< InteractingGeometry , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&) > interactingGeometryDispatcher;
 		// FIXME - in fact it is a 1D dispatcher
 		DynLibDispatcher< GeometricalModel    , GLDrawGeometricalModelFunctor,    void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, bool) > geometricalModelDispatcher;
 		DynLibDispatcher< GeometricalModel    , GLDrawShadowVolumeFunctor,        void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;

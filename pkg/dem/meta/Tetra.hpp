@@ -110,7 +110,7 @@ REGISTER_SERIALIZABLE(TetraAABB);
 	class TetraDraw: public GLDrawInteractingGeometryFunctor
 	{	
 		public:
-			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 			RENDERS(TetraMold);
 			REGISTER_CLASS_NAME(TetraDraw);

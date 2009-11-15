@@ -10,7 +10,7 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&,bool)
+void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cg->diffuseColor[0],cg->diffuseColor[1],cg->diffuseColor[2]));

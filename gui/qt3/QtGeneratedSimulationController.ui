@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>252</width>
-            <height>563</height>
+            <width>266</width>
+            <height>558</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -29,14 +29,14 @@
     <property name="frameShadow">
         <enum>Plain</enum>
     </property>
-    <vbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
         <property name="margin">
             <number>0</number>
         </property>
-        <widget class="QLayoutWidget">
+        <widget class="QLayoutWidget" row="0" column="0" rowspan="1" colspan="3">
             <property name="name">
                 <cstring>layout8</cstring>
             </property>
@@ -142,122 +142,269 @@
                 </widget>
             </grid>
         </widget>
-        <widget class="QLayoutWidget">
+        <widget class="QPushButton" row="2" column="2">
             <property name="name">
-                <cstring>layout10</cstring>
+                <cstring>pbCenterScene_2</cstring>
             </property>
-            <grid>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Center</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="2">
+            <property name="name">
+                <cstring>pbZXY</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>50</height>
+                </size>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="pixmap">
+                <pixmap>image0</pixmap>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="1">
+            <property name="name">
+                <cstring>pbYZX</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>25</height>
+                </size>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="pixmap">
+                <pixmap>image1</pixmap>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="1">
+            <property name="name">
+                <cstring>pbReference</cstring>
+            </property>
+            <property name="text">
+                <string>Reference</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="0">
+            <property name="name">
+                <cstring>pbXYZ</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>25</height>
+                </size>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="pixmap">
+                <pixmap>image2</pixmap>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="0">
+            <property name="name">
+                <cstring>pbNewView_2</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>New 3D</string>
+            </property>
+        </widget>
+        <widget class="QTabWidget" row="1" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>tabWidget</cstring>
+            </property>
+            <property name="autoMask">
+                <bool>false</bool>
+            </property>
+            <property name="tabPosition">
+                <enum>Top</enum>
+            </property>
+            <property name="tabShape">
+                <enum>Rounded</enum>
+            </property>
+            <property name="margin">
+                <number>0</number>
+            </property>
+            <widget class="QWidget">
                 <property name="name">
-                    <cstring>unnamed</cstring>
+                    <cstring>tab</cstring>
                 </property>
-                <widget class="QPushButton" row="1" column="2">
+                <attribute name="title">
+                    <string>Simulation</string>
+                </attribute>
+                <grid>
                     <property name="name">
-                        <cstring>pbCenterScene_2</cstring>
+                        <cstring>unnamed</cstring>
                     </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>7</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Center</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="2">
-                    <property name="name">
-                        <cstring>pbZXY</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>3</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>50</height>
-                        </size>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="pixmap">
-                        <pixmap>image0</pixmap>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="1">
-                    <property name="name">
-                        <cstring>pbYZX</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>3</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>25</height>
-                        </size>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="pixmap">
-                        <pixmap>image1</pixmap>
-                    </property>
-                </widget>
-                <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
-                    <property name="name">
-                        <cstring>tabWidget</cstring>
-                    </property>
-                    <property name="autoMask">
-                        <bool>false</bool>
-                    </property>
-                    <property name="tabPosition">
-                        <enum>Top</enum>
-                    </property>
-                    <property name="tabShape">
-                        <enum>Rounded</enum>
-                    </property>
-                    <property name="margin">
-                        <number>0</number>
-                    </property>
-                    <widget class="QWidget">
+                    <widget class="QLayoutWidget" row="0" column="0">
                         <property name="name">
-                            <cstring>tab</cstring>
+                            <cstring>layout8</cstring>
                         </property>
-                        <attribute name="title">
-                            <string>Simulation</string>
-                        </attribute>
                         <grid>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QPushButton" row="0" column="0">
+                            <widget class="QButtonGroup" row="3" column="0">
                                 <property name="name">
-                                    <cstring>pbLoadSimulation</cstring>
+                                    <cstring>timestep</cstring>
                                 </property>
-                                <property name="text">
-                                    <string>Load</string>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>3</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
                                 </property>
+                                <property name="frameShadow">
+                                    <enum>Sunken</enum>
+                                </property>
+                                <property name="lineWidth">
+                                    <number>1</number>
+                                </property>
+                                <property name="title">
+                                    <string>timestep</string>
+                                </property>
+                                <property name="flat">
+                                    <bool>false</bool>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QRadioButton">
+                                        <property name="name">
+                                            <cstring>rbTimeStepper</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>Time stepper</string>
+                                        </property>
+                                        <property name="buttonGroupId">
+                                            <number>0</number>
+                                        </property>
+                                    </widget>
+                                    <widget class="QRadioButton">
+                                        <property name="name">
+                                            <cstring>rbFixed</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>Fixed step</string>
+                                        </property>
+                                        <property name="buttonGroupId">
+                                            <number>2</number>
+                                        </property>
+                                    </widget>
+                                </vbox>
                             </widget>
-                            <widget class="QLayoutWidget" row="4" column="0" rowspan="1" colspan="2">
+                            <widget class="QLayoutWidget" row="0" column="0">
+                                <property name="name">
+                                    <cstring>layout6</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pbLoadSimulation</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Load</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pbSaveSimulation</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>3</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="text">
+                                            <string>Save</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>pbGenerate</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Generate</string>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                            <widget class="QLayoutWidget" row="4" column="0">
                                 <property name="name">
                                     <cstring>layout4</cstring>
                                 </property>
@@ -326,65 +473,7 @@
                                     </widget>
                                 </hbox>
                             </widget>
-                            <widget class="QButtonGroup" row="3" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>timestep</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>3</hsizetype>
-                                        <vsizetype>3</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="frameShadow">
-                                    <enum>Sunken</enum>
-                                </property>
-                                <property name="lineWidth">
-                                    <number>1</number>
-                                </property>
-                                <property name="title">
-                                    <string>timestep</string>
-                                </property>
-                                <property name="flat">
-                                    <bool>false</bool>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QRadioButton">
-                                        <property name="name">
-                                            <cstring>rbTimeStepper</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>Time stepper</string>
-                                        </property>
-                                        <property name="buttonGroupId">
-                                            <number>0</number>
-                                        </property>
-                                    </widget>
-                                    <widget class="QRadioButton">
-                                        <property name="name">
-                                            <cstring>rbFixed</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>Fixed step</string>
-                                        </property>
-                                        <property name="buttonGroupId">
-                                            <number>2</number>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QFrame" row="2" column="0" rowspan="1" colspan="2">
+                            <widget class="QFrame" row="2" column="0">
                                 <property name="name">
                                     <cstring>frame5</cstring>
                                 </property>
@@ -442,7 +531,7 @@
                                                     <string></string>
                                                 </property>
                                                 <property name="pixmap">
-                                                    <pixmap>image2</pixmap>
+                                                    <pixmap>image3</pixmap>
                                                 </property>
                                             </widget>
                                             <widget class="QPushButton">
@@ -470,7 +559,7 @@
                                                     <string></string>
                                                 </property>
                                                 <property name="pixmap">
-                                                    <pixmap>image3</pixmap>
+                                                    <pixmap>image4</pixmap>
                                                 </property>
                                             </widget>
                                         </hbox>
@@ -508,7 +597,7 @@
                                                     <string></string>
                                                 </property>
                                                 <property name="pixmap">
-                                                    <pixmap>image4</pixmap>
+                                                    <pixmap>image5</pixmap>
                                                 </property>
                                             </widget>
                                             <widget class="QPushButton">
@@ -536,7 +625,7 @@
                                                     <string></string>
                                                 </property>
                                                 <property name="pixmap">
-                                                    <pixmap>image5</pixmap>
+                                                    <pixmap>image6</pixmap>
                                                 </property>
                                                 <property name="toolTip" stdset="0">
                                                     <string>Note: currently using synchronized display can *sometimes* lead to crash when reloading file.</string>
@@ -546,23 +635,7 @@
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QPushButton" row="0" column="1">
-                                <property name="name">
-                                    <cstring>pbSaveSimulation</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>3</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="text">
-                                    <string>Save</string>
-                                </property>
-                            </widget>
-                            <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+                            <widget class="QLabel" row="1" column="0">
                                 <property name="name">
                                     <cstring>tlCurrentSimulation</cstring>
                                 </property>
@@ -583,263 +656,208 @@
                             </widget>
                         </grid>
                     </widget>
-                    <widget class="QWidget">
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Display</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <widget class="QLabel" row="3" column="0">
                         <property name="name">
-                            <cstring>tab</cstring>
+                            <cstring>textLabel1</cstring>
                         </property>
-                        <attribute name="title">
-                            <string>Display</string>
-                        </attribute>
-                        <grid>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <property name="margin">
-                                <number>0</number>
-                            </property>
-                            <property name="spacing">
-                                <number>0</number>
-                            </property>
-                            <widget class="QLabel" row="3" column="0">
-                                <property name="name">
-                                    <cstring>textLabel1</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Refresh [ms]</string>
-                                </property>
-                                <property name="toolTip" stdset="0">
-                                    <string>How often you wish the display to refresh.</string>
-                                </property>
-                            </widget>
-                            <widget class="QSpinBox" row="3" column="1">
-                                <property name="name">
-                                    <cstring>sbRefreshTime</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>0</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>50</width>
-                                        <height>0</height>
-                                    </size>
-                                </property>
-                                <property name="maxValue">
-                                    <number>600000</number>
-                                </property>
-                                <property name="value">
-                                    <number>20</number>
-                                </property>
-                                <property name="toolTip" stdset="0">
-                                    <string>How often you wish the display to refresh.</string>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton" row="1" column="0" rowspan="1" colspan="3">
-                                <property name="name">
-                                    <cstring>pbApply</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>3</hsizetype>
-                                        <vsizetype>1</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>0</width>
-                                        <height>0</height>
-                                    </size>
-                                </property>
-                                <property name="text">
-                                    <string>Apply</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>checkBox1</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>sync.display</string>
-                                </property>
-                                <property name="toolTip" stdset="0">
-                                    <string>Not synchronized: one processor for calculation, another for display. Synchronized can sometimes crash - yet to be fixed.</string>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton" row="3" column="2">
-                                <property name="name">
-                                    <cstring>pushButton10</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>0</hsizetype>
-                                        <vsizetype>0</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>20</width>
-                                        <height>25</height>
-                                    </size>
-                                </property>
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>20</width>
-                                        <height>25</height>
-                                    </size>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="pixmap">
-                                    <pixmap>image6</pixmap>
-                                </property>
-                            </widget>
-                            <widget class="QFrame" row="0" column="0" rowspan="1" colspan="3">
-                                <property name="name">
-                                    <cstring>scrollViewOutsideFrame</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>1</hsizetype>
-                                        <vsizetype>3</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>5</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="frameShape">
-                                    <enum>NoFrame</enum>
-                                </property>
-                                <property name="frameShadow">
-                                    <enum>Raised</enum>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                            </widget>
-                        </grid>
+                        <property name="text">
+                            <string>Refresh [ms]</string>
+                        </property>
+                        <property name="toolTip" stdset="0">
+                            <string>How often you wish the display to refresh.</string>
+                        </property>
                     </widget>
-                    <widget class="QWidget">
+                    <widget class="QSpinBox" row="3" column="1">
                         <property name="name">
-                            <cstring>TabPage</cstring>
+                            <cstring>sbRefreshTime</cstring>
                         </property>
-                        <attribute name="title">
-                            <string>Python</string>
-                        </attribute>
-                        <vbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLineEdit">
-                                <property name="name">
-                                    <cstring>pyOneliner</cstring>
-                                </property>
-                                <property name="font">
-                                    <font>
-                                        <family>Monospace</family>
-                                    </font>
-                                </property>
-                            </widget>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel1_2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>(Command output goes to the console, not here)</string>
-                                </property>
-                                <property name="alignment">
-                                    <set>WordBreak|AlignVCenter|AlignRight</set>
-                                </property>
-                                <property name="indent">
-                                    <number>-1</number>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Vertical</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>20</width>
-                                        <height>191</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </vbox>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>0</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>50</width>
+                                <height>0</height>
+                            </size>
+                        </property>
+                        <property name="maxValue">
+                            <number>600000</number>
+                        </property>
+                        <property name="value">
+                            <number>20</number>
+                        </property>
+                        <property name="toolTip" stdset="0">
+                            <string>How often you wish the display to refresh.</string>
+                        </property>
                     </widget>
-                </widget>
-                <widget class="QPushButton" row="1" column="1">
+                    <widget class="QPushButton" row="1" column="0" rowspan="1" colspan="3">
+                        <property name="name">
+                            <cstring>pbApply</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>3</hsizetype>
+                                <vsizetype>1</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>0</height>
+                            </size>
+                        </property>
+                        <property name="text">
+                            <string>Apply</string>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>checkBox1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>sync.display</string>
+                        </property>
+                        <property name="toolTip" stdset="0">
+                            <string>Not synchronized: one processor for calculation, another for display. Synchronized can sometimes crash - yet to be fixed.</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="3" column="2">
+                        <property name="name">
+                            <cstring>pushButton10</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>0</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>20</width>
+                                <height>25</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>20</width>
+                                <height>25</height>
+                            </size>
+                        </property>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="pixmap">
+                            <pixmap>image7</pixmap>
+                        </property>
+                    </widget>
+                    <widget class="QFrame" row="0" column="0" rowspan="1" colspan="3">
+                        <property name="name">
+                            <cstring>scrollViewOutsideFrame</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>1</hsizetype>
+                                <vsizetype>3</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>5</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="frameShape">
+                            <enum>NoFrame</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Raised</enum>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>TabPage</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Python</string>
+                </attribute>
+                <vbox>
                     <property name="name">
-                        <cstring>pbReference</cstring>
+                        <cstring>unnamed</cstring>
                     </property>
-                    <property name="text">
-                        <string>Reference</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="0">
-                    <property name="name">
-                        <cstring>pbXYZ</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>3</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>25</height>
-                        </size>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="pixmap">
-                        <pixmap>image7</pixmap>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="1" column="0">
-                    <property name="name">
-                        <cstring>pbNewView_2</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>true</bool>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>7</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>New 3D</string>
-                    </property>
-                </widget>
-            </grid>
+                    <widget class="QLineEdit">
+                        <property name="name">
+                            <cstring>pyOneliner</cstring>
+                        </property>
+                        <property name="font">
+                            <font>
+                                <family>Monospace</family>
+                            </font>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel1_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>(Command output goes to the console, not here)</string>
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignVCenter|AlignRight</set>
+                        </property>
+                        <property name="indent">
+                            <number>-1</number>
+                        </property>
+                    </widget>
+                    <spacer>
+                        <property name="name">
+                            <cstring>spacer2</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>191</height>
+                            </size>
+                        </property>
+                    </spacer>
+                </vbox>
+            </widget>
         </widget>
-    </vbox>
+    </grid>
 </widget>
 <images>
     <image name="image0">
@@ -849,22 +867,22 @@
         <data format="PNG" length="434">89504e470d0a1a0a0000000d49484452000000280000002808060000008cfeb86d00000179494441545885edd8b14a1c4118c0f1df8928be8076218d2068114b0b5fc027486b7a5345c84b68ac24d60a798560672df800369a4040021ad11416ea59ec1c6c74766f8e3d7737b07ff860f8e6dbbbffceccceb0dbf3927e2407bd82fcab3219c9e545e67082bff5e88cc6248e708d85865da27cc103d69a1689f15eb6163f372d126349b6e6be352d52c4a9ecc198695a84f8d6d1aa6de6bfa668246b65a269816114adab7e424d2db47e045b2f98bacd3436cdad1fc132ba6d26854eb02a9d60553ac1aa748255199cb1a39c1a8d9ccba982b51f7fb129fe8e334c87380bb9d7e2183f6433d3c3cf90fb87fcc82ce21e9fb019da8b91ba54fa43aefb10fa57b01adaeb6582f0157f42ec95d48d22988f3c33b8c20e767129f24efefca259dce056f685abeccfaac4806dfcc26f6c15dd659e37b80bf1b6a42e85612308f3b9bef914c17d5c843818a3604a5d61e7807778c4063e86f67205c15492050f718ea910e721f7bc6edc240b0efb915ac97fa36ec54b52c7b879020c2e72e95070cdb80000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="PNG" length="252">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c349444154388dadd4310e82401046e1b78462e8f61cda6187e7974ebabdc7764e870d2460609d59a5217f80f0e58510d2944001015545447ede4dd60c02593322c276df867e2e5d3fdb214de9f48dd7fe32033cc72978c44d5100c0cb2d0ea5a6ab743dace262d355ea15375122aa4a94080abb0d40b73bdf87613ebd7fd9a6a65e71537ae391d4227635b58add4d2de2aaa6dbf3631cc3e7f36d6d53e896eff68f4d8f84eb6e6b9a9e09ab9b9684554dbf09dd4d2d425753abd0dcd42334fd4f6bf71b0403e127c7dd51090000000049454e44ae426082</data>
+        <data format="PNG" length="409">89504e470d0a1a0a0000000d49484452000000280000002808060000008cfeb86d00000160494441545885edd8cf2a05511cc0f1cf95c80bb0916c9462c1d2c20b7801b6ec59515e025bb628af203b6b65cfe6a2946c08c502d762ce2dae3b7f34cc8c9a6ffdea77a6697edf39bf9973eaf095135ca211e22a5cab0c4b686106b3215f2c53a8d1311ec03576d187790ce3b960af44364592b7d828d9a52b63a2d6b6425e49da82a5d353b6401a9517fcd7d4df60163a17ea36ad0cf71442e567b0f282dddad7ede728adcd959fc124ea65260bb5605e6ac1bcd48279a905f3d2de637fb26b94b22f67152c7cfbeb6c712b26fe924334d11fa219ae7d13eb644874c27096725f1a692f398157ac622de4136982bd38c63dc67f4930a923dbb80bb113f790cf6ce10d73198ae589368378c0a3a87389820b61bc9ee145b290650647f01262344970124f3848289647308e3ddc84d84f2a7c8e53d139e16f09a63185772c6325e4d37185d3be95bf103cc285e8c0b42fe44771826914be50f79659bca6083e00acfe78c833f5cc8f0000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="PNG" length="232">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000af49444154388ded95a10ec33010435fa2810bbb5f181e1becbe7f8565c1fd85b01eeb401b2d8dc29ab2869c6ccb8ae5931217a7080608981922721afb640904922544841ed8c529764b98f12359424529e76718565880002cc46976597fbd9f6be621f01d4757fbbd8a82818a6266a828db09ff59e8079e8daffded4e614fb2cf423ff0d0ecd41f12ee37d6494bbd95b4f6fbd616eba4a5de4a5afbef4eef4eef4e7b767ac97bdaecf42c7657fc513f8f2ab9c097ced54c0000000049454e44ae426082</data>
+        <data format="PNG" length="252">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c349444154388dadd4310e82401046e1b78462e8f61cda6187e7974ebabdc7764e870d2460609d59a5217f80f0e58510d2944001015545447ede4dd60c02593322c276df867e2e5d3fdb214de9f48dd7fe32033cc72978c44d5100c0cb2d0ea5a6ab743dace262d355ea15375122aa4a94080abb0d40b73bdf87613ebd7fd9a6a65e71537ae391d4227635b58add4d2de2aaa6dbf3631cc3e7f36d6d53e896eff68f4d8f84eb6e6b9a9e09ab9b9684554dbf09dd4d2d425753abd0dcd42334fd4f6bf71b0403e127c7dd51090000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="PNG" length="255">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c649444154388db594d90a83400c458f0bd28542feff9ffa2f81822fadda87d176d4319d14bd20e38470b22a1c2fbd8ce7109e8fbdf050caf9555ad07bc2cf051d9db50679cdb30310176cd298690a98d2e4a37506340b5847bebdd5e7320f0840b778b7a0b99265f02ee9b68e660d4acb34683d4cb3e10b3569b30e7c073e80abfced72819ea86a0fd49014c0754f68153e6f79ec053d8743dad8e818943c41e3fb1e7b3a0b60fe13fe819e4037d62bc8b3a7004d6883adcc4cf516cedf4007942ad3ef38bd01af6e31af98932e9f0000000049454e44ae426082</data>
+        <data format="PNG" length="232">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000af49444154388ded95a10ec33010435fa2810bbb5f181e1becbe7f8565c1fd85b01eeb401b2d8dc29ab2869c6ccb8ae5931217a7080608981922721afb640904922544841ed8c529764b98f12359424529e76718565880002cc46976597fbd9f6be621f01d4757fbbd8a82818a6266a828db09ff59e8079e8daffded4e614fb2cf423ff0d0ecd41f12ee37d6494bbd95b4f6fbd616eba4a5de4a5afbef4eef4eef4e7b767ac97bdaecf42c7657fc513f8f2ab9c097ced54c0000000049454e44ae426082</data>
     </image>
     <image name="image5">
-        <data format="PNG" length="305">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000f849444154388db5943b12823010863f1f95158de839b0f5021ec00bd8702b8f2117e0326ab38d54385a844748086c66f49f49917d7c2cc966412501e4a38b85a536b081abc01350c9405e0dc882cd831701600daca6539340ae57a9a44d2533c069b9bf7f77f605706e96ad83922fb5a9b25bb9e5a3b7ab2559183880c6744b7bcbf201b945248eaafdf2c6b25d7f05b555fe03fafc07741b8790fdf092c7a1c7c8c2bcf8165a59b64b24d48eb739737d1a92e44e5ee6064cbc2815b06e3dcea4f19e6181e9db12d3155bcc195e80d330b49f5a2e34c51f2a1aed207904a01d5c314f017843b2768d810191ac31e3ad1af75319bf0f04f8024c83732f0a67978c0000000049454e44ae426082</data>
+        <data format="PNG" length="255">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000c649444154388db594d90a83400c458f0bd28542feff9ffa2f81822fadda87d176d4319d14bd20e38470b22a1c2fbd8ce7109e8fbdf050caf9555ad07bc2cf051d9db50679cdb30310176cd298690a98d2e4a37506340b5847bebdd5e7320f0840b778b7a0b99265f02ee9b68e660d4acb34683d4cb3e10b3569b30e7c073e80abfced72819ea86a0fd49014c0754f68153e6f79ec053d8743dad8e818943c41e3fb1e7b3a0b60fe13fe819e4037d62bc8b3a7004d6883adcc4cf516cedf4007942ad3ef38bd01af6e31af98932e9f0000000049454e44ae426082</data>
     </image>
     <image name="image6">
-        <data format="PNG" length="160">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000006749444154388dadccd10d80300c03d1947118a1fbcb23b00e2c4013dbc9fd9ef4168098eecae6def73b8eba70893a3085aa308d2ab084b2b08c32b08556b08d66700b3dc16d1478d628fa07b6d01368a31968a11528a30c28a12c48a30a48a12a58a20e1811f101d3512a7c38fee1ac0000000049454e44ae426082</data>
+        <data format="PNG" length="305">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a596000000f849444154388db5943b12823010863f1f95158de839b0f5021ec00bd8702b8f2117e0326ab38d54385a844748086c66f49f49917d7c2cc966412501e4a38b85a536b081abc01350c9405e0dc882cd831701600daca6539340ae57a9a44d2533c069b9bf7f77f605706e96ad83922fb5a9b25bb9e5a3b7ab2559183880c6744b7bcbf201b945248eaafdf2c6b25d7f05b555fe03fafc07741b8790fdf092c7a1c7c8c2bcf8165a59b64b24d48eb739737d1a92e44e5ee6064cbc2815b06e3dcea4f19e6181e9db12d3155bcc195e80d330b49f5a2e34c51f2a1aed207904a01d5c314f017843b2768d810191ac31e3ad1af75319bf0f04f8024c83732f0a67978c0000000049454e44ae426082</data>
     </image>
     <image name="image7">
-        <data format="PNG" length="409">89504e470d0a1a0a0000000d49484452000000280000002808060000008cfeb86d00000160494441545885edd8cf2a05511cc0f1cf95c80bb0916c9462c1d2c20b7801b6ec59515e025bb628af203b6b65cfe6a2946c08c502d762ce2dae3b7f34cc8c9a6ffdea77a6697edf39bf9973eaf095135ca211e22a5cab0c4b686106b3215f2c53a8d1311ec03576d187790ce3b960af44364592b7d828d9a52b63a2d6b6425e49da82a5d353b6401a9517fcd7d4df60163a17ea36ad0cf71442e567b0f282dddad7ede728adcd959fc124ea65260bb5605e6ac1bcd48279a905f3d2de637fb26b94b22f67152c7cfbeb6c712b26fe924334d11fa219ae7d13eb644874c27096725f1a692f398157ac622de4136982bd38c63dc67f4930a923dbb80bb113f790cf6ce10d73198ae589368378c0a3a87389820b61bc9ee145b290650647f01262344970124f3848289647308e3ddc84d84f2a7c8e53d139e16f09a63185772c6325e4d37185d3be95bf103cc285e8c0b42fe44771826914be50f79659bca6083e00acfe78c833f5cc8f0000000049454e44ae426082</data>
+        <data format="PNG" length="160">89504e470d0a1a0a0000000d4948445200000015000000150806000000a917a5960000006749444154388dadccd10d80300c03d1947118a1fbcb23b00e2c4013dbc9fd9ef4168098eecae6def73b8eba70893a3085aa308d2ab084b2b08c32b08556b08d66700b3dc16d1478d628fa07b6d01368a31968a11528a30c28a12c48a30a48a12a58a20e1811f101d3512a7c38fee1ac0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -988,6 +1006,12 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pyOnelinerEnter()</slot>
     </connection>
+    <connection>
+        <sender>pbGenerate</sender>
+        <signal>clicked()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>pbGenerate_clicked()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
@@ -1022,6 +1046,7 @@
     <slot>pbYZX_clicked()</slot>
     <slot>pbZXY_clicked()</slot>
     <slot>pyOnelinerEnter()</slot>
+    <slot>pbGenerate_clicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -16,7 +16,7 @@ int  GLDrawBssSweptSphereLineSegment::glWiredList = -1;
 
 GLDrawBssSweptSphereLineSegment::GLDrawBssSweptSphereLineSegment(){ /*first=true;*/ };
 
-void GLDrawBssSweptSphereLineSegment::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool)
+void GLDrawBssSweptSphereLineSegment::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool,const GLViewInfo&)
 {
         
   if (first)

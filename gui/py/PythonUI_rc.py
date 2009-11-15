@@ -68,6 +68,8 @@ else:
 #### HANDLE RENAMED CLASSES ####
 # if old class name is used, the new object is constructed and a warning is issued about old name being used
 renamed={
+	# renamed 15.11.2009
+	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere',
 	# renamed 10.10.2009
 	'CpmPhysDamageColorizer':'CpmStateUpdater',
 	# renamed 23.5.2009, may be removed in a few months

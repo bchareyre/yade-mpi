@@ -11,6 +11,7 @@
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
+#include<yade/core/BodyVector.hpp>
 
 class LatticeBeamParameters;
 class StrainRecorder;

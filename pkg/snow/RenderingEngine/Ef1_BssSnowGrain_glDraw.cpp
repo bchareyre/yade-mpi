@@ -29,7 +29,7 @@ void quad_bsh(Vector3r a,Vector3r b, Vector3r c, Vector3r d,Vector3r n)
 	glVertex3v(d);
 }
 
-void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& pp,bool wire)
+void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& pp,bool wire, const GLViewInfo&)
 {
 //	s.go(cm,pp,wire);
 //	return;

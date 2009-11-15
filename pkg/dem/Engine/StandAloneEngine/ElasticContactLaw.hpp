@@ -20,21 +20,22 @@
 
 class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 	public:
-	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody, bool neverErase=false);
+	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
 	int sdecGroupMask;
 	bool momentRotationLaw;	
+	bool neverErase;
 	
 	#ifdef SCG_SHEAR
 		bool useShear;
 	#endif
-	ef2_Spheres_Elastic_ElasticLaw(): sdecGroupMask(1), momentRotationLaw(true)
+	ef2_Spheres_Elastic_ElasticLaw(): sdecGroupMask(1), momentRotationLaw(true), neverErase(false)
 		#ifdef SCG_SHEAR
 			, useShear(false)
 		#endif
 		{}
 	FUNCTOR2D(SpheresContactGeometry,ElasticContactInteraction);
 	REGISTER_CLASS_AND_BASE(ef2_Spheres_Elastic_ElasticLaw,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(sdecGroupMask)(momentRotationLaw)
+	REGISTER_ATTRIBUTES(ConstitutiveLaw,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR
 			(useShear)
 		#endif

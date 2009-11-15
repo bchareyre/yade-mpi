@@ -104,6 +104,28 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b['isDynamic']=dynamic
 	return b
 
+def wall(position,axis,sense=0,color=None,physParamsClass='BodyMacroParameters',**physParamsAttr):
+	"""Return ready-made wall body.
+
+	@param position: float or Vector3 specifying center of the wall. If float, it is the position along given axis, the other 2 components being zero
+	@param axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
+	@param sense: sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
+	@return: Body instance
+
+	Note: GeometricalModel is not set.
+	"""
+	b=Body()
+	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr)
+	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
+	if isinstance(position,(int,long,float)):
+		pos2=Vector3(0,0,0); pos2[axis]=position
+	else: pos2=position
+	pp.update({'se3':[pos2[0],pos2[1],pos2[2],1,0,0,0],'refSe3':[pos2[0],pos2[1],pos2[2],1,0,0,0],'intertia':[0,0,0]})
+	b.phys=PhysicalParameters(physParamsClass); b.phys.updateExistingAttrs(pp)
+	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+	b.dynamic=False
+	return b
+
 def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noInteractingGeometry=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()

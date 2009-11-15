@@ -19,7 +19,7 @@ class GLDrawBssSweptSphereLineSegment : public GLDrawInteractingGeometryFunctor
 	
 	public :
                 GLDrawBssSweptSphereLineSegment();
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 /// Serialization
 	protected :
 		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};

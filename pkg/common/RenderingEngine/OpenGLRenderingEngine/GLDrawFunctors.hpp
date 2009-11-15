@@ -16,6 +16,12 @@
 
 #define RENDERS(name) public: virtual string renders() const { return #name;};
 
+struct GLViewInfo{
+	GLViewInfo(): sceneCenter(Vector3r::ZERO), sceneRadius(1.){}
+	Vector3r sceneCenter;
+	Real sceneRadius;
+};
+
 class GLDrawBoundingVolumeFunctor: public EngineUnit1D<void, TYPELIST_1(const shared_ptr<BoundingVolume>&)> {
 	public:
 		virtual ~GLDrawBoundingVolumeFunctor() {};
@@ -37,7 +43,7 @@ class GLDrawGeometricalModelFunctor: public EngineUnit1D<void,TYPELIST_3(const s
 REGISTER_SERIALIZABLE(GLDrawGeometricalModelFunctor);
 
 
-class GLDrawInteractingGeometryFunctor: public EngineUnit1D<void, TYPELIST_3(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool)>{
+class GLDrawInteractingGeometryFunctor: public EngineUnit1D<void, TYPELIST_4(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)>{
 	public:
 		virtual ~GLDrawInteractingGeometryFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };

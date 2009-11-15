@@ -105,6 +105,8 @@ class TriaxialTest : public FileGenerator
 				,noFiles
 				// use Facets instead of Boxes for the walls
 				,facetWalls
+				// use Walls instead of Boxes for the walls
+				,wallWalls
 				;
 
 				//! Generate faster simulation: use InsertionSortCollider and InteractionDispatchers
@@ -206,6 +208,7 @@ class TriaxialTest : public FileGenerator
 		(fast)
 		(noFiles)
 		(facetWalls)
+		(wallWalls)
 	);
 	REGISTER_CLASS_NAME(TriaxialTest);
 	REGISTER_BASE_CLASS_NAME(FileGenerator);

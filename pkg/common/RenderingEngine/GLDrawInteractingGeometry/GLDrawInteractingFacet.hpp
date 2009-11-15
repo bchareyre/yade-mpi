@@ -14,7 +14,7 @@ class GLDrawInteractingFacet : public GLDrawInteractingGeometryFunctor
 {	
 	
 	public :
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 	RENDERS(InteractingFacet);
 	REGISTER_CLASS_NAME(GLDrawInteractingFacet);

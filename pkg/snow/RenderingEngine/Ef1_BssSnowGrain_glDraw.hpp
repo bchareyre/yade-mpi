@@ -15,7 +15,7 @@ class Ef1_BssSnowGrain_glDraw : public GLDrawInteractingGeometryFunctor
 {
 //	GLDrawInteractingSphere s;
 	public :
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 	RENDERS(BssSnowGrain);
 	REGISTER_CLASS_NAME(Ef1_BssSnowGrain_glDraw);

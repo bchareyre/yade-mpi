@@ -26,7 +26,7 @@ class GLDrawLatticeInteractingGeometry : public GLDrawInteractingGeometryFunctor
 
 	public :
 		GLDrawLatticeInteractingGeometry();
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool);
+		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 	RENDERS(LatticeInteractingGeometry);
 	REGISTER_CLASS_NAME(GLDrawLatticeInteractingGeometry);
