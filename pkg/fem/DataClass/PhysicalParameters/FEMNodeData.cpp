@@ -22,3 +22,5 @@ FEMNodeData::~FEMNodeData()
 
 
 YADE_PLUGIN((FEMNodeData));
+YADE_REQUIRE_FEATURE(deprecated)
+

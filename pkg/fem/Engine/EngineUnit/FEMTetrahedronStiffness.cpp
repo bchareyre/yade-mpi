@@ -36,3 +36,5 @@ void FEMTetrahedronStiffness::go(	  const shared_ptr<PhysicalParameters>& par
 	
 }
 YADE_PLUGIN((FEMTetrahedronStiffness));
+YADE_REQUIRE_FEATURE(deprecated)
+

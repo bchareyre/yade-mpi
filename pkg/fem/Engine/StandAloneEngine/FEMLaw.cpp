@@ -77,3 +77,5 @@ void FEMLaw::action(MetaBody* fem)
 
 
 YADE_PLUGIN((FEMLaw));
+YADE_REQUIRE_FEATURE(deprecated)
+

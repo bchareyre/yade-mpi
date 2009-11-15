@@ -6,6 +6,8 @@
 #include<boost/algorithm/string/join.hpp>
 #include<yade/core/MetaBody.hpp>
 
+YADE_REQUIRE_FEATURE(deprecated);
+
 YADE_PLUGIN((SQLiteRecorder));
 using namespace boost;
 CREATE_LOGGER(SQLiteRecorder);

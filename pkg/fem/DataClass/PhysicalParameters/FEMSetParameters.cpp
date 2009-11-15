@@ -25,3 +25,5 @@ FEMSetParameters::~FEMSetParameters()
 
 
 YADE_PLUGIN((FEMSetParameters));
+YADE_REQUIRE_FEATURE(deprecated)
+

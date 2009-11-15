@@ -2,8 +2,10 @@
 #include<boost/python.hpp>
 #include<yade/pkg-common/OpenGLRenderingEngine.hpp>
 
-#include"GLSimulationPlayerViewer.hpp"
-#include"QtSimulationPlayer.hpp"
+#ifdef YADE_DEPRECATED
+	#include"GLSimulationPlayerViewer.hpp"
+	#include"QtSimulationPlayer.hpp"
+#endif
 
 #include<qapplication.h>
 #include<qcolor.h>
@@ -35,7 +37,9 @@ shared_ptr<OpenGLRenderingEngine> ensuredRenderer(){ensuredMainWindow()->ensureR
 void OpenGLRenderingEngine_setBodiesRefSe3(const shared_ptr<OpenGLRenderingEngine>& self){ self->setBodiesRefSe3(Omega::instance().getRootBody()); }
 
 #define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
-POST_SYNTH_EVENT(PLAYER,player);
+#ifdef YADE_DEPRECATED
+	POST_SYNTH_EVENT(PLAYER,player);
+#endif
 POST_SYNTH_EVENT(CONTROLLER,controller);
 POST_SYNTH_EVENT(GENERATOR,generator);
 #undef POST_SYNT_EVENT
@@ -44,7 +48,7 @@ POST_SYNTH_EVENT(GENERATOR,generator);
 void restoreGLViewerState_str(string str){string* s=new string(str); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_STR,(void*)s));}
 void restoreGLViewerState_num(int dispStateNo){int* i=new int(dispStateNo); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_NUM,(void*)i));}
 
-
+#ifdef YADE_DEPRECATED
 /* This function adds the ability to non-interactively run the player. 
  *
  * @param savedSim is simulation saved by either SQLiteRecorder (preferrably) or 
@@ -114,8 +118,8 @@ python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQG
 	return python::make_tuple(snapBase2+"-%.04d.png",snaps);
 }
 
-
 BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayerSession_overloads,runPlayerSession,2,7);
+#endif
 
 qglviewer::Vec tuple2vec(python::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){python::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 python::tuple vec2tuple(qglviewer::Vec v){return python::make_tuple(v[0],v[1],v[2]);};
@@ -172,26 +176,29 @@ python::list getAllViews(){
 	return ret;
 };
 
+#ifdef YADE_DEPRECATED
 pyGLViewer getPlayerView(){
 	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
 	if(!player) throw runtime_error("Player is not active, unable to get its view");
 	return pyGLViewer(0);
 }
-
+#endif
 
 BOOST_PYTHON_MODULE(_qt){
 	def("Generator",evtGENERATOR,"Start simulation generator");
 	def("Controller",evtCONTROLLER,"Start simulation controller");
-	def("Player",evtPLAYER,"Start simulation player");
 	def("View",evtVIEW,"Create new 3d view");
 	def("center",centerViews,"Center all existing views.");
 	def("Renderer",ensuredRenderer,"Return wrapped OpenGLRenderingEngine; the renderer is constructed if necessary.");
 	def("close",Quit);
 	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
 	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI from within python.");
-	def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook","startWait")));
 	def("views",getAllViews);
-	def("getPlayerView",getPlayerView,"Get the 3d view of the player (raises exception if player not active)");
+	#ifdef YADE_DEPRECATED
+		def("Player",evtPLAYER,"Start simulation player");
+		def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook","startWait")));
+		def("getPlayerView",getPlayerView,"Get the 3d view of the player (raises exception if player not active)");
+	#endif
 
 	python::class_<OpenGLRenderingEngine, shared_ptr<OpenGLRenderingEngine>, python::bases<Serializable>, noncopyable>("OpenGLRenderingEngine")
 		.def("setRefSe3",&OpenGLRenderingEngine_setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");

@@ -44,3 +44,5 @@ void FEMSet2Tetrahedrons::go(	  const shared_ptr<PhysicalParameters>& ph
 }
 
 YADE_PLUGIN((FEMSet2Tetrahedrons));
+YADE_REQUIRE_FEATURE(deprecated)
+

@@ -395,3 +395,6 @@ void TetrahedronsTest::makeTet(shared_ptr<Tetrahedron>& tet, Real size)
 }
 
 YADE_PLUGIN((TetrahedronsTest));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

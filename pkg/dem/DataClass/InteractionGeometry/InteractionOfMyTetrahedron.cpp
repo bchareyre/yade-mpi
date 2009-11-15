@@ -19,3 +19,6 @@ InteractionOfMyTetrahedron::~InteractionOfMyTetrahedron ()
 }
 
 YADE_PLUGIN((InteractionOfMyTetrahedron));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

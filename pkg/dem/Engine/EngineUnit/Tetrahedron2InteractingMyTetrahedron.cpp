@@ -33,3 +33,6 @@ void Tetrahedron2InteractingMyTetrahedron::go(	const shared_ptr<GeometricalModel
 }
 	
 YADE_PLUGIN((Tetrahedron2InteractingMyTetrahedron));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

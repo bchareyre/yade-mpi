@@ -34,8 +34,7 @@
 
 #include<yade/pkg-common/AABB.hpp>
 
-#include<yade/core/BodyRedirectionVector.hpp>
-
+#include<yade/core/BodyVector.hpp>
 #include<yade/pkg-common/DisplacementEngine.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -362,7 +361,7 @@ bool LatticeExample::generate()
 
 	}
 
-        BodyRedirectionVector bc;
+        BodyVector bc;
         bc.clear();
 
 	BodyContainer::iterator bi    = rootBody->bodies->begin();
@@ -691,7 +690,7 @@ bool LatticeExample::checkAngle( Vector3r a, Vector3r& b)
 }
 
 /// returns true if angle is bigger than minAngle_betweenBeams_deg
-bool LatticeExample::checkMinimumAngle(BodyRedirectionVector& bc,shared_ptr<Body>& body)
+bool LatticeExample::checkMinimumAngle(BodyVector& bc,shared_ptr<Body>& body)
 {
 	bool answer = true;
 	LatticeBeamParameters* newBeam = static_cast<LatticeBeamParameters*>(body->physicalParameters.get());

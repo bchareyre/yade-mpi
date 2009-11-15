@@ -129,3 +129,5 @@ void FEMSetTextLoader::createTetrahedron(  const MetaBody* rootBody
 }
 
 YADE_PLUGIN((FEMSetTextLoader));
+YADE_REQUIRE_FEATURE(deprecated)
+

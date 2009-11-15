@@ -91,3 +91,6 @@ bool InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedro
 }
 
 YADE_PLUGIN((InteractingMyTetrahedron2InteractingMyTetrahedron4InteractionOfMyTetrahedron));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

@@ -44,3 +44,6 @@ void InteractingMyTetrahedron2AABB::go(	  const shared_ptr<InteractingGeometry>&
 }
 	
 YADE_PLUGIN((InteractingMyTetrahedron2AABB));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

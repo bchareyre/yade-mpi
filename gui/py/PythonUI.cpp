@@ -86,7 +86,33 @@ void PythonUI::pythonSession(){
 		PyRun_SimpleString("import yade");
 		PyRun_SimpleString("from __future__ import division");
 
+		std::string features("[");
+		#ifdef YADE_OPENMP
+			features+="'openmp',";
+		#endif
+		#ifdef YADE_OPENGL
+			features+="'opengl',";
+		#endif
+		#ifdef YADE_VTK
+			features+="'vtk',";
+		#endif
+		#ifdef YADE_GTS
+			features+="'gts',";
+		#endif
+		#ifdef YADE_CGAL
+			features+="'cgal',";
+		#endif
+		#ifdef YADE_LOG4CXX
+			features+="'log4cxx',";
+		#endif
+		#ifdef YADE_DEPRECATED
+			features+="'deprecated',";
+		#endif
+		features+="]";
+
+
 		#define PYTHON_DEFINE_STRING(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "='")+cxxName+"'").c_str())
+		#define PYTHON_DEFINE_RAW(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+cxxName).c_str())
 		#define PYTHON_DEFINE_BOOL(pyName,cxxName) PyRun_SimpleString((string("yade.runtime." pyName "=")+(cxxName?"True":"False")).c_str())
 			// wrap those in python::handle<> ??
 			PYTHON_DEFINE_STRING("prefix",prefix);
@@ -94,6 +120,7 @@ void PythonUI::pythonSession(){
 			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
 			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
 			PYTHON_DEFINE_STRING("script",runScript);
+			PYTHON_DEFINE_RAW("features",features);
 			PYTHON_DEFINE_BOOL("stopAfter",stopAfter);
 			PYTHON_DEFINE_BOOL("nonInteractive",nonInteractive);
 			{ ostringstream oss; oss<<"yade.runtime.argv=["; if(scriptArgs.size()>0){ FOREACH(string s, scriptArgs) oss<<"'"<<s<<"',"; } oss<<"]"; PyRun_SimpleString(oss.str().c_str()); }

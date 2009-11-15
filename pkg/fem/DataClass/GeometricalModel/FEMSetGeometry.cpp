@@ -22,3 +22,5 @@ FEMSetGeometry::~FEMSetGeometry()
 
 
 YADE_PLUGIN((FEMSetGeometry));
+YADE_REQUIRE_FEATURE(deprecated)
+

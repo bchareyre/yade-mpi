@@ -29,3 +29,6 @@ ClosestFeatures::~ClosestFeatures ()
 // 
 
 YADE_PLUGIN((ClosestFeatures));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

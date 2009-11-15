@@ -184,3 +184,5 @@ void FEMTetrahedronData::localCalcKeMatrix( ublas::matrix<Real>& coord )
 }
 
 YADE_PLUGIN((FEMTetrahedronData));
+YADE_REQUIRE_FEATURE(deprecated)
+

@@ -11,7 +11,6 @@
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
-#include<yade/core/BodyRedirectionVector.hpp>
 
 class LatticeBeamParameters;
 class StrainRecorder;
@@ -290,7 +289,7 @@ struct Circle
 		bool isDeleted(Vector3r pos, Vector3r min, Vector3r max);
                 void calcBeamAngles(Body* body, BodyContainer* bodies,InteractionContainer* ints);
                 void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, int otherId,InteractionContainer* ints, int thisId);
-                bool checkMinimumAngle(BodyRedirectionVector&,shared_ptr<Body>&);
+                bool checkMinimumAngle(BodyVector&,shared_ptr<Body>&);
                 bool checkAngle( Vector3r , Vector3r& );
                 void imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity,Vector3r blocked_xyz);
                 void regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max);

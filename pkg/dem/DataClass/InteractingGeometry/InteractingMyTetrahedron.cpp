@@ -20,3 +20,6 @@ InteractingMyTetrahedron::~InteractingMyTetrahedron ()
 
 
 YADE_PLUGIN((InteractingMyTetrahedron));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

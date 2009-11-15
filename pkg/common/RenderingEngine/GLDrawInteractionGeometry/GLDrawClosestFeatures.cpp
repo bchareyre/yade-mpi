@@ -45,3 +45,6 @@ void GLDrawClosestFeatures::go(
 
 YADE_PLUGIN((GLDrawClosestFeatures));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(deprecated)
+

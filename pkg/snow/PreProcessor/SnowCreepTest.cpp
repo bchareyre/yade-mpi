@@ -56,7 +56,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/core/BodyRedirectionVector.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -177,8 +176,6 @@ bool SnowCreepTest::generate()
 	rootBody = shared_ptr<MetaBody>(new MetaBody);
 	createActors(rootBody);
 	positionRootBody(rootBody);
-
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 
 	shared_ptr<Body> body;
 	

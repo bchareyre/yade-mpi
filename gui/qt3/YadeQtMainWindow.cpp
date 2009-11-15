@@ -22,6 +22,7 @@
 #include <qtoolbar.h>
 #include <qimage.h>
 #include <qpixmap.h>
+#include <qbutton.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -75,6 +76,10 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);
 	move(preferences->mainWindowPositionX,preferences->mainWindowPositionY);
 
+	#ifndef YADE_DEPRECATED
+		btPlayer->setEnabled(false);
+	#endif
+
 	// HACK
 	if(!guiMayDisappear && Omega::instance().getSimulationFileName()!="") createController();
 
@@ -87,7 +92,11 @@ void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 	#if 1
 	//shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 		//if((rb && rb->bodies->size()>0) ||
-		if(controller || player || generator) {this->hide();}
+		if(controller || 
+			#ifdef YADE_DEPRECATED
+				player ||
+			#endif
+			generator) {this->hide();}
 		else { if(!guiMayDisappear) this->show(); }
 	#endif
 	// update GL views (if any)
@@ -239,7 +248,9 @@ size_t YadeQtMainWindow::viewNo(shared_ptr<GLViewer> g){
 
 void YadeQtMainWindow::closeAllChilds(bool closeGL){
 	if(closeGL){ while(glViews.size()>0 && glViews[0]!=NULL) { LOG_DEBUG("glViews.size()="<<glViews.size()<<", glViews[0]="<<glViews[0]); closeView(-1);} }
-	if(player) player=shared_ptr<QtSimulationPlayer>();
+	#ifdef YADE_DEPRECATED
+		if(player) player=shared_ptr<QtSimulationPlayer>();
+	#endif
 	if(controller) controller=shared_ptr<SimulationController>();
 	if(generator) generator=shared_ptr<QtFileGenerator>();
 }
@@ -248,7 +259,9 @@ void YadeQtMainWindow::customEvent(QCustomEvent* e){
 	switch(e->type()){
 		case EVENT_CONTROLLER: createController(); break;
 		case EVENT_VIEW: createView(); break;
-		case EVENT_PLAYER: createPlayer(); break;
+		#ifdef YADE_DEPRECATED
+			case EVENT_PLAYER: createPlayer(); break;
+		#endif
 		case EVENT_GENERATOR: createGenerator(); break;
 		case EVENT_RESIZE_VIEW: {
 			vector<int>* d=(vector<int>*)e->data();

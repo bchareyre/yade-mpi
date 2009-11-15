@@ -239,3 +239,5 @@ void FEMBeam::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 
  
 YADE_PLUGIN((FEMBeam));
+YADE_REQUIRE_FEATURE(deprecated)
+

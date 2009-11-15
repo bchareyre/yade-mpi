@@ -9,8 +9,6 @@ if not isActive():
 	# will raise ImportError if the GUI could not be activated for some reason
 	activate()
 
-
-
 def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,fps=24,msecSleep=0):
 	"""Create video by running simulation. SnapshotEngine is added (and removed once done), temporary
 	files are deleted. The video is theora-encoded in the ogg container. Periodicity is controlled
@@ -40,32 +38,37 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	O.engines=origEngines
 
 
-def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None,startWait=False):
-	"""Create video by replaying a simulation. Snapshots are taken to temporary files,
-	encoded to a .ogg stream (theora codec); temps are deleted at the end.
+import yade.runtime
+if 'deprecated' in yade.runtime.features:
+	def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None,startWait=False):
+		"""Create video by replaying a simulation. Snapshots are taken to temporary files,
+		encoded to a .ogg stream (theora codec); temps are deleted at the end.
 
-	If the output file exists already, a ~[number] is appended and the old file is renamed.
+		If the output file exists already, a ~[number] is appended and the old file is renamed.
 
-	playerDb is the database with saved simulation states,
-	out is the output file (like a.ogg), fps is frames-per-second for the video that is created,
-	dispParamsNo, stride and postLoadHook are passed to qt.runPlayer (docs in gui/qt3/QtGUI-Python.cpp).
-	
-	You need a display to run this (either virtual, like xvfb, or physical).
+		playerDb is the database with saved simulation states,
+		out is the output file (like a.ogg), fps is frames-per-second for the video that is created,
+		dispParamsNo, stride and postLoadHook are passed to qt.runPlayer (docs in gui/qt3/QtGUI-Python.cpp).
+		
+		You need a display to run this (either virtual, like xvfb, or physical).
 
-	Necessary packages: python-gst0.10 gstreamer0.10-plugins-good python-gobject
-	"""
-	import sys,os
-	from yade import qt,utils
-	# postLoadHook and viewerState have "" instead of None in the c++ interface
-	wildcard,snaps=qt.runPlayerSession(
-		playerDb,
-		'', # snapBase
-		savedQGLState=(viewerState if viewerState else ''),
-		dispParamsNo=dispParamsNo,
-		stride=stride,
-		postLoadHook=(postLoadHook if postLoadHook else ''),
-		startWait=startWait)
-	utils.encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=fps)
-	print "Cleaning snapshot files."
-	for f in snaps: os.remove(f)
+		Necessary packages: python-gst0.10 gstreamer0.10-plugins-good python-gobject
+		"""
+		import sys,os
+		from yade import qt,utils
+		# postLoadHook and viewerState have "" instead of None in the c++ interface
+		wildcard,snaps=qt.runPlayerSession(
+			playerDb,
+			'', # snapBase
+			savedQGLState=(viewerState if viewerState else ''),
+			dispParamsNo=dispParamsNo,
+			stride=stride,
+			postLoadHook=(postLoadHook if postLoadHook else ''),
+			startWait=startWait)
+		utils.encodeVideoFromFrames(wildcard,out,renameNotOverwrite=True,fps=fps)
+		print "Cleaning snapshot files."
+		for f in snaps: os.remove(f)
+else:
+	def makePlayerVideo(*args,**kw):
+		raise RuntimeError("Yade not built with the 'deprecated' feature (needed for makePlayerVideo)")
 

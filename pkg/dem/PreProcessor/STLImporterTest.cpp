@@ -17,7 +17,6 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/core/BodyRedirectionVector.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>

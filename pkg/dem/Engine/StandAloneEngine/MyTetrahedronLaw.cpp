@@ -77,3 +77,6 @@ void MyTetrahedronLaw::action(MetaBody* ncb)
 
 
 YADE_PLUGIN((MyTetrahedronLaw));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

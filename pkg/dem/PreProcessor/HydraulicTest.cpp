@@ -44,7 +44,6 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/core/BodyRedirectionVector.hpp>
 
 #include<yade/pkg-common/TranslationEngine.hpp>
 

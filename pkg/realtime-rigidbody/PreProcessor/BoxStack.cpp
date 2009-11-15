@@ -297,3 +297,6 @@ void BoxStack::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 YADE_PLUGIN((BoxStack));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

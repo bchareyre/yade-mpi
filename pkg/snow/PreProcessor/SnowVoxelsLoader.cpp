@@ -49,7 +49,6 @@
 
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-#include<yade/core/BodyRedirectionVector.hpp>
 #include<yade/pkg-snow/ElawSnowLayersDeformation.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
@@ -200,7 +199,6 @@ bool SnowVoxelsLoader::generate()
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
-	rootBody->bodies 			= shared_ptr<BodyContainer>(new BodyRedirectionVector);
 	
 	if(m_grains.size() == 0)
 	{

@@ -24,10 +24,10 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'ThreadWorker.cpp',
 			'TimeStepper.cpp',
 			'yade.cpp',
-			'containers/BodyRedirectionVector.cpp',
 			'containers/BodyVector.cpp',
 			'containers/InteractionVecMap.cpp',
-			]),
+			]+(['containers/BodyRedirectionVector.cpp',] if 'deprecated' in env['features'] else [])
+			),
 		LIBS=env['LIBS']+[
 			'yade-support',
 			'sqlite3x',

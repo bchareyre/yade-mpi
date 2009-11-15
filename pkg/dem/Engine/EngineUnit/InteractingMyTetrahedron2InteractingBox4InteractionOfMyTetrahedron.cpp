@@ -131,3 +131,6 @@ bool InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron::goRever
 }
 
 YADE_PLUGIN((InteractingMyTetrahedron2InteractingBox4InteractionOfMyTetrahedron));
+
+YADE_REQUIRE_FEATURE(deprecated)
+

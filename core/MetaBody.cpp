@@ -22,7 +22,6 @@
 
 /* this is meant to improve usability: MetaBody is ready by default (so is Omega by that token)
  * and different type of containers can still be used instead by explicit assignment */
-#include<yade/core/BodyRedirectionVector.hpp>
 #include<yade/core/BodyVector.hpp>
 #include<yade/core/InteractionVecMap.hpp>
 
