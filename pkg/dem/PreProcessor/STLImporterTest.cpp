@@ -13,6 +13,7 @@
 #include<yade/pkg-common/InteractingFacet.hpp>
 #ifdef YADE_SHAPE
 	#include<yade/pkg-common/Facet.hpp>
+	#include<yade/pkg-common/Sphere.hpp>
 #endif
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
