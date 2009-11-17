@@ -3,7 +3,6 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
@@ -186,8 +185,8 @@ python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Rea
 /* reset highlight of all bodies */
 void highlightNone(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
-		if(!b->geometricalModel) continue;
-		b->geometricalModel->highlight=false;
+		if(!b->interactingGeometry) continue;
+		b->interactingGeometry->highlight=false;
 	}
 }
 
@@ -258,15 +257,15 @@ void wireSome(string filter){
 	int mode=(filter=="none"?none:(filter=="all"?all:(filter=="noSpheres"?noSpheres:unknown)));
 	if(mode==unknown) { LOG_WARN("Unknown wire filter `"<<filter<<"', using noSpheres instead."); mode=noSpheres; }
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
-		if(!b->geometricalModel) return;
+		if(!b->interactingGeometry) return;
 		bool wire;
 		switch(mode){
 			case none: wire=false; break;
 			case all: wire=true; break;
-			case noSpheres: wire=!(bool)(dynamic_pointer_cast<Sphere>(b->geometricalModel)); break;
+			case noSpheres: wire=!(bool)(dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry)); break;
 			default: throw logic_error("No such case possible");
 		}
-		b->geometricalModel->wire=wire;
+		b->interactingGeometry->wire=wire;
 	}
 }
 void wireAll(){wireSome("all");}
@@ -339,7 +338,7 @@ Real approxSectionArea(Real coord, int axis){
 	const Real sqrt3=sqrt(3);
 	Vector2r mm,mx; int i=0;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
-		Sphere* s=dynamic_cast<Sphere*>(b->geometricalModel.get());
+		InteractingSphere* s=dynamic_cast<InteractingSphere*>(b->interactingGeometry.get());
 		if(!s) continue;
 		const Vector3r& pos(b->physicalParameters->se3.position); const Real r(s->radius);
 		if((pos[axis]>coord && (pos[axis]-r)>coord) || (pos[axis]<coord && (pos[axis]+r)<coord)) continue;

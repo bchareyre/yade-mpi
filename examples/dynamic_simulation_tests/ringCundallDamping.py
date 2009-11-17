@@ -76,8 +76,6 @@ o.engines=[
 	RotationEngine(subscribedBodies=walls,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.73)
 ]
 
-o.miscParams=[GLDrawSphere(glutUse=True)]
-
 for b in o.bodies:
     if b.shape.name=='Sphere':
         b.phys.blockedDOFs=['z'] # blocked movement along Z

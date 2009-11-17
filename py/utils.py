@@ -77,8 +77,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=
 	s=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	s.shape=GeometricalModel('Sphere',radius=radius,diffuseColor=color,wire=wire,highlight=highlight)
-	s.mold=InteractingGeometry('InteractingSphere',radius=radius,diffuseColor=color)
+	s.mold=InteractingSphere(radius=radius,diffuseColor=color,wire=wire,highlight=highlight)
 	V=(4./3)*math.pi*radius**3
 	inert=(2./5.)*V*density*radius**2
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert]})
@@ -93,8 +92,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.shape=GeometricalModel('Box',extents=extents,diffuseColor=color,wire=wire,highlight=highlight)
-	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color)
+	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color,wire=wire,highlight=highlight)
 	mass=8*extents[0]*extents[1]*extents[2]*density
 	V=extents[0]*extents[1]*extents[2]
 	pp.update({'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)]})
@@ -131,17 +129,15 @@ def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,
 	b=Body()
 	if not color: color=randomColor()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.shape=GeometricalModel('Facet',diffuseColor=color,wire=wire,highlight=highlight)
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.shape['vertices']=vertices;	
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
 	b.phys=PhysicalParameters(physParamsClass)
 	b.phys.updateExistingAttrs(pp)
 	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 	b['isDynamic']=dynamic
 	if not noInteractingGeometry: 
-		b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color)
+		b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color,wire=wire,highlight=highlight)
 		b.mold['vertices']=vertices
 		b.mold.postProcessAttributes(True)
 	return b
@@ -191,7 +187,7 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 		for j in [0,1]:
 			center[axis]=extrema[j][axis]+(j-.5)*thickness
 			walls.append(box(center=center,extents=extents,dynamic=False,**kw))
-			walls[-1].shape['wire']=True
+			walls[-1].mold['wire']=True
 	return walls
 
 
@@ -228,18 +224,14 @@ def fractionalBox(fraction=1.,minMax=None):
 	return (tuple([minMax[0][i]+(1-fraction)*half[i] for i in [0,1,2]]),tuple([minMax[1][i]-(1-fraction)*half[i] for i in [0,1,2]]))
 
 
-def randomizeColors(onShapes=True,onMolds=False,onlyDynamic=False):
-	"""Assign random colors to shape's (GeometricalModel) and/or mold's (InteractingGeometry) diffuseColor.
-	
-	onShapes and onMolds turn on/off operating on the respective colors.
+def randomizeColors(onlyDynamic=False):
+	"""Assign random colors to InteractingGeometry::diffuseColor.
+
 	If onlyDynamic is true, only dynamic bodies will have the color changed.
 	"""
-	if not onShapes and not onMolds: return
-	o=Omega()
-	for b in o.bodies:
+	for b in O.bodies:
 		color=(random.random(),random.random(),random.random())
-		if onShapes and (b['isDynamic'] or not onlyDynamic): b.shape['diffuseColor']=color
-		if onMolds  and (b['isDynamic'] or not onlyDynamic): b.mold['diffuseColor']=color
+		if b['isDynamic'] or not onlyDynamic: b.mold['diffuseColor']=color
 
 
 def spheresFromFile(filename,scale=1.,wenjieFormat=False,**kw):
@@ -270,8 +262,8 @@ def spheresToFile(filename,consider=lambda id: True):
 	out=open(filename,'w')
 	count=0
 	for b in o.bodies:
-		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
-		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape['radius']))
+		if not b.mold or not b.mold.name=='InteractingSphere' or not consider(b.id): continue
+		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.mold['radius']))
 		count+=1
 	out.close()
 	return count
@@ -318,8 +310,7 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 	imp = STLImporter()
 	imp.wire = wire
 	imp.open(file)
-	o=Omega()
-	begin=len(o.bodies)
+	begin=len(O.bodies)
 	for i in xrange(imp.number_of_facets):
 		b=Body()
 		b['isDynamic']=False
@@ -329,13 +320,13 @@ def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=
 		b.phys.updateExistingAttrs(pp)
 		if not noBoundingVolume:
 			b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
-		o.bodies.append(b)
-	imp.import_geometry(o.bodies,begin,noInteractingGeometry)
+		O.bodies.append(b)
+	imp.import_geometry(O.bodies,begin,noInteractingGeometry)
 	imported=range(begin,begin+imp.number_of_facets)
 	for i in imported:
 		if not noInteractingGeometry:
-			o.bodies[i].mold.postProcessAttributes(True)
-		o.bodies[i].shape['diffuseColor']=color
+			O.bodies[i].mold.postProcessAttributes(True)
+			O.bodies[i].mold['diffuseColor']=color
 	return imported
 
 

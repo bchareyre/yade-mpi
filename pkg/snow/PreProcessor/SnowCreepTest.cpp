@@ -70,7 +70,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-
+YADE_REQUIRE_FEATURE(shape)
 
 using namespace boost;
 using namespace std;

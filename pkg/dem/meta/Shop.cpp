@@ -12,10 +12,13 @@
 
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
+
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/Box.hpp>
+#endif
 
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -73,6 +76,7 @@ _SPEC_CAST(char*,string);
 #undef _SPEC_CAST
 
 CREATE_LOGGER(Shop);
+YADE_PLUGIN((Shop));
 
 map<string,boost::any> Shop::defaults;
 
@@ -326,13 +330,15 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
 	mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
 	body->interactingGeometry=mold;
 
-	//shape
-	shared_ptr<Sphere> shape(new Sphere);
-	shape->radius=radius;
-	shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
-	shape->wire=getDefault<bool>("shape_wire");
-	shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
-	body->geometricalModel=shape;
+	#ifdef YADE_SHAPE
+		//shape
+		shared_ptr<Sphere> shape(new Sphere);
+		shape->radius=radius;
+		shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
+		shape->wire=getDefault<bool>("shape_wire");
+		shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
+		body->geometricalModel=shape;
+	#endif
 
 	return body;
 
@@ -360,12 +366,14 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
 		body->boundingVolume=aabb;
 
 		//shape
-		shared_ptr<Box> shape(new Box);
-		shape->extents=extents;
-		shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
-		shape->wire=getDefault<bool>("shape_wire");
-		shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
-		body->geometricalModel=shape;
+		#ifdef YADE_SHAPE
+			shared_ptr<Box> shape(new Box);
+			shape->extents=extents;
+			shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
+			shape->wire=getDefault<bool>("shape_wire");
+			shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
+			body->geometricalModel=shape;
+		#endif
 
 		// mold
 		shared_ptr<InteractingBox> mold(new InteractingBox);
@@ -401,12 +409,14 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4]){
 		body->boundingVolume=aabb;
 
 		//shape
-		shared_ptr<Tetrahedron> shape(new Tetrahedron);
-		shape->v[0]=v[0]; shape->v[1]=v[1]; shape->v[2]=v[2]; shape->v[3]=v[3];
-		shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
-		shape->wire=getDefault<bool>("shape_wire");
-		shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
-		body->geometricalModel=shape;
+		#ifdef YADE_SHAPE
+			shared_ptr<Tetrahedron> shape(new Tetrahedron);
+			shape->v[0]=v[0]; shape->v[1]=v[1]; shape->v[2]=v[2]; shape->v[3]=v[3];
+			shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
+			shape->wire=getDefault<bool>("shape_wire");
+			shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
+			body->geometricalModel=shape;
+		#endif
 
 		// mold
 		shared_ptr<TetraMold> mold(new TetraMold(v[0],v[1],v[2],v[3]));
@@ -486,9 +496,9 @@ Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
 	if(!rb)rb=Omega::instance().getRootBody();
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->physicalParameters || !b->geometricalModel) continue;
+		if(!b->physicalParameters || !b->interactingGeometry) continue;
 		shared_ptr<ElasticBodyParameters> ebp=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel);
+		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!ebp || !s) continue;
 		Real density=ebp->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));

@@ -2,6 +2,7 @@
 #include"BssSnowGrain.hpp"
 #include<Wm3Quaternion.h>
 
+YADE_REQUIRE_FEATURE(shape);
 
 BssSnowGrain::BssSnowGrain():InteractingSphere()
 {

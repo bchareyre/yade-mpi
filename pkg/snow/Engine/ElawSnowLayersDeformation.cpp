@@ -16,6 +16,7 @@
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 
 ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 {

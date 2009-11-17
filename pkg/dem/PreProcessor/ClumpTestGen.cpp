@@ -29,7 +29,9 @@ bool ClumpTestGen::generate()
 	shared_ptr<Body> ground=Shop::box(Vector3r(0,0,-1),Vector3r(3,3,.2));
 	ground->isDynamic=false;
 	// revert random colors for this single case...
-	ground->geometricalModel->diffuseColor=Vector3r(.6,.6,.6);
+	#ifdef YADE_SHAPE
+		ground->geometricalModel->diffuseColor=Vector3r(.6,.6,.6);
+	#endif
 	ground->interactingGeometry->diffuseColor=Vector3r(.3,.3,.3);
 	rootBody->bodies->insert(ground);
 

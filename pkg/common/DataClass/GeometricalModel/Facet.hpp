@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/GeometricalModel.hpp>
-
+#ifdef YADE_SHAPE
 class Facet : public GeometricalModel {
 	public :
 	vector<Vector3r> vertices;
@@ -22,5 +22,7 @@ class Facet : public GeometricalModel {
 };
 
 REGISTER_SERIALIZABLE(Facet);
-
+#else
+	#error This file may be included only with the 'shape' feature enabled.
+#endif
 

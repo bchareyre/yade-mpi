@@ -17,6 +17,7 @@
 
 #include <string>
 
+#ifdef YADE_SHAPE
 /*! \brief
 	Abstract interface for all classes that build InteractingGeometry from GeometricalModel
 
@@ -47,5 +48,5 @@ class InteractingGeometryEngineUnit : 	public EngineUnit2D
 };
 
 REGISTER_SERIALIZABLE(InteractingGeometryEngineUnit);
-
+#endif
 

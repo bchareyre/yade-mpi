@@ -16,9 +16,6 @@ O.engines=[
 	ElasticContactLaw(useShear=False,label='elasticLaw'),
 	PeriodicPythonRunner(iterPeriod=10000,command='interInfo()'),
 ]
-O.miscParams=[
-	GLDrawSphere(glutUse=True)
-]
 
 O.dt=1e-8
 O.saveTmp('init')

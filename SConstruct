@@ -553,7 +553,7 @@ def combiner_build(target, source, env):
 env.Append(BUILDERS = {'Combine': env.Builder(action = SCons.Action.Action(combiner_build, "> $TARGET"),target_factory = env.fs.File,)})
 
 import yadeSCons
-allPlugs=yadeSCons.scanAllPlugins(None)
+allPlugs=yadeSCons.scanAllPlugins(None,feats=env['features'])
 buildPlugs=yadeSCons.getWantedPlugins(allPlugs,env['exclude'],env['features'],env['linkStrategy'])
 def linkPlugins(plugins):
 	"""Given list of plugins we need to link to, return list of real libraries that we should link to."""

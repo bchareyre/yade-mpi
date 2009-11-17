@@ -10,7 +10,7 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
+void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const shared_ptr<PhysicalParameters>&,bool wire,const GLViewInfo&)
 {
 	// FIXME : check that : one of those 2 lines are useless
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cg->diffuseColor[0],cg->diffuseColor[1],cg->diffuseColor[2]));
@@ -20,16 +20,8 @@ void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const s
 	
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 
-// 	if (wire)
-// 	{
- 		glDisable(GL_LIGHTING);
- 		glutWireCube(1);
-// 	}
-// 	else
-// 	{
-//		glEnable(GL_LIGHTING);
-//		glutSolidCube(1);
-//	}
+ 	if (wire) glutWireCube(1);
+ 	else glutSolidCube(1);
 }
 
 YADE_PLUGIN((GLDrawInteractingBox));

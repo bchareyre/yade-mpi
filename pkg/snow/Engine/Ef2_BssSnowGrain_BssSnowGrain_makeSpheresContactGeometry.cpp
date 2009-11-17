@@ -11,7 +11,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/core/Omega.hpp>
 
-
+YADE_REQUIRE_FEATURE(shape);
 
 bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,

@@ -45,7 +45,7 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-
+YADE_REQUIRE_FEATURE(shape);
 
 SDECSpheresPlane::SDECSpheresPlane () : FileGenerator()
 {

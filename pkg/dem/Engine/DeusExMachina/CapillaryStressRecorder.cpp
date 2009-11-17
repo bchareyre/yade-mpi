@@ -9,7 +9,7 @@
 #include "CapillaryStressRecorder.hpp"
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/pkg-common/Sphere.hpp>
+#include <yade/pkg-common/InteractingSphere.hpp>
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
@@ -26,7 +26,7 @@ CapillaryStressRecorder::CapillaryStressRecorder () : DataRecorder()
 {
 	outputFile = "";
 	interval = 1;
-	sphere_ptr = shared_ptr<GeometricalModel> (new Sphere);
+	sphere_ptr = shared_ptr<InteractingGeometry> (new InteractingSphere);
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 // 	height = 0;
 // 	width = 0;
@@ -189,13 +189,13 @@ void CapillaryStressRecorder::action(MetaBody * ncb)
 	{	
 		shared_ptr<Body> b = *bi;
 		
-		int geometryIndex = b->geometricalModel->getClassIndex();
+		int geometryIndex = b->interactingGeometry->getClassIndex();
 		//cerr << "model = " << geometryIndex << endl;
 		
 		if (geometryIndex == SpheresClassIndex)
 		{
-			Sphere* sphere =
-		static_cast<Sphere*>(b->geometricalModel.get());
+			InteractingSphere* sphere =
+		static_cast<InteractingSphere*>(b->interactingGeometry.get());
 			Rbody = sphere->radius;
 			SR+=Rbody;
 			

@@ -16,6 +16,8 @@
 #include<yade/core/Omega.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 void GLDrawLatticeSetGeometry::calcMinMax()
 {
 /*	min=Vector3r(0,0,0);

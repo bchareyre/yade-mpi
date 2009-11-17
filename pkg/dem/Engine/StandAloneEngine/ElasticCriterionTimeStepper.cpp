@@ -13,7 +13,7 @@
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/InteractingSphere.hpp>
 
 
 ElasticCriterionTimeStepper::ElasticCriterionTimeStepper() : TimeStepper() , sdecContactModel(new MacroMicroElasticRelationships)
@@ -32,7 +32,7 @@ ElasticCriterionTimeStepper::~ElasticCriterionTimeStepper()
 void ElasticCriterionTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
 {
 	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
-	Sphere* sphere 		= dynamic_cast<Sphere*>(body->geometricalModel.get());
+	InteractingSphere* sphere 		= dynamic_cast<InteractingSphere*>(body->interactingGeometry.get());
 
 	if(! (sphere && sdec) )
 		return; // not possible to compute!

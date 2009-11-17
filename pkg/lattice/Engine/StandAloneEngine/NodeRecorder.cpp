@@ -187,7 +187,7 @@ void NodeRecorder::action(MetaBody * ncb)
 					case 5 : col=Vector3r(1,1,0);break;
 					//                    1 1 1        
 				}
-				(*(ncb->bodies))[*i]->geometricalModel->diffuseColor = col; // FIXME [1]
+				(*(ncb->bodies))[*i]->interactingGeometry->diffuseColor = col; // FIXME [1]
 			}
 		}
 

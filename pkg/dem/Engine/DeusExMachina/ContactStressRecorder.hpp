@@ -13,7 +13,6 @@
 #include <string>
 #include <fstream>
 
-class GeometricalModel;
 class TriaxialCompressionEngine;
 // class SampleCapillaryPressureEngine;
 
@@ -22,7 +21,7 @@ class ContactStressRecorder : public DataRecorder
 {
 	private :
 		
-		shared_ptr<GeometricalModel> sphere_ptr;
+		shared_ptr<InteractingGeometry> sphere_ptr;
 		int SpheresClassIndex;
 		
 		std::ofstream ofile;

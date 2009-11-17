@@ -14,9 +14,11 @@
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 
 
-#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/Box.hpp>
+#endif
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -115,8 +117,10 @@ bool Funnel::generate()
 	east->physicalParameters->se3.orientation.FromAxisAngle(Vector3r(0,0,1),angle);
 	west->physicalParameters->se3.orientation.FromAxisAngle(Vector3r(0,0,1),-angle);
 
-	north->geometricalModel->wire = true;
-	north->geometricalModel->shadowCaster = false;
+	#ifdef YADE_SHAPE
+		north->geometricalModel->wire = true;
+		north->geometricalModel->shadowCaster = false;
+	#endif
 	
 	rootBody->bodies->insert(north);
 	rootBody->bodies->insert(south);
@@ -145,7 +149,6 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
@@ -170,16 +173,19 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
-	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;
+	#ifdef YADE_SHAPE
+		shared_ptr<Sphere> gSphere(new Sphere);
+		gSphere->radius			= radius;
+		gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+		gSphere->wire			= false;
+		gSphere->shadowCaster		= true;
+		body->geometricalModel		= gSphere;
+	#endif
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
 	body->interactingGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }
@@ -190,7 +196,6 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	
@@ -216,17 +221,20 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
-	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3r(1,1,1);
-	gBox->wire			= false;
-	gBox->shadowCaster		= true;
+	#ifdef YADE_SHAPE
+		shared_ptr<Box> gBox(new Box);
+		gBox->extents			= extents;
+		gBox->diffuseColor		= Vector3r(1,1,1);
+		gBox->wire			= false;
+		gBox->shadowCaster		= true;
+		body->geometricalModel		= gBox;
+	#endif
 	
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(1,1,1);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
-	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
 

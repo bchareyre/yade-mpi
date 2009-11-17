@@ -30,7 +30,6 @@ def addRandomSphere():
 
 for i in range(0,100): addRandomSphere()
 
-O.miscParams=[GLDrawSphere(glutUse=True)]
 O.dt=1e-4
 #O.run()
 O.saveTmp('init')

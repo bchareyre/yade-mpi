@@ -22,7 +22,6 @@ import random
 for i in range(0,100):
 	O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),velocity=[random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1)]))
 
-O.miscParams=[GLDrawSphere(glutUse=True)]
 O.dt=1e-4
 O.run()
 O.saveTmp('init')

@@ -13,8 +13,8 @@
 #include<vtkTriangle.h>
 #include<vtkLine.h>
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/pkg-dem/ConcretePM.hpp>
 
 
@@ -110,8 +110,8 @@ void VTKRecorder::action(MetaBody* rootBody)
 			if(!I->isReal()) continue;
 			//const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(i->interactionPhysics.get());
 			if(skipFacetIntr){
-				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId1())->geometricalModel.get()))) continue;
-				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId2())->geometricalModel.get()))) continue;
+				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId1())->interactingGeometry.get()))) continue;
+				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId2())->interactingGeometry.get()))) continue;
 			}
 			vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 			line->GetPointIds()->SetId(0,I->getId1());
@@ -129,7 +129,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if (recActive[REC_SPHERES])
 		{
-			const Sphere* sphere = dynamic_cast<Sphere*>(b->geometricalModel.get()); 
+			const InteractingSphere* sphere = dynamic_cast<InteractingSphere*>(b->interactingGeometry.get()); 
 			if (sphere) 
 			{
 				if(skipNondynamic && !b->isDynamic) continue;
@@ -162,7 +162,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 		}
 		if (recActive[REC_FACETS])
 		{
-			const Facet* facet = dynamic_cast<Facet*>(b->geometricalModel.get()); 
+			const InteractingFacet* facet = dynamic_cast<InteractingFacet*>(b->interactingGeometry.get()); 
 			if (facet)
 			{
 				const Se3r& O = b->physicalParameters->se3;

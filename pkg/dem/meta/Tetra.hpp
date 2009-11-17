@@ -8,14 +8,17 @@
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/InteractionSolver.hpp>
 
-#include<yade/pkg-common/Tetrahedron.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
-#include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 
 #include<Wm3Math.h>
 #include<Wm3Vector3.h>
+
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Tetrahedron.hpp>
+	#include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
+#endif
 
 
 /* Our mold of tetrahedron: just 4 vertices.
@@ -60,6 +63,7 @@ class TetraBang: public InteractionGeometry{
 };
 REGISTER_SERIALIZABLE(TetraBang);
 
+#ifdef YADE_SHAPE
 /*! Creates TetraMold from Tetrahedron.
  *
  * Self-contained. */
@@ -78,6 +82,7 @@ class Tetrahedron2TetraMold: public InteractingGeometryEngineUnit
 	DEFINE_FUNCTOR_ORDER_2D(Tetrahedron,TetraMold);
 };
 REGISTER_SERIALIZABLE(Tetrahedron2TetraMold);
+#endif
 
 /*! Creates AABB from TetraMold. 
  *
@@ -153,8 +158,8 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 		DEFINE_FUNCTOR_ORDER_2D(TetraMold,TetraMold);
 		DECLARE_LOGGER;
 	private:
-		list<Tetrahedron> Tetra2TetraIntersection(const Tetrahedron& A, const Tetrahedron& B);
-		list<Tetrahedron> TetraClipByPlane(const Tetrahedron& T, const Vector3r& P, const Vector3r& n);
+		list<TetraMold> Tetra2TetraIntersection(const TetraMold& A, const TetraMold& B);
+		list<TetraMold> TetraClipByPlane(const TetraMold& T, const Vector3r& P, const Vector3r& n);
 		//! Intersection of line given by points A, B and plane given by P and its normal.
 		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).Dot(normal) / (B-A).Dot(normal); /* TRWM3VEC(A); TRWM3VEC(B); TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("t="<<t); TRWM3VEC((A+t*(B-A))); */ return A+t*(B-A); }
 };

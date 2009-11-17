@@ -17,7 +17,6 @@ o.engines=[
 	GravityEngine(gravity=(0,0,1e-2)),
 	NewtonsDampedLaw(damping=0.2)
 ]
-o.miscParams=[GLDrawSphere(glutUse=True)]
 
 from yade import utils
 from math import *

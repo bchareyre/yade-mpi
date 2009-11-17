@@ -34,6 +34,8 @@
 #include<yade/pkg-dem/SimpleViscoelasticRelationships.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
+YADE_REQUIRE_FEATURE(shape)
+
 TestSimpleViscoelastic::TestSimpleViscoelastic() : FileGenerator()
 {
     tc = 0.001;

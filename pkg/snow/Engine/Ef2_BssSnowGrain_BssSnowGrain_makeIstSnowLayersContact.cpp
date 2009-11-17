@@ -17,6 +17,7 @@
 	#include <Wm3Plane3.h>
 #endif
 
+YADE_REQUIRE_FEATURE(shape);
 
 bool is_point_orthogonally_projected_on_triangle_from_both_sides(const Vector3r& a,const Vector3r& b,const Vector3r c,Vector3r& N,Vector3r& P,Real point_plane_distance)
 {

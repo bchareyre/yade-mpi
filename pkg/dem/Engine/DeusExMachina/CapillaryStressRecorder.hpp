@@ -14,7 +14,7 @@
 #include <fstream>
 
 class TriaxialCompressionEngine;
-class GeometricalModel;
+class InteractingGeometry;
 
 class CapillaryStressRecorder : public DataRecorder
 {
@@ -22,7 +22,7 @@ class CapillaryStressRecorder : public DataRecorder
 		std::ofstream ofile; 
 		
 		bool changed;
-		shared_ptr<GeometricalModel> sphere_ptr;
+		shared_ptr<InteractingGeometry> sphere_ptr;
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		int SpheresClassIndex;
 	

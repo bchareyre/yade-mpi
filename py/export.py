@@ -18,9 +18,9 @@ class VTKWriter:
 		positions=[]; radii=[]
 
 		for b in Omega().bodies:
-			if b.shape.name=='Sphere':
+			if b.mold.name=='InteractingSphere':
 				positions.append(b.phys['se3'][0])
-				radii.append(b.shape['radius'])
+				radii.append(b.mold['radius'])
 
 		# Document and root element
 		doc = xml.dom.minidom.Document()

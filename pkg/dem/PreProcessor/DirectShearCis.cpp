@@ -59,6 +59,8 @@
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
 
+YADE_REQUIRE_FEATURE(shape);
+
 using namespace std;
 
 

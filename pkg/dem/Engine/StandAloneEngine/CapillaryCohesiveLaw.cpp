@@ -120,9 +120,9 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
                                 continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 			
                         /// interaction geometry search
-			int geometryIndex1 = (*bodies)[id1]->geometricalModel->getClassIndex(); // !!!
+			int geometryIndex1 = (*bodies)[id1]->interactingGeometry->getClassIndex(); // !!!
                         //cerr << "geo1 =" << geometryIndex1 << endl;
-                        int geometryIndex2 = (*bodies)[id2]->geometricalModel->getClassIndex();
+                        int geometryIndex2 = (*bodies)[id2]->interactingGeometry->getClassIndex();
                         //cerr << "geo2 =" << geometryIndex2 << endl;
 
                         if (!(geometryIndex1 == geometryIndex2))

@@ -12,6 +12,8 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Omega.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 void triangle(Vector3r a,Vector3r b, Vector3r c,Vector3r n)
 {
 	glNormal3v(n);

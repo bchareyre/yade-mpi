@@ -92,7 +92,7 @@ def oofemTextExport(fName):
 		if strainer and b.id in strainer['negIds']: boundary=-1
 		elif strainer and b.id in strainer['posIds']: boundary=1
 		else: boundary=0
-		bodies.append("%d %g %g %g %g %d"%(b.id,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius'],boundary))
+		bodies.append("%d %g %g %g %g %d"%(b.id,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.mold['radius'],boundary))
 
 	for i in o.interactions:
 		if not i.geom or not i.phys: continue
@@ -115,7 +115,7 @@ OutputManager tstep_all dofman_all element_all
 	for b in O.bodies:
 		mf=' '.join([str(a) for a in list(O.actions.f(b.id))+list(O.actions.m(b.id))])
 		f.write("## #%d: forces %s\n"%(b.id+1,mf))
-		f.write("Particle %d coords 3 %.15e %.15e %.15e rad %g"%(b.id+1,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.shape['radius']))
+		f.write("Particle %d coords 3 %.15e %.15e %.15e rad %g"%(b.id+1,b.phys['se3'][0],b.phys['se3'][1],b.phys['se3'][2],b.mold['radius']))
 		bcMap[b.id]=tuple([bcMax+i for i in [1,2,3,4,5,6]])
 		bcMax+=6
 		f.write(' bc '+' '.join([str(i) for i in bcMap[b.id]])+'\n')
@@ -168,7 +168,7 @@ def oofemDirectExport(fileBase,title=None,negIds=[],posIds=[]):
 	f.write("Node 1 coords 3 0.0 0.0 0.0 bc 6 1 1 1 1 1 1\n")
 	f.write("Node 2 coords 3 0.0 0.0 0.0 bc 6 1 2 1 1 1 1\n")
 	for b in o.bodies:
-		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.phys.refPos[0],b.phys.refPos[1],b.phys.refPos[2],b.shape['radius']))
+		f.write("Particle %d coords 3 %g %g %g rad %g"%(b.id+3,b.phys.refPos[0],b.phys.refPos[1],b.phys.refPos[2],b.mold['radius']))
 		if b.id in negIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 1 0 0 0 0 ")
 		elif b.id in posIds: f.write(" dofType 6 1 1 1 1 1 1 masterMask 6 0 2 0 0 0 0 0")
 		f.write('\n')

@@ -16,37 +16,37 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/EngineUnit2D.hpp>
 
+#ifdef YADE_SHAPE
+	/*! \brief
+			  Abstract interface for building GeometricalModel depending on PhysicalParameters
+			  (currently used for updating geometry if physics has changed and affects it).
 
-/*! \brief
-        Abstract interface for building GeometricalModel depending on PhysicalParameters
-        (currently used for updating geometry if physics has changed and affects it).
-
-        It is used when you want to update GeometricalModel of your Body during runtime. Only Physical
-        Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
-	the Body. So it is given as first argument.
+			  It is used when you want to update GeometricalModel of your Body during runtime. Only Physical
+			  Parameters of the Body can affect "perfect geometrical representation"(GeometricalModel) of
+		the Body. So it is given as first argument.
 
 
-DEPRECATED explanation (will move do BodyFactory perhaps?):
+	DEPRECATED explanation (will move do BodyFactory perhaps?):
 
-	It is used for creating a geometrical model from a given set of parameters.
-	This is very useful when you want to load a file that contains geometrical data or when
-	you want to build an object with that depends on several parameters.
-	
-*/
-class GeometricalModelEngineUnit : 	public EngineUnit2D
-					<
-		 				void ,
-		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
-								, shared_ptr<GeometricalModel>&
-								, const Body*
-			   				  )
-					>
-{
-	public: virtual ~GeometricalModelEngineUnit();	
-	REGISTER_CLASS_NAME(GeometricalModelEngineUnit);
-	REGISTER_BASE_CLASS_NAME(EngineUnit2D);
-};
+		It is used for creating a geometrical model from a given set of parameters.
+		This is very useful when you want to load a file that contains geometrical data or when
+		you want to build an object with that depends on several parameters.
+		
+	*/
+	class GeometricalModelEngineUnit : 	public EngineUnit2D
+						<
+							void ,
+							TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+									, shared_ptr<GeometricalModel>&
+									, const Body*
+									  )
+						>
+	{
+		public: virtual ~GeometricalModelEngineUnit();	
+		REGISTER_CLASS_NAME(GeometricalModelEngineUnit);
+		REGISTER_BASE_CLASS_NAME(EngineUnit2D);
+	};
 
-REGISTER_SERIALIZABLE(GeometricalModelEngineUnit);
-
+	REGISTER_SERIALIZABLE(GeometricalModelEngineUnit);
+#endif
 

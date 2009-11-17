@@ -14,7 +14,6 @@ O.engines=[
 	GravityEngine(gravity=(0,0,-1000)),
 	NewtonsDampedLaw(damping=0.2)
 ]
-O.miscParams=[GLDrawSphere(glutUse=True)]
 
 for n in range(30):
 	O.bodies.append(utils.sphere([0,n,0],.50001,dynamic=(n>0),color=[1-(n/20.),n/20.,0],young=30e9,poisson=.3,density=2400))

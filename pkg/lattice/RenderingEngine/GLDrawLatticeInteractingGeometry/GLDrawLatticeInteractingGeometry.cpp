@@ -17,6 +17,8 @@
 #include<yade/core/Omega.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 GLDrawLatticeInteractingGeometry::GLDrawLatticeInteractingGeometry() : maxLen(0)
 {
 };

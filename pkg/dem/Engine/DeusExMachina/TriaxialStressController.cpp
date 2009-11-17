@@ -17,7 +17,9 @@
 
 
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Sphere.hpp>
+#endif
 
 CREATE_LOGGER(TriaxialStressController);
 
@@ -327,7 +329,9 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 		{
 			( static_cast<InteractingSphere*> ( ( *bi )->interactingGeometry.get() ) )->radius *= multiplier;
 			//( static_cast<Sphere*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
-			Sphere* s = dynamic_cast<Sphere*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
+			#ifdef YADE_SHAPE
+				Sphere* s = dynamic_cast<Sphere*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
+			#endif
 			( static_cast<ParticleParameters*> ( ( *bi )->physicalParameters.get() ) )->mass *= pow ( multiplier,3 );
 			( static_cast<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() ) )->inertia *= pow ( multiplier,5 );
 

@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include<yade/core/GeometricalModel.hpp>
 
+#ifdef YADE_SHAPE
+#include<yade/core/GeometricalModel.hpp>
 class Sphere : public GeometricalModel
 {
 	public :
@@ -24,5 +25,6 @@ class Sphere : public GeometricalModel
 };
 
 REGISTER_SERIALIZABLE(Sphere);
-
-
+#else
+	#error This file may be included only with the shape feature enabled.
+#endif

@@ -8,8 +8,6 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
 #include<yade/pkg-common/NewtonsMomentumLaw.hpp>
@@ -127,12 +125,6 @@ bool SimpleScene::generate(){
 		shared_ptr<AABB> aabb(new AABB);
 		aabb->diffuseColor=Vector3r(0,1,0);
 		b->boundingVolume=aabb;
-
-		//shape
-		shared_ptr<Box> shape(new Box);
-		shape->extents=extents;
-		shape->diffuseColor=Vector3r(1,0,0);
-		b->geometricalModel=shape;
 
 		// mold
 		shared_ptr<InteractingBox> mold(new InteractingBox);

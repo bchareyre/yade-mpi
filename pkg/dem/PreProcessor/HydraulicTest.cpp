@@ -51,6 +51,8 @@
 #include <boost/filesystem/convenience.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 
 
 HydraulicTest::HydraulicTest () : FileGenerator()

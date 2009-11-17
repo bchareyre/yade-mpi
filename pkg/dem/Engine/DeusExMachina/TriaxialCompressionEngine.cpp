@@ -15,7 +15,7 @@
 #include<boost/lambda/lambda.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 

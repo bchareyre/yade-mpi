@@ -51,7 +51,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		gm=GeometricalModel(wire=True); self.assert_(gm['wire']==True)
 	def testNonderived_attrs_few(self):
 		# classes deriving just from Serializable can be instantiated by their name directly, including attributes
-		glds=GLDrawSphere(glutUse=True,glutSlices=24); self.assert_(glds.name=='GLDrawSphere')
+		glds=GLDrawInteractingSphere(glutSlices=24); self.assert_(glds.name=='GLDrawInteractingSphere')
 	def testDispatcherCtor(self):
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one

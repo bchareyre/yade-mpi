@@ -8,10 +8,9 @@
 
 #pragma once
 
+#ifdef YADE_SHAPE
 
 #include<yade/core/GeometricalModel.hpp>
-
-
 class Box: public GeometricalModel{
 	public:
 		Vector3r extents;
@@ -24,4 +23,7 @@ class Box: public GeometricalModel{
 
 REGISTER_SERIALIZABLE(Box);
 
+#else
+	#error This file may be included only with the shape feature enabled.
+#endif
 

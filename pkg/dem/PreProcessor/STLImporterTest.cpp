@@ -11,7 +11,9 @@
 #include<yade/pkg-common/SpatialQuickSortCollider.hpp>
 #include<yade/pkg-dem/STLImporter.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
-#include<yade/pkg-common/Facet.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Facet.hpp>
+#endif
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -30,7 +32,6 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
-#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
@@ -153,7 +154,6 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
@@ -180,16 +180,19 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	gSphere->radius			= radius;
-	gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
-	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;
+	#ifdef YADE_SHAPE
+		shared_ptr<Sphere> gSphere(new Sphere);
+		gSphere->radius			= radius;
+		gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+		gSphere->wire			= false;
+		gSphere->shadowCaster		= true;
+		body->geometricalModel		= gSphere;
+	#endif
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
 	body->interactingGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }

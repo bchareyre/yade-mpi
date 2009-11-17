@@ -56,6 +56,8 @@
 
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 
 MembraneTest::MembraneTest () : FileGenerator()
 {

@@ -26,9 +26,11 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/Box.hpp>
+#endif
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -373,7 +375,9 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	#ifdef YADE_SHAPE
+		shared_ptr<Sphere> gSphere(new Sphere);
+	#endif
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
@@ -404,17 +408,19 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 
-	gSphere->radius			= radius;
-//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
-	gSphere->diffuseColor		= spheresColor;
-	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
+	#ifdef YADE_SHAPE
+		gSphere->radius			= radius;
+	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
+		gSphere->diffuseColor		= spheresColor;
+		gSphere->wire			= false;
+		gSphere->shadowCaster		= true;
+		body->geometricalModel		= gSphere;
+	#endif
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }
@@ -425,7 +431,9 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+	#ifdef YADE_SHAPE
+		shared_ptr<Box> gBox(new Box);	
+	#endif
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
@@ -453,17 +461,19 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
-	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3r(1,1,1);
-	gBox->wire			= wire;
-	gBox->shadowCaster		= false;
+	#ifdef YADE_SHAPE
+		gBox->extents			= extents;
+		gBox->diffuseColor		= Vector3r(1,1,1);
+		gBox->wire			= wire;
+		gBox->shadowCaster		= false;
+		body->geometricalModel		= gBox;
+	#endif
 	
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(1,1,1);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
-	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
 

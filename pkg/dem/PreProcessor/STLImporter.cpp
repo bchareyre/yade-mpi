@@ -49,19 +49,23 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, b
 		shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
 		iFacet->diffuseColor    = Vector3r(0.8,0.3,0.3);
 
-		shared_ptr<Facet> gFacet(new Facet);
-		gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
-		gFacet->wire	    = wire;
-		gFacet->shadowCaster    = true;
+		#ifdef YADE_SHAPE
+			shared_ptr<Facet> gFacet(new Facet);
+			gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
+			gFacet->wire	    = wire;
+			gFacet->shadowCaster    = true;
+			(*bodies)[b_id]->geometricalModel	= gFacet;
+		#endif
 
 		for (int j=0; j<3; ++j)
 		{   
 				iFacet->vertices.push_back(v[j]-icc);
-				gFacet->vertices.push_back(v[j]-icc);
+				#ifdef YADE_SHAPE
+					gFacet->vertices.push_back(v[j]-icc);
+				#endif
 		}
 
 		(*bodies)[b_id]->physicalParameters->se3 = Se3r( icc, Quaternionr( 1,0,0,0 ) );
-		(*bodies)[b_id]->geometricalModel	= gFacet;
 		if (!noInteractingGeometry) (*bodies)[b_id]->interactingGeometry	= iFacet;
 
 		++b_id;

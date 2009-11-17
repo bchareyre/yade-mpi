@@ -8,7 +8,7 @@
 
 #include "ForceSnapshot.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
@@ -92,8 +92,8 @@ void ForceSnapshot::action(MetaBody * ncb)
 				Vector3r pos1=(b1->physicalParameters.get())->se3.position;	// the position of centers
 				Vector3r pos2=(b2->physicalParameters.get())->se3.position;
 
-				Real R1 = YADE_CAST<Sphere*>(b1->geometricalModel.get())->radius;
-				Real R2 = YADE_CAST<Sphere*>(b2->geometricalModel.get())->radius;
+				Real R1 = YADE_CAST<InteractingSphere*>(b1->interactingGeometry.get())->radius;
+				Real R2 = YADE_CAST<InteractingSphere*>(b2->interactingGeometry.get())->radius;
 
 				Vector3r Fn=(YADE_CAST<ElasticContactInteraction*>(contact->interactionPhysics.get()))->normalForce;
 				Real Fnl=Fn.Length();

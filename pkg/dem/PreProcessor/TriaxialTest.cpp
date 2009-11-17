@@ -25,10 +25,12 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Box.hpp>
+	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/Facet.hpp>
+#endif
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -369,7 +371,6 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
@@ -398,17 +399,19 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-
-	gSphere->radius			= radius;
-	gSphere->diffuseColor		= spheresColor;
-	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;
+	#ifdef YADE_SHAPE
+		shared_ptr<Sphere> gSphere(new Sphere);
+		gSphere->radius			= radius;
+		gSphere->diffuseColor		= spheresColor;
+		gSphere->wire			= false;
+		gSphere->shadowCaster		= true;
+		body->geometricalModel		= gSphere;
+	#endif
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 
 	body->interactingGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }
@@ -442,12 +445,14 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 
 
 	if(!facetWalls && !wallWalls){
-		shared_ptr<Box> gBox(new Box);
-		gBox->extents			= extents;
-		gBox->diffuseColor		= Vector3r(1,1,1);
-		gBox->wire			= wire;
-		gBox->shadowCaster		= false;
-		body->geometricalModel		= gBox;
+		#ifdef YADE_SHAPE
+			shared_ptr<Box> gBox(new Box);
+			gBox->extents			= extents;
+			gBox->diffuseColor		= Vector3r(1,1,1);
+			gBox->wire			= wire;
+			gBox->shadowCaster		= false;
+			body->geometricalModel		= gBox;
+		#endif
 
 		shared_ptr<InteractingBox> iBox(new InteractingBox);
 		iBox->extents			= extents;
@@ -462,12 +467,15 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
 		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
-		shared_ptr<Facet> facet(new Facet);
-		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog); facet->vertices.push_back(v[i]-cog);}
-		iFacet->diffuseColor=facet->diffuseColor=Vector3r(1,1,1);
-		facet->wire=true;
-		body->geometricalModel=facet;
+		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
+		iFacet->diffuseColor=Vector3r(1,1,1);
 		body->interactingGeometry=iFacet;
+		#ifdef YADE_SHAPE
+			shared_ptr<Facet> facet(new Facet);
+			for(int i=0; i<3; i++){ facet->vertices.push_back(v[i]-cog);}
+			facet->wire=true;
+			body->geometricalModel=facet;
+		#endif
 	}
 	if(wallWalls){
 		shared_ptr<Wall> wall(new Wall);

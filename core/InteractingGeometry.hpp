@@ -25,16 +25,17 @@ class BoundingVolumeEngineUnit;
 class InteractingGeometry : public Serializable, public Indexable
 {
 	public :
-		InteractingGeometry(){diffuseColor=Vector3r(1,1,1);}
-		Vector3r diffuseColor;	// FIXME - why here? and then - why no
-					// bool wire; even though GeometricalModel has bool wire ?
+		InteractingGeometry(): diffuseColor(Vector3r(1,1,1)), wire(false), highlight(false) {}
+		Vector3r diffuseColor;
+		bool wire;
+		bool highlight;
 
 		#ifdef BV_FUNCTOR_CACHE
 			shared_ptr<BoundingVolumeEngineUnit> boundFunctor;
 		#endif
 
 /// Serialization
-	REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
+	REGISTER_ATTRIBUTES(Serializable,(diffuseColor)(wire)(highlight));
 	REGISTER_CLASS_AND_BASE(InteractingGeometry,Serializable Indexable);
 /// Indexable
 	REGISTER_INDEX_COUNTER(InteractingGeometry);

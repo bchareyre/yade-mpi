@@ -10,8 +10,11 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/Facet.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/InteractingFacet.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Facet.hpp>
+	#include<yade/pkg-common/Sphere.hpp>
+#endif
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include"SpheresFactory.hpp"
 #include<sstream>
@@ -130,11 +133,7 @@ Vector3r SpheresFactory::generatePositionOnSurface()
     Real t2 = randomUnit()*(1-t1);
 
     shared_ptr<Body> facet = Body::byId(facetId);
-	#ifdef YADE_SHAPE
-   	 Facet* gfacet = static_cast<Facet*>(facet->geometricalModel.get());
-	#else
-		#warn Code possibly affected by lack of GeometricalModel
-	#endif
+    InteractingFacet* gfacet = static_cast<InteractingFacet*>(facet->interactingGeometry.get());
 
 
 
@@ -155,7 +154,6 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;
@@ -183,18 +181,19 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	gSphere->radius			= r;
-	gSphere->diffuseColor	= color;
-	gSphere->wire			= false;
-	gSphere->shadowCaster	= true;
+	#ifdef YADE_SHAPE
+		shared_ptr<Sphere> gSphere(new Sphere);
+		gSphere->radius			= r;
+		gSphere->diffuseColor	= color;
+		gSphere->wire			= false;
+		gSphere->shadowCaster	= true;
+		body->geometricalModel		= gSphere;
+	#endif
 	
 	iSphere->radius			= r;
 	iSphere->diffuseColor	= Vector3r(0.8,0.3,0.3);
 
 	body->interactingGeometry	= iSphere;
-	#ifdef YADE_SHAPE
-		body->geometricalModel		= gSphere;
-	#endif
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }

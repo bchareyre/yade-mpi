@@ -16,7 +16,6 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (Tetrahedron2Te
 
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Tetrahedron.hpp>
 #include<yade/pkg-common/ElasticBodyParameters.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 
@@ -90,15 +89,15 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 		}
 	#endif
 
-	// transform to global coordinates, build Tetrahedron objects
-	Tetrahedron tA(se31.orientation*A->v[0]+se31.position,se31.orientation*A->v[1]+se31.position,se31.orientation*A->v[2]+se31.position,se31.orientation*A->v[3]+se31.position);
-	Tetrahedron tB(se32.orientation*B->v[0]+se32.position,se32.orientation*B->v[1]+se32.position,se32.orientation*B->v[2]+se32.position,se32.orientation*B->v[3]+se32.position);
+	// transform to global coordinates, build TetraMold objects
+	TetraMold tA(se31.orientation*A->v[0]+se31.position,se31.orientation*A->v[1]+se31.position,se31.orientation*A->v[2]+se31.position,se31.orientation*A->v[3]+se31.position);
+	TetraMold tB(se32.orientation*B->v[0]+se32.position,se32.orientation*B->v[1]+se32.position,se32.orientation*B->v[2]+se32.position,se32.orientation*B->v[3]+se32.position);
 	// calculate intersection
 	#if 0
-		tB=Tetrahedron(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
-		tA=Tetrahedron(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
+		tB=TetraMold(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
+		tA=TetraMold(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
 	#endif
-	list<Tetrahedron> tAB=Tetra2TetraIntersection(tA,tB);
+	list<TetraMold> tAB=Tetra2TetraIntersection(tA,tB);
 	if(tAB.size()==0) { /* LOG_DEBUG("No intersection."); */ return false;} //no intersecting volume
 
 	Real V(0); // volume of intersection (cummulative)
@@ -107,7 +106,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	Vector3r tt[4]; for(int i=0; i<4; i++) tt[i]=tA.v[i];
 	//DEBUG TRWM3VEC(tt[0]); TRWM3VEC(tt[1]); TRWM3VEC(tt[2]); TRWM3VEC(tt[3]); TRVAR1(TetrahedronVolume(tA.v)); TRVAR1(TetrahedronVolume(tt)); TRWM3MAT(TetrahedronInertiaTensor(tA.v));
 
-	for(list<Tetrahedron>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	for(list<TetraMold>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		Real dV=TetrahedronVolume(II->v);
 		V+=dV;
 		//DEBUG TRVAR1(dV); TRWM3VEC(II->v[0]); TRWM3VEC(II->v[1]); TRWM3VEC(II->v[2]); TRWM3VEC(II->v[3]); LOG_TRACE("====")
@@ -118,7 +117,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 		// I is purely geometrical (as if with unit density)
 	
 	// get total 
-	Vector3r dist;	for(list<Tetrahedron>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	Vector3r dist;	for(list<TetraMold>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		II->v[0]-=centroid; II->v[1]-=centroid; II->v[2]-=centroid; II->v[3]-=centroid;
 		dist=(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25-centroid;
 		/* use parallel axis theorem */ 
@@ -213,9 +212,9 @@ bool Tetra2TetraBang::goReverse(const shared_ptr<InteractingGeometry>& cm1,const
  * return S
  *
  */
-list<Tetrahedron> Tetra2TetraBang::Tetra2TetraIntersection(const Tetrahedron& A, const Tetrahedron& B){
+list<TetraMold> Tetra2TetraBang::Tetra2TetraIntersection(const TetraMold& A, const TetraMold& B){
 	// list of 4hedra to split; initially A
-	list<Tetrahedron> ret; ret.push_back(A);
+	list<TetraMold> ret; ret.push_back(A);
 	/* I is vertex index at B;
 	 * clipping face is [i i1 i2], normal points away from i3 */
 	int i,i1,i2,i3;
@@ -229,21 +228,21 @@ list<Tetrahedron> Tetra2TetraBang::Tetra2TetraIntersection(const Tetrahedron& A,
 		const Vector3r& P(B.v[i]); // reference point on the plane
 		normal=(B.v[i1]-P).Cross(B.v[i2]-P); normal.Normalize(); // normal
 		if((B.v[i3]-P).Dot(normal)>0) normal*=-1; // outer normal
-		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
-		for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
-			list<Tetrahedron> splitDecomposition=TetraClipByPlane(*I,P,normal);
+		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<TetraMold>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
+		for(list<TetraMold>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
+			list<TetraMold> splitDecomposition=TetraClipByPlane(*I,P,normal);
 			// replace current list element by the result of decomposition;
 			// I points after the erased one, so decomposed 4hedra will not be touched in this iteration, just as we want.
 			// Since it will be incremented by I++ at the end of the cycle, compensate for that by I--;
 			I=ret.erase(I); ret.insert(I,splitDecomposition.begin(),splitDecomposition.end()); /* I--; */
-			/* LOG_TRACE("DUMP current tetrahedron list:"); for(list<Tetrahedron>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump();*/ 
+			/* LOG_TRACE("DUMP current tetrahedron list:"); for(list<TetraMold>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump();*/ 
 		}
 	}
 	//exit(0);
 	return ret;
 }
 
-/*! Clip Tetrahedron T by plane give by point P and outer normal n.
+/*! Clip TetraMold T by plane give by point P and outer normal n.
  *
  * Algorithm: 
  *
@@ -271,9 +270,9 @@ list<Tetrahedron> Tetra2TetraBang::Tetra2TetraIntersection(const Tetrahedron& A,
  *
  * http://members.tripod.com/~Paul_Kirby/vector/Vplanelineint.html
  */
-list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const Vector3r& P, const Vector3r& normal){
+list<TetraMold> Tetra2TetraBang::TetraClipByPlane(const TetraMold& T, const Vector3r& P, const Vector3r& normal){
 	
-	list<Tetrahedron> ret;
+	list<TetraMold> ret;
 	// scaling factor for Mathr::EPSILON: average edge length
 	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).Length();
 
@@ -316,37 +315,37 @@ list<Tetrahedron> Tetra2TetraBang::TetraClipByPlane(const Tetrahedron& T, const 
 		#define _BD PTPT(1,3)
 		#define _CD PTPT(2,3)
 		// -+++ → 1Δ [A AB AC AD]
-		if(NEG==1 && POS==3){ret.push_back(Tetrahedron(_A,_AB,_AC,_AD)); return ret;}
+		if(NEG==1 && POS==3){ret.push_back(TetraMold(_A,_AB,_AC,_AD)); return ret;}
 		// -++0 → 1Δ [A AB AC D]
-		if(NEG==1 && POS==2 && ZER==1){ret.push_back(Tetrahedron(_A,_AB,_AC,_D)); return ret;}
+		if(NEG==1 && POS==2 && ZER==1){ret.push_back(TetraMold(_A,_AB,_AC,_D)); return ret;}
 		//	-+00 → 1Δ [A AB C D]
-		if(NEG==1 && POS==1 && ZER==2){ret.push_back(Tetrahedron(_A,_AB,_C,_D)); return ret;}
+		if(NEG==1 && POS==1 && ZER==2){ret.push_back(TetraMold(_A,_AB,_C,_D)); return ret;}
 		// --++ → 3Δ [A AC AD B BC BD] ⇒ (e.g.) [A AC AD B] [B BC BD AD] [B AD AC BC]
 		if(NEG==2 && POS ==2){
 			// [A AC AD B]
-			ret.push_back(Tetrahedron(_A,_AC,_AD,_B));
+			ret.push_back(TetraMold(_A,_AC,_AD,_B));
 			// [B BC BD AD]
-			ret.push_back(Tetrahedron(_B,_BC,_BD,_AD));
+			ret.push_back(TetraMold(_B,_BC,_BD,_AD));
 			// [B AD AC BC]
-			ret.push_back(Tetrahedron(_B,_AD,_AC,_BC));
+			ret.push_back(TetraMold(_B,_AD,_AC,_BC));
 			return ret;
 		}
 		// --+0 → 2Δ [A B AC BC D] ⇒ (e.g.) [A AC BC D] [B BC A D] 
 		if(NEG==2 && POS==1 && ZER==1){
 			// [A AC BC D]
-			ret.push_back(Tetrahedron(_A,_AC,_BC,_D));
+			ret.push_back(TetraMold(_A,_AC,_BC,_D));
 			// [B BC A D]
-			ret.push_back(Tetrahedron(_B,_BC,_A,_D));
+			ret.push_back(TetraMold(_B,_BC,_A,_D));
 			return ret;
 		}
 		// ---+ → 3Δ [A B C AD BD CD] ⇒ (e.g.) [A B C AD] [AD BD CD B] [AD C B BD]
 		if(NEG==3 && POS==1){
 			//[A B C AD]
-			ret.push_back(Tetrahedron(_A,_B,_C,_AD));
+			ret.push_back(TetraMold(_A,_B,_C,_AD));
 			//[AD BD CD B]
-			ret.push_back(Tetrahedron(_AD,_BD,_CD,_B));
+			ret.push_back(TetraMold(_AD,_BD,_CD,_B));
 			//[AD C B BD]
-			ret.push_back(Tetrahedron(_AD,_C,_B,_BD));
+			ret.push_back(TetraMold(_AD,_C,_B,_BD));
 			return ret;
 		}
 		#undef _A
@@ -565,14 +564,13 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
  * @todo check for geometrical correctness...
  * */
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
-	const shared_ptr<Tetrahedron>& tShape(YADE_PTR_CAST<Tetrahedron>(tetraBody->geometricalModel));
 	const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
 	const shared_ptr<TetraMold>& tMold(dynamic_pointer_cast<TetraMold>(tetraBody->interactingGeometry));
 
-	#define v0 tShape->v[0]
-	#define v1 tShape->v[1]
-	#define v2 tShape->v[2]
-	#define v3 tShape->v[3]
+	#define v0 tMold->v[0]
+	#define v1 tMold->v[1]
+	#define v2 tMold->v[2]
+	#define v3 tMold->v[3]
 
 	// adjust position (origin to centroid)
 	Vector3r cg=(v0+v1+v2+v3)*.25;
@@ -581,15 +579,14 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	rbp->se3.position+=cg;
 
 	// adjust orientation (local axes to principal axes)
-	Matrix3r I_old=TetrahedronInertiaTensor(tShape->v); //≡TetrahedronCentralInertiaTensor
+	Matrix3r I_old=TetrahedronInertiaTensor(tMold->v); //≡TetrahedronCentralInertiaTensor
 	Matrix3r I_rot(true), I_new(true); 
 	I_old.EigenDecomposition(I_rot,I_new);
 	Quaternionr I_Qrot; I_Qrot.FromRotationMatrix(I_rot);
 	//! @fixme from right to left: rotate by I_rot, then add original rotation (?!!)
 	rbp->se3.orientation=rbp->se3.orientation*I_Qrot;
 	for(size_t i=0; i<4; i++){
-		tShape->v[i]=I_Qrot.Conjugate()*tShape->v[i];
-		if(tMold) tMold->v[i]=tShape->v[i]; // this may have failed...
+		tMold->v[i]=I_Qrot.Conjugate()*tMold->v[i];
 	}
 
 	// set inertia

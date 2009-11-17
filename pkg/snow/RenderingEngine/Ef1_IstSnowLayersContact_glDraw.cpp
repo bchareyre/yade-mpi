@@ -17,7 +17,7 @@
 	#include <Wm3ApprPlaneFit3.h>
 	#include <Wm3Plane3.h>
 #endif
-
+YADE_REQUIRE_FEATURE(shape)
 YADE_PLUGIN((Ef1_IstSnowLayersContact_glDraw));
 /*
 /// all points must share the same plane!

@@ -10,7 +10,7 @@
 #include <yade/pkg-common/RigidBodyParameters.hpp>
 #include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-common/Force.hpp>
-#include <yade/pkg-common/Sphere.hpp>
+#include <yade/pkg-common/InteractingSphere.hpp>
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 
@@ -37,7 +37,7 @@ ContactStressRecorder::ContactStressRecorder () : DataRecorder()/*, actionForce 
 	upperCorner = Vector3r ( 0,0,0 );
 	lowerCorner = Vector3r ( 0,0,0 );
 
-	sphere_ptr = shared_ptr<GeometricalModel> ( new Sphere );
+	sphere_ptr = shared_ptr<InteractingGeometry> ( new InteractingSphere );
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 
 	//triaxCompEng = NULL;
@@ -125,9 +125,9 @@ void ContactStressRecorder::action ( MetaBody * ncb )
 				f1_el_z=fel[2];
 
 				int geometryIndex1 =
-					( *bodies ) [id1]->geometricalModel->getClassIndex();
+					( *bodies ) [id1]->interactingGeometry->getClassIndex();
 				int geometryIndex2 =
-					( *bodies ) [id2]->geometricalModel->getClassIndex();
+					( *bodies ) [id2]->interactingGeometry->getClassIndex();
 
 				if ( geometryIndex1 == geometryIndex2 )
 
@@ -204,7 +204,7 @@ void ContactStressRecorder::action ( MetaBody * ncb )
 	{
 		shared_ptr<Body> b = *bi;
 
-		int geometryIndex = b->geometricalModel->getClassIndex();
+		int geometryIndex = b->interactingGeometry->getClassIndex();
 
 		if ( geometryIndex == SpheresClassIndex )
 		{
@@ -214,7 +214,7 @@ void ContactStressRecorder::action ( MetaBody * ncb )
 			kinematicE +=
 				0.5* ( pp->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
-			Sphere* sphere = static_cast<Sphere*> ( b->geometricalModel.get() );
+			InteractingSphere* sphere = static_cast<InteractingSphere*> ( b->interactingGeometry.get() );
 			Rbody = sphere->radius;
 			if ( Rbody<Rmin ) Rmin = Rbody;
 			if ( Rbody>Rmax ) Rmax = Rbody;

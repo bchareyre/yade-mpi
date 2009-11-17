@@ -13,28 +13,13 @@
 class GLDrawInteractingSphere : public GLDrawInteractingGeometryFunctor
 {	
 	private :
-		static bool first;
-		static vector<Vector3r> vertices;
-		static vector<Vector3r> faces;
-		static int glWiredSphereList;
-		static int glSphereList;
-		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
-		void drawSphere(int depth);
-
-		static bool wire, glutUse, glutNormalize;
+		static bool wire, glutNormalize;
 		static int glutSlices, glutStacks;
-	
 	public :
-		GLDrawInteractingSphere();
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
-		virtual void initgl(){first=true;};
-/// Serialization
-	protected :
-		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};
-	REGISTER_ATTRIBUTES(Serializable,(wire)(glutUse)(glutNormalize)(glutSlices)(glutStacks));
 	RENDERS(InteractingSphere);
-	REGISTER_CLASS_NAME(GLDrawInteractingSphere);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	REGISTER_ATTRIBUTES(Serializable,(wire)(glutNormalize)(glutSlices)(glutStacks));
+	REGISTER_CLASS_AND_BASE(GLDrawInteractingSphere,GLDrawInteractingGeometryFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawInteractingSphere);

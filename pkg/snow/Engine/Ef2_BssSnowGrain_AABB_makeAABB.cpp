@@ -10,7 +10,7 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-common/AABB.hpp>
-
+YADE_REQUIRE_FEATURE(shape);
 void Ef2_BssSnowGrain_AABB_makeAABB::go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body* b)
 {
 	BssSnowGrain* bss = static_cast<BssSnowGrain*>(cm.get());

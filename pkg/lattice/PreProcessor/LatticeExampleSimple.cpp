@@ -31,6 +31,7 @@
 using namespace boost;
 using namespace std;
 
+YADE_REQUIRE_FEATURE(shape);
 
 LatticeExampleSimple::LatticeExampleSimple() : FileGenerator()
 {

@@ -37,7 +37,6 @@ O.bodies.append([
 	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
 	utils.sphere([0,0,sign*.49999],radius=.5,young=1e3,wire=True,density=1),
 ])
-O.miscParams=[GLDrawSphere(glutUse=True)]
 O.timingEnabled=True
 O.saveTmp()
 O.dt=1e-4

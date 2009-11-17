@@ -50,6 +50,8 @@
 	#include <Wm3Query.h>
 #endif
 
+YADE_REQUIRE_FEATURE(shape)
+
 using namespace boost;
 using namespace std;
 

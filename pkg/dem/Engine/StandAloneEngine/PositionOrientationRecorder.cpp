@@ -45,8 +45,8 @@ void PositionOrientationRecorder::action(MetaBody * ncb){
 		for(BodyContainer::iterator bi    = ncb->bodies->begin(); bi!=biEnd; ++bi){
 			const Se3r& se3=(*bi)->physicalParameters->se3;
 			ofile<<se3.position[0]<<" "<<se3.position[1]<<" "<<se3.position[2]<<" "<<se3.orientation[0]<<" "<<se3.orientation[1]<<" "<<se3.orientation[2]<<" "<<se3.orientation[3]<<endl;
-			if(saveRgb && (*bi)->geometricalModel) {
-				const Vector3r& color=(*bi)->geometricalModel->diffuseColor;
+			if(saveRgb && (*bi)->interactingGeometry) {
+				const Vector3r& color=(*bi)->interactingGeometry->diffuseColor;
 				rgbFile<<color[0]<<" "<<color[1]<<" "<<color[2]<<endl;
 			}
 		}

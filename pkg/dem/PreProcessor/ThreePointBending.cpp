@@ -54,6 +54,7 @@
 
 #include<yade/pkg-dem/Shop.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 
 ThreePointBending::ThreePointBending () : FileGenerator()
 {

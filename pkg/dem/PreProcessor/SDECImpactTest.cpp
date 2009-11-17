@@ -54,6 +54,7 @@
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
 
+YADE_REQUIRE_FEATURE(shape)
 
 using namespace boost;
 using namespace std;

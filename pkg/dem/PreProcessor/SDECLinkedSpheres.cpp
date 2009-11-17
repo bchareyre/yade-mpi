@@ -50,7 +50,7 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
-
+YADE_REQUIRE_FEATURE(shape)
 
 SDECLinkedSpheres::SDECLinkedSpheres () : FileGenerator()
 {

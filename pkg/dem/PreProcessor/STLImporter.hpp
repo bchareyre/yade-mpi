@@ -6,7 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #pragma once
-#include<yade/pkg-common/Facet.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/Facet.hpp>
+#endif
 #include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyContainer.hpp>

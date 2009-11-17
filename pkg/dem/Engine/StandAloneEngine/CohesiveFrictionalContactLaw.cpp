@@ -64,7 +64,7 @@ void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
         for ( ; bi!=biEnd ; ++bi )
         {
             shared_ptr<Body> b = *bi;
-            if (b->geometricalModel && b->interactingGeometry && b->geometricalModel->getClassName()=="Sphere")
+            if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere")
                 (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken = true;
             // b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
         }
@@ -356,7 +356,7 @@ currentContactPhysics->moment_bending = moment_bending;
         for ( ; bi!=biEnd ; ++bi )
         {
             shared_ptr<Body> b = *bi;
-            if (b->geometricalModel && b->interactingGeometry && b->geometricalModel->getClassName()=="Sphere" && erosionActivated)
+            if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere" && erosionActivated)
             {
                 //cerr << "translate it" << endl;
                 if ((static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken == true)
@@ -364,11 +364,11 @@ currentContactPhysics->moment_bending = moment_bending;
                     if (b->isDynamic)
                         (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->se3.position += translation_vect_;
                     b->isDynamic = false;
-                    b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
+                    b->interactingGeometry->diffuseColor= Vector3r(0.5,0.3,0.9);
 
 
                 }
-                else  b->geometricalModel->diffuseColor= Vector3r(0.5,0.9,0.3);
+                else  b->interactingGeometry->diffuseColor= Vector3r(0.5,0.9,0.3);
             }
         }
     }

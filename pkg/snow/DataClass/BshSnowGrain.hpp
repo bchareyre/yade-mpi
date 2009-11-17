@@ -10,7 +10,6 @@
 #include<boost/tuple/tuple.hpp>
 #include<boost/thread.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
 
 typedef std::vector< std::vector<std::vector<unsigned char> > > T_DATA;
 

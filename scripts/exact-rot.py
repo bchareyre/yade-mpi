@@ -22,7 +22,6 @@ O.engines=[
 from yade import utils
 O.bodies.append(utils.sphere([0,0,0],1,dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400,wire=True))
 O.bodies.append(utils.sphere([0,sqrt(2),sqrt(2)],1,color=[0,1,0],young=30e9,poisson=.3,density=2400,wire=True))
-O.miscParams=[GLDrawSphere(glutUse=True)]
 
 O.dt=.8*utils.PWaveTimeStep()
 O.saveTmp()

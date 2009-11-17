@@ -24,20 +24,31 @@ class Plugin:
 def grepForIncludes(root,f):
 	import re
 	ret=set()
+	skipping=False
+	lineNo=0
 	for l in open(root+'/'+f):
+		if re.match(r'\s*#endif.*$',l): skipping=False; continue
+		if skipping: continue
 		m=re.match(r'^\s*#include\s*<yade/([^/]*)/(.*)>.*$',l)
 		if m:
 			incMod=m.group(1); baseName=m.group(2).split('.')[0];
 			if incMod=='core' or incMod.startswith('lib-'): continue
-			#print f,baseName
+			if skipping: continue
 			ret.add(baseName)
+			continue
+		m=re.match(r'\s*#ifdef\s*YADE_(.*)\s*$',l)
+		if m:
+			feat=m.group(1).lower()
+			if feat not in features: skipping=True; continue
 	return ret
 
+features=[]
 
-def scanAllPlugins(cacheFile):
+def scanAllPlugins(cacheFile,feats):
 	"""Traverse all files in pkg/, recording what plugins they link with and what features they require.
 	Save the result in a cache file and only regenerate the information if the cache file is missing."""
 	import os, os.path, re, shelve
+	features=feats # update the module-level var
 	if cacheFile:
 		refresh=os.path.exists(cacheFile)
 		plugInfo=shelve.open(cacheFile)
@@ -50,7 +61,14 @@ def scanAllPlugins(cacheFile):
 				ff=root+'/'+f
 				linkDeps,featureDeps=set(),set()
 				isPlugin=True #False
+				skipping=False
 				for l in open(ff):
+					if re.match(r'\s*#endif.*$',l): skipping=False; continue
+					if skipping: continue
+					m=re.match(r'\s*#ifdef\s*YADE_(.*)\s*$',l)
+					if m:
+						feat=m.group(1).lower()
+						if feat not in features: skipping=True
 					if re.match(r'\s*YADE_PLUGIN\(.*',l): isPlugin=True
 					m=re.match(r'^\s*#include\s*<yade/([^/]*)/(.*)>.*$',l)
 					if m:

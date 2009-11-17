@@ -55,7 +55,7 @@
 #include <utility>
 
 using namespace std;
-
+YADE_REQUIRE_FEATURE(shape);
 
 SimpleShear::SimpleShear () : FileGenerator()
 {

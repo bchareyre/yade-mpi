@@ -12,6 +12,8 @@
 #include<yade/pkg-lattice/LineSegment.hpp>
 #include<yade/core/MetaBody.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 					, shared_ptr<GeometricalModel>& 
 					, const Body* body)

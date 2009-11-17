@@ -75,7 +75,7 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
             for ( ; bi!=biEnd ; ++bi )
             {
                 shared_ptr<Body> b = *bi;
-                if (b->geometricalModel && b->interactingGeometry && b->geometricalModel->getClassName()=="Sphere")
+                if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere")
                 {
                     //cerr << "translate it" << endl;
                     if ((static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken == true)

@@ -21,7 +21,7 @@
 	#include <Wm3ApprPlaneFit3.h>
 	#include <Wm3Plane3.h>
 #endif
-
+YADE_REQUIRE_FEATURE(shape);
 CREATE_LOGGER(Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
 
 bool is_point_inside_box(InteractingBox* b, Vector3r P)

@@ -81,8 +81,6 @@ o.engines=[
 
 ]
 
-o.miscParams=[GLDrawSphere(glutUse=True)]
-
 for b in o.bodies:
     if b.shape.name=='Sphere':
         b.phys.blockedDOFs=['z']

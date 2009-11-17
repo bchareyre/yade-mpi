@@ -14,7 +14,11 @@ class OpenGLRenderingEngine : public RenderingEngine
 {	
 	public :
 		Vector3r Light_position,Background_color;
-		bool Show_DOF,Show_ID,Body_state,Body_bounding_volume,Body_interacting_geom,Body_geometrical_model,Cast_shadows,Shadow_volumes,Fast_shadow_volume,Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics;
+		bool Show_DOF,Show_ID,Body_state,Body_bounding_volume,Body_interacting_geom,
+			#ifdef YADE_SHAPE
+				Body_geometrical_model,Shadow_volumes,Fast_shadow_volume,Cast_shadows,
+			#endif
+			Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics;
 		body_id_t current_selection;
 		int Draw_mask;
 
@@ -66,8 +70,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 			interactingGeometryFunctorNames, 
 			#ifdef YADE_SHAPE
 				geometricalModelFunctorNames,
+				shadowVolumeFunctorNames,
 			#endif
-			shadowVolumeFunctorNames,
 			interactionGeometryFunctorNames,
 			interactionPhysicsFunctorNames;
 
@@ -79,8 +83,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 		void addInteractingGeometryFunctor(const string& str);
 		#ifdef YADE_SHAPE
 			void addGeometricalModelFunctor(const string& str);
+			void addShadowVolumeFunctor(const string& str);
 		#endif
-		void addShadowVolumeFunctor(const string& str);
 		void addInteractionGeometryFunctor(const string& str);
 		void addInteractionPhysicsFunctor(const string& str);
 			
@@ -102,13 +106,19 @@ class OpenGLRenderingEngine : public RenderingEngine
 		void renderState(const shared_ptr<MetaBody>& rootBody);
 		void renderBoundingVolume(const shared_ptr<MetaBody>& rootBody);
 		void renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody);
-		void renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
-		void renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
-		void renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
+		#ifdef YADE_SHAPE
+			void renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
+			void renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
+			void renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position);
+		#endif
 	
 	protected :
 		void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(Serializable,(scaleDisplacements)(displacementScale)(scaleRotations)(rotationScale)(Light_position)(Background_color)(Body_wire)(Show_DOF)(Show_ID)(Body_state)(Body_bounding_volume)(Body_interacting_geom)(Body_geometrical_model)(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(Cast_shadows)(Shadow_volumes)(Fast_shadow_volume)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit));
+	REGISTER_ATTRIBUTES(Serializable,(scaleDisplacements)(displacementScale)(scaleRotations)(rotationScale)(Light_position)(Background_color)(Body_wire)(Show_DOF)(Show_ID)(Body_state)(Body_bounding_volume)(Body_interacting_geom)
+		#ifdef YADE_SHAPE
+			(Body_geometrical_model)(Cast_shadows)(Shadow_volumes)(Fast_shadow_volume)
+		#endif
+		(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit));
 	REGISTER_CLASS_AND_BASE(OpenGLRenderingEngine,RenderingEngine);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderingEngine);

@@ -12,8 +12,8 @@
 #include<yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <yade/pkg-common/Sphere.hpp>
-#include <yade/pkg-common/Box.hpp>
+#include <yade/pkg-common/InteractingSphere.hpp>
+#include <yade/pkg-common/InteractingBox.hpp>
 
 #include <yade/pkg-dem/SpheresContactGeometry.hpp>
 #include <yade/pkg-common/NormalShearInteractions.hpp>
@@ -66,11 +66,11 @@ void HistoryRecorder::action(MetaBody * ncb)
 	 if (b->isClump()) continue;
 	 
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-	 const GeometricalModel* gm   = YADE_CAST<GeometricalModel*>(b->geometricalModel.get());
+	 const InteractingGeometry* gm   = YADE_CAST<InteractingGeometry*>(b->interactingGeometry.get());
 
-	if ( typeid(*gm) == typeid(Sphere) )
+	if ( typeid(*gm) == typeid(InteractingSphere) )
      {
-		ofs << "sphere " << b->groupMask << " " << YADE_CAST<Sphere*>(b->geometricalModel.get())->radius
+		ofs << "sphere " << b->groupMask << " " << YADE_CAST<InteractingSphere*>(b->interactingGeometry.get())->radius
 		<< " " << p->se3.position[0] << " " << p->se3.position[1] << " " << p->se3.position[2]
 		<< " 0 0 0" 
 		<< " " << p->velocity[0] << " " << p->velocity[1] << " " << p->velocity[2]
@@ -78,9 +78,9 @@ void HistoryRecorder::action(MetaBody * ncb)
 		<< endl << flush;
 	 }
 
-	if ( typeid(*gm) == typeid(Box) )
+	if ( typeid(*gm) == typeid(InteractingBox) )
 	{
-	  ofs << "box " << b->groupMask << " " << YADE_CAST<Box*>(b->geometricalModel.get())->extents
+	  ofs << "box " << b->groupMask << " " << YADE_CAST<InteractingBox*>(b->interactingGeometry.get())->extents
 	  << " " << p->se3.position[0] << " " << p->se3.position[1] << " " << p->se3.position[2]
 	  << " 0 0 0"
 	  << " " << p->velocity[0] << " " << p->velocity[1] << " " << p->velocity[2]
@@ -113,8 +113,8 @@ void HistoryRecorder::action(MetaBody * ncb)
 	   if( typeid(*ig) == typeid(SpheresContactGeometry) )
 	   {
 		 
-		 if (typeid(*(b1->geometricalModel.get())) == typeid(Sphere)
-		  && typeid(*(b2->geometricalModel.get())) == typeid(Sphere))
+		 if (typeid(*(b1->interactingGeometry.get())) == typeid(InteractingSphere)
+		  && typeid(*(b2->interactingGeometry.get())) == typeid(InteractingSphere))
 		 {
 		   const NormalShearInteraction* nsi = YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get());
 		   Vector3r n = nsi->normalForce;
