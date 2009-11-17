@@ -9,6 +9,8 @@
 #include "Quadrilateral.hpp"
 #include<yade/core/MetaBody.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 Quadrilateral::Quadrilateral() : GeometricalModel()
 {
 	createIndex();

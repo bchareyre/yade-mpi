@@ -9,6 +9,8 @@
 
 #include "BshTube.hpp"
 
+YADE_REQUIRE_FEATURE(shape);
+
 BshTube::BshTube () : GeometricalModel()
 {		
 	createIndex();

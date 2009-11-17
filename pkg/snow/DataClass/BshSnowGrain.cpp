@@ -1,6 +1,9 @@
 #include"BshSnowGrain.hpp"
 #include<Wm3Quaternion.h>
 
+YADE_REQUIRE_FEATURE(shape);
+
+
 // a voxel is 20.4 microns (2.04 × 10-5 meters)
 // the sample was 10.4mm hight
 

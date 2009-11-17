@@ -14,18 +14,12 @@
 #include"YadeQtGeneratedMainWindow.h"
 #include<yade/gui-qt3/SimulationController.hpp>
 #include<yade/gui-qt3/QtFileGenerator.hpp>
-#ifdef YADE_DEPRECATED
-	#include<yade/gui-qt3/QtSimulationPlayer.hpp>
-#endif
 #include<yade/gui-qt3/QtGUIPreferences.hpp>
 
 class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 {
 	public:
 		shared_ptr<SimulationController> controller;
-		#ifdef YADE_DEPRECATED
-			shared_ptr<QtSimulationPlayer> player;
-		#endif
 		shared_ptr<QtFileGenerator> generator;
 		vector<shared_ptr<GLViewer> > glViews;
 		shared_ptr<OpenGLRenderingEngine> renderer;
@@ -63,9 +57,6 @@ class YadeQtMainWindow: public YadeQtGeneratedMainWindow
 		/* each of player, controller, generator have slots for them being opened and closed: create{Player,Controller,Generator} and the instances are kept in player, controller, generator. */
 		#define __MK_RM_CHILD(Child,child,YadeClass,closeGL)  virtual void close##Child(){if(child)child=shared_ptr<YadeClass>();} virtual void create##Child(){closeAllChilds(closeGL); if(!child){child=shared_ptr<YadeClass>(new YadeClass()); connect(child.get(),SIGNAL(closeSignal()),this,SLOT(close##Child())); child->show();} else {child->show(); child->raise();}}
 		__MK_RM_CHILD(Generator,generator,QtFileGenerator,true);
-		#ifdef YADE_DEPRECATED
-			__MK_RM_CHILD(Player,player,QtSimulationPlayer,true);
-		#endif
 		__MK_RM_CHILD(Controller,controller,SimulationController,false);
 		#undef __MK_RM_CHILD
 		virtual void Quit();

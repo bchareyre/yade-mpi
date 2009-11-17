@@ -12,6 +12,7 @@
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 
 void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {

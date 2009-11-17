@@ -8,6 +8,7 @@
 
 #include "GeometricalModelMetaEngine.hpp"
 #include<yade/core/MetaBody.hpp>
+YADE_REQUIRE_FEATURE(shape);
 
 void GeometricalModelMetaEngine::action(MetaBody* ncb)
 {

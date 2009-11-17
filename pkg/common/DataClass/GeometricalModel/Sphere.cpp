@@ -8,6 +8,8 @@
 
 #include "Sphere.hpp"
 
+YADE_REQUIRE_FEATURE(shape);
+
 Sphere::Sphere () : GeometricalModel()
 {
 	createIndex();

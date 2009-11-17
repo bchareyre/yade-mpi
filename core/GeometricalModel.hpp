@@ -16,6 +16,8 @@
 
 class InteractingGeometry;
 
+#ifdef YADE_SHAPE
+
 class GeometricalModel : public Serializable, public Indexable
 {
 	public :
@@ -30,4 +32,4 @@ class GeometricalModel : public Serializable, public Indexable
 
 REGISTER_SERIALIZABLE(GeometricalModel);
 
-
+#endif

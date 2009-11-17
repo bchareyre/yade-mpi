@@ -130,7 +130,13 @@ Vector3r SpheresFactory::generatePositionOnSurface()
     Real t2 = randomUnit()*(1-t1);
 
     shared_ptr<Body> facet = Body::byId(facetId);
-    Facet* gfacet = static_cast<Facet*>(facet->geometricalModel.get());
+	#ifdef YADE_SHAPE
+   	 Facet* gfacet = static_cast<Facet*>(facet->geometricalModel.get());
+	#else
+		#warn Code possibly affected by lack of GeometricalModel
+	#endif
+
+
 
     return t1*(gfacet->vertices[1]-gfacet->vertices[0])+t2*(gfacet->vertices[2]-gfacet->vertices[0])+gfacet->vertices[0]+facet->physicalParameters->se3.position;
     
@@ -186,7 +192,9 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	iSphere->diffuseColor	= Vector3r(0.8,0.3,0.3);
 
 	body->interactingGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
+	#ifdef YADE_SHAPE
+		body->geometricalModel		= gSphere;
+	#endif
 	body->boundingVolume		= aabb;
 	body->physicalParameters	= physics;
 }

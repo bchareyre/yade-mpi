@@ -2,11 +2,6 @@
 #include<boost/python.hpp>
 #include<yade/pkg-common/OpenGLRenderingEngine.hpp>
 
-#ifdef YADE_DEPRECATED
-	#include"GLSimulationPlayerViewer.hpp"
-	#include"QtSimulationPlayer.hpp"
-#endif
-
 #include<qapplication.h>
 #include<qcolor.h>
 
@@ -37,9 +32,6 @@ shared_ptr<OpenGLRenderingEngine> ensuredRenderer(){ensuredMainWindow()->ensureR
 void OpenGLRenderingEngine_setBodiesRefSe3(const shared_ptr<OpenGLRenderingEngine>& self){ self->setBodiesRefSe3(Omega::instance().getRootBody()); }
 
 #define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
-#ifdef YADE_DEPRECATED
-	POST_SYNTH_EVENT(PLAYER,player);
-#endif
 POST_SYNTH_EVENT(CONTROLLER,controller);
 POST_SYNTH_EVENT(GENERATOR,generator);
 #undef POST_SYNT_EVENT
@@ -48,78 +40,6 @@ POST_SYNTH_EVENT(GENERATOR,generator);
 void restoreGLViewerState_str(string str){string* s=new string(str); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_STR,(void*)s));}
 void restoreGLViewerState_num(int dispStateNo){int* i=new int(dispStateNo); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESTORE_GLVIEWER_NUM,(void*)i));}
 
-#ifdef YADE_DEPRECATED
-/* This function adds the ability to non-interactively run the player. 
- *
- * @param savedSim is simulation saved by either SQLiteRecorder (preferrably) or 
- * is a simulation XML if using PositionOrientationRecorder (beware: must be run from the
- * same dir if the base xyz snapshot dir is relative.
- *
- * @param savedQGLState is file with QGLViewer state (camera position, orientation, display 
- * dimensions etc) saved when running the GLViewer (either in player or during simulation) and
- * pressing 'S'; this saves state to /tmp/qglviewerState.xml.
- *
- * @param dispParamsNo reloads n-th display parameters (GLViewer and OpenGLRenderingEngine)
- * from states saved in MetaBody::dispParams.
- *
- * @param stride is that every stride-th simulation state will be taken
-
- * @param snapBase is basename for .png snapshots. If ommited, tmpnam generates unique basename.
- *
- * @param postLoadHook is string with python command(s) that will be interpreted after loading if non-empty.
- * 	Can be used e.g. for adjusting wire display of bodies after loading the simulation.
- *
- * This function may be especially useful for offsreen rendering using Xvfb
- * (install the xvfb package first). Then run
- *
- * $ Xvfb :1 -ac -screen 0 1024x768x16 # :1 is display number, last is width x height x depth
- * 
- * and on another console something like
- *
- * yade-trunk /tmp/tmpFile.py
- *
- * with /tmp/tmpFile.py containing something like:
- *
- *  from yade import qt
- *  qt.runPlayerSession('/tmp/aa.sqlite','/tmp/__g','/tmp/qglviewerState.xml',20)
- *  quit()
- *
- * @returns tuple of (wildcard,[snap0,snap1,snap2,...]), where the list contains filename of snapshots.
- */
-python::tuple runPlayerSession(string savedSim,string snapBase="",string savedQGLState="",int dispParamsNo=-1,int stride=1,string postLoadHook="",bool startWait=false){
-	evtPLAYER();
-	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
-	GLSimulationPlayerViewer* glv=player->glSimulationPlayerViewer;
-	string snapBase2(snapBase);
-	if(snapBase2.empty()){
-		char tmpl[]="/tmp/yade-player-XXXXXX";
-		snapBase2=mkdtemp(tmpl);
-		snapBase2+="/frame-";
-		LOG_INFO("Using "<<snapBase2<<" as temporary basename for snapshots.");
-	}
-	glv->stride=stride;
-	glv->load(savedSim); // Omega locks rendering here for us
-	glv->saveSnapShots=true;
-	glv->snapshotsBase=snapBase2;
-	{
-		GLLock lock(glv);
-		if(!savedQGLState.empty()){ LOG_INFO("Loading view state from "<<savedQGLState); glv->setStateFileName(savedQGLState); glv->restoreStateFromFile(); glv->setStateFileName(QString::null); }
-		if(dispParamsNo>=0) { LOG_INFO("Loading view state from state #"<<dispParamsNo); glv->useDisplayParameters(dispParamsNo);}
-	}
-	if(startWait){ LOG_INFO("[[[ Manual view setup, press BACKSPACE to start player ]]]"); glv->trigger=false; while(!glv->trigger) {usleep(200000);cerr<<"@";} }
-	if(!postLoadHook.empty()){ PyGILState_STATE gstate; LOG_INFO("Running postLoadHook "<<postLoadHook); Py_BEGIN_ALLOW_THREADS; gstate = PyGILState_Ensure(); PyRun_SimpleString(postLoadHook.c_str()); PyGILState_Release(gstate); Py_END_ALLOW_THREADS; }
-	player->hide();
-	glv->raise();
-	glv->startAnimation();
-	Py_BEGIN_ALLOW_THREADS;
-	while(glv->animationIsStarted()) { usleep(2000000); LOG_DEBUG("Last msg: "<<*player->messages.rbegin()); }
-	Py_END_ALLOW_THREADS;
-	python::list snaps; FOREACH(string s, glv->snapshots){snaps.append(s);}
-	return python::make_tuple(snapBase2+"-%.04d.png",snaps);
-}
-
-BOOST_PYTHON_FUNCTION_OVERLOADS(runPlayerSession_overloads,runPlayerSession,2,7);
-#endif
 
 qglviewer::Vec tuple2vec(python::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){python::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 python::tuple vec2tuple(qglviewer::Vec v){return python::make_tuple(v[0],v[1],v[2]);};
@@ -176,14 +96,6 @@ python::list getAllViews(){
 	return ret;
 };
 
-#ifdef YADE_DEPRECATED
-pyGLViewer getPlayerView(){
-	shared_ptr<QtSimulationPlayer> player=ensuredMainWindow()->player;
-	if(!player) throw runtime_error("Player is not active, unable to get its view");
-	return pyGLViewer(0);
-}
-#endif
-
 BOOST_PYTHON_MODULE(_qt){
 	def("Generator",evtGENERATOR,"Start simulation generator");
 	def("Controller",evtCONTROLLER,"Start simulation controller");
@@ -194,11 +106,6 @@ BOOST_PYTHON_MODULE(_qt){
 	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
 	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI from within python.");
 	def("views",getAllViews);
-	#ifdef YADE_DEPRECATED
-		def("Player",evtPLAYER,"Start simulation player");
-		def("runPlayerSession",runPlayerSession,runPlayerSession_overloads(args("savedQGLState","dispParamsNo","stride","postLoadHook","startWait")));
-		def("getPlayerView",getPlayerView,"Get the 3d view of the player (raises exception if player not active)");
-	#endif
 
 	python::class_<OpenGLRenderingEngine, shared_ptr<OpenGLRenderingEngine>, python::bases<Serializable>, noncopyable>("OpenGLRenderingEngine")
 		.def("setRefSe3",&OpenGLRenderingEngine_setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");

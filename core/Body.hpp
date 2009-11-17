@@ -70,8 +70,10 @@ class Body : public Serializable
 
 		/// here are stored physical things that describe the Body: mass, stiffness
 		shared_ptr<PhysicalParameters>	physicalParameters;
-		/// the 'perfect' representation of body's geometry: Polyhedron, Box
-		shared_ptr<GeometricalModel>	geometricalModel;
+		#ifdef YADE_SHAPE
+			/// the 'perfect' representation of body's geometry: Polyhedron, Box
+			shared_ptr<GeometricalModel>	geometricalModel;
+		#endif
 		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox
 		shared_ptr<InteractingGeometry> interactingGeometry;
 		/// BoundingVolume is used for quick detection of potential interactions, that can be: AABB, K-Dop
@@ -93,7 +95,9 @@ class Body : public Serializable
 			(groupMask)
 			(isDynamic)
 			(physicalParameters)
-			(geometricalModel)
+			#ifdef YADE_SHAPE
+				(geometricalModel)
+			#endif
 			(interactingGeometry)
 			(boundingVolume)
 			(clumpId)

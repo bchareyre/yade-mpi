@@ -6,7 +6,9 @@
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 #include<yade/core/BoundingVolume.hpp>
 #include<yade/core/PhysicalParameters.hpp>
-#include<yade/core/GeometricalModel.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/core/GeometricalModel.hpp>
+#endif
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/EngineUnit1D.hpp>
 #include<yade/core/InteractionGeometry.hpp>
@@ -31,17 +33,17 @@ class GLDrawBoundingVolumeFunctor: public EngineUnit1D<void, TYPELIST_1(const sh
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 REGISTER_SERIALIZABLE(GLDrawBoundingVolumeFunctor);
-
-class GLDrawGeometricalModelFunctor: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool)>{
-	public: 
-		virtual ~GLDrawGeometricalModelFunctor() {};
-		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
-		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
-	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
-};
-REGISTER_SERIALIZABLE(GLDrawGeometricalModelFunctor);
-
+#ifdef YADE_SHAPE
+	class GLDrawGeometricalModelFunctor: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool)>{
+		public: 
+			virtual ~GLDrawGeometricalModelFunctor() {};
+			virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+			virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
+		REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
+		REGISTER_BASE_CLASS_NAME(EngineUnit1D);
+	};
+	REGISTER_SERIALIZABLE(GLDrawGeometricalModelFunctor);
+#endif
 
 class GLDrawInteractingGeometryFunctor: public EngineUnit1D<void, TYPELIST_4(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)>{
 	public:
@@ -73,13 +75,15 @@ class GLDrawInteractionPhysicsFunctor: public EngineUnit1D<void, TYPELIST_5(cons
 };
 REGISTER_SERIALIZABLE(GLDrawInteractionPhysicsFunctor);
 
-class GLDrawShadowVolumeFunctor: public EngineUnit1D<void, TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r&)>{
-	public:
-		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
-	REGISTER_CLASS_NAME(GLDrawShadowVolumeFunctor);
-	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
-};
-REGISTER_SERIALIZABLE(GLDrawShadowVolumeFunctor);
+#ifdef YADE_SHAPE
+	class GLDrawShadowVolumeFunctor: public EngineUnit1D<void, TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r&)>{
+		public:
+			virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
+		REGISTER_CLASS_NAME(GLDrawShadowVolumeFunctor);
+		REGISTER_BASE_CLASS_NAME(EngineUnit1D);
+	};
+	REGISTER_SERIALIZABLE(GLDrawShadowVolumeFunctor);
+#endif
 
 class GLDrawStateFunctor: public EngineUnit1D<void,TYPELIST_1(const shared_ptr<PhysicalParameters>&/*, draw parameters: color, scale, given from OpenGLRenderer, or sth.... */)>{
 	public : 

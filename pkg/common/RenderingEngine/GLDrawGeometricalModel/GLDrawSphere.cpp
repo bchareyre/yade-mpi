@@ -10,6 +10,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 
 //void drawString(string str,int x,int y,float * c)
 //{

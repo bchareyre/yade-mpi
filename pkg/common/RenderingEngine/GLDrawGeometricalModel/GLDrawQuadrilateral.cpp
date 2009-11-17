@@ -10,6 +10,7 @@
 #include<yade/pkg-common/Quadrilateral.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
+YADE_REQUIRE_FEATURE(shape);
 
 Vector3r makeColor(double val,double min,double max)
 {

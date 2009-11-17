@@ -387,7 +387,7 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 			}
 		}
 		else { bpp->normDmg=0; bpp->normEpsPl=0;}
-		B->geometricalModel->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);
+		B->interactingGeometry->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);
 	}
 }
 

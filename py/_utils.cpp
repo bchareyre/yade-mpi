@@ -8,6 +8,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/lib-computational-geometry/Hull2d.hpp>
 #include<cmath>
@@ -36,7 +37,7 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel); if(!s) continue;
+		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-(centers?Vector3r::ZERO:rrr));
 		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+(centers?Vector3r::ZERO:rrr));
@@ -51,7 +52,7 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	Real minCoord=extract<double>(extrema[0][axis])(),maxCoord=extract<double>(extrema[1][axis])();
 	python::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
-		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->geometricalModel); if(!s) continue;
+		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry); if(!s) continue;
 		if(b->physicalParameters->se3.position[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->physicalParameters->se3.position[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
 	}

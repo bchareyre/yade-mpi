@@ -29,7 +29,9 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	Body_state = false;
 	Body_bounding_volume = false;
 	Body_interacting_geom = false;
-	Body_geometrical_model = true;
+	#ifdef YADE_SHAPE
+		Body_geometrical_model = true;
+	#endif
 	Cast_shadows = false;
 	Shadow_volumes = false;
 	Fast_shadow_volume = true;
@@ -54,8 +56,10 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawStateFunctor")) addStateFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor")) addBoundingVolumeFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor")) addInteractingGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawGeometricalModelFunctor")) addGeometricalModelFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor")) addShadowVolumeFunctor((*di).first);
+		#ifdef YADE_SHAPE
+			if (Omega::instance().isInheritingFrom((*di).first,"GLDrawGeometricalModelFunctor")) addGeometricalModelFunctor((*di).first);
+			if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor")) addShadowVolumeFunctor((*di).first);
+		#endif
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
 	}
@@ -79,8 +83,10 @@ void OpenGLRenderingEngine::initgl(){
 		(static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactingGeometryFunctorNames)
 		(static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,geometricalModelFunctorNames)
-		(static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	#ifdef YADE_SHAPE
+		BOOST_FOREACH(vector<string>& s,geometricalModelFunctorNames)
+			(static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	#endif
 	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames)
 		(static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames)
@@ -88,6 +94,7 @@ void OpenGLRenderingEngine::initgl(){
 }
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody){
+	#ifdef YADE_SHAPE
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b || !b->geometricalModel) continue;
 		glPushMatrix();
@@ -102,6 +109,7 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody
 		}
 		glPopMatrix();
 	}
+	#endif
 };
 
 bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
@@ -237,7 +245,9 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 		} else{
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_NORMALIZE);
-			renderGeometricalModel(rootBody);
+			#ifdef YADE_SHAPE
+				renderGeometricalModel(rootBody);
+			#endif
 		}
 	}
 	if (Body_state) renderState(rootBody);
@@ -258,7 +268,9 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaB
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);	
+	#ifdef YADE_SHAPE
+		renderGeometricalModel(rootBody);	
+	#endif
 	
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
@@ -283,13 +295,17 @@ void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaB
 	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
 	glDisable(GL_LIGHT0);
 	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);	
+	#ifdef YADE_SHAPE
+		renderGeometricalModel(rootBody);	
+	#endif
 	
 	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
 	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
 	glEnable(GL_LIGHT0);
 	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);	
+	#ifdef YADE_SHAPE
+		renderGeometricalModel(rootBody);		
+	#endif
 	
 	glDepthFunc(GL_LESS);
 	glDisable(GL_STENCIL_TEST);
@@ -301,7 +317,9 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);	
+	#ifdef YADE_SHAPE
+		renderGeometricalModel(rootBody);	
+	#endif
 
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_STENCIL_TEST);
@@ -390,6 +408,7 @@ void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<M
 
 
 void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position){	
+	#ifdef YADE_SHAPE
 	if (!rootBody->geometricalModel){
 		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 			if(!b || !b->physicalParameters->isDisplayed) continue;
@@ -398,9 +417,11 @@ void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& root
 		}
 	}
 	else shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Light_position);
+#endif
 }
 
 void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){	
+	#ifdef YADE_SHAPE
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
 	if((rootBody->geometricalModel || Draw_inside) && Draw_inside) {
@@ -440,8 +461,9 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){
 		}
 	}
 	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
+	#endif
 }
-
+#ifdef YADE_SHAPE
 void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
@@ -516,7 +538,7 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 		}
 	}
 }
-
+#endif
 
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody){	
 	{
@@ -600,7 +622,9 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	for(unsigned int i=0;i<stateFunctorNames.size();i++) stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
 	for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++) boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactingGeometryFunctorNames.size();i++) interactingGeometryDispatcher.add1DEntry(interactingGeometryFunctorNames[i][0],interactingGeometryFunctorNames[i][1]);
-	for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++) geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
+	#ifdef YADE_SHAPE
+		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++) geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
+	#endif
 	for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++) shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
@@ -625,10 +649,12 @@ void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); interactingGeometryFunctorNames.push_back(v);
 }
+#ifdef YADE_SHAPE
 void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); geometricalModelFunctorNames.push_back(v);
 }
+#endif
 void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawShadowVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); shadowVolumeFunctorNames.push_back(v);

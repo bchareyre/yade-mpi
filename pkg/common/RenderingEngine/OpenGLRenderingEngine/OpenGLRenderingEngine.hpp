@@ -54,15 +54,19 @@ class OpenGLRenderingEngine : public RenderingEngine
 		DynLibDispatcher< PhysicalParameters  , GLDrawStateFunctor,               void , TYPELIST_1(const shared_ptr<PhysicalParameters>&) > stateDispatcher;
 		DynLibDispatcher< BoundingVolume      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
 		DynLibDispatcher< InteractingGeometry , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&) > interactingGeometryDispatcher;
-		// FIXME - in fact it is a 1D dispatcher
-		DynLibDispatcher< GeometricalModel    , GLDrawGeometricalModelFunctor,    void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, bool) > geometricalModelDispatcher;
-		DynLibDispatcher< GeometricalModel    , GLDrawShadowVolumeFunctor,        void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
+		#ifdef YADE_SHAPE
+			// FIXME - in fact it is a 1D dispatcher
+			DynLibDispatcher< GeometricalModel    , GLDrawGeometricalModelFunctor,    void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, bool) > geometricalModelDispatcher;
+			DynLibDispatcher< GeometricalModel    , GLDrawShadowVolumeFunctor,        void , TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r& ) > shadowVolumeDispatcher;
+		#endif
 
 		vector<vector<string> >
 			stateFunctorNames,
 			boundingVolumeFunctorNames,
 			interactingGeometryFunctorNames, 
-			geometricalModelFunctorNames,
+			#ifdef YADE_SHAPE
+				geometricalModelFunctorNames,
+			#endif
 			shadowVolumeFunctorNames,
 			interactionGeometryFunctorNames,
 			interactionPhysicsFunctorNames;
@@ -73,7 +77,9 @@ class OpenGLRenderingEngine : public RenderingEngine
 		void addStateFunctor(const string& str);
 		void addBoundingVolumeFunctor(const string& str);
 		void addInteractingGeometryFunctor(const string& str);
-		void addGeometricalModelFunctor(const string& str);
+		#ifdef YADE_SHAPE
+			void addGeometricalModelFunctor(const string& str);
+		#endif
 		void addShadowVolumeFunctor(const string& str);
 		void addInteractionGeometryFunctor(const string& str);
 		void addInteractionPhysicsFunctor(const string& str);
@@ -88,7 +94,9 @@ class OpenGLRenderingEngine : public RenderingEngine
 	
 	private :
 		void renderDOF_ID(const shared_ptr<MetaBody>& rootBody);
-		void renderGeometricalModel(const shared_ptr<MetaBody>& rootBody);
+		#ifdef YADE_SHAPE
+			void renderGeometricalModel(const shared_ptr<MetaBody>& rootBody);
+		#endif
 		void renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody);
 		void renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody);
 		void renderState(const shared_ptr<MetaBody>& rootBody);

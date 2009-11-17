@@ -10,6 +10,7 @@
 #include <yade/pkg-common/Facet.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
     Facet* facet = static_cast<Facet*>(gm.get());

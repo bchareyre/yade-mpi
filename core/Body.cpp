@@ -39,7 +39,9 @@ Body::Body (body_id_t newId, int newGroup) :
 	, groupMask(newGroup)
 	,clumpId(ID_NONE)
 	, physicalParameters(shared_ptr<PhysicalParameters>())
-	, geometricalModel(shared_ptr<GeometricalModel>())
+	#ifdef YADE_SHAPE
+		, geometricalModel(shared_ptr<GeometricalModel>())
+	#endif
 	, interactingGeometry(shared_ptr<InteractingGeometry>())
 	, boundingVolume(shared_ptr<BoundingVolume>())
 	

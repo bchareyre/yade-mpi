@@ -7,7 +7,7 @@
 #
 # Type "scons -h" for yade-specific options and "scons -H" for scons' options. Note that yade options will be remembered (saved in scons.config) so that you need to specify them only for the first time. Like this, for example:
 #
-#	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,fem,lattice,realtime-rigidbody,snow
+#	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,lattice,snow
 #
 # Next time, you can simply run "scons" or "scons -j4" (for 4-parallel builds) to rebuild targets that need it. IF YOU NEED TO READ CODE IN THIS FILE, SOMETHING IS BROKEN AND YOU SHOULD REALLY TELL ME.
 #
@@ -135,10 +135,10 @@ opts.AddVariables(
 	BoolVariable('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
-	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','fem','lattice','realtime-rigidbody','snow']),
+	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts','vtk','deprecated']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts','vtk','deprecated','shape']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -559,6 +559,8 @@ def linkPlugins(plugins):
 	"""Given list of plugins we need to link to, return list of real libraries that we should link to."""
 	ret=set()
 	for p in plugins:
+		if not buildPlugs.has_key(p):
+			raise RuntimeError("Plugin %s has unmet dependency!"%p)
 		ret.add(buildPlugs[p].obj)
 	return list(ret)
 

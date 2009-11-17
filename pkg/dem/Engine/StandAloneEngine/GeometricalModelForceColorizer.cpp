@@ -14,6 +14,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 //#include <Wm3Vector3r.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 
 GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEngine()
 {

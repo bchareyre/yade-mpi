@@ -22,7 +22,7 @@ if 'qt3' not in env['exclude']:
 				,
 			LIBS=(['PythonUI'] if 'YADE_PYTHON' in env['CPPDEFINES'] else [])+[
 				'yade-serialization-qt',
-				linkPlugins(['GravityEngines','OpenGLRenderingEngine','PositionOrientationRecorder','FilterEngine']),
+				linkPlugins(['GravityEngines','OpenGLRenderingEngine','PositionOrientationRecorder']+(['FilterEngine'] if 'deprecated' in env['features'] else [])),
 				'$QGLVIEWER_LIB'],
 			CPPPATH=env['CPPPATH']+['qt3']
 		),

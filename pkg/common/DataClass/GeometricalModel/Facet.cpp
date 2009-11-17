@@ -6,7 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+
 #include "Facet.hpp"
+YADE_REQUIRE_FEATURE(shape);
 
 Facet::Facet () : GeometricalModel()
 {

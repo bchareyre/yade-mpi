@@ -10,3 +10,5 @@ Box::Box () : GeometricalModel() { createIndex(); }
 Box::~Box (){}
 YADE_PLUGIN((Box));
 
+YADE_REQUIRE_FEATURE(shape);
+

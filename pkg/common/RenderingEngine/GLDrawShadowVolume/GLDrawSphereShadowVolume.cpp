@@ -10,6 +10,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 
 void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const shared_ptr<PhysicalParameters>& pp, const Vector3r& lightPos)
 {

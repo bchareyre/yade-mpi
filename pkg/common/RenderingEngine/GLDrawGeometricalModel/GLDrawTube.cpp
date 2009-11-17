@@ -11,6 +11,8 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
+
 bool GLDrawTube::first           = true;
 int  GLDrawTube::glWiredTubeList = -1;
 int  GLDrawTube::glTubeList      = -1;

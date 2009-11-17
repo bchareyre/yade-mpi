@@ -5,10 +5,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+
 #include "ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment.hpp"
 #include<yade/pkg-common/BssSweptSphereLineSegment.hpp>
 #include<yade/pkg-common/BshTube.hpp>
 #include<yade/pkg-common/BcpConnection.hpp>
+YADE_REQUIRE_FEATURE(shape);
 
 void ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment::go(	const shared_ptr<GeometricalModel>& gm,
 				shared_ptr<InteractingGeometry>& ig,

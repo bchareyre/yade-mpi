@@ -13,6 +13,8 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 
+YADE_REQUIRE_FEATURE(shape);
+
 inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
 
 void triangle_bsh(Vector3r a,Vector3r b, Vector3r c,Vector3r n)

@@ -76,7 +76,7 @@ Sorry for that. */
 #include"Voxel/SafeVectors3.cpp"
 #include"Voxel/VoxelEnvelope.cpp"
 
-
+YADE_REQUIRE_FEATURE(shape);
 YADE_PLUGIN((SnowVoxelsLoader));
 
 SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
@@ -584,7 +584,6 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
@@ -612,17 +611,20 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
-	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3r(0.5,0.5,0.5);
-	gBox->wire			= wire;
-	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(0.5,0.5,0.5);
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
-	body->geometricalModel		= gBox;
+	#ifdef YADE_SHAPE
+		shared_ptr<Box> gBox(new Box);
+		gBox->extents			= extents;
+		gBox->diffuseColor		= Vector3r(0.5,0.5,0.5);
+		gBox->wire			= wire;
+		gBox->shadowCaster		= false;
+		body->geometricalModel		= gBox;
+	#endif
 	body->physicalParameters	= physics;
 }
 

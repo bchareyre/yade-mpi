@@ -8,6 +8,7 @@
 
 #include "LineSegment.hpp"
 
+YADE_REQUIRE_FEATURE(shape);
 LineSegment::LineSegment () : GeometricalModel()
 {		
 	createIndex();

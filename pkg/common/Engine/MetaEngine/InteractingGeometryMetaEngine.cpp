@@ -11,6 +11,7 @@
 #include "InteractingGeometryMetaEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 
+YADE_REQUIRE_FEATURE(shape);
 void InteractingGeometryMetaEngine::action(MetaBody* ncb)
 {
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
