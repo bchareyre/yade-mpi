@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include<yade/core/MetaEngine2D.hpp>
-#include<yade/core/MetaEngine1D.hpp>
+#include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
 

@@ -14,7 +14,7 @@
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/GeometricalModel.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/core/EngineUnit2D.hpp>
+#include<yade/core/EngineUnit.hpp>
 
 #ifdef YADE_SHAPE
 	/*! \brief

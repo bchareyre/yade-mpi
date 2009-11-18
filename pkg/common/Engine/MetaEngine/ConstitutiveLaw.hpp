@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/Interaction.hpp>
-#include<yade/core/EngineUnit2D.hpp>
+#include<yade/core/EngineUnit.hpp>
 #include<yade/core/MetaBody.hpp>
 
 class ConstitutiveLaw: public EngineUnit2D <

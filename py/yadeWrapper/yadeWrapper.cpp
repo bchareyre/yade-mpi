@@ -31,14 +31,11 @@
 #include<yade/pkg-dem/STLImporter.hpp>
 
 #include<yade/core/MetaEngine.hpp>
-#include<yade/core/MetaEngine1D.hpp>
-#include<yade/core/MetaEngine2D.hpp>
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/core/DeusExMachina.hpp>
 #include<yade/core/EngineUnit.hpp>
 #include<yade/pkg-common/ParallelEngine.hpp>
-#include<yade/core/EngineUnit1D.hpp>
-#include<yade/core/EngineUnit2D.hpp>
+#include<yade/core/EngineUnit.hpp>
 
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
 #ifdef YADE_SHAPE

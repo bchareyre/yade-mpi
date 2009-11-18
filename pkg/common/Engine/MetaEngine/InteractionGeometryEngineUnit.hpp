@@ -11,7 +11,7 @@
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/EngineUnit2D.hpp>
+#include<yade/core/EngineUnit.hpp>
 
 #include <string>
 

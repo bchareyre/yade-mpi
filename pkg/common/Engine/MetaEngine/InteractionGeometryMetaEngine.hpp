@@ -13,7 +13,7 @@
 
 #include<yade/core/Interaction.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
-#include<yade/core/MetaEngine2D.hpp>
+#include<yade/core/MetaEngine.hpp>
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 

@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
-#include<yade/core/MetaEngine1D.hpp>
+#include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>

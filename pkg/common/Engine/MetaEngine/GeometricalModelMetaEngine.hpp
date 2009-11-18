@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
-#include<yade/core/MetaEngine2D.hpp>
+#include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/GeometricalModel.hpp>

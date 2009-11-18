@@ -10,7 +10,7 @@
 
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/EngineUnit2D.hpp>
+#include<yade/core/EngineUnit.hpp>
 #include <string>
 
 /*! \brief

@@ -1,6 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/MetaEngine2D.hpp>
+#include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>

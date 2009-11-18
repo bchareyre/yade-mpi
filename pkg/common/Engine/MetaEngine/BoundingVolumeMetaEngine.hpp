@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
 
-#include<yade/core/MetaEngine2D.hpp>
+#include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/BoundingVolume.hpp>

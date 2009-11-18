@@ -11,8 +11,7 @@
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/MetaBody.hpp>
-#include<yade/core/EngineUnit2D.hpp>
-#include<yade/core/EngineUnit1D.hpp>
+#include<yade/core/EngineUnit.hpp>
 
 class PhysicalActionDamperUnit: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<PhysicalParameters>&,const Body*, MetaBody*)>{
 	REGISTER_CLASS_AND_BASE(PhysicalActionDamperUnit,EngineUnit1D);

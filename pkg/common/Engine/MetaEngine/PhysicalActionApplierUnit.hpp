@@ -10,8 +10,7 @@
 
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/core/EngineUnit2D.hpp>
-#include<yade/core/EngineUnit1D.hpp>
+#include<yade/core/EngineUnit.hpp>
 
 class PhysicalActionApplierUnit: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<PhysicalParameters>&,const Body*, MetaBody*)>{
 	public: virtual ~PhysicalActionApplierUnit();

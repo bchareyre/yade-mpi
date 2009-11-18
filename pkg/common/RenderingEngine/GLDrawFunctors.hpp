@@ -10,7 +10,7 @@
 	#include<yade/core/GeometricalModel.hpp>
 #endif
 #include<yade/core/InteractingGeometry.hpp>
-#include<yade/core/EngineUnit1D.hpp>
+#include<yade/core/EngineUnit.hpp>
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/InteractionPhysics.hpp>

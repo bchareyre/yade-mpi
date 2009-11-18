@@ -10,7 +10,7 @@
 
 #include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/core/EngineUnit1D.hpp>
+#include<yade/core/EngineUnit.hpp>
 #include<yade/core/BexContainer.hpp>
 
 /*! \brief
