@@ -17,12 +17,10 @@ if 'qt3' not in env['exclude']:
 				'qt3/QtGeneratedSimulationController.ui',
 				'qt3/QtGeneratedMessageDialog.ui',
 				'qt3/YadeQtGeneratedMainWindow.ui',
-				'qt3/QtFileGeneratorController.ui',
-				]+(['qt3/QtSimulationPlayer.cpp','qt3/GLSimulationPlayerViewer.cpp','qt3/QtGeneratedSimulationPlayer.ui',] if 'deprecated' in env['features'] else [])
-				,
+				'qt3/QtFileGeneratorController.ui'],
 			LIBS=(['PythonUI'] if 'YADE_PYTHON' in env['CPPDEFINES'] else [])+[
 				'yade-serialization-qt',
-				linkPlugins(['GravityEngines','OpenGLRenderingEngine','PositionOrientationRecorder']+(['FilterEngine'] if 'deprecated' in env['features'] else [])),
+				linkPlugins(['GravityEngines','OpenGLRenderingEngine','PositionOrientationRecorder']),
 				'$QGLVIEWER_LIB'],
 			CPPPATH=env['CPPPATH']+['qt3']
 		),
@@ -32,8 +30,8 @@ if 'qt3' not in env['exclude']:
 	### HACK that works around https://bugs.launchpad.net/yade/+bug/406343
 	### (not clear why scons is not picking up the dependency automatically, though)
 	###
-	#gens=['$buildDir/gui/qt3/'+h for h in 'QtGeneratedSimulationController.h','QtGeneratedMessageDialog.h','YadeQtGeneratedMainWindow.h','QtFileGeneratorController.h']+(['QtGeneratedSimulationPlayer.h'] if 'deprecated' in env['features'] else [])
-	#env.Depends(['qt3/FileDialog.cpp','qt3/GLViewer.cpp','qt3/MessageDialog.cpp','qt3/QtFileGenerator.cpp','qt3/QtGUI.cpp','qt3/QtGUIPreferences.cpp','qt3/SimulationController.cpp','qt3/YadeQtMainWindow.cpp','qt3/YadeCamera.cpp']+(['qt3/GLSimulationPlayerViewer.cpp','qt3/QtSimulationPlayer.cpp'] if 'deprecated' in env['features'] else []),gens)
+	#gens=['$buildDir/gui/qt3/'+h for h in 'QtGeneratedSimulationController.h','QtGeneratedMessageDialog.h','YadeQtGeneratedMainWindow.h','QtFileGeneratorController.h']
+	#env.Depends(['qt3/FileDialog.cpp','qt3/GLViewer.cpp','qt3/MessageDialog.cpp','qt3/QtFileGenerator.cpp','qt3/QtGUI.cpp','qt3/QtGUIPreferences.cpp','qt3/SimulationController.cpp','qt3/YadeQtMainWindow.cpp','qt3/YadeCamera.cpp'],gens)
 
 import os.path
 

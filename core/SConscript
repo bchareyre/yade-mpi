@@ -25,8 +25,7 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'TimeStepper.cpp',
 			'yade.cpp',
 			'containers/BodyVector.cpp',
-			'containers/InteractionVecMap.cpp',
-			]+(['containers/BodyRedirectionVector.cpp',] if 'deprecated' in env['features'] else [])
+			'containers/InteractionVecMap.cpp']
 			),
 		LIBS=env['LIBS']+[
 			'yade-support',
