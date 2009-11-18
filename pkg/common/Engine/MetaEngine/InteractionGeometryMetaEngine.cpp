@@ -52,6 +52,7 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r cellSize; if(ncb->isPeriodic) cellSize=ncb->cellMax-ncb->cellMin;
+	bool removeUnseenIntrs=(ncb->interactions->iterColliderLastRun>=0 && ncb->interactions->iterColliderLastRun==ncb->currentIteration);
 	#ifdef YADE_OPENMP
 		const long size=ncb->transientInteractions->size();
 		#pragma omp parallel for
@@ -60,6 +61,10 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 	#else
 		FOREACH(const shared_ptr<Interaction>& I, *ncb->interactions){
 	#endif
+			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<ncb->currentIteration) {
+				ncb->interactions->requestErase(I->getId1(),I->getId2());
+				continue;
+			}
 			const shared_ptr<Body>& b1=(*bodies)[I->getId1()];
 			const shared_ptr<Body>& b2=(*bodies)[I->getId2()];
 			bool wasReal=I->isReal();

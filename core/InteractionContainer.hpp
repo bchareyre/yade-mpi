@@ -86,8 +86,9 @@ class InteractionContainer : public Serializable
 {
 	public :
 		boost::mutex	drawloopmutex;
+		long iterColliderLastRun;
 
-		InteractionContainer(): serializeSorted(false) {
+		InteractionContainer(): iterColliderLastRun(-1), serializeSorted(false) {
 			#ifdef YADE_OPENMP
 				threadsPendingErase.resize(omp_get_max_threads());
 			#endif

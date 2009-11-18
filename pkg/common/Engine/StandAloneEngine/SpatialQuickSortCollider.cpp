@@ -15,7 +15,6 @@ YADE_PLUGIN((SpatialQuickSortCollider));
 
 SpatialQuickSortCollider::SpatialQuickSortCollider() : Collider()
 {
-	haveDistantTransient=false;
 }
 
 SpatialQuickSortCollider::~SpatialQuickSortCollider()
@@ -27,8 +26,9 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 {
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	// This collider traverses all interactions at every step, therefore interactions that were reset() will be deleted automatically as needed
-	ncb->interactions->clearPendingErase();
+	// This collider traverses all interactions at every step, therefore all interactions
+	// that were requested for erase might be erased here and will be recreated if necessary.
+	ncb->interactions->unconditionalErasePending();
 
 	size_t nbElements=bodies->size();
 	if (nbElements!=rank.size())
@@ -59,12 +59,9 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	   rank[i]->min = min;
 	   rank[i]->max = max;
 	}
-
-	shared_ptr< InteractionContainer > transientInteractions = ncb->transientInteractions;
-	InteractionContainer::iterator ii    = transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = transientInteractions->end();
-	for( ; ii!=iiEnd ; ++ii)
-		(*ii)->cycle=false;
+	
+	const shared_ptr<InteractionContainer>& interactions=ncb->interactions;
+	ncb->interactions->iterColliderLastRun=ncb->currentIteration;
 
 	sort(rank.begin(), rank.end(), xBoundComparator()); // sotring along X
 
@@ -85,34 +82,14 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 			&& rank[j]->max[2] > min[2])
 			{
 				id2=rank[j]->id;
-				if ( (interaction = transientInteractions->find(body_id_t(id),body_id_t(id2))) == 0)
+				if ( (interaction = interactions->find(body_id_t(id),body_id_t(id2))) == 0)
 				{
 					interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
-					transientInteractions->insert(interaction);
+					interactions->insert(interaction);
 				}
-				interaction->cycle=true; 
-				// if interaction !isReal it falls back to the potential state
-				// FIXME: eudoxos: do nothing here... is that correct?
-				// if (!haveDistantTransient && !interaction->isReal()) interaction->isNew=true;
+				interaction->iterLastSeen=ncb->currentIteration; 
 			}
 	    }
 	}
-
-	ii    = transientInteractions->begin();
-	iiEnd = transientInteractions->end();
-	for( ; ii!=iiEnd ; ++ii)
-	{
-		interaction = *ii;
-		if( 
-			// if haveDistantTransient remove interactions deleted by the constitutive law
-				(haveDistantTransient && !interaction->isReal())
-			// if !haveDistantTransient remove interactions without AABB overlapping
-				|| (!haveDistantTransient && !interaction->cycle) 
-		) { 
-			transientInteractions->erase( interaction->getId1(), interaction->getId2() ); 
-			continue; 
-		}
-	}
-
 }
 

@@ -38,11 +38,7 @@ class SpatialQuickSortCollider : public Collider {
 
 	virtual void action(MetaBody*);
 
-
-	//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.
-	bool haveDistantTransient;
-
-	REGISTER_ATTRIBUTES(Collider,(haveDistantTransient));
+	REGISTER_ATTRIBUTES(Collider,);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(SpatialQuickSortCollider);
 	REGISTER_BASE_CLASS_NAME(Collider);

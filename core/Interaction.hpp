@@ -33,8 +33,8 @@ class Interaction : public Serializable
 		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
 		bool isFresh(MetaBody* rb);
 
-		//! phase flag to mark (for example, SpatialQuickSortCollider mark by it the stale interactions) 
-		bool cycle;      
+		//! At which step this interaction was last detected by the collider. InteractionDispatcher will remove it if InteractionContainer::iterColliderLastRun==currentStep and iterLastSeen<currentStep
+		long iterLastSeen;      
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 

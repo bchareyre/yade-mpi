@@ -35,6 +35,7 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 		alreadyWarnedNoCollider=true;
 	}
 	Vector3r cellSize; if(rootBody->isPeriodic) cellSize=rootBody->cellMax-rootBody->cellMin;
+	bool removeUnseenIntrs=(rootBody->interactions->iterColliderLastRun>=0 && rootBody->interactions->iterColliderLastRun==rootBody->currentIteration);
 	#ifdef YADE_OPENMP
 		const long size=rootBody->interactions->size();
 		#pragma omp parallel for schedule(guided)
@@ -44,13 +45,19 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 		FOREACH(shared_ptr<Interaction> I, *rootBody->interactions){
 	#endif
 		#ifdef DISPATCH_CACHE
+			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<rootBody->currentIteration) {
+				rootBody->interactions->requestErase(I->getId1(),I->getId2());
+				continue;
+			}
 
 			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
 
+			// FIXME: maybe this could be run even in production code without harm. It would make removing bodies much faster, since we wouldn't have to search its interactions and removing them.
 			#ifndef NDEBUG
-				if(!b1_ || !b2_){ LOG_ERROR("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); rootBody->interactions->requestErase(I->getId1(),I->getId2()); continue; }
+				if(!b1_ || !b2_){ LOG_ERROR("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); rootBody->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
 			#endif
+
 			// go fast if this pair of bodies cannot interact at all
 			if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
 
