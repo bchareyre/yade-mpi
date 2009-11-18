@@ -366,7 +366,7 @@ if not env.GetOption('clean'):
 			and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 		if not ok: featureNotOK('python')
 	if 'cgal' in env['features']:
-		ok=cong.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
+		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		if not ok: featureNotOK('cgal')
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 
