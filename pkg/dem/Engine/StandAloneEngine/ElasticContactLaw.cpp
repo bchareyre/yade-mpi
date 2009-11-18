@@ -22,10 +22,10 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
+	neverErase = false;
 	#ifdef SCG_SHEAR
 		useShear=false;
 	#endif
-	neverErase = false;
 }
 
 
@@ -60,8 +60,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
 			SpheresContactGeometry*    currentContactGeometry= static_cast<SpheresContactGeometry*>(ig.get());
 			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());			
-			
-			// delete interaction where spheres don't touch (or are "far enough" with respect to interactionDeletionFactor)
+						
 			if(currentContactGeometry->penetrationDepth <0)
 			{
 				if (neverErase) {
@@ -69,9 +68,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 					currentContactPhysics->normalForce = Vector3r::ZERO;}
 				else 	ncb->interactions->requestErase(id1,id2);
 				return;
-			}
-				
-				
+			}	
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id2,ncb)->physicalParameters.get());
