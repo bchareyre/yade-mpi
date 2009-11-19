@@ -124,7 +124,7 @@ def wall(position,axis,sense=0,color=None,physParamsClass='BodyMacroParameters',
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noInteractingGeometry=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noBoundingVolume=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()
 	if not color: color=randomColor()
@@ -134,12 +134,11 @@ def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,
 	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
 	b.phys=PhysicalParameters(physParamsClass)
 	b.phys.updateExistingAttrs(pp)
-	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+	if not noBoundingVolume: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 	b['isDynamic']=dynamic
-	if not noInteractingGeometry: 
-		b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color,wire=wire,highlight=highlight)
-		b.mold['vertices']=vertices
-		b.mold.postProcessAttributes(True)
+	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color,wire=wire,highlight=highlight)
+	b.mold['vertices']=vertices
+	b.mold.postProcessAttributes(True)
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):

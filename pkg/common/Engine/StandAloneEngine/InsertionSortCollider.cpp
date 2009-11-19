@@ -68,7 +68,7 @@ bool InsertionSortCollider::probeBoundingVolume(const BoundingVolume& bv)
 			it=XX.begin(),et=XX.end(); it < et; ++it)
 	{
 		if (it->coord > bv.max[0]) break;
-		if (!it->flags.isMin) continue;
+		if (!it->flags.isMin || !it->flags.hasBB) continue;
 		int offset = 3*it->id;
 		if (!(maxima[offset] < bv.min[0] ||
 				minima[offset+1] > bv.max[1] ||
