@@ -76,6 +76,11 @@ private:
 	typedef	boost::variate_generator<boost::minstd_rand,boost::uniform_int<> > RandomInt;
 	shared_ptr<RandomInt> randomFacet;
 
+	static boost::variate_generator<boost::mt19937,boost::uniform_real<> > 
+		randomUnit;
+	static boost::variate_generator<boost::mt19937,boost::uniform_real<> >
+		randomSymmetricUnit;
+
 	DECLARE_LOGGER;
 
 	REGISTER_ATTRIBUTES(PeriodicEngine,

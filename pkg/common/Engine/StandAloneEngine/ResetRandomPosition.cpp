@@ -20,12 +20,10 @@ YADE_PLUGIN((ResetRandomPosition));
 YADE_REQUIRE_FEATURE(PYTHON)
 CREATE_LOGGER(ResetRandomPosition);
 
-namespace {
 boost::variate_generator<boost::mt19937,boost::uniform_real<> > 
-	randomUnit(boost::mt19937(),boost::uniform_real<>(0,1));
+	ResetRandomPosition::randomUnit(boost::mt19937(),boost::uniform_real<>(0,1));
 boost::variate_generator<boost::mt19937,boost::uniform_real<> >
-	randomSymmetricUnit(boost::mt19937(),boost::uniform_real<>(-1,1));
-}
+	ResetRandomPosition::randomSymmetricUnit(boost::mt19937(),boost::uniform_real<>(-1,1));
 
 ResetRandomPosition::ResetRandomPosition() 
 {
