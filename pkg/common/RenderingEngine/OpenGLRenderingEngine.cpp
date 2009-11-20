@@ -94,22 +94,20 @@ void OpenGLRenderingEngine::initgl(){
 }
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<MetaBody>& rootBody){
-	#ifdef YADE_SHAPE
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b || !b->geometricalModel) continue;
+		if(!b || !b->interactingGeometry) continue;
 		glPushMatrix();
 		const Se3r& se3=b->physicalParameters->se3;
 		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if(b->geometricalModel->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
+		//if(b->interactingGeometry->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
 			glPushName(b->getId());
-			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,/* always solid, not wireframe */false);
+			interactingGeometryDispatcher(b->interactingGeometry,b->physicalParameters,/* always solid, not wireframe */false);
 			glPopName();
-		}
+		//}
 		glPopMatrix();
 	}
-	#endif
 };
 
 bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){

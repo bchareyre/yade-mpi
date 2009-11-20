@@ -22,8 +22,8 @@
     </property>
     <property name="minimumSize">
         <size>
-            <width>244</width>
-            <height>128</height>
+            <width>230</width>
+            <height>111</height>
         </size>
     </property>
     <property name="caption">
@@ -56,14 +56,6 @@
                     </property>
                     <property name="text">
                         <string>Controller</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="1" column="0">
-                    <property name="name">
-                        <cstring>btPlayer</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Player</string>
                     </property>
                 </widget>
                 <widget class="QPushButton" row="0" column="0">
@@ -101,27 +93,18 @@
         <slot>createGenerator()</slot>
     </connection>
     <connection>
-        <sender>btQuit</sender>
-        <signal>pressed()</signal>
-        <receiver>YadeQtGeneratedMainWindow</receiver>
-        <slot>Quit()</slot>
-    </connection>
-    <connection>
-        <sender>btPlayer</sender>
-        <signal>pressed()</signal>
-        <receiver>YadeQtGeneratedMainWindow</receiver>
-        <slot>createPlayer()</slot>
-    </connection>
-    <connection>
         <sender>btController</sender>
         <signal>pressed()</signal>
         <receiver>YadeQtGeneratedMainWindow</receiver>
         <slot>createController()</slot>
     </connection>
+    <connection>
+        <sender>btQuit</sender>
+        <signal>pressed()</signal>
+        <receiver>YadeQtGeneratedMainWindow</receiver>
+        <slot>Quit()</slot>
+    </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">YadeQtGeneratedMainWindow.ui.h</include>
-</includes>
 <slots>
     <slot>closeController()</slot>
     <slot>createGenerator()</slot>

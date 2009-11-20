@@ -144,7 +144,7 @@ opts.AddVariables(
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
 	EnumVariable('linkStrategy','How to link plugins together','per-class',['per-class','per-pkg[broken]','monolithic','static[broken]']),
 	('version','Yade version (if not specified, guess will be attempted)',None),
-	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)',None,None,colonSplit),
+	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)',None),
 	('LIBPATH','Additional paths for the linker (colon-separated)',None,None,colonSplit),
 	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,colonSplit),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None,None,colonSplit),
@@ -160,6 +160,8 @@ opts.AddVariables(
 )
 opts.Update(env)
 opts.Save(optsFile,env)
+if env.has_key('CPPPATH'):
+	env['CPPPATH']=colonSplit(env['CPPPATH'])
 
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})

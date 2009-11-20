@@ -105,12 +105,12 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 def wall(position,axis,sense=0,color=None,physParamsClass='BodyMacroParameters',**physParamsAttr):
 	"""Return ready-made wall body.
 
-	@param position: float or Vector3 specifying center of the wall. If float, it is the position along given axis, the other 2 components being zero
-	@param axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
-	@param sense: sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
-	@return: Body instance
+	:param position: float or Vector3 specifying center of the wall. If float, it is the position along given axis, the other 2 components being zero
+	:param axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
+	:param sense: sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
+	:return: Body instance
 
-	Note: GeometricalModel is not set.
+	.. note: GeometricalModel is not set.
 	"""
 	b=Body()
 	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr)

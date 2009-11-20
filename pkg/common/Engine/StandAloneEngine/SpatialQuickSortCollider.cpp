@@ -43,21 +43,19 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 	shared_ptr<Body> b;
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
-	for(int i=0 ; bi!=biEnd ; ++bi,++i )
+	for(int i=0 ; bi!=biEnd ; ++bi)
 	{
 	   b = *bi;
+		if(!b->boundingVolume) continue;
 	   
-	   if(b->boundingVolume) 
-	   {
-	      min = b->boundingVolume->min;
-	      max = b->boundingVolume->max;
-	   }
-	   else
-	      min=max=b->physicalParameters->se3.position;
+	   min = b->boundingVolume->min;
+	   max = b->boundingVolume->max;
 
 	   rank[i]->id = b->getId();
 	   rank[i]->min = min;
 	   rank[i]->max = max;
+
+		i++;
 	}
 	
 	const shared_ptr<InteractionContainer>& interactions=ncb->interactions;

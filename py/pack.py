@@ -219,28 +219,28 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The priodicity depens on whether	the spheresInCell parameter is given.
 
-	L{O.switchWorld()<Omega.switchWorld>} magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
+	*O.switchWorld()* magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
 	This function therefore should never run in parallel with some code accessing your simulation.
 
-	@param predicate: solid-defining predicate for which we generate packing
-	@param spheresInCell: if given, the packing will be periodic, with given number of spheres in the periodic cell.
-	@param radius: mean radius of spheres
-	@param rRelFuzz: relative fuzz of the radius -- e.g. radius=10, rRelFuzz=.2, then spheres will have radii 10 ± ½(10*.2)).
+	:param predicate: solid-defining predicate for which we generate packing
+	:param spheresInCell: if given, the packing will be periodic, with given number of spheres in the periodic cell.
+	:param radius: mean radius of spheres
+	:param rRelFuzz: relative fuzz of the radius -- e.g. radius=10, rRelFuzz=.2, then spheres will have radii 10 ± ½(10*.2)).
 		0 by default, meaning all spheres will have exactly the same radius.
-	@param cropLayers: (aperiodic only) how many layers of spheres will be added to the computed dimension of the box so that there no
+	:param cropLayers: (aperiodic only) how many layers of spheres will be added to the computed dimension of the box so that there no
 		(or not so much, at least) boundary effects at the boundaries of the predicate.
-	@param dim: dimension of the packing, to override dimensions of the predicate (if it is infinite, for instance)
-	@param memoizeDb: name of sqlite database (existent or nonexistent) to find an already generated packing or to store
+	:param dim: dimension of the packing, to override dimensions of the predicate (if it is infinite, for instance)
+	:param memoizeDb: name of sqlite database (existent or nonexistent) to find an already generated packing or to store
 		the packing that will be generated, if not found (the technique of caching results of expensive computations
 		is known as memoization). Fuzzy matching is used to select suitable candidate -- packing will be scaled, rRelFuzz
 		and dimensions compared. Packing that are too small are dictarded. From the remaining candidate, the one with the
 		least number spheres will be loaded and returned.
-	@param useOBB: effective only if a inGtsSurface predicate is given. If true (default), oriented bounding box will be
+	:param useOBB: effective only if a inGtsSurface predicate is given. If true (default), oriented bounding box will be
 		computed first; it can reduce substantially number of spheres for the triaxial compression (like 10× depending on
 		how much asymmetric the body is), see scripts/test/gts-triax-pack-obb.py.
-	@param memoDbg: show packigns that are considered and reasons why they are rejected/accepted
+	:param memoDbg: show packigns that are considered and reasons why they are rejected/accepted
 
-	@return: SpherePack object with spheres, filtered by the predicate.
+	:return: SpherePack object with spheres, filtered by the predicate.
 	"""
 	import sqlite3, os.path, cPickle, time, sys, _packPredicates
 	from yade import log
