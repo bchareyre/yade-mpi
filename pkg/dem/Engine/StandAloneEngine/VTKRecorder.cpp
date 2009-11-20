@@ -127,6 +127,8 @@ void VTKRecorder::action(MetaBody* rootBody)
 	}
 
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if (!b) continue;
+
 		if (recActive[REC_SPHERES])
 		{
 			const InteractingSphere* sphere = dynamic_cast<InteractingSphere*>(b->interactingGeometry.get()); 
