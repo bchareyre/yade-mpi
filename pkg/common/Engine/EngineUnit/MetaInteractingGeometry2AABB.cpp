@@ -26,22 +26,15 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	Vector3r mn(inf,inf,inf);
 	
 	const MetaBody * ncb = YADE_CAST<const MetaBody*>(body);
-	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for( ; bi!=biEnd ; ++bi )
-	{
-		shared_ptr<Body> b = *bi;
-		if(b->boundingVolume)
-		{
+	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
+		if(!b) continue;
+		if(b->boundingVolume){
 			for(int i=0; i<3; i++){
 				if(!isinf(b->boundingVolume->max[i])) mx[i]=max(mx[i],b->boundingVolume->max[i]);
 				if(!isinf(b->boundingVolume->min[i])) mn[i]=min(mn[i],b->boundingVolume->min[i]);
 			}
-		} 
-		else
-		{
+		} else {
 	 		mx=componentMaxVector(mx,b->physicalParameters->se3.position);
  			mn=componentMinVector(mn,b->physicalParameters->se3.position);
 		}
@@ -49,7 +42,7 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	
 	aabb->center = (mx+mn)*0.5;
 	aabb->halfSize = (mx-mn)*0.5;
-	
+
 	aabb->min = mn;
 	aabb->max = mx;
 }

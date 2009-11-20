@@ -67,6 +67,7 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 		}
 	long moveFaster=0, moveSlower=0;
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(!b) continue;
 		RigidBodyParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 		Real velSq=VelocityBins::getBodyVelSq(rbp);
 		binNo_t newBin=-1, oldBin=bodyBins[b->getId()];

@@ -10,7 +10,7 @@
 #include <yade/pkg-common/InteractingFacet.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-
+bool GLDrawInteractingFacet::normals=false;
 
 void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool,const GLViewInfo&)
 {   
@@ -28,6 +28,8 @@ void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const
 	    glVertex3v(vertices[1]);
 	    glVertex3v(vertices[2]);
     glEnd();
+
+	 if(!normals) return;
 
 	// facet's normal 
     glBegin(GL_LINES);

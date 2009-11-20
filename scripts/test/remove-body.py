@@ -7,8 +7,8 @@
 
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB()]),
-	InsertionSortCollider(),
+	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	InsertionSortCollider(nBins=5,sweepLength=5e-3),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(
 		[ef2_Facet_Sphere_Dem3DofGeom()],
@@ -22,6 +22,8 @@ O.bodies.append([
 	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
 	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False,young=1e3)
 ])
+
+#GLDrawInteractingFacet(normals=True)
 
 import random,sys
 

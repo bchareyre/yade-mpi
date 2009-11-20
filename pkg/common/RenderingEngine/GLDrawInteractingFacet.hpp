@@ -12,13 +12,15 @@
 
 class GLDrawInteractingFacet : public GLDrawInteractingGeometryFunctor
 {	
-	
+	//! render facet's and edges' normals
+	static bool normals;
 	public :
 		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 	RENDERS(InteractingFacet);
 	REGISTER_CLASS_NAME(GLDrawInteractingFacet);
 	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	REGISTER_ATTRIBUTES(GLDrawInteractingGeometryFunctor,(normals));
 };
 
 REGISTER_SERIALIZABLE(GLDrawInteractingFacet);
