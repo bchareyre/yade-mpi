@@ -14,6 +14,9 @@
 #include"InteractingGeometry.hpp"
 #include"BoundingVolume.hpp"
 #include"PhysicalParameters.hpp"
+#include"State.hpp"
+#include"Material.hpp"
+
 #include"InteractionContainer.hpp"
 #include"Interaction.hpp"
 
@@ -68,8 +71,15 @@ class Body : public Serializable
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
-		/// here are stored physical things that describe the Body: mass, stiffness
-		shared_ptr<PhysicalParameters>	physicalParameters;
+		#ifdef YADE_NOMATERIAL
+			/// here are stored physical things that describe the Body: mass, stiffness
+			shared_ptr<PhysicalParameters>	physicalParameters;
+		#else
+			//! material of the body; might be shared among bodies (via shared_ptr)
+			shared_ptr<Material> material;
+			//! state of the body
+			shared_ptr<State> state;
+		#endif
 		#ifdef YADE_SHAPE
 			/// the 'perfect' representation of body's geometry: Polyhedron, Box
 			shared_ptr<GeometricalModel>	geometricalModel;
@@ -94,7 +104,12 @@ class Body : public Serializable
 			(id)
 			(groupMask)
 			(isDynamic)
-			(physicalParameters)
+			#ifdef YADE_NOMATERIAL
+				(physicalParameters)
+			#else
+				(material)
+				(state)
+			#endif
 			#ifdef YADE_SHAPE
 				(geometricalModel)
 			#endif

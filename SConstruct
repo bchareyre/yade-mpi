@@ -138,7 +138,7 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts','vtk','shape']),
+	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts','vtk','shape','nomaterial']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
