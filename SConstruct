@@ -161,9 +161,9 @@ opts.AddVariables(
 opts.Update(env)
 opts.Save(optsFile,env)
 if env.has_key('CPPPATH'):
-	env['CPPPATH']=colonSplit(env['CPPPATH'][0])
+	env['CPPPATH']=colonSplit(env['CPPPATH'])
 if env.has_key('LIBPATH'):
-	env['LIBPATH']=colonSplit(env['LIBPATH'][0])
+	env['LIBPATH']=colonSplit(env['LIBPATH'])
 
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
