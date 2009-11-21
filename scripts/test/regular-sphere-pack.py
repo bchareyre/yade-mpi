@@ -56,7 +56,8 @@ kwMeshes={'frictionAngle':0.5,'color':[1,1,0],'wire':True,'dynamic':False}
 O.bodies.append(utils.import_mesh_geometry('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
 """Import regular-sphere-pack-LSMGegGeo.geo into the YADE simulation"""
-O.bodies.append(utils.import_LSMGenGeo_geometry('cyl.geo',moveTo=[-7.0,-7.0,-5.9],color=(0,0,1),**kw))
+O.bodies.append(utils.import_LSMGenGeo_geometry('regular-sphere-pack-LSMGegGeo.geo',moveTo=[-7.0,-7.0,-5.9],color=(1,0,1),**kw))
+
 
 try:
 	from yade import qt

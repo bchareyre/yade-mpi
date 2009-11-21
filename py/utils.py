@@ -374,6 +374,31 @@ def import_mesh_geometry(meshfile="file.mesh",**kw):
 		ret.append(facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
 	return ret
 
+def import_LSMGenGeo_geometry(fileName="file.geo",moveTo=[0.0,0.0,0.0],**kw):
+	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
+	moveTo[X,Y,Z] parameter moves the specimen.
+	Remaining **kw arguments are passed to utils.sphere; 
+	
+	LSMGenGeo library allows to create pack of spheres
+	with given [Rmin:Rmax] with null stress inside the specimen.
+	Can be usefull for Mining Rock simulation.
+	
+	Example added to scripts/test/regular-sphere-pack.py
+	Example of LSMGenGeo library using is added to genCylLSM.py
+	
+  http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
+	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
+
+	infile = open(fileName,"r")
+	lines = infile.readlines()
+	infile.close()
+
+	numSpheres = int(lines[6].split()[0])
+	ret=[]
+	for line in lines[7:numSpheres+7]:
+		data = line.split()
+		ret.append(sphere([moveTo[0]+float(data[0]),moveTo[1]+float(data[1]),moveTo[2]+float(data[2])],float(data[3]),**kw))
+	return ret
 
 def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	"""Create .ogg video from external image files.
