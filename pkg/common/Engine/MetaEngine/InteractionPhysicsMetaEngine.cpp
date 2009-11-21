@@ -14,7 +14,7 @@
  * 
  * The interaction must be real (needed?).
  */
-void InteractionPhysicsMetaEngine::explicitAction(shared_ptr<PhysicalParameters>& pp1, shared_ptr<PhysicalParameters>& pp2, shared_ptr<Interaction>& i){
+void InteractionPhysicsMetaEngine::explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i){
 	// should we throw instead of asserting?
 	assert(i->isReal());
 	operator()(pp1,pp2,i);
@@ -36,7 +36,7 @@ void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 				shared_ptr<Body>& b1 = (*bodies)[interaction->getId1()];
 				shared_ptr<Body>& b2 = (*bodies)[interaction->getId2()];
 				bool hadPhys=interaction->interactionPhysics;
-				operator()(b1->physicalParameters, b2->physicalParameters, interaction);
+				operator()(b1->material, b2->material, interaction);
 				assert(interaction->interactionPhysics);
 				if(!hadPhys) interaction->iterMadeReal=ncb->currentIteration;
 			}

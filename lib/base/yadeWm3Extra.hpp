@@ -61,6 +61,7 @@ class Se3
 		}
 		Se3<RealType> inverse(){ return Se3(-(orientation.inverse()*position), orientation.inverse());}
 
+
 		void toGLMatrix(float m[16]){ orientation.toGLMatrix(m); m[12] = position[0]; m[13] = position[1]; m[14] = position[2];}
 
 		Vector3<RealType> operator * (const Vector3<RealType>& b ){return orientation*b+position;}

@@ -13,10 +13,10 @@
 class SimpleElasticRelationships : public InteractionPhysicsEngineUnit
 {
 	public :
-		virtual void go(	const shared_ptr<PhysicalParameters>& b1,
-					const shared_ptr<PhysicalParameters>& b2,
+		virtual void go(	const shared_ptr<Material>& b1,
+					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
+	FUNCTOR2D(GranularMat,GranularMat);
 	REGISTER_CLASS_AND_BASE(SimpleElasticRelationships,InteractionPhysicsEngineUnit);
 	REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,/*nothing here*/);
 };

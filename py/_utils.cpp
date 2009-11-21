@@ -38,8 +38,8 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
-		minimum=componentMinVector(minimum,b->physicalParameters->se3.position-(centers?Vector3r::ZERO:rrr));
-		maximum=componentMaxVector(maximum,b->physicalParameters->se3.position+(centers?Vector3r::ZERO:rrr));
+		minimum=componentMinVector(minimum,b->state->pos-(centers?Vector3r::ZERO:rrr));
+		maximum=componentMaxVector(maximum,b->state->pos+(centers?Vector3r::ZERO:rrr));
 	}
 	Vector3r dim=maximum-minimum;
 	return python::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
@@ -52,8 +52,8 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	python::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry); if(!s) continue;
-		if(b->physicalParameters->se3.position[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
-		if(b->physicalParameters->se3.position[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
+		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
+		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
 	}
 	return python::make_tuple(minIds,maxIds);
 }
@@ -64,9 +64,9 @@ python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()
 	if(useBB){bbMin=extract<Vector3r>(AABB[0])();bbMax=extract<Vector3r>(AABB[1])();}
 	python::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getRootBody()->bodies){
-		if(useBB && !isInBB(b->physicalParameters->se3.position,bbMin,bbMax)) continue;
-		retCoord.append(b->physicalParameters->se3.position[axis]);
-		retDispl.append(b->physicalParameters->se3.position[axis]-b->physicalParameters->refSe3.position[axis]);
+		if(useBB && !isInBB(b->state->pos,bbMin,bbMax)) continue;
+		retCoord.append(b->state->pos[axis]);
+		retDispl.append(b->state->pos[axis]-b->state->refPos[axis]);
 	}
 	return python::make_tuple(retCoord,retDispl);
 }
@@ -74,8 +74,8 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(coordsAndDisplacements_overloads,coordsAndDispla
 
 void setRefSe3(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
-		b->physicalParameters->refSe3.position=b->physicalParameters->se3.position;
-		b->physicalParameters->refSe3.orientation=b->physicalParameters->se3.orientation;
+		b->state->refPos=b->state->pos;
+		b->state->refOri=b->state->ori;
 	}
 }
 
@@ -90,13 +90,13 @@ Real elasticEnergyInAABB(python::tuple AABB){
 		shared_ptr<NormalShearInteraction> bc=dynamic_pointer_cast<NormalShearInteraction>(i->interactionPhysics); if(!bc) continue;
 		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!bc){LOG_ERROR("NormalShearInteraction contact doesn't have SpheresContactGeomety associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
-		bool isIn1=isInBB(b1->physicalParameters->se3.position,bbMin,bbMax), isIn2=isInBB(b2->physicalParameters->se3.position,bbMin,bbMax);
+		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
 		LOG_DEBUG("Interaction #"<<i->getId1()<<"--#"<<i->getId2());
 		Real weight=1.;
 		if((!isIn1 && isIn2) || (isIn1 && !isIn2)){
 			//shared_ptr<Body> bIn=isIn1?b1:b2, bOut=isIn2?b2:b1;
-			Vector3r vIn=(isIn1?b1:b2)->physicalParameters->se3.position, vOut=(isIn2?b1:b2)->physicalParameters->se3.position;
+			Vector3r vIn=(isIn1?b1:b2)->state->pos, vOut=(isIn2?b1:b2)->state->pos;
 			#define _WEIGHT_COMPONENT(axis) if(vOut[axis]<bbMin[axis]) weight=min(weight,abs((vOut[axis]-bbMin[axis])/(vOut[axis]-vIn[axis]))); else if(vOut[axis]>bbMax[axis]) weight=min(weight,abs((vOut[axis]-bbMax[axis])/(vOut[axis]-vIn[axis])));
 			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
 			assert(weight>=0 && weight<=1);
@@ -129,7 +129,7 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 		if(!i->isReal()) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
-		if(useBB && !isInBB(b1->physicalParameters->se3.position,bbMin,bbMax) && !isInBB(b2->physicalParameters->se3.position,bbMin,bbMax)) continue;
+		if(useBB && !isInBB(b1->state->pos,bbMin,bbMax) && !isInBB(b2->state->pos,bbMin,bbMax)) continue;
 		shared_ptr<SpheresContactGeometry> scg=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!scg) continue;
 		Vector3r n(scg->normal); n[axis]=0.; Real nLen=n.Length();
 		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
@@ -151,8 +151,8 @@ python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
 		if(!i->isReal()) continue;
 		const body_id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
-		if(useBB && isInBB(b1->physicalParameters->se3.position,bbMin,bbMax)) bodyNumInta[id1]=bodyNumInta[id1]>0?bodyNumInta[id1]+1:1;
-		if(useBB && isInBB(b2->physicalParameters->se3.position,bbMin,bbMax)) bodyNumInta[id2]=bodyNumInta[id2]>0?bodyNumInta[id2]+1:1;
+		if(useBB && isInBB(b1->state->pos,bbMin,bbMax)) bodyNumInta[id1]=bodyNumInta[id1]>0?bodyNumInta[id1]+1:1;
+		if(useBB && isInBB(b2->state->pos,bbMin,bbMax)) bodyNumInta[id2]=bodyNumInta[id2]>0?bodyNumInta[id2]+1:1;
 		maxInta=max(max(maxInta,bodyNumInta[b1->getId()]),bodyNumInta[b2->getId()]);
 	}
 	vector<int> bins; bins.resize(maxInta+1);
@@ -210,7 +210,7 @@ Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axis
 		const Body* b=(*rb->bodies)[python::extract<int>(ids[i])].get();
 		const Vector3r& m=rb->bex.getTorque(b->getId());
 		const Vector3r& f=rb->bex.getForce(b->getId());
-		Vector3r r=b->physicalParameters->se3.position-axisPt;
+		Vector3r r=b->state->pos-axisPt;
 		ret+=axis.Dot(m+r.Cross(f));
 	}
 	return ret;
@@ -340,7 +340,7 @@ Real approxSectionArea(Real coord, int axis){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
 		InteractingSphere* s=dynamic_cast<InteractingSphere*>(b->interactingGeometry.get());
 		if(!s) continue;
-		const Vector3r& pos(b->physicalParameters->se3.position); const Real r(s->radius);
+		const Vector3r& pos(b->state->pos); const Real r(s->radius);
 		if((pos[axis]>coord && (pos[axis]-r)>coord) || (pos[axis]<coord && (pos[axis]+r)<coord)) continue;
 		Vector2r c(pos[ax1],pos[ax2]);
 		cloud.push_back(c+Vector2r(r,0)); cloud.push_back(c+Vector2r(-r,0));
@@ -372,7 +372,7 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 		Vector3r pos1,pos2;
 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies
 		if(d3dg){ pos1=d3dg->se31.position; pos2=d3dg->se32.position; }
-		else{ pos1=Body::byId(I->getId1(),rootBody)->physicalParameters->se3.position; pos2=Body::byId(I->getId2(),rootBody)->physicalParameters->se3.position; }
+		else{ pos1=Body::byId(I->getId1(),rootBody)->state->pos; pos2=Body::byId(I->getId2(),rootBody)->state->pos; }
 		Real dot1=(pos1-planePt).Dot(normal), dot2=(pos2-planePt).Dot(normal);
 		if(dot1*dot2>0) continue; // both interaction points on the same side of the plane
 		// if pt1 is on the negative plane side, d3dg->normal.Dot(normal)>0, the force is well oriented;

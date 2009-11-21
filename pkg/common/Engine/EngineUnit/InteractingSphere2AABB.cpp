@@ -21,6 +21,3 @@ void InteractingSphere2AABB::go(const shared_ptr<InteractingGeometry>& cm, share
 }
 	
 YADE_PLUGIN((InteractingSphere2AABB));
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
-

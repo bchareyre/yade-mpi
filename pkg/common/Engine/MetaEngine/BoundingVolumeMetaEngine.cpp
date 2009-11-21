@@ -13,7 +13,6 @@
 
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 
 CREATE_LOGGER(BoundingVolumeMetaEngine);
@@ -35,9 +34,9 @@ void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 			if(!ig->boundFunctor){ bool swap=false; ig->boundFunctor=this->getFunctor2D(ig,b->boundingVolume,swap); /* no sense, different types: */ assert(!swap); if(!ig->boundFunctor) continue; }
 			// LOG_DEBUG("ig->boundFunctor.get()=="<<ig->boundFunctor.get()<<" for "<<b->interactingGeometry->getClassName()<<", #"<<id);
 			//if(!ig->boundFunctor) throw runtime_error("boundFunctor not found for #"+lexical_cast<string>(id)); assert(ig->boundFunctor);
-			ig->boundFunctor->go(ig,b->boundingVolume,b->physicalParameters->se3,b.get());
+			ig->boundFunctor->go(ig,b->boundingVolume,b->state->se3,b.get());
 		#else
-			operator()(ig,b->boundingVolume,b->physicalParameters->se3,b.get());
+			operator()(ig,b->boundingVolume,b->state->se3,b.get());
 		#endif
 		if(sweepDist>0){
 			AABB* aabb=YADE_CAST<AABB*>(b->boundingVolume.get());
@@ -51,12 +50,10 @@ void BoundingVolumeMetaEngine::action(MetaBody* ncb)
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 	}
-	if(ncb->physicalParameters && ncb->boundingVolume && ncb->interactingGeometry) operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->physicalParameters->se3,ncb);
+	if(ncb->state && ncb->boundingVolume && ncb->interactingGeometry) operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->state->se3,ncb);
 }
 
 
 
 YADE_PLUGIN((BoundingVolumeMetaEngine));
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

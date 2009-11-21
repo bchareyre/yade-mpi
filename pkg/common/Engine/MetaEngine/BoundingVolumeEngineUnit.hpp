@@ -38,7 +38,7 @@ class BoundingVolumeEngineUnit : public EngineUnit2D
 		 			void ,
 		 			TYPELIST_4(	  const shared_ptr<InteractingGeometry>&
 							, shared_ptr<BoundingVolume>&
-							, const Se3r&	// FIXME - remove Se3r, because not everything is supposed to have it. 
+							, const Se3r& 	// FIXME - remove Se3r, because not everything is supposed to have it. 
 									// If some function needs Se3r it must find it through Body*
 							, const Body*	// with that - functors have all the data they may need, but it's const
 			  			  )

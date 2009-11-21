@@ -26,7 +26,7 @@
 class PhysicalParametersEngineUnit :    public EngineUnit1D
 					<
 		 				void ,
-		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+		 				TYPELIST_3(	  const shared_ptr<State>&
 								, Body*, BexContainer&
 			   				  )
 					>

@@ -11,25 +11,25 @@
 
 #include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
-#include<yade/core/PhysicalParameters.hpp>
+#include<yade/core/Material.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 
 class InteractionPhysicsMetaEngine : 	public MetaEngine2D
 					<	
-						PhysicalParameters,					// base classe for dispatch
-						PhysicalParameters,					// base classe for dispatch
+						Material,					// base classe for dispatch
+						Material,					// base classe for dispatch
 						InteractionPhysicsEngineUnit,				// class that provides multivirtual call
 						void,							// return type
-						TYPELIST_3(	  const shared_ptr<PhysicalParameters>&	// arguments
-								, const shared_ptr<PhysicalParameters>&
+						TYPELIST_3(	  const shared_ptr<Material>&	// arguments
+								, const shared_ptr<Material>&
 								, const shared_ptr<Interaction>&
 							  )
 					>
 {		
 	public :
 		virtual void action(MetaBody*);
-		void explicitAction(shared_ptr<PhysicalParameters>& pp1, shared_ptr<PhysicalParameters>& pp2, shared_ptr<Interaction>& i);
+		void explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i);
 
 	REGISTER_CLASS_NAME(InteractionPhysicsMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);

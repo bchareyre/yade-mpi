@@ -70,39 +70,39 @@ def downCast(obj,newClassName):
 	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
 	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
-bodiesPhysDefaults={'young':30e9,'poisson':.3,'frictionAngle':.5236}
+bodiesMatDefaults={'density':2e3,'young':30e9,'poisson':.3,'frictionAngle':.5236}
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def _commonBodySetup(b,volume,geomInertia,materialClass='GranularMat',noBound=False,**matKw):
+	"""Assign common body parameters."""
+	matKw2=bodiesMatDefault.copy(); matKw2.update(matKw)
+	b.mat=Material(materialClass)
+	b.mat.updateExistingAttrs(matKw2)
+	mass=volume*b.mat['density']
+	b.state.update(mass=mass,inertia=mass*geomInertia)
+	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+
+def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=False,**matKw):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
-	s=Body()
-	if not color: color=randomColor()
-	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	s.mold=InteractingSphere(radius=radius,diffuseColor=color,wire=wire,highlight=highlight)
+	b=Body()
+	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.pos=b.refPos=center
 	V=(4./3)*math.pi*radius**3
-	inert=(2./5.)*V*density*radius**2
-	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'mass':V*density,'inertia':[inert,inert,inert]})
-	s.phys=PhysicalParameters(physParamsClass)
-	s.phys.updateExistingAttrs(pp)
-	s.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+	geomInert=(2./5.)*V*radius**2
+	_commonBodySetup(s,V,geomInert,**matKw)
 	s['isDynamic']=dynamic
 	return s
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,highlight=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,highlight=False,**matKw):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
-	if not color: color=randomColor()
-	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
-	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color,wire=wire,highlight=highlight)
-	mass=8*extents[0]*extents[1]*extents[2]*density
-	V=extents[0]*extents[1]*extents[2]
-	pp.update({'se3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'refSe3':[center[0],center[1],center[2],orientation[0],orientation[1],orientation[2],orientation[3]],'mass':V*density,'inertia':[mass*4*(extents[1]**2+extents[2]**2),mass*4*(extents[0]**2+extents[2]**2),mass*4*(extents[0]**2+extents[1]**2)]})
-	b.phys=PhysicalParameters(physParamsClass)
-	b.phys.updateExistingAttrs(pp)
-	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	V=8*extents[0]*extents[1]*extents[2]
+	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
+	_commonBodySetup(b,V,geomInert,materialClass,**matKw)
 	b['isDynamic']=dynamic
 	return b
 
-def wall(position,axis,sense=0,color=None,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def wall(position,axis,sense=0,color=None,materialClass='GranularMat',**matKw):
 	"""Return ready-made wall body.
 
 	:param position: float or Vector3 specifying center of the wall. If float, it is the position along given axis, the other 2 components being zero
@@ -113,32 +113,26 @@ def wall(position,axis,sense=0,color=None,physParamsClass='BodyMacroParameters',
 	.. note: GeometricalModel is not set.
 	"""
 	b=Body()
-	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr)
 	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
 	else: pos2=position
-	pp.update({'se3':[pos2[0],pos2[1],pos2[2],1,0,0,0],'refSe3':[pos2[0],pos2[1],pos2[2],1,0,0,0],'intertia':[0,0,0]})
-	b.phys=PhysicalParameters(physParamsClass); b.phys.updateExistingAttrs(pp)
-	b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+	b.pos=b.refPos=pos2
+	_commonBodySetup(s,0,Vector3(0,0,0),**matKw)
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noBoundingVolume=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,**matKw):
 	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()
-	if not color: color=randomColor()
-	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	pp.update({'se3':[center[0],center[1],center[2],1,0,0,0],'refSe3':[center[0],center[1],center[2],1,0,0,0],'inertia':[0,0,0]})
-	b.phys=PhysicalParameters(physParamsClass)
-	b.phys.updateExistingAttrs(pp)
-	if not noBoundingVolume: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
-	b['isDynamic']=dynamic
-	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color,wire=wire,highlight=highlight)
+	b.pos=b.refPos=center
+	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.mold['vertices']=vertices
 	b.mold.postProcessAttributes(True)
+	_commonBodySetup(s,0,Vector3(0,0,0),noBound=noBoundingVolume,**matKw)
+	b['isDynamic']=dynamic
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):

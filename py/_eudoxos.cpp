@@ -21,12 +21,12 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 		if(!i->interactionPhysics) continue;
 		shared_ptr<CpmPhys> bc=dynamic_pointer_cast<CpmPhys>(i->interactionPhysics); if(!bc) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
-		bool isIn1=isInBB(b1->physicalParameters->se3.position,bbMin,bbMax), isIn2=isInBB(b2->physicalParameters->se3.position,bbMin,bbMax);
+		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
 		Real weight=1.;
 		if((!isIn1 && isIn2) || (isIn1 && !isIn2)){
 			//shared_ptr<Body> bIn=isIn1?b1:b2, bOut=isIn2?b2:b1;
-			Vector3r vIn=(isIn1?b1:b2)->physicalParameters->se3.position, vOut=(isIn2?b1:b2)->physicalParameters->se3.position;
+			Vector3r vIn=(isIn1?b1:b2)->state->pos, vOut=(isIn2?b1:b2)->state->pos;
 			#define _WEIGHT_COMPONENT(axis) if(vOut[axis]<bbMin[axis]) weight=min(weight,abs((vOut[axis]-bbMin[axis])/(vOut[axis]-vIn[axis]))); else if(vOut[axis]>bbMax[axis]) weight=min(weight,abs((vOut[axis]-bbMax[axis])/(vOut[axis]-vIn[axis])));
 			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
 			assert(weight>=0 && weight<=1);
@@ -73,16 +73,15 @@ Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])
 void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirection, Real timeToAxis, Real subtractDist=0., Real perturbation=0.1){
 	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getRootBody()->bodies)){
 		if(!b->isDynamic) continue;
-		ParticleParameters* pp=YADE_CAST<ParticleParameters*>(b->physicalParameters.get());
-		const Vector3r& x0=pp->se3.position;
+		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;
 		const Vector3r x2=axisPoint+axisDirection;
 		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
 		Vector3r toAxis=closestAxisPoint-x0;
 		if(subtractDist>0) toAxis*=(toAxis.Length()-subtractDist)/toAxis.Length();
-		pp->velocity=toAxis/timeToAxis;
-		Vector3r ppDiff=perturbation*(1./sqrt(3.))*Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom())*pp->velocity.Length();
-		pp->velocity+=ppDiff;
+		b->state->vel=toAxis/timeToAxis;
+		Vector3r ppDiff=perturbation*(1./sqrt(3.))*Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom())*b->state->vel.Length();
+		b->state->vel+=ppDiff;
 	}
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,5);

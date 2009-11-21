@@ -22,7 +22,7 @@ def listChildClassesRecursive(base):
 
 
 rootClasses=set([
-	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
+	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','Material','State','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
 	'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw',
 	'BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','PhysicalActionDamper','PhysicalActionApplier','ConstitutiveLawDispatcher'])
 allClasses=listChildClassesRecursive('Serializable')
@@ -116,7 +116,7 @@ class TestWm3Wrapper(unittest.TestCase):
 		self.assertAlmostEqual(q1.ToAxisAngle()[1],pi/2)
 	# not really wm3 thing, but closely related
 	def testSe3Conversion(self):
-		pp=PhysicalParameters()
+		pp=State()
 		pp['se3']=(Vector3().ZERO,Quaternion().IDENTITY)
 		self.assert_(pp['se3'][0]==Vector3().ZERO)
 		self.assert_(pp['se3'][1]==Quaternion().IDENTITY)

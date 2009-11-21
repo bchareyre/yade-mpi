@@ -34,7 +34,7 @@ REGISTER_SERIALIZABLE(Wall2AABB);
 		//! Number of divisions
 		static int div;
 		public:
-			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
+			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 		RENDERS(Wall);
 		REGISTER_ATTRIBUTES(GLDrawInteractingGeometryFunctor,(div));
 		REGISTER_CLASS_AND_BASE(Gl1_Wall,GLDrawInteractingGeometryFunctor);

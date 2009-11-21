@@ -4,8 +4,8 @@
 #pragma once
 
 #include<yade/core/InteractionGeometry.hpp>
+#include<yade/core/State.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 /*! Class representing geometry of two spheres in contact.
  *
@@ -27,7 +27,7 @@ class SpheresContactGeometry: public GenericSpheresContact {
 			//! Normal of the contact in the previous step
 			Vector3r prevNormal;
 			//! update shear on this contact given dynamic parameters of bodies. Should be called from constitutive law, exactly once per iteration. Returns shear increment in this update, which is already added to shear.
-			Vector3r updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
+			Vector3r updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting=true);
 		#endif
 		
 		/* keep this for reference, until it is implemented elsewhere, like Dem6DofGeom, if it ever exists */
@@ -47,7 +47,7 @@ class SpheresContactGeometry: public GenericSpheresContact {
 			{ createIndex(); }
 		virtual ~SpheresContactGeometry();
 
-		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting=true);
+		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting=true);
 
 	REGISTER_ATTRIBUTES(Serializable,
 			(normal)

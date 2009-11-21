@@ -17,10 +17,10 @@
 
 class PhysicalParametersMetaEngine :	public MetaEngine1D
 					<	
-						PhysicalParameters ,
+						State ,
 						PhysicalParametersEngineUnit,
 						void ,
-						TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+						TYPELIST_3(	  const shared_ptr<State>&
 								, Body*, BexContainer&
 				  			  )
 					>

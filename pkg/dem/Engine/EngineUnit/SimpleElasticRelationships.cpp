@@ -10,14 +10,14 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 
 
 
-void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // BodyMacroParameters
-					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters
+void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
+					, const shared_ptr<Material>& b2
 					, const shared_ptr<Interaction>& interaction)
 {
 	
@@ -27,17 +27,17 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 	{
 		if(!interaction->interactionPhysics)
 		{
-			const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>(b1);
-			const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>(b2);
+			const shared_ptr<GranularMat>& mat1 = YADE_PTR_CAST<GranularMat>(b1);
+			const shared_ptr<GranularMat>& mat2 = YADE_PTR_CAST<GranularMat>(b2);
 			
 			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
 			
 			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
 
-			Real Ea 	= sdec1->young;
-			Real Eb 	= sdec2->young;
-			Real Va 	= sdec1->poisson;
-			Real Vb 	= sdec2->poisson;
+			Real Ea 	= mat1->young;
+			Real Eb 	= mat2->young;
+			Real Va 	= mat1->poisson;
+			Real Vb 	= mat2->poisson;
 			#if 0
 				Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
 				Real Db 	= interactionGeometry->radius2; // FIXME - as above
@@ -51,8 +51,8 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 				else throw runtime_error("SimpleElasticRelationships: geometry is neither SpheresContactGeometry nor Dem3DofGeom");
 			#endif
 			
-			Real fa 	= sdec1->frictionAngle;
-			Real fb 	= sdec2->frictionAngle;
+			Real fa 	= mat1->frictionAngle;
+			Real fb 	= mat2->frictionAngle;
 
 			//Real Eab	= 2*Ea*Eb/(Ea+Eb);
 			//Real Vab	= 2*Va*Vb/(Va+Vb);
@@ -83,6 +83,4 @@ void SimpleElasticRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 
 	throw runtime_error("SimpleElasticRelationships currently fails for non-SpheresContactGeometry geometry!");
 };
 YADE_PLUGIN((SimpleElasticRelationships));
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

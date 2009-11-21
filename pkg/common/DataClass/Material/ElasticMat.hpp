@@ -5,9 +5,10 @@
 class ElasticMat: public Material{
 	public:
 	Real young;
+	Real poisson;
 	ElasticMat(){ createIndex(); }
 	virtual ~ElasticMat();
-	REGISTER_ATTRIBUTES(Material,(young));
+	REGISTER_ATTRIBUTES(Material,(young)(poisson));
 	REGISTER_CLASS_AND_BASE(ElasticMat,Material);
 	REGISTER_CLASS_INDEX(ElasticMat,Material);
 };
