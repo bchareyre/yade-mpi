@@ -6,5 +6,3 @@ YADE_PLUGIN((NormalInteraction)(NormalShearInteraction));
 NormalInteraction::~NormalInteraction(){};
 NormalShearInteraction::~NormalShearInteraction(){};
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
-

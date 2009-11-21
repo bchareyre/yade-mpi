@@ -4,7 +4,7 @@
 #include<algorithm>
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/BodyContainer.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/core/State.hpp>
 
 YADE_PLUGIN((Clump)(ClumpMemberMover));
 CREATE_LOGGER(Clump);
@@ -42,7 +42,7 @@ void ClumpMemberMover::applyCondition(MetaBody* rootBody){
  */
 Clump::Clump(): Body(){
 	isDynamic=true;
-	physicalParameters=shared_ptr<RigidBodyParameters>(new RigidBodyParameters);
+	state=shared_ptr<State>(new State);
 
 	// these will not be defined for the moment...
 #if 0
@@ -68,7 +68,7 @@ void Clump::add(body_id_t subId){
 
 	// preconditions
 	assert(subBody->isDynamic);
-	assert(physicalParameters);
+	assert(state);
 	assert(members.count(subId)==0);
 	assert(subId<getId());
 
@@ -101,26 +101,27 @@ void Clump::del(body_id_t subId){
  * @note Velocities of members are not updated, since members have isdynamic==false. It is possible, though, that someone needs to have a moving clump that is later broken apart and that liberated particle continue to move in the same way as they did within the clump. In that case, this will have to be completed.
  */
 void Clump::moveMembers(){
-	const Se3r& mySe3(physicalParameters->se3);
-	const shared_ptr<RigidBodyParameters>& myRBP=static_pointer_cast<RigidBodyParameters>(physicalParameters);
+	//const Se3r& mySe3(physicalParameters->se3);
+	//const shared_ptr<RigidBodyParameters>& myRBP=static_pointer_cast<RigidBodyParameters>(physicalParameters);
 	for(Clump::memberMap::iterator I=members.begin(); I!=members.end(); I++){
 		// now, I->first is Body::id_t, I->second is Se3r of that body in the clump
 		shared_ptr<Body> member=Body::byId(I->first);
-		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(member->physicalParameters));
+		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(member->physicalParameters));
+		State* subState=member->state.get();
 		//LOG_TRACE("Old #"<<I->first<<"position: "<<subRBP->se3.position);
-		subRBP->se3.position=mySe3.position+mySe3.orientation*I->second.position;
-		subRBP->se3.orientation=mySe3.orientation*I->second.orientation;
+		subState->pos=state->pos+state->ori*I->second.position;
+		subState->ori=state->ori*I->second.orientation;
 		//LOG_TRACE("New #"<<I->first<<"position: "<<subRBP->se3.position);
 		//LOG_TRACE("Clump #"<<getId()<<" moved #"<<I->first<<".");
 
 		//! FIXME: we set velocity because of damping here; but since positions are integrated after all forces applied, these velocities will be used in the NEXT step for CundallNonViscousDamping. Does that matter?!
-		subRBP->velocity=myRBP->velocity+myRBP->angularVelocity.Cross(I->second.position);
-		subRBP->angularVelocity=myRBP->angularVelocity;
+		subState->vel=state->vel+state->angVel.Cross(I->second.position);
+		subState->angVel=state->angVel;
 	}
 	/* @bug Temporarily we reset acceleration and angularAcceleration of the clump here;
 	 * should be a new negine that will take care of that?
 	 */
-	const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
+	// const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
 	#if 0
 		if(Omega::instance().getCurrentIteration()%50==0){
 			Real Erot=.5*clumpRBP->inertia[0]*pow(clumpRBP->angularVelocity[0],2)+.5*clumpRBP->inertia[1]*pow(clumpRBP->angularVelocity[1],2)+.5*clumpRBP->inertia[2]*pow(clumpRBP->angularVelocity[2],2);
@@ -131,9 +132,7 @@ void Clump::moveMembers(){
 		}
 	#endif
 
-	clumpRBP->acceleration=Vector3r(0,0,0);
-	clumpRBP->angularAcceleration=Vector3r(0,0,0);
-	
+	state->accel=state->angAccel=Vector3r::ZERO;
 }
 
 /*! Clump's se3 will be updated (origin at centroid and axes coincident with principal inertia axes) and subSe3 modified in such a way that members positions in world coordinates will not change.
@@ -179,23 +178,24 @@ void Clump::updateProperties(bool intersecting){
 	double M=0; // mass
 	Vector3r Sg(0,0,0); // static moment
 	Matrix3r Ig(true /* fill with zeros */ ), Ic(true); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
-	Se3r& mySe3(physicalParameters->se3);
-	const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
+	//Se3r& mySe3(physicalParameters->se3);
+	//const shared_ptr<RigidBodyParameters>& clumpRBP(YADE_PTR_CAST<RigidBodyParameters>(physicalParameters));
 
 	if(members.size()==1){
 		LOG_DEBUG("Clump of size one will be treated specially.")
 		memberMap::iterator I=members.begin();
 		shared_ptr<Body> subBody=Body::byId(I->first);
-		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+		State* subState=subBody->state.get();
 		// se3 of the clump as whole is the same as the member's se3
-		mySe3.position=subRBP->se3.position;
-		mySe3.orientation=subRBP->se3.orientation;
+		state->pos=subState->pos;
+		state->ori=subState->ori;
 		// relative member's se3 is identity
 		I->second.position=Vector3r::ZERO; I->second.orientation=Quaternionr::IDENTITY;
-		clumpRBP->inertia=subRBP->inertia;
-		clumpRBP->mass=subRBP->mass;
-		clumpRBP->velocity=Vector3r::ZERO;
-		clumpRBP->angularVelocity=Vector3r::ZERO;
+		state->inertia=subState->inertia;	
+		state->mass=subState->mass;
+		state->vel=Vector3r::ZERO;
+		state->angVel=Vector3r::ZERO;
 		return;
 	}
 
@@ -208,15 +208,16 @@ void Clump::updateProperties(bool intersecting){
 		for(memberMap::iterator I=members.begin(); I!=members.end(); I++){
 			// now, I->first is Body::id_t, I->second is Se3r of that body
 			shared_ptr<Body> subBody=Body::byId(I->first);
-			const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
-			M+=subRBP->mass;
-			Sg+=subRBP->mass*subRBP->se3.position;
+			//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+			State* subState=subBody->state.get();
+			M+=subState->mass;
+			Sg+=subState->mass*subState->pos;
 			// transform from local to global coords
 			// FIXME: verify this!
-			Quaternionr subRBP_orientation_conjugate=subRBP->se3.orientation.Conjugate();
-			Matrix3r Imatrix(subRBP->inertia[0],subRBP->inertia[1],subRBP->inertia[2]);
+			Quaternionr subState_orientation_conjugate=subState->ori.Conjugate();
+			Matrix3r Imatrix(subState->inertia[0],subState->inertia[1],subState->inertia[2]);
 			// TRWM3MAT(Imatrix); TRWM3QUAT(subRBP_orientation_conjugate);
-			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subRBP_orientation_conjugate),subRBP->mass,-1.*subRBP->se3.position);
+			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subState_orientation_conjugate),subState->mass,-1.*subState->pos);
 
 			//TRWM3MAT(Clump::inertiaTensorRotate(Matrix3r(subRBP->inertia),subRBP_orientation_conjugate));
 		}
@@ -225,9 +226,9 @@ void Clump::updateProperties(bool intersecting){
 	TRWM3MAT(Ig);
 	TRWM3VEC(Sg);
 
-	mySe3.position=Sg/M; // clump's centroid
+	state->pos=Sg/M; // clump's centroid
 	// this will calculate translation only, since rotation is zero
-	Matrix3r Ic_orientG=Clump::inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, mySe3.position); // inertia at clump's centroid but with world orientation
+	Matrix3r Ic_orientG=Clump::inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, state->pos); // inertia at clump's centroid but with world orientation
 	TRWM3MAT(Ic_orientG);
 
 	Matrix3r R_g2c(true); //rotation matrix
@@ -243,10 +244,10 @@ void Clump::updateProperties(bool intersecting){
 	//TRWM3MAT(Clump::inertiaTensorRotate(Ic_orientG,R_g2c));
 
 	// set quaternion from rotation matrix
-	mySe3.orientation.FromRotationMatrix(R_g2c);
+	state->ori.FromRotationMatrix(R_g2c);
 	// now Ic is diagonal
-	clumpRBP->inertia=Vector3r(Ic(0,0),Ic(1,1),Ic(2,2));
-	clumpRBP->mass=M;
+	state->inertia=Vector3r(Ic(0,0),Ic(1,1),Ic(2,2));
+	state->mass=M;
 
 
 	// this block will be removed once EigenDecomposition works for diagonal matrices
@@ -257,26 +258,25 @@ void Clump::updateProperties(bool intersecting){
 			//!!!!! note that this is HIGHLY incorrect for all non-single clumps !!!!!
 			memberMap::iterator I=members.begin();
 			shared_ptr<Body> subBody=Body::byId(I->first);
-			const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
-			clumpRBP->inertia=subRBP->inertia*10.; // 10 is arbitrary; just to have inertia of clump bigger
+			state->inertia=subBody->state->inertia*10.; // 10 is arbitrary; just to have inertia of clump bigger
 			// orientation of the clump is broken as well, since is result of EigenDecomposition as well (rotation matrix)
-			mySe3.orientation.FromRotationMatrix(Matrix3r(1,0,0,0,1,0,0,0,1));
+			state->ori.FromRotationMatrix(Matrix3r(1,0,0,0,1,0,0,0,1));
 		}
 	#endif
-	TRWM3VEC(clumpRBP->inertia);
+	TRWM3VEC(state->inertia);
 
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
-	clumpRBP->velocity=Vector3r(0,0,0);
-	clumpRBP->angularVelocity=Vector3r(0,0,0);
+	state->vel=state->angVel=Vector3r::ZERO;
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
 	// Conjugate is equivalent to Inverse for normalized quaternions
 	for(memberMap::iterator I=members.begin(); I!=members.end(); I++){
 		// now, I->first is Body::id_t, I->second is Se3r of that body
 		shared_ptr<Body> subBody=Body::byId(I->first);
-		const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
-		I->second.orientation=mySe3.orientation.Conjugate()*subRBP->se3.orientation;
-		I->second.position=mySe3.orientation.Conjugate()*(subRBP->se3.position-mySe3.position);
+		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
+		State* subState=subBody->state.get();
+		I->second.orientation=state->ori.Conjugate()*subState->ori;
+		I->second.position=state->ori.Conjugate()*(subState->pos-state->pos);
 	}
 
 }
@@ -326,8 +326,4 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 	return inertiaTensorRotate(I,T);
 }
 
-
-
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

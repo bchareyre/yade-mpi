@@ -3,7 +3,6 @@
 
 #include"VelocityBins.hpp"
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<boost/foreach.hpp>
 #ifndef FOREACH
 #	define FOREACH BOOST_FOREACH
@@ -11,7 +10,6 @@
 CREATE_LOGGER(VelocityBins);
 
 bool VelocityBins::incrementDists_shouldCollide(Real dt){
-	// const shared_ptr<Body>& b=Body::byId(0); LOG_INFO("Body #0: z off "<<b->physicalParameters->se3.position[2]-b->physicalParameters->refSe3.position[2]<<", velocity "<<static_pointer_cast<RigidBodyParameters>(b->physicalParameters)->velocity[2]);
 	int i=0;
 	FOREACH(Bin& bin, bins){
 		// NOTE: this mimics the integration scheme of NewtonsDampedLaw
@@ -68,8 +66,7 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 	long moveFaster=0, moveSlower=0;
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b) continue;
-		RigidBodyParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-		Real velSq=VelocityBins::getBodyVelSq(rbp);
+		Real velSq=VelocityBins::getBodyVelSq(b->state.get());
 		binNo_t newBin=-1, oldBin=bodyBins[b->getId()];
 		// we could compute logarithm and round it here, but perhaps this is faster
 		for(size_t i=0; i<nBins; i++){
@@ -118,6 +115,4 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 	}
 	void VelocityBins::binVelSqFinalize(){}
 #endif
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

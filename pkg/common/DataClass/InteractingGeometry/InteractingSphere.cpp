@@ -20,5 +20,3 @@ InteractingSphere::~InteractingSphere ()
 
 YADE_PLUGIN((InteractingSphere));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
-

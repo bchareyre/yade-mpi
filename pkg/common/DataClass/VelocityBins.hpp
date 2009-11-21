@@ -2,7 +2,7 @@
 #pragma once 
 
 #include<yade/core/Interaction.hpp> // for body_id_t
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/core/State.hpp>
 #include<vector>
 #ifdef YADE_OPENMP
 	#include<omp.h>
@@ -78,8 +78,8 @@ class VelocityBins{
 	// get velSq for given body; this should be called from NewtonsDampedLaw as well,
 	// to ensure that the same formulas are used (once we have angularVelocity + AABB span,
 	// for instance
-	static Real getBodyVelSq(RigidBodyParameters* rbp){
-		return rbp->velocity.SquaredLength();
+	static Real getBodyVelSq(State* state){
+		return state->vel.SquaredLength();
 	}
 
 	DECLARE_LOGGER;
