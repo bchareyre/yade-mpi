@@ -92,7 +92,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=
 	b['isDynamic']=dynamic
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,highlight=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,highlight=False,**matKw):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
@@ -114,7 +114,6 @@ def wall(position,axis,sense=0,color=None,**matKw):
 	.. note: GeometricalModel is not set.
 	"""
 	b=Body()
-	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr)
 	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
@@ -124,11 +123,10 @@ def wall(position,axis,sense=0,color=None,**matKw):
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noBoundingVolume=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noBoundingVolume=False,**matKw):
 	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()
 	if not color: color=randomColor()
-	pp=bodiesPhysDefaults.copy(); pp.update(physParamsAttr);
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
 	b.state.pos=b.state.refPos=center
