@@ -25,9 +25,9 @@ Interaction::cellDist holds information about relative cell coordinates of the 2
 relative to the 1st one. Dispatchers (InteractionGeometryMetaEngine and InteractionDispatchers)
 use this information to pass modified position of the 2nd body to InteractionGeometryEngineUnits.
 Since properly behaving InteractionGeometryEngineUnit's and ConstitutiveLaw's do not take positions
-directly from Body::physicalParameters, the interaction is computed with the periodic positions.
+directly from Body::state, the interaction is computed with the periodic positions.
 
-Positions of bodies (in the sense of Body::physicalParameters) and their natural bboxes are not wrapped
+Positions of bodies (in the sense of Body::state) and their natural bboxes are not wrapped
 to the periodic cell, they can be anywhere (but not "too far" in the sense of int overflow).
 
 Since Interaction::cellDists holds cell coordinates, it is possible to change the cell boundaries
@@ -53,7 +53,7 @@ python:
 Requirements
 ============
 * No body can have AABB larger than about .499*cellSize. Exception is thrown if that is false.
-* Constitutive law must not get body positions from Body::physicalParameters directly.
+* Constitutive law must not get body positions from Body::state directly.
 	If it does, it uses Interaction::cellDist to compute periodic position.
 	Dem3Dof family of Ig2 functors and Law2_* engines are known to behave well.
 * No body can get further away than MAXINT periods. It will do horrible things if there is overflow. Not checked at the moment.

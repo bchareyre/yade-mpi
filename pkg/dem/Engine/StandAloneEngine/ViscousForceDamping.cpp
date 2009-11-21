@@ -138,3 +138,6 @@ void ViscousForceDamping::action(Body* body)
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

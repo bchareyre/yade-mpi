@@ -23,3 +23,6 @@ LatticeSetGeometry::~LatticeSetGeometry()
 
 
 YADE_PLUGIN((LatticeSetGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

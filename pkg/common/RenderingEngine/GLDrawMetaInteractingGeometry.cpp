@@ -18,3 +18,6 @@ void GLDrawMetaInteractingGeometry::go(const shared_ptr<InteractingGeometry>& , 
 
 YADE_PLUGIN((GLDrawMetaInteractingGeometry));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

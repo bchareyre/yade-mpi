@@ -8,19 +8,19 @@
  
 #pragma once
 
-#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
+#include<yade/pkg-common/StateEngineUnit.hpp>
 #include<yade/core/MetaEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
-#include<yade/core/PhysicalParameters.hpp>
+#include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/BexContainer.hpp>
 
-class PhysicalParametersMetaEngine :	public MetaEngine1D
+class StateMetaEngine :	public MetaEngine1D
 					<	
-						PhysicalParameters ,
-						PhysicalParametersEngineUnit,
+						State ,
+						StateEngineUnit,
 						void ,
-						TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+						TYPELIST_3(	  const shared_ptr<State>&
 								, Body*, BexContainer&
 				  			  )
 					>
@@ -28,11 +28,11 @@ class PhysicalParametersMetaEngine :	public MetaEngine1D
 	public :
 		virtual void action(MetaBody*);
 
-	REGISTER_CLASS_NAME(PhysicalParametersMetaEngine);
+	REGISTER_CLASS_NAME(StateMetaEngine);
 	REGISTER_BASE_CLASS_NAME(MetaEngine1D);
 
 };
 
-REGISTER_SERIALIZABLE(PhysicalParametersMetaEngine);
+REGISTER_SERIALIZABLE(StateMetaEngine);
 
 

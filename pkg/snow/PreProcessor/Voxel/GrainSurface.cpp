@@ -282,3 +282,6 @@ void GrainSurface::draw(SafeVectors3& colors,Config& c)
 //	con[other][current].color=colors[current];
 //}
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -396,3 +396,6 @@ if(!surface)
 }
 
 YADE_PLUGIN((Ef1_BshSnowGrain_glDraw));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

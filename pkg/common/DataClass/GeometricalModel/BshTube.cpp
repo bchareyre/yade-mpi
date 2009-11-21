@@ -23,3 +23,6 @@ BshTube::~BshTube ()
 
 YADE_PLUGIN((BshTube));
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

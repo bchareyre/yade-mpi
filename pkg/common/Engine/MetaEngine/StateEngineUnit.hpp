@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include<yade/core/PhysicalParameters.hpp>
+#include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/EngineUnit.hpp>
 #include<yade/core/BexContainer.hpp>
 
 /*! \brief
-	Abstract interface for all classes that want to do something depending on PhysicalParameters (works like adding external virtual function)
+	Abstract interface for all classes that want to do something depending on State (works like adding external virtual function)
 
 	Currently it is used for LeapFron integration and creating FEM
 
@@ -23,19 +23,19 @@
 	
 */
 
-class PhysicalParametersEngineUnit :    public EngineUnit1D
+class StateEngineUnit :    public EngineUnit1D
 					<
 		 				void ,
-		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
+		 				TYPELIST_3(	  const shared_ptr<State>&
 								, Body*, BexContainer&
 			   				  )
 					>
 {
-	public: virtual ~PhysicalParametersEngineUnit();	
-	REGISTER_CLASS_NAME(PhysicalParametersEngineUnit);
+	public: virtual ~StateEngineUnit();	
+	REGISTER_CLASS_NAME(StateEngineUnit);
 	REGISTER_BASE_CLASS_NAME(EngineUnit1D);
 };
 
-REGISTER_SERIALIZABLE(PhysicalParametersEngineUnit);
+REGISTER_SERIALIZABLE(StateEngineUnit);
 
 

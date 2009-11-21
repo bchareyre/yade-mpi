@@ -59,3 +59,6 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 }
 
 YADE_PLUGIN((LatticeSet2LatticeBeams));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

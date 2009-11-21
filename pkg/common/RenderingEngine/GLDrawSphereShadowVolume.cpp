@@ -59,3 +59,6 @@ void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const
 
 YADE_PLUGIN((GLDrawSphereShadowVolume));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

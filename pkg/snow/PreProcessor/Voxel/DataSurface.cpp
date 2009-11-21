@@ -107,3 +107,6 @@ void DataSurface::draw(SafeVectors3& axes,SafeVectors3& colors,Config& c,const s
 		c.remove_transparency();
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

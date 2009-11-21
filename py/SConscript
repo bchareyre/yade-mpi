@@ -29,9 +29,8 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 		env.File('pack.py'),
 		env.File('export.py'),
 		env.File('post2d.py'),
-		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','BoundingVolumeMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'shape' in env['features'] else []))
-			),
-		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundingVolumeEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit PhysicalParametersEngineUnit PhysicalActionDamperUnit PhysicalActionApplierUnit ConstitutiveLaw")+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit'] if 'shape' in env['features'] else [])))
+		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','BoundingVolumeMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'shape' in env['features'] else [])+(['StateMetaEngine',] if 'physpar' in env['features'] else []))),
+		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundingVolumeEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit ConstitutiveLaw")+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit'] if 'shape' in env['features'] else [])+(['PhysicalActionDamperUnit','PhysicalActionApplierUnit','StateEngineUnit'] if 'physpar' in env['features'] else [])))
 	])
 	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
 		env.File('__init__.py','tests'),

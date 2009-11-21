@@ -18,3 +18,6 @@ void PhysicalActionDamper::action(MetaBody* ncb){
 	}
 }
 YADE_PLUGIN((PhysicalActionDamper));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

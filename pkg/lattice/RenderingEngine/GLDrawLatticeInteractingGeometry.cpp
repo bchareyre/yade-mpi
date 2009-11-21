@@ -204,3 +204,6 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 
 YADE_PLUGIN((GLDrawLatticeInteractingGeometry));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

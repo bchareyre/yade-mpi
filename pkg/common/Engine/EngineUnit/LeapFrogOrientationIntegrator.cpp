@@ -51,3 +51,6 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 }
 
 YADE_PLUGIN((LeapFrogOrientationIntegrator));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

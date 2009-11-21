@@ -2,3 +2,6 @@
 YADE_REQUIRE_FEATURE(shape);
 //YADE_REQUIRE_FEATURE(deprecated);
 GeometricalModelEngineUnit::~GeometricalModelEngineUnit(){};
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

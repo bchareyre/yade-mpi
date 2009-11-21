@@ -50,3 +50,6 @@ void GLDrawRigidBodyState::go(const shared_ptr<PhysicalParameters>& bst)
 
 YADE_PLUGIN((GLDrawRigidBodyState));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -32,3 +32,6 @@ void NewtonsMomentumLaw::go(const shared_ptr<PhysicalParameters>& b, const Body*
 }
 
 YADE_PLUGIN((NewtonsMomentumLaw));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

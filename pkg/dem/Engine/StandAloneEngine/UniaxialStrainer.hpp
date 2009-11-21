@@ -22,7 +22,7 @@ class UniaxialStrainer: public StandAloneEngine {
 		bool needsInit;
 
 		void computeAxialForce();
-		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->physicalParameters->se3.position[axis]; };
+		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->state->pos[axis]; };
 		void init();
 	public:
 		virtual bool isActivated(MetaBody*){return active;}

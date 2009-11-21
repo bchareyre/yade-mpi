@@ -18,3 +18,6 @@ ElasticBodyParameters::~ElasticBodyParameters()
 }
 
 YADE_PLUGIN((ElasticBodyParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

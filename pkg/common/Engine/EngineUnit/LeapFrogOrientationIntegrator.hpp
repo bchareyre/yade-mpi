@@ -8,21 +8,21 @@
 
 #pragma once
 
-#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
+#include<yade/pkg-common/StateEngineUnit.hpp>
 
-class LeapFrogOrientationIntegrator : public PhysicalParametersEngineUnit 
+class LeapFrogOrientationIntegrator : public StateEngineUnit 
 {
 	private :
 // 		vector<Vector3r> prevAngularVelocities;
 // 		vector<bool> firsts;
 	
 	public :
-		virtual void go( 	  const shared_ptr<PhysicalParameters>&
+		virtual void go( 	  const shared_ptr<State>&
 					, Body*, BexContainer& );
 
 	FUNCTOR1D(RigidBodyParameters);	
 	REGISTER_CLASS_NAME(LeapFrogOrientationIntegrator);
-	REGISTER_BASE_CLASS_NAME(PhysicalParametersEngineUnit);
+	REGISTER_BASE_CLASS_NAME(StateEngineUnit);
 };
 
 REGISTER_SERIALIZABLE(LeapFrogOrientationIntegrator);

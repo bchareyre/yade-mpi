@@ -95,3 +95,6 @@ bool TetraTestGen::generate()
 	message="ATTN: this example is not working yet!";
 	return true;
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

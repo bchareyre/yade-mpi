@@ -35,8 +35,8 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 				if(!isinf(b->boundingVolume->min[i])) mn[i]=min(mn[i],b->boundingVolume->min[i]);
 			}
 		} else {
-	 		mx=componentMaxVector(mx,b->physicalParameters->se3.position);
- 			mn=componentMinVector(mn,b->physicalParameters->se3.position);
+	 		mx=componentMaxVector(mx,b->state->pos);
+ 			mn=componentMinVector(mn,b->state->pos);
 		}
 	}
 	

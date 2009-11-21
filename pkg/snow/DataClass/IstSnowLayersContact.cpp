@@ -8,3 +8,6 @@ IstSnowLayersContact::IstSnowLayersContact()
 IstSnowLayersContact::~IstSnowLayersContact()
 {}
 		
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

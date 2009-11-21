@@ -29,5 +29,4 @@ void SDECLinkPhysics::postProcessAttributes(bool deserializing)
 	}
 }
 
-
-YADE_PLUGIN((SDECLinkPhysics));
+YADE_REQUIRE_FEATURE(PHYSPAR);

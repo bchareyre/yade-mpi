@@ -1,13 +1,3 @@
 #include "ElasticContactInteraction.hpp"
-
-ElasticContactInteraction::ElasticContactInteraction()
-{
-	createIndex();
-	
-}
-
-ElasticContactInteraction::~ElasticContactInteraction()
-{
-}
-
+ElasticContactInteraction::~ElasticContactInteraction(){}
 YADE_PLUGIN((ElasticContactInteraction));

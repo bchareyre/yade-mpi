@@ -50,6 +50,7 @@ MetaBody::MetaBody() :
 	isPeriodic=false;
 	// FIXME: move MetaInteractingGeometry to core and create it here right away
 	// interactingGeometry=shared_ptr<InteractingGeometry>(new MetaInteractingGeometry);
+	material=shared_ptr<Material>(new Material);
 
 	// fill default tags
 	struct passwd* pw;

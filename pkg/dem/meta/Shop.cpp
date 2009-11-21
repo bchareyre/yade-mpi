@@ -22,19 +22,17 @@
 
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 #include<yade/pkg-common/InteractingBox2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/NewtonsForceLaw.hpp>
-#include<yade/pkg-common/NewtonsMomentumLaw.hpp>
-#include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
-#include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
+#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
-#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
+#include<yade/pkg-dem/SimpleElasticRelationships.hpp>
+//#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
@@ -43,19 +41,13 @@ class MetaInteractingGeometry2AABB; */
 
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
+#include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -136,9 +128,8 @@ Real Shop::kineticEnergy(MetaBody* _rb){
 	Real ret=0.;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
-		shared_ptr<RigidBodyParameters> rbp=YADE_PTR_CAST<RigidBodyParameters>(b->physicalParameters); assert(rbp);
 		// ½(mv²+ωIω)
-		ret+=.5*(rbp->mass*rbp->velocity.SquaredLength()+rbp->angularVelocity.Dot(diagMult(rbp->inertia,rbp->angularVelocity)));
+		ret+=.5*(b->state->mass*b->state->vel.SquaredLength()+b->state->angVel.Dot(diagMult(b->state->inertia,b->state->angVel)));
 	}
 	return ret;
 }
@@ -200,13 +191,6 @@ void Shop::init(){
 shared_ptr<MetaBody> Shop::rootBody(){
 	shared_ptr<MetaBody> rootBody = shared_ptr<MetaBody>(new MetaBody);
 	rootBody->isDynamic=false;
-	
-	shared_ptr<ParticleParameters> physics(new ParticleParameters);
-	physics->se3=Se3r(Vector3r(0,0,0),Quaternionr(Vector3r(0,0,1),0));
-	physics->mass=0;
-	physics->velocity=Vector3r::ZERO;
-	physics->acceleration=Vector3r::ZERO;
-	rootBody->physicalParameters=physics;
 
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());	set->diffuseColor=Vector3r(0,0,1);
 	rootBody->interactingGeometry=YADE_PTR_CAST<InteractingGeometry>(set);	
@@ -241,7 +225,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	/*	GO(unsigned short); GO(short); GO(char);GO(int);GO(unsigned int);GO(long);GO(unsigned long);GO(long long);GO(unsigned long long); */
 	
 	if(getDefault<int>("param_timeStepUpdateInterval")>0){
-		shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
+		shared_ptr<GlobalStiffnessTimeStepper> sdecTimeStepper(new GlobalStiffnessTimeStepper);
 		sdecTimeStepper->sdecGroupMask=getDefault<int>("body_sdecGroupMask");
 		sdecTimeStepper->timeStepUpdateInterval=getDefault<int>("param_timeStepUpdateInterval");
 		sdecTimeStepper->timeStepUpdateInterval=300;
@@ -261,7 +245,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
-	interactionPhysicsDispatcher->add(new MacroMicroElasticRelationships);
+	interactionPhysicsDispatcher->add(new SimpleElasticRelationships);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
@@ -275,31 +259,20 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 		rootBody->engines.push_back(gravityCondition);
 	}
 	
-	if(getDefault<double>("param_damping")>0){
-		shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-		actionForceDamping->damping = getDefault<double>("param_damping");
-		shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-		actionMomentumDamping->damping = getDefault<double>("param_damping");
-		shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-		actionDampingDispatcher->add(actionForceDamping);
-		actionDampingDispatcher->add(actionMomentumDamping);
-		rootBody->engines.push_back(actionDampingDispatcher);
-	}
-	
-	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-	applyActionDispatcher->add(new NewtonsForceLaw);
-	applyActionDispatcher->add(new NewtonsMomentumLaw);
-	rootBody->engines.push_back(applyActionDispatcher);
-	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
-	positionIntegrator->add(new LeapFrogPositionIntegrator);
-	rootBody->engines.push_back(positionIntegrator);
-
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
-	orientationIntegrator->add(new LeapFrogOrientationIntegrator);
-	rootBody->engines.push_back(orientationIntegrator);
+	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
+	newton->damping=max(getDefault<double>("param_damping"),0.);
+	rootBody->engines.push_back(newton);
 }
 
+
+shared_ptr<GranularMat> Shop::defaultGranularMat(){
+	shared_ptr<GranularMat> mat(new GranularMat);
+	mat->density=getDefault<double>("phys_density");
+	mat->young=getDefault<double>("phys_young");
+	mat->poisson=getDefault<double>("phys_poisson");
+	mat->frictionAngle=getDefault<double>("phys_frictionAngle");
+	return mat;
+}
 
 /*! Create body - sphere. */
 shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
@@ -307,17 +280,12 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
 	shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
 	body->isDynamic=true;
 
-	// physics
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	physics->angularVelocity=Vector3r(0,0,0);
-	physics->velocity=Vector3r(0,0,0);
-	physics->mass=4.0/3.0*Mathr::PI*radius*radius*radius*getDefault<double>("phys_density");
-	physics->inertia=Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
-	physics->se3=Se3r(center,Quaternionr(Vector3r(0,0,1),0));
-	physics->young=getDefault<double>("phys_young");
-	physics->poisson=getDefault<double>("phys_poisson");
-	physics->frictionAngle=getDefault<double>("phys_frictionAngle");
-	body->physicalParameters=physics;
+	// material
+	body->material=Shop::defaultGranularMat();
+	
+	// state
+	body->state->mass=4.0/3.0*Mathr::PI*radius*radius*radius*body->material->density;
+	body->state->inertia=Vector3r(2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius);
 
 	// aabb
 	shared_ptr<AABB> aabb(new AABB);
@@ -349,16 +317,13 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
 		shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
 		body->isDynamic=true;
 
-		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-		physics->angularVelocity=Vector3r(0,0,0);
-		physics->velocity=Vector3r(0,0,0);
-		physics->mass=8*extents[0]*extents[1]*extents[2]*getDefault<double>("phys_density");
-		physics->inertia=Vector3r(physics->mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,physics->mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,physics->mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
-		physics->se3=Se3r(center,Quaternionr(Vector3r(0,0,1),0));
-		physics->young=getDefault<double>("phys_young");
-		physics->poisson=getDefault<double>("phys_poisson");
-		physics->frictionAngle=getDefault<double>("phys_frictionAngle");
-		body->physicalParameters=physics;
+		// material
+		body->material=defaultGranularMat();
+	
+		// state
+		Real mass=8.0*extents[0]*extents[1]*extents[2]*body->material->density;
+		body->state->mass=mass;
+		body->state->inertia=Vector3r(mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
 
 		// aabb
 		shared_ptr<AABB> aabb(new AABB);
@@ -392,16 +357,9 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4]){
 		Vector3r centroid=(v_global[0]+v_global[1]+v_global[2]+v_global[3])*.25;
 		Vector3r v[4]; for(int i=0; i<4; i++) v[i]=v_global[i]-centroid;
 
-		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-		physics->angularVelocity=Vector3r(0,0,0);
-		physics->velocity=Vector3r(0,0,0);
-		physics->mass=getDefault<double>("phys_density")*TetrahedronVolume(v);
+		body->material=defaultGranularMat();
+		body->state->mass=body->material->density*TetrahedronVolume(v);
 		// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
-		physics->se3=Se3r(centroid,Quaternionr(Vector3r(0,0,1),0));
-		physics->young=getDefault<double>("phys_young");
-		physics->poisson=getDefault<double>("phys_poisson");
-		physics->frictionAngle=getDefault<double>("phys_frictionAngle");
-		body->physicalParameters=physics;
 
 		// aabb
 		shared_ptr<AABB> aabb(new AABB);
@@ -439,7 +397,7 @@ void Shop::saveSpheresToFile(string fname){
 		if (!b->isDynamic) continue;
 		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!intSph) continue;
-		const Vector3r& pos=b->physicalParameters->se3.position;
+		const Vector3r& pos=b->state->pos;
 		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
 	}
 	f.close();
@@ -496,11 +454,11 @@ Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
 	if(!rb)rb=Omega::instance().getRootBody();
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->physicalParameters || !b->interactingGeometry) continue;
-		shared_ptr<ElasticBodyParameters> ebp=dynamic_pointer_cast<ElasticBodyParameters>(b->physicalParameters);
+		if(!b->material || !b->interactingGeometry) continue;
+		shared_ptr<ElasticMat> ebp=dynamic_pointer_cast<ElasticMat>(b->material);
 		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!ebp || !s) continue;
-		Real density=ebp->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
+		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));
 	}
 	return dt;
@@ -554,7 +512,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t
 	if(!physMeta) throw runtime_error("No InteractionPhysicsMetaEngine in engines.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2);
-	physMeta->explicitAction(b1->physicalParameters,b2->physicalParameters,i);
+	physMeta->explicitAction(b1->material,b2->material,i);
 	rb->transientInteractions->insert(i);
 	return i;
 }
@@ -1180,6 +1138,7 @@ Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, con
 	return v0+((v2-v0)*(v1-v0).Length()+(v1-v0)*(v2-v0).Length())/((v1-v0).Length()+(v2-v1).Length()+(v0-v2).Length());
 }
 
+#ifdef YADE_PHYSPAR
 void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticBodyParameters> b)
 {
     b->kn = m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(en),2) );
@@ -1190,7 +1149,7 @@ void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real
     if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
     if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
 }
-
+#endif
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale
  *
@@ -1213,5 +1172,3 @@ Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period){
 	if(period) *period=(long)floor(xNorm);
 	return x0+xxNorm*(x1-x0);
 }
-
-

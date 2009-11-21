@@ -259,9 +259,9 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 			const shared_ptr<BoundingVolume>& bvXX=Body::byId(idXX,rb)->boundingVolume; const shared_ptr<BoundingVolume>& bvYY=Body::byId(idYY,rb)->boundingVolume; const shared_ptr<BoundingVolume>& bvZZ=Body::byId(idZZ,rb)->boundingVolume;
 			// copy bounds from boundingVolume if there is one, otherwise use position; store what was used in the flags.hasBB bit
 			// PERI: add current period number to the coordinate
-			XX[i].coord=((XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (Body::byId(idXX,rb)->physicalParameters->se3.position[0])) - XX.cellDim*XX[i].period;
-			YY[i].coord=((YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (Body::byId(idYY,rb)->physicalParameters->se3.position[1])) - YY.cellDim*YY[i].period;
-			ZZ[i].coord=((ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (Body::byId(idZZ,rb)->physicalParameters->se3.position[2])) - ZZ.cellDim*ZZ[i].period;
+			XX[i].coord=((XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (Body::byId(idXX,rb)->state->pos[0])) - XX.cellDim*XX[i].period;
+			YY[i].coord=((YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (Body::byId(idYY,rb)->state->pos[1])) - YY.cellDim*YY[i].period;
+			ZZ[i].coord=((ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (Body::byId(idZZ,rb)->state->pos[2])) - ZZ.cellDim*ZZ[i].period;
 			// PERI: at the initial step, fix periods of bodies
 			// doInitSort is also called when bodies are just added; changing the period should not have influence here, though.
 			if(doInitSort){
@@ -275,7 +275,7 @@ void PeriodicInsertionSortCollider::action(MetaBody* rb){
 				if(bvXX) {
 					memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); // ⇐ faster than 6 assignments
 				}  
-				else{ const Vector3r& pos=Body::byId(idXX,rb)->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
+				else{ const Vector3r& pos=Body::byId(idXX,rb)->state->pos; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
 			}
 		}
 

@@ -452,3 +452,6 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const sh
 }
 
 YADE_PLUGIN((Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

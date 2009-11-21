@@ -53,3 +53,6 @@ bool StaticSpheresAttractionEngine::doesItApplyToThisBody(Body* b)
 
 
 YADE_PLUGIN((StaticSpheresAttractionEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -53,3 +53,6 @@ CohesiveFrictionalContactInteraction::~CohesiveFrictionalContactInteraction()
 
 
 YADE_PLUGIN((CohesiveFrictionalContactInteraction));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

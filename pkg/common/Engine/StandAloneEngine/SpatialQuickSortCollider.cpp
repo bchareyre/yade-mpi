@@ -41,12 +41,9 @@ void SpatialQuickSortCollider::action(MetaBody* ncb)
 
 	Vector3r min,max;
 	shared_ptr<Body> b;
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for(int i=0 ; bi!=biEnd ; ++bi)
-	{
-	   b = *bi;
-		if(!b->boundingVolume) continue;
+	int i=0;
+	FOREACH(const shared_ptr<Body>& b, *bodies){
+		if(!b || !b->boundingVolume) continue;
 	   
 	   min = b->boundingVolume->min;
 	   max = b->boundingVolume->max;

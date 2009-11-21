@@ -22,3 +22,6 @@ NonLocalDependency::~NonLocalDependency()
 
 
 YADE_PLUGIN((NonLocalDependency));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -45,7 +45,7 @@
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 
 
@@ -433,9 +433,9 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
@@ -496,3 +496,6 @@ void SDECImpactTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 YADE_PLUGIN((SDECImpactTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

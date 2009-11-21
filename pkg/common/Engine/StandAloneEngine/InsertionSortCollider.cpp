@@ -192,15 +192,15 @@ void InsertionSortCollider::action(MetaBody* rb){
 			const shared_ptr<Body>& bXX=Body::byId(idXX,rb); const shared_ptr<Body>& bYY=Body::byId(idYY,rb); const shared_ptr<Body>& bZZ=Body::byId(idZZ,rb);
 			if(bXX){
 				const shared_ptr<BoundingVolume>& bvXX=bXX->boundingVolume;
-				XX[i].coord=(XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (bXX->physicalParameters->se3.position[0]);
+				XX[i].coord=(XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (bXX->state->pos[0]);
 			} else { XX[i].flags.hasBB=false; /* XX[i].coord=0; */ }
 			if(bYY){
 				const shared_ptr<BoundingVolume>& bvYY=bYY->boundingVolume;
-				YY[i].coord=(YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (bYY->physicalParameters->se3.position[1]);
+				YY[i].coord=(YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (bYY->state->pos[1]);
 			} else { YY[i].flags.hasBB=false; /* YY[i].coord=0; */ }
 			if(bZZ){
 				const shared_ptr<BoundingVolume>& bvZZ=bZZ->boundingVolume;
-				ZZ[i].coord=(ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (bZZ->physicalParameters->se3.position[2]);
+				ZZ[i].coord=(ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (bZZ->state->pos[2]);
 			} else { ZZ[i].flags.hasBB=false; /* ZZ[i].coord=0; */ }
 			// and for each body, copy its minima and maxima arrays as well
 			if(XX[i].flags.isMin){
@@ -208,7 +208,7 @@ void InsertionSortCollider::action(MetaBody* rb){
 				if(bXX){
 					const shared_ptr<BoundingVolume>& bvXX=bXX->boundingVolume;
 					if(bvXX) { memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
-					else{ const Vector3r& pos=bXX->physicalParameters->se3.position; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
+					else{ const Vector3r& pos=bXX->state->pos; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
 				} else { memset(&minima[3*idXX],0,3*sizeof(Real)); memset(&maxima[3*idXX],0,3*sizeof(Real)); }
 			}
 		}
@@ -299,3 +299,5 @@ void InsertionSortCollider::action(MetaBody* rb){
 		}
 	ISC_CHECKPOINT("sort&collide");
 }
+
+

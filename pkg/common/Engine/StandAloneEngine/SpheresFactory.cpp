@@ -196,3 +196,6 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	body->physicalParameters	= physics;
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -10,7 +10,7 @@
 
 #include "TriaxialStateRecorder.hpp"
 //#include <yade/pkg-common/RigidBodyParameters.hpp>
-#include <yade/pkg-common/ParticleParameters.hpp>
+//#include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-dem/BodyMacroParameters.hpp>
 //#include <yade/pkg-dem/ElasticContactLaw.hpp>
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
@@ -101,11 +101,9 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 
 		if ( b->isDynamic )
 		{
-			const shared_ptr<ParticleParameters>& pp =
-				YADE_PTR_CAST<ParticleParameters> ( b->physicalParameters );
-			const Vector3r& v = pp->velocity;
+			const Vector3r& v = b->state->vel;
 			kinematicE +=
-				0.5* ( pp->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
+				0.5* ( b->state->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
 			Vs += 1.3333333*Mathr::PI*pow ( YADE_PTR_CAST<InteractingSphere>( b->interactingGeometry)->radius, 3 );
 

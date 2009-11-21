@@ -86,7 +86,7 @@ bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1,
 
 	void Gl1_Dem3DofGeom_WallSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_WallSphere* ws=static_cast<Dem3DofGeom_WallSphere*>(ig.get());
-		const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;
+		const Se3r& se31=b1->state->se3,se32=b2->state->se3;
 		const Vector3r& pos1=se31.position; const Vector3r& pos2=se32.position;
 		//const Quaternionr& ori1=se31.orientation;
 		const Quaternionr& ori2=se32.orientation;

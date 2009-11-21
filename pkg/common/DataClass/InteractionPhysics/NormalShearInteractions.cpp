@@ -5,3 +5,4 @@ YADE_PLUGIN((NormalInteraction)(NormalShearInteraction));
  */
 NormalInteraction::~NormalInteraction(){};
 NormalShearInteraction::~NormalShearInteraction(){};
+

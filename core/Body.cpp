@@ -25,26 +25,6 @@ const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<MetaBody> rb){retur
 #endif
 
 // we must initialize id = 0, otherwise BodyContainer will crash.
-Body::Body () : 
-	  Serializable()
-	, id(0)
-	, groupMask(1)
-	,clumpId(ID_NONE)
-{
-}
-
-Body::Body (body_id_t newId, int newGroup) :
-	  Serializable()
-	, id(newId)
-	, groupMask(newGroup)
-	,clumpId(ID_NONE)
-	, physicalParameters(shared_ptr<PhysicalParameters>())
-	#ifdef YADE_SHAPE
-		, geometricalModel(shared_ptr<GeometricalModel>())
-	#endif
-	, interactingGeometry(shared_ptr<InteractingGeometry>())
-	, boundingVolume(shared_ptr<BoundingVolume>())
-	
-{
-}
+Body::Body(): id(0),groupMask(1),clumpId(ID_NONE), state(shared_ptr<State>(new State)){}
+Body::Body(body_id_t newId, int newGroup): id(newId), groupMask(newGroup), clumpId(ID_NONE), state(shared_ptr<State>(new State)){}
 

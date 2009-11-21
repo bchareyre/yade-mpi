@@ -6,13 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "PhysicalParametersMetaEngine.hpp"
+#include "StateMetaEngine.hpp"
 
 
 #include<yade/core/MetaBody.hpp>
 
 
-void PhysicalParametersMetaEngine::action(MetaBody* ncb)
+void StateMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	ncb->bex.sync();
@@ -22,10 +22,10 @@ void PhysicalParametersMetaEngine::action(MetaBody* ncb)
 	for( ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> b = *bi;
-		operator()(b->physicalParameters,b.get(),ncb->bex);
+		operator()(b->state,b.get(),ncb->bex);
 	}
 	
- 	operator()(ncb->physicalParameters,ncb,ncb->bex);
+ 	operator()(ncb->state,ncb,ncb->bex);
 }
 
-YADE_PLUGIN((PhysicalParametersMetaEngine));
+YADE_REQUIRE_FEATURE(PHYSPAR);

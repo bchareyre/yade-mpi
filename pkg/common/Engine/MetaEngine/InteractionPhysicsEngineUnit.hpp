@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/PhysicalParameters.hpp>
+#include<yade/core/Material.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/EngineUnit.hpp>
 #include <string>
@@ -30,8 +30,8 @@
 class InteractionPhysicsEngineUnit : 	public EngineUnit2D
 					<
 		 				void ,
-		 				TYPELIST_3(	  const shared_ptr<PhysicalParameters>&
-								, const shared_ptr<PhysicalParameters>&
+		 				TYPELIST_3(	  const shared_ptr<Material>&
+								, const shared_ptr<Material>&
 								, const shared_ptr<Interaction>&
 			   				  ) 
 					>

@@ -76,3 +76,6 @@ void StaticAttractionEngine::applyCondition(MetaBody * ncb)
 }
 
 YADE_PLUGIN((StaticAttractionEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

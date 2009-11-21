@@ -30,3 +30,6 @@ Vector3r SafeVectors3::operator[](size_t i)const
 	}
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

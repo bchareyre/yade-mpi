@@ -96,3 +96,6 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	cons
 }
 
 YADE_PLUGIN((Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

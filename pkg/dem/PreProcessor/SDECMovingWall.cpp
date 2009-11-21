@@ -44,7 +44,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 YADE_REQUIRE_FEATURE(shape)
 
@@ -329,9 +329,9 @@ void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 // moving wall
 	shared_ptr<TranslationEngine> kinematic = shared_ptr<TranslationEngine>(new TranslationEngine);
@@ -397,3 +397,6 @@ void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((SDECMovingWall));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

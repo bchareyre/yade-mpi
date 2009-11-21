@@ -20,7 +20,7 @@ if 'qt3' not in env['exclude']:
 				'qt3/QtFileGeneratorController.ui'],
 			LIBS=(['PythonUI'] if 'YADE_PYTHON' in env['CPPDEFINES'] else [])+[
 				'yade-serialization-qt',
-				linkPlugins(['GravityEngines','OpenGLRenderingEngine','PositionOrientationRecorder']),
+				linkPlugins(['GravityEngines','OpenGLRenderingEngine']),
 				'$QGLVIEWER_LIB'],
 			CPPPATH=env['CPPPATH']+['qt3']
 		),

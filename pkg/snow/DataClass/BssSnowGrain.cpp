@@ -60,3 +60,6 @@ BssSnowGrain::BssSnowGrain(BshSnowGrain* grain, Real one_voxel_in_meters_is)
 
 
 YADE_PLUGIN((BssSnowGrain));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

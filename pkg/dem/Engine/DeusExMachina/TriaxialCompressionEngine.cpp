@@ -9,19 +9,19 @@
 #include "TriaxialCompressionEngine.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/lambda/lambda.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 
 class CohesiveFrictionalRelationships;
 
 CREATE_LOGGER(TriaxialCompressionEngine);
+YADE_PLUGIN((TriaxialCompressionEngine));
 
 TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(strain[1])
 {
@@ -257,10 +257,10 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 			//else currentStrainRate = strainRate;
 
 			/* Move top and bottom wall according to strain rate */
-			PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
-			p->se3.position += 0.5*currentStrainRate*height*translationAxis*dt;
-			p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
-			p->se3.position -= 0.5*currentStrainRate*height*translationAxis*dt;
+			State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
+			p_bottom->pos += 0.5*currentStrainRate*height*translationAxis*dt;
+			State* p_top=Body::byId(wall_top_id,ncb)->state.get();
+			p_top->pos -= 0.5*currentStrainRate*height*translationAxis*dt;
 		} else {
 			Omega::instance().stopSimulationLoop();
 		}
@@ -274,21 +274,23 @@ void TriaxialCompressionEngine::applyCondition ( MetaBody * ncb )
 		}
 		
 		Real dt = Omega::instance().getTimeStep();
+
+		State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
+		State* p_top=Body::byId(wall_top_id,ncb)->state.get();
+		State* p_left=Body::byId(wall_left_id,ncb)->state.get();
+		State* p_right=Body::byId(wall_right_id,ncb)->state.get();
+		State* p_front=Body::byId(wall_front_id,ncb)->state.get();
+		State* p_back=Body::byId(wall_back_id,ncb)->state.get();
+
 		/* Move top and bottom wall according to strain rate */
-		PhysicalParameters* p=static_cast<PhysicalParameters*> ( Body::byId ( wall_bottom_id )->physicalParameters.get() );
-		p->se3.position += 0.5*strainRate*height*translationAxis*dt;
-		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_top_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*strainRate*height*translationAxis*dt;
+		p_bottom->pos += 0.5*strainRate*height*translationAxis*dt;
+		p_top->pos -= 0.5*strainRate*height*translationAxis*dt;
 
-		p=static_cast<PhysicalParameters*> ( Body::byId ( wall_back_id )->physicalParameters.get() );
-		p->se3.position += 0.5*strainRate*depth*translationAxisz*dt;
-		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_front_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*strainRate*depth*translationAxisz*dt;
+		p_back->pos += 0.5*strainRate*depth*translationAxisz*dt;
+		p_front->pos -= 0.5*strainRate*depth*translationAxisz*dt;
 
-		p=static_cast<PhysicalParameters*> ( Body::byId ( wall_left_id )->physicalParameters.get() );
-		p->se3.position += 0.5*strainRate*width*translationAxisx*dt;
-		p = static_cast<PhysicalParameters*> ( Body::byId ( wall_right_id )->physicalParameters.get() );
-		p->se3.position -= 0.5*strainRate*width*translationAxisx*dt;
+		p_left->pos += 0.5*strainRate*width*translationAxisx*dt;
+		p_right->pos -= 0.5*strainRate*width*translationAxisx*dt;
 	}
  
 }
@@ -304,15 +306,15 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 	{	
 		shared_ptr<Body> b = *bi;
 		if (b->isDynamic)
-		YADE_PTR_CAST<BodyMacroParameters> (b->physicalParameters)->frictionAngle = frictionDegree * Mathr::PI/180.0;
+		YADE_PTR_CAST<GranularMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
 		
 	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
 	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end(); 
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if (!(*ii)->isReal()) continue;
-		const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);
-		const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId2())]->physicalParameters);		
+		const shared_ptr<GranularMat>& sdec1 = YADE_PTR_CAST<GranularMat>((*bodies)[(body_id_t) ((*ii)->getId1())]->material);
+		const shared_ptr<GranularMat>& sdec2 = YADE_PTR_CAST<GranularMat>((*bodies)[(body_id_t) ((*ii)->getId2())]->material);		
 		//FIXME - why dynamic_cast fails here?
 		//const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>((*ii)->interactionPhysics);
 		const shared_ptr<ElasticContactInteraction>& contactPhysics = static_pointer_cast<ElasticContactInteraction>((*ii)->interactionPhysics);
@@ -325,6 +327,3 @@ void TriaxialCompressionEngine::setContactProperties(MetaBody * ncb, Real fricti
 	}
 } 
 
- 
-
-YADE_PLUGIN((TriaxialCompressionEngine));

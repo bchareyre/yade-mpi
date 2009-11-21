@@ -25,3 +25,6 @@ CapillaryParameters::~CapillaryParameters()
 // }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

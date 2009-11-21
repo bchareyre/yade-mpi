@@ -37,3 +37,6 @@ void GLDrawViscoelasticInteraction::go(
 
 YADE_PLUGIN((GLDrawViscoelasticInteraction));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

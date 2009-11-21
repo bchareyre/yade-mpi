@@ -56,7 +56,7 @@
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -530,9 +530,9 @@ void CohesiveTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 		
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
 	//shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
@@ -708,3 +708,6 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 
 
 YADE_PLUGIN((CohesiveTriaxialTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

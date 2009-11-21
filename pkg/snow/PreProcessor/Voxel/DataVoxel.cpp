@@ -991,3 +991,6 @@ std::pair<std::set<int> ,std::string> DataVoxel::how_many_grains()
 };
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

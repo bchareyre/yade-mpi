@@ -17,7 +17,6 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'MetaEngine.cpp',
 			'NullGUI.cpp',
 			'Omega.cpp',
-			'PhysicalParameters.cpp',
 			'Preferences.cpp',
 			'SimulationFlow.cpp',
 			'State.cpp',
@@ -27,6 +26,7 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'yade.cpp',
 			'containers/BodyVector.cpp',
 			'containers/InteractionVecMap.cpp']
+			+(['PhysicalParameters.cpp'] if 'physpar' in env['features'] else [])
 			),
 		LIBS=env['LIBS']+[
 			'yade-support',

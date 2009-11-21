@@ -20,3 +20,6 @@ LatticeInteractingGeometry::~LatticeInteractingGeometry ()
 
 
 YADE_PLUGIN((LatticeInteractingGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

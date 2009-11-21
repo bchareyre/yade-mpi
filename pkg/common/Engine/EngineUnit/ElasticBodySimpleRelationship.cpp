@@ -31,3 +31,6 @@ void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& 
 
 
 YADE_PLUGIN((ElasticBodySimpleRelationship));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

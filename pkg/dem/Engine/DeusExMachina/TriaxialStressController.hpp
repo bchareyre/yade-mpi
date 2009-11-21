@@ -13,7 +13,7 @@
 #include<yade/lib-base/yadeWm3.hpp>
 
 class MetaBody;
-class PhysicalParameters;
+class State;
 
 
 /*! \brief Controls the stress on the boundaries of a box and compute strain-like and stress-like quantities for the packing
@@ -96,7 +96,7 @@ class TriaxialStressController : public DeusExMachina
 	
 		virtual void applyCondition(MetaBody*);
 		//! Regulate the stress applied on walls with flag wall_XXX_activated = true
-		void controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel);
+		void controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, State* p, Real wall_max_vel);
 		void controlInternalStress(MetaBody* ncb, Real multiplier);
 		void updateStiffness(MetaBody* ncb);
 		void computeStressStrain(MetaBody* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain

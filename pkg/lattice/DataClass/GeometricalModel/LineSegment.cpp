@@ -20,3 +20,6 @@ LineSegment::~LineSegment ()
 
 
 YADE_PLUGIN((LineSegment));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

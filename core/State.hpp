@@ -1,5 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
+#include<yade/lib-serialization/Serializable.hpp>
 /*! State (internal & spatial variables) of a body.
 
 For now, I put position, orientation, velocity and angular velocity here,
@@ -13,17 +14,25 @@ All state variables are initialized to zeros.
 Historical note: this used to be part of the PhysicalParameters class.
 The other data are now in the Material class.
 */
-
 class State: public Serializable{
 	public:
-		//! Spatial position and orientation
 		Se3r se3;
-		//! Reference position and orientation
-		Se3r refSe3;
-		//! linear velocity
-		Vector3r velocity;
-		//! angular velocity
-		Vector3r angularVelocity;
+
+		/// linear motion
+		Vector3r& pos;
+		Vector3r vel;
+		Vector3r accel;
+		Real mass;
+
+		/// rotational motion
+		Quaternionr& ori;
+		Vector3r angVel;
+		Vector3r angAccel;
+		Vector3r inertia;
+
+		/// reference values
+		Vector3r refPos;
+		Quaternionr refOri;
 
 		//! mutex for updating the parameters from within the interaction loop (only used rarely)
 		boost::mutex updateMutex;
@@ -49,9 +58,9 @@ class State: public Serializable{
 		//! Setter of blockedDOFs from list of strings (['x','rx','rz'] → DOF_X | DOR_RX | DOF_RZ)
 		void blockedDOFs_vec_set(const std::vector<std::string>& dofs);
 
-	State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY), velocity(Vector3r::ZERO), angularVelocity(Vector3r::ZERO){}
+	State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY),pos(se3.position),vel(Vector3r::ZERO),accel(Vector3r::ZERO),mass(0.),ori(se3.orientation),angVel(Vector3r::ZERO),angAccel(Vector3r::ZERO),inertia(Vector3r::ZERO),refPos(Vector3r::ZERO),refOri(Quaternionr::IDENTITY),blockedDOFs(DOF_NONE){}
 
 	REGISTER_CLASS_AND_BASE(State,Serializable);
-	REGISTER_ATTRIBUTES(Serializable,(se3)(refSe3)(blockedDOFs)(velocity)(angularVelocity));
+	REGISTER_ATTRIBUTES(Serializable,(pos)(vel)(accel)(mass)(ori)(angVel)(angAccel)(inertia)(refPos)(refOri)(blockedDOFs));
 };
 REGISTER_SERIALIZABLE(State);

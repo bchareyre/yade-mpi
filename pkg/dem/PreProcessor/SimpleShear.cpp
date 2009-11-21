@@ -49,7 +49,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
@@ -412,4 +412,7 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 	}
 }
 
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

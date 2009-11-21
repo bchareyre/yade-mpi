@@ -3,7 +3,6 @@
 #include<boost/foreach.hpp>
 
 #include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
 YADE_PLUGIN((UniaxialStrainer));
@@ -16,20 +15,18 @@ void UniaxialStrainer::init(){
 	assert(posIds.size()>0);
 	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
-	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); posCoords.push_back(b->physicalParameters->se3.position[axis]);
+	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); posCoords.push_back(b->state->pos[axis]);
 		if(blockDisplacements && blockRotations) b->isDynamic=false;
 		else{
-			shared_ptr<PhysicalParameters> &pp=b->physicalParameters;
-			if(!blockDisplacements)pp->blockedDOFs=PhysicalParameters::axisDOF(axis); else pp->blockedDOFs=PhysicalParameters::DOF_XYZ;
-			if(blockRotations) pp->blockedDOFs|=PhysicalParameters::DOF_RXRYRZ;
+			if(!blockDisplacements) b->state->blockedDOFs=State::axisDOF(axis); else b->state->blockedDOFs=State::DOF_XYZ;
+			if(blockRotations) b->state->blockedDOFs|=State::DOF_RXRYRZ;
 		}
 	}
-	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); negCoords.push_back(b->physicalParameters->se3.position[axis]);
+	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); negCoords.push_back(b->state->pos[axis]);
 		if(blockDisplacements && blockRotations) b->isDynamic=false;
 		else{
-			shared_ptr<PhysicalParameters> &pp=b->physicalParameters;
-			if(!blockDisplacements)pp->blockedDOFs=PhysicalParameters::axisDOF(axis); else pp->blockedDOFs=PhysicalParameters::DOF_XYZ;
-			if(blockRotations) pp->blockedDOFs|=PhysicalParameters::DOF_RXRYRZ;
+			if(!blockDisplacements) b->state->blockedDOFs=State::axisDOF(axis); else b->state->blockedDOFs=State::DOF_XYZ;
+			if(blockRotations) b->state->blockedDOFs|=State::DOF_RXRYRZ;
 		}
 	}
 
@@ -77,7 +74,7 @@ void UniaxialStrainer::init(){
 			if(std::find(posIds.begin(),posIds.end(),b->id)!=posIds.end() || std::find(negIds.begin(),negIds.end(),b->id)!=negIds.end()) { continue; }
 			Real p=axisCoord(b->id);
 			Real pNormalized=(p-p0)/(p1-p0);
-			YADE_CAST<ParticleParameters*>(b->physicalParameters.get())->velocity[axis]=pNormalized*(v1-v0)+v0;
+			b->state->vel[axis]=pNormalized*(v1-v0)+v0;
 		}
 	}
 	stressUpdateInterval=min(1000,max(1,(int)(1e-5/(abs(strainRate)*Omega::instance().getTimeStep()))));
@@ -164,4 +161,3 @@ void UniaxialStrainer::computeAxialForce(){
 	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
 	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->bex.getForce(id)[axis];
 }
-

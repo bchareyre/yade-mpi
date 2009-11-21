@@ -352,7 +352,7 @@ void GLViewer::centerMedianQuartile(){
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		for(int i=0; i<3; i++) coords[i].push_back(b->physicalParameters->se3.position[i]);
+		for(int i=0; i<3; i++) coords[i].push_back(b->state->pos[i]);
 	}
 	Vector3r median,interQuart;
 	for(int i=0;i<3;i++){
@@ -382,8 +382,8 @@ void GLViewer::centerScene(){
 			Real inf=std::numeric_limits<Real>::infinity();
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-				max=componentMaxVector(max,b->physicalParameters->se3.position);
-				min=componentMinVector(min,b->physicalParameters->se3.position);
+				max=componentMaxVector(max,b->state->pos);
+				min=componentMinVector(min,b->state->pos);
 			}
 		} else {LOG_DEBUG("Using rootBody's AABB");}
 	} else {
@@ -409,8 +409,8 @@ void GLViewer::draw()
 			static int last(-1);
 			if(last == selection) // delay by one redraw, so the body will not jump into 0,0,0 coords
 			{
-				Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.orientation;
-				Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->physicalParameters->se3.position;
+				Quaternionr& q = (*(Omega::instance().getRootBody()->bodies))[selection]->state->ori;
+				Vector3r&    v = (*(Omega::instance().getRootBody()->bodies))[selection]->state->pos;
 				float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);v[0]=v0;v[1]=v1;v[2]=v2;
 				double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);	q[0]=q0;q[1]=q1;q[2]=q2;q[3]=q3;
 			}
@@ -467,8 +467,8 @@ void GLViewer::postSelection(const QPoint& point)
 		displayMessage("Selected body #"+lexical_cast<string>(selection)+(Body::byId(selection)->isClump()?" (clump)":""));
 		//wasDynamic=Body::byId(selection)->isDynamic;
 		//Body::byId(selection)->isDynamic = false;
-		Quaternionr& q = Body::byId(selection)->physicalParameters->se3.orientation;
-		Vector3r&    v = Body::byId(selection)->physicalParameters->se3.position;
+		Quaternionr& q = Body::byId(selection)->state->ori;
+		Vector3r&    v = Body::byId(selection)->state->pos;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
 		Omega::instance().getRootBody()->selectedBody = selection;
 		#ifdef YADE_PYTHON

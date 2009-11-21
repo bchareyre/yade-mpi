@@ -41,26 +41,29 @@
 #ifdef YADE_SHAPE
 	#include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 	#include<yade/pkg-common/InteractingGeometryMetaEngine.hpp>
+	#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
 #endif
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/PhysicalActionApplier.hpp>
+#ifdef YADE_PHYSPAR
+	#include<yade/pkg-common/StateMetaEngine.hpp>
+	#include<yade/pkg-common/PhysicalActionDamper.hpp>
+	#include<yade/pkg-common/PhysicalActionApplier.hpp>
+	#include<yade/pkg-common/StateEngineUnit.hpp>
+	#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
+	#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
+
+	#include<yade/pkg-common/ParticleParameters.hpp>
+#endif
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/ParticleParameters.hpp>
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
-#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
-#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
-#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
-#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
@@ -75,6 +78,8 @@ using namespace std;
 class RenderingEngine;
 
 /*!
+
+	FIXME: outdated syntax
 	
 	A regular class (not Omega) is instantiated like this:
 
@@ -82,13 +87,13 @@ class RenderingEngine;
 		
 	if class name is not given, the RootClass itself is instantiated
 
-		p=PhysicalParameters() # p is now instance of PhysicalParameters
-		p=PhysicalParameters('RigidBodyParameters') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
-		p=PhysicalParameters('RigidBodyParameters',mass=100,se3=(Vector3(1,1,2),Quaternion.IDENTITY)) # convenience constructor
+		p=Material() # p is now instance of Material
+		p=Material('GranularMat') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
+		p=Material('GranularMat',mass=100,se3=(Vector3(1,1,2),Quaternion.IDENTITY)) # convenience constructor
 
 	The last statement is equivalent to:
 
-		p=PhysicalParameters('RigidBodyParameters')
+		p=Material('GranularMat')
 		p['mass']=100; 
 		p['se3']=[1,1,2,1,0,0,0]
 
@@ -272,7 +277,7 @@ class pyOmega{
 	pyOmega(): OMEGA(Omega::instance()){
 		shared_ptr<MetaBody> rb=OMEGA.getRootBody();
 		assert(rb);
-		if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes PhysicalParametersMetaEngine... why? */
+		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
 		// initialized in constructor now: rb->boundingVolume->diffuseColor=Vector3r(1,1,1); 
 		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
@@ -605,14 +610,14 @@ python::list ParallelEngine_slaves_get(shared_ptr<ParallelEngine> self){
 shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); ParallelEngine_slaves_set(instance,slaves); return instance; }
 
 // injected methods
-Vector3r PhysicalParameters_displ_get(const shared_ptr<PhysicalParameters>& pp){return pp->se3.position-pp->refSe3.position;}
-Vector3r PhysicalParameters_rot_get  (const shared_ptr<PhysicalParameters>& pp){Quaternionr relRot=pp->refSe3.orientation.Conjugate()*pp->se3.orientation; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); return axis*angle;  }
-Vector3r PhysicalParameters_pos_get(const shared_ptr<PhysicalParameters>& pp){return pp->se3.position;}
-Quaternionr PhysicalParameters_ori_get(const shared_ptr<PhysicalParameters>& pp){return pp->se3.orientation;}
-Vector3r PhysicalParameters_refPos_get(const shared_ptr<PhysicalParameters>& pp){return pp->refSe3.position;}
-void PhysicalParameters_pos_set(const shared_ptr<PhysicalParameters>& pp, const Vector3r& p){ pp->se3.position=p; }
-void PhysicalParameters_refPos_set(const shared_ptr<PhysicalParameters>& pp, const Vector3r& p){ pp->refSe3.position=p; }
-void PhysicalParameters_ori_set(const shared_ptr<PhysicalParameters>& pp, const Quaternionr& p){ pp->se3.orientation=p; }
+Vector3r State_displ_get(const shared_ptr<State>& pp){return pp->pos-pp->refPos;}
+Vector3r State_rot_get  (const shared_ptr<State>& pp){Quaternionr relRot=pp->refOri.Conjugate()*pp->ori; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); return axis*angle;  }
+Vector3r State_pos_get(const shared_ptr<State>& pp){return pp->pos;}
+Quaternionr State_ori_get(const shared_ptr<State>& pp){return pp->ori;}
+void State_pos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->pos=p; }
+void State_ori_set(const shared_ptr<State>& pp, const Quaternionr& p){ pp->ori=p; }
+//Vector3r State_refPos_get(const shared_ptr<State>& pp){return pp->refPos;}
+//void State_refPos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->refPos=p; }
 
 long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
 long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
@@ -775,9 +780,11 @@ BOOST_PYTHON_MODULE(wrapper)
 		#endif
 		EXPOSE_DISPATCHER(InteractionGeometryMetaEngine,InteractionGeometryEngineUnit)
 		EXPOSE_DISPATCHER(InteractionPhysicsMetaEngine,InteractionPhysicsEngineUnit)
-		EXPOSE_DISPATCHER(PhysicalParametersMetaEngine,PhysicalParametersEngineUnit)
-		EXPOSE_DISPATCHER(PhysicalActionDamper,PhysicalActionDamperUnit)
-		EXPOSE_DISPATCHER(PhysicalActionApplier,PhysicalActionApplierUnit)
+		#ifdef YADE_PHYSPAR
+			EXPOSE_DISPATCHER(StateMetaEngine,StateEngineUnit)
+			EXPOSE_DISPATCHER(PhysicalActionDamper,PhysicalActionDamperUnit)
+			EXPOSE_DISPATCHER(PhysicalActionApplier,PhysicalActionApplierUnit)
+		#endif
 		EXPOSE_DISPATCHER(ConstitutiveLawDispatcher,ConstitutiveLaw)
 	#undef EXPOSE_DISPATCHER
 
@@ -789,9 +796,11 @@ BOOST_PYTHON_MODULE(wrapper)
 		#endif
 		EXPOSE_FUNCTOR(InteractionGeometryEngineUnit)
 		EXPOSE_FUNCTOR(InteractionPhysicsEngineUnit)
-		EXPOSE_FUNCTOR(PhysicalParametersEngineUnit)
-		EXPOSE_FUNCTOR(PhysicalActionDamperUnit)
-		EXPOSE_FUNCTOR(PhysicalActionApplierUnit)
+		#ifdef YADE_PHYSPAR
+			EXPOSE_FUNCTOR(StateEngineUnit)
+			EXPOSE_FUNCTOR(PhysicalActionDamperUnit)
+			EXPOSE_FUNCTOR(PhysicalActionApplierUnit)
+		#endif
 		EXPOSE_FUNCTOR(ConstitutiveLaw)
 	#undef EXPOSE_FUNCTOR
 		
@@ -806,7 +815,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		#endif
 		.def_readwrite("mold",&Body::interactingGeometry)
 		.def_readwrite("bound",&Body::boundingVolume)
-		.def_readwrite("phys",&Body::physicalParameters)
+		.def_readwrite("mat",&Body::material)
+		.def_readwrite("state",&Body::state)
 		.def_readwrite("dynamic",&Body::isDynamic)
 		.def_readonly("id",&Body::id)
 		.def_readwrite("mask",&Body::groupMask)
@@ -820,6 +830,17 @@ BOOST_PYTHON_MODULE(wrapper)
 	EXPOSE_CXX_CLASS_IX(BoundingVolume)
 		.def_readonly("min",&BoundingVolume::min)
 		.def_readonly("max",&BoundingVolume::max);
+	EXPOSE_CXX_CLASS_IX(Material)
+		.def_readwrite("label",&Material::label);
+	EXPOSE_CXX_CLASS(State)
+		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
+		.add_property("pos",&State_pos_get,&State_pos_set)
+		.add_property("ori",&State_ori_get,&State_ori_set)
+		.def_readwrite("refPos",&State::refPos)
+		.add_property("displ",&State_displ_get)
+		.add_property("rot",&State_rot_get);
+	// deprecated
+	#ifdef YADE_PHYSPAR
 	EXPOSE_CXX_CLASS_IX(PhysicalParameters)
 		.add_property("blockedDOFs",&PhysicalParameters::blockedDOFs_vec_get,&PhysicalParameters::blockedDOFs_vec_set)
 		.add_property("pos",&PhysicalParameters_pos_get,&PhysicalParameters_pos_set)
@@ -827,6 +848,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("refPos",&PhysicalParameters_refPos_get,&PhysicalParameters_refPos_set)
 		.add_property("displ",&PhysicalParameters_displ_get)
 		.add_property("rot",&PhysicalParameters_rot_get);
+	#endif
 	// interaction
 	EXPOSE_CXX_CLASS(Interaction)
 		.def_readwrite("phys",&Interaction::interactionPhysics)

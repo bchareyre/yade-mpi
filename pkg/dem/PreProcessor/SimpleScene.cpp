@@ -6,7 +6,7 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
@@ -15,7 +15,7 @@
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
@@ -87,11 +87,11 @@ bool SimpleScene::generate(){
 			applyActionDispatcher->add(new NewtonsMomentumLaw);
 			rootBody->engines.push_back(applyActionDispatcher);
 		//@
-		shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+		shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 			positionIntegrator->add(new LeapFrogPositionIntegrator);
 			rootBody->engines.push_back(positionIntegrator);
 		//@
-		shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+		shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 			orientationIntegrator->add(new LeapFrogOrientationIntegrator);
 			rootBody->engines.push_back(orientationIntegrator);
 	//@
@@ -146,3 +146,6 @@ bool SimpleScene::generate(){
 	//@
 	return true;
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

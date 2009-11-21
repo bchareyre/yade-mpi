@@ -73,3 +73,6 @@ void FlowEngine::applyCondition(MetaBody* ncb)
 }
 
 YADE_PLUGIN((FlowEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

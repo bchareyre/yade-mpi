@@ -80,3 +80,6 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::goRever
 }
 
 YADE_PLUGIN((InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

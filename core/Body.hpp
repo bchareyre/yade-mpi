@@ -13,7 +13,9 @@
 #include"GeometricalModel.hpp"
 #include"InteractingGeometry.hpp"
 #include"BoundingVolume.hpp"
-#include"PhysicalParameters.hpp"
+#ifdef YADE_PHYSPAR
+	#include"PhysicalParameters.hpp"
+#endif
 #include"State.hpp"
 #include"Material.hpp"
 
@@ -71,10 +73,9 @@ class Body : public Serializable
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
+		#ifdef YADE_PHYSPAR
 			/// here are stored physical things that describe the Body: mass, stiffness
 			shared_ptr<PhysicalParameters>	physicalParameters;
-		#ifdef YADE_NOMATERIAL
-			// later move physicalParameters here
 		#else
 			//! material of the body; might be shared among bodies (via shared_ptr)
 			shared_ptr<Material> material;
@@ -105,7 +106,7 @@ class Body : public Serializable
 			(id)
 			(groupMask)
 			(isDynamic)
-			#ifdef YADE_NOMATERIAL
+			#ifdef YADE_PHYSPAR
 				(physicalParameters)
 			#else
 				(material)

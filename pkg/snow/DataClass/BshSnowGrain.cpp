@@ -606,3 +606,6 @@ Real BshSnowGrain::calc_depth(size_t I)
 }
 
 YADE_PLUGIN((BshSnowGrain)(Grrrr));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

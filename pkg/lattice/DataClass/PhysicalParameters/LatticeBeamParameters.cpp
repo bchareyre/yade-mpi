@@ -145,3 +145,6 @@ Real LatticeBeamParameters::strain()
 }
 
 YADE_PLUGIN((LatticeBeamParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -15,7 +15,7 @@
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
@@ -123,4 +123,7 @@ void UniaxialStrainerGen::createEngines(){
 
 
 
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

@@ -15,7 +15,7 @@ bool GLDrawInteractingSphere::glutNormalize=true;
 int  GLDrawInteractingSphere::glutSlices=12;
 int  GLDrawInteractingSphere::glutStacks=6;
 
-void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>& ,bool wire2, const GLViewInfo&)
+void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
 {
 	Real r=(static_cast<InteractingSphere*>(cm.get()))->radius;
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));

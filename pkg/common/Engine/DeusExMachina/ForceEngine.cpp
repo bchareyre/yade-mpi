@@ -23,3 +23,6 @@ void InterpolatingDirectedForceEngine::applyCondition(MetaBody* rb){
 	ForceEngine::applyCondition(rb);
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

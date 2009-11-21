@@ -27,3 +27,6 @@ void TranslationEngine::applyCondition(MetaBody * ncb){
 }
 
 YADE_PLUGIN((TranslationEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -172,3 +172,6 @@ Vector3r ResetRandomPosition::generatePositionInVolume()
     
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

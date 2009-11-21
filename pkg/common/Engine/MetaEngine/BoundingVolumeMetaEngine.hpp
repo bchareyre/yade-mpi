@@ -15,6 +15,7 @@
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/BoundingVolume.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/core/State.hpp>
 
 class VelocityBins;
 
@@ -47,7 +48,6 @@ class BoundingVolumeMetaEngine :	public MetaEngine2D
 	REGISTER_BASE_CLASS_NAME(MetaEngine2D);
 	REGISTER_ATTRIBUTES(MetaEngine,(activated)(sweepDist));
 };
-
 REGISTER_SERIALIZABLE(BoundingVolumeMetaEngine);
 
 

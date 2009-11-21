@@ -38,7 +38,7 @@ shared_ptr<Interaction> InteractionGeometryMetaEngine::explicitAction(const shar
 	// example if bodies don't have an interactionGeometry), returned
 	// interaction is non real, i.e. interaction->isReal==false. Sega.
 	shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
-	b1->interactingGeometry && b2->interactingGeometry && operator()( b1->interactingGeometry , b2->interactingGeometry , b1->physicalParameters->se3 , b2->physicalParameters->se3 , interaction );
+	b1->interactingGeometry && b2->interactingGeometry && operator()( b1->interactingGeometry , b2->interactingGeometry , b1->state->se3 , b2->state->se3 , interaction );
 	return interaction;
 }
 
@@ -71,10 +71,10 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 			if (!b1->interactingGeometry || !b2->interactingGeometry) { assert(!wasReal); continue; } // some bodies do not have interactingGeometry
 			bool geomCreated;
 			if(!ncb->isPeriodic){
-				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, b2->physicalParameters->se3, I);
+				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->state->se3, b2->state->se3, I);
 			} else{
-				Se3r se32=b2->physicalParameters->se3; se32.position+=Vector3r(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
-				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->physicalParameters->se3, se32, I);
+				Se3r se32=b2->state->se3; se32.position+=Vector3r(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
+				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, b1->state->se3, se32, I);
 			}
 			// reset && erase interaction that existed but now has no geometry anymore
 			if(wasReal && !geomCreated){ ncb->interactions->requestErase(I->getId1(),I->getId2()); }
@@ -82,3 +82,4 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((InteractionGeometryMetaEngine));
+

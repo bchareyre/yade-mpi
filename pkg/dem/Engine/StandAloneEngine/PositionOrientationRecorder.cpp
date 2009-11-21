@@ -9,7 +9,6 @@
 *************************************************************************/
 
 #include "PositionOrientationRecorder.hpp"
-#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
 #include <boost/lexical_cast.hpp>
@@ -43,7 +42,7 @@ void PositionOrientationRecorder::action(MetaBody * ncb){
 		LOG_INFO("Snapshot "<<fileBase<<".bz2"<<(saveRgb?" (+rgb)":""));
 		BodyContainer::iterator biEnd = ncb->bodies->end();
 		for(BodyContainer::iterator bi    = ncb->bodies->begin(); bi!=biEnd; ++bi){
-			const Se3r& se3=(*bi)->physicalParameters->se3;
+			const Se3r& se3=(*bi)->state->se3;
 			ofile<<se3.position[0]<<" "<<se3.position[1]<<" "<<se3.position[2]<<" "<<se3.orientation[0]<<" "<<se3.orientation[1]<<" "<<se3.orientation[2]<<" "<<se3.orientation[3]<<endl;
 			if(saveRgb && (*bi)->interactingGeometry) {
 				const Vector3r& color=(*bi)->interactingGeometry->diffuseColor;
@@ -55,3 +54,4 @@ void PositionOrientationRecorder::action(MetaBody * ncb){
 
 
 YADE_PLUGIN((PositionOrientationRecorder));
+

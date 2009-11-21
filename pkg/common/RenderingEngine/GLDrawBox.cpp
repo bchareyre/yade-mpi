@@ -24,7 +24,7 @@ void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Phys
 	
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 
-	if (gm->wire || wire)
+	if (wire)
 	{
 		glDisable(GL_LIGHTING);
 		glutWireCube(1);
@@ -39,3 +39,6 @@ void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Phys
 
 YADE_PLUGIN((GLDrawBox));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -25,6 +25,7 @@
 class MetaBody;
 class Body;
 class SimpleViscoelasticBodyParameters;
+class GranularMat;
 
 using namespace std;
 using boost::shared_ptr;
@@ -68,6 +69,9 @@ class Shop{
 		//! create default tetrahedron
 		static shared_ptr<Body> tetra(Vector3r v[4]);
 
+		//! return instance of default GranularMat
+		static shared_ptr<GranularMat> defaultGranularMat();
+
 		//! Return vector of pairs (center,radius) loaded from a file with numbers inside
 		static vector<pair<Vector3r,Real> > loadSpheresFromFile(string fname,Vector3r& minXYZ, Vector3r& maxXYZ);
 		
@@ -89,10 +93,12 @@ class Shop{
 		//! Calculate inscribed circle center of trianlge
 		static Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
 
+		#ifdef YADE_PHYSPAR
 		/// Get viscoelastic parameters kn,cn,ks,cs from analytical solution of
 		/// a problem of interaction of pair spheres with mass m, collision
 		/// time tc and restitution coefficients en,es.
 	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticBodyParameters> b);
+		#endif
 
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, MetaBody* _rb=NULL);

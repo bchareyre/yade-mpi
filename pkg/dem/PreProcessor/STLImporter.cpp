@@ -65,7 +65,8 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, b
 				#endif
 		}
 
-		(*bodies)[b_id]->physicalParameters->se3 = Se3r( icc, Quaternionr( 1,0,0,0 ) );
+		(*bodies)[b_id]->state->pos=icc;
+		(*bodies)[b_id]->state->ori=Quaternionr::IDENTITY;
 		if (!noInteractingGeometry) (*bodies)[b_id]->interactingGeometry	= iFacet;
 
 		++b_id;

@@ -54,7 +54,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
@@ -306,9 +306,9 @@ void DirectShearCis::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
  	
 
@@ -435,4 +435,7 @@ std::pair<string,bool> DirectShearCis::ImportCloud(vector<BasicSphere>& sphere_l
 	}
 }
 
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

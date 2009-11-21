@@ -237,3 +237,6 @@ void GLDrawLatticeSetGeometry::go(const shared_ptr<GeometricalModel>& gm, const 
 
 YADE_PLUGIN((GLDrawLatticeSetGeometry));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

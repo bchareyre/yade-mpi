@@ -43,7 +43,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 YADE_REQUIRE_FEATURE(shape);
 
@@ -313,9 +313,9 @@ void SDECSpheresPlane::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 	
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
  	
 
@@ -373,3 +373,6 @@ void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((SDECSpheresPlane));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

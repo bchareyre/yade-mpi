@@ -33,3 +33,6 @@ Tetrahedron::~Tetrahedron()
 
 YADE_PLUGIN((Tetrahedron));
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

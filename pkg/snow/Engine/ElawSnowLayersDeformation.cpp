@@ -174,3 +174,6 @@ void ElawSnowLayersDeformation::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((ElawSnowLayersDeformation));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

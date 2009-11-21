@@ -47,7 +47,7 @@
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include<yade/pkg-snow/ElawSnowLayersDeformation.hpp>
 
@@ -403,9 +403,9 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 		
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
@@ -627,4 +627,7 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	#endif
 	body->physicalParameters	= physics;
 }
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

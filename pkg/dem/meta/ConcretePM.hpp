@@ -46,8 +46,7 @@ There are other classes, which are not strictly necessary:
 
 #pragma once
 
-#include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
@@ -55,7 +54,7 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 /* This class holds information associated with each body */
-class CpmMat: public BodyMacroParameters {
+class CpmMat: public GranularMat {
 	public:
 		//! volumetric strain around this body
 		Real epsVolumetric;
@@ -71,10 +70,10 @@ class CpmMat: public BodyMacroParameters {
 		Real normEpsPl;
 		//! stresses on the particle
 		Vector3r sigma,tau;
-		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
-		REGISTER_CLASS_AND_BASE(CpmMat,BodyMacroParameters);
-		REGISTER_CLASS_INDEX(CpmMat,BodyMacroParameters);
+		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) { createIndex();};
+		REGISTER_ATTRIBUTES(GranularMat, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
+		REGISTER_CLASS_AND_BASE(CpmMat,GranularMat);
+		REGISTER_CLASS_INDEX(CpmMat,GranularMat);
 };
 REGISTER_SERIALIZABLE(CpmMat);
 
@@ -221,7 +220,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 			isoPrestress=0;
 		}
 
-		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
+		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
 			(cohesiveThresholdIter)
 			(G_over_E)

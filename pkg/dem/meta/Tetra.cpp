@@ -13,11 +13,10 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (Tetrahedron2Te
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
-
+#include<yade/core/State.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/ElasticBodyParameters.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 
 //#include<Wm3Tetrahedron3.h>
 //#include<Wm3IntrTetrahedron3Tetrahedron3.h> // not necessary since the cpp includes it as well
@@ -165,8 +164,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 
 	/* Now rotate the whole inertia tensors of A and B and estimate maxPenetrationDepth -- the length of the body in the direction of the contact normal.
 	 * This will be used to calculate relative deformation, which is needed for elastic response. */
-	const shared_ptr<BodyMacroParameters>& physA=YADE_PTR_CAST<BodyMacroParameters>(Body::byId(interaction->getId1())->physicalParameters);
-	const shared_ptr<BodyMacroParameters>& physB=YADE_PTR_CAST<BodyMacroParameters>(Body::byId(interaction->getId2())->physicalParameters);
+	const State* physA=Body::byId(interaction->getId1())->state.get(); const State* physB=Body::byId(interaction->getId2())->state.get();
 	// WARNING: Matrix3r(Vector3r(...)) is compiled, but gives zero matrix??!! Use explicitly constructor from diagonal entries
 	Matrix3r IA(physA->inertia[0],physA->inertia[1],physA->inertia[2]); Matrix3r IB(physB->inertia[0],physB->inertia[1],physB->inertia[2]);
 	// see Clump::inertiaTensorRotate for references
@@ -387,8 +385,8 @@ void TetraLaw::action(MetaBody* rootBody)
 			
 		if(!(A->getGroupMask()&B->getGroupMask()&sdecGroupMask)) continue; // no bits overlap in masks, skip this one
 
-		const shared_ptr<ElasticBodyParameters>& physA(dynamic_pointer_cast<ElasticBodyParameters>(A->physicalParameters));
-		const shared_ptr<ElasticBodyParameters>& physB(dynamic_pointer_cast<ElasticBodyParameters>(B->physicalParameters));
+		const shared_ptr<ElasticMat>& physA(dynamic_pointer_cast<ElasticMat>(A->material));
+		const shared_ptr<ElasticMat>& physB(dynamic_pointer_cast<ElasticMat>(B->material));
 		
 
 		/* Cross-section is volumetrically equivalent to the penetration configuration */
@@ -405,18 +403,18 @@ void TetraLaw::action(MetaBody* rootBody)
 		Vector3r F=contactGeom->normal*averageStrain*young*contactGeom->equivalentCrossSection;
 		TRWM3VEC(contactGeom->normal);
 		TRWM3VEC(F);
-		TRWM3VEC((physB->se3.position-contactGeom->contactPoint).Cross(F));
+		TRWM3VEC((A->state->pos-contactGeom->contactPoint).Cross(F));
 
 		rootBody->bex.addForce (idA,-F);
 		rootBody->bex.addForce (idB, F);
-		rootBody->bex.addTorque(idA,-(physA->se3.position-contactGeom->contactPoint).Cross(F));
-		rootBody->bex.addTorque(idB, (physA->se3.position-contactGeom->contactPoint).Cross(F));
+		rootBody->bex.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).Cross(F));
+		rootBody->bex.addTorque(idB, (B->state->pos-contactGeom->contactPoint).Cross(F));
 	}
 }
 
 #ifdef YADE_OPENGL
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
+	void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 		glColor3v(cm->diffuseColor);
@@ -564,7 +562,8 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
  * @todo check for geometrical correctness...
  * */
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
-	const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
+	//const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
+	State* rbp=tetraBody->state.get();
 	const shared_ptr<TetraMold>& tMold(dynamic_pointer_cast<TetraMold>(tetraBody->interactingGeometry));
 
 	#define v0 tMold->v[0]
@@ -598,6 +597,4 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	#undef v2
 	#undef v3
 }
-
-
 

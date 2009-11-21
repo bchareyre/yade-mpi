@@ -36,3 +36,6 @@ void Se3Interpolator::applyCondition(MetaBody* mb){
 		#endif
 	}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -30,3 +30,6 @@ LatticeSetParameters::~LatticeSetParameters()
 
  
 YADE_PLUGIN((LatticeSetParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

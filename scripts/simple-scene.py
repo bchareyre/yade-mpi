@@ -67,9 +67,9 @@ o.engines=[
 #		NewtonsMomentumLaw(),
 #	]),
 #	## Acceleration results in velocity change. Integrating the velocity over dt, position of the body will change.
-#	PhysicalParametersMetaEngine([LeapFrogPositionIntegrator()]),
+#	StateMetaEngine([LeapFrogPositionIntegrator()]),
 #	## Angular acceleration changes angular velocity, resulting in position and/or orientation change of the body.
-#	PhysicalParametersMetaEngine([LeapFrogOrientationIntegrator()])
+#	StateMetaEngine([LeapFrogOrientationIntegrator()])
 ]
 
 

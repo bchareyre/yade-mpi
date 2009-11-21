@@ -9,7 +9,7 @@ YADE_PLUGIN((SpheresContactGeometry));
 SpheresContactGeometry::~SpheresContactGeometry(){};
 
 #ifdef SCG_SHEAR
-Vector3r SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
+Vector3r SpheresContactGeometry::updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
@@ -19,7 +19,7 @@ Vector3r SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, co
 	// approximated rotations
 		axis = prevNormal.Cross(normal); 
 		shearIncrement -= shear.Cross(axis);
-		angle = dt*0.5*normal.Dot(rbp1->angularVelocity + rbp2->angularVelocity);
+		angle = dt*0.5*normal.Dot(rbp1->angVel + rbp2->angVel);
 		axis = angle*normal;
 		shearIncrement -= (shear+shearIncrement).Cross(axis);
 		
@@ -30,7 +30,7 @@ Vector3r SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, co
 		angle					= acos(normal.Dot(prevNormal));
 		q.FromAngleAxis(angle,axis);
 		shearForce        = shearForce*q;
-		angle             = dt*0.5*normal.dot(rbp1->angularVelocity+rbp2->angularVelocity);
+		angle             = dt*0.5*normal.dot(rbp1->angVel+rbp2->angVel);
 		axis					= normal;
 		q.FromAngleAxis(angle,axis);
 		shearForce        = q*shearForce;
@@ -51,11 +51,11 @@ Vector3r SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, co
 	}
 	else {
 		// FIXME: It is correct for sphere-sphere and sphere-facet contact
-		c1x = (x - rbp1->se3.position);
-		c2x = (x - rbp2->se3.position);
+		c1x = (x - rbp1->pos);
+		c2x = (x - rbp2->pos);
 	}
 
-	Vector3r relativeVelocity = (rbp2->velocity+rbp2->angularVelocity.Cross(c2x)) - (rbp1->velocity+rbp1->angularVelocity.Cross(c1x));
+	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.Cross(c2x)) - (rbp1->vel+rbp1->angVel.Cross(c1x));
 	Vector3r shearVelocity = relativeVelocity-normal.Dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = shearVelocity*dt;
 	shearIncrement -= shearDisplacement;
@@ -65,7 +65,7 @@ Vector3r SpheresContactGeometry::updateShear(const RigidBodyParameters* rbp1, co
 }
 #endif
 
-void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const RigidBodyParameters* rbp1, const RigidBodyParameters* rbp2, Real dt, bool avoidGranularRatcheting){
+void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
@@ -73,7 +73,7 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 	// approximated rotations
 		axis = prevNormal.Cross(normal); 
 		shearForce -= shearForce.Cross(axis);
-		angle = dt*0.5*normal.Dot(rbp1->angularVelocity + rbp2->angularVelocity);
+		angle = dt*0.5*normal.Dot(rbp1->angVel + rbp2->angVel);
 		axis = angle*normal;
 		shearForce -= shearForce.Cross(axis);
 		
@@ -84,7 +84,7 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 		angle					= acos(normal.Dot(prevNormal));
 		q.FromAngleAxis(angle,axis);
 		shearForce        = shearForce*q;
-		angle             = dt*0.5*normal.dot(rbp1->angularVelocity+rbp2->angularVelocity);
+		angle             = dt*0.5*normal.dot(rbp1->angVel+rbp2->angVel);
 		axis					= normal;
 		q.FromAngleAxis(angle,axis);
 		shearForce        = q*shearForce;
@@ -105,11 +105,11 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 	}
 	else {
 		// FIXME: It is correct for sphere-sphere and sphere-facet contact
-		c1x = (x - rbp1->se3.position);
-		c2x = (x - rbp2->se3.position);
+		c1x = (x - rbp1->pos);
+		c2x = (x - rbp2->pos);
 	}
 
-	Vector3r relativeVelocity = (rbp2->velocity+rbp2->angularVelocity.Cross(c2x)) - (rbp1->velocity+rbp1->angularVelocity.Cross(c1x));
+	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.Cross(c2x)) - (rbp1->vel+rbp1->angVel.Cross(c1x));
 	Vector3r shearVelocity = relativeVelocity-normal.Dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = shearVelocity*dt;
 	shearForce -= ks*shearDisplacement;
@@ -133,3 +133,4 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 		bend=relRot-tors*normal;
 	}
 #endif
+

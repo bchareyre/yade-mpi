@@ -47,3 +47,6 @@ ContactLaw1Interaction::~ContactLaw1Interaction()
 
 
 YADE_PLUGIN((ContactLaw1Interaction));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -130,3 +130,6 @@ another would be HerzMindlinContactModel
 	}
 };
 YADE_PLUGIN((MacroMicroElasticRelationships));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

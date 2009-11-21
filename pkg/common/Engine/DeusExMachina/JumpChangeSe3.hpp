@@ -23,17 +23,15 @@ class JumpChangeSe3: public DeusExMachina {
 			FOREACH(body_id_t id, subscribedBodies){
 				const shared_ptr<Body>& b=Body::byId(id,mb);
 				if(setVelocities){
-					shared_ptr<RigidBodyParameters> rbp=YADE_PTR_CAST<RigidBodyParameters>(b->physicalParameters);
 					Real dt=Omega::instance().getTimeStep();
-					rbp->velocity=deltaSe3.position/dt;
+					body->state->vel=deltaSe3.position/dt;
 					Vector3r axis; Real angle; deltaSe3.orientation.ToAxisAngle(axis,angle); axis.Normalize();
-					rbp->angularVelocity=axis*angle/dt;
+					body->state->angVel=axis*angle/dt;
 					LOG_DEBUG("Angular velocity set to "<<axis*angle/dt<<". Axis="<<axis<<", angle="<<angle);
 				}
 				if(!setVelocities || (setVelocities && !b->isDynamic)){
-					Se3r& se3=b->physicalParameters->se3;
-					se3.position+=deltaSe3.position;
-					se3.orientation=deltaSe3.orientation*se3.orientation;
+					b->state->pos+=deltaSe3.position;
+					b->state->ori=deltaSe3.orientation*se3.orientation;
 				}
 			}
 		}

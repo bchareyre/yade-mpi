@@ -91,3 +91,6 @@ void WallStressRecorder::action(MetaBody * ncb)
 }
 
 YADE_PLUGIN((WallStressRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

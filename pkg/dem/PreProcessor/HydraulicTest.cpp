@@ -42,7 +42,7 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 
 #include<yade/pkg-common/TranslationEngine.hpp>
@@ -317,3 +317,6 @@ bool HydraulicTest::inside(Vector3r pos)
 };
 
 YADE_PLUGIN((HydraulicTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

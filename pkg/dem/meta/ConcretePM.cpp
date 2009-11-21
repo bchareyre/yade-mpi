@@ -1,7 +1,6 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"ConcretePM.hpp"
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -16,14 +15,14 @@ YADE_PLUGIN((CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhy
 
 CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 
-void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
+void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
 	if(interaction->interactionPhysics) return; 
 
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
 	assert(contGeom);
 
-	const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
-	const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
+	const shared_ptr<CpmMat>& elast1=YADE_PTR_CAST<CpmMat>(pp1);
+	const shared_ptr<CpmMat>& elast2=YADE_PTR_CAST<CpmMat>(pp2);
 
 	Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young); // harmonic Young's modulus average
 	//Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
@@ -200,10 +199,11 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
 		if(isCohesive){
 			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
-			const shared_ptr<CpmMat>& rbp1=YADE_PTR_CAST<CpmMat>(body1->physicalParameters), rbp2=YADE_PTR_CAST<CpmMat>(body2->physicalParameters);
+			const shared_ptr<CpmMat>& rbp1=YADE_PTR_CAST<CpmMat>(body1->material), rbp2=YADE_PTR_CAST<CpmMat>(body2->material);
 			// nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/
-			{ boost::mutex::scoped_lock lock(rbp1->updateMutex); rbp1->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; }
-			{ boost::mutex::scoped_lock lock(rbp2->updateMutex); rbp2->numBrokenCohesive+=1; rbp2->epsPlBroken+=epsPlSum; }
+			// FIXME: those state things must be moved outside CpmMat into something like CpmState; then the updateMutex will also work
+			{ /* boost::mutex::scoped_lock lock(rbp1->updateMutex); */ rbp1->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; }
+			{ /* boost::mutex::scoped_lock lock(rbp2->updateMutex); */ rbp2->numBrokenCohesive+=1; rbp2->epsPlBroken+=epsPlSum; }
 		}
 		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		return;
@@ -244,12 +244,16 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 			min((Real)1.,max((Real)0.,BC->epsTrans/BC->epsCrackOnset)),
 			min((Real)1.,max((Real)0.,abs(BC->epsTrans)/BC->epsCrackOnset-1)));
 
-		if(contactLine) GLUtils::GLDrawLine(b1->physicalParameters->dispSe3.position,b2->physicalParameters->dispSe3.position,lineColor);
-		if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
-		else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position),lineColor); }
+		// FIXME: should be computed by the renderer; for now, use the real values
+		const Se3r& dispSe31=b1->state->se3;
+		const Se3r& dispSe32=b2->state->se3;
+
+		if(contactLine) GLUtils::GLDrawLine(dispSe31.position,dispSe32.position,lineColor);
+		if(dmgLabel){ GLUtils::GLDrawNum(BC->omega,0.5*(dispSe32.position+dispSe32.position),lineColor); }
+		else if(epsNLabel){ GLUtils::GLDrawNum(BC->epsN,0.5*(dispSe31.position+dispSe32.position),lineColor); }
 		if(BC->omega>0 && dmgPlane){
 			Real halfSize=sqrt(1-BC->relResidualStrength)*.5*.705*sqrt(BC->crossSection);
-			Vector3r midPt=.5*Vector3r(b1->physicalParameters->dispSe3.position+b2->physicalParameters->dispSe3.position);
+			Vector3r midPt=.5*Vector3r(dispSe31.position+dispSe32.position);
 			glDisable(GL_CULL_FACE);
 			glPushMatrix();
 				glTranslatev(midPt);
@@ -373,7 +377,7 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		const body_id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
-		CpmMat* bpp=dynamic_cast<CpmMat*>(B->physicalParameters.get());
+		CpmMat* bpp=dynamic_cast<CpmMat*>(B->material.get());
 		if(!bpp) continue;
 		bpp->sigma=bodyStats[id].sigma;
 		bpp->tau=bodyStats[id].tau;
@@ -389,4 +393,3 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 		B->interactingGeometry->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);
 	}
 }
-

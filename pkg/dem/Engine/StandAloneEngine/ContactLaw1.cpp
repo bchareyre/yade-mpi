@@ -311,3 +311,6 @@ void ContactLaw1::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((ContactLaw1));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -27,13 +27,17 @@
 #include<yade/core/Engine.hpp>
 
 #include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
-#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
+#ifdef YADE_SHAPE
+	#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
+#endif
+#ifdef YADE_PHYSPAR
+	#include<yade/pkg-common/StateEngineUnit.hpp>
+	#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
+	#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
+#endif
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
-#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
-#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
-#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 
@@ -140,9 +144,11 @@ BOOST_PYTHON_MODULE(_customConverters){
 		#endif
 		VECTOR_ENGINE_UNIT(InteractionGeometryEngineUnit)
 		VECTOR_ENGINE_UNIT(InteractionPhysicsEngineUnit)
-		VECTOR_ENGINE_UNIT(PhysicalParametersEngineUnit)
-		VECTOR_ENGINE_UNIT(PhysicalActionDamperUnit)
-		VECTOR_ENGINE_UNIT(PhysicalActionApplierUnit)
+		#ifdef YADE_PHYSPAR
+			VECTOR_ENGINE_UNIT(StateEngineUnit)
+			VECTOR_ENGINE_UNIT(PhysicalActionDamperUnit)
+			VECTOR_ENGINE_UNIT(PhysicalActionApplierUnit)
+		#endif
 		VECTOR_ENGINE_UNIT(ConstitutiveLaw)
 	#undef VECTOR_ENGINE_UNIT
 }

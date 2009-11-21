@@ -35,3 +35,6 @@ Quadrilateral::~Quadrilateral(){}
 
 YADE_PLUGIN((Quadrilateral));
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

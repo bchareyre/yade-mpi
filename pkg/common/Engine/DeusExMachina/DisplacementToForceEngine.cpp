@@ -71,3 +71,6 @@ void DisplacementToForceEngine::applyCondition(MetaBody * ncb)
 }
 
 YADE_PLUGIN((DisplacementToForceEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

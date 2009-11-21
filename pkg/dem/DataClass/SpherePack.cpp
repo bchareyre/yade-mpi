@@ -75,7 +75,7 @@ void SpherePack::fromSimulation() {
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!intSph) continue;
-		pack.push_back(Sph(b->physicalParameters->se3.position,intSph->radius));
+		pack.push_back(Sph(b->state->pos,intSph->radius));
 	}
 	if(rootBody->isPeriodic) { cellSize=rootBody->cellMax-rootBody->cellMin; }
 }
@@ -137,4 +137,3 @@ void SpherePack::cellRepeat(Vector3<int> count){
 	}
 	cellSize=Vector3r(cellSize[0]*count[0],cellSize[1]*count[1],cellSize[2]*count[2]);
 }
-

@@ -37,7 +37,7 @@ GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper()
 
 void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb)
 {
-	RigidBodyParameters * sdec	= static_cast<RigidBodyParameters*>(body->physicalParameters.get());
+	const State* sdec=body->state.get();
 	
 	// Sphere* sphere = static_cast<Sphere*>(body->geometricalModel.get());
 	

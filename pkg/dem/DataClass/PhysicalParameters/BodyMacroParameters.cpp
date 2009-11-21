@@ -20,3 +20,6 @@ BodyMacroParameters::~BodyMacroParameters()
 }
 
 YADE_PLUGIN((BodyMacroParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

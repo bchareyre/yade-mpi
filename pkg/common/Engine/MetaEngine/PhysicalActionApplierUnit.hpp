@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include<yade/core/PhysicalParameters.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/core/State.hpp>
 #include<yade/core/EngineUnit.hpp>
 
-class PhysicalActionApplierUnit: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<PhysicalParameters>&,const Body*, MetaBody*)>{
+class PhysicalActionApplierUnit: public EngineUnit1D<void,TYPELIST_3(const shared_ptr<State>&,const Body*, MetaBody*)>{
 	public: virtual ~PhysicalActionApplierUnit();
 	REGISTER_CLASS_AND_BASE(PhysicalActionApplierUnit,EngineUnit1D);
 	REGISTER_ATTRIBUTES(EngineUnit, /* nothing here */ );

@@ -21,3 +21,6 @@ BcpConnection::~BcpConnection()
 }
 
 YADE_PLUGIN((BcpConnection));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

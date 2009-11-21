@@ -16,7 +16,7 @@ class ElasticContactInteraction: public NormalShearInteraction
 				;	
 		Vector3r	prevNormal;			// unit normal of the contact plane.
 
-		ElasticContactInteraction();
+		ElasticContactInteraction(){ createIndex(); }
 		virtual ~ElasticContactInteraction();
 	REGISTER_ATTRIBUTES(NormalShearInteraction,(prevNormal)/*(initialKn)(initialKs)*/(tangensOfFrictionAngle));
 	REGISTER_CLASS_NAME(ElasticContactInteraction);

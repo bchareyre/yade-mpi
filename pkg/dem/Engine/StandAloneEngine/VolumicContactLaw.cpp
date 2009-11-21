@@ -635,3 +635,5 @@ void VolumicContactLaw::action(MetaBody* ncb)
 
  
 YADE_PLUGIN((VolumicContactLaw));
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

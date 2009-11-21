@@ -37,7 +37,7 @@
 
 #include<yade/core/BodyVector.hpp>
 #include<yade/pkg-common/DisplacementEngine.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 
 #include<yade/pkg-common/Quadrilateral.hpp>
@@ -2172,3 +2172,6 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((LatticeExample));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

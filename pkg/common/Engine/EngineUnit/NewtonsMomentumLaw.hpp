@@ -11,7 +11,7 @@
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 class NewtonsMomentumLaw: public PhysicalActionApplierUnit{
 	public:
-		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
+		virtual void go(const shared_ptr<State>&, const Body*, MetaBody*);
 		FUNCTOR1D(RigidBodyParameters);
 		REGISTER_CLASS_AND_BASE(NewtonsMomentumLaw,PhysicalActionApplierUnit);
 };

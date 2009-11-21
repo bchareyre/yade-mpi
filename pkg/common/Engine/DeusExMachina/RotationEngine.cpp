@@ -3,7 +3,6 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"RotationEngine.hpp"
-#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/pkg-dem/Shop.hpp>
@@ -30,19 +29,17 @@ void SpiralEngine::applyCondition(MetaBody* rb){
 		assert(id<(body_id_t)bodies->size());
 		Body* b=Body::byId(id,rb).get();
 		if(!b) continue;
-		RigidBodyParameters* rbp=YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-		assert(rbp);
 		// translation
-		rbp->se3.position+=dt*linearVelocity*axis;
+		b->state->pos+=dt*linearVelocity*axis;
 		// rotation
-		rbp->se3.position=q*(rbp->se3.position-axisPt)+axisPt;
-		rbp->se3.orientation=q*rbp->se3.orientation;
-		rbp->se3.orientation.Normalize(); // to make sure
+		b->state->pos=q*(b->state->pos-axisPt)+axisPt;
+		b->state->ori=q*b->state->ori;
+		b->state->ori.Normalize(); // to make sure
 		// bug: https://bugs.launchpad.net/yade/+bug/398089; since subscribed bodies are not dynamic (assumption), we have to set theri velocities here as well;
 		// otherwise, their displacement will be missed in NewtonsDampedLaw and when using velocityBins, they will have no influence;
 		// that can cause interactions to be missed, for example
-		rbp->velocity=linearVelocity*axis+angularVelocity*axis.Cross(rbp->se3.position-axisPt); // check this...
-		rbp->angularVelocity=angularVelocity*axis;
+		b->state->vel=linearVelocity*axis+angularVelocity*axis.Cross(b->state->pos-axisPt); // check this...
+		b->state->angVel=angularVelocity*axis;
 	}
 }
 
@@ -68,28 +65,30 @@ void RotationEngine::applyCondition(MetaBody *ncb)
 	Quaternionr q;
 	q.FromAxisAngle(rotationAxis,angularVelocity*dt);
 
-	Vector3r ax;
-	Real an;
+	// Vector3r ax; Real an;
 	
 	for(;ii!=iiEnd;++ii)
 	{
-		RigidBodyParameters * rb = static_cast<RigidBodyParameters*>((*bodies)[*ii]->physicalParameters.get());
+		State* rb=Body::byId(*ii,ncb)->state.get();
 
-		rb->angularVelocity	= rotationAxis*angularVelocity;
+		rb->angVel	= rotationAxis*angularVelocity;
 
 		if(rotateAroundZero)
         {
-            const Vector3r l = rb->se3.position-zeroPoint;
-			rb->se3.position	= q*l+zeroPoint; 
-            rb->velocity		= rb->angularVelocity.Cross(l);
+            const Vector3r l = rb->pos-zeroPoint;
+			rb->pos	= q*l+zeroPoint; 
+            rb->vel		= rb->angVel.Cross(l);
 		}
 			
-		rb->se3.orientation	= q*rb->se3.orientation;
-		rb->se3.orientation.Normalize();
-		rb->se3.orientation.ToAxisAngle(ax,an);
+		rb->ori	= q*rb->ori;
+		rb->ori.Normalize();
+		//rb->ori.ToAxisAngle(ax,an);
 		
 	}
 
 
 }
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

@@ -51,7 +51,7 @@
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingNode.hpp>
-#include<yade/pkg-common/PhysicalParametersMetaEngine.hpp>
+#include<yade/pkg-common/StateMetaEngine.hpp>
 
 
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
@@ -300,10 +300,10 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 	applyActionDispatcher->add("NewtonsForceLaw");
 	applyActionDispatcher->add("NewtonsMomentumLaw");
 
-	shared_ptr<PhysicalParametersMetaEngine> positionIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
 	positionIntegrator->add("LeapFrogPositionIntegrator");
 
-	shared_ptr<PhysicalParametersMetaEngine> orientationIntegrator(new PhysicalParametersMetaEngine);
+	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
 	shared_ptr<ConstitutiveLawDispatcher> constitutiveLaw(new ConstitutiveLawDispatcher);
@@ -355,3 +355,6 @@ void MembraneTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((MembraneTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

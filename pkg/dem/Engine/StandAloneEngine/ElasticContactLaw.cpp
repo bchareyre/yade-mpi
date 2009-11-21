@@ -7,10 +7,8 @@
 *************************************************************************/
 
 #include"ElasticContactLaw.hpp"
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/MetaBody.hpp>
@@ -70,8 +68,8 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 				return;
 			}	
 	
-			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id1,ncb)->physicalParameters.get());
-			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>(Body::byId(id2,ncb)->physicalParameters.get());
+			State* de1 = Body::byId(id1,ncb)->state.get();
+			State* de2 = Body::byId(id2,ncb)->state.get();
 
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	

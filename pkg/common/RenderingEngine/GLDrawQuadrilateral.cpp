@@ -217,3 +217,6 @@ void GLDrawQuadrilateral::calculateStrainQuadrilateral(
 
 YADE_PLUGIN((GLDrawQuadrilateral));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

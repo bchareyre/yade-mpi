@@ -72,3 +72,6 @@ void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<Intera
 	addTorque(id1,-c1x.Cross(f),rootBody);
 	addTorque(id2, c2x.Cross(f),rootBody);
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

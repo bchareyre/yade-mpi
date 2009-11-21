@@ -31,8 +31,8 @@ _allSerializables=set(listChildClassesRecursive('Serializable'))
 _noPropsClasses=set(['InteractionContainer','BodyContainer','EngineUnit','Engine','MetaEngine'])
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
-	'StandAloneEngine','DeusExMachina','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator',
-	'BoundingVolumeEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw']+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit','GeometricalModel'] if 'shape' in runtime.features else []))
+	'StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator',
+	'BoundingVolumeEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','ConstitutiveLaw']+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit','GeometricalModel'] if 'shape' in runtime.features else [])+(['PhysicalParameters','PhysicalActionApplierUnit','PhysicalActionDamperUnit','StateEngineUnit'] if 'physpar' in runtime.features else ['Material','State']))
 # classes for which proxies were already created
 _proxiedClasses=set()
 
@@ -40,7 +40,10 @@ _proxiedClasses=set()
 if 1:
 	# create types for all classes that yade defines: first those deriving from some root classes
 	for root in _pyRootClasses:
-		rootType=yade.wrapper.__dict__[root]
+		try:
+			rootType=yade.wrapper.__dict__[root]
+		except KeyError:
+			print 'WARNING: class %s not defined'%root
 		for p in listChildClassesRecursive(root):
 			_proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 			_proxiedClasses.add(p)

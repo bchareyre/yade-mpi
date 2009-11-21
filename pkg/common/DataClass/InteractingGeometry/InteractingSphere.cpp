@@ -19,3 +19,4 @@ InteractingSphere::~InteractingSphere ()
 
 
 YADE_PLUGIN((InteractingSphere));
+

@@ -103,7 +103,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 	if(recActive[REC_INTR]){
 		// save body positions, referenced by ids by vtkLine
 		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-			const Vector3r& pos=b->physicalParameters->se3.position;
+			const Vector3r& pos=b->state->pos;
 			intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
 		}
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
@@ -136,7 +136,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 			{
 				if(skipNondynamic && !b->isDynamic) continue;
 				vtkIdType pid[1];
-				const Vector3r& pos = b->physicalParameters->se3.position;
+				const Vector3r& pos = b->state->pos;
 				pid[0] = spheresPos->InsertNextPoint(pos[0], pos[1], pos[2]);
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
@@ -147,12 +147,12 @@ void VTKRecorder::action(MetaBody* rootBody)
 					spheresColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_VELOCITY]){
-					spheresVelocity->InsertNextTupleValue((float*)(&(YADE_CAST<ParticleParameters*>(b->physicalParameters.get()))->velocity));
+					spheresVelocity->InsertNextTupleValue((float*)(&b->state->vel));
 				}
 				if (recActive[REC_CPM]) {
-					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->physicalParameters)->normDmg);
-					const Vector3r& ss=YADE_PTR_CAST<CpmMat>(b->physicalParameters)->sigma;
-					const Vector3r& tt=YADE_PTR_CAST<CpmMat>(b->physicalParameters)->tau;
+					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->material)->normDmg);
+					const Vector3r& ss=YADE_PTR_CAST<CpmMat>(b->material)->sigma;
+					const Vector3r& tt=YADE_PTR_CAST<CpmMat>(b->material)->tau;
 					float s[3]={ss[0],ss[1],ss[2]};
 					float t[3]={tt[0],tt[1],tt[2]};
 					cpmSigma->InsertNextTupleValue(s);
@@ -167,7 +167,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 			const InteractingFacet* facet = dynamic_cast<InteractingFacet*>(b->interactingGeometry.get()); 
 			if (facet)
 			{
-				const Se3r& O = b->physicalParameters->se3;
+				const Se3r& O = b->state->se3;
 				const vector<Vector3r>& localPos = facet->vertices;
 				Matrix3r facetAxisT; O.orientation.ToRotationMatrix(facetAxisT);
 				vtkSmartPointer<vtkTriangle> tri = vtkSmartPointer<vtkTriangle>::New();
@@ -252,4 +252,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 	//writer->SetInput(multiblockDataset);
 	//writer->Write();	
 }
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

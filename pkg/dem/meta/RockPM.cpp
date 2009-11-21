@@ -135,3 +135,6 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 
 RpmPhys::~RpmPhys(){};
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -170,8 +170,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 
 	void Gl1_Dem3DofGeom_FacetSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_FacetSphere* fs = static_cast<Dem3DofGeom_FacetSphere*>(ig.get());
-		//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
-		const Se3r& se31=b1->physicalParameters->se3,se32=b2->physicalParameters->se3;
+		const Se3r& se31=b1->state->se3,se32=b2->state->se3;
 		const Vector3r& pos1=se31.position; const Vector3r& pos2=se32.position;
 		const Quaternionr& ori1=se31.orientation; const Quaternionr& ori2=se32.orientation;
 		const Vector3r& contPt=fs->contactPoint;

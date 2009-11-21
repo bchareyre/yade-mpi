@@ -7,12 +7,11 @@
 *************************************************************************/
  
 #include"TriaxialStressController.hpp"
-#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/core/State.hpp>
 
 
 
@@ -127,7 +126,7 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 	}
 }
 
-void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, PhysicalParameters* p, Real wall_max_vel)
+void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, State* p, Real wall_max_vel)
 {
 	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce); 
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
@@ -151,7 +150,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 	//cerr << "translation = " << previousTranslation[wall] << endl;
 	p->se3.position += previousTranslation[wall];
 	// this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
-	static_cast<RigidBodyParameters*>(p)->velocity=previousTranslation[wall]/ncb->dt;
+	p->vel=previousTranslation[wall]/ncb->dt;
 	if(log)TRVAR2(previousTranslation,p->se3.position);
 }
 
@@ -165,18 +164,14 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
 	// sync thread storage of BexContainer
 	ncb->bex.sync(); 
 	
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	
-	
-
 	if(thickness<0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->interactingGeometry)->extents.Y();
 
-	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
-	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
-	PhysicalParameters* p_left  = static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
-	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
-	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
-	PhysicalParameters* p_back  = static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
+	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
+	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
+	State* p_left=Body::byId(wall_left_id,ncb)->state.get();
+	State* p_right=Body::byId(wall_right_id,ncb)->state.get();
+	State* p_front=Body::byId(wall_front_id,ncb)->state.get();
+	State* p_back=Body::byId(wall_back_id,ncb)->state.get();
 		
 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
 	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
@@ -273,13 +268,12 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
  */
 void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	PhysicalParameters* p_bottom = static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.get());
-	PhysicalParameters* p_top   =	 static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get());
-	PhysicalParameters* p_left  = static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get());
-	PhysicalParameters* p_right = static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.get());
-	PhysicalParameters* p_front = static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.get());
-	PhysicalParameters* p_back  = static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get());
+	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
+	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
+	State* p_left=Body::byId(wall_left_id,ncb)->state.get();
+	State* p_right=Body::byId(wall_right_id,ncb)->state.get();
+	State* p_front=Body::byId(wall_front_id,ncb)->state.get();
+	State* p_back=Body::byId(wall_back_id,ncb)->state.get();
 	
  	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() - thickness;
  	width = p_right->se3.position.X() - p_left->se3.position.X() - thickness;
@@ -332,8 +326,10 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 			#ifdef YADE_SHAPE
 				Sphere* s = dynamic_cast<Sphere*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
 			#endif
-			( static_cast<ParticleParameters*> ( ( *bi )->physicalParameters.get() ) )->mass *= pow ( multiplier,3 );
-			( static_cast<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() ) )->inertia *= pow ( multiplier,5 );
+				//( static_cast<ParticleParameters*> ( ( *bi )->physicalParameters.get() ) )->mass *= pow ( multiplier,3 );
+				//( static_cast<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() ) )->inertia *= pow ( multiplier,5 );
+				(*bi)->state->mass*=pow(multiplier,3);
+				(*bi)->state->inertia*=pow(multiplier,5);
 
 		}
 	}

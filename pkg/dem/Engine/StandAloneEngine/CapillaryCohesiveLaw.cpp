@@ -710,3 +710,6 @@ BodiesMenisciiList::BodiesMenisciiList()
 {
 	initialized=false;
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -240,3 +240,6 @@ bool VoxelEnvelope::ready()
 	return m_data_voxel.ready();
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

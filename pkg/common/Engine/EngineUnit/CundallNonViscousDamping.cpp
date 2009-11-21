@@ -27,3 +27,6 @@ void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& 
 	}
 	rb->bex.addForce(id,df); rb->bex.addTorque(id,dt);
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

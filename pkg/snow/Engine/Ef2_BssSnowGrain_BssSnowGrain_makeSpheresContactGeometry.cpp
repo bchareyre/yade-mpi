@@ -98,3 +98,6 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const 
 }
 
 YADE_PLUGIN((Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -101,3 +101,6 @@ void MeasurePoisson::action(MetaBody * ncb)
 }
 
 YADE_PLUGIN((MeasurePoisson));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

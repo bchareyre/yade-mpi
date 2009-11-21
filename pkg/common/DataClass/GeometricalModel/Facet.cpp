@@ -22,3 +22,6 @@ Facet::~Facet ()
 
 YADE_PLUGIN((Facet));
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

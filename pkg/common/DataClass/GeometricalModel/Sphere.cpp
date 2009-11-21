@@ -23,3 +23,6 @@ Sphere::~Sphere ()
 
 YADE_PLUGIN((Sphere));
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

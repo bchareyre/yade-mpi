@@ -6,7 +6,7 @@
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/DeusExMachina.hpp>
-#include<yade/pkg-common/PhysicalParametersEngineUnit.hpp>
+#include<yade/pkg-common/StateEngineUnit.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
@@ -107,4 +107,7 @@ void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clump
 	clump->updateProperties(false);
 }
 
+
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
 

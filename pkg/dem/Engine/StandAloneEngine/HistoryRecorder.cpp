@@ -140,3 +140,6 @@ void HistoryRecorder::action(MetaBody * ncb)
 
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+
