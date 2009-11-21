@@ -13,7 +13,9 @@
 #include"GeometricalModel.hpp"
 #include"InteractingGeometry.hpp"
 #include"BoundingVolume.hpp"
-#include"PhysicalParameters.hpp"
+#ifdef YADE_PHYSPAR
+	#include"PhysicalParameters.hpp"
+#endif
 #include"State.hpp"
 #include"Material.hpp"
 

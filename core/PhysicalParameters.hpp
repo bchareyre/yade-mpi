@@ -3,6 +3,10 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 
+#ifndef YADE_PHYSPAR
+	#error This file can be included only with the deprecated feature 'physpar' enabled!
+#endif
+
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
