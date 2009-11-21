@@ -48,8 +48,6 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	strainRateTension=.1,
 	strainRateCompression=1,
 	setSpeeds=True,
-	# the packing has about 50% porosity, 2×2400==4800
-	density=4800,
 	# 1=tension, 2=compression (ANDed; 3=both)
 	doModes=3,
 
@@ -66,7 +64,7 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.2*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',young=young,poisson=poisson,frictionAngle=frictionAngle,physParamsClass='CpmMat',density=density)
+spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.2*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',young=young,poisson=poisson,frictionAngle=frictionAngle,materialClass='CpmMat')
 O.bodies.append(spheres)
 bb=utils.uniaxialTestFeatures()
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']

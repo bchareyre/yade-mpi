@@ -13,6 +13,7 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'Interaction.cpp',
 			'InteractionContainer.cpp',
 			'GroupRelationData.cpp',
+			'Material.cpp',
 			'MetaBody.cpp',
 			'MetaEngine.cpp',
 			'NullGUI.cpp',

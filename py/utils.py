@@ -74,6 +74,7 @@ bodiesMatDefaults={'density':2e3,'young':30e9,'poisson':.3,'frictionAngle':.5236
 
 def _commonBodySetup(b,volume,geomInertia,materialClass='GranularMat',noBound=False,**matKw):
 	"""Assign common body parameters."""
+	if 'physParamsClass' in matKw.keys(): raise RuntimeError("You as passing physParamsClass as argument, but it is no longer used. Use materialClass instead.")
 	matKw2=bodiesMatDefaults.copy(); matKw2.update(matKw)
 	b.mat=Material(materialClass)
 	b.mat.updateExistingAttrs(matKw2)
@@ -92,7 +93,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=
 	b['isDynamic']=dynamic
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,density=1,highlight=False,**matKw):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,**matKw):
 	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
@@ -123,7 +124,7 @@ def wall(position,axis,sense=0,color=None,**matKw):
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,density=1,highlight=False,noBoundingVolume=False,**matKw):
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,**matKw):
 	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
 	b=Body()
 	if not color: color=randomColor()

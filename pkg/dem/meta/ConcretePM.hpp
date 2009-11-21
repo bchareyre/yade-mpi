@@ -70,7 +70,7 @@ class CpmMat: public GranularMat {
 		Real normEpsPl;
 		//! stresses on the particle
 		Vector3r sigma,tau;
-		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) { createIndex();};
+		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) { createIndex(); density=4800; };
 		REGISTER_ATTRIBUTES(GranularMat, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
 		REGISTER_CLASS_AND_BASE(CpmMat,GranularMat);
 		REGISTER_CLASS_INDEX(CpmMat,GranularMat);

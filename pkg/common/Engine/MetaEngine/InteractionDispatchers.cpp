@@ -94,7 +94,6 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 				continue; // in any case don't care about this one anymore
 			}
 
-
 			// InteractionPhysicsMetaEngine
 			if(!I->functorCache.phys){
 				I->functorCache.phys=physDispatcher->getFunctor2D(b1->material,b2->material,swap);
