@@ -299,3 +299,6 @@ void InsertionSortCollider::action(MetaBody* rb){
 		}
 	ISC_CHECKPOINT("sort&collide");
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -118,3 +118,6 @@ void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepL
 	}
 	void VelocityBins::binVelSqFinalize(){}
 #endif
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

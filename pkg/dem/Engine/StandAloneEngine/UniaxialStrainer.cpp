@@ -165,3 +165,6 @@ void UniaxialStrainer::computeAxialForce(){
 	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->bex.getForce(id)[axis];
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

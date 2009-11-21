@@ -216,3 +216,6 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(MetaBody* rb){
 		}
 	}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -14,3 +14,6 @@ void ef2_Dem3Dof_NormalShear_ElasticFrictionalLaw::go(shared_ptr<InteractionGeom
 	applyForceAtContactPoint(phys->normalForce+phys->shearForce, geom->contactPoint, I->getId1(), geom->se31.position, I->getId2(), geom->se32.position, rootBody);
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -35,3 +35,6 @@ LatticeBeamAngularSpring::~LatticeBeamAngularSpring()
 
 
 YADE_PLUGIN((LatticeBeamAngularSpring));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

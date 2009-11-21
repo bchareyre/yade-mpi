@@ -41,3 +41,6 @@ void GLDrawNormalInteraction::go(
 
 YADE_PLUGIN((GLDrawNormalInteraction));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

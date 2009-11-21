@@ -44,3 +44,6 @@ void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Ph
 }
 YADE_PLUGIN((GLDrawFacet));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

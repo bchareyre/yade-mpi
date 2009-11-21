@@ -16,3 +16,6 @@ void PhysicalActionApplier::action(MetaBody* ncb){
 	}
 }
 YADE_PLUGIN((PhysicalActionApplier));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

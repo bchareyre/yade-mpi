@@ -328,3 +328,6 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

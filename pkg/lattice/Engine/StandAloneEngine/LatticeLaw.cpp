@@ -712,3 +712,6 @@ if(tension_compression_different_stiffness)
 */
 
 YADE_PLUGIN((LatticeLaw));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

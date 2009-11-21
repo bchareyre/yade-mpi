@@ -74,3 +74,6 @@ void AveragePositionRecorder::action(MetaBody * ncb)
 
 
 YADE_PLUGIN((AveragePositionRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

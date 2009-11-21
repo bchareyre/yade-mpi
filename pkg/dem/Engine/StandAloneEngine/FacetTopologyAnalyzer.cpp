@@ -138,3 +138,6 @@ void FacetTopologyAnalyzer::action(MetaBody* rb){
 	}
 }
 #endif
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

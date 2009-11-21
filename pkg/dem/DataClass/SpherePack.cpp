@@ -138,3 +138,6 @@ void SpherePack::cellRepeat(Vector3<int> count){
 	cellSize=Vector3r(cellSize[0]*count[0],cellSize[1]*count[1],cellSize[2]*count[2]);
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

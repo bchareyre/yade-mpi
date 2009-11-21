@@ -356,3 +356,6 @@ void ThreePointBending::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 YADE_PLUGIN((ThreePointBending));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

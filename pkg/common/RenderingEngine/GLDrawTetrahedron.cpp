@@ -146,3 +146,6 @@ void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_
 
 YADE_PLUGIN((GLDrawTetrahedron));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

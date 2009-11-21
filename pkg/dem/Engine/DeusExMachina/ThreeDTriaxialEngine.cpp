@@ -217,3 +217,6 @@ void ThreeDTriaxialEngine::setContactProperties(MetaBody * ncb, Real frictionDeg
  
 
 YADE_PLUGIN((ThreeDTriaxialEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -355,3 +355,6 @@ void MembraneTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((MembraneTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

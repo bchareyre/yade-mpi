@@ -28,3 +28,6 @@ void GeometricalModelMetaEngine::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((GeometricalModelMetaEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

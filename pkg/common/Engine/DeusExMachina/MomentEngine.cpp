@@ -41,3 +41,6 @@ void MomentEngine::applyCondition(MetaBody* ncb)
 }
 
 YADE_PLUGIN((MomentEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

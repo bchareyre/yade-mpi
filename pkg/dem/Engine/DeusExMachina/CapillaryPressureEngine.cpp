@@ -49,3 +49,6 @@ void CapillaryPressureEngine::applyCondition(MetaBody * rootBody)
 }
 
 YADE_PLUGIN((CapillaryPressureEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

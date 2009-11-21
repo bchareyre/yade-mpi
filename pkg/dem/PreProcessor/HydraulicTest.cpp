@@ -317,3 +317,6 @@ bool HydraulicTest::inside(Vector3r pos)
 };
 
 YADE_PLUGIN((HydraulicTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

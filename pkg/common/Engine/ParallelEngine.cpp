@@ -26,3 +26,6 @@ void ParallelEngine::action(MetaBody* rootBody){
 		}
 	}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

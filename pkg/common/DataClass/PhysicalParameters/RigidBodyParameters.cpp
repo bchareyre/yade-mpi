@@ -23,3 +23,6 @@ RigidBodyParameters::~RigidBodyParameters()
 }
 
 YADE_PLUGIN((RigidBodyParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -146,3 +146,6 @@ bool SimpleScene::generate(){
 	//@
 	return true;
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

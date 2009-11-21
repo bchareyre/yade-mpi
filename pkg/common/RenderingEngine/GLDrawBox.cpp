@@ -39,3 +39,6 @@ void GLDrawBox::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Phys
 
 YADE_PLUGIN((GLDrawBox));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

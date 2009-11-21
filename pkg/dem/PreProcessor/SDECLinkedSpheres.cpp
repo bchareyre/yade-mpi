@@ -368,3 +368,6 @@ void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 YADE_PLUGIN((SDECLinkedSpheres));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -706,3 +706,6 @@ string GenerateCloud_snow(vector<BasicSphere>& sphere_list, Vector3r lowerCorner
 
 
 YADE_PLUGIN((SnowCreepTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

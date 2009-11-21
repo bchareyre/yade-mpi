@@ -180,3 +180,6 @@ void NonLocalInitializer::action(MetaBody * rootBody)
 }
 
 YADE_PLUGIN((NonLocalInitializer));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

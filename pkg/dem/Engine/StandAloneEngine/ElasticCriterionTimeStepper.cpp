@@ -135,3 +135,6 @@ void ElasticCriterionTimeStepper::computeTimeStep(MetaBody* ncb)
 }
 
 YADE_PLUGIN((ElasticCriterionTimeStepper));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

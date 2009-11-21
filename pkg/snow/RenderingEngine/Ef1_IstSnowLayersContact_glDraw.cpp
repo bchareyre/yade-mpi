@@ -454,3 +454,6 @@ void Ef1_IstSnowLayersContact_glDraw::go(
 */
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

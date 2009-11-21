@@ -194,3 +194,6 @@ void BeamRecorder::action(MetaBody * ncb)
 }
 
 YADE_PLUGIN((BeamRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

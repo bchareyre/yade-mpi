@@ -19,3 +19,6 @@ InteractingBox::~InteractingBox ()
 }
 
 YADE_PLUGIN((InteractingBox));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

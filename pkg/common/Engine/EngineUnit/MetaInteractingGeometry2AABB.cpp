@@ -48,3 +48,6 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 }
 	
 YADE_PLUGIN((MetaInteractingGeometry2AABB));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

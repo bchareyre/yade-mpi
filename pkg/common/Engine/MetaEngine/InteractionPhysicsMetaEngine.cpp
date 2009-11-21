@@ -44,3 +44,6 @@ void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((InteractionPhysicsMetaEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

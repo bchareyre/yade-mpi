@@ -4,3 +4,6 @@ Real Dem3DofGeom::displacementN(){throw;}
 Dem3DofGeom::~Dem3DofGeom(){}
 GenericSpheresContact::~GenericSpheresContact(){}
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

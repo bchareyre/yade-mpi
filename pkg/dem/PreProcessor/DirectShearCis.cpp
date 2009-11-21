@@ -436,3 +436,6 @@ std::pair<string,bool> DirectShearCis::ImportCloud(vector<BasicSphere>& sphere_l
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

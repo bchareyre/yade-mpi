@@ -32,3 +32,6 @@ void InteractingFacet2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
 }
 	
 YADE_PLUGIN((InteractingFacet2AABB));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

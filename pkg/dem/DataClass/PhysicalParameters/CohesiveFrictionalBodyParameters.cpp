@@ -20,3 +20,6 @@ CohesiveFrictionalBodyParameters::~CohesiveFrictionalBodyParameters()
 }
 
 YADE_PLUGIN((CohesiveFrictionalBodyParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

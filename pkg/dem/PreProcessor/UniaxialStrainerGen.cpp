@@ -124,3 +124,6 @@ void UniaxialStrainerGen::createEngines(){
 
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

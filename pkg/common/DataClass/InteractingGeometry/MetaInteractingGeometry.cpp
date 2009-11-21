@@ -18,3 +18,6 @@ MetaInteractingGeometry::~MetaInteractingGeometry ()
 }
 
 YADE_PLUGIN((MetaInteractingGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

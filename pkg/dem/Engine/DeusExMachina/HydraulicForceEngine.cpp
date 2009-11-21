@@ -177,3 +177,6 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
 }
 
 YADE_PLUGIN((HydraulicForceEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

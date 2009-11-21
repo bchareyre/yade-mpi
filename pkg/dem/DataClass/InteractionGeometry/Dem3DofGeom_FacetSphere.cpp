@@ -202,3 +202,6 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 
 #endif
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -1215,3 +1215,6 @@ Real Shop::periodicWrap(Real x, Real x0, Real x1, long* period){
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

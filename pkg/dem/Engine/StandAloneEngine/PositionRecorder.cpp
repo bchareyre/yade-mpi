@@ -75,3 +75,6 @@ void PositionRecorder::action(MetaBody * ncb)
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

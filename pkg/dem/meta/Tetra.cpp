@@ -601,3 +601,6 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

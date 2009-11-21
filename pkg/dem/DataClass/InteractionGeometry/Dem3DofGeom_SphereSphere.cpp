@@ -183,3 +183,6 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 	return true;
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -253,3 +253,6 @@ void VTKRecorder::action(MetaBody* rootBody)
 	//writer->Write();	
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

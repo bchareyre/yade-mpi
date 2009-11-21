@@ -143,3 +143,6 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 		#endif
 		}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

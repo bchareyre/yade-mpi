@@ -247,3 +247,6 @@ if(wireFrame)
 
 YADE_PLUGIN((GLDrawCohesiveFrictionalContactInteraction));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -119,3 +119,6 @@ void StrainRecorder::action(MetaBody * ncb)
 }
 
 YADE_PLUGIN((StrainRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

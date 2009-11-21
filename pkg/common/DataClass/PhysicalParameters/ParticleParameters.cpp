@@ -24,3 +24,6 @@ ParticleParameters::~ParticleParameters()
 }
 
 YADE_PLUGIN((ParticleParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -2,3 +2,6 @@
 YADE_REQUIRE_FEATURE(shape);
 InteractingGeometryEngineUnit::~InteractingGeometryEngineUnit(){};
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

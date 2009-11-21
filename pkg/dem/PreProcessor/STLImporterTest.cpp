@@ -295,3 +295,6 @@ void STLImporterTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((STLImporterTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

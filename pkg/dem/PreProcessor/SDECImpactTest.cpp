@@ -496,3 +496,6 @@ void SDECImpactTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 
 YADE_PLUGIN((SDECImpactTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

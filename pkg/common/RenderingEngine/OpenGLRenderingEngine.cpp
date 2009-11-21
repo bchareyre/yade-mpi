@@ -675,3 +675,6 @@ void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2){
 }
 #endif
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

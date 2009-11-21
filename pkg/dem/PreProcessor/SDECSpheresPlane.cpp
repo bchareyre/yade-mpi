@@ -373,3 +373,6 @@ void SDECSpheresPlane::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((SDECSpheresPlane));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

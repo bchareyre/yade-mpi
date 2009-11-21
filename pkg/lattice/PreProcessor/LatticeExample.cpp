@@ -2172,3 +2172,6 @@ void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((LatticeExample));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

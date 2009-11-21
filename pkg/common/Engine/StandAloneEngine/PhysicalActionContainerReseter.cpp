@@ -16,3 +16,6 @@ void PhysicalActionContainerReseter::action(MetaBody* ncb){ ncb->bex.reset(); }
 
 void BexResetter::action(MetaBody* ncb){ ncb->bex.reset(); }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

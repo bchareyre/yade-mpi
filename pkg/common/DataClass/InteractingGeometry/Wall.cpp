@@ -49,3 +49,6 @@ void Wall2AABB::go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<Boundin
 		glEnd();
 	}
 #endif
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -33,3 +33,6 @@ void InteractingBox2AABB::go(	const shared_ptr<InteractingGeometry>& cm,
 }
 	
 YADE_PLUGIN((InteractingBox2AABB));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

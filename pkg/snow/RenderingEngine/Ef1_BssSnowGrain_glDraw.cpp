@@ -182,3 +182,6 @@ void Ef1_BssSnowGrain_glDraw::go(const shared_ptr<InteractingGeometry>& cm, cons
 
 
 YADE_PLUGIN((Ef1_BssSnowGrain_glDraw));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

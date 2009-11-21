@@ -628,3 +628,6 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	body->physicalParameters	= physics;
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

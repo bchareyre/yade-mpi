@@ -61,3 +61,6 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::goReverse(	cons
 }
 
 YADE_PLUGIN((InteractingSphere2InteractingSphere4SpheresContactGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

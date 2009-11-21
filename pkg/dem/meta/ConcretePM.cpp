@@ -390,3 +390,6 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 	}
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

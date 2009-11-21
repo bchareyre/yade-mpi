@@ -71,3 +71,6 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, b
 		++b_id;
 	}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

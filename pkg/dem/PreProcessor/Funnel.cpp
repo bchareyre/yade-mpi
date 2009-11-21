@@ -325,3 +325,6 @@ void Funnel::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((Funnel));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

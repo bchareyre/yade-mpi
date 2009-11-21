@@ -708,3 +708,6 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 
 
 YADE_PLUGIN((CohesiveTriaxialTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

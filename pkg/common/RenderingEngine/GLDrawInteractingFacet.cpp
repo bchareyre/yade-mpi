@@ -54,3 +54,6 @@ void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const
 
 YADE_PLUGIN((GLDrawInteractingFacet));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

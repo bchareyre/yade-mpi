@@ -93,3 +93,6 @@ void RotationEngine::applyCondition(MetaBody *ncb)
 
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

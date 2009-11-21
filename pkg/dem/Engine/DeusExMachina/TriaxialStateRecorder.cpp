@@ -298,3 +298,6 @@ TriaxialStressController::ComputeLoveStress ( MetaBody * ncb )
 
 
 YADE_PLUGIN((TriaxialStateRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

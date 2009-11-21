@@ -26,3 +26,6 @@ void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<Interacti
 }
 	
 YADE_PLUGIN((ef2_BssSweptSphereLineSegment_AABB_makeAABB));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

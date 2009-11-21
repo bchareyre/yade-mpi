@@ -88,3 +88,6 @@ void ResetPositionEngine::initialize(MetaBody * ncb)
 		os << ini_pos[i][0]<< '\t' << ini_pos[i][1]<< '\t' << ini_pos[i][2]<< std::endl;
 }
 YADE_PLUGIN((ResetPositionEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -69,3 +69,6 @@ void GLDrawLatticeBeamState::go(const shared_ptr<PhysicalParameters>& pp)
 
 YADE_PLUGIN((GLDrawLatticeBeamState));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

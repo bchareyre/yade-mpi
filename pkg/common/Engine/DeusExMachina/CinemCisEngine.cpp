@@ -100,3 +100,6 @@ void CinemCisEngine::applyTranslation(MetaBody * ncb)
 
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

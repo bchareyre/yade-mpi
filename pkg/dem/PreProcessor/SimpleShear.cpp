@@ -413,3 +413,6 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -27,3 +27,6 @@ void InteractingGeometryMetaEngine::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((InteractingGeometryMetaEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

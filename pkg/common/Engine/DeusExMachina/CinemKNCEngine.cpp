@@ -273,3 +273,6 @@ void CinemKNCEngine::computeStiffness(MetaBody* ncb)
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

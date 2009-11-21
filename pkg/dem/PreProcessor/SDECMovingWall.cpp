@@ -397,3 +397,6 @@ void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
 
 YADE_PLUGIN((SDECMovingWall));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

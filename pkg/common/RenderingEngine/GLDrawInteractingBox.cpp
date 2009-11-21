@@ -26,3 +26,6 @@ void GLDrawInteractingBox::go(const shared_ptr<InteractingGeometry>& cg, const s
 
 YADE_PLUGIN((GLDrawInteractingBox));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

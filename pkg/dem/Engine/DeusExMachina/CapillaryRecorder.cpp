@@ -107,3 +107,6 @@ static_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get())
 }
 
 YADE_PLUGIN((CapillaryRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

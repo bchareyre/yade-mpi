@@ -52,3 +52,6 @@ void AxialGravityEngine::applyCondition(MetaBody* rootBody){
 		rootBody->bex.addForce(b->getId(),acceleration*myMass*toAxis);
 	}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

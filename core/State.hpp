@@ -13,7 +13,6 @@ All state variables are initialized to zeros.
 Historical note: this used to be part of the PhysicalParameters class.
 The other data are now in the Material class.
 */
-
 class State: public Serializable{
 	public:
 		/// linear motion

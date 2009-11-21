@@ -74,3 +74,6 @@ void VelocityRecorder::action(MetaBody * ncb)
 
 
 YADE_PLUGIN((VelocityRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

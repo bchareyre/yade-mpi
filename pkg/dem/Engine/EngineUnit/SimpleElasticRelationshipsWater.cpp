@@ -111,3 +111,6 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& 
 // 	}
 };
 YADE_PLUGIN((SimpleElasticRelationshipsWater));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

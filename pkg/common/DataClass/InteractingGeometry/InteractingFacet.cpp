@@ -43,3 +43,6 @@ void InteractingFacet::postProcessAttributes(bool deserializing)
 	}
 }
 YADE_PLUGIN((InteractingFacet));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -29,3 +29,6 @@ void PhysicalParametersMetaEngine::action(MetaBody* ncb)
 }
 
 YADE_PLUGIN((PhysicalParametersMetaEngine));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -246,3 +246,6 @@ void GLDrawSphere::clearGlMatrix()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 YADE_PLUGIN((GLDrawSphere));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

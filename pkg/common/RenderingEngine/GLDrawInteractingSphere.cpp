@@ -28,3 +28,6 @@ void GLDrawInteractingSphere::go(const shared_ptr<InteractingGeometry>& cm, cons
 }
 YADE_PLUGIN((GLDrawInteractingSphere));
 YADE_REQUIRE_FEATURE(OPENGL)
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

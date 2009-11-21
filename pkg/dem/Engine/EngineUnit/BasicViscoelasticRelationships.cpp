@@ -100,3 +100,6 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
 }
 
 YADE_PLUGIN((BasicViscoelasticRelationships));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

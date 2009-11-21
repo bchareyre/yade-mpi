@@ -331,3 +331,6 @@ void ContactStressRecorder::action ( MetaBody * ncb )
 }
 
 YADE_PLUGIN((ContactStressRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

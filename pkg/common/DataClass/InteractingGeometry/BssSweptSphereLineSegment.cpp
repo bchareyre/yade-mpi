@@ -21,3 +21,6 @@ BssSweptSphereLineSegment::~BssSweptSphereLineSegment ()
 }
 
 YADE_PLUGIN((BssSweptSphereLineSegment));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

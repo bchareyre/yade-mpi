@@ -554,3 +554,6 @@ void LatticeExampleCTData::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vec
 }
 
 YADE_PLUGIN((LatticeExampleCTData));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

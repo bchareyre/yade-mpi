@@ -418,3 +418,6 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 }
 
 YADE_PLUGIN((TriaxialStressController));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

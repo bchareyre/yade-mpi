@@ -511,3 +511,6 @@ void LatticeExampleSimple::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vec
 }
 
 YADE_PLUGIN((LatticeExampleSimple));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

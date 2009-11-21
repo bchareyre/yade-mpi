@@ -25,3 +25,6 @@ LatticeNodeParameters::~LatticeNodeParameters()
 
 
 YADE_PLUGIN((LatticeNodeParameters));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

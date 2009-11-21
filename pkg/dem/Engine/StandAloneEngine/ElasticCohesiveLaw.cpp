@@ -231,3 +231,6 @@ void ElasticCohesiveLaw::action(MetaBody* ncb)
 
 
 YADE_PLUGIN((ElasticCohesiveLaw));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

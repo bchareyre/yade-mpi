@@ -136,3 +136,6 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	if(haveBins) velocityBins->binVelSqFinalize();
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

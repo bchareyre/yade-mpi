@@ -82,3 +82,6 @@ void GLDrawSpheresContactGeometry::go(
 
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

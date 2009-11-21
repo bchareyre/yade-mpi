@@ -55,3 +55,6 @@ void PositionOrientationRecorder::action(MetaBody * ncb){
 
 
 YADE_PLUGIN((PositionOrientationRecorder));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -16,3 +16,6 @@ void ConstitutiveLawDispatcher::action(MetaBody* rootBody){
 		}
 	}
 }
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

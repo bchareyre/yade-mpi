@@ -166,3 +166,6 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const s
 }
 
 YADE_PLUGIN((InteractingBox2InteractingSphere4SpheresContactGeometry));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

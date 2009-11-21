@@ -34,3 +34,6 @@ void NewtonsForceLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb
 
 
 YADE_PLUGIN((NewtonsForceLaw));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

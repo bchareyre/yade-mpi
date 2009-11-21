@@ -133,3 +133,6 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 		bend=relRot-tors*normal;
 	}
 #endif
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

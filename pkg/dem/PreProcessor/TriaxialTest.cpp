@@ -719,3 +719,6 @@ string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lo
 
 
 YADE_PLUGIN((TriaxialTest));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

@@ -19,3 +19,6 @@ ViscoelasticInteraction::~ViscoelasticInteraction()
 }
 
 YADE_PLUGIN((ViscoelasticInteraction));
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

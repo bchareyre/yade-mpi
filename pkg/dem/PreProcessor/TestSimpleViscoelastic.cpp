@@ -259,3 +259,6 @@ void TestSimpleViscoelastic::positionRootBody(shared_ptr<MetaBody>& rootBody)
 
     
     
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

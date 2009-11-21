@@ -115,3 +115,6 @@ bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1,
 	}
 
 #endif
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

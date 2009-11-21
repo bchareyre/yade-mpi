@@ -115,3 +115,6 @@ void Config::apply_transparency()
 // suggested by nam page             GL_SRC_ALPHA              ,     GL_ONE_MINUS_SRC_ALPHA
 }
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+

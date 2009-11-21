@@ -108,3 +108,6 @@ void ClumpTestGen::createOneClump(shared_ptr<MetaBody>& rootBody, Vector3r clump
 }
 
 
+
+YADE_REQUIRE_FEATURE(PHYSPAR);
+
