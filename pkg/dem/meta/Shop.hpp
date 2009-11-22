@@ -25,6 +25,7 @@
 class MetaBody;
 class Body;
 class SimpleViscoelasticBodyParameters;
+class SimpleViscoelasticMat;
 class GranularMat;
 
 using namespace std;
@@ -99,6 +100,7 @@ class Shop{
 		/// time tc and restitution coefficients en,es.
 	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticBodyParameters> b);
 		#endif
+	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticMat> b);
 
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, MetaBody* _rb=NULL);

@@ -33,7 +33,7 @@
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 //#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
-
+#include<yade/pkg-dem/ViscoelasticPM.hpp>
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
 class MetaInteractingGeometry;
@@ -1150,6 +1150,17 @@ void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real
     if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
 }
 #endif
+
+void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticMat> b)
+{
+    b->kn = m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(en),2) );
+    b->cn = -2.0*m/tc * Mathr::Log(en);
+    b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
+    b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
+
+    if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
+    if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
+}
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale
  *

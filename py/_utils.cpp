@@ -10,6 +10,7 @@
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/lib-computational-geometry/Hull2d.hpp>
 #include<cmath>
+#include<yade/pkg-dem/ViscoelasticPM.hpp>
 
 #include<numpy/ndarrayobject.h>
 
@@ -183,6 +184,17 @@ Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vec
 		 return d;
 	}
 #endif
+python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
+{
+	shared_ptr<SimpleViscoelasticMat> b = shared_ptr<SimpleViscoelasticMat>(new SimpleViscoelasticMat());
+	Shop::getViscoelasticFromSpheresInteraction(m,tc,en,es,b);
+	python::dict d;
+	d["kn"]=b->kn;
+	d["cn"]=b->cn;
+	d["ks"]=b->ks;
+	d["cs"]=b->cs;
+	return d;
+}
 /* reset highlight of all bodies */
 void highlightNone(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
@@ -428,6 +440,7 @@ BOOST_PYTHON_MODULE(_utils){
 	#ifdef YADE_PHYSPAR
 		def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	#endif
+	def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
 	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumBexForces",sumBexForces);

@@ -11,10 +11,9 @@
 
 CREATE_LOGGER(STLImporter);
 
-STLImporter::STLImporter()  
+STLImporter::STLImporter(): number_of_facets(0)
 {
-    wire=false;
-	number_of_facets=0;
+
 }
  
 bool STLImporter::open(const char* filename)
@@ -37,9 +36,8 @@ bool STLImporter::open(const char* filename)
 	return true;
 }
 
-void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, bool noInteractingGeometry)
+void STLImporter::import(shared_ptr<BodyContainer> bodies)
 {
-	unsigned int b_id = begin;
 	for(int i=0,e=tr.size(); i<e; i+=3)
 	{
 		Vector3r v[3]={tr[i],tr[i+1],tr[i+2]};
@@ -64,11 +62,13 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies, unsigned int begin, b
 					gFacet->vertices.push_back(v[j]-icc);
 				#endif
 		}
+		//iFacet->postProcessAttributes(true);
+		//postProcessAttributes is protected
 
-		(*bodies)[b_id]->state->pos=icc;
-		(*bodies)[b_id]->state->ori=Quaternionr::IDENTITY;
-		if (!noInteractingGeometry) (*bodies)[b_id]->interactingGeometry	= iFacet;
-
-		++b_id;
+		shared_ptr<Body> b(new Body());
+		b->state->pos=icc;
+		b->state->ori=Quaternionr::IDENTITY;
+		b->interactingGeometry	= iFacet;
+		bodies->insert(b);
 	}
 }

@@ -79,10 +79,10 @@ def _commonBodySetup(b,volume,geomInertia,materialClass='GranularMat',noBound=Fa
 	b.mat=Material(materialClass)
 	b.mat.updateExistingAttrs(matKw2)
 	mass=volume*b.mat['density']
-	b.state['mass'],b.state['inertia']=mass,geomInertia*mass
+	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,density=1,highlight=False,**matKw):
+def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,**matKw):
 	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
 	b=Body()
 	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
@@ -300,29 +300,21 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 		pylab.ylabel('Body count')
 	pylab.show()
 
-
-def import_stl_geometry(file, young=30e9,poisson=.3,color=[0,1,0],frictionAngle=0.5236,wire=True,noBoundingVolume=False,noInteractingGeometry=False,physParamsClass='BodyMacroParameters',**physParamsAttr):
+def import_stl_geometry(file, dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False, **matKw):
 	""" Import geometry from stl file, create facets and return list of their ids."""
 	imp = STLImporter()
-	imp.wire = wire
 	imp.open(file)
 	begin=len(O.bodies)
-	for i in xrange(imp.number_of_facets):
-		b=Body()
-		b['isDynamic']=False
-		pp={'se3':[0,0,0,1,0,0,0],'young':young,'poisson':poisson,'frictionAngle':frictionAngle}
-		pp.update(physParamsAttr)
-		b.phys=PhysicalParameters(physParamsClass)
-		b.phys.updateExistingAttrs(pp)
-		if not noBoundingVolume:
-			b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
-		O.bodies.append(b)
-	imp.import_geometry(O.bodies,begin,noInteractingGeometry)
+	imp.import_geometry(O.bodies)
 	imported=range(begin,begin+imp.number_of_facets)
 	for i in imported:
-		if not noInteractingGeometry:
-			O.bodies[i].mold.postProcessAttributes(True)
-			O.bodies[i].mold['diffuseColor']=color
+		b=O.bodies[i]
+		b['isDynamic']=dynamic
+		b.mold.postProcessAttributes(True)
+		b.mold['diffuseColor']=color if color else randomColor()
+		b.mold['wire']=wire
+		b.mold['highlight']=highlight
+		_commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,**matKw)
 	return imported
 
 

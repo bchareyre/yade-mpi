@@ -24,11 +24,8 @@ class STLImporter {
 	/// number of facets 
 	unsigned int number_of_facets;
 
-	/// set wire attribute for facets (by default false)
-	bool wire;
-
 	/// import geometry 
-	void import(shared_ptr<BodyContainer> bodies, unsigned int begin=0, bool noInteractingGeometry=false);
+	void import(shared_ptr<BodyContainer> bodies);
 
 	DECLARE_LOGGER;
 protected:
