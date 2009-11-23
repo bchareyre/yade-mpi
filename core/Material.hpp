@@ -12,7 +12,7 @@ The other data are now in the State class.
 */
 class Material: public Serializable, public Indexable{
 	public:
-		Material(){ createIndex(); }
+		Material(): id(-1), density(-1){ createIndex(); }
 		~Material();
 		//! global id of the material; if >= 0, the material is shared and can be found under this index in MetaBody::materials
 		//! (necessary since yade::serialization doesn't track shared pointers)

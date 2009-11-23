@@ -31,9 +31,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 		bool pointClipped(const Vector3r& p);
 		vector<Vector3r> clipPlaneNormals;
-		void setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody);
-		void setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody);
-		long numBodiesWhenRefSe3LastSet,numIterWhenRefSe3LastSet;
+		void setBodiesDispInfo(const shared_ptr<MetaBody>& rootBody);
 		static bool glutInitDone;
 		static size_t selectBodyLimit;
 		Vector3r viewDirection; // updated from GLViewer regularly
@@ -49,6 +47,16 @@ class OpenGLRenderingEngine : public RenderingEngine
 		//! wrap point to inside MetaBody's cell (identity if !MetaBody::isPeriodic)
 		Vector3r wrapCellPt(const Vector3r& pt, MetaBody* rb);
 		void drawPeriodicCell(MetaBody*);
+
+		void setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody);
+
+		struct BodyDisp{
+			Vector3r pos;
+			Quaternionr ori;
+			bool isDisplayed;
+		};
+
+		vector<BodyDisp> bodyDisp;
 
 
 	private :

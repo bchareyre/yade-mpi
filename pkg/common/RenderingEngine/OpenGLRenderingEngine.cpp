@@ -46,7 +46,6 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 
 	scaleDisplacements=false; scaleRotations=false;
 	displacementScale=Vector3r(1,1,1); rotationScale=1;
-	numBodiesWhenRefSe3LastSet=0;
 
 	for(int i=0; i<clipPlaneNum; i++){clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)); clipPlaneActive.push_back(false); clipPlaneNormals.push_back(Vector3r(1,0,0));}
 	
@@ -74,6 +73,12 @@ void OpenGLRenderingEngine::init(){
 	/* transparent spheres (still not working): glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); */
 	glutInitDone=true;
 }
+
+void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody){
+	LOG_DEBUG("(re)initializing reference positions and orientations.");
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
+}
+
 
 void OpenGLRenderingEngine::initgl(){
 	LOG_INFO("(re)initializing GL for gldraw methods.\n");
@@ -116,12 +121,6 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 	return false;
 }
 
-void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody){
-	LOG_DEBUG("(re)initializing reference positions and orientations.");
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
-	numBodiesWhenRefSe3LastSet=rootBody->bodies->size();
-	numIterWhenRefSe3LastSet=Omega::instance().getCurrentIteration();
-}
 /* mostly copied from PeriodicInsertionSortCollider
  	FIXME: common implementation somewhere */
 
@@ -134,27 +133,29 @@ Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, MetaBody* rb){
 	return Vector3r(wrapCell(pt[0],rb->cellMin[0],rb->cellMax[0]),wrapCell(pt[1],rb->cellMin[1],rb->cellMax[1]),wrapCell(pt[2],rb->cellMin[2],rb->cellMax[2]));
 }
 
-void OpenGLRenderingEngine::setBodiesDispSe3(const shared_ptr<MetaBody>& rootBody){
-	#ifdef YADE_PHYSPAR
-		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		// FIXME: dispSe3 must be put somewhere; probably not in Body::state directly, however
-			if(!b || !b->physicalParameters) continue;
-			const Se3r& se3=b->physicalParameters->se3; const Se3r& refSe3=b->physicalParameters->refSe3; Se3r& dispSe3=b->physicalParameters->dispSe3;
-			Vector3r posCell=wrapCellPt(se3.position,rootBody.get());
-			b->physicalParameters->isDisplayed=!pointClipped(posCell);
-			// if no scaling, return quickly
-			if(!(scaleDisplacements||scaleRotations||rootBody->isPeriodic)){ b->physicalParameters->dispSe3=b->physicalParameters->se3; continue; }
-			// apply scaling
-			dispSe3.position=(scaleDisplacements ? diagMult(displacementScale,se3.position-refSe3.position)+wrapCellPt(refSe3.position,rootBody.get()) : posCell );
-			if(scaleRotations){
-				Quaternionr relRot=refSe3.orientation.Conjugate()*se3.orientation;
-				Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle);
-				angle*=rotationScale;
-				dispSe3.orientation=refSe3.orientation*Quaternionr(axis,angle);
-			} else {dispSe3.orientation=se3.orientation;}
+void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<MetaBody>& rootBody){
+	if(rootBody->bodies->size()!=bodyDisp.size()) bodyDisp.resize(rootBody->bodies->size());
+	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		if(!b || !b->state) continue;
+		size_t id=b->getId();
+		const Vector3r& pos=b->state->pos; const Vector3r& refPos=b->state->refPos;
+		const Quaternionr& ori=b->state->ori; const Quaternionr& refOri=b->state->refOri;
+		Vector3r posCell=wrapCellPt(pos,rootBody.get());
+		bodyDisp[id].isDisplayed=!pointClipped(posCell);	
+		// if no scaling and no periodic, return quickly
+		if(!(scaleDisplacements||scaleRotations||rootBody->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
+		// apply scaling
+		bodyDisp[id].pos=(scaleDisplacements ? diagMult(displacementScale,pos-refPos)+wrapCellPt(refPos,rootBody.get()) : posCell );
+		if(!scaleRotations) bodyDisp[id].ori=ori;
+		else{
+			Quaternionr relRot=refOri.Conjugate()*ori;
+			Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle);
+			angle*=rotationScale;
+			bodyDisp[id].ori=refOri*Quaternionr(axis,angle);
 		}
-	#endif
+	}
 }
+
 // draw periodic cell, if active
 void OpenGLRenderingEngine::drawPeriodicCell(MetaBody* rootBody){
 	if(!rootBody->isPeriodic) return;
@@ -208,49 +209,12 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 		/* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */
 	}
 
-	// if scaling positions or orientations, save reference values if not already done; if # of bodies changes, we have to reset those; remember iteration when this was done to detect (at least in most cases) that the simulation was reloaded
-	if((scaleDisplacements || scaleRotations) && (rootBody->bodies->size()!=numBodiesWhenRefSe3LastSet||Omega::instance().getCurrentIteration()<=numIterWhenRefSe3LastSet)){setBodiesRefSe3(rootBody);}
-	
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
-	setBodiesDispSe3(rootBody);
+	setBodiesDispInfo(rootBody);
 
 	drawPeriodicCell(rootBody.get());
 
 	if (Show_DOF || Show_ID) renderDOF_ID(rootBody);
-	#ifdef YADE_SHAPE
-		if (Body_geometrical_model){
-			if (Cast_shadows){	
-				if (Fast_shadow_volume) renderSceneUsingFastShadowVolumes(rootBody,Light_position);
-				else renderSceneUsingShadowVolumes(rootBody,Light_position);
-				// draw transparent shadow volume
-				if (Shadow_volumes) {
-					glAlphaFunc(GL_GREATER, 1.0f/255.0f);
-					glEnable(GL_ALPHA_TEST);
-					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					glEnable(GL_BLEND);	
-				
-					glColor4f(0.86,0.058,0.9,0.3);
-					glEnable(GL_LIGHTING);
-					
-					glEnable(GL_CULL_FACE);
-				
-					glCullFace(GL_FRONT);
-					renderShadowVolumes(rootBody,Light_position);
-
-					glCullFace(GL_BACK);
-					renderShadowVolumes(rootBody,Light_position);
-
-					glEnable(GL_DEPTH_TEST);
-					glDisable(GL_BLEND);
-					glDisable(GL_ALPHA_TEST);
-				}
-			} else{
-				glEnable(GL_CULL_FACE);
-				glEnable(GL_NORMALIZE);
-				renderGeometricalModel(rootBody);
-			}
-		}
-	#endif
 	#ifdef YADE_PHYSPAR
 		if (Body_state) renderState(rootBody);
 	#endif
@@ -263,155 +227,6 @@ void OpenGLRenderingEngine::render(const shared_ptr<MetaBody>& rootBody, body_id
 	if (Interaction_geometry) renderInteractionGeometry(rootBody);
 	if (Interaction_physics) renderInteractionPhysics(rootBody);
 }
-
-
-#ifdef YADE_SHAPE
-void OpenGLRenderingEngine::renderSceneUsingShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position)
-{
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glEnable(GL_NORMALIZE);
-		renderGeometricalModel(rootBody);	
-	
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_STENCIL_TEST);
-	glDepthMask(GL_FALSE);
-	glStencilFunc(GL_ALWAYS, 0, 0);
-
-	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-	glCullFace(GL_BACK);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,Light_position);
-	
-	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-	glCullFace(GL_FRONT);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,Light_position);	
-			
-	glDepthMask(GL_TRUE);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glCullFace(GL_BACK);
-	glDepthFunc(GL_LEQUAL);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-		
-	glStencilFunc(GL_EQUAL, 1, 1);  /* draw shadowed part */
-	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
-	glDisable(GL_LIGHT0);
-	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);	
-	
-	glStencilFunc(GL_EQUAL, 0, 1);  /* draw lit part */
-	glStencilFunc(GL_EQUAL, 0, (GLuint)(-1));
-	glEnable(GL_LIGHT0);
-	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);		
-	
-	glDepthFunc(GL_LESS);
-	glDisable(GL_STENCIL_TEST);
-
-}
-void OpenGLRenderingEngine::renderSceneUsingFastShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position)
-{
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_NORMALIZE);
-	renderGeometricalModel(rootBody);	
-
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glEnable(GL_STENCIL_TEST);
-	glDepthMask(GL_FALSE);
-	glStencilFunc(GL_ALWAYS, 0, 0);	
-	
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-	glCullFace(GL_BACK);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,Light_position);
-	
-	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-	glCullFace(GL_FRONT);  /* increment using front face of shadow volume */
-	renderShadowVolumes(rootBody,Light_position);	
-	
-	// Need to do that to remove shadow that are not on object but if glClear is 0
-/*	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);	
-	glCullFace(GL_BACK);
-	glDepthMask(GL_TRUE);
-	Real clearDepthValue=0;
-	glGetDoublev(GL_DEPTH_CLEAR_VALUE,&clearDepthValue);
-	glDepthFunc(GL_EQUAL);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 1, 1, 0, 0.0, -clearDepthValue);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	
-	glColor3f(1,0,0);
-	glBegin(GL_QUADS);
-		glVertex3f(0,0,clearDepthValue);
-		glVertex3f(0,1,clearDepthValue);
-		glVertex3f(1,1,clearDepthValue);
-		glVertex3f(1,0,clearDepthValue);
-	glEnd();
-	
-	glMatrixMode(GL_PROJECTION); 
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix(); */
-			
-	//glDepthMask(GL_TRUE);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glCullFace(GL_BACK);
-	glDepthFunc(GL_LEQUAL);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
-
-	glStencilFunc(GL_NOTEQUAL, 0, (GLuint)(-1));
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 1, 1, 0, 0.0, -1.0);	
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glDisable(GL_CULL_FACE);
-	glAlphaFunc(GL_GREATER, 1.0f/255.0f);
-	glEnable(GL_ALPHA_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);	
-	glDisable(GL_LIGHTING);	
-	glColor4f(0,0,0,0.5);
-	glBegin(GL_QUADS);
-		glVertex2f(0,0);
-		glVertex2f(0,1);
-		glVertex2f(1,1);
-		glVertex2f(1,0);
-	glEnd();
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
-	glEnable(GL_CULL_FACE);
-	glMatrixMode(GL_PROJECTION); 
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix(); 
-
-	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LESS);
-	glDisable(GL_STENCIL_TEST);
-}	
-
-
-void OpenGLRenderingEngine::renderShadowVolumes(const shared_ptr<MetaBody>& rootBody,Vector3r Light_position){	
-	if (!rootBody->geometricalModel){
-		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-			if(!b || !b->physicalParameters->isDisplayed) continue;
-			if (b->geometricalModel->shadowCaster && ( (b->getGroupMask() & Draw_mask) || b->getGroupMask()==0 ))
-				shadowVolumeDispatcher(b->geometricalModel,b->physicalParameters,Light_position);
-		}
-	}
-	else shadowVolumeDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Light_position);
-}
-#endif
 
 void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){	
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
@@ -505,7 +320,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->interactionGeometry) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
-			//FIXME: if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
+			if(!(bodyDisp[I->getId1()].isDisplayed||bodyDisp[I->getId2()].isDisplayed)) continue;
 			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
 	}
@@ -518,9 +333,8 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>&
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->interactionPhysics) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
-			// FIXME:
-			// if(!b1->physicalParameters||!b2->physicalParameters) continue;
-			// if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
+			body_id_t id1=I->getId1(), id2=I->getId2();
+			if(!(bodyDisp[id1].isDisplayed||bodyDisp[id2].isDisplayed)) continue;
 			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
 	}
@@ -541,9 +355,8 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<MetaBody>& rootBody){
 
 void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<MetaBody>& rootBody){	
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b) continue;
-		// FIXME:
-		// if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
+		if(!b || !b->boundingVolume) continue;
+		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		if(b->boundingVolume && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
 			glPushMatrix(); boundingVolumeDispatcher(b->boundingVolume); glPopMatrix();
 		}
@@ -565,14 +378,14 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
 
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b) continue;
-		// FIXME:
-		//if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
-		const Se3r& se3=b->state->se3; // dispSe3
+		if(!b || !b->interactingGeometry) continue;
+		if(!bodyDisp[b->getId()].isDisplayed) continue;
+		Vector3r pos=bodyDisp[b->getId()].pos;
+		Quaternionr ori=bodyDisp[b->getId()].ori;
 		if(b->interactingGeometry && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
 			glPushMatrix();
-				Real angle;	Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
-				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
+				Real angle;	Vector3r axis;	ori.ToAxisAngle(axis,angle);	
+				glTranslatef(pos[0],pos[1],pos[2]);
 				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 				if(current_selection==b->getId() || b->interactingGeometry->highlight){
 					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
@@ -592,46 +405,72 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 				}
 			glPopMatrix();
 			if(current_selection==b->getId() || b->interactingGeometry->highlight){
-				if(!b->boundingVolume || Body_wire || b->interactingGeometry->wire) GLUtils::GLDrawInt(b->getId(),se3.position);
+				if(!b->boundingVolume || Body_wire || b->interactingGeometry->wire) GLUtils::GLDrawInt(b->getId(),pos);
 				else {
 					// move the label towards the camera by the bounding box so that it is not hidden inside the body
-					const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=se3.position;
+					const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=pos;
 					Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
 					Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
-					GLUtils::GLDrawInt(b->getId(),se3.position+dr,Vector3r::ONE);
+					GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::ONE);
 				}
 			}
 			// if the body goes over the cell margin, draw it in all other positions with wire
 			// this could be done in a nicer way perhaps...
 			if(b->boundingVolume && rootBody->isPeriodic){
 				const Vector3r& cellMin(rootBody->cellMin); const Vector3r& cellMax(rootBody->cellMax); Vector3r cellSize=cellMax-cellMin;
+				// traverse all periodic cells around the body, to see if any of them touches
 				Vector3<int> bodyPer,minPer,maxPer;
 				for(int i=0; i<3; i++){
-					bodyPer[i]=(int)floor((b->state->pos[i]-cellMin[i])/cellSize[i]);
-					minPer[i]=(int)floor((b->boundingVolume->min[i]-cellMin[i])/cellSize[i]);
-					maxPer[i]=(int)floor((b->boundingVolume->max[i]-cellMin[i])/cellSize[i]);
-					//assert(bodyPer[i]<=maxPer[i]); assert(bodyPer[i]>=minPer[i]);
+					bodyPer[i]=(int)floor((pos[i]-cellMin[i])/cellSize[i]); // period of the center
+					minPer[i]=(int)floor((b->boundingVolume->min[i]-cellMin[i])/cellSize[i]); // period of the minimum point
+					maxPer[i]=(int)floor((b->boundingVolume->max[i]-cellMin[i])/cellSize[i]); // period of the maximum point
 				}
-				/* m is bitmask from 3 couples (0…64=2^6) */
-				for(int m=0; m<64; m++){
-					// any mask containing 00 couple is invalid
-					if((!(m&1) && (!(m&2))) || (!(m&4) && (!(m&8))) || (!(m&16) && (!(m&32)))) continue;
-					Vector3r pt(se3.position);
-					bool isInside=false;
-					for(int j=0; j<3; j++){
-						if(m&(1<<(2*j))) {
-							if(m&(1<<(2*j+1))) { if(bodyPer[j]>=maxPer[j]) {isInside=true; break; } pt[j]-=cellSize[j]; }
-							else { if(bodyPer[j]<=minPer[j]){ isInside=true; break; } pt[j]+=cellSize[j]; }
+				if (minPer[0]!=maxPer[0] || minPer[1]!=maxPer[1] || minPer[2]!=maxPer[2]){ // crosses cell boundary?
+					Vector3<int> i;
+					for(i[0]=-1; i[0]<=1; i[0]++) for(i[1]=-1;i[1]<=1; i[1]++) for(i[2]=-1; i[2]<=1; i[2]++){
+						if(i[0]==0 && i[1]==0 && i[2]==0) continue; // middle; already rendered above
+						if((i[0]==0 && minPer[0]==maxPer[0]) || (i[1]==0 && minPer[0]==maxPer[0]) || (i[2]==0 && minPer[0]==maxPer[0])) continue;
+						if((i[0]<=0 && i[1]<=0 && i[2]<=0 && minPer[0]==bodyPer[0]+i[0] && minPer[1]==bodyPer[1]+i[1] && minPer[2]==bodyPer[2]+i[2]) ||
+							(i[0]>=0 && i[1]>=0 && i[2]>=0 && maxPer[0]==bodyPer[0]+i[0] && maxPer[1]==bodyPer[1]+i[1] && maxPer[2]==bodyPer[2]+i[2])){
+							Vector3r pt(pos[0]+cellSize[0]*i[0],pos[1]+cellSize[1]*i[1],pos[2]+cellSize[2]*i[2]);
+							glPushMatrix();
+								glTranslatev(pt);
+								glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+								interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
+							glPopMatrix();
 						}
 					}
-					if(isInside) continue;
-					if(pt==se3.position) continue; // shouldn't happen, but it happens :-(
-					glPushMatrix();
-						glTranslatev(pt);
-						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-						interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
-					glPopMatrix();
 				}
+				#if 0
+					Vector3<int> bodyPer,minPer,maxPer;
+					for(int i=0; i<3; i++){
+						bodyPer[i]=(int)floor((b->state->pos[i]-cellMin[i])/cellSize[i]); // period of the center
+						minPer[i]=(int)floor((b->boundingVolume->min[i]-cellMin[i])/cellSize[i]); // period of the minimum point
+						maxPer[i]=(int)floor((b->boundingVolume->max[i]-cellMin[i])/cellSize[i]); // period of the maximum point
+						//assert(bodyPer[i]<=maxPer[i]); assert(bodyPer[i]>=minPer[i]);
+					}
+
+					/* m is bitmask from 3 couples (0…64=2^6) */
+					for(int m=0; m<64; m++){
+						// any mask containing 00 couple is invalid
+						if((!(m&1) && (!(m&2))) || (!(m&4) && (!(m&8))) || (!(m&16) && (!(m&32)))) continue;
+						Vector3r pt(se3.position);
+						bool isInside=false;
+						for(int j=0; j<3; j++){
+							if(m&(1<<(2*j))) {
+								if(m&(1<<(2*j+1))) { if(bodyPer[j]>=maxPer[j]) {isInside=true; break; } pt[j]-=cellSize[j]; }
+								else { if(bodyPer[j]<=minPer[j]){ isInside=true; break; } pt[j]+=cellSize[j]; }
+							}
+						}
+						if(!isInside) continue;
+						if(pt==se3.position) continue; // shouldn't happen, but it happens :-(
+						glPushMatrix();
+							glTranslatev(pt);
+							glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+							interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
+						glPopMatrix();
+					}
+				#endif
 			}
 		}
 	}
