@@ -13,6 +13,7 @@
 #include"Body.hpp"
 #include"BodyContainer.hpp"
 #include"Engine.hpp"
+#include"Material.hpp"
 #include"DisplayParameters.hpp"
 #include"BexContainer.hpp"
 #include"GroupRelationData.hpp"
@@ -28,8 +29,10 @@ class MetaBody : public Body
 		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50
 		shared_ptr<InteractionContainer> interactions;
-		// only alias for interactions, will be removed
-		shared_ptr<InteractionContainer>&	transientInteractions;	// disappear, reappear according to spatial criterion
+		//! Container of shared materials. Add elements using MetaBody::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!
+		vector<shared_ptr<Material> > materials;
+		//! Adds material to MetaBody::materials. It also sets id of the material accordingly and returns it.
+		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
 
 		BexContainer bex;
 
@@ -69,7 +72,8 @@ class MetaBody : public Body
 		(engines)
 		(initializers)
 		(bodies)
-		(transientInteractions)
+		(interactions)
+		(materials)
 		(miscParams)
 		(dispParams)
 		(dt)

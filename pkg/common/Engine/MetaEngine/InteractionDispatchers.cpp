@@ -53,10 +53,7 @@ void InteractionDispatchers::action(MetaBody* rootBody){
 			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),rootBody);
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
 
-			// FIXME: maybe this could be run even in production code without harm. It would make removing bodies much faster, since we wouldn't have to search its interactions and removing them.
-			#ifndef NDEBUG
-				if(!b1_ || !b2_){ LOG_ERROR("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); rootBody->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
-			#endif
+			if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); rootBody->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
 
 			// go fast if this pair of bodies cannot interact at all
 			if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;

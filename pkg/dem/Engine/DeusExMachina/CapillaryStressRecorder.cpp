@@ -85,8 +85,8 @@ void CapillaryStressRecorder::action(MetaBody * ncb)
 	Real sig11_cap=0, sig22_cap=0, sig33_cap=0, sig12_cap=0, sig13_cap=0,
 	sig23_cap=0, Vwater = 0, CapillaryPressure = 0;
 	
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+        InteractionContainer::iterator iiEnd = ncb->interactions->end();
         
         int j = 0;
         

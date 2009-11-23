@@ -31,8 +31,8 @@ void ElawSnowLayersDeformation::action(MetaBody* ncb)
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 //	Real dt = Omega::instance().getTimeStep();
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for (  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal())

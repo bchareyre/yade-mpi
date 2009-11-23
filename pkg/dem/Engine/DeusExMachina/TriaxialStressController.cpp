@@ -98,8 +98,8 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 {
 	for (int i=0; i<6; ++i) stiffness[i] = 0;
 
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal())
@@ -334,8 +334,8 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 		}
 	}
 	// << "bouclesurInteraction" << endl;
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for ( ; ii!=iiEnd ; ++ii )
 	{
 		if ( ( *ii )->isReal() )
@@ -365,8 +365,8 @@ Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUn
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if ((*ii)->isReal()) {
 			const shared_ptr<Interaction>& contact = *ii;

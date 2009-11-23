@@ -34,8 +34,7 @@
 bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
-	Body(), bodies(new BodyVector), interactions(new InteractionVecMap), transientInteractions(interactions)
-{	
+	Body(), bodies(new BodyVector), interactions(new InteractionVecMap){	
 	engines.clear();
 	initializers.clear();
 	needsInitializers=true;
@@ -69,13 +68,13 @@ MetaBody::MetaBody() :
 
 
 
-void MetaBody::postProcessAttributes(bool deserializing)
-{
-	// this is now checked in MoveToNextTimeStep
-	//runInitializers();	
-	
-	//	initializers.clear(); // FIXME - we want to delate ONLY some of them!
-	//                                       because when you save and load file, you still want some initializers, but not all of them. Eg - you don't want VRML loader, or FEM loader, but you want BoundingVolumeMetaEngine. Maybe we need two list of initilizers? One that 'survive' between load and save, and others that are deleted on first time?
+void MetaBody::postProcessAttributes(bool deserializing){
+	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
+	FOREACH(const shared_ptr<Body>& b, *bodies){
+		if(b->material->id<0) continue; // not a shared material
+		assert((size_t)b->material->id < materials.size());
+		b->material=materials[b->material->id];
+	}
 }
 
 

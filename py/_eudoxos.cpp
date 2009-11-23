@@ -17,7 +17,7 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	Real E=0;
-	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
 		if(!i->interactionPhysics) continue;
 		shared_ptr<CpmPhys> bc=dynamic_pointer_cast<CpmPhys>(i->interactionPhysics); if(!bc) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
@@ -43,7 +43,7 @@ Real yieldSigmaTMagnitude(Real sigmaN, int yieldSurfType=0){
 		/* find first suitable interaction */
 		MetaBody* rootBody=Omega::instance().getRootBody().get();
 		shared_ptr<Interaction> I;
-		FOREACH(I, *rootBody->transientInteractions){
+		FOREACH(I, *rootBody->interactions){
 			if(I->isReal()) break;
 		}
 		Real nan=std::numeric_limits<Real>::quiet_NaN();

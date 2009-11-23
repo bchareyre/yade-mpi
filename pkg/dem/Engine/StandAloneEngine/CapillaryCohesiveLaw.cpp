@@ -102,8 +102,8 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
 
         /// Non Permanents Links ///
 
-        InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+        InteractionContainer::iterator ii    = ncb->interactions->begin();
+        InteractionContainer::iterator iiEnd = ncb->interactions->end();
 
         /// initialisation du volume avant calcul
         //Real Vtotal = 0;
@@ -259,7 +259,7 @@ void CapillaryCohesiveLaw::action(MetaBody* ncb)
         if (fusionDetection)
                 checkFusion(ncb);
 
-        for(ii= ncb->transientInteractions->begin(); ii!=iiEnd ; ++ii ) 
+        for(ii= ncb->interactions->begin(); ii!=iiEnd ; ++ii ) 
 	{	//cerr << "interaction " << ii << endl;
                 if ((*ii)->isReal()) 
 		{
@@ -308,8 +308,8 @@ void CapillaryCohesiveLaw::checkFusion(MetaBody * ncb)
 {
 
 	//Reset fusion numbers
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+        InteractionContainer::iterator iiEnd = ncb->interactions->end();
         for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->fusionNumber=0;
 	
 	
@@ -646,8 +646,8 @@ bool BodiesMenisciiList::prepare(Body * body)
 		interactionsOnBody[i].clear();
 	}
 	
-        InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+        InteractionContainer::iterator ii    = ncb->interactions->begin();
+        InteractionContainer::iterator iiEnd = ncb->interactions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal()) {
                 	if (static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);

@@ -501,8 +501,8 @@ void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& r
 
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody){	
 	{
-		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
-		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->interactionGeometry) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
 			//FIXME: if(!(b1->physicalParameters->isDisplayed||b2->physicalParameters->isDisplayed)) continue;
@@ -514,8 +514,8 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>
 
 void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody){	
 	{
-		boost::mutex::scoped_lock lock(rootBody->transientInteractions->drawloopmutex);
-		FOREACH(const shared_ptr<Interaction>& I, *rootBody->transientInteractions){
+		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
+		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->interactionPhysics) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
 			// FIXME:

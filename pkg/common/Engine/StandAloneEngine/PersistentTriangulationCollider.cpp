@@ -94,9 +94,9 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 //ENDOF VORONOI TESSELATION
 
 
-	transientInteractions = ncb->transientInteractions;
-	InteractionContainer::iterator I_end = transientInteractions->end();
-	for ( InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I )
+	interactions = ncb->interactions;
+	InteractionContainer::iterator I_end = interactions->end();
+	for ( InteractionContainer::iterator I=interactions->begin(); I!=I_end; ++I )
 	{
 		// FIXME: eudoxos commented out as isReal and isNew is removed...
 		//  if ( ( *I )->isReal ) ( *I )->isNew=false;
@@ -116,13 +116,13 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 			Tes->nextFacet ( interaction_pair );
 
 			// look if the pair (id1,id2) already exists in the overleppingBB collection
-			const shared_ptr<Interaction>& interaction=transientInteractions->find ( body_id_t ( id1 ),body_id_t ( id2 ) );
+			const shared_ptr<Interaction>& interaction=interactions->find ( body_id_t ( id1 ),body_id_t ( id2 ) );
 			bool found= ( interaction!=0 );//Bruno's Hack
 
 			// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
 			if ( !found )
 			{
-				transientInteractions->insert ( body_id_t ( id1 ),body_id_t ( id2 ) );
+				interactions->insert ( body_id_t ( id1 ),body_id_t ( id2 ) );
 				//cerr << "inserted " << id1 << "-" << id2<<endl;
 			}
 			else interaction->isNeighbor = true;
@@ -130,21 +130,21 @@ void PersistentTriangulationCollider::action ( MetaBody* ncb )
 		}
 
 		vector< pair<unsigned int,unsigned int> > toErase;
-		I_end = transientInteractions->end();
-		for ( InteractionContainer::iterator I=transientInteractions->begin(); I!=I_end; ++I )
+		I_end = interactions->end();
+		for ( InteractionContainer::iterator I=interactions->begin(); I!=I_end; ++I )
 		{
 			if ( ( ! ( *I )->isNeighbor ) && ( haveDistantTransient ? ! ( *I )->isReal() : true ) )
 			{
 				toErase.push_back ( pair<unsigned int,unsigned int> ( ( *I )->getId1() , ( *I )->getId2() ) );
 				//cerr << "to delete " << ( *I )->getId1() << "-" << ( *I )->getId2() << "(isNeighbor=" << ( *I )->isNeighbor<< endl;
 			}
-			//transientInteractions->erase ( ( *I )->getId1() , ( *I )->getId2() );
+			//interactions->erase ( ( *I )->getId1() , ( *I )->getId2() );
 		}
 		vector< pair<unsigned int,unsigned int> >::iterator it = toErase.begin();
 		vector< pair<unsigned int,unsigned int> >::iterator it_end = toErase.end();
 		for ( ;it!=it_end;++it )
 		{
-			transientInteractions->erase ( it->first , it->second );
+			interactions->erase ( it->first , it->second );
 			//cerr << "deleted " << it->first << "-" << it->second<<endl;
 		}
 	}

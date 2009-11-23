@@ -21,20 +21,8 @@ def listChildClassesRecursive(base):
 	return ret | ret2
 
 
-rootClasses=set([
-<<<<<<< TREE
-<<<<<<< TREE
-	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','Material','State','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
-	'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','StateEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw',
-	'BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','StateMetaEngine','PhysicalActionDamper','PhysicalActionApplier','ConstitutiveLawDispatcher'])
-=======
-	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','PhysicalParameters','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
->>>>>>> MERGE-SOURCE
-=======
-	'StandAloneEngine','DeusExMachina','GeometricalModel','InteractingGeometry','Material','State','BoundingVolume','InteractingGeometry','InteractionPhysics','FileGenerator',
-	'BoundingVolumeEngineUnit','GeometricalModelEngineUnit','InteractingGeometryEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','PhysicalParametersEngineUnit','PhysicalActionDamperUnit','PhysicalActionApplierUnit','ConstitutiveLaw',
-	'BoundingVolumeMetaEngine','GeometricalModelMetaEngine','InteractingGeometryMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','PhysicalParametersMetaEngine','PhysicalActionDamper','PhysicalActionApplier','ConstitutiveLawDispatcher'])
->>>>>>> MERGE-SOURCE
+rootClasses=set(['StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator','BoundingVolumeEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','ConstitutiveLaw','Material','State'])
+
 allClasses=listChildClassesRecursive('Serializable')
 
 class TestObjectInstantiation(unittest.TestCase):
@@ -50,7 +38,7 @@ class TestObjectInstantiation(unittest.TestCase):
 			obj=eval(r)(); self.assert_(obj.name==r,'Failed for '+r)
 	def testSerializableCtors_attrs_few(self):
 		# attributes passed when using the Serializable('Foo',attr1=value1,attr2=value2) syntax
-		gm=Serializable('GeometricalModel',wire=True); self.assert_(gm['wire']==True)
+		gm=Serializable('InteractingGeometry',wire=True); self.assert_(gm['wire']==True)
 	def testRootDerivedCtors(self):
 		# classes that are not root classes but derive from them can be instantiated by their name
 		for r in rootClasses:
@@ -58,7 +46,7 @@ class TestObjectInstantiation(unittest.TestCase):
 				obj=eval(c)(); self.assert_(obj.name==c,'Failed for '+c)
 	def testRootDerivedCtors_attrs_few(self):
 		# attributes passed when using the Foo(attr1=value1,attr2=value2) syntax
-		gm=GeometricalModel(wire=True); self.assert_(gm['wire']==True)
+		gm=InteractingGeometry(wire=True); self.assert_(gm['wire']==True)
 	def testNonderived_attrs_few(self):
 		# classes deriving just from Serializable can be instantiated by their name directly, including attributes
 		glds=GLDrawInteractingSphere(glutSlices=24); self.assert_(glds.name=='GLDrawInteractingSphere')
@@ -89,8 +77,8 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assertRaises(TypeError,lambda: ConstitutiveLawDispatcher([InteractingSphere2AABB()]))
 	def testInvalidAttr(self):
 		# accessing invalid attributes raises KeyError
-		self.assertRaises(KeyError,lambda: Sphere(attributeThatDoesntExist=42))
-		self.assertRaises(KeyError,lambda: Sphere()['attributeThatDoesntExist'])
+		self.assertRaises(KeyError,lambda: InteractingSphere(attributeThatDoesntExist=42))
+		self.assertRaises(KeyError,lambda: InteractingSphere()['attributeThatDoesntExist'])
 	
 class TestWm3Wrapper(unittest.TestCase):
 	def assertVQAlmostEqual(self,v1,v2):
@@ -125,7 +113,10 @@ class TestWm3Wrapper(unittest.TestCase):
 		self.assertVQAlmostEqual(q1.ToAxisAngle()[0],(0,0,1))
 		self.assertAlmostEqual(q1.ToAxisAngle()[1],pi/2)
 	# not really wm3 thing, but closely related
-	def testSe3Conversion(self):
+	# no way to test this currently, as State::se3 is not serialized (State::pos and State::ori are serialized instead...)
+	# remove the '_' from the method name to re-enable
+	def _testSe3Conversion(self):
+		return
 		pp=State()
 		pp['se3']=(Vector3().ZERO,Quaternion().IDENTITY)
 		self.assert_(pp['se3'][0]==Vector3().ZERO)

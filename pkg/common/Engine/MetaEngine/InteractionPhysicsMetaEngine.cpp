@@ -25,10 +25,10 @@ void InteractionPhysicsMetaEngine::action(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	#ifdef YADE_OPENMP
-		const long size=ncb->transientInteractions->size();
+		const long size=ncb->interactions->size();
 		#pragma omp parallel for
 		for(long i=0; i<size; i++){
-			const shared_ptr<Interaction>& interaction=(*ncb->transientInteractions)[i];
+			const shared_ptr<Interaction>& interaction=(*ncb->interactions)[i];
 	#else
 		FOREACH(const shared_ptr<Interaction>& interaction, *ncb->interactions){
 	#endif

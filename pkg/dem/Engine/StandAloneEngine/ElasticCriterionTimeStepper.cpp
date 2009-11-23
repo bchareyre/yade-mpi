@@ -104,20 +104,20 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 void ElasticCriterionTimeStepper::computeTimeStep(MetaBody* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	shared_ptr<InteractionContainer>& transientInteractions = ncb->transientInteractions;
+	shared_ptr<InteractionContainer>& interactions = ncb->interactions;
 
 	newDt = Mathr::MAX_REAL;
 	computedSomething = false; // this flag is to avoid setting timestep to MAX_REAL :)
 
-	InteractionContainer::iterator ii    = transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = transientInteractions->end();
+	InteractionContainer::iterator ii    = interactions->begin();
+	InteractionContainer::iterator iiEnd = interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 		findTimeStepFromInteraction(*ii , bodies);
 
 	if(! computedSomething)
 	{
-// no transientInteractions at all? so let's try to estimate timestep by investigating bodies,
-// simulating that a body in contact with itself. this happens only when there were not transientInteractions at all.
+// no interactions at all? so let's try to estimate timestep by investigating bodies,
+// simulating that a body in contact with itself. this happens only when there were not interactions at all.
 		BodyContainer::iterator bi    = bodies->begin();
 		BodyContainer::iterator biEnd = bodies->end();
 		for(  ; bi!=biEnd ; ++bi )

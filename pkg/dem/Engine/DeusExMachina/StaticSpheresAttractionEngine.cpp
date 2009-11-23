@@ -16,8 +16,8 @@ Real StaticSpheresAttractionEngine::getMaxDisplacement(MetaBody* ncb)
 	// calculation based on max normal force - FIXME not working satifactionary, currently
 	/*
 	Real penetration=0;
-	InteractionContainer::iterator in     = ncb->transientInteractions->begin();
-	InteractionContainer::iterator in_end = ncb->transientInteractions->end();
+	InteractionContainer::iterator in     = ncb->interactions->begin();
+	InteractionContainer::iterator in_end = ncb->interactions->end();
 	for( ; in!=in_end ; ++in )
 		if(	   doesItApplyToThisBody((*(ncb->bodies))[ (*in)->getId1() ].get()) 
 			&& doesItApplyToThisBody((*(ncb->bodies))[ (*in)->getId2() ].get()))

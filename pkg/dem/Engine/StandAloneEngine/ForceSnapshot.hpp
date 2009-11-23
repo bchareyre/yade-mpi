@@ -14,7 +14,7 @@
 
 /*! \brief Exports a data file to study (normal) forces network
 
-When called from a simulation this engine is executed on some iterations (defined in "list_id" variable). At each execution an output file is generated, containing, for all the real "transientInteractions" (cf core/Metabody.hpp) some things about the bodies linked by this interaction, and the value of the normal force.
+When called from a simulation this engine is executed on some iterations (defined in "list_id" variable). At each execution an output file is generated, containing, for all the real "interactions" (cf core/Metabody.hpp) some things about the bodies linked by this interaction, and the value of the normal force.
 WARNING : Used for instance only with simulations using "ElasticContactLaw" and so "ElasticContactInteraction"
 */
 

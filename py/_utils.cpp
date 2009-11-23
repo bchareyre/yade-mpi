@@ -85,7 +85,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
 	Vector3r bbMin=extract<Vector3r>(AABB[0])(), bbMax=extract<Vector3r>(AABB[1])();
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	Real E=0;
-	FOREACH(const shared_ptr<Interaction>&i, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
 		if(!i->interactionPhysics) continue;
 		shared_ptr<NormalShearInteraction> bc=dynamic_pointer_cast<NormalShearInteraction>(i->interactionPhysics); if(!bc) continue;
 		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!bc){LOG_ERROR("NormalShearInteraction contact doesn't have SpheresContactGeomety associated?!"); continue;}
@@ -125,7 +125,7 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
-	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
@@ -148,7 +148,7 @@ python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 	const shared_ptr<MetaBody>& rb=Omega::instance().getRootBody();
 	vector<int> bodyNumInta; bodyNumInta.resize(rb->bodies->size(),-1 /* uninitialized */);
 	int maxInta=0;
-	FOREACH(const shared_ptr<Interaction>& i, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
 		const body_id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 		if(useBB && isInBB(b1->state->pos,bbMin,bbMax)) bodyNumInta[id1]=bodyNumInta[id1]>0?bodyNumInta[id1]+1:1;

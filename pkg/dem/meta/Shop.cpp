@@ -115,7 +115,7 @@ Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	Real meanF=sumF/rb->bodies->size(); 
 	// get max force on contacts
 	Real maxContactF=0;
-	FOREACH(const shared_ptr<Interaction>& I, *rb->transientInteractions){
+	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
 		shared_ptr<NormalShearInteraction> nsi=YADE_PTR_CAST<NormalShearInteraction>(I->interactionPhysics); assert(nsi);
 		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).Length());
@@ -502,7 +502,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t
 	InteractionGeometryMetaEngine* geomMeta=NULL;
 	InteractionPhysicsMetaEngine* physMeta=NULL;
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
-	if(rb->transientInteractions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
+	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryMetaEngine*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsMetaEngine*>(e.get()); if(physMeta) continue; }
@@ -513,7 +513,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2);
 	physMeta->explicitAction(b1->material,b2->material,i);
-	rb->transientInteractions->insert(i);
+	rb->interactions->insert(i);
 	return i;
 }
 

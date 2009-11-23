@@ -70,62 +70,96 @@ def downCast(obj,newClassName):
 	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
 	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
-bodiesMatDefaults={'density':2e3,'young':30e9,'poisson':.3,'frictionAngle':.5236}
 
-def _commonBodySetup(b,volume,geomInertia,materialClass='GranularMat',noBound=False,**matKw):
+def defaultMaterial():
+	return GranularMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
+
+def _commonBodySetup(b,volume,geomInertia,material,noBound=False):
 	"""Assign common body parameters."""
-	if 'physParamsClass' in matKw.keys(): raise RuntimeError("You as passing physParamsClass as argument, but it is no longer used. Use materialClass instead.")
-	matKw2=bodiesMatDefaults.copy(); matKw2.update(matKw)
-	b.mat=Material(materialClass)
-	b.mat.updateExistingAttrs(matKw2)
+	#if 'physParamsClass' in matKw.keys(): raise ArgumentError("You as passing physParamsClass as argument, but it is no longer used. Use material instead.")
+	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
+	if material==0 and len(O.materials)==0: O.materials.append(defaultMaterial());
+	if isinstance(material,int): b.mat=O.materials[material]
+	elif isinstance(material,string): b.mat=O.materials[material]
+	elif isinstance(material,Material): b.mat=material
+	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
+	#matKw2=bodiesMatDefaults.copy(); matKw2.update(matKw)
+	#b.mat=Material(materialClass)
+	#b.mat.updateExistingAttrs(matKw2)
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,**matKw):
-	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
+def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):
+	"""Create sphere with given parameters; mass and inertia computed automatically.
+
+	:Parameters:
+		`center`: Vector3
+			center
+		`radius`: float
+			radius
+		`color`: Vector3 or None
+			random color will be assigned if None
+		`material`: int or string or Material instance
+			if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0].
+	"""
 	b=Body()
 	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.state.pos=b.state.refPos=center
 	V=(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2
-	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),**matKw)
+	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
 	b['isDynamic']=dynamic
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,**matKw):
-	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=0):
+	"""Create box (cuboid) with given parameters.
+
+	:Parameters:
+		`extents`: Vector3
+			half-sizes along x,y,z axes
+	
+	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
 	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.state.pos=b.state.refPos=center
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
-	_commonBodySetup(b,V,geomInert,**matKw)
+	_commonBodySetup(b,V,geomInert,material)
 	b['isDynamic']=dynamic
 	return b
 
-def wall(position,axis,sense=0,color=None,**matKw):
+def wall(position,axis,sense=0,color=None,material=0):
 	"""Return ready-made wall body.
 
-	:param position: float or Vector3 specifying center of the wall. If float, it is the position along given axis, the other 2 components being zero
-	:param axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
-	:param sense: sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
-	:return: Body instance
+	:Parameters:
+		`position`: float or Vector3
+			center of the wall. If float, it is the position along given axis, the other 2 components being zero
+		`axis`: ∈{0,1,2}
+			orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
+		`sense`: ∈{-1,0,1}
+			sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
 
-	.. note: GeometricalModel is not set.
-	"""
+	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
 	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
 	else: pos2=position
 	b.pos=b.refPos=pos2
-	_commonBodySetup(b,0,Vector3(0,0,0),**matKw)
+	_commonBodySetup(b,0,Vector3(0,0,0),material)
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,**matKw):
-	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,material=0):
+	"""Create facet with given parameters.
+
+	:Parameters:
+		`vertices`: [Vector3,Vector3,Vector3]
+			coordinates of vertices in the global coordinate system.
+		`noBoundingVolume`: do not assign Body().bound
+	
+	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
 	if not color: color=randomColor()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
@@ -134,14 +168,20 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBounding
 	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.mold['vertices']=vertices
 	b.mold.postProcessAttributes(True)
-	_commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,**matKw)
+	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBoundingVolume)
 	b['isDynamic']=dynamic
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
-	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation. wallMask determines which walls will be created,
-	in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls.
-	Remaining **kw arguments are passed to utils.facet. The facets are oriented outwards from the box."""
+	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
+
+	:Parameters:
+		`wallMask`: bitmask
+			 determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32).
+			 The numbers are ANDed; the default 63 means to create all walls.
+
+	Remaining **kw arguments are passed to utils.facet.
+	The facets are oriented outwards from the box."""
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
 		return [facet((a,b,c),**kw),facet((a,c,d),**kw)]
@@ -166,7 +206,7 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
-	"""return 6 walls that will wrap existing packing;
+	"""Return 6 boxes that will wrap existing packing as walls from all sides;
 	extrema are extremal points of the AABB of the packing (will be calculated if not specified)
 	thickness is wall thickness (will be 1/10 of the X-dimension if not specified)
 	Walls will be enlarged in their plane by oversizeFactor.
@@ -502,21 +542,6 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	dictParams.update(dictDefaults); saveVars('table',**dictParams)
 	return len(tagsParams)
 
-def ColorizedVelocityFilter(isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Velocity, m/s'):
-    f = DeusExMachina('ColorizedVelocityFilter',isFilterActivated=isFilterActivated,autoScale=autoScale,minValue=minValue,maxValue=maxValue,posX=posX,posY=posY,width=width,height=height,title=title)
-    O.engines+=[f]
-    return f
-
-def ColorizedTimeFilter(point=[0,0,0],normal=[0,1,0],isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Time, m/s'):
-    f = DeusExMachina('ColorizedTimeFilter',point=point,normal=normal,isFilterActivated=isFilterActivated,autoScale=autoScale,minValue=minValue,maxValue=maxValue,posX=posX,posY=posY,width=width,height=height,title=title)
-    O.engines+=[f]
-    return f
-
-def PythonRunnerFilter(command='pass',isFilterActivated=True):
-    f = DeusExMachina('PythonRunnerFilter',command=command,isFilterActivated=isFilterActivated)
-    O.engines+=[f]
-    return f
-
 def replaceCollider(colliderEngine):
 	"""Replaces collider (Collider) engine with the engine supplied. Raises error if no collider is in engines."""
 	colliderIdx=-1
@@ -526,7 +551,6 @@ def replaceCollider(colliderEngine):
 			break
 	if colliderIdx<0: raise RuntimeError("No Collider found within O.engines.")
 	O.engines=O.engines[:colliderIdx]+[colliderEngine]+O.engines[colliderIdx+1:]
-
 
 def procStatus(name):
 	import os

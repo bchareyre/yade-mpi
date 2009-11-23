@@ -134,6 +134,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 	custom_vector_from_seq<std::string>(); to_python_converter<std::vector<std::string>, custom_vector_to_list<std::string> >();
 	custom_vector_from_seq<shared_ptr<Body> >(); to_python_converter<std::vector<shared_ptr<Body> >, custom_vector_to_list<shared_ptr<Body> > >();
 	custom_vector_from_seq<shared_ptr<Engine> >(); to_python_converter<std::vector<shared_ptr<Engine> >, custom_vector_to_list<shared_ptr<Engine> > >();
+	custom_vector_from_seq<shared_ptr<Material> >(); to_python_converter<std::vector<shared_ptr<Material> >, custom_vector_to_list<shared_ptr<Material> > >();
 	custom_vector_from_seq<shared_ptr<Serializable> >(); to_python_converter<std::vector<shared_ptr<Serializable> >, custom_vector_to_list<shared_ptr<Serializable> > >();
 
   #define VECTOR_ENGINE_UNIT(ENGINE_UNIT) custom_vector_from_seq<shared_ptr<ENGINE_UNIT> >(); to_python_converter<std::vector<shared_ptr<ENGINE_UNIT> >,custom_vector_to_list<shared_ptr<ENGINE_UNIT> > >();

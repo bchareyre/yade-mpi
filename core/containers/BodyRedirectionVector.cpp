@@ -110,7 +110,7 @@ unsigned int BodyRedirectionVector::insert(shared_ptr<Body>& b)
 			if((indexes.size() > newPosition)  && exists(newPosition))
 					newUsed = true;
 		}
-		//cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break transientInteractions for this body!\n";
+		//cerr << "WARNING: body id=\"" << position << "\" is already used. Using first free id=\"" << newPosition << "\", beware - if you are loading a file, this will break interactions for this body!\n";
 		position = newPosition;
 	}
 	BodyContainer::setId(b,position);

@@ -40,7 +40,7 @@ bool SimpleViscoelasticSpheresInteractionRecorder::isActivated(MetaBody*)
 
 void SimpleViscoelasticSpheresInteractionRecorder::action(MetaBody * ncb)
 {
-    shared_ptr<InteractionContainer>& interactions = ncb->transientInteractions;
+    shared_ptr<InteractionContainer>& interactions = ncb->interactions;
   
     InteractionContainer::iterator ii    = interactions->begin();
     InteractionContainer::iterator iiEnd = interactions->end();
