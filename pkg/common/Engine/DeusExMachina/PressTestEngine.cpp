@@ -1,6 +1,5 @@
 
 #include"PressTestEngine.hpp"
-#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 
 
@@ -51,6 +50,3 @@ void PressTestEngine::applyCondition(MetaBody * ncb){
 
 CREATE_LOGGER(PressTestEngine);
 YADE_PLUGIN((PressTestEngine));
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
-

@@ -1,6 +1,5 @@
 #include"RockPM.hpp"
 #include<yade/core/MetaBody.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -92,7 +91,7 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 
 CREATE_LOGGER(Ip2_RpmMat_RpmMat_RpmPhys);
 
-void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction){
+void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
 	if(interaction->interactionPhysics) return; 
 
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
@@ -102,20 +101,21 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
 	const shared_ptr<RpmMat>& rpm2=YADE_PTR_CAST<RpmMat>(pp2);
 	
-	const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
-	const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
+	//const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
+	//const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
+
 	long cohesiveThresholdIter=10;
 	
 	bool initCohesive = rpm1->initCohesive*rpm2->initCohesive;
 	
-	Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young);
+	Real E12=2*rpm1->young*rpm2->young/(rpm1->young+rpm2->young);
 	Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
 	Real S12=Mathr::PI*pow(minRad,2);
 	Real G_over_E = (rpm1->G_over_E + rpm2->G_over_E)/2;
 	shared_ptr<RpmPhys> contPhys(new RpmPhys());
 	contPhys->E=E12;
 	contPhys->G=E12*G_over_E;
-	contPhys->tanFrictionAngle=tan(.5*(elast1->frictionAngle+elast2->frictionAngle));
+	contPhys->tanFrictionAngle=tan(.5*(rpm1->frictionAngle+rpm2->frictionAngle));
 	contPhys->crossSection=S12;
 	contPhys->kn=contPhys->E*contPhys->crossSection;
 	contPhys->ks=contPhys->G*contPhys->crossSection;
@@ -134,7 +134,3 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<PhysicalParameters>& pp1, co
 }
 
 RpmPhys::~RpmPhys(){};
-
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
-
