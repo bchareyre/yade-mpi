@@ -50,3 +50,5 @@ void PressTestEngine::applyCondition(MetaBody * ncb){
 
 CREATE_LOGGER(PressTestEngine);
 YADE_PLUGIN((PressTestEngine));
+
+YADE_REQUIRE_FEATURE(physpar)
