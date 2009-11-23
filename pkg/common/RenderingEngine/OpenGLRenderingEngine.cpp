@@ -28,12 +28,6 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	Show_ID = false;
 	Body_state = false;
 	Body_bounding_volume = false;
-	#ifdef YADE_SHAPE
-		Body_geometrical_model = false;
-		Cast_shadows = false;
-		Shadow_volumes = false;
-		Fast_shadow_volume = true;
-	#endif
 	Body_interacting_geom = true;
 	Body_wire = false;
 	Interaction_wire = false;
@@ -55,10 +49,6 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawStateFunctor")) addStateFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor")) addBoundingVolumeFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor")) addInteractingGeometryFunctor((*di).first);
-		#ifdef YADE_SHAPE
-			if (Omega::instance().isInheritingFrom((*di).first,"GLDrawGeometricalModelFunctor")) addGeometricalModelFunctor((*di).first);
-			if (Omega::instance().isInheritingFrom((*di).first,"GLDrawShadowVolumeFunctor")) addShadowVolumeFunctor((*di).first);
-		#endif
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
 		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
 	}
@@ -88,10 +78,6 @@ void OpenGLRenderingEngine::initgl(){
 		(static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactingGeometryFunctorNames)
 		(static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	#ifdef YADE_SHAPE
-		BOOST_FOREACH(vector<string>& s,geometricalModelFunctorNames)
-			(static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	#endif
 	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames)
 		(static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames)
@@ -268,52 +254,6 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<MetaBody>& rootBody){
 	if(rootBody->interactingGeometry) interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->state,Body_wire);
 }
 
-#ifdef YADE_SHAPE
-void OpenGLRenderingEngine::renderGeometricalModel(const shared_ptr<MetaBody>& rootBody){
-	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
-	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
-	if(rootBody->geometricalModel) geometricalModelDispatcher(rootBody->geometricalModel,rootBody->physicalParameters,Body_wire);
-	if(!Draw_inside) return;
-	FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
-		if(!b) continue;
-		if(!b->geometricalModel || (!((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0))) continue;
-		if(b->physicalParameters && !b->physicalParameters->isDisplayed) continue;
-		const Se3r& se3=b->physicalParameters->dispSe3;
-		glPushMatrix();
-		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
-		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		if(current_selection==b->getId() || b->geometricalModel->highlight){
-			glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
-			glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-			const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
-			glColor4(h[0],h[1],h[2],.2);
-			glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-
-			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
-
-			glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
-			glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-			glColor3v(Vector3r::ZERO);
-			glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-		} else {
-			geometricalModelDispatcher(b->geometricalModel,b->physicalParameters,Body_wire);
-		}
-		glPopMatrix();
-		if(current_selection==b->getId() || b->geometricalModel->highlight){
-			if(!b->boundingVolume || Body_wire || b->geometricalModel->wire) GLUtils::GLDrawInt(b->getId(),se3.position);
-			else {
-				// move the label towards the camera by the bounding box so that it is not hidden inside the body
-				const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=se3.position;
-				Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
-				Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
-				GLUtils::GLDrawInt(b->getId(),se3.position+dr,Vector3r::ONE);
-			}
-		}
-	}
-}
-#endif
-
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody){	
 	{
 		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
@@ -382,95 +322,59 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<MetaBody>
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		Vector3r pos=bodyDisp[b->getId()].pos;
 		Quaternionr ori=bodyDisp[b->getId()].ori;
-		if(b->interactingGeometry && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
-			glPushMatrix();
-				Real angle;	Vector3r axis;	ori.ToAxisAngle(axis,angle);	
-				glTranslatef(pos[0],pos[1],pos[2]);
-				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-				if(current_selection==b->getId() || b->interactingGeometry->highlight){
-					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-					const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
-					glColor4(h[0],h[1],h[2],.2);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-					///
-					interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire,viewInfo);
-					///
-					glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-					glColor3v(Vector3r::ZERO);
-					glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-				} else {
-					interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire,viewInfo);
-				}
-			glPopMatrix();
+		if(!b->interactingGeometry || !((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)) continue;
+		glPushMatrix();
+			Real angle;	Vector3r axis;	ori.ToAxisAngle(axis,angle);	
+			glTranslatef(pos[0],pos[1],pos[2]);
+			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 			if(current_selection==b->getId() || b->interactingGeometry->highlight){
-				if(!b->boundingVolume || Body_wire || b->interactingGeometry->wire) GLUtils::GLDrawInt(b->getId(),pos);
-				else {
-					// move the label towards the camera by the bounding box so that it is not hidden inside the body
-					const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=pos;
-					Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
-					Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
-					GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::ONE);
-				}
+				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
+				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+				const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
+				glColor4(h[0],h[1],h[2],.2);
+				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+				///
+				interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire,viewInfo);
+				///
+				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
+				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
+				glColor3v(Vector3r::ZERO);
+				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
+			} else {
+				interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire,viewInfo);
 			}
-			// if the body goes over the cell margin, draw it in all other positions with wire
-			// this could be done in a nicer way perhaps...
-			if(b->boundingVolume && rootBody->isPeriodic){
-				const Vector3r& cellMin(rootBody->cellMin); const Vector3r& cellMax(rootBody->cellMax); Vector3r cellSize=cellMax-cellMin;
-				// traverse all periodic cells around the body, to see if any of them touches
-				Vector3<int> bodyPer,minPer,maxPer;
-				for(int i=0; i<3; i++){
-					bodyPer[i]=(int)floor((pos[i]-cellMin[i])/cellSize[i]); // period of the center
-					minPer[i]=(int)floor((b->boundingVolume->min[i]-cellMin[i])/cellSize[i]); // period of the minimum point
-					maxPer[i]=(int)floor((b->boundingVolume->max[i]-cellMin[i])/cellSize[i]); // period of the maximum point
+		glPopMatrix();
+		if(current_selection==b->getId() || b->interactingGeometry->highlight){
+			if(!b->boundingVolume || Body_wire || b->interactingGeometry->wire) GLUtils::GLDrawInt(b->getId(),pos);
+			else {
+				// move the label towards the camera by the bounding box so that it is not hidden inside the body
+				const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=pos;
+				Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
+				Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
+				GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::ONE);
+			}
+		}
+		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
+		// precondition: pos is inside the cell.
+		if(b->boundingVolume && rootBody->isPeriodic){
+			const Vector3r& cellMin(rootBody->cellMin); const Vector3r& cellMax(rootBody->cellMax); Vector3r cellSize=cellMax-cellMin;
+			// traverse all periodic cells around the body, to see if any of them touches
+			Vector3r halfSize=b->boundingVolume->max-b->boundingVolume->min; halfSize*=.5;
+			Vector3r pmin,pmax;
+			Vector3<int> i;
+			for(i[0]=-1; i[0]<=1; i[0]++) for(i[1]=-1;i[1]<=1; i[1]++) for(i[2]=-1; i[2]<=1; i[2]++){
+				if(i[0]==0 && i[1]==0 && i[2]==0) continue; // middle; already rendered above
+				Vector3r pt=pos+Vector3r(cellSize[0]*i[0],cellSize[1]*i[1],cellSize[2]*i[2]);
+				pmin=pt-halfSize; pmax=pt+halfSize;
+				if(pmin[0]<=cellMax[0] && pmax[0]>=cellMin[0] &&
+					pmin[1]<=cellMax[1] && pmax[1]>=cellMin[1] &&
+					pmin[2]<=cellMax[2] && pmax[2]>=cellMin[2]) {
+					glPushMatrix();
+						glTranslatev(pt);
+						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+						interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
+					glPopMatrix();
 				}
-				if (minPer[0]!=maxPer[0] || minPer[1]!=maxPer[1] || minPer[2]!=maxPer[2]){ // crosses cell boundary?
-					Vector3<int> i;
-					for(i[0]=-1; i[0]<=1; i[0]++) for(i[1]=-1;i[1]<=1; i[1]++) for(i[2]=-1; i[2]<=1; i[2]++){
-						if(i[0]==0 && i[1]==0 && i[2]==0) continue; // middle; already rendered above
-						if((i[0]==0 && minPer[0]==maxPer[0]) || (i[1]==0 && minPer[0]==maxPer[0]) || (i[2]==0 && minPer[0]==maxPer[0])) continue;
-						if((i[0]<=0 && i[1]<=0 && i[2]<=0 && minPer[0]==bodyPer[0]+i[0] && minPer[1]==bodyPer[1]+i[1] && minPer[2]==bodyPer[2]+i[2]) ||
-							(i[0]>=0 && i[1]>=0 && i[2]>=0 && maxPer[0]==bodyPer[0]+i[0] && maxPer[1]==bodyPer[1]+i[1] && maxPer[2]==bodyPer[2]+i[2])){
-							Vector3r pt(pos[0]+cellSize[0]*i[0],pos[1]+cellSize[1]*i[1],pos[2]+cellSize[2]*i[2]);
-							glPushMatrix();
-								glTranslatev(pt);
-								glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-								interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
-							glPopMatrix();
-						}
-					}
-				}
-				#if 0
-					Vector3<int> bodyPer,minPer,maxPer;
-					for(int i=0; i<3; i++){
-						bodyPer[i]=(int)floor((b->state->pos[i]-cellMin[i])/cellSize[i]); // period of the center
-						minPer[i]=(int)floor((b->boundingVolume->min[i]-cellMin[i])/cellSize[i]); // period of the minimum point
-						maxPer[i]=(int)floor((b->boundingVolume->max[i]-cellMin[i])/cellSize[i]); // period of the maximum point
-						//assert(bodyPer[i]<=maxPer[i]); assert(bodyPer[i]>=minPer[i]);
-					}
-
-					/* m is bitmask from 3 couples (0…64=2^6) */
-					for(int m=0; m<64; m++){
-						// any mask containing 00 couple is invalid
-						if((!(m&1) && (!(m&2))) || (!(m&4) && (!(m&8))) || (!(m&16) && (!(m&32)))) continue;
-						Vector3r pt(se3.position);
-						bool isInside=false;
-						for(int j=0; j<3; j++){
-							if(m&(1<<(2*j))) {
-								if(m&(1<<(2*j+1))) { if(bodyPer[j]>=maxPer[j]) {isInside=true; break; } pt[j]-=cellSize[j]; }
-								else { if(bodyPer[j]<=minPer[j]){ isInside=true; break; } pt[j]+=cellSize[j]; }
-							}
-						}
-						if(!isInside) continue;
-						if(pt==se3.position) continue; // shouldn't happen, but it happens :-(
-						glPushMatrix();
-							glTranslatev(pt);
-							glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-							interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
-						glPopMatrix();
-					}
-				#endif
 			}
 		}
 	}
@@ -486,10 +390,6 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	#endif
 	for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++) boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactingGeometryFunctorNames.size();i++) interactingGeometryDispatcher.add1DEntry(interactingGeometryFunctorNames[i][0],interactingGeometryFunctorNames[i][1]);
-	#ifdef YADE_SHAPE
-		for(unsigned int i=0;i<geometricalModelFunctorNames.size();i++) geometricalModelDispatcher.add1DEntry(geometricalModelFunctorNames[i][0],geometricalModelFunctorNames[i][1]);
-		for(unsigned int i=0;i<shadowVolumeFunctorNames.size();i++) shadowVolumeDispatcher.add1DEntry(shadowVolumeFunctorNames[i][0],shadowVolumeFunctorNames[i][1]);
-	#endif
 	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
 }
@@ -513,13 +413,3 @@ void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); interactingGeometryFunctorNames.push_back(v);
 }
-#ifdef YADE_SHAPE
-void OpenGLRenderingEngine::addGeometricalModelFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawGeometricalModelFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); geometricalModelFunctorNames.push_back(v);
-}
-void OpenGLRenderingEngine::addShadowVolumeFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawShadowVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); shadowVolumeFunctorNames.push_back(v);
-}
-#endif

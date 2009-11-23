@@ -284,7 +284,7 @@ class pyMaterialContainer{
 		shared_ptr<Material> getitem_label(string label){
 			// translate runtime_error to KeyError (instead of RuntimeError) if the material doesn't exist
 			try { return Material::byLabel(label,rb);	}
-			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); python::throw_error_already_set(); }
+			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); python::throw_error_already_set(); /* never reached; avoids warning */ throw; }
 		}
 		int append(shared_ptr<Material>& m){ rb->materials.push_back(m); m->id=rb->materials.size()-1; return m->id; }
 		vector<int> appendList(vector<shared_ptr<Material> > mm){ vector<int> ret; FOREACH(shared_ptr<Material>& m, mm) ret.push_back(append(m)); return ret; }

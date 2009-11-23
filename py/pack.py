@@ -215,7 +215,7 @@ def filterSpherePack(predicate,spherePack,**kw):
 		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 	return ret
 
-def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,**kw):
+def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The priodicity depens on whether	the spheresInCell parameter is given.
 
@@ -297,7 +297,7 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 				sp.cellSize=(X,Y,Z); sp.cellFill(Vector3(fullDim[0],fullDim[1],fullDim[2])); sp.cellSize=(0,0,0) # resetting cellSize avoids warning when rotating
 			sp.scale(scale);
 			if orientation: sp.rotate(*orientation.ToAxisAngle())
-			return filterSpherePack(predicate,sp,**kw)
+			return filterSpherePack(predicate,sp,material=material)
 		print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
 		sys.stdout.flush()
 	O.switchWorld(); O.resetThisWorld() ### !!
@@ -347,7 +347,7 @@ def randomDensePack(predicate,radius,dim=None,cropLayers=0,rRelFuzz=0.,spheresIn
 	if orientation:
 		sp.cellSize=(0,0,0); # reset periodicity to avoid warning when rotating periodic packing
 		sp.rotate(*orientation.ToAxisAngle())
-	return filterSpherePack(predicate,sp,**kw)
+	return filterSpherePack(predicate,sp,material=material)
 
 # compatibility with the deprecated name, can be removed in the future
 def triaxialPack(*args,**kw):

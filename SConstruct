@@ -74,7 +74,7 @@ env=Environment(tools=['default'])
 profileFile='scons.current-profile'
 
 profOpts=Variables(profileFile)
-profOpts.Add(('profile','Config profile to use (predefined: default or "", opt); append ! to use it but not save for next build (in scons.current-profile)','default'))
+profOpts.Add(('profile','Config profile to use (predefined: default or "", dbg); append ! to use it but not save for next build (in scons.current-profile)','default'))
 profOpts.Update(env)
 # multiple profiles - run them all at the same time
 # take care not to save current profile for those parallel builds
@@ -109,9 +109,9 @@ profile=env['profile']
 print '@@@ Using profile',profile,'('+optsFile+') @@@'
 
 # defaults for various profiles
-if profile=='default': defOptions={'debug':1,'variant':'','optimize':0}
-elif profile=='opt': defOptions={'debug':0,'variant':'-opt','optimize':1}
-else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile}
+if profile=='default': defOptions={'debug':0,'variant':'','optimize':1,'linkStrategy':'monolithic'}
+elif profile=='dbg': defOptions={'debug':1,'variant':'-dbg','optimize':0,'linkStrategy':'per-class'}
+else: defOptions={'debug':0,'optimize':0,'variant':'-'+profile,'linkStrategy':'per-class'}
 
 
 opts=Variables(optsFile)
@@ -142,12 +142,12 @@ opts.AddVariables(
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
-	EnumVariable('linkStrategy','How to link plugins together','per-class',['per-class','per-pkg[broken]','monolithic','static[broken]']),
+	EnumVariable('linkStrategy','How to link plugins together',defOptions['linkStrategy'],['per-class','per-pkg[broken]','monolithic','static[broken]']),
 	('version','Yade version (if not specified, guess will be attempted)',None),
-	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)',None),
+	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.2:/usr/include/vtk-5.4'),
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
-	('QTDIR','Directories where to look for qt3',['/usr/share/qt3','/usr/lib/qt','/usr/lib/qt3','/usr/qt/3','/usr/lib/qt-3.3'],None,colonSplit),
-	('PATH','Path (not imported automatically from the shell) (colon-separated)',None,None,colonSplit),
+	('QTDIR','Directories where to look for qt3','/usr/share/qt3:/usr/lib/qt:/usr/lib/qt3:/usr/qt/3:/usr/lib/qt-3.3'),
+	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
 	('CXX','The c++ compiler','g++'),
 	('CXXFLAGS','Additional compiler flags for compilation (like -march=core2).',None,None,Split),
 	('march','Architecture to use with -march=... when optimizing','native',None,None),
@@ -160,10 +160,10 @@ opts.AddVariables(
 )
 opts.Update(env)
 opts.Save(optsFile,env)
-if env.has_key('CPPPATH'):
-	env['CPPPATH']=colonSplit(env['CPPPATH'])
-if env.has_key('LIBPATH'):
-	env['LIBPATH']=colonSplit(env['LIBPATH'])
+# handle colon-separated lists:
+for k in ('CPPPATH','LIBPATH','QTDIR','PATH'):
+	if env.has_key(k):
+		env[k]=colonSplit(env[k])
 
 # do not propagate PATH from outside, to ensure identical builds on different machines
 #env.Append(ENV={'PATH':['/usr/local/bin','/bin','/usr/bin']})
