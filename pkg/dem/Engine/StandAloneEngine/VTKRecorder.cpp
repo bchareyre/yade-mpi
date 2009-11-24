@@ -149,7 +149,9 @@ void VTKRecorder::action(MetaBody* rootBody)
 				if(recActive[REC_VELOCITY]){
 					spheresVelocity->InsertNextTupleValue((float*)(&b->state->vel));
 				}
-				if (recActive[REC_CPM]) {
+				/*
+				*Vaclav, please, fix it. 
+				* if (recActive[REC_CPM]) {
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->material)->normDmg);
 					const Vector3r& ss=YADE_PTR_CAST<CpmState>(b->material)->sigma;
 					const Vector3r& tt=YADE_PTR_CAST<CpmState>(b->material)->tau;
@@ -158,7 +160,7 @@ void VTKRecorder::action(MetaBody* rootBody)
 					cpmSigma->InsertNextTupleValue(s);
 					cpmSigmaM->InsertNextValue((ss[0]+ss[1]+ss[2])/3.);
 					cpmTau->InsertNextTupleValue(t);
-				}
+				}*/
 				continue;
 			}
 		}
@@ -252,7 +254,3 @@ void VTKRecorder::action(MetaBody* rootBody)
 	//writer->SetInput(multiblockDataset);
 	//writer->Write();	
 }
-
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
-
