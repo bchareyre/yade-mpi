@@ -7,26 +7,17 @@
 *************************************************************************/
 
 #include"TranslationEngine.hpp"
-#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/MetaBody.hpp>
 
 void TranslationEngine::applyCondition(MetaBody * ncb){
-	shared_ptr<BodyContainer>& bodies=ncb->bodies;
-
 	Real dt=Omega::instance().getTimeStep();
-	const int sign = 1; // ?
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)bodies->size());
-		if(ParticleParameters* p = dynamic_cast<ParticleParameters*>((*bodies)[id]->physicalParameters.get())){
-			p->se3.position+=sign*dt*velocity*translationAxis;
-			p->velocity=sign*velocity*translationAxis;
-		} else{
-			Body::byId(id,ncb)->physicalParameters->se3.position+=sign*dt*velocity*translationAxis;
-		}
+		Body* b=Body::byId(id,ncb).get();
+		if(!b) continue;
+		b->state->pos+=dt*velocity*translationAxis;
+		b->state->vel=velocity*translationAxis;
 	}
 }
 
 YADE_PLUGIN((TranslationEngine));
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
-
