@@ -873,7 +873,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readonly("min",&BoundingVolume::min)
 		.def_readonly("max",&BoundingVolume::max);
 	EXPOSE_CXX_CLASS_IX(Material)
-		.def_readwrite("label",&Material::label);
+		.def_readwrite("label",&Material::label)
+		.def("newAssocState",&Material::newAssocState)
+		;
 	EXPOSE_CXX_CLASS(State)
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
 		.add_property("pos",&State_pos_get,&State_pos_set)

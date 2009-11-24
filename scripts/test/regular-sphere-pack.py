@@ -84,4 +84,4 @@ O.engines=[
 ]
 # we don't care about physical accuracy here, over-critical step is fine as long as the simulation doesn't explode
 O.dt=3*utils.PWaveTimeStep()
-#O.saveTmp()
+O.saveTmp()

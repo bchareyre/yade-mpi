@@ -64,7 +64,7 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=1))
+concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800))
 spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.2*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
 O.bodies.append(spheres)
 bb=utils.uniaxialTestFeatures()

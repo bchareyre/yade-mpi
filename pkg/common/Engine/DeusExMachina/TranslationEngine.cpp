@@ -12,7 +12,7 @@
 void TranslationEngine::applyCondition(MetaBody * ncb){
 	Real dt=Omega::instance().getTimeStep();
 	FOREACH(body_id_t id,subscribedBodies){
-		assert(id<(body_id_t)bodies->size());
+		assert(id<(body_id_t)ncb->bodies->size());
 		Body* b=Body::byId(id,ncb).get();
 		if(!b) continue;
 		b->state->pos+=dt*velocity*translationAxis;

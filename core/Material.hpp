@@ -3,6 +3,8 @@
 #include<string>
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/core/State.hpp>
+
 
 class MetaBody;
 /*! Material properties associated with a body.
@@ -21,6 +23,11 @@ class Material: public Serializable, public Indexable{
 		std::string label;
 		//! material density; used to compute mass from geometry of the body
 		Real density;
+
+		//! Function to return empty default-initialized instance of State that 
+		// is supposed to go along with this Material. Don't override unless you need
+		// something else than basic State.
+		virtual shared_ptr<State> newAssocState(){ return shared_ptr<State>(new State); }
 
 		static const shared_ptr<Material> byId(int id, MetaBody* world=NULL);
 		static const shared_ptr<Material> byId(int id, shared_ptr<MetaBody> world) {return byId(id,world.get());}

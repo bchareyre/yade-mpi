@@ -71,8 +71,8 @@ MetaBody::MetaBody() :
 void MetaBody::postProcessAttributes(bool deserializing){
 	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
 	FOREACH(const shared_ptr<Body>& b, *bodies){
-		if(b->material->id<0) continue; // not a shared material
-		assert(b->material->id < materials.size());
+		if(!b->material || b->material->id<0) continue; // not a shared material
+		assert(b->material->id < (int)materials.size());
 		b->material=materials[b->material->id];
 	}
 }

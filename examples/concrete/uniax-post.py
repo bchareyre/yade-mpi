@@ -10,10 +10,10 @@ O.load('/tmp/uniax-tension.xml.bz2')
 # flattener that project to the xz plane
 flattener=post2d.AxisFlatten(useRef=False,axis=1)
 # return scalar given a Body instance
-extractDmg=lambda b: b.phys['normDmg']
+extractDmg=lambda b: b.state['normDmg']
 # will call flattener.planar implicitly
-# the same as: extractVelocity=lambda b: flattener.planar(b,b.phys['velocity'])
-extractVelocity=lambda b: b.phys['velocity']
+# the same as: extractVelocity=lambda b: flattener.planar(b,b.state['vel'])
+extractVelocity=lambda b: b.state['vel']
 
 # create new figure
 pylab.figure()

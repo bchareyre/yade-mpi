@@ -376,7 +376,7 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		const body_id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
-		CpmState* state=dynamic_cast<CpmState*>(B->material.get());
+		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
 		if(!state) continue;
 		state->sigma=bodyStats[id].sigma;
 		state->tau=bodyStats[id].tau;

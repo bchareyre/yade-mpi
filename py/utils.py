@@ -83,9 +83,8 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False):
 	elif isinstance(material,string): b.mat=O.materials[material]
 	elif isinstance(material,Material): b.mat=material
 	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
-	#matKw2=bodiesMatDefaults.copy(); matKw2.update(matKw)
-	#b.mat=Material(materialClass)
-	#b.mat.updateExistingAttrs(matKw2)
+	## resets state (!!)
+	b.state=b.mat.newAssocState()
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
@@ -105,11 +104,11 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	"""
 	b=Body()
 	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.state.pos=b.state.refPos=center
 	V=(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
-	b['isDynamic']=dynamic
+	b.state.pos=b.state.refPos=center
+	b.dynamic=dynamic
 	return b
 
 def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=0):
@@ -122,11 +121,11 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
 	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.state.pos=b.state.refPos=center
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material)
-	b['isDynamic']=dynamic
+	b.state.pos=b.state.refPos=center
+	b.dynamic=dynamic
 	return b
 
 def wall(position,axis,sense=0,color=None,material=0):
@@ -143,11 +142,11 @@ def wall(position,axis,sense=0,color=None,material=0):
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
 	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
+	_commonBodySetup(b,0,Vector3(0,0,0),material)
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
 	else: pos2=position
 	b.pos=b.refPos=pos2
-	_commonBodySetup(b,0,Vector3(0,0,0),material)
 	b.dynamic=False
 	return b
 
@@ -164,12 +163,12 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBounding
 	if not color: color=randomColor()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.state.pos=b.state.refPos=center
 	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.mold['vertices']=vertices
 	b.mold.postProcessAttributes(True)
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBoundingVolume)
-	b['isDynamic']=dynamic
+	b.state.pos=b.state.refPos=center
+	b.dynamic=dynamic
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):

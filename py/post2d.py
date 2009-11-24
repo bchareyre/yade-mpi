@@ -27,10 +27,10 @@ This example can be found in examples/concrete/uniax-post.py ::
  # flattener that project to the xz plane
  flattener=post2d.AxisFlatten(useRef=False,axis=1)
  # return scalar given a Body instance
- extractDmg=lambda b: b.phys['normDmg']
+ extractDmg=lambda b: b.state['normDmg']
  # will call flattener.planar implicitly
- # the same as: extractVelocity=lambda b: flattener.planar(b,b.phys['velocity'])
- extractVelocity=lambda b: b.phys['velocity']
+ # the same as: extractVelocity=lambda b: flattener.planar(b,b.state['vel'])
+ extractVelocity=lambda b: b.state['vel']
 
  # create new figure
  pylab.figure()
@@ -79,7 +79,7 @@ class SpiralFlatten(Flatten):
 		self.useRef,self.thetaRange,self.dH_dTheta,self.axis,self.periodStart=useRef,thetaRange,dH_dTheta,axis,periodStart
 		self.ax1,self.ax2=(axis+1)%3,(axis+2)%3
 	def _getPos(self,b):
-		return b.phys.refPos if self.useRef else b.phys.pos
+		return b.state.refPos if self.useRef else b.state.pos
 	def __call__(self,b):
 		import yade.utils
 		xy,theta=yade.utils.spiralProject(_getPos(b),self.dH_dTheta,self.axis,self.periodStart)
@@ -107,7 +107,7 @@ class CylinderFlatten(Flatten):
 		if axis not in (0,1,2): raise IndexError("axis must be one of 0,1,2 (not %d)"%axis)
 		self.useRef,self.axis=useRef,axis
 	def _getPos(self,b):
-		return b.phys.refPos if self.useRef else b.phys.pos
+		return b.state.refPos if self.useRef else b.state.pos
 	def __call__(self,b):
 		p=_getPos(b)
 		pp=(p[(self.axis+1)%3],p[(self.axis+2)%3])
@@ -133,7 +133,7 @@ class AxisFlatten(Flatten):
 		self.useRef,self.axis=useRef,axis
 		self.ax1,self.ax2=(self.axis+1)%3,(self.axis+2)%3
 	def __call__(self,b):
-		p=b.phys.refPos if self.useRef else b.phys.pos
+		p=b.state.refPos if self.useRef else b.state.pos
 		return (p[self.ax1],p[self.ax2])
 	def planar(self,pos,vec):
 		return vec[self.ax1],vec[self.ax2]
