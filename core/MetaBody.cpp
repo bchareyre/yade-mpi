@@ -79,9 +79,9 @@ void MetaBody::postProcessAttributes(bool deserializing){
 
 
 
-void MetaBody::moveToNextTimeStep()
-{
+void MetaBody::moveToNextTimeStep(){
 	if(needsInitializers){
+		checkStateTypes();
 		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated(this)) e->action(this); }
 		bex.resize(bodies->size());
 		needsInitializers=false;
@@ -95,6 +95,8 @@ void MetaBody::moveToNextTimeStep()
 			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
 	}
+	currentIteration++;
+	simulationTime+=dt;
 }
 
 shared_ptr<Engine> MetaBody::engineByName(string s){
@@ -119,3 +121,12 @@ void MetaBody::setTimeSteppersActive(bool a)
 	}
 }
 
+void MetaBody::checkStateTypes(){
+	FOREACH(const shared_ptr<Body>& b, *bodies){
+		if(!b || !b->material) continue;
+		if(b->material && !b->state) throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": has Body::material, but NULL Body::state.");
+		if(!b->material->stateTypeOk(b->state.get())){
+			throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": Body::material type "+b->material->getClassName()+" doesn't correspond to Body::state type "+b->state->getClassName()+" (should be "+b->material->newAssocState()->getClassName()+" instead).");
+		}
+	}
+}

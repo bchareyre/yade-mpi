@@ -18,6 +18,19 @@ class TestEngines(unittest.TestCase): pass
 class TestIO(unittest.TestCase): pass
 class TestTags(unittest.TestCase): pass 
 
+class TestMaterialStateAssociativity(unittest.TestCase):
+	def setUp(self): O.reset()
+	def testThrowsAtBadCombination(self):
+		"throws when body has material and state that don't work together."
+		b=Body()
+		b.mat=CpmMat()
+		b.state=State() #should be CpmState()
+		O.bodies.append(b)
+		self.assertRaises(RuntimeError,lambda: O.step()) # throws runtime_error
+	def testMaterialReturnsState(self):
+		"CpmMat returns CpmState when asked for newAssocState"
+		self.assert_(CpmMat().newAssocState().name=='CpmState')
+
 class TestBodies(unittest.TestCase):
 	def setUp(self):
 		O.reset()

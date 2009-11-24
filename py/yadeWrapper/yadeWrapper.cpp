@@ -376,7 +376,7 @@ class pyOmega{
 		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
-	void step() { LOG_DEBUG("STEP!"); run(1); wait();  }
+	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getRootBody()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
 	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS; }
 
 	void load(std::string fileName) {

@@ -85,7 +85,8 @@ REGISTER_SERIALIZABLE(CpmState);
 class CpmMat: public GranularMat {
 	public:
 		CpmMat() { createIndex(); density=4800; };
-		virtual shared_ptr<State> newAssocState(){ return shared_ptr<State>(new CpmState); }
+		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
+		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
 		REGISTER_ATTRIBUTES(GranularMat,);
 		REGISTER_CLASS_AND_BASE(CpmMat,GranularMat);
 		REGISTER_CLASS_INDEX(CpmMat,GranularMat);

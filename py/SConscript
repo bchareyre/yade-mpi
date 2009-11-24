@@ -22,6 +22,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 			]),
 		env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
 		env.File('utils.py'),
+		env.File('ymport.py'),
 		env.File('eudoxos.py'),
 		env.File('plot.py'),
 		env.File('linterpolation.py'),

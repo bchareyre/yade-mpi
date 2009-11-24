@@ -1,4 +1,4 @@
-from yade import pack
+from yade import pack,ymport
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -58,10 +58,10 @@ O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o
 
 
 """Import regular-sphere-pack.mesh into the YADE simulation"""
-O.bodies.append(utils.import_mesh_geometry('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
+O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
 """Import regular-sphere-pack-LSMGegGeo.geo into the YADE simulation"""
-O.bodies.append(utils.import_LSMGenGeo_geometry('regular-sphere-pack-LSMGegGeo.geo',moveTo=[-7.0,-7.0,-5.9],color=(1,0,1),**kw))
+O.bodies.append(ymport.gengeo('regular-sphere-pack-LSMGegGeo.geo',moveTo=[-7.0,-7.0,-5.9],color=(1,0,1),**kw))
 
 
 try:

@@ -27,7 +27,14 @@ class Material: public Serializable, public Indexable{
 		//! Function to return empty default-initialized instance of State that 
 		// is supposed to go along with this Material. Don't override unless you need
 		// something else than basic State.
-		virtual shared_ptr<State> newAssocState(){ return shared_ptr<State>(new State); }
+		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new State); }
+		/*! Function that returns true if given State instance is what this material expects.
+			
+			Base Material class has no requirements, but the check would normally look like this:
+
+				return (bool)dynamic_cast<State*> state;
+		*/
+		virtual bool stateTypeOk(State* state) const { return true; }
 
 		static const shared_ptr<Material> byId(int id, MetaBody* world=NULL);
 		static const shared_ptr<Material> byId(int id, shared_ptr<MetaBody> world) {return byId(id,world.get());}

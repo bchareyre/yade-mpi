@@ -33,6 +33,8 @@ class MetaBody : public Body
 		vector<shared_ptr<Material> > materials;
 		//! Adds material to MetaBody::materials. It also sets id of the material accordingly and returns it.
 		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
+		//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundingVolumeMetaEngine the first time it runs)
+		void checkStateTypes();
 
 		BexContainer bex;
 

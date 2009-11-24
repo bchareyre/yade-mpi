@@ -269,24 +269,6 @@ def randomizeColors(onlyDynamic=False):
 		if b['isDynamic'] or not onlyDynamic: b.mold['diffuseColor']=color
 
 
-def spheresFromFile(filename,scale=1.,wenjieFormat=False,**kw):
-	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
-
-	filename is the file holding ASCII numbers (at least 4 colums that hold x_center, y_center, z_center, radius).
-	All remaining arguments are passed the the yade.utils.sphere function that creates the bodies.
-
-	wenjieFormat will skip all lines that have exactly 5 numbers and where the 4th one is exactly 1.0 -
-	this was used by a fellow developer called Wenjie to mark box elements.
-	
-	Returns list of body ids that were inserted into simulation."""
-	o=Omega()
-	ret=[]
-	for l in open(filename):
-		ss=[float(i) for i in l.split()]
-		if wenjieFormat and len(ss)==5 and ss[4]==1.0: continue
-		id=o.bodies.append(sphere([scale*ss[0],scale*ss[1],scale*ss[2]],scale*ss[3],**kw))
-		ret.append(id)
-	return ret
 
 def spheresToFile(filename,consider=lambda id: True):
 	"""Save sphere coordinates into ASCII file; the format of the line is: x y z r.
@@ -339,94 +321,9 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 		pylab.ylabel('Body count')
 	pylab.show()
 
-def import_stl_geometry(file, dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False, **matKw):
-	""" Import geometry from stl file, create facets and return list of their ids."""
-	imp = STLImporter()
-	imp.open(file)
-	begin=len(O.bodies)
-	imp.import_geometry(O.bodies)
-	imported=range(begin,begin+imp.number_of_facets)
-	for i in imported:
-		b=O.bodies[i]
-		b['isDynamic']=dynamic
-		b.mold.postProcessAttributes(True)
-		b.mold['diffuseColor']=color if color else randomColor()
-		b.mold['wire']=wire
-		b.mold['highlight']=highlight
-		_commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,**matKw)
-	return imported
 
 
-def import_mesh_geometry(meshfile="file.mesh",**kw):
-	""" Imports geometry from mesh file and creates facets.
-	Remaining **kw arguments are passed to utils.facet; 
-	mesh files can be easily created with GMSH http://www.geuz.org/gmsh/
-	Example added to scripts/test/regular-sphere-pack.py"""
-	infile = open(meshfile,"r")
-	lines = infile.readlines()
-	infile.close()
 
-	nodelistVector3=[]
-	numNodes = int(lines[4].split()[0])
-	for i in range(numNodes):
-		nodelistVector3.append(Vector3(0.0,0.0,0.0))
-	id = 0
-	for line in lines[5:numNodes+5]:
-		data = line.split()
-		X = float(data[0])
-		Y = float(data[1])
-		Z = float(data[2])
-		nodelistVector3[id] = Vector3(X,Y,Z)
-		id += 1
-	numTriangles = int(lines[numNodes+6].split()[0])
-	triList = []
-	for i in range(numTriangles):
-		triList.append([0,0,0,0])
-	 
-	tid = 0
-	for line in lines[numNodes+7:numNodes+7+numTriangles]:
-		data = line.split()
-		id1 = int(data[0])-1
-		id2 = int(data[1])-1
-		id3 = int(data[2])-1
-		triList[tid][0] = tid
-		triList[tid][1] = id1
-		triList[tid][2] = id2
-		triList[tid][3] = id3
-		tid += 1
-		ret=[]
-	for i in triList:
-		a=nodelistVector3[i[1]]
-		b=nodelistVector3[i[2]]
-		c=nodelistVector3[i[3]]
-		ret.append(facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
-	return ret
-
-def import_LSMGenGeo_geometry(fileName="file.geo",moveTo=[0.0,0.0,0.0],**kw):
-	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
-	moveTo[X,Y,Z] parameter moves the specimen.
-	Remaining **kw arguments are passed to utils.sphere; 
-	
-	LSMGenGeo library allows to create pack of spheres
-	with given [Rmin:Rmax] with null stress inside the specimen.
-	Can be usefull for Mining Rock simulation.
-	
-	Example added to scripts/test/regular-sphere-pack.py
-	Example of LSMGenGeo library using is added to genCylLSM.py
-	
-  http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
-	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
-
-	infile = open(fileName,"r")
-	lines = infile.readlines()
-	infile.close()
-
-	numSpheres = int(lines[6].split()[0])
-	ret=[]
-	for line in lines[7:numSpheres+7]:
-		data = line.split()
-		ret.append(sphere([moveTo[0]+float(data[0]),moveTo[1]+float(data[1]),moveTo[2]+float(data[2])],float(data[3]),**kw))
-	return ret
 
 def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	"""Create .ogg video from external image files.
@@ -600,3 +497,27 @@ def xMirror(half):
 	If the last point's x coord is zero, it will not be duplicated."""
 	return list(half)+[(x,-y) for x,y in reversed(half[:-1] if half[-1][0]==0 else half)]
 
+#############################
+##### deprecated functions
+
+
+def _deprecatedUtilsFunction(old,new):
+	import warnings
+	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category='DeprecationWarning')
+
+def spheresFromFile(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.text')
+	import yade.ymport
+	return yade.ymport.text(*args,**kw)
+def import_stl_geometry(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.stl')
+	import yade.ymport
+	return yade.ymport.stl(*args,**kw)
+def import_mesh_geometry(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.gmsh')
+	import yade.ymport
+	return yade.ymport.stl(*args,**kw)
+def import_LSMGenGeo_geometry(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.gengeo')
+	import yade.ymport
+	return yade.ymport.gengeo(*args,**kw)

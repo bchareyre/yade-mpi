@@ -10,8 +10,11 @@ es = 0.3
 
 ## Import wall's geometry
 params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-imported = utils.import_stl_geometry('baraban.stl',frictionAngle=frictionAngle,materialClass="SimpleViscoelasticMat",**params) # **params sets kn, cn, ks, cs
-
+print params
+facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+sphereMat=O.materials.append(SimpleViscoelasticMat(density=Density,frictionAngle=frictionAngle,**params))
+from yade import ymport
+imported = ymport.stl('baraban.stl',material=facetMat) 
 ## Spheres
 sphereRadius = 0.2
 nbSpheres = (10,10,10)
@@ -22,7 +25,7 @@ for i in xrange(nbSpheres[0]):
             x = (i*2 - nbSpheres[0])*sphereRadius*1.1
             y = j*sphereRadius*2.2
             z = (k*2 - nbSpheres[2])*sphereRadius*1.1
-            s=utils.sphere([x,y,z],sphereRadius,density=Density,frictionAngle=frictionAngle,materialClass="SimpleViscoelasticMat")
+            s=utils.sphere([x,y,z],sphereRadius,material=sphereMat)
             p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
             s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
             O.bodies.append(s)
