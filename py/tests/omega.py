@@ -27,6 +27,13 @@ class TestMaterialStateAssociativity(unittest.TestCase):
 		b.state=State() #should be CpmState()
 		O.bodies.append(b)
 		self.assertRaises(RuntimeError,lambda: O.step()) # throws runtime_error
+	def testThrowsAtNullState(self):
+		"throws when body has material but NULL state."
+		b=Body()
+		b.mat=Material()
+		b.state=None # → shared_ptr<State>() by boost::python
+		O.bodies.append(b)
+		self.assertRaises(RuntimeError,lambda: O.step())
 	def testMaterialReturnsState(self):
 		"CpmMat returns CpmState when asked for newAssocState"
 		self.assert_(CpmMat().newAssocState().name=='CpmState')
