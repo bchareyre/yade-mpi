@@ -155,12 +155,10 @@ class Omega : public Singleton<Omega>
 
 		long int	getCurrentIteration();
 		void		setCurrentIteration(long int i);
-		void		incrementCurrentIteration();
 		
 		Real		getSimulationTime();
 		Real 		getComputationTime();
 		time_duration getComputationDuration();
-		void		incrementSimulationTime();
 		
 		void init();
 		void timeInit();
