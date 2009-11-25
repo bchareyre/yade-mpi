@@ -89,7 +89,7 @@ def gmsh(meshfile="file.mesh",**kw):
 		ret.append(utils.facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
 	return ret
 
-def gengeo(fileName="file.geo",moveTo=[0.0,0.0,0.0],**kw):
+def gengeo(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
 	moveTo[X,Y,Z] parameter moves the specimen.
 	Remaining **kw arguments are passed to utils.sphere; 
@@ -113,6 +113,6 @@ def gengeo(fileName="file.geo",moveTo=[0.0,0.0,0.0],**kw):
 	ret=[]
 	for line in lines[7:numSpheres+7]:
 		data = line.split()
-		ret.append(utils.sphere([moveTo[0]+float(data[0]),moveTo[1]+float(data[1]),moveTo[2]+float(data[2])],float(data[3]),**kw))
+		ret.append(utils.sphere([moveTo[0]+scale*float(data[0]),moveTo[1]+scale*float(data[1]),moveTo[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 

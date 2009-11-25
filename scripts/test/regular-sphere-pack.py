@@ -18,7 +18,7 @@ rad,gap=.15,.02
 rho=1e3
 
 #Add material
-O.materials.append([GranularMat(young=1e8,frictionAngle=0.5,density=rho,label='materialZero')])
+O.materials.append([GranularMat(young=37e9,frictionAngle=0.5,density=rho,label='materialZero')])
 
 #Parameters, which will be passed into spheres and facets creators
 kw={'material':0}
@@ -60,8 +60,8 @@ O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o
 """Import regular-sphere-pack.mesh into the YADE simulation"""
 O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
-"""Import regular-sphere-pack-LSMGegGeo.geo into the YADE simulation"""
-O.bodies.append(ymport.gengeo('regular-sphere-pack-LSMGegGeo.geo',moveTo=[-7.0,-7.0,-5.9],color=(1,0,1),**kw))
+"""Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation"""
+O.bodies.append(ymport.gengeo('regular-sphere-pack-LSMGenGeo.geo',moveTo=[-7.0,-7.0,-5.9],scale=15.0,color=(1,0,1),**kw))
 
 
 try:
