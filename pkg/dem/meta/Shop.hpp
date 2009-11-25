@@ -64,11 +64,11 @@ class Shop{
 		 */
 		static void rootBodyActors(shared_ptr<MetaBody>);
 		//! create default sphere, along with its boundingVolume etc. 
-		static shared_ptr<Body> sphere(Vector3r center, Real radius);
+		static shared_ptr<Body> sphere(Vector3r center, Real radius, shared_ptr<Material> mat);
 		//! create default box with everything needed
-		static shared_ptr<Body> box(Vector3r center, Vector3r extents);
+		static shared_ptr<Body> box(Vector3r center, Vector3r extents, shared_ptr<Material> mat);
 		//! create default tetrahedron
-		static shared_ptr<Body> tetra(Vector3r v[4]);
+		static shared_ptr<Body> tetra(Vector3r v[4], shared_ptr<Material> mat);
 
 		//! return instance of default GranularMat
 		static shared_ptr<GranularMat> defaultGranularMat();

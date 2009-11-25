@@ -71,20 +71,12 @@ else:
 #### HANDLE RENAMED CLASSES ####
 # if old class name is used, the new object is constructed and a warning is issued about old name being used
 renamed={
+	# integrated 25.11.2009
+	'PeriodicInsertionSortCollider':'InsertionSortCollider',
 	# renamed 15.11.2009
 	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere',
 	# renamed 10.10.2009
 	'CpmPhysDamageColorizer':'CpmStateUpdater',
-	# renamed 23.5.2009, may be removed in a few months
-	'BrefcomMakeContact':'Ip2_CpmMat_CpmMat_CpmPhys',
-	'BrefcomContact':'CpmPhys',
-	'BrefcomPhysParams':'CpmMat',
-	'ef2_Spheres_Brefcom_BrefcomLaw':'Law2_Dem3DofGeom_CpmPhys_Cpm',
-	'GLDrawBrefcomContact':'GLDrawCpmPhys',
-	'BrefcomDamageColorizer':'CpmPhysDamageColorizer',
-	'BrefcomGlobalCharacteristics':'CpmGlobalCharacteristics',
-	'Preprocessor':'FileGenerator', # renamed back to comply with the c++ name, 4.8.2009
-	'PersistentSAPCollider':'InsertionSortCollider',
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -42,7 +42,7 @@ if 0:
 O.saveTmp()
 O.loadTmp()
 
-if 1:
+if 0:
 	O.timingEnabled=True
 	from yade import timing
 	for i in range(4):

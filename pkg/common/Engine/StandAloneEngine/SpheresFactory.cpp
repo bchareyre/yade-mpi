@@ -92,19 +92,15 @@ void SpheresFactory::action(MetaBody* ncb)
 		shared_ptr<Body> sphere;
 		createSphere(sphere,position,r);
 
-		if (bI->probeBoundingVolume(bv)) 
-		{
-			bool is_overlap=false;
-			for( unsigned int i=0, e=bI->probedBodies.size(); i<e; ++i)
-			{
-				if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry)
-				{
-					is_overlap=true;
-					break;
-				}
+		bool is_overlap=false;
+		vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
+		FOREACH(body_id_t id, probedBodies){
+			if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry){
+				is_overlap=true;
+				break;
 			}
-			if (is_overlap) continue;
 		}
+		if (is_overlap) continue;
 		if (pySpheresCreator!="")
 		{
 			ostringstream command;

@@ -1,12 +1,13 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/Material.hpp>
+#include<limits>
 /*! Elastic material */
 class ElasticMat: public Material{
 	public:
 	Real young;
 	Real poisson;
-	ElasticMat(){ createIndex(); }
+	ElasticMat(): young(1e9),poisson(.25) { createIndex(); }
 	virtual ~ElasticMat();
 	REGISTER_ATTRIBUTES(Material,(young)(poisson));
 	REGISTER_CLASS_AND_BASE(ElasticMat,Material);
@@ -18,7 +19,7 @@ REGISTER_SERIALIZABLE(ElasticMat);
 class GranularMat: public ElasticMat{
 	public:
 	Real frictionAngle;
-	GranularMat(){ createIndex(); }
+	GranularMat(): frictionAngle(.5){ createIndex(); }
 	virtual ~GranularMat();
 	REGISTER_ATTRIBUTES(ElasticMat,(frictionAngle));
 	REGISTER_CLASS_AND_BASE(GranularMat,ElasticMat);

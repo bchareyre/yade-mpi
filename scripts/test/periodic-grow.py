@@ -2,11 +2,11 @@
 It prints strain and average stress (computed from total volume force)
 once in a while."""
 from yade import log,timing
-log.setLevel("PeriodicInsertionSortCollider",log.TRACE)
+log.setLevel("InsertionSortCollider",log.TRACE)
 O.engines=[
 	BexResetter(),
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(),MetaInteractingGeometry2AABB()]),
-	PeriodicInsertionSortCollider(),  # this is important, obviously
+	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],
@@ -16,7 +16,7 @@ O.engines=[
 ]
 import random
 for i in xrange(250):
-	O.bodies.append(utils.sphere(Vector3(10*random.random(),10*random.random(),10*random.random()),.5+random.random(),density=1000))
+	O.bodies.append(utils.sphere(Vector3(10*random.random(),10*random.random(),10*random.random()),.5+random.random()))
 cubeSize=20
 # absolute positioning of the cell is not important
 O.periodicCell=((-.5*cubeSize,-.5*cubeSize,0),(.5*cubeSize,.5*cubeSize,cubeSize))

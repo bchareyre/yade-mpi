@@ -15,10 +15,9 @@ has sphere taken off at the back and also a notch) and the body (with cylidrical
 """
 
 rad,gap=.15,.02
-rho=1e3
 
 #Add material
-O.materials.append([GranularMat(young=37e9,frictionAngle=0.5,density=rho,label='materialZero')])
+O.materials.append(GranularMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3))
 
 #Parameters, which will be passed into spheres and facets creators
 kw={'material':0}
@@ -82,6 +81,11 @@ O.engines=[
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
 	NewtonsDampedLaw(damping=.1)
 ]
-# we don't care about physical accuracy here, over-critical step is fine as long as the simulation doesn't explode
-O.dt=3*utils.PWaveTimeStep()
+# we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
+O.dt=utils.PWaveTimeStep()
 O.saveTmp()
+O.timingEnabled=True
+O.run(10000,True)
+from yade import timing
+timing.stats()
+quit()

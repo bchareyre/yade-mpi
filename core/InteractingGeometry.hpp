@@ -11,13 +11,6 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
-// the geometry through which the body will interact:
-// - planet emitting gravity has just radius of influence
-// - magnet has also just volume of influence
-// - for tetrahedrons we can use sphere tree or sweptshpere volume
-//
-// in general we can use it to initialize interaction
-
 #define BV_FUNCTOR_CACHE
 
 class BoundingVolumeEngineUnit;

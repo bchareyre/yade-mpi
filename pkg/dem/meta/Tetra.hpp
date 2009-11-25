@@ -15,11 +15,6 @@
 #include<Wm3Math.h>
 #include<Wm3Vector3.h>
 
-#ifdef YADE_SHAPE
-	#include<yade/pkg-common/Tetrahedron.hpp>
-	#include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
-#endif
-
 
 /* Our mold of tetrahedron: just 4 vertices.
  *
@@ -62,27 +57,6 @@ class TetraBang: public InteractionGeometry{
 		REGISTER_CLASS_AND_BASE(TetraBang,InteractionGeometry);
 };
 REGISTER_SERIALIZABLE(TetraBang);
-
-#ifdef YADE_SHAPE
-/*! Creates TetraMold from Tetrahedron.
- *
- * Self-contained. */
-
-class Tetrahedron2TetraMold: public InteractingGeometryEngineUnit
-{
-	public:
-		void go(const shared_ptr<GeometricalModel>& gm,shared_ptr<InteractingGeometry>& ig,const Se3r& se3,const Body*){
-			Tetrahedron* tet=static_cast<Tetrahedron*>(gm.get());
-			//! @fixme this seems superfluous?!: if(!ig)
-			ig=boost::shared_ptr<InteractingGeometry>(new TetraMold(tet->v[0],tet->v[1],tet->v[2],tet->v[3]));
-		}
-	FUNCTOR2D(Tetrahedron,TetraMold);
-	REGISTER_CLASS_NAME(Tetrahedron2TetraMold);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometryEngineUnit);
-	DEFINE_FUNCTOR_ORDER_2D(Tetrahedron,TetraMold);
-};
-REGISTER_SERIALIZABLE(Tetrahedron2TetraMold);
-#endif
 
 /*! Creates AABB from TetraMold. 
  *

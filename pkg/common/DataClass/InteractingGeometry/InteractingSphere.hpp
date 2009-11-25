@@ -15,7 +15,8 @@ class InteractingSphere : public InteractingGeometry
 	public :
 		Real radius;
 
-		InteractingSphere ();
+		InteractingSphere();
+		InteractingSphere(Real _radius): radius(_radius){}
 		virtual ~InteractingSphere ();
 
 	REGISTER_ATTRIBUTES(InteractingGeometry,(radius));

@@ -308,7 +308,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.periodicCell
 		#print x1,y1,z1,radius,rRelFuzz
 		num=sp.makeCloud(O.periodicCell[0],O.periodicCell[1],radius,rRelFuzz,spheresInCell,True)
-		O.engines=[BexResetter(),BoundingVolumeMetaEngine([InteractingSphere2AABB()]),PeriodicInsertionSortCollider(),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[100e9,1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonsDampedLaw(damping=.6)]
+		O.engines=[BexResetter(),BoundingVolumeMetaEngine([InteractingSphere2AABB()]),InsertionSortCollider(),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[100e9,1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonsDampedLaw(damping=.6)]
 		O.materials.append(GranularMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 		O.dt=utils.PWaveTimeStep()

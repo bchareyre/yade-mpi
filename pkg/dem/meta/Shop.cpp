@@ -275,116 +275,47 @@ shared_ptr<GranularMat> Shop::defaultGranularMat(){
 }
 
 /*! Create body - sphere. */
-shared_ptr<Body> Shop::sphere(Vector3r center, Real radius){
-	// body itself
-	shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
+shared_ptr<Body> Shop::sphere(Vector3r center, Real radius, shared_ptr<Material> mat){
+	shared_ptr<Body> body(new Body);
 	body->isDynamic=true;
-
-	// material
-	body->material=Shop::defaultGranularMat();
-	
-	// state
+	body->material=mat ? mat : defaultGranularMat();
+	body->state->pos=center;
 	body->state->mass=4.0/3.0*Mathr::PI*radius*radius*radius*body->material->density;
 	body->state->inertia=Vector3r(2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius);
-
-	// aabb
-	shared_ptr<AABB> aabb(new AABB);
-	aabb->diffuseColor=getDefault<bool>("aabb_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("aabb_color");
-	body->boundingVolume=aabb;
-
-	// mold
-	shared_ptr<InteractingSphere> mold(new InteractingSphere);
-	mold->radius=radius;
-	mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
-	body->interactingGeometry=mold;
-
-	#ifdef YADE_SHAPE
-		//shape
-		shared_ptr<Sphere> shape(new Sphere);
-		shape->radius=radius;
-		shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
-		shape->wire=getDefault<bool>("shape_wire");
-		shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
-		body->geometricalModel=shape;
-	#endif
-
+	body->boundingVolume=shared_ptr<AABB>(new AABB);
+	body->interactingGeometry=shared_ptr<InteractingSphere>(new InteractingSphere(radius));
 	return body;
-
 }
 
 /*! Create body - box. */
-shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents){
-		shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
-		body->isDynamic=true;
-
-		// material
-		body->material=defaultGranularMat();
-	
-		// state
-		Real mass=8.0*extents[0]*extents[1]*extents[2]*body->material->density;
-		body->state->mass=mass;
-		body->state->inertia=Vector3r(mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
-
-		// aabb
-		shared_ptr<AABB> aabb(new AABB);
-		aabb->diffuseColor=getDefault<bool>("aabb_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("aabb_color");
-		body->boundingVolume=aabb;
-
-		//shape
-		#ifdef YADE_SHAPE
-			shared_ptr<Box> shape(new Box);
-			shape->extents=extents;
-			shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
-			shape->wire=getDefault<bool>("shape_wire");
-			shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
-			body->geometricalModel=shape;
-		#endif
-
-		// mold
-		shared_ptr<InteractingBox> mold(new InteractingBox);
-		mold->extents=extents;
-		mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
-		body->interactingGeometry=mold;
-
-		return body;
+shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents, shared_ptr<Material> mat){
+	shared_ptr<Body> body(new Body);
+	body->isDynamic=true;
+	body->material=mat ? mat : defaultGranularMat();
+	body->state->pos=center;
+	Real mass=8.0*extents[0]*extents[1]*extents[2]*body->material->density;
+	body->state->mass=mass;
+	body->state->inertia=Vector3r(mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
+	body->boundingVolume=shared_ptr<AABB>(new AABB);
+	body->interactingGeometry=shared_ptr<InteractingBox>(new InteractingBox(extents));
+	return body;
 }
 
 /*! Create body - tetrahedron. */
-shared_ptr<Body> Shop::tetra(Vector3r v_global[4]){
-		shared_ptr<Body> body=shared_ptr<Body>(new Body(body_id_t(0),getDefault<int>("body_sdecGroupMask")));
-		body->isDynamic=true;
-
-		Vector3r centroid=(v_global[0]+v_global[1]+v_global[2]+v_global[3])*.25;
-		Vector3r v[4]; for(int i=0; i<4; i++) v[i]=v_global[i]-centroid;
-
-		body->material=defaultGranularMat();
-		body->state->mass=body->material->density*TetrahedronVolume(v);
-		// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
-
-		// aabb
-		shared_ptr<AABB> aabb(new AABB);
-		aabb->diffuseColor=getDefault<bool>("aabb_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("aabb_color");
-		body->boundingVolume=aabb;
-
-		//shape
-		#ifdef YADE_SHAPE
-			shared_ptr<Tetrahedron> shape(new Tetrahedron);
-			shape->v[0]=v[0]; shape->v[1]=v[1]; shape->v[2]=v[2]; shape->v[3]=v[3];
-			shape->diffuseColor=getDefault<bool>("shape_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("shape_color");
-			shape->wire=getDefault<bool>("shape_wire");
-			shape->shadowCaster=getDefault<bool>("shape_shadowCaster");
-			body->geometricalModel=shape;
-		#endif
-
-		// mold
-		shared_ptr<TetraMold> mold(new TetraMold(v[0],v[1],v[2],v[3]));
-		mold->diffuseColor=getDefault<bool>("mold_randomColor")?Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()):getDefault<Vector3r>("mold_color");
-		body->interactingGeometry=mold;
-
-		// make local axes coincident with principal axes
-		TetrahedronWithLocalAxesPrincipal(body);
-
-		return body;
+shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
+	shared_ptr<Body> body(new Body);
+	body->isDynamic=true;
+	body->material=mat ? mat : defaultGranularMat();
+	Vector3r centroid=(v_global[0]+v_global[1]+v_global[2]+v_global[3])*.25;
+	Vector3r v[4]; for(int i=0; i<4; i++) v[i]=v_global[i]-centroid;
+	body->state->pos=centroid;
+	body->state->mass=body->material->density*TetrahedronVolume(v);
+	// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
+	body->boundingVolume=shared_ptr<AABB>(new AABB);
+	body->interactingGeometry=shared_ptr<TetraMold>(new TetraMold(v[0],v[1],v[2],v[3]));
+	// make local axes coincident with principal axes
+	TetrahedronWithLocalAxesPrincipal(body);
+	return body;
 }
 
 
