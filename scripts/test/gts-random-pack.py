@@ -43,4 +43,5 @@ if 1:
 	O.bodies.append(pack.randomDensePack(pack.inGtsSurface(horse),radius=5e-3,memoizeDb=memoizeDb))
 	horse.translate(.07,0,0)
 	O.bodies.append(pack.gtsSurface2Facets(horse))
+	# specifying spheresInCell makes the packing periodic, with the given number of spheres, proportions being equal to that of the predicate
 	O.bodies.append(pack.randomDensePack(pack.inGtsSurface(horse),radius=1e-3,spheresInCell=2000,memoizeDb=memoizeDb))

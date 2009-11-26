@@ -16,8 +16,6 @@ void SimulationFlow::singleAction()
 	if (OO.getRootBody()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
 	{
 		OO.getRootBody()->moveToNextTimeStep();
-		OO.incrementCurrentIteration();
-		OO.incrementSimulationTime();
 		if(OO.getRootBody()->stopAtIteration>0 && OO.getCurrentIteration()==OO.getRootBody()->stopAtIteration){
 			setTerminate(true);
 		}

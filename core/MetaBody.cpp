@@ -34,8 +34,7 @@
 bool TimingInfo::enabled=false;
 
 MetaBody::MetaBody() :
-	Body(), bodies(new BodyVector), interactions(new InteractionVecMap), transientInteractions(interactions)
-{	
+	Body(), bodies(new BodyVector), interactions(new InteractionVecMap){	
 	engines.clear();
 	initializers.clear();
 	needsInitializers=true;
@@ -69,20 +68,20 @@ MetaBody::MetaBody() :
 
 
 
-void MetaBody::postProcessAttributes(bool deserializing)
-{
-	// this is now checked in MoveToNextTimeStep
-	//runInitializers();	
-	
-	//	initializers.clear(); // FIXME - we want to delate ONLY some of them!
-	//                                       because when you save and load file, you still want some initializers, but not all of them. Eg - you don't want VRML loader, or FEM loader, but you want BoundingVolumeMetaEngine. Maybe we need two list of initilizers? One that 'survive' between load and save, and others that are deleted on first time?
+void MetaBody::postProcessAttributes(bool deserializing){
+	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
+	FOREACH(const shared_ptr<Body>& b, *bodies){
+		if(!b->material || b->material->id<0) continue; // not a shared material
+		assert(b->material->id < (int)materials.size());
+		b->material=materials[b->material->id];
+	}
 }
 
 
 
-void MetaBody::moveToNextTimeStep()
-{
+void MetaBody::moveToNextTimeStep(){
 	if(needsInitializers){
+		checkStateTypes();
 		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated(this)) e->action(this); }
 		bex.resize(bodies->size());
 		needsInitializers=false;
@@ -96,6 +95,8 @@ void MetaBody::moveToNextTimeStep()
 			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 		}
 	}
+	currentIteration++;
+	simulationTime+=dt;
 }
 
 shared_ptr<Engine> MetaBody::engineByName(string s){
@@ -120,3 +121,12 @@ void MetaBody::setTimeSteppersActive(bool a)
 	}
 }
 
+void MetaBody::checkStateTypes(){
+	FOREACH(const shared_ptr<Body>& b, *bodies){
+		if(!b || !b->material) continue;
+		if(b->material && !b->state) throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": has Body::material, but NULL Body::state.");
+		if(!b->material->stateTypeOk(b->state.get())){
+			throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": Body::material type "+b->material->getClassName()+" doesn't correspond to Body::state type "+b->state->getClassName()+" (should be "+b->material->newAssocState()->getClassName()+" instead).");
+		}
+	}
+}

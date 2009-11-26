@@ -24,6 +24,7 @@ SpatialQuickSortCollider::~SpatialQuickSortCollider()
 
 void SpatialQuickSortCollider::action(MetaBody* ncb)
 {
+	if(ncb->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	// This collider traverses all interactions at every step, therefore all interactions

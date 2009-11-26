@@ -148,8 +148,8 @@ void MicroMacroAnalyser::setState ( MetaBody* ncb, unsigned int state, bool save
 	TS.mean_radius /= Ng;//rayon moyen
 	LOG_INFO ( " loaded : " << Ng << " grains with mean radius = " << TS.mean_radius );
 
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for ( ; ii!=iiEnd ; ++ii )
 	{
 		if ( ( *ii )->isReal() )

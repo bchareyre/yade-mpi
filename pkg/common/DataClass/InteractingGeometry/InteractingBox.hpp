@@ -18,6 +18,7 @@ class InteractingBox : public InteractingGeometry
 		Vector3r extents;
 
 		InteractingBox ();
+		InteractingBox(const Vector3r& _extents): extents(_extents){}
 		virtual ~InteractingBox ();	
 	
 	REGISTER_ATTRIBUTES(InteractingGeometry,(extents));

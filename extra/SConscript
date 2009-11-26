@@ -6,7 +6,7 @@ linkPlugins=env['linkPlugins']
 import os.path, os
 
 env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
-	env.SharedLibrary('PeriodicInsertionSortCollider',['PeriodicInsertionSortCollider.cpp'],LIBS=env['LIBS']+linkPlugins(['InsertionSortCollider','Shop'])),
+	# env.SharedLibrary('PeriodicInsertionSortCollider',['PeriodicInsertionSortCollider.cpp'],LIBS=env['LIBS']+linkPlugins(['InsertionSortCollider','Shop'])),
 ])
 
 

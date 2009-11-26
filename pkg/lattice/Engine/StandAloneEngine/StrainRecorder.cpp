@@ -85,7 +85,7 @@ void StrainRecorder::action(MetaBody * ncb)
 	strain_y = (currentLength - initialLength) / initialLength; // odkszta?cenie ca?ej próbki
 	
 	//bool nonlocal = false;
-	//if (ncb->transientInteractions->size() != 0) // it's non-local
+	//if (ncb->interactions->size() != 0) // it's non-local
 	//	nonlocal = true;
 	
 	for( ; i != end ; ++i )

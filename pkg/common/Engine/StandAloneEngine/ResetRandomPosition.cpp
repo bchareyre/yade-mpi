@@ -115,18 +115,14 @@ void ResetRandomPosition::action(MetaBody* ncb)
 				if (is_overlap) continue; // new attempt
 
 				// Test overlap with other bodies
-				if (bI->probeBoundingVolume(bv)) 
-				{
-					for( unsigned int i=0, e=bI->probedBodies.size(); i<e; ++i)
-					{
-						if (iGME->explicitAction(b,Body::byId(bI->probedBodies[i]))->interactionGeometry)
-						{
-							is_overlap=true;
-							break;
-						}
+				vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
+				FOREACH(body_id_t id, probedBodies){
+					if (iGME->explicitAction(b,Body::byId(bI->probedBodies[i]))->interactionGeometry){
+						is_overlap=true;
+						break;
 					}
-					if (is_overlap) continue; // new attempt
 				}
+				if (is_overlap) continue; // new attempt
 				break;
 			}
 			if (is_overlap)

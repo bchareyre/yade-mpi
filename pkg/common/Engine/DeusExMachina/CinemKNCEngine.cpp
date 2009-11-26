@@ -246,8 +246,8 @@ void CinemKNCEngine::stopMovement()
 void CinemKNCEngine::computeStiffness(MetaBody* ncb)
 {
 	stiffness=0.0;
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal())

@@ -52,12 +52,10 @@ Omega::~Omega(){LOG_INFO("Shuting down; duration "<<(microsec_clock::local_time(
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
-void Omega::incrementCurrentIteration(){ if(rootBody) rootBody->currentIteration++;}
 long int Omega::getCurrentIteration(){ return (rootBody?rootBody->currentIteration:-1); }
 void Omega::setCurrentIteration(long int i) { if(rootBody) rootBody->currentIteration=i; }
 
 Real Omega::getSimulationTime() { return rootBody?rootBody->simulationTime:-1;};
-void Omega::incrementSimulationTime() { if(rootBody) rootBody->simulationTime+=getTimeStep();};
 
 void Omega::setSimulationFileName(const string f){simulationFileName = f;}
 string Omega::getSimulationFileName(){return simulationFileName;}

@@ -19,6 +19,7 @@ CREATE_LOGGER(InsertionSortCollider);
 
 // return true if bodies bb overlap in all 3 dimensions
 bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2) const {
+	assert(!periodic);
 	return
 		(minima[3*id1+0]<=maxima[3*id2+0]) && (maxima[3*id1+0]>=minima[3*id2+0]) &&
 		(minima[3*id1+1]<=maxima[3*id2+1]) && (maxima[3*id1+1]>=minima[3*id2+1]) &&
@@ -27,6 +28,8 @@ bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2) const {
 
 // called by the insertion sort if 2 bodies swapped their bounds
 void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, InteractionContainer* interactions, MetaBody* rb){
+	assert(!periodic);
+	assert(id1!=id2);
 	// do bboxes overlap in all 3 dimensions?
 	bool overlap=spatialOverlap(id1,id2);
 	// existing interaction?
@@ -47,9 +50,10 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 	assert(false); // unreachable
 }
 
-void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer* interactions, MetaBody* rb, bool doCollide){
-	long size=v.size();
-	for(long i=0; i<size; i++){
+void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, MetaBody* rb, bool doCollide){
+	assert(!periodic);
+	assert(v.size==(long)v.vec.size());
+	for(long i=0; i<v.size; i++){
 		const Bound viInit=v[i]; long j=i-1; /* cache hasBB; otherwise 1% overall performance hit */ const bool viInitBB=viInit.flags.hasBB;
 		while(j>=0 && v[j]>viInit){
 			v[j+1]=v[j];
@@ -61,11 +65,11 @@ void InsertionSortCollider::insertionSort(vector<Bound>& v, InteractionContainer
 	}
 }
 
-bool InsertionSortCollider::probeBoundingVolume(const BoundingVolume& bv)
-{
-	probedBodies.clear();
+vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const BoundingVolume& bv){
+	if(periodic){ LOG_FATAL("Probing with periodic boundary not implemented."); abort(); }
+	vector<body_id_t> ret;
 	for( vector<Bound>::iterator 
-			it=XX.begin(),et=XX.end(); it < et; ++it)
+			it=BB[0].vec.begin(),et=BB[0].vec.end(); it < et; ++it)
 	{
 		if (it->coord > bv.max[0]) break;
 		if (!it->flags.isMin || !it->flags.hasBB) continue;
@@ -76,10 +80,10 @@ bool InsertionSortCollider::probeBoundingVolume(const BoundingVolume& bv)
 				minima[offset+2] > bv.max[2] ||
 				maxima[offset+2] < bv.min[2] )) 
 		{
-			probedBodies.push_back(it->id);
+			ret.push_back(it->id);
 		}
 	}
-	return (bool)probedBodies.size();
+	return ret;
 }
 
 #ifdef COLLIDE_STRIDED
@@ -94,7 +98,7 @@ bool InsertionSortCollider::probeBoundingVolume(const BoundingVolume& bv)
 			fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*rb->dt;
 			if(fastestBodyMaxDist>=sweepLength) return true;
 		}
-		if(XX.size()!=2*rb->bodies->size()) return true;
+		if(BB[0].size!=2*rb->bodies->size()) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
 		rb->interactions->erasePending(*this,rb);
@@ -107,33 +111,44 @@ void InsertionSortCollider::action(MetaBody* rb){
 		timingDeltas->start();
 	#endif
 
-	size_t nBodies=rb->bodies->size();
+	long nBodies=(long)rb->bodies->size();
 	InteractionContainer* interactions=rb->interactions.get();
-	
-	// bite: conditions that make it necessary to run collider even if not scheduled are in isActivated
+	rb->interactions->iterColliderLastRun=-1;
+
+	// periodicity changed, force reinit
+	if(rb->isPeriodic != periodic){
+		for(int i=0; i<3; i++) BB[i].vec.clear();
+		periodic=rb->isPeriodic;
+	}
+
 
 	// pre-conditions
 		// adjust storage size
 		bool doInitSort=false;
-		if(XX.size()!=2*nBodies){
-			LOG_DEBUG("Resize bounds containers from "<<XX.size()<<" to "<<nBodies*2<<", will std::sort.");
+		if(BB[0].size!=2*nBodies){
+			long BBsize=BB[0].size;
+			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
-			if(2*nBodies<XX.size()){ XX.clear(); YY.clear(); ZZ.clear(); }
+			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].vec.clear(); }
 			// more than 100 bodies was added, do initial sort again
 			// maybe: should rather depend on ratio of added bodies to those already present...?
-			if(2*nBodies-XX.size()>200 || XX.size()==0) doInitSort=true;
-			XX.reserve(2*nBodies); YY.reserve(2*nBodies); ZZ.reserve(2*nBodies);
-			assert((XX.size()%2)==0);
-			for(size_t id=XX.size()/2; id<nBodies; id++){
+			if(2*nBodies-BBsize>200 || BBsize==0) doInitSort=true;
+			assert((BBsize%2)==0);
+			for(int i=0; i<3; i++){
+				BB[i].vec.reserve(2*nBodies);
 				// add lower and upper bounds; coord is not important, will be updated from bb shortly
-				XX.push_back(Bound(0,id,/*isMin=*/true)); XX.push_back(Bound(0,id,/*isMin=*/false));
-				YY.push_back(Bound(0,id,          true)); YY.push_back(Bound(0,id,          false));
-				ZZ.push_back(Bound(0,id,          true)); ZZ.push_back(Bound(0,id,          false));
+				for(long id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bound(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bound(0,id,/*isMin=*/false)); }
+				BB[i].size=BB[i].vec.size();
 			}
 		}
-		if(minima.size()!=3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
-		assert(XX.size()==2*rb->bodies->size());
+		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
+		assert(BB[0].size==2*rb->bodies->size());
+
+		// update periodicity
+		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
+		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(rb); 
+
 		#ifdef COLLIDE_STRIDED
 			// get the BoundingVolumeMetaEngine and turn it off; we will call it ourselves
 			if(!boundDispatcher){
@@ -187,117 +202,236 @@ void InsertionSortCollider::action(MetaBody* rb){
 	ISC_CHECKPOINT("bound");
 
 	// copy bounds along given axis into our arrays
-		for(size_t i=0; i<2*nBodies; i++){
-			const body_id_t& idXX=XX[i].id; const body_id_t& idYY=YY[i].id; const body_id_t& idZZ=ZZ[i].id;
-			const shared_ptr<Body>& bXX=Body::byId(idXX,rb); const shared_ptr<Body>& bYY=Body::byId(idYY,rb); const shared_ptr<Body>& bZZ=Body::byId(idZZ,rb);
-			if(bXX){
-				const shared_ptr<BoundingVolume>& bvXX=bXX->boundingVolume;
-				XX[i].coord=(XX[i].flags.hasBB=(bool)bvXX) ? (XX[i].flags.isMin ? bvXX->min[0] : bvXX->max[0]) : (bXX->state->pos[0]);
-			} else { XX[i].flags.hasBB=false; /* XX[i].coord=0; */ }
-			if(bYY){
-				const shared_ptr<BoundingVolume>& bvYY=bYY->boundingVolume;
-				YY[i].coord=(YY[i].flags.hasBB=(bool)bvYY) ? (YY[i].flags.isMin ? bvYY->min[1] : bvYY->max[1]) : (bYY->state->pos[1]);
-			} else { YY[i].flags.hasBB=false; /* YY[i].coord=0; */ }
-			if(bZZ){
-				const shared_ptr<BoundingVolume>& bvZZ=bZZ->boundingVolume;
-				ZZ[i].coord=(ZZ[i].flags.hasBB=(bool)bvZZ) ? (ZZ[i].flags.isMin ? bvZZ->min[2] : bvZZ->max[2]) : (bZZ->state->pos[2]);
-			} else { ZZ[i].flags.hasBB=false; /* ZZ[i].coord=0; */ }
-			// and for each body, copy its minima and maxima arrays as well
-			if(XX[i].flags.isMin){
-				BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
-				if(bXX){
-					const shared_ptr<BoundingVolume>& bvXX=bXX->boundingVolume;
-					if(bvXX) { memcpy(&minima[3*idXX],&bvXX->min,3*sizeof(Real)); memcpy(&maxima[3*idXX],&bvXX->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
-					else{ const Vector3r& pos=bXX->state->pos; memcpy(&minima[3*idXX],pos,3*sizeof(Real)); memcpy(&maxima[3*idXX],pos,3*sizeof(Real)); }
-				} else { memset(&minima[3*idXX],0,3*sizeof(Real)); memset(&maxima[3*idXX],0,3*sizeof(Real)); }
-			}
+		for(long i=0; i<2*nBodies; i++){
+			for(int j=0; j<3; j++){
+				VecBounds& BBj=BB[j];
+				const body_id_t id=BBj[i].id;
+				const shared_ptr<Body>& b=Body::byId(id,rb);
+				if(b){
+					const shared_ptr<BoundingVolume>& bv=b->boundingVolume;
+					// coordinate is min/max if has bounding volume, otherwise both are the position. Add periodic shift so that we are inside the cell
+					// watch out for the parentheses around ?: within ?: (there was unwanted conversion of the Reals to bools!)
+					BBj[i].coord=((BBj[i].flags.hasBB=((bool)bv)) ? (BBj[i].flags.isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
+				} else { BBj[i].flags.hasBB=false; /* for vanished body, keep the coordinate as-is, to minimize inversions. */ }
+				// if initializing periodic, shift coords & record the period into BBj[i].period
+				if(doInitSort && periodic) BBj[i].coord=cellWrap(BBj[i].coord,BBj.cellMin,BBj.cellMax,BBj[i].period);
+			}	
 		}
+	// for each body, copy its minima and maxima, for quick checks of overlaps later
+	for(body_id_t id=0; id<nBodies; id++){
+		BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
+		const shared_ptr<Body>& b=Body::byId(id,rb);
+		if(b){
+			const shared_ptr<BoundingVolume>& bv=b->boundingVolume;
+			if(bv) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
+			else{ const Vector3r& pos=b->state->pos; memcpy(&minima[3*id],pos,3*sizeof(Real)); memcpy(&maxima[3*id],pos,3*sizeof(Real)); }
+		} else { memset(&minima[3*id],0,3*sizeof(Real)); memset(&maxima[3*id],0,3*sizeof(Real)); }
+	}
+
 	ISC_CHECKPOINT("copy");
 
 	// process interactions that the constitutive law asked to be erased
-		interactions->erasePending(*this,rb);
+	interactions->erasePending(*this,rb);
 	ISC_CHECKPOINT("erase");
 
 	// sort
+		// the regular case
 		if(!doInitSort && !sortThenCollide){
 			/* each inversion in insertionSort calls handleBoundInversion, which in turns may add/remove interaction */
-			insertionSort(XX,interactions,rb); insertionSort(YY,interactions,rb); insertionSort(ZZ,interactions,rb);
+			if(!periodic) for(int i=0; i<3; i++) insertionSort(BB[i],interactions,rb); 
+			else for(int i=0; i<3; i++) insertionSortPeri(BB[i],interactions,rb);
 		}
+		// create initial interactions (much slower)
 		else {
 			if(doInitSort){
-				// the initial sort is in independent in 3 dimensions, may be run in parallel
-				// it seems that there is no time gain running this in parallel, though
-				#pragma omp parallel sections
-				{
-					#pragma omp section
-						{ std::sort(XX.begin(),XX.end()); }
-					#pragma omp section
-						{ std::sort(YY.begin(),YY.end()); }
-					#pragma omp section
-						{ std::sort(ZZ.begin(),ZZ.end()); }
-				}
+				// the initial sort is in independent in 3 dimensions, may be run in parallel; it seems that there is no time gain running in parallel, though
+				for(int i=0; i<3; i++) 	std::sort(BB[i].vec.begin(),BB[i].vec.end());
 			} else { // sortThenCollide
-				insertionSort(XX,interactions,rb,false); insertionSort(YY,interactions,rb,false); insertionSort(ZZ,interactions,rb,false);
+				if(!periodic) for(int i=0; i<3; i++) insertionSort(BB[i],interactions,rb,false);
+				else for(int i=0; i<3; i++) insertionSortPeri(BB[i],interactions,rb,false);
 			}
 			// traverse the container along requested axis
 			assert(sortAxis==0 || sortAxis==1 || sortAxis==2);
-			vector<Bound>& V=(sortAxis==0?XX:(sortAxis==1?YY:ZZ));
+			VecBounds& V=BB[sortAxis];
 			// go through potential aabb collisions, create interactions as necessary
-			for(size_t i=0; i<2*nBodies; i++){
-				// start from the lower bound
-				// skip bodies without bbox since we would possibly never meet the upper bound again (std::sort may not be stable) and we don't want to collide those anyway
-				if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
-				const body_id_t& iid=V[i].id;
-				/* NOTE: no longer applicable, since operator< behaves specially for same ids and coords
-					NOTE: reported in https://bugs.launchpad.net/yade/+bug/402098
-					NOTE: remove next comment once the operator< solutions is verified to work
-
-				
-					If std::sort swaps equal min/max bounds, there are 2 cases distinct cases to handle:
-
-					1. i is inside V, j gets to the end of V (since it loops till the maxbound is found)
-						here, we swap min/max to get the in the right order and continue with the loop over i;
-						next time this j-bound is handled (with a different i, for sure), it will be OK.
-					2. i is at the end of V, therefore (j=i+1)==2*nBodies, therefore V[j] doesn't exist (past the end)
-						here, we can just check for that and break the loop if it happens.
-						It is the last i that we process, nothing will come after.
-
-					NOTE: XX,YY,ZZ containers don't guarantee that i_min<i_max. This is needed only here and is
-						handled only for the sortAxis. Functionality-wise, this has no impact on further collision
-						detection, though.
-				*/
-				// TRVAR3(i,iid,V[i].coord);
-				// go up until we meet the upper bound
-				for(size_t j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
-					const body_id_t& jid=V[j].id;
-					/// Not sure why this doesn't work. If this condition is commented out, we have exact same interactions as from SpatialQuickSort. Otherwise some interactions are missing!
-					// skip bodies with smaller (arbitrary, could be greater as well) id, since they will detect us when their turn comes
-					//if(jid<iid) { /* LOG_TRACE("Skip #"<<V[j].id<<(V[j].flags.isMin?"(min)":"(max)")<<" with "<<iid<<" (smaller id)"); */ continue; }
-					// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
-					if(!V[j].flags.isMin) continue;
-					/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
-					handleBoundInversion(iid,jid,interactions,rb);
-					// no longer applicable since operator< gives minimum as smaller in case of same id and same coords
-					#if 0
-						// now we are at the last element, but we still have not met the upper bound of V[i].id
-						// that means that the upper bound is before the upper one; that can only happen if they
-						// are equal and the unstable std::sort has swapped them. In that case, we need to go reverse
-						// from V[i] until we meet the upper bound and swap the isMin flag
-						if(j==2*nBodies-1){ /* handle case 1. of swapped min/max */
-							size_t k=i-1;
-							while(V[k].id!=iid && k>0) k--;
-							assert(V[k].id==iid); // if this fails, we didn't meet the other bound in the downwards sense either; that should never happen
-							assert(!V[k].flags.isMin); // the lower bound should be maximum in this (exceptional) case; we will fix that now
-							V[k].flags.isMin=true; V[i].flags.isMin=false;
-							LOG_DEBUG("Swapping coincident min/max of #"<<iid<<" at positions "<<k<<" and "<<i<<" (coords: "<<V[k].coord<<" and "<<V[i].coord<<")");
-							break; // would happen anyways
-						}
-					#endif
-					assert(j<2*nBodies-1);
+			if(!periodic){
+				for(long i=0; i<2*nBodies; i++){
+					// start from the lower bound (i.e. skipping upper bounds)
+					// skip bodies without bbox, because they don't collide
+					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
+					const body_id_t& iid=V[i].id;
+					// go up until we meet the upper bound
+					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
+						const body_id_t& jid=V[j].id;
+						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
+						if(!V[j].flags.isMin) continue;
+						/* abuse the same function here; since it does spatial overlap check first, it is OK to use it */
+						handleBoundInversion(iid,jid,interactions,rb);
+						assert(j<2*nBodies-1);
+					}
+				}
+			} else { // periodic case: see comments above
+				for(long i=0; i<2*nBodies; i++){
+					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
+					const body_id_t& iid=V[i].id;
+					long cnt=0;
+					// we might wrap over the periodi boundary here; that's why the condition is difference from the aperiodic case
+					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
+						const body_id_t& jid=V[j].id;
+						if(!V[j].flags.isMin) continue;
+						handleBoundInversionPeri(iid,jid,interactions,rb);
+						if(cnt++>2*(long)nBodies){ LOG_FATAL("Uninterrupted loop in the initial sort?"); throw std::logic_error("loop??"); }
+					}
 				}
 			}
 		}
 	ISC_CHECKPOINT("sort&collide");
 }
 
+
+// return floating value wrapped between x0 and x1 and saving period number to period
+Real InsertionSortCollider::cellWrap(const Real x, const Real x0, const Real x1, int& period){
+	Real xNorm=(x-x0)/(x1-x0);
+	period=(int)floor(xNorm); // some people say this is very slow; probably optimized by gcc, however (google suggests)
+	return x0+(xNorm-period)*(x1-x0);
+}
+
+// return coordinate wrapped to x0…x1, relative to x0; don't care about period
+Real InsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real x1){
+	Real xNorm=(x-x0)/(x1-x0);
+	return (xNorm-floor(xNorm))*(x1-x0);
+}
+
+void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer* interactions, MetaBody*rb, bool doCollide){
+	assert(periodic);
+	long &loIdx=v.loIdx; const long &size=v.size;
+	for(long _i=0; _i<size; _i++){
+		const long i=v.norm(_i);
+		const long i_1=v.norm(i-1);
+		//switch period of (i) if the coord is below the lower edge cooridnate-wise and just above the split
+		if(i==loIdx && v[i].coord<v.cellMin){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+		// coordinate of v[i] used to check inversions
+		// if crossing the split, adjust by cellDim;
+		// if we get below the loIdx however, the v[i].coord will have been adjusted already, no need to do that here
+		const Real iCmpCoord=v[i].coord+(i==loIdx ? v.cellDim : 0); 
+		// no inversion
+		if(v[i_1].coord<=iCmpCoord) continue;
+		// vi is the copy that will travel down the list, while other elts go up
+		// if will be placed in the list only at the end, to avoid extra copying
+		int j=i_1; Bound vi=v[i];  const bool viHasBB=vi.flags.hasBB;
+		while(v[j].coord>vi.coord + /* wrap for elt just below split */ (v.norm(j+1)==loIdx ? v.cellDim : 0)){
+			long j1=v.norm(j+1);
+			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
+			// this can happen without any side-effects
+			if (false && v[j].coord>v.cellMax+v.cellDim){
+				// this condition is not strictly necessary, but the loop of insertionSort would have to run more times.
+				// Since size of particle is required to be < .5*cellDim, this would mean simulation explosion anyway
+				LOG_FATAL("Body #"<<v[j].id<<" going faster than 1 cell in one step? Not handled.");
+				throw runtime_error(__FILE__ ": body mmoving too fast (skipped 1 cell).");
+			}
+			Bound& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
+			vNew=v[j];
+			// inversions close the the split need special care
+			if(j==loIdx && vi.coord<v.cellMin) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
+			if(doCollide && viHasBB && v[j].flags.hasBB){
+				if(vi.id==vNew.id){ // BUG!!
+					LOG_FATAL("Inversion of body's #"<<vi.id<<" boundary with its other boundary, "<<v[j].coord<<" meets "<<vi.coord);
+					throw runtime_error(__FILE__ ": Body's boundary metting its opposite boundary.");
+				}
+				handleBoundInversionPeri(vi.id,vNew.id,interactions,rb);
+			}
+			j=v.norm(j-1);
+		}
+		v[v.norm(j+1)]=vi;
+	}
+}
+
+// called by the insertion sort if 2 bodies swapped their bounds
+void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id2, InteractionContainer* interactions, MetaBody* rb){
+	assert(periodic);
+	// do bboxes overlap in all 3 dimensions?
+	Vector3<int> periods;
+	bool overlap=spatialOverlapPeri(id1,id2,rb,periods);
+	// existing interaction?
+	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
+	bool hasInter=(bool)I;
+	#ifdef PISC_DEBUG
+		if(watchIds(id1,id2)) LOG_INFO("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
+	#endif
+	// interaction doesn't exist and shouldn't, or it exists and should
+	if(!overlap && !hasInter) return;
+	if(overlap && hasInter){  return; }
+	// create interaction if not yet existing
+	if(overlap && !hasInter){ // second condition only for readability
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)) LOG_INFO("Attemtping collision of #"<<id1<<"+#"<<id2);
+		#endif
+		if(!Collider::mayCollide(Body::byId(id1,rb).get(),Body::byId(id2,rb).get())) return;
+		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
+		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
+		newI->cellDist=periods;
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)) LOG_INFO("Created intr #"<<id1<<"+#"<<id2<<", periods="<<periods);
+		#endif
+		interactions->insert(newI);
+		return;
+	}
+	if(!overlap && hasInter){ if(!I->isReal()) interactions->erase(id1,id2); return; }
+	assert(false); // unreachable
+}
+
+/* Performance hint
+	================
+
+	Since this function is called (most the time) from insertionSort,
+	we actually already know what is the overlap status in that one dimension, including
+	periodicity information; both values could be passed down as a parameters, avoiding 1 of 3 loops here.
+	We do some floats math here, so the speedup could noticeable; doesn't concertn the non-periodic variant,
+	where it is only plain comparisons taking place.
+
+	In the same way, handleBoundInversion is passed only id1 and id2, but again insertionSort already knows in which sense
+	the inversion happens; if the boundaries get apart (min getting up over max), it wouldn't have to check for overlap
+	at all, for instance.
+*/
+//! return true if bodies bb overlap in all 3 dimensions
+bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,MetaBody* rb, Vector3<int>& periods) const {
+	assert(periodic);
+	assert(id1!=id2); // programming error, or weird bodies (too large?)
+	for(int axis=0; axis<3; axis++){
+		Real dim=rb->cellMax[axis]-rb->cellMin[axis];
+		// too big bodies in interaction
+		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
+		// find body of which when taken as period start will make the gap smaller
+		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
+		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
+		#ifdef PISC_DEBUG
+		if(watchIds(id1,id2)){
+			TRVAR3(id1,id2,axis);
+			TRVAR4(minima[3*id1+axis],maxima[3*id1+axis],minima[3*id2+axis],maxima[3*id2+axis]);
+			TRVAR2(cellWrapRel(m1,m2,m2+dim),cellWrapRel(m2,m1,m1+dim));
+			TRVAR3(m1,m2,wMn);
+		}
+		#endif
+		int pmn1,pmx1,pmn2,pmx2;
+		Real mn1=cellWrap(minima[3*id1+axis],wMn,wMn+dim,pmn1), mx1=cellWrap(maxima[3*id1+axis],wMn,wMn+dim,pmx1);
+		Real mn2=cellWrap(minima[3*id2+axis],wMn,wMn+dim,pmn2), mx2=cellWrap(maxima[3*id2+axis],wMn,wMn+dim,pmx2);
+		#ifdef PISC_DEBUG
+			if(watchIds(id1,id2)){
+				TRVAR4(mn1,mx1,mn2,mx2);
+				TRVAR4(pmn1,pmx1,pmn2,pmx2);
+			}
+		#endif
+		if((pmn1!=pmx1) || (pmn2!=pmx2)){
+			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=mn1?mx1:mx2)<<")");
+			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
+		}
+		periods[axis]=(int)(pmn1-pmn2);
+		if(!(mn1<=mx2 && mx1 >= mn2)) return false;
+	}
+	#ifdef PISC_DEBUG
+		if(watchIds(id1,id2)) LOG_INFO("Overlap #"<<id1<<"+#"<<id2<<", periods "<<periods);
+	#endif
+	return true;
+}
 

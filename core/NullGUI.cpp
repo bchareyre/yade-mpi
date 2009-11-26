@@ -168,8 +168,6 @@ int NullGUI::loop()
 	while(1)
 	{
 		Omega::instance().getRootBody()->moveToNextTimeStep();
-		Omega::instance().incrementCurrentIteration();
-		Omega::instance().incrementSimulationTime();
 
 		if(Omega::instance().getCurrentIteration() % interval == 0 )
 		{

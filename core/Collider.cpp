@@ -39,9 +39,6 @@ bool Collider::handleExistingInteraction(Interaction* I){
 }
 bool Collider::mayCollide(const Body* b1, const Body* b2){
 	return 
-		// not yet implemented: only collide if at least one of the bodies is not shadow
-		// ((!b1->isShadow()) || (!b2->isShadow())) &&
-		
 		// only collide if at least one particle is standalone or they belong to different clumps
 		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) &&
 		 // do not collide clumps, since they are just containers, never interact

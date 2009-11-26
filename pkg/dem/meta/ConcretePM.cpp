@@ -4,7 +4,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-YADE_PLUGIN((CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(CpmGlobalCharacteristics)
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(CpmGlobalCharacteristics)
 	#ifdef YADE_OPENGL
 		(GLDrawCpmPhys)
 	#endif	
@@ -21,11 +21,11 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
 	assert(contGeom);
 
-	const shared_ptr<CpmMat>& elast1=YADE_PTR_CAST<CpmMat>(pp1);
-	const shared_ptr<CpmMat>& elast2=YADE_PTR_CAST<CpmMat>(pp2);
+	const shared_ptr<CpmMat>& mat1=YADE_PTR_CAST<CpmMat>(pp1);
+	const shared_ptr<CpmMat>& mat2=YADE_PTR_CAST<CpmMat>(pp2);
 
-	Real E12=2*elast1->young*elast2->young/(elast1->young+elast2->young); // harmonic Young's modulus average
-	//Real nu12=2*elast1->poisson*elast2->poisson/(elast1->poisson+elast2->poisson); // dtto for Poisson ratio 
+	Real E12=2*mat1->young*mat2->young/(mat1->young+mat2->young); // harmonic Young's modulus average
+	//Real nu12=2*mat1->poisson*mat2->poisson/(mat1->poisson+mat2->poisson); // dtto for Poisson ratio 
 	Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
 	Real S12=Mathr::PI*pow(minRad,2); // "surface" of interaction
 	//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
@@ -37,7 +37,7 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 
 	contPhys->E=E12;
 	contPhys->G=E12*G_over_E;
-	contPhys->tanFrictionAngle=tan(.5*(elast1->frictionAngle+elast2->frictionAngle));
+	contPhys->tanFrictionAngle=tan(.5*(mat1->frictionAngle+mat2->frictionAngle));
 	contPhys->undamagedCohesion=sigmaT;
 	contPhys->crossSection=S12;
 	contPhys->epsCrackOnset=epsCrackOnset;
@@ -199,11 +199,10 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
 		if(isCohesive){
 			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
-			const shared_ptr<CpmMat>& rbp1=YADE_PTR_CAST<CpmMat>(body1->material), rbp2=YADE_PTR_CAST<CpmMat>(body2->material);
+			const shared_ptr<CpmState>& st1=YADE_PTR_CAST<CpmState>(body1->state), st2=YADE_PTR_CAST<CpmState>(body2->state);
 			// nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/
-			// FIXME: those state things must be moved outside CpmMat into something like CpmState; then the updateMutex will also work
-			{ /* boost::mutex::scoped_lock lock(rbp1->updateMutex); */ rbp1->numBrokenCohesive+=1; rbp1->epsPlBroken+=epsPlSum; }
-			{ /* boost::mutex::scoped_lock lock(rbp2->updateMutex); */ rbp2->numBrokenCohesive+=1; rbp2->epsPlBroken+=epsPlSum; }
+			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive+=1; st1->epsPlBroken+=epsPlSum; }
+			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive+=1; st2->epsPlBroken+=epsPlSum; }
 		}
 		rootBody->interactions->requestErase(I->getId1(),I->getId2());
 		return;
@@ -377,19 +376,19 @@ void CpmStateUpdater::update(MetaBody* _rootBody){
 	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
 		const body_id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
-		CpmMat* bpp=dynamic_cast<CpmMat*>(B->material.get());
-		if(!bpp) continue;
-		bpp->sigma=bodyStats[id].sigma;
-		bpp->tau=bodyStats[id].tau;
-		int cohLinksWhenever=bodyStats[id].nCohLinks+bpp->numBrokenCohesive;
+		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
+		if(!state) continue;
+		state->sigma=bodyStats[id].sigma;
+		state->tau=bodyStats[id].tau;
+		int cohLinksWhenever=bodyStats[id].nCohLinks+state->numBrokenCohesive;
 		if(cohLinksWhenever>0){
-			bpp->normDmg=(bodyStats[id].dmgSum+bpp->numBrokenCohesive)/cohLinksWhenever;
-			bpp->normEpsPl=(bodyStats[id].epsPlSum+bpp->epsPlBroken)/cohLinksWhenever;
-			if(bpp->normDmg>1){
-				LOG_WARN("#"<<id<<" normDmg="<<bpp->normDmg<<" nCohLinks="<<bodyStats[id].nCohLinks<<", numBrokenCohesive="<<bpp->numBrokenCohesive<<", dmgSum="<<bodyStats[id].dmgSum<<", numAllCohLinks"<<cohLinksWhenever);
+			state->normDmg=(bodyStats[id].dmgSum+state->numBrokenCohesive)/cohLinksWhenever;
+			state->normEpsPl=(bodyStats[id].epsPlSum+state->epsPlBroken)/cohLinksWhenever;
+			if(state->normDmg>1){
+				LOG_WARN("#"<<id<<" normDmg="<<state->normDmg<<" nCohLinks="<<bodyStats[id].nCohLinks<<", numBrokenCohesive="<<state->numBrokenCohesive<<", dmgSum="<<bodyStats[id].dmgSum<<", numAllCohLinks"<<cohLinksWhenever);
 			}
 		}
-		else { bpp->normDmg=0; bpp->normEpsPl=0;}
-		B->interactingGeometry->diffuseColor=Vector3r(bpp->normDmg,1-bpp->normDmg,B->isDynamic?0:1);
+		else { state->normDmg=0; state->normEpsPl=0;}
+		B->interactingGeometry->diffuseColor=Vector3r(state->normDmg,1-state->normDmg,B->isDynamic?0:1);
 	}
 }

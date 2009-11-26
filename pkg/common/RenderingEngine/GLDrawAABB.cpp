@@ -22,6 +22,3 @@ void GLDrawAABB::go(const shared_ptr<BoundingVolume>& bv)
 
 YADE_PLUGIN((GLDrawAABB));
 YADE_REQUIRE_FEATURE(OPENGL)
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
-

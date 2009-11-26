@@ -196,8 +196,8 @@ void ThreeDTriaxialEngine::setContactProperties(MetaBody * ncb, Real frictionDeg
 		YADE_PTR_CAST<BodyMacroParameters> (b->physicalParameters)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
 		
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end(); 
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end(); 
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if (!(*ii)->isReal()) continue;
 		const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);

@@ -71,8 +71,8 @@ void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
     }
     //iter = Omega::instance().getCurrentIteration();
 
-    InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-    InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+    InteractionContainer::iterator ii    = ncb->interactions->begin();
+    InteractionContainer::iterator iiEnd = ncb->interactions->end();
     for (  ; ii!=iiEnd ; ++ii )
     {
         //if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)

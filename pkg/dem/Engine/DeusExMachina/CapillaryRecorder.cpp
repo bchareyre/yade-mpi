@@ -68,8 +68,8 @@ static_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get())
 		Real Dintergranular = x - (R1+R2);	
 	
 	// capillary parameters
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-        InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+        InteractionContainer::iterator iiEnd = ncb->interactions->end();
         
         Real Vtotal = 0;
         Real CapillaryPressure = 0;

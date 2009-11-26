@@ -39,7 +39,7 @@ class VelocityBins;
 
 class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
-	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpRBP);
+	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState);
 	bool haveBins;
 	void accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb);
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);

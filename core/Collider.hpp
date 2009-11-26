@@ -18,9 +18,9 @@ class Collider : public StandAloneEngine
 		virtual ~Collider();
 		/*! To probe the BoundingVolume on a bodies presense.
 		 *
-		 * Returns true, if the BoundingVolume contains a bodies, otherwise it returns false.
+		 * returns list of body ids with which there is potential overlap.
 		 */
-		virtual  bool probeBoundingVolume(const BoundingVolume&){throw;}
+		virtual  vector<body_id_t> probeBoundingVolume(const BoundingVolume&){throw;}
 		/*! Tell whether given bodies may interact, for other than spatial reasons.
 		 *
 		 * Concrete collider implementations should call this function if
@@ -32,8 +32,6 @@ class Collider : public StandAloneEngine
 		 * Returns whether the interaction should be preserved (true) or deleted (false).
 		 */
 		bool handleExistingInteraction(Interaction*);
-
-		vector<body_id_t> probedBodies;
 
 	protected:
 

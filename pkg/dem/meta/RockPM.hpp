@@ -8,13 +8,12 @@ mechanical behavior of mining rocks.
 
 #pragma once
 
-#include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 
 
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
@@ -28,7 +27,7 @@ class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
 /** This class holds information associated with each body */
-class RpmMat: public BodyMacroParameters {
+class RpmMat: public GranularMat {
 	public:
 		int exampleNumber; ///<Number of "stone"
 		bool initCohesive, isDamaged;
@@ -41,15 +40,15 @@ class RpmMat: public BodyMacroParameters {
 			stressCompressMax(0), 
 			Brittleness(0), 
 			G_over_E(1) {createIndex();};
-		REGISTER_ATTRIBUTES(BodyMacroParameters, 
+		REGISTER_ATTRIBUTES(GranularMat, 
 			(exampleNumber)
 			(initCohesive)
 			(isDamaged)
 			(stressCompressMax)
 			(Brittleness)
 			(G_over_E));
-		REGISTER_CLASS_AND_BASE(RpmMat,BodyMacroParameters);
-		REGISTER_CLASS_INDEX(RpmMat,BodyMacroParameters);
+		REGISTER_CLASS_AND_BASE(RpmMat,GranularMat);
+		REGISTER_CLASS_INDEX(RpmMat,GranularMat);
 };
 REGISTER_SERIALIZABLE(RpmMat);
 
@@ -63,7 +62,7 @@ class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
 			initDistance = 0;
 		}
 
-		virtual void go(const shared_ptr<PhysicalParameters>& pp1, const shared_ptr<PhysicalParameters>& pp2, const shared_ptr<Interaction>& interaction);
+		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
 			(initDistance)
 		);

@@ -54,10 +54,10 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 	Vector3r cellSize; if(ncb->isPeriodic) cellSize=ncb->cellMax-ncb->cellMin;
 	bool removeUnseenIntrs=(ncb->interactions->iterColliderLastRun>=0 && ncb->interactions->iterColliderLastRun==ncb->currentIteration);
 	#ifdef YADE_OPENMP
-		const long size=ncb->transientInteractions->size();
+		const long size=ncb->interactions->size();
 		#pragma omp parallel for
 		for(long i=0; i<size; i++){
-			const shared_ptr<Interaction>& I=(*ncb->transientInteractions)[i];
+			const shared_ptr<Interaction>& I=(*ncb->interactions)[i];
 	#else
 		FOREACH(const shared_ptr<Interaction>& I, *ncb->interactions){
 	#endif
@@ -67,6 +67,9 @@ void InteractionGeometryMetaEngine::action(MetaBody* ncb)
 			}
 			const shared_ptr<Body>& b1=(*bodies)[I->getId1()];
 			const shared_ptr<Body>& b2=(*bodies)[I->getId2()];
+
+			if(!b1 || !b2){ LOG_DEBUG("Body #"<<(b1?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); ncb->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
+
 			bool wasReal=I->isReal();
 			if (!b1->interactingGeometry || !b2->interactingGeometry) { assert(!wasReal); continue; } // some bodies do not have interactingGeometry
 			bool geomCreated;

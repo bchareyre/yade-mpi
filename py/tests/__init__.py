@@ -4,7 +4,7 @@
 import unittest 
 
 # add any new test suites to the list here, so that they are picked up by testAll
-allTests=['wrapper',]
+allTests=['wrapper','omega']
 
 # fully qualified module names
 allTestsFQ=['yade.tests.'+test for test in allTests]

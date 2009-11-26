@@ -53,8 +53,12 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
-/* This class holds information associated with each body */
-class CpmMat: public GranularMat {
+/* Cpm state information about each body.
+
+None of that is used for computation (at least not now), only for post-processing.
+
+*/
+class CpmState: public State {
 	public:
 		//! volumetric strain around this body
 		Real epsVolumetric;
@@ -70,8 +74,20 @@ class CpmMat: public GranularMat {
 		Real normEpsPl;
 		//! stresses on the particle
 		Vector3r sigma,tau;
-		CpmMat(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) { createIndex(); density=4800; };
-		REGISTER_ATTRIBUTES(GranularMat, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
+
+	CpmState(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) { };
+	REGISTER_ATTRIBUTES(State, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
+	REGISTER_CLASS_AND_BASE(CpmState,State);
+};
+REGISTER_SERIALIZABLE(CpmState);
+
+/* This class holds information associated with each body */
+class CpmMat: public GranularMat {
+	public:
+		CpmMat() { createIndex(); density=4800; };
+		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
+		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
+		REGISTER_ATTRIBUTES(GranularMat,);
 		REGISTER_CLASS_AND_BASE(CpmMat,GranularMat);
 		REGISTER_CLASS_INDEX(CpmMat,GranularMat);
 };

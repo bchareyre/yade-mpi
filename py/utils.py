@@ -70,78 +70,117 @@ def downCast(obj,newClassName):
 	Obj should be up in the inheritance tree, otherwise some attributes may not be defined in the new class."""
 	return obj.__class__(newClassName,dict([ (key,obj[key]) for key in obj.keys() ]))
 
-bodiesMatDefaults={'density':2e3,'young':30e9,'poisson':.3,'frictionAngle':.5236}
 
-def _commonBodySetup(b,volume,geomInertia,materialClass='GranularMat',noBound=False,**matKw):
+def defaultMaterial():
+	return GranularMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
+
+def _commonBodySetup(b,volume,geomInertia,material,noBound=False):
 	"""Assign common body parameters."""
-	if 'physParamsClass' in matKw.keys(): raise RuntimeError("You as passing physParamsClass as argument, but it is no longer used. Use materialClass instead.")
-	matKw2=bodiesMatDefaults.copy(); matKw2.update(matKw)
-	b.mat=Material(materialClass)
-	b.mat.updateExistingAttrs(matKw2)
+	#if 'physParamsClass' in matKw.keys(): raise ArgumentError("You as passing physParamsClass as argument, but it is no longer used. Use material instead.")
+	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
+	if material==0 and len(O.materials)==0: O.materials.append(defaultMaterial());
+	if isinstance(material,int): b.mat=O.materials[material]
+	elif isinstance(material,string): b.mat=O.materials[material]
+	elif isinstance(material,Material): b.mat=material
+	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
+	## resets state (!!)
+	b.state=b.mat.newAssocState()
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,**matKw):
-	"""Create default sphere, with given parameters. Physical properties such as mass and inertia are calculated automatically."""
-	b=Body()
-	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.state.pos=b.state.refPos=center
-	V=(4./3)*math.pi*radius**3
-	geomInert=(2./5.)*V*radius**2
-	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),**matKw)
-	b['isDynamic']=dynamic
-	return b
+def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):
+	"""Create sphere with given parameters; mass and inertia computed automatically.
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,**matKw):
-	"""Create default box (cuboid), with given parameters. Physical properties such as mass and inertia are calculated automatically."""
-	b=Body()
-	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.state.pos=b.state.refPos=center
-	V=8*extents[0]*extents[1]*extents[2]
-	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
-	_commonBodySetup(b,V,geomInert,**matKw)
-	b['isDynamic']=dynamic
-	return b
-
-def wall(position,axis,sense=0,color=None,**matKw):
-	"""Return ready-made wall body.
-
-	:param position: float or Vector3 specifying center of the wall. If float, it is the position along given axis, the other 2 components being zero
-	:param axis: orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
-	:param sense: sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
-	:return: Body instance
-
-	.. note: GeometricalModel is not set.
+	:Parameters:
+		`center`: Vector3
+			center
+		`radius`: float
+			radius
+		`color`: Vector3 or None
+			random color will be assigned if None
+		`material`: int or string or Material instance
+			if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0].
 	"""
 	b=Body()
+	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	V=(4./3)*math.pi*radius**3
+	geomInert=(2./5.)*V*radius**2
+	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
+	b.state.pos=b.state.refPos=center
+	b.dynamic=dynamic
+	return b
+
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=0):
+	"""Create box (cuboid) with given parameters.
+
+	:Parameters:
+		`extents`: Vector3
+			half-sizes along x,y,z axes
+	
+	See utils.sphere's documentation for meaning of other parameters."""
+	b=Body()
+	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	V=8*extents[0]*extents[1]*extents[2]
+	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
+	_commonBodySetup(b,V,geomInert,material)
+	b.state.pos=b.state.refPos=center
+	b.dynamic=dynamic
+	return b
+
+def wall(position,axis,sense=0,color=None,material=0):
+	"""Return ready-made wall body.
+
+	:Parameters:
+		`position`: float or Vector3
+			center of the wall. If float, it is the position along given axis, the other 2 components being zero
+		`axis`: ∈{0,1,2}
+			orientation of the wall normal (0,1,2) for x,y,z (sc. planes yz, xz, xy)
+		`sense`: ∈{-1,0,1}
+			sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
+
+	See utils.sphere's documentation for meaning of other parameters."""
+	b=Body()
 	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
+	_commonBodySetup(b,0,Vector3(0,0,0),material)
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
 	else: pos2=position
 	b.pos=b.refPos=pos2
-	_commonBodySetup(b,0,Vector3(0,0,0),**matKw)
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,**matKw):
-	"""Create default facet with given parameters. Vertices are given as sequence of 3 3-tuple and they, all in global coordinates."""
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,material=0):
+	"""Create facet with given parameters.
+
+	:Parameters:
+		`vertices`: [Vector3,Vector3,Vector3]
+			coordinates of vertices in the global coordinate system.
+		`noBoundingVolume`: do not assign Body().bound
+	
+	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
 	if not color: color=randomColor()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.state.pos=b.state.refPos=center
 	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.mold['vertices']=vertices
 	b.mold.postProcessAttributes(True)
-	_commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,**matKw)
-	b['isDynamic']=dynamic
+	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBoundingVolume)
+	b.state.pos=b.state.refPos=center
+	b.dynamic=dynamic
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
-	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation. wallMask determines which walls will be created,
-	in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls.
-	Remaining **kw arguments are passed to utils.facet. The facets are oriented outwards from the box."""
+	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
+
+	:Parameters:
+		`wallMask`: bitmask
+			 determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32).
+			 The numbers are ANDed; the default 63 means to create all walls.
+
+	Remaining **kw arguments are passed to utils.facet.
+	The facets are oriented outwards from the box."""
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
 		return [facet((a,b,c),**kw),facet((a,c,d),**kw)]
@@ -166,7 +205,7 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
-	"""return 6 walls that will wrap existing packing;
+	"""Return 6 boxes that will wrap existing packing as walls from all sides;
 	extrema are extremal points of the AABB of the packing (will be calculated if not specified)
 	thickness is wall thickness (will be 1/10 of the X-dimension if not specified)
 	Walls will be enlarged in their plane by oversizeFactor.
@@ -230,24 +269,6 @@ def randomizeColors(onlyDynamic=False):
 		if b['isDynamic'] or not onlyDynamic: b.mold['diffuseColor']=color
 
 
-def spheresFromFile(filename,scale=1.,wenjieFormat=False,**kw):
-	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
-
-	filename is the file holding ASCII numbers (at least 4 colums that hold x_center, y_center, z_center, radius).
-	All remaining arguments are passed the the yade.utils.sphere function that creates the bodies.
-
-	wenjieFormat will skip all lines that have exactly 5 numbers and where the 4th one is exactly 1.0 -
-	this was used by a fellow developer called Wenjie to mark box elements.
-	
-	Returns list of body ids that were inserted into simulation."""
-	o=Omega()
-	ret=[]
-	for l in open(filename):
-		ss=[float(i) for i in l.split()]
-		if wenjieFormat and len(ss)==5 and ss[4]==1.0: continue
-		id=o.bodies.append(sphere([scale*ss[0],scale*ss[1],scale*ss[2]],scale*ss[3],**kw))
-		ret.append(id)
-	return ret
 
 def spheresToFile(filename,consider=lambda id: True):
 	"""Save sphere coordinates into ASCII file; the format of the line is: x y z r.
@@ -300,94 +321,9 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 		pylab.ylabel('Body count')
 	pylab.show()
 
-def import_stl_geometry(file, dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False, **matKw):
-	""" Import geometry from stl file, create facets and return list of their ids."""
-	imp = STLImporter()
-	imp.open(file)
-	begin=len(O.bodies)
-	imp.import_geometry(O.bodies)
-	imported=range(begin,begin+imp.number_of_facets)
-	for i in imported:
-		b=O.bodies[i]
-		b['isDynamic']=dynamic
-		b.mold.postProcessAttributes(True)
-		b.mold['diffuseColor']=color if color else randomColor()
-		b.mold['wire']=wire
-		b.mold['highlight']=highlight
-		_commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,**matKw)
-	return imported
 
 
-def import_mesh_geometry(meshfile="file.mesh",**kw):
-	""" Imports geometry from mesh file and creates facets.
-	Remaining **kw arguments are passed to utils.facet; 
-	mesh files can be easily created with GMSH http://www.geuz.org/gmsh/
-	Example added to scripts/test/regular-sphere-pack.py"""
-	infile = open(meshfile,"r")
-	lines = infile.readlines()
-	infile.close()
 
-	nodelistVector3=[]
-	numNodes = int(lines[4].split()[0])
-	for i in range(numNodes):
-		nodelistVector3.append(Vector3(0.0,0.0,0.0))
-	id = 0
-	for line in lines[5:numNodes+5]:
-		data = line.split()
-		X = float(data[0])
-		Y = float(data[1])
-		Z = float(data[2])
-		nodelistVector3[id] = Vector3(X,Y,Z)
-		id += 1
-	numTriangles = int(lines[numNodes+6].split()[0])
-	triList = []
-	for i in range(numTriangles):
-		triList.append([0,0,0,0])
-	 
-	tid = 0
-	for line in lines[numNodes+7:numNodes+7+numTriangles]:
-		data = line.split()
-		id1 = int(data[0])-1
-		id2 = int(data[1])-1
-		id3 = int(data[2])-1
-		triList[tid][0] = tid
-		triList[tid][1] = id1
-		triList[tid][2] = id2
-		triList[tid][3] = id3
-		tid += 1
-		ret=[]
-	for i in triList:
-		a=nodelistVector3[i[1]]
-		b=nodelistVector3[i[2]]
-		c=nodelistVector3[i[3]]
-		ret.append(facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
-	return ret
-
-def import_LSMGenGeo_geometry(fileName="file.geo",moveTo=[0.0,0.0,0.0],**kw):
-	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
-	moveTo[X,Y,Z] parameter moves the specimen.
-	Remaining **kw arguments are passed to utils.sphere; 
-	
-	LSMGenGeo library allows to create pack of spheres
-	with given [Rmin:Rmax] with null stress inside the specimen.
-	Can be usefull for Mining Rock simulation.
-	
-	Example added to scripts/test/regular-sphere-pack.py
-	Example of LSMGenGeo library using is added to genCylLSM.py
-	
-  http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
-	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
-
-	infile = open(fileName,"r")
-	lines = infile.readlines()
-	infile.close()
-
-	numSpheres = int(lines[6].split()[0])
-	ret=[]
-	for line in lines[7:numSpheres+7]:
-		data = line.split()
-		ret.append(sphere([moveTo[0]+float(data[0]),moveTo[1]+float(data[1]),moveTo[2]+float(data[2])],float(data[3]),**kw))
-	return ret
 
 def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	"""Create .ogg video from external image files.
@@ -502,21 +438,6 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	dictParams.update(dictDefaults); saveVars('table',**dictParams)
 	return len(tagsParams)
 
-def ColorizedVelocityFilter(isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Velocity, m/s'):
-    f = DeusExMachina('ColorizedVelocityFilter',isFilterActivated=isFilterActivated,autoScale=autoScale,minValue=minValue,maxValue=maxValue,posX=posX,posY=posY,width=width,height=height,title=title)
-    O.engines+=[f]
-    return f
-
-def ColorizedTimeFilter(point=[0,0,0],normal=[0,1,0],isFilterActivated=True,autoScale=True,minValue=0,maxValue=0,posX=0,posY=0.2,width=0.05,height=0.5,title='Time, m/s'):
-    f = DeusExMachina('ColorizedTimeFilter',point=point,normal=normal,isFilterActivated=isFilterActivated,autoScale=autoScale,minValue=minValue,maxValue=maxValue,posX=posX,posY=posY,width=width,height=height,title=title)
-    O.engines+=[f]
-    return f
-
-def PythonRunnerFilter(command='pass',isFilterActivated=True):
-    f = DeusExMachina('PythonRunnerFilter',command=command,isFilterActivated=isFilterActivated)
-    O.engines+=[f]
-    return f
-
 def replaceCollider(colliderEngine):
 	"""Replaces collider (Collider) engine with the engine supplied. Raises error if no collider is in engines."""
 	colliderIdx=-1
@@ -526,7 +447,6 @@ def replaceCollider(colliderEngine):
 			break
 	if colliderIdx<0: raise RuntimeError("No Collider found within O.engines.")
 	O.engines=O.engines[:colliderIdx]+[colliderEngine]+O.engines[colliderIdx+1:]
-
 
 def procStatus(name):
 	import os
@@ -577,3 +497,27 @@ def xMirror(half):
 	If the last point's x coord is zero, it will not be duplicated."""
 	return list(half)+[(x,-y) for x,y in reversed(half[:-1] if half[-1][0]==0 else half)]
 
+#############################
+##### deprecated functions
+
+
+def _deprecatedUtilsFunction(old,new):
+	import warnings
+	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category='DeprecationWarning')
+
+def spheresFromFile(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.text')
+	import yade.ymport
+	return yade.ymport.text(*args,**kw)
+def import_stl_geometry(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.stl')
+	import yade.ymport
+	return yade.ymport.stl(*args,**kw)
+def import_mesh_geometry(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.gmsh')
+	import yade.ymport
+	return yade.ymport.stl(*args,**kw)
+def import_LSMGenGeo_geometry(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'yade.import.gengeo')
+	import yade.ymport
+	return yade.ymport.gengeo(*args,**kw)

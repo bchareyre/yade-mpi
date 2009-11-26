@@ -73,8 +73,8 @@ void ForceSnapshot::action(MetaBody * ncb)
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r pos(Vector3r::ZERO);	// which will be the position (of the center) of the considered body
 
-	InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-	InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 
 	for( ;ii!=iiEnd;++ii)
 	{

@@ -3,14 +3,14 @@ from yade import pack,log,timing
 p=pack.SpherePack()
 p.makeCloud(O.periodicCell[0],O.periodicCell[1],1,.5,700,True)
 for sph in p:
-	O.bodies.append(utils.sphere(sph[0],sph[1],density=1000,dynamic=True))
+	O.bodies.append(utils.sphere(sph[0],sph[1]))
 
 #log.setLevel("PeriIsoCompressor",log.TRACE)
 O.timingEnabled=True
 O.engines=[
 	BexResetter(),
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(),MetaInteractingGeometry2AABB()]),
-	PeriodicInsertionSortCollider(),
+	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom()],
 		[SimpleElasticRelationships()],

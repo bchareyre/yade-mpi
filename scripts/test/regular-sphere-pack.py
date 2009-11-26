@@ -1,4 +1,4 @@
-from yade import pack
+from yade import pack,ymport
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -15,18 +15,23 @@ has sphere taken off at the back and also a notch) and the body (with cylidrical
 """
 
 rad,gap=.15,.02
-rho=1e3
-kw={'density':rho,'frictionAngle':.1}
+
+#Add material
+O.materials.append(GranularMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3))
+
+#Parameters, which will be passed into spheres and facets creators
+kw={'material':0}
+kwBoxes={'color':[1,0,0],'wire':False,'dynamic':False,'material':0}
+kwMeshes={'color':[1,1,0],'wire':True,'dynamic':False,'material':0}
 
 O.bodies.append(
 	pack.regularHexa(
 		(pack.inSphere((0,0,4),2)-pack.inSphere((0,-2,5),2)) & pack.notInNotch(centerPoint=(0,0,4),edge=(0,1,0),normal=(-1,1,-1),aperture=.2)
-		,radius=rad,gap=gap,color=(0,1,0),density=10*rho
-	) # head
-	+[utils.sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),density=rho),utils.sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),density=rho),utils.sphere((0,2.4,4),radius=.4,color=(1,0,0),density=rho)] # eyes and nose
-	+[utils.facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)] # ground
-	+pack.regularHexa(pack.inCylinder((-1,2.2,3.3),(1,2.2,3.3),2*rad),radius=rad,gap=gap/3,color=(0.929,0.412,0.412),density=10*rho) #mouth
+		,radius=rad,gap=gap,color=(0,1,0),material=0) # head
+	+[utils.sphere((.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),utils.sphere((-.8,1.9,5),radius=.2,color=(.6,.6,.6),material=0),utils.sphere((0,2.4,4),radius=.4,color=(1,0,0),material=0)] # eyes and nose
+	+pack.regularHexa(pack.inCylinder((-1,2.2,3.3),(1,2.2,3.3),2*rad),radius=rad,gap=gap/3,color=(0.929,0.412,0.412),material=0) #mouth
 )
+groundId=O.bodies.append(utils.facet([(12,0,-6),(0,12,-6,),(-12,-12,-6)],dynamic=False)) # ground
 
 for part in [
 	pack.regularHexa (
@@ -39,7 +44,7 @@ for part in [
 	]: O.bodies.appendClumped(part)
 
 
-kwBoxes={'frictionAngle':0.5,'color':[1,0,0],'wire':False,'dynamic':False}
+
 q1 = Quaternion(Vector3(0,0,1),(3.14159/3))
 o1,o_angl = q1.ToAxisAngle()
 O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
@@ -52,11 +57,10 @@ O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o
 
 
 """Import regular-sphere-pack.mesh into the YADE simulation"""
-kwMeshes={'frictionAngle':0.5,'color':[1,1,0],'wire':True,'dynamic':False}
-O.bodies.append(utils.import_mesh_geometry('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
+O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
-"""Import regular-sphere-pack-LSMGegGeo.geo into the YADE simulation"""
-O.bodies.append(utils.import_LSMGenGeo_geometry('regular-sphere-pack-LSMGegGeo.geo',moveTo=[-7.0,-7.0,-5.9],color=(1,0,1),**kw))
+"""Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation"""
+O.bodies.append(ymport.gengeo('regular-sphere-pack-LSMGenGeo.geo',moveTo=[-7.0,-7.0,-5.9],scale=1.0,color=(1,0,1),**kw))
 
 
 try:
@@ -77,6 +81,11 @@ O.engines=[
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
 	NewtonsDampedLaw(damping=.1)
 ]
-# we don't care about physical accuracy here, over-critical step is fine as long as the simulation doesn't explode
-O.dt=3*utils.PWaveTimeStep()
+# we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
+O.dt=utils.PWaveTimeStep()
 O.saveTmp()
+O.timingEnabled=True
+O.run(10000,True)
+from yade import timing
+timing.stats()
+quit()

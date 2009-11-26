@@ -150,9 +150,9 @@ void VTKRecorder::action(MetaBody* rootBody)
 					spheresVelocity->InsertNextTupleValue((float*)(&b->state->vel));
 				}
 				if (recActive[REC_CPM]) {
-					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmMat>(b->material)->normDmg);
-					const Vector3r& ss=YADE_PTR_CAST<CpmMat>(b->material)->sigma;
-					const Vector3r& tt=YADE_PTR_CAST<CpmMat>(b->material)->tau;
+					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
+					const Vector3r& ss=YADE_PTR_CAST<CpmState>(b->state)->sigma;
+					const Vector3r& tt=YADE_PTR_CAST<CpmState>(b->state)->tau;
 					float s[3]={ss[0],ss[1],ss[2]};
 					float t[3]={tt[0],tt[1],tt[2]};
 					cpmSigma->InsertNextTupleValue(s);

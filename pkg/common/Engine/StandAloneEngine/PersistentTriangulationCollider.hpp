@@ -53,7 +53,7 @@ class PersistentTriangulationCollider : public Collider
 		};
 
 	protected :
-		/// number of potential transientInteractions = number of interacting AABB
+		/// number of potential interactions = number of interacting AABB
 		int nbPotentialInteractions;
 
 		/// number of AABB
@@ -70,7 +70,7 @@ class PersistentTriangulationCollider : public Collider
 
 		// collection of AABB that are in interaction
 		//protected : vector< set<unsigned int> > overlappingBB;
-		shared_ptr<InteractionContainer> transientInteractions;
+		shared_ptr<InteractionContainer> interactions;
 		/// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
 		vector<Real> maxima;
 
@@ -103,7 +103,7 @@ class PersistentTriangulationCollider : public Collider
 
 		virtual ~PersistentTriangulationCollider();
 
-		/// return a list "transientInteractions" of pairs of Body which Bounding volume are in potential interaction
+		/// return a list "interactions" of pairs of Body which Bounding volume are in potential interaction
 		void action(MetaBody *);
 
 		//! When creating transient interaction, look first if a persistent link between the pair in question exists; in that case, skip it.

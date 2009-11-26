@@ -22,6 +22,7 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 			]),
 		env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
 		env.File('utils.py'),
+		env.File('ymport.py'),
 		env.File('eudoxos.py'),
 		env.File('plot.py'),
 		env.File('linterpolation.py'),
@@ -34,7 +35,8 @@ if 'YADE_PYTHON' in env['CPPDEFINES']:
 	])
 	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
 		env.File('__init__.py','tests'),
-		env.File('wrapper.py','tests')
+		env.File('wrapper.py','tests'),
+		env.File('omega.py','tests')
 	])
 
 	# 3rd party modules:

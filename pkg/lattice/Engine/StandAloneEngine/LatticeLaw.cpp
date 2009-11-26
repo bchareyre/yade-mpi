@@ -609,7 +609,7 @@ if(tension_compression_different_stiffness)
 		beam->nonLocalDivisor = 0.0;
 	}
 
-        //if (lattice->transientInteractions->size() != 0) // calculate non-local strain of beams
+        //if (lattice->interactions->size() != 0) // calculate non-local strain of beams
         if ( nonlocal ) // calculate non-local strain of beams
 	{
 		unsigned long int counter = 0;

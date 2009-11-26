@@ -27,7 +27,6 @@ CREATE_LOGGER(UniaxialStrainerGen);
 bool UniaxialStrainerGen::generate(){
 	message="";
 	rootBody=Shop::rootBody();
-	//Shop::rootBodyActors(rootBody);
 	createEngines();
 	shared_ptr<UniaxialStrainer> strainer(new UniaxialStrainer);
 	rootBody->engines.push_back(strainer); // updating params later

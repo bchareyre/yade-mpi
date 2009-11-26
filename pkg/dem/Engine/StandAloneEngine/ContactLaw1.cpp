@@ -35,8 +35,8 @@ void ContactLaw1::action(MetaBody* ncb)
 
     Real dt = Omega::instance().getTimeStep();
 
-    InteractionContainer::iterator ii    = ncb->transientInteractions->begin();
-    InteractionContainer::iterator iiEnd = ncb->transientInteractions->end();
+    InteractionContainer::iterator ii    = ncb->interactions->begin();
+    InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	int nbreInteracTot=0;
 	int nbreInteracMomPlastif=0;
     for (  ; ii!=iiEnd ; ++ii )

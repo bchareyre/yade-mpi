@@ -129,17 +129,33 @@ class RenderingEngine;
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
 #endif
 
+/*
+Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
+However, it will not skip removed bodies automatically, hence this iterator which does just that.
+*/
+class pyBodyIterator{
+	BodyContainer::iterator I, Iend;
+	public:
+	pyBodyIterator(const shared_ptr<BodyContainer>& bc){ I=bc->begin(); Iend=bc->end(); }
+	pyBodyIterator pyIter(){return *this;}
+	shared_ptr<Body> pyNext(){
+		BodyContainer::iterator ret;
+		while(I!=Iend){ ret=I; ++I; if(*ret) return *ret; }
+		PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); /* never reached, but makes the compiler happier */ throw;
+	}
+};
 
 class pyBodyContainer{
 	public:
 	const shared_ptr<BodyContainer> proxee;
+	pyBodyIterator pyIter(){return pyBodyIterator(proxee);}
 	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
 	shared_ptr<Body> pyGetitem(body_id_t id){
 		if((size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
 		else return (*proxee)[id];
 	}
-	body_id_t insert(shared_ptr<Body> b){ return proxee->insert(b); }
-	vector<body_id_t> insertList(vector<shared_ptr<Body> > bb){
+	body_id_t append(shared_ptr<Body> b){ return proxee->insert(b); }
+	vector<body_id_t> appendList(vector<shared_ptr<Body> > bb){
 		/* prevent crash when adding lots of bodies (not clear why it happens exactly, bt is like this:
 
 			#3  <signal handler called>
@@ -159,10 +175,10 @@ class pyBodyContainer{
 		#else
 			boost::mutex::scoped_lock lock(Omega::instance().renderMutex);
 		#endif
-		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(insert(b));} return ret;
+		vector<body_id_t> ret; FOREACH(shared_ptr<Body>& b, bb){ret.push_back(append(b));} return ret;
 	}
-	python::tuple insertClump(vector<shared_ptr<Body> > bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
-		vector<body_id_t> ids(insertList(bb));
+	python::tuple appendClump(vector<shared_ptr<Body> > bb){/*clump: first add constitutents, then add clump, then add constitutents to the clump, then update clump props*/
+		vector<body_id_t> ids(appendList(bb));
 		shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
 		shared_ptr<Body> clumpAsBody=static_pointer_cast<Body>(clump);
 		clump->isDynamic=true;
@@ -171,17 +187,10 @@ class pyBodyContainer{
 		clump->updateProperties(false);
 		return python::make_tuple(clump->getId(),ids);
 	}
-	vector<body_id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return insertList(bb);}
+	vector<body_id_t> replace(vector<shared_ptr<Body> > bb){proxee->clear(); return appendList(bb);}
 	long length(){return proxee->size();}
 	void clear(){proxee->clear();}
-	bool fastErase(body_id_t id){ return proxee->erase(id); }
-	bool erase(body_id_t id){
-		const shared_ptr<InteractionContainer> interactions(Omega::instance().getRootBody()->interactions);
-		FOREACH(const shared_ptr<Interaction>& I, *interactions){
-			if(I->getId1()==id || I->getId2()==id) { interactions->requestErase(I->getId1(),I->getId2(),/*force*/ true); /* cerr<<"RequestErase'd intr #"<<I->getId1()<<"+#"<<I->getId2()<<endl;*/ }
-		}
-		return proxee->erase(id);
-	}
+	bool erase(body_id_t id){ return proxee->erase(id); }
 };
 
 
@@ -212,6 +221,7 @@ class pyTags{
 			return ret;
 		}
 };
+
 
 class pyInteractionIterator{
 	InteractionContainer::iterator I, Iend;
@@ -266,6 +276,21 @@ class pyBexContainer{
 		void rot_add(long id, const Vector3r& t){    rb->bex.addRot(id,t);}
 };
 
+class pyMaterialContainer{
+		shared_ptr<MetaBody> rb;
+	public:
+		pyMaterialContainer() {rb=Omega::instance().getRootBody();}
+		shared_ptr<Material> getitem_id(int id){ if(id<0 || (size_t)id>=rb->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); python::throw_error_already_set(); } return Material::byId(id,rb); }
+		shared_ptr<Material> getitem_label(string label){
+			// translate runtime_error to KeyError (instead of RuntimeError) if the material doesn't exist
+			try { return Material::byLabel(label,rb);	}
+			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); python::throw_error_already_set(); /* never reached; avoids warning */ throw; }
+		}
+		int append(shared_ptr<Material>& m){ rb->materials.push_back(m); m->id=rb->materials.size()-1; return m->id; }
+		vector<int> appendList(vector<shared_ptr<Material> > mm){ vector<int> ret; FOREACH(shared_ptr<Material>& m, mm) ret.push_back(append(m)); return ret; }
+		int len(){ return (int)rb->materials.size(); }
+};
+
 void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
 
 class pyOmega{
@@ -289,6 +314,13 @@ class pyOmega{
 	};
 	/* Create variables in python's __builtin__ namespace that correspond to labeled objects. At this moment, only engines and functors can be labeled (not bodies etc). */
 	void mapLabeledEntitiesToVariables(){
+		// not sure if we should map materials to variables by default...
+		// a call to this functions would have to be added to pyMaterialContainer::append
+		#if 0
+			FOREACH(const shared_ptr<Material>& m, OMEGA.getRootBody()->materials){
+				if(!m->label.empty()) { PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+m->label+"=Omega().materials["+lexical_cast<string>(m->id)+"]").c_str()); PyGILState_Release(gstate); }
+			}
+		#endif
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getRootBody()->engines){
 			if(!e->label.empty()){
 				PyGILState_STATE gstate; gstate = PyGILState_Ensure();
@@ -344,7 +376,7 @@ class pyOmega{
 		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
-	void step() { LOG_DEBUG("STEP!"); run(1); wait();  }
+	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getRootBody()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
 	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS; }
 
 	void load(std::string fileName) {
@@ -434,6 +466,7 @@ class pyOmega{
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->interactions); }
 	
 	pyBexContainer bex_get(void){return pyBexContainer();}
+	pyMaterialContainer materials_get(void){return pyMaterialContainer();}
 	
 
 	python::list listChildClasses(const string& base){
@@ -676,6 +709,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (MetaBody::initializers).")
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
+		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")
 		.add_property("actions",&pyOmega::bex_get,"Deprecated alias for Omega().bex")
 		.add_property("bex",&pyOmega::bex_get,"BodyExternalVariables (forces, torques, ..) in  the current simulation.")
 		.add_property("tags",&pyOmega::tags_get,"Tags (string=string dictionary) of the current simulation (container supporting string-index access/assignment)")
@@ -701,13 +735,16 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pyBodyContainer>("BodyContainer",python::init<pyBodyContainer&>())
 		.def("__getitem__",&pyBodyContainer::pyGetitem)
 		.def("__len__",&pyBodyContainer::length)
-		.def("append",&pyBodyContainer::insert,"Append one Body instance, return its id.")
-		.def("append",&pyBodyContainer::insertList,"Append list of Body instance, return list of ids")
-		.def("appendClumped",&pyBodyContainer::insertClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids")
+		.def("__iter__",&pyBodyContainer::pyIter)
+		.def("append",&pyBodyContainer::append,"Append one Body instance, return its id.")
+		.def("append",&pyBodyContainer::appendList,"Append list of Body instance, return list of ids")
+		.def("appendClumped",&pyBodyContainer::appendClump,"Append given list of bodies as a clump (rigid aggregate); return list of ids.")
 		.def("clear", &pyBodyContainer::clear,"Remove all bodies (interactions not checked)")
-		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; deletes all interactions of this body as well (entails loop over all itrs)")
-		.def("fastErase", &pyBodyContainer::fastErase,"Erase body unconditionally, without checking its involvment in interactions.")
+		.def("erase", &pyBodyContainer::erase,"Erase body with the given id; all interaction will be deleted by InteractionDispatchers in the next step.")
 		.def("replace",&pyBodyContainer::replace);
+	python::class_<pyBodyIterator>("BodyIterator",python::init<pyBodyIterator&>())
+		.def("__iter__",&pyBodyIterator::pyIter)
+		.def("next",&pyBodyIterator::pyNext);
 	python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
@@ -732,6 +769,13 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("addT",&pyBexContainer::torque_add)
 		.def("addMove",&pyBexContainer::move_add)
 		.def("addRot",&pyBexContainer::rot_add);
+
+	python::class_<pyMaterialContainer>("MaterialContainer",python::init<pyMaterialContainer&>())
+		.def("append",&pyMaterialContainer::append,"Add new shared material; changes its id and return it.")
+		.def("append",&pyMaterialContainer::appendList,"Append list of Material instances, return list of ids.")
+		.def("__getitem__",&pyMaterialContainer::getitem_id)
+		.def("__getitem__",&pyMaterialContainer::getitem_label)
+		.def("__len__",&pyMaterialContainer::len);
 
 	python::class_<pySTLImporter>("STLImporter")
 	    .def("open",&pySTLImporter::open)
@@ -829,7 +873,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readonly("min",&BoundingVolume::min)
 		.def_readonly("max",&BoundingVolume::max);
 	EXPOSE_CXX_CLASS_IX(Material)
-		.def_readwrite("label",&Material::label);
+		.def_readwrite("label",&Material::label)
+		.def("newAssocState",&Material::newAssocState)
+		;
 	EXPOSE_CXX_CLASS(State)
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
 		.add_property("pos",&State_pos_get,&State_pos_set)
