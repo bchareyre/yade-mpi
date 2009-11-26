@@ -101,9 +101,6 @@ void Ip2_RpmMat_RpmMat_RpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	const shared_ptr<RpmMat>& rpm1=YADE_PTR_CAST<RpmMat>(pp1);
 	const shared_ptr<RpmMat>& rpm2=YADE_PTR_CAST<RpmMat>(pp2);
 	
-	//const shared_ptr<BodyMacroParameters>& elast1=static_pointer_cast<BodyMacroParameters>(pp1);
-	//const shared_ptr<BodyMacroParameters>& elast2=static_pointer_cast<BodyMacroParameters>(pp2);
-
 	long cohesiveThresholdIter=10;
 	
 	bool initCohesive = rpm1->initCohesive*rpm2->initCohesive;
