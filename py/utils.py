@@ -74,7 +74,7 @@ def downCast(obj,newClassName):
 def defaultMaterial():
 	return GranularMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
 
-def _commonBodySetup(b,volume,geomInertia,material,noBound=False):
+def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True):
 	"""Assign common body parameters."""
 	#if 'physParamsClass' in matKw.keys(): raise ArgumentError("You as passing physParamsClass as argument, but it is no longer used. Use material instead.")
 	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
@@ -84,7 +84,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False):
 	elif isinstance(material,Material): b.mat=material
 	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
 	## resets state (!!)
-	b.state=b.mat.newAssocState()
+	if resetState: b.state=b.mat.newAssocState()
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])

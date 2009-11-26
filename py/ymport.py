@@ -41,7 +41,7 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBoundingVolum
 		b.mold['diffuseColor']=color if color else utils.randomColor()
 		b.mold['wire']=wire
 		b.mold['highlight']=highlight
-		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,material=material)
+		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBoundingVolume,material=material,resetState=False)
 	return imported
 
 def gmsh(meshfile="file.mesh",**kw):
