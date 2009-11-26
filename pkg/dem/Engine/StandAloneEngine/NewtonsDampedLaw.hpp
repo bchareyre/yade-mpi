@@ -41,25 +41,30 @@ class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
 	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpRBP);
 	bool haveBins;
+	void accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb);
+	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	public:
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;
 		/// store square of max. velocity, for informative purposes; computed again at every step
 		Real maxVelocitySq;
+		/// Enable of the accurate rigid body rotation integrator
+		bool accRigidBodyRot;
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(MetaBody *);		
-		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1){
+		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1), accRigidBodyRot(false){
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif
 		}
 
-	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq));
+	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq)(accRigidBodyRot));
 	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,StandAloneEngine);
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(NewtonsDampedLaw);
 

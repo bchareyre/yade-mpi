@@ -49,8 +49,8 @@ void VTKRecorder::action(MetaBody* rootBody)
 		else if(rec=="facets") recActive[REC_FACETS]=true;
 		else if(rec=="colors") recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
-		// else if(rec=="intr") recActive[REC_INTR]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm). Ignored.");
+		else if(rec=="intr") recActive[REC_INTR]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm, intr). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -252,7 +252,4 @@ void VTKRecorder::action(MetaBody* rootBody)
 	//writer->SetInput(multiblockDataset);
 	//writer->Write();	
 }
-
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

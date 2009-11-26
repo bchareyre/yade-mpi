@@ -115,7 +115,8 @@ void Clump::moveMembers(){
 		//LOG_TRACE("Clump #"<<getId()<<" moved #"<<I->first<<".");
 
 		//! FIXME: we set velocity because of damping here; but since positions are integrated after all forces applied, these velocities will be used in the NEXT step for CundallNonViscousDamping. Does that matter?!
-		subState->vel=state->vel+state->angVel.Cross(I->second.position);
+		//subState->vel=state->vel+state->angVel.Cross(I->second.position);
+		subState->vel=state->vel+state->angVel.Cross(subState->pos-state->pos);
 		subState->angVel=state->angVel;
 	}
 	/* @bug Temporarily we reset acceleration and angularAcceleration of the clump here;

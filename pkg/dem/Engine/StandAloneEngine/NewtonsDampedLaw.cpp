@@ -16,6 +16,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 YADE_PLUGIN((NewtonsDampedLaw));
+CREATE_LOGGER(NewtonsDampedLaw);
 void NewtonsDampedLaw::cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration){
 	for(int i=0; i<3; i++){
 		angularAcceleration[i]*= 1 - damping*Mathr::Sign ( m[i]*(angularVelocity[i] + (Real) 0.5 *dt*angularAcceleration[i]) );
@@ -83,6 +84,11 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 				cundallDamp(dt,f,state->vel,state->accel,m,state->angVel,state->angAccel);
 			}
 			else if (b->isClump()){
+				if (accRigidBodyRot) {
+					accurateRigidBodyRotationIntegrator(ncb,b);
+					continue;
+				}
+
 				state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
 				// sum force on clump memebrs, add them to the clump itself
 				FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
@@ -135,4 +141,66 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
 	if(haveBins) velocityBins->binVelSqFinalize();
+}
+
+void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb){
+	Real dt=Omega::instance().getTimeStep();
+	State* state=rb->state.get();
+	const body_id_t id=rb->getId();
+
+	state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
+
+	// sum of forces and torques
+	const Vector3r& f=ncb->bex.getForce(id); const Vector3r& m=ncb->bex.getTorque(id);
+	Vector3r F(f), M(m);
+	FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(rb.get())->members){
+		const body_id_t memberId=mm.first;
+		const shared_ptr<Body>& b=Body::byId(memberId,ncb);
+		assert(b->isClumpMember());
+		State* bs=b->state.get();
+		const Vector3r& f=ncb->bex.getForce(memberId); const Vector3r& m=ncb->bex.getTorque(memberId);
+		F+=f; M+=(bs->pos-state->pos).Cross(f)+m;
+	}
+	// translation equation
+	state->accel=F/state->mass;
+	state->vel+=dt*state->accel;
+	state->pos+=state->vel*dt;//+ncb->bex.getMove(id);
+	// rotation equation
+	Vector3r l_n = state->prevAngMom + dt/2 * M; // global angular momentum at time n
+	Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
+	Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
+	Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
+	Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
+	state->prevAngMom+=dt*M; // global angular momentum at time n+1/2
+	Vector3r l_b_half = state->ori.Conjugate().Rotate(state->prevAngMom); // local angular momentum at time n+1/2
+	Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2
+	Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
+	state->ori+=dt*dotQ_half; // Q at time n+1
+	state->ori.Normalize();
+	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
+	//if(rb->isClump()) static_cast<Clump*>(rb.get())->moveMembers();
+	static_cast<Clump*>(rb.get())->moveMembers();
+
+	LOG_TRACE("\nforce: " << F << " torque: " << M
+		<< "\nglobal angular momentum at time n: " << l_n
+		<< "\nlocal angular momentum at time n:  " << l_b_n
+		<< "\nlocal angular velocity at time n:  " << angVel_b_n
+		<< "\ndQ/dt at time n:                   " << dotQ_n
+		<< "\nQ at time n+1/2:                   " << Q_half
+		<< "\nglobal angular momentum at time n+1/2: " << state->prevAngMom
+		<< "\nlocal angular momentum at time n+1/2:  " << l_b_half
+		<< "\nlocal angular velocity at time n+1/2:  " << angVel_b_half
+		<< "\ndQ/dt at time n+1/2:                   " << dotQ_half
+		<< "\nQ at time n+1:                         " << state->ori
+		<< "\nglobal angular velocity at time n+1/2: " << state->angVel
+	);
+}
+	
+Quaternionr NewtonsDampedLaw::DotQ(const Vector3r& angVel, const Quaternionr& Q){
+	Quaternionr dotQ(Quaternionr::ZERO);
+	dotQ[0] = (-Q[1]*angVel[0]-Q[2]*angVel[1]-Q[3]*angVel[2])/2;
+	dotQ[1] = ( Q[0]*angVel[0]-Q[3]*angVel[1]+Q[2]*angVel[2])/2;
+	dotQ[2] = ( Q[3]*angVel[0]+Q[0]*angVel[1]-Q[1]*angVel[2])/2;
+	dotQ[3] = (-Q[2]*angVel[0]+Q[1]*angVel[1]+Q[0]*angVel[2])/2;
+	return dotQ;
 }

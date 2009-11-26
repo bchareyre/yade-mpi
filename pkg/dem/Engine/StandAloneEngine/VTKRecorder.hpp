@@ -20,7 +20,7 @@ class VTKRecorder: public PeriodicEngine {
 		virtual void action(MetaBody*);
 	private:
 		
-	REGISTER_ATTRIBUTES(PeriodicEngine,(recorders)(fileName)(compress)(skipNondynamic));
+	REGISTER_ATTRIBUTES(PeriodicEngine,(recorders)(fileName)(compress)(skipNondynamic)(skipFacetIntr));
 	REGISTER_CLASS_AND_BASE(VTKRecorder,PeriodicEngine);
 	DECLARE_LOGGER;
 };
