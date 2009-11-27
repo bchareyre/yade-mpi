@@ -55,91 +55,10 @@ void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId
 	#endif
 }
 
-void NewtonsDampedLaw::handleStandAloneBody(MetaBody* ncb, const shared_ptr<Body>& b){
-	Real dt=Omega::instance().getTimeStep();
-	const body_id_t& id=b->getId();
-	State* state=b->state.get();
-	// acceleration
-	const Vector3r& m=ncb->bex.getTorque(id); 
-	const Vector3r& f=ncb->bex.getForce(id);
-	state->accel=f/state->mass;
-	state->angAccel=diagDiv(m,state->inertia);
-	cundallDamp(dt,f,state->vel,state->accel,m,state->angVel,state->angAccel);
-	// blocking DOFs
-	blockTranslateDOFs( state->blockedDOFs, state->accel );
-	blockRotateDOFs( state->blockedDOFs, state->angAccel );
-	// translate equation
-	state->vel+=dt*state->accel;
-	state->pos+=state->vel*dt+ncb->bex.getMove(id);
-	// rotate equation
-	state->angVel+=dt*state->angAccel;
-	Vector3r axis = state->angVel;
-	Real angle = axis.Normalize();
-	Quaternionr q;
-	q.FromAxisAngle ( axis,angle*dt );
-	state->ori = q*state->ori;
-	if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
-	state->ori.Normalize();
-}
-
-void NewtonsDampedLaw::handleClumpBody(MetaBody* ncb, const shared_ptr<Body>& clump){
-	const Real dt=Omega::instance().getTimeStep();
-	State* clumpState=clump->state.get();
-	const body_id_t id=clump->getId();
-	clumpState->accel=clumpState->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
-	// sum of forces and torques
-	const Vector3r& f=ncb->bex.getForce(id); 
-	const Vector3r& m=ncb->bex.getTorque(id);
-	Vector3r F(f), M(m);
-	FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(clump.get())->members){
-		const body_id_t memberId=mm.first;
-		const shared_ptr<Body>& b=Body::byId(memberId,ncb);
-		assert(b->isClumpMember());
-		State* state=b->state.get();
-		const Vector3r& f=ncb->bex.getForce(memberId); const Vector3r& m=ncb->bex.getTorque(memberId);
-		F+=f; M+=(state->pos-clumpState->pos).Cross(f)+m;
-		if(haveBins) velocityBins->binVelSqUse(memberId,VelocityBins::getBodyVelSq(state));
-		#ifdef YADE_OPENMP
-			Real& thrMaxVSq=threadMaxVelocitySq[omp_get_thread_num()]; thrMaxVSq=max(thrMaxVSq,state->vel.SquaredLength());
-		#else
-			maxVelocitySq=max(maxVelocitySq,state->vel.SquaredLength());
-		#endif
-	}
-	//// sum force on clump memebrs, add them to the clump itself
-	//FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
-		//handleClumpMember(ncb,mm.first,state);
-	//}
-	//// at this point, forces from clump members are already summed up, this is just for forces applied to clump proper, if there are such
-	//Vector3r dLinAccel=f/state->mass, dAngAccel=diagDiv(m,state->inertia);
-	//cundallDamp(dt,f,state->vel,dLinAccel,m,state->angVel,dAngAccel);
-	//state->accel+=dLinAccel;
-	//state->angAccel+=dAngAccel;
-
-	// translate equation
-	clumpState->accel=F/clumpState->mass; blockTranslateDOFs( clumpState->blockedDOFs, clumpState->accel );
-	clumpState->vel+=dt*clumpState->accel; 
-	clumpState->pos+=clumpState->vel*dt+ncb->bex.getMove(id);
-	// rotate equation
-	if (accRigidBodyRot) 
-		accurateRigidBodyRotationIntegrator(ncb,clump,M);
-	else {
-		clumpState->angAccel=diagDiv(M,clumpState->inertia);
-		blockRotateDOFs( clumpState->blockedDOFs, clumpState->angAccel );
-		clumpState->angVel+=dt*clumpState->angAccel;
-		Vector3r axis = clumpState->angVel;
-		Real angle = axis.Normalize();
-		Quaternionr q; q.FromAxisAngle ( axis,angle*dt );
-		clumpState->ori = q*clumpState->ori;
-		if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); clumpState->ori=q*clumpState->ori; }
-		clumpState->ori.Normalize();
-	}
-	static_cast<Clump*>(clump.get())->moveMembers();
-}
-
 void NewtonsDampedLaw::action(MetaBody * ncb)
 {
 	ncb->bex.sync();
-	//Real dt=Omega::instance().getTimeStep();
+	Real dt=Omega::instance().getTimeStep();
 	maxVelocitySq=-1;
 	haveBins=(bool)velocityBins;
 	if(haveBins) velocityBins->binVelSqInitialize();
@@ -168,41 +87,36 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 				#endif
 				continue;
 			}
+			const Vector3r& m=ncb->bex.getTorque(id); const Vector3r& f=ncb->bex.getForce(id);
 
 			if (b->isStandalone()){
-				handleStandAloneBody(ncb,b);
-				//const Vector3r& m=ncb->bex.getTorque(id); 
-				//const Vector3r& f=ncb->bex.getForce(id);
-				//state->accel=f/state->mass;
-				//state->angAccel=diagDiv(m,state->inertia);
-				//cundallDamp(dt,f,state->vel,state->accel,m,state->angVel,state->angAccel);
+				state->accel=f/state->mass;
+				state->angAccel=diagDiv(m,state->inertia);
+				cundallDamp(dt,f,state->vel,state->accel,m,state->angVel,state->angAccel);
 			}
 			else if (b->isClump()){
-				handleClumpBody(ncb,b);
-				//if (accRigidBodyRot) {
-					//accurateRigidBodyRotationIntegrator(ncb,b);
-					//continue;
-				//}
-				//const Vector3r& m=ncb->bex.getTorque(id); 
-				//const Vector3r& f=ncb->bex.getForce(id);
-				//state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
-				//// sum force on clump memebrs, add them to the clump itself
-				//FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
-					//handleClumpMember(ncb,mm.first,state);
-				//}
-				//// at this point, forces from clump members are already summed up, this is just for forces applied to clump proper, if there are such
-				//Vector3r dLinAccel=f/state->mass, dAngAccel=diagDiv(m,state->inertia);
-				//cundallDamp(dt,f,state->vel,dLinAccel,m,state->angVel,dAngAccel);
-				//state->accel+=dLinAccel;
-				//state->angAccel+=dAngAccel;
+				if (accRigidBodyRot) {
+					accurateRigidBodyRotationIntegrator(ncb,b);
+					continue;
+				}
+				state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
+				// sum force on clump memebrs, add them to the clump itself
+				FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
+					handleClumpMember(ncb,mm.first,state);
+				}
+				// at this point, forces from clump members are already summed up, this is just for forces applied to clump proper, if there are such
+				Vector3r dLinAccel=f/state->mass, dAngAccel=diagDiv(m,state->inertia);
+				cundallDamp(dt,f,state->vel,dLinAccel,m,state->angVel,dAngAccel);
+				state->accel+=dLinAccel;
+				state->angAccel+=dAngAccel;
 			}
 
-			//// blocking DOFs
-			////blockTranslateDOFs( state->blockedDOFs, state->accel );
-			////state->vel+=+dt*state->accel;
+			// blocking DOFs
+			blockTranslateDOFs( state->blockedDOFs, state->accel );
+			state->vel+=+dt*state->accel;
 
-			////blockRotateDOFs( state->blockedDOFs, state->angAccel );
-			////state->angVel+=dt*state->angAccel;
+			blockRotateDOFs( state->blockedDOFs, state->angAccel );
+			state->angVel+=dt*state->angAccel;
 
 			//if(state->blockedDOFs==State::DOF_NONE){
 				//state->angVel+=dt*state->angAccel;
@@ -227,18 +141,18 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 					maxVelocitySq=max(maxVelocitySq,state->vel.SquaredLength());
 				#endif
 
-			//Vector3r axis = state->angVel;
-			//Real angle = axis.Normalize();
-			//Quaternionr q;
-			//q.FromAxisAngle ( axis,angle*dt );
-			//state->ori = q*state->ori;
-			//if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
-			//state->ori.Normalize();
+			Vector3r axis = state->angVel;
+			Real angle = axis.Normalize();
+			Quaternionr q;
+			q.FromAxisAngle ( axis,angle*dt );
+			state->ori = q*state->ori;
+			if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
+			state->ori.Normalize();
 
-			//Vector3r prevPos=state->pos;
-			//state->pos += state->vel*dt + ncb->bex.getMove(id);
+			Vector3r prevPos=state->pos;
+			state->pos += state->vel*dt + ncb->bex.getMove(id);
 
-			//if(b->isClump()) static_cast<Clump*>(b.get())->moveMembers();
+			if(b->isClump()) static_cast<Clump*>(b.get())->moveMembers();
 	}
 	#ifdef YADE_OPENMP
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
@@ -246,26 +160,26 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	if(haveBins) velocityBins->binVelSqFinalize();
 }
 
-void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb, const Vector3r& M){
+void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb){
 	const Real dt=Omega::instance().getTimeStep();
 	State* state=rb->state.get();
 	const body_id_t id=rb->getId();
-	//state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
-	//// sum of forces and torques
-	//const Vector3r& f=ncb->bex.getForce(id); const Vector3r& m=ncb->bex.getTorque(id);
-	//Vector3r F(f), M(m);
-	//FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(rb.get())->members){
-		//const body_id_t memberId=mm.first;
-		//const shared_ptr<Body>& b=Body::byId(memberId,ncb);
-		//assert(b->isClumpMember());
-		//State* bs=b->state.get();
-		//const Vector3r& f=ncb->bex.getForce(memberId); const Vector3r& m=ncb->bex.getTorque(memberId);
-		//F+=f; M+=(bs->pos-state->pos).Cross(f)+m;
-	//}
-	//// translate equation
-	//state->accel=F/state->mass; blockTranslateDOFs( state->blockedDOFs, state->accel );
-	//state->vel+=dt*state->accel; state->pos+=state->vel*dt+ncb->bex.getMove(id);
-	// rotate equation
+	state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
+	// sum of forces and torques
+	const Vector3r& f=ncb->bex.getForce(id); const Vector3r& m=ncb->bex.getTorque(id);
+	Vector3r F(f), M(m);
+	FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(rb.get())->members){
+		const body_id_t memberId=mm.first;
+		const shared_ptr<Body>& b=Body::byId(memberId,ncb);
+		assert(b->isClumpMember());
+		State* bs=b->state.get();
+		const Vector3r& f=ncb->bex.getForce(memberId); const Vector3r& m=ncb->bex.getTorque(memberId);
+		F+=f; M+=(bs->pos-state->pos).Cross(f)+m;
+	}
+	// translation equation
+	state->accel=F/state->mass; blockTranslateDOFs( state->blockedDOFs, state->accel );
+	state->vel+=dt*state->accel; state->pos+=state->vel*dt+ncb->bex.getMove(id);
+	// rotation equation
 	Matrix3r A; state->ori.Conjugate().ToRotationMatrix(A); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2 * M; // global angular momentum at time n
 	//Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
@@ -282,10 +196,9 @@ void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const 
 	state->ori+=dt*dotQ_half; state->ori.Normalize(); // Q at time n+1
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
 	//if(rb->isClump()) static_cast<Clump*>(rb.get())->moveMembers();
-	//static_cast<Clump*>(rb.get())->moveMembers();
+	static_cast<Clump*>(rb.get())->moveMembers();
 
-	LOG_TRACE(//"\nforce: " << F << 
-		" torque: " << M
+	LOG_TRACE("\nforce: " << F << " torque: " << M
 		<< "\nglobal angular momentum at time n: " << l_n
 		<< "\nlocal angular momentum at time n:  " << l_b_n
 		<< "\nlocal angular velocity at time n:  " << angVel_b_n
