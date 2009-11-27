@@ -4,16 +4,18 @@ with given parameters.
 
 Be sure LSMGenGeo library is installed.
 
-Symply start this script:
-  python genCylLSM.py
-
-The result is 2 files:
-  "cyl.geo" is the geometry file which can be imported into YADE with import_LSMGenGeo_geometry() function
-  "cyl.vtk" is the VTK-filed which can be opened by any VTK-based software, for example Paraview
+The result is:
+	2 files:
+		"cyl.geo" is the geometry file which can be imported into YADE with import_LSMGenGeo_geometry() function
+		"cyl.vtk" is the VTK-filed which can be opened by any VTK-based software, for example Paraview
+	spheres, imported into the YADE simulation, according to generated geometry
 
 http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
 https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/
 """
+from yade import pack,ymport
+from yade import utils
+from math import *
 from GenGeo import *
 import sys
 
@@ -59,5 +61,22 @@ packer.generatePacking (
   groupID=0
 )
 
+#Write data to files
 mntable.write(fileName+".geo",1)
 mntable.write(fileName+".vtu",2)
+
+#Add material
+O.materials.append(GranularMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3))
+
+#Parameters, which will be passed into spheres and facets creators
+kw={'material':0}
+
+#Import the GenGeo geometry directly into the YADE simulation
+O.bodies.append(ymport.gengeo(mntable,moveTo=[-1.0,-1.0,-1.0],scale=2.0,color=(1,1,0),**kw))
+
+try:
+	from yade import qt
+	qt.Controller()
+	qt.View()
+except ImportError: pass
+

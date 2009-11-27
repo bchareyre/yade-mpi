@@ -89,7 +89,7 @@ def gmsh(meshfile="file.mesh",**kw):
 		ret.append(utils.facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
 	return ret
 
-def gengeo(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
+def gengeoFile(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
 	moveTo[X,Y,Z] parameter moves the specimen.
 	Remaining **kw arguments are passed to utils.sphere; 
@@ -116,3 +116,26 @@ def gengeo(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 		ret.append(utils.sphere([moveTo[0]+scale*float(data[0]),moveTo[1]+scale*float(data[1]),moveTo[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
+def gengeo(mntable,moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
+	""" Imports geometry from LSMGenGeo library and creates spheres.
+	moveTo[X,Y,Z] parameter moves the specimen.
+	Remaining **kw arguments are passed to utils.sphere; 
+	
+	LSMGenGeo library allows to create pack of spheres
+	with given [Rmin:Rmax] with null stress inside the specimen.
+	Can be usefull for Mining Rock simulation.
+	
+	Example added to scripts/test/regular-sphere-pack.py
+	Example of LSMGenGeo library using is added to genCylLSM.py
+	
+	http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
+	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
+	from GenGeo import MNTable3D,Sphere
+	
+	ret=[]
+	sphereList=mntable.getSphereListFromGroup(0)
+	for i in range(0, len(sphereList)):
+		r=sphereList[i].Radius()
+		c=sphereList[i].Centre()
+		ret.append(utils.sphere([moveTo[0]+scale*float(c.X()),moveTo[1]+scale*float(c.Y()),moveTo[2]+scale*float(c.Z())],scale*float(r),**kw))
+	return ret
