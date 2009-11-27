@@ -57,12 +57,12 @@ for k,l in itertools.product(arange(0,10),arange(0,10)):
 	#O.bodies[clpId].state.blockedDOFs=['x','y']
 
 # ... and spheres
-for k,l in itertools.product(arange(0,9),arange(0,9)):
-	sphAloneId=O.bodies.append( [utils.sphere( Vector3(x0t+Rs*(k*4+4),y0t+Rs*(l*4+4),i*Rs*2.3+zt),Rs,color=(0,1,0),material=dfltSpheresMat) for i in xrange(4) ] )
-	for id in sphAloneId:
-		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-		s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+#for k,l in itertools.product(arange(0,9),arange(0,9)):
+	#sphAloneId=O.bodies.append( [utils.sphere( Vector3(x0t+Rs*(k*4+4),y0t+Rs*(l*4+4),i*Rs*2.3+zt),Rs,color=(0,1,0),material=dfltSpheresMat) for i in xrange(4) ] )
+	#for id in sphAloneId:
+		#s=O.bodies[id]
+		#p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
+		#s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 		#s.state.blockedDOFs=['rx','ry','rz']
 		#s.state.blockedDOFs=['x','y']
 
@@ -77,7 +77,8 @@ O.engines=[
 		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonsDampedLaw(damping=0,accRigidBodyRot=True),
+	#NewtonsDampedLaw(damping=0,accRigidBodyRot=True),
+	NewtonsDampedLaw(damping=0,accRigidBodyRot=False),
 	#VTKRecorder(virtPeriod=0.01,fileName='/tmp/',recorders=['spheres','velocity','facets'])
 ]
 

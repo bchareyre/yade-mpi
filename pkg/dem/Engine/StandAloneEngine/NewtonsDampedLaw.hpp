@@ -41,10 +41,12 @@ class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
 	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState);
 	bool haveBins;
-	void accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb);
+	void accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb, const Vector3r& M);
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
+	inline void handleStandAloneBody(MetaBody* ncb, const shared_ptr<Body>& b);
+	inline void handleClumpBody(MetaBody* ncb, const shared_ptr<Body>& clump);
 
 	public:
 		///damping coefficient for Cundall's non viscous damping
