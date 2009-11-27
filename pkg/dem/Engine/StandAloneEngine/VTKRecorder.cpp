@@ -60,13 +60,16 @@ void VTKRecorder::action(MetaBody* rootBody)
 	vtkSmartPointer<vtkCellArray> spheresCells = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
 	radii->SetNumberOfComponents(1);
-	radii->SetName("Radii");
+	radii->SetName("radii");
 	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
 	spheresColors->SetNumberOfComponents(3);
-	spheresColors->SetName("Colors");
+	spheresColors->SetName("colors");
 	vtkSmartPointer<vtkFloatArray> spheresVelocity = vtkSmartPointer<vtkFloatArray>::New();
 	spheresVelocity->SetNumberOfComponents(3);
 	spheresVelocity->SetName("velocity");
+	vtkSmartPointer<vtkFloatArray> sphAngVel = vtkSmartPointer<vtkFloatArray>::New();
+	sphAngVel->SetNumberOfComponents(3);
+	sphAngVel->SetName("angVel");
 
 	// facets
 	vtkSmartPointer<vtkPoints> facetsPos = vtkSmartPointer<vtkPoints>::New();
@@ -147,7 +150,16 @@ void VTKRecorder::action(MetaBody* rootBody)
 					spheresColors->InsertNextTupleValue(c);
 				}
 				if(recActive[REC_VELOCITY]){
-					spheresVelocity->InsertNextTupleValue((float*)(&b->state->vel));
+					const Vector3r& vel = b->state->vel;
+					float v[3] = { vel[0],vel[1],vel[2] };
+					spheresVelocity->InsertNextTupleValue(v);
+
+					const Vector3r& angVel = b->state->angVel;
+					float av[3] = { angVel[0],angVel[1],angVel[2] };
+					sphAngVel->InsertNextTupleValue(av);
+
+					//spheresVelocity->InsertNextTupleValue((float*)(&b->state->vel));
+					//sphAngVel->InsertNextTupleValue((float*)(&b->state->angVel));
 				}
 				if (recActive[REC_CPM]) {
 					cpmDamage->InsertNextValue(YADE_PTR_CAST<CpmState>(b->state)->normDmg);
@@ -199,7 +211,10 @@ void VTKRecorder::action(MetaBody* rootBody)
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
-		if (recActive[REC_VELOCITY]) spheresUg->GetPointData()->AddArray(spheresVelocity);
+		if (recActive[REC_VELOCITY]) {
+			spheresUg->GetPointData()->AddArray(spheresVelocity);
+			spheresUg->GetPointData()->AddArray(sphAngVel);
+		}
 		if (recActive[REC_CPM]) {
 			spheresUg->GetPointData()->AddArray(cpmDamage);
 			spheresUg->GetPointData()->AddArray(cpmSigma);

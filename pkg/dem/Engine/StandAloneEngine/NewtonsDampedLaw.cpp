@@ -141,12 +141,10 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 }
 
 void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb){
-	Real dt=Omega::instance().getTimeStep();
+	const Real dt=Omega::instance().getTimeStep();
 	State* state=rb->state.get();
 	const body_id_t id=rb->getId();
-
 	state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
-
 	// sum of forces and torques
 	const Vector3r& f=ncb->bex.getForce(id); const Vector3r& m=ncb->bex.getTorque(id);
 	Vector3r F(f), M(m);
@@ -163,17 +161,19 @@ void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const 
 	state->vel+=dt*state->accel;
 	state->pos+=state->vel*dt;//+ncb->bex.getMove(id);
 	// rotation equation
-	Vector3r l_n = state->prevAngMom + dt/2 * M; // global angular momentum at time n
-	Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
-	Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
-	Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
-	Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
+	Matrix3r A; state->ori.Conjugate().ToRotationMatrix(A); // rotation matrix from global to local r.f.
+	const Vector3r l_n = state->prevAngMom + dt/2 * M; // global angular momentum at time n
+	//Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
+	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
+	const Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
+	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
+	const Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
 	state->prevAngMom+=dt*M; // global angular momentum at time n+1/2
-	Vector3r l_b_half = state->ori.Conjugate().Rotate(state->prevAngMom); // local angular momentum at time n+1/2
-	Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2
-	Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
-	state->ori+=dt*dotQ_half; // Q at time n+1
-	state->ori.Normalize();
+	//Vector3r l_b_half = state->ori.Conjugate().Rotate(state->prevAngMom); // local angular momentum at time n+1/2
+	const Vector3r l_b_half = A*state->prevAngMom; // local angular momentum at time n+1/2
+	const Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2
+	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
+	state->ori+=dt*dotQ_half; state->ori.Normalize(); // Q at time n+1
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
 	//if(rb->isClump()) static_cast<Clump*>(rb.get())->moveMembers();
 	static_cast<Clump*>(rb.get())->moveMembers();
