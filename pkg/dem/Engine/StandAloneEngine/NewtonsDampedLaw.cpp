@@ -20,6 +20,20 @@ void NewtonsDampedLaw::cundallDamp(const Real& dt, const Vector3r& f, const Vect
 		acceleration       [i]*= 1 - damping*Mathr::Sign ( f[i]*(velocity       [i] + (Real) 0.5 *dt*acceleration       [i]) );
 	}
 }
+void NewtonsDampedLaw::blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v) {
+	if(blockedDOFs==State::DOF_NONE) return;
+	if(blockedDOFs==State::DOF_ALL)  v = Vector3r::ZERO;
+	if((blockedDOFs & State::DOF_X)!=0) v[0]=0;
+	if((blockedDOFs & State::DOF_Y)!=0) v[1]=0;
+	if((blockedDOFs & State::DOF_Z)!=0) v[2]=0;
+}
+void NewtonsDampedLaw::blockRotateDOFs(unsigned blockedDOFs, Vector3r& v) {
+	if(blockedDOFs==State::DOF_NONE) return;
+	if(blockedDOFs==State::DOF_ALL)  v = Vector3r::ZERO;
+	if((blockedDOFs & State::DOF_RX)!=0) v[0]=0;
+	if((blockedDOFs & State::DOF_RY)!=0) v[1]=0;
+	if((blockedDOFs & State::DOF_RZ)!=0) v[2]=0;
+}
 void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState){
 	const shared_ptr<Body>& b=Body::byId(memberId,ncb);
 	assert(b->isClumpMember());
@@ -98,20 +112,26 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 			}
 
 			// blocking DOFs
-			if(state->blockedDOFs==State::DOF_NONE){
-				state->angVel+=dt*state->angAccel;
-				state->vel+=+dt*state->accel;
-			} else if(state->blockedDOFs==State::DOF_ALL){
-				/* do nothing */
-			} else {
-				// handle more complicated cases here
-				if((state->blockedDOFs & State::DOF_X)==0) state->vel[0]+=dt*state->accel[0];
-				if((state->blockedDOFs & State::DOF_Y)==0) state->vel[1]+=dt*state->accel[1];
-				if((state->blockedDOFs & State::DOF_Z)==0) state->vel[2]+=dt*state->accel[2];
-				if((state->blockedDOFs & State::DOF_RX)==0) state->angVel[0]+=dt*state->angAccel[0];
-				if((state->blockedDOFs & State::DOF_RY)==0) state->angVel[1]+=dt*state->angAccel[1];
-				if((state->blockedDOFs & State::DOF_RZ)==0) state->angVel[2]+=dt*state->angAccel[2];
-			}
+			blockTranslateDOFs( state->blockedDOFs, state->accel );
+			state->vel+=+dt*state->accel;
+
+			blockRotateDOFs( state->blockedDOFs, state->angAccel );
+			state->angVel+=dt*state->angAccel;
+
+			//if(state->blockedDOFs==State::DOF_NONE){
+				//state->angVel+=dt*state->angAccel;
+				//state->vel+=+dt*state->accel;
+			//} else if(state->blockedDOFs==State::DOF_ALL){
+				//[> do nothing <]
+			//} else {
+				//// handle more complicated cases here
+				//if((state->blockedDOFs & State::DOF_X)==0) state->vel[0]+=dt*state->accel[0];
+				//if((state->blockedDOFs & State::DOF_Y)==0) state->vel[1]+=dt*state->accel[1];
+				//if((state->blockedDOFs & State::DOF_Z)==0) state->vel[2]+=dt*state->accel[2];
+				//if((state->blockedDOFs & State::DOF_RX)==0) state->angVel[0]+=dt*state->angAccel[0];
+				//if((state->blockedDOFs & State::DOF_RY)==0) state->angVel[1]+=dt*state->angAccel[1];
+				//if((state->blockedDOFs & State::DOF_RZ)==0) state->angVel[2]+=dt*state->angAccel[2];
+			//}
 
 			// velocities are ready now, save maxima
 				if(haveBins) {velocityBins->binVelSqUse(id,VelocityBins::getBodyVelSq(state));}
@@ -141,12 +161,10 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 }
 
 void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb){
-	Real dt=Omega::instance().getTimeStep();
+	const Real dt=Omega::instance().getTimeStep();
 	State* state=rb->state.get();
 	const body_id_t id=rb->getId();
-
 	state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
-
 	// sum of forces and torques
 	const Vector3r& f=ncb->bex.getForce(id); const Vector3r& m=ncb->bex.getTorque(id);
 	Vector3r F(f), M(m);
@@ -159,21 +177,23 @@ void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const 
 		F+=f; M+=(bs->pos-state->pos).Cross(f)+m;
 	}
 	// translation equation
-	state->accel=F/state->mass;
-	state->vel+=dt*state->accel;
-	state->pos+=state->vel*dt;//+ncb->bex.getMove(id);
+	state->accel=F/state->mass; blockTranslateDOFs( state->blockedDOFs, state->accel );
+	state->vel+=dt*state->accel; state->pos+=state->vel*dt+ncb->bex.getMove(id);
 	// rotation equation
-	Vector3r l_n = state->prevAngMom + dt/2 * M; // global angular momentum at time n
-	Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
-	Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
-	Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
-	Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
+	Matrix3r A; state->ori.Conjugate().ToRotationMatrix(A); // rotation matrix from global to local r.f.
+	const Vector3r l_n = state->prevAngMom + dt/2 * M; // global angular momentum at time n
+	//Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
+	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
+	const Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
+	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
+	const Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
 	state->prevAngMom+=dt*M; // global angular momentum at time n+1/2
-	Vector3r l_b_half = state->ori.Conjugate().Rotate(state->prevAngMom); // local angular momentum at time n+1/2
+	//Vector3r l_b_half = state->ori.Conjugate().Rotate(state->prevAngMom); // local angular momentum at time n+1/2
+	const Vector3r l_b_half = A*state->prevAngMom; // local angular momentum at time n+1/2
 	Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2
-	Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
-	state->ori+=dt*dotQ_half; // Q at time n+1
-	state->ori.Normalize();
+	blockRotateDOFs( state->blockedDOFs, angVel_b_half );
+	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
+	state->ori+=dt*dotQ_half; state->ori.Normalize(); // Q at time n+1
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
 	//if(rb->isClump()) static_cast<Clump*>(rb.get())->moveMembers();
 	static_cast<Clump*>(rb.get())->moveMembers();

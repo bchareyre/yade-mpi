@@ -43,6 +43,9 @@ class NewtonsDampedLaw : public StandAloneEngine{
 	bool haveBins;
 	void accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb);
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
+	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
+	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
+
 	public:
 		///damping coefficient for Cundall's non viscous damping
 		Real damping;
