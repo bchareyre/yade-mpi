@@ -48,7 +48,6 @@
 
 class MetaBody;
 class ThreadRunner;
-class Preferences;
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -94,7 +93,6 @@ class Omega: public Singleton<Omega>
 		boost::mutex loadingSimulationMutex;
 
 	public :
-		shared_ptr<Preferences> preferences;
 		string 				 yadeConfigPath;	// FIXME - must be private and more clean
 		string 				 yadeVersionName;	// FIXME - public ?
 

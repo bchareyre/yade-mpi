@@ -31,7 +31,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'MetaEngine.cpp',
 			'NullGUI.cpp',
 			'Omega.cpp',
-			'Preferences.cpp',
 			'SimulationFlow.cpp',
 			'State.cpp',
 			'ThreadRunner.cpp',
