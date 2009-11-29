@@ -7,11 +7,9 @@
 #include<limits>
 using namespace std; // sorry
 
-#ifdef YADE_PYTHON
-	#include<boost/python.hpp>
-	#include<yade/extra/boost_python_len.hpp>
-	using namespace boost;
-#endif
+#include<boost/python.hpp>
+#include<yade/extra/boost_python_len.hpp>
+using namespace boost;
 
 #include<boost/foreach.hpp>
 #ifndef FOREACH
@@ -35,25 +33,19 @@ public:
 	struct Sph{
 		Vector3r c; Real r;
 		Sph(const Vector3r& _c, Real _r): c(_c), r(_r){};
-		#ifdef YADE_PYTHON
-			python::tuple asTuple() const { return python::make_tuple(c,r); }
-		#endif
+		python::tuple asTuple() const { return python::make_tuple(c,r); }
 	};
 	std::vector<Sph> pack;
 	Vector3r cellSize;
 	SpherePack(): cellSize(Vector3r::ZERO){};
-	#ifdef YADE_PYTHON
-		SpherePack(const python::list& l):cellSize(Vector3r::ZERO){ fromList(l); }
-	#endif
+	SpherePack(const python::list& l):cellSize(Vector3r::ZERO){ fromList(l); }
 	// add single sphere
 	void add(const Vector3r& c, Real r){ pack.push_back(Sph(c,r)); }
 
 	// I/O
-	#ifdef YADE_PYTHON
-		void fromList(const python::list& l);
-		python::list toList() const;
-		python::list toList_pointsAsTuples() const;
-	#endif
+	void fromList(const python::list& l);
+	python::list toList() const;
+	python::list toList_pointsAsTuples() const;
 	void fromFile(const string file);
 	void toFile(const string file) const;
 	void fromSimulation();
@@ -67,9 +59,7 @@ public:
 
 	// spatial characteristics
 	Vector3r dim() const {Vector3r mn,mx; aabb(mn,mx); return mx-mn;}
-	#ifdef YADE_PYTHON
-		python::tuple aabb_py() const { Vector3r mn,mx; aabb(mn,mx); return python::make_tuple(mn,mx); }
-	#endif
+	python::tuple aabb_py() const { Vector3r mn,mx; aabb(mn,mx); return python::make_tuple(mn,mx); }
 	void aabb(Vector3r& mn, Vector3r& mx) const {
 		Real inf=std::numeric_limits<Real>::infinity(); mn=Vector3r(inf,inf,inf); mx=Vector3r(-inf,-inf,-inf);
 		FOREACH(const Sph& s, pack){ Vector3r r(s.r,s.r,s.r); mn=componentMinVector(mn,s.c-r); mx=componentMaxVector(mx,s.c+r);}
@@ -91,20 +81,18 @@ public:
 	void scale(Real scale){ Vector3r mid=midPt(); cellSize*=scale; FOREACH(Sph& s, pack) {s.c=scale*(s.c-mid)+mid; s.r*=abs(scale); } }
 
 	// iteration 
-	#ifdef YADE_PYTHON
-		size_t len() const{ return pack.size(); }
-		python::tuple getitem(size_t idx){ if(idx<0 || idx>=pack.size()) throw runtime_error("Index "+lexical_cast<string>(idx)+" out of range 0.."+lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
-		struct iterator{
-			const SpherePack& sPack; size_t pos;
-			iterator(const SpherePack& _sPack): sPack(_sPack), pos(0){}
-			iterator iter(){ return *this;}
-			python::tuple next(){
-				if(pos==sPack.pack.size()){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
-				return sPack.pack[pos++].asTuple();
-			}
-		};
-		SpherePack::iterator getIterator() const{ return SpherePack::iterator(*this);};
-	#endif
+	size_t len() const{ return pack.size(); }
+	python::tuple getitem(size_t idx){ if(idx<0 || idx>=pack.size()) throw runtime_error("Index "+lexical_cast<string>(idx)+" out of range 0.."+lexical_cast<string>(pack.size()-1)); return pack[idx].asTuple(); }
+	struct iterator{
+		const SpherePack& sPack; size_t pos;
+		iterator(const SpherePack& _sPack): sPack(_sPack), pos(0){}
+		iterator iter(){ return *this;}
+		python::tuple next(){
+			if(pos==sPack.pack.size()){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
+			return sPack.pack[pos++].asTuple();
+		}
+	};
+	SpherePack::iterator getIterator() const{ return SpherePack::iterator(*this);};
 	DECLARE_LOGGER;
 };
 

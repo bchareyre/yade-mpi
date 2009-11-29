@@ -20,38 +20,36 @@ CREATE_LOGGER(SpherePack);
 using namespace std;
 using namespace boost;
 
-#ifdef YADE_PYTHON
-	// if we need explicit conversions at a few places
-	python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0],v[1],v[2]);}
-	Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
-	Vector3r tuple2vec(python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
+// if we need explicit conversions at a few places
+python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0],v[1],v[2]);}
+Vector3r tuple2vec(const python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
+Vector3r tuple2vec(python::tuple& t){return Vector3r(python::extract<double>(t[0])(),python::extract<double>(t[1])(),python::extract<double>(t[2])());}
 
-	void SpherePack::fromList(const python::list& l){
-		pack.clear();
-		size_t len=python::len(l);
-		for(size_t i=0; i<len; i++){
-			const python::tuple& t=python::extract<python::tuple>(l[i]);
-			//python::extract<python::tuple> tup(t[0]);
-			//if(tup.check()) { pack.push_back(Sph(tuple2vec(tup()),python::extract<double>(t[1]))); continue;}
-			python::extract<Vector3r> vec(t[0]);
-			if(vec.check()) { pack.push_back(Sph(vec(),python::extract<double>(t[1]))); continue; }
-			PyErr_SetString(PyExc_TypeError, "List elements must be (tuple or Vector3, float)!");
-			python::throw_error_already_set();
-		}
-	};
+void SpherePack::fromList(const python::list& l){
+	pack.clear();
+	size_t len=python::len(l);
+	for(size_t i=0; i<len; i++){
+		const python::tuple& t=python::extract<python::tuple>(l[i]);
+		//python::extract<python::tuple> tup(t[0]);
+		//if(tup.check()) { pack.push_back(Sph(tuple2vec(tup()),python::extract<double>(t[1]))); continue;}
+		python::extract<Vector3r> vec(t[0]);
+		if(vec.check()) { pack.push_back(Sph(vec(),python::extract<double>(t[1]))); continue; }
+		PyErr_SetString(PyExc_TypeError, "List elements must be (tuple or Vector3, float)!");
+		python::throw_error_already_set();
+	}
+};
 
-	python::list SpherePack::toList() const {
-		python::list ret;
-		FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c,s.r));
-		return ret;
-	};
+python::list SpherePack::toList() const {
+	python::list ret;
+	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(s.c,s.r));
+	return ret;
+};
 
-	python::list SpherePack::toList_pointsAsTuples() const {
-		python::list ret;
-		FOREACH(const Sph& s, pack) ret.append(python::make_tuple(vec2tuple(s.c),s.r));
-		return ret;
-	};
-#endif
+python::list SpherePack::toList_pointsAsTuples() const {
+	python::list ret;
+	FOREACH(const Sph& s, pack) ret.append(python::make_tuple(vec2tuple(s.c),s.r));
+	return ret;
+};
 
 void SpherePack::fromFile(string file) {
 	typedef pair<Vector3r,Real> pairVector3rReal;

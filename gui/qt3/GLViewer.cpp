@@ -25,10 +25,8 @@
 #include<yade/core/Interaction.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/version.hpp>
-#ifdef YADE_PYTHON
-	#include<boost/python.hpp>
-	using namespace boost;
-#endif
+#include<boost/python.hpp>
+using namespace boost;
 
 CREATE_LOGGER(GLViewer);
 
@@ -471,19 +469,17 @@ void GLViewer::postSelection(const QPoint& point)
 		Vector3r&    v = Body::byId(selection)->state->pos;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
 		Omega::instance().getRootBody()->selectedBody = selection;
-		#ifdef YADE_PYTHON
-			try{
-				PyGILState_STATE gstate;
-					gstate = PyGILState_Ensure();
-					python::object main=python::import("__main__");
-					python::object global=main.attr("__dict__");
-					python::eval(string("onBodySelect("+lexical_cast<string>(selection)+")").c_str(),global,global);
-				PyGILState_Release(gstate);
-				// see https://svn.boost.org/trac/boost/ticket/2781 for exception handling
-			} catch (python::error_already_set const &) {
-				LOG_DEBUG("unable to call onBodySelect. Not defined?");
-			}
-		#endif
+		try{
+			PyGILState_STATE gstate;
+				gstate = PyGILState_Ensure();
+				python::object main=python::import("__main__");
+				python::object global=main.attr("__dict__");
+				python::eval(string("onBodySelect("+lexical_cast<string>(selection)+")").c_str(),global,global);
+			PyGILState_Release(gstate);
+			// see https://svn.boost.org/trac/boost/ticket/2781 for exception handling
+		} catch (python::error_already_set const &) {
+			LOG_DEBUG("unable to call onBodySelect. Not defined?");
+		}
 	}
 }
 

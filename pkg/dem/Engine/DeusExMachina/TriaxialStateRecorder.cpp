@@ -9,9 +9,6 @@
 *************************************************************************/
 
 #include "TriaxialStateRecorder.hpp"
-//#include <yade/pkg-common/RigidBodyParameters.hpp>
-//#include <yade/pkg-common/ParticleParameters.hpp>
-//#include <yade/pkg-dem/BodyMacroParameters.hpp>
 //#include <yade/pkg-dem/ElasticContactLaw.hpp>
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
@@ -32,38 +29,19 @@
 
 CREATE_LOGGER(TriaxialStateRecorder);
 
-TriaxialStateRecorder::TriaxialStateRecorder () : DataRecorder()
-
-{
-	outputFile = "TriaxialStateRecord";
-	interval = 1;
+TriaxialStateRecorder::TriaxialStateRecorder () : Recorder(){
+	iterPeriod=1;
 	porosity = 1.;
-		
-	//triaxialStressController = NULL;
 }
-
-
-void TriaxialStateRecorder::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
-		ofile.open(outputFile.c_str(), std::ios::app);
-		if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
-		//if (!file_exists) ofile<<"iteration fn11 fn22 fn33 fn111 fn222 fn333 Position_right unb_f porosity Energie_Cinétique" << endl;
-	}
-}
-
-
-
-bool TriaxialStateRecorder::isActivated(MetaBody*)
-{
-	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
-}
-
 
 void TriaxialStateRecorder::action (MetaBody * ncb )
 {
+	// at the beginning of the file; write column titles
+	if(out.tellp()==0){
+		out<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE"<<endl;
+	}
+
+
 	if ( !triaxialCompressionEngine )
 	{
 		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
@@ -121,7 +99,7 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 
 // ======================================================================== 
 
- 	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+ 	out << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
  	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
  	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
  	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
@@ -139,7 +117,7 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 	if ( Omega::instance().getCurrentIteration() % 500 == 0 || Omega::instance().getCurrentIteration() == 0 )
 	{
 
-	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+	out << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
 // 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
 // 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
 // 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "

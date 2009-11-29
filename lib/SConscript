@@ -8,7 +8,7 @@ def yadeStaticOrSharedLib(*args,**kw):
 	return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.SharedLibrary(*args,**kw))
 	#return env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary(*args,**kw))
 
-if 'qt3' not in env['exclude']:
+if 'opengl' in env['features']:
 	yadeStaticOrSharedLib('yade-serialization-qt',['serialization-qt/QtGUIGenerator.cpp'],
 		#LIBS=env['LIBS']+['yade-suypportbase','XMLFormatManager']),
 		LIBS=['yade-support']),
@@ -50,17 +50,16 @@ if 'qt3' not in env['exclude']:
 		CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
 		LIBS=env['LIBS']+['GL']
 	)
-if 'YADE_OPENGL' in env['CPPDEFINES']:
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','$QGLVIEWER_LIB']),
-
+#env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary
 yadeStaticOrSharedLib('yade-support',env.Combine('yade-support.cpp',[
 	'base/yadeWm3Extra.cpp',
 	'computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp',
-	'factory/ClassFactory.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
+	'factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
 	'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 	'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp',
-	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializableSingleton.cpp','serialization/SerializationExceptions.cpp']),LIBS=['dl'])
-
+	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializationExceptions.cpp']),LIBS=['dl'],CXXFLAGS=env['CXXFLAGS']+['-fPIC'])
+#)
 #######################
 ###### 3rd party libs
 #######################
@@ -70,5 +69,4 @@ yadeStaticOrSharedLib('miniWm3',
 	# miniWm3 cannot link with itself, filter it out.
 	LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
 	# miniWm3 will be always optimized and without debugging info, even in debug builds; suppress all warnings
-	CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w']),
-yadeStaticOrSharedLib('sqlite3x',Split('sqlite3x/sqlite3x_command.cpp sqlite3x/sqlite3x_connection.cpp sqlite3x/sqlite3x_cursor.cpp sqlite3x/sqlite3x_exception.cpp sqlite3x/sqlite3x_settings_db.cpp	sqlite3x/sqlite3x_transaction.cpp'),LIBS='sqlite3',CXXFLAGS=env['CXXFLAGS']+['-O3','-g0']),
+	CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w'])

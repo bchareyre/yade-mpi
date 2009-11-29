@@ -8,10 +8,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifdef YADE_PYTHON
-	#include<Python.h>
-	extern int Py_OptimizeFlag;
-#endif
+#include<Python.h>
+extern int Py_OptimizeFlag;
 
 #include<signal.h>
 #include<cstdlib>
@@ -25,9 +23,9 @@
 #include<boost/regex.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
 #include<yade/lib-base/Logging.hpp>
-#include"Omega.hpp"
-#include"FrontEnd.hpp"
-#include"Preferences.hpp"
+#include<yade/core/Omega.hpp>
+#include<yade/core/FrontEnd.hpp>
+// #include<yade/core/Preferences.hpp>
 
 // #define YADE_HUP_EMERGENCY_SAVE
 
@@ -68,7 +66,6 @@ sigHandler(int sig){
 		int res;
 	#endif
 	switch(sig){
-	#ifdef YADE_PYTHON
 		case SIGINT:
 			LOG_DEBUG("Finalizing Python...");
 			Py_Finalize();
@@ -76,7 +73,6 @@ sigHandler(int sig){
 			signal(SIGINT,SIG_DFL); // reset to default
 			kill(getpid(),SIGINT); // kill ourselves, this time without Python
 			break;
-	#endif
 	#ifdef YADE_DEBUG
 		case SIGABRT:
 		case SIGSEGV:
@@ -105,7 +101,7 @@ sigHandler(int sig){
 	}
 }
 
-
+#if 0
 void firstRunSetup(shared_ptr<Preferences>& pref)
 {
 	string cfgFile=Omega::instance().yadeConfigPath+"/preferences.xml";
@@ -118,6 +114,7 @@ void firstRunSetup(shared_ptr<Preferences>& pref)
 	LOG_INFO("Setting GUI: "<<pref->defaultGUILibName);
 	IOFormatManager::saveToFile("XMLFormatManager",cfgFile,"preferences",pref);
 }
+#endif
 
 #ifdef YADE_HUP_EMERGENCY_SAVE
 	string findRecoveryCandidate(filesystem::path dir, string start){
@@ -170,9 +167,6 @@ void printHelp()
 	#ifdef YADE_OPENGL
 		"   YADE_OPENGL   (3d rendering)\n"
 	#endif
-	#ifdef YADE_PYTHON
-		"   YADE_PYTHON   (python scripting support)\n"
-	#endif
 	;
 	if(!isnan(std::numeric_limits<double>::quiet_NaN())) cerr<<
 		"   -ffast-math?  WARNING: NaN's will not work"<<endl;
@@ -185,6 +179,9 @@ void printHelp()
 
 int main(int argc, char *argv[])
 {
+	Omega::instance();
+	ClassFactory::instance();
+	SerializableSingleton::instance();
 	/* Omega::init() cannot be called from Omega::Omega (invoked at first instance() call), since init calls resetRootBody,
 	 * which locks renderMutex, calls instance() in turn, but since not constructed yet,
 	 * instance() → Omega::Omega → init → resetRootBody → lock renderMutex → deadlock */
@@ -200,7 +197,7 @@ int main(int argc, char *argv[])
 
 	bool useGdb=true;
 	
-	int ch; string gui=""; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
+	int ch; string gui="QtGUI"; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
 	while(coreOptions && (ch=getopt(argc,argv,"+hnN:wC:cxvS:"))!=-1)
 		switch(ch){
 			case 'h': printHelp(); return 1;
@@ -238,25 +235,27 @@ int main(int argc, char *argv[])
 		else if (verbose>=2) logger->setLevel(debugLevel);
 	#endif
 
-	Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
+	// Omega::instance().preferences    = shared_ptr<Preferences>(new Preferences);
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
+#if 0
 	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
+#endif
 
 
-	#ifdef YADE_PYTHON
-		/* see http://www.python.org/dev/peps/pep-0311 for threading with Python embedded */
-		LOG_DEBUG("Initializing Python...");
-		Py_OptimizeFlag=1;
-		Py_Initialize();
-		//PyEval_InitThreads(); // this locks the GIL as side-effect
-		//PyGILState_STATE pyState=PyGILState_Ensure(); PyGILState_Release(pyState);
-		signal(SIGINT,sigHandler);
-	#endif
+	/* see http://www.python.org/dev/peps/pep-0311 for threading with Python embedded */
+	LOG_DEBUG("Initializing Python...");
+	Py_OptimizeFlag=1;
+	Py_Initialize();
+	//PyEval_InitThreads(); // this locks the GIL as side-effect
+	//PyGILState_STATE pyState=PyGILState_Ensure(); PyGILState_Release(pyState);
+	signal(SIGINT,sigHandler);
 
-	if (!filesystem::exists(yadeConfigPath) || setup || !filesystem::exists(yadeConfigFile)){
+	if (!filesystem::exists(yadeConfigPath) || setup  /* || !filesystem::exists(yadeConfigFile) */ ){
 		filesystem::create_directories(yadeConfigPath);
-		firstRunSetup(Omega::instance().preferences);
+		#if 0
+			firstRunSetup(Omega::instance().preferences);
+		#endif
 	}
 
 	#ifdef YADE_DEBUG
@@ -270,22 +269,28 @@ int main(int argc, char *argv[])
 			LOG_DEBUG("ABRT/SEGV signal handlers set, crash batch created as "<<Omega::instance().gdbCrashBatch);
 		}
 	#endif
-	
-	LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
+
+	#if 0	
+		LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
+	#endif
 
 	LOG_INFO("Loading plugins");
 
+	vector<string> pluginDirs;
 	// set YADE_PREFIX to use prefix different from the one compiled-in; used for testing deb package when not installed
-	if(!getenv("YADE_PREFIX")){
-		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/plugins" ));
-		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/gui" ));
-		Omega::instance().scanPlugins(string(PREFIX "/lib/yade" SUFFIX "/extra" ));
+	if(getenv("YADE_PREFIX")){
+		pluginDirs.push_back(getenv("YADE_PREFIX")+string("/lib/yade" SUFFIX "/plugins"));
+		pluginDirs.push_back(getenv("YADE_PREFIX")+string("/lib/yade" SUFFIX "/gui"));
+		pluginDirs.push_back(getenv("YADE_PREFIX")+string("/lib/yade" SUFFIX "/extra"));
 	} else {
-		string otherPREFIX(getenv("YADE_PREFIX"));
-		Omega::instance().scanPlugins(otherPREFIX+"/lib/yade" SUFFIX "/plugins");
-		Omega::instance().scanPlugins(otherPREFIX+"/lib/yade" SUFFIX "/gui");
-		Omega::instance().scanPlugins(otherPREFIX+"/lib/yade" SUFFIX "/extra");
+		pluginDirs.push_back(PREFIX+string("/lib/yade" SUFFIX "/plugins"));
+		pluginDirs.push_back(PREFIX+string("/lib/yade" SUFFIX "/gui"));
+		pluginDirs.push_back(PREFIX+string("/lib/yade" SUFFIX "/extra"));
 	}
+	//	pluginDirs.push_back((otherPrefix.empty() ? string(PREFIX) : otherPrefix ) + string("/lib/yade" SUFFIX "/plugins"));
+	//pluginDirs.push_back((otherPrefix.empty() ? string(PREFIX) : otherPrefix ) + string("/lib/yade" SUFFIX "/gui"));
+	//pluginDirs.push_back((otherPrefix.empty() ? string(PREFIX) : otherPrefix ) + string("/lib/yade" SUFFIX "/extra"));
+	Omega::instance().scanPlugins(pluginDirs);
 	Omega::instance().init();
 
 	// make directory for temporaries
@@ -308,7 +313,7 @@ int main(int argc, char *argv[])
 	#endif
 
 	// handle this a little more inteligently, use FrontEnd::available to chec kif the GUI will really run (QtGUi without DISPLAY and similar)
-	if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
+	// if(gui.size()==0) gui=Omega::instance().preferences->defaultGUILibName;
 	#ifdef YADE_OPENGL
 		if(!explicitUI && gui=="PythonUI" && !getenv("TERM")){ LOG_WARN("No $TERM, using QtGUI instead of PythonUI"); gui="QtGUI"; }
 	#else
@@ -330,16 +335,14 @@ int main(int argc, char *argv[])
 
 	// remove all remaining temporary files
 	Omega::instance().cleanupTemps();
-	#ifdef YADE_PYTHON
-		/* pyFinalize crashes with boost:python<=1.35
-		 * http://www.boost.org/libs/python/todo.html#pyfinalize-safety has explanation 
-		 * once this is fixed, you should remove workaround that saves history from ipython session in gui/py/PythonUI_rc.py:63
-		 *   import IPython.ipapi
-		 *   IPython.ipapi.get().IP.atexit_operations()
-		 */
-		// LOG_DEBUG("Finalizing Python...");
-		// Py_Finalize();
-	#endif
+	/* pyFinalize crashes with boost:python<=1.35
+	 * http://www.boost.org/libs/python/todo.html#pyfinalize-safety has explanation 
+	 * once this is fixed, you should remove workaround that saves history from ipython session in gui/py/PythonUI_rc.py:63
+	 *   import IPython.ipapi
+	 *   IPython.ipapi.get().IP.atexit_operations()
+	 */
+	// LOG_DEBUG("Finalizing Python...");
+	// Py_Finalize();
 	#ifdef YADE_DEBUG
 		if(useGdb){
 			signal(SIGABRT,SIG_DFL); signal(SIGHUP,SIG_DFL); // default handlers

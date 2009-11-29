@@ -68,7 +68,7 @@ _SPEC_CAST(char*,string);
 #undef _SPEC_CAST
 
 CREATE_LOGGER(Shop);
-YADE_PLUGIN((Shop));
+// YADE_PLUGIN((Shop));
 
 map<string,boost::any> Shop::defaults;
 

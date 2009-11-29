@@ -301,6 +301,11 @@ class pyOmega{
 	public:
 	pyOmega(): OMEGA(Omega::instance()){
 		shared_ptr<MetaBody> rb=OMEGA.getRootBody();
+		if(!rb){
+			OMEGA.init();
+			rb=OMEGA.getRootBody();
+		}
+		fprintf(stderr,"rootBody = %p",rb.get());
 		assert(rb);
 		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
@@ -674,7 +679,6 @@ namespace boost { namespace python { namespace detail {
 		return detail::make_raw_function(objects::py_function(detail::raw_constructor_dispatcher<F>(f),mpl::vector2<void, object>(),min_args+1,(std::numeric_limits<unsigned>::max)()));
 	}
 }} // namespace boost::python
-
 
 BOOST_PYTHON_MODULE(wrapper)
 {

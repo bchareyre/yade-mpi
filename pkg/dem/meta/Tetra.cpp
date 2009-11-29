@@ -2,7 +2,7 @@
 
 #include"Tetra.hpp"
 
-YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (Tetrahedron2TetraMold) (TetraAABB) 
+YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB) 
 	/* some code in cpp (this file): */ (TetraLaw) (Tetra2TetraBang)
 	#ifdef YADE_OPENGL
 		(TetraDraw)

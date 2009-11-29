@@ -31,9 +31,7 @@ void Se3Interpolator::applyCondition(MetaBody* mb){
 	if(t>=1.){
 		done=true;
 		LOG_DEBUG("Goal reached.");
-		#ifdef YADE_PYTHON
-			if(!goalHook.empty()){ PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString(goalHook.c_str()); PyGILState_Release(gstate); }
-		#endif
+		if(!goalHook.empty()){ PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString(goalHook.c_str()); PyGILState_Release(gstate); }
 	}
 }
 

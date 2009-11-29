@@ -6,16 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "SerializableSingleton.hpp"
-#include <iostream>
+#include"SerializableSingleton.hpp"
+#include<iostream>
+#include<cstdio>
 
-CREATE_LOGGER(SerializableSingleton);
-
-SerializableSingleton::SerializableSingleton() 
-{
-	if(getenv("YADE_DEBUG")) cerr<<"Constructing SerializableSingleton; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n";
-}
-
+SINGLETON_SELF(SerializableSingleton);
 
 bool SerializableSingleton::registerSerializableDescriptor( string name , VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f )
 {

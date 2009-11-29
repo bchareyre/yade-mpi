@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/DataRecorder.hpp>
+#include<yade/pkg-common/PeriodicEngines.hpp>
 #include <string>
 #include <fstream>
 /*!
@@ -17,25 +17,19 @@
  * See http://yade.wikia.com/wiki/New:Making_videos for details .
  *
  */
-class PositionOrientationRecorder : public DataRecorder
+class PositionOrientationRecorder : public PeriodicEngine
 {
 	public :
 		//! basename of the output files; for example, /tmp/xyz will produce /tmp/xyz_000010, /tmp/xyz_000020 and so on (with interval==10)
 		std::string outputFile;
-		//! modulo of iteration number when the se3's will be be written out
-		unsigned int interval;
 		bool saveRgb;
 	
 		PositionOrientationRecorder ();
-		~PositionOrientationRecorder ();
 		virtual void action(MetaBody*);
 
-	protected :
-		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(saveRgb));
+	REGISTER_ATTRIBUTES(PeriodicEngine,(outputFile)(saveRgb));
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(PositionOrientationRecorder);
-	REGISTER_BASE_CLASS_NAME(DataRecorder);
+	REGISTER_CLASS_AND_BASE(PositionOrientationRecorder,PeriodicEngine);
 };
 
 REGISTER_SERIALIZABLE(PositionOrientationRecorder);

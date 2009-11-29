@@ -13,11 +13,10 @@
 #include <string>
 #include <map>
 #include<yade/lib-loki/Singleton.hpp>
-#include<yade/lib-base/Logging.hpp>
 
 using namespace std;
 
-class SerializableSingleton : public Singleton< SerializableSingleton >
+class SerializableSingleton : public Singleton<SerializableSingleton>
 {
 	private :
 		/// Pointer on a function that return the type_info of the registered class
@@ -46,10 +45,9 @@ class SerializableSingleton : public Singleton< SerializableSingleton >
 	public :
 		bool registerSerializableDescriptor( string name, VerifyFactorableFnPtr verify, SerializableTypes::Type type, bool f);
 		bool findClassInfo(const type_info& tp,SerializableTypes::Type& type, string& serializableClassName,bool& fundamental);
-		DECLARE_LOGGER;
 
 	private :
-		SerializableSingleton();
+		SerializableSingleton(){ if (getenv("YADE_DEBUG")) fprintf(stderr,"Constructing SerializableSingleton.\n"); }
 		SerializableSingleton(const SerializableSingleton&);
 		~SerializableSingleton() {};
 		SerializableSingleton& operator=(const SerializableSingleton&);

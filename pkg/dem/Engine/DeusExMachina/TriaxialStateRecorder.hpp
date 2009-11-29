@@ -11,10 +11,7 @@
 
 #pragma once
 
-#include <yade/core/DataRecorder.hpp>
-
-#include <string>
-#include <fstream>
+#include <yade/pkg-common/Recorder.hpp>
 
 /*! \brief Record the stress-strain state of a sample in simulations using TriaxialCompressionEngine
 
@@ -26,38 +23,27 @@
 
 class TriaxialCompressionEngine;
 
-class TriaxialStateRecorder : public DataRecorder
+class TriaxialStateRecorder : public Recorder
 {
 	private :
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
-		std::ofstream ofile;
-		
 		bool changed;
-	
 	public :
-		std::string	 outputFile;
-		unsigned int	 interval;
 		Real 		porosity;
 		
 		//Real height, width, depth;
 		//Real thickness; // FIXME should retrieve "extents" of a InteractingBox
 		
-		
 		//int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;
 
 		TriaxialStateRecorder ();
-
 		virtual void action(MetaBody*);
-		virtual bool isActivated(MetaBody*);
 	DECLARE_LOGGER;
-	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(porosity));
+	REGISTER_ATTRIBUTES(Recorder,(porosity));
 
 	protected :
-		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(TriaxialStateRecorder);
-	REGISTER_BASE_CLASS_NAME(DataRecorder);
+	REGISTER_CLASS_AND_BASE(TriaxialStateRecorder,Recorder);
 };
-
 REGISTER_SERIALIZABLE(TriaxialStateRecorder);
 
 

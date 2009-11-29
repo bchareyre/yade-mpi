@@ -4,7 +4,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)(CpmGlobalCharacteristics)
+YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(GLDrawCpmPhys)
 	#endif	

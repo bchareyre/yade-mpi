@@ -135,10 +135,10 @@ opts.AddVariables(
 	BoolVariable('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
-	ListVariable('exclude','Yade components that will not be built','none',names=['qt3','gui','extra','common','dem','lattice','snow']),
+	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','python,log4cxx,opengl,gts,openmp',names=['opengl','python','log4cxx','cgal','openmp','gts','vtk','shape','physpar']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp',names=['opengl','log4cxx','cgal','openmp','gts','vtk','shape','physpar','python']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -159,6 +159,9 @@ opts.AddVariables(
 	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
 opts.Update(env)
+# deprecated features, is mandatory now. This removes it from the saved profile
+# so that when we remove it from features definitely, the profile will be OK.
+if 'python' in env['features']: env['features'].remove('python')
 opts.Save(optsFile,env)
 # handle colon-separated lists:
 for k in ('CPPPATH','LIBPATH','QTDIR','PATH'):
@@ -328,6 +331,10 @@ if not env.GetOption('clean'):
 	if not env['useMiniWm3']:
 		conf.env.Append(CPPPATH='/usr/include/wm3') # packaged version
 		ok&=conf.CheckLibWithHeader('Wm3Foundation','Wm3Math.h','c++','Wm3::Math<double>::PI;',autoadd=1)
+	ok&=(conf.CheckPython()
+		and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
+		and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
+		and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)
@@ -341,34 +348,21 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
 		env.Append(LIBS='vtkHybrid')
 		if not ok: featureNotOK('vtk',note="You might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
-	if 'opengl' in env['features']:
-		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
-		# TODO ok=True for darwin platform where openGL (and glut) is native
-		if not ok: featureNotOK('opengl')
 	if 'gts' in env['features']:
 		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
 		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)
 		if not ok: featureNotOK('gts')
-	if 'qt3' not in env['exclude']:
-		if 'opengl' not in env['features']:
-			print "\nQt3 interface can only be used if opengl is enabled.\nEither add opengl to 'features' or add qt3 to 'exclude'."
-			Exit(1)
-		ok&=conf.CheckQt(env['QTDIR'])
-		if not ok:
-			print "ERROR: Qt3 library not found. Add qt3 to the 'exclude' list (opengl will be skipped as well)"
-			Exit(1)
+	if 'opengl' in env['features']:
+		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
+		# TODO ok=True for darwin platform where openGL (and glut) is native
+		if not ok: featureNotOK('opengl')
+		ok=conf.CheckQt(env['QTDIR'])
+		if not ok: featureNotOK('opengl','Building with OpenGL implies qt3 interface, which was not found, although OpenGL was.')
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 		env['QGLVIEWER_LIB']='yade-QGLViewer';
-
 	if 'log4cxx' in env['features']:
 		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
 		if not ok: featureNotOK('log4cxx')
-	if 'python' in env['features']:
-		ok=(conf.CheckPython()
-			and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
-			and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
-			and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
-		if not ok: featureNotOK('python')
 	if 'cgal' in env['features']:
 		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		if not ok: featureNotOK('cgal')
@@ -566,7 +560,7 @@ def linkPlugins(plugins):
 		if not buildPlugs.has_key(p):
 			raise RuntimeError("Plugin %s will not be built!"%p)
 		ret.add(buildPlugs[p].obj)
-	return list(ret)
+	return ['core','yade-support']+list(ret)
 
 env['linkPlugins']=linkPlugins
 env['buildPlugs']=buildPlugs
@@ -584,7 +578,7 @@ if not COMMAND_LINE_TARGETS:
 		for f in files:
 			ff=os.path.join(root,f)
 			# do not delete python-optimized files and symbolic links (lib_gts__python-module.so, for instance)
-			if ff not in toInstall and not ff.endswith('.pyo') and not os.path.islink(ff) and not os.path.basename(ff).startswith('.nfs'):
+			if ff not in toInstall and not ff.endswith('.pyo') and not ff.endswith('.pyc') and not os.path.islink(ff) and not os.path.basename(ff).startswith('.nfs'):
 				print "Deleting extra plugin", ff
 				os.remove(ff)
 

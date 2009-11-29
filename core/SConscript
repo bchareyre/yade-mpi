@@ -1,7 +1,20 @@
 Import('*')
-env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
-	env.Program('yade',
-		env.Combine('core.cpp',['Body.cpp',
+
+pyMain='$PREFIX/bin/yade$SUFFIX-py'
+env.InstallAs(pyMain,env.File('main.py','main'))
+env.AddPostAction(pyMain,Chmod(pyMain,0755))
+
+env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
+	env.SharedLibrary('boot',['main/pyboot.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-support','core'])
+])
+
+
+env.InstallAs('$PREFIX/bin/yade$SUFFIX',env.Program('yade',['main/main.cpp'],LIBS=env['LIBS']+['yade-support','core'],CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['realVersion']+'\\"'),]))
+
+env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
+	env.SharedLibrary('core',
+		env.Combine('core.cpp',[
+			'Body.cpp',
 			'BodyContainer.cpp',
 			'BoundingVolume.cpp',
 			'Collider.cpp',
@@ -24,18 +37,18 @@ env.InstallAs(['$PREFIX/bin/yade$SUFFIX'],[
 			'ThreadRunner.cpp',
 			'ThreadWorker.cpp',
 			'TimeStepper.cpp',
-			'yade.cpp',
 			'containers/BodyVector.cpp',
-			'containers/InteractionVecMap.cpp']
+			'containers/InteractionVecMap.cpp',
+
+			
+			]
 			+(['PhysicalParameters.cpp'] if 'physpar' in env['features'] else [])
 			),
 		LIBS=env['LIBS']+[
 			'yade-support',
-			'sqlite3x',
 			'miniWm3',
 			'rt', # realtime lib, for clock_gettime 
 			]+
 			(['$QGLVIEWER_LIB','yade-opengl'] if 'YADE_OPENGL' in env['CPPDEFINES'] else []),
-		CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['realVersion']+'\\"'),]
-		)
+	)
 ])

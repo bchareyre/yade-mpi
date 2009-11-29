@@ -3,61 +3,60 @@ Import('*')
 linkPlugins=env['linkPlugins']
 import os.path 
 
-if 'YADE_PYTHON' in env['CPPDEFINES']:
-	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
-		env.SharedLibrary('WeightedAverage2d',['WeightedAverage2d.cpp'],SHLIBPREFIX=''),
-		env.SharedLibrary('_eudoxos',['_eudoxos.cpp'],SHLIBPREFIX='',CXXFLAGS=env['CXXFLAGS']+([] if not os.path.exists('../../brefcom-mm.hh') else ['-include','../brefcom-mm.hh']),LIBS=env['LIBS']+[
-			linkPlugins(['Shop','ConcretePM']),
-			]),
-		env.SharedLibrary('log',['log.cpp'],SHLIBPREFIX=''),
-		env.SharedLibrary('_utils',['_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
-			linkPlugins(['Shop','ConcretePM','InteractingFacet']),
-			]),
-		env.SharedLibrary('_packPredicates',['_packPredicates.cpp'],SHLIBPREFIX='',
-			# link to the symlink to the python module (created in lib/SConstruct; see explanation there)
-			LIBS=env['LIBS']+(['_gts__python-module'] if 'YADE_GTS' in env['CPPDEFINES'] else []),
-			),
-		env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
-			linkPlugins(['Shop','SpherePack']),
-			]),
-		env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
-		env.File('utils.py'),
-		env.File('ymport.py'),
-		env.File('eudoxos.py'),
-		env.File('plot.py'),
-		env.File('linterpolation.py'),
-		env.File('timing.py'),
-		env.File('pack.py'),
-		env.File('export.py'),
-		env.File('post2d.py'),
-		env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=linkPlugins(['Shop','BoundingVolumeMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'shape' in env['features'] else [])+(['StateMetaEngine',] if 'physpar' in env['features'] else []))),
-		env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundingVolumeEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit ConstitutiveLaw")+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit'] if 'shape' in env['features'] else [])+(['PhysicalActionDamperUnit','PhysicalActionApplierUnit','StateEngineUnit'] if 'physpar' in env['features'] else [])))
-	])
-	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
-		env.File('__init__.py','tests'),
-		env.File('wrapper.py','tests'),
-		env.File('omega.py','tests')
-	])
+env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
+	env.SharedLibrary('WeightedAverage2d',['WeightedAverage2d.cpp'],SHLIBPREFIX=''),
+	env.SharedLibrary('_eudoxos',['_eudoxos.cpp'],SHLIBPREFIX='',CXXFLAGS=env['CXXFLAGS']+([] if not os.path.exists('../../brefcom-mm.hh') else ['-include','../brefcom-mm.hh']),LIBS=env['LIBS']+[
+		linkPlugins(['Shop','ConcretePM']),
+		]),
+	env.SharedLibrary('log',['log.cpp'],SHLIBPREFIX=''),
+	env.SharedLibrary('_utils',['_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
+		linkPlugins(['Shop','ConcretePM','InteractingFacet']),
+		]),
+	env.SharedLibrary('_packPredicates',['_packPredicates.cpp'],SHLIBPREFIX='',
+		# link to the symlink to the python module (created in lib/SConstruct; see explanation there)
+		LIBS=env['LIBS']+(['_gts__python-module'] if 'YADE_GTS' in env['CPPDEFINES'] else []),
+		),
+	env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
+		linkPlugins(['Shop','SpherePack']),
+		]),
+	env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
+	env.File('utils.py'),
+	env.File('ymport.py'),
+	env.File('eudoxos.py'),
+	env.File('plot.py'),
+	env.File('linterpolation.py'),
+	env.File('timing.py'),
+	env.File('pack.py'),
+	env.File('export.py'),
+	env.File('post2d.py'),
+	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=['PythonUI']+linkPlugins(['Shop','BoundingVolumeMetaEngine','InteractionGeometryMetaEngine','InteractionPhysicsMetaEngine','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'shape' in env['features'] else [])+(['StateMetaEngine',] if 'physpar' in env['features'] else []))),
+	env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundingVolumeEngineUnit InteractionGeometryEngineUnit InteractionPhysicsEngineUnit ConstitutiveLaw")+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit'] if 'shape' in env['features'] else [])+(['PhysicalActionDamperUnit','PhysicalActionApplierUnit','StateEngineUnit'] if 'physpar' in env['features'] else [])))
+])
+env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
+	env.File('__init__.py','tests'),
+	env.File('wrapper.py','tests'),
+	env.File('omega.py','tests')
+])
 
-	# 3rd party modules:
-	# ==================
-	env.Install('$PREFIX/lib/yade$SUFFIX/py',[
-		env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/']),
-	])
+# 3rd party modules:
+# ==================
+env.Install('$PREFIX/lib/yade$SUFFIX/py',[
+	env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/'],LIBS=env['LIBS']+['core']),
+])
 
-	if 'YADE_GTS' in env['CPPDEFINES']:
-		env.Install('$PREFIX/lib/yade$SUFFIX/py/gts',[
-			env.SharedLibrary('_gts',['3rd-party/pygts-0.3.1/cleanup.c','3rd-party/pygts-0.3.1/edge.c','3rd-party/pygts-0.3.1/face.c','3rd-party/pygts-0.3.1/object.c','3rd-party/pygts-0.3.1/point.c','3rd-party/pygts-0.3.1/pygts.c','3rd-party/pygts-0.3.1/segment.c','3rd-party/pygts-0.3.1/surface.c','3rd-party/pygts-0.3.1/triangle.c','3rd-party/pygts-0.3.1/vertex.c'],SHLIBPREFIX='',CPPDEFINES=env['CPPDEFINES']+['PYGTS_HAS_NUMPY']),
-			env.File('3rd-party/pygts-0.3.1/__init__.py'),
-			env.File('3rd-party/pygts-0.3.1/pygts.py')
-		])
-		#
-		# the _packPredicates module needs to link to us, but linker by defaults looks for lib*.so files
-		# Therefore we will create symlink with that name (in lib/ rather than py/gts, so that it is in the RPATH
-		# without further modifications). If the file were copied (installed 2 times), static data would be
-		# created twice and it would break python type identification (among other things).
-		#
-		env.Command('$PREFIX/lib/yade$SUFFIX/lib/lib_gts__python-module.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so','ln -s -f ../py/gts/_gts.so $TARGET')
+if 'YADE_GTS' in env['CPPDEFINES']:
+	env.Install('$PREFIX/lib/yade$SUFFIX/py/gts',[
+		env.SharedLibrary('_gts',['3rd-party/pygts-0.3.1/cleanup.c','3rd-party/pygts-0.3.1/edge.c','3rd-party/pygts-0.3.1/face.c','3rd-party/pygts-0.3.1/object.c','3rd-party/pygts-0.3.1/point.c','3rd-party/pygts-0.3.1/pygts.c','3rd-party/pygts-0.3.1/segment.c','3rd-party/pygts-0.3.1/surface.c','3rd-party/pygts-0.3.1/triangle.c','3rd-party/pygts-0.3.1/vertex.c'],SHLIBPREFIX='',CPPDEFINES=env['CPPDEFINES']+['PYGTS_HAS_NUMPY']),
+		env.File('3rd-party/pygts-0.3.1/__init__.py'),
+		env.File('3rd-party/pygts-0.3.1/pygts.py')
+	])
+	#
+	# the _packPredicates module needs to link to us, but linker by defaults looks for lib*.so files
+	# Therefore we will create symlink with that name (in lib/ rather than py/gts, so that it is in the RPATH
+	# without further modifications). If the file were copied (installed 2 times), static data would be
+	# created twice and it would break python type identification (among other things).
+	#
+	env.Command('$PREFIX/lib/yade$SUFFIX/lib/lib_gts__python-module.so','$PREFIX/lib/yade$SUFFIX/py/gts/_gts.so','ln -s -f ../py/gts/_gts.so $TARGET')
 
 
 

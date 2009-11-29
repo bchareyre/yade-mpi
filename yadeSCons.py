@@ -146,9 +146,9 @@ def buildPluginLibs(env,plugInfo):
 		srcs=list(objs[obj][0])
 		if len(srcs)>1: srcs=env.Combine('$buildDir/'+obj+'.cpp',srcs)
 		if linkStrategy!='static':
-			env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.SharedLibrary(obj,srcs,LIBS=env['LIBS']+list(objs[obj][1])))
+			env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.SharedLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
 		else:
-			env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.StaticLibrary(obj,srcs,LIBS=env['LIBS']+list(objs[obj][1])))
+			env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.StaticLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
 	
 
 	

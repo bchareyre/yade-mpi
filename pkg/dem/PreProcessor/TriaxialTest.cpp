@@ -547,8 +547,8 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 	// recording global stress
 	if(recordIntervalIter>0 && !noFiles){
 		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
-		triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
-		triaxialStateRecorder-> interval 		= recordIntervalIter;
+		triaxialStateRecorder-> file 		= WallStressRecordFile + Key;
+		triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 		//triaxialStateRecorderer-> thickness 		= thickness;
 	}
 	

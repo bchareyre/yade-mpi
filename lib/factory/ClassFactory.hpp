@@ -15,6 +15,7 @@
 #include<string>
 #include<list>
 #include<iostream>
+#include<cstdio>
 
 #ifndef  __GXX_EXPERIMENTAL_CXX0X__
 #	include<boost/shared_ptr.hpp>
@@ -92,7 +93,7 @@ class Factorable;
 	\note ClassFactory is a singleton so you can't create an instance of it because its constructor is private.
 	You should instead use ClassFactory::instance().createShared("Rigidbody") for example.
 */
-class ClassFactory : public Singleton< ClassFactory >
+class ClassFactory : public Singleton<ClassFactory>
 {
 	private :
 		/// Pointer on a function that create an instance of a serializable class an return a shared pointer on it
@@ -127,10 +128,11 @@ class ClassFactory : public Singleton< ClassFactory >
 		/// Map that contains the name of the registered class and their description
 		FactorableCreatorsMap map;
 
-		ClassFactory() { if(getenv("YADE_DEBUG")) cerr<<"Constructing ClassFactory; _must_ be only once, otherwise linking is broken (missing -rdynamic?)\n"<<endl; };
+		ClassFactory() { if(getenv("YADE_DEBUG")) fprintf(stderr,"Constructing ClassFactory.\n"); }
 		ClassFactory(const ClassFactory&);
 		ClassFactory& operator=(const ClassFactory&);
 		virtual ~ClassFactory() {};
+		DECLARE_LOGGER;
 
 	public :
 		/*! This method is used to register a Factorable class into the factory. It is called only from macro REGISTER_CLASS_TO_FACTORY

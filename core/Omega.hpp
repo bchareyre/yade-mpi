@@ -11,19 +11,17 @@
 #pragma once
 
 // qt3 sucks
-#ifdef YADE_PYTHON
-	#ifdef QT_MOC_CPP
+#ifdef QT_MOC_CPP
+	#undef slots
+	#include<Python.h>
+	#define slots slots
+#else
+	#ifdef slots
 		#undef slots
 		#include<Python.h>
-		#define slots slots
+		#define slots
 	#else
-		#ifdef slots
-			#undef slots
-			#include<Python.h>
-			#define slots
-		#else
-			#include<Python.h>
-		#endif
+		#include<Python.h>
 	#endif
 #endif
 
@@ -65,10 +63,10 @@ struct DynlibDescriptor
 			,isSerializable;
 };
 
-class Omega : public Singleton<Omega>
+class Omega: public Singleton<Omega>
 {
 
-	private	:
+	private:
 		shared_ptr<ThreadRunner>	 simulationLoop;
 		SimulationFlow			 simulationFlow_;
 
@@ -130,7 +128,7 @@ class Omega : public Singleton<Omega>
 		bool		isRunning();
 
 		const		map<string,DynlibDescriptor>& getDynlibsDescriptor();
-		void		scanPlugins(string baseDir);
+		void		scanPlugins(vector<string> baseDirs);
 		bool		isInheritingFrom(const string& className, const string& baseClassName );
 
 		void		setTimeStep(const Real);
@@ -172,11 +170,8 @@ class Omega : public Singleton<Omega>
 
 		DECLARE_LOGGER;
 
-	private	:
-		Omega();
-		~Omega();
-		Omega(const Omega&);
-		Omega& operator=(const Omega&);
+		Omega(){ LOG_DEBUG("Constructing Omega."); }
+		~Omega(){}
 
 	FRIEND_SINGLETON(Omega);
 	friend class pyOmega;

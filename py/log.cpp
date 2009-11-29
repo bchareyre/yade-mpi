@@ -31,22 +31,28 @@ enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 		}
 		log4cxx::LogManager::getLogger("yade."+loggerName)->setLevel(l);
 	}
+	void logLoadConfig(std::string f){ log4cxx::PropertyConfigurator::configure(f); }
 #else
 	bool warnedOnce=false;
 	void logSetLevel(std::string loggerName, int level){
 		// better somehow python's raise RuntimeWarning, but not sure how to do that from c++
 		// it shouldn't be trapped by boost::python's exception translator, just print warning
 		// Do like this for now.
-		if(!warnedOnce){
-			LOG_WARN("Yade was compiled without log4cxx support. Setting log levels from python will have no effect (warn once).");
-			warnedOnce=true;
-		}
+		if(warnedOnce) return;
+		LOG_WARN("Yade was compiled without log4cxx support. Setting log levels from python will have no effect (warn once).");
+		warnedOnce=true;
+	}
+	void logLoadConfig(std::string f){
+		if(warnedOnce) return;
+		LOG_WARN("Yade was compiled without log4cxx support. Loading log file will have no effect (warn once).");
+		warnedOnce=true;
 	}
 #endif
 
 BOOST_PYTHON_MODULE(log){
 	python::scope().attr("__doc__") = "Acess and manipulation of log4cxx loggers.";
 	python::def("setLevel",logSetLevel,"Set minimum severity level (constants TRACE,DEBUG,INFO,WARN,ERROR,FATAL) for given logger\nleading 'yade.' will be appended automatically to the logger name; if logger is '', the root logger 'yade' will be operated on.");
+	python::def("loadConfig",logLoadConfig,"Load configuration from file (log4cxx::PropertyConfigurator::configure)");
 	python::scope().attr("TRACE")=(int)ll_TRACE;
 	python::scope().attr("DEBUG")=(int)ll_DEBUG;
 	python::scope().attr("INFO")= (int)ll_INFO;

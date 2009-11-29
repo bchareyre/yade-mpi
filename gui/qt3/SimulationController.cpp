@@ -29,9 +29,7 @@
 #		define FOREACH BOOST_FOREACH
 #	endif
 
-#ifdef YADE_PYTHON
-	#include<boost/python.hpp>
-#endif
+#include<boost/python.hpp>
 
 
 CREATE_LOGGER(SimulationController);
@@ -96,10 +94,8 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
 
-	#ifndef YADE_PYTHON
-		pyOneliner->setEnabled(false);
-		pyOneliner->setText("Yade compiled without Python");
-	#endif
+	pyOneliner->setEnabled(false);
+	pyOneliner->setText("Yade compiled without Python");
 }
 
 /* restart timer with SimulationController::refreshTime */
@@ -136,7 +132,6 @@ void SimulationController::pbZXY_clicked()
    execute the command and make the line empty
 */
 void SimulationController::pyOnelinerEnter(){
-#ifdef YADE_PYTHON
 	PyGILState_STATE gstate;
 		gstate = PyGILState_Ensure();
 		try{
@@ -149,7 +144,6 @@ void SimulationController::pyOnelinerEnter(){
 		}
 	PyGILState_Release(gstate);
 	pyOneliner->clear();
-#endif
 };
 
 void SimulationController::pbGenerate_clicked(){

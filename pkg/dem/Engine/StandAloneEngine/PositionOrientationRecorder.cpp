@@ -18,36 +18,32 @@
 
 CREATE_LOGGER(PositionOrientationRecorder);
 
-PositionOrientationRecorder::PositionOrientationRecorder () : DataRecorder(){
+PositionOrientationRecorder::PositionOrientationRecorder() {
 	outputFile = "positionorientation";
-	interval = 50;
 	saveRgb=false;
+	iterPeriod=50;
 }
-PositionOrientationRecorder::~PositionOrientationRecorder (){}
-void PositionOrientationRecorder::postProcessAttributes(bool deserializing){if(deserializing) {}}
 
 void PositionOrientationRecorder::action(MetaBody * ncb){
-	if( Omega::instance().getCurrentIteration() % interval == 0 ){
-		ostringstream oss;
-		oss<<setfill('0')<<outputFile<<"_"<<setw(7)<<Omega::instance().getCurrentIteration();
-		string fileBase=oss.str();
-		iostreams::filtering_ostream ofile; ofile.push(iostreams::bzip2_compressor()); ofile.push(iostreams::file_sink(fileBase+".bz2"));
-		iostreams::filtering_ostream rgbFile;
-		if(saveRgb){
-			rgbFile.push(iostreams::bzip2_compressor());
-			rgbFile.push(iostreams::file_sink(fileBase+".rgb.bz2"));
-		}
-		if(!ofile.good()){ LOG_ERROR("Snapshot "<<fileBase<<".bz2 could not be opened for writing (skipping)!"); return; }
-		if(saveRgb && !rgbFile.good()){ LOG_ERROR("Snapshot "<<fileBase<<".rgb.bz2 could not be opened for writing (skipping)!"); return; }
-		LOG_INFO("Snapshot "<<fileBase<<".bz2"<<(saveRgb?" (+rgb)":""));
-		BodyContainer::iterator biEnd = ncb->bodies->end();
-		for(BodyContainer::iterator bi    = ncb->bodies->begin(); bi!=biEnd; ++bi){
-			const Se3r& se3=(*bi)->state->se3;
-			ofile<<se3.position[0]<<" "<<se3.position[1]<<" "<<se3.position[2]<<" "<<se3.orientation[0]<<" "<<se3.orientation[1]<<" "<<se3.orientation[2]<<" "<<se3.orientation[3]<<endl;
-			if(saveRgb && (*bi)->interactingGeometry) {
-				const Vector3r& color=(*bi)->interactingGeometry->diffuseColor;
-				rgbFile<<color[0]<<" "<<color[1]<<" "<<color[2]<<endl;
-			}
+	ostringstream oss;
+	oss<<setfill('0')<<outputFile<<"_"<<setw(7)<<Omega::instance().getCurrentIteration();
+	string fileBase=oss.str();
+	iostreams::filtering_ostream ofile; ofile.push(iostreams::bzip2_compressor()); ofile.push(iostreams::file_sink(fileBase+".bz2"));
+	iostreams::filtering_ostream rgbFile;
+	if(saveRgb){
+		rgbFile.push(iostreams::bzip2_compressor());
+		rgbFile.push(iostreams::file_sink(fileBase+".rgb.bz2"));
+	}
+	if(!ofile.good()){ LOG_ERROR("Snapshot "<<fileBase<<".bz2 could not be opened for writing (skipping)!"); return; }
+	if(saveRgb && !rgbFile.good()){ LOG_ERROR("Snapshot "<<fileBase<<".rgb.bz2 could not be opened for writing (skipping)!"); return; }
+	LOG_INFO("Snapshot "<<fileBase<<".bz2"<<(saveRgb?" (+rgb)":""));
+	BodyContainer::iterator biEnd = ncb->bodies->end();
+	for(BodyContainer::iterator bi    = ncb->bodies->begin(); bi!=biEnd; ++bi){
+		const Se3r& se3=(*bi)->state->se3;
+		ofile<<se3.position[0]<<" "<<se3.position[1]<<" "<<se3.position[2]<<" "<<se3.orientation[0]<<" "<<se3.orientation[1]<<" "<<se3.orientation[2]<<" "<<se3.orientation[3]<<endl;
+		if(saveRgb && (*bi)->interactingGeometry) {
+			const Vector3r& color=(*bi)->interactingGeometry->diffuseColor;
+			rgbFile<<color[0]<<" "<<color[1]<<" "<<color[2]<<endl;
 		}
 	}
 }
