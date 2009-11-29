@@ -39,7 +39,7 @@ DynLibManager::~DynLibManager ()
 // load plugin with given filename
 bool DynLibManager::load (const string& lib){
 	if (lib.empty()) throw std::runtime_error(__FILE__ ": got empty library name to load.");
-	void* handle = dlopen(lib.c_str(),RTLD_NOW);
+	void* handle = dlopen(lib.c_str(),RTLD_GLOBAL | RTLD_NOW);
 	if (!handle) return !error();
 	handles[lib] = handle;
 	return true;

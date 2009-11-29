@@ -305,7 +305,6 @@ class pyOmega{
 			OMEGA.init();
 			rb=OMEGA.getRootBody();
 		}
-		fprintf(stderr,"rootBody = %p",rb.get());
 		assert(rb);
 		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
@@ -590,8 +589,10 @@ shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::di
 	shared_ptr<T> instance;
 	if(clss.empty()){ instance=shared_ptr<T>(new T); }
 	else{
-		instance=dynamic_pointer_cast<T>(ClassFactory::instance().createShared(clss));
-		if(!instance) throw runtime_error("Invalid class `"+clss+"': either nonexistent, or unable to cast to type `"+typeid(T).name()+"'");
+		shared_ptr<Factorable> instance0=ClassFactory::instance().createShared(clss);
+		if(!instance0) throw runtime_error("Invalid class `"+clss+"' (not created by ClassFactory).");
+		instance=dynamic_pointer_cast<T>(instance0);
+		if(!instance) throw runtime_error("Invalid class `"+clss+"' (unable to cast to typeid `"+typeid(T).name()+"')");
 	}
 	Serializable_updateAttrs(instance,d);
 	return instance;

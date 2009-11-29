@@ -91,7 +91,7 @@ O.engines=[
 	PeriodicPythonRunner(virtPeriod=3e-5/strainRateTension,realLim=5,command='addPlotData()',label='plotDataCollector'),
 	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
-O.miscParams=[GLDrawCpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
+#O.miscParams=[GLDrawCpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 
 # plot stresses in ¼, ½ and ¾ if desired as well; too crowded in the graph that includes confinement, though
 plot.plots={'eps':('sigma',)} #'sigma.25','sigma.50','sigma.75')}

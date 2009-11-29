@@ -1,6 +1,15 @@
 #!/usr/bin/python
 # syntax:python
 
+# see file:///usr/share/doc/python2.6/html/library/sys.html#sys.setdlopenflags
+# and various web posts on the topic, e.g.
+# * http://gcc.gnu.org/faq.html#dso
+# * http://www.code-muse.com/blog/?p=58
+# * http://wiki.python.org/moin/boost.python/CrossExtensionModuleDependencies
+import sys, DLFCN
+sys.setdlopenflags(DLFCN.RTLD_NOW | DLFCN.RTLD_GLOBAL)
+
+
 # find what is our version, based on argv[0]
 import sys,re,os.path
 m=re.match('(.*)/bin/yade(-.*)-py',sys.argv[0])

@@ -36,25 +36,17 @@ void yadeInitialize(python::list& dd, bool gdb){
 		log4cxx::LoggerPtr localLogger=log4cxx::Logger::getLogger("yade");
 		localLogger->setLevel(getenv("YADE_DEBUG")?debugLevel:warnLevel);
 	#endif
-	// create singletons
-	Omega::instance();
-	ClassFactory::instance();
-	SerializableSingleton::instance();
+
+	#if defined(YADE_OPENMP) || defined(YADE_OPENGL)
+		LOG_ERROR("Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.")
+	#endif
 
 	PyEval_InitThreads();
 
-	int _i=0;
-	#define TR fprintf(stderr,"%d",_i++)
-	TR;
 	Omega& O(Omega::instance());
-	TR;
 	O.init();
 	O.origArgv=NULL; O.origArgc=0;
-
-	fprintf(stderr,"rootBody=%p\n",O.getRootBody().get());
-	TR;
 	O.initTemps();
-	TR;
 	#ifdef YADE_DEBUG
 		if(gdb){
 			ofstream gdbBatch;
@@ -64,15 +56,14 @@ void yadeInitialize(python::list& dd, bool gdb){
 			signal(SIGSEGV,crashHandler);
 		}
 	#endif
-	TR;
-	TR;
 	vector<string> dd2; for(int i=0; i<python::len(dd); i++) dd2.push_back(python::extract<string>(dd[i]));
 	Omega::instance().scanPlugins(dd2);
-	TR;
 }
 void yadeFinalize(){ Omega::instance().cleanupTemps(); }
 
 BOOST_PYTHON_MODULE(boot){
+	// FIXME: still a crasher with openmp or OpenGL...
+	// cerr<<"[boot]"<<endl;
 	python::scope().attr("initialize")=&yadeInitialize;
 	python::scope().attr("finalize")=&yadeFinalize; //,"Finalize yade (only to be used internally).")
 }

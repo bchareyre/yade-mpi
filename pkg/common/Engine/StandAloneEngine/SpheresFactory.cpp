@@ -20,7 +20,6 @@
 #include<sstream>
 
 YADE_PLUGIN((SpheresFactory));
-YADE_REQUIRE_FEATURE(PYTHON)
 CREATE_LOGGER(SpheresFactory);
 
 boost::variate_generator<boost::mt19937,boost::uniform_real<> > 
