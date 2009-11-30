@@ -38,10 +38,12 @@ class State;
 class VelocityBins;
 
 class NewtonsDampedLaw : public StandAloneEngine{
-	inline void cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration);
+	inline void cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A);
 	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState);
 	bool haveBins;
-	void accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb);
+	inline void lfTranslate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog translate
+	inline void lfSpheralRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog rotate of spheral body
+	inline void lfRigidBodyRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of rigid (non symmetric) body
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
