@@ -845,6 +845,7 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	EXPOSE_CXX_CLASS(Body)
 		.def_readwrite("mold",&Body::interactingGeometry)
+		.def_readwrite("geom",&Body::interactingGeometry)
 		.def_readwrite("bound",&Body::boundingVolume)
 		.def_readwrite("mat",&Body::material)
 		.def_readwrite("state",&Body::state)

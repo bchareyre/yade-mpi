@@ -135,9 +135,6 @@ def getPluginLibs(p,plugInfo):
 	ret.discard(p.obj)
 	return ret
 
-def seqChunks(l,n):
-    return [l[i:i+n] for i in range(0, len(l), n)]
-
 def buildPluginLibs(env,plugInfo):
 	objs={}
 	linkStrategy=env['linkStrategy']

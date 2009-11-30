@@ -598,3 +598,7 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	#undef v3
 }
 
+
+Real TetrahedronVolume(const Vector3r v[4]) { return fabs((Vector3r(v[3])-Vector3r(v[0])).Dot((Vector3r(v[3])-Vector3r(v[1])).Cross(Vector3r(v[3])-Vector3r(v[2]))))/6.; }
+Real TetrahedronVolume(const vector<Vector3r>& v) { return fabs(Vector3r(v[1]-v[0]).Dot(Vector3r(v[2]-v[0]).Cross(v[3]-v[0])))/6.; }
+
