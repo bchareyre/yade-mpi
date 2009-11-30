@@ -38,15 +38,11 @@ using namespace std;
 		log4cxx::LevelPtr debugLevel=log4cxx::Level::DEBUG, infoLevel=log4cxx::Level::INFO, warnLevel=log4cxx::Level::WARN;
 	#endif
 
-	/* initialization of log4cxx for early logging */
-	__attribute__((constructor/* (1000) ::: can be uncommented for gcc>=4.0 */)) void initLog4cxx(){
+	/* initialization of log4cxx */
+	void initLog4cxx(){
 		log4cxx::BasicConfigurator::configure();
 		log4cxx::LoggerPtr localLogger=log4cxx::Logger::getLogger("yade");
-		if(getenv("YADE_DEBUG")){
-			LOG_INFO("YADE_DEBUG environment variable is defined, logging level is DEBUG.");
-			localLogger->setLevel(debugLevel);
-		}
-		else localLogger->setLevel(warnLevel);
+		localLogger->setLevel(warnLevel);
 	}
 #endif
 
@@ -60,7 +56,6 @@ void warnOnceHandler(int sig){
 void
 sigHandler(int sig){
 	#ifdef YADE_DEBUG
-		int res;
 	#endif
 	switch(sig){
 		case SIGINT:
@@ -75,7 +70,7 @@ sigHandler(int sig){
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			res=std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			{ int res; res=std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str()); } // braces to create scope for res
 			unlink(Omega::instance().gdbCrashBatch.c_str()); // delete the crash batch file
 			raise(sig); // reemit signal after exiting gdb
 			break;
@@ -132,6 +127,9 @@ void printHelp()
 
 int main(int argc, char *argv[])
 {
+	#ifdef YADE_LOG4CXX
+		initLog4cxx();
+	#endif
 	Omega::instance();
 	ClassFactory::instance();
 	SerializableSingleton::instance();
@@ -150,7 +148,13 @@ int main(int argc, char *argv[])
 
 	bool useGdb=true;
 	
-	int ch; string gui="QtGUI"; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
+	// default UI
+	#ifdef YADE_OPENGL
+		string gui="QtGUI";
+	#else
+		string gui="PythonUI";
+	#endif
+	int ch; string simulationFileName=""; bool setup=false; int verbose=0; bool coreOptions=true; bool explicitUI=false;
 	while(coreOptions && (ch=getopt(argc,argv,"+hnN:wC:cxvS:"))!=-1)
 		switch(ch){
 			case 'h': printHelp(); return 1;
@@ -175,11 +179,14 @@ int main(int argc, char *argv[])
 	#ifdef YADE_LOG4CXX
 		// read logging configuration from file and watch it (creates a separate thread)
 		std::string logConf=configPath+"/logging.conf";
+		if(getenv("YADE_DEBUG")){
+			logger->setLevel(debugLevel);
+			LOG_INFO("YADE_DEBUG environment variable is defined, logging level set to DEBUG.");
+		} else logger->setLevel(warnLevel);
 		if(filesystem::exists(logConf)){
 			log4cxx::PropertyConfigurator::configure(logConf);
 			LOG_INFO("Loading "<<logConf);
 		} else { // otherwise use simple console-directed logging
-			logger->setLevel(warnLevel);
 			LOG_INFO("Logger uses basic (console) configuration since `"<<logConf<<"' was not found. INFO and DEBUG messages will be omitted.");
 			LOG_INFO("Look at the file doc/logging.conf.sample in the source distribution as an example on how to customize logging.");
 		}
