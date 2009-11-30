@@ -3,11 +3,16 @@
 
 #include<signal.h>
 #include<cstdlib>
+#include<cstdio>
 #include<iostream>
 #include<string>
 #include<stdexcept>
 
 #include<boost/python.hpp>
+
+#ifdef YADE_LOG4CXX
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
+#endif
 
 #ifdef YADE_DEBUG
 	void crashHandler(int sig){
@@ -38,7 +43,12 @@ void yadeInitialize(python::list& dd, bool gdb){
 	#endif
 
 	#if defined(YADE_OPENMP) || defined(YADE_OPENGL)
-		//LOG_ERROR("Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.")
+		#ifdef LOG4CXX
+			LOG_ERROR("Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.")
+		#else
+			// avoid log4cxx-less LOG_ERROR, since it uses cerr, which crashes due to libsctc++ (?) issue.
+			fprintf(stderr,"ERROR: Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.\n");
+		#endif
 	#endif
 
 	PyEval_InitThreads();

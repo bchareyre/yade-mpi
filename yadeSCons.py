@@ -135,16 +135,23 @@ def getPluginLibs(p,plugInfo):
 	ret.discard(p.obj)
 	return ret
 
+def seqChunks(l,n):
+    return [l[i:i+n] for i in range(0, len(l), n)]
+
 def buildPluginLibs(env,plugInfo):
 	objs={}
 	linkStrategy=env['linkStrategy']
+	chunkSize=env['chunkSize']
 	for p in plugInfo.values():
 		if not objs.has_key(p.obj): objs[p.obj]=(set(),set())
 		objs[p.obj][0].add(p.src)
 		objs[p.obj][1].update(p.libs)
 	for obj in objs.keys():
 		srcs=list(objs[obj][0])
-		if len(srcs)>1: srcs=env.Combine('$buildDir/'+obj+'.cpp',srcs)
+		if len(srcs)>1:
+			if len(srcs)<chunkSize: srcs=env.Combine('$buildDir/'+obj+'.cpp',srcs)
+			# thanks to http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python :
+			else: srcs=[env.Combine('$buildDir/'+obj+'%d.cpp'%i,srcs[i:i+chunkSize]) for i in range(0,len(srcs),chunkSize)]
 		if linkStrategy!='static':
 			env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.SharedLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
 		else:

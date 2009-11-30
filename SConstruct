@@ -143,6 +143,7 @@ opts.AddVariables(
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
 	EnumVariable('linkStrategy','How to link plugins together',defOptions['linkStrategy'],['per-class','per-pkg[broken]','monolithic','static[broken]']),
+	('chunkSize','Maximum files to compile in one translation unit when building plugins.',20,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.2:/usr/include/vtk-5.4'),
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
@@ -558,7 +559,7 @@ def linkPlugins(plugins):
 	ret=set()
 	for p in plugins:
 		if not buildPlugs.has_key(p):
-			raise RuntimeError("Plugin %s will not be built!"%p)
+			raise RuntimeError("Plugin %s is required (backtrace shows where), but will not be built!"%p)
 		ret.add(buildPlugs[p].obj)
 	return ['core','yade-support']+list(ret)
 

@@ -38,11 +38,6 @@
 #include<yade/core/EngineUnit.hpp>
 
 #include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
-#ifdef YADE_SHAPE
-	#include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
-	#include<yade/pkg-common/InteractingGeometryMetaEngine.hpp>
-	#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
-#endif
 #include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
 #include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
@@ -821,10 +816,6 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<MetaEngine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>).def("dump",&DispatcherT::dump);
 		EXPOSE_DISPATCHER(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit)
-		#ifdef YADE_SHAPE
-			EXPOSE_DISPATCHER(GeometricalModelMetaEngine,GeometricalModelEngineUnit)
-			EXPOSE_DISPATCHER(InteractingGeometryMetaEngine,InteractingGeometryEngineUnit)
-		#endif
 		EXPOSE_DISPATCHER(InteractionGeometryMetaEngine,InteractionGeometryEngineUnit)
 		EXPOSE_DISPATCHER(InteractionPhysicsMetaEngine,InteractionPhysicsEngineUnit)
 		#ifdef YADE_PHYSPAR
@@ -837,10 +828,6 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<EngineUnit>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
 		EXPOSE_FUNCTOR(BoundingVolumeEngineUnit)
-		#ifdef YADE_SHAPE
-			EXPOSE_FUNCTOR(GeometricalModelEngineUnit)
-			EXPOSE_FUNCTOR(InteractingGeometryEngineUnit)
-		#endif
 		EXPOSE_FUNCTOR(InteractionGeometryEngineUnit)
 		EXPOSE_FUNCTOR(InteractionPhysicsEngineUnit)
 		#ifdef YADE_PHYSPAR
@@ -857,9 +844,6 @@ BOOST_PYTHON_MODULE(wrapper)
 	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("classIndex",&Indexable_getClassIndex<className>)
 
 	EXPOSE_CXX_CLASS(Body)
-		#ifdef YADE_SHAPE
-			.def_readwrite("shape",&Body::geometricalModel)
-		#endif
 		.def_readwrite("mold",&Body::interactingGeometry)
 		.def_readwrite("bound",&Body::boundingVolume)
 		.def_readwrite("mat",&Body::material)
@@ -871,9 +855,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("isClumpMember",&Body::isClumpMember)
 		.add_property("isClump",&Body::isClump);
 	EXPOSE_CXX_CLASS_IX(InteractingGeometry);
-	#ifdef YADE_SHAPE
-		EXPOSE_CXX_CLASS_IX(GeometricalModel);
-	#endif
 	EXPOSE_CXX_CLASS_IX(BoundingVolume)
 		.def_readonly("min",&BoundingVolume::min)
 		.def_readonly("max",&BoundingVolume::max);
