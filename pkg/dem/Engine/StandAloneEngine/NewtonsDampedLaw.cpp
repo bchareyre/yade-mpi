@@ -17,12 +17,6 @@ CREATE_LOGGER(NewtonsDampedLaw);
 void NewtonsDampedLaw::cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A){
 	for(int i=0; i<3; i++) A[i]*= 1 - damping*Mathr::Sign ( N[i]*(V[i] + (Real) 0.5 *dt*A[i]) );
 }
-//void NewtonsDampedLaw::cundallDamp(const Real& dt, const Vector3r& f, const Vector3r& velocity, Vector3r& acceleration, const Vector3r& m, const Vector3r& angularVelocity, Vector3r& angularAcceleration){
-	//for(int i=0; i<3; i++){
-		//angularAcceleration[i]*= 1 - damping*Mathr::Sign ( m[i]*(angularVelocity[i] + (Real) 0.5 *dt*angularAcceleration[i]) );
-		//acceleration       [i]*= 1 - damping*Mathr::Sign ( f[i]*(velocity       [i] + (Real) 0.5 *dt*acceleration       [i]) );
-	//}
-//}
 void NewtonsDampedLaw::blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v) {
 	if(blockedDOFs==State::DOF_NONE) return;
 	if(blockedDOFs==State::DOF_ALL)  v = Vector3r::ZERO;
@@ -93,40 +87,21 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 				continue;
 			}
 
-//inline NewtonsDampedLaw::lfTranslate(MetaBody* ncb, State* state)
-//{
-
 			if (b->isStandalone()){
+				// translate equation
+				const Vector3r& f=ncb->bex.getForce(id); 
+				state->accel=f/state->mass; 
+				cundallDamp(dt,f,state->vel,state->accel); 
+				lfTranslate(ncb,state,id,dt);
+				// rotate equation
 				if (/*b->isSpheral || */ !accRigidBodyRot){ // spheral body or accRigidBodyRot disabled
-					// translate equation
-					const Vector3r& f=ncb->bex.getForce(id); 
-					state->accel=f/state->mass; 
-					cundallDamp(dt,f,state->vel,state->accel); 
-					blockTranslateDOFs(state->blockedDOFs, state->accel);
-					state->vel+=dt*state->accel;
-					state->pos += state->vel*dt + ncb->bex.getMove(id);
-					// rotate equation
 					const Vector3r& m=ncb->bex.getTorque(id); 
 					state->angAccel=diagDiv(m,state->inertia);
 					cundallDamp(dt,m,state->angVel,state->angAccel);
-					blockRotateDOFs(state->blockedDOFs, state->angAccel);
-					state->angVel+=dt*state->angAccel;
-					Vector3r axis = state->angVel; Real angle = axis.Normalize();
-					Quaternionr q; q.FromAxisAngle ( axis,angle*dt );
-					state->ori = q*state->ori;
-					if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
-					state->ori.Normalize();
+					lfSpheralRotate(ncb,state,id,dt);
 				} else { // non spheral body and accRigidBodyRot enabled
-					// translate equation
-					const Vector3r& f=ncb->bex.getForce(id); 
-					state->accel=f/state->mass; 
-					cundallDamp(dt,f,state->vel,state->accel); 
-					blockTranslateDOFs(state->blockedDOFs, state->accel);
-					state->vel+=dt*state->accel;
-					state->pos += state->vel*dt + ncb->bex.getMove(id);
-					// rotate equation
 					const Vector3r& m=ncb->bex.getTorque(id); 
-					accurateRigidBodyRotationIntegrator(ncb,b,m);
+					lfRigidBodyRotate(ncb,state,id,dt,m);
 				}
 			} else if (b->isClump()){
 				state->accel=state->angAccel=Vector3r::ZERO; // to make sure; should be reset in Clump::moveMembers
@@ -144,11 +119,13 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 						const shared_ptr<Body>& member=Body::byId(memberId,ncb);
 						assert(member->isClumpMember());
 						State* memberState=member->state.get();
+						// Linear acceleration
 						const Vector3r& f=ncb->bex.getForce(memberId); 
 						Vector3r diffClumpAccel=f/state->mass;
 						// damp increment of accel on the clump, using velocities of the clump MEMBER
 						cundallDamp(dt,f,memberState->vel,diffClumpAccel);
 						state->accel+=diffClumpAccel;
+						// Momentum
 						const Vector3r& m=ncb->bex.getTorque(memberId);
 						M+=(memberState->pos-state->pos).Cross(f)+m;
 						if(haveBins) velocityBins->binVelSqUse(memberId,VelocityBins::getBodyVelSq(memberState));
@@ -158,37 +135,22 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 							maxVelocitySq=max(maxVelocitySq,memberState->vel.SquaredLength());
 						#endif
 					}
-					// translation
-					blockTranslateDOFs(state->blockedDOFs, state->accel);
-					state->vel+=dt*state->accel;
-					state->pos += state->vel*dt + ncb->bex.getMove(id);
-					// rotation
-					accurateRigidBodyRotationIntegrator(ncb,b,M);
+					// motion
+					lfTranslate(ncb,state,id,dt);
+					lfRigidBodyRotate(ncb,state,id,dt,M);
 				} else { // accRigidBodyRot disabled
 					// sum force on clump memebrs, add them to the clump itself
 					FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
 						handleClumpMember(ncb,mm.first,state);
 					}
-					// at this point, forces from clump members are already summed up, this is just for forces applied to clump proper, if there are such
+					// forces applied to clump proper, if there are such
 					const Vector3r& m=ncb->bex.getTorque(id); const Vector3r& f=ncb->bex.getForce(id);
 					Vector3r dLinAccel=f/state->mass, dAngAccel=diagDiv(m,state->inertia);
 					cundallDamp(dt,f,state->vel,dLinAccel); cundallDamp(dt,m,state->angVel,dAngAccel);
 					state->accel+=dLinAccel; state->angAccel+=dAngAccel;
-					// blocking DOFs
-					blockTranslateDOFs( state->blockedDOFs, state->accel );
-					state->vel+=+dt*state->accel;
-					blockRotateDOFs( state->blockedDOFs, state->angAccel );
-					state->angVel+=dt*state->angAccel;
-					// translation
-					state->vel+=dt*state->accel;
-					state->pos += state->vel*dt + ncb->bex.getMove(id);
-					// rotation
-					state->angVel+=dt*state->angAccel;
-					Vector3r axis = state->angVel; Real angle = axis.Normalize();
-					Quaternionr q; q.FromAxisAngle ( axis,angle*dt );
-					state->ori = q*state->ori;
-					if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
-					state->ori.Normalize();
+					// motion
+					lfTranslate(ncb,state,id,dt);
+					lfSpheralRotate(ncb,state,id,dt);
 				}
 				static_cast<Clump*>(b.get())->moveMembers();
 			}
@@ -207,29 +169,40 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	if(haveBins) velocityBins->binVelSqFinalize();
 }
 
-void NewtonsDampedLaw::accurateRigidBodyRotationIntegrator(MetaBody* ncb, const shared_ptr<Body>& rb, const Vector3r& M){
-	const Real dt=Omega::instance().getTimeStep();
-	State* state=rb->state.get();
-	const body_id_t id=rb->getId();
-	// rotation equation
+inline void NewtonsDampedLaw::lfTranslate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt )
+{
+	blockTranslateDOFs(state->blockedDOFs, state->accel);
+	state->vel+=dt*state->accel;
+	state->pos += state->vel*dt + ncb->bex.getMove(id);
+}
+inline void NewtonsDampedLaw::lfSpheralRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt )
+{
+	blockRotateDOFs(state->blockedDOFs, state->angAccel);
+	state->angVel+=dt*state->angAccel;
+	Vector3r axis = state->angVel; Real angle = axis.Normalize();
+	Quaternionr q; q.FromAxisAngle ( axis,angle*dt );
+	state->ori = q*state->ori;
+	if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); Quaternionr q; q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
+	state->ori.Normalize();
+}
+void NewtonsDampedLaw::lfRigidBodyRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M){
 	Matrix3r A; state->ori.Conjugate().ToRotationMatrix(A); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2 * M; // global angular momentum at time n
-	//Vector3r l_b_n = state->ori.Conjugate().Rotate(l_n); // local angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
 	const Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
 	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
 	const Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
-	//Vector3r l_b_half = state->ori.Conjugate().Rotate(state->angMom); // local angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
 	Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2
 	blockRotateDOFs( state->blockedDOFs, angVel_b_half );
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
-	state->ori+=dt*dotQ_half; state->ori.Normalize(); // Q at time n+1
+	state->ori+=dt*dotQ_half; // Q at time n+1
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
+	if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); Quaternionr q; q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
+	state->ori.Normalize(); 
 
-	LOG_TRACE(//"\nforce: " << F << 
-			" torque: " << M
+	LOG_TRACE( "\ntorque: " << M
 		<< "\nglobal angular momentum at time n: " << l_n
 		<< "\nlocal angular momentum at time n:  " << l_b_n
 		<< "\nlocal angular velocity at time n:  " << angVel_b_n
