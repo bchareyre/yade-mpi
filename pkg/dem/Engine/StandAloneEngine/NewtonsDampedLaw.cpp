@@ -201,20 +201,6 @@ void NewtonsDampedLaw::lfRigidBodyRotate(MetaBody* ncb, State* state, const body
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
 	if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); Quaternionr q; q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
 	state->ori.Normalize(); 
-
-	LOG_TRACE( "\ntorque: " << M
-		<< "\nglobal angular momentum at time n: " << l_n
-		<< "\nlocal angular momentum at time n:  " << l_b_n
-		<< "\nlocal angular velocity at time n:  " << angVel_b_n
-		<< "\ndQ/dt at time n:                   " << dotQ_n
-		<< "\nQ at time n+1/2:                   " << Q_half
-		<< "\nglobal angular momentum at time n+1/2: " << state->angMom
-		<< "\nlocal angular momentum at time n+1/2:  " << l_b_half
-		<< "\nlocal angular velocity at time n+1/2:  " << angVel_b_half
-		<< "\ndQ/dt at time n+1/2:                   " << dotQ_half
-		<< "\nQ at time n+1:                         " << state->ori
-		<< "\nglobal angular velocity at time n+1/2: " << state->angVel
-	);
 }
 	
 Quaternionr NewtonsDampedLaw::DotQ(const Vector3r& angVel, const Quaternionr& Q){
