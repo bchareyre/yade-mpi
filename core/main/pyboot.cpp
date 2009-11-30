@@ -38,7 +38,7 @@ void yadeInitialize(python::list& dd, bool gdb){
 	#endif
 
 	#if defined(YADE_OPENMP) || defined(YADE_OPENGL)
-		LOG_ERROR("Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.")
+		//LOG_ERROR("Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.")
 	#endif
 
 	PyEval_InitThreads();
