@@ -1,5 +1,5 @@
 /* C.W.Boon @ NOV 2009 */
-
+YADE_REQUIRE_FEATURE(abcd);
 #pragma once
 
 #include<yade/pkg-dem/BodyMacroParameters.hpp> //Superclass for body properties

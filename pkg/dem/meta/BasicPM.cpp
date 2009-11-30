@@ -1,5 +1,7 @@
 /*C.W.Boon @ NOV 2009 */
 
+YADE_REQUIRE_FEATURE(abcd);
+
 #include"BasicPM.hpp"
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>

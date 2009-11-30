@@ -1,6 +1,6 @@
 #! file to test BasicPM.cpp
 # -*- coding: utf-8 -*-
-
+YADE_REQUIRE_FEATURE(abcd),
 #!/usr/local/bin/yade-trunk -x
 # -*- coding: utf-8 -*-
 # -*- encoding=utf-8 -*-
