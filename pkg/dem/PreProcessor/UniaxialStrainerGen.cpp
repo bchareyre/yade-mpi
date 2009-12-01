@@ -5,15 +5,15 @@
 #include<yade/pkg-dem/ConcretePM.hpp>
 
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -84,7 +84,7 @@ bool UniaxialStrainerGen::generate(){
 void UniaxialStrainerGen::createEngines(){
 	rootBody->initializers.clear();
 
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 		boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 		boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
 		rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -97,11 +97,11 @@ void UniaxialStrainerGen::createEngines(){
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 		rootBody->engines.push_back(collider);
 
-	shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
+	shared_ptr<InteractionGeometryDispatcher> igeomDispatcher(new InteractionGeometryDispatcher);
 		igeomDispatcher->add(shared_ptr<ef2_Sphere_Sphere_Dem3DofGeom>(new ef2_Sphere_Sphere_Dem3DofGeom));
 		rootBody->engines.push_back(igeomDispatcher);
 
-	shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
+	shared_ptr<InteractionPhysicsDispatcher> iphysDispatcher(new InteractionPhysicsDispatcher);
 		shared_ptr<Ip2_CpmMat_CpmMat_CpmPhys> bmc(new Ip2_CpmMat_CpmMat_CpmPhys);
 		bmc->cohesiveThresholdIter=cohesiveThresholdIter;
 		bmc->cohesiveThresholdIter=-1; bmc->G_over_E=1;bmc->sigmaT=3e9; bmc->neverDamage=true; bmc->epsCrackOnset=1e-4; bmc->relDuctility=5;

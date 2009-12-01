@@ -28,12 +28,16 @@ _proxyNamespace=__builtins__.__dict__
 # all classes that we want to handle at this point
 _allSerializables=set(listChildClassesRecursive('Serializable'))
 # classes that cannot be instantiated in python directly, and will have no properties generated for them
-_noPropsClasses=set(['InteractionContainer','BodyContainer','EngineUnit','Engine','MetaEngine'])
+_noPropsClasses=set(['InteractionContainer','BodyContainer','Functor','Engine','Dispatcher'])
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
 	'StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator',
-	'BoundingVolumeEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','ConstitutiveLaw']+(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit','GeometricalModel'] if 'shape' in runtime.features else [])+(['PhysicalParameters','PhysicalActionApplierUnit','PhysicalActionDamperUnit','StateEngineUnit'] if 'physpar' in runtime.features else ['Material','State']))
-# classes for which proxies were already created
+	'BoundingVolumeFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','ConstitutiveLaw']+
+	(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit','GeometricalModel'] if 'shape' in runtime.features else [])+(['PhysicalParameters','PhysicalActionApplierUnit','PhysicalActionDamperUnit','StateEngineUnit'] if 'physpar' in runtime.features else ['Material','State'])
+	# childless classes
+	+['BoundingVolumeDispatcher','InteracionGeometryDispatcher','InteractionPhysicsDispatcher','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine']
+)
+
 _proxiedClasses=set()
 
 
@@ -47,6 +51,8 @@ if 1:
 		for p in listChildClassesRecursive(root):
 			_proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 			_proxiedClasses.add(p)
+		# inject wrapped class itself into _proxyNamespace
+		_proxyNamespace[root]=rootType
 	# create types for classes that derive just from Serializable
 	for p in _allSerializables-_proxiedClasses-_pyRootClasses:
 		_proxyNamespace[p]=type(p,(Serializable,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
@@ -70,19 +76,31 @@ else:
 
 #### HANDLE RENAMED CLASSES ####
 # if old class name is used, the new object is constructed and a warning is issued about old name being used
+# keep chronologically ordered, oldest first; script/rename-class.py appends at the end
 renamed={
-	# integrated 25.11.2009
-	'PeriodicInsertionSortCollider':'InsertionSortCollider',
-	# renamed 15.11.2009
-	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere',
-	# renamed 10.10.2009
-	'CpmPhysDamageColorizer':'CpmStateUpdater',
+	'CpmPhysDamageColorizer':'CpmStateUpdater', # renamed 10.10.2009
+	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere', # renamed 15.11.2009
+	'PeriodicInsertionSortCollider':'InsertionSortCollider',	# integrated 25.11.2009
+	'BoundingVolumeMetaEngine':'BoundingVolumeDispatcher', # Tue Dec  1 14:28:29 2009, vaclav@flux
+	'MetaEngine1D':'Dispatcher1D', # Tue Dec  1 14:32:02 2009, vaclav@flux
+	'MetaEngine2D':'Dispatcher2D', # Tue Dec  1 14:33:26 2009, vaclav@flux
+	'MetaEngine':'Dispatcher', # Tue Dec  1 14:33:40 2009, vaclav@flux
+	'BoundingVolumeEngineUnit':'BoundingVolumeFunctor', # Tue Dec  1 14:39:53 2009, vaclav@flux
+	'InteractionGeometryMetaEngine':'InteractionGeometryDispatcher', # Tue Dec  1 14:40:36 2009, vaclav@flux
+	'InteractionPhysicsMetaEngine':'InteractionPhysicsDispatcher', # Tue Dec  1 14:40:53 2009, vaclav@flux
+	'InteractionPhysicsEngineUnit':'InteractionPhysicsFunctor', # Tue Dec  1 14:41:19 2009, vaclav@flux
+	'InteractionGeometryEngineUnit':'InteractionGeometryFunctor', # Tue Dec  1 14:41:56 2009, vaclav@flux
+	'EngineUnit1D':'Functor1D', # Tue Dec  1 14:59:46 2009, vaclav@flux
+	'EngineUnit2D':'Functor2D', # Tue Dec  1 14:59:51 2009, vaclav@flux
+	'EngineUnit':'Functor', # Tue Dec  1 14:59:56 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
-for oldName in renamed:
+for oldName in renamed.keys():
 	class warnWrap:
-		def __init__(self,_old,_new): self.old,self.new=_old,_new
+		def __init__(self,_old,_new):
+			assert(_proxyNamespace.has_key(_new))
+			self.old,self.new=_old,_new
 		def __call__(self,*args,**kw):
 			import warnings; warnings.warn("Class `%s' was renamed to (or replaced by) `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=3);
 			return _proxyNamespace[self.new](*args,**kw)

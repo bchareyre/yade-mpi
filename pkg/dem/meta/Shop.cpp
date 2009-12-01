@@ -42,9 +42,9 @@ class MetaInteractingGeometry2AABB; */
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -209,7 +209,7 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 	// initializers	
 	rootBody->initializers.clear();
 
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 	boundingVolumeDispatcher->add(new InteractingBox2AABB);
 	boundingVolumeDispatcher->add(new TetraAABB);
@@ -238,13 +238,13 @@ void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
 
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	interactionGeometryDispatcher->add(new InteractingBox2InteractingSphere4SpheresContactGeometry);
 	interactionGeometryDispatcher->add(new Tetra2TetraBang);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
-	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(new SimpleElasticRelationships);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
@@ -430,17 +430,17 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 }
 
 shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2){
-	InteractionGeometryMetaEngine* geomMeta=NULL;
-	InteractionPhysicsMetaEngine* physMeta=NULL;
+	InteractionGeometryDispatcher* geomMeta=NULL;
+	InteractionPhysicsDispatcher* physMeta=NULL;
 	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
 	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
-		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryMetaEngine*>(e.get()); if(geomMeta) continue; }
-		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsMetaEngine*>(e.get()); if(physMeta) continue; }
+		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }
+		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsDispatcher*>(e.get()); if(physMeta) continue; }
 		if(geomMeta&&physMeta){break;}
 	}
-	if(!geomMeta) throw runtime_error("No InteractionGeometryMetaEngine in engines.");
-	if(!physMeta) throw runtime_error("No InteractionPhysicsMetaEngine in engines.");
+	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines.");
+	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2);
 	physMeta->explicitAction(b1->material,b2->material,i);

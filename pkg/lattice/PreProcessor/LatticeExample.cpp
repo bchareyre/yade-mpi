@@ -30,7 +30,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyVector.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
@@ -977,7 +977,7 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
 
 void LatticeExample::createActors(shared_ptr<MetaBody>& )
 {
-        shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+        shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 
         shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);

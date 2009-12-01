@@ -14,8 +14,8 @@
 //BOOST_STRONG_TYPEDEF(int, body_id_t)
 typedef int body_id_t;
 
-class InteractionGeometryEngineUnit;
-class InteractionPhysicsEngineUnit;
+class InteractionGeometryFunctor;
+class InteractionPhysicsFunctor;
 class ConstitutiveLaw;
 class MetaBody;
 
@@ -24,9 +24,9 @@ class Interaction : public Serializable
 	private	:
 		body_id_t id1,id2;
 		//! Step number at which the interaction was fully created (interactionGeometry and interactionPhysics).
-		//! Should be touched only by InteractionPhysicsMetaEngine and InteractionDispatchers, making them friends therefore
+		//! Should be touched only by InteractionPhysicsDispatcher and InteractionDispatchers, making them friends therefore
 		long iterMadeReal;
-		friend class InteractionPhysicsMetaEngine;
+		friend class InteractionPhysicsDispatcher;
 		friend class InteractionDispatchers;
 	public :
 		bool isReal() const {return (bool)interactionGeometry && (bool)interactionPhysics;}
@@ -68,8 +68,8 @@ class Interaction : public Serializable
 			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
 			bool geomExists;
 			// shared_ptr's are initialized to NULLs automagically
-			shared_ptr<InteractionGeometryEngineUnit> geom;
-			shared_ptr<InteractionPhysicsEngineUnit> phys;
+			shared_ptr<InteractionGeometryFunctor> geom;
+			shared_ptr<InteractionPhysicsFunctor> phys;
 			shared_ptr<ConstitutiveLaw> constLaw;
 		} functorCache;
 

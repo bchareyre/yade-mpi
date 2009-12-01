@@ -30,9 +30,9 @@ Their container (VecBounds) holds position of where the space wraps.
 The sorting algorithm is changed in such way that periods are changed when body crosses cell boundary.
 
 Interaction::cellDist holds information about relative cell coordinates of the 2nd body
-relative to the 1st one. Dispatchers (InteractionGeometryMetaEngine and InteractionDispatchers)
-use this information to pass modified position of the 2nd body to InteractionGeometryEngineUnits.
-Since properly behaving InteractionGeometryEngineUnit's and ConstitutiveLaw's do not take positions
+relative to the 1st one. Dispatchers (InteractionGeometryDispatcher and InteractionDispatchers)
+use this information to pass modified position of the 2nd body to InteractionGeometryFunctors.
+Since properly behaving InteractionGeometryFunctor's and ConstitutiveLaw's do not take positions
 directly from Body::state, the interaction is computed with the periodic positions.
 
 Positions of bodies (in the sense of Body::state) and their natural bboxes are not wrapped
@@ -93,7 +93,7 @@ Possible performance improvements & bugs
 	#define ISC_CHECKPOINT(cpt)
 #endif
 
-class BoundingVolumeMetaEngine;
+class BoundingVolumeDispatcher;
 class NewtonsDampedLaw;
 
 class InsertionSortCollider: public Collider{
@@ -120,7 +120,7 @@ class InsertionSortCollider: public Collider{
 	};
 	#ifdef COLLIDE_STRIDED
 		// keep this dispatcher and call it ourselves as needed
-		shared_ptr<BoundingVolumeMetaEngine> boundDispatcher;
+		shared_ptr<BoundingVolumeDispatcher> boundDispatcher;
 		// we need this to find out about current maxVelocitySq
 		shared_ptr<NewtonsDampedLaw> newton;
 		// if False, no type of striding is used

@@ -48,20 +48,20 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_WallSphere);
 #endif
 
-#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-class ef2_Wall_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
+#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+class ef2_Wall_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
 			c->swapOrder(); return go(cm2,cm1,state2,state1,-shift2,c);
-			LOG_ERROR("!! goReverse might not work in ef2_Wall_Sphere_Dem3DofGeom. InteractionGeometryMetaEngine should swap interaction members first and call go(...) afterwards.");
+			LOG_ERROR("!! goReverse might not work in ef2_Wall_Sphere_Dem3DofGeom. InteractionGeometryDispatcher should swap interaction members first and call go(...) afterwards.");
 		}
 		ef2_Wall_Sphere_Dem3DofGeom(){}
 
 	FUNCTOR2D(Wall,InteractingSphere);
 	DEFINE_FUNCTOR_ORDER_2D(Wall,InteractingSphere);
-	REGISTER_CLASS_AND_BASE(ef2_Wall_Sphere_Dem3DofGeom,InteractionGeometryEngineUnit);
-	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,);
+	REGISTER_CLASS_AND_BASE(ef2_Wall_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
+	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ef2_Wall_Sphere_Dem3DofGeom);

@@ -21,7 +21,7 @@ void Interaction::init(){
 	isNeighbor = true;//NOTE : TriangulationCollider needs that
 	iterMadeReal=-1;
 	functorCache.geomExists=true;
-	//functorCache.geom=shared_ptr<InteractionGeometryEngineUnit>(); functorCache.phys=shared_ptr<InteractionPhysicsEngineUnit>(); functorCache.constLaw=shared_ptr<ConstitutiveLaw>();
+	//functorCache.geom=shared_ptr<InteractionGeometryFunctor>(); functorCache.phys=shared_ptr<InteractionPhysicsFunctor>(); functorCache.constLaw=shared_ptr<ConstitutiveLaw>();
 }
 
 void Interaction::reset(){

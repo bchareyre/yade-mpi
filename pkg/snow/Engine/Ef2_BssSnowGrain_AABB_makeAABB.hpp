@@ -8,9 +8,9 @@
  
 #pragma once
 
-#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
+#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
 
-class Ef2_BssSnowGrain_AABB_makeAABB : public BoundingVolumeEngineUnit
+class Ef2_BssSnowGrain_AABB_makeAABB : public BoundingVolumeFunctor
 {
 	public :
 		Ef2_BssSnowGrain_AABB_makeAABB() {};
@@ -18,7 +18,7 @@ class Ef2_BssSnowGrain_AABB_makeAABB : public BoundingVolumeEngineUnit
 
 	FUNCTOR2D(BssSnowGrain,AABB);
 	REGISTER_CLASS_NAME(Ef2_BssSnowGrain_AABB_makeAABB);
-	REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
+	REGISTER_BASE_CLASS_NAME(BoundingVolumeFunctor);
 };
 
 REGISTER_SERIALIZABLE(Ef2_BssSnowGrain_AABB_makeAABB);

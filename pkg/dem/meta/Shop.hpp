@@ -107,7 +107,7 @@ class Shop{
 		static Real kineticEnergy(MetaBody* _rb=NULL);
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, MetaBody *_rb=NULL);
 
-		//! create transientInteraction between 2 bodies, using existing MetaEngine in Omega
+		//! create transientInteraction between 2 bodies, using existing Dispatcher in Omega
 		static shared_ptr<Interaction> createExplicitInteraction(body_id_t id1, body_id_t id2);
 
 		//! apply force on contact point on both bodies (reversed on body 2)

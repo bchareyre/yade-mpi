@@ -2,8 +2,8 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
@@ -21,7 +21,7 @@ bool TetraTestGen::generate()
 
 	rootBody=Shop::rootBody();
 
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add(new TetraAABB);
 	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -29,10 +29,10 @@ bool TetraTestGen::generate()
 	rootBody->engines.push_back(shared_ptr<Engine>(new BexResetter));
 	rootBody->engines.push_back(boundingVolumeDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add(new Tetra2TetraBang);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
-	// do not add any InteractionPhysicsMetaEngine
+	// do not add any InteractionPhysicsDispatcher
 	shared_ptr<TetraLaw> constitutiveLaw(new TetraLaw);
 	rootBody->engines.push_back(constitutiveLaw);
 

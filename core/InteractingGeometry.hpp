@@ -13,7 +13,7 @@
 
 #define BV_FUNCTOR_CACHE
 
-class BoundingVolumeEngineUnit;
+class BoundingVolumeFunctor;
 
 class InteractingGeometry : public Serializable, public Indexable
 {
@@ -24,7 +24,7 @@ class InteractingGeometry : public Serializable, public Indexable
 		bool highlight;
 
 		#ifdef BV_FUNCTOR_CACHE
-			shared_ptr<BoundingVolumeEngineUnit> boundFunctor;
+			shared_ptr<BoundingVolumeFunctor> boundFunctor;
 		#endif
 
 /// Serialization

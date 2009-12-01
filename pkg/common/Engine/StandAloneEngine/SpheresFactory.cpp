@@ -66,10 +66,10 @@ void SpheresFactory::action(MetaBody* ncb)
 			LOG_FATAL("Can't find Collider." );
 			return;
 		}
-		iGME=dynamic_cast<InteractionGeometryMetaEngine*>(ncb->engineByName("InteractionGeometryMetaEngine").get());
+		iGME=dynamic_cast<InteractionGeometryDispatcher*>(ncb->engineByName("InteractionGeometryDispatcher").get());
 		if (!iGME) 
 		{
-			LOG_FATAL("Can't find InteractionGeometryMetaEngine." );
+			LOG_FATAL("Can't find InteractionGeometryDispatcher." );
 			return;
 		}
 		first_run=false;

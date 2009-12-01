@@ -13,11 +13,11 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/MetaBody.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -137,14 +137,14 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 void TestSimpleViscoelastic::createActors(shared_ptr<MetaBody>& rootBody)
 {
     
-    shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+    shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
     interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
     interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 
-    shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+    shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
     interactionPhysicsDispatcher->add("SimpleViscoelasticRelationships");
 	    
-    shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+    shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
     boundingVolumeDispatcher->add("InteractingSphere2AABB");
     boundingVolumeDispatcher->add("InteractingBox2AABB");
     boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");

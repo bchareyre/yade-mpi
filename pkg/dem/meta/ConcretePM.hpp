@@ -47,7 +47,7 @@ There are other classes, which are not strictly necessary:
 #pragma once
 
 #include<yade/pkg-common/ElasticMat.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
@@ -211,7 +211,7 @@ REGISTER_SERIALIZABLE(CpmPhys);
 /*! @brief Convert macroscopic properties to CpmPhys with corresponding parameters.
  *
  * */
-class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
+class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsFunctor{
 	private:
 	public:
 		/* nonelastic material parameters */
@@ -237,7 +237,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 		}
 
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
-		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
+		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,
 			(cohesiveThresholdIter)
 			(G_over_E)
 			(sigmaT)
@@ -252,7 +252,7 @@ class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsEngineUnit{
 		);
 
 		FUNCTOR2D(CpmMat,CpmMat);
-		REGISTER_CLASS_AND_BASE(Ip2_CpmMat_CpmMat_CpmPhys,InteractionPhysicsEngineUnit);
+		REGISTER_CLASS_AND_BASE(Ip2_CpmMat_CpmMat_CpmPhys,InteractionPhysicsFunctor);
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);

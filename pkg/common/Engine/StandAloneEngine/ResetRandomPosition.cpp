@@ -57,19 +57,19 @@ void ResetRandomPosition::action(MetaBody* ncb)
 			LOG_FATAL("Can't find Collider." );
 			return;
 		}
-		iGME=dynamic_cast<InteractionGeometryMetaEngine*>(ncb->engineByName("InteractionGeometryMetaEngine").get());
+		iGME=dynamic_cast<InteractionGeometryDispatcher*>(ncb->engineByName("InteractionGeometryDispatcher").get());
 		if (!iGME) 
 		{
 			InteractionDispatchers* iDsp=dynamic_cast<InteractionDispatchers*>(ncb->engineByName("InteractionDispatchers").get());
 			if (!iDsp)
 			{
-				LOG_FATAL("Can't find nor InteractionGeometryMetaEngine nor InteractionDispatchers." );
+				LOG_FATAL("Can't find nor InteractionGeometryDispatcher nor InteractionDispatchers." );
 				return;
 			}
-			iGME=dynamic_cast<InteractionGeometryMetaEngine*>(iDsp->geomDispatcher.get());
+			iGME=dynamic_cast<InteractionGeometryDispatcher*>(iDsp->geomDispatcher.get());
 			if (!iGME)
 			{
-				LOG_FATAL("Can't find InteractionGeometryMetaEngine." );
+				LOG_FATAL("Can't find InteractionGeometryDispatcher." );
 				return;
 			}
 		}

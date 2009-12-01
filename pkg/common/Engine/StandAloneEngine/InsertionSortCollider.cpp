@@ -4,7 +4,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 
@@ -150,10 +150,10 @@ void InsertionSortCollider::action(MetaBody* rb){
 		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(rb); 
 
 		#ifdef COLLIDE_STRIDED
-			// get the BoundingVolumeMetaEngine and turn it off; we will call it ourselves
+			// get the BoundingVolumeDispatcher and turn it off; we will call it ourselves
 			if(!boundDispatcher){
-				FOREACH(shared_ptr<Engine>& e, rb->engines){ boundDispatcher=dynamic_pointer_cast<BoundingVolumeMetaEngine>(e); if(boundDispatcher) break; }
-				if(!boundDispatcher){ LOG_FATAL("Unable to locate BoundingVolumeMetaEngine within engines, aborting."); abort(); }
+				FOREACH(shared_ptr<Engine>& e, rb->engines){ boundDispatcher=dynamic_pointer_cast<BoundingVolumeDispatcher>(e); if(boundDispatcher) break; }
+				if(!boundDispatcher){ LOG_FATAL("Unable to locate BoundingVolumeDispatcher within engines, aborting."); abort(); }
 				boundDispatcher->activated=false; // deactive the engine, we will call it ourselves from now (just when needed)
 			}
 			if(sweepLength>0){

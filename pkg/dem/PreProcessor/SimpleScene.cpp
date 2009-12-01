@@ -16,9 +16,9 @@
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -40,7 +40,7 @@ bool SimpleScene::generate(){
 	/* initializers */
 		rootBody->initializers.clear();
 		//@
-		shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+		shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 			boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 			boundingVolumeDispatcher->add(new InteractingBox2AABB);
 			boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
@@ -57,12 +57,12 @@ bool SimpleScene::generate(){
 		shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 			rootBody->engines.push_back(collider);
 		//@
-		shared_ptr<InteractionGeometryMetaEngine> igeomDispatcher(new InteractionGeometryMetaEngine);
+		shared_ptr<InteractionGeometryDispatcher> igeomDispatcher(new InteractionGeometryDispatcher);
 			igeomDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
 			igeomDispatcher->add(new InteractingBox2InteractingSphere4SpheresContactGeometry);
 			rootBody->engines.push_back(igeomDispatcher);
 		//@
-		shared_ptr<InteractionPhysicsMetaEngine> iphysDispatcher(new InteractionPhysicsMetaEngine);
+		shared_ptr<InteractionPhysicsDispatcher> iphysDispatcher(new InteractionPhysicsDispatcher);
 			iphysDispatcher->add(new SimpleElasticRelationships);
 			rootBody->engines.push_back(iphysDispatcher);
 		//@

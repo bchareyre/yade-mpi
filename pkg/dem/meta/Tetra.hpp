@@ -9,8 +9,8 @@
 #include<yade/core/InteractionSolver.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
-#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
+#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
 #include<Wm3Math.h>
 #include<Wm3Vector3.h>
@@ -62,7 +62,7 @@ REGISTER_SERIALIZABLE(TetraBang);
  *
  * Self-contained. */
 
-class TetraAABB: public BoundingVolumeEngineUnit
+class TetraAABB: public BoundingVolumeFunctor
 {
 	public:
 		void go(const shared_ptr<InteractingGeometry>& ig, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
@@ -79,7 +79,7 @@ class TetraAABB: public BoundingVolumeEngineUnit
 		}
 		FUNCTOR2D(TetraMold,AABB);
 		REGISTER_CLASS_NAME(TetraAABB);
-		REGISTER_BASE_CLASS_NAME(BoundingVolumeEngineUnit);
+		REGISTER_BASE_CLASS_NAME(BoundingVolumeFunctor);
 };
 REGISTER_SERIALIZABLE(TetraAABB);
 
@@ -120,7 +120,7 @@ REGISTER_SERIALIZABLE(TetraLaw);
 /*! @fixme implement Tetra2BoxBang by representing box as 6 tetrahedra. */
 
 /*! Create TetraBang (collision geometry) from colliding TetraMolds. */
-class Tetra2TetraBang: public InteractionGeometryEngineUnit
+class Tetra2TetraBang: public InteractionGeometryFunctor
 {
 	public:
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
@@ -128,7 +128,7 @@ class Tetra2TetraBang: public InteractionGeometryEngineUnit
 
 		FUNCTOR2D(TetraMold,TetraMold);
 		REGISTER_CLASS_NAME(Tetra2TetraBang);
-		REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
+		REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 		DEFINE_FUNCTOR_ORDER_2D(TetraMold,TetraMold);
 		DECLARE_LOGGER;
 	private:

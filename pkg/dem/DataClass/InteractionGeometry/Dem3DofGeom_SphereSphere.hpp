@@ -56,8 +56,8 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 	REGISTER_SERIALIZABLE(GLDraw_Dem3DofGeom_SphereSphere);
 #endif
 
-#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-class ef2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
+#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+class ef2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
 		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>&, const shared_ptr<InteractingGeometry>&, const State&, const State&, const Vector3r& shift2, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
@@ -67,8 +67,8 @@ class ef2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
 		ef2_Sphere_Sphere_Dem3DofGeom(): distFactor(-1.) {}
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
-	REGISTER_CLASS_AND_BASE(ef2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryEngineUnit);
-	REGISTER_ATTRIBUTES(InteractionGeometryEngineUnit,(distFactor));
+	REGISTER_CLASS_AND_BASE(ef2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
+	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(distFactor));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ef2_Sphere_Sphere_Dem3DofGeom);

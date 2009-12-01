@@ -3,7 +3,7 @@ YADE_REQUIRE_FEATURE(abcd);
 #pragma once
 
 #include<yade/pkg-dem/BodyMacroParameters.hpp> //Superclass for body properties
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp> //Superclass to link body and interaction properties
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp> //Superclass to link body and interaction properties
 #include<yade/pkg-common/NormalShearInteractions.hpp> //Superclass for interaction properties 
 #include<yade/pkg-common/ConstitutiveLaw.hpp> //Superclass for contact laws
 
@@ -32,13 +32,13 @@ REGISTER_SERIALIZABLE(CSMat);
 
 /* This class links body and interaction properties */
 /* It does not store variables */
-class Ip2_CSMat_CSMat_CSPhys: public InteractionPhysicsEngineUnit{
+class Ip2_CSMat_CSMat_CSPhys: public InteractionPhysicsFunctor{
 	public:
 		Ip2_CSMat_CSMat_CSPhys(){};
 		virtual void go(const shared_ptr<PhysicalParameters>& b1, const shared_ptr<PhysicalParameters>& b2, const shared_ptr<Interaction>& interaction);
-		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,/*nothing here*/);
+		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/*nothing here*/);
 		FUNCTOR2D(CSMat,CSMat);
-		REGISTER_CLASS_AND_BASE(Ip2_CSMat_CSMat_CSPhys,InteractionPhysicsEngineUnit);
+		REGISTER_CLASS_AND_BASE(Ip2_CSMat_CSMat_CSPhys,InteractionPhysicsFunctor);
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_CSMat_CSMat_CSPhys);

@@ -25,7 +25,7 @@
 #include<yade/core/MetaBody.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -35,8 +35,8 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>

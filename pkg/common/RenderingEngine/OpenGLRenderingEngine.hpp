@@ -4,7 +4,7 @@
 
 #include<yade/core/RenderingEngine.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
-#include<yade/core/MetaEngine.hpp>
+#include<yade/core/Dispatcher.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 

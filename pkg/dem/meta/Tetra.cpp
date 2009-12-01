@@ -395,7 +395,7 @@ void TetraLaw::action(MetaBody* rootBody)
 
 		/* Do not use NormalInteraction::kn (as calculated by ElasticBodySimpleRelationship).
 		 * NormalInteraction::kn is not Young's modulus, it is calculated by MacroMicroElasticRelationships. So perhaps
-		 * a new InteractionPhysicsEngineUnit will be needed that will just pass the average Young's modulus here?
+		 * a new InteractionPhysicsFunctor will be needed that will just pass the average Young's modulus here?
 		 * For now, just go back to Young's moduli directly here. */
 		Real young=.5*(physA->young+physB->young);
 		TRVAR3(young,averageStrain,contactGeom->equivalentCrossSection);

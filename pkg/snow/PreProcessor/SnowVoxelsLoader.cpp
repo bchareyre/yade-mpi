@@ -26,7 +26,7 @@
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -39,8 +39,8 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -360,14 +360,14 @@ bool SnowVoxelsLoader::generate()
 
 void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 {
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 
-	shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact);
-	shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
-	//shared_ptr<InteractionGeometryEngineUnit> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);
-	//shared_ptr<InteractionGeometryEngineUnit> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
-	//shared_ptr<InteractionGeometryEngineUnit> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	//shared_ptr<InteractionGeometryEngineUnit> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	shared_ptr<InteractionGeometryFunctor> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact);
+	shared_ptr<InteractionGeometryFunctor> s2(new Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
+	//shared_ptr<InteractionGeometryFunctor> s1(new Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry);
+	//shared_ptr<InteractionGeometryFunctor> s2(new Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
+	//shared_ptr<InteractionGeometryFunctor> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	//shared_ptr<InteractionGeometryFunctor> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
 	
 	interactionGeometryDispatcher->add(s1);
 	interactionGeometryDispatcher->add(s2);
@@ -377,10 +377,10 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	cohesiveFrictionalRelationships->normalCohesion = normalCohesion;
 	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
 	cohesiveFrictionalRelationships->setCohesionNow = true;
-	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("Ef2_BssSnowGrain_AABB_makeAABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");

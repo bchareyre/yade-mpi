@@ -6,7 +6,7 @@
 
 #include<yade/core/Material.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 /* Simple viscoelastic model */
@@ -51,14 +51,14 @@ REGISTER_SERIALIZABLE(SimpleViscoelasticPhys);
 
 /// Convert material to interaction physics.
 // Uses the rule of consecutively connection.
-class Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys: public InteractionPhysicsEngineUnit {
+class Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys: public InteractionPhysicsFunctor {
 	public :
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,/* */)
+	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/* */)
 	FUNCTOR2D(SimpleViscoelasticMat,SimpleViscoelasticMat);
-	REGISTER_CLASS_AND_BASE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys, InteractionPhysicsEngineUnit);
+	REGISTER_CLASS_AND_BASE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys, InteractionPhysicsFunctor);
 
 };
 REGISTER_SERIALIZABLE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys);

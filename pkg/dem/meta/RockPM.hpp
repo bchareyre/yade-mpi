@@ -8,7 +8,7 @@ mechanical behavior of mining rocks.
 
 #pragma once
 
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
@@ -53,7 +53,7 @@ class RpmMat: public GranularMat {
 REGISTER_SERIALIZABLE(RpmMat);
 
 
-class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
+class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsFunctor{
 	private:
 	public:
 		Real initDistance;
@@ -63,12 +63,12 @@ class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsEngineUnit{
 		}
 
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
-		REGISTER_ATTRIBUTES(InteractionPhysicsEngineUnit,
+		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,
 			(initDistance)
 		);
 
 		FUNCTOR2D(RpmMat,RpmMat);
-		REGISTER_CLASS_AND_BASE(Ip2_RpmMat_RpmMat_RpmPhys,InteractionPhysicsEngineUnit);
+		REGISTER_CLASS_AND_BASE(Ip2_RpmMat_RpmMat_RpmPhys,InteractionPhysicsFunctor);
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);

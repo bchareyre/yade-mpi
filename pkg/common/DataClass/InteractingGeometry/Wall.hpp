@@ -1,7 +1,7 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/InteractingGeometry.hpp>
-#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
+#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
 
 
 /*! Object representing infinite plane aligned with the coordinate system (axis-aligned wall). */
@@ -21,11 +21,11 @@ REGISTER_SERIALIZABLE(Wall);
 
 /*! Functor for computing axis-aligned bounding box
     from axis-aligned wall. Has no parameters. */
-class Wall2AABB: public BoundingVolumeEngineUnit{
+class Wall2AABB: public BoundingVolumeFunctor{
 	public:
 		virtual void go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*);
 	FUNCTOR2D(Wall,AABB);
-	REGISTER_CLASS_AND_BASE(Wall2AABB,BoundingVolumeEngineUnit);
+	REGISTER_CLASS_AND_BASE(Wall2AABB,BoundingVolumeFunctor);
 };
 REGISTER_SERIALIZABLE(Wall2AABB);
 #ifdef YADE_OPENGL

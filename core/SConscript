@@ -28,7 +28,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'GroupRelationData.cpp',
 			'Material.cpp',
 			'MetaBody.cpp',
-			'MetaEngine.cpp',
+			'Dispatcher.cpp',
 			'NullGUI.cpp',
 			'Omega.cpp',
 			'SimulationFlow.cpp',

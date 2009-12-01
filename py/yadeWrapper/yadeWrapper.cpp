@@ -30,16 +30,16 @@
 
 #include<yade/pkg-dem/STLImporter.hpp>
 
-#include<yade/core/MetaEngine.hpp>
+#include<yade/core/Dispatcher.hpp>
 #include<yade/core/StandAloneEngine.hpp>
 #include<yade/core/DeusExMachina.hpp>
-#include<yade/core/EngineUnit.hpp>
+#include<yade/core/Functor.hpp>
 #include<yade/pkg-common/ParallelEngine.hpp>
-#include<yade/core/EngineUnit.hpp>
+#include<yade/core/Functor.hpp>
 
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 #ifdef YADE_PHYSPAR
@@ -55,10 +55,10 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
-#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
+#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
-#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
@@ -109,9 +109,9 @@ class RenderingEngine;
 		b.keys() # serializable attributes, accessible via b['attribute']
 		dir(b) # python data members, accessible via b.attribute; the __something__ attributes are python internal attributes/metods -- methods are just callable members
 
-	MetaEngine class has special constructor (for convenience):
+	Dispatcher class has special constructor (for convenience):
 
-		m=MetaEngine('class name as string',[list of engine units])
+		m=Dispatcher('class name as string',[list of engine units])
 
 	and it is equivalent to
 
@@ -326,9 +326,9 @@ class pyOmega{
 				PyRun_SimpleString(("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')").c_str());
 				PyGILState_Release(gstate);
 			}
-			if(isChildClassOf(e->getClassName(),"MetaEngine")){
-				shared_ptr<MetaEngine> ee=dynamic_pointer_cast<MetaEngine>(e);
-				FOREACH(const shared_ptr<EngineUnit>& f, ee->functorArguments){
+			if(isChildClassOf(e->getClassName(),"Dispatcher")){
+				shared_ptr<Dispatcher> ee=dynamic_pointer_cast<Dispatcher>(e);
+				FOREACH(const shared_ptr<Functor>& f, ee->functorArguments){
 					if(!f->label.empty()){
 						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')").c_str()); PyGILState_Release(gstate);
 					}
@@ -336,11 +336,11 @@ class pyOmega{
 			}
 			if(e->getClassName()=="InteractionDispatchers"){
 				shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(e);
-				list<shared_ptr<EngineUnit> > eus;
-				FOREACH(const shared_ptr<EngineUnit>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<EngineUnit>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<EngineUnit>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<EngineUnit>& eu,eus){
+				list<shared_ptr<Functor> > eus;
+				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(!eu->label.empty()){
 						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')").c_str()); PyGILState_Release(gstate);
 					}
@@ -441,19 +441,19 @@ class pyOmega{
 	python::object labeled_engine_get(string label){
 		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getRootBody()->engines){
 			if(eng->label==label){ return python::object(eng); }
-			shared_ptr<MetaEngine> me=dynamic_pointer_cast<MetaEngine>(eng);
+			shared_ptr<Dispatcher> me=dynamic_pointer_cast<Dispatcher>(eng);
 			if(me){
-				FOREACH(const shared_ptr<EngineUnit>& eu, me->functorArguments){
+				FOREACH(const shared_ptr<Functor>& eu, me->functorArguments){
 					if(eu->label==label) return python::object(eu);
 				}
 			}
 			shared_ptr<InteractionDispatchers> ee=dynamic_pointer_cast<InteractionDispatchers>(eng);
 			if(ee){
-				list<shared_ptr<EngineUnit> > eus;
-				FOREACH(const shared_ptr<EngineUnit>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<EngineUnit>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<EngineUnit>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<EngineUnit>& eu,eus){
+				list<shared_ptr<Functor> > eus;
+				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(eu->label==label) return python::object(eu);
 				}
 			}
@@ -604,14 +604,14 @@ shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<functo
 template<typename DispatcherT, typename functorT>
 std::vector<shared_ptr<functorT> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
 	std::vector<shared_ptr<functorT> > ret;
-	FOREACH(const shared_ptr<EngineUnit>& functor, self->functorArguments){ shared_ptr<functorT> functorRightType(dynamic_pointer_cast<functorT>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain EngineUnit of the required type "+typeid(functorT).name()+"?"); ret.push_back(functorRightType); }
+	FOREACH(const shared_ptr<Functor>& functor, self->functorArguments){ shared_ptr<functorT> functorRightType(dynamic_pointer_cast<functorT>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(functorT).name()+"?"); ret.push_back(functorRightType); }
 	return ret;
 }
 // FIXME: and this one as well
-shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryEngineUnit> >& gff, const std::vector<shared_ptr<InteractionPhysicsEngineUnit> >& pff, const std::vector<shared_ptr<ConstitutiveLaw> >& cff){
+shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<ConstitutiveLaw> >& cff){
 	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
-	FOREACH(shared_ptr<InteractionGeometryEngineUnit> gf, gff) instance->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<InteractionPhysicsEngineUnit> pf, pff) instance->physDispatcher->add(pf);
+	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
+	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
 	FOREACH(shared_ptr<ConstitutiveLaw> cf, cff) instance->constLawDispatcher->add(cf);
 	return instance;
 }
@@ -799,10 +799,10 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readonly("timingDeltas",&Engine::timingDeltas);
 	python::class_<StandAloneEngine,shared_ptr<StandAloneEngine>, python::bases<Engine>, noncopyable>("StandAloneEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<StandAloneEngine>));
 	python::class_<DeusExMachina,shared_ptr<DeusExMachina>, python::bases<Engine>, noncopyable>("DeusExMachina").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<DeusExMachina>));
-	python::class_<EngineUnit, shared_ptr<EngineUnit>, python::bases<Serializable>, noncopyable >("EngineUnit",python::no_init)
-		.def_readonly("timingDeltas",&EngineUnit::timingDeltas)
-		.add_property("bases",&EngineUnit::getFunctorTypes);
-	python::class_<MetaEngine, shared_ptr<MetaEngine>, python::bases<Engine>, noncopyable>("MetaEngine",python::no_init);
+	python::class_<Functor, shared_ptr<Functor>, python::bases<Serializable>, noncopyable >("Functor",python::no_init)
+		.def_readonly("timingDeltas",&Functor::timingDeltas)
+		.add_property("bases",&Functor::getFunctorTypes);
+	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
 	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas_pyData).def("reset",&TimingDeltas::reset);
 
 	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers")
@@ -814,10 +814,10 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
 		.add_property("slaves",&ParallelEngine_slaves_get,&ParallelEngine_slaves_set);
 
-	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<MetaEngine>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>).def("dump",&DispatcherT::dump);
-		EXPOSE_DISPATCHER(BoundingVolumeMetaEngine,BoundingVolumeEngineUnit)
-		EXPOSE_DISPATCHER(InteractionGeometryMetaEngine,InteractionGeometryEngineUnit)
-		EXPOSE_DISPATCHER(InteractionPhysicsMetaEngine,InteractionPhysicsEngineUnit)
+	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>).def("dump",&DispatcherT::dump);
+		EXPOSE_DISPATCHER(BoundingVolumeDispatcher,BoundingVolumeFunctor)
+		EXPOSE_DISPATCHER(InteractionGeometryDispatcher,InteractionGeometryFunctor)
+		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher,InteractionPhysicsFunctor)
 		#ifdef YADE_PHYSPAR
 			EXPOSE_DISPATCHER(StateMetaEngine,StateEngineUnit)
 			EXPOSE_DISPATCHER(PhysicalActionDamper,PhysicalActionDamperUnit)
@@ -826,10 +826,10 @@ BOOST_PYTHON_MODULE(wrapper)
 		EXPOSE_DISPATCHER(ConstitutiveLawDispatcher,ConstitutiveLaw)
 	#undef EXPOSE_DISPATCHER
 
-	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<EngineUnit>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
-		EXPOSE_FUNCTOR(BoundingVolumeEngineUnit)
-		EXPOSE_FUNCTOR(InteractionGeometryEngineUnit)
-		EXPOSE_FUNCTOR(InteractionPhysicsEngineUnit)
+	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<Functor>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
+		EXPOSE_FUNCTOR(BoundingVolumeFunctor)
+		EXPOSE_FUNCTOR(InteractionGeometryFunctor)
+		EXPOSE_FUNCTOR(InteractionPhysicsFunctor)
 		#ifdef YADE_PHYSPAR
 			EXPOSE_FUNCTOR(StateEngineUnit)
 			EXPOSE_FUNCTOR(PhysicalActionDamperUnit)

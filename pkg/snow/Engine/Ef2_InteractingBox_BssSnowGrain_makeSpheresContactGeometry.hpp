@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
+#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 
-class Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry : public InteractionGeometryEngineUnit
+class Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry : public InteractionGeometryFunctor
 {
 	InteractingBox2InteractingSphere4SpheresContactGeometry g;
 	public :
@@ -29,7 +29,7 @@ class Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry : public Intera
 		Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry():assist(false){};
 
 	REGISTER_CLASS_NAME(Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
-	REGISTER_BASE_CLASS_NAME(InteractionGeometryEngineUnit);
+	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 
 	FUNCTOR2D(InteractingBox,BssSnowGrain);
 

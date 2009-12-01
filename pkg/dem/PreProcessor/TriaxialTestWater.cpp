@@ -39,7 +39,7 @@
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeMetaEngine.hpp>
+#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
@@ -51,8 +51,8 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 
-#include<yade/pkg-common/InteractionGeometryMetaEngine.hpp>
-#include<yade/pkg-common/InteractionPhysicsMetaEngine.hpp>
+#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
+#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -422,7 +422,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
 	
-	shared_ptr<InteractionGeometryMetaEngine> interactionGeometryDispatcher(new InteractionGeometryMetaEngine);
+	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	
 	shared_ptr<InteractingSphere2InteractingSphere4SpheresContactGeometry> iS2IS4SContactGeometry(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
 	iS2IS4SContactGeometry->interactionDetectionFactor = distanceFactor;//Detect potential distant interaction (meniscii)
@@ -432,17 +432,17 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 	
 	
 
-	shared_ptr<InteractionPhysicsMetaEngine> interactionPhysicsDispatcher(new InteractionPhysicsMetaEngine);
+	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 //	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
-// Unhandled exception: St13runtime_error : Class `SimpleElasticRelationships' could not be cast to required 2D EngineUnit	
+// Unhandled exception: St13runtime_error : Class `SimpleElasticRelationships' could not be cast to required 2D Functor	
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW
-	shared_ptr<InteractionPhysicsEngineUnit> ss(new SimpleElasticRelationshipsWater);
+	shared_ptr<InteractionPhysicsFunctor> ss(new SimpleElasticRelationshipsWater);
 	interactionPhysicsDispatcher->add(ss);
 	
 		
-	shared_ptr<BoundingVolumeMetaEngine> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeMetaEngine>(new BoundingVolumeMetaEngine);
+	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	
 	shared_ptr<InteractingSphere2AABB> interactingSphere2AABB(new InteractingSphere2AABB);
 	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)

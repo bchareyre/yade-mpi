@@ -26,7 +26,7 @@
 
 #include<yade/core/Engine.hpp>
 
-#include<yade/pkg-common/BoundingVolumeEngineUnit.hpp>
+#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
 #ifdef YADE_SHAPE
 	#include<yade/pkg-common/GeometricalModelEngineUnit.hpp>
 #endif
@@ -36,8 +36,8 @@
 	#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 #endif
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
-#include<yade/pkg-common/InteractionGeometryEngineUnit.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
+#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/ConstitutiveLaw.hpp>
 
 
@@ -138,13 +138,13 @@ BOOST_PYTHON_MODULE(_customConverters){
 	custom_vector_from_seq<shared_ptr<Serializable> >(); to_python_converter<std::vector<shared_ptr<Serializable> >, custom_vector_to_list<shared_ptr<Serializable> > >();
 
   #define VECTOR_ENGINE_UNIT(ENGINE_UNIT) custom_vector_from_seq<shared_ptr<ENGINE_UNIT> >(); to_python_converter<std::vector<shared_ptr<ENGINE_UNIT> >,custom_vector_to_list<shared_ptr<ENGINE_UNIT> > >();
-		VECTOR_ENGINE_UNIT(BoundingVolumeEngineUnit)
+		VECTOR_ENGINE_UNIT(BoundingVolumeFunctor)
 		#ifdef YADE_SHAPE
 			VECTOR_ENGINE_UNIT(GeometricalModelEngineUnit)
 			VECTOR_ENGINE_UNIT(InteractingGeometryEngineUnit)
 		#endif
-		VECTOR_ENGINE_UNIT(InteractionGeometryEngineUnit)
-		VECTOR_ENGINE_UNIT(InteractionPhysicsEngineUnit)
+		VECTOR_ENGINE_UNIT(InteractionGeometryFunctor)
+		VECTOR_ENGINE_UNIT(InteractionPhysicsFunctor)
 		#ifdef YADE_PHYSPAR
 			VECTOR_ENGINE_UNIT(StateEngineUnit)
 			VECTOR_ENGINE_UNIT(PhysicalActionDamperUnit)

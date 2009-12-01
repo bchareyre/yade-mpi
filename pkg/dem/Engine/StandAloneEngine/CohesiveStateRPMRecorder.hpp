@@ -3,7 +3,7 @@
 */
 #pragma once
 #include <yade/pkg-common/Recorder.hpp>
-#include <yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include <yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include <yade/pkg-dem/RockPM.hpp>
 
 

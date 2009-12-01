@@ -164,8 +164,8 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
 		for( ; bci!=bciEnd ; ++bci){
 			string name = *bci;
-			if (name=="MetaEngine1D" || name=="MetaEngine2D") (*dli).second.baseClasses.insert("MetaEngine");
-			else if (name=="EngineUnit1D" || name=="EngineUnit2D") (*dli).second.baseClasses.insert("EngineUnit");
+			if (name=="Dispatcher1D" || name=="Dispatcher2D") (*dli).second.baseClasses.insert("Dispatcher");
+			else if (name=="Functor1D" || name=="Functor2D") (*dli).second.baseClasses.insert("Functor");
 			else if (name=="Serializable") (*dli).second.baseClasses.insert("Factorable");
 			else if (name!="Factorable" && name!="Indexable") {
 				shared_ptr<Factorable> f = ClassFactory::instance().createShared(name);

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <yade/pkg-common/PeriodicEngines.hpp>
-#include <yade/pkg-common/InteractionGeometryMetaEngine.hpp>
+#include <yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include <yade/core/Collider.hpp>
 #include <yade/core/MetaBody.hpp>
 #include <vector>
@@ -61,9 +61,9 @@ private:
 	/// It is necessary in order to probe the bounding volume for new sphere.
 	Collider* bI;
 	
-	/// @brief Pointer to InteractionGeometryMetaEngine.
+	/// @brief Pointer to InteractionGeometryDispatcher.
 	/// It is necessary in order to detect a real overlap with other bodies.
-	InteractionGeometryMetaEngine* iGME;
+	InteractionGeometryDispatcher* iGME;
 
 	std::vector<shared_ptr<Body> > shiftedBodies;
 

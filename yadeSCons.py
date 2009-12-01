@@ -85,7 +85,7 @@ def scanAllPlugins(cacheFile,feats):
 					if m:
 						inc=m.group(1); incBaseName=m.group(1).split('.')[0]
 						if not os.path.exists(root+'/'+m.group(1)):
-							print "WARNING: file %s included from %s doesn't exist"%(m.group(1),fullF)
+							print "WARNING: file %s included from %s doesn't exist"%(m.group(1),ff)
 						else:
 							linkDeps.update(grepForIncludes(root,m.group(1)))
 							continue
@@ -148,7 +148,7 @@ def buildPluginLibs(env,plugInfo):
 		if len(srcs)>1:
 			if len(srcs)<chunkSize: srcs=env.Combine('$buildDir/'+obj+'.cpp',srcs)
 			# thanks to http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python :
-			else: srcs=[env.Combine('$buildDir/'+obj+'%d.cpp'%i,srcs[i:i+chunkSize]) for i in range(0,len(srcs),chunkSize)]
+			else: srcs=[env.Combine('$buildDir/'+obj+'%d.cpp'%j,srcs[i:i+chunkSize]) for j,i in enumerate(range(0,len(srcs),chunkSize))]
 		if linkStrategy!='static':
 			env.Install('$PREFIX/lib/yade$SUFFIX/plugins',env.SharedLibrary(obj,srcs,LIBS=env['LIBS']+['yade-support','core']+list(objs[obj][1])))
 		else:
