@@ -1,15 +1,14 @@
 /*! This class is for storing the cohesive contacts number 
- * of RPM model in file
+ * of RPM model in a file. Class derived from Recorder
 */
 #pragma once
-#include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
-#include<yade/pkg-dem/RockPM.hpp>
+#include <yade/pkg-common/Recorder.hpp>
+#include <yade/pkg-common/InteractionPhysicsEngineUnit.hpp>
+#include <yade/pkg-dem/RockPM.hpp>
 
 
-class CohesiveStateRPMRecorder: public PeriodicEngine {
+class CohesiveStateRPMRecorder: public Recorder {
 	public:
-		string outFileName;
 		int numberCohesiveContacts;
 		CohesiveStateRPMRecorder(); 
 		~CohesiveStateRPMRecorder();
@@ -19,8 +18,8 @@ class CohesiveStateRPMRecorder: public PeriodicEngine {
 	private:
 		std::ofstream outFile;
 		
-	REGISTER_ATTRIBUTES(PeriodicEngine,(outFileName));
-	REGISTER_CLASS_AND_BASE(CohesiveStateRPMRecorder,PeriodicEngine);
+	REGISTER_ATTRIBUTES(Recorder,(numberCohesiveContacts));
+	REGISTER_CLASS_AND_BASE(CohesiveStateRPMRecorder,Recorder);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(CohesiveStateRPMRecorder);

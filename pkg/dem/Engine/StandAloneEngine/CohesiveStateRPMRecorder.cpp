@@ -3,8 +3,8 @@
 YADE_PLUGIN((CohesiveStateRPMRecorder));
 CREATE_LOGGER(CohesiveStateRPMRecorder);
 
-CohesiveStateRPMRecorder::CohesiveStateRPMRecorder() {
-	initRun=true;
+CohesiveStateRPMRecorder::CohesiveStateRPMRecorder():Recorder(){
+	initRun=true;												//We want to save the data in the beginning
 	numberCohesiveContacts=0;
 }
 
@@ -16,15 +16,15 @@ void CohesiveStateRPMRecorder::init(MetaBody* rootBody) {
 
 void CohesiveStateRPMRecorder::action(MetaBody* rootBody) {
 	numberCohesiveContacts=0;
+	//Check all interactions
 	FOREACH(const shared_ptr<Interaction>& i, *rootBody->interactions){
-		if(!i->isReal()) continue;
+		if(!i->isReal()) continue;				//Check whether they are real
 		const shared_ptr<RpmPhys>& contPhys = YADE_PTR_CAST<RpmPhys>(i->interactionPhysics);
-		if (contPhys->isCohesive==true) {
-			numberCohesiveContacts++;
+		if (contPhys->isCohesive==true) {	//Check whether they are cohesive
+			numberCohesiveContacts++;				//If yes - calculate them
 		}
 	}
-	//Temporary solution, while flieRecorder class is not ready
-	outFile.open(outFileName.c_str(), ios::out | ios::app);
-	outFile<<Omega::instance().getCurrentIteration()<<" "<<numberCohesiveContacts<<"\n";
-	outFile.close();
+	//Save data to a file
+	out<<Omega::instance().getCurrentIteration()<<" "<<numberCohesiveContacts<<"\n";
+	out.close();
 }
