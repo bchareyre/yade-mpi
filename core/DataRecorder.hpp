@@ -8,7 +8,7 @@
 
 #pragma once
 
-#error DataRecorder is superseded by Recorder <yade/pkg-dem/Recorder.hpp>, do not include this file.
+#error DataRecorder is superseded by Recorder <yade/pkg-common/Recorder.hpp>, do not include this file.
 #include "StandAloneEngine.hpp"
 
 class DataRecorder : public StandAloneEngine
