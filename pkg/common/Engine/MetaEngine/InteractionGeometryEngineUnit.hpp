@@ -12,6 +12,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/EngineUnit.hpp>
+#include<yade/core/State.hpp>
 
 #include <string>
 
@@ -20,13 +21,12 @@
 
 	This is a crucial EngineUnit used during runtime, when an interaction is detected and starts to exist between two
 	Body 'ies, a class Interaction to describe it must be created.
-	 
-	Currently we can build: SpheresContactGeometry, ErrorTolerantContact, ClosestFeatures
 
-	\param const shared_ptr<InteractingGeometry>&	first interacting Body
-	\param const shared_ptr<InteractingGeometry>&	second interacting Body
-	\param Se3r&					first Body's 3d transformation (FIXME: should be removed)
-	\param Se3r&					second Body's 3d transformation (FIXME: should be removed)
+	\param const shared_ptr<InteractingGeometry>&	first Body geometry
+	\param const shared_ptr<InteractingGeometry>&	second Body geometry
+	\param State&					first Body's State
+	\param State&					second Body's State
+	\param Vector3r& 				second Body's relative shift (for periodicity)
 	\return shared_ptr<Interaction>&		it returns the Interaction to be built (given as last argument to the function)
 	
 */
@@ -34,10 +34,11 @@
 class InteractionGeometryEngineUnit : 	public EngineUnit2D
 					<
 		 				bool ,
-		 				TYPELIST_5(	  const shared_ptr<InteractingGeometry>&
+		 				TYPELIST_6(	  const shared_ptr<InteractingGeometry>&
 								, const shared_ptr<InteractingGeometry>&
-								, const Se3r&
-								, const Se3r&
+								, const State&
+								, const State&
+								, const Vector3r& 
 								, const shared_ptr<Interaction>&
 			  				  ) 
 					>

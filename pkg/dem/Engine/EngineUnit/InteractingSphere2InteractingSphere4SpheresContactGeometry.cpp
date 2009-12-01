@@ -18,12 +18,13 @@ InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2In
 
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,
-							const Se3r& se31,
-							const Se3r& se32,
+							const State& state1, const State& state2, const Vector3r& shift2,
 							const shared_ptr<Interaction>& c)
 {
+	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
+
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
-	Vector3r normal=se32.position-se31.position;
+	Vector3r normal=(se32.position+shift2)-se31.position;
 	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.SquaredLength();
 	if (penetrationDepthSq>0 || c->isReal()){
 		shared_ptr<SpheresContactGeometry> scm;
@@ -53,11 +54,12 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 
 bool InteractingSphere2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 								const shared_ptr<InteractingGeometry>& cm2,
-								const Se3r& se31,
-								const Se3r& se32,
+								const State& state1,
+								const State& state2,
+								const Vector3r& shift2,
 								const shared_ptr<Interaction>& c)
 {
-	return go(cm1,cm2,se31,se32,c);
+	return go(cm1,cm2,state2,state1,-shift2,c);
 }
 
 YADE_PLUGIN((InteractingSphere2InteractingSphere4SpheresContactGeometry));

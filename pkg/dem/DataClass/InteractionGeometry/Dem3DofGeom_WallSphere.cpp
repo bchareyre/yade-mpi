@@ -39,15 +39,15 @@ Real Dem3DofGeom_WallSphere::slipToDisplacementTMax(Real displacementTMax){
 }
 
 CREATE_LOGGER(ef2_Wall_Sphere_Dem3DofGeom);
-bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
+bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
 	Wall* wall=static_cast<Wall*>(cm1.get());
 	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
 
-	Real dist=se32.position[wall->axis]-se31.position[wall->axis];
+	Real dist=(state2.pos+shift2)[wall->axis]-state1.pos[wall->axis];
 	if(!c->isReal() && abs(dist)>sphereRadius){ /*LOG_DEBUG("dist="<<dist<<", returning false");*/ return false; } // wall and sphere too far from each other
 
 	// contact point is sphere center projected onto the wall
-	Vector3r contPt=se32.position; contPt[wall->axis]=se31.position[wall->axis];
+	Vector3r contPt=state2.pos; contPt[wall->axis]=state1.pos[wall->axis];
 	Vector3r normalGlob(0.,0.,0.);
 	// wall interacting from both sides: normal depends on sphere's position
 	assert(wall->sense==-1 || wall->sense==0 || wall->sense==1);
@@ -62,13 +62,13 @@ bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1,
 		ws->effR2=abs(dist);
 		ws->refR1=-1; ws->refR2=sphereRadius;
 		ws->refLength=ws->effR2;
-		ws->cp1pt=contPt-se31.position; // initial contact point relative to wall position (orientation is global, since it is coincident with local for a wall)
+		ws->cp1pt=contPt-state1.pos; // initial contact point relative to wall position (orientation is global, since it is coincident with local for a wall)
 		ws->cp2rel=Quaternionr::IDENTITY;
-		ws->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
+		ws->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		ws->cp2rel.Normalize();
 		//LOG_INFO(ws->cp1pt);
 	}
-	ws->se31=se31; ws->se32=se32;
+	ws->se31=state1.se3; ws->se32=state2.se3;
 	ws->contactPoint=contPt;
 	ws->normal=normalGlob;
 	return true;

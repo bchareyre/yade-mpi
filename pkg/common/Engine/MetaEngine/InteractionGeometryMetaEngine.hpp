@@ -25,10 +25,11 @@ class InteractionGeometryMetaEngine :	public MetaEngine2D
 						InteractingGeometry,						// base classe for dispatch
 						InteractionGeometryEngineUnit,					// class that provides multivirtual call
 						bool ,								// return type
-						TYPELIST_5(	  const shared_ptr<InteractingGeometry>&	// arguments
+						TYPELIST_6(	  const shared_ptr<InteractingGeometry>&	// arguments
 								, const shared_ptr<InteractingGeometry>&
-								, const Se3r&
-								, const Se3r&
+								, const State&
+								, const State&
+								, const Vector3r& 
 								, const shared_ptr<Interaction>&
 							  )
 						, false								// disable auto symmetry handling

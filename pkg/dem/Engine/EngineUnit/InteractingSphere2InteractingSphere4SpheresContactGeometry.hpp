@@ -13,8 +13,8 @@
 class InteractingSphere2InteractingSphere4SpheresContactGeometry : public InteractionGeometryEngineUnit
 {
 	public :
-		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
+		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const shared_ptr<Interaction>& c);
 					
 		InteractingSphere2InteractingSphere4SpheresContactGeometry();		
 		

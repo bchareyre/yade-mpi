@@ -16,13 +16,15 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 	public :
 		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
 					const shared_ptr<InteractingGeometry>& cm2,
-					const Se3r& se31,
-					const Se3r& se32,
+					const State& state1,
+					const State& state2,
+					const Vector3r& shift2,
 					const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 					const shared_ptr<InteractingGeometry>& cm2,
-					const Se3r& se31,
-					const Se3r& se32,
+					const State& state1,
+					const State& state2,
+					const Vector3r& shift2,
 					const shared_ptr<Interaction>& c);
 					
 		InteractingFacet2InteractingSphere4SpheresContactGeometry();		

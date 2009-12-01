@@ -149,9 +149,9 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 	CREATE_LOGGER(ef2_Sphere_Sphere_Dem3DofGeom);
 #endif
 
-bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
+bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
-	Vector3r normal=se32.position-se31.position;
+	Vector3r normal=(state2.pos+shift2)-state1.pos;
 	Real penetrationDepthSq=pow((distFactor>0?distFactor:1.)*(s1->radius+s2->radius),2)-normal.SquaredLength();
 	if (penetrationDepthSq<0 && !c->isReal()){
 		return false;
@@ -171,15 +171,15 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 		if(Omega::instance().getCurrentIteration()<=10){
 			ss->effR1=s1->radius-.5*penetrationDepth; ss->effR2=s2->radius-.5*penetrationDepth;
 		} else {ss->effR1=s1->radius; ss->effR2=s2->radius;}
-		// for bending only: ss->initRelOri12=se31.orientation.Conjugate()*se32.orientation;
+		// for bending only: ss->initRelOri12=state1.ori.Conjugate()*state2.ori;
 		// quasi-constants
-		ss->cp1rel.Align(Vector3r::UNIT_X,se31.orientation.Conjugate()*normal);
-		ss->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normal));
+		ss->cp1rel.Align(Vector3r::UNIT_X,state1.ori.Conjugate()*normal);
+		ss->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normal));
 		ss->cp1rel.Normalize(); ss->cp2rel.Normalize();
 	}
 	ss->normal=normal;
-	ss->contactPoint=se31.position+(ss->effR1-.5*(ss->refLength-dist))*ss->normal;
-	ss->se31=se31; ss->se32=se32;
+	ss->contactPoint=state1.pos+(ss->effR1-.5*(ss->refLength-dist))*ss->normal;
+	ss->se31=state1.se3; ss->se32=state2.se3;
 	return true;
 }
 

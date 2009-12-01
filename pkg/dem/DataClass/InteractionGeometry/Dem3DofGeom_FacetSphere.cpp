@@ -39,16 +39,17 @@ Real Dem3DofGeom_FacetSphere::slipToDisplacementTMax(Real displacementTMax){
 }
 
 CREATE_LOGGER(ef2_Facet_Sphere_Dem3DofGeom);
-bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
+bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
 	InteractingFacet* facet=static_cast<InteractingFacet*>(cm1.get());
 	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
+
 
 	#if 1
 		/* new code written from scratch, to make sure the algorithm is correct; it is about the same speed 
 			as sega's algo below, but seems more readable to me.
 			The FACET_TOPO thing is still missing here but can be copied literally once it is tested */
 		// begin facet-local coordinates
-			Vector3r cogLine=se31.orientation.Conjugate()*(se32.position-se31.position); // connect centers of gravity
+			Vector3r cogLine=state1.ori.Conjugate()*(state2.pos+shift2-state1.pos); // connect centers of gravity
 			//TRVAR4(se31.position,se31.orientation,se32.position,cogLine);
 			Vector3r normal=facet->nf;
 			Real planeDist=normal.Dot(cogLine);
@@ -80,7 +81,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 	#else
 		/* This code was mostly copied from InteractingFacet2InteractinSphere4SpheresContactGeometry */
 		// begin facet-local coordinates 
-			Vector3r contactLine=se31.orientation.Conjugate()*(se32.position-se31.position);
+			Vector3r contactLine=state1.ori.Conjugate()*(state2.pos+shift2-state1.pos);
 			Vector3r normal=facet->nf;
 			Real L=normal.Dot(contactLine); // height/depth of sphere's center from facet's plane
 			if(L<0){normal*=-1; L*=-1;}
@@ -138,7 +139,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 	if(penetrationDepth<0 && !c->isReal()) return false;
 
 	shared_ptr<Dem3DofGeom_FacetSphere> fs;
-	Vector3r normalGlob=se31.orientation*normal;
+	Vector3r normalGlob=state1.ori*normal;
 	if(c->interactionGeometry) fs=YADE_PTR_CAST<Dem3DofGeom_FacetSphere>(c->interactionGeometry);
 	else {
 		fs=shared_ptr<Dem3DofGeom_FacetSphere>(new Dem3DofGeom_FacetSphere());
@@ -148,12 +149,12 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 		fs->refLength=fs->effR2;
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=facet->nf;
-		fs->cp2rel.Align(Vector3r::UNIT_X,se32.orientation.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
+		fs->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		fs->cp2rel.Normalize();
 	}
-	fs->se31=se31; fs->se32=se32;
+	fs->se31=state1.se3; fs->se32=state2.se3;
 	fs->normal=normalGlob;
-	fs->contactPoint=se32.position+(-normalGlob)*(sphereRadius-penetrationDepth);
+	fs->contactPoint=state2.pos+shift2+(-normalGlob)*(sphereRadius-penetrationDepth);
 	return true;
 }
 

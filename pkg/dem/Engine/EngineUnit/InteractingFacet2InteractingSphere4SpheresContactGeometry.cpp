@@ -22,10 +22,12 @@ InteractingFacet2InteractingSphere4SpheresContactGeometry::InteractingFacet2Inte
 
 bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_ptr<InteractingGeometry>& cm1,
 							const shared_ptr<InteractingGeometry>& cm2,
-							const Se3r& se31,
-							const Se3r& se32,
+							const State& state1,
+							const State& state2,
+							const Vector3r& shift2,
 							const shared_ptr<Interaction>& c)
 {
+	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	InteractingFacet*   facet = static_cast<InteractingFacet*>(cm1.get());
 	/* could be written as (needs to be tested):
 	 * Vector3r cl=se31.orientation.Conjugate()*(se32.position-se31.position);
@@ -119,13 +121,14 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
 								const shared_ptr<InteractingGeometry>& cm2,
-								const Se3r& se31,
-								const Se3r& se32,
+								const State& state1,
+								const State& state2,
+								const Vector3r& shift2,
 								const shared_ptr<Interaction>& c)
 {
 	c->swapOrder();
 	//LOG_WARN("Swapped interaction order for "<<c->getId2()<<"&"<<c->getId1());
-	return go(cm2,cm1,se32,se31,c);
+	return go(cm2,cm1,state2,state1,-shift2,c);
 }
 
 YADE_PLUGIN((InteractingFacet2InteractingSphere4SpheresContactGeometry));

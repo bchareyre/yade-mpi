@@ -61,9 +61,9 @@ class ef2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryEngineUnit{
 		return A+min(1.,max(0.,u))*BA;
 	}
 	public:
-		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const Se3r& se31, const Se3r& se32, const shared_ptr<Interaction>& c){
-			c->swapOrder(); return go(cm2,cm1,se32,se31,c);
+		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
+			c->swapOrder(); return go(cm2,cm1,state2,state1,-shift2,c);
 			LOG_ERROR("!! goReverse maybe doesn't work in ef2_Facet_Sphere_Dem3DofGeom. InteractionGeometryMetaEngine should swap interaction members first and call go(...) afterwards.");
 		}
 

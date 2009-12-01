@@ -67,6 +67,7 @@ void yadeInitialize(python::list& dd, bool gdb){
 		}
 	#endif
 	vector<string> dd2; for(int i=0; i<python::len(dd); i++) dd2.push_back(python::extract<string>(dd[i]));
+	//TODO: call Omega::instance().buildDynlibDatabase(dd2); and scan directories for plugins in the python boot part (gets rid of ugly Omega code once no c++ main exists)
 	Omega::instance().scanPlugins(dd2);
 }
 void yadeFinalize(){ Omega::instance().cleanupTemps(); }

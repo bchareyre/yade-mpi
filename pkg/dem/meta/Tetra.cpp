@@ -43,7 +43,8 @@ CREATE_LOGGER(Tetra2TetraBang);
  * @todo thoroughly test this for numerical correctness.
  *
  */
-bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared_ptr<InteractingGeometry>& cm2,const Se3r& se31,const Se3r& se32,const shared_ptr<Interaction>& interaction){
+bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared_ptr<InteractingGeometry>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
+	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	TetraMold* A = static_cast<TetraMold*>(cm1.get());
 	TetraMold* B = static_cast<TetraMold*>(cm2.get());
 	//return false;
@@ -90,7 +91,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 
 	// transform to global coordinates, build TetraMold objects
 	TetraMold tA(se31.orientation*A->v[0]+se31.position,se31.orientation*A->v[1]+se31.position,se31.orientation*A->v[2]+se31.position,se31.orientation*A->v[3]+se31.position);
-	TetraMold tB(se32.orientation*B->v[0]+se32.position,se32.orientation*B->v[1]+se32.position,se32.orientation*B->v[2]+se32.position,se32.orientation*B->v[3]+se32.position);
+	TetraMold tB(se32.orientation*B->v[0]+se32.position+shift2,se32.orientation*B->v[1]+se32.position+shift2,se32.orientation*B->v[2]+se32.position+shift2,se32.orientation*B->v[3]+se32.position+shift2);
 	// calculate intersection
 	#if 0
 		tB=TetraMold(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
@@ -187,9 +188,9 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	return true;
 }
 
-bool Tetra2TetraBang::goReverse(const shared_ptr<InteractingGeometry>& cm1,const shared_ptr<InteractingGeometry>& cm2,const Se3r& se31,const Se3r& se32,const shared_ptr<Interaction>& interaction){
+bool Tetra2TetraBang::goReverse(const shared_ptr<InteractingGeometry>& cm1,const shared_ptr<InteractingGeometry>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
 	// reverse only normal direction, otherwise use the inverse contact
-	bool isInteracting=go(cm2,cm1,se32,se31,interaction);
+	bool isInteracting=go(cm2,cm1,state2,state1,-shift2,interaction);
 	if(isInteracting){
 		TetraBang* bang=static_cast<TetraBang*>(interaction->interactionGeometry.get());
 		bang->normal*=-1;
