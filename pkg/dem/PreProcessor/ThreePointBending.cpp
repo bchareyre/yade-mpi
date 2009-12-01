@@ -104,7 +104,7 @@ bool ThreePointBending::generate()
 	// load simulation file, extract spheres and use those
 	if (yadeFileWithSpheres.size()!=0){
 		shared_ptr<World> metaBodyWithSpheres;
-		IOFormatManager::loadFromFile("XMLFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres);
+		IOFormatManager::loadFromFile("XMLFormatManager",yadeFileWithSpheres,"world",metaBodyWithSpheres);
 		assert(metaBodyWithSpheres->getClassName()=="World");
 
 		FOREACH(shared_ptr<Body> b, *metaBodyWithSpheres->bodies){

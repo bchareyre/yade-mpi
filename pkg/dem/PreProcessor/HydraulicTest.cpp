@@ -96,10 +96,10 @@ bool HydraulicTest::generate()
 		try
 		{
 			if ( filesystem::extension ( yadeFileWithSpheres ) ==".xml" )
-				IOFormatManager::loadFromFile ( "XMLFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres );
+				IOFormatManager::loadFromFile ( "XMLFormatManager",yadeFileWithSpheres,"world",metaBodyWithSpheres );
 
 			else if ( filesystem::extension ( yadeFileWithSpheres ) ==".yade" )
-				IOFormatManager::loadFromFile ( "BINFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres );
+				IOFormatManager::loadFromFile ( "BINFormatManager",yadeFileWithSpheres,"world",metaBodyWithSpheres );
 
 		if ( metaBodyWithSpheres->getClassName() != "World" ) { message="Error: cannot load the file that should contain spheres"; return false; }
 		}
