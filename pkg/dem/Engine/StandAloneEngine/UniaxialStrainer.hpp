@@ -18,14 +18,14 @@
  */
 class UniaxialStrainer: public StandAloneEngine {
 	private:
-		MetaBody* rootBody;
+		World* rootBody;
 		bool needsInit;
 
 		void computeAxialForce();
 		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->state->pos[axis]; };
 		void init();
 	public:
-		virtual bool isActivated(MetaBody*){return active;}
+		virtual bool isActivated(World*){return active;}
 		//! strain rate, starting at 0, linearly raising to strainRate
 		Real strainRate,currentStrainRate;
 		//! alternatively, absolute speed of boundary motion can be specified; this is effective only at the beginning and if strainRate is not set; changing absSpeed directly during simulation wil have no effect.
@@ -39,7 +39,7 @@ class UniaxialStrainer: public StandAloneEngine {
 		//! Flag whether the sense of straining has already been reversed
 		bool notYetReversed;
 		Real sumPosForces,sumNegForces;
-		//! crossSection perpendicular to he strained axis, computed from AABB of MetaBody
+		//! crossSection perpendicular to he strained axis, computed from AABB of World
 		Real crossSectionArea;		//! Apply strain along x (0), y (1) or z(2) axis
 		//! The axis which is strained (0,1,2 for x,y,z)
 		int axis;
@@ -67,7 +67,7 @@ class UniaxialStrainer: public StandAloneEngine {
 		//! Auxiliary vars (serializable, for recording)
 		Real strain, avgStress;
 
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; strain=avgStress=0; blockRotations=false; blockDisplacements=false; setSpeeds=false; strainRate=absSpeed=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; initAccelTime=-200;};
 		virtual ~UniaxialStrainer(){};
 		REGISTER_ATTRIBUTES(StandAloneEngine,

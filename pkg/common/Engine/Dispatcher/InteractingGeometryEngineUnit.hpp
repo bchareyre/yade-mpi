@@ -11,7 +11,7 @@
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/GeometricalModel.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Functor.hpp>
 
 

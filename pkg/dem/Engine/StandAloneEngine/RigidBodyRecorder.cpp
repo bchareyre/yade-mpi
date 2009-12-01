@@ -7,7 +7,7 @@
 *************************************************************************/
 #include "RigidBodyRecorder.hpp"
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 RigidBodyRecorder::RigidBodyRecorder(): DataRecorder(), rigidBodyParameters(new RigidBodyParameters)
@@ -33,12 +33,12 @@ void RigidBodyRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool RigidBodyRecorder::isActivated(MetaBody*)
+bool RigidBodyRecorder::isActivated(World*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void RigidBodyRecorder::action(MetaBody * ncb)
+void RigidBodyRecorder::action(World * ncb)
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

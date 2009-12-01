@@ -29,8 +29,8 @@ void ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment::go(	co
   
   BcpConnection* bc = static_cast<BcpConnection*>(body->physicalParameters.get());
 
-  SSLS->position = (*(Omega::instance().getRootBody()->bodies))[bc->id1]->physicalParameters->se3.position;
-  Vector3r len = (*(Omega::instance().getRootBody()->bodies))[bc->id2]->physicalParameters->se3.position - SSLS->position;
+  SSLS->position = (*(Omega::instance().getWorld()->bodies))[bc->id1]->physicalParameters->se3.position;
+  Vector3r len = (*(Omega::instance().getWorld()->bodies))[bc->id2]->physicalParameters->se3.position - SSLS->position;
   len.Normalize();
   SSLS->orientation = len;
   

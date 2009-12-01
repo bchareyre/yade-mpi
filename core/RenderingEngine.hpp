@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "MetaBody.hpp"
+#include "World.hpp"
 #include<yade/lib-serialization/Serializable.hpp>
 
 class RenderingEngine :  public Serializable
@@ -17,8 +17,8 @@ class RenderingEngine :  public Serializable
 		RenderingEngine():Serializable() {};
 		virtual ~RenderingEngine() {} ;
 	
-		virtual void render(const shared_ptr<MetaBody>& , const int selection = -1) {throw;};
-		virtual void renderWithNames(const shared_ptr<MetaBody>& ) {throw;};
+		virtual void render(const shared_ptr<World>& , const int selection = -1) {throw;};
+		virtual void renderWithNames(const shared_ptr<World>& ) {throw;};
 		virtual void init() {throw;};
 		virtual void initgl() {};
 

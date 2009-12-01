@@ -3,7 +3,7 @@
 
 #include<yade/pkg-dem/PeriIsoCompressor.hpp>
 #include<yade/pkg-dem/Shop.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 using namespace std;
 
@@ -11,7 +11,7 @@ YADE_PLUGIN((PeriIsoCompressor))
 
 
 CREATE_LOGGER(PeriIsoCompressor);
-void PeriIsoCompressor::action(MetaBody* rb){
+void PeriIsoCompressor::action(World* rb){
 	if(!rb->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
 	if(state>=stresses.size()) return;
 	// initialize values

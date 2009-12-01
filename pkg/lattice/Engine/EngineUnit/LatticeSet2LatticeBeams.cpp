@@ -10,7 +10,7 @@
 #include<yade/pkg-lattice/LatticeSetParameters.hpp>
 #include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/pkg-lattice/LineSegment.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 YADE_REQUIRE_FEATURE(shape);
 
@@ -19,7 +19,7 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 					, const Body* body)
 {
 	int beamGroupMask = static_cast<const LatticeSetParameters*>(ph.get())->beamGroupMask;
-	const MetaBody * ncb = static_cast<const MetaBody*>(body);
+	const World * ncb = static_cast<const World*>(body);
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	BodyContainer::iterator bi    = bodies->begin();
@@ -32,7 +32,7 @@ void LatticeSet2LatticeBeams::go(	  const shared_ptr<PhysicalParameters>& ph
 			LineSegment* line 		= static_cast<LineSegment*>	     (b->geometricalModel.get());
 			LatticeBeamParameters* beam 	= static_cast<LatticeBeamParameters*>(b->physicalParameters.get());
 
-// FIXME - this copying of length between latticeBeam geometry and physics, inside MetaBody could
+// FIXME - this copying of length between latticeBeam geometry and physics, inside World could
 //         be done just once, if length was inside shared_ptr. This can be improved once we make
 //         indexable Parameters: Velocity, Position, Orientation, ....
 			line->length                    = beam->length;

@@ -11,16 +11,6 @@
 #include<algorithm>
 #include<vector>
 
-list<string> Dispatcher::getNeededBex(){
-	list<string> ret;
-	FOREACH(shared_ptr<Functor> e, functorArguments){
-		list<string> eBex=e->getNeededBex();
-		ret.insert(ret.end(),eBex.begin(),eBex.end());
-	}
-	ret.sort();
-	ret.unique();
-	return ret;
-}
 
 
 Dispatcher::Dispatcher()

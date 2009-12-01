@@ -2,7 +2,7 @@
 
 #include"Clump.hpp"
 #include<algorithm>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
 
@@ -21,7 +21,7 @@ ClumpMemberMover::ClumpMemberMover(){/*createIndex();*/ }
  * _param pp passed by the dispatcher
  * _param clump passed by the dispatcher
  */
-void ClumpMemberMover::applyCondition(MetaBody* rootBody){
+void ClumpMemberMover::applyCondition(World* rootBody){
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
 		shared_ptr<Body> b = *I;
 		if(b->isClump()){

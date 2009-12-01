@@ -6,7 +6,7 @@ class CundallNonViscousForceDamping : public PhysicalActionDamperUnit{
 	public:
 		Real damping;
 		CundallNonViscousForceDamping(): damping(0){};
-		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
+		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, World*);
 	REGISTER_ATTRIBUTES(PhysicalActionDamperUnit,(damping));
 	FUNCTOR1D(ParticleParameters);
 	REGISTER_CLASS_AND_BASE(CundallNonViscousForceDamping,PhysicalActionDamperUnit);
@@ -17,7 +17,7 @@ class CundallNonViscousMomentumDamping : public PhysicalActionDamperUnit{
 	public:
 		Real damping;
 		CundallNonViscousMomentumDamping(): damping(0){};
-		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*);
+		virtual void go(const shared_ptr<PhysicalParameters>&, const Body*, World*);
 	REGISTER_ATTRIBUTES(PhysicalActionDamperUnit,(damping));
 	FUNCTOR1D(RigidBodyParameters);
 	REGISTER_CLASS_AND_BASE(CundallNonViscousMomentumDamping,PhysicalActionDamperUnit);

@@ -1,9 +1,9 @@
 
 #include"PressTestEngine.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 
-void PressTestEngine::applyCondition(MetaBody * ncb){
+void PressTestEngine::applyCondition(World * ncb){
 	if (curentDirection != stop) {
 		if (curentDirection==forward) { 										 ///<Forward direction of the press
 			FOREACH(body_id_t id, subscribedBodies){

@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 YADE_PLUGIN((ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw));
-void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody){
+void ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody){
 
 	SpheresContactGeometry* geom=static_cast<SpheresContactGeometry*>(_geom.get());
 	ViscoelasticInteraction* phys=static_cast<ViscoelasticInteraction*>(_phys.get());

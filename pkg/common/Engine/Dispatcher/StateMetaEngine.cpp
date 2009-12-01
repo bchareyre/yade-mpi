@@ -9,10 +9,10 @@
 #include "StateMetaEngine.hpp"
 
 
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 
-void StateMetaEngine::action(MetaBody* ncb)
+void StateMetaEngine::action(World* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	ncb->bex.sync();

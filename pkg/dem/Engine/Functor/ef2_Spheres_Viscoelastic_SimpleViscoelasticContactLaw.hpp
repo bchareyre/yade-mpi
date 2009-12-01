@@ -14,7 +14,7 @@
 class ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw : public ConstitutiveLaw
 {
 	public :
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, MetaBody*);
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, World*);
 		FUNCTOR2D(SpheresContactGeometry,ViscoelasticInteraction);
 		REGISTER_CLASS_AND_BASE(ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw,ConstitutiveLaw);
 };

@@ -18,7 +18,7 @@ mechanical behavior of mining rocks.
 
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
 		FUNCTOR2D(Dem3DofGeom,RpmPhys);
 		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_RockPMPhys_Rpm,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);

@@ -19,7 +19,7 @@
 	#include<yade/pkg-common/Sphere.hpp>
 	#include<yade/pkg-common/Box.hpp>
 #endif
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -77,7 +77,7 @@ void Funnel::postProcessAttributes(bool)
 
 bool Funnel::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -239,7 +239,7 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 }
 
 
-void Funnel::createActors(shared_ptr<MetaBody>& rootBody)
+void Funnel::createActors(shared_ptr<World>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -299,7 +299,7 @@ void Funnel::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void Funnel::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void Funnel::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	

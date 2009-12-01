@@ -11,9 +11,9 @@
 #include"NewtonsForceLaw.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
-void NewtonsForceLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, MetaBody* rb){
+void NewtonsForceLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, World* rb){
 	Vector3r f=rb->bex.getForce(bb->getId());
 	ParticleParameters * p = YADE_CAST<ParticleParameters*>(b.get());
 	

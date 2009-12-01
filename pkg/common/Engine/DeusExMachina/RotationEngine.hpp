@@ -20,7 +20,7 @@ class RotationEngine : public DeusExMachina
 		bool rotateAroundZero;
 		Vector3r zeroPoint;
 
-		void applyCondition(MetaBody * );
+		void applyCondition(World * );
 
 	protected :
 	REGISTER_ATTRIBUTES(DeusExMachina,(angularVelocity)(rotationAxis)(rotateAroundZero)(zeroPoint));
@@ -42,7 +42,7 @@ class SpiralEngine:public DeusExMachina{
 		Vector3r axisPt;
 		//! how much have we turned so far
 		Real angleTurned;
-	virtual void applyCondition(MetaBody*);
+	virtual void applyCondition(World*);
 	REGISTER_CLASS_AND_BASE(SpiralEngine,DeusExMachina);
 	REGISTER_ATTRIBUTES(DeusExMachina,(angularVelocity)(linearVelocity)(axis)(axisPt)(angleTurned));
 };
@@ -68,7 +68,7 @@ class InterpolatingSpiralEngine: public SpiralEngine{
 		//! axial translation per radian turn (can be negative)
 		Real slope;
 		InterpolatingSpiralEngine(): _pos(0), wrap(false), slope(0){}
-		virtual void applyCondition(MetaBody* rb);
+		virtual void applyCondition(World* rb);
 	REGISTER_CLASS_AND_BASE(InterpolatingSpiralEngine,SpiralEngine);
 	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(wrap)(slope));
 };

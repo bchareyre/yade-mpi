@@ -10,7 +10,7 @@
 
 #include"PersistentTriangulationCollider.hpp"
 #include<yade/core/Body.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include<limits>
 #include<utility>
@@ -42,7 +42,7 @@ PersistentTriangulationCollider::~PersistentTriangulationCollider()
 	delete Tes;
 }
 
-void PersistentTriangulationCollider::action ( MetaBody* ncb )
+void PersistentTriangulationCollider::action ( World* ncb )
 {
 	shared_ptr<BodyContainer> bodies=ncb->bodies;
 	bool triangulationIteration = false;

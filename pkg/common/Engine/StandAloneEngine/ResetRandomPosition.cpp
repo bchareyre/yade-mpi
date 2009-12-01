@@ -43,7 +43,7 @@ ResetRandomPosition::~ResetRandomPosition()
 	
 }
 
-void ResetRandomPosition::action(MetaBody* ncb)
+void ResetRandomPosition::action(World* ncb)
 {
 	if (first_run)
 	{

@@ -26,7 +26,7 @@ class StateMetaEngine :	public Dispatcher1D
 					>
 {
 	public :
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 
 	REGISTER_CLASS_NAME(StateMetaEngine);
 	REGISTER_BASE_CLASS_NAME(Dispatcher1D);

@@ -19,7 +19,7 @@
 //#include <yade/pkg-dem/ElasticContactInteraction.hpp>
 
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -34,7 +34,7 @@ TriaxialStateRecorder::TriaxialStateRecorder () : Recorder(){
 	porosity = 1.;
 }
 
-void TriaxialStateRecorder::action (MetaBody * ncb )
+void TriaxialStateRecorder::action (World * ncb )
 {
 	// at the beginning of the file; write column titles
 	if(out.tellp()==0){
@@ -151,7 +151,7 @@ void TriaxialStateRecorder::action (MetaBody * ncb )
 
 }
 /*
-TriaxialStressController::ComputeLoveStress ( MetaBody * ncb )
+TriaxialStressController::ComputeLoveStress ( World * ncb )
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

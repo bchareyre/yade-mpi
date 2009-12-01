@@ -12,7 +12,7 @@ class GravityEngine : public DeusExMachina{
 		Vector3r gravity;
 		GravityEngine(): gravity(Vector3r::ZERO){};
 		virtual ~GravityEngine(){};
-		virtual void applyCondition(MetaBody*);
+		virtual void applyCondition(World*);
 	protected :
 	REGISTER_ATTRIBUTES(DeusExMachina,(gravity));
 	REGISTER_CLASS_AND_BASE(GravityEngine,DeusExMachina);
@@ -35,7 +35,7 @@ class CentralGravityEngine: public DeusExMachina {
 		bool reciprocal;
 		CentralGravityEngine(){ reciprocal=false; }
 		virtual ~CentralGravityEngine(){};
-		virtual void applyCondition(MetaBody*);
+		virtual void applyCondition(World*);
 	protected:
 		REGISTER_ATTRIBUTES(DeusExMachina,(centralBody)(accel)(reciprocal));
 		REGISTER_CLASS_NAME(CentralGravityEngine);
@@ -57,7 +57,7 @@ class AxialGravityEngine: public DeusExMachina {
 		Real acceleration;
 		AxialGravityEngine(){ }
 		virtual ~AxialGravityEngine(){};
-		virtual void applyCondition(MetaBody*);
+		virtual void applyCondition(World*);
 	protected:
 		REGISTER_ATTRIBUTES(DeusExMachina,(axisPoint)(axisDirection)(acceleration));
 		REGISTER_CLASS_NAME(AxialGravityEngine);

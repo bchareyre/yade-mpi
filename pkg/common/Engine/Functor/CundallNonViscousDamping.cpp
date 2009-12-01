@@ -6,7 +6,7 @@
 
 YADE_PLUGIN((CundallNonViscousForceDamping)(CundallNonViscousMomentumDamping));
 //! damping of force, for bodies that have only ParticleParameters
-void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, MetaBody* rb){
+void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, World* rb){
 	if(body->isClump()) return;
 	Vector3r f=getForceUnsynced(body->getId(),rb);
 	ParticleParameters *p=static_cast<ParticleParameters*>(pp.get());
@@ -15,7 +15,7 @@ void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp,
 	rb->bex.addForce(body->getId(),df);
 }
 //! damping of both force and torque, for bodies that have RigidBodyParameters
-void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, MetaBody* rb){
+void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, World* rb){
 	if(body->isClump()) return;
 	body_id_t id=body->getId();
 	Vector3r f=getForceUnsynced(id,rb),t=getTorqueUnsynced(id,rb);

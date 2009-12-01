@@ -20,7 +20,7 @@
 #include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 CREATE_LOGGER ( ContactStressRecorder );
@@ -56,13 +56,13 @@ void ContactStressRecorder::postProcessAttributes ( bool deserializing )
 
 
 
-bool ContactStressRecorder::isActivated(MetaBody*)
+bool ContactStressRecorder::isActivated(World*)
 {
 	return ( ( Omega::instance().getCurrentIteration() % interval == 0 ) && ( ofile ) );
 }
 
 
-void ContactStressRecorder::action ( MetaBody * ncb )
+void ContactStressRecorder::action ( World * ncb )
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

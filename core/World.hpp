@@ -22,16 +22,16 @@
 #define HOST_NAME_MAX 255 
 #endif
 
-class MetaBody : public Body
+class World : public Body
 {
 	public :
 		shared_ptr<BodyContainer>		bodies;
 		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50
 		shared_ptr<InteractionContainer> interactions;
-		//! Container of shared materials. Add elements using MetaBody::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!
+		//! Container of shared materials. Add elements using World::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!
 		vector<shared_ptr<Material> > materials;
-		//! Adds material to MetaBody::materials. It also sets id of the material accordingly and returns it.
+		//! Adds material to World::materials. It also sets id of the material accordingly and returns it.
 		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
 		//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundingVolumeDispatcher the first time it runs)
 		void checkStateTypes();
@@ -46,7 +46,7 @@ class MetaBody : public Body
 
 		shared_ptr<GroupRelationData>           grpRelationData;
 
-		MetaBody();
+		World();
 
 		void moveToNextTimeStep();
 
@@ -86,9 +86,9 @@ class MetaBody : public Body
 		(cellMax)
 		(isPeriodic)
 	);
-	REGISTER_CLASS_AND_BASE(MetaBody,Body);
+	REGISTER_CLASS_AND_BASE(World,Body);
 };
 
-REGISTER_SERIALIZABLE(MetaBody);
+REGISTER_SERIALIZABLE(World);
 
 

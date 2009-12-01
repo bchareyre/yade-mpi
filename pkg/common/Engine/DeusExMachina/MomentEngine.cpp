@@ -10,7 +10,7 @@
 #include<yade/pkg-common/ParticleParameters.hpp>
 
 
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 
 MomentEngine::MomentEngine() : moment(Vector3r::ZERO)
@@ -23,7 +23,7 @@ MomentEngine::~MomentEngine()
 
 
 
-void MomentEngine::applyCondition(MetaBody* ncb)
+void MomentEngine::applyCondition(World* ncb)
 {
 	
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();

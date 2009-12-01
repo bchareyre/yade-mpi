@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
 #include"InsertionSortCollider.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
@@ -27,7 +27,7 @@ bool InsertionSortCollider::spatialOverlap(body_id_t id1, body_id_t id2) const {
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
-void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, InteractionContainer* interactions, MetaBody* rb){
+void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, InteractionContainer* interactions, World* rb){
 	assert(!periodic);
 	assert(id1!=id2);
 	// do bboxes overlap in all 3 dimensions?
@@ -50,7 +50,7 @@ void InsertionSortCollider::handleBoundInversion(body_id_t id1, body_id_t id2, I
 	assert(false); // unreachable
 }
 
-void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, MetaBody* rb, bool doCollide){
+void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, World* rb, bool doCollide){
 	assert(!periodic);
 	assert(v.size==(long)v.vec.size());
 	for(long i=0; i<v.size; i++){
@@ -87,7 +87,7 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const BoundingVolum
 }
 
 #ifdef COLLIDE_STRIDED
-	bool InsertionSortCollider::isActivated(MetaBody* rb){
+	bool InsertionSortCollider::isActivated(World* rb){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
 		if(!strideActive) return true;
@@ -106,7 +106,7 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const BoundingVolum
 	}
 #endif
 
-void InsertionSortCollider::action(MetaBody* rb){
+void InsertionSortCollider::action(World* rb){
 	#ifdef ISC_TIMING
 		timingDeltas->start();
 	#endif
@@ -302,7 +302,7 @@ Real InsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real 
 	return (xNorm-floor(xNorm))*(x1-x0);
 }
 
-void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer* interactions, MetaBody*rb, bool doCollide){
+void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer* interactions, World*rb, bool doCollide){
 	assert(periodic);
 	long &loIdx=v.loIdx; const long &size=v.size;
 	for(long _i=0; _i<size; _i++){
@@ -348,7 +348,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 }
 
 // called by the insertion sort if 2 bodies swapped their bounds
-void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id2, InteractionContainer* interactions, MetaBody* rb){
+void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id2, InteractionContainer* interactions, World* rb){
 	assert(periodic);
 	// do bboxes overlap in all 3 dimensions?
 	Vector3<int> periods;
@@ -395,7 +395,7 @@ void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id
 	at all, for instance.
 */
 //! return true if bodies bb overlap in all 3 dimensions
-bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,MetaBody* rb, Vector3<int>& periods) const {
+bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,World* rb, Vector3<int>& periods) const {
 	assert(periodic);
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){

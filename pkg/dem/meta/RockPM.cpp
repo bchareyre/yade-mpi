@@ -1,5 +1,5 @@
 #include"RockPM.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -10,7 +10,7 @@ YADE_PLUGIN((Law2_Dem3DofGeom_RockPMPhys_Rpm)(RpmMat)(Ip2_RpmMat_RpmMat_RpmPhys)
 /********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
 CREATE_LOGGER(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
-void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
+void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, World* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	RpmPhys* phys=static_cast<RpmPhys*>(ip.get());
 	

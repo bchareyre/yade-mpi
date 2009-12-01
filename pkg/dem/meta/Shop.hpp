@@ -18,11 +18,11 @@
 #include<boost/function.hpp>
 
 /*
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Omega.hpp>
 */
-class MetaBody;
+class World;
 class Body;
 class SimpleViscoelasticBodyParameters;
 class SimpleViscoelasticMat;
@@ -57,12 +57,12 @@ class Shop{
 			defaults[key]=boost::any(value);}
 
 		//! creates empty rootBody along with its parameters (boundingVolume etc.)
-		static shared_ptr<MetaBody> rootBody();
-		/*! creates engines and initilizers within given MetaBody: elastic contact law, with gravity, timestepper and damping.
+		static shared_ptr<World> rootBody();
+		/*! creates engines and initilizers within given World: elastic contact law, with gravity, timestepper and damping.
 		 *
 		 * All parameters are take from Shop::defaults, which are user-settable.
 		 */
-		static void rootBodyActors(shared_ptr<MetaBody>);
+		static void rootBodyActors(shared_ptr<World>);
 		//! create default sphere, along with its boundingVolume etc. 
 		static shared_ptr<Body> sphere(Vector3r center, Real radius, shared_ptr<Material> mat);
 		//! create default box with everything needed
@@ -86,7 +86,7 @@ class Shop{
 
 
 		//! Estimate timestep based on P-wave propagation speed
-		static Real PWaveTimeStep(shared_ptr<MetaBody> rb=shared_ptr<MetaBody>());
+		static Real PWaveTimeStep(shared_ptr<World> rb=shared_ptr<World>());
 
 		//! return 2d coordinates of a 3d point within plane defined by rotation axis and inclination of spiral, wrapped to the 0th period
 		static boost::tuple<Real, Real, Real> spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0);
@@ -103,15 +103,15 @@ class Shop{
 	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticMat> b);
 
 		//! Get unbalanced force of the whole simulation
-		static Real unbalancedForce(bool useMaxForce=false, MetaBody* _rb=NULL);
-		static Real kineticEnergy(MetaBody* _rb=NULL);
-		static Vector3r totalForceInVolume(Real& avgIsoStiffness, MetaBody *_rb=NULL);
+		static Real unbalancedForce(bool useMaxForce=false, World* _rb=NULL);
+		static Real kineticEnergy(World* _rb=NULL);
+		static Vector3r totalForceInVolume(Real& avgIsoStiffness, World *_rb=NULL);
 
 		//! create transientInteraction between 2 bodies, using existing Dispatcher in Omega
 		static shared_ptr<Interaction> createExplicitInteraction(body_id_t id1, body_id_t id2);
 
 		//! apply force on contact point on both bodies (reversed on body 2)
-		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, MetaBody* rb);
+		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, World* rb);
 
 		//! map scalar variable to 1d colorscale
 		static Vector3r scalarOnColorScale(Real x, Real xmin=0., Real xmax=1.);

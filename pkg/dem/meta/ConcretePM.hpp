@@ -279,11 +279,11 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 		//! Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, 1=no softening, >1=hardening)
 		static Real relKnSoft;
 		Law2_Dem3DofGeom_CpmPhys_Cpm() { }
-		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
 		// utility functions
 		//! Update avgStress on all bodies (called from VTKRecorder and yade.eudoxos.particleConfinement)
 		//! Might be anywhere else as well (static method)
-		static void updateBodiesState(MetaBody*);
+		static void updateBodiesState(World*);
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
 	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
 	REGISTER_ATTRIBUTES(ConstitutiveLaw,(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(omegaThreshold)(epsSoft)(relKnSoft));
@@ -304,8 +304,8 @@ class CpmGlobalCharacteristics: public PeriodicEngine{
 	public:
 		bool useMaxForce; // use maximum unbalanced force instead of mean unbalanced force
 		Real unbalancedForce;
-		void compute(MetaBody* rb, bool useMax=false);
-		virtual void action(MetaBody* rb){compute(rb,useMaxForce);}
+		void compute(World* rb, bool useMax=false);
+		virtual void action(World* rb){compute(rb,useMaxForce);}
 		CpmGlobalCharacteristics(){};
 	REGISTER_ATTRIBUTES(PeriodicEngine,
 		(unbalancedForce)
@@ -337,8 +337,8 @@ class CpmStateUpdater: public PeriodicEngine {
 		//! maximum damage over all contacts
 		static Real maxOmega;
 		CpmStateUpdater(){maxOmega=0; /* run at the very beginning */ initRun=true;}
-		virtual void action(MetaBody* rb){ update(rb); }
-		static void update(MetaBody* rb=NULL);
+		virtual void action(World* rb){ update(rb); }
+		static void update(World* rb=NULL);
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
 	REGISTER_CLASS_AND_BASE(CpmStateUpdater,PeriodicEngine);

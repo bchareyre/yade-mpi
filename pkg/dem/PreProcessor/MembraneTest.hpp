@@ -26,8 +26,8 @@ class MembraneTest : public FileGenerator
                 void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool dynamic);
 		void createNode(shared_ptr<Body>& body, unsigned int i, unsigned int j);
                 void connectNodes(shared_ptr<Body>& body, unsigned int id1, unsigned int id2);
-		void createActors(shared_ptr<MetaBody>& rootBody);
-		void positionRootBody(shared_ptr<MetaBody>& rootBody);
+		void createActors(shared_ptr<World>& rootBody);
+		void positionRootBody(shared_ptr<World>& rootBody);
 
 	public :
 		MembraneTest ();

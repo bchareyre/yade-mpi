@@ -35,7 +35,7 @@ _pyRootClasses=set([
 	'BoundingVolumeFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','ConstitutiveLaw']+
 	(['GeometricalModelEngineUnit','InteractingGeometryEngineUnit','GeometricalModel'] if 'shape' in runtime.features else [])+(['PhysicalParameters','PhysicalActionApplierUnit','PhysicalActionDamperUnit','StateEngineUnit'] if 'physpar' in runtime.features else ['Material','State'])
 	# childless classes
-	+['BoundingVolumeDispatcher','InteracionGeometryDispatcher','InteractionPhysicsDispatcher','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine']
+	+['BoundingVolumeDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine']
 )
 
 _proxiedClasses=set()
@@ -82,24 +82,18 @@ renamed={
 	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere', # renamed 15.11.2009
 	'PeriodicInsertionSortCollider':'InsertionSortCollider',	# integrated 25.11.2009
 	'BoundingVolumeMetaEngine':'BoundingVolumeDispatcher', # Tue Dec  1 14:28:29 2009, vaclav@flux
-	'MetaEngine1D':'Dispatcher1D', # Tue Dec  1 14:32:02 2009, vaclav@flux
-	'MetaEngine2D':'Dispatcher2D', # Tue Dec  1 14:33:26 2009, vaclav@flux
-	'MetaEngine':'Dispatcher', # Tue Dec  1 14:33:40 2009, vaclav@flux
 	'BoundingVolumeEngineUnit':'BoundingVolumeFunctor', # Tue Dec  1 14:39:53 2009, vaclav@flux
 	'InteractionGeometryMetaEngine':'InteractionGeometryDispatcher', # Tue Dec  1 14:40:36 2009, vaclav@flux
 	'InteractionPhysicsMetaEngine':'InteractionPhysicsDispatcher', # Tue Dec  1 14:40:53 2009, vaclav@flux
 	'InteractionPhysicsEngineUnit':'InteractionPhysicsFunctor', # Tue Dec  1 14:41:19 2009, vaclav@flux
 	'InteractionGeometryEngineUnit':'InteractionGeometryFunctor', # Tue Dec  1 14:41:56 2009, vaclav@flux
-	'EngineUnit1D':'Functor1D', # Tue Dec  1 14:59:46 2009, vaclav@flux
-	'EngineUnit2D':'Functor2D', # Tue Dec  1 14:59:51 2009, vaclav@flux
-	'EngineUnit':'Functor', # Tue Dec  1 14:59:56 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
 for oldName in renamed.keys():
 	class warnWrap:
 		def __init__(self,_old,_new):
-			assert(_proxyNamespace.has_key(_new))
+			# assert(_proxyNamespace.has_key(_new))
 			self.old,self.new=_old,_new
 		def __call__(self,*args,**kw):
 			import warnings; warnings.warn("Class `%s' was renamed to (or replaced by) `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=3);

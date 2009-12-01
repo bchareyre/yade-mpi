@@ -29,8 +29,8 @@ class CapillaryRecorder : public DataRecorder
 
 		CapillaryRecorder ();
 
-		virtual void action(MetaBody*);
-		virtual bool isActivated(MetaBody*);
+		virtual void action(World*);
+		virtual bool isActivated(World*);
 	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(bigBallId));
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

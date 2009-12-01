@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-miniWm3/Wm3Math.h>
 
@@ -24,7 +24,7 @@ CinemDNCEngine::CinemDNCEngine()
 }
 
 
-void CinemDNCEngine::applyCondition(MetaBody * body)
+void CinemDNCEngine::applyCondition(World * body)
 {
 	if(theta<=thetalim)
 	{
@@ -36,7 +36,7 @@ void CinemDNCEngine::applyCondition(MetaBody * body)
 
 
 
-void CinemDNCEngine::applyRotTranslation(MetaBody * ncb)
+void CinemDNCEngine::applyRotTranslation(World * ncb)
 {
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
@@ -73,7 +73,7 @@ void CinemDNCEngine::applyRotTranslation(MetaBody * ncb)
 }
 
 
-void CinemDNCEngine::applyTranslation(MetaBody * ncb)
+void CinemDNCEngine::applyTranslation(World * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

@@ -9,9 +9,9 @@
 *************************************************************************/
 
 #include "PhysicalActionDamper.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
-void PhysicalActionDamper::action(MetaBody* ncb){
+void PhysicalActionDamper::action(World* ncb){
 	ncb->bex.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		operator()(b->physicalParameters,b.get(),ncb);

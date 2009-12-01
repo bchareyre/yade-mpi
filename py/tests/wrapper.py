@@ -21,7 +21,7 @@ def listChildClassesRecursive(base):
 	return ret | ret2
 
 
-rootClasses=set(['StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator','BoundingVolumeEngineUnit','InteractionGeometryEngineUnit','InteractionPhysicsEngineUnit','ConstitutiveLaw','Material','State'])
+rootClasses=set(['StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator','BoundingVolumeFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','ConstitutiveLaw','Material','State'])
 
 allClasses=listChildClassesRecursive('Serializable')
 
@@ -61,7 +61,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		# InteractionDispatchers takes 3 lists
 		id=InteractionDispatchers([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
-		self.assert_(id.geomDispatcher.name=='InteractionGeometryMetaEngine')
+		self.assert_(id.geomDispatcher.name=='InteractionGeometryDispatcher')
 		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
 		self.assert_(id.constLawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
 	def testParallelEngineCtor(self):

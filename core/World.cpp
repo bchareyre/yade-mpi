@@ -8,7 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"MetaBody.hpp"
+#include"World.hpp"
 #include<yade/core/Engine.hpp>
 #include<yade/core/Timing.hpp>
 #include<yade/core/TimeStepper.hpp>
@@ -20,7 +20,7 @@
 #include<boost/algorithm/string.hpp>
 
 
-/* this is meant to improve usability: MetaBody is ready by default (so is Omega by that token)
+/* this is meant to improve usability: World is ready by default (so is Omega by that token)
  * and different type of containers can still be used instead by explicit assignment */
 #include<yade/core/BodyVector.hpp>
 #include<yade/core/InteractionVecMap.hpp>
@@ -33,7 +33,7 @@
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-MetaBody::MetaBody() :
+World::World() :
 	Body(), bodies(new BodyVector), interactions(new InteractionVecMap){	
 	engines.clear();
 	initializers.clear();
@@ -68,7 +68,7 @@ MetaBody::MetaBody() :
 
 
 
-void MetaBody::postProcessAttributes(bool deserializing){
+void World::postProcessAttributes(bool deserializing){
 	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b->material || b->material->id<0) continue; // not a shared material
@@ -79,10 +79,10 @@ void MetaBody::postProcessAttributes(bool deserializing){
 
 
 
-void MetaBody::moveToNextTimeStep(){
+void World::moveToNextTimeStep(){
 	if(needsInitializers){
 		checkStateTypes();
-		FOREACH(shared_ptr<Engine> e, initializers){ if(e->isActivated(this)) e->action(this); }
+		FOREACH(shared_ptr<Engine> e, initializers){ e->world=this; if(!e->isActivated(this)) continue;e->action(this); } 
 		bex.resize(bodies->size());
 		needsInitializers=false;
 	}
@@ -90,30 +90,30 @@ void MetaBody::moveToNextTimeStep(){
 	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
 	FOREACH(const shared_ptr<Engine>& e, engines){
-		if(e->isActivated(this)){
-			e->action(this);
-			if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
-		}
+		e->world=this;
+		if(!e->isActivated(this)) continue;
+		e->action(this);
+		if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 	}
 	currentIteration++;
 	simulationTime+=dt;
 }
 
-shared_ptr<Engine> MetaBody::engineByName(string s){
+shared_ptr<Engine> World::engineByName(string s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->getClassName()==s) return e;
 	}
 	return shared_ptr<Engine>();
 }
 
-shared_ptr<Engine> MetaBody::engineByLabel(string s){
+shared_ptr<Engine> World::engineByLabel(string s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->label==s) return e;
 	}
 	return shared_ptr<Engine>();
 }
 
-void MetaBody::setTimeSteppersActive(bool a)
+void World::setTimeSteppersActive(bool a)
 {
 	FOREACH(shared_ptr<Engine> e, engines){
 		if (Omega::instance().isInheritingFrom(e->getClassName(),"TimeStepper"))
@@ -121,7 +121,7 @@ void MetaBody::setTimeSteppersActive(bool a)
 	}
 }
 
-void MetaBody::checkStateTypes(){
+void World::checkStateTypes(){
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b || !b->material) continue;
 		if(b->material && !b->state) throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": has Body::material, but NULL Body::state.");

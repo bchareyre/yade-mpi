@@ -15,7 +15,7 @@
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 ViscousForceDamping::ViscousForceDamping() : InteractionSolver() ,betaNormal(0.0), betaShear(0.0)
 {
@@ -31,7 +31,7 @@ ViscousForceDamping::ViscousForceDamping() : InteractionSolver() ,betaNormal(0.0
 //FIXME : remove bool first !!!!!
 void ViscousForceDamping::action(Body* body)
 {
-	MetaBody * ncb = YADE_CAST<MetaBody*>(body);
+	World * ncb = YADE_CAST<World*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();

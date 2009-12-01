@@ -16,7 +16,7 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/Tetra.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 
 MacroMicroElasticRelationships::MacroMicroElasticRelationships()

@@ -12,7 +12,7 @@
 //#include<vtkMultiBlockDataSet.h>
 #include<vtkTriangle.h>
 #include<vtkLine.h>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/pkg-dem/ConcretePM.hpp>
@@ -36,11 +36,11 @@ VTKRecorder::~VTKRecorder()
 	
 }
 
-void VTKRecorder::init(MetaBody* rootBody)
+void VTKRecorder::init(World* rootBody)
 {
 }
 
-void VTKRecorder::action(MetaBody* rootBody)
+void VTKRecorder::action(World* rootBody)
 {
 	vector<bool> recActive(REC_SENTINEL,false);
 	FOREACH(string& rec, recorders){

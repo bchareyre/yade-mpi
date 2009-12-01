@@ -7,7 +7,7 @@
 #include<boost/tokenizer.hpp>
 #include<boost/tuple/tuple.hpp>
 
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Body.hpp>
 
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
@@ -74,7 +74,7 @@ map<string,boost::any> Shop::defaults;
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
  */
-void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, MetaBody* rootBody){
+void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, World* rootBody){
 	rootBody->bex.addForce(id1,force);
 	rootBody->bex.addForce(id2,-force);
 	rootBody->bex.addTorque(id1,(contPt-pos1).Cross(force));
@@ -89,8 +89,8 @@ areas of the cell will give average stress in that direction.
 
 Requires all .isReal() interaction to have interactionPhysics deriving from NormalShearInteraction.
 */
-Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, MetaBody* _rb){
-	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
+Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, World* _rb){
+	World* rb=_rb ? _rb : Omega::instance().getWorld().get();
 	Vector3r force(Vector3r::ZERO); Real stiff=0; long n=0;
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
@@ -103,8 +103,8 @@ Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, MetaBody* _rb){
 	return force;
 }
 
-Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
-	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
+Real Shop::unbalancedForce(bool useMaxForce, World* _rb){
+	World* rb=_rb ? _rb : Omega::instance().getWorld().get();
 	rb->bex.sync();
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
@@ -123,8 +123,8 @@ Real Shop::unbalancedForce(bool useMaxForce, MetaBody* _rb){
 	return (useMaxForce?maxF:meanF)/maxContactF;
 }
 
-Real Shop::kineticEnergy(MetaBody* _rb){
-	MetaBody* rb=_rb ? _rb : Omega::instance().getRootBody().get();
+Real Shop::kineticEnergy(World* _rb){
+	World* rb=_rb ? _rb : Omega::instance().getWorld().get();
 	Real ret=0.;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
@@ -188,8 +188,8 @@ void Shop::init(){
 }
 
 /*! Create root body. */
-shared_ptr<MetaBody> Shop::rootBody(){
-	shared_ptr<MetaBody> rootBody = shared_ptr<MetaBody>(new MetaBody);
+shared_ptr<World> Shop::rootBody(){
+	shared_ptr<World> rootBody = shared_ptr<World>(new World);
 	rootBody->isDynamic=false;
 
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());	set->diffuseColor=Vector3r(0,0,1);
@@ -203,9 +203,9 @@ shared_ptr<MetaBody> Shop::rootBody(){
 }
 
 
-/*! Assign default set of actors (initializers and engines) to an existing MetaBody.
+/*! Assign default set of actors (initializers and engines) to an existing World.
  */
-void Shop::rootBodyActors(shared_ptr<MetaBody> rootBody){
+void Shop::rootBodyActors(shared_ptr<World> rootBody){
 	// initializers	
 	rootBody->initializers.clear();
 
@@ -320,7 +320,7 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 
 
 void Shop::saveSpheresToFile(string fname){
-	const shared_ptr<MetaBody>& rootBody=Omega::instance().getRootBody();
+	const shared_ptr<World>& rootBody=Omega::instance().getWorld();
 	ofstream f(fname.c_str());
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 
@@ -380,9 +380,9 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vec
 	return spheres;
 }
 
-Real Shop::PWaveTimeStep(shared_ptr<MetaBody> _rb){
-	shared_ptr<MetaBody> rb=_rb;
-	if(!rb)rb=Omega::instance().getRootBody();
+Real Shop::PWaveTimeStep(shared_ptr<World> _rb){
+	shared_ptr<World> rb=_rb;
+	if(!rb)rb=Omega::instance().getWorld();
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->material || !b->interactingGeometry) continue;
@@ -432,7 +432,7 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2){
 	InteractionGeometryDispatcher* geomMeta=NULL;
 	InteractionPhysicsDispatcher* physMeta=NULL;
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	shared_ptr<World> rb=Omega::instance().getWorld();
 	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }

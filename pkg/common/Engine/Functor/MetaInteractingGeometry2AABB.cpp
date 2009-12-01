@@ -25,7 +25,7 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	Vector3r mx(-inf,-inf,-inf);
 	Vector3r mn(inf,inf,inf);
 	
-	const MetaBody * ncb = YADE_CAST<const MetaBody*>(body);
+	const World * ncb = YADE_CAST<const World*>(body);
 	
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		if(!b) continue;

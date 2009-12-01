@@ -6,7 +6,7 @@
 #include<yade/core/State.hpp>
 
 
-class MetaBody;
+class World;
 /*! Material properties associated with a body.
 
 Historical note: this used to be part of the PhysicalParameters class.
@@ -16,7 +16,7 @@ class Material: public Serializable, public Indexable{
 	public:
 		Material(): id(-1), density(-1){ createIndex(); }
 		~Material();
-		//! global id of the material; if >= 0, the material is shared and can be found under this index in MetaBody::materials
+		//! global id of the material; if >= 0, the material is shared and can be found under this index in World::materials
 		//! (necessary since yade::serialization doesn't track shared pointers)
 		int id;
 		//! textual name of material; if shared, can be looked up by that name
@@ -36,10 +36,10 @@ class Material: public Serializable, public Indexable{
 		*/
 		virtual bool stateTypeOk(State* state) const { return true; }
 
-		static const shared_ptr<Material> byId(int id, MetaBody* world=NULL);
-		static const shared_ptr<Material> byId(int id, shared_ptr<MetaBody> world) {return byId(id,world.get());}
-		static const shared_ptr<Material> byLabel(const std::string& label, MetaBody* world=NULL);
-		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<MetaBody> world) {return byLabel(label,world.get());}
+		static const shared_ptr<Material> byId(int id, World* world=NULL);
+		static const shared_ptr<Material> byId(int id, shared_ptr<World> world) {return byId(id,world.get());}
+		static const shared_ptr<Material> byLabel(const std::string& label, World* world=NULL);
+		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<World> world) {return byLabel(label,world.get());}
 
 	REGISTER_CLASS_AND_BASE(Material,Serializable);
 	REGISTER_ATTRIBUTES(Serializable,(id)(label)(density));

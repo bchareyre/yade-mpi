@@ -9,10 +9,10 @@
 #pragma once
 
 #include<yade/core/DeusExMachina.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
-class MetaBody;
+class World;
 class State;
 
 
@@ -26,14 +26,14 @@ class TriaxialStressController : public DeusExMachina
 	private :
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		bool firstRun;
-		inline const Vector3r getForce(MetaBody* rb, body_id_t id){ return rb->bex.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
+		inline const Vector3r getForce(World* rb, body_id_t id){ return rb->bex.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
 		
 		 	
 	public :
 		unsigned int stiffnessUpdateInterval, computeStressStrainInterval, radiusControlInterval;
 		//! internal index values for retrieving walls
 		enum { wall_bottom=0, wall_top, wall_left, wall_right, wall_front, wall_back };
-		//! real index values of walls in the MetaBody
+		//! real index values of walls in the World
 		int wall_id [6];
 		//! Defines the prescibed resultant force 
 		//Vector3r		force;	
@@ -94,14 +94,14 @@ class TriaxialStressController : public DeusExMachina
 		TriaxialStressController();
 		virtual ~TriaxialStressController();
 	
-		virtual void applyCondition(MetaBody*);
+		virtual void applyCondition(World*);
 		//! Regulate the stress applied on walls with flag wall_XXX_activated = true
-		void controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, State* p, Real wall_max_vel);
-		void controlInternalStress(MetaBody* ncb, Real multiplier);
-		void updateStiffness(MetaBody* ncb);
-		void computeStressStrain(MetaBody* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
+		void controlExternalStress(int wall, World* ncb, Vector3r resultantForce, State* p, Real wall_max_vel);
+		void controlInternalStress(World* ncb, Real multiplier);
+		void updateStiffness(World* ncb);
+		void computeStressStrain(World* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-    		Real ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced=false);
+    		Real ComputeUnbalancedForce(World * ncb, bool maxUnbalanced=false);
 
 		DECLARE_LOGGER;
 		

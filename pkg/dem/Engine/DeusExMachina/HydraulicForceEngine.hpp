@@ -25,7 +25,7 @@ class HydraulicForceEngine : public DeusExMachina
 	
 		HydraulicForceEngine();
 		virtual ~HydraulicForceEngine();
-		virtual void applyCondition(MetaBody*);
+		virtual void applyCondition(World*);
 	
 	REGISTER_ATTRIBUTES(DeusExMachina,(gravity)(isActivated)(dummyParameter)(HFinverted)(savePositions)(outputFile)(inputFile)(HFinversion_counter)(forceFactor));
 	REGISTER_CLASS_NAME(HydraulicForceEngine);

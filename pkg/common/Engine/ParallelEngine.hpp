@@ -6,9 +6,8 @@ class ParallelEngine: public Engine {
 		slaveContainer slaves;
 		ParallelEngine(){};
 		virtual ~ParallelEngine(){};
-		virtual void action(MetaBody*);
-		virtual bool isActivated(MetaBody*){return true;}
-		virtual list<string> getNeededBex();		
+		virtual void action(World*);
+		virtual bool isActivated(World*){return true;}
 	REGISTER_ATTRIBUTES(Engine,(slaves));
 	REGISTER_CLASS_NAME(ParallelEngine);
 	REGISTER_BASE_CLASS_NAME(Engine);

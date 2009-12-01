@@ -35,8 +35,8 @@ class NodeRecorder : public DataRecorder
 
 		NodeRecorder ();
 
-		virtual void action(MetaBody*);
-		virtual bool isActivated(MetaBody*);
+		virtual void action(World*);
+		virtual bool isActivated(World*);
 	REGISTER_ATTRIBUTES(DataRecorder,
 		(outputFile)
 		(interval)

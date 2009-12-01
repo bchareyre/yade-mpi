@@ -36,8 +36,8 @@ class MicroMacroAnalyser : public StandAloneEngine
 		
 	public :
 		MicroMacroAnalyser();
-		void action(MetaBody*);
-		void setState(MetaBody* ncb, unsigned int state, bool saveStates = false, bool computeIncrement = false);//Set current state as initial (state=1) or final (state=2) congiguration for later kinematic analysis on the increment; if requested : save snapshots (with specific format) - possibly including contact forces increments on the state1->state2 interval
+		void action(World*);
+		void setState(World* ncb, unsigned int state, bool saveStates = false, bool computeIncrement = false);//Set current state as initial (state=1) or final (state=2) congiguration for later kinematic analysis on the increment; if requested : save snapshots (with specific format) - possibly including contact forces increments on the state1->state2 interval
 		int interval;
 		
 	DECLARE_LOGGER;

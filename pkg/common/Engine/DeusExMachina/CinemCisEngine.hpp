@@ -27,15 +27,15 @@ class CinemCisEngine : public DeusExMachina
 
 	public :
 		CinemCisEngine();
-		void applyCondition(MetaBody * body);
+		void applyCondition(World * body);
 
 		Real	 shearSpeed	// to be defined in the PreProcessor
 			,thetalim 	// the maximum value of theta, at wich the displacement is stopped
 			;
 		body_id_t id_boxhaut;	// the id of the upper wall : defined in the constructor
 		Vector3r rotationAxis;	// defined in the constructor
-		void applyRotTranslation(MetaBody *);	// to let move (rotation combined with translation) the lateral walls
-		void applyTranslation(MetaBody *);	// to let move (translation) the upper wall
+		void applyRotTranslation(World *);	// to let move (rotation combined with translation) the lateral walls
+		void applyTranslation(World *);	// to let move (translation) the upper wall
 	REGISTER_ATTRIBUTES(DeusExMachina,(shearSpeed)(rotationAxis)(theta)(thetalim)(id_boxhaut));
 	REGISTER_CLASS_NAME(CinemCisEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);

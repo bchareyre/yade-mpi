@@ -20,21 +20,21 @@
 class Interaction;
 class BodyContainer;
 //class MacroMicroElasticRelationships;
-class MetaBody;
+class World;
 
 class GlobalStiffnessTimeStepper : public TimeStepper
 {
 	private :
 		vector<Vector3r> stiffnesses;
 		vector<Vector3r> Rstiffnesses;
-		void computeStiffnesses(MetaBody*);
+		void computeStiffnesses(World*);
 
 		Real		newDt, previousDt;
 		bool		computedSomething,
 				computedOnce;
 		//shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
 
-		void findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb);
+		void findTimeStepFromBody(const shared_ptr<Body>& body, World * ncb);
 		void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
 
 	public :
@@ -47,8 +47,8 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		GlobalStiffnessTimeStepper();
 		virtual ~GlobalStiffnessTimeStepper();
 	
-		virtual void computeTimeStep(MetaBody*);
-		virtual bool isActivated(MetaBody*);
+		virtual void computeTimeStep(World*);
+		virtual bool isActivated(World*);
 		DECLARE_LOGGER;
 
 	REGISTER_ATTRIBUTES(TimeStepper,(sdecGroupMask)(defaultDt)(previousDt)(timestepSafetyCoefficient)(computedOnce));

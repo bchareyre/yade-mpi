@@ -91,7 +91,7 @@ void UniaxialStrainer::init(){
 	 * */
 	if(crossSectionArea<=0){
 		shared_ptr<AABB> rbAABB;
-		if (Omega::instance().getRootBody()->boundingVolume && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getRootBody()->boundingVolume))){
+		if (Omega::instance().getWorld()->boundingVolume && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getWorld()->boundingVolume))){
 			int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
 			crossSectionArea=4*rbAABB->halfSize[axis2]*rbAABB->halfSize[axis3];
 			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
@@ -103,7 +103,7 @@ void UniaxialStrainer::init(){
 	assert(crossSectionArea>0);
 }
 
-void UniaxialStrainer::action(MetaBody* _rootBody){
+void UniaxialStrainer::action(World* _rootBody){
 	rootBody=_rootBody;
 	if(needsInit) init();
 	// postconditions for initParams

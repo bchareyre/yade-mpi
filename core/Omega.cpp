@@ -9,7 +9,7 @@
 *************************************************************************/
 
 #include"Omega.hpp"
-#include"MetaBody.hpp"
+#include"World.hpp"
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
 #include<Wm3Vector3.h>
@@ -49,17 +49,17 @@ SINGLETON_SELF(Omega);
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
-long int Omega::getCurrentIteration(){ return (rootBody?rootBody->currentIteration:-1); }
-void Omega::setCurrentIteration(long int i) { if(rootBody) rootBody->currentIteration=i; }
+long int Omega::getCurrentIteration(){ return (world?world->currentIteration:-1); }
+void Omega::setCurrentIteration(long int i) { if(world) world->currentIteration=i; }
 
-Real Omega::getSimulationTime() { return rootBody?rootBody->simulationTime:-1;};
+Real Omega::getSimulationTime() { return world?world->simulationTime:-1;};
 
 void Omega::setSimulationFileName(const string f){simulationFileName = f;}
 string Omega::getSimulationFileName(){return simulationFileName;}
 
-const shared_ptr<MetaBody>& Omega::getRootBody(){return rootBody;}
-void Omega::setRootBody(shared_ptr<MetaBody>& rb){ RenderMutexLock lock; rootBody=rb;}
-void Omega::resetRootBody(){ RenderMutexLock lock; rootBody = shared_ptr<MetaBody>(new MetaBody);}
+const shared_ptr<World>& Omega::getWorld(){return world;}
+void Omega::setWorld(shared_ptr<World>& rb){ RenderMutexLock lock; world=rb;}
+void Omega::resetWorld(){ RenderMutexLock lock; world = shared_ptr<World>(new World);}
 
 ptime Omega::getMsStartingSimulationTime(){return msStartingSimulationTime;}
 time_duration Omega::getSimulationPauseDuration(){return simulationPauseDuration;}
@@ -92,8 +92,8 @@ void Omega::reset(){
 
 void Omega::init(){
 	simulationFileName="";
-	resetRootBody();
-	rootBodyAnother=shared_ptr<MetaBody>(new MetaBody);
+	resetWorld();
+	worldAnother=shared_ptr<World>(new World);
 	timeInit();
 	createSimulationLoop();
 }
@@ -220,14 +220,14 @@ void Omega::scanPlugins(vector<string> baseDirs){
 
 void Omega::loadSimulationFromStream(std::istream& stream){
 	LOG_DEBUG("Loading simulation from stream.");
-	resetRootBody();
+	resetWorld();
 	RenderMutexLock lock;
-	IOFormatManager::loadFromStream("XMLFormatManager",stream,"rootBody",rootBody);
+	IOFormatManager::loadFromStream("XMLFormatManager",stream,"world",world);
 }
 
 void Omega::saveSimulationToStream(std::ostream& stream){
 	LOG_DEBUG("Saving simulation to stream.");
-	IOFormatManager::saveToStream("XMLFormatManager",stream,"rootBody",rootBody);
+	IOFormatManager::saveToStream("XMLFormatManager",stream,"world",world);
 }
 
 void Omega::loadSimulation(){
@@ -239,25 +239,25 @@ void Omega::loadSimulation(){
 	{
 		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 			joinSimulationLoop(); // stop current simulation if running
-			resetRootBody();
-			RenderMutexLock lock; IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"rootBody",rootBody);
+			resetWorld();
+			RenderMutexLock lock; IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"world",world);
 		}
 		else if(algorithm::ends_with(simulationFileName,".yade")){
 			joinSimulationLoop();
-			resetRootBody();
-			RenderMutexLock lock; IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"rootBody",rootBody);
+			resetWorld();
+			RenderMutexLock lock; IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"world",world);
 		}
 		else if(algorithm::starts_with(simulationFileName,":memory:")){
 			if(memSavedSimulations.count(simulationFileName)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+simulationFileName);
 			istringstream iss(memSavedSimulations[simulationFileName]);
 			joinSimulationLoop();
-			resetRootBody();
-			RenderMutexLock lock; IOFormatManager::loadFromStream("XMLFormatManager",iss,"rootBody",rootBody);
+			resetWorld();
+			RenderMutexLock lock; IOFormatManager::loadFromStream("XMLFormatManager",iss,"world",world);
 		}
 		else throw runtime_error("Extension of file to load not recognized "+simulationFileName);
 	}
 
-	if( rootBody->getClassName() != "MetaBody") throw runtime_error("Wrong file format (rootBody is not a MetaBody!?) in "+simulationFileName);
+	if( world->getClassName() != "World") throw runtime_error("Wrong file format (world is not a World!?) in "+simulationFileName);
 
 	timeInit();
 
@@ -273,16 +273,16 @@ void Omega::saveSimulation(const string name)
 
 	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.bz2")){
 		FormatChecker::format=FormatChecker::XML;
-		IOFormatManager::saveToFile("XMLFormatManager",name,"rootBody",rootBody);
+		IOFormatManager::saveToFile("XMLFormatManager",name,"world",world);
 	}
 	else if(algorithm::ends_with(name,".yade")){
 		FormatChecker::format=FormatChecker::BIN;
-		IOFormatManager::saveToFile("BINFormatManager",name,"rootBody",rootBody);
+		IOFormatManager::saveToFile("BINFormatManager",name,"world",world);
 	}
 	else if(algorithm::starts_with(name,":memory:")){
 		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
 		ostringstream oss;
-		IOFormatManager::saveToStream("XMLFormatManager",oss,"rootBody",rootBody);
+		IOFormatManager::saveToStream("XMLFormatManager",oss,"world",world);
 		memSavedSimulations[name]=oss.str();
 	}
 	else {
@@ -292,13 +292,13 @@ void Omega::saveSimulation(const string name)
 
 
 
-void Omega::setTimeStep(const Real t){	if(rootBody) rootBody->dt=t;}
-Real Omega::getTimeStep(){	if(rootBody) return rootBody->dt; else return -1; }
-void Omega::skipTimeStepper(bool s){ if(rootBody) rootBody->setTimeSteppersActive(!s);}
+void Omega::setTimeStep(const Real t){	if(world) world->dt=t;}
+Real Omega::getTimeStep(){	if(world) return world->dt; else return -1; }
+void Omega::skipTimeStepper(bool s){ if(world) world->setTimeSteppersActive(!s);}
 
 bool Omega::timeStepperActive(){
-	if(!rootBody) return false;
-	FOREACH(const shared_ptr<Engine>& e, rootBody->engines){
+	if(!world) return false;
+	FOREACH(const shared_ptr<Engine>& e, world->engines){
 		if (isInheritingFrom(e->getClassName(),"TimeStepper")){
 			return static_pointer_cast<TimeStepper>(e)->active;
 		}
@@ -307,8 +307,8 @@ bool Omega::timeStepperActive(){
 }
 
 bool Omega::containTimeStepper(){
-	if(!rootBody) return false;
-	FOREACH(const shared_ptr<Engine>& e, rootBody->engines){
+	if(!world) return false;
+	FOREACH(const shared_ptr<Engine>& e, world->engines){
 		if (e && isInheritingFrom(e->getClassName(),"TimeStepper")) return true;
 	}
 	return false;

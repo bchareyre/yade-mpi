@@ -13,9 +13,9 @@
 #include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
 
 class Body;
-class MetaBody;
-class PhysicalActionDamper: public Dispatcher1D<PhysicalParameters,PhysicalActionDamperUnit,void,TYPELIST_3(const shared_ptr<PhysicalParameters>&, const Body*, MetaBody*)>{
-	public: virtual void action(MetaBody*);
+class World;
+class PhysicalActionDamper: public Dispatcher1D<PhysicalParameters,PhysicalActionDamperUnit,void,TYPELIST_3(const shared_ptr<PhysicalParameters>&, const Body*, World*)>{
+	public: virtual void action(World*);
 	REGISTER_CLASS_AND_BASE(PhysicalActionDamper,Dispatcher1D);
 };
 REGISTER_SERIALIZABLE(PhysicalActionDamper);

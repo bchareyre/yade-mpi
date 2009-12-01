@@ -26,7 +26,7 @@ InteractionDispatchers::InteractionDispatchers(){
 
 #define DISPATCH_CACHE
 
-void InteractionDispatchers::action(MetaBody* rootBody){
+void InteractionDispatchers::action(World* rootBody){
 	#ifdef IDISP_TIMING
 		timingDeltas->start();
 	#endif

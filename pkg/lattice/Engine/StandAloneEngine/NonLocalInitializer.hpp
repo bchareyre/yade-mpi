@@ -27,7 +27,7 @@ class NonLocalInitializer : public StandAloneEngine
 		
 		NonLocalInitializer ();
 		virtual ~NonLocalInitializer ();
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 
 	REGISTER_ATTRIBUTES(StandAloneEngine,(range));
 	REGISTER_CLASS_NAME(NonLocalInitializer);

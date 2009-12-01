@@ -25,7 +25,7 @@ class PositionOrientationRecorder : public PeriodicEngine
 		bool saveRgb;
 	
 		PositionOrientationRecorder ();
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 
 	REGISTER_ATTRIBUTES(PeriodicEngine,(outputFile)(saveRgb));
 	DECLARE_LOGGER;

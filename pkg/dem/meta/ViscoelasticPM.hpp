@@ -67,7 +67,7 @@ REGISTER_SERIALIZABLE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleVisco
 /// This class provides linear viscoelastic contact model
 class Law2_Spheres_Viscoelastic_SimpleViscoelastic: public ConstitutiveLaw {
 	public :
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, MetaBody*);
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, World*);
 		FUNCTOR2D(SpheresContactGeometry,SimpleViscoelasticPhys);
 		REGISTER_CLASS_AND_BASE(Law2_Spheres_Viscoelastic_SimpleViscoelastic,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/* */);

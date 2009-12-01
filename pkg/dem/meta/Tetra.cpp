@@ -12,7 +12,7 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB)
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
@@ -373,7 +373,7 @@ CREATE_LOGGER(TetraLaw);
  *
  * DO NOT USE, probably doesn't work.
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
-void TetraLaw::action(MetaBody* rootBody)
+void TetraLaw::action(World* rootBody)
 {
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		// normally, we would test isReal(), but TetraLaw doesn't use interactionPhysics at all

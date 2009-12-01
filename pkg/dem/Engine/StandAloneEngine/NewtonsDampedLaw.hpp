@@ -39,11 +39,11 @@ class VelocityBins;
 
 class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A);
-	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState);
+	void handleClumpMember(World* ncb, const body_id_t memberId, State* clumpState);
 	bool haveBins;
-	inline void lfTranslate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog translate
-	inline void lfSpheralRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog rotate of spheral body
-	inline void lfRigidBodyRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of rigid (non symmetric) body
+	inline void lfTranslate(World* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog translate
+	inline void lfSpheralRotate(World* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog rotate of spheral body
+	inline void lfRigidBodyRotate(World* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of rigid (non symmetric) body
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
@@ -60,7 +60,7 @@ class NewtonsDampedLaw : public StandAloneEngine{
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
-		virtual void action(MetaBody *);		
+		virtual void action(World *);		
 		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1), accRigidBodyRot(false){
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());

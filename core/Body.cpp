@@ -11,14 +11,14 @@
 #include "Body.hpp"
 
 #include <limits>
-#include "MetaBody.hpp"
+#include "World.hpp"
 #include "Omega.hpp"
 
 //! This could be -1 if id_t is re-typedef'ed as `int'
 const body_id_t Body::ID_NONE=body_id_t(-1);
 
-const shared_ptr<Body>& Body::byId(body_id_t _id, MetaBody* rb){return (*((rb?rb:Omega::instance().getRootBody().get())->bodies))[_id];}
-const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<MetaBody> rb){return (*(rb->bodies))[_id];}
+const shared_ptr<Body>& Body::byId(body_id_t _id, World* rb){return (*((rb?rb:Omega::instance().getWorld().get())->bodies))[_id];}
+const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<World> rb){return (*(rb->bodies))[_id];}
 
 #ifdef YADE_BOOST_SERIALIZATION
 	BOOST_CLASS_EXPORT(Body);

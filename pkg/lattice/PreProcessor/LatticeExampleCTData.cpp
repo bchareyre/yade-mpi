@@ -9,7 +9,7 @@
 #include<iostream>
 #include<fstream>
 #include"LatticeExampleCTData.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -102,7 +102,7 @@ bool LatticeExampleCTData::generate()
 //	return false;
 
 
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	make_simulation_loop(rootBody);    // make the simulation loop
 	positionRootBody(rootBody); // set global coordinate system, etc.
 	
@@ -247,7 +247,7 @@ bool LatticeExampleCTData::generate()
 	return true;
 }
 
-void LatticeExampleCTData::create_angular_springs(int totalNodesCount,shared_ptr<MetaBody> rootBody)
+void LatticeExampleCTData::create_angular_springs(int totalNodesCount,shared_ptr<World> rootBody)
 {
 	// check what nodes are connected with which beams, this is necessary for creating the angular/torsional springs
         std::vector< std::vector< unsigned int > > connections;
@@ -461,7 +461,7 @@ void LatticeExampleCTData::calcBeamAngles(
 }
 
 
-void LatticeExampleCTData::make_simulation_loop(shared_ptr<MetaBody>& )
+void LatticeExampleCTData::make_simulation_loop(shared_ptr<World>& )
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -485,7 +485,7 @@ void LatticeExampleCTData::make_simulation_loop(shared_ptr<MetaBody>& )
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 }
 
-void LatticeExampleCTData::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void LatticeExampleCTData::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic             = false;
 
@@ -517,7 +517,7 @@ void LatticeExampleCTData::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 	= physics;
 }
 
-void LatticeExampleCTData::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
+void LatticeExampleCTData::imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
 	translationCondition->displacement  = displacement;

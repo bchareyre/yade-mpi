@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"NewtonsDampedLaw.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -31,7 +31,7 @@ void NewtonsDampedLaw::blockRotateDOFs(unsigned blockedDOFs, Vector3r& v) {
 	if((blockedDOFs & State::DOF_RY)!=0) v[1]=0;
 	if((blockedDOFs & State::DOF_RZ)!=0) v[2]=0;
 }
-void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState){
+void NewtonsDampedLaw::handleClumpMember(World* ncb, const body_id_t memberId, State* clumpState){
 	const shared_ptr<Body>& b=Body::byId(memberId,ncb);
 	assert(b->isClumpMember());
 	State* state=b->state.get();
@@ -54,7 +54,7 @@ void NewtonsDampedLaw::handleClumpMember(MetaBody* ncb, const body_id_t memberId
 	#endif
 }
 
-void NewtonsDampedLaw::action(MetaBody * ncb)
+void NewtonsDampedLaw::action(World * ncb)
 {
 	ncb->bex.sync();
 	Real dt=Omega::instance().getTimeStep();
@@ -169,13 +169,13 @@ void NewtonsDampedLaw::action(MetaBody * ncb)
 	if(haveBins) velocityBins->binVelSqFinalize();
 }
 
-inline void NewtonsDampedLaw::lfTranslate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt )
+inline void NewtonsDampedLaw::lfTranslate(World* ncb, State* state, const body_id_t& id, const Real& dt )
 {
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
 	state->vel+=dt*state->accel;
 	state->pos += state->vel*dt + ncb->bex.getMove(id);
 }
-inline void NewtonsDampedLaw::lfSpheralRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt )
+inline void NewtonsDampedLaw::lfSpheralRotate(World* ncb, State* state, const body_id_t& id, const Real& dt )
 {
 	blockRotateDOFs(state->blockedDOFs, state->angAccel);
 	state->angVel+=dt*state->angAccel;
@@ -185,7 +185,7 @@ inline void NewtonsDampedLaw::lfSpheralRotate(MetaBody* ncb, State* state, const
 	if(ncb->bex.getMoveRotUsed() && ncb->bex.getRot(id)!=Vector3r::ZERO){ Vector3r r(ncb->bex.getRot(id)); Real norm=r.Normalize(); Quaternionr q; q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
 	state->ori.Normalize();
 }
-void NewtonsDampedLaw::lfRigidBodyRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M){
+void NewtonsDampedLaw::lfRigidBodyRotate(World* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M){
 	Matrix3r A; state->ori.Conjugate().ToRotationMatrix(A); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2 * M; // global angular momentum at time n
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n

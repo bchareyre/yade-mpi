@@ -11,8 +11,8 @@
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
+#include<yade/core/World.hpp>
 
 YADE_PLUGIN((ef2_Spheres_Elastic_ElasticLaw)(Law2_Dem3Dof_Elastic_Elastic)(ElasticContactLaw));
 
@@ -29,7 +29,7 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 
 
 
-void ElasticContactLaw::action(MetaBody* rootBody)
+void ElasticContactLaw::action(World* rootBody)
 {
 	if(!functor) functor=shared_ptr<ef2_Spheres_Elastic_ElasticLaw>(new ef2_Spheres_Elastic_ElasticLaw);
 	functor->momentRotationLaw=momentRotationLaw;
@@ -50,7 +50,7 @@ void ElasticContactLaw::action(MetaBody* rootBody)
 
 
 CREATE_LOGGER(ef2_Spheres_Elastic_ElasticLaw);
-void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* ncb){
+void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, World* ncb){
 	Real dt = Omega::instance().getTimeStep();
 
 			int id1 = contact->getId1(), id2 = contact->getId2();
@@ -109,7 +109,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, MetaBody* rootBody){
+void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, World* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
 	Real displN=geom->displacementN();

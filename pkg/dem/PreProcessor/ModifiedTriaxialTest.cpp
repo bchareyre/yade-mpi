@@ -31,7 +31,7 @@ YADE_REQUIRE_FEATURE(CGAL)
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -178,7 +178,7 @@ bool ModifiedTriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -472,7 +472,7 @@ void ModifiedTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 }
 
 
-void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
+void ModifiedTriaxialTest::createActors(shared_ptr<World>& rootBody)
 {
 // recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
@@ -615,7 +615,7 @@ void ModifiedTriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void ModifiedTriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void ModifiedTriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

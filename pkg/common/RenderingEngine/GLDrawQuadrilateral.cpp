@@ -8,7 +8,7 @@
 
 #include "GLDrawQuadrilateral.hpp"
 #include<yade/pkg-common/Quadrilateral.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 YADE_REQUIRE_FEATURE(shape);
 
@@ -35,7 +35,7 @@ void GLDrawQuadrilateral::go(const shared_ptr<GeometricalModel>& gm, const share
 	int WTT = Omega::instance().isoSec%3; 
 
 	Quadrilateral* q = static_cast<Quadrilateral*>(gm.get());
-	MetaBody* mb = Omega::instance().getRootBody().get();
+	World* mb = Omega::instance().getWorld().get();
 	
 	if(   !(
 		   mb->bodies->exists(q->n1)

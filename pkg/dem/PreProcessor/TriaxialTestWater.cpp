@@ -35,7 +35,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -181,7 +181,7 @@ bool TriaxialTestWater::generate()
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	message="";
 	
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -417,7 +417,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 }
 
 
-void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
+void TriaxialTestWater::createActors(shared_ptr<World>& rootBody)
 {
 	
 	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
@@ -603,7 +603,7 @@ void TriaxialTestWater::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void TriaxialTestWater::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void TriaxialTestWater::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

@@ -1,5 +1,5 @@
 
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
@@ -44,8 +44,8 @@ bool TetraTestGen::generate()
 	rootBody->dt=1e-5;
 	
 	#if 0
-	shared_ptr<MetaBody> oldRootBody=Omega::instance().getRootBody();
-	Omega::instance().setRootBody(rootBody);
+	shared_ptr<World> oldRootBody=Omega::instance().getWorld();
+	Omega::instance().setWorld(rootBody);
 	#endif
 
 	Vector3r v[4];
@@ -89,7 +89,7 @@ bool TetraTestGen::generate()
 	#endif 
 
 	#if 0
-	Omega::instance().setRootBody(oldRootBody);
+	Omega::instance().setWorld(oldRootBody);
 	#endif
 	
 	message="ATTN: this example is not working yet!";

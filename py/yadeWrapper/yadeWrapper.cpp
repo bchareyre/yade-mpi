@@ -191,8 +191,8 @@ class pyBodyContainer{
 
 class pyTags{
 	public:
-		pyTags(const shared_ptr<MetaBody> _mb): mb(_mb){}
-		const shared_ptr<MetaBody> mb;
+		pyTags(const shared_ptr<World> _mb): mb(_mb){}
+		const shared_ptr<World> mb;
 		bool hasKey(const string& key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
 		string getItem(string key){
 			FOREACH(string& val, mb->tags){
@@ -258,9 +258,9 @@ class pyInteractionContainer{
 
 
 class pyBexContainer{
-		shared_ptr<MetaBody> rb;
+		shared_ptr<World> rb;
 	public:
-		pyBexContainer(){ rb=Omega::instance().getRootBody(); }
+		pyBexContainer(){ rb=Omega::instance().getWorld(); }
 		Vector3r force_get(long id){  rb->bex.sync(); return rb->bex.getForce(id); }
 		Vector3r torque_get(long id){ rb->bex.sync(); return rb->bex.getTorque(id); }
 		Vector3r move_get(long id){   rb->bex.sync(); return rb->bex.getMove(id); }
@@ -272,9 +272,9 @@ class pyBexContainer{
 };
 
 class pyMaterialContainer{
-		shared_ptr<MetaBody> rb;
+		shared_ptr<World> rb;
 	public:
-		pyMaterialContainer() {rb=Omega::instance().getRootBody();}
+		pyMaterialContainer() {rb=Omega::instance().getWorld();}
 		shared_ptr<Material> getitem_id(int id){ if(id<0 || (size_t)id>=rb->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); python::throw_error_already_set(); } return Material::byId(id,rb); }
 		shared_ptr<Material> getitem_label(string label){
 			// translate runtime_error to KeyError (instead of RuntimeError) if the material doesn't exist
@@ -291,21 +291,21 @@ void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
 class pyOmega{
 	private:
 		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
-		void assertRootBody(){if(!OMEGA.getRootBody()) throw std::runtime_error("No root body."); }
+		void assertRootBody(){if(!OMEGA.getWorld()) throw std::runtime_error("No root body."); }
 		Omega& OMEGA;
 	public:
 	pyOmega(): OMEGA(Omega::instance()){
-		shared_ptr<MetaBody> rb=OMEGA.getRootBody();
+		shared_ptr<World> rb=OMEGA.getWorld();
 		if(!rb){
 			OMEGA.init();
-			rb=OMEGA.getRootBody();
+			rb=OMEGA.getWorld();
 		}
 		assert(rb);
 		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
 		// initialized in constructor now: rb->boundingVolume->diffuseColor=Vector3r(1,1,1); 
 		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
-		//if(!OMEGA.getRootBody()){shared_ptr<MetaBody> mb=Shop::rootBody(); OMEGA.setRootBody(mb);}
+		//if(!OMEGA.getWorld()){shared_ptr<World> mb=Shop::rootBody(); OMEGA.setWorld(mb);}
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){
 			OMEGA.createSimulationLoop();
@@ -316,11 +316,11 @@ class pyOmega{
 		// not sure if we should map materials to variables by default...
 		// a call to this functions would have to be added to pyMaterialContainer::append
 		#if 0
-			FOREACH(const shared_ptr<Material>& m, OMEGA.getRootBody()->materials){
+			FOREACH(const shared_ptr<Material>& m, OMEGA.getWorld()->materials){
 				if(!m->label.empty()) { PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+m->label+"=Omega().materials["+lexical_cast<string>(m->id)+"]").c_str()); PyGILState_Release(gstate); }
 			}
 		#endif
-		FOREACH(const shared_ptr<Engine>& e, OMEGA.getRootBody()->engines){
+		FOREACH(const shared_ptr<Engine>& e, OMEGA.getWorld()->engines){
 			if(!e->label.empty()){
 				PyGILState_STATE gstate; gstate = PyGILState_Ensure();
 				PyRun_SimpleString(("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')").c_str());
@@ -355,27 +355,27 @@ class pyOmega{
 	double dt_get(){return OMEGA.getTimeStep();}
 	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt);}
 
-	long stopAtIter_get(){return OMEGA.getRootBody()->stopAtIteration; }
-	void stopAtIter_set(long s){OMEGA.getRootBody()->stopAtIteration=s; }
+	long stopAtIter_get(){return OMEGA.getWorld()->stopAtIteration; }
+	void stopAtIter_set(long s){OMEGA.getWorld()->stopAtIteration=s; }
 
 	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
 	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
-	unsigned long bexSyncCount_get(){ return OMEGA.getRootBody()->bex.syncCount;}
-	void bexSyncCount_set(unsigned long count){ OMEGA.getRootBody()->bex.syncCount=count;}
+	unsigned long bexSyncCount_get(){ return OMEGA.getWorld()->bex.syncCount;}
+	void bexSyncCount_set(unsigned long count){ OMEGA.getWorld()->bex.syncCount=count;}
 
 	void run(long int numIter=-1,bool doWait=false){
-		if(numIter>0) OMEGA.getRootBody()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
+		if(numIter>0) OMEGA.getWorld()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		OMEGA.startSimulationLoop();
 		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
 		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
-		LOG_DEBUG("RUN"<<((OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getRootBody()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
+		LOG_DEBUG("RUN"<<((OMEGA.getWorld()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getWorld()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
-	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getRootBody()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
+	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getWorld()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
 	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS; }
 
 	void load(std::string fileName) {
@@ -404,9 +404,9 @@ class pyOmega{
 	}
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
-	void resetThisWorld(){Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; OMEGA.resetRootBody(); OMEGA.createSimulationLoop();}
-	void resetTime(){ OMEGA.getRootBody()->currentIteration=0; OMEGA.getRootBody()->simulationTime=0; OMEGA.timeInit(); }
-	void switchWorld(){ std::swap(OMEGA.rootBody,OMEGA.rootBodyAnother); }
+	void resetThisWorld(){Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; OMEGA.resetWorld(); OMEGA.createSimulationLoop();}
+	void resetTime(){ OMEGA.getWorld()->currentIteration=0; OMEGA.getWorld()->simulationTime=0; OMEGA.timeInit(); }
+	void switchWorld(){ std::swap(OMEGA.world,OMEGA.worldAnother); }
 
 	void save(std::string fileName){
 		assertRootBody();
@@ -419,27 +419,27 @@ class pyOmega{
 
 	python::list miscParams_get(){
 		python::list ret;
-		FOREACH(shared_ptr<Serializable>& s, OMEGA.getRootBody()->miscParams){
+		FOREACH(shared_ptr<Serializable>& s, OMEGA.getWorld()->miscParams){
 			ret.append(s);
 		}
 		return ret;
 	}
 
 	void miscParams_set(vector<shared_ptr<Serializable> > ss){
-		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getRootBody()->miscParams;
+		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getWorld()->miscParams;
 		miscParams.clear();
 		FOREACH(shared_ptr<Serializable> s, ss){
 			miscParams.push_back(s);
 		}
 	}
 
-	vector<shared_ptr<Engine> > engines_get(void){assertRootBody(); return OMEGA.getRootBody()->engines;}
-	void engines_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getRootBody()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getRootBody()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
-	vector<shared_ptr<Engine> > initializers_get(void){assertRootBody(); return OMEGA.getRootBody()->initializers;}
-	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getRootBody()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getRootBody()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getRootBody()->needsInitializers=true; }
+	vector<shared_ptr<Engine> > engines_get(void){assertRootBody(); return OMEGA.getWorld()->engines;}
+	void engines_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getWorld()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getWorld()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
+	vector<shared_ptr<Engine> > initializers_get(void){assertRootBody(); return OMEGA.getWorld()->initializers;}
+	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getWorld()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getWorld()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getWorld()->needsInitializers=true; }
 
 	python::object labeled_engine_get(string label){
-		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getRootBody()->engines){
+		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getWorld()->engines){
 			if(eng->label==label){ return python::object(eng); }
 			shared_ptr<Dispatcher> me=dynamic_pointer_cast<Dispatcher>(eng);
 			if(me){
@@ -461,8 +461,8 @@ class pyOmega{
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
 	
-	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getRootBody()->bodies); }
-	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getRootBody()->interactions); }
+	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getWorld()->bodies); }
+	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getWorld()->interactions); }
 	
 	pyBexContainer bex_get(void){return pyBexContainer();}
 	pyMaterialContainer materials_get(void){return pyMaterialContainer();}
@@ -485,26 +485,26 @@ class pyOmega{
 		return ret;
 	}
 
-	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getRootBody());}
+	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getWorld());}
 
 	void interactionContainer_set(string clss){
-		MetaBody* rb=OMEGA.getRootBody().get();
+		World* rb=OMEGA.getWorld().get();
 		if(rb->interactions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
 		shared_ptr<InteractionContainer> ic=dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
 		rb->interactions=ic;
 	}
-	string interactionContainer_get(string clss){ return OMEGA.getRootBody()->interactions->getClassName(); }
+	string interactionContainer_get(string clss){ return OMEGA.getWorld()->interactions->getClassName(); }
 
 	void bodyContainer_set(string clss){
-		MetaBody* rb=OMEGA.getRootBody().get();
+		World* rb=OMEGA.getWorld().get();
 		if(rb->bodies->size()>0) throw std::runtime_error("Body container not empty, will not change its class.");
 		shared_ptr<BodyContainer> bc=dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
 		rb->bodies=bc;
 	}
-	string bodyContainer_get(string clss){ return OMEGA.getRootBody()->bodies->getClassName(); }
+	string bodyContainer_get(string clss){ return OMEGA.getWorld()->bodies->getClassName(); }
 	#ifdef YADE_OPENMP
 		int numThreads_get(){ return omp_get_max_threads();}
-		void numThreads_set(int n){ int bcn=OMEGA.getRootBody()->bex.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("BexContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
+		void numThreads_set(int n){ int bcn=OMEGA.getWorld()->bex.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("BexContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
 	#else
 		int numThreads_get(){return 1;}
 		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
@@ -513,25 +513,25 @@ class pyOmega{
 	void saveXML(string filename){
 		std::ofstream ofs(filename.c_str());
 		boost::archive::xml_oarchive oa(ofs);
-		shared_ptr<MetaBody> YadeSimulation=OMEGA.getRootBody();
+		shared_ptr<World> YadeSimulation=OMEGA.getWorld();
 		oa << YadeSimulation;
 	}
 	#endif
 	void periodicCell_set(python::tuple& t){
-		if(python::len(t)==2){ OMEGA.getRootBody()->cellMin=python::extract<Vector3r>(t[0]); OMEGA.getRootBody()->cellMax=python::extract<Vector3r>(t[1]); OMEGA.getRootBody()->isPeriodic=true; }
-		else if (python::len(t)==0) {OMEGA.getRootBody()->isPeriodic=false; }
+		if(python::len(t)==2){ OMEGA.getWorld()->cellMin=python::extract<Vector3r>(t[0]); OMEGA.getWorld()->cellMax=python::extract<Vector3r>(t[1]); OMEGA.getWorld()->isPeriodic=true; }
+		else if (python::len(t)==0) {OMEGA.getWorld()->isPeriodic=false; }
 		else throw invalid_argument("Must pass either 2 Vector3's to set periodic cell,  or () to disable periodicity (got "+lexical_cast<string>(python::len(t))+" instead).");
 	}
 	python::tuple periodicCell_get(){
 		vector<Vector3r> ret;
-		if(OMEGA.getRootBody()->isPeriodic){ return python::make_tuple(OMEGA.getRootBody()->cellMin,OMEGA.getRootBody()->cellMax); }
+		if(OMEGA.getWorld()->isPeriodic){ return python::make_tuple(OMEGA.getWorld()->cellMin,OMEGA.getWorld()->cellMax); }
 		return python::make_tuple();
 	}
 	void exitNoBacktrace(int status=0){
 		signal(SIGSEGV,termHandler); /* unset the handler that runs gdb and prints backtrace */
 		exit(status);
 	}
-	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getRootBody().get()); }
+	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getWorld().get()); }
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
@@ -704,9 +704,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n For example: \n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider['nBins']=5 ## collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
-		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (MetaBody::engines).")
-		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (MetaBody::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
-		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (MetaBody::initializers).")
+		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (World::engines).")
+		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (World::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
+		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (World::initializers).")
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")

@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
 

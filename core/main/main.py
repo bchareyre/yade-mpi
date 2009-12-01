@@ -50,6 +50,7 @@ for arg in sys.argv:
 
 
 execfile(prefix+'/lib/yade'+suffix+'/gui/PythonUI_rc.py')
+
 #setupPythonRuntime()
 
 #sys.argv[0]='<embedded python interpreter>'

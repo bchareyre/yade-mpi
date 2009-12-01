@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "Quadrilateral.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 YADE_REQUIRE_FEATURE(shape);
 
@@ -16,7 +16,7 @@ Quadrilateral::Quadrilateral() : GeometricalModel()
 	createIndex();
 }
 
-Quadrilateral::Quadrilateral(int p1,int p2,int p3,int p4,MetaBody* mb) : GeometricalModel()
+Quadrilateral::Quadrilateral(int p1,int p2,int p3,int p4,World* mb) : GeometricalModel()
 {
 	createIndex();
 	n1 = p1;

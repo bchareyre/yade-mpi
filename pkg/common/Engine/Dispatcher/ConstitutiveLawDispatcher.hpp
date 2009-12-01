@@ -11,11 +11,11 @@ class ConstitutiveLawDispatcher:
 		InteractionPhysics,  // 2nd base classe for dispatch
 		ConstitutiveLaw,     // functor base class
 		void,                // return type
-		TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, MetaBody*),
+		TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, World*),
 		false                // autosymmetry
 	>{
 		public:
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 		REGISTER_CLASS_AND_BASE(ConstitutiveLawDispatcher,Dispatcher2D);
 };
 REGISTER_SERIALIZABLE(ConstitutiveLawDispatcher);

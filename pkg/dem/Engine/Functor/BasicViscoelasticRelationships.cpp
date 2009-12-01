@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/GroupRelationData.hpp>
 
 
@@ -28,13 +28,13 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
 {
     if(interaction->interactionPhysics) return;
 
-    shared_ptr<GroupRelationData> data = (Omega::instance().getRootBody().get())->grpRelationData;
+    shared_ptr<GroupRelationData> data = (Omega::instance().getWorld().get())->grpRelationData;
 
     interaction->interactionPhysics = shared_ptr<ViscoelasticInteraction>(new ViscoelasticInteraction());
     ViscoelasticInteraction* contactPhysics = YADE_CAST<ViscoelasticInteraction*>(interaction->interactionPhysics.get());
 
-    shared_ptr<Body> bdy1 = (*((Omega::instance().getRootBody().get())->bodies))[ interaction->getId1() ];
-    shared_ptr<Body> bdy2 = (*((Omega::instance().getRootBody().get())->bodies))[ interaction->getId2() ];
+    shared_ptr<Body> bdy1 = (*((Omega::instance().getWorld().get())->bodies))[ interaction->getId1() ];
+    shared_ptr<Body> bdy2 = (*((Omega::instance().getWorld().get())->bodies))[ interaction->getId2() ];
 
     if (data->isActivated())
     {
@@ -67,7 +67,7 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
     
     if (bdy1->isClumpMember())
     {
-        const shared_ptr<Body>& clump = (*((Omega::instance().getRootBody().get())->bodies))[ bdy1->clumpId ];
+        const shared_ptr<Body>& clump = (*((Omega::instance().getWorld().get())->bodies))[ bdy1->clumpId ];
         RigidBodyParameters* clumpRBP=YADE_CAST<RigidBodyParameters*> ( clump->physicalParameters.get() );
         m1 = clumpRBP->mass;
         if (!clump->isDynamic) m1 *= 1.0e6;
@@ -81,7 +81,7 @@ void BasicViscoelasticRelationships::go(  const shared_ptr<PhysicalParameters>& 
     
     if (bdy2->isClumpMember())
     {
-        const shared_ptr<Body>& clump = (*((Omega::instance().getRootBody().get())->bodies))[ bdy2->clumpId ];
+        const shared_ptr<Body>& clump = (*((Omega::instance().getWorld().get())->bodies))[ bdy2->clumpId ];
         RigidBodyParameters* clumpRBP=YADE_CAST<RigidBodyParameters*> ( clump->physicalParameters.get() );
         m2 = clumpRBP->mass;
         if (!clump->isDynamic) m2 *= 1.0e6;

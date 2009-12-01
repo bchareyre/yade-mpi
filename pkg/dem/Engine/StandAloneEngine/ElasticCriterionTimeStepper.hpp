@@ -30,7 +30,7 @@ class ElasticCriterionTimeStepper : public TimeStepper
 		ElasticCriterionTimeStepper();
 		virtual ~ElasticCriterionTimeStepper();
 	
-		virtual void computeTimeStep(MetaBody* body);
+		virtual void computeTimeStep(World* body);
 	REGISTER_ATTRIBUTES(TimeStepper,(sdecGroupMask));
 	REGISTER_CLASS_NAME(ElasticCriterionTimeStepper);
 	REGISTER_BASE_CLASS_NAME(TimeStepper);

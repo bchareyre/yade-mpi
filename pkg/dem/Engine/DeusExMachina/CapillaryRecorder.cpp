@@ -13,7 +13,7 @@
 #include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 
@@ -34,13 +34,13 @@ void CapillaryRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryRecorder::isActivated(MetaBody* rootBody)
+bool CapillaryRecorder::isActivated(World* rootBody)
 {
 	return ((rootBody->currentIteration % interval == 0) && (ofile));
 }
 
 
-void CapillaryRecorder::action(MetaBody * ncb)
+void CapillaryRecorder::action(World * ncb)
 {
 	Real fx=0, fy=0, fz=0;
 	

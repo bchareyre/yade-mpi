@@ -9,7 +9,7 @@
 #include "MGPRecorder.hpp"
 
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <yade/pkg-common/InteractingSphere.hpp>
@@ -37,12 +37,12 @@ void MGPRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-bool MGPRecorder::isActivated(MetaBody*)
+bool MGPRecorder::isActivated(World*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void MGPRecorder::action(MetaBody * ncb)
+void MGPRecorder::action(World * ncb)
 {
   shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

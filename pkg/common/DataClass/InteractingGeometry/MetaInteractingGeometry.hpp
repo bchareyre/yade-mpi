@@ -18,7 +18,7 @@ class MetaInteractingGeometry : public InteractingGeometry
 
 /// Serialization
 	REGISTER_CLASS_AND_BASE(MetaInteractingGeometry,InteractingGeometry);
-	// FIXME: if this class is registered, MetaBody then has "abstract" InteractingGeometry, which fails in the functor (??)
+	// FIXME: if this class is registered, World then has "abstract" InteractingGeometry, which fails in the functor (??)
 	REGISTER_ATTRIBUTES(InteractingGeometry,/* no attributes */);
 /// Indexable
 	REGISTER_CLASS_INDEX(MetaInteractingGeometry,InteractingGeometry);

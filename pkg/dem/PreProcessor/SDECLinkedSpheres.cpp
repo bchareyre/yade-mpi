@@ -27,7 +27,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -89,7 +89,7 @@ void SDECLinkedSpheres::postProcessAttributes(bool)
 
 bool SDECLinkedSpheres::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -275,7 +275,7 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 }
 
 
-void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
+void SDECLinkedSpheres::createActors(shared_ptr<World>& rootBody)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -342,7 +342,7 @@ void SDECLinkedSpheres::createActors(shared_ptr<MetaBody>& rootBody)
 }
 	
 
-void SDECLinkedSpheres::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void SDECLinkedSpheres::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	

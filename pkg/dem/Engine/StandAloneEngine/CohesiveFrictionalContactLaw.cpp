@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 
 Vector3r translation_vect_ (0.10,0,0);
@@ -46,7 +46,7 @@ void outv(Vector3r axis)
 	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", length: " << axis.Length() << " | ";
 }
 
-void CohesiveFrictionalContactLaw::action(MetaBody* ncb)
+void CohesiveFrictionalContactLaw::action(World* ncb)
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

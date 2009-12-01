@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"LatticeExampleSimple.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -69,7 +69,7 @@ LatticeExampleSimple::~LatticeExampleSimple()
 
 bool LatticeExampleSimple::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	make_simulation_loop(rootBody);    // make the simulation loop
 	positionRootBody(rootBody); // set global coordinate system, etc.
 	
@@ -204,7 +204,7 @@ bool LatticeExampleSimple::generate()
 	return true;
 }
 
-void LatticeExampleSimple::create_angular_springs(int totalNodesCount,shared_ptr<MetaBody> rootBody)
+void LatticeExampleSimple::create_angular_springs(int totalNodesCount,shared_ptr<World> rootBody)
 {
 	// check what nodes are connected with which beams, this is necessary for creating the angular/torsional springs
         std::vector< std::vector< unsigned int > > connections;
@@ -418,7 +418,7 @@ void LatticeExampleSimple::calcBeamAngles(
 }
 
 
-void LatticeExampleSimple::make_simulation_loop(shared_ptr<MetaBody>& )
+void LatticeExampleSimple::make_simulation_loop(shared_ptr<World>& )
 {
 	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -442,7 +442,7 @@ void LatticeExampleSimple::make_simulation_loop(shared_ptr<MetaBody>& )
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 }
 
-void LatticeExampleSimple::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void LatticeExampleSimple::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic             = false;
 
@@ -474,7 +474,7 @@ void LatticeExampleSimple::positionRootBody(shared_ptr<MetaBody>& rootBody)
 	rootBody->physicalParameters 	= physics;
 }
 
-void LatticeExampleSimple::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
+void LatticeExampleSimple::imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
 	translationCondition->displacement  = displacement;

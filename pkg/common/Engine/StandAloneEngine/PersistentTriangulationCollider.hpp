@@ -104,7 +104,7 @@ class PersistentTriangulationCollider : public Collider
 		virtual ~PersistentTriangulationCollider();
 
 		/// return a list "interactions" of pairs of Body which Bounding volume are in potential interaction
-		void action(MetaBody *);
+		void action(World *);
 
 		//! When creating transient interaction, look first if a persistent link between the pair in question exists; in that case, skip it.
 		bool noTransientIfPersistentExists;

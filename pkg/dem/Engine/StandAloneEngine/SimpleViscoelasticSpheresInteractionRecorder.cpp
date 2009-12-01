@@ -7,7 +7,7 @@
 *************************************************************************/
 #include "SimpleViscoelasticSpheresInteractionRecorder.hpp"
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 SimpleViscoelasticSpheresInteractionRecorder::SimpleViscoelasticSpheresInteractionRecorder (): DataRecorder(), interactionSphere(new SpheresContactGeometry), viscoelasticInteraction(new ViscoelasticInteraction)
@@ -33,12 +33,12 @@ void SimpleViscoelasticSpheresInteractionRecorder::postProcessAttributes(bool de
 
 
 
-bool SimpleViscoelasticSpheresInteractionRecorder::isActivated(MetaBody*)
+bool SimpleViscoelasticSpheresInteractionRecorder::isActivated(World*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void SimpleViscoelasticSpheresInteractionRecorder::action(MetaBody * ncb)
+void SimpleViscoelasticSpheresInteractionRecorder::action(World * ncb)
 {
     shared_ptr<InteractionContainer>& interactions = ncb->interactions;
   

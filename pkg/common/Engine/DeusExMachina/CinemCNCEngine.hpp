@@ -86,9 +86,9 @@ class CinemCNCEngine : public DeusExMachina
 	protected :
 		REGISTER_ATTRIBUTES(DeusExMachina,(shearSpeed)(gammalim)(prevF_sup)(firstRun)(id_boxhaut)(id_boxbas)(id_boxleft)(id_boxright)(id_boxfront)(id_boxback)(Y0)(F_0)(k)(max_vel)(wallDamping)(Key)(LOG)(coeff_dech));
 		void letMove(Body* body);
-		void computeDu(MetaBody* ncb);
+		void computeDu(World* ncb);
 		void stopMovement();		// to cancel all the velocities when gammalim is reached
-		void computeStiffness(MetaBody* ncb);
+		void computeStiffness(World* ncb);
 	REGISTER_CLASS_NAME(CinemCNCEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);
 };

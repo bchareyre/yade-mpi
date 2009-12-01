@@ -20,7 +20,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -100,7 +100,7 @@ void SDECMovingWall::postProcessAttributes(bool)
 
 bool SDECMovingWall::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -300,7 +300,7 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 }
 
 
-void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
+void SDECMovingWall::createActors(shared_ptr<World>& rootBody)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
@@ -371,7 +371,7 @@ void SDECMovingWall::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void SDECMovingWall::positionRootBody(shared_ptr<MetaBody>& rootBody) 
+void SDECMovingWall::positionRootBody(shared_ptr<World>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	

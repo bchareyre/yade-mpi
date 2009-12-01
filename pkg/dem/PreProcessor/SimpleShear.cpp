@@ -29,7 +29,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -105,7 +105,7 @@ void SimpleShear::postProcessAttributes(bool)
 
 bool SimpleShear::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -253,7 +253,7 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 }
 
 
-void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
+void SimpleShear::createActors(shared_ptr<World>& rootBody)
 {
 
 	shared_ptr<PositionSnapshot> possnap = shared_ptr<PositionSnapshot>(new PositionSnapshot);
@@ -317,7 +317,7 @@ void SimpleShear::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void SimpleShear::positionRootBody(shared_ptr<MetaBody>& rootBody) 
+void SimpleShear::positionRootBody(shared_ptr<World>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	

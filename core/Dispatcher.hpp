@@ -31,8 +31,6 @@ class Dispatcher : public Engine
 		virtual void add(Functor*) {throw;}
 		virtual void add(string) {throw;}
 
-		virtual list<string> getNeededBex();
-		
 		void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<Functor> eu);
 		void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<Functor> eu);
 		void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<Functor> eu);

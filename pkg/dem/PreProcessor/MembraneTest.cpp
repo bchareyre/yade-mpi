@@ -26,7 +26,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -89,7 +89,7 @@ void MembraneTest::postProcessAttributes(bool)
 bool MembraneTest::generate()
 {
 	Omega::instance().setTimeStep(0.04);
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -277,7 +277,7 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 
 
 
-void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
+void MembraneTest::createActors(shared_ptr<World>& rootBody)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
         interactionGeometryDispatcher->add("InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry");
@@ -328,7 +328,7 @@ void MembraneTest::createActors(shared_ptr<MetaBody>& rootBody)
 
 
 
-void MembraneTest::positionRootBody(shared_ptr<MetaBody>& rootBody) 
+void MembraneTest::positionRootBody(shared_ptr<World>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	

@@ -29,8 +29,8 @@ public :
     MGPRecorder ();
     ~MGPRecorder ();
 
-    virtual void action(MetaBody*);
-    bool isActivated(MetaBody*);
+    virtual void action(World*);
+    bool isActivated(World*);
 
 protected :
     virtual void postProcessAttributes(bool deserializing);

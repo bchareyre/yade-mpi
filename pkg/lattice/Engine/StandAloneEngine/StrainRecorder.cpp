@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "StrainRecorder.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 // to calculate strain of whole speciemen - first two bodies in subscribedBodies are Nodes. FIXME - make it clean!
@@ -38,13 +38,13 @@ void StrainRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool StrainRecorder::isActivated(MetaBody*)
+bool StrainRecorder::isActivated(World*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void StrainRecorder::action(MetaBody * ncb)
+void StrainRecorder::action(World * ncb)
 {
 //	std::cerr << "StrainRecorder quits\n";
 //	return;

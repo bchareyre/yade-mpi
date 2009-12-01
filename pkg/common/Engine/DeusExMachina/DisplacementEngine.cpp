@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "DisplacementEngine.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 void DisplacementEngine::postProcessAttributes(bool deserializing)
 {
@@ -19,12 +19,12 @@ void DisplacementEngine::postProcessAttributes(bool deserializing)
 }
 
 
-bool DisplacementEngine::isActivated(MetaBody*)
+bool DisplacementEngine::isActivated(World*)
 {
    return active;
 }
 
-void DisplacementEngine::applyCondition(MetaBody * ncb)
+void DisplacementEngine::applyCondition(World * ncb)
 {
 
 /// FIXME - that's a hack! more control needed from the GUI !

@@ -9,7 +9,7 @@ class InteractionDispatchers: public StandAloneEngine {
 	bool alreadyWarnedNoCollider;
 	public:
 		InteractionDispatchers();
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 		shared_ptr<InteractionGeometryDispatcher> geomDispatcher;
 		shared_ptr<InteractionPhysicsDispatcher> physDispatcher;
 		shared_ptr<ConstitutiveLawDispatcher> constLawDispatcher;

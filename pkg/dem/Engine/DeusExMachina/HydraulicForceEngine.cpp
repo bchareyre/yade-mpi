@@ -8,13 +8,13 @@
 
 #include "HydraulicForceEngine.hpp"
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <yade/core/Body.hpp>
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <vector>
 #include "HydraulicForceEngine.hpp"
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <vector>
 #include <yade/pkg-dem/Shop.hpp>
@@ -42,7 +42,7 @@ HydraulicForceEngine::~HydraulicForceEngine()
 
 
 
-void HydraulicForceEngine::applyCondition(MetaBody* ncb)
+void HydraulicForceEngine::applyCondition(World* ncb)
 {
 
     if (isActivated)
@@ -133,7 +133,7 @@ void HydraulicForceEngine::applyCondition(MetaBody* ncb)
 	    	{Shop::saveSpheresToFile(outputFile.c_str()); savePositions = false;}//only once
 	    #else
 	    {
-		    const shared_ptr<MetaBody>& rootBody=Omega::instance().getRootBody();
+		    const shared_ptr<World>& rootBody=Omega::instance().getWorld();
 		    ofstream f(outputFile.c_str());
 		    if(!f.good()) throw runtime_error("Unable to open file `"+outputFile+"'");
 		    FOREACH(shared_ptr<Body> b, *rootBody->bodies){

@@ -2,7 +2,7 @@
 
 #pragma once
 #include<yade/core/Collider.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 class InteractionContainer;
 /* Collider that should run in O(n log(n)) time, but faster than historical PersistentSAPCollider.
 
@@ -53,7 +53,7 @@ It seems to affect body selection somehow, but that is perhaps not related at al
 Periodicity control
 ===================
 c++:
-	MetaBody::isPeriodic, MetaBody::cellMin, MetaBody::cellMax
+	World::isPeriodic, World::cellMin, World::cellMax
 python:
 	O.periodicCell=((0,0,0),(10,10,10)  # activates periodic boundary
 	O.periodicCell=() # deactivates periodic boundary
@@ -152,8 +152,8 @@ class InsertionSortCollider: public Collider{
 		long loIdx;
 		Bound& operator[](long idx){ assert(idx<size && idx>=0); return vec[idx]; }
 		const Bound& operator[](long idx) const { assert(idx<size && idx>=0); return vec[idx]; }
-		// update number of bodies, periodic properties and size from MetaBody
-		void updatePeriodicity(MetaBody* rb){
+		// update number of bodies, periodic properties and size from World
+		void updatePeriodicity(World* rb){
 			assert(rb->isPeriodic);
 			assert(axis>=0 && axis <=2);
 			cellMin=rb->cellMin[axis]; cellMax=rb->cellMax[axis]; cellDim=cellMax-cellMin;
@@ -168,7 +168,7 @@ class InsertionSortCollider: public Collider{
 	VecBounds BB[3];
 	//! storage for bb maxima and minima
 	std::vector<Real> maxima, minima;
-	//! Whether the MetaBody was periodic (to detect the change, which shouldn't happen, but shouldn't crash us either)
+	//! Whether the World was periodic (to detect the change, which shouldn't happen, but shouldn't crash us either)
 	bool periodic;
 
 
@@ -176,14 +176,14 @@ class InsertionSortCollider: public Collider{
 	/*! sorting routine; insertion sort is very fast for strongly pre-sorted lists, which is our case
   	    http://en.wikipedia.org/wiki/Insertion_sort has the algorithm and other details
 	*/
-	void insertionSort(VecBounds& v,InteractionContainer*,MetaBody*,bool doCollide=true);
-	void handleBoundInversion(body_id_t,body_id_t,InteractionContainer*,MetaBody*);
+	void insertionSort(VecBounds& v,InteractionContainer*,World*,bool doCollide=true);
+	void handleBoundInversion(body_id_t,body_id_t,InteractionContainer*,World*);
 	bool spatialOverlap(body_id_t,body_id_t) const;
 
 	// periodic variants
-	void insertionSortPeri(VecBounds& v,InteractionContainer*,MetaBody*,bool doCollide=true);
-	void handleBoundInversionPeri(body_id_t,body_id_t,InteractionContainer*,MetaBody*);
-	bool spatialOverlapPeri(body_id_t,body_id_t,MetaBody*,Vector3<int>&) const;
+	void insertionSortPeri(VecBounds& v,InteractionContainer*,World*,bool doCollide=true);
+	void handleBoundInversionPeri(body_id_t,body_id_t,InteractionContainer*,World*);
+	bool spatialOverlapPeri(body_id_t,body_id_t,World*,Vector3<int>&) const;
 	static Real cellWrap(const Real, const Real, const Real, int&);
 	static Real cellWrapRel(const Real, const Real, const Real);
 
@@ -195,12 +195,12 @@ class InsertionSortCollider: public Collider{
 	// This makes the collider non-persistent, not remembering last state
 	bool sortThenCollide;
 	//! Predicate called from loop within InteractionContainer::erasePending
-	bool shouldBeErased(body_id_t id1, body_id_t id2, MetaBody* rb) const {
+	bool shouldBeErased(body_id_t id1, body_id_t id2, World* rb) const {
 		if(!periodic) return !spatialOverlap(id1,id2);
 		else { Vector3<int> periods; return !spatialOverlapPeri(id1,id2,rb,periods); }
 	}
 	#ifdef COLLIDE_STRIDED
-		virtual bool isActivated(MetaBody*);
+		virtual bool isActivated(World*);
 	#endif
 
 	vector<body_id_t> probeBoundingVolume(const BoundingVolume&);
@@ -215,7 +215,7 @@ class InsertionSortCollider: public Collider{
 			#endif 
 			for(int i=0; i<3; i++) BB[i].axis=i;
 		 }
-	virtual void action(MetaBody*);
+	virtual void action(World*);
 	REGISTER_CLASS_AND_BASE(InsertionSortCollider,Collider);
 	REGISTER_ATTRIBUTES(Collider,(sortAxis)(sortThenCollide)
 		#ifdef COLLIDE_STRIDED

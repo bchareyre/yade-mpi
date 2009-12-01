@@ -22,7 +22,7 @@ class ElawSnowLayersDeformation : public InteractionSolver
 		Real creep_viscosity;
 	
 		ElawSnowLayersDeformation();
-		void action(MetaBody*);
+		void action(World*);
 
 	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(creep_viscosity));
 	REGISTER_CLASS_NAME(ElawSnowLayersDeformation);

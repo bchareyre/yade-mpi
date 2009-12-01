@@ -30,7 +30,7 @@ class InteractingGeometryMetaEngine : 	public Dispatcher2D
 					>
 {
 	public :
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 
 	REGISTER_CLASS_NAME(InteractingGeometryMetaEngine);
 	REGISTER_BASE_CLASS_NAME(Dispatcher2D);

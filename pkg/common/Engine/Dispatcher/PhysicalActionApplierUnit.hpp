@@ -12,7 +12,7 @@
 #include<yade/core/State.hpp>
 #include<yade/core/Functor.hpp>
 
-class PhysicalActionApplierUnit: public Functor1D<void,TYPELIST_3(const shared_ptr<State>&,const Body*, MetaBody*)>{
+class PhysicalActionApplierUnit: public Functor1D<void,TYPELIST_3(const shared_ptr<State>&,const Body*, World*)>{
 	public: virtual ~PhysicalActionApplierUnit();
 	REGISTER_CLASS_AND_BASE(PhysicalActionApplierUnit,Functor1D);
 	REGISTER_ATTRIBUTES(Functor, /* nothing here */ );

@@ -3,7 +3,7 @@
 #include<yade/pkg-dem/SpherePack.hpp>
 
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -69,7 +69,7 @@ void SpherePack::toFile(const string fname) const {
 
 void SpherePack::fromSimulation() {
 	pack.clear();
-	MetaBody* rootBody=Omega::instance().getRootBody().get();
+	World* rootBody=Omega::instance().getWorld().get();
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 		if(!intSph) continue;

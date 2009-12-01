@@ -2,7 +2,7 @@
 
 
 #include"VelocityBins.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<boost/foreach.hpp>
 #ifndef FOREACH
 #	define FOREACH BOOST_FOREACH
@@ -23,7 +23,7 @@ bool VelocityBins::incrementDists_shouldCollide(Real dt){
 	return false;
 }
 
-void VelocityBins::setBins(MetaBody* rootBody, Real currMaxVelSq, Real refSweepLength){
+void VelocityBins::setBins(World* rootBody, Real currMaxVelSq, Real refSweepLength){
 	// initialization
 		// sanity checks
 		if(nBins<1 || nBins>100){LOG_FATAL("Number of bins must be >=1 and <=100"); abort(); }

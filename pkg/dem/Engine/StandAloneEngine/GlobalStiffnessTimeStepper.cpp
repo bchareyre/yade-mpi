@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 //#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN((GlobalStiffnessTimeStepper));
@@ -35,7 +35,7 @@ GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper()
 
 
 
-void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, MetaBody * ncb)
+void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, World * ncb)
 {
 	const State* sdec=body->state.get();
 	
@@ -109,13 +109,13 @@ void GlobalStiffnessTimeStepper::findTimeStepFromInteraction(const shared_ptr<In
 
 }
 
-bool GlobalStiffnessTimeStepper::isActivated(MetaBody*)
+bool GlobalStiffnessTimeStepper::isActivated(World*)
 {
 	return (active && ((!computedOnce) || (Omega::instance().getCurrentIteration() % timeStepUpdateInterval == 0) || (Omega::instance().getCurrentIteration() < (long int) 2) ));
 }
 
 
-void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
+void GlobalStiffnessTimeStepper::computeTimeStep(World* ncb)
 {
 	// for some reason, this line is necessary to have correct functioning (no idea _why_)
 	// see scripts/test/compare-identical.py, run with or without active=active.
@@ -169,7 +169,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(MetaBody* ncb)
 			string(", BUT timestep is ")+lexical_cast<string>(Omega::instance().getTimeStep()))<<".");
 }
 
-void GlobalStiffnessTimeStepper::computeStiffnesses(MetaBody* rb){
+void GlobalStiffnessTimeStepper::computeStiffnesses(World* rb){
 	/* check size */
 	size_t size=stiffnesses.size();
 	if(size<rb->bodies->size()){

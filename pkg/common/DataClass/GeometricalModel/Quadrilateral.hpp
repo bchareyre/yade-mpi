@@ -12,7 +12,7 @@
 #include <Wm3Math.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-class MetaBody;
+class World;
 
 class Quadrilateral : public GeometricalModel
 {
@@ -22,7 +22,7 @@ class Quadrilateral : public GeometricalModel
 					// for strain map display. some design changes are needed here anyway.
 
 		Quadrilateral();
-		Quadrilateral(int p1,int p2,int p3,int p4,MetaBody* mb);
+		Quadrilateral(int p1,int p2,int p3,int p4,World* mb);
 		virtual ~Quadrilateral();
 
 	REGISTER_ATTRIBUTES(GeometricalModel,(n1)(n2)(n3)(n4)(i1)(i2)(i3)(i4));

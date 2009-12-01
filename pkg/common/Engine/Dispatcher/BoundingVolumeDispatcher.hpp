@@ -40,8 +40,8 @@ class BoundingVolumeDispatcher :	public Dispatcher2D
 		//! bounding box will be enlarged by this amount in all 3 dimensions; must be non-negative;
 		Real sweepDist;
 		BoundingVolumeDispatcher(): activated(true), sweepDist(0) {}
-		virtual void action(MetaBody*);
-		virtual bool isActivated(MetaBody*){ return activated; }
+		virtual void action(World*);
+		virtual bool isActivated(World*){ return activated; }
 		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
 	REGISTER_CLASS_NAME(BoundingVolumeDispatcher);

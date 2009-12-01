@@ -28,7 +28,7 @@ class InteractionPhysicsDispatcher : 	public Dispatcher2D
 					>
 {		
 	public :
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 		void explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i);
 
 	REGISTER_CLASS_NAME(InteractionPhysicsDispatcher);

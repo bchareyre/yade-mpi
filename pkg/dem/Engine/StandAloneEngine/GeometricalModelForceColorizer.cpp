@@ -9,7 +9,7 @@
 #include "GeometricalModelForceColorizer.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 //#include <Wm3Vector3r.hpp>
@@ -21,14 +21,14 @@ GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEn
 }
 
 
-bool GeometricalModelForceColorizer::isActivated(MetaBody*)
+bool GeometricalModelForceColorizer::isActivated(World*)
 {
 	return true;
 //	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void GeometricalModelForceColorizer::action(MetaBody * ncb)
+void GeometricalModelForceColorizer::action(World * ncb)
 {
 	// FIXME the same in GLDrawLatticeBeamState.cpp
 	ncb->bex.sync();

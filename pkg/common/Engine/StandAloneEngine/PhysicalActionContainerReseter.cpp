@@ -7,13 +7,13 @@
 *************************************************************************/
 
 #include"PhysicalActionContainerReseter.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
 YADE_PLUGIN((PhysicalActionContainerReseter)(BexResetter));
 
 PhysicalActionContainerReseter::PhysicalActionContainerReseter(){}
 PhysicalActionContainerReseter::~PhysicalActionContainerReseter(){} 
-void PhysicalActionContainerReseter::action(MetaBody* ncb){ ncb->bex.reset(); }
+void PhysicalActionContainerReseter::action(World* ncb){ ncb->bex.reset(); }
 
-void BexResetter::action(MetaBody* ncb){ ncb->bex.reset(); }
+void BexResetter::action(World* ncb){ ncb->bex.reset(); }
 

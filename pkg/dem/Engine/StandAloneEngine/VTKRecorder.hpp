@@ -16,8 +16,8 @@ class VTKRecorder: public PeriodicEngine {
 		bool skipNondynamic;
 		VTKRecorder(); 
 		~VTKRecorder();
-		void init(MetaBody*);
-		virtual void action(MetaBody*);
+		void init(World*);
+		virtual void action(World*);
 	private:
 		
 	REGISTER_ATTRIBUTES(PeriodicEngine,(recorders)(fileName)(compress)(skipNondynamic)(skipFacetIntr));

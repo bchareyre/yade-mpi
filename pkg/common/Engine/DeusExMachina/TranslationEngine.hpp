@@ -15,7 +15,7 @@ class TranslationEngine : public DeusExMachina {
 	public:
 		Real velocity;
 		Vector3r translationAxis;
-		virtual void applyCondition(MetaBody *);
+		virtual void applyCondition(World *);
 		virtual void postProcessAttributes(bool deserializing){ if(deserializing) translationAxis.Normalize(); }
 	REGISTER_ATTRIBUTES(DeusExMachina,(velocity)(translationAxis));
 	REGISTER_CLASS_AND_BASE(TranslationEngine,DeusExMachina);

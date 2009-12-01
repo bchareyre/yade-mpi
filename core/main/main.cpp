@@ -133,9 +133,9 @@ int main(int argc, char *argv[])
 	Omega::instance();
 	ClassFactory::instance();
 	SerializableSingleton::instance();
-	/* Omega::init() cannot be called from Omega::Omega (invoked at first instance() call), since init calls resetRootBody,
+	/* Omega::init() cannot be called from Omega::Omega (invoked at first instance() call), since init calls resetWorld,
 	 * which locks renderMutex, calls instance() in turn, but since not constructed yet,
-	 * instance() → Omega::Omega → init → resetRootBody → lock renderMutex → deadlock */
+	 * instance() → Omega::Omega → init → resetWorld → lock renderMutex → deadlock */
 	Omega::instance().init();
 	Omega::instance().yadeVersionName = "Yet Another Dynamic Engine, version " YADE_VERSION;
 

@@ -17,7 +17,7 @@ class StaticSpheresAttractionEngine : public StaticAttractionEngine
 		StaticSpheresAttractionEngine() : max_displacement(0) {};
 		Real max_displacement;
 	protected :
-		virtual Real getMaxDisplacement(MetaBody*);
+		virtual Real getMaxDisplacement(World*);
 		virtual bool doesItApplyToThisBody(Body*);
 	REGISTER_ATTRIBUTES(StaticAttractionEngine,/*(applies_to_what)(divide_radius)*/(max_displacement));
 	REGISTER_CLASS_NAME(StaticSpheresAttractionEngine);

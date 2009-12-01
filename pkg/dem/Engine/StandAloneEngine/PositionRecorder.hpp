@@ -24,8 +24,8 @@ class PositionRecorder : public DataRecorder
 	
 		PositionRecorder ();
 		~PositionRecorder ();
-		virtual void action(MetaBody*);
-		virtual bool isActivated(MetaBody*);
+		virtual void action(World*);
+		virtual bool isActivated(World*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

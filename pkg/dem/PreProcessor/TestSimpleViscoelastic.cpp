@@ -8,10 +8,10 @@
 #include "TestSimpleViscoelastic.hpp"
 #include <yade/pkg-dem/Shop.hpp>
 #include <yade/core/Body.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -63,7 +63,7 @@ void TestSimpleViscoelastic::postProcessAttributes(bool)
 
 bool TestSimpleViscoelastic::generate()
 {
-    rootBody = shared_ptr<MetaBody>(new MetaBody);
+    rootBody = shared_ptr<World>(new World);
     createActors(rootBody);
     positionRootBody(rootBody);
     
@@ -134,7 +134,7 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 	body->physicalParameters	= physics;
 }
 
-void TestSimpleViscoelastic::createActors(shared_ptr<MetaBody>& rootBody)
+void TestSimpleViscoelastic::createActors(shared_ptr<World>& rootBody)
 {
     
     shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -233,7 +233,7 @@ void TestSimpleViscoelastic::createSphere(shared_ptr<Body>& body, int i)
 }
     
 
-void TestSimpleViscoelastic::positionRootBody(shared_ptr<MetaBody>& rootBody) 
+void TestSimpleViscoelastic::positionRootBody(shared_ptr<World>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	

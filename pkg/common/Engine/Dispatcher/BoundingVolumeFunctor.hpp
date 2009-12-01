@@ -13,7 +13,7 @@
 #include<yade/core/BoundingVolume.hpp>
 #include<yade/core/InteractingGeometry.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Functor.hpp>
 
 #include <string>

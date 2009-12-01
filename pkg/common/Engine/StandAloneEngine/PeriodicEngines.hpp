@@ -19,7 +19,7 @@ class PeriodicEngine:  public StandAloneEngine {
 		Real virtPeriod, virtLast, realPeriod, realLast; long iterPeriod,iterLast,nDo,nDone;
 		bool initRun;
 		PeriodicEngine(): virtPeriod(0),virtLast(0),realPeriod(0),realLast(0),iterPeriod(0),iterLast(0),nDo(-1),nDone(0),initRun(false) { realLast=getClock(); }
-		virtual bool isActivated(MetaBody*){
+		virtual bool isActivated(World*){
 			Real virtNow=Omega::instance().getSimulationTime();
 			Real realNow=getClock();
 			long iterNow=Omega::instance().getCurrentIteration();
@@ -75,7 +75,7 @@ class StretchPeriodicEngine: public PeriodicEngine{
 	Real realLim, virtLim; long iterLim;
 	Real stretchFactor;
 	bool mayStretch;
-	virtual bool isActivated(MetaBody* rootBody){
+	virtual bool isActivated(World* rootBody){
 		assert(stretchFactor>0);
 		if(iterLim==0 && iterPeriod!=0){iterLim=iterPeriod;} else if(iterLim!=0 && iterPeriod==0){iterPeriod=iterLim;}
 		if(realLim==0 && realPeriod!=0){realLim=realPeriod;} else if(realLim!=0 && realPeriod==0){realPeriod=realLim;}
@@ -110,7 +110,7 @@ REGISTER_SERIALIZABLE(StretchPeriodicEngine);
  * If it is useful to make the actual periods smaller/larger, mayDouble and mayHalve signify whether actual periods
  * (considering only enabled criteria) may be halved/doubled without getting off limits.
  *
- * This engine may be used only by deriving an engine with something useful in action(MetaBody*);
+ * This engine may be used only by deriving an engine with something useful in action(World*);
  * if used as-is, it will throw when activated.
  */
 class __attribute__((deprecated)) RangePeriodicEngine: public StandAloneEngine {
@@ -127,8 +127,8 @@ class __attribute__((deprecated)) RangePeriodicEngine: public StandAloneEngine {
 		}
 	public :
 		RangePeriodicEngine(): virtTimeLim(-1,0,0),realTimeLim(-1,0,0),iterLim(-1,0,0), lastRealTime(0.),lastVirtTime(0.),lastIter(0),mayDouble(false),mayHalve(false),perhapsInconsistent(true){};
-		virtual void action(MetaBody* b) { throw; }
-		virtual bool isActivated(MetaBody* rootBody){
+		virtual void action(World* b) { throw; }
+		virtual bool isActivated(World* rootBody){
 			if(perhapsInconsistent){ ensureConsistency(virtTimeLim); ensureConsistency(realTimeLim); ensureConsistency(iterLim); perhapsInconsistent=false; }
 
 			mayDouble=((virtTimeLim[0]<0 || 2*virtTimeLim[1]<=virtTimeLim[2]) && (realTimeLim[0]<0 || 2*realTimeLim[1]<=realTimeLim[2]) && (iterLim[0]<0 || 2*iterLim[1]<=iterLim[2]));

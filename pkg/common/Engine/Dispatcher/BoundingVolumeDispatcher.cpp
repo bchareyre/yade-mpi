@@ -11,13 +11,13 @@
 #include "BoundingVolumeDispatcher.hpp"
 
 
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 
 CREATE_LOGGER(BoundingVolumeDispatcher);
 
-void BoundingVolumeDispatcher::action(MetaBody* ncb)
+void BoundingVolumeDispatcher::action(World* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	const long numBodies=(long)bodies->size();

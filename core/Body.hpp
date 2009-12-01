@@ -28,7 +28,7 @@
 
 #define ISDYNAMIC_REDEFINED
 
-class MetaBody;
+class World;
 
 /*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.
  */
@@ -49,8 +49,8 @@ class Body : public Serializable
 		//! symbolic constant for body that doesn't exist.
 		static const body_id_t ID_NONE;
 		//! get Body pointer given its id. 
-		static const shared_ptr<Body>& byId(body_id_t _id,MetaBody* rb=NULL);
-		static const shared_ptr<Body>& byId(body_id_t _id,shared_ptr<MetaBody> rb);
+		static const shared_ptr<Body>& byId(body_id_t _id,World* rb=NULL);
+		static const shared_ptr<Body>& byId(body_id_t _id,shared_ptr<World> rb);
 
 		
 		//! Whether this Body is a Clump.

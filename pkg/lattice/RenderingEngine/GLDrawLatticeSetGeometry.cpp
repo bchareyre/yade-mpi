@@ -12,7 +12,7 @@
 #include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -29,7 +29,7 @@ void GLDrawLatticeSetGeometry::calcMinMax()
 	min = Vector3r(1,1,1)*10000.0;
 	max = min*(-1.0);
 	
-	MetaBody * lattice = static_cast<MetaBody*>(Omega::instance().getRootBody().get());
+	World * lattice = static_cast<World*>(Omega::instance().getWorld().get());
 	int nodeGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->nodeGroupMask;
 	BodyContainer* bodies = lattice->bodies.get();
 	BodyContainer::iterator bi    = bodies->begin();
@@ -113,7 +113,7 @@ void GLDrawLatticeSetGeometry::generateScalarField()
 			}
 
 
-	MetaBody * lattice = static_cast<MetaBody*>(Omega::instance().getRootBody().get());
+	World * lattice = static_cast<World*>(Omega::instance().getWorld().get());
 
 //	int nodeGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->nodeGroupMask;
 	int beamGroupMask  = static_cast<LatticeSetParameters*>(lattice->physicalParameters.get())->beamGroupMask;

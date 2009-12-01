@@ -28,7 +28,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 		bool pointClipped(const Vector3r& p);
 		vector<Vector3r> clipPlaneNormals;
-		void setBodiesDispInfo(const shared_ptr<MetaBody>& rootBody);
+		void setBodiesDispInfo(const shared_ptr<World>& rootBody);
 		static bool glutInitDone;
 		static size_t selectBodyLimit;
 		Vector3r viewDirection; // updated from GLViewer regularly
@@ -41,11 +41,11 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 		//! wrap number to interval x0…x1
 		Real wrapCell(const Real x, const Real x0, const Real x1);
-		//! wrap point to inside MetaBody's cell (identity if !MetaBody::isPeriodic)
-		Vector3r wrapCellPt(const Vector3r& pt, MetaBody* rb);
-		void drawPeriodicCell(MetaBody*);
+		//! wrap point to inside World's cell (identity if !World::isPeriodic)
+		Vector3r wrapCellPt(const Vector3r& pt, World* rb);
+		void drawPeriodicCell(World*);
 
-		void setBodiesRefSe3(const shared_ptr<MetaBody>& rootBody);
+		void setBodiesRefSe3(const shared_ptr<World>& rootBody);
 
 		struct BodyDisp{
 			Vector3r pos;
@@ -85,18 +85,18 @@ class OpenGLRenderingEngine : public RenderingEngine
 	
 		void init();
 		void initgl();
-		void render(const shared_ptr<MetaBody>& body, body_id_t selection = body_id_t(-1));
-		virtual void renderWithNames(const shared_ptr<MetaBody>& );
+		void render(const shared_ptr<World>& body, body_id_t selection = body_id_t(-1));
+		virtual void renderWithNames(const shared_ptr<World>& );
 	
 	private :
-		void renderDOF_ID(const shared_ptr<MetaBody>& rootBody);
-		void renderInteractionPhysics(const shared_ptr<MetaBody>& rootBody);
-		void renderInteractionGeometry(const shared_ptr<MetaBody>& rootBody);
+		void renderDOF_ID(const shared_ptr<World>& rootBody);
+		void renderInteractionPhysics(const shared_ptr<World>& rootBody);
+		void renderInteractionGeometry(const shared_ptr<World>& rootBody);
 		#ifdef YADE_PHYSPAR
-			void renderState(const shared_ptr<MetaBody>& rootBody);
+			void renderState(const shared_ptr<World>& rootBody);
 		#endif
-		void renderBoundingVolume(const shared_ptr<MetaBody>& rootBody);
-		void renderInteractingGeometry(const shared_ptr<MetaBody>& rootBody);
+		void renderBoundingVolume(const shared_ptr<World>& rootBody);
+		void renderInteractingGeometry(const shared_ptr<World>& rootBody);
 	
 	protected :
 		void postProcessAttributes(bool deserializing);

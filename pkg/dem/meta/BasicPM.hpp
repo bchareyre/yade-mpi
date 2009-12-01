@@ -11,7 +11,7 @@ YADE_REQUIRE_FEATURE(abcd);
 class CundallStrackLaw: public ConstitutiveLaw{
 	public:
 		
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
 		FUNCTOR2D(Dem3DofGeom,CSPhys);
 		REGISTER_CLASS_AND_BASE(CundallStrackLaw,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);

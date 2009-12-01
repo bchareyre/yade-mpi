@@ -22,7 +22,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -195,7 +195,7 @@ bool SnowVoxelsLoader::generate()
 	if(!load_voxels())
 		return false;
 
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -358,7 +358,7 @@ bool SnowVoxelsLoader::generate()
 	return true;
 }
 
-void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
+void SnowVoxelsLoader::createActors(shared_ptr<World>& rootBody)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 
@@ -506,7 +506,7 @@ void SnowVoxelsLoader::createActors(shared_ptr<MetaBody>& rootBody)
 	
 }
 
-void SnowVoxelsLoader::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void SnowVoxelsLoader::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

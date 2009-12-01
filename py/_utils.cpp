@@ -1,7 +1,7 @@
 #include<yade/pkg-dem/Shop.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
@@ -35,7 +35,7 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getWorld()->bodies){
 		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=componentMinVector(minimum,b->state->pos-(centers?Vector3r::ZERO:rrr));
@@ -50,7 +50,7 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	python::tuple extrema=aabbExtrema();
 	Real minCoord=extract<double>(extrema[0][axis])(),maxCoord=extract<double>(extrema[1][axis])();
 	python::list minIds,maxIds;
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getWorld()->bodies){
 		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry); if(!s) continue;
 		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
@@ -63,7 +63,7 @@ python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()
 	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(AABB)>0;
 	if(useBB){bbMin=extract<Vector3r>(AABB[0])();bbMax=extract<Vector3r>(AABB[1])();}
 	python::list retCoord,retDispl;
-	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getWorld()->bodies){
 		if(useBB && !isInBB(b->state->pos,bbMin,bbMax)) continue;
 		retCoord.append(b->state->pos[axis]);
 		retDispl.append(b->state->pos[axis]-b->state->refPos[axis]);
@@ -73,7 +73,7 @@ python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()
 BOOST_PYTHON_FUNCTION_OVERLOADS(coordsAndDisplacements_overloads,coordsAndDisplacements,1,2);
 
 void setRefSe3(){
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getWorld()->bodies){
 		b->state->refPos=b->state->pos;
 		b->state->refOri=b->state->ori;
 	}
@@ -83,7 +83,7 @@ Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 
 Real elasticEnergyInAABB(python::tuple AABB){
 	Vector3r bbMin=extract<Vector3r>(AABB[0])(), bbMax=extract<Vector3r>(AABB[1])();
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	shared_ptr<World> rb=Omega::instance().getWorld();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
 		if(!i->interactionPhysics) continue;
@@ -124,7 +124,7 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	shared_ptr<World> rb=Omega::instance().getWorld();
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
@@ -145,7 +145,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interaction
 
 python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
-	const shared_ptr<MetaBody>& rb=Omega::instance().getRootBody();
+	const shared_ptr<World>& rb=Omega::instance().getWorld();
 	vector<int> bodyNumInta; bodyNumInta.resize(rb->bodies->size(),-1 /* uninitialized */);
 	int maxInta=0;
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
@@ -197,7 +197,7 @@ python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Rea
 }
 /* reset highlight of all bodies */
 void highlightNone(){
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getWorld()->bodies){
 		if(!b->interactingGeometry) continue;
 		b->interactingGeometry->highlight=false;
 	}
@@ -215,7 +215,7 @@ void highlightNone(){
  * projected onto axis.
  */
 Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	shared_ptr<World> rb=Omega::instance().getWorld();
 	rb->bex.sync();
 	Real ret=0;
 	size_t len=python::len(ids);
@@ -235,7 +235,7 @@ Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axis
  *
  */
 Real sumBexForces(python::tuple ids, const Vector3r& direction){
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody();
+	shared_ptr<World> rb=Omega::instance().getWorld();
 	rb->bex.sync();
 	Real ret=0;
 	size_t len=python::len(ids);
@@ -251,7 +251,7 @@ Real sumBexForces(python::tuple ids, const Vector3r& direction){
    If axis is given, it will sum forces perpendicular to given axis only (not the the facet normals).
 */
 Real sumFacetNormalForces(vector<body_id_t> ids, int axis=-1){
-	shared_ptr<MetaBody> rb=Omega::instance().getRootBody(); rb->bex.sync();
+	shared_ptr<World> rb=Omega::instance().getWorld(); rb->bex.sync();
 	Real ret=0;
 	FOREACH(const body_id_t id, ids){
 		InteractingFacet* f=YADE_CAST<InteractingFacet*>(Body::byId(id,rb)->interactingGeometry.get());
@@ -269,7 +269,7 @@ void wireSome(string filter){
 	enum{none,all,noSpheres,unknown};
 	int mode=(filter=="none"?none:(filter=="all"?all:(filter=="noSpheres"?noSpheres:unknown)));
 	if(mode==unknown) { LOG_WARN("Unknown wire filter `"<<filter<<"', using noSpheres instead."); mode=noSpheres; }
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getWorld()->bodies){
 		if(!b->interactingGeometry) return;
 		bool wire;
 		switch(mode){
@@ -350,7 +350,7 @@ Real approxSectionArea(Real coord, int axis){
 	const int ax1=(axis+1)%3, ax2=(axis+2)%3;
 	const Real sqrt3=sqrt(3);
 	Vector2r mm,mx; int i=0;
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getRootBody()->bodies){
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getWorld()->bodies){
 		InteractingSphere* s=dynamic_cast<InteractingSphere*>(b->interactingGeometry.get());
 		if(!s) continue;
 		const Vector3r& pos(b->state->pos); const Real r(s->radius);
@@ -377,7 +377,7 @@ Real approxSectionArea(Real coord, int axis){
 */
 Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 	Vector3r ret(Vector3r::ZERO);
-	MetaBody* rootBody=Omega::instance().getRootBody().get();
+	World* rootBody=Omega::instance().getWorld().get();
 	FOREACH(const shared_ptr<Interaction>&I, *rootBody->interactions){
 		if(!I->isReal()) continue;
 		NormalShearInteraction* nsi=dynamic_cast<NormalShearInteraction*>(I->interactionPhysics.get());

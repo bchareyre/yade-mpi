@@ -26,8 +26,8 @@ class DeusExMachina : public Engine
 	public :
 		std::vector<int> subscribedBodies; /// Lists of bodies whose state will be modified by deux ex machina
 		DeusExMachina ();
-		virtual void action(MetaBody*);
-		virtual void applyCondition(MetaBody*) { throw; };
+		virtual void action(World*);
+		virtual void applyCondition(World*) { throw; };
 	//	virtual bool isActivated();
 	protected :
 	REGISTER_ATTRIBUTES(Engine,(subscribedBodies));

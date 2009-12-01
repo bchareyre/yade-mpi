@@ -11,6 +11,6 @@
 DeusExMachina::DeusExMachina() : Engine() {
 	subscribedBodies.resize(0); // what is this good for?
 }
-void DeusExMachina::action(MetaBody* b) {
+void DeusExMachina::action(World* b) {
 	this->applyCondition(b);
 }

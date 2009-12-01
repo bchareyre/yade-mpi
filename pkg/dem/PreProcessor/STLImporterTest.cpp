@@ -17,7 +17,7 @@
 #endif
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
@@ -75,7 +75,7 @@ void STLImporterTest::postProcessAttributes(bool)
 
 bool STLImporterTest::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	positionRootBody(rootBody);
 
 	rootBody->dt = 0.001; //default time step
@@ -198,7 +198,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body->physicalParameters	= physics;
 }
 
-void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
+void STLImporterTest::createActors(shared_ptr<World>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -269,7 +269,7 @@ void STLImporterTest::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void STLImporterTest::positionRootBody(shared_ptr<MetaBody>& rootBody) 
+void STLImporterTest::positionRootBody(shared_ptr<World>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	

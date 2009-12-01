@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #include "SpatialQuickSortCollider.hpp"
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <yade/core/BodyContainer.hpp>
 #include <math.h>
 #include <algorithm>
@@ -22,7 +22,7 @@ SpatialQuickSortCollider::~SpatialQuickSortCollider()
 
 }
 
-void SpatialQuickSortCollider::action(MetaBody* ncb)
+void SpatialQuickSortCollider::action(World* ncb)
 {
 	if(ncb->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;

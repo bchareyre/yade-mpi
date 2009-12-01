@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 
@@ -25,7 +25,7 @@ ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 }
 
 
-void ElawSnowLayersDeformation::action(MetaBody* ncb)
+void ElawSnowLayersDeformation::action(World* ncb)
 {
 	//return;
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

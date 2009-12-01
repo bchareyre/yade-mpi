@@ -23,7 +23,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -131,7 +131,7 @@ bool SDECImpactTest::generate()
 {
 	int startId=boost::numeric::bounds<int>::highest(), endId=0; // record forces from group 2
 	
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -387,7 +387,7 @@ void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 }
 
 
-void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
+void SDECImpactTest::createActors(shared_ptr<World>& rootBody)
 {
 // recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
@@ -470,7 +470,7 @@ void SDECImpactTest::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void SDECImpactTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void SDECImpactTest::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

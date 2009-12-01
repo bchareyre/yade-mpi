@@ -22,7 +22,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
@@ -78,7 +78,7 @@ void HydraulicTest::postProcessAttributes(bool)
 
 bool HydraulicTest::generate()
 {
-	rootBody = shared_ptr<MetaBody> ( new MetaBody );
+	rootBody = shared_ptr<World> ( new World );
 	positionRootBody ( rootBody );
 
 
@@ -87,7 +87,7 @@ bool HydraulicTest::generate()
 /////////////////////////////////////
 	// load file
 
-	shared_ptr<MetaBody> metaBodyWithSpheres;
+	shared_ptr<World> metaBodyWithSpheres;
 
 	if ( yadeFileWithSpheres.size() !=0
 			&& filesystem::exists ( yadeFileWithSpheres )
@@ -101,7 +101,7 @@ bool HydraulicTest::generate()
 			else if ( filesystem::extension ( yadeFileWithSpheres ) ==".yade" )
 				IOFormatManager::loadFromFile ( "BINFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres );
 
-		if ( metaBodyWithSpheres->getClassName() != "MetaBody" ) { message="Error: cannot load the file that should contain spheres"; return false; }
+		if ( metaBodyWithSpheres->getClassName() != "World" ) { message="Error: cannot load the file that should contain spheres"; return false; }
 		}
 		catch ( SerializableError& e )
 		{
@@ -283,7 +283,7 @@ bool HydraulicTest::generate()
 	return true;
 }
 
-void HydraulicTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void HydraulicTest::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	

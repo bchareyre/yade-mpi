@@ -11,7 +11,7 @@
 #include "VelocityRecorder.hpp"
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 
@@ -32,13 +32,13 @@ void VelocityRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool VelocityRecorder::isActivated(MetaBody*)
+bool VelocityRecorder::isActivated(World*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void VelocityRecorder::action(MetaBody * ncb)
+void VelocityRecorder::action(World * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

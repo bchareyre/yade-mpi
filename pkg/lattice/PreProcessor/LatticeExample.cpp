@@ -286,7 +286,7 @@ bool LatticeExample::generate()
 	fibres_total=0;
 	matrix_total=0;
 	beam_total=0;
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 	
@@ -975,7 +975,7 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
                 calcAxisAngle(beam,bodies,*i,ints,body->getId());
 }
 
-void LatticeExample::createActors(shared_ptr<MetaBody>& )
+void LatticeExample::createActors(shared_ptr<World>& )
 {
         shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -1063,7 +1063,7 @@ BeamRecorder bbbb;
         }
 }       
 
-void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void LatticeExample::positionRootBody(shared_ptr<World>& rootBody)
 {
         rootBody->isDynamic             = false;
 
@@ -1096,7 +1096,7 @@ void LatticeExample::positionRootBody(shared_ptr<MetaBody>& rootBody)
 }
 	
  
-void LatticeExample::imposeTranslation(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement,Vector3r blocked_xyz)
+void LatticeExample::imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement,Vector3r blocked_xyz)
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
  	translationCondition->displacement  = displacement;
@@ -1299,7 +1299,7 @@ bool LatticeExample::notDeleted(Vector3r pos)
 	));
 };
 
-void LatticeExample::regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
+void LatticeExample::regionDelete(shared_ptr<World>& rootBody, Vector3r min, Vector3r max)
 {
         vector<unsigned int> futureDeletes;
         
@@ -1328,7 +1328,7 @@ void LatticeExample::regionDelete(shared_ptr<MetaBody>& rootBody, Vector3r min, 
                 rootBody->bodies->erase(*vsta); 
 }
 
-void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
+void LatticeExample::nonDestroy(shared_ptr<World>& rootBody, Vector3r min, Vector3r max)
 {
 	std::list<unsigned int> marked;
         
@@ -1367,7 +1367,7 @@ void LatticeExample::nonDestroy(shared_ptr<MetaBody>& rootBody, Vector3r min, Ve
 }
 
 
-void LatticeExample::modifyCT(shared_ptr<MetaBody>& rootBody, Vector3r min, Vector3r max)
+void LatticeExample::modifyCT(shared_ptr<World>& rootBody, Vector3r min, Vector3r max)
 {
 	std::list<unsigned int> marked;
         
@@ -1513,7 +1513,7 @@ float LatticeExample::aggsVolumes(std::vector<Circle>& c)
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-void LatticeExample::addAggregates(shared_ptr<MetaBody>& rootBody)
+void LatticeExample::addAggregates(shared_ptr<World>& rootBody)
 {
         // first make a list of circles
         std::vector<Circle> c;
@@ -2126,7 +2126,7 @@ bool LatticeExample::fibreAllows(Vector3r a)
 
 
 
-void LatticeExample::makeFibreBeams(shared_ptr<MetaBody>& rootBody)
+void LatticeExample::makeFibreBeams(shared_ptr<World>& rootBody)
 {
         { // set different properties for beams that are fibre
                 BodyContainer::iterator bi    = rootBody->bodies->begin();

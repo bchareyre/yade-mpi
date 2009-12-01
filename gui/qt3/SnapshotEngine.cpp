@@ -3,7 +3,7 @@
 #include<iomanip>
 CREATE_LOGGER(SnapshotEngine);
 YADE_PLUGIN((SnapshotEngine));
-void SnapshotEngine::action(MetaBody* rb){
+void SnapshotEngine::action(World* rb){
 	shared_ptr<GLViewer> glv;
 	if(!YadeQtMainWindow::self || ((size_t)viewNo>=YadeQtMainWindow::self->glViews.size()) || !(glv=YadeQtMainWindow::self->glViews[viewNo])){
 		if(!ignoreErrors) throw invalid_argument("View #"+lexical_cast<string>(viewNo)+" (SnapshotEngine::viewNo) doesn't exist.");

@@ -25,7 +25,7 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 		long iter;/// used for checking if new iteration
 	
 		CohesiveFrictionalContactLaw();
-		void action(MetaBody*);
+		void action(World*);
 
 	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(erosionActivated)(detectBrokenBodies)(always_use_moment_law)(shear_creep)(twist_creep)(creep_viscosity));
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactLaw);

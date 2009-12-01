@@ -20,7 +20,7 @@
 
 class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 	public:
-	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
 	int sdecGroupMask;
 	bool momentRotationLaw;	
 	bool neverErase;	
@@ -53,7 +53,7 @@ This class serves also as tutorial and is documented in detail at
 */
 class Law2_Dem3Dof_Elastic_Elastic: public ConstitutiveLaw{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, MetaBody* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
 		FUNCTOR2D(Dem3DofGeom,ElasticContactInteraction);
 		REGISTER_CLASS_AND_BASE(Law2_Dem3Dof_Elastic_Elastic,ConstitutiveLaw);
 		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
@@ -74,7 +74,7 @@ class ElasticContactLaw : public InteractionSolver
 		#endif
 	
 		ElasticContactLaw();
-		void action(MetaBody*);
+		void action(World*);
 
 		shared_ptr<ef2_Spheres_Elastic_ElasticLaw> functor;
 

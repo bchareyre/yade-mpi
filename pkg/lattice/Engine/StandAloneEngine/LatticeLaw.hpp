@@ -22,7 +22,7 @@ class LatticeLaw : public InteractionSolver
 		std::list<unsigned int> futureDeletes;
 		//bool nonlocal;
                 
-                bool deleteBeam(MetaBody* lattice , LatticeBeamParameters* beam, Body*);
+                bool deleteBeam(World* lattice , LatticeBeamParameters* beam, Body*);
                 void calcBeamPositionOrientationNewLength(Body* body, BodyContainer* bodies);
 	public :
 		bool roughEdges,ensure2D,calcTorsion,tension_compression_different_stiffness;// FIXME, FIXME, FIXME 
@@ -30,7 +30,7 @@ class LatticeLaw : public InteractionSolver
 		Real respect_non_destroy;
 		LatticeLaw();
 		virtual ~LatticeLaw();
-		void action(MetaBody*);
+		void action(World*);
 		REGISTER_ATTRIBUTES(InteractionSolver,
 			(roughEdges)
 			(ensure2D)

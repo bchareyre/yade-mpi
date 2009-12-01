@@ -11,10 +11,10 @@ CohesiveStateRPMRecorder::CohesiveStateRPMRecorder():Recorder(){
 CohesiveStateRPMRecorder::~CohesiveStateRPMRecorder() {
 }
 
-void CohesiveStateRPMRecorder::init(MetaBody* rootBody) {
+void CohesiveStateRPMRecorder::init(World* rootBody) {
 }
 
-void CohesiveStateRPMRecorder::action(MetaBody* rootBody) {
+void CohesiveStateRPMRecorder::action(World* rootBody) {
 	numberCohesiveContacts=0;
 	//Check all interactions
 	FOREACH(const shared_ptr<Interaction>& i, *rootBody->interactions){

@@ -37,7 +37,7 @@ class InteractionGeometryDispatcher :	public Dispatcher2D
 {
 	bool alreadyWarnedNoCollider;
 	public :
-		virtual void action(MetaBody*);
+		virtual void action(World*);
 		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2);
 		InteractionGeometryDispatcher(): alreadyWarnedNoCollider(false){}
 

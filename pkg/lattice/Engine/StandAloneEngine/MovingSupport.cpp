@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "MovingSupport.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 // to calculate strain of whole speciemen - first two bodies in subscribedBodies are Nodes. FIXME - make it clean!
@@ -68,13 +68,13 @@ void MovingSupport::postProcessAttributes(bool deserializing)
 
 
 
-bool MovingSupport::isActivated(MetaBody*)
+bool MovingSupport::isActivated(World*)
 {
 	return true;
 }
 
 
-void MovingSupport::action(MetaBody * ncb)
+void MovingSupport::action(World * ncb)
 	// FIXME: about "bool first":
 	// FIXME: maybe it could be added to initialiers, and called with a bool argument saying that the initialisation is performed. 
 {

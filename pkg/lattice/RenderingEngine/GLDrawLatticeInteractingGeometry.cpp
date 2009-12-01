@@ -13,7 +13,7 @@
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 #include<yade/pkg-lattice/LatticeInteractingGeometry.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -95,8 +95,8 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 	}
 	int limit = Omega::instance().isoSec;
 
-	InteractionContainer* interactions = Omega::instance().getRootBody()->interactions.get();
-	BodyContainer* bodies = Omega::instance().getRootBody()->bodies.get();
+	InteractionContainer* interactions = Omega::instance().getWorld()->interactions.get();
+	BodyContainer* bodies = Omega::instance().getWorld()->bodies.get();
 
 	InteractionContainer::iterator angles     = interactions->begin();
 	InteractionContainer::iterator angles_end = interactions->end();

@@ -52,7 +52,7 @@ SpheresFactory::~SpheresFactory()
 	
 }
 
-void SpheresFactory::action(MetaBody* ncb)
+void SpheresFactory::action(World* ncb)
 {
 	if (first_run)
 	{

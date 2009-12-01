@@ -46,7 +46,7 @@
 #	define FOREACH BOOST_FOREACH
 #endif
 
-class MetaBody;
+class World;
 class ThreadRunner;
 
 using namespace boost;
@@ -71,9 +71,9 @@ class Omega: public Singleton<Omega>
 
 		map<string,DynlibDescriptor>	 dynlibs;	// FIXME : should store that in ClassFactory ?
 		
-		shared_ptr<MetaBody>	rootBody;
+		shared_ptr<World>	world;
 
-		shared_ptr<MetaBody>	rootBodyAnother; // used for temporarily running different simulation, in Omega().switchWorld()
+		shared_ptr<World>	worldAnother; // used for temporarily running different simulation, in Omega().switchWorld()
 
 		//ptime				 sStartingSimulationTime;
 		ptime				 msStartingSimulationTime;
@@ -135,9 +135,9 @@ class Omega: public Singleton<Omega>
 		bool 		timeStepperActive();
 		bool		containTimeStepper();
 
-		const		shared_ptr<MetaBody>& getRootBody();
-		void		setRootBody(shared_ptr<MetaBody>&);
-		void		resetRootBody();
+		const		shared_ptr<World>& getWorld();
+		void		setWorld(shared_ptr<World>&);
+		void		resetWorld();
 		
 		ptime		getMsStartingSimulationTime();
 		time_duration	getSimulationPauseDuration();

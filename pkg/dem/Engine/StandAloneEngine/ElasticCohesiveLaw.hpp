@@ -24,7 +24,7 @@ class ElasticCohesiveLaw : public InteractionSolver
 		bool momentRotationLaw;
 		
 		ElasticCohesiveLaw();
-		void action(MetaBody*);
+		void action(World*);
 
 	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw));
 

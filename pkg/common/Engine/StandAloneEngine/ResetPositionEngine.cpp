@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"ResetPositionEngine.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<boost/foreach.hpp>
 
@@ -25,7 +25,7 @@ ResetPositionEngine::ResetPositionEngine(){
 void ResetPositionEngine::postProcessAttributes(bool deserializing){}
 
 
-void ResetPositionEngine::action(MetaBody * ncb)
+void ResetPositionEngine::action(World * ncb)
 {
 	if (first) { initialize(ncb); return; }
 
@@ -41,7 +41,7 @@ void ResetPositionEngine::action(MetaBody * ncb)
 	}
 }
 
-void ResetPositionEngine::initialize(MetaBody * ncb)
+void ResetPositionEngine::initialize(World * ncb)
 {
 	first=false;
 	if (fileName=="")

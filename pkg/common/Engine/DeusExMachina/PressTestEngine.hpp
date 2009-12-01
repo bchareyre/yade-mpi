@@ -28,7 +28,7 @@ class PressTestEngine: public TranslationEngine{
 			currentIterationAfterDestruction(0), 
 			pressVelocityForw2Back(25) {};
 		virtual ~PressTestEngine(){};
-		virtual void applyCondition(MetaBody*);
+		virtual void applyCondition(World*);
 	REGISTER_CLASS_AND_BASE(PressTestEngine,TranslationEngine);
 	REGISTER_ATTRIBUTES(TranslationEngine, (numberIterationAfterDestruction) (predictedForce) (riseUpPressHigher));
 	DECLARE_LOGGER;

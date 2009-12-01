@@ -25,7 +25,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -93,7 +93,7 @@ void ThreePointBending::postProcessAttributes(bool)
 
 bool ThreePointBending::generate()
 {
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -103,9 +103,9 @@ bool ThreePointBending::generate()
 
 	// load simulation file, extract spheres and use those
 	if (yadeFileWithSpheres.size()!=0){
-		shared_ptr<MetaBody> metaBodyWithSpheres;
+		shared_ptr<World> metaBodyWithSpheres;
 		IOFormatManager::loadFromFile("XMLFormatManager",yadeFileWithSpheres,"rootBody",metaBodyWithSpheres);
-		assert(metaBodyWithSpheres->getClassName()=="MetaBody");
+		assert(metaBodyWithSpheres->getClassName()=="World");
 
 		FOREACH(shared_ptr<Body> b, *metaBodyWithSpheres->bodies){
 			if(b->geometricalModel->getClassName()!="Sphere") continue;
@@ -260,7 +260,7 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 }
 
 
-void ThreePointBending::createActors(shared_ptr<MetaBody>& rootBody)
+void ThreePointBending::createActors(shared_ptr<World>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -330,7 +330,7 @@ void ThreePointBending::createActors(shared_ptr<MetaBody>& rootBody)
 }
 	
 
-void ThreePointBending::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void ThreePointBending::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	

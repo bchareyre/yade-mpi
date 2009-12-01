@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"TranslationEngine.hpp"
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 
-void TranslationEngine::applyCondition(MetaBody * ncb){
+void TranslationEngine::applyCondition(World * ncb){
 	Real dt=Omega::instance().getTimeStep();
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)ncb->bodies->size());

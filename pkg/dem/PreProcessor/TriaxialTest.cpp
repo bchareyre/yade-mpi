@@ -31,7 +31,7 @@
 	#include<yade/pkg-common/Sphere.hpp>
 	#include<yade/pkg-common/Facet.hpp>
 #endif
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -230,7 +230,7 @@ bool TriaxialTest::generate()
 	}
 
 	// setup rootBody here, since radiusMean is now at its true value (if it was negative)
-	rootBody = shared_ptr<MetaBody>(new MetaBody);
+	rootBody = shared_ptr<World>(new World);
 	positionRootBody(rootBody);
 	createActors(rootBody);
 
@@ -481,7 +481,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 }
 
 
-void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
+void TriaxialTest::createActors(shared_ptr<World>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -625,7 +625,7 @@ void TriaxialTest::createActors(shared_ptr<MetaBody>& rootBody)
 }
 
 
-void TriaxialTest::positionRootBody(shared_ptr<MetaBody>& rootBody)
+void TriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
 {
 	rootBody->isDynamic		= false;
 

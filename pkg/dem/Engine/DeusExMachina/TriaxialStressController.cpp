@@ -15,7 +15,7 @@
 
 
 
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #ifdef YADE_SHAPE
 	#include<yade/pkg-common/Sphere.hpp>
 #endif
@@ -94,7 +94,7 @@ TriaxialStressController::~TriaxialStressController()
 }
 
 
-void TriaxialStressController::updateStiffness (MetaBody * ncb)
+void TriaxialStressController::updateStiffness (World * ncb)
 {
 	for (int i=0; i<6; ++i) stiffness[i] = 0;
 
@@ -126,7 +126,7 @@ void TriaxialStressController::updateStiffness (MetaBody * ncb)
 	}
 }
 
-void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Vector3r resultantForce, State* p, Real wall_max_vel)
+void TriaxialStressController::controlExternalStress(int wall, World* ncb, Vector3r resultantForce, State* p, Real wall_max_vel)
 {
 	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce); 
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
@@ -157,7 +157,7 @@ void TriaxialStressController::controlExternalStress(int wall, MetaBody* ncb, Ve
 
 
 
-void TriaxialStressController::applyCondition(MetaBody* ncb)
+void TriaxialStressController::applyCondition(World* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
 
@@ -266,7 +266,7 @@ void TriaxialStressController::applyCondition(MetaBody* ncb)
  *
  * (This function used to return meanStress, but since the return value was not used anywhere, it now returns void)
  */
-void TriaxialStressController::computeStressStrain(MetaBody* ncb)
+void TriaxialStressController::computeStressStrain(World* ncb)
 {
 	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
@@ -310,7 +310,7 @@ void TriaxialStressController::computeStressStrain(MetaBody* ncb)
 	meanStress/=6.;
 }
 
-void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multiplier )
+void TriaxialStressController::controlInternalStress ( World* ncb, Real multiplier )
 {
 	spheresVolume *= pow ( multiplier,3 );
 	BodyContainer::iterator bi    = ncb->bodies->begin();
@@ -354,9 +354,9 @@ void TriaxialStressController::controlInternalStress ( MetaBody* ncb, Real multi
 }
 
 /*!
-    \fn TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
+    \fn TriaxialStressController::ComputeUnbalancedForce(World * ncb, bool maxUnbalanced)
  */
-Real TriaxialStressController::ComputeUnbalancedForce(MetaBody * ncb, bool maxUnbalanced)
+Real TriaxialStressController::ComputeUnbalancedForce(World * ncb, bool maxUnbalanced)
 {
 	ncb->bex.sync();
 	//compute the mean contact force

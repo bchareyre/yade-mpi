@@ -16,7 +16,7 @@
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 
 #include <yade/core/Omega.hpp>
-#include <yade/core/MetaBody.hpp>
+#include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 CREATE_LOGGER(CapillaryStressRecorder);
@@ -52,13 +52,13 @@ void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryStressRecorder::isActivated(MetaBody* rootBody)
+bool CapillaryStressRecorder::isActivated(World* rootBody)
 {
 	return ((rootBody->currentIteration % interval == 0) && (ofile));
 }
 
 
-void CapillaryStressRecorder::action(MetaBody * ncb)
+void CapillaryStressRecorder::action(World * ncb)
 {
 	if ( !triaxialCompressionEngine )
 	{

@@ -10,7 +10,7 @@
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/MetaBody.hpp>
+#include<yade/core/World.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>
 
 YADE_REQUIRE_FEATURE(shape);
@@ -173,10 +173,10 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 /*
 	// plot depth tetrahedron of selected surface
 
-//	int me = (int)(Omega::instance().getRootBody()->selectedBody);
-//	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+//	int me = (int)(Omega::instance().getWorld()->selectedBody);
+//	if(me > 0 && me < Omega::instance().getWorld()->bodies->size())
 //	{
-//		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+//		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[me]->geometricalModel.get());
 //		if(m && m==gr)
 //		{
 //			if(gr->slices[0][0] == m->slices[0][0])
@@ -226,25 +226,25 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 //	std::vector<Vector3r> me_inside;me_inside.clear();
 //	std::vector<Vector3r> oth_inside;oth_inside.clear();
 
-	int me = (int)(Omega::instance().getRootBody()->selectedBody);
-	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+	int me = (int)(Omega::instance().getWorld()->selectedBody);
+	if(me > 0 && me < Omega::instance().getWorld()->bodies->size())
 	{
-		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[me]->geometricalModel.get());
 		if(m && m==gr)
 		{
 			if(gr->slices[0][0] == m->slices[0][0])
 			{
 				std::cerr << "got body " << me << "\n";
 				int other=17;
-				if(other > 0 && other < Omega::instance().getRootBody()->bodies->size())
+				if(other > 0 && other < Omega::instance().getWorld()->bodies->size())
 				{
-				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[other]->geometricalModel.get());
 				if(oth)
 				{
-				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
-				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
-				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
-				Quaternionr oth_q((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.orientation);
+				Vector3r    my_pos((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.position);
+				Vector3r    oth_pos((*(Omega::instance().getWorld()->bodies))[other]->physicalParameters->se3.position);
+				Quaternionr my_q((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.orientation);
+				Quaternionr oth_q((*(Omega::instance().getWorld()->bodies))[other]->physicalParameters->se3.orientation);
 
 				glColor3f(1,0,0);
 				for(size_t i=0;i < gr->slices.size();++i)
@@ -271,24 +271,24 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 
 // check inside of grain 17 with the selected one
 	me = 17;
-	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+	if(me > 0 && me < Omega::instance().getWorld()->bodies->size())
 	{
-		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[me]->geometricalModel.get());
 		if(m && m==gr)
 		{
 			if(gr->slices[0][0] == m->slices[0][0])
 			{
 				std::cerr << "got body " << me << "\n";
-				int other=(int)(Omega::instance().getRootBody()->selectedBody);
-				if(other > 0 && other < Omega::instance().getRootBody()->bodies->size())
+				int other=(int)(Omega::instance().getWorld()->selectedBody);
+				if(other > 0 && other < Omega::instance().getWorld()->bodies->size())
 				{
-				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+				BshSnowGrain* oth = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[other]->geometricalModel.get());
 				if(oth)
 				{
-				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
-				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
-				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
-				Quaternionr oth_q((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.orientation);
+				Vector3r    my_pos((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.position);
+				Vector3r    oth_pos((*(Omega::instance().getWorld()->bodies))[other]->physicalParameters->se3.position);
+				Quaternionr my_q((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.orientation);
+				Quaternionr oth_q((*(Omega::instance().getWorld()->bodies))[other]->physicalParameters->se3.orientation);
 
 				glColor3f(0,1,1);
 				for(size_t i=0;i < gr->slices.size();++i)
@@ -319,13 +319,13 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 	// check current grain insides
 //if(!surface)
 //{
-//	int me = (int)(Omega::instance().getRootBody()->selectedBody);
-//	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+//	int me = (int)(Omega::instance().getWorld()->selectedBody);
+//	if(me > 0 && me < Omega::instance().getWorld()->bodies->size())
 //	{
-//		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+//		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[me]->geometricalModel.get());
 //		if(m && m==gr)
 //		{
-//			Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
+//			Vector3r    my_pos((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.position);
 //
 //			for(float x=-1 ; x<1 ; x+=0.15)
 //			for(float y=-1 ; y<1 ; y+=0.15)
@@ -347,22 +347,22 @@ void Ef1_BshSnowGrain_glDraw::go(const shared_ptr<GeometricalModel>& gm, const s
 if(!surface)
 {
 //	glBegin(GL_POINTS);
-	int me = (int)(Omega::instance().getRootBody()->selectedBody);
-	if(me > 0 && me < Omega::instance().getRootBody()->bodies->size())
+	int me = (int)(Omega::instance().getWorld()->selectedBody);
+	if(me > 0 && me < Omega::instance().getWorld()->bodies->size())
 	{
-		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[me]->geometricalModel.get());
+		BshSnowGrain* m = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[me]->geometricalModel.get());
 		if(m)
 		{
 			if(gr->slices[0][0] == m->slices[0][0])
 			{
 				std::cerr << "got body " << me << "\n";
 				int other=17;
-				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getRootBody()->bodies))[other]->geometricalModel.get());
+				BshSnowGrain* oth = static_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[other]->geometricalModel.get());
 
-				Vector3r    my_pos((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.position);
-				Vector3r    oth_pos((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.position);
-				Quaternionr my_q((*(Omega::instance().getRootBody()->bodies))[me]->physicalParameters->se3.orientation);
-				Quaternionr oth_q((*(Omega::instance().getRootBody()->bodies))[other]->physicalParameters->se3.orientation);
+				Vector3r    my_pos((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.position);
+				Vector3r    oth_pos((*(Omega::instance().getWorld()->bodies))[other]->physicalParameters->se3.position);
+				Quaternionr my_q((*(Omega::instance().getWorld()->bodies))[me]->physicalParameters->se3.orientation);
+				Quaternionr oth_q((*(Omega::instance().getWorld()->bodies))[other]->physicalParameters->se3.orientation);
 
 				glColor3f(1,0,0);
 //				for(size_t i=0;i < gr->slices.size();++i){
