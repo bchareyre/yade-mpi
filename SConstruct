@@ -70,7 +70,7 @@ if 'Variables' not in dir():
 	Variables=Options
 	BoolVariable,ListVariable,EnumVariable=BoolOption,ListOption,EnumOption
 
-env=Environment(tools=['default'])
+env=Environment(tools=['default','scanreplace'],toolpath=['scripts'])
 profileFile='scons.current-profile'
 
 profOpts=Variables(profileFile)
@@ -302,9 +302,16 @@ def CheckCXX(context):
 	ret=context.TryLink('#include<iostream>\nint main(int argc, char**argv){std::cerr<<std::endl;return 0;}\n','.cpp')
 	context.Result(ret)
 	return ret
+def CheckLibStdCxx(context):
+	context.Message('Finding libstdc++ library... ')
+	ret=os.popen(context.env['CXX']+' -print-file-name=libstdc++.so').readlines()[0][:-1]
+	context.env['libstdcxx']=ret
+	context.Result(ret)
+	return ret
+	
 
 if not env.GetOption('clean'):
-	conf=env.Configure(custom_tests={'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckIPython':CheckIPython},
+	conf=env.Configure(custom_tests={'CheckLibStdCxx':CheckLibStdCxx,'CheckQt':CheckQt,'CheckCXX':CheckCXX,'CheckPython':CheckPython,'CheckScientificPython':CheckScientificPython,'CheckIPython':CheckIPython},
 		conf_dir='$buildDir/.sconf_temp',log_file='$buildDir/config.log')
 
 	ok=True
@@ -312,6 +319,7 @@ if not env.GetOption('clean'):
 	if not ok:
 			print "\nYour compiler is broken, no point in continuing. See `%s' for what went wrong and use the CXX/CXXFLAGS parameters to change your compiler."%(buildDir+'/config.log')
 			Exit(1)
+	conf.CheckLibStdCxx()
 	# check essential libs
 	ok&=conf.CheckLibWithHeader('pthread','pthread.h','c','pthread_exit(NULL);',autoadd=1)
 
