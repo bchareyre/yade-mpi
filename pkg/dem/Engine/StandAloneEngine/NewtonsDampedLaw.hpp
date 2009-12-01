@@ -39,11 +39,15 @@ class VelocityBins;
 
 class NewtonsDampedLaw : public StandAloneEngine{
 	inline void cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A);
-	void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState);
+	//void handleClumpMember(MetaBody* ncb, const body_id_t memberId, State* clumpState);
+	inline void handleClumpMemberAccel(MetaBody* ncb, const body_id_t memberId, State* clumpState);
+	inline void handleClumpMemberAngAccel(MetaBody* ncb, const body_id_t memberId, State* clumpState);
+	inline void handleClumpMemberTorque(MetaBody* ncb, const body_id_t memberId, State* clumpState, Vector3r& M);
+	inline void saveMaximaVelocity(MetaBody* ncb, const body_id_t memberId, State* clumpState);
 	bool haveBins;
-	inline void lfTranslate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog translate
-	inline void lfSpheralRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog rotate of spheral body
-	inline void lfRigidBodyRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of rigid (non symmetric) body
+	inline void leapfrogTranslate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog translate
+	inline void leapfrogSphericalRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt); // leap-frog rotate of spherical body
+	inline void leapfrogAsphericalRotate(MetaBody* ncb, State* state, const body_id_t& id, const Real& dt, const Vector3r& M); // leap-frog rotate of aspherical body
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
@@ -53,21 +57,21 @@ class NewtonsDampedLaw : public StandAloneEngine{
 		Real damping;
 		/// store square of max. velocity, for informative purposes; computed again at every step
 		Real maxVelocitySq;
-		/// Enable of the accurate rigid body rotation integrator
-		bool accRigidBodyRot;
+		/// Enable of the exact aspherical body rotation integrator
+		bool exactAsphericalRot;
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(MetaBody *);		
-		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1), accRigidBodyRot(false){
+		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false){
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif
 		}
 
-	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq)(accRigidBodyRot));
+	REGISTER_ATTRIBUTES(StandAloneEngine,(damping)(maxVelocitySq)(exactAsphericalRot));
 	REGISTER_CLASS_AND_BASE(NewtonsDampedLaw,StandAloneEngine);
 	DECLARE_LOGGER;
 };
