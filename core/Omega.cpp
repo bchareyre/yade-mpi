@@ -184,7 +184,7 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 void Omega::scanPlugins(vector<string> baseDirs){
 	// silently skip non-existent plugin directories
 	FOREACH(const string& baseDir, baseDirs){
-		if(!filesystem::exists(baseDir)) return;
+		if(!filesystem::exists(baseDir)) continue;
 		try{
 			filesystem::recursive_directory_iterator Iend;
 			for(filesystem::recursive_directory_iterator I(baseDir); I!=Iend; ++I){ 
