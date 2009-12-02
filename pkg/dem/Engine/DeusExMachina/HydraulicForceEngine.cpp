@@ -173,5 +173,5 @@ void HydraulicForceEngine::applyCondition(World* ncb)
 
 YADE_PLUGIN((HydraulicForceEngine));
 
-//YADE_REQUIRE_FEATURE(PHYSPAR);
+
 

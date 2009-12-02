@@ -383,5 +383,5 @@ currentContactPhysics->moment_bending = moment_bending;
 
 YADE_PLUGIN((CohesiveFrictionalContactLaw));
 
-//YADE_REQUIRE_FEATURE(PHYSPAR);
+
 

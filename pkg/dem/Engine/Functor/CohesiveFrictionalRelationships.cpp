@@ -170,5 +170,5 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // Co
 };
 YADE_PLUGIN((CohesiveFrictionalRelationships));
 
-//YADE_REQUIRE_FEATURE(PHYSPAR);
+
 
