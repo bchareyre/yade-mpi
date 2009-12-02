@@ -27,6 +27,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.File('linterpolation.py'),
 	env.File('timing.py'),
 	env.File('pack.py'),
+	env.File('system.py'),
 	env.File('export.py'),
 	env.File('post2d.py'),
 	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=['PythonUI']+linkPlugins(['Shop','BoundingVolumeDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'shape' in env['features'] else [])+(['StateMetaEngine',] if 'physpar' in env['features'] else []))),

@@ -468,7 +468,7 @@ class pyOmega{
 	pyMaterialContainer materials_get(void){return pyMaterialContainer();}
 	
 
-	python::list listChildClasses(const string& base){
+	python::list listChildClassesNonrecursive(const string& base){
 		python::list ret;
 		for(map<string,DynlibDescriptor>::const_iterator di=Omega::instance().getDynlibsDescriptor().begin();di!=Omega::instance().getDynlibsDescriptor().end();++di) if (Omega::instance().isInheritingFrom((*di).first,base)) ret.append(di->first);
 		return ret;
@@ -713,7 +713,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("actions",&pyOmega::bex_get,"Deprecated alias for Omega().bex")
 		.add_property("bex",&pyOmega::bex_get,"BodyExternalVariables (forces, torques, ..) in  the current simulation.")
 		.add_property("tags",&pyOmega::tags_get,"Tags (string=string dictionary) of the current simulation (container supporting string-index access/assignment)")
-		.def("childClasses",&pyOmega::listChildClasses,"Return list of all classes deriving from given class, as registered in the class factory")
+		.def("childClassesNonrecursive",&pyOmega::listChildClassesNonrecursive,"Return list of all classes deriving from given class, as registered in the class factory")
 		.def("isChildClassOf",&pyOmega::isChildClassOf,"Tells whether the first class derives from the second one (both given as strings).")
 		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set,"Get/set type of body container (as string); there must be no bodies.")
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set,"Get/set type of interaction container (as string); there must be no interactions.")

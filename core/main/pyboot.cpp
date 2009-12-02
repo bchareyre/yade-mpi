@@ -42,20 +42,11 @@ void yadeInitialize(python::list& dd, bool gdb){
 		localLogger->setLevel(getenv("YADE_DEBUG")?debugLevel:warnLevel);
 	#endif
 
-	#if defined(YADE_OPENMP) || defined(YADE_OPENGL)
-		#ifdef LOG4CXX
-			LOG_ERROR("Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.")
-		#else
-			// avoid log4cxx-less LOG_ERROR, since it uses cerr, which crashes due to libsctc++ (?) issue.
-			fprintf(stderr,"ERROR: Yade compiled with openmp/opengl. Using python main will likely crash as soone as an ostream is used.\n");
-		#endif
-	#endif
-
 	PyEval_InitThreads();
 
 	Omega& O(Omega::instance());
 	O.init();
-	O.origArgv=NULL; O.origArgc=0;
+	O.origArgv=NULL; O.origArgc=0; // not needed, anyway
 	O.initTemps();
 	#ifdef YADE_DEBUG
 		if(gdb){
