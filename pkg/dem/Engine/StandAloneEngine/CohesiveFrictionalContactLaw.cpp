@@ -96,8 +96,8 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
             if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
                 continue; // skip other groups,
 
-	    CohesiveFrictionalBodyParameters* de1 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id1]->material.get());
-	    CohesiveFrictionalBodyParameters* de2 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id2]->material.get());
+	   // CohesiveFrictionalBodyParameters* de1 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id1]->material.get());
+	   // CohesiveFrictionalBodyParameters* de2 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id2]->material.get());
 	    
 	    Body* b1 = (*bodies)[id1].get();
 	    Body* b2 = (*bodies)[id2].get();
