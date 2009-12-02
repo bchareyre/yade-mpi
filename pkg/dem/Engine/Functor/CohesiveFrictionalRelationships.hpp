@@ -15,8 +15,8 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsFunctor
 	public :
 		CohesiveFrictionalRelationships();
 
-		virtual void go(	const shared_ptr<PhysicalParameters>& b1,
-					const shared_ptr<PhysicalParameters>& b2,
+		virtual void go(	const shared_ptr<Material>& b1,
+					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
 
 		Real 		normalCohesion,
@@ -28,7 +28,7 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsFunctor
 		int cohesionDefinitionIteration;
 		long iter;//REMOVE THIS
 
-	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(normalCohesion)(shearCohesion)(setCohesionNow)(setCohesionOnNewContacts));
+		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(normalCohesion)(shearCohesion)(setCohesionNow)(setCohesionOnNewContacts));
 	FUNCTOR2D(CohesiveFrictionalBodyParameters,CohesiveFrictionalBodyParameters);
 	REGISTER_CLASS_NAME(CohesiveFrictionalRelationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);

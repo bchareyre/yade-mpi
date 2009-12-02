@@ -28,18 +28,8 @@ CohesiveFrictionalRelationships::CohesiveFrictionalRelationships()
 }
 
 
-
-//
-//
-//
-/// Big WHAT THE FUCK? this code below is duplicated THREE times due to some weird IFs !
-/// need to FIXME that.
-/// but from all my testing it works currently. / janek
-//
-//
-
-void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalBodyParameters
-					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalBodyParameters
+void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // CohesiveFrictionalBodyParameters
+		, const shared_ptr<Material>& b2 // CohesiveFrictionalBodyParameters
 					, const shared_ptr<Interaction>& interaction)
 {
 	CohesiveFrictionalBodyParameters* sdec1 = static_cast<CohesiveFrictionalBodyParameters*>(b1.get());
@@ -54,7 +44,7 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 		setCohesionNow = 0;}
 	
 	
-	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
+	if(interactionGeometry) 
 	{
 		if(!interaction->interactionPhysics)
 		{
@@ -66,8 +56,8 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			Real Eb 	= sdec2->young;
 			Real Va 	= sdec1->poisson;
 			Real Vb 	= sdec2->poisson;
-			Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
-			Real Db 	= interactionGeometry->radius2; // FIXME - as above
+			Real Da 	= interactionGeometry->radius1; 
+			Real Db 	= interactionGeometry->radius2; 
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 
@@ -96,12 +86,11 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 				contactPhysics->cohesionBroken = false;
 				contactPhysics->normalAdhesion			= normalCohesion*pow(std::min(Db, Da),2);
 				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(Db, Da),2);;
-			
-				// FIXME - not sure: do I need to repeat it here [1] ?
-				contactPhysics->initialOrientation1	= sdec1->se3.orientation;
-				contactPhysics->initialOrientation2	= sdec2->se3.orientation;
-				contactPhysics->initialPosition1    = sdec1->se3.position;
-				contactPhysics->initialPosition2    = sdec2->se3.position;
+							
+				contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
+				contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
+				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
+				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 				contactPhysics->kr = Kr;
 				contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
@@ -127,11 +116,10 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 			contactPhysics->ks = contactPhysics->initialKs;
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 
-			// FIXME - or here [1] ?
-			contactPhysics->initialOrientation1	= sdec1->se3.orientation;
-			contactPhysics->initialOrientation2	= sdec2->se3.orientation;
-			contactPhysics->initialPosition1    = sdec1->se3.position;
-			contactPhysics->initialPosition2    = sdec2->se3.position;
+			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
+			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
+			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
+			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 			contactPhysics->kr = Kr;
 			contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
@@ -157,12 +145,12 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 				contactPhysics->shearAdhesion			= shearCohesion*pow(std::min(interactionGeometry->radius2, interactionGeometry->radius1),2);
 				//setCohesionNow = false;
 
-			contactPhysics->initialOrientation1 = sdec1->se3.orientation;
-			contactPhysics->initialOrientation2 = sdec2->se3.orientation;
-			contactPhysics->initialPosition1    = sdec1->se3.position;
-			contactPhysics->initialPosition2    = sdec2->se3.position;
-			Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
-			Real Db 	= interactionGeometry->radius2; // FIXME - as above
+			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
+			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
+			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
+			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
+			Real Da 	= interactionGeometry->radius1; 
+			Real Db 	= interactionGeometry->radius2; 
 			Real Kr = Da*Db*contactPhysics->ks*2.0; // just like "2.0" above - it's an arbitrary parameter
 			contactPhysics->kr = Kr;
 			contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
@@ -179,22 +167,8 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<PhysicalParameters>
 		}	
 		
 	}
-#if 0
-	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
-	{
-		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
-		if (sdecLinkGeometry)
-		{		
-			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
-	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
-			linkPhysics->kn 			= linkPhysics->initialKn;
-			linkPhysics->ks 			= linkPhysics->initialKs;
-			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
-		}
-	}
-#endif
 };
 YADE_PLUGIN((CohesiveFrictionalRelationships));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

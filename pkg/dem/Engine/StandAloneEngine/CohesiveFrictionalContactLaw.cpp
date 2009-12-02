@@ -10,10 +10,8 @@
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/World.hpp>
-
 
 Vector3r translation_vect_ (0.10,0,0);
 
@@ -65,7 +63,7 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
         {
             shared_ptr<Body> b = *bi;
             if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere")
-                (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken = true;
+                (static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken = true;
             // b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
         }
     }
@@ -87,8 +85,8 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
 		     * && (*bodies)[(*ii)->getId2()]->interactingGeometry->getClassName() != "box" */
 		    )
             {
-                YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId1()]->physicalParameters.get())->isBroken = false;
-                YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId2()]->physicalParameters.get())->isBroken = false;
+                YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId1()]->material.get())->isBroken = false;
+		YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId2()]->material.get())->isBroken = false;
             }
 
             const shared_ptr<Interaction>& contact = *ii;
@@ -98,8 +96,12 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
             if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
                 continue; // skip other groups,
 
-            CohesiveFrictionalBodyParameters* de1 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id1]->physicalParameters.get());
-            CohesiveFrictionalBodyParameters* de2 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id2]->physicalParameters.get());
+	    CohesiveFrictionalBodyParameters* de1 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id1]->material.get());
+	    CohesiveFrictionalBodyParameters* de2 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id2]->material.get());
+	    
+	    Body* b1 = (*bodies)[id1].get();
+	    Body* b2 = (*bodies)[id2].get();
+	    
             SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
             CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> (contact->interactionPhysics.get());
 
@@ -123,7 +125,7 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
 
                 ncb->interactions->requestErase(contact->getId1(),contact->getId2());
                 // contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
-					 currentContactPhysics->cohesionBroken = true;
+		currentContactPhysics->cohesionBroken = true;
                 currentContactPhysics->normalForce = Vector3r::ZERO;
                 currentContactPhysics->shearForce = Vector3r::ZERO;
 
@@ -141,7 +143,7 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
 
 		axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
 		shearForce 	       -= shearForce.Cross(axis);
-		angle 			= dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
+		angle 			= dt*0.5*currentContactGeometry->normal.Dot(Body::byId(id1)->state->angVel+Body::byId(id2)->state->angVel);
 		axis 			= angle*currentContactGeometry->normal;
 		shearForce 	       -= shearForce.Cross(axis);
 
@@ -162,16 +164,18 @@ void CohesiveFrictionalContactLaw::action(World* ncb)
 
                 /// 							 ///
 
+		
+		
                 Vector3r x				= currentContactGeometry->contactPoint;
-                Vector3r c1x				= (x - de1->se3.position);
-                Vector3r c2x				= (x - de2->se3.position);
+		Vector3r c1x				= (x - b1->state->pos);
+		Vector3r c2x				= (x - b2->state->pos);
                 /// The following definition of c1x and c2x is to avoid "granular ratcheting" 
 		///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
 		///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
 		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
                 Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
                 Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
-                Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
+		Vector3r relativeVelocity		= ( b2->state->vel+b2->state->angVel.Cross(_c2x_)) - (b1->state->vel+b1->state->angVel.Cross(_c1x_));
                 Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
                 Vector3r shearDisplacement		= shearVelocity*dt;
 
@@ -298,8 +302,8 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
 			//	currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
 			//}
 
-			Quaternionr delta( de1->se3.orientation * currentContactPhysics->initialOrientation1.Conjugate() *
-		                           currentContactPhysics->initialOrientation2 * de2->se3.orientation.Conjugate());
+			Quaternionr delta( b1->state->ori * currentContactPhysics->initialOrientation1.Conjugate() *
+		                           currentContactPhysics->initialOrientation2 * b2->state->ori.Conjugate());
 			if(twist_creep){
 				delta = delta * currentContactPhysics->twistCreep;
 			}
@@ -359,10 +363,10 @@ currentContactPhysics->moment_bending = moment_bending;
             if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere" && erosionActivated)
             {
                 //cerr << "translate it" << endl;
-                if ((static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken == true)
+                if ((static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken == true)
                 {
                     if (b->isDynamic)
-                        (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->se3.position += translation_vect_;
+                        b->state->pos += translation_vect_;
                     b->isDynamic = false;
                     b->interactingGeometry->diffuseColor= Vector3r(0.5,0.3,0.9);
 
@@ -379,5 +383,5 @@ currentContactPhysics->moment_bending = moment_bending;
 
 YADE_PLUGIN((CohesiveFrictionalContactLaw));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

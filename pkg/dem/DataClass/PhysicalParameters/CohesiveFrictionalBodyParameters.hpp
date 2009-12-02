@@ -12,10 +12,10 @@
 #pragma once
 
 
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 
 
-class CohesiveFrictionalBodyParameters : public BodyMacroParameters
+class CohesiveFrictionalBodyParameters : public GranularMat
 {
 	public :
 		bool		isBroken;
@@ -26,10 +26,10 @@ class CohesiveFrictionalBodyParameters : public BodyMacroParameters
 
 /// Serialization
 	REGISTER_CLASS_NAME(CohesiveFrictionalBodyParameters);
-	REGISTER_BASE_CLASS_NAME(BodyMacroParameters);
-	REGISTER_ATTRIBUTES(BodyMacroParameters,(isBroken)(isCohesive));
+	REGISTER_BASE_CLASS_NAME(GranularMat);
+	REGISTER_ATTRIBUTES(GranularMat,(isBroken)(isCohesive));
 /// Indexable
-	REGISTER_CLASS_INDEX(CohesiveFrictionalBodyParameters,BodyMacroParameters);
+	REGISTER_CLASS_INDEX(CohesiveFrictionalBodyParameters,GranularMat);
 };
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalBodyParameters);

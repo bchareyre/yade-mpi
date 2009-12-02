@@ -8,7 +8,7 @@
 
 #include "CohesiveFrictionalBodyParameters.hpp"
 
-CohesiveFrictionalBodyParameters::CohesiveFrictionalBodyParameters () : BodyMacroParameters()
+CohesiveFrictionalBodyParameters::CohesiveFrictionalBodyParameters () : GranularMat()
 {
 	createIndex();
 	isBroken=true;
@@ -21,5 +21,5 @@ CohesiveFrictionalBodyParameters::~CohesiveFrictionalBodyParameters()
 
 YADE_PLUGIN((CohesiveFrictionalBodyParameters));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

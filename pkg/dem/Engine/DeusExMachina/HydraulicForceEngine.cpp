@@ -7,16 +7,11 @@
 *************************************************************************/
 
 #include "HydraulicForceEngine.hpp"
-#include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/core/World.hpp>
 #include <yade/core/Body.hpp>
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <vector>
 #include "HydraulicForceEngine.hpp"
-#include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/core/World.hpp>
-#include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
-#include <vector>
 #include <yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
@@ -78,7 +73,7 @@ void HydraulicForceEngine::applyCondition(World* ncb)
                 if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere")
                 {
                     //cerr << "translate it" << endl;
-                    if ((static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->isBroken == true)
+                    if ((static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken == true)
                     {
 								ncb->bex.addForce(b->getId(),Vector3r(0,5,0));
                     }
@@ -140,7 +135,7 @@ void HydraulicForceEngine::applyCondition(World* ncb)
 			    if (!b->isDynamic) continue;
 			    shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
 			    if(!intSph) continue;
-			    const Vector3r& pos=b->physicalParameters->se3.position;
+			    const Vector3r& pos=b->state->pos;
 			    f<< b->getId()<<" "<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
 		    }
 		    f.close();
@@ -178,5 +173,5 @@ void HydraulicForceEngine::applyCondition(World* ncb)
 
 YADE_PLUGIN((HydraulicForceEngine));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

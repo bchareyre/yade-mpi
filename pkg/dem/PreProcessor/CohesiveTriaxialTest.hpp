@@ -16,9 +16,9 @@
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
 
-class ForceRecorder;
-class AveragePositionRecorder;
-class VelocityRecorder;
+//class ForceRecorder;
+//class AveragePositionRecorder;
+//class VelocityRecorder;
 class TriaxialStressController;
 class TriaxialCompressionEngine;
 class TriaxialStateRecorder;
@@ -109,9 +109,9 @@ class CohesiveTriaxialTest : public FileGenerator
 				,AnimationSnapshotsBaseName
 				,WallStressRecordFile;
 	
-		shared_ptr<ForceRecorder> forcerec;
-		shared_ptr<VelocityRecorder> velocityRecorder;
-		shared_ptr<AveragePositionRecorder> averagePositionRecorder;
+		//shared_ptr<ForceRecorder> forcerec;
+		//shared_ptr<VelocityRecorder> velocityRecorder;
+		//shared_ptr<AveragePositionRecorder> averagePositionRecorder;
 		shared_ptr<TriaxialCompressionEngine> triaxialcompressionEngine;
 		shared_ptr<TriaxialStressController> triaxialstressController;
 		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
