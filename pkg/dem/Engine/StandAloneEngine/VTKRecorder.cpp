@@ -50,7 +50,8 @@ void VTKRecorder::action(World* rootBody)
 		else if(rec=="colors") recActive[REC_COLORS]=true;
 		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else if(rec=="intr") recActive[REC_INTR]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm, intr). Ignored.");
+		else if(rec=="ids") recActive[REC_IDS]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm, intr, ids). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -61,6 +62,9 @@ void VTKRecorder::action(World* rootBody)
 	vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
 	radii->SetNumberOfComponents(1);
 	radii->SetName("radii");
+	vtkSmartPointer<vtkFloatArray> spheresIds = vtkSmartPointer<vtkFloatArray>::New();
+	spheresIds->SetNumberOfComponents(1);
+	spheresIds->SetName("IDS");
 	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
 	spheresColors->SetNumberOfComponents(3);
 	spheresColors->SetName("colors");
@@ -143,6 +147,7 @@ void VTKRecorder::action(World* rootBody)
 				pid[0] = spheresPos->InsertNextPoint(pos[0], pos[1], pos[2]);
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
+				if (recActive[REC_IDS]) spheresIds->InsertNextValue(b->getId()); 
 				if (recActive[REC_COLORS])
 				{
 					const Vector3r& color = sphere->diffuseColor;
@@ -210,6 +215,7 @@ void VTKRecorder::action(World* rootBody)
 		spheresUg->SetPoints(spheresPos);
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
+		if (recActive[REC_IDS]) spheresUg->GetPointData()->AddArray(spheresIds);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
 		if (recActive[REC_VELOCITY]) {
 			spheresUg->GetPointData()->AddArray(spheresVelocity);
