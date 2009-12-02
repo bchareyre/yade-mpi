@@ -10,8 +10,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/World.hpp>
 
@@ -21,11 +20,8 @@ SimpleElasticRelationshipsWater::SimpleElasticRelationshipsWater()
 
 }
 
-
-
-
-void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& b1 //BodyMacroParameters
-					, const shared_ptr<PhysicalParameters>& b2 // BodyMacroParameters
+void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //GranularMat
+					, const shared_ptr<Material>& b2 // GranularMat
 					, const shared_ptr<Interaction>& interaction)
 {
 	
@@ -37,8 +33,11 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& 
 		if(!interaction->interactionPhysics)
 		{
 //cerr << "interaction->isNew" << endl;
-			const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>(b1);
-			const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>(b2);
+			
+// 			Body* de1 = (*bodies)[id1].get();
+// 			Body* de2 = (*bodies)[id2].get();
+ 			const shared_ptr<GranularMat>& sdec1 = YADE_PTR_CAST<GranularMat>(b1);
+ 			const shared_ptr<GranularMat>& sdec2 = YADE_PTR_CAST<GranularMat>(b2);
 			
  			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());
 //			interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());
@@ -86,31 +85,11 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<PhysicalParameters>& 
 
 		}
 		
-		/*else
-		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
-
-			contactPhysics->kn = contactPhysics->initialKn;
-			contactPhysics->ks = contactPhysics->initialKs;
-			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-		}*/	
 		
 	}
-	else cerr << "Problem here (PERMANENT LINK)" << endl;
-// 	else   // this is PERMANENT LINK because previous dynamic_cast failed, dispatcher should do this job
-// 	{
-// 		SDECLinkGeometry* sdecLinkGeometry =  dynamic_cast<SDECLinkGeometry*>(interaction->interactionGeometry.get());
-// 		if (sdecLinkGeometry)
-// 		{		
-// 			SDECLinkPhysics* linkPhysics = static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
-// 	//		linkPhysics->frictionAngle 		= ?? //FIXME - uninitialized 
-// 			linkPhysics->kn 			= linkPhysics->initialKn;
-// 			linkPhysics->ks 			= linkPhysics->initialKs;
-// 			linkPhysics->equilibriumDistance 	= linkPhysics->initialEquilibriumDistance;
-// 		}
-// 	}
+
 };
 YADE_PLUGIN((SimpleElasticRelationshipsWater));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+
 

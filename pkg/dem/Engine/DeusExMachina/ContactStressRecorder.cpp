@@ -7,11 +7,11 @@
 *************************************************************************/
 
 #include "ContactStressRecorder.hpp"
-#include <yade/pkg-common/RigidBodyParameters.hpp>
-#include <yade/pkg-common/ParticleParameters.hpp>
+#include <yade/pkg-common/ElasticMat.hpp>
+//#include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-common/Force.hpp>
 #include <yade/pkg-common/InteractingSphere.hpp>
-#include <yade/pkg-dem/BodyMacroParameters.hpp>
+//#include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 
 #include <yade/pkg-dem/SpheresContactGeometry.hpp>
@@ -25,7 +25,7 @@
 
 CREATE_LOGGER ( ContactStressRecorder );
 
-ContactStressRecorder::ContactStressRecorder () : DataRecorder()/*, actionForce ( new Force )*/
+ContactStressRecorder::ContactStressRecorder () : Recorder()/*, actionForce ( new Force )*/
 {
 	outputFile = "";
 	interval = 1;
@@ -128,21 +128,25 @@ void ContactStressRecorder::action ( World * ncb )
 					( *bodies ) [id1]->interactingGeometry->getClassIndex();
 				int geometryIndex2 =
 					( *bodies ) [id2]->interactingGeometry->getClassIndex();
+				
+				
 
 				if ( geometryIndex1 == geometryIndex2 )
 
 				{
-					BodyMacroParameters* de1 = static_cast<BodyMacroParameters*> ( ( *bodies ) [id1]->physicalParameters.get() );
-					x1 = de1->se3.position[0];
-					y1 = de1->se3.position[1];
-					z1 = de1->se3.position[2];
+					
+					Body* de1 = (*bodies)[id1].get();
+					Body* de2 = (*bodies)[id2].get();
+			
 
+					x1 = de1->state->pos[0];
+					y1 = de1->state->pos[1];
+					z1 = de1->state->pos[2];
 
-					BodyMacroParameters* de2 = static_cast<BodyMacroParameters*> ( ( *bodies ) [id2]->physicalParameters.get() );
-					x2 = de2->se3.position[0];
-					y2 = de2->se3.position[1];
-					z2 = de2->se3.position[2];
-
+					x2 = de2->state->pos[0];
+					y2 = de2->state->pos[1];
+					z2 = de2->state->pos[2];
+					
 					///Calcul des contraintes elastiques spheres/spheres
 
 					sig11_el = sig11_el + f1_el_x* ( x2 - x1 );
@@ -209,10 +213,10 @@ void ContactStressRecorder::action ( World * ncb )
 		if ( geometryIndex == SpheresClassIndex )
 		{
 			nbElt +=1;
-			ParticleParameters* pp = static_cast<ParticleParameters*> ( b->physicalParameters.get() );
-			Vector3r v = pp->velocity;
+			//ParticleParameters* pp = static_cast<ParticleParameters*> ( b->physicalParameters.get() );
+			Vector3r v = b->state->vel;
 			kinematicE +=
-				0.5* ( pp->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
+					0.5* ( b->state->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
 			InteractingSphere* sphere = static_cast<InteractingSphere*> ( b->interactingGeometry.get() );
 			Rbody = sphere->radius;
@@ -332,5 +336,4 @@ void ContactStressRecorder::action ( World * ncb )
 
 YADE_PLUGIN((ContactStressRecorder));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

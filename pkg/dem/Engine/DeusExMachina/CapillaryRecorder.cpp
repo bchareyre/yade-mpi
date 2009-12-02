@@ -9,15 +9,15 @@
 *************************************************************************/
 
 #include "CapillaryRecorder.hpp"
-#include <yade/pkg-common/RigidBodyParameters.hpp>
-#include <yade/pkg-common/ParticleParameters.hpp>
+#include <yade/pkg-common/ElasticMat.hpp>
+//#include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/World.hpp>
 #include <boost/lexical_cast.hpp>
 
 
-CapillaryRecorder::CapillaryRecorder () : DataRecorder()
+CapillaryRecorder::CapillaryRecorder () : Recorder()
 {
 	outputFile = "";
 	interval = 1;
@@ -56,18 +56,18 @@ void CapillaryRecorder::action(World * ncb)
 	Real R1 = 0.001;
 	Real R2 = 0.001;
 	
-	//physicalParameters de bigBall
-	
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	ParticleParameters* bigBallpp =
-static_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get())
-; ;
-		
-		Real x = bigBallpp-> se3.position[0];
-		
-		Real Dintergranular = x - (R1+R2);	
-	
-	// capillary parameters
+// 	//physicalParameters de bigBall
+// 	
+// 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+// 	Material* bigBallpp =
+// 	static_cast<GranularMat*>((*bodies)[bigBallId]->material.get())
+// ; ;
+// 		
+// 		Real x = bigBallpp-> se3.position[0];
+// 		
+// 		Real Dintergranular = x - (R1+R2);	
+// 	
+// 	// capillary parameters
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
         InteractionContainer::iterator iiEnd = ncb->interactions->end();
         
@@ -100,7 +100,7 @@ static_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get())
 		<< lexical_cast<string>(fy) << " " 
 		<< lexical_cast<string>(fz) << " " 
 		<< lexical_cast<string>(CapillaryPressure) << " "
-		<< lexical_cast<string>(Dintergranular)<< " "
+//		<< lexical_cast<string>(Dintergranular)<< " "
 		<< lexical_cast<string>(Vtotal)<< " " << endl;
 	
 	
@@ -108,5 +108,5 @@ static_cast<ParticleParameters*>((*bodies)[bigBallId]->physicalParameters.get())
 
 YADE_PLUGIN((CapillaryRecorder));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

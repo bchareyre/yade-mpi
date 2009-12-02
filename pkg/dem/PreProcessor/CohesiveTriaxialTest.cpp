@@ -10,7 +10,7 @@
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 //#include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -370,7 +370,7 @@ bool CohesiveTriaxialTest::generate()
 void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
 // 	#ifdef YADE_SHAPE
 // 		shared_ptr<Sphere> gSphere(new Sphere);
@@ -403,8 +403,6 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	}
 	
 	aabb->diffuseColor		= Vector3r(0,1,0);
-
-
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
@@ -427,7 +425,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
 // 	#ifdef YADE_SHAPE
 // 		shared_ptr<Box> gBox(new Box);	
@@ -455,7 +453,6 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxPoissonRatio;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
-	physics->isCohesive		= false;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 	

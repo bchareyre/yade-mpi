@@ -50,5 +50,5 @@ void CapillaryPressureEngine::applyCondition(World * rootBody)
 
 YADE_PLUGIN((CapillaryPressureEngine));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

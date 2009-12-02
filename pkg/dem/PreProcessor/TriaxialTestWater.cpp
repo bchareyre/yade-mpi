@@ -17,24 +17,17 @@
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 // #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp>
-
+#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 
-#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
-#include<yade/pkg-dem/AveragePositionRecorder.hpp>
-#include<yade/pkg-dem/ForceRecorder.hpp>
-#include<yade/pkg-dem/VelocityRecorder.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 #include <yade/pkg-dem/CapillaryStressRecorder.hpp>
 #include <yade/pkg-dem/ContactStressRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/World.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -45,10 +38,6 @@
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/PhysicalActionApplier.hpp>
-#include<yade/pkg-common/PhysicalActionDamper.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
@@ -59,8 +48,6 @@
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-
-#include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -76,7 +63,6 @@
 #include <boost/random/normal_distribution.hpp>
 
 
-YADE_REQUIRE_FEATURE(shape);
 
 using namespace boost;
 using namespace std;
@@ -323,59 +309,64 @@ bool TriaxialTestWater::generate()
 void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
+
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
+	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
+	q.Normalize();
+//	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= dynamic;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
+	body->state->angVel		= Vector3r(0,0,0);
+	body->state->vel		= Vector3r(0,0,0);
+	body->state->mass		= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	
-	physics->inertia		= Vector3r( 	2.0/5.0*physics->mass*radius*radius,
-							2.0/5.0*physics->mass*radius*radius,
-							2.0/5.0*physics->mass*radius*radius);
-	physics->se3			= Se3r(position,q);
+	body->state->inertia		= Vector3r( 	2.0/5.0*body->state->mass*radius*radius,
+			2.0/5.0*body->state->mass*radius*radius,
+   2.0/5.0*body->state->mass*radius*radius);
+	body->state->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
+	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
-// 	if((!big) && (!dynamic) && (!boxWalls))
-// 	{
-// 		physics->young			= boxYoungModulus;
-// 		physics->poisson		= boxPoissonRatio;
-// 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
-// 	}
+	if((!dynamic) && (!boxWalls))
+	{
+		physics->young			= boxYoungModulus;
+		physics->poisson		= boxPoissonRatio;
+		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
+	}
 	
 	aabb->diffuseColor		= Vector3r(0,1,0);
-
-
-	gSphere->radius			= radius;
-	gSphere->diffuseColor		= spheresColor;
-	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
-
+	iSphere->wire			= false;
+	
 	body->interactingGeometry	= iSphere;
-	body->geometricalModel		= gSphere;
+// 	#ifdef YADE_SHAPE
+// 		gSphere->radius			= radius;
+// 	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
+// 		gSphere->diffuseColor		= spheresColor;
+// 		gSphere->wire			= false;
+// 		gSphere->shadowCaster		= true;
+// 		body->geometricalModel		= gSphere;
+// 	#endif
 	body->boundingVolume		= aabb;
-	body->physicalParameters	= physics;
+	body->material	= physics;
 }
 
 
 void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
+	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+// 	#ifdef YADE_SHAPE
+// 		shared_ptr<Box> gBox(new Box);	
+// 	#endif
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
@@ -383,37 +374,32 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 
 	body->isDynamic			= false;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 0; 
+	body->state->angVel		= Vector3r(0,0,0);
+	body->state->vel		= Vector3r(0,0,0);
+	body->state->mass			= 0; 
 	//physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
-	physics->inertia		= Vector3r(
-							  physics->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
-							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
-							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
-						);
+	body->state->inertia		= Vector3r(
+			body->state->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
+			, body->state->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
+			, body->state->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
+						  );
 //	physics->mass			= 0;
 //	physics->inertia		= Vector3r(0,0,0);
-	physics->se3			= Se3r(position,q);
+	body->state->se3			= Se3r(position,q);
 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxPoissonRatio;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
-
-	gBox->extents			= extents;
-	gBox->diffuseColor		= Vector3r(1,1,1);
-	gBox->wire			= wire;
-	gBox->shadowCaster		= false;
 	
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(1,1,1);
+	iBox->wire			= wire;
 
 	body->boundingVolume		= aabb;
 	body->interactingGeometry	= iBox;
-	body->geometricalModel		= gBox;
-	body->physicalParameters	= physics;
+	body->material	= physics;	
 }
 
 
@@ -524,8 +510,8 @@ void TriaxialTestWater::createActors(shared_ptr<World>& rootBody)
 // recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
 	TriaxialStateRecorder);
-	triaxialStateRecorder-> outputFile 		= WallStressRecordFile + Key;
-	triaxialStateRecorder-> interval 		= recordIntervalIter;
+	triaxialStateRecorder-> file 		= WallStressRecordFile + Key;
+	triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
 	//triaxialStateRecorderer-> thickness 		= thickness;
 
 	// recording capillary stress
@@ -604,16 +590,11 @@ void TriaxialTestWater::createActors(shared_ptr<World>& rootBody)
 
 
 void TriaxialTestWater::positionRootBody(shared_ptr<World>& rootBody)
-{
+{	
 	rootBody->isDynamic		= false;
 
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
-	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
-	physics->se3			= Se3r(Vector3r(0,0,0),q);
-	physics->mass			= 0;
-	physics->velocity		= Vector3r::ZERO;
-	physics->acceleration		= Vector3r::ZERO;
 	
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
 	
@@ -623,9 +604,7 @@ void TriaxialTestWater::positionRootBody(shared_ptr<World>& rootBody)
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
 	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
-	rootBody->physicalParameters 	= physics;
-	
+	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);	
 }
 
 
@@ -685,5 +664,5 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 
 YADE_PLUGIN((TriaxialTestWater));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

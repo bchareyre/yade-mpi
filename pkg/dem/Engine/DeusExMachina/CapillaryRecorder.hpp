@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include <yade/core/DataRecorder.hpp>
+#include <yade/pkg-common/Recorder.hpp>
 
 #include <string>
 #include <fstream>
 
 
-class CapillaryRecorder : public DataRecorder
+class CapillaryRecorder : public Recorder
 {
 	private :
 		std::ofstream ofile; 
@@ -31,11 +31,11 @@ class CapillaryRecorder : public DataRecorder
 
 		virtual void action(World*);
 		virtual bool isActivated(World*);
-	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(bigBallId));
+	REGISTER_ATTRIBUTES(Recorder,(outputFile)(interval)(bigBallId));
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(CapillaryRecorder);
-	REGISTER_BASE_CLASS_NAME(DataRecorder);
+	REGISTER_BASE_CLASS_NAME(Recorder);
 };
 
 REGISTER_SERIALIZABLE(CapillaryRecorder);

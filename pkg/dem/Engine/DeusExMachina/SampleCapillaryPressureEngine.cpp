@@ -137,5 +137,5 @@ void SampleCapillaryPressureEngine::applyCondition(World * ncb)
 		UnbalancedForce = ComputeUnbalancedForce(ncb);
 } 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

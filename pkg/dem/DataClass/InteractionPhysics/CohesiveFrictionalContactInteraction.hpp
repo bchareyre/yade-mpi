@@ -38,19 +38,6 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 		// FIXME where this?
 		(orientationToContact1)(orientationToContact2)(initialOrientation1)(initialOrientation2)(kr)(currentContactOrientation)(initialContactOrientation)(initialPosition1)(initialPosition2)(twistCreep)
 		(moment_twist)(moment_bending)
-		/* (prevX1)(prevX2)(initX1)(initX2) */
-		//		Real		 kn				// normal elastic constant.
-		//				,ks				// shear elastic constant.
-		//				,initialKn			// initial normal elastic constant.
-		//				,initialKs			// initial shear elastic constant.
-		//				,equilibriumDistance		// equilibrium distance
-		//				,initialEquilibriumDistance	// initial equilibrium distance
-		//				,frictionAngle 			// angle of friction, according to Coulumb criterion
-		//				,tangensOfFrictionAngle;
-		//	
-		//		Vector3r	prevNormal			// unit normal of the contact plane.
-		//				,normalForce			// normal force applied on a DE
-		//				,shearForce;			// shear force applied on a DE
 	);
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactInteraction);
 	REGISTER_BASE_CLASS_NAME(ElasticContactInteraction);

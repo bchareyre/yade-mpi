@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include "CapillaryStressRecorder.hpp"
-#include <yade/pkg-common/RigidBodyParameters.hpp>
-#include <yade/pkg-common/ParticleParameters.hpp>
+//#include <yade/pkg-common/RigidBodyParameters.hpp>
+//#include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-common/InteractingSphere.hpp>
-#include <yade/pkg-dem/BodyMacroParameters.hpp>
+#include <yade/pkg-common/ElasticMat.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
@@ -21,7 +21,7 @@
 
 CREATE_LOGGER(CapillaryStressRecorder);
 
-CapillaryStressRecorder::CapillaryStressRecorder () : DataRecorder()
+CapillaryStressRecorder::CapillaryStressRecorder () : Recorder()
 
 {
 	outputFile = "";
@@ -112,16 +112,19 @@ void CapillaryStressRecorder::action(World * ncb)
 			f1_cap_y=fcap[1];
 			f1_cap_z=fcap[2];
 			
-			BodyMacroParameters* de1 		= static_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-			x1 = de1->se3.position[0];
-			y1 = de1->se3.position[1];
-			z1 = de1->se3.position[2];
+			Body* de1 = (*bodies)[id1].get();
+			Body* de2 = (*bodies)[id2].get();
+			
+// 			BodyMacroParameters* de1 		= static_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+			x1 = de1->state->pos[0];
+			y1 = de1->state->pos[1];
+			z1 = de1->state->pos[2];
 
 
-			BodyMacroParameters* de2 		= static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			x2 = de2->se3.position[0];
-			y2 = de2->se3.position[1];
-			z2 = de2->se3.position[2];
+// 			BodyMacroParameters* de2 		= static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			x2 = de2->state->pos[0];
+			y2 = de2->state->pos[1];
+			z2 = de2->state->pos[2];
 
 			///Calcul des contraintes capillaires "locales"
 			
@@ -238,5 +241,5 @@ void CapillaryStressRecorder::action(World * ncb)
 
 YADE_PLUGIN((CapillaryStressRecorder));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

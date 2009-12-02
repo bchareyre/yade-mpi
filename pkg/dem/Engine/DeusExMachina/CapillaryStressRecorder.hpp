@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <yade/core/DataRecorder.hpp>
+#include <yade/pkg-common/Recorder.hpp>
 
 #include <string>
 #include <fstream>
@@ -16,7 +16,7 @@
 class TriaxialCompressionEngine;
 class InteractingGeometry;
 
-class CapillaryStressRecorder : public DataRecorder
+class CapillaryStressRecorder : public Recorder
 {
 	private :
 		std::ofstream ofile; 
@@ -42,11 +42,11 @@ class CapillaryStressRecorder : public DataRecorder
 		virtual void action(World*);
 		virtual bool isActivated(World*);
 	DECLARE_LOGGER;
-	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)/*(wall_bottom_id)(wall_top_id)(wall_left_id)(wall_right_id)(wall_front_id)(wall_back_id)(height)(width)(depth)(thickness)(upperCorner)(lowerCorner)	*/);
+	REGISTER_ATTRIBUTES(Recorder,(outputFile)(interval)/*(wall_bottom_id)(wall_top_id)(wall_left_id)(wall_right_id)(wall_front_id)(wall_back_id)(height)(width)(depth)(thickness)(upperCorner)(lowerCorner)	*/);
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(CapillaryStressRecorder);
-	REGISTER_BASE_CLASS_NAME(DataRecorder);
+	REGISTER_BASE_CLASS_NAME(Recorder);
 };
 
 REGISTER_SERIALIZABLE(CapillaryStressRecorder);

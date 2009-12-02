@@ -15,12 +15,12 @@ class SimpleElasticRelationshipsWater : public InteractionPhysicsFunctor
 	public :
 		SimpleElasticRelationshipsWater();
 
-		virtual void go(	const shared_ptr<PhysicalParameters>& b1,
-					const shared_ptr<PhysicalParameters>& b2,
+		virtual void go(	const shared_ptr<Material>& b1,
+					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
 
 	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/* */);
-	FUNCTOR2D(BodyMacroParameters,BodyMacroParameters);
+	FUNCTOR2D(GranularMat,GranularMat);
 	REGISTER_CLASS_NAME(SimpleElasticRelationshipsWater);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
 

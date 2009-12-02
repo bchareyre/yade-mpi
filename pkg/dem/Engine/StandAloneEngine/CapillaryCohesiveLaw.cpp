@@ -13,7 +13,7 @@
 
 
 #include "CapillaryCohesiveLaw.hpp"
-#include <yade/pkg-dem/BodyMacroParameters.hpp>
+#include <yade/pkg-common/ElasticMat.hpp>
 #include <yade/pkg-dem/SpheresContactGeometry.hpp>
 
 #include <yade/pkg-dem/CapillaryParameters.hpp>
@@ -30,8 +30,6 @@
 
 using namespace std;
 
-//int compteur1 = 0;
-//int compteur2 = 0;
 
 CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver()
 {
@@ -130,21 +128,19 @@ void CapillaryCohesiveLaw::action(World* ncb)
 
                         /// definition of interacting objects (not in contact)
 
-                        BodyMacroParameters* de1 		=
-                                static_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-                        BodyMacroParameters* de2 		=
-                                static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+//                         BodyMacroParameters* de1 		=
+//                                 static_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
+//                         BodyMacroParameters* de2 		=
+//                                 static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
+			
+			Body* b1 = (*bodies)[id1].get();
+			Body* b2 = (*bodies)[id2].get();
 
                         SpheresContactGeometry* currentContactGeometry 	=
                                 static_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 
                         CapillaryParameters* currentContactPhysics 	=
                                 static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
-
-                        //SDECLinkPhysics* currentContactPhysics	= static_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
-
-                        //                         CapillaryParameters* meniscusParameters
-                        // = static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
 
                         /// Capillary components definition:
 
@@ -157,15 +153,6 @@ void CapillaryCohesiveLaw::action(World* ncb)
 
                         Real alpha=1; // OK si pas de gravite!!!
 
-//                         Real R1, R2;
-//                         if (currentContactGeometry->radius2 > currentContactGeometry->radius1) {
-//                                 R1=currentContactGeometry->radius1;
-//                                 R2=currentContactGeometry->radius2;
-//                         } else {
-//                                 R1=currentContactGeometry->radius2;
-//                                 R2=currentContactGeometry->radius1;
-//                         }
-
                         Real R1 = 0;
                         R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->radius1 ) ;
                         Real R2 = 0;
@@ -174,7 +161,7 @@ void CapillaryCohesiveLaw::action(World* ncb)
 
                         /// intergranular distance
 
-                        Real D = alpha*(de2->se3.position-de1->se3.position).Length()-alpha*(                       currentContactGeometry->radius1+ currentContactGeometry->radius2);
+                        Real D = alpha*(b2->state->pos-b1->state->pos).Length()-alpha*(                       currentContactGeometry->radius1+ currentContactGeometry->radius2);
 
 // 			Real intergranularDistance = currentContactGeometry->penetrationDepth;
 			//cerr << "D = " << intergranularDistance << endl;
@@ -711,5 +698,5 @@ BodiesMenisciiList::BodiesMenisciiList()
 	initialized=false;
 }
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 

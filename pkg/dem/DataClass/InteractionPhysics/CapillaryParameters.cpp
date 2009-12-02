@@ -19,12 +19,9 @@ CapillaryParameters::~CapillaryParameters()
 {
 }
 
-// void CapillaryParameters::postProcessAttributes(bool)
-// {
-// 
-// }
 
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+
+
 
