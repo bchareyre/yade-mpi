@@ -1,9 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004,2007 by
-*  	Olivier Galizzi <olivier.galizzi@imag.fr>
-*  	Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
-*  	Václav Šmilauer <eudoxos@arcig.cz>
-*
+*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@imag.fr>         *
+*                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
@@ -16,7 +13,7 @@
 #include<utility>
 #include<vector>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 #include<yade/extra/TesselationWrapper.h>
 
 YADE_REQUIRE_FEATURE(CGAL)
@@ -59,8 +56,7 @@ void PersistentTriangulationCollider::action ( World* ncb )
 			if ( ( *bi )->isDynamic )
 			{//means "is it a sphere (not a wall)"
 				const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->interactingGeometry.get() );
-				const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() );
-				Tes->insert ( p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, ( *bi )->getId() );
+				Tes->insert ( (*bi)->state->pos[0],(*bi)->state->pos[1],(*bi)->state->pos[2], s->radius, ( *bi )->getId() );
 			}
 		}
 		Tes->AddBoundingPlanes();
@@ -152,5 +148,5 @@ void PersistentTriangulationCollider::action ( World* ncb )
 }
 
 YADE_PLUGIN((PersistentTriangulationCollider));
-YADE_REQUIRE_FEATURE(PHYSPAR);
+
 
