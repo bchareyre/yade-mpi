@@ -7,7 +7,7 @@
 *************************************************************************/
 
 
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/pkg-common/ElasticMat.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
@@ -36,8 +36,6 @@ MicroMacroAnalyser::MicroMacroAnalyser() : StandAloneEngine()
 	outputFile = "MicroMacroAnalysis";
 	stateFileName = "./snapshots/state";
 }
-
-
 
 void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 {
@@ -126,11 +124,11 @@ void MicroMacroAnalyser::setState ( World* ncb, unsigned int state, bool saveSta
 		else {//then it is a sphere (not a wall)
 			++Ng;
 			const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->interactingGeometry.get() );
-			const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() );
-			const Vector3r& pos = p->se3.position;
+			//const GranularMat* p = YADE_CAST<GranularMat*> ( ( *bi )->material.get() );
+			const Vector3r& pos = (*bi)->state->pos;
 			Real rad = s->radius;
 
-			TS.grains[Idg].sphere = Sphere ( Point ( p->se3.position[0],p->se3.position[1],p->se3.position[2] ),  rad );
+			TS.grains[Idg].sphere = Sphere ( Point ( pos[0],pos[1],pos[2] ),  rad );
 //    TS.grains[Idg].translation = trans;
 //    grains[Idg].rotation = rot;
 			TS.box.base = Point ( min ( TS.box.base.x(), pos.X()-rad ),
@@ -226,5 +224,5 @@ void MicroMacroAnalyser::setState ( World* ncb, unsigned int state, bool saveSta
 
 
 YADE_PLUGIN((MicroMacroAnalyser));
-YADE_REQUIRE_FEATURE(PHYSPAR);
+
 
