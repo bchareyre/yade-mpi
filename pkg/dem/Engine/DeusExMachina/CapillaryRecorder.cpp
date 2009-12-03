@@ -53,8 +53,8 @@ void CapillaryRecorder::action(World * ncb)
 		fz=force[2];
 		
 	// R1 R2 -> geometricalModel // �modifier cf capllaryStressRecorder
-	Real R1 = 0.001;
-	Real R2 = 0.001;
+// 	Real R1 = 0.001;
+// 	Real R2 = 0.001;
 	
 // 	//physicalParameters de bigBall
 // 	
