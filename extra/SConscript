@@ -10,3 +10,21 @@ env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
 ])
 
 
+
+if 'cgal' in env['features']:
+	# TesselationWrapper is library compiled here, but is required by MicroMacroAnalyser in pkg/dem.
+	# Because there is no way to compile non-plugin library in pkg/, it is compiled here and
+	# YADE_LINK_EXTRA_LIB is used in MicroMacroAnalyser.cpp to declare the dependency.
+	#
+	# It also means however, that if you have exclude='extra', then TesselationWrapper will not be built
+	# and linking of microMacroAnalyser will fail. Keep that in mind.
+	#
+	# Best place for TesselationWrapper would in lib/, same as e.g. lib/import/ which contains routines
+	# for STL import used by the importer.
+	#
+	env.Install('$PREFIX/lib/yade$SUFFIX/extra',[
+		env.SharedLibrary('TesselationWrapper',env.Combine('TesselationWrapperAll.cpp',Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TesselationWrapper.cpp triangulation/test.cpp triangulation/TriaxialState.cpp'))),
+	])
+
+
+

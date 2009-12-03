@@ -181,41 +181,49 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
 
+void Omega::loadPlugins(vector<string> pluginFiles){
+	FOREACH(const string& plugin, pluginFiles){
+		LOG_DEBUG("Loading plugin "<<plugin);
+		if(!ClassFactory::instance().load(plugin)){
+			string err=ClassFactory::instance().lastError();
+			if(err.find(": undefined symbol: ")!=std::string::npos){
+				size_t pos=err.rfind(":");	assert(pos!=std::string::npos);
+				std::string sym(err,pos+2); //2 removes ": " from the beginning
+				int status=0; char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
+				LOG_FATAL(plugin<<": undefined symbol `"<<demangled_sym<<"'"); LOG_FATAL(plugin<<": "<<err); LOG_FATAL("Bailing out.");
+			}
+			else {
+				LOG_FATAL(plugin<<": "<<err<<" ."); /* leave space to not to confuse c++filt */ LOG_FATAL("Bailing out.");
+			}
+			abort();
+		}
+	}
+	list<string>& plugins(ClassFactory::instance().pluginClasses);
+	plugins.sort(); plugins.unique();
+	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
+}
+
 void Omega::scanPlugins(vector<string> baseDirs){
-	// silently skip non-existent plugin directories
+	vector<string> pluginFiles;
 	FOREACH(const string& baseDir, baseDirs){
+		// silently skip non-existent plugin directories
 		if(!filesystem::exists(baseDir)) continue;
 		try{
 			filesystem::recursive_directory_iterator Iend;
 			for(filesystem::recursive_directory_iterator I(baseDir); I!=Iend; ++I){ 
 				filesystem::path pth=I->path();
 				if(filesystem::is_directory(pth) || !algorithm::starts_with(pth.leaf(),"lib") || !algorithm::ends_with(pth.leaf(),".so")) { LOG_DEBUG("File not considered a plugin: "<<pth.leaf()<<"."); continue; }
-				LOG_DEBUG("Trying "<<pth.leaf());
 				filesystem::path name(filesystem::basename(pth));
 				if(name.leaf().length()<1) continue; // filter out 0-length filenames
-				string plugin=name.leaf();
-				if(!ClassFactory::instance().load(pth.string())){
-					string err=ClassFactory::instance().lastError();
-					if(err.find(": undefined symbol: ")!=std::string::npos){
-						size_t pos=err.rfind(":");	assert(pos!=std::string::npos);
-						std::string sym(err,pos+2); //2 removes ": " from the beginning
-						int status=0; char* demangled_sym=abi::__cxa_demangle(sym.c_str(),0,0,&status);
-						LOG_FATAL(plugin<<": undefined symbol `"<<demangled_sym<<"'"); LOG_FATAL(plugin<<": "<<err); LOG_FATAL("Bailing out.");
-					}
-					else {
-						LOG_FATAL(plugin<<": "<<err<<" ."); /* leave space to not to confuse c++filt */ LOG_FATAL("Bailing out.");
-					}
-					abort();
-				}
+				LOG_DEBUG("Will load plugin "<<pth.leaf());
+				pluginFiles.push_back(pth.string());
 			}
 		} catch(filesystem::basic_filesystem_error<filesystem::path>& e) {
 			LOG_FATAL("Error from recursive plugin directory scan (unreadable directory?): "<<e.what());
 			throw;
 		}
 	}
-	list<string>& plugins(ClassFactory::instance().pluginClasses);
-	plugins.sort(); plugins.unique();
-	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
+	loadPlugins(pluginFiles);
 }
 
 void Omega::loadSimulationFromStream(std::istream& stream){

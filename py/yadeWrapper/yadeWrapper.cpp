@@ -527,6 +527,10 @@ class pyOmega{
 		if(OMEGA.getWorld()->isPeriodic){ return python::make_tuple(OMEGA.getWorld()->cellMin,OMEGA.getWorld()->cellMax); }
 		return python::make_tuple();
 	}
+	void disableGdb(){
+		signal(SIGSEGV,SIG_DFL);
+		signal(SIGABRT,SIG_DFL);
+	}
 	void exitNoBacktrace(int status=0){
 		signal(SIGSEGV,termHandler); /* unset the handler that runs gdb and prints backtrace */
 		exit(status);
@@ -722,6 +726,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
 		.add_property("periodicCell",&pyOmega::periodicCell_get,&pyOmega::periodicCell_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.")
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads(python::args("status"),"Disable our SEGV handler and exit."))
+		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
 		#endif

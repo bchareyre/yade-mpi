@@ -117,7 +117,7 @@ void PythonUI::pythonSession(){
 			// wrap those in python::handle<> ??
 			PYTHON_DEFINE_STRING("prefix",prefix);
 			PYTHON_DEFINE_STRING("suffix",SUFFIX);
-			PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
+			if(Omega::instance().origArgv) PYTHON_DEFINE_STRING("executable",Omega::instance().origArgv[0]);
 			PYTHON_DEFINE_STRING("simulation",Omega::instance().getSimulationFileName());
 			PYTHON_DEFINE_STRING("script",runScript);
 			PYTHON_DEFINE_RAW("features",features);

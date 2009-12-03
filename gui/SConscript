@@ -50,7 +50,6 @@ env.InstallAs('$PREFIX/bin/yade$SUFFIX-multi',env.File('yade-multi','py'))
 # these modules will not be imported directly (probably)
 # the rest was moved to py/ directory
 env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
-	env.File('__init__.py','py'),
 	env.File('runtime.py','py'),
 	env.File('ipython.py','py'),
 	env.File('PythonTCPServer.py','py'),

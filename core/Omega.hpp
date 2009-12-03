@@ -127,6 +127,7 @@ class Omega: public Singleton<Omega>
 
 		const		map<string,DynlibDescriptor>& getDynlibsDescriptor();
 		void		scanPlugins(vector<string> baseDirs);
+		void		loadPlugins(vector<string> pluginFiles);
 		bool		isInheritingFrom(const string& className, const string& baseClassName );
 
 		void		setTimeStep(const Real);

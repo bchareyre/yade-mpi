@@ -2,84 +2,67 @@
 # encoding: utf-8
 # syntax:python
 
-import sys,ctypes
-try:
-	import dl
-except ImportError:
-	import DLFCN as dl
-# see file:///usr/share/doc/python2.6/html/library/sys.html#sys.setdlopenflags
-# and various web posts on the topic, e.g.
-# * http://gcc.gnu.org/faq.html#dso
-# * http://www.code-muse.com/blog/?p=58
-# * http://wiki.python.org/moin/boost.python/CrossExtensionModuleDependencies
-sys.setdlopenflags(dl.RTLD_NOW | dl.RTLD_GLOBAL)
-# important: initialize c++ by importing libstdc++ directly
-# see http://www.abclinuxu.cz/poradna/programovani/show/286322
-# https://bugs.launchpad.net/bugs/490744
-libstdcxx='${libstdcxx}' # substituted by scons
-ctypes.cdll.LoadLibrary(libstdcxx)
+import sys,os,os.path
+# get yade path (allow YADE_PREFIX to override)
+prefix,suffix='${PREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
+sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
+
+# initialization and c++ plugins import
+import yade
+# other parts we will need soon
+import yade.config
+import yade.wrapper
+import yade.log
 
 
+# handle command-line options first
+import optparse
+par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(yade.config.version,','.join(yade.config.features)))
+par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores.',dest='threads',type='int')
+par.add_option('-x',help='Exit when the script finishes',dest='exitAfter')
+if 'log4cxx' in yade.config.features:
+	par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.',action='count',dest='verbosity')
+if yade.config.debug:
+	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
 
-# find what is our version, based on argv[0]
-# should be improved
-import sys,re,os,os.path
-m=re.match('(.*)/bin/yade(-.*)-py',sys.argv[0])
-if not m: raise RuntimeError("Unable to find prefix and yade version from argv[0]=='%s'."%sys.argv[0])
-prefix,suffix=m.group(1),m.group(2)
-libDir=prefix+'/lib/yade'+suffix
-pluginDirs=[libDir+dir for dir in ('','/plugins','/gui','/extra') if os.path.exists(libDir+dir)]
-sys.path.append(libDir+'/py')
+opts,args=par.parse_args()
 
-# this works, cool!
-## os.environ['OMP_NUM_THREADS']=str(1)
+if opts.threads:
+	os.environ['OMP_NUM_THREADS']=str(opts.threads)
+if yade.config.debug and opts.noGdb:
+	yade.wrapper.Omega().disableGdb()
+if 'log4cxx' in yade.config.features and opts.verbosity:
+	yade.log.setLevel([yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,3)])
 
-# now we can import yade's c++ modules just fine
-import yade.boot
-yade.boot.initialize(pluginDirs,True)
-
-from math import *
-from yade.wrapper import *
-from miniWm3Wrap import *
-from yade._customConverters import *
-from yade import runtime
-from yade import utils
-
-# get some scons things here
-runtime.features='${features}'.split(',') # substituted by scons
-
-runtime.prefix,runtime.suffix=prefix,suffix
-runtime.argv=sys.argv
-# todo
-runtime.stopAfter=False
-# todo
-runtime.nonInteractive=False
-# todo
-runtime.simulation=''
-runtime.script=''
-for arg in sys.argv:
-	if arg.endswith('.xml') or arg.endswith('.xml.bz2'): runtime.simulation=arg
-	elif arg.endswith('.py'): runtime.script=arg
-
+# open GUI if possible
 try:
 	import yade.qt
 	yade.qt.Controller()
 except ImportError: pass
-#
-# this fills __builtins__ with wrapped types and proxy classes; it could be factored out, though
-#
-execfile(prefix+'/lib/yade'+suffix+'/gui/PythonUI_rc.py')
 
+# be nice to users
+from math import *
+from miniWm3Wrap import *
 
-#setupPythonRuntime()
+# something to run?
+if len(args)>0:
+	if args[0].endswith('.xml') or args[0].endswith('.xml.bz2'):
+		if len(args)>1: raise RuntimeError('Extra arguments to XML simulation to run: '+' '.join(args[1:]))
+		print "Running simulation "+args[0]
+		O=yade.wrapper.Omega(); O.load(args[0]); O.run()
+	if args[0].endswith('.py'):
+		print "Running script "+args[0]
+		yade.runtime.argv=args[1:]
+		execfile(args[0])
+		if opts.exitAfter: sys.exit(0)
 
-#sys.argv[0]='<embedded python interpreter>'
-if 0:
-	if 0:
+# show python command-line
+if 1:
+	if 1:
 		from IPython.Shell import IPShellEmbed
-		ipshell=IPShellEmbed(exit_msg='Bye.',rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/py/yade/ipython.py']})
+		ipshell=IPShellEmbed(exit_msg='Bye.',rc_override={'execfile':[prefix+'/lib/yade'+suffix+'/py/yade/ipython.py']})
 		ipshell()
 	else:
 		import bpython
 		bpython.embed()
-
+O.exitNoBacktrace()

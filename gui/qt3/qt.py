@@ -38,8 +38,8 @@ def makeSimulationVideo(output,realPeriod=1,virtPeriod=0,iterPeriod=0,viewNo=0,f
 	O.engines=origEngines
 
 
-import yade.runtime
-if 'deprecated' in yade.runtime.features:
+import yade.config
+if 'deprecated' in yade.config.features:
 	def makePlayerVideo(playerDb,out,viewerState=None,dispParamsNo=-1,stride=1,fps=24,postLoadHook=None,startWait=False):
 		"""Create video by replaying a simulation. Snapshots are taken to temporary files,
 		encoded to a .ogg stream (theora codec); temps are deleted at the end.

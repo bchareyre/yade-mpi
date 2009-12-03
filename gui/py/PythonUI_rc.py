@@ -12,8 +12,6 @@ from yade import runtime
 from yade import utils
 
 import yade.system
-yade.system.setExitHandlers()
-yade.system.injectCtors()
 yade.system.runServers()
 
 
@@ -53,13 +51,14 @@ if not runtime.__dict__.has_key('noSession'):
 		else:
 			sys.argv[0]='<embedded python interpreter>'
 			from IPython.Shell import IPShellEmbed
-			ipshell = IPShellEmbed(banner=r"""
+			banner=r"""
 		__   __    ____          ____                      _      
 		\ \ / /_ _|  _ \  ___   / ___|___  _ __  ___  ___ | | ___ 
 		 \ V / _` | | | |/ _ \ | |   / _ \| '_ \/ __|/ _ \| |/ _ \ 
 		  | | (_| | |_| |  __/ | |__| (_) | | | \__ \ (_) | |  __/
 		  |_|\__,_|____/ \___|  \____\___/|_| |_|___/\___/|_|\___|
-		""",exit_msg='Bye.'
+		"""
+			ipshell = IPShellEmbed(banner='',exit_msg=None
 			,rc_override={'execfile':[runtime.prefix+'/lib/yade'+runtime.suffix+'/py/yade/ipython.py']})
 
 			ipshell()

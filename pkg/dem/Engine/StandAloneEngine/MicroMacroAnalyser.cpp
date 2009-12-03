@@ -23,7 +23,11 @@
 #include<yade/extra/KinematicLocalisationAnalyser.hpp>
 #include<yade/extra/TriaxialState.h>
 
+YADE_PLUGIN((MicroMacroAnalyser));
 YADE_REQUIRE_FEATURE(CGAL)
+// see comment in extra/SConscript
+YADE_LINK_EXTRA_LIB(TesselationWrapper)
+
 
 CREATE_LOGGER(MicroMacroAnalyser);
 
@@ -223,6 +227,5 @@ void MicroMacroAnalyser::setState ( World* ncb, unsigned int state, bool saveSta
 
 
 
-YADE_PLUGIN((MicroMacroAnalyser));
 
 

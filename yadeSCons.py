@@ -4,10 +4,6 @@ def getRealVersion():
 	import os.path,re,os
 	if os.path.exists('RELEASE'):
 		return file('RELEASE').readline().strip()
-	if os.path.exists('.svn'):
-		for l in os.popen("LC_ALL=C svn info").readlines():
-			m=re.match(r'Revision: ([0-9]+)',l)
-			if m: return 'svn'+m.group(1)
 	if os.path.exists('.bzr'):
 		for l in os.popen("LC_ALL=C bzr version-info 2>/dev/null").readlines():
 			m=re.match(r'revno: ([0-9]+)',l)
@@ -81,6 +77,9 @@ def scanAllPlugins(cacheFile,feats):
 					m=re.match('^\s*YADE_REQUIRE_FEATURE\((.*)\).*$',l)
 					if m:
 						featureDeps.add(m.group(1).upper())
+					m=re.match('^s*YADE_LINK_EXTRA_LIB\((.*)\).*$',l)
+					if m:
+						linkDeps.add('!'+m.group(1)) # hack!! see getPLuginLibs
 					m=re.match('^\s*#include\s*"([^/]*)".*$',l)
 					if m:
 						inc=m.group(1); incBaseName=m.group(1).split('.')[0]
@@ -129,6 +128,8 @@ def getPluginLibs(p,plugInfo):
 	for dep in p.deps:
 		if dep in plugInfo.keys():
 			ret.add(plugInfo[dep].obj)
+		elif dep.startswith('!'):
+			ret.add(dep[1:])
 		else:
 			pass
 			#print p.src+':',dep,"not a plugin?"

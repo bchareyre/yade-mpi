@@ -190,4 +190,5 @@ class ClassFactory : public Singleton<ClassFactory>
 #define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor)) void BOOST_PP_CAT(registerThisPluginClasses_,BOOST_PP_SEQ_HEAD(plugins)) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
 //! Macro informing build file generator what features that particular file depends on. Has no effect at compile-time. Can be specified multiple times within a single (.cpp) file
 #define YADE_REQUIRE_FEATURE(feature)
+#define YADE_LINK_EXTRA_LIB(lib)
 

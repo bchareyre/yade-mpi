@@ -8,7 +8,7 @@ import sys
 from yade import wrapper
 from yade._customConverters import *
 from yade import runtime
-__builtins__['O']=wrapper.Omega()
+O=wrapper.Omega()
 
 def childClasses(base):
 	"""Recursively enumerate classes deriving from given base (as string). Returns set."""
@@ -47,15 +47,16 @@ _deprecated={
 }
 
 
-def injectCtors(proxyNamespace=__builtins__):
-	"""Input wrapped classes as well as proxies for their derived types into the __builtins__ namespace. Should be invoked at yade startup.
+def cxxCtorsDict(proxyNamespace=__builtins__):
+	"""Return dictionary of class constructors for yade's c++ types, which should be used to update a namespace.
 	
-	Root classes are those that are directly wrapped by boost::python. These are only imported to proxyNamespace.
+	Root classes are those that are directly wrapped by boost::python. These are only put to the dict.
 
 	Derived classes (from these root classes) are faked by creating a callable which invokes appropriate root class constructor with the derived class parameter and passes remaining arguments to it.
 
 	Classes that are neither root nor derived are exposed via callable object that constructs a Serializable of given type and passes the parameters.
 	"""
+	proxyNamespace={}
 	# classes derived from wrappers (but not from Serializable directly)
 	for root in _pyRootClasses:
 		try:
@@ -80,6 +81,7 @@ def injectCtors(proxyNamespace=__builtins__):
 				import warnings; warnings.warn("Class `%s' was renamed to (or replaced by) `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
 				return proxyNamespace[self.new](*args,**kw)
 		proxyNamespace[oldName]=warnWrap(oldName,_deprecated[oldName])
+	return proxyNamespace
 
 def setExitHandlers():
 	"""Set exit handler to avoid gdb run if log4cxx crashes at exit.

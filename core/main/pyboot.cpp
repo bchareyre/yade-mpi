@@ -11,7 +11,20 @@
 #include<boost/python.hpp>
 
 #ifdef YADE_LOG4CXX
-	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
+	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.boot");
+	/* initialize here so that ClassFactory can use log4cxx without warnings */
+	__attribute__((constructor)) void initLog4cxx() {
+		#ifdef LOG4CXX_TRACE
+			log4cxx::LevelPtr debugLevel=log4cxx::Level::getDebug(), infoLevel=log4cxx::Level::getInfo(), warnLevel=log4cxx::Level::getWarn();
+		#else
+			log4cxx::LevelPtr debugLevel=log4cxx::Level::DEBUG, infoLevel=log4cxx::Level::INFO, warnLevel=log4cxx::Level::WARN;
+		#endif
+
+		log4cxx::BasicConfigurator::configure();
+		log4cxx::LoggerPtr localLogger=log4cxx::Logger::getLogger("yade");
+		localLogger->setLevel(getenv("YADE_DEBUG")?debugLevel:warnLevel);
+		LOG4CXX_DEBUG(localLogger,"Log4cxx initialized.");
+	}
 #endif
 
 #ifdef YADE_DEBUG
@@ -28,19 +41,8 @@
 	}		
 #endif
 
-/* Initialize yade, scan given directories for plugins and load them */
-void yadeInitialize(python::list& dd, bool gdb){
-	#ifdef YADE_LOG4CXX
-		#ifdef LOG4CXX_TRACE
-			log4cxx::LevelPtr debugLevel=log4cxx::Level::getDebug(), infoLevel=log4cxx::Level::getInfo(), warnLevel=log4cxx::Level::getWarn();
-		#else
-			log4cxx::LevelPtr debugLevel=log4cxx::Level::DEBUG, infoLevel=log4cxx::Level::INFO, warnLevel=log4cxx::Level::WARN;
-		#endif
-
-		log4cxx::BasicConfigurator::configure();
-		log4cxx::LoggerPtr localLogger=log4cxx::Logger::getLogger("yade");
-		localLogger->setLevel(getenv("YADE_DEBUG")?debugLevel:warnLevel);
-	#endif
+/* Initialize yade, loading given plugins */
+void yadeInitialize(python::list& pp){
 
 	PyEval_InitThreads();
 
@@ -49,23 +51,18 @@ void yadeInitialize(python::list& dd, bool gdb){
 	O.origArgv=NULL; O.origArgc=0; // not needed, anyway
 	O.initTemps();
 	#ifdef YADE_DEBUG
-		if(gdb){
-			ofstream gdbBatch;
-			O.gdbCrashBatch=O.tmpFilename();
-			gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
-			signal(SIGABRT,crashHandler);
-			signal(SIGSEGV,crashHandler);
-		}
+		ofstream gdbBatch;
+		O.gdbCrashBatch=O.tmpFilename();
+		gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
+		signal(SIGABRT,crashHandler);
+		signal(SIGSEGV,crashHandler);
 	#endif
-	vector<string> dd2; for(int i=0; i<python::len(dd); i++) dd2.push_back(python::extract<string>(dd[i]));
-	//TODO: call Omega::instance().buildDynlibDatabase(dd2); and scan directories for plugins in the python boot part (gets rid of ugly Omega code once no c++ main exists)
-	Omega::instance().scanPlugins(dd2);
+	vector<string> ppp; for(int i=0; i<python::len(pp); i++) ppp.push_back(python::extract<string>(pp[i]));
+	Omega::instance().loadPlugins(ppp);
 }
 void yadeFinalize(){ Omega::instance().cleanupTemps(); }
 
 BOOST_PYTHON_MODULE(boot){
-	// FIXME: still a crasher with openmp or OpenGL...
-	// cerr<<"[boot]"<<endl;
 	python::scope().attr("initialize")=&yadeInitialize;
 	python::scope().attr("finalize")=&yadeFinalize; //,"Finalize yade (only to be used internally).")
 }

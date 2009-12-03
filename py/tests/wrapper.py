@@ -11,19 +11,12 @@ from yade.wrapper import *
 from miniWm3Wrap import *
 from yade._customConverters import *
 from math import *
-
-
-# copied from PythonUI_rc, should be in some common place (utils? runtime?)
-def listChildClassesRecursive(base):
-	ret=set(O.childClasses(base)); ret2=set()
-	for bb in ret:
-		ret2|=listChildClassesRecursive(bb)
-	return ret | ret2
+from yade import system
 
 
 rootClasses=set(['StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator','BoundingVolumeFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','ConstitutiveLaw','Material','State'])
 
-allClasses=listChildClassesRecursive('Serializable')
+allClasses=system.childClasses('Serializable')
 
 class TestObjectInstantiation(unittest.TestCase):
 	def setUp(self):
@@ -42,7 +35,7 @@ class TestObjectInstantiation(unittest.TestCase):
 	def testRootDerivedCtors(self):
 		# classes that are not root classes but derive from them can be instantiated by their name
 		for r in rootClasses:
-			for c in listChildClassesRecursive(r):
+			for c in system.childClasses(r):
 				obj=eval(c)(); self.assert_(obj.name==c,'Failed for '+c)
 	def testRootDerivedCtors_attrs_few(self):
 		# attributes passed when using the Foo(attr1=value1,attr2=value2) syntax
