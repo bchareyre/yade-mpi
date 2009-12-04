@@ -357,7 +357,7 @@ void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id
 	const shared_ptr<Interaction>& I=interactions->find(id1,id2);
 	bool hasInter=(bool)I;
 	#ifdef PISC_DEBUG
-		if(watchIds(id1,id2)) LOG_INFO("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
+		if(watchIds(id1,id2)) LOG_DEBUG("Inversion #"<<id1<<"+#"<<id2<<", overlap=="<<overlap<<", hasInter=="<<hasInter);
 	#endif
 	// interaction doesn't exist and shouldn't, or it exists and should
 	if(!overlap && !hasInter) return;
@@ -365,14 +365,14 @@ void InsertionSortCollider::handleBoundInversionPeri(body_id_t id1, body_id_t id
 	// create interaction if not yet existing
 	if(overlap && !hasInter){ // second condition only for readability
 		#ifdef PISC_DEBUG
-			if(watchIds(id1,id2)) LOG_INFO("Attemtping collision of #"<<id1<<"+#"<<id2);
+			if(watchIds(id1,id2)) LOG_DEBUG("Attemtping collision of #"<<id1<<"+#"<<id2);
 		#endif
 		if(!Collider::mayCollide(Body::byId(id1,rb).get(),Body::byId(id2,rb).get())) return;
 		// LOG_TRACE("Creating new interaction #"<<id1<<"+#"<<id2);
 		shared_ptr<Interaction> newI=shared_ptr<Interaction>(new Interaction(id1,id2));
 		newI->cellDist=periods;
 		#ifdef PISC_DEBUG
-			if(watchIds(id1,id2)) LOG_INFO("Created intr #"<<id1<<"+#"<<id2<<", periods="<<periods);
+			if(watchIds(id1,id2)) LOG_DEBUG("Created intr #"<<id1<<"+#"<<id2<<", periods="<<periods);
 		#endif
 		interactions->insert(newI);
 		return;
@@ -430,8 +430,13 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Worl
 		if(!(mn1<=mx2 && mx1 >= mn2)) return false;
 	}
 	#ifdef PISC_DEBUG
-		if(watchIds(id1,id2)) LOG_INFO("Overlap #"<<id1<<"+#"<<id2<<", periods "<<periods);
+		if(watchIds(id1,id2)) LOG_DEBUG("Overlap #"<<id1<<"+#"<<id2<<", periods "<<periods);
 	#endif
 	return true;
 }
 
+#ifdef PISC_DEBUG
+	bool InsertionSortCollider::watchIds(body_id_t id1, body_id_t id2) const{
+		return true; //id1==1 || id2==1;
+	}
+#endif

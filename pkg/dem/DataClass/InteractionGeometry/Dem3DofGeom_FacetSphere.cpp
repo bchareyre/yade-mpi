@@ -152,7 +152,7 @@ bool ef2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1
 		fs->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		fs->cp2rel.Normalize();
 	}
-	fs->se31=state1.se3; fs->se32=state2.se3;
+	fs->se31=state1.se3; fs->se32=state2.se3; fs->se32.position+=shift2;
 	fs->normal=normalGlob;
 	fs->contactPoint=state2.pos+shift2+(-normalGlob)*(sphereRadius-penetrationDepth);
 	return true;

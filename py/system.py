@@ -92,7 +92,7 @@ def setExitHandlers():
 		def _quit(): import sys; sys.exit(0)
 		__builtins__['quit']=_quit
 	# avoid backtrace at regular exit, even if we crash
-	sys.exit=O.exitNoBacktrace
+	sys.exit=wrapper.Omega().exitNoBacktrace
 	#sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
 
 def runServers():

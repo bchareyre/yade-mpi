@@ -4,6 +4,8 @@
 See https://yade.hmg.inpg.fr/index.php/Speed_profiling_using_TimingInfo_and_TimingDeltas_classes
 for more details on usage."""
 
+from yade import *
+
 
 def _resetEngine(e):
 	if e.timingDeltas: e.timingDeltas.reset()

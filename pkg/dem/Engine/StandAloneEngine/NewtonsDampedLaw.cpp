@@ -129,7 +129,7 @@ void NewtonsDampedLaw::action(World * ncb)
 					state->angAccel+=dAngAccel;
 					FOREACH(Clump::memberMap::value_type mm, static_cast<Clump*>(b.get())->members){
 						const body_id_t& memberId=mm.first;
-						const shared_ptr<Body>& member=Body::byId(memberId,ncb); assert(b->isClumpMember());
+						const shared_ptr<Body>& member=Body::byId(memberId,ncb); assert(member->isClumpMember());
 						State* memberState=member->state.get();
 						handleClumpMemberAccel(ncb,memberId,memberState,state);
 						handleClumpMemberAngAccel(ncb,memberId,memberState,state);

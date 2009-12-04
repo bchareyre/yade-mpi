@@ -5,7 +5,7 @@ Includes a clump.
 
 from yade import log,timing
 
-#log.setLevel("PeriodicInsertionSortCollider",log.TRACE)
+#log.setLevel("InsertionSortCollider",log.DEBUG)
 O.engines=[
 	BexResetter(),
 	BoundingVolumeMetaEngine([InteractingSphere2AABB(),MetaInteractingGeometry2AABB()]),

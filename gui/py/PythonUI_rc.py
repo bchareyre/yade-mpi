@@ -8,6 +8,7 @@ from math import *
 from miniWm3Wrap import *
 from yade.wrapper import *
 from yade._customConverters import *
+from yade import * # types
 from yade import runtime
 from yade import utils
 

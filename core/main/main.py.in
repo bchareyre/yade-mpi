@@ -41,8 +41,8 @@ try:
 except ImportError: pass
 
 # be nice to users
+from yade import *
 from math import *
-from miniWm3Wrap import *
 
 # something to run?
 if len(args)>0:

@@ -68,7 +68,7 @@ bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1,
 		ws->cp2rel.Normalize();
 		//LOG_INFO(ws->cp1pt);
 	}
-	ws->se31=state1.se3; ws->se32=state2.se3;
+	ws->se31=state1.se3; ws->se32=state2.se3; ws->se32.position+=shift2;
 	ws->contactPoint=contPt;
 	ws->normal=normalGlob;
 	return true;

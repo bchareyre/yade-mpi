@@ -179,7 +179,7 @@ bool ef2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm
 	}
 	ss->normal=normal;
 	ss->contactPoint=state1.pos+(ss->effR1-.5*(ss->refLength-dist))*ss->normal;
-	ss->se31=state1.se3; ss->se32=state2.se3;
+	ss->se31=state1.se3; ss->se32=state2.se3; ss->se32.position+=shift2;
 	return true;
 }
 

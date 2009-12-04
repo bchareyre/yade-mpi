@@ -19,7 +19,7 @@ from math import sqrt
 from yade import utils
 
 from miniWm3Wrap import *
-from yade.wrapper import *
+from yade import *
 
 ## compatibility hack for python 2.5 (21/8/2009)
 ## can be safely removed at some point

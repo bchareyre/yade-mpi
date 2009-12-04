@@ -118,6 +118,9 @@ class InsertionSortCollider: public Collider{
 			return coord>b.coord;
 		}
 	};
+	#ifdef PISC_DEBUG
+		bool watchIds(body_id_t id1,body_id_t id2) const;
+	#endif
 	#ifdef COLLIDE_STRIDED
 		// keep this dispatcher and call it ourselves as needed
 		shared_ptr<BoundingVolumeDispatcher> boundDispatcher;

@@ -898,5 +898,6 @@ BOOST_PYTHON_MODULE(wrapper)
 	EXPOSE_CXX_CLASS(FileGenerator)
 		.def("generate",&FileGenerator_generate)
 		.def("load",&FileGenerator_load);
+	python::scope().attr("O")=pyOmega();
 }
 

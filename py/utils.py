@@ -10,6 +10,7 @@ Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
 
 import math,random
+from yade import *
 from yade.wrapper import *
 from miniWm3Wrap import *
 try: # use psyco if available
