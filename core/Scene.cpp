@@ -48,7 +48,7 @@ Scene::Scene() :
 	selectedBody=-1;
 	isPeriodic=false;
 	// FIXME: move MetaInteractingGeometry to core and create it here right away
-	// interactingGeometry=shared_ptr<Shape>(new MetaInteractingGeometry);
+	// shape=shared_ptr<Shape>(new MetaInteractingGeometry);
 	material=shared_ptr<Material>(new Material);
 
 	// fill default tags

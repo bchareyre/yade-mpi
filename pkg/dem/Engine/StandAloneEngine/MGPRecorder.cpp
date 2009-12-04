@@ -62,12 +62,12 @@ void MGPRecorder::action(Scene * ncb)
 	 if (b->isClump()) continue;
 	 
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-     const Shape* gm   = YADE_CAST<Shape*>(b->interactingGeometry.get());
+     const Shape* gm   = YADE_CAST<Shape*>(b->shape.get());
 
      if ( typeid(*gm) == typeid(InteractingSphere) )
      {
       ofs << "   <body>" << endl;
-      ofs << "    <SPHER id=\"" << b->getId() << "\" r=\"" << YADE_CAST<InteractingSphere*>(b->interactingGeometry.get())->radius << "\">" << endl;
+      ofs << "    <SPHER id=\"" << b->getId() << "\" r=\"" << YADE_CAST<InteractingSphere*>(b->shape.get())->radius << "\">" << endl;
       ofs << "     <position x=\"" << p->se3.position[0] << "\" y=\"" 
           << p->se3.position[1] << "\" z=\"" << p->se3.position[2] << "\"/>" << endl;   
       ofs << "     <velocity x=\"" << p->velocity[0] << "\" y=\"" 

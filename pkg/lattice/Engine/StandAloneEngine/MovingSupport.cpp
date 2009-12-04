@@ -198,8 +198,8 @@ void MovingSupport::action(Scene * ncb)
 				node1->displacementIncremental += DI; 
 				node2->displacementIncremental -= DI;
 
-				(*(ncb->bodies))[id1]->interactingGeometry->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0); // FIXME [1]
-				(*(ncb->bodies))[id2]->interactingGeometry->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0); // FIXME [1]
+				(*(ncb->bodies))[id1]->shape->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0); // FIXME [1]
+				(*(ncb->bodies))[id2]->shape->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0); // FIXME [1]
 			}
 		}
 	}

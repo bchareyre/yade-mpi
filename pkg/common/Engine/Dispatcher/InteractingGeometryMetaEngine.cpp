@@ -20,10 +20,10 @@ void InteractingGeometryMetaEngine::action(Scene* ncb)
 	// #pragma omp parallel for
 	for(int id=0; id<numBodies; id++){
 		const shared_ptr<Body>& b=(*bodies)[id];
-		if(b->geometricalModel && b->interactingGeometry) operator()(b->geometricalModel,b->interactingGeometry,b->physicalParameters->se3,b.get());
+		if(b->geometricalModel && b->shape) operator()(b->geometricalModel,b->shape,b->physicalParameters->se3,b.get());
 	}
-	if(ncb->geometricalModel && ncb->interactingGeometry)
-		operator()(ncb->geometricalModel,ncb->interactingGeometry,ncb->physicalParameters->se3,ncb);
+	if(ncb->geometricalModel && ncb->shape)
+		operator()(ncb->geometricalModel,ncb->shape,ncb->physicalParameters->se3,ncb);
 }
 
 YADE_PLUGIN((InteractingGeometryMetaEngine));

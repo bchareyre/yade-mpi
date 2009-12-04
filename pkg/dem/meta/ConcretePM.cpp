@@ -389,6 +389,6 @@ void CpmStateUpdater::update(Scene* _rootBody){
 			}
 		}
 		else { state->normDmg=0; state->normEpsPl=0;}
-		B->interactingGeometry->diffuseColor=Vector3r(state->normDmg,1-state->normDmg,B->isDynamic?0:1);
+		B->shape->diffuseColor=Vector3r(state->normDmg,1-state->normDmg,B->isDynamic?0:1);
 	}
 }

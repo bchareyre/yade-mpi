@@ -463,8 +463,8 @@ void LatticeExampleCTData::calcBeamAngles(
 
 void LatticeExampleCTData::make_simulation_loop(shared_ptr<Scene>& )
 {
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
 	geometricalModelDispatcher->add("LatticeSet2LatticeBeams");
@@ -476,12 +476,12 @@ void LatticeExampleCTData::make_simulation_loop(shared_ptr<Scene>& )
 	latticeLaw->tension_compression_different_stiffness = false;
 
 	rootBody->engines.clear();
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(latticeLaw);
 	rootBody->engines.push_back(geometricalModelDispatcher);
 
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 }
 
@@ -511,8 +511,8 @@ void LatticeExampleCTData::positionRootBody(shared_ptr<Scene>& rootBody)
 	gm->wire 			= false;
 	gm->shadowCaster 		= true;
 
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->geometricalModel 	= gm;
 	rootBody->physicalParameters 	= physics;
 }

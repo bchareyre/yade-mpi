@@ -84,15 +84,15 @@ bool UniaxialStrainerGen::generate(){
 void UniaxialStrainerGen::createEngines(){
 	rootBody->initializers.clear();
 
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-		boundingVolumeDispatcher->add(new InteractingSphere2AABB);
-		boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
-		rootBody->initializers.push_back(boundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+		boundDispatcher->add(new InteractingSphere2AABB);
+		boundDispatcher->add(new MetaInteractingGeometry2AABB);
+		rootBody->initializers.push_back(boundDispatcher);
 
 	rootBody->engines.clear();
 
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 		rootBody->engines.push_back(collider);

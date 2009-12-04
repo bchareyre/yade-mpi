@@ -118,9 +118,9 @@ void CapillaryCohesiveLaw::action(Scene* ncb)
                                 continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 			
                         /// interaction geometry search
-			int geometryIndex1 = (*bodies)[id1]->interactingGeometry->getClassIndex(); // !!!
+			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!
                         //cerr << "geo1 =" << geometryIndex1 << endl;
-                        int geometryIndex2 = (*bodies)[id2]->interactingGeometry->getClassIndex();
+                        int geometryIndex2 = (*bodies)[id2]->shape->getClassIndex();
                         //cerr << "geo2 =" << geometryIndex2 << endl;
 
                         if (!(geometryIndex1 == geometryIndex2))

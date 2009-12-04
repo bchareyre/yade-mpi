@@ -345,7 +345,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	iSphere->wire			= false;
 	
-	body->interactingGeometry	= iSphere;
+	body->shape	= iSphere;
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		gSphere->radius			= radius;
 // 	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
@@ -354,7 +354,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 // 		gSphere->shadowCaster		= true;
 // 		body->geometricalModel		= gSphere;
 // 	#endif
-	body->boundingVolume		= aabb;
+	body->bound		= aabb;
 	body->material	= physics;
 }
 
@@ -397,8 +397,8 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	iBox->diffuseColor		= Vector3r(1,1,1);
 	iBox->wire			= wire;
 
-	body->boundingVolume		= aabb;
-	body->interactingGeometry	= iBox;
+	body->bound		= aabb;
+	body->shape	= iBox;
 	body->material	= physics;	
 }
 
@@ -428,14 +428,14 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add(ss);
 	
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	
 	shared_ptr<InteractingSphere2AABB> interactingSphere2AABB(new InteractingSphere2AABB);
 	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
 	
-	boundingVolumeDispatcher->add(interactingSphere2AABB);
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	boundDispatcher->add(interactingSphere2AABB);
+	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -549,7 +549,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -584,7 +584,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 	
 }
 
@@ -603,8 +603,8 @@ void TriaxialTestWater::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);	
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);	
 }
 
 

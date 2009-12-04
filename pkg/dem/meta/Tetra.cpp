@@ -565,7 +565,7 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	//const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
 	State* rbp=tetraBody->state.get();
-	const shared_ptr<TetraMold>& tMold(dynamic_pointer_cast<TetraMold>(tetraBody->interactingGeometry));
+	const shared_ptr<TetraMold>& tMold(dynamic_pointer_cast<TetraMold>(tetraBody->shape));
 
 	#define v0 tMold->v[0]
 	#define v1 tMold->v[1]

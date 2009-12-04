@@ -17,7 +17,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 	// minimum facet edge length (tolerance scale)
 	Real minSqLen=numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		shared_ptr<InteractingFacet> f=dynamic_pointer_cast<InteractingFacet>(b->interactingGeometry);
+		shared_ptr<InteractingFacet> f=dynamic_pointer_cast<InteractingFacet>(b->shape);
 		if(!f) continue;
 		const Vector3r& pos=b->physicalParameters->se3.position;
 		for(size_t i=0; i<3; i++){
@@ -115,7 +115,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 				}
 			}
 			// add adjacency information to the facet itself
-			InteractingFacet *f1=YADE_CAST<InteractingFacet*>((*rb->bodies)[ti->id]->interactingGeometry.get()), *f2=YADE_CAST<InteractingFacet*>((*rb->bodies)[tj->id]->interactingGeometry.get());
+			InteractingFacet *f1=YADE_CAST<InteractingFacet*>((*rb->bodies)[ti->id]->shape.get()), *f2=YADE_CAST<InteractingFacet*>((*rb->bodies)[tj->id]->shape.get());
 			f1->edgeAdjIds[ei]=ti->id; f2->edgeAdjIds[ej]=tj->id;
 			// normals are in the sense of vertex rotation (right-hand rule); therefore, if vertices of the adjacent edge are opposite on each facet, normals are in the same direction
 			bool invNormals=(ti->vertices[ei]==tj->vertices[ej]);

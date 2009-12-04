@@ -49,7 +49,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 // 	for(  ; bi!=biEnd ; ++bi )
 // 	{
 // 		if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
-// 			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+// 			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->shape.get());
 // 			const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
 // 			T.checkMinMax(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius);
 // 		}
@@ -64,7 +64,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 // 		for( bi = biBegin; bi!=biEnd ; ++bi )
 // 		{
 // 			if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
-// 				const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+// 				const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->shape.get());
 // 				const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
 // 				T.insert(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
 // 			}
@@ -85,7 +85,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 // 		for( bi = biBegin; bi!=biEnd ; ++bi )
 // 		{
 // 			if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
-// 				const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+// 				const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->shape.get());
 // 				const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
 // 				T.insert(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
 // 			}
@@ -118,7 +118,7 @@ void VolumicContactLaw::action(Scene* ncb)
 	for(  ; bi!=biEnd ; ++bi )
 	{
 		if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
-			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->shape.get());
 			const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
 			T1.insert(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
 	
@@ -179,7 +179,7 @@ void VolumicContactLaw::action(Scene* ncb)
 		{
 		b2 = b2+1;
 //		cout << "Itération = " << Omega::instance().getCurrentIteration() << endl;
-		const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi1)->interactingGeometry.get());
+		const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi1)->shape.get());
  		Real vol_sphere = 4.18 * (pow(s->radius,3));//Volume de la sphère
 
 	        compacite_init.push_back ((vol_sphere/T1.Volume((*bi1)->getId()))*0.999999);//La compacité dans la cellule de voronoï
@@ -507,7 +507,7 @@ void VolumicContactLaw::action(Scene* ncb)
 	{
 
 		if ((*bi)->isDynamic) {//means "is it a sphere (not a wall)"
- 			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->interactingGeometry.get());
+ 			const InteractingSphere* s = YADE_CAST<InteractingSphere*>((*bi)->shape.get());
  			const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
 // 			T1.insert(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
 

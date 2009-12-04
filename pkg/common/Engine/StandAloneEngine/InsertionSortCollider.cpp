@@ -208,7 +208,7 @@ void InsertionSortCollider::action(Scene* rb){
 				const body_id_t id=BBj[i].id;
 				const shared_ptr<Body>& b=Body::byId(id,rb);
 				if(b){
-					const shared_ptr<Bound>& bv=b->boundingVolume;
+					const shared_ptr<Bound>& bv=b->bound;
 					// coordinate is min/max if has bounding volume, otherwise both are the position. Add periodic shift so that we are inside the cell
 					// watch out for the parentheses around ?: within ?: (there was unwanted conversion of the Reals to bools!)
 					BBj[i].coord=((BBj[i].flags.hasBB=((bool)bv)) ? (BBj[i].flags.isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
@@ -222,7 +222,7 @@ void InsertionSortCollider::action(Scene* rb){
 		BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
 		const shared_ptr<Body>& b=Body::byId(id,rb);
 		if(b){
-			const shared_ptr<Bound>& bv=b->boundingVolume;
+			const shared_ptr<Bound>& bv=b->bound;
 			if(bv) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
 			else{ const Vector3r& pos=b->state->pos; memcpy(&minima[3*id],pos,3*sizeof(Real)); memcpy(&maxima[3*id],pos,3*sizeof(Real)); }
 		} else { memset(&minima[3*id],0,3*sizeof(Real)); memset(&maxima[3*id],0,3*sizeof(Real)); }

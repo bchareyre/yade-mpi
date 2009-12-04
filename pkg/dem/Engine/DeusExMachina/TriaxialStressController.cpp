@@ -164,7 +164,7 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 	// sync thread storage of BexContainer
 	ncb->bex.sync(); 
 	
-	if(thickness<0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->interactingGeometry)->extents.Y();
+	if(thickness<0) thickness=YADE_PTR_CAST<InteractingBox>(Body::byId(wall_bottom_id,ncb)->shape)->extents.Y();
 
 	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
@@ -189,7 +189,7 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 			if ( b->isDynamic )
 			{
 				const shared_ptr<InteractingSphere>& sphere =
-						YADE_PTR_CAST<InteractingSphere> ( b->interactingGeometry );
+						YADE_PTR_CAST<InteractingSphere> ( b->shape );
 				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		}
@@ -321,7 +321,7 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
 	{
 		if ( ( *bi )->isDynamic )
 		{
-			( static_cast<InteractingSphere*> ( ( *bi )->interactingGeometry.get() ) )->radius *= multiplier;
+			( static_cast<InteractingSphere*> ( ( *bi )->shape.get() ) )->radius *= multiplier;
 			//( static_cast<Sphere*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
 			#ifdef YADE_GEOMETRICALMODEL
 				Sphere* s = dynamic_cast<Sphere*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
@@ -346,9 +346,9 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
 			//      if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
 			//   contact->radius2 *= multiplier;
 			if ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->isDynamic )
-				contact->radius1 = static_cast<InteractingSphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->interactingGeometry.get() )->radius;
+				contact->radius1 = static_cast<InteractingSphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->shape.get() )->radius;
 			if ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->isDynamic )
-				contact->radius2 = static_cast<InteractingSphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->interactingGeometry.get() )->radius;
+				contact->radius2 = static_cast<InteractingSphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->shape.get() )->radius;
 		}
 	}
 }

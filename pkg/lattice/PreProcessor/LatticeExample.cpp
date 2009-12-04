@@ -977,8 +977,8 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
 
 void LatticeExample::createActors(shared_ptr<Scene>& )
 {
-        shared_ptr<BoundDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+        shared_ptr<BoundDispatcher> boundDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
         shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
         geometricalModelDispatcher->add("LatticeSet2LatticeBeams");
@@ -1042,7 +1042,7 @@ BeamRecorder bbbb;
 	latticeLaw->respect_non_destroy = nonDestroy_stiffness;
         
         rootBody->engines.clear();
-        rootBody->engines.push_back(boundingVolumeDispatcher);
+        rootBody->engines.push_back(boundDispatcher);
         rootBody->engines.push_back(latticeLaw);
         rootBody->engines.push_back(geometricalModelDispatcher);
         rootBody->engines.push_back(strainRecorder);
@@ -1052,7 +1052,7 @@ BeamRecorder bbbb;
 	rootBody->engines.push_back(movingSupport);
         
         rootBody->initializers.clear();
-        rootBody->initializers.push_back(boundingVolumeDispatcher);
+        rootBody->initializers.push_back(boundDispatcher);
         rootBody->initializers.push_back(geometricalModelDispatcher);
 
         if(useNonLocalModel)
@@ -1089,8 +1089,8 @@ void LatticeExample::positionRootBody(shared_ptr<Scene>& rootBody)
 	gm->wire 			= false;
 	gm->shadowCaster 		= true;
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->geometricalModel 	= gm;
 	rootBody->physicalParameters 	= physics;
 }

@@ -193,10 +193,10 @@ shared_ptr<Scene> Shop::rootBody(){
 	rootBody->isDynamic=false;
 
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());	set->diffuseColor=Vector3r(0,0,1);
-	rootBody->interactingGeometry=YADE_PTR_CAST<Shape>(set);	
+	rootBody->shape=YADE_PTR_CAST<Shape>(set);	
 	
 	shared_ptr<AABB> aabb(new AABB); aabb->diffuseColor=Vector3r(0,0,1);
-	rootBody->boundingVolume=YADE_PTR_CAST<Bound>(aabb);
+	rootBody->bound=YADE_PTR_CAST<Bound>(aabb);
 	
 
 	return rootBody;
@@ -209,12 +209,12 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	// initializers	
 	rootBody->initializers.clear();
 
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add(new InteractingSphere2AABB);
-	boundingVolumeDispatcher->add(new InteractingBox2AABB);
-	boundingVolumeDispatcher->add(new TetraAABB);
-	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add(new InteractingSphere2AABB);
+	boundDispatcher->add(new InteractingBox2AABB);
+	boundDispatcher->add(new TetraAABB);
+	boundDispatcher->add(new MetaInteractingGeometry2AABB);
+	rootBody->initializers.push_back(boundDispatcher);
 
 	//engines
 	rootBody->engines.clear();
@@ -234,7 +234,7 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 
@@ -282,8 +282,8 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius, shared_ptr<Material>
 	body->state->pos=center;
 	body->state->mass=4.0/3.0*Mathr::PI*radius*radius*radius*body->material->density;
 	body->state->inertia=Vector3r(2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius);
-	body->boundingVolume=shared_ptr<AABB>(new AABB);
-	body->interactingGeometry=shared_ptr<InteractingSphere>(new InteractingSphere(radius));
+	body->bound=shared_ptr<AABB>(new AABB);
+	body->shape=shared_ptr<InteractingSphere>(new InteractingSphere(radius));
 	return body;
 }
 
@@ -296,8 +296,8 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents, shared_ptr<Materia
 	Real mass=8.0*extents[0]*extents[1]*extents[2]*body->material->density;
 	body->state->mass=mass;
 	body->state->inertia=Vector3r(mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
-	body->boundingVolume=shared_ptr<AABB>(new AABB);
-	body->interactingGeometry=shared_ptr<InteractingBox>(new InteractingBox(extents));
+	body->bound=shared_ptr<AABB>(new AABB);
+	body->shape=shared_ptr<InteractingBox>(new InteractingBox(extents));
 	return body;
 }
 
@@ -311,8 +311,8 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 	body->state->pos=centroid;
 	body->state->mass=body->material->density*TetrahedronVolume(v);
 	// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
-	body->boundingVolume=shared_ptr<AABB>(new AABB);
-	body->interactingGeometry=shared_ptr<TetraMold>(new TetraMold(v[0],v[1],v[2],v[3]));
+	body->bound=shared_ptr<AABB>(new AABB);
+	body->shape=shared_ptr<TetraMold>(new TetraMold(v[0],v[1],v[2],v[3]));
 	// make local axes coincident with principal axes
 	TetrahedronWithLocalAxesPrincipal(body);
 	return body;
@@ -326,7 +326,7 @@ void Shop::saveSpheresToFile(string fname){
 
 	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
 		if (!b->isDynamic) continue;
-		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
+		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->shape);
 		if(!intSph) continue;
 		const Vector3r& pos=b->state->pos;
 		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
@@ -385,9 +385,9 @@ Real Shop::PWaveTimeStep(shared_ptr<Scene> _rb){
 	if(!rb)rb=Omega::instance().getScene();
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		if(!b->material || !b->interactingGeometry) continue;
+		if(!b->material || !b->shape) continue;
 		shared_ptr<ElasticMat> ebp=dynamic_pointer_cast<ElasticMat>(b->material);
-		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
+		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->shape);
 		if(!ebp || !s) continue;
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));

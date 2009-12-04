@@ -40,19 +40,19 @@ bool SimpleScene::generate(){
 	/* initializers */
 		rootBody->initializers.clear();
 		//@
-		shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-			boundingVolumeDispatcher->add(new InteractingSphere2AABB);
-			boundingVolumeDispatcher->add(new InteractingBox2AABB);
-			boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
-			rootBody->initializers.push_back(boundingVolumeDispatcher);
+		shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+			boundDispatcher->add(new InteractingSphere2AABB);
+			boundDispatcher->add(new InteractingBox2AABB);
+			boundDispatcher->add(new MetaInteractingGeometry2AABB);
+			rootBody->initializers.push_back(boundDispatcher);
 	//@
 	/* engines */
 		rootBody->engines.clear();
 		//@
 		rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 		//@
-		// use boundingVolumeDispatcher that we defined above
-		rootBody->engines.push_back(boundingVolumeDispatcher);
+		// use boundDispatcher that we defined above
+		rootBody->engines.push_back(boundDispatcher);
 		//@
 		shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 			rootBody->engines.push_back(collider);
@@ -124,13 +124,13 @@ bool SimpleScene::generate(){
 		// aabb
 		shared_ptr<AABB> aabb(new AABB);
 		aabb->diffuseColor=Vector3r(0,1,0);
-		b->boundingVolume=aabb;
+		b->bound=aabb;
 
 		// mold
 		shared_ptr<InteractingBox> mold(new InteractingBox);
 		mold->extents=extents;
 		mold->diffuseColor=Vector3r(1,0,0);
-		b->interactingGeometry=mold;
+		b->shape=mold;
 
 		rootBody->bodies->insert(b);
 	}

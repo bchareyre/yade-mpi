@@ -183,11 +183,11 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 	}
 		
 // Computation of the current dimensions of the box : //
-	Real Xleft = (leftbox->physicalParameters.get())->se3.position.X() + (YADE_CAST<InteractingBox*>(leftbox->interactingGeometry.get()))->extents.X();
-	Real Xright = (rightbox->physicalParameters.get())->se3.position.X() - (YADE_CAST<InteractingBox*>(rightbox->interactingGeometry.get()))->extents.X();
+	Real Xleft = (leftbox->physicalParameters.get())->se3.position.X() + (YADE_CAST<InteractingBox*>(leftbox->shape.get()))->extents.X();
+	Real Xright = (rightbox->physicalParameters.get())->se3.position.X() - (YADE_CAST<InteractingBox*>(rightbox->shape.get()))->extents.X();
 
-	Real Zfront = (frontbox->physicalParameters.get())->se3.position.Z() - YADE_CAST<InteractingBox*>(frontbox->interactingGeometry.get())->extents.Z();
-	Real Zback = (backbox->physicalParameters.get())->se3.position.Z() + (YADE_CAST<InteractingBox*>(backbox->interactingGeometry.get()))->extents.Z();
+	Real Zfront = (frontbox->physicalParameters.get())->se3.position.Z() - YADE_CAST<InteractingBox*>(frontbox->shape.get())->extents.Z();
+	Real Zback = (backbox->physicalParameters.get())->se3.position.Z() + (YADE_CAST<InteractingBox*>(backbox->shape.get()))->extents.Z();
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //

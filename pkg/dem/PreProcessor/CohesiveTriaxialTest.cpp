@@ -408,7 +408,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	iSphere->wire			= false;
 	
-	body->interactingGeometry	= iSphere;
+	body->shape	= iSphere;
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		gSphere->radius			= radius;
 // 	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
@@ -417,7 +417,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 // 		gSphere->shadowCaster		= true;
 // 		body->geometricalModel		= gSphere;
 // 	#endif
-	body->boundingVolume		= aabb;
+	body->bound		= aabb;
 	body->material	= physics;
 }
 
@@ -460,8 +460,8 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	iBox->diffuseColor		= Vector3r(1,1,1);
 	iBox->wire			= wire;
 
-	body->boundingVolume		= aabb;
-	body->interactingGeometry	= iBox;
+	body->bound		= aabb;
+	body->shape	= iBox;
 	body->material	= physics;	
 }
 
@@ -482,10 +482,10 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("InteractingSphere2AABB");
+	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	
 
@@ -578,7 +578,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -597,7 +597,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 	
 }
 
@@ -616,8 +616,8 @@ void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);	
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);	
 }
 
 

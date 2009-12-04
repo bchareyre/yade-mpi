@@ -126,8 +126,8 @@ void Ef1_IstSnowLayersContact_glDraw::go(
 	int id1 = ip->getId1();
 	int id2 = ip->getId2();
 	Real LEN(sc->radius1+sc->radius2);
-	BssSnowGrain* m1 = dynamic_cast<BssSnowGrain*>(b1->interactingGeometry.get());
-	BssSnowGrain* m2 = dynamic_cast<BssSnowGrain*>(b2->interactingGeometry.get());
+	BssSnowGrain* m1 = dynamic_cast<BssSnowGrain*>(b1->shape.get());
+	BssSnowGrain* m2 = dynamic_cast<BssSnowGrain*>(b2->shape.get());
 		//std::map<int,std::list<boost::tuple<Real,int,int> > >	depths; // body_id , < depth, i, j (indexes of point on a slice) >
 		//std::map<int,Real>	sphere_depth;
 		//BshSnowGrain	m_copy;

@@ -74,9 +74,9 @@ void OpenGLRenderingEngine::initgl(){
 	LOG_INFO("(re)initializing GL for gldraw methods.\n");
 	BOOST_FOREACH(vector<string>& s,stateFunctorNames)
 		(static_pointer_cast<GLDrawStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,boundingVolumeFunctorNames)
+	BOOST_FOREACH(vector<string>& s,boundFunctorNames)
 		(static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,interactingGeometryFunctorNames)
+	BOOST_FOREACH(vector<string>& s,shapeFunctorNames)
 		(static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames)
 		(static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
@@ -86,15 +86,15 @@ void OpenGLRenderingEngine::initgl(){
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b || !b->interactingGeometry) continue;
+		if(!b || !b->shape) continue;
 		glPushMatrix();
 		const Se3r& se3=b->state->se3;
 		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-		//if(b->interactingGeometry->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
+		//if(b->shape->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
 			glPushName(b->getId());
-			interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire);
+			shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire);
 			glPopName();
 		//}
 		glPopMatrix();
@@ -219,7 +219,7 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
 	FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
 		if(!b) continue;
-		if(b->interactingGeometry && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
+		if(b->shape && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
 			if(b->state /* && FIXME: !b->physicalParameters->isDisplayed */) continue;
 			if(!Show_ID && b->state->blockedDOFs==0) continue;
 			const Se3r& se3=b->state->se3; // FIXME: should be dispSe3
@@ -251,7 +251,7 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){
 			glPopMatrix();
 		}
 	}
-	if(rootBody->interactingGeometry) interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->state,Body_wire);
+	if(rootBody->shape) shapeDispatcher(rootBody->shape,rootBody->state,Body_wire);
 }
 
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<Scene>& rootBody){	
@@ -295,13 +295,13 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<Scene>& rootBody){
 
 void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& rootBody){	
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b || !b->boundingVolume) continue;
+		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
-		if(b->boundingVolume && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
-			glPushMatrix(); boundingVolumeDispatcher(b->boundingVolume); glPopMatrix();
+		if(b->bound && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
+			glPushMatrix(); boundDispatcher(b->bound); glPopMatrix();
 		}
 	}
-	if(rootBody->boundingVolume){ glPushMatrix(); boundingVolumeDispatcher(rootBody->boundingVolume); glPopMatrix(); }
+	if(rootBody->bound){ glPushMatrix(); boundDispatcher(rootBody->bound); glPopMatrix(); }
 }
 
 
@@ -318,37 +318,37 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
 
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b || !b->interactingGeometry) continue;
+		if(!b || !b->shape) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		Vector3r pos=bodyDisp[b->getId()].pos;
 		Quaternionr ori=bodyDisp[b->getId()].ori;
-		if(!b->interactingGeometry || !((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)) continue;
+		if(!b->shape || !((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)) continue;
 		glPushMatrix();
 			Real angle;	Vector3r axis;	ori.ToAxisAngle(axis,angle);	
 			glTranslatef(pos[0],pos[1],pos[2]);
 			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			if(current_selection==b->getId() || b->interactingGeometry->highlight){
+			if(current_selection==b->getId() || b->shape->highlight){
 				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
 				const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : highlightEmission1);
 				glColor4(h[0],h[1],h[2],.2);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 				///
-				interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire,viewInfo);
+				shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire,viewInfo);
 				///
 				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
 				glColor3v(Vector3r::ZERO);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 			} else {
-				interactingGeometryDispatcher(b->interactingGeometry,b->state,Body_wire || b->interactingGeometry->wire,viewInfo);
+				shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire,viewInfo);
 			}
 		glPopMatrix();
-		if(current_selection==b->getId() || b->interactingGeometry->highlight){
-			if(!b->boundingVolume || Body_wire || b->interactingGeometry->wire) GLUtils::GLDrawInt(b->getId(),pos);
+		if(current_selection==b->getId() || b->shape->highlight){
+			if(!b->bound || Body_wire || b->shape->wire) GLUtils::GLDrawInt(b->getId(),pos);
 			else {
 				// move the label towards the camera by the bounding box so that it is not hidden inside the body
-				const Vector3r& mn=b->boundingVolume->min; const Vector3r& mx=b->boundingVolume->max; const Vector3r& p=pos;
+				const Vector3r& mn=b->bound->min; const Vector3r& mx=b->bound->max; const Vector3r& p=pos;
 				Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
 				Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
 				GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::ONE);
@@ -356,10 +356,10 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 		}
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
-		if(b->boundingVolume && rootBody->isPeriodic){
+		if(b->bound && rootBody->isPeriodic){
 			const Vector3r& cellMin(rootBody->cellMin); const Vector3r& cellMax(rootBody->cellMax); Vector3r cellSize=cellMax-cellMin;
 			// traverse all periodic cells around the body, to see if any of them touches
-			Vector3r halfSize=b->boundingVolume->max-b->boundingVolume->min; halfSize*=.5;
+			Vector3r halfSize=b->bound->max-b->bound->min; halfSize*=.5;
 			Vector3r pmin,pmax;
 			Vector3<int> i;
 			for(i[0]=-1; i[0]<=1; i[0]++) for(i[1]=-1;i[1]<=1; i[1]++) for(i[2]=-1; i[2]<=1; i[2]++){
@@ -372,13 +372,13 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 					glPushMatrix();
 						glTranslatev(pt);
 						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-						interactingGeometryDispatcher(b->interactingGeometry,b->state,/*Body_wire*/ true, viewInfo);
+						shapeDispatcher(b->shape,b->state,/*Body_wire*/ true, viewInfo);
 					glPopMatrix();
 				}
 			}
 		}
 	}
-	if(rootBody->interactingGeometry){ glPushMatrix(); interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->state,Body_wire,viewInfo); glPopMatrix(); }
+	if(rootBody->shape){ glPushMatrix(); shapeDispatcher(rootBody->shape,rootBody->state,Body_wire,viewInfo); glPopMatrix(); }
 }
 
 
@@ -388,8 +388,8 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	#ifdef YADE_PHYSPAR
 		for(unsigned int i=0;i<stateFunctorNames.size();i++) stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
 	#endif
-	for(unsigned int i=0;i<boundingVolumeFunctorNames.size();i++) boundingVolumeDispatcher.add1DEntry(boundingVolumeFunctorNames[i][0],boundingVolumeFunctorNames[i][1]);
-	for(unsigned int i=0;i<interactingGeometryFunctorNames.size();i++) interactingGeometryDispatcher.add1DEntry(interactingGeometryFunctorNames[i][0],interactingGeometryFunctorNames[i][1]);
+	for(unsigned int i=0;i<boundFunctorNames.size();i++) boundDispatcher.add1DEntry(boundFunctorNames[i][0],boundFunctorNames[i][1]);
+	for(unsigned int i=0;i<shapeFunctorNames.size();i++) shapeDispatcher.add1DEntry(shapeFunctorNames[i][0],shapeFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
 }
@@ -407,9 +407,9 @@ void OpenGLRenderingEngine::addStateFunctor(const string& str2){
 }
 void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); boundingVolumeFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); boundFunctorNames.push_back(v);
 }
 void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2){
 	string str1 = (static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
-	vector<string> v; v.push_back(str1); v.push_back(str2); interactingGeometryFunctorNames.push_back(v);
+	vector<string> v; v.push_back(str1); v.push_back(str2); shapeFunctorNames.push_back(v);
 }

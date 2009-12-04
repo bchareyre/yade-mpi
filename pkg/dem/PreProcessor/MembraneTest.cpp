@@ -196,8 +196,8 @@ void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsign
         
         body->isDynamic             = false;
         body->geometricalModel      = tube;
-        body->interactingGeometry   = bss;
-        body->boundingVolume        = aabb;
+        body->shape   = bss;
+        body->bound        = aabb;
         body->physicalParameters    = connection;
 }
     
@@ -235,9 +235,9 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 
   iSphere->diffuseColor     = Vector3r(0.0,0.0,1.0);
 
-  body->interactingGeometry = iSphere;
+  body->shape = iSphere;
   body->geometricalModel    = gSphere;
-  body->boundingVolume      = aabb;
+  body->bound      = aabb;
   body->physicalParameters  = physics;
 }  
     
@@ -268,9 +268,9 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 
         //inode->diffuseColor              = Vector3r(0.5,0.5,1.0);
         
-	body->interactingGeometry	= inode;
+	body->shape	= inode;
 	body->geometricalModel		= node;
-	body->boundingVolume		= aabb;
+	body->bound		= aabb;
 	body->physicalParameters	= physics;
 }
 
@@ -285,13 +285,13 @@ void MembraneTest::createActors(shared_ptr<Scene>& rootBody)
         shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
         interactionPhysicsDispatcher->add("SimpleViscoelasticRelationships");
 
-	shared_ptr<InteractingGeometryMetaEngine> interactingGeometryDispatcher	= shared_ptr<InteractingGeometryMetaEngine>(new InteractingGeometryMetaEngine);
-	interactingGeometryDispatcher->add("ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment");
+	shared_ptr<InteractingGeometryMetaEngine> shapeDispatcher	= shared_ptr<InteractingGeometryMetaEngine>(new InteractingGeometryMetaEngine);
+	shapeDispatcher->add("ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment");
 	
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-        boundingVolumeDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB"); 
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("InteractingSphere2AABB");
+        boundDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB"); 
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -311,7 +311,7 @@ void MembraneTest::createActors(shared_ptr<Scene>& rootBody)
 
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);	
+	rootBody->engines.push_back(boundDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -322,8 +322,8 @@ void MembraneTest::createActors(shared_ptr<Scene>& rootBody)
         rootBody->engines.push_back(orientationIntegrator);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(interactingGeometryDispatcher);
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(shapeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 }
 
 
@@ -347,8 +347,8 @@ void MembraneTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume		= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape		= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

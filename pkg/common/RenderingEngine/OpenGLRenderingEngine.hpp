@@ -61,13 +61,13 @@ class OpenGLRenderingEngine : public RenderingEngine
 		DynLibDispatcher< InteractionPhysics  , GLDrawInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
 
 		DynLibDispatcher< State  , GLDrawStateFunctor,               void , TYPELIST_1(const shared_ptr<State>&) > stateDispatcher;
-		DynLibDispatcher< Bound      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<Bound>&) > boundingVolumeDispatcher;
-		DynLibDispatcher< Shape , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > interactingGeometryDispatcher;
+		DynLibDispatcher< Bound      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<Bound>&) > boundDispatcher;
+		DynLibDispatcher< Shape , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > shapeDispatcher;
 
 		vector<vector<string> >
 			stateFunctorNames,
-			boundingVolumeFunctorNames,
-			interactingGeometryFunctorNames, 
+			boundFunctorNames,
+			shapeFunctorNames, 
 			interactionGeometryFunctorNames,
 			interactionPhysicsFunctorNames;
 

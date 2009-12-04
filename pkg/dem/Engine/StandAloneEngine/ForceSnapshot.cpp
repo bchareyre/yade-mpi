@@ -92,8 +92,8 @@ void ForceSnapshot::action(Scene * ncb)
 				Vector3r pos1=(b1->physicalParameters.get())->se3.position;	// the position of centers
 				Vector3r pos2=(b2->physicalParameters.get())->se3.position;
 
-				Real R1 = YADE_CAST<InteractingSphere*>(b1->interactingGeometry.get())->radius;
-				Real R2 = YADE_CAST<InteractingSphere*>(b2->interactingGeometry.get())->radius;
+				Real R1 = YADE_CAST<InteractingSphere*>(b1->shape.get())->radius;
+				Real R2 = YADE_CAST<InteractingSphere*>(b2->shape.get())->radius;
 
 				Vector3r Fn=(YADE_CAST<ElasticContactInteraction*>(contact->interactionPhysics.get()))->normalForce;
 				Real Fnl=Fn.Length();

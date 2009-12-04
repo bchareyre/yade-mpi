@@ -380,11 +380,11 @@ void GLViewer::centerScene(){
 	if(rb->bodies->size()<renderer->selectBodyLimit){LOG_INFO("Less than "+lexical_cast<string>(renderer->selectBodyLimit)+" bodies, moving possible. Select with shift, press 'm' to move.");}
 	else{LOG_INFO("More than "+lexical_cast<string>(renderer->selectBodyLimit)+" (OpenGLRenderingEngine::selectBodyLimit) bodies. Moving not possible.");}
 	Vector3r min,max;	
-	if(rb->boundingVolume){
-		min=rb->boundingVolume->min; max=rb->boundingVolume->max;
+	if(rb->bound){
+		min=rb->bound->min; max=rb->bound->max;
 		if(std::max(max[0]-min[0],std::max(max[1]-min[1],max[2]-min[2]))<=0){
 			// AABB is not yet calculated...
-			LOG_DEBUG("rootBody's boundingVolume not yet calculated or has one dimension zero, attempt get that from bodies' positions.");
+			LOG_DEBUG("rootBody's bound not yet calculated or has one dimension zero, attempt get that from bodies' positions.");
 			Real inf=std::numeric_limits<Real>::infinity();
 			min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
 			FOREACH(const shared_ptr<Body>& b, *rb->bodies){

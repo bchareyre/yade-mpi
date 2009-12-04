@@ -70,7 +70,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
             for ( ; bi!=biEnd ; ++bi )
             {
                 shared_ptr<Body> b = *bi;
-                if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere")
+                if (b->shape && b->shape->getClassName()=="InteractingSphere")
                 {
                     //cerr << "translate it" << endl;
                     if ((static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken == true)
@@ -133,7 +133,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
 		    if(!f.good()) throw runtime_error("Unable to open file `"+outputFile+"'");
 		    FOREACH(shared_ptr<Body> b, *rootBody->bodies){
 			    if (!b->isDynamic) continue;
-			    shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
+			    shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->shape);
 			    if(!intSph) continue;
 			    const Vector3r& pos=b->state->pos;
 			    f<< b->getId()<<" "<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;

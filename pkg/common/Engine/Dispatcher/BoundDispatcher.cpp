@@ -27,30 +27,30 @@ void BoundDispatcher::action(Scene* ncb)
 	for(int id=0; id<numBodies; id++){
 		if(!bodies->exists(id)) continue; // don't delete this check  - Janek
 		const shared_ptr<Body>& b=(*bodies)[id];
-		shared_ptr<Shape>& ig=b->interactingGeometry;
-		if(!ig || !b->boundingVolume) continue;
+		shared_ptr<Shape>& ig=b->shape;
+		if(!ig || !b->bound) continue;
 
 		#ifdef BV_FUNCTOR_CACHE
-			if(!ig->boundFunctor){ bool swap=false; ig->boundFunctor=this->getFunctor2D(ig,b->boundingVolume,swap); /* no sense, different types: */ assert(!swap); if(!ig->boundFunctor) continue; }
-			// LOG_DEBUG("ig->boundFunctor.get()=="<<ig->boundFunctor.get()<<" for "<<b->interactingGeometry->getClassName()<<", #"<<id);
+			if(!ig->boundFunctor){ bool swap=false; ig->boundFunctor=this->getFunctor2D(ig,b->bound,swap); /* no sense, different types: */ assert(!swap); if(!ig->boundFunctor) continue; }
+			// LOG_DEBUG("ig->boundFunctor.get()=="<<ig->boundFunctor.get()<<" for "<<b->shape->getClassName()<<", #"<<id);
 			//if(!ig->boundFunctor) throw runtime_error("boundFunctor not found for #"+lexical_cast<string>(id)); assert(ig->boundFunctor);
-			ig->boundFunctor->go(ig,b->boundingVolume,b->state->se3,b.get());
+			ig->boundFunctor->go(ig,b->bound,b->state->se3,b.get());
 		#else
-			operator()(ig,b->boundingVolume,b->state->se3,b.get());
+			operator()(ig,b->bound,b->state->se3,b.get());
 		#endif
 		if(sweepDist>0){
-			AABB* aabb=YADE_CAST<AABB*>(b->boundingVolume.get());
+			AABB* aabb=YADE_CAST<AABB*>(b->bound.get());
 			aabb->halfSize+=Vector3r(sweepDist,sweepDist,sweepDist);
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 		if(haveBins){
-			AABB* aabb=YADE_CAST<AABB*>(b->boundingVolume.get());
+			AABB* aabb=YADE_CAST<AABB*>(b->bound.get());
 			Real sweep=velocityBins->bins[velocityBins->bodyBins[b->getId()]].maxDist;
 			aabb->halfSize+=Vector3r(sweep,sweep,sweep);
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 	}
-	if(ncb->state && ncb->boundingVolume && ncb->interactingGeometry) operator()(ncb->interactingGeometry,ncb->boundingVolume,ncb->state->se3,ncb);
+	if(ncb->state && ncb->bound && ncb->shape) operator()(ncb->shape,ncb->bound,ncb->state->se3,ncb);
 }
 
 

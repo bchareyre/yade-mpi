@@ -56,8 +56,8 @@ void ElawSnowLayersDeformation::action(Scene* ncb)
 //			SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
 			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> (contact->interactionPhysics.get());
 
-			BssSnowGrain* b1 = dynamic_cast<BssSnowGrain*>((*bodies)[id1]->interactingGeometry.get());
-			BssSnowGrain* b2 = dynamic_cast<BssSnowGrain*>((*bodies)[id2]->interactingGeometry.get());
+			BssSnowGrain* b1 = dynamic_cast<BssSnowGrain*>((*bodies)[id1]->shape.get());
+			BssSnowGrain* b2 = dynamic_cast<BssSnowGrain*>((*bodies)[id2]->shape.get());
 			
 			BshSnowGrain* B1 = dynamic_cast<BshSnowGrain*>((*bodies)[id1]->geometricalModel.get());
 			BshSnowGrain* B2 = dynamic_cast<BshSnowGrain*>((*bodies)[id2]->geometricalModel.get());

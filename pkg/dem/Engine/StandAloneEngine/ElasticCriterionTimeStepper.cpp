@@ -32,7 +32,7 @@ ElasticCriterionTimeStepper::~ElasticCriterionTimeStepper()
 void ElasticCriterionTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body)
 {
 	BodyMacroParameters * sdec	= dynamic_cast<BodyMacroParameters*>(body->physicalParameters.get());
-	InteractingSphere* sphere 		= dynamic_cast<InteractingSphere*>(body->interactingGeometry.get());
+	InteractingSphere* sphere 		= dynamic_cast<InteractingSphere*>(body->shape.get());
 
 	if(! (sphere && sdec) )
 		return; // not possible to compute!

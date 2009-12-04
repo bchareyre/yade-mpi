@@ -16,16 +16,16 @@ void PeriIsoCompressor::action(Scene* rb){
 	if(state>=stresses.size()) return;
 	// initialize values
 	if(charLen<=0){
-		Bound* bv=Body::byId(0,rb)->boundingVolume.get();
-		if(!bv){ LOG_FATAL("No charLen defined and body #0 has no boundingVolume"); throw; }
+		Bound* bv=Body::byId(0,rb)->bound.get();
+		if(!bv){ LOG_FATAL("No charLen defined and body #0 has no bound"); throw; }
 		const Vector3r sz=bv->max-bv->min;
 		charLen=(sz[0]+sz[1]+sz[2])/3.;
 		LOG_INFO("No charLen defined, taking avg bbox size of body #0 = "<<charLen);
 	}
 	if(maxSpan<=0){
 		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-			if(!b->boundingVolume) continue;
-			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->boundingVolume->max[i]-b->boundingVolume->min[i]);
+			if(!b->bound) continue;
+			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->bound->max[i]-b->bound->min[i]);
 		}
 		
 	}

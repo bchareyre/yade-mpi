@@ -125,9 +125,9 @@ void ContactStressRecorder::action ( Scene * ncb )
 				f1_el_z=fel[2];
 
 				int geometryIndex1 =
-					( *bodies ) [id1]->interactingGeometry->getClassIndex();
+					( *bodies ) [id1]->shape->getClassIndex();
 				int geometryIndex2 =
-					( *bodies ) [id2]->interactingGeometry->getClassIndex();
+					( *bodies ) [id2]->shape->getClassIndex();
 				
 				
 
@@ -208,7 +208,7 @@ void ContactStressRecorder::action ( Scene * ncb )
 	{
 		shared_ptr<Body> b = *bi;
 
-		int geometryIndex = b->interactingGeometry->getClassIndex();
+		int geometryIndex = b->shape->getClassIndex();
 
 		if ( geometryIndex == SpheresClassIndex )
 		{
@@ -218,7 +218,7 @@ void ContactStressRecorder::action ( Scene * ncb )
 			kinematicE +=
 					0.5* ( b->state->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
-			InteractingSphere* sphere = static_cast<InteractingSphere*> ( b->interactingGeometry.get() );
+			InteractingSphere* sphere = static_cast<InteractingSphere*> ( b->shape.get() );
 			Rbody = sphere->radius;
 			if ( Rbody<Rmin ) Rmin = Rbody;
 			if ( Rbody>Rmax ) Rmax = Rbody;

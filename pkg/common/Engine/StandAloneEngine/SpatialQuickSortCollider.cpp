@@ -44,10 +44,10 @@ void SpatialQuickSortCollider::action(Scene* ncb)
 	shared_ptr<Body> b;
 	int i=0;
 	FOREACH(const shared_ptr<Body>& b, *bodies){
-		if(!b || !b->boundingVolume) continue;
+		if(!b || !b->bound) continue;
 	   
-	   min = b->boundingVolume->min;
-	   max = b->boundingVolume->max;
+	   min = b->bound->min;
+	   max = b->bound->max;
 
 	   rank[i]->id = b->getId();
 	   rank[i]->min = min;

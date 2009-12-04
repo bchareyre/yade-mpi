@@ -71,7 +71,7 @@ void SpherePack::fromSimulation() {
 	pack.clear();
 	Scene* rootBody=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->interactingGeometry);
+		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->shape);
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius));
 	}

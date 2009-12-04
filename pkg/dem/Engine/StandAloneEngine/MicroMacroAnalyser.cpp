@@ -124,7 +124,7 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 		if ( !( *bi )->isDynamic ) TS.grains[Idg].isSphere = false;
 		else {//then it is a sphere (not a wall)
 			++Ng;
-			const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->interactingGeometry.get() );
+			const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->shape.get() );
 			//const GranularMat* p = YADE_CAST<GranularMat*> ( ( *bi )->material.get() );
 			const Vector3r& pos = (*bi)->state->pos;
 			Real rad = s->radius;

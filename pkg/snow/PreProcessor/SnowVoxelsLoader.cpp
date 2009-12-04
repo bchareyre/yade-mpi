@@ -380,10 +380,10 @@ void SnowVoxelsLoader::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("Ef2_BssSnowGrain_AABB_makeAABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("Ef2_BssSnowGrain_AABB_makeAABB");
+	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	
 
@@ -470,7 +470,7 @@ void SnowVoxelsLoader::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -502,7 +502,7 @@ void SnowVoxelsLoader::createActors(shared_ptr<Scene>& rootBody)
 	//rootBody->engines.push_back(positionOrientationRecorder);}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 	
 }
 
@@ -525,8 +525,8 @@ void SnowVoxelsLoader::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }
@@ -572,9 +572,9 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 	//iSphere->radius			= radius; // already calculated
 	iSphere->diffuseColor		= grain->color;
 
-	body->interactingGeometry	= iSphere;
+	body->shape	= iSphere;
 	body->geometricalModel		= gSnowGrain;
-	body->boundingVolume		= aabb;
+	body->bound		= aabb;
 	body->physicalParameters	= physics;
 }
 
@@ -615,8 +615,8 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(0.5,0.5,0.5);
 
-	body->boundingVolume		= aabb;
-	body->interactingGeometry	= iBox;
+	body->bound		= aabb;
+	body->shape	= iBox;
 	#ifdef YADE_GEOMETRICALMODEL
 		shared_ptr<Box> gBox(new Box);
 		gBox->extents			= extents;

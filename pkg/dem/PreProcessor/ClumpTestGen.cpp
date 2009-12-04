@@ -32,7 +32,7 @@ bool ClumpTestGen::generate()
 	#ifdef YADE_GEOMETRICALMODEL
 		ground->geometricalModel->diffuseColor=Vector3r(.6,.6,.6);
 	#endif
-	ground->interactingGeometry->diffuseColor=Vector3r(.3,.3,.3);
+	ground->shape->diffuseColor=Vector3r(.3,.3,.3);
 	rootBody->bodies->insert(ground);
 
 	vector<Vector3r> relPos; vector<Real> radii; Vector3r clumpPos;

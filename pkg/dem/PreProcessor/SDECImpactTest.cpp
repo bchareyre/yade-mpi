@@ -334,9 +334,9 @@ void SDECImpactTest::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 
-	body->interactingGeometry	= iSphere;
+	body->shape	= iSphere;
 	body->geometricalModel		= gSphere;
-	body->boundingVolume		= aabb;
+	body->bound		= aabb;
 	body->physicalParameters	= physics;
 }
 
@@ -380,8 +380,8 @@ void SDECImpactTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(1,1,1);
 
-	body->boundingVolume		= aabb;
-	body->interactingGeometry	= iBox;
+	body->bound		= aabb;
+	body->shape	= iBox;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
@@ -410,10 +410,10 @@ void SDECImpactTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("InteractingSphere2AABB");
+	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	
 
@@ -449,7 +449,7 @@ void SDECImpactTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(sdecTimeStepper);
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -465,7 +465,7 @@ void SDECImpactTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(forcerec);
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 	
 }
 
@@ -489,8 +489,8 @@ void SDECImpactTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }

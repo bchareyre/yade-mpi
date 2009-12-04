@@ -46,11 +46,11 @@ Clump::Clump(): Body(){
 
 	// these will not be defined for the moment...
 #if 0
-	boundingVolume=shared_ptr<AABB>(new AABB);
-	boundingVolume->diffuseColor=Vector3r(1,0,0);
+	bound=shared_ptr<AABB>(new AABB);
+	bound->diffuseColor=Vector3r(1,0,0);
 
-	interactingGeometry=shared_ptr<Shape>(new Shape);
-	interactingGeometry->diffuseColor=Vector3r(0,0,0);
+	shape=shared_ptr<Shape>(new Shape);
+	shape->diffuseColor=Vector3r(0,0,0);
 
 	geometricalModel=shared_ptr<GeometricalModel>(new GeometricalModel);
 	geometricalModel->diffuseColor=Vector3r(0,0,0); geometricalModel->wire=false; geometricalModel->visible=false; geometricalModel->shadowCaster=false;

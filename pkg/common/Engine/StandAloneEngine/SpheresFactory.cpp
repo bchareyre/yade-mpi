@@ -126,7 +126,7 @@ Vector3r SpheresFactory::generatePositionOnSurface()
     Real t2 = randomUnit()*(1-t1);
 
     shared_ptr<Body> facet = Body::byId(facetId);
-    InteractingFacet* gfacet = static_cast<InteractingFacet*>(facet->interactingGeometry.get());
+    InteractingFacet* gfacet = static_cast<InteractingFacet*>(facet->shape.get());
 
 
 
@@ -186,8 +186,8 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	iSphere->radius			= r;
 	iSphere->diffuseColor	= Vector3r(0.8,0.3,0.3);
 
-	body->interactingGeometry	= iSphere;
-	body->boundingVolume		= aabb;
+	body->shape	= iSphere;
+	body->bound		= aabb;
 	body->physicalParameters	= physics;
 }
 

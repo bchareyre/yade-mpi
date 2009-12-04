@@ -68,7 +68,7 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies)
 		shared_ptr<Body> b(new Body());
 		b->state->pos=icc;
 		b->state->ori=Quaternionr::IDENTITY;
-		b->interactingGeometry	= iFacet;
+		b->shape	= iFacet;
 		bodies->insert(b);
 	}
 }

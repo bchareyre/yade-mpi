@@ -66,11 +66,11 @@ void HistoryRecorder::action(Scene * ncb)
 	 if (b->isClump()) continue;
 	 
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-	 const Shape* gm   = YADE_CAST<Shape*>(b->interactingGeometry.get());
+	 const Shape* gm   = YADE_CAST<Shape*>(b->shape.get());
 
 	if ( typeid(*gm) == typeid(InteractingSphere) )
      {
-		ofs << "sphere " << b->groupMask << " " << YADE_CAST<InteractingSphere*>(b->interactingGeometry.get())->radius
+		ofs << "sphere " << b->groupMask << " " << YADE_CAST<InteractingSphere*>(b->shape.get())->radius
 		<< " " << p->se3.position[0] << " " << p->se3.position[1] << " " << p->se3.position[2]
 		<< " 0 0 0" 
 		<< " " << p->velocity[0] << " " << p->velocity[1] << " " << p->velocity[2]
@@ -80,7 +80,7 @@ void HistoryRecorder::action(Scene * ncb)
 
 	if ( typeid(*gm) == typeid(InteractingBox) )
 	{
-	  ofs << "box " << b->groupMask << " " << YADE_CAST<InteractingBox*>(b->interactingGeometry.get())->extents
+	  ofs << "box " << b->groupMask << " " << YADE_CAST<InteractingBox*>(b->shape.get())->extents
 	  << " " << p->se3.position[0] << " " << p->se3.position[1] << " " << p->se3.position[2]
 	  << " 0 0 0"
 	  << " " << p->velocity[0] << " " << p->velocity[1] << " " << p->velocity[2]
@@ -113,8 +113,8 @@ void HistoryRecorder::action(Scene * ncb)
 	   if( typeid(*ig) == typeid(SpheresContactGeometry) )
 	   {
 		 
-		 if (typeid(*(b1->interactingGeometry.get())) == typeid(InteractingSphere)
-		  && typeid(*(b2->interactingGeometry.get())) == typeid(InteractingSphere))
+		 if (typeid(*(b1->shape.get())) == typeid(InteractingSphere)
+		  && typeid(*(b2->shape.get())) == typeid(InteractingSphere))
 		 {
 		   const NormalShearInteraction* nsi = YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get());
 		   Vector3r n = nsi->normalForce;

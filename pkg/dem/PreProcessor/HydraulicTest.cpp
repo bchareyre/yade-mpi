@@ -220,8 +220,8 @@ bool HydraulicTest::generate()
 //
 //    shared_ptr<BodyMacroParameters> a = YADE_PTR_CAST<BodyMacroParameters>(bodyA->physicalParameters);
 //    shared_ptr<BodyMacroParameters> b = YADE_PTR_CAST<BodyMacroParameters>(bodyB->physicalParameters);
-//    shared_ptr<InteractingSphere> as = YADE_PTR_CAST<InteractingSphere>(bodyA->interactingGeometry);
-//    shared_ptr<InteractingSphere> bs = YADE_PTR_CAST<InteractingSphere>(bodyB->interactingGeometry);
+//    shared_ptr<InteractingSphere> as = YADE_PTR_CAST<InteractingSphere>(bodyA->shape);
+//    shared_ptr<InteractingSphere> bs = YADE_PTR_CAST<InteractingSphere>(bodyB->shape);
 //
 // /*   if ((a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))
 //    {
@@ -302,8 +302,8 @@ void HydraulicTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }

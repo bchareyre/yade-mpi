@@ -78,7 +78,7 @@ void PositionSnapshot::action(Scene * ncb)
 		{
 			Id=b->getId();
 			pos=(b->physicalParameters.get())->se3.position;
-			Real rayon = YADE_CAST<InteractingSphere*>(b->interactingGeometry.get())->radius;
+			Real rayon = YADE_CAST<InteractingSphere*>(b->shape.get())->radius;
 			myfile << lexical_cast<string>(Id) << " " << lexical_cast<string>(rayon) << " " << lexical_cast<string>(pos[0]) << " " << lexical_cast<string>(pos[1]) << " " << lexical_cast<string>(pos[2]) << endl;
 		}
 	}

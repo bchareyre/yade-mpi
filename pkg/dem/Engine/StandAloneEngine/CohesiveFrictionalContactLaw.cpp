@@ -62,7 +62,7 @@ void CohesiveFrictionalContactLaw::action(Scene* ncb)
         for ( ; bi!=biEnd ; ++bi )
         {
             shared_ptr<Body> b = *bi;
-            if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere")
+            if (b->shape && b->shape->getClassName()=="InteractingSphere")
                 (static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken = true;
             // b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
         }
@@ -81,8 +81,8 @@ void CohesiveFrictionalContactLaw::action(Scene* ncb)
 		     *
 		     * FIXME - got to replace this with a working test.
 		     *
-		     * && (*bodies)[(*ii)->getId1()]->interactingGeometry->getClassName() != "box"  
-		     * && (*bodies)[(*ii)->getId2()]->interactingGeometry->getClassName() != "box" */
+		     * && (*bodies)[(*ii)->getId1()]->shape->getClassName() != "box"  
+		     * && (*bodies)[(*ii)->getId2()]->shape->getClassName() != "box" */
 		    )
             {
                 YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId1()]->material.get())->isBroken = false;
@@ -227,7 +227,7 @@ shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
                 //if (!currentContactPhysics->cohesionBroken)
                 //{
                 //cerr << "de1->isBroken == false;" << endl;
-//                     if ((*bodies)[id1]->interactingGeometry->getClassName() != "box"  && (*bodies)[id2]->interactingGeometry->getClassName() != "box")
+//                     if ((*bodies)[id1]->shape->getClassName() != "box"  && (*bodies)[id2]->shape->getClassName() != "box")
 //                     de1->isBroken = false;
 //                     de2->isBroken = false;
 //                ++ncount;//REMOVE
@@ -360,7 +360,7 @@ currentContactPhysics->moment_bending = moment_bending;
         for ( ; bi!=biEnd ; ++bi )
         {
             shared_ptr<Body> b = *bi;
-            if (b->interactingGeometry && b->interactingGeometry->getClassName()=="InteractingSphere" && erosionActivated)
+            if (b->shape && b->shape->getClassName()=="InteractingSphere" && erosionActivated)
             {
                 //cerr << "translate it" << endl;
                 if ((static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken == true)
@@ -368,11 +368,11 @@ currentContactPhysics->moment_bending = moment_bending;
                     if (b->isDynamic)
                         b->state->pos += translation_vect_;
                     b->isDynamic = false;
-                    b->interactingGeometry->diffuseColor= Vector3r(0.5,0.3,0.9);
+                    b->shape->diffuseColor= Vector3r(0.5,0.3,0.9);
 
 
                 }
-                else  b->interactingGeometry->diffuseColor= Vector3r(0.5,0.9,0.3);
+                else  b->shape->diffuseColor= Vector3r(0.5,0.9,0.3);
             }
         }
     }

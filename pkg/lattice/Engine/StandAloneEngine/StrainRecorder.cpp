@@ -66,7 +66,7 @@ void StrainRecorder::action(Scene * ncb)
 		return;
 	}
 	LatticeNodeParameters* node1 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
-	(*(ncb->bodies))[*i]->interactingGeometry->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[*i]->shape->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
 	if(!ncb->bodies->exists(*i)) 
 	{
@@ -74,7 +74,7 @@ void StrainRecorder::action(Scene * ncb)
 		return;
 	}
 	LatticeNodeParameters* node2 = dynamic_cast<LatticeNodeParameters*>( (*(ncb->bodies))[*i]->physicalParameters . get() );
-	(*(ncb->bodies))[*i]->interactingGeometry->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
+	(*(ncb->bodies))[*i]->shape->diffuseColor = Vector3r(1.0,0.0,0.0); // FIXME [1]
 	++i;
 	// FIXME - instead of tracking only two points (one on top, another on bottom), it's better
 	// to mark two regions of points and track their average position. Now if one point is deleted, it's impossible
@@ -98,7 +98,7 @@ void StrainRecorder::action(Scene * ncb)
 			//Real s_nonl_y =0;
 			//if(nonlocal)
 			//	s_nonl_y 		= (beam->nonLocalStrain / beam->nonLocalDivisor) * std::abs(beam->direction[1]);
-			(*(ncb->bodies))[*i]->interactingGeometry->diffuseColor = Vector3r(0.0,1.0,1.0); // FIXME [1]
+			(*(ncb->bodies))[*i]->shape->diffuseColor = Vector3r(0.0,1.0,1.0); // FIXME [1]
 			stress_y += s_y;
 			stress_s += s_s;
 			//stress_nonlocal_y += s_nonl_y;

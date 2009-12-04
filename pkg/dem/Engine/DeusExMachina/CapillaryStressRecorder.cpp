@@ -192,13 +192,13 @@ void CapillaryStressRecorder::action(Scene * ncb)
 	{	
 		shared_ptr<Body> b = *bi;
 		
-		int geometryIndex = b->interactingGeometry->getClassIndex();
+		int geometryIndex = b->shape->getClassIndex();
 		//cerr << "model = " << geometryIndex << endl;
 		
 		if (geometryIndex == SpheresClassIndex)
 		{
 			InteractingSphere* sphere =
-		static_cast<InteractingSphere*>(b->interactingGeometry.get());
+		static_cast<InteractingSphere*>(b->shape.get());
 			Rbody = sphere->radius;
 			SR+=Rbody;
 			

@@ -29,10 +29,10 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<Shape>&
 	
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		if(!b) continue;
-		if(b->boundingVolume){
+		if(b->bound){
 			for(int i=0; i<3; i++){
-				if(!isinf(b->boundingVolume->max[i])) mx[i]=max(mx[i],b->boundingVolume->max[i]);
-				if(!isinf(b->boundingVolume->min[i])) mn[i]=min(mn[i],b->boundingVolume->min[i]);
+				if(!isinf(b->bound->max[i])) mx[i]=max(mx[i],b->bound->max[i]);
+				if(!isinf(b->bound->min[i])) mn[i]=min(mn[i],b->bound->min[i]);
 			}
 		} else {
 	 		mx=componentMaxVector(mx,b->state->pos);

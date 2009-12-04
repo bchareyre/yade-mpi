@@ -87,9 +87,13 @@ class Body : public Serializable
 			shared_ptr<GeometricalModel>	geometricalModel;
 		#endif
 		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox
-		shared_ptr<Shape> interactingGeometry;
+		shared_ptr<Shape> shape;
 		/// Bound is used for quick detection of potential interactions, that can be: AABB, K-Dop
-		shared_ptr<Bound>	boundingVolume;
+		shared_ptr<Bound>	bound;
+
+		// for backwards-compatibility, will be removed in the future
+		__attribute__ ((deprecated)) shared_ptr<Shape>& interactingGeometry;
+		__attribute__ ((deprecated)) shared_ptr<Bound>&	boundingVolume;
 	
 		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.
 		 * It is useful for example for collision detection : if two colliding bodies are only
@@ -115,8 +119,8 @@ class Body : public Serializable
 			#ifdef YADE_GEOMETRICALMODEL
 				(geometricalModel)
 			#endif
-			(interactingGeometry)
-			(boundingVolume)
+			(shape)
+			(bound)
 			(clumpId)
 		);
 

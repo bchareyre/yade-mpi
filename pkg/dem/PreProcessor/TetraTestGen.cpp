@@ -21,13 +21,13 @@ bool TetraTestGen::generate()
 
 	rootBody=Shop::rootBody();
 
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add(new TetraAABB);
-	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add(new TetraAABB);
+	boundDispatcher->add(new MetaInteractingGeometry2AABB);
+	rootBody->initializers.push_back(boundDispatcher);
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new BexResetter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add(new Tetra2TetraBang);

@@ -61,12 +61,12 @@ void InteractionDispatchers::action(Scene* rootBody){
 			// we know there is no geometry functor already, take the short path
 			if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
 			// no interaction geometry for either of bodies; no interaction possible
-			if(!b1_->interactingGeometry || !b2_->interactingGeometry) { assert(!I->isReal()); continue; }
+			if(!b1_->shape || !b2_->shape) { assert(!I->isReal()); continue; }
 
 			bool swap=false;
 			// InteractionGeometryDispatcher
 			if(!I->functorCache.geom || !I->functorCache.phys){
-				I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->interactingGeometry,b2_->interactingGeometry,swap);
+				I->functorCache.geom=geomDispatcher->getFunctor2D(b1_->shape,b2_->shape,swap);
 				// returns NULL ptr if no functor exists; remember that and shortcut
 				if(!I->functorCache.geom) { I->functorCache.geomExists=false; continue; }
 			}
@@ -81,10 +81,10 @@ void InteractionDispatchers::action(Scene* rootBody){
 			assert(I->functorCache.geom);
 			bool wasReal=I->isReal();
 			bool geomCreated;
-			if(!rootBody->isPeriodic) geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry, *b1->state, *b2->state, Vector3r::ZERO, I);
+			if(!rootBody->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
-				geomCreated=I->functorCache.geom->go(b1->interactingGeometry,b2->interactingGeometry,*b1->state,*b2->state,shift2,I);
+				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,I);
 			}
 			if(!geomCreated){
 				if(wasReal) rootBody->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
@@ -125,8 +125,8 @@ void InteractionDispatchers::action(Scene* rootBody){
 			// InteractionGeometryDispatcher
 			bool wasReal=I->isReal();
 			bool geomCreated =
-				b1->interactingGeometry && b2->interactingGeometry && // some bodies do not have interactingGeometry
-				geomDispatcher->operator()(b1->interactingGeometry, b2->interactingGeometry, *b1->state, *b2->state, Vector3r::ZERO, I);
+				b1->shape && b2->shape && // some bodies do not have shape
+				geomDispatcher->operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
 			// FIXME: port from the part above
 			if(rootBody->isPeriodic) { LOG_FATAL(__FILE__ ": Periodicity not handled without DISPATCH_CACHE."); abort(); }
 			if(!geomCreated){

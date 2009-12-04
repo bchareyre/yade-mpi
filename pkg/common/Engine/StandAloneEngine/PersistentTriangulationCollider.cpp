@@ -55,7 +55,7 @@ void PersistentTriangulationCollider::action ( Scene* ncb )
 		{
 			if ( ( *bi )->isDynamic )
 			{//means "is it a sphere (not a wall)"
-				const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->interactingGeometry.get() );
+				const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->shape.get() );
 				Tes->insert ( (*bi)->state->pos[0],(*bi)->state->pos[1],(*bi)->state->pos[2], s->radius, ( *bi )->getId() );
 			}
 		}
@@ -74,11 +74,11 @@ void PersistentTriangulationCollider::action ( Scene* ncb )
 //   {
 //    if ( ( *bi )->isDynamic )
 //    {//means "is it a sphere (not a wall)"
-//     const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->interactingGeometry.get() );
+//     const InteractingSphere* s = YADE_CAST<InteractingSphere*> ( ( *bi )->shape.get() );
 //     const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() );
 //     Tes->move ( p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, ( *bi )->getId() );
 // //    else {
-// //    const InteractingBox* s = YADE_CAST<InteractingBox*>((*bi)->interactingGeometry.get());
+// //    const InteractingBox* s = YADE_CAST<InteractingBox*>((*bi)->shape.get());
 // //    const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
 // //    Tes.move(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
 // //    }

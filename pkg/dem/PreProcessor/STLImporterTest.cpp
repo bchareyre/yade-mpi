@@ -117,7 +117,7 @@ bool STLImporterTest::generate()
 	    // bounding box 
 		shared_ptr<AABB> aabb(new AABB);
 		aabb->diffuseColor		= Vector3r(0,1,0);
-		b->boundingVolume	= aabb;
+		b->bound	= aabb;
 	    
 	    rootBody->bodies->insert(b);
 	}
@@ -193,8 +193,8 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
-	body->interactingGeometry	= iSphere;
-	body->boundingVolume		= aabb;
+	body->shape	= iSphere;
+	body->bound		= aabb;
 	body->physicalParameters	= physics;
 }
 
@@ -208,10 +208,10 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingFacet2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("InteractingSphere2AABB");
+	boundDispatcher->add("InteractingFacet2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -242,7 +242,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	shared_ptr<Shape> facet(new InteractingFacet);
 	for(BodyContainer::iterator bi = rootBody->bodies->begin(), biEnd=rootBody->bodies->end(); bi!=biEnd; ++bi)
-	    if ( (*bi)->interactingGeometry->getClassIndex() == facet->getClassIndex() )
+	    if ( (*bi)->shape->getClassIndex() == facet->getClassIndex() )
 		kinematic->subscribedBodies.push_back((*bi)->getId());
 
 	shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
@@ -252,7 +252,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
 	rootBody->engines.push_back(sdecTimeStepper);
-	rootBody->engines.push_back(boundingVolumeDispatcher);	
+	rootBody->engines.push_back(boundDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new SpatialQuickSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -265,7 +265,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(kinematic);
  	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 }
 
 
@@ -288,8 +288,8 @@ void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume		= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape		= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

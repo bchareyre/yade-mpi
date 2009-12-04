@@ -25,11 +25,11 @@ CREATE_LOGGER(InteractionGeometryDispatcher);
  */
 
 shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2){
-	//assert(b1->interactingGeometry && b2->interactingGeometry);
+	//assert(b1->shape && b2->shape);
 	//shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
 	//i->isReal=true;
-	//bool op=operator()(b1->interactingGeometry,b2->interactingGeometry,b1->physicalParameters->se3,b2->physicalParameters->se3,i);
-	//if(!op) throw runtime_error("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->interactingGeometry->getClassName()+","+b2->interactingGeometry->getClassName()+") or the dispatchee returned false.");
+	//bool op=operator()(b1->shape,b2->shape,b1->physicalParameters->se3,b2->physicalParameters->se3,i);
+	//if(!op) throw runtime_error("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+") or the dispatchee returned false.");
 	//return i;
 
 	// FIXME: not clear why it is not a good idea. If I really wnat interaction that I call this function, I also want it to say loudly that it failed.
@@ -40,7 +40,7 @@ shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shar
 	// example if bodies don't have an interactionGeometry), returned
 	// interaction is non real, i.e. interaction->isReal==false. Sega.
 	shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
-	b1->interactingGeometry && b2->interactingGeometry && operator()( b1->interactingGeometry , b2->interactingGeometry , *b1->state , *b2->state , Vector3r::ZERO, interaction );
+	b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::ZERO, interaction );
 	return interaction;
 }
 
@@ -73,13 +73,13 @@ void InteractionGeometryDispatcher::action(Scene* ncb)
 			if(!b1 || !b2){ LOG_DEBUG("Body #"<<(b1?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); ncb->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
 
 			bool wasReal=I->isReal();
-			if (!b1->interactingGeometry || !b2->interactingGeometry) { assert(!wasReal); continue; } // some bodies do not have interactingGeometry
+			if (!b1->shape || !b2->shape) { assert(!wasReal); continue; } // some bodies do not have shape
 			bool geomCreated;
 			if(!ncb->isPeriodic){
-				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, *b1->state, *b2->state, Vector3r::ZERO, I);
+				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
 			} else{
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
-				geomCreated=operator()(b1->interactingGeometry, b2->interactingGeometry, *b1->state, *b2->state, shift2, I);
+				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, I);
 			}
 			// reset && erase interaction that existed but now has no geometry anymore
 			if(wasReal && !geomCreated){ ncb->interactions->requestErase(I->getId1(),I->getId2()); }

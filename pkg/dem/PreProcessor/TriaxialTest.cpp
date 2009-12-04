@@ -405,8 +405,8 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 
-	body->interactingGeometry	= iSphere;
-	body->boundingVolume		= aabb;
+	body->shape	= iSphere;
+	body->bound		= aabb;
 	body->material	= mat;
 }
 
@@ -419,7 +419,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(1,0,0);
-	body->boundingVolume		= aabb;
+	body->bound		= aabb;
 	
 	/* FIXME?? mass is not assigned (zero), is that OK?
 	body->state->inertia		= Vector3r(
@@ -451,7 +451,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		iBox->extents			= extents;
 		iBox->wire			= wire;
 		iBox->diffuseColor		= Vector3r(1,1,1);
-		body->interactingGeometry	= iBox;
+		body->shape	= iBox;
 	}
 	// guess the orientation
 	int ax0 = extents[0]==0 ? 0 : (extents[1]==0 ? 1 : 2); int ax1=(ax0+1)%3, ax2=(ax0+2)%3;
@@ -463,7 +463,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
 		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
 		iFacet->diffuseColor=Vector3r(1,1,1);
-		body->interactingGeometry=iFacet;
+		body->shape=iFacet;
 		#ifdef YADE_GEOMETRICALMODEL
 			shared_ptr<Facet> facet(new Facet);
 			for(int i=0; i<3; i++){ facet->vertices.push_back(v[i]-cog);}
@@ -476,7 +476,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		wall->sense=0; // interact from both sides, since unspecified here
 		wall->axis=ax0;
 		// Wall has no geometricalModel, skip assignment to body->geometricalModel
-		body->interactingGeometry=wall;
+		body->shape=wall;
 	}
 }
 
@@ -500,12 +500,12 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add(ss);
 	
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
-	boundingVolumeDispatcher->add("InteractingFacet2AABB");
-	boundingVolumeDispatcher->add("Wall2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("InteractingSphere2AABB");
+	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("InteractingFacet2AABB");
+	boundDispatcher->add("Wall2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -569,7 +569,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	rootBody->engines.push_back(collider);
 	if(fast){
@@ -620,7 +620,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	}
 	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 	
 }
 
@@ -639,8 +639,8 @@ void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	
 }
 // 0xdeadc0de, superseded by SpherePack::makeCloud

@@ -117,8 +117,8 @@ void VTKRecorder::action(Scene* rootBody)
 			if(!I->isReal()) continue;
 			//const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(i->interactionPhysics.get());
 			if(skipFacetIntr){
-				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId1())->interactingGeometry.get()))) continue;
-				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId2())->interactingGeometry.get()))) continue;
+				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId1())->shape.get()))) continue;
+				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId2())->shape.get()))) continue;
 			}
 			vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 			line->GetPointIds()->SetId(0,I->getId1());
@@ -138,7 +138,7 @@ void VTKRecorder::action(Scene* rootBody)
 
 		if (recActive[REC_SPHERES])
 		{
-			const InteractingSphere* sphere = dynamic_cast<InteractingSphere*>(b->interactingGeometry.get()); 
+			const InteractingSphere* sphere = dynamic_cast<InteractingSphere*>(b->shape.get()); 
 			if (sphere) 
 			{
 				if(skipNondynamic && !b->isDynamic) continue;
@@ -181,7 +181,7 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 		if (recActive[REC_FACETS])
 		{
-			const InteractingFacet* facet = dynamic_cast<InteractingFacet*>(b->interactingGeometry.get()); 
+			const InteractingFacet* facet = dynamic_cast<InteractingFacet*>(b->shape.get()); 
 			if (facet)
 			{
 				const Se3r& O = b->state->se3;

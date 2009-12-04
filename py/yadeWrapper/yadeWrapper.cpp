@@ -102,7 +102,7 @@ class RenderingEngine;
 		b=Body()
 		b.mold=Shape("InteractingSphere",radius=1)
 		b.shape=GeometricalModel("Sphere",radius=1)
-		b.mold # will give you the interactingGeometry of body
+		b.mold # will give you the shape of body
 	
 	Instances can be queried about attributes and data members they have:
 
@@ -306,9 +306,9 @@ class pyOmega{
 		}
 		assert(rb);
 		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
-		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
-		// initialized in constructor now: rb->boundingVolume->diffuseColor=Vector3r(1,1,1); 
-		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
+		if(!rb->bound){rb->bound=shared_ptr<AABB>(new AABB);}
+		// initialized in constructor now: rb->bound->diffuseColor=Vector3r(1,1,1); 
+		if(!rb->shape){rb->shape=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
 		//if(!OMEGA.getScene()){shared_ptr<Scene> mb=Shop::rootBody(); OMEGA.setScene(mb);}
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){
@@ -660,8 +660,8 @@ void State_ori_set(const shared_ptr<State>& pp, const Quaternionr& p){ pp->ori=p
 //Vector3r State_refPos_get(const shared_ptr<State>& pp){return pp->refPos;}
 //void State_refPos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->refPos=p; }
 
-shared_ptr<Shape> Body_interactingGeometry_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->interactingGeometry; }
-void Body_interactingGeometry_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->interactingGeometry=ig; }
+shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->shape; }
+void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
 
 
 long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
@@ -858,10 +858,10 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	EXPOSE_CXX_CLASS(Body)
 		// mold and geom are deprecated:
-		.add_property("mold",&Body_interactingGeometry_deprec_get,&Body_interactingGeometry_deprec_set)
-		.add_property("geom",&Body_interactingGeometry_deprec_get,&Body_interactingGeometry_deprec_set)
-		.def_readwrite("shape",&Body::interactingGeometry)
-		.def_readwrite("bound",&Body::boundingVolume)
+		.add_property("mold",&Body_shape_deprec_get,&Body_shape_deprec_set)
+		.add_property("geom",&Body_shape_deprec_get,&Body_shape_deprec_set)
+		.def_readwrite("shape",&Body::shape)
+		.def_readwrite("bound",&Body::bound)
 		.def_readwrite("mat",&Body::material)
 		.def_readwrite("state",&Body::state)
 		.def_readwrite("dynamic",&Body::isDynamic)

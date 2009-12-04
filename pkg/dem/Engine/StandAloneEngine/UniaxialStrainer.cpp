@@ -91,7 +91,7 @@ void UniaxialStrainer::init(){
 	 * */
 	if(crossSectionArea<=0){
 		shared_ptr<AABB> rbAABB;
-		if (Omega::instance().getScene()->boundingVolume && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getScene()->boundingVolume))){
+		if (Omega::instance().getScene()->bound && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getScene()->bound))){
 			int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
 			crossSectionArea=4*rbAABB->halfSize[axis2]*rbAABB->halfSize[axis3];
 			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");

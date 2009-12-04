@@ -157,8 +157,8 @@ bool ThreePointBending::generate()
 
 			shared_ptr<BodyMacroParameters> a = YADE_PTR_CAST<BodyMacroParameters>(bodyA->physicalParameters);
 			shared_ptr<BodyMacroParameters> b = YADE_PTR_CAST<BodyMacroParameters>(bodyB->physicalParameters);
-			shared_ptr<InteractingSphere>	as = YADE_PTR_CAST<InteractingSphere>(bodyA->interactingGeometry);
-			shared_ptr<InteractingSphere>	bs = YADE_PTR_CAST<InteractingSphere>(bodyB->interactingGeometry);
+			shared_ptr<InteractingSphere>	as = YADE_PTR_CAST<InteractingSphere>(bodyA->shape);
+			shared_ptr<InteractingSphere>	bs = YADE_PTR_CAST<InteractingSphere>(bodyB->shape);
 
 			if ((a->se3.position-b->se3.position).Length() < interactionFactor*(as->radius+bs->radius))  
 			{
@@ -253,8 +253,8 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(1,1,1);
 
-	body->boundingVolume		= aabb;
-	body->interactingGeometry	= iBox;
+	body->bound		= aabb;
+	body->shape	= iBox;
 	body->geometricalModel		= gBox;
 	body->physicalParameters	= physics;
 }
@@ -270,10 +270,10 @@ void ThreePointBending::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
-	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundingVolumeDispatcher->add("InteractingSphere2AABB");
-	boundingVolumeDispatcher->add("InteractingBox2AABB");
-	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
+	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
+	boundDispatcher->add("InteractingSphere2AABB");
+	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("MetaInteractingGeometry2AABB");
 		
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
@@ -313,7 +313,7 @@ void ThreePointBending::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.clear();
 	rootBody->engines.push_back(sdecTimeStepper);
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-	rootBody->engines.push_back(boundingVolumeDispatcher);
+	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
@@ -326,7 +326,7 @@ void ThreePointBending::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(kinematic);
 
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundingVolumeDispatcher);
+	rootBody->initializers.push_back(boundDispatcher);
 }
 	
 
@@ -349,8 +349,8 @@ void ThreePointBending::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
+	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }
