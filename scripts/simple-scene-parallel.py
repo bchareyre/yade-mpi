@@ -5,7 +5,7 @@
 #
 
 O.initializers=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
 	]
 O.engines=[
 	# physical actions will not be needed until the contact law comes in;
@@ -28,10 +28,10 @@ O.engines=[
 		# BexResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
 		BexResetter(),
 		# Engines within the group will be run serially, however
-		[BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),	PersistentSAPCollider(),]
+		[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),	PersistentSAPCollider(),]
 	]),
-	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	# the rest must also be run sequentially
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)
 	ElasticContactLaw(),

@@ -3,15 +3,15 @@
 
 o=Omega()
 o.initializers=[
-	BoundingVolumeMetaEngine([
+	BoundDispatcher([
 		InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()
 	]
 o.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(hasShear=True)]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(hasShear=True)]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(isCohesive=True),
 	MomentEngine(subscribedBodies=[1],moment=(0,1000,0)),
 	GravityEngine(gravity=(0,0,1e-2)),

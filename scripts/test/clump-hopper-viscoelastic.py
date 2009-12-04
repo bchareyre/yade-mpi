@@ -71,7 +71,7 @@ for k,l in itertools.product(arange(0,9),arange(0,9)):
 # Create engines
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(nBins=5,sweepLength=.1*Rs),
 	InteractionDispatchers(
 		[InteractingSphere2InteractingSphere4SpheresContactGeometry(), InteractingFacet2InteractingSphere4SpheresContactGeometry()],

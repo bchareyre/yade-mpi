@@ -4,7 +4,7 @@
 # Test case for sphere-facet interaction.
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(

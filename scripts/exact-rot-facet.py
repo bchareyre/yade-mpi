@@ -6,17 +6,17 @@
 
 from math import *
 O.initializers=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()])
 	]
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([
+	InteractionGeometryDispatcher([
 		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
 		InteractingFacet2InteractingSphere4SpheresContactGeometry(),
 	]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(),
 	RotationEngine(subscribedBodies=[1],rotationAxis=[1,0,0],angularVelocity=.01),
 	NewtonsDampedLaw(damping=0.2)

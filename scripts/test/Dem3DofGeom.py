@@ -6,11 +6,11 @@ O.bodies.append([
 	utils.sphere([-1,0,2],1,dynamic=True,color=(1,0,0),wire=True),
 ])
 O.engines=[
-	BoundingVolumeMetaEngine([
+	BoundDispatcher([
 		InteractingSphere2AABB(),InteractingFacet2AABB(),Wall2AABB()
 	]),
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([
+	InteractionGeometryDispatcher([
 		ef2_Sphere_Sphere_Dem3DofGeom(),
 		ef2_Facet_Sphere_Dem3DofGeom(),
 		ef2_Wall_Sphere_Dem3DofGeom()

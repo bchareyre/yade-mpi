@@ -8,11 +8,11 @@ print gravity,density,initialSpeed
 
 o=Omega()
 o.initializers=[
-		BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
+		BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 o.engines=[
 	PhysicalActionContainerReseter(),
-	BoundingVolumeMetaEngine([
+	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingBox2AABB(),
 		MetaInteractingGeometry2AABB()

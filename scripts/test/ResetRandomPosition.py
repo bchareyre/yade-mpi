@@ -38,10 +38,10 @@ for id in spheres:
 	s.phys['kn'],s.phys['cn'],s.phys['ks'],s.phys['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 
 # Create engines
-O.initializers=[ BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]) ]
+O.initializers=[ BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]) ]
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(), MetaInteractingGeometry2AABB()
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(), MetaInteractingGeometry2AABB()
 	]),
 	InsertionSortCollider(nBins=5,sweepLength=.1*Rs),
 	InteractionDispatchers(

@@ -38,16 +38,16 @@ O.engines=[
 	## Resets forces and momenta the act on bodies
 	BexResetter(),
 	## Associates bounding volume to each body.
-	BoundingVolumeMetaEngine([ InteractingSphere2AABB(), InteractingFacet2AABB() ]),
+	BoundDispatcher([ InteractingSphere2AABB(), InteractingFacet2AABB() ]),
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),
 	## Create geometry information about each potential collision.
-	InteractionGeometryMetaEngine([
+	InteractionGeometryDispatcher([
 		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
 		InteractingFacet2InteractingSphere4SpheresContactGeometry()
 	]),
 	## Create physical information about the interaction.
-	InteractionPhysicsMetaEngine([
+	InteractionPhysicsDispatcher([
 		Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()
 	]),
     ## Constitutive law

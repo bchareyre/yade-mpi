@@ -10,7 +10,7 @@ O.dt=utils.PWaveTimeStep()
 
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
 	InsertionSortCollider(label='isc'),
 	InteractionDispatchers(
 		[ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()],
@@ -32,6 +32,6 @@ O.timingEnabled=True
 isc['sweepLength']=.1
 isc['nBins']=5
 #log.setLevel('InsertionSortCollider',log.DEBUG)
-#log.setLevel('BoundingVolumeMetaEngine',log.DEBUG)
+#log.setLevel('BoundDispatcher',log.DEBUG)
 O.saveTmp()
 O.step()

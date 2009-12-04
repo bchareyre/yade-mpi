@@ -10,7 +10,7 @@ o=Omega() # for advaned folks: this creates default MetaBody as well
 ## Initializers are run before the simulation.
 o.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
 ]
 
 ## Engines are called consecutively at each iteration. Their order matters.
@@ -24,7 +24,7 @@ o.engines=[
 	## associates bounding volume - in this case, AxisAlignedBoundingBox (AABB) - to each body.
 	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, Box, or MetaBody (rootBody).
 	## AABBs will be used to detect collisions later, by PersistentSAPCollider
-	BoundingVolumeMetaEngine([
+	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingBox2AABB(),
 		MetaInteractingGeometry2AABB()
@@ -35,7 +35,7 @@ o.engines=[
 	## Decide whether the potential collisions are real; if so, create geometry information about each potential collision.
 	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
 	## Note that there is no EngineUnit for box-box collision. They are not implemented.
-	InteractionGeometryMetaEngine([
+	InteractionGeometryDispatcher([
 		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
 		InteractingBox2InteractingSphere4SpheresContactGeometry()
 	]),
@@ -43,7 +43,7 @@ o.engines=[
 	## This may consist in deriving contact rigidity from elastic moduli of each body, for example.
 	## The purpose is that the contact may be "solved" without reference to related bodies,
 	## only with the information contained in contact geometry and physics.
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	## "Solver" of the contact, also called (consitutive) law.
 	## Based on the information in interaction physics and geometry, it applies corresponding forces on bodies in interaction.
 	ElasticContactLaw(),
@@ -105,7 +105,7 @@ if False:
 	mass=8*.5*.5*.5*2400
 	# * se3 (position & orientation) as 3 position coordinates, then 3 direction axis coordinates and rotation angle
 	b.phys=BodyMacroParameters(se3=[0,0,0,1,0,0,0],mass=mass,inertia=[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],young=30e9,poisson=.3)
-	# other information about AABB will be updated during simulation by relevant BoundingVolumeMetaEngine
+	# other information about AABB will be updated during simulation by relevant BoundDispatcher
 	b.bound=AABB(diffuseColor=[0,1,0])
 	# add the body to the simulation
 	o.bodies.append(b)

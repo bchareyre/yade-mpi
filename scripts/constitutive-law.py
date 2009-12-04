@@ -2,14 +2,14 @@
 # -*- encoding=utf-8 -*-
 
 O.initializers=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
 	]
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ConstitutiveLawDispatcher([ef2_Spheres_Elastic_ElasticLaw()]),
 	GravityEngine(gravity=(0,0,-1000)),
 	NewtonsDampedLaw(damping=0.2)

@@ -45,7 +45,7 @@ o.dt=0.0001
 
 ## Initializers 
 o.initializers=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 
 ## Engines 
@@ -54,7 +54,7 @@ o.engines=[
 	BexResetter(),
 
 	## Associates bounding volume to each body.
-	BoundingVolumeMetaEngine([
+	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingFacet2AABB(),
 		MetaInteractingGeometry2AABB()
@@ -62,12 +62,12 @@ o.engines=[
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),
 	## Create geometry information about each potential collision.
-	InteractionGeometryMetaEngine([
+	InteractionGeometryDispatcher([
 		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
 		InteractingFacet2InteractingSphere4SpheresContactGeometry()
 	]),
 	## Create physical information about the interaction.
-	InteractionPhysicsMetaEngine([MacroMicroElasticRelationships()]),
+	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
     ## Constitutive law
 	ElasticContactLaw(),
 	## Apply gravity

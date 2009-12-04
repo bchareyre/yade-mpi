@@ -19,16 +19,16 @@ O.dt=0.0001
 
 ## Initializers 
 O.initializers=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 
 ## Engines 
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionGeometryDispatcher([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic()]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonsDampedLaw(damping=0.3),

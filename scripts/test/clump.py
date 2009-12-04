@@ -1,7 +1,7 @@
-O.initializers=[BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])]
+O.initializers=[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])]
 O.engines=[
 	PhysicalActionContainerReseter(),
-	BoundingVolumeMetaEngine([
+	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingBox2AABB(),
 		MetaInteractingGeometry2AABB()

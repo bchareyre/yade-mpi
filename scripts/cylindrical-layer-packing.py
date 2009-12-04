@@ -6,7 +6,7 @@ from math import *
 o=Omega()
 
 # we will use this in both initializers and engines, so we save it to a temp variable to save typing
-aabbDispatcher=BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+aabbDispatcher=BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
 
 o.initializers=[aabbDispatcher]
 
@@ -14,8 +14,8 @@ o.engines=[
 	BexResetter(),
 	aabbDispatcher,
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(),
 	GlobalStiffnessTimeStepper(defaultDt=1e-4,active=True,timeStepUpdateInterval=500),
 	AxialGravityEngine(axisPoint=(0,0,0),axisDirection=(1,0,0),acceleration=1e4),

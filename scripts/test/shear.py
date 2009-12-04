@@ -8,10 +8,10 @@ O.bodies.append([
 	utils.sphere([0,0,1],.5000001,dynamic=True,color=(0,0,1))
 ])
 O.engines=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
-	InteractionPhysicsMetaEngine([SimpleElasticRelationships()]),
+	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
 	ElasticContactLaw(useShear=False,label='elasticLaw'),
 	PeriodicPythonRunner(iterPeriod=10000,command='interInfo()'),

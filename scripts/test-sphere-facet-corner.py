@@ -14,16 +14,16 @@ O.bodies.append([
 
 ## Initializers 
 O.initializers=[
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
 	]
 
 ## Engines 
 O.engines=[
 	BexResetter(),
-	BoundingVolumeMetaEngine([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryMetaEngine([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingFacet2InteractingSphere4SpheresContactGeometry()]),
-	InteractionPhysicsMetaEngine([MacroMicroElasticRelationships()]),
+	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingFacet2InteractingSphere4SpheresContactGeometry()]),
+	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
 	ElasticContactLaw(),
 	GravityEngine(gravity=(0,0,-10)),
 	NewtonsDampedLaw(damping=.3)

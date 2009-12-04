@@ -89,7 +89,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	b['id']=-1
-	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
+	if not noBound: b.bound=Bound('AABB',diffuseColor=[0,1,0])
 
 def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
@@ -122,7 +122,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
-	b.shape=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Shape('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material)
@@ -152,13 +152,13 @@ def wall(position,axis,sense=0,color=None,material=0):
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBoundingVolume=False,material=0):
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=0):
 	"""Create facet with given parameters.
 
 	:Parameters:
 		`vertices`: [Vector3,Vector3,Vector3]
 			coordinates of vertices in the global coordinate system.
-		`noBoundingVolume`: do not assign Body().bound
+		`noBound`: do not assign Body().bound
 	
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
@@ -168,7 +168,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBounding
 	b.shape=Shape('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.shape['vertices']=vertices
 	b.shape.postProcessAttributes(True)
-	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBoundingVolume)
+	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
 	return b
@@ -262,7 +262,7 @@ def fractionalBox(fraction=1.,minMax=None):
 
 
 def randomizeColors(onlyDynamic=False):
-	"""Assign random colors to InteractingGeometry::diffuseColor.
+	"""Assign random colors to Shape::diffuseColor.
 
 	If onlyDynamic is true, only dynamic bodies will have the color changed.
 	"""
