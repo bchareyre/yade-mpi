@@ -87,7 +87,7 @@ from yade import utils
 ## * young: Young's modulus
 ## * poisson: Poissons's ratio
 
-o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
+o.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],dynamic=False))
 
 ## The above command could be actully written without the util.box function like this:
 ## (will not be executed, since the condition is never True)
@@ -117,7 +117,7 @@ if False:
 ## python will deduce based on where they are what they mean.
 ##
 ## It could also be written without using utils.sphere - see gui/py/utils.py for the code of the utils.sphere function
-o.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
+o.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
 
 ## Estimate timestep from p-wave speed and multiply it by safety factor of .2
 o.dt=.2*utils.PWaveTimeStep()

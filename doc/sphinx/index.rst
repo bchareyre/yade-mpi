@@ -8,8 +8,12 @@ Welcome to Yade's documentation!
 
 Contents:
 
+
+
 .. toctree::
   :maxdepth: 2
+
+  arch.rst
 
 .. automodule:: yade
   :members:
