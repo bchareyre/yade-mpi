@@ -85,7 +85,7 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void pbGenerate_clicked();
 		virtual void pyOnelinerEnter();
 
-
+		void keyPressEvent(QKeyEvent *event);
 
         
         protected :

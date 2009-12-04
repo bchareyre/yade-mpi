@@ -150,7 +150,8 @@ class pyBodyContainer{
 		else return (*proxee)[id];
 	}
 	body_id_t append(shared_ptr<Body> b){
-		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body aleady has id "+lexical_cast<string>(b->getId())+"set; appending such body is not allowed.").c_str()); return proxee->insert(b); }
+		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body aleady has id "+lexical_cast<string>(b->getId())+"set; appending such body is not allowed.").c_str()); python::throw_error_already_set(); }
+		return proxee->insert(b);
 	}
 	vector<body_id_t> appendList(vector<shared_ptr<Body> > bb){
 		/* prevent crash when adding lots of bodies (not clear why it happens exactly, bt is like this:

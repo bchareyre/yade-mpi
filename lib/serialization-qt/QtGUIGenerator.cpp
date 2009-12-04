@@ -173,17 +173,16 @@ std::string sanitize(const std::string num)
 		}
 		else
 		{
-			std::cerr << "INFO: sanitize failed: " << a << " != " << b << "\n";
+			// std::cerr << "INFO: sanitize failed: " << a << " != " << b << "\n";
 			return num; // return original numer, since they are different
 		}
 	}
 	catch(std::bad_cast&)
 	{
-		std::cerr << "INFO: sanitize failed: " << ret << " != " << num << "\n";
+		// std::cerr << "INFO: sanitize failed: " << ret << " != " << num << "\n";
 		return num; // oops, the number got corrupted somehow
 	}
 };
-
 
 void QtGUIGenerator::buildGUI(shared_ptr<Serializable> s,  QWidget * widget)
 {

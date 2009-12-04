@@ -145,6 +145,10 @@ void GLViewer::mouseMovesManipulatedFrame(qglviewer::Constraint* c){
 	manipulatedFrame()->setConstraint(c);
 }
 
+bool GLViewer::isManipulating(){
+	return isMoving || manipulatedClipPlane>=0;
+}
+
 void GLViewer::resetManipulation(){
 	mouseMovesCamera();
 	setSelectedName(-1);
@@ -213,7 +217,11 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 
 	if(false){}
 	/* special keys: Escape and Space */
-	else if(e->key()==Qt::Key_Escape){ resetManipulation(); displayMessage("Manipulating scene."); }
+	//else if(e->key()==Qt::Key_F9 || e->key()==Qt::Key_F10 || e->key()==Qt::Key_F11 || e->key()==Qt::Key_F12){ YadeQtMainWindow::self->closeView(this); }
+	else if(e->key()==Qt::Key_Escape){
+		if(!isManipulating()){ /* CRASH, deleting this: YadeQtMainWindow::self->closeView(this); */ return; }
+		else { resetManipulation(); displayMessage("Manipulating scene."); }
+	}
 	else if(e->key()==Qt::Key_Space){
 		if(manipulatedClipPlane>=0) {displayMessage("Clip plane #"+lexical_cast<string>(manipulatedClipPlane+1)+(renderer->clipPlaneActive[manipulatedClipPlane]?" de":" ")+"activated"); renderer->clipPlaneActive[manipulatedClipPlane]=!renderer->clipPlaneActive[manipulatedClipPlane]; }
 	}

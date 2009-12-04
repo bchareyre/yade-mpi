@@ -1,6 +1,6 @@
 Import('*')
 
-pyMain='$PREFIX/bin/yade$SUFFIX-py'
+pyMain='$PREFIX/bin/yade$SUFFIX'
 env.InstallAs(pyMain,env.ScanReplace('main/main.py.in'))
 
 env.InstallAs(pyMain,env.File(env.ScanReplace('main/main.py.in'),''))
@@ -10,7 +10,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.SharedLibrary('boot',['main/pyboot.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-support','core'])
 ])
 
-env.InstallAs('$PREFIX/bin/yade$SUFFIX',env.Program('yade',['main/main.cpp'],LIBS=env['LIBS']+['yade-support','core'],CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['realVersion']+'\\"'),]))
+env.InstallAs('$PREFIX/bin/yade$SUFFIX-cxx',env.Program('yade',['main/main.cpp'],LIBS=env['LIBS']+['yade-support','core'],CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['realVersion']+'\\"'),]))
 
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 	env.SharedLibrary('core',

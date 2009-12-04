@@ -52,13 +52,19 @@ if 'opengl' in env['features']:
 	)
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','$QGLVIEWER_LIB']),
 #env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary
-yadeStaticOrSharedLib('yade-support',env.Combine('yade-support.cpp',[
-	'base/yadeWm3Extra.cpp',
-	'computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp',
-	'factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
-	'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
-	'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp',
-	'serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp','serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializationExceptions.cpp']),LIBS=['dl'],CXXFLAGS=env['CXXFLAGS']+['-fPIC'])
+yadeStaticOrSharedLib('yade-support',[
+	env.Combine('yade-support.cpp',[
+			'base/yadeWm3Extra.cpp',
+			'computational-geometry/Distances2D.cpp','computational-geometry/Distances3D.cpp','computational-geometry/Intersections2D.cpp','computational-geometry/Intersections3D.cpp','computational-geometry/MarchingCube.cpp',
+			'factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
+			'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
+			'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp',
+			'serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializationExceptions.cpp',
+		]
+		# compile TesselationWrapper only if cgal is enabled
+		+(Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TesselationWrapper.cpp triangulation/test.cpp triangulation/TriaxialState.cpp') if 'cgal' in env['features'] else []))
+	],LIBS=['dl'],CXXFLAGS=env['CXXFLAGS']+['-fPIC']
+)
 #)
 #######################
 ###### 3rd party libs

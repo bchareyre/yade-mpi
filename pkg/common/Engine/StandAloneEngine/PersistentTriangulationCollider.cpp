@@ -14,7 +14,7 @@
 #include<vector>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
-#include<yade/extra/TesselationWrapper.h>
+#include<yade/lib-triangulation/TesselationWrapper.h>
 
 YADE_REQUIRE_FEATURE(CGAL)
 

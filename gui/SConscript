@@ -52,7 +52,6 @@ env.InstallAs('$PREFIX/bin/yade$SUFFIX-multi',env.File('yade-multi','py'))
 env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.File('runtime.py','py'),
 	env.File('ipython.py','py'),
-	env.File('PythonTCPServer.py','py'),
 ])
 
 

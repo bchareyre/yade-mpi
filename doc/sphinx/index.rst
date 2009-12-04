@@ -15,19 +15,35 @@ Contents:
 
   arch.rst
 
-.. automodule:: yade
+  modules.rst
+
+  yade.pack.rst
+
+.. .. automodule:: yade
   :members:
   :undoc-members:
 
-yade.pack
+yade.log
 ---------
-.. automodule:: yade.pack
+.. automodule:: yade.log
   :members:
   :undoc-members:
 
-yade.utils
-----------
-.. automodule:: yade.utils
+yade.timing
+-----------
+.. automodule:: yade.timing
+  :members:
+  :undoc-members:
+
+yade.post2d
+-----------
+.. automodule:: yade.post2d
+  :members:
+  :undoc-members:
+
+yade.plot
+-----------
+.. automodule:: yade.plot
   :members:
   :undoc-members:
 

@@ -6,6 +6,22 @@ import sys,os,os.path
 # get yade path (allow YADE_PREFIX to override)
 prefix,suffix='${PREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
+# duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
+debug,features,version=bool(${debug}),'${features}'.split(','),'${realVersion}'
+
+# handle command-line options first
+import optparse
+par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(version,','.join(features)))
+par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores.',dest='threads',type='int')
+par.add_option('-x',help='Exit when the script finishes',dest='exitAfter')
+if 'log4cxx' in features:
+	par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.',action='count',dest='verbosity')
+if debug:
+	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
+
+opts,args=par.parse_args()
+# c++-boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
+if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
 
 # initialization and c++ plugins import
 import yade
@@ -13,34 +29,28 @@ import yade
 import yade.config
 import yade.wrapper
 import yade.log
+import yade.system
 
-
-# handle command-line options first
-import optparse
-par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(yade.config.version,','.join(yade.config.features)))
-par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores.',dest='threads',type='int')
-par.add_option('-x',help='Exit when the script finishes',dest='exitAfter')
-if 'log4cxx' in yade.config.features:
-	par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.',action='count',dest='verbosity')
-if yade.config.debug:
-	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
-
-opts,args=par.parse_args()
+# continue option processing
 
 if opts.threads:
 	os.environ['OMP_NUM_THREADS']=str(opts.threads)
 if yade.config.debug and opts.noGdb:
 	yade.wrapper.Omega().disableGdb()
 if 'log4cxx' in yade.config.features and opts.verbosity:
-	yade.log.setLevel([yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,3)])
+	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,3)])
+
+# run servers
+yade.system.runServers()
 
 # open GUI if possible
+qtEnabled=False
 try:
 	import yade.qt
-	yade.qt.Controller()
+	qtEnabled=True
 except ImportError: pass
 
-# be nice to users
+# prepare nice namespace for users
 from yade import *
 from math import *
 
@@ -60,7 +70,22 @@ if len(args)>0:
 if 1:
 	if 1:
 		from IPython.Shell import IPShellEmbed
-		ipshell=IPShellEmbed(exit_msg='Bye.',rc_override={'execfile':[prefix+'/lib/yade'+suffix+'/py/yade/ipython.py']})
+		ipshell=IPShellEmbed(
+			argv=[],
+			#exit_msg='Bye.',
+			banner='[[ ^L clears screen, ^U kills line.'+(' F12 controller, F11 3d view, F10 both, F9 generator.' if qtEnabled else '')+' ]]',
+			rc_override={
+				'execfile':[prefix+'/lib/yade'+suffix+'/py/yade/ipython.py'],
+				'readline_parse_and_bind':[
+					'tab: complete',
+					# only with the gui
+					# the escape codes might not work on non-linux terminals.
+					]+(['"\e[24~": "\C-Uyade.qt.Controller();\C-M"', # F12
+					'"\e[23~": "\C-Uyade.qt.View();\C-M"', # F11
+					'"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"', # F10
+					'"\e[20~": "\C-Uyade.qt.Generator();\C-M"', #F9
+					] if qtEnabled else [])
+			})
 		ipshell()
 	else:
 		import bpython

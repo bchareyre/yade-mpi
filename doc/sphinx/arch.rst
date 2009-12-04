@@ -1,20 +1,20 @@
-######################
+**********************
 Architecture overview
-######################
+**********************
 
 In the following, a high-level overview of Yade architecture will be given.
 As many of the features are directly represented in simulation scripts, which
 are written in Python, being familiar with this language will help you follow
 the examples. For the rest, this knowledge is not strictly necessary.
 
-****************
+
 Simulation loop
-****************
+================
 
 Yade's simulation are explicit, proceeding in time by given timestep (:ref:`timestep`). At every step, a sequence of :ctype:`Engines` is run; these Engines operate on :ctype:`Body`'s (particles) and their :ctype:`Interaction`'s.
 
 Bodies
-======
+------
 Bodies in simulation are distinguished by their unique numerical id.
 
 Each body has some :ctype:`Shape` in the geometrical sense: sphere, facet (triangle), infinite wall; this shape is constant throughout Body's life. Orthogonal to shape is :ctype:`Material` holding material properties, independently of the shape, such as Young's modulus; a material can be shared between multiple bodies. To account for various changes a Body might undergo, there is a :ctype:`State` associated with every Body − it holds spatial position and orientation, velocity and so on. Finally (but this is invisible to the user), there is :ctype:`Bound` approximating (bounding) the body in space, to speed up collision detection. 
@@ -59,7 +59,7 @@ Bodies can be iterated over using standard python syntax:
 	1 0.5
 
 Interactions
-============
+--------------
 Interactions (used as uniting term for contacts and bonds, i.e. non-cohesive and cohesive interactions) are always between two bodies. In typical cases, they are created automatically based on spatial position of bodies. If two bodies are sufficiently close (in terms of their bounds), the collider creates interaction, which we call *potential*. Later in the loop, such interaction is checked for precise overlap based on shapes of the 2 bodies (sphere with triangle, for instance); if they do overlap, the interaction becomes *real*.
 
 Each (real) :ctype:`Interaction` has again several components.
@@ -83,7 +83,7 @@ Suppose now interactions are already created. We can access them by the id pair:
 	ValueError: No such interaction
 
 Engines
-=======
+--------
 
 A typical simulation loop does the following:
 
@@ -123,7 +123,7 @@ There are 2 fundamental types of Engines:
 	invoking various :ctype:`Functor`'s based on types they receive. For instance, ``BoundDispatcher([Bv1_Sphere_AABB])`` creates a ``BoundDispatcher``, which will, based on shape type, use one of its functors to create bound for each body. In this case, it has 2 functors, one for spheres, one for facets; the ``Bo`` functor creating Bound, which is called based on ``1`` type ``Sphere`` it receives, and creates bound of type ``Aabb`` (axis-aligned bounding box).
 
 Dispatchers and functors
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 As said, BoundDispatcher dispatches based on Shape type; for sphere, it will use ``Bo1_Sphere_Aabb``, for facets ``Bo1_Facet_Aabb``.
 
 ``InteractionDispatchers`` hides 3 dispatchers, which all operate on interactions.
@@ -143,7 +143,7 @@ As said, BoundDispatcher dispatches based on Shape type; for sphere, it will use
 
 
 Controlling the loop
-====================
+---------------------
 
 As explained above, the loop consists in running defined sequence of engines. Step number can be queried by ``O.iter`` and advancing by one step is done by ``O.step()``. Every step advances *virtual time* by current timestep, ``O.dt``:
 
@@ -171,13 +171,13 @@ Normal simulations, however, are run continuously. Starting/stopping the loop is
 	>>> O.wait()
 	>>> O.iter
 	500000
-******************
+
 Input and output
-*****************
+=================
 Yade provides functions for creating, saving and loading simulations.
 
 Creating simulation
-===================
+--------------------
 To create simulation, one can either use a specialized class of type :ctype:`Generator` to create full scene, possibly receiving some parameters. Generators are written in c++ and their role is limited to well-defined scenarios. For instance, to create triaxial test scene:
 
 	>>> TriaxialTest(numberOfGrains=1000).load()
@@ -219,9 +219,6 @@ It can be sometimes useful to run different simulation, while the original one i
 suspended, e.g. when dynamically creating packing. ``O.switchWorld()``  toggles between the
 primary and secondary simulation.
 
-****************************
-Creating simulation
-****************************
 
 Yade python introduction (class instantiation)
 Mathematical formulation

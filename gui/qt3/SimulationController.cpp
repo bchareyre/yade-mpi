@@ -94,8 +94,6 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
 
-	pyOneliner->setEnabled(false);
-	pyOneliner->setText("Yade compiled without Python");
 }
 
 /* restart timer with SimulationController::refreshTime */
@@ -520,3 +518,25 @@ void SimulationController::dtIntegerMantissaExponent(int& mantissa, int& exponen
 	exponent=floor(log10(dt));
 	mantissa=((int)(.1+dt/(pow((float)10,exponent)))); // .1: rounding issues
 }
+
+void SimulationController::keyPressEvent(QKeyEvent *event){
+	switch(event->key()){
+		case Qt::Key_Escape:
+		case Qt::Key_F1:
+		case Qt::Key_F2:
+		case Qt::Key_F3:
+		case Qt::Key_F4:
+		case Qt::Key_F5:
+		case Qt::Key_F6:
+		case Qt::Key_F7:
+		case Qt::Key_F8:
+		case Qt::Key_F9:
+		case Qt::Key_F10:
+		case Qt::Key_F11:
+		case Qt::Key_F12:
+			YadeQtMainWindow::self->closeController(); break;
+		default:
+			QtGeneratedSimulationController::keyPressEvent(event);
+	}
+}
+

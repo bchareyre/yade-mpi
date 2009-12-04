@@ -106,9 +106,9 @@ def runServers():
 	at runtime. Each connection receives pickled dictionary with those values.
 	This socket is primarily used by yade-multi batch scheduler.
 	"""
-	import yade.PythonTCPServer
-	srv=yade.PythonTCPServer.GenericTCPServer(handler=yade.PythonTCPServer.PythonConsoleSocketEmulator,title='TCP python prompt',cookie=True,minPort=9000)
+	import yade.remote
+	srv=yade.remote.GenericTCPServer(handler=yade.remote.PythonConsoleSocketEmulator,title='TCP python prompt',cookie=True,minPort=9000)
 	yade.runtime.cookie=srv.server.cookie
-	info=yade.PythonTCPServer.GenericTCPServer(handler=yade.PythonTCPServer.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
+	info=yade.remote.GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 	sys.stdout.flush()
 

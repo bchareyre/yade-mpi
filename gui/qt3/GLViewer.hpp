@@ -70,6 +70,7 @@ class GLViewer : public QGLViewer
 		void mouseMovesCamera();
 		void mouseMovesManipulatedFrame(qglviewer::Constraint* c=NULL);
 		void resetManipulation();
+		bool isManipulating();
 		void startClipPlaneManipulation(int planeNo);
 		//! get QGLViewer state as string (XML); QGLViewer normally only supports saving state to file.
 		string getState();

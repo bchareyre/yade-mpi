@@ -19,15 +19,12 @@
 
 #include "MicroMacroAnalyser.hpp"
 
-#include<yade/extra/TesselationWrapper.h>
-#include<yade/extra/KinematicLocalisationAnalyser.hpp>
-#include<yade/extra/TriaxialState.h>
+#include<yade/lib-triangulation/TesselationWrapper.h>
+#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
+#include<yade/lib-triangulation/TriaxialState.h>
 
 YADE_PLUGIN((MicroMacroAnalyser));
 YADE_REQUIRE_FEATURE(CGAL)
-// see comment in extra/SConscript
-YADE_LINK_EXTRA_LIB(TesselationWrapper)
-
 
 CREATE_LOGGER(MicroMacroAnalyser);
 

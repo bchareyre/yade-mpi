@@ -60,5 +60,7 @@ __all__=yadeTypes.keys()+['O']
 import miniWm3Wrap,wrapper
 from miniWm3Wrap import *
 from wrapper import *
-__all__+=dir(miniWm3Wrap)+dir(wrapper)
+# import a few "important" modules along with *
+import utils # some others?
+__all__+=['utils',]+dir(miniWm3Wrap)+dir(wrapper)
 
