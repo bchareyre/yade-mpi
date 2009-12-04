@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 
@@ -101,7 +101,7 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 }
 
 
-void ElasticCriterionTimeStepper::computeTimeStep(World* ncb)
+void ElasticCriterionTimeStepper::computeTimeStep(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	shared_ptr<InteractionContainer>& interactions = ncb->interactions;

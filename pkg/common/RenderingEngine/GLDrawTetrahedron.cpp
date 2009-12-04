@@ -11,7 +11,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 void GLDrawTetrahedron::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>&,bool wire)
 {

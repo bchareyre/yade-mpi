@@ -129,8 +129,8 @@ class TriaxialTestWater : public FileGenerator
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
-		void createActors(shared_ptr<World>& rootBody);
-		void positionRootBody(shared_ptr<World>& rootBody);
+		void createActors(shared_ptr<Scene>& rootBody);
+		void positionRootBody(shared_ptr<Scene>& rootBody);
 	
 	public : 
 		TriaxialTestWater ();

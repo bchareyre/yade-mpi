@@ -17,8 +17,8 @@
 #include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
 
 class Body;
-class PhysicalActionApplier: public Dispatcher1D<PhysicalParameters,PhysicalActionApplierUnit,void,TYPELIST_3(const shared_ptr<PhysicalParameters>&,const Body*, World*)>{
-	public: virtual void action(World*);
+class PhysicalActionApplier: public Dispatcher1D<PhysicalParameters,PhysicalActionApplierUnit,void,TYPELIST_3(const shared_ptr<PhysicalParameters>&,const Body*, Scene*)>{
+	public: virtual void action(Scene*);
 	REGISTER_CLASS_AND_BASE(PhysicalActionApplier,Dispatcher1D);
 };
 REGISTER_SERIALIZABLE(PhysicalActionApplier);

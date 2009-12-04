@@ -36,7 +36,7 @@ class HydraulicTest : public FileGenerator
 
 		bool		 momentRotationLaw;
 	
-		void positionRootBody(shared_ptr<World>& rootBody);
+		void positionRootBody(shared_ptr<Scene>& rootBody);
 		bool inside(Vector3r pos);
 	
 	public :

@@ -15,8 +15,8 @@
 
 
 
-#include<yade/core/World.hpp>
-#ifdef YADE_SHAPE
+#include<yade/core/Scene.hpp>
+#ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Sphere.hpp>
 #endif
 
@@ -94,7 +94,7 @@ TriaxialStressController::~TriaxialStressController()
 }
 
 
-void TriaxialStressController::updateStiffness (World * ncb)
+void TriaxialStressController::updateStiffness (Scene * ncb)
 {
 	for (int i=0; i<6; ++i) stiffness[i] = 0;
 
@@ -126,7 +126,7 @@ void TriaxialStressController::updateStiffness (World * ncb)
 	}
 }
 
-void TriaxialStressController::controlExternalStress(int wall, World* ncb, Vector3r resultantForce, State* p, Real wall_max_vel)
+void TriaxialStressController::controlExternalStress(int wall, Scene* ncb, Vector3r resultantForce, State* p, Real wall_max_vel)
 {
 	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce); 
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
@@ -157,7 +157,7 @@ void TriaxialStressController::controlExternalStress(int wall, World* ncb, Vecto
 
 
 
-void TriaxialStressController::applyCondition(World* ncb)
+void TriaxialStressController::applyCondition(Scene* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
 
@@ -266,7 +266,7 @@ void TriaxialStressController::applyCondition(World* ncb)
  *
  * (This function used to return meanStress, but since the return value was not used anywhere, it now returns void)
  */
-void TriaxialStressController::computeStressStrain(World* ncb)
+void TriaxialStressController::computeStressStrain(Scene* ncb)
 {
 	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
@@ -310,7 +310,7 @@ void TriaxialStressController::computeStressStrain(World* ncb)
 	meanStress/=6.;
 }
 
-void TriaxialStressController::controlInternalStress ( World* ncb, Real multiplier )
+void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multiplier )
 {
 	spheresVolume *= pow ( multiplier,3 );
 	BodyContainer::iterator bi    = ncb->bodies->begin();
@@ -323,7 +323,7 @@ void TriaxialStressController::controlInternalStress ( World* ncb, Real multipli
 		{
 			( static_cast<InteractingSphere*> ( ( *bi )->interactingGeometry.get() ) )->radius *= multiplier;
 			//( static_cast<Sphere*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
-			#ifdef YADE_SHAPE
+			#ifdef YADE_GEOMETRICALMODEL
 				Sphere* s = dynamic_cast<Sphere*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
 			#endif
 				//( static_cast<ParticleParameters*> ( ( *bi )->physicalParameters.get() ) )->mass *= pow ( multiplier,3 );
@@ -354,9 +354,9 @@ void TriaxialStressController::controlInternalStress ( World* ncb, Real multipli
 }
 
 /*!
-    \fn TriaxialStressController::ComputeUnbalancedForce(World * ncb, bool maxUnbalanced)
+    \fn TriaxialStressController::ComputeUnbalancedForce(Scene * ncb, bool maxUnbalanced)
  */
-Real TriaxialStressController::ComputeUnbalancedForce(World * ncb, bool maxUnbalanced)
+Real TriaxialStressController::ComputeUnbalancedForce(Scene * ncb, bool maxUnbalanced)
 {
 	ncb->bex.sync();
 	//compute the mean contact force

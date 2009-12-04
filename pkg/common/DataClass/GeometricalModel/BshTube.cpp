@@ -9,7 +9,7 @@
 
 #include "BshTube.hpp"
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 BshTube::BshTube () : GeometricalModel()
 {		

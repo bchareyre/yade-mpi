@@ -9,7 +9,7 @@
 #include "HistoryRecorder.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <yade/pkg-common/InteractingSphere.hpp>
@@ -42,14 +42,14 @@ void HistoryRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool HistoryRecorder::isActivated(World*)
+bool HistoryRecorder::isActivated(Scene*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
 
 
-void HistoryRecorder::action(World * ncb)
+void HistoryRecorder::action(Scene * ncb)
 {
   shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
@@ -66,7 +66,7 @@ void HistoryRecorder::action(World * ncb)
 	 if (b->isClump()) continue;
 	 
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-	 const InteractingGeometry* gm   = YADE_CAST<InteractingGeometry*>(b->interactingGeometry.get());
+	 const Shape* gm   = YADE_CAST<Shape*>(b->interactingGeometry.get());
 
 	if ( typeid(*gm) == typeid(InteractingSphere) )
      {

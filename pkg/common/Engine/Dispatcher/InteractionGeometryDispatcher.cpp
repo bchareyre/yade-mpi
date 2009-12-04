@@ -11,7 +11,7 @@
 #include "InteractionGeometryDispatcher.hpp"
 
 
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 	
 CREATE_LOGGER(InteractionGeometryDispatcher);
 
@@ -44,7 +44,7 @@ shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shar
 	return interaction;
 }
 
-void InteractionGeometryDispatcher::action(World* ncb)
+void InteractionGeometryDispatcher::action(Scene* ncb)
 {
 	// Erase interaction that were requested for erase, but not processed by the collider, if any (and warn once about that, as it is suspicious)
 	if(ncb->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){

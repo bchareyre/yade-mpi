@@ -7,7 +7,7 @@
 #include<yade/core/Material.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/LawFunctor.hpp>
 
 /* Simple viscoelastic model */
  
@@ -65,12 +65,12 @@ REGISTER_SERIALIZABLE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleVisco
 
 /// Constitutive law
 /// This class provides linear viscoelastic contact model
-class Law2_Spheres_Viscoelastic_SimpleViscoelastic: public ConstitutiveLaw {
+class Law2_Spheres_Viscoelastic_SimpleViscoelastic: public LawFunctor {
 	public :
-		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, World*);
+		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*);
 		FUNCTOR2D(SpheresContactGeometry,SimpleViscoelasticPhys);
-		REGISTER_CLASS_AND_BASE(Law2_Spheres_Viscoelastic_SimpleViscoelastic,ConstitutiveLaw);
-		REGISTER_ATTRIBUTES(ConstitutiveLaw,/* */);
+		REGISTER_CLASS_AND_BASE(Law2_Spheres_Viscoelastic_SimpleViscoelastic,LawFunctor);
+		REGISTER_ATTRIBUTES(LawFunctor,/* */);
 };
 REGISTER_SERIALIZABLE(Law2_Spheres_Viscoelastic_SimpleViscoelastic);
 

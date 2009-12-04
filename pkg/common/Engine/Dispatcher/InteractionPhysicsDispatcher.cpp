@@ -9,7 +9,7 @@
 #include "InteractionPhysicsDispatcher.hpp"
 
 
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 /* Single dispatch for given bodies pp's and interaction.
  * 
  * The interaction must be real (needed?).
@@ -21,7 +21,7 @@ void InteractionPhysicsDispatcher::explicitAction(shared_ptr<Material>& pp1, sha
 }
 
 
-void InteractionPhysicsDispatcher::action(World* ncb)
+void InteractionPhysicsDispatcher::action(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	#ifdef YADE_OPENMP

@@ -1,8 +1,8 @@
 
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -21,7 +21,7 @@ bool TetraTestGen::generate()
 
 	rootBody=Shop::rootBody();
 
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add(new TetraAABB);
 	boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundingVolumeDispatcher);
@@ -44,8 +44,8 @@ bool TetraTestGen::generate()
 	rootBody->dt=1e-5;
 	
 	#if 0
-	shared_ptr<World> oldRootBody=Omega::instance().getWorld();
-	Omega::instance().setWorld(rootBody);
+	shared_ptr<Scene> oldRootBody=Omega::instance().getScene();
+	Omega::instance().setScene(rootBody);
 	#endif
 
 	Vector3r v[4];
@@ -89,7 +89,7 @@ bool TetraTestGen::generate()
 	#endif 
 
 	#if 0
-	Omega::instance().setWorld(oldRootBody);
+	Omega::instance().setScene(oldRootBody);
 	#endif
 	
 	message="ATTN: this example is not working yet!";

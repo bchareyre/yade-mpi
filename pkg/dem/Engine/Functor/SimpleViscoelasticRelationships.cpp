@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 
 SimpleViscoelasticRelationships::SimpleViscoelasticRelationships()

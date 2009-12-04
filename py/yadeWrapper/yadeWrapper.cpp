@@ -37,10 +37,10 @@
 #include<yade/pkg-common/ParallelEngine.hpp>
 #include<yade/core/Functor.hpp>
 
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
-#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
+#include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 #ifdef YADE_PHYSPAR
 	#include<yade/pkg-common/StateMetaEngine.hpp>
@@ -55,11 +55,11 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
-#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 #include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/LawFunctor.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/Clump.hpp>
@@ -100,7 +100,7 @@ class RenderingEngine;
 	Those attributes that are not fundamental types (strings, numbers, booleans, se3, vectors, quaternions, arrays of numbers, arrays of strings) can be accessed only through explicit python data members, for example:
 		
 		b=Body()
-		b.mold=InteractingGeometry("InteractingSphere",radius=1)
+		b.mold=Shape("InteractingSphere",radius=1)
 		b.shape=GeometricalModel("Sphere",radius=1)
 		b.mold # will give you the interactingGeometry of body
 	
@@ -150,7 +150,8 @@ class pyBodyContainer{
 		else return (*proxee)[id];
 	}
 	body_id_t append(shared_ptr<Body> b){
-		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body aleady has id "+lexical_cast<string>(b->getId())+"set; appending such body is not allowed.").c_str()); python::throw_error_already_set(); }
+		// shoud be >=0, but Body is by default created with id 0... :-|
+		if(b->getId()>0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+"set; appending such body is not allowed.").c_str()); python::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
 	vector<body_id_t> appendList(vector<shared_ptr<Body> > bb){
@@ -194,8 +195,8 @@ class pyBodyContainer{
 
 class pyTags{
 	public:
-		pyTags(const shared_ptr<World> _mb): mb(_mb){}
-		const shared_ptr<World> mb;
+		pyTags(const shared_ptr<Scene> _mb): mb(_mb){}
+		const shared_ptr<Scene> mb;
 		bool hasKey(const string& key){ FOREACH(string val, mb->tags){ if(algorithm::starts_with(val,key+"=")){ return true;} } return false; }
 		string getItem(string key){
 			FOREACH(string& val, mb->tags){
@@ -261,9 +262,9 @@ class pyInteractionContainer{
 
 
 class pyBexContainer{
-		shared_ptr<World> rb;
+		shared_ptr<Scene> rb;
 	public:
-		pyBexContainer(){ rb=Omega::instance().getWorld(); }
+		pyBexContainer(){ rb=Omega::instance().getScene(); }
 		Vector3r force_get(long id){  rb->bex.sync(); return rb->bex.getForce(id); }
 		Vector3r torque_get(long id){ rb->bex.sync(); return rb->bex.getTorque(id); }
 		Vector3r move_get(long id){   rb->bex.sync(); return rb->bex.getMove(id); }
@@ -275,9 +276,9 @@ class pyBexContainer{
 };
 
 class pyMaterialContainer{
-		shared_ptr<World> rb;
+		shared_ptr<Scene> rb;
 	public:
-		pyMaterialContainer() {rb=Omega::instance().getWorld();}
+		pyMaterialContainer() {rb=Omega::instance().getScene();}
 		shared_ptr<Material> getitem_id(int id){ if(id<0 || (size_t)id>=rb->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); python::throw_error_already_set(); /* never reached */ throw; } return Material::byId(id,rb); }
 		shared_ptr<Material> getitem_label(string label){
 			// translate runtime_error to KeyError (instead of RuntimeError) if the material doesn't exist
@@ -294,21 +295,21 @@ void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
 class pyOmega{
 	private:
 		// can be safely removed now, since pyOmega makes an empty rootBody in the constructor, if there is none
-		void assertRootBody(){if(!OMEGA.getWorld()) throw std::runtime_error("No root body."); }
+		void assertRootBody(){if(!OMEGA.getScene()) throw std::runtime_error("No root body."); }
 		Omega& OMEGA;
 	public:
 	pyOmega(): OMEGA(Omega::instance()){
-		shared_ptr<World> rb=OMEGA.getWorld();
+		shared_ptr<Scene> rb=OMEGA.getScene();
 		if(!rb){
 			OMEGA.init();
-			rb=OMEGA.getWorld();
+			rb=OMEGA.getScene();
 		}
 		assert(rb);
 		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
 		if(!rb->boundingVolume){rb->boundingVolume=shared_ptr<AABB>(new AABB);}
 		// initialized in constructor now: rb->boundingVolume->diffuseColor=Vector3r(1,1,1); 
 		if(!rb->interactingGeometry){rb->interactingGeometry=shared_ptr<MetaInteractingGeometry>(new MetaInteractingGeometry);}
-		//if(!OMEGA.getWorld()){shared_ptr<World> mb=Shop::rootBody(); OMEGA.setWorld(mb);}
+		//if(!OMEGA.getScene()){shared_ptr<Scene> mb=Shop::rootBody(); OMEGA.setScene(mb);}
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){
 			OMEGA.createSimulationLoop();
@@ -319,11 +320,11 @@ class pyOmega{
 		// not sure if we should map materials to variables by default...
 		// a call to this functions would have to be added to pyMaterialContainer::append
 		#if 0
-			FOREACH(const shared_ptr<Material>& m, OMEGA.getWorld()->materials){
+			FOREACH(const shared_ptr<Material>& m, OMEGA.getScene()->materials){
 				if(!m->label.empty()) { PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+m->label+"=Omega().materials["+lexical_cast<string>(m->id)+"]").c_str()); PyGILState_Release(gstate); }
 			}
 		#endif
-		FOREACH(const shared_ptr<Engine>& e, OMEGA.getWorld()->engines){
+		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
 			if(!e->label.empty()){
 				PyGILState_STATE gstate; gstate = PyGILState_Ensure();
 				PyRun_SimpleString(("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')").c_str());
@@ -358,27 +359,27 @@ class pyOmega{
 	double dt_get(){return OMEGA.getTimeStep();}
 	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt);}
 
-	long stopAtIter_get(){return OMEGA.getWorld()->stopAtIteration; }
-	void stopAtIter_set(long s){OMEGA.getWorld()->stopAtIteration=s; }
+	long stopAtIter_get(){return OMEGA.getScene()->stopAtIteration; }
+	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIteration=s; }
 
 	bool usesTimeStepper_get(){return OMEGA.timeStepperActive();}
 	void usesTimeStepper_set(bool use){OMEGA.skipTimeStepper(!use);}
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
-	unsigned long bexSyncCount_get(){ return OMEGA.getWorld()->bex.syncCount;}
-	void bexSyncCount_set(unsigned long count){ OMEGA.getWorld()->bex.syncCount=count;}
+	unsigned long bexSyncCount_get(){ return OMEGA.getScene()->bex.syncCount;}
+	void bexSyncCount_set(unsigned long count){ OMEGA.getScene()->bex.syncCount=count;}
 
 	void run(long int numIter=-1,bool doWait=false){
-		if(numIter>0) OMEGA.getWorld()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
+		if(numIter>0) OMEGA.getScene()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
 		OMEGA.startSimulationLoop();
 		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
 		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
-		LOG_DEBUG("RUN"<<((OMEGA.getWorld()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getWorld()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
+		LOG_DEBUG("RUN"<<((OMEGA.getScene()->stopAtIteration-OMEGA.getCurrentIteration())>0?string(" ("+lexical_cast<string>(OMEGA.getScene()->stopAtIteration-OMEGA.getCurrentIteration())+" to go)"):string(""))<<"!");
 		if(doWait) wait();
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
-	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getWorld()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
+	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getScene()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
 	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS; }
 
 	void load(std::string fileName) {
@@ -407,9 +408,9 @@ class pyOmega{
 	}
 
 	void reset(){Py_BEGIN_ALLOW_THREADS; OMEGA.reset(); Py_END_ALLOW_THREADS; }
-	void resetThisWorld(){Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; OMEGA.resetWorld(); OMEGA.createSimulationLoop();}
-	void resetTime(){ OMEGA.getWorld()->currentIteration=0; OMEGA.getWorld()->simulationTime=0; OMEGA.timeInit(); }
-	void switchWorld(){ std::swap(OMEGA.world,OMEGA.worldAnother); }
+	void resetThisScene(){Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; OMEGA.resetScene(); OMEGA.createSimulationLoop();}
+	void resetTime(){ OMEGA.getScene()->currentIteration=0; OMEGA.getScene()->simulationTime=0; OMEGA.timeInit(); }
+	void switchScene(){ std::swap(OMEGA.scene,OMEGA.sceneAnother); }
 
 	void save(std::string fileName){
 		assertRootBody();
@@ -422,27 +423,27 @@ class pyOmega{
 
 	python::list miscParams_get(){
 		python::list ret;
-		FOREACH(shared_ptr<Serializable>& s, OMEGA.getWorld()->miscParams){
+		FOREACH(shared_ptr<Serializable>& s, OMEGA.getScene()->miscParams){
 			ret.append(s);
 		}
 		return ret;
 	}
 
 	void miscParams_set(vector<shared_ptr<Serializable> > ss){
-		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getWorld()->miscParams;
+		vector<shared_ptr<Serializable> >& miscParams=OMEGA.getScene()->miscParams;
 		miscParams.clear();
 		FOREACH(shared_ptr<Serializable> s, ss){
 			miscParams.push_back(s);
 		}
 	}
 
-	vector<shared_ptr<Engine> > engines_get(void){assertRootBody(); return OMEGA.getWorld()->engines;}
-	void engines_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getWorld()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getWorld()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
-	vector<shared_ptr<Engine> > initializers_get(void){assertRootBody(); return OMEGA.getWorld()->initializers;}
-	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getWorld()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getWorld()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getWorld()->needsInitializers=true; }
+	vector<shared_ptr<Engine> > engines_get(void){assertRootBody(); return OMEGA.getScene()->engines;}
+	void engines_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getScene()->engines.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->engines.push_back(e); mapLabeledEntitiesToVariables(); }
+	vector<shared_ptr<Engine> > initializers_get(void){assertRootBody(); return OMEGA.getScene()->initializers;}
+	void initializers_set(const vector<shared_ptr<Engine> >& egs){assertRootBody(); OMEGA.getScene()->initializers.clear(); FOREACH(const shared_ptr<Engine>& e, egs) OMEGA.getScene()->initializers.push_back(e); mapLabeledEntitiesToVariables(); OMEGA.getScene()->needsInitializers=true; }
 
 	python::object labeled_engine_get(string label){
-		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getWorld()->engines){
+		FOREACH(const shared_ptr<Engine>& eng, OMEGA.getScene()->engines){
 			if(eng->label==label){ return python::object(eng); }
 			shared_ptr<Dispatcher> me=dynamic_pointer_cast<Dispatcher>(eng);
 			if(me){
@@ -464,8 +465,8 @@ class pyOmega{
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
 	
-	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getWorld()->bodies); }
-	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getWorld()->interactions); }
+	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getScene()->bodies); }
+	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
 	
 	pyBexContainer bex_get(void){return pyBexContainer();}
 	pyMaterialContainer materials_get(void){return pyMaterialContainer();}
@@ -488,26 +489,26 @@ class pyOmega{
 		return ret;
 	}
 
-	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getWorld());}
+	pyTags tags_get(void){assertRootBody(); return pyTags(OMEGA.getScene());}
 
 	void interactionContainer_set(string clss){
-		World* rb=OMEGA.getWorld().get();
+		Scene* rb=OMEGA.getScene().get();
 		if(rb->interactions->size()>0) throw std::runtime_error("Interaction container not empty, will not change its class.");
 		shared_ptr<InteractionContainer> ic=dynamic_pointer_cast<InteractionContainer>(ClassFactory::instance().createShared(clss));
 		rb->interactions=ic;
 	}
-	string interactionContainer_get(string clss){ return OMEGA.getWorld()->interactions->getClassName(); }
+	string interactionContainer_get(string clss){ return OMEGA.getScene()->interactions->getClassName(); }
 
 	void bodyContainer_set(string clss){
-		World* rb=OMEGA.getWorld().get();
+		Scene* rb=OMEGA.getScene().get();
 		if(rb->bodies->size()>0) throw std::runtime_error("Body container not empty, will not change its class.");
 		shared_ptr<BodyContainer> bc=dynamic_pointer_cast<BodyContainer>(ClassFactory::instance().createShared(clss));
 		rb->bodies=bc;
 	}
-	string bodyContainer_get(string clss){ return OMEGA.getWorld()->bodies->getClassName(); }
+	string bodyContainer_get(string clss){ return OMEGA.getScene()->bodies->getClassName(); }
 	#ifdef YADE_OPENMP
 		int numThreads_get(){ return omp_get_max_threads();}
-		void numThreads_set(int n){ int bcn=OMEGA.getWorld()->bex.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("BexContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
+		void numThreads_set(int n){ int bcn=OMEGA.getScene()->bex.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("BexContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
 	#else
 		int numThreads_get(){return 1;}
 		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
@@ -516,18 +517,18 @@ class pyOmega{
 	void saveXML(string filename){
 		std::ofstream ofs(filename.c_str());
 		boost::archive::xml_oarchive oa(ofs);
-		shared_ptr<World> YadeSimulation=OMEGA.getWorld();
+		shared_ptr<Scene> YadeSimulation=OMEGA.getScene();
 		oa << YadeSimulation;
 	}
 	#endif
 	void periodicCell_set(python::tuple& t){
-		if(python::len(t)==2){ OMEGA.getWorld()->cellMin=python::extract<Vector3r>(t[0]); OMEGA.getWorld()->cellMax=python::extract<Vector3r>(t[1]); OMEGA.getWorld()->isPeriodic=true; }
-		else if (python::len(t)==0) {OMEGA.getWorld()->isPeriodic=false; }
+		if(python::len(t)==2){ OMEGA.getScene()->cellMin=python::extract<Vector3r>(t[0]); OMEGA.getScene()->cellMax=python::extract<Vector3r>(t[1]); OMEGA.getScene()->isPeriodic=true; }
+		else if (python::len(t)==0) {OMEGA.getScene()->isPeriodic=false; }
 		else throw invalid_argument("Must pass either 2 Vector3's to set periodic cell,  or () to disable periodicity (got "+lexical_cast<string>(python::len(t))+" instead).");
 	}
 	python::tuple periodicCell_get(){
 		vector<Vector3r> ret;
-		if(OMEGA.getWorld()->isPeriodic){ return python::make_tuple(OMEGA.getWorld()->cellMin,OMEGA.getWorld()->cellMax); }
+		if(OMEGA.getScene()->isPeriodic){ return python::make_tuple(OMEGA.getScene()->cellMin,OMEGA.getScene()->cellMax); }
 		return python::make_tuple();
 	}
 	void disableGdb(){
@@ -538,7 +539,7 @@ class pyOmega{
 		signal(SIGSEGV,termHandler); /* unset the handler that runs gdb and prints backtrace */
 		exit(status);
 	}
-	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getWorld().get()); }
+	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getScene().get()); }
 };
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
@@ -615,11 +616,11 @@ std::vector<shared_ptr<functorT> > Dispatcher_functors_get(shared_ptr<Dispatcher
 	return ret;
 }
 // FIXME: and this one as well
-shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<ConstitutiveLaw> >& cff){
+shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
 	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
 	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
 	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
-	FOREACH(shared_ptr<ConstitutiveLaw> cf, cff) instance->constLawDispatcher->add(cf);
+	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->constLawDispatcher->add(cf);
 	return instance;
 }
 
@@ -658,6 +659,10 @@ void State_pos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->pos=p; }
 void State_ori_set(const shared_ptr<State>& pp, const Quaternionr& p){ pp->ori=p; }
 //Vector3r State_refPos_get(const shared_ptr<State>& pp){return pp->refPos;}
 //void State_refPos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->refPos=p; }
+
+shared_ptr<Shape> Body_interactingGeometry_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->interactingGeometry; }
+void Body_interactingGeometry_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->interactingGeometry=ig; }
+
 
 long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
 long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
@@ -705,15 +710,15 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("pause",&pyOmega::pause,"Stop simulation execution.\n(may be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
-		.def("reset",&pyOmega::reset,"Reset simulations completely (including another world!).")
-		.def("resetThisWorld",&pyOmega::resetThisWorld,"Reset current world.")
-		.def("switchWorld",&pyOmega::switchWorld,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchWorld(); [b still refers to the body in the first simulation here])")
+		.def("reset",&pyOmega::reset,"Reset simulations completely (including another scene!).")
+		.def("resetThisScene",&pyOmega::resetThisScene,"Reset current scene.")
+		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
 		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n For example: \n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider['nBins']=5 ## collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
-		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (World::engines).")
-		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (World::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
-		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (World::initializers).")
+		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (Scene::engines).")
+		.add_property("miscParams",&pyOmega::miscParams_get,&pyOmega::miscParams_set,"MiscParams in the simulation (Scene::mistParams), usually used to save serializables that don't fit anywhere else, like GL functors")
+		.add_property("initializers",&pyOmega::initializers_get,&pyOmega::initializers_set,"List of initializers (Scene::initializers).")
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")
@@ -823,7 +828,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("slaves",&ParallelEngine_slaves_get,&ParallelEngine_slaves_set);
 
 	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>).def("dump",&DispatcherT::dump);
-		EXPOSE_DISPATCHER(BoundingVolumeDispatcher,BoundingVolumeFunctor)
+		EXPOSE_DISPATCHER(BoundDispatcher,BoundFunctor)
 		EXPOSE_DISPATCHER(InteractionGeometryDispatcher,InteractionGeometryFunctor)
 		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher,InteractionPhysicsFunctor)
 		#ifdef YADE_PHYSPAR
@@ -831,11 +836,11 @@ BOOST_PYTHON_MODULE(wrapper)
 			EXPOSE_DISPATCHER(PhysicalActionDamper,PhysicalActionDamperUnit)
 			EXPOSE_DISPATCHER(PhysicalActionApplier,PhysicalActionApplierUnit)
 		#endif
-		EXPOSE_DISPATCHER(ConstitutiveLawDispatcher,ConstitutiveLaw)
+		EXPOSE_DISPATCHER(LawDispatcher,LawFunctor)
 	#undef EXPOSE_DISPATCHER
 
 	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<Functor>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
-		EXPOSE_FUNCTOR(BoundingVolumeFunctor)
+		EXPOSE_FUNCTOR(BoundFunctor)
 		EXPOSE_FUNCTOR(InteractionGeometryFunctor)
 		EXPOSE_FUNCTOR(InteractionPhysicsFunctor)
 		#ifdef YADE_PHYSPAR
@@ -843,7 +848,7 @@ BOOST_PYTHON_MODULE(wrapper)
 			EXPOSE_FUNCTOR(PhysicalActionDamperUnit)
 			EXPOSE_FUNCTOR(PhysicalActionApplierUnit)
 		#endif
-		EXPOSE_FUNCTOR(ConstitutiveLaw)
+		EXPOSE_FUNCTOR(LawFunctor)
 	#undef EXPOSE_FUNCTOR
 		
 	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>))
@@ -852,8 +857,10 @@ BOOST_PYTHON_MODULE(wrapper)
 	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("classIndex",&Indexable_getClassIndex<className>)
 
 	EXPOSE_CXX_CLASS(Body)
-		.def_readwrite("mold",&Body::interactingGeometry)
-		.def_readwrite("geom",&Body::interactingGeometry)
+		// mold and geom are deprecated:
+		.add_property("mold",&Body_interactingGeometry_deprec_get,&Body_interactingGeometry_deprec_set)
+		.add_property("geom",&Body_interactingGeometry_deprec_get,&Body_interactingGeometry_deprec_set)
+		.def_readwrite("shape",&Body::interactingGeometry)
 		.def_readwrite("bound",&Body::boundingVolume)
 		.def_readwrite("mat",&Body::material)
 		.def_readwrite("state",&Body::state)
@@ -863,10 +870,10 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("isStandalone",&Body::isStandalone)
 		.add_property("isClumpMember",&Body::isClumpMember)
 		.add_property("isClump",&Body::isClump);
-	EXPOSE_CXX_CLASS_IX(InteractingGeometry);
-	EXPOSE_CXX_CLASS_IX(BoundingVolume)
-		.def_readonly("min",&BoundingVolume::min)
-		.def_readonly("max",&BoundingVolume::max);
+	EXPOSE_CXX_CLASS_IX(Shape);
+	EXPOSE_CXX_CLASS_IX(Bound)
+		.def_readonly("min",&Bound::min)
+		.def_readonly("max",&Bound::max);
 	EXPOSE_CXX_CLASS_IX(Material)
 		.def_readwrite("label",&Material::label)
 		.def("newAssocState",&Material::newAssocState)

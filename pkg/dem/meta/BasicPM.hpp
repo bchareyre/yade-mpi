@@ -5,16 +5,16 @@ YADE_REQUIRE_FEATURE(abcd);
 #include<yade/pkg-dem/BodyMacroParameters.hpp> //Superclass for body properties
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp> //Superclass to link body and interaction properties
 #include<yade/pkg-common/NormalShearInteractions.hpp> //Superclass for interaction properties 
-#include<yade/pkg-common/ConstitutiveLaw.hpp> //Superclass for contact laws
+#include<yade/pkg-common/LawFunctor.hpp> //Superclass for contact laws
 
 /* Contact Law */
-class CundallStrackLaw: public ConstitutiveLaw{
+class CundallStrackLaw: public LawFunctor{
 	public:
 		
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 		FUNCTOR2D(Dem3DofGeom,CSPhys);
-		REGISTER_CLASS_AND_BASE(CundallStrackLaw,ConstitutiveLaw);
-		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
+		REGISTER_CLASS_AND_BASE(CundallStrackLaw,LawFunctor);
+		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
 		DECLARE_LOGGER;	
 };
 REGISTER_SERIALIZABLE(CundallStrackLaw);

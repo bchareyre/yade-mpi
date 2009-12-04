@@ -9,10 +9,10 @@
 #pragma once
 
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 
 
-class InteractingBox : public InteractingGeometry
+class InteractingBox : public Shape
 {
 	public :
 		Vector3r extents;
@@ -21,10 +21,10 @@ class InteractingBox : public InteractingGeometry
 		InteractingBox(const Vector3r& _extents): extents(_extents){}
 		virtual ~InteractingBox ();	
 	
-	REGISTER_ATTRIBUTES(InteractingGeometry,(extents));
-	REGISTER_CLASS_INDEX(InteractingBox,InteractingGeometry);
+	REGISTER_ATTRIBUTES(Shape,(extents));
+	REGISTER_CLASS_INDEX(InteractingBox,Shape);
 	REGISTER_CLASS_NAME(InteractingBox);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
+	REGISTER_BASE_CLASS_NAME(Shape);
 
 
 };

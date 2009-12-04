@@ -26,17 +26,17 @@
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Box.hpp>
 	#include<yade/pkg-common/Sphere.hpp>
 	#include<yade/pkg-common/Facet.hpp>
 #endif
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -230,7 +230,7 @@ bool TriaxialTest::generate()
 	}
 
 	// setup rootBody here, since radiusMean is now at its true value (if it was negative)
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	positionRootBody(rootBody);
 	createActors(rootBody);
 
@@ -393,7 +393,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	#ifdef YADE_SHAPE
+	#ifdef YADE_GEOMETRICALMODEL
 		shared_ptr<Sphere> gSphere(new Sphere);
 		gSphere->radius			= radius;
 		gSphere->diffuseColor		= spheresColor;
@@ -438,7 +438,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 
 
 	if(!facetWalls && !wallWalls){
-		#ifdef YADE_SHAPE
+		#ifdef YADE_GEOMETRICALMODEL
 			shared_ptr<Box> gBox(new Box);
 			gBox->extents			= extents;
 			gBox->diffuseColor		= Vector3r(1,1,1);
@@ -464,7 +464,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
 		iFacet->diffuseColor=Vector3r(1,1,1);
 		body->interactingGeometry=iFacet;
-		#ifdef YADE_SHAPE
+		#ifdef YADE_GEOMETRICALMODEL
 			shared_ptr<Facet> facet(new Facet);
 			for(int i=0; i<3; i++){ facet->vertices.push_back(v[i]-cog);}
 			facet->wire=true;
@@ -481,7 +481,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 }
 
 
-void TriaxialTest::createActors(shared_ptr<World>& rootBody)
+void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -489,9 +489,9 @@ void TriaxialTest::createActors(shared_ptr<World>& rootBody)
 		interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
 		interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
 	} else {
-		interactionGeometryDispatcher->add("ef2_Sphere_Sphere_Dem3DofGeom");
-		interactionGeometryDispatcher->add("ef2_Facet_Sphere_Dem3DofGeom");
-		interactionGeometryDispatcher->add("ef2_Wall_Sphere_Dem3DofGeom");
+		interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_Dem3DofGeom");
+		interactionGeometryDispatcher->add("Ig2_Facet_Sphere_Dem3DofGeom");
+		interactionGeometryDispatcher->add("Ig2_Wall_Sphere_Dem3DofGeom");
 	}
 
 
@@ -500,7 +500,7 @@ void TriaxialTest::createActors(shared_ptr<World>& rootBody)
 	interactionPhysicsDispatcher->add(ss);
 	
 		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("InteractingFacet2AABB");
@@ -578,7 +578,7 @@ void TriaxialTest::createActors(shared_ptr<World>& rootBody)
 		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
-			ids->constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
+			ids->constLawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 			if(!facetWalls && !wallWalls){
 				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw); see->sdecGroupMask=2;
 				ids->constLawDispatcher->add(see);
@@ -625,7 +625,7 @@ void TriaxialTest::createActors(shared_ptr<World>& rootBody)
 }
 
 
-void TriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
+void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 	rootBody->isDynamic		= false;
 
@@ -639,8 +639,8 @@ void TriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
 	
 }
 // 0xdeadc0de, superseded by SpherePack::makeCloud

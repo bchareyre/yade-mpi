@@ -13,7 +13,7 @@
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 #include <yade/pkg-common/InteractingSphere.hpp>
 
@@ -48,9 +48,9 @@ void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 	}
 }
 
-void MicroMacroAnalyser::action(World* ncb)
+void MicroMacroAnalyser::action(Scene* ncb)
 {
-	//cerr << "MicroMacroAnalyser::action(World* ncb) (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
+	//cerr << "MicroMacroAnalyser::action(Scene* ncb) (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
 	if (Omega::instance().getCurrentIteration() == 0) setState(ncb, 1);
 	else if (Omega::instance().getCurrentIteration() % interval == 0) {
 		setState(ncb, 2, true, true);
@@ -64,7 +64,7 @@ void MicroMacroAnalyser::action(World* ncb)
 
 
 
-void MicroMacroAnalyser::setState ( World* ncb, unsigned int state, bool saveStates, bool computeIncrement )
+void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveStates, bool computeIncrement )
 {
 	LOG_INFO ("MicroMacroAnalyser::setState");
 	if ( !triaxialCompressionEngine )

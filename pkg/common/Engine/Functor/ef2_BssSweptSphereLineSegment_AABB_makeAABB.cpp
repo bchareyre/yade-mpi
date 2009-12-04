@@ -10,8 +10,8 @@
 #include<yade/pkg-common/BssSweptSphereLineSegment.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
-void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<InteractingGeometry>& cm,
-				shared_ptr<BoundingVolume>& bv,
+void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<Shape>& cm,
+				shared_ptr<Bound>& bv,
 				const Se3r& se3,
 				const Body*	)
 {

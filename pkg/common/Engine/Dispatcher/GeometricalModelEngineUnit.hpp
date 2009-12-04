@@ -16,7 +16,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/Functor.hpp>
 
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 	/*! \brief
 			  Abstract interface for building GeometricalModel depending on PhysicalParameters
 			  (currently used for updating geometry if physics has changed and affects it).

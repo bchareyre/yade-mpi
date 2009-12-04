@@ -1,16 +1,16 @@
 #include"FacetTopologyAnalyzer.hpp"
 #include<yade/pkg-common/InteractingFacet.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 
 CREATE_LOGGER(FacetTopologyAnalyzer);
 YADE_PLUGIN((FacetTopologyAnalyzer));
 #ifndef FACET_TOPO
-void FacetTopologyAnalyzer::action(World* rb){
+void FacetTopologyAnalyzer::action(Scene* rb){
 	throw runtime_error("FACET_TOPO was not enabled in InteractingFacet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.");
 }
 #else
-void FacetTopologyAnalyzer::action(World* rb){
+void FacetTopologyAnalyzer::action(Scene* rb){
 	commonEdgesFound=0;
 	LOG_DEBUG("Projection axis for analysis is "<<projectionAxis);
 	vector<shared_ptr<VertexData> > vv;

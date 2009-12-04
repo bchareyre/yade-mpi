@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"StaticAttractionEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 
 /*! \brief Compress stuff faster and better!
@@ -24,7 +24,7 @@
  *   Forces are NOT used here. Only displacement value, which is normalized
  *   afterwards, which means that ALL values of D (for each body) are <= 1.
  *   Then all D (for all bodies) are multiplied by whatever returns the virtual
- *   function getMaxDisplacement(World*). Function doesItApplyToThisBody(Body*)
+ *   function getMaxDisplacement(Scene*). Function doesItApplyToThisBody(Body*)
  *   is used to check if Body should be considered for displacement. This
  *   function can for example check if isDynamic.
  *
@@ -34,7 +34,7 @@
  *   After the compression stage is over, engine should be disabled by 
  *   setting active=false;
  */
-void StaticAttractionEngine::applyCondition(World * ncb)
+void StaticAttractionEngine::applyCondition(Scene * ncb)
 {
 
 	BodyContainer::iterator bi    = ncb->bodies->begin();

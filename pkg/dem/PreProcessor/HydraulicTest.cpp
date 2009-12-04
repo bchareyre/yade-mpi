@@ -22,10 +22,10 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -51,7 +51,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 
 
@@ -78,7 +78,7 @@ void HydraulicTest::postProcessAttributes(bool)
 
 bool HydraulicTest::generate()
 {
-	rootBody = shared_ptr<World> ( new World );
+	rootBody = shared_ptr<Scene> ( new Scene );
 	positionRootBody ( rootBody );
 
 
@@ -87,7 +87,7 @@ bool HydraulicTest::generate()
 /////////////////////////////////////
 	// load file
 
-	shared_ptr<World> metaBodyWithSpheres;
+	shared_ptr<Scene> metaBodyWithSpheres;
 
 	if ( yadeFileWithSpheres.size() !=0
 			&& filesystem::exists ( yadeFileWithSpheres )
@@ -96,12 +96,12 @@ bool HydraulicTest::generate()
 		try
 		{
 			if ( filesystem::extension ( yadeFileWithSpheres ) ==".xml" )
-				IOFormatManager::loadFromFile ( "XMLFormatManager",yadeFileWithSpheres,"world",metaBodyWithSpheres );
+				IOFormatManager::loadFromFile ( "XMLFormatManager",yadeFileWithSpheres,"scene",metaBodyWithSpheres );
 
 			else if ( filesystem::extension ( yadeFileWithSpheres ) ==".yade" )
-				IOFormatManager::loadFromFile ( "BINFormatManager",yadeFileWithSpheres,"world",metaBodyWithSpheres );
+				IOFormatManager::loadFromFile ( "BINFormatManager",yadeFileWithSpheres,"scene",metaBodyWithSpheres );
 
-		if ( metaBodyWithSpheres->getClassName() != "World" ) { message="Error: cannot load the file that should contain spheres"; return false; }
+		if ( metaBodyWithSpheres->getClassName() != "Scene" ) { message="Error: cannot load the file that should contain spheres"; return false; }
 		}
 		catch ( SerializableError& e )
 		{
@@ -283,7 +283,7 @@ bool HydraulicTest::generate()
 	return true;
 }
 
-void HydraulicTest::positionRootBody(shared_ptr<World>& rootBody)
+void HydraulicTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	
@@ -302,8 +302,8 @@ void HydraulicTest::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }

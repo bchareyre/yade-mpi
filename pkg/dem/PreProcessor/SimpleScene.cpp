@@ -18,7 +18,7 @@
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -40,7 +40,7 @@ bool SimpleScene::generate(){
 	/* initializers */
 		rootBody->initializers.clear();
 		//@
-		shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+		shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 			boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 			boundingVolumeDispatcher->add(new InteractingBox2AABB);
 			boundingVolumeDispatcher->add(new MetaInteractingGeometry2AABB);

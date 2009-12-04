@@ -1,11 +1,11 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
-#include<yade/core/InteractingGeometry.hpp>
-#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/core/Shape.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 
 
 /*! Object representing infinite plane aligned with the coordinate system (axis-aligned wall). */
-class Wall: public InteractingGeometry{
+class Wall: public Shape{
 	public:
 		Wall(){ createIndex(); }
 		virtual ~Wall(); // vtable
@@ -13,19 +13,19 @@ class Wall: public InteractingGeometry{
 		int sense;
 		//! Axis of the normal; can be 0,1,2 for +x, +y, +z respectively (Body's orientation is disregarded for walls)
 		int axis;
-	REGISTER_ATTRIBUTES(InteractingGeometry,(sense)(axis));
-	REGISTER_CLASS_AND_BASE(Wall,InteractingGeometry);
-	REGISTER_CLASS_INDEX(Wall,InteractingGeometry);
+	REGISTER_ATTRIBUTES(Shape,(sense)(axis));
+	REGISTER_CLASS_AND_BASE(Wall,Shape);
+	REGISTER_CLASS_INDEX(Wall,Shape);
 };	
 REGISTER_SERIALIZABLE(Wall);
 
 /*! Functor for computing axis-aligned bounding box
     from axis-aligned wall. Has no parameters. */
-class Wall2AABB: public BoundingVolumeFunctor{
+class Wall2AABB: public BoundFunctor{
 	public:
-		virtual void go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*);
+		virtual void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 	FUNCTOR2D(Wall,AABB);
-	REGISTER_CLASS_AND_BASE(Wall2AABB,BoundingVolumeFunctor);
+	REGISTER_CLASS_AND_BASE(Wall2AABB,BoundFunctor);
 };
 REGISTER_SERIALIZABLE(Wall2AABB);
 #ifdef YADE_OPENGL
@@ -34,7 +34,7 @@ REGISTER_SERIALIZABLE(Wall2AABB);
 		//! Number of divisions
 		static int div;
 		public:
-			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 		RENDERS(Wall);
 		REGISTER_ATTRIBUTES(GLDrawInteractingGeometryFunctor,(div));
 		REGISTER_CLASS_AND_BASE(Gl1_Wall,GLDrawInteractingGeometryFunctor);

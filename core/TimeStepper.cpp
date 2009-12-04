@@ -10,7 +10,7 @@
 
 #include<yade/core/TimeStepper.hpp>
 #include<yade/core/StandAloneEngine.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 TimeStepper::TimeStepper() : StandAloneEngine()
 {	
@@ -19,7 +19,7 @@ TimeStepper::TimeStepper() : StandAloneEngine()
 }
 
 
-bool TimeStepper::isActivated(World* mb)
+bool TimeStepper::isActivated(Scene* mb)
 {
 	return (active && (mb->currentIteration % timeStepUpdateInterval == 0));
 }

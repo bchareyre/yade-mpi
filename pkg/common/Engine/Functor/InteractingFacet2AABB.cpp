@@ -10,8 +10,8 @@
 #include "InteractingFacet2AABB.hpp"
 #include <yade/pkg-common/AABB.hpp>
 
-void InteractingFacet2AABB::go(	  const shared_ptr<InteractingGeometry>& cm
-				, shared_ptr<BoundingVolume>& bv
+void InteractingFacet2AABB::go(	  const shared_ptr<Shape>& cm
+				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body*	)
 {

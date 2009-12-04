@@ -8,7 +8,7 @@
 
 
 #include "Facet.hpp"
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 Facet::Facet () : GeometricalModel()
 {

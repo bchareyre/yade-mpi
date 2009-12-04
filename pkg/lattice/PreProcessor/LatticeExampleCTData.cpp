@@ -9,8 +9,8 @@
 #include<iostream>
 #include<fstream>
 #include"LatticeExampleCTData.hpp"
-#include<yade/core/World.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/core/Scene.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
@@ -33,7 +33,7 @@
 using namespace boost;
 using namespace std;
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 LatticeExampleCTData::LatticeExampleCTData() : FileGenerator()
 {
@@ -102,7 +102,7 @@ bool LatticeExampleCTData::generate()
 //	return false;
 
 
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	make_simulation_loop(rootBody);    // make the simulation loop
 	positionRootBody(rootBody); // set global coordinate system, etc.
 	
@@ -247,7 +247,7 @@ bool LatticeExampleCTData::generate()
 	return true;
 }
 
-void LatticeExampleCTData::create_angular_springs(int totalNodesCount,shared_ptr<World> rootBody)
+void LatticeExampleCTData::create_angular_springs(int totalNodesCount,shared_ptr<Scene> rootBody)
 {
 	// check what nodes are connected with which beams, this is necessary for creating the angular/torsional springs
         std::vector< std::vector< unsigned int > > connections;
@@ -461,9 +461,9 @@ void LatticeExampleCTData::calcBeamAngles(
 }
 
 
-void LatticeExampleCTData::make_simulation_loop(shared_ptr<World>& )
+void LatticeExampleCTData::make_simulation_loop(shared_ptr<Scene>& )
 {
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 
 	shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
@@ -485,7 +485,7 @@ void LatticeExampleCTData::make_simulation_loop(shared_ptr<World>& )
 	rootBody->initializers.push_back(geometricalModelDispatcher);
 }
 
-void LatticeExampleCTData::positionRootBody(shared_ptr<World>& rootBody)
+void LatticeExampleCTData::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 	rootBody->isDynamic             = false;
 
@@ -511,13 +511,13 @@ void LatticeExampleCTData::positionRootBody(shared_ptr<World>& rootBody)
 	gm->wire 			= false;
 	gm->shadowCaster 		= true;
 
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->geometricalModel 	= gm;
 	rootBody->physicalParameters 	= physics;
 }
 
-void LatticeExampleCTData::imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
+void LatticeExampleCTData::imposeTranslation(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement)
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
 	translationCondition->displacement  = displacement;

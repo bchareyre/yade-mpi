@@ -18,13 +18,13 @@ class Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact : public Interact
 	Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact g;
 	Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry ggg;
 	public :
-		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
-					const shared_ptr<InteractingGeometry>& cm2,
+		virtual bool go(	const shared_ptr<Shape>& cm1,
+					const shared_ptr<Shape>& cm2,
 					const State& state1, const State state2, const Vector3r& shift2,
 					const shared_ptr<Interaction>& c);
 
-		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-					const shared_ptr<InteractingGeometry>& cm2,
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1,
+					const shared_ptr<Shape>& cm2,
 					const State& state1, const State state2, const Vector3r& shift2,
 					const shared_ptr<Interaction>& c);
 

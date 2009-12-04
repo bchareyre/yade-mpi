@@ -30,7 +30,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyVector.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
@@ -50,7 +50,7 @@
 	#include <Wm3Query.h>
 #endif
 
-YADE_REQUIRE_FEATURE(shape)
+YADE_REQUIRE_FEATURE(geometricalmodel)
 
 using namespace boost;
 using namespace std;
@@ -286,7 +286,7 @@ bool LatticeExample::generate()
 	fibres_total=0;
 	matrix_total=0;
 	beam_total=0;
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 	
@@ -975,9 +975,9 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
                 calcAxisAngle(beam,bodies,*i,ints,body->getId());
 }
 
-void LatticeExample::createActors(shared_ptr<World>& )
+void LatticeExample::createActors(shared_ptr<Scene>& )
 {
-        shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+        shared_ptr<BoundDispatcher> boundingVolumeDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
 
         shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
@@ -1063,7 +1063,7 @@ BeamRecorder bbbb;
         }
 }       
 
-void LatticeExample::positionRootBody(shared_ptr<World>& rootBody)
+void LatticeExample::positionRootBody(shared_ptr<Scene>& rootBody)
 {
         rootBody->isDynamic             = false;
 
@@ -1089,14 +1089,14 @@ void LatticeExample::positionRootBody(shared_ptr<World>& rootBody)
 	gm->wire 			= false;
 	gm->shadowCaster 		= true;
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->geometricalModel 	= gm;
 	rootBody->physicalParameters 	= physics;
 }
 	
  
-void LatticeExample::imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement,Vector3r blocked_xyz)
+void LatticeExample::imposeTranslation(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement,Vector3r blocked_xyz)
 {
 	shared_ptr<DisplacementEngine> translationCondition = shared_ptr<DisplacementEngine>(new DisplacementEngine);
  	translationCondition->displacement  = displacement;
@@ -1299,7 +1299,7 @@ bool LatticeExample::notDeleted(Vector3r pos)
 	));
 };
 
-void LatticeExample::regionDelete(shared_ptr<World>& rootBody, Vector3r min, Vector3r max)
+void LatticeExample::regionDelete(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max)
 {
         vector<unsigned int> futureDeletes;
         
@@ -1328,7 +1328,7 @@ void LatticeExample::regionDelete(shared_ptr<World>& rootBody, Vector3r min, Vec
                 rootBody->bodies->erase(*vsta); 
 }
 
-void LatticeExample::nonDestroy(shared_ptr<World>& rootBody, Vector3r min, Vector3r max)
+void LatticeExample::nonDestroy(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max)
 {
 	std::list<unsigned int> marked;
         
@@ -1367,7 +1367,7 @@ void LatticeExample::nonDestroy(shared_ptr<World>& rootBody, Vector3r min, Vecto
 }
 
 
-void LatticeExample::modifyCT(shared_ptr<World>& rootBody, Vector3r min, Vector3r max)
+void LatticeExample::modifyCT(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max)
 {
 	std::list<unsigned int> marked;
         
@@ -1513,7 +1513,7 @@ float LatticeExample::aggsVolumes(std::vector<Circle>& c)
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
-void LatticeExample::addAggregates(shared_ptr<World>& rootBody)
+void LatticeExample::addAggregates(shared_ptr<Scene>& rootBody)
 {
         // first make a list of circles
         std::vector<Circle> c;
@@ -2126,7 +2126,7 @@ bool LatticeExample::fibreAllows(Vector3r a)
 
 
 
-void LatticeExample::makeFibreBeams(shared_ptr<World>& rootBody)
+void LatticeExample::makeFibreBeams(shared_ptr<Scene>& rootBody)
 {
         { // set different properties for beams that are fibre
                 BodyContainer::iterator bi    = rootBody->bodies->begin();

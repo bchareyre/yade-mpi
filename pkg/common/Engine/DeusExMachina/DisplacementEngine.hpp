@@ -17,10 +17,10 @@ class DisplacementEngine : public DeusExMachina
 	public :
 		Real displacement;
 		Vector3r translationAxis;
-		void applyCondition(World *);
+		void applyCondition(Scene *);
 		bool active;
 		DisplacementEngine():active(true){};
-		bool isActivated(World*);
+		bool isActivated(Scene*);
 
 	protected :
 		virtual void postProcessAttributes(bool);

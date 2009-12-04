@@ -7,7 +7,7 @@
 #include<boost/tokenizer.hpp>
 #include<boost/tuple/tuple.hpp>
 
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
@@ -15,7 +15,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Sphere.hpp>
 	#include<yade/pkg-common/Box.hpp>
 #endif
@@ -44,7 +44,7 @@ class MetaInteractingGeometry2AABB; */
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -74,7 +74,7 @@ map<string,boost::any> Shop::defaults;
 
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
  */
-void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, World* rootBody){
+void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* rootBody){
 	rootBody->bex.addForce(id1,force);
 	rootBody->bex.addForce(id2,-force);
 	rootBody->bex.addTorque(id1,(contPt-pos1).Cross(force));
@@ -89,8 +89,8 @@ areas of the cell will give average stress in that direction.
 
 Requires all .isReal() interaction to have interactionPhysics deriving from NormalShearInteraction.
 */
-Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, World* _rb){
-	World* rb=_rb ? _rb : Omega::instance().getWorld().get();
+Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
+	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	Vector3r force(Vector3r::ZERO); Real stiff=0; long n=0;
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
@@ -103,8 +103,8 @@ Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, World* _rb){
 	return force;
 }
 
-Real Shop::unbalancedForce(bool useMaxForce, World* _rb){
-	World* rb=_rb ? _rb : Omega::instance().getWorld().get();
+Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
+	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	rb->bex.sync();
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
@@ -123,8 +123,8 @@ Real Shop::unbalancedForce(bool useMaxForce, World* _rb){
 	return (useMaxForce?maxF:meanF)/maxContactF;
 }
 
-Real Shop::kineticEnergy(World* _rb){
-	World* rb=_rb ? _rb : Omega::instance().getWorld().get();
+Real Shop::kineticEnergy(Scene* _rb){
+	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	Real ret=0.;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
@@ -188,28 +188,28 @@ void Shop::init(){
 }
 
 /*! Create root body. */
-shared_ptr<World> Shop::rootBody(){
-	shared_ptr<World> rootBody = shared_ptr<World>(new World);
+shared_ptr<Scene> Shop::rootBody(){
+	shared_ptr<Scene> rootBody = shared_ptr<Scene>(new Scene);
 	rootBody->isDynamic=false;
 
 	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());	set->diffuseColor=Vector3r(0,0,1);
-	rootBody->interactingGeometry=YADE_PTR_CAST<InteractingGeometry>(set);	
+	rootBody->interactingGeometry=YADE_PTR_CAST<Shape>(set);	
 	
 	shared_ptr<AABB> aabb(new AABB); aabb->diffuseColor=Vector3r(0,0,1);
-	rootBody->boundingVolume=YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->boundingVolume=YADE_PTR_CAST<Bound>(aabb);
 	
 
 	return rootBody;
 }
 
 
-/*! Assign default set of actors (initializers and engines) to an existing World.
+/*! Assign default set of actors (initializers and engines) to an existing Scene.
  */
-void Shop::rootBodyActors(shared_ptr<World> rootBody){
+void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	// initializers	
 	rootBody->initializers.clear();
 
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add(new InteractingSphere2AABB);
 	boundingVolumeDispatcher->add(new InteractingBox2AABB);
 	boundingVolumeDispatcher->add(new TetraAABB);
@@ -320,7 +320,7 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 
 
 void Shop::saveSpheresToFile(string fname){
-	const shared_ptr<World>& rootBody=Omega::instance().getWorld();
+	const shared_ptr<Scene>& rootBody=Omega::instance().getScene();
 	ofstream f(fname.c_str());
 	if(!f.good()) throw runtime_error("Unable to open file `"+fname+"'");
 
@@ -380,9 +380,9 @@ vector<pair<Vector3r,Real> > Shop::loadSpheresSmallSdecXyz(Vector3r& minXYZ, Vec
 	return spheres;
 }
 
-Real Shop::PWaveTimeStep(shared_ptr<World> _rb){
-	shared_ptr<World> rb=_rb;
-	if(!rb)rb=Omega::instance().getWorld();
+Real Shop::PWaveTimeStep(shared_ptr<Scene> _rb){
+	shared_ptr<Scene> rb=_rb;
+	if(!rb)rb=Omega::instance().getScene();
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->material || !b->interactingGeometry) continue;
@@ -432,7 +432,7 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2){
 	InteractionGeometryDispatcher* geomMeta=NULL;
 	InteractionPhysicsDispatcher* physMeta=NULL;
-	shared_ptr<World> rb=Omega::instance().getWorld();
+	shared_ptr<Scene> rb=Omega::instance().getScene();
 	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }

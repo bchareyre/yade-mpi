@@ -14,11 +14,11 @@
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
-		const shared_ptr<InteractingGeometry>& cm1,
-		const shared_ptr<InteractingGeometry>& cm2,
+		const shared_ptr<Shape>& cm1,
+		const shared_ptr<Shape>& cm2,
 		const Se3r& se31,
 		const Se3r& se32,
 		const shared_ptr<Interaction>& c)
@@ -73,8 +73,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 }
 
 
-bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-						const shared_ptr<InteractingGeometry>& cm2,
+bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const shared_ptr<Shape>& cm1,
+						const shared_ptr<Shape>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)

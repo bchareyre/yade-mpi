@@ -11,10 +11,10 @@
 #include "NewtonsMomentumLaw.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 //! Newtons law for both force and torque
-void NewtonsMomentumLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, World* rb){
+void NewtonsMomentumLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, Scene* rb){
 	body_id_t id=bb->getId();
 	Vector3r f=rb->bex.getForce(id); Vector3r m=rb->bex.getTorque(id);
 	RigidBodyParameters *rbp = static_cast<RigidBodyParameters*>(b.get());

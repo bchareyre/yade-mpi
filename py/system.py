@@ -22,10 +22,10 @@ _allSerializables=childClasses('Serializable')
 _noPropsClasses=set(['InteractionContainer','BodyContainer','Functor','Engine','Dispatcher'])
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
-	'StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator',
-	'BoundingVolumeFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','ConstitutiveLaw','Material','State']
+	'StandAloneEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
+	'BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State']
 	# childless classes
-	+['BoundingVolumeDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','ConstitutiveLawDispatcher','InteractionDispatchers','ParallelEngine']
+	+['BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine']
 )
 ## set of classes for which the proxies were created
 _proxiedClasses=set()
@@ -43,6 +43,15 @@ _deprecated={
 	'InteractionPhysicsMetaEngine':'InteractionPhysicsDispatcher', # Tue Dec  1 14:40:53 2009, vaclav@flux
 	'InteractionPhysicsEngineUnit':'InteractionPhysicsFunctor', # Tue Dec  1 14:41:19 2009, vaclav@flux
 	'InteractionGeometryEngineUnit':'InteractionGeometryFunctor', # Tue Dec  1 14:41:56 2009, vaclav@flux
+	'BoundingVolume':'Bound', # Fri Dec  4 23:44:14 2009, vaclav@flux
+	'BoundingVolumeDispatcher':'BoundDispatcher', # Fri Dec  4 23:44:27 2009, vaclav@flux
+	'BoundingVolumeFunctor':'BoundFunctor', # Fri Dec  4 23:44:34 2009, vaclav@flux
+	'InteractingGeometry':'Shape', # Fri Dec  4 23:48:13 2009, vaclav@flux
+	'ConstitutiveLaw':'LawFunctor', # Fri Dec  4 23:57:51 2009, vaclav@flux
+	'ConstitutiveLawDispatcher':'LawDispatcher', # Fri Dec  4 23:57:59 2009, vaclav@flux
+	'ef2_Sphere_Sphere_Dem3DofGeom':'Ig2_Sphere_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:03 2009, vaclav@flux
+	'ef2_Facet_Sphere_Dem3DofGeom':'Ig2_Facet_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:13 2009, vaclav@flux
+	'ef2_Wall_Sphere_Dem3DofGeom':'Ig2_Wall_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:22 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

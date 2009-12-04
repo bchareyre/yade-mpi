@@ -18,16 +18,16 @@
 	if their bounding volumes (for example a AABB) are in collision.
 */
 
-class BoundingVolume : public Serializable, public Indexable
+class Bound : public Serializable, public Indexable
 {
 	public :
 		Vector3r	 diffuseColor		/// Color of the bounding volume. Used only for drawing purpose
 				,min			/// Minimum of the bounding volume
 				,max;			/// Maximum of the bounding volume
-		BoundingVolume(): diffuseColor(Vector3r(1,1,1)), min(Vector3r(0,0,0)), max(Vector3r(0,0,0)) {}
+		Bound(): diffuseColor(Vector3r(1,1,1)), min(Vector3r(0,0,0)), max(Vector3r(0,0,0)) {}
 
 	REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
-	REGISTER_CLASS_AND_BASE(BoundingVolume,Serializable Indexable);
-	REGISTER_INDEX_COUNTER(BoundingVolume);
+	REGISTER_CLASS_AND_BASE(Bound,Serializable Indexable);
+	REGISTER_INDEX_COUNTER(Bound);
 };
-REGISTER_SERIALIZABLE(BoundingVolume);
+REGISTER_SERIALIZABLE(Bound);

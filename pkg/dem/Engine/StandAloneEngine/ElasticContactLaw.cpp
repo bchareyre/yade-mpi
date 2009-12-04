@@ -11,8 +11,8 @@
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
+#include<yade/core/Scene.hpp>
 
 YADE_PLUGIN((ef2_Spheres_Elastic_ElasticLaw)(Law2_Dem3Dof_Elastic_Elastic)(ElasticContactLaw));
 
@@ -29,7 +29,7 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 
 
 
-void ElasticContactLaw::action(World* rootBody)
+void ElasticContactLaw::action(Scene* rootBody)
 {
 	if(!functor) functor=shared_ptr<ef2_Spheres_Elastic_ElasticLaw>(new ef2_Spheres_Elastic_ElasticLaw);
 	functor->momentRotationLaw=momentRotationLaw;
@@ -41,7 +41,7 @@ void ElasticContactLaw::action(World* rootBody)
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
-			// these checks would be redundant in the functor (ConstitutiveLawDispatcher does that already)
+			// these checks would be redundant in the functor (LawDispatcher does that already)
 			if(!dynamic_cast<SpheresContactGeometry*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
 		#endif
 			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
@@ -50,11 +50,11 @@ void ElasticContactLaw::action(World* rootBody)
 
 
 CREATE_LOGGER(ef2_Spheres_Elastic_ElasticLaw);
-void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, World* ncb){
+void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
 	Real dt = Omega::instance().getTimeStep();
 
 			int id1 = contact->getId1(), id2 = contact->getId2();
-			// FIXME: mask handling should move to ConstitutiveLaw itself, outside the functors
+			// FIXME: mask handling should move to LawFunctor itself, outside the functors
 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
 			SpheresContactGeometry*    currentContactGeometry= static_cast<SpheresContactGeometry*>(ig.get());
 			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());			
@@ -109,7 +109,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, World* rootBody){
+void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
 	Real displN=geom->displacementN();

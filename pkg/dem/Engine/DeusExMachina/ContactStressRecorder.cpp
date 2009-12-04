@@ -20,7 +20,7 @@
 #include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/core/Omega.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 CREATE_LOGGER ( ContactStressRecorder );
@@ -37,7 +37,7 @@ ContactStressRecorder::ContactStressRecorder () : Recorder()/*, actionForce ( ne
 	upperCorner = Vector3r ( 0,0,0 );
 	lowerCorner = Vector3r ( 0,0,0 );
 
-	sphere_ptr = shared_ptr<InteractingGeometry> ( new InteractingSphere );
+	sphere_ptr = shared_ptr<Shape> ( new InteractingSphere );
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 
 	//triaxCompEng = NULL;
@@ -56,13 +56,13 @@ void ContactStressRecorder::postProcessAttributes ( bool deserializing )
 
 
 
-bool ContactStressRecorder::isActivated(World*)
+bool ContactStressRecorder::isActivated(Scene*)
 {
 	return ( ( Omega::instance().getCurrentIteration() % interval == 0 ) && ( ofile ) );
 }
 
 
-void ContactStressRecorder::action ( World * ncb )
+void ContactStressRecorder::action ( Scene * ncb )
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

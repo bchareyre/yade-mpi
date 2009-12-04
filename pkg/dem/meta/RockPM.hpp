@@ -12,16 +12,16 @@ mechanical behavior of mining rocks.
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/LawFunctor.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
 
-class Law2_Dem3DofGeom_RockPMPhys_Rpm: public ConstitutiveLaw{
+class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 		FUNCTOR2D(Dem3DofGeom,RpmPhys);
-		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_RockPMPhys_Rpm,ConstitutiveLaw);
-		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
+		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_RockPMPhys_Rpm,LawFunctor);
+		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
 		DECLARE_LOGGER;	
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);

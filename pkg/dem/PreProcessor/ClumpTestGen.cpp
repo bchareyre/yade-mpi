@@ -2,7 +2,7 @@
 
 #include"ClumpTestGen.hpp"
 #include<yade/pkg-dem/Clump.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/FileGenerator.hpp>
 #include<yade/core/DeusExMachina.hpp>
@@ -23,13 +23,13 @@ bool ClumpTestGen::generate()
 	rootBody->engines.push_back(shared_ptr<ClumpMemberMover>(new ClumpMemberMover));
 	
 
-	shared_ptr<World> oldRootBody=Omega::instance().getWorld();
-	Omega::instance().setWorld(rootBody);
+	shared_ptr<Scene> oldRootBody=Omega::instance().getScene();
+	Omega::instance().setScene(rootBody);
 
 	shared_ptr<Body> ground=Shop::box(Vector3r(0,0,-1),Vector3r(3,3,.2));
 	ground->isDynamic=false;
 	// revert random colors for this single case...
-	#ifdef YADE_SHAPE
+	#ifdef YADE_GEOMETRICALMODEL
 		ground->geometricalModel->diffuseColor=Vector3r(.6,.6,.6);
 	#endif
 	ground->interactingGeometry->diffuseColor=Vector3r(.3,.3,.3);
@@ -68,7 +68,7 @@ bool ClumpTestGen::generate()
 	relPos.clear(); radii.clear();
 
 	// restore Omega
-	Omega::instance().setWorld(oldRootBody);
+	Omega::instance().setScene(oldRootBody);
 	
 	message="OK";
 	return true;
@@ -87,7 +87,7 @@ bool ClumpTestGen::generate()
  * @param radii Radii of composing spheres. Must have the same length as relPos.
  * @param rootBody clumpedBodies.
  */
-void ClumpTestGen::createOneClump(shared_ptr<World>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii)
+void ClumpTestGen::createOneClump(shared_ptr<Scene>& rootBody, Vector3r clumpPos, vector<Vector3r> relPos, vector<Real> radii)
 {
 	assert(relPos.size()==radii.size());
 	list<body_id_t> clumpMembers;	

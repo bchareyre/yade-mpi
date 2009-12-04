@@ -14,7 +14,7 @@
 #include <fstream>
 
 class TriaxialCompressionEngine;
-class InteractingGeometry;
+class Shape;
 
 class CapillaryStressRecorder : public Recorder
 {
@@ -22,7 +22,7 @@ class CapillaryStressRecorder : public Recorder
 		std::ofstream ofile; 
 		
 		bool changed;
-		shared_ptr<InteractingGeometry> sphere_ptr;
+		shared_ptr<Shape> sphere_ptr;
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		int SpheresClassIndex;
 	
@@ -39,8 +39,8 @@ class CapillaryStressRecorder : public Recorder
 
 		CapillaryStressRecorder ();
 
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(Recorder,(outputFile)(interval)/*(wall_bottom_id)(wall_top_id)(wall_left_id)(wall_right_id)(wall_front_id)(wall_back_id)(height)(width)(depth)(thickness)(upperCorner)(lowerCorner)	*/);
 	protected :

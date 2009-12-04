@@ -9,7 +9,7 @@
 
 #include "Tetrahedron.hpp"
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 Tetrahedron::Tetrahedron(): GeometricalModel()
 {

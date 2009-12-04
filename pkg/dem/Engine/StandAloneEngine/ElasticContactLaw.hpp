@@ -12,15 +12,15 @@
 
 // only to see whether SCG_SHEAR is defined, may be removed in the future
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
-#include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/LawFunctor.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
 
-class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
+class ef2_Spheres_Elastic_ElasticLaw: public LawFunctor{
 	public:
-	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
+	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 	int sdecGroupMask;
 	bool momentRotationLaw;	
 	bool neverErase;	
@@ -35,8 +35,8 @@ class ef2_Spheres_Elastic_ElasticLaw: public ConstitutiveLaw{
 		#endif
 		{}
 	FUNCTOR2D(SpheresContactGeometry,ElasticContactInteraction);
-	REGISTER_CLASS_AND_BASE(ef2_Spheres_Elastic_ElasticLaw,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(sdecGroupMask)(momentRotationLaw)(neverErase)
+	REGISTER_CLASS_AND_BASE(ef2_Spheres_Elastic_ElasticLaw,LawFunctor);
+	REGISTER_ATTRIBUTES(LawFunctor,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR
 			(useShear)
 		#endif
@@ -51,12 +51,12 @@ This class serves also as tutorial and is documented in detail at
 
 	http://yade.wikia.com/wiki/ConstitutiveLawHowto
 */
-class Law2_Dem3Dof_Elastic_Elastic: public ConstitutiveLaw{
+class Law2_Dem3Dof_Elastic_Elastic: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 		FUNCTOR2D(Dem3DofGeom,ElasticContactInteraction);
-		REGISTER_CLASS_AND_BASE(Law2_Dem3Dof_Elastic_Elastic,ConstitutiveLaw);
-		REGISTER_ATTRIBUTES(ConstitutiveLaw,/*nothing here*/);
+		REGISTER_CLASS_AND_BASE(Law2_Dem3Dof_Elastic_Elastic,LawFunctor);
+		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
 };
 REGISTER_SERIALIZABLE(Law2_Dem3Dof_Elastic_Elastic);
 
@@ -74,7 +74,7 @@ class ElasticContactLaw : public InteractionSolver
 		#endif
 	
 		ElasticContactLaw();
-		void action(World*);
+		void action(Scene*);
 
 		shared_ptr<ef2_Spheres_Elastic_ElasticLaw> functor;
 

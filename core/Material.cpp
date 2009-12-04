@@ -7,15 +7,15 @@
 
 Material::~Material(){}
 
-const shared_ptr<Material> Material::byId(int id, World* w_){
-	World* w=w_?w_:Omega::instance().getWorld().get();
+const shared_ptr<Material> Material::byId(int id, Scene* w_){
+	Scene* w=w_?w_:Omega::instance().getScene().get();
 	assert(id>=0 && (size_t)id<w->materials.size());
 	assert(w->materials[id]->id == id);
 	return w->materials[id];
 }
 
-const shared_ptr<Material> Material::byLabel(const std::string& label, World* w_){
-	World* w=w_?w_:Omega::instance().getWorld().get();
+const shared_ptr<Material> Material::byLabel(const std::string& label, Scene* w_){
+	Scene* w=w_?w_:Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Material>& m, w->materials){
 		if(m->label == label) return m;
 	}

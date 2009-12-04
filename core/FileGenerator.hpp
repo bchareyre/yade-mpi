@@ -11,7 +11,7 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-base/Logging.hpp>
 
-#include "World.hpp"
+#include "Scene.hpp"
 #include "ThreadWorker.hpp"
 
 class FileGenerator
@@ -19,7 +19,7 @@ class FileGenerator
 	, public ThreadWorker
 {
 	protected :
-		shared_ptr<World>	 rootBody;
+		shared_ptr<Scene>	 rootBody;
 
 		string			 outputFileName
 					,serializationDynlib;

@@ -9,7 +9,7 @@
 
 CREATE_LOGGER(InteractingFacet);
 
-InteractingFacet::InteractingFacet() : InteractingGeometry()
+InteractingFacet::InteractingFacet() : Shape()
 {
 	createIndex();
 	#ifdef FACET_TOPO

@@ -18,8 +18,8 @@
  * */
 class ResetPositionEngine : public PeriodicEngine {
 	public:
-		void action(World*);
-		bool isActivated(World* rootBody) {if (first) return true; else return PeriodicEngine::isActivated(rootBody);}
+		void action(Scene*);
+		bool isActivated(Scene* rootBody) {if (first) return true; else return PeriodicEngine::isActivated(rootBody);}
 		ResetPositionEngine();
 
 		Real Y_min;
@@ -39,7 +39,7 @@ class ResetPositionEngine : public PeriodicEngine {
 	private:
 		std::vector<Vector3r> ini_pos;
 		bool first;
-		void initialize(World * ncb);
+		void initialize(Scene * ncb);
 };
 
 REGISTER_SERIALIZABLE(ResetPositionEngine);

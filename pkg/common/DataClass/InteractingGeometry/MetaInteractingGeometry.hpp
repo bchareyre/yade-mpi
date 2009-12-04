@@ -8,20 +8,20 @@
 
 #pragma once
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 
-class MetaInteractingGeometry : public InteractingGeometry
+class MetaInteractingGeometry : public Shape
 {
 	public :
 		MetaInteractingGeometry ();
 		virtual ~MetaInteractingGeometry ();
 
 /// Serialization
-	REGISTER_CLASS_AND_BASE(MetaInteractingGeometry,InteractingGeometry);
-	// FIXME: if this class is registered, World then has "abstract" InteractingGeometry, which fails in the functor (??)
-	REGISTER_ATTRIBUTES(InteractingGeometry,/* no attributes */);
+	REGISTER_CLASS_AND_BASE(MetaInteractingGeometry,Shape);
+	// FIXME: if this class is registered, Scene then has "abstract" Shape, which fails in the functor (??)
+	REGISTER_ATTRIBUTES(Shape,/* no attributes */);
 /// Indexable
-	REGISTER_CLASS_INDEX(MetaInteractingGeometry,InteractingGeometry);
+	REGISTER_CLASS_INDEX(MetaInteractingGeometry,Shape);
 };
 
 REGISTER_SERIALIZABLE(MetaInteractingGeometry);

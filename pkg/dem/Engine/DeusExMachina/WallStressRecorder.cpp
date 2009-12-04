@@ -16,7 +16,7 @@
 #include <yade/pkg-dem/ElasticContactInteraction.hpp>
 
 #include <yade/core/Omega.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 
@@ -43,13 +43,13 @@ void WallStressRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool WallStressRecorder::isActivated(World*)
+bool WallStressRecorder::isActivated(Scene*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void WallStressRecorder::action(World * ncb)
+void WallStressRecorder::action(Scene * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 		

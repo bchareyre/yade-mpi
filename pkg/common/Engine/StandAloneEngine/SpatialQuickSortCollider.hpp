@@ -36,7 +36,7 @@ class SpatialQuickSortCollider : public Collider {
 	SpatialQuickSortCollider();
 	virtual ~SpatialQuickSortCollider();
 
-	virtual void action(World*);
+	virtual void action(Scene*);
 
 	REGISTER_ATTRIBUTES(Collider,);
 	DECLARE_LOGGER;

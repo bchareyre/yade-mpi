@@ -21,7 +21,7 @@ class ContactStressRecorder : public Recorder
 {
 	private :
 		
-		shared_ptr<InteractingGeometry> sphere_ptr;
+		shared_ptr<Shape> sphere_ptr;
 		int SpheresClassIndex;
 		
 		std::ofstream ofile;
@@ -43,8 +43,8 @@ class ContactStressRecorder : public Recorder
 
 		ContactStressRecorder ();
 
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

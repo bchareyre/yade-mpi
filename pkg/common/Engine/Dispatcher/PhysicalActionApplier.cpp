@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"PhysicalActionApplier.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
-void PhysicalActionApplier::action(World* ncb){
+void PhysicalActionApplier::action(Scene* ncb){
 	ncb->bex.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		operator()(b->physicalParameters,b.get(),ncb);

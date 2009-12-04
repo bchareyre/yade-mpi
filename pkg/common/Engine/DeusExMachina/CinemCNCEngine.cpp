@@ -11,7 +11,7 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include <yade/lib-miniWm3/Wm3Math.h>
 
@@ -79,7 +79,7 @@ void CinemCNCEngine::applyCondition(Body * body)
 
 void CinemCNCEngine::letMove(Body * body)
 {
-	World * ncb = YADE_CAST<World*>(body);
+	Scene * ncb = YADE_CAST<Scene*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
@@ -160,7 +160,7 @@ void CinemCNCEngine::computeAlpha()
 }
 
 
-void CinemCNCEngine::computeDu(World* ncb)
+void CinemCNCEngine::computeDu(Scene* ncb)
 {
 	ncb->bex.sync(); Vector3r F_sup=ncb->bex.getForce(id_boxhaut);
 	
@@ -249,7 +249,7 @@ void CinemCNCEngine::stopMovement()
 	rb->angularVelocity	=  Vector3r(0,0,0);
 }
 
-void CinemCNCEngine::computeStiffness(World* ncb)
+void CinemCNCEngine::computeStiffness(Scene* ncb)
 {
 	int nbre_contacts = 0;
 	stiffness=0.0;

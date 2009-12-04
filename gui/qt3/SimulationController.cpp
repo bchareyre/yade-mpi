@@ -81,7 +81,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 
 	// there is file existence assertion in loadSimulationFromFilename, so yade will abort cleanly...
 	LOG_DEBUG("Omega's simulation filename: `"<<Omega::instance().getSimulationFileName()<<"'");
-	if (Omega::instance().getSimulationFileName()!="" && (!Omega::instance().getWorld() || (Omega::instance().getWorld()->bodies->size()==0 && Omega::instance().getWorld()->engines.size()==0))){
+	if (Omega::instance().getSimulationFileName()!="" && (!Omega::instance().getScene() || (Omega::instance().getScene()->bodies->size()==0 && Omega::instance().getScene()->engines.size()==0))){
 		loadSimulationFromFileName(Omega::instance().getSimulationFileName());
 	}
 	else{ LOG_DEBUG("Not loading simulation in ctor"); }
@@ -208,7 +208,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		 
 		catch(SerializableError& e) // catching it...
 		{
-			Omega::instance().resetWorld();
+			Omega::instance().resetScene();
 			Omega::instance().setSimulationFileName("");
 			LOG_ERROR(e.what());
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),NULL /*this->parentWidget()->parentWidget()*/));
@@ -220,7 +220,7 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 		}
 		catch(std::runtime_error& e)
 		{
-			Omega::instance().resetWorld();
+			Omega::instance().resetScene();
 			Omega::instance().setSimulationFileName("");
 			LOG_ERROR(e.what());
 			shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(e.what(),NULL /*this->parentWidget()->parentWidget()*/));
@@ -268,7 +268,7 @@ void SimulationController::pbCenterSceneClicked() { YadeQtMainWindow::self->cent
 void SimulationController::closeEvent(QCloseEvent *){ /* switch to async run if running */ if(syncRunning) cbSyncToggled(false); YadeQtMainWindow::self->Quit(); emit closeSignal(); }
 void SimulationController::pbStopClicked() { Omega::instance().stopSimulationLoop(); syncRunning=false; }
 void SimulationController::pbOneSimulationStepClicked(){pbStopClicked();Omega::instance().spawnSingleSimulationLoop();}
-void SimulationController::pbReferenceClicked() {if(YadeQtMainWindow::self->renderer) YadeQtMainWindow::self->renderer->setBodiesRefSe3(Omega::instance().getWorld());}
+void SimulationController::pbReferenceClicked() {if(YadeQtMainWindow::self->renderer) YadeQtMainWindow::self->renderer->setBodiesRefSe3(Omega::instance().getScene());}
 void SimulationController::pbStart2Clicked() { pbStartClicked(); }
 void SimulationController::pbStartClicked(){
 	restartTimer();
@@ -304,7 +304,7 @@ void SimulationController::pbResetClicked()
 	std::string name=Omega::instance().getSimulationFileName(); 
 	loadSimulationFromFileName(name,false /* don't re-center scene */);
 
-	if(Omega::instance().getWorld())
+	if(Omega::instance().getScene())
 	{
 		// timeStepper setup done in loadSimulationFromFileName
 	} 
@@ -469,12 +469,12 @@ void SimulationController::doUpdate(){
 
    // update estimation time
 	char strEstimation[64];
-	if (Omega::instance().getWorld()->stopAtIteration>0 && iterPerSec>0 ) estimation=duration+time_duration(seconds((Omega::instance().getWorld()->stopAtIteration-Omega::instance().getCurrentIteration())/iterPerSec));
+	if (Omega::instance().getScene()->stopAtIteration>0 && iterPerSec>0 ) estimation=duration+time_duration(seconds((Omega::instance().getScene()->stopAtIteration-Omega::instance().getCurrentIteration())/iterPerSec));
 	snprintf(strEstimation,64,"estimation %02d:%02d:%02d",estimation.hours(),estimation.minutes(),estimation.seconds());
  	labelEstimationTime->setText(strEstimation);
 
 	char strStopAtIter[64];
-	snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getWorld()->stopAtIteration);
+	snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getScene()->stopAtIteration);
 	labelStopAtIter->setText(strStopAtIter);
 
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
@@ -489,7 +489,7 @@ void SimulationController::doUpdate(){
 	//cerr<<"dt="<<dt<<",exp10="<<exp10<<",10^exp10="<<pow((float)10,exp10)<<endl;
 
 	/* enable/disable controls here, dynamically */
-	hasSimulation=(Omega::instance().getWorld() ? Omega::instance().getWorld()->bodies->size()>0 : false );
+	hasSimulation=(Omega::instance().getScene() ? Omega::instance().getScene()->bodies->size()>0 : false );
 	bool	isRunning=Omega::instance().isRunning() || syncRunning,
 		hasTimeStepper=Omega::instance().containTimeStepper(),
 		usesTimeStepper=Omega::instance().timeStepperActive(),

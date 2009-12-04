@@ -16,7 +16,7 @@
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 
 #include <yade/core/Omega.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 CREATE_LOGGER(CapillaryStressRecorder);
@@ -26,7 +26,7 @@ CapillaryStressRecorder::CapillaryStressRecorder () : Recorder()
 {
 	outputFile = "";
 	interval = 1;
-	sphere_ptr = shared_ptr<InteractingGeometry> (new InteractingSphere);
+	sphere_ptr = shared_ptr<Shape> (new InteractingSphere);
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 // 	height = 0;
 // 	width = 0;
@@ -52,13 +52,13 @@ void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryStressRecorder::isActivated(World* rootBody)
+bool CapillaryStressRecorder::isActivated(Scene* rootBody)
 {
 	return ((rootBody->currentIteration % interval == 0) && (ofile));
 }
 
 
-void CapillaryStressRecorder::action(World * ncb)
+void CapillaryStressRecorder::action(Scene * ncb)
 {
 	if ( !triaxialCompressionEngine )
 	{

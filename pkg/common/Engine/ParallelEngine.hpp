@@ -6,8 +6,8 @@ class ParallelEngine: public Engine {
 		slaveContainer slaves;
 		ParallelEngine(){};
 		virtual ~ParallelEngine(){};
-		virtual void action(World*);
-		virtual bool isActivated(World*){return true;}
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*){return true;}
 	REGISTER_ATTRIBUTES(Engine,(slaves));
 	REGISTER_CLASS_NAME(ParallelEngine);
 	REGISTER_BASE_CLASS_NAME(Engine);

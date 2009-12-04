@@ -13,7 +13,7 @@
 class GLDrawAABB : public GLDrawBoundingVolumeFunctor
 {
 	public :
-		virtual void go(const shared_ptr<BoundingVolume>&);
+		virtual void go(const shared_ptr<Bound>&);
 
 	RENDERS(AABB);
 	REGISTER_CLASS_NAME(GLDrawAABB);

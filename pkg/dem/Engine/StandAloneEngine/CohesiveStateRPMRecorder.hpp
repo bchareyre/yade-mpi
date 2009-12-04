@@ -12,8 +12,8 @@ class CohesiveStateRPMRecorder: public Recorder {
 		int numberCohesiveContacts;
 		CohesiveStateRPMRecorder(); 
 		~CohesiveStateRPMRecorder();
-		void init(World*);
-		virtual void action(World*);
+		void init(Scene*);
+		virtual void action(Scene*);
 		
 	private:
 		std::ofstream outFile;

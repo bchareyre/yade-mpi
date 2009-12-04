@@ -10,7 +10,7 @@
 #include <yade/pkg-common/PeriodicEngines.hpp>
 #include <yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include <yade/core/Collider.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <vector>
 #include <string>
 
@@ -24,7 +24,7 @@ public:
 	virtual ~ResetRandomPosition();
 
 	/// @brief Create one sphere per call.
-	virtual void action(World*);
+	virtual void action(Scene*);
 
 	/// @brief The geometry of the section on which spheres will be placed. 
 	vector<body_id_t> factoryFacets; 

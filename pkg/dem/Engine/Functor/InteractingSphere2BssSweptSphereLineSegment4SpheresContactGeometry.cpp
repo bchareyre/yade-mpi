@@ -16,8 +16,8 @@
 // BUILDING WORK !!!!
 
 bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::go(
-		const shared_ptr<InteractingGeometry>& cm1,
-		const shared_ptr<InteractingGeometry>& cm2,
+		const shared_ptr<Shape>& cm1,
+		const shared_ptr<Shape>& cm2,
 		const Se3r& se31,
   
 		const Se3r& se32,
@@ -59,8 +59,8 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::go(
 }
 
 
-bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-						const shared_ptr<InteractingGeometry>& cm2,
+bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::goReverse(	const shared_ptr<Shape>& cm1,
+						const shared_ptr<Shape>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)

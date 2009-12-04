@@ -36,7 +36,7 @@ class ContactLaw1 : public InteractionSolver
 		bool momentAlwaysElastic;	// if true the value of the momentum (computed only if momentRotationLaw !!) is not limited by a plastic threshold
 	
 		ContactLaw1();
-		void action(World*);
+		void action(Scene*);
 	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
 	REGISTER_CLASS_NAME(ContactLaw1);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);

@@ -8,7 +8,7 @@
 	#include<omp.h>
 #endif
 
-class World;
+class Scene;
 
 /* Class for putting bodies to velcoity bins, for optimization
 of collision detection.
@@ -56,7 +56,7 @@ class VelocityBins{
 	// how often to show histogram, if LOG_DEBUG is enabled;
 	long histInterval, histLast;
 	// Assign bins to all bodies
-	void setBins(World*, Real currMaxVelSq, Real refSweepLength);
+	void setBins(Scene*, Real currMaxVelSq, Real refSweepLength);
 
 	// Increment maximum per-bin distances and tell whether some bodies may be	already getting out of the swept bbox (in that case, we need to recompute bounding volumes and run the collider)
 	bool incrementDists_shouldCollide(Real dt);

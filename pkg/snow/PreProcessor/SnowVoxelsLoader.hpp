@@ -121,8 +121,8 @@ class SnowVoxelsLoader : public FileGenerator
 		~SnowVoxelsLoader();
 		virtual bool generate();
 		bool load_voxels();
-		void createActors(shared_ptr<World>& rootBody);
-		void positionRootBody(shared_ptr<World>& rootBody);
+		void createActors(shared_ptr<Scene>& rootBody);
+		void positionRootBody(shared_ptr<Scene>& rootBody);
 		void create_grain(shared_ptr<Body>& body, Vector3r position, bool dynamic , boost::shared_ptr<BshSnowGrain> grain);
 		void create_box(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire);
 	

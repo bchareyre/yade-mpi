@@ -9,9 +9,9 @@
 #include <yade/pkg-dem/StaticSpheresAttractionEngine.hpp>
 #include <yade/pkg-dem/ElasticContactInteraction.hpp>
 #include <yade/pkg-common/InteractingSphere.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 
-Real StaticSpheresAttractionEngine::getMaxDisplacement(World* ncb)
+Real StaticSpheresAttractionEngine::getMaxDisplacement(Scene* ncb)
 {
 	// calculation based on max normal force - FIXME not working satifactionary, currently
 	/*

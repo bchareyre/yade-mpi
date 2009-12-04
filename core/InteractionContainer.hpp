@@ -154,7 +154,7 @@ class InteractionContainer : public Serializable
 
 			Returns number of interactions, have they been erased or not (this is useful to check if there were some erased, after traversing those)
 		*/
-		template<class T> int erasePending(const T& t, World* rb){
+		template<class T> int erasePending(const T& t, Scene* rb){
 			int ret=0;
 			#ifdef YADE_OPENMP
 				// shadow the this->pendingErase by the local variable, to share the code

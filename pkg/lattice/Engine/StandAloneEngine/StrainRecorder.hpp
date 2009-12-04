@@ -28,8 +28,8 @@ class StrainRecorder : public DataRecorder
 
 		StrainRecorder ();
 
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

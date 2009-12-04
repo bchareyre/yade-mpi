@@ -15,7 +15,7 @@ using namespace std;
 # if 0
 Real elasticEnergyDensityInAABB(python::tuple AABB){
 	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
-	shared_ptr<World> rb=Omega::instance().getWorld();
+	shared_ptr<Scene> rb=Omega::instance().getScene();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
 		if(!i->interactionPhysics) continue;
@@ -41,7 +41,7 @@ Real elasticEnergyDensityInAABB(python::tuple AABB){
 Real yieldSigmaTMagnitude(Real sigmaN, int yieldSurfType=0){
 	#ifdef CPM_YIELD_SIGMA_T_MAGNITUDE
 		/* find first suitable interaction */
-		World* rootBody=Omega::instance().getWorld().get();
+		Scene* rootBody=Omega::instance().getScene().get();
 		shared_ptr<Interaction> I;
 		FOREACH(I, *rootBody->interactions){
 			if(I->isReal()) break;
@@ -71,7 +71,7 @@ Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])
  * The code is analogous to AxialGravityEngine and is intended to give initial motion
  * to particles subject to axial compaction to speed up the process. */
 void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirection, Real timeToAxis, Real subtractDist=0., Real perturbation=0.1){
-	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getWorld()->bodies)){
+	FOREACH(const shared_ptr<Body>&b, *(Omega::instance().getScene()->bodies)){
 		if(!b->isDynamic) continue;
 		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;
@@ -92,7 +92,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxi
 	which will be coincident with the y axis in the 2d projection.
 	Not sure how much is this function useful... */
 std::vector<Vector3r> spiralSphereStresses2d(Real dH_dTheta,const int axis=2){
-	World* rb=Omega::instance().getWorld().get();
+	Scene* rb=Omega::instance().getScene().get();
 	vector<Vector3r> ret(rb->bodies->size(),Vector3r::ZERO);
 	int ax1=(axis+1)%3,ax2=(axis+2)%3;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){

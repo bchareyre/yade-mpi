@@ -9,7 +9,7 @@
 #include "PositionRecorder.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 
@@ -38,14 +38,14 @@ void PositionRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool PositionRecorder::isActivated(World*)
+bool PositionRecorder::isActivated(Scene*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
 
-void PositionRecorder::action(World * ncb)
+void PositionRecorder::action(Scene * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r pos(Vector3r::ZERO);

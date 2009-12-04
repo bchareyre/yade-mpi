@@ -8,17 +8,17 @@
  
 #pragma once
 
-#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 
-class InteractingSphere2AABB : public BoundingVolumeFunctor
+class InteractingSphere2AABB : public BoundFunctor
 {
 	public :
 		InteractingSphere2AABB(): aabbEnlargeFactor(-1.) {}
-		void go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r&, const Body*);
+		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
 		double aabbEnlargeFactor;
 	FUNCTOR2D(InteractingSphere,AABB);
-	REGISTER_ATTRIBUTES(BoundingVolumeFunctor,(aabbEnlargeFactor));
-	REGISTER_CLASS_AND_BASE(InteractingSphere2AABB,BoundingVolumeFunctor);
+	REGISTER_ATTRIBUTES(BoundFunctor,(aabbEnlargeFactor));
+	REGISTER_CLASS_AND_BASE(InteractingSphere2AABB,BoundFunctor);
 };
 
 REGISTER_SERIALIZABLE(InteractingSphere2AABB);

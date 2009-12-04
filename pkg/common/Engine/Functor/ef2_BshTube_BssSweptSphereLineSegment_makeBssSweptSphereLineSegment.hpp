@@ -13,7 +13,7 @@ class ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment : publ
 {
 	public :
 		void go(	  const shared_ptr<GeometricalModel>& gm
-				, shared_ptr<InteractingGeometry>& ig
+				, shared_ptr<Shape>& ig
 				, const Se3r& se3
 				, const Body*	);
 

@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 using namespace std;
 
@@ -41,7 +41,7 @@ void ForceSnapshot::postProcessAttributes(bool deserializing)
 
 
 
-bool ForceSnapshot::isActivated(World*)
+bool ForceSnapshot::isActivated(Scene*)
 {
 	vector<int>::const_iterator ii = list_id.begin();
 	vector<int>::const_iterator iiEnd = list_id.end();
@@ -57,7 +57,7 @@ bool ForceSnapshot::isActivated(World*)
 
 
 
-void ForceSnapshot::action(World * ncb)
+void ForceSnapshot::action(Scene * ncb)
 {
 // 	copie de outputFile dans ce qui sera utilise pour le nom des fichiers resultats
 	nom_int=outputFile;

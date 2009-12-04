@@ -8,7 +8,7 @@
 
 #include "LatticeSetGeometry.hpp"
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 LatticeSetGeometry::LatticeSetGeometry() : GeometricalModel()
 {

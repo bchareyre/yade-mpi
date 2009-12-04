@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 Vector3r translation_vect_ (0.10,0,0);
 
@@ -44,7 +44,7 @@ void outv(Vector3r axis)
 	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", length: " << axis.Length() << " | ";
 }
 
-void CohesiveFrictionalContactLaw::action(World* ncb)
+void CohesiveFrictionalContactLaw::action(Scene* ncb)
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

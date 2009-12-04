@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "HydraulicForceEngine.hpp"
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <yade/core/Body.hpp>
 #include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include <vector>
@@ -37,7 +37,7 @@ HydraulicForceEngine::~HydraulicForceEngine()
 
 
 
-void HydraulicForceEngine::applyCondition(World* ncb)
+void HydraulicForceEngine::applyCondition(Scene* ncb)
 {
 
     if (isActivated)
@@ -128,7 +128,7 @@ void HydraulicForceEngine::applyCondition(World* ncb)
 	    	{Shop::saveSpheresToFile(outputFile.c_str()); savePositions = false;}//only once
 	    #else
 	    {
-		    const shared_ptr<World>& rootBody=Omega::instance().getWorld();
+		    const shared_ptr<Scene>& rootBody=Omega::instance().getScene();
 		    ofstream f(outputFile.c_str());
 		    if(!f.good()) throw runtime_error("Unable to open file `"+outputFile+"'");
 		    FOREACH(shared_ptr<Body> b, *rootBody->bodies){

@@ -8,16 +8,16 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "BoundingVolumeDispatcher.hpp"
+#include "BoundDispatcher.hpp"
 
 
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 
-CREATE_LOGGER(BoundingVolumeDispatcher);
+CREATE_LOGGER(BoundDispatcher);
 
-void BoundingVolumeDispatcher::action(World* ncb)
+void BoundDispatcher::action(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	const long numBodies=(long)bodies->size();
@@ -27,7 +27,7 @@ void BoundingVolumeDispatcher::action(World* ncb)
 	for(int id=0; id<numBodies; id++){
 		if(!bodies->exists(id)) continue; // don't delete this check  - Janek
 		const shared_ptr<Body>& b=(*bodies)[id];
-		shared_ptr<InteractingGeometry>& ig=b->interactingGeometry;
+		shared_ptr<Shape>& ig=b->interactingGeometry;
 		if(!ig || !b->boundingVolume) continue;
 
 		#ifdef BV_FUNCTOR_CACHE
@@ -55,5 +55,5 @@ void BoundingVolumeDispatcher::action(World* ncb)
 
 
 
-YADE_PLUGIN((BoundingVolumeDispatcher));
+YADE_PLUGIN((BoundDispatcher));
 

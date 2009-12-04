@@ -12,7 +12,7 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB)
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
@@ -43,7 +43,7 @@ CREATE_LOGGER(Tetra2TetraBang);
  * @todo thoroughly test this for numerical correctness.
  *
  */
-bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared_ptr<InteractingGeometry>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
+bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	TetraMold* A = static_cast<TetraMold*>(cm1.get());
 	TetraMold* B = static_cast<TetraMold*>(cm2.get());
@@ -188,7 +188,7 @@ bool Tetra2TetraBang::go(const shared_ptr<InteractingGeometry>& cm1,const shared
 	return true;
 }
 
-bool Tetra2TetraBang::goReverse(const shared_ptr<InteractingGeometry>& cm1,const shared_ptr<InteractingGeometry>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
+bool Tetra2TetraBang::goReverse(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
 	// reverse only normal direction, otherwise use the inverse contact
 	bool isInteracting=go(cm2,cm1,state2,state1,-shift2,interaction);
 	if(isInteracting){
@@ -373,7 +373,7 @@ CREATE_LOGGER(TetraLaw);
  *
  * DO NOT USE, probably doesn't work.
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
-void TetraLaw::action(World* rootBody)
+void TetraLaw::action(Scene* rootBody)
 {
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 		// normally, we would test isReal(), but TetraLaw doesn't use interactionPhysics at all
@@ -415,7 +415,7 @@ void TetraLaw::action(World* rootBody)
 
 #ifdef YADE_OPENGL
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	void TetraDraw::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
+	void TetraDraw::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 		glColor3v(cm->diffuseColor);

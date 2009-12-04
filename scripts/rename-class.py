@@ -6,7 +6,7 @@ replCnt,moveCnt=0,0
 
 for root, dirs, files in os.walk('.'):
 	for name in files:
-		if 'StandAlone' in name: print root+'/'+name,oldClass
+		if os.path.isdir(root+'/'+name): continue
 		if not name.endswith('pp') and name!='SConscript': continue
 		modified=False; new=[]; fullName=root+'/'+name
 		for l in open(fullName):
@@ -29,10 +29,10 @@ import time,pwd,socket
 #if replCnt>0:
 if True:
 	new=[]
-	for l in open('gui/py/PythonUI_rc.py'):
+	for l in open('py/system.py'):
 		if 'END_RENAMED_CLASSES_LIST' in l: new+="\t'%s':'%s', # %s, %s@%s\n"%(oldClass,newClass,time.asctime(),pwd.getpwuid(os.getuid())[0],socket.gethostname())
 		new+=l
-	f=open('gui/py/PythonUI_rc.py','w')
+	f=open('py/system.py','w')
 	for l in new: f.write(l)
 	f.close()
 

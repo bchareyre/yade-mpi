@@ -3,20 +3,20 @@
 #include<yade/core/Dispatcher.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/LawFunctor.hpp>
 
-class ConstitutiveLawDispatcher:
+class LawDispatcher:
 	public Dispatcher2D <
 		InteractionGeometry, // 1st base classe for dispatch
 		InteractionPhysics,  // 2nd base classe for dispatch
-		ConstitutiveLaw,     // functor base class
+		LawFunctor,     // functor base class
 		void,                // return type
-		TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, World*),
+		TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*),
 		false                // autosymmetry
 	>{
 		public:
-		virtual void action(World*);
-		REGISTER_CLASS_AND_BASE(ConstitutiveLawDispatcher,Dispatcher2D);
+		virtual void action(Scene*);
+		REGISTER_CLASS_AND_BASE(LawDispatcher,Dispatcher2D);
 };
-REGISTER_SERIALIZABLE(ConstitutiveLawDispatcher);
+REGISTER_SERIALIZABLE(LawDispatcher);
 

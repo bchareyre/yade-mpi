@@ -17,7 +17,7 @@ class PhysicalActionContainerReseter : public StandAloneEngine
 	public :
 		PhysicalActionContainerReseter();
 		virtual ~PhysicalActionContainerReseter();
-		virtual void action(World*);
+		virtual void action(Scene*);
 
 	REGISTER_CLASS_AND_BASE(PhysicalActionContainerReseter,StandAloneEngine);
 };
@@ -25,7 +25,7 @@ REGISTER_SERIALIZABLE(PhysicalActionContainerReseter);
 
 class BexResetter: public StandAloneEngine{
 	public:
-		virtual void action(World*);
+		virtual void action(Scene*);
 	REGISTER_CLASS_AND_BASE(BexResetter,StandAloneEngine);
 };
 REGISTER_SERIALIZABLE(BexResetter);

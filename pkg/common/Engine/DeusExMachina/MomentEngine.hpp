@@ -19,7 +19,7 @@ class MomentEngine : public DeusExMachina
 		MomentEngine();
 		virtual ~MomentEngine();
 	
-		virtual void applyCondition(World*);
+		virtual void applyCondition(Scene*);
 	REGISTER_ATTRIBUTES(DeusExMachina,(moment));
 	REGISTER_CLASS_NAME(MomentEngine);
 	REGISTER_BASE_CLASS_NAME(DeusExMachina);

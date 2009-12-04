@@ -11,6 +11,6 @@
 DeusExMachina::DeusExMachina() : Engine() {
 	subscribedBodies.resize(0); // what is this good for?
 }
-void DeusExMachina::action(World* b) {
+void DeusExMachina::action(Scene* b) {
 	this->applyCondition(b);
 }

@@ -29,7 +29,7 @@ YadeQtMainWindow* ensuredMainWindow(){if(!qtGuiIsActive()){qtGuiActivate(); whil
 void centerViews(void){ensuredMainWindow()->centerViews();}
 void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
 shared_ptr<OpenGLRenderingEngine> ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return ensuredMainWindow()->renderer;}
-void OpenGLRenderingEngine_setBodiesRefSe3(const shared_ptr<OpenGLRenderingEngine>& self){ self->setBodiesRefSe3(Omega::instance().getWorld()); }
+void OpenGLRenderingEngine_setBodiesRefSe3(const shared_ptr<OpenGLRenderingEngine>& self){ self->setBodiesRefSe3(Omega::instance().getScene()); }
 
 #define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
 POST_SYNTH_EVENT(CONTROLLER,controller);

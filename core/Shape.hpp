@@ -13,25 +13,25 @@
 
 #define BV_FUNCTOR_CACHE
 
-class BoundingVolumeFunctor;
+class BoundFunctor;
 
-class InteractingGeometry : public Serializable, public Indexable
+class Shape : public Serializable, public Indexable
 {
 	public :
-		InteractingGeometry(): diffuseColor(Vector3r(1,1,1)), wire(false), highlight(false) {}
+		Shape(): diffuseColor(Vector3r(1,1,1)), wire(false), highlight(false) {}
 		Vector3r diffuseColor;
 		bool wire;
 		bool highlight;
 
 		#ifdef BV_FUNCTOR_CACHE
-			shared_ptr<BoundingVolumeFunctor> boundFunctor;
+			shared_ptr<BoundFunctor> boundFunctor;
 		#endif
 
 /// Serialization
 	REGISTER_ATTRIBUTES(Serializable,(diffuseColor)(wire)(highlight));
-	REGISTER_CLASS_AND_BASE(InteractingGeometry,Serializable Indexable);
+	REGISTER_CLASS_AND_BASE(Shape,Serializable Indexable);
 /// Indexable
-	REGISTER_INDEX_COUNTER(InteractingGeometry);
+	REGISTER_INDEX_COUNTER(Shape);
 };
-REGISTER_SERIALIZABLE(InteractingGeometry);
+REGISTER_SERIALIZABLE(Shape);
 

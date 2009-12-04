@@ -7,10 +7,10 @@
 *************************************************************************/
 
 #include "GeometricalModelMetaEngine.hpp"
-#include<yade/core/World.hpp>
-YADE_REQUIRE_FEATURE(shape);
+#include<yade/core/Scene.hpp>
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
-void GeometricalModelMetaEngine::action(World* ncb)
+void GeometricalModelMetaEngine::action(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

@@ -9,19 +9,19 @@
 #pragma once
 
 
-#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 
 
-class ef2_BssSweptSphereLineSegment_AABB_makeAABB : public BoundingVolumeFunctor
+class ef2_BssSweptSphereLineSegment_AABB_makeAABB : public BoundFunctor
 {
 	public :
-		void go(	  const shared_ptr<InteractingGeometry>& cm
-				, shared_ptr<BoundingVolume>& bv
+		void go(	  const shared_ptr<Shape>& cm
+				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body*	);
                 FUNCTOR2D(BssSweptSphereLineSegment,AABB);
                 REGISTER_CLASS_NAME(ef2_BssSweptSphereLineSegment_AABB_makeAABB);
-	        REGISTER_BASE_CLASS_NAME(BoundingVolumeFunctor);
+	        REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };
 
 REGISTER_SERIALIZABLE(ef2_BssSweptSphereLineSegment_AABB_makeAABB);

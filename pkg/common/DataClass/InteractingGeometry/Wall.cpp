@@ -11,7 +11,7 @@ YADE_PLUGIN((Wall)(Wall2AABB)
 
 Wall::~Wall(){} // vtable
 
-void Wall2AABB::go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
+void Wall2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 	Wall* wall=static_cast<Wall*>(cm.get());
 	AABB* aabb=static_cast<AABB*>(bv.get());
 	aabb->center=se3.position;
@@ -26,7 +26,7 @@ void Wall2AABB::go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<Boundin
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	int  Gl1_Wall::div=20;
 
-	void Gl1_Wall::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<State>& pp, bool, const GLViewInfo& glinfo){   
+	void Gl1_Wall::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& pp, bool, const GLViewInfo& glinfo){   
 		Wall* wall=static_cast<Wall*>(cm.get());
 		int ax0=wall->axis,ax1=(wall->axis+1)%3,ax2=(wall->axis+2)%3;
 		Vector3r a1,b1,a2,b2; // beginnings (a) and endings (b) of lines in both senses (0,1)

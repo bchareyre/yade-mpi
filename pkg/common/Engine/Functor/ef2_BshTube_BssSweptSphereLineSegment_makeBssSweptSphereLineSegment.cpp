@@ -10,17 +10,17 @@
 #include<yade/pkg-common/BssSweptSphereLineSegment.hpp>
 #include<yade/pkg-common/BshTube.hpp>
 #include<yade/pkg-common/BcpConnection.hpp>
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 void ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment::go(	const shared_ptr<GeometricalModel>& gm,
-				shared_ptr<InteractingGeometry>& ig,
+				shared_ptr<Shape>& ig,
 				const Se3r& se3,
 				const Body* body)
 {
   
   BshTube* tube = static_cast<BshTube*>(gm.get());
   if(ig == 0)
-    ig = boost::shared_ptr<InteractingGeometry>(new BssSweptSphereLineSegment);
+    ig = boost::shared_ptr<Shape>(new BssSweptSphereLineSegment);
 
   BssSweptSphereLineSegment* SSLS = static_cast<BssSweptSphereLineSegment*>(ig.get());
   
@@ -29,8 +29,8 @@ void ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment::go(	co
   
   BcpConnection* bc = static_cast<BcpConnection*>(body->physicalParameters.get());
 
-  SSLS->position = (*(Omega::instance().getWorld()->bodies))[bc->id1]->physicalParameters->se3.position;
-  Vector3r len = (*(Omega::instance().getWorld()->bodies))[bc->id2]->physicalParameters->se3.position - SSLS->position;
+  SSLS->position = (*(Omega::instance().getScene()->bodies))[bc->id1]->physicalParameters->se3.position;
+  Vector3r len = (*(Omega::instance().getScene()->bodies))[bc->id2]->physicalParameters->se3.position - SSLS->position;
   len.Normalize();
   SSLS->orientation = len;
   

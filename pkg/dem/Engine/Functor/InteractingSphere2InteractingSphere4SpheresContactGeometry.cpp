@@ -16,8 +16,8 @@ InteractingSphere2InteractingSphere4SpheresContactGeometry::InteractingSphere2In
 	interactionDetectionFactor = 1;
 }
 
-bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<InteractingGeometry>& cm1,
-							const shared_ptr<InteractingGeometry>& cm2,
+bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const shared_ptr<Shape>& cm1,
+							const shared_ptr<Shape>& cm2,
 							const State& state1, const State& state2, const Vector3r& shift2,
 							const shared_ptr<Interaction>& c)
 {
@@ -52,8 +52,8 @@ bool InteractingSphere2InteractingSphere4SpheresContactGeometry::go(	const share
 }
 
 
-bool InteractingSphere2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-								const shared_ptr<InteractingGeometry>& cm2,
+bool InteractingSphere2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<Shape>& cm1,
+								const shared_ptr<Shape>& cm2,
 								const State& state1,
 								const State& state2,
 								const Vector3r& shift2,

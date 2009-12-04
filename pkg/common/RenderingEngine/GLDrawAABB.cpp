@@ -10,7 +10,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
-void GLDrawAABB::go(const shared_ptr<BoundingVolume>& bv)
+void GLDrawAABB::go(const shared_ptr<Bound>& bv)
 {
 	AABB * aabb = static_cast<AABB*>(bv.get());
 	glColor3v(bv->diffuseColor);

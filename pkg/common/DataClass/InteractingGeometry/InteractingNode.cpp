@@ -8,7 +8,7 @@
 
 #include "InteractingNode.hpp"
 
-InteractingNode::InteractingNode () : InteractingGeometry()
+InteractingNode::InteractingNode () : Shape()
 {
 	createIndex();
 }

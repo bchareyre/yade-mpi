@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <yade/core/BoundingVolume.hpp>
+#include <yade/core/Bound.hpp>
 #include "StandAloneEngine.hpp"
 
 class Collider : public StandAloneEngine
@@ -16,11 +16,11 @@ class Collider : public StandAloneEngine
 	public :
 		Collider();
 		virtual ~Collider();
-		/*! To probe the BoundingVolume on a bodies presense.
+		/*! To probe the Bound on a bodies presense.
 		 *
 		 * returns list of body ids with which there is potential overlap.
 		 */
-		virtual  vector<body_id_t> probeBoundingVolume(const BoundingVolume&){throw;}
+		virtual  vector<body_id_t> probeBoundingVolume(const Bound&){throw;}
 		/*! Tell whether given bodies may interact, for other than spatial reasons.
 		 *
 		 * Concrete collider implementations should call this function if

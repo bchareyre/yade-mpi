@@ -2,7 +2,7 @@
 //#include<omp.h> // needed for omp_get_thread_num() (debugging)
 YADE_PLUGIN((ParallelEngine));
 
-void ParallelEngine::action(World* rootBody){
+void ParallelEngine::action(Scene* rootBody){
 	// openMP warns if the iteration variable is unsigned...
 	const int size=(int)slaves.size();
 	#ifdef YADE_OPENMP
@@ -12,7 +12,7 @@ void ParallelEngine::action(World* rootBody){
 		// run every slave group sequentially
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {
 			//cerr<<"["<<omp_get_thread_num()<<":"<<e->getClassName()<<"]";
-			e->world=world;
+			e->scene=scene;
 			if(e->isActivated(rootBody)) { e->action(rootBody); }
 		}
 	}

@@ -15,8 +15,8 @@
 #include<limits>
 
 
-void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
-						, shared_ptr<BoundingVolume>& bv
+void MetaInteractingGeometry2AABB::go(	  const shared_ptr<Shape>&
+						, shared_ptr<Bound>& bv
 						, const Se3r&
 						, const Body* body )
 {
@@ -25,7 +25,7 @@ void MetaInteractingGeometry2AABB::go(	  const shared_ptr<InteractingGeometry>&
 	Vector3r mx(-inf,-inf,-inf);
 	Vector3r mn(inf,inf,inf);
 	
-	const World * ncb = YADE_CAST<const World*>(body);
+	const Scene * ncb = YADE_CAST<const Scene*>(body);
 	
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		if(!b) continue;

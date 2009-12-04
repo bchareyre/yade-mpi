@@ -8,7 +8,7 @@
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
@@ -17,7 +17,7 @@
 	#include <Wm3ApprPlaneFit3.h>
 	#include <Wm3Plane3.h>
 #endif
-YADE_REQUIRE_FEATURE(shape)
+YADE_REQUIRE_FEATURE(geometricalmodel)
 YADE_PLUGIN((Ef1_IstSnowLayersContact_glDraw));
 /*
 /// all points must share the same plane!
@@ -228,13 +228,13 @@ void Ef1_IstSnowLayersContact_glDraw::go(
 
 
 /*
-	if(!(id1 == (int)(Omega::instance().getWorld()->selectedBody) || id2 == (int)(Omega::instance().getWorld()->selectedBody)))
+	if(!(id1 == (int)(Omega::instance().getScene()->selectedBody) || id2 == (int)(Omega::instance().getScene()->selectedBody)))
 		return;
 
-	assert(Omega::instance().getWorld()->bodies->exists(id1));
-	assert(Omega::instance().getWorld()->bodies->exists(id2));
-	BshSnowGrain* m1 = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[id1]->geometricalModel.get());
-	BshSnowGrain* m2 = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getWorld()->bodies))[id2]->geometricalModel.get());
+	assert(Omega::instance().getScene()->bodies->exists(id1));
+	assert(Omega::instance().getScene()->bodies->exists(id2));
+	BshSnowGrain* m1 = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getScene()->bodies))[id1]->geometricalModel.get());
+	BshSnowGrain* m2 = dynamic_cast<BshSnowGrain*>((*(Omega::instance().getScene()->bodies))[id2]->geometricalModel.get());
 	if(!m1 || !m2)
 	{
 		std::cerr << "not BshSnowGrain\n";
@@ -242,10 +242,10 @@ void Ef1_IstSnowLayersContact_glDraw::go(
 	}
 	std::vector<Vector3r> inside;
 	std::vector<Vector3r> cross_section;
-	Vector3r    pos1((*(Omega::instance().getWorld()->bodies))[id1]->physicalParameters->se3.position);
-	Vector3r    pos2((*(Omega::instance().getWorld()->bodies))[id2]->physicalParameters->se3.position);
-	Quaternionr q1((*(Omega::instance().getWorld()->bodies))[id1]->physicalParameters->se3.orientation);
-	Quaternionr q2((*(Omega::instance().getWorld()->bodies))[id2]->physicalParameters->se3.orientation);
+	Vector3r    pos1((*(Omega::instance().getScene()->bodies))[id1]->physicalParameters->se3.position);
+	Vector3r    pos2((*(Omega::instance().getScene()->bodies))[id2]->physicalParameters->se3.position);
+	Quaternionr q1((*(Omega::instance().getScene()->bodies))[id1]->physicalParameters->se3.orientation);
+	Quaternionr q2((*(Omega::instance().getScene()->bodies))[id2]->physicalParameters->se3.orientation);
 
 	glColor3(1.0,0.0,0.0);
 	for(size_t i=0;i < m1->slices.size();++i)

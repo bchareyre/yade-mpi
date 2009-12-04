@@ -10,7 +10,7 @@
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 using namespace std;
 
@@ -37,7 +37,7 @@ void PositionSnapshot::postProcessAttributes(bool deserializing)
 
 
 
-bool PositionSnapshot::isActivated(World*)
+bool PositionSnapshot::isActivated(Scene*)
 {
 	vector<int>::const_iterator ii = list_id.begin();
 	vector<int>::const_iterator iiEnd = list_id.end();
@@ -53,7 +53,7 @@ bool PositionSnapshot::isActivated(World*)
 
 
 
-void PositionSnapshot::action(World * ncb)
+void PositionSnapshot::action(Scene * ncb)
 {
 // 	copie de outputFile dans ce qui sera utilise pour le nom des fichiers resultats
 	nom_int=outputFile;

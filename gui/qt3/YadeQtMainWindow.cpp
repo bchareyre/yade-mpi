@@ -87,7 +87,7 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 
 void YadeQtMainWindow::timerEvent(QTimerEvent* evt){
 	#if 1
-	//shared_ptr<World> rb=Omega::instance().getWorld();
+	//shared_ptr<Scene> rb=Omega::instance().getScene();
 		//if((rb && rb->bodies->size()>0) ||
 		if(controller || generator) {this->hide();}
 		else { if(!guiMayDisappear) this->show(); }
@@ -170,11 +170,11 @@ void YadeQtMainWindow::createView(){
 
 void YadeQtMainWindow::lookDown(shared_ptr<GLViewer> glv)
 {
-	bool hasSimulation=(Omega::instance().getWorld() ? Omega::instance().getWorld()->bodies->size()>0 : false );
+	bool hasSimulation=(Omega::instance().getScene() ? Omega::instance().getScene()->bodies->size()>0 : false );
 	if(hasSimulation)
 	{	
 		Vector3r g(0,1,0);
-		FOREACH(const shared_ptr<Engine>& e,Omega::instance().getWorld()->engines){
+		FOREACH(const shared_ptr<Engine>& e,Omega::instance().getScene()->engines){
 			if(e && e->getClassName()=="GravityEngine")  
 				g = -1.0*(dynamic_cast<GravityEngine*>(e.get()))->gravity;
 		}

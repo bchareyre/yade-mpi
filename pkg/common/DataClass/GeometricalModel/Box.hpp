@@ -8,7 +8,7 @@
 
 #pragma once
 
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 
 #include<yade/core/GeometricalModel.hpp>
 class Box: public GeometricalModel{

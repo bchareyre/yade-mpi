@@ -12,7 +12,7 @@
 
 bool GLDrawInteractingFacet::normals=false;
 
-void GLDrawInteractingFacet::go(const shared_ptr<InteractingGeometry>& cm, const shared_ptr<State>& ,bool,const GLViewInfo&)
+void GLDrawInteractingFacet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool,const GLViewInfo&)
 {   
     InteractingFacet* facet = static_cast<InteractingFacet*>(cm.get());
     const vector<Vector3r>& vertices = facet->vertices;

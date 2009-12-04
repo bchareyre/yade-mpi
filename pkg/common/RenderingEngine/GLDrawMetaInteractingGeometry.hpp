@@ -13,7 +13,7 @@
 class GLDrawMetaInteractingGeometry : public GLDrawInteractingGeometryFunctor
 {
 	public :
-		virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 	RENDERS(MetaInteractingGeometry);
 	REGISTER_CLASS_NAME(GLDrawMetaInteractingGeometry);

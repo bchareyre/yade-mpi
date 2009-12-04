@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "TriaxialCompressionEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<boost/lexical_cast.hpp>
@@ -71,7 +71,7 @@ void TriaxialCompressionEngine::postProcessAttributes(bool deserializing)
 }
 
 
-void TriaxialCompressionEngine::doStateTransition(World * body, stateNum nextState){
+void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextState){
 
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
@@ -121,7 +121,7 @@ void TriaxialCompressionEngine::doStateTransition(World * body, stateNum nextSta
 	previousState=currentState; // should be always kept in sync, used to track manual changes to the .xml
 }
 
-void TriaxialCompressionEngine::updateParameters ( World * ncb )
+void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 {
 	UnbalancedForce=ComputeUnbalancedForce ( ncb );
 
@@ -189,7 +189,7 @@ void TriaxialCompressionEngine::updateParameters ( World * ncb )
 }
 
 
-void TriaxialCompressionEngine::applyCondition ( World * ncb )
+void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 {
 
 
@@ -295,7 +295,7 @@ void TriaxialCompressionEngine::applyCondition ( World * ncb )
  
 }
 
-void TriaxialCompressionEngine::setContactProperties(World * ncb, Real frictionDegree)
+void TriaxialCompressionEngine::setContactProperties(Scene * ncb, Real frictionDegree)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 			

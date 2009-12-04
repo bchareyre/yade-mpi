@@ -21,7 +21,7 @@
 	#include <Wm3ApprPlaneFit3.h>
 	#include <Wm3Plane3.h>
 #endif
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 CREATE_LOGGER(Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
 
 bool is_point_inside_box(InteractingBox* b, Vector3r P)
@@ -49,8 +49,8 @@ Vector3r find_cross_point(InteractingBox* m,Vector3r in,Vector3r out, Quaternion
 
 
 bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
-		const shared_ptr<InteractingGeometry>& cm1,
-		const shared_ptr<InteractingGeometry>& cm2,
+		const shared_ptr<Shape>& cm1,
+		const shared_ptr<Shape>& cm2,
 		const Se3r& se31,
 		const Se3r& se32,
 		const shared_ptr<Interaction>& c)
@@ -252,8 +252,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 }
 
 
-bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-						const shared_ptr<InteractingGeometry>& cm2,
+bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const shared_ptr<Shape>& cm1,
+						const shared_ptr<Shape>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
 						const shared_ptr<Interaction>& c)

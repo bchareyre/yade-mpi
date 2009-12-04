@@ -18,19 +18,19 @@ class Body;
 
 class Engine: public Serializable{
 	public:
-		// pointer to the simulation, set at every step by World::moveToNextTimeStep
-		World* world;
+		// pointer to the simulation, set at every step by Scene::moveToNextTimeStep
+		Scene* scene;
 		//! user-definable label, to convenienty retrieve this particular engine instance even if multiple engines of the same type exist
 		string label;
 		//! high-level profiling information; not serializable
 		TimingInfo timingInfo; 
 		//! precise profiling information (timing of fragments of the engine)
 		shared_ptr<TimingDeltas> timingDeltas;
-		Engine(): world(NULL) {};
+		Engine(): scene(NULL) {};
 		virtual ~Engine() {};
 	
-		virtual bool isActivated(World*) { return true; };
-		virtual void action(World*) { throw; };
+		virtual bool isActivated(Scene*) { return true; };
+		virtual void action(Scene*) { throw; };
 	REGISTER_ATTRIBUTES(Serializable,(label));
 	REGISTER_CLASS_AND_BASE(Engine,Serializable);
 };

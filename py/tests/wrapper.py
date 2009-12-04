@@ -12,9 +12,10 @@ from miniWm3Wrap import *
 from yade._customConverters import *
 from math import *
 from yade import system
+from yade import *
 
 
-rootClasses=set(['StandAloneEngine','DeusExMachina','InteractingGeometry','BoundingVolume','InteractionGeometry','InteractionPhysics','FileGenerator','BoundingVolumeFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','ConstitutiveLaw','Material','State'])
+rootClasses=set(['StandAloneEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator','BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State'])
 
 allClasses=system.childClasses('Serializable')
 
@@ -31,7 +32,7 @@ class TestObjectInstantiation(unittest.TestCase):
 			obj=eval(r)(); self.assert_(obj.name==r,'Failed for '+r)
 	def testSerializableCtors_attrs_few(self):
 		# attributes passed when using the Serializable('Foo',attr1=value1,attr2=value2) syntax
-		gm=Serializable('InteractingGeometry',wire=True); self.assert_(gm['wire']==True)
+		gm=Serializable('Shape',wire=True); self.assert_(gm['wire']==True)
 	def testRootDerivedCtors(self):
 		# classes that are not root classes but derive from them can be instantiated by their name
 		for r in rootClasses:
@@ -39,7 +40,7 @@ class TestObjectInstantiation(unittest.TestCase):
 				obj=eval(c)(); self.assert_(obj.name==c,'Failed for '+c)
 	def testRootDerivedCtors_attrs_few(self):
 		# attributes passed when using the Foo(attr1=value1,attr2=value2) syntax
-		gm=InteractingGeometry(wire=True); self.assert_(gm['wire']==True)
+		gm=Shape(wire=True); self.assert_(gm['wire']==True)
 	# not applicable for OpenGL-less builds... seems all other classes do derive from something below Serializable
 	#def testNonderived_attrs_few(self):
 	#	# classes deriving just from Serializable can be instantiated by their name directly, including attributes
@@ -47,9 +48,9 @@ class TestObjectInstantiation(unittest.TestCase):
 	def testDispatcherCtor(self):
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one
-		cld1=ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3Dof_Elastic_Elastic()]); self.assert_(len(cld1.functors)==1)
+		cld1=LawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3Dof_Elastic_Elastic()]); self.assert_(len(cld1.functors)==1)
 		# two different make two different, right?
-		cld2=ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
+		cld2=LawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
 	def testInteractionDispatchersCtor(self):
 		# InteractionDispatchers takes 3 lists
 		id=InteractionDispatchers([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],)
@@ -58,7 +59,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
 		self.assert_(id.constLawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
 	def testParallelEngineCtor(self):
-		pe=ParallelEngine([InsertionSortCollider(),[BoundingVolumeMetaEngine(),BexResetter()]])
+		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),BexResetter()]])
 		self.assert_(pe.slaves[0].name=='InsertionSortCollider')
 		self.assert_(len(pe.slaves[1])==2)
 		pe.slaves=[]

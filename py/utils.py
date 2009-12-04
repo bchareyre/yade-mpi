@@ -88,6 +88,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	if resetState: b.state=b.mat.newAssocState()
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
+	b['id']=-1
 	if not noBound: b.bound=BoundingVolume('AABB',diffuseColor=[0,1,0])
 
 def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):
@@ -104,7 +105,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 			if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0].
 	"""
 	b=Body()
-	b.mold=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
@@ -121,7 +122,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
-	b.mold=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=InteractingGeometry('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material)
@@ -142,7 +143,7 @@ def wall(position,axis,sense=0,color=None,material=0):
 
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
-	b.mold=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
+	b.shape=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
 	_commonBodySetup(b,0,Vector3(0,0,0),material)
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
@@ -164,9 +165,9 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBounding
 	if not color: color=randomColor()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.mold=InteractingGeometry('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.mold['vertices']=vertices
-	b.mold.postProcessAttributes(True)
+	b.shape=Shape('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape['vertices']=vertices
+	b.shape.postProcessAttributes(True)
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBoundingVolume)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic
@@ -223,7 +224,7 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 		for j in [0,1]:
 			center[axis]=extrema[j][axis]+(j-.5)*thickness
 			walls.append(box(center=center,extents=extents,dynamic=False,**kw))
-			walls[-1].mold['wire']=True
+			walls[-1].shape['wire']=True
 	return walls
 
 
@@ -267,7 +268,7 @@ def randomizeColors(onlyDynamic=False):
 	"""
 	for b in O.bodies:
 		color=(random.random(),random.random(),random.random())
-		if b['isDynamic'] or not onlyDynamic: b.mold['diffuseColor']=color
+		if b['isDynamic'] or not onlyDynamic: b.shape['diffuseColor']=color
 
 
 
@@ -280,8 +281,8 @@ def spheresToFile(filename,consider=lambda id: True):
 	out=open(filename,'w')
 	count=0
 	for b in o.bodies:
-		if not b.mold or not b.mold.name=='InteractingSphere' or not consider(b.id): continue
-		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.mold['radius']))
+		if not b.shape or not b.shape.name=='InteractingSphere' or not consider(b.id): continue
+		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape['radius']))
 		count+=1
 	out.close()
 	return count

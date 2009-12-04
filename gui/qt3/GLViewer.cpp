@@ -169,7 +169,7 @@ void GLViewer::startClipPlaneManipulation(int planeNo){
 
 void GLViewer::useDisplayParameters(size_t n){
 	LOG_DEBUG("Loading display parameters from #"<<n);
-	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getWorld()->dispParams;
+	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;
 	if(dispParams.size()<=(size_t)n){LOG_ERROR("Display parameters #"<<n<<" don't exist (number of entries "<<dispParams.size()<<")"); return;}
 	const shared_ptr<DisplayParameters>& dp=dispParams[n];
 	string val;
@@ -181,7 +181,7 @@ void GLViewer::useDisplayParameters(size_t n){
 
 void GLViewer::saveDisplayParameters(size_t n){
 	LOG_DEBUG("Saving display parameters to #"<<n);
-	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getWorld()->dispParams;
+	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;
 	if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
 	shared_ptr<DisplayParameters>& dp=dispParams[n];
 	ostringstream oglre; IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
@@ -252,9 +252,9 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		else useDisplayParameters(n);
 	}
 	/* letters alphabetically */
-	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getWorld()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
+	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getScene()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); }
-	else if(e->key()==Qt::Key_D &&(e->state() & AltButton)){ body_id_t id; if((id=Omega::instance().getWorld()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->isDynamic=!b->isDynamic; LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic?"":"NOT")<<" dynamic"); } }
+	else if(e->key()==Qt::Key_D &&(e->state() & AltButton)){ body_id_t id; if((id=Omega::instance().getScene()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->isDynamic=!b->isDynamic; LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
 	else if (e->key()==Qt::Key_M && selectedName() >= 0){
@@ -329,7 +329,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 }
 /* Center the scene such that periodic cell is contained in the view */
 void GLViewer::centerPeriodic(){
-	World* rb=Omega::instance().getWorld().get();
+	Scene* rb=Omega::instance().getScene().get();
 	assert(rb->isPeriodic);
 	Vector3r center=.5*(rb->cellMin+rb->cellMax);
 	Vector3r halfSize=.5*(rb->cellMax-rb->cellMin);
@@ -348,7 +348,7 @@ void GLViewer::centerPeriodic(){
  * "central" (where most bodies is) part very small or even invisible.
  */
 void GLViewer::centerMedianQuartile(){
-	World* rb=Omega::instance().getWorld().get();
+	Scene* rb=Omega::instance().getScene().get();
 	if(rb->isPeriodic){ centerPeriodic(); return; }
 	long nBodies=rb->bodies->size();
 	if(nBodies<4) {
@@ -373,7 +373,7 @@ void GLViewer::centerMedianQuartile(){
 }
 
 void GLViewer::centerScene(){
-	World* rb=Omega::instance().getWorld().get();
+	Scene* rb=Omega::instance().getScene().get();
 	if (!rb) return;
 	if(rb->isPeriodic){ centerPeriodic(); return; }
 
@@ -409,18 +409,18 @@ void GLViewer::centerScene(){
 void GLViewer::draw()
 {
 	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
-	if(Omega::instance().getWorld()){
+	if(Omega::instance().getScene()){
 		int selection = selectedName();
-		if(selection!=-1 && (*(Omega::instance().getWorld()->bodies)).exists(selection) && isMoving){
+		if(selection!=-1 && (*(Omega::instance().getScene()->bodies)).exists(selection) && isMoving){
 			static int last(-1);
 			if(last == selection) // delay by one redraw, so the body will not jump into 0,0,0 coords
 			{
-				Quaternionr& q = (*(Omega::instance().getWorld()->bodies))[selection]->state->ori;
-				Vector3r&    v = (*(Omega::instance().getWorld()->bodies))[selection]->state->pos;
+				Quaternionr& q = (*(Omega::instance().getScene()->bodies))[selection]->state->ori;
+				Vector3r&    v = (*(Omega::instance().getScene()->bodies))[selection]->state->pos;
 				float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);v[0]=v0;v[1]=v1;v[2]=v2;
 				double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);	q[0]=q0;q[1]=q1;q[2]=q2;q[3]=q3;
 			}
-			(*(Omega::instance().getWorld()->bodies))[selection]->userForcedDisplacementRedrawHook();	
+			(*(Omega::instance().getScene()->bodies))[selection]->userForcedDisplacementRedrawHook();	
 			last=selection;
 		}
 		if(manipulatedClipPlane>=0){
@@ -440,13 +440,13 @@ void GLViewer::draw()
 			}
 			renderer->clipPlaneSe3[manipulatedClipPlane]=newSe3;
 		}
-		renderer->render(Omega::instance().getWorld(), selectedName());
+		renderer->render(Omega::instance().getScene(), selectedName());
 	}
 }
 
 void GLViewer::drawWithNames(){
 	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
-	if(Omega::instance().getWorld() && Omega::instance().getWorld()->bodies->size()<renderer->selectBodyLimit) renderer->renderWithNames(Omega::instance().getWorld());
+	if(Omega::instance().getScene() && Omega::instance().getScene()->bodies->size()<renderer->selectBodyLimit) renderer->renderWithNames(Omega::instance().getScene());
 }
 
 // new object selected.
@@ -458,11 +458,11 @@ void GLViewer::postSelection(const QPoint& point)
 	if(selection<0){
 		if(isMoving){
 			displayMessage("Moving finished"); mouseMovesCamera(); isMoving=false;
-			Omega::instance().getWorld()->selectedBody = -1;
+			Omega::instance().getScene()->selectedBody = -1;
 		}
 		return;
 	}
-	if(selection>=0 && (*(Omega::instance().getWorld()->bodies)).exists(selection)){
+	if(selection>=0 && (*(Omega::instance().getScene()->bodies)).exists(selection)){
 		resetManipulation();
 		if(Body::byId(body_id_t(selection))->isClumpMember()){ // select clump (invisible) instead of its member
 			LOG_DEBUG("Clump member #"<<selection<<" selected, selecting clump instead.");
@@ -476,7 +476,7 @@ void GLViewer::postSelection(const QPoint& point)
 		Quaternionr& q = Body::byId(selection)->state->ori;
 		Vector3r&    v = Body::byId(selection)->state->pos;
 		manipulatedFrame()->setPositionAndOrientation(qglviewer::Vec(v[0],v[1],v[2]),qglviewer::Quaternion(q[0],q[1],q[2],q[3]));
-		Omega::instance().getWorld()->selectedBody = selection;
+		Omega::instance().getScene()->selectedBody = selection;
 		try{
 			PyGILState_STATE gstate;
 				gstate = PyGILState_Ensure();
@@ -497,7 +497,7 @@ void GLViewer::endSelection(const QPoint &point){
 	manipulatedClipPlane=-1;
 	//int old = selectedName();
 	QGLViewer::endSelection(point);
-	// if(old != -1 && old!=selectedName() && (*(Omega::instance().getWorld()->bodies)).exists(old)) Body::byId(old)->isDynamic = wasDynamic;
+	// if(old != -1 && old!=selectedName() && (*(Omega::instance().getScene()->bodies)).exists(old)) Body::byId(old)->isDynamic = wasDynamic;
 }
 
 qglviewer::Vec GLViewer::displayedSceneCenter(){
@@ -590,7 +590,7 @@ void GLViewer::postDraw(){
 		}
 	}
 	
-	World* rb=Omega::instance().getWorld().get();
+	Scene* rb=Omega::instance().getScene().get();
 	#define _W3 setw(3)<<setfill('0')
 	#define _W2 setw(2)<<setfill('0')
 	if(timeDispMask!=0){

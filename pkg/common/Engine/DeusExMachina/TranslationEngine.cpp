@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"TranslationEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
-void TranslationEngine::applyCondition(World * ncb){
+void TranslationEngine::applyCondition(Scene * ncb){
 	Real dt=Omega::instance().getTimeStep();
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)ncb->bodies->size());

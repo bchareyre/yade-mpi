@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/ContactLaw1Interaction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 #include <yade/lib-miniWm3/Wm3Math.h>
 
@@ -29,7 +29,7 @@ ContactLaw1::ContactLaw1() : InteractionSolver()
 
 
 
-void ContactLaw1::action(World* ncb)
+void ContactLaw1::action(Scene* ncb)
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

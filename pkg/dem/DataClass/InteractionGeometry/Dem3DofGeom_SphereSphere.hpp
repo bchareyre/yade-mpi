@@ -39,7 +39,7 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 	REGISTER_CLASS_AND_BASE(Dem3DofGeom_SphereSphere,Dem3DofGeom);
 	REGISTER_CLASS_INDEX(Dem3DofGeom_SphereSphere,Dem3DofGeom);
 	friend class GLDraw_Dem3DofGeom_SphereSphere;
-	friend class ef2_Sphere_Sphere_Dem3DofGeom;
+	friend class Ig2_Sphere_Sphere_Dem3DofGeom;
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 
@@ -57,19 +57,19 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 #endif
 
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
-class ef2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
+class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
-		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(	const shared_ptr<InteractingGeometry>&, const shared_ptr<InteractingGeometry>&, const State&, const State&, const Vector3r& shift2, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r& shift2, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
 		//! Factor of sphere radius such that sphere "touch" if their centers are not further than distFactor*(r1+r2);
 		//! if negative, equilibrium distance is the sum of the sphere's radii, which is the default.
 		Real distFactor;
-		ef2_Sphere_Sphere_Dem3DofGeom(): distFactor(-1.) {}
+		Ig2_Sphere_Sphere_Dem3DofGeom(): distFactor(-1.) {}
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
-	REGISTER_CLASS_AND_BASE(ef2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
+	REGISTER_CLASS_AND_BASE(Ig2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(distFactor));
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(ef2_Sphere_Sphere_Dem3DofGeom);
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_Dem3DofGeom);
 

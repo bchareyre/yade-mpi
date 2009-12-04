@@ -3,7 +3,7 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"RotationEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -11,14 +11,14 @@
 
 YADE_PLUGIN((RotationEngine)(SpiralEngine)(InterpolatingSpiralEngine));
 
-void InterpolatingSpiralEngine::applyCondition(World* rb){
+void InterpolatingSpiralEngine::applyCondition(Scene* rb){
 	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;
 	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,_pos);
 	linearVelocity=angularVelocity*slope;
 	SpiralEngine::applyCondition(rb);
 }
 
-void SpiralEngine::applyCondition(World* rb){
+void SpiralEngine::applyCondition(Scene* rb){
 	Real dt=Omega::instance().getTimeStep();
 	axis.Normalize();
 	Quaternionr q;
@@ -51,7 +51,7 @@ RotationEngine::RotationEngine()
 
 
 
-void RotationEngine::applyCondition(World *ncb)
+void RotationEngine::applyCondition(Scene *ncb)
 {
     rotationAxis.Normalize();
 

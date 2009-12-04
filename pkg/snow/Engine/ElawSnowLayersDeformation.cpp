@@ -12,11 +12,11 @@
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 {
@@ -25,7 +25,7 @@ ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 }
 
 
-void ElawSnowLayersDeformation::action(World* ncb)
+void ElawSnowLayersDeformation::action(Scene* ncb)
 {
 	//return;
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

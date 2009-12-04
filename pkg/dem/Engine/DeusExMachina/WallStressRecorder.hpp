@@ -33,8 +33,8 @@ class WallStressRecorder : public DataRecorder
 
 		WallStressRecorder ();
 
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(DataRecorder,

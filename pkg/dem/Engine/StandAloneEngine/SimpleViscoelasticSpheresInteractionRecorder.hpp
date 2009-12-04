@@ -30,8 +30,8 @@ public :
     SimpleViscoelasticSpheresInteractionRecorder();
     ~SimpleViscoelasticSpheresInteractionRecorder();
 
-    virtual void action(World*);
-    bool isActivated(World*);
+    virtual void action(Scene*);
+    bool isActivated(Scene*);
 
 protected :
     virtual void postProcessAttributes(bool deserializing);

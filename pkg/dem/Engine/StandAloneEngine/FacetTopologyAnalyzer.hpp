@@ -54,7 +54,7 @@ class FacetTopologyAnalyzer: public StandAloneEngine{
 		long commonEdgesFound;
 		//! how many common vertices were identified during last run
 		long commonVerticesFound;
-	void action(World*); 
+	void action(Scene*); 
 	FacetTopologyAnalyzer(): projectionAxis(Vector3r::UNIT_X), relTolerance(1e-4), commonEdgesFound(0), commonVerticesFound(0) {}
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(FacetTopologyAnalyzer,StandAloneEngine);

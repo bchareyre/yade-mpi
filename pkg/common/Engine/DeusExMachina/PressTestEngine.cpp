@@ -1,9 +1,9 @@
 
 #include"PressTestEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 
-void PressTestEngine::applyCondition(World * ncb){
+void PressTestEngine::applyCondition(Scene * ncb){
 	if (curentDirection != stop) {
 		if (curentDirection==forward) { 										 ///<Forward direction of the press
 			FOREACH(body_id_t id, subscribedBodies){

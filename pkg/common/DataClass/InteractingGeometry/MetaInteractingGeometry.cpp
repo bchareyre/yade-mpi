@@ -8,7 +8,7 @@
 
 #include "MetaInteractingGeometry.hpp"
 
-MetaInteractingGeometry::MetaInteractingGeometry () : InteractingGeometry()
+MetaInteractingGeometry::MetaInteractingGeometry () : Shape()
 {
 	createIndex();
 }

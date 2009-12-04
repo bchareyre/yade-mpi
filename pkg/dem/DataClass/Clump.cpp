@@ -2,7 +2,7 @@
 
 #include"Clump.hpp"
 #include<algorithm>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
 
@@ -21,7 +21,7 @@ ClumpMemberMover::ClumpMemberMover(){/*createIndex();*/ }
  * _param pp passed by the dispatcher
  * _param clump passed by the dispatcher
  */
-void ClumpMemberMover::applyCondition(World* rootBody){
+void ClumpMemberMover::applyCondition(Scene* rootBody){
 	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
 		shared_ptr<Body> b = *I;
 		if(b->isClump()){
@@ -37,7 +37,7 @@ void ClumpMemberMover::applyCondition(World* rootBody){
  **************************************************************************************/
 
 /*! Create zero'ed RigidBodyParameters; they should not be manipulated directly, since they are all calculated in Clump::update.
- * @todo do we need to do the same for GeomtricalModel, InteractingGeometry and BoundingVolume? They will never be used. Sort that out for sure.
+ * @todo do we need to do the same for GeomtricalModel, Shape and Bound? They will never be used. Sort that out for sure.
  * @bug setting Clump::isDynamic in constructor is not enough (as if it were modified somewhere), must be set explicitly by the user after construction (why?)
  */
 Clump::Clump(): Body(){
@@ -49,7 +49,7 @@ Clump::Clump(): Body(){
 	boundingVolume=shared_ptr<AABB>(new AABB);
 	boundingVolume->diffuseColor=Vector3r(1,0,0);
 
-	interactingGeometry=shared_ptr<InteractingGeometry>(new InteractingGeometry);
+	interactingGeometry=shared_ptr<Shape>(new Shape);
 	interactingGeometry->diffuseColor=Vector3r(0,0,0);
 
 	geometricalModel=shared_ptr<GeometricalModel>(new GeometricalModel);

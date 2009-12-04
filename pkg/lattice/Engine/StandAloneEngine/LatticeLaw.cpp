@@ -13,7 +13,7 @@
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 #include<yade/pkg-lattice/LatticeSetParameters.hpp>
 #include<yade/core/BodyContainer.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 LatticeLaw::LatticeLaw() : InteractionSolver()
@@ -28,7 +28,7 @@ LatticeLaw::~LatticeLaw()
 
 }
 
-bool LatticeLaw::deleteBeam(World* metaBody , LatticeBeamParameters* beam, Body* b)
+bool LatticeLaw::deleteBeam(Scene* metaBody , LatticeBeamParameters* beam, Body* b)
 {
 	Real strain;
 
@@ -104,7 +104,7 @@ void LatticeLaw::calcBeamPositionOrientationNewLength(Body* body, BodyContainer*
 
 }
 
-void LatticeLaw::action(World* lattice)
+void LatticeLaw::action(Scene* lattice)
 {
 	futureDeletes.clear();
 

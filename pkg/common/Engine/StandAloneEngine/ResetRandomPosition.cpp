@@ -43,7 +43,7 @@ ResetRandomPosition::~ResetRandomPosition()
 	
 }
 
-void ResetRandomPosition::action(World* ncb)
+void ResetRandomPosition::action(Scene* ncb)
 {
 	if (first_run)
 	{
@@ -96,7 +96,7 @@ void ResetRandomPosition::action(World* ncb)
 				position = (volumeSection) ? generatePositionInVolume():generatePositionOnSurface();
 
 				const Real r = YADE_CAST<InteractingSphere*>(b->interactingGeometry.get())->radius;
-				BoundingVolume bv;
+				Bound bv;
 				bv.min = Vector3r(position[0]-r, position[1]-r, position[2]-r);
 				bv.max = Vector3r(position[0]+r, position[1]+r, position[2]+r);
 

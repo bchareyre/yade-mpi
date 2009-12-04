@@ -13,15 +13,15 @@
 class InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry : public InteractionGeometryFunctor
 {
 	public :
-		virtual bool go(	const shared_ptr<InteractingGeometry>& cm1,
-					const shared_ptr<InteractingGeometry>& cm2,
+		virtual bool go(	const shared_ptr<Shape>& cm1,
+					const shared_ptr<Shape>& cm2,
 					const State& state1,
 					const State& state2,
 					const Vector3r& shift2,
 					const shared_ptr<Interaction>& c);
 
-		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-					const shared_ptr<InteractingGeometry>& cm2,
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1,
+					const shared_ptr<Shape>& cm2,
 					const State& state1,
 					const State& state2,
 					const Vector3r& shift2,

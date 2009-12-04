@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/GeometricalModel.hpp>
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 class Facet : public GeometricalModel {
 	public :
 	vector<Vector3r> vertices;

@@ -7,13 +7,13 @@
 *************************************************************************/
 
 #include"PhysicalActionContainerReseter.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 YADE_PLUGIN((PhysicalActionContainerReseter)(BexResetter));
 
 PhysicalActionContainerReseter::PhysicalActionContainerReseter(){}
 PhysicalActionContainerReseter::~PhysicalActionContainerReseter(){} 
-void PhysicalActionContainerReseter::action(World* ncb){ ncb->bex.reset(); }
+void PhysicalActionContainerReseter::action(Scene* ncb){ ncb->bex.reset(); }
 
-void BexResetter::action(World* ncb){ ncb->bex.reset(); }
+void BexResetter::action(Scene* ncb){ ncb->bex.reset(); }
 

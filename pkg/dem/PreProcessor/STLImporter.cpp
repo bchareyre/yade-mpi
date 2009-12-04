@@ -47,7 +47,7 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies)
 		shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
 		iFacet->diffuseColor    = Vector3r(0.8,0.3,0.3);
 
-		#ifdef YADE_SHAPE
+		#ifdef YADE_GEOMETRICALMODEL
 			shared_ptr<Facet> gFacet(new Facet);
 			gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
 			gFacet->wire	    = wire;
@@ -58,7 +58,7 @@ void STLImporter::import(shared_ptr<BodyContainer> bodies)
 		for (int j=0; j<3; ++j)
 		{   
 				iFacet->vertices.push_back(v[j]-icc);
-				#ifdef YADE_SHAPE
+				#ifdef YADE_GEOMETRICALMODEL
 					gFacet->vertices.push_back(v[j]-icc);
 				#endif
 		}

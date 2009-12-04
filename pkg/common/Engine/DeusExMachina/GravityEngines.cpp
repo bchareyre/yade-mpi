@@ -7,11 +7,11 @@
 *************************************************************************/
 
 #include"GravityEngines.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine));
 
-void GravityEngine::applyCondition(World* ncb){
+void GravityEngine::applyCondition(Scene* ncb){
 	/* skip bodies that are within a clump;
 	 * even if they are marked isDynamic==false, forces applied to them are passed to the clump, which is dynamic;
 	 * and since clump is a body with mass equal to the sum of masses of its components, it would have gravity applied twice.
@@ -25,7 +25,7 @@ void GravityEngine::applyCondition(World* ncb){
 	}
 }
 
-void CentralGravityEngine::applyCondition(World* rootBody){
+void CentralGravityEngine::applyCondition(Scene* rootBody){
 	const Vector3r& centralPos=Body::byId(centralBody)->state->pos;
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(b->isClumpMember() || b->getId()==centralBody) continue; // skip clump members and central body
@@ -36,7 +36,7 @@ void CentralGravityEngine::applyCondition(World* rootBody){
 	}
 }
 
-void AxialGravityEngine::applyCondition(World* rootBody){
+void AxialGravityEngine::applyCondition(Scene* rootBody){
 	FOREACH(const shared_ptr<Body>&b, *rootBody->bodies){
 		if(b->isClumpMember()) continue;
 		/* http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html */

@@ -51,7 +51,7 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-common/ConstitutiveLaw.hpp>
+#include<yade/pkg-common/LawFunctor.hpp>
 
 /* Cpm state information about each body.
 
@@ -259,7 +259,7 @@ REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 
 
 
-class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
+class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/*! Damage evolution law */
 	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
@@ -279,14 +279,14 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public ConstitutiveLaw{
 		//! Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, 1=no softening, >1=hardening)
 		static Real relKnSoft;
 		Law2_Dem3DofGeom_CpmPhys_Cpm() { }
-		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody);
+		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 		// utility functions
 		//! Update avgStress on all bodies (called from VTKRecorder and yade.eudoxos.particleConfinement)
 		//! Might be anywhere else as well (static method)
-		static void updateBodiesState(World*);
+		static void updateBodiesState(Scene*);
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,ConstitutiveLaw);
-	REGISTER_ATTRIBUTES(ConstitutiveLaw,(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(omegaThreshold)(epsSoft)(relKnSoft));
+	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor);
+	REGISTER_ATTRIBUTES(LawFunctor,(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(omegaThreshold)(epsSoft)(relKnSoft));
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
@@ -304,8 +304,8 @@ class CpmGlobalCharacteristics: public PeriodicEngine{
 	public:
 		bool useMaxForce; // use maximum unbalanced force instead of mean unbalanced force
 		Real unbalancedForce;
-		void compute(World* rb, bool useMax=false);
-		virtual void action(World* rb){compute(rb,useMaxForce);}
+		void compute(Scene* rb, bool useMax=false);
+		virtual void action(Scene* rb){compute(rb,useMaxForce);}
 		CpmGlobalCharacteristics(){};
 	REGISTER_ATTRIBUTES(PeriodicEngine,
 		(unbalancedForce)
@@ -337,8 +337,8 @@ class CpmStateUpdater: public PeriodicEngine {
 		//! maximum damage over all contacts
 		static Real maxOmega;
 		CpmStateUpdater(){maxOmega=0; /* run at the very beginning */ initRun=true;}
-		virtual void action(World* rb){ update(rb); }
-		static void update(World* rb=NULL);
+		virtual void action(Scene* rb){ update(rb); }
+		static void update(Scene* rb=NULL);
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
 	REGISTER_CLASS_AND_BASE(CpmStateUpdater,PeriodicEngine);

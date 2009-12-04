@@ -3,7 +3,7 @@
 YADE_REQUIRE_FEATURE(abcd);
 
 #include"BasicPM.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 
@@ -15,7 +15,7 @@ YADE_PLUGIN((CundallStrackLaw)(Ip2_CSMat_CSMat_CSPhys));
 /********************** CundallStrackLaw ****************************/
 CREATE_LOGGER(CundallStrackLaw);
 
-void CundallStrackLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, World* rootBody){
+void CundallStrackLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
 	
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	CSPhys* phys=static_cast<CSPhys*>(ip.get());

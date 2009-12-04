@@ -19,7 +19,7 @@ class FlowEngine : public DeusExMachina
 		FlowEngine();
 		virtual ~FlowEngine();
 	
-		virtual void applyCondition(World*);
+		virtual void applyCondition(Scene*);
 	
 	protected :
 	REGISTER_ATTRIBUTES(DeusExMachina,/*(gravity)*/(isActivated)(dummyParameter));

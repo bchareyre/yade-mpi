@@ -8,8 +8,8 @@
 
 #include "FlowEngine.hpp"
 #include <yade/pkg-common/ParticleParameters.hpp>
-#include<yade/core/World.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -25,7 +25,7 @@ FlowEngine::~FlowEngine()
 }
 
 
-void FlowEngine::applyCondition(World* ncb)
+void FlowEngine::applyCondition(Scene* ncb)
 {
 	if (!isActivated) return;
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

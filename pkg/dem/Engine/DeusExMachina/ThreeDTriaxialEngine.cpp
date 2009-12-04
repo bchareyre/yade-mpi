@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "ThreeDTriaxialEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 //#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
@@ -84,7 +84,7 @@ ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 
 
 
-void ThreeDTriaxialEngine::applyCondition ( World * ncb )
+void ThreeDTriaxialEngine::applyCondition ( Scene * ncb )
 {
 
 	if ( firstRun )
@@ -182,7 +182,7 @@ void ThreeDTriaxialEngine::applyCondition ( World * ncb )
 
 }
 
-void ThreeDTriaxialEngine::setContactProperties(World * ncb, Real frictionDegree)
+void ThreeDTriaxialEngine::setContactProperties(Scene * ncb, Real frictionDegree)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 			

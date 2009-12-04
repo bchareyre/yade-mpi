@@ -23,15 +23,15 @@
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Sphere.hpp>
 	#include<yade/pkg-common/Box.hpp>
 #endif
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -168,7 +168,7 @@ bool CohesiveTriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -372,7 +372,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
-// 	#ifdef YADE_SHAPE
+// 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<Sphere> gSphere(new Sphere);
 // 	#endif
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
@@ -409,7 +409,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	iSphere->wire			= false;
 	
 	body->interactingGeometry	= iSphere;
-// 	#ifdef YADE_SHAPE
+// 	#ifdef YADE_GEOMETRICALMODEL
 // 		gSphere->radius			= radius;
 // 	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 // 		gSphere->diffuseColor		= spheresColor;
@@ -427,7 +427,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
-// 	#ifdef YADE_SHAPE
+// 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<Box> gBox(new Box);	
 // 	#endif
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
@@ -466,7 +466,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 }
 
 
-void CohesiveTriaxialTest::createActors(shared_ptr<World>& rootBody)
+void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -482,7 +482,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<World>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -602,7 +602,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<World>& rootBody)
 }
 
 
-void CohesiveTriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
+void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {	
 	rootBody->isDynamic		= false;
 
@@ -616,8 +616,8 @@ void CohesiveTriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);	
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);	
 }
 
 

@@ -1,7 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
-#include "ConstitutiveLawDispatcher.hpp"
-YADE_PLUGIN((ConstitutiveLawDispatcher));
-void ConstitutiveLawDispatcher::action(World* rootBody){
+#include "LawDispatcher.hpp"
+YADE_PLUGIN((LawDispatcher));
+void LawDispatcher::action(Scene* rootBody){
 	#ifdef YADE_OPENMP
 		const long size=rootBody->interactions->size();
 		#pragma omp parallel for

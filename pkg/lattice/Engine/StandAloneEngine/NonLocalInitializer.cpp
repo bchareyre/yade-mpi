@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "NonLocalInitializer.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-lattice/LatticeBeamParameters.hpp>
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 #include<yade/pkg-lattice/LatticeSetParameters.hpp>
@@ -120,7 +120,7 @@ bool NonLocalInitializer::calcNonLocal(Body* body1, Body* body2, BodyContainer* 
 	} 
 }
 
-void NonLocalInitializer::action(World * rootBody)
+void NonLocalInitializer::action(Scene * rootBody)
 {
 	return; // YADEview
 

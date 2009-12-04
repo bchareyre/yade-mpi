@@ -8,18 +8,18 @@
  
 #pragma once
 
-#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 
-class MetaInteractingGeometry2AABB : public BoundingVolumeFunctor
+class MetaInteractingGeometry2AABB : public BoundFunctor
 {
 	public :
-		void go(	  const shared_ptr<InteractingGeometry>& cm
-				, shared_ptr<BoundingVolume>& bv
+		void go(	  const shared_ptr<Shape>& cm
+				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body* );
 	FUNCTOR2D(MetaInteractingGeometry,AABB);
 	REGISTER_CLASS_NAME(MetaInteractingGeometry2AABB);
-	REGISTER_BASE_CLASS_NAME(BoundingVolumeFunctor);
+	REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };
 
 REGISTER_SERIALIZABLE(MetaInteractingGeometry2AABB);

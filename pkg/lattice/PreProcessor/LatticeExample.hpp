@@ -100,8 +100,8 @@ class LatticeExample : public FileGenerator
 
 		std::vector<std::pair<Vector3r,Vector3r> > fibres; // start, direction
 
-                void addAggregates(shared_ptr<World>& rootBody);
-                void makeFibreBeams(shared_ptr<World>& rootBody);
+                void addAggregates(shared_ptr<Scene>& rootBody);
+                void makeFibreBeams(shared_ptr<Scene>& rootBody);
 		int isFibre(Vector3r,Vector3r);
 		bool fibreAllows(Vector3r);
 
@@ -277,8 +277,8 @@ struct Circle
 
 		bool generate();
 	
-		void createActors(shared_ptr<World>& rootBody);
-		void positionRootBody(shared_ptr<World>& rootBody);
+		void createActors(shared_ptr<Scene>& rootBody);
+		void positionRootBody(shared_ptr<Scene>& rootBody);
 		bool createNode(shared_ptr<Body>& body, int i, int j, int k);
 		bool createNodeXYZ(shared_ptr<Body>& body, Real i, Real j, Real k);
 		bool createQuad(shared_ptr<Body>& body, int i, int j, Vector3r);
@@ -292,10 +292,10 @@ struct Circle
                 void calcAxisAngle(LatticeBeamParameters* beam, BodyContainer* bodies, int otherId,InteractionContainer* ints, int thisId);
                 bool checkMinimumAngle(BodyVector&,shared_ptr<Body>&);
                 bool checkAngle( Vector3r , Vector3r& );
-                void imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity,Vector3r blocked_xyz);
-                void regionDelete(shared_ptr<World>& rootBody, Vector3r min, Vector3r max);
-                void nonDestroy(shared_ptr<World>& rootBody, Vector3r min, Vector3r max);
-                void modifyCT(shared_ptr<World>& rootBody, Vector3r min, Vector3r max);
+                void imposeTranslation(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real velocity,Vector3r blocked_xyz);
+                void regionDelete(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max);
+                void nonDestroy(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max);
+                void modifyCT(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max);
 		void makeFibres();
 
                 REGISTER_CLASS_NAME(LatticeExample);

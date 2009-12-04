@@ -75,12 +75,12 @@ class CapillaryCohesiveLaw : public InteractionSolver
 		Real CapillaryPressure;
 		bool fusionDetection;//If yes, a BodiesMenisciiList is maintained and updated at each time step
 		bool binaryFusion;//if true, capillary forces are set to zero as soon as 1 fusion at least is detected
-		void checkFusion(World * ncb);
+		void checkFusion(Scene * ncb);
 		shared_ptr<capillarylaw> capillary;
 		BodiesMenisciiList bodiesMenisciiList;
 						
 		CapillaryCohesiveLaw();
-		void action(World * ncb);
+		void action(Scene * ncb);
 		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(CapillaryPressure)(fusionDetection)(binaryFusion));
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(CapillaryCohesiveLaw);

@@ -71,7 +71,7 @@ bool FileGenerator::generateAndSave()
 		setProgress(1.0);
 		try
 		{
-			IOFormatManager::saveToFile(serializationDynlib, outputFileName, "world", rootBody);
+			IOFormatManager::saveToFile(serializationDynlib, outputFileName, "scene", rootBody);
 		}
 		catch(SerializableError& e)
 		{

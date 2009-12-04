@@ -17,7 +17,7 @@
 	#include <Wm3Plane3.h>
 #endif
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 bool is_point_orthogonally_projected_on_triangle_from_both_sides(const Vector3r& a,const Vector3r& b,const Vector3r c,Vector3r& N,Vector3r& P,Real point_plane_distance)
 {
@@ -120,8 +120,8 @@ Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::Ef2_BssSnowGrain_BssSnow
 }
 
 
-bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_ptr<InteractingGeometry>& cm1,
-							const shared_ptr<InteractingGeometry>& cm2,
+bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_ptr<Shape>& cm1,
+							const shared_ptr<Shape>& cm2,
 							const Se3r& se31,
 							const Se3r& se32,
 							const shared_ptr<Interaction>& c)
@@ -430,8 +430,8 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_pt
 }
 
 
-bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const shared_ptr<InteractingGeometry>& cm1,
-								const shared_ptr<InteractingGeometry>& cm2,
+bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const shared_ptr<Shape>& cm1,
+								const shared_ptr<Shape>& cm2,
 								const Se3r& se31,
 								const Se3r& se32,
 								const shared_ptr<Interaction>& c)

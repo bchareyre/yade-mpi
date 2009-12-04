@@ -8,12 +8,12 @@
 #include "TestSimpleViscoelastic.hpp"
 #include <yade/pkg-dem/Shop.hpp>
 #include <yade/core/Body.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
@@ -26,7 +26,7 @@
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
+#include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-dem/RigidBodyRecorder.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticSpheresInteractionRecorder.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
@@ -34,7 +34,7 @@
 #include<yade/pkg-dem/SimpleViscoelasticRelationships.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
-YADE_REQUIRE_FEATURE(shape)
+YADE_REQUIRE_FEATURE(geometricalmodel)
 
 TestSimpleViscoelastic::TestSimpleViscoelastic() : FileGenerator()
 {
@@ -63,7 +63,7 @@ void TestSimpleViscoelastic::postProcessAttributes(bool)
 
 bool TestSimpleViscoelastic::generate()
 {
-    rootBody = shared_ptr<World>(new World);
+    rootBody = shared_ptr<Scene>(new Scene);
     createActors(rootBody);
     positionRootBody(rootBody);
     
@@ -134,7 +134,7 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 	body->physicalParameters	= physics;
 }
 
-void TestSimpleViscoelastic::createActors(shared_ptr<World>& rootBody)
+void TestSimpleViscoelastic::createActors(shared_ptr<Scene>& rootBody)
 {
     
     shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -144,7 +144,7 @@ void TestSimpleViscoelastic::createActors(shared_ptr<World>& rootBody)
     shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
     interactionPhysicsDispatcher->add("SimpleViscoelasticRelationships");
 	    
-    shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+    shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
     boundingVolumeDispatcher->add("InteractingSphere2AABB");
     boundingVolumeDispatcher->add("InteractingBox2AABB");
     boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -161,7 +161,7 @@ void TestSimpleViscoelastic::createActors(shared_ptr<World>& rootBody)
     shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
     orientationIntegrator->add("LeapFrogOrientationIntegrator");
     
-	shared_ptr<ConstitutiveLawDispatcher> constitutiveLaw(new ConstitutiveLawDispatcher);
+	shared_ptr<LawDispatcher> constitutiveLaw(new LawDispatcher);
 	constitutiveLaw->add("ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw");
 
     rootBody->engines.clear();
@@ -233,7 +233,7 @@ void TestSimpleViscoelastic::createSphere(shared_ptr<Body>& body, int i)
 }
     
 
-void TestSimpleViscoelastic::positionRootBody(shared_ptr<World>& rootBody) 
+void TestSimpleViscoelastic::positionRootBody(shared_ptr<Scene>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	
@@ -252,8 +252,8 @@ void TestSimpleViscoelastic::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume		= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry		= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

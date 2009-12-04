@@ -3,7 +3,7 @@
 
 #include<yade/pkg-dem/PeriIsoCompressor.hpp>
 #include<yade/pkg-dem/Shop.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 using namespace std;
 
@@ -11,12 +11,12 @@ YADE_PLUGIN((PeriIsoCompressor))
 
 
 CREATE_LOGGER(PeriIsoCompressor);
-void PeriIsoCompressor::action(World* rb){
+void PeriIsoCompressor::action(Scene* rb){
 	if(!rb->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
 	if(state>=stresses.size()) return;
 	// initialize values
 	if(charLen<=0){
-		BoundingVolume* bv=Body::byId(0,rb)->boundingVolume.get();
+		Bound* bv=Body::byId(0,rb)->boundingVolume.get();
 		if(!bv){ LOG_FATAL("No charLen defined and body #0 has no boundingVolume"); throw; }
 		const Vector3r sz=bv->max-bv->min;
 		charLen=(sz[0]+sz[1]+sz[2])/3.;

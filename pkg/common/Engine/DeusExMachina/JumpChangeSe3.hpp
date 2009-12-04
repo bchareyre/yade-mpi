@@ -19,7 +19,7 @@ class JumpChangeSe3: public DeusExMachina {
 	public:
 		JumpChangeSe3(){deltaSe3.position=Vector3r::ZERO; deltaSe3.orientation=Quaternionr::IDENTITY; setVelocities=false;};
 		virtual ~JumpChangeSe3(){};
-		virtual void applyCondition(World* mb){
+		virtual void applyCondition(Scene* mb){
 			FOREACH(body_id_t id, subscribedBodies){
 				const shared_ptr<Body>& b=Body::byId(id,mb);
 				if(setVelocities){

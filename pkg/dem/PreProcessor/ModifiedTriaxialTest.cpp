@@ -31,11 +31,11 @@ YADE_REQUIRE_FEATURE(CGAL)
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -178,7 +178,7 @@ bool ModifiedTriaxialTest::generate()
 {
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -472,7 +472,7 @@ void ModifiedTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 }
 
 
-void ModifiedTriaxialTest::createActors(shared_ptr<World>& rootBody)
+void ModifiedTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 {
 // recording average positions
 	averagePositionRecorder = shared_ptr<AveragePositionRecorder>(new AveragePositionRecorder);
@@ -494,7 +494,7 @@ void ModifiedTriaxialTest::createActors(shared_ptr<World>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
 		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -615,7 +615,7 @@ void ModifiedTriaxialTest::createActors(shared_ptr<World>& rootBody)
 }
 
 
-void ModifiedTriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
+void ModifiedTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 	rootBody->isDynamic		= false;
 
@@ -634,8 +634,8 @@ void ModifiedTriaxialTest::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 	= physics;
 	
 }

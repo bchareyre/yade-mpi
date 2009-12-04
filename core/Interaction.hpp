@@ -16,8 +16,8 @@ typedef int body_id_t;
 
 class InteractionGeometryFunctor;
 class InteractionPhysicsFunctor;
-class ConstitutiveLaw;
-class World;
+class LawFunctor;
+class Scene;
 
 class Interaction : public Serializable
 {
@@ -31,14 +31,14 @@ class Interaction : public Serializable
 	public :
 		bool isReal() const {return (bool)interactionGeometry && (bool)interactionPhysics;}
 		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
-		bool isFresh(World* rb);
+		bool isFresh(Scene* rb);
 
 		//! At which step this interaction was last detected by the collider. InteractionDispatcher will remove it if InteractionContainer::iterColliderLastRun==currentStep and iterLastSeen<currentStep
 		long iterLastSeen;      
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 
-		/*! relative distance between bodies, given in (World::cellMax-World::cellMin) units
+		/*! relative distance between bodies, given in (Scene::cellMax-Scene::cellMin) units
 			Position of id1 must be incremented by that distance so that there is spatial interaction 
 
 			NOTE (tricky): cellDist must survive Interaction::reset(), it is only initialized in ctor
@@ -70,7 +70,7 @@ class Interaction : public Serializable
 			// shared_ptr's are initialized to NULLs automagically
 			shared_ptr<InteractionGeometryFunctor> geom;
 			shared_ptr<InteractionPhysicsFunctor> phys;
-			shared_ptr<ConstitutiveLaw> constLaw;
+			shared_ptr<LawFunctor> constLaw;
 		} functorCache;
 
 		//! Reset interaction to the intial state (keep only body ids)

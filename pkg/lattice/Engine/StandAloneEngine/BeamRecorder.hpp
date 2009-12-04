@@ -36,8 +36,8 @@ class BeamRecorder : public DataRecorder
 
 		BeamRecorder ();
 
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 
 	protected :
 		virtual void preProcessAttributes(bool deserializing);

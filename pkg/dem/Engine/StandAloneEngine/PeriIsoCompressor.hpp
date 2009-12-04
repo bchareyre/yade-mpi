@@ -26,7 +26,7 @@ class PeriIsoCompressor: public StandAloneEngine{
 	string doneHook;
 	//! whether to exactly keep proportions of the cell
 	bool keepProportions;
-	void action(World*);
+	void action(Scene*);
 	PeriIsoCompressor(): avgStiffness(-1), maxDisplPerStep(-1), sumForces(Vector3r::ZERO), sigma(Vector3r::ZERO), charLen(-1), maxSpan(-1), maxUnbalanced(1e-4), currUnbalanced(-1), globalUpdateInt(20), state(0), keepProportions(true){}
 	REGISTER_ATTRIBUTES(StandAloneEngine,(stresses)(charLen)(maxUnbalanced)(globalUpdateInt)(state)(doneHook)(maxSpan)(keepProportions));
 	DECLARE_LOGGER;

@@ -125,7 +125,7 @@ class BexContainer{
 			size=newSize;
 		}
 		/*! Reset all data, also reset summary forces/torques and mark the container clean. */
-		// perhaps should be private and friend World or whatever the only caller should be
+		// perhaps should be private and friend Scene or whatever the only caller should be
 		void reset(){
 			for(int thread=0; thread<nThreads; thread++){
 				memset(_forceData [thread][0],0,sizeof(Vector3r)*size);

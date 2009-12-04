@@ -10,7 +10,7 @@ class ForceEngine : public DeusExMachina{
 		Vector3r force;
 		ForceEngine(): force(Vector3r::ZERO){};
 		virtual ~ForceEngine(){};
-		virtual void applyCondition(World*);
+		virtual void applyCondition(Scene*);
 	REGISTER_CLASS_AND_BASE(ForceEngine,DeusExMachina);
 	REGISTER_ATTRIBUTES(DeusExMachina,(force));
 };
@@ -37,7 +37,7 @@ class InterpolatingDirectedForceEngine: public ForceEngine{
 		bool wrap;
 		InterpolatingDirectedForceEngine(): _pos(0),direction(Vector3r::UNIT_X),wrap(false){};
 		virtual ~InterpolatingDirectedForceEngine(){};
-		virtual void applyCondition(World*);
+		virtual void applyCondition(Scene*);
 	REGISTER_CLASS_AND_BASE(InterpolatingDirectedForceEngine,ForceEngine);
 	REGISTER_ATTRIBUTES(ForceEngine,(times)(magnitudes)(direction)(wrap));
 };

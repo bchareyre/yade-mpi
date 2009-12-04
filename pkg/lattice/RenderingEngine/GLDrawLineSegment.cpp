@@ -9,7 +9,7 @@
 #include "GLDrawLineSegment.hpp"
 #include<yade/pkg-lattice/LineSegment.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 GLDrawLineSegment::GLDrawLineSegment() : maxLen(0)
 {

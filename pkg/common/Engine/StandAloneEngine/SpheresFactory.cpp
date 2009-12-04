@@ -11,7 +11,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Facet.hpp>
 	#include<yade/pkg-common/Sphere.hpp>
 #endif
@@ -52,7 +52,7 @@ SpheresFactory::~SpheresFactory()
 	
 }
 
-void SpheresFactory::action(World* ncb)
+void SpheresFactory::action(Scene* ncb)
 {
 	if (first_run)
 	{
@@ -84,7 +84,7 @@ void SpheresFactory::action(World* ncb)
 
 		Real r=radius+radiusRange*randomSymmetricUnit();
 
-		BoundingVolume bv;
+		Bound bv;
 		bv.min = Vector3r(position[0]-r, position[1]-r, position[2]-r);
 		bv.max = Vector3r(position[0]+r, position[1]+r, position[2]+r);
 
@@ -174,7 +174,7 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	#ifdef YADE_SHAPE
+	#ifdef YADE_GEOMETRICALMODEL
 		shared_ptr<Sphere> gSphere(new Sphere);
 		gSphere->radius			= r;
 		gSphere->diffuseColor	= color;

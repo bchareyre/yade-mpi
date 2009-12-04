@@ -10,7 +10,7 @@
 
 #include "PositionOrientationRecorder.hpp"
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
@@ -24,7 +24,7 @@ PositionOrientationRecorder::PositionOrientationRecorder() {
 	iterPeriod=50;
 }
 
-void PositionOrientationRecorder::action(World * ncb){
+void PositionOrientationRecorder::action(Scene * ncb){
 	ostringstream oss;
 	oss<<setfill('0')<<outputFile<<"_"<<setw(7)<<Omega::instance().getCurrentIteration();
 	string fileBase=oss.str();

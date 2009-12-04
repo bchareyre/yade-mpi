@@ -219,7 +219,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The priodicity depens on whether	the spheresInCell parameter is given.
 
-	*O.switchWorld()* magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
+	*O.switchScene()* magic is used to have clean simulation for TriaxialTest without deleting the original simulation.
 	This function therefore should never run in parallel with some code accessing your simulation.
 
 	:param predicate: solid-defining predicate for which we generate packing
@@ -300,7 +300,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 			return filterSpherePack(predicate,sp,material=material)
 		print "No suitable packing in database found, running",'PERIODIC compression' if wantPeri else 'triaxial'
 		sys.stdout.flush()
-	O.switchWorld(); O.resetThisWorld() ### !!
+	O.switchScene(); O.resetThisScene() ### !!
 	if wantPeri:
 		# x1,y1,z1 already computed above
 		sp=SpherePack()
@@ -328,7 +328,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 		log.setLevel('TriaxialCompressionEngine',log.WARN)
 		O.run(); O.wait()
 		sp=SpherePack(); sp.fromSimulation()
-	O.switchWorld() ### !!
+	O.switchScene() ### !!
 	if(memoizeDb):
 		if os.path.exists(memoizeDb):
 			conn=sqlite3.connect(memoizeDb)

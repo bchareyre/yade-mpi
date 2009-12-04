@@ -11,16 +11,16 @@
 #include<yade/pkg-common/SpatialQuickSortCollider.hpp>
 #include<yade/pkg-dem/STLImporter.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Facet.hpp>
 	#include<yade/pkg-common/Sphere.hpp>
 #endif
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
@@ -75,7 +75,7 @@ void STLImporterTest::postProcessAttributes(bool)
 
 bool STLImporterTest::generate()
 {
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	positionRootBody(rootBody);
 
 	rootBody->dt = 0.001; //default time step
@@ -181,7 +181,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	#ifdef YADE_SHAPE
+	#ifdef YADE_GEOMETRICALMODEL
 		shared_ptr<Sphere> gSphere(new Sphere);
 		gSphere->radius			= radius;
 		gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
@@ -198,7 +198,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body->physicalParameters	= physics;
 }
 
-void STLImporterTest::createActors(shared_ptr<World>& rootBody)
+void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 {
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
@@ -208,7 +208,7 @@ void STLImporterTest::createActors(shared_ptr<World>& rootBody)
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingFacet2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -240,7 +240,7 @@ void STLImporterTest::createActors(shared_ptr<World>& rootBody)
  	kinematic->rotateAroundZero = true;
 	
 	
-	shared_ptr<InteractingGeometry> facet(new InteractingFacet);
+	shared_ptr<Shape> facet(new InteractingFacet);
 	for(BodyContainer::iterator bi = rootBody->bodies->begin(), biEnd=rootBody->bodies->end(); bi!=biEnd; ++bi)
 	    if ( (*bi)->interactingGeometry->getClassIndex() == facet->getClassIndex() )
 		kinematic->subscribedBodies.push_back((*bi)->getId());
@@ -269,7 +269,7 @@ void STLImporterTest::createActors(shared_ptr<World>& rootBody)
 }
 
 
-void STLImporterTest::positionRootBody(shared_ptr<World>& rootBody) 
+void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	
@@ -288,8 +288,8 @@ void STLImporterTest::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume		= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry		= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

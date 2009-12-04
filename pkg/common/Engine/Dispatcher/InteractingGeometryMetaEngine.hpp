@@ -13,24 +13,24 @@
 #include<yade/core/Dispatcher.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/GeometricalModel.hpp>
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 #include<yade/core/Body.hpp>
 
 class InteractingGeometryMetaEngine : 	public Dispatcher2D
 					<	
 						GeometricalModel,						// base classe for dispatch
-						InteractingGeometry,						// base classe for dispatch
+						Shape,						// base classe for dispatch
 						InteractingGeometryEngineUnit,					// class that provides multivirtual call
 						void ,								// return type
 						TYPELIST_4(	  const shared_ptr<GeometricalModel>&		// arguments
-								, shared_ptr<InteractingGeometry>& 		// is not working when const, because functors are supposed to modify it!
+								, shared_ptr<Shape>& 		// is not working when const, because functors are supposed to modify it!
 								, const Se3r&
 								, const Body* 					// with that - functors have all the data they may need
 							  )
 					>
 {
 	public :
-		virtual void action(World*);
+		virtual void action(Scene*);
 
 	REGISTER_CLASS_NAME(InteractingGeometryMetaEngine);
 	REGISTER_BASE_CLASS_NAME(Dispatcher2D);

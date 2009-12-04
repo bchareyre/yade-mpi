@@ -12,7 +12,7 @@
 
 class NewtonsForceLaw: public PhysicalActionApplierUnit{
 	public:
-		virtual void go(const shared_ptr<State>&, const Body*, World*);
+		virtual void go(const shared_ptr<State>&, const Body*, Scene*);
 		FUNCTOR1D(ParticleParameters);
 		REGISTER_CLASS_AND_BASE(NewtonsForceLaw,PhysicalActionApplierUnit);
 };

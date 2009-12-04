@@ -15,8 +15,8 @@ class GeometricalModelForceColorizer : public StandAloneEngine
 	public :
 		GeometricalModelForceColorizer ();
 
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 	
 	REGISTER_CLASS_NAME(GeometricalModelForceColorizer);
 	REGISTER_BASE_CLASS_NAME(StandAloneEngine);

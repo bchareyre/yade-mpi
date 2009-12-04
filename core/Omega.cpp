@@ -9,7 +9,7 @@
 *************************************************************************/
 
 #include"Omega.hpp"
-#include"World.hpp"
+#include"Scene.hpp"
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
 #include<Wm3Vector3.h>
@@ -49,17 +49,17 @@ SINGLETON_SELF(Omega);
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
-long int Omega::getCurrentIteration(){ return (world?world->currentIteration:-1); }
-void Omega::setCurrentIteration(long int i) { if(world) world->currentIteration=i; }
+long int Omega::getCurrentIteration(){ return (scene?scene->currentIteration:-1); }
+void Omega::setCurrentIteration(long int i) { if(scene) scene->currentIteration=i; }
 
-Real Omega::getSimulationTime() { return world?world->simulationTime:-1;};
+Real Omega::getSimulationTime() { return scene?scene->simulationTime:-1;};
 
 void Omega::setSimulationFileName(const string f){simulationFileName = f;}
 string Omega::getSimulationFileName(){return simulationFileName;}
 
-const shared_ptr<World>& Omega::getWorld(){return world;}
-void Omega::setWorld(shared_ptr<World>& rb){ RenderMutexLock lock; world=rb;}
-void Omega::resetWorld(){ RenderMutexLock lock; world = shared_ptr<World>(new World);}
+const shared_ptr<Scene>& Omega::getScene(){return scene;}
+void Omega::setScene(shared_ptr<Scene>& rb){ RenderMutexLock lock; scene=rb;}
+void Omega::resetScene(){ RenderMutexLock lock; scene = shared_ptr<Scene>(new Scene);}
 
 ptime Omega::getMsStartingSimulationTime(){return msStartingSimulationTime;}
 time_duration Omega::getSimulationPauseDuration(){return simulationPauseDuration;}
@@ -92,8 +92,8 @@ void Omega::reset(){
 
 void Omega::init(){
 	simulationFileName="";
-	resetWorld();
-	worldAnother=shared_ptr<World>(new World);
+	resetScene();
+	sceneAnother=shared_ptr<Scene>(new Scene);
 	timeInit();
 	createSimulationLoop();
 }
@@ -228,14 +228,14 @@ void Omega::scanPlugins(vector<string> baseDirs){
 
 void Omega::loadSimulationFromStream(std::istream& stream){
 	LOG_DEBUG("Loading simulation from stream.");
-	resetWorld();
+	resetScene();
 	RenderMutexLock lock;
-	IOFormatManager::loadFromStream("XMLFormatManager",stream,"world",world);
+	IOFormatManager::loadFromStream("XMLFormatManager",stream,"scene",scene);
 }
 
 void Omega::saveSimulationToStream(std::ostream& stream){
 	LOG_DEBUG("Saving simulation to stream.");
-	IOFormatManager::saveToStream("XMLFormatManager",stream,"world",world);
+	IOFormatManager::saveToStream("XMLFormatManager",stream,"scene",scene);
 }
 
 void Omega::loadSimulation(){
@@ -247,25 +247,25 @@ void Omega::loadSimulation(){
 	{
 		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 			joinSimulationLoop(); // stop current simulation if running
-			resetWorld();
-			RenderMutexLock lock; IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"world",world);
+			resetScene();
+			RenderMutexLock lock; IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"scene",scene);
 		}
 		else if(algorithm::ends_with(simulationFileName,".yade")){
 			joinSimulationLoop();
-			resetWorld();
-			RenderMutexLock lock; IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"world",world);
+			resetScene();
+			RenderMutexLock lock; IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"scene",scene);
 		}
 		else if(algorithm::starts_with(simulationFileName,":memory:")){
 			if(memSavedSimulations.count(simulationFileName)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+simulationFileName);
 			istringstream iss(memSavedSimulations[simulationFileName]);
 			joinSimulationLoop();
-			resetWorld();
-			RenderMutexLock lock; IOFormatManager::loadFromStream("XMLFormatManager",iss,"world",world);
+			resetScene();
+			RenderMutexLock lock; IOFormatManager::loadFromStream("XMLFormatManager",iss,"scene",scene);
 		}
 		else throw runtime_error("Extension of file to load not recognized "+simulationFileName);
 	}
 
-	if( world->getClassName() != "World") throw runtime_error("Wrong file format (world is not a World!?) in "+simulationFileName);
+	if( scene->getClassName() != "Scene") throw runtime_error("Wrong file format (scene is not a Scene!?) in "+simulationFileName);
 
 	timeInit();
 
@@ -281,16 +281,16 @@ void Omega::saveSimulation(const string name)
 
 	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.bz2")){
 		FormatChecker::format=FormatChecker::XML;
-		IOFormatManager::saveToFile("XMLFormatManager",name,"world",world);
+		IOFormatManager::saveToFile("XMLFormatManager",name,"scene",scene);
 	}
 	else if(algorithm::ends_with(name,".yade")){
 		FormatChecker::format=FormatChecker::BIN;
-		IOFormatManager::saveToFile("BINFormatManager",name,"world",world);
+		IOFormatManager::saveToFile("BINFormatManager",name,"scene",scene);
 	}
 	else if(algorithm::starts_with(name,":memory:")){
 		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
 		ostringstream oss;
-		IOFormatManager::saveToStream("XMLFormatManager",oss,"world",world);
+		IOFormatManager::saveToStream("XMLFormatManager",oss,"scene",scene);
 		memSavedSimulations[name]=oss.str();
 	}
 	else {
@@ -300,13 +300,13 @@ void Omega::saveSimulation(const string name)
 
 
 
-void Omega::setTimeStep(const Real t){	if(world) world->dt=t;}
-Real Omega::getTimeStep(){	if(world) return world->dt; else return -1; }
-void Omega::skipTimeStepper(bool s){ if(world) world->setTimeSteppersActive(!s);}
+void Omega::setTimeStep(const Real t){	if(scene) scene->dt=t;}
+Real Omega::getTimeStep(){	if(scene) return scene->dt; else return -1; }
+void Omega::skipTimeStepper(bool s){ if(scene) scene->setTimeSteppersActive(!s);}
 
 bool Omega::timeStepperActive(){
-	if(!world) return false;
-	FOREACH(const shared_ptr<Engine>& e, world->engines){
+	if(!scene) return false;
+	FOREACH(const shared_ptr<Engine>& e, scene->engines){
 		if (isInheritingFrom(e->getClassName(),"TimeStepper")){
 			return static_pointer_cast<TimeStepper>(e)->active;
 		}
@@ -315,8 +315,8 @@ bool Omega::timeStepperActive(){
 }
 
 bool Omega::containTimeStepper(){
-	if(!world) return false;
-	FOREACH(const shared_ptr<Engine>& e, world->engines){
+	if(!scene) return false;
+	FOREACH(const shared_ptr<Engine>& e, scene->engines){
 		if (e && isInheritingFrom(e->getClassName(),"TimeStepper")) return true;
 	}
 	return false;

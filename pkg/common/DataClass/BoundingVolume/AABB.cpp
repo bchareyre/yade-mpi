@@ -8,7 +8,7 @@
 
 #include "AABB.hpp"
 
-AABB::AABB(): BoundingVolume(), halfSize(0,0,0), center(0,0,0){
+AABB::AABB(): Bound(), halfSize(0,0,0), center(0,0,0){
 	createIndex();
 }
 

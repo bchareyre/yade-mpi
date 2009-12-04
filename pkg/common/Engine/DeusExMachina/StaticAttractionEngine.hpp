@@ -15,13 +15,13 @@
 class StaticAttractionEngine : public DeusExMachina
 {
 	public :
-		void applyCondition(World *);
+		void applyCondition(Scene *);
 		bool active;
 		StaticAttractionEngine() : active(true) {};
-		virtual bool isActivated(World*) { return active; };
+		virtual bool isActivated(Scene*) { return active; };
 
 	protected :
-		virtual Real getMaxDisplacement(World*) {throw "do not use StaticAttractionEngine directly, use derived classes instead.";};
+		virtual Real getMaxDisplacement(Scene*) {throw "do not use StaticAttractionEngine directly, use derived classes instead.";};
 		virtual bool doesItApplyToThisBody(Body*) {throw "do not use StaticAttractionEngine directly, use derived classes instead.";};
 	REGISTER_ATTRIBUTES(DeusExMachina,(active));
 	REGISTER_CLASS_NAME(StaticAttractionEngine);

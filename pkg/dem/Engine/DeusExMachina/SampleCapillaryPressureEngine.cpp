@@ -8,7 +8,7 @@
 
 #include "SampleCapillaryPressureEngine.hpp"
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 //#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
@@ -50,10 +50,10 @@ SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 }
 
 
-void SampleCapillaryPressureEngine::updateParameters(World * ncb)
+void SampleCapillaryPressureEngine::updateParameters(Scene * ncb)
 {
 	//cerr << "updateParameters" << endl;
-// 	World * ncb = static_cast<World*>(body);
+// 	Scene * ncb = static_cast<Scene*>(body);
 
 	UnbalancedForce = ComputeUnbalancedForce(ncb);
 
@@ -98,10 +98,10 @@ void SampleCapillaryPressureEngine::updateParameters(World * ncb)
 	//cerr << "fin updateParameters" << endl;
 }
 	
-void SampleCapillaryPressureEngine::applyCondition(World * ncb)
+void SampleCapillaryPressureEngine::applyCondition(Scene * ncb)
 {	
 	//cerr << "applyConditionSampleCapillaryPressure" << endl;
-// 	World* ncb = static_cast<World*>(body);
+// 	Scene* ncb = static_cast<Scene*>(body);
 
 	updateParameters(ncb);
 	

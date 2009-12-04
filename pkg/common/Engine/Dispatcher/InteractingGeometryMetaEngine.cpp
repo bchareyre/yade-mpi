@@ -9,10 +9,10 @@
 *************************************************************************/
 
 #include "InteractingGeometryMetaEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
-void InteractingGeometryMetaEngine::action(World* ncb)
+YADE_REQUIRE_FEATURE(geometricalmodel);
+void InteractingGeometryMetaEngine::action(Scene* ncb)
 {
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

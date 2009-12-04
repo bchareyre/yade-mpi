@@ -21,7 +21,7 @@ class Recorder: public PeriodicEngine{
 		//! Whether to delete current file contents, if any, when opening (false by default)
 		bool truncate;
 		Recorder(): truncate(false){}
-		virtual bool isActivated(World* rb){
+		virtual bool isActivated(Scene* rb){
 			if(PeriodicEngine::isActivated(rb)){
 				if(!out.is_open()) openAndCheck();
 				return true;}

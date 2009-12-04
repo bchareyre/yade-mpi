@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/core/BoundingVolume.hpp>
+#include<yade/core/Bound.hpp>
 
-class AABB : public BoundingVolume
+class AABB : public Bound
 {
 	public :
 		Vector3r	 halfSize
@@ -20,10 +20,10 @@ class AABB : public BoundingVolume
 		virtual ~AABB();
 	
 /// Serialization
-	REGISTER_CLASS_AND_BASE(AABB,BoundingVolume);	
-	REGISTER_ATTRIBUTES(BoundingVolume,/* no attributes */);
+	REGISTER_CLASS_AND_BASE(AABB,Bound);	
+	REGISTER_ATTRIBUTES(Bound,/* no attributes */);
 /// Indexable
-	REGISTER_CLASS_INDEX(AABB,BoundingVolume);
+	REGISTER_CLASS_INDEX(AABB,Bound);
 };
 REGISTER_SERIALIZABLE(AABB);
 

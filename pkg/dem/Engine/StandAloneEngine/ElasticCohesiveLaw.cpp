@@ -15,7 +15,7 @@
 
 
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -29,7 +29,7 @@ ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver()
 }
 
 
-void ElasticCohesiveLaw::action(World* ncb)
+void ElasticCohesiveLaw::action(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

@@ -17,7 +17,7 @@ CREATE_LOGGER(InteractionDispatchers);
 InteractionDispatchers::InteractionDispatchers(){
 	geomDispatcher=shared_ptr<InteractionGeometryDispatcher>(new InteractionGeometryDispatcher);
 	physDispatcher=shared_ptr<InteractionPhysicsDispatcher>(new InteractionPhysicsDispatcher);
-	constLawDispatcher=shared_ptr<ConstitutiveLawDispatcher>(new ConstitutiveLawDispatcher);
+	constLawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 	alreadyWarnedNoCollider=false;
 	#ifdef IDISP_TIMING
 		timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
@@ -26,7 +26,7 @@ InteractionDispatchers::InteractionDispatchers(){
 
 #define DISPATCH_CACHE
 
-void InteractionDispatchers::action(World* rootBody){
+void InteractionDispatchers::action(Scene* rootBody){
 	#ifdef IDISP_TIMING
 		timingDeltas->start();
 	#endif
@@ -105,7 +105,7 @@ void InteractionDispatchers::action(World* rootBody){
 
 			if(!wasReal) I->iterMadeReal=rootBody->currentIteration; // mark the interaction as created right now
 
-			// ConstitutiveLawDispatcher
+			// LawDispatcher
 			// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction
 			// would not have interactionGeometry and interactionPhysics yet.
 			if(!I->functorCache.constLaw){
@@ -136,7 +136,7 @@ void InteractionDispatchers::action(World* rootBody){
 			// InteractionPhysicsDispatcher
 			// geom may have swapped bodies, get bodies again
 			physDispatcher->operator()(Body::byId(I->getId1(),rootBody)->material, Body::byId(I->getId2(),rootBody)->material,I);
-			// ConstitutiveLawDispatcher
+			// LawDispatcher
 			constLawDispatcher->operator()(I->interactionGeometry,I->interactionPhysics,I.get(),rootBody);
 		#endif
 		}

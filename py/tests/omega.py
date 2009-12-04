@@ -10,6 +10,7 @@ from yade.wrapper import *
 from miniWm3Wrap import *
 from yade._customConverters import *
 from yade import utils
+from yade import *
 
 ## TODO tests
 class TestInteractions(unittest.TestCase): pass

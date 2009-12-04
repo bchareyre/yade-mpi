@@ -9,26 +9,26 @@
 #include "GeometricalModelForceColorizer.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 //#include <Wm3Vector3r.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 GeometricalModelForceColorizer::GeometricalModelForceColorizer () : StandAloneEngine()
 {
 }
 
 
-bool GeometricalModelForceColorizer::isActivated(World*)
+bool GeometricalModelForceColorizer::isActivated(Scene*)
 {
 	return true;
 //	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void GeometricalModelForceColorizer::action(World * ncb)
+void GeometricalModelForceColorizer::action(Scene * ncb)
 {
 	// FIXME the same in GLDrawLatticeBeamState.cpp
 	ncb->bex.sync();

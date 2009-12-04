@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-miniWm3/Wm3Math.h>
 
@@ -26,7 +26,7 @@ CinemCisEngine::CinemCisEngine()
 
 
 
-void CinemCisEngine::applyCondition(World * body)
+void CinemCisEngine::applyCondition(Scene * body)
 {
 	if(theta<=thetalim)
 	{
@@ -38,7 +38,7 @@ void CinemCisEngine::applyCondition(World * body)
 
 
 
-void CinemCisEngine::applyRotTranslation(World * ncb)
+void CinemCisEngine::applyRotTranslation(Scene * ncb)
 {
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
@@ -75,7 +75,7 @@ void CinemCisEngine::applyRotTranslation(World * ncb)
 }
 
 
-void CinemCisEngine::applyTranslation(World * ncb)
+void CinemCisEngine::applyTranslation(Scene * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

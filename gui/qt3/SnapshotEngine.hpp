@@ -23,7 +23,7 @@ class SnapshotEngine: public PeriodicEngine{
 		//! number of msec to sleep after snapshot (to prevent 3d hw problems)
 		int msecSleep;
 	SnapshotEngine():counter(0),viewNo(0),ignoreErrors(true),msecSleep(0){}
-	virtual void action(World*);
+	virtual void action(Scene*);
 	REGISTER_ATTRIBUTES(PeriodicEngine,(fileBase)(counter)(viewNo)(ignoreErrors)(savedSnapshots)(msecSleep));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(SnapshotEngine,PeriodicEngine);

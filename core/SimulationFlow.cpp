@@ -7,16 +7,16 @@
 *************************************************************************/
 
 #include "SimulationFlow.hpp"
-#include "World.hpp"
+#include "Scene.hpp"
 #include "Omega.hpp"
 
 void SimulationFlow::singleAction()
 {
 	Omega& OO=Omega::instance();
-	if (OO.getWorld()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
+	if (OO.getScene()) // FIXME - would it contain the loop in the private variables, this check would be unnecessary
 	{
-		OO.getWorld()->moveToNextTimeStep();
-		if(OO.getWorld()->stopAtIteration>0 && OO.getCurrentIteration()==OO.getWorld()->stopAtIteration){
+		OO.getScene()->moveToNextTimeStep();
+		if(OO.getScene()->stopAtIteration>0 && OO.getCurrentIteration()==OO.getScene()->stopAtIteration){
 			setTerminate(true);
 		}
 	}

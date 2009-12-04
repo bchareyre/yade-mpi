@@ -18,8 +18,8 @@ class AveragePositionRecorder : public DataRecorder
 	public :
 		AveragePositionRecorder ();
 		
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

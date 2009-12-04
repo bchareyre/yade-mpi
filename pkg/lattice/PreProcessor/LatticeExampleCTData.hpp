@@ -52,15 +52,15 @@ class LatticeExampleCTData : public FileGenerator
 		virtual ~LatticeExampleCTData();
 
 		bool generate();
-		void make_simulation_loop(shared_ptr<World>& );
-		void positionRootBody(shared_ptr<World>& rootBody);
+		void make_simulation_loop(shared_ptr<Scene>& );
+		void positionRootBody(shared_ptr<Scene>& rootBody);
 		bool createNodeXYZ(shared_ptr<Body>& body, Vector3r position);
 		void createBeam(shared_ptr<Body>& body, int i, int j);
 		Real calcBeamPositionOrientationLength(shared_ptr<Body>& body, Real E_min, Real E_max, Real k_l, Real k_b, Real k_t);
-		void create_angular_springs(int nodes_count,shared_ptr<World> rootBody);
+		void create_angular_springs(int nodes_count,shared_ptr<Scene> rootBody);
 		void calcBeamAngles(Body* body, BodyContainer* bodies, InteractionContainer* ints,std::vector< std::vector< unsigned int > >& connections);
 		void calcAxisAngle(LatticeBeamParameters* beam1, BodyContainer* bodies, int otherId, InteractionContainer* ints, int thisId);
-		void imposeTranslation(shared_ptr<World>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement);
+		void imposeTranslation(shared_ptr<Scene>& rootBody, Vector3r min, Vector3r max, Vector3r direction, Real displacement);
 
                 REGISTER_CLASS_NAME(LatticeExampleCTData);
 		REGISTER_BASE_CLASS_NAME(FileGenerator);

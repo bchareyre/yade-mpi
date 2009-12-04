@@ -28,11 +28,11 @@
 #include <yade/pkg-dem/ContactStressRecorder.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
@@ -167,7 +167,7 @@ bool TriaxialTestWater::generate()
 //	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	message="";
 	
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -346,7 +346,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	iSphere->wire			= false;
 	
 	body->interactingGeometry	= iSphere;
-// 	#ifdef YADE_SHAPE
+// 	#ifdef YADE_GEOMETRICALMODEL
 // 		gSphere->radius			= radius;
 // 	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 // 		gSphere->diffuseColor		= spheresColor;
@@ -364,7 +364,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
-// 	#ifdef YADE_SHAPE
+// 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<Box> gBox(new Box);	
 // 	#endif
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
@@ -403,7 +403,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 }
 
 
-void TriaxialTestWater::createActors(shared_ptr<World>& rootBody)
+void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 {
 	
 	Real distanceFactor = 1.3;//Create potential interactions as soon as the distance is less than factor*(rad1+rad2) 
@@ -428,7 +428,7 @@ void TriaxialTestWater::createActors(shared_ptr<World>& rootBody)
 	interactionPhysicsDispatcher->add(ss);
 	
 		
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	
 	shared_ptr<InteractingSphere2AABB> interactingSphere2AABB(new InteractingSphere2AABB);
 	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
@@ -589,7 +589,7 @@ void TriaxialTestWater::createActors(shared_ptr<World>& rootBody)
 }
 
 
-void TriaxialTestWater::positionRootBody(shared_ptr<World>& rootBody)
+void TriaxialTestWater::positionRootBody(shared_ptr<Scene>& rootBody)
 {	
 	rootBody->isDynamic		= false;
 
@@ -603,8 +603,8 @@ void TriaxialTestWater::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry	= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume	= YADE_PTR_CAST<BoundingVolume>(aabb);	
+	rootBody->interactingGeometry	= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume	= YADE_PTR_CAST<Bound>(aabb);	
 }
 
 

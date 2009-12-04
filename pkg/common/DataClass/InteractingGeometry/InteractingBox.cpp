@@ -9,7 +9,7 @@
 #include "InteractingBox.hpp"
 
 
-InteractingBox::InteractingBox () : InteractingGeometry()
+InteractingBox::InteractingBox () : Shape()
 {		
 	createIndex();
 }

@@ -32,10 +32,10 @@ class Se3Interpolator: public DeusExMachina {
 		Real goalVirt, goalReal; long goalIter;
 		long startVirt, startReal; long startIter;
 		string goalHook;
-		virtual bool isActivated(World*){return !done;}
+		virtual bool isActivated(Scene*){return !done;}
 		Se3Interpolator(): done(false), started(false), rotRelative(false), goalVirt(0), goalReal(0), goalIter(0) {};
 		virtual ~Se3Interpolator(){};
-		virtual void applyCondition(World* mb);
+		virtual void applyCondition(Scene* mb);
 	protected:
 		REGISTER_ATTRIBUTES(DeusExMachina,
 			(done)

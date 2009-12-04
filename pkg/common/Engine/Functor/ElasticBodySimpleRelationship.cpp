@@ -10,7 +10,7 @@
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/ElasticBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 void ElasticBodySimpleRelationship::go(	  const shared_ptr<PhysicalParameters>& b1
 					, const shared_ptr<PhysicalParameters>& b2

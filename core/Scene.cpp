@@ -8,7 +8,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"World.hpp"
+#include"Scene.hpp"
 #include<yade/core/Engine.hpp>
 #include<yade/core/Timing.hpp>
 #include<yade/core/TimeStepper.hpp>
@@ -20,7 +20,7 @@
 #include<boost/algorithm/string.hpp>
 
 
-/* this is meant to improve usability: World is ready by default (so is Omega by that token)
+/* this is meant to improve usability: Scene is ready by default (so is Omega by that token)
  * and different type of containers can still be used instead by explicit assignment */
 #include<yade/core/BodyVector.hpp>
 #include<yade/core/InteractionVecMap.hpp>
@@ -33,7 +33,7 @@
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-World::World() :
+Scene::Scene() :
 	Body(), bodies(new BodyVector), interactions(new InteractionVecMap){	
 	engines.clear();
 	initializers.clear();
@@ -48,7 +48,7 @@ World::World() :
 	selectedBody=-1;
 	isPeriodic=false;
 	// FIXME: move MetaInteractingGeometry to core and create it here right away
-	// interactingGeometry=shared_ptr<InteractingGeometry>(new MetaInteractingGeometry);
+	// interactingGeometry=shared_ptr<Shape>(new MetaInteractingGeometry);
 	material=shared_ptr<Material>(new Material);
 
 	// fill default tags
@@ -68,7 +68,7 @@ World::World() :
 
 
 
-void World::postProcessAttributes(bool deserializing){
+void Scene::postProcessAttributes(bool deserializing){
 	/* since yade::serialization doesn't properly handle shared pointers, iterate over all bodies and make materials shared again, if id>=0 */
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b->material || b->material->id<0) continue; // not a shared material
@@ -79,10 +79,10 @@ void World::postProcessAttributes(bool deserializing){
 
 
 
-void World::moveToNextTimeStep(){
+void Scene::moveToNextTimeStep(){
 	if(needsInitializers){
 		checkStateTypes();
-		FOREACH(shared_ptr<Engine> e, initializers){ e->world=this; if(!e->isActivated(this)) continue;e->action(this); } 
+		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(!e->isActivated(this)) continue;e->action(this); } 
 		bex.resize(bodies->size());
 		needsInitializers=false;
 	}
@@ -90,7 +90,7 @@ void World::moveToNextTimeStep(){
 	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
 	FOREACH(const shared_ptr<Engine>& e, engines){
-		e->world=this;
+		e->scene=this;
 		if(!e->isActivated(this)) continue;
 		e->action(this);
 		if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
@@ -99,21 +99,21 @@ void World::moveToNextTimeStep(){
 	simulationTime+=dt;
 }
 
-shared_ptr<Engine> World::engineByName(string s){
+shared_ptr<Engine> Scene::engineByName(string s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->getClassName()==s) return e;
 	}
 	return shared_ptr<Engine>();
 }
 
-shared_ptr<Engine> World::engineByLabel(string s){
+shared_ptr<Engine> Scene::engineByLabel(string s){
 	FOREACH(shared_ptr<Engine> e, engines){
 		if(e->label==s) return e;
 	}
 	return shared_ptr<Engine>();
 }
 
-void World::setTimeSteppersActive(bool a)
+void Scene::setTimeSteppersActive(bool a)
 {
 	FOREACH(shared_ptr<Engine> e, engines){
 		if (Omega::instance().isInheritingFrom(e->getClassName(),"TimeStepper"))
@@ -121,7 +121,7 @@ void World::setTimeSteppersActive(bool a)
 	}
 }
 
-void World::checkStateTypes(){
+void Scene::checkStateTypes(){
 	FOREACH(const shared_ptr<Body>& b, *bodies){
 		if(!b || !b->material) continue;
 		if(b->material && !b->state) throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": has Body::material, but NULL Body::state.");

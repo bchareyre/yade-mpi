@@ -14,9 +14,9 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
-class InteractingGeometry;
+class Shape;
 
-#ifdef YADE_SHAPE
+#ifdef YADE_GEOMETRICALMODEL
 
 class GeometricalModel : public Serializable, public Indexable
 {

@@ -11,7 +11,7 @@
 #include "ForceRecorder.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/filesystem/operations.hpp>
 
@@ -50,13 +50,13 @@ void ForceRecorder::init()
 }
 
 
-bool ForceRecorder::isActivated(World*)
+bool ForceRecorder::isActivated(Scene*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void ForceRecorder::action(World * ncb)
+void ForceRecorder::action(Scene * ncb)
 {
 	if (first) init();
 	ncb->bex.sync();

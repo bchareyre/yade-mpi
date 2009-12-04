@@ -14,7 +14,7 @@
 //#include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw.hpp>
 //#include<yade/pkg-dem/ElasticBodyParameters2BcpConnection4ElasticContactInteraction.hpp>
-#include<yade/pkg-common/ConstitutiveLawDispatcher.hpp>
+#include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment.hpp>
@@ -26,12 +26,12 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -56,7 +56,7 @@
 
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 
 MembraneTest::MembraneTest () : FileGenerator()
@@ -89,7 +89,7 @@ void MembraneTest::postProcessAttributes(bool)
 bool MembraneTest::generate()
 {
 	Omega::instance().setTimeStep(0.04);
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -277,7 +277,7 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 
 
 
-void MembraneTest::createActors(shared_ptr<World>& rootBody)
+void MembraneTest::createActors(shared_ptr<Scene>& rootBody)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
         interactionGeometryDispatcher->add("InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry");
@@ -288,7 +288,7 @@ void MembraneTest::createActors(shared_ptr<World>& rootBody)
 	shared_ptr<InteractingGeometryMetaEngine> interactingGeometryDispatcher	= shared_ptr<InteractingGeometryMetaEngine>(new InteractingGeometryMetaEngine);
 	interactingGeometryDispatcher->add("ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment");
 	
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
         boundingVolumeDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB"); 
@@ -306,7 +306,7 @@ void MembraneTest::createActors(shared_ptr<World>& rootBody)
 	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
 
-	shared_ptr<ConstitutiveLawDispatcher> constitutiveLaw(new ConstitutiveLawDispatcher);
+	shared_ptr<LawDispatcher> constitutiveLaw(new LawDispatcher);
 	constitutiveLaw->add("ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw");
 
 	rootBody->engines.clear();
@@ -328,7 +328,7 @@ void MembraneTest::createActors(shared_ptr<World>& rootBody)
 
 
 
-void MembraneTest::positionRootBody(shared_ptr<World>& rootBody) 
+void MembraneTest::positionRootBody(shared_ptr<Scene>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	
@@ -347,8 +347,8 @@ void MembraneTest::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume		= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry		= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

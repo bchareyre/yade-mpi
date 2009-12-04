@@ -8,7 +8,7 @@
 
 #include "Sphere.hpp"
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 Sphere::Sphere () : GeometricalModel()
 {

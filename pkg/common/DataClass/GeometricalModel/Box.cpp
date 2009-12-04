@@ -10,7 +10,7 @@ Box::Box () : GeometricalModel() { createIndex(); }
 Box::~Box (){}
 YADE_PLUGIN((Box));
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

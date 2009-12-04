@@ -23,8 +23,8 @@ class VelocityRecorder : public DataRecorder
 		std::string outputFile;
 		unsigned int interval;
 		VelocityRecorder ();
-		virtual void action(World*);
-		virtual bool isActivated(World*);
+		virtual void action(Scene*);
+		virtual bool isActivated(Scene*);
 	
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

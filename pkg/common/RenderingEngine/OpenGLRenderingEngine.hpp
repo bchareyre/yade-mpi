@@ -28,7 +28,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 		bool pointClipped(const Vector3r& p);
 		vector<Vector3r> clipPlaneNormals;
-		void setBodiesDispInfo(const shared_ptr<World>& rootBody);
+		void setBodiesDispInfo(const shared_ptr<Scene>& rootBody);
 		static bool glutInitDone;
 		static size_t selectBodyLimit;
 		Vector3r viewDirection; // updated from GLViewer regularly
@@ -41,11 +41,11 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 		//! wrap number to interval x0…x1
 		Real wrapCell(const Real x, const Real x0, const Real x1);
-		//! wrap point to inside World's cell (identity if !World::isPeriodic)
-		Vector3r wrapCellPt(const Vector3r& pt, World* rb);
-		void drawPeriodicCell(World*);
+		//! wrap point to inside Scene's cell (identity if !Scene::isPeriodic)
+		Vector3r wrapCellPt(const Vector3r& pt, Scene* rb);
+		void drawPeriodicCell(Scene*);
 
-		void setBodiesRefSe3(const shared_ptr<World>& rootBody);
+		void setBodiesRefSe3(const shared_ptr<Scene>& rootBody);
 
 		struct BodyDisp{
 			Vector3r pos;
@@ -61,8 +61,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 		DynLibDispatcher< InteractionPhysics  , GLDrawInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
 
 		DynLibDispatcher< State  , GLDrawStateFunctor,               void , TYPELIST_1(const shared_ptr<State>&) > stateDispatcher;
-		DynLibDispatcher< BoundingVolume      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<BoundingVolume>&) > boundingVolumeDispatcher;
-		DynLibDispatcher< InteractingGeometry , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<InteractingGeometry>&, const shared_ptr<State>&,bool,const GLViewInfo&) > interactingGeometryDispatcher;
+		DynLibDispatcher< Bound      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<Bound>&) > boundingVolumeDispatcher;
+		DynLibDispatcher< Shape , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > interactingGeometryDispatcher;
 
 		vector<vector<string> >
 			stateFunctorNames,
@@ -85,18 +85,18 @@ class OpenGLRenderingEngine : public RenderingEngine
 	
 		void init();
 		void initgl();
-		void render(const shared_ptr<World>& body, body_id_t selection = body_id_t(-1));
-		virtual void renderWithNames(const shared_ptr<World>& );
+		void render(const shared_ptr<Scene>& body, body_id_t selection = body_id_t(-1));
+		virtual void renderWithNames(const shared_ptr<Scene>& );
 	
 	private :
-		void renderDOF_ID(const shared_ptr<World>& rootBody);
-		void renderInteractionPhysics(const shared_ptr<World>& rootBody);
-		void renderInteractionGeometry(const shared_ptr<World>& rootBody);
+		void renderDOF_ID(const shared_ptr<Scene>& rootBody);
+		void renderInteractionPhysics(const shared_ptr<Scene>& rootBody);
+		void renderInteractionGeometry(const shared_ptr<Scene>& rootBody);
 		#ifdef YADE_PHYSPAR
-			void renderState(const shared_ptr<World>& rootBody);
+			void renderState(const shared_ptr<Scene>& rootBody);
 		#endif
-		void renderBoundingVolume(const shared_ptr<World>& rootBody);
-		void renderInteractingGeometry(const shared_ptr<World>& rootBody);
+		void renderBoundingVolume(const shared_ptr<Scene>& rootBody);
+		void renderInteractingGeometry(const shared_ptr<Scene>& rootBody);
 	
 	protected :
 		void postProcessAttributes(bool deserializing);

@@ -1,7 +1,7 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<yade/core/StandAloneEngine.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 /* Execute a python command (in addPlotDataCall) periodically, with defined (and adjustable) periodicity.
  *
@@ -15,7 +15,7 @@ class PeriodicPythonRunner: public StretchPeriodicEngine {
 	public :
 		PeriodicPythonRunner(): command("pass"){};
 		/* virtual bool isActivated: not overridden, StretchPeriodicEngine handles that */
-		virtual void action(World* b){
+		virtual void action(Scene* b){
 			PyGILState_STATE gstate;
 				gstate = PyGILState_Ensure();
 				PyRun_SimpleString(command.c_str()); // this is suboptimal, since it has to be parsed at every execution; critical?

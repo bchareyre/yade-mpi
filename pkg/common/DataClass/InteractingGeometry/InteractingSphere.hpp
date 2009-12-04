@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 
-class InteractingSphere : public InteractingGeometry
+class InteractingSphere : public Shape
 {
 	public :
 		Real radius;
@@ -19,10 +19,10 @@ class InteractingSphere : public InteractingGeometry
 		InteractingSphere(Real _radius): radius(_radius){}
 		virtual ~InteractingSphere ();
 
-	REGISTER_ATTRIBUTES(InteractingGeometry,(radius));
+	REGISTER_ATTRIBUTES(Shape,(radius));
 	REGISTER_CLASS_NAME(InteractingSphere);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
-	REGISTER_CLASS_INDEX(InteractingSphere,InteractingGeometry);
+	REGISTER_BASE_CLASS_NAME(Shape);
+	REGISTER_CLASS_INDEX(InteractingSphere,Shape);
 };
 
 REGISTER_SERIALIZABLE(InteractingSphere);

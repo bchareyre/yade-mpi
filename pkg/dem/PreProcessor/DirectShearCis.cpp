@@ -30,11 +30,11 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
-#include<yade/pkg-common/BoundingVolumeDispatcher.hpp>
+#include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
@@ -59,7 +59,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include <utility>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 using namespace std;
 
@@ -113,7 +113,7 @@ void DirectShearCis::postProcessAttributes(bool)
 
 bool DirectShearCis::generate()
 {
-	rootBody = shared_ptr<World>(new World);
+	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
 	positionRootBody(rootBody);
 
@@ -259,7 +259,7 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 }
 
 
-void DirectShearCis::createActors(shared_ptr<World>& rootBody)
+void DirectShearCis::createActors(shared_ptr<Scene>& rootBody)
 {
 
 	shared_ptr<PositionSnapshot> possnap = shared_ptr<PositionSnapshot>(new PositionSnapshot);
@@ -286,7 +286,7 @@ void DirectShearCis::createActors(shared_ptr<World>& rootBody)
 	shared_ptr<InteractionPhysicsFunctor> ss(new SimpleElasticRelationships);
 	interactionPhysicsDispatcher->add(ss);
 
-	shared_ptr<BoundingVolumeDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundingVolumeDispatcher>(new BoundingVolumeDispatcher);
+	shared_ptr<BoundDispatcher> boundingVolumeDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundingVolumeDispatcher->add("InteractingSphere2AABB");
 	boundingVolumeDispatcher->add("InteractingBox2AABB");
 	boundingVolumeDispatcher->add("MetaInteractingGeometry2AABB");
@@ -340,7 +340,7 @@ void DirectShearCis::createActors(shared_ptr<World>& rootBody)
 }
 
 
-void DirectShearCis::positionRootBody(shared_ptr<World>& rootBody) 
+void DirectShearCis::positionRootBody(shared_ptr<Scene>& rootBody) 
 {
 	rootBody->isDynamic		= false;
 	
@@ -359,8 +359,8 @@ void DirectShearCis::positionRootBody(shared_ptr<World>& rootBody)
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->interactingGeometry		= YADE_PTR_CAST<InteractingGeometry>(set);	
-	rootBody->boundingVolume		= YADE_PTR_CAST<BoundingVolume>(aabb);
+	rootBody->interactingGeometry		= YADE_PTR_CAST<Shape>(set);	
+	rootBody->boundingVolume		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }
 

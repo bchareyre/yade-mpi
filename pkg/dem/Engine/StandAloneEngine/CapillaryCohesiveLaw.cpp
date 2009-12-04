@@ -18,7 +18,7 @@
 
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <Wm3Vector3.h>
 #include <yade/lib-base/yadeWm3.hpp>
 
@@ -81,14 +81,14 @@ MeniscusParameters::~MeniscusParameters()
 
 
 //FIXME : remove bool first !!!!!
-void CapillaryCohesiveLaw::action(World* ncb)
+void CapillaryCohesiveLaw::action(Scene* ncb)
 {
 //	cerr << "capillaryLawAction" << endl;
         //compteur1 = 0;
         //compteur2 = 0;
         //cerr << "CapillaryCohesiveLaw::action" << endl;
 
-//         World * ncb = static_cast<World*>(body);
+//         Scene * ncb = static_cast<Scene*>(body);
         shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
         if (fusionDetection) {
@@ -291,7 +291,7 @@ void capillarylaw::fill(const char* filename)
 
 }
 
-void CapillaryCohesiveLaw::checkFusion(World * ncb)
+void CapillaryCohesiveLaw::checkFusion(Scene * ncb)
 {
 
 	//Reset fusion numbers
@@ -617,7 +617,7 @@ bool BodiesMenisciiList::prepare(Body * body)
 {
 	//cerr << "preparing bodiesInteractionsList" << endl;
 	interactionsOnBody.clear();
-	World * ncb = static_cast<World*>(body);
+	Scene * ncb = static_cast<Scene*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	body_id_t MaxId = -1;

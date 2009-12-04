@@ -13,7 +13,7 @@
 // #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 
 CL1Relationships::CL1Relationships()

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "DisplacementEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 void DisplacementEngine::postProcessAttributes(bool deserializing)
 {
@@ -19,12 +19,12 @@ void DisplacementEngine::postProcessAttributes(bool deserializing)
 }
 
 
-bool DisplacementEngine::isActivated(World*)
+bool DisplacementEngine::isActivated(Scene*)
 {
    return active;
 }
 
-void DisplacementEngine::applyCondition(World * ncb)
+void DisplacementEngine::applyCondition(Scene * ncb)
 {
 
 /// FIXME - that's a hack! more control needed from the GUI !

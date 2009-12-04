@@ -9,7 +9,7 @@
 #include "GLDrawMetaInteractingGeometry.hpp"
 
 
-void GLDrawMetaInteractingGeometry::go(const shared_ptr<InteractingGeometry>& , const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
+void GLDrawMetaInteractingGeometry::go(const shared_ptr<Shape>& , const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
 {
 
 

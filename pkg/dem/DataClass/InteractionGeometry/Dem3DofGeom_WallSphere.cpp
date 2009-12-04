@@ -6,7 +6,7 @@ YADE_PLUGIN((Dem3DofGeom_WallSphere)
 	#ifdef YADE_OPENGL
 		(Gl1_Dem3DofGeom_WallSphere)
 	#endif	
-		(ef2_Wall_Sphere_Dem3DofGeom));
+		(Ig2_Wall_Sphere_Dem3DofGeom));
 
 CREATE_LOGGER(Dem3DofGeom_WallSphere);
 Dem3DofGeom_WallSphere::~Dem3DofGeom_WallSphere(){}
@@ -38,8 +38,8 @@ Real Dem3DofGeom_WallSphere::slipToDisplacementTMax(Real displacementTMax){
 	return (displacementTMax/scale)*(1-scale);
 }
 
-CREATE_LOGGER(ef2_Wall_Sphere_Dem3DofGeom);
-bool ef2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
+CREATE_LOGGER(Ig2_Wall_Sphere_Dem3DofGeom);
+bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
 	Wall* wall=static_cast<Wall*>(cm1.get());
 	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
 

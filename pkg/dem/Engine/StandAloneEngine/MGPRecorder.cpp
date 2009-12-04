@@ -9,7 +9,7 @@
 #include "MGPRecorder.hpp"
 
 #include <yade/core/Omega.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <yade/pkg-common/InteractingSphere.hpp>
@@ -37,12 +37,12 @@ void MGPRecorder::postProcessAttributes(bool deserializing)
 }
 
 
-bool MGPRecorder::isActivated(World*)
+bool MGPRecorder::isActivated(Scene*)
 {
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void MGPRecorder::action(World * ncb)
+void MGPRecorder::action(Scene * ncb)
 {
   shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
@@ -62,7 +62,7 @@ void MGPRecorder::action(World * ncb)
 	 if (b->isClump()) continue;
 	 
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
-     const InteractingGeometry* gm   = YADE_CAST<InteractingGeometry*>(b->interactingGeometry.get());
+     const Shape* gm   = YADE_CAST<Shape*>(b->interactingGeometry.get());
 
      if ( typeid(*gm) == typeid(InteractingSphere) )
      {

@@ -11,7 +11,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-base/yadeWm3.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 bool GLDrawTube::first           = true;
 int  GLDrawTube::glWiredTubeList = -1;

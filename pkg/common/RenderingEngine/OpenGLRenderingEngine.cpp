@@ -64,7 +64,7 @@ void OpenGLRenderingEngine::init(){
 	glutInitDone=true;
 }
 
-void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<World>& rootBody){
+void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& rootBody){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
 }
@@ -84,7 +84,7 @@ void OpenGLRenderingEngine::initgl(){
 		(static_pointer_cast<GLDrawInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 }
 
-void OpenGLRenderingEngine::renderWithNames(const shared_ptr<World>& rootBody){
+void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& rootBody){
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b || !b->interactingGeometry) continue;
 		glPushMatrix();
@@ -114,12 +114,12 @@ Real OpenGLRenderingEngine::wrapCell(const Real x, const Real x0, const Real x1)
 	Real xNorm=(x-x0)/(x1-x0);
 	return x0+(xNorm-floor(xNorm))*(x1-x0);
 }
-Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, World* rb){
+Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, Scene* rb){
 	if(!rb->isPeriodic) return pt;
 	return Vector3r(wrapCell(pt[0],rb->cellMin[0],rb->cellMax[0]),wrapCell(pt[1],rb->cellMin[1],rb->cellMax[1]),wrapCell(pt[2],rb->cellMin[2],rb->cellMax[2]));
 }
 
-void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<World>& rootBody){
+void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody){
 	if(rootBody->bodies->size()!=bodyDisp.size()) bodyDisp.resize(rootBody->bodies->size());
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b || !b->state) continue;
@@ -143,7 +143,7 @@ void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<World>& rootBody)
 }
 
 // draw periodic cell, if active
-void OpenGLRenderingEngine::drawPeriodicCell(World* rootBody){
+void OpenGLRenderingEngine::drawPeriodicCell(Scene* rootBody){
 	if(!rootBody->isPeriodic) return;
 	glPushMatrix();
 		glColor3v(Vector3r(1,1,0));
@@ -155,7 +155,7 @@ void OpenGLRenderingEngine::drawPeriodicCell(World* rootBody){
 
 
 
-void OpenGLRenderingEngine::render(const shared_ptr<World>& rootBody, body_id_t selection	/*FIXME: not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
+void OpenGLRenderingEngine::render(const shared_ptr<Scene>& rootBody, body_id_t selection	/*FIXME: not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
 	assert(glutInitDone);
 	current_selection = selection;
@@ -214,7 +214,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<World>& rootBody, body_id_t 
 	if (Interaction_physics) renderInteractionPhysics(rootBody);
 }
 
-void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<World>& rootBody){	
+void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){	
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
 	FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
@@ -254,7 +254,7 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<World>& rootBody){
 	if(rootBody->interactingGeometry) interactingGeometryDispatcher(rootBody->interactingGeometry,rootBody->state,Body_wire);
 }
 
-void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<World>& rootBody){	
+void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<Scene>& rootBody){	
 	{
 		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
@@ -267,7 +267,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<World>& r
 }
 
 
-void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<World>& rootBody){	
+void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<Scene>& rootBody){	
 	{
 		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
@@ -281,7 +281,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<World>& ro
 }
 
 #ifdef YADE_PHYSPAR
-void OpenGLRenderingEngine::renderState(const shared_ptr<World>& rootBody){	
+void OpenGLRenderingEngine::renderState(const shared_ptr<Scene>& rootBody){	
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b) continue;
 		if(b->state /* && !b->state->isDisplayed*/ ) continue;
@@ -293,7 +293,7 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<World>& rootBody){
 }
 #endif
 
-void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<World>& rootBody){	
+void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& rootBody){	
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
 		if(!b || !b->boundingVolume) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
@@ -305,7 +305,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<World>& rootBo
 }
 
 
-void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<World>& rootBody)
+void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& rootBody)
 {
 	// Additional clipping planes: http://fly.srk.fer.hr/~unreal/theredbook/chapter03.html
 	#if 0

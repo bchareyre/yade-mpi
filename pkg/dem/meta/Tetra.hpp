@@ -4,12 +4,12 @@
 
 #include<vector>
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/InteractionSolver.hpp>
 
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/BoundingVolumeFunctor.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
 #include<Wm3Math.h>
@@ -19,7 +19,7 @@
 /* Our mold of tetrahedron: just 4 vertices.
  *
  * Self-contained. */
-class TetraMold: public InteractingGeometry{
+class TetraMold: public Shape{
 	public:
 		//! vertices of the tetrahedron.
 		// FIXME - a std::vector....
@@ -29,9 +29,9 @@ class TetraMold: public InteractingGeometry{
 		TetraMold(Vector3r v0, Vector3r v1, Vector3r v2, Vector3r v3){createIndex(); v.resize(4); v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3; }
 		virtual ~TetraMold (){};
 	protected:
-		REGISTER_ATTRIBUTES(InteractingGeometry,(v));
-		REGISTER_CLASS_AND_BASE(TetraMold,InteractingGeometry);
-		REGISTER_CLASS_INDEX(TetraMold,InteractingGeometry);
+		REGISTER_ATTRIBUTES(Shape,(v));
+		REGISTER_CLASS_AND_BASE(TetraMold,Shape);
+		REGISTER_CLASS_INDEX(TetraMold,Shape);
 };
 REGISTER_SERIALIZABLE(TetraMold);
 
@@ -62,10 +62,10 @@ REGISTER_SERIALIZABLE(TetraBang);
  *
  * Self-contained. */
 
-class TetraAABB: public BoundingVolumeFunctor
+class TetraAABB: public BoundFunctor
 {
 	public:
-		void go(const shared_ptr<InteractingGeometry>& ig, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
+		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 			TetraMold* t=static_cast<TetraMold*>(ig.get());
 			AABB* aabb=static_cast<AABB*>(bv.get());
 			Quaternionr invRot=se3.orientation.Conjugate();
@@ -79,7 +79,7 @@ class TetraAABB: public BoundingVolumeFunctor
 		}
 		FUNCTOR2D(TetraMold,AABB);
 		REGISTER_CLASS_NAME(TetraAABB);
-		REGISTER_BASE_CLASS_NAME(BoundingVolumeFunctor);
+		REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };
 REGISTER_SERIALIZABLE(TetraAABB);
 
@@ -89,7 +89,7 @@ REGISTER_SERIALIZABLE(TetraAABB);
 	class TetraDraw: public GLDrawInteractingGeometryFunctor
 	{	
 		public:
-			virtual void go(const shared_ptr<InteractingGeometry>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
 			RENDERS(TetraMold);
 			REGISTER_CLASS_NAME(TetraDraw);
@@ -106,7 +106,7 @@ class TetraLaw: public InteractionSolver {
 
 		int sdecGroupMask; // probably unused?!
 
-		void action(World*);
+		void action(Scene*);
 
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(InteractionSolver,/* nothing*/);
@@ -123,8 +123,8 @@ REGISTER_SERIALIZABLE(TetraLaw);
 class Tetra2TetraBang: public InteractionGeometryFunctor
 {
 	public:
-		virtual bool go(const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(	const shared_ptr<InteractingGeometry>& cm1, const shared_ptr<InteractingGeometry>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
 
 		FUNCTOR2D(TetraMold,TetraMold);
 		REGISTER_CLASS_NAME(Tetra2TetraBang);

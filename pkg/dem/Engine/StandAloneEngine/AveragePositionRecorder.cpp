@@ -13,7 +13,7 @@
 
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 
 #include <boost/lexical_cast.hpp>
@@ -36,13 +36,13 @@ void AveragePositionRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool AveragePositionRecorder::isActivated(World*)
+bool AveragePositionRecorder::isActivated(Scene*)
 {
 	return ((Omega::instance().getCurrentIteration() % interval == 0) && (ofile));
 }
 
 
-void AveragePositionRecorder::action(World * ncb)
+void AveragePositionRecorder::action(Scene * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

@@ -22,18 +22,18 @@
 #define HOST_NAME_MAX 255 
 #endif
 
-class World : public Body
+class Scene : public Body
 {
 	public :
 		shared_ptr<BodyContainer>		bodies;
 		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50
 		shared_ptr<InteractionContainer> interactions;
-		//! Container of shared materials. Add elements using World::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!
+		//! Container of shared materials. Add elements using Scene::addMaterial, not directly. Do NOT remove elements from here unless you know what you are doing!
 		vector<shared_ptr<Material> > materials;
-		//! Adds material to World::materials. It also sets id of the material accordingly and returns it.
+		//! Adds material to Scene::materials. It also sets id of the material accordingly and returns it.
 		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
-		//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundingVolumeDispatcher the first time it runs)
+		//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundDispatcher the first time it runs)
 		void checkStateTypes();
 
 		BexContainer bex;
@@ -46,7 +46,7 @@ class World : public Body
 
 		shared_ptr<GroupRelationData>           grpRelationData;
 
-		World();
+		Scene();
 
 		void moveToNextTimeStep();
 
@@ -86,9 +86,9 @@ class World : public Body
 		(cellMax)
 		(isPeriodic)
 	);
-	REGISTER_CLASS_AND_BASE(World,Body);
+	REGISTER_CLASS_AND_BASE(Scene,Body);
 };
 
-REGISTER_SERIALIZABLE(World);
+REGISTER_SERIALIZABLE(Scene);
 
 

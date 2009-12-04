@@ -36,8 +36,8 @@ class SDECSpheresPlane : public FileGenerator
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 		void createSphere(shared_ptr<Body>& body, int i, int j, int k);
 		void createGroundSphere(shared_ptr<Body>& body,Real radius, Real i, Real j, Real k);
-		void createActors(shared_ptr<World>& rootBody);
-		void positionRootBody(shared_ptr<World>& rootBody);
+		void createActors(shared_ptr<Scene>& rootBody);
+		void positionRootBody(shared_ptr<Scene>& rootBody);
 
 	// construction
 	public :

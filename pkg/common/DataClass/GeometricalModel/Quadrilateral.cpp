@@ -7,16 +7,16 @@
 *************************************************************************/
 
 #include "Quadrilateral.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 Quadrilateral::Quadrilateral() : GeometricalModel()
 {
 	createIndex();
 }
 
-Quadrilateral::Quadrilateral(int p1,int p2,int p3,int p4,World* mb) : GeometricalModel()
+Quadrilateral::Quadrilateral(int p1,int p2,int p3,int p4,Scene* mb) : GeometricalModel()
 {
 	createIndex();
 	n1 = p1;

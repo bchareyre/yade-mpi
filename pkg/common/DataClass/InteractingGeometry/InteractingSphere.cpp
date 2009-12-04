@@ -8,7 +8,7 @@
 
 #include "InteractingSphere.hpp"
 
-InteractingSphere::InteractingSphere () : InteractingGeometry(), radius(0.0)
+InteractingSphere::InteractingSphere () : Shape(), radius(0.0)
 {
 	createIndex();
 }

@@ -11,8 +11,8 @@
 
 #include<iostream>
 #include"GeometricalModel.hpp"
-#include"InteractingGeometry.hpp"
-#include"BoundingVolume.hpp"
+#include"Shape.hpp"
+#include"Bound.hpp"
 #ifdef YADE_PHYSPAR
 	#include"PhysicalParameters.hpp"
 #endif
@@ -28,7 +28,7 @@
 
 #define ISDYNAMIC_REDEFINED
 
-class World;
+class Scene;
 
 /*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.
  */
@@ -49,8 +49,8 @@ class Body : public Serializable
 		//! symbolic constant for body that doesn't exist.
 		static const body_id_t ID_NONE;
 		//! get Body pointer given its id. 
-		static const shared_ptr<Body>& byId(body_id_t _id,World* rb=NULL);
-		static const shared_ptr<Body>& byId(body_id_t _id,shared_ptr<World> rb);
+		static const shared_ptr<Body>& byId(body_id_t _id,Scene* rb=NULL);
+		static const shared_ptr<Body>& byId(body_id_t _id,shared_ptr<Scene> rb);
 
 		
 		//! Whether this Body is a Clump.
@@ -82,14 +82,14 @@ class Body : public Serializable
 			//! state of the body
 			shared_ptr<State> state;
 		#endif
-		#ifdef YADE_SHAPE
+		#ifdef YADE_GEOMETRICALMODEL
 			/// the 'perfect' representation of body's geometry: Polyhedron, Box
 			shared_ptr<GeometricalModel>	geometricalModel;
 		#endif
 		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox
-		shared_ptr<InteractingGeometry> interactingGeometry;
-		/// BoundingVolume is used for quick detection of potential interactions, that can be: AABB, K-Dop
-		shared_ptr<BoundingVolume>	boundingVolume;
+		shared_ptr<Shape> interactingGeometry;
+		/// Bound is used for quick detection of potential interactions, that can be: AABB, K-Dop
+		shared_ptr<Bound>	boundingVolume;
 	
 		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.
 		 * It is useful for example for collision detection : if two colliding bodies are only
@@ -112,7 +112,7 @@ class Body : public Serializable
 				(material)
 				(state)
 			#endif
-			#ifdef YADE_SHAPE
+			#ifdef YADE_GEOMETRICALMODEL
 				(geometricalModel)
 			#endif
 			(interactingGeometry)

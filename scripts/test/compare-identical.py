@@ -30,14 +30,14 @@ yade.log.setLevel('TriaxialCompressionEngine',yade.log.WARN)
 if O.numThreads>1:
 	print "WARNING: You should run single-threaded with OMP_NUM_THREADS=1; interaction order will be probably different otherwise!"
 
-for world in 0,1:
-	O.load(initFile); O.interactions.serializeSorted=True; O.switchWorld();
+for scene in 0,1:
+	O.load(initFile); O.interactions.serializeSorted=True; O.switchScene();
 from hashlib import md5; import difflib,sys
 print "Identical at steps ",
 for i in xrange(0,stopIter/nSteps):
 	sys.stdout.flush()
-	for world in 'A','B':
-		O.run(nSteps,True); O.saveTmp(world); O.switchWorld()
+	for scene in 'A','B':
+		O.run(nSteps,True); O.saveTmp(scene); O.switchScene()
 	A,B=O.tmpToString('A'),O.tmpToString('B')
 	# fast compare first using hash digest
 	Ahash,Bhash=md5(A),md5(B)

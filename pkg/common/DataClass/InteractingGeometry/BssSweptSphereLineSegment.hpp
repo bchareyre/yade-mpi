@@ -9,10 +9,10 @@
 #pragma once
 
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 
 
-class BssSweptSphereLineSegment : public InteractingGeometry
+class BssSweptSphereLineSegment : public Shape
 {
 	public :
                 Real     radius, length; // FIXME halfLength
@@ -23,10 +23,10 @@ class BssSweptSphereLineSegment : public InteractingGeometry
                 BssSweptSphereLineSegment ();
                 virtual ~BssSweptSphereLineSegment ();	
 	
-	REGISTER_ATTRIBUTES(InteractingGeometry,(radius)(length)(position)(orientation));
-	REGISTER_CLASS_INDEX(BssSweptSphereLineSegment,InteractingGeometry);
+	REGISTER_ATTRIBUTES(Shape,(radius)(length)(position)(orientation));
+	REGISTER_CLASS_INDEX(BssSweptSphereLineSegment,Shape);
 	REGISTER_CLASS_NAME(BssSweptSphereLineSegment);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
+	REGISTER_BASE_CLASS_NAME(Shape);
 };
 
 REGISTER_SERIALIZABLE(BssSweptSphereLineSegment);

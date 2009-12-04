@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"DisplacementToForceEngine.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 
 DisplacementToForceEngine::DisplacementToForceEngine() : targetForce(Vector3r::ZERO), targetForceMask(Vector3r::ZERO) 
@@ -39,7 +39,7 @@ void DisplacementToForceEngine::postProcessAttributes(bool deserializing)
 
 
 
-void DisplacementToForceEngine::applyCondition(World * ncb)
+void DisplacementToForceEngine::applyCondition(Scene * ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

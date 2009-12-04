@@ -9,7 +9,7 @@
 #include "BssSweptSphereLineSegment.hpp"
 
 
-BssSweptSphereLineSegment::BssSweptSphereLineSegment () : InteractingGeometry()
+BssSweptSphereLineSegment::BssSweptSphereLineSegment () : Shape()
 {		
 	createIndex();
         position = orientation = Vector3r(0,0,0);

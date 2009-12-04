@@ -31,8 +31,8 @@ class VolumicContactLaw : public InteractionSolver
 
 	
 		VolumicContactLaw();
-		void action(World*);
-		void speedTest(World* ncb);
+		void action(Scene*);
+		void speedTest(Scene* ncb);
 	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)/*(compacite_init)*/);
 	REGISTER_CLASS_NAME(VolumicContactLaw);
 	REGISTER_BASE_CLASS_NAME(InteractionSolver);

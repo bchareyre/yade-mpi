@@ -8,14 +8,14 @@
 #pragma once
 
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 #include<yade/core/Body.hpp>
 
 // define this to have topology information about facets enabled;
 // it is necessary for FacetTopologyAnalyzer
 #define FACET_TOPO
 
-class InteractingFacet : public InteractingGeometry {
+class InteractingFacet : public Shape {
     public:
 	
 	// Registered attributes
@@ -47,16 +47,16 @@ class InteractingFacet : public InteractingGeometry {
 
 	DECLARE_LOGGER;
 
-	REGISTER_ATTRIBUTES(InteractingGeometry,(vertices)
+	REGISTER_ATTRIBUTES(Shape,(vertices)
 		#ifdef FACET_TOPO
 			(edgeAdjIds)(edgeAdjHalfAngle)
 		#endif
 	);
 	protected: void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(InteractingFacet);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
+	REGISTER_BASE_CLASS_NAME(Shape);
 
-	REGISTER_CLASS_INDEX(InteractingFacet,InteractingGeometry);
+	REGISTER_CLASS_INDEX(InteractingFacet,Shape);
 };
 
 REGISTER_SERIALIZABLE(InteractingFacet);

@@ -8,7 +8,7 @@
 
 #include "CapillaryPressureEngine.hpp"
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
-#include <yade/core/World.hpp>
+#include <yade/core/Scene.hpp>
 
 using namespace boost;
 using namespace std;
@@ -29,7 +29,7 @@ CapillaryPressureEngine::~CapillaryPressureEngine()
 
 
 
-void CapillaryPressureEngine::applyCondition(World * rootBody)
+void CapillaryPressureEngine::applyCondition(Scene * rootBody)
 {		
 	//cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
 	

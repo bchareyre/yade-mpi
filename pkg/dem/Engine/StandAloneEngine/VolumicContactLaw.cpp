@@ -12,7 +12,7 @@
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 
 #include <yade/pkg-common/InteractingSphere.hpp>
 #include "VolumicContactLaw.hpp"
@@ -38,7 +38,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 
 
 
-// void VolumicContactLaw::speedTest(World* ncb)
+// void VolumicContactLaw::speedTest(Scene* ncb)
 // {
 // //BEGIN SPEED TEST
 // 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -100,7 +100,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 // }
 
 
-void VolumicContactLaw::action(World* ncb)
+void VolumicContactLaw::action(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

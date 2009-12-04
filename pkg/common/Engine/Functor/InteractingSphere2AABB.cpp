@@ -10,7 +10,7 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
-void InteractingSphere2AABB::go(const shared_ptr<InteractingGeometry>& cm, shared_ptr<BoundingVolume>& bv, const Se3r& se3, const Body*){
+void InteractingSphere2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 	InteractingSphere* sphere = static_cast<InteractingSphere*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	aabb->center = se3.position;

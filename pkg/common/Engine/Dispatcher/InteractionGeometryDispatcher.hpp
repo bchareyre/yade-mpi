@@ -14,19 +14,19 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/Dispatcher.hpp>
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
 class Body;
 
 class InteractionGeometryDispatcher :	public Dispatcher2D
 					<	
-						InteractingGeometry,						// base classe for dispatch
-						InteractingGeometry,						// base classe for dispatch
+						Shape,						// base classe for dispatch
+						Shape,						// base classe for dispatch
 						InteractionGeometryFunctor,					// class that provides multivirtual call
 						bool ,								// return type
-						TYPELIST_6(	  const shared_ptr<InteractingGeometry>&	// arguments
-								, const shared_ptr<InteractingGeometry>&
+						TYPELIST_6(	  const shared_ptr<Shape>&	// arguments
+								, const shared_ptr<Shape>&
 								, const State&
 								, const State&
 								, const Vector3r& 
@@ -37,7 +37,7 @@ class InteractionGeometryDispatcher :	public Dispatcher2D
 {
 	bool alreadyWarnedNoCollider;
 	public :
-		virtual void action(World*);
+		virtual void action(Scene*);
 		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2);
 		InteractionGeometryDispatcher(): alreadyWarnedNoCollider(false){}
 

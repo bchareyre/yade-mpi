@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "NullGUI.hpp"
-#include "World.hpp"
+#include "Scene.hpp"
 #include "FileGenerator.hpp"
 #include <iostream>
 #include <boost/filesystem/convenience.hpp>
@@ -167,7 +167,7 @@ int NullGUI::loop()
 	boost::posix_time::ptime start = boost::posix_time::second_clock::local_time();
 	while(1)
 	{
-		Omega::instance().getWorld()->moveToNextTimeStep();
+		Omega::instance().getScene()->moveToNextTimeStep();
 
 		if(Omega::instance().getCurrentIteration() % interval == 0 )
 		{

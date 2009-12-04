@@ -8,21 +8,21 @@
 
 #pragma once
 
-#include<yade/core/InteractingGeometry.hpp>
+#include<yade/core/Shape.hpp>
 
-class InteractingNode : public InteractingGeometry
+class InteractingNode : public Shape
 {
 	public :
 		InteractingNode ();
 		virtual ~InteractingNode ();
 
 /// Serialization
-	REGISTER_ATTRIBUTES(InteractingGeometry,/* */);
+	REGISTER_ATTRIBUTES(Shape,/* */);
 	REGISTER_CLASS_NAME(InteractingNode);
-	REGISTER_BASE_CLASS_NAME(InteractingGeometry);
+	REGISTER_BASE_CLASS_NAME(Shape);
 
 /// Indexable
-	REGISTER_CLASS_INDEX(InteractingNode,InteractingGeometry);
+	REGISTER_CLASS_INDEX(InteractingNode,Shape);
 };
 
 REGISTER_SERIALIZABLE(InteractingNode);

@@ -8,9 +8,9 @@
 
 #include "GLDrawQuadrilateral.hpp"
 #include<yade/pkg-common/Quadrilateral.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 Vector3r makeColor(double val,double min,double max)
 {
@@ -35,7 +35,7 @@ void GLDrawQuadrilateral::go(const shared_ptr<GeometricalModel>& gm, const share
 	int WTT = Omega::instance().isoSec%3; 
 
 	Quadrilateral* q = static_cast<Quadrilateral*>(gm.get());
-	World* mb = Omega::instance().getWorld().get();
+	Scene* mb = Omega::instance().getScene().get();
 	
 	if(   !(
 		   mb->bodies->exists(q->n1)

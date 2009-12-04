@@ -13,11 +13,11 @@
 #include<yade/pkg-lattice/LatticeNodeParameters.hpp>
 #include<yade/pkg-lattice/LatticeInteractingGeometry.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
-YADE_REQUIRE_FEATURE(shape);
+YADE_REQUIRE_FEATURE(geometricalmodel);
 
 GLDrawLatticeInteractingGeometry::GLDrawLatticeInteractingGeometry() : maxLen(0)
 {
@@ -83,7 +83,7 @@ void GLDrawLatticeInteractingGeometry::damagedNeighbor(unsigned int a)
 	//(*(bodies))[A]->geometricalModel->diffuseColor = Vector3r(0.0,0.0,((float)section)/2.0);
 };
 
-void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>& gm, const shared_ptr<PhysicalParameters>&,bool wire, const GLViewInfo&)
+void GLDrawLatticeInteractingGeometry::go(const shared_ptr<Shape>& gm, const shared_ptr<PhysicalParameters>&,bool wire, const GLViewInfo&)
 {
 //	return;
 
@@ -95,8 +95,8 @@ void GLDrawLatticeInteractingGeometry::go(const shared_ptr<InteractingGeometry>&
 	}
 	int limit = Omega::instance().isoSec;
 
-	InteractionContainer* interactions = Omega::instance().getWorld()->interactions.get();
-	BodyContainer* bodies = Omega::instance().getWorld()->bodies.get();
+	InteractionContainer* interactions = Omega::instance().getScene()->interactions.get();
+	BodyContainer* bodies = Omega::instance().getScene()->bodies.get();
 
 	InteractionContainer::iterator angles     = interactions->begin();
 	InteractionContainer::iterator angles_end = interactions->end();

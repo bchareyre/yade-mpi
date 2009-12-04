@@ -1,6 +1,6 @@
 // 2007,2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include"ConcretePM.hpp"
-#include<yade/core/World.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -134,7 +134,7 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=1.;
 #endif
 
 
-void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, World* rootBody){
+void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
 
@@ -295,7 +295,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 /*** DEPRECATED ***/
 #if 0
 CREATE_LOGGER(CpmGlobalCharacteristics);
-void CpmGlobalCharacteristics::compute(World* rb, bool useMaxForce){
+void CpmGlobalCharacteristics::compute(Scene* rb, bool useMaxForce){
 	rb->bex.sync();
 
 	// 1. reset volumetric strain (cummulative in the next loop)
@@ -346,8 +346,8 @@ void CpmGlobalCharacteristics::compute(World* rb, bool useMaxForce){
 CREATE_LOGGER(CpmStateUpdater);
 Real CpmStateUpdater::maxOmega=0.;
 
-void CpmStateUpdater::update(World* _rootBody){
-	World *rootBody=_rootBody?_rootBody:Omega::instance().getWorld().get();
+void CpmStateUpdater::update(Scene* _rootBody){
+	Scene *rootBody=_rootBody?_rootBody:Omega::instance().getScene().get();
 	vector<BodyStats> bodyStats; bodyStats.resize(rootBody->bodies->size());
 	assert(bodyStats[0].nCohLinks==0); // should be initialized by dfault ctor
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
