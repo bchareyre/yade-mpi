@@ -5,9 +5,8 @@ def getRealVersion():
 	if os.path.exists('RELEASE'):
 		return file('RELEASE').readline().strip()
 	if os.path.exists('.bzr'):
-		for l in os.popen("LC_ALL=C bzr version-info 2>/dev/null").readlines():
-			m=re.match(r'revno: ([0-9]+)',l)
-			if m: return 'bzr'+m.group(1)
+		for l in os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines():
+			return 'bzr'+l[:-1]
 	return None
 
 

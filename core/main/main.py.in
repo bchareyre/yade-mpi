@@ -20,8 +20,10 @@ if debug:
 	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
 
 opts,args=par.parse_args()
-# c++-boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
+# c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
 if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
+
+print 'Welcome to Yade '+version
 
 # initialization and c++ plugins import
 import yade
@@ -48,6 +50,7 @@ qtEnabled=False
 try:
 	import yade.qt
 	qtEnabled=True
+	yade.qt.Controller()
 except ImportError: pass
 
 # prepare nice namespace for users

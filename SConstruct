@@ -198,14 +198,11 @@ Help(opts.GenerateHelpText(env))
 ###########################################
 import yadeSCons
 ## ALL generated stuff should go here - therefore we must determine it very early!!
-if not env.has_key('version'):
-	env['realVersion']=yadeSCons.getRealVersion()
-	if not env['realVersion']: env['realVersion']='unknown'
-	env['version']=env['realVersion']
-if not env.has_key('realVersion') or not env['realVersion']: env['realVersion']=env['version']
+env['realVersion']=yadeSCons.getRealVersion() or 'unknown' # unknown if nothing returned
+if not env.has_key('version'): env['version']=env['realVersion']
 
 env['SUFFIX']='-'+env['version']+env['variant']
-print "Yade version is `%s', installed files will be suffixed with `%s'."%(env['version'],env['SUFFIX'])
+print "Yade version is `%s' (%s), installed files will be suffixed with `%s'."%(env['version'],env['realVersion'],env['SUFFIX'])
 # make buildDir absolute, saves hassles later
 buildDir=os.path.abspath(env.subst('$buildPrefix/build$SUFFIX'))
 print "All intermediary files will be in `%s'."%env.subst(buildDir)
@@ -543,6 +540,7 @@ if not env.GetOption('clean'):
 	mkSymlink(buildDir+'/include/yade-'+env['version']+'/indexing_suite','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')
 	#env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
 	env.Default(env.Alias('install',['$PREFIX/bin','$PREFIX/lib'])) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
+
 
 env.Export('env');
 

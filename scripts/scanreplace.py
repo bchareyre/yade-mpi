@@ -8,7 +8,7 @@ def replace_action(target, source, env):
     return 0
 
 def replace_string(target, source, env):
-    return "R %s %s" % (str(source[0]), str(target[0]))
+    return None #"T %s %s" % (str(source[0]), str(target[0]))
 
 def generate(env, **kw):
     action = env.Action(replace_action, replace_string)
