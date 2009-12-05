@@ -50,6 +50,9 @@ class NewtonsDampedLaw : public StandAloneEngine{
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
+	Vector3r prevCellSize;
+
+
 
 	public:
 		///damping coefficient for Cundall's non viscous damping
@@ -58,13 +61,14 @@ class NewtonsDampedLaw : public StandAloneEngine{
 		Real maxVelocitySq;
 		/// Enable of the exact aspherical body rotation integrator
 		bool exactAsphericalRot;
+
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(Scene *);		
-		NewtonsDampedLaw(): damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false){
+		NewtonsDampedLaw(): prevCellSize(Vector3r::ZERO),damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false){
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif

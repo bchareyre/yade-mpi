@@ -16,7 +16,7 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
-	PeriIsoCompressor(charLen=.5,stresses=[50e9,1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
+	PeriIsoCompressor(charLen=.5,stresses=[-50e9,-1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
 	NewtonsDampedLaw(damping=.4)
 ]
 O.dt=utils.PWaveTimeStep()
