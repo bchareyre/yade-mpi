@@ -236,7 +236,8 @@ void Clump::updateProperties(bool intersecting){
 	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
 	//TRWM3MAT(Ic_orientG);
 	Ic_orientG.EigenDecomposition(R_g2c,Ic);
-	/*! @bug: eigendecomposition is wrong. see http://article.gmane.org/gmane.science.physics.yade.devel/99 for message. */
+	/*! @bug eigendecomposition might be wrong. see http://article.gmane.org/gmane.science.physics.yade.devel/99 for message. It is worked around below, however.
+	*/
 	// has NaNs for identity matrix!
 	TRWM3MAT(R_g2c);
 

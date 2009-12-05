@@ -33,8 +33,7 @@ def resetData():
 
 
 plotDataCollector=None
-import yade.wrapper
-o=yade.wrapper.Omega()
+from yade import *
 
 maxDataLen=1000
 

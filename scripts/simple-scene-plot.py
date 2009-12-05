@@ -25,11 +25,11 @@ O.engines=[
 	### 
 	### The engine _must_ be labeled 'plotDataCollector', so that the reducer may find it and adjust its periods if necessary.
 	###
-	PeriodicPythonRunner(iterPeriod=200,command='myAddPlotData()',label='plotDataCollector')
+	PeriodicPythonRunner(iterPeriod=20,command='myAddPlotData()',label='plotDataCollector')
 ]
 from yade import utils
-O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))
-O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0],young=30e9,poisson=.3,density=2400))
+O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0]))
+O.bodies.append(utils.sphere([0,0,2],1,color=[0,1,0]))
 O.dt=.2*utils.PWaveTimeStep()
 
 
@@ -38,11 +38,11 @@ O.dt=.2*utils.PWaveTimeStep()
 ############################################
 
 from math import *
-import yade.plot
+from yade import plot
 ## we will have 2 plots:
 ## 1. t as function of i (joke test function)
 ## 2. i as function of t on left y-axis ('|||' makes the separation) and z_sph, v_sph (as green circles connected with line) and z_sph_half again as function of t
-yade.plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'),'z_sph_half')}
+plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'),'z_sph_half')}
 
 ## this function is called by plotDataCollector
 ## it should add data with the labels that we will plot
@@ -50,14 +50,9 @@ yade.plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'),'z_sph_half')}
 def myAddPlotData():
 	## store some numbers under some labels
 	sph=O.bodies[1]
-	yade.plot.addData(t=O.time,i=O.iter,z_sph=sph.phys.pos[2],z_sph_half=.5*sph.phys.pos[2],v_sph=sqrt(sum([v**2 for v in sph.phys['velocity']])))
+	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sqrt(sum([v**2 for v in sph.state['vel']])))
 
 O.run(int(2./O.dt),True);
-print """Now, you can say
-
- yade.plot.plot()
-
-to see figures.
-"""
-import yade.plot as yp
-yp.saveGnuplot('/tmp/a')
+print "Now calling plot.plot() to show the figures (close them to continue)."
+plot.plot()
+plot.saveGnuplot('/tmp/a')
