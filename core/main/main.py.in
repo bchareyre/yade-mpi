@@ -32,6 +32,7 @@ import yade.config
 import yade.wrapper
 import yade.log
 import yade.system
+import yade.plot
 
 # continue option processing
 
@@ -82,7 +83,7 @@ if 1:
 		ipshell=IPShellEmbed(
 			argv=[],
 			#exit_msg='Bye.',
-			banner='[[ ^L clears screen, ^U kills line.'+(' F12 controller, F11 3d view, F10 both, F9 generator.' if qtEnabled else '')+' ]]',
+			banner='[[ ^L clears screen, ^U kills line.'+(' F12 controller, F11 3d view, F10 both, F9 generator, F8 plot.' if qtEnabled else '')+' ]]',
 			rc_override={
 				'execfile':[prefix+'/lib/yade'+suffix+'/py/yade/ipython.py'],
 				'readline_parse_and_bind':[
@@ -93,6 +94,7 @@ if 1:
 					'"\e[23~": "\C-Uyade.qt.View();\C-M"', # F11
 					'"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"', # F10
 					'"\e[20~": "\C-Uyade.qt.Generator();\C-M"', #F9
+					'"\e[19~": "\C-Uyade.plot.plot();\C-M"', #F9
 					] if qtEnabled else [])
 			})
 		ipshell()

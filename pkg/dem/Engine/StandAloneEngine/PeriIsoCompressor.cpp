@@ -103,10 +103,10 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
 		for(int i=0; i<3; i++){
 			const Real absNormI=abs(gsc->normal[i]);
-			Real f=nsi->normalForce[i]+nsi->shearForce[i];
+			Real f=(reversedForces?-1.:1.)*(nsi->normalForce[i]+nsi->shearForce[i]);
 			// force is as applied to id1, and normal is from id1 towards id2;
 			// therefore if they have the same sense, it is tensile force (positive)
-			sumForce[i]+=Mathr::Sign(f*gsc->normal[i])*f;
+			sumForce[i]+=Mathr::Sign(f*gsc->normal[i])*abs(f);
 			sumLength[i]+=absNormI*(gsc->refR1+gsc->refR2);
 			sumStiff[i]+=absNormI*nsi->kn+(1-absNormI)*nsi->ks;
 		}
@@ -143,8 +143,8 @@ void PeriTriaxController::action(Scene* scene){
 	bool allOk=true; Vector3r cellGrow(Vector3r::ZERO);
 	// apply condition along each axis separately (stress or strain)
 	for(int axis=0; axis<3; axis++){
-		Real maxGrow=refSize[axis]*maxStrainRate*scene->dt;
-		if(stressMask & 1<<axis){ // control stress
+		Real maxGrow=refSize[axis]*maxStrainRate[axis]*scene->dt;
+		if(stressMask & (1<<axis)){ // control stress
 			// stiffness K=EA; σ₁=goal stress; Δσ wanted stress difference to apply
 			// ΔεE=(Δl/l₀)(K/A) = Δσ=σ₁-σ ↔ Δl=(σ₁-σ)l₀(A/K)
 			cellGrow[axis]=(goal[axis]-stress[axis])*refSize[axis]*cellArea[axis]/(stiff[axis]>0?stiff[axis]:1.);
@@ -160,11 +160,9 @@ void PeriTriaxController::action(Scene* scene){
 		// steady evolution with fluctuations; see TriaxialStressController
 		cellGrow[axis]=(1-growDamping)*cellGrow[axis]+.8*prevGrow[axis];
 		// crude way of predicting stress, for steps when it is not computed from intrs
-		if(stiff[axis]>0) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]);
-		strain[axis]+=cellGrow[axis]/refSize[axis];
 		if(doUpdate) LOG_DEBUG(axis<<": cellGrow="<<cellGrow[axis]<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);
 		// signal if condition not satisfied
-		if(stressMask & 1<<axis){
+		if(stressMask & (1<<axis)){
 			Real curr=stress[axis];
 			if((goal[axis]!=0 && abs((curr-goal[axis])/goal[axis])>relStressTol) || abs(curr-goal[axis])>absStressTol) allOk=false;
 		} else {
@@ -175,9 +173,18 @@ void PeriTriaxController::action(Scene* scene){
 				if(doUpdate) LOG_DEBUG("Strain not OK; "<<abs(curr-goal[axis])<<">1e-6");
 			}
 		}
-		// change cell size now
-		scene->cellMax+=cellGrow;
 	}
+	// update stress and strain
+	for(int axis=0; axis<3; axis++){
+		strain[axis]+=cellGrow[axis]/refSize[axis];
+		// take in account something like poisson's effect here…
+		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
+		if(stiff[axis]>0) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]); //-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
+	}
+	// change cell size now
+	scene->cellMax+=cellGrow;
+	strainRate=cellGrow/scene->dt;
+
 	if(allOk){
 		if(doUpdate || currUnbalanced<0) {
 			currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);

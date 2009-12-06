@@ -41,12 +41,15 @@ strainStress[0] and strainStress[2] are stress values, and strainStress[1] is st
 */
 class PeriTriaxController: public StandAloneEngine{
 	public:
+	//! For broken constitutive laws, normalForce and shearForce on interactions are in the reverse sense
+	//! see https://bugs.launchpad.net/yade/+bug/493102
+	bool reversedForces;
 	//! Desired stress or strain values (depending on stressMask)
 	Vector3r goal;
 	//! mask determining strain/stress (0/1) meaning for goal components
 	int stressMask;
 	//! Maximum strain rate of the periodic cell
-	Real maxStrainRate;
+	Vector3r maxStrainRate;
 	//! maximum unbalanced force (defaults to 1e-4)
 	Real maxUnbalanced;
 	//! Absolute stress tolerance (1e3)
@@ -69,6 +72,8 @@ class PeriTriaxController: public StandAloneEngine{
 	Vector3r stress;
 	//! cell strain, updated at every step
 	Vector3r strain;
+	//! cell strain rate, updated at every step
+	Vector3r strainRate;
 	//! average stiffness, updated at every step (only every globUpdate steps recomputed from interactions)
 	Vector3r stiff;
 	//! current unbalanced force (updated every globUpdate)
@@ -78,8 +83,8 @@ class PeriTriaxController: public StandAloneEngine{
 
 	void action(Scene*);
 	void strainStressStiffUpdate();
-	PeriTriaxController(): goal(Vector3r::ZERO),stressMask(0),maxStrainRate(1.),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.25),globUpdate(100),refSize(Vector3r(-1,-1,-1)),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
-	REGISTER_ATTRIBUTES(StandAloneEngine,(goal)(stressMask)(maxStrainRate)(maxUnbalanced)(absStressTol)(relStressTol)(growDamping)(globUpdate)(doneHook)(refSize)(stress)(strain)(stiff));
+	PeriTriaxController(): reversedForces(false),goal(Vector3r::ZERO),stressMask(0),maxStrainRate(Vector3r(1,1,1)),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.25),globUpdate(100),refSize(Vector3r(-1,-1,-1)),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),strainRate(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
+	REGISTER_ATTRIBUTES(StandAloneEngine,(reversedForces)(goal)(stressMask)(maxStrainRate)(maxUnbalanced)(absStressTol)(relStressTol)(growDamping)(globUpdate)(doneHook)(refSize)(stress)(strain)(strainRate)(stiff));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(PeriTriaxController,StandAloneEngine);
 };

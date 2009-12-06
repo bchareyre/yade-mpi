@@ -354,4 +354,35 @@ def triaxialPack(*args,**kw):
 	import warnings; warnings.warn("pack.triaxialPack was renamed to pack.randomDensePack, update your code!",DeprecationWarning,stacklevel=2);
 	return randomDensePack(*args,**kw)
 
+def randomPeriPack(radius,rRelFuzz,initSize):
+	"""Generate periodic dense packing.	EXPERIMENTAL, you at your own risk.
+
+	A cell of initSize is stuffed with as many spheres as possible (ignore the warning from SpherePack::makeCloud about
+	not being able to	add any more spheres), then we run periodic compression with PeriIsoCompressor, just like with
+	randomDensePack.
+
+	:param radius: mean sphere radius
+	:param rRelFuzz: relative fuzz of sphere radius (equal distribution); see the same param for randomDensePack.
+	:param initSize: initial size of the periodic cell.
+
+	:return: SpherePack object, which also contains periodicity information.
+
+	:todo: memoization in db; what criteria??
+
+	"""
+	from math import pi
+	O.switchScene(); O.resetThisScene()
+	sp=SpherePack()
+	O.periodicCell=((0,0,0),Vector3(initSize))
+	sp.makeCloud(O.periodicCell[0],O.periodicCell[1],radius,rRelFuzz,int(initSize[0]*initSize[1]*initSize[2]/((4/3.)*pi*radius**3)),True)
+	O.engines=[BexResetter(),BoundDispatcher([InteractingSphere2AABB()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonsDampedLaw(damping=.8)]
+	O.materials.append(GranularMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
+	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
+	O.dt=utils.PWaveTimeStep()
+	O.timingEnabled=True
+	O.run(); O.wait()
+	ret=SpherePack()
+	ret.fromSimulation()
+	O.switchScene()
+	return ret
 
