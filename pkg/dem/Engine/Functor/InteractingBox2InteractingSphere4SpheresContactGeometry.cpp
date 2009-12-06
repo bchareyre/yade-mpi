@@ -23,6 +23,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		const State& state1,
 		const State& state2,
 		const Vector3r& shift2,
+		const bool& force,
 		const shared_ptr<Interaction>& c)
 {
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
@@ -163,10 +164,11 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const s
 						const State& state1,
 						const State& state2,
 						const Vector3r& shift2,
+						const bool& force,
 						const shared_ptr<Interaction>& c)
 {
 	c->swapOrder();
-	return go(cm2,cm1,state2,state1,-shift2,c);
+	return go(cm2,cm1,state2,state1,-shift2,force,c);
 }
 
 YADE_PLUGIN((InteractingBox2InteractingSphere4SpheresContactGeometry));

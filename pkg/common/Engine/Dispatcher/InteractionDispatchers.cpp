@@ -81,10 +81,10 @@ void InteractionDispatchers::action(Scene* rootBody){
 			assert(I->functorCache.geom);
 			bool wasReal=I->isReal();
 			bool geomCreated;
-			if(!rootBody->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
+			if(!rootBody->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
-				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,I);
+				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			if(!geomCreated){
 				if(wasReal) rootBody->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step

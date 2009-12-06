@@ -34,11 +34,12 @@
 class InteractionGeometryFunctor : 	public Functor2D
 					<
 		 				bool ,
-		 				TYPELIST_6(	  const shared_ptr<Shape>&
+		 				TYPELIST_7(	  const shared_ptr<Shape>&
 								, const shared_ptr<Shape>&
 								, const State&
 								, const State&
 								, const Vector3r& 
+								, const bool&
 								, const shared_ptr<Interaction>&
 			  				  ) 
 					>

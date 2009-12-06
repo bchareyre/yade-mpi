@@ -25,11 +25,12 @@ class InteractionGeometryDispatcher :	public Dispatcher2D
 						Shape,						// base classe for dispatch
 						InteractionGeometryFunctor,					// class that provides multivirtual call
 						bool ,								// return type
-						TYPELIST_6(	  const shared_ptr<Shape>&	// arguments
+						TYPELIST_7(	  const shared_ptr<Shape>&	// arguments
 								, const shared_ptr<Shape>&
 								, const State&
 								, const State&
 								, const Vector3r& 
+								, const bool &
 								, const shared_ptr<Interaction>&
 							  )
 						, false								// disable auto symmetry handling
@@ -38,7 +39,7 @@ class InteractionGeometryDispatcher :	public Dispatcher2D
 	bool alreadyWarnedNoCollider;
 	public :
 		virtual void action(Scene*);
-		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2);
+		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool force);
 		InteractionGeometryDispatcher(): alreadyWarnedNoCollider(false){}
 
 	REGISTER_CLASS_AND_BASE(InteractionGeometryDispatcher,Dispatcher2D);

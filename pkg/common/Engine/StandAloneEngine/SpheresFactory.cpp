@@ -94,7 +94,7 @@ void SpheresFactory::action(Scene* ncb)
 		bool is_overlap=false;
 		vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
 		FOREACH(body_id_t id, probedBodies){
-			if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry){
+			if (iGME->explicitAction(sphere,Body::byId(bI->probedBodies[i]))->interactionGeometry,/*force*/false){
 				is_overlap=true;
 				break;
 			}

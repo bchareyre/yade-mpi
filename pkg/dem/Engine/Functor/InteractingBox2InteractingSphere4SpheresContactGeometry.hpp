@@ -20,6 +20,7 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 					const State& state1,
 					const State& state2,
 					const Vector3r& shift2,
+					const bool& force,
 					const shared_ptr<Interaction>& c);
 
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1,
@@ -27,6 +28,7 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 					const State& state1,
 					const State& state2,
 					const Vector3r& shift2,
+					const bool& force,
 					const shared_ptr<Interaction>& c);
 
 	REGISTER_CLASS_NAME(InteractingBox2InteractingSphere4SpheresContactGeometry);

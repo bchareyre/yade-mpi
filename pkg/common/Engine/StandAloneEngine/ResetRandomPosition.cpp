@@ -105,7 +105,7 @@ void ResetRandomPosition::action(Scene* ncb)
 				// Test overlap with already shifted bodies
 				FOREACH(shared_ptr<Body> sb, shiftedBodies)
 				{
-					if (iGME->explicitAction(b,sb)->interactionGeometry)
+					if (iGME->explicitAction(b,sb)->interactionGeometry,/*force*/false)
 					{
 						is_overlap=true;
 						break;
@@ -116,7 +116,7 @@ void ResetRandomPosition::action(Scene* ncb)
 				// Test overlap with other bodies
 				vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
 				FOREACH(body_id_t id, probedBodies){
-					if (iGME->explicitAction(b,Body::byId(bI->probedBodies[i]))->interactionGeometry){
+					if (iGME->explicitAction(b,Body::byId(bI->probedBodies[i]))->interactionGeometry,/*force*/false){
 						is_overlap=true;
 						break;
 					}

@@ -73,9 +73,9 @@ namespace{
 
 namespace{
 	boost::python::object pyGetAttr(const std::string& key){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); /*never reached; avoids warning*/ throw; }
-	void pySetAttr(const std::string& key, const boost::python::object& value){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
+	void pySetAttr(const std::string& key, const boost::python::object& /* value */){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
 	boost::python::list pyKeys(){ return boost::python::list();}
-	bool pyHasKey(const std::string& key) { return false; }
+	bool pyHasKey(const std::string&) { return false; }
 	boost::python::dict pyDict() { return boost::python::dict(); }
 };
 

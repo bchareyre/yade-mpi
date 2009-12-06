@@ -39,10 +39,11 @@ Real Dem3DofGeom_FacetSphere::slipToDisplacementTMax(Real displacementTMax){
 }
 
 CREATE_LOGGER(Ig2_Facet_Sphere_Dem3DofGeom);
-bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
+bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	InteractingFacet* facet=static_cast<InteractingFacet*>(cm1.get());
 	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
 
+	// InteractionGeometryFunctor::go(cm1,cm2,state1,state2,shift2,force,c);
 
 	#if 1
 		/* new code written from scratch, to make sure the algorithm is correct; it is about the same speed 
@@ -76,7 +77,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			}
 			normal=cogLine-contactPt; // called normal, but it is no longer the facet's normal (for compat)
 			//TRVAR3(normal,contactPt,sphereRadius);
-			if(!c->isReal() && normal.SquaredLength()>sphereRadius*sphereRadius) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
+			if(!c->isReal() && normal.SquaredLength()>sphereRadius*sphereRadius && !force) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
 			Real penetrationDepth=sphereRadius-normal.Normalize();
 	#else
 		/* This code was mostly copied from InteractingFacet2InteractinSphere4SpheresContactGeometry */

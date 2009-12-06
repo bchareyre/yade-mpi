@@ -16,7 +16,8 @@
  */
 void InteractionPhysicsDispatcher::explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i){
 	// should we throw instead of asserting?
-	assert(i->isReal());
+	//assert(i->isReal());
+	if(!i->interactionGeometry) throw runtime_error(string(__FILE__)+": explicitAction received interaction without interactionGeometry.");
 	operator()(pp1,pp2,i);
 }
 

@@ -101,6 +101,7 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		typedef typename Impl::Parm4 Parm4;
 		typedef typename Impl::Parm5 Parm5;
 		typedef typename Impl::Parm6 Parm6;
+		typedef typename Impl::Parm7 Parm7;
 	
 		ResultType error(int n)
 		{
@@ -111,6 +112,7 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 			+ "4. " + typeid(Parm4).name() + "\n"
 			+ "5. " + typeid(Parm5).name() + "\n"
 			+ "6. " + typeid(Parm6).name() + "\n"
+			+ "7. " + typeid(Parm7).name() + "\n"
 			+ "number of types used in the call: " + boost::lexical_cast<string>(n) + "\n\n";
 			cerr << err.c_str();
 			throw MultiMethodsBadVirtualCall(err.c_str());
@@ -129,6 +131,7 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
 		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
 		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
+		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 			{ return error(7); };
 		
 		virtual ResultType goReverse(	Parm1) 							{ return error(1); };
 		virtual ResultType goReverse(	Parm1,Parm2) 						{ return error(2); };
@@ -136,6 +139,7 @@ class FunctorWrapper //: public Serializable // FIXME functor shouldn't be seria
 		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
 		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
 		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
+		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 			{ return error(7); };
 };
 
 #define DEFINE_FUNCTOR_ORDER_2D(class1,class2)							\

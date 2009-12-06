@@ -11,7 +11,7 @@
 Collider::Collider(){}
 
 Collider::~Collider(){}
-bool Collider::handleExistingInteraction(Interaction* I){
+bool Collider::handleExistingInteraction(Interaction*){
 	throw runtime_error("handleExistingInteraction should not be called");
 #if 0
 	/* logically, we have 4 possibilities

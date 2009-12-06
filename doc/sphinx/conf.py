@@ -22,10 +22,35 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+
+#
+# HACK: change ipython console regexp from ipython_console_highlighting.py
+import re
+sys.path.append(os.path.abspath('.'))
+#ich.IPythonConsoleLexer.input_prompt = re.compile("(Yade \[[0-9]+\]: )|(   \.\.\.+:)")
+#ich.IPythonConsoleLexer.output_prompt = re.compile("( ->  \[[0-9]+\]: )|(   \.\.\.+:)")
+#ich.IPythonConsoleLexer.continue_prompt = re.compile("     \.\.\.+:")
+
+#import IPython.ipapi
+#ip=IPython.ipapi.get()
+#o=ip.options
+#o.prompt_in1="Yade [\#]: "
+#o.prompt_in2="     .\D.. "
+#o.prompt_out=" ->  [\#]: "
+
+#import ipython_directive as id
+#id.rgxin =re.compile('In \[(\d+)\]:\s?(.*)\s*')
+#id.rgxout=re.compile('Out\[(\d+)\]:\s?(.*)\s*')
+#id.fmtin ='Yade [%d]:'
+#id.fmtout=' ->  [%d]:'
+
+
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.pngmath',
     'matplotlib.sphinxext.mathmpl',
+    'ipython_directive',
+    'ipython_console_highlighting'
     ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -42,7 +67,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Yade'
-copyright = u'2009, Yade developers'
+copyright = u'2009, Václav Šmilauer'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -177,7 +202,7 @@ htmlhelp_basename = 'Yadedoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'Yade.tex', u'Yade Documentation',
-   u'Yade developers', 'manual'),
+   u'Václav Šmilauer', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

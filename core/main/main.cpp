@@ -46,8 +46,8 @@ using namespace std;
 	}
 #endif
 
-void nullHandler(int sig){}
-void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
+void nullHandler(int){}
+void termHandler(int){cerr<<"terminating..."<<endl; raise(SIGTERM);}
 void warnOnceHandler(int sig){
 	cerr<<"WARN: nullHandler (probably log4cxx error), signal "<<(sig==SIGSEGV?"SEGV":"[other]")<<". Signal will be ignored since now."<<endl;
 	signal(sig,nullHandler);

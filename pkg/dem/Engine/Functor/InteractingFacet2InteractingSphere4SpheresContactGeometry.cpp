@@ -25,6 +25,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 							const State& state1,
 							const State& state2,
 							const Vector3r& shift2,
+							const bool& force,
 							const shared_ptr<Interaction>& c)
 {
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
@@ -46,7 +47,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 	if (L<0) {normal=-normal; L=-L; }
 
 	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
-	if (L>sphereRadius && !c->isReal())  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
+	if (L>sphereRadius && !c->isReal() && !force)  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
 
 	Vector3r cp = cl - L*normal;
 	const Vector3r* ne = facet->ne;
@@ -124,11 +125,12 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const
 								const State& state1,
 								const State& state2,
 								const Vector3r& shift2,
+								const bool& force,
 								const shared_ptr<Interaction>& c)
 {
 	c->swapOrder();
 	//LOG_WARN("Swapped interaction order for "<<c->getId2()<<"&"<<c->getId1());
-	return go(cm2,cm1,state2,state1,-shift2,c);
+	return go(cm2,cm1,state2,state1,-shift2,force,c);
 }
 
 YADE_PLUGIN((InteractingFacet2InteractingSphere4SpheresContactGeometry));

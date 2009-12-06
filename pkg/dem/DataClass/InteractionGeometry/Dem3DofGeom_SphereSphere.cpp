@@ -149,11 +149,11 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 	CREATE_LOGGER(Ig2_Sphere_Sphere_Dem3DofGeom);
 #endif
 
-bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
+bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
 	Vector3r normal=(state2.pos+shift2)-state1.pos;
 	Real penetrationDepthSq=pow((distFactor>0?distFactor:1.)*(s1->radius+s2->radius),2)-normal.SquaredLength();
-	if (penetrationDepthSq<0 && !c->isReal()){
+	if (penetrationDepthSq<0 && !c->isReal() && !force){
 		return false;
 	}
 

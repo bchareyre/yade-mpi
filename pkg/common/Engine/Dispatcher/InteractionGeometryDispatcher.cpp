@@ -24,28 +24,21 @@ CREATE_LOGGER(InteractionGeometryDispatcher);
  * \fixme: doesn't handle periodicity!
  */
 
-shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2){
-	//assert(b1->shape && b2->shape);
-	//shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
-	//i->isReal=true;
-	//bool op=operator()(b1->shape,b2->shape,b1->physicalParameters->se3,b2->physicalParameters->se3,i);
-	//if(!op) throw runtime_error("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+") or the dispatchee returned false.");
-	//return i;
-
-	// FIXME: not clear why it is not a good idea. If I really wnat interaction that I call this function, I also want it to say loudly that it failed.
-	
-	// Seems asserts and throws in code above is not good idea.
-	// Below code do same (i.e. create interaction for specified bodies), but
-	// without artifical exceptions. If creating interaction fails (for
-	// example if bodies don't have an interactionGeometry), returned
-	// interaction is non real, i.e. interaction->isReal==false. Sega.
-	shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
-	b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::ZERO, interaction );
-	return interaction;
+shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool force){
+	if(force){
+		assert(b1->shape && b2->shape);
+		shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
+		bool op=operator()(b1->shape,b2->shape,*b1->state,*b2->state,/*shift2*/Vector3r::ZERO,/*force*/true,i);
+		if(!op) throw runtime_error("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+") or the dispatchee returned false (it was asked to force creation of InteractionGeometry; that would a bug).");
+		return i;
+	} else {
+		shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
+		b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::ZERO, /*force*/ false, interaction );
+		return interaction;
+	}
 }
 
-void InteractionGeometryDispatcher::action(Scene* ncb)
-{
+void InteractionGeometryDispatcher::action(Scene* ncb){
 	// Erase interaction that were requested for erase, but not processed by the collider, if any (and warn once about that, as it is suspicious)
 	if(ncb->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
 		LOG_WARN("Interactions pending erase found, no collider being used?");
@@ -76,10 +69,10 @@ void InteractionGeometryDispatcher::action(Scene* ncb)
 			if (!b1->shape || !b2->shape) { assert(!wasReal); continue; } // some bodies do not have shape
 			bool geomCreated;
 			if(!ncb->isPeriodic){
-				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
+				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/ false, I);
 			} else{
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
-				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, I);
+				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, /*force*/ false, I);
 			}
 			// reset && erase interaction that existed but now has no geometry anymore
 			if(wasReal && !geomCreated){ ncb->interactions->requestErase(I->getId1(),I->getId2()); }

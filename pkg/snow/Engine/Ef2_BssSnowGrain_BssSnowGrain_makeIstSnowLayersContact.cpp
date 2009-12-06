@@ -124,6 +124,8 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_pt
 							const shared_ptr<Shape>& cm2,
 							const Se3r& se31,
 							const Se3r& se32,
+							const Vector3r& shift2,
+							const bool& force,
 							const shared_ptr<Interaction>& c)
 {
 //	bool result = g.go(cm1,cm2,se31,se32,c);
@@ -434,6 +436,8 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const sh
 								const shared_ptr<Shape>& cm2,
 								const Se3r& se31,
 								const Se3r& se32,
+								const Vector3r& shift2,
+								const bool& force,
 								const shared_ptr<Interaction>& c)
 {
 	std::cerr << "---- goReverse ---- " << __FILE__ << "\n";

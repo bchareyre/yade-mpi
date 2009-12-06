@@ -19,8 +19,9 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::go(
 		const shared_ptr<Shape>& cm1,
 		const shared_ptr<Shape>& cm2,
 		const Se3r& se31,
-  
-		const Se3r& se32,
+  		const Se3r& se32,
+		const Vector3r& shift2,
+		const bool& force,
 		const shared_ptr<Interaction>& c)
 {
         InteractingSphere* s            = static_cast<InteractingSphere*>(cm1.get());
@@ -63,6 +64,8 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::goRever
 						const shared_ptr<Shape>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
+						const Vector3r& shift2,
+						const bool& force,
 						const shared_ptr<Interaction>& c)
 {
 	bool isInteracting = go(cm2,cm1,se32,se31,c);

@@ -39,12 +39,12 @@ Real Dem3DofGeom_WallSphere::slipToDisplacementTMax(Real displacementTMax){
 }
 
 CREATE_LOGGER(Ig2_Wall_Sphere_Dem3DofGeom);
-bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
+bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	Wall* wall=static_cast<Wall*>(cm1.get());
 	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
 
 	Real dist=(state2.pos+shift2)[wall->axis]-state1.pos[wall->axis];
-	if(!c->isReal() && abs(dist)>sphereRadius){ /*LOG_DEBUG("dist="<<dist<<", returning false");*/ return false; } // wall and sphere too far from each other
+	if(!c->isReal() && abs(dist)>sphereRadius && !force){ /*LOG_DEBUG("dist="<<dist<<", returning false");*/ return false; } // wall and sphere too far from each other
 
 	// contact point is sphere center projected onto the wall
 	Vector3r contPt=state2.pos; contPt[wall->axis]=state1.pos[wall->axis];
