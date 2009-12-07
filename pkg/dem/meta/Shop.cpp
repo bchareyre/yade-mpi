@@ -44,6 +44,7 @@ class MetaInteractingGeometry2AABB; */
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
+#include<yade/pkg-common/InteractionDispatchers.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
