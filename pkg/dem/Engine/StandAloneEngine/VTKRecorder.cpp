@@ -119,7 +119,6 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->isReal()) continue;
-			//const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(i->interactionPhysics.get());
 			if(skipFacetIntr){
 				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId1())->shape.get()))) continue;
 				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId2())->shape.get()))) continue;
@@ -128,10 +127,16 @@ void VTKRecorder::action(Scene* rootBody)
 			line->GetPointIds()->SetId(0,I->getId1());
 			line->GetPointIds()->SetId(1,I->getId2());
 			intrCells->InsertNextCell(line);
-			if(recActive[REC_CPM]){
+			if(recActive[REC_CPM]){		//For CPM model 
 				const CpmPhys* phys = YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
 				intrForceN->InsertNextValue(phys->Fn);
 				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
+				intrAbsForceT->InsertNextTupleValue(fs);
+			} else {									//For all other models
+				const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
+				float fn[3]={abs(phys->normalForce[0]),abs(phys->normalForce[1]),abs(phys->normalForce[2])};
+				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
+				intrForceN->InsertNextTupleValue(fn);
 				intrAbsForceT->InsertNextTupleValue(fs);
 			}
 		}
