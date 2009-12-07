@@ -34,7 +34,7 @@ class CL1Relationships : public InteractionPhysicsFunctor
 		int cohesionDefinitionIteration;
 		long iter;//REMOVE THIS
 
-	FUNCTOR2D(CohesiveFrictionalBodyParameters,CohesiveFrictionalBodyParameters);
+	FUNCTOR2D(CohesiveFrictionalMat,CohesiveFrictionalMat);
 	REGISTER_CLASS_NAME(CL1Relationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
 	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(betaR)(setCohesionNow)(setCohesionOnNewContacts));

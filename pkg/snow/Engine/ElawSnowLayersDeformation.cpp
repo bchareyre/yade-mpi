@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"ElawSnowLayersDeformation.hpp"
-#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
@@ -51,8 +51,8 @@ void ElawSnowLayersDeformation::action(Scene* ncb)
 
 			std::cerr << __FILE__ << " " << id1 << " " << id2 << "\n";
 
-			CohesiveFrictionalBodyParameters* de1 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id1]->physicalParameters.get());
-			CohesiveFrictionalBodyParameters* de2 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id2]->physicalParameters.get());
+			CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
+			CohesiveFrictionalMat* de2 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id2]->physicalParameters.get());
 //			SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
 			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> (contact->interactionPhysics.get());
 

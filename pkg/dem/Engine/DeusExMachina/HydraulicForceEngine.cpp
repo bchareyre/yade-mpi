@@ -9,7 +9,7 @@
 #include "HydraulicForceEngine.hpp"
 #include <yade/core/Scene.hpp>
 #include <yade/core/Body.hpp>
-#include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include <vector>
 #include "HydraulicForceEngine.hpp"
 #include <yade/pkg-dem/Shop.hpp>
@@ -55,7 +55,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
 // //             initialPositions.clear();
 // //             for (int i =0; i < initialPositions.size(); ++i)
 // //             {
-// //             	initialPositions[i-6] = (static_cast<CohesiveFrictionalBodyParameters*> (b->physicalParameters.get()))->se3.position[1];
+// //             	initialPositions[i-6] = (static_cast<CohesiveFrictionalMat*> (b->physicalParameters.get()))->se3.position[1];
 // //             	
 // //             }
 //             
@@ -73,7 +73,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
                 if (b->shape && b->shape->getClassName()=="InteractingSphere")
                 {
                     //cerr << "translate it" << endl;
-                    if ((static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken == true)
+                    if ((static_cast<CohesiveFrictionalMat*> (b->material.get()))->isBroken == true)
                     {
 								ncb->bex.addForce(b->getId(),Vector3r(0,5,0));
                     }

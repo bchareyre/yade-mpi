@@ -630,8 +630,8 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 	long t, i;
 	for (i=0; i<number; ++i) {
 		BasicSphere s;
+		s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
 		for (t=0; t<tries; ++t) {
-			s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
 			s.first.X() = lowerCorner.X()+s.second+(dimensions.X()-2*s.second)*random1();
 			s.first.Y() = lowerCorner.Y()+s.second+(dimensions.Y()-2*s.second)*random1();
 			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*random1();

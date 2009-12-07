@@ -15,7 +15,7 @@
 
 #include <yade/lib-miniWm3/Wm3Math.h>
 
-#include <yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include <yade/pkg-dem/ContactLaw1.hpp>
 #include <yade/pkg-dem/CL1Relationships.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -118,7 +118,7 @@ bool SimpleShear::generate()
 
 	shared_ptr<Body> w2;	// The lower one :
 	createBox(w2,Vector3r(width/2.0,-thickness/2.0,0),Vector3r(width/2.0,thickness/2.0,profondeur/2.0));
-	YADE_CAST<CohesiveFrictionalBodyParameters*>(w2->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
+	YADE_CAST<CohesiveFrictionalMat*>(w2->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
 	rootBody->bodies->insert(w2);
 
 	shared_ptr<Body> w3;	// The right one
@@ -127,7 +127,7 @@ bool SimpleShear::generate()
 
 	shared_ptr<Body> w4; // The upper one
 	createBox(w4,Vector3r(width/2.0,height+thickness/2.0,0),Vector3r(width/2.0,thickness/2.0,profondeur/2.0));
-	YADE_CAST<CohesiveFrictionalBodyParameters*>(w4->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
+	YADE_CAST<CohesiveFrictionalMat*>(w4->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
 	rootBody->bodies->insert(w4);
 
 // To close the front and the bottom of the box 
@@ -167,7 +167,7 @@ bool SimpleShear::generate()
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
@@ -209,7 +209,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
