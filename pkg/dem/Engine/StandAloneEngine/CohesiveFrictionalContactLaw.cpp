@@ -7,13 +7,13 @@
 *************************************************************************/
 
 #include "CohesiveFrictionalContactLaw.hpp"
-#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-Vector3r translation_vect_ (0.10,0,0);
+Vector3r translation_vect_ ( 0.10,0,0 );
 
 
 CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver()
@@ -31,357 +31,285 @@ CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver
 }
 
 
-void out(Quaternionr q)
+void out ( Quaternionr q )
 {
 	Vector3r axis;
 	Real angle;
-	q.ToAxisAngle(axis,angle);
+	q.ToAxisAngle ( axis,angle );
 	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", angle: " << angle << " | ";
 }
 
-void outv(Vector3r axis)
+void outv ( Vector3r axis )
 {
 	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", length: " << axis.Length() << " | ";
 }
 
-void CohesiveFrictionalContactLaw::action(Scene* ncb)
+void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 {
-    shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
-    Real dt = Omega::instance().getTimeStep();
+	Real dt = Omega::instance().getTimeStep();
 //    static long ncount = 0;//REMOVE
 //    ncount = 0;
 
-    ///Reset the isBroken flag
-    //if (iter != Omega::instance().getCurrentIteration())
-    //
-    if (detectBrokenBodies)
-    {
-        BodyContainer::iterator bi    = bodies->begin();
-        BodyContainer::iterator biEnd = bodies->end();
-        for ( ; bi!=biEnd ; ++bi )
-        {
-            shared_ptr<Body> b = *bi;
-            if (b->shape && b->shape->getClassName()=="InteractingSphere")
-                (static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken = true;
-            // b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
-        }
-    }
-    //iter = Omega::instance().getCurrentIteration();
+	///Reset the isBroken flag
+	//if (iter != Omega::instance().getCurrentIteration())
+	//
+	if ( detectBrokenBodies )
+	{
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for ( ; bi!=biEnd ; ++bi )
+		{
+			shared_ptr<Body> b = *bi;
+			if ( b->shape && b->shape->getClassName() =="InteractingSphere" )
+				( static_cast<CohesiveFrictionalMat*> ( b->material.get() ) )->isBroken = true;
+			// b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
+		}
+	}
+	//iter = Omega::instance().getCurrentIteration();
 
-    InteractionContainer::iterator ii    = ncb->interactions->begin();
-    InteractionContainer::iterator iiEnd = ncb->interactions->end();
-    for (  ; ii!=iiEnd ; ++ii )
-    {
-        //if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
-        if ((*ii)->isReal())
-        {
-            if (detectBrokenBodies 
-		    /* FIXME - this had no effect. InteractingBox has its isBroken=false too.
-		     *
-		     * FIXME - got to replace this with a working test.
-		     *
-		     * && (*bodies)[(*ii)->getId1()]->shape->getClassName() != "box"  
-		     * && (*bodies)[(*ii)->getId2()]->shape->getClassName() != "box" */
-		    )
-            {
-                YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId1()]->material.get())->isBroken = false;
-		YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[(*ii)->getId2()]->material.get())->isBroken = false;
-            }
+	InteractionContainer::iterator ii    = ncb->interactions->begin();
+	InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	for ( ; ii!=iiEnd ; ++ii )
+	{
+		//if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
+		if ( ( *ii )->isReal() )
+		{
+			if ( detectBrokenBodies
+					  && (*bodies)[(*ii)->getId1()]->shape->getClassName() != "box"
+					  && (*bodies)[(*ii)->getId2()]->shape->getClassName() != "box"
+			   )
+			{
+				YADE_CAST<CohesiveFrictionalMat*> ( ( *bodies ) [ ( *ii )->getId1() ]->material.get() )->isBroken = false;
+				YADE_CAST<CohesiveFrictionalMat*> ( ( *bodies ) [ ( *ii )->getId2() ]->material.get() )->isBroken = false;
+			}
 
-            const shared_ptr<Interaction>& contact = *ii;
-            int id1 = contact->getId1();
-            int id2 = contact->getId2();
+			const shared_ptr<Interaction>& contact = *ii;
+			int id1 = contact->getId1();
+			int id2 = contact->getId2();
 
-            if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
-                continue; // skip other groups,
+			if ( ! ( ( *bodies ) [id1]->getGroupMask() & ( *bodies ) [id2]->getGroupMask() & sdecGroupMask ) )
+				continue; // skip other groups,
 
-	   // CohesiveFrictionalBodyParameters* de1 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id1]->material.get());
-	   // CohesiveFrictionalBodyParameters* de2 			= YADE_CAST<CohesiveFrictionalBodyParameters*>((*bodies)[id2]->material.get());
-	    
-	    Body* b1 = (*bodies)[id1].get();
-	    Body* b2 = (*bodies)[id2].get();
-	    
-            SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
-            CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> (contact->interactionPhysics.get());
+			Body* b1 = ( *bodies ) [id1].get();
+			Body* b2 = ( *bodies ) [id2].get();
 
-            Vector3r& shearForce 			= currentContactPhysics->shearForce;
+			SpheresContactGeometry* currentContactGeometry  = YADE_CAST<SpheresContactGeometry*> ( contact->interactionGeometry.get() );
+			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> ( contact->interactionPhysics.get() );
 
-				if (contact->isFresh(ncb)) shearForce			= Vector3r::ZERO;
+			Vector3r& shearForce    = currentContactPhysics->shearForce;
 
-            Real un 				= currentContactGeometry->penetrationDepth;
-            Real Fn				= currentContactPhysics->kn*un;
-            currentContactPhysics->normalForce	= Fn*currentContactGeometry->normal;
-            if (   un < 0 
-		&& (   currentContactPhysics->normalForce.SquaredLength() > pow(currentContactPhysics->normalAdhesion,2) 
-		    || currentContactPhysics->normalAdhesion==0
-		   )
-	       )
-            { // BREAK due to tension
+			if ( contact->isFresh ( ncb ) ) shearForce   = Vector3r::ZERO;
 
-                //currentContactPhysics->SetBreakingState();
-                //if (currentContactPhysics->cohesionBroken) {
-                //cerr << "broken" << endl;
+			Real un     = currentContactGeometry->penetrationDepth;
+			Real Fn    = currentContactPhysics->kn*un;
+			currentContactPhysics->normalForce = Fn*currentContactGeometry->normal;
+			if ( un < 0
+					&& ( currentContactPhysics->normalForce.SquaredLength() > pow ( currentContactPhysics->normalAdhesion,2 )
+						 || currentContactPhysics->normalAdhesion==0
+					   )
+			   )
+			{
+				// BREAK due to tension
 
-                ncb->interactions->requestErase(contact->getId1(),contact->getId2());
-                // contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
-		currentContactPhysics->cohesionBroken = true;
-                currentContactPhysics->normalForce = Vector3r::ZERO;
-                currentContactPhysics->shearForce = Vector3r::ZERO;
+				//currentContactPhysics->SetBreakingState();
+				//if (currentContactPhysics->cohesionBroken) {
+				//cerr << "broken" << endl;
 
-                //return;
-                //    } else
-                //    currentContactPhysics->normalForce	= -currentContactPhysics->normalAdhesion*currentContactGeometry->normal;
-            }
-            else
-            {
+				ncb->interactions->requestErase ( contact->getId1(),contact->getId2() );
+				// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
+				currentContactPhysics->cohesionBroken = true;
+				currentContactPhysics->normalForce = Vector3r::ZERO;
+				currentContactPhysics->shearForce = Vector3r::ZERO;
 
-                Vector3r axis;
-                Real angle;
+				//return;
+				//    } else
+				//    currentContactPhysics->normalForce = -currentContactPhysics->normalAdhesion*currentContactGeometry->normal;
+			}
+			else
+			{
 
-                /// Here is the code with approximated rotations 	 ///
+				Vector3r axis;
+				Real angle;
 
-		axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
-		shearForce 	       -= shearForce.Cross(axis);
-		angle 			= dt*0.5*currentContactGeometry->normal.Dot(Body::byId(id1)->state->angVel+Body::byId(id2)->state->angVel);
-		axis 			= angle*currentContactGeometry->normal;
-		shearForce 	       -= shearForce.Cross(axis);
+				/// Here is the code with approximated rotations   ///
 
-                /// Here is the code with exact rotations 		 ///
+				axis    = currentContactPhysics->prevNormal.Cross ( currentContactGeometry->normal );
+				shearForce         -= shearForce.Cross ( axis );
+				angle    = dt*0.5*currentContactGeometry->normal.Dot ( Body::byId ( id1 )->state->angVel+Body::byId ( id2 )->state->angVel );
+				axis    = angle*currentContactGeometry->normal;
+				shearForce         -= shearForce.Cross ( axis );
 
-                // 		Quaternionr q;
-                //
-                // 		axis					= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
-                // 		angle					= acos(currentContactGeometry->normal.dot(currentContactPhysics->prevNormal));
-                // 		q.fromAngleAxis(angle,axis);
-                //
-                // 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
-                //
-                // 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
-                // 		axis					= currentContactGeometry->normal;
-                // 		q.fromAngleAxis(angle,axis);
-                // 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
-
-                /// 							 ///
-
-		
-		
-                Vector3r x				= currentContactGeometry->contactPoint;
-		Vector3r c1x				= (x - b1->state->pos);
-		Vector3r c2x				= (x - b2->state->pos);
-                /// The following definition of c1x and c2x is to avoid "granular ratcheting" 
-		///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
-		///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
-		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
-                Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
-                Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
-		Vector3r relativeVelocity		= ( b2->state->vel+b2->state->angVel.Cross(_c2x_)) - (b1->state->vel+b1->state->angVel.Cross(_c1x_));
-                Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
-                Vector3r shearDisplacement		= shearVelocity*dt;
+				
+				Vector3r x    = currentContactGeometry->contactPoint;
+				Vector3r c1x    = ( x - b1->state->pos );
+				Vector3r c2x    = ( x - b2->state->pos );
+				/// The following definition of c1x and c2x is to avoid "granular ratcheting"
+				///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN,
+				///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
+				///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
+				Vector3r _c1x_ = currentContactGeometry->radius1*currentContactGeometry->normal;
+				Vector3r _c2x_ = -currentContactGeometry->radius2*currentContactGeometry->normal;
+				Vector3r relativeVelocity  = ( b2->state->vel+b2->state->angVel.Cross ( _c2x_ ) ) - ( b1->state->vel+b1->state->angVel.Cross ( _c1x_ ) );
+				Vector3r shearVelocity   = relativeVelocity-currentContactGeometry->normal.Dot ( relativeVelocity ) *currentContactGeometry->normal;
+				Vector3r shearDisplacement  = shearVelocity*dt;
 
 
 ///////////////////////// CREEP START (commented out) ///////////
-if(shear_creep){
-	shearForce                            -= currentContactPhysics->ks*(shearDisplacement + shearForce*dt/creep_viscosity);
-} else {
-shearForce 			       -= currentContactPhysics->ks*shearDisplacement;
-}
+				if ( shear_creep )
+				{
+					shearForce                            -= currentContactPhysics->ks* ( shearDisplacement + shearForce*dt/creep_viscosity );
+				}
+				else
+				{
+					shearForce           -= currentContactPhysics->ks*shearDisplacement;
+				}
 ///////////////////////// CREEP END /////////////////////////////
 
-                //  cerr << "shearForce = " << shearForce << endl;
-                Real maxFs = 0;
-                Real Fs = currentContactPhysics->shearForce.Length();
-                //if (!currentContactPhysics->cohesionBroken) {
-                maxFs = std::max((Real) 0, currentContactPhysics->shearAdhesion + Fn*currentContactPhysics->tangensOfFrictionAngle);
-                // if (!currentContactPhysics->cohesionDisablesFriction)
-                //         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
-                //} else
-                // maxFs = Fn * currentContactPhysics->tangensOfFrictionAngle;
-                //  cerr << "maxFs = " << maxFs << "     Fs = " << Fs<< endl;
-                if ( Fs  > maxFs )
-                {
-			currentContactPhysics->cohesionBroken = true;
+				//  cerr << "shearForce = " << shearForce << endl;
+				Real maxFs = 0;
+				Real Fs = currentContactPhysics->shearForce.Length();
+				//if (!currentContactPhysics->cohesionBroken) {
+				maxFs = std::max ( ( Real ) 0, currentContactPhysics->shearAdhesion + Fn*currentContactPhysics->tangensOfFrictionAngle );
+				// if (!currentContactPhysics->cohesionDisablesFriction)
+				//         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
+				//} else
+				// maxFs = Fn * currentContactPhysics->tangensOfFrictionAngle;
+				//  cerr << "maxFs = " << maxFs << "     Fs = " << Fs<< endl;
+				if ( Fs  > maxFs )
+				{
+					currentContactPhysics->cohesionBroken = true;
 
-                    // brokenStatus[
-                    //if (currentContactPhysics->fragile && !currentContactPhysics->cohesionBroken)
-		    
-			currentContactPhysics->SetBreakingState();
+					// brokenStatus[
+					//if (currentContactPhysics->fragile && !currentContactPhysics->cohesionBroken)
 
-                    //     maxFs = currentContactPhysics->shearAdhesion;
-                    //    if (!currentContactPhysics->cohesionDisablesFriction && un>0)
-                    //         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
+					currentContactPhysics->SetBreakingState();
 
-                    maxFs = max((Real) 0, Fn * currentContactPhysics->tangensOfFrictionAngle);
+					//     maxFs = currentContactPhysics->shearAdhesion;
+					//    if (!currentContactPhysics->cohesionDisablesFriction && un>0)
+					//         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
 
-                    //cerr << "currentContactPhysics->tangensOfFrictionAngle = " << currentContactPhysics->tangensOfFrictionAngle << endl;
-                    // cerr << "maxFs = " << maxFs << endl;
+					maxFs = max ( ( Real ) 0, Fn * currentContactPhysics->tangensOfFrictionAngle );
 
-                    maxFs = maxFs / Fs;
-                    // cerr << "maxFs = " << maxFs << endl;
-                    if (maxFs>1)
-                        cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-                    shearForce *= maxFs;
-			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::ZERO;
-                }
+					//cerr << "currentContactPhysics->tangensOfFrictionAngle = " << currentContactPhysics->tangensOfFrictionAngle << endl;
+					// cerr << "maxFs = " << maxFs << endl;
 
-                //if (!currentContactPhysics->cohesionBroken)
-                //{
-                //cerr << "de1->isBroken == false;" << endl;
-//                     if ((*bodies)[id1]->shape->getClassName() != "box"  && (*bodies)[id2]->shape->getClassName() != "box")
-//                     de1->isBroken = false;
-//                     de2->isBroken = false;
-//                ++ncount;//REMOVE
-                //(*bodies)[id1]->geometricalModel->diffuseColor= Vector3r(0.8,0.3,0.3);
-                //(*bodies)[id2]->geometricalModel->diffuseColor= Vector3r(0.8,0.3,0.3);
-                //}
+					maxFs = maxFs / Fs;
+					// cerr << "maxFs = " << maxFs << endl;
+					if ( maxFs>1 )
+						cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+					shearForce *= maxFs;
+					if ( Fn<0 )  currentContactPhysics->normalForce = Vector3r::ZERO;
+				}
 
-                ////////// PFC3d SlipModel
+		////////// PFC3d SlipModel
 
-                Vector3r f				= currentContactPhysics->normalForce + shearForce;
-                // cerr << "currentContactPhysics->normalForce= " << currentContactPhysics->normalForce << endl;
-                //  cerr << "shearForce " << shearForce << endl;
-                // cerr << "f= " << f << endl;
-                // it will be some macro(	body->physicalActions,	ActionType , bodyId )
-					ncb->bex.addForce (id1,-f);
-					ncb->bex.addForce (id2, f);
-					ncb->bex.addTorque(id1,-c1x.Cross(f));
-					ncb->bex.addTorque(id2, c2x.Cross(f));
+				Vector3r f    = currentContactPhysics->normalForce + shearForce;
+				// cerr << "currentContactPhysics->normalForce= " << currentContactPhysics->normalForce << endl;
+				//  cerr << "shearForce " << shearForce << endl;
+				// cerr << "f= " << f << endl;
+				// it will be some macro( body->physicalActions, ActionType , bodyId )
+				ncb->bex.addForce ( id1,-f );
+				ncb->bex.addForce ( id2, f );
+				ncb->bex.addTorque ( id1,-c1x.Cross ( f ) );
+				ncb->bex.addTorque ( id2, c2x.Cross ( f ) );
 
-/////	/// Moment law					 	 ///
-/////		if(momentRotationLaw /*&& currentContactPhysics->cohesionBroken == false*/ )
-/////		{	
-/////			Quaternionr delta = ...
-/////
-/////	//This indentation is a rewrite of original equations (the two commented lines), should work exactly the same.
-///////Real elasticMoment = currentContactPhysics->kr * std::abs(angle); // positive value (*)
-/////
-/////	Real angle_twist(angle * axis.Dot(currentContactGeometry->normal) );
-/////	Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
-//////* no creep	
-////////////////////////////// CREEP START ///////////////////////////
-/////			Real viscosity_twist = viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
-/////			Real angle_twist_creeped = angle_twist * (1 - dt/viscosity_twist);
-/////			Quaternionr q_twist(currentContactGeometry->normal , angle_twist);
-/////			//Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist*0.996);
-/////			Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist_creeped);
-/////			Quaternionr q_twist_delta(q_twist_creeped * q_twist.Conjugate() );
-/////			// modify the initialRelativeOrientation to substract some twisting
-/////			currentContactPhysics->initialRelativeOrientation = currentContactPhysics->initialRelativeOrientation * q_twist_delta;
-////////////////////////////// CREEP END /////////////////////////////
-/////*/
-/////	Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
-/////
-/////	Vector3r axis_bending(angle*axis - axis_twist);
-/////	Vector3r moment_bending(axis_bending * currentContactPhysics->kr);
-/////
-/////			/*
-/////			// We cannot have insanely big moment, so we take a min value of ELASTIC and PLASTIC moment.
-/////			Real avgRadius = 0.5 * (currentContactGeometry->radius1 + currentContactGeometry->radius2);
-/////			// FIXME - elasticRollingLimit is currently assumed to be 1.0
-/////			Real plasticMoment = currentContactPhysics->elasticRollingLimit * avgRadius * std::abs(Fn); // positive value (*)
-/////			Real moment(std::min(elasticMoment, plasticMoment)); // RESULT
-/////			*/
-/////
-///////Vector3r moment = axis * elasticMoment * (angle<0.0?-1.0:1.0); // restore sign. (*)
-/////
-/////	Vector3r moment = moment_twist + moment_bending;
-/////
-/////			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += moment;
-/////			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= moment;
-/////		}
-/////	/// Moment law	END				 	 ///
 
-	/// Moment law					 	 ///
-		if(momentRotationLaw && (currentContactPhysics->cohesionBroken == false || always_use_moment_law) )
-		{
-			// Not necessary. OK.
-			//{// updates only orientation of contact (local coordinate system)
-			//	Vector3r axis = currentContactPhysics->prevNormal.UnitCross(currentContactGeometry->normal);
-			//	Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
-			//	Quaternionr align(axis,angle);
-			//	currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
-			//}
 
-			Quaternionr delta( b1->state->ori * currentContactPhysics->initialOrientation1.Conjugate() *
-		                           currentContactPhysics->initialOrientation2 * b2->state->ori.Conjugate());
-			if(twist_creep){
-				delta = delta * currentContactPhysics->twistCreep;
-			}
+				/// Moment law        ///
+				if ( momentRotationLaw && ( currentContactPhysics->cohesionBroken == false || always_use_moment_law ) )
+				{
+					// Not necessary. OK.
+					//{// updates only orientation of contact (local coordinate system)
+					// Vector3r axis = currentContactPhysics->prevNormal.UnitCross(currentContactGeometry->normal);
+					// Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
+					// Quaternionr align(axis,angle);
+					// currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
+					//}
 
-			Vector3r axis;	// axis of rotation - this is the Moment direction UNIT vector.
-			Real angle;	// angle represents the power of resistant ELASTIC moment
-			delta.ToAxisAngle(axis,angle);
-			if(angle > Mathr::PI) angle -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi 
+					Quaternionr delta ( b1->state->ori * currentContactPhysics->initialOrientation1.Conjugate() *
+										currentContactPhysics->initialOrientation2 * b2->state->ori.Conjugate() );
+					if ( twist_creep )
+					{
+						delta = delta * currentContactPhysics->twistCreep;
+					}
 
-	//This indentation is a rewrite of original equations (the two commented lines), should work exactly the same.
+					Vector3r axis; // axis of rotation - this is the Moment direction UNIT vector.
+					Real angle; // angle represents the power of resistant ELASTIC moment
+					delta.ToAxisAngle ( axis,angle );
+					if ( angle > Mathr::PI ) angle -= Mathr::TWO_PI; // angle is between 0 and 2*pi, but should be between -pi and pi
+
+					//This indentation is a rewrite of original equations (the two commented lines), should work exactly the same.
 //Real elasticMoment = currentContactPhysics->kr * std::abs(angle); // positive value (*)
 
-	Real angle_twist(angle * axis.Dot(currentContactGeometry->normal) );
-	Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
+					Real angle_twist ( angle * axis.Dot ( currentContactGeometry->normal ) );
+					Vector3r axis_twist ( angle_twist * currentContactGeometry->normal );
 
-			if(twist_creep){
-				Real viscosity_twist = creep_viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
-				Real angle_twist_creeped = angle_twist * (1 - dt/viscosity_twist);
-				Quaternionr q_twist(currentContactGeometry->normal , angle_twist);
-				//Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist*0.996);
-				Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist_creeped);
-				Quaternionr q_twist_delta(q_twist_creeped * q_twist.Conjugate() );
-		currentContactPhysics->twistCreep = currentContactPhysics->twistCreep * q_twist_delta;
-				// modify the initialRelativeOrientation to substract some twisting
-			//	currentContactPhysics->initialRelativeOrientation = currentContactPhysics->initialRelativeOrientation * q_twist_delta;
-			//currentContactPhysics->initialOrientation1 = currentContactPhysics->initialOrientation1 * q_twist_delta;
-			//currentContactPhysics->initialOrientation2 = currentContactPhysics->initialOrientation2 * q_twist_delta.Conjugate();
-			}
+					if ( twist_creep )
+					{
+						Real viscosity_twist = creep_viscosity * std::pow ( ( 2 * std::min ( currentContactGeometry->radius1,currentContactGeometry->radius2 ) ),2 ) / 16.0;
+						Real angle_twist_creeped = angle_twist * ( 1 - dt/viscosity_twist );
+						Quaternionr q_twist ( currentContactGeometry->normal , angle_twist );
+						//Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist*0.996);
+						Quaternionr q_twist_creeped ( currentContactGeometry->normal , angle_twist_creeped );
+						Quaternionr q_twist_delta ( q_twist_creeped * q_twist.Conjugate() );
+						currentContactPhysics->twistCreep = currentContactPhysics->twistCreep * q_twist_delta;
+						// modify the initialRelativeOrientation to substract some twisting
+						// currentContactPhysics->initialRelativeOrientation = currentContactPhysics->initialRelativeOrientation * q_twist_delta;
+						//currentContactPhysics->initialOrientation1 = currentContactPhysics->initialOrientation1 * q_twist_delta;
+						//currentContactPhysics->initialOrientation2 = currentContactPhysics->initialOrientation2 * q_twist_delta.Conjugate();
+					}
 
 
-	Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
+					Vector3r moment_twist ( axis_twist * currentContactPhysics->kr );
 
-	Vector3r axis_bending(angle*axis - axis_twist);
-	Vector3r moment_bending(axis_bending * currentContactPhysics->kr);
+					Vector3r axis_bending ( angle*axis - axis_twist );
+					Vector3r moment_bending ( axis_bending * currentContactPhysics->kr );
 
 //Vector3r moment = axis * elasticMoment * (angle<0.0?-1.0:1.0); // restore sign. (*)
 
-	Vector3r moment = moment_twist + moment_bending;
-currentContactPhysics->moment_twist = moment_twist;
-currentContactPhysics->moment_bending = moment_bending;
-			ncb->bex.addTorque(id1,-moment);
-			ncb->bex.addTorque(id2, moment);
+					Vector3r moment = moment_twist + moment_bending;
+					currentContactPhysics->moment_twist = moment_twist;
+					currentContactPhysics->moment_bending = moment_bending;
+					ncb->bex.addTorque ( id1,-moment );
+					ncb->bex.addTorque ( id2, moment );
+				}
+				/// Moment law END       ///
+
+				currentContactPhysics->prevNormal = currentContactGeometry->normal;
+			}
 		}
-	/// Moment law	END				 	 ///
-
-                currentContactPhysics->prevNormal = currentContactGeometry->normal;
-            }
-        }
-    }
-    if (detectBrokenBodies)
-    {
-    	BodyContainer::iterator bi    = bodies->begin();
-        BodyContainer::iterator biEnd = bodies->end();
-        for ( ; bi!=biEnd ; ++bi )
-        {
-            shared_ptr<Body> b = *bi;
-            if (b->shape && b->shape->getClassName()=="InteractingSphere" && erosionActivated)
-            {
-                //cerr << "translate it" << endl;
-                if ((static_cast<CohesiveFrictionalBodyParameters*> (b->material.get()))->isBroken == true)
-                {
-                    if (b->isDynamic)
-                        b->state->pos += translation_vect_;
-                    b->isDynamic = false;
-                    b->shape->diffuseColor= Vector3r(0.5,0.3,0.9);
+	}
+	if ( detectBrokenBodies )
+	{
+		BodyContainer::iterator bi    = bodies->begin();
+		BodyContainer::iterator biEnd = bodies->end();
+		for ( ; bi!=biEnd ; ++bi )
+		{
+			shared_ptr<Body> b = *bi;
+			if ( b->shape && b->shape->getClassName() =="InteractingSphere" && erosionActivated )
+			{
+				//cerr << "translate it" << endl;
+				if ( ( static_cast<CohesiveFrictionalMat*> ( b->material.get() ) )->isBroken == true )
+				{
+					if ( b->isDynamic )
+						b->state->pos += translation_vect_;
+					b->isDynamic = false;
+					b->shape->diffuseColor= Vector3r ( 0.5,0.3,0.9 );
 
 
-                }
-                else  b->shape->diffuseColor= Vector3r(0.5,0.9,0.3);
-            }
-        }
-    }
-    //cerr << "ncount= " << ncount << endl;//REMOVE
+				}
+				else  b->shape->diffuseColor= Vector3r ( 0.5,0.9,0.3 );
+			}
+		}
+	}
+	//cerr << "ncount= " << ncount << endl;//REMOVE
 
 
 }
 
-YADE_PLUGIN((CohesiveFrictionalContactLaw));
+YADE_PLUGIN ( ( CohesiveFrictionalContactLaw ) );
 
 
 

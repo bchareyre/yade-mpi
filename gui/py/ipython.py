@@ -35,7 +35,7 @@ o=ip.options
 o.separate_in,o.separate_out,o.separate_out2="0","0","0"
 # from ipython manpage
 o.prompt_in1="Yade [\#]: "
-o.prompt_in2="Yade ..\D. "
+o.prompt_in2="     .\D.. "
 o.prompt_out=" ->  [\#]: "
 #ip.options.profile='yade'
 

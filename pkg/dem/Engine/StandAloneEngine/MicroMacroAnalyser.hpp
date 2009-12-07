@@ -18,7 +18,7 @@
 
 /*! \brief Compute quantities like fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing
 		
-	This class is using a separate library built from extra/triangulation sources		
+	This class is using a separate library built from lib/triangulation sources		
  */
 
 class KinematicLocalisationAnalyser;

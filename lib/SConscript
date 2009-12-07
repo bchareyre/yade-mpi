@@ -48,7 +48,7 @@ if 'opengl' in env['features']:
 		# since the generated header is #include'd "...", it looks for it in the original dir
 		# no idea why this _does_ work with gui/qt3. Go figure.
 		CPPPATH=env['CPPPATH']+['${TARGET.dir}'],
-		LIBS=env['LIBS']+['GL']
+		LIBS=env['LIBS']+['GLU','GL']
 	)
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','$QGLVIEWER_LIB']),
 #env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary

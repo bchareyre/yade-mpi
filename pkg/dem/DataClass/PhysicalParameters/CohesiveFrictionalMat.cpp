@@ -6,20 +6,20 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "CohesiveFrictionalBodyParameters.hpp"
+#include "CohesiveFrictionalMat.hpp"
 
-CohesiveFrictionalBodyParameters::CohesiveFrictionalBodyParameters () : GranularMat()
+CohesiveFrictionalMat::CohesiveFrictionalMat () : GranularMat()
 {
 	createIndex();
 	isBroken=true;
 	isCohesive=true;
 }
 
-CohesiveFrictionalBodyParameters::~CohesiveFrictionalBodyParameters()
+CohesiveFrictionalMat::~CohesiveFrictionalMat()
 {
 }
 
-YADE_PLUGIN((CohesiveFrictionalBodyParameters));
+YADE_PLUGIN((CohesiveFrictionalMat));
 
 
 

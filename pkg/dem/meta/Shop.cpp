@@ -44,6 +44,7 @@ class MetaInteractingGeometry2AABB; */
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
+#include<yade/pkg-common/InteractionDispatchers.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 
@@ -429,20 +430,24 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 	}
 }
 
-shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2){
+shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t id2, bool force){
 	InteractionGeometryDispatcher* geomMeta=NULL;
 	InteractionPhysicsDispatcher* physMeta=NULL;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("transientInteraction already exists between #")+lexical_cast<string>(id1)+" and "+lexical_cast<string>(id2));
+	if(rb->interactions->find(body_id_t(id1),body_id_t(id2))!=0) throw runtime_error(string("Interaction #")+lexical_cast<string>(id1)+"+#"+lexical_cast<string>(id2)+" already exists.");
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<InteractionGeometryDispatcher*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<InteractionPhysicsDispatcher*>(e.get()); if(physMeta) continue; }
+		InteractionDispatchers* id(dynamic_cast<InteractionDispatchers*>(e.get()));
+		if(id){ geomMeta=id->geomDispatcher.get(); physMeta=id->physDispatcher.get(); }
 		if(geomMeta&&physMeta){break;}
 	}
-	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines.");
-	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines.");
+	if(!geomMeta) throw runtime_error("No InteractionGeometryDispatcher in engines or inside InteractionDispatchers.");
+	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines or inside InteractionDispatchers.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
-	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2);
+	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2,/*force*/force);
+	assert(force || i);
+	if(!i) return i;
 	physMeta->explicitAction(b1->material,b2->material,i);
 	rb->interactions->insert(i);
 	return i;

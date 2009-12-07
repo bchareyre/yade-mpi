@@ -43,7 +43,7 @@ CREATE_LOGGER(Tetra2TetraBang);
  * @todo thoroughly test this for numerical correctness.
  *
  */
-bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
+bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 	TetraMold* A = static_cast<TetraMold*>(cm1.get());
 	TetraMold* B = static_cast<TetraMold*>(cm2.get());
@@ -188,9 +188,9 @@ bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& c
 	return true;
 }
 
-bool Tetra2TetraBang::goReverse(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& interaction){
+bool Tetra2TetraBang::goReverse(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 	// reverse only normal direction, otherwise use the inverse contact
-	bool isInteracting=go(cm2,cm1,state2,state1,-shift2,interaction);
+	bool isInteracting=go(cm2,cm1,state2,state1,-shift2,force,interaction);
 	if(isInteracting){
 		TetraBang* bang=static_cast<TetraBang*>(interaction->interactionGeometry.get());
 		bang->normal*=-1;

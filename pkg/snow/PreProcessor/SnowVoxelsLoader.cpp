@@ -7,7 +7,7 @@
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -106,7 +106,7 @@ SnowVoxelsLoader::SnowVoxelsLoader() : FileGenerator()
 	use_grain_shear_creep	= true;
 	use_grain_twist_creep	= true;
 
-// a pixel is 20.4 microns (2.04 × 10-5 meters)
+// a pixel is 20.4 microns (2.04 ï¿½ 10-5 meters)
 // the sample was 10.4mm high
 	one_voxel_in_meters_is	= 2.04e-5;
 	layer_distance_voxels   = 6.0;
@@ -534,7 +534,7 @@ void SnowVoxelsLoader::positionRootBody(shared_ptr<Scene>& rootBody)
 void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, bool dynamic , boost::shared_ptr<BshSnowGrain> grain)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<BshSnowGrain> gSnowGrain(grain);
 	
@@ -582,7 +582,7 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	

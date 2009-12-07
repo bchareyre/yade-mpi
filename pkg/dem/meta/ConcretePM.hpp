@@ -334,13 +334,15 @@ REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 class CpmStateUpdater: public PeriodicEngine {
 	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {} };
 	public:
+		//! average residual strength
+		static Real avgRelResidual;
 		//! maximum damage over all contacts
 		static Real maxOmega;
 		CpmStateUpdater(){maxOmega=0; /* run at the very beginning */ initRun=true;}
 		virtual void action(Scene* rb){ update(rb); }
 		static void update(Scene* rb=NULL);
 	DECLARE_LOGGER;
-	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega));
+	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega)(avgRelResidual));
 	REGISTER_CLASS_AND_BASE(CpmStateUpdater,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(CpmStateUpdater);

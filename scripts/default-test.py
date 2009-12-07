@@ -6,29 +6,36 @@
 # using the default SMTP settings (sendmail?) on your system
 #
 import os,time,sys
-import yade.runtime
+from yade import *
+import yade.runtime,yade.system,yade.config
 simulFile='/tmp/yade-test-%d.xml'%(os.getpid()) # generated simulations here
 pyCmdFile='/tmp/yade-test-%d.py'%(os.getpid()) # generated script here
 msgFile='/tmp/yade-test-%d.msg'%(os.getpid()) # write message here
 runSimul="""
 # generated file
+from yade import *
 simulFile='%s'; msgFile='%s'; nIter=%d;
 import time
 try:
-	o=Omega(); o.load(simulFile)
-	o.run(10); o.wait() # run first 10 iterations
-	start=time.time(); o.run(nIter); o.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
+	O.load(simulFile)
+	O.run(10); O.wait() # run first 10 iterations
+	start=time.time(); O.run(nIter); O.wait(); finish=time.time() # run nIter iterations, wait to finish, measure elapsed time
 	speed=nIter/(finish-start); open(msgFile,'w').write('%%g iter/sec'%%speed)
 except:
 	import sys, traceback
 	traceback.print_exc()
 	sys.exit(1)
+print 'main: Yade: normal exit.'
+O.exitNoBacktrace()
 quit()
 """%(simulFile,msgFile,100)
 
 runGenerator="""
 #generated file
-FileGenerator('%%s'%%s).generate('%s')
+from yade import *
+%%s(%%s).generate('%s')
+print 'main: Yade: normal exit.'
+O.exitNoBacktrace()
 quit()
 """%(simulFile)
 
@@ -37,7 +44,7 @@ def crashProofRun(cmd,quiet=True):
 	import subprocess,os,os.path,yade.runtime
 	f=open(pyCmdFile,'w'); f.write(cmd); f.close(); 
 	if os.path.exists(msgFile): os.remove(msgFile)
-	p=subprocess.Popen([yade.runtime.executable,'-N','PythonUI','--','-n','-s',pyCmdFile],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	p=subprocess.Popen([sys.executable,pyCmdFile],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=dict(os.environ,**{'PYTHONPATH':os.path.join(yade.config.prefix,'lib','yade'+yade.config.suffix,'py'),'DISPLAY':''}))
 	pout=p.communicate()[0]
 	retval=p.wait()
 	if not quiet: print pout
@@ -56,9 +63,8 @@ broken=[]
 genParams={
 	#'USCTGen':{'spheresFile':'examples/small.sdec.xyz'}
 }
-o=Omega()
 
-for pp in o.childClasses('FileGenerator'):
+for pp in yade.system.childClasses('FileGenerator'):
 	if pp in broken:
 		summary.append(pp,'skipped (broken)','');
 	params='' if pp not in genParams else (","+",".join(["%s=%s"%(k,repr(genParams[pp][k])) for k in genParams[pp]]))

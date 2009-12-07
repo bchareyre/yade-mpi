@@ -11,7 +11,7 @@
 #include<yade/pkg-dem/ContactLaw1Interaction.hpp>
 // #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
 // #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
-#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -37,12 +37,12 @@ CL1Relationships::CL1Relationships()
 //
 //
 
-void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalBodyParameters
-					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalBodyParameters
+void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalMat
+					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalMat
 					, const shared_ptr<Interaction>& interaction)
 {
-	CohesiveFrictionalBodyParameters* sdec1 = static_cast<CohesiveFrictionalBodyParameters*>(b1.get());
-	CohesiveFrictionalBodyParameters* sdec2 = static_cast<CohesiveFrictionalBodyParameters*>(b2.get());
+	CohesiveFrictionalMat* sdec1 = static_cast<CohesiveFrictionalMat*>(b1.get());
+	CohesiveFrictionalMat* sdec2 = static_cast<CohesiveFrictionalMat*>(b2.get());
 	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once

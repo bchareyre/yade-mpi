@@ -14,7 +14,7 @@
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalBodyParameters.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -375,7 +375,7 @@ bool SnowCreepTest::generate()
 void SnowCreepTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Sphere> gSphere(new Sphere);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
@@ -427,7 +427,7 @@ void SnowCreepTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real
 void SnowCreepTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalBodyParameters> physics(new CohesiveFrictionalBodyParameters);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<Box> gBox(new Box);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);

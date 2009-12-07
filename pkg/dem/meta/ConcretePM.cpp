@@ -43,8 +43,8 @@ void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared
 	contPhys->epsCrackOnset=epsCrackOnset;
 	contPhys->epsFracture=relDuctility*epsCrackOnset;
 	// inherited from NormalShearInteracion, used in the timestepper
-	contPhys->kn=contPhys->E*contPhys->crossSection;
-	contPhys->ks=contPhys->G*contPhys->crossSection;
+
+	// contPhys->kn, contPhys->ks assigned in the constitutive law, as they depend on area of the contact as well
 
 	if(neverDamage) contPhys->neverDamage=true;
 	if(cohesiveThresholdIter<0 || (Omega::instance().getCurrentIteration()<cohesiveThresholdIter)) contPhys->isCohesive=true;
@@ -134,9 +134,15 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=1.;
 #endif
 
 
-void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
+void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* scene){
 	Dem3DofGeom* contGeom=static_cast<Dem3DofGeom*>(_geom.get());
 	CpmPhys* BC=static_cast<CpmPhys*>(_phys.get());
+
+	// just the first time
+	if(I->isFresh(scene)){
+		BC->kn=BC->crossSection*BC->E/contGeom->refLength;
+		BC->ks=BC->crossSection*BC->G/contGeom->refLength;
+	}
 
 	// shorthands
 		Real& epsN(BC->epsN);
@@ -198,20 +204,20 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	// handle broken contacts
 	if(epsN>0. && ((isCohesive && omega>omegaThreshold) || !isCohesive)){
 		if(isCohesive){
-			const shared_ptr<Body>& body1=Body::byId(I->getId1(),rootBody), body2=Body::byId(I->getId2(),rootBody); assert(body1); assert(body2);
+			const shared_ptr<Body>& body1=Body::byId(I->getId1(),scene), body2=Body::byId(I->getId2(),scene); assert(body1); assert(body2);
 			const shared_ptr<CpmState>& st1=YADE_PTR_CAST<CpmState>(body1->state), st2=YADE_PTR_CAST<CpmState>(body2->state);
 			// nice article about openMP::critical vs. scoped locks: http://www.thinkingparallel.com/2006/08/21/scoped-locking-vs-critical-in-openmp-a-personal-shootout/
 			{ boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive+=1; st1->epsPlBroken+=epsPlSum; }
 			{ boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive+=1; st2->epsPlBroken+=epsPlSum; }
 		}
-		rootBody->interactions->requestErase(I->getId1(),I->getId2());
+		scene->interactions->requestErase(I->getId1(),I->getId2());
 		return;
 	}
 
 	Fn=sigmaN*crossSection; BC->normalForce=Fn*contGeom->normal;
 	Fs=sigmaT*crossSection; BC->shearForce=Fs;
 
-	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, rootBody);
+	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, scene);
 }
 
 #ifdef YADE_OPENGL
@@ -345,12 +351,14 @@ void CpmGlobalCharacteristics::compute(Scene* rb, bool useMaxForce){
 /********************** CpmStateUpdater ****************************/
 CREATE_LOGGER(CpmStateUpdater);
 Real CpmStateUpdater::maxOmega=0.;
+Real CpmStateUpdater::avgRelResidual=0.;
 
-void CpmStateUpdater::update(Scene* _rootBody){
-	Scene *rootBody=_rootBody?_rootBody:Omega::instance().getScene().get();
-	vector<BodyStats> bodyStats; bodyStats.resize(rootBody->bodies->size());
+void CpmStateUpdater::update(Scene* _scene){
+	Scene *scene=_scene?_scene:Omega::instance().getScene().get();
+	vector<BodyStats> bodyStats; bodyStats.resize(scene->bodies->size());
 	assert(bodyStats[0].nCohLinks==0); // should be initialized by dfault ctor
-	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+	avgRelResidual=0; Real nAvgRelResidual=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		shared_ptr<CpmPhys> phys=dynamic_pointer_cast<CpmPhys>(I->interactionPhysics);
 		if(!phys) continue;
@@ -372,8 +380,11 @@ void CpmStateUpdater::update(Scene* _rootBody){
 		bodyStats[id1].nCohLinks++; bodyStats[id1].dmgSum+=(1-phys->relResidualStrength); bodyStats[id1].epsPlSum+=phys->epsPlSum;
 		bodyStats[id2].nCohLinks++; bodyStats[id2].dmgSum+=(1-phys->relResidualStrength); bodyStats[id2].epsPlSum+=phys->epsPlSum;
 		maxOmega=max(maxOmega,phys->omega);
+
+		avgRelResidual+=phys->relResidualStrength;
+		nAvgRelResidual+=1;
 	}
-	FOREACH(shared_ptr<Body> B, *rootBody->bodies){
+	FOREACH(shared_ptr<Body> B, *scene->bodies){
 		const body_id_t& id=B->getId();
 		// add damaged contacts that have already been deleted
 		CpmState* state=dynamic_cast<CpmState*>(B->state.get());
@@ -390,5 +401,7 @@ void CpmStateUpdater::update(Scene* _rootBody){
 		}
 		else { state->normDmg=0; state->normEpsPl=0;}
 		B->shape->diffuseColor=Vector3r(state->normDmg,1-state->normDmg,B->isDynamic?0:1);
+		nAvgRelResidual+=0.5*state->numBrokenCohesive; // add half or broken interactions, other body has the other half
 	}
+	avgRelResidual/=nAvgRelResidual;
 }

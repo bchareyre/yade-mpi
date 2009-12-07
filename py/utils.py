@@ -62,7 +62,7 @@ def SpherePWaveTimeStep(radius,density,young):
 	from math import sqrt
 	return radius/sqrt(young/density)
 
-def randomColor(): return [random.random(),random.random(),random.random()]
+def randomColor(): return Vector3(random.random(),random.random(),random.random())
 
 def typedEngine(name): return [e for e in Omega().engines if e.name==name][0]
 
@@ -162,7 +162,6 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
-	if not color: color=randomColor()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
 	b.shape=Shape('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)

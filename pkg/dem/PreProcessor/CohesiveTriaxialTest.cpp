@@ -10,14 +10,10 @@
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
-//#include<yade/pkg-dem/SDECLinkPhysics.hpp>
+#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
-//#include<yade/pkg-dem/AveragePositionRecorder.hpp>
-//#include<yade/pkg-dem/ForceRecorder.hpp>
-//#include<yade/pkg-dem/VelocityRecorder.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
@@ -40,10 +36,6 @@
 #include<yade/pkg-dem/NewtonsDampedLaw.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
-//#include<yade/pkg-common/PhysicalActionApplier.hpp>
-//#include<yade/pkg-common/PhysicalActionDamper.hpp>
-//#include<yade/pkg-common/CundallNonViscousDamping.hpp>
-//#include<yade/pkg-common/CundallNonViscousDamping.hpp>
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -52,8 +44,6 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
-
-//#include<yade/pkg-common/StateDispatcher.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -292,77 +282,7 @@ bool CohesiveTriaxialTest::generate()
 		rootBody->bodies->insert(body);
 	}
 	
-// 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
-// 	{
-// 		
-// 		Vector3r layersDistance (Vector3r::ZERO); 
-// 		for (int layer=1; layer <= nlayers; ++layer)
-// 		{			
-// 			ifstream loadFile(importFilename.c_str());
-// 			long int i=0;
-// 			Real f,g,x,y,z,radius;
-// 			while( ! loadFile.eof() )
-// 			{
-// 				++i;
-// 				loadFile >> x;
-// 				loadFile >> y;
-// 				loadFile >> z;
-// 				Vector3r position = (Vector3r(x,z,y) + layersDistance);
-// 				loadFile >> radius;
-// 			
-// 				loadFile >> f;
-// 				loadFile >> g;
-// 				if( boxWalls ? f>1 : false ) // skip loading of SDEC walls
-// 					continue;
-// 				if(f==8)
-// 					continue;
-// 	
-// 		//		if( i % 100 == 0 ) // FIXME - should display a progress BAR !!
-// 		//			cout << "loaded: " << i << endl;
-// 				if(f==1)
-// 				{
-// 					lowerCorner[0] = min(position[0]-radius , lowerCorner[0]);
-// 					lowerCorner[1] = min(position[1]-radius , lowerCorner[1]);
-// 					lowerCorner[2] = min(position[2]-radius , lowerCorner[2]);
-// 					upperCorner[0] = max(position[0]+radius , upperCorner[0]);
-// 					upperCorner[1] = max(position[1]+radius , upperCorner[1]);
-// 					upperCorner[2] = max(position[2]+radius , upperCorner[2]);
-// 				}
-// 				createSphere(body,position,radius,false,f==1);
-// 				rootBody->bodies->insert(body);
-// 				if(f == 2)
-// 				{
-// 					startId = std::min(body->getId() , startId);
-// 					endId   = std::max(body->getId() , endId);
-// 				}
-// 					
-// 			}
-// 			layersDistance.y() = upperCorner.y();
-// 		}
-// 	}
-
-// create bigBall
-	//Vector3r position = (upperCorner+lowerCorner)*0.5 + Vector3r(0,bigBallDropHeight,0);
-	//createSphere(body,position,bigBallRadius,true,false);	
-	//int bigId = 0;
-// 	if(bigBall)
-// 		rootBody->bodies->insert(body);
-// 	bigId = body->getId();
-	//forcerec->startId = startId;
-	//forcerec->endId   = endId;
-	//averagePositionRecorder->bigBallId = bigId;
-	//velocityRecorder->bigBallId = bigId;
-
-	
-	
 	return true;
-//  	return "Generated a sample inside box of dimensions: (" 
-//  		+ lexical_cast<string>(lowerCorner[0]) + "," 
-//  		+ lexical_cast<string>(lowerCorner[1]) + "," 
-//  		+ lexical_cast<string>(lowerCorner[2]) + ") and (" 
-//  		+ lexical_cast<string>(upperCorner[0]) + "," 
-//  		+ lexical_cast<string>(upperCorner[1]) + "," 
-//  		+ lexical_cast<string>(upperCorner[2]) + ").";
 
 }
 
@@ -370,7 +290,7 @@ bool CohesiveTriaxialTest::generate()
 void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<GranularMat> physics(new GranularMat);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<Sphere> gSphere(new Sphere);
@@ -425,11 +345,9 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<GranularMat> physics(new GranularMat);
+	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
-// 	#ifdef YADE_GEOMETRICALMODEL
-// 		shared_ptr<Box> gBox(new Box);	
-// 	#endif
+
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;
@@ -488,39 +406,9 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	
-
-		
-//	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
-//	gravityCondition->gravity = gravity;
-	
-// 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-// 	actionForceDamping->damping = dampingForce;
-// 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-// 	actionMomentumDamping->damping = dampingMomentum;
-// 	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-// 	actionDampingDispatcher->add(actionForceDamping);
-// 	actionDampingDispatcher->add(actionMomentumDamping);
-// 	
-// 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-// 	applyActionDispatcher->add("NewtonsForceLaw");
-// 	applyActionDispatcher->add("NewtonsMomentumLaw");
-// 		
-// 	shared_ptr<StateDispatcher> positionIntegrator(new StateDispatcher);
-// 	positionIntegrator->add("LeapFrogPositionIntegrator");
-// 	shared_ptr<StateDispatcher> orientationIntegrator(new StateDispatcher);
-// 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
-	
 	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
 	newton->damping=dampingMomentum;
-	
 
-	//shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	//sdecTimeStepper->sdecGroupMask = 2;
-	//sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-	
-	//shared_ptr<StiffnessMatrixTimeStepper> stiffnessMatrixTimeStepper(new StiffnessMatrixTimeStepper);
-	//stiffnessMatrixTimeStepper->sdecGroupMask = 2;
-	//stiffnessMatrixTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask = 2;
@@ -531,12 +419,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<CohesiveFrictionalContactLaw> cohesiveFrictionalContactLaw(new CohesiveFrictionalContactLaw);
 	cohesiveFrictionalContactLaw->sdecGroupMask = 2;
 	
-	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
-	//stiffnesscounter->sdecGroupMask = 2;
-	//stiffnesscounter->interval = timeStepUpdateInterval;
 	
-	// moving walls to regulate the stress applied + compress when the packing is dense an stable
-	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
 	triaxialcompressionEngine-> stiffnessUpdateInterval = wallStiffnessUpdateInterval;// = stiffness update interval
 	triaxialcompressionEngine-> radiusControlInterval = radiusControlInterval;// = stiffness update interval
@@ -573,22 +456,18 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialstressController-> thickness = thickness;
 	triaxialstressController->wall_bottom_activated = false;
 	triaxialstressController->wall_top_activated = false;	
-		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
-//	rootBody->engines.push_back(sdecTimeStepper);	
 	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 	rootBody->engines.push_back(cohesiveFrictionalContactLaw);
 	rootBody->engines.push_back(triaxialcompressionEngine);
-	//rootBody->engines.push_back(stiffnesscounter);
-	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialStateRecorder);
-	rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
+	//rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
 	rootBody->engines.push_back(newton);
 
 	if (saveAnimationSnapshots) {
@@ -643,8 +522,8 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 	long t, i;
 	for (i=0; i<number; ++i) {
 		BasicSphere s;
+		s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
 		for (t=0; t<tries; ++t) {
-			s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
 			s.first.X() = lowerCorner.X()+s.second+(dimensions.X()-2*s.second)*random1();
 			s.first.Y() = lowerCorner.Y()+s.second+(dimensions.Y()-2*s.second)*random1();
 			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*random1();
@@ -670,6 +549,4 @@ string GenerateCloud_cohesive(vector<BasicSphere>& sphere_list, Vector3r lowerCo
 
 
 YADE_PLUGIN((CohesiveTriaxialTest));
-
-//YADE_REQUIRE_FEATURE(PHYSPAR);
 

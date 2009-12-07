@@ -51,9 +51,9 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 class Ig2_Wall_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
-		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c){
-			c->swapOrder(); return go(cm2,cm1,state2,state1,-shift2,c);
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
+			c->swapOrder(); return go(cm2,cm1,state2,state1,-shift2,force,c);
 			LOG_ERROR("!! goReverse might not work in Ig2_Wall_Sphere_Dem3DofGeom. InteractionGeometryDispatcher should swap interaction members first and call go(...) afterwards.");
 		}
 		Ig2_Wall_Sphere_Dem3DofGeom(){}

@@ -53,6 +53,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 		const shared_ptr<Shape>& cm2,
 		const Se3r& se31,
 		const Se3r& se32,
+		const Vector3r& shift2,
+		const bool& force,
 		const shared_ptr<Interaction>& c)
 {
 
@@ -256,6 +258,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 						const shared_ptr<Shape>& cm2,
 						const Se3r& se31,
 						const Se3r& se32,
+						const Vector3r& shift2,
+						const bool& force,
 						const shared_ptr<Interaction>& c)
 {
 //	bool result = go(cm2,cm1,se32,se31,c);

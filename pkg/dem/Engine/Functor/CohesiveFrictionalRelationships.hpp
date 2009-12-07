@@ -29,7 +29,7 @@ class CohesiveFrictionalRelationships : public InteractionPhysicsFunctor
 		long iter;//REMOVE THIS
 
 		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(normalCohesion)(shearCohesion)(setCohesionNow)(setCohesionOnNewContacts));
-	FUNCTOR2D(CohesiveFrictionalBodyParameters,CohesiveFrictionalBodyParameters);
+	FUNCTOR2D(CohesiveFrictionalMat,CohesiveFrictionalMat);
 	REGISTER_CLASS_NAME(CohesiveFrictionalRelationships);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
 };

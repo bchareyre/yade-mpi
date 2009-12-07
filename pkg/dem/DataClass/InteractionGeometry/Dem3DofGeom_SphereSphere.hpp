@@ -59,8 +59,8 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
-		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(	const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r& shift2, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
 		//! Factor of sphere radius such that sphere "touch" if their centers are not further than distFactor*(r1+r2);
 		//! if negative, equilibrium distance is the sum of the sphere's radii, which is the default.
 		Real distFactor;

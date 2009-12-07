@@ -410,8 +410,7 @@ python::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real
 }
 //BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
 
-// for now, don't return anything, since we would have to include the whole yadeControl.cpp because of pyInteraction
-void Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ (void) Shop::createExplicitInteraction(id1,id2);}
+shared_ptr<Interaction> Shop__createExplicitInteraction(body_id_t id1, body_id_t id2){ return Shop::createExplicitInteraction(id1,id2,/*force*/true);}
 
 //Vector3r Shop__scalarOnColorScale(Real scalar){ return Shop::scalarOnColorScale(scalar);}
 

@@ -53,7 +53,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		cld2=LawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
 	def testInteractionDispatchersCtor(self):
 		# InteractionDispatchers takes 3 lists
-		id=InteractionDispatchers([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],)
+		id=InteractionDispatchers([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
 		self.assert_(id.geomDispatcher.name=='InteractionGeometryDispatcher')
 		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
@@ -69,7 +69,7 @@ class TestObjectInstantiation(unittest.TestCase):
 	##
 	def testWrongFunctorType(self):
 		# dispatchers accept only correct functors
-		self.assertRaises(TypeError,lambda: ConstitutiveLawDispatcher([InteractingSphere2AABB()]))
+		self.assertRaises(TypeError,lambda: LawDispatcher([InteractingSphere2AABB()]))
 	def testInvalidAttr(self):
 		# accessing invalid attributes raises KeyError
 		self.assertRaises(KeyError,lambda: InteractingSphere(attributeThatDoesntExist=42))

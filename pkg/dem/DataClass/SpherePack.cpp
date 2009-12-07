@@ -86,8 +86,9 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	if(periodic)(cellSize=size);
 	for(size_t i=0; i<num; i++) {
 		size_t t;
+		Real r=(rnd()-.5)*rRelFuzz*rMean+rMean; 
 		for(t=0; t<maxTry; ++t){
-			Real r=(rnd()-.5)*rRelFuzz*rMean+rMean; Vector3r c;
+			Vector3r c;
 			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
 			else { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+size[axis]*rnd(); }
 			size_t packSize=pack.size(); bool overlap=false;

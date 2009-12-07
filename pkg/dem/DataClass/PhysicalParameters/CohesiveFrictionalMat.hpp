@@ -13,23 +13,23 @@
 #include<yade/pkg-common/ElasticMat.hpp>
 
 
-class CohesiveFrictionalBodyParameters : public GranularMat
+class CohesiveFrictionalMat : public GranularMat
 {
 	public :
 		bool		isBroken;
 		bool		isCohesive;
 
-		CohesiveFrictionalBodyParameters ();
-		virtual ~CohesiveFrictionalBodyParameters ();
+		CohesiveFrictionalMat ();
+		virtual ~CohesiveFrictionalMat ();
 
 /// Serialization
-	REGISTER_CLASS_NAME(CohesiveFrictionalBodyParameters);
+	REGISTER_CLASS_NAME(CohesiveFrictionalMat);
 	REGISTER_BASE_CLASS_NAME(GranularMat);
 	REGISTER_ATTRIBUTES(GranularMat,(isBroken)(isCohesive));
 /// Indexable
-	REGISTER_CLASS_INDEX(CohesiveFrictionalBodyParameters,GranularMat);
+	REGISTER_CLASS_INDEX(CohesiveFrictionalMat,GranularMat);
 };
 
-REGISTER_SERIALIZABLE(CohesiveFrictionalBodyParameters);
+REGISTER_SERIALIZABLE(CohesiveFrictionalMat);
 
 

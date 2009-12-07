@@ -20,7 +20,7 @@ All that concerned brokenBodies (this flag and the erosionactivated one) and the
 
 The Relationsships corresponding are CL1Relationships, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions
 To use it you should also use :
-- CohesiveFrictionalBodyParameters for the bodies, with "isCohesive" = 1 (A verifier ce dernier point)
+- CohesiveFrictionalMat for the bodies, with "isCohesive" = 1 (A verifier ce dernier point)
 - CL1Relationships (=> which involves interactions of "ContactLaw1Interaction" type)
 
  */

@@ -108,7 +108,7 @@ class Shop{
 		static Vector3r totalForceInVolume(Real& avgIsoStiffness, Scene *_rb=NULL);
 
 		//! create transientInteraction between 2 bodies, using existing Dispatcher in Omega
-		static shared_ptr<Interaction> createExplicitInteraction(body_id_t id1, body_id_t id2);
+		static shared_ptr<Interaction> createExplicitInteraction(body_id_t id1, body_id_t id2, bool force);
 
 		//! apply force on contact point on both bodies (reversed on body 2)
 		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* rb);

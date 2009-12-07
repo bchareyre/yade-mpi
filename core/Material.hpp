@@ -34,7 +34,7 @@ class Material: public Serializable, public Indexable{
 
 				return (bool)dynamic_cast<State*> state;
 		*/
-		virtual bool stateTypeOk(State* state) const { return true; }
+		virtual bool stateTypeOk(State*) const { return true; }
 
 		static const shared_ptr<Material> byId(int id, Scene* scene=NULL);
 		static const shared_ptr<Material> byId(int id, shared_ptr<Scene> scene) {return byId(id,scene.get());}

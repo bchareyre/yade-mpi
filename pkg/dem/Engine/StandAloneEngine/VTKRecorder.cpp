@@ -51,7 +51,8 @@ void VTKRecorder::action(Scene* rootBody)
 		else if(rec=="cpm") recActive[REC_CPM]=true;
 		else if(rec=="intr") recActive[REC_INTR]=true;
 		else if(rec=="ids") recActive[REC_IDS]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm, intr, ids). Ignored.");
+		else if(rec=="clumpids") recActive[REC_CLUMPIDS]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: spheres, velocity, facets, colors, cpm, intr, ids, clumpids). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -65,6 +66,9 @@ void VTKRecorder::action(Scene* rootBody)
 	vtkSmartPointer<vtkFloatArray> spheresIds = vtkSmartPointer<vtkFloatArray>::New();
 	spheresIds->SetNumberOfComponents(1);
 	spheresIds->SetName("IDS");
+	vtkSmartPointer<vtkFloatArray> clumpIds = vtkSmartPointer<vtkFloatArray>::New();
+	clumpIds->SetNumberOfComponents(1);
+	clumpIds->SetName("clumpIDS");
 	vtkSmartPointer<vtkFloatArray> spheresColors = vtkSmartPointer<vtkFloatArray>::New();
 	spheresColors->SetNumberOfComponents(3);
 	spheresColors->SetName("colors");
@@ -115,7 +119,6 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->isReal()) continue;
-			//const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(i->interactionPhysics.get());
 			if(skipFacetIntr){
 				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId1())->shape.get()))) continue;
 				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId2())->shape.get()))) continue;
@@ -124,10 +127,16 @@ void VTKRecorder::action(Scene* rootBody)
 			line->GetPointIds()->SetId(0,I->getId1());
 			line->GetPointIds()->SetId(1,I->getId2());
 			intrCells->InsertNextCell(line);
-			if(recActive[REC_CPM]){
+			if(recActive[REC_CPM]){		//For CPM model 
 				const CpmPhys* phys = YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
 				intrForceN->InsertNextValue(phys->Fn);
 				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
+				intrAbsForceT->InsertNextTupleValue(fs);
+			} else {									//For all other models
+				const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
+				float fn[3]={abs(phys->normalForce[0]),abs(phys->normalForce[1]),abs(phys->normalForce[2])};
+				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
+				intrForceN->InsertNextTupleValue(fn);
 				intrAbsForceT->InsertNextTupleValue(fs);
 			}
 		}
@@ -148,6 +157,7 @@ void VTKRecorder::action(Scene* rootBody)
 				spheresCells->InsertNextCell(1,pid);
 				radii->InsertNextValue(sphere->radius);
 				if (recActive[REC_IDS]) spheresIds->InsertNextValue(b->getId()); 
+				if (recActive[REC_CLUMPIDS]) clumpIds->InsertNextValue(b->clumpId); 
 				if (recActive[REC_COLORS])
 				{
 					const Vector3r& color = sphere->diffuseColor;
@@ -216,6 +226,7 @@ void VTKRecorder::action(Scene* rootBody)
 		spheresUg->SetCells(VTK_VERTEX, spheresCells);
 		spheresUg->GetPointData()->AddArray(radii);
 		if (recActive[REC_IDS]) spheresUg->GetPointData()->AddArray(spheresIds);
+		if (recActive[REC_CLUMPIDS]) spheresUg->GetPointData()->AddArray(clumpIds);
 		if (recActive[REC_COLORS]) spheresUg->GetPointData()->AddArray(spheresColors);
 		if (recActive[REC_VELOCITY]) {
 			spheresUg->GetPointData()->AddArray(spheresVelocity);
