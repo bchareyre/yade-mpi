@@ -96,7 +96,7 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 
 /* non-parallel implementations */
 #ifdef YADE_OPENMP
-	void VelocityBins::binVelSqInitialize(){ FOREACH(Bin& bin, bins){ FOREACH(Real& vSq, bin.threadMaxVelSq) vSq=0.; }}
+	void VelocityBins::binVelSqInitialize(Real vSqInit){ FOREACH(Bin& bin, bins){ FOREACH(Real& vSq, bin.threadMaxVelSq) vSq=vSqInit; }}
 	void VelocityBins::binVelSqUse(body_id_t id, Real velSq){
 		Real& maxVelSq(bins[bodyBins[id]].threadMaxVelSq[omp_get_thread_num()]);
 		maxVelSq=max(maxVelSq,velSq);
@@ -108,7 +108,7 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 		}
 	}
 #else
-	void VelocityBins::binVelSqInitialize(){ FOREACH(Bin& bin, bins) bin.currMaxVelSq=0; }
+	void VelocityBins::binVelSqInitialize(Real vSqInit=0.){ FOREACH(Bin& bin, bins) bin.currMaxVelSq=vSqInit; }
 	void VelocityBins::binVelSqUse(body_id_t id, Real velSq){
 		Real& maxVelSq(bins[bodyBins[id]].currMaxVelSq);
 		maxVelSq=max(maxVelSq,velSq);

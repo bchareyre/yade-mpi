@@ -66,7 +66,13 @@ if len(args)>0:
 	if args[0].endswith('.py'):
 		print "Running script "+args[0]
 		yade.runtime.argv=args[1:]
-		execfile(args[0])
+		try:
+			execfile(args[0])
+		except SystemExit: raise
+		except: # all other exceptions
+			import traceback
+			traceback.print_exc()
+			if opts.exitAfter: sys.exit(1)
 		if opts.exitAfter: sys.exit(0)
 
 # show python command-line

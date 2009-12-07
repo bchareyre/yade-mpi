@@ -69,7 +69,7 @@ class VelocityBins{
 	body in that bin and binVelSqFinalize() will not do nothing.
 	*/
 	// reset per-bin max velocities
-	void binVelSqInitialize();
+	void binVelSqInitialize(Real velSqInit=0.);
 	// use body max velocity -- called for every body at every step (from NewtonsDampedLaw, normally)
 	void binVelSqUse(body_id_t id, Real velSq);
 	// actually assign max velocities to their respective bins
