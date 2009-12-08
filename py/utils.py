@@ -362,83 +362,6 @@ def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	if tmpDir: shutil.rmtree(tmpDir)
 
 
-def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw):
-	"""
-	Read parameters from a file and assign them to __builtin__ variables.
-
-	tableFile is a text file (with one value per blank-separated columns)
-	tableLine is number of line where to get the values from
-
-		The format of the file is as follows (commens starting with # and empty lines allowed)
-		
-		# commented lines allowed anywhere
-		name1 name2 … # first non-blank line are column headings
-		val1  val2  … # 1st parameter set
-		val2  val2  … # 2nd 
-		…
-
-	The name `description' is special and is assigned to Omega().tags['description']
-
-	assigns Omega().tags['params']="name1=val1,name2=val2,…"
-	
-	assigns Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
-
-	saves all parameters (default as well as settable) using saveVars('table')
-
-	return value is the number of assigned parameters.
-	"""
-	o=Omega()
-	tagsParams=[]
-	dictDefaults,dictParams={},{}
-	import os, __builtin__,re
-	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
-		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
-		o.tags['line']='l!'
-	else:
-		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
-		env=tableFileLine.split(':')
-		tableDesc=None
-		tableFile,tableLine=env[0],env[1]
-		if len(env)>2: tableDesc=env[3]
-		o.tags['line']='l'+tableLine
-		# the empty '#' line to make line number 1-based
-		ll=[l for l in ['#']+open(tableFile).readlines()]; values=ll[int(tableLine)][:-1].split('#')[0].split()
-		for i in range(0,len(values)):
-			lineNo=int(tableLine)-1
-			while values[i]=='=':
-				values[i]=ll[lineNo].split('#')[0].split()[i]
-				if lineNo==0: raise RuntimeError("the = specifier doesn't refer to a value at some previous line.")
-				lineNo-=1
-		names=None
-		for l in ll:
-			if not re.match(r'^\s*(#.*)?$',l): names=l.split(); break
-		if not names: raise RuntimeError("No non-blank line (colum headings) found.");
-		assert(len(names)==len(values))
-		if 'description' in names: O.tags['description']=values[names.index('description')]
-		else:
-			bangCols=[i for i,h in enumerate(names) if h[-1]=='!']
-			if len(bangCols)==0: bangCols=range(len(names))
-			for i in range(len(names)):
-				if names[i][-1]=='!': names[i]=names[i][:-1] # strip trailing !
-			O.tags['description']=','.join(names[col]+'='+('%g'%values[col] if isinstance(values[col],float) else str(values[col])) for col in bangCols).replace("'",'').replace('"','')
-		for i in range(len(names)):
-			if names[i]=='description': continue
-			if names[i] not in kw.keys():
-				if (not unknownOk) and names[i][0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
-			else:
-				if values[i]!='*': kw.pop(names[i])
-				else: continue
-			if names[i][0]!='!':
-				exec('%s=%s'%(names[i],values[i])) in __builtins__; tagsParams+=['%s=%s'%(names[i],values[i])]; dictParams[names[i]]=values[i]
-	defaults=[]
-	for k in kw.keys():
-		exec("%s=%s"%(k,repr(kw[k]))) in __builtins__
-		defaults+=["%s=%s"%(k,kw[k])]; dictDefaults[k]=kw[k]
-	o.tags['defaultParams']=",".join(defaults)
-	o.tags['params']=",".join(tagsParams)
-	dictParams.update(dictDefaults); saveVars('table',**dictParams)
-	return len(tagsParams)
-
 def replaceCollider(colliderEngine):
 	"""Replaces collider (Collider) engine with the engine supplied. Raises error if no collider is in engines."""
 	colliderIdx=-1
@@ -522,3 +445,126 @@ def import_LSMGenGeo_geometry(*args,**kw):
 	_deprecatedUtilsFunction(func.__name__,'yade.import.gengeo')
 	import yade.ymport
 	return yade.ymport.gengeo(*args,**kw)
+
+
+class TableParamReader():
+	def __init__(self,file):
+		import re
+		"Setup the reader class, read data into memory."
+		# read file in memory, remove newlines and comments; the [''] makes lines 1-indexed
+		ll=[re.sub('\s*#.*','',l[:-1]) for l in ['']+open(file,'r').readlines()]
+		# usable lines are those that contain something else than just spaces
+		usableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1])]
+		headings=ll[usableLines[0]].split()
+		# use all values of which heading has ! after its name to build up the description string
+		# if there are none, use all columns
+		if not 'description' in headings:
+			bangHeads=[h[:-1] for h in headings if h[-1]=='!'] or headings
+			headings=[(h[:-1] if h[-1]=='!' else h) for h in headings]
+		usableLines=usableLines[1:] # and remove headinds from usableLines
+		values={}
+		for l in usableLines:
+			val={}
+			for i in range(len(headings)):
+				val[headings[i]]=ll[l].split()[i]
+			values[l]=val
+		lines=values.keys(); lines.sort()
+		# replace '=' by previous value of the parameter
+		for i,l in enumerate(lines):
+			for j in values[l].keys():
+				if values[l][j]=='=':
+					try:
+						values[l][j]=values[lines[i-1]][j]
+					except IndexError,KeyError:
+						raise RuntimeError("The = specifier on line %d refers to nonexistent value on previous line?"%l)
+		#import pprint; pprint.pprint(headings); pprint.pprint(values)
+		# add descriptions, but if they repeat, append line number as well
+		if not 'description' in headings:
+			descs=set()
+			for l in lines:
+				dd=','.join(head.replace('!','')+'='+('%g'%values[head] if isinstance(values[l][head],float) else str(values[l][head])) for head in bangHeads).replace("'",'').replace('"','')
+				if dd in descs: dd+='__line=%d__'%l
+				values[l]['description']=dd
+				descs.add(dd)
+		self.values=values
+				
+	def paramDict(self):
+		return self.values
+		
+if __name__=="__main__":
+	tryTable="""head1 important2! !OMP_NUM_THREADS! abcd
+	1 1.1 1.2 1.3
+	'a' 'b' 'c' 'd'  ### comment
+	
+	# empty line
+	1 = = g
+"""
+	file='/tmp/try-tbl.txt'
+	f=open(file,'w')
+	f.write(tryTable)
+	f.close()
+	from pprint import *
+	pprint(TableParamReader(file).paramDict())
+	
+def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw):
+	"""
+	Read parameters from a file and assign them to __builtin__ variables.
+
+	tableFile is a text file (with one value per blank-separated columns)
+	tableLine is number of line where to get the values from
+
+		The format of the file is as follows (commens starting with # and empty lines allowed)
+		
+		# commented lines allowed anywhere
+		name1 name2 … # first non-blank line are column headings
+					# empty line is OK, with or without comment
+		val1  val2  … # 1st parameter set
+		val2  val2  … # 2nd 
+		…
+
+	The name `description' is special and is assigned to Omega().tags['description']
+
+	assigns Omega().tags['params']="name1=val1,name2=val2,…"
+	
+	assigns Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
+
+	saves all parameters (default as well as settable) using saveVars('table')
+
+	return value is the number of assigned parameters.
+	"""
+	tagsParams=[]
+	dictDefaults,dictParams={},{}
+	import os, __builtin__,re
+	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
+		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
+		o.tags['line']='l!'
+	else:
+		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
+		env=tableFileLine.split(':')
+		tableFile,tableLine=env[0],int(env[1])
+		allTab=TableParamReader(tableFile).paramDict()
+		if not allTab.has_key(tableLine): raise RuntimeError("Table %s doesn't contain valid line number %d"%(tableFile,tableLine))
+		vv=allTab[tableLine]
+		O.tags['line']='l%d'%tableLine
+		O.tags['description']=vv['description']
+		# assign values specified in the table to python vars
+		# !something cols are skipped, those are env vars we don't treat at all (they are contained in description, though)
+		for col in vv.keys():
+			if col=='description' or col[0]=='!': continue
+			if col not in kw.keys():
+				if (not unknownOk) and col[0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
+			else:
+				continue # skipping unknown var
+			if vv[col]=='*': vv[col]=kw[col] # use default value for * in the table
+			else: kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
+			exec('%s=%s'%(col,vv[col])) in __builtins__; tagsParams+=['%s=%s'%(col,vv[col])]; dictParams[col]=vv[col]
+	# assign remaining (default) keys to python vars
+	defaults=[]
+	for k in kw.keys():
+		exec("%s=%s"%(k,repr(kw[k]))) in __builtins__
+		defaults+=["%s=%s"%(k,kw[k])]; dictDefaults[k]=kw[k]
+	O.tags['defaultParams']=",".join(defaults)
+	O.tags['params']=",".join(tagsParams)
+	dictParams.update(dictDefaults); saveVars('table',**dictParams)
+	return len(tagsParams)
+

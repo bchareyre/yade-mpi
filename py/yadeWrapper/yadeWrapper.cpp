@@ -290,7 +290,8 @@ class pyMaterialContainer{
 		int len(){ return (int)rb->materials.size(); }
 };
 
-void termHandler(int sig){cerr<<"terminating..."<<endl; raise(SIGTERM);}
+void termHandlerNormal(int sig){cerr<<"Yade: normal exit."<<endl; raise(SIGTERM);}
+void termHandlerError(int sig){cerr<<"Yade: error exit."<<endl; raise(SIGTERM);}
 
 class pyOmega{
 	private:
@@ -536,7 +537,8 @@ class pyOmega{
 		signal(SIGABRT,SIG_DFL);
 	}
 	void exitNoBacktrace(int status=0){
-		signal(SIGSEGV,termHandler); /* unset the handler that runs gdb and prints backtrace */
+		if(status==0) signal(SIGSEGV,termHandlerNormal); /* unset the handler that runs gdb and prints backtrace */
+		else signal(SIGSEGV,termHandlerError);
 		exit(status);
 	}
 	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getScene().get()); }
@@ -733,7 +735,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
 		.add_property("periodicCell",&pyOmega::periodicCell_get,&pyOmega::periodicCell_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.")
-		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads(python::args("status"),"Disable our SEGV handler and exit."))
+		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads("Disable SEGV handler and exit."))
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")

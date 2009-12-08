@@ -45,7 +45,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/gui',[
 	env.SharedLibrary('PythonUI',['py/PythonUI.cpp'],LIBS=env['LIBS']+linkPlugins([])),
 	env.File('PythonUI_rc.py','py'),
 ])
-env.InstallAs('$PREFIX/bin/yade$SUFFIX-multi',env.File('yade-multi','py'))
+# env.InstallAs('$PREFIX/bin/yade$SUFFIX-multi',env.File('yade-multi','py'))
 
 # these modules will not be imported directly (probably)
 # the rest was moved to py/ directory

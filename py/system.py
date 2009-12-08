@@ -8,6 +8,7 @@ import sys
 from yade import wrapper
 from yade._customConverters import *
 from yade import runtime
+from yade import config
 O=wrapper.Omega()
 
 def childClasses(base):
@@ -93,15 +94,12 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 	return proxyNamespace
 
 def setExitHandlers():
-	"""Set exit handler to avoid gdb run if log4cxx crashes at exit.
-	Remove excepthook."""
-	#import sys
-	# python2.4 workaround (so that quit() works as it does in 2.5)
-	if not callable(__builtins__['quit']):
-		def _quit(): import sys; sys.exit(0)
-		__builtins__['quit']=_quit
+	"""Set exit handler to avoid gdb run if log4cxx crashes at exit."""
 	# avoid backtrace at regular exit, even if we crash
-	sys.exit=wrapper.Omega().exitNoBacktrace
+	if 'log4cxx' in config.features:
+		__builtins__['quit']=wrapper.Omega().exitNoBacktrace
+		sys.exit=wrapper.Omega().exitNoBacktrace
+	# this seems to be not needed anymore:
 	#sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
 
 def runServers():

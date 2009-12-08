@@ -5,6 +5,14 @@
 
 import os, sys, thread, time, logging, pipes
 
+## replaced by scons automatically
+prefix,suffix='${PREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
+sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
+executable=os.path.join(prefix,'bin','yade'+suffix)
+## we just need this ...
+import yade.utils, yade.config
+
+
 class JobInfo():
 	def __init__(self,num,id,command,log,nSlots):
 		self.started,self.finished,self.duration,self.exitStatus=None,None,None,None
@@ -116,6 +124,7 @@ def runJob(job):
 	job.started=time.time();
 	print '#%d (%s%s) started on %s'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots,time.asctime())
 	job.exitStatus=os.system(job.command)
+	if job.exitStatus!=0 and len([l for l in open(job.log) if l.startswith('Yade: normal exit.')])>0: job.exitStatus=0
 	job.finished=time.time()
 	dt=job.finished-job.started;
 	job.duration=t2hhmmss(dt)
@@ -159,7 +168,7 @@ parser.add_option('--log',dest='logFormat',help='Format of job log files -- must
 parser.add_option('--global-log',dest='globalLog',help='Filename where to redirect output of yade-multi itself (as opposed to --log); if not specified (default), stdout/stderr are used',metavar='FILE')
 parser.add_option('-l','--lines',dest='lineList',help='Lines of TABLE to use, in the format 2,3-5,8,11-13 (default: all available lines in TABLE)',metavar='LIST')
 parser.add_option('--nice',dest='nice',type='int',help='Nice value of spawned jobs (default: 10)',default=10)
-parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%sys.argv[0][:-6],default=sys.argv[0][:-6],metavar='FILE') ## strip the '-multi' extension
+parser.add_option('--executable',dest='executable',help='Name of the program to run (default: %s)'%executable,default=executable,metavar='FILE')
 parser.add_option('--gnuplot',dest='gnuplotOut',help='Gnuplot file where gnuplot from all jobs should be put together',default=None,metavar='FILE')
 parser.add_option('--dry-run',action='store_true',dest='dryRun',help='Do not actually run (useful for getting gnuplot only, for instance)',default=False)
 parser.add_option('--http-wait',action='store_true',dest='httpWait',help='Do not quit if still serving overview over http repeatedly',default=False)
@@ -180,18 +189,9 @@ if (not '%' in logFormat) and ('@' not in logFormat): raise StandardError("Log s
 
 print "Will run `%s' on `%s' with nice value %d, output redirected to `%s', %d jobs at a time."%(executable,simul,nice,logFormat,maxJobs)
 
-ll=[re.sub('\s*#.*','',l) for l in ['']+open(table,'r').readlines()] # remove comments
-availableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1])]
-# first non-blank line are column headings
-headings=ll[availableLines[0]].split()
-availableLines=availableLines[1:]
-# read actual data
-values={}
-for l in availableLines:
-	val={}
-	for i in range(len(headings)):
-		val[i]=ll[l].split()[i]
-	values[l]=val
+reader=yade.utils.TableParamReader(table)
+params=reader.paramDict()
+availableLines=params.keys()
 
 print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
 
@@ -205,55 +205,30 @@ if lineList:
 		return ret
 	useLines0=numRange2List(lineList)
 	for l in useLines0:
-		if l not in availableLines: logging.warn('skipping unavailable line %d that was requested from the command line.'%l)
-		elif l==1: logging.warn("WARNING: skipping line 1 that should contain variable labels")
+		if l not in availableLines: logging.warn('Skipping unavailable line %d that was requested from the command line.'%l)
 		else: useLines+=[l]
 else: useLines=availableLines
-try:
-	idColumn=headings.index('description')
-	idStrings={}
-	for i in useLines: idStrings[i]=values[i][idColumn] # textual descripion of respective lines 
-	print "Will use lines ",', '.join([str(i)+' (%s)'%idStrings[i] for i in useLines])+'.'
-	#print idStrings
-except ValueError:
-	# try to get idStrings from columns with trailing !
-	bangCols=[i for i,h in enumerate(headings) if h[-1]=='!']
-	if len(bangCols)==0:
-		print 'WARN: no headings with trailing !, will use all of them for description'
-		bangCols=range(len(headings))
-	for i in range(len(headings)):
-		if headings[i][-1]=='!': headings[i]=headings[i][:-1]
-	idStrings={}
-	for i in useLines:
-		newIdBase=','.join( headings[col]+'='+('%g'%values[i][col] if isinstance(values[i][col],float) else str(values[i][col])) for col in bangCols)
-		newId=newIdBase; j=1
-		while newId in idStrings.values():
-			newId=newIdBase+'_%d_'%j; j+=1
-		idStrings[i]=newId.replace("'",'').replace('"','')
-	print "Will use lines ",', '.join([str(i) for i in useLines])+'.'
-
+print "Will use lines ",', '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.'
 
 jobs=[]
 for i,l in enumerate(useLines):
 	logFile=logFormat.replace('%',str(l))
-	if idStrings: logFile=logFile.replace('@',idStrings[l])
-	else: logFile=logFile.replace('@',str(l))
-	logFile=logFile.replace('!','')
+	logFile=logFile.replace('@',params[l]['description'])
 	envVars=[]
 	nSlots=opts.defaultThreads
-	for col,head in enumerate(headings):
-		if head=='!EXEC': executable=values[l][col]
-		if head=='!OMP_NUM_THREADS':
-			nSlots=int(values[l][col]); maxCpu=getNumCores()
-			continue
-		if head[0]=='!': envVars+=['%s=%s'%(head[1:],values[l][col])]
+	for col in params[l].keys():
+		if col[0]!='!': continue
+		if col=='!OMP_NUM_THREADS':
+			nSlots=int(params[l][col]); maxCpu=getNumCores()
+		elif col=='!EXEC': executable=params[l][col]
+		else: envVars+=['%s=%s'%(head[1:],values[l][col])]
 	if nSlots>maxJobs:
 		if opts.forceThreads:
 			logging.info('Forcing job #%d to use only %d slots (max available) instead of %d requested'%(i,maxJobs,nSlots))
 			nSlots=maxJobs
 		else:
 			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
-	jobs.append(JobInfo(i,idStrings[l] if idStrings else '#'+str(i),'PARAM_TABLE=%s:%d OMP_NUM_THREADS=%d %s nice -n %d %s -N PythonUI -- -n -x %s > %s 2>&1'%(table,l,nSlots,' '.join(envVars),nice,executable,simul,pipes.quote(logFile)),logFile,nSlots))
+	jobs.append(JobInfo(i,params[l]['description'],'PARAM_TABLE=%s:%d DISPLAY= %s %s --threads=%d %s -x %s > %s 2>&1'%(table,l,' '.join(envVars),executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',simul,pipes.quote(logFile)),logFile,nSlots))
 
 print "Job summary:"
 for job in jobs:
@@ -309,3 +284,5 @@ if httpWait and time.time()-httpLastServe<10:
 	print "(continue serving http until no longer requested  as per --http-wait)"
 	while time.time()-httpLastServe<10:
 		time.sleep(1)
+
+yade.Omega().exitNoBacktrace()
