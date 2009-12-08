@@ -38,6 +38,9 @@ REGISTER_SERIALIZABLE(PeriIsoCompressor);
 strainStress contains absolute values for the controlled quantity, and stressMask determines
 meaning of those values (0 for strain, 1 for stress): e.g. ( 1<<0 | 1<<2 ) = 1 | 4 = 5 means that
 strainStress[0] and strainStress[2] are stress values, and strainStress[1] is strain.
+
+See scripts/test/periodic-triax.py for a simple example.
+
 */
 class PeriTriaxController: public StandAloneEngine{
 	public:
@@ -83,7 +86,7 @@ class PeriTriaxController: public StandAloneEngine{
 
 	void action(Scene*);
 	void strainStressStiffUpdate();
-	PeriTriaxController(): reversedForces(false),goal(Vector3r::ZERO),stressMask(0),maxStrainRate(Vector3r(1,1,1)),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.25),globUpdate(100),refSize(Vector3r(-1,-1,-1)),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),strainRate(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
+	PeriTriaxController(): reversedForces(false),goal(Vector3r::ZERO),stressMask(0),maxStrainRate(Vector3r(1,1,1)),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.25),globUpdate(5),refSize(Vector3r(-1,-1,-1)),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),strainRate(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
 	REGISTER_ATTRIBUTES(StandAloneEngine,(reversedForces)(goal)(stressMask)(maxStrainRate)(maxUnbalanced)(absStressTol)(relStressTol)(growDamping)(globUpdate)(doneHook)(refSize)(stress)(strain)(strainRate)(stiff));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(PeriTriaxController,StandAloneEngine);

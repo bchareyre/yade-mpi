@@ -3,7 +3,7 @@
 "Test and demonstrate use of PeriTriaxController."
 from yade import *
 from yade import pack,log,qt
-log.setLevel('PeriTriaxController',log.DEBUG)
+#log.setLevel('PeriTriaxController',log.DEBUG)
 O.periodicCell=(0,0,0),(.1,.1,.1)
 sp=pack.SpherePack()
 radius=5e-3
@@ -20,7 +20,7 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()]
 	),
-	PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=1.,doneHook='triaxDone()',label='triax'),
+	PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
 	NewtonsDampedLaw(damping=.6),
 ]
 O.dt=utils.PWaveTimeStep()
