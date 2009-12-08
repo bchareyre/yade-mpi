@@ -1,9 +1,9 @@
-!OMP_NUM_THREADS important! unimportant this!
+!OMP_NUM_THREADS important! unimportant this! more
 # comment
 	# comment and empty line
 
-3 51 'hummm' 3.1415 
-3 51 'paaah' =
-= 52 = * 
-= =  'not' =
-= 52 'yes' 2.71828
+3 51 'hummm' 3.1415  'a'
+3 51 'paaah' = 'b'
+= 52 = *  'c'
+= =  'not' = 'd' 
+= 52 'yes' 2.71828 'e'

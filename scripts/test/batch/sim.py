@@ -7,10 +7,12 @@ utils.readParamsFromTable(unknownOk=True,
 	notInTable='notInTable'
 )
 print O.tags['description']
+print 'important',important
+print 'unimportant',unimportant
 #print O.tags['params']
 #print O.tags['defaultParams']
 import time
-time.sleep(5)
+#time.sleep(5)
 print 'finished'
 import sys
 sys.stdout.flush()

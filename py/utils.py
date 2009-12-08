@@ -551,12 +551,10 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		# !something cols are skipped, those are env vars we don't treat at all (they are contained in description, though)
 		for col in vv.keys():
 			if col=='description' or col[0]=='!': continue
-			if col not in kw.keys():
-				if (not unknownOk) and col[0]!='!': raise NameError("Parameter `%s' has no default value assigned"%names[i])
-			else:
-				continue # skipping unknown var
+			if col not in kw.keys() and (not unknownOk): raise NameError("Parameter `%s' has no default value assigned"%names[i])
 			if vv[col]=='*': vv[col]=kw[col] # use default value for * in the table
-			else: kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
+			elif col in kw.keys(): kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
+			print 'ASSIGN',col,vv[col]
 			exec('%s=%s'%(col,vv[col])) in __builtins__; tagsParams+=['%s=%s'%(col,vv[col])]; dictParams[col]=vv[col]
 	# assign remaining (default) keys to python vars
 	defaults=[]
