@@ -22,6 +22,7 @@ class GlobalStiffnessTimeStepper;
 
 /*! \brief Isotropic compression + triaxial compression test
 
+	TriaxialTest full documentation is here : http://yade-dem.org/index.php/TriaxialTest
 	This preprocessor is designed to :
 	1/ generate random loose packings and compress them under isotropic confining stress, either squeezing the packing between moving rigid boxes or expanding the particles while boxes are fixed (depending on flag "InternalCompaction").
 	2/ simulate all sorts triaxial loading path (there is however a default loading path corresponding to constant lateral stress in 2 directions and constant strain rate on the third direction - this loading path is used when the flag AutoCompressionActivation = true, otherwise the simulation stops after isotropic compression)
@@ -36,6 +37,8 @@ class GlobalStiffnessTimeStepper;
 	3/ TriaxialTest is currently using GlobalStiffnessTimeStepper to compute an appropriate dt for the numerical scheme. The TriaxialTest is the only preprocessor using these classes in Yade because they have been developped AFTER most of preprocessor examples, BUT they can be used in principle in any situation and they have nothing specifically related to the triaxial test.
 	
 	@note TriaxialStressController::ComputeUnbalancedForce(...) returns a value that can be usefull for evaluating the stability of the packing. It is defined as (mean force on particles)/(mean contact force), so that it tends to 0 in a stable packing. This parameter is checked by TriaxialCompressionEngine to switch from one stage of the simulation to the next one (e.g. stop isotropic confinment and start axial loading)
+
+	@note Compaction is done (1) by moving rigid boxes or (2) by increasing the sizes of the particles (decided using the option "internalCompaction" : true => size increase). Both algorithm needs numerical parameters to prevent instabilities. For instance, with method (1) maxWallVelocity is the maximum wall velocity, with method (2) finalMaxMultiplier is the max value of the multiplier applied on sizes at each iteration (always something like 1.00001). 
 	
  */
 
