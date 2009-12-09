@@ -42,7 +42,7 @@ def reduceData(l):
 	"""
 	if l>maxDataLen:
 		global plotDataCollector
-		if not plotDataCollector: plotDataCollector=o.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
+		if not plotDataCollector: plotDataCollector=O.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
 		if plotDataCollector['mayStretch']: # may we double the period without getting over limits?
 			plotDataCollector['stretchFactor']=2. # just to make sure
 			print "Reducing data: %d > %d"%(l,maxDataLen)
