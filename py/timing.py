@@ -60,7 +60,7 @@ def _engines_stats(engines,totalTime,level):
 		if e.__class__.__name__=='InteractionDispatcher':
 			lines+=_engines_stats(e.geomDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.physDispatcher.functors,e.execTime,level+1)
-			lines+=_engines_stats(e.constLawDispatcher.functors,e.execTime,level+1)
+			lines+=_engines_stats(e.lawDispatcher.functors,e.execTime,level+1)
 		elif e.__class__.__name__=='ParallelEngine': lines+=_engines_stats(e.slave,e.execTime,level+1)
 	if hereLines>1:
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1

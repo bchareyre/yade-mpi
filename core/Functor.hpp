@@ -14,11 +14,14 @@
 #include<yade/lib-multimethods/FunctorWrapper.hpp>
 
 class TimingDeltas;
+class Scene;
 
 class Functor : public Serializable
 {
 	public: virtual vector<std::string> getFunctorTypes(){throw;}
 	shared_ptr<TimingDeltas> timingDeltas;
+	//! updated before every dispatch loop by the dispatcher; DO NOT ABUSE access to scene, except for getting global variables like scene->dt.
+	Scene* scene;
 	// label to be able to retrieve an engine unit by its label
 	string label; 
 	REGISTER_CLASS_AND_BASE(Functor,Serializable);

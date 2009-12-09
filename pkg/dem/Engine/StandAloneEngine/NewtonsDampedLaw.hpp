@@ -50,7 +50,12 @@ class NewtonsDampedLaw : public StandAloneEngine{
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
-	Vector3r prevCellSize;
+	// cell corners from previous step, used to detect change, find max velocity and update positions if linearCellResize enabled
+	Vector3r prevCellMax, prevCellMin;
+	// cache sizes, recomputed before the loop at every step
+	Vector3r prevCellSize, cellSize;
+	// whether the cell has changed from the previous step
+	bool cellChanged;
 
 
 
@@ -61,6 +66,8 @@ class NewtonsDampedLaw : public StandAloneEngine{
 		Real maxVelocitySq;
 		/// Enable of the exact aspherical body rotation integrator
 		bool exactAsphericalRot;
+		//! Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled (default), 1: position update, 2: velocity update.
+		int homotheticCellResize;
 
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
@@ -68,7 +75,7 @@ class NewtonsDampedLaw : public StandAloneEngine{
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(Scene *);		
-		NewtonsDampedLaw(): prevCellSize(Vector3r::ZERO),damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false){
+		NewtonsDampedLaw(): prevCellSize(Vector3r::ZERO),damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false), homotheticCellResize(0){
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif

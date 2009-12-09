@@ -12,12 +12,12 @@ class InteractionDispatchers: public StandAloneEngine {
 		virtual void action(Scene*);
 		shared_ptr<InteractionGeometryDispatcher> geomDispatcher;
 		shared_ptr<InteractionPhysicsDispatcher> physDispatcher;
-		shared_ptr<LawDispatcher> constLawDispatcher;
+		shared_ptr<LawDispatcher> lawDispatcher;
 		REGISTER_CLASS_AND_BASE(InteractionDispatchers,StandAloneEngine);
 		REGISTER_ATTRIBUTES(StandAloneEngine,
 			(geomDispatcher)
 			(physDispatcher)
-			(constLawDispatcher)
+			(lawDispatcher)
 		);
 		DECLARE_LOGGER;
 };

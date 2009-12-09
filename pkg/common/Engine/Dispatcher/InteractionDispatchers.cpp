@@ -17,7 +17,7 @@ CREATE_LOGGER(InteractionDispatchers);
 InteractionDispatchers::InteractionDispatchers(){
 	geomDispatcher=shared_ptr<InteractionGeometryDispatcher>(new InteractionGeometryDispatcher);
 	physDispatcher=shared_ptr<InteractionPhysicsDispatcher>(new InteractionPhysicsDispatcher);
-	constLawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
+	lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 	alreadyWarnedNoCollider=false;
 	#ifdef IDISP_TIMING
 		timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
@@ -26,34 +26,37 @@ InteractionDispatchers::InteractionDispatchers(){
 
 #define DISPATCH_CACHE
 
-void InteractionDispatchers::action(Scene* rootBody){
+void InteractionDispatchers::action(Scene*){
 	#ifdef IDISP_TIMING
 		timingDeltas->start();
 	#endif
-	if(rootBody->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
+	if(scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;
 	}
-	Vector3r cellSize; if(rootBody->isPeriodic) cellSize=rootBody->cellMax-rootBody->cellMin;
-	bool removeUnseenIntrs=(rootBody->interactions->iterColliderLastRun>=0 && rootBody->interactions->iterColliderLastRun==rootBody->currentIteration);
+	geomDispatcher->updateScenePtr();
+	physDispatcher->updateScenePtr();
+	lawDispatcher->updateScenePtr();
+	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cellMax-scene->cellMin;
+	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
 	#ifdef YADE_OPENMP
-		const long size=rootBody->interactions->size();
+		const long size=scene->interactions->size();
 		#pragma omp parallel for schedule(guided)
 		for(long i=0; i<size; i++){
-			const shared_ptr<Interaction>& I=(*rootBody->interactions)[i];
+			const shared_ptr<Interaction>& I=(*scene->interactions)[i];
 	#else
-		FOREACH(shared_ptr<Interaction> I, *rootBody->interactions){
+		FOREACH(shared_ptr<Interaction> I, *scene->interactions){
 	#endif
 		#ifdef DISPATCH_CACHE
-			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<rootBody->currentIteration) {
-				rootBody->interactions->requestErase(I->getId1(),I->getId2());
+			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->currentIteration) {
+				scene->interactions->requestErase(I->getId1(),I->getId2());
 				continue;
 			}
 
-			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),rootBody);
-			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),rootBody);
+			const shared_ptr<Body>& b1_=Body::byId(I->getId1(),scene);
+			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
 
-			if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); rootBody->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
+			if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
 
 			// go fast if this pair of bodies cannot interact at all
 			if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
@@ -75,19 +78,19 @@ void InteractionDispatchers::action(Scene* rootBody){
 			// and can call go in all cases
 			if(swap){I->swapOrder();}
 			// body pointers must be updated, in case we swapped
-			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody);
-			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
+			const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
 
 			assert(I->functorCache.geom);
 			bool wasReal=I->isReal();
 			bool geomCreated;
-			if(!rootBody->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
+			if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			if(!geomCreated){
-				if(wasReal) rootBody->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
+				if(wasReal) scene->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
 				continue; // in any case don't care about this one anymore
 			}
 
@@ -103,13 +106,13 @@ void InteractionDispatchers::action(Scene* rootBody){
 			I->functorCache.phys->go(b1->material,b2->material,I);
 			assert(I->interactionPhysics);
 
-			if(!wasReal) I->iterMadeReal=rootBody->currentIteration; // mark the interaction as created right now
+			if(!wasReal) I->iterMadeReal=scene->currentIteration; // mark the interaction as created right now
 
 			// LawDispatcher
 			// populating constLaw cache must be done after geom and physics dispatchers have been called, since otherwise the interaction
 			// would not have interactionGeometry and interactionPhysics yet.
 			if(!I->functorCache.constLaw){
-				I->functorCache.constLaw=constLawDispatcher->getFunctor2D(I->interactionGeometry,I->interactionPhysics,swap);
+				I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->interactionGeometry,I->interactionPhysics,swap);
 				if(!I->functorCache.constLaw){
 					LOG_FATAL("getFunctor2D returned empty functor for  #"<<I->getId1()<<"+"<<I->getId2()<<", types "<<I->interactionGeometry->getClassName()<<"="<<I->interactionGeometry->getClassIndex()<<" and "<<I->interactionPhysics->getClassName()<<"="<<I->interactionPhysics->getClassIndex());
 					//abort();
@@ -118,26 +121,26 @@ void InteractionDispatchers::action(Scene* rootBody){
 				assert(!swap); // reverse call would make no sense, as the arguments are of different types
 			}
 		  	assert(I->functorCache.constLaw);
-			I->functorCache.constLaw->go(I->interactionGeometry,I->interactionPhysics,I.get(),rootBody);
+			I->functorCache.constLaw->go(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
 		#else
-			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody);
-			const shared_ptr<Body>& b2=Body::byId(I->getId2(),rootBody);
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene);
+			const shared_ptr<Body>& b2=Body::byId(I->getId2(),scene);
 			// InteractionGeometryDispatcher
 			bool wasReal=I->isReal();
 			bool geomCreated =
 				b1->shape && b2->shape && // some bodies do not have shape
 				geomDispatcher->operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
 			// FIXME: port from the part above
-			if(rootBody->isPeriodic) { LOG_FATAL(__FILE__ ": Periodicity not handled without DISPATCH_CACHE."); abort(); }
+			if(scene->isPeriodic) { LOG_FATAL(__FILE__ ": Periodicity not handled without DISPATCH_CACHE."); abort(); }
 			if(!geomCreated){
-				if(wasReal) *rootBody->interactions->requestErase(I->getId1(),I->getId2());
+				if(wasReal) *scene->interactions->requestErase(I->getId1(),I->getId2());
 				continue;
 			}
 			// InteractionPhysicsDispatcher
 			// geom may have swapped bodies, get bodies again
-			physDispatcher->operator()(Body::byId(I->getId1(),rootBody)->material, Body::byId(I->getId2(),rootBody)->material,I);
+			physDispatcher->operator()(Body::byId(I->getId1(),scene)->material, Body::byId(I->getId2(),scene)->material,I);
 			// LawDispatcher
-			constLawDispatcher->operator()(I->interactionGeometry,I->interactionPhysics,I.get(),rootBody);
+			lawDispatcher->operator()(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
 		#endif
 		}
 }

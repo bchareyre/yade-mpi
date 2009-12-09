@@ -578,12 +578,12 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
 			ids->geomDispatcher=interactionGeometryDispatcher;
 			ids->physDispatcher=interactionPhysicsDispatcher;
-			ids->constLawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
+			ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 			if(!facetWalls && !wallWalls){
 				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw); see->sdecGroupMask=2;
-				ids->constLawDispatcher->add(see);
+				ids->lawDispatcher->add(see);
 			} else {
-				ids->constLawDispatcher->add(shared_ptr<Law2_Dem3Dof_Elastic_Elastic>(new Law2_Dem3Dof_Elastic_Elastic));
+				ids->lawDispatcher->add(shared_ptr<Law2_Dem3Dof_Elastic_Elastic>(new Law2_Dem3Dof_Elastic_Elastic));
 			}
 		rootBody->engines.push_back(ids);
 	} else {

@@ -17,9 +17,10 @@
 
 CREATE_LOGGER(BoundDispatcher);
 
-void BoundDispatcher::action(Scene* ncb)
+void BoundDispatcher::action(Scene*)
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	updateScenePtr();
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	const long numBodies=(long)bodies->size();
 	bool haveBins=(bool)velocityBins;
 	if(sweepDist!=0 && haveBins){ LOG_FATAL("Only one of sweepDist or velocityBins can used!"); abort(); }
@@ -50,7 +51,7 @@ void BoundDispatcher::action(Scene* ncb)
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 	}
-	if(ncb->state && ncb->bound && ncb->shape) operator()(ncb->shape,ncb->bound,ncb->state->se3,ncb);
+	if(scene->state && scene->bound && scene->shape) operator()(scene->shape,scene->bound,scene->state->se3,scene);
 }
 
 

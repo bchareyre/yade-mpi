@@ -59,18 +59,18 @@ void NewtonsDampedLaw::saveMaximaVelocity(Scene* scene, const body_id_t& id, Sta
 	#endif
 }
 
-void NewtonsDampedLaw::action(Scene* scene)
+void NewtonsDampedLaw::action(Scene*)
 {
 	scene->bex.sync();
 	Real dt=scene->dt;
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
-	if(scene->isPeriodic && prevCellSize!=Vector3r::ZERO){ maxVelocitySq=(prevCellSize-(scene->cellMax-scene->cellMin)).SquaredLength()/pow(dt,2); }
-	else maxVelocitySq=0;
+	if(scene->isPeriodic && (prevCellMax!=scene->cellMax || prevCellMin!=scene->cellMin)){ cellChanged=true; maxVelocitySq=(prevCellMax-prevCellMin-(scene->cellMax-scene->cellMin)).SquaredLength()/pow(dt,2); }
+	else { maxVelocitySq=0; cellChanged=false; }
+	prevCellSize=prevCellMax-prevCellMin; cellSize=scene->cellMax-scene->cellMin;
 	haveBins=(bool)velocityBins;
 	if(haveBins) velocityBins->binVelSqInitialize(maxVelocitySq);
-	if(scene->isPeriodic) prevCellSize=scene->cellMax-scene->cellMin;
 
 	#ifdef YADE_OPENMP
 		FOREACH(Real& thrMaxVSq, threadMaxVelocitySq) { thrMaxVSq=0; }
@@ -98,12 +98,12 @@ void NewtonsDampedLaw::action(Scene* scene)
 				cundallDamp(dt,f,state->vel,state->accel); 
 				leapfrogTranslate(scene,state,id,dt);
 				// rotate equation
-				if (/*b->isSpheral || */ !exactAsphericalRot){ // spheral body or exactAsphericalRot disabled
+				if (!exactAsphericalRot){ // exactAsphericalRot disabled
 					const Vector3r& m=scene->bex.getTorque(id); 
 					state->angAccel=diagDiv(m,state->inertia);
 					cundallDamp(dt,m,state->angVel,state->angAccel);
 					leapfrogSphericalRotate(scene,state,id,dt);
-				} else { // non spheral body and exactAsphericalRot enabled
+				} else { // exactAsphericalRot enabled
 					const Vector3r& m=scene->bex.getTorque(id); 
 					leapfrogAsphericalRotate(scene,state,id,dt,m);
 				}
@@ -152,13 +152,21 @@ void NewtonsDampedLaw::action(Scene* scene)
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
 	if(haveBins) velocityBins->binVelSqFinalize();
+	if(scene->isPeriodic) { prevCellMax=scene->cellMax; prevCellMin=scene->cellMin; }
 }
 
 inline void NewtonsDampedLaw::leapfrogTranslate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
 {
+	// for homothetic resize of the cell (if enabled), compute the position difference of the homothetic transformation
+	// the term ξ=(x'-x₀')/(x₁'-x₀') is normalized cell coordinate (' meaning at previous step),
+	// which is then used to compute new position x=ξ(x₁-x₀)+x₀. (per component)
+	// Then we update either velocity by (x-x')/Δt (homotheticCellResize==1)
+	//   or position by (x-x') (homotheticCellResize==2)
+	Vector3r dPos;
+	if(cellChanged && homotheticCellResize){ for(int i=0; i<3; i++) dPos[i]=((state->pos[i]-prevCellMin[i])/(prevCellSize[i]))*cellSize[i]+scene->cellMin[i]-state->pos[i]; }
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
-	state->vel+=dt*state->accel;
-	state->pos += state->vel*dt + scene->bex.getMove(id);
+	state->vel+=dt*state->accel;                             if(homotheticCellResize==1) state->vel+=dPos/dt;
+	state->pos += state->vel*dt + scene->bex.getMove(id);    if(homotheticCellResize==2) state->pos+=dPos;
 }
 inline void NewtonsDampedLaw::leapfrogSphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
 {

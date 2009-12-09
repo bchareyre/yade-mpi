@@ -344,7 +344,7 @@ class pyOmega{
 				list<shared_ptr<Functor> > eus;
 				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(!eu->label.empty()){
 						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')").c_str()); PyGILState_Release(gstate);
@@ -457,7 +457,7 @@ class pyOmega{
 				list<shared_ptr<Functor> > eus;
 				FOREACH(const shared_ptr<Functor>& eu,ee->geomDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,ee->physDispatcher->functorArguments) eus.push_back(eu);
-				FOREACH(const shared_ptr<Functor>& eu,ee->constLawDispatcher->functorArguments) eus.push_back(eu);
+				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(eu->label==label) return python::object(eu);
 				}
@@ -622,7 +622,7 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
 	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
 	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
-	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->constLawDispatcher->add(cf);
+	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
 	return instance;
 }
 
@@ -824,7 +824,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
 		.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher)
 		.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher)
-		.def_readonly("constLawDispatcher",&InteractionDispatchers::constLawDispatcher);
+		.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher);
 	python::class_<ParallelEngine,shared_ptr<ParallelEngine>, python::bases<Engine>, noncopyable>("ParallelEngine")
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
 		.add_property("slaves",&ParallelEngine_slaves_get,&ParallelEngine_slaves_set);

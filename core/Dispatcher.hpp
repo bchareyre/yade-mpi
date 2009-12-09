@@ -31,6 +31,9 @@ class Dispatcher : public Engine
 		virtual void add(Functor*) {throw;}
 		virtual void add(string) {throw;}
 
+		//! Should be called by dispatcher before every loop (could be somehow optimized, since it will change very rarely)
+		void updateScenePtr() { FOREACH(shared_ptr<Functor> f, functorArguments){ f->scene=scene; } }
+
 		void storeFunctorName(const string& baseClassName1, const string& libName, shared_ptr<Functor> eu);
 		void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& libName, shared_ptr<Functor> eu);
 		void storeFunctorName(const string& baseClassName1, const string& baseClassName2, const string& baseClassName3, const string& libName, shared_ptr<Functor> eu);
