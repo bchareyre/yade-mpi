@@ -60,7 +60,7 @@ O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o
 O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
 """Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation"""
-O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',moveTo=[-7.0,-7.0,-5.9],scale=1.0,color=(1,0,1),**kw))
+O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=[-7.0,-7.0,-5.9],scale=1.0,color=(1,0,1),**kw))
 
 
 try:

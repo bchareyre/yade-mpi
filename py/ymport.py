@@ -44,9 +44,9 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
 	return imported
 
-def gmsh(meshfile="file.mesh",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
+def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from mesh file and creates facets.
-	moveTo[X,Y,Z] parameter moves the specimen.
+	shift[X,Y,Z] parameter moves the specimen.
 	scale factor scales the given data.
 	
 	Remaining **kw arguments are passed to utils.facet; 
@@ -63,9 +63,9 @@ def gmsh(meshfile="file.mesh",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	id = 0
 	for line in lines[5:numNodes+5]:
 		data = line.split()
-		X = moveTo[0]+float(data[0])*scale
-		Y = moveTo[1]+float(data[1])*scale
-		Z = moveTo[2]+float(data[2])*scale
+		X = shift[0]+float(data[0])*scale
+		Y = shift[1]+float(data[1])*scale
+		Z = shift[2]+float(data[2])*scale
 		nodelistVector3[id] = Vector3(X,Y,Z)
 		id += 1
 	numTriangles = int(lines[numNodes+6].split()[0])
@@ -92,9 +92,9 @@ def gmsh(meshfile="file.mesh",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 		ret.append(utils.facet((nodelistVector3[i[1]],nodelistVector3[i[2]],nodelistVector3[i[3]]),**kw))
 	return ret
 
-def gengeoFile(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
+def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
-	moveTo[X,Y,Z] parameter moves the specimen.
+	shift[X,Y,Z] parameter moves the specimen.
 	scale factor scales the given data.
 	Remaining **kw arguments are passed to utils.sphere; 
 	
@@ -117,12 +117,12 @@ def gengeoFile(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	ret=[]
 	for line in lines[7:numSpheres+7]:
 		data = line.split()
-		ret.append(utils.sphere([moveTo[0]+scale*float(data[0]),moveTo[1]+scale*float(data[1]),moveTo[2]+scale*float(data[2])],scale*float(data[3]),**kw))
+		ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
-def gengeo(mntable,moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
+def gengeo(mntable,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo library and creates spheres.
-	moveTo[X,Y,Z] parameter moves the specimen.
+	shift[X,Y,Z] parameter moves the specimen.
 	Remaining **kw arguments are passed to utils.sphere; 
 	
 	LSMGenGeo library allows to create pack of spheres
@@ -141,5 +141,5 @@ def gengeo(mntable,moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	for i in range(0, len(sphereList)):
 		r=sphereList[i].Radius()
 		c=sphereList[i].Centre()
-		ret.append(utils.sphere([moveTo[0]+scale*float(c.X()),moveTo[1]+scale*float(c.Y()),moveTo[2]+scale*float(c.Z())],scale*float(r),**kw))
+		ret.append(utils.sphere([shift[0]+scale*float(c.X()),shift[1]+scale*float(c.Y()),shift[2]+scale*float(c.Z())],scale*float(r),**kw))
 	return ret

@@ -191,7 +191,7 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	elif (extents[2]==0):
 		wallMask=16
 	if (((extents[0]==0) and (extents[1]==0)) or ((extents[0]==0) and (extents[2]==0)) or ((extents[1]==0) and (extents[2]==0))):
-		raise TypeError("Please, specify at least 2 none-zero dimensions in extents!");
+		raise RuntimeError("Please, specify at least 2 none-zero dimensions in extents!");
 	
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
