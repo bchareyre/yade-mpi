@@ -23,7 +23,7 @@ _allSerializables=childClasses('Serializable')
 _noPropsClasses=set(['InteractionContainer','BodyContainer','Functor','Engine','Dispatcher'])
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
-	'GlobalEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
+	'GlobalEngine','PartialEngine','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
 	'BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State']
 	# childless classes
 	+['BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine']

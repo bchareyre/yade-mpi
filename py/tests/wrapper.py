@@ -15,7 +15,7 @@ from yade import system
 from yade import *
 
 
-rootClasses=set(['GlobalEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator','BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State'])
+rootClasses=set(['GlobalEngine','PartialEngine','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator','BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State'])
 
 allClasses=system.childClasses('Serializable')
 

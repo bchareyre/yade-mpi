@@ -18,7 +18,7 @@ by padding the interpolation with constant head and tail using
 the sanitizeInterpolation function.
 
 There is a c++ template function for interpolating on such sequences in
-pkg/common/Engine/DeusExMachina/LinearInterpolate.hpp (stateful, therefore
+pkg/common/Engine/PartialEngine/LinearInterpolate.hpp (stateful, therefore
 fast for sequential reads).
 
 TODO: Interpolating from within python is not (yet) supported.

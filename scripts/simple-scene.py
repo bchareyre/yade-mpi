@@ -15,7 +15,7 @@ o.initializers=[
 
 ## Engines are called consecutively at each iteration. Their order matters.
 ##
-## Some of them work by themselves (GlobalEngine, DeusExMachina - the difference of these two is unimportant).
+## Some of them work by themselves (GlobalEngine, PartialEngine - the difference of these two is unimportant).
 ##
 ## MetaEngines act as dispatchers and based on the type of objects they operate on, different EngineUnits are called.
 o.engines=[
