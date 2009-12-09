@@ -12,7 +12,7 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
-#include<yade/pkg-dem/BodyMacroParameters.hpp>
+//#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include"ResetRandomPosition.hpp"
 #include<sstream>
 
@@ -82,7 +82,7 @@ void ResetRandomPosition::action(Scene* ncb)
 	FOREACH(int id, subscribedBodies)
 	{
 		shared_ptr<Body> b = Body::byId(id);
-		RigidBodyParameters* rb = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
+		State* rb = b->state.get();
 		Vector3r& position = rb->se3.position;
 
 		if ( (position-point).Dot(normal) < 0 )
@@ -105,7 +105,7 @@ void ResetRandomPosition::action(Scene* ncb)
 				// Test overlap with already shifted bodies
 				FOREACH(shared_ptr<Body> sb, shiftedBodies)
 				{
-					if (iGME->explicitAction(b,sb)->interactionGeometry,/*force*/false)
+					if (iGME->explicitAction(b,sb,/*force*/false)->interactionGeometry)
 					{
 						is_overlap=true;
 						break;
@@ -116,7 +116,7 @@ void ResetRandomPosition::action(Scene* ncb)
 				// Test overlap with other bodies
 				vector<body_id_t> probedBodies=bI->probeBoundingVolume(bv);
 				FOREACH(body_id_t id, probedBodies){
-					if (iGME->explicitAction(b,Body::byId(bI->probedBodies[i]))->interactionGeometry,/*force*/false){
+					if (iGME->explicitAction(b,Body::byId(id),/*force*/false)->interactionGeometry){
 						is_overlap=true;
 						break;
 					}
@@ -131,11 +131,11 @@ void ResetRandomPosition::action(Scene* ncb)
 				return;
 			}
 
-			rb->velocity		= Vector3r(//
+			rb->vel		= Vector3r(//
 					velocity[0]+velocityRange[0]*randomSymmetricUnit(),
 					velocity[1]+velocityRange[1]*randomSymmetricUnit(),
 					velocity[2]+velocityRange[2]*randomSymmetricUnit());
-			rb->angularVelocity= Vector3r(//
+			rb->angVel = Vector3r(//
 					angularVelocity[0]+angularVelocityRange[0]*randomSymmetricUnit(),
 					angularVelocity[1]+angularVelocityRange[1]*randomSymmetricUnit(),
 					angularVelocity[2]+angularVelocityRange[2]*randomSymmetricUnit());
@@ -154,7 +154,7 @@ Vector3r ResetRandomPosition::generatePositionOnSurface()
     shared_ptr<Body> facet = Body::byId(facetId);
 	InteractingFacet* ifacet = static_cast<InteractingFacet*>(facet->shape.get());
 
-	return t1*(ifacet->vertices[1]-ifacet->vertices[0])+t2*(ifacet->vertices[2]-ifacet->vertices[0])+ifacet->vertices[0]+facet->physicalParameters->se3.position;
+	return t1*(ifacet->vertices[1]-ifacet->vertices[0])+t2*(ifacet->vertices[2]-ifacet->vertices[0])+ifacet->vertices[0]+facet->state->se3.position;
     
 }
 
@@ -168,5 +168,5 @@ Vector3r ResetRandomPosition::generatePositionInVolume()
 }
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+//YADE_REQUIRE_FEATURE(PHYSPAR);
 
