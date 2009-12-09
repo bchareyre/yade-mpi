@@ -73,7 +73,7 @@ o.engines=[
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
 	## Motion equation
-	NewtonsDampedLaw(damping=0.3),
+	NewtonIntegrator(damping=0.3),
 	## Apply kinematics to rod
 	TranslationEngine(subscribedBodies=rod,translationAxis=[0,-1,0],velocity=0.075),
 	## Save force on rod

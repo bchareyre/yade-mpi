@@ -13,7 +13,7 @@
 /*! \brief A shear test		DEPRECATED, replaced by SimpleShear
 
 This preprocessor allows to simulate a shear test of a sample contained in a deformable parallelogram box
-The movement of the box is controlled by the Engine "CinemCisEngine" (in pkg/common/Engine/DeusExMachina/)
+The movement of the box is controlled by the Engine "CinemCisEngine" (in pkg/common/Engine/PartialEngine/)
 The sample could be generated via the same method used in TriaxialTest Preprocesor (=> see GenerateCloud) or by reading a text file containing positions and radii of a sample (=> see ImportCloud). This last one is the one by default used by this PreProcessor as it is written here => you need to have such a file.
  */
 

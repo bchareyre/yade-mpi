@@ -11,7 +11,7 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	GravityEngine(gravity=[0,0,-1e4]),
-	NewtonsDampedLaw(damping=.1)
+	NewtonIntegrator(damping=.1)
 ]
 collider['sweepLength'],collider['nBins'],collider['binCoeff']=.5,2,2
 O.dt=8e-2*utils.PWaveTimeStep()

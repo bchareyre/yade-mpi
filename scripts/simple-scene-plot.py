@@ -14,7 +14,7 @@ O.engines=[
 		[ef2_Spheres_Elastic_ElasticLaw()]
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonsDampedLaw(damping=.2),
+	NewtonIntegrator(damping=.2),
 	###
 	### NOTE this extra engine:
 	###

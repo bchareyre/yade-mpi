@@ -46,7 +46,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-1e3)), # gravity artificially high, to make it faster going ;-)
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(0,1,1),angularVelocity=30*(2*pi/60),subscribedBodies=cylIds,label='rotor'),
-	NewtonsDampedLaw(damping=.3),
+	NewtonIntegrator(damping=.3),
 ]
 O.dt=utils.PWaveTimeStep()
 O.stopAtIter=int(2*pi/(rotor['angularVelocity']*O.dt))

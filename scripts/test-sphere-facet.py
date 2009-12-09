@@ -30,7 +30,7 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	GravityEngine(gravity=(0,0,-10),label='gravitator'),
-	NewtonsDampedLaw(damping=.3),
+	NewtonIntegrator(damping=.3),
 	PeriodicPythonRunner(iterPeriod=4000,command='setGravity()'),
 	]
 O.bodies.append([

@@ -85,7 +85,7 @@ O.engines=[
 		[Ip2_CpmMat_CpmMat_CpmPhys(sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress)],
 		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
 	),
-	NewtonsDampedLaw(damping=damping,label='damper'),
+	NewtonIntegrator(damping=damping,label='damper'),
 	CpmStateUpdater(realPeriod=1),
 	UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	PeriodicPythonRunner(virtPeriod=3e-5/strainRateTension,realLim=5,command='addPlotData()',label='plotDataCollector'),

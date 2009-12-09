@@ -12,7 +12,7 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
-	NewtonsDampedLaw(damping=.6)
+	NewtonIntegrator(damping=.6)
 ]
 import random
 for i in xrange(250):

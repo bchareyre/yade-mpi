@@ -18,7 +18,7 @@
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/LawDispatcher.hpp>
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/Dem3DofGeom_SphereSphere.hpp>
 
@@ -112,7 +112,7 @@ void UniaxialStrainerGen::createEngines(){
 		clDisp->add(shared_ptr<LawFunctor>(new Law2_Dem3DofGeom_CpmPhys_Cpm));
 	rootBody->engines.push_back(clDisp);
 
-	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
+	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 		newton->damping=damping;
 	rootBody->engines.push_back(newton);
 

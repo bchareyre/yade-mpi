@@ -15,7 +15,7 @@ o.initializers=[
 
 ## Engines are called consecutively at each iteration. Their order matters.
 ##
-## Some of them work by themselves (StandAloneEngine, DeusExMachina - the difference of these two is unimportant).
+## Some of them work by themselves (GlobalEngine, DeusExMachina - the difference of these two is unimportant).
 ##
 ## MetaEngines act as dispatchers and based on the type of objects they operate on, different EngineUnits are called.
 o.engines=[
@@ -55,7 +55,7 @@ o.engines=[
 	## This MetaEngine acts on all PhysicalActions and selects the right EngineUnit base on type of the PhysicalAction.
 	#
 	# note that following 4 engines (till the end) can be replaced by an optimized monolithic version:
-	NewtonsDampedLaw(damping=0.1)
+	NewtonIntegrator(damping=0.1)
 	#
 #	PhysicalActionDamper([
 #		CundallNonViscousForceDamping(damping=0.2),

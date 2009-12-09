@@ -9,9 +9,9 @@
 #pragma once
 
 #include <yade/core/Bound.hpp>
-#include "StandAloneEngine.hpp"
+#include "GlobalEngine.hpp"
 
-class Collider : public StandAloneEngine
+class Collider : public GlobalEngine
 {
 	public :
 		Collider();
@@ -36,7 +36,7 @@ class Collider : public StandAloneEngine
 	protected:
 
 	REGISTER_CLASS_NAME(Collider);	
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(Collider);

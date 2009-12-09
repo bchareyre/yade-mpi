@@ -15,7 +15,7 @@ o.engines=[
 	ElasticContactLaw(isCohesive=True),
 	MomentEngine(subscribedBodies=[1],moment=(0,1000,0)),
 	GravityEngine(gravity=(0,0,1e-2)),
-	NewtonsDampedLaw(damping=0.2)
+	NewtonIntegrator(damping=0.2)
 ]
 
 from yade import utils

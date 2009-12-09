@@ -34,7 +34,7 @@ o.engines=[
 	
 	GravityEngine(gravity=[0,0,-9.81]),
 	
-	NewtonsDampedLaw(damping = 0.01)
+	NewtonIntegrator(damping = 0.01)
 ]
 
 

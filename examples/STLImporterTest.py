@@ -55,7 +55,7 @@ O.engines=[
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
 	## Cundall damping must been disabled!
-	NewtonsDampedLaw(damping=0),
+	NewtonIntegrator(damping=0),
 	## Apply kinematics to walls
 	RotationEngine(subscribedBodies=imported,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
 ]

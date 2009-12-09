@@ -19,7 +19,7 @@ o.engines=[
 	ElasticContactLaw(),
 	GlobalStiffnessTimeStepper(defaultDt=1e-4,active=True,timeStepUpdateInterval=500),
 	AxialGravityEngine(axisPoint=(0,0,0),axisDirection=(1,0,0),acceleration=1e4),
-	NewtonsDampedLaw(damping=.4)
+	NewtonIntegrator(damping=.4)
 ]
 
 rCenter=4

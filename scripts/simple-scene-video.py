@@ -12,7 +12,7 @@ O.engines=[
 		[ef2_Spheres_Elastic_ElasticLaw()]
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonsDampedLaw(damping=.2)
+	NewtonIntegrator(damping=.2)
 ]
 
 O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400))

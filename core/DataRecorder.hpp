@@ -9,16 +9,16 @@
 #pragma once
 
 #error DataRecorder is superseded by Recorder <yade/pkg-common/Recorder.hpp>, do not include this file.
-#include "StandAloneEngine.hpp"
+#include "GlobalEngine.hpp"
 
-class DataRecorder : public StandAloneEngine
+class DataRecorder : public GlobalEngine
 {
 	public :
 		DataRecorder() {};
 		virtual ~DataRecorder() {};
 
 	REGISTER_CLASS_NAME(DataRecorder);	
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(DataRecorder);

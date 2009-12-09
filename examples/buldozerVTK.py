@@ -68,7 +68,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=[0,0,-9.8]),
 	TranslationEngine(translationAxis=[1,0,0],velocity=2,subscribedBodies=KnifeIDs), # Buldozer motion
-	NewtonsDampedLaw(damping=0),
+	NewtonIntegrator(damping=0),
 	VTKRecorder(virtPeriod=0.01,fileName='/tmp/buldozer-',recorders=['spheres','facets'])
 ]
 

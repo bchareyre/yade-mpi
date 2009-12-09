@@ -16,7 +16,7 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	GravityEngine(gravity=[0,0,-10]),
-	NewtonsDampedLaw(damping=0.01),
+	NewtonIntegrator(damping=0.01),
 	]
 O.bodies.append([
 	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),

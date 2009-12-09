@@ -5,7 +5,7 @@ import gts,os,random,itertools
 from numpy import *
 import yade.log 
 
-#yade.log.setLevel('NewtonsDampedLaw',yade.log.TRACE)
+#yade.log.setLevel('NewtonIntegrator',yade.log.TRACE)
 
 # Parameters
 tc=0.001# collision time 
@@ -68,7 +68,7 @@ O.engines=[
 		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonsDampedLaw(damping=0,accRigidBodyRot=True),
+	NewtonIntegrator(damping=0,accRigidBodyRot=True),
 ]
 
 renderer = qt.Renderer()

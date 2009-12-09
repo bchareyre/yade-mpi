@@ -36,7 +36,7 @@ O.engines=[
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)
 	ElasticContactLaw(),
 	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonsDampedLaw(damping=.2)
+	NewtonIntegrator(damping=.2)
 ]
 
 from yade import utils

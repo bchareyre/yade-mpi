@@ -17,7 +17,7 @@ O.engines=[
 	GravityEngine(gravity=(0,0,-9.81)),
 	RotationEngine(subscribedBodies=[1],rotationAxis=(1,0,0),angularVelocity=.01),
 	RotationEngine(subscribedBodies=[0],rotationAxis=(1,1,1),angularVelocity=-.02),
-	NewtonsDampedLaw(damping=.2)
+	NewtonIntegrator(damping=.2)
 ]
 from yade import utils
 O.bodies.append(utils.sphere([0,0,0],1,dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=2400,wire=True))

@@ -41,7 +41,7 @@
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -602,7 +602,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	if(recordIntervalIter>0 && !noFiles) rootBody->engines.push_back(triaxialStateRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	
-	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
+	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
 	rootBody->engines.push_back(newton);
 	

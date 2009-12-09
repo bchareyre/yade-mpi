@@ -11,11 +11,11 @@
 #include <list>
 #include <vector>
 #include "Interaction.hpp"
-#include "StandAloneEngine.hpp"
+#include "GlobalEngine.hpp"
 
 class Body;
 
-class TimeStepper : public StandAloneEngine
+class TimeStepper : public GlobalEngine
 {
 	public :
 		bool active;
@@ -27,8 +27,8 @@ class TimeStepper : public StandAloneEngine
 		virtual void action(Scene* b) { computeTimeStep(b);} ;
 		void setActive(bool a, int nb=-1);
 
-	REGISTER_ATTRIBUTES(StandAloneEngine,(active)(timeStepUpdateInterval));
-	REGISTER_CLASS_AND_BASE(TimeStepper,StandAloneEngine);
+	REGISTER_ATTRIBUTES(GlobalEngine,(active)(timeStepUpdateInterval));
+	REGISTER_CLASS_AND_BASE(TimeStepper,GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(TimeStepper);

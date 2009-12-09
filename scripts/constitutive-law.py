@@ -12,7 +12,7 @@ O.engines=[
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ConstitutiveLawDispatcher([ef2_Spheres_Elastic_ElasticLaw()]),
 	GravityEngine(gravity=(0,0,-1000)),
-	NewtonsDampedLaw(damping=0.2)
+	NewtonIntegrator(damping=0.2)
 ]
 
 for n in range(30):

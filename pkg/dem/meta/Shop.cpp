@@ -28,7 +28,7 @@
 #include<yade/pkg-common/InteractingBox2AABB.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
@@ -260,7 +260,7 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 		rootBody->engines.push_back(gravityCondition);
 	}
 	
-	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
+	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=max(getDefault<double>("param_damping"),0.);
 	rootBody->engines.push_back(newton);
 }

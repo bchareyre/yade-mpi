@@ -15,7 +15,7 @@ from yade import system
 from yade import *
 
 
-rootClasses=set(['StandAloneEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator','BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State'])
+rootClasses=set(['GlobalEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator','BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State'])
 
 allClasses=system.childClasses('Serializable')
 
@@ -57,7 +57,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assert_(len(id.geomDispatcher.functors)==2)
 		self.assert_(id.geomDispatcher.name=='InteractionGeometryDispatcher')
 		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
-		self.assert_(id.constLawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
+		self.assert_(id.lawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
 	def testParallelEngineCtor(self):
 		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),BexResetter()]])
 		self.assert_(pe.slaves[0].name=='InsertionSortCollider')

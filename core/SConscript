@@ -24,7 +24,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'BodyContainer.cpp',
 			'Bound.cpp',
 			'Collider.cpp',
-			'DeusExMachina.cpp',
+			'PartialEngine.cpp',
 			'FileGenerator.cpp',
 			'FrontEnd.cpp',
 			'GeometricalModel.cpp',

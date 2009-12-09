@@ -10,7 +10,7 @@ log.setLevel('TriaxialCompressionEngine',log.WARN) # shut up
 log.setLevel('InsertionSortCollider',log.DEBUG)
 
 collider=utils.typedEngine('InsertionSortCollider')
-newton=utils.typedEngine('NewtonsDampedLaw')
+newton=utils.typedEngine('NewtonIntegrator')
 
 # use striding; say "if 0:" to disable striding and compare to regular runs
 if 1:

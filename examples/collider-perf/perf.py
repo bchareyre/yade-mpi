@@ -23,7 +23,7 @@ O.dt=utils.PWaveTimeStep()
 isc=O.engines[2]
 isc['sweepLength']=1e-1
 
-if not fast: utils.replaceCollider(StandAloneEngine(collider))
+if not fast: utils.replaceCollider(GlobalEngine(collider))
 
 O.step()
 timing.stats()

@@ -61,7 +61,7 @@ class VelocityBins{
 	// Increment maximum per-bin distances and tell whether some bodies may be	already getting out of the swept bbox (in that case, we need to recompute bounding volumes and run the collider)
 	bool incrementDists_shouldCollide(Real dt);
 	
-	/* NOTE: following 3 functions are separated because of multi-threaded operation of NewtonsDampedLaw
+	/* NOTE: following 3 functions are separated because of multi-threaded operation of NewtonIntegrator
 	in that case, every thread must have its own per-bin maximum and binVelSqFinalize will assign the
 	overall maxima to the bins.
 
@@ -70,12 +70,12 @@ class VelocityBins{
 	*/
 	// reset per-bin max velocities
 	void binVelSqInitialize(Real velSqInit=0.);
-	// use body max velocity -- called for every body at every step (from NewtonsDampedLaw, normally)
+	// use body max velocity -- called for every body at every step (from NewtonIntegrator, normally)
 	void binVelSqUse(body_id_t id, Real velSq);
 	// actually assign max velocities to their respective bins
 	void binVelSqFinalize();
 
-	// get velSq for given body; this should be called from NewtonsDampedLaw as well,
+	// get velSq for given body; this should be called from NewtonIntegrator as well,
 	// to ensure that the same formulas are used (once we have angularVelocity + AABB span,
 	// for instance
 	static Real getBodyVelSq(const State* state){

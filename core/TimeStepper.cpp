@@ -9,10 +9,10 @@
 *************************************************************************/
 
 #include<yade/core/TimeStepper.hpp>
-#include<yade/core/StandAloneEngine.hpp>
+#include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Scene.hpp>
 
-TimeStepper::TimeStepper() : StandAloneEngine()
+TimeStepper::TimeStepper() : GlobalEngine()
 {	
 	active = true;
 	timeStepUpdateInterval = 1;

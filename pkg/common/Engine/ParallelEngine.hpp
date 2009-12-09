@@ -1,5 +1,5 @@
 #pragma once
-#include<yade/core/StandAloneEngine.hpp>
+#include<yade/core/GlobalEngine.hpp>
 class ParallelEngine: public Engine {
 	public:
 		typedef vector<vector<shared_ptr<Engine> > > slaveContainer;

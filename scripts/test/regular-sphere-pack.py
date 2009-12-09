@@ -79,7 +79,7 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
-	NewtonsDampedLaw(damping=.1)
+	NewtonIntegrator(damping=.1)
 ]
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
 O.dt=utils.PWaveTimeStep()

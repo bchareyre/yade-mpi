@@ -71,7 +71,7 @@ O.engines=[
 	GravityEngine(gravity=(0,0,-3e4)), # gravity artificially high, to make it faster going ;-)
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-120,subscribedBodies=millIds),
 	SnapshotEngine(iterPeriod=30,fileBase='/tmp/mill-',viewNo=0,label='snapshooter'),
-	NewtonsDampedLaw(damping=.3),
+	NewtonIntegrator(damping=.3),
 ]
 
 O.saveTmp()

@@ -68,7 +68,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-9.8)),
 	TranslationEngine(translationAxis=[1,0,0],velocity=5,subscribedBodies=KnifeIDs), # Buldozer motion
-	NewtonsDampedLaw(damping=.3),
+	NewtonIntegrator(damping=.3),
 	SnapshotEngine(iterPeriod=1600,fileBase='/tmp/buldozer-',viewNo=0,label='snapshooter'),
 ]
 

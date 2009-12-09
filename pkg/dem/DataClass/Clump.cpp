@@ -61,7 +61,7 @@ Clump::Clump(): Body(){
 /*! @pre Body must be dynamic.
  * @pre Body must not be part or this clump already.
  * @pre Body must have valid (non-NULL) Body::physicalParameters
- * @pre Body must have id that is smaller than the clump's id (reason: processing order in NewtonsDampedLaw)
+ * @pre Body must have id that is smaller than the clump's id (reason: processing order in NewtonIntegrator)
  */
 void Clump::add(body_id_t subId){
 	shared_ptr<Body> subBody=Body::byId(subId);

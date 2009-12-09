@@ -31,7 +31,7 @@ O.engines=[
 	# label: automatically defines python variable of that name pointing to this engine
 	InterpolatingDirectedForceEngine(subscribedBodies=[1],direction=[0,0,-1],magnitudes=magnitudes,times=times,wrap=True,label='forcer'),
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
-	NewtonsDampedLaw(damping=0.01),
+	NewtonIntegrator(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)
 	PeriodicPythonRunner(iterPeriod=50,command='myAddPlotData()',label='plotDataCollector')
 ]

@@ -31,7 +31,7 @@ O.engines=[
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic()]),
 	GravityEngine(gravity=(0,0,-9.81)),
-	NewtonsDampedLaw(damping=0.3),
+	NewtonIntegrator(damping=0.3),
 	## Spheres factory engines
 	SpheresFactory(factoryFacets=factory1,virtPeriod=0.005,radius=0.07,radiusRange=0.03,young=Young,pySpheresCreator='spheresCreator',color=(1,0,0)),
 	SpheresFactory(factoryFacets=factory2,virtPeriod= 0.01,radius=0.08,young=Young,color=(0,1,0)),

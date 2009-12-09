@@ -17,7 +17,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=[0,0,-10]),
 	TranslationEngine(translationAxis=(1,0,0),velocity=10,subscribedBodies=[0]),
-	NewtonsDampedLaw(damping=.4)
+	NewtonIntegrator(damping=.4)
 ]
 O.bodies.append(utils.sphere([-4,0,11],2,dynamic=False))
 O.bodies.append(utils.sphere([0,-2,5.5],2))

@@ -31,8 +31,8 @@
 #include<yade/pkg-dem/STLImporter.hpp>
 
 #include<yade/core/Dispatcher.hpp>
-#include<yade/core/StandAloneEngine.hpp>
-#include<yade/core/DeusExMachina.hpp>
+#include<yade/core/GlobalEngine.hpp>
+#include<yade/core/PartialEngine.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/pkg-common/ParallelEngine.hpp>
 #include<yade/core/Functor.hpp>
@@ -812,8 +812,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
 		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
 		.def_readonly("timingDeltas",&Engine::timingDeltas);
-	python::class_<StandAloneEngine,shared_ptr<StandAloneEngine>, python::bases<Engine>, noncopyable>("StandAloneEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<StandAloneEngine>));
-	python::class_<DeusExMachina,shared_ptr<DeusExMachina>, python::bases<Engine>, noncopyable>("DeusExMachina").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<DeusExMachina>));
+	python::class_<GlobalEngine,shared_ptr<GlobalEngine>, python::bases<Engine>, noncopyable>("GlobalEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<GlobalEngine>));
+	python::class_<PartialEngine,shared_ptr<PartialEngine>, python::bases<Engine>, noncopyable>("PartialEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<PartialEngine>));
 	python::class_<Functor, shared_ptr<Functor>, python::bases<Serializable>, noncopyable >("Functor",python::no_init)
 		.def_readonly("timingDeltas",&Functor::timingDeltas)
 		.add_property("bases",&Functor::getFunctorTypes);

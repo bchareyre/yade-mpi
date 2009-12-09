@@ -38,7 +38,7 @@
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -571,7 +571,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(contactStressRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	
-	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
+	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
 	
 	//if(!rotationBlocked)
 	//	rootBody->engines.push_back(orientationIntegrator);

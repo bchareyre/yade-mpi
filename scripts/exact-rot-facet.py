@@ -19,7 +19,7 @@ O.engines=[
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(),
 	RotationEngine(subscribedBodies=[1],rotationAxis=[1,0,0],angularVelocity=.01),
-	NewtonsDampedLaw(damping=0.2)
+	NewtonIntegrator(damping=0.2)
 ]
 from yade import utils
 scale=.1

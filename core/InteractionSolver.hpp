@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include "StandAloneEngine.hpp"
+#include "GlobalEngine.hpp"
 
-class InteractionSolver : public StandAloneEngine
+class InteractionSolver : public GlobalEngine
 {
 	public :
 		InteractionSolver() {};
 		virtual ~InteractionSolver() {};
 
 	REGISTER_CLASS_NAME(InteractionSolver);	
-	REGISTER_BASE_CLASS_NAME(StandAloneEngine);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(InteractionSolver);

@@ -155,14 +155,21 @@ opts.AddVariables(
 	#('SHLINK','Linker for shared objects','g++'),
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
-	BoolVariable('pretty',"Don't show commands being run, only what files are being compiled/linked/installed",1),
+	BoolVariable('brief',"Don't show commands being run, only what files are being compiled/linked/installed",True),
+	BoolVariable('pretty',"Deprecated alias for 'brief', don't use.",True),
 	BoolVariable('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
 opts.Update(env)
-# deprecated features, is mandatory now. This removes it from the saved profile
+
+# deprecated feature, is mandatory now. This removes it from the saved profile
 # so that when we remove it from features definitely, the profile will be OK.
 if 'python' in env['features']: env['features'].remove('python')
+# pretty is deprecated; save value to brief and reset pretty to the default (True) so that it is not saved in the profile
+# otherwise once it is removed completely, scons would crash at unknown var in there.
+if env['pretty'] not in (True,1,'y','yes','true','t','all'):
+	env['brief']=env['pretty']; env['pretty']=True
+
 opts.Save(optsFile,env)
 # handle colon-separated lists:
 for k in ('CPPPATH','LIBPATH','QTDIR','PATH'):

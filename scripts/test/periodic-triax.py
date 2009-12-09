@@ -21,7 +21,7 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()]
 	),
 	PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
-	NewtonsDampedLaw(damping=.6),
+	NewtonIntegrator(damping=.6),
 ]
 O.dt=utils.PWaveTimeStep()
 O.run();

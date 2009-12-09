@@ -26,7 +26,7 @@ O.engines=[
 	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
 	ElasticContactLaw(),
 	GravityEngine(gravity=(0,0,-10)),
-	NewtonsDampedLaw(damping=.3)
+	NewtonIntegrator(damping=.3)
 ]
 
 ## Timestep 

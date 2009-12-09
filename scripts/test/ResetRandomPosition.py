@@ -50,7 +50,7 @@ O.engines=[
 		[ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),
-	NewtonsDampedLaw(damping=0),
+	NewtonIntegrator(damping=0),
 	ResetRandomPosition(factoryFacets=fctIds,velocity=(0,0,-2),virtPeriod=0.01,subscribedBodies=spheres,point=(0,0,-.5),normal=(0,0,1),maxAttempts=100),
 ]
 

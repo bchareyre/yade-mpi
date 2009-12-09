@@ -39,7 +39,7 @@
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-common/CinemDNCEngine.hpp>
 
@@ -309,7 +309,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 		rootBody->engines.push_back(gravityCondition);
 	if(shearApplied)
 		rootBody->engines.push_back(kinematic);
-	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonsDampedLaw));
+	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));
 // 	rootBody->engines.push_back(possnap);
 // 	rootBody->engines.push_back(forcesnap);
 	rootBody->initializers.clear();

@@ -33,7 +33,7 @@
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/HydraulicForceEngine.hpp>
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
 
@@ -406,7 +406,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	boundDispatcher->add("MetaInteractingGeometry2AABB");
 
 	
-	shared_ptr<NewtonsDampedLaw> newton(new NewtonsDampedLaw);
+	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
 
 	

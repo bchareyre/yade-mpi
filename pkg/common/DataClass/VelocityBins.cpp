@@ -12,7 +12,7 @@ CREATE_LOGGER(VelocityBins);
 bool VelocityBins::incrementDists_shouldCollide(Real dt){
 	int i=0;
 	FOREACH(Bin& bin, bins){
-		// NOTE: this mimics the integration scheme of NewtonsDampedLaw
+		// NOTE: this mimics the integration scheme of NewtonIntegrator
 		// if you use different integration method, it must be changed (or the infrastructure somehow modified to allow for that)
 		bin.currDist+=dt*sqrt(bin.currMaxVelSq); i++;
 		if(bin.currDist>bin.maxDist){

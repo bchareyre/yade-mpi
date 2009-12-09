@@ -8,7 +8,7 @@
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-dem/NewtonsDampedLaw.hpp>
+#include<yade/pkg-dem/NewtonIntegrator.hpp>
 
 #include"TetraTestGen.hpp"
 
@@ -39,7 +39,7 @@ bool TetraTestGen::generate()
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity=Vector3r(0,0,-9.81);
 	rootBody->engines.push_back(gravityCondition);
-	rootBody->engines.push_back(shared_ptr<Engine>(new NewtonsDampedLaw));
+	rootBody->engines.push_back(shared_ptr<Engine>(new NewtonIntegrator));
 
 	rootBody->dt=1e-5;
 	

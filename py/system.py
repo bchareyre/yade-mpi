@@ -23,7 +23,7 @@ _allSerializables=childClasses('Serializable')
 _noPropsClasses=set(['InteractionContainer','BodyContainer','Functor','Engine','Dispatcher'])
 # classes that have special wrappers; only the most-bottom ones, with their names as it is in c++
 _pyRootClasses=set([
-	'StandAloneEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
+	'GlobalEngine','DeusExMachina','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator',
 	'BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State']
 	# childless classes
 	+['BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine']
@@ -53,6 +53,9 @@ _deprecated={
 	'ef2_Sphere_Sphere_Dem3DofGeom':'Ig2_Sphere_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:03 2009, vaclav@flux
 	'ef2_Facet_Sphere_Dem3DofGeom':'Ig2_Facet_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:13 2009, vaclav@flux
 	'ef2_Wall_Sphere_Dem3DofGeom':'Ig2_Wall_Sphere_Dem3DofGeom', # Sat Dec  5 00:02:22 2009, vaclav@flux
+	'NewtonsDampedLaw':'NewtonIntegrator', # Wed Dec  9 17:44:15 2009, vaclav@flux
+	'StandAloneEngine':'GlobalEngine', # Wed Dec  9 17:46:12 2009, vaclav@flux
+	'DeusExMachina':'PartialEngine', # Wed Dec  9 17:53:06 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

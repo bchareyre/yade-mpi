@@ -4,7 +4,7 @@
 
 #include<yade/core/Scene.hpp>
 #include<yade/core/FileGenerator.hpp>
-#include<yade/core/DeusExMachina.hpp>
+#include<yade/core/PartialEngine.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 
 

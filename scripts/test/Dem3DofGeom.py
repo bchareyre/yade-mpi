@@ -18,7 +18,7 @@ O.engines=[
 	#GravityEngine(gravity=(0,0,-10))
 	RotationEngine(rotationAxis=[0,1,0],angularVelocity=10,subscribedBodies=[1]),
 	TranslationEngine(translationAxis=[1,0,0],velocity=10,subscribedBodies=[1]),
-	#NewtonsDampedLaw()
+	#NewtonIntegrator()
 ]
 O.miscParams=[
 	GLDraw_Dem3DofGeom_SphereSphere(normal=True,rolledPoints=True,unrolledPoints=True,shear=True,shearLabel=True),

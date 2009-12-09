@@ -7,7 +7,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
-#include<yade/core/DeusExMachina.hpp>
+#include<yade/core/PartialEngine.hpp>
 
 
 /*! Body representing clump (rigid aggregate) composed by other existing bodies.
@@ -84,14 +84,14 @@ REGISTER_SERIALIZABLE(Clump);
 
 
 /*! Update ::Clump::members positions so that the Clump behaves as a rigid body. */
-class ClumpMemberMover: public DeusExMachina {
+class ClumpMemberMover: public PartialEngine {
 	public:
 		//! Interates over rootBody->bodies and calls Clump::moveSubBodies() for clumps.
 		virtual void applyCondition(Scene* rootBody);
 		ClumpMemberMover();
 		virtual ~ClumpMemberMover(){};
-	REGISTER_CLASS_AND_BASE(ClumpMemberMover,DeusExMachina);
-	REGISTER_ATTRIBUTES(DeusExMachina,/*nothing here*/);
+	REGISTER_CLASS_AND_BASE(ClumpMemberMover,PartialEngine);
+	REGISTER_ATTRIBUTES(PartialEngine,/*nothing here*/);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ClumpMemberMover);

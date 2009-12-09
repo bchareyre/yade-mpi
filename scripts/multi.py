@@ -25,7 +25,7 @@ o.engines=[
 	),
 	GravityEngine(gravity=(0,0,gravity)), ## here we use the 'gravity' parameter
 	PeriodicPythonRunner(iterPeriod=100,command='myAddPlotData()',label='plotDataCollector'),
-	NewtonsDampedLaw(damping=0.4)
+	NewtonIntegrator(damping=0.4)
 ]
 o.bodies.append(utils.box([0,50,0],extents=[1,50,1],dynamic=False,color=[1,0,0],young=30e9,poisson=.3,density=density)) ## here we use the density parameter
 o.bodies.append(utils.sphere([0,0,10],1,color=[0,1,0],young=30e9,poisson=.3,density=density)) ## here again
