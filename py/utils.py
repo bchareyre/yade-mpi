@@ -537,7 +537,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	import os, __builtin__,re
 	if not tableFileLine and not os.environ.has_key('PARAM_TABLE'):
 		if not noTableOk: raise EnvironmentError("PARAM_TABLE is not defined in the environment")
-		o.tags['line']='l!'
+		O.tags['line']='l!'
 	else:
 		if not tableFileLine: tableFileLine=os.environ['PARAM_TABLE']
 		env=tableFileLine.split(':')
