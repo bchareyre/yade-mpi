@@ -44,8 +44,11 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
 	return imported
 
-def gmsh(meshfile="file.mesh",**kw):
+def gmsh(meshfile="file.mesh",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from mesh file and creates facets.
+	moveTo[X,Y,Z] parameter moves the specimen.
+	scale factor scales the given data.
+	
 	Remaining **kw arguments are passed to utils.facet; 
 	mesh files can be easily created with GMSH http://www.geuz.org/gmsh/
 	Example added to scripts/test/regular-sphere-pack.py"""
@@ -60,9 +63,9 @@ def gmsh(meshfile="file.mesh",**kw):
 	id = 0
 	for line in lines[5:numNodes+5]:
 		data = line.split()
-		X = float(data[0])
-		Y = float(data[1])
-		Z = float(data[2])
+		X = moveTo[0]+float(data[0])*scale
+		Y = moveTo[1]+float(data[1])*scale
+		Z = moveTo[2]+float(data[2])*scale
 		nodelistVector3[id] = Vector3(X,Y,Z)
 		id += 1
 	numTriangles = int(lines[numNodes+6].split()[0])
@@ -92,6 +95,7 @@ def gmsh(meshfile="file.mesh",**kw):
 def gengeoFile(fileName="file.geo",moveTo=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
 	moveTo[X,Y,Z] parameter moves the specimen.
+	scale factor scales the given data.
 	Remaining **kw arguments are passed to utils.sphere; 
 	
 	LSMGenGeo library allows to create pack of spheres
