@@ -44,7 +44,7 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
 	return imported
 
-def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
+def mesh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from mesh file and creates facets.
 	shift[X,Y,Z] parameter moves the specimen.
 	scale factor scales the given data.
