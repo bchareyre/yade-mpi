@@ -10,11 +10,10 @@ es = 0.3
 
 ## Import wall's geometry
 params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-print params
 facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
 sphereMat=O.materials.append(SimpleViscoelasticMat(density=Density,frictionAngle=frictionAngle,**params))
 from yade import ymport
-imported = ymport.stl('baraban.stl',material=facetMat) 
+fctIds=O.bodies.append(ymport.stl('baraban.stl',color=(1,0,0),material=facetMat))
 ## Spheres
 sphereRadius = 0.2
 nbSpheres = (10,10,10)
@@ -57,7 +56,7 @@ O.engines=[
 	## Cundall damping must been disabled!
 	NewtonIntegrator(damping=0),
 	## Apply kinematics to walls
-	RotationEngine(subscribedBodies=imported,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
+	RotationEngine(subscribedBodies=fctIds,rotationAxis=[0,0,1],rotateAroundZero=True,angularVelocity=0.5)
 ]
 
 from yade import qt

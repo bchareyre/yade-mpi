@@ -16,19 +16,7 @@
 
 class STLImporter {
     public:
-	STLImporter();	
-
-	/// open file
-	bool open(const char* filename);
-
-	/// number of facets 
-	unsigned int number_of_facets;
-
-	/// import geometry 
-	void import(shared_ptr<BodyContainer> bodies);
-
+	vector<shared_ptr<Body> > import(const char*);
 	DECLARE_LOGGER;
-protected:
-		vector<Vector3r> tr; 
 };
 

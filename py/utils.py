@@ -88,7 +88,6 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	if resetState: b.state=b.mat.newAssocState()
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
-	b['id']=-1
 	if not noBound: b.bound=Bound('AABB',diffuseColor=[0,1,0])
 
 def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):

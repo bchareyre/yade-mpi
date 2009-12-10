@@ -30,19 +30,15 @@ def ascii(filename,scale=1.,wenjieFormat=False,**kw):
 def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=0):
 	""" Import geometry from stl file, create facets and return list of their ids."""
 	imp = STLImporter()
-	imp.open(file)
-	begin=len(O.bodies)
-	imp.import_geometry(O.bodies)
-	imported=range(begin,begin+imp.number_of_facets)
-	for i in imported:
-		b=O.bodies[i]
+	facets=imp.ymport(file)
+	for b in facets:
 		b['isDynamic']=dynamic
-		b.mold.postProcessAttributes(True)
-		b.mold['diffuseColor']=color if color else utils.randomColor()
-		b.mold['wire']=wire
-		b.mold['highlight']=highlight
+		b.shape.postProcessAttributes(True)
+		b.shape['diffuseColor']=color if color else utils.randomColor()
+		b.shape['wire']=wire
+		b.shape['highlight']=highlight
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
-	return imported
+	return facets
 
 def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from mesh file and creates facets.

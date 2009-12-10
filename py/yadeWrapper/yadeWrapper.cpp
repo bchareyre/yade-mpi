@@ -548,10 +548,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_loadTmp_overloads,loadTmp,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_exitNoBacktrace_overloads,exitNoBacktrace,0,1);
 
-class pySTLImporter : public STLImporter {
-    public:
-	void py_import(pyBodyContainer bc) { import(bc.proxee); }
-};
+class pySTLImporter : public STLImporter {};
 
 
 /*****************************************************************************
@@ -793,9 +790,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__len__",&pyMaterialContainer::len);
 
 	python::class_<pySTLImporter>("STLImporter")
-	    .def("open",&pySTLImporter::open)
-	    .add_property("number_of_facets",&pySTLImporter::number_of_facets)
-	    .def("import_geometry",&pySTLImporter::py_import);
+		.def("ymport",&pySTLImporter::import);
 
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
