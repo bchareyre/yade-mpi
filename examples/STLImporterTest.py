@@ -37,20 +37,18 @@ O.engines=[
 	## Resets forces and momenta the act on bodies
 	BexResetter(),
 	## Associates bounding volume to each body.
-	BoundDispatcher([ InteractingSphere2AABB(), InteractingFacet2AABB() ]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),
-	## Create geometry information about each potential collision.
-	InteractionGeometryDispatcher([
-		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
-		InteractingFacet2InteractingSphere4SpheresContactGeometry()
-	]),
-	## Create physical information about the interaction.
-	InteractionPhysicsDispatcher([
-		Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()
-	]),
-    ## Constitutive law
-	ConstitutiveLawDispatcher([ Law2_Spheres_Viscoelastic_SimpleViscoelastic() ]),
+	## Interactions
+	InteractionDispatchers(
+		## Create geometry information about each potential collision.
+		[InteractingSphere2InteractingSphere4SpheresContactGeometry(), InteractingFacet2InteractingSphere4SpheresContactGeometry()],
+		## Create physical information about the interaction.
+		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
+		## Constitutive law
+		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
 	## Cundall damping must been disabled!
