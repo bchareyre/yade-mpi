@@ -10,7 +10,6 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 
-#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -27,7 +26,6 @@
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 #include<yade/pkg-common/InteractingBox2AABB.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
-#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
@@ -36,8 +34,7 @@
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
-class SceneShape;
-class Bo1_SceneShape_Aabb; */
+class SceneShape; */
 
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>

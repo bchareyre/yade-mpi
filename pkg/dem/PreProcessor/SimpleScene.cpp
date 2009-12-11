@@ -4,7 +4,6 @@
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 #include<yade/pkg-common/InteractingBox2AABB.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
-#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
@@ -43,7 +42,6 @@ bool SimpleScene::generate(){
 		shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 			boundDispatcher->add(new InteractingSphere2AABB);
 			boundDispatcher->add(new InteractingBox2AABB);
-			boundDispatcher->add(new Bo1_SceneShape_Aabb);
 			rootBody->initializers.push_back(boundDispatcher);
 	//@
 	/* engines */

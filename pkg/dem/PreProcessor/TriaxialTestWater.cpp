@@ -33,7 +33,6 @@
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 
@@ -435,7 +434,6 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	
 	boundDispatcher->add(interactingSphere2AABB);
 	boundDispatcher->add("InteractingBox2AABB");
-	boundDispatcher->add("Bo1_SceneShape_Aabb");
 
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

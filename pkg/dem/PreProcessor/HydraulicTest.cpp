@@ -26,7 +26,6 @@
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 
 #include<yade/pkg-common/PhysicalActionDamper.hpp>

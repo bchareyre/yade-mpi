@@ -978,7 +978,6 @@ void LatticeExample::calcBeamAngles(Body* body, BodyContainer* bodies, Interacti
 void LatticeExample::createActors(shared_ptr<Scene>& )
 {
         shared_ptr<BoundDispatcher> boundDispatcher   = shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("Bo1_SceneShape_Aabb");
 
         shared_ptr<GeometricalModelMetaEngine> geometricalModelDispatcher       = shared_ptr<GeometricalModelMetaEngine>(new GeometricalModelMetaEngine);
         geometricalModelDispatcher->add("LatticeSet2LatticeBeams");
