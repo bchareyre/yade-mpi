@@ -624,7 +624,22 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 
 template<typename someIndexable>
 int Indexable_getClassIndex(const shared_ptr<someIndexable> i){return i->getClassIndex();}
-
+//template<typename someIndexable>
+//int Indexable_getBaseClassIndex(const shared_ptr<someIndexable> i){return i->getBaseClassIndex(1);}
+template<typename someIndexable>
+vector<int> Indexable_getClassIndices(const shared_ptr<someIndexable> i){
+	int depth=1; vector<int> ret;
+	ret.push_back(i->getClassIndex());
+	while(true){
+		//cerr<<"depth="<<depth;
+		int idx=i->getBaseClassIndex(depth);
+		//cerr<<", idx="<<idx<<endl;
+		if(idx<0) return ret;
+		ret.push_back(idx);
+		depth++;
+	}
+}
+		
 // ParallelEngine
 void ParallelEngine_slaves_set(shared_ptr<ParallelEngine> self, const python::list& slaves){
 	int len=python::len(slaves);
@@ -647,16 +662,6 @@ python::list ParallelEngine_slaves_get(shared_ptr<ParallelEngine> self){
 	return ret;
 }
 shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); ParallelEngine_slaves_set(instance,slaves); return instance; }
-
-// injected methods
-Vector3r State_displ_get(const shared_ptr<State>& pp){return pp->pos-pp->refPos;}
-Vector3r State_rot_get  (const shared_ptr<State>& pp){Quaternionr relRot=pp->refOri.Conjugate()*pp->ori; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); return axis*angle;  }
-Vector3r State_pos_get(const shared_ptr<State>& pp){return pp->pos;}
-Quaternionr State_ori_get(const shared_ptr<State>& pp){return pp->ori;}
-void State_pos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->pos=p; }
-void State_ori_set(const shared_ptr<State>& pp, const Quaternionr& p){ pp->ori=p; }
-//Vector3r State_refPos_get(const shared_ptr<State>& pp){return pp->refPos;}
-//void State_refPos_set(const shared_ptr<State>& pp, const Vector3r& p){ pp->refPos=p; }
 
 shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->shape; }
 void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
@@ -850,7 +855,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>))
 	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
 	// expose indexable class, with access to the index
-	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("classIndex",&Indexable_getClassIndex<className>)
+	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("classIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").add_property("classIndices",&Indexable_getClassIndices<className>,"Return list of indices of base classes, starting from the class instance itself, then immediate parent and so on to the top-level indexable at last.")
 
 	EXPOSE_CXX_CLASS(Body)
 		// mold and geom are deprecated:
@@ -876,11 +881,11 @@ BOOST_PYTHON_MODULE(wrapper)
 		;
 	EXPOSE_CXX_CLASS(State)
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
-		.add_property("pos",&State_pos_get,&State_pos_set)
-		.add_property("ori",&State_ori_get,&State_ori_set)
+		.add_property("pos",&State::pos_get,&State::pos_set)
+		.add_property("ori",&State::ori_get,&State::ori_set)
 		.def_readwrite("refPos",&State::refPos)
-		.add_property("displ",&State_displ_get)
-		.add_property("rot",&State_rot_get);
+		.add_property("displ",&State::displ)
+		.add_property("rot",&State::rot);
 	// deprecated
 	#ifdef YADE_PHYSPAR
 	EXPOSE_CXX_CLASS_IX(PhysicalParameters)

@@ -59,6 +59,19 @@ class State: public Serializable{
 		//! Setter of blockedDOFs from list of strings (['x','rx','rz'] → DOF_X | DOR_RX | DOF_RZ)
 		void blockedDOFs_vec_set(const std::vector<std::string>& dofs);
 
+		//! Return displacement (current-reference position)
+		Vector3r displ() const {return pos-refPos;}
+		//! Return rotation (current-reference orientation, as Vector3r)
+		Vector3r rot() const { Quaternionr relRot=refOri.Conjugate()*ori; Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle); return axis*angle; }
+
+		// python access functions: pos and ori are references to inside Se3r and cannot be pointed to directly
+		Vector3r pos_get() const {return pos;}
+		void pos_set(const Vector3r& p) {pos=p;}
+		Quaternionr ori_get() const {return ori; }
+		void ori_set(const Quaternionr& o){ori=o;}
+
+
+
 	State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY),pos(se3.position),vel(Vector3r::ZERO),accel(Vector3r::ZERO),mass(0.),ori(se3.orientation),angVel(Vector3r::ZERO),angAccel(Vector3r::ZERO),angMom(Vector3r::ZERO),inertia(Vector3r::ZERO),refPos(Vector3r::ZERO),refOri(Quaternionr::IDENTITY),blockedDOFs(DOF_NONE){}
 
 	REGISTER_CLASS_AND_BASE(State,Serializable);

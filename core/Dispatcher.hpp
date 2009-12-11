@@ -75,7 +75,7 @@ class Dispatcher1D : public Dispatcher,
 {
 
 	public :
-		void dump(){ DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry>::dumpDispatchMatrix1D(std::cerr); }
+		void dump(){ DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry>::dumpDispatchMatrix1D(std::cout); }
 		virtual void add(FunctorType* eu){ add(shared_ptr<FunctorType>(eu)); }
 		virtual void add(shared_ptr<FunctorType> eu){
 			storeFunctorName(eu->get1DFunctorType1(),eu->getClassName(),eu);
@@ -145,7 +145,7 @@ class Dispatcher2D : public Dispatcher,
 				>
 {
 	public :
-		void dump(){ DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry>::dumpDispatchMatrix2D(std::cerr); }
+		void dump(){ DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry>::dumpDispatchMatrix2D(std::cout); }
 		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
 		virtual void add(FunctorType* eu){ add(shared_ptr<FunctorType>(eu)); }
 		/* add functor by shared pointer */

@@ -14,7 +14,7 @@ The other data are now in the State class.
 */
 class Material: public Serializable, public Indexable{
 	public:
-		Material(): id(-1), density(-1){ createIndex(); }
+		Material(): id(-1), density(-1){ }
 		~Material();
 		//! global id of the material; if >= 0, the material is shared and can be found under this index in Scene::materials
 		//! (necessary since yade::serialization doesn't track shared pointers)
