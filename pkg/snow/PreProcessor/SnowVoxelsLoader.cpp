@@ -27,8 +27,8 @@
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/HydraulicForceEngine.hpp>
@@ -383,7 +383,7 @@ void SnowVoxelsLoader::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add("Ef2_BssSnowGrain_AABB_makeAABB");
 	boundDispatcher->add("InteractingBox2AABB");
-	boundDispatcher->add("MetaInteractingGeometry2AABB");
+	boundDispatcher->add("Bo1_SceneShape_Aabb");
 
 	
 
@@ -518,7 +518,7 @@ void SnowVoxelsLoader::positionRootBody(shared_ptr<Scene>& rootBody)
 	physics->velocity		= Vector3r::ZERO;
 	physics->acceleration		= Vector3r::ZERO;
 	
-	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
+	shared_ptr<SceneShape> set(new SceneShape());
 	
 	set->diffuseColor		= Vector3r(0,0,1);
 

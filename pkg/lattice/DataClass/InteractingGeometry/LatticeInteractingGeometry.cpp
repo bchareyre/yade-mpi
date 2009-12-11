@@ -9,7 +9,7 @@
 #include "LatticeInteractingGeometry.hpp"
 
 
-LatticeInteractingGeometry::LatticeInteractingGeometry () : MetaInteractingGeometry()
+LatticeInteractingGeometry::LatticeInteractingGeometry () : SceneShape()
 {
 	createIndex();
 }

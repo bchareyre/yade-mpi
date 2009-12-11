@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawElasticContactInteraction : public GLDrawInteractionPhysicsFunctor
+class GLDrawElasticContactInteraction : public GlInteractionPhysicsFunctor
 {	
 	int boxIndex;
 	Real maxLength;
@@ -22,7 +22,7 @@ class GLDrawElasticContactInteraction : public GLDrawInteractionPhysicsFunctor
 
 	RENDERS(ElasticContactInteraction);
 	REGISTER_CLASS_NAME(GLDrawElasticContactInteraction);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
+	REGISTER_BASE_CLASS_NAME(GlInteractionPhysicsFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawElasticContactInteraction);

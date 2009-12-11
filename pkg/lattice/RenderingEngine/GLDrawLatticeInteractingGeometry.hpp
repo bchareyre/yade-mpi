@@ -11,7 +11,7 @@
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 #include <vector>
 
-class GLDrawLatticeInteractingGeometry : public GLDrawInteractingGeometryFunctor
+class GLDrawLatticeInteractingGeometry : public GlShapeFunctor
 {
 	private :
 		Real maxLen;
@@ -30,7 +30,7 @@ class GLDrawLatticeInteractingGeometry : public GLDrawInteractingGeometryFunctor
 
 	RENDERS(LatticeInteractingGeometry);
 	REGISTER_CLASS_NAME(GLDrawLatticeInteractingGeometry);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
 
 };
 

@@ -10,14 +10,14 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawAABB : public GLDrawBoundingVolumeFunctor
+class GLDrawAABB : public GlBoundFunctor
 {
 	public :
 		virtual void go(const shared_ptr<Bound>&);
 
 	RENDERS(AABB);
 	REGISTER_CLASS_NAME(GLDrawAABB);
-	REGISTER_BASE_CLASS_NAME(GLDrawBoundingVolumeFunctor);
+	REGISTER_BASE_CLASS_NAME(GlBoundFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawAABB);

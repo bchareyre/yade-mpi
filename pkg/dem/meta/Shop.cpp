@@ -10,8 +10,8 @@
 #include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
@@ -26,8 +26,8 @@
 
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
 #include<yade/pkg-common/InteractingBox2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
 #include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
@@ -36,8 +36,8 @@
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
 /*class InteractingSphere2AABB;
 class InteractingBox2AABB;
-class MetaInteractingGeometry;
-class MetaInteractingGeometry2AABB; */
+class SceneShape;
+class Bo1_SceneShape_Aabb; */
 
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
@@ -190,17 +190,7 @@ void Shop::init(){
 
 /*! Create root body. */
 shared_ptr<Scene> Shop::rootBody(){
-	shared_ptr<Scene> rootBody = shared_ptr<Scene>(new Scene);
-	rootBody->isDynamic=false;
-
-	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());	set->diffuseColor=Vector3r(0,0,1);
-	rootBody->shape=YADE_PTR_CAST<Shape>(set);	
-	
-	shared_ptr<AABB> aabb(new AABB); aabb->diffuseColor=Vector3r(0,0,1);
-	rootBody->bound=YADE_PTR_CAST<Bound>(aabb);
-	
-
-	return rootBody;
+	return shared_ptr<Scene>(new Scene);
 }
 
 
@@ -214,7 +204,6 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	boundDispatcher->add(new InteractingSphere2AABB);
 	boundDispatcher->add(new InteractingBox2AABB);
 	boundDispatcher->add(new TetraAABB);
-	boundDispatcher->add(new MetaInteractingGeometry2AABB);
 	rootBody->initializers.push_back(boundDispatcher);
 
 	//engines

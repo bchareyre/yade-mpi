@@ -6,7 +6,7 @@ from math import *
 o=Omega()
 
 # we will use this in both initializers and engines, so we save it to a temp variable to save typing
-aabbDispatcher=BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+aabbDispatcher=BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()])
 
 o.initializers=[aabbDispatcher]
 

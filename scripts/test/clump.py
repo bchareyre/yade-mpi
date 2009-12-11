@@ -1,10 +1,9 @@
-O.initializers=[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])]
+O.initializers=[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),])]
 O.engines=[
 	PhysicalActionContainerReseter(),
 	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingBox2AABB(),
-		MetaInteractingGeometry2AABB()
 	]),
 	PersistentSAPCollider(),
 	InteractionDispatchers(

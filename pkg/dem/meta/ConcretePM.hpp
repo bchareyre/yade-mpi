@@ -319,12 +319,12 @@ REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class GLDrawCpmPhys: public GLDrawInteractionPhysicsFunctor {
+	class GLDrawCpmPhys: public GlInteractionPhysicsFunctor {
 		public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		virtual ~GLDrawCpmPhys() {};
 		REGISTER_ATTRIBUTES(Serializable,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
 		RENDERS(CpmPhys);
-		REGISTER_CLASS_AND_BASE(GLDrawCpmPhys,GLDrawInteractionPhysicsFunctor);
+		REGISTER_CLASS_AND_BASE(GLDrawCpmPhys,GlInteractionPhysicsFunctor);
 		DECLARE_LOGGER;
 		static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
 	};

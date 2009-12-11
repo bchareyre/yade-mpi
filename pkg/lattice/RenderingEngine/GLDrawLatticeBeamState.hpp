@@ -10,14 +10,14 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawLatticeBeamState : public GLDrawStateFunctor
+class GLDrawLatticeBeamState : public GlStateFunctor
 {
 	public :
 		virtual void go(const shared_ptr<PhysicalParameters>&);
 
 	RENDERS(LatticeBeamParameters);
 	REGISTER_CLASS_NAME(GLDrawLatticeBeamState);
-	REGISTER_BASE_CLASS_NAME(GLDrawStateFunctor);
+	REGISTER_BASE_CLASS_NAME(GlStateFunctor);
 
 };
 

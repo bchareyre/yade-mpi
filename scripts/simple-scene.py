@@ -10,7 +10,7 @@ o=Omega() # for advaned folks: this creates default MetaBody as well
 ## Initializers are run before the simulation.
 o.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),])
 ]
 
 ## Engines are called consecutively at each iteration. Their order matters.
@@ -27,7 +27,6 @@ o.engines=[
 	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingBox2AABB(),
-		MetaInteractingGeometry2AABB()
 	]),
 	## Using bounding boxes created by the previous engine, find possible body collisions.
 	## These possible collisions are inserted in Omega.interactions container (MetaBody::transientInteractions in c++).

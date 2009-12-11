@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawBssSweptSphereLineSegment : public GLDrawInteractingGeometryFunctor
+class GLDrawBssSweptSphereLineSegment : public GlShapeFunctor
 {	
 	private :
 		static bool first;
@@ -26,7 +26,7 @@ class GLDrawBssSweptSphereLineSegment : public GLDrawInteractingGeometryFunctor
 
         RENDERS(BssSweptSphereLineSegment);
         REGISTER_CLASS_NAME(GLDrawBssSweptSphereLineSegment);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawBssSweptSphereLineSegment);

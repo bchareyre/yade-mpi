@@ -6,13 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawInteractingFacet.hpp"
+#include "Gl1_Facet.hpp"
 #include <yade/pkg-common/InteractingFacet.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-bool GLDrawInteractingFacet::normals=false;
+bool Gl1_Facet::normals=false;
 
-void GLDrawInteractingFacet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool,const GLViewInfo&)
+void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool,const GLViewInfo&)
 {   
     InteractingFacet* facet = static_cast<InteractingFacet*>(cm.get());
     const vector<Vector3r>& vertices = facet->vertices;
@@ -52,5 +52,5 @@ void GLDrawInteractingFacet::go(const shared_ptr<Shape>& cm, const shared_ptr<St
     glEnd();
 }
 
-YADE_PLUGIN((GLDrawInteractingFacet));
+YADE_PLUGIN((Gl1_Facet));
 YADE_REQUIRE_FEATURE(OPENGL)

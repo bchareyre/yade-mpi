@@ -11,7 +11,7 @@
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
 
-class GLDrawTube : public GLDrawGeometricalModelFunctor
+class GLDrawTube : public GlGeometricalModelFunctor
 {
 	private :
 		static bool first;
@@ -25,7 +25,7 @@ class GLDrawTube : public GLDrawGeometricalModelFunctor
                 
 	RENDERS(BshTube);
 	REGISTER_CLASS_NAME(GLDrawTube);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawTube);

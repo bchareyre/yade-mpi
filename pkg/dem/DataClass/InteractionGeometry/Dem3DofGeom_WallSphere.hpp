@@ -37,13 +37,13 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class Gl1_Dem3DofGeom_WallSphere:public GLDrawInteractionGeometryFunctor{
+	class Gl1_Dem3DofGeom_WallSphere:public GlInteractionGeometryFunctor{
 		public:
 			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 			static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
 		RENDERS(Dem3DofGeom_WallSphere);
-		REGISTER_CLASS_AND_BASE(Gl1_Dem3DofGeom_WallSphere,GLDrawInteractionGeometryFunctor);
-		REGISTER_ATTRIBUTES(GLDrawInteractionGeometryFunctor, (normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel) );
+		REGISTER_CLASS_AND_BASE(Gl1_Dem3DofGeom_WallSphere,GlInteractionGeometryFunctor);
+		REGISTER_ATTRIBUTES(GlInteractionGeometryFunctor, (normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel) );
 	};
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_WallSphere);
 #endif

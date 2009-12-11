@@ -607,17 +607,16 @@ std::ostream& operator<<(std::ostream& os, Tableau& T)
         return os;
 }
 
-BodiesMenisciiList::BodiesMenisciiList(Body * body)
+BodiesMenisciiList::BodiesMenisciiList(Scene * ncb)
 {
 	initialized=false;
-	prepare(body);
+	prepare(ncb);
 }
 
-bool BodiesMenisciiList::prepare(Body * body)
+bool BodiesMenisciiList::prepare(Scene * ncb)
 {
 	//cerr << "preparing bodiesInteractionsList" << endl;
 	interactionsOnBody.clear();
-	Scene * ncb = static_cast<Scene*>(body);
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	
 	body_id_t MaxId = -1;

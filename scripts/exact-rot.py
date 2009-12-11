@@ -2,11 +2,11 @@
 # -*- encoding=utf-8 -*-
 from math import *
 O.initializers=[
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
-	]
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()])
+]
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([
 		InteractingSphere2InteractingSphere4SpheresContactGeometry(),

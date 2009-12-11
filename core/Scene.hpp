@@ -22,9 +22,12 @@
 #define HOST_NAME_MAX 255 
 #endif
 
-class Scene : public Body
-{
-	public :
+class Bound;
+
+class Scene: public Serializable{
+	public:
+		shared_ptr<Bound> bound;
+		shared_ptr<Shape> shape;
 		shared_ptr<BodyContainer>		bodies;
 		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50
@@ -35,6 +38,8 @@ class Scene : public Body
 		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
 		//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundDispatcher the first time it runs)
 		void checkStateTypes();
+		//! update our bound; used directly instead of a BoundFunctor, since we don't derive from Body anymore
+		void updateBound();
 
 		BexContainer bex;
 
@@ -68,7 +73,7 @@ class Scene : public Body
 		body_id_t selectedBody;
 	protected :
 		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(Body,
+	REGISTER_ATTRIBUTES(Serializable,
 		(tags)
 		(grpRelationData)
 		(engines)
@@ -86,7 +91,7 @@ class Scene : public Body
 		(cellMax)
 		(isPeriodic)
 	);
-	REGISTER_CLASS_AND_BASE(Scene,Body);
+	REGISTER_CLASS_AND_BASE(Scene,Serializable);
 };
 
 REGISTER_SERIALIZABLE(Scene);

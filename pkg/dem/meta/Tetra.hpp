@@ -86,16 +86,16 @@ REGISTER_SERIALIZABLE(TetraAABB);
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
 	/*! Draw TetraMold using OpenGL */
-	class TetraDraw: public GLDrawInteractingGeometryFunctor
+	class Gl1_Tetra: public GlShapeFunctor
 	{	
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
 			RENDERS(TetraMold);
-			REGISTER_CLASS_NAME(TetraDraw);
-			REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+			REGISTER_CLASS_NAME(Gl1_Tetra);
+			REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
 	};
-	REGISTER_SERIALIZABLE(TetraDraw);
+	REGISTER_SERIALIZABLE(Gl1_Tetra);
 #endif
 
 /*! Calculate physical response based on penetration configuration given by TetraBang. */

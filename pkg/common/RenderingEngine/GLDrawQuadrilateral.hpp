@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawQuadrilateral : public GLDrawGeometricalModelFunctor
+class GLDrawQuadrilateral : public GlGeometricalModelFunctor
 {
 	private:
 		// FIXME - this does not belong here
@@ -24,7 +24,7 @@ class GLDrawQuadrilateral : public GLDrawGeometricalModelFunctor
 
 	RENDERS(Quadrilateral);
 	REGISTER_CLASS_NAME(GLDrawQuadrilateral);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawQuadrilateral);

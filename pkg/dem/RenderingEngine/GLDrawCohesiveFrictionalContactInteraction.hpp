@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawCohesiveFrictionalContactInteraction : public GLDrawInteractionPhysicsFunctor
+class GLDrawCohesiveFrictionalContactInteraction : public GlInteractionPhysicsFunctor
 {	
 	int boxIndex;
 	bool isReal;
@@ -24,7 +24,7 @@ class GLDrawCohesiveFrictionalContactInteraction : public GLDrawInteractionPhysi
 
 	RENDERS(CohesiveFrictionalContactInteraction);
 	REGISTER_CLASS_NAME(GLDrawCohesiveFrictionalContactInteraction);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
+	REGISTER_BASE_CLASS_NAME(GlInteractionPhysicsFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawCohesiveFrictionalContactInteraction);

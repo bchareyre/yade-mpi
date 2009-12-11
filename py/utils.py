@@ -206,14 +206,18 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
+If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
 
 	:Parameters:
 		`wallMask`: bitmask
 			 determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32).
 			 The numbers are ANDed; the default 63 means to create all walls.
+		`**kw`: passed to utils.facet.
+	
+	:Return:
+		List of facets forming the box.
+	"""
 
-	Remaining **kw arguments are passed to utils.facet.
-	The facets are oriented outwards from the box."""
 	
 	"""Defence from zero dimensions"""
 	if (extents[0]==0):
@@ -491,9 +495,24 @@ def import_LSMGenGeo_geometry(*args,**kw):
 
 
 class TableParamReader():
+	"""Class for reading simulation parameters from text file.
+	
+Each parameter is represented by one column, each parameter set by one line. Colums are separated by blanks (no quoting).
+
+First non-empty line contains column titles (without quotes).
+You may use special column named 'description' to describe this parameter set;
+if such colum is absent, description will be built by concatenating column names and corresponding values (``param1=34,param2=12.22,param4=foo``)
+
+  * from columns ending in ``!`` (the ``!`` is not included in the column name)
+  * from all columns, if no columns end in ``!``.
+
+Empty lines within the file are ignored (although counted); ``#`` starts comment till the end of line. Number of blank-separated columns must be the same for all non-empty lines.
+
+A special value ``=`` can be used instead of parameter value; value from the previous non-empty line will be used instead (works recursively).
+	"""
 	def __init__(self,file):
-		import re
 		"Setup the reader class, read data into memory."
+		import re
 		# read file in memory, remove newlines and comments; the [''] makes lines 1-indexed
 		ll=[re.sub('\s*#.*','',l[:-1]) for l in ['']+open(file,'r').readlines()]
 		# usable lines are those that contain something else than just spaces
@@ -532,6 +551,7 @@ class TableParamReader():
 		self.values=values
 				
 	def paramDict(self):
+		"""Return dictionary containing data from file given to constructor. Keys are line numbers (which might be non-contiguous and refer to real line numbers that one can see in text editors), values are dictionaries mapping parameter names to their values given in the file. The special value '=' has already been interpreted, ``!`` (bangs) (if any) were already removed from column titles, ``description`` column has already been added (if absent)."""
 		return self.values
 		
 if __name__=="__main__":

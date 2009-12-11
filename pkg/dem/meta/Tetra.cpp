@@ -5,7 +5,7 @@
 YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB) 
 	/* some code in cpp (this file): */ (TetraLaw) (Tetra2TetraBang)
 	#ifdef YADE_OPENGL
-		(TetraDraw)
+		(Gl1_Tetra)
 	#endif	
 	);
 
@@ -415,7 +415,7 @@ void TetraLaw::action(Scene* rootBody)
 
 #ifdef YADE_OPENGL
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
-	void TetraDraw::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
+	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 		glColor3v(cm->diffuseColor);

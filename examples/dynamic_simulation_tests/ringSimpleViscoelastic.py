@@ -41,7 +41,7 @@ print "Number of spheres: %d" % spheresCount
 ## Initializers 
 o.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()])
 	]
 
 ## Engines 
@@ -53,7 +53,6 @@ o.engines=[
 	BoundDispatcher([
 		InteractingSphere2AABB(),
 		InteractingFacet2AABB(),
-		MetaInteractingGeometry2AABB()
 	]),
 
 	## Using bounding boxes find possible body collisions.

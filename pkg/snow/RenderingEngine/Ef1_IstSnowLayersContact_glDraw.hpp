@@ -4,7 +4,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class Ef1_IstSnowLayersContact_glDraw : public GLDrawInteractionGeometryFunctor
+class Ef1_IstSnowLayersContact_glDraw : public GlInteractionGeometryFunctor
 {
 	public :
 		Ef1_IstSnowLayersContact_glDraw(){}
@@ -12,7 +12,7 @@ class Ef1_IstSnowLayersContact_glDraw : public GLDrawInteractionGeometryFunctor
 
 	RENDERS(IstSnowLayersContact);
 	REGISTER_CLASS_NAME(Ef1_IstSnowLayersContact_glDraw);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(GlInteractionGeometryFunctor);
 };
 
 REGISTER_SERIALIZABLE(Ef1_IstSnowLayersContact_glDraw);

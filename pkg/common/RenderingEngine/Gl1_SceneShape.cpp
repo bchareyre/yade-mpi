@@ -6,17 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawMetaInteractingGeometry.hpp"
+#include "Gl1_SceneShape.hpp"
 
 
-void GLDrawMetaInteractingGeometry::go(const shared_ptr<Shape>& , const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
+void Gl1_SceneShape::go(const shared_ptr<Shape>& , const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&)
 {
 
 
 }
 
 
-YADE_PLUGIN((GLDrawMetaInteractingGeometry));
+YADE_PLUGIN((Gl1_SceneShape));
 YADE_REQUIRE_FEATURE(OPENGL)
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

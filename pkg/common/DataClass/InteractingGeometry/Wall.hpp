@@ -30,14 +30,14 @@ class Wall2AABB: public BoundFunctor{
 REGISTER_SERIALIZABLE(Wall2AABB);
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class Gl1_Wall: public GLDrawInteractingGeometryFunctor{	
+	class Gl1_Wall: public GlShapeFunctor{	
 		//! Number of divisions
 		static int div;
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 		RENDERS(Wall);
-		REGISTER_ATTRIBUTES(GLDrawInteractingGeometryFunctor,(div));
-		REGISTER_CLASS_AND_BASE(Gl1_Wall,GLDrawInteractingGeometryFunctor);
+		REGISTER_ATTRIBUTES(GlShapeFunctor,(div));
+		REGISTER_CLASS_AND_BASE(Gl1_Wall,GlShapeFunctor);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Wall);
 #endif

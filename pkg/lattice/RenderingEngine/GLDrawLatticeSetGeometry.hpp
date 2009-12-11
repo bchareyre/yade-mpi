@@ -12,14 +12,14 @@
 #include<yade/lib-computational-geometry/MarchingCube.hpp>
 #include <vector>
 
-class GLDrawLatticeSetGeometry : public GLDrawGeometricalModelFunctor
+class GLDrawLatticeSetGeometry : public GlGeometricalModelFunctor
 {
 	public :
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 
 	RENDERS(LatticeSetGeometry);
 	REGISTER_CLASS_NAME(GLDrawLatticeSetGeometry);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 
 	private :
 		MarchingCube mc;

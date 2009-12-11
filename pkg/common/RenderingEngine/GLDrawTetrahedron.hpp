@@ -10,14 +10,14 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawTetrahedron : public GLDrawGeometricalModelFunctor
+class GLDrawTetrahedron : public GlGeometricalModelFunctor
 {
 	public :
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 
 	RENDERS(Tetrahedron);
 	REGISTER_CLASS_NAME(GLDrawTetrahedron);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawTetrahedron);

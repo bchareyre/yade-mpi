@@ -37,8 +37,8 @@
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
@@ -505,7 +505,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	boundDispatcher->add("InteractingBox2AABB");
 	boundDispatcher->add("InteractingFacet2AABB");
 	boundDispatcher->add("Wall2AABB");
-	boundDispatcher->add("MetaInteractingGeometry2AABB");
+	boundDispatcher->add("Bo1_SceneShape_Aabb");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -627,21 +627,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 
 void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
-	rootBody->isDynamic		= false;
-
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-	
-	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-	
-	set->diffuseColor		= Vector3r(0,0,1);
-
-	shared_ptr<AABB> aabb(new AABB);
-	aabb->diffuseColor		= Vector3r(0,0,1);
-	
-	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);
-	
 }
 // 0xdeadc0de, superseded by SpherePack::makeCloud
 #if 0

@@ -28,8 +28,8 @@
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/HydraulicForceEngine.hpp>
@@ -403,7 +403,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add("InteractingSphere2AABB");
 	boundDispatcher->add("InteractingBox2AABB");
-	boundDispatcher->add("MetaInteractingGeometry2AABB");
+	boundDispatcher->add("Bo1_SceneShape_Aabb");
 
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
@@ -483,20 +483,11 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 
 void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {	
-	rootBody->isDynamic		= false;
-
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
-	
-	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
-	
-	set->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<AABB> aabb(new AABB);
 	aabb->diffuseColor		= Vector3r(0,0,1);
-	
-	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
-	rootBody->bound	= YADE_PTR_CAST<Bound>(aabb);	
 }
 
 

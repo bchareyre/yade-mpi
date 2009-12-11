@@ -46,11 +46,11 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	map<string,DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di){
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawStateFunctor")) addStateFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawBoundingVolumeFunctor")) addBoundingVolumeFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractingGeometryFunctor")) addInteractingGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
-		if (Omega::instance().isInheritingFrom((*di).first,"GLDrawInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GlStateFunctor")) addStateFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GlBoundFunctor")) addBoundingVolumeFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GlShapeFunctor")) addInteractingGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GlInteractionGeometryFunctor")) addInteractionGeometryFunctor((*di).first);
+		if (Omega::instance().isInheritingFrom((*di).first,"GlInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
 	}
 	postProcessAttributes(true);
 }
@@ -73,15 +73,15 @@ void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& rootBody){
 void OpenGLRenderingEngine::initgl(){
 	LOG_INFO("(re)initializing GL for gldraw methods.\n");
 	BOOST_FOREACH(vector<string>& s,stateFunctorNames)
-		(static_pointer_cast<GLDrawStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+		(static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,boundFunctorNames)
-		(static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+		(static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,shapeFunctorNames)
-		(static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+		(static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames)
-		(static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+		(static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames)
-		(static_pointer_cast<GLDrawInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+		(static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 }
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& rootBody){
@@ -159,6 +159,9 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& rootBody, body_id_t 
 
 	assert(glutInitDone);
 	current_selection = selection;
+
+	// just to make sure, since it is not initialized by default
+	if(!rootBody->bound) rootBody->bound=shared_ptr<AABB>(new AABB);
 
 	// recompute emissive light colors for highlighted bodies
 	Real now=TimingInfo::getNow(/*even if timing is disabled*/true)*1e-9;
@@ -251,7 +254,7 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){
 			glPopMatrix();
 		}
 	}
-	if(rootBody->shape) shapeDispatcher(rootBody->shape,rootBody->state,Body_wire);
+	if(rootBody->shape) shapeDispatcher(rootBody->shape,shared_ptr<State>(),true);
 }
 
 void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<Scene>& rootBody){	
@@ -301,7 +304,19 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& rootBo
 			glPushMatrix(); boundDispatcher(b->bound); glPopMatrix();
 		}
 	}
-	if(rootBody->bound){ glPushMatrix(); boundDispatcher(rootBody->bound); glPopMatrix(); }
+	// since we remove the functor as Scene doesn't inherit from Body anymore, hardcore the rendering routine here
+	// for periodic scene, renderPeriodicCell is called separately
+	if(!rootBody->isPeriodic){
+		if(!rootBody->bound) rootBody->updateBound();
+		glColor3v(Vector3r(0,1,0));
+		Vector3r size=rootBody->bound->max-rootBody->bound->min;
+		Vector3r center=.5*(rootBody->bound->min+rootBody->bound->max);
+		glPushMatrix();
+			glTranslatev(center);
+			glScalev(size);
+			glutWireCube(1);
+		glPopMatrix();
+	}
 }
 
 
@@ -378,7 +393,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 			}
 		}
 	}
-	if(rootBody->shape){ glPushMatrix(); shapeDispatcher(rootBody->shape,rootBody->state,Body_wire,viewInfo); glPopMatrix(); }
+	if(rootBody->shape){ glPushMatrix(); shapeDispatcher(rootBody->shape,shared_ptr<State>(),true,viewInfo); glPopMatrix(); }
 }
 
 
@@ -394,22 +409,22 @@ void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	for(unsigned int i=0;i<interactionPhysicsFunctorNames.size();i++) interactionPhysicsDispatcher.add1DEntry(interactionPhysicsFunctorNames[i][0],interactionPhysicsFunctorNames[i][1]);	
 }
 void OpenGLRenderingEngine::addInteractionGeometryFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawInteractionGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	string str1 = (static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); interactionGeometryFunctorNames.push_back(v);
 }
 void OpenGLRenderingEngine::addInteractionPhysicsFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawInteractionPhysicsFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	string str1 = (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); interactionPhysicsFunctorNames.push_back(v);
 }
 void OpenGLRenderingEngine::addStateFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawStateFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	string str1 = (static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); stateFunctorNames.push_back(v);
 }
 void OpenGLRenderingEngine::addBoundingVolumeFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawBoundingVolumeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	string str1 = (static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); boundFunctorNames.push_back(v);
 }
 void OpenGLRenderingEngine::addInteractingGeometryFunctor(const string& str2){
-	string str1 = (static_pointer_cast<GLDrawInteractingGeometryFunctor>(ClassFactory::instance().createShared(str2)))->renders();
+	string str1 = (static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(str2)))->renders();
 	vector<string> v; v.push_back(str1); v.push_back(str2); shapeFunctorNames.push_back(v);
 }

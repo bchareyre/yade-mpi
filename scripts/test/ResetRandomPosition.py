@@ -43,7 +43,7 @@ for id in spheres:
 	s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 
 # Create engines
-O.initializers=[ BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]) ]
+O.initializers=[ BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]) ]
 O.engines=[
 	BexResetter(),
 	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),

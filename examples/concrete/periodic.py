@@ -92,7 +92,7 @@ import yade.plot as yp
 
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(aabbEnlargeFactor=intRadius,label='is2aabb'),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
 	InsertionSortCollider(sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],

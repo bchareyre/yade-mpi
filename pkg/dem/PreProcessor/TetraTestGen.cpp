@@ -6,7 +6,7 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 
@@ -23,7 +23,7 @@ bool TetraTestGen::generate()
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add(new TetraAABB);
-	boundDispatcher->add(new MetaInteractingGeometry2AABB);
+	boundDispatcher->add(new Bo1_SceneShape_Aabb);
 	rootBody->initializers.push_back(boundDispatcher);
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new BexResetter));

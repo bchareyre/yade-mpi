@@ -27,8 +27,8 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
-#include<yade/pkg-common/MetaInteractingGeometry2AABB.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
+#include<yade/pkg-common/Bo1_SceneShape_Aabb.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
@@ -211,7 +211,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add("InteractingSphere2AABB");
 	boundDispatcher->add("InteractingFacet2AABB");
-	boundDispatcher->add("MetaInteractingGeometry2AABB");
+	boundDispatcher->add("Bo1_SceneShape_Aabb");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -282,7 +282,7 @@ void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	physics->velocity			= Vector3r(0,0,0);
 	physics->acceleration			= Vector3r::ZERO;
 		
-	shared_ptr<MetaInteractingGeometry> set(new MetaInteractingGeometry());
+	shared_ptr<SceneShape> set(new SceneShape());
 	set->diffuseColor			= Vector3r(0,0,1);
 	
 	shared_ptr<AABB> aabb(new AABB);

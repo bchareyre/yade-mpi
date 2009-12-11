@@ -24,7 +24,7 @@ O.miscParams=[
 	GLDraw_Dem3DofGeom_SphereSphere(normal=True,rolledPoints=True,unrolledPoints=True,shear=True,shearLabel=True),
 	Gl1_Dem3DofGeom_FacetSphere(normal=False,rolledPoints=True,unrolledPoints=True,shear=True,shearLabel=True),
 	Gl1_Dem3DofGeom_WallSphere(normal=False,rolledPoints=True,unrolledPoints=True,shear=True,shearLabel=True),
-	GLDrawInteractingSphere(wire=True)
+	Gl1_Sphere(wire=True)
 ]
 
 try:

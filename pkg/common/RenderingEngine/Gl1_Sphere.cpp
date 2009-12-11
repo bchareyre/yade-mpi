@@ -6,16 +6,16 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawInteractingSphere.hpp"
+#include "Gl1_Sphere.hpp"
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-bool GLDrawInteractingSphere::wire=false;
-bool GLDrawInteractingSphere::glutNormalize=true;
-int  GLDrawInteractingSphere::glutSlices=12;
-int  GLDrawInteractingSphere::glutStacks=6;
+bool Gl1_Sphere::wire=false;
+bool Gl1_Sphere::glutNormalize=true;
+int  Gl1_Sphere::glutSlices=12;
+int  Gl1_Sphere::glutStacks=6;
 
-void GLDrawInteractingSphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
+void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
 {
 	Real r=(static_cast<InteractingSphere*>(cm.get()))->radius;
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
@@ -26,5 +26,5 @@ void GLDrawInteractingSphere::go(const shared_ptr<Shape>& cm, const shared_ptr<S
 	if(glutNormalize) glPopAttrib();
 	return;
 }
-YADE_PLUGIN((GLDrawInteractingSphere));
+YADE_PLUGIN((Gl1_Sphere));
 YADE_REQUIRE_FEATURE(OPENGL)

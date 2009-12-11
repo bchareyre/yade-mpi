@@ -62,6 +62,20 @@ _deprecated={
 	'GLDrawSphere':'GLDrawSphereModel', # Fri Dec 11 15:43:31 2009, vaclav@flux
 	'GLDrawBox':'GLDrawBoxModel', # Fri Dec 11 15:43:50 2009, vaclav@flux
 	'GLDrawFacet':'GLDrawFacetModel', # Fri Dec 11 15:44:04 2009, vaclav@flux
+	'GLDrawInteractingGeometryFunctor':'GlShapeFunctor', # Fri Dec 11 16:08:16 2009, vaclav@flux
+	'GLDrawGeometricalModelFunctor':'GlGeometricalModelFunctor', # Fri Dec 11 16:08:40 2009, vaclav@flux
+	'GLDrawBoundingVolumeFunctor':'GlBoundFunctor', # Fri Dec 11 16:09:16 2009, vaclav@flux
+	'GLDrawInteractionGeometryFunctor':'GlInteractionGeometryFunctor', # Fri Dec 11 16:09:48 2009, vaclav@flux
+	'GLDrawInteractionPhysicsFunctor':'GlInteractionPhysicsFunctor', # Fri Dec 11 16:10:02 2009, vaclav@flux
+	'GLDrawStateFunctor':'GlStateFunctor', # Fri Dec 11 16:10:29 2009, vaclav@flux
+	'GLDrawInteractingSphere':'Gl1_Sphere', # Fri Dec 11 16:20:51 2009, vaclav@flux
+	'GLDrawInteractingFacet':'Gl1_Facet', # Fri Dec 11 16:21:06 2009, vaclav@flux
+	'GLDrawInteractingBox':'Gl1_Box', # Fri Dec 11 16:21:17 2009, vaclav@flux
+	'TetraDraw':'Gl1_Tetra', # Fri Dec 11 16:22:18 2009, vaclav@flux
+	'MetaInteractingGeometry':'SceneShape', # Fri Dec 11 16:56:06 2009, vaclav@flux
+	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:00:00 2009, vaclav@flux
+	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:10:17 2009, vaclav@flux
+	'MetaInteractingGeometry2AABB':'DontUseThisClassAnymore_itWillBeRemovedInTheFuture', # Fri Dec 11 17:10:50 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

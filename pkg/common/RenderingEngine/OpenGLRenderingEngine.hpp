@@ -57,12 +57,12 @@ class OpenGLRenderingEngine : public RenderingEngine
 
 
 	private :
-		DynLibDispatcher< InteractionGeometry , GLDrawInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
-		DynLibDispatcher< InteractionPhysics  , GLDrawInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
+		DynLibDispatcher< InteractionGeometry , GlInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
+		DynLibDispatcher< InteractionPhysics  , GlInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
 
-		DynLibDispatcher< State  , GLDrawStateFunctor,               void , TYPELIST_1(const shared_ptr<State>&) > stateDispatcher;
-		DynLibDispatcher< Bound      , GLDrawBoundingVolumeFunctor,      void , TYPELIST_1(const shared_ptr<Bound>&) > boundDispatcher;
-		DynLibDispatcher< Shape , GLDrawInteractingGeometryFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > shapeDispatcher;
+		DynLibDispatcher< State  , GlStateFunctor,               void , TYPELIST_1(const shared_ptr<State>&) > stateDispatcher;
+		DynLibDispatcher< Bound      , GlBoundFunctor,      void , TYPELIST_1(const shared_ptr<Bound>&) > boundDispatcher;
+		DynLibDispatcher< Shape , GlShapeFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > shapeDispatcher;
 
 		vector<vector<string> >
 			stateFunctorNames,

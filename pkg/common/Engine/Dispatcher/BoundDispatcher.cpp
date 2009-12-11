@@ -51,7 +51,7 @@ void BoundDispatcher::action(Scene*)
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 	}
-	if(scene->state && scene->bound && scene->shape) operator()(scene->shape,scene->bound,scene->state->se3,scene);
+	scene->updateBound();
 }
 
 

@@ -7,7 +7,7 @@
 
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(nBins=5,sweepLength=5e-3),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(

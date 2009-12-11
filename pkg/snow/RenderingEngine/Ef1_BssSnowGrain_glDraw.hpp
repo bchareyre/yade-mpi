@@ -9,18 +9,18 @@
 #pragma once
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
-#include<yade/pkg-common/GLDrawInteractingSphere.hpp>
+#include<yade/pkg-common/Gl1_Sphere.hpp>
 
 
-class Ef1_BssSnowGrain_glDraw : public GLDrawInteractingGeometryFunctor
+class Ef1_BssSnowGrain_glDraw : public GlShapeFunctor
 {
-//	GLDrawInteractingSphere s;
+//	Gl1_Sphere s;
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
 
 	RENDERS(BssSnowGrain);
 	REGISTER_CLASS_NAME(Ef1_BssSnowGrain_glDraw);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
 };
 
 REGISTER_SERIALIZABLE(Ef1_BssSnowGrain_glDraw);

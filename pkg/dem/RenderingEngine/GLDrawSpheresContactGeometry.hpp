@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawSpheresContactGeometry : public GLDrawInteractionGeometryFunctor{	
+class GLDrawSpheresContactGeometry : public GlInteractionGeometryFunctor{	
 	private :
 		Real midMax;
 		Real forceMax;
@@ -21,7 +21,7 @@ class GLDrawSpheresContactGeometry : public GLDrawInteractionGeometryFunctor{
 	DECLARE_LOGGER;
 	RENDERS(SpheresContactGeometry);
 	REGISTER_CLASS_NAME(GLDrawSpheresContactGeometry);
-	REGISTER_BASE_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_BASE_CLASS_NAME(GlInteractionGeometryFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawSpheresContactGeometry);

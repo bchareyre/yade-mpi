@@ -8,7 +8,7 @@ o=Omega()
 
 o.initializers=[
 	
-	BoundDispatcher([InteractingSphere2AABB(),MetaInteractingGeometry2AABB()])
+	BoundDispatcher([InteractingSphere2AABB()])
 ]
 
 
@@ -18,7 +18,6 @@ o.engines=[
 	
 	BoundDispatcher([
 		InteractingSphere2AABB(),
-		MetaInteractingGeometry2AABB()
 	]),
 	
 	InsertionSortCollider(),

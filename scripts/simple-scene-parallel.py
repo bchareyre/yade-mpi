@@ -5,7 +5,7 @@
 #
 
 O.initializers=[
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
 	]
 O.engines=[
 	# physical actions will not be needed until the contact law comes in;
@@ -28,7 +28,7 @@ O.engines=[
 		# BexResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
 		BexResetter(),
 		# Engines within the group will be run serially, however
-		[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB()]),	PersistentSAPCollider(),]
+		[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),	PersistentSAPCollider(),]
 	]),
 	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),

@@ -24,56 +24,56 @@ struct GLViewInfo{
 	Real sceneRadius;
 };
 
-class GLDrawBoundingVolumeFunctor: public Functor1D<void, TYPELIST_1(const shared_ptr<Bound>&)> {
+class GlBoundFunctor: public Functor1D<void, TYPELIST_1(const shared_ptr<Bound>&)> {
 	public:
-		virtual ~GLDrawBoundingVolumeFunctor() {};
+		virtual ~GlBoundFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GLDrawBoundingVolumeFunctor);
+	REGISTER_CLASS_NAME(GlBoundFunctor);
 	REGISTER_BASE_CLASS_NAME(Functor1D);
 };
-REGISTER_SERIALIZABLE(GLDrawBoundingVolumeFunctor);
+REGISTER_SERIALIZABLE(GlBoundFunctor);
 #ifdef YADE_GEOMETRICALMODEL
-	class GLDrawGeometricalModelFunctor: public Functor1D<void,TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<State>&,bool)>{
+	class GlGeometricalModelFunctor: public Functor1D<void,TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<State>&,bool)>{
 		public: 
-			virtual ~GLDrawGeometricalModelFunctor() {};
+			virtual ~GlGeometricalModelFunctor() {};
 			virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 			virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-		REGISTER_CLASS_NAME(GLDrawGeometricalModelFunctor);
+		REGISTER_CLASS_NAME(GlGeometricalModelFunctor);
 		REGISTER_BASE_CLASS_NAME(Functor1D);
 	};
-	REGISTER_SERIALIZABLE(GLDrawGeometricalModelFunctor);
+	REGISTER_SERIALIZABLE(GlGeometricalModelFunctor);
 #endif
 
-class GLDrawInteractingGeometryFunctor: public Functor1D<void, TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&)>{
+class GlShapeFunctor: public Functor1D<void, TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&)>{
 	public:
-		virtual ~GLDrawInteractingGeometryFunctor() {};
+		virtual ~GlShapeFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GLDrawInteractingGeometryFunctor);
+	REGISTER_CLASS_NAME(GlShapeFunctor);
 	REGISTER_BASE_CLASS_NAME(Functor1D);
 };
-REGISTER_SERIALIZABLE(GLDrawInteractingGeometryFunctor);
+REGISTER_SERIALIZABLE(GlShapeFunctor);
 
-class GLDrawInteractionGeometryFunctor: public Functor1D<void,TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)>{
+class GlInteractionGeometryFunctor: public Functor1D<void,TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)>{
 	public: 
-		virtual ~GLDrawInteractionGeometryFunctor() {};
+		virtual ~GlInteractionGeometryFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GLDrawInteractionGeometryFunctor);
+	REGISTER_CLASS_NAME(GlInteractionGeometryFunctor);
 	REGISTER_BASE_CLASS_NAME(Functor1D);
 };
-REGISTER_SERIALIZABLE(GLDrawInteractionGeometryFunctor);
+REGISTER_SERIALIZABLE(GlInteractionGeometryFunctor);
 
-class GLDrawInteractionPhysicsFunctor: public Functor1D<void, TYPELIST_5(const shared_ptr<InteractionPhysics>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)>{
+class GlInteractionPhysicsFunctor: public Functor1D<void, TYPELIST_5(const shared_ptr<InteractionPhysics>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)>{
 	public: 
-		virtual ~GLDrawInteractionPhysicsFunctor() {};
+		virtual ~GlInteractionPhysicsFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GLDrawInteractionPhysicsFunctor);
+	REGISTER_CLASS_NAME(GlInteractionPhysicsFunctor);
 	REGISTER_BASE_CLASS_NAME(Functor1D);
 };
-REGISTER_SERIALIZABLE(GLDrawInteractionPhysicsFunctor);
+REGISTER_SERIALIZABLE(GlInteractionPhysicsFunctor);
 
 #ifdef YADE_GEOMETRICALMODEL
 	class GLDrawShadowVolumeFunctor: public Functor1D<void, TYPELIST_3(const shared_ptr<GeometricalModel>&, const shared_ptr<State>&, const Vector3r&)>{
@@ -85,13 +85,13 @@ REGISTER_SERIALIZABLE(GLDrawInteractionPhysicsFunctor);
 	REGISTER_SERIALIZABLE(GLDrawShadowVolumeFunctor);
 #endif
 
-class GLDrawStateFunctor: public Functor1D<void,TYPELIST_1(const shared_ptr<State>&/*, draw parameters: color, scale, given from OpenGLRenderer, or sth.... */)>{
+class GlStateFunctor: public Functor1D<void,TYPELIST_1(const shared_ptr<State>&/*, draw parameters: color, scale, given from OpenGLRenderer, or sth.... */)>{
 	public : 
-		virtual ~GLDrawStateFunctor() {};
+		virtual ~GlStateFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GLDrawStateFunctor);
+	REGISTER_CLASS_NAME(GlStateFunctor);
 	REGISTER_BASE_CLASS_NAME(Functor1D);
 };
-REGISTER_SERIALIZABLE(GLDrawStateFunctor);
+REGISTER_SERIALIZABLE(GlStateFunctor);
 

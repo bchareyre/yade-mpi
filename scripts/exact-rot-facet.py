@@ -6,11 +6,11 @@
 
 from math import *
 O.initializers=[
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()])
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),InteractingFacet2AABB()])
 	]
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),MetaInteractingGeometry2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([
 		InteractingSphere2InteractingSphere4SpheresContactGeometry(),

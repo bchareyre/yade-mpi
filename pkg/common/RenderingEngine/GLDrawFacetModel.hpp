@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawFacetModel : public GLDrawGeometricalModelFunctor
+class GLDrawFacetModel : public GlGeometricalModelFunctor
 {
 	
 	public :
@@ -18,7 +18,7 @@ class GLDrawFacetModel : public GLDrawGeometricalModelFunctor
 		
 	RENDERS(FacetModel);
 	REGISTER_CLASS_NAME(GLDrawFacetModel);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 };
 
 REGISTER_SERIALIZABLE(GLDrawFacetModel);

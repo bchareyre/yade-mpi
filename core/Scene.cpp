@@ -33,23 +33,20 @@
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-Scene::Scene() :
-	Body(), bodies(new BodyVector), interactions(new InteractionVecMap){	
-	engines.clear();
-	initializers.clear();
+Scene::Scene():
+	bodies(new BodyVector), interactions(new InteractionVecMap){	
 	needsInitializers=true;
 	currentIteration=0;
 	simulationTime=0;
 	stopAtIteration=0;
 	stopAtRealTime=0; // not yet implemented
 	stopAtVirtTime=0; // not yet implemented either
-	isDynamic=false;
 	dt=1e-8;
 	selectedBody=-1;
 	isPeriodic=false;
-	// FIXME: move MetaInteractingGeometry to core and create it here right away
-	// shape=shared_ptr<Shape>(new MetaInteractingGeometry);
-	material=shared_ptr<Material>(new Material);
+	cellMin=cellMax=Vector3r::ZERO;
+	// FIXME: move SceneShape to core and create it here right away
+	// shape=shared_ptr<Shape>(new SceneShape);
 
 	// fill default tags
 	struct passwd* pw;
@@ -129,4 +126,24 @@ void Scene::checkStateTypes(){
 			throw std::runtime_error("Body #"+lexical_cast<string>(b->getId())+": Body::material type "+b->material->getClassName()+" doesn't correspond to Body::state type "+b->state->getClassName()+" (should be "+b->material->newAssocState()->getClassName()+" instead).");
 		}
 	}
+}
+
+void Scene::updateBound(){
+	if(!bound) bound=shared_ptr<Bound>(new Bound);
+	const Real& inf=std::numeric_limits<Real>::infinity();
+	Vector3r mx(-inf,-inf,-inf);
+	Vector3r mn(inf,inf,inf);
+	FOREACH(const shared_ptr<Body>& b, *bodies){
+		if(!b) continue;
+		if(b->bound){
+			for(int i=0; i<3; i++){
+				if(!isinf(b->bound->max[i])) mx[i]=max(mx[i],b->bound->max[i]);
+				if(!isinf(b->bound->min[i])) mn[i]=min(mn[i],b->bound->min[i]);
+			}
+		} else {
+	 		mx=componentMaxVector(mx,b->state->pos);
+ 			mn=componentMinVector(mn,b->state->pos);
+		}
+	}
+	bound->min=mn; bound->max=mx;
 }

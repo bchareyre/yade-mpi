@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/pkg-common/MetaInteractingGeometry.hpp>
+#include<yade/pkg-common/SceneShape.hpp>
 
-class LatticeInteractingGeometry : public MetaInteractingGeometry
+class LatticeInteractingGeometry : public SceneShape
 {
 	public :
 		LatticeInteractingGeometry ();
@@ -18,10 +18,10 @@ class LatticeInteractingGeometry : public MetaInteractingGeometry
 
 /// Serialization
 	REGISTER_CLASS_NAME(LatticeInteractingGeometry);
-	REGISTER_BASE_CLASS_NAME(MetaInteractingGeometry);
+	REGISTER_BASE_CLASS_NAME(SceneShape);
 	
 /// Indexable
-	REGISTER_CLASS_INDEX(LatticeInteractingGeometry,MetaInteractingGeometry);
+	REGISTER_CLASS_INDEX(LatticeInteractingGeometry,SceneShape);
 };
 
 REGISTER_SERIALIZABLE(LatticeInteractingGeometry);

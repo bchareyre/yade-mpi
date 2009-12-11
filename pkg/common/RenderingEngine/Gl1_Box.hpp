@@ -6,16 +6,20 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "MetaInteractingGeometry.hpp"
+#pragma once
 
-MetaInteractingGeometry::MetaInteractingGeometry () : Shape()
+#include<yade/pkg-common/GLDrawFunctors.hpp>
+
+class Gl1_Box : public GlShapeFunctor
 {
-	createIndex();
-}
+	public :
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
-MetaInteractingGeometry::~MetaInteractingGeometry ()
-{
-}
+	RENDERS(InteractingBox);
+	REGISTER_CLASS_NAME(Gl1_Box);
+	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
+};
 
-YADE_PLUGIN((MetaInteractingGeometry));
+REGISTER_SERIALIZABLE(Gl1_Box);
+
 

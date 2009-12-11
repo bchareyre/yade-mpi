@@ -44,7 +44,7 @@ class TestObjectInstantiation(unittest.TestCase):
 	# not applicable for OpenGL-less builds... seems all other classes do derive from something below Serializable
 	#def testNonderived_attrs_few(self):
 	#	# classes deriving just from Serializable can be instantiated by their name directly, including attributes
-	#	gld3d=GLDrawInteractingSphere(glutSlices=24); self.assert_(glds.name=='GLDrawInteractingSphere')
+	#	gld3d=Gl1_Sphere(glutSlices=24); self.assert_(glds.name=='Gl1_Sphere')
 	def testDispatcherCtor(self):
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one

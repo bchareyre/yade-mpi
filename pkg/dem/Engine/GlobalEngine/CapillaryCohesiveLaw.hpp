@@ -55,8 +55,8 @@ class BodiesMenisciiList
 		
 	public:
 		BodiesMenisciiList();
-		BodiesMenisciiList(Body* body);
-		bool prepare(Body* body);
+		BodiesMenisciiList(Scene* body);
+		bool prepare(Scene* scene);
 		bool insert(const shared_ptr<Interaction>& interaction);
 		bool remove(const shared_ptr<Interaction>& interaction);
 		list< shared_ptr<Interaction> >& operator[] (int index);

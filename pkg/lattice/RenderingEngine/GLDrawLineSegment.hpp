@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawLineSegment : public GLDrawGeometricalModelFunctor
+class GLDrawLineSegment : public GlGeometricalModelFunctor
 {
 	private :
 		Real maxLen;
@@ -20,7 +20,7 @@ class GLDrawLineSegment : public GLDrawGeometricalModelFunctor
 
 	RENDERS(LineSegment);
 	REGISTER_CLASS_NAME(GLDrawLineSegment);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 
 };
 

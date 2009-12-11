@@ -8,21 +8,18 @@
 
 #pragma once
 
-#include<yade/core/Shape.hpp>
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class MetaInteractingGeometry : public Shape
+class Gl1_SceneShape : public GlShapeFunctor
 {
 	public :
-		MetaInteractingGeometry ();
-		virtual ~MetaInteractingGeometry ();
-
-/// Serialization
-	REGISTER_CLASS_AND_BASE(MetaInteractingGeometry,Shape);
-	// FIXME: if this class is registered, Scene then has "abstract" Shape, which fails in the functor (??)
-	REGISTER_ATTRIBUTES(Shape,/* no attributes */);
-/// Indexable
-	REGISTER_CLASS_INDEX(MetaInteractingGeometry,Shape);
+		virtual void go(const shared_ptr<Shape>&, const shared_ptr<PhysicalParameters>&,bool,const GLViewInfo&);
+	RENDERS(SceneShape);
+	REGISTER_CLASS_NAME(Gl1_SceneShape);
+	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
 };
 
-REGISTER_SERIALIZABLE(MetaInteractingGeometry);
+REGISTER_FACTORABLE(Gl1_SceneShape);
+
+
 

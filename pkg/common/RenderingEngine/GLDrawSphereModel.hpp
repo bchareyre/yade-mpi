@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawSphereModel : public GLDrawGeometricalModelFunctor
+class GLDrawSphereModel : public GlGeometricalModelFunctor
 {
 	private :
 		static bool first;
@@ -35,7 +35,7 @@ class GLDrawSphereModel : public GLDrawGeometricalModelFunctor
 	REGISTER_ATTRIBUTES(Serializable,(glutUse)(glutNormalize)(glutSlices)(glutStacks));
 	RENDERS(SphereModel);
 	REGISTER_CLASS_NAME(GLDrawSphereModel);
-	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+	REGISTER_BASE_CLASS_NAME(GlGeometricalModelFunctor);
 };
 REGISTER_SERIALIZABLE(GLDrawSphereModel);
 
