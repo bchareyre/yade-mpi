@@ -23,6 +23,9 @@ def testAll():
 	"""Run all tests defined in all yade.tests.* modules and return
 	TestResult object for further examination."""
 	suite=unittest.defaultTestLoader.loadTestsFromNames(allTestsFQ)
+	import doctest
+	import yade.utils
+	suite.addTest(doctest.DocTestSuite(yade.utils))
 	return unittest.TextTestRunner(verbosity=2).run(suite)
 
 	

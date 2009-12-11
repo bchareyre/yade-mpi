@@ -58,8 +58,11 @@ void InteractionDispatchers::action(Scene*){
 
 			if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
 
-			// go fast if this pair of bodies cannot interact at all
-			if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
+			// already in Collider::mayCollider, no need to check here anymore
+			#if 0
+				// go fast if this pair of bodies cannot interact at all
+				if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
+			#endif
 
 			// we know there is no geometry functor already, take the short path
 			if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }

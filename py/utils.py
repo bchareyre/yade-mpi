@@ -17,6 +17,7 @@ try: # use psyco if available
 	import psyco
 	psyco.full()
 except ImportError: pass
+import doctest
 
 # c++ implementations for performance reasons
 from yade._utils import *
@@ -81,7 +82,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
 	if material==0 and len(O.materials)==0: O.materials.append(defaultMaterial());
 	if isinstance(material,int): b.mat=O.materials[material]
-	elif isinstance(material,string): b.mat=O.materials[material]
+	elif isinstance(material,str): b.mat=O.materials[material]
 	elif isinstance(material,Material): b.mat=material
 	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
 	## resets state (!!)
@@ -102,6 +103,38 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 			random color will be assigned if None
 		`material`: int or string or Material instance
 			if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0].
+
+	>>> O.reset()
+	>>> from yade import utils
+
+	Creating default shared material if none exists neither is given::
+
+	>>> len(O.materials)
+	0
+	>>> s0=utils.sphere([2,0,0],1)
+	>>> len(O.materials)
+	1
+
+	Instance of material can be given::
+
+	>>> s1=utils.sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElasticMat(young=30e9,density=2e3))
+	>>> s1.shape['wire']
+	False
+	>>> s1.shape['diffuseColor']
+	Vector3(0,1,0)
+	>>> s1.mat['density']
+	2000.0
+
+	Material can be given by label::
+
+	>>> O.materials.append(GranularMat(young=10e9,poisson=.11,label='myMaterial'))
+	1
+	>>> s2=utils.sphere([0,0,2],1,material='myMaterial')
+	>>> s2.mat['label']
+	'myMaterial'
+	>>> s2.mat['poisson']
+	0.11
+
 	"""
 	b=Body()
 	b.shape=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)

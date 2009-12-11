@@ -25,6 +25,6 @@ const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<Scene> rb){return (
 #endif
 
 // we must initialize id = 0, otherwise BodyContainer will crash.
-Body::Body(): id(0),groupMask(1),clumpId(ID_NONE), state(shared_ptr<State>(new State)), interactingGeometry(shape), boundingVolume(bound){}
+Body::Body(): id(Body::ID_NONE),groupMask(1),clumpId(ID_NONE), state(shared_ptr<State>(new State)), interactingGeometry(shape), boundingVolume(bound){}
 Body::Body(body_id_t newId, int newGroup): id(newId), groupMask(newGroup), clumpId(ID_NONE), state(shared_ptr<State>(new State)), interactingGeometry(shape), boundingVolume(bound){}
 

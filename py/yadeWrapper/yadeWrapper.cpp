@@ -260,11 +260,10 @@ class pyInteractionContainer{
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
 };
 
-
-class pyBexContainer{
+class pyForceContainer{
 		shared_ptr<Scene> rb;
 	public:
-		pyBexContainer(){ rb=Omega::instance().getScene(); }
+		pyForceContainer(){ rb=Omega::instance().getScene(); }
 		Vector3r force_get(long id){  rb->bex.sync(); return rb->bex.getForce(id); }
 		Vector3r torque_get(long id){ rb->bex.sync(); return rb->bex.getTorque(id); }
 		Vector3r move_get(long id){   rb->bex.sync(); return rb->bex.getMove(id); }
@@ -469,7 +468,7 @@ class pyOmega{
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getScene()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
 	
-	pyBexContainer bex_get(void){return pyBexContainer();}
+	pyForceContainer bex_get(void){return pyForceContainer();}
 	pyMaterialContainer materials_get(void){return pyMaterialContainer();}
 	
 
@@ -771,16 +770,16 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
 
-	python::class_<pyBexContainer>("BexContainer",python::init<pyBexContainer&>())
-		.def("f",&pyBexContainer::force_get)
-		.def("t",&pyBexContainer::torque_get)
-		.def("m",&pyBexContainer::torque_get)
-		.def("move",&pyBexContainer::move_get)
-		.def("rot",&pyBexContainer::rot_get)
-		.def("addF",&pyBexContainer::force_add)
-		.def("addT",&pyBexContainer::torque_add)
-		.def("addMove",&pyBexContainer::move_add)
-		.def("addRot",&pyBexContainer::rot_add);
+	python::class_<pyForceContainer>("BexContainer",python::init<pyForceContainer&>())
+		.def("f",&pyForceContainer::force_get)
+		.def("t",&pyForceContainer::torque_get)
+		.def("m",&pyForceContainer::torque_get)
+		.def("move",&pyForceContainer::move_get)
+		.def("rot",&pyForceContainer::rot_get)
+		.def("addF",&pyForceContainer::force_add)
+		.def("addT",&pyForceContainer::torque_add)
+		.def("addMove",&pyForceContainer::move_add)
+		.def("addRot",&pyForceContainer::rot_add);
 
 	python::class_<pyMaterialContainer>("MaterialContainer",python::init<pyMaterialContainer&>())
 		.def("append",&pyMaterialContainer::append,"Add new shared material; changes its id and return it.")
