@@ -26,7 +26,7 @@
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -188,7 +188,7 @@ void SDECLinkedSpheres::createSphere(shared_ptr<Body>& body, int i, int j, int k
 	body = shared_ptr<Body>(new Body(body_id_t(0),55));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;

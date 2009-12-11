@@ -21,7 +21,7 @@
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>

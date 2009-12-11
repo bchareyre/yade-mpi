@@ -11,20 +11,20 @@
 
 #ifdef YADE_GEOMETRICALMODEL
 #include<yade/core/GeometricalModel.hpp>
-class Sphere : public GeometricalModel
+class SphereModel : public GeometricalModel
 {
 	public :
 		Real radius;
 
-		Sphere ();
-		virtual ~Sphere ();
+		SphereModel ();
+		virtual ~SphereModel ();
 
 	REGISTER_ATTRIBUTES(GeometricalModel,(radius));
-	REGISTER_CLASS_AND_BASE(Sphere,GeometricalModel);
-	REGISTER_CLASS_INDEX(Sphere,GeometricalModel);
+	REGISTER_CLASS_AND_BASE(SphereModel,GeometricalModel);
+	REGISTER_CLASS_INDEX(SphereModel,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(Sphere);
+REGISTER_SERIALIZABLE(SphereModel);
 #else
 	#error This file may be included only with the shape feature enabled.
 #endif

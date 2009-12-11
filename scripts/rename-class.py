@@ -9,6 +9,7 @@ for root, dirs, files in os.walk('.'):
 		if os.path.isdir(root+'/'+name): continue
 		if not name.endswith('pp') and name!='SConscript': continue
 		modified=False; new=[]; fullName=root+'/'+name
+		if fullName.startswith('./lib/') or fullName.startswith('./extra'): continue
 		for l in open(fullName):
 			nl,cnt=re.subn(r'\b'+oldClass+r'\b',newClass,l)
 			if cnt>0:

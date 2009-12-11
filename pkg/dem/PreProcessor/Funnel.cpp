@@ -16,7 +16,7 @@
 
 #include<yade/pkg-common/AABB.hpp>
 #ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/SphereModel.hpp>
 	#include<yade/pkg-common/Box.hpp>
 #endif
 #include<yade/core/Scene.hpp>
@@ -174,7 +174,7 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<Sphere> gSphere(new Sphere);
+		shared_ptr<SphereModel> gSphere(new SphereModel);
 		gSphere->radius			= radius;
 		gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 		gSphere->wire			= false;

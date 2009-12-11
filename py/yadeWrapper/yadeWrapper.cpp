@@ -101,7 +101,7 @@ class RenderingEngine;
 		
 		b=Body()
 		b.mold=Shape("InteractingSphere",radius=1)
-		b.shape=GeometricalModel("Sphere",radius=1)
+		b.shape=GeometricalModel("SphereModel",radius=1)
 		b.mold # will give you the shape of body
 	
 	Instances can be queried about attributes and data members they have:

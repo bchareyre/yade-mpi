@@ -6,22 +6,22 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Sphere.hpp"
+#include "SphereModel.hpp"
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
 
-Sphere::Sphere () : GeometricalModel()
+SphereModel::SphereModel () : GeometricalModel()
 {
 	createIndex();
 }
 
 
-Sphere::~Sphere ()
+SphereModel::~SphereModel ()
 {
 }
 
 
-YADE_PLUGIN((Sphere));
+YADE_PLUGIN((SphereModel));
 
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

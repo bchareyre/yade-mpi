@@ -20,7 +20,7 @@
 
 #include<yade/pkg-common/AABB.hpp>
 #ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/SphereModel.hpp>
 	#include<yade/pkg-common/Box.hpp>
 #endif
 #include<yade/core/Scene.hpp>
@@ -293,7 +293,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 // 	#ifdef YADE_GEOMETRICALMODEL
-// 		shared_ptr<Sphere> gSphere(new Sphere);
+// 		shared_ptr<SphereModel> gSphere(new SphereModel);
 // 	#endif
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	

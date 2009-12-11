@@ -13,7 +13,7 @@
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-//#include <yade/pkg-common/Sphere.hpp>
+//#include <yade/pkg-common/SphereModel.hpp>
 
 //#include <yade/pkg-dem/SpheresContactGeometry.hpp>
 //#include <yade/pkg-dem/ElasticContactInteraction.hpp>

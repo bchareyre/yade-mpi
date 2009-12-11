@@ -24,7 +24,7 @@
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -108,9 +108,9 @@ bool ThreePointBending::generate()
 		assert(metaBodyWithSpheres->getClassName()=="Scene");
 
 		FOREACH(shared_ptr<Body> b, *metaBodyWithSpheres->bodies){
-			if(b->geometricalModel->getClassName()!="Sphere") continue;
-			min = componentMinVector(min,b->physicalParameters->se3.position - static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
-			max = componentMaxVector(max,b->physicalParameters->se3.position + static_cast<Sphere*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
+			if(b->geometricalModel->getClassName()!="SphereModel") continue;
+			min = componentMinVector(min,b->physicalParameters->se3.position - static_cast<SphereModel*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
+			max = componentMaxVector(max,b->physicalParameters->se3.position + static_cast<SphereModel*>(b->geometricalModel.get())->radius * Vector3r(1,1,1));
 			BodyMacroParameters* bm = dynamic_cast<BodyMacroParameters*>(b->physicalParameters.get());
 			if(!bm) {message="Error: spheres don't use BodyMacroParameters for physical parameters"; return false;}
 			bm->young		= sphereYoungModulus;

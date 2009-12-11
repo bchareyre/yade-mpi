@@ -13,7 +13,7 @@
 #include<yade/pkg-common/InteractingFacet.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Facet.hpp>
-	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/SphereModel.hpp>
 #endif
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
@@ -182,7 +182,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<Sphere> gSphere(new Sphere);
+		shared_ptr<SphereModel> gSphere(new SphereModel);
 		gSphere->radius			= radius;
 		gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 		gSphere->wire			= false;

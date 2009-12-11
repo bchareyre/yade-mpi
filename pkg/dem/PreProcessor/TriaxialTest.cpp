@@ -28,7 +28,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/Box.hpp>
-	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/SphereModel.hpp>
 	#include<yade/pkg-common/Facet.hpp>
 #endif
 #include<yade/core/Scene.hpp>
@@ -394,7 +394,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<Sphere> gSphere(new Sphere);
+		shared_ptr<SphereModel> gSphere(new SphereModel);
 		gSphere->radius			= radius;
 		gSphere->diffuseColor		= spheresColor;
 		gSphere->wire			= false;

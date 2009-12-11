@@ -16,7 +16,7 @@
 //#include<yade/pkg-dem/ElasticBodyParameters2BcpConnection4ElasticContactInteraction.hpp>
 #include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/pkg-common/ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment.hpp>
 #include<yade/pkg-common/ef2_BssSweptSphereLineSegment_AABB_makeAABB.hpp>
 #include<yade/pkg-common/BcpConnection.hpp>
@@ -206,7 +206,7 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
   body = shared_ptr<Body>(new Body(body_id_t(0),1));
   shared_ptr<SimpleViscoelasticBodyParameters> physics(new SimpleViscoelasticBodyParameters); // Bcp + Bst
   shared_ptr<AABB> aabb(new AABB);                                      // Bbv
-  shared_ptr<Sphere> gSphere(new Sphere);                               // Bsh
+  shared_ptr<SphereModel> gSphere(new SphereModel);                               // Bsh
   shared_ptr<InteractingSphere> iSphere(new InteractingSphere);         // Bss
         
   Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
@@ -246,7 +246,7 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // Bcp + Bst
 	shared_ptr<AABB> aabb(new AABB);                                // Bbv (not needed?)
-	shared_ptr<Sphere> node(new Sphere);                            // Bsh
+	shared_ptr<SphereModel> node(new SphereModel);                            // Bsh
         shared_ptr<InteractingNode> inode(new InteractingNode);         // Bss
         
 // 	if ((i==0 && j==0)||(i==0 && j==nbZ)||(i==nbX && j==nbZ)||(i==nbX && j==0))

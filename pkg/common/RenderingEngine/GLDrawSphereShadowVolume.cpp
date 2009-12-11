@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawSphereShadowVolume.hpp"
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
@@ -17,7 +17,7 @@ void GLDrawSphereShadowVolume::go(const shared_ptr<GeometricalModel>& gm , const
 	//FIXME : do not cast on RigidBodyParameters but use Parameters instead
 	//Vector3r center = (static_cast<ParticleParameters*>(pp.get()))->se3.position;
 	Vector3r center = pp->se3.position;
-	Real radius = (static_cast<Sphere*>(gm.get()))->radius;
+	Real radius = (static_cast<SphereModel*>(gm.get()))->radius;
 	
 	Vector3r dir = lightPos-center;
 	Vector3r normalDir(-dir[1],dir[0],0);

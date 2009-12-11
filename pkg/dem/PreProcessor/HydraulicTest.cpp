@@ -21,7 +21,7 @@
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
@@ -124,11 +124,11 @@ bool HydraulicTest::generate()
 		BodyContainer::iterator biEnd = metaBodyWithSpheres->bodies->end();
 		for ( ; bi!=biEnd ; ++bi )
 		{
-			if ( ( *bi )->geometricalModel->getClassName() == "Sphere" )
+			if ( ( *bi )->geometricalModel->getClassName() == "SphereModel" )
 			{
 				shared_ptr<Body> b = *bi;
-				min = componentMinVector ( min,b->physicalParameters->se3.position - static_cast<Sphere*> ( b->geometricalModel.get() )->radius * Vector3r ( 1,1,1 ) );
-				max = componentMaxVector ( max,b->physicalParameters->se3.position + static_cast<Sphere*> ( b->geometricalModel.get() )->radius * Vector3r ( 1,1,1 ) );
+				min = componentMinVector ( min,b->physicalParameters->se3.position - static_cast<SphereModel*> ( b->geometricalModel.get() )->radius * Vector3r ( 1,1,1 ) );
+				max = componentMaxVector ( max,b->physicalParameters->se3.position + static_cast<SphereModel*> ( b->geometricalModel.get() )->radius * Vector3r ( 1,1,1 ) );
 
 				BodyMacroParameters* bm = dynamic_cast<BodyMacroParameters*> ( b->physicalParameters.get() );
 				if ( !bm ) {message="Error: spheres don't use BodyMacroParameters for physical parameters"; return false;}
@@ -146,7 +146,7 @@ bool HydraulicTest::generate()
 		BodyContainer::iterator biEnd = metaBodyWithSpheres->bodies->end();
 		for ( ; bi!=biEnd ; ++bi )
 		{
-			if ( ( *bi )->geometricalModel->getClassName() == "Sphere" )
+			if ( ( *bi )->geometricalModel->getClassName() == "SphereModel" )
 			{
 				if ( inside ( ( *bi )->physicalParameters->se3.position ) )
 				{
@@ -182,9 +182,9 @@ bool HydraulicTest::generate()
 		BodyContainer::iterator biEnd = rootBody->bodies->end();
 		for ( ; bi!=biEnd ; ++bi )
 		{
-			if ( ( *bi )->geometricalModel->getClassName() == "Sphere" )
+			if ( ( *bi )->geometricalModel->getClassName() == "SphereModel" )
 			{
-				saveFile << ( *bi )->getId() << " " << YADE_PTR_CAST<Sphere> ( ( *bi )->geometricalModel )->radius  << " " << ( *bi )->physicalParameters->se3.position << std::endl;
+				saveFile << ( *bi )->getId() << " " << YADE_PTR_CAST<SphereModel> ( ( *bi )->geometricalModel )->radius  << " " << ( *bi )->physicalParameters->se3.position << std::endl;
 
 			}
 		}
@@ -213,8 +213,8 @@ bool HydraulicTest::generate()
 //   ++bi2;
 //   for( ; bi2!=biEnd ; ++bi2 )
 //   {
-//    if(   (*bi)->geometricalModel->getClassName() == "Sphere"
-//       && (*bi2)->geometricalModel->getClassName() == "Sphere")
+//    if(   (*bi)->geometricalModel->getClassName() == "SphereModel"
+//       && (*bi2)->geometricalModel->getClassName() == "SphereModel")
 //    {
 //    shared_ptr<Body> bodyB = *bi2;
 //

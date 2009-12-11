@@ -24,7 +24,7 @@
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-dem/RigidBodyRecorder.hpp>
@@ -195,7 +195,7 @@ void TestSimpleViscoelastic::createSphere(shared_ptr<Body>& body, int i)
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<SimpleViscoelasticBodyParameters> physics(new SimpleViscoelasticBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q;

@@ -16,7 +16,7 @@
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
 #ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/Sphere.hpp>
+	#include<yade/pkg-common/SphereModel.hpp>
 	#include<yade/pkg-common/Box.hpp>
 #endif
 

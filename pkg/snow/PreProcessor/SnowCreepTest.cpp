@@ -28,7 +28,7 @@
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -377,7 +377,7 @@ void SnowCreepTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());

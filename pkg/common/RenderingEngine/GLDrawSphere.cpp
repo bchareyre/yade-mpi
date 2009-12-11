@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawSphere.hpp"
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
@@ -39,7 +39,7 @@ GLDrawSphere::GLDrawSphere(){first=true;};
 void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
 	if(glutUse){
-		Real r= (static_cast<Sphere*>(gm.get()))->radius;
+		Real r= (static_cast<SphereModel*>(gm.get()))->radius;
 		glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 		glColor3v(gm->diffuseColor);
 		if(glutNormalize)	glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
@@ -103,7 +103,7 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 		first = false;
 	}
 	
-	Real radius = (static_cast<Sphere*>(gm.get()))->radius;
+	Real radius = (static_cast<SphereModel*>(gm.get()))->radius;
 	
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);

@@ -25,7 +25,7 @@
 
 #include<yade/pkg-lattice/LatticeInteractingGeometry.hpp>
 
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyVector.hpp>
@@ -717,7 +717,7 @@ bool LatticeExample::createNodeXYZ(shared_ptr<Body>& body, Real x, Real y, Real 
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<SphereModel> gSphere(new SphereModel);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()) , Mathr::UnitRandom()*Mathr::PI );
@@ -754,7 +754,7 @@ bool LatticeExample::createNode(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<SphereModel> gSphere(new SphereModel);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()) , Mathr::UnitRandom()*Mathr::PI );

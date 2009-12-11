@@ -11,7 +11,7 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/SphereModel.hpp>
 #include<yade/pkg-common/DisplacementEngine.hpp>
 #include<yade/pkg-lattice/LatticeLaw.hpp>
 #include<yade/pkg-lattice/LatticeSetParameters.hpp>
@@ -253,7 +253,7 @@ bool LatticeExampleSimple::createNodeXYZ(shared_ptr<Body>& body, Vector3r positi
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),nodeGroupMask));
 	shared_ptr<LatticeNodeParameters> physics(new LatticeNodeParameters);
-	shared_ptr<Sphere> gSphere(new Sphere);
+	shared_ptr<SphereModel> gSphere(new SphereModel);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom()) , Mathr::UnitRandom()*Mathr::PI );
