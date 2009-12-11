@@ -10,17 +10,17 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawFacet : public GLDrawGeometricalModelFunctor
+class GLDrawFacetModel : public GLDrawGeometricalModelFunctor
 {
 	
 	public :
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 		
-	RENDERS(Facet);
-	REGISTER_CLASS_NAME(GLDrawFacet);
+	RENDERS(FacetModel);
+	REGISTER_CLASS_NAME(GLDrawFacetModel);
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawFacet);
+REGISTER_SERIALIZABLE(GLDrawFacetModel);
 
 

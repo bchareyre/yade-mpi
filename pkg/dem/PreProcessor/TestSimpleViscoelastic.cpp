@@ -25,7 +25,7 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-dem/RigidBodyRecorder.hpp>
 #include<yade/pkg-dem/SimpleViscoelasticSpheresInteractionRecorder.hpp>
@@ -99,7 +99,7 @@ void TestSimpleViscoelastic::createBox(shared_ptr<Body>& body, Vector3r position
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<SimpleViscoelasticBodyParameters> physics(new SimpleViscoelasticBodyParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	

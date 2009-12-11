@@ -24,7 +24,7 @@
 	This is useful when it's not trivial to just write the parameters of Shape by hand.
 	Then we can use this InteractingGeometryEngineUnit to build it from GeometricalModel.
 
-	Currently it is only used to build a PolyhedralSweptSphere from Box and from Tetrahedron
+	Currently it is only used to build a PolyhedralSweptSphere from BoxModel and from Tetrahedron
 	  
 	\param const shared_ptr<GeometricalModel>&	exact geometry of Body
 	\param Se3r&					the 3D transformation to apply to the collision model before building the bounding volume

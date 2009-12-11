@@ -28,7 +28,7 @@ YADE_REQUIRE_FEATURE(CGAL)
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/WallStressRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
@@ -430,7 +430,7 @@ void ModifiedTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;

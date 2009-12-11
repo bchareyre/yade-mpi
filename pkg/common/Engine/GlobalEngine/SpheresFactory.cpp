@@ -12,7 +12,7 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 #ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/Facet.hpp>
+	#include<yade/pkg-common/FacetModel.hpp>
 	#include<yade/pkg-common/SphereModel.hpp>
 #endif
 #include<yade/pkg-dem/BodyMacroParameters.hpp>

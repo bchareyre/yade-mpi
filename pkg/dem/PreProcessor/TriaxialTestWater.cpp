@@ -365,7 +365,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
 // 	#ifdef YADE_GEOMETRICALMODEL
-// 		shared_ptr<Box> gBox(new Box);	
+// 		shared_ptr<BoxModel> gBox(new BoxModel);	
 // 	#endif
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	

@@ -19,7 +19,7 @@
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
@@ -157,7 +157,7 @@ bool HydraulicTest::generate()
 					nbSpheres++;
 				}
 			}
-			if ( ( *bi )->geometricalModel->getClassName() == "Box" )
+			if ( ( *bi )->geometricalModel->getClassName() == "BoxModel" )
 			{
 				//if(  inside((*bi)->physicalParameters->se3.position)  )
 				{

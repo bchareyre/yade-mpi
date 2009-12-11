@@ -97,7 +97,7 @@ void UniaxialStrainer::init(){
 			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
 		} else {
 			crossSectionArea=1.;
-			LOG_WARN("No Axis Aligned Bounding Box for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
+			LOG_WARN("No Axis Aligned Bounding BoxModel for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
 		}
 	}
 	assert(crossSectionArea>0);

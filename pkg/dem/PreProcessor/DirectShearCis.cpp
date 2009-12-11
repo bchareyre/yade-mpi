@@ -27,7 +27,7 @@
 #include <yade/pkg-dem/ForceRecorder.hpp>
 #include <yade/pkg-dem/ForceSnapshot.hpp>
 
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
@@ -118,7 +118,7 @@ bool DirectShearCis::generate()
 	positionRootBody(rootBody);
 
 
-// Box walls
+// BoxModel walls
 	shared_ptr<Body> w1;	// The left one :
 	createBox(w1,Vector3r(-thickness/2.0,(height)/2.0,0),Vector3r(thickness/2.0,5*(height/2.0+thickness),profondeur/2.0));
 	rootBody->bodies->insert(w1);
@@ -218,7 +218,7 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	body = shared_ptr<Body>(new Body(0,1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	

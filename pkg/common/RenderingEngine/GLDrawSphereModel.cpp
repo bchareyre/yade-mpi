@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawSphere.hpp"
+#include "GLDrawSphereModel.hpp"
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
@@ -22,21 +22,21 @@ YADE_REQUIRE_FEATURE(geometricalmodel);
 //      glPopMatrix();
 //}
 
-int GLDrawSphere::glSphereList=-1;
-int GLDrawSphere::glWiredSphereList=-1;
+int GLDrawSphereModel::glSphereList=-1;
+int GLDrawSphereModel::glWiredSphereList=-1;
 
-vector<Vector3r> GLDrawSphere::vertices;
-vector<Vector3r> GLDrawSphere::faces;
-bool GLDrawSphere::first = true;
+vector<Vector3r> GLDrawSphereModel::vertices;
+vector<Vector3r> GLDrawSphereModel::faces;
+bool GLDrawSphereModel::first = true;
 
-bool GLDrawSphere::glutUse=false;
-bool GLDrawSphere::glutNormalize=true;
-int  GLDrawSphere::glutSlices=12;
-int  GLDrawSphere::glutStacks=6;
+bool GLDrawSphereModel::glutUse=false;
+bool GLDrawSphereModel::glutNormalize=true;
+int  GLDrawSphereModel::glutSlices=12;
+int  GLDrawSphereModel::glutStacks=6;
 
-GLDrawSphere::GLDrawSphere(){first=true;};
+GLDrawSphereModel::GLDrawSphereModel(){first=true;};
 		
-void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
+void GLDrawSphereModel::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
 	if(glutUse){
 		Real r= (static_cast<SphereModel*>(gm.get()))->radius;
@@ -136,7 +136,7 @@ void GLDrawSphere::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<P
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
+void GLDrawSphereModel::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
 {
 	Vector3r v12,v23,v31;
 
@@ -197,7 +197,7 @@ void GLDrawSphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawSphere::drawSphere(int depth)
+void GLDrawSphereModel::drawSphere(int depth)
 {
 	glShadeModel(GL_SMOOTH);
 	
@@ -205,7 +205,7 @@ void GLDrawSphere::drawSphere(int depth)
 		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
 }
 
-void GLDrawSphere::drawCircle(bool filled)
+void GLDrawSphereModel::drawCircle(bool filled)
 {
 	float vectorY1=1.0,startY=vectorY1;
 	float vectorX1=0,startX=vectorX1;
@@ -227,7 +227,7 @@ void GLDrawSphere::drawCircle(bool filled)
 	glEnd();
 }
 
-void GLDrawSphere::clearGlMatrix()
+void GLDrawSphereModel::clearGlMatrix()
 {
 	float modelview[16];
 	int i,j;
@@ -244,7 +244,7 @@ void GLDrawSphere::clearGlMatrix()
 	glLoadMatrixf(modelview);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-YADE_PLUGIN((GLDrawSphere));
+YADE_PLUGIN((GLDrawSphereModel));
 YADE_REQUIRE_FEATURE(OPENGL)
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

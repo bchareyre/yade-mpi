@@ -83,7 +83,7 @@ class Body : public Serializable
 			shared_ptr<State> state;
 		#endif
 		#ifdef YADE_GEOMETRICALMODEL
-			/// the 'perfect' representation of body's geometry: Polyhedron, Box
+			/// the 'perfect' representation of body's geometry: Polyhedron, BoxModel
 			shared_ptr<GeometricalModel>	geometricalModel;
 		#endif
 		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox

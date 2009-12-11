@@ -19,7 +19,7 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/pkg-dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
@@ -618,7 +618,7 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	body->bound		= aabb;
 	body->shape	= iBox;
 	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<Box> gBox(new Box);
+		shared_ptr<BoxModel> gBox(new BoxModel);
 		gBox->extents			= extents;
 		gBox->diffuseColor		= Vector3r(0.5,0.5,0.5);
 		gBox->wire			= wire;

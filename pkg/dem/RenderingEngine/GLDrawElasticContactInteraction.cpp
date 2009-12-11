@@ -52,8 +52,8 @@ void GLDrawElasticContactInteraction::go(
 //	Vector3r pos2   = b2->physicalParameters->se3.position;
 
 	/// skip drawing interaction with boxes....
-//		if(boxIndex == -1 && b1->geometricalModel->getClassName() == "Box") boxIndex = b1->geometricalModel->getClassIndex();
-//		if(boxIndex == -1 && b2->geometricalModel->getClassName() == "Box") boxIndex = b2->geometricalModel->getClassIndex();
+//		if(boxIndex == -1 && b1->geometricalModel->getClassName() == "BoxModel") boxIndex = b1->geometricalModel->getClassIndex();
+//		if(boxIndex == -1 && b2->geometricalModel->getClassName() == "BoxModel") boxIndex = b2->geometricalModel->getClassIndex();
 //		if(b1->geometricalModel->getClassIndex() == boxIndex || b2->geometricalModel->getClassIndex() == boxIndex) return;
 	//
 

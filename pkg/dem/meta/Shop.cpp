@@ -17,7 +17,7 @@
 
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/SphereModel.hpp>
-	#include<yade/pkg-common/Box.hpp>
+	#include<yade/pkg-common/BoxModel.hpp>
 #endif
 
 #include<yade/pkg-common/InteractingBox.hpp>

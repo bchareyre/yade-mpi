@@ -10,7 +10,7 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawSphere : public GLDrawGeometricalModelFunctor
+class GLDrawSphereModel : public GLDrawGeometricalModelFunctor
 {
 	private :
 		static bool first;
@@ -26,7 +26,7 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 		static int glutSlices, glutStacks;
 		
 	public :
-		GLDrawSphere();
+		GLDrawSphereModel();
 		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
 		virtual void initgl(){first=true;};
 /// Serialization
@@ -34,9 +34,9 @@ class GLDrawSphere : public GLDrawGeometricalModelFunctor
 		virtual void postProcessAttributes(bool deserializing){if(deserializing){first=true;};};
 	REGISTER_ATTRIBUTES(Serializable,(glutUse)(glutNormalize)(glutSlices)(glutStacks));
 	RENDERS(SphereModel);
-	REGISTER_CLASS_NAME(GLDrawSphere);
+	REGISTER_CLASS_NAME(GLDrawSphereModel);
 	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
 };
-REGISTER_SERIALIZABLE(GLDrawSphere);
+REGISTER_SERIALIZABLE(GLDrawSphereModel);
 
 

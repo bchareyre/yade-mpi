@@ -6,14 +6,14 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "GLDrawFacet.hpp"
-#include <yade/pkg-common/Facet.hpp>
+#include "GLDrawFacetModel.hpp"
+#include <yade/pkg-common/FacetModel.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
-void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
+void GLDrawFacetModel::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<PhysicalParameters>& ph,bool wire)
 {
-    Facet* facet = static_cast<Facet*>(gm.get());
+    FacetModel* facet = static_cast<FacetModel*>(gm.get());
     
     
 	if (gm->wire || wire)
@@ -42,7 +42,7 @@ void GLDrawFacet::go(const shared_ptr<GeometricalModel>& gm, const shared_ptr<Ph
 		glEnd();
     }
 }
-YADE_PLUGIN((GLDrawFacet));
+YADE_PLUGIN((GLDrawFacetModel));
 YADE_REQUIRE_FEATURE(OPENGL)
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

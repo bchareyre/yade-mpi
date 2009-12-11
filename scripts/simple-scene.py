@@ -22,7 +22,7 @@ o.engines=[
 	## Resets forces and momenta the act on bodies
 	BexResetter(),
 	## associates bounding volume - in this case, AxisAlignedBoundingBox (AABB) - to each body.
-	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, Box, or MetaBody (rootBody).
+	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, BoxModel, or MetaBody (rootBody).
 	## AABBs will be used to detect collisions later, by PersistentSAPCollider
 	BoundDispatcher([
 		InteractingSphere2AABB(),
@@ -97,7 +97,7 @@ if False:
 	# set the isDynamic body attribute
 	b['isDynamic']=False
 	# Assign geometrical model (shape) to the body: a box of given size
-	b.shape=Box(extents=[.5,.5,.5],diffuseColor=[1,0,0])
+	b.shape=BoxModel(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# Assign computational model (mold; may be simplified form of shape) to the body
 	b.mold=InteractingBox(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# physical parameters:

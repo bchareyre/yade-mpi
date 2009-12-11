@@ -5,13 +5,21 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include "Box.hpp"
-Box::Box () : GeometricalModel() { createIndex(); }
-Box::~Box (){}
-YADE_PLUGIN((Box));
 
-YADE_REQUIRE_FEATURE(geometricalmodel);
+#pragma once
 
+#include<yade/pkg-common/GLDrawFunctors.hpp>
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+class GLDrawBoxModel : public GLDrawGeometricalModelFunctor
+{
+	public :
+		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&,bool);
+
+	RENDERS(BoxModel);
+	REGISTER_CLASS_NAME(GLDrawBoxModel);
+	REGISTER_BASE_CLASS_NAME(GLDrawGeometricalModelFunctor);
+};
+
+REGISTER_SERIALIZABLE(GLDrawBoxModel);
+
 

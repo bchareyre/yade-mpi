@@ -8,18 +8,22 @@
 
 #pragma once
 
-#include<yade/pkg-common/GLDrawFunctors.hpp>
+#ifdef YADE_GEOMETRICALMODEL
 
-class GLDrawSphereShadowVolume : public GLDrawShadowVolumeFunctor
-{
-	public :
-		virtual void go(const shared_ptr<GeometricalModel>&, const shared_ptr<PhysicalParameters>&, const Vector3r&);
-
-	RENDERS(SphereModel);
-	REGISTER_CLASS_NAME(GLDrawSphereShadowVolume);
-	REGISTER_BASE_CLASS_NAME(GLDrawShadowVolumeFunctor);
+#include<yade/core/GeometricalModel.hpp>
+class BoxModel: public GeometricalModel{
+	public:
+		Vector3r extents;
+		BoxModel();
+		virtual ~BoxModel();
+	REGISTER_ATTRIBUTES(GeometricalModel,(extents));
+	REGISTER_CLASS_AND_BASE(BoxModel,GeometricalModel);
+	REGISTER_CLASS_INDEX(BoxModel,GeometricalModel);
 };
 
-REGISTER_SERIALIZABLE(GLDrawSphereShadowVolume);
+REGISTER_SERIALIZABLE(BoxModel);
 
+#else
+	#error This file may be included only with the shape feature enabled.
+#endif
 

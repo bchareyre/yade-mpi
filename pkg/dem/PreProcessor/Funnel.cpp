@@ -17,7 +17,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/SphereModel.hpp>
-	#include<yade/pkg-common/Box.hpp>
+	#include<yade/pkg-common/BoxModel.hpp>
 #endif
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -222,7 +222,7 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
 	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<Box> gBox(new Box);
+		shared_ptr<BoxModel> gBox(new BoxModel);
 		gBox->extents			= extents;
 		gBox->diffuseColor		= Vector3r(1,1,1);
 		gBox->wire			= false;

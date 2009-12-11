@@ -17,7 +17,7 @@
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
 
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
@@ -259,7 +259,7 @@ void SDECMovingWall::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	

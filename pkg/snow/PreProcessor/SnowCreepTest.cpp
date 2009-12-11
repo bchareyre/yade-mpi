@@ -26,7 +26,7 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/AABB.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
@@ -429,7 +429,7 @@ void SnowCreepTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<Box> gBox(new Box);
+	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<InteractingBox> iBox(new InteractingBox);
 	
 	Quaternionr q;

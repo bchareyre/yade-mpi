@@ -21,7 +21,7 @@
 #include<yade/pkg-common/AABB.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/SphereModel.hpp>
-	#include<yade/pkg-common/Box.hpp>
+	#include<yade/pkg-common/BoxModel.hpp>
 #endif
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
