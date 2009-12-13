@@ -10,7 +10,9 @@
 
 #include "Engine.hpp"
 #include "Functor.hpp"
+#include<yade/core/Omega.hpp>
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
+#include<boost/lexical_cast.hpp>
 
 class Dispatcher : public Engine
 {
@@ -47,6 +49,7 @@ class Dispatcher : public Engine
 		virtual int getDimension() { throw; };
 		virtual string getBaseClassType(unsigned int ) { throw; };
 
+
 	protected:
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(Engine,(functorNames)(functorArguments));
@@ -54,6 +57,29 @@ class Dispatcher : public Engine
 };
 REGISTER_SERIALIZABLE(Dispatcher);
 
+/*! Function returning class name (as string) for given index and topIndexable (top-level indexable, such as Shape, Material and so on)
+This function exists solely for debugging, is quite slow: it has to traverse all classes and ask for inheritance information.
+It should be used primarily to convert indices to names in Dispatcher::dictDispatchMatrix?D; since it relies on Omega for RTTI,
+this code could not be in Dispatcher itself.
+*/
+template<class topIndexable>
+std::string Dispatcher_indexToClassName(int idx){
+	scoped_ptr<topIndexable> top(new topIndexable);
+	std::string topName=top->getClassName();
+	typedef std::pair<string,DynlibDescriptor> classItemType;
+	FOREACH(classItemType clss, Omega::instance().getDynlibsDescriptor()){
+		if(Omega::instance().isInheritingFrom_recursive(clss.first,topName) || clss.first==topName){
+			// create instance, to ask for index
+			shared_ptr<topIndexable> inst=dynamic_pointer_cast<topIndexable>(ClassFactory::instance().createShared(clss.first));
+			assert(inst);
+			if(inst->getClassIndex()<0 && inst->getClassName()!=top->getClassName()){
+				throw logic_error("Class "+inst->getClassName()+" didn't use REGISTER_CLASS_INDEX("+inst->getClassName()+","+top->getClassName()+") and/or forgot to call createIndex() in the ctor. [[ Please fix that! ]]");
+			}
+			if(inst->getClassIndex()==idx) return clss.first;
+		}
+	}
+	throw runtime_error("No class with index "+boost::lexical_cast<string>(idx)+" found (top-level indexable is "+topName+")");
+}
 
 
 template
@@ -75,7 +101,21 @@ class Dispatcher1D : public Dispatcher,
 {
 
 	public :
-		void dump(){ DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry>::dumpDispatchMatrix1D(std::cout); }
+		typedef baseClass argType1;
+		typedef FunctorType functorType;
+		typedef DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry> dispatcherBase;
+
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass>& arg){ return getExecutor(arg); }
+		python::dict dump(bool convertIndicesToNames){
+			python::dict ret;
+			FOREACH(const DynLibDispatcher_Item1D& item, dispatcherBase::dataDispatchMatrix1D()){
+				if(convertIndicesToNames){
+					string arg1=Dispatcher_indexToClassName<argType1>(item.ix1);
+					ret[python::make_tuple(arg1)]=item.functorName;
+				} else ret[python::make_tuple(item.ix1)]=item.functorName;
+			}
+			return ret;
+		}
 		virtual void add(FunctorType* eu){ add(shared_ptr<FunctorType>(eu)); }
 		virtual void add(shared_ptr<FunctorType> eu){
 			storeFunctorName(eu->get1DFunctorType1(),eu->getClassName(),eu);
@@ -145,7 +185,21 @@ class Dispatcher2D : public Dispatcher,
 				>
 {
 	public :
-		void dump(){ DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry>::dumpDispatchMatrix2D(std::cout); }
+		typedef baseClass1 argType1;
+		typedef baseClass2 argType2;
+		typedef FunctorType functorType;
+		typedef DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry> dispatcherBase;
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1>& arg1, shared_ptr<baseClass2>& arg2){ return getExecutor(arg1,arg2); }
+		python::dict dump(bool convertIndicesToNames){
+			python::dict ret;
+			FOREACH(const DynLibDispatcher_Item2D& item, dispatcherBase::dataDispatchMatrix2D()){
+				if(convertIndicesToNames){
+					string arg1=Dispatcher_indexToClassName<argType1>(item.ix1), arg2=Dispatcher_indexToClassName<argType2>(item.ix2);
+					ret[python::make_tuple(arg1,arg2)]=item.functorName;
+				} else ret[python::make_tuple(item.ix1,item.ix2)]=item.functorName;
+			}
+			return ret;
+		}
 		/* add functor by pointer: this is convenience for calls like foo->add(new SomeFunctor); */
 		virtual void add(FunctorType* eu){ add(shared_ptr<FunctorType>(eu)); }
 		/* add functor by shared pointer */

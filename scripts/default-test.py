@@ -89,8 +89,9 @@ if reports:
 	reportText='\n'.join([80*'#'+'\n'+r[0]+': '+r[1]+'\n'+80*'#'+'\n'+r[2] for r in reports])
 	if mailTo and mailFrom:
 		from email.mime.text import MIMEText
+		import yade.config
 		msg=MIMEText(reportText)
-		msg['Subject']="Automated crash report for "+yade.runtime.executable+": "+",".join([r[0] for r in reports])
+		msg['Subject']="Automated crash report for Yade "+yade.config.revision+": "+",".join([r[0] for r in reports])
 		msg['From']=mailFrom
 		msg['To']=mailTo
 		msg['Reply-To']='yade-dev@lists.launchpad.net'

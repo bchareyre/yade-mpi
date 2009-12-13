@@ -49,12 +49,13 @@ class TetraBang: public InteractionGeometry{
 		Vector3r contactPoint;
 		Vector3r normal;
 
-		TetraBang(): InteractionGeometry(){};
+		TetraBang() { createIndex(); };
 		virtual ~TetraBang(){};
 	protected:
 		REGISTER_ATTRIBUTES(InteractionGeometry,(penetrationVolume)(equivalentCrossSection)(contactPoint)(normal)(equivalentPenetrationDepth)(maxPenetrationDepthA)(maxPenetrationDepthB));
 		FUNCTOR2D(TetraMold,TetraMold);
 		REGISTER_CLASS_AND_BASE(TetraBang,InteractionGeometry);
+		REGISTER_CLASS_INDEX(TetraBang,InteractionGeometry);
 };
 REGISTER_SERIALIZABLE(TetraBang);
 

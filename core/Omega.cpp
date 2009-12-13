@@ -181,6 +181,14 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 	return (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end());
 }
 
+bool Omega::isInheritingFrom_recursive(const string& className, const string& baseClassName){
+	if (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end()) return true;
+	FOREACH(const string& parent,dynlibs[className].baseClasses){
+		if(isInheritingFrom_recursive(parent,baseClassName)) return true;
+	}
+	return false;
+}
+
 void Omega::loadPlugins(vector<string> pluginFiles){
 	FOREACH(const string& plugin, pluginFiles){
 		LOG_DEBUG("Loading plugin "<<plugin);

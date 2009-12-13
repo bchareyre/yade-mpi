@@ -151,7 +151,7 @@ class pyBodyContainer{
 	}
 	body_id_t append(shared_ptr<Body> b){
 		// shoud be >=0, but Body is by default created with id 0... :-|
-		if(b->getId()>0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+"set; appending such body is not allowed.").c_str()); python::throw_error_already_set(); }
+		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+"set; appending such body (for the second time) is not allowed.").c_str()); python::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
 	vector<body_id_t> appendList(vector<shared_ptr<Body> > bb){
@@ -479,7 +479,7 @@ class pyOmega{
 	}
 
 	bool isChildClassOf(const string& child, const string& base){
-		return (Omega::instance().isInheritingFrom(child,base));
+		return (Omega::instance().isInheritingFrom_recursive(child,base));
 	}
 
 	python::list plugins_get(){
@@ -600,17 +600,17 @@ shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::di
 }
 
 // FIXME: those could be moved to the c++ classes themselves, right?
-template<typename DispatcherT, typename functorT>
-shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<functorT> >& functors){
+template<typename DispatcherT>
+shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typename DispatcherT::functorType> >& functors){
 	shared_ptr<DispatcherT> instance(new DispatcherT);
-	FOREACH(shared_ptr<functorT> functor,functors) instance->add(functor);
+	FOREACH(shared_ptr<typename DispatcherT::functorType> functor,functors) instance->add(functor);
 	return instance;
 }
 // FIXME: this one as well
-template<typename DispatcherT, typename functorT>
-std::vector<shared_ptr<functorT> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
-	std::vector<shared_ptr<functorT> > ret;
-	FOREACH(const shared_ptr<Functor>& functor, self->functorArguments){ shared_ptr<functorT> functorRightType(dynamic_pointer_cast<functorT>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(functorT).name()+"?"); ret.push_back(functorRightType); }
+template<typename DispatcherT>
+std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
+	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
+	FOREACH(const shared_ptr<Functor>& functor, self->functorArguments){ shared_ptr<typename DispatcherT::functorType> functorRightType(dynamic_pointer_cast<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
 	return ret;
 }
 // FIXME: and this one as well
@@ -622,21 +622,19 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 	return instance;
 }
 
-template<typename someIndexable>
-int Indexable_getClassIndex(const shared_ptr<someIndexable> i){return i->getClassIndex();}
-//template<typename someIndexable>
-//int Indexable_getBaseClassIndex(const shared_ptr<someIndexable> i){return i->getBaseClassIndex(1);}
-template<typename someIndexable>
-vector<int> Indexable_getClassIndices(const shared_ptr<someIndexable> i){
-	int depth=1; vector<int> ret;
-	ret.push_back(i->getClassIndex());
+template<typename TopIndexable>
+int Indexable_getClassIndex(const shared_ptr<TopIndexable> i){return i->getClassIndex();}
+template<typename TopIndexable>
+python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, bool convertToNames){
+	int depth=1; python::list ret; int idx0=i->getClassIndex();
+	if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx0));
+	else ret.append(idx0);
+	if(idx0<0) return ret; // don't continue and call getBaseClassIndex(), since we are at the top already
 	while(true){
-		//cerr<<"depth="<<depth;
-		int idx=i->getBaseClassIndex(depth);
-		//cerr<<", idx="<<idx<<endl;
+		int idx=i->getBaseClassIndex(depth++);
+		if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx));
+		else ret.append(idx);
 		if(idx<0) return ret;
-		ret.push_back(idx);
-		depth++;
 	}
 }
 		
@@ -828,16 +826,16 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
 		.add_property("slaves",&ParallelEngine_slaves_get,&ParallelEngine_slaves_set);
 
-	#define EXPOSE_DISPATCHER(DispatcherT,functorT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT,functorT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT,functorT>).def("dump",&DispatcherT::dump);
-		EXPOSE_DISPATCHER(BoundDispatcher,BoundFunctor)
-		EXPOSE_DISPATCHER(InteractionGeometryDispatcher,InteractionGeometryFunctor)
-		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher,InteractionPhysicsFunctor)
+	#define EXPOSE_DISPATCHER(DispatcherT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>).def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
+		EXPOSE_DISPATCHER(BoundDispatcher)
+		EXPOSE_DISPATCHER(InteractionGeometryDispatcher)
+		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher)
 		#ifdef YADE_PHYSPAR
-			EXPOSE_DISPATCHER(StateMetaEngine,StateEngineUnit)
-			EXPOSE_DISPATCHER(PhysicalActionDamper,PhysicalActionDamperUnit)
-			EXPOSE_DISPATCHER(PhysicalActionApplier,PhysicalActionApplierUnit)
+			EXPOSE_DISPATCHER(StateMetaEngine)
+			EXPOSE_DISPATCHER(PhysicalActionDamper)
+			EXPOSE_DISPATCHER(PhysicalActionApplier)
 		#endif
-		EXPOSE_DISPATCHER(LawDispatcher,LawFunctor)
+		EXPOSE_DISPATCHER(LawDispatcher)
 	#undef EXPOSE_DISPATCHER
 
 	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<Functor>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
@@ -855,7 +853,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>))
 	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
 	// expose indexable class, with access to the index
-	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("classIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").add_property("classIndices",&Indexable_getClassIndices<className>,"Return list of indices of base classes, starting from the class instance itself, then immediate parent and so on to the top-level indexable at last.")
+	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("dispIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").def("dispHierarchy",&Indexable_getClassIndices<className>,(python::arg("names")=true),"Return list of dispatch classes (from down upwards), starting with the class instance itself, top-level indexable at last. If names is true (default), return class names rather than numerical indices.")
 
 	EXPOSE_CXX_CLASS(Body)
 		// mold and geom are deprecated:

@@ -25,18 +25,17 @@ from yade._utils import *
 def saveVars(mark='',loadNow=False,**kw):
 	"""Save passed variables into the simulation so that it can be recovered when the simulation is loaded again.
 
-	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use
+	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use::
 
-	 utils.saveVars(a=a,b=b,c=c)
+		>>> utils.saveVars(a=a,b=b,c=c)
 
-	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once
-	the .xml is loaded again, use
+	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
 
-	 utils.loadVars(mark)
+		>>> utils.loadVars(mark)
 
 	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
 
-	If loadParam==True, variables will be loaded immediately after saving. That effectively makes **kw available in builtin namespace.
+	If *loadParam*==True, variables will be loaded immediately after saving. That effectively makes *\*\*kw* available in builtin namespace.
 	"""
 	import cPickle
 	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(kw)
@@ -104,36 +103,39 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 		`material`: int or string or Material instance
 			if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0].
 
+	:return:
+		A Body instance with desired characteristics.
+
 	>>> O.reset()
 	>>> from yade import utils
 
 	Creating default shared material if none exists neither is given::
 
-	>>> len(O.materials)
-	0
-	>>> s0=utils.sphere([2,0,0],1)
-	>>> len(O.materials)
-	1
+		>>> len(O.materials)
+		0
+		>>> s0=utils.sphere([2,0,0],1)
+		>>> len(O.materials)
+		1
 
 	Instance of material can be given::
 
-	>>> s1=utils.sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElasticMat(young=30e9,density=2e3))
-	>>> s1.shape['wire']
-	False
-	>>> s1.shape['diffuseColor']
-	Vector3(0,1,0)
-	>>> s1.mat['density']
-	2000.0
+		>>> s1=utils.sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElasticMat(young=30e9,density=2e3))
+		>>> s1.shape['wire']
+		False
+		>>> s1.shape['diffuseColor']
+		Vector3(0,1,0)
+		>>> s1.mat['density']
+		2000.0
 
 	Material can be given by label::
 
-	>>> O.materials.append(GranularMat(young=10e9,poisson=.11,label='myMaterial'))
-	1
-	>>> s2=utils.sphere([0,0,2],1,material='myMaterial')
-	>>> s2.mat['label']
-	'myMaterial'
-	>>> s2.mat['poisson']
-	0.11
+		>>> O.materials.append(GranularMat(young=10e9,poisson=.11,label='myMaterial'))
+		1
+		>>> s2=utils.sphere([0,0,2],1,material='myMaterial')
+		>>> s2.mat['label']
+		'myMaterial'
+		>>> s2.mat['poisson']
+		0.11
 
 	"""
 	b=Body()
@@ -190,7 +192,8 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	:Parameters:
 		`vertices`: [Vector3,Vector3,Vector3]
 			coordinates of vertices in the global coordinate system.
-		`noBound`: do not assign Body().bound
+		`noBound`:
+			do not assign Body().bound
 	
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
@@ -212,7 +215,8 @@ If any of the box dimensions is zero, corresponding facets will not be created. 
 		`wallMask`: bitmask
 			 determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32).
 			 The numbers are ANDed; the default 63 means to create all walls.
-		`**kw`: passed to utils.facet.
+		`**kw`:
+			passed to utils.facet.
 	
 	:Return:
 		List of facets forming the box.
@@ -573,10 +577,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 	"""
 	Read parameters from a file and assign them to __builtin__ variables.
 
-	tableFile is a text file (with one value per blank-separated columns)
-	tableLine is number of line where to get the values from
-
-		The format of the file is as follows (commens starting with # and empty lines allowed)
+	The format of the file is as follows (commens starting with # and empty lines allowed)::
 		
 		# commented lines allowed anywhere
 		name1 name2 … # first non-blank line are column headings
@@ -585,15 +586,27 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 		val2  val2  … # 2nd 
 		…
 
-	The name `description' is special and is assigned to Omega().tags['description']
+	Assigned tags:
 
-	assigns Omega().tags['params']="name1=val1,name2=val2,…"
-	
-	assigns Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
+	* *description* column is assigned to Omega().tags['description']; this column is synthesized if absent (see :ref:`TableParamReader`)
+	* Omega().tags['params']="name1=val1,name2=val2,…"
+	* Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
 
-	saves all parameters (default as well as settable) using saveVars('table')
+	All parameters (default as well as settable) are saved using saveVars('table').
 
-	return value is the number of assigned parameters.
+	:parameters:
+		`tableFile`:
+			text file (with one value per blank-separated columns)
+		`tableLine`:
+			number of line where to get the values from.
+		`noTableOk`: bool
+			do not raise exception if the file cannot be open; use default values
+		`unknownOk`: bool
+			do not raise exception if unknown column name is found in the file; assign it as well
+
+	:return:
+		number of assigned parameters.
+
 	"""
 	tagsParams=[]
 	dictDefaults,dictParams={},{}

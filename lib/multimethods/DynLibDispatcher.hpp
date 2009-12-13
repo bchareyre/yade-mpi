@@ -21,6 +21,7 @@
 #include<yade/lib-loki/NullType.hpp>
 
 
+
 #include<vector>
 #include<list>
 #include<string>
@@ -31,6 +32,8 @@ using namespace std;
 using namespace boost;
 
 
+struct DynLibDispatcher_Item2D{ int ix1, ix2; std::string functorName; DynLibDispatcher_Item2D(int a, int b, std::string c):ix1(a),ix2(b),functorName(c){}; };
+struct DynLibDispatcher_Item1D{ int ix1     ; std::string functorName; DynLibDispatcher_Item1D(int a,        std::string c):ix1(a),       functorName(c){}; };
 ///
 /// base classes involved in multiple dispatch must be derived from Indexable
 ///
@@ -58,7 +61,6 @@ template
 >
 class DynLibDispatcher
 {
-
 		// this template recursively defines a type for callBacks matrix, with required number of dimensions
 	private : template<class T > struct Matrix
 		  {
@@ -161,20 +163,6 @@ class DynLibDispatcher
 	private : typedef typename Impl::Parm14 Parm14;
 	private : typedef typename Impl::Parm15 Parm15;
 	
-	// Serialization stuff.. - FIXME - maybe this should be done in separate class...
-//		bool deserializing;
-// //	protected:
-// // 		vector<vector<string> >	functorNames;
-// // 		list<shared_ptr<Executor> > functorArguments;
-// // 		typedef typename list<shared_ptr<Executor> >::iterator executorListIterator;
-			
-// 			virtual void registerAttributes()
-// 			{
-// 				REGISTER_ATTRIBUTE_(functorNames);
-// 				if(functors.size() != 0)
-// 					REGISTER_ATTRIBUTE_(functors);
-// 			}
-			
  	public  : DynLibDispatcher()
 		  {
 			// FIXME - static_assert( typeid(BaseClass1) == typeid(Parm1) ); // 1D
@@ -204,6 +192,13 @@ class DynLibDispatcher
 			return callBacks[index1][index2];
 		  }
 
+		  shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1, shared_ptr<BaseClass2>& arg2){
+				if(arg1->getClassIndex()<0 || arg2->getClassIndex()<0) throw runtime_error("No functor for types "+arg1->getClassName()+" (index "+lexical_cast<string>(arg1->getClassIndex())+") + "+arg2->getClassName()+" (index "+lexical_cast<string>(arg2->getClassIndex())+"), since some of the indices is invalid (negative).");
+			  	int ix1,ix2;
+				if(locateMultivirtualFunctor2D(ix1,ix2,arg1,arg2)) return callBacks[ix1][ix2];
+				return shared_ptr<Executor>();
+		  }
+
  	public  : shared_ptr<Executor> getExecutor(const string& baseClassName)
 		  {
 
@@ -216,6 +211,13 @@ class DynLibDispatcher
 			assert(callBacks.size()>=(unsigned int)index);
 
 			return callBacks[index];
+		  }
+
+		  shared_ptr<Executor> getExecutor(shared_ptr<BaseClass1>& arg1){
+			  	int ix1;
+				if(arg1->getClassIndex()<0) throw runtime_error("No functor for type "+arg1->getClassName()+" (index "+lexical_cast<string>(arg1->getClassIndex())+"), since the index is invalid (negative).");
+				if(locateMultivirtualFunctor2D(ix1,arg1)) return callBacks[ix1];
+				return shared_ptr<Executor>();
 		  }
 
  	public  : shared_ptr<Executor> makeExecutor(string libName)
@@ -240,53 +242,6 @@ class DynLibDispatcher
 			
 			return executor;
 		  }
-		
-// // 		void storeFunctorArguments(shared_ptr<Executor>& ex)
-// // 		{
-// // 			if(! ex) return;
-// // 			bool dupe = false;
-// // 			executorListIterator it    = functorArguments.begin();
-// // 			executorListIterator itEnd = functorArguments.end();
-// // 			for( ; it != itEnd ; ++it )
-// // 				if( (*it)->getClassName() == ex->getClassName() )
-// // 					dupe = true;
-// // 			
-// // 			if(! dupe) functorArguments.push_back(ex);
-// // 		}
-// // 		
-// // 		shared_ptr<Executor> findFunctorArguments(string libName)
-// // 		{
-// // 			executorListIterator it    = functorArguments.begin();
-// // 			executorListIterator itEnd = functorArguments.end();
-// // 			for( ; it != itEnd ; ++it )
-// // 				if( (*it)->getClassName() == libName )
-// // 					return *it;
-// // 			
-// // 			return shared_ptr<Executor>();
-// // 		}
-
-// add multivirtual function to 1D
-// // 		void postProcessDispatcher1D(bool d)
-// // 		{
-// // 			if(d)
-// // 			{
-// // 				deserializing = true;
-// // 				for(unsigned int i=0;i<functorNames.size();i++)
-// // 					add(functorNames[i][0],functorNames[i][1],findFunctorArguments(functorNames[i][1]));
-// // 				deserializing = false;
-// // 			}
-// // 		}
-		
-// // 		void storeFunctorName(	  const string& baseClassName
-// // 					, const string& libName
-// // 					, shared_ptr<Executor>& ex)
-// // 		{
-// // 			vector<string> v;
-// // 			v.push_back(baseClassName);
-// // 			v.push_back(libName);
-// // 			functorNames.push_back(v);
-// // 			storeFunctorArguments(ex);
-// // 		}
 		
  	public  : void add1DEntry( string baseClassName, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
 		  {
@@ -348,31 +303,6 @@ class DynLibDispatcher
 			return false; // FIXME - this line should be not needed
 		  }
 
-		
-// add multivirtual function to 2D
-// // 		void postProcessDispatcher2D(bool d)
-// // 		{
-// // 			if(d)
-// // 			{
-// // 				deserializing = true;
-// // 				for(unsigned int i=0;i<functorNames.size();i++)
-// // 					add(functorNames[i][0],functorNames[i][1],functorNames[i][2],findFunctorArguments(functorNames[i][2]));
-// // 				deserializing = false;
-// // 			}
-// // 		}
-		
-// // 		void storeFunctorName(	  const string& baseClassName1
-// // 					, const string& baseClassName2
-// // 					, const string& libName
-// // 					, shared_ptr<Executor>& ex) // 2D
-// // 		{
-// // 			vector<string> v;
-// // 			v.push_back(baseClassName1);
-// // 			v.push_back(baseClassName2);
-// // 			v.push_back(libName);
-// // 			functorNames.push_back(v);
-// // 			storeFunctorArguments(ex);
-// // 		}
 		
 	public  : void add2DEntry( string baseClassName1, string baseClassName2, string libName, shared_ptr<Executor> ex = shared_ptr<Executor>())
 		  {
@@ -455,22 +385,30 @@ class DynLibDispatcher
 			swap=(bool)(callBacksInfo[ix1][ix2]);
 			return callBacks[ix1][ix2];
 		}
-	
+		/*! Return representation of the dispatch matrix as vector of int,int,string (i.e. index1,index2,functor name) */
+		vector<DynLibDispatcher_Item2D> dataDispatchMatrix2D(){
+			vector<DynLibDispatcher_Item2D> ret; for(size_t i=0; i<callBacks.size(); i++){ for(size_t j=0; j<callBacks.size(); j++){ if(callBacks[i][j]) ret.push_back(DynLibDispatcher_Item2D(i,j,callBacks[i][j]->getClassName())); } }
+			return ret;
+		}
+		/*! Return representation of the dispatch matrix as vector of int,string (i.e. index,functor name) */
+		vector<DynLibDispatcher_Item1D> dataDispatchMatrix1D(){
+			vector<DynLibDispatcher_Item1D> ret; for(size_t i=0; i<callBacks.size(); i++){ if(callBacks[i]) ret.push_back(DynLibDispatcher_Item1D(i,callBacks[i]->getClassName())); }
+			return ret;
+		}
+		/*! Dump 2d dispatch matrix to given stream. */
 		std::ostream& dumpDispatchMatrix2D(std::ostream& out, const string& prefix=""){
-			for(size_t i=0; i<callBacks.size(); i++){
-				for(size_t j=0; j<callBacks.size(); j++){
-					if(callBacks[i][j]) out<<prefix<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
-				}
-			}
+			for(size_t i=0; i<callBacks.size(); i++){	for(size_t j=0; j<callBacks.size(); j++){
+				if(callBacks[i][j]) out<<prefix<<i<<"+"<<j<<" -> "<<callBacks[i][j]->getClassName()<<std::endl;
+			}}
 			return out;
 		}
+		/*! Dump 1d dispatch matrix to given stream. */
 		std::ostream& dumpDispatchMatrix1D(std::ostream& out, const string& prefix=""){
 			for(size_t i=0; i<callBacks.size(); i++){
-					if(callBacks[i]) out<<prefix<<i<<" -> "<<callBacks[i]->getClassName()<<std::endl;
+				if(callBacks[i]) out<<prefix<<i<<" -> "<<callBacks[i]->getClassName()<<std::endl;
 			}
 			return out;
 		}
-
 		bool locateMultivirtualFunctor2D(int& index1, int& index2, shared_ptr<BaseClass1>& base1,shared_ptr<BaseClass2>& base2)
 		  {
 			//#define _DISP_TRACE(msg) cerr<<"@DT@"<<__LINE__<<" "<<msg<<endl;
@@ -479,107 +417,50 @@ class DynLibDispatcher
 			assert(index1>=0); assert(index2>=0); 
 			assert((unsigned int)(index1)<callBacks.size()); assert((unsigned int)(index2)<callBacks[index1].size());
 			_DISP_TRACE("arg1: "<<base1->getClassName()<<"="<<index1<<"; arg2: "<<base2->getClassName()<<"="<<index2)
-			#define _FIX_2D_DISPATCHES
-			#ifdef _FIX_2D_DISPATCHES
-				/* This is python pseudocode for the algorithm:
+			/* This is python code for the algorithm:
 
-					def ff(x,sum): print x,sum-x,sum
-					for dist in range(0,5):
-						for ix1 in range(0,dist+1): ff(ix1,dist)
+				def ff(x,sum): print x,sum-x,sum
+				for dist in range(0,5):
+					for ix1 in range(0,dist+1): ff(ix1,dist)
 
-					Increase depth sum from 0 up and look for possible matches, of which sum of distances beween the argument and the declared functor arg type equals depth.
-					
-					Two matches are considered euqally good (ambiguous) if they have the same depth. That raises exception.
+				Increase depth sum from 0 up and look for possible matches, of which sum of distances beween the argument and the declared functor arg type equals depth.
+				
+				Two matches are considered euqally good (ambiguous) if they have the same depth. That raises exception.
 
-					If both indices are negative (reached the top of hierarchy for that indexable type) and nothing has been found for given depth, raise exception (undefined dispatch).
+				If both indices are negative (reached the top of hierarchy for that indexable type) and nothing has been found for given depth, raise exception (undefined dispatch).
 
-					FIXME: by the original design, callBacks don't distinguish between dispatch that was already looked for,
-					but is undefined and dispatch that was never looked for before. This means that there can be lot of useless lookups;
-					e.g. if MetaInteractingGeometry2AABB is not in BoundingVoumeMetaEngine, it is looked up at every step.
+				FIXME: by the original design, callBacks don't distinguish between dispatch that was already looked for,
+				but is undefined and dispatch that was never looked for before. This means that there can be lot of useless lookups;
+				e.g. if MetaInteractingGeometry2AABB is not in BoundingVoumeMetaEngine, it is looked up at every step.
 
-				*/
-				if(callBacks[index1][index2]){ _DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName()); return true; }
-				int foundIx1,foundIx2; int maxDp1=-1, maxDp2=-1;
-				// if(base1->getBaseClassIndex(0)<0) maxDp1=0; if(base2->getBaseClassIndex(0)<0) maxDp2=0;
-				for(int dist=1; ; dist++){
-					bool distTooBig=true;
-					foundIx1=foundIx2=-1; // found no dispatch at this depth yet
-					for(int dp1=0; dp1<=dist; dp1++){
-						int dp2=dist-dp1;
-						if((maxDp1>=0 && dp1>maxDp1) || (maxDp2>=0 && dp2>maxDp2)) continue;
-						_DISP_TRACE(" Trying indices with depths "<<dp1<<" and "<<dp2<<", dist="<<dist);
-						int ix1=dp1>0?base1->getBaseClassIndex(dp1):index1, ix2=dp2>0?base2->getBaseClassIndex(dp2):index2;
-						if(ix1<0) maxDp1=dp1; if(ix2<0) maxDp2=dp2;
-						if(ix1<0 || ix2<0) continue; // hierarchy height exceeded in either dimension
-						distTooBig=false;
-						if(callBacks[ix1][ix2]){
-							if(foundIx1!=-1 && callBacks[foundIx1][foundIx2]!=callBacks[ix1][ix2]){ // we found a callback, but there already was one at this distance and it was different from the current one
-								cerr<<__FILE__<<":"<<__LINE__<<": ambiguous 2d dispatch ("<<"arg1="<<base1->getClassName()<<", arg2="<<base2->getClassName()<<", distance="<<dist<<"), dispatch matrix:"<<endl;
-								dumpDispatchMatrix2D(cerr,"AMBIGUOUS: "); throw runtime_error("Ambiguous dispatch.");
-							}
-							foundIx1=ix1; foundIx2=ix2;
-							callBacks[index1][index2]=callBacks[ix1][ix2]; callBacksInfo[index1][index2]=callBacksInfo[ix1][ix2];
-							_DISP_TRACE("Found callback ["<<ix1<<"]["<<ix2<<"] → "<<callBacks[ix1][ix2]->getClassName());
+			*/
+			if(callBacks[index1][index2]){ _DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName()); return true; }
+			int foundIx1,foundIx2; int maxDp1=-1, maxDp2=-1;
+			// if(base1->getBaseClassIndex(0)<0) maxDp1=0; if(base2->getBaseClassIndex(0)<0) maxDp2=0;
+			for(int dist=1; ; dist++){
+				bool distTooBig=true;
+				foundIx1=foundIx2=-1; // found no dispatch at this depth yet
+				for(int dp1=0; dp1<=dist; dp1++){
+					int dp2=dist-dp1;
+					if((maxDp1>=0 && dp1>maxDp1) || (maxDp2>=0 && dp2>maxDp2)) continue;
+					_DISP_TRACE(" Trying indices with depths "<<dp1<<" and "<<dp2<<", dist="<<dist);
+					int ix1=dp1>0?base1->getBaseClassIndex(dp1):index1, ix2=dp2>0?base2->getBaseClassIndex(dp2):index2;
+					if(ix1<0) maxDp1=dp1; if(ix2<0) maxDp2=dp2;
+					if(ix1<0 || ix2<0) continue; // hierarchy height exceeded in either dimension
+					distTooBig=false;
+					if(callBacks[ix1][ix2]){
+						if(foundIx1!=-1 && callBacks[foundIx1][foundIx2]!=callBacks[ix1][ix2]){ // we found a callback, but there already was one at this distance and it was different from the current one
+							cerr<<__FILE__<<":"<<__LINE__<<": ambiguous 2d dispatch ("<<"arg1="<<base1->getClassName()<<", arg2="<<base2->getClassName()<<", distance="<<dist<<"), dispatch matrix:"<<endl;
+							dumpDispatchMatrix2D(cerr,"AMBIGUOUS: "); throw runtime_error("Ambiguous dispatch.");
 						}
-					}
-					if(foundIx1!=-1) return true;
-					if(distTooBig){ _DISP_TRACE("Undefined dispatch, dist="<<dist); return false; /* undefined dispatch */ }
-				}
-			#else
-				#if 0 
-					if((unsigned)index1>=callBacks.size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base1->getClassName()<<" (index=="<<index1<<", callBacks.size()=="<<callBacks.size()<<endl;
-					if((unsigned)index2>=callBacks[index2].size()) cerr<<__FILE__<<":"<<__LINE__<<" FATAL: Index out of range for class "<<base2->getClassName()<<" (index=="<<index2<<", callBacks[index1].size()=="<<callBacks[index1].size()<<endl;
-				#endif
-					
-				if(callBacks[index1][index2]){
-					_DISP_TRACE("Direct hit at ["<<index1<<"]["<<index2<<"] → "<<callBacks[index1][index2]->getClassName());
-					return true;
-				}
-
-				int depth1=1, depth2=1;
-				int index1_tmp=base1->getBaseClassIndex(depth1), index2_tmp = base2->getBaseClassIndex(depth2);
-				_DISP_TRACE("base classes: "<<base1->getBaseClassName()<<"="<<index1_tmp<<", "<<base2->getBaseClassName()<<"="<<index2_tmp);
-				if(index1_tmp == -1) {
-					while(1){
-						if(index2_tmp == -1){
-							_DISP_TRACE("Returning FALSE");
-							return false;
-						}
-						if(callBacks[index1][index2_tmp]){ // FIXME - this is not working, when index1 or index2 is out-of-boundary. I have to resize callBacks and callBacksInfo tables.  - this should be a separate function to resize stuff
-							callBacksInfo[index1][index2] = callBacksInfo[index1][index2_tmp];
-							callBacks    [index1][index2] = callBacks    [index1][index2_tmp];
-	//						index2 = index2_tmp;
-							_DISP_TRACE("Found callback ["<<index1<<"]["<<index2_tmp<<"] → "<<callBacks[index1][index2_tmp]->getClassName());
-							return true;
-						}
-						index2_tmp = base2->getBaseClassIndex(++depth2);
-						_DISP_TRACE("index2_tmp="<<index2_tmp<<" (pushed up)");
+						foundIx1=ix1; foundIx2=ix2;
+						callBacks[index1][index2]=callBacks[ix1][ix2]; callBacksInfo[index1][index2]=callBacksInfo[ix1][ix2];
+						_DISP_TRACE("Found callback ["<<ix1<<"]["<<ix2<<"] → "<<callBacks[ix1][ix2]->getClassName());
 					}
 				}
-				else if(index2_tmp == -1) {
-					while(1){
-						if(index1_tmp == -1){
-							_DISP_TRACE("Returning FALSE");
-							 return false;
-						}
-						if(callBacks[index1_tmp][index2]){
-							callBacksInfo[index1][index2] = callBacksInfo[index1_tmp][index2];
-							callBacks    [index1][index2] = callBacks    [index1_tmp][index2];
-	//						index1 = index1_tmp;
-							_DISP_TRACE("Found callback ["<<index1_tmp<<"]["<<index2<<"] → "<<callBacks[index1_tmp][index2]->getClassName());
-							return true;
-						}
-						index1_tmp = base1->getBaseClassIndex(++depth1);
-						_DISP_TRACE("index1_tmp="<<index1_tmp<<" (pushed up)");
-					}
-				}
-				//else if( index1_tmp != -1 && index2_tmp != -1 )
-				_DISP_TRACE("UNDEFINED/AMBIGUOUS, dumping dispatch matrix");
-				dumpDispatchMatrix2D(cerr);
-				_DISP_TRACE("end matrix dump.")
-				throw std::runtime_error("DynLibDispatcher: ambiguous or undefined dispatch for 2d multivirtual function, classes: "+base1->getClassName()+" "+base2->getClassName());
-				//return false;
-			#endif
+				if(foundIx1!=-1) return true;
+				if(distTooBig){ _DISP_TRACE("Undefined dispatch, dist="<<dist); return false; /* undefined dispatch */ }
+			}
 		};
 
 		

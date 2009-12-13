@@ -27,6 +27,7 @@
 	\param State&					first Body's State
 	\param State&					second Body's State
 	\param Vector3r& 				second Body's relative shift (for periodicity)
+	\param bool & force        force creation of the geometry, even if the interaction doesn't exist yet and the bodies are too far for regular contact (used from explicitAction)
 	\return shared_ptr<Interaction>&		it returns the Interaction to be built (given as last argument to the function)
 	
 */

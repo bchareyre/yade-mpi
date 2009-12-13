@@ -129,6 +129,7 @@ class Omega: public Singleton<Omega>
 		void		scanPlugins(vector<string> baseDirs);
 		void		loadPlugins(vector<string> pluginFiles);
 		bool		isInheritingFrom(const string& className, const string& baseClassName );
+		bool		isInheritingFrom_recursive(const string& className, const string& baseClassName );
 
 		void		setTimeStep(const Real);
 		Real		getTimeStep();
