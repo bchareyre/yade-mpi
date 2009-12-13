@@ -30,7 +30,7 @@ CREATE_LOGGER(MicroMacroAnalyser);
 
 MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()
 {
-	analyser = shared_ptr<KinematicLocalisationAnalyser> (new KinematicLocalisationAnalyser);
+	analyser = shared_ptr<CGT::KinematicLocalisationAnalyser> (new CGT::KinematicLocalisationAnalyser);
 	analyser->SetConsecutive (true);
 	analyser->SetNO_ZERO_ID (false);
 	interval = 100;
@@ -55,7 +55,7 @@ void MicroMacroAnalyser::action(Scene* ncb)
 	else if (Omega::instance().getCurrentIteration() % interval == 0) {
 		setState(ncb, 2, true, true);
 		analyser->ComputeParticlesDeformation();
-		Tenseur_sym3 epsg ( analyser->grad_u_total );
+		CGT::Tenseur_sym3 epsg ( analyser->grad_u_total );
 		ofile << Omega::instance().getCurrentIteration() << analyser->Delta_epsilon(1,1)<<" "<<analyser->Delta_epsilon(2,2)<<" "<<analyser->Delta_epsilon(3,3)<<" "<<epsg(1,1)<<" "<<epsg(2,2)<< " "<<epsg(3,3)<<" "<<epsg(1,2)<<" "<<epsg(1,3)<<" "<<epsg(2,3)<<endl;
 		analyser->SwitchStates();
 	}
@@ -84,11 +84,11 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	}
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	TriaxialState* ts;
+	CGT::TriaxialState* ts;
 	if ( state==1 ) ts = analyser->TS0;
 	else if ( state==2 ) ts = analyser->TS1;
 	else LOG_ERROR ( "state must be 1 or 2, instead of " << state );
-	TriaxialState& TS = *ts;
+	CGT::TriaxialState& TS = *ts;
 
 	TS.reset();
 
@@ -129,13 +129,13 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 			const Vector3r& pos = (*bi)->state->pos;
 			Real rad = s->radius;
 
-			TS.grains[Idg].sphere = Sphere ( Point ( pos[0],pos[1],pos[2] ),  rad );
+			TS.grains[Idg].sphere = CGT::Sphere ( CGT::Point ( pos[0],pos[1],pos[2] ),  rad );
 //    TS.grains[Idg].translation = trans;
 //    grains[Idg].rotation = rot;
-			TS.box.base = Point ( min ( TS.box.base.x(), pos.X()-rad ),
+			TS.box.base = CGT::Point ( min ( TS.box.base.x(), pos.X()-rad ),
 								  min ( TS.box.base.y(), pos.Y()-rad ),
 								  min ( TS.box.base.z(), pos.Z()-rad ) );
-			TS.box.sommet = Point ( max ( TS.box.sommet.x(), pos.X() +rad ),
+			TS.box.sommet = CGT::Point ( max ( TS.box.sommet.x(), pos.X() +rad ),
 									max ( TS.box.sommet.y(), pos.Y() +rad ),
 									max ( TS.box.sommet.z(), pos.Z() +rad ) );
 			TS.mean_radius += TS.grains[Idg].sphere.weight();
@@ -153,9 +153,9 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	{
 		if ( ( *ii )->isReal() )
 		{
-			TriaxialState::Contact *c = new TriaxialState::Contact;
+			CGT::TriaxialState::Contact *c = new CGT::TriaxialState::Contact;
 			TS.contacts.push_back ( c );
-			TriaxialState::VectorGrain& grains = TS.grains;
+			CGT::TriaxialState::VectorGrain& grains = TS.grains;
 			body_id_t id1 = ( *ii )->getId1();
 			body_id_t id2 = ( *ii )->getId2();
 
@@ -163,13 +163,13 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 			c->grain2 = & ( TS.grains[id2] );
 			grains[id1].contacts.push_back ( c );
 			grains[id2].contacts.push_back ( c );
-			c->normal = Vecteur ( 
+			c->normal = CGT::Vecteur ( 
 					 ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal.X(),
 					 ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal.Y(),
 					 ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal.Z() );
 // 			c->normal = ( grains[id2].sphere.point()-grains[id1].sphere.point() );
 // 			c->normal = c->normal/sqrt ( pow ( c->normal.x(),2 ) +pow ( c->normal.y(),2 ) +pow ( c->normal.z(),2 ) );
-			c->position = Vecteur ( 
+			c->position = CGT::Vecteur ( 
 					( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.X(),
 					( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Y(),
 					( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Z() );
@@ -181,7 +181,7 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 
 			c->fn = YADE_CAST<ElasticContactInteraction*> ( ( ( *ii )->interactionPhysics.get() ) )->normalForce.Dot ( ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal );
 			Vector3r fs = YADE_CAST<ElasticContactInteraction*> ( ( *ii )->interactionPhysics.get() )->shearForce;
-			c->fs = Vecteur ( fs.X(),fs.Y(),fs.Z() );
+			c->fs = CGT::Vecteur ( fs.X(),fs.Y(),fs.Z() );
 			c->old_fn = c->fn;
 			c->old_fs = c->fs;
 			c->frictional_work = 0;

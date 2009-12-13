@@ -18,7 +18,7 @@
 
 
 #include <utility>
-
+namespace CGT {
 
 class Tesselation;
 
@@ -63,4 +63,5 @@ public:
 	void nextFacet (std::pair<unsigned int, unsigned int>& facet); 
 };
 
+} // namespace CGT
 #endif

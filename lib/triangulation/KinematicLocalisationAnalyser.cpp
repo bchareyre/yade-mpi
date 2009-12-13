@@ -13,10 +13,14 @@
 #include "Tesselation.h"
 #include "KinematicLocalisationAnalyser.hpp"
 #include "TriaxialState.h"
+
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 //#include <utility>
+
+namespace CGT {
 
 int n_debug = 0;
 //cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
@@ -1037,3 +1041,4 @@ Real KinematicLocalisationAnalyser::ComputeMacroPorosity (void)
 
 
 
+} // namespace CGT

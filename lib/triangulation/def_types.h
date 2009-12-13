@@ -4,6 +4,7 @@
 #define _Def_types
 
 
+
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Cartesian.h>
 #include <CGAL/Regular_triangulation_3.h>
@@ -14,6 +15,11 @@
 #include <CGAL/circulator.h>
 #include <CGAL/number_utils.h>
 
+#include <boost/static_assert.hpp>
+
+
+
+namespace CGT{
 
 typedef CGAL::Cartesian<double> K ;
 typedef CGAL::Regular_triangulation_euclidean_traits_3<K>   Traits;
@@ -21,6 +27,8 @@ typedef K::Point_3											Point;
 //typedef Traits::Bare_point 									Point;
 typedef Traits::Vector_3 									Vecteur;
 typedef Traits::Segment_3									Segment;
+/* compilation inside yade: check that Real in yade is the same as Real we will define; otherwise it might make things go wrong badly (perhaps) */
+BOOST_STATIC_ASSERT(sizeof(Traits::RT)==sizeof(Real));
 typedef Traits::RT											Real; //Dans cartesian, RT = FT
 typedef Traits::Weighted_point								Sphere;
 typedef Traits::Line_3										Droite;
@@ -84,5 +92,7 @@ public:
 
 
 
+
+} // namespace CGT
 
 #endif

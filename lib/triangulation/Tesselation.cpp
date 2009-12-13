@@ -5,6 +5,8 @@
 
 using namespace std;
 
+namespace CGT {
+
 Tesselation::Tesselation ( void )
 {
 //  std::cout << "Tesselation(void)" << std::endl;
@@ -515,3 +517,5 @@ bool Tesselation::is_internal ( Finite_facets_iterator &facet )
 // {
 //  return vertexHandles[id]->info().v();
 // }
+
+} //namespace CGT

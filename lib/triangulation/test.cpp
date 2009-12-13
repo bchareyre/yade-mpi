@@ -5,6 +5,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace CGT;
 
 int main ( int argc, char *argv[ ], char *envp[ ] )
 {

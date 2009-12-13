@@ -5,6 +5,8 @@
 #include "def_types.h"
 #include <cassert>
 
+namespace CGT {
+
 typedef Vertex_Info				vertex_info;		//d�fini le type des infos li�es � chaque sommet
 typedef	Cell_Info				cell_info;		//d�fini le type des infos li�es � chaque cellule
 typedef CGAL::Triangulation_vertex_base_with_info_3<vertex_info, Traits>	Vb_info;
@@ -50,3 +52,4 @@ long New_segments		( Real** ppCoordonnes );
 int	Regular_Triangule( );
 void Delete_liste_edges (Real** ppCoordonnes, long N_edges=0);
 
+} // namespace CGT

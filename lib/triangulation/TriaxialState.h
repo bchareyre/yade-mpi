@@ -15,7 +15,7 @@
 #include "Tesselation.h"
 #include <vector>
 
-
+namespace CGT{
 using namespace std;
 
 class TriaxialState
@@ -66,8 +66,8 @@ public:
 	bool inside(Real x, Real y, Real z);
 	bool inside(Vecteur v);
 	bool inside(Point p);
-	static Real find_parameter (char* parameter_name, char* filename);
-	static Real find_parameter (char* parameter_name, ifstream& file);
+	static Real find_parameter (const char* parameter_name, const char* filename);
+	static Real find_parameter (const char* parameter_name, ifstream& file);
 	void reset (void);
 
 	GrainIterator grains_begin (void);
@@ -98,4 +98,5 @@ private :
 
 };
 
+} // namespace CGT
 #endif

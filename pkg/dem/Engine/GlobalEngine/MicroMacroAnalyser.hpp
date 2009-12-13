@@ -10,6 +10,7 @@
 
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
@@ -21,7 +22,6 @@
 	This class is using a separate library built from lib/triangulation sources		
  */
 
-class KinematicLocalisationAnalyser;
 
 class MicroMacroAnalyser : public GlobalEngine
 {
@@ -30,7 +30,7 @@ class MicroMacroAnalyser : public GlobalEngine
 		std::ofstream ofile;
 		
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
-		shared_ptr<KinematicLocalisationAnalyser> analyser;
+		shared_ptr<CGT::KinematicLocalisationAnalyser> analyser;
 		std::string	 outputFile;
 		std::string	 stateFileName;
 		

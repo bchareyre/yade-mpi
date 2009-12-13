@@ -6,6 +6,7 @@
 #include "def_types.h" //pour d�finition de la classe "Vecteur"
 
 using namespace std;
+namespace CGT {
 
 
 //const Tenseur3 NULL_TENSEUR3 = Tenseur3(0,0,0,0,0,0,0,0,0);
@@ -404,3 +405,5 @@ operator<<(std::ostream& os, const Tenseur_anti3& T)
 // 	return os;
 // }
 
+
+} // namespace CGT

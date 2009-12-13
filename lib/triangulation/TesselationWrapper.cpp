@@ -17,6 +17,8 @@
 
 using namespace std;
 
+namespace CGT {
+
 static Point Pmin;
 static Point Pmax;
 static double inf = 1e10;
@@ -263,4 +265,6 @@ void 	TesselationWrapper::RemoveBoundingPlanes (void)
 	rad_divided = false;
 	bounded = false;
 	cerr << " end remove bounding planes " << endl;
-} 
+}
+
+} //namespace CGT

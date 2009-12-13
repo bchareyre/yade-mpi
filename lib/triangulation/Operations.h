@@ -5,6 +5,7 @@
 #include "CGAL/intersections.h"
 #include "CGAL/squared_distance_3.h" 
 
+namespace CGT {
 
 // Types de sortie
 typedef double Tenseur [9];
@@ -20,5 +21,6 @@ Point	Intersect (Plan &P1, Plan &P2, Plan &P3);
 // Opérations sur les cellules
 
 
+} //namespace CGT
 
 

@@ -16,6 +16,8 @@
 #include "../vueGL/vue3d.h"
 #endif
 
+namespace CGT {
+
 TriaxialState::TriaxialState(void) : NO_ZERO_ID(true), filter_distance(-0.1), tesselated(false) {}
 
 TriaxialState::~TriaxialState(void)
@@ -25,7 +27,7 @@ TriaxialState::~TriaxialState(void)
 		if (*it) delete *it;}
 }
 
-Real TriaxialState::find_parameter (char* parameter_name, ifstream& file)
+Real TriaxialState::find_parameter (const char* parameter_name, ifstream& file)
 {
 	/*long starting_position = file.tellg();
 	file.seekg (0, ios::end);
@@ -64,7 +66,7 @@ Real TriaxialState::find_parameter (char* parameter_name, ifstream& file)
 	return value;
 }
 
-Real TriaxialState::find_parameter (char* parameter_name, char* filename)
+Real TriaxialState::find_parameter (const char* parameter_name, const char* filename)
 {
 	ifstream statefile (filename);
 	return find_parameter(parameter_name, statefile);
@@ -312,3 +314,5 @@ bool TriaxialState::to_file(const char* filename)
 		Statefile.close();
 		return true;
 }
+
+} // namespace CGT

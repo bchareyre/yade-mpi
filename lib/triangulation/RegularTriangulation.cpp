@@ -3,6 +3,8 @@
 
 #include "RegularTriangulation.h"
 
+namespace CGT {
+
 typedef Real*			p_Real;
 
 //Conversion de Weight vers Real
@@ -203,3 +205,5 @@ void Delete_liste_edges (Real** ppCoordonnes, long N_edges)
 	}
 	else std::cout << "Real** ppCoordonnees doit �tre d�fini " << std::endl;
 }
+
+} //namespace CGT

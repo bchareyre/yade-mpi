@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 
+namespace CGT {
+
 using namespace std;
 
 //class Vecteur;// Classe externe
@@ -119,5 +121,6 @@ class Tenseur_anti3 : public Tens
 
 static const Tenseur3 NULL_TENSEUR3 ( 0,0,0,0,0,0,0,0,0 );
 
+}
 
 #endif

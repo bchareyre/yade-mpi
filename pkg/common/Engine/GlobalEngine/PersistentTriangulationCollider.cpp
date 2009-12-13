@@ -23,7 +23,7 @@ PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 	noTransientIfPersistentExists=false;
 	haveDistantTransient=false;
 	isTriangulated = false;
-	Tes = new ( TesselationWrapper );
+	Tes = new ( CGT::TesselationWrapper );
 
 	nbObjects=0;
 	xBounds.clear();

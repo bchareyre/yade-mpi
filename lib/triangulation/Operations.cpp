@@ -2,6 +2,8 @@
 
 #include "Operations.h"
 
+namespace CGT {
+
 
 Plan PlanRadical	(const Sphere& S1, const Sphere& S2)
 {
@@ -36,4 +38,5 @@ Point Intersect (Plan &P1, Plan &P2, Plan &P3)
 		exit(0);}
 }
 
+} //namespace CGT
 

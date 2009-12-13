@@ -15,6 +15,7 @@ une info "Point" accessible par la fonction c.info() )
 #include "RegularTriangulation.h"
 #include "stdafx.h"
 
+namespace CGT {
 
 // Classe Tesselation, contient les fonctions permettant de calculer la Tessalisation
 // d'une RTriangulation et de stocker les centres dans chacune de ses cellules
@@ -99,4 +100,6 @@ public:
 	
 };
 
+
+} // namespace CGT
 
