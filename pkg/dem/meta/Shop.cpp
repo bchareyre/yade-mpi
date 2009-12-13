@@ -19,8 +19,8 @@
 	#include<yade/pkg-common/BoxModel.hpp>
 #endif
 
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
 #include<yade/pkg-common/InteractingSphere2AABB.hpp>
@@ -270,7 +270,7 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius, shared_ptr<Material>
 	body->state->mass=4.0/3.0*Mathr::PI*radius*radius*radius*body->material->density;
 	body->state->inertia=Vector3r(2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius);
 	body->bound=shared_ptr<AABB>(new AABB);
-	body->shape=shared_ptr<InteractingSphere>(new InteractingSphere(radius));
+	body->shape=shared_ptr<Sphere>(new Sphere(radius));
 	return body;
 }
 
@@ -284,7 +284,7 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents, shared_ptr<Materia
 	body->state->mass=mass;
 	body->state->inertia=Vector3r(mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
 	body->bound=shared_ptr<AABB>(new AABB);
-	body->shape=shared_ptr<InteractingBox>(new InteractingBox(extents));
+	body->shape=shared_ptr<Box>(new Box(extents));
 	return body;
 }
 
@@ -313,7 +313,7 @@ void Shop::saveSpheresToFile(string fname){
 
 	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
 		if (!b->isDynamic) continue;
-		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->shape);
+		shared_ptr<Sphere>	intSph=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!intSph) continue;
 		const Vector3r& pos=b->state->pos;
 		f<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;
@@ -374,7 +374,7 @@ Real Shop::PWaveTimeStep(shared_ptr<Scene> _rb){
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->material || !b->shape) continue;
 		shared_ptr<ElasticMat> ebp=dynamic_pointer_cast<ElasticMat>(b->material);
-		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->shape);
+		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!ebp || !s) continue;
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));
 		dt=min(dt,s->radius/sqrt(ebp->young/density));

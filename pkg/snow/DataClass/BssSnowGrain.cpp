@@ -4,7 +4,7 @@
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
 
-BssSnowGrain::BssSnowGrain():InteractingSphere()
+BssSnowGrain::BssSnowGrain():Sphere()
 {
 	createIndex();
 };

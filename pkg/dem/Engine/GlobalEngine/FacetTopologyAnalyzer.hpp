@@ -4,7 +4,7 @@
 /*! Initializer for filling adjacency geometry data for facets.
  *
  * Common vertices and common edges are identified and mutual angle between facet faces
- * is written to InteractingFacet instances.
+ * is written to Facet instances.
  * If facets don't move with respect to each other, this must be done only at the beginning.
  */
 class FacetTopologyAnalyzer: public GlobalEngine{

@@ -33,7 +33,7 @@ class ContactStressRecorder : public Recorder
 		unsigned int	 interval;
 		
 		Real height, width, depth;
-		Real thickness; // FIXME should retrieve "extents" of a InteractingBox
+		Real thickness; // FIXME should retrieve "extents" of a Box
 		Vector3r upperCorner, lowerCorner;
 		
 		shared_ptr<TriaxialCompressionEngine> triaxCompEng;

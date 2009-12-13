@@ -9,8 +9,8 @@
 #include<boost/random.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 //#include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include"ResetRandomPosition.hpp"
@@ -95,7 +95,7 @@ void ResetRandomPosition::action(Scene* ncb)
 			{
 				position = (volumeSection) ? generatePositionInVolume():generatePositionOnSurface();
 
-				const Real r = YADE_CAST<InteractingSphere*>(b->shape.get())->radius;
+				const Real r = YADE_CAST<Sphere*>(b->shape.get())->radius;
 				Bound bv;
 				bv.min = Vector3r(position[0]-r, position[1]-r, position[2]-r);
 				bv.max = Vector3r(position[0]+r, position[1]+r, position[2]+r);
@@ -152,7 +152,7 @@ Vector3r ResetRandomPosition::generatePositionOnSurface()
     Real t2 = randomUnit()*(1-t1);
 
     shared_ptr<Body> facet = Body::byId(facetId);
-	InteractingFacet* ifacet = static_cast<InteractingFacet*>(facet->shape.get());
+	Facet* ifacet = static_cast<Facet*>(facet->shape.get());
 
 	return t1*(ifacet->vertices[1]-ifacet->vertices[0])+t2*(ifacet->vertices[2]-ifacet->vertices[0])+ifacet->vertices[0]+facet->state->se3.position;
     

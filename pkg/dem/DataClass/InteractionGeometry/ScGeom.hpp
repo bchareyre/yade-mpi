@@ -63,5 +63,7 @@ class ScGeom: public GenericSpheresContact {
 	REGISTER_CLASS_INDEX(ScGeom,InteractionGeometry);
 };
 
+__attribute__((deprecated)) typedef ScGeom SpheresContactGeometry;
+
 REGISTER_SERIALIZABLE(ScGeom);
 

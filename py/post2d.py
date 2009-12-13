@@ -163,7 +163,7 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 	nDim=0
 	for b in O.bodies:
 		if onlyDynamic and not b.dynamic: continue
-		if b.mold.name!='InteractingSphere': continue
+		if b.mold.name!='Sphere': continue
 		xy,d=flattener(b),extractor(b)
 		if xy==None or d==None: continue
 		if nDim==0: nDim=1 if isinstance(d,float) else 2

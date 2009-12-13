@@ -1,5 +1,5 @@
 #include"FacetTopologyAnalyzer.hpp"
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Body.hpp>
 
@@ -7,7 +7,7 @@ CREATE_LOGGER(FacetTopologyAnalyzer);
 YADE_PLUGIN((FacetTopologyAnalyzer));
 #ifndef FACET_TOPO
 void FacetTopologyAnalyzer::action(Scene* rb){
-	throw runtime_error("FACET_TOPO was not enabled in InteractingFacet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.");
+	throw runtime_error("FACET_TOPO was not enabled in Facet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.");
 }
 #else
 void FacetTopologyAnalyzer::action(Scene* rb){
@@ -17,7 +17,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 	// minimum facet edge length (tolerance scale)
 	Real minSqLen=numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-		shared_ptr<InteractingFacet> f=dynamic_pointer_cast<InteractingFacet>(b->shape);
+		shared_ptr<Facet> f=dynamic_pointer_cast<Facet>(b->shape);
 		if(!f) continue;
 		const Vector3r& pos=b->physicalParameters->se3.position;
 		for(size_t i=0; i<3; i++){
@@ -115,7 +115,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 				}
 			}
 			// add adjacency information to the facet itself
-			InteractingFacet *f1=YADE_CAST<InteractingFacet*>((*rb->bodies)[ti->id]->shape.get()), *f2=YADE_CAST<InteractingFacet*>((*rb->bodies)[tj->id]->shape.get());
+			Facet *f1=YADE_CAST<Facet*>((*rb->bodies)[ti->id]->shape.get()), *f2=YADE_CAST<Facet*>((*rb->bodies)[tj->id]->shape.get());
 			f1->edgeAdjIds[ei]=ti->id; f2->edgeAdjIds[ej]=tj->id;
 			// normals are in the sense of vertex rotation (right-hand rule); therefore, if vertices of the adjacent edge are opposite on each facet, normals are in the same direction
 			bool invNormals=(ti->vertices[ei]==tj->vertices[ej]);

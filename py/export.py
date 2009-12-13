@@ -18,7 +18,7 @@ class VTKWriter:
 		positions=[]; radii=[]
 
 		for b in Omega().bodies:
-			if b.mold.name=='InteractingSphere':
+			if b.mold.name=='Sphere':
 				positions.append(b.phys['se3'][0])
 				radii.append(b.mold['radius'])
 

@@ -7,7 +7,7 @@
 *************************************************************************/
  
 #include "InteractingBox2AABB.hpp"
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
 
@@ -16,7 +16,7 @@ void InteractingBox2AABB::go(	const shared_ptr<Shape>& cm,
 				const Se3r& se3,
 				const Body*	)
 {
-	InteractingBox* box = static_cast<InteractingBox*>(cm.get());
+	Box* box = static_cast<Box*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	
 	aabb->center = se3.position;

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "Gl1_Box.hpp"
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 void Gl1_Box::go(const shared_ptr<Shape>& cg, const shared_ptr<State>&,bool wire,const GLViewInfo&)
@@ -16,7 +16,7 @@ void Gl1_Box::go(const shared_ptr<Shape>& cg, const shared_ptr<State>&,bool wire
   	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cg->diffuseColor[0],cg->diffuseColor[1],cg->diffuseColor[2]));
 	glColor3v(cg->diffuseColor);
 	
-	Vector3r &extents = (static_cast<InteractingBox*>(cg.get()))->extents;
+	Vector3r &extents = (static_cast<Box*>(cg.get()))->extents;
 	
 	glScalef(2*extents[0],2*extents[1],2*extents[2]);
 

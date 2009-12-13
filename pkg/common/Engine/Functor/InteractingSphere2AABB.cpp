@@ -7,11 +7,11 @@
 *************************************************************************/
  
 #include "InteractingSphere2AABB.hpp"
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/AABB.hpp>
 
 void InteractingSphere2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
-	InteractingSphere* sphere = static_cast<InteractingSphere*>(cm.get());
+	Sphere* sphere = static_cast<Sphere*>(cm.get());
 	AABB* aabb = static_cast<AABB*>(bv.get());
 	aabb->center = se3.position;
 	aabb->halfSize = (aabbEnlargeFactor>0?aabbEnlargeFactor:1.)*Vector3r(sphere->radius,sphere->radius,sphere->radius);

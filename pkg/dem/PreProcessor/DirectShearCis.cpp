@@ -51,8 +51,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include <boost/filesystem/convenience.hpp>
@@ -177,7 +177,7 @@ void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<SphereModel> gSphere(new SphereModel);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -218,7 +218,7 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<BoxModel> gBox(new BoxModel);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	
 	Quaternionr q;

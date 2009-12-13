@@ -8,8 +8,8 @@
 
 #include"Ig2_Facet_Sphere_ScGeom.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -29,7 +29,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 							const shared_ptr<Interaction>& c)
 {
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
-	InteractingFacet*   facet = static_cast<InteractingFacet*>(cm1.get());
+	Facet*   facet = static_cast<Facet*>(cm1.get());
 	/* could be written as (needs to be tested):
 	 * Vector3r cl=se31.orientation.Conjugate()*(se32.position-se31.position);
 	 */
@@ -46,7 +46,7 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 	Real L = normal.Dot(cl);
 	if (L<0) {normal=-normal; L=-L; }
 
-	Real sphereRadius = static_cast<InteractingSphere*>(cm2.get())->radius;
+	Real sphereRadius = static_cast<Sphere*>(cm2.get())->radius;
 	if (L>sphereRadius && !c->isReal() && !force)  return false; // no contact, but only if there was no previous contact; ortherwise, the constitutive law is responsible for setting Interaction::isReal=false
 
 	Vector3r cp = cl - L*normal;

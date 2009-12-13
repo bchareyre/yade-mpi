@@ -65,8 +65,8 @@ class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 		//! if negative, equilibrium distance is the sum of the sphere's radii, which is the default.
 		Real distFactor;
 		Ig2_Sphere_Sphere_Dem3DofGeom(): distFactor(-1.) {}
-	FUNCTOR2D(InteractingSphere,InteractingSphere);
-	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
+	FUNCTOR2D(Sphere,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 	REGISTER_CLASS_AND_BASE(Ig2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(distFactor));
 	DECLARE_LOGGER;

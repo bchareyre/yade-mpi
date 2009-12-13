@@ -9,7 +9,7 @@
 
 #include "CinemKNCEngine.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -183,11 +183,11 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 	}
 		
 // Computation of the current dimensions of the box : //
-	Real Xleft = (leftbox->physicalParameters.get())->se3.position.X() + (YADE_CAST<InteractingBox*>(leftbox->shape.get()))->extents.X();
-	Real Xright = (rightbox->physicalParameters.get())->se3.position.X() - (YADE_CAST<InteractingBox*>(rightbox->shape.get()))->extents.X();
+	Real Xleft = (leftbox->physicalParameters.get())->se3.position.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
+	Real Xright = (rightbox->physicalParameters.get())->se3.position.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
 
-	Real Zfront = (frontbox->physicalParameters.get())->se3.position.Z() - YADE_CAST<InteractingBox*>(frontbox->shape.get())->extents.Z();
-	Real Zback = (backbox->physicalParameters.get())->se3.position.Z() + (YADE_CAST<InteractingBox*>(backbox->shape.get()))->extents.Z();
+	Real Zfront = (frontbox->physicalParameters.get())->se3.position.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
+	Real Zback = (backbox->physicalParameters.get())->se3.position.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //

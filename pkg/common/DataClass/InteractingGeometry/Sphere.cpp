@@ -6,29 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#pragma once
+#include "Sphere.hpp"
 
-
-#include<yade/core/Shape.hpp>
-
-
-class InteractingBox : public Shape
+Sphere::Sphere () : Shape(), radius(0.0)
 {
-	public :
-		Vector3r extents;
+	createIndex();
+}
 
-		InteractingBox ();
-		InteractingBox(const Vector3r& _extents): extents(_extents){}
-		virtual ~InteractingBox ();	
-	
-	REGISTER_ATTRIBUTES(Shape,(extents));
-	REGISTER_CLASS_INDEX(InteractingBox,Shape);
-	REGISTER_CLASS_NAME(InteractingBox);
-	REGISTER_BASE_CLASS_NAME(Shape);
+Sphere::~Sphere ()
+{
+}
 
 
-};
-
-REGISTER_SERIALIZABLE(InteractingBox);
-
+YADE_PLUGIN((Sphere));
 

@@ -7,7 +7,7 @@
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-snow/IstSnowLayersContact.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/core/Omega.hpp>

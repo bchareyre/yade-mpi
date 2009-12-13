@@ -7,7 +7,7 @@
 *************************************************************************/
  
 #include"Ef2_BssSnowGrain_AABB_makeAABB.hpp"
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-common/AABB.hpp>
 YADE_REQUIRE_FEATURE(geometricalmodel);

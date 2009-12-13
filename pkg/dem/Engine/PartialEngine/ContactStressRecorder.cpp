@@ -10,7 +10,7 @@
 #include <yade/pkg-common/ElasticMat.hpp>
 //#include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-common/Force.hpp>
-#include <yade/pkg-common/InteractingSphere.hpp>
+#include <yade/pkg-common/Sphere.hpp>
 //#include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 
@@ -37,7 +37,7 @@ ContactStressRecorder::ContactStressRecorder () : Recorder()/*, actionForce ( ne
 	upperCorner = Vector3r ( 0,0,0 );
 	lowerCorner = Vector3r ( 0,0,0 );
 
-	sphere_ptr = shared_ptr<Shape> ( new InteractingSphere );
+	sphere_ptr = shared_ptr<Shape> ( new Sphere );
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 
 	//triaxCompEng = NULL;
@@ -218,7 +218,7 @@ void ContactStressRecorder::action ( Scene * ncb )
 			kinematicE +=
 					0.5* ( b->state->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
-			InteractingSphere* sphere = static_cast<InteractingSphere*> ( b->shape.get() );
+			Sphere* sphere = static_cast<Sphere*> ( b->shape.get() );
 			Rbody = sphere->radius;
 			if ( Rbody<Rmin ) Rmin = Rbody;
 			if ( Rbody>Rmax ) Rmax = Rbody;

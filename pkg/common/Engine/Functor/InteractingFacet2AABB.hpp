@@ -18,7 +18,7 @@ class InteractingFacet2AABB : public BoundFunctor
 				, const Se3r& se3
 				, const Body*	);
 	
-	FUNCTOR2D(InteractingFacet,AABB);
+	FUNCTOR2D(Facet,AABB);
 	
 	REGISTER_CLASS_NAME(InteractingFacet2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundFunctor);

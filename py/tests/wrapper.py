@@ -72,8 +72,8 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assertRaises(TypeError,lambda: LawDispatcher([InteractingSphere2AABB()]))
 	def testInvalidAttr(self):
 		# accessing invalid attributes raises KeyError
-		self.assertRaises(KeyError,lambda: InteractingSphere(attributeThatDoesntExist=42))
-		self.assertRaises(KeyError,lambda: InteractingSphere()['attributeThatDoesntExist'])
+		self.assertRaises(KeyError,lambda: Sphere(attributeThatDoesntExist=42))
+		self.assertRaises(KeyError,lambda: Sphere()['attributeThatDoesntExist'])
 	
 class TestWm3Wrapper(unittest.TestCase):
 	def assertVQAlmostEqual(self,v1,v2):

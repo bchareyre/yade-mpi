@@ -7,7 +7,7 @@
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
 #include<yade/pkg-common/NewtonsMomentumLaw.hpp>
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
@@ -125,7 +125,7 @@ bool SimpleScene::generate(){
 		b->bound=aabb;
 
 		// mold
-		shared_ptr<InteractingBox> mold(new InteractingBox);
+		shared_ptr<Box> mold(new Box);
 		mold->extents=extents;
 		mold->diffuseColor=Vector3r(1,0,0);
 		b->shape=mold;

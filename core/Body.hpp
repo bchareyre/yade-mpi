@@ -86,7 +86,7 @@ class Body : public Serializable
 			/// the 'perfect' representation of body's geometry: Polyhedron, BoxModel
 			shared_ptr<GeometricalModel>	geometricalModel;
 		#endif
-		/// description of how this body interacts with others, like: SphereHierarchy, InteractingBox
+		/// description of how this body interacts with others, like: SphereHierarchy, Box
 		shared_ptr<Shape> shape;
 		/// Bound is used for quick detection of potential interactions, that can be: AABB, K-Dop
 		shared_ptr<Bound>	bound;

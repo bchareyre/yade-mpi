@@ -9,7 +9,7 @@
 #include "CapillaryStressRecorder.hpp"
 //#include <yade/pkg-common/RigidBodyParameters.hpp>
 //#include <yade/pkg-common/ParticleParameters.hpp>
-#include <yade/pkg-common/InteractingSphere.hpp>
+#include <yade/pkg-common/Sphere.hpp>
 #include <yade/pkg-common/ElasticMat.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
@@ -26,7 +26,7 @@ CapillaryStressRecorder::CapillaryStressRecorder () : Recorder()
 {
 	outputFile = "";
 	interval = 1;
-	sphere_ptr = shared_ptr<Shape> (new InteractingSphere);
+	sphere_ptr = shared_ptr<Shape> (new Sphere);
 	SpheresClassIndex = sphere_ptr->getClassIndex();
 // 	height = 0;
 // 	width = 0;
@@ -197,8 +197,8 @@ void CapillaryStressRecorder::action(Scene * ncb)
 		
 		if (geometryIndex == SpheresClassIndex)
 		{
-			InteractingSphere* sphere =
-		static_cast<InteractingSphere*>(b->shape.get());
+			Sphere* sphere =
+		static_cast<Sphere*>(b->shape.get());
 			Rbody = sphere->radius;
 			SR+=Rbody;
 			

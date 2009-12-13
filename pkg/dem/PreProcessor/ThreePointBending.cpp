@@ -40,8 +40,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
@@ -156,8 +156,8 @@ bool ThreePointBending::generate()
 
 			shared_ptr<BodyMacroParameters> a = YADE_PTR_CAST<BodyMacroParameters>(bodyA->physicalParameters);
 			shared_ptr<BodyMacroParameters> b = YADE_PTR_CAST<BodyMacroParameters>(bodyB->physicalParameters);
-			shared_ptr<InteractingSphere>	as = YADE_PTR_CAST<InteractingSphere>(bodyA->shape);
-			shared_ptr<InteractingSphere>	bs = YADE_PTR_CAST<InteractingSphere>(bodyB->shape);
+			shared_ptr<Sphere>	as = YADE_PTR_CAST<Sphere>(bodyA->shape);
+			shared_ptr<Sphere>	bs = YADE_PTR_CAST<Sphere>(bodyB->shape);
 
 			if ((a->se3.position-b->se3.position).Length() < interactionFactor*(as->radius+bs->radius))  
 			{
@@ -225,7 +225,7 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<BoxModel> gBox(new BoxModel);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	body->isDynamic			= false;
 	

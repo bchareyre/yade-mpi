@@ -15,7 +15,7 @@
 // it is necessary for FacetTopologyAnalyzer
 #define FACET_TOPO
 
-class InteractingFacet : public Shape {
+class Facet : public Shape {
     public:
 	
 	// Registered attributes
@@ -23,8 +23,8 @@ class InteractingFacet : public Shape {
 	/// Vertex positions in the local reference frame
 	vector<Vector3r> vertices;
 
-	InteractingFacet();
-	virtual ~InteractingFacet();
+	Facet();
+	virtual ~Facet();
 	
 	// Postprocessed attributes 
 
@@ -53,11 +53,11 @@ class InteractingFacet : public Shape {
 		#endif
 	);
 	protected: void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(InteractingFacet);
+	REGISTER_CLASS_NAME(Facet);
 	REGISTER_BASE_CLASS_NAME(Shape);
 
-	REGISTER_CLASS_INDEX(InteractingFacet,Shape);
+	REGISTER_CLASS_INDEX(Facet,Shape);
 };
 
-REGISTER_SERIALIZABLE(InteractingFacet);
+REGISTER_SERIALIZABLE(Facet);
 

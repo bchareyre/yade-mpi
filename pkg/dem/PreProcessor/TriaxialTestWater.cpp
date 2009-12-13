@@ -42,8 +42,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
@@ -311,7 +311,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	shared_ptr<GranularMat> physics(new GranularMat);
 	shared_ptr<AABB> aabb(new AABB);
 
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
 	q.Normalize();
@@ -366,7 +366,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<BoxModel> gBox(new BoxModel);	
 // 	#endif
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);

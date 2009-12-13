@@ -4,7 +4,7 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
 #include <boost/random/linear_congruential.hpp>
@@ -71,7 +71,7 @@ void SpherePack::fromSimulation() {
 	pack.clear();
 	Scene* rootBody=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->shape);
+		shared_ptr<Sphere>	intSph=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius));
 	}

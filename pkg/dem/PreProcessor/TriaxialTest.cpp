@@ -45,9 +45,9 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/Wall.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
@@ -364,7 +364,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	//shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -446,7 +446,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 			body->geometricalModel		= gBox;
 		#endif
 
-		shared_ptr<InteractingBox> iBox(new InteractingBox);
+		shared_ptr<Box> iBox(new Box);
 		iBox->extents			= extents;
 		iBox->wire			= wire;
 		iBox->diffuseColor		= Vector3r(1,1,1);
@@ -459,7 +459,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		Vector3r side1(Vector3r::ZERO); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::ZERO); side2[ax2]=4*extents[ax2];
 		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
 		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
-		shared_ptr<InteractingFacet> iFacet(new InteractingFacet);
+		shared_ptr<Facet> iFacet(new Facet);
 		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
 		iFacet->diffuseColor=Vector3r(1,1,1);
 		body->shape=iFacet;

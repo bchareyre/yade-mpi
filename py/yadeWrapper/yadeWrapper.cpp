@@ -100,7 +100,7 @@ class RenderingEngine;
 	Those attributes that are not fundamental types (strings, numbers, booleans, se3, vectors, quaternions, arrays of numbers, arrays of strings) can be accessed only through explicit python data members, for example:
 		
 		b=Body()
-		b.mold=Shape("InteractingSphere",radius=1)
+		b.mold=Shape("Sphere",radius=1)
 		b.shape=GeometricalModel("SphereModel",radius=1)
 		b.mold # will give you the shape of body
 	

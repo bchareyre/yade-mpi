@@ -62,7 +62,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 		for ( ; bi!=biEnd ; ++bi )
 		{
 			shared_ptr<Body> b = *bi;
-			if ( b->shape && b->shape->getClassName() =="InteractingSphere" )
+			if ( b->shape && b->shape->getClassName() =="Sphere" )
 				( static_cast<CohesiveFrictionalMat*> ( b->material.get() ) )->isBroken = true;
 			// b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
 		}
@@ -288,7 +288,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 		for ( ; bi!=biEnd ; ++bi )
 		{
 			shared_ptr<Body> b = *bi;
-			if ( b->shape && b->shape->getClassName() =="InteractingSphere" && erosionActivated )
+			if ( b->shape && b->shape->getClassName() =="Sphere" && erosionActivated )
 			{
 				//cerr << "translate it" << endl;
 				if ( ( static_cast<CohesiveFrictionalMat*> ( b->material.get() ) )->isBroken == true )

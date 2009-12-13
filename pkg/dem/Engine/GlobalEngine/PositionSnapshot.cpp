@@ -8,7 +8,7 @@
 
 #include "PositionSnapshot.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
@@ -78,7 +78,7 @@ void PositionSnapshot::action(Scene * ncb)
 		{
 			Id=b->getId();
 			pos=(b->physicalParameters.get())->se3.position;
-			Real rayon = YADE_CAST<InteractingSphere*>(b->shape.get())->radius;
+			Real rayon = YADE_CAST<Sphere*>(b->shape.get())->radius;
 			myfile << lexical_cast<string>(Id) << " " << lexical_cast<string>(rayon) << " " << lexical_cast<string>(pos[0]) << " " << lexical_cast<string>(pos[1]) << " " << lexical_cast<string>(pos[2]) << endl;
 		}
 	}

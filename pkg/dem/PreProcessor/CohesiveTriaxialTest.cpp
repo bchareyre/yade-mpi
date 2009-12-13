@@ -39,8 +39,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -294,7 +294,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<SphereModel> gSphere(new SphereModel);
 // 	#endif
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
 	q.Normalize();
@@ -347,7 +347,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
 
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);

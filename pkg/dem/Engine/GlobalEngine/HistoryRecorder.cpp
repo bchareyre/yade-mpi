@@ -12,8 +12,8 @@
 #include<yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <yade/pkg-common/InteractingSphere.hpp>
-#include <yade/pkg-common/InteractingBox.hpp>
+#include <yade/pkg-common/Sphere.hpp>
+#include <yade/pkg-common/Box.hpp>
 
 #include <yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-common/NormalShearInteractions.hpp>
@@ -68,9 +68,9 @@ void HistoryRecorder::action(Scene * ncb)
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
 	 const Shape* gm   = YADE_CAST<Shape*>(b->shape.get());
 
-	if ( typeid(*gm) == typeid(InteractingSphere) )
+	if ( typeid(*gm) == typeid(Sphere) )
      {
-		ofs << "sphere " << b->groupMask << " " << YADE_CAST<InteractingSphere*>(b->shape.get())->radius
+		ofs << "sphere " << b->groupMask << " " << YADE_CAST<Sphere*>(b->shape.get())->radius
 		<< " " << p->se3.position[0] << " " << p->se3.position[1] << " " << p->se3.position[2]
 		<< " 0 0 0" 
 		<< " " << p->velocity[0] << " " << p->velocity[1] << " " << p->velocity[2]
@@ -78,9 +78,9 @@ void HistoryRecorder::action(Scene * ncb)
 		<< endl << flush;
 	 }
 
-	if ( typeid(*gm) == typeid(InteractingBox) )
+	if ( typeid(*gm) == typeid(Box) )
 	{
-	  ofs << "box " << b->groupMask << " " << YADE_CAST<InteractingBox*>(b->shape.get())->extents
+	  ofs << "box " << b->groupMask << " " << YADE_CAST<Box*>(b->shape.get())->extents
 	  << " " << p->se3.position[0] << " " << p->se3.position[1] << " " << p->se3.position[2]
 	  << " 0 0 0"
 	  << " " << p->velocity[0] << " " << p->velocity[1] << " " << p->velocity[2]
@@ -113,8 +113,8 @@ void HistoryRecorder::action(Scene * ncb)
 	   if( typeid(*ig) == typeid(ScGeom) )
 	   {
 		 
-		 if (typeid(*(b1->shape.get())) == typeid(InteractingSphere)
-		  && typeid(*(b2->shape.get())) == typeid(InteractingSphere))
+		 if (typeid(*(b1->shape.get())) == typeid(Sphere)
+		  && typeid(*(b2->shape.get())) == typeid(Sphere))
 		 {
 		   const NormalShearInteraction* nsi = YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get());
 		   Vector3r n = nsi->normalForce;

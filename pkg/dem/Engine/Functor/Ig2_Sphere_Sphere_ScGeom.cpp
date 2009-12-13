@@ -5,7 +5,7 @@
 
 #include"Ig2_Sphere_Sphere_ScGeom.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/core/Omega.hpp>
@@ -23,7 +23,7 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 {
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
 
-	InteractingSphere *s1=static_cast<InteractingSphere*>(cm1.get()), *s2=static_cast<InteractingSphere*>(cm2.get());
+	Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
 	Vector3r normal=(se32.position+shift2)-se31.position;
 	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.SquaredLength();
 	if (penetrationDepthSq>0 || c->isReal() || force){

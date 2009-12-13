@@ -13,7 +13,7 @@
 #include <vector>
 #include "HydraulicForceEngine.hpp"
 #include <yade/pkg-dem/Shop.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 vector<Real> initialPositions;
 
@@ -70,7 +70,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
             for ( ; bi!=biEnd ; ++bi )
             {
                 shared_ptr<Body> b = *bi;
-                if (b->shape && b->shape->getClassName()=="InteractingSphere")
+                if (b->shape && b->shape->getClassName()=="Sphere")
                 {
                     //cerr << "translate it" << endl;
                     if ((static_cast<CohesiveFrictionalMat*> (b->material.get()))->isBroken == true)
@@ -133,7 +133,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
 		    if(!f.good()) throw runtime_error("Unable to open file `"+outputFile+"'");
 		    FOREACH(shared_ptr<Body> b, *rootBody->bodies){
 			    if (!b->isDynamic) continue;
-			    shared_ptr<InteractingSphere>	intSph=dynamic_pointer_cast<InteractingSphere>(b->shape);
+			    shared_ptr<Sphere>	intSph=dynamic_pointer_cast<Sphere>(b->shape);
 			    if(!intSph) continue;
 			    const Vector3r& pos=b->state->pos;
 			    f<< b->getId()<<" "<<pos[0]<<" "<<pos[1]<<" "<<pos[2]<<" "<<intSph->radius<<endl; // <<" "<<1<<" "<<1<<endl;

@@ -37,9 +37,9 @@ class Ig2_Facet_Sphere_ScGeom : public InteractionGeometryFunctor
 
 	DECLARE_LOGGER;
 
-	FUNCTOR2D(InteractingFacet,InteractingSphere);
+	FUNCTOR2D(Facet,Sphere);
 
-	DEFINE_FUNCTOR_ORDER_2D(InteractingFacet,InteractingSphere);
+	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
 
 	// The radius of the inscribed circle of the facet is decreases by the
 	// value of the sphere's radius multipled by shrinkFactor. So, at

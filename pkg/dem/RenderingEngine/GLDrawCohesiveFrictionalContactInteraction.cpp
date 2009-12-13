@@ -105,8 +105,8 @@ void GLDrawCohesiveFrictionalContactInteraction::go(
 	Vector3r pos2   = b2->physicalParameters->se3.position;
 
 	/// skip drawing interaction with boxes....
-		if(boxIndex == -1 && b1->shape->getClassName() == "InteractingBox") boxIndex = b1->shape->getClassIndex();
-		if(boxIndex == -1 && b2->shape->getClassName() == "InteractingBox") boxIndex = b2->shape->getClassIndex();
+		if(boxIndex == -1 && b1->shape->getClassName() == "Box") boxIndex = b1->shape->getClassIndex();
+		if(boxIndex == -1 && b2->shape->getClassName() == "Box") boxIndex = b2->shape->getClassIndex();
 		if(b1->shape->getClassIndex() == boxIndex || b2->shape->getClassIndex() == boxIndex) return;
 	//
 

@@ -6,7 +6,7 @@
 #include<vector>
 #include<boost/serialization/vector.hpp>
 #include<boost/serialization/shared_ptr.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<boost/tuple/tuple.hpp>
 
@@ -44,7 +44,7 @@ struct depth_one
 	};
 };
 
-class BssSnowGrain : public InteractingSphere
+class BssSnowGrain : public Sphere
 {
 	public: 
 		std::map<int,std::set<depth_one> >	depths; // body_id , < depth, i, j (indexes of point on a slice) >
@@ -55,11 +55,11 @@ class BssSnowGrain : public InteractingSphere
 		BssSnowGrain(BshSnowGrain* grain, Real one_voxel_in_meters_is);
 	
 	// FIXME: BssSnowGrain has no copy-constructor; will be inaccessible from python
-	// REGISTER_ATTRIBUTES(InteractingSphere,(m_copy));
-	virtual void registerAttributes(){ InteractingSphere::registerAttributes(); REGISTER_ATTRIBUTE_(m_copy); }
+	// REGISTER_ATTRIBUTES(Sphere,(m_copy));
+	virtual void registerAttributes(){ Sphere::registerAttributes(); REGISTER_ATTRIBUTE_(m_copy); }
 	REGISTER_CLASS_NAME(BssSnowGrain);
-	REGISTER_BASE_CLASS_NAME(InteractingSphere);
-	REGISTER_CLASS_INDEX(BssSnowGrain,InteractingSphere);
+	REGISTER_BASE_CLASS_NAME(Sphere);
+	REGISTER_CLASS_INDEX(BssSnowGrain,Sphere);
 };
 
 REGISTER_SERIALIZABLE(BssSnowGrain);

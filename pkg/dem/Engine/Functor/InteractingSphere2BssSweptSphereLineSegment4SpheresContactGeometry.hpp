@@ -32,9 +32,9 @@ class InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry : publi
         REGISTER_CLASS_NAME(InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 
-        FUNCTOR2D(InteractingSphere,BssSweptSphereLineSegment);
+        FUNCTOR2D(Sphere,BssSweptSphereLineSegment);
 
-        DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,BssSweptSphereLineSegment);
+        DEFINE_FUNCTOR_ORDER_2D(Sphere,BssSweptSphereLineSegment);
 };
 
 REGISTER_SERIALIZABLE(InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry);

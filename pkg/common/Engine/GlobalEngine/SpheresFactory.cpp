@@ -9,8 +9,8 @@
 #include<boost/random.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/FacetModel.hpp>
 	#include<yade/pkg-common/SphereModel.hpp>
@@ -126,7 +126,7 @@ Vector3r SpheresFactory::generatePositionOnSurface()
     Real t2 = randomUnit()*(1-t1);
 
     shared_ptr<Body> facet = Body::byId(facetId);
-    InteractingFacet* gfacet = static_cast<InteractingFacet*>(facet->shape.get());
+    Facet* gfacet = static_cast<Facet*>(facet->shape.get());
 
 
 
@@ -147,7 +147,7 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);

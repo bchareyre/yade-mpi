@@ -17,7 +17,7 @@ class Gl1_Sphere : public GlShapeFunctor
 		static int glutSlices, glutStacks;
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-	RENDERS(InteractingSphere);
+	RENDERS(Sphere);
 	REGISTER_ATTRIBUTES(Serializable,(wire)(glutNormalize)(glutSlices)(glutStacks));
 	REGISTER_CLASS_AND_BASE(Gl1_Sphere,GlShapeFunctor);
 };

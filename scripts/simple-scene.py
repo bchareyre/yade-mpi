@@ -98,7 +98,7 @@ if False:
 	# Assign geometrical model (shape) to the body: a box of given size
 	b.shape=BoxModel(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# Assign computational model (mold; may be simplified form of shape) to the body
-	b.mold=InteractingBox(extents=[.5,.5,.5],diffuseColor=[1,0,0])
+	b.mold=Box(extents=[.5,.5,.5],diffuseColor=[1,0,0])
 	# physical parameters:
 	# store mass to a temporary
 	mass=8*.5*.5*.5*2400

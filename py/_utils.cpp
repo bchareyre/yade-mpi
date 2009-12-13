@@ -5,8 +5,8 @@
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/lib-computational-geometry/Hull2d.hpp>
 #include<cmath>
@@ -36,7 +36,7 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->shape); if(!s) continue;
+		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=componentMinVector(minimum,b->state->pos-(centers?Vector3r::ZERO:rrr));
 		maximum=componentMaxVector(maximum,b->state->pos+(centers?Vector3r::ZERO:rrr));
@@ -51,7 +51,7 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	Real minCoord=extract<double>(extrema[0][axis])(),maxCoord=extract<double>(extrema[1][axis])();
 	python::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		shared_ptr<InteractingSphere> s=dynamic_pointer_cast<InteractingSphere>(b->shape); if(!s) continue;
+		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
 	}
@@ -254,7 +254,7 @@ Real sumFacetNormalForces(vector<body_id_t> ids, int axis=-1){
 	shared_ptr<Scene> rb=Omega::instance().getScene(); rb->bex.sync();
 	Real ret=0;
 	FOREACH(const body_id_t id, ids){
-		InteractingFacet* f=YADE_CAST<InteractingFacet*>(Body::byId(id,rb)->shape.get());
+		Facet* f=YADE_CAST<Facet*>(Body::byId(id,rb)->shape.get());
 		if(axis<0) ret+=rb->bex.getForce(id).Dot(f->nf);
 		else {
 			Vector3r ff=rb->bex.getForce(id); ff[axis]=0;
@@ -275,7 +275,7 @@ void wireSome(string filter){
 		switch(mode){
 			case none: wire=false; break;
 			case all: wire=true; break;
-			case noSpheres: wire=!(bool)(dynamic_pointer_cast<InteractingSphere>(b->shape)); break;
+			case noSpheres: wire=!(bool)(dynamic_pointer_cast<Sphere>(b->shape)); break;
 			default: throw logic_error("No such case possible");
 		}
 		b->shape->wire=wire;
@@ -351,7 +351,7 @@ Real approxSectionArea(Real coord, int axis){
 	const Real sqrt3=sqrt(3);
 	Vector2r mm,mx; int i=0;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		InteractingSphere* s=dynamic_cast<InteractingSphere*>(b->shape.get());
+		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
 		if(!s) continue;
 		const Vector3r& pos(b->state->pos); const Real r(s->radius);
 		if((pos[axis]>coord && (pos[axis]-r)>coord) || (pos[axis]<coord && (pos[axis]+r)<coord)) continue;

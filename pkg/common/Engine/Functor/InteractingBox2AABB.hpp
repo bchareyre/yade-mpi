@@ -19,7 +19,7 @@ class InteractingBox2AABB : public BoundFunctor
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body*	);
-	FUNCTOR2D(InteractingBox,AABB);
+	FUNCTOR2D(Box,AABB);
 	REGISTER_CLASS_NAME(InteractingBox2AABB);
 	REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };

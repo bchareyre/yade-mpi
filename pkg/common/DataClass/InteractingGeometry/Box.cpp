@@ -6,17 +6,16 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "InteractingSphere.hpp"
+#include "Box.hpp"
 
-InteractingSphere::InteractingSphere () : Shape(), radius(0.0)
-{
+
+Box::Box () : Shape()
+{		
 	createIndex();
 }
 
-InteractingSphere::~InteractingSphere ()
-{
+Box::~Box ()
+{		
 }
 
-
-YADE_PLUGIN((InteractingSphere));
-
+YADE_PLUGIN((Box));

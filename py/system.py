@@ -80,6 +80,9 @@ _deprecated={
 	'InteractingSphere2InteractingSphere4SpheresContactGeometry':'Ig2_Sphere_Sphere_ScGeom', # Sun Dec 13 21:02:31 2009, vaclav@flux
 	'InteractingFacet2InteractingSphere4SpheresContactGeometry':'Ig2_Facet_Sphere_ScGeom', # Sun Dec 13 21:02:57 2009, vaclav@flux
 	'InteractingBox2InteractingSphere4SpheresContactGeometry':'Ig2_Box_Sphere_ScGeom', # Sun Dec 13 21:03:10 2009, vaclav@flux
+	'InteractingSphere':'Sphere', # Sun Dec 13 21:13:40 2009, vaclav@flux
+	'InteractingFacet':'Facet', # Sun Dec 13 21:15:07 2009, vaclav@flux
+	'InteractingBox':'Box', # Sun Dec 13 21:15:16 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -47,8 +47,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/InteractingNode.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 
@@ -206,7 +206,7 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
   shared_ptr<SimpleViscoelasticBodyParameters> physics(new SimpleViscoelasticBodyParameters); // Bcp + Bst
   shared_ptr<AABB> aabb(new AABB);                                      // Bbv
   shared_ptr<SphereModel> gSphere(new SphereModel);                               // Bsh
-  shared_ptr<InteractingSphere> iSphere(new InteractingSphere);         // Bss
+  shared_ptr<Sphere> iSphere(new Sphere);         // Bss
         
   Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
   q.Normalize();

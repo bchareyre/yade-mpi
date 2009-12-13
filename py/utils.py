@@ -142,7 +142,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 
 	"""
 	b=Body()
-	b.shape=InteractingSphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Sphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
@@ -159,7 +159,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	
 	See utils.sphere's documentation for meaning of other parameters."""
 	b=Body()
-	b.shape=Shape('InteractingBox',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Shape('Box',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material)
@@ -202,7 +202,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	b=Body()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.shape=Shape('InteractingFacet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Shape('Facet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.shape['vertices']=vertices
 	b.shape.postProcessAttributes(True)
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
@@ -334,7 +334,7 @@ def spheresToFile(filename,consider=lambda id: True):
 	out=open(filename,'w')
 	count=0
 	for b in o.bodies:
-		if not b.shape or not b.shape.name=='InteractingSphere' or not consider(b.id): continue
+		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
 		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape['radius']))
 		count+=1
 	out.close()

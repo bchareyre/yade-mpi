@@ -10,7 +10,7 @@
 #include"STLImporterTest.hpp"
 #include<yade/pkg-common/SpatialQuickSortCollider.hpp>
 #include<yade/pkg-dem/STLImporter.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/FacetModel.hpp>
 	#include<yade/pkg-common/SphereModel.hpp>
@@ -24,7 +24,7 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
@@ -154,7 +154,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -238,7 +238,7 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
  	kinematic->rotateAroundZero = true;
 	
 	
-	shared_ptr<Shape> facet(new InteractingFacet);
+	shared_ptr<Shape> facet(new Facet);
 	for(BodyContainer::iterator bi = rootBody->bodies->begin(), biEnd=rootBody->bodies->end(); bi!=biEnd; ++bi)
 	    if ( (*bi)->shape->getClassIndex() == facet->getClassIndex() )
 		kinematic->subscribedBodies.push_back((*bi)->getId());

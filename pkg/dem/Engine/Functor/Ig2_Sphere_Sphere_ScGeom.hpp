@@ -28,9 +28,9 @@ class Ig2_Sphere_Sphere_ScGeom : public InteractionGeometryFunctor
 
 	REGISTER_CLASS_AND_BASE(Ig2_Sphere_Sphere_ScGeom,InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(interactionDetectionFactor));
-	FUNCTOR2D(InteractingSphere,InteractingSphere);
+	FUNCTOR2D(Sphere,Sphere);
 	// needed for the dispatcher, even if it is symmetric
-	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
+	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_ScGeom);
 

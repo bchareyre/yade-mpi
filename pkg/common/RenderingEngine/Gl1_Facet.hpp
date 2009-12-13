@@ -17,7 +17,7 @@ class Gl1_Facet : public GlShapeFunctor
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
-	RENDERS(InteractingFacet);
+	RENDERS(Facet);
 	REGISTER_CLASS_NAME(Gl1_Facet);
 	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
 	REGISTER_ATTRIBUTES(GlShapeFunctor,(normals));

@@ -8,23 +8,27 @@
 
 #pragma once
 
+
 #include<yade/core/Shape.hpp>
 
-class InteractingSphere : public Shape
+
+class Box : public Shape
 {
 	public :
-		Real radius;
+		Vector3r extents;
 
-		InteractingSphere();
-		InteractingSphere(Real _radius): radius(_radius){}
-		virtual ~InteractingSphere ();
-
-	REGISTER_ATTRIBUTES(Shape,(radius));
-	REGISTER_CLASS_NAME(InteractingSphere);
+		Box ();
+		Box(const Vector3r& _extents): extents(_extents){}
+		virtual ~Box ();	
+	
+	REGISTER_ATTRIBUTES(Shape,(extents));
+	REGISTER_CLASS_INDEX(Box,Shape);
+	REGISTER_CLASS_NAME(Box);
 	REGISTER_BASE_CLASS_NAME(Shape);
-	REGISTER_CLASS_INDEX(InteractingSphere,Shape);
+
+
 };
 
-REGISTER_SERIALIZABLE(InteractingSphere);
+REGISTER_SERIALIZABLE(Box);
 
 

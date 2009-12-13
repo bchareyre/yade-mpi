@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#include <yade/pkg-common/InteractingFacet.hpp>
+#include <yade/pkg-common/Facet.hpp>
 #include "InteractingFacet2AABB.hpp"
 #include <yade/pkg-common/AABB.hpp>
 
@@ -16,7 +16,7 @@ void InteractingFacet2AABB::go(	  const shared_ptr<Shape>& cm
 				, const Body*	)
 {
 	AABB* aabb = static_cast<AABB*>(bv.get());
-	InteractingFacet* facet = static_cast<InteractingFacet*>(cm.get());
+	Facet* facet = static_cast<Facet*>(cm.get());
 	const Vector3r& O = se3.position;
 	Matrix3r facetAxisT; se3.orientation.ToRotationMatrix(facetAxisT);
 	const vector<Vector3r>& vertices=facet->vertices;

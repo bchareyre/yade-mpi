@@ -58,8 +58,8 @@ class Ig2_Wall_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 		}
 		Ig2_Wall_Sphere_Dem3DofGeom(){}
 
-	FUNCTOR2D(Wall,InteractingSphere);
-	DEFINE_FUNCTOR_ORDER_2D(Wall,InteractingSphere);
+	FUNCTOR2D(Wall,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Wall,Sphere);
 	REGISTER_CLASS_AND_BASE(Ig2_Wall_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,);
 	DECLARE_LOGGER;

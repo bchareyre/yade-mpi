@@ -16,7 +16,7 @@ class InteractingSphere2AABB : public BoundFunctor
 		InteractingSphere2AABB(): aabbEnlargeFactor(-1.) {}
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
 		double aabbEnlargeFactor;
-	FUNCTOR2D(InteractingSphere,AABB);
+	FUNCTOR2D(Sphere,AABB);
 	REGISTER_ATTRIBUTES(BoundFunctor,(aabbEnlargeFactor));
 	REGISTER_CLASS_AND_BASE(InteractingSphere2AABB,BoundFunctor);
 };

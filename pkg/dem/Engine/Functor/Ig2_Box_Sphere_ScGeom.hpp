@@ -34,9 +34,9 @@ class Ig2_Box_Sphere_ScGeom : public InteractionGeometryFunctor
 	REGISTER_CLASS_NAME(Ig2_Box_Sphere_ScGeom);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 
-	FUNCTOR2D(InteractingBox,InteractingSphere);
+	FUNCTOR2D(Box,Sphere);
 
-	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
+	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
 };
 
 REGISTER_SERIALIZABLE(Ig2_Box_Sphere_ScGeom);

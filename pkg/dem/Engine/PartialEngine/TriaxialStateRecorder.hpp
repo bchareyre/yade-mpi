@@ -32,7 +32,7 @@ class TriaxialStateRecorder : public Recorder
 		Real 		porosity;
 		
 		//Real height, width, depth;
-		//Real thickness; // FIXME should retrieve "extents" of a InteractingBox
+		//Real thickness; // FIXME should retrieve "extents" of a Box
 		
 		//int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;
 

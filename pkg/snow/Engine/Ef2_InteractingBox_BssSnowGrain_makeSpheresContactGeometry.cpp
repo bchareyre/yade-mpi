@@ -8,8 +8,8 @@
 
 #include"Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -28,14 +28,14 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 
 	if(result)
 	{
-		//InteractingBox* s1=static_cast<InteractingBox*>(cm1.get()), *s2=static_cast<BssSnowGrain*>(cm2.get());
-		if(cm1->getClassName() != std::string("InteractingBox") || cm2->getClassName() != std::string("BssSnowGrain"))
+		//Box* s1=static_cast<Box*>(cm1.get()), *s2=static_cast<BssSnowGrain*>(cm2.get());
+		if(cm1->getClassName() != std::string("Box") || cm2->getClassName() != std::string("BssSnowGrain"))
 		{
 			std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
 			std::cerr << "whooooooooops =22=\n";
 			return false;
 		}
-				InteractingBox* s1=static_cast<InteractingBox*>(cm1.get());
+				Box* s1=static_cast<Box*>(cm1.get());
 				BssSnowGrain *s2=static_cast<BssSnowGrain*>(cm2.get());
 				if(s1==0 || s2==0)
 				{

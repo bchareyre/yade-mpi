@@ -13,8 +13,8 @@
 #include<vtkTriangle.h>
 #include<vtkLine.h>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-dem/ConcretePM.hpp>
 
 
@@ -120,8 +120,8 @@ void VTKRecorder::action(Scene* rootBody)
 		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
 			if(!I->isReal()) continue;
 			if(skipFacetIntr){
-				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId1())->shape.get()))) continue;
-				if(!(dynamic_cast<InteractingSphere*>(Body::byId(I->getId2())->shape.get()))) continue;
+				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId1())->shape.get()))) continue;
+				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId2())->shape.get()))) continue;
 			}
 			vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 			line->GetPointIds()->SetId(0,I->getId1());
@@ -147,7 +147,7 @@ void VTKRecorder::action(Scene* rootBody)
 
 		if (recActive[REC_SPHERES])
 		{
-			const InteractingSphere* sphere = dynamic_cast<InteractingSphere*>(b->shape.get()); 
+			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get()); 
 			if (sphere) 
 			{
 				if(skipNondynamic && !b->isDynamic) continue;
@@ -191,7 +191,7 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 		if (recActive[REC_FACETS])
 		{
-			const InteractingFacet* facet = dynamic_cast<InteractingFacet*>(b->shape.get()); 
+			const Facet* facet = dynamic_cast<Facet*>(b->shape.get()); 
 			if (facet)
 			{
 				const Se3r& O = b->state->se3;

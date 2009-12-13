@@ -38,8 +38,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 
 
@@ -148,7 +148,7 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -195,7 +195,7 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	
 	Quaternionr q;

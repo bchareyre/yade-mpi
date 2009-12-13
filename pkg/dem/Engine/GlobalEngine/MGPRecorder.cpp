@@ -12,7 +12,7 @@
 #include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <yade/pkg-common/InteractingSphere.hpp>
+#include <yade/pkg-common/Sphere.hpp>
 
 MGPRecorder::MGPRecorder(): DataRecorder()
 {
@@ -64,10 +64,10 @@ void MGPRecorder::action(Scene * ncb)
      const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>(b->physicalParameters.get());
      const Shape* gm   = YADE_CAST<Shape*>(b->shape.get());
 
-     if ( typeid(*gm) == typeid(InteractingSphere) )
+     if ( typeid(*gm) == typeid(Sphere) )
      {
       ofs << "   <body>" << endl;
-      ofs << "    <SPHER id=\"" << b->getId() << "\" r=\"" << YADE_CAST<InteractingSphere*>(b->shape.get())->radius << "\">" << endl;
+      ofs << "    <SPHER id=\"" << b->getId() << "\" r=\"" << YADE_CAST<Sphere*>(b->shape.get())->radius << "\">" << endl;
       ofs << "     <position x=\"" << p->se3.position[0] << "\" y=\"" 
           << p->se3.position[1] << "\" z=\"" << p->se3.position[2] << "\"/>" << endl;   
       ofs << "     <velocity x=\"" << p->velocity[0] << "\" y=\"" 

@@ -9,7 +9,7 @@
 
 #include "CinemCNCEngine.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>

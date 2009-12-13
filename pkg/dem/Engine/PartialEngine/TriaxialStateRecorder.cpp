@@ -12,7 +12,7 @@
 //#include <yade/pkg-dem/ElasticContactLaw.hpp>
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 //#include <yade/pkg-common/SphereModel.hpp>
 
 //#include <yade/pkg-dem/ScGeom.hpp>
@@ -83,7 +83,7 @@ void TriaxialStateRecorder::action (Scene * ncb )
 			kinematicE +=
 				0.5* ( b->state->mass ) * ( v[0]*v[0]+v[1]*v[1]+v[2]*v[2] );
 
-			Vs += 1.3333333*Mathr::PI*pow ( YADE_PTR_CAST<InteractingSphere>( b->shape)->radius, 3 );
+			Vs += 1.3333333*Mathr::PI*pow ( YADE_PTR_CAST<Sphere>( b->shape)->radius, 3 );
 
 		}
 	}

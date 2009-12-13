@@ -8,7 +8,7 @@
 
 #include"InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/BssSweptSphereLineSegment.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -24,7 +24,7 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::go(
 		const bool& force,
 		const shared_ptr<Interaction>& c)
 {
-        InteractingSphere* s            = static_cast<InteractingSphere*>(cm1.get());
+        Sphere* s            = static_cast<Sphere*>(cm1.get());
         BssSweptSphereLineSegment* ssls = static_cast<BssSweptSphereLineSegment*>(cm2.get());
         
         Real SquaredHalfLength = 0.25 * ssls->length * ssls->length; // FIXME - ssls should store halfLength

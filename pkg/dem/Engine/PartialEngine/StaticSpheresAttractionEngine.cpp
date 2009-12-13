@@ -8,7 +8,7 @@
 
 #include <yade/pkg-dem/StaticSpheresAttractionEngine.hpp>
 #include <yade/pkg-dem/ElasticContactInteraction.hpp>
-#include <yade/pkg-common/InteractingSphere.hpp>
+#include <yade/pkg-common/Sphere.hpp>
 #include <yade/core/Scene.hpp>
 
 Real StaticSpheresAttractionEngine::getMaxDisplacement(Scene* ncb)
@@ -38,7 +38,7 @@ Real StaticSpheresAttractionEngine::getMaxDisplacement(Scene* ncb)
 		BodyContainer::iterator biEnd = ncb->bodies->end();
 		for( ; bi!=biEnd ; ++bi )
 			if(doesItApplyToThisBody((*bi).get()))
-				max_radius = std::max(static_cast<InteractingSphere*>((*bi)->shape.get())->radius , max_radius);
+				max_radius = std::max(static_cast<Sphere*>((*bi)->shape.get())->radius , max_radius);
 		max_displacement = max_radius / 50;
 	}
 	return max_displacement;
@@ -46,7 +46,7 @@ Real StaticSpheresAttractionEngine::getMaxDisplacement(Scene* ncb)
 
 bool StaticSpheresAttractionEngine::doesItApplyToThisBody(Body* b)
 {
-	if(b->isDynamic && b->shape->getClassName()=="InteractingSphere")
+	if(b->isDynamic && b->shape->getClassName()=="Sphere")
 		return true; 
 	return false;
 };

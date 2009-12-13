@@ -7,14 +7,14 @@
 *************************************************************************/
 
 #include "Gl1_Facet.hpp"
-#include <yade/pkg-common/InteractingFacet.hpp>
+#include <yade/pkg-common/Facet.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
 bool Gl1_Facet::normals=false;
 
 void Gl1_Facet::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool,const GLViewInfo&)
 {   
-    InteractingFacet* facet = static_cast<InteractingFacet*>(cm.get());
+    Facet* facet = static_cast<Facet*>(cm.get());
     const vector<Vector3r>& vertices = facet->vertices;
 	const Vector3r* ne = facet->ne;
 	const Real& icr = facet->icr;

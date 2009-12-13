@@ -40,8 +40,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
@@ -154,7 +154,7 @@ void SDECSpheresPlane::createGroundSphere(shared_ptr<Body>& body,Real radius, Re
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<SphereModel> gSphere(new SphereModel);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -195,7 +195,7 @@ void SDECSpheresPlane::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<SphereModel> gSphere(new SphereModel);
-	shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
@@ -242,7 +242,7 @@ void SDECSpheresPlane::createBox(shared_ptr<Body>& body, Vector3r position, Vect
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 	shared_ptr<AABB> aabb(new AABB);
 	shared_ptr<BoxModel> gBox(new BoxModel);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	
 	Quaternionr q;

@@ -41,8 +41,8 @@
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
+#include<yade/pkg-common/Box.hpp>
+#include<yade/pkg-common/Sphere.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -539,7 +539,7 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 
 	shared_ptr<BssSnowGrain> iSphere(new BssSnowGrain(gSnowGrain.get(),one_voxel_in_meters_is)); 
 	Real radius = iSphere->radius;
-	//shared_ptr<InteractingSphere> iSphere(new InteractingSphere);
+	//shared_ptr<Sphere> iSphere(new Sphere);
 	//Real radius = (grain->start-grain->end).Length()*0.5;
 	
 	Quaternionr q;//(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
@@ -582,7 +582,7 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<AABB> aabb(new AABB);
-	shared_ptr<InteractingBox> iBox(new InteractingBox);
+	shared_ptr<Box> iBox(new Box);
 	
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);

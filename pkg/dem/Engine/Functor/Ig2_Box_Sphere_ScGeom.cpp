@@ -10,8 +10,8 @@
 
 #include"Ig2_Box_Sphere_ScGeom.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Box.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -32,8 +32,8 @@ bool Ig2_Box_Sphere_ScGeom::go(
 	Vector3r pt1,pt2,normal;
 	Real depth;
 
-	InteractingBox* obb = static_cast<InteractingBox*>(cm1.get());
-	InteractingSphere* s = static_cast<InteractingSphere*>(cm2.get());
+	Box* obb = static_cast<Box*>(cm1.get());
+	Sphere* s = static_cast<Sphere*>(cm2.get());
 	
 	Vector3r extents = obb->extents;
 

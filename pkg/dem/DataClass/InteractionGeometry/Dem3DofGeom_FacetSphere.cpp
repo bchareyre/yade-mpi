@@ -1,7 +1,7 @@
 // © Václav Šmilauer <eudoxos@arcig.cz>
 #include "Dem3DofGeom_FacetSphere.hpp"
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingFacet.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Facet.hpp>
 YADE_PLUGIN((Dem3DofGeom_FacetSphere)
 	#ifdef YADE_OPENGL
 		(Gl1_Dem3DofGeom_FacetSphere)
@@ -40,8 +40,8 @@ Real Dem3DofGeom_FacetSphere::slipToDisplacementTMax(Real displacementTMax){
 
 CREATE_LOGGER(Ig2_Facet_Sphere_Dem3DofGeom);
 bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
-	InteractingFacet* facet=static_cast<InteractingFacet*>(cm1.get());
-	Real sphereRadius=static_cast<InteractingSphere*>(cm2.get())->radius;
+	Facet* facet=static_cast<Facet*>(cm1.get());
+	Real sphereRadius=static_cast<Sphere*>(cm2.get())->radius;
 
 	// InteractionGeometryFunctor::go(cm1,cm2,state1,state2,shift2,force,c);
 

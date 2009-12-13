@@ -10,7 +10,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 		]),
 	env.SharedLibrary('log',['log.cpp'],SHLIBPREFIX=''),
 	env.SharedLibrary('_utils',['_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
-		linkPlugins(['Shop','ConcretePM','InteractingFacet']),
+		linkPlugins(['Shop','ConcretePM','Facet']),
 		]),
 	env.SharedLibrary('_packPredicates',['_packPredicates.cpp'],SHLIBPREFIX='',
 		# link to the symlink to the python module (created in lib/SConstruct; see explanation there)

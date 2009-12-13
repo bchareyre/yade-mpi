@@ -31,9 +31,9 @@ class Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry : public Intera
 	REGISTER_CLASS_NAME(Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 
-	FUNCTOR2D(InteractingBox,BssSnowGrain);
+	FUNCTOR2D(Box,BssSnowGrain);
 
-	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,BssSnowGrain);
+	DEFINE_FUNCTOR_ORDER_2D(Box,BssSnowGrain);
 };
 
 REGISTER_SERIALIZABLE(Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry);

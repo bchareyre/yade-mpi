@@ -70,8 +70,8 @@ class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 		//! Reduce the facet's size, probably to avoid singularities at common facets' edges (?)
 		Real shrinkFactor;
 		Ig2_Facet_Sphere_Dem3DofGeom(): shrinkFactor(0.) {}
-	FUNCTOR2D(InteractingFacet,InteractingSphere);
-	DEFINE_FUNCTOR_ORDER_2D(InteractingFacet,InteractingSphere);
+	FUNCTOR2D(Facet,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
 	REGISTER_CLASS_AND_BASE(Ig2_Facet_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(shrinkFactor));
 	DECLARE_LOGGER;

@@ -11,8 +11,8 @@
 #include"Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-snow/IstSnowLayersContact.hpp>
-#include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-common/InteractingBox.hpp>
+#include<yade/pkg-common/Sphere.hpp>
+#include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
@@ -24,7 +24,7 @@
 YADE_REQUIRE_FEATURE(geometricalmodel);
 CREATE_LOGGER(Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact);
 
-bool is_point_inside_box(InteractingBox* b, Vector3r P)
+bool is_point_inside_box(Box* b, Vector3r P)
 {
 	return		std::abs(P[0]) < std::abs(b->extents[0])
 		 &&	std::abs(P[1]) < std::abs(b->extents[1])
@@ -32,7 +32,7 @@ bool is_point_inside_box(InteractingBox* b, Vector3r P)
 };
 
 
-Vector3r find_cross_point(InteractingBox* m,Vector3r in,Vector3r out, Quaternionr q2, Quaternionr q1, Vector3r pos1, Vector3r pos2,int depth = 4)
+Vector3r find_cross_point(Box* m,Vector3r in,Vector3r out, Quaternionr q2, Quaternionr q1, Vector3r pos1, Vector3r pos2,int depth = 4)
 {
 	Vector3r mid((in+out)*0.5);
 	if(depth == 0)
@@ -58,16 +58,16 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 		const shared_ptr<Interaction>& c)
 {
 
-	//InteractingBox* m1=static_cast<InteractingBox*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());
+	//Box* m1=static_cast<Box*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());
 	//std::cerr << "------------------- " << __FILE__ << "\n";
 
-	if(cm1->getClassName() != std::string("InteractingBox") || cm2->getClassName() != std::string("BssSnowGrain"))
+	if(cm1->getClassName() != std::string("Box") || cm2->getClassName() != std::string("BssSnowGrain"))
 	{
 		std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
 		std::cerr << "whooooooooops =66=\n";
 		return false;
 	}
-				InteractingBox* m1=static_cast<InteractingBox*>(cm1.get());
+				Box* m1=static_cast<Box*>(cm1.get());
 				BssSnowGrain *m2=static_cast<BssSnowGrain*>(cm2.get());
 				if(m1==0 || m2==0)
 				{
@@ -274,16 +274,16 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 //	return result;
 
 
-	//InteractingBox* m1=static_cast<InteractingBox*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());
+	//Box* m1=static_cast<Box*>(cm1.get()), *m2=static_cast<BssSnowGrain*>(cm2.get());
 ////	std::cerr << "----- reverse ----- " << __FILE__ << "\n";
 
-	if(cm1->getClassName() != std::string("BssSnowGrain") || cm2->getClassName() != std::string("InteractingBox"))
+	if(cm1->getClassName() != std::string("BssSnowGrain") || cm2->getClassName() != std::string("Box"))
 	{
 		std::cerr << cm1->getClassName() << " " << cm2->getClassName() << "\n";
 		std::cerr << "whooooooooops =11=\n";
 		return false;
 	}
-				InteractingBox* m2=static_cast<InteractingBox*>(cm2.get());
+				Box* m2=static_cast<Box*>(cm2.get());
 				BssSnowGrain *m1=static_cast<BssSnowGrain*>(cm1.get());
 				if(m1==0 || m2==0)
 				{
