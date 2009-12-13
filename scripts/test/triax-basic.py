@@ -45,7 +45,7 @@ O.engines=[
 	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
 	InsertionSortCollider(nBins=5,sweepLength=.05),
 	InteractionDispatchers(
-		[InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
 		[SimpleElasticRelationships()],
 		[ef2_Spheres_Elastic_ElasticLaw()]
 	),

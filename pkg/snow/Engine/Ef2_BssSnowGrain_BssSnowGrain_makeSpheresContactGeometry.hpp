@@ -9,12 +9,12 @@
 #pragma once
 
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 
 class Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry : public InteractionGeometryFunctor
 {
 	public :
-		InteractingSphere2InteractingSphere4SpheresContactGeometry g;
+		Ig2_Sphere_Sphere_ScGeom g;
 
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);

@@ -30,7 +30,7 @@ O.engines=[
 		# Engines within the group will be run serially, however
 		[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),	PersistentSAPCollider(),]
 	]),
-	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
+	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	# the rest must also be run sequentially
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)

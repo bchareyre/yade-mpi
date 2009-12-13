@@ -62,8 +62,8 @@ o.engines=[
 	InsertionSortCollider(),
 	## Create geometry information about each potential collision.
 	InteractionGeometryDispatcher([
-		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
-		InteractingFacet2InteractingSphere4SpheresContactGeometry()
+		Ig2_Sphere_Sphere_ScGeom(),
+		Ig2_Facet_Sphere_ScGeom()
 	]),
 	## Create physical information about the interaction.
 	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),

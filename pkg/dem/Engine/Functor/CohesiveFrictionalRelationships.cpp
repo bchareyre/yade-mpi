@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"CohesiveFrictionalRelationships.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/core/Omega.hpp>
@@ -32,7 +32,7 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // Co
 {
 	CohesiveFrictionalMat* sdec1 = static_cast<CohesiveFrictionalMat*>(b1.get());
 	CohesiveFrictionalMat* sdec2 = static_cast<CohesiveFrictionalMat*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once
 	if (setCohesionNow && cohesionDefinitionIteration==-1) {

@@ -1,7 +1,7 @@
 // © 2009 Janek Kozicki <cosurgi@mail.berlios.de>
 
 #include"Ef1_IstSnowLayersContact_glDraw.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-snow/IstSnowLayersContact.hpp>

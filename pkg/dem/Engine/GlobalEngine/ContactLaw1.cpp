@@ -8,7 +8,7 @@
 
 #include "ContactLaw1.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ContactLaw1Interaction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
@@ -54,7 +54,7 @@ void ContactLaw1::action(Scene* ncb)
 
 		CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
 		CohesiveFrictionalMat* de2 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id2]->physicalParameters.get());
-		SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
 		ContactLaw1Interaction* currentContactPhysics = YADE_CAST<ContactLaw1Interaction*> (contact->interactionPhysics.get());
 
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;

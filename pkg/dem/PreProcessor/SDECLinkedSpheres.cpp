@@ -20,7 +20,7 @@
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 
 
@@ -154,7 +154,7 @@ bool SDECLinkedSpheres::generate()
 			if ((a->se3.position - b->se3.position).Length() < (as->radius + bs->radius))  
 			{
 				shared_ptr<Interaction> 		link(new Interaction( bodyA->getId() , bodyB->getId() ));
-				shared_ptr<SpheresContactGeometry>		geometry(new SpheresContactGeometry);
+				shared_ptr<ScGeom>		geometry(new ScGeom);
 				shared_ptr<SDECLinkPhysics>	physics(new SDECLinkPhysics);
 				
 				geometry->radius1			= as->radius - fabs(as->radius - bs->radius)*0.5;
@@ -177,7 +177,7 @@ bool SDECLinkedSpheres::generate()
 	message="total number of permament links created: " 
 		+ lexical_cast<string>(rootBody->interactions->size()) 
 		+ "\nWARNING: link bonds are nearly working, but the formulas are waiting for total rewrite!"
-		+"\nWARNING: interactions will not generate any force since we use SpheresContactGeometry instead of SDECLinkGeometry now.";
+		+"\nWARNING: interactions will not generate any force since we use ScGeom instead of SDECLinkGeometry now.";
 	return true;
 }
 
@@ -277,8 +277,8 @@ void SDECLinkedSpheres::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 void SDECLinkedSpheres::createActors(shared_ptr<Scene>& rootBody)
 {
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
-	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+	interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_ScGeom");
+	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");

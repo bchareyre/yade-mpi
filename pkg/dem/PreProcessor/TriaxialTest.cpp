@@ -485,8 +485,8 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	if(!facetWalls && !wallWalls){
-		interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
-		interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+		interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_ScGeom");
+		interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 	} else {
 		interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_Dem3DofGeom");
 		interactionGeometryDispatcher->add("Ig2_Facet_Sphere_Dem3DofGeom");

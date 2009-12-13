@@ -8,7 +8,7 @@
 
 
 #include<yade/pkg-common/ElasticMat.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
@@ -164,22 +164,22 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 			grains[id1].contacts.push_back ( c );
 			grains[id2].contacts.push_back ( c );
 			c->normal = CGT::Vecteur ( 
-					 ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal.X(),
-					 ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal.Y(),
-					 ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal.Z() );
+					 ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal.X(),
+					 ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal.Y(),
+					 ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal.Z() );
 // 			c->normal = ( grains[id2].sphere.point()-grains[id1].sphere.point() );
 // 			c->normal = c->normal/sqrt ( pow ( c->normal.x(),2 ) +pow ( c->normal.y(),2 ) +pow ( c->normal.z(),2 ) );
 			c->position = CGT::Vecteur ( 
-					( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.X(),
-					( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Y(),
-					( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Z() );
+					( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.X(),
+					( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Y(),
+					( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Z() );
 // 			c->position = 0.5* ( ( grains[id1].sphere.point()-CGAL::ORIGIN ) +
 // 								 ( grains[id1].sphere.weight() *c->normal ) +
 // 								 ( grains[id2].sphere.point()-CGAL::ORIGIN ) -
 // 								 ( grains[id2].sphere.weight() *c->normal ) );
 
 
-			c->fn = YADE_CAST<ElasticContactInteraction*> ( ( ( *ii )->interactionPhysics.get() ) )->normalForce.Dot ( ( YADE_CAST<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() ) )->normal );
+			c->fn = YADE_CAST<ElasticContactInteraction*> ( ( ( *ii )->interactionPhysics.get() ) )->normalForce.Dot ( ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal );
 			Vector3r fs = YADE_CAST<ElasticContactInteraction*> ( ( *ii )->interactionPhysics.get() )->shearForce;
 			c->fs = CGT::Vecteur ( fs.X(),fs.Y(),fs.Z() );
 			c->old_fn = c->fn;

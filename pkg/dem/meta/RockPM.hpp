@@ -9,7 +9,7 @@ mechanical behavior of mining rocks.
 #pragma once
 
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>

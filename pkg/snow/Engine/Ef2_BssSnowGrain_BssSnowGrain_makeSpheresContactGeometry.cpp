@@ -4,7 +4,7 @@
 // ÂŠ 2008 VĂĄclav Ĺ milauer <eudoxos@arcig.cz>
 
 #include"Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 
@@ -43,9 +43,9 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::go(	const shared_
 	Real penetrationDepthSq=pow((s1->radius+s2->radius),2) - normal.SquaredLength();
 	if (penetrationDepthSq>0 || c->isReal() || assist)
 	{
-		shared_ptr<SpheresContactGeometry> scm;
-		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
-		else { scm=shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry()); c->interactionGeometry=scm; std::cerr << "new SpheresContactGeometry\n";}
+		shared_ptr<ScGeom> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<ScGeom>(c->interactionGeometry);
+		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; std::cerr << "new ScGeom\n";}
 		if(scm==0)
 			std::cerr << "missing scm\n";
 	
@@ -92,8 +92,8 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeSpheresContactGeometry::goReverse(	const 
 	bool result = go(cm2,cm1,se32,se31,c);
 	if(result)
 	{
-		shared_ptr<SpheresContactGeometry> scm;
-		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		shared_ptr<ScGeom> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<ScGeom>(c->interactionGeometry);
 		else { std::cerr << "whooooooooops =5= " << __FILE__ << "\n"; return false; }
 		scm->normal *= -1.0;
 		std::swap(scm->radius1,scm->radius2);

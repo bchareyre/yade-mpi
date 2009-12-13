@@ -2,7 +2,7 @@
 #pragma once
 #include<yade/core/InteractionGeometry.hpp>
 
-/*! Abstract class that unites SpheresContactGeometry and Dem3DofGeom,
+/*! Abstract class that unites ScGeom and Dem3DofGeom,
 	created for the purposes of GlobalStiffnessTimeStepper.
 	It exists purely on the c++, i.e. registers no attributes (the derived classes do register
 	their attributes that are initialized as references here) and doesn't exist in the yade

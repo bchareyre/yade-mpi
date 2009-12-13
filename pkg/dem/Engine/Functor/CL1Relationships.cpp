@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"CL1Relationships.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ContactLaw1Interaction.hpp>
-// #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
+// #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> ScGeom !!?
 // #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/core/Omega.hpp>
@@ -43,7 +43,7 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 {
 	CohesiveFrictionalMat* sdec1 = static_cast<CohesiveFrictionalMat*>(b1.get());
 	CohesiveFrictionalMat* sdec2 = static_cast<CohesiveFrictionalMat*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once
 	if (setCohesionNow && cohesionDefinitionIteration==-1) {
@@ -53,7 +53,7 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 		setCohesionNow = 0;}
 	
 	
-	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
+	if(interactionGeometry) // so it is ScGeom  - NON PERMANENT LINK
 	{
 		if(!interaction->interactionPhysics)
 		{

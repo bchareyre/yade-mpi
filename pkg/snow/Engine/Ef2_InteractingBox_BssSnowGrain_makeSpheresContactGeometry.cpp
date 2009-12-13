@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
@@ -44,8 +44,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::go(
 					return false;
 				}
 			
-		shared_ptr<SpheresContactGeometry> scm;
-		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		shared_ptr<ScGeom> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<ScGeom>(c->interactionGeometry);
 		else 
 		{ 
 			std::cerr << "whooooooooops =3= " << __FILE__ << "\n";
@@ -86,8 +86,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry::goReverse(	cons
 	bool result = go(cm2,cm1,se32,se31,c);
 	if(result)
 	{
-		shared_ptr<SpheresContactGeometry> scm;
-		if(c->interactionGeometry) scm=dynamic_pointer_cast<SpheresContactGeometry>(c->interactionGeometry);
+		shared_ptr<ScGeom> scm;
+		if(c->interactionGeometry) scm=dynamic_pointer_cast<ScGeom>(c->interactionGeometry);
 		else { std::cerr << "whooooooooops =4= " << __FILE__ << "\n"; return false; }
 		scm->normal *= -1.0;
 		std::swap(scm->radius1,scm->radius2);

@@ -39,6 +39,8 @@ print "Replaced %d occurences, moved %d files and %d directories"%(replCnt,moveC
 print "Update python scripts (if wanted) by running: perl -pi -e 's/\\b%s\\b/%s/g' `ls **/*.py |grep -v py/system.py`"%(oldClass,newClass)
 import time,pwd,socket
 # update python deprecation records
+if replCnt+moveCnt+moveDirCnt==0:
+	print "No replaces, not updating py/system.py deprecated names map."
 if True:
 	new=[]
 	for l in open('py/system.py'):

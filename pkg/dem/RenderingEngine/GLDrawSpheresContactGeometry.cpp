@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"GLDrawSpheresContactGeometry.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
@@ -25,7 +25,7 @@ void GLDrawSpheresContactGeometry::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	SpheresContactGeometry* sc = static_cast<SpheresContactGeometry*>(ig.get());
+	ScGeom* sc = static_cast<ScGeom*>(ig.get());
 
 	#if 0
 		const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;

@@ -137,8 +137,8 @@ void TestSimpleViscoelastic::createActors(shared_ptr<Scene>& rootBody)
 {
     
     shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-    interactionGeometryDispatcher->add("InteractingSphere2InteractingSphere4SpheresContactGeometry");
-    interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+    interactionGeometryDispatcher->add("Ig2_Sphere_Sphere_ScGeom");
+    interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 
     shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
     interactionPhysicsDispatcher->add("SimpleViscoelasticRelationships");

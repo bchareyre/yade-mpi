@@ -3,7 +3,7 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -112,7 +112,7 @@ Real elasticEnergyInAABB(python::tuple AABB){
  * to the plane perpendicular to axis∈[0,1,2]; the number of bins can be specified and they cover
  * the range (0,π), since interactions are bidirecional, hence periodically the same on (π,2π).
  *
- * Only contacts using SpheresContactGeometry are considered.
+ * Only contacts using ScGeom are considered.
  * Both bodies must be in the mask (except if mask is 0, when all bodies are considered)
  * If the projection is shorter than minProjLen, it is skipped.
  *
@@ -130,7 +130,7 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		if(!b1->maskOk(mask) || !b2->maskOk(mask)) continue;
 		if(useBB && !isInBB(b1->state->pos,bbMin,bbMax) && !isInBB(b2->state->pos,bbMin,bbMax)) continue;
-		shared_ptr<SpheresContactGeometry> scg=dynamic_pointer_cast<SpheresContactGeometry>(i->interactionGeometry); if(!scg) continue;
+		shared_ptr<ScGeom> scg=dynamic_pointer_cast<ScGeom>(i->interactionGeometry); if(!scg) continue;
 		Vector3r n(scg->normal); n[axis]=0.; Real nLen=n.Length();
 		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
 		Real theta=acos(n[axis2]/nLen)*(n[axis3]>0?1:-1); if(theta<0) theta+=Mathr::PI;

@@ -9,9 +9,9 @@
 *************************************************************************/
 
 #include"MacroMicroElasticRelationships.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-//#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> SpheresContactGeometry !!?
+//#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> ScGeom !!?
 //#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/Tetra.hpp>
@@ -34,9 +34,9 @@ void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>&
 {
 	BodyMacroParameters* sdec1 = static_cast<BodyMacroParameters*>(b1.get());
 	BodyMacroParameters* sdec2 = static_cast<BodyMacroParameters*>(b2.get());
-	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
-	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
+	if(interactionGeometry) // so it is ScGeom  - NON PERMANENT LINK
 	{
 
 /* OLD VERSION  this is a LinearContactModel, different class, model different that MicroMacroElasticRelationships

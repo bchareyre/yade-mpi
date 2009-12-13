@@ -8,7 +8,7 @@
 
 #include "CohesiveFrictionalContactLaw.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
@@ -95,7 +95,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 			Body* b1 = ( *bodies ) [id1].get();
 			Body* b2 = ( *bodies ) [id2].get();
 
-			SpheresContactGeometry* currentContactGeometry  = YADE_CAST<SpheresContactGeometry*> ( contact->interactionGeometry.get() );
+			ScGeom* currentContactGeometry  = YADE_CAST<ScGeom*> ( contact->interactionGeometry.get() );
 			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> ( contact->interactionPhysics.get() );
 
 			Vector3r& shearForce    = currentContactPhysics->shearForce;

@@ -19,7 +19,7 @@ class GLDrawSpheresContactGeometry : public GlInteractionGeometryFunctor{
 		virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 
 	DECLARE_LOGGER;
-	RENDERS(SpheresContactGeometry);
+	RENDERS(ScGeom);
 	REGISTER_CLASS_NAME(GLDrawSpheresContactGeometry);
 	REGISTER_BASE_CLASS_NAME(GlInteractionGeometryFunctor);
 };

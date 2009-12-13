@@ -1,7 +1,7 @@
 // 2009 © Sergei Dorofeenko <sega@users.berlios.de>
 #include"ViscoelasticPM.hpp"
 #include<yade/core/State.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -34,7 +34,7 @@ void Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys::go(c
 /* Law2_Spheres_Viscoelastic_SimpleViscoelastic */
 void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
 
-	const SpheresContactGeometry& geom=*static_cast<SpheresContactGeometry*>(_geom.get());
+	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	SimpleViscoelasticPhys& phys=*static_cast<SimpleViscoelasticPhys*>(_phys.get());
 
 	int id1 = I->getId1();

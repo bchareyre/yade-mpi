@@ -9,7 +9,7 @@
 #include "ElasticCriterionTimeStepper.hpp"
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
@@ -72,7 +72,7 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 
 	ElasticContactInteraction* sdecContact = dynamic_cast<ElasticContactInteraction*>(interaction->interactionPhysics.get());
 	// if(!sdecContact) sdecContact=dynamic_cast<SDECLinkPhysics*>(interaction->interactionPhysics.get());
-	SpheresContactGeometry* interactionGeometry = dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	ScGeom* interactionGeometry = dynamic_cast<ScGeom*>(interaction->interactionGeometry.get());
 	BodyMacroParameters * body1	= dynamic_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 	BodyMacroParameters * body2	= dynamic_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 

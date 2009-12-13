@@ -9,11 +9,11 @@
 #pragma once
 
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
-#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 
 class Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry : public InteractionGeometryFunctor
 {
-	InteractingBox2InteractingSphere4SpheresContactGeometry g;
+	Ig2_Box_Sphere_ScGeom g;
 	public :
 		virtual bool go(	const shared_ptr<Shape>& cm1,
 					const shared_ptr<Shape>& cm2,

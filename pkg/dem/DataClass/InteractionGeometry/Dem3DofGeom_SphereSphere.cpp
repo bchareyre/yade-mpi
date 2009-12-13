@@ -15,7 +15,7 @@ Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}
  * such that the angle of shortest arc from (1,0,0) pt on the sphere to the point itself is the same
  * as the angle of segment of the same length on the tangent plane.
  *
- * This function is (or should be) inverse of SpheresContactGeometry::rollPlanePtToSphere.
+ * This function is (or should be) inverse of ScGeom::rollPlanePtToSphere.
  * 
  * @param fromXtoPtOri gives orientation of the vector from sphere center to the sphere point from the global +x axis.
  * @param radius the distance from sphere center to the contact plane
@@ -30,7 +30,7 @@ Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& from
 
 /*! Project point from tangent plane to the sphere.
  *
- * This function is (or should be) inverse of SpheresContactGeometry::unrollSpherePtToPlane.
+ * This function is (or should be) inverse of ScGeom::unrollSpherePtToPlane.
  *
  * @param planePt point on the tangent plane, with origin at the contact point (i.e. at sphere center + normal*radius)
  * @param radius sphere radius

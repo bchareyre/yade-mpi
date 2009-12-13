@@ -9,7 +9,7 @@
 #include"BasicViscoelasticRelationships.hpp"
 #include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-dem/ViscoelasticInteraction.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/GroupRelationData.hpp>

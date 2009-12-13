@@ -8,7 +8,7 @@
 
 #include"GlobalStiffnessTimeStepper.hpp"
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 //#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
 #include<yade/core/Interaction.hpp>

@@ -8,8 +8,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"InteractingBox2InteractingSphere4SpheresContactGeometry.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include"Ig2_Box_Sphere_ScGeom.hpp"
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 
@@ -17,7 +17,7 @@
 
 
 
-bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
+bool Ig2_Box_Sphere_ScGeom::go(
 		const shared_ptr<Shape>& cm1,
 		const shared_ptr<Shape>& cm2,
 		const State& state1,
@@ -88,10 +88,10 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 		pt1 = se32.position+normal*minCBoxDist;
 		pt2 = se32.position-normal*s->radius;
 
-		shared_ptr<SpheresContactGeometry> scm;
+		shared_ptr<ScGeom> scm;
 		bool isNew=!c->interactionGeometry;
-		if (isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
-		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
+		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 
 		#ifdef SCG_SHEAR
 			if(isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
@@ -136,10 +136,10 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 
 		pt2=se32.position+cOnBox_sphere*s->radius;
 		
-		shared_ptr<SpheresContactGeometry> scm;
+		shared_ptr<ScGeom> scm;
 		bool isNew=!c->interactionGeometry;
-		if (isNew) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
-		else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);	
+		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
+		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);	
 		#ifdef SCG_SHEAR
 			if(isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
 			else {scm->prevNormal=scm->normal;}
@@ -159,7 +159,7 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::go(
 }
 
 
-bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<Shape>& cm1,
+bool Ig2_Box_Sphere_ScGeom::goReverse(	const shared_ptr<Shape>& cm1,
 						const shared_ptr<Shape>& cm2,
 						const State& state1,
 						const State& state2,
@@ -171,4 +171,4 @@ bool InteractingBox2InteractingSphere4SpheresContactGeometry::goReverse(	const s
 	return go(cm2,cm1,state2,state1,-shift2,force,c);
 }
 
-YADE_PLUGIN((InteractingBox2InteractingSphere4SpheresContactGeometry));
+YADE_PLUGIN((Ig2_Box_Sphere_ScGeom));

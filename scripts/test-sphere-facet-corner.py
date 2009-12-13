@@ -22,7 +22,7 @@ O.engines=[
 	BexResetter(),
 	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingFacet2InteractingSphere4SpheresContactGeometry()]),
+	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
 	ElasticContactLaw(),
 	GravityEngine(gravity=(0,0,-10)),

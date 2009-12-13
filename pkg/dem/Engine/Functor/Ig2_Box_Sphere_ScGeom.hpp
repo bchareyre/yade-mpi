@@ -12,7 +12,7 @@
 
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
-class InteractingBox2InteractingSphere4SpheresContactGeometry : public InteractionGeometryFunctor
+class Ig2_Box_Sphere_ScGeom : public InteractionGeometryFunctor
 {
 	public :
 		virtual bool go(	const shared_ptr<Shape>& cm1,
@@ -31,7 +31,7 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 					const bool& force,
 					const shared_ptr<Interaction>& c);
 
-	REGISTER_CLASS_NAME(InteractingBox2InteractingSphere4SpheresContactGeometry);
+	REGISTER_CLASS_NAME(Ig2_Box_Sphere_ScGeom);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 
 	FUNCTOR2D(InteractingBox,InteractingSphere);
@@ -39,6 +39,6 @@ class InteractingBox2InteractingSphere4SpheresContactGeometry : public Interacti
 	DEFINE_FUNCTOR_ORDER_2D(InteractingBox,InteractingSphere);
 };
 
-REGISTER_SERIALIZABLE(InteractingBox2InteractingSphere4SpheresContactGeometry);
+REGISTER_SERIALIZABLE(Ig2_Box_Sphere_ScGeom);
 
 

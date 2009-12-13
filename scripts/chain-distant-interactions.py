@@ -10,7 +10,7 @@ o.engines=[
 	BexResetter(),
 	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()])
 	InsertionSortCollider(),
-	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(hasShear=True)]),
+	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(hasShear=True)]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(isCohesive=True),
 	MomentEngine(subscribedBodies=[1],moment=(0,1000,0)),

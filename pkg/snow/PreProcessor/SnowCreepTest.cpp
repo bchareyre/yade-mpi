@@ -38,8 +38,8 @@
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/HydraulicForceEngine.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -488,9 +488,9 @@ void SnowCreepTest::createActors(shared_ptr<Scene>& rootBody)
 
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	shared_ptr<InteractionGeometryFunctor> s1(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	shared_ptr<InteractionGeometryFunctor> s1(new Ig2_Sphere_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s1);
-	shared_ptr<InteractionGeometryFunctor> s2(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	shared_ptr<InteractionGeometryFunctor> s2(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s2);
 
 	shared_ptr<CohesiveFrictionalRelationships> cohesiveFrictionalRelationships = shared_ptr<CohesiveFrictionalRelationships> (new CohesiveFrictionalRelationships);

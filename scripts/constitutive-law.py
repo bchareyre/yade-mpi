@@ -8,7 +8,7 @@ O.engines=[
 	BexResetter(),
 	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
+	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ConstitutiveLawDispatcher([ef2_Spheres_Elastic_ElasticLaw()]),
 	GravityEngine(gravity=(0,0,-1000)),

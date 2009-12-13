@@ -22,7 +22,7 @@ TriaxialTest(importFilename=inSph,noFiles=True).load()
 O.usesTimeStepper=False
 O.dt=utils.PWaveTimeStep()
 #
-# uncomment this line to enable shear computation in SpheresContactGeometry and then compare results with this line commented
+# uncomment this line to enable shear computation in ScGeom and then compare results with this line commented
 #
 [e for e in O.engines if e.name=='ElasticContactLaw'][0]['useShear']=True
 if 1:

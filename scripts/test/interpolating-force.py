@@ -19,7 +19,7 @@ O.engines=[
 	BoundDispatcher([InteractingSphere2AABB()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
-		[InteractingSphere2InteractingSphere4SpheresContactGeometry()],
+		[Ig2_Sphere_Sphere_ScGeom()],
 		[SimpleElasticRelationships()],
 		[ef2_Spheres_Elastic_ElasticLaw()]
 	),

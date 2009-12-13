@@ -8,7 +8,7 @@
 
 #include "GLDrawCohesiveFrictionalContactInteraction.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
@@ -100,7 +100,7 @@ void GLDrawCohesiveFrictionalContactInteraction::go(
 	isReal=i->isReal();
 
 	CohesiveFrictionalContactInteraction*    ph = static_cast<CohesiveFrictionalContactInteraction*>(ih.get());
-	SpheresContactGeometry*    sc = static_cast<SpheresContactGeometry*>(i->interactionGeometry.get());
+	ScGeom*    sc = static_cast<ScGeom*>(i->interactionGeometry.get());
 	Vector3r pos1   = b1->physicalParameters->se3.position;
 	Vector3r pos2   = b2->physicalParameters->se3.position;
 

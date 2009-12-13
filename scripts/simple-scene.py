@@ -35,8 +35,8 @@ o.engines=[
 	## Here, the decision about which EngineUnit to use depends on types of _both_ bodies.
 	## Note that there is no EngineUnit for box-box collision. They are not implemented.
 	InteractionGeometryDispatcher([
-		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
-		InteractingBox2InteractingSphere4SpheresContactGeometry()
+		Ig2_Sphere_Sphere_ScGeom(),
+		Ig2_Box_Sphere_ScGeom()
 	]),
 	## Create physical information about the interaction.
 	## This may consist in deriving contact rigidity from elastic moduli of each body, for example.

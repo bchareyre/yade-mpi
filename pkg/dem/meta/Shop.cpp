@@ -27,8 +27,8 @@
 #include<yade/pkg-common/InteractingBox2AABB.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 //#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
@@ -48,7 +48,7 @@ class SceneShape; */
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 
 
@@ -226,8 +226,8 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-	interactionGeometryDispatcher->add(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Tetra2TetraBang);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 

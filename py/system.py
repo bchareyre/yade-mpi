@@ -76,6 +76,10 @@ _deprecated={
 	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:00:00 2009, vaclav@flux
 	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:10:17 2009, vaclav@flux
 	'MetaInteractingGeometry2AABB':'DontUseThisClassAnymore_itWillBeRemovedInTheFuture', # Fri Dec 11 17:10:50 2009, vaclav@flux
+	'SpheresContactGeometry':'ScGeom', # Sun Dec 13 20:59:09 2009, vaclav@flux
+	'InteractingSphere2InteractingSphere4SpheresContactGeometry':'Ig2_Sphere_Sphere_ScGeom', # Sun Dec 13 21:02:31 2009, vaclav@flux
+	'InteractingFacet2InteractingSphere4SpheresContactGeometry':'Ig2_Facet_Sphere_ScGeom', # Sun Dec 13 21:02:57 2009, vaclav@flux
+	'InteractingBox2InteractingSphere4SpheresContactGeometry':'Ig2_Box_Sphere_ScGeom', # Sun Dec 13 21:03:10 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -9,7 +9,7 @@
 *************************************************************************/
 
 #include"Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-snow/IstSnowLayersContact.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
@@ -232,7 +232,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::go(
 
 //	std::cerr << __FILE__ << " " << scm->getClassName() << "\n";
 		
-		// FIXME: SpheresContactGeometry (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
+		// FIXME: ScGeom (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
 		//        the penetration depth, contact point and normal. I couldn't make stimulation to be stable without this.
 //FIXME//		bool old_n = c->isNew;
 //FIXME//		c->isNew=false;
@@ -265,8 +265,8 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 //	bool result = go(cm2,cm1,se32,se31,c);
 //	if(result)
 //	{
-//		shared_ptr<SpheresContactGeometry> scm;
-//		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+//		shared_ptr<ScGeom> scm;
+//		if(c->interactionGeometry) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 //		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
 //		scm->normal *= -1.0;
 //		std::swap(scm->radius1,scm->radius2);
@@ -448,7 +448,7 @@ bool Ef2_InteractingBox_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const 
 		
 //	std::cerr << __FILE__ << " " << scm->getClassName() << "\n";
 		
-		// FIXME: SpheresContactGeometry (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
+		// FIXME: ScGeom (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
 		//        the penetration depth, contact point and normal. I couldn't make stimulation to be stable without this.
 //FIXME//		bool old_n = c->isNew;
 //FIXME//		c->isNew=false;

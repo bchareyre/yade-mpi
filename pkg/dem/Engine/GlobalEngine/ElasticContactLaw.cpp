@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"ElasticContactLaw.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
@@ -42,7 +42,7 @@ void ElasticContactLaw::action(Scene* rootBody)
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (LawDispatcher does that already)
-			if(!dynamic_cast<SpheresContactGeometry*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
+			if(!dynamic_cast<ScGeom*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
 		#endif
 			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
 	}
@@ -56,7 +56,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 			int id1 = contact->getId1(), id2 = contact->getId2();
 			// FIXME: mask handling should move to LawFunctor itself, outside the functors
 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
-			SpheresContactGeometry*    currentContactGeometry= static_cast<SpheresContactGeometry*>(ig.get());
+			ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
 			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());			
 						
 			if(currentContactGeometry->penetrationDepth <0)

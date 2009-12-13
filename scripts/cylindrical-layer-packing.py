@@ -14,7 +14,7 @@ o.engines=[
 	BexResetter(),
 	aabbDispatcher,
 	InsertionSortCollider(),
-	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry(),InteractingBox2InteractingSphere4SpheresContactGeometry()]),
+	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(),
 	GlobalStiffnessTimeStepper(defaultDt=1e-4,active=True,timeStepUpdateInterval=500),

@@ -6,21 +6,21 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"InteractingFacet2InteractingSphere4SpheresContactGeometry.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include"Ig2_Facet_Sphere_ScGeom.hpp"
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingFacet.hpp>
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
-CREATE_LOGGER(InteractingFacet2InteractingSphere4SpheresContactGeometry);
+CREATE_LOGGER(Ig2_Facet_Sphere_ScGeom);
 
-InteractingFacet2InteractingSphere4SpheresContactGeometry::InteractingFacet2InteractingSphere4SpheresContactGeometry() 
+Ig2_Facet_Sphere_ScGeom::Ig2_Facet_Sphere_ScGeom() 
 {
 	shrinkFactor=0;
 }
 
-bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_ptr<Shape>& cm1,
+bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 							const shared_ptr<Shape>& cm2,
 							const State& state1,
 							const State& state2,
@@ -98,11 +98,11 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 
 	if (penetrationDepth>0 || c->isReal())
 	{
-		shared_ptr<SpheresContactGeometry> scm;
+		shared_ptr<ScGeom> scm;
 		if (c->interactionGeometry)
-			scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+			scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 		else
-			scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
+			scm = shared_ptr<ScGeom>(new ScGeom());
 	  
 		normal = facetAxisT*normal; // in global orientation
 		scm->contactPoint = se32.position - (sphereRadius-0.5*penetrationDepth)*normal; 
@@ -120,7 +120,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::go(const shared_
 }
 
 
-bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const shared_ptr<Shape>& cm1,
+bool Ig2_Facet_Sphere_ScGeom::goReverse(	const shared_ptr<Shape>& cm1,
 								const shared_ptr<Shape>& cm2,
 								const State& state1,
 								const State& state2,
@@ -133,7 +133,7 @@ bool InteractingFacet2InteractingSphere4SpheresContactGeometry::goReverse(	const
 	return go(cm2,cm1,state2,state1,-shift2,force,c);
 }
 
-YADE_PLUGIN((InteractingFacet2InteractingSphere4SpheresContactGeometry));
+YADE_PLUGIN((Ig2_Facet_Sphere_ScGeom));
 
 //YADE_REQUIRE_FEATURE(PHYSPAR);
 

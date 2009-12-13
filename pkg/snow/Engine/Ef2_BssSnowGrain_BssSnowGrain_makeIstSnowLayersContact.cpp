@@ -4,7 +4,7 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include"Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-snow/IstSnowLayersContact.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
@@ -335,7 +335,7 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::go(	const shared_pt
 	//}
 
 
-		// FIXME: SpheresContactGeometry (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
+		// FIXME: ScGeom (components that are not from IstSnowLayersContact itself) are calculated by "parent" class
 		//        the penetration depth, contact point and normal. I couldn't make stimulation to be stable without this.
 		//g.assist=true;
 		return g.go(cm1,cm2,se31,se32,c);
@@ -446,8 +446,8 @@ bool Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact::goReverse(	const sh
 //	bool result = go(cm2,cm1,se32,se31,c);
 //	if(result)
 //	{
-//		shared_ptr<SpheresContactGeometry> scm;
-//		if(c->interactionGeometry) scm=YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+//		shared_ptr<ScGeom> scm;
+//		if(c->interactionGeometry) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 //		else { std::cerr << "whooooooooops_2!" << __FILE__ << "\n"; return false; }
 //		scm->normal *= -1.0;
 //		std::swap(scm->radius1,scm->radius2);

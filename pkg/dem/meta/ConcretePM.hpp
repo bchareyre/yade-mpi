@@ -48,7 +48,7 @@ There are other classes, which are not strictly necessary:
 
 #include<yade/pkg-common/ElasticMat.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>

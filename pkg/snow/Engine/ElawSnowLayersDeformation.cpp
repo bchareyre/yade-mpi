@@ -8,7 +8,7 @@
 
 #include"ElawSnowLayersDeformation.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
@@ -53,7 +53,7 @@ void ElawSnowLayersDeformation::action(Scene* ncb)
 
 			CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
 			CohesiveFrictionalMat* de2 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id2]->physicalParameters.get());
-//			SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+//			ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
 			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> (contact->interactionPhysics.get());
 
 			BssSnowGrain* b1 = dynamic_cast<BssSnowGrain*>((*bodies)[id1]->shape.get());

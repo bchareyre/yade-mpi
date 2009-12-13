@@ -49,7 +49,7 @@ O.engines=[
 	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
-		[InteractingSphere2InteractingSphere4SpheresContactGeometry(), InteractingFacet2InteractingSphere4SpheresContactGeometry()],
+		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
 		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),

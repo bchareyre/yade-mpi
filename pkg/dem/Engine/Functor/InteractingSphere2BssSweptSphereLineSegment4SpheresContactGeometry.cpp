@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/BssSweptSphereLineSegment.hpp>
 
@@ -39,9 +39,9 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::go(
                 Real overlap = ccn_dist - s->radius - ssls->radius;
                 if (overlap <= 0.0)
                 {
-                        shared_ptr<SpheresContactGeometry> scm;
-                        if (c->interactionGeometry) scm = shared_ptr<SpheresContactGeometry>(new SpheresContactGeometry());
-                        else scm = YADE_PTR_CAST<SpheresContactGeometry>(c->interactionGeometry);
+                        shared_ptr<ScGeom> scm;
+                        if (c->interactionGeometry) scm = shared_ptr<ScGeom>(new ScGeom());
+                        else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
         
                         scm->contactPoint = se32.position + proj + (ssls->radius+0.5*overlap)*ccn;
                         scm->normal = -ccn;
@@ -71,7 +71,7 @@ bool InteractingSphere2BssSweptSphereLineSegment4SpheresContactGeometry::goRever
 	bool isInteracting = go(cm2,cm1,se32,se31,c);
 	if (isInteracting)
 	{
-		SpheresContactGeometry* scm = static_cast<SpheresContactGeometry*>(c->interactionGeometry.get());
+		ScGeom* scm = static_cast<ScGeom*>(c->interactionGeometry.get());
 
                 // Inverse the normal direction and swap the radii
 		scm->normal = -scm->normal;

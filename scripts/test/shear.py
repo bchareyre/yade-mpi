@@ -1,5 +1,5 @@
 #
-# script for testing SpheresContactGeometry shear computation
+# script for testing ScGeom shear computation
 # Runs the same 2-sphere setup for useShear=False and for useShear=True
 #
 
@@ -10,7 +10,7 @@ O.bodies.append([
 O.engines=[
 	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
 	InsertionSortCollider(),
-	InteractionGeometryDispatcher([InteractingSphere2InteractingSphere4SpheresContactGeometry()]),
+	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
 	ElasticContactLaw(useShear=False,label='elasticLaw'),

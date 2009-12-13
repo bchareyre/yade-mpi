@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
-//#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+//#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg-snow/Ef2_BssSnowGrain_BssSnowGrain_makeIstSnowLayersContact.hpp>
 #include<yade/pkg-snow/Ef2_InteractingBox_BssSnowGrain_makeSpheresContactGeometry.hpp>
 

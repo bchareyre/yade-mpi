@@ -14,7 +14,7 @@
 
 #define SCG_SHEAR
 
-class SpheresContactGeometry: public GenericSpheresContact {
+class ScGeom: public GenericSpheresContact {
 	public:
 		Vector3r& normal; // unit vector in the direction from sphere1 center to sphere2 center
 		Vector3r contactPoint;
@@ -40,12 +40,12 @@ class SpheresContactGeometry: public GenericSpheresContact {
 		#endif
 
 
-		SpheresContactGeometry():normal(GenericSpheresContact::normal),contactPoint(Vector3r::ZERO),radius1(GenericSpheresContact::refR1),radius2(GenericSpheresContact::refR2)
+		ScGeom():normal(GenericSpheresContact::normal),contactPoint(Vector3r::ZERO),radius1(GenericSpheresContact::refR1),radius2(GenericSpheresContact::refR2)
 		#ifdef SCG_SHEAR
 			,shear(Vector3r::ZERO), prevNormal(Vector3r::ZERO) /*initialized to proper value by geom functor*/
 		#endif
 			{ createIndex(); }
-		virtual ~SpheresContactGeometry();
+		virtual ~ScGeom();
 
 		void updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting=true);
 
@@ -59,9 +59,9 @@ class SpheresContactGeometry: public GenericSpheresContact {
 				(prevNormal)
 			#endif
 			);
-	REGISTER_CLASS_AND_BASE(SpheresContactGeometry,InteractionGeometry);
-	REGISTER_CLASS_INDEX(SpheresContactGeometry,InteractionGeometry);
+	REGISTER_CLASS_AND_BASE(ScGeom,InteractionGeometry);
+	REGISTER_CLASS_INDEX(ScGeom,InteractionGeometry);
 };
 
-REGISTER_SERIALIZABLE(SpheresContactGeometry);
+REGISTER_SERIALIZABLE(ScGeom);
 

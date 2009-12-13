@@ -27,11 +27,14 @@ def saveVars(mark='',loadNow=False,**kw):
 
 	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use::
 
-		>>> utils.saveVars(a=a,b=b,c=c)
+		>>> from yade import utils
+		>>> utils.saveVars('mark',a=1,b=2,c=3,loadNow=True)
+		>>> a,b,c
+		(1, 2, 3)
 
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
 
-		>>> utils.loadVars(mark)
+		>>> utils.loadVars('mark')
 
 	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
 

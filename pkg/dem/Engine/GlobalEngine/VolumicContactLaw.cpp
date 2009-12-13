@@ -8,7 +8,7 @@
 #include <yade/pkg-common/ParticleParameters.hpp>
  
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
@@ -212,7 +212,7 @@ void VolumicContactLaw::action(Scene* ncb)
 			
 			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask) ) continue;
 
-			const SpheresContactGeometry*    currentContactGeometry= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+			const ScGeom*    currentContactGeometry= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
 			ElasticContactInteraction* currentContactPhysics = YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			if((!currentContactGeometry)||(!currentContactPhysics)) continue;
 	

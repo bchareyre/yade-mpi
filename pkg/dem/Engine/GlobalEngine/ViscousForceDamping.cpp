@@ -11,7 +11,7 @@
 
 #include "ViscousForceDamping.hpp"
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
@@ -53,7 +53,7 @@ void ViscousForceDamping::action(Body* body)
 	
 			BodyMacroParameters* de1 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			BodyMacroParameters* de2 				= YADE_CAST<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			SpheresContactGeometry* currentContactGeometry		= YADE_CAST<SpheresContactGeometry*>(contact->interactionGeometry.get());
+			ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
 			ElasticContactInteraction* currentContactPhysics   	= YADE_CAST<ElasticContactInteraction*> (contact->interactionPhysics.get());
 			
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;

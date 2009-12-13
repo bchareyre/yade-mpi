@@ -10,13 +10,13 @@
 
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
-class InteractingSphere2InteractingSphere4SpheresContactGeometry : public InteractionGeometryFunctor
+class Ig2_Sphere_Sphere_ScGeom : public InteractionGeometryFunctor
 {
 	public :
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 					
-		InteractingSphere2InteractingSphere4SpheresContactGeometry();		
+		Ig2_Sphere_Sphere_ScGeom();		
 		
 		/*! enlarge both radii by this factor (if >1), to permit creation of distant interactions.
 		 *
@@ -26,11 +26,11 @@ class InteractingSphere2InteractingSphere4SpheresContactGeometry : public Intera
 		 * which will create larger bounding boxes and should be of the same value. */
 		double interactionDetectionFactor;
 
-	REGISTER_CLASS_AND_BASE(InteractingSphere2InteractingSphere4SpheresContactGeometry,InteractionGeometryFunctor);
+	REGISTER_CLASS_AND_BASE(Ig2_Sphere_Sphere_ScGeom,InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(interactionDetectionFactor));
 	FUNCTOR2D(InteractingSphere,InteractingSphere);
 	// needed for the dispatcher, even if it is symmetric
 	DEFINE_FUNCTOR_ORDER_2D(InteractingSphere,InteractingSphere);
 };
-REGISTER_SERIALIZABLE(InteractingSphere2InteractingSphere4SpheresContactGeometry);
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_ScGeom);
 

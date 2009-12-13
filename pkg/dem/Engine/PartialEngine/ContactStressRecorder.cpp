@@ -14,7 +14,7 @@
 //#include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 
-#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include <yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/ElasticContactInteraction.hpp>
 
 #include <yade/pkg-dem/TriaxialStressController.hpp>
@@ -103,8 +103,8 @@ void ContactStressRecorder::action ( Scene * ncb )
 			unsigned int id1 = interaction -> getId1();
 			unsigned int id2 = interaction -> getId2();
 
-			SpheresContactGeometry* currentContactGeometry  =
-				static_cast<SpheresContactGeometry*> ( interaction->interactionGeometry.get() );
+			ScGeom* currentContactGeometry  =
+				static_cast<ScGeom*> ( interaction->interactionGeometry.get() );
 
 			ElasticContactInteraction* currentContactPhysics =
 				static_cast<ElasticContactInteraction*> ( interaction->interactionPhysics.get() );

@@ -15,7 +15,7 @@
 #include <yade/pkg-common/InteractingSphere.hpp>
 #include <yade/pkg-common/InteractingBox.hpp>
 
-#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include <yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-common/NormalShearInteractions.hpp>
 
 HistoryRecorder::HistoryRecorder () : DataRecorder()
@@ -110,7 +110,7 @@ void HistoryRecorder::action(Scene * ncb)
 	   shared_ptr<Body> b1=(*bodies)[id1];
 	   shared_ptr<Body> b2=(*bodies)[id2];
 
-	   if( typeid(*ig) == typeid(SpheresContactGeometry) )
+	   if( typeid(*ig) == typeid(ScGeom) )
 	   {
 		 
 		 if (typeid(*(b1->shape.get())) == typeid(InteractingSphere)

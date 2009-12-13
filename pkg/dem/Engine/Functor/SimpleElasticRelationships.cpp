@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"SimpleElasticRelationships.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/Omega.hpp>
@@ -21,7 +21,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
 					, const shared_ptr<Interaction>& interaction)
 {
 	
-	//SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	//ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
 	//if(interactionGeometry)
 	{
@@ -44,11 +44,11 @@ void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
 				Vector3r normal=interactionGeometry->normal;
 			#else
 				Real Da,Db; Vector3r normal;
-				SpheresContactGeometry* scg=dynamic_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+				ScGeom* scg=dynamic_cast<ScGeom*>(interaction->interactionGeometry.get());
 				Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(interaction->interactionGeometry.get());
 				if(scg){ Da=scg->radius1; Db=scg->radius2; normal=scg->normal; }
 				else if(d3dg){Da=d3dg->refR1>0?d3dg->refR1:2*d3dg->refR2; Db=d3dg->refR2>0?d3dg->refR2:d3dg->refR1; normal=d3dg->normal; }
-				else throw runtime_error("SimpleElasticRelationships: geometry is neither SpheresContactGeometry nor Dem3DofGeom");
+				else throw runtime_error("SimpleElasticRelationships: geometry is neither ScGeom nor Dem3DofGeom");
 			#endif
 			
 			Real fa 	= mat1->frictionAngle;
@@ -80,7 +80,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
 		}	
 		return;
 	}
-	throw runtime_error("SimpleElasticRelationships currently fails for non-SpheresContactGeometry geometry!");
+	throw runtime_error("SimpleElasticRelationships currently fails for non-ScGeom geometry!");
 };
 YADE_PLUGIN((SimpleElasticRelationships));
 

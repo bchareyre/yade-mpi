@@ -44,7 +44,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
 #include<yade/pkg-common/InteractingSphere.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -409,11 +409,11 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	
-	shared_ptr<InteractingSphere2InteractingSphere4SpheresContactGeometry> iS2IS4SContactGeometry(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
+	shared_ptr<Ig2_Sphere_Sphere_ScGeom> iS2IS4SContactGeometry(new Ig2_Sphere_Sphere_ScGeom);
 	iS2IS4SContactGeometry->interactionDetectionFactor = distanceFactor;//Detect potential distant interaction (meniscii)
 	
 	interactionGeometryDispatcher->add(iS2IS4SContactGeometry);
-	interactionGeometryDispatcher->add("InteractingBox2InteractingSphere4SpheresContactGeometry");
+	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 	
 	
 

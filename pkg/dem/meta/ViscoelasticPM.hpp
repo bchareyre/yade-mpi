@@ -68,7 +68,7 @@ REGISTER_SERIALIZABLE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleVisco
 class Law2_Spheres_Viscoelastic_SimpleViscoelastic: public LawFunctor {
 	public :
 		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*);
-		FUNCTOR2D(SpheresContactGeometry,SimpleViscoelasticPhys);
+		FUNCTOR2D(ScGeom,SimpleViscoelasticPhys);
 		REGISTER_CLASS_AND_BASE(Law2_Spheres_Viscoelastic_SimpleViscoelastic,LawFunctor);
 		REGISTER_ATTRIBUTES(LawFunctor,/* */);
 };

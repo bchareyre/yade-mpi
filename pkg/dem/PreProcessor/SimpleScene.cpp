@@ -12,8 +12,8 @@
 #include<yade/pkg-common/NewtonsMomentumLaw.hpp>
 #include<yade/pkg-common/LeapFrogPositionIntegrator.hpp>
 #include<yade/pkg-common/LeapFrogOrientationIntegrator.hpp>
-#include<yade/pkg-dem/InteractingSphere2InteractingSphere4SpheresContactGeometry.hpp>
-#include<yade/pkg-dem/InteractingBox2InteractingSphere4SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
+#include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -24,7 +24,7 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
@@ -56,8 +56,8 @@ bool SimpleScene::generate(){
 			rootBody->engines.push_back(collider);
 		//@
 		shared_ptr<InteractionGeometryDispatcher> igeomDispatcher(new InteractionGeometryDispatcher);
-			igeomDispatcher->add(new InteractingSphere2InteractingSphere4SpheresContactGeometry);
-			igeomDispatcher->add(new InteractingBox2InteractingSphere4SpheresContactGeometry);
+			igeomDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
+			igeomDispatcher->add(new Ig2_Box_Sphere_ScGeom);
 			rootBody->engines.push_back(igeomDispatcher);
 		//@
 		shared_ptr<InteractionPhysicsDispatcher> iphysDispatcher(new InteractionPhysicsDispatcher);

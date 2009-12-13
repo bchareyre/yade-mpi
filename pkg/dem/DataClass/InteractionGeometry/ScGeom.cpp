@@ -2,14 +2,14 @@
 // © 2004 Janek Kozicki <cosurgi@berlios.de>
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-#include "SpheresContactGeometry.hpp"
+#include "ScGeom.hpp"
 #include<yade/core/Omega.hpp>
-YADE_PLUGIN((SpheresContactGeometry));
+YADE_PLUGIN((ScGeom));
 // At least one virtual method must be in the .cpp file (!!!)
-SpheresContactGeometry::~SpheresContactGeometry(){};
+ScGeom::~ScGeom(){};
 
 #ifdef SCG_SHEAR
-Vector3r SpheresContactGeometry::updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
+Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
@@ -65,7 +65,7 @@ Vector3r SpheresContactGeometry::updateShear(const State* rbp1, const State* rbp
 }
 #endif
 
-void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
+void ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
@@ -118,7 +118,7 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 
 /* keep this for reference; declarations in the header */
 #if 0
-	Vector3r SpheresContactGeometry::relRotVector() const{
+	Vector3r ScGeom::relRotVector() const{
 		Quaternionr relOri12=ori1.Conjugate()*ori2;
 		Quaternionr oriDiff=initRelOri12.Conjugate()*relOri12;
 		Vector3r axis; Real angle;
@@ -127,7 +127,7 @@ void SpheresContactGeometry::updateShearForce(Vector3r& shearForce, Real ks, con
 		return angle*axis;
 	}
 
-	void SpheresContactGeometry::bendingTorsionAbs(Vector3r& bend, Real& tors){
+	void ScGeom::bendingTorsionAbs(Vector3r& bend, Real& tors){
 		Vector3r relRot=relRotVector();
 		tors=relRot.Dot(normal);
 		bend=relRot-tors*normal;

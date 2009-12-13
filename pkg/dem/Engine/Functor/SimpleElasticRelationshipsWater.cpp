@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"SimpleElasticRelationshipsWater.hpp"
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
@@ -25,9 +25,9 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //Granu
 					, const shared_ptr<Interaction>& interaction)
 {
 	
-	SpheresContactGeometry* interactionGeometry = YADE_CAST<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
-	if(interactionGeometry) // so it is SpheresContactGeometry  - NON PERMANENT LINK
+	if(interactionGeometry) // so it is ScGeom  - NON PERMANENT LINK
 	{
 //cerr << "interactionGeometry" << endl;
 		if(!interaction->interactionPhysics)

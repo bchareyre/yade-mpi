@@ -14,7 +14,7 @@
 
 #include "CapillaryCohesiveLaw.hpp"
 #include <yade/pkg-common/ElasticMat.hpp>
-#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include <yade/pkg-dem/ScGeom.hpp>
 
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
@@ -136,8 +136,8 @@ void CapillaryCohesiveLaw::action(Scene* ncb)
 			Body* b1 = (*bodies)[id1].get();
 			Body* b2 = (*bodies)[id2].get();
 
-                        SpheresContactGeometry* currentContactGeometry 	=
-                                static_cast<SpheresContactGeometry*>(interaction->interactionGeometry.get());
+                        ScGeom* currentContactGeometry 	=
+                                static_cast<ScGeom*>(interaction->interactionGeometry.get());
 
                         CapillaryParameters* currentContactPhysics 	=
                                 static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
@@ -328,8 +328,8 @@ void CapillaryCohesiveLaw::checkFusion(Scene * ncb)
 
 					//cerr << "angle1 = " << angle1 << " | angle2 = " << angle2 << endl;	
 					
-					Vector3r normalFirstMeniscus = YADE_CAST<SpheresContactGeometry*>((*firstMeniscus)->interactionGeometry.get())->normal;
-					Vector3r normalCurrentMeniscus = YADE_CAST<SpheresContactGeometry*>((*currentMeniscus)->interactionGeometry.get())->normal;
+					Vector3r normalFirstMeniscus = YADE_CAST<ScGeom*>((*firstMeniscus)->interactionGeometry.get())->normal;
+					Vector3r normalCurrentMeniscus = YADE_CAST<ScGeom*>((*currentMeniscus)->interactionGeometry.get())->normal;
 					
 					//if (i != (*firstMeniscus)->getId1()) normalFirstMeniscus = -normalFirstMeniscus;
 					//if (i != (*currentMeniscus)->getId1()) normalCurrentMeniscus = -normalCurrentMeniscus;
@@ -353,9 +353,9 @@ void CapillaryCohesiveLaw::checkFusion(Scene * ncb)
 					//if ((angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(normalFirstMeniscus.Dot(normalCurrentMeniscus)))
 					
 // 					if (//check here if wet angles are overlaping (check with squares is faster since SquaredLength of cross product gives squared sinus)
-// 					(angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(static_cast<SpheresContactGeometry*>((*firstMeniscus)->interactionGeometry.get())->normal
+// 					(angle1+angle2)*Mathr::DEG_TO_RAD > Mathr::FastInvCos0(static_cast<ScGeom*>((*firstMeniscus)->interactionGeometry.get())->normal
 // 					.Dot(
-// 					static_cast<SpheresContactGeometry*>((*currentMeniscus)->interactionGeometry.get())->normal))) 
+// 					static_cast<ScGeom*>((*currentMeniscus)->interactionGeometry.get())->normal))) 
 					{
 						++(interactionPhysics1->fusionNumber); ++(interactionPhysics2->fusionNumber);//count +1 if 2 meniscii are overlaping
 					};

@@ -8,16 +8,16 @@
 #pragma once
 
 #include <yade/core/DataRecorder.hpp>
-#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include <yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/ViscoelasticInteraction.hpp>
 #include <set>
 
-/// Save SpheresContactGeometry and ViscoelasticInteraction of the
+/// Save ScGeom and ViscoelasticInteraction of the
 /// interaction between the body Id1 and the body Id2 into the file
 /// outputBaseId1-Id2.
 class SimpleViscoelasticSpheresInteractionRecorder : public DataRecorder {
 private: 
-    shared_ptr<SpheresContactGeometry> interactionSphere;
+    shared_ptr<ScGeom> interactionSphere;
     shared_ptr<ViscoelasticInteraction> viscoelasticInteraction;
     set<pair<int,int> > interaction_ids;
 

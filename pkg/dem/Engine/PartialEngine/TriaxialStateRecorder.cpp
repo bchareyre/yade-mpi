@@ -15,14 +15,14 @@
 #include<yade/pkg-common/InteractingSphere.hpp>
 //#include <yade/pkg-common/SphereModel.hpp>
 
-//#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+//#include <yade/pkg-dem/ScGeom.hpp>
 //#include <yade/pkg-dem/ElasticContactInteraction.hpp>
 
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <yade/pkg-dem/SpheresContactGeometry.hpp>
+#include <yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/ElasticContactInteraction.hpp>
 
 
@@ -177,8 +177,8 @@ TriaxialStressController::ComputeLoveStress ( Scene * ncb )
 		 unsigned int id1 = interaction -> getId1();
 		 unsigned int id2 = interaction -> getId2();
 
-		 SpheresContactGeometry* currentContactGeometry  =
-				 static_cast<SpheresContactGeometry*> ( interaction->interactionGeometry.
+		 ScGeom* currentContactGeometry  =
+				 static_cast<ScGeom*> ( interaction->interactionGeometry.
 				 get() );
 
 		 ElasticContactInteraction* currentContactPhysics =

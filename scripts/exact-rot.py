@@ -9,8 +9,8 @@ O.engines=[
 	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([
-		InteractingSphere2InteractingSphere4SpheresContactGeometry(),
-		InteractingFacet2InteractingSphere4SpheresContactGeometry(),
+		Ig2_Sphere_Sphere_ScGeom(),
+		Ig2_Facet_Sphere_ScGeom(),
 	]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
 	ElasticContactLaw(),

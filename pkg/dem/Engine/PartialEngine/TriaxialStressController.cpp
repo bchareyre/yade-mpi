@@ -9,7 +9,7 @@
 #include"TriaxialStressController.hpp"
 #include<yade/pkg-common/InteractingSphere.hpp>
 #include<yade/pkg-common/InteractingBox.hpp>
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/ElasticContactInteraction.hpp>
 #include<yade/core/State.hpp>
 
@@ -338,7 +338,7 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
 	{
 		if ( ( *ii )->isReal() )
 		{
-			SpheresContactGeometry* contact = static_cast<SpheresContactGeometry*> ( ( *ii )->interactionGeometry.get() );
+			ScGeom* contact = static_cast<ScGeom*> ( ( *ii )->interactionGeometry.get() );
 			//      if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
 			//   contact->radius1 *= multiplier;
 			//      if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)

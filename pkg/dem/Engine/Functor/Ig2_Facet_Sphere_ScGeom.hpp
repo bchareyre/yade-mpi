@@ -11,7 +11,7 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
-class InteractingFacet2InteractingSphere4SpheresContactGeometry : public InteractionGeometryFunctor
+class Ig2_Facet_Sphere_ScGeom : public InteractionGeometryFunctor
 {
 	public :
 		virtual bool go(	const shared_ptr<Shape>& cm1,
@@ -29,9 +29,9 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 					const bool& force,
 					const shared_ptr<Interaction>& c);
 					
-		InteractingFacet2InteractingSphere4SpheresContactGeometry();		
+		Ig2_Facet_Sphere_ScGeom();		
 					
-	REGISTER_CLASS_NAME(InteractingFacet2InteractingSphere4SpheresContactGeometry);
+	REGISTER_CLASS_NAME(Ig2_Facet_Sphere_ScGeom);
 	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
 	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(shrinkFactor));
 
@@ -50,6 +50,6 @@ class InteractingFacet2InteractingSphere4SpheresContactGeometry : public Interac
 	Real shrinkFactor; 
 };
 
-REGISTER_SERIALIZABLE(InteractingFacet2InteractingSphere4SpheresContactGeometry);
+REGISTER_SERIALIZABLE(Ig2_Facet_Sphere_ScGeom);
 
 

@@ -11,7 +11,7 @@
 #include<yade/core/InteractionSolver.hpp>
 
 // only to see whether SCG_SHEAR is defined, may be removed in the future
-#include<yade/pkg-dem/SpheresContactGeometry.hpp>
+#include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
 
 #include <set>
@@ -34,7 +34,7 @@ class ef2_Spheres_Elastic_ElasticLaw: public LawFunctor{
 			, useShear(false)
 		#endif
 		{}
-	FUNCTOR2D(SpheresContactGeometry,ElasticContactInteraction);
+	FUNCTOR2D(ScGeom,ElasticContactInteraction);
 	REGISTER_CLASS_AND_BASE(ef2_Spheres_Elastic_ElasticLaw,LawFunctor);
 	REGISTER_ATTRIBUTES(LawFunctor,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR
