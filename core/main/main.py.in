@@ -24,7 +24,7 @@ opts,args=par.parse_args()
 # c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
 if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
 
-print 'Welcome to Yade '+version
+sys.stderr.write('Welcome to Yade '+version+'\n')
 
 # initialization and c++ plugins import
 import yade
@@ -65,10 +65,10 @@ from math import *
 if len(args)>0:
 	if args[0].endswith('.xml') or args[0].endswith('.xml.bz2'):
 		if len(args)>1: raise RuntimeError('Extra arguments to XML simulation to run: '+' '.join(args[1:]))
-		print "Running simulation "+args[0]
+		sys.stderr.write("Running simulation "+args[0]+'\n')
 		O=yade.wrapper.Omega(); O.load(args[0]); O.run()
 	if args[0].endswith('.py'):
-		print "Running script "+args[0]
+		sys.stderr.write("Running script "+args[0]+'\n')
 		yade.runtime.argv=args[1:]
 		try:
 			execfile(args[0])

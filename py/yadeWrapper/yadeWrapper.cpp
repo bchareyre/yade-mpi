@@ -538,6 +538,8 @@ class pyOmega{
 	void exitNoBacktrace(int status=0){
 		if(status==0) signal(SIGSEGV,termHandlerNormal); /* unset the handler that runs gdb and prints backtrace */
 		else signal(SIGSEGV,termHandlerError);
+		// try to clean our mess
+		Omega::instance().cleanupTemps();
 		exit(status);
 	}
 	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getScene().get()); }

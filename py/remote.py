@@ -87,7 +87,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 class GenericTCPServer:
 	"Base class for socket server, handling port allocation, initial logging and thead backgrounding."
 	def __init__(self,handler,title,cookie=True,minPort=9000,host='',maxPort=65536,background=True):
-		import socket, random
+		import socket, random, sys
 		self.port=-1
 		self.host=host
 		tryPort=minPort
@@ -99,9 +99,9 @@ class GenericTCPServer:
 				if cookie:
 					self.server.cookie=''.join([i for i in random.sample('yadesucks',6)])
 					self.server.authenticated=[]
-					print title,"on %s:%d, auth cookie `%s'"%(host if host else 'localhost',self.port,self.server.cookie)
+					sys.stderr.write(title+" on %s:%d, auth cookie `%s'\n"%(host if host else 'localhost',self.port,self.server.cookie))
 				else:
-					print title,"on %s:%d"%(host if host else 'localhost',self.port)
+					sys.stderr.write(title+" on %s:%d\n"%(host if host else 'localhost',self.port))
 				if background:
 					import thread; thread.start_new_thread(self.server.serve_forever,())
 				else: self.server.serve_forever()

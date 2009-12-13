@@ -27,14 +27,13 @@ def saveVars(mark='',loadNow=False,**kw):
 
 	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use::
 
-		>>> from yade import utils
-		>>> utils.saveVars('mark',a=1,b=2,c=3,loadNow=True)
+		>>> saveVars('mark',a=1,b=2,c=3,loadNow=True)
 		>>> a,b,c
 		(1, 2, 3)
 
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
 
-		>>> utils.loadVars('mark')
+		>>> loadVars('mark')
 
 	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
 
@@ -60,8 +59,12 @@ def loadVars(mark=None):
 
 
 def SpherePWaveTimeStep(radius,density,young):
-	"""Compute P-wave critical timestep for a single sphere.
-	If you want to compute minimum critical timestep for all spheres in the simulation, use utils.PWaveTimeStep() instead."""
+	r"""Compute P-wave critical timestep for a single (presumably representative) sphere, using formula for P-Wave propagation speed :math:`\Delta t_{c}=\frac{r}{E/\rho}`.
+	If you want to compute minimum critical timestep for all spheres in the simulation, use utils.PWaveTimeStep() instead.
+	
+	>>> SpherePWaveTimeStep(1e-3,2400,30e9)
+	2.8284271247461903e-07
+	"""
 	from math import sqrt
 	return radius/sqrt(young/density)
 
@@ -109,20 +112,19 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	:return:
 		A Body instance with desired characteristics.
 
-	>>> O.reset()
-	>>> from yade import utils
 
 	Creating default shared material if none exists neither is given::
 
+		>>> O.reset()
 		>>> len(O.materials)
 		0
-		>>> s0=utils.sphere([2,0,0],1)
+		>>> s0=sphere([2,0,0],1)
 		>>> len(O.materials)
 		1
 
 	Instance of material can be given::
 
-		>>> s1=utils.sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElasticMat(young=30e9,density=2e3))
+		>>> s1=sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElasticMat(young=30e9,density=2e3))
 		>>> s1.shape['wire']
 		False
 		>>> s1.shape['diffuseColor']
@@ -134,7 +136,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 
 		>>> O.materials.append(GranularMat(young=10e9,poisson=.11,label='myMaterial'))
 		1
-		>>> s2=utils.sphere([0,0,2],1,material='myMaterial')
+		>>> s2=sphere([0,0,2],1,material='myMaterial')
 		>>> s2.mat['label']
 		'myMaterial'
 		>>> s2.mat['poisson']
@@ -382,11 +384,16 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True):
 
 def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 	"""Create .ogg video from external image files.
-	
-	@param frameSpec: If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order. B{Warning:} GStreamer is picky about the wildcard; if you pass a wrong one, if will not complain, but silently stall.
-	@param out: file to save video into
-	@param renameNotOverwrite: if True, existing same-named video file will have ~[number] appended; will be overwritten otherwise.
-	@param fps: Frames per second.
+
+	:parameters:
+		`frameSpec`: wildcard | sequence of filenames
+			If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order. B{Warning:} GStreamer is picky about the wildcard; if you pass a wrong one, if will not complain, but silently stall.
+		`out`: filename
+			file to save video into
+		`renameNotOverwrite`: bool
+			if True, existing same-named video file will have ~[number] appended; will be overwritten otherwise.
+		`fps`:
+			Frames per second.
 	"""
 	import pygst,sys,gobject,os,tempfile,shutil
 	pygst.require("0.10")
@@ -438,19 +445,22 @@ def vmData():
 def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
 	"""Get some data about the current packing useful for uniaxial test:
 	
-		1. Find the dimensions that is the longest (uniaxial loading axis)
+#. Find the dimensions that is the longest (uniaxial loading axis)
 
-		2. Find the minimum cross-section area of the speciment by examining several (areaSections)
-			sections perpendicular to axis, computing area of the convex hull for each one. This will
-			work also for non-prismatic specimen.
+#. Find the minimum cross-section area of the speciment by examining several (areaSections)
+	sections perpendicular to axis, computing area of the convex hull for each one. This will
+	work also for non-prismatic specimen.
 
-		3. Find the bodies that are on the negative/positive boundary, to which the straining condition
-			should be applied.
+#. Find the bodies that are on the negative/positive boundary, to which the straining condition
+	should be applied.
 
-	@param filename: if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
-	@param areaSection: number of section that will be used to estimate cross-section
+:parameters:
+	`filename`:
+		if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
+	`areaSection`:
+		number of section that will be used to estimate cross-section
 
-	@return: dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
+:return: dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
 	"""
 	if filename: ids=spheresFromFile(filename,**kw)
 	else: ids=[b.id for b in O.bodies]
@@ -471,8 +481,8 @@ def NormalRestitution2DampingRate(en):
 
 def xMirror(half):
 	"""Mirror a sequence of 2d points around the x axis (changing sign on the y coord).
-	The sequence should start up and then it will wrap from y downwards (or vice versa).
-	If the last point's x coord is zero, it will not be duplicated."""
+The sequence should start up and then it will wrap from y downwards (or vice versa).
+If the last point's x coord is zero, it will not be duplicated."""
 	return list(half)+[(x,-y) for x,y in reversed(half[:-1] if half[-1][0]==0 else half)]
 
 #############################
@@ -510,8 +520,8 @@ First non-empty line contains column titles (without quotes).
 You may use special column named 'description' to describe this parameter set;
 if such colum is absent, description will be built by concatenating column names and corresponding values (``param1=34,param2=12.22,param4=foo``)
 
-  * from columns ending in ``!`` (the ``!`` is not included in the column name)
-  * from all columns, if no columns end in ``!``.
+* from columns ending in ``!`` (the ``!`` is not included in the column name)
+* from all columns, if no columns end in ``!``.
 
 Empty lines within the file are ignored (although counted); ``#`` starts comment till the end of line. Number of blank-separated columns must be the same for all non-empty lines.
 
