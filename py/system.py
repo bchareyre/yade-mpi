@@ -56,9 +56,9 @@ _deprecated={
 	'NewtonsDampedLaw':'NewtonIntegrator', # Wed Dec  9 17:44:15 2009, vaclav@flux
 	'StandAloneEngine':'GlobalEngine', # Wed Dec  9 17:46:12 2009, vaclav@flux
 	'DeusExMachina':'PartialEngine', # Wed Dec  9 17:53:06 2009, vaclav@flux
-	'Sphere':'SphereModel', # 11/12/2009, vaclav@flux
-	'Facet':'FacetModel', # Fri Dec 11 15:27:41 2009, vaclav@flux
-	'Box':'BoxModel', # Fri Dec 11 15:39:44 2009, vaclav@flux
+	## 'Sphere':'SphereModel', # 11/12/2009, vaclav@flux   ### comment out to prevent loop, since InteractingSphere was renamed to Sphere later
+	## 'Facet':'FacetModel', # Fri Dec 11 15:27:41 2009, vaclav@flux   ### dtto
+	## 'Box':'BoxModel', # Fri Dec 11 15:39:44 2009, vaclav@flux       ### dtto
 	'GLDrawSphere':'GLDrawSphereModel', # Fri Dec 11 15:43:31 2009, vaclav@flux
 	'GLDrawBox':'GLDrawBoxModel', # Fri Dec 11 15:43:50 2009, vaclav@flux
 	'GLDrawFacet':'GLDrawFacetModel', # Fri Dec 11 15:44:04 2009, vaclav@flux
