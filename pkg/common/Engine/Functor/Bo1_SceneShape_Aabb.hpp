@@ -9,7 +9,7 @@
 #pragma once
 #include<yade/pkg-common/BoundFunctor.hpp>
 
-class DontUseThisClassAnymore_itWillBeRemovedInTheFuture : public BoundFunctor
+class DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely : public BoundFunctor
 {
 	public :
 		void go(	  const shared_ptr<Shape>& cm
@@ -17,9 +17,9 @@ class DontUseThisClassAnymore_itWillBeRemovedInTheFuture : public BoundFunctor
 				, const Se3r& se3
 				, const Body* );
 	FUNCTOR2D(SceneShape,AABB);
-	REGISTER_CLASS_NAME(DontUseThisClassAnymore_itWillBeRemovedInTheFuture);
+	REGISTER_CLASS_NAME(DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely);
 	REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };
 
-REGISTER_SERIALIZABLE(DontUseThisClassAnymore_itWillBeRemovedInTheFuture);
+REGISTER_SERIALIZABLE(DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely);
 

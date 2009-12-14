@@ -76,7 +76,6 @@ _deprecated={
 	'MetaInteractingGeometry':'SceneShape', # Fri Dec 11 16:56:06 2009, vaclav@flux
 	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:00:00 2009, vaclav@flux
 	'GLDrawMetaInteractingGeometry':'Gl1_SceneShape', # Fri Dec 11 17:10:17 2009, vaclav@flux
-	'MetaInteractingGeometry2AABB':'DontUseThisClassAnymore_itWillBeRemovedInTheFuture', # Fri Dec 11 17:10:50 2009, vaclav@flux
 	'SpheresContactGeometry':'ScGeom', # Sun Dec 13 20:59:09 2009, vaclav@flux
 	'InteractingSphere2InteractingSphere4SpheresContactGeometry':'Ig2_Sphere_Sphere_ScGeom', # Sun Dec 13 21:02:31 2009, vaclav@flux
 	'InteractingFacet2InteractingSphere4SpheresContactGeometry':'Ig2_Facet_Sphere_ScGeom', # Sun Dec 13 21:02:57 2009, vaclav@flux
@@ -84,6 +83,7 @@ _deprecated={
 	'InteractingSphere':'Sphere', # Sun Dec 13 21:13:40 2009, vaclav@flux
 	'InteractingFacet':'Facet', # Sun Dec 13 21:15:07 2009, vaclav@flux
 	'InteractingBox':'Box', # Sun Dec 13 21:15:16 2009, vaclav@flux
+	'MetaInteractingGeometry2AABB':'DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely', # Mon Dec 14 09:33:20 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

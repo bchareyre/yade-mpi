@@ -16,10 +16,10 @@
 #include<limits>
 
 
-void DontUseThisClassAnymore_itWillBeRemovedInTheFuture::go(	  const shared_ptr<Shape>&
+void DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely::go(	  const shared_ptr<Shape>&
 						, shared_ptr<Bound>& bv
 						, const Se3r&
 						, const Body* body )
 {}
 	
-YADE_PLUGIN((DontUseThisClassAnymore_itWillBeRemovedInTheFuture));
+YADE_PLUGIN((DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely));
