@@ -5,6 +5,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/core/Timing.hpp>
+#include<yade/pkg-common/AABB.hpp>
 
 #ifdef __APPLE__
 #  include <OpenGL/glu.h>
