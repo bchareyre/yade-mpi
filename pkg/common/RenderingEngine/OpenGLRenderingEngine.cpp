@@ -111,13 +111,13 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 /* mostly copied from PeriodicInsertionSortCollider
  	FIXME: common implementation somewhere */
 
-Real OpenGLRenderingEngine::wrapCell(const Real x, const Real x0, const Real x1){
-	Real xNorm=(x-x0)/(x1-x0);
-	return x0+(xNorm-floor(xNorm))*(x1-x0);
+Real OpenGLRenderingEngine::wrapCell(const Real x, const Real x1){
+	Real xNorm=(x)/(x1);
+	return (xNorm-floor(xNorm))*(x1);
 }
 Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, Scene* rb){
 	if(!rb->isPeriodic) return pt;
-	return Vector3r(wrapCell(pt[0],rb->cellMin[0],rb->cellMax[0]),wrapCell(pt[1],rb->cellMin[1],rb->cellMax[1]),wrapCell(pt[2],rb->cellMin[2],rb->cellMax[2]));
+	return Vector3r(wrapCell(pt[0],rb->cellSize[0]),wrapCell(pt[1],rb->cellSize[1]),wrapCell(pt[2],rb->cellSize[2]));
 }
 
 void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody){
@@ -148,8 +148,8 @@ void OpenGLRenderingEngine::drawPeriodicCell(Scene* rootBody){
 	if(!rootBody->isPeriodic) return;
 	glPushMatrix();
 		glColor3v(Vector3r(1,1,0));
-		Vector3r cent=.5*(rootBody->cellMin+rootBody->cellMax); Vector3r size=rootBody->cellMax-rootBody->cellMin;
-		glTranslate(cent[0],cent[1],cent[2]); glScale(size[0],size[1],size[2]);
+		Vector3r cent=.5*rootBody->cellSize;
+		glTranslate(cent[0],cent[1],cent[2]); glScale(rootBody->cellSize[0],rootBody->cellSize[1],rootBody->cellSize[2]);
 		glutWireCube(1);
 	glPopMatrix();
 }
@@ -373,7 +373,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
 		if(b->bound && rootBody->isPeriodic){
-			const Vector3r& cellMin(rootBody->cellMin); const Vector3r& cellMax(rootBody->cellMax); Vector3r cellSize=cellMax-cellMin;
+			const Vector3r& cellSize(rootBody->cellSize);
 			// traverse all periodic cells around the body, to see if any of them touches
 			Vector3r halfSize=b->bound->max-b->bound->min; halfSize*=.5;
 			Vector3r pmin,pmax;
@@ -382,9 +382,9 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 				if(i[0]==0 && i[1]==0 && i[2]==0) continue; // middle; already rendered above
 				Vector3r pt=pos+Vector3r(cellSize[0]*i[0],cellSize[1]*i[1],cellSize[2]*i[2]);
 				pmin=pt-halfSize; pmax=pt+halfSize;
-				if(pmin[0]<=cellMax[0] && pmax[0]>=cellMin[0] &&
-					pmin[1]<=cellMax[1] && pmax[1]>=cellMin[1] &&
-					pmin[2]<=cellMax[2] && pmax[2]>=cellMin[2]) {
+				if(pmin[0]<=cellSize[0] && pmax[0]>=0 &&
+					pmin[1]<=cellSize[1] && pmax[1]>=0 &&
+					pmin[2]<=cellSize[2] && pmax[2]>=0) {
 					glPushMatrix();
 						glTranslatev(pt);
 						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);

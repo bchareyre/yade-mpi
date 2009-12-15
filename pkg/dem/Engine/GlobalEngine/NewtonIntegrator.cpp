@@ -66,9 +66,8 @@ void NewtonIntegrator::action(Scene*)
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
-	if(scene->isPeriodic && (prevCellMax!=scene->cellMax || prevCellMin!=scene->cellMin)){ cellChanged=true; maxVelocitySq=(prevCellMax-prevCellMin-(scene->cellMax-scene->cellMin)).SquaredLength()/pow(dt,2); }
+	if(scene->isPeriodic && (prevCellSize!=scene->cellSize)){ cellChanged=true; maxVelocitySq=(prevCellSize-scene->cellSize).SquaredLength()/pow(dt,2); }
 	else { maxVelocitySq=0; cellChanged=false; }
-	prevCellSize=prevCellMax-prevCellMin; cellSize=scene->cellMax-scene->cellMin;
 	haveBins=(bool)velocityBins;
 	if(haveBins) velocityBins->binVelSqInitialize(maxVelocitySq);
 
@@ -152,7 +151,7 @@ void NewtonIntegrator::action(Scene*)
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }
 	#endif
 	if(haveBins) velocityBins->binVelSqFinalize();
-	if(scene->isPeriodic) { prevCellMax=scene->cellMax; prevCellMin=scene->cellMin; }
+	if(scene->isPeriodic) { prevCellSize=scene->cellSize; }
 }
 
 inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
@@ -162,8 +161,9 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 	// which is then used to compute new position x=ξ(x₁-x₀)+x₀. (per component)
 	// Then we update either velocity by (x-x')/Δt (homotheticCellResize==1)
 	//   or position by (x-x') (homotheticCellResize==2)
-	Vector3r dPos;
-	if(cellChanged && homotheticCellResize){ for(int i=0; i<3; i++) dPos[i]=((state->pos[i]-prevCellMin[i])/(prevCellSize[i]))*cellSize[i]+scene->cellMin[i]-state->pos[i]; }
+	// FIXME: wrap state->pos first, then apply the shift; otherwise result might be garbage
+	Vector3r dPos(Vector3r::ZERO); // initialize to avoid warning; find way to avoid it in a better way
+	if(cellChanged && homotheticCellResize){ for(int i=0; i<3; i++) dPos[i]=(state->pos[i]/prevCellSize[i])*scene->cellSize[i]-state->pos[i]; }
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
 	state->vel+=dt*state->accel;                             if(homotheticCellResize==1) state->vel+=dPos/dt;
 	state->pos += state->vel*dt + scene->bex.getMove(id);    if(homotheticCellResize==2) state->pos+=dPos;

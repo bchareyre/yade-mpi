@@ -19,7 +19,7 @@ for i in xrange(250):
 	O.bodies.append(utils.sphere(Vector3(10*random.random(),10*random.random(),10*random.random()),.5+random.random()))
 cubeSize=20
 # absolute positioning of the cell is not important
-O.periodicCell=((-.5*cubeSize,-.5*cubeSize,0),(.5*cubeSize,.5*cubeSize,cubeSize))
+O.periodicCell=Vector3(cubeSize,cubeSize,cubeSize)
 O.dt=utils.PWaveTimeStep()
 O.saveTmp()
 from yade import qt
@@ -28,12 +28,10 @@ step=.01
 O.run(200,True)
 for i in range(0,250):
 	O.run(200,True)
-	mn,mx=O.periodicCell
-	step=(mx-mn); step=Vector3(.002*step[0],.002*step[1],.002*step[2])
-	O.periodicCell=mn+step,mx-step
+	O.periodicCell=O.periodicCell*.998
 	if (i%10==0):
 		F,stiff=utils.totalForceInVolume()
-		dim=mx-mn; A=Vector3(dim[1]*dim[2],dim[0]*dim[2],dim[0]*dim[1])
+		dim=O.periodicCell; A=Vector3(dim[1]*dim[2],dim[0]*dim[2],dim[0]*dim[1])
 		avgStress=sum([F[i]/A[i] for i in 0,1,2])/3.
 		print 'strain',(cubeSize-dim[0])/cubeSize,'avg. stress ',avgStress,'unbalanced ',utils.unbalancedForce()
 #O.timingEnabled=True; timing.reset(); O.run(200000,True); timing.stats()

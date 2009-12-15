@@ -38,7 +38,7 @@ class Interaction : public Serializable
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 
-		/*! relative distance between bodies, given in (Scene::cellMax-Scene::cellMin) units
+		/*! relative distance between bodies, given in (Scene::cellSize) units
 			Position of id1 must be incremented by that distance so that there is spatial interaction 
 
 			NOTE (tricky): cellDist must survive Interaction::reset(), it is only initialized in ctor

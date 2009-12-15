@@ -39,8 +39,8 @@ class OpenGLRenderingEngine : public RenderingEngine
 		Real normSaw(Real t, Real period){ Real xi=(t-period*((int)(t/period)))/period; /* normalized value, (0-1〉 */ return (xi<.5?2*xi:2-2*xi); }
 		Real normSquare(Real t, Real period){ Real xi=(t-period*((int)(t/period)))/period; /* normalized value, (0-1〉 */ return (xi<.5?0:1); }
 
-		//! wrap number to interval x0…x1
-		Real wrapCell(const Real x, const Real x0, const Real x1);
+		//! wrap number to interval 0…x1
+		Real wrapCell(const Real x, const Real x1);
 		//! wrap point to inside Scene's cell (identity if !Scene::isPeriodic)
 		Vector3r wrapCellPt(const Vector3r& pt, Scene* rb);
 		void drawPeriodicCell(Scene*);

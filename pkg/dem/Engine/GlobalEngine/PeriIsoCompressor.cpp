@@ -33,7 +33,7 @@ void PeriIsoCompressor::action(Scene* rb){
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
 	const long& step=rb->currentIteration;
-	Vector3r cellSize=rb->cellMax-rb->cellMin; //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
+	Vector3r cellSize=rb->cellSize; //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	Real minSize=min(cellSize[0],min(cellSize[1],cellSize[2])), maxSize=max(cellSize[0],max(cellSize[1],cellSize[2]));
 	if(minSize<2.1*maxSpan){ throw runtime_error("Minimum cell size is smaller than 2.1*span_of_the_biggest_body! (periodic collider requirement)"); }
@@ -42,7 +42,7 @@ void PeriIsoCompressor::action(Scene* rb){
 		sigma=-Vector3r(sumForces[0]/cellArea[0],sumForces[1]/cellArea[1],sumForces[2]/cellArea[2]);
 		LOG_TRACE("Updated sigma="<<sigma<<", avgStiffness="<<avgStiffness);
 	}
-	Real sigmaGoal=stresses[state]; assert(sigmaGoal>0);
+	Real sigmaGoal=stresses[state]; assert(sigmaGoal<0);
 	// expansion of cell in this step (absolute length)
 	Vector3r cellGrow(Vector3r::ZERO);
 	// is the stress condition satisfied in all directions?
@@ -72,7 +72,7 @@ void PeriIsoCompressor::action(Scene* rb){
 		}
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
-	rb->cellMin-=.5*cellGrow; rb->cellMax+=.5*cellGrow;
+	rb->cellSize+=cellGrow;
 	// handle state transitions
 	if(allStressesOK){
 		if((step%globalUpdateInt)==0) currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,rb);
@@ -91,7 +91,7 @@ void PeriIsoCompressor::action(Scene* rb){
 
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
-	const Vector3r cellSize(scene->cellMax-scene->cellMin);
+	const Vector3r& cellSize(scene->cellSize);
 	for(int i=0; i<3; i++) strain[i]=(cellSize[i]-refSize[i])/refSize[i];
 	// stress and stiffness
 	Vector3r sumForce(Vector3r::ZERO), sumStiff(Vector3r::ZERO), sumLength(Vector3r::ZERO);
@@ -122,7 +122,7 @@ CREATE_LOGGER(PeriTriaxController);
 
 void PeriTriaxController::action(Scene* scene){
 	if(!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
-	Vector3r cellSize=scene->cellMax-scene->cellMin;
+	const Vector3r& cellSize=scene->cellSize;
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
 	if(refSize[0]<0) refSize=cellSize;
@@ -182,7 +182,7 @@ void PeriTriaxController::action(Scene* scene){
 		if(stiff[axis]>0) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]); //-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
 	// change cell size now
-	scene->cellMax+=cellGrow;
+	scene->cellSize+=cellGrow;
 	strainRate=cellGrow/scene->dt;
 
 	if(allOk){

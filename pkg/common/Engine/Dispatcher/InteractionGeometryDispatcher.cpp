@@ -48,7 +48,7 @@ void InteractionGeometryDispatcher::action(Scene*){
 	updateScenePtr();
 
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cellMax-scene->cellMin;
+	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cellSize;
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();

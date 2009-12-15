@@ -24,7 +24,7 @@ O.bodies.append(utils.sphere([0,-2,5.5],2))
 O.bodies.append(utils.sphere([0,2,5.5],2))
 O.bodies.appendClumped([utils.sphere([0,4,8],.8),utils.sphere([0,5,7],.6)])
 # sets up the periodic cell
-O.periodicCell=((-5,-5,0),(5,5,10))
+O.periodicCell=Vector3(10,10,10)
 O.dt=.1*utils.PWaveTimeStep()
 O.saveTmp()
 from yade import qt

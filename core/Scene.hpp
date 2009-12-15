@@ -65,7 +65,7 @@ class Scene: public Serializable{
 		long stopAtIteration;
 		Real stopAtVirtTime;
 		Real stopAtRealTime;
-		Vector3r cellMin, cellMax;
+		Vector3r cellSize;
 		bool isPeriodic;
 
 		bool needsInitializers;
@@ -87,8 +87,7 @@ class Scene: public Serializable{
 		(currentIteration)
 		(simulationTime)
 		(stopAtIteration)
-		(cellMin)
-		(cellMax)
+		(cellSize)
 		(isPeriodic)
 	);
 	REGISTER_CLASS_AND_BASE(Scene,Serializable);

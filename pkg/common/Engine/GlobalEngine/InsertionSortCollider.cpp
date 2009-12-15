@@ -214,7 +214,7 @@ void InsertionSortCollider::action(Scene* rb){
 					BBj[i].coord=((BBj[i].flags.hasBB=((bool)bv)) ? (BBj[i].flags.isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
 				} else { BBj[i].flags.hasBB=false; /* for vanished body, keep the coordinate as-is, to minimize inversions. */ }
 				// if initializing periodic, shift coords & record the period into BBj[i].period
-				if(doInitSort && periodic) BBj[i].coord=cellWrap(BBj[i].coord,BBj.cellMin,BBj.cellMax,BBj[i].period);
+				if(doInitSort && periodic) BBj[i].coord=cellWrap(BBj[i].coord,0,BBj.cellDim,BBj[i].period);
 			}	
 		}
 	// for each body, copy its minima and maxima, for quick checks of overlaps later
@@ -296,7 +296,7 @@ Real InsertionSortCollider::cellWrap(const Real x, const Real x0, const Real x1,
 	return x0+(xNorm-period)*(x1-x0);
 }
 
-// return coordinate wrapped to x0…x1, relative to x0; don't care about period
+// return coordinate wrapped to 0…x1, relative to x0; don't care about period
 Real InsertionSortCollider::cellWrapRel(const Real x, const Real x0, const Real x1){
 	Real xNorm=(x-x0)/(x1-x0);
 	return (xNorm-floor(xNorm))*(x1-x0);
@@ -309,7 +309,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 		const long i=v.norm(_i);
 		const long i_1=v.norm(i-1);
 		//switch period of (i) if the coord is below the lower edge cooridnate-wise and just above the split
-		if(i==loIdx && v[i].coord<v.cellMin){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+		if(i==loIdx && v[i].coord<0){ v[i].period-=1; v[i].coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 		// coordinate of v[i] used to check inversions
 		// if crossing the split, adjust by cellDim;
 		// if we get below the loIdx however, the v[i].coord will have been adjusted already, no need to do that here
@@ -323,7 +323,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 			long j1=v.norm(j+1);
 			// OK, now if many bodies move at the same pace through the cell and at one point, there is inversion,
 			// this can happen without any side-effects
-			if (false && v[j].coord>v.cellMax+v.cellDim){
+			if (false && v[j].coord>2*v.cellDim){
 				// this condition is not strictly necessary, but the loop of insertionSort would have to run more times.
 				// Since size of particle is required to be < .5*cellDim, this would mean simulation explosion anyway
 				LOG_FATAL("Body #"<<v[j].id<<" going faster than 1 cell in one step? Not handled.");
@@ -332,7 +332,7 @@ void InsertionSortCollider::insertionSortPeri(VecBounds& v, InteractionContainer
 			Bounds& vNew(v[j1]); // elt at j+1 being overwritten by the one at j and adjusted
 			vNew=v[j];
 			// inversions close the the split need special care
-			if(j==loIdx && vi.coord<v.cellMin) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
+			if(j==loIdx && vi.coord<0) { vi.period-=1; vi.coord+=v.cellDim; loIdx=v.norm(loIdx+1); }
 			else if(j1==loIdx) { vNew.period+=1; vNew.coord-=v.cellDim; loIdx=v.norm(loIdx-1); }
 			if(doCollide && viHasBB && v[j].flags.hasBB){
 				if(vi.id==vNew.id){ // BUG!!
@@ -399,7 +399,7 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 	assert(periodic);
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){
-		Real dim=rb->cellMax[axis]-rb->cellMin[axis];
+		Real dim=rb->cellSize[axis];
 		// too big bodies in interaction
 		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
 		// find body of which when taken as period start will make the gap smaller

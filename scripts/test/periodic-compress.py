@@ -1,7 +1,7 @@
-O.periodicCell=(0,0,0),(20,20,10)
+O.periodicCell=Vector3(20,20,10)
 from yade import pack,log,timing
 p=pack.SpherePack()
-p.makeCloud(O.periodicCell[0],O.periodicCell[1],1,.5,700,True)
+p.makeCloud(Vector3().ZERO,O.periodicCell,1,.5,700,True)
 for sph in p:
 	O.bodies.append(utils.sphere(sph[0],sph[1]))
 

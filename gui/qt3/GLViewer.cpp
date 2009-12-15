@@ -331,8 +331,8 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 void GLViewer::centerPeriodic(){
 	Scene* rb=Omega::instance().getScene().get();
 	assert(rb->isPeriodic);
-	Vector3r center=.5*(rb->cellMin+rb->cellMax);
-	Vector3r halfSize=.5*(rb->cellMax-rb->cellMin);
+	Vector3r center=.5*rb->cellSize;
+	Vector3r halfSize=.5*rb->cellSize;
 	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2]));
 	LOG_DEBUG("Periodic scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
 	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));

@@ -80,7 +80,7 @@ sp.cellSize=sphDict['cell']
 import numpy
 avgRadius=numpy.average([r for c,r in sp])
 O.bodies.append([utils.sphere(c,r,color=utils.randomColor()) for c,r in sp])
-O.periodicCell=(Vector3(0,0,0),sp.cellSize)
+O.periodicCell=sp.cellSize
 axis=2
 ax1=(axis+1)%3
 ax2=(axis+2)%3
@@ -162,7 +162,6 @@ def stopIfDamaged():
 	# FIXME: only temporary, should be .5
 	minMaxRatio=0.5 if mode=='tension' else 0.5
 	if extremum==0: return
-	cellSize=O.periodicCell[1]-O.periodicCell[0]
 	print O.tags['id'],mode,strainer['strain'][axis],sigma[-1]
 	#print 'strain',strainer['strain'],'stress',strainer['stress']
 	import sys;	sys.stdout.flush()

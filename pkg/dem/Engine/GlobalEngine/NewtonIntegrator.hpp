@@ -50,10 +50,8 @@ class NewtonIntegrator : public GlobalEngine{
 	Quaternionr DotQ(const Vector3r& angVel, const Quaternionr& Q);
 	inline void blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v);
 	inline void blockRotateDOFs(unsigned blockedDOFs, Vector3r& v);
-	// cell corners from previous step, used to detect change, find max velocity and update positions if linearCellResize enabled
-	Vector3r prevCellMax, prevCellMin;
-	// cache sizes, recomputed before the loop at every step
-	Vector3r prevCellSize, cellSize;
+	// cell size from previous step, used to detect change, find max velocity and update positions if linearCellResize enabled
+	Vector3r prevCellSize;
 	// whether the cell has changed from the previous step
 	bool cellChanged;
 

@@ -44,7 +44,7 @@ Scene::Scene():
 	dt=1e-8;
 	selectedBody=-1;
 	isPeriodic=false;
-	cellMin=cellMax=Vector3r::ZERO;
+	cellSize=Vector3r::ZERO;
 	// FIXME: move SceneShape to core and create it here right away
 	// shape=shared_ptr<Shape>(new SceneShape);
 

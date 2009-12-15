@@ -521,15 +521,13 @@ class pyOmega{
 		oa << YadeSimulation;
 	}
 	#endif
-	void periodicCell_set(python::tuple& t){
-		if(python::len(t)==2){ OMEGA.getScene()->cellMin=python::extract<Vector3r>(t[0]); OMEGA.getScene()->cellMax=python::extract<Vector3r>(t[1]); OMEGA.getScene()->isPeriodic=true; }
-		else if (python::len(t)==0) {OMEGA.getScene()->isPeriodic=false; }
-		else throw invalid_argument("Must pass either 2 Vector3's to set periodic cell,  or () to disable periodicity (got "+lexical_cast<string>(python::len(t))+" instead).");
+	void periodicCell_set(Vector3r& size){
+		if(size[0]>0 && size[1]>0 && size[2]>0) { OMEGA.getScene()->cellSize=size; OMEGA.getScene()->isPeriodic=true; }
+		else {OMEGA.getScene()->isPeriodic=false; }
 	}
-	python::tuple periodicCell_get(){
-		vector<Vector3r> ret;
-		if(OMEGA.getScene()->isPeriodic){ return python::make_tuple(OMEGA.getScene()->cellMin,OMEGA.getScene()->cellMax); }
-		return python::make_tuple();
+	Vector3r periodicCell_get(){
+		if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cellSize;
+		return Vector3r(-1,-1,-1);
 	}
 	void disableGdb(){
 		signal(SIGSEGV,SIG_DFL);

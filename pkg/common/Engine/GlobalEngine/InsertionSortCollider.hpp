@@ -53,7 +53,7 @@ It seems to affect body selection somehow, but that is perhaps not related at al
 Periodicity control
 ===================
 c++:
-	Scene::isPeriodic, Scene::cellMin, Scene::cellMax
+	Scene::isPeriodic, Scene::cellSize
 python:
 	O.periodicCell=((0,0,0),(10,10,10)  # activates periodic boundary
 	O.periodicCell=() # deactivates periodic boundary
@@ -148,7 +148,7 @@ class InsertionSortCollider: public Collider{
 		// axis set in the ctor
 		int axis;
 		std::vector<Bounds> vec;
-		Real cellMin, cellMax, cellDim;
+		Real cellDim;
 		// cache vector size(), update at every step in action()
 		long size;
 		// index of the lowest coordinate element, before which the container wraps
@@ -159,7 +159,7 @@ class InsertionSortCollider: public Collider{
 		void updatePeriodicity(Scene* rb){
 			assert(rb->isPeriodic);
 			assert(axis>=0 && axis <=2);
-			cellMin=rb->cellMin[axis]; cellMax=rb->cellMax[axis]; cellDim=cellMax-cellMin;
+			cellDim=rb->cellSize[axis];
 		}
 		// normalize given index to the right range (wraps around)
 		long norm(long i) const { if(i<0) i+=size; long ret=i%size; assert(ret>=0 && ret<size); return ret;}
