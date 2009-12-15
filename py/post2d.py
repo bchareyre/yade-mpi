@@ -54,6 +54,7 @@ This example can be found in examples/concrete/uniax-post.py ::
  pylab.show()
 
 """
+from yade import *
 
 class Flatten:
 	"""Abstract class for converting 3d point into 2d. Used by post2d.data2d."""
