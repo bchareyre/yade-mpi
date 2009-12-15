@@ -85,7 +85,7 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	//xyPlaneConstraint->setRotationConstraint(qglviewer::AxisPlaneConstraint::FORBIDDEN,qglviewer::Vec(0,0,1));
 	manipulatedFrame()->setConstraint(NULL);
 
-	setKeyDescription(Qt::Key_C,"Set scene center to the selected body (if any)");
+	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
 	setKeyDescription(Qt::Key_C & Qt::ALT,"Set scene center to median body position");
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
 	setKeyDescription(Qt::Key_G,"Toggle grid");
@@ -117,6 +117,8 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	setKeyDescription(Qt::Key_1 & Qt::ALT,"Add/remove plane #1 (2,...) to/from the bound group");
 	setKeyDescription(Qt::Key_0,"Clear the bound group");
 	setKeyDescription(Qt::Key_Space,"Activate/deactivate the manipulated clipping plane");
+
+	centerScene();
 }
 
 void GLViewer::mouseMovesCamera(){
@@ -252,8 +254,13 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		else useDisplayParameters(n);
 	}
 	/* letters alphabetically */
-	else if(e->key()==Qt::Key_C && selectedName() >= 0 && (*(Omega::instance().getScene()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 	else if(e->key()==Qt::Key_C && (e->state() & AltButton)){ displayMessage("Median centering"); centerMedianQuartile(); }
+	else if(e->key()==Qt::Key_C){
+		// center around selected body
+		if(selectedName() >= 0 && (*(Omega::instance().getScene()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
+		// make all bodies visible
+		else centerScene();
+	}
 	else if(e->key()==Qt::Key_D &&(e->state() & AltButton)){ body_id_t id; if((id=Omega::instance().getScene()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->isDynamic=!b->isDynamic; LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
 	else if(e->key()==Qt::Key_G) {bool anyDrawn=drawGridXYZ[0]||drawGridXYZ[1]||drawGridXYZ[2]; for(int i=0; i<3; i++)drawGridXYZ[i]=!anyDrawn; }
