@@ -45,7 +45,7 @@ class Indexable
 // this macro is used by classes that are a dimension in multimethod matrix
 
 #define REGISTER_CLASS_INDEX(SomeClass,BaseClass)                                      \
-	private: static int& getClassIndexStatic() { static int index = -1; return index; } \
+	public: static int& getClassIndexStatic() { static int index = -1; return index; } \
 	public: virtual int& getClassIndex()       { return getClassIndexStatic(); }        \
 	public: virtual const int& getClassIndex() const { return getClassIndexStatic(); }  \
 	public: virtual int& getBaseClassIndex(int depth) {              \
