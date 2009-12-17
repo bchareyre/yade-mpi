@@ -11,6 +11,7 @@
 #pragma once
 
 #include"Body.hpp"
+#include"Cell.hpp"
 #include"BodyContainer.hpp"
 #include"Engine.hpp"
 #include"Material.hpp"
@@ -43,10 +44,12 @@ class Scene: public Serializable{
 
 		BexContainer bex;
 
-		vector<shared_ptr<Serializable> > miscParams; // will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)
-		//! tags like mp3 tags: author, date, version, description etc.
+		//! information on periodicity; only should be used if Scene::isPeriodic
+		Cell cell;
+		//! store for arbitrary Serializable objects; will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)
+		vector<shared_ptr<Serializable> > miscParams; 		//! tags like mp3 tags: author, date, version, description etc.
 		list<string> tags;
-		//! "hash maps" of display parameters
+		//! "hash maps" of display parameters (since yade::serialization has no support for maps, emulate it via vector of strings in format key=value)
 		vector<shared_ptr<DisplayParameters> > dispParams;
 
 		shared_ptr<GroupRelationData>           grpRelationData;
@@ -65,7 +68,6 @@ class Scene: public Serializable{
 		long stopAtIteration;
 		Real stopAtVirtTime;
 		Real stopAtRealTime;
-		Vector3r cellSize;
 		bool isPeriodic;
 
 		bool needsInitializers;
@@ -87,8 +89,8 @@ class Scene: public Serializable{
 		(currentIteration)
 		(simulationTime)
 		(stopAtIteration)
-		(cellSize)
 		(isPeriodic)
+		(cell)
 	);
 	REGISTER_CLASS_AND_BASE(Scene,Serializable);
 };

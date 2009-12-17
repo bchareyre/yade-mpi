@@ -16,7 +16,7 @@ class Sphere : public Shape
 		Real radius;
 
 		Sphere();
-		Sphere(Real _radius): radius(_radius){}
+		Sphere(Real _radius): radius(_radius){ createIndex(); }
 		virtual ~Sphere ();
 
 	REGISTER_ATTRIBUTES(Shape,(radius));

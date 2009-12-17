@@ -4,10 +4,10 @@
 from yade import *
 from yade import pack,log,qt
 #log.setLevel('PeriTriaxController',log.DEBUG)
-O.periodicCell=Vector3(.1,.1,.1)
+O.cellSize=Vector3(.1,.1,.1)
 sp=pack.SpherePack()
 radius=5e-3
-num=sp.makeCloud(Vector3().ZERO,O.periodicCell,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
+num=sp.makeCloud(Vector3().ZERO,O.cellSize,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
 O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 

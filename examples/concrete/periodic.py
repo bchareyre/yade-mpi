@@ -80,7 +80,7 @@ sp.cellSize=sphDict['cell']
 import numpy
 avgRadius=numpy.average([r for c,r in sp])
 O.bodies.append([utils.sphere(c,r,color=utils.randomColor()) for c,r in sp])
-O.periodicCell=sp.cellSize
+O.cellSize=sp.cellSize
 axis=2
 ax1=(axis+1)%3
 ax2=(axis+2)%3

@@ -1,7 +1,7 @@
-O.periodicCell=Vector3(20,20,10)
+O.cellSize=Vector3(20,20,10)
 from yade import pack,log,timing
 p=pack.SpherePack()
-p.makeCloud(Vector3().ZERO,O.periodicCell,1,.5,700,True)
+p.makeCloud(Vector3().ZERO,O.cellSize,1,.5,700,True)
 for sph in p:
 	O.bodies.append(utils.sphere(sph[0],sph[1]))
 
@@ -21,7 +21,7 @@ O.engines=[
 ]
 O.dt=utils.PWaveTimeStep()
 O.saveTmp()
-print O.periodicCell
+print O.cellSize
 from yade import qt; qt.Controller(); qt.View()
 O.run()
 O.wait()

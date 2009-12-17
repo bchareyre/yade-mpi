@@ -147,7 +147,7 @@ void InsertionSortCollider::action(Scene* rb){
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
-		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(rb); 
+		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene); 
 
 		#ifdef COLLIDE_STRIDED
 			// get the BoundDispatcher and turn it off; we will call it ourselves
@@ -399,7 +399,7 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 	assert(periodic);
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){
-		Real dim=rb->cellSize[axis];
+		Real dim=rb->cell.size[axis];
 		// too big bodies in interaction
 		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
 		// find body of which when taken as period start will make the gap smaller

@@ -91,10 +91,6 @@ class Body : public Serializable
 		/// Bound is used for quick detection of potential interactions, that can be: AABB, K-Dop
 		shared_ptr<Bound>	bound;
 
-		// for backwards-compatibility, will be removed in the future
-		__attribute__ ((deprecated)) shared_ptr<Shape>& interactingGeometry;
-		__attribute__ ((deprecated)) shared_ptr<Bound>&	boundingVolume;
-	
 		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.
 		 * It is useful for example for collision detection : if two colliding bodies are only
 		 * kinematic then it is useless to modelise their contact */

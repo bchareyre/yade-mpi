@@ -521,14 +521,20 @@ class pyOmega{
 		oa << YadeSimulation;
 	}
 	#endif
-	void periodicCell_set(Vector3r& size){
-		if(size[0]>0 && size[1]>0 && size[2]>0) { OMEGA.getScene()->cellSize=size; OMEGA.getScene()->isPeriodic=true; }
+	void cellSize_set_depr(const Vector3r& size){ LOG_WARN("O.periodicCell is deprecated (and will be removed), use O.cellSize instead."); cellSize_set(size); }
+	Vector3r cellSize_get_depr(){ LOG_WARN("O.periodicCell is deprecated (and will be removed), use O.cellSize instead."); return cellSize_get(); }
+
+	void cellSize_set(const Vector3r& size){
+		if(size[0]>0 && size[1]>0 && size[2]>0) { OMEGA.getScene()->cell.size=size; OMEGA.getScene()->isPeriodic=true; }
 		else {OMEGA.getScene()->isPeriodic=false; }
+		OMEGA.getScene()->cell.updateCache();
 	}
-	Vector3r periodicCell_get(){
-		if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cellSize;
+	Vector3r cellSize_get(){
+		if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell.size;
 		return Vector3r(-1,-1,-1);
 	}
+	void cellShear_set(const Vector3r& s){ OMEGA.getScene()->cell.shear=s; /* DO NOT FORGET!! */ OMEGA.getScene()->cell.updateCache(); }
+	Vector3r cellShear_get(){ return OMEGA.getScene()->cell.shear; }
 	void disableGdb(){
 		signal(SIGSEGV,SIG_DFL);
 		signal(SIGABRT,SIG_DFL);
@@ -733,7 +739,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
-		.add_property("periodicCell",&pyOmega::periodicCell_get,&pyOmega::periodicCell_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.")
+		.add_property("periodicCell",&pyOmega::cellSize_get_depr,&pyOmega::cellSize_set_depr,"Deprecated alias for cellSize")
+		.add_property("cellSize",&pyOmega::cellSize_get,&pyOmega::cellSize_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.")
+		.add_property("cellShear",&pyOmega::cellShear_get,&pyOmega::cellShear_set,"Get/set periodic cell shear.")
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads("Disable SEGV handler and exit."))
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION

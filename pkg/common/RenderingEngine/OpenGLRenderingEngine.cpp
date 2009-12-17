@@ -117,7 +117,7 @@ Real OpenGLRenderingEngine::wrapCell(const Real x, const Real x1){
 }
 Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, Scene* rb){
 	if(!rb->isPeriodic) return pt;
-	return Vector3r(wrapCell(pt[0],rb->cellSize[0]),wrapCell(pt[1],rb->cellSize[1]),wrapCell(pt[2],rb->cellSize[2]));
+	return Vector3r(wrapCell(pt[0],rb->cell.size[0]),wrapCell(pt[1],rb->cell.size[1]),wrapCell(pt[2],rb->cell.size[2]));
 }
 
 void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody){
@@ -144,12 +144,20 @@ void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody)
 }
 
 // draw periodic cell, if active
-void OpenGLRenderingEngine::drawPeriodicCell(Scene* rootBody){
-	if(!rootBody->isPeriodic) return;
+void OpenGLRenderingEngine::drawPeriodicCell(Scene* scene){
+	if(!scene->isPeriodic) return;
+	const Vector3r& shear(scene->cell.shear);
+	// shear center (moves when sheared)
+	Vector3r cent=scene->cell._shearTrsf*(.5*scene->cell.size);
+	// see http://www.songho.ca/opengl/gl_transform.html#matrix
+	GLdouble cellMat[16]={
+		scene->cell.size[0],shear[2],shear[1],cent[0],
+		shear[2],scene->cell.size[1],shear[0],cent[1],
+		shear[1],shear[0],scene->cell.size[2],cent[2],
+		0,0,0,1};
+	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
-		glColor3v(Vector3r(1,1,0));
-		Vector3r cent=.5*rootBody->cellSize;
-		glTranslate(cent[0],cent[1],cent[2]); glScale(rootBody->cellSize[0],rootBody->cellSize[1],rootBody->cellSize[2]);
+		glMultTransposeMatrixd(cellMat);
 		glutWireCube(1);
 	glPopMatrix();
 }
@@ -373,7 +381,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
 		if(b->bound && rootBody->isPeriodic){
-			const Vector3r& cellSize(rootBody->cellSize);
+			const Vector3r& cellSize(rootBody->cell.size);
 			// traverse all periodic cells around the body, to see if any of them touches
 			Vector3r halfSize=b->bound->max-b->bound->min; halfSize*=.5;
 			Vector3r pmin,pmax;

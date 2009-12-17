@@ -69,13 +69,13 @@ void SpherePack::toFile(const string fname) const {
 
 void SpherePack::fromSimulation() {
 	pack.clear();
-	Scene* rootBody=Omega::instance().getScene().get();
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+	Scene* scene=Omega::instance().getScene().get();
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		shared_ptr<Sphere>	intSph=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius));
 	}
-	if(rootBody->isPeriodic) { cellSize=rootBody->cellSize; }
+	if(scene->isPeriodic) { cellSize=scene->cell.size; }
 }
 
 long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, size_t num, bool periodic){

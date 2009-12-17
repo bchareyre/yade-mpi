@@ -156,10 +156,10 @@ class InsertionSortCollider: public Collider{
 		Bounds& operator[](long idx){ assert(idx<size && idx>=0); return vec[idx]; }
 		const Bounds& operator[](long idx) const { assert(idx<size && idx>=0); return vec[idx]; }
 		// update number of bodies, periodic properties and size from Scene
-		void updatePeriodicity(Scene* rb){
-			assert(rb->isPeriodic);
+		void updatePeriodicity(Scene* scene){
+			assert(scene->isPeriodic);
 			assert(axis>=0 && axis <=2);
-			cellDim=rb->cellSize[axis];
+			cellDim=scene->cell.size[axis];
 		}
 		// normalize given index to the right range (wraps around)
 		long norm(long i) const { if(i<0) i+=size; long ret=i%size; assert(ret>=0 && ret<size); return ret;}

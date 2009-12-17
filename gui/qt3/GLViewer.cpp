@@ -336,10 +336,10 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 }
 /* Center the scene such that periodic cell is contained in the view */
 void GLViewer::centerPeriodic(){
-	Scene* rb=Omega::instance().getScene().get();
-	assert(rb->isPeriodic);
-	Vector3r center=.5*rb->cellSize;
-	Vector3r halfSize=.5*rb->cellSize;
+	Scene* scene=Omega::instance().getScene().get();
+	assert(scene->isPeriodic);
+	Vector3r center=.5*scene->cell.size;
+	Vector3r halfSize=.5*scene->cell.size;
 	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2]));
 	LOG_DEBUG("Periodic scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
 	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
@@ -355,16 +355,16 @@ void GLViewer::centerPeriodic(){
  * "central" (where most bodies is) part very small or even invisible.
  */
 void GLViewer::centerMedianQuartile(){
-	Scene* rb=Omega::instance().getScene().get();
-	if(rb->isPeriodic){ centerPeriodic(); return; }
-	long nBodies=rb->bodies->size();
+	Scene* scene=Omega::instance().getScene().get();
+	if(scene->isPeriodic){ centerPeriodic(); return; }
+	long nBodies=scene->bodies->size();
 	if(nBodies<4) {
 		LOG_INFO("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
 		return centerScene();
 	}
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		for(int i=0; i<3; i++) coords[i].push_back(b->state->pos[i]);
 	}
 	Vector3r median,interQuart;
@@ -630,7 +630,10 @@ void GLViewer::postDraw(){
 		}
 		if(drawGridXYZ[0] || drawGridXYZ[1] || drawGridXYZ[2]){
 			glColor3v(Vector3r(1,1,0));
-			QGLViewer::drawText(x,y,std::string("grid: "+boost::lexical_cast<std::string>(gridStep))+(grid_subdivision?(std::string(" ,subdivision: "+boost::lexical_cast<std::string>(gridStep*0.1))):(std::string(""))));
+			ostringstream oss;
+			oss<<"grid: "<<setprecision(4)<<gridStep;
+			if(grid_subdivision) oss<<" (minor "<<setprecision(4)<<gridStep*.1<<")";
+			QGLViewer::drawText(x,y,oss.str());
 			y-=lineHt;
 		}
 	}

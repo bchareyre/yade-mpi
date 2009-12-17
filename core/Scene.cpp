@@ -33,8 +33,7 @@
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-Scene::Scene():
-	bodies(new BodyVector), interactions(new InteractionVecMap){	
+Scene::Scene(): bodies(new BodyVector), interactions(new InteractionVecMap){	
 	needsInitializers=true;
 	currentIteration=0;
 	simulationTime=0;
@@ -44,9 +43,6 @@ Scene::Scene():
 	dt=1e-8;
 	selectedBody=-1;
 	isPeriodic=false;
-	cellSize=Vector3r::ZERO;
-	// FIXME: move SceneShape to core and create it here right away
-	// shape=shared_ptr<Shape>(new SceneShape);
 
 	// fill default tags
 	struct passwd* pw;
@@ -83,6 +79,8 @@ void Scene::moveToNextTimeStep(){
 		bex.resize(bodies->size());
 		needsInitializers=false;
 	}
+	// update cell data
+	if(isPeriodic) cell.updateCache();
 	//bex.reset(); // uncomment if PhysicalActionContainerReseter is removed
 	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
