@@ -19,7 +19,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
@@ -114,7 +114,7 @@ bool STLImporterTest::generate()
 	    b->physicalParameters	= physics;
 
 	    // bounding box 
-		shared_ptr<AABB> aabb(new AABB);
+		shared_ptr<Aabb> aabb(new Aabb);
 		aabb->diffuseColor		= Vector3r(0,1,0);
 		b->bound	= aabb;
 	    
@@ -153,7 +153,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
@@ -208,8 +208,8 @@ void STLImporterTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingFacet2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Facet_Aabb");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -283,7 +283,7 @@ void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<SceneShape> set(new SceneShape());
 	set->diffuseColor			= Vector3r(0,0,1);
 	
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
 	rootBody->shape		= YADE_PTR_CAST<Shape>(set);	

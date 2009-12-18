@@ -25,7 +25,7 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/BoxModel.hpp>
 	#include<yade/pkg-common/SphereModel.hpp>
@@ -363,7 +363,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	//shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
@@ -416,7 +416,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->isDynamic			= false;
 
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(1,0,0);
 	body->bound		= aabb;
 	
@@ -500,10 +500,10 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingBox2AABB");
-	boundDispatcher->add("InteractingFacet2AABB");
-	boundDispatcher->add("Wall2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Box_Aabb");
+	boundDispatcher->add("Bo1_Facet_Aabb");
+	boundDispatcher->add("Bo1_Wall_Aabb");
 		
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

@@ -61,7 +61,7 @@ O.dt=utils.PWaveTimeStep()
 
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],

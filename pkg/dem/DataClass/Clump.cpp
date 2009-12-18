@@ -46,7 +46,7 @@ Clump::Clump(): Body(){
 
 	// these will not be defined for the moment...
 #if 0
-	bound=shared_ptr<AABB>(new AABB);
+	bound=shared_ptr<Aabb>(new Aabb);
 	bound->diffuseColor=Vector3r(1,0,0);
 
 	shape=shared_ptr<Shape>(new Shape);

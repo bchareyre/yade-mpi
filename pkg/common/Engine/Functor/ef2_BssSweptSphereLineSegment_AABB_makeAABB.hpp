@@ -19,7 +19,7 @@ class ef2_BssSweptSphereLineSegment_AABB_makeAABB : public BoundFunctor
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body*	);
-                FUNCTOR2D(BssSweptSphereLineSegment,AABB);
+                FUNCTOR2D(BssSweptSphereLineSegment,Aabb);
                 REGISTER_CLASS_NAME(ef2_BssSweptSphereLineSegment_AABB_makeAABB);
 	        REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };

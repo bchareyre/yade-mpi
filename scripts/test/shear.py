@@ -8,7 +8,7 @@ O.bodies.append([
 	utils.sphere([0,0,1],.5000001,dynamic=True,color=(0,0,1))
 ])
 O.engines=[
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),

@@ -32,7 +32,7 @@ O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
 
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(label='collider'),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],

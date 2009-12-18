@@ -13,9 +13,9 @@
 
 /*! \brief Abstract interface for all bounding volumes.
 
-	All the bounding volumes (BoundingSphere, AABB ...) derive from this class. A bounding volume is used to speed up the
+	All the bounding volumes (BoundingSphere, Aabb ...) derive from this class. A bounding volume is used to speed up the
 	collision detection. Instead of computing if 2 complex polyhedrons collide each other, it is much faster to first test
-	if their bounding volumes (for example a AABB) are in collision.
+	if their bounding volumes (for example a Aabb) are in collision.
 */
 
 class Bound : public Serializable, public Indexable

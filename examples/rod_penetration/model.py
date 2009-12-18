@@ -45,7 +45,7 @@ o.dt=0.0001
 
 ## Initializers 
 o.initializers=[
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()])
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 	]
 
 ## Engines 
@@ -55,8 +55,8 @@ o.engines=[
 
 	## Associates bounding volume to each body.
 	BoundDispatcher([
-		InteractingSphere2AABB(),
-		InteractingFacet2AABB(),
+		Bo1_Sphere_Aabb(),
+		Bo1_Facet_Aabb(),
 	]),
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),

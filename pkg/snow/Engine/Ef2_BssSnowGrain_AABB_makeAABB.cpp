@@ -9,12 +9,12 @@
 #include"Ef2_BssSnowGrain_AABB_makeAABB.hpp"
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 YADE_REQUIRE_FEATURE(geometricalmodel);
 void Ef2_BssSnowGrain_AABB_makeAABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b)
 {
 	BssSnowGrain* bss = static_cast<BssSnowGrain*>(cm.get());
-	AABB* aabb = static_cast<AABB*>(bv.get());
+	Aabb* aabb = static_cast<Aabb*>(bv.get());
 
 /*
 	public:

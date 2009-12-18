@@ -5,11 +5,11 @@
 #
 
 O.initializers=[
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	]
 O.engines=[
 	# physical actions will not be needed until the contact law comes in;
-	# therefore it can run in parallel with the AABB engines and collider;
+	# therefore it can run in parallel with the Aabb engines and collider;
 	# but since collider depends on AABBs, they will run sequentially, one after another
 	#
 	# ParallelEngine takes list of engines, which are run in parallel;
@@ -28,7 +28,7 @@ O.engines=[
 		# BexResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
 		BexResetter(),
 		# Engines within the group will be run serially, however
-		[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),	PersistentSAPCollider(),]
+		[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),	PersistentSAPCollider(),]
 	]),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),

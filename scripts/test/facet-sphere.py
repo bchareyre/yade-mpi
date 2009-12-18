@@ -4,7 +4,7 @@
 # Test case for sphere-facet interaction.
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(

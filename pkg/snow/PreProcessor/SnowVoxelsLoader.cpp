@@ -20,7 +20,7 @@
 #include<yade/pkg-dem/TriaxialStateRecorder.hpp>
 
 #include<yade/pkg-common/BoxModel.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -381,7 +381,7 @@ void SnowVoxelsLoader::createActors(shared_ptr<Scene>& rootBody)
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add("Ef2_BssSnowGrain_AABB_makeAABB");
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Box_Aabb");
 
 	
 
@@ -520,7 +520,7 @@ void SnowVoxelsLoader::positionRootBody(shared_ptr<Scene>& rootBody)
 	
 	set->diffuseColor		= Vector3r(0,0,1);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
 	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	
@@ -533,7 +533,7 @@ void SnowVoxelsLoader::create_grain(shared_ptr<Body>& body, Vector3r position, b
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<BshSnowGrain> gSnowGrain(grain);
 	
 
@@ -581,7 +581,7 @@ void SnowVoxelsLoader::create_box(shared_ptr<Body>& body, Vector3r position, Vec
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Box> iBox(new Box);
 	
 	Quaternionr q;

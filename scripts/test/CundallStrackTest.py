@@ -8,7 +8,7 @@ o=Omega()
 
 o.initializers=[
 	
-	BoundDispatcher([InteractingSphere2AABB()])
+	BoundDispatcher([Bo1_Sphere_Aabb()])
 ]
 
 
@@ -17,7 +17,7 @@ o.engines=[
 	BexResetter(),
 	
 	BoundDispatcher([
-		InteractingSphere2AABB(),
+		Bo1_Sphere_Aabb(),
 	]),
 	
 	InsertionSortCollider(),

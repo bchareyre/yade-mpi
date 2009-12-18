@@ -27,7 +27,7 @@
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
 #include<yade/pkg-common/BoxModel.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -375,7 +375,7 @@ void SnowCreepTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
@@ -427,7 +427,7 @@ void SnowCreepTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
 	
@@ -501,8 +501,8 @@ void SnowCreepTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Box_Aabb");
 
 	
 
@@ -645,7 +645,7 @@ void SnowCreepTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	
 	set->diffuseColor		= Vector3r(0,0,1);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
 	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	

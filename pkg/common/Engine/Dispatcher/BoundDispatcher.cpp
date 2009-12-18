@@ -12,7 +12,7 @@
 
 
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
 
 CREATE_LOGGER(BoundDispatcher);
@@ -40,12 +40,12 @@ void BoundDispatcher::action(Scene*)
 			operator()(ig,b->bound,b->state->se3,b.get());
 		#endif
 		if(sweepDist>0){
-			AABB* aabb=YADE_CAST<AABB*>(b->bound.get());
+			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
 			aabb->halfSize+=Vector3r(sweepDist,sweepDist,sweepDist);
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
 		}
 		if(haveBins){
-			AABB* aabb=YADE_CAST<AABB*>(b->bound.get());
+			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
 			Real sweep=velocityBins->bins[velocityBins->bodyBins[b->getId()]].maxDist;
 			aabb->halfSize+=Vector3r(sweep,sweep,sweep);
 			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;

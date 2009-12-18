@@ -9,7 +9,7 @@ for sph in p:
 O.timingEnabled=True
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom()],

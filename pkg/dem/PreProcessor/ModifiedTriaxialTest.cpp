@@ -29,7 +29,7 @@ YADE_REQUIRE_FEATURE(CGAL)
 #include <yade/pkg-dem/WallStressRecorder.hpp>
 
 #include<yade/pkg-common/BoxModel.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -378,7 +378,7 @@ void ModifiedTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
@@ -428,7 +428,7 @@ void ModifiedTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
 	
@@ -494,8 +494,8 @@ void ModifiedTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Box_Aabb");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -629,7 +629,7 @@ void ModifiedTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	
 	set->diffuseColor		= Vector3r(0,0,1);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
 	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	

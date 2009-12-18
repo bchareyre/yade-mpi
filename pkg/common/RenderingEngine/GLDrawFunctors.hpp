@@ -24,7 +24,7 @@ struct GLViewInfo{
 	Real sceneRadius;
 };
 
-class GlBoundFunctor: public Functor1D<void, TYPELIST_1(const shared_ptr<Bound>&)> {
+class GlBoundFunctor: public Functor1D<void, TYPELIST_2(const shared_ptr<Bound>&, Scene*)> {
 	public:
 		virtual ~GlBoundFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };

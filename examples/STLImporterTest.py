@@ -37,7 +37,7 @@ O.engines=[
 	## Resets forces and momenta the act on bodies
 	BexResetter(),
 	## Associates bounding volume to each body.
-	BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),
 	## Interactions

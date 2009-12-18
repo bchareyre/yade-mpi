@@ -18,7 +18,7 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/SphereModel.hpp>
 	#include<yade/pkg-common/BoxModel.hpp>
@@ -290,7 +290,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<SphereModel> gSphere(new SphereModel);
 // 	#endif
@@ -345,7 +345,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 
 	shared_ptr<Box> iBox(new Box);
 	
@@ -400,8 +400,8 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add(cohesiveFrictionalRelationships);
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Box_Aabb");
 
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
@@ -484,7 +484,7 @@ void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	Quaternionr q;
 	q.FromAxisAngle( Vector3r(0,0,1),0);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 }
 

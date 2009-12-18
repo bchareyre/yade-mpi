@@ -2,11 +2,11 @@
 # -*- encoding=utf-8 -*-
 o=Omega() 
 o.initializers=[
-		BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()])
+		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
 ]
 o.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],

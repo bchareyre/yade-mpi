@@ -33,7 +33,7 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 #include<yade/core/BodyVector.hpp>
 #include<yade/pkg-common/DisplacementEngine.hpp>
@@ -1080,7 +1080,7 @@ void LatticeExample::positionRootBody(shared_ptr<Scene>& rootBody)
 
 	set->diffuseColor		= Vector3r(0,0,1);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 
 	shared_ptr<GeometricalModel> gm = YADE_PTR_CAST<GeometricalModel>(ClassFactory::instance().createShared("LatticeSetGeometry"));

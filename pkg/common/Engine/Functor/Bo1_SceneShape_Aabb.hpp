@@ -16,7 +16,7 @@ class DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSim
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body* );
-	FUNCTOR2D(SceneShape,AABB);
+	FUNCTOR2D(SceneShape,Aabb);
 	REGISTER_CLASS_NAME(DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely);
 	REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };

@@ -61,7 +61,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 		DynLibDispatcher< InteractionPhysics  , GlInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
 
 		DynLibDispatcher< State  , GlStateFunctor,               void , TYPELIST_1(const shared_ptr<State>&) > stateDispatcher;
-		DynLibDispatcher< Bound      , GlBoundFunctor,      void , TYPELIST_1(const shared_ptr<Bound>&) > boundDispatcher;
+		DynLibDispatcher< Bound      , GlBoundFunctor,      void , TYPELIST_2(const shared_ptr<Bound>&, Scene*) > boundDispatcher;
 		DynLibDispatcher< Shape , GlShapeFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > shapeDispatcher;
 
 		vector<vector<string> >

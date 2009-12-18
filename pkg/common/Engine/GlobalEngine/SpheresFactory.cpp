@@ -8,7 +8,7 @@
 
 #include<boost/random.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>
 #ifdef YADE_GEOMETRICALMODEL
@@ -146,7 +146,7 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;

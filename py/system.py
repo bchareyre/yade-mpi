@@ -84,6 +84,12 @@ _deprecated={
 	'InteractingFacet':'Facet', # Sun Dec 13 21:15:07 2009, vaclav@flux
 	'InteractingBox':'Box', # Sun Dec 13 21:15:16 2009, vaclav@flux
 	'MetaInteractingGeometry2AABB':'DontUseClass_MetaInteractingGeometry2AABB__youCanRemoveItSafelyFromYourSimulation_itWillBeRemovedInTheFutureCompletely', # Mon Dec 14 09:33:20 2009, vaclav@flux
+	'InteractingSphere2AABB':'Bo1_Sphere_Aabb', # Thu Dec 17 08:59:29 2009, vaclav@falx
+	'InteractingFacet2AABB':'Bo1_Facet_Aabb', # Thu Dec 17 08:59:56 2009, vaclav@falx
+	'InteractingBox2AABB':'Bo1_Box_Aabb', # Thu Dec 17 09:00:14 2009, vaclav@falx
+	'Wall2AABB':'Bo1_Wall_Aabb', # Thu Dec 17 09:01:07 2009, vaclav@falx
+	'AABB':'Aabb', # Thu Dec 17 09:01:35 2009, vaclav@falx
+	'GLDrawAABB':'Gl1_Aabb', # Thu Dec 17 09:07:58 2009, vaclav@falx
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

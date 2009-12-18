@@ -11,7 +11,7 @@
 
 
 #include<yade/pkg-common/SceneShape.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<limits>
 

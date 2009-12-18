@@ -11,7 +11,7 @@
 #include<yade/core/Body.hpp>
 
 #include<yade/pkg-common/SceneShape.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
 #ifdef YADE_GEOMETRICALMODEL
@@ -23,8 +23,8 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
-#include<yade/pkg-common/InteractingSphere2AABB.hpp>
-#include<yade/pkg-common/InteractingBox2AABB.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
@@ -32,8 +32,8 @@
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 //#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
-/*class InteractingSphere2AABB;
-class InteractingBox2AABB;
+/*class Bo1_Sphere_Aabb;
+class Bo1_Box_Aabb;
 class SceneShape; */
 
 
@@ -198,8 +198,8 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	rootBody->initializers.clear();
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new InteractingSphere2AABB);
-	boundDispatcher->add(new InteractingBox2AABB);
+	boundDispatcher->add(new Bo1_Sphere_Aabb);
+	boundDispatcher->add(new Bo1_Box_Aabb);
 	boundDispatcher->add(new TetraAABB);
 	rootBody->initializers.push_back(boundDispatcher);
 
@@ -269,7 +269,7 @@ shared_ptr<Body> Shop::sphere(Vector3r center, Real radius, shared_ptr<Material>
 	body->state->pos=center;
 	body->state->mass=4.0/3.0*Mathr::PI*radius*radius*radius*body->material->density;
 	body->state->inertia=Vector3r(2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius,2.0/5.0*body->state->mass*radius*radius);
-	body->bound=shared_ptr<AABB>(new AABB);
+	body->bound=shared_ptr<Aabb>(new Aabb);
 	body->shape=shared_ptr<Sphere>(new Sphere(radius));
 	return body;
 }
@@ -283,7 +283,7 @@ shared_ptr<Body> Shop::box(Vector3r center, Vector3r extents, shared_ptr<Materia
 	Real mass=8.0*extents[0]*extents[1]*extents[2]*body->material->density;
 	body->state->mass=mass;
 	body->state->inertia=Vector3r(mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
-	body->bound=shared_ptr<AABB>(new AABB);
+	body->bound=shared_ptr<Aabb>(new Aabb);
 	body->shape=shared_ptr<Box>(new Box(extents));
 	return body;
 }
@@ -298,7 +298,7 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 	body->state->pos=centroid;
 	body->state->mass=body->material->density*TetrahedronVolume(v);
 	// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
-	body->bound=shared_ptr<AABB>(new AABB);
+	body->bound=shared_ptr<Aabb>(new Aabb);
 	body->shape=shared_ptr<TetraMold>(new TetraMold(v[0],v[1],v[2],v[3]));
 	// make local axes coincident with principal axes
 	TetrahedronWithLocalAxesPrincipal(body);
@@ -432,7 +432,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(body_id_t id1, body_id_t
 	if(!physMeta) throw runtime_error("No InteractionPhysicsDispatcher in engines or inside InteractionDispatchers.");
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2,/*force*/force);
-	assert(force || i);
+	assert(force && i);
 	if(!i) return i;
 	physMeta->explicitAction(b1->material,b2->material,i);
 	rb->interactions->insert(i);

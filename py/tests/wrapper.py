@@ -69,7 +69,7 @@ class TestObjectInstantiation(unittest.TestCase):
 	##
 	def testWrongFunctorType(self):
 		# dispatchers accept only correct functors
-		self.assertRaises(TypeError,lambda: LawDispatcher([InteractingSphere2AABB()]))
+		self.assertRaises(TypeError,lambda: LawDispatcher([Bo1_Sphere_Aabb()]))
 	def testInvalidAttr(self):
 		# accessing invalid attributes raises KeyError
 		self.assertRaises(KeyError,lambda: Sphere(attributeThatDoesntExist=42))

@@ -7,7 +7,7 @@ O.bodies.append([
 ])
 O.engines=[
 	BoundDispatcher([
-		InteractingSphere2AABB(),InteractingFacet2AABB(),Wall2AABB()
+		Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()
 	]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([

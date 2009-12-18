@@ -1,10 +1,10 @@
 #!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 
-O.initializers=[BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),])]
+O.initializers=[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),])]
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],

@@ -39,7 +39,7 @@ class UniaxialStrainer: public GlobalEngine {
 		//! Flag whether the sense of straining has already been reversed
 		bool notYetReversed;
 		Real sumPosForces,sumNegForces;
-		//! crossSection perpendicular to he strained axis, computed from AABB of Scene
+		//! crossSection perpendicular to he strained axis, computed from Aabb of Scene
 		Real crossSectionArea;		//! Apply strain along x (0), y (1) or z(2) axis
 		//! The axis which is strained (0,1,2 for x,y,z)
 		int axis;

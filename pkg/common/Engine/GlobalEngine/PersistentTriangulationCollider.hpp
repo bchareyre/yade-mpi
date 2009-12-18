@@ -38,8 +38,8 @@ class PersistentTriangulationCollider : public Collider
 		struct AABBBound
 		{
 			AABBBound(int i, char l) : id(i),lower(l) {};
-			int		id;		// AABB of the "id" shpere
-			char		lower;		// is it the lower or upper bound of the AABB
+			int		id;		// Aabb of the "id" shpere
+			char		lower;		// is it the lower or upper bound of the Aabb
 			Real		value;		// value of the bound
 		};
 		// strucuture that compare 2 AABBBounds => used in the sort algorithm
@@ -52,28 +52,28 @@ class PersistentTriangulationCollider : public Collider
 		};
 
 	protected :
-		/// number of potential interactions = number of interacting AABB
+		/// number of potential interactions = number of interacting Aabb
 		int nbPotentialInteractions;
 
-		/// number of AABB
+		/// number of Aabb
 		unsigned int nbObjects;
 
-		/// AABB extremity of the sphere number "id" projected onto the X axis
+		/// Aabb extremity of the sphere number "id" projected onto the X axis
 		vector<shared_ptr<AABBBound> > xBounds;
 
-		/// AABB extremity of the sphere number "id" projected onto the Y axis
+		/// Aabb extremity of the sphere number "id" projected onto the Y axis
 		vector<shared_ptr<AABBBound> > yBounds;
 
-		/// AABB extremity of the sphere number "id" projected onto the Z axis
+		/// Aabb extremity of the sphere number "id" projected onto the Z axis
 		vector<shared_ptr<AABBBound> > zBounds;
 
-		// collection of AABB that are in interaction
+		// collection of Aabb that are in interaction
 		//protected : vector< set<unsigned int> > overlappingBB;
 		shared_ptr<InteractionContainer> interactions;
-		/// upper right corner of the AABB of the objects =>  for spheres = center[i]-radius
+		/// upper right corner of the Aabb of the objects =>  for spheres = center[i]-radius
 		vector<Real> maxima;
 
-		/// lower left corner of the AABB of the objects =>  for spheres = center[i]+radius
+		/// lower left corner of the Aabb of the objects =>  for spheres = center[i]+radius
 		vector<Real> minima;
 
 		/// Used the first time broadInteractionTest is called, to initialize and sort the xBounds, yBounds,
@@ -81,7 +81,7 @@ class PersistentTriangulationCollider : public Collider
 		void updateIds(unsigned int nbElements);
 
 		/// Permutation sort the xBounds, yBounds, zBounds arrays according to the "value" field
-		/// Calls updateOverlapingBBSet every time a permutation between 2 AABB i and j occurs
+		/// Calls updateOverlapingBBSet every time a permutation between 2 Aabb i and j occurs
 		void sortBounds(vector<shared_ptr<AABBBound> >& bounds, int nbElements);
 
 		/// Tests if the AABBi and AABBj really overlap.
@@ -93,7 +93,7 @@ class PersistentTriangulationCollider : public Collider
 		void updateBounds(int nbElements);
 
 		/// Used the first time broadInteractionTest is called
-		/// It is necessary to initialise the overlapping AABB collection because this collection is only
+		/// It is necessary to initialise the overlapping Aabb collection because this collection is only
 		/// incrementally udated each time step
 		void findOverlappingBB(vector<shared_ptr<AABBBound> >& bounds, int nbElements);
 

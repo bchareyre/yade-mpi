@@ -16,7 +16,7 @@ class Ef2_BssSnowGrain_AABB_makeAABB : public BoundFunctor
 		Ef2_BssSnowGrain_AABB_makeAABB() {};
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 
-	FUNCTOR2D(BssSnowGrain,AABB);
+	FUNCTOR2D(BssSnowGrain,Aabb);
 	REGISTER_CLASS_NAME(Ef2_BssSnowGrain_AABB_makeAABB);
 	REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };

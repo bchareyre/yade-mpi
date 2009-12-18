@@ -7,15 +7,15 @@
 *************************************************************************/
  
 #include <yade/pkg-common/Facet.hpp>
-#include "InteractingFacet2AABB.hpp"
-#include <yade/pkg-common/AABB.hpp>
+#include "Bo1_Facet_Aabb.hpp"
+#include <yade/pkg-common/Aabb.hpp>
 
-void InteractingFacet2AABB::go(	  const shared_ptr<Shape>& cm
+void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body*	)
 {
-	AABB* aabb = static_cast<AABB*>(bv.get());
+	Aabb* aabb = static_cast<Aabb*>(bv.get());
 	Facet* facet = static_cast<Facet*>(cm.get());
 	const Vector3r& O = se3.position;
 	Matrix3r facetAxisT; se3.orientation.ToRotationMatrix(facetAxisT);
@@ -31,4 +31,4 @@ void InteractingFacet2AABB::go(	  const shared_ptr<Shape>& cm
 	aabb->center = aabb->min + aabb->halfSize;
 }
 	
-YADE_PLUGIN((InteractingFacet2AABB));
+YADE_PLUGIN((Bo1_Facet_Aabb));

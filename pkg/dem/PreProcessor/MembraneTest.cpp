@@ -25,7 +25,7 @@
 
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -162,7 +162,7 @@ void MembraneTest::connectNodes(shared_ptr<Body>& body, unsigned int id1, unsign
 {
         body = shared_ptr<Body>(new Body(body_id_t(0),1)); 
         shared_ptr<BcpConnection> connection(new BcpConnection);                  // Bcp + Bst
-        shared_ptr<AABB> aabb(new AABB);                                          // Bbv
+        shared_ptr<Aabb> aabb(new Aabb);                                          // Bbv
         shared_ptr<BshTube> tube(new BshTube);                                    // Bsh
         shared_ptr<BssSweptSphereLineSegment> bss(new BssSweptSphereLineSegment); // Bss
           
@@ -204,7 +204,7 @@ void MembraneTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 {
   body = shared_ptr<Body>(new Body(body_id_t(0),1));
   shared_ptr<SimpleViscoelasticBodyParameters> physics(new SimpleViscoelasticBodyParameters); // Bcp + Bst
-  shared_ptr<AABB> aabb(new AABB);                                      // Bbv
+  shared_ptr<Aabb> aabb(new Aabb);                                      // Bbv
   shared_ptr<SphereModel> gSphere(new SphereModel);                               // Bsh
   shared_ptr<Sphere> iSphere(new Sphere);         // Bss
         
@@ -244,7 +244,7 @@ void MembraneTest::createNode(shared_ptr<Body>& body, unsigned int i, unsigned i
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // Bcp + Bst
-	shared_ptr<AABB> aabb(new AABB);                                // Bbv (not needed?)
+	shared_ptr<Aabb> aabb(new Aabb);                                // Bbv (not needed?)
 	shared_ptr<SphereModel> node(new SphereModel);                            // Bsh
         shared_ptr<InteractingNode> inode(new InteractingNode);         // Bss
         
@@ -288,7 +288,7 @@ void MembraneTest::createActors(shared_ptr<Scene>& rootBody)
 	shapeDispatcher->add("ef2_BshTube_BssSweptSphereLineSegment_makeBssSweptSphereLineSegment");
 	
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
         boundDispatcher->add("ef2_BssSweptSphereLineSegment_AABB_makeAABB");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
@@ -342,7 +342,7 @@ void MembraneTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<SceneShape> set(new SceneShape());
 	set->diffuseColor			= Vector3r(0,0,1);
 	
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
 	rootBody->shape		= YADE_PTR_CAST<Shape>(set);	

@@ -20,7 +20,7 @@
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
 #include<yade/pkg-common/BoxModel.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -298,7 +298,7 @@ void HydraulicTest::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<SceneShape> set(new SceneShape());
 	set->diffuseColor		= Vector3r(0,0,1);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
 	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	

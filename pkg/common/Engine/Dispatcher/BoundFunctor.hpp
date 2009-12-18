@@ -23,8 +23,8 @@
 
 	This is useful when it's not trivial to build the bounding volume from (some complicated) interaction model.
 	 
-	For example if you want to build an AABB from a box which is not initially aligned with the world
-	axis, it is not easy to write by hand into the configuration file the center and size of this AABB.
+	For example if you want to build an Aabb from a box which is not initially aligned with the world
+	axis, it is not easy to write by hand into the configuration file the center and size of this Aabb.
 	Instead you can use a BoundFunctor that will compute for you the correct value.
 		
 	\param const shared_ptr<Shape>&	the collision model from wich we want to extract the bounding volume

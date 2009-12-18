@@ -10,16 +10,16 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class GLDrawAABB : public GlBoundFunctor
+class Gl1_Aabb : public GlBoundFunctor
 {
 	public :
-		virtual void go(const shared_ptr<Bound>&);
+		virtual void go(const shared_ptr<Bound>&, Scene*);
 
-	RENDERS(AABB);
-	REGISTER_CLASS_NAME(GLDrawAABB);
+	RENDERS(Aabb);
+	REGISTER_CLASS_NAME(Gl1_Aabb);
 	REGISTER_BASE_CLASS_NAME(GlBoundFunctor);
 };
 
-REGISTER_SERIALIZABLE(GLDrawAABB);
+REGISTER_SERIALIZABLE(Gl1_Aabb);
 
 

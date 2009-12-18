@@ -2,7 +2,7 @@ o=Omega()
 
 o.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),InteractingFacet2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers([ef2_Facet_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],),
 	GravityEngine(gravity=[0,0,-10]),

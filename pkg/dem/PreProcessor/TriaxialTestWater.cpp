@@ -27,14 +27,14 @@
 #include <yade/pkg-dem/CapillaryStressRecorder.hpp>
 #include <yade/pkg-dem/ContactStressRecorder.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
-#include<yade/pkg-common/InteractingSphere2AABB.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
@@ -309,7 +309,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<GranularMat> physics(new GranularMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
@@ -362,7 +362,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<GranularMat> physics(new GranularMat);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<BoxModel> gBox(new BoxModel);	
 // 	#endif
@@ -429,11 +429,11 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	
-	shared_ptr<InteractingSphere2AABB> interactingSphere2AABB(new InteractingSphere2AABB);
+	shared_ptr<Bo1_Sphere_Aabb> interactingSphere2AABB(new Bo1_Sphere_Aabb);
 	interactingSphere2AABB->aabbEnlargeFactor = distanceFactor;//Detect potential distant interaction (meniscii)
 	
 	boundDispatcher->add(interactingSphere2AABB);
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Box_Aabb");
 
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;

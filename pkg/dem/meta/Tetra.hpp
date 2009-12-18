@@ -8,7 +8,7 @@
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/InteractionSolver.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/BoundFunctor.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
@@ -59,7 +59,7 @@ class TetraBang: public InteractionGeometry{
 };
 REGISTER_SERIALIZABLE(TetraBang);
 
-/*! Creates AABB from TetraMold. 
+/*! Creates Aabb from TetraMold. 
  *
  * Self-contained. */
 
@@ -68,7 +68,7 @@ class TetraAABB: public BoundFunctor
 	public:
 		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 			TetraMold* t=static_cast<TetraMold*>(ig.get());
-			AABB* aabb=static_cast<AABB*>(bv.get());
+			Aabb* aabb=static_cast<Aabb*>(bv.get());
 			Quaternionr invRot=se3.orientation.Conjugate();
 			Vector3r v_g[4]; for(int i=0; i<4; i++) v_g[i]=se3.orientation*t->v[i]; // vertices in global coordinates
 			#define __VOP(op,ix) op(v_g[0][ix],op(v_g[1][ix],op(v_g[2][ix],v_g[3][ix])))
@@ -78,7 +78,7 @@ class TetraAABB: public BoundFunctor
 			aabb->center=(aabb->min+aabb->max)*0.5;
 			aabb->halfSize=(aabb->max-aabb->min)*0.5;
 		}
-		FUNCTOR2D(TetraMold,AABB);
+		FUNCTOR2D(TetraMold,Aabb);
 		REGISTER_CLASS_NAME(TetraAABB);
 		REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };

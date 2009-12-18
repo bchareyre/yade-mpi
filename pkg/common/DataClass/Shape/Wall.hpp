@@ -21,13 +21,13 @@ REGISTER_SERIALIZABLE(Wall);
 
 /*! Functor for computing axis-aligned bounding box
     from axis-aligned wall. Has no parameters. */
-class Wall2AABB: public BoundFunctor{
+class Bo1_Wall_Aabb: public BoundFunctor{
 	public:
 		virtual void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
-	FUNCTOR2D(Wall,AABB);
-	REGISTER_CLASS_AND_BASE(Wall2AABB,BoundFunctor);
+	FUNCTOR2D(Wall,Aabb);
+	REGISTER_CLASS_AND_BASE(Bo1_Wall_Aabb,BoundFunctor);
 };
-REGISTER_SERIALIZABLE(Wall2AABB);
+REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
 	class Gl1_Wall: public GlShapeFunctor{	

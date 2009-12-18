@@ -94,7 +94,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	if resetState: b.state=b.mat.newAssocState()
 	mass=volume*b.mat['density']
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
-	if not noBound: b.bound=Bound('AABB',diffuseColor=[0,1,0])
+	if not noBound: b.bound=Bound('Aabb',diffuseColor=[0,1,0])
 
 def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
@@ -263,7 +263,7 @@ If any of the box dimensions is zero, corresponding facets will not be created. 
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""Return 6 boxes that will wrap existing packing as walls from all sides;
-	extrema are extremal points of the AABB of the packing (will be calculated if not specified)
+	extrema are extremal points of the Aabb of the packing (will be calculated if not specified)
 	thickness is wall thickness (will be 1/10 of the X-dimension if not specified)
 	Walls will be enlarged in their plane by oversizeFactor.
 	returns list of 6 wall Bodies enclosing the packing, in the order minX,maxX,minY,maxY,minZ,maxZ.

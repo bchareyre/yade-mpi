@@ -59,9 +59,9 @@ python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2);
 
-python::tuple coordsAndDisplacements(int axis,python::tuple AABB=python::tuple()){
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(AABB)>0;
-	if(useBB){bbMin=extract<Vector3r>(AABB[0])();bbMax=extract<Vector3r>(AABB[1])();}
+python::tuple coordsAndDisplacements(int axis,python::tuple Aabb=python::tuple()){
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(Aabb)>0;
+	if(useBB){bbMin=extract<Vector3r>(Aabb[0])();bbMax=extract<Vector3r>(Aabb[1])();}
 	python::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getScene()->bodies){
 		if(useBB && !isInBB(b->state->pos,bbMin,bbMax)) continue;
@@ -81,8 +81,8 @@ void setRefSe3(){
 
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 
-Real elasticEnergyInAABB(python::tuple AABB){
-	Vector3r bbMin=extract<Vector3r>(AABB[0])(), bbMax=extract<Vector3r>(AABB[1])();
+Real elasticEnergyInAABB(python::tuple Aabb){
+	Vector3r bbMin=extract<Vector3r>(Aabb[0])(), bbMax=extract<Vector3r>(Aabb[1])();
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
@@ -100,8 +100,8 @@ Real elasticEnergyInAABB(python::tuple AABB){
 			#define _WEIGHT_COMPONENT(axis) if(vOut[axis]<bbMin[axis]) weight=min(weight,abs((vOut[axis]-bbMin[axis])/(vOut[axis]-vIn[axis]))); else if(vOut[axis]>bbMax[axis]) weight=min(weight,abs((vOut[axis]-bbMax[axis])/(vOut[axis]-vIn[axis])));
 			_WEIGHT_COMPONENT(0); _WEIGHT_COMPONENT(1); _WEIGHT_COMPONENT(2);
 			assert(weight>=0 && weight<=1);
-			//cerr<<"Interaction crosses AABB boundary, weight is "<<weight<<endl;
-			//LOG_DEBUG("Interaction crosses AABB boundary, weight is "<<weight);
+			//cerr<<"Interaction crosses Aabb boundary, weight is "<<weight<<endl;
+			//LOG_DEBUG("Interaction crosses Aabb boundary, weight is "<<weight);
 		} else {assert(isIn1 && isIn2); /* cerr<<"Interaction inside, weight is "<<weight<<endl;*/ /*LOG_DEBUG("Interaction inside, weight is "<<weight);*/}
 		E+=geom->refLength*weight*(.5*bc->kn*pow(geom->strainN(),2)+.5*bc->ks*pow(geom->strainT().Length(),2));
 	}
@@ -430,7 +430,7 @@ BOOST_PYTHON_MODULE(_utils){
 	#if 0
 		def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
 	#endif
-	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("AABB"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the AABB=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
+	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("Aabb"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
 	def("setRefSe3",setRefSe3,"Set reference positions and orientation of all bodies equal to their current ones.");
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));
 	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));

@@ -432,7 +432,7 @@ int BshSnowGrain::how_many_faces()
 		a.resize(m_lookup_resolution);
 		BOOST_FOREACH(std::vector<std::set<int> >& b,a) b.resize(m_lookup_resolution);
 	}
-	// calculate min/max of AABB of polyhedron
+	// calculate min/max of Aabb of polyhedron
 	m_min = get<0>(m_faces[0]);
 	m_max = m_min;
 	for(size_t i = 0; i < SS ; ++i)

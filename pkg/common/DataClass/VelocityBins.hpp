@@ -76,7 +76,7 @@ class VelocityBins{
 	void binVelSqFinalize();
 
 	// get velSq for given body; this should be called from NewtonIntegrator as well,
-	// to ensure that the same formulas are used (once we have angularVelocity + AABB span,
+	// to ensure that the same formulas are used (once we have angularVelocity + Aabb span,
 	// for instance
 	static Real getBodyVelSq(const State* state){
 		return state->vel.SquaredLength();

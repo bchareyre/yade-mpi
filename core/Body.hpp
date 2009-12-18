@@ -88,7 +88,7 @@ class Body : public Serializable
 		#endif
 		/// description of how this body interacts with others, like: SphereHierarchy, Box
 		shared_ptr<Shape> shape;
-		/// Bound is used for quick detection of potential interactions, that can be: AABB, K-Dop
+		/// Bound is used for quick detection of potential interactions, that can be: Aabb, K-Dop
 		shared_ptr<Bound>	bound;
 
 		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.

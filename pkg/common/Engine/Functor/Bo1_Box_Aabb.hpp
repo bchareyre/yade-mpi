@@ -12,18 +12,18 @@
 #include<yade/pkg-common/BoundFunctor.hpp>
 
 
-class InteractingBox2AABB : public BoundFunctor
+class Bo1_Box_Aabb : public BoundFunctor
 {
 	public :
 		void go(	  const shared_ptr<Shape>& cm
 				, shared_ptr<Bound>& bv
 				, const Se3r& se3
 				, const Body*	);
-	FUNCTOR2D(Box,AABB);
-	REGISTER_CLASS_NAME(InteractingBox2AABB);
+	FUNCTOR2D(Box,Aabb);
+	REGISTER_CLASS_NAME(Bo1_Box_Aabb);
 	REGISTER_BASE_CLASS_NAME(BoundFunctor);
 };
 
-REGISTER_SERIALIZABLE(InteractingBox2AABB);
+REGISTER_SERIALIZABLE(Bo1_Box_Aabb);
 
 

@@ -14,7 +14,7 @@
 #include<yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #ifdef YADE_GEOMETRICALMODEL
 	#include<yade/pkg-common/SphereModel.hpp>
 	#include<yade/pkg-common/BoxModel.hpp>
@@ -147,7 +147,7 @@ void Funnel::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
@@ -194,7 +194,7 @@ void Funnel::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r exten
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),1));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Box> iBox(new Box);
 	
 	
@@ -249,8 +249,8 @@ void Funnel::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Box_Aabb");
 	
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
@@ -313,7 +313,7 @@ void Funnel::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<SceneShape> set(new SceneShape());
 	set->diffuseColor			= Vector3r(0,0,1);
 	
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
 	rootBody->shape		= YADE_PTR_CAST<Shape>(set);	

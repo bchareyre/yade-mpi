@@ -178,7 +178,7 @@ def regularOrtho(predicate,radius,gap,**kw):
 	Created spheres will have given radius and will be separated by gap space."""
 	ret=[]
 	mn,mx=predicate.aabb()
-	if(max([mx[i]-mn[i] for i in 0,1,2])==float('inf')): raise ValueError("AABB of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
+	if(max([mx[i]-mn[i] for i in 0,1,2])==float('inf')): raise ValueError("Aabb of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
 	xx,yy,zz=[arange(mn[i]+radius,mx[i]-radius,2*radius+gap) for i in 0,1,2]
 	for xyz in itertools.product(xx,yy,zz):
 		if predicate(xyz,radius): ret+=[utils.sphere(xyz,radius=radius,**kw)]
@@ -192,7 +192,7 @@ def regularHexa(predicate,radius,gap,**kw):
 	h=a*sqrt(3)/2.
 	mn,mx=predicate.aabb()
 	dim=[mx[i]-mn[i] for i in 0,1,2]
-	if(max(dim)==float('inf')): raise ValueError("AABB of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
+	if(max(dim)==float('inf')): raise ValueError("Aabb of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
 	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/h)+1),range(0,int(dim[2]/h)+1)]
 	for i,j,k in itertools.product(ii,jj,kk):
 		x,y,z=mn[0]+radius+i*a,mn[1]+radius+j*h,mn[2]+radius+k*h
@@ -308,7 +308,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.cellSize
 		#print x1,y1,z1,radius,rRelFuzz
 		num=sp.makeCloud(Vector3().ZERO,O.cellSize,radius,rRelFuzz,spheresInCell,True)
-		O.engines=[BexResetter(),BoundDispatcher([InteractingSphere2AABB()]),InsertionSortCollider(nBins=5,sweepLength=.05*radius),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
+		O.engines=[BexResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=5,sweepLength=.05*radius),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=radius/5.,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
 		O.materials.append(GranularMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 		O.dt=utils.PWaveTimeStep()
@@ -375,7 +375,7 @@ def randomPeriPack(radius,rRelFuzz,initSize):
 	sp=SpherePack()
 	O.cellSize=Vector3(initSize)
 	sp.makeCloud(Vector3().ZERO,O.cellSize,radius,rRelFuzz,int(initSize[0]*initSize[1]*initSize[2]/((4/3.)*pi*radius**3)),True)
-	O.engines=[BexResetter(),BoundDispatcher([InteractingSphere2AABB()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
+	O.engines=[BexResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(GranularMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 	O.dt=utils.PWaveTimeStep()

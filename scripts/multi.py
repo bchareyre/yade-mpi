@@ -8,13 +8,13 @@ print gravity,density,initialSpeed
 
 o=Omega()
 o.initializers=[
-		BoundDispatcher([InteractingSphere2AABB(),InteractingFacet2AABB()])
+		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 	]
 o.engines=[
 	PhysicalActionContainerReseter(),
 	BoundDispatcher([
-		InteractingSphere2AABB(),
-		InteractingBox2AABB(),
+		Bo1_Sphere_Aabb(),
+		Bo1_Box_Aabb(),
 	]),
 	PersistentSAPCollider(),
 	InteractionDispatchers(

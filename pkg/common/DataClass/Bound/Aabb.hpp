@@ -6,15 +6,25 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "AABB.hpp"
+#pragma once
 
-AABB::AABB(): Bound(), halfSize(0,0,0), center(0,0,0){
-	createIndex();
-}
+#include<yade/core/Bound.hpp>
 
-AABB::~AABB ()
+class Aabb : public Bound
 {
-}
+	public :
+		Vector3r	 halfSize
+				,center;
 
-YADE_PLUGIN((AABB));
+		Aabb();
+		virtual ~Aabb();
+	
+/// Serialization
+	REGISTER_CLASS_AND_BASE(Aabb,Bound);	
+	REGISTER_ATTRIBUTES(Bound,/* no attributes */);
+/// Indexable
+	REGISTER_CLASS_INDEX(Aabb,Bound);
+};
+REGISTER_SERIALIZABLE(Aabb);
+
 

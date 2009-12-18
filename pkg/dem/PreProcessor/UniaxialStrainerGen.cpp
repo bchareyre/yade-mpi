@@ -8,8 +8,8 @@
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/AABB.hpp>
-#include<yade/pkg-common/InteractingSphere2AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -84,7 +84,7 @@ void UniaxialStrainerGen::createEngines(){
 	rootBody->initializers.clear();
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-		boundDispatcher->add(new InteractingSphere2AABB);
+		boundDispatcher->add(new Bo1_Sphere_Aabb);
 		rootBody->initializers.push_back(boundDispatcher);
 
 	rootBody->engines.clear();

@@ -115,14 +115,14 @@ void PersistentTriangulationCollider::action ( Scene* ncb )
 			const shared_ptr<Interaction>& interaction=interactions->find ( body_id_t ( id1 ),body_id_t ( id2 ) );
 			bool found= ( interaction!=0 );//Bruno's Hack
 
-			// inserts the pair p=(id1,id2) if the two AABB overlaps and if p does not exists in the overlappingBB
+			// inserts the pair p=(id1,id2) if the two Aabb overlaps and if p does not exists in the overlappingBB
 			if ( !found )
 			{
 				interactions->insert ( body_id_t ( id1 ),body_id_t ( id2 ) );
 				//cerr << "inserted " << id1 << "-" << id2<<endl;
 			}
 			else interaction->isNeighbor = true;
-			// removes the pair p=(id1,id2) if the two AABB do not overlapp any more and if p already exists in the overlappingBB
+			// removes the pair p=(id1,id2) if the two Aabb do not overlapp any more and if p already exists in the overlappingBB
 		}
 
 		vector< pair<unsigned int,unsigned int> > toErase;

@@ -1,9 +1,9 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #include<yade/pkg-common/Wall.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<limits>
 
-YADE_PLUGIN((Wall)(Wall2AABB)
+YADE_PLUGIN((Wall)(Bo1_Wall_Aabb)
 	#ifdef YADE_OPENGL
 		(Gl1_Wall)
 	#endif
@@ -11,9 +11,9 @@ YADE_PLUGIN((Wall)(Wall2AABB)
 
 Wall::~Wall(){} // vtable
 
-void Wall2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
+void Bo1_Wall_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 	Wall* wall=static_cast<Wall*>(cm.get());
-	AABB* aabb=static_cast<AABB*>(bv.get());
+	Aabb* aabb=static_cast<Aabb*>(bv.get());
 	aabb->center=se3.position;
 	const Real& inf=std::numeric_limits<Real>::infinity();
 	aabb->halfSize=Vector3r(inf,inf,inf); aabb->halfSize[wall->axis]=0.;

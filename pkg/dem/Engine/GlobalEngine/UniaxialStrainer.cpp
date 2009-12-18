@@ -3,7 +3,7 @@
 #include<boost/foreach.hpp>
 
 #include<yade/core/InteractionContainer.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 YADE_PLUGIN((UniaxialStrainer));
 /************************ UniaxialStrainer **********************/
@@ -80,7 +80,7 @@ void UniaxialStrainer::init(){
 	stressUpdateInterval=min(1000,max(1,(int)(1e-5/(abs(strainRate)*Omega::instance().getTimeStep()))));
 	LOG_INFO("Stress will be updated every "<<stressUpdateInterval<<" steps.");
 
-	/* if we have default (<0) crossSectionArea, try to get it from root's AABB;
+	/* if we have default (<0) crossSectionArea, try to get it from root's Aabb;
 	 * this will not work if there are foreign bodies in the simulation,
 	 * in which case you must give the value yourself as engine attribute.
 	 *
@@ -90,8 +90,8 @@ void UniaxialStrainer::init(){
 	 *
 	 * */
 	if(crossSectionArea<=0){
-		shared_ptr<AABB> rbAABB;
-		if (Omega::instance().getScene()->bound && (rbAABB=dynamic_pointer_cast<AABB>(Omega::instance().getScene()->bound))){
+		shared_ptr<Aabb> rbAABB;
+		if (Omega::instance().getScene()->bound && (rbAABB=dynamic_pointer_cast<Aabb>(Omega::instance().getScene()->bound))){
 			int axis2=(axis+1)%3, axis3=(axis+2)%3; // perpendicular axes indices
 			crossSectionArea=4*rbAABB->halfSize[axis2]*rbAABB->halfSize[axis3];
 			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");

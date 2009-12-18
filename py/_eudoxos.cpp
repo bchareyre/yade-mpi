@@ -13,8 +13,8 @@ using namespace std;
 #endif
 
 # if 0
-Real elasticEnergyDensityInAABB(python::tuple AABB){
-	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(AABB[0])()), bbMax=tuple2vec(python::extract<python::tuple>(AABB[1])()); Vector3r box=bbMax-bbMin;
+Real elasticEnergyDensityInAABB(python::tuple Aabb){
+	Vector3r bbMin=tuple2vec(python::extract<python::tuple>(Aabb[0])()), bbMax=tuple2vec(python::extract<python::tuple>(Aabb[1])()); Vector3r box=bbMax-bbMin;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){

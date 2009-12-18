@@ -5,7 +5,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/core/Timing.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 #ifdef __APPLE__
 #  include <OpenGL/glu.h>
@@ -72,17 +72,12 @@ void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& rootBody){
 
 
 void OpenGLRenderingEngine::initgl(){
-	LOG_INFO("(re)initializing GL for gldraw methods.\n");
-	BOOST_FOREACH(vector<string>& s,stateFunctorNames)
-		(static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,boundFunctorNames)
-		(static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,shapeFunctorNames)
-		(static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames)
-		(static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
-	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames)
-		(static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	LOG_DEBUG("(re)initializing GL for gldraw methods.\n");
+	BOOST_FOREACH(vector<string>& s,stateFunctorNames) (static_pointer_cast<GlStateFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,boundFunctorNames)	(static_pointer_cast<GlBoundFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,shapeFunctorNames)	(static_pointer_cast<GlShapeFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,interactionGeometryFunctorNames) (static_pointer_cast<GlInteractionGeometryFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
+	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames) (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 }
 
 void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& rootBody){
@@ -147,17 +142,12 @@ void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody)
 void OpenGLRenderingEngine::drawPeriodicCell(Scene* scene){
 	if(!scene->isPeriodic) return;
 	const Vector3r& shear(scene->cell.shear);
-	// shear center (moves when sheared)
-	Vector3r cent=scene->cell._shearTrsf*(.5*scene->cell.size);
-	// see http://www.songho.ca/opengl/gl_transform.html#matrix
-	GLdouble cellMat[16]={
-		scene->cell.size[0],shear[2],shear[1],cent[0],
-		shear[2],scene->cell.size[1],shear[0],cent[1],
-		shear[1],shear[0],scene->cell.size[2],cent[2],
-		0,0,0,1};
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
-		glMultTransposeMatrixd(cellMat);
+		// order matters
+		glTranslatev(scene->cell._shearTrsf*(.5*scene->cell.size)); // shear center (moves when sheared)
+		glScalev(scene->cell.size);
+		glMultMatrixd(scene->cell._glShearMatrix);
 		glutWireCube(1);
 	glPopMatrix();
 }
@@ -169,8 +159,10 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& rootBody, body_id_t 
 	assert(glutInitDone);
 	current_selection = selection;
 
+	// assign scene inside functors
+
 	// just to make sure, since it is not initialized by default
-	if(!rootBody->bound) rootBody->bound=shared_ptr<AABB>(new AABB);
+	if(!rootBody->bound) rootBody->bound=shared_ptr<Aabb>(new Aabb);
 
 	// recompute emissive light colors for highlighted bodies
 	Real now=TimingInfo::getNow(/*even if timing is disabled*/true)*1e-9;
@@ -305,21 +297,21 @@ void OpenGLRenderingEngine::renderState(const shared_ptr<Scene>& rootBody){
 }
 #endif
 
-void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& rootBody){	
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& scene){	
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		if(b->bound && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
-			glPushMatrix(); boundDispatcher(b->bound); glPopMatrix();
+			glPushMatrix(); boundDispatcher(b->bound,scene.get()); glPopMatrix();
 		}
 	}
 	// since we remove the functor as Scene doesn't inherit from Body anymore, hardcore the rendering routine here
 	// for periodic scene, renderPeriodicCell is called separately
-	if(!rootBody->isPeriodic){
-		if(!rootBody->bound) rootBody->updateBound();
+	if(!scene->isPeriodic){
+		if(!scene->bound) scene->updateBound();
 		glColor3v(Vector3r(0,1,0));
-		Vector3r size=rootBody->bound->max-rootBody->bound->min;
-		Vector3r center=.5*(rootBody->bound->min+rootBody->bound->max);
+		Vector3r size=scene->bound->max-scene->bound->min;
+		Vector3r center=.5*(scene->bound->min+scene->bound->max);
 		glPushMatrix();
 			glTranslatev(center);
 			glScalev(size);

@@ -5,20 +5,22 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+ 
+#pragma once
 
-#include"GLDrawAABB.hpp"
-#include<yade/lib-opengl/OpenGLWrapper.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/BoundFunctor.hpp>
 
-void GLDrawAABB::go(const shared_ptr<Bound>& bv)
+class Bo1_Sphere_Aabb : public BoundFunctor
 {
-	AABB * aabb = static_cast<AABB*>(bv.get());
-	glColor3v(bv->diffuseColor);
-	glTranslate(aabb->center[0],aabb->center[1],aabb->center[2]);
-	glScale(2*aabb->halfSize[0],2*aabb->halfSize[1],2*aabb->halfSize[2]);
-	glDisable(GL_LIGHTING);
-	glutWireCube(1);
-}
+	public :
+		Bo1_Sphere_Aabb(): aabbEnlargeFactor(-1.) {}
+		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
+		double aabbEnlargeFactor;
+	FUNCTOR2D(Sphere,Aabb);
+	REGISTER_ATTRIBUTES(BoundFunctor,(aabbEnlargeFactor));
+	REGISTER_CLASS_AND_BASE(Bo1_Sphere_Aabb,BoundFunctor);
+};
 
-YADE_PLUGIN((GLDrawAABB));
-YADE_REQUIRE_FEATURE(OPENGL)
+REGISTER_SERIALIZABLE(Bo1_Sphere_Aabb);
+
+

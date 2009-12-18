@@ -4,11 +4,11 @@
 o=Omega()
 o.initializers=[
 	BoundDispatcher([
-		InteractingSphere2AABB(),InteractingBox2AABB()
+		Bo1_Sphere_Aabb(),Bo1_Box_Aabb()
 	]
 o.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB()])
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(hasShear=True)]),
 	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),

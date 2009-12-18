@@ -16,7 +16,7 @@ magnitudes=[.5*maxMag*(sin(t*(freq*2*pi))+1) for t in times] # generate points o
 
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom()],

@@ -12,6 +12,7 @@
 	using Wm3::Vector3;
 	typedef Wm3::Matrix3<double> Matrix3r;
 	typedef double Real;
+	class Serializable{};
 #endif
 // end yade compatibility
 
@@ -37,6 +38,7 @@ class Cell: public Serializable{
 	Vector3r _shearSine;
 	Matrix3r _shearTrsf;
 	Matrix3r _unshearTrsf;
+	double _glShearMatrix[16];
 	// should be called before every step
 	void updateCache(){
 		for(int i=0; i<3; i++) {
@@ -45,8 +47,45 @@ class Cell: public Serializable{
 		}
 		_shearTrsf=Matrix3r(1,shear[2],shear[1],shear[2],1,shear[0],shear[1],shear[0],1);
 		_unshearTrsf=_shearTrsf.Inverse();
+		fillGlShearMatrix(_glShearMatrix);
 	}
 
+	/*! Fill column-major (standard) OpenGL matrix for shear (don't use directly, use _glShearMatrix instead).
+
+	Note: the order of OpenGL transoformations matters; for instance, if you draw sheared wire box of size *size*, centered at *center*, the order is:
+
+		1. translation: glTranslatev(center);
+		2. scaling: glScalev(size);
+		3. shearing: glMultMatrixd(scene->cell._glShearMatrix);
+		4. draw: glutWireCube(1);
+	
+	See also http://www.songho.ca/opengl/gl_transform.html#matrix
+	*/
+	void fillGlShearMatrix(double m[16]){
+		m[0]=1;        m[4]=shear[2]; m[8]=shear[1]; m[12]=0;
+		m[1]=shear[2]; m[5]=1;        m[9]=shear[0]; m[13]=0;
+		m[2]=shear[1]; m[6]=shear[0]; m[10]=1;       m[14]=0;
+		m[3]=0;        m[7]=0;        m[11]=0;       m[15]=1;
+	}
+
+	// doesn't seem to be really useful
+	#if 0
+		/*! Prepare OpenGL matrix with current shear and given translation and scale.
+		
+		This matrix is ccumulated product of this sequence:
+
+			glTranslatev(translation);
+			glScalev(scale);
+			glMultMatrixd(scene->cell._glShearMatric);
+
+		*/
+		void glTrsfMatrix(double m[16], const Vector3r& translation, const Vector3r& scale){
+			m[0]=scale[0];          m[4]=scale[2]*shear[2]; m[8]=scale[1]*shear[1]; m[12]=translation[0];
+			m[1]=scale[2]*shear[2]; m[5]=scale[1];          m[9]=scale[0]*shear[0]; m[13]=translation[1];
+			m[2]=scale[1]*shear[1]; m[6]=shear[0];          m[10]=scale[2];         m[14]=translation[2];
+			m[3]=0;        m[7]=0;        m[11]=0;       m[15]=1;
+		}
+	#endif
 	/*! Apply inverse shear on point; to put it inside (unsheared) periodic cell, apply wrapPt on the returned value. */
 	Vector3r unshearPt(const Vector3r& pt){ return _unshearTrsf*pt; }
 	//! Apply shear on point. 

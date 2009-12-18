@@ -8,7 +8,7 @@
  
 #include "ef2_BssSweptSphereLineSegment_AABB_makeAABB.hpp"
 #include<yade/pkg-common/BssSweptSphereLineSegment.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<Shape>& cm,
 				shared_ptr<Bound>& bv,
@@ -16,7 +16,7 @@ void ef2_BssSweptSphereLineSegment_AABB_makeAABB::go(	const shared_ptr<Shape>& c
 				const Body*	)
 {
         BssSweptSphereLineSegment* SSLS = static_cast<BssSweptSphereLineSegment*>(cm.get());
-        AABB* aabb = static_cast<AABB*>(bv.get());
+        Aabb* aabb = static_cast<Aabb*>(bv.get());
         
         aabb->center = SSLS->position + 0.5 * SSLS->length * SSLS->orientation; // here orientation is not a quaternion but a unit vector
         aabb->halfSize = (0.5 * SSLS->length) * SSLS->orientation + Vector3r(SSLS->radius,SSLS->radius,SSLS->radius); 

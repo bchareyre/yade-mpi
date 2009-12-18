@@ -10,7 +10,7 @@ o=Omega() # for advaned folks: this creates default MetaBody as well
 ## Initializers are run before the simulation.
 o.initializers=[
 	## Create bounding boxes. They are needed to zoom the 3d view properly before we start the simulation.
-	BoundDispatcher([InteractingSphere2AABB(),InteractingBox2AABB(),])
+	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),])
 ]
 
 ## Engines are called consecutively at each iteration. Their order matters.
@@ -21,12 +21,12 @@ o.initializers=[
 o.engines=[
 	## Resets forces and momenta the act on bodies
 	BexResetter(),
-	## associates bounding volume - in this case, AxisAlignedBoundingBox (AABB) - to each body.
+	## associates bounding volume - in this case, AxisAlignedBoundingBox (Aabb) - to each body.
 	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, BoxModel, or MetaBody (rootBody).
 	## AABBs will be used to detect collisions later, by PersistentSAPCollider
 	BoundDispatcher([
-		InteractingSphere2AABB(),
-		InteractingBox2AABB(),
+		Bo1_Sphere_Aabb(),
+		Bo1_Box_Aabb(),
 	]),
 	## Using bounding boxes created by the previous engine, find possible body collisions.
 	## These possible collisions are inserted in Omega.interactions container (MetaBody::transientInteractions in c++).
@@ -104,8 +104,8 @@ if False:
 	mass=8*.5*.5*.5*2400
 	# * se3 (position & orientation) as 3 position coordinates, then 3 direction axis coordinates and rotation angle
 	b.phys=BodyMacroParameters(se3=[0,0,0,1,0,0,0],mass=mass,inertia=[mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2),mass*4*(.5**2+.5**2)],young=30e9,poisson=.3)
-	# other information about AABB will be updated during simulation by relevant BoundDispatcher
-	b.bound=AABB(diffuseColor=[0,1,0])
+	# other information about Aabb will be updated during simulation by relevant BoundDispatcher
+	b.bound=Aabb(diffuseColor=[0,1,0])
 	# add the body to the simulation
 	o.bodies.append(b)
 

@@ -8,7 +8,7 @@ from yade import log,timing
 #log.setLevel("InsertionSortCollider",log.DEBUG)
 O.engines=[
 	BexResetter(),
-	BoundDispatcher([InteractingSphere2AABB()]),
+	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(label='collider'),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom()],

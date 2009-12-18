@@ -40,7 +40,7 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	if cutoff>0: cut=utils.fractionalBox(fraction=1-cutoff)
 	for axis in [0,1,2]:
 		if cutoff>0:
-			w,dw=utils.coordsAndDisplacements(axis,AABB=cut)
+			w,dw=utils.coordsAndDisplacements(axis,Aabb=cut)
 		else:
 			w,dw=utils.coordsAndDisplacements(axis)
 		l,ll=stats.linregress(w,dw)[0:2] # use only tangent and section

@@ -1,12 +1,12 @@
 #include"SimpleScene.hpp"
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
-#include<yade/pkg-common/InteractingSphere2AABB.hpp>
-#include<yade/pkg-common/InteractingBox2AABB.hpp>
+#include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
+#include<yade/pkg-common/Bo1_Box_Aabb.hpp>
 #include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/NewtonsForceLaw.hpp>
 #include<yade/pkg-common/NewtonsMomentumLaw.hpp>
@@ -40,8 +40,8 @@ bool SimpleScene::generate(){
 		rootBody->initializers.clear();
 		//@
 		shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-			boundDispatcher->add(new InteractingSphere2AABB);
-			boundDispatcher->add(new InteractingBox2AABB);
+			boundDispatcher->add(new Bo1_Sphere_Aabb);
+			boundDispatcher->add(new Bo1_Box_Aabb);
 			rootBody->initializers.push_back(boundDispatcher);
 	//@
 	/* engines */
@@ -120,7 +120,7 @@ bool SimpleScene::generate(){
 		b->physicalParameters=physics;
 
 		// aabb
-		shared_ptr<AABB> aabb(new AABB);
+		shared_ptr<Aabb> aabb(new Aabb);
 		aabb->diffuseColor=Vector3r(0,1,0);
 		b->bound=aabb;
 

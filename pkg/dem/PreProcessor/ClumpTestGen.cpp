@@ -8,7 +8,7 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/pkg-common/StateEngineUnit.hpp>
 #include<yade/pkg-common/RigidBodyParameters.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 YADE_PLUGIN((ClumpTestGen));
 CREATE_LOGGER(ClumpTestGen);

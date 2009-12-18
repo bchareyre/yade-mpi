@@ -23,7 +23,7 @@
 
 
 #include<yade/pkg-common/BoxModel.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -223,7 +223,7 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),55));
 	shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
 	
@@ -270,8 +270,8 @@ void ThreePointBending::createActors(shared_ptr<Scene>& rootBody)
 	interactionPhysicsDispatcher->add("MacroMicroElasticRelationships");
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add("InteractingSphere2AABB");
-	boundDispatcher->add("InteractingBox2AABB");
+	boundDispatcher->add("Bo1_Sphere_Aabb");
+	boundDispatcher->add("Bo1_Box_Aabb");
 		
 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
 	actionForceDamping->damping = dampingForce;
@@ -344,7 +344,7 @@ void ThreePointBending::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<SceneShape> set(new SceneShape());
 	set->diffuseColor		= Vector3r(0,0,1);
 
-	shared_ptr<AABB> aabb(new AABB);
+	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 	
 	rootBody->shape	= YADE_PTR_CAST<Shape>(set);	

@@ -6,18 +6,18 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
-#include "InteractingBox2AABB.hpp"
+#include "Bo1_Box_Aabb.hpp"
 #include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 
-void InteractingBox2AABB::go(	const shared_ptr<Shape>& cm,
+void Bo1_Box_Aabb::go(	const shared_ptr<Shape>& cm,
 				shared_ptr<Bound>& bv,
 				const Se3r& se3,
 				const Body*	)
 {
 	Box* box = static_cast<Box*>(cm.get());
-	AABB* aabb = static_cast<AABB*>(bv.get());
+	Aabb* aabb = static_cast<Aabb*>(bv.get());
 	
 	aabb->center = se3.position;
 
@@ -32,4 +32,4 @@ void InteractingBox2AABB::go(	const shared_ptr<Shape>& cm,
 	aabb->max = aabb->center+aabb->halfSize;
 }
 	
-YADE_PLUGIN((InteractingBox2AABB));
+YADE_PLUGIN((Bo1_Box_Aabb));

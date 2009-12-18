@@ -60,7 +60,7 @@ python:
 
 Requirements
 ============
-* No body can have AABB larger than about .499*cellSize. Exception is thrown if that is false.
+* No body can have Aabb larger than about .499*cellSize. Exception is thrown if that is false.
 * Constitutive law must not get body positions from Body::state directly.
 	If it does, it uses Interaction::cellDist to compute periodic position.
 	Dem3Dof family of Ig2 functors and Law2_* engines are known to behave well.

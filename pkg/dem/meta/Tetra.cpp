@@ -16,7 +16,7 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB)
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/ElasticMat.hpp>
 
-#include<yade/pkg-common/AABB.hpp>
+#include<yade/pkg-common/Aabb.hpp>
 
 //#include<Wm3Tetrahedron3.h>
 //#include<Wm3IntrTetrahedron3Tetrahedron3.h> // not necessary since the cpp includes it as well
