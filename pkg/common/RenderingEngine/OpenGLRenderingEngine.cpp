@@ -70,6 +70,8 @@ void OpenGLRenderingEngine::init(){
 void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& scene){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
+	scene->cell.refSize=scene->cell.size;
+	scene->cell.refShear=scene->cell.shear;
 }
 
 
@@ -106,17 +108,6 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 	return false;
 }
 
-/* mostly copied from PeriodicInsertionSortCollider
- 	FIXME: common implementation somewhere */
-
-Real OpenGLRenderingEngine::wrapCell(const Real x, const Real x1){
-	Real xNorm=(x)/(x1);
-	return (xNorm-floor(xNorm))*(x1);
-}
-Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, Scene* rb){
-	if(!rb->isPeriodic) return pt;
-	return Vector3r(wrapCell(pt[0],rb->cell.size[0]),wrapCell(pt[1],rb->cell.size[1]),wrapCell(pt[2],rb->cell.size[2]));
-}
 
 void OpenGLRenderingEngine::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
@@ -125,12 +116,13 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 		size_t id=b->getId();
 		const Vector3r& pos=b->state->pos; const Vector3r& refPos=b->state->refPos;
 		const Quaternionr& ori=b->state->ori; const Quaternionr& refOri=b->state->refOri;
-		Vector3r posCell=(!scene->isPeriodic ? pos : scene->cell.wrapShearedPt(pos));
-		bodyDisp[id].isDisplayed=!pointClipped(posCell);	
+		Vector3r cellPos=(!scene->isPeriodic ? pos : scene->cell.wrapShearedPt(pos)); // inside the cell if periodic, same as pos otherwise
+		bodyDisp[id].isDisplayed=!pointClipped(cellPos);	
 		// if no scaling and no periodic, return quickly
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling
-		bodyDisp[id].pos=(scaleDisplacements ? diagMult(displacementScale,pos-refPos)+wrapCellPt(refPos,scene.get()) : posCell );
+		bodyDisp[id].pos=cellPos; // point of reference (inside the cell for periodic)
+		if(scaleDisplacements) bodyDisp[id].pos+=diagMult(displacementScale,pos-refPos); // add scaled translation to the point of reference
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
 			Quaternionr relRot=refOri.Conjugate()*ori;
@@ -147,6 +139,8 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		// order matters
+		Vector3r size=scene->cell.size;
+		if(scaleDisplacements) size=diagMult(displacementScale,size);
 		glTranslatev(scene->cell._shearTrsf*(.5*scene->cell.size)); // shear center (moves when sheared)
 		glMultMatrixd(scene->cell._glShearMatrix);
 		glScalev(scene->cell.size);

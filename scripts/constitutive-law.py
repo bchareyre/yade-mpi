@@ -16,7 +16,7 @@ O.engines=[
 ]
 
 for n in range(30):
-	O.bodies.append(utils.sphere([0,n,0],.50001,dynamic=(n>0),color=[1-(n/20.),n/20.,0],young=30e9,poisson=.3,density=2400))
+	O.bodies.append(utils.sphere([0,n,0],.50001,dynamic=(n>0),color=[1-(n/20.),n/20.,0]))
 O.bodies[len(O.bodies)-1]['isDynamic']=False
 #	# looks for metaengine found in Omega() and uses those
 #	if n>0: utils.createInteraction(n-1,n)

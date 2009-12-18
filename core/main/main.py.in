@@ -9,6 +9,12 @@ sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
 debug,features,version=bool(${debug}),'${features}'.split(','),'${realVersion}'
 
+## python2.5 relative module imports workaround
+v=sys.version_info
+if v[0]==2 and v[1]<=5:
+	for submodule in ('yade','gts','yade/tests'):
+		sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py',submodule))
+
 # handle command-line options first
 import optparse
 par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(version,','.join(features)))

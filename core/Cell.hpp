@@ -33,6 +33,9 @@ class Cell: public Serializable{
 		//! for details
 		Vector3r shear;
 
+		//! reference values of size and shear (for rendering, mainly)
+		Vector3r refSize, refShear, refCenter;
+
 	// caches
 	Vector3r _shearAngle;
 	Vector3r _shearSin;

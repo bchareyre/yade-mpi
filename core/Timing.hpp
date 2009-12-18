@@ -1,6 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once
 #include<time.h>
+#include<boost/python.hpp>
 
 struct TimingInfo{
 	typedef unsigned long long delta;
@@ -8,12 +9,13 @@ struct TimingInfo{
 	delta nsec;
 	TimingInfo():nExec(0),nsec(0){}
 	static delta getNow(bool evenIfDisabled=false)
-	{ 
+	{
+		if(!enabled && !evenIfDisabled) return 0L;
 #ifdef __APPLE__
-		std::cerr << "Warning: Time profiling should not be performed." << std::endl;
+		std::cerr << "ERROR: Time profiling (TimingInfo) not implemented on Apples." << std::endl;
 		return 0L;
 #else
-		if(!enabled && !evenIfDisabled) return 0L; struct timespec ts; 
+		struct timespec ts; 
 		clock_gettime(CLOCK_MONOTONIC,&ts); 
 		return delta(1e9*ts.tv_sec+ts.tv_nsec);		
 #endif
@@ -40,4 +42,10 @@ class TimingDeltas{
 			data[i].nExec+=1; data[i].nsec+=now-last; last=now; i++;
 		}
 		void reset(){ data.clear(); labels.clear(); }
+		// python access
+		boost::python::list pyData(){
+			boost::python::list ret;
+			for(size_t i=0; i<data.size(); i++){ ret.append(boost::python::make_tuple(labels[i],data[i].nsec,data[i].nExec));}
+			return ret;
+		}
 };

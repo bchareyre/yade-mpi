@@ -572,11 +572,6 @@ std::string Serializable_pyStr(const shared_ptr<Serializable>& self) {
 	return "<"+self->getClassName()+" instance at "+lexical_cast<string>(self.get())+">";
 }
 
-python::list TimingDeltas_pyData(const shared_ptr<TimingDeltas> self){
-	python::list ret;
-	for(size_t i=0; i<self->data.size(); i++){ ret.append(python::make_tuple(self->labels[i],self->data[i].nsec,self->data[i].nExec));}
-	return ret;
-}
 
 TimingInfo::delta Engine_timingInfo_nsec_get(const shared_ptr<Engine>& e){return e->timingInfo.nsec;}; void Engine_timingInfo_nsec_set(const shared_ptr<Engine>& e, TimingInfo::delta d){ e->timingInfo.nsec=d;}
 long Engine_timingInfo_nExec_get(const shared_ptr<Engine>& e){return e->timingInfo.nExec;}; void Engine_timingInfo_nExec_set(const shared_ptr<Engine>& e, long d){ e->timingInfo.nExec=d;}
@@ -641,35 +636,13 @@ python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, bool co
 }
 		
 // ParallelEngine
-void ParallelEngine_slaves_set(shared_ptr<ParallelEngine> self, const python::list& slaves){
-	int len=python::len(slaves);
-	self->slaves=ParallelEngine::slaveContainer(); // empty the container
-	for(int i=0; i<len; i++){
-		python::extract<std::vector<shared_ptr<Engine> > > serialGroup(slaves[i]);
-		if (serialGroup.check()){ self->slaves.push_back(serialGroup()); continue; }
-		python::extract<shared_ptr<Engine> > serialAlone(slaves[i]);
-		if (serialAlone.check()){ vector<shared_ptr<Engine> > aloneWrap; aloneWrap.push_back(serialAlone()); self->slaves.push_back(aloneWrap); continue; }
-		PyErr_SetString(PyExc_TypeError,"List elements must be either\n (a) sequences of engines to be executed one after another\n(b) alone engines.");
-		python::throw_error_already_set();
-	}
-}
-python::list ParallelEngine_slaves_get(shared_ptr<ParallelEngine> self){
-	python::list ret;
-	FOREACH(vector<shared_ptr<Engine > >& grp, self->slaves){
-		if(grp.size()==1) ret.append(python::object(grp[0]));
-		else ret.append(python::object(grp));
-	}
-	return ret;
-}
-shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); ParallelEngine_slaves_set(instance,slaves); return instance; }
+shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); instance->slaves_set(slaves); return instance; }
 
 shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->shape; }
 void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
 
-
 long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
 long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
-python::tuple Interaction_getCellDist(const shared_ptr<Interaction>& i){ return python::make_tuple(i->cellDist[0],i->cellDist[1],i->cellDist[2]); }
 
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
 void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
@@ -819,7 +792,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readonly("timingDeltas",&Functor::timingDeltas)
 		.add_property("bases",&Functor::getFunctorTypes);
 	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
-	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas_pyData).def("reset",&TimingDeltas::reset);
+	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData).def("reset",&TimingDeltas::reset);
 
 	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers")
 		.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
@@ -828,7 +801,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher);
 	python::class_<ParallelEngine,shared_ptr<ParallelEngine>, python::bases<Engine>, noncopyable>("ParallelEngine")
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
-		.add_property("slaves",&ParallelEngine_slaves_get,&ParallelEngine_slaves_set);
+		.add_property("slaves",&ParallelEngine::slaves_get,&ParallelEngine::slaves_set);
 
 	#define EXPOSE_DISPATCHER(DispatcherT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>).def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
 		EXPOSE_DISPATCHER(BoundDispatcher)
@@ -905,7 +878,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("id1",&Interaction_getId1)
 		.add_property("id2",&Interaction_getId2)
 		.add_property("isReal",&Interaction::isReal)
-		.add_property("cellDist",&Interaction_getCellDist);
+		.add_property("cellDist",&Interaction::cellDist);
 	EXPOSE_CXX_CLASS_IX(InteractionPhysics);
 	EXPOSE_CXX_CLASS_IX(InteractionGeometry);
 	EXPOSE_CXX_CLASS(FileGenerator)
