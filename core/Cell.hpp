@@ -35,15 +35,18 @@ class Cell: public Serializable{
 
 	// caches
 	Vector3r _shearAngle;
-	Vector3r _shearSine;
+	Vector3r _shearSin;
+	Vector3r _shearCos;
 	Matrix3r _shearTrsf;
 	Matrix3r _unshearTrsf;
+
 	double _glShearMatrix[16];
 	// should be called before every step
 	void updateCache(){
 		for(int i=0; i<3; i++) {
 			_shearAngle[i]=atan(shear[i]);
-			_shearSine[i]=sin(_shearAngle[i]);
+			_shearSin[i]=sin(_shearAngle[i]);
+			_shearCos[i]=cos(_shearAngle[i]);
 		}
 		_shearTrsf=Matrix3r(1,shear[2],shear[1],shear[2],1,shear[0],shear[1],shear[0],1);
 		_unshearTrsf=_shearTrsf.Inverse();
@@ -55,8 +58,8 @@ class Cell: public Serializable{
 	Note: the order of OpenGL transoformations matters; for instance, if you draw sheared wire box of size *size*, centered at *center*, the order is:
 
 		1. translation: glTranslatev(center);
-		2. scaling: glScalev(size);
 		3. shearing: glMultMatrixd(scene->cell._glShearMatrix);
+		2. scaling: glScalev(size);
 		4. draw: glutWireCube(1);
 	
 	See also http://www.songho.ca/opengl/gl_transform.html#matrix
@@ -86,6 +89,8 @@ class Cell: public Serializable{
 			m[3]=0;        m[7]=0;        m[11]=0;       m[15]=1;
 		}
 	#endif
+	/*! Return point inside periodic cell, even if shear is applied */
+	Vector3r wrapShearedPt(const Vector3r& pt){ return shearPt(wrapPt(unshearPt(pt))); }
 	/*! Apply inverse shear on point; to put it inside (unsheared) periodic cell, apply wrapPt on the returned value. */
 	Vector3r unshearPt(const Vector3r& pt){ return _unshearTrsf*pt; }
 	//! Apply shear on point. 

@@ -20,15 +20,23 @@ void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 	const Vector3r& O = se3.position;
 	Matrix3r facetAxisT; se3.orientation.ToRotationMatrix(facetAxisT);
 	const vector<Vector3r>& vertices=facet->vertices;
-	aabb->min=aabb->max = O + facetAxisT * vertices[0];
-	for (int i=1;i<3;++i)
-	{
-	    Vector3r v = O + facetAxisT * vertices[i];
-	    aabb->min = componentMinVector( aabb->min, v);
-	    aabb->max = componentMaxVector( aabb->max, v);
+	if(!scene->isPeriodic){
+		aabb->min=aabb->max = O + facetAxisT * vertices[0];
+		for (int i=1;i<3;++i)
+		{
+			Vector3r v = O + facetAxisT * vertices[i];
+			aabb->min = componentMinVector( aabb->min, v);
+			aabb->max = componentMaxVector( aabb->max, v);
+		}
+	} else {
+		Real inf=std::numeric_limits<Real>::infinity();
+		aabb->min=Vector3r(inf,inf,inf); aabb->max=Vector3r(-inf,-inf,-inf);
+		for(int i=0; i<3; i++){
+			Vector3r v=scene->cell.unshearPt(O+facetAxisT*vertices[i]);
+			aabb->min=componentMinVector(aabb->min,v);
+			aabb->max=componentMaxVector(aabb->max,v);
+		}
 	}
-	aabb->halfSize = (aabb->max - aabb->min)/2;
-	aabb->center = aabb->min + aabb->halfSize;
 }
 	
 YADE_PLUGIN((Bo1_Facet_Aabb));

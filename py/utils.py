@@ -89,6 +89,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	if isinstance(material,int): b.mat=O.materials[material]
 	elif isinstance(material,str): b.mat=O.materials[material]
 	elif isinstance(material,Material): b.mat=material
+	elif callable(material): b.mat=material()
 	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
 	## resets state (!!)
 	if resetState: b.state=b.mat.newAssocState()
@@ -106,8 +107,11 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 			radius
 		`color`: Vector3 or None
 			random color will be assigned if None
-		`material`: int or string or Material instance
-			if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0].
+		`material`: int | string | Material instance | callable returning Material instance
+			* if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
+			* if string, it is label of an existing material that will be used
+			* if Material instance, this instance will be used
+			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
 
 	:return:
 		A Body instance with desired characteristics.
@@ -141,6 +145,18 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 		'myMaterial'
 		>>> s2.mat['poisson']
 		0.11
+
+	Finally, material can be a callable object (taking no arguments), which returns a Material instance.
+	Use this if you don't call this function directly (for instance, through yade.pack.randomDensePack), passing
+	only 1 *material* parameter, but you don't want material to be shared.
+
+	For instance, randomized material properties can be created like this:
+
+		>>> import random
+		>>> def matFactory(): return ElasticMat(young=1e10*random.random(),density=1e3+1e3*random.random())
+		... 
+		>>> s3=sphere([0,2,0],1,material=matFactory)
+		>>> s4=sphere([1,2,0],1,material=matFactory)
 
 	"""
 	b=Body()

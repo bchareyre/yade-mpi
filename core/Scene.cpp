@@ -68,6 +68,8 @@ void Scene::postProcessAttributes(bool deserializing){
 		assert(b->material->id < (int)materials.size());
 		b->material=materials[b->material->id];
 	}
+	// update cell cache, so that rendering is correct even before we start
+	cell.updateCache();
 }
 
 

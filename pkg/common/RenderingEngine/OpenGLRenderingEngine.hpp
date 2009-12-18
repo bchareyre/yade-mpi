@@ -15,7 +15,7 @@ class OpenGLRenderingEngine : public RenderingEngine
 	public :
 		Vector3r Light_position,Background_color;
 		bool Show_DOF,Show_ID,Body_state,Body_bounding_volume,Body_interacting_geom,
-			Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics;
+			Body_wire,Interaction_wire,Draw_inside,Interaction_geometry,Interaction_physics, intrAllWire;
 		body_id_t current_selection;
 		int Draw_mask;
 
@@ -96,12 +96,14 @@ class OpenGLRenderingEngine : public RenderingEngine
 			void renderState(const shared_ptr<Scene>& rootBody);
 		#endif
 		void renderBoundingVolume(const shared_ptr<Scene>& rootBody);
-		void renderInteractingGeometry(const shared_ptr<Scene>& rootBody);
+		void renderShape(const shared_ptr<Scene>& rootBody);
+
+		void renderAllInteractionsWire(const shared_ptr<Scene>& rootBody);
 	
 	protected :
 		void postProcessAttributes(bool deserializing);
 	REGISTER_ATTRIBUTES(Serializable,(scaleDisplacements)(displacementScale)(scaleRotations)(rotationScale)(Light_position)(Background_color)(Body_wire)(Show_DOF)(Show_ID)(Body_state)(Body_bounding_volume)(Body_interacting_geom)
-		(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit));
+		(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit)(intrAllWire));
 	REGISTER_CLASS_AND_BASE(OpenGLRenderingEngine,RenderingEngine);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderingEngine);

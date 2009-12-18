@@ -41,14 +41,14 @@ void BoundDispatcher::action(Scene*)
 		#endif
 		if(sweepDist>0){
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
-			aabb->halfSize+=Vector3r(sweepDist,sweepDist,sweepDist);
-			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
+			aabb->min-=Vector3r(sweepDist,sweepDist,sweepDist);
+			aabb->max+=Vector3r(sweepDist,sweepDist,sweepDist);
 		}
 		if(haveBins){
 			Aabb* aabb=YADE_CAST<Aabb*>(b->bound.get());
 			Real sweep=velocityBins->bins[velocityBins->bodyBins[b->getId()]].maxDist;
-			aabb->halfSize+=Vector3r(sweep,sweep,sweep);
-			aabb->min=aabb->center-aabb->halfSize; aabb->max=aabb->center+aabb->halfSize;
+			aabb->min-=Vector3r(sweep,sweep,sweep);
+			aabb->max+=Vector3r(sweep,sweep,sweep);
 		}
 	}
 	scene->updateBound();

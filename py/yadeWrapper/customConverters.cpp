@@ -60,6 +60,13 @@ struct custom_Vector3r_from_seq{
 	}
 };
 
+struct custom_vector3i_to_seq{
+	static PyObject* convert(const Vector3<int> v3i){
+		python::tuple ret(python::make_tuple(v3i[0],v3i[1],v3i[2]));
+		return incref(ret.ptr());
+	}
+};
+
 /* two-way se3 handling */
 struct custom_se3_to_tuple{
 	static PyObject* convert(const Se3r& se3){
@@ -120,12 +127,16 @@ struct custom_vector_from_seq{
 
 
 
+
+
 using namespace boost::python;
 
 BOOST_PYTHON_MODULE(_customConverters){
 	// class_<std::vector<int> >("vecInt").def(indexing::container_suite<std::vector<int> >());
 	custom_Vector3r_from_seq(); // Vector3r is wrapped, it is returned as a Vector3 instance; no to-python converter needed
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
+	// Vector3<int> to python (not implemented the other way around yet)
+	custom_vector3i_to_seq(); to_python_converter<Vector3<int>,custom_vector3i_to_seq>();
 	// register from-python converter and to-python converter
 	custom_vector_from_seq<int>(); to_python_converter<std::vector<int>, custom_vector_to_list<int> >();
 	custom_vector_from_seq<Real>(); to_python_converter<std::vector<Real>, custom_vector_to_list<Real> >();

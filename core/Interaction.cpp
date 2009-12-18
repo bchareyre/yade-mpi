@@ -36,4 +36,5 @@ void Interaction::swapOrder(){
 		throw std::logic_error("Bodies in interaction cannot be swapped if they have interactionGeometry or interactionPhysics.");
 	}
 	std::swap(id1,id2);
+	cellDist*=-1;
 }

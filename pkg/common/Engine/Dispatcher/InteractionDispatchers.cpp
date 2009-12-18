@@ -90,6 +90,8 @@ void InteractionDispatchers::action(Scene*){
 			if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
+				// in sheared cell, apply shear on the mutual position as well
+				shift2=scene->cell.shearPt(shift2);
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			if(!geomCreated){

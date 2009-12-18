@@ -32,6 +32,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum
 	Body_interacting_geom = true;
 	Body_wire = false;
 	Interaction_wire = false;
+	intrAllWire=false;
 	Draw_inside = true;
 	Draw_mask = ~0;
 	Light_position = Vector3r(75.0,130.0,0.0);
@@ -115,19 +116,19 @@ Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, Scene* rb){
 	return Vector3r(wrapCell(pt[0],rb->cell.size[0]),wrapCell(pt[1],rb->cell.size[1]),wrapCell(pt[2],rb->cell.size[2]));
 }
 
-void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody){
-	if(rootBody->bodies->size()!=bodyDisp.size()) bodyDisp.resize(rootBody->bodies->size());
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& scene){
+	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->state) continue;
 		size_t id=b->getId();
 		const Vector3r& pos=b->state->pos; const Vector3r& refPos=b->state->refPos;
 		const Quaternionr& ori=b->state->ori; const Quaternionr& refOri=b->state->refOri;
-		Vector3r posCell=wrapCellPt(pos,rootBody.get());
+		Vector3r posCell=(!scene->isPeriodic ? pos : scene->cell.wrapShearedPt(pos));
 		bodyDisp[id].isDisplayed=!pointClipped(posCell);	
 		// if no scaling and no periodic, return quickly
-		if(!(scaleDisplacements||scaleRotations||rootBody->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
+		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling
-		bodyDisp[id].pos=(scaleDisplacements ? diagMult(displacementScale,pos-refPos)+wrapCellPt(refPos,rootBody.get()) : posCell );
+		bodyDisp[id].pos=(scaleDisplacements ? diagMult(displacementScale,pos-refPos)+wrapCellPt(refPos,scene.get()) : posCell );
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
 			Quaternionr relRot=refOri.Conjugate()*ori;
@@ -141,13 +142,12 @@ void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& rootBody)
 // draw periodic cell, if active
 void OpenGLRenderingEngine::drawPeriodicCell(Scene* scene){
 	if(!scene->isPeriodic) return;
-	const Vector3r& shear(scene->cell.shear);
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		// order matters
 		glTranslatev(scene->cell._shearTrsf*(.5*scene->cell.size)); // shear center (moves when sheared)
-		glScalev(scene->cell.size);
 		glMultMatrixd(scene->cell._glShearMatrix);
+		glScalev(scene->cell.size);
 		glutWireCube(1);
 	glPopMatrix();
 }
@@ -212,10 +212,24 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& rootBody, body_id_t 
 	if (Body_interacting_geom){
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
-		renderInteractingGeometry(rootBody);
+		renderShape(rootBody);
 	}
+	if (intrAllWire) renderAllInteractionsWire(rootBody);
 	if (Interaction_geometry) renderInteractionGeometry(rootBody);
 	if (Interaction_physics) renderInteractionPhysics(rootBody);
+}
+
+void OpenGLRenderingEngine::renderAllInteractionsWire(const shared_ptr<Scene>& scene){
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+		glColor3v(i->isReal()? Vector3r(0,1,0) : Vector3r(.5,0,1));
+		Vector3r p1=Body::byId(i->getId1(),scene)->state->pos;
+		Vector3r shift2(i->cellDist[0]*scene->cell.size[0],i->cellDist[1]*scene->cell.size[1],i->cellDist[2]*scene->cell.size[2]);
+		// in sheared cell, apply shear on the mutual position as well
+		shift2=scene->cell.shearPt(shift2);
+		Vector3r rel=Body::byId(i->getId2(),scene)->state->pos+shift2-p1;
+		if(scene->isPeriodic) p1=scene->cell.wrapShearedPt(p1);
+		glBegin(GL_LINES); glVertex3v(p1);glVertex3v(p1+rel);glEnd();
+	}
 }
 
 void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){	
@@ -321,7 +335,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& scene)
 }
 
 
-void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& rootBody)
+void OpenGLRenderingEngine::renderShape(const shared_ptr<Scene>& scene)
 {
 	// Additional clipping planes: http://fly.srk.fer.hr/~unreal/theredbook/chapter03.html
 	#if 0
@@ -333,7 +347,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};
 
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->shape) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		Vector3r pos=bodyDisp[b->getId()].pos;
@@ -372,21 +386,22 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 		}
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
-		if(b->bound && rootBody->isPeriodic){
-			const Vector3r& cellSize(rootBody->cell.size);
+		if(b->bound && scene->isPeriodic){
+			const Vector3r& cellSize(scene->cell.size);
+			pos=scene->cell.unshearPt(pos); // remove the shear component
 			// traverse all periodic cells around the body, to see if any of them touches
 			Vector3r halfSize=b->bound->max-b->bound->min; halfSize*=.5;
 			Vector3r pmin,pmax;
 			Vector3<int> i;
 			for(i[0]=-1; i[0]<=1; i[0]++) for(i[1]=-1;i[1]<=1; i[1]++) for(i[2]=-1; i[2]<=1; i[2]++){
 				if(i[0]==0 && i[1]==0 && i[2]==0) continue; // middle; already rendered above
-				Vector3r pt=pos+Vector3r(cellSize[0]*i[0],cellSize[1]*i[1],cellSize[2]*i[2]);
-				pmin=pt-halfSize; pmax=pt+halfSize;
+				Vector3r pos2=pos+Vector3r(cellSize[0]*i[0],cellSize[1]*i[1],cellSize[2]*i[2]); // shift, but without shear!
+				pmin=pos2-halfSize; pmax=pos2+halfSize;
 				if(pmin[0]<=cellSize[0] && pmax[0]>=0 &&
 					pmin[1]<=cellSize[1] && pmax[1]>=0 &&
 					pmin[2]<=cellSize[2] && pmax[2]>=0) {
 					glPushMatrix();
-						glTranslatev(pt);
+						glTranslatev(scene->cell.shearPt(pos2));
 						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 						shapeDispatcher(b->shape,b->state,/*Body_wire*/ true, viewInfo);
 					glPopMatrix();
@@ -394,7 +409,7 @@ void OpenGLRenderingEngine::renderInteractingGeometry(const shared_ptr<Scene>& r
 			}
 		}
 	}
-	if(rootBody->shape){ glPushMatrix(); shapeDispatcher(rootBody->shape,shared_ptr<State>(),true,viewInfo); glPopMatrix(); }
+	if(scene->shape){ glPushMatrix(); shapeDispatcher(scene->shape,shared_ptr<State>(),true,viewInfo); glPopMatrix(); }
 }
 
 

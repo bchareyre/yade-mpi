@@ -75,8 +75,6 @@ class TetraAABB: public BoundFunctor
 				aabb->min=se3.position+Vector3r(__VOP(std::min,0),__VOP(std::min,1),__VOP(std::min,2));
 				aabb->max=se3.position+Vector3r(__VOP(std::max,0),__VOP(std::max,1),__VOP(std::max,2));
 			#undef __VOP
-			aabb->center=(aabb->min+aabb->max)*0.5;
-			aabb->halfSize=(aabb->max-aabb->min)*0.5;
 		}
 		FUNCTOR2D(TetraMold,Aabb);
 		REGISTER_CLASS_NAME(TetraAABB);

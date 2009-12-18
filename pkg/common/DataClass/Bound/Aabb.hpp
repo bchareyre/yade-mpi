@@ -10,19 +10,19 @@
 
 #include<yade/core/Bound.hpp>
 
-class Aabb : public Bound
-{
-	public :
-		Vector3r	 halfSize
-				,center;
+/*! Representation of bound by min and max points.
 
+This class is redundant, since it has no data members; don't delete it, though,
+as Bound::{min,max} might move here one day.
+
+*/
+class Aabb : public Bound{
+	public :
 		Aabb();
 		virtual ~Aabb();
 	
-/// Serialization
 	REGISTER_CLASS_AND_BASE(Aabb,Bound);	
-	REGISTER_ATTRIBUTES(Bound,/* no attributes */);
-/// Indexable
+	REGISTER_ATTRIBUTES(Bound, /* (min)(max) */ );  // not necessary to store min and max, but it is handy for debugging/python inspection 
 	REGISTER_CLASS_INDEX(Aabb,Bound);
 };
 REGISTER_SERIALIZABLE(Aabb);
