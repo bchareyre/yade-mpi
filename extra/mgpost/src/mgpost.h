@@ -46,7 +46,7 @@
 #define MGP_VERSION     "0.5.4" 
 
 #define DISTANCE_INIT   15.0f
-#define DISTANCE_MAX    300.0f
+#define DISTANCE_MAX    3000.0f
 #define THETA_INIT      -30
 #define PHI_INIT        300
 
