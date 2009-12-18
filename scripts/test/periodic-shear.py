@@ -21,15 +21,15 @@ while False:
 	O.cellShear=Vector3(.2*sin(g),.2*cos(pi*g),.2*sin(2*g)+.2*cos(3*g))
 	time.sleep(0.001)
 	g+=1e-3
-O.cellShear=(.1,.05,.2)
+O.cellShear=(.15,.05,.2)
 O.dt=2e-2*utils.PWaveTimeStep()
 O.step()
 O.saveTmp()
 rdr=yade.qt.Renderer()
 #rdr['Body_bounding_volume']=True
 rdr['intrAllWire']=True
-from yade import log
-import yade.qt,time
+#from yade import log
+#import yade.qt,time
 v=yade.qt.View()
 v.axes=True
 v.grid=(True,True,True)

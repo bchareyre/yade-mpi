@@ -22,7 +22,9 @@
 #include<yade/lib-opengl/FpsTracker.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/core/Body.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/core/Interaction.hpp>
+#include<yade/core/DisplayParameters.hpp>
 #include<boost/filesystem/operations.hpp>
 #include<boost/version.hpp>
 #include<boost/python.hpp>

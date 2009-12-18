@@ -27,9 +27,10 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <yade/pkg-common/GravityEngines.hpp>
+#include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/gui-qt3/QtGUI.hpp>
 #include<qapplication.h>
+#include<yade/core/Scene.hpp>
 
 
 using namespace std;

@@ -5,6 +5,7 @@
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
 #include<yade/core/Timing.hpp>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 
 #ifdef __APPLE__
@@ -24,7 +25,7 @@ CREATE_LOGGER(OpenGLRenderingEngine);
 bool OpenGLRenderingEngine::glutInitDone=false;
 size_t OpenGLRenderingEngine::selectBodyLimit=500;
 
-OpenGLRenderingEngine::OpenGLRenderingEngine() : RenderingEngine(), clipPlaneNum(3){
+OpenGLRenderingEngine::OpenGLRenderingEngine(): clipPlaneNum(3){
 	Show_DOF = false;
 	Show_ID = false;
 	Body_state = false;
@@ -66,9 +67,9 @@ void OpenGLRenderingEngine::init(){
 	glutInitDone=true;
 }
 
-void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& rootBody){
+void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& scene){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
 }
 
 
@@ -81,8 +82,9 @@ void OpenGLRenderingEngine::initgl(){
 	BOOST_FOREACH(vector<string>& s,interactionPhysicsFunctorNames) (static_pointer_cast<GlInteractionPhysicsFunctor>(ClassFactory::instance().createShared(s[1])))->initgl();
 }
 
-void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& rootBody){
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
+	scene=_scene;
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->shape) continue;
 		glPushMatrix();
 		const Se3r& se3=b->state->se3;
@@ -116,7 +118,7 @@ Vector3r OpenGLRenderingEngine::wrapCellPt(const Vector3r& pt, Scene* rb){
 	return Vector3r(wrapCell(pt[0],rb->cell.size[0]),wrapCell(pt[1],rb->cell.size[1]),wrapCell(pt[2],rb->cell.size[2]));
 }
 
-void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& scene){
+void OpenGLRenderingEngine::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->state) continue;
@@ -140,7 +142,7 @@ void OpenGLRenderingEngine::setBodiesDispInfo(const shared_ptr<Scene>& scene){
 }
 
 // draw periodic cell, if active
-void OpenGLRenderingEngine::drawPeriodicCell(Scene* scene){
+void OpenGLRenderingEngine::drawPeriodicCell(){
 	if(!scene->isPeriodic) return;
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
@@ -154,15 +156,17 @@ void OpenGLRenderingEngine::drawPeriodicCell(Scene* scene){
 
 
 
-void OpenGLRenderingEngine::render(const shared_ptr<Scene>& rootBody, body_id_t selection	/*FIXME: not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
+void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
 	assert(glutInitDone);
 	current_selection = selection;
 
+	scene=_scene;
+
 	// assign scene inside functors
 
 	// just to make sure, since it is not initialized by default
-	if(!rootBody->bound) rootBody->bound=shared_ptr<Aabb>(new Aabb);
+	if(!scene->bound) scene->bound=shared_ptr<Aabb>(new Aabb);
 
 	// recompute emissive light colors for highlighted bodies
 	Real now=TimingInfo::getNow(/*even if timing is disabled*/true)*1e-9;
@@ -200,26 +204,23 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& rootBody, body_id_t 
 	}
 
 	// set displayed Se3 of body (scaling) and isDisplayed (clipping)
-	setBodiesDispInfo(rootBody);
+	setBodiesDispInfo();
 
-	drawPeriodicCell(rootBody.get());
+	drawPeriodicCell();
 
-	if (Show_DOF || Show_ID) renderDOF_ID(rootBody);
-	#ifdef YADE_PHYSPAR
-		if (Body_state) renderState(rootBody);
-	#endif
-	if (Body_bounding_volume) renderBoundingVolume(rootBody);
+	if (Show_DOF || Show_ID) renderDOF_ID();
+	if (Body_bounding_volume) renderBoundingVolume();
 	if (Body_interacting_geom){
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
-		renderShape(rootBody);
+		renderShape();
 	}
-	if (intrAllWire) renderAllInteractionsWire(rootBody);
-	if (Interaction_geometry) renderInteractionGeometry(rootBody);
-	if (Interaction_physics) renderInteractionPhysics(rootBody);
+	if (intrAllWire) renderAllInteractionsWire();
+	if (Interaction_geometry) renderInteractionGeometry();
+	if (Interaction_physics) renderInteractionPhysics();
 }
 
-void OpenGLRenderingEngine::renderAllInteractionsWire(const shared_ptr<Scene>& scene){
+void OpenGLRenderingEngine::renderAllInteractionsWire(){
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 		glColor3v(i->isReal()? Vector3r(0,1,0) : Vector3r(.5,0,1));
 		Vector3r p1=Body::byId(i->getId1(),scene)->state->pos;
@@ -232,10 +233,10 @@ void OpenGLRenderingEngine::renderAllInteractionsWire(const shared_ptr<Scene>& s
 	}
 }
 
-void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){	
+void OpenGLRenderingEngine::renderDOF_ID(){	
 	const GLfloat ambientColorSelected[4]={10.0,0.0,0.0,1.0};	
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
-	FOREACH(const shared_ptr<Body> b, *rootBody->bodies){
+	FOREACH(const shared_ptr<Body> b, *scene->bodies){
 		if(!b) continue;
 		if(b->shape && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
 			if(b->state /* && FIXME: !b->physicalParameters->isDisplayed */) continue;
@@ -269,15 +270,14 @@ void OpenGLRenderingEngine::renderDOF_ID(const shared_ptr<Scene>& rootBody){
 			glPopMatrix();
 		}
 	}
-	if(rootBody->shape) shapeDispatcher(rootBody->shape,shared_ptr<State>(),true);
 }
 
-void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<Scene>& rootBody){	
+void OpenGLRenderingEngine::renderInteractionGeometry(){	
 	{
-		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
-		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
+		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			if(!I->interactionGeometry) continue;
-			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			if(!(bodyDisp[I->getId1()].isDisplayed||bodyDisp[I->getId2()].isDisplayed)) continue;
 			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,Interaction_wire); glPopMatrix();
 		}
@@ -285,12 +285,12 @@ void OpenGLRenderingEngine::renderInteractionGeometry(const shared_ptr<Scene>& r
 }
 
 
-void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<Scene>& rootBody){	
+void OpenGLRenderingEngine::renderInteractionPhysics(){	
 	{
-		boost::mutex::scoped_lock lock(rootBody->interactions->drawloopmutex);
-		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
+		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			if(!I->interactionPhysics) continue;
-			const shared_ptr<Body>& b1=Body::byId(I->getId1(),rootBody), b2=Body::byId(I->getId2(),rootBody);
+			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			body_id_t id1=I->getId1(), id2=I->getId2();
 			if(!(bodyDisp[id1].isDisplayed||bodyDisp[id2].isDisplayed)) continue;
 			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
@@ -298,20 +298,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(const shared_ptr<Scene>& ro
 	}
 }
 
-#ifdef YADE_PHYSPAR
-void OpenGLRenderingEngine::renderState(const shared_ptr<Scene>& rootBody){	
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
-		if(!b) continue;
-		if(b->state /* && !b->state->isDisplayed*/ ) continue;
-		if(b->state && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
-			glPushMatrix(); stateDispatcher(b->state); glPopMatrix();
-		}
-	}
-	if(rootBody->state){ glPushMatrix(); stateDispatcher(rootBody->state); glPopMatrix();}
-}
-#endif
-
-void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& scene){	
+void OpenGLRenderingEngine::renderBoundingVolume(){	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
@@ -335,7 +322,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(const shared_ptr<Scene>& scene)
 }
 
 
-void OpenGLRenderingEngine::renderShape(const shared_ptr<Scene>& scene)
+void OpenGLRenderingEngine::renderShape()
 {
 	// Additional clipping planes: http://fly.srk.fer.hr/~unreal/theredbook/chapter03.html
 	#if 0
@@ -409,16 +396,12 @@ void OpenGLRenderingEngine::renderShape(const shared_ptr<Scene>& scene)
 			}
 		}
 	}
-	if(scene->shape){ glPushMatrix(); shapeDispatcher(scene->shape,shared_ptr<State>(),true,viewInfo); glPopMatrix(); }
 }
 
 
 
 void OpenGLRenderingEngine::postProcessAttributes(bool deserializing){
 	if(!deserializing) return;
-	#ifdef YADE_PHYSPAR
-		for(unsigned int i=0;i<stateFunctorNames.size();i++) stateDispatcher.add1DEntry(stateFunctorNames[i][0],stateFunctorNames[i][1]);
-	#endif
 	for(unsigned int i=0;i<boundFunctorNames.size();i++) boundDispatcher.add1DEntry(boundFunctorNames[i][0],boundFunctorNames[i][1]);
 	for(unsigned int i=0;i<shapeFunctorNames.size();i++) shapeDispatcher.add1DEntry(shapeFunctorNames[i][0],shapeFunctorNames[i][1]);
 	for(unsigned int i=0;i<interactionGeometryFunctorNames.size();i++) interactionGeometryDispatcher.add1DEntry(interactionGeometryFunctorNames[i][0],interactionGeometryFunctorNames[i][1]);

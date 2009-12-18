@@ -28,7 +28,6 @@ class Bound;
 class Scene: public Serializable{
 	public:
 		shared_ptr<Bound> bound;
-		shared_ptr<Shape> shape;
 		shared_ptr<BodyContainer>		bodies;
 		vector<shared_ptr<Engine> >		engines;
 		vector<shared_ptr<Engine> >		initializers; // FIXME: see MovingSupport:50

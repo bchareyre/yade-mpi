@@ -10,7 +10,6 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
-#include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>

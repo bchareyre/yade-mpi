@@ -13,7 +13,6 @@
 #include<yade/core/Omega.hpp>
 #include<yade/lib-opengl/GLWindowsManager.hpp>
 #include<yade/lib-serialization-qt/QtGUIGenerator.hpp>
-#include<yade/core/RenderingEngine.hpp>
 #include<qlayout.h>
 #include<qframe.h>
 #include<qscrollview.h>

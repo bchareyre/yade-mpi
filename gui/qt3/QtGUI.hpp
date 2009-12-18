@@ -13,7 +13,6 @@
 class YadeQtMainWindow;
 class SimulationController;
 class GLViewer;
-class RenderingEngine;
 class QApplication;
 
 class QtGUI : public FrontEnd

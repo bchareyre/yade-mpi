@@ -3,7 +3,6 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg-common/Bo1_Box_Aabb.hpp>
-#include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/Aabb.hpp>

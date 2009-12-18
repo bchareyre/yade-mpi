@@ -24,7 +24,6 @@
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/SceneShape.hpp>
 
 #include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
 
@@ -310,13 +309,9 @@ void Funnel::positionRootBody(shared_ptr<Scene>& rootBody)
 	physics->velocity			= Vector3r(0,0,0);
 	physics->acceleration			= Vector3r::ZERO;
 		
-	shared_ptr<SceneShape> set(new SceneShape());
-	set->diffuseColor			= Vector3r(0,0,1);
-	
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor			= Vector3r(0,0,1);
 	
-	rootBody->shape		= YADE_PTR_CAST<Shape>(set);	
 	rootBody->bound		= YADE_PTR_CAST<Bound>(aabb);
 	rootBody->physicalParameters 		= physics;
 }

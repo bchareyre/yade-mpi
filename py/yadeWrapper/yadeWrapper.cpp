@@ -52,7 +52,6 @@
 
 	#include<yade/pkg-common/ParticleParameters.hpp>
 #endif
-#include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 
 #include<yade/pkg-common/BoundFunctor.hpp>
@@ -69,8 +68,6 @@ using namespace std;
 
 #include<yade/extra/boost_python_len.hpp>
 
-
-class RenderingEngine;
 
 /*!
 
@@ -308,7 +305,6 @@ class pyOmega{
 		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
 		// if(!rb->bound){rb->bound=shared_ptr<Aabb>(new Aabb);}
 		// initialized in constructor now: rb->bound->diffuseColor=Vector3r(1,1,1); 
-		if(!rb->shape){rb->shape=shared_ptr<SceneShape>(new SceneShape);}
 		//if(!OMEGA.getScene()){shared_ptr<Scene> mb=Shop::rootBody(); OMEGA.setScene(mb);}
 		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){

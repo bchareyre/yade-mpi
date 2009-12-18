@@ -29,7 +29,6 @@
 
 #include<yade/core/Body.hpp>
 #include<yade/core/BodyVector.hpp>
-#include<yade/pkg-common/SceneShape.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/GeometricalModelMetaEngine.hpp>
 
