@@ -24,6 +24,7 @@ class Functor : public Serializable
 	Scene* scene;
 	// label to be able to retrieve an engine unit by its label
 	string label; 
+	virtual ~Functor(); // defined in Dispatcher.cpp
 	REGISTER_CLASS_AND_BASE(Functor,Serializable);
 	REGISTER_ATTRIBUTES(Serializable,(label));
 };

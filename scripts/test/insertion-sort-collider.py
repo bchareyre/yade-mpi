@@ -8,15 +8,16 @@ o.engines=[
 	GravityEngine(gravity=[0,0,-10]),
 	NewtonIntegrator(damping=0.01),
 ]
-
+O.materials.append(GranularMat(young=1e3))
 O.bodies.append([
-	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0],young=1e3),
-	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False,young=1e3)
+	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0]),
+	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False)
 ])
 import random
 if 1:
 	for i in range(0,100):
-		O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),velocity=[random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1)]))
+		O.bodies.append(utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05),))
+		O.bodies[len(O.bodies)-1].state['vel']=Vector3(random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1))
 else:
 	O.bodies.append(utils.sphere([0,0,.6],.5))
 O.dt=1e-4

@@ -76,7 +76,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assertRaises(KeyError,lambda: Sphere()['attributeThatDoesntExist'])
 	
 class TestWm3Wrapper(unittest.TestCase):
-	def assertVQAlmostEqual(self,v1,v2):
+	def assertSeqAlmostEqual(self,v1,v2):
 		"floating-point comparison of vectors/quaterions"
 		self.assertEqual(len(v1),len(v2));
 		for i in range(len(v1)): self.assertAlmostEqual(v1[i],v2[i],msg='Component '+str(i)+' of '+str(v1)+' and '+str(v2))
@@ -102,11 +102,33 @@ class TestWm3Wrapper(unittest.TestCase):
 		q2=Quaternion(Vector3(0,0,1),pi/2)
 		q1==q2
 		x,y,z,one=Vector3().UNIT_X,Vector3().UNIT_Y,Vector3().UNIT_Z,Vector3().ONE
-		self.assertVQAlmostEqual(q1*x,y)
-		self.assertVQAlmostEqual(q1*q1*x,-x)
-		self.assertVQAlmostEqual(q1*q1.Conjugate(),Quaternion().IDENTITY)
-		self.assertVQAlmostEqual(q1.ToAxisAngle()[0],(0,0,1))
+		self.assertSeqAlmostEqual(q1*x,y)
+		self.assertSeqAlmostEqual(q1*q1*x,-x)
+		self.assertSeqAlmostEqual(q1*q1.Conjugate(),Quaternion().IDENTITY)
+		self.assertSeqAlmostEqual(q1.ToAxisAngle()[0],(0,0,1))
 		self.assertAlmostEqual(q1.ToAxisAngle()[1],pi/2)
+	def testMatrix3(self):
+		#construction
+		m1=Matrix3(1,0,0,0,1,0,0,0,1)
+		# comparison
+		self.assert_(m1==Matrix3().IDENTITY)
+		# rotation matrix from quaternion
+		m1.FromAxisAngle(Vector3(0,0,1),pi/2)
+		# multiplication with vectors
+		self.assertSeqAlmostEqual(m1*Vector3().UNIT_X,Vector3().UNIT_Y)
+		# determinant
+		m2=Matrix3(-2,2,-3,-1,1,3,2,0,-1)
+		self.assertEqual(m2.Determinant(),18)
+		# inverse 
+		inv=Matrix3(-0.055555555555556,0.111111111111111,0.5,0.277777777777778,0.444444444444444,0.5,-0.111111111111111,0.222222222222222,0.0)
+		m2inv=m2.Inverse()
+		self.assertSeqAlmostEqual(m2inv,inv)
+		# matrix-matrix multiplication
+		self.assertSeqAlmostEqual(Matrix3().IDENTITY*Matrix3().IDENTITY,Matrix3().IDENTITY)
+		m3=Matrix3(1,2,3,4,5,6,-1,0,3)
+		m33=m3*m3
+		self.assertSeqAlmostEqual(m33,Matrix3(6,12,24,18,33,60,-4,-2,6))
+		
 	# not really wm3 thing, but closely related
 	# no way to test this currently, as State::se3 is not serialized (State::pos and State::ori are serialized instead...)
 	# remove the '_' from the method name to re-enable

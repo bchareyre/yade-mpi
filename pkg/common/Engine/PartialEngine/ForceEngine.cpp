@@ -3,26 +3,23 @@
 
 
 #include"ForceEngine.hpp"
-#include<yade/pkg-common/ParticleParameters.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/LinearInterpolate.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
-void ForceEngine::applyCondition(Scene* ncb){
+void ForceEngine::applyCondition(Scene*){
 	FOREACH(body_id_t id, subscribedBodies){
-		assert(ncb->bodies->exists(id));
-		ncb->bex.addForce(id,force);
+		assert(scene->bodies->exists(id));
+		scene->bex.addForce(id,force);
 	}
 }
 
-void InterpolatingDirectedForceEngine::applyCondition(Scene* rb){
-	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;
+void InterpolatingDirectedForceEngine::applyCondition(Scene* scene){
+	Real virtTime=wrap ? Shop::periodicWrap(scene->simulationTime,*times.begin(),*times.rbegin()) : scene->simulationTime;
 	direction.Normalize(); 
 	force=linearInterpolate<Real>(virtTime,times,magnitudes,_pos)*direction;
-	ForceEngine::applyCondition(rb);
+	ForceEngine::applyCondition(scene);
 }
 
-
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

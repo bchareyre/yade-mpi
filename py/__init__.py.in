@@ -47,8 +47,9 @@ for root,dirs,files in os.walk(libDir):
 	
 
 # c++ initialization code
-import boot,system
+import boot
 boot.initialize(plugins)
+import system
 system.setExitHandlers() # avoid backtrace if crash at finalization (log4cxx)
 
 # create types

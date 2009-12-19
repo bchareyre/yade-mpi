@@ -4,7 +4,7 @@
 #include<yade/core/Omega.hpp>
 YADE_PLUGIN((Dem3DofGeom_SphereSphere)
 	#ifdef YADE_OPENGL
-		(GLDraw_Dem3DofGeom_SphereSphere)
+		(Gl1_Dem3DofGeom_SphereSphere)
 	#endif
 	(Ig2_Sphere_Sphere_Dem3DofGeom));
 
@@ -95,13 +95,13 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const V
 #ifdef YADE_OPENGL
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	#include<yade/lib-opengl/GLUtils.hpp>
-	bool GLDraw_Dem3DofGeom_SphereSphere::normal=false;
-	bool GLDraw_Dem3DofGeom_SphereSphere::rolledPoints=false;
-	bool GLDraw_Dem3DofGeom_SphereSphere::unrolledPoints=false;
-	bool GLDraw_Dem3DofGeom_SphereSphere::shear=false;
-	bool GLDraw_Dem3DofGeom_SphereSphere::shearLabel=false;
+	bool Gl1_Dem3DofGeom_SphereSphere::normal=false;
+	bool Gl1_Dem3DofGeom_SphereSphere::rolledPoints=false;
+	bool Gl1_Dem3DofGeom_SphereSphere::unrolledPoints=false;
+	bool Gl1_Dem3DofGeom_SphereSphere::shear=false;
+	bool Gl1_Dem3DofGeom_SphereSphere::shearLabel=false;
 
-	void GLDraw_Dem3DofGeom_SphereSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_Dem3DofGeom_SphereSphere::go(const shared_ptr<InteractionGeometry>& ig, const shared_ptr<Interaction>& ip, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		Dem3DofGeom_SphereSphere* ss = static_cast<Dem3DofGeom_SphereSphere*>(ig.get());
 		//const Se3r& se31=b1->physicalParameters->dispSe3,se32=b2->physicalParameters->dispSe3;
 		const Se3r& se31=b1->state->se3,se32=b2->state->se3;

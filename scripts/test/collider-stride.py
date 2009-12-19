@@ -4,8 +4,9 @@
 
 O.bodies.append([
 	utils.facet([[1,0,0],[-1,2,0],[-1,-2,0]]),
-	utils.sphere([0,0,2],.5,color=(0,1,0),density=2e3,velocity=[0,0,-1])
+	utils.sphere([0,0,2],.5,color=(0,1,0))
 ])
+O.bodies[1].state['vel']=Vector3(0,0,-1)
 O.dt=utils.PWaveTimeStep()
 
 O.engines=[

@@ -7,5 +7,5 @@ O.engines=[
 
 for i in xrange(0,20):
 	O.step()
-	print O.bex.f(0),O.bodies[0].phys.pos
+	print O.bex.f(0),O.bodies[0].state.pos
 quit()

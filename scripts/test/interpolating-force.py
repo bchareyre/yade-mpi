@@ -8,10 +8,10 @@
 
 from numpy import arange
 
-nPulses=2 # run for total of 2 pulses
+nPulses=10 # run for total of 2 pulses
 freq=10. # 5 pulses per second
 times=arange(0,1/freq,.01/freq) # generate 100 points equally distributed over the period (can be much more)
-maxMag=1e10 # maximum magnitude of applied force
+maxMag=1e5 # maximum magnitude of applied force
 magnitudes=[.5*maxMag*(sin(t*(freq*2*pi))+1) for t in times] # generate points on sine wave over 1 period, but shifted up to be ∈(0,2)
 
 O.engines=[
@@ -33,7 +33,7 @@ O.engines=[
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
 	NewtonIntegrator(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)
-	PeriodicPythonRunner(iterPeriod=50,command='myAddPlotData()',label='plotDataCollector')
+	PeriodicPythonRunner(iterPeriod=10,command='myAddPlotData()',label='plotDataCollector')
 ]
 
 O.bodies.append([

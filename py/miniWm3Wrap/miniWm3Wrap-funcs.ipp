@@ -1,20 +1,33 @@
+// 2008,2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #include<boost/lexical_cast.hpp>
 #include<string>
 #include<stdexcept>
+#include<sstream>
 
-#define IDX_CHECK(i,MAX){ if(i<0 || i>=MAX) { PyErr_SetString(PyExc_IndexError, "Index out of range 0.." #MAX); boost::python::throw_error_already_set(); } }
+#define IDX_CHECK(i,MAX){ if(i<0 || i>=MAX) { PyErr_SetString(PyExc_IndexError, ("Index out of range 0.." + boost::lexical_cast<std::string>(MAX-1)).c_str()); boost::python::throw_error_already_set(); } }
+#define IDX2_CHECKED_TUPLE_INTS(tuple,max2,arr2) {int l=boost::python::len(tuple); if(l!=2) { PyErr_SetString(PyExc_IndexError,"Index must be integer or a 2-tuple"); boost::python::throw_error_already_set(); } for(int _i=0; _i<2; _i++) { boost::python::extract<int> val(tuple[_i]); if(!val.check()) throw std::runtime_error("Unable to convert "+boost::lexical_cast<std::string>(_i)+"-th index to int."); int v=val(); IDX_CHECK(v,max2[_i]); arr2[_i]=v; }  }
+
 void Vector2_set_item(Vector2r & self, int idx, Real value){ IDX_CHECK(idx,2); self[idx]=value; }
 void Vector3_set_item(Vector3r & self, int idx, Real value){ IDX_CHECK(idx,3); self[idx]=value; }
 void Quaternion_set_item(Quaternionr & self, int idx, Real value){ IDX_CHECK(idx,4); self[idx]=value; }
+void Matrix3_set_item(Matrix3r & self, boost::python::tuple _idx, Real value){ int idx[2]; int mx[2]={3,3}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); self(idx[0],idx[1])=value; }
+void Matrix3_set_item_linear(Matrix3r & self, int idx, Real value){ IDX_CHECK(idx,9); self(idx/3,idx%3)=value; }
+
 Real Vector2_get_item(const Vector2r & self, int idx){ IDX_CHECK(idx,2); return self[idx]; }
 Real Vector3_get_item(const Vector3r & self, int idx){ IDX_CHECK(idx,3); return self[idx]; }
 Real Quaternion_get_item(const Quaternionr & self, int idx){ IDX_CHECK(idx,4); return self[idx]; }
+Real Matrix3_get_item(Matrix3r & self, boost::python::tuple _idx){ int idx[2]; int mx[2]={3,3}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); return self(idx[0],idx[1]); }
+Real Matrix3_get_item_linear(Matrix3r & self, int idx){ IDX_CHECK(idx,9); return self(idx/3,idx%3); }
+
 std::string Vector2_str(const Vector2r & self){ return std::string("Vector2(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+")";}
 std::string Vector3_str(const Vector3r & self){ return std::string("Vector3(")+boost::lexical_cast<std::string>(self[0])+","+boost::lexical_cast<std::string>(self[1])+","+boost::lexical_cast<std::string>(self[2])+")";}
 std::string Quaternion_str(const Quaternionr & self){ Vector3r axis; Real angle; self.ToAxisAngle(axis,angle); return std::string("Quaternion((")+boost::lexical_cast<std::string>(axis[0])+","+boost::lexical_cast<std::string>(axis[1])+","+boost::lexical_cast<std::string>(axis[2])+"),"+boost::lexical_cast<std::string>(angle)+")";}
+std::string Matrix3_str(const Matrix3r & self){ std::ostringstream oss; oss<<"Matrix3("; for(int i=0; i<3; i++) for(int j=0; j<3; j++) oss<<self(i,j)<<((i==2 && j==2)?")":",")<<((i<2 && j==2)?" ":""); return oss.str(); }
+
 int Vector2_len(){return 2;}
 int Vector3_len(){return 3;}
 int Quaternion_len(){return 4;}
+int Matrix3_len(){return 9;}
 #undef IDX_CHECK
 
 #if 1
@@ -23,6 +36,7 @@ int Quaternion_len(){return 4;}
 	_WORKAROUND(Vector2r,ONE); _WORKAROUND(Vector2r,UNIT_X); _WORKAROUND(Vector2r,UNIT_Y); _WORKAROUND(Vector2r,ZERO);
 	_WORKAROUND(Vector3r,ONE); _WORKAROUND(Vector3r,UNIT_X); _WORKAROUND(Vector3r,UNIT_Y); _WORKAROUND(Vector3r,UNIT_Z); _WORKAROUND(Vector3r,ZERO);
 	_WORKAROUND(Quaternionr,IDENTITY); _WORKAROUND(Quaternionr,ZERO);
+	_WORKAROUND(Matrix3r,IDENTITY); _WORKAROUND(Matrix3r,ZERO);
 	#undef _WORKAROUND
 #endif
 

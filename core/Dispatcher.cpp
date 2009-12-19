@@ -6,11 +6,15 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Dispatcher.hpp"
 
+#include<yade/core/Functor.hpp>
+Functor::~Functor(){}; // vtable
+
+#include "Dispatcher.hpp"
 #include<algorithm>
 #include<vector>
 
+YADE_PLUGIN((Functor)(Dispatcher));
 
 
 Dispatcher::Dispatcher()

@@ -186,8 +186,17 @@ class ClassFactory : public Singleton<ClassFactory>
 	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z)
 #endif
 
+// the __attribute__((constructor(priority))) construct not supported before gcc 4.3
+// it will only produce warning from log4cxx if not used
+#if __GNUC__ == 4 && __GNUC_MINOR__ >=3
+	#define YADE_CTOR_PRIORITY(p) (p)
+#else
+	#define YADE_CTOR_PRIORITY(p)
+#endif
+
 #define _YADE_PLUGIN_REPEAT(x,y,z) BOOST_PP_STRINGIZE(z),
-#define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor)) void BOOST_PP_CAT(registerThisPluginClasses_,BOOST_PP_SEQ_HEAD(plugins)) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
+// priority 500 is greater than priority for log4cxx initialization (in core/main/pyboot.cpp); therefore lo5cxx will be initialized before plugins are registered
+#define YADE_PLUGIN(plugins) namespace{ __attribute__((constructor YADE_CTOR_PRIORITY(500))) void BOOST_PP_CAT(registerThisPluginClasses_,BOOST_PP_SEQ_HEAD(plugins)) (void){ const char* info[]={__FILE__ , BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_REPEAT,~,plugins) NULL}; ClassFactory::instance().registerPluginClasses(info);} } BOOST_PP_SEQ_FOR_EACH(_YADE_PLUGIN_BOOST_REGISTER,~,plugins)
 //! Macro informing build file generator what features that particular file depends on. Has no effect at compile-time. Can be specified multiple times within a single (.cpp) file
 #define YADE_REQUIRE_FEATURE(feature)
 #define YADE_LINK_EXTRA_LIB(lib)

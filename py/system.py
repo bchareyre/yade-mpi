@@ -90,6 +90,7 @@ _deprecated={
 	'Wall2AABB':'Bo1_Wall_Aabb', # Thu Dec 17 09:01:07 2009, vaclav@falx
 	'AABB':'Aabb', # Thu Dec 17 09:01:35 2009, vaclav@falx
 	'GLDrawAABB':'Gl1_Aabb', # Thu Dec 17 09:07:58 2009, vaclav@falx
+	'GLDraw_Dem3DofGeom_SphereSphere':'Gl1_Dem3DofGeom_SphereSphere', # Fri Dec 18 23:01:39 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
@@ -155,4 +156,10 @@ def runServers():
 	yade.runtime.cookie=srv.server.cookie
 	info=yade.remote.GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 	sys.stdout.flush()
+
+
+# consistency check
+# if there are no serializables, then plugins were not loaded yet, probably
+if(len(_allSerializables)==0):
+	raise ImportError("No classes deriving from Serializable found; you must call yade.boot.initialize to load plugins before importing yade.system.")
 

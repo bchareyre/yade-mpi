@@ -22,11 +22,13 @@ if not os.path.exists('horse.coarse.gts'):
 
 surf=gts.read(open('horse.coarse.gts'))
 
+O.materials.append(GranularMat(young=30e9,density=2000))
+
 if surf.is_closed():
 	pred=pack.inGtsSurface(surf)
 	aabb=pred.aabb()
 	dim0=aabb[1][0]-aabb[0][0]; radius=dim0/30. # get some characteristic dimension, use it for radius
-	O.bodies.append(pack.regularHexa(pred,radius=radius,gap=radius/4.,density=2000))
+	O.bodies.append(pack.regularHexa(pred,radius=radius,gap=radius/4.))
 	surf.translate(0,0,-(aabb[1][2]-aabb[0][2])) # move surface down so that facets are underneath the falling spheres
 O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
 

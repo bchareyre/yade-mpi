@@ -19,7 +19,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		shared_ptr<Facet> f=dynamic_pointer_cast<Facet>(b->shape);
 		if(!f) continue;
-		const Vector3r& pos=b->physicalParameters->se3.position;
+		const Vector3r& pos=b->state->pos;
 		for(size_t i=0; i<3; i++){
 			vv.push_back(shared_ptr<VertexData>(new VertexData(b->getId(),i,f->vertices[i]+pos,(f->vertices[i]+pos).Dot(projectionAxis))));
 			minSqLen=min(minSqLen,(f->vertices[i]-f->vertices[(i+1)%3]).SquaredLength());
@@ -123,10 +123,10 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 				( invNormals && (ti->vertices[ ei     ]==tj->vertices[ej]) && (ti->vertices[(ei+1)%3]==tj->vertices[(ej+1)%3]) ) ||
 				(!invNormals && (ti->vertices[(ei+1)%3]==tj->vertices[ej]) && (ti->vertices[ ei     ]==tj->vertices[(ej+1)%3]) ));
 			// angle between normals
-			PhysicalParameters *pp1=(*rb->bodies)[ti->id]->physicalParameters.get(), *pp2=(*rb->bodies)[tj->id]->physicalParameters.get();
-			Vector3r n1g=pp1->se3.orientation*f1->nf, n2g=pp2->se3.orientation*f2->nf;
+			const shared_ptr<Body>& b1=Body::byId(ti->id,scene); const shared_ptr<Body>& b2=Body::byId(tj->id,scene);
+			Vector3r n1g=b1->state->ori*f1->nf, n2g=b2->state->ori*f2->nf;
 			//TRVAR2(n1g,n2g);
-			Vector3r contEdge1g=pp1->se3.orientation*(f1->vertices[(ei+1)%3]-f1->vertices[ei]); // vector of the edge of contact in global coords
+			Vector3r contEdge1g=b1->state->ori*(f1->vertices[(ei+1)%3]-f1->vertices[ei]); // vector of the edge of contact in global coords
 			Quaternionr q12; q12.Align(n1g,(invNormals?-1.:1.)*n2g); Real halfAngle; Vector3r axis; q12.ToAxisAngle(axis,halfAngle); halfAngle*=.5;
 			assert(halfAngle>=0 && halfAngle<=Mathr::HALF_PI);
 			if(axis.Dot(contEdge1g)<0 /* convex contact from the side of +n1 */ ) halfAngle*=-1.;
@@ -139,5 +139,4 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 }
 #endif
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

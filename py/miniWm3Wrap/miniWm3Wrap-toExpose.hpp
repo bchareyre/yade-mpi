@@ -17,6 +17,6 @@ namespace pyplusplus{ namespace aliases {
 Vector3r noexpose_v3r;
 Vector2r noexpose_v2r;
 Quaternionr noexpose_qr;
-//Matrix3r noexpose_m3r;
+Matrix3r noexpose_m3r;
 //Matrix2r noexpose_m2r;
 

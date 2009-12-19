@@ -14,8 +14,11 @@
 	#include<log4cxx/consoleappender.h>
 	#include<log4cxx/patternlayout.h>
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.boot");
-	/* initialize here so that ClassFactory can use log4cxx without warnings */
-	__attribute__((constructor)) void initLog4cxx() {
+	/* Initialize here so that ClassFactory can use log4cxx without warnings.
+	Priority for registering function inside YADE_PLUGIN is 500, therefore it will have log4cxx ready when it's run.
+	gcc<4.3 doesn't support ctor priority, therefore we wrap it in the YADE_CTOR_PRIORITY macro, which expands to (200)
+	or to nothing, depending on gcc version. */
+	__attribute__((constructor YADE_CTOR_PRIORITY(200))) void initLog4cxx() {
 		#ifdef LOG4CXX_TRACE
 			log4cxx::LevelPtr debugLevel=log4cxx::Level::getDebug(), infoLevel=log4cxx::Level::getInfo(), warnLevel=log4cxx::Level::getWarn();
 			// LOG4CXX_STR: http://old.nabble.com/Link-error-when-using-Layout-on-MS-Windows-td20906802.html
