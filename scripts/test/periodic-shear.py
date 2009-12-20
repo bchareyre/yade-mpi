@@ -1,4 +1,5 @@
-O.cellSize=Vector3(.5,.5,.5)
+O.periodic=True
+O.cell.refSize=Vector3(.5,.5,.5)
 O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
 O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
 O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
@@ -16,12 +17,12 @@ O.engines=[
 	NewtonIntegrator(),
 ]
 
-g=0.
-while False:
-	O.cellShear=Vector3(.2*sin(g),.2*cos(pi*g),.2*sin(2*g)+.2*cos(3*g))
-	time.sleep(0.001)
-	g+=1e-3
-O.cellShear=(.15,.05,.2)
+#g=0.
+#while False:
+#	O.cellShear=Vector3(.2*sin(g),.2*cos(pi*g),.2*sin(2*g)+.2*cos(3*g))
+#	time.sleep(0.001)
+#	g+=1e-3
+O.cell.strain=Matrix3(0,0,0, 0,0,.5, 0,0,0)
 O.dt=2e-2*utils.PWaveTimeStep()
 O.step()
 O.saveTmp()

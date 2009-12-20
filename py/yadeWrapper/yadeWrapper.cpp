@@ -42,16 +42,6 @@
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
-#ifdef YADE_PHYSPAR
-	#include<yade/pkg-common/StateMetaEngine.hpp>
-	#include<yade/pkg-common/PhysicalActionDamper.hpp>
-	#include<yade/pkg-common/PhysicalActionApplier.hpp>
-	#include<yade/pkg-common/StateEngineUnit.hpp>
-	#include<yade/pkg-common/PhysicalActionDamperUnit.hpp>
-	#include<yade/pkg-common/PhysicalActionApplierUnit.hpp>
-
-	#include<yade/pkg-common/ParticleParameters.hpp>
-#endif
 #include<yade/pkg-common/Aabb.hpp>
 
 #include<yade/pkg-common/BoundFunctor.hpp>
@@ -517,20 +507,37 @@ class pyOmega{
 		oa << YadeSimulation;
 	}
 	#endif
+	
+#if 0
+	/***************** cell access ****************/
 	void cellSize_set_depr(const Vector3r& size){ LOG_WARN("O.periodicCell is deprecated (and will be removed), use O.cellSize instead."); cellSize_set(size); }
 	Vector3r cellSize_get_depr(){ LOG_WARN("O.periodicCell is deprecated (and will be removed), use O.cellSize instead."); return cellSize_get(); }
 
 	void cellSize_set(const Vector3r& size){
-		if(size[0]>0 && size[1]>0 && size[2]>0) { OMEGA.getScene()->cell.size=size; OMEGA.getScene()->isPeriodic=true; }
+		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
+		if(size[0]>0 && size[1]>0 && size[2]>0) { OMEGA.getScene()->cell->refSize=size; OMEGA.getScene()->isPeriodic=true; }
 		else {OMEGA.getScene()->isPeriodic=false; }
-		OMEGA.getScene()->cell.updateCache();
+		OMEGA.getScene()->cell->updateCache();
 	}
 	Vector3r cellSize_get(){
-		if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell.size;
+		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
+		if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell->refSize;
 		return Vector3r(-1,-1,-1);
 	}
-	void cellShear_set(const Vector3r& s){ OMEGA.getScene()->cell.shear=s; /* DO NOT FORGET!! */ OMEGA.getScene()->cell.updateCache(); }
-	Vector3r cellShear_get(){ return OMEGA.getScene()->cell.shear; }
+	void cellShear_set(const Vector3r& s){
+		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
+		OMEGA.getScene()->cell->shear=s; /* DO NOT FORGET!! */ OMEGA.getScene()->cell->updateCache();
+	}
+	Vector3r cellShear_get(){
+		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
+		return OMEGA.getScene()->cell->shear;
+	}
+#endif
+
+	shared_ptr<Cell> cell_get(){ if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell; return shared_ptr<Cell>(); }
+	bool periodic_get(void){ return OMEGA.getScene()->isPeriodic; } 
+	void periodic_set(bool v){ OMEGA.getScene()->isPeriodic=v; }
+
 	void disableGdb(){
 		signal(SIGSEGV,SIG_DFL);
 		signal(SIGABRT,SIG_DFL);
@@ -708,9 +715,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
 		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
-		.add_property("periodicCell",&pyOmega::cellSize_get_depr,&pyOmega::cellSize_set_depr,"Deprecated alias for cellSize")
-		.add_property("cellSize",&pyOmega::cellSize_get,&pyOmega::cellSize_set, "Get/set periodic cell minimum and maximum (tuple of 2 Vector3's), or () for no periodicity.")
-		.add_property("cellShear",&pyOmega::cellShear_get,&pyOmega::cellShear_set,"Get/set periodic cell shear.")
+		.add_property("cell",&pyOmega::cell_get,"Periodic cell of the current scene (None if the scene is aperiodic).")
+		.add_property("periodic",&pyOmega::periodic_get,&pyOmega::periodic_set,"Get/set whether the scene is periodic or not (True/False).")
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads("Disable SEGV handler and exit."))
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
@@ -775,7 +781,7 @@ BOOST_PYTHON_MODULE(wrapper)
 ///////////// proxyless wrappers 
 
 	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
-		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable_pyStr).def("__repr__",&Serializable_pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes)
+		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable_pyStr).def("__repr__",&Serializable_pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
 		.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
 		.def("updateAttrs",&Serializable_updateAttrs).def("updateExistingAttrs",&Serializable_updateExistingAttrs)
 		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
@@ -794,6 +800,13 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
 	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData).def("reset",&TimingDeltas::reset);
 
+	python::class_<Cell,shared_ptr<Cell>, python::bases<Serializable>, noncopyable>("Cell",python::no_init)
+		.def_readwrite("refSize",&Cell::refSize)
+		.def_readwrite("strain",&Cell::strain)
+		.add_property("extension",&Cell::getExtensionalStrain)
+		//.add_property("size",&Cell::getSize,python::return_value_policy<python::return_internal_referece>()
+	;
+
 	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers")
 		.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
 		.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher)
@@ -807,11 +820,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		EXPOSE_DISPATCHER(BoundDispatcher)
 		EXPOSE_DISPATCHER(InteractionGeometryDispatcher)
 		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher)
-		#ifdef YADE_PHYSPAR
-			EXPOSE_DISPATCHER(StateMetaEngine)
-			EXPOSE_DISPATCHER(PhysicalActionDamper)
-			EXPOSE_DISPATCHER(PhysicalActionApplier)
-		#endif
 		EXPOSE_DISPATCHER(LawDispatcher)
 	#undef EXPOSE_DISPATCHER
 
@@ -819,11 +827,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		EXPOSE_FUNCTOR(BoundFunctor)
 		EXPOSE_FUNCTOR(InteractionGeometryFunctor)
 		EXPOSE_FUNCTOR(InteractionPhysicsFunctor)
-		#ifdef YADE_PHYSPAR
-			EXPOSE_FUNCTOR(StateEngineUnit)
-			EXPOSE_FUNCTOR(PhysicalActionDamperUnit)
-			EXPOSE_FUNCTOR(PhysicalActionApplierUnit)
-		#endif
 		EXPOSE_FUNCTOR(LawFunctor)
 	#undef EXPOSE_FUNCTOR
 		
@@ -861,16 +864,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readwrite("refPos",&State::refPos)
 		.add_property("displ",&State::displ)
 		.add_property("rot",&State::rot);
-	// deprecated
-	#ifdef YADE_PHYSPAR
-	EXPOSE_CXX_CLASS_IX(PhysicalParameters)
-		.add_property("blockedDOFs",&PhysicalParameters::blockedDOFs_vec_get,&PhysicalParameters::blockedDOFs_vec_set)
-		.add_property("pos",&PhysicalParameters_pos_get,&PhysicalParameters_pos_set)
-		.add_property("ori",&PhysicalParameters_ori_get,&PhysicalParameters_ori_set)
-		.add_property("refPos",&PhysicalParameters_refPos_get,&PhysicalParameters_refPos_set)
-		.add_property("displ",&PhysicalParameters_displ_get)
-		.add_property("rot",&PhysicalParameters_rot_get);
-	#endif
 	// interaction
 	EXPOSE_CXX_CLASS(Interaction)
 		.def_readwrite("phys",&Interaction::interactionPhysics)

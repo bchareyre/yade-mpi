@@ -70,8 +70,8 @@ void OpenGLRenderingEngine::init(){
 void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& scene){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
-	scene->cell.refSize=scene->cell.size;
-	scene->cell.refShear=scene->cell.shear;
+	scene->cell->refSize=scene->cell->getSize();
+	// scene->cell->refShear=scene->cell->shear;
 }
 
 
@@ -116,7 +116,7 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 		size_t id=b->getId();
 		const Vector3r& pos=b->state->pos; const Vector3r& refPos=b->state->refPos;
 		const Quaternionr& ori=b->state->ori; const Quaternionr& refOri=b->state->refOri;
-		Vector3r cellPos=(!scene->isPeriodic ? pos : scene->cell.wrapShearedPt(pos)); // inside the cell if periodic, same as pos otherwise
+		Vector3r cellPos=(!scene->isPeriodic ? pos : scene->cell->wrapShearedPt(pos)); // inside the cell if periodic, same as pos otherwise
 		bodyDisp[id].isDisplayed=!pointClipped(cellPos);	
 		// if no scaling and no periodic, return quickly
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
@@ -139,11 +139,11 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		// order matters
-		Vector3r size=scene->cell.size;
+		Vector3r size=scene->cell->getSize();
 		if(scaleDisplacements) size=diagMult(displacementScale,size);
-		glTranslatev(scene->cell._shearTrsf*(.5*scene->cell.size)); // shear center (moves when sheared)
-		glMultMatrixd(scene->cell._glShearMatrix);
-		glScalev(scene->cell.size);
+		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
+		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
+		glScalev(size);
 		glutWireCube(1);
 	glPopMatrix();
 }
@@ -218,11 +218,12 @@ void OpenGLRenderingEngine::renderAllInteractionsWire(){
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
 		glColor3v(i->isReal()? Vector3r(0,1,0) : Vector3r(.5,0,1));
 		Vector3r p1=Body::byId(i->getId1(),scene)->state->pos;
-		Vector3r shift2(i->cellDist[0]*scene->cell.size[0],i->cellDist[1]*scene->cell.size[1],i->cellDist[2]*scene->cell.size[2]);
+		const Vector3r& size=scene->cell->getSize();
+		Vector3r shift2(i->cellDist[0]*size[0],i->cellDist[1]*size[1],i->cellDist[2]*size[2]);
 		// in sheared cell, apply shear on the mutual position as well
-		shift2=scene->cell.shearPt(shift2);
+		shift2=scene->cell->shearPt(shift2);
 		Vector3r rel=Body::byId(i->getId2(),scene)->state->pos+shift2-p1;
-		if(scene->isPeriodic) p1=scene->cell.wrapShearedPt(p1);
+		if(scene->isPeriodic) p1=scene->cell->wrapShearedPt(p1);
 		glBegin(GL_LINES); glVertex3v(p1);glVertex3v(p1+rel);glEnd();
 	}
 }
@@ -368,8 +369,8 @@ void OpenGLRenderingEngine::renderShape()
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
 		// precondition: pos is inside the cell.
 		if(b->bound && scene->isPeriodic){
-			const Vector3r& cellSize(scene->cell.size);
-			pos=scene->cell.unshearPt(pos); // remove the shear component
+			const Vector3r& cellSize(scene->cell->getSize());
+			pos=scene->cell->unshearPt(pos); // remove the shear component
 			// traverse all periodic cells around the body, to see if any of them touches
 			Vector3r halfSize=b->bound->max-b->bound->min; halfSize*=.5;
 			Vector3r pmin,pmax;
@@ -382,7 +383,7 @@ void OpenGLRenderingEngine::renderShape()
 					pmin[1]<=cellSize[1] && pmax[1]>=0 &&
 					pmin[2]<=cellSize[2] && pmax[2]>=0) {
 					glPushMatrix();
-						glTranslatev(scene->cell.shearPt(pos2));
+						glTranslatev(scene->cell->shearPt(pos2));
 						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 						shapeDispatcher(b->shape,b->state,/*Body_wire*/ true, viewInfo);
 					glPopMatrix();

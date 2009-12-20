@@ -75,7 +75,7 @@ void SpherePack::fromSimulation() {
 		if(!intSph) continue;
 		pack.push_back(Sph(b->state->pos,intSph->radius));
 	}
-	if(scene->isPeriodic) { cellSize=scene->cell.size; }
+	if(scene->isPeriodic) { cellSize=scene->cell->getSize(); }
 }
 
 long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, size_t num, bool periodic){

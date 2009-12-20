@@ -159,7 +159,7 @@ class InsertionSortCollider: public Collider{
 		void updatePeriodicity(Scene* scene){
 			assert(scene->isPeriodic);
 			assert(axis>=0 && axis <=2);
-			cellDim=scene->cell.size[axis];
+			cellDim=scene->cell->getSize()[axis];
 		}
 		// normalize given index to the right range (wraps around)
 		long norm(long i) const { if(i<0) i+=size; long ret=i%size; assert(ret>=0 && ret<size); return ret;}

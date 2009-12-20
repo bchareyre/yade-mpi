@@ -13,32 +13,32 @@ YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController))
 
 
 CREATE_LOGGER(PeriIsoCompressor);
-void PeriIsoCompressor::action(Scene* rb){
-	if(!rb->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
+void PeriIsoCompressor::action(Scene* scene){
+	if(!scene->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
 	if(state>=stresses.size()) return;
 	// initialize values
 	if(charLen<=0){
-		Bound* bv=Body::byId(0,rb)->bound.get();
+		Bound* bv=Body::byId(0,scene)->bound.get();
 		if(!bv){ LOG_FATAL("No charLen defined and body #0 has no bound"); throw; }
 		const Vector3r sz=bv->max-bv->min;
 		charLen=(sz[0]+sz[1]+sz[2])/3.;
 		LOG_INFO("No charLen defined, taking avg bbox size of body #0 = "<<charLen);
 	}
 	if(maxSpan<=0){
-		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 			if(!b || !b->bound) continue;
 			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->bound->max[i]-b->bound->min[i]);
 		}
 		
 	}
 	if(maxDisplPerStep<0) maxDisplPerStep=1e-2*charLen; // this should be tuned somehow…
-	const long& step=rb->currentIteration;
-	Vector3r cellSize=rb->cell.size; //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
+	const long& step=scene->currentIteration;
+	Vector3r cellSize=scene->cell->getSize(); //unused: Real cellVolume=cellSize[0]*cellSize[1]*cellSize[2];
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	Real minSize=min(cellSize[0],min(cellSize[1],cellSize[2])), maxSize=max(cellSize[0],max(cellSize[1],cellSize[2]));
 	if(minSize<2.1*maxSpan){ throw runtime_error("Minimum cell size is smaller than 2.1*span_of_the_biggest_body! (periodic collider requirement)"); }
 	if(((step%globalUpdateInt)==0) || avgStiffness<0 || sigma[0]<0 || sigma[1]<0 || sigma[2]<0){
-		Vector3r sumForces=Shop::totalForceInVolume(avgStiffness,rb);
+		Vector3r sumForces=Shop::totalForceInVolume(avgStiffness,scene);
 		sigma=-Vector3r(sumForces[0]/cellArea[0],sumForces[1]/cellArea[1],sumForces[2]/cellArea[2]);
 		LOG_TRACE("Updated sigma="<<sigma<<", avgStiffness="<<avgStiffness);
 	}
@@ -52,7 +52,9 @@ void PeriIsoCompressor::action(Scene* rb){
 		Real avgGrow=1e-4*(sigmaGoal-sigAvg)*avgArea/(avgStiffness>0?avgStiffness:1);
 		Real maxToAvg=maxSize/avgSize;
 		if(abs(maxToAvg*avgGrow)>maxDisplPerStep) avgGrow=Mathr::Sign(avgGrow)*maxDisplPerStep/maxToAvg;
-		avgGrow=max(avgGrow,-(minSize-2.1*maxSpan)/maxToAvg);
+		Real okGrow=-(minSize-2.1*maxSpan)/maxToAvg;
+		if(avgGrow<okGrow) throw runtime_error("Unable to shring cell due to maximum body size (although required by stress condition). Increase particle rigidity, increase total sample dimensions, or decrease goal stress.");
+		// avgGrow=max(avgGrow,-(minSize-2.1*maxSpan)/maxToAvg);
 		if(avgStiffness>0) { sigma+=(avgGrow*avgStiffness)*Vector3r::ONE; sigAvg+=avgGrow*avgStiffness; }
 		if(abs((sigAvg-sigmaGoal)/sigmaGoal)>5e-3) allStressesOK=false;
 		cellGrow=(avgGrow/avgSize)*cellSize;
@@ -72,10 +74,10 @@ void PeriIsoCompressor::action(Scene* rb){
 		}
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
-	rb->cell.size+=cellGrow;
+	scene->cell->refSize+=cellGrow;
 	// handle state transitions
 	if(allStressesOK){
-		if((step%globalUpdateInt)==0) currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,rb);
+		if((step%globalUpdateInt)==0) currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
 		if(currUnbalanced<maxUnbalanced){
 			state+=1;
 			// sigmaGoal reached and packing stable
@@ -91,7 +93,7 @@ void PeriIsoCompressor::action(Scene* rb){
 
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
-	const Vector3r& cellSize(scene->cell.size);
+	const Vector3r& cellSize(scene->cell->getSize());
 	for(int i=0; i<3; i++) strain[i]=(cellSize[i]-refSize[i])/refSize[i];
 	// stress and stiffness
 	Vector3r sumForce(Vector3r::ZERO), sumStiff(Vector3r::ZERO), sumLength(Vector3r::ZERO);
@@ -122,7 +124,7 @@ CREATE_LOGGER(PeriTriaxController);
 
 void PeriTriaxController::action(Scene* scene){
 	if(!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
-	const Vector3r& cellSize=scene->cell.size;
+	const Vector3r& cellSize=scene->cell->getSize();
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
 	if(refSize[0]<0) refSize=cellSize;
@@ -182,7 +184,7 @@ void PeriTriaxController::action(Scene* scene){
 		if(stiff[axis]>0) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]); //-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
 	// change cell size now
-	scene->cell.size+=cellGrow;
+	scene->cell->refSize+=cellGrow;
 	strainRate=cellGrow/scene->dt;
 
 	if(allOk){

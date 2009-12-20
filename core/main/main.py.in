@@ -50,7 +50,7 @@ if opts.nice:
 if yade.config.debug and opts.noGdb:
 	yade.wrapper.Omega().disableGdb()
 if 'log4cxx' in yade.config.features and opts.verbosity:
-	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,3)])
+	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,2)])
 
 # run servers
 yade.system.runServers()

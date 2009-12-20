@@ -33,7 +33,7 @@
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-Scene::Scene(): bodies(new BodyVector), interactions(new InteractionVecMap){	
+Scene::Scene(): bodies(new BodyVector), interactions(new InteractionVecMap), cell(new Cell){	
 	needsInitializers=true;
 	currentIteration=0;
 	simulationTime=0;
@@ -68,8 +68,6 @@ void Scene::postProcessAttributes(bool deserializing){
 		assert(b->material->id < (int)materials.size());
 		b->material=materials[b->material->id];
 	}
-	// update cell cache, so that rendering is correct even before we start
-	cell.updateCache();
 }
 
 
@@ -82,7 +80,7 @@ void Scene::moveToNextTimeStep(){
 		needsInitializers=false;
 	}
 	// update cell data
-	if(isPeriodic) cell.updateCache();
+	if(isPeriodic) cell->updateCache();
 	//bex.reset(); // uncomment if PhysicalActionContainerReseter is removed
 	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here

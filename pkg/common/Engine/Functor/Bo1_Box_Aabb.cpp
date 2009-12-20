@@ -19,7 +19,7 @@ void Bo1_Box_Aabb::go(	const shared_ptr<Shape>& cm,
 	Box* box = static_cast<Box*>(cm.get());
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
 
-	if(scene->isPeriodic && scene->cell.shear!=Vector3r::ZERO) throw logic_error(__FILE__ "Boxes not (yet?) supported in sheared cell.");
+	if(scene->isPeriodic && scene->cell->hasShear()) throw logic_error(__FILE__ "Boxes not (yet?) supported in sheared cell.");
 	
 	Matrix3r r;
 	se3.orientation.ToRotationMatrix(r);

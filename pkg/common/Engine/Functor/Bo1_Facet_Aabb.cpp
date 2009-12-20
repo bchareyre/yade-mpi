@@ -32,7 +32,7 @@ void Bo1_Facet_Aabb::go(	  const shared_ptr<Shape>& cm
 		Real inf=std::numeric_limits<Real>::infinity();
 		aabb->min=Vector3r(inf,inf,inf); aabb->max=Vector3r(-inf,-inf,-inf);
 		for(int i=0; i<3; i++){
-			Vector3r v=scene->cell.unshearPt(O+facetAxisT*vertices[i]);
+			Vector3r v=scene->cell->unshearPt(O+facetAxisT*vertices[i]);
 			aabb->min=componentMinVector(aabb->min,v);
 			aabb->max=componentMaxVector(aabb->max,v);
 		}

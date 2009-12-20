@@ -44,7 +44,7 @@ class Scene: public Serializable{
 		BexContainer bex;
 
 		//! information on periodicity; only should be used if Scene::isPeriodic
-		Cell cell;
+		shared_ptr<Cell> cell;
 		//! store for arbitrary Serializable objects; will set static parameters during deserialization (primarily for GLDraw functors which otherwise have no attribute access)
 		vector<shared_ptr<Serializable> > miscParams; 		//! tags like mp3 tags: author, date, version, description etc.
 		list<string> tags;

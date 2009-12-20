@@ -119,12 +119,16 @@ void ClassFactory::registerPluginClasses(const char* fileAndClasses[]){
 	if(fileAndClasses[1]==NULL){
 		/* strip leading path (if any; using / as path separator) and strip one suffix (if any) to get the contained class name */
 		string heldClass=boost::algorithm::replace_regex_copy(string(fileAndClasses[0]),boost::regex("^(.*/)?(.*?)(\\.[^.]*)?$"),string("\\2"));
-		LOG_DEBUG("Plugin "<<fileAndClasses[0]<<", class "<<heldClass<<" (deduced)");
+		#ifdef YADE_DEBUG
+			if(getenv("YADE_DEBUG")) cerr<<__FILE__<<":"<<__LINE__<<": Plugin "<<fileAndClasses[0]<<", class "<<heldClass<<" (deduced)"<<endl;
+		#endif
 		pluginClasses.push_back(heldClass); // last item with everything up to last / take off and .suffix strip
 	}
 	else {
 		for(int i=1; fileAndClasses[i]!=NULL; i++){
-			LOG_DEBUG("Plugin "<<fileAndClasses[0]<<", class "<<fileAndClasses[i]);
+			#ifdef YADE_DEBUG
+				if(getenv("YADE_DEBUG")) cerr<<__FILE__<<":"<<__LINE__<<": Plugin "<<fileAndClasses[0]<<", class "<<fileAndClasses[i]<<endl;	
+			#endif
 			pluginClasses.push_back(fileAndClasses[i]);
 		}
 	}
