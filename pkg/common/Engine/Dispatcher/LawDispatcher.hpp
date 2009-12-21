@@ -17,6 +17,7 @@ class LawDispatcher:
 		public:
 		virtual void action(Scene*);
 		REGISTER_CLASS_AND_BASE(LawDispatcher,Dispatcher2D);
+		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(LawDispatcher);
 

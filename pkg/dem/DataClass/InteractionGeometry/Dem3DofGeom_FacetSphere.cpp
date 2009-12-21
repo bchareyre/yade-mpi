@@ -51,7 +51,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			The FACET_TOPO thing is still missing here but can be copied literally once it is tested */
 		// begin facet-local coordinates
 			Vector3r cogLine=state1.ori.Conjugate()*(state2.pos+shift2-state1.pos); // connect centers of gravity
-			//TRVAR4(se31.position,se31.orientation,se32.position,cogLine);
+			//TRVAR4(state1.pos,state1.ori,state2.pos,cogLine);
 			Vector3r normal=facet->nf;
 			Real planeDist=normal.Dot(cogLine);
 			if(planeDist<0){normal*=-1; planeDist*=-1; }
@@ -139,15 +139,24 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 
 	if(penetrationDepth<0 && !c->isReal()) return false;
 
+
 	shared_ptr<Dem3DofGeom_FacetSphere> fs;
 	Vector3r normalGlob=state1.ori*normal;
+	bool isNew=false;
 	if(c->interactionGeometry) fs=YADE_PTR_CAST<Dem3DofGeom_FacetSphere>(c->interactionGeometry);
 	else {
+		isNew=true;
 		fs=shared_ptr<Dem3DofGeom_FacetSphere>(new Dem3DofGeom_FacetSphere());
 		c->interactionGeometry=fs;
 		fs->effR2=sphereRadius-penetrationDepth;
 		fs->refR1=-1; fs->refR2=sphereRadius;
-		fs->refLength=fs->effR2;
+		// postponed till below, to avoid numeric issues
+		// see https://lists.launchpad.net/yade-dev/msg02794.html
+		// since displacementN() is computed from fs->contactPoint,
+		// it was returning something like +1e-16 at the very first step
+		// when it was created ⇒ the constitutive law was erasing the
+		// contact as soon as it was created.
+		//fs->refLength=fs->effR2;
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=facet->nf;
 		fs->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
@@ -155,7 +164,11 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	}
 	fs->se31=state1.se3; fs->se32=state2.se3; fs->se32.position+=shift2;
 	fs->normal=normalGlob;
-	fs->contactPoint=state2.pos+shift2+(-normalGlob)*(sphereRadius-penetrationDepth);
+	fs->contactPoint=state2.pos+shift2+(-normalGlob)*fs->effR2;
+	// this refLength computation mimics what displacementN() does inside
+	// displcementN will therefore return exactly zero at the step the contact
+	// was created, which is what we want
+	if(isNew) fs->refLength=(state2.pos+shift2-fs->contactPoint).Length();
 	return true;
 }
 

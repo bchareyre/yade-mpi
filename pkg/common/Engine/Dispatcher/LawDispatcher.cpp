@@ -1,6 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #include "LawDispatcher.hpp"
 YADE_PLUGIN((LawDispatcher));
+CREATE_LOGGER(LawDispatcher);
 void LawDispatcher::action(Scene*){
 	updateScenePtr();
 	#ifdef YADE_OPENMP
@@ -14,6 +15,7 @@ void LawDispatcher::action(Scene*){
 		if(I->isReal()){
 			assert(I->interactionGeometry); assert(I->interactionPhysics);
 			operator()(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
+			if(!I->isReal() && I->isFresh(scene)) LOG_ERROR("Law functor deleted interaction that was just created. Please report bug: either this message is spurious, or the functor (or something else) is buggy.");
 		}
 	}
 }

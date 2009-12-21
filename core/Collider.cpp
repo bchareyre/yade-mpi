@@ -39,6 +39,8 @@ bool Collider::handleExistingInteraction(Interaction*){
 }
 bool Collider::mayCollide(const Body* b1, const Body* b2){
 	return 
+		// might be called with deleted bodies, i.e. NULL pointers
+		(b1!=NULL && b2!=NULL) &&
 		// only collide if at least one particle is standalone or they belong to different clumps
 		(b1->isStandalone() || b2->isStandalone() || b1->clumpId!=b2->clumpId ) &&
 		 // do not collide clumps, since they are just containers, never interact

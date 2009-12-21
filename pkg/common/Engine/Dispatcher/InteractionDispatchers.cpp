@@ -146,6 +146,7 @@ void InteractionDispatchers::action(Scene*){
 			physDispatcher->operator()(Body::byId(I->getId1(),scene)->material, Body::byId(I->getId2(),scene)->material,I);
 			// LawDispatcher
 			lawDispatcher->operator()(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
+			if(!I->isReal() && I->isFresn(scene)) LOG_WARN("Law functor deleted interaction that was just created. Please report bug: either this message is spurious, or the functor (or something else) is buggy.");
 		#endif
 		}
 }

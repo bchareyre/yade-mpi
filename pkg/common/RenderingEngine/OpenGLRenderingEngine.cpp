@@ -95,7 +95,7 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		//if(b->shape->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
 			glPushName(b->getId());
-			shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire);
+			shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire,viewInfo);
 			glPopName();
 		//}
 		glPopMatrix();
