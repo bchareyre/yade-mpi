@@ -127,7 +127,6 @@ RTriangulation Empilement::Triangulation (void)
 
 void Triangule ( Empilement &E, RTriangulation &T)
 {	
-	int current = 0;
 	Vertex_handle Vh;
 	//Sphere* it;
 	std::cout << "top1" << std::endl;

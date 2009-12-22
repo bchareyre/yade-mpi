@@ -14,7 +14,6 @@
 #include "TesselationWrapper.h"
 #include "Tesselation.h"
 
-
 using namespace std;
 
 namespace CGT {

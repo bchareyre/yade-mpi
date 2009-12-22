@@ -1,6 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2009 by Bruno Chareyre                                  *
-*  bruno.chareyre@hmg.inpg.fr                                            *
+*  Copyright (C) 2009 by Emanuele Catalano                               *
+*  emanuele.catalanog.inpg.fr                                            *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -314,7 +314,7 @@ void FlowEngine::UpdateVolumes ( Scene* ncb )
 Real FlowEngine::Volume_cell_single_fictious (CGT::Cell_handle cell, Scene* ncb)
 {
 	Real V[3][3];
-	int b;
+	int b=0;
 	int w=0;
 	
 	Real Wall_point[3];

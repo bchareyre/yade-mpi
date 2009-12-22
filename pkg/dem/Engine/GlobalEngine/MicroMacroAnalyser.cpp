@@ -84,7 +84,7 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	}
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	CGT::TriaxialState* ts;
+	CGT::TriaxialState* ts=0;
 	if ( state==1 ) ts = analyser->TS0;
 	else if ( state==2 ) ts = analyser->TS1;
 	else LOG_ERROR ( "state must be 1 or 2, instead of " << state );

@@ -19,6 +19,7 @@
 
 #define FLOW_ENGINE
 
+
 namespace CGT{
 
 typedef CGAL::Cartesian<double> K;
@@ -82,7 +83,7 @@ public:
 	Cell_Info& operator= (const Point &p) { Point::operator= (p); return *this; }
 	//Info& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
 #ifdef FLOW_ENGINE
-	Cell_Info& operator= (const vector<double> &v) { for (int i=0; i<4;) module_permeability[i]= v[i++]; return *this; }
+	Cell_Info& operator= (const vector<double> &v) { for (int i=0; i<4;i++) module_permeability[i]= v[i]; return *this; }
 #endif
 	Cell_Info& operator= (const float &scalar) { s=scalar; return *this; }
 // 	Cell_Info& operator= (const float &scalar) { VolumeVariation=scalar; return *this; }

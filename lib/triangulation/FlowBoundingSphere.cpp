@@ -334,7 +334,7 @@ namespace CGT
 		std::ofstream oFile ( "Analytical_Consolidation",std::ios::out );
 
 		int H = 10;
-		double U = 0, Tv = 0, p0 = 10, dz = H/10;
+		double U = 0, Tv = 0, /*p0 = 10,*/ dz = H/10;
 
 		for ( double z=0; z<=H; z+=dz )
 		{

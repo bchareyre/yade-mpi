@@ -17,9 +17,6 @@
 #define		_Rad_ecart		0.1
 
 namespace CGT{
-//// Macro to get a random integer with a specified range 
-//#define getrandom(min, max) \
-//    ((rand()%(int)(((max) + 1)-(min)))+ (min))
 
 double Rand_d (void);	//Tirage d'un double entre 0 et 1
 Sphere Rand_sph (double rad_max = 0.01); //Tirage d'une sph�re dans une bo�te (0,0,0) -> (1,1,1) 
