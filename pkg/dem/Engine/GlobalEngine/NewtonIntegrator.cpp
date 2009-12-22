@@ -12,6 +12,9 @@
 #include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
+//#define VELGRAD
+
+
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
 void NewtonIntegrator::cundallDamp(const Real& dt, const Vector3r& N, const Vector3r& V, Vector3r& A){
@@ -62,7 +65,9 @@ void NewtonIntegrator::saveMaximaVelocity(Scene* scene, const body_id_t& id, Sta
 void NewtonIntegrator::action(Scene*)
 {
 	// only temporary
+#ifndef VELGRAD
 	if(homotheticCellResize) throw runtime_error("Homothetic resizing not yet implemented with new, core/Cell.hpp based cell (extension+shear).");
+#endif
 
 	scene->bex.sync();
 	Real dt=scene->dt;
@@ -166,10 +171,20 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 	//   or position by (x-x') (homotheticCellResize==2)
 	// FIXME: wrap state->pos first, then apply the shift; otherwise result might be garbage
 	Vector3r dPos(Vector3r::ZERO); // initialize to avoid warning; find way to avoid it in a better way
+#ifndef VELGRAD
 	if(cellChanged && homotheticCellResize){ for(int i=0; i<3; i++) dPos[i]=(state->pos[i]/prevCellSize[i])*scene->cell->getSize()[i]-state->pos[i]; }
+#else
+	if(homotheticCellResize){ dPos = scene->cell->getShearIncrMatrix()*scene->cell->wrapShearedPt(state->pos);
+	}
+#endif	
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
-	state->vel+=dt*state->accel;                             if(homotheticCellResize==1) state->vel+=dPos/dt;
-	state->pos += state->vel*dt + scene->bex.getMove(id);    if(homotheticCellResize==2) state->pos+=dPos;
+	state->vel+=dt*state->accel;
+	state->pos += state->vel*dt + scene->bex.getMove(id);
+	//apply cell deformation
+	if(homotheticCellResize>=1) state->pos+=dPos;
+	//update velocity for usage in rate dependant equations (e.g. viscous law) FIXME : it is not recommended to do that because it impacts the dynamics (this modified velocity will be used as reference in the next time-step)
+	if(homotheticCellResize==2) state->vel+=dPos/dt;
+
 }
 inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
 {

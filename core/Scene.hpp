@@ -23,6 +23,8 @@
 #define HOST_NAME_MAX 255 
 #endif
 
+//#define VELGRAD
+
 class Bound;
 
 class Scene: public Serializable{

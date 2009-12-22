@@ -73,7 +73,7 @@ class NewtonIntegrator : public GlobalEngine{
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(Scene *);		
-		NewtonIntegrator(): prevCellSize(Vector3r::ZERO),damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false), homotheticCellResize(0){
+		NewtonIntegrator(): prevCellSize(Vector3r::ZERO),damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false), homotheticCellResize(1){
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif

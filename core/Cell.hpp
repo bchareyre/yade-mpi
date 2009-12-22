@@ -16,6 +16,9 @@
 #endif
 // end yade compatibility
 
+	
+//#define VELGRAD
+	
 /*! Periodic cell parameters and routines. Usually instantiated as Scene::cell.
 
 The cell has size and shear, which are independent. 
@@ -23,7 +26,16 @@ The cell has size and shear, which are independent.
 */
 class Cell: public Serializable{
 	public:
-		Cell(): refSize(Vector3r(1,1,1)), strain(Matrix3r::ZERO){ updateCache(); }
+		Cell(): refSize(Vector3r(1,1,1)), strain(Matrix3r::ZERO)
+#ifdef VELGRAD
+				, velGrad(Matrix3r::ZERO) 
+				, Hsize(Matrix3r::IDENTITY)
+				,_shearTrsfMatrix(Matrix3r::IDENTITY)
+				{ updateCache(0); }
+#else
+				{ updateCache(); }
+#endif
+				
 		//! size of the cell, projected on axes (for non-zero shear)
 		Vector3r refSize;
 		//! 3 non-diagonal components of the shear matrix, ordered by axis normal to the shear plane,
@@ -33,6 +45,11 @@ class Cell: public Serializable{
 		//! for details
 		// Vector3r shear;
 		Matrix3r strain;
+#ifdef VELGRAD
+		Matrix3r velGrad;
+		Matrix3r Hsize;
+		Matrix3r _shearIncrt;
+#endif
 
 		//! reference values of size and shear (for rendering, mainly)
 		// Vector3r refShear, refCenter;
@@ -49,6 +66,11 @@ class Cell: public Serializable{
 	const Matrix3r& getShearTrsfMatrix() const { return _shearTrsfMatrix; }
 	//! inverse of getShearTrsfMatrix().
 	const Matrix3r& getUnshearTrsfMatrix() const {return _unshearTrsfMatrix;}
+#ifdef VELGRAD	
+	//! transformation increment matrix applying arbitrary field
+	const Matrix3r& getShearIncrMatrix() const { return _shearIncrt; }
+#endif	
+	
 	/*! return pointer to column-major OpenGL 4x4 matrix applying pure shear. This matrix is suitable as argument for glMultMatrixd.
 
 	Note: the order of OpenGL transoformations matters; for instance, if you draw sheared wire box of size *size*,
@@ -83,6 +105,21 @@ class Cell: public Serializable{
 	public:
 
 	// should be called before every step
+#ifdef VELGRAD
+	void updateCache(double dt){	
+		//incremental disp gradient
+		_shearIncrt=dt*velGrad;
+		
+		//update Hsize (redundant with total transformation perhaps)
+		Hsize=Hsize+_shearIncrt*Hsize;
+		//total transformation
+		_shearTrsfMatrix = _shearTrsfMatrix + _shearIncrt*_shearTrsfMatrix;// M = (Id+G).M = F.M
+		//compatibility with Vaclav's code :
+		_size[0]=Hsize[0][0]; _size[1]=Hsize[1][1]; _size[2]=Hsize[2][2];
+		_hasShear = false;
+		_unshearTrsfMatrix=_shearTrsfMatrix.Inverse();
+		strain=_shearTrsfMatrix;
+#else
 	void updateCache(){
 		/*
 		for(int i=0; i<3; i++) {
@@ -98,10 +135,14 @@ class Cell: public Serializable{
 		_unshearTrsfMatrix=_shearTrsfMatrix.Inverse();
 		// _shearTrsf=Matrix3r(1,shear[2],shear[1],shear[2],1,shear[0],shear[1],shear[0],1);
 		// _unshearTrsf=strain.Inverse();
+#endif
 		fillGlShearTrsfMatrix(_glShearTrsfMatrix);
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) _cosMatrix[i][j]=(i==j?0:cos(atan(strain[i][j])));
 	}
-
+	
+// #ifdef VELGRAD		
+// 	void updateCache(){ updateCache(0);}
+// #endif
 
 	// doesn't seem to be really useful
 	#if 0
@@ -144,9 +185,16 @@ class Cell: public Serializable{
 	static Real wrapNum(const Real& x, const Real& sz, int& period){
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
-
+#ifdef VELGRAD
+	void postProcessAttributes(bool deserializing){ if(deserializing) updateCache(0); }
+#else
 	void postProcessAttributes(bool deserializing){ if(deserializing) updateCache(); }
-	REGISTER_ATTRIBUTES(Serializable,(refSize)(strain));
+#endif
+	REGISTER_ATTRIBUTES(Serializable,(refSize)(strain)
+#ifdef VELGRAD
+			(velGrad)(Hsize)
+#endif
+			   );
 	REGISTER_CLASS_AND_BASE(Cell,Serializable);
 };
 REGISTER_SERIALIZABLE(Cell);

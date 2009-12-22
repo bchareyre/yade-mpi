@@ -56,6 +56,8 @@
 using namespace boost;
 using namespace std;
 
+//#define VELGRAD
+
 #include<yade/extra/boost_python_len.hpp>
 
 
@@ -803,6 +805,10 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<Cell,shared_ptr<Cell>, python::bases<Serializable>, noncopyable>("Cell",python::no_init)
 		.def_readwrite("refSize",&Cell::refSize)
 		.def_readwrite("strain",&Cell::strain)
+#ifdef VELGRAD
+		.def_readwrite("velGrad",&Cell::velGrad)
+		.def_readwrite("Hsize",&Cell::Hsize)
+#endif
 		.add_property("extension",&Cell::getExtensionalStrain)
 		//.add_property("size",&Cell::getSize,python::return_value_policy<python::return_internal_referece>()
 	;
