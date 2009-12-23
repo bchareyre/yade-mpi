@@ -95,6 +95,7 @@ void InteractionDispatchers::action(Scene*){
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			if(!geomCreated){
+				if(wasReal) LOG_WARN("InteractionGeometryFunctor returned false on existing interaction!");
 				if(wasReal) scene->interactions->requestErase(I->getId1(),I->getId2()); // fully created interaction without geometry is reset and perhaps erased in the next step
 				continue; // in any case don't care about this one anymore
 			}

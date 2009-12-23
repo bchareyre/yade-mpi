@@ -145,9 +145,10 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	bool isNew=false;
 	if(c->interactionGeometry) fs=YADE_PTR_CAST<Dem3DofGeom_FacetSphere>(c->interactionGeometry);
 	else {
-		isNew=true;
+		// LOG_TRACE("Creating new Dem3DofGeom_FacetSphere");
 		fs=shared_ptr<Dem3DofGeom_FacetSphere>(new Dem3DofGeom_FacetSphere());
 		c->interactionGeometry=fs;
+		isNew=true;
 		fs->effR2=sphereRadius-penetrationDepth;
 		fs->refR1=-1; fs->refR2=sphereRadius;
 		// postponed till below, to avoid numeric issues
@@ -156,7 +157,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		// it was returning something like +1e-16 at the very first step
 		// when it was created ⇒ the constitutive law was erasing the
 		// contact as soon as it was created.
-		//fs->refLength=fs->effR2;
+		// fs->refLength=…
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=facet->nf;
 		fs->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
@@ -164,7 +165,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	}
 	fs->se31=state1.se3; fs->se32=state2.se3; fs->se32.position+=shift2;
 	fs->normal=normalGlob;
-	fs->contactPoint=state2.pos+shift2+(-normalGlob)*fs->effR2;
+	fs->contactPoint=state2.pos+shift2+(-normalGlob)*(sphereRadius-penetrationDepth);
 	// this refLength computation mimics what displacementN() does inside
 	// displcementN will therefore return exactly zero at the step the contact
 	// was created, which is what we want

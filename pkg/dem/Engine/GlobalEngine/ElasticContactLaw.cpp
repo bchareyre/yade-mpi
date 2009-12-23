@@ -113,7 +113,7 @@ void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, share
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
 	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
 	Real displN=geom->displacementN();
-	if(displN>0){rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
+	if(displN>0){ rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
 	phys->normalForce=phys->kn*displN*geom->normal;
 	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
