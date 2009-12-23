@@ -29,7 +29,7 @@ class Cell: public Serializable{
 		Cell(): refSize(Vector3r(1,1,1)), strain(Matrix3r::ZERO)
 #ifdef VELGRAD
 				, velGrad(Matrix3r::ZERO) 
-				, Hsize(Matrix3r::IDENTITY)
+				, Hsize(Matrix3r::ZERO)
 				,_shearTrsfMatrix(Matrix3r::IDENTITY)
 				{ updateCache(0); }
 #else
@@ -107,9 +107,10 @@ class Cell: public Serializable{
 	// should be called before every step
 #ifdef VELGRAD
 	void updateCache(double dt){	
+		//initialize Hsize for "lazy" default scripts, after that Hsize is free to change
+		if (Hsize[0][0]==0) {Hsize[0][0]=refSize[0]; Hsize[1][1]=refSize[1]; Hsize[2][2]=refSize[2];}
 		//incremental disp gradient
-		_shearIncrt=dt*velGrad;
-		
+		_shearIncrt=dt*velGrad;		
 		//update Hsize (redundant with total transformation perhaps)
 		Hsize=Hsize+_shearIncrt*Hsize;
 		//total transformation

@@ -12,7 +12,6 @@
 #include<yade/pkg-common/VelocityBins.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
-//#define VELGRAD
 
 
 YADE_PLUGIN((NewtonIntegrator));

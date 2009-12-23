@@ -56,7 +56,6 @@
 using namespace boost;
 using namespace std;
 
-//#define VELGRAD
 
 #include<yade/extra/boost_python_len.hpp>
 
