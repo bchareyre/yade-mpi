@@ -17,7 +17,7 @@
 // end yade compatibility
 
 	
-//#define VELGRAD
+#define VELGRAD
 	
 /*! Periodic cell parameters and routines. Usually instantiated as Scene::cell.
 
@@ -108,7 +108,7 @@ class Cell: public Serializable{
 #ifdef VELGRAD
 	void updateCache(double dt){	
 		//initialize Hsize for "lazy" default scripts, after that Hsize is free to change
-		if (Hsize[0][0]==0) {Hsize[0][0]=refSize[0]; Hsize[1][1]=refSize[1]; Hsize[2][2]=refSize[2];}
+		if (refSize[0]!=1 && Hsize[0][0]==0) {Hsize[0][0]=refSize[0]; Hsize[1][1]=refSize[1]; Hsize[2][2]=refSize[2];}
 		//incremental disp gradient
 		_shearIncrt=dt*velGrad;		
 		//update Hsize (redundant with total transformation perhaps)

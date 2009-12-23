@@ -74,7 +74,13 @@ void PeriIsoCompressor::action(Scene* scene){
 		}
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
+#ifdef VELGRAD
+	for(int axis=0; axis<3; axis++){
+		if (scene->dt!=0) scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*scene->cell->refSize[axis]);
+	}
+#endif
 	scene->cell->refSize+=cellGrow;
+
 	// handle state transitions
 	if(allStressesOK){
 		if((step%globalUpdateInt)==0) currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
@@ -178,6 +184,9 @@ void PeriTriaxController::action(Scene* scene){
 	}
 	// update stress and strain
 	for(int axis=0; axis<3; axis++){
+#ifdef VELGRAD
+		if (scene->dt!=0) scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
+#endif
 		strain[axis]+=cellGrow[axis]/refSize[axis];
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
