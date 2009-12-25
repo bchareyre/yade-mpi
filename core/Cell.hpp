@@ -117,25 +117,16 @@ class Cell: public Serializable{
 		_shearTrsfMatrix = _shearTrsfMatrix + _shearIncrt*_shearTrsfMatrix;// M = (Id+G).M = F.M
 		//compatibility with Vaclav's code :
 		_size[0]=Hsize[0][0]; _size[1]=Hsize[1][1]; _size[2]=Hsize[2][2];
-		_hasShear = false;
+		_hasShear = true;
 		_unshearTrsfMatrix=_shearTrsfMatrix.Inverse();
 		strain=_shearTrsfMatrix;
 #else
 	void updateCache(){
-		/*
-		for(int i=0; i<3; i++) {
-			_shearAngle[i]=atan(shear[i]);
-			_shearSin[i]=sin(_shearAngle[i]);
-			_shearCos[i]=cos(_shearAngle[i]);
-		}
-		*/
 		_size=refSize+diagMult(getExtensionalStrain(),refSize);
-		_hasShear=(strain[0][1]==0 && strain[0][2]==0 && strain[1][0]==0 && strain[1][2]==0 && strain[2][0]==0 && strain[2][1]==0);
+		_hasShear=!(strain[0][1]==0 && strain[0][2]==0 && strain[1][0]==0 && strain[1][2]==0 && strain[2][0]==0 && strain[2][1]==0);
 		_shearTrsfMatrix=strain;
 		_shearTrsfMatrix[0][0]=_shearTrsfMatrix[1][1]=_shearTrsfMatrix[2][2]=1.;
 		_unshearTrsfMatrix=_shearTrsfMatrix.Inverse();
-		// _shearTrsf=Matrix3r(1,shear[2],shear[1],shear[2],1,shear[0],shear[1],shear[0],1);
-		// _unshearTrsf=strain.Inverse();
 #endif
 		fillGlShearTrsfMatrix(_glShearTrsfMatrix);
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) _cosMatrix[i][j]=(i==j?0:cos(atan(strain[i][j])));
