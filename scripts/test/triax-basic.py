@@ -41,7 +41,7 @@ triax=TriaxialCompressionEngine(
 )
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InsertionSortCollider(nBins=5,sweepLength=.05),
 	InteractionDispatchers(

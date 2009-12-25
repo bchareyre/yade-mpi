@@ -49,7 +49,7 @@
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/Wall.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 
@@ -565,7 +565,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	
 	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(boundDispatcher);
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	rootBody->engines.push_back(collider);

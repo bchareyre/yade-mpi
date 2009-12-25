@@ -91,7 +91,7 @@ import yade.log
 import yade.plot as yp
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
 	InsertionSortCollider(sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(

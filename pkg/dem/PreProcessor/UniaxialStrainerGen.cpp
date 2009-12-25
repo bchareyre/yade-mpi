@@ -6,7 +6,7 @@
 
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
@@ -88,7 +88,7 @@ void UniaxialStrainerGen::createEngines(){
 
 	rootBody->engines.clear();
 
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(boundDispatcher);
 
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);

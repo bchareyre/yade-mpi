@@ -206,6 +206,9 @@ class InsertionSortCollider: public Collider{
 		virtual bool isActivated(Scene*);
 	#endif
 
+	// force reinitialization at next run
+	virtual void invalidatePersistentData(){ for(int i=0; i<3; i++){ BB[i].vec.clear(); BB[i].size=0; }}
+
 	vector<body_id_t> probeBoundingVolume(const Bound&);
 
 	InsertionSortCollider():

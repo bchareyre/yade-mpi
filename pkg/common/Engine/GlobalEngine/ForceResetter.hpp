@@ -10,24 +10,12 @@
 
 #include<yade/core/GlobalEngine.hpp>
 
-class Body;
-
-class PhysicalActionContainerReseter : public GlobalEngine
-{
-	public :
-		PhysicalActionContainerReseter();
-		virtual ~PhysicalActionContainerReseter();
-		virtual void action(Scene*);
-
-	REGISTER_CLASS_AND_BASE(PhysicalActionContainerReseter,GlobalEngine);
-};
-REGISTER_SERIALIZABLE(PhysicalActionContainerReseter);
-
-class BexResetter: public GlobalEngine{
+class Scene;
+class ForceResetter: public GlobalEngine{
 	public:
 		virtual void action(Scene*);
-	REGISTER_CLASS_AND_BASE(BexResetter,GlobalEngine);
+	REGISTER_CLASS_AND_BASE(ForceResetter,GlobalEngine);
 };
-REGISTER_SERIALIZABLE(BexResetter);
+REGISTER_SERIALIZABLE(ForceResetter);
 
 

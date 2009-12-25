@@ -155,7 +155,7 @@ void CinemKNCEngine::computeAlpha()
 void CinemKNCEngine::computeDu(Scene* ncb)
 {
 
-	ncb->bex.sync(); Vector3r F_sup=ncb->bex.getForce(id_boxhaut);
+	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_boxhaut);
 	
 	if(firstRun)
 	{

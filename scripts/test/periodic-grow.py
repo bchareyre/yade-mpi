@@ -4,7 +4,7 @@ once in a while."""
 from yade import log,timing
 log.setLevel("InsertionSortCollider",log.TRACE)
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

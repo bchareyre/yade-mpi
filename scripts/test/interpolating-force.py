@@ -15,7 +15,7 @@ maxMag=1e5 # maximum magnitude of applied force
 magnitudes=[.5*maxMag*(sin(t*(freq*2*pi))+1) for t in times] # generate points on sine wave over 1 period, but shifted up to be ∈(0,2)
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

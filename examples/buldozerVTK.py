@@ -58,7 +58,7 @@ O.dt=.2*tc
 O.initializers=[ BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]) ]
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

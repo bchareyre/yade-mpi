@@ -161,8 +161,8 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 {
 	//cerr << "TriaxialStressController::applyCondition" << endl;
 
-	// sync thread storage of BexContainer
-	ncb->bex.sync(); 
+	// sync thread storage of ForceContainer
+	ncb->forces.sync(); 
 	
 	if(thickness<0) thickness=YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,ncb)->shape)->extents.Y();
 
@@ -356,7 +356,7 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
  */
 Real TriaxialStressController::ComputeUnbalancedForce(Scene * ncb, bool maxUnbalanced)
 {
-	ncb->bex.sync();
+	ncb->forces.sync();
 	//compute the mean contact force
 	Real MeanForce = 0.f;
 	long nForce = 0;

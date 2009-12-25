@@ -15,17 +15,17 @@
 void StateMetaEngine::action(Scene* ncb)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	ncb->bex.sync();
+	ncb->forces.sync();
 	
 	BodyContainer::iterator bi    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
 	for( ; bi!=biEnd ; ++bi )
 	{
 		shared_ptr<Body> b = *bi;
-		operator()(b->state,b.get(),ncb->bex);
+		operator()(b->state,b.get(),ncb->forces);
 	}
 	
- 	operator()(ncb->state,ncb,ncb->bex);
+ 	operator()(ncb->state,ncb,ncb->forces);
 }
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

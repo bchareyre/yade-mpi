@@ -60,7 +60,7 @@ print "Numer of grains",len(O.bodies)-len(millIds)
 O.dt=utils.PWaveTimeStep()
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

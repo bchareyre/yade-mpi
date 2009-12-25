@@ -310,7 +310,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 		#print x1,y1,z1,radius,rRelFuzz
 		O.materials.append(GranularMat(young=3e10,density=2400))
 		num=sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,rRelFuzz,spheresInCell,True)
-		O.engines=[BexResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=5,sweepLength=.05*radius),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
+		O.engines=[ForceResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=5,sweepLength=.05*radius),InteractionDispatchers([ef2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
 		O.materials.append(GranularMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 		O.dt=utils.PWaveTimeStep()
@@ -378,7 +378,7 @@ def randomPeriPack(radius,rRelFuzz,initSize):
 	O.periodic=True
 	O.cell.refSize=Vector3(initSize)
 	sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,rRelFuzz,int(initSize[0]*initSize[1]*initSize[2]/((4/3.)*pi*radius**3)),True)
-	O.engines=[BexResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
+	O.engines=[ForceResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(GranularMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
 	O.dt=utils.PWaveTimeStep()

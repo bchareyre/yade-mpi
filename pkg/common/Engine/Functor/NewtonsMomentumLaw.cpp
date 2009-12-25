@@ -16,7 +16,7 @@
 //! Newtons law for both force and torque
 void NewtonsMomentumLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, Scene* rb){
 	body_id_t id=bb->getId();
-	Vector3r f=rb->bex.getForce(id); Vector3r m=rb->bex.getTorque(id);
+	Vector3r f=rb->forces.getForce(id); Vector3r m=rb->forces.getTorque(id);
 	RigidBodyParameters *rbp = static_cast<RigidBodyParameters*>(b.get());
 	if(bb->isStandalone()){ rbp->acceleration=f/rbp->mass; rbp->angularAcceleration=diagDiv(m,rbp->inertia); }
 	else if(bb->isClump()){ rbp->acceleration+=f/rbp->mass; rbp->angularAcceleration+=diagDiv(m,rbp->inertia); }

@@ -51,7 +51,7 @@ Scene::Scene(): bodies(new BodyVector), interactions(new InteractionVecMap), cel
 	pw=getpwuid(geteuid()); if(!pw) throw runtime_error("getpwuid(geteuid()) failed!");
 	// a few default tags
 	// real name: will have all non-ASCII characters replaced by ? since serialization doesn't handle that
-	// the standard GECOS format is Real Name,,, - first command and after will be discarded
+	// the standard GECOS format is Real Name,,, - first comma and after will be discarded
 	string gecos(pw->pw_gecos), gecos2; size_t p=gecos.find(","); if(p!=string::npos) boost::algorithm::erase_tail(gecos,gecos.size()-p); for(size_t i=0;i<gecos.size();i++){gecos2.push_back(((unsigned char)gecos[i])<128 ? gecos[i] : '?'); }
 	tags.push_back(boost::algorithm::replace_all_copy(string("author=")+gecos2+" ("+string(pw->pw_name)+"@"+hostname+")"," ","~"));
 	tags.push_back(string("isoTime="+boost::posix_time::to_iso_string(boost::posix_time::second_clock::local_time())));
@@ -77,7 +77,7 @@ void Scene::moveToNextTimeStep(){
 	if(needsInitializers){
 		checkStateTypes();
 		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(!e->isActivated(this)) continue;e->action(this); } 
-		bex.resize(bodies->size());
+		forces.resize(bodies->size());
 		needsInitializers=false;
 	}
 	// update cell data
@@ -86,7 +86,7 @@ void Scene::moveToNextTimeStep(){
 #else
 	if(isPeriodic) cell->updateCache(dt);
 #endif
-	//bex.reset(); // uncomment if PhysicalActionContainerReseter is removed
+	//forces.reset(); // uncomment if ForceResetter is removed
 	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
 	FOREACH(const shared_ptr<Engine>& e, engines){

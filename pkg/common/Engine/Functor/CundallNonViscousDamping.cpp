@@ -12,7 +12,7 @@ void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp,
 	ParticleParameters *p=static_cast<ParticleParameters*>(pp.get());
 	Vector3r df=Vector3r::ZERO;
 	for(int i=0; i<3; i++){df[i]=-f[i]*damping*Mathr::Sign(f[i]*p->velocity[i]);}
-	rb->bex.addForce(body->getId(),df);
+	rb->forces.addForce(body->getId(),df);
 }
 //! damping of both force and torque, for bodies that have RigidBodyParameters
 void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& pp, const Body* body, Scene* rb){
@@ -25,7 +25,7 @@ void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& 
 		df[i]=-f[i]*damping*Mathr::Sign(f[i]*p->velocity[i]);
 		dt[i]=-t[i]*damping*Mathr::Sign(t[i]*p->angularVelocity[i]);
 	}
-	rb->bex.addForce(id,df); rb->bex.addTorque(id,dt);
+	rb->forces.addForce(id,df); rb->forces.addTorque(id,dt);
 }
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

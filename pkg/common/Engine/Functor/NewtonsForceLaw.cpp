@@ -14,7 +14,7 @@
 #include<yade/core/Scene.hpp>
 
 void NewtonsForceLaw::go(const shared_ptr<PhysicalParameters>& b, const Body* bb, Scene* rb){
-	Vector3r f=rb->bex.getForce(bb->getId());
+	Vector3r f=rb->forces.getForce(bb->getId());
 	ParticleParameters * p = YADE_CAST<ParticleParameters*>(b.get());
 	
 	// normal behavior of a standalone particle or a clump itself

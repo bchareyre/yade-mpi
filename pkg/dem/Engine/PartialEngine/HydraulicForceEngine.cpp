@@ -75,7 +75,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
                     //cerr << "translate it" << endl;
                     if ((static_cast<CohesiveFrictionalMat*> (b->material.get()))->isBroken == true)
                     {
-								ncb->bex.addForce(b->getId(),Vector3r(0,5,0));
+								ncb->forces.addForce(b->getId(),Vector3r(0,5,0));
                     }
                     // else  b->geometricalModel->diffuseColor= Vector3r(0.5,0.9,0.3);
                 }
@@ -116,8 +116,8 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
 // 		    cerr << "f=" << f << " on " << id << endl;
                     //f /= -10000;
                     //t *= 0;
-						  	ncb->bex.addForce(id,f);
-							ncb->bex.addTorque(id,t);
+						  	ncb->forces.addForce(id,f);
+							ncb->forces.addTorque(id,t);
                 }
 		file.close();
             }

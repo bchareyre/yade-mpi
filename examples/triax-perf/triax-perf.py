@@ -20,5 +20,5 @@ O.timingEnabled=True
 O.run(200,True)
 from yade import timing
 timing.stats()
-print 'BexContainer synced %d times'%(O.bexSyncCount)
+print 'ForceContainer synced %d times'%(O.bexSyncCount)
 

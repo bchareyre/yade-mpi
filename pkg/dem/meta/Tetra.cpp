@@ -406,10 +406,10 @@ void TetraLaw::action(Scene* rootBody)
 		TRWM3VEC(F);
 		TRWM3VEC((A->state->pos-contactGeom->contactPoint).Cross(F));
 
-		rootBody->bex.addForce (idA,-F);
-		rootBody->bex.addForce (idB, F);
-		rootBody->bex.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).Cross(F));
-		rootBody->bex.addTorque(idB, (B->state->pos-contactGeom->contactPoint).Cross(F));
+		rootBody->forces.addForce (idA,-F);
+		rootBody->forces.addForce (idB, F);
+		rootBody->forces.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).Cross(F));
+		rootBody->forces.addTorque(idB, (B->state->pos-contactGeom->contactPoint).Cross(F));
 	}
 }
 

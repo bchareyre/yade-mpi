@@ -57,6 +57,9 @@ class TestBodies(unittest.TestCase):
 		"Erased bodies are None in python"
 		O.bodies.erase(0)
 		self.assert_(O.bodies[0]==None)
+	def testNegativeIndex(self):
+		"Negative index counts backwards (like python sequences)."
+		self.assert_(O.bodies[-1]==O.bodies[self.count-1])
 	def testErasedIterate(self):
 		"Iterator over O.bodies silently skips erased bodies."
 		removed,counted=0,0
@@ -91,6 +94,9 @@ class TestMaterials(unittest.TestCase):
 	def testLen(self):
 		"len(O.materials)"
 		self.assert_(len(O.materials)==2)
+	def testNegativeIndex(self):
+		"Negative index counts backwards."
+		self.assert_(O.materials[-1]==O.materials[1])
 	def testIterate(self):
 		"Iteration over O.materials"
 		counted=0

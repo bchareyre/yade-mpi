@@ -24,7 +24,7 @@ O.initializers=[
 
 ## Engines 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),

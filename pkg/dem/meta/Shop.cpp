@@ -35,7 +35,7 @@ class Bo1_Box_Aabb;
 class SceneShape; */
 
 
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
@@ -68,13 +68,77 @@ CREATE_LOGGER(Shop);
 
 map<string,boost::any> Shop::defaults;
 
+/*! Flip periodic cell by given number of cells.
+
+*/
+
+Matrix3r Shop::flipCell(const Matrix3r& _flip){
+	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell);
+	Matrix3r flip;
+	if(_flip==Matrix3r::ZERO){
+		LOG_ERROR("Computing optimal cell flip not yet implemented, no flipping done!");
+		return Matrix3r::ZERO;
+		// flip=optimal matrix …
+	} else {
+		flip=_flip;
+	}
+
+	// current cell coords of bodies
+	vector<Vector3<int> > oldCells; oldCells.resize(scene->bodies->size());
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		if(!b) continue; cell->wrapShearedPt(b->state->pos,oldCells[b->getId()]);
+	}
+
+	// change cell strain here
+	Vector3r size=cell->getSize();
+	Matrix3r strainInc;
+	for(int i=0; i<3; i++) for(int j=0; j<3; j++){
+		if(i==j) { if(flip[i][j]!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); strainInc[i][j]=0; continue; }
+		// make sure non-diagonal entries are "integers"
+		if(flip[i][j]!=double(int(flip[i][j]))) LOG_WARN("Flip matrix entry "<<flip[i][j]<<" at ["<<i<<","<<j<<"] not integer?! (will be rounded)");
+		strainInc[i][j]=int(flip[i][j])*size[j]/size[i];
+	}
+	TRWM3MAT(cell->strain);
+	TRWM3MAT(strainInc);
+	cell->strain+=strainInc;
+	cell->postProcessAttributes(/*deserializing*/true);
+
+	// new cell coords of bodies
+	vector<Vector3<int> > newCells; newCells.resize(scene->bodies->size());
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		if(!b) continue;
+		cell->wrapShearedPt(b->state->pos,newCells[b->getId()]);
+	}
+
+	// remove all potential interactions
+	scene->interactions->eraseNonReal();
+	// adjust Interaction::cellDist for real interactions; 
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+		body_id_t id1=i->getId1(),id2=i->getId2();
+		// this must be the same for both old and new interaction: cell2-cell1+cellDist
+		// c₂-c₁+c₁₂=k; c'₂+c₁'+c₁₂'=k   (new cell coords have ')
+		// c₁₂'=(c₂-c₁+c₁₂)-(c₂'-c₁')
+		i->cellDist=(oldCells[id2]-oldCells[id1]+i->cellDist)-(newCells[id2]-newCells[id1]);
+	}
+
+
+	// force reinitialization of the collider
+	bool colliderFound=false;
+	FOREACH(const shared_ptr<Engine>& e, scene->engines){
+		Collider* c=dynamic_cast<Collider*>(e.get());
+		if(c){ colliderFound=true; c->invalidatePersistentData(); }
+	}
+	if(!colliderFound) LOG_WARN("No collider found while flipping cell; continuing simulation might give garbage results.");
+	return flip;
+}
+
 /* Apply force on contact point to 2 bodies; the force is oriented as it applies on the first body and is reversed on the second.
  */
 void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, body_id_t id1, const Vector3r& pos1, body_id_t id2, const Vector3r& pos2, Scene* rootBody){
-	rootBody->bex.addForce(id1,force);
-	rootBody->bex.addForce(id2,-force);
-	rootBody->bex.addTorque(id1,(contPt-pos1).Cross(force));
-	rootBody->bex.addTorque(id2,-(contPt-pos2).Cross(force));
+	rootBody->forces.addForce(id1,force);
+	rootBody->forces.addForce(id2,-force);
+	rootBody->forces.addTorque(id1,(contPt-pos1).Cross(force));
+	rootBody->forces.addTorque(id2,-(contPt-pos2).Cross(force));
 }
 
 
@@ -101,12 +165,12 @@ Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
 
 Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
-	rb->bex.sync();
+	rb->forces.sync();
 	// get maximum force on a body and sum of all forces (for averaging)
 	Real sumF=0,maxF=0,currF;
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->isDynamic) continue;
-		currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
+		currF=rb->forces.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
 	}
 	Real meanF=sumF/rb->bodies->size(); 
 	// get max force on contacts
@@ -217,7 +281,7 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 		rootBody->engines.push_back(sdecTimeStepper);
 	}
 
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 
 	rootBody->engines.push_back(boundDispatcher);
 

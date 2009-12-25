@@ -1,6 +1,6 @@
 O.bodies.append(utils.sphere([0,0,0],1,dynamic=True))
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	PeriodicPythonRunner(command='O.bex.addMove(0,(1e-2,0,0))',iterPeriod=1),
 	NewtonIntegrator()
 ]

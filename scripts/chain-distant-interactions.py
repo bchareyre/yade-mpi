@@ -7,7 +7,7 @@ o.initializers=[
 		Bo1_Sphere_Aabb(),Bo1_Box_Aabb()
 	]
 o.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(hasShear=True)]),

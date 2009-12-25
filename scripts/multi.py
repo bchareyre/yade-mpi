@@ -11,7 +11,7 @@ o.initializers=[
 		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 	]
 o.engines=[
-	PhysicalActionContainerReseter(),
+	ForceResetter(),
 	BoundDispatcher([
 		Bo1_Sphere_Aabb(),
 		Bo1_Box_Aabb(),

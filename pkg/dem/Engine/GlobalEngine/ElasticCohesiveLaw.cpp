@@ -102,10 +102,10 @@ void ElasticCohesiveLaw::action(Scene* ncb)
 			currentContactPhysics->shearForce      -= currentContactPhysics->ks*shearDisplacement;
 	
 			Vector3r f = currentContactPhysics->normalForce + currentContactPhysics->shearForce;
-			ncb->bex.addForce (id1,-f);
-			ncb->bex.addForce (id2,+f);
-			ncb->bex.addTorque(id1,-c1x.Cross(f));
-			ncb->bex.addTorque(id2, c2x.Cross(f));
+			ncb->forces.addForce (id1,-f);
+			ncb->forces.addForce (id2,+f);
+			ncb->forces.addTorque(id1,-c1x.Cross(f));
+			ncb->forces.addTorque(id2, c2x.Cross(f));
 	
 	
 	
@@ -201,8 +201,8 @@ void ElasticCohesiveLaw::action(Scene* ncb)
 	
 			//if (normElastic<=normMPlastic)
 			//{
-			ncb->bex.addTorque(id1,-q_n_i*mElastic);
-			ncb->bex.addTorque(id2, q_n_i*mElastic);
+			ncb->forces.addTorque(id1,-q_n_i*mElastic);
+			ncb->forces.addTorque(id2, q_n_i*mElastic);
 	
 			//}  
 			//else

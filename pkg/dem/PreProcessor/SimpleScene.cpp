@@ -3,7 +3,7 @@
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg-common/Bo1_Box_Aabb.hpp>
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/Box.hpp>
@@ -46,7 +46,7 @@ bool SimpleScene::generate(){
 	/* engines */
 		rootBody->engines.clear();
 		//@
-		rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+		rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 		//@
 		// use boundDispatcher that we defined above
 		rootBody->engines.push_back(boundDispatcher);

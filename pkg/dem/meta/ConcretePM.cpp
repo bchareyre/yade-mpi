@@ -302,7 +302,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 #if 0
 CREATE_LOGGER(CpmGlobalCharacteristics);
 void CpmGlobalCharacteristics::compute(Scene* rb, bool useMaxForce){
-	rb->bex.sync();
+	rb->forces.sync();
 
 	// 1. reset volumetric strain (cummulative in the next loop)
 	// 2. get maximum force on a body and sum of all forces (for averaging)
@@ -311,7 +311,7 @@ void CpmGlobalCharacteristics::compute(Scene* rb, bool useMaxForce){
 	CpmMat* bpp(YADE_CAST<CpmMat*>(b->physicalParameters.get()));
 		bpp->epsVolumetric=0;
 		bpp->numContacts=0;
-		currF=rb->bex.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
+		currF=rb->forces.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
 	}
 	Real meanF=sumF/rb->bodies->size(); 
 

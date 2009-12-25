@@ -13,7 +13,7 @@
 #include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
-#include<yade/core/BexContainer.hpp>
+#include<yade/core/ForceContainer.hpp>
 
 class StateMetaEngine :	public Dispatcher1D
 					<	
@@ -21,7 +21,7 @@ class StateMetaEngine :	public Dispatcher1D
 						StateEngineUnit,
 						void ,
 						TYPELIST_3(	  const shared_ptr<State>&
-								, Body*, BexContainer&
+								, Body*, ForceContainer&
 				  			  )
 					>
 {

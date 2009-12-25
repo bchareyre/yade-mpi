@@ -94,9 +94,9 @@ void FlowEngine::applyCondition ( Scene* ncb )
 				id = V_it->info().id();
 				for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
 
-				ncb->bex.addForce ( id, f );
-				ncb->bex.addForce ( id, -f );
-				//ncb->bex.addTorque(id,t);
+				ncb->forces.addForce ( id, f );
+				ncb->forces.addForce ( id, -f );
+				//ncb->forces.addTorque(id,t);
 			}
 
 			/** ADD LIBRARIES TO SCONSCRIPT FILE!!!! **/

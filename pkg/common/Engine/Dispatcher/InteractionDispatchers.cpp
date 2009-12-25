@@ -13,7 +13,6 @@ CREATE_LOGGER(InteractionDispatchers);
 
 
 
-
 InteractionDispatchers::InteractionDispatchers(){
 	geomDispatcher=shared_ptr<InteractionGeometryDispatcher>(new InteractionGeometryDispatcher);
 	physDispatcher=shared_ptr<InteractionPhysicsDispatcher>(new InteractionPhysicsDispatcher);

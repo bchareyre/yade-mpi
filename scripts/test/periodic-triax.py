@@ -13,7 +13,7 @@ O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(nBins=5,sweepLength=.05*radius),
 	InteractionDispatchers(

@@ -41,7 +41,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 
 #include<yade/pkg-dem/Shop.hpp>
 
@@ -455,7 +455,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialstressController->wall_top_activated = false;	
 	
 	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);

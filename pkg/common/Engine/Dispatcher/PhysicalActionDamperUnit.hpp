@@ -18,8 +18,8 @@ class PhysicalActionDamperUnit: public Functor1D<void,TYPELIST_3(const shared_pt
 	REGISTER_ATTRIBUTES(Functor,/* nothing here */);
 	public: virtual ~PhysicalActionDamperUnit();
 	protected:
-	/* We are friend of BexContainer. These functions can be used safely provided that bex is NEVER read after being modified. */
-	Vector3r getForceUnsynced (body_id_t id, Scene* rb){ return rb->bex.getForceUnsynced (id);}
-	Vector3r getTorqueUnsynced(body_id_t id, Scene* rb){ return rb->bex.getTorqueUnsynced(id);}
+	/* We are friend of ForceContainer. These functions can be used safely provided that forces is NEVER read after being modified. */
+	Vector3r getForceUnsynced (body_id_t id, Scene* rb){ return rb->forces.getForceUnsynced (id);}
+	Vector3r getTorqueUnsynced(body_id_t id, Scene* rb){ return rb->forces.getTorqueUnsynced(id);}
 };
 REGISTER_SERIALIZABLE(PhysicalActionDamperUnit);

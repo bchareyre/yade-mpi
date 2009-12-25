@@ -85,7 +85,7 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	"""Assign common body parameters."""
 	#if 'physParamsClass' in matKw.keys(): raise ArgumentError("You as passing physParamsClass as argument, but it is no longer used. Use material instead.")
 	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
-	if material==0 and len(O.materials)==0: O.materials.append(defaultMaterial());
+	if material==-1 and len(O.materials)==0: O.materials.append(defaultMaterial());
 	if isinstance(material,int): b.mat=O.materials[material]
 	elif isinstance(material,str): b.mat=O.materials[material]
 	elif isinstance(material,Material): b.mat=material
@@ -97,8 +97,10 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
 	if not noBound: b.bound=Bound('Aabb',diffuseColor=[0,1,0])
 
-def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=0):
+def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
+
+	Last assigned material is used by default (*material*=-1), and utils.defaultMaterial() will be used if no material is defined at all.
 
 	:Parameters:
 		`center`: Vector3
@@ -108,7 +110,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 		`color`: Vector3 or None
 			random color will be assigned if None
 		`material`: int | string | Material instance | callable returning Material instance
-			* if int, O.materials[material] will be used; as a special case, if material==0 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
+			* if int, O.materials[material] will be used; as a special case, if material==-1 and there is no shared materials defined, utils.defaultMaterial() will be assigned to O.materials[0]
 			* if string, it is label of an existing material that will be used
 			* if Material instance, this instance will be used
 			* if callable, it will be called without arguments; returned Material value will be used (Material factory object, if you like)
@@ -168,7 +170,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	b.dynamic=dynamic
 	return b
 
-def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=0):
+def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,highlight=False,material=-1):
 	"""Create box (cuboid) with given parameters.
 
 	:Parameters:
@@ -185,7 +187,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	b.dynamic=dynamic
 	return b
 
-def wall(position,axis,sense=0,color=None,material=0):
+def wall(position,axis,sense=0,color=None,material=-1):
 	"""Return ready-made wall body.
 
 	:Parameters:
@@ -207,7 +209,7 @@ def wall(position,axis,sense=0,color=None,material=0):
 	b.dynamic=False
 	return b
 
-def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=0):
+def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1):
 	"""Create facet with given parameters.
 
 	:Parameters:
@@ -508,6 +510,13 @@ If the last point's x coord is zero, it will not be duplicated."""
 def _deprecatedUtilsFunction(old,new):
 	import warnings
 	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category='DeprecationWarning')
+
+def sumBexForces(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'utils.sumForces')
+	return sumForces(*args,**kw)
+def sumBexTorques(*args,**kw):
+	_deprecatedUtilsFunction(func.__name__,'utils.sumTorques')
+	return sumTorques(*args,**kw)
 
 def spheresFromFile(*args,**kw):
 	_deprecatedUtilsFunction(func.__name__,'yade.import.text')

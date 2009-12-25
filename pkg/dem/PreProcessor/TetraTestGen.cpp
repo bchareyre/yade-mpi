@@ -4,7 +4,7 @@
 
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
@@ -24,7 +24,7 @@ bool TetraTestGen::generate()
 	boundDispatcher->add(new TetraAABB);
 	rootBody->initializers.push_back(boundDispatcher);
 	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new BexResetter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);

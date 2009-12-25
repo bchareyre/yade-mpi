@@ -44,8 +44,8 @@ void CapillaryRecorder::action(Scene * ncb)
 {
 	Real fx=0, fy=0, fz=0;
 	
-	ncb->bex.sync();
-	Vector3r force=ncb->bex.getForce(bigBallId);
+	ncb->forces.sync();
+	Vector3r force=ncb->forces.getForce(bigBallId);
 	
 		
 		fx=force[0];

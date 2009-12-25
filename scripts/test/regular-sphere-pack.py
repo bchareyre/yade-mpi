@@ -70,7 +70,7 @@ try:
 except ImportError: pass
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

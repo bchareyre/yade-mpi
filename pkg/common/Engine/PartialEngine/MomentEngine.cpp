@@ -33,7 +33,7 @@ void MomentEngine::applyCondition(Scene* ncb)
 	{
 		if(ncb->bodies->exists( *ii ))
 		{
-			ncb->bex.addTorque(*ii,moment);
+			ncb->forces.addTorque(*ii,moment);
 		} else {
 			std::cerr << "MomentEngine: body " << *ii << "doesn't exist, cannot apply moment.";
 		}

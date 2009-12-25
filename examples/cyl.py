@@ -36,7 +36,7 @@ sp.rotate((1,0,0),-pi/4)
 O.bodies.append([utils.sphere(s[0],s[1],density=3000) for s in sp])
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InsertionSortCollider(nBins=5,sweepLength=.1*rMean),
 	InteractionDispatchers(

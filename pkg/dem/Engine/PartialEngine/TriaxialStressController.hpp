@@ -26,7 +26,7 @@ class TriaxialStressController : public PartialEngine
 	private :
 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		bool firstRun;
-		inline const Vector3r getForce(Scene* rb, body_id_t id){ return rb->bex.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
+		inline const Vector3r getForce(Scene* rb, body_id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
 		
 		 	
 	public :

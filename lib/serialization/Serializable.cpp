@@ -10,6 +10,28 @@
 
 #include "Serializable.hpp"
 
+void Serializable::pyUpdateAttrs(const python::dict& d){
+	python::list l=d.items(); size_t ll=python::len(l);
+	for(size_t i=0; i<ll; i++){
+		python::tuple t=python::extract<python::tuple>(l[i]);
+		string key=python::extract<string>(t[0]);
+		pySetAttr(key,t[1]);
+	}
+}
+
+python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
+	python::list ret; python::list l=d.items(); size_t ll=python::len(l);
+	for(size_t i=0; i<ll; i++){
+		python::tuple t=python::extract<python::tuple>(l[i]);
+		string key=python::extract<string>(t[0]);
+		if(pyHasKey(key)) pySetAttr(key,t[1]); else ret.append(t[0]);
+	}
+	return ret; 
+}
+
+
+
+
 void Serializable::unregisterSerializableAttributes(bool deserializing)
 {
 	Archives::iterator ai    = archives.begin();

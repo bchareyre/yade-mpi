@@ -127,10 +127,10 @@ void ViscousForceDamping::action(Body* body)
 			Vector3r viscousDampingForce	= normalDampingForce + shearDampingForce;
 			
 //	Add forces
-			ncb->bex.addForce (id1,-viscousDampingForce);
-			ncb->bex.addForce (id2,+viscousDampingForce);
-			ncb->bex.addTorque(id1,-c1x.Cross(viscousDampingForce));
-			ncb->bex.addTorque(id2, c2x.Cross(viscousDampingForce));
+			ncb->forces.addForce (id1,-viscousDampingForce);
+			ncb->forces.addForce (id2,+viscousDampingForce);
+			ncb->forces.addTorque(id1,-c1x.Cross(viscousDampingForce));
+			ncb->forces.addTorque(id2, c2x.Cross(viscousDampingForce));
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 		}
 	}

@@ -467,10 +467,10 @@ void VolumicContactLaw::action(Scene* ncb)
 	
 			Vector3r f				= currentContactPhysics->normalForce + shearForce;
 			
-			ncb->bex.addForce (id1,-f);
-			ncb->bex.addForce (id2,+f);
-			ncb->bex.addTorque(id1,-c1x.Cross(f));
-			ncb->bex.addTorque(id2, c2x.Cross(f));
+			ncb->forces.addForce (id1,-f);
+			ncb->forces.addForce (id2,+f);
+			ncb->forces.addTorque(id1,-c1x.Cross(f));
+			ncb->forces.addTorque(id2, c2x.Cross(f));
 			
 			currentContactPhysics->prevNormal = currentContactGeometry->normal;
 

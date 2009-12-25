@@ -5,7 +5,7 @@ O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
 O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
 O.bodies.append(utils.sphere([.3,0,0],.1,dynamic=False))
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
@@ -15,7 +15,12 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-10)),
 	NewtonIntegrator(),
+	PeriodicPythonRunner(command='doCellFlip()',realPeriod=5)
 ]
+
+def doCellFlip():
+	flip=1 if O.cell.strain[1,2]<0 else -1;
+	utils.flipCell(Matrix3(0,0,0, 0,0,flip, 0,0,0))
 
 #g=0.
 #while False:
@@ -34,3 +39,7 @@ rdr['intrAllWire']=True
 v=yade.qt.View()
 v.axes=True
 v.grid=(True,True,True)
+
+#from yade import log
+#log.setLevel('Shop',log.TRACE)
+#log.setLevel('InsertionSortCollider',log.TRACE)

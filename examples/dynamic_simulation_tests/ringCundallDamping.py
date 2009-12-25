@@ -41,7 +41,7 @@ o.initializers=[
 ## Engines 
 o.engines=[
 	## Resets forces and momenta the act on bodies
-	BexResetter(),
+	ForceResetter(),
 
 	## Associates bounding volume to each body.
 	BoundDispatcher([

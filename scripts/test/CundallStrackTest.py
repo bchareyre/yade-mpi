@@ -14,7 +14,7 @@ o.initializers=[
 
 o.engines=[
 	
-	BexResetter(),
+	ForceResetter(),
 	
 	BoundDispatcher([
 		Bo1_Sphere_Aabb(),

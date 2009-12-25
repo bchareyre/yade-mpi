@@ -113,7 +113,9 @@ class InteractionContainer : public Serializable
 		// sort interactions before serializations; useful if comparing XML files from different runs (false by default)
 		bool serializeSorted;
 
-		// std::pair is not handled by yade::serialization, use vector<body_id_t> instead
+		//! Erase all non-real (in term of Interaction::isReal()) interactions
+		void eraseNonReal();
+		
 		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state)
 		//! and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
 		void requestErase(body_id_t id1, body_id_t id2, bool force=false);

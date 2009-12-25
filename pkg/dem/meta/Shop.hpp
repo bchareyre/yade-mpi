@@ -118,4 +118,8 @@ class Shop{
 
 		//! wrap floating number periodically to the given range
 		static Real periodicWrap(Real x, Real x0, Real x1, long* period=NULL);
+
+		//! Flip cell shear without affecting interactions; if flip is zeros, it will be computed such that abs of shear strain is minimal for each shear component
+		//! Diagonal terms of flip are meaningless and ignored.
+		static Matrix3r flipCell(const Matrix3r& flip=Matrix3r::ZERO);
 };

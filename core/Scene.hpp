@@ -16,7 +16,7 @@
 #include"Engine.hpp"
 #include"Material.hpp"
 #include"DisplayParameters.hpp"
-#include"BexContainer.hpp"
+#include"ForceContainer.hpp"
 #include"GroupRelationData.hpp"
 
 #ifndef HOST_NAME_MAX
@@ -43,7 +43,7 @@ class Scene: public Serializable{
 		//! update our bound; used directly instead of a BoundFunctor, since we don't derive from Body anymore
 		void updateBound();
 
-		BexContainer bex;
+		ForceContainer forces;
 
 		//! information on periodicity; only should be used if Scene::isPeriodic
 		shared_ptr<Cell> cell;

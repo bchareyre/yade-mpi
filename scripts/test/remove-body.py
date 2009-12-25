@@ -6,7 +6,7 @@
 #O.bodyContainer="BodyVector"
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(nBins=5,sweepLength=5e-3),
 	#SpatialQuickSortCollider(),

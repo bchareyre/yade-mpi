@@ -10,7 +10,7 @@ for sph in p:
 #log.setLevel("PeriIsoCompressor",log.TRACE)
 O.timingEnabled=True
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

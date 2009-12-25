@@ -46,12 +46,12 @@ void DisplacementToForceEngine::applyCondition(Scene * ncb)
 	std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
 
-	ncb->bex.sync();
+	ncb->forces.sync();
 
 	for(;ii!=iiEnd;++ii)
 		if( bodies->exists(*ii) )
 		{
-			Vector3r current_force=ncb->bex.getForce(*ii);
+			Vector3r current_force=ncb->forces.getForce(*ii);
 
 			Real current_length_sq = 
 				  (targetForceMask[0] != 0) ? current_force[0]*current_force[0]:0.0 

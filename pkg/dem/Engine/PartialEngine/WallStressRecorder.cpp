@@ -70,10 +70,10 @@ void WallStressRecorder::action(Scene * ncb)
 	/// calcul des contraintes via forces resultantes sur murs
 	
 	Real SIG_wall_11 = 0, SIG_wall_22 = 0, SIG_wall_33 = 0;
-	ncb->bex.sync();
-	Vector3r F_wall_11=ncb->bex.getForce(wall_left_id);
-	Vector3r F_wall_22=ncb->bex.getForce(wall_top_id);
-	Vector3r F_wall_33=ncb->bex.getForce(wall_front_id);
+	ncb->forces.sync();
+	Vector3r F_wall_11=ncb->forces.getForce(wall_left_id);
+	Vector3r F_wall_22=ncb->forces.getForce(wall_top_id);
+	Vector3r F_wall_33=ncb->forces.getForce(wall_front_id);
 	
 	SIG_wall_11 = F_wall_11[0]/(depth*height);
 	SIG_wall_22 = F_wall_22[1]/(depth*width);

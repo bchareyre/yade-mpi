@@ -59,7 +59,7 @@ bool ForceRecorder::isActivated(Scene*)
 void ForceRecorder::action(Scene * ncb)
 {
 	if (first) init();
-	ncb->bex.sync();
+	ncb->forces.sync();
 
 	Real x=0, y=0, z=0;
 	
@@ -67,7 +67,7 @@ void ForceRecorder::action(Scene * ncb)
 	{
 		if(ncb->bodies->exists(i))
 		{
-			Vector3r force=ncb->bex.getForce(i);
+			Vector3r force=ncb->forces.getForce(i);
 		
 			x+=force[0];
 			y+=force[1];

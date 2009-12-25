@@ -20,7 +20,7 @@ o.initializers=[
 ## MetaEngines act as dispatchers and based on the type of objects they operate on, different EngineUnits are called.
 o.engines=[
 	## Resets forces and momenta the act on bodies
-	BexResetter(),
+	ForceResetter(),
 	## associates bounding volume - in this case, AxisAlignedBoundingBox (Aabb) - to each body.
 	## MetaEngine calls corresponding EngineUnit, depending on whether the body is Sphere, BoxModel, or MetaBody (rootBody).
 	## AABBs will be used to detect collisions later, by PersistentSAPCollider

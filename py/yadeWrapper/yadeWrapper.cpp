@@ -133,8 +133,9 @@ class pyBodyContainer{
 	const shared_ptr<BodyContainer> proxee;
 	pyBodyIterator pyIter(){return pyBodyIterator(proxee);}
 	pyBodyContainer(const shared_ptr<BodyContainer>& _proxee): proxee(_proxee){}
-	shared_ptr<Body> pyGetitem(body_id_t id){
-		if((size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
+	shared_ptr<Body> pyGetitem(body_id_t _id){
+		int id=(_id>=0 ? _id : proxee->size()+_id);
+		if(id<0 || (size_t)id>=proxee->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* make compiler happy; never reached */ return shared_ptr<Body>(); }
 		else return (*proxee)[id];
 	}
 	body_id_t append(shared_ptr<Body> b){
@@ -249,32 +250,34 @@ class pyInteractionContainer{
 };
 
 class pyForceContainer{
-		shared_ptr<Scene> rb;
+		shared_ptr<Scene> scene;
 	public:
-		pyForceContainer(){ rb=Omega::instance().getScene(); }
-		Vector3r force_get(long id){  rb->bex.sync(); return rb->bex.getForce(id); }
-		Vector3r torque_get(long id){ rb->bex.sync(); return rb->bex.getTorque(id); }
-		Vector3r move_get(long id){   rb->bex.sync(); return rb->bex.getMove(id); }
-		Vector3r rot_get(long id){    rb->bex.sync(); return rb->bex.getRot(id); }
-		void force_add(long id, const Vector3r& f){  rb->bex.addForce (id,f); }
-		void torque_add(long id, const Vector3r& t){ rb->bex.addTorque(id,t);}
-		void move_add(long id, const Vector3r& t){   rb->bex.addMove(id,t);}
-		void rot_add(long id, const Vector3r& t){    rb->bex.addRot(id,t);}
+		pyForceContainer(shared_ptr<Scene> _scene): scene(_scene) { }
+		Vector3r force_get(long id){  scene->forces.sync(); return scene->forces.getForce(id); }
+		Vector3r torque_get(long id){ scene->forces.sync(); return scene->forces.getTorque(id); }
+		Vector3r move_get(long id){   scene->forces.sync(); return scene->forces.getMove(id); }
+		Vector3r rot_get(long id){    scene->forces.sync(); return scene->forces.getRot(id); }
+		void force_add(long id, const Vector3r& f){  scene->forces.addForce (id,f); }
+		void torque_add(long id, const Vector3r& t){ scene->forces.addTorque(id,t);}
+		void move_add(long id, const Vector3r& t){   scene->forces.addMove(id,t);}
+		void rot_add(long id, const Vector3r& t){    scene->forces.addRot(id,t);}
+		long syncCount_get(){ return scene->forces.syncCount;}
+		void syncCount_set(long count){ scene->forces.syncCount=count;}
 };
 
 class pyMaterialContainer{
-		shared_ptr<Scene> rb;
+		shared_ptr<Scene> scene;
 	public:
-		pyMaterialContainer() {rb=Omega::instance().getScene();}
-		shared_ptr<Material> getitem_id(int id){ if(id<0 || (size_t)id>=rb->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); python::throw_error_already_set(); /* never reached */ throw; } return Material::byId(id,rb); }
+		pyMaterialContainer(shared_ptr<Scene> _scene): scene(_scene) { }
+		shared_ptr<Material> getitem_id(int _id){ int id=(_id>=0 ? _id : scene->materials.size()+_id); if(id<0 || (size_t)id>=scene->materials.size()){ PyErr_SetString(PyExc_IndexError, "Material id out of range."); python::throw_error_already_set(); /* never reached */ throw; } return Material::byId(id,scene); }
 		shared_ptr<Material> getitem_label(string label){
 			// translate runtime_error to KeyError (instead of RuntimeError) if the material doesn't exist
-			try { return Material::byLabel(label,rb);	}
+			try { return Material::byLabel(label,scene);	}
 			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); python::throw_error_already_set(); /* never reached; avoids warning */ throw; }
 		}
-		int append(shared_ptr<Material>& m){ rb->materials.push_back(m); m->id=rb->materials.size()-1; return m->id; }
+		int append(shared_ptr<Material>& m){ scene->materials.push_back(m); m->id=scene->materials.size()-1; return m->id; }
 		vector<int> appendList(vector<shared_ptr<Material> > mm){ vector<int> ret; FOREACH(shared_ptr<Material>& m, mm) ret.push_back(append(m)); return ret; }
-		int len(){ return (int)rb->materials.size(); }
+		int len(){ return (int)scene->materials.size(); }
 };
 
 void termHandlerNormal(int sig){cerr<<"Yade: normal exit."<<endl; raise(SIGTERM);}
@@ -354,8 +357,9 @@ class pyOmega{
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
-	unsigned long bexSyncCount_get(){ return OMEGA.getScene()->bex.syncCount;}
-	void bexSyncCount_set(unsigned long count){ OMEGA.getScene()->bex.syncCount=count;}
+	// deprecated:
+		unsigned long forceSyncCount_get(){ LOG_WARN("O.bexSyncCount is deprecated, use O.forces.syncCount instead."); return OMEGA.getScene()->forces.syncCount;}
+		void forceSyncCount_set(unsigned long count){  LOG_WARN("O.bexSyncCount is deprecated, use O.forces.syncCount instead."); OMEGA.getScene()->forces.syncCount=count;}
 
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getScene()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
@@ -455,8 +459,9 @@ class pyOmega{
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getScene()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
 	
-	pyForceContainer bex_get(void){return pyForceContainer();}
-	pyMaterialContainer materials_get(void){return pyMaterialContainer();}
+	pyForceContainer bex_get(void){ LOG_WARN("O.bex is deprecated, use O.forces instead."); return pyForceContainer(OMEGA.getScene());}
+	pyForceContainer forces_get(void){return pyForceContainer(OMEGA.getScene());}
+	pyMaterialContainer materials_get(void){return pyMaterialContainer(OMEGA.getScene());}
 	
 
 	python::list listChildClassesNonrecursive(const string& base){
@@ -495,7 +500,7 @@ class pyOmega{
 	string bodyContainer_get(string clss){ return OMEGA.getScene()->bodies->getClassName(); }
 	#ifdef YADE_OPENMP
 		int numThreads_get(){ return omp_get_max_threads();}
-		void numThreads_set(int n){ int bcn=OMEGA.getScene()->bex.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("BexContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
+		void numThreads_set(int n){ int bcn=OMEGA.getScene()->forces.getNumAllocatedThreads(); if(bcn<n) LOG_WARN("ForceContainer has only "<<bcn<<" threads allocated. Changing thread number to on "<<bcn<<" instead of "<<n<<" requested."); omp_set_num_threads(min(n,bcn)); LOG_WARN("BUG: Omega().numThreads=n doesn't work as expected (number of threads is not changed globally). Set env var OMP_NUM_THREADS instead."); }
 	#else
 		int numThreads_get(){return 1;}
 		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
@@ -509,32 +514,6 @@ class pyOmega{
 	}
 	#endif
 	
-#if 0
-	/***************** cell access ****************/
-	void cellSize_set_depr(const Vector3r& size){ LOG_WARN("O.periodicCell is deprecated (and will be removed), use O.cellSize instead."); cellSize_set(size); }
-	Vector3r cellSize_get_depr(){ LOG_WARN("O.periodicCell is deprecated (and will be removed), use O.cellSize instead."); return cellSize_get(); }
-
-	void cellSize_set(const Vector3r& size){
-		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
-		if(size[0]>0 && size[1]>0 && size[2]>0) { OMEGA.getScene()->cell->refSize=size; OMEGA.getScene()->isPeriodic=true; }
-		else {OMEGA.getScene()->isPeriodic=false; }
-		OMEGA.getScene()->cell->updateCache();
-	}
-	Vector3r cellSize_get(){
-		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
-		if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell->refSize;
-		return Vector3r(-1,-1,-1);
-	}
-	void cellShear_set(const Vector3r& s){
-		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
-		OMEGA.getScene()->cell->shear=s; /* DO NOT FORGET!! */ OMEGA.getScene()->cell->updateCache();
-	}
-	Vector3r cellShear_get(){
-		LOG_WARN(__PRETTY_FUNCTION__<<" is deprecated.");
-		return OMEGA.getScene()->cell->shear;
-	}
-#endif
-
 	shared_ptr<Cell> cell_get(){ if(OMEGA.getScene()->isPeriodic) return OMEGA.getScene()->cell; return shared_ptr<Cell>(); }
 	bool periodic_get(void){ return OMEGA.getScene()->isPeriodic; } 
 	void periodic_set(bool v){ OMEGA.getScene()->isPeriodic=v; }
@@ -552,37 +531,20 @@ class pyOmega{
 	}
 	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getScene().get()); }
 };
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_run_overloads,run,0,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_saveTmp_overloads,saveTmp,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_loadTmp_overloads,loadTmp,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(omega_exitNoBacktrace_overloads,exitNoBacktrace,0,1);
 
 class pySTLImporter : public STLImporter {};
 
 
-/*****************************************************************************
-********** New helper functions */
-void Serializable_updateAttrs(const shared_ptr<Serializable>& self, const python::dict& d){
-	python::list l=d.items(); size_t ll=python::len(l);
-	for(size_t i=0; i<ll; i++){
-		python::tuple t=python::extract<python::tuple>(l[i]); string key=python::extract<string>(t[0]); self->pySetAttr(key,t[1]);
-	}
-}
-python::list Serializable_updateExistingAttrs(const shared_ptr<Serializable>& self, const python::dict& d){
-	python::list ret; python::list l=d.items(); size_t ll=python::len(l);
-	for(size_t i=0; i<ll; i++){
-		python::tuple t=python::extract<python::tuple>(l[i]); string key=python::extract<string>(t[0]);
-		if(self->pyHasKey(key)) self->pySetAttr(key,t[1]); else ret.append(t[0]);
-	}
-	return ret; 
-}
-std::string Serializable_pyStr(const shared_ptr<Serializable>& self) {
-	return "<"+self->getClassName()+" instance at "+lexical_cast<string>(self.get())+">";
-}
-
-
 TimingInfo::delta Engine_timingInfo_nsec_get(const shared_ptr<Engine>& e){return e->timingInfo.nsec;}; void Engine_timingInfo_nsec_set(const shared_ptr<Engine>& e, TimingInfo::delta d){ e->timingInfo.nsec=d;}
 long Engine_timingInfo_nExec_get(const shared_ptr<Engine>& e){return e->timingInfo.nExec;}; void Engine_timingInfo_nExec_set(const shared_ptr<Engine>& e, long d){ e->timingInfo.nExec=d;}
+
+shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
+	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
+	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
+	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
+	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
+	return instance;
+}
 
 template <typename T>
 shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::dict& d){
@@ -600,31 +562,24 @@ shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::di
 		instance=dynamic_pointer_cast<T>(instance0);
 		if(!instance) throw runtime_error("Invalid class `"+clss+"' (unable to cast to typeid `"+typeid(T).name()+"')");
 	}
-	Serializable_updateAttrs(instance,d);
+	instance->pyUpdateAttrs(d);
 	return instance;
 }
 
-// FIXME: those could be moved to the c++ classes themselves, right?
+
+// stupid; Dispatcher is not a template, hence converting this into a real constructor would be complicated; keep it here.
 template<typename DispatcherT>
 shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typename DispatcherT::functorType> >& functors){
 	shared_ptr<DispatcherT> instance(new DispatcherT);
 	FOREACH(shared_ptr<typename DispatcherT::functorType> functor,functors) instance->add(functor);
 	return instance;
 }
-// FIXME: this one as well
+// same applies here
 template<typename DispatcherT>
 std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
 	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
 	FOREACH(const shared_ptr<Functor>& functor, self->functorArguments){ shared_ptr<typename DispatcherT::functorType> functorRightType(dynamic_pointer_cast<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
 	return ret;
-}
-// FIXME: and this one as well
-shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
-	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
-	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
-	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
-	return instance;
 }
 
 template<typename TopIndexable>
@@ -685,12 +640,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("load",&pyOmega::load,"Load simulation from file.")
 		.def("reload",&pyOmega::reload,"Reload current simulation")
 		.def("save",&pyOmega::save,"Save current simulation to file (should be .xml or .xml.bz2)")
-		.def("loadTmp",&pyOmega::loadTmp,omega_loadTmp_overloads(python::args("mark"),"Load simulation previously stored in memory by saveTmp.\n @param mark optionally distinguishes multiple saved simulations"))
-		.def("saveTmp",&pyOmega::saveTmp,omega_saveTmp_overloads(python::args("mark"),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp.\n @param mark optionally distinguishes different memory-saved simulations."))
+		.def("loadTmp",&pyOmega::loadTmp,(python::args("mark")=""),"Load simulation previously stored in memory by saveTmp.\n @param mark optionally distinguishes multiple saved simulations")
+		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp.\n @param mark optionally distinguishes different memory-saved simulations.")
 		.def("tmpToFile",&pyOmega::tmpToFile,"Return XML of saveTmp'd simulation as string.")
 		.def("tmpToString",&pyOmega::tmpToString,"Save XML of saveTmp'd simulation in file.")
 		.def("saveSpheres",&pyOmega::saveSpheres,"Saves spherical bodies to external ASCII file, one sphere (x y z r) per line.")
-		.def("run",&pyOmega::run,omega_run_overloads("Run the simulation.\n@param nSteps how many steps to run, then stop.\n@param wait if True, doesn't return until the simulation will have stopped."))
+		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation.\n@param nSteps how many steps to run, then stop.\n@param wait if True, doesn't return until the simulation will have stopped.")
 		.def("pause",&pyOmega::pause,"Stop simulation execution.\n(may be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
@@ -706,19 +661,19 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")
-		.add_property("actions",&pyOmega::bex_get,"Deprecated alias for Omega().bex")
-		.add_property("bex",&pyOmega::bex_get,"BodyExternalVariables (forces, torques, ..) in  the current simulation.")
+		.add_property("bex",&pyOmega::bex_get,"[DEPRECATED] use O.forces instead.")
+		.add_property("forces",&pyOmega::forces_get,"ForceContainer (forces, torques, displacements) in the current simulation.")
 		.add_property("tags",&pyOmega::tags_get,"Tags (string=string dictionary) of the current simulation (container supporting string-index access/assignment)")
 		.def("childClassesNonrecursive",&pyOmega::listChildClassesNonrecursive,"Return list of all classes deriving from given class, as registered in the class factory")
 		.def("isChildClassOf",&pyOmega::isChildClassOf,"Tells whether the first class derives from the second one (both given as strings).")
 		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set,"Get/set type of body container (as string); there must be no bodies.")
 		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set,"Get/set type of interaction container (as string); there must be no interactions.")
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
-		.add_property("bexSyncCount",&pyOmega::bexSyncCount_get,&pyOmega::bexSyncCount_set,"Counter for number of syncs in BexContainer, for profiling purposes.")
+		.add_property("bexSyncCount",&pyOmega::forceSyncCount_get,&pyOmega::forceSyncCount_set,"[DEPRECATED] Counter for number of syncs in ForceContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
 		.add_property("cell",&pyOmega::cell_get,"Periodic cell of the current scene (None if the scene is aperiodic).")
 		.add_property("periodic",&pyOmega::periodic_get,&pyOmega::periodic_set,"Get/set whether the scene is periodic or not (True/False).")
-		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,omega_exitNoBacktrace_overloads("Disable SEGV handler and exit."))
+		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(python::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
@@ -757,7 +712,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__iter__",&pyInteractionIterator::pyIter)
 		.def("next",&pyInteractionIterator::pyNext);
 
-	python::class_<pyForceContainer>("BexContainer",python::init<pyForceContainer&>())
+	python::class_<pyForceContainer>("ForceContainer",python::init<pyForceContainer&>())
 		.def("f",&pyForceContainer::force_get)
 		.def("t",&pyForceContainer::torque_get)
 		.def("m",&pyForceContainer::torque_get)
@@ -766,7 +721,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("addF",&pyForceContainer::force_add)
 		.def("addT",&pyForceContainer::torque_add)
 		.def("addMove",&pyForceContainer::move_add)
-		.def("addRot",&pyForceContainer::rot_add);
+		.def("addRot",&pyForceContainer::rot_add)
+		.add_property("syncCount",&pyForceContainer::syncCount_get,&pyForceContainer::syncCount_set)
+		;
 
 	python::class_<pyMaterialContainer>("MaterialContainer",python::init<pyMaterialContainer&>())
 		.def("append",&pyMaterialContainer::append,"Add new shared material; changes its id and return it.")
@@ -782,9 +739,9 @@ BOOST_PYTHON_MODULE(wrapper)
 ///////////// proxyless wrappers 
 
 	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
-		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable_pyStr).def("__repr__",&Serializable_pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
+		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
 		.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
-		.def("updateAttrs",&Serializable_updateAttrs).def("updateExistingAttrs",&Serializable_updateExistingAttrs)
+		.def("updateAttrs",&Serializable::pyUpdateAttrs).def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs)
 		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
 		// aliases for __getitem__ and __setitem__, but they are used by the property generator code and can be useful if we deprecate the object['attr'] type of access
 		.def("_prop_get",&Serializable::pyGetAttr).def("_prop_set",&Serializable::pySetAttr)

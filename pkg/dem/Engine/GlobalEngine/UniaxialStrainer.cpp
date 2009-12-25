@@ -158,7 +158,7 @@ void UniaxialStrainer::action(Scene* _rootBody){
 
 void UniaxialStrainer::computeAxialForce(){
 	sumPosForces=sumNegForces=0;
-	rootBody->bex.sync();
-	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->bex.getForce(id)[axis];
-	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->bex.getForce(id)[axis];
+	rootBody->forces.sync();
+	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->forces.getForce(id)[axis];
+	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->forces.getForce(id)[axis];
 }

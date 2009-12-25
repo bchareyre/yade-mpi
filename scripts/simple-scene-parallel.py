@@ -25,8 +25,8 @@ O.engines=[
 	#  implementation of openMP in gcc: http://gcc.gnu.org/projects/gomp/
 	#
 	ParallelEngine([
-		# BexResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
-		BexResetter(),
+		# ForceResetter will run in parallel with the second group of BoundingVolumeMEtaEngine+PersistentSAPCollider
+		ForceResetter(),
 		# Engines within the group will be run serially, however
 		[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),	PersistentSAPCollider(),]
 	]),

@@ -214,15 +214,15 @@ void highlightNone(){
  * is position relative to axisPt; moment from moment is m; such moment per body is
  * projected onto axis.
  */
-Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
+Real sumTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	rb->bex.sync();
+	rb->forces.sync();
 	Real ret=0;
 	size_t len=python::len(ids);
 	for(size_t i=0; i<len; i++){
 		const Body* b=(*rb->bodies)[python::extract<int>(ids[i])].get();
-		const Vector3r& m=rb->bex.getTorque(b->getId());
-		const Vector3r& f=rb->bex.getForce(b->getId());
+		const Vector3r& m=rb->forces.getTorque(b->getId());
+		const Vector3r& f=rb->forces.getForce(b->getId());
 		Vector3r r=b->state->pos-axisPt;
 		ret+=axis.Dot(m+r.Cross(f));
 	}
@@ -234,14 +234,14 @@ Real sumBexTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axis
  * @param direction direction in which forces are summed
  *
  */
-Real sumBexForces(python::tuple ids, const Vector3r& direction){
+Real sumForces(python::tuple ids, const Vector3r& direction){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	rb->bex.sync();
+	rb->forces.sync();
 	Real ret=0;
 	size_t len=python::len(ids);
 	for(size_t i=0; i<len; i++){
 		body_id_t id=python::extract<int>(ids[i]);
-		const Vector3r& f=rb->bex.getForce(id);
+		const Vector3r& f=rb->forces.getForce(id);
 		ret+=direction.Dot(f);
 	}
 	return ret;
@@ -251,13 +251,13 @@ Real sumBexForces(python::tuple ids, const Vector3r& direction){
    If axis is given, it will sum forces perpendicular to given axis only (not the the facet normals).
 */
 Real sumFacetNormalForces(vector<body_id_t> ids, int axis=-1){
-	shared_ptr<Scene> rb=Omega::instance().getScene(); rb->bex.sync();
+	shared_ptr<Scene> rb=Omega::instance().getScene(); rb->forces.sync();
 	Real ret=0;
 	FOREACH(const body_id_t id, ids){
 		Facet* f=YADE_CAST<Facet*>(Body::byId(id,rb)->shape.get());
-		if(axis<0) ret+=rb->bex.getForce(id).Dot(f->nf);
+		if(axis<0) ret+=rb->forces.getForce(id).Dot(f->nf);
 		else {
-			Vector3r ff=rb->bex.getForce(id); ff[axis]=0;
+			Vector3r ff=rb->forces.getForce(id); ff[axis]=0;
 			ret+=ff.Dot(f->nf);
 		}
 	}
@@ -442,8 +442,8 @@ BOOST_PYTHON_MODULE(_utils){
 	def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
 	def("kineticEnergy",Shop__kineticEnergy);
-	def("sumBexForces",sumBexForces);
-	def("sumBexTorques",sumBexTorques);
+	def("sumForces",sumForces);
+	def("sumTorques",sumTorques);
 	def("sumFacetNormalForces",sumFacetNormalForces,(python::arg("axis")=-1));
 	def("forcesOnPlane",forcesOnPlane);
 	def("forcesOnCoordPlane",forcesOnCoordPlane);
@@ -456,6 +456,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("wireAll",wireAll);
 	def("wireNone",wireNone);
 	def("wireNoSpheres",wireNoSpheres);
+	def("flipCell",&Shop::flipCell);
 }
 
 

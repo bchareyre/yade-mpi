@@ -10,9 +10,9 @@
 #ifdef YADE_OPENMP
 
 #include<omp.h>
-/*! Container for Body External Variables (bex), typically forces and torques from interactions.
- * Values should be reset at every iteration by calling BexContainer::reset();
- * If you want to add your own bex, you need to:
+/*! Container for Body External Variables (forces), typically forces and torques from interactions.
+ * Values should be reset at every iteration by calling ForceContainer::reset();
+ * If you want to add your own force type, you need to:
  *
  * 	1. Create storage vector
  * 	2. Create accessor function
@@ -21,7 +21,7 @@
  * 	5. update the sync function (for the multithreaded implementation)
  *
  * This class exists in two flavors: non-parallel and parallel. The parallel one stores
- * bex increments separately for every thread and sums those when sync() is called.
+ * force increments separately for every thread and sums those when sync() is called.
  * The reason of this design is that the container is not truly random-access, but rather
  * is written to everywhere in one phase and read in the next one. Adding to force/torque
  * marks the container as dirty and sync() must be performed before reading the stored data.
@@ -32,14 +32,14 @@
  * is dirty. Every full sync increments the syncCount variable, that should ideally equal
  * the number of steps (one per step).
  *
- * The number of threads (omp_get_max_threads) may not change once BexContainer is constructed.
+ * The number of threads (omp_get_max_threads) may not change once ForceContainer is constructed.
  *
  * The non-parallel flavor has the same interface, but sync() is no-op and synchronization
  * is not enforced at all.
  */
 
-//! This is the parallel flavor of BexContainer
-class BexContainer{
+//! This is the parallel flavor of ForceContainer
+class ForceContainer{
 	private:
 		typedef std::vector<Vector3r> vvector;
 		std::vector<vvector> _forceData;
@@ -57,7 +57,7 @@ class BexContainer{
 			if (size<=(size_t)id) resize(min((size_t)1.5*(id+100),(size_t)(id+2000)));
 		}
 
-		inline void ensureSynced(){ if(!synced) throw runtime_error("BexContainer not thread-synchronized; call sync() first!"); }
+		inline void ensureSynced(){ if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!"); }
 
 		/*! Function to allow friend classes to get force even if not synced.
 		* Dangerous! The caller must know what it is doing! (i.e. don't read after write
@@ -66,7 +66,7 @@ class BexContainer{
 		const Vector3r& getTorqueUnsynced(body_id_t id){ensureSize(id); return _force[id];}
 		friend class PhysicalActionDamperUnit;
 	public:
-		BexContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0){
+		ForceContainer(): size(0), synced(true),moveRotUsed(false),syncCount(0){
 			nThreads=omp_get_max_threads();
 			for(int i=0; i<nThreads; i++){
 				_forceData.push_back(vvector()); _torqueData.push_back(vvector());
@@ -149,8 +149,8 @@ class BexContainer{
 };
 
 #else
-//! This is the non-parallel flavor of BexContainer
-class BexContainer {
+//! This is the non-parallel flavor of ForceContainer
+class ForceContainer {
 	private:
 		std::vector<Vector3r> _force;
 		std::vector<Vector3r> _torque;
@@ -163,7 +163,7 @@ class BexContainer {
 		const Vector3r& getTorqueUnsynced(body_id_t id){ return getForce(id);}
 		bool moveRotUsed;
 	public:
-		BexContainer(): size(0), moveRotUsed(false), syncCount(0){}
+		ForceContainer(): size(0), moveRotUsed(false), syncCount(0){}
 		const Vector3r& getForce(body_id_t id){ensureSize(id); return _force[id];}
 		void  addForce(body_id_t id,const Vector3r& f){ensureSize(id); _force[id]+=f;}
 		const Vector3r& getTorque(body_id_t id){ensureSize(id); return _torque[id];}
@@ -172,7 +172,7 @@ class BexContainer {
 		void  addMove(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _move[id]+=f;}
 		const Vector3r& getRot(body_id_t id){ensureSize(id); return _rot[id];}
 		void  addRot(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
-		//! Set all bex's to zero
+		//! Set all forces to zero
 		void reset(){
 			memset(_force [0],0,sizeof(Vector3r)*size);
 			memset(_torque[0],0,sizeof(Vector3r)*size);

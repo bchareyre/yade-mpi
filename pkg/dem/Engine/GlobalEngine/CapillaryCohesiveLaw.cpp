@@ -268,8 +268,8 @@ void CapillaryCohesiveLaw::action(Scene* ncb)
 					else if (currentContactPhysics->fusionNumber !=0)
 						currentContactPhysics->Fcap /= (currentContactPhysics->fusionNumber+1);
                                 }
-											ncb->bex.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
-											ncb->bex.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
+											ncb->forces.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
+											ncb->forces.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
 
 				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
 

@@ -50,7 +50,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 
 #include<yade/pkg-common/StateMetaEngine.hpp>
 
@@ -592,7 +592,7 @@ void SnowCreepTest::createActors(shared_ptr<Scene>& rootBody)
 		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	
 	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 //	rootBody->engines.push_back(sdecTimeStepper);	
 	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));

@@ -59,7 +59,7 @@ class TestObjectInstantiation(unittest.TestCase):
 		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
 		self.assert_(id.lawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
 	def testParallelEngineCtor(self):
-		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),BexResetter()]])
+		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),ForceResetter()]])
 		self.assert_(pe.slaves[0].name=='InsertionSortCollider')
 		self.assert_(len(pe.slaves[1])==2)
 		pe.slaves=[]

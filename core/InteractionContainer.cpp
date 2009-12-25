@@ -28,7 +28,6 @@ void InteractionContainer::clearPendingErase(){
 	#else
 		pendingErase.clear();
 	#endif
-	
 }
 
 int InteractionContainer::unconditionalErasePending(){
@@ -45,6 +44,17 @@ int InteractionContainer::unconditionalErasePending(){
 		}
 	#endif
 	return ret;
+}
+
+void InteractionContainer::eraseNonReal(){
+	typedef pair<int,int> Ids;
+	std::list<Ids> ids;
+	FOREACH(const shared_ptr<Interaction>& i, *this){
+		if(!i->isReal()) ids.push_back(Ids(i->getId1(),i->getId2()));
+	}
+	FOREACH(const Ids& id, ids){
+		this->erase(id.first,id.second);
+	}
 }
 
 

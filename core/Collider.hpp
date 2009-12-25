@@ -33,6 +33,13 @@ class Collider : public GlobalEngine
 		 */
 		bool handleExistingInteraction(Interaction*);
 
+		/*! Invalidate all persistent data (if the collider has any), forcing reinitialization at next run.
+		The default implementation does nothing, colliders should override it if it is applicable.
+
+		Currently used from Shop::flipCell, which changes cell information for bodies.
+		*/
+		virtual void invalidatePersistentData(){}
+
 	protected:
 
 	REGISTER_CLASS_NAME(Collider);	

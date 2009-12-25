@@ -18,7 +18,7 @@ class LeapFrogPositionIntegrator : public StateEngineUnit
 	
 	public :
 		virtual void go(	  const shared_ptr<State>&
-					, Body*, BexContainer&);
+					, Body*, ForceContainer&);
 
 	FUNCTOR1D(ParticleParameters);	
 	REGISTER_CLASS_NAME(LeapFrogPositionIntegrator);

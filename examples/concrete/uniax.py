@@ -77,7 +77,7 @@ coord_25,coord_50,coord_75=mm+.25*(mx-mm),mm+.5*(mx-mm),mm+.75*(mx-mm)
 area_25,area_50,area_75=utils.approxSectionArea(coord_25,axis),utils.approxSectionArea(coord_50,axis),utils.approxSectionArea(coord_75,axis)
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
 	InsertionSortCollider(sweepLength=.05*sphereRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(

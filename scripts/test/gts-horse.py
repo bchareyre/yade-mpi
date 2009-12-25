@@ -33,7 +33,7 @@ if surf.is_closed():
 O.bodies.append(pack.gtsSurface2Facets(surf,wire=True))
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(label='collider'),
 	InteractionDispatchers(

@@ -11,7 +11,7 @@
 #include<yade/core/State.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/core/Functor.hpp>
-#include<yade/core/BexContainer.hpp>
+#include<yade/core/ForceContainer.hpp>
 
 /*! \brief
 	Abstract interface for all classes that want to do something depending on State (works like adding external virtual function)
@@ -27,7 +27,7 @@ class StateEngineUnit :    public Functor1D
 					<
 		 				void ,
 		 				TYPELIST_3(	  const shared_ptr<State>&
-								, Body*, BexContainer&
+								, Body*, ForceContainer&
 			   				  )
 					>
 {

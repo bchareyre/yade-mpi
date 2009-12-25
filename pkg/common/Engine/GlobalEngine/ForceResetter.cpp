@@ -6,14 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"PhysicalActionContainerReseter.hpp"
+#include"ForceResetter.hpp"
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((PhysicalActionContainerReseter)(BexResetter));
+YADE_PLUGIN((ForceResetter));
 
-PhysicalActionContainerReseter::PhysicalActionContainerReseter(){}
-PhysicalActionContainerReseter::~PhysicalActionContainerReseter(){} 
-void PhysicalActionContainerReseter::action(Scene* ncb){ ncb->bex.reset(); }
-
-void BexResetter::action(Scene* ncb){ ncb->bex.reset(); }
+void ForceResetter::action(Scene* ncb){ ncb->forces.reset(); }
 

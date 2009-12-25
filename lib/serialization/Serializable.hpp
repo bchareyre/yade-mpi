@@ -134,6 +134,14 @@ class Serializable : public Factorable
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
+		
+		//! update attributes from dictionary
+		void pyUpdateAttrs(const boost::python::dict& d);
+		//! update attributes from dictionary, silently skipping nonexistent attributes; skipped attributes names are returned as list
+		python::list pyUpdateExistingAttrs(const boost::python::dict& d);
+		//! string representation of this object
+		std::string pyStr() { return "<"+getClassName()+" instance at "+lexical_cast<string>(this)+">"; }
+		
 
 	private :
 		Archives				archives;

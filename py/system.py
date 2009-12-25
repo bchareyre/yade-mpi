@@ -91,6 +91,10 @@ _deprecated={
 	'AABB':'Aabb', # Thu Dec 17 09:01:35 2009, vaclav@falx
 	'GLDrawAABB':'Gl1_Aabb', # Thu Dec 17 09:07:58 2009, vaclav@falx
 	'GLDraw_Dem3DofGeom_SphereSphere':'Gl1_Dem3DofGeom_SphereSphere', # Fri Dec 18 23:01:39 2009, vaclav@flux
+	'BexContainer':'ForceContainer', # Fri Dec 25 11:43:44 2009, vaclav@flux
+	'BexResetter':'ForceResetter', # Fri Dec 25 11:44:01 2009, vaclav@flux
+	'PhysicalActionContainerResetter':'ForceResetter', # Fri Dec 25 11:45:32 2009, vaclav@flux
+	'PhysicalActionContainerReseter':'ForceResetter', # Fri Dec 25 11:45:51 2009, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -10,7 +10,7 @@ O.bodies[1].state['vel']=Vector3(0,0,-1)
 O.dt=utils.PWaveTimeStep()
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(label='isc'),
 	InteractionDispatchers(

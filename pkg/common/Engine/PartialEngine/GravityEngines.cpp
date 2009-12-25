@@ -20,7 +20,7 @@ void GravityEngine::action(Scene*){
 	 * since that will apply smaller number of forces. */
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || b->isClumpMember()) continue;
-		scene->bex.addForce(b->getId(),gravity*b->state->mass);
+		scene->forces.addForce(b->getId(),gravity*b->state->mass);
 	}
 }
 
@@ -30,8 +30,8 @@ void CentralGravityEngine::action(Scene*){
 		if(!b || b->isClumpMember() || b->getId()==centralBody) continue; // skip clump members and central body
 		Real F=accel*b->state->mass;
 		Vector3r toCenter=centralPos-b->state->pos; toCenter.Normalize();
-		scene->bex.addForce(b->getId(),F*toCenter);
-		if(reciprocal) scene->bex.addForce(centralBody,-F*toCenter);
+		scene->forces.addForce(b->getId(),F*toCenter);
+		if(reciprocal) scene->forces.addForce(centralBody,-F*toCenter);
 	}
 }
 
@@ -44,6 +44,6 @@ void AxialGravityEngine::action(Scene*){
 		const Vector3r x2=axisPoint+axisDirection;
 		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
 		Vector3r toAxis=closestAxisPoint-x0; toAxis.Normalize();
-		scene->bex.addForce(b->getId(),acceleration*b->state->mass*toAxis);
+		scene->forces.addForce(b->getId(),acceleration*b->state->mass*toAxis);
 	}
 }

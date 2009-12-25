@@ -39,7 +39,7 @@
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 #include<yade/pkg-common/StateMetaEngine.hpp>
 
 

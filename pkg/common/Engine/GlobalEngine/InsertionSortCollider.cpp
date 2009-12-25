@@ -214,7 +214,9 @@ void InsertionSortCollider::action(Scene* scene){
 					BBj[i].coord=((BBj[i].flags.hasBB=((bool)bv)) ? (BBj[i].flags.isMin ? bv->min[j] : bv->max[j]) : (b->state->pos[j])) - (periodic ? BBj.cellDim*BBj[i].period : 0.);
 				} else { BBj[i].flags.hasBB=false; /* for vanished body, keep the coordinate as-is, to minimize inversions. */ }
 				// if initializing periodic, shift coords & record the period into BBj[i].period
-				if(doInitSort && periodic) BBj[i].coord=cellWrap(BBj[i].coord,0,BBj.cellDim,BBj[i].period);
+				if(doInitSort && periodic) {
+					BBj[i].coord=cellWrap(BBj[i].coord,0,BBj.cellDim,BBj[i].period);
+				}
 			}	
 		}
 	// for each body, copy its minima and maxima, for quick checks of overlaps later
@@ -245,7 +247,8 @@ void InsertionSortCollider::action(Scene* scene){
 		else {
 			if(doInitSort){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel; it seems that there is no time gain running in parallel, though
-				for(int i=0; i<3; i++) 	std::sort(BB[i].vec.begin(),BB[i].vec.end());
+				// important to reset loInx for periodic simulation (!!)
+				for(int i=0; i<3; i++) { BB[i].loIdx=0; std::sort(BB[i].vec.begin(),BB[i].vec.end()); }
 			} else { // sortThenCollide
 				if(!periodic) for(int i=0; i<3; i++) insertionSort(BB[i],interactions,scene,false);
 				else for(int i=0; i<3; i++) insertionSortPeri(BB[i],interactions,scene,false);
@@ -275,7 +278,7 @@ void InsertionSortCollider::action(Scene* scene){
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const body_id_t& iid=V[i].id;
 					long cnt=0;
-					// we might wrap over the periodi boundary here; that's why the condition is difference from the aperiodic case
+					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
 					for(long j=V.norm(i+1); V[j].id!=iid; j=V.norm(j+1)){
 						const body_id_t& jid=V[j].id;
 						if(!V[j].flags.isMin) continue;

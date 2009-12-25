@@ -27,7 +27,7 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 
-#include<yade/pkg-common/PhysicalActionContainerReseter.hpp>
+#include<yade/pkg-common/ForceResetter.hpp>
 
 #include<yade/pkg-common/PhysicalActionDamper.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -321,7 +321,7 @@ void SDECSpheresPlane::createActors(shared_ptr<Scene>& rootBody)
 	sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 
 	rootBody->engines.clear();
-	rootBody->engines.push_back(shared_ptr<Engine>(new PhysicalActionContainerReseter));
+	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(sdecTimeStepper);
 	rootBody->engines.push_back(boundDispatcher);	
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));

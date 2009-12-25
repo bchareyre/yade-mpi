@@ -31,7 +31,7 @@ bool GeometricalModelForceColorizer::isActivated(Scene*)
 void GeometricalModelForceColorizer::action(Scene * ncb)
 {
 	// FIXME the same in GLDrawLatticeBeamState.cpp
-	ncb->bex.sync();
+	ncb->forces.sync();
 
 	BodyContainer* bodies = ncb->bodies.get();
 	
@@ -45,7 +45,7 @@ void GeometricalModelForceColorizer::action(Scene * ncb)
 		if(body->isDynamic)
 		{
 			unsigned int i = body -> getId();
-			Vector3r force=ncb->bex.getForce(i);
+			Vector3r force=ncb->forces.getForce(i);
 			min = std::min( force[0] , std::min( force[1] , std::min( force[2], min ) ) );
 			max = std::max( force[0] , std::max( force[1] , std::max( force[2], max ) ) );
 		}
@@ -61,7 +61,7 @@ void GeometricalModelForceColorizer::action(Scene * ncb)
 		{
 			GeometricalModel* gm = body->geometricalModel.get();
 			unsigned int i = body -> getId();
-			Vector3r force=ncb->bex.getForce(i);
+			Vector3r force=ncb->forces.getForce(i);
 
 			gm->diffuseColor[0] = (force[2]-min)/(max-min);
 			gm->diffuseColor[1] = (force[2]-min)/(max-min);

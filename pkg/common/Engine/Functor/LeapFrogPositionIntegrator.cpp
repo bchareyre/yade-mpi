@@ -12,7 +12,7 @@
 
 
 void LeapFrogPositionIntegrator::go(const shared_ptr<PhysicalParameters>& b
-						, Body* body, BexContainer& bex)
+						, Body* body, ForceContainer& forces)
 {
 	if(!body->isDynamic) return;
 
@@ -37,7 +37,7 @@ void LeapFrogPositionIntegrator::go(const shared_ptr<PhysicalParameters>& b
 		if((p->blockedDOFs & PhysicalParameters::DOF_Y)==0) p->velocity[1]+=dt*p->acceleration[1];
 		if((p->blockedDOFs & PhysicalParameters::DOF_Z)==0) p->velocity[2]+=dt*p->acceleration[2];
 	}
-	p->se3.position += p->velocity*dt + bex.getMove(body->getId());
+	p->se3.position += p->velocity*dt + forces.getMove(body->getId());
 
 	//cerr<<"#"<<body->getId()<<"dx="<<prevVelocities[id]*dt<<endl;
 

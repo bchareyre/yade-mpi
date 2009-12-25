@@ -203,10 +203,10 @@ void ContactLaw1::action(Scene* ncb)
                 //  cerr << "shearForce " << shearForce << endl;
                 // cerr << "f= " << f << endl;
                 // it will be some macro(	body->physicalActions,	ActionType , bodyId )
-					ncb->bex.addForce (id1,-f);
-					ncb->bex.addForce (id2,+f);
-					ncb->bex.addTorque(id1,-c1x.Cross(f));
-					ncb->bex.addTorque(id2, c2x.Cross(f));
+					ncb->forces.addForce (id1,-f);
+					ncb->forces.addForce (id2,+f);
+					ncb->forces.addTorque(id1,-c1x.Cross(f));
+					ncb->forces.addTorque(id2, c2x.Cross(f));
 
 /////	/// Moment law					 	 ///
 /////		if(momentRotationLaw /*&& currentContactPhysics->cohesionBroken == false*/ )
@@ -295,8 +295,8 @@ void ContactLaw1::action(Scene* ncb)
 					nbreInteracMomPlastif++;
 					}
 			}
-			ncb->bex.addTorque(id1,-moment);
-			ncb->bex.addTorque(id2,+moment);
+			ncb->forces.addTorque(id1,-moment);
+			ncb->forces.addTorque(id2,+moment);
 		}
 	/// Moment law	END				 	 ///
 

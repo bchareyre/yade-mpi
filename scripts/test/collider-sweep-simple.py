@@ -2,7 +2,7 @@ O.bodies.append(utils.sphere([0,0,10],.5))
 #O.bodies.append(utils.sphere([0,0,0],.5,dynamic=False))
 
 O.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(label='collider'),
 	InteractionDispatchers(

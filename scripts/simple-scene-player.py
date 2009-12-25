@@ -5,7 +5,7 @@ o.initializers=[
 		BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
 ]
 o.engines=[
-	BexResetter(),
+	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(

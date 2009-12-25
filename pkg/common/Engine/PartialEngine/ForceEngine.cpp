@@ -11,7 +11,7 @@ YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
 void ForceEngine::applyCondition(Scene*){
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(scene->bodies->exists(id));
-		scene->bex.addForce(id,force);
+		scene->forces.addForce(id,force);
 	}
 }
 
