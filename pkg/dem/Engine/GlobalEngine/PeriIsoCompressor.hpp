@@ -65,8 +65,6 @@ class PeriTriaxController: public GlobalEngine{
 	int globUpdate;
 	//! python command to be run when the desired state is reached
 	string doneHook;
-	//! reference cell size (set automatically; if refSize[0]<0 (initial default), the current size is referenced)
-	Vector3r refSize;
 	//! maximum body dimension (set automatically)
 	Vector3r maxBodySpan;
 
@@ -86,8 +84,8 @@ class PeriTriaxController: public GlobalEngine{
 
 	void action(Scene*);
 	void strainStressStiffUpdate();
-	PeriTriaxController(): reversedForces(false),goal(Vector3r::ZERO),stressMask(0),maxStrainRate(Vector3r(1,1,1)),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.25),globUpdate(5),refSize(Vector3r(-1,-1,-1)),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),strainRate(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
-	REGISTER_ATTRIBUTES(GlobalEngine,(reversedForces)(goal)(stressMask)(maxStrainRate)(maxUnbalanced)(absStressTol)(relStressTol)(growDamping)(globUpdate)(doneHook)(refSize)(stress)(strain)(strainRate)(stiff));
+	PeriTriaxController(): reversedForces(false),goal(Vector3r::ZERO),stressMask(0),maxStrainRate(Vector3r(1,1,1)),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.25),globUpdate(5),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),strainRate(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
+	REGISTER_ATTRIBUTES(GlobalEngine,(reversedForces)(goal)(stressMask)(maxStrainRate)(maxUnbalanced)(absStressTol)(relStressTol)(growDamping)(globUpdate)(doneHook)(stress)(strain)(strainRate)(stiff));
 	DECLARE_LOGGER;
 	REGISTER_CLASS_AND_BASE(PeriTriaxController,GlobalEngine);
 };

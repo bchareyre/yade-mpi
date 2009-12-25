@@ -80,12 +80,7 @@ void Scene::moveToNextTimeStep(){
 		forces.resize(bodies->size());
 		needsInitializers=false;
 	}
-	// update cell data
-#ifndef VELGRAD
-	if(isPeriodic) cell->updateCache();
-#else
-	if(isPeriodic) cell->updateCache(dt);
-#endif
+	if(isPeriodic) cell->integrateAndUpdate(dt);
 	//forces.reset(); // uncomment if ForceResetter is removed
 	bool TimingInfo_enabled=TimingInfo::enabled; // cache the value, so that when it is changed inside the step, the engine that was just running doesn't get bogus values
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here

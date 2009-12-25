@@ -7,7 +7,7 @@ p.makeCloud(Vector3().ZERO,O.cell.refSize,1,.5,700,True)
 for sph in p:
 	O.bodies.append(utils.sphere(sph[0],sph[1]))
 
-#log.setLevel("PeriIsoCompressor",log.TRACE)
+log.setLevel("PeriIsoCompressor",log.DEBUG)
 O.timingEnabled=True
 O.engines=[
 	ForceResetter(),
@@ -19,7 +19,7 @@ O.engines=[
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
 	PeriIsoCompressor(charLen=.5,stresses=[-50e9,-1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
-	NewtonIntegrator(damping=.4)
+	NewtonIntegrator(damping=.4,homotheticCellResize=1)
 ]
 O.dt=utils.PWaveTimeStep()
 O.saveTmp()
@@ -28,6 +28,9 @@ from yade import qt; qt.Controller(); qt.View()
 O.run()
 O.wait()
 timing.stats()
+#while True:
+#	O.step()
+
 
 # now take that packing and pad some larger volume with it
 #sp=pack.SpherePack()

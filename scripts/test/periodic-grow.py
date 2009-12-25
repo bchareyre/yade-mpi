@@ -12,7 +12,7 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()],
 	),
-	NewtonIntegrator(damping=.6)
+	NewtonIntegrator(damping=.6,homotheticCellResize=1)
 ]
 import random
 for i in xrange(250):
@@ -25,14 +25,13 @@ O.dt=utils.PWaveTimeStep()
 O.saveTmp()
 from yade import qt
 qt.Controller(); qt.View()
-step=.01
 O.run(200,True)
-for i in range(0,250):
-	O.run(200,True)
-	O.cell.refSize=O.cell.refSize*.998
-	if (i%10==0):
-		F,stiff=utils.totalForceInVolume()
-		dim=O.cell.refSize; A=Vector3(dim[1]*dim[2],dim[0]*dim[2],dim[0]*dim[1])
-		avgStress=sum([F[i]/A[i] for i in 0,1,2])/3.
-		print 'strain',(cubeSize-dim[0])/cubeSize,'avg. stress ',avgStress,'unbalanced ',utils.unbalancedForce()
+rate=-1e-4*cubeSize/(O.dt*200)*Matrix3().IDENTITY
+O.cell['velGrad']=rate
+for i in range(0,25):
+	O.run(2000,True)
+	F,stiff=utils.totalForceInVolume()
+	dim=O.cell.refSize; A=Vector3(dim[1]*dim[2],dim[0]*dim[2],dim[0]*dim[1])
+	avgStress=sum([F[i]/A[i] for i in 0,1,2])/3.
+	print 'strain',(cubeSize-dim[0])/cubeSize,'avg. stress ',avgStress,'unbalanced ',utils.unbalancedForce()
 #O.timingEnabled=True; timing.reset(); O.run(200000,True); timing.stats()

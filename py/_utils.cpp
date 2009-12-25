@@ -456,7 +456,7 @@ BOOST_PYTHON_MODULE(_utils){
 	def("wireAll",wireAll);
 	def("wireNone",wireNone);
 	def("wireNoSpheres",wireNoSpheres);
-	def("flipCell",&Shop::flipCell);
+	def("flipCell",&Shop::flipCell,(python::arg("flip")=Matrix3r::ZERO));
 }
 
 

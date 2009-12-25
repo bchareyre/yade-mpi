@@ -382,8 +382,10 @@ void OpenGLRenderingEngine::renderShape()
 				if(pmin[0]<=cellSize[0] && pmax[0]>=0 &&
 					pmin[1]<=cellSize[1] && pmax[1]>=0 &&
 					pmin[2]<=cellSize[2] && pmax[2]>=0) {
+					Vector3r pt=scene->cell->shearPt(pos2);
+					if(pointClipped(pt)) continue;
 					glPushMatrix();
-						glTranslatev(scene->cell->shearPt(pos2));
+						glTranslatev(pt);
 						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 						shapeDispatcher(b->shape,b->state,/*Body_wire*/ true, viewInfo);
 					glPopMatrix();

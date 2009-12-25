@@ -63,11 +63,6 @@ void NewtonIntegrator::saveMaximaVelocity(Scene* scene, const body_id_t& id, Sta
 
 void NewtonIntegrator::action(Scene*)
 {
-	// only temporary
-#ifndef VELGRAD
-	if(homotheticCellResize) throw runtime_error("Homothetic resizing not yet implemented with new, core/Cell.hpp based cell (extension+shear).");
-#endif
-
 	scene->forces.sync();
 	Real dt=scene->dt;
 	// account for motion of the periodic boundary, if we remember its last position
@@ -163,26 +158,18 @@ void NewtonIntegrator::action(Scene*)
 
 inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
 {
-	// for homothetic resize of the cell (if enabled), compute the position difference of the homothetic transformation
-	// the term ξ=(x'-x₀')/(x₁'-x₀') is normalized cell coordinate (' meaning at previous step),
-	// which is then used to compute new position x=ξ(x₁-x₀)+x₀. (per component)
-	// Then we update either velocity by (x-x')/Δt (homotheticCellResize==1)
-	//   or position by (x-x') (homotheticCellResize==2)
-	// FIXME: wrap state->pos first, then apply the shift; otherwise result might be garbage
-	Vector3r dPos(Vector3r::ZERO); // initialize to avoid warning; find way to avoid it in a better way
-#ifndef VELGRAD
-	if(cellChanged && homotheticCellResize){ for(int i=0; i<3; i++) dPos[i]=(state->pos[i]/prevCellSize[i])*scene->cell->getSize()[i]-state->pos[i]; }
-#else
-	if(homotheticCellResize){ dPos = scene->cell->getShearIncrMatrix()*scene->cell->wrapShearedPt(state->pos);
-	}
-#endif	
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
 	state->vel+=dt*state->accel;
 	state->pos += state->vel*dt + scene->forces.getMove(id);
-	//apply cell deformation
-	if(homotheticCellResize>=1) state->pos+=dPos;
-	//update velocity for usage in rate dependant equations (e.g. viscous law) FIXME : it is not recommended to do that because it impacts the dynamics (this modified velocity will be used as reference in the next time-step)
-	if(homotheticCellResize==2) state->vel+=dPos/dt;
+	assert(homotheticCellResize>=0 && homotheticCellResize<=2);
+	if(homotheticCellResize>0){
+		Vector3r dPos(scene->cell->getStrainIncrMatrix()*scene->cell->wrapShearedPt(state->pos));
+		// apply cell deformation
+		if(homotheticCellResize>=1) state->pos+=dPos;
+		// update velocity for usage in rate dependant equations (e.g. viscous law)
+		// FIXME : it is not recommended to do that because it impacts the dynamics (this modified velocity will be used as reference in the next time-step)
+		if(homotheticCellResize==2) state->vel+=dPos/dt;
+	}
 
 }
 inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt )

@@ -70,15 +70,22 @@ map<string,boost::any> Shop::defaults;
 
 /*! Flip periodic cell by given number of cells.
 
+Still broken, some interactions are missed. Should be checked.
 */
 
 Matrix3r Shop::flipCell(const Matrix3r& _flip){
-	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell);
+	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell); const Matrix3r& strain(cell->strain);
+	Vector3r size=cell->getSize();
 	Matrix3r flip;
 	if(_flip==Matrix3r::ZERO){
-		LOG_ERROR("Computing optimal cell flip not yet implemented, no flipping done!");
-		return Matrix3r::ZERO;
-		// flip=optimal matrix …
+		bool hasNonzero=false;
+		for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
+			if(i==j){ flip[i][j]=0; continue; }
+			flip[i][j]=-floor(.5+strain[i][j]/(size[j]/size[i]));
+			if(flip[i][j]!=0) hasNonzero=true;
+		}
+		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::ZERO;}
+		LOG_DEBUG("Computed flip matrix: upper "<<flip[0][1]<<","<<flip[0][2]<<","<<flip[1][2]<<"; lower "<<flip[1][0]<<","<<flip[2][0]<<","<<flip[2][1]);
 	} else {
 		flip=_flip;
 	}
@@ -90,7 +97,6 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	}
 
 	// change cell strain here
-	Vector3r size=cell->getSize();
 	Matrix3r strainInc;
 	for(int i=0; i<3; i++) for(int j=0; j<3; j++){
 		if(i==j) { if(flip[i][j]!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); strainInc[i][j]=0; continue; }

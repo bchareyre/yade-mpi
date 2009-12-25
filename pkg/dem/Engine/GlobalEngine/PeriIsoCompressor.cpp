@@ -74,12 +74,9 @@ void PeriIsoCompressor::action(Scene* scene){
 		}
 	}
 	TRVAR4(cellGrow,sigma,sigmaGoal,avgStiffness);
-#ifdef VELGRAD
-	for(int axis=0; axis<3; axis++){
-		if (scene->dt!=0) scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*scene->cell->refSize[axis]);
-	}
-#endif
-	scene->cell->refSize+=cellGrow;
+	assert(scene->dt>0);
+	for(int axis=0; axis<3; axis++){ scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*scene->cell->refSize[axis]); }
+	// scene->cell->refSize+=cellGrow;
 
 	// handle state transitions
 	if(allStressesOK){
@@ -100,7 +97,7 @@ void PeriIsoCompressor::action(Scene* scene){
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
 	const Vector3r& cellSize(scene->cell->getSize());
-	for(int i=0; i<3; i++) strain[i]=(cellSize[i]-refSize[i])/refSize[i];
+	for(int i=0; i<3; i++) strain[i]=scene->cell->strain[i][i];
 	// stress and stiffness
 	Vector3r sumForce(Vector3r::ZERO), sumStiff(Vector3r::ZERO), sumLength(Vector3r::ZERO);
 	int n=0;
@@ -128,12 +125,12 @@ void PeriTriaxController::strainStressStiffUpdate(){
 
 CREATE_LOGGER(PeriTriaxController);
 
-void PeriTriaxController::action(Scene* scene){
+void PeriTriaxController::action(Scene*){
 	if(!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
 	const Vector3r& cellSize=scene->cell->getSize();
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
-	if(refSize[0]<0) refSize=cellSize;
+	const Vector3r& refSize=scene->cell->refSize;
 	if(maxBodySpan[0]<=0){
 		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 			if(!b || !b->bound) continue;
@@ -182,18 +179,21 @@ void PeriTriaxController::action(Scene* scene){
 			}
 		}
 	}
+	assert(scene->dt>0.);
 	// update stress and strain
 	for(int axis=0; axis<3; axis++){
-#ifdef VELGRAD
-		if (scene->dt!=0) scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
-#endif
-		strain[axis]+=cellGrow[axis]/refSize[axis];
+		// either prescribe velocity gradient
+		scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
+		// or strain increment (but NOT both)
+		// strain[axis]+=cellGrow[axis]/refSize[axis];
+
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
 		if(stiff[axis]>0) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]); //-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
 	// change cell size now
-	scene->cell->refSize+=cellGrow;
+	// scene->cell->refSize+=cellGrow;
+
 	strainRate=cellGrow/scene->dt;
 
 	if(allOk){

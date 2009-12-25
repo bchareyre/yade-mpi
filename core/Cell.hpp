@@ -1,24 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 // #include<yade/lib-base/yadeWm3Extra.hpp>
 
-// begin yade compatibility
-#ifndef PREFIX
-	#include<yade/lib-miniWm3/Wm3Vector3.h>
-	#include<yade/lib-miniWm3/Wm3Matrix3.h>
-	#define REGISTER_ATTRIBUTES(a,b)
-	#define REGISTER_SERIALIZABLE(a)
-	#define REGISTER_CLASS_AND_BASE(a,b)
-	typedef Wm3::Vector3<double> Vector3r;
-	using Wm3::Vector3;
-	typedef Wm3::Matrix3<double> Matrix3r;
-	typedef double Real;
-	class Serializable{};
-#endif
-// end yade compatibility
-
-	
-#define VELGRAD
-	
 /*! Periodic cell parameters and routines. Usually instantiated as Scene::cell.
 
 The cell has size and shear, which are independent. 
@@ -26,33 +8,15 @@ The cell has size and shear, which are independent.
 */
 class Cell: public Serializable{
 	public:
-		Cell(): refSize(Vector3r(1,1,1)), strain(Matrix3r::ZERO)
-#ifdef VELGRAD
-				, velGrad(Matrix3r::ZERO) 
-				, Hsize(Matrix3r::ZERO)
-				,_shearTrsfMatrix(Matrix3r::IDENTITY)
-				{ updateCache(0); }
-#else
-				{ updateCache(); }
-#endif
+		Cell(): refSize(Vector3r(1,1,1)), strain(Matrix3r::ZERO), velGrad(Matrix3r::ZERO){ integrateAndUpdate(0); }
 				
 		//! size of the cell, projected on axes (for non-zero shear)
 		Vector3r refSize;
-		//! 3 non-diagonal components of the shear matrix, ordered by axis normal to the shear plane,
-		//! i.e. (εyz=εzy,εxz=εzx,εxy=εyx). Shear of the cell is always symmetric (transforms
-		//! a box into a parallelepiped).
-		//! See http://www.efunda.com/formulae/solid_mechanics/mat_mechanics/strain.cfm#matrix
-		//! for details
-		// Vector3r shear;
+		//! Strain matrix (current total strain)
+		//! Ordering see http://www.efunda.com/formulae/solid_mechanics/mat_mechanics/strain.cfm#matrix
 		Matrix3r strain;
-#ifdef VELGRAD
 		Matrix3r velGrad;
-		Matrix3r Hsize;
-		Matrix3r _shearIncrt;
-#endif
-
-		//! reference values of size and shear (for rendering, mainly)
-		// Vector3r refShear, refCenter;
+		//Matrix3r Hsize;
 
 	//! Get current size (refSize × normal strain)
 	const Vector3r& getSize() const { return _size; }
@@ -66,10 +30,8 @@ class Cell: public Serializable{
 	const Matrix3r& getShearTrsfMatrix() const { return _shearTrsfMatrix; }
 	//! inverse of getShearTrsfMatrix().
 	const Matrix3r& getUnshearTrsfMatrix() const {return _unshearTrsfMatrix;}
-#ifdef VELGRAD	
 	//! transformation increment matrix applying arbitrary field
-	const Matrix3r& getShearIncrMatrix() const { return _shearIncrt; }
-#endif	
+	const Matrix3r& getStrainIncrMatrix() const { return _strainInc; }
 	
 	/*! return pointer to column-major OpenGL 4x4 matrix applying pure shear. This matrix is suitable as argument for glMultMatrixd.
 
@@ -87,13 +49,12 @@ class Cell: public Serializable{
 	//! Whether any shear (non-diagonal) component of the strain matrix is nonzero.
 	bool hasShear() const {return _hasShear; }
 
-	// caches
+	// caches; private
 	private:
+		Matrix3r _strainInc;
 		Vector3r _size;
 		bool _hasShear;
 		Matrix3r _shearTrsfMatrix, _unshearTrsfMatrix, _cosMatrix;
-		// Vector3r _shearAngle, _shearSin, _shearCos;
-		//Matrix3r _shearTrsf, _unshearTrsf;
 		double _glShearTrsfMatrix[16];
 		void fillGlShearTrsfMatrix(double m[16]){
 			m[0]=1;            m[4]=strain[0][1]; m[8]=strain[0][2]; m[12]=0;
@@ -104,56 +65,38 @@ class Cell: public Serializable{
 
 	public:
 
-	// should be called before every step
-#ifdef VELGRAD
-	void updateCache(double dt){	
-		//initialize Hsize for "lazy" default scripts, after that Hsize is free to change
-		if (refSize[0]!=1 && Hsize[0][0]==0) {Hsize[0][0]=refSize[0]; Hsize[1][1]=refSize[1]; Hsize[2][2]=refSize[2];}
-		//incremental disp gradient
-		_shearIncrt=dt*velGrad;		
-		//update Hsize (redundant with total transformation perhaps)
-		Hsize=Hsize+_shearIncrt*Hsize;
-		//total transformation
-		_shearTrsfMatrix = _shearTrsfMatrix + _shearIncrt*_shearTrsfMatrix;// M = (Id+G).M = F.M
-		//compatibility with Vaclav's code :
-		_size[0]=Hsize[0][0]; _size[1]=Hsize[1][1]; _size[2]=Hsize[2][2];
-		_hasShear = true;
+	//! "integrate" velGrad, update cached values used by public getter
+	void integrateAndUpdate(Real dt){
+		#if 0
+			//initialize Hsize for "lazy" default scripts, after that Hsize is free to change
+			if (refSize[0]!=1 && Hsize[0][0]==0) {Hsize[0][0]=refSize[0]; Hsize[1][1]=refSize[1]; Hsize[2][2]=refSize[2];}
+			//update Hsize (redundant with total transformation perhaps)
+			Hsize=Hsize+_shearInc*Hsize;
+		#endif
+
+		//incremental displacement gradient
+		_strainInc=dt*velGrad;
+		// total transformation; M = (Id+G).M = F.M
+		strain+=_strainInc*_shearTrsfMatrix;
+		#if 0 
+			cerr<<"velGrad "; for(int i=0; i<3; i++) for(int j=0; j<3; j++) cerr<<velGrad[i][j]<<endl;
+			cerr<<"_strainInc "; for(int i=0; i<3; i++) for(int j=0; j<3; j++) cerr<<_strainInc[i][j]<<endl;
+			cerr<<"strain "; for(int i=0; i<3; i++) for(int j=0; j<3; j++) cerr<<strain[i][j]<<endl;
+		#endif
+		// pure shear transformation: strain with 1s on the diagonal
+		_shearTrsfMatrix=strain; _shearTrsfMatrix[0][0]=_shearTrsfMatrix[1][1]=_shearTrsfMatrix[2][2]=1.;
+		// pure unshear transformation
 		_unshearTrsfMatrix=_shearTrsfMatrix.Inverse();
-		strain=_shearTrsfMatrix;
-#else
-	void updateCache(){
-		_size=refSize+diagMult(getExtensionalStrain(),refSize);
+		// some parts can branch depending on presence/absence of shear
 		_hasShear=!(strain[0][1]==0 && strain[0][2]==0 && strain[1][0]==0 && strain[1][2]==0 && strain[2][0]==0 && strain[2][1]==0);
-		_shearTrsfMatrix=strain;
-		_shearTrsfMatrix[0][0]=_shearTrsfMatrix[1][1]=_shearTrsfMatrix[2][2]=1.;
-		_unshearTrsfMatrix=_shearTrsfMatrix.Inverse();
-#endif
+		// current cell size (in units on physical space axes)
+		_size=refSize+diagMult(getExtensionalStrain(),refSize);
+		// OpenGL shear matrix (used frequently)
 		fillGlShearTrsfMatrix(_glShearTrsfMatrix);
+		// precompute cosines of angles, used for enlarge factor when computing Aabb's
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) _cosMatrix[i][j]=(i==j?0:cos(atan(strain[i][j])));
 	}
 	
-// #ifdef VELGRAD		
-// 	void updateCache(){ updateCache(0);}
-// #endif
-
-	// doesn't seem to be really useful
-	#if 0
-		/*! Prepare OpenGL matrix with current shear and given translation and scale.
-		
-		This matrix is ccumulated product of this sequence:
-
-			glTranslatev(translation);
-			glScalev(scale);
-			glMultMatrixd(scene->cell->_glShearMatrix);
-
-		*/
-		void glTrsfMatrix(double m[16], const Vector3r& translation, const Vector3r& scale){
-			m[0]=scale[0];          m[4]=scale[2]*shear[2]; m[8]=scale[1]*shear[1]; m[12]=translation[0];
-			m[1]=scale[2]*shear[2]; m[5]=scale[1];          m[9]=scale[0]*shear[0]; m[13]=translation[1];
-			m[2]=scale[1]*shear[1]; m[6]=shear[0];          m[10]=scale[2];         m[14]=translation[2];
-			m[3]=0;        m[7]=0;        m[11]=0;       m[15]=1;
-		}
-	#endif
 	/*! Return point inside periodic cell, even if shear is applied */
 	Vector3r wrapShearedPt(const Vector3r& pt){ return shearPt(wrapPt(unshearPt(pt))); }
 	/*! Return point inside periodic cell, even if shear is applied; store cell coordinates in period. */
@@ -170,7 +113,6 @@ class Cell: public Serializable{
 	Vector3r wrapPt(const Vector3r pt, Vector3<int>& period)const{
 		Vector3r ret; for(int i=0; i<3; i++){ ret[i]=wrapNum(pt[i],_size[i],period[i]); } return ret;
 	}
-
 	/*! Wrap number to interval 0…sz */
 	static Real wrapNum(const Real& x, const Real& sz){
 		Real norm=x/sz; return (norm-floor(norm))*sz;
@@ -179,16 +121,8 @@ class Cell: public Serializable{
 	static Real wrapNum(const Real& x, const Real& sz, int& period){
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
-#ifdef VELGRAD
-	void postProcessAttributes(bool deserializing){ if(deserializing) updateCache(0); }
-#else
-	void postProcessAttributes(bool deserializing){ if(deserializing) updateCache(); }
-#endif
-	REGISTER_ATTRIBUTES(Serializable,(refSize)(strain)
-#ifdef VELGRAD
-			(velGrad)(Hsize)
-#endif
-			   );
+	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
+	REGISTER_ATTRIBUTES(Serializable,(refSize)(strain)(velGrad));
 	REGISTER_CLASS_AND_BASE(Cell,Serializable);
 };
 REGISTER_SERIALIZABLE(Cell);

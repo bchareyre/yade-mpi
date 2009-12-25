@@ -4,6 +4,7 @@
 from yade import *
 from yade import pack,log,qt
 #log.setLevel('PeriTriaxController',log.DEBUG)
+#log.setLevel('Shop',log.TRACE)
 O.periodic=True
 O.cell.refSize=Vector3(.1,.1,.1)
 O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
@@ -24,13 +25,14 @@ O.engines=[
 	),
 	PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
 	NewtonIntegrator(damping=.6, homotheticCellResize=1),
+	PeriodicPythonRunner(command='utils.flipCell()',iterPeriod=1000), # broken for larger strains?
 ]
-O.dt=0.1*utils.PWaveTimeStep()
+O.dt=0.5*utils.PWaveTimeStep()
 O.run(1)
 qt.View()
 O.cell.velGrad=Matrix3(0,5,0,0,0,0, 0,0,-5)
 O.run();
-
+rrr=qt.Renderer(); rrr['intrAllWire'],rrr['Body_interacting_geom']=True,False
 
 phase=0
 def triaxDone():
