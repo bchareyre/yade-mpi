@@ -216,8 +216,13 @@ class pyInteractionIterator{
 	public:
 	pyInteractionIterator(const shared_ptr<InteractionContainer>& ic){ I=ic->begin(); Iend=ic->end(); }
 	pyInteractionIterator pyIter(){return *this;}
-	shared_ptr<Interaction> pyNext(){ if(!(I!=Iend)){ PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set(); }
-		InteractionContainer::iterator ret=I; ++I; return *ret; }
+	shared_ptr<Interaction> pyNext(){
+		InteractionContainer::iterator ret;
+		while(I!=Iend){ ret=I; ++I; if((*ret)->isReal()) return *ret; }
+		PyErr_SetNone(PyExc_StopIteration); python::throw_error_already_set();
+		throw; // to avoid compiler warning; never reached
+		//InteractionContainer::iterator ret=I; ++I; return *ret;
+	}
 };
 
 class pyInteractionContainer{
