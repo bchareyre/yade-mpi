@@ -7,7 +7,9 @@ from yade import pack,log,qt
 #log.setLevel('Shop',log.TRACE)
 O.periodic=True
 O.cell.refSize=Vector3(.1,.1,.1)
-O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
+#O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
+O.cell.trsf=Matrix3().IDENTITY;
+
 sp=pack.SpherePack()
 radius=5e-3
 num=sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic

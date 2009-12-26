@@ -19,7 +19,7 @@ O.engines=[
 ]
 
 def doCellFlip():
-	flip=1 if O.cell.strain[1,2]<0 else -1;
+	flip=1 if O.cell.trsf[1,2]<0 else -1;
 	utils.flipCell(Matrix3(0,0,0, 0,0,flip, 0,0,0))
 
 #g=0.
@@ -27,7 +27,7 @@ def doCellFlip():
 #	O.cellShear=Vector3(.2*sin(g),.2*cos(pi*g),.2*sin(2*g)+.2*cos(3*g))
 #	time.sleep(0.001)
 #	g+=1e-3
-O.cell.strain=Matrix3(0,0,0, 0,0,.5, 0,0,0)
+O.cell.trsf=Matrix3(1,0,0, 0,1,.5, 0,0,1)
 O.dt=2e-2*utils.PWaveTimeStep()
 O.step()
 O.saveTmp()

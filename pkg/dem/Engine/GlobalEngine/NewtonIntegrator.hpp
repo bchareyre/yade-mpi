@@ -66,6 +66,8 @@ class NewtonIntegrator : public GlobalEngine{
 		bool exactAsphericalRot;
 		//! Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled (default), 1: position update, 2: velocity update.
 		int homotheticCellResize;
+		//! Store transformation increment for the current step (updated automatically)
+		Matrix3r cellTrsfInc;
 
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;

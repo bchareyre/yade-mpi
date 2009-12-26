@@ -74,14 +74,14 @@ Still broken, some interactions are missed. Should be checked.
 */
 
 Matrix3r Shop::flipCell(const Matrix3r& _flip){
-	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell); const Matrix3r& strain(cell->strain);
+	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell); const Matrix3r& trsf(cell->trsf);
 	Vector3r size=cell->getSize();
 	Matrix3r flip;
 	if(_flip==Matrix3r::ZERO){
 		bool hasNonzero=false;
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
 			if(i==j){ flip[i][j]=0; continue; }
-			flip[i][j]=-floor(.5+strain[i][j]/(size[j]/size[i]));
+			flip[i][j]=-floor(.5+trsf[i][j]/(size[j]/size[i]));
 			if(flip[i][j]!=0) hasNonzero=true;
 		}
 		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::ZERO;}
@@ -96,17 +96,17 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		if(!b) continue; cell->wrapShearedPt(b->state->pos,oldCells[b->getId()]);
 	}
 
-	// change cell strain here
-	Matrix3r strainInc;
+	// change cell trsf here
+	Matrix3r trsfInc;
 	for(int i=0; i<3; i++) for(int j=0; j<3; j++){
-		if(i==j) { if(flip[i][j]!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); strainInc[i][j]=0; continue; }
+		if(i==j) { if(flip[i][j]!=0) LOG_WARN("Non-zero diagonal term at ["<<i<<","<<j<<"] is meaningless and will be ignored."); trsfInc[i][j]=0; continue; }
 		// make sure non-diagonal entries are "integers"
 		if(flip[i][j]!=double(int(flip[i][j]))) LOG_WARN("Flip matrix entry "<<flip[i][j]<<" at ["<<i<<","<<j<<"] not integer?! (will be rounded)");
-		strainInc[i][j]=int(flip[i][j])*size[j]/size[i];
+		trsfInc[i][j]=int(flip[i][j])*size[j]/size[i];
 	}
-	TRWM3MAT(cell->strain);
-	TRWM3MAT(strainInc);
-	cell->strain+=strainInc;
+	TRWM3MAT(cell->trsf);
+	TRWM3MAT(trsfInc);
+	cell->trsf+=trsfInc;
 	cell->postProcessAttributes(/*deserializing*/true);
 
 	// new cell coords of bodies

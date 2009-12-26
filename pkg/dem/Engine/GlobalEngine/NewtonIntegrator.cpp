@@ -65,6 +65,8 @@ void NewtonIntegrator::action(Scene*)
 {
 	scene->forces.sync();
 	Real dt=scene->dt;
+	// precompute transformation increment; using Cell::getTrsfInc would get increment from the previous step, which is not right... (?)
+	if(scene->isPeriodic && homotheticCellResize) cellTrsfInc=dt*scene->cell->velGrad;
 	// account for motion of the periodic boundary, if we remember its last position
 	// its velocity will count as max velocity of bodies
 	// otherwise the collider might not run if only the cell were changing without any particle motion
@@ -163,7 +165,8 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 	state->pos += state->vel*dt + scene->forces.getMove(id);
 	assert(homotheticCellResize>=0 && homotheticCellResize<=2);
 	if(homotheticCellResize>0){
-		Vector3r dPos(scene->cell->getStrainIncrMatrix()*scene->cell->wrapShearedPt(state->pos));
+		//Vector3r dPos(scene->cell->getTrsfInc()*scene->cell->wrapShearedPt(state->pos));
+		Vector3r dPos(cellTrsfInc*scene->cell->wrapShearedPt(state->pos));
 		// apply cell deformation
 		if(homotheticCellResize>=1) state->pos+=dPos;
 		// update velocity for usage in rate dependant equations (e.g. viscous law)

@@ -97,7 +97,7 @@ void PeriIsoCompressor::action(Scene* scene){
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
 	const Vector3r& cellSize(scene->cell->getSize());
-	for(int i=0; i<3; i++) strain[i]=scene->cell->strain[i][i];
+	for(int i=0; i<3; i++) strain[i]=scene->cell->trsf[i][i]-1.;
 	// stress and stiffness
 	Vector3r sumForce(Vector3r::ZERO), sumStiff(Vector3r::ZERO), sumLength(Vector3r::ZERO);
 	int n=0;
