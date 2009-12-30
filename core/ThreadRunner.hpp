@@ -53,8 +53,10 @@ class ThreadRunner
 		void		run();
 		void		call();
 
+		DECLARE_LOGGER;
+
 	public :
-		ThreadRunner(ThreadWorker* c) : m_thread_worker(c), m_looping(false) {};
+		ThreadRunner(ThreadWorker* c) : m_thread_worker(c), m_looping(false), workerThrew(false) {};
 		~ThreadRunner();
 
 		/// perform ThreadWorker::singleAction() in separate thread
@@ -67,6 +69,10 @@ class ThreadRunner
 		void pleaseTerminate();
 		/// precondition for the loop started with start().
 		bool looping();
+		//! if true, workerException is copy of the exception thrown by the worker
+		bool workerThrew;
+		//! last exception thrown by the worker, if any
+		std::exception workerException;
 };
 
 

@@ -26,6 +26,7 @@
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<yade/core/Omega.hpp>
+#include<yade/core/ThreadRunner.hpp>
 #include<yade/core/FileGenerator.hpp>
 
 #include<yade/pkg-dem/STLImporter.hpp>
@@ -35,7 +36,6 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/pkg-common/ParallelEngine.hpp>
-#include<yade/core/Functor.hpp>
 
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
@@ -376,8 +376,12 @@ class pyOmega{
 	}
 	void pause(){Py_BEGIN_ALLOW_THREADS; OMEGA.stopSimulationLoop(); Py_END_ALLOW_THREADS; LOG_DEBUG("PAUSE!");}
 	void step() { if(OMEGA.isRunning()) throw runtime_error("Called O.step() while simulation is running."); OMEGA.getScene()->moveToNextTimeStep(); /* LOG_DEBUG("STEP!"); run(1); wait(); */ }
-	void wait(){ if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return; timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS; }
-
+	void wait(){
+		if(OMEGA.isRunning()){LOG_DEBUG("WAIT!");} else return;
+		timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */ Py_BEGIN_ALLOW_THREADS; while(OMEGA.isRunning()) nanosleep(&t1,&t2); Py_END_ALLOW_THREADS;
+		if(!OMEGA.simulationLoop->workerThrew) return;
+		LOG_ERROR("Simulation error encountered."); OMEGA.simulationLoop->workerThrew=false; throw OMEGA.simulationLoop->workerException;
+	}
 	void load(std::string fileName) {
 		Py_BEGIN_ALLOW_THREADS; OMEGA.joinSimulationLoop(); Py_END_ALLOW_THREADS; 
 		OMEGA.setSimulationFileName(fileName);

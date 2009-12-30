@@ -1,5 +1,5 @@
 O.periodic=True
-O.cell.refSize=Vector3(.5,.5,.5)
+O.cell.refSize=Vector3(.55,.55,.55)
 O.bodies.append(utils.facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))
 O.bodies.append(utils.sphere([.3,.1,.4],.05,dynamic=True))
 O.bodies.append(utils.sphere([.200001,.2000001,.4],.05,dynamic=False))
@@ -36,9 +36,9 @@ rdr=yade.qt.Renderer()
 rdr['intrAllWire']=True
 #from yade import log
 #import yade.qt,time
-v=yade.qt.View()
-v.axes=True
-v.grid=(True,True,True)
+#v=yade.qt.View()
+#v.axes=True
+#v.grid=(True,True,True)
 
 from yade import log
 #log.setLevel('Shop',log.TRACE)

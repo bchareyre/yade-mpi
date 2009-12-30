@@ -25,8 +25,8 @@ void Bo1_Sphere_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, con
 		for(int i=0; i<3; i++){
 			//cerr<<"cos["<<i<<"]"<<cos[i]<<" ";
 			int i1=(i+1)%3,i2=(i+2)%3;
-			halfSize[i1]+=refHalfSize[i1]*(1/cos[i]-1);
-			halfSize[i2]+=refHalfSize[i2]*(1/cos[i]-1);
+			halfSize[i1]+=.5*refHalfSize[i1]*(1/cos[i]-1);
+			halfSize[i2]+=.5*refHalfSize[i2]*(1/cos[i]-1);
 		}
 	}
 	//cerr<<" || "<<halfSize<<endl;

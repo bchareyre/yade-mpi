@@ -15,13 +15,22 @@
 
 #include<iostream>
 
+CREATE_LOGGER(ThreadRunner);
+
 void ThreadRunner::run()
 {
 	// this is the body of execution of separate thread
 	boost::mutex::scoped_lock lock(m_runmutex);
-	while(looping()) {
-		call();
-		if(m_thread_worker->shouldTerminate()){ stop(); return; }
+	try{
+		workerThrew=false;
+		while(looping()) {
+			call();
+			if(m_thread_worker->shouldTerminate()){ stop(); return; }
+		}
+	} catch (std::exception& e){
+		LOG_FATAL("Exception occured: "<<endl<<e.what());
+		workerException=std::exception(e); workerThrew=true;
+		stop(); return;
 	}
 }
 
