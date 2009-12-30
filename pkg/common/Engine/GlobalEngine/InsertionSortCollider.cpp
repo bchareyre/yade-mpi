@@ -403,14 +403,15 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 	assert(id1!=id2); // programming error, or weird bodies (too large?)
 	for(int axis=0; axis<3; axis++){
 		Real dim=scene->cell->getSize()[axis];
+		// LOG_DEBUG("dim["<<axis<<"]="<<dim);
 		// too big bodies in interaction
 		assert(maxima[3*id1+axis]-minima[3*id1+axis]<.99*dim); assert(maxima[3*id2+axis]-minima[3*id2+axis]<.99*dim);
-		// find body of which when taken as period start will make the gap smaller
+		// find body of which minimum when taken as period start will make the gap smaller
 		Real m1=minima[3*id1+axis],m2=minima[3*id2+axis];
 		Real wMn=(cellWrapRel(m1,m2,m2+dim)<cellWrapRel(m2,m1,m1+dim)) ? m2 : m1;
 		#ifdef PISC_DEBUG
 		if(watchIds(id1,id2)){
-			TRVAR3(id1,id2,axis);
+			TRVAR4(id1,id2,axis,dim);
 			TRVAR4(minima[3*id1+axis],maxima[3*id1+axis],minima[3*id2+axis],maxima[3*id2+axis]);
 			TRVAR2(cellWrapRel(m1,m2,m2+dim),cellWrapRel(m2,m1,m1+dim));
 			TRVAR3(m1,m2,wMn);
@@ -425,7 +426,10 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 				TRVAR4(pmn1,pmx1,pmn2,pmx2);
 			}
 		#endif
-		if((pmn1!=pmx1) || (pmn2!=pmx2)){
+		/* FIXME: condition temporary disabled
+			if wMn==m1 and minima[id2]<m1, then it might give spurious error; why should it be error, though?
+		*/
+		if(false && ((pmn1!=pmx1) || (pmn2!=pmx2))){
 			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=mn1?mx1:mx2)<<")");
 			throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
 		}
@@ -440,6 +444,6 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 
 #ifdef PISC_DEBUG
 	bool InsertionSortCollider::watchIds(body_id_t id1, body_id_t id2) const{
-		return true; //id1==1 || id2==1;
+		return id1==3 || id2==3; //true; //id1==1 || id2==1;
 	}
 #endif
