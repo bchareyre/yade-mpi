@@ -767,8 +767,8 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readwrite("refSize",&Cell::refSize)
 		.def_readwrite("trsf",&Cell::trsf)
 		.def_readwrite("velGrad",&Cell::velGrad)
+		.def_readonly("size",&Cell::getSize_copy)
 		//.def_readwrite("Hsize",&Cell::Hsize)
-		.add_property("stretch",&Cell::getStretchRatio)
 		//.add_property("size",&Cell::getSize,python::return_value_policy<python::return_internal_referece>()
 	;
 

@@ -26,8 +26,8 @@ class Cell: public Serializable{
 	Vector3r getSize_copy() const { return _size; }
 	//! stretch ratio Λ(n) (http://en.wikipedia.org/wiki/Finite_strain_theory#Stretch_ratio)
 	Vector3r getStretchRatio() const { return Vector3r(trsf[0][0],trsf[1][1],trsf[2][2]); }
-	//! return matrix containing cosines of shear angles
-	const Matrix3r& getCosMatrix() const {return _cosMatrix;}
+	//! return vector of consines of skew angle in yz, xz, xy planes between respective transformed base vectors
+	const Vector3r& getCos() const {return _cos;}
 	//! transformation matrix applying puse shear (normal strain removed: ones on the diagonal)
 	const Matrix3r& getShearTrsf() const { return _shearTrsf; }
 	//! inverse of getShearTrsfMatrix().
@@ -54,14 +54,14 @@ class Cell: public Serializable{
 	// caches; private
 	private:
 		Matrix3r _trsfInc;
-		Vector3r _size;
+		Vector3r _size, _cos;
 		bool _hasShear;
-		Matrix3r _shearTrsf, _unshearTrsf, _cosMatrix;
+		Matrix3r _shearTrsf, _unshearTrsf;
 		double _glShearTrsfMatrix[16];
 		void fillGlShearTrsfMatrix(double m[16]){
-			m[0]=1;          m[4]=trsf[0][1]; m[8]=trsf[0][2]; m[12]=0;
-			m[1]=trsf[1][0]; m[5]=1;          m[9]=trsf[1][2]; m[13]=0;
-			m[2]=trsf[2][0]; m[6]=trsf[2][1]; m[10]=1;         m[14]=0;
+			m[0]=trsf[0][0]; m[4]=trsf[0][1]; m[8]=trsf[0][2]; m[12]=0;
+			m[1]=trsf[1][0]; m[5]=trsf[1][1]; m[9]=trsf[1][2]; m[13]=0;
+			m[2]=trsf[2][0]; m[6]=trsf[2][1]; m[10]=trsf[2][2];m[14]=0;
 			m[3]=0;          m[7]=0;          m[11]=0;         m[15]=1;
 		}
 
@@ -69,34 +69,35 @@ class Cell: public Serializable{
 
 	//! "integrate" velGrad, update cached values used by public getter
 	void integrateAndUpdate(Real dt){
-		#if 0
-			//initialize Hsize for "lazy" default scripts, after that Hsize is free to change
-			if (refSize[0]!=1 && Hsize[0][0]==0) {Hsize[0][0]=refSize[0]; Hsize[1][1]=refSize[1]; Hsize[2][2]=refSize[2];}
-			//update Hsize (redundant with total transformation perhaps)
-			Hsize=Hsize+_shearInc*Hsize;
-		#endif
-
 		//incremental displacement gradient
 		_trsfInc=dt*velGrad;
 		// total transformation; M = (Id+G).M = F.M
 		trsf+=_trsfInc*trsf;
-		#if 0 
-			cerr<<"velGrad "; for(int i=0; i<3; i++) for(int j=0; j<3; j++) cerr<<velGrad[i][j]<<endl;
-			cerr<<"_strainInc "; for(int i=0; i<3; i++) for(int j=0; j<3; j++) cerr<<_strainInc[i][j]<<endl;
-			cerr<<"strain "; for(int i=0; i<3; i++) for(int j=0; j<3; j++) cerr<<strain[i][j]<<endl;
-		#endif
+		// Hsize will contain colums with transformed base vectors
+		Matrix3r Hsize(refSize[0],refSize[1],refSize[2]);
+		Hsize=trsf*Hsize;
+		// lengths of transformed cell vectors, skew cosines
+		Vector3r Hnorm[3]; // normalized transformed base vectors
+		for(int i=0; i<3; i++){
+			_size[i]=Vector3r(Hsize[i][0],Hsize[i][1],Hsize[i][2]).Length();
+			Hnorm[i]=Vector3r(Hsize[i][0],Hsize[i][1],Hsize[i][2]); Hnorm[i].Normalize();
+		};
+		//cerr<<"Hsize="<<endl<<Hsize[0][0]<<" "<<Hsize[0][1]<<" "<<Hsize[0][2]<<endl<<Hsize[1][0]<<" "<<Hsize[1][1]<<" "<<Hsize[1][2]<<endl<<Hsize[2][0]<<" "<<Hsize[2][1]<<" "<<Hsize[2][2]<<endl;
+		//cerr<<"Hnorm="<<Hnorm[0]<<" | "<<Hnorm[1]<<" | "<<Hnorm[2]<<endl;
+		// skew cosines
+		for(int i=0; i<3; i++){
+			int i1=(i+1)%3, i2=(i+2)%3;
+			// sin between axes is cos of skew
+			_cos[i]=(Hnorm[i1].Cross(Hnorm[i2])).SquaredLength();
+		}
 		// pure shear trsf: ones on diagonal
 		_shearTrsf=trsf; _shearTrsf[0][0]=_shearTrsf[1][1]=_shearTrsf[2][2]=1.;
 		// pure unshear transformation
 		_unshearTrsf=_shearTrsf.Inverse();
 		// some parts can branch depending on presence/absence of shear
 		_hasShear=(trsf[0][1]!=0 || trsf[0][2]!=0 || trsf[1][0]!=0 || trsf[1][2]!=0 || trsf[2][0]!=0 || trsf[2][1]!=0);
-		// current cell size (in units on physical space axes)
-		_size=diagMult(getStretchRatio(),refSize);
 		// OpenGL shear matrix (used frequently)
 		fillGlShearTrsfMatrix(_glShearTrsfMatrix);
-		// precompute cosines of angles, used for enlarge factor when computing Aabb's
-		for(int i=0; i<3; i++) for(int j=0; j<3; j++) _cosMatrix[i][j]=(i==j?0:cos(atan(trsf[i][j])));
 	}
 	
 	/*! Return point inside periodic cell, even if shear is applied */

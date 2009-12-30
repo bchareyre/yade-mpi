@@ -25,14 +25,15 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()]
 	),
-	PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
+	#PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
 	NewtonIntegrator(damping=.6, homotheticCellResize=1),
 	PeriodicPythonRunner(command='utils.flipCell()',iterPeriod=1000), # broken for larger strains?
 ]
 O.dt=0.5*utils.PWaveTimeStep()
 O.run(1)
 qt.View()
-O.cell.velGrad=Matrix3(0,5,0,0,0,0, 0,0,-5)
+O.cell.velGrad=Matrix3(0,5,0,0,0,0,0,0,0)
+O.saveTmp()
 O.run();
 rrr=qt.Renderer(); rrr['intrAllWire'],rrr['Body_interacting_geom']=True,False
 
@@ -49,6 +50,6 @@ def triaxDone():
 		print 'Here we are: stress',triax['stress'],'strain',triax['strain'],'stiffness',triax['stiff']
 		print 'Done, pausing now.'
 		O.pause()
-		
+	
 	
 

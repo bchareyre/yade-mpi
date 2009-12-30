@@ -138,12 +138,12 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	if(!scene->isPeriodic) return;
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
-		// order matters
-		Vector3r size=scene->cell->getSize();
-		if(scaleDisplacements) size=diagMult(displacementScale,size);
-		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
+		Vector3r refSize=scene->cell->refSize;
+		if(scaleDisplacements) refSize=diagMult(displacementScale,refSize);
+		//glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
+		glTranslatev(scene->cell->trsf*(.5*refSize));
 		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
-		glScalev(size);
+		glScalev(refSize);
 		glutWireCube(1);
 	glPopMatrix();
 }

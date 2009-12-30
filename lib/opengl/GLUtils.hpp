@@ -12,6 +12,8 @@
 #include<string>
 
 struct GLUtils{
+	// render wire of parallelepiped with sides given by vectors a,b,c; zero corner is at origin
+	static void Parallelepiped(const Vector3r& a, const Vector3r& b, const Vector3r& c);
 	static void GLDrawArrow(const Vector3r& from, const Vector3r& to, const Vector3r& color=Vector3r(1,1,1)){
 		glEnable(GL_LIGHTING); glColor3v(color); qglviewer::Vec a(from[0],from[1],from[2]),b(to[0],to[1],to[2]); QGLViewer::drawArrow(a,b);	
 	}

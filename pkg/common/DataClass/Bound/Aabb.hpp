@@ -22,7 +22,7 @@ class Aabb : public Bound{
 		virtual ~Aabb();
 	
 	REGISTER_CLASS_AND_BASE(Aabb,Bound);	
-	REGISTER_ATTRIBUTES(Bound, /* (min)(max) */ );  // not necessary to store min and max, but it is handy for debugging/python inspection 
+	REGISTER_ATTRIBUTES(Bound, (min)(max) );  // not necessary to store min and max, but it is handy for debugging/python inspection 
 	REGISTER_CLASS_INDEX(Aabb,Bound);
 };
 REGISTER_SERIALIZABLE(Aabb);
