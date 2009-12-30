@@ -90,3 +90,56 @@ class PeriTriaxController: public GlobalEngine{
 	REGISTER_CLASS_AND_BASE(PeriTriaxController,GlobalEngine);
 };
 REGISTER_SERIALIZABLE(PeriTriaxController);
+
+//TODO :(1) isotropic compression with mean stress/strain (preserve aspect ration like in other engines)
+//	(2) check vs. maxStrainRate? Not sure it is needed in that case
+class PeriController: public GlobalEngine{
+	public:
+	//! For broken constitutive laws, normalForce and shearForce on interactions are in the reverse sense
+	//! see https://bugs.launchpad.net/yade/+bug/493102
+		bool reversedForces;
+	//! Desired stress or strain values (depending on stressMask)
+		Vector3r goal;
+	//! mask determining strain/stress (0/1) meaning for goal components
+		int stressMask;
+	//! Maximum strain rate of the periodic cell
+		Vector3r maxStrainRate;
+	//! maximum unbalanced force (defaults to 1e-4)
+		Real maxUnbalanced;
+	//! Absolute stress tolerance (1e3)
+		Real absStressTol;
+	//! Relative stress tolerance (3e-5)
+		Real relStressTol;
+	//! Damping of cell resizing (0=perfect control, 1=no control at all); see also TriaxialStressController::wallDamping.
+		Real growDamping;
+	//! how often to recompute average stress, stiffness and unbalaced force (defaults to 100)
+		int globUpdate;
+	//! python command to be run when the desired state is reached
+		string doneHook;
+	//! maximum body dimension (set automatically)
+		Vector3r maxBodySpan;
+
+
+	//! average stresses, updated at every step (only every globUpdate steps recomputed from interactions)
+		Vector3r stress;
+	//! cell strain, updated at every step
+		Vector3r strain;
+	//! cell strain rate, updated at every step
+		Vector3r strainRate;
+	//! average stiffness, updated at every step (only every globUpdate steps recomputed from interactions)
+		Vector3r stiff;
+	//! current unbalanced force (updated every globUpdate)
+		Real currUnbalanced;
+	//! previous cell grow
+		Vector3r prevGrow;
+
+		void action(Scene*);
+		Matrix3r stressStrainUpdate();
+		PeriController(): reversedForces(false),goal(Vector3r::ZERO),stressMask(0),maxStrainRate(Vector3r(1,1,1)),maxUnbalanced(1e-4),absStressTol(1e3),relStressTol(3e-5),growDamping(.5),globUpdate(5),maxBodySpan(Vector3r(-1,-1,-1)),stress(Vector3r::ZERO),strain(Vector3r::ZERO),strainRate(Vector3r::ZERO),stiff(Vector3r::ZERO),currUnbalanced(-1),prevGrow(Vector3r::ZERO){}
+		REGISTER_ATTRIBUTES(GlobalEngine,(reversedForces)(goal)(stressMask)(maxStrainRate)(maxUnbalanced)(absStressTol)(relStressTol)(growDamping)(globUpdate)(doneHook)(stress)(strain)(strainRate)(stiff));
+		DECLARE_LOGGER;
+		REGISTER_CLASS_AND_BASE(PeriController,GlobalEngine);
+};
+REGISTER_SERIALIZABLE(PeriController);
+
+

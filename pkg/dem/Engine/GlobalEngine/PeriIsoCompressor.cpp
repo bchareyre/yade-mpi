@@ -6,10 +6,11 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<Wm3Math.h>
 
 using namespace std;
 
-YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController))
+YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(PeriController))
 
 
 CREATE_LOGGER(PeriIsoCompressor);
@@ -125,6 +126,8 @@ void PeriTriaxController::strainStressStiffUpdate(){
 
 CREATE_LOGGER(PeriTriaxController);
 
+
+
 void PeriTriaxController::action(Scene*){
 	if(!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
 	const Vector3r& cellSize=scene->cell->getSize();
@@ -209,4 +212,133 @@ void PeriTriaxController::action(Scene*){
 			} else { Omega::instance().stopSimulationLoop(); }
 		}
 	}
+}
+
+CREATE_LOGGER(PeriController);
+
+void PeriController::action(Scene*){
+	if(!scene->isPeriodic){ throw runtime_error("PeriController run on aperiodic simulation."); }
+	
+	const Vector3r& cellSize=scene->cell->getSize();
+	const Vector3r& refSize=scene->cell->refSize;
+	//Matrix3r Hsize (refSize[0],0,0,0,refSize[1],0,0,0,refSize[2]);
+	//Hsize =  scene->cell->trsf*Hsize;
+	//Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
+	// initial updates
+	LOG_DEBUG("Entering PeriController::action");
+	if(maxBodySpan[0]<=0){
+		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+			if(!b || !b->bound) continue;
+			for(int i=0; i<3; i++) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);
+		}
+	}
+	// check current size
+	if(2.1*maxBodySpan[0]>cellSize[0] || 2.1*maxBodySpan[1]>cellSize[1] || 2.1*maxBodySpan[2]>cellSize[2]){
+		LOG_DEBUG("cellSize="<<cellSize<<", maxBodySpan="<<maxBodySpan);
+		throw runtime_error("Minimum cell size is smaller than 2.1*maxBodySpan (periodic collider requirement)");
+	}
+	
+	stressStrainUpdate();
+	
+	bool allOk=true; Vector3r cellGrow(Vector3r::ZERO);
+	// apply condition along each axis separately (stress or strain)
+	for(int axis=0; axis<3; axis++){
+		Real maxGrow=refSize[axis]*maxStrainRate[axis]*scene->dt;
+		if(stressMask & (1<<axis)){ // control stress
+			//accelerate the deformation using the density of the period, includes Cundall's damping
+			Real mass = 0.2;
+			Real dampFactor = 1 - growDamping*Mathr::Sign ( (scene->cell->velGrad[axis][axis])*(goal[axis]-stress[axis]) );
+			scene->cell->velGrad[axis][axis]+=dampFactor*scene->dt*(goal[axis]-stress[axis])/mass;
+			LOG_TRACE(axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<scene->cell->velGrad[axis][axis]);
+ 		} else { // don't control strainRate, strainRate should always be defined by the user
+// 			cellGrow[axis]=(goal[axis]-strain[axis])*refSize[axis];
+ 			LOG_TRACE(axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis]);
+		}
+		// limit maximum strain rate
+		//if(abs(cellGrow[axis])>maxGrow) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxGrow;
+		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
+		//cellGrow[axis]=max(cellGrow[axis],-(cellSize[axis]-2.1*maxBodySpan[axis]));
+		// steady evolution with fluctuations; see TriaxialStressController
+		//cellGrow[axis]=(1-growDamping)*cellGrow[axis]+.8*prevGrow[axis];
+		// crude way of predicting stress, for steps when it is not computed from intrs
+		//LOG_DEBUG(axis<<": cellGrow="<<cellGrow[axis]<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);
+		// signal if condition not satisfied
+		if(stressMask & (1<<axis)){
+			Real curr=stress[axis];
+			if((goal[axis]!=0 && abs((curr-goal[axis])/goal[axis])>relStressTol) || abs(curr-goal[axis])>absStressTol) allOk=false;
+		} else {
+			Real curr=strain[axis];
+			// since strain is prescribed exactly, tolerances need just to accomodate rounding issues
+			if((goal[axis]!=0 && abs((curr-goal[axis])/goal[axis])>1e-6) || abs(curr-goal[axis])>1e-6) {
+				allOk=false;
+				LOG_DEBUG("Strain not OK; "<<abs(curr-goal[axis])<<">1e-6");
+			}
+		}
+	}
+	
+	// update stress and strain
+// 	for(int axis=0; axis<3; axis++){
+// 		// either prescribe velocity gradient
+// 		scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
+// 	}
+	
+// 	strainRate=cellGrow/scene->dt;
+	
+	if(allOk){
+		if(currUnbalanced<0 || (scene->currentIteration%globUpdate)==0 ) {
+			currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
+			LOG_DEBUG("Stress/strain="<<(stressMask&1?stress[0]:strain[0])<<","<<(stressMask&2?stress[1]:strain[1])<<","<<(stressMask&4?stress[2]:strain[2])<<", goal="<<goal<<", unbalanced="<<currUnbalanced);
+		}
+		if(currUnbalanced<maxUnbalanced){
+			// LOG_INFO("Goal reached, packing stable.");
+			if(!doneHook.empty()){
+				LOG_DEBUG("Running doneHook: "<<doneHook);
+				PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString(doneHook.c_str()); PyGILState_Release(gstate);
+			} else { Omega::instance().stopSimulationLoop(); }
+		}
+	}
+}
+
+Matrix3r PeriController::stressStrainUpdate(){
+	//Compute volume
+	Matrix3r Hsize (scene->cell->refSize[0],0,0,
+			0,scene->cell->refSize[1],0,
+  			 0,0,scene->cell->refSize[2]);
+	Hsize =  scene->cell->trsf*Hsize;
+	Real volume = Hsize.Determinant();
+	//"Natural" strain, correct for large deformations, only used for comparison with goals
+	for(int i=0; i<3; i++) strain[i]=Mathr::Log(scene->cell->trsf[i][i]);
+	
+	//Compute sum(fi*lj)
+	Matrix3r stressTensor(Matrix3r::ZERO);
+	
+	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
+		if(!I->isReal()) continue;
+		//n++;
+		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
+		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*>(I->interactionGeometry.get());
+		for(int i=0; i<3; i++){
+			//Contact force
+			Vector3r f=(reversedForces?-1.:1.)*(nsi->normalForce+nsi->shearForce);
+			
+			//branch vector, FIXME : the first definition generalizes to non-spherical bodies but needs wrapped coords.
+// 			Vector3r branch=
+//			(reversedForces?-1.:1.)*(Body::byId(I->getId1())->state->pos-Body::byId(I->getId2())->state->pos);
+			Vector3r branch=gsc->normal*(gsc->refR1+gsc->refR2);
+
+			//Cross product
+			// tensor product f*branch
+			stressTensor+=Matrix3r (f, branch);
+			
+		}
+	}
+	//Compute stress=sum(fi*lj)/Volume (Love equation)
+	stressTensor /= volume;
+	for (int axis=0; axis<3; axis++) stress[axis]=stressTensor[axis][axis];
+	LOG_DEBUG("stressTensor : "<<endl
+			<<stressTensor[0][0]<<" "<<stressTensor[0][1]<<" "<<stressTensor[0][2]<<endl
+			<<stressTensor[1][0]<<" "<<stressTensor[1][1]<<" "<<stressTensor[1][2]<<endl
+			<<stressTensor[2][0]<<" "<<stressTensor[2][1]<<" "<<stressTensor[2][2]<<endl
+			<<"unbalanced = "<<Shop::unbalancedForce(/*useMaxForce=*/false,scene));
+	return stressTensor;
 }
