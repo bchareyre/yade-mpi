@@ -32,7 +32,7 @@ def triaxDone():
 	if phase==0:
 		print 'Here we are: stress',triax['stress'],'strain',triax['strain'],'stiffness',triax['stiff']
 		print 'Now shearing.'
-		O.cell.velGrad[1,2]=3.0
+		O.cell.velGrad[1,2]=6.0
 		triax.stressMask=7
 		triax['goal']=[-1e4,-1e4,-1e4]
 		phase+=1
@@ -42,14 +42,17 @@ def triaxDone():
 		#O.pause()
 		
 O.dt=utils.PWaveTimeStep()
-O.run(10000);
+O.run(7000);
 qt.View()
+r=qt.Renderer()
+r['Background_color']=1,1,1
 O.wait()
 
 O.cell.velGrad[1,2]=0
-O.cell.velGrad[2,1]=-3
-O.run(10000);
+O.cell.velGrad[2,1]=-6
+O.run(5000);
+O.wait()
 
-O.cell.velGrad[1,2]=-3
-O.cell.velGrad[2,1]=3
-O.run(10000);
+O.cell.velGrad[1,2]=6
+O.cell.velGrad[2,1]=0
+O.run(5000);
