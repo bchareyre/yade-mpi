@@ -3,9 +3,10 @@
 "Test and demonstrate use of PeriTriaxController."
 from yade import *
 from yade import pack,log,qt
-#log.setLevel('PeriTriaxController',log.DEBUG)
+log.setLevel('PeriTriaxController',log.TRACE)
 O.periodic=True
 O.cell.refSize=Vector3(.1,.1,.1)
+#O.cell.Hsize=Matrix3(0.1,0,0, 0,0.1,0, 0,0,0.1)
 sp=pack.SpherePack()
 radius=5e-3
 num=sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,.2,500,periodic=True) # min,max,radius,rRelFuzz,spheresInCell,periodic
@@ -21,8 +22,10 @@ O.engines=[
 		[SimpleElasticRelationships()],
 		[Law2_Dem3Dof_Elastic_Elastic()]
 	),
-	PeriTriaxController(goal=[-1e5,-1e5,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
-	NewtonIntegrator(damping=.6),
+	#PeriTriaxController(maxUnbalanced=0.01,relStressTol=0.02,goal=[-1e4,-1e4,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
+	#using cell inertia
+	PeriTriaxController(dynCell=True,mass=0.2,maxUnbalanced=0.01,relStressTol=0.02,goal=[-1e4,-1e4,0],stressMask=3,globUpdate=5,maxStrainRate=[1.,1.,1.],doneHook='triaxDone()',label='triax'),
+	NewtonIntegrator(damping=.2),
 ]
 O.dt=utils.PWaveTimeStep()
 O.run();
@@ -34,7 +37,7 @@ def triaxDone():
 	if phase==0:
 		print 'Here we are: stress',triax['stress'],'strain',triax['strain'],'stiffness',triax['stiff']
 		print 'Now εz will go from 0 to .2 while σx and σy will be kept the same.'
-		triax['goal']=[-1e5,-1e5,.2]
+		triax['goal']=[-1e4,-1e4,-0.2]
 		phase+=1
 	elif phase==1:
 		print 'Here we are: stress',triax['stress'],'strain',triax['strain'],'stiffness',triax['stiff']
