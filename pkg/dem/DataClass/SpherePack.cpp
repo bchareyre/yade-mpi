@@ -78,14 +78,14 @@ void SpherePack::fromSimulation() {
 	if(scene->isPeriodic) { cellSize=scene->cell->getSize(); }
 }
 
-long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, size_t num, bool periodic){
+long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, int num, bool periodic){
 	static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
-	const size_t maxTry=1000;
+	const int maxTry=1000;
 	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
-	for(size_t i=0; i<num; i++) {
-		size_t t;
+	for(int i=0; (i<num) || (num<0); i++) {
+		int t;
 		Real r=(rnd()-.5)*rRelFuzz*rMean+rMean; 
 		for(t=0; t<maxTry; ++t){
 			Vector3r c;
@@ -104,7 +104,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 			if(!overlap) { pack.push_back(Sph(c,r)); break; }
 		}
 		if (t==maxTry) {
-			LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num);
+			if(num>0) LOG_WARN("Exceeded "<<maxTry<<" tries to insert non-overlapping sphere to packing. Only "<<i<<" spheres was added, although you requested "<<num);
 			return i;
 		}
 	}

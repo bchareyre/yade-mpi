@@ -426,9 +426,6 @@ bool InsertionSortCollider::spatialOverlapPeri(body_id_t id1, body_id_t id2,Scen
 				TRVAR4(pmn1,pmx1,pmn2,pmx2);
 			}
 		#endif
-		/* FIXME: condition temporary disabled
-			if wMn==m1 and minima[id2]<m1, then it might give spurious error; why should it be error, though?
-		*/
 		if(((pmn1!=pmx1) || (pmn2!=pmx2))){
 			Real span=(pmn1!=pmx1?mx1-mn1:mx2-mn2); if(span<0) span=dim-span;
 			LOG_FATAL("Body #"<<(pmn1!=pmx1?id1:id2)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", min="<<(pmn1!=pmx1?mn1:mn2)<<", max="<<(pmn1!=pmx1?mx1:mx2)<<", span="<<span<<")");

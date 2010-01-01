@@ -36,7 +36,8 @@ void InteractionDispatchers::action(Scene*){
 	geomDispatcher->updateScenePtr();
 	physDispatcher->updateScenePtr();
 	lawDispatcher->updateScenePtr();
-	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cell->getSize();
+	// transformed cell size 
+	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cell->trsf*scene->cell->refSize;
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
@@ -89,8 +90,6 @@ void InteractionDispatchers::action(Scene*){
 			if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
-				// in sheared cell, apply shear on the mutual position as well
-				shift2=scene->cell->shearPt(shift2);
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			if(!geomCreated){

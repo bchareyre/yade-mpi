@@ -9,6 +9,8 @@
 	#include<indexing_suite/vector.hpp>
 #endif
 
+#include<yade/lib-pyutil/numpy.hpp>
+
 #include<boost/python.hpp>
 #include<boost/python/class.hpp>
 #include<boost/python/module.hpp>
@@ -21,6 +23,8 @@
 #include<string>
 #include<stdexcept>
 #include<iostream>
+#include<map>
+
 #include<yade/lib-base/yadeWm3.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 
@@ -126,6 +130,13 @@ struct custom_vector_from_seq{
 
 
 
+template<typename numT, int dim>
+struct custom_numpyBoost_to_py{
+	static PyObject* convert(numpy_boost<numT, dim> nb){
+		return nb.py_ptr(); // handles incref internally
+	}
+};
+
 
 
 
@@ -137,6 +148,8 @@ BOOST_PYTHON_MODULE(_customConverters){
 	custom_Se3r_from_seq(); to_python_converter<Se3r,custom_se3_to_tuple>();
 	// Vector3<int> to python (not implemented the other way around yet)
 	custom_vector3i_to_seq(); to_python_converter<Vector3<int>,custom_vector3i_to_seq>();
+	// StrArrayMap (typedef for std::map<std::string,numpy_boost>) → python dictionary
+	//custom_StrArrayMap_to_dict();
 	// register from-python converter and to-python converter
 	custom_vector_from_seq<int>(); to_python_converter<std::vector<int>, custom_vector_to_list<int> >();
 	custom_vector_from_seq<Real>(); to_python_converter<std::vector<Real>, custom_vector_to_list<Real> >();
@@ -147,6 +160,13 @@ BOOST_PYTHON_MODULE(_customConverters){
 	custom_vector_from_seq<shared_ptr<Engine> >(); to_python_converter<std::vector<shared_ptr<Engine> >, custom_vector_to_list<shared_ptr<Engine> > >();
 	custom_vector_from_seq<shared_ptr<Material> >(); to_python_converter<std::vector<shared_ptr<Material> >, custom_vector_to_list<shared_ptr<Material> > >();
 	custom_vector_from_seq<shared_ptr<Serializable> >(); to_python_converter<std::vector<shared_ptr<Serializable> >, custom_vector_to_list<shared_ptr<Serializable> > >();
+
+	import_array();
+	to_python_converter<numpy_boost<Real,1>, custom_numpyBoost_to_py<Real,1> >();
+	to_python_converter<numpy_boost<Real,2>, custom_numpyBoost_to_py<Real,2> >();
+	to_python_converter<numpy_boost<int,1>, custom_numpyBoost_to_py<int,1> >();
+	to_python_converter<numpy_boost<int,2>, custom_numpyBoost_to_py<int,2> >();
+
 
   #define VECTOR_ENGINE_UNIT(ENGINE_UNIT) custom_vector_from_seq<shared_ptr<ENGINE_UNIT> >(); to_python_converter<std::vector<shared_ptr<ENGINE_UNIT> >,custom_vector_to_list<shared_ptr<ENGINE_UNIT> > >();
 		VECTOR_ENGINE_UNIT(BoundFunctor)

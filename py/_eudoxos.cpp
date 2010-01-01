@@ -1,7 +1,10 @@
+#include<yade/lib-pyutil/numpy.hpp>
+
 #include<yade/pkg-dem/ConcretePM.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/pkg-dem/Shop.hpp>
+
 using namespace boost::python;
 using namespace std;
 #ifdef YADE_LOG4CXX
@@ -126,15 +129,36 @@ std::vector<Vector3r> spiralSphereStresses2d(Real dH_dTheta,const int axis=2){
 	return ret;
 }
 #endif
+
 void particleConfinement(){
 	CpmStateUpdater::update();
 }
 
+python::dict testNumpy(){
+	Scene* scene=Omega::instance().getScene().get();
+	int dim1[]={scene->bodies->size()};
+	int dim2[]={scene->bodies->size(),3};
+	numpy_boost<Real,1> mass(dim1);
+	numpy_boost<Real,2> vel(dim2);
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		if(!b) continue;
+		mass[b->getId()]=b->state->mass;
+		VECTOR3R_TO_NUMPY(vel[b->getId()],b->state->vel);
+	}
+	python::dict ret;
+	ret["mass"]=mass;
+	ret["vel"]=vel;
+	return ret;
+}
+
+
 
 BOOST_PYTHON_MODULE(_eudoxos){
+	import_array();
 	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
 	def("yieldSigmaTMagnitude",yieldSigmaTMagnitude);
 	// def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
 	def("particleConfinement",particleConfinement);
+	def("testNumpy",testNumpy);
 }
 

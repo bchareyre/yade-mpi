@@ -50,8 +50,8 @@ public:
 	void toFile(const string file) const;
 	void fromSimulation();
 
-	// random generation
-	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, size_t num, bool periodic=false);
+	// random generation; if num<0, insert as many spheres as possible
+	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, int num, bool periodic=false);
 
 	// periodic repetition
 	void cellRepeat(Vector3<int> count);
