@@ -60,6 +60,7 @@ yadeStaticOrSharedLib('yade-support',[
 			'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 			'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp',
 			'serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializationExceptions.cpp',
+			'pyutil/gil.cpp'
 		]
 		# compile TesselationWrapper only if cgal is enabled
 		+(Split('triangulation/KinematicLocalisationAnalyser.cpp triangulation/Operations.cpp triangulation/RegularTriangulation.cpp triangulation/Timer.cpp triangulation/basicVTKwritter.cpp triangulation/FlowBoundingSphere.cpp triangulation/Deformation.cpp triangulation/Empilement.cpp triangulation/stdafx.cpp triangulation/Tenseur3.cpp triangulation/Tesselation.cpp triangulation/TesselationWrapper.cpp triangulation/test.cpp triangulation/TriaxialState.cpp') if 'cgal' in env['features'] else [])),

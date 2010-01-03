@@ -16,46 +16,59 @@ YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofG
 CREATE_LOGGER(Ip2_CpmMat_CpmMat_CpmPhys);
 
 void Ip2_CpmMat_CpmMat_CpmPhys::go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction){
-	if(interaction->interactionPhysics) return; 
+	// no updates of an already existing contact necessary
+	if(interaction->interactionPhysics) return;
+	shared_ptr<CpmPhys> cpmPhys(new CpmPhys());
+	interaction->interactionPhysics=cpmPhys;
+	CpmMat* mat1=YADE_CAST<CpmMat*>(pp1.get());
+	CpmMat* mat2=YADE_CAST<CpmMat*>(pp2.get());
 
-	Dem3DofGeom* contGeom=YADE_CAST<Dem3DofGeom*>(interaction->interactionGeometry.get());
-	assert(contGeom);
+	// check unassigned values
+	assert(!isnan(mat1->G_over_E));
+	if(!mat1->neverDamage) {
+		assert(!isnan(mat1->sigmaT));
+		assert(!isnan(mat1->epsCrackOnset));
+		assert(!isnan(mat1->relDuctility));
+		assert(!isnan(mat1->G_over_E));
+	}
 
-	const shared_ptr<CpmMat>& mat1=YADE_PTR_CAST<CpmMat>(pp1);
-	const shared_ptr<CpmMat>& mat2=YADE_PTR_CAST<CpmMat>(pp2);
-
-	Real E12=2*mat1->young*mat2->young/(mat1->young+mat2->young); // harmonic Young's modulus average
-	//Real nu12=2*mat1->poisson*mat2->poisson/(mat1->poisson+mat2->poisson); // dtto for Poisson ratio 
-	Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
-	Real S12=Mathr::PI*pow(minRad,2); // "surface" of interaction
-	//Real E=(E12 /* was here for Kn:  *S12/d0  */)*((1+alpha)/(beta*(1+nu12)+gamma*(1-alpha*nu12)));
-	//Real E=E12; // apply alpha, beta, gamma: garbage values of E !?
-
-	if(!neverDamage) { assert(!isnan(sigmaT)); }
-
-	shared_ptr<CpmPhys> contPhys(new CpmPhys());
-
-	contPhys->E=E12;
-	contPhys->G=E12*G_over_E;
-	contPhys->tanFrictionAngle=tan(.5*(mat1->frictionAngle+mat2->frictionAngle));
-	contPhys->undamagedCohesion=sigmaT;
-	contPhys->crossSection=S12;
-	contPhys->epsCrackOnset=epsCrackOnset;
-	contPhys->epsFracture=relDuctility*epsCrackOnset;
-	// inherited from NormalShearInteracion, used in the timestepper
-
-	// contPhys->kn, contPhys->ks assigned in the constitutive law, as they depend on area of the contact as well
-
-	if(neverDamage) contPhys->neverDamage=true;
-	if(cohesiveThresholdIter<0 || (Omega::instance().getCurrentIteration()<cohesiveThresholdIter)) contPhys->isCohesive=true;
-	else contPhys->isCohesive=false;
-	contPhys->dmgTau=dmgTau;
-	contPhys->dmgRateExp=dmgRateExp;
-	contPhys->plTau=plTau;
-	contPhys->plRateExp=plRateExp;
-	contPhys->isoPrestress=isoPrestress;
-
-	interaction->interactionPhysics=contPhys;
+	// bodies sharing the same material; no averages necessary
+	if(mat1->id>=0 && mat1->id==mat2->id) {
+		cpmPhys->E=mat1->young;
+		cpmPhys->G=mat1->young*mat1->G_over_E;
+		cpmPhys->tanFrictionAngle=tan(mat1->frictionAngle);
+		cpmPhys->undamagedCohesion=mat1->sigmaT;
+		cpmPhys->epsFracture=mat1->relDuctility*mat1->epsCrackOnset;
+		cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->currentIteration<cohesiveThresholdIter);
+		#define _CPATTR(a) cpmPhys->a=mat1->a
+			_CPATTR(epsCrackOnset);
+			_CPATTR(neverDamage);
+			_CPATTR(dmgTau);
+			_CPATTR(dmgRateExp);
+			_CPATTR(plTau);
+			_CPATTR(plRateExp);
+			_CPATTR(isoPrestress);
+		#undef _CPATTR
+	} else {
+		// averaging over both materials
+		#define _AVGATTR(a) cpmPhys->a=.5*(mat1->a+mat2->a)
+			cpmPhys->E=.5*(mat1->young+mat2->young);
+			cpmPhys->G=.5*(mat1->G_over_E+mat2->G_over_E)*.5*(mat1->young+mat2->young);
+			cpmPhys->tanFrictionAngle=tan(.5*(mat1->frictionAngle+mat2->frictionAngle));
+			cpmPhys->undamagedCohesion=.5*(mat1->sigmaT+mat2->sigmaT);
+			cpmPhys->epsFracture=.5*(mat1->relDuctility+mat2->relDuctility)*.5*(mat1->epsCrackOnset+mat2->epsCrackOnset);
+			cpmPhys->isCohesive=(cohesiveThresholdIter<0 || scene->currentIteration<cohesiveThresholdIter);
+			_AVGATTR(epsCrackOnset);
+			cpmPhys->neverDamage=(mat1->neverDamage || mat2->neverDamage);
+			_AVGATTR(dmgTau);
+			_AVGATTR(dmgRateExp);
+			_AVGATTR(plTau);
+			_AVGATTR(plRateExp);
+			_AVGATTR(isoPrestress);
+		#undef _AVGATTR
+	}
+	// NOTE: some params are not assigned until in Law2_Dem3DofGeom_CpmPhys_Cpm, since they need geometry as well; those are:
+	// 	crossSection, kn, ks
 }
 
 
@@ -140,6 +153,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 
 	// just the first time
 	if(I->isFresh(scene)){
+		Real minRad=(contGeom->refR1<=0?contGeom->refR2:(contGeom->refR2<=0?contGeom->refR1:min(contGeom->refR1,contGeom->refR2)));
+		BC->crossSection=Mathr::PI*pow(minRad,2);
 		BC->kn=BC->crossSection*BC->E/contGeom->refLength;
 		BC->ks=BC->crossSection*BC->G/contGeom->refLength;
 	}
@@ -365,15 +380,16 @@ void CpmStateUpdater::update(Scene* _scene){
 		const body_id_t id1=I->getId1(), id2=I->getId2();
 		Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
 		
-		Vector3r stress=(1./phys->crossSection)*(phys->normalForce+phys->shearForce);
-		const Vector3r& p1(geom->se31.position); const Vector3r& cp(geom->contactPoint);
-		// force towards the body is negative, away from it is positive (compression/tension)
+		Vector3r normalStress=((1./phys->crossSection)*geom->normal.Dot(phys->normalForce))*geom->normal;
+		bodyStats[id1].sigma+=normalStress; bodyStats[id2].sigma+=normalStress;
+		Vector3r shearStress;
 		for(int i=0; i<3; i++){
-			stress[i]*=cp[i]>p1[i] ? 1. : -1.;
+			int ix1=(i+1)%3,ix2=(i+2)%3;
+			shearStress[i]=Mathr::Sign(geom->normal[ix1])*phys->shearForce[ix1]+Mathr::Sign(geom->normal[ix2])*phys->shearForce[ix2];
+			shearStress[i]/=phys->crossSection;
 		}
-		bodyStats[id1].sigma+=stress; bodyStats[id2].sigma+=stress;
-		bodyStats[id1].tau+=stress.Cross(cp-geom->se31.position);
-		bodyStats[id2].tau+=stress.Cross(cp-geom->se32.position);
+		bodyStats[id1].tau+=shearStress;
+		bodyStats[id2].tau+=shearStress;
 		bodyStats[id1].nLinks++; bodyStats[id2].nLinks++;
 		
 		if(!phys->isCohesive) continue;

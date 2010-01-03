@@ -6,6 +6,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/NormalShearInteractions.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
+#include<yade/lib-pyutil/gil.hpp>
 #include<Wm3Math.h>
 
 using namespace std;
@@ -87,7 +88,7 @@ void PeriIsoCompressor::action(Scene* scene){
 			// sigmaGoal reached and packing stable
 			if(state==stresses.size()){ // no next stress to go for
 				LOG_INFO("Finished");
-				if(!doneHook.empty()){ LOG_DEBUG("Running doneHook: "<<doneHook); PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString(doneHook.c_str()); PyGILState_Release(gstate); }
+				if(!doneHook.empty()){ LOG_DEBUG("Running doneHook: "<<doneHook); pyRunString(doneHook); }
 			} else { LOG_INFO("Loaded to "<<sigmaGoal<<" done, going to "<<stresses[state]<<" now"); }
 		} else {
 			if((step%globalUpdateInt)==0) LOG_DEBUG("Stress="<<sigma<<", goal="<<sigmaGoal<<", unbalanced="<<currUnbalanced);
@@ -98,21 +99,24 @@ void PeriIsoCompressor::action(Scene* scene){
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
 	//"Natural" strain, correct for large deformations, only used for comparison with goals
-	for ( int i=0; i<3; i++ ) strain[i]=Mathr::Log ( scene->cell->trsf[i][i] );
+	// → no logarithm here, I have code for strain-stress test that needs regular linear strain.
+	//	Why not set goals as logarithm, if you need it?
+	for ( int i=0; i<3; i++ ) strain[i]=(scene->cell->trsf[i][i]);
 
 	//stress tensor and stiffness
 	
 	//Compute volume of the deformed cell
 	// NOTE : needs refSize, could be generalized to arbitrary initial shapes using trsf*refHsize 
-	Real volume = ( scene->cell->trsf*Matrix3r ( scene->cell->refSize[0],0,0, 0,scene->cell->refSize[1],0,0,0,scene->cell->refSize[2] ) ).Determinant();
+	// → initial cell size is always box, and will be. The cell repeats  periodically, initial shape doesn't (shouldn't, at least) dinfluence interactions at all/
+	Real volume=scene->cell->trsf.Determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
 
 	//Compute sum(fi*lj) and stiffness
 	stressTensor = Matrix3r::ZERO;
-	Vector3r sumStiff ( Vector3r::ZERO );
+	Vector3r sumStiff(Vector3r::ZERO);
 	int n=0;
-	//NOTE : This sort of loops on interactions could be removed if we had callbacks in e.g. constitutive laws
-	FOREACH ( const shared_ptr<Interaction>&I, *scene->interactions )
-	{
+	// NOTE : This sort of loops on interactions could be removed if we had callbacks in e.g. constitutive laws
+	// → very likely performance hit; do you have some concrete design in mind?
+	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if ( !I->isReal() ) continue;
 		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*> ( I->interactionPhysics.get() );
 		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->interactionGeometry.get() );
@@ -124,22 +128,22 @@ void PeriTriaxController::strainStressStiffUpdate(){
 		Vector3r branch= ( reversedForces?-1.:1. ) *gsc->normal* ( gsc->refR1+gsc->refR2 );
 		// tensorial product f*branch
 		stressTensor+=Matrix3r ( f, branch );
-		if ( !dynCell )
+		if( !dynCell )
 		{
 			for ( int i=0; i<3; i++ ) sumStiff[i]+=abs ( gsc->normal[i] ) *nsi->kn+ ( 1-abs ( gsc->normal[i] ) ) *nsi->ks;
 			n++;
 		}
 	}
-	//Compute stressTensor=sum(fi*lj)/Volume (Love equation)
+	// Compute stressTensor=sum(fi*lj)/Volume (Love equation)
 	stressTensor /= volume;
-	for ( int axis=0; axis<3; axis++ ) stress[axis]=stressTensor[axis][axis];
+	for(int axis=0; axis<3; axis++) stress[axis]=stressTensor[axis][axis];
 	LOG_DEBUG ( "stressTensor : "<<endl
 				<<stressTensor[0][0]<<" "<<stressTensor[0][1]<<" "<<stressTensor[0][2]<<endl
 				<<stressTensor[1][0]<<" "<<stressTensor[1][1]<<" "<<stressTensor[1][2]<<endl
 				<<stressTensor[2][0]<<" "<<stressTensor[2][1]<<" "<<stressTensor[2][2]<<endl
 				<<"unbalanced = "<<Shop::unbalancedForce ( /*useMaxForce=*/false,scene ) );
 
-	if ( n>0 ) stiff= ( 1./n ) *sumStiff;
+	if (n>0) stiff=(1./n)*sumStiff;
 	else stiff=Vector3r::ZERO;
 }
 
@@ -148,93 +152,87 @@ CREATE_LOGGER(PeriTriaxController);
 
 
 
-void PeriTriaxController::action ( Scene* )
+void PeriTriaxController::action(Scene*)
 {
-	if ( !scene->isPeriodic ) { throw runtime_error ( "PeriTriaxController run on aperiodic simulation." ); }
+	if (!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
 	const Vector3r& cellSize=scene->cell->getSize();
-	Vector3r cellArea=Vector3r ( cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1] );
+	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
 	const Vector3r& refSize=scene->cell->refSize;
-	if ( maxBodySpan[0]<=0 )
-	{
-		FOREACH ( const shared_ptr<Body>& b,*scene->bodies )
-		{
-			if ( !b || !b->bound ) continue;
-			for ( int i=0; i<3; i++ ) maxBodySpan[i]=max ( maxBodySpan[i],b->bound->max[i]-b->bound->min[i] );
+	if (maxBodySpan[0]<=0){
+		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+			if(!b || !b->bound) continue;
+			for(int i=0; i<3; i++) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);
 		}
 	}
 	// check current size
-	if ( 2.1*maxBodySpan[0]>cellSize[0] || 2.1*maxBodySpan[1]>cellSize[1] || 2.1*maxBodySpan[2]>cellSize[2] )
-	{
-		LOG_DEBUG ( "cellSize="<<cellSize<<", maxBodySpan="<<maxBodySpan );
-		throw runtime_error ( "Minimum cell size is smaller than 2.1*maxBodySpan (periodic collider requirement)" );
+	if(2.1*maxBodySpan[0]>cellSize[0] || 2.1*maxBodySpan[1]>cellSize[1] || 2.1*maxBodySpan[2]>cellSize[2]){
+		LOG_DEBUG("cellSize="<<cellSize<<", maxBodySpan="<<maxBodySpan);
+		throw runtime_error("Minimum cell size is smaller than 2.1*maxBodySpan (periodic collider requirement)");
 	}
-	bool doUpdate ( ( scene->currentIteration%globUpdate ) ==0 );
-	if ( doUpdate || min ( stiff[0],min ( stiff[1],stiff[2] ) ) <=0 || dynCell ) { strainStressStiffUpdate(); }
+	bool doUpdate((scene->currentIteration%globUpdate)==0);
+	if(doUpdate || min(stiff[0],min(stiff[1],stiff[2])) <=0 || dynCell){ strainStressStiffUpdate(); }
 
-	bool allOk=true; Vector3r cellGrow ( Vector3r::ZERO );
+	bool allOk=true; Vector3r cellGrow(Vector3r::ZERO);
 	// apply condition along each axis separately (stress or strain)
-	for ( int axis=0; axis<3; axis++ )
-	{
+	for(int axis=0; axis<3; axis++){
 		//NOTE (1): don't multiply by refSize here (see note (2))
-		Real maxGrow=/*refSize[axis]**/maxStrainRate[axis]*scene->dt;
-		if ( stressMask & ( 1<<axis ) )   // control stress
-		{
-			if ( !dynCell )
-			{
+		Real maxGrow=refSize[axis]*maxStrainRate[axis]*scene->dt;
+		if(stressMask & (1<<axis)){   // control stress
+			if(!dynCell){
+				// PLEASE keep formulas up-to-date if you change code...
+				//
 				// stiffness K=EA; σ₁=goal stress; Δσ wanted stress difference to apply
 				// ΔεE=(Δl/l₀)(K/A) = Δσ=σ₁-σ ↔ Δl=(σ₁-σ)l₀(A/K)
-				cellGrow[axis]= ( goal[axis]-stress[axis] ) */*refSize[axis]**/cellArea[axis]/ ( stiff[axis]>0?stiff[axis]:1. );
-				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis] );
-			}
-			else  //accelerate the deformation using the density of the period, includes Cundall's damping
-			{
-				assert ( mass>0 );//user set
+				cellGrow[axis]=(goal[axis]-stress[axis])*refSize[axis]*cellArea[axis]/(stiff[axis]>0?stiff[axis]:1.);
+				LOG_TRACE(axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis]);
+			} else {  //accelerate the deformation using the density of the period, includes Cundall's damping
+				assert( mass>0 );//user set
 				Real dampFactor = 1 - growDamping*Mathr::Sign ( ( scene->cell->velGrad[axis][axis] ) * ( goal[axis]-stress[axis] ) );
 				scene->cell->velGrad[axis][axis]+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
 				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<scene->cell->velGrad[axis][axis] );
 			}
-		}
-		else   // control strain
-		{
+		} else {    // control strain
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
-			cellGrow[axis]=Mathr::Exp ( goal[axis]-strain[axis] ) /**refSize[axis]*/-1;
+			// → sorry, exp removed, see comment about log above; fix formulas if you need it back
+			cellGrow[axis]=(goal[axis]-strain[axis])*refSize[axis];
 			LOG_TRACE ( axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis] );
 		}
 		// limit maximum strain rate
-		if ( abs ( cellGrow[axis] ) >maxGrow ) cellGrow[axis]=Mathr::Sign ( cellGrow[axis] ) *maxGrow;
+		if (abs(cellGrow[axis])>maxGrow) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxGrow;
 		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
 		/** NOTE : this is one place where size can't be removed (except for span tests). Commented out for now. Do we really need to handle this very special case here? The simulation will go crazy anyway, so we can as well throw at the next step. I'm trying to remove "size" when it's not needed, partly because I have in mind independant control on 9 components of stress/velGrad and it will be easier with a the matrix formalism (we dont have 9 sizes...). If one day size is not used anywhere, we can remove it. (B.C.)*/
-		//cellGrow[axis]=max(cellGrow[axis],-(cellSize[axis]-2.1*maxBodySpan[axis]));
+		/* → we need to handle this really:
+			1. cell size is defined exactly, no reason to hate it anymore. And the collider needs it as well.
+			2. automatic compressions (like pack.randomPeriPack) might create pathologic ratios of the box, but still need some result.
+			please check that the units are ok, since what is cellGrow now?
+		*/
+		cellGrow[axis]=max(cellGrow[axis],-(cellSize[axis]-2.1*maxBodySpan[axis]));
 
 		// steady evolution with fluctuations; see TriaxialStressController
-		cellGrow[axis]= ( 1-growDamping ) *cellGrow[axis]+.8*prevGrow[axis];
+		cellGrow[axis]=(1-growDamping)*cellGrow[axis]+.8*prevGrow[axis];
 		// crude way of predicting stress, for steps when it is not computed from intrs
-		if ( doUpdate ) LOG_DEBUG ( axis<<": cellGrow="<<cellGrow[axis]<<", new stress="<<stress[axis]<<", new strain="<<strain[axis] );
+		if(doUpdate) LOG_DEBUG(axis<<": cellGrow="<<cellGrow[axis]<<", new stress="<<stress[axis]<<", new strain="<<strain[axis]);
 		// signal if condition not satisfied
-		if ( stressMask & ( 1<<axis ) )
-		{
+		if(stressMask&(1<<axis)){
 			Real curr=stress[axis];
-			if ( ( goal[axis]!=0 && abs ( ( curr-goal[axis] ) /goal[axis] ) >relStressTol ) || abs ( curr-goal[axis] ) >absStressTol ) allOk=false;
-		}
-		else
-		{
+			if((goal[axis]!=0 && abs((curr-goal[axis])/goal[axis])>relStressTol) || abs(curr-goal[axis])>absStressTol) allOk=false;
+		}else{
 			Real curr=strain[axis];
 			// since strain is prescribed exactly, tolerances need just to accomodate rounding issues
-			if ( ( goal[axis]!=0 && abs ( ( curr-goal[axis] ) /goal[axis] ) >1e-6 ) || abs ( curr-goal[axis] ) >1e-6 )
-			{
+			if((goal[axis]!=0 && abs((curr-goal[axis])/goal[axis])>1e-6) || abs(curr-goal[axis])>1e-6){
 				allOk=false;
-				if ( doUpdate ) LOG_DEBUG ( "Strain not OK; "<<abs ( curr-goal[axis] ) <<">1e-6" );
+				if(doUpdate) LOG_DEBUG("Strain not OK; "<<abs(curr-goal[axis])<<">1e-6");
 			}
 		}
 	}
-	assert ( scene->dt>0. );
+	assert(scene->dt>0.);
 	// update stress and strain
 	if (!dynCell) for ( int axis=0; axis<3; axis++ )
 	{
 		// either prescribe velocity gradient
 		//NOTE (2) : ... and don't divide here
-		scene->cell->velGrad[axis][axis]=cellGrow[axis]/ ( scene->dt/**refSize[axis]*/ );
+		scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
 		// or strain increment (but NOT both)
 		// strain[axis]+=cellGrow[axis]/refSize[axis];
 
@@ -249,20 +247,16 @@ void PeriTriaxController::action ( Scene* )
 
 	strainRate=cellGrow/scene->dt;
 
-	if ( allOk )
-	{
-		if ( doUpdate || currUnbalanced<0 )
-		{
-			currUnbalanced=Shop::unbalancedForce ( /*useMaxForce=*/false,scene );
-			LOG_DEBUG ( "Stress/strain="<< ( stressMask&1?stress[0]:strain[0] ) <<","<< ( stressMask&2?stress[1]:strain[1] ) <<","<< ( stressMask&4?stress[2]:strain[2] ) <<", goal="<<goal<<", unbalanced="<<currUnbalanced );
+	if(allOk){
+		if(doUpdate || currUnbalanced<0){
+			currUnbalanced=Shop::unbalancedForce(/*useMaxForce=*/false,scene);
+			LOG_DEBUG("Stress/strain="<<(stressMask&1?stress[0]:strain[0])<<","<<(stressMask&2?stress[1]:strain[1])<<","<<(stressMask&4?stress[2]:strain[2])<<", goal="<<goal<<", unbalanced="<<currUnbalanced );
 		}
-		if ( currUnbalanced<maxUnbalanced )
-		{
+		if(currUnbalanced<maxUnbalanced){
 			// LOG_INFO("Goal reached, packing stable.");
-			if ( !doneHook.empty() )
-			{
+			if (!doneHook.empty()){
 				LOG_DEBUG ( "Running doneHook: "<<doneHook );
-				PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString ( doneHook.c_str() ); PyGILState_Release ( gstate );
+				pyRunString(doneHook);
 			}
 			else { Omega::instance().stopSimulationLoop(); }
 		}

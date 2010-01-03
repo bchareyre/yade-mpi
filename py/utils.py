@@ -509,29 +509,29 @@ If the last point's x coord is zero, it will not be duplicated."""
 
 def _deprecatedUtilsFunction(old,new):
 	import warnings
-	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category='DeprecationWarning')
+	warnings.warn('Function utils.%s is deprecated, use %s instead.'%(old,new),stacklevel=2,category=DeprecationWarning)
 
 def sumBexForces(*args,**kw):
-	_deprecatedUtilsFunction(func.__name__,'utils.sumForces')
+	_deprecatedUtilsFunction('sumBexForces','utils.sumForces')
 	return sumForces(*args,**kw)
 def sumBexTorques(*args,**kw):
-	_deprecatedUtilsFunction(func.__name__,'utils.sumTorques')
+	_deprecatedUtilsFunction('sumBexTorques','utils.sumTorques')
 	return sumTorques(*args,**kw)
 
 def spheresFromFile(*args,**kw):
-	_deprecatedUtilsFunction(func.__name__,'yade.import.text')
+	_deprecatedUtilsFunction('spheresFromFile','yade.import.text')
 	import yade.ymport
 	return yade.ymport.text(*args,**kw)
 def import_stl_geometry(*args,**kw):
-	_deprecatedUtilsFunction(func.__name__,'yade.import.stl')
+	_deprecatedUtilsFunction('import_stl_geometry','yade.import.stl')
 	import yade.ymport
 	return yade.ymport.stl(*args,**kw)
 def import_mesh_geometry(*args,**kw):
-	_deprecatedUtilsFunction(func.__name__,'yade.import.gmsh')
+	_deprecatedUtilsFunction('import_mesh_geometry','yade.import.gmsh')
 	import yade.ymport
 	return yade.ymport.stl(*args,**kw)
 def import_LSMGenGeo_geometry(*args,**kw):
-	_deprecatedUtilsFunction(func.__name__,'yade.import.gengeo')
+	_deprecatedUtilsFunction('import_LSMGenGeo_geometry','yade.import.gengeo')
 	import yade.ymport
 	return yade.ymport.gengeo(*args,**kw)
 

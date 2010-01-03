@@ -10,21 +10,15 @@
 
 #include<yade/core/PartialEngine.hpp>
 
-
-class MomentEngine : public PartialEngine 
-{
+class MomentEngine: public PartialEngine{
 	public :
-		Vector3r		moment;
-
+		Vector3r moment;
 		MomentEngine();
 		virtual ~MomentEngine();
-	
 		virtual void applyCondition(Scene*);
 	REGISTER_ATTRIBUTES(PartialEngine,(moment));
-	REGISTER_CLASS_NAME(MomentEngine);
-	REGISTER_BASE_CLASS_NAME(PartialEngine);
+	REGISTER_CLASS_AND_BASE(MomentEngine,PartialEngine);
 };
-
 REGISTER_SERIALIZABLE(MomentEngine);
 
 

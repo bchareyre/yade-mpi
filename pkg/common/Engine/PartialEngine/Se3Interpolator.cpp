@@ -1,6 +1,7 @@
 
 #include"Se3Interpolator.hpp"
 #include<yade/pkg-common/PeriodicEngines.hpp>
+#include<yade/lib-pyutil/gil.hpp>
 
 YADE_PLUGIN((Se3Interpolator))CREATE_LOGGER(Se3Interpolator);
 
@@ -31,7 +32,7 @@ void Se3Interpolator::applyCondition(Scene* mb){
 	if(t>=1.){
 		done=true;
 		LOG_DEBUG("Goal reached.");
-		if(!goalHook.empty()){ PyGILState_STATE gstate; gstate=PyGILState_Ensure(); PyRun_SimpleString(goalHook.c_str()); PyGILState_Release(gstate); }
+		if(!goalHook.empty()) PyRunString(goalHook);
 	}
 }
 

@@ -4,7 +4,7 @@ using namespace boost;
 //#include<omp.h> // needed for omp_get_thread_num() (debugging)
 YADE_PLUGIN((ParallelEngine));
 
-void ParallelEngine::action(Scene* rootBody){
+void ParallelEngine::action(Scene*){
 	// openMP warns if the iteration variable is unsigned...
 	const int size=(int)slaves.size();
 	#ifdef YADE_OPENMP
@@ -15,7 +15,7 @@ void ParallelEngine::action(Scene* rootBody){
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {
 			//cerr<<"["<<omp_get_thread_num()<<":"<<e->getClassName()<<"]";
 			e->scene=scene;
-			if(e->isActivated(rootBody)) { e->action(rootBody); }
+			if(e->isActivated(scene)) { e->action(scene); }
 		}
 	}
 }

@@ -64,7 +64,8 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # make geom; the dimensions are hard-coded here; could be in param table if desired
 # z-oriented hyperboloid, length 20cm, diameter 10cm, skirt 8cm
 # using spheres 7mm of diameter
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800))
+concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
+
 spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
 O.bodies.append(spheres)
 bb=utils.uniaxialTestFeatures()
@@ -81,8 +82,8 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(aabbEnlargeFactor=intRadius,label='is2aabb'),]),
 	InsertionSortCollider(sweepLength=.05*sphereRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(
-		[ef2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
-		[Ip2_CpmMat_CpmMat_CpmPhys(sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress)],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
+		[Ip2_CpmMat_CpmMat_CpmPhys()],
 		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
 	),
 	NewtonIntegrator(damping=damping,label='damper'),

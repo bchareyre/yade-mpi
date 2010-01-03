@@ -39,8 +39,8 @@ _deprecated={
 	'CpmPhysDamageColorizer':'CpmStateUpdater', # renamed 10.10.2009
 	'GLDraw_Dem3DofGeom_FacetSphere':'Gl1_Dem3DofGeom_FacetSphere', # renamed 15.11.2009
 	'PeriodicInsertionSortCollider':'InsertionSortCollider',	# integrated 25.11.2009
-	'BoundingVolumeMetaEngine':'BoundingDispatcher', # Tue Dec  1 14:28:29 2009, vaclav@flux  ## was BoundingVolumeDispatcher, generating double warning
-	'BoundingVolumeEngineUnit':'BoundingFunctor', # Tue Dec  1 14:39:53 2009, vaclav@flux ## was BoundingVolumeFunctor, generating double warning
+	'BoundingVolumeMetaEngine':'BoundDispatcher', # Tue Dec  1 14:28:29 2009, vaclav@flux  ## was BoundingVolumeDispatcher, generating double warning
+	'BoundingVolumeEngineUnit':'BoundFunctor', # Tue Dec  1 14:39:53 2009, vaclav@flux ## was BoundingVolumeFunctor, generating double warning
 	'InteractionGeometryMetaEngine':'InteractionGeometryDispatcher', # Tue Dec  1 14:40:36 2009, vaclav@flux
 	'InteractionPhysicsMetaEngine':'InteractionPhysicsDispatcher', # Tue Dec  1 14:40:53 2009, vaclav@flux
 	'InteractionPhysicsEngineUnit':'InteractionPhysicsFunctor', # Tue Dec  1 14:41:19 2009, vaclav@flux

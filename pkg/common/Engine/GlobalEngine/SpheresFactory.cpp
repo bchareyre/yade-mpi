@@ -16,6 +16,7 @@
 	#include<yade/pkg-common/SphereModel.hpp>
 #endif
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
+#include<yade/lib-pyutil/gil.hpp>
 #include"SpheresFactory.hpp"
 #include<sstream>
 
@@ -104,10 +105,7 @@ void SpheresFactory::action(Scene* ncb)
 		{
 			ostringstream command;
 			command << pySpheresCreator << "((" << position[0] << ',' << position[1] << ',' << position[2] << ")," << r << ')';
-			PyGILState_STATE gstate;
-				gstate = PyGILState_Ensure();
-				PyRun_SimpleString(command.str().c_str()); 
-			PyGILState_Release(gstate);
+			pyRunString(command.str());
 		}
 		else
 		{

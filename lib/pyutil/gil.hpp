@@ -10,6 +10,4 @@ class gilLock{
 };
 
 //! run string as python command; locks & unlocks GIL automatically
-void pyRunString(const std::string& cmd){
-	gilLock lock; PyRun_SimpleString(cmd.c_str());
-};
+void pyRunString(const std::string& cmd);

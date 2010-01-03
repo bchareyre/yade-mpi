@@ -43,49 +43,27 @@ void SpiralEngine::applyCondition(Scene* rb){
 	}
 }
 
-RotationEngine::RotationEngine()
-{
+RotationEngine::RotationEngine(){
 	rotateAroundZero = false;
 	zeroPoint = Vector3r(0,0,0);
 }
 
 
 
-void RotationEngine::applyCondition(Scene *ncb)
-{
-    rotationAxis.Normalize();
-
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
-
-	std::vector<int>::const_iterator ii = subscribedBodies.begin();
-	std::vector<int>::const_iterator iiEnd = subscribedBodies.end();
-
-	Real dt = Omega::instance().getTimeStep();
-
+void RotationEngine::applyCondition(Scene*){
+   rotationAxis.Normalize();
 	Quaternionr q;
-	q.FromAxisAngle(rotationAxis,angularVelocity*dt);
-
-	// Vector3r ax; Real an;
-	
-	for(;ii!=iiEnd;++ii)
-	{
-		State* rb=Body::byId(*ii,ncb)->state.get();
-
-		rb->angVel	= rotationAxis*angularVelocity;
-
-		if(rotateAroundZero)
-        {
-            const Vector3r l = rb->pos-zeroPoint;
-			rb->pos	= q*l+zeroPoint; 
-            rb->vel		= rb->angVel.Cross(l);
+	q.FromAxisAngle(rotationAxis,angularVelocity*scene->dt);
+	FOREACH(body_id_t id,subscribedBodies){
+		State* rb=Body::byId(id,scene)->state.get();
+		rb->angVel=rotationAxis*angularVelocity;
+		if(rotateAroundZero){
+			const Vector3r l=rb->pos-zeroPoint;
+			rb->pos=q*l+zeroPoint; 
+			rb->vel=rb->angVel.Cross(l);
 		}
-			
-		rb->ori	= q*rb->ori;
+		rb->ori=q*rb->ori;
 		rb->ori.Normalize();
-		//rb->ori.ToAxisAngle(ax,an);
-		
 	}
-
-
 }
 

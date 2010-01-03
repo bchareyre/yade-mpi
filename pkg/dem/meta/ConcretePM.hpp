@@ -84,10 +84,21 @@ REGISTER_SERIALIZABLE(CpmState);
 /* This class holds information associated with each body */
 class CpmMat: public GranularMat {
 	public:
-		CpmMat() { createIndex(); density=4800; };
+		/* nonelastic material parameters; meaning clarified in CpmPhys, under same names */
+		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, dmgTau, dmgRateExp, plTau, plRateExp, isoPrestress;
+		//! Contacts won't receive any damage (CpmPhys::neverDamage=true); defaults to false
+		bool neverDamage;
+		CpmMat() {
+			createIndex(); density=4800;
+			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
+			sigmaT=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
+			neverDamage=false;
+			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1; // disable visco-damage and visco-plasticity
+			isoPrestress=0;
+		};
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
-		REGISTER_ATTRIBUTES(GranularMat,);
+		REGISTER_ATTRIBUTES(GranularMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
 		REGISTER_CLASS_AND_BASE(CpmMat,GranularMat);
 		REGISTER_CLASS_INDEX(CpmMat,GranularMat);
 };
@@ -214,41 +225,16 @@ REGISTER_SERIALIZABLE(CpmPhys);
 class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsFunctor{
 	private:
 	public:
-		/* nonelastic material parameters */
-		/* alternatively (and more cleanly), we would have subclass of ElasticBodyParameters,
-		 * which would define just those in addition to the elastic ones.
-		 * This might be done later, for now hardcode that here. */
-		/* uniaxial tension resistance, bending parameter of the damage evolution law, whear weighting constant for epsT in the strain seminorm (kappa) calculation. Default to NaN so that user gets loudly notified it was not set.
-		
-		*/
-		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, tau, expDmgRate, dmgTau, dmgRateExp, plTau, plRateExp, isoPrestress;
 		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
-		//! Create contacts that don't receive any damage (CpmPhys::neverDamage=true); defaults to false
-		bool neverDamage;
 
 		Ip2_CpmMat_CpmMat_CpmPhys(){
-			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
-			neverDamage=false;
-			cohesiveThresholdIter=10;
-			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1;
-			isoPrestress=0;
+			cohesiveThresholdIter=10; // create cohesive interactions in first 10 steps by default
 		}
 
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,
 			(cohesiveThresholdIter)
-			(G_over_E)
-			(sigmaT)
-			(neverDamage)
-			(epsCrackOnset)
-			(relDuctility)
-			(dmgTau)
-			(dmgRateExp)
-			(plTau)
-			(plRateExp)
-			(isoPrestress)
 		);
 
 		FUNCTOR2D(CpmMat,CpmMat);

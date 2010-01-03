@@ -25,6 +25,7 @@
 
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
+#include<yade/lib-pyutil/gil.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/ThreadRunner.hpp>
 #include<yade/core/FileGenerator.hpp>
@@ -321,15 +322,13 @@ class pyOmega{
 		#endif
 		FOREACH(const shared_ptr<Engine>& e, OMEGA.getScene()->engines){
 			if(!e->label.empty()){
-				PyGILState_STATE gstate; gstate = PyGILState_Ensure();
-				PyRun_SimpleString(("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')").c_str());
-				PyGILState_Release(gstate);
+				pyRunString("__builtins__."+e->label+"=Omega().labeledEngine('"+e->label+"')");
 			}
 			if(isChildClassOf(e->getClassName(),"Dispatcher")){
 				shared_ptr<Dispatcher> ee=dynamic_pointer_cast<Dispatcher>(e);
 				FOREACH(const shared_ptr<Functor>& f, ee->functorArguments){
 					if(!f->label.empty()){
-						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')").c_str()); PyGILState_Release(gstate);
+						pyRunString("__builtins__."+f->label+"=Omega().labeledEngine('"+f->label+"')");
 					}
 				}
 			}
@@ -341,7 +340,7 @@ class pyOmega{
 				FOREACH(const shared_ptr<Functor>& eu,ee->lawDispatcher->functorArguments) eus.push_back(eu);
 				FOREACH(const shared_ptr<Functor>& eu,eus){
 					if(!eu->label.empty()){
-						PyGILState_STATE gstate; gstate = PyGILState_Ensure(); PyRun_SimpleString(("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')").c_str()); PyGILState_Release(gstate);
+						pyRunString("__builtins__."+eu->label+"=Omega().labeledEngine('"+eu->label+"')");
 					}
 				}
 			}
@@ -538,7 +537,7 @@ class pyOmega{
 		Omega::instance().cleanupTemps();
 		exit(status);
 	}
-	void runEngine(const shared_ptr<Engine>& e){ e->action(OMEGA.getScene().get()); }
+	void runEngine(const shared_ptr<Engine>& e){ LOG_WARN("Omega().runEngine(): deprecated, use __call__ method of the engine instance directly instead; will be removed in the future."); e->scene=OMEGA.getScene().get(); e->action(OMEGA.getScene().get()); }
 };
 
 class pySTLImporter : public STLImporter {};
@@ -546,6 +545,7 @@ class pySTLImporter : public STLImporter {};
 
 TimingInfo::delta Engine_timingInfo_nsec_get(const shared_ptr<Engine>& e){return e->timingInfo.nsec;}; void Engine_timingInfo_nsec_set(const shared_ptr<Engine>& e, TimingInfo::delta d){ e->timingInfo.nsec=d;}
 long Engine_timingInfo_nExec_get(const shared_ptr<Engine>& e){return e->timingInfo.nExec;}; void Engine_timingInfo_nExec_set(const shared_ptr<Engine>& e, long d){ e->timingInfo.nExec=d;}
+void Engine_action(const shared_ptr<Engine>& e){ e->scene=Omega::instance().getScene().get(); e->action(e->scene); }
 
 shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
 	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
@@ -758,7 +758,8 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<Engine, shared_ptr<Engine>, python::bases<Serializable>, noncopyable >("Engine",python::no_init)
 		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
 		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
-		.def_readonly("timingDeltas",&Engine::timingDeltas);
+		.def_readonly("timingDeltas",&Engine::timingDeltas)
+		.def("__call__",&Engine_action);
 	python::class_<GlobalEngine,shared_ptr<GlobalEngine>, python::bases<Engine>, noncopyable>("GlobalEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<GlobalEngine>));
 	python::class_<PartialEngine,shared_ptr<PartialEngine>, python::bases<Engine>, noncopyable>("PartialEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<PartialEngine>));
 	python::class_<Functor, shared_ptr<Functor>, python::bases<Serializable>, noncopyable >("Functor",python::no_init)

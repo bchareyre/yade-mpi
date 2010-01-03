@@ -67,7 +67,7 @@ void Clump::add(body_id_t subId){
 	shared_ptr<Body> subBody=Body::byId(subId);
 
 	// preconditions
-	assert(subBody->isDynamic);
+	//assert(subBody->isDynamic);
 	assert(state);
 	assert(members.count(subId)==0);
 	assert(subId<getId());
@@ -226,6 +226,7 @@ void Clump::updateProperties(bool intersecting){
 	TRVAR1(M);
 	TRWM3MAT(Ig);
 	TRWM3VEC(Sg);
+	if(M==0){ state->mass=0; state->inertia=Vector3r(0,0,0); isDynamic=false; return; }
 
 	state->pos=Sg/M; // clump's centroid
 	// this will calculate translation only, since rotation is zero

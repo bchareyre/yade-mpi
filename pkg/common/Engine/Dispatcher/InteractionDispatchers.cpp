@@ -33,6 +33,7 @@ void InteractionDispatchers::action(Scene*){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;
 	}
+	geomDispatcher->scene=physDispatcher->scene=lawDispatcher->scene=scene;
 	geomDispatcher->updateScenePtr();
 	physDispatcher->updateScenePtr();
 	lawDispatcher->updateScenePtr();
