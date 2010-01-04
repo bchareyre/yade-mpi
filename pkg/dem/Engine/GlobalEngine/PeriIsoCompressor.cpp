@@ -101,7 +101,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	//"Natural" strain, correct for large deformations, only used for comparison with goals
 	// → no logarithm here, I have code for strain-stress test that needs regular linear strain.
 	//	Why not set goals as logarithm, if you need it?
-	for ( int i=0; i<3; i++ ) strain[i]=(scene->cell->trsf[i][i]);
+	for(int i=0; i<3; i++) strain[i]=(scene->cell->getSize()[i]-scene->cell->refSize[i])/(scene->cell->refSize[i]);
 
 	//stress tensor and stiffness
 	
@@ -233,14 +233,15 @@ void PeriTriaxController::action(Scene*)
 		// either prescribe velocity gradient
 		//NOTE (2) : ... and don't divide here
 		scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
-		// or strain increment (but NOT both)
-		// strain[axis]+=cellGrow[axis]/refSize[axis];
+		// used only for goal comparisons...
+		strain[axis]+=cellGrow[axis]/refSize[axis];
 
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
 		//don't modify stress if dynCell, testing only stiff[axis]>0 would not allow switching the control mode in simulations,
 		///NOTE : this one uses size and is hard to generalize to 9 components as well, how can we predict the full stress tensor? It would need a 9x9 stifness matrix!! At the end, I wonder if the implementation of independant control on the 9 components would not be easier and cleaner in a different engine... This stiffness approach is not a piece of cake. Controlling arbitrary components using inertia and comparing Fkk vs. goal[k][k] is really a different (and easier) problem. I feel like I'm mixing two different things, with a lot of complication to preserve a few specific features that will not be generalised at the end, just for the sake of avoiding a few duplicated lines. What do you think?
-		if ( stiff[axis]>0 && !dynCell ) stress[axis]+= ( cellGrow[axis]/refSize[axis] ) * ( stiff[axis]/cellArea[axis] ); //-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
+		if (stiff[axis]>0 && !dynCell) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]);
+			//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}
 	// change cell size now
 	// scene->cell->refSize+=cellGrow;

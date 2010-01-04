@@ -575,6 +575,18 @@ shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::di
 	return instance;
 }
 
+template <typename T>
+shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& d){
+	shared_ptr<Factorable> inst0=ClassFactory::instance().createShared(self->getClassName());
+	if(!inst0) throw runtime_error("Invalid class `"+self->getClassName()+"' (not created by ClassFactory).");
+	shared_ptr<T> inst=dynamic_pointer_cast<T>(inst0);
+	if(!inst) throw runtime_error("Invalid class `"+self->getClassName()+"' (unable to cast to typeid `"+typeid(T).name()+"')");
+	inst->pyUpdateAttrs(self->pyDict());
+	// if d not empty (how to test that?)
+	inst->pyUpdateAttrs(d);
+	inst->postProcessAttributes(/*deserializing*/true);
+	return inst;
+}
 
 // stupid; Dispatcher is not a template, hence converting this into a real constructor would be complicated; keep it here.
 template<typename DispatcherT>
@@ -751,6 +763,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
 		.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
 		.def("updateAttrs",&Serializable::pyUpdateAttrs).def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs)
+		.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict())
 		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
 		// aliases for __getitem__ and __setitem__, but they are used by the property generator code and can be useful if we deprecate the object['attr'] type of access
 		.def("_prop_get",&Serializable::pyGetAttr).def("_prop_set",&Serializable::pySetAttr)
@@ -800,7 +813,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		EXPOSE_FUNCTOR(LawFunctor)
 	#undef EXPOSE_FUNCTOR
 		
-	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>))
+	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>)).def("clone",&Serializable_clone<cxxName>,python::arg("attrs")=python::dict())
 	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
 	// expose indexable class, with access to the index
 	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("dispIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").def("dispHierarchy",&Indexable_getClassIndices<className>,(python::arg("names")=true),"Return list of dispatch classes (from down upwards), starting with the class instance itself, top-level indexable at last. If names is true (default), return class names rather than numerical indices.")

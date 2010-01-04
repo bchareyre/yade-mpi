@@ -70,7 +70,7 @@ if not os.path.exists(packingFile):
 # load the packing (again);
 #
 import cPickle as pickle
-concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800))
+concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
 sphDict=pickle.load(open(packingFile))
 from yade import pack
 sp=pack.SpherePack()
@@ -80,7 +80,8 @@ sp.cellSize=sphDict['cell']
 import numpy
 avgRadius=numpy.average([r for c,r in sp])
 O.bodies.append([utils.sphere(c,r,color=utils.randomColor()) for c,r in sp])
-O.cellSize=sp.cellSize
+O.periodic=True
+O.cell.refSize=sp.cellSize
 axis=2
 ax1=(axis+1)%3
 ax2=(axis+2)%3
@@ -96,7 +97,7 @@ O.engines=[
 	InsertionSortCollider(sweepLength=.05*avgRadius,nBins=5,binCoeff=5),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
-		[Ip2_CpmMat_CpmMat_CpmPhys(sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress)],
+		[Ip2_CpmMat_CpmMat_CpmPhys()],
 		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
 	),
 	NewtonIntegrator(damping=damping,label='newton'),
@@ -104,7 +105,7 @@ O.engines=[
 	#
 	#UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	#
-	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),maxStrainRate=Vector3(1,1,1),label='strainer',reversedForces=False,globUpdate=2),
+	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),maxStrainRate=Vector3(5,5,5),label='strainer',reversedForces=False,globUpdate=2),
 	PeriodicPythonRunner(virtPeriod=1e-5/strainRateTension,realLim=2,command='addPlotData()',label='plotDataCollector'),
 	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
