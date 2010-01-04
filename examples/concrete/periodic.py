@@ -43,8 +43,8 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	relDuctility=30,
 
 	intRadius=1.5,
-	dtSafety=.8,
-	damping=0.4,
+	dtSafety=.4,
+	damping=0.2,
 	strainRateTension=10,
 	strainRateCompression=50,
 	# 1=tension, 2=compression (ANDed; 3=both)
@@ -105,7 +105,7 @@ O.engines=[
 	#
 	#UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
 	#
-	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),maxStrainRate=Vector3(5,5,5),label='strainer',reversedForces=False,globUpdate=2),
+	PeriTriaxController(goal=[1,1,1],stressMask=( (7^(1<<axis | 1<<ax1)) if biaxial else (7^(1<<axis)) ),label='strainer',reversedForces=False,globUpdate=2),
 	PeriodicPythonRunner(virtPeriod=1e-5/strainRateTension,realLim=2,command='addPlotData()',label='plotDataCollector'),
 	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
@@ -127,26 +127,25 @@ def initTest():
 		O.wait();
 		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
-	maxStrainRate=Vector3(1,1,1)
+	maxStrainRate=Vector3(1,1,1);
 	goal=Vector3(1,1,1);
 	if not biaxial: # uniaxial
 		maxStrainRate[axis]=abs(strainRateTension) if mode=='tension' else abs(strainRateCompression)
-		maxStrainRate[ax1]=maxStrainRate[ax2]=100*maxStrainRate[axis]
+		maxStrainRate[ax1]=maxStrainRate[ax2]=1000*maxStrainRate[axis]
 		goal[axis]=1 if mode=='tension' else -1;
 	else:
 		maxStrainRate[axis]=abs(strainRateTension) if mode=='tension' else abs(strainRateCompression)
 		maxStrainRate[ax1]=maxStrainRate[axis]
-		maxStrainRate[ax2]=100*maxStrainRate[axis]
+		maxStrainRate[ax2]=1000*maxStrainRate[axis]
 		goal[axis]=1 if mode=='tension' else -1;
 		goal[ax1]=goal[axis]
 	strainer['maxStrainRate']=maxStrainRate
 	strainer['goal']=goal
 	try:
-		pass
-		#from yade import qt
-		#renderer=qt.Renderer()
-		#renderer['scaleDisplacements']=True
-		#renderer['displacementScale']=(1000,1000,1000) if mode=='tension' else (100,100,100)
+		from yade import qt
+		renderer=qt.Renderer()
+		renderer['scaleDisplacements']=True
+		renderer['displacementScale']=(1000,1000,1000) if mode=='tension' else (100,100,100)
 	except ImportError: pass
 	print "init done, will now run."
 	O.step(); O.step(); # to create initial contacts

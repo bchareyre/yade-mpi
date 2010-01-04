@@ -139,7 +139,7 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		Vector3r size=scene->cell->getSize();
-		if(scaleDisplacements) size=diagMult(displacementScale,size);
+		if(scaleDisplacements) size+=diagMult(displacementScale,size-scene->cell->refSize);
 		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
 		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
 		glScalev(size);
