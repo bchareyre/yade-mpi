@@ -10,15 +10,21 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class Gl1_Sphere : public GlShapeFunctor
-{	
+class Gl1_Sphere : public GlShapeFunctor{	
 	private :
-		static bool wire, glutNormalize;
+		static bool wire, stripes, glutNormalize;
 		static int glutSlices, glutStacks;
+
+		// for stripes
+		static vector<Vector3r> vertices, faces;
+		static int glSphereList;
+		void subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth);
+		void drawSphere(void);
+		void initGlLists(void);
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 	RENDERS(Sphere);
-	REGISTER_ATTRIBUTES(Serializable,(wire)(glutNormalize)(glutSlices)(glutStacks));
+	REGISTER_ATTRIBUTES(Serializable,(wire)(glutNormalize)(glutSlices)(glutStacks)(stripes));
 	REGISTER_CLASS_AND_BASE(Gl1_Sphere,GlShapeFunctor);
 };
 

@@ -22,9 +22,9 @@ YADE_REQUIRE_FEATURE(geometricalmodel);
 //      glPopMatrix();
 //}
 
-int GLDrawSphereModel::glSphereList=-1;
 int GLDrawSphereModel::glWiredSphereList=-1;
 
+int GLDrawSphereModel::glSphereList=-1;
 vector<Vector3r> GLDrawSphereModel::vertices;
 vector<Vector3r> GLDrawSphereModel::faces;
 bool GLDrawSphereModel::first = true;
@@ -108,9 +108,6 @@ void GLDrawSphereModel::go(const shared_ptr<GeometricalModel>& gm, const shared_
 	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2]));
 	glColor3v(gm->diffuseColor);
 
-// transparent spheres
-//glColor4(gm->diffuseColor[0],gm->diffuseColor[1],gm->diffuseColor[2],0.4);
-
  	if (gm->wire || wire)
  	{// circle facing the camera
 		glPushMatrix();
@@ -118,15 +115,6 @@ void GLDrawSphereModel::go(const shared_ptr<GeometricalModel>& gm, const shared_
 		glScalef(radius,radius,radius);
                 glCallList(glWiredSphereList);
 		glPopMatrix();
-		
-/////////////////////////// FIXME - display coordinates (stupid place!!)
-//              glPushMatrix();
-//              glRasterPos2i(0,0);
-//              std::string str=std::string("  (") + boost::lexical_cast<std::string>((float)(ph->se3.position[0])) + "," + boost::lexical_cast<std::string>((float)(ph->se3.position[1])) + ")";
-//              for(unsigned int i=0;i<str.length();i++)
-//                      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, str[i]);
-//              glPopMatrix();
-///////////////////////////
         }
         else
         {
@@ -136,74 +124,6 @@ void GLDrawSphereModel::go(const shared_ptr<GeometricalModel>& gm, const shared_
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GLDrawSphereModel::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth)
-{
-	Vector3r v12,v23,v31;
-
-	if (depth==0)
-	{
-		Vector3r v = (v1+v2+v3)/3.0;
-		Real angle = atan(v[2]/v[0])/v.Length();
-
-	////////////////////////////
-	//
-	// FIXME - another parameter to GLDraw* to allow to disable that stripe on the sphere
-	//
-	// BEGIN mark
-		GLfloat matAmbient[4];
-
-		if (angle>-Mathr::PI/6.0 && angle<=Mathr::PI/6.0)
-		{
-			matAmbient[0] = 0.2;
-			matAmbient[1] = 0.2;
-			matAmbient[2] = 0.2;
-			matAmbient[3] = 0.0;
-		}
-		else
-		{
-			matAmbient[0] = 0.0;
-			matAmbient[1] = 0.0;
-			matAmbient[2] = 0.0;
-			matAmbient[3] = 0.0;
-		}
-	
-		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matAmbient);
-	// END mark
-	////////////////////////////
-	
-	
-		glBegin(GL_TRIANGLES);
-			glNormal3v(v3);
-			glVertex3v(v3);
-			glNormal3v(v2);
-			glVertex3v(v2);
-			glNormal3v(v1);
-			glVertex3v(v1);
-		glEnd();
-
-		return;
-	}
-	v12 = v1+v2;
-	v23 = v2+v3;
-	v31 = v3+v1;
-	v12.Normalize();
-	v23.Normalize();
-	v31.Normalize();
-	subdivideTriangle(v1,v12,v31,depth-1);
-	subdivideTriangle(v2,v23,v12,depth-1);
-	subdivideTriangle(v3,v31,v23,depth-1);
-	subdivideTriangle(v12,v23,v31,depth-1);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void GLDrawSphereModel::drawSphere(int depth)
-{
-	glShadeModel(GL_SMOOTH);
-	
-	for(int i=0;i<20;i++)
-		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
-}
 
 void GLDrawSphereModel::drawCircle(bool filled)
 {
