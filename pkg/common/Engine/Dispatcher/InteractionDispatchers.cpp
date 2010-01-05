@@ -91,6 +91,15 @@ void InteractionDispatchers::action(Scene*){
 			if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
+
+				// in sheared cell, apply shear on the mutual position as well
+				shift2=scene->cell->shearPt(shift2);
+				//suggested change to avoid one matrix multiplication (with Hsize updated in cell ofc), I'll make the change cleanly if ok. Same sorts of simplifications are possible in many places. Just putting one example here.
+				// Hsize will contain colums with transformed base vectors
+// 				Matrix3r Hsize(scene->cell->refSize[0],scene->cell->refSize[1],scene->cell->refSize[2]); Hsize=scene->cell->trsf*Hsize;
+// 				Vector3r shift3((Real) I->cellDist[0]*Hsize.GetColumn(0)+(Real)I->cellDist[1]*Hsize.GetColumn(1)+(Real)I->cellDist[2]*Hsize.GetColumn(2));
+// 				if ((Omega::instance().getCurrentIteration() % 100 == 0)) LOG_DEBUG(shift2 << " vs " << shift3);
+
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
 			if(!geomCreated){

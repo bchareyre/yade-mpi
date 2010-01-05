@@ -1,7 +1,7 @@
 /*************************************************************************
-*  Copyright (C) 2006 by Bruno Chareyre				  *
-*  bruno.chareyre@hmg.inpg.fr					    *
-*									*
+*  Copyright (C) 2006 by Bruno Chareyre				 	 *
+*  bruno.chareyre@hmg.inpg.fr					  	 *
+*									 *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
@@ -86,7 +86,7 @@ TriaxialStressController::TriaxialStressController(): wall_bottom_id(wall_id[0])
 	sigma1 = 0;
 	sigma2 = 0;
 	sigma3 = 0;
-	isTriaxialCompression = true;
+	isAxisymetric = true;
 }
 
 TriaxialStressController::~TriaxialStressController()
@@ -193,15 +193,16 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		}
-		
+		max_vel1=3 * width /(depth+width+depth)*max_vel;				
+		max_vel2=3 * height /(depth+width+depth)*max_vel;
+		max_vel3 =3 * depth /(depth+width+depth)*max_vel;
 		firstRun = false;
 	}
 
 	// NOT JUST at the first run, since sigma_iso may be changed
 	// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
-	if (isTriaxialCompression){
-		sigma1=sigma2=sigma3=sigma_iso;
-		max_vel1=max_vel2=max_vel3=max_vel;
+	if (isAxisymetric){
+		sigma1=sigma2=sigma3=sigma_iso;		
 	}
 
 
@@ -232,12 +233,12 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 		if (wall_top_activated) controlExternalStress(wall_top, ncb, wallForce, p_top, max_vel2);
 		
 		wallForce = Vector3r(sigma1*height*depth, 0, 0);
-		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel1*width/height);
-		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel1*width/height);
+		if (wall_left_activated) controlExternalStress(wall_left, ncb, -wallForce, p_left, max_vel1);
+		if (wall_right_activated) controlExternalStress(wall_right, ncb, wallForce, p_right, max_vel1);
 		
 		wallForce = Vector3r(0, 0, sigma3*height*width);
-		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel3*depth/height);
-		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel3*depth/height);
+		if (wall_back_activated) controlExternalStress(wall_back, ncb, -wallForce, p_back, max_vel3);
+		if (wall_front_activated) controlExternalStress(wall_front, ncb, wallForce, p_front, max_vel3);
 	}
 	else //if internal compaction
 	{

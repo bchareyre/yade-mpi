@@ -99,15 +99,15 @@ void PeriIsoCompressor::action(Scene* scene){
 void PeriTriaxController::strainStressStiffUpdate(){
 	// update strain first
 	//"Natural" strain, correct for large deformations, only used for comparison with goals
-	// → no logarithm here, I have code for strain-stress test that needs regular linear strain.
-	//	Why not set goals as logarithm, if you need it?
-	for(int i=0; i<3; i++) strain[i]=(scene->cell->getSize()[i]-scene->cell->refSize[i])/(scene->cell->refSize[i]);
-
+	for (int i=0;i<3;i++) strain[i]=Mathr::Log(scene->cell->trsf[i][i]);
 	//stress tensor and stiffness
 	
 	//Compute volume of the deformed cell
 	// NOTE : needs refSize, could be generalized to arbitrary initial shapes using trsf*refHsize 
 	// → initial cell size is always box, and will be. The cell repeats  periodically, initial shape doesn't (shouldn't, at least) dinfluence interactions at all/
+	// → this is one more place where Hsize would make things shorter : volume=Hsize.Determinant; The full code relies on the fact that initial Hsize is a box. You didn't modify the equation btw, result is the same as in r1936, which was (with spaces...)
+	//trsf*Matrix3r ( scene->cell->refSize[0],0,0, 0,scene->cell->refSize[1],0,0,0,scene->cell->refSize[2] ) ).Determinant()
+	//remark : the volume of a parallelepiped u1,u2,u3 is always det(u1,u2,u3)
 	Real volume=scene->cell->trsf.Determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
 
 	//Compute sum(fi*lj) and stiffness
@@ -116,6 +116,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	int n=0;
 	// NOTE : This sort of loops on interactions could be removed if we had callbacks in e.g. constitutive laws
 	// → very likely performance hit; do you have some concrete design in mind?
+	// → a vector with functors so we can law->functs->pushback(myThing), and access to the fundamental members (forces, stiffness, normal, etc.). Implementing the second part is less clear in my mind. Inheriting from law::funct(force&, stiffness&, ...)?
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if ( !I->isReal() ) continue;
 		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*> ( I->interactionPhysics.get() );
@@ -156,6 +157,7 @@ void PeriTriaxController::action(Scene*)
 {
 	if (!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
 	const Vector3r& cellSize=scene->cell->getSize();
+	//FIXME : this is wrong I think (almost sure, B.)
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
 	const Vector3r& refSize=scene->cell->refSize;
@@ -176,15 +178,12 @@ void PeriTriaxController::action(Scene*)
 	bool allOk=true; Vector3r cellGrow(Vector3r::ZERO);
 	// apply condition along each axis separately (stress or strain)
 	for(int axis=0; axis<3; axis++){
-		//NOTE (1): don't multiply by refSize here (see note (2))
-		Real maxGrow=refSize[axis]*maxStrainRate[axis]*scene->dt;
+		Real maxGrow=maxStrainRate[axis]*scene->dt;
 		if(stressMask & (1<<axis)){   // control stress
 			if(!dynCell){
-				// PLEASE keep formulas up-to-date if you change code...
-				//
 				// stiffness K=EA; σ₁=goal stress; Δσ wanted stress difference to apply
-				// ΔεE=(Δl/l₀)(K/A) = Δσ=σ₁-σ ↔ Δl=(σ₁-σ)l₀(A/K)
-				cellGrow[axis]=(goal[axis]-stress[axis])*refSize[axis]*cellArea[axis]/(stiff[axis]>0?stiff[axis]:1.);
+				// ΔεE=(Δl/l)(K/A) - Grow is Δε
+				cellGrow[axis]=(goal[axis]-stress[axis])*cellArea[axis]/(stiff[axis]>0?stiff[axis]:1.);
 				LOG_TRACE(axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis]);
 			} else {  //accelerate the deformation using the density of the period, includes Cundall's damping
 				assert( mass>0 );//user set
@@ -192,21 +191,15 @@ void PeriTriaxController::action(Scene*)
 				scene->cell->velGrad[axis][axis]+=dampFactor*scene->dt* ( goal[axis]-stress[axis] ) /mass;
 				LOG_TRACE ( axis<<": stress="<<stress[axis]<<", goal="<<goal[axis]<<", velGrad="<<scene->cell->velGrad[axis][axis] );
 			}
-		} else {    // control strain
+		} else {    // control strain, see "true strain" definition here http://en.wikipedia.org/wiki/Finite_strain_theory
 			///NOTE : everything could be generalized to 9 independant components by comparing F[i,i] vs. Matrix3r goal[i,i], but it would be simpler in that case to let the user set the prescribed loading rates velGrad[i,i] when [i,i] is not stress-controlled. This "else" would disappear.
-			// → sorry, exp removed, see comment about log above; fix formulas if you need it back
-			cellGrow[axis]=(goal[axis]-strain[axis])*refSize[axis];
+			cellGrow[axis]=Mathr::Exp ( goal[axis]-strain[axis] ) -1;
 			LOG_TRACE ( axis<<": strain="<<strain[axis]<<", goal="<<goal[axis]<<", cellGrow="<<cellGrow[axis] );
 		}
 		// limit maximum strain rate
 		if (abs(cellGrow[axis])>maxGrow) cellGrow[axis]=Mathr::Sign(cellGrow[axis])*maxGrow;
+		
 		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
-		/** NOTE : this is one place where size can't be removed (except for span tests). Commented out for now. Do we really need to handle this very special case here? The simulation will go crazy anyway, so we can as well throw at the next step. I'm trying to remove "size" when it's not needed, partly because I have in mind independant control on 9 components of stress/velGrad and it will be easier with a the matrix formalism (we dont have 9 sizes...). If one day size is not used anywhere, we can remove it. (B.C.)*/
-		/* → we need to handle this really:
-			1. cell size is defined exactly, no reason to hate it anymore. And the collider needs it as well.
-			2. automatic compressions (like pack.randomPeriPack) might create pathologic ratios of the box, but still need some result.
-			please check that the units are ok, since what is cellGrow now?
-		*/
 		cellGrow[axis]=max(cellGrow[axis],-(cellSize[axis]-2.1*maxBodySpan[axis]));
 
 		// steady evolution with fluctuations; see TriaxialStressController
@@ -231,15 +224,13 @@ void PeriTriaxController::action(Scene*)
 	if (!dynCell) for ( int axis=0; axis<3; axis++ )
 	{
 		// either prescribe velocity gradient
-		//NOTE (2) : ... and don't divide here
-		scene->cell->velGrad[axis][axis]=cellGrow[axis]/(scene->dt*refSize[axis]);
+		scene->cell->velGrad[axis][axis]=cellGrow[axis]/scene->dt;
 		// used only for goal comparisons...
-		strain[axis]+=cellGrow[axis]/refSize[axis];
+		strain[axis]+=cellGrow[axis];
 
 		// take in account something like poisson's effect here…
 		//Real bogusPoisson=0.25; int ax1=(axis+1)%3,ax2=(axis+2)%3;
 		//don't modify stress if dynCell, testing only stiff[axis]>0 would not allow switching the control mode in simulations,
-		///NOTE : this one uses size and is hard to generalize to 9 components as well, how can we predict the full stress tensor? It would need a 9x9 stifness matrix!! At the end, I wonder if the implementation of independant control on the 9 components would not be easier and cleaner in a different engine... This stiffness approach is not a piece of cake. Controlling arbitrary components using inertia and comparing Fkk vs. goal[k][k] is really a different (and easier) problem. I feel like I'm mixing two different things, with a lot of complication to preserve a few specific features that will not be generalised at the end, just for the sake of avoiding a few duplicated lines. What do you think?
 		if (stiff[axis]>0 && !dynCell) stress[axis]+=(cellGrow[axis]/refSize[axis])*(stiff[axis]/cellArea[axis]);
 			//-bogusPoisson*(cellGrow[ax1]/refSize[ax1])*(stiff[ax1]/cellArea[ax1])-bogusPoisson*(cellGrow[ax2]/refSize[ax2])*(stiff[ax2]/cellArea[ax2]);
 	}

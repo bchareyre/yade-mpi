@@ -77,8 +77,8 @@ class TriaxialStressController : public PartialEngine
 		Real sigma1;
 		Real sigma2;
 		Real sigma3;
-		//!"if (isTriaxialCompression)" (true by default) sigma_iso is attributed to sigma1, 2 and 3
-		bool isTriaxialCompression;
+		//!"if (isAxisymetric)" (true by default) sigma_iso is attributed to sigma1, 2 and 3
+		bool isAxisymetric;
 		Real max_vel;
 		//! The three following parameters allow to perform an external stress control with different stress values for the three space directions.
 		Real max_vel1;
@@ -140,7 +140,7 @@ class TriaxialStressController : public PartialEngine
 		(sigma1)
 		(sigma2)
 		(sigma3)
-		(isTriaxialCompression)
+		(isAxisymetric)
 		(maxMultiplier)
 		(finalMaxMultiplier)
 		(max_vel)
