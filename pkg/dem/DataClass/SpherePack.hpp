@@ -50,7 +50,7 @@ public:
 	void toFile(const string file) const;
 	void fromSimulation();
 
-	// random generation; if num<0, insert as many spheres as possible; if porosity>0 recompute meanRadius (porosity<0.4 recommended) to try and generate "num" spheres in the box.
+	// random generation; if num<0, insert as many spheres as possible; if porosity>0, recompute meanRadius (porosity>0.65 recommended) and try generating this porosity with num spheres.
 	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, int num=-1, bool periodic=false, Real porosity=-1);
 
 	// periodic repetition

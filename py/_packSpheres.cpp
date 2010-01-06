@@ -12,7 +12,7 @@ BOOST_PYTHON_MODULE(_packSpheres){
 		.def("load",&SpherePack::fromFile,"Load packing from external text file (current data will be discarded).")
 		.def("save",&SpherePack::toFile,"Save packing to external text file (will be overwritten).")
 		.def("fromSimulation",&SpherePack::fromSimulation,"Make packing corresponding to the current simulation. Discards current data.")
-		.def("makeCloud",&SpherePack::makeCloud,(python::arg("minCorner"),python::arg("maxCorner"),python::arg("rMean"),python::arg("rRelFuzz"),python::arg("num")=-1,python::arg("periodic")=false,python::arg("porosity")=-1),"Create random packing encosed in box given by minCorner and maxCorner, containing num spheres. Returns number of created spheres, which can be < num if the packing is too tight.")
+			.def("makeCloud",&SpherePack::makeCloud,(python::arg("minCorner"),python::arg("maxCorner"),python::arg("rMean"),python::arg("rRelFuzz"),python::arg("num")=-1,python::arg("periodic")=false),"Create random packing enclosed in box given by minCorner and maxCorner, containing num spheres. Returns number of created spheres, which can be < num if the packing is too tight. If porosity>0, recompute meanRadius (porosity>0.65 recommended) and try generating this porosity with num spheres.")
 		.def("aabb",&SpherePack::aabb_py,"Get axis-aligned bounding box coordinates, as 2 3-tuples.")
 		.def("dim",&SpherePack::dim,"Return dimensions of the packing in terms of aabb(), as a 3-tuple.")
 		.def("center",&SpherePack::midPt,"Return coordinates of the bounding box center.")
