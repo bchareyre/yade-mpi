@@ -15,32 +15,19 @@
 #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
-
 #include<yade/pkg-common/ElasticMat.hpp>
-
-//#include<yade/pkg-dem/AveragePositionRecorder.hpp>
-//#include<yade/pkg-dem/ForceRecorder.hpp>
-//#include<yade/pkg-dem/VelocityRecorder.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
-
 #include<yade/pkg-common/Aabb.hpp>
-#ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/BoxModel.hpp>
-	#include<yade/pkg-common/SphereModel.hpp>
-	#include<yade/pkg-common/FacetModel.hpp>
-#endif
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
-
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
-
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/core/Body.hpp>
@@ -48,37 +35,26 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/Wall.hpp>
-
 #include<yade/pkg-common/ForceResetter.hpp>
-
 #include<yade/pkg-common/InteractionDispatchers.hpp>
-
 #include<yade/pkg-dem/Shop.hpp>
-
 
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
-
 // random
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
-
 #include<yade/pkg-dem/SpherePack.hpp>
-
 //#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
-
 
 CREATE_LOGGER(TriaxialTest);
 
 using namespace boost;
 using namespace std;
-
-
-
 
 TriaxialTest::TriaxialTest () : FileGenerator()
 {
@@ -108,79 +84,55 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
 	WallStressRecordFile = "./WallStresses"+Key;
 
-	rotationBlocked = false;
-	//	boxWalls 		= false;
+	rotationBlocked 	= false;
 	boxWalls 		= true;
 	internalCompaction	=false;
-	
-	dampingForce = 0.2;
-	dampingMomentum = 0.2;
-	defaultDt = -1;
+	dampingForce 		= 0.2;
+	dampingMomentum 	= 0.2;
+	defaultDt 		= -1;
 	
 	timeStepUpdateInterval = 50;
 	timeStepOutputInterval = 50;
 	wallStiffnessUpdateInterval = 10;
-	radiusControlInterval = 10;
-	numberOfGrains = 400;
-	strainRate = 0.1;
-	maxWallVelocity=10;
-	StabilityCriterion = 0.01;
+	radiusControlInterval 	= 10;
+	numberOfGrains 		= 400;
+	strainRate 		= 0.1;
+	maxWallVelocity		=10;
+	StabilityCriterion 	= 0.01;
 	autoCompressionActivation = true;
-	autoUnload = true;
-	autoStopSimulation = false;
-	maxMultiplier = 1.01;
-	finalMaxMultiplier = 1.001;
-	
-	sphereYoungModulus  = 15000000.0;
-	spherePoissonRatio  = 0.5;	
-	sphereFrictionDeg = 18.0;
+	autoUnload 		= true;
+	autoStopSimulation 	= false;
+	maxMultiplier 		= 1.01;
+	finalMaxMultiplier 	= 1.001;	
+	sphereYoungModulus  	= 15000000.0;
+	sphereKsOnKn  	= 0.5;	
+	sphereFrictionDeg 	= 18.0;
 	compactionFrictionDeg   = sphereFrictionDeg;
 	density			= 2600;
 	
-	boxYoungModulus   = 15000000.0;
-	boxPoissonRatio  = 0.2;
-	boxFrictionDeg   = 0.f;
-	gravity 	= Vector3r(0,-9.81,0);
+	boxYoungModulus   	= 15000000.0;
+	boxKsOnKn  	= 0.2;
+	boxFrictionDeg   	= 0.f;
+	gravity 		= Vector3r(0,-9.81,0);
 	
 	sigmaIsoCompaction = 50000;
 	sigmaLateralConfinement=sigmaIsoCompaction;
-
 	wallOversizeFactor=1.3;
-
 	biaxial2dTest=false;
-
 	radiusStdDev=0.3;
 	radiusMean=-1; // no radius specified
-	
 	isotropicCompaction=false;
 	fixedPorosity = 1;
-	
 	fast=false;
 	noFiles=false;
 	facetWalls=false;
 	wallWalls=false;
-
-	
-	
-//	wall_top_id =0;
-// 	wall_bottom_id =0;
-// 	wall_left_id =0;
-// 	all_right_id =0;
-// 	wall_front_id =0;
-// 	wall_back_id =0;
 }
 
-
-TriaxialTest::~TriaxialTest ()
-{
-
-}
-
-
+TriaxialTest::~TriaxialTest () {}
 
 bool TriaxialTest::generate()
 {
-//	unsigned int startId=boost::numeric::bounds<unsigned int>::highest(), endId=0; // record forces from group 2
 	message="";
 	
 	if(biaxial2dTest && (8.0*(upperCorner[2]-lowerCorner[2]))>(upperCorner[0]-lowerCorner[0]))
@@ -199,7 +151,7 @@ bool TriaxialTest::generate()
 	/* if _mean_radius is not given (i.e. <=0), then calculate it from box size;
 	 * OTOH, if it is specified, scale the box preserving its ratio and lowerCorner so that the radius can be as requested
 	 */
-	Real porosity=.75;
+	Real porosity=.8;
 	SpherePack sphere_pack;
 	if(importFilename==""){
 		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
@@ -218,24 +170,18 @@ bool TriaxialTest::generate()
 		message+="Generated a sample with " + lexical_cast<string>(num) + " spheres inside box of dimensions: ("
 			+ lexical_cast<string>(upperCorner[0]-lowerCorner[0]) + "," 
 			+ lexical_cast<string>(upperCorner[1]-lowerCorner[1]) + "," 
-			+ lexical_cast<string>(upperCorner[2]-lowerCorner[2]) + ").";
-		
-	}
+			+ lexical_cast<string>(upperCorner[2]-lowerCorner[2]) + ").";}
 	else {
 		if(radiusMean>0) LOG_WARN("radiusMean ignored, since importFilename specified.");
 		sphere_pack.fromFile(importFilename);
-		sphere_pack.aabb(lowerCorner,upperCorner);
-	}
-
+		sphere_pack.aabb(lowerCorner,upperCorner);}
 	// setup rootBody here, since radiusMean is now at its true value (if it was negative)
 	rootBody = shared_ptr<Scene>(new Scene);
 	positionRootBody(rootBody);
 	createActors(rootBody);
 
-
 	if(thickness<0) thickness=radiusMean;
 	if(facetWalls || wallWalls) thickness=0;
-	
 	if(boxWalls)
 	{
 	// bottom box
@@ -254,18 +200,14 @@ bool TriaxialTest::generate()
 			triaxialcompressionEngine->wall_bottom_id = body->getId();
 			//triaxialStateRecorder->wall_bottom_id = body->getId();
 			}
-		//forcerec->id = body->getId();
-	
+		//forcerec->id = body->getId();	
 	// top box
-	 	center			= Vector3r(
-	 						(lowerCorner[0]+upperCorner[0])/2,
+	 	center			= Vector3r(	(lowerCorner[0]+upperCorner[0])/2,
 	 						upperCorner[1]+thickness/2.0,
 	 						(lowerCorner[2]+upperCorner[2])/2);
-	 	halfSize		= Vector3r(
-	 						wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
+	 	halfSize		= Vector3r(	wallOversizeFactor*fabs(lowerCorner[0]-upperCorner[0])/2+thickness,
 	 						thickness/2.0,
 	 						wallOversizeFactor*fabs(lowerCorner[2]-upperCorner[2])/2+thickness);
-	
 		createBox(body,center,halfSize,wall_top_wire);
 	 	if(wall_top) {
 			rootBody->bodies->insert(body);
@@ -273,7 +215,6 @@ bool TriaxialTest::generate()
 			//triaxialStateRecorder->wall_top_id = body->getId();
 			}
 	// box 1
-	
 	 	center			= Vector3r(
 	 						lowerCorner[0]-thickness/2.0,
 	 						(lowerCorner[1]+upperCorner[1])/2,
@@ -318,8 +259,7 @@ bool TriaxialTest::generate()
 			rootBody->bodies->insert(body);
 			triaxialcompressionEngine->wall_back_id = body->getId();
 			//triaxialStateRecorder->wall_back_id = body->getId();
-			}
-	
+			}	
 	// box 4
 	 	center			= Vector3r(
 	 						(lowerCorner[0]+upperCorner[0])/2,
@@ -335,9 +275,7 @@ bool TriaxialTest::generate()
 			triaxialcompressionEngine->wall_front_id = body->getId();
 			//triaxialStateRecorder->wall_front_id = body->getId();
 			}
-			 
 	}
-
 	size_t imax=sphere_pack.pack.size();
 	for(size_t i=0; i<imax; i++){
 		const SpherePack::Sph& sp(sphere_pack.pack[i]);
@@ -345,15 +283,13 @@ bool TriaxialTest::generate()
 		createSphere(body,sp.c,sp.r,false,true);
 		if(biaxial2dTest){ body->state->blockedDOFs=State::DOF_Z; }
 		rootBody->bodies->insert(body);
-	}	
-
+	}
 	if(defaultDt<0){
 		defaultDt=Shop::PWaveTimeStep(rootBody);
 		rootBody->dt=defaultDt;
 		globalStiffnessTimeStepper->defaultDt=defaultDt;
 		LOG_INFO("Computed default (PWave) timestep "<<defaultDt);
 	}
-
 	return true;
 }
 
@@ -366,43 +302,20 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-	
-	body->isDynamic			= dynamic;
-	
-	body->state->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
-	
+	q.FromAxisAngle( Vector3r(0,0,1),0);	
+	body->isDynamic			= dynamic;	
+	body->state->mass		= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	body->state->inertia		= Vector3r( 	2.0/5.0*body->state->mass*radius*radius,
 							2.0/5.0*body->state->mass*radius*radius,
 							2.0/5.0*body->state->mass*radius*radius);
 	body->state->pos=position;
-
 	shared_ptr<GranularMat> mat(new GranularMat);
 	mat->young			= sphereYoungModulus;
-	mat->poisson		= spherePoissonRatio;
+	mat->poisson		= sphereKsOnKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
-
-// 	if((!big) && (!dynamic) && (!boxWalls))
-// 	{
-// 		physics->young			= boxYoungModulus;
-// 		physics->poisson		= boxPoissonRatio;
-// 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
-// 	}
-	
 	aabb->diffuseColor		= Vector3r(0,1,0);
-
-	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<SphereModel> gSphere(new SphereModel);
-		gSphere->radius			= radius;
-		gSphere->diffuseColor		= spheresColor;
-		gSphere->wire			= false;
-		gSphere->shadowCaster		= true;
-		body->geometricalModel		= gSphere;
-	#endif
-	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
-
 	body->shape	= iSphere;
 	body->bound		= aabb;
 	body->material	= mat;
@@ -413,38 +326,16 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	body->isDynamic			= false;
-
-
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(1,0,0);
 	body->bound		= aabb;
-	
-	/* FIXME?? mass is not assigned (zero), is that OK?
-	body->state->inertia		= Vector3r(
-							  body->state->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
-							, body->state->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
-							, body->state->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
-						);
-	*/
 	body->state->pos=position;
-
 	shared_ptr<GranularMat> mat(new GranularMat);
 	mat->young			= sphereYoungModulus;
-	mat->poisson		= spherePoissonRatio;
+	mat->poisson		= sphereKsOnKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
 	body->material=mat;
-
-
 	if(!facetWalls && !wallWalls){
-		#ifdef YADE_GEOMETRICALMODEL
-			shared_ptr<BoxModel> gBox(new BoxModel);
-			gBox->extents			= extents;
-			gBox->diffuseColor		= Vector3r(1,1,1);
-			gBox->wire			= wire;
-			gBox->shadowCaster		= false;
-			body->geometricalModel		= gBox;
-		#endif
-
 		shared_ptr<Box> iBox(new Box);
 		iBox->extents			= extents;
 		iBox->wire			= wire;
@@ -513,10 +404,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
 	globalStiffnessTimeStepper->defaultDt = defaultDt;
 	
-	//shared_ptr<StiffnessCounter> stiffnesscounter(new StiffnessCounter);
-	//stiffnesscounter->sdecGroupMask = 2;
-	//stiffnesscounter->interval = timeStepUpdateInterval;
-	
 	// moving walls to regulate the stress applied + compress when the packing is dense an stable
 	//cerr << "triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);
@@ -538,20 +425,15 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialcompressionEngine->noFiles=noFiles;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
-	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;
-	
-	
+	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;	
 	// recording global stress
 	if(recordIntervalIter>0 && !noFiles){
 		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
 		triaxialStateRecorder-> file 		= WallStressRecordFile + Key;
 		triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
-		//triaxialStateRecorderer-> thickness 		= thickness;
 	}
-	
-
 	#if 0	
-	// moving walls to regulate the stress applied
+	// moving walls to regulate the stress applied, but no loading
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
 	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
@@ -561,9 +443,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialstressController->wall_bottom_activated = false;
 	triaxialstressController->wall_top_activated = false;	
 		//cerr << "fin de sezction triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
-	#endif
-	
-	
+	#endif	
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(boundDispatcher);
@@ -591,84 +471,23 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 		elasticContactLaw->sdecGroupMask = 2;
 		rootBody->engines.push_back(elasticContactLaw);
 	}
-	
-	//rootBody->engines.push_back(stiffnesscounter);
-	//rootBody->engines.push_back(stiffnessMatrixTimeStepper);
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	if(recordIntervalIter>0 && !noFiles) rootBody->engines.push_back(triaxialStateRecorder);
-	//rootBody->engines.push_back(gravityCondition);
 	
 	shared_ptr<NewtonIntegrator> newton(new NewtonIntegrator);
 	newton->damping=dampingMomentum;
 	rootBody->engines.push_back(newton);
-	
 	//if (0) rootBody->engines.push_back(shared_ptr<Engine>(new MicroMacroAnalyser));
-	
-	//if(!rotationBlocked)
-	//	rootBody->engines.push_back(orientationIntegrator);
-	//rootBody->engines.push_back(triaxialstressController);
-	
-		
 	if (saveAnimationSnapshots) {
 		shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
 		positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
-		rootBody->engines.push_back(positionOrientationRecorder);
-	}
-	
+		rootBody->engines.push_back(positionOrientationRecorder);}	
 	rootBody->initializers.clear();
-	rootBody->initializers.push_back(boundDispatcher);
-	
+	rootBody->initializers.push_back(boundDispatcher);	
 }
-
 
 void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 }
-// 0xdeadc0de, superseded by SpherePack::makeCloud
-#if 0
-string TriaxialTest::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real mean_radius, Real porosity)
-{
-	typedef boost::minstd_rand StdGenerator;
-	static StdGenerator generator;
-	static boost::variate_generator<StdGenerator&, boost::uniform_real<> >
-			random1(generator, boost::uniform_real<>(0,1));
-        //         static boost::variate_generator<StdGenerator&, boost::normal_distribution<> >
-        //         randomN(generator, boost::normal_distribution<>(aggregateMeanRadius,aggregateSigmaRadius));
-
-	sphere_list.clear();
-	long tries = 1000; //nb of tries for positionning the next sphere
-	Vector3r dimensions = upperCorner - lowerCorner;
-
-	LOG_INFO("Generating "<<number<<" aggregates ...");
-	
-	long t, i;
-	for (i=0; i<number; ++i) {
-		BasicSphere s;
-		for (t=0; t<tries; ++t) {
-			s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
-			s.first.X() = lowerCorner.X()+s.second+(dimensions.X()-2*s.second)*random1();
-			s.first.Y() = lowerCorner.Y()+s.second+(dimensions.Y()-2*s.second)*random1();
-			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*random1();
-			bool overlap=false;
-			for (long j=0; (j<i && !overlap); j++)
-				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).SquaredLength()) overlap=true;
-			if (!overlap)
-			{
-				sphere_list.push_back(s);
-				break;
-			}			
-		}
-		if (t==tries) return "More than " + lexical_cast<string>(tries) +
-					" tries while generating sphere number " +
-					lexical_cast<string>(i+1) + "/" + lexical_cast<string>(number) + ".";
-	}
-	return "Generated a sample with " + lexical_cast<string>(number) + " spheres inside box of dimensions: (" 
-			+ lexical_cast<string>(dimensions[0]) + "," 
-			+ lexical_cast<string>(dimensions[1]) + "," 
-			+ lexical_cast<string>(dimensions[2]) + ").";
-}
-#endif
-
-
 YADE_PLUGIN((TriaxialTest));

@@ -53,13 +53,13 @@ class TriaxialTestWater : public FileGenerator
 
 		Real		 thickness
 				,sphereYoungModulus
-				,spherePoissonRatio
+				,sphereKsOnKn
 				,sphereFrictionDeg
 				//! If a different value of friction is to be used during the compaction phase
 				,compactionFrictionDeg
 				,Rdispersion
 				,boxYoungModulus
-				,boxPoissonRatio
+				,boxKsOnKn
 				,boxFrictionDeg
 				,density
 				,dampingForce
@@ -150,11 +150,11 @@ class TriaxialTestWater : public FileGenerator
 		(finalMaxMultiplier)
 
 		(sphereYoungModulus)
-		(spherePoissonRatio)
+		(sphereKsOnKn)
 		(sphereFrictionDeg)
 		(compactionFrictionDeg)
 		(boxYoungModulus)
-		(boxPoissonRatio)
+		(boxKsOnKn)
 		(boxFrictionDeg)
 
 		(density)

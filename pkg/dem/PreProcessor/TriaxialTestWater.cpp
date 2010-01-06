@@ -124,13 +124,13 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	finalMaxMultiplier = 1.001;
 	
 	sphereYoungModulus  = 5000000.0;
-	spherePoissonRatio  = 0.5;	
+	sphereKsOnKn  = 0.5;	
 	sphereFrictionDeg = 30.0;
 	compactionFrictionDeg   = sphereFrictionDeg;
 	density			= 2600;
 	
 	boxYoungModulus   = 5000000.0;
-	boxPoissonRatio  = 0.2;
+	boxKsOnKn  = 0.2;
 	boxFrictionDeg   = 0.f;
 	gravity 	= Vector3r(0,-9.81,0);
 	
@@ -327,13 +327,13 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
    2.0/5.0*body->state->mass*radius*radius);
 	body->state->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
-	physics->poisson		= spherePoissonRatio;
+	physics->poisson		= sphereKsOnKn;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	if((!dynamic) && (!boxWalls))
 	{
 		physics->young			= boxYoungModulus;
-		physics->poisson		= boxPoissonRatio;
+		physics->poisson		= boxKsOnKn;
 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 	}
 	
@@ -386,7 +386,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	body->state->se3			= Se3r(position,q);
 
 	physics->young			= boxYoungModulus;
-	physics->poisson		= boxPoissonRatio;
+	physics->poisson		= boxKsOnKn;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);

@@ -53,12 +53,12 @@ class TriaxialTest : public FileGenerator
 
 		Real		 thickness
 				,sphereYoungModulus
-				,spherePoissonRatio
+				,sphereKsOnKn
 				,sphereFrictionDeg
 				//! If a different value of friction is to be used during the compaction phase
 				,compactionFrictionDeg
 				,boxYoungModulus
-				,boxPoissonRatio
+				,boxKsOnKn
 				,boxFrictionDeg
 				,density
 				,dampingForce
@@ -93,8 +93,7 @@ class TriaxialTest : public FileGenerator
 				//! see docs for TriaxialCompressionEngine and TriaxialCompressionEngine::autoUnload
 				,autoUnload
 				//! stop the simulation or run it forever (i.e. until the user stops it)
-				,autoStopSimulation
-			
+				,autoStopSimulation			
 				,rotationBlocked
 				,spheresRandomColor
 				,boxWalls
@@ -111,7 +110,6 @@ class TriaxialTest : public FileGenerator
 				// use Walls instead of Boxes for the walls
 				,wallWalls
 				;
-
 				//! Generate faster simulation: use InsertionSortCollider and InteractionDispatchers
 				bool fast;
 
@@ -146,12 +144,6 @@ class TriaxialTest : public FileGenerator
 		void positionRootBody(shared_ptr<Scene>& rootBody);
 
 		typedef pair<Vector3r, Real> BasicSphere;
-	//	0xdeadc0de
-	#if 0
-		//! generate a list of non-overlapping spheres
-		string GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r lowerCorner, Vector3r upperCorner, long number, Real rad_std_dev, Real mean_radius, Real porosity);
-	#endif
-
 	
 	public : 
 		TriaxialTest ();
@@ -172,15 +164,13 @@ class TriaxialTest : public FileGenerator
 		(finalMaxMultiplier)
 		(radiusStdDev)
 		(radiusMean)
-
 		(sphereYoungModulus)
-		(spherePoissonRatio)
+		(sphereKsOnKn)
 		(sphereFrictionDeg)
 		(compactionFrictionDeg)
 		(boxYoungModulus)
-		(boxPoissonRatio)
+		(boxKsOnKn)
 		(boxFrictionDeg)
-
 		(density)
 		(defaultDt)
 		(dampingForce)
