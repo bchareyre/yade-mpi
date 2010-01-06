@@ -51,7 +51,7 @@ public:
 	void fromSimulation();
 
 	// random generation; if num<0, insert as many spheres as possible; if porosity>0 recompute meanRadius (porosity<0.4 recommended) to try and generate "num" spheres in the box.
-	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, int num, bool periodic=false, Real porosity=-1);
+	long makeCloud(Vector3r min, Vector3r max, Real rMean, Real rFuzz, int num=-1, bool periodic=false, Real porosity=-1);
 
 	// periodic repetition
 	void cellRepeat(Vector3<int> count);
