@@ -338,3 +338,9 @@ proprietary programs.  If your program is a subroutine library, you may
 consider it more useful to permit linking proprietary applications with the
 library.  If this is what you want to do, use the GNU Library General
 Public License instead of this License.
+
+13. As a special exception, you have permission to link this program
+with the CGAL library and distribute executables, as long as you
+follow the requirements of the GNU GPL in regard to all of the
+software in the executable aside from CGAL.
+
