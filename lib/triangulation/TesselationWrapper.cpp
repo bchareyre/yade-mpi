@@ -131,33 +131,25 @@ bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned
 		else {
 		cerr << "Tes->move(x,y,z,rad,id)==NULL" << endl; return false;}
 }
-//  void TesselationWrapper::ComputeTesselation( void )
-
-//  	AddBoundingPlanes();
 
 
- void TesselationWrapper::ComputeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
+void TesselationWrapper::ComputeTesselation( void )
 {
-
 	if (!rad_divided) {
 		mean_radius /= n_spheres;
 		rad_divided = true;}
-		
- 	AddBoundingPlanes( pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
-	
 	Tes->Compute();	
-
- 
+}
+ void TesselationWrapper::ComputeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
+{	
+ 	AddBoundingPlanes( pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
+	ComputeTesselation();
 }
 
-//  void TesselationWrapper::ComputeVolumes(void)
- void TesselationWrapper::ComputeVolumes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
+void TesselationWrapper::ComputeVolumes(void)
 {
-//  	ComputeTesselation();
-	ComputeTesselation(pminx,pmaxx,pminy, pmaxy, pminz, pmaxz, dt);
-// 	//cout << "tesselated" << endl;
+  	ComputeTesselation();
 	Tes->ComputeVolumes();
-
 }
 
 unsigned int TesselationWrapper::NumberOfFacets(void)

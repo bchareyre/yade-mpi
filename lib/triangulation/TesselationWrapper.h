@@ -55,8 +55,7 @@ public:
 	
 	///Compute Voronoi vertices + volumes of all cells
 	///use ComputeTesselation to force update, e.g. after spheres positions have been updated
-//  	void	ComputeVolumes	(void);
- 	void	ComputeVolumes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt);
+  	void	ComputeVolumes	(void);
 	double	Volume	(unsigned int id);
 	
 	unsigned int NumberOfFacets(void);

@@ -55,14 +55,10 @@ int main ( int argc, char *argv[ ], char *envp[ ] )
 
 	cout << T1.insert(0.5000, 0.7929, 0.5000, 0.2071,17) << endl;
 	
-//  	T1.ComputeVolumes();
-
-	T1.ComputeVolumes(0, 1.0, 0, 1.0, 0, 1.0, 0.00001);
-
-	
+	T1.AddBoundingPlanes();
+  	T1.ComputeVolumes();
+		
 	cout << "sphere icicicicici     =    " << T1.NumberOfFacets() << endl ;
-
-
 	
 	for (int i =1; i<15; ++i) {
 	cout << "sphere " << i << " v=" << T1.Volume(i) << endl;
