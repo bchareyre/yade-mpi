@@ -53,12 +53,12 @@ class TriaxialTest : public FileGenerator
 
 		Real		 thickness
 				,sphereYoungModulus
-				,sphereKsOnKn
+				,sphereKsDivKn
 				,sphereFrictionDeg
 				//! If a different value of friction is to be used during the compaction phase
 				,compactionFrictionDeg
 				,boxYoungModulus
-				,boxKsOnKn
+				,boxKsDivKn
 				,boxFrictionDeg
 				,density
 				,dampingForce
@@ -165,11 +165,11 @@ class TriaxialTest : public FileGenerator
 		(radiusStdDev)
 		(radiusMean)
 		(sphereYoungModulus)
-		(sphereKsOnKn)
+		(sphereKsDivKn)
 		(sphereFrictionDeg)
 		(compactionFrictionDeg)
 		(boxYoungModulus)
-		(boxKsOnKn)
+		(boxKsDivKn)
 		(boxFrictionDeg)
 		(density)
 		(defaultDt)

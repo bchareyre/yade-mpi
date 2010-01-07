@@ -121,7 +121,7 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	finalMaxMultiplier = 1.0001;
 	
 	sphereYoungModulus  = 15000000.0;
-	sphereKsOnKn  = 0.5;
+	sphereKsDivKn  = 0.5;
 	sphereFrictionDeg   = 18.0;
 	normalCohesion = 0;
 	shearCohesion = 0;
@@ -129,7 +129,7 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	density			= 2600;
 	
 	boxYoungModulus   = 15000000.0;
-	boxKsOnKn  = 0.2;
+	boxKsDivKn  = 0.2;
 	boxFrictionDeg   = 0.f;
 	gravity 	= Vector3r(0,-9.81,0);
 	
@@ -310,13 +310,13 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
    							2.0/5.0*body->state->mass*radius*radius);
 	body->state->se3			= Se3r(position,q);
 	physics->young			= sphereYoungModulus;
-	physics->poisson		= sphereKsOnKn;
+	physics->poisson		= sphereKsDivKn;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
 
 	if((!dynamic) && (!boxWalls))
 	{
 		physics->young			= boxYoungModulus;
-		physics->poisson		= boxKsOnKn;
+		physics->poisson		= boxKsDivKn;
 		physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 	}
 	
@@ -367,7 +367,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 	body->state->se3			= Se3r(position,q);
 
 	physics->young			= boxYoungModulus;
-	physics->poisson		= boxKsOnKn;
+	physics->poisson		= boxKsDivKn;
 	physics->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);

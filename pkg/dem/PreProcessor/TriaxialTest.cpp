@@ -105,13 +105,13 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	maxMultiplier 		= 1.01;
 	finalMaxMultiplier 	= 1.001;	
 	sphereYoungModulus  	= 15000000.0;
-	sphereKsOnKn  	= 0.5;	
+	sphereKsDivKn  	= 0.5;	
 	sphereFrictionDeg 	= 18.0;
 	compactionFrictionDeg   = sphereFrictionDeg;
 	density			= 2600;
 	
 	boxYoungModulus   	= 15000000.0;
-	boxKsOnKn  	= 0.2;
+	boxKsDivKn  	= 0.2;
 	boxFrictionDeg   	= 0.f;
 	gravity 		= Vector3r(0,-9.81,0);
 	
@@ -311,7 +311,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	body->state->pos=position;
 	shared_ptr<GranularMat> mat(new GranularMat);
 	mat->young			= sphereYoungModulus;
-	mat->poisson		= sphereKsOnKn;
+	mat->poisson		= sphereKsDivKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	iSphere->radius			= radius;
@@ -332,7 +332,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	body->state->pos=position;
 	shared_ptr<GranularMat> mat(new GranularMat);
 	mat->young			= sphereYoungModulus;
-	mat->poisson		= sphereKsOnKn;
+	mat->poisson		= sphereKsDivKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
 	body->material=mat;
 	if(!facetWalls && !wallWalls){

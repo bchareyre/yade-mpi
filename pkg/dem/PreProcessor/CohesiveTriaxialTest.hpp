@@ -35,12 +35,12 @@ class CohesiveTriaxialTest : public FileGenerator
 
 		Real		 thickness
 				,sphereYoungModulus
-				,sphereKsOnKn
+				,sphereKsDivKn
 				,sphereFrictionDeg
 				,normalCohesion
 				,shearCohesion
 				,boxYoungModulus
-				,boxKsOnKn
+				,boxKsDivKn
 				,boxFrictionDeg
 				,density
 				,dampingForce
@@ -133,14 +133,14 @@ class CohesiveTriaxialTest : public FileGenerator
 		(finalMaxMultiplier)
 
 		(sphereYoungModulus)
-		(sphereKsOnKn)
+		(sphereKsDivKn)
 		(sphereFrictionDeg)
 		(normalCohesion)
 		(shearCohesion)
 		(setCohesionOnNewContacts)
 
 		(boxYoungModulus)
-		(boxKsOnKn)
+		(boxKsDivKn)
 		(boxFrictionDeg)
 
 		(density)
