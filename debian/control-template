@@ -2,13 +2,13 @@ Source: yade@_VERSION@
 Section: x11
 Priority: optional
 Maintainer: Vaclav Smilauer <eudoxos@arcig.cz>
-Build-Depends: debhelper (>= 5), scons, libqt3-mt-dev, qt3-dev-tools, freeglut3-dev, libboost-dev (>=1.34), libboost-date-time-dev (>=1.34), libboost-filesystem-dev (>=1.34), libboost-thread-dev (>=1.34), libboost-regex-dev (>=1.34), libboost-python-dev (>=1.34), libboost-iostreams-dev (>=1.34), libboost-program-options-dev, libboost-serialization-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libsqlite3-dev, libgts-dev, python-numpy, g++(>4.0), libvtk5-dev
+Build-Depends: debhelper (>= 5), scons, libqt3-mt-dev, qt3-dev-tools, freeglut3-dev, libboost-dev (>=1.34), libboost-date-time-dev (>=1.34), libboost-filesystem-dev (>=1.34), libboost-thread-dev (>=1.34), libboost-regex-dev (>=1.34), libboost-python-dev (>=1.34), libboost-iostreams-dev (>=1.34), libboost-program-options-dev, libboost-serialization-dev, liblog4cxx9-dev | liblog4cxx10-dev, docbook-to-man, ipython, libsqlite3-dev, libgts-dev, libgts-bin, python-numpy, g++(>4.0), libvtk5-dev
 Standards-Version: 3.7.2
 
 Package: yade@_VERSION@
 Architecture: any
 Provides: yade@SNAPSHOT@
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, python-matplotlib, libgts-bin
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .
@@ -17,7 +17,7 @@ Description: Platform for dynamical modeling.
 Package: yade@_VERSION@-dbg
 Architecture: any
 Provides: yade@SNAPSHOT@-dbg
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, gdb, python-matplotlib
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy, ipython, gdb, python-matplotlib, libgts-bin
 Description: Platform for dynamical modeling.
  Yet Another Dynamic Engine. etc.
  .

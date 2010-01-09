@@ -13,11 +13,15 @@ DISTRIBUTION=$1; [ -n "$DISTRIBUTION" ] || DISTRIBUTION="unstable"
 ## VERSION (from RELEASE or svn or bzr)
 if [ -f RELEASE ]; then	VERSION=`cat RELEASE`; SNAPSHOT=""
 elif [ -d .svn ]; then VERSION="svn$( svn info | egrep '^Revision:' | cut -f2 -d' ')"; SNAPSHOT="-snapshot"
-elif [ -d .bzr ]; then VERSION="bzr$( bzr version-info | egrep '^revno:' | cut -f2 -d' ')"; SNAPSHOT="-snapshot"
+elif [ -d .bzr ]; then VERSION="bzr$( bzr revno )"; SNAPSHOT="-snapshot"
 else echo 'Revision could not be determined (RELEASE or .svn or .bzr)' >2; exit 1;
 fi
 _VERSION="-$VERSION"; echo $VERSION > VERSION
-cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g" debian/control; perl -pi -e"s/\@_VERSION\@/$_VERSION/g" debian/control; perl -pi -e"s/\@SNAPSHOT\@/$SNAPSHOT/g" debian/control
+cp debian/yade.postinst-template debian/yade$_VERSION.postinst
+cp debian/yade-dbg.postinst-template debian/yade$_VERSION-dbg.postinst
+cp debian/yade.prerm-template debian/yade$_VERSION.prerm
+cp debian/yade-dbg.prerm-template debian/yade$_VERSION-dbg.prerm
+cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g; s/\@_VERSION\@/$_VERSION/g; s/\@SNAPSHOT\@/$SNAPSHOT/g" debian/control debian/yade$_VERSION.postinst debian/yade$_VERSION-dbg.postinst debian/yade$_VERSION.prerm debian/yade$_VERSION-dbg.prerm;
 
 ## debian/changelog
 DEBDATE=`date -R`
