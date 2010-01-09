@@ -1,12 +1,14 @@
 
 def getRealVersion():
-	"Attempts to get yade version from RELEASE file if it exists or from bzr or svn."
+	"Attempts to get yade version from RELEASE file if it exists or from bzr/svn, or from VERSION"
 	import os.path,re,os
 	if os.path.exists('RELEASE'):
 		return file('RELEASE').readline().strip()
 	if os.path.exists('.bzr'):
 		for l in os.popen("LC_ALL=C bzr revno 2>/dev/null").readlines():
 			return 'bzr'+l[:-1]
+	if os.path.exists('VERSION'):
+		return file('VERSION').readline().strip()
 	return None
 
 
@@ -118,8 +120,8 @@ def getPluginObj(plug,linkStrategy):
 	"""Return name of library this plugin will be compiled into, based on current linkStrategy."""
 	if   linkStrategy=='per-class': return plug.name
 	elif linkStrategy=='per-pkg': return plug.module
-	elif linkStrategy=='monolithic': return 'packages'
-	elif linkStrategy=='static': return 'packages'
+	elif linkStrategy=='monolithic': return 'plugins'
+	elif linkStrategy=='static': return 'plugins'
 
 def getPluginLibs(p,plugInfo):
 	"""Returns library names this plugin should link to, based on current information about other plugins."""

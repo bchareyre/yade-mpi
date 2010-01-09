@@ -12,11 +12,11 @@ from os.path import *
 bin=abspath(sys.argv[1])
 print bin,dirname(bin)
 prefix=normpath(dirname(bin)+'/..')
-cmd='LD_PRELOAD= YADE_PREFIX='+prefix+' '+' '.join(sys.argv[1:])
+cmd='DISPLAY= LD_PRELOAD= YADE_PREFIX='+prefix+' '+' '.join(sys.argv[1:])
 print cmd
 p=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
 pout=p.communicate()[0]
 retval=p.wait()
 print pout
-if retval==0 or 'terminating...' in pout: sys.exit(0)
+if retval==0 or 'Yade: normal exit.' in pout: sys.exit(0)
 sys.exit(retval)

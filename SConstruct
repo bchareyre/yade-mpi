@@ -130,7 +130,7 @@ def colonSplit(x): return x.split(':')
 opts.AddVariables(
 	### OLD: use PathOption with PathOption.PathIsDirCreate, but that doesn't exist in 0.96.1!
 	('PREFIX','Install path prefix','/usr/local'),
-	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.','$PREFIX'),
+	('runtimePREFIX','Runtime path prefix; DO NOT USE, inteded for packaging only.',None),
 	('variant','Build variant, will be suffixed to all files, along with version (beware: if PREFIX is the same, headers of the older version will still be overwritten',defOptions['variant'],None,lambda x:x),
 	BoolVariable('debug', 'Enable debugging information and disable optimizations',defOptions['debug']),
 	BoolVariable('gprof','Enable profiling information for gprof',0),
@@ -161,16 +161,9 @@ opts.AddVariables(
 	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
 opts.Update(env)
-
-# deprecated feature, is mandatory now. This removes it from the saved profile
-# so that when we remove it from features definitely, the profile will be OK.
-if 'python' in env['features']: env['features'].remove('python')
-# pretty is deprecated; save value to brief and reset pretty to the default (True) so that it is not saved in the profile
-# otherwise once it is removed completely, scons would crash at unknown var in there.
-if env['pretty'] not in (True,1,'y','yes','true','t','all'):
-	env['brief']=env['pretty']; env['pretty']=True
-
 opts.Save(optsFile,env)
+# fix expansion in python substitution by assigning the right value if not specified
+if not env.has_key('runtimePREFIX') or not env['runtimePREFIX']: env['runtimePREFIX']=env['PREFIX']
 # handle colon-separated lists:
 for k in ('CPPPATH','LIBPATH','QTDIR','PATH'):
 	if env.has_key(k):
@@ -357,14 +350,6 @@ if not env.GetOption('clean'):
 		if note: print "Note:",note
 		Exit(1)
 	# check "optional" libs
-	if 'vtk' in env['features']:
-		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
-		env.Append(LIBS='vtkHybrid')
-		if not ok: featureNotOK('vtk',note="You might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
-	if 'gts' in env['features']:
-		env.ParseConfig('pkg-config glib-2.0 --cflags --libs');
-		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)
-		if not ok: featureNotOK('gts')
 	if 'opengl' in env['features']:
 		ok=conf.CheckLibWithHeader('glut','GL/glut.h','c++','glutGetModifiers();',autoadd=1)
 		# TODO ok=True for darwin platform where openGL (and glut) is native
@@ -373,6 +358,14 @@ if not env.GetOption('clean'):
 		if not ok: featureNotOK('opengl','Building with OpenGL implies qt3 interface, which was not found, although OpenGL was.')
 		env.Tool('qt'); env.Replace(QT_LIB='qt-mt')
 		env['QGLVIEWER_LIB']='yade-QGLViewer';
+	if 'vtk' in env['features']:
+		ok=conf.CheckLibWithHeader(['vtkCommon'],'vtkInstantiator.h','c++','vtkInstantiator::New();',autoadd=1)
+		env.Append(LIBS='vtkHybrid')
+		if not ok: featureNotOK('vtk',note="You might have to add VTK header directory (e.g. /usr/include/vtk-5.4) to CPPPATH.")
+	if 'gts' in env['features']:
+		env.ParseConfig('pkg-config gts --cflags --libs');
+		ok=conf.CheckLibWithHeader('gts','gts.h','c++','gts_object_class();',autoadd=1)
+		if not ok: featureNotOK('gts')
 	if 'log4cxx' in env['features']:
 		ok=conf.CheckLibWithHeader('log4cxx','log4cxx/logger.h','c++','log4cxx::Logger::getLogger("");',autoadd=1)
 		if not ok: featureNotOK('log4cxx')

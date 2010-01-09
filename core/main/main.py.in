@@ -4,7 +4,7 @@
 
 import sys,os,os.path
 # get yade path (allow YADE_PREFIX to override)
-prefix,suffix='${PREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
 # duplicate some items from yade.config here, so that we can increase verbosity when the c++ part is booting
 debug,features,version=bool(${debug}),'${features}'.split(','),'${realVersion}'

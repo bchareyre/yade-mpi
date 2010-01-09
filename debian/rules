@@ -44,7 +44,8 @@ clean:
 	## eudoxos: FIXME: scons skips config when cleaning and doesn't know where it built anything
 	dh_testdir
 	# scons clean
-	rm -rf debian/build-* debian/yade-*
+	## remove builddirs and installation directories
+	rm -rf debian/build-* `find debian/ -name 'yade-*' -type d`
 	rm -rf scons.profile* scons.current-profile
 	dh_clean 
 
@@ -67,8 +68,8 @@ install: build
 check: install
 	dh_testdir
 	dh_testroot
-	scripts/yade-exec-wrapper debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg -x -N PythonUI -- -n -x scripts/regression-tests.py
-	scripts/yade-exec-wrapper debian/yade${_VERSION}/usr/bin/yade${_VERSION} -x -N PythonUI -- -n -x scripts/regression-tests.py
+	scripts/yade-exec-wrapper debian/yade${_VERSION}-dbg/usr/bin/yade${_VERSION}-dbg -x scripts/regression-tests.py
+	scripts/yade-exec-wrapper debian/yade${_VERSION}/usr/bin/yade${_VERSION} -x scripts/regression-tests.py
 
 # Build architecture-independent files here.
 binary-indep: build install

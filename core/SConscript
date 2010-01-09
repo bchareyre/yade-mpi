@@ -45,8 +45,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'TimeStepper.cpp',
 			'containers/BodyVector.cpp',
 			'containers/InteractionVecMap.cpp',
-
-			
+			'corePlugins.cpp'			
 			]
 			+(['PhysicalParameters.cpp'] if 'physpar' in env['features'] else [])
 			),

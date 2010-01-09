@@ -3,8 +3,8 @@ Compile-time configuration for yade.
 
 Template file is processed by scons to create the actual configuration at build-time.
 """
-
-prefix='${PREFIX}'
+import os
+prefix='${runtimePREFIX}' 
 suffix='${SUFFIX}'
 libstdcxx='${libstdcxx}'
 features='${features}'.split(',')
