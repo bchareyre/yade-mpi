@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include <yade/pkg-dem/StaticSpheresAttractionEngine.hpp>
-#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+#include <yade/pkg-dem/FrictPhys.hpp>
 #include <yade/pkg-common/Sphere.hpp>
 #include <yade/core/Scene.hpp>
 
@@ -21,8 +21,8 @@ Real StaticSpheresAttractionEngine::getMaxDisplacement(Scene* ncb)
 	for( ; in!=in_end ; ++in )
 		if(	   doesItApplyToThisBody((*(ncb->bodies))[ (*in)->getId1() ].get()) 
 			&& doesItApplyToThisBody((*(ncb->bodies))[ (*in)->getId2() ].get()))
-		{ // FIXME - it should work with more than ElasticContactInteraction
-			ElasticContactInteraction* el = dynamic_cast<ElasticContactInteraction*>((*in)->interactionPhysics.get());
+		{ // FIXME - it should work with more than FrictPhys
+			FrictPhys* el = dynamic_cast<FrictPhys*>((*in)->interactionPhysics.get());
 			if(el)
 				penetration = std::max(el->normalForce.Length() / el->initialKn , penetration);
 		}

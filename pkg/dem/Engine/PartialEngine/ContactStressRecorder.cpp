@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "ContactStressRecorder.hpp"
-#include <yade/pkg-common/ElasticMat.hpp>
+#include <yade/pkg-common/ElastMat.hpp>
 //#include <yade/pkg-common/ParticleParameters.hpp>
 //#include <yade/pkg-common/Force.hpp>
 #include <yade/pkg-common/Sphere.hpp>
@@ -15,7 +15,7 @@
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 
 #include <yade/pkg-dem/ScGeom.hpp>
-#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+#include <yade/pkg-dem/FrictPhys.hpp>
 
 #include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
@@ -106,8 +106,8 @@ void ContactStressRecorder::action ( Scene * ncb )
 			ScGeom* currentContactGeometry  =
 				static_cast<ScGeom*> ( interaction->interactionGeometry.get() );
 
-			ElasticContactInteraction* currentContactPhysics =
-				static_cast<ElasticContactInteraction*> ( interaction->interactionPhysics.get() );
+			FrictPhys* currentContactPhysics =
+				static_cast<FrictPhys*> ( interaction->interactionPhysics.get() );
 
 			Real fn = currentContactPhysics->normalForce.Length();
 

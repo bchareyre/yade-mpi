@@ -10,16 +10,16 @@
 
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 
-class SimpleElasticRelationships : public InteractionPhysicsFunctor
+class Ip2_FrictMat_FrictMat_FrictPhys : public InteractionPhysicsFunctor
 {
 	public :
 		virtual void go(	const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	FUNCTOR2D(GranularMat,GranularMat);
-	REGISTER_CLASS_AND_BASE(SimpleElasticRelationships,InteractionPhysicsFunctor);
+	FUNCTOR2D(FrictMat,FrictMat);
+	REGISTER_CLASS_AND_BASE(Ip2_FrictMat_FrictMat_FrictPhys,InteractionPhysicsFunctor);
 	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/*nothing here*/);
 };
-REGISTER_SERIALIZABLE(SimpleElasticRelationships);
+REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_FrictPhys);
 
 

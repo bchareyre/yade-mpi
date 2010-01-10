@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"GLDrawNormalInteraction.hpp"
-#include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
@@ -19,7 +19,7 @@ void GLDrawNormalInteraction::go(
 		const shared_ptr<Body>& b2,
 		bool wireFrame)
 {
-	NormalInteraction* p = static_cast<NormalInteraction*>(ip.get());
+	NormPhys* p = static_cast<NormPhys*>(ip.get());
 //	FIXME: so there must be a way for *not* storing the color inside those classes like BodyBoundingVolume and BodyState
 //	       and simultaneously easy to set up the colors from the GUI according to some usful criterions:
 //	          - to which group it belongs

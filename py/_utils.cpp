@@ -7,7 +7,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/pkg-common/Facet.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/lib-computational-geometry/Hull2d.hpp>
 #include<cmath>
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
@@ -87,8 +87,8 @@ Real elasticEnergyInAABB(python::tuple Aabb){
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
 		if(!i->interactionPhysics) continue;
-		shared_ptr<NormalShearInteraction> bc=dynamic_pointer_cast<NormalShearInteraction>(i->interactionPhysics); if(!bc) continue;
-		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!bc){LOG_ERROR("NormalShearInteraction contact doesn't have SpheresContactGeomety associated?!"); continue;}
+		shared_ptr<NormShearPhys> bc=dynamic_pointer_cast<NormShearPhys>(i->interactionPhysics); if(!bc) continue;
+		shared_ptr<Dem3DofGeom> geom=dynamic_pointer_cast<Dem3DofGeom>(i->interactionGeometry); if(!bc){LOG_ERROR("NormShearPhys contact doesn't have SpheresContactGeomety associated?!"); continue;}
 		const shared_ptr<Body>& b1=Body::byId(i->getId1(),rb), b2=Body::byId(i->getId2(),rb);
 		bool isIn1=isInBB(b1->state->pos,bbMin,bbMax), isIn2=isInBB(b2->state->pos,bbMin,bbMax);
 		if(!isIn1 && !isIn2) continue;
@@ -368,7 +368,7 @@ Real approxSectionArea(Real coord, int axis){
 	vector<Vector2r> hull=ch2d();
 	return simplePolygonArea2d(hull);
 }
-/* Find all interactions deriving from NormalShearInteraction that cross plane given by a point and normal
+/* Find all interactions deriving from NormShearPhys that cross plane given by a point and normal
 	(the normal may not be normalized in this case, though) and sum forces (both normal and shear) on them.
 	
 	Return a 3-tuple with the components along global x,y,z axes.
@@ -380,7 +380,7 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 	Scene* rootBody=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Interaction>&I, *rootBody->interactions){
 		if(!I->isReal()) continue;
-		NormalShearInteraction* nsi=dynamic_cast<NormalShearInteraction*>(I->interactionPhysics.get());
+		NormShearPhys* nsi=dynamic_cast<NormShearPhys*>(I->interactionPhysics.get());
 		if(!nsi) continue;
 		Vector3r pos1,pos2;
 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(I->interactionGeometry.get()); // Dem3DofGeom has copy of se3 in itself, otherwise we have to look up the bodies

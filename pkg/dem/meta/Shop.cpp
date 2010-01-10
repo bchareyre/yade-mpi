@@ -20,14 +20,14 @@
 
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 
 #include<yade/pkg-common/Bo1_Sphere_Aabb.hpp>
 #include<yade/pkg-common/Bo1_Box_Aabb.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
-#include<yade/pkg-dem/SimpleElasticRelationships.hpp>
+#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 //#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
 /*class Bo1_Sphere_Aabb;
@@ -47,7 +47,7 @@ class SceneShape; */
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
 
 #include<yade/pkg-dem/Tetra.hpp>
@@ -153,14 +153,14 @@ void Shop::applyForceAtContactPoint(const Vector3r& force, const Vector3r& contP
 Designed for being used with periodic cell, where diving the resulting components by
 areas of the cell will give average stress in that direction.
 
-Requires all .isReal() interaction to have interactionPhysics deriving from NormalShearInteraction.
+Requires all .isReal() interaction to have interactionPhysics deriving from NormShearPhys.
 */
 Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
 	Vector3r force(Vector3r::ZERO); Real stiff=0; long n=0;
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
-		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
+		NormShearPhys* nsi=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
 		force+=Vector3r(abs(nsi->normalForce[0]+nsi->shearForce[0]),abs(nsi->normalForce[1]+nsi->shearForce[1]),abs(nsi->normalForce[2]+nsi->shearForce[2]));
 		stiff+=(1/3.)*nsi->kn+(2/3.)*nsi->ks; // count kn in one direction and ks in the other two
 		n++;
@@ -183,7 +183,7 @@ Real Shop::unbalancedForce(bool useMaxForce, Scene* _rb){
 	Real maxContactF=0;
 	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
 		if(!I->isReal()) continue;
-		shared_ptr<NormalShearInteraction> nsi=YADE_PTR_CAST<NormalShearInteraction>(I->interactionPhysics); assert(nsi);
+		shared_ptr<NormShearPhys> nsi=YADE_PTR_CAST<NormShearPhys>(I->interactionPhysics); assert(nsi);
 		maxContactF=max(maxContactF,(nsi->normalForce+nsi->shearForce).Length());
 	}
 	return (useMaxForce?maxF:meanF)/maxContactF;
@@ -300,7 +300,7 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add(new SimpleElasticRelationships);
+	interactionPhysicsDispatcher->add(new Ip2_FrictMat_FrictMat_FrictPhys);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
@@ -320,8 +320,8 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 }
 
 
-shared_ptr<GranularMat> Shop::defaultGranularMat(){
-	shared_ptr<GranularMat> mat(new GranularMat);
+shared_ptr<FrictMat> Shop::defaultGranularMat(){
+	shared_ptr<FrictMat> mat(new FrictMat);
 	mat->density=getDefault<double>("phys_density");
 	mat->young=getDefault<double>("phys_young");
 	mat->poisson=getDefault<double>("phys_poisson");
@@ -441,7 +441,7 @@ Real Shop::PWaveTimeStep(shared_ptr<Scene> _rb){
 	Real dt=std::numeric_limits<Real>::infinity();
 	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
 		if(!b->material || !b->shape) continue;
-		shared_ptr<ElasticMat> ebp=dynamic_pointer_cast<ElasticMat>(b->material);
+		shared_ptr<ElastMat> ebp=dynamic_pointer_cast<ElastMat>(b->material);
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape);
 		if(!ebp || !s) continue;
 		Real density=b->state->mass/((4/3.)*Mathr::PI*pow(s->radius,3));

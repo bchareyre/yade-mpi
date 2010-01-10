@@ -10,7 +10,7 @@
 
 #include"MacroMicroElasticRelationships.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 //#include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> ScGeom !!?
 //#include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
@@ -42,12 +42,12 @@ void MacroMicroElasticRelationships::go(	  const shared_ptr<PhysicalParameters>&
 /* OLD VERSION  this is a LinearContactModel, different class, model different that MicroMacroElasticRelationships
 another would be HerzMindlinContactModel
 
-		shared_ptr<ElasticContactInteraction> contactPhysics;
+		shared_ptr<FrictPhys> contactPhysics;
 		
 		if ( interaction->isNew)
 		{
-			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
+			interaction->interactionPhysics = shared_ptr<FrictPhys>(new FrictPhys());
+			contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->interactionPhysics);
 			
 			contactPhysics->initialKn			= 2*(sdec1->kn*sdec2->kn)/(sdec1->kn+sdec2->kn);
 			contactPhysics->initialKs			= 2*(sdec1->ks*sdec2->ks)/(sdec1->ks+sdec2->ks);
@@ -55,7 +55,7 @@ another would be HerzMindlinContactModel
 			contactPhysics->initialEquilibriumDistance	= interactionGeometry->radius1+interactionGeometry->radius2;
 		}
 		else
-			contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
+			contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->interactionPhysics);
 		
 		contactPhysics->kn = contactPhysics->initialKn;
 		contactPhysics->ks = contactPhysics->initialKs;
@@ -63,8 +63,8 @@ another would be HerzMindlinContactModel
 */
 		if(!interaction->interactionPhysics)
 		{
-			interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			interaction->interactionPhysics = shared_ptr<FrictPhys>(new FrictPhys());
+			FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -99,7 +99,7 @@ another would be HerzMindlinContactModel
 		}
 		else
 		{	// FIXME - are those lines necessary ???? what they are doing in fact ???
-			ElasticContactInteraction* contactPhysics = YADE_CAST<ElasticContactInteraction*>(interaction->interactionPhysics.get());
+			FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>(interaction->interactionPhysics.get());
 			if(contactPhysics)
 			{
 				contactPhysics->kn = contactPhysics->initialKn;

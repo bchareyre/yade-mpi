@@ -15,7 +15,7 @@ YADE_REQUIRE_FEATURE(CGAL)
 #include "ModifiedTriaxialTest.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/SimpleElasticRelationships.hpp>
+#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg-dem/BodyMacroParameters.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -490,7 +490,7 @@ void ModifiedTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
+	interactionPhysicsDispatcher->add("Ip2_FrictMat_FrictMat_FrictPhys");
 		
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add("Bo1_Sphere_Aabb");

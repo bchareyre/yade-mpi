@@ -72,12 +72,12 @@ using namespace std;
 	if class name is not given, the RootClass itself is instantiated
 
 		p=Material() # p is now instance of Material
-		p=Material('GranularMat') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
-		p=Material('GranularMat',mass=100,se3=(Vector3(1,1,2),Quaternion.IDENTITY)) # convenience constructor
+		p=Material('FrictMat') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
+		p=Material('FrictMat',mass=100,se3=(Vector3(1,1,2),Quaternion.IDENTITY)) # convenience constructor
 
 	The last statement is equivalent to:
 
-		p=Material('GranularMat')
+		p=Material('FrictMat')
 		p['mass']=100; 
 		p['se3']=[1,1,2,1,0,0,0]
 

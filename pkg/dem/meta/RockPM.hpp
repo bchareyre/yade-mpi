@@ -11,9 +11,9 @@ mechanical behavior of mining rocks.
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 
 
 class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
@@ -27,7 +27,7 @@ class Law2_Dem3DofGeom_RockPMPhys_Rpm: public LawFunctor{
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_RockPMPhys_Rpm);
 
 /** This class holds information associated with each body */
-class RpmMat: public GranularMat {
+class RpmMat: public FrictMat {
 	public:
 		int exampleNumber; ///<Number of "stone"
 		bool initCohesive, isDamaged;
@@ -40,15 +40,15 @@ class RpmMat: public GranularMat {
 			stressCompressMax(0), 
 			Brittleness(0), 
 			G_over_E(1) {createIndex();};
-		REGISTER_ATTRIBUTES(GranularMat, 
+		REGISTER_ATTRIBUTES(FrictMat, 
 			(exampleNumber)
 			(initCohesive)
 			(isDamaged)
 			(stressCompressMax)
 			(Brittleness)
 			(G_over_E));
-		REGISTER_CLASS_AND_BASE(RpmMat,GranularMat);
-		REGISTER_CLASS_INDEX(RpmMat,GranularMat);
+		REGISTER_CLASS_AND_BASE(RpmMat,FrictMat);
+		REGISTER_CLASS_INDEX(RpmMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(RpmMat);
 
@@ -74,7 +74,7 @@ class Ip2_RpmMat_RpmMat_RpmPhys: public InteractionPhysicsFunctor{
 REGISTER_SERIALIZABLE(Ip2_RpmMat_RpmMat_RpmPhys);
 
 
-class RpmPhys: public NormalShearInteraction {
+class RpmPhys: public NormShearPhys {
 	private:
 	public:
 		Real crossSection,E,G,tanFrictionAngle,lengthMaxCompression,lengthMaxTension;
@@ -84,7 +84,7 @@ class RpmPhys: public NormalShearInteraction {
 
 		bool isCohesive;
 
-		RpmPhys(): NormalShearInteraction(),
+		RpmPhys(): NormShearPhys(),
 			crossSection(0),
 			E(0),
 			G(0), 
@@ -94,7 +94,7 @@ class RpmPhys: public NormalShearInteraction {
 			isCohesive(false) { createIndex(); epsT=Vector3r::ZERO; omega=0; Fn=0; Fs=Vector3r::ZERO;}
 		virtual ~RpmPhys();
 
-		REGISTER_ATTRIBUTES(NormalShearInteraction,
+		REGISTER_ATTRIBUTES(NormShearPhys,
 			(E)
 			(G)
 			(tanFrictionAngle)
@@ -102,7 +102,7 @@ class RpmPhys: public NormalShearInteraction {
 			(lengthMaxCompression)
 			(lengthMaxTension)
 		);
-	REGISTER_CLASS_AND_BASE(RpmPhys,NormalShearInteraction);
-	REGISTER_CLASS_INDEX(RpmPhys,NormalShearInteraction);
+	REGISTER_CLASS_AND_BASE(RpmPhys,NormShearPhys);
+	REGISTER_CLASS_INDEX(RpmPhys,NormShearPhys);
 };
 REGISTER_SERIALIZABLE(RpmPhys);

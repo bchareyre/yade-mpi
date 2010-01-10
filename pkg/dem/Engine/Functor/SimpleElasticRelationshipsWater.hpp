@@ -20,7 +20,7 @@ class SimpleElasticRelationshipsWater : public InteractionPhysicsFunctor
 					const shared_ptr<Interaction>& interaction);
 
 	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/* */);
-	FUNCTOR2D(GranularMat,GranularMat);
+	FUNCTOR2D(FrictMat,FrictMat);
 	REGISTER_CLASS_NAME(SimpleElasticRelationshipsWater);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
 

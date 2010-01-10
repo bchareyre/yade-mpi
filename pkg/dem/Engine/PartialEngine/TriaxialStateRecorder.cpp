@@ -16,14 +16,14 @@
 //#include <yade/pkg-common/SphereModel.hpp>
 
 //#include <yade/pkg-dem/ScGeom.hpp>
-//#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+//#include <yade/pkg-dem/FrictPhys.hpp>
 
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <yade/pkg-dem/ScGeom.hpp>
-#include <yade/pkg-dem/ElasticContactInteraction.hpp>
+#include <yade/pkg-dem/FrictPhys.hpp>
 
 
 
@@ -181,8 +181,8 @@ TriaxialStressController::ComputeLoveStress ( Scene * ncb )
 				 static_cast<ScGeom*> ( interaction->interactionGeometry.
 				 get() );
 
-		 ElasticContactInteraction* currentContactPhysics =
-				 static_cast<ElasticContactInteraction*>
+		 FrictPhys* currentContactPhysics =
+				 static_cast<FrictPhys*>
 				 ( interaction->interactionPhysics.get() );
 
 		 Real fn = currentContactPhysics->normalForce.Length();

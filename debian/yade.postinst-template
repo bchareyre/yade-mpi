@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
     configure)
-	 	update-alternatives --install /usr/bin/yade yade /usr/bin/yade@_VERSION@ 10 --slave /usr/bin/yade-multi yade-multi /usr/bin/yade@_VERSION@-multi
+	 	update-alternatives --install /usr/bin/yade yade /usr/bin/yade@_VERSION@ @PRIORITY@ --slave /usr/bin/yade-multi yade-multi /usr/bin/yade@_VERSION@-multi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

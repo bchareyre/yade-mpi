@@ -12,10 +12,10 @@
 #include "TriaxialTest.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include<yade/pkg-dem/SimpleElasticRelationships.hpp>
+#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
@@ -309,7 +309,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 							2.0/5.0*body->state->mass*radius*radius,
 							2.0/5.0*body->state->mass*radius*radius);
 	body->state->pos=position;
-	shared_ptr<GranularMat> mat(new GranularMat);
+	shared_ptr<FrictMat> mat(new FrictMat);
 	mat->young			= sphereYoungModulus;
 	mat->poisson		= sphereKsDivKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
@@ -330,7 +330,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	aabb->diffuseColor		= Vector3r(1,0,0);
 	body->bound		= aabb;
 	body->state->pos=position;
-	shared_ptr<GranularMat> mat(new GranularMat);
+	shared_ptr<FrictMat> mat(new FrictMat);
 	mat->young			= sphereYoungModulus;
 	mat->poisson		= sphereKsDivKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
@@ -385,7 +385,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	shared_ptr<InteractionPhysicsFunctor> ss(new SimpleElasticRelationships);
+	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(ss);
 	
 		
@@ -457,10 +457,10 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 			ids->physDispatcher=interactionPhysicsDispatcher;
 			ids->lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
 			if(!facetWalls && !wallWalls){
-				shared_ptr<ef2_Spheres_Elastic_ElasticLaw> see(new ef2_Spheres_Elastic_ElasticLaw); see->sdecGroupMask=2;
+				shared_ptr<Law2_ScGeom_FrictPhys_Basic> see(new Law2_ScGeom_FrictPhys_Basic); see->sdecGroupMask=2;
 				ids->lawDispatcher->add(see);
 			} else {
-				ids->lawDispatcher->add(shared_ptr<Law2_Dem3Dof_Elastic_Elastic>(new Law2_Dem3Dof_Elastic_Elastic));
+				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_Basic>(new Law2_Dem3DofGeom_FrictPhys_Basic));
 			}
 		rootBody->engines.push_back(ids);
 	} else {

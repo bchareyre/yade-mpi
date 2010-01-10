@@ -9,7 +9,7 @@
 *************************************************************************/
 
 #include "CapillaryRecorder.hpp"
-#include <yade/pkg-common/ElasticMat.hpp>
+#include <yade/pkg-common/ElastMat.hpp>
 //#include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
@@ -60,7 +60,7 @@ void CapillaryRecorder::action(Scene * ncb)
 // 	
 // 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 // 	Material* bigBallpp =
-// 	static_cast<GranularMat*>((*bodies)[bigBallId]->material.get())
+// 	static_cast<FrictMat*>((*bodies)[bigBallId]->material.get())
 // ; ;
 // 		
 // 		Real x = bigBallpp-> se3.position[0];

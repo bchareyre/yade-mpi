@@ -4,7 +4,7 @@
 #include<yade/pkg-dem/PeriIsoCompressor.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/lib-pyutil/gil.hpp>
 #include<Wm3Math.h>
@@ -64,7 +64,7 @@ void PeriIsoCompressor::action(Scene* scene){
 	else{ // handle each dimension separately
 		for(int axis=0; axis<3; axis++){
 			// Δσ=ΔεE=(Δl/l)×(l×K/A) ↔ Δl=Δσ×A/K
-			// FIXME: either NormalShearInteraction::{kn,ks} is computed wrong or we have dimensionality problem here
+			// FIXME: either NormShearPhys::{kn,ks} is computed wrong or we have dimensionality problem here
 			// FIXME: that is why the fixup 1e-4 is needed here
 			// FIXME: or perhaps maxDisplaPerStep=1e-2*charLen is too big??
 			cellGrow[axis]=1e-4*(sigmaGoal-sigma[axis])*cellArea[axis]/(avgStiffness>0?avgStiffness:1);  // FIXME: wrong dimensions? See PeriTriaxController
@@ -119,7 +119,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	// → a vector with functors so we can law->functs->pushback(myThing), and access to the fundamental members (forces, stiffness, normal, etc.). Implementing the second part is less clear in my mind. Inheriting from law::funct(force&, stiffness&, ...)?
 	FOREACH(const shared_ptr<Interaction>&I, *scene->interactions){
 		if ( !I->isReal() ) continue;
-		NormalShearInteraction* nsi=YADE_CAST<NormalShearInteraction*> ( I->interactionPhysics.get() );
+		NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->interactionPhysics.get() );
 		GenericSpheresContact* gsc=YADE_CAST<GenericSpheresContact*> ( I->interactionGeometry.get() );
 		//Contact force
 		Vector3r f= ( reversedForces?-1.:1. ) * ( nsi->normalForce+nsi->shearForce );

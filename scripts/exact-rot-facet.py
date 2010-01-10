@@ -16,7 +16,7 @@ O.engines=[
 		Ig2_Sphere_Sphere_ScGeom(),
 		Ig2_Facet_Sphere_ScGeom(),
 	]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(),
 	RotationEngine(subscribedBodies=[1],rotationAxis=[1,0,0],angularVelocity=.01),
 	NewtonIntegrator(damping=0.2)

@@ -6,17 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"SimpleElasticRelationships.hpp"
+#include"Ip2_FrictMat_FrictMat_FrictPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 
 
 
-void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
+void Ip2_FrictMat_FrictMat_FrictPhys::go(	  const shared_ptr<Material>& b1
 					, const shared_ptr<Material>& b2
 					, const shared_ptr<Interaction>& interaction)
 {
@@ -27,12 +27,12 @@ void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
 	{
 		if(!interaction->interactionPhysics)
 		{
-			const shared_ptr<GranularMat>& mat1 = YADE_PTR_CAST<GranularMat>(b1);
-			const shared_ptr<GranularMat>& mat2 = YADE_PTR_CAST<GranularMat>(b2);
+			const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(b1);
+			const shared_ptr<FrictMat>& mat2 = YADE_PTR_CAST<FrictMat>(b2);
 			
-			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<ElasticContactInteraction>(new ElasticContactInteraction());
+			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<FrictPhys>(new FrictPhys());
 			
-			const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>(interaction->interactionPhysics);
+			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->interactionPhysics);
 
 			Real Ea 	= mat1->young;
 			Real Eb 	= mat2->young;
@@ -48,7 +48,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
 				Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(interaction->interactionGeometry.get());
 				if(scg){ Da=scg->radius1; Db=scg->radius2; normal=scg->normal; }
 				else if(d3dg){Da=d3dg->refR1>0?d3dg->refR1:2*d3dg->refR2; Db=d3dg->refR2>0?d3dg->refR2:d3dg->refR1; normal=d3dg->normal; }
-				else throw runtime_error("SimpleElasticRelationships: geometry is neither ScGeom nor Dem3DofGeom");
+				else throw runtime_error("Ip2_FrictMat_FrictMat_FrictPhys: geometry is neither ScGeom nor Dem3DofGeom");
 			#endif
 			
 			Real fa 	= mat1->frictionAngle;
@@ -80,7 +80,7 @@ void SimpleElasticRelationships::go(	  const shared_ptr<Material>& b1
 		}	
 		return;
 	}
-	throw runtime_error("SimpleElasticRelationships currently fails for non-ScGeom geometry!");
+	throw runtime_error("Ip2_FrictMat_FrictMat_FrictPhys currently fails for non-ScGeom geometry!");
 };
-YADE_PLUGIN((SimpleElasticRelationships));
+YADE_PLUGIN((Ip2_FrictMat_FrictMat_FrictPhys));
 

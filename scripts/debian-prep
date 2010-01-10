@@ -16,12 +16,21 @@ elif [ -d .svn ]; then VERSION="svn$( svn info | egrep '^Revision:' | cut -f2 -d
 elif [ -d .bzr ]; then VERSION="bzr$( bzr revno )"; SNAPSHOT="-snapshot"
 else echo 'Revision could not be determined (RELEASE or .svn or .bzr)' >2; exit 1;
 fi
+# compute version priority:
+# * releases get 10000*version (discarding anything not digit and dot)
+# * snapshots get their revision number (discarding anything not digit)
+# This way, releases have always higher number than snapshots and
+# both releases and snapshots are properly ordered
+if [ -f RELEASE ]; then PRIORITY=$( echo 10000\*`cat RELEASE | sed s'/[^0-9.]//g'` | bc | cut -d. -f1 )
+else PRIORITY=$( echo $VERSION | sed s'/[^0-9]//g' )
+fi
 _VERSION="-$VERSION"; echo $VERSION > VERSION
+echo PRIORITY $PRIORITY
 cp debian/yade.postinst-template debian/yade$_VERSION.postinst
 cp debian/yade-dbg.postinst-template debian/yade$_VERSION-dbg.postinst
 cp debian/yade.prerm-template debian/yade$_VERSION.prerm
 cp debian/yade-dbg.prerm-template debian/yade$_VERSION-dbg.prerm
-cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g; s/\@_VERSION\@/$_VERSION/g; s/\@SNAPSHOT\@/$SNAPSHOT/g" debian/control debian/yade$_VERSION.postinst debian/yade$_VERSION-dbg.postinst debian/yade$_VERSION.prerm debian/yade$_VERSION-dbg.prerm;
+cp debian/control-template debian/control; perl -pi -e"s/\@VERSION\@/$VERSION/g; s/\@_VERSION\@/$_VERSION/g; s/\@SNAPSHOT\@/$SNAPSHOT/g; s/\@PRIORITY\@/$PRIORITY/g;" debian/control debian/yade$_VERSION.postinst debian/yade$_VERSION-dbg.postinst debian/yade$_VERSION.prerm debian/yade$_VERSION-dbg.prerm;
 
 ## debian/changelog
 DEBDATE=`date -R`

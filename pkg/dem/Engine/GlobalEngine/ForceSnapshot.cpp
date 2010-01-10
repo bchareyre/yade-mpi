@@ -9,7 +9,7 @@
 #include "ForceSnapshot.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
@@ -95,7 +95,7 @@ void ForceSnapshot::action(Scene * ncb)
 				Real R1 = YADE_CAST<Sphere*>(b1->shape.get())->radius;
 				Real R2 = YADE_CAST<Sphere*>(b2->shape.get())->radius;
 
-				Vector3r Fn=(YADE_CAST<ElasticContactInteraction*>(contact->interactionPhysics.get()))->normalForce;
+				Vector3r Fn=(YADE_CAST<FrictPhys*>(contact->interactionPhysics.get()))->normalForce;
 				Real Fnl=Fn.Length();
 
 				myfile<<lexical_cast<string>(id1)<<" "<<lexical_cast<string>(id2)<<" "<<lexical_cast<string>(Fnl)<<" "<<lexical_cast<string>(R1);

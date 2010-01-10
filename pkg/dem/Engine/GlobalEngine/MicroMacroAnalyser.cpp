@@ -7,10 +7,10 @@
 *************************************************************************/
 
 
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
@@ -125,7 +125,7 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 		else {//then it is a sphere (not a wall)
 			++Ng;
 			const Sphere* s = YADE_CAST<Sphere*> ( ( *bi )->shape.get() );
-			//const GranularMat* p = YADE_CAST<GranularMat*> ( ( *bi )->material.get() );
+			//const FrictMat* p = YADE_CAST<FrictMat*> ( ( *bi )->material.get() );
 			const Vector3r& pos = (*bi)->state->pos;
 			Real rad = s->radius;
 
@@ -179,8 +179,8 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 // 								 ( grains[id2].sphere.weight() *c->normal ) );
 
 
-			c->fn = YADE_CAST<ElasticContactInteraction*> ( ( ( *ii )->interactionPhysics.get() ) )->normalForce.Dot ( ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal );
-			Vector3r fs = YADE_CAST<ElasticContactInteraction*> ( ( *ii )->interactionPhysics.get() )->shearForce;
+			c->fn = YADE_CAST<FrictPhys*> ( ( ( *ii )->interactionPhysics.get() ) )->normalForce.Dot ( ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal );
+			Vector3r fs = YADE_CAST<FrictPhys*> ( ( *ii )->interactionPhysics.get() )->shearForce;
 			c->fs = CGT::Vecteur ( fs.X(),fs.Y(),fs.Z() );
 			c->old_fn = c->fn;
 			c->old_fs = c->fs;

@@ -15,9 +15,9 @@
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
-// #include<yade/pkg-dem/SimpleElasticRelationships.hpp>
+// #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 
@@ -307,7 +307,7 @@ bool TriaxialTestWater::generate()
 void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool big, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<GranularMat> physics(new GranularMat);
+	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -360,7 +360,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<GranularMat> physics(new GranularMat);
+	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	#ifdef YADE_GEOMETRICALMODEL
 // 		shared_ptr<BoxModel> gBox(new BoxModel);	
@@ -417,8 +417,8 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-//	interactionPhysicsDispatcher->add("SimpleElasticRelationships");
-// Unhandled exception: St13runtime_error : Class `SimpleElasticRelationships' could not be cast to required 2D Functor	
+//	interactionPhysicsDispatcher->add("Ip2_FrictMat_FrictMat_FrictPhys");
+// Unhandled exception: St13runtime_error : Class `Ip2_FrictMat_FrictMat_FrictPhys' could not be cast to required 2D Functor	
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW

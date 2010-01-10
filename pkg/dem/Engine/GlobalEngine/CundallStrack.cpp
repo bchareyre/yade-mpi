@@ -43,8 +43,8 @@ void Ip2_BMP_BMP_CSPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Mat
 			
 	assert(d3dg);
 
-	const shared_ptr<GranularMat>& sdec1 = YADE_PTR_CAST<GranularMat>(b1);
-	const shared_ptr<GranularMat>& sdec2 = YADE_PTR_CAST<GranularMat>(b2);
+	const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>(b1);
+	const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>(b2);
 			
 	shared_ptr<CSPhys> contactPhysics(new CSPhys()); 
 			

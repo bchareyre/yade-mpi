@@ -66,7 +66,7 @@ mntable.write(fileName+".geo",1)
 mntable.write(fileName+".vtu",2)
 
 #Add material
-O.materials.append(GranularMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3))
+O.materials.append(FrictMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3))
 
 #Parameters, which will be passed into spheres and facets creators
 kw={'material':0}

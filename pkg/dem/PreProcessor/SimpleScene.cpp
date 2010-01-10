@@ -24,7 +24,7 @@
 #include<yade/pkg-common/GravityEngines.hpp>
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/SimpleElasticRelationships.hpp>
+#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
 
@@ -60,7 +60,7 @@ bool SimpleScene::generate(){
 			rootBody->engines.push_back(igeomDispatcher);
 		//@
 		shared_ptr<InteractionPhysicsDispatcher> iphysDispatcher(new InteractionPhysicsDispatcher);
-			iphysDispatcher->add(new SimpleElasticRelationships);
+			iphysDispatcher->add(new Ip2_FrictMat_FrictMat_FrictPhys);
 			rootBody->engines.push_back(iphysDispatcher);
 		//@
 		shared_ptr<ElasticContactLaw> ecl(new ElasticContactLaw);

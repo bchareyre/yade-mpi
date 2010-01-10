@@ -9,8 +9,8 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
-	ConstitutiveLawDispatcher([ef2_Spheres_Elastic_ElasticLaw()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	ConstitutiveLawDispatcher([Law2_ScGeom_FrictPhys_Basic()]),
 	GravityEngine(gravity=(0,0,-1000)),
 	NewtonIntegrator(damping=0.2)
 ]

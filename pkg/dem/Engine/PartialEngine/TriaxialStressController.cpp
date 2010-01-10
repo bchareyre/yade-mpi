@@ -10,7 +10,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/State.hpp>
 
 
@@ -106,7 +106,7 @@ void TriaxialStressController::updateStiffness (Scene * ncb)
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
-			Real fn = (static_cast<ElasticContactInteraction*>	(contact->interactionPhysics.get()))->normalForce.Length();
+			Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.Length();
 
 			if (fn!=0)
 			{
@@ -116,8 +116,8 @@ void TriaxialStressController::updateStiffness (Scene * ncb)
 				{
 					if ( wall_id[index]==id1 || wall_id[index]==id2 )
 					{
-						ElasticContactInteraction* currentContactPhysics =
-						static_cast<ElasticContactInteraction*> ( contact->interactionPhysics.get() );
+						FrictPhys* currentContactPhysics =
+						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
 						stiffness[index]  += currentContactPhysics->kn;
 					}
 				}
@@ -369,7 +369,7 @@ Real TriaxialStressController::ComputeUnbalancedForce(Scene * ncb, bool maxUnbal
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if ((*ii)->isReal()) {
 			const shared_ptr<Interaction>& contact = *ii;
-			Real f = (static_cast<ElasticContactInteraction*> ((contact->interactionPhysics.get()))->normalForce+static_cast<ElasticContactInteraction*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
+			Real f = (static_cast<FrictPhys*> ((contact->interactionPhysics.get()))->normalForce+static_cast<FrictPhys*>(contact->interactionPhysics.get())->shearForce).SquaredLength();
 			if (f!=0)
 			{
 			MeanForce += Mathr::Sqrt(f);

@@ -2,8 +2,8 @@
 
 #include"Ef1_IstSnowLayersContact_glDraw.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-snow/IstSnowLayersContact.hpp>
 #include<yade/pkg-snow/BshSnowGrain.hpp>
 #include<yade/pkg-snow/BssSnowGrain.hpp>

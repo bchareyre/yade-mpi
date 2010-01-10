@@ -16,7 +16,7 @@
 #include <yade/pkg-common/Box.hpp>
 
 #include <yade/pkg-dem/ScGeom.hpp>
-#include <yade/pkg-common/NormalShearInteractions.hpp>
+#include <yade/pkg-common/NormShearPhys.hpp>
 
 HistoryRecorder::HistoryRecorder () : DataRecorder()
 {
@@ -116,7 +116,7 @@ void HistoryRecorder::action(Scene * ncb)
 		 if (typeid(*(b1->shape.get())) == typeid(Sphere)
 		  && typeid(*(b2->shape.get())) == typeid(Sphere))
 		 {
-		   const NormalShearInteraction* nsi = YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get());
+		   const NormShearPhys* nsi = YADE_CAST<NormShearPhys*>(contact->interactionPhysics.get());
 		   Vector3r n = nsi->normalForce;
 		   Real fn = n.Length();
 

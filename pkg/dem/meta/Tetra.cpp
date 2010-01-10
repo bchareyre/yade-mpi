@@ -14,7 +14,7 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB)
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/State.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
 
@@ -386,15 +386,15 @@ void TetraLaw::action(Scene* rootBody)
 			
 		if(!(A->getGroupMask()&B->getGroupMask()&sdecGroupMask)) continue; // no bits overlap in masks, skip this one
 
-		const shared_ptr<ElasticMat>& physA(dynamic_pointer_cast<ElasticMat>(A->material));
-		const shared_ptr<ElasticMat>& physB(dynamic_pointer_cast<ElasticMat>(B->material));
+		const shared_ptr<ElastMat>& physA(dynamic_pointer_cast<ElastMat>(A->material));
+		const shared_ptr<ElastMat>& physB(dynamic_pointer_cast<ElastMat>(B->material));
 		
 
 		/* Cross-section is volumetrically equivalent to the penetration configuration */
 		Real averageStrain=contactGeom->equivalentPenetrationDepth/(.5*(contactGeom->maxPenetrationDepthA+contactGeom->maxPenetrationDepthB));
 
-		/* Do not use NormalInteraction::kn (as calculated by ElasticBodySimpleRelationship).
-		 * NormalInteraction::kn is not Young's modulus, it is calculated by MacroMicroElasticRelationships. So perhaps
+		/* Do not use NormPhys::kn (as calculated by ElasticBodySimpleRelationship).
+		 * NormPhys::kn is not Young's modulus, it is calculated by MacroMicroElasticRelationships. So perhaps
 		 * a new InteractionPhysicsFunctor will be needed that will just pass the average Young's modulus here?
 		 * For now, just go back to Young's moduli directly here. */
 		Real young=.5*(physA->young+physB->young);

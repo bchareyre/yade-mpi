@@ -10,8 +10,8 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
-		[SimpleElasticRelationships()],
-		[ef2_Spheres_Elastic_ElasticLaw()]
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_ScGeom_FrictPhys_Basic()]
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=.2),

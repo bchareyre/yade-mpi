@@ -79,7 +79,7 @@ def downCast(obj,newClassName):
 
 
 def defaultMaterial():
-	return GranularMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
+	return FrictMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5,label='defaultMat')
 
 def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True):
 	"""Assign common body parameters."""
@@ -130,7 +130,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 
 	Instance of material can be given::
 
-		>>> s1=sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElasticMat(young=30e9,density=2e3))
+		>>> s1=sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElastMat(young=30e9,density=2e3))
 		>>> s1.shape['wire']
 		False
 		>>> s1.shape['diffuseColor']
@@ -140,7 +140,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 
 	Material can be given by label::
 
-		>>> O.materials.append(GranularMat(young=10e9,poisson=.11,label='myMaterial'))
+		>>> O.materials.append(FrictMat(young=10e9,poisson=.11,label='myMaterial'))
 		1
 		>>> s2=sphere([0,0,2],1,material='myMaterial')
 		>>> s2.mat['label']
@@ -155,7 +155,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	For instance, randomized material properties can be created like this:
 
 		>>> import random
-		>>> def matFactory(): return ElasticMat(young=1e10*random.random(),density=1e3+1e3*random.random())
+		>>> def matFactory(): return ElastMat(young=1e10*random.random(),density=1e3+1e3*random.random())
 		... 
 		>>> s3=sphere([0,2,0],1,material=matFactory)
 		>>> s4=sphere([1,2,0],1,material=matFactory)

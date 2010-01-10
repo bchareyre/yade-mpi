@@ -11,8 +11,8 @@ mn,mx=Vector3(0,0,0),Vector3(10,10,10)
 sp.makeCloud(mn,mx,.5,.2,10000,False)
 
 ## create material #0, which will be used as default
-O.materials.append(GranularMat(young=150e6,poisson=.4,frictionAngle=.4,density=2600))
-O.materials.append(GranularMat(young=150e6,poisson=.4,frictionAngle=.2,density=2600,label='frictionless'))
+O.materials.append(FrictMat(young=150e6,poisson=.4,frictionAngle=.4,density=2600))
+O.materials.append(FrictMat(young=150e6,poisson=.4,frictionAngle=.2,density=2600,label='frictionless'))
 
 
 ## copy spheres from the packing into the scene
@@ -46,8 +46,8 @@ O.engines=[
 	InsertionSortCollider(nBins=5,sweepLength=.05),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
-		[SimpleElasticRelationships()],
-		[ef2_Spheres_Elastic_ElasticLaw()]
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_ScGeom_FrictPhys_Basic()]
 	),
 	GlobalStiffnessTimeStepper(),
 	triax,

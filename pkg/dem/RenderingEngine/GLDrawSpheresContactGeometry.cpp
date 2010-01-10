@@ -8,8 +8,8 @@
 
 #include"GLDrawSpheresContactGeometry.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-opengl/GLUtils.hpp>
@@ -62,8 +62,8 @@ void GLDrawSpheresContactGeometry::go(
 		glPushMatrix();
 			glTranslatev(sc->contactPoint-(sc->normal*dif));
 			glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-			// BUG: would crash with anything else than ElasticContactInteraction; use GLDrawInteractionPhysics for such things
-			/// ElasticContactInteraction* el = static_cast<ElasticContactInteraction*>(ip->interactionPhysics.get());
+			// BUG: would crash with anything else than FrictPhys; use GLDrawInteractionPhysics for such things
+			/// FrictPhys* el = static_cast<FrictPhys*>(ip->interactionPhysics.get());
 			// FIXME - we need a way to give parameters from outside, again.... so curerntly this scale is hardcoded here
 			if( (!ip->isNew) && ip->isReal() && ip->interactionPhysics){
 				Real force = el->normalForce.Length()/600;

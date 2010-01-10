@@ -74,8 +74,8 @@ class TestMaterials(unittest.TestCase):
 		# common setup for all tests in this class
 		O.reset()
 		O.materials.append([
-			GranularMat(young=1,label='materialZero'),
-			ElasticMat(young=100,label='materialOne')
+			FrictMat(young=1,label='materialZero'),
+			ElastMat(young=100,label='materialOne')
 		])
 		O.bodies.append([
 			utils.sphere([0,0,0],.5,material=0),

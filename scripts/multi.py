@@ -19,8 +19,8 @@ o.engines=[
 	PersistentSAPCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
-		[SimpleElasticRelationships(),],
-		[ef2_Spheres_Elastic_ElasticLaw(),]
+		[Ip2_FrictMat_FrictMat_FrictPhys(),],
+		[Law2_ScGeom_FrictPhys_Basic(),]
 	),
 	GravityEngine(gravity=(0,0,gravity)), ## here we use the 'gravity' parameter
 	PeriodicPythonRunner(iterPeriod=100,command='myAddPlotData()',label='plotDataCollector'),

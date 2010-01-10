@@ -9,8 +9,8 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom()],
-		[SimpleElasticRelationships()],
-		[Law2_Dem3Dof_Elastic_Elastic()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
 	NewtonIntegrator(damping=.6,homotheticCellResize=1)
 ]

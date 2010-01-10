@@ -17,7 +17,7 @@
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
 class CohesiveFrictionalRelationships;
 
@@ -203,8 +203,8 @@ void ThreeDTriaxialEngine::setContactProperties(Scene * ncb, Real frictionDegree
 		const shared_ptr<BodyMacroParameters>& sdec1 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId1())]->physicalParameters);
 		const shared_ptr<BodyMacroParameters>& sdec2 = YADE_PTR_CAST<BodyMacroParameters>((*bodies)[(body_id_t) ((*ii)->getId2())]->physicalParameters);		
 		//FIXME - why dynamic_cast fails here?
-		//const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>((*ii)->interactionPhysics);
-		const shared_ptr<ElasticContactInteraction>& contactPhysics = static_pointer_cast<ElasticContactInteraction>((*ii)->interactionPhysics);
+		//const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->interactionPhysics);
+		const shared_ptr<FrictPhys>& contactPhysics = static_pointer_cast<FrictPhys>((*ii)->interactionPhysics);
 
 		Real fa 	= sdec1->frictionAngle;
 		Real fb 	= sdec2->frictionAngle;

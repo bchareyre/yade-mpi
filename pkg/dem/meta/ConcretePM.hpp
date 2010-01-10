@@ -46,11 +46,11 @@ There are other classes, which are not strictly necessary:
 
 #pragma once
 
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
 
 /* Cpm state information about each body.
@@ -82,7 +82,7 @@ class CpmState: public State {
 REGISTER_SERIALIZABLE(CpmState);
 
 /* This class holds information associated with each body */
-class CpmMat: public GranularMat {
+class CpmMat: public FrictMat {
 	public:
 		/* nonelastic material parameters; meaning clarified in CpmPhys, under same names */
 		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, dmgTau, dmgRateExp, plTau, plRateExp, isoPrestress;
@@ -98,9 +98,9 @@ class CpmMat: public GranularMat {
 		};
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
-		REGISTER_ATTRIBUTES(GranularMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
-		REGISTER_CLASS_AND_BASE(CpmMat,GranularMat);
-		REGISTER_CLASS_INDEX(CpmMat,GranularMat);
+		REGISTER_ATTRIBUTES(FrictMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
+		REGISTER_CLASS_AND_BASE(CpmMat,FrictMat);
+		REGISTER_CLASS_INDEX(CpmMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(CpmMat);
 
@@ -111,7 +111,7 @@ REGISTER_SERIALIZABLE(CpmMat);
  * that includes damage effects and chages of parameters inside CpmPhys.
  *
  */
-class CpmPhys: public NormalShearInteraction {
+class CpmPhys: public NormShearPhys {
 	private:
 	public:
 		/*! Fundamental parameters (constants) */
@@ -162,7 +162,7 @@ class CpmPhys: public NormalShearInteraction {
 		static long cummBetaIter, cummBetaCount;
 
 		/*! auxiliary variable for visualization, recalculated in Law2_Dem3DofGeom_CpmPhys_Cpm at every iteration */
-		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormalShearInteraction 
+		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormShearPhys 
 		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r epsT, sigmaT, Fs;
 
 
@@ -172,10 +172,10 @@ class CpmPhys: public NormalShearInteraction {
 
 
 
-		CpmPhys(): NormalShearInteraction(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsNPl(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
+		CpmPhys(): NormShearPhys(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsNPl(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
 		virtual ~CpmPhys();
 
-		REGISTER_ATTRIBUTES(NormalShearInteraction,
+		REGISTER_ATTRIBUTES(NormShearPhys,
 			(E)
 			(G)
 			(tanFrictionAngle)
@@ -212,9 +212,9 @@ class CpmPhys: public NormalShearInteraction {
 			(sigmaT)
 			(relResidualStrength)
 		);
-	REGISTER_CLASS_AND_BASE(CpmPhys,NormalShearInteraction);
+	REGISTER_CLASS_AND_BASE(CpmPhys,NormShearPhys);
 	DECLARE_LOGGER;
-	REGISTER_CLASS_INDEX(CpmPhys,NormalShearInteraction);
+	REGISTER_CLASS_INDEX(CpmPhys,NormShearPhys);
 };
 REGISTER_SERIALIZABLE(CpmPhys);
 

@@ -31,7 +31,7 @@ O.engines=[
 		[BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),	PersistentSAPCollider(),]
 	]),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	# the rest must also be run sequentially
 	# (contact law as well as gravity modify physical actions, which are, once computed, used in the integrator)
 	ElasticContactLaw(),

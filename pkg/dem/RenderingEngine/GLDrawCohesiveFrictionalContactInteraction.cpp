@@ -9,8 +9,8 @@
 #include "GLDrawCohesiveFrictionalContactInteraction.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 #include<yade/lib-QGLViewer/qglviewer.h>

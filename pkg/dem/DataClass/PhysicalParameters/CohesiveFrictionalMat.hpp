@@ -10,10 +10,10 @@
 #pragma once
 
 
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 
 
-class CohesiveFrictionalMat : public GranularMat
+class CohesiveFrictionalMat : public FrictMat
 {
 	public :
 		bool		isBroken;
@@ -24,10 +24,10 @@ class CohesiveFrictionalMat : public GranularMat
 
 /// Serialization
 	REGISTER_CLASS_NAME(CohesiveFrictionalMat);
-	REGISTER_BASE_CLASS_NAME(GranularMat);
-	REGISTER_ATTRIBUTES(GranularMat,(isBroken)(isCohesive));
+	REGISTER_BASE_CLASS_NAME(FrictMat);
+	REGISTER_ATTRIBUTES(FrictMat,(isBroken)(isCohesive));
 /// Indexable
-	REGISTER_CLASS_INDEX(CohesiveFrictionalMat,GranularMat);
+	REGISTER_CLASS_INDEX(CohesiveFrictionalMat,FrictMat);
 };
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalMat);

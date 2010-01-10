@@ -15,8 +15,8 @@
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 
 class CohesiveFrictionalRelationships;
 
@@ -306,18 +306,18 @@ void TriaxialCompressionEngine::setContactProperties(Scene * ncb, Real frictionD
 	{	
 		shared_ptr<Body> b = *bi;
 		if (b->isDynamic)
-		YADE_PTR_CAST<GranularMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
+		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
 		
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end(); 
 	for(  ; ii!=iiEnd ; ++ii ) {
 		if (!(*ii)->isReal()) continue;
-		const shared_ptr<GranularMat>& sdec1 = YADE_PTR_CAST<GranularMat>((*bodies)[(body_id_t) ((*ii)->getId1())]->material);
-		const shared_ptr<GranularMat>& sdec2 = YADE_PTR_CAST<GranularMat>((*bodies)[(body_id_t) ((*ii)->getId2())]->material);		
+		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((*ii)->getId1())]->material);
+		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((*ii)->getId2())]->material);		
 		//FIXME - why dynamic_cast fails here?
-		//const shared_ptr<ElasticContactInteraction>& contactPhysics = YADE_PTR_CAST<ElasticContactInteraction>((*ii)->interactionPhysics);
-		const shared_ptr<ElasticContactInteraction>& contactPhysics = static_pointer_cast<ElasticContactInteraction>((*ii)->interactionPhysics);
+		//const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->interactionPhysics);
+		const shared_ptr<FrictPhys>& contactPhysics = static_pointer_cast<FrictPhys>((*ii)->interactionPhysics);
 
 		Real fa 	= sdec1->frictionAngle;
 		Real fb 	= sdec2->frictionAngle;

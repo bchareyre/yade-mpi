@@ -95,6 +95,16 @@ _deprecated={
 	'BexResetter':'ForceResetter', # Fri Dec 25 11:44:01 2009, vaclav@flux
 	'PhysicalActionContainerResetter':'ForceResetter', # Fri Dec 25 11:45:32 2009, vaclav@flux
 	'PhysicalActionContainerReseter':'ForceResetter', # Fri Dec 25 11:45:51 2009, vaclav@flux
+	'GranularMat':'FrictMat', # Sun Jan 10 09:26:45 2010, vaclav@flux
+	'SimpleElasticRelationships':'Ip2_FrictMat_FrictMat_NormShearPhys', # Sun Jan 10 09:28:17 2010, vaclav@flux
+	'NormalInteraction':'NormPhys', # Sun Jan 10 09:28:56 2010, vaclav@flux
+	'NormalShearInteraction':'NormShearPhys', # Sun Jan 10 09:29:22 2010, vaclav@flux
+	'ElasticMat':'ElastMat', # Sun Jan 10 09:53:15 2010, vaclav@flux
+	'ElasticContactInteraction':'FrictPhys', # Sun Jan 10 09:57:59 2010, vaclav@flux
+	'ef2_Spheres_Elastic_ElasticLaw':'Law2_ScGeom_FrictPhys_Basic', # Sun Jan 10 09:59:42 2010, vaclav@flux
+	'Law2_Dem3Dof_Elastic_Elastic':'Law2_Dem3Dof_FrictPhys_Basic', # Sun Jan 10 10:00:25 2010, vaclav@flux
+	'Law2_Dem3Dof_FrictPhys_Basic':'Law2_Dem3DofGeom_FrictPhys_Basic', # Sun Jan 10 10:01:27 2010, vaclav@flux
+	'Ip2_FrictMat_FrictMat_NormShearPhys':'Ip2_FrictMat_FrictMat_FrictPhys', # Sun Jan 10 10:07:40 2010, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -8,7 +8,7 @@
 
 #include "CohesiveFrictionalMat.hpp"
 
-CohesiveFrictionalMat::CohesiveFrictionalMat () : GranularMat()
+CohesiveFrictionalMat::CohesiveFrictionalMat () : FrictMat()
 {
 	createIndex();
 	isBroken=true;

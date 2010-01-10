@@ -8,13 +8,13 @@
 
 #include"ElasticContactLaw.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((ef2_Spheres_Elastic_ElasticLaw)(Law2_Dem3Dof_Elastic_Elastic)(ElasticContactLaw));
+YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw));
 
 ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 {
@@ -31,7 +31,7 @@ ElasticContactLaw::ElasticContactLaw() : InteractionSolver()
 
 void ElasticContactLaw::action(Scene* rootBody)
 {
-	if(!functor) functor=shared_ptr<ef2_Spheres_Elastic_ElasticLaw>(new ef2_Spheres_Elastic_ElasticLaw);
+	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
 	functor->momentRotationLaw=momentRotationLaw;
 	functor->sdecGroupMask=sdecGroupMask;
 	#ifdef SCG_SHEAR
@@ -42,22 +42,22 @@ void ElasticContactLaw::action(Scene* rootBody)
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (LawDispatcher does that already)
-			if(!dynamic_cast<ScGeom*>(I->interactionGeometry.get()) || !dynamic_cast<ElasticContactInteraction*>(I->interactionPhysics.get())) continue;	
+			if(!dynamic_cast<ScGeom*>(I->interactionGeometry.get()) || !dynamic_cast<FrictPhys*>(I->interactionPhysics.get())) continue;	
 		#endif
 			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
 	}
 }
 
 
-CREATE_LOGGER(ef2_Spheres_Elastic_ElasticLaw);
-void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
+CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
+void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
 	Real dt = Omega::instance().getTimeStep();
 
 			int id1 = contact->getId1(), id2 = contact->getId2();
 			// FIXME: mask handling should move to LawFunctor itself, outside the functors
 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
 			ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
-			ElasticContactInteraction* currentContactPhysics = static_cast<ElasticContactInteraction*>(ip.get());			
+			FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());			
 						
 			if(currentContactGeometry->penetrationDepth <0)
 			{
@@ -73,7 +73,7 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 
 			Vector3r& shearForce 			= currentContactPhysics->shearForce;
 	
-			// no need for this, initialized to Vector3r::ZERO in NormalShearInteraction ctor
+			// no need for this, initialized to Vector3r::ZERO in NormShearPhys ctor
 			// if (contact->isFresh(ncb)) shearForce=Vector3r(0,0,0);
 					
 			Real un=currentContactGeometry->penetrationDepth;
@@ -109,9 +109,9 @@ void ef2_Spheres_Elastic_ElasticLaw::go(shared_ptr<InteractionGeometry>& ig, sha
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
-void Law2_Dem3Dof_Elastic_Elastic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
+void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){
 	Dem3DofGeom* geom=static_cast<Dem3DofGeom*>(ig.get());
-	ElasticContactInteraction* phys=static_cast<ElasticContactInteraction*>(ip.get());
+	FrictPhys* phys=static_cast<FrictPhys*>(ip.get());
 	Real displN=geom->displacementN();
 	if(displN>0){ rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
 	phys->normalForce=phys->kn*displN*geom->normal;

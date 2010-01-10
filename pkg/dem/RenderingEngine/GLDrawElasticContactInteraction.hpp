@@ -20,7 +20,7 @@ class GLDrawElasticContactInteraction : public GlInteractionPhysicsFunctor
 		void drawArrow(const Vector3r from,const Vector3r to,const Vector3r color);
 		void drawFlatText(const Vector3r pos,const std::string txt);
 
-	RENDERS(ElasticContactInteraction);
+	RENDERS(FrictPhys);
 	REGISTER_CLASS_NAME(GLDrawElasticContactInteraction);
 	REGISTER_BASE_CLASS_NAME(GlInteractionPhysicsFunctor);
 };

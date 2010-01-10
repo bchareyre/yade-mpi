@@ -28,8 +28,8 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([ef2_Facet_Sphere_Dem3DofGeom(),ef2_Sphere_Sphere_Dem3DofGeom()]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
-	ConstitutiveLawDispatcher([Law2_Dem3Dof_Elastic_Elastic()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
+	ConstitutiveLawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic()]),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(damping=0.3),
 	## Spheres factory engines

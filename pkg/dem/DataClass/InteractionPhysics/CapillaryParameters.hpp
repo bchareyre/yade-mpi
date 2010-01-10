@@ -7,9 +7,9 @@
 *************************************************************************/
 #pragma once
 //#include <yade/core/InteractionPhysics.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
-class CapillaryParameters : public ElasticContactInteraction
+class CapillaryParameters : public FrictPhys
 {
 	public :	Real	 Vmeniscus
 				,CapillaryPressure
@@ -24,9 +24,9 @@ class CapillaryParameters : public ElasticContactInteraction
 				
 		CapillaryParameters();
 		virtual ~CapillaryParameters();
-	REGISTER_ATTRIBUTES(ElasticContactInteraction,(Vmeniscus)(CapillaryPressure)(Fcap)(Delta1)(Delta2)(meniscus)(fusionNumber));
+	REGISTER_ATTRIBUTES(FrictPhys,(Vmeniscus)(CapillaryPressure)(Fcap)(Delta1)(Delta2)(meniscus)(fusionNumber));
 	REGISTER_CLASS_NAME(CapillaryParameters);
-	REGISTER_BASE_CLASS_NAME(ElasticContactInteraction);
+	REGISTER_BASE_CLASS_NAME(FrictPhys);
 };
 
 REGISTER_SERIALIZABLE(CapillaryParameters);

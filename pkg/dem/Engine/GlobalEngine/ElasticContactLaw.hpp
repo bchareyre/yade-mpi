@@ -18,7 +18,7 @@
 #include <boost/tuple/tuple.hpp>
 
 
-class ef2_Spheres_Elastic_ElasticLaw: public LawFunctor{
+class Law2_ScGeom_FrictPhys_Basic: public LawFunctor{
 	public:
 	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 	int sdecGroupMask;
@@ -29,13 +29,13 @@ class ef2_Spheres_Elastic_ElasticLaw: public LawFunctor{
 		bool useShear;
 	#endif
 	
-	ef2_Spheres_Elastic_ElasticLaw(): sdecGroupMask(1), momentRotationLaw(true), neverErase(false)
+	Law2_ScGeom_FrictPhys_Basic(): sdecGroupMask(1), momentRotationLaw(true), neverErase(false)
 		#ifdef SCG_SHEAR
 			, useShear(false)
 		#endif
 		{}
-	FUNCTOR2D(ScGeom,ElasticContactInteraction);
-	REGISTER_CLASS_AND_BASE(ef2_Spheres_Elastic_ElasticLaw,LawFunctor);
+	FUNCTOR2D(ScGeom,FrictPhys);
+	REGISTER_CLASS_AND_BASE(Law2_ScGeom_FrictPhys_Basic,LawFunctor);
 	REGISTER_ATTRIBUTES(LawFunctor,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR
 			(useShear)
@@ -43,7 +43,7 @@ class ef2_Spheres_Elastic_ElasticLaw: public LawFunctor{
 	);
 	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(ef2_Spheres_Elastic_ElasticLaw);
+REGISTER_SERIALIZABLE(Law2_ScGeom_FrictPhys_Basic);
 
 /* Constitutive law for linear compression, no tension, and linear plasticity surface.
 
@@ -51,14 +51,14 @@ This class serves also as tutorial and is documented in detail at
 
 	http://yade.wikia.com/wiki/ConstitutiveLawHowto
 */
-class Law2_Dem3Dof_Elastic_Elastic: public LawFunctor{
+class Law2_Dem3DofGeom_FrictPhys_Basic: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
-		FUNCTOR2D(Dem3DofGeom,ElasticContactInteraction);
-		REGISTER_CLASS_AND_BASE(Law2_Dem3Dof_Elastic_Elastic,LawFunctor);
+		FUNCTOR2D(Dem3DofGeom,FrictPhys);
+		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_FrictPhys_Basic,LawFunctor);
 		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
 };
-REGISTER_SERIALIZABLE(Law2_Dem3Dof_Elastic_Elastic);
+REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_FrictPhys_Basic);
 
 class ElasticContactLaw : public InteractionSolver
 {
@@ -76,7 +76,7 @@ class ElasticContactLaw : public InteractionSolver
 		ElasticContactLaw();
 		void action(Scene*);
 
-		shared_ptr<ef2_Spheres_Elastic_ElasticLaw> functor;
+		shared_ptr<Law2_ScGeom_FrictPhys_Basic> functor;
 
 		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR

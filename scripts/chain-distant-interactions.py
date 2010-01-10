@@ -11,7 +11,7 @@ o.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()])
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(hasShear=True)]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(isCohesive=True),
 	MomentEngine(subscribedBodies=[1],moment=(0,1000,0)),
 	GravityEngine(gravity=(0,0,1e-2)),

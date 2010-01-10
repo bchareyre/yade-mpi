@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
     configure)
-	 	update-alternatives --install /usr/bin/yade-dbg yade-dbg /usr/bin/yade@_VERSION@-dbg 10 --slave /usr/bin/yade-dbg-multi yade-dbg-multi /usr/bin/yade@_VERSION@-dbg-multi
+	 	update-alternatives --install /usr/bin/yade-dbg yade-dbg /usr/bin/yade@_VERSION@-dbg @PRIORITY@ --slave /usr/bin/yade-dbg-multi yade-dbg-multi /usr/bin/yade@_VERSION@-dbg-multi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

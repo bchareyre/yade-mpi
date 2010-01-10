@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
-class ViscoelasticInteraction : public ElasticContactInteraction
+class ViscoelasticInteraction : public FrictPhys
 {
 	public :
 	    
@@ -23,8 +23,8 @@ class ViscoelasticInteraction : public ElasticContactInteraction
 		virtual ~ViscoelasticInteraction();
 	protected :
 
-	REGISTER_ATTRIBUTES(ElasticContactInteraction,(cn)(cs));
-	REGISTER_CLASS_AND_BASE(ViscoelasticInteraction,ElasticContactInteraction);
+	REGISTER_ATTRIBUTES(FrictPhys,(cn)(cs));
+	REGISTER_CLASS_AND_BASE(ViscoelasticInteraction,FrictPhys);
 
 };
 

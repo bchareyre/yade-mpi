@@ -15,7 +15,7 @@ o.engines=[
 	aabbDispatcher,
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(),
 	GlobalStiffnessTimeStepper(defaultDt=1e-4,active=True,timeStepUpdateInterval=500),
 	AxialGravityEngine(axisPoint=(0,0,0),axisDirection=(1,0,0),acceleration=1e4),

@@ -1,7 +1,7 @@
 O.periodic=True
 O.cell.refSize=Vector3(20,20,10)
 from yade import pack,log,timing
-O.materials.append(GranularMat(young=30e9,density=2400))
+O.materials.append(FrictMat(young=30e9,density=2400))
 p=pack.SpherePack()
 p.makeCloud(Vector3().ZERO,O.cell.refSize,1,.5,700,True)
 for sph in p:
@@ -15,8 +15,8 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom()],
-		[SimpleElasticRelationships()],
-		[Law2_Dem3Dof_Elastic_Elastic()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
 	PeriIsoCompressor(charLen=.5,stresses=[-50e9,-1e8],doneHook="print 'FINISHED'; O.pause() ",keepProportions=True),
 	NewtonIntegrator(damping=.4,homotheticCellResize=1)

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os,re,sys,os.path
 
 if not os.path.exists('SConstruct'): raise 'Must be run from the top-level source directory'

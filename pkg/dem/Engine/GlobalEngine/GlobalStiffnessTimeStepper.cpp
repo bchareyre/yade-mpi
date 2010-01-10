@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include"GlobalStiffnessTimeStepper.hpp"
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 //#include<yade/pkg-dem/MacroMicroElasticRelationships.hpp>
@@ -183,15 +183,15 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 		if(!contact->isReal()) continue;
 
 		GenericSpheresContact* geom=YADE_CAST<GenericSpheresContact*>(contact->interactionGeometry.get()); assert(geom);
-		NormalShearInteraction* phys=YADE_CAST<NormalShearInteraction*>(contact->interactionPhysics.get()); assert(phys);
+		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(contact->interactionPhysics.get()); assert(phys);
 		// all we need for getting stiffness
 		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->refR1; Real& radius2=geom->refR2;
-		// FIXME? NormalShearInteraction knows nothing about whether the contact is "active" (force!=0) or not;
+		// FIXME? NormShearPhys knows nothing about whether the contact is "active" (force!=0) or not;
 		// former code: if(force==0) continue; /* disregard this interaction, it is not active */.
 		// It seems though that in such case either the interaction is accidentally at perfect equilibrium (unlikely)
 		// or it should have been deleted already. Right? 
 		//ANSWER : some interactions can exist without fn, e.g. distant capillary force, wich does not contribute to the overall stiffness via kn. The test is needed.
-		Real fn = (static_cast<NormalShearInteraction *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
+		Real fn = (static_cast<NormShearPhys *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
 
 		if (fn!=0) {
 			//Diagonal terms of the translational stiffness matrix

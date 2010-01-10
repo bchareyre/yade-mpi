@@ -15,7 +15,7 @@ class GLDrawNormalInteraction : public GlInteractionPhysicsFunctor
 	public :
 		virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 
-	RENDERS(NormalInteraction);
+	RENDERS(NormPhys);
 	REGISTER_CLASS_NAME(GLDrawNormalInteraction);
 	REGISTER_BASE_CLASS_NAME(GlInteractionPhysicsFunctor);
 };

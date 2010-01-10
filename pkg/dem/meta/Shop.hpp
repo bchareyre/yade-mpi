@@ -26,7 +26,7 @@ class Scene;
 class Body;
 class SimpleViscoelasticBodyParameters;
 class SimpleViscoelasticMat;
-class GranularMat;
+class FrictMat;
 
 using namespace std;
 using boost::shared_ptr;
@@ -70,8 +70,8 @@ class Shop{
 		//! create default tetrahedron
 		static shared_ptr<Body> tetra(Vector3r v[4], shared_ptr<Material> mat);
 
-		//! return instance of default GranularMat
-		static shared_ptr<GranularMat> defaultGranularMat();
+		//! return instance of default FrictMat
+		static shared_ptr<FrictMat> defaultGranularMat();
 
 		//! Return vector of pairs (center,radius) loaded from a file with numbers inside
 		static vector<pair<Vector3r,Real> > loadSpheresFromFile(string fname,Vector3r& minXYZ, Vector3r& maxXYZ);

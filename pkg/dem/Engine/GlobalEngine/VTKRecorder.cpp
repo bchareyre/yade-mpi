@@ -133,7 +133,7 @@ void VTKRecorder::action(Scene* rootBody)
 				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
 				intrAbsForceT->InsertNextTupleValue(fs);
 			} else {									//For all other models
-				const NormalShearInteraction* phys = YADE_CAST<NormalShearInteraction*>(I->interactionPhysics.get());
+				const NormShearPhys* phys = YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
 				float fn[3]={abs(phys->normalForce[0]),abs(phys->normalForce[1]),abs(phys->normalForce[2])};
 				float fs[3]={abs(phys->shearForce[0]),abs(phys->shearForce[1]),abs(phys->shearForce[2])};
 				intrForceN->InsertNextTupleValue(fn);

@@ -5,7 +5,7 @@
 #pragma once
 
 #include<yade/core/Material.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
 
@@ -34,7 +34,7 @@ class SimpleViscoelasticMat : public Material {
 REGISTER_SERIALIZABLE(SimpleViscoelasticMat);
 
 /// Interaction physics
-class SimpleViscoelasticPhys : public ElasticContactInteraction {
+class SimpleViscoelasticPhys : public FrictPhys {
 	public :
 	    /// Normal viscous 
 	    Real cn;
@@ -43,9 +43,9 @@ class SimpleViscoelasticPhys : public ElasticContactInteraction {
 		SimpleViscoelasticPhys(){ createIndex(); }
 		virtual ~SimpleViscoelasticPhys();
 	protected :
-	REGISTER_ATTRIBUTES(ElasticContactInteraction,(cn)(cs));
-	REGISTER_CLASS_AND_BASE(SimpleViscoelasticPhys,ElasticContactInteraction);
-	REGISTER_CLASS_INDEX(SimpleViscoelasticPhys,ElasticContactInteraction);
+	REGISTER_ATTRIBUTES(FrictPhys,(cn)(cs));
+	REGISTER_CLASS_AND_BASE(SimpleViscoelasticPhys,FrictPhys);
+	REGISTER_CLASS_INDEX(SimpleViscoelasticPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(SimpleViscoelasticPhys);
 

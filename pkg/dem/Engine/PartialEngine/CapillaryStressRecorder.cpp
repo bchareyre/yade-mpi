@@ -10,7 +10,7 @@
 //#include <yade/pkg-common/RigidBodyParameters.hpp>
 //#include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-common/Sphere.hpp>
-#include <yade/pkg-common/ElasticMat.hpp>
+#include <yade/pkg-common/ElastMat.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>

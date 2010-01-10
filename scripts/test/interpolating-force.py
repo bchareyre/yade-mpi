@@ -20,8 +20,8 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom()],
-		[SimpleElasticRelationships()],
-		[ef2_Spheres_Elastic_ElasticLaw()]
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_ScGeom_FrictPhys_Basic()]
 	),
 	# subscribedBodies: what bodies is force applied to
 	# direction: direction of the force (normalized automatically), constant

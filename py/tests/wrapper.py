@@ -48,16 +48,16 @@ class TestObjectInstantiation(unittest.TestCase):
 	def testDispatcherCtor(self):
 		# dispatchers take list of their functors in the ctor
 		# same functors are collapsed in one
-		cld1=LawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3Dof_Elastic_Elastic()]); self.assert_(len(cld1.functors)==1)
+		cld1=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic(),Law2_Dem3DofGeom_FrictPhys_Basic()]); self.assert_(len(cld1.functors)==1)
 		# two different make two different, right?
-		cld2=LawDispatcher([Law2_Dem3Dof_Elastic_Elastic(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
+		cld2=LawDispatcher([Law2_Dem3DofGeom_FrictPhys_Basic(),Law2_Dem3DofGeom_CpmPhys_Cpm()]); self.assert_(len(cld2.functors)==2)
 	def testInteractionDispatchersCtor(self):
 		# InteractionDispatchers takes 3 lists
-		id=InteractionDispatchers([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],)
+		id=InteractionDispatchers([Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],)
 		self.assert_(len(id.geomDispatcher.functors)==2)
 		self.assert_(id.geomDispatcher.name=='InteractionGeometryDispatcher')
-		self.assert_(id.physDispatcher.functors[0].name=='SimpleElasticRelationships')
-		self.assert_(id.lawDispatcher.functors[0].name=='Law2_Dem3Dof_Elastic_Elastic')
+		self.assert_(id.physDispatcher.functors[0].name=='Ip2_FrictMat_FrictMat_FrictPhys')
+		self.assert_(id.lawDispatcher.functors[0].name=='Law2_Dem3DofGeom_FrictPhys_Basic')
 	def testParallelEngineCtor(self):
 		pe=ParallelEngine([InsertionSortCollider(),[BoundDispatcher(),ForceResetter()]])
 		self.assert_(pe.slaves[0].name=='InsertionSortCollider')

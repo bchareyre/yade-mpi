@@ -10,7 +10,7 @@
 #include "CinemCNCEngine.hpp"
 #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/pkg-common/Box.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include <yade/lib-miniWm3/Wm3Math.h>
@@ -261,15 +261,15 @@ void CinemCNCEngine::computeStiffness(Scene* ncb)
 		{
 			const shared_ptr<Interaction>& contact = *ii;
 			
-			Real fn = (static_cast<ElasticContactInteraction*>	(contact->interactionPhysics.get()))->normalForce.Length();
+			Real fn = (static_cast<FrictPhys*>	(contact->interactionPhysics.get()))->normalForce.Length();
 
 			if (fn!=0)
 			{
 				int id1 = contact->getId1(), id2 = contact->getId2();
 				if ( id_boxhaut==id1 || id_boxhaut==id2 )
 					{
-						ElasticContactInteraction* currentContactPhysics =
-						static_cast<ElasticContactInteraction*> ( contact->interactionPhysics.get() );
+						FrictPhys* currentContactPhysics =
+						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
 						stiffness  += currentContactPhysics->kn;
 						nbre_contacts += 1;
 					}

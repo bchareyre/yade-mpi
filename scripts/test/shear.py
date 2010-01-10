@@ -11,7 +11,7 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom()]),
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	RotationEngine(rotationAxis=[1,1,0],angularVelocity=.001,subscribedBodies=[1]),
 	ElasticContactLaw(useShear=False,label='elasticLaw'),
 	PeriodicPythonRunner(iterPeriod=10000,command='interInfo()'),

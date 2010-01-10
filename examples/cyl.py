@@ -41,8 +41,8 @@ O.engines=[
 	InsertionSortCollider(nBins=5,sweepLength=.1*rMean),
 	InteractionDispatchers(
 		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
-		[SimpleElasticRelationships()],
-		[Law2_Dem3Dof_Elastic_Elastic()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
 	GravityEngine(gravity=(0,0,-1e3)), # gravity artificially high, to make it faster going ;-)
 	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(0,1,1),angularVelocity=30*(2*pi/60),subscribedBodies=cylIds,label='rotor'),

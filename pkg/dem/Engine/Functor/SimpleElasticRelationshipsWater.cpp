@@ -9,8 +9,8 @@
 #include"SimpleElasticRelationshipsWater.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -20,8 +20,8 @@ SimpleElasticRelationshipsWater::SimpleElasticRelationshipsWater()
 
 }
 
-void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //GranularMat
-					, const shared_ptr<Material>& b2 // GranularMat
+void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //FrictMat
+					, const shared_ptr<Material>& b2 // FrictMat
 					, const shared_ptr<Interaction>& interaction)
 {
 	
@@ -36,8 +36,8 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //Granu
 			
 // 			Body* de1 = (*bodies)[id1].get();
 // 			Body* de2 = (*bodies)[id2].get();
- 			const shared_ptr<GranularMat>& sdec1 = YADE_PTR_CAST<GranularMat>(b1);
- 			const shared_ptr<GranularMat>& sdec2 = YADE_PTR_CAST<GranularMat>(b2);
+ 			const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>(b1);
+ 			const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>(b2);
 			
  			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());
 //			interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());

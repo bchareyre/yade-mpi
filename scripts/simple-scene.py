@@ -42,7 +42,7 @@ o.engines=[
 	## This may consist in deriving contact rigidity from elastic moduli of each body, for example.
 	## The purpose is that the contact may be "solved" without reference to related bodies,
 	## only with the information contained in contact geometry and physics.
-	InteractionPhysicsDispatcher([SimpleElasticRelationships()]),
+	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	## "Solver" of the contact, also called (consitutive) law.
 	## Based on the information in interaction physics and geometry, it applies corresponding forces on bodies in interaction.
 	ElasticContactLaw(),

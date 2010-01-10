@@ -13,7 +13,7 @@
 
 
 #include "CapillaryCohesiveLaw.hpp"
-#include <yade/pkg-common/ElasticMat.hpp>
+#include <yade/pkg-common/ElastMat.hpp>
 #include <yade/pkg-dem/ScGeom.hpp>
 
 #include <yade/pkg-dem/CapillaryParameters.hpp>

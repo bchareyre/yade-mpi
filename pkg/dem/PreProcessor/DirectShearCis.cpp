@@ -18,7 +18,7 @@
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/MacroMicroElasticRelationships.hpp>
-#include <yade/pkg-dem/SimpleElasticRelationships.hpp>
+#include <yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include <yade/pkg-dem/ElasticCriterionTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>
 
@@ -281,7 +281,7 @@ void DirectShearCis::createActors(shared_ptr<Scene>& rootBody)
 	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	shared_ptr<InteractionPhysicsFunctor> ss(new SimpleElasticRelationships);
+	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_FrictMat_FrictMat_FrictPhys);
 	interactionPhysicsDispatcher->add(ss);
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);

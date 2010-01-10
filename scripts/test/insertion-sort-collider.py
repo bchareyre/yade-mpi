@@ -4,11 +4,11 @@ o.engines=[
 	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
-	InteractionDispatchers([ef2_Facet_Sphere_Dem3DofGeom()],[SimpleElasticRelationships()],[Law2_Dem3Dof_Elastic_Elastic()],),
+	InteractionDispatchers([ef2_Facet_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()],),
 	GravityEngine(gravity=[0,0,-10]),
 	NewtonIntegrator(damping=0.01),
 ]
-O.materials.append(GranularMat(young=1e3))
+O.materials.append(FrictMat(young=1e3))
 O.bodies.append([
 	utils.facet([[-1,-1,0],[1,-1,0],[0,1,0]],dynamic=False,color=[1,0,0]),
 	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False)

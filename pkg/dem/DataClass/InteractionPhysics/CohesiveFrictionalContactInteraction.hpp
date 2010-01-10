@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include<yade/pkg-common/NormalShearInteractions.hpp>
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
+#include<yade/pkg-common/NormShearPhys.hpp>
+#include<yade/pkg-dem/FrictPhys.hpp>
 
-class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
+class CohesiveFrictionalContactInteraction : public FrictPhys
 {
 	public :
 		bool		cohesionDisablesFriction,	//is shear strength the sum of friction and adhesion or only adhesion?
@@ -33,15 +33,15 @@ class CohesiveFrictionalContactInteraction : public ElasticContactInteraction
 		virtual ~CohesiveFrictionalContactInteraction();
 		void SetBreakingState ();
 
-	REGISTER_ATTRIBUTES(NormalInteraction,
+	REGISTER_ATTRIBUTES(NormPhys,
 		(prevNormal)(shearForce)(ks)(initialKn)(initialKs)(tangensOfFrictionAngle)(cohesionDisablesFriction)(fragile)(cohesionBroken)(normalAdhesion)(shearAdhesion)
 		// FIXME where this?
 		(orientationToContact1)(orientationToContact2)(initialOrientation1)(initialOrientation2)(kr)(currentContactOrientation)(initialContactOrientation)(initialPosition1)(initialPosition2)(twistCreep)
 		(moment_twist)(moment_bending)
 	);
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactInteraction);
-	REGISTER_BASE_CLASS_NAME(ElasticContactInteraction);
-	REGISTER_CLASS_INDEX(CohesiveFrictionalContactInteraction,ElasticContactInteraction);
+	REGISTER_BASE_CLASS_NAME(FrictPhys);
+	REGISTER_CLASS_INDEX(CohesiveFrictionalContactInteraction,FrictPhys);
 
 };
 
