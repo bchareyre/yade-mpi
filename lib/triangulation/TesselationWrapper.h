@@ -67,7 +67,7 @@ public:
 	double	Volume	(unsigned int id);
 	
 	/// number of facets in the tesselation (finite branches of the triangulation)
-	unsigned int InitFacetIter(void);
+	unsigned int NumberOfFacets(bool initIters=false);
 	/// set first and last facets, set facet_it = facet_begin
 	void InitIter(void);
 	/// set facet = (body1->id,body2->id), returns facet_it==facet_begin

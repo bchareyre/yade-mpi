@@ -13,8 +13,8 @@
 #include<utility>
 #include<vector>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/ElastMat.hpp>
-#include<yade/lib-triangulation/TesselationWrapper.h>
+#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-dem/TesselationWrapper.hpp>
 
 YADE_REQUIRE_FEATURE(CGAL)
 
@@ -23,7 +23,7 @@ PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 	noTransientIfPersistentExists=false;
 	haveDistantTransient=false;
 	isTriangulated = false;
-	Tes = new ( CGT::TesselationWrapper );
+	Tes = new ( TesselationWrapper );
 
 	nbObjects=0;
 	xBounds.clear();
@@ -106,7 +106,7 @@ void PersistentTriangulationCollider::action ( Scene* ncb )
 		unsigned int& id1 = interaction_pair.first;
 		unsigned int& id2 = interaction_pair.second;
 
-		unsigned int numberOfInteractions = Tes->NumberOfFacets();
+		unsigned int numberOfInteractions = Tes->NumberOfFacets(true);
 		for ( unsigned int i=0; i<numberOfInteractions; ++i )
 		{
 			Tes->nextFacet ( interaction_pair );

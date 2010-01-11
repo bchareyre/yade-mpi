@@ -37,10 +37,11 @@ public:
     	bool insert(double x, double y, double z, double rad, unsigned int id);
 	/// A faster version of insert
 	bool insertSceneSpheres(const Scene* scene);
-	/// Move one sphere to the new position and maintain triangulation (invalidates the tesselation)
+	/// Move one sphere to the new position (x,y,z) and maintain triangulation (invalidates the tesselation)
 	bool move (double x, double y, double z, double rad, unsigned int id);
 	
     	void checkMinMax(double x, double y, double z, double rad);//for experimentation purpose	
+	/// Reset the triangulation
     	void clear(void);
     	void clear2(void);
     	    	
@@ -60,10 +61,10 @@ public:
 	double	Volume	(unsigned int id);
 	
 	/// number of facets in the tesselation (finite branches of the triangulation)
-	unsigned int InitFacetIter(void);
+	unsigned int NumberOfFacets(bool initIters=false);
 	/// set first and last facets, set facet_it = facet_begin
 	void InitIter(void);
-	/// set facet = (body1->id,body2->id), returns facet_it==facet_begin
+	/// set facet = next pair (body1->id,body2->id), returns facet_it==facet_end
 	bool nextFacet (std::pair<unsigned int, unsigned int>& facet);
 	
 private:

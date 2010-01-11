@@ -160,12 +160,10 @@ void TesselationWrapper::ComputeVolumes(void)
 	Tes->ComputeVolumes();
 }
 
-unsigned int TesselationWrapper::InitFacetIter(void)
+unsigned int TesselationWrapper::NumberOfFacets(bool initIters)
 {
-	facet_begin = Tes->Triangulation().finite_edges_begin ();
-	facet_end = Tes->Triangulation().finite_edges_end ();
-	facet_it = facet_begin;
-	return Tes->Triangulation().number_of_finite_edges ();
+	if (initIters) InitIter();
+	return Tes->Triangulation().number_of_finite_edges();
 }
 
 void TesselationWrapper::InitIter(void)

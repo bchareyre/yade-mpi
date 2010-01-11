@@ -15,7 +15,7 @@
 #include <vector>
 #include <algorithm>
 
-#include<yade/lib-triangulation/TesselationWrapper.h>
+#include<yade/pkg-dem/TesselationWrapper.hpp>
 
 
 /*! \brief Collision detection engine based on regular triangulation.
@@ -33,7 +33,7 @@ class PersistentTriangulationCollider : public Collider
 {
 	private :
 	
-		CGT::TesselationWrapper* Tes;	
+		TesselationWrapper* Tes;	
 		// represent an extrmity of an Axis ALigned bounding box
 		struct AABBBound
 		{
