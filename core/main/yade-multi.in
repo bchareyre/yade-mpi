@@ -6,7 +6,7 @@
 import os, sys, thread, time, logging, pipes
 
 ## replaced by scons automatically
-prefix,suffix='${PREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ('YADE_PREFIX'),'${SUFFIX}'
 sys.path.append(os.path.join(prefix,'lib','yade'+suffix,'py'))
 executable=os.path.join(prefix,'bin','yade'+suffix)
 ## we just need this ...
