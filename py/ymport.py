@@ -46,30 +46,41 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	
 	Remaining **kw arguments are passed to utils.facet; 
 	mesh files can be easily created with GMSH http://www.geuz.org/gmsh/
-	Example added to scripts/test/regular-sphere-pack.py"""
+	Example added to scripts/test/regular-sphere-pack.py
+	
+	Additional examples of mesh-files can be downloaded here
+	http://www-roc.inria.fr/gamma/download/download.php
+	"""
 	infile = open(meshfile,"r")
 	lines = infile.readlines()
 	infile.close()
 
 	nodelistVector3=[]
-	numNodes = int(lines[4].split()[0])
+	findVerticesString=0
+	
+	while (lines[findVerticesString].split()[0]<>'Vertices'): #Find the string with the number of Vertices
+		findVerticesString+=1
+	findVerticesString+=1
+	numNodes = int(lines[findVerticesString].split()[0])
+	
 	for i in range(numNodes):
 		nodelistVector3.append(Vector3(0.0,0.0,0.0))
 	id = 0
-	for line in lines[5:numNodes+5]:
+	
+	for line in lines[findVerticesString+1:numNodes+findVerticesString+1]:
 		data = line.split()
 		X = shift[0]+float(data[0])*scale
 		Y = shift[1]+float(data[1])*scale
 		Z = shift[2]+float(data[2])*scale
 		nodelistVector3[id] = Vector3(X,Y,Z)
 		id += 1
-	numTriangles = int(lines[numNodes+6].split()[0])
+	numTriangles = int(lines[numNodes+findVerticesString+2].split()[0])
 	triList = []
 	for i in range(numTriangles):
 		triList.append([0,0,0,0])
-	 
+	
 	tid = 0
-	for line in lines[numNodes+7:numNodes+7+numTriangles]:
+	for line in lines[numNodes+findVerticesString+3:numNodes+findVerticesString+3+numTriangles]:
 		data = line.split()
 		id1 = int(data[0])-1
 		id2 = int(data[1])-1
@@ -100,6 +111,7 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	Example added to scripts/test/regular-sphere-pack.py
 	Example of LSMGenGeo library using is added to genCylLSM.py
 	
+	https://answers.launchpad.net/esys-particle/+faq/877
 	http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
 	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
 	from yade.utils import sphere
@@ -127,6 +139,7 @@ def gengeo(mntable,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	Example added to scripts/test/regular-sphere-pack.py
 	Example of LSMGenGeo library using is added to genCylLSM.py
 	
+	https://answers.launchpad.net/esys-particle/+faq/877
 	http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
 	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
 	from GenGeo import MNTable3D,Sphere
