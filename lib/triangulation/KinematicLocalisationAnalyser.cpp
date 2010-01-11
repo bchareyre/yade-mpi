@@ -217,7 +217,7 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
 		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie sym�trique
 		double dev = (double) epsilon.Deviatoric().Norme();
-		output_file<<V_it->info().id()<<" "<<ParticleDeformation[V_it->info().id()]<<endl<<dev<<endl;
+		output_file<<V_it->info().id()<<endl<<ParticleDeformation[V_it->info().id()]<<dev<<endl;
 	}
 }
 
