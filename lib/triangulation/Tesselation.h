@@ -26,7 +26,7 @@ public:
 	typedef std::vector<Cell_handle>	Vector_Cell;
 	typedef std::list<Point>		List_Point;
 	typedef Vector_Cell::iterator		VCell_iterator;
-	
+	unsigned int max_id;
 	//Donn�es
 
 private:
@@ -34,9 +34,7 @@ private:
 	RTriangulation* Tes; //=NULL ou Tri selon le constructeur appell�, permet au destructeur
 						 //de savoir s'il faut d�truire la Triangulation ou non
 	bool computed;
-	bool redirected;//is vertexHandles filled with current vertex pointers? 
-	unsigned int max_id;
-	
+	bool redirected;//is vertexHandles filled with current vertex pointers? 	
 
 public:
 	Real TotalFiniteVoronoiVolume;

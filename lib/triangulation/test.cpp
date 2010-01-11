@@ -58,7 +58,7 @@ int main ( int argc, char *argv[ ], char *envp[ ] )
 	T1.AddBoundingPlanes();
   	T1.ComputeVolumes();
 		
-	cout << "sphere icicicicici     =    " << T1.NumberOfFacets() << endl ;
+	cout << "sphere icicicicici     =    " << T1.InitFacetIter() << endl ;
 	
 	for (int i =1; i<15; ++i) {
 	cout << "sphere " << i << " v=" << T1.Volume(i) << endl;

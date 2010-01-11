@@ -17,7 +17,7 @@
 #include <yade/pkg-common/Sphere.hpp>
 #include "VolumicContactLaw.hpp"
 //#include<yade/extra/TesselationWrapper.h>
-#include "/home/jf/YADE/trunk/extra/triangulation/TesselationWrapper.h"
+#include<yade/pkg-dem/TesselationWrapper.hpp>
 #include <time.h>
 
 YADE_REQUIRE_FEATURE(NONSENSE__THIS_PLUGIN_WILL_NEVER_BE_BUILT_UNLESS_YOU_REMOVE_ABSOLUTE_PATHS_FROM_INCLUDES!!)

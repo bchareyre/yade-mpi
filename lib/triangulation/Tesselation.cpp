@@ -487,7 +487,7 @@ void Tesselation::ComputePorosity ( void )  //WARNING : This function will erase
 	{
 		if ( V_it->info().v() && !V_it->info().isFictious )
 		{
-			Real r = 4.188790 * std::pow ( sqrt ( V_it->point().weight() ),3 );// 4/3*PI*R³ = 4.188...*R³
+			Real r = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
 			TotalInternalVoronoiPorosity+=r;
 			//rr+=V_it->info().v();
 			TotalInternalVoronoiVolume += V_it->info().v();

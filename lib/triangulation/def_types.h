@@ -28,8 +28,10 @@ typedef K::Point_3									Point;
 //typedef Traits::Bare_point 								Point;
 typedef Traits::Vector_3 								Vecteur;
 typedef Traits::Segment_3								Segment;
+#ifndef NO_REAL_CHECK
 /** compilation inside yade: check that Real in yade is the same as Real we will define; otherwise it might make things go wrong badly (perhaps) **/
 BOOST_STATIC_ASSERT(sizeof(Traits::RT)==sizeof(Real));
+#endif
 typedef Traits::RT									Real; //Dans cartesian, RT = FT
 typedef Traits::Weighted_point								Sphere;
 typedef Traits::Line_3									Droite;

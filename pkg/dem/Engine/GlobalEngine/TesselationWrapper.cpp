@@ -1,24 +1,117 @@
+/*************************************************************************
+*  Copyright (C) 2008 by Bruno Chareyre                                  *
+*  bruno.chareyre@hmg.inpg.fr                                            *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+#include"TesselationWrapper.hpp"
+//#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
+//#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
+
+//using namespace std;
+YADE_PLUGIN((TesselationWrapper));
+YADE_REQUIRE_FEATURE(CGAL)
+
+//spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
+//template<class _Triangulation>
+struct RTraits_for_spatial_sort : public CGT::RTriangulation::Geom_traits {
+	//typedef typename _Triangulation::Geom_traits Gt;
+	typedef CGT::RTriangulation::Geom_traits Gt;
+	typedef std::pair<const CGT::Sphere*,body_id_t> Point_3;
+
+	struct Less_x_3 {
+		bool operator()(const Point_3& p,const Point_3& q) const {
+			return Gt::Less_x_3()(* (p.first),* (q.first));
+		}
+	};
+
+	struct Less_y_3 {
+		bool operator()(const Point_3& p,const Point_3& q) const {
+			return Gt::Less_y_3()(* (p.first),* (q.first));
+		}
+	};
+
+	struct Less_z_3 {
+		bool operator()(const Point_3& p,const Point_3& q) const {
+			return Gt::Less_z_3()(* (p.first),* (q.first));
+		}
+	};
+	Less_x_3  less_x_3_object() const {return Less_x_3();}
+	Less_y_3  less_y_3_object() const {return Less_y_3();}
+	Less_z_3  less_z_3_object() const {return Less_z_3();}
+};
 
 
-//
-// C++ Implementation: TesselationWrapper
-//
-// Description: 
-//
-//
-// Author: chareyre <bruno.chareyre@hmg.inpg.fr>, (C) 2008
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
-#include "TesselationWrapper.h"
+//function inserting points into a triangulation (where YADE::Sphere is converted to CGT::Sphere)
+//and setting the info field to the bodies id.
+//Possible improvements : use bodies pointers to avoid one copy, use aabb's lists to replace the shuffle/sort part
+// template <class Triangulation>
+void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, TesselationWrapper &TW)
+{
+	CGT::Tesselation& Tes = *(TW.Tes);
+	CGT::RTriangulation& T = Tes.Triangulation();
+	std::vector<CGT::Sphere> spheres;
+	std::vector<std::pair<const CGT::Sphere*,body_id_t> > pointsPtrs;
+	spheres.reserve(bodies->size());
+	pointsPtrs.reserve(bodies->size());
+
+	BodyContainer::iterator biBegin    = bodies->begin();
+	BodyContainer::iterator biEnd = bodies->end();
+	BodyContainer::iterator bi = biBegin;
+
+	body_id_t Ng = 0;
+	TW.mean_radius = 0;
+	for (; bi!=biEnd ; ++bi) {
+		if ((*bi)->isDynamic) { //then it is a sphere (not a wall) FIXME : need test if isSphere
+			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
+			const Vector3r& pos = (*bi)->state->pos;
+			const Real rad = s->radius;
+			CGT::Sphere sp (CGT::Point(pos[0],pos[1],pos[2]),rad*rad);
+			spheres.push_back(sp);
+			pointsPtrs.push_back(std::make_pair(&(spheres[Ng]/*.point()*/),(*bi)->getId()));
+			Ng++;
+			TW.mean_radius += rad;
+		}
+	}
+	TW.mean_radius /= Ng;
+	spheres.resize(Ng);
+	pointsPtrs.resize(Ng);
+	std::random_shuffle(pointsPtrs.begin(), pointsPtrs.end());
+	spatial_sort(pointsPtrs.begin(),pointsPtrs.end(), RTraits_for_spatial_sort()/*, CGT::RTriangulation::Weighted_point*/);
+
+	CGT::RTriangulation::Cell_handle hint;
+	
+	long Nt = 0;
+	for (std::vector<std::pair<const CGT::Sphere*,body_id_t> >::const_iterator
+			p = pointsPtrs.begin();p != pointsPtrs.end(); ++p) {
+		CGT::RTriangulation::Locate_type lt;
+		CGT::RTriangulation::Cell_handle c;
+		int li, lj;
+		c = T.locate(* (p->first), lt, li, lj, hint);
+		CGT::RTriangulation::Vertex_handle v = T.insert(* (p->first), lt, c, li, lj);
+		if (v==CGT::RTriangulation::Vertex_handle())
+			hint=c;
+		else {
+			v->info() =  (const unsigned int) p->second;
+			//Vh->info().isFictious = false;//false is the default
+			Tes.max_id = std::max(Tes.max_id,(const unsigned int) p->second);
+			hint=v->cell();
+			++Nt;
+		}
+	}
+	cerr << " loaded : " << Ng<<", triangulated : "<<Nt<<", mean radius = " << TW.mean_radius<<endl;
+}
 
 
-using namespace std;
-namespace CGT {
 
-static Point Pmin;
-static Point Pmax;
+
+//namespace CGT {
+
+CREATE_LOGGER(TesselationWrapper);
+
+static CGT::Point Pmin;
+static CGT::Point Pmax;
 static double inf = 1e10;
  double pminx=0;
  double pminy=0;
@@ -50,8 +143,8 @@ TesselationWrapper::~TesselationWrapper()
  void TesselationWrapper::clear(void)
  {
  	Tes->Clear();
-	Pmin = Point(inf, inf, inf);
-	Pmax = Point(-inf, -inf, -inf);
+	Pmin = CGT::Point(inf, inf, inf);
+	Pmax = CGT::Point(-inf, -inf, -inf);
 	mean_radius = 0;
 	n_spheres = 0;
 	rad_divided = false;
@@ -75,12 +168,12 @@ TesselationWrapper::~TesselationWrapper()
 // 	facet_it = Tes->Triangulation().finite_edges_end ();
  } 
 
-//  bool TesselationWrapper::insertSceneSpheres(const Scene* scene)
-//  {
-// 	 const shared_ptr<BodyContainer>& bodies = scene->bodies;
-// 	 build_triangulation_with_ids(bodies, *this);
-// 	 return 1;
-//  }
+ bool TesselationWrapper::insertSceneSpheres(const Scene* scene)
+ {
+	 const shared_ptr<BodyContainer>& bodies = scene->bodies;
+	 build_triangulation_with_ids(bodies, *this);
+	 return 1;
+ }
  
  
  
@@ -94,10 +187,10 @@ bool TesselationWrapper::insert(double x, double y, double z, double rad, unsign
 {
 	using namespace std;
 
-	Pmin = Point(min(Pmin.x(), x-rad),
+	Pmin = CGT::Point(min(Pmin.x(), x-rad),
 					  min(Pmin.y(), y-rad),
 					  min(Pmin.z(), z-rad));
-	Pmax = Point(max(Pmax.x(), x+rad),
+	Pmax = CGT::Point(max(Pmax.x(), x+rad),
 					  max(Pmax.y(), y+rad),
 					  max(Pmax.z(), z+rad));
 	mean_radius += rad;
@@ -109,10 +202,10 @@ bool TesselationWrapper::insert(double x, double y, double z, double rad, unsign
 void TesselationWrapper::checkMinMax(double x, double y, double z, double rad)
 {	
 	using namespace std;
-	Pmin = Point( min(Pmin.x(), x-rad),
+	Pmin = CGT::Point( min(Pmin.x(), x-rad),
 							min(Pmin.y(), y-rad),
 							min(Pmin.z(), z-rad) );
-	Pmax = Point( max(Pmax.x(), x+rad),
+	Pmax = CGT::Point( max(Pmax.x(), x+rad),
 							max(Pmax.y(), y+rad),
 							max(Pmax.z(), z+rad) );
 		mean_radius += rad;
@@ -126,10 +219,10 @@ bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned
 {	
 	using namespace std;
 
-	Pmin = Point( min(Pmin.x(), x-rad),
+	Pmin = CGT::Point( min(Pmin.x(), x-rad),
 							min(Pmin.y(), y-rad),
 							min(Pmin.z(), z-rad) );
-	Pmax = Point( max(Pmax.x(), x+rad),
+	Pmax = CGT::Point( max(Pmax.x(), x+rad),
 							max(Pmax.y(), y+rad),
 							max(Pmax.z(), z+rad) );
 		mean_radius += rad;
@@ -265,8 +358,8 @@ void 	TesselationWrapper::RemoveBoundingPlanes (void)
 	Tes->remove(3);
 	Tes->remove(4);
 	Tes->remove(5);
-	Pmin = Point(inf, inf, inf);
-	Pmax = Point(-inf, -inf, -inf);
+	Pmin = CGT::Point(inf, inf, inf);
+	Pmax = CGT::Point(-inf, -inf, -inf);
 	mean_radius = 0;
 	//n_spheres = 0;
 	rad_divided = false;
@@ -274,7 +367,32 @@ void 	TesselationWrapper::RemoveBoundingPlanes (void)
 	cerr << " end remove bounding planes " << endl;
 }
 
-} //namespace CGT
+//} //namespace CGT
 
+
+
+
+
+// int main()
+// {
+// 	std::list<Point> input;
+// 
+// 	input.push_back ( Point ( 0,0,0 ) );
+// 	input.push_back ( Point ( 1,0,0 ) );
+// 	input.push_back ( Point ( 0,1,0 ) );
+// 	input.push_back ( Point ( 0,0,1 ) );
+// 	input.push_back ( Point ( 2,2,2 ) );
+// 	input.push_back ( Point ( -1,0,1 ) );
+// 
+// 	Delaunay T;
+// 
+// 	build_triangulation_with_indices ( input.begin(),input.end(),T );
+// 
+// 	Delaunay::Finite_vertices_iterator vit;
+// 	for ( vit = T.finite_vertices_begin(); vit != T.finite_vertices_end(); ++vit )
+// 		std::cout << vit->info() << "\n"; //prints the position in input
+// 
+// 	return 0;
+// }
 
 

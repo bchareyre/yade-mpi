@@ -19,13 +19,12 @@
 
 #include "MicroMacroAnalyser.hpp"
 
-#include<yade/lib-triangulation/TesselationWrapper.h>
+#include<yade/pkg-dem/TesselationWrapper.hpp>
 #include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 #include<yade/lib-triangulation/TriaxialState.h>
 
 YADE_PLUGIN((MicroMacroAnalyser));
 YADE_REQUIRE_FEATURE(CGAL)
-
 CREATE_LOGGER(MicroMacroAnalyser);
 
 MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()

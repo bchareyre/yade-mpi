@@ -19,7 +19,7 @@ include $(CGAL_MAKEFILE)
 CXXFLAGS = \
            $(CGAL_CXXFLAGS) \
            $(LONG_NAME_PROBLEM_CXXFLAGS) \
-           -DCGAL_NDEBUG -DNDEBUG -O3
+           -DCGAL_NDEBUG -DNDEBUG -DNO_REAL_CHECK -O3
            
 
 
