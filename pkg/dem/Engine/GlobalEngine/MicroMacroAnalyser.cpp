@@ -30,6 +30,7 @@ MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()
 	interval = 100;
 	outputFile = "MicroMacroAnalysis";
 	stateFileName = "./snapshots/state";
+	initialized = false;
 }
 
 void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
@@ -44,7 +45,7 @@ void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 void MicroMacroAnalyser::action(Scene* ncb)
 {
 	//cerr << "MicroMacroAnalyser::action(Scene* ncb) (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
-	if (Omega::instance().getCurrentIteration() == 0) setState(ncb, 1);
+	if (!initialized) {setState(ncb, 1); initialized=true;}
 	else if (Omega::instance().getCurrentIteration() % interval == 0) {
 		setState(ncb, 2, true, true);
 		analyser->ComputeParticlesDeformation();

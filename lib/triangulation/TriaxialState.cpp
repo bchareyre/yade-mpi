@@ -18,7 +18,7 @@
 
 namespace CGT {
 
-TriaxialState::TriaxialState(void) : NO_ZERO_ID(true), filter_distance(-0.1), tesselated(false) {}
+TriaxialState::TriaxialState(void) : NO_ZERO_ID(false), filter_distance(-0.1), tesselated(false) {}
 
 TriaxialState::~TriaxialState(void)
 {
@@ -44,7 +44,7 @@ Real TriaxialState::find_parameter (const char* parameter_name, ifstream& file)
 	Real value;
 	file >> buffer;
 	bool test = (buffer == string(parameter_name));
-	//cout << "buffer0 " << buffer << " test0: "<< test << endl;
+	cout << "buffer0 " << buffer << " test0: "<< test << endl;
 	while (!test)
 	{
 		buffer.clear();
@@ -161,20 +161,19 @@ bool TriaxialState::inside(Point p)
 bool TriaxialState::from_file(const char* filename)
 {
 	reset();
-	
-
-	ifstream Statefile (filename);
+	ifstream Statefile(filename);
 	cout << filename << endl;
-	if (!Statefile.is_open())	{
+	if (!Statefile.is_open()) {
 		cout << "Error opening files";
-		return false;	}
+		return false;
+	}
 
 	//int a=0;
-	#ifdef USE_OGL_VIEW
+#ifdef USE_OGL_VIEW
 	Vue3D Vue1;
-	#endif
-	
-		
+#endif
+
+
 	long Idg;
 	Statefile >> Ng;
 	//Real x, y, z, rad; //coordonn�es/rayon
@@ -184,8 +183,8 @@ bool TriaxialState::from_file(const char* filename)
 	Vecteur trans, rot;
 	Real rad; //coordonn�es/rayon
 	bool isSphere;
-		
-	
+
+
 	grains.resize(Ng+1);
 	//cout << "Ngrains =" << Ng << endl;
 	if (NO_ZERO_ID) {
@@ -196,10 +195,9 @@ bool TriaxialState::from_file(const char* filename)
 		git->rotation = CGAL::NULL_VECTOR;
 	}
 
-	long i= NO_ZERO_ID ? 1 : 0; 
-	
-	for (; i <= Ng ; ++i) 
-	{
+	long i= NO_ZERO_ID ? 1 : 0;
+
+	for (; i <= Ng ; ++i) {
 		Statefile >> Idg >> pos >> rad >> trans >> rot  >> isSphere;
 		grains[Idg].id = Idg;
 		grains[Idg].sphere = Sphere(pos, rad);
@@ -207,17 +205,17 @@ bool TriaxialState::from_file(const char* filename)
 		grains[Idg].rotation = rot;
 		grains[Idg].isSphere = isSphere;
 
-		box.base = Point( min(box.base.x(), pos.x()-rad),
-							min(box.base.y(), pos.y()-rad),
-							min(box.base.z(), pos.z()-rad) );
-		box.sommet = Point( max(box.sommet.x(), pos.x()+rad),
-							max(box.sommet.y(), pos.y()+rad),
-							max(box.sommet.z(), pos.z()+rad) );
+		box.base = Point(min(box.base.x(), pos.x()-rad),
+						 min(box.base.y(), pos.y()-rad),
+						 min(box.base.z(), pos.z()-rad));
+		box.sommet = Point(max(box.sommet.x(), pos.x()+rad),
+						   max(box.sommet.y(), pos.y()+rad),
+						   max(box.sommet.z(), pos.z()+rad));
 		mean_radius += grains[Idg].sphere.weight();
 		//cout << "Idg: "<< Idg << " sphere: " << grains[Idg].sphere << " trans: " << grains[Idg].translation << endl;
 	}
 	mean_radius /= Ng;//rayon moyen
-	cout << filename << " loaded : " << Ng << " grains with mean radius = " << mean_radius << endl;
+	//cout << filename << " loaded : " << Ng << " grains with mean radius = " << mean_radius << endl;
 
 	long id1, id2;
 	int stat;
@@ -225,10 +223,12 @@ bool TriaxialState::from_file(const char* filename)
 	Real old_fn, fn, frictional_work;
 	Statefile >> Nc;
 	contacts.resize(Nc);
-	for (long i=0 ; i < Nc ; ++i)
-	{
+
+	for (long i=0 ; i < Nc ; ++i) {
+		cout << "hereNc"<<Nc<<"/"<<i<<endl;
 		Contact* c = new Contact;
-		Statefile >> id1 >> id2 >> c_pos >> old_fn >> old_fs >> fn >> fs >> frictional_work >> stat;
+		Statefile >> id1 >> id2 >> normal >> c_pos >> old_fn >> old_fs >> fn >> fs >> frictional_work >> stat;
+		
 		normal = (grains[id2].sphere.point()-grains[id1].sphere.point());
 		normal = normal/sqrt(pow(normal.x(),2)+pow(normal.y(),2)+pow(normal.z(),2));
 		c->grain1 = &(grains[id1]);
@@ -248,31 +248,31 @@ bool TriaxialState::from_file(const char* filename)
 	}
 
 	//cout << "c_pos=" << contacts[10]->position << " old_fn=" << contacts[10]->old_fn << " normal=" << contacts[10]->normal << endl;
-
+	cout << "here0"<<endl;
 	//rfric = find_parameter("rfric=", Statefile);// � remettre quand les fichiers n'auront plus l'espace de trop...
-	Eyn = find_parameter("Eyn=", Statefile);
-	Eys = find_parameter("Eys=", Statefile);
-	wszzh = find_parameter("wszzh=", Statefile);
-	wsxxd = find_parameter("wsxxd=", Statefile);
-	wsyyfa = find_parameter("wsyyfa=", Statefile);
-	eps3 = find_parameter("eps3=", Statefile);
-	eps1 = find_parameter("eps1=", Statefile);
-	eps2 = find_parameter("eps2=", Statefile);
-	porom = find_parameter("porom=", Statefile);
-	haut = find_parameter("haut=", Statefile);
-	larg = find_parameter("larg=", Statefile);
-	prof = find_parameter("prof=", Statefile);
-	ratio_f = find_parameter("ratio_f=", Statefile);
-	vit = find_parameter("vit=", Statefile);
-
+	Eyn = find_parameter("Eyn", Statefile);
+	Eys = find_parameter("Eys", Statefile);
+	wszzh = find_parameter("wszzh", Statefile);
+	wsxxd = find_parameter("wsxxd", Statefile);
+	wsyyfa = find_parameter("wsyyfa", Statefile);
+	eps3 = find_parameter("eps3", Statefile);
+	eps1 = find_parameter("eps1", Statefile);
+	eps2 = find_parameter("eps2", Statefile);
+	porom = find_parameter("porom", Statefile);
+	haut = find_parameter("haut", Statefile);
+	larg = find_parameter("larg", Statefile);
+	prof = find_parameter("prof", Statefile);
+	ratio_f = find_parameter("ratio_f", Statefile);
+	vit = find_parameter("vit", Statefile);
 	Statefile.close();
-	//cout << endl << "wszzh= " << wszzh << endl; 
+	cout << "here1"<<endl;
+	//cout << endl << "wszzh= " << wszzh << endl;
 
 	/*GrainIterator grains_end = grains.end();
 	for (GrainIterator it=grains.begin(); it!=grains_end; ++it)
 	{
-		if (it==grains.begin()) ++it;
-		Vue1.Dessine_Sphere(it->sphere.x(), it->sphere.y(), it->sphere.z(), it->sphere.weight(), 10);
+	 if (it==grains.begin()) ++it;
+	 Vue1.Dessine_Sphere(it->sphere.x(), it->sphere.y(), it->sphere.z(), it->sphere.weight(), 10);
 	}*/
 	//Vue1.Affiche();
 

@@ -33,6 +33,7 @@ class MicroMacroAnalyser : public GlobalEngine
 		shared_ptr<CGT::KinematicLocalisationAnalyser> analyser;
 		std::string	 outputFile;
 		std::string	 stateFileName;
+		bool initialized;
 		
 	public :
 		MicroMacroAnalyser();

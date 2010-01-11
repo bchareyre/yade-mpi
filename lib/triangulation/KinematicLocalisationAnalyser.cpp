@@ -76,7 +76,30 @@ state_file1, const char* state_file0, bool consecutive_files)
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
 }
 
-
+KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_name, int n0, int n1)
+{
+	file_number_1 = n1;
+	file_number_0 = n0;
+	base_file_name = string(base_name);
+	
+	consecutive = ((n1-n0)==1);
+	sphere_discretisation = SPHERE_DISCRETISATION;
+	linear_discretisation = LINEAR_DISCRETISATION;
+	TS1 = new(TriaxialState);
+	TS0 = new(TriaxialState);
+	
+//	char buffer [50];
+	std::ostringstream file_name1, file_name0;
+	file_name1 << (string) (base_file_name) << n1;
+	file_name0 << (string) (base_file_name) << n0;
+	cout << "file names : " << file_name0.str().c_str() << ", " << file_name1.str().c_str() << endl;
+	TS1->from_file( file_name1.str().c_str() );
+	TS0->from_file( file_name0.str().c_str() );
+	
+	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
+	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
+	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
+}
 
 void KinematicLocalisationAnalyser::SetBaseFileName (string name)
 {
@@ -177,12 +200,12 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 	Tesselation& Tes = TS1->tesselation();
 	RTriangulation& Tri = Tes.Triangulation();
 
-	output_file << Tri.number_of_vertices();
+	output_file << Tri.number_of_vertices()<<endl;
 	for (RTriangulation::Finite_vertices_iterator  V_it =
 				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++)
 		output_file<<V_it->info().id()<<" "<<V_it->point()<<endl;
 	
-	output_file << Tri.number_of_finite_cells();
+	output_file << Tri.number_of_finite_cells()<<endl;
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
 	Finite_cells_iterator cell0 = Tri.finite_cells_end();
 	for (; cell != cell0; cell++) {
