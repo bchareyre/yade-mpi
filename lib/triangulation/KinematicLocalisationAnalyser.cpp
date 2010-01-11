@@ -165,8 +165,40 @@ vector<Edge_iterator>& KinematicLocalisationAnalyser::Oriented_Filtered_edges (R
 	return filteredList;
 }
 
+bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
+{
+	ofstream output_file(output_file_name);
+	if (!output_file.is_open()) {
+		cerr << "Error opening files";
+		return false;
+	}
+	ComputeParticlesDeformation();
 
-bool KinematicLocalisationAnalyser::ToFile (const char* output_file_name)
+	Tesselation& Tes = TS1->tesselation();
+	RTriangulation& Tri = Tes.Triangulation();
+
+	output_file << Tri.number_of_vertices();
+	for (RTriangulation::Finite_vertices_iterator  V_it =
+				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++)
+		output_file<<V_it->info().id()<<" "<<V_it->point()<<endl;
+	
+	output_file << Tri.number_of_finite_cells();
+	Finite_cells_iterator cell = Tri.finite_cells_begin();
+	Finite_cells_iterator cell0 = Tri.finite_cells_end();
+	for (; cell != cell0; cell++) {
+		for (unsigned int index=0; index<4; index++) output_file << cell->vertex(index)->info().id()<<" " ;
+		output_file<<endl;
+	}
+
+	for (RTriangulation::Finite_vertices_iterator  V_it =
+				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
+		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie sym�trique
+		double dev = (double) epsilon.Deviatoric().Norme();
+		output_file<<V_it->info().id()<<" "<<ParticleDeformation[V_it->info().id()]<<endl<<dev<<endl;
+	}
+}
+
+bool KinematicLocalisationAnalyser::DistribsToFile (const char* output_file_name)
 {
 	ofstream output_file (output_file_name);
 	if (!output_file.is_open())	{

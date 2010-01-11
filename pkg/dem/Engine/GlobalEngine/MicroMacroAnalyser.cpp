@@ -48,6 +48,9 @@ void MicroMacroAnalyser::action(Scene* ncb)
 	else if (Omega::instance().getCurrentIteration() % interval == 0) {
 		setState(ncb, 2, true, true);
 		analyser->ComputeParticlesDeformation();
+		for (int i=0; i<analyser->ParticleDeformation.size();i++) cerr<< analyser->ParticleDeformation[i]<<endl;
+		analyser->DefToFile();
+		
 		CGT::Tenseur_sym3 epsg(analyser->grad_u_total);
 		ofile << Omega::instance().getCurrentIteration() << analyser->Delta_epsilon(1,1)<<" "<<analyser->Delta_epsilon(2,2)<<" "<<analyser->Delta_epsilon(3,3)<<" "<<epsg(1,1)<<" "<<epsg(2,2)<< " "<<epsg(3,3)<<" "<<epsg(1,2)<<" "<<epsg(1,3)<<" "<<epsg(2,3)<<endl;
 		analyser->SwitchStates();

@@ -36,15 +36,10 @@ const int l_vertices [4][3] = { {1, 2, 3}, {0, 3, 2}, {3, 0, 1}, {2, 1, 0} };
 
 class KinematicLocalisationAnalyser
 {
-
-
-
 	public:
-
 		typedef vector< pair<Real,Real> > RGrid1D;
 		typedef vector<vector <Real> >  RGrid2D;
 		typedef vector<vector<vector<Real> > > RGrid3D;
-
 
 		KinematicLocalisationAnalyser();
 		KinematicLocalisationAnalyser ( const char* state_file1 );
@@ -59,7 +54,9 @@ class KinematicLocalisationAnalyser
 		void SetNO_ZERO_ID (bool);
 		void SwitchStates ( void );
 
-		bool ToFile ( const char* output_file_name );
+		bool DistribsToFile (const char* output_file_name);
+		///Write the averaged deformation on each grain in a file (vertices and cells lists included in the file), no need to call ComputeParticlesDeformation()
+		bool DefToFile (const char* output_file_name = "deformations");
 		ofstream& ContactDistributionToFile ( ofstream& output_file );
 		ofstream& AllNeighborDistributionToFile ( ofstream& output_file );
 		ofstream& StrictNeighborDistributionToFile ( ofstream& output_file );
