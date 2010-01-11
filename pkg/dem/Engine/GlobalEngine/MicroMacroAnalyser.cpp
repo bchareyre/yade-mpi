@@ -7,18 +7,13 @@
 *************************************************************************/
 
 
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-
-#include<yade/pkg-dem/ElasticContactInteraction.hpp>
-
+#include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
-
 #include <yade/pkg-common/Sphere.hpp>
-
 #include "MicroMacroAnalyser.hpp"
-
 #include<yade/pkg-dem/TesselationWrapper.hpp>
 #include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 #include<yade/lib-triangulation/TriaxialState.h>
@@ -30,8 +25,8 @@ CREATE_LOGGER(MicroMacroAnalyser);
 MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()
 {
 	analyser = shared_ptr<CGT::KinematicLocalisationAnalyser> (new CGT::KinematicLocalisationAnalyser);
-	analyser->SetConsecutive (true);
-	analyser->SetNO_ZERO_ID (false);
+	analyser->SetConsecutive(true);
+	analyser->SetNO_ZERO_ID(false);
 	interval = 100;
 	outputFile = "MicroMacroAnalysis";
 	stateFileName = "./snapshots/state";
@@ -39,9 +34,8 @@ MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()
 
 void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 {
-	if(deserializing)
-	{
-		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
+	if (deserializing) {
+		bool file_exists = std::ifstream(outputFile.c_str());  //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
 		if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
 	}
@@ -54,7 +48,7 @@ void MicroMacroAnalyser::action(Scene* ncb)
 	else if (Omega::instance().getCurrentIteration() % interval == 0) {
 		setState(ncb, 2, true, true);
 		analyser->ComputeParticlesDeformation();
-		CGT::Tenseur_sym3 epsg ( analyser->grad_u_total );
+		CGT::Tenseur_sym3 epsg(analyser->grad_u_total);
 		ofile << Omega::instance().getCurrentIteration() << analyser->Delta_epsilon(1,1)<<" "<<analyser->Delta_epsilon(2,2)<<" "<<analyser->Delta_epsilon(3,3)<<" "<<epsg(1,1)<<" "<<epsg(2,2)<< " "<<epsg(3,3)<<" "<<epsg(1,2)<<" "<<epsg(1,3)<<" "<<epsg(2,3)<<endl;
 		analyser->SwitchStates();
 	}
@@ -63,30 +57,27 @@ void MicroMacroAnalyser::action(Scene* ncb)
 
 
 
-void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveStates, bool computeIncrement )
+void MicroMacroAnalyser::setState(Scene* ncb, unsigned int state, bool saveStates, bool computeIncrement)
 {
-	LOG_INFO ("MicroMacroAnalyser::setState");
-	if ( !triaxialCompressionEngine )
-	{
+	LOG_INFO("MicroMacroAnalyser::setState");
+	if (!triaxialCompressionEngine) {
 		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
 		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
-		for ( ;itFirst!=itLast; ++itFirst )
-		{
-			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
-			{
-				LOG_DEBUG ( "stress controller engine found" );
-				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
+		for (;itFirst!=itLast; ++itFirst) {
+			if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {   //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
+				LOG_DEBUG("stress controller engine found");
+				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);
 				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
 			}
 		}
-		if ( !triaxialCompressionEngine ) LOG_ERROR ( "stress controller engine not found" );
+		if (!triaxialCompressionEngine) LOG_ERROR("stress controller engine not found");
 	}
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	CGT::TriaxialState* ts=0;
-	if ( state==1 ) ts = analyser->TS0;
-	else if ( state==2 ) ts = analyser->TS1;
-	else LOG_ERROR ( "state must be 1 or 2, instead of " << state );
+	if (state==1) ts = analyser->TS0;
+	else if (state==2) ts = analyser->TS1;
+	else LOG_ERROR("state must be 1 or 2, instead of " << state);
 	CGT::TriaxialState& TS = *ts;
 
 	TS.reset();
@@ -101,7 +92,7 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	//Vecteur trans, rot;
 	//Real rad; //coordonn�es/rayon
 
-	TS.grains.resize ( Ng );
+	TS.grains.resize(Ng);
 	//cerr << "Ngrains =" << Ng << endl;
 	//GrainIterator git= grains.begin();
 //  git->id=0;
@@ -114,29 +105,28 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	BodyContainer::iterator bi = biBegin;
 	Ng = 0;
 
-	
-	for ( ; bi!=biEnd ; ++bi )
-	{
-		body_id_t Idg = ( *bi )->getId();
+
+	for (; bi!=biEnd ; ++bi) {
+		body_id_t Idg = (*bi)->getId();
 		TS.grains[Idg].id = Idg;
-		
-		if ( !( *bi )->isDynamic ) TS.grains[Idg].isSphere = false;
+
+		if (!(*bi)->isDynamic) TS.grains[Idg].isSphere = false;
 		else {//then it is a sphere (not a wall)
 			++Ng;
-			const Sphere* s = YADE_CAST<Sphere*> ( ( *bi )->shape.get() );
+			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
 			//const GranularMat* p = YADE_CAST<GranularMat*> ( ( *bi )->material.get() );
 			const Vector3r& pos = (*bi)->state->pos;
 			Real rad = s->radius;
 
-			TS.grains[Idg].sphere = CGT::Sphere ( CGT::Point ( pos[0],pos[1],pos[2] ),  rad );
+			TS.grains[Idg].sphere = CGT::Sphere(CGT::Point(pos[0],pos[1],pos[2]),  rad);
 //    TS.grains[Idg].translation = trans;
 //    grains[Idg].rotation = rot;
-			TS.box.base = CGT::Point ( min ( TS.box.base.x(), pos.X()-rad ),
-								  min ( TS.box.base.y(), pos.Y()-rad ),
-								  min ( TS.box.base.z(), pos.Z()-rad ) );
-			TS.box.sommet = CGT::Point ( max ( TS.box.sommet.x(), pos.X() +rad ),
-									max ( TS.box.sommet.y(), pos.Y() +rad ),
-									max ( TS.box.sommet.z(), pos.Z() +rad ) );
+			TS.box.base = CGT::Point(min(TS.box.base.x(), pos.X()-rad),
+									 min(TS.box.base.y(), pos.Y()-rad),
+									 min(TS.box.base.z(), pos.Z()-rad));
+			TS.box.sommet = CGT::Point(max(TS.box.sommet.x(), pos.X() +rad),
+									   max(TS.box.sommet.y(), pos.Y() +rad),
+									   max(TS.box.sommet.z(), pos.Z() +rad));
 			TS.mean_radius += TS.grains[Idg].sphere.weight();
 
 
@@ -144,54 +134,46 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	}
 
 	TS.mean_radius /= Ng;//rayon moyen
-	LOG_INFO ( " loaded : " << Ng << " grains with mean radius = " << TS.mean_radius );
+	LOG_INFO(" loaded : " << Ng << " grains with mean radius = " << TS.mean_radius);
 
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end();
-	for ( ; ii!=iiEnd ; ++ii )
-	{
-		if ( ( *ii )->isReal() )
-		{
+	for (; ii!=iiEnd ; ++ii) {
+		if ((*ii)->isReal()) {
 			CGT::TriaxialState::Contact *c = new CGT::TriaxialState::Contact;
-			TS.contacts.push_back ( c );
+			TS.contacts.push_back(c);
 			CGT::TriaxialState::VectorGrain& grains = TS.grains;
-			body_id_t id1 = ( *ii )->getId1();
-			body_id_t id2 = ( *ii )->getId2();
+			body_id_t id1 = (*ii)->getId1();
+			body_id_t id2 = (*ii)->getId2();
 
-			c->grain1 = & ( TS.grains[id1] );
-			c->grain2 = & ( TS.grains[id2] );
-			grains[id1].contacts.push_back ( c );
-			grains[id2].contacts.push_back ( c );
-			c->normal = CGT::Vecteur ( 
-					 ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal.X(),
-					 ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal.Y(),
-					 ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal.Z() );
-// 			c->normal = ( grains[id2].sphere.point()-grains[id1].sphere.point() );
-// 			c->normal = c->normal/sqrt ( pow ( c->normal.x(),2 ) +pow ( c->normal.y(),2 ) +pow ( c->normal.z(),2 ) );
-			c->position = CGT::Vecteur ( 
-					( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.X(),
-					( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Y(),
-					( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->contactPoint.Z() );
-// 			c->position = 0.5* ( ( grains[id1].sphere.point()-CGAL::ORIGIN ) +
-// 								 ( grains[id1].sphere.weight() *c->normal ) +
-// 								 ( grains[id2].sphere.point()-CGAL::ORIGIN ) -
-// 								 ( grains[id2].sphere.weight() *c->normal ) );
-
-
-			c->fn = YADE_CAST<ElasticContactInteraction*> ( ( ( *ii )->interactionPhysics.get() ) )->normalForce.Dot ( ( YADE_CAST<ScGeom*> ( ( *ii )->interactionGeometry.get() ) )->normal );
-			Vector3r fs = YADE_CAST<ElasticContactInteraction*> ( ( *ii )->interactionPhysics.get() )->shearForce;
-			c->fs = CGT::Vecteur ( fs.X(),fs.Y(),fs.Z() );
+			c->grain1 = & (TS.grains[id1]);
+			c->grain2 = & (TS.grains[id2]);
+			grains[id1].contacts.push_back(c);
+			grains[id2].contacts.push_back(c);
+			c->normal = CGT::Vecteur((YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->normal.X(),
+						(YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->normal.Y(),
+						(YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->normal.Z());
+//    c->normal = ( grains[id2].sphere.point()-grains[id1].sphere.point() );
+//    c->normal = c->normal/sqrt ( pow ( c->normal.x(),2 ) +pow ( c->normal.y(),2 ) +pow ( c->normal.z(),2 ) );
+			c->position = CGT::Vecteur((YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->contactPoint.X(),
+						  (YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->contactPoint.Y(),
+						  (YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->contactPoint.Z());
+//    c->position = 0.5* ( ( grains[id1].sphere.point()-CGAL::ORIGIN ) +
+//          ( grains[id1].sphere.weight() *c->normal ) +
+//          ( grains[id2].sphere.point()-CGAL::ORIGIN ) -
+//          ( grains[id2].sphere.weight() *c->normal ) );
+			c->fn = YADE_CAST<FrictPhys*> (((*ii)->interactionPhysics.get()))->normalForce.Dot((YADE_CAST<ScGeom*> ((*ii)->interactionGeometry.get()))->normal);
+			Vector3r fs = YADE_CAST<FrictPhys*> ((*ii)->interactionPhysics.get())->shearForce;
+			c->fs = CGT::Vecteur(fs.X(),fs.Y(),fs.Z());
 			c->old_fn = c->fn;
 			c->old_fs = c->fs;
 			c->frictional_work = 0;
 		}
 	}
-
 	//Load various parameters
-
 	//rfric = find_parameter("rfric=", Statefile);// � remettre quand les fichiers n'auront plus l'espace de trop...
-//  Eyn = find_parameter("Eyn=", Statefile);
-//  Eys = find_parameter("Eys=", Statefile);
+	//  Eyn = find_parameter("Eyn=", Statefile);
+	//  Eys = find_parameter("Eys=", Statefile);
 	TS.wszzh = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];//find_parameter("wszzh=", Statefile);
 	TS.wsxxd = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0];//find_parameter("wsxxd=", Statefile);
 	TS.wsyyfa = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2];//find_parameter("wsyyfa=", Statefile);
@@ -203,20 +185,16 @@ void MicroMacroAnalyser::setState ( Scene* ncb, unsigned int state, bool saveSta
 	TS.larg = triaxialCompressionEngine->width;//find_parameter("larg=", Statefile);
 	TS.prof = triaxialCompressionEngine->depth;//find_parameter("prof=", Statefile);
 	TS.porom = analyser->ComputeMacroPorosity();//find_parameter("porom=", Statefile);
-	TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce ( ncb );//find_parameter("ratio_f=", Statefile);
+	TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(ncb);   //find_parameter("ratio_f=", Statefile);
 //  vit = find_parameter("vit=", Statefile);
-
-	
-	if ( state == 2 && computeIncrement )
-	{
+	if (state == 2 && computeIncrement) {
 		analyser->SetForceIncrements();
 		analyser->SetDisplacementIncrements();
 	}
-	if ( saveStates ) 
-	{
+	if (saveStates) {
 		ostringstream oss;
 		oss<<stateFileName<<"_"<<Omega::instance().getCurrentIteration();
-		TS.to_file ( oss.str().c_str() );
+		TS.to_file(oss.str().c_str());
 	}
 	cerr << "ENDOF MicroMacroAnalyser::setState" << endl;
 }

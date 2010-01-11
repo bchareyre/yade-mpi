@@ -1,6 +1,3 @@
-
-
-
 #include "TesselationWrapper.h"
 #include <iostream>
 
@@ -58,11 +55,11 @@ int main ( int argc, char *argv[ ], char *envp[ ] )
 	T1.AddBoundingPlanes();
   	T1.ComputeVolumes();
 		
-	cout << "sphere icicicicici     =    " << T1.InitFacetIter() << endl ;
-	
 	for (int i =1; i<15; ++i) {
 	cout << "sphere " << i << " v=" << T1.Volume(i) << endl;
 	}
+	
+	cout << T1.Tes->Triangulation() << endl;
 // 	cout << "sphere 1 : v=" << T1.Volume(2) << endl;
 // 	cout << "sphere 1 : v=" << T1.Volume(3) << endl;
 // 	cout << "sphere 1 : v=" << T1.Volume(4) << endl;

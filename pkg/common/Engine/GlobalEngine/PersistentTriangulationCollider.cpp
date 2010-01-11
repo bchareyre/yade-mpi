@@ -13,7 +13,7 @@
 #include<utility>
 #include<vector>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/ElasticMat.hpp>
+#include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/TesselationWrapper.hpp>
 
 YADE_REQUIRE_FEATURE(CGAL)
