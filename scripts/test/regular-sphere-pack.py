@@ -44,7 +44,7 @@ for part in [
 	]: O.bodies.appendClumped(part)
 
 
-
+""" Example of utils.facetBox usage """
 q1 = Quaternion(Vector3(0,0,1),(3.14159/3))
 o1,o_angl = q1.ToAxisAngle()
 O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
@@ -55,6 +55,10 @@ q1 = Quaternion(Vector3(0,0,1),(3.14159))
 o1,o_angl = q1.ToAxisAngle()
 O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
 
+""" Example of utils.facetCylinder usage, RotationEngine example see below"""
+q1 = Quaternion(Vector3(0,0,1),(3.14159/2))
+o1,o_angl = q1.ToAxisAngle()
+rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,(o1[0],o1[1],o1[2],o_angl),closed=0,segmentsNumber=10,**kwBoxes))
 
 """Import regular-sphere-pack.mesh into the YADE simulation"""
 O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
@@ -79,7 +83,13 @@ O.engines=[
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
 	GravityEngine(gravity=(1e-2,1e-2,-1000)),
-	NewtonIntegrator(damping=.1)
+	NewtonIntegrator(damping=.1),
+	RotationEngine(
+		subscribedBodies=rotateIDs,
+		angularVelocity=10.0,
+		rotationAxis=[0,0,1],
+		rotateAroundZero=1,
+		zeroPoint=[6.0,6.0,0.0])
 ]
 # we don't care about physical accuracy here, (over)critical step is fine as long as the simulation doesn't explode
 O.dt=utils.PWaveTimeStep()

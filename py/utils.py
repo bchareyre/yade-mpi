@@ -233,20 +233,24 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
-
 	:Parameters:
-		`wallMask`: bitmask
+		`center` :
+			center of the created box; (X,Y,Z) coordinates;
+		`extents` :
+			lengths of the box sides; (eX,eY,eZ);
+		`orientation` :
+			orientation of the box in quaternion format;
+		`wallMask`: bitmask;
 			 determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32).
 			 The numbers are ANDed; the default 63 means to create all walls.
 		`**kw`:
-			passed to utils.facet.
+			passed to utils.facet;
 	
 	:Return:
 		List of facets forming the box.
 	"""
-
 	
-	"""Defence from zero dimensions"""
+	"""Defense from zero dimensions"""
 	if (extents[0]==0):
 		wallMask=1
 	elif (extents[1]==0):
@@ -255,6 +259,7 @@ If any of the box dimensions is zero, corresponding facets will not be created. 
 		wallMask=16
 	if (((extents[0]==0) and (extents[1]==0)) or ((extents[0]==0) and (extents[2]==0)) or ((extents[1]==0) and (extents[2]==0))):
 		raise RuntimeError("Please, specify at least 2 none-zero dimensions in extents!");
+	"""___________________________"""
 	
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
@@ -277,6 +282,57 @@ If any of the box dimensions is zero, corresponding facets will not be created. 
 	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
 	
+def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,closed=1,**kw):
+	"""Create arbitrarily-aligned cylinder composed of facets, with given center, height and orientation.
+	:Parameters:
+		`center` :
+			cylinder center; (X,Y,Z) coordinates
+		`radius` :
+			cylinder radius;
+		`extents` :
+			lengths of the box sides; (eX,eY,eZ);
+		`orientation` :
+			orientation of the box in quaternion format;
+		`**kw` :
+			passed to utils.facet;
+		`closed` :
+			flag, which defines, whether cylinder is closed from the ends or not;
+		`segmentsNumber` :
+			the number of edges on the cylinder surface, the minimum is 5;
+	:Return:
+		List of facets forming the cylinder.
+	"""
+	"""Defense from zero dimensions"""
+	if (segmentsNumber<5):
+		raise RuntimeError("The segmentsNumber should be at least 5");
+	if (height<=0):
+		raise RuntimeError("The height should have the positive value");
+	if (radius<=0):
+		raise RuntimeError("The radius should have the positive value");
+	"""___________________________"""
+	import numpy
+	anglesInRad = numpy.linspace(0, 2.0*math.pi, segmentsNumber+1, endpoint=True)
+	P1=[]; P2=[]
+	P1.append(Vector3(0,0,-height/2))
+	P2.append(Vector3(0,0,+height/2))
+	
+	for i in anglesInRad:
+		X=radius*math.cos(i)
+		Y=radius*math.sin(i)
+		P1.append(Vector3(X,Y,-height/2))
+		P2.append(Vector3(X,Y,+height/2))
+	qTemp = Quaternion(Vector3(orientation[0],orientation[1],orientation[2]),orientation[3])
+	for i in range(0,len(P1)):
+		P1[i]=qTemp.Rotate(P1[i])+Vector3(center[0],center[1],center[2])
+		P2[i]=qTemp.Rotate(P2[i])+Vector3(center[0],center[1],center[2])
+	ret=[]
+	for i in range(2,len(P1)):
+		if (closed==1):
+			ret.append(facet((P1[0],P1[i],P1[i-1]),**kw))
+			ret.append(facet((P2[0],P2[i-1],P2[i]),**kw))
+		ret.append(facet((P1[i],P2[i],P2[i-1]),**kw))
+		ret.append(facet((P2[i-1],P1[i-1],P1[i]),**kw))
+	return ret
 	
 
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
