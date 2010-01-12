@@ -2,22 +2,22 @@
 
 using namespace std;
 
-void basicVTKwritter::open(const char * filename, const char * comment)
+bool basicVTKwritter::open(const char * filename, const char * comment)
 {
   file.open(filename,ios_base::out);
   if (!file)
   {
 	cerr << "Cannot open file [" << filename << "]" << endl;
-	return;
+	return false;
   }
 
   // Header
-  file << "# vtk DataFile Version 2.0" << endl;
+  file << "# vtk DataFile Version 3.0" << endl;
   file << comment << endl;
   file << "ASCII" << endl;
   file << "DATASET UNSTRUCTURED_GRID" << endl;
   file << endl;
-
+  return true;
 }
 
 void basicVTKwritter::begin_vertices()

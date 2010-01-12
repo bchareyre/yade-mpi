@@ -190,6 +190,51 @@ vector<Edge_iterator>& KinematicLocalisationAnalyser::Oriented_Filtered_edges (R
 
 bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 {
+	ComputeParticlesDeformation();
+	Tesselation& Tes = TS1->tesselation();
+	RTriangulation& Tri = Tes.Triangulation();
+	basicVTKwritter vtk((unsigned int)(Tri.number_of_vertices()), (unsigned int)(Tri.number_of_finite_cells()));
+	vtk.open(output_file_name, "test bidon"); // <- what a pretty comment! 
+	
+	vtk.begin_vertices();
+	RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin();
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) vtk.file <<  V_it->point() << endl;
+	vtk.end_vertices();
+	
+	vtk.begin_cells();
+	Finite_cells_iterator cell = Tri.finite_cells_begin();
+	for (; cell != Tri.finite_cells_end(); ++cell) 
+	{
+		vtk.write_cell(
+		cell->vertex(0)->info().id(), 
+		cell->vertex(1)->info().id(),
+		cell->vertex(2)->info().id(), 
+		cell->vertex(3)->info().id()
+		);
+	}
+	vtk.end_cells();
+	
+	vtk.begin_data("Strain_matrix", POINT_DATA, TENSORS, FLOAT);
+	V_it = finite_vertices_begin();
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) 
+	{
+		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
+		vtk.file << ParticleDeformation[V_it->info().id()] << endl;
+	}
+	vtk.end_data();
+	
+	vtk.begin_data("Strain_deviator", POINT_DATA, SCALARS, FLOAT);
+	V_it = finite_vertices_begin();
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) 
+	{
+		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
+		vtk.write_data( (float) epsilon.Deviatoric().Norme() );
+	}
+	vtk.end_data();
+	
+	return true;
+	
+	/*
 	ofstream output_file(output_file_name);
 	if (!output_file.is_open()) {
 		cerr << "Error opening files";
@@ -215,10 +260,11 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 
 	for (RTriangulation::Finite_vertices_iterator  V_it =
 				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
-		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie sym�trique
+		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie symetrique
 		double dev = (double) epsilon.Deviatoric().Norme();
 		output_file<<V_it->info().id()<<endl<<ParticleDeformation[V_it->info().id()]<<dev<<endl;
 	}
+	*/
 }
 
 bool KinematicLocalisationAnalyser::DistribsToFile (const char* output_file_name)
