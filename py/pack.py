@@ -225,7 +225,7 @@ def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0
 	:param predicate: solid-defining predicate for which we generate packing
 	:param spheresInCell: if given, the packing will be periodic, with given number of spheres in the periodic cell.
 	:param radius: mean radius of spheres
-	:param rRelFuzz: relative fuzz of the radius -- e.g. radius=10, rRelFuzz=.2, then spheres will have radii 10 ± ½(10*.2)).
+	:param rRelFuzz: relative fuzz of the radius -- e.g. radius=10, rRelFuzz=.2, then spheres will have radii 10 ± (10*.2)).
 		0 by default, meaning all spheres will have exactly the same radius.
 	:param cropLayers: (aperiodic only) how many layers of spheres will be added to the computed dimension of the box so that there no
 		(or not so much, at least) boundary effects at the boundaries of the predicate.
