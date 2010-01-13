@@ -89,7 +89,7 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	if(periodic)(cellSize=size);
 	for(int i=0; (i<num) || (num<0); i++) {
 		int t;
-		Real r=(rnd()-.5)*rRelFuzz*rMean+rMean; 
+		Real r=2*(rnd()-.5)*rRelFuzz*rMean+rMean; 
 		for(t=0; t<maxTry; ++t){
 			Vector3r c;
 			if(!periodic) { for(int axis=0; axis<3; axis++) c[axis]=mn[axis]+r+(size[axis]-2*r)*rnd(); }
