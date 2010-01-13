@@ -14,7 +14,7 @@ struct basicVTKwritter
 
 	basicVTKwritter(unsigned int nV, unsigned int nC) : nbVertices(nV),nbCells(nC) { }
 	
-	void open(const char * filename, const char * comment);
+	bool open(const char * filename, const char * comment);
 	
 	void begin_vertices();
 	void write_point(float x, float y, float z);
