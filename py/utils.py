@@ -231,22 +231,20 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	return b
 
 def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
-	"""Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
-	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
-	
-	@param center: center of the created box; (X,Y,Z) coordinates;
-	
-	@param extents: lengths of the box sides; (eX,eY,eZ);
-	
-	@param orientation: orientation of the box in quaternion format;
-	
-	@param wallMask: bitmask; determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls;
-	
-	@param **kw: passed to utils.facet;
-	
-	@return : List of facets forming the box;
-	
 	"""
+	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
+	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
+	Return list of facets forming the box;
+	
+	:Parameters:
+			- `center`: center of the created box; (X,Y,Z) coordinates;
+			- `extents`: lengths of the box sides; (eX,eY,eZ);
+			- `orientation`: orientation of the box in quaternion format;
+			- `extents`: lengths of the box sides; (eX,eY,eZ);
+			- `wallMask`: bitmask; determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls;
+			- `**kw`: passed to utils.facet;
+	"""
+	
 	
 	#Defense from zero dimensions
 	if (extents[0]==0):
@@ -281,25 +279,20 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	return ret
 	
 def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,closed=1,**kw):
-	"""Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
-	
-	@param center: center of the created box; (X,Y,Z) coordinates;
-	
-	@param radius: cylinder radius;
-	
-	@param height: cylinder height;
-	
-	@param orientation: orientation of the box in quaternion format;
-	
-	@param segmentsNumber: the number of edges on the cylinder surface, the minimum is 5;
-	
-	@param closed:  defines, whether cylinder is closed from the ends or not;
-	
-	@param **kw: passed to utils.facet;
-	
-	@return : List of facets forming the cylinder;
-	
 	"""
+	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
+	Return List of facets forming the cylinder;
+	
+	:Parameters:
+			- `center`: center of the created cylinder; (X,Y,Z) coordinates;
+			- `radius`: cylinder radius;
+			- `height`: cylinder height;
+			- `orientation`: orientation of the cylinder in quaternion format;
+			- `segmentsNumber`: the number of edges on the cylinder surface, the minimum is 5;
+			- `closed`: defines, whether cylinder is closed from the ends or not;
+			- `**kw`: passed to utils.facet;
+	"""
+	
 	#Defense from zero dimensions
 	if (segmentsNumber<5):
 		raise RuntimeError("The segmentsNumber should be at least 5");
