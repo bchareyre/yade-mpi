@@ -8,7 +8,8 @@ from yade import *
 
 import sys
 # add the configuration file
-sys.argv+=['--config=yade-epydoc.conf','-v'] # '-v'
+# fix command-line args (epydoc would choke receiving "yade-something yade-epydoc.py --config=...", which is the case for python main; this changes to "yade-something --config=...")
+sys.argv=[sys.argv[0]]+['--config=yade-epydoc.conf','-v'] # '-v'
 from epydoc.cli import cli
 cli()
 quit()

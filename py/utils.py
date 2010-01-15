@@ -460,7 +460,7 @@ def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 		`fps`:
 			Frames per second.
 	"""
-	import pygst,sys,gobject,os,tempfile,shutil
+	import pygst,sys,gobject,os,tempfile,shutil,os.path
 	pygst.require("0.10")
 	import gst
 	if renameNotOverwrite and os.path.exists(out):
@@ -471,7 +471,7 @@ def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 		# create a new common prefix, symlink given files to prefix-%05d.png in their order, adjust wildcard, go ahead.
 		tmpDir=tempfile.mkdtemp()
 		for no,frame in enumerate(frameSpec):
-			os.symlink(frame,os.path.join(tmpDir,'%07d'%no))
+			os.symlink(os.path.abspath(frame),os.path.join(tmpDir,'%07d'%no))
 		wildcard=os.path.join(tmpDir,'%07d')
 	else:
 		tmpDir=None; wildcard=frameSpec

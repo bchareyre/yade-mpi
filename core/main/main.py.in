@@ -39,7 +39,7 @@ import yade.config
 import yade.wrapper
 import yade.log
 import yade.system
-import yade.plot
+#import yade.plot
 
 # continue option processing
 

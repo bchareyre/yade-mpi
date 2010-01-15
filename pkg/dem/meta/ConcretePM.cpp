@@ -385,7 +385,7 @@ void CpmStateUpdater::update(Scene* _scene){
 		Vector3r shearStress;
 		for(int i=0; i<3; i++){
 			int ix1=(i+1)%3,ix2=(i+2)%3;
-			shearStress[i]=Mathr::Sign(geom->normal[ix1])*phys->shearForce[ix1]+Mathr::Sign(geom->normal[ix2])*phys->shearForce[ix2];
+			shearStress[i]=geom->normal[ix1]*phys->shearForce[ix1]+geom->normal[ix2]*phys->shearForce[ix2];
 			shearStress[i]/=phys->crossSection;
 		}
 		bodyStats[id1].tau+=shearStress;

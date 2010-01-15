@@ -538,6 +538,7 @@ class pyOmega{
 		exit(status);
 	}
 	void runEngine(const shared_ptr<Engine>& e){ LOG_WARN("Omega().runEngine(): deprecated, use __call__ method of the engine instance directly instead; will be removed in the future."); e->scene=OMEGA.getScene().get(); e->action(OMEGA.getScene().get()); }
+	std::string tmpFilename(){ return OMEGA.tmpFilename(); }
 };
 
 class pySTLImporter : public STLImporter {};
@@ -700,6 +701,7 @@ BOOST_PYTHON_MODULE(wrapper)
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
 		#endif
 		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
+		.def("tmpFilename",&pyOmega::tmpFilename,"Return unique name of file in temporary directory which will be deleted when yade exits.")
 		;
 	python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
