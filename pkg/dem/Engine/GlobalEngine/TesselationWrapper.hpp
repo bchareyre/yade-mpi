@@ -6,21 +6,30 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #pragma once
-
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/core/Omega.hpp>
 #include <utility>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-triangulation/Tesselation.h>
-//namespace CGT {
-
+//#include<yade/lib-pyutil/numpy.hpp>
+#include<boost/python.hpp>
+#include"MicroMacroAnalyser.hpp"
+#include<yade/extra/boost_python_len.hpp>
 
 /*! \class TesselationWrapper
  * \brief Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.
  * More accessors in course of implementation. Feel free to suggest new ones.
+ *
+ * Usage :
+ * TW.setState(0)
+ * O.run(1000); O.wait()
+ * TW.setState(1)
+ * array = TW.getVolPoroDef(True) //syntax here?
  * 
  */
+
+
 class TesselationWrapper : public GlobalEngine{
 public:
 
@@ -67,11 +76,33 @@ public:
 	/// set facet = next pair (body1->id,body2->id), returns facet_it==facet_end
 	bool nextFacet (std::pair<unsigned int, unsigned int>& facet);
 	
+	/// make the current state the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get only volmumes and porosity
+	void setState (bool state=0);	
+	/// return python array containing voronoi volumes, per-particle porosity, and optionaly per-particle deformation, if states 0 and 1 have been assigned 
+	boost::python::dict getVolPoroDef(bool deformation);//{
+// 		Scene* scene=Omega::instance().getScene().get();
+// 		int dim1[]={scene->bodies->size()};
+// 		int dim2[]={scene->bodies->size(),3};
+// 		numpy_boost<Real,1> mass(dim1);
+// 		numpy_boost<Real,2> vel(dim2);
+// 		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+// 			if(!b) continue;
+// 			mass[b->getId()]=b->state->mass;
+// 			VECTOR3R_TO_NUMPY(vel[b->getId()],b->state->vel);
+// 		}
+// 		python::dict ret;
+// 		ret["mass"]=mass;
+// 		ret["vel"]=vel;
+// 		return ret;
+// 	}
+
+	
 private:
 	/// edge iterators are used for returning tesselation "facets", i.e. spheres with a common branch in the triangulation, convert CGAL::edge to int pair (b1->id, b2->id)
 	CGT::Finite_edges_iterator facet_begin;
 	CGT::Finite_edges_iterator facet_end;
 	CGT::Finite_edges_iterator facet_it;
+	MicroMacroAnalyser mma;
 public:	
 	REGISTER_ATTRIBUTES(GlobalEngine,(n_spheres));
 	REGISTER_CLASS_NAME(TesselationWrapper);

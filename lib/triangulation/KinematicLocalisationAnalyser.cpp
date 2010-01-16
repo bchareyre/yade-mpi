@@ -13,8 +13,6 @@
 #include "Tesselation.h"
 #include "KinematicLocalisationAnalyser.hpp"
 #include "TriaxialState.h"
-
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -76,6 +74,19 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char*
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
 }
 
+const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformation(const char* state_file1, const char* state_file0)
+{
+	consecutive = false;
+	TS1->from_file(state_file1);
+	TS0->from_file(state_file0);
+	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
+	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
+	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
+	ComputeParticlesDeformation();
+	return ComputeParticlesDeformation();
+}
+
+
 KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_name, int n0, int n1)
 {
 	file_number_1 = n1;
@@ -129,9 +140,7 @@ bool KinematicLocalisationAnalyser::SetFileNumbers(int n0, int n1)
 	} else if (n1 != file_number_1) {
 		//file_name = base_file_name + string(n1);
 		bf0 = true;
-		bf1 = TS1->from_file((base_file_name + _itoa(file_number_1)).c_str());
-	}
-
+		bf1 = TS1->from_file((base_file_name + _itoa(file_number_1)).c_str());}
 	file_number_1 = n1;
 	file_number_0 = n0;
 	consecutive = ((n1-n0) ==1);
@@ -186,51 +195,48 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 	Tesselation& Tes = TS1->tesselation();
 	RTriangulation& Tri = Tes.Triangulation();
 	basicVTKwritter vtk((unsigned int)(Tri.number_of_vertices()), (unsigned int)(Tri.number_of_finite_cells()));
-	vtk.open(output_file_name, "test bidon"); // <- what a pretty comment! 
-	
+	vtk.open(output_file_name, "test bidon"); // <- what a pretty comment!
+
 	vtk.begin_vertices();
 	RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin();
-	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) vtk.file <<  V_it->point() << endl;
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) vtk.file <<  V_it->point().point() << endl;
 	vtk.end_vertices();
-	
+
 	vtk.begin_cells();
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
-	for (; cell != Tri.finite_cells_end(); ++cell) 
-	{
+	for (; cell != Tri.finite_cells_end(); ++cell) {
 		vtk.write_cell(
-		cell->vertex(0)->info().id(), 
-		cell->vertex(1)->info().id(),
-		cell->vertex(2)->info().id(), 
-		cell->vertex(3)->info().id()
+			cell->vertex(0)->info().id()-6,
+			cell->vertex(1)->info().id()-6,
+			cell->vertex(2)->info().id()-6,
+			cell->vertex(3)->info().id()-6
 		);
 	}
 	vtk.end_cells();
-	
+
 	vtk.begin_data("Strain_matrix", POINT_DATA, TENSORS, FLOAT);
 	V_it = Tri.finite_vertices_begin();
-	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) 
-	{
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) {
 		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
 		vtk.file << ParticleDeformation[V_it->info().id()] << endl;
 	}
 	vtk.end_data();
-	
+
 	vtk.begin_data("Strain_deviator", POINT_DATA, SCALARS, FLOAT);
 	V_it = Tri.finite_vertices_begin();
-	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) 
-	{
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) {
 		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
-		vtk.write_data( (float) epsilon.Deviatoric().Norme() );
+		vtk.write_data((float) epsilon.Deviatoric().Norme());
 	}
 	vtk.end_data();
-	
+
 	return true;
-	
+
 	/*
 	ofstream output_file(output_file_name);
 	if (!output_file.is_open()) {
-		cerr << "Error opening files";
-		return false;
+	 cerr << "Error opening files";
+	 return false;
 	}
 	ComputeParticlesDeformation();
 
@@ -239,22 +245,22 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 
 	output_file << Tri.number_of_vertices()<<endl;
 	for (RTriangulation::Finite_vertices_iterator  V_it =
-				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++)
-		output_file<<V_it->info().id()<<" "<<V_it->point()<<endl;
+	   Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++)
+	 output_file<<V_it->info().id()<<" "<<V_it->point()<<endl;
 
 	output_file << Tri.number_of_finite_cells()<<endl;
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
 	Finite_cells_iterator cell0 = Tri.finite_cells_end();
 	for (; cell != cell0; cell++) {
-		for (unsigned int index=0; index<4; index++) output_file << cell->vertex(index)->info().id()<<" " ;
-		output_file<<endl;
+	 for (unsigned int index=0; index<4; index++) output_file << cell->vertex(index)->info().id()<<" " ;
+	 output_file<<endl;
 	}
 
 	for (RTriangulation::Finite_vertices_iterator  V_it =
-				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
-		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie symetrique
-		double dev = (double) epsilon.Deviatoric().Norme();
-		output_file<<V_it->info().id()<<endl<<ParticleDeformation[V_it->info().id()]<<dev<<endl;
+	   Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
+	 Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]); // partie symetrique
+	 double dev = (double) epsilon.Deviatoric().Norme();
+	 output_file<<V_it->info().id()<<endl<<ParticleDeformation[V_it->info().id()]<<dev<<endl;
 
 	}
 	*/
@@ -447,16 +453,11 @@ Tenseur_sym3 KinematicLocalisationAnalyser::Contact_fabric(TriaxialState&
 	return Tens;
 }
 
-
-
-
-
 Real KinematicLocalisationAnalyser::Contact_anisotropy(TriaxialState& state)
 {
 	Tenseur_sym3 tens(Contact_fabric(state));
 	return tens.Deviatoric().Norme()/tens.Trace();
 }
-
 
 Real KinematicLocalisationAnalyser::Neighbor_anisotropy(TriaxialState& state)
 {
@@ -548,19 +549,6 @@ NormalDisplacementDistributionToFile(vector<Edge_iterator>& edges, ofstream& out
 	return output_file;
 
 }
-
-
-//vector<pair<Real,Real> >  KinematicLocalisationAnalyser::
-//NormalDisplacementDistribution(TriaxialState& state, TriaxialState& state0)
-//{
-// vector<pair<Real,Real> > table;
-// table.resize(linear_discretisation);
-//
-//
-// return table;
-//}
-
-
 
 ofstream& KinematicLocalisationAnalyser::
 ContactDistributionToFile(ofstream& output_file)
@@ -818,24 +806,13 @@ void KinematicLocalisationAnalyser::SetDisplacementIncrements(void)
 	for (TriaxialState::GrainIterator git = TS1->grains_begin(); git!=gend; ++git)
 		if (git->id >= 0) git->translation =  TS1->grain(git->id).sphere.point() - TS0->grain(git->id).sphere.point();
 	consecutive = true;
-
-
 }
-
-
 
 ofstream& KinematicLocalisationAnalyser::
 StrictNeighborDistributionToFile(ofstream& output_file)
 {
 	return output_file;
 }
-
-
-
-
-
-
-
 // Tenseur3 KinematicLocalisationAnalyser::Grad_u (Point &p1, Point &p2, Point &p3)
 // {
 //  Tenseur3 T;
@@ -878,8 +855,6 @@ void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet
 							  (cell->vertex(l_vertices[facet][1])->point())) /2.f;
 	Somme(T, V, S);
 }
-
-
 // void KinematicLocalisationAnalyser::Grad_u (Point &p1, Point &p2, Point &p3, Vecteur &V, Tenseur3& T) // rotation 1->2->3 orient�e vers l'ext�rieur
 // {
 //  Vecteur S = 0.5*cross_product(p2-p1, p3-p2);
@@ -888,15 +863,7 @@ void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell, int facet
 
 void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell,
 		Tenseur3& T, bool vol_divide)// Calcule le gradient de d�p.
-{
-	/*char msg [256];
-	sprintf(msg, "Exec Grad_u (Finite_cells_iterator cell, Tenseur3& T, bool
-	vol_divide)");
-	Udata::out(msg);
-	sprintf(msg, "***  Hv = \n %f %f %f \n %f %f %f \n %f %f %f \n",
-	T(1,1), T(1,2), T(1,3), T(2,1), T(2,2), T(2,3),
-	T(3,1), T(3,2), T(3,3));
-	Udata::out(msg);*/
+{	
 	T.reset();
 	Vecteur v;
 	for (int facet=0; facet<4; facet++) {
@@ -989,9 +956,10 @@ void KinematicLocalisationAnalyser::Grad_u(Finite_cells_iterator cell,
 //
 //end
 
-void KinematicLocalisationAnalyser::ComputeParticlesDeformation(void)
+
+
+const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformation(void)
 {
-	//cerr << "compute particle deformation" << endl;
 	Tesselation& Tes = TS1->tesselation();
 	RTriangulation& Tri = Tes.Triangulation();
 	Tenseur3 grad_u;
@@ -1072,7 +1040,7 @@ void KinematicLocalisationAnalyser::ComputeParticlesDeformation(void)
 	if (v_total) grad_u_total /= v_total;
 	cerr << "Total volume = " << v_total << ", grad_u = " << endl << grad_u_total << endl << "sym_grad_u (true average strain): " << endl << Tenseur_sym3(grad_u_total) << endl;
 	cerr << "Macro strain : "<< endl << Delta_epsilon << endl;
-
+	return ParticleDeformation;
 }
 
 Real KinematicLocalisationAnalyser::ComputeMacroPorosity(void)

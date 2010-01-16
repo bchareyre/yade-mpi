@@ -5,13 +5,21 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include"TesselationWrapper.hpp"
+
+///FIXME : this include breaks compilation, see commented "numpy" code at the end of the file
+//#include<yade/lib-pyutil/numpy.hpp>
+
 //#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 //#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
+#include<boost/python.hpp>
+#include<yade/extra/boost_python_len.hpp>
+#include<yade/pkg-dem/Shop.hpp>
+#include"TesselationWrapper.hpp"
 
 //using namespace std;
 YADE_PLUGIN((TesselationWrapper));
 YADE_REQUIRE_FEATURE(CGAL)
+//using namespace boost::python;
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
@@ -47,6 +55,7 @@ struct RTraits_for_spatial_sort : public CGT::RTriangulation::Geom_traits {
 // template <class Triangulation>
 void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, TesselationWrapper &TW)
 {
+	TW.clear();
 	CGT::Tesselation& Tes = *(TW.Tes);
 	CGT::RTriangulation& T = Tes.Triangulation();
 	std::vector<CGT::Sphere> spheres;
@@ -72,7 +81,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			TW.mean_radius += rad;
 		}
 	}
-	TW.mean_radius /= Ng;
+	TW.mean_radius /= Ng; TW.rad_divided = true;
 	spheres.resize(Ng);
 	pointsPtrs.resize(Ng);
 	std::random_shuffle(pointsPtrs.begin(), pointsPtrs.end());
@@ -80,7 +89,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 
 	CGT::RTriangulation::Cell_handle hint;
 
-	long Nt = 0;
+	TW.n_spheres = 0;
 	for (std::vector<std::pair<const CGT::Sphere*,body_id_t> >::const_iterator
 			p = pointsPtrs.begin();p != pointsPtrs.end(); ++p) {
 		CGT::RTriangulation::Locate_type lt;
@@ -95,10 +104,10 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			//Vh->info().isFictious = false;//false is the default
 			Tes.max_id = std::max(Tes.max_id,(const unsigned int) p->second);
 			hint=v->cell();
-			++Nt;
+			++TW.n_spheres;
 		}
 	}
-	cerr << " loaded : " << Ng<<", triangulated : "<<Nt<<", mean radius = " << TW.mean_radius<<endl;
+	cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
 }
 
 
@@ -310,12 +319,12 @@ void  TesselationWrapper::AddBoundingPlanes(void)
 		Tes->redirect();
 		//Add big bounding spheres with isFictious=true
 
-		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()), Pmin.y()-FAR*(Pmax.x()-Pmin.x()), 0.5*(Pmax.z()-Pmin.z()), FAR*(Pmax.x()-Pmin.x()), 0, true);
-		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()), Pmax.y()+FAR*(Pmax.x()-Pmin.x()), 0.5*(Pmax.z()-Pmin.z()), FAR*(Pmax.x()-Pmin.x()), 1, true);
-		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()), 0.5*(Pmax.y()-Pmin.y()), 0.5*(Pmax.z()-Pmin.z()), FAR*(Pmax.y()-Pmin.y()), 2, true);
-		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()), 0.5*(Pmax.y()-Pmin.y()), 0.5*(Pmax.z()-Pmin.z()), FAR*(Pmax.y()-Pmin.y()), 3, true);
-		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()), 0.5*(Pmax.y()-Pmin.y()), Pmin.z()-FAR*(Pmax.y()-Pmin.y()), FAR*(Pmax.y()-Pmin.y()), 4, true);
-		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()), 0.5*(Pmax.y()-Pmin.y()), Pmax.z()+FAR*(Pmax.y()-Pmin.y()), FAR*(Pmax.y()-Pmin.y()), 5, true);
+		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 0, true);
+		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 1, true);
+		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()-Pmin.y()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.y()-Pmin.y()),2, true);
+		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()-Pmin.y()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.y()-Pmin.y()),3,true);
+		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()-Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),4,true);
+		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()-Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),5, true);
 		bounded = true;
 	}
 
@@ -345,32 +354,68 @@ void  TesselationWrapper::RemoveBoundingPlanes(void)
 	cerr << " end remove bounding planes " << endl;
 }
 
-//} //namespace CGT
 
-
-
-
-
-// int main()
-// {
-//  std::list<Point> input;
-//
-//  input.push_back ( Point ( 0,0,0 ) );
-//  input.push_back ( Point ( 1,0,0 ) );
-//  input.push_back ( Point ( 0,1,0 ) );
-//  input.push_back ( Point ( 0,0,1 ) );
-//  input.push_back ( Point ( 2,2,2 ) );
-//  input.push_back ( Point ( -1,0,1 ) );
-//
-//  Delaunay T;
-//
-//  build_triangulation_with_indices ( input.begin(),input.end(),T );
-//
-//  Delaunay::Finite_vertices_iterator vit;
-//  for ( vit = T.finite_vertices_begin(); vit != T.finite_vertices_end(); ++vit )
-//   std::cout << vit->info() << "\n"; //prints the position in input
-//
-//  return 0;
+// python::dict testNumpy(){
+// 	Scene* scene=Omega::instance().getScene().get();
+// 	int dim1[]={scene->bodies->size()};
+// 	int dim2[]={scene->bodies->size(),3};
+// 	numpy_boost<Real,1> mass(dim1);
+// 	numpy_boost<Real,2> vel(dim2);
+// 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+// 		if(!b) continue;
+// 		mass[b->getId()]=b->state->mass;
+// 		VECTOR3R_TO_NUMPY(vel[b->getId()],b->state->vel);
+// 	}
+// 	python::dict ret;
+// 	ret["mass"]=mass;
+// 	ret["vel"]=vel;
+// 	return ret;
 // }
 
 
+void TesselationWrapper::setState (bool state){ mma.setState(state ? 2 : 1);}
+
+python::dict TesselationWrapper::getVolPoroDef(bool deformation){
+	
+		//using namespace CGT;
+		Scene* scene=Omega::instance().getScene().get();
+		CGT::Tesselation* pTes;
+		if (deformation){//use the final state to compute volumes
+			mma.analyser->ComputeParticlesDeformation();
+			pTes = &mma.analyser->TS1->tesselation();}
+		else pTes = &mma.analyser->TS0->tesselation();//no reason to use the final state if we don't want to compute deformations, keep using the initial
+		CGT::Tesselation& Tes = *pTes;
+		CGT::RTriangulation& Tri = Tes.Triangulation();
+		if (!scene->isPeriodic) AddBoundingPlanes();
+		ComputeVolumes();
+		int bodiesDim = scene->bodies->size();
+		int dim1[]={bodiesDim};
+		int dim2[]={bodiesDim,9};
+		/// This is the code that needs numpy include
+		//numpy_boost<body_id_t,1> id(dim1);
+// 		boost::python::numpy_boost<double,1> vol(dim1);
+// 		boost::python::numpy_boost<double,1> poro(dim1);
+// 		boost::python::numpy_boost<double,2> def(dim2);
+// 		//FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+// 		for (CGT::RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
+// 			id[]=V_it->info().id()
+// 			//if(!b) continue;
+// 			const body_id_t id = V_it->info().id();
+// 			Real sphereVol = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
+// 			vol[id]=V_it->info().v();			
+// 			poro[id]=(V_it->info().v() - sphereVol)/V_it->info().v();
+// 			//if (deformation) MATRIX3R_TO_NUMPY(def[id],ParticleDeformation[id]);
+// 			cerr << V_it->info().v()<<" "<<ParticleDeformation[id]<<endl;
+// 		}
+// 		python::dict ret;
+// 		ret["vol"]=vol;
+// 		ret["poro"]=poro;
+// 		if (deformation) ret["def"]=def;		
+// 		return ret;
+}
+
+/// Needed somewhere?
+// BOOST_PYTHON_MODULE(_eudoxos){
+// 	import_array();
+// 	def("testNumpy",testNumpy);
+// }

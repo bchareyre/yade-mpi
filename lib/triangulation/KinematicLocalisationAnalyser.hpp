@@ -6,14 +6,11 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-/**
-@author Bruno Chareyre
-*/
-//This class computes statistics of micro-variables assuming axi-symetry
-
+/*! \brief Computes statistics of micro-variables assuming axi-symetry.
+	
+ */
 
 #pragma once
-
 #include "TriaxialState.h"
 #include "Tenseur3.h"
 //class TriaxialState;
@@ -22,17 +19,10 @@ namespace CGT {
 
 #define SPHERE_DISCRETISATION 20; //number of "teta" intervals on the unit sphere
 #define LINEAR_DISCRETISATION 200; //number of intervals on segments like [UNmin,UNmax]
-
-
-// l_vertices : d�finition de l'ordre de parcours des sommets
+	
+// l_vertices : definition de l'ordre de parcours des sommets
 // pour la facette k, les indices des 3 sommets sont dans la colonne k
 const int l_vertices [4][3] = { {1, 2, 3}, {0, 3, 2}, {3, 0, 1}, {2, 1, 0} };
-
-
-
-
-
-
 
 class KinematicLocalisationAnalyser
 {
@@ -53,6 +43,7 @@ class KinematicLocalisationAnalyser
 		void SetConsecutive (bool);
 		void SetNO_ZERO_ID (bool);
 		void SwitchStates ( void );
+		
 
 		bool DistribsToFile (const char* output_file_name);
 		///Write the averaged deformation on each grain in a file (vertices and cells lists included in the file), no need to call ComputeParticlesDeformation()
@@ -80,8 +71,10 @@ class KinematicLocalisationAnalyser
 		void Grad_u ( Finite_cells_iterator cell, int facet, Vecteur &V, Tenseur3& T );
 		///Compute grad_u in cell (by default, T= average grad_u in cell, if !vol_divide, T=grad_u*volume
 		void Grad_u ( Finite_cells_iterator cell, Tenseur3& T, bool vol_divide=true );
-		///Compute grad_u for all particles, by summing grad_u of all adjaent cells
-		void ComputeParticlesDeformation (void);
+		/// Compute grad_u for all particles, by summing grad_u of all adjaent cells using current states
+		const vector<Tenseur3>& ComputeParticlesDeformation (void);
+		/// Do everything in one step by giving the current (file1) and reference (file0) positions 
+		const vector<Tenseur3>& ComputeParticlesDeformation(const char* state_file1, const char* state_file0);
 		///Compute porisity from cumulated spheres volumes and positions of boxes
 		Real ComputeMacroPorosity (void );
 

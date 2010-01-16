@@ -11,26 +11,26 @@
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
-
 #include <set>
 #include <boost/tuple/tuple.hpp>
 #include <string>
 #include <fstream>
 
-/*! \brief Compute quantities like fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing
-		
-	This class is using a separate library built from lib/triangulation sources		
+/*! \brief Compute fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing.
+	
  */
 
+namespace CGT {
+class TriaxialState;
+class Tenseur3;
+}
 
 class MicroMacroAnalyser : public GlobalEngine
 {
 /// Attributes
 	private :
-		std::ofstream ofile;
-		
+		std::ofstream ofile;		
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
-		shared_ptr<CGT::KinematicLocalisationAnalyser> analyser;
 		std::string	 outputFile;
 		std::string	 stateFileName;
 		bool initialized;
@@ -38,8 +38,13 @@ class MicroMacroAnalyser : public GlobalEngine
 	public :
 		MicroMacroAnalyser();
 		void action(Scene*);
-		void setState(Scene* ncb, unsigned int state, bool saveStates = false, bool computeIncrement = false);//Set current state as initial (state=1) or final (state=2) congiguration for later kinematic analysis on the increment; if requested : save snapshots (with specific format) - possibly including contact forces increments on the state1->state2 interval
+		/// Set current state as initial (state=1) or final (state=2) congiguration for later kinematic analysis on the increment; if requested : save snapshots (with specific format) - possibly including contact forces increments on the state1->state2 interval
+		void setState(unsigned int state, bool save_states = false, bool computeIncrement = false);
+		/// Copy the current simulation in a TriaxialState structure. If filename!=NULL, save it to a file that can be reloaded later for computing strain increments, state must be 1 or 2.
+		CGT::TriaxialState& makeState(unsigned int state, const char* filename = NULL);
+		//const vector<CGT::Tenseur3>& makeDeformationArray(const char* state_file1, const char* state_file0);
 		int interval;
+		shared_ptr<CGT::KinematicLocalisationAnalyser> analyser;
 		
 	DECLARE_LOGGER;
 	
