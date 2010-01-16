@@ -13,7 +13,7 @@ YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_MomentMat_Momen
 
 
 
-/********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
+/********************** Law2_SCG_MomentPhys_CohesionlessMomentRotation ****************************/
 CREATE_LOGGER(Law2_SCG_MomentPhys_CohesionlessMomentRotation);
 
 void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* rootBody){

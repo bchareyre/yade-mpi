@@ -10,6 +10,31 @@
 #include <boost/tuple/tuple.hpp>
 
 /* Contact law have been verified with Plassiard et al. (2009) : A spherical discrete element model: calibration procedure and incremental response */
+/* Can be used in Triaxial Test, but significant changes has to be made */
+
+/*    CHANGES THAT HAS TO BE DONE ON TRIAXIAL TEST */
+/*
+Ip2_MomentMat_MomentMat_MomentPhys and Law2_SCG_MomentPhys_CohesionlessMomentRotation have to be added. Since it uses ScGeom, it uses boxes rather than facets.  Spheres and boxes have to be changed to MomentMat rather than FrictMat
+
+  INPUT FOR Ip2_MomentMat_MomentMat_MomentPhys: 
+
+1.  If boolean userInputStiffness=true & useAlphaBeta=false, users can input Knormal, Kshear and Krotate directly.  Then, kn,ks and kr will be equal to these values, rather than calculated E and v.
+
+2.  If boolean userInputStiffness=true & useAlphaBeta=true, users input Knormal, Alpha and Beta.  Then ks and kr are calculated from alpha & beta respectively
+
+3.  If both are false, it calculates kn and ks are calculated from E and v, whilst kr = 0.
+
+  
+  INPUT FOR MomentMat:
+
+1.  Users can input eta (constant for plastic moment) to Spheres and Boxes. For more complicated cases, users can modify TriaxialStressController to use different eta values during isotropic compaction.
+
+  CONTACT LAW:
+  The contribution of stiffnesses are scaled according to the radius of the particle, as implemented in Plassiard et al. (2009)
+*/
+
+
+
 
 class Law2_SCG_MomentPhys_CohesionlessMomentRotation: public LawFunctor{
 	public:
@@ -44,7 +69,7 @@ class MomentPhys: public NormShearPhys {
 	private:
 	public:
 		Real frictionAngle, tanFrictionAngle, Eta;  
-		Vector3r prevNormal, shear;
+		Vector3r prevNormal, shear; 
 		Real cumulativeRotation;
 		Quaternionr	initialOrientation1,initialOrientation2;
 		Real		kr; // rolling stiffness
