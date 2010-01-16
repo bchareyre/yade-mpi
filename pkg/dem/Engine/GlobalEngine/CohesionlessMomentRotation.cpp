@@ -9,7 +9,7 @@
 /* Contact law have been verified with Plassiard et al. (2009) : A spherical discrete element model: calibration procedure and incremental response */
 
 
-YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_BMP_BMP_MomentPhys)(MomentPhys));
+YADE_PLUGIN((Law2_SCG_MomentPhys_CohesionlessMomentRotation)(Ip2_MomentMat_MomentMat_MomentPhys)(MomentPhys));
 
 
 
@@ -40,58 +40,54 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 
 	
 	///////////////////////////////////////////////////////////////////////  SHEAR FORCE ///////////////////////////////////////////////
-				/*ShearForce*/
-				Vector3r& shearForce = phys->shearForce; //alias for phys->shearForce
+	/*ShearForce*/
+	Vector3r& shearForce = phys->shearForce; //alias for phys->shearForce
 
 
-				/// Here is the code with approximated rotations ///
-				axis	 = phys->prevNormal.Cross(geom->normal);  //axis of rotation between previous and current
-				shearForce -= shearForce.Cross(axis); //minus shearForce that is perpendicular (outward) to contact (not tangent)
-				angle 	= dt*0.5*geom->normal.Dot(Body::byId(id1)->state->angVel+Body::byId(id2)->state->angVel); 
-				axis 	= angle*geom->normal;
-				shearForce -= shearForce.Cross(axis); //minus shearForce that is perpendicular outward to contact (not tangent)
+	/// Here is the code with approximated rotations ///
+	axis	 = phys->prevNormal.Cross(geom->normal);  //axis of rotation between previous and current
+	shearForce -= shearForce.Cross(axis); //minus shearForce that is perpendicular (outward) to contact (not tangent)
+	angle 	= dt*0.5*geom->normal.Dot(Body::byId(id1)->state->angVel+Body::byId(id2)->state->angVel); 
+	axis 	= angle*geom->normal;
+	shearForce -= shearForce.Cross(axis); //minus shearForce that is perpendicular outward to contact (not tangent)
 
-				/// Here is the code with exact rotations 		 ///
-				//Quaternionr q;
-				//1st imagine we have to rotate shearForce ON the x-y plane as a result of contact point rotation
-				//axis = phys->prevNormal.Cross(geom->normal); // axis of rotation of contact point
-				//angle = Mathr::ACos(geom->normal.Dot(phys->prevNormal)); //angle of rotation of contact point
-				//q.FromAxisAngle(axis,angle); //quaternion for rotation of contact point
-			       // shearForce = q*shearForce; //rotate shearForce from previous contact orientation to current contact orientation
+	/// Here is the code with exact rotations 		 ///
+	//Quaternionr q;
+	//1st imagine we have to rotate shearForce ON the x-y plane as a result of contact point rotation
+	//axis = phys->prevNormal.Cross(geom->normal); // axis of rotation of contact point
+	//angle = Mathr::ACos(geom->normal.Dot(phys->prevNormal)); //angle of rotation of contact point
+	//q.FromAxisAngle(axis,angle); //quaternion for rotation of contact point
+	// shearForce = q*shearForce; //rotate shearForce from previous contact orientation to current contact orientation
 	
-				//Then imagine we have to find a direction by rotating  THROUGH the x-y plane, ABOUT the contact normal (i.e. axis).  The direction should be along the resultant angular velocity.
-				//angle	= dt*0.5*geom->normal.Dot(Body::byId(id1)->state->angVel + Body::byId(id1)->state->angVel); //angle of rotation about the contact normal
-				//axis	= geom->normal;
-				//q.FromAxisAngle(axis,angle);
-				//shearForce	= q*shearForce;
-				/// 							 ///
+	//Then imagine we have to find a direction by rotating  THROUGH the x-y plane, ABOUT the contact normal (i.e. axis).  The direction should be along the resultant angular velocity.
+	//angle	= dt*0.5*geom->normal.Dot(Body::byId(id1)->state->angVel + Body::byId(id1)->state->angVel); //angle of rotation about the contact normal
+	//axis	= geom->normal;
+	//q.FromAxisAngle(axis,angle);
+	//shearForce	= q*shearForce;
+	/// 							 ///
 
 	
-				Vector3r x = geom->contactPoint;
-				Vector3r c1x	= (x - b1->state->pos); //distance of contact point from centre1
-				Vector3r c2x	= (x - b2 ->state->pos); //distance of contact ponit from centre2	
-					/// The following definition of c1x and c2x is to avoid "granular ratcheting" 
-					///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
-					///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
-					///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
+	Vector3r x = geom->contactPoint;
+	Vector3r c1x	= (x - b1->state->pos); //distance of contact point from centre1
+	Vector3r c2x	= (x - b2 ->state->pos); //distance of contact ponit from centre2	
+	/// The following definition of c1x and c2x is to avoid "granular ratcheting" 
+	///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
+	///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
+	///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
+	Vector3r _c1x_(0,0,0);
+	Vector3r _c2x_(0,0,0);
+	if (preventGranularRatcheting){
+		_c1x_	= geom->radius1*geom->normal; //vector radius1
+		_c2x_	= -geom->radius2*geom->normal; //vector radius2
+	}else{
+		_c1x_ = c1x;
+		_c2x_ = c2x;
+	}
 
-
-				Vector3r _c1x_(0,0,0);
-				Vector3r _c2x_(0,0,0);
-
-				if (preventGranularRatcheting){
-					_c1x_	= geom->radius1*geom->normal; //vector radius1
-					_c2x_	= -geom->radius2*geom->normal; //vector radius2
-				}else{
-					_c1x_ = c1x;
-					_c2x_ = c2x;
-				}
-
-				Vector3r relativeVelocity	= (b2->state->vel + b2->state->angVel.Cross(_c2x_)) - (b1->state->vel + b1->state->angVel.Cross(_c1x_));
-				Vector3r shearVelocity	= relativeVelocity - geom->normal.Dot(relativeVelocity)*geom->normal; //First find the scalar value of normal velocity.  Then change it to a vector.  Then minus.
-				Vector3r shearDisplacement	= shearVelocity*dt; //in Dem3DofGeom displacementT() is cumulative
-				  
-				shearForce -= phys->ks*shearDisplacement; //shearForce is cumulative here because shearDisplacement is not cumulative.  See CundallStrack.hpp, it is different!
+	Vector3r relativeVelocity	= (b2->state->vel + b2->state->angVel.Cross(_c2x_)) - (b1->state->vel + b1->state->angVel.Cross(_c1x_));
+	Vector3r shearVelocity=relativeVelocity- geom->normal.Dot(relativeVelocity)*geom->normal; //1st find the scalar value of normal velocity.  Then change it to a vector.  Then minus.
+	Vector3r shearDisplacement	= shearVelocity*dt; //in Dem3DofGeom displacementT() is cumulative
+	shearForce -= phys->ks*shearDisplacement; //shearForce is cumulative here because shearDisplacement is not cumulative.  See CundallStrack.hpp, it is different!
       
 	
 	////////////////////////////////////////////////////////////   SHEAR FORCE END   ///////////////////////////////////////////////////////////////////////////////
@@ -135,7 +131,6 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 	
 	Vector3r axis_bending(angleM*axisM - axis_twist); //total rotation minus rotation about normal
 	Vector3r moment_bending(axis_bending * phys->kr);
-
 	Vector3r moment = moment_twist + moment_bending;
 
 	Real radiusm = 0.5*(geom->radius1 + geom->radius2); //radius is used here
@@ -179,8 +174,6 @@ void Ip2_MomentMat_MomentMat_MomentPhys::go(const shared_ptr<Material>& b1, cons
 	const shared_ptr<MomentMat>& sdec2 = YADE_PTR_CAST<MomentMat>(b2);
 			
 	shared_ptr<MomentPhys> contactPhysics(new MomentPhys()); 
-	//interaction->interactionPhysics = shared_ptr<MomentPhys>(new MomentPhys());		
-	//const shared_ptr<MomentPhys>& contactPhysics = YADE_PTR_CAST<MomentPhys>(interaction->interactionPhysics);
 
 	/* From interaction physics */
 	Real Ea 	= sdec1->young;
@@ -201,8 +194,7 @@ void Ip2_MomentMat_MomentMat_MomentPhys::go(const shared_ptr<Material>& b1, cons
 	Real Ks=0;
 	Real Kr=0;	
 	
-	Real radiusm = (Da + Db)/2;
-	//Kr = Beta*Ks*radiusm*radiusm;  
+	Real radiusm = (Da + Db)/2; 
 
 	if(userInputStiffness == true && useAlphaBeta == true){
 	Kn = 0.5*Knormal*radiusm;
@@ -218,7 +210,6 @@ void Ip2_MomentMat_MomentMat_MomentPhys::go(const shared_ptr<Material>& b1, cons
 	else{ 
 	Kn = 2*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 	Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
-	//Kr = Da*Db*Ks*2.0; // just like "2.0" above - it's an arbitrary parameter
 	Kr=0;	
 	}
 	
@@ -246,11 +237,11 @@ MomentPhys::MomentPhys()
 	tanFrictionAngle = 0;
 	Eta = 0;
 	prevNormal = Vector3r(0,0,0);
-
+	
 	moment_twist = Vector3r(0,0,0);
 	moment_bending = Vector3r(0,0,0);
 	
-	shear = Vector3r(0,0,0); //currently not used
+	shear = Vector3r(0,0,0);
 	cumulativeRotation =0; 
 // assign neutral value	
 	initialOrientation1 = Quaternionr(1.0,0.0,0.0,0.0);

@@ -1,3 +1,5 @@
+/* CWBoon@2010  booncw@hotmail.com */
+
 #pragma once
 #include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
@@ -7,6 +9,7 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
+/* Contact law have been verified with Plassiard et al. (2009) : A spherical discrete element model: calibration procedure and incremental response */
 
 class Law2_SCG_MomentPhys_CohesionlessMomentRotation: public LawFunctor{
 	public:
@@ -41,8 +44,7 @@ class MomentPhys: public NormShearPhys {
 	private:
 	public:
 		Real frictionAngle, tanFrictionAngle, Eta;  
-		Vector3r prevNormal;
-		Vector3r shear;
+		Vector3r prevNormal, shear;
 		Real cumulativeRotation;
 		Quaternionr	initialOrientation1,initialOrientation2;
 		Real		kr; // rolling stiffness
@@ -51,7 +53,7 @@ class MomentPhys: public NormShearPhys {
 	
 	virtual ~MomentPhys();
 
-	REGISTER_ATTRIBUTES(NormShearPhys,(tanFrictionAngle) (frictionAngle) (prevNormal) (initialOrientation1) (initialOrientation2) (kr) (Eta)(moment_twist) (moment_bending) (shear)(cumulativeRotation));
+	REGISTER_ATTRIBUTES(NormShearPhys,(tanFrictionAngle) (frictionAngle) (prevNormal) (initialOrientation1) (initialOrientation2) (kr) (Eta)(moment_twist) (moment_bending) (cumulativeRotation)(shear));
 	REGISTER_CLASS_AND_BASE(MomentPhys,NormShearPhys);
 	REGISTER_CLASS_INDEX(MomentPhys,NormShearPhys);
 };
