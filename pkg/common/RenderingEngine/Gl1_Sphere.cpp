@@ -28,7 +28,17 @@ void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool 
 		if (wire || wire2) glutWireSphere(r,glutSlices,glutStacks);
 		else {
  			if(stripes) { glScalef(r,r,r); drawSphere();}
-			else glutSolidSphere(r,glutSlices,glutStacks);
+			else {
+// 				if(glSphereList<0) {
+// 					glSphereList = glGenLists(1);
+// 					glNewList(glSphereList,GL_COMPILE);
+// 					//glShadeModel(GL_SMOOTH); glDisable(GL_LIGHTING);
+// 					glutSolidSphere(1,glutSlices,glutStacks);
+// 					glEndList();}
+// 				
+// 				glScalef(r,r,r);
+// 				glCallList(glSphereList);}
+				glutSolidSphere(r,glutSlices,glutStacks);}
 		}
 	if(glutNormalize) glPopAttrib();
 	return;
@@ -44,15 +54,10 @@ YADE_REQUIRE_FEATURE(OPENGL)
 // https://blueprints.launchpad.net/yade/+spec/sphere-gl-stripes
 
 void Gl1_Sphere::drawSphere(){
-	int depth=1; // used to be function argument, but called only from 1 place, always with 1
-	if(vertices.size()==0) initGlLists();
+	if(glSphereList<0) initGlLists();
 	glShadeModel(GL_SMOOTH);
 	//glScalef(radius,radius,radius);
 	glCallList(glSphereList);
-	// render the sphere now
-	for(int i=0;i<20;i++)
-		subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],depth);
-	
 }
 
 void Gl1_Sphere::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int depth){
@@ -135,6 +140,10 @@ void Gl1_Sphere::initGlLists(void){
 	glSphereList = glGenLists(1);
 	glNewList(glSphereList,GL_COMPILE);
 		glEnable(GL_LIGHTING);
-		drawSphere();
+		glShadeModel(GL_SMOOTH);	
+		// render the sphere now
+		for(int i=0;i<20;i++)
+			subdivideTriangle(vertices[(unsigned int)faces[i][0]],vertices[(unsigned int)faces[i][1]],vertices[(unsigned int)faces[i][2]],1);
+		//drawSphere();
 	glEndList();
 }
