@@ -138,14 +138,14 @@ opts.AddVariables(
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
 	# OK, dummy prevents bug in scons: if one selects all, it says all in scons.config, but without quotes, which generates error.
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp',names=['opengl','log4cxx','cgal','openmp','gts','vtk','geometricalmodel','physpar','python']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','geometricalmodel','physpar','python','eigen']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
 	EnumVariable('linkStrategy','How to link plugins together',defOptions['linkStrategy'],['per-class','per-pkg[broken]','monolithic','static[broken]']),
 	('chunkSize','Maximum files to compile in one translation unit when building plugins.',20,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
-	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.2:/usr/include/vtk-5.4'),
+	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2'),
 	('LIBPATH','Additional paths for the linker (colon-separated)',None),
 	('QTDIR','Directories where to look for qt3','/usr/share/qt3:/usr/lib/qt:/usr/lib/qt3:/usr/qt/3:/usr/lib/qt-3.3'),
 	('PATH','Path (not imported automatically from the shell) (colon-separated)',None),
@@ -373,6 +373,11 @@ if not env.GetOption('clean'):
 		ok=conf.CheckLibWithHeader('CGAL','CGAL/Exact_predicates_inexact_constructions_kernel.h','c++','CGAL::Exact_predicates_inexact_constructions_kernel::Point_3();')
 		env.Append(CXXFLAGS='-frounding-math') # required by cgal, otherwise we get assertion failure at startup
 		if not ok: featureNotOK('cgal')
+	if 'eigen' in env['features']:
+		ok=conf.CheckLibWithHeader(['Eigen'],'Eigen/Core','c++','Eigen::Matrix4f::Identity()',autoadd=1)
+		env.Append(LIBS='Eigen')
+		if not ok: featureNotOK('eigen',note="You might have to add eigen header directory (e.g. /usr/include/eigen2) to CPPPATH.")
+
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 
 	env.Append(CPPDEFINES=['YADE_'+f.upper() for f in env['features']])
