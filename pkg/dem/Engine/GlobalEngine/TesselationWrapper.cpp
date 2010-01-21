@@ -6,20 +6,15 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-///FIXME : this include breaks compilation, see commented "numpy" code at the end of the file
 #include<yade/lib-pyutil/numpy.hpp>
-
-//#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
-//#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 #include"TesselationWrapper.hpp"
 
-//using namespace std;
 YADE_PLUGIN((TesselationWrapper));
 YADE_REQUIRE_FEATURE(CGAL)
-//using namespace boost::python;
+CREATE_LOGGER(TesselationWrapper);
 
 //spatial sort traits to use with a pair of CGAL::sphere pointers and integer.
 //template<class _Triangulation>
@@ -77,8 +72,9 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			CGT::Sphere sp(CGT::Point(pos[0],pos[1],pos[2]),rad*rad);
 			spheres.push_back(sp);
 			pointsPtrs.push_back(std::make_pair(&(spheres[Ng]/*.point()*/),(*bi)->getId()));
-			Ng++;
-			TW.mean_radius += rad;
+			TW.Pmin = CGT::Point(min(TW.Pmin.x(),pos.X()-rad),min(TW.Pmin.y(), pos.Y()-rad),min(TW.Pmin.z(), pos.Z()-rad));
+			TW.Pmax = CGT::Point(max(TW.Pmax.x(),pos.X()+rad),max(TW.Pmax.y(),pos.Y()+rad),max(TW.Pmax.z(),pos.Z()+rad));
+			Ng++; TW.mean_radius += rad;
 		}
 	}
 	TW.mean_radius /= Ng; TW.rad_divided = true;
@@ -103,22 +99,17 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			v->info() = (const unsigned int) p->second;
 			//Vh->info().isFictious = false;//false is the default
 			Tes.max_id = std::max(Tes.max_id,(const unsigned int) p->second);
+			Tes.vertexHandles[p->second]=v;
 			hint=v->cell();
 			++TW.n_spheres;
 		}
 	}
-	cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
+	//cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
 }
 
 
-
-
-//namespace CGT {
-
-CREATE_LOGGER(TesselationWrapper);
-
-static CGT::Point Pmin;
-static CGT::Point Pmax;
+// static CGT::Point Pmin;
+// static CGT::Point Pmax;
 static double inf = 1e10;
 double pminx=0;
 double pminy=0;
@@ -141,11 +132,7 @@ TesselationWrapper::TesselationWrapper()
 	facet_it = Tes->Triangulation().finite_edges_begin();
 }
 
-
-TesselationWrapper::~TesselationWrapper()
-{
-	delete Tes;
-}
+TesselationWrapper::~TesselationWrapper() { delete Tes;}
 
 void TesselationWrapper::clear(void)
 {
@@ -228,7 +215,6 @@ bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned
 	}
 }
 
-
 void TesselationWrapper::ComputeTesselation(void)
 {
 	if (!rad_divided) {
@@ -237,6 +223,7 @@ void TesselationWrapper::ComputeTesselation(void)
 	}
 	Tes->Compute();
 }
+
 void TesselationWrapper::ComputeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz, double dt)
 {
 	AddBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz, dt);
@@ -270,75 +257,49 @@ bool TesselationWrapper::nextFacet(std::pair<unsigned int,unsigned int>& facet)
 	return true;
 }
 
-
-
 void TesselationWrapper::AddBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz,double dt)
 {
-//  cout << " pminx                                                    " << pminx << endl;
-//  cout << " pminy                                                    " << pminy << endl;
-//  cout << " pminz                                                    " << pminz << endl;
-//  cout << " pmaxx                                                    " << pmaxx << endl;
-//  cout << " pmaxy                                                    " << pmaxy << endl;
-//  cout << " pmaxz                                                    " << pmaxz << endl;
+	//Not sure this hack form JFJ works in all cases (?)
 	if (dt == 0) {
-//  cout << "thickness               =               " << dt << endl;
-//  thickness = -1*pminx;
 		thickness = -1*pminx;
 	}
-//  cout << "thickness               =               " << thickness << endl;
 	if (!bounded) {
 		if (!rad_divided) {
 			mean_radius /= n_spheres;
 			rad_divided = true;
 		}
 		double FAR = 10000;
-
-		Tes->redirect();
-		//Add big bounding spheres with isFictious=true
-
-		Tes->vertexHandles[0]=Tes->insert(0.5*(pminx+pmaxx), pminy-FAR*(pmaxx-pminx), 0.5*(pmaxz-pminz), FAR*(pmaxx-pminx)+thickness, 0, true);
-		Tes->vertexHandles[1]=Tes->insert(0.5*(pminx+pmaxx), pmaxy+FAR*(pmaxx-pminx), 0.5*(pmaxz-pminz), FAR*(pmaxx-pminx)+thickness, 1, true);
-		Tes->vertexHandles[2]=Tes->insert(pminx-FAR*(pmaxy-pminy), 0.5*(pmaxy-pminy), 0.5*(pmaxz-pminz), FAR*(pmaxy-pminy)+thickness, 2, true);
-		Tes->vertexHandles[3]=Tes->insert(pmaxx+FAR*(pmaxx-pminy), 0.5*(pmaxy-pminy), 0.5*(pmaxz-pminz), FAR*(pmaxy-pminy)+thickness, 3, true);
-		Tes->vertexHandles[4]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy-pminy), pminz-FAR*(pmaxy-pminy), FAR*(pmaxy-pminy)+thickness, 4, true);
-		Tes->vertexHandles[5]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy-pminy), pmaxz+FAR*(pmaxy-pminy), FAR*(pmaxy-pminy)+thickness, 5, true);
+		Tes->vertexHandles[0]=Tes->insert(0.5*(pminx+pmaxx),pminy-FAR*(pmaxx-pminx),0.5*(pmaxz+pminz),FAR*(pmaxx-pminx)+thickness,0,true);
+		Tes->vertexHandles[1]=Tes->insert(0.5*(pminx+pmaxx), pmaxy+FAR*(pmaxx-pminx),0.5*(pmaxz+pminz),FAR*(pmaxx-pminx)+thickness, 1, true);
+		Tes->vertexHandles[2]=Tes->insert(pminx-FAR*(pmaxy-pminy), 0.5*(pmaxy+pminy), 0.5*(pmaxz+pminz), FAR*(pmaxy-pminy)+thickness, 2, true);
+		Tes->vertexHandles[3]=Tes->insert(pmaxx+FAR*(pmaxx-pminy), 0.5*(pmaxy+pminy), 0.5*(pmaxz+pminz), FAR*(pmaxy-pminy)+thickness, 3, true);
+		Tes->vertexHandles[4]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy+pminy), pminz-FAR*(pmaxy-pminy), FAR*(pmaxy-pminy)+thickness, 4, true);
+		Tes->vertexHandles[5]=Tes->insert(0.5*(pminx+pmaxx), 0.5*(pmaxy+pminy), pmaxz+FAR*(pmaxy-pminy), FAR*(pmaxy-pminy)+thickness, 5, true);
 		bounded = true;
 	}
 }
 
 void  TesselationWrapper::AddBoundingPlanes(void)
 {
-
 	if (!bounded) {
 		if (!rad_divided) {
 			mean_radius /= n_spheres;
 			rad_divided = true;
 		}
 		double FAR = 10000;
-
-		Tes->redirect();
 		//Add big bounding spheres with isFictious=true
-
-		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 0, true);
-		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 1, true);
-		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()-Pmin.y()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.y()-Pmin.y()),2, true);
-		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()-Pmin.y()),0.5*(Pmax.z()-Pmin.z()),FAR*(Pmax.y()-Pmin.y()),3,true);
-		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()-Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),4,true);
-		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()-Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),5, true);
+		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 0, true);
+		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 1, true);
+		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),2, true);
+		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),3,true);
+		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),4,true);
+		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),5, true);
 		bounded = true;
 	}
-
-
-
 }
-
 
 void  TesselationWrapper::RemoveBoundingPlanes(void)
 {
-
-	cerr << "start redirection";
-	Tes->redirect();
-	cerr << " | start redirection" << endl;
 	Tes->remove(0);
 	Tes->remove(1);
 	Tes->remove(2);
@@ -348,36 +309,14 @@ void  TesselationWrapper::RemoveBoundingPlanes(void)
 	Pmin = CGT::Point(inf, inf, inf);
 	Pmax = CGT::Point(-inf, -inf, -inf);
 	mean_radius = 0;
-	//n_spheres = 0;
 	rad_divided = false;
 	bounded = false;
-	cerr << " end remove bounding planes " << endl;
 }
-
-
-// python::dict testNumpy(){
-// 	Scene* scene=Omega::instance().getScene().get();
-// 	int dim1[]={scene->bodies->size()};
-// 	int dim2[]={scene->bodies->size(),3};
-// 	numpy_boost<Real,1> mass(dim1);
-// 	numpy_boost<Real,2> vel(dim2);
-// 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-// 		if(!b) continue;
-// 		mass[b->getId()]=b->state->mass;
-// 		VECTOR3R_TO_NUMPY(vel[b->getId()],b->state->vel);
-// 	}
-// 	python::dict ret;
-// 	ret["mass"]=mass;
-// 	ret["vel"]=vel;
-// 	return ret;
-// }
-
 
 void TesselationWrapper::setState (bool state){ mma.setState(state ? 2 : 1);}
 
-python::dict TesselationWrapper::getVolPoroDef(bool deformation){
-	
-		//using namespace CGT;
+python::dict TesselationWrapper::getVolPoroDef(bool deformation)
+{
 		Scene* scene=Omega::instance().getScene().get();
 		CGT::Tesselation* pTes;
 		if (deformation){//use the final state to compute volumes
@@ -392,7 +331,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation){
 		int dim1[]={bodiesDim};
 		int dim2[]={bodiesDim,9};
 		/// This is the code that needs numpy include
-		numpy_boost<body_id_t,1> id(dim1);
+		//numpy_boost<body_id_t,1> id(dim1);
  		numpy_boost<double,1> vol(dim1);
  		numpy_boost<double,1> poro(dim1);
  		numpy_boost<double,2> def(dim2);
@@ -404,7 +343,7 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation){
  			Real sphereVol = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
  			vol[id]=V_it->info().v();			
  			poro[id]=(V_it->info().v() - sphereVol)/V_it->info().v();
- 			//if (deformation) MATRIX3R_TO_NUMPY(def[id],ParticleDeformation[id]);
+			if (deformation) MATRIX3R_TO_NUMPY(mma.analyser->ParticleDeformation[id],def[id]);
  			//cerr << V_it->info().v()<<" "<<ParticleDeformation[id]<<endl;
  		}
  		python::dict ret;
@@ -413,9 +352,3 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation){
  		if (deformation) ret["def"]=def;		
  		return ret;
 }
-
-/// Needed somewhere?
-// BOOST_PYTHON_MODULE(_eudoxos){
-// 	import_array();
-// 	def("testNumpy",testNumpy);
-// }
