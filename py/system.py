@@ -126,12 +126,14 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 		except KeyError:
 			print 'WARNING: class %s not defined'%root
 		for p in childClasses(root):
+			if proxyNamespace.has_key(p): continue
 			proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 			_proxiedClasses.add(p)
 		# inject wrapped class itself into proxyNamespace
 		proxyNamespace[root]=rootType
 	# classes that derive just from Serializable: the remaining ones
 	for p in _allSerializables-_proxiedClasses-_pyRootClasses:
+		if proxyNamespace.has_key(p): continue
 		proxyNamespace[p]=type(p,(wrapper.Serializable,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
 	# deprecated names
 	for oldName in _deprecated.keys():

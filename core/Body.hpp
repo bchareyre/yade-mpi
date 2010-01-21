@@ -100,26 +100,18 @@ class Body : public Serializable
 		Body ();
 		Body (body_id_t newId, int newGroup);
 
-		// Serialization
-	protected:
-		REGISTER_ATTRIBUTES(Serializable,
-			(id)
-			(groupMask)
-			(isDynamic)
-			#ifdef YADE_PHYSPAR
-				(physicalParameters)
-			#else
-				(material)
-				(state)
-			#endif
-			#ifdef YADE_GEOMETRICALMODEL
-				(geometricalModel)
-			#endif
-			(shape)
-			(bound)
-			(clumpId)
-		);
-
-	REGISTER_CLASS_AND_BASE(Body,Serializable);
+	// Serialization
+	//protected:
+	//	REGISTER_ATTRIBUTES(Serializable,(id)(groupMask)(isDynamic)(material)(state)(shape)(bound)(clumpId));
+	//REGISTER_CLASS_AND_BASE(Body,Serializable);
+	YADE_CLASS_BASE_ATTRS_PY(Body,Serializable,(id)(groupMask)(isDynamic)(material)(state)(shape)(bound)(clumpId),
+		.def_readwrite("mat",&Body::material)
+		.def_readwrite("dynamic",&Body::isDynamic)
+		.def_readonly("id",&Body::id) // should overwrite def_readwrite("id",...) earlier
+		.def_readwrite("mask",&Body::groupMask)
+		.add_property("isStandalone",&Body::isStandalone)
+		.add_property("isClumpMember",&Body::isClumpMember)
+		.add_property("isClump",&Body::isClump);
+	);
 };
 REGISTER_SERIALIZABLE(Body);

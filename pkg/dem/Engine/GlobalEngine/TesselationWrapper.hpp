@@ -14,7 +14,7 @@
 #include<yade/lib-triangulation/Tesselation.h>
 //#include<yade/lib-pyutil/numpy.hpp>
 #include<boost/python.hpp>
-#include"MicroMacroAnalyser.hpp"
+#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 #include<yade/extra/boost_python_len.hpp>
 
 /*! \class TesselationWrapper

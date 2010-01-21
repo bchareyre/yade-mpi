@@ -25,6 +25,7 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/thread/mutex.hpp>
 #include<boost/version.hpp>
+#include<boost/python.hpp>
 
 #include<cxxabi.h>
 
@@ -139,6 +140,8 @@ bool Omega::isRunning(){ if(simulationLoop) return simulationLoop->looping(); el
 
 void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){	
 	LOG_DEBUG("called with "<<dynlibsList.size()<<" plugins.");
+	boost::python::object wrapperScope=boost::python::import("yade.wrapper");
+	std::list<string> pythonables;
 	FOREACH(string name, dynlibsList){
 		shared_ptr<Factorable> f;
 		try {
@@ -150,10 +153,32 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 			for(int i=0;i<f->getBaseClassNumber();i++){
 				dynlibs[name].baseClasses.insert(f->getBaseClassName(i));
 			}
+			if(dynlibs[name].isSerializable) pythonables.push_back(name);
 		}
 		catch (FactoryError& e){
 			/* FIXME: this catches all errors! Some of them are not harmful, however:
 			 * when a class is not factorable, it is OK to skip it; */	
+		}
+	}
+	// handle Serializable specially
+	Serializable().pyRegisterClass(wrapperScope);
+	/* python classes must be registered such that base classes come before derived ones;
+	for now, just loop until we succeed; proper solution will be to build graphs of classes
+	and traverse it from the top. It will be done once all classes are pythonable. */
+	for(int i=0; i<100; i++){
+		std::list<string> done;
+		for(std::list<string>::iterator I=pythonables.begin(); I!=pythonables.end(); ){
+			shared_ptr<Serializable> s=static_pointer_cast<Serializable>(ClassFactory::instance().createShared(*I));
+			try{
+				s->pyRegisterClass(wrapperScope);
+				//cerr<<"{"<<*I<<"}"<<endl;
+				std::list<string>::iterator prev=I++;
+				pythonables.erase(prev);
+			} catch (boost::python::error_already_set& w){
+				if(getenv("YADE_DEBUG")) cerr<<"["<<*I<<"]";
+				boost::python::handle_exception();
+				I++;
+			}
 		}
 	}
 

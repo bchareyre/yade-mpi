@@ -37,6 +37,7 @@ import yade
 # other parts we will need soon
 import yade.config
 import yade.wrapper
+import yade.ww
 import yade.log
 import yade.system
 #import yade.plot

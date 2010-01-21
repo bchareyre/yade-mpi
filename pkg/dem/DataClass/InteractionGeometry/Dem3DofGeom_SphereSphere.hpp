@@ -43,6 +43,22 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 };
 REGISTER_SERIALIZABLE(Dem3DofGeom_SphereSphere);
 
+class Dem6DofGeom_SphereSphere: public Dem3DofGeom_SphereSphere{
+	public:
+		// initial relative orientation, used for bending and twist computation
+		Quaternionr initRelOri12;
+	// return relative rotation, composed of both bend and twist
+	Vector3r relRotVector() const;
+	virtual void bendTwistAbs(Vector3r& bend, Real& twist);
+	virtual ~Dem6DofGeom_SphereSphere();
+	Dem6DofGeom_SphereSphere(const Dem3DofGeom_SphereSphere& ss): Dem3DofGeom_SphereSphere(ss){ createIndex(); }
+	Dem6DofGeom_SphereSphere(){ createIndex(); }
+	REGISTER_ATTRIBUTES(Dem3DofGeom_SphereSphere,(initRelOri12));
+	REGISTER_CLASS_AND_BASE(Dem6DofGeom_SphereSphere,Dem3DofGeom_SphereSphere);
+	REGISTER_CLASS_INDEX(Dem6DofGeom_SphereSphere,Dem3DofGeom_SphereSphere);
+};
+REGISTER_SERIALIZABLE(Dem6DofGeom_SphereSphere);
+
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
 	class Gl1_Dem3DofGeom_SphereSphere:public GlInteractionGeometryFunctor{
@@ -73,3 +89,14 @@ class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_Dem3DofGeom);
 
+class Ig2_Sphere_Sphere_Dem6DofGeom: public Ig2_Sphere_Sphere_Dem3DofGeom{
+	public:
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(	const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
+	FUNCTOR2D(Sphere,Sphere);
+	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
+	REGISTER_CLASS_AND_BASE(Ig2_Sphere_Sphere_Dem6DofGeom,Ig2_Sphere_Sphere_Dem3DofGeom);
+	REGISTER_ATTRIBUTES(Ig2_Sphere_Sphere_Dem3DofGeom,/* no attrs */);
+	DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_Dem6DofGeom);

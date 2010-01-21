@@ -1,5 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz
-
+#pragma once
 #include"numpy_boost.hpp"
 
 // helper macro do assign Vector3r values to a subarray

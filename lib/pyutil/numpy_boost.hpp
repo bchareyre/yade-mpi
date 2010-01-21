@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <complex>
 #include <algorithm>
 
-namespace detail {
+namespace numpy_boost_detail {
   template<class T>
   class numpy_type_map {
   public:
@@ -143,7 +143,7 @@ public:
   {
     PyArrayObject* a;
 
-    a = (PyArrayObject*)PyArray_FromObject(obj, detail::numpy_type_map<T>::typenum, NDims, NDims);
+    a = (PyArrayObject*)PyArray_FromObject(obj, numpy_boost_detail::numpy_type_map<T>::typenum, NDims, NDims);
     if (a == NULL) {
       // TODO: Extract Python exception
       throw numpy_boost_exception();
@@ -170,7 +170,7 @@ public:
 
     boost::detail::multi_array::copy_n(extents, NDims, shape);
 
-    a = (PyArrayObject*)PyArray_SimpleNew(NDims, shape, detail::numpy_type_map<T>::typenum);
+    a = (PyArrayObject*)PyArray_SimpleNew(NDims, shape, numpy_boost_detail::numpy_type_map<T>::typenum);
     if (a == NULL) {
       // TODO: Extract Python exception
       throw numpy_boost_exception();

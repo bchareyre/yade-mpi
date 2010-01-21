@@ -53,12 +53,22 @@ This class serves also as tutorial and is documented in detail at
 */
 class Law2_Dem3DofGeom_FrictPhys_Basic: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
 		FUNCTOR2D(Dem3DofGeom,FrictPhys);
 		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_FrictPhys_Basic,LawFunctor);
 		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_FrictPhys_Basic);
+
+/* Class for demonstrating beam-like behavior of the contact (normal, shear, bend and twist) */
+class Law2_Dem6DofGeom_FrictPhys_Beam: public LawFunctor{
+	public:
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
+		FUNCTOR2D(Dem6DofGeom,FrictPhys);
+		REGISTER_CLASS_AND_BASE(Law2_Dem6DofGeom_FrictPhys_Beam,LawFunctor);
+		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
+};
+REGISTER_SERIALIZABLE(Law2_Dem6DofGeom_FrictPhys_Beam);
 
 class ElasticContactLaw : public InteractionSolver
 {

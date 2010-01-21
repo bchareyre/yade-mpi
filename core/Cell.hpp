@@ -94,7 +94,7 @@ class Cell: public Serializable{
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
 	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
-	REGISTER_ATTRIBUTES(Serializable,(refSize)(trsf)(velGrad));
-	REGISTER_CLASS_AND_BASE(Cell,Serializable);
+	YADE_CLASS_BASE_ATTRS_PY(Cell,Serializable,(refSize)(trsf)(velGrad),.def_readonly("size",&Cell::getSize_copy));
+	//void pyRegisterClass() const { boost::python::class_<Cell,shared_ptr<Cell>,boost::python::bases<Serializable>,boost::noncopyable>("Cell").def_readwrite("refSize",&Cell::refSize) ; }
 };
 REGISTER_SERIALIZABLE(Cell);

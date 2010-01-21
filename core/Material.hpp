@@ -15,7 +15,7 @@ The other data are now in the State class.
 class Material: public Serializable, public Indexable{
 	public:
 		Material(): id(-1), density(1000){ }
-		~Material();
+		virtual ~Material();
 		//! global id of the material; if >= 0, the material is shared and can be found under this index in Scene::materials
 		//! (necessary since yade::serialization doesn't track shared pointers)
 		int id;
@@ -41,8 +41,11 @@ class Material: public Serializable, public Indexable{
 		static const shared_ptr<Material> byLabel(const std::string& label, Scene* scene=NULL);
 		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<Scene> scene) {return byLabel(label,scene.get());}
 
-	REGISTER_CLASS_AND_BASE(Material,Serializable);
-	REGISTER_ATTRIBUTES(Serializable,(id)(label)(density));
+	//REGISTER_CLASS_AND_BASE(Material,Serializable);
+	//REGISTER_ATTRIBUTES(Serializable,(id)(label)(density));
+	YADE_CLASS_BASE_ATTRS_PY(Material,Serializable,(id)(label)(density),
+		.def("newAssocState",&Material::newAssocState)
+	);
 	REGISTER_INDEX_COUNTER(Material);
 };
 REGISTER_SERIALIZABLE(Material);

@@ -11,8 +11,7 @@ class GravityEngine: public GlobalEngine{
 		GravityEngine(): gravity(Vector3r::ZERO){};
 		virtual ~GravityEngine(){};
 		virtual void action(Scene*);
-	REGISTER_ATTRIBUTES(GlobalEngine,(gravity));
-	REGISTER_CLASS_AND_BASE(GravityEngine,GlobalEngine);
+	YADE_CLASS_BASE_ATTRS(GravityEngine,GlobalEngine,(gravity));
 };
 REGISTER_SERIALIZABLE(GravityEngine);
 
@@ -32,10 +31,7 @@ class CentralGravityEngine: public GlobalEngine {
 		CentralGravityEngine(){ reciprocal=false; }
 		virtual ~CentralGravityEngine(){};
 		virtual void action(Scene*);
-	protected:
-		REGISTER_ATTRIBUTES(GlobalEngine,(centralBody)(accel)(reciprocal));
-		REGISTER_CLASS_NAME(CentralGravityEngine);
-		REGISTER_BASE_CLASS_NAME(GlobalEngine);
+	YADE_CLASS_BASE_ATTRS(CentralGravityEngine,GlobalEngine,(centralBody)(accel)(reciprocal));
 };
 REGISTER_SERIALIZABLE(CentralGravityEngine);
 
@@ -53,10 +49,7 @@ class AxialGravityEngine: public GlobalEngine {
 		AxialGravityEngine(){ }
 		virtual ~AxialGravityEngine(){};
 		virtual void action(Scene*);
-	protected:
-		REGISTER_ATTRIBUTES(GlobalEngine,(axisPoint)(axisDirection)(acceleration));
-		REGISTER_CLASS_NAME(AxialGravityEngine);
-		REGISTER_BASE_CLASS_NAME(GlobalEngine);
+	YADE_CLASS_BASE_ATTRS(AxialGravityEngine,GlobalEngine,(axisPoint)(axisDirection)(acceleration));
 };
 REGISTER_SERIALIZABLE(AxialGravityEngine);
 

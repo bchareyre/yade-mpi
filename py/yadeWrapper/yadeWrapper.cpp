@@ -26,6 +26,7 @@
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<yade/lib-pyutil/gil.hpp>
+#include<yade/lib-pyutil/raw_constructor.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/ThreadRunner.hpp>
 #include<yade/core/FileGenerator.hpp>
@@ -53,6 +54,7 @@
 
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/Clump.hpp>
+
 
 using namespace boost;
 using namespace std;
@@ -281,7 +283,7 @@ class pyMaterialContainer{
 			try { return Material::byLabel(label,scene);	}
 			catch (std::runtime_error& e){ PyErr_SetString(PyExc_KeyError,e.what()); python::throw_error_already_set(); /* never reached; avoids warning */ throw; }
 		}
-		int append(shared_ptr<Material>& m){ scene->materials.push_back(m); m->id=scene->materials.size()-1; return m->id; }
+		int append(shared_ptr<Material> m){ scene->materials.push_back(m); m->id=scene->materials.size()-1; return m->id; }
 		vector<int> appendList(vector<shared_ptr<Material> > mm){ vector<int> ret; FOREACH(shared_ptr<Material>& m, mm) ret.push_back(append(m)); return ret; }
 		int len(){ return (int)scene->materials.size(); }
 };
@@ -556,39 +558,6 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 	return instance;
 }
 
-template <typename T>
-shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::dict& d){
-	if(python::len(t)>1) throw runtime_error("Zero or one (and not more) non-keyword string argument required");
-	string clss;
-	if(python::len(t)==1){
-		python::extract<string> clss_(t[0]); if(!clss_.check()) throw runtime_error("First argument (if given) must be a string.");
-		clss=clss_();
-	}
-	shared_ptr<T> instance;
-	if(clss.empty()){ instance=shared_ptr<T>(new T); }
-	else{
-		shared_ptr<Factorable> instance0=ClassFactory::instance().createShared(clss);
-		if(!instance0) throw runtime_error("Invalid class `"+clss+"' (not created by ClassFactory).");
-		instance=dynamic_pointer_cast<T>(instance0);
-		if(!instance) throw runtime_error("Invalid class `"+clss+"' (unable to cast to typeid `"+typeid(T).name()+"')");
-	}
-	instance->pyUpdateAttrs(d);
-	return instance;
-}
-
-template <typename T>
-shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& d){
-	shared_ptr<Factorable> inst0=ClassFactory::instance().createShared(self->getClassName());
-	if(!inst0) throw runtime_error("Invalid class `"+self->getClassName()+"' (not created by ClassFactory).");
-	shared_ptr<T> inst=dynamic_pointer_cast<T>(inst0);
-	if(!inst) throw runtime_error("Invalid class `"+self->getClassName()+"' (unable to cast to typeid `"+typeid(T).name()+"')");
-	inst->pyUpdateAttrs(self->pyDict());
-	// if d not empty (how to test that?)
-	inst->pyUpdateAttrs(d);
-	inst->postProcessAttributes(/*deserializing*/true);
-	return inst;
-}
-
 // stupid; Dispatcher is not a template, hence converting this into a real constructor would be complicated; keep it here.
 template<typename DispatcherT>
 shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typename DispatcherT::functorType> >& functors){
@@ -631,23 +600,6 @@ long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId
 
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
 void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
-
-// many thanks to http://markmail.org/message/s4ksg6nfspw2wxwd
-namespace boost { namespace python { namespace detail {
-	template <class F> struct raw_constructor_dispatcher{
-		raw_constructor_dispatcher(F f): f(make_constructor(f)) {}
-		PyObject* operator()(PyObject* args, PyObject* keywords)
-		{
-			 borrowed_reference_t* ra = borrowed_reference(args); object a(ra);
-			 return incref(object(f(object(a[0]),object(a.slice(1,len(a))),keywords ? dict(borrowed_reference(keywords)) : dict())).ptr() );
-		}
-		private: object f;
-	};
-	}
-	template <class F> object raw_constructor(F f, std::size_t min_args = 0){
-		return detail::make_raw_function(objects::py_function(detail::raw_constructor_dispatcher<F>(f),mpl::vector2<void, object>(),min_args+1,(std::numeric_limits<unsigned>::max)()));
-	}
-}} // namespace boost::python
 
 BOOST_PYTHON_MODULE(wrapper)
 {
@@ -760,7 +712,8 @@ BOOST_PYTHON_MODULE(wrapper)
 
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
-
+	Serializable().pyRegisterClass(python::scope());
+#if 0
 	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
 		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
 		.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
@@ -770,6 +723,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		// aliases for __getitem__ and __setitem__, but they are used by the property generator code and can be useful if we deprecate the object['attr'] type of access
 		.def("_prop_get",&Serializable::pyGetAttr).def("_prop_set",&Serializable::pySetAttr)
 		;
+#endif
 	python::class_<Engine, shared_ptr<Engine>, python::bases<Serializable>, noncopyable >("Engine",python::no_init)
 		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
 		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
@@ -782,7 +736,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bases",&Functor::getFunctorTypes);
 	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
 	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData).def("reset",&TimingDeltas::reset);
-
+#if 0
 	python::class_<Cell,shared_ptr<Cell>, python::bases<Serializable>, noncopyable>("Cell",python::no_init)
 		.def_readwrite("refSize",&Cell::refSize)
 		.def_readwrite("trsf",&Cell::trsf)
@@ -791,7 +745,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		//.def_readwrite("Hsize",&Cell::Hsize)
 		//.add_property("size",&Cell::getSize,python::return_value_policy<python::return_internal_referece>()
 	;
-
+#endif
 	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers")
 		.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
 		.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher)
@@ -820,6 +774,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	// expose indexable class, with access to the index
 	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("dispIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").def("dispHierarchy",&Indexable_getClassIndices<className>,(python::arg("names")=true),"Return list of dispatch classes (from down upwards), starting with the class instance itself, top-level indexable at last. If names is true (default), return class names rather than numerical indices.")
 
+#if 0
 	EXPOSE_CXX_CLASS(Body)
 		// mold and geom are deprecated:
 		.add_property("mold",&Body_shape_deprec_get,&Body_shape_deprec_set)
@@ -834,14 +789,17 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("isStandalone",&Body::isStandalone)
 		.add_property("isClumpMember",&Body::isClumpMember)
 		.add_property("isClump",&Body::isClump);
+#endif
 	EXPOSE_CXX_CLASS_IX(Shape);
 	EXPOSE_CXX_CLASS_IX(Bound)
 		.def_readonly("min",&Bound::min)
 		.def_readonly("max",&Bound::max);
+#if 0
 	EXPOSE_CXX_CLASS_IX(Material)
 		.def_readwrite("label",&Material::label)
 		.def("newAssocState",&Material::newAssocState)
 		;
+#endif
 	EXPOSE_CXX_CLASS(State)
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
 		.add_property("pos",&State::pos_get,&State::pos_set)

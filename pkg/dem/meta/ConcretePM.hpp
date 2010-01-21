@@ -98,8 +98,9 @@ class CpmMat: public FrictMat {
 		};
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
-		REGISTER_ATTRIBUTES(FrictMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
-		REGISTER_CLASS_AND_BASE(CpmMat,FrictMat);
+		//REGISTER_ATTRIBUTES(FrictMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
+		//REGISTER_CLASS_AND_BASE(CpmMat,FrictMat);
+		YADE_CLASS_BASE_ATTRS(CpmMat,FrictMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
 		REGISTER_CLASS_INDEX(CpmMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(CpmMat);

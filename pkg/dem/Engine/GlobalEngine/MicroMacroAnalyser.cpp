@@ -14,7 +14,6 @@
 #include<yade/core/Scene.hpp>
 #include <yade/pkg-common/Sphere.hpp>
 #include "MicroMacroAnalyser.hpp"
-#include<yade/pkg-dem/TesselationWrapper.hpp>
 #include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 #include<yade/lib-triangulation/TriaxialState.h>
 #include <yade/lib-triangulation/Tenseur3.h>

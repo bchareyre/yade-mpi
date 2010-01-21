@@ -7,7 +7,7 @@
 *************************************************************************/
 
 ///FIXME : this include breaks compilation, see commented "numpy" code at the end of the file
-//#include<yade/lib-pyutil/numpy.hpp>
+#include<yade/lib-pyutil/numpy.hpp>
 
 //#include "CGAL/constructions/constructions_on_weighted_points_cartesian_3.h"
 //#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
@@ -392,26 +392,26 @@ python::dict TesselationWrapper::getVolPoroDef(bool deformation){
 		int dim1[]={bodiesDim};
 		int dim2[]={bodiesDim,9};
 		/// This is the code that needs numpy include
-		//numpy_boost<body_id_t,1> id(dim1);
-// 		boost::python::numpy_boost<double,1> vol(dim1);
-// 		boost::python::numpy_boost<double,1> poro(dim1);
-// 		boost::python::numpy_boost<double,2> def(dim2);
-// 		//FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-// 		for (CGT::RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
-// 			id[]=V_it->info().id()
-// 			//if(!b) continue;
-// 			const body_id_t id = V_it->info().id();
-// 			Real sphereVol = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
-// 			vol[id]=V_it->info().v();			
-// 			poro[id]=(V_it->info().v() - sphereVol)/V_it->info().v();
-// 			//if (deformation) MATRIX3R_TO_NUMPY(def[id],ParticleDeformation[id]);
-// 			cerr << V_it->info().v()<<" "<<ParticleDeformation[id]<<endl;
-// 		}
-// 		python::dict ret;
-// 		ret["vol"]=vol;
-// 		ret["poro"]=poro;
-// 		if (deformation) ret["def"]=def;		
-// 		return ret;
+		numpy_boost<body_id_t,1> id(dim1);
+ 		numpy_boost<double,1> vol(dim1);
+ 		numpy_boost<double,1> poro(dim1);
+ 		numpy_boost<double,2> def(dim2);
+ 		//FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+ 		for (CGT::RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
+ 			//id[]=V_it->info().id()
+ 			//if(!b) continue;
+ 			const body_id_t id = V_it->info().id();
+ 			Real sphereVol = 4.188790 * std::pow ( ( V_it->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
+ 			vol[id]=V_it->info().v();			
+ 			poro[id]=(V_it->info().v() - sphereVol)/V_it->info().v();
+ 			//if (deformation) MATRIX3R_TO_NUMPY(def[id],ParticleDeformation[id]);
+ 			//cerr << V_it->info().v()<<" "<<ParticleDeformation[id]<<endl;
+ 		}
+ 		python::dict ret;
+ 		ret["vol"]=vol;
+ 		ret["poro"]=poro;
+ 		if (deformation) ret["def"]=def;		
+ 		return ret;
 }
 
 /// Needed somewhere?

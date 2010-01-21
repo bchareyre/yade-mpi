@@ -10,6 +10,7 @@
 
 #include "Serializable.hpp"
 
+
 void Serializable::pyUpdateAttrs(const python::dict& d){
 	python::list l=d.items(); size_t ll=python::len(l);
 	for(size_t i=0; i<ll; i++){
