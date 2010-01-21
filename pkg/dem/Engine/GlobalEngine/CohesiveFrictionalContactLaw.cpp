@@ -49,26 +49,6 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
-//    static long ncount = 0;//REMOVE
-//    ncount = 0;
-
-	///Reset the isBroken flag
-	//if (iter != Omega::instance().getCurrentIteration())
-	//
-	if ( detectBrokenBodies )
-	{
-		BodyContainer::iterator bi    = bodies->begin();
-		BodyContainer::iterator biEnd = bodies->end();
-		for ( ; bi!=biEnd ; ++bi )
-		{
-			shared_ptr<Body> b = *bi;
-			if ( b->shape && b->shape->getClassName() =="Sphere" )
-				( static_cast<CohesiveFrictionalMat*> ( b->material.get() ) )->isBroken = true;
-			// b->geometricalModel->diffuseColor= Vector3r(0.5,0.3,0.9);
-		}
-	}
-	//iter = Omega::instance().getCurrentIteration();
-
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end();
 	for ( ; ii!=iiEnd ; ++ii )
@@ -89,17 +69,13 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 			int id1 = contact->getId1();
 			int id2 = contact->getId2();
 
-			if ( ! ( ( *bodies ) [id1]->getGroupMask() & ( *bodies ) [id2]->getGroupMask() & sdecGroupMask ) )
+			if (!((*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask))
 				continue; // skip other groups,
-
 			Body* b1 = ( *bodies ) [id1].get();
 			Body* b2 = ( *bodies ) [id2].get();
-
 			ScGeom* currentContactGeometry  = YADE_CAST<ScGeom*> ( contact->interactionGeometry.get() );
 			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> ( contact->interactionPhysics.get() );
-
 			Vector3r& shearForce    = currentContactPhysics->shearForce;
-
 			if ( contact->isFresh ( ncb ) ) shearForce   = Vector3r::ZERO;
 
 			Real un     = currentContactGeometry->penetrationDepth;
@@ -112,36 +88,22 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 			   )
 			{
 				// BREAK due to tension
-
-				//currentContactPhysics->SetBreakingState();
-				//if (currentContactPhysics->cohesionBroken) {
-				//cerr << "broken" << endl;
-
 				ncb->interactions->requestErase ( contact->getId1(),contact->getId2() );
 				// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 				currentContactPhysics->cohesionBroken = true;
 				currentContactPhysics->normalForce = Vector3r::ZERO;
 				currentContactPhysics->shearForce = Vector3r::ZERO;
-
-				//return;
-				//    } else
-				//    currentContactPhysics->normalForce = -currentContactPhysics->normalAdhesion*currentContactGeometry->normal;
 			}
 			else
 			{
-
 				Vector3r axis;
 				Real angle;
-
 				/// Here is the code with approximated rotations   ///
-
 				axis    = currentContactPhysics->prevNormal.Cross ( currentContactGeometry->normal );
 				shearForce         -= shearForce.Cross ( axis );
 				angle    = dt*0.5*currentContactGeometry->normal.Dot ( Body::byId ( id1 )->state->angVel+Body::byId ( id2 )->state->angVel );
 				axis    = angle*currentContactGeometry->normal;
 				shearForce         -= shearForce.Cross ( axis );
-
-				
 				Vector3r x    = currentContactGeometry->contactPoint;
 				Vector3r c1x    = ( x - b1->state->pos );
 				Vector3r c2x    = ( x - b2->state->pos );
@@ -170,7 +132,6 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 				//  cerr << "shearForce = " << shearForce << endl;
 				Real maxFs = 0;
 				Real Fs = currentContactPhysics->shearForce.Length();
-				//if (!currentContactPhysics->cohesionBroken) {
 				maxFs = std::max ( ( Real ) 0, currentContactPhysics->shearAdhesion + Fn*currentContactPhysics->tangensOfFrictionAngle );
 				// if (!currentContactPhysics->cohesionDisablesFriction)
 				//         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
@@ -185,16 +146,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 					//if (currentContactPhysics->fragile && !currentContactPhysics->cohesionBroken)
 
 					currentContactPhysics->SetBreakingState();
-
-					//     maxFs = currentContactPhysics->shearAdhesion;
-					//    if (!currentContactPhysics->cohesionDisablesFriction && un>0)
-					//         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
-
 					maxFs = max ( ( Real ) 0, Fn * currentContactPhysics->tangensOfFrictionAngle );
-
-					//cerr << "currentContactPhysics->tangensOfFrictionAngle = " << currentContactPhysics->tangensOfFrictionAngle << endl;
-					// cerr << "maxFs = " << maxFs << endl;
-
 					maxFs = maxFs / Fs;
 					// cerr << "maxFs = " << maxFs << endl;
 					if ( maxFs>1 )
@@ -202,9 +154,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 					shearForce *= maxFs;
 					if ( Fn<0 )  currentContactPhysics->normalForce = Vector3r::ZERO;
 				}
-
-		////////// PFC3d SlipModel
-
+				////////// PFC3d SlipModel
 				Vector3r f    = currentContactPhysics->normalForce + shearForce;
 				// cerr << "currentContactPhysics->normalForce= " << currentContactPhysics->normalForce << endl;
 				//  cerr << "shearForce " << shearForce << endl;
@@ -281,35 +231,9 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 			}
 		}
 	}
-	if ( detectBrokenBodies )
-	{
-		BodyContainer::iterator bi    = bodies->begin();
-		BodyContainer::iterator biEnd = bodies->end();
-		for ( ; bi!=biEnd ; ++bi )
-		{
-			shared_ptr<Body> b = *bi;
-			if ( b->shape && b->shape->getClassName() =="Sphere" && erosionActivated )
-			{
-				//cerr << "translate it" << endl;
-				if ( ( static_cast<CohesiveFrictionalMat*> ( b->material.get() ) )->isBroken == true )
-				{
-					if ( b->isDynamic )
-						b->state->pos += translation_vect_;
-					b->isDynamic = false;
-					b->shape->diffuseColor= Vector3r ( 0.5,0.3,0.9 );
-
-
-				}
-				else  b->shape->diffuseColor= Vector3r ( 0.5,0.9,0.3 );
-			}
-		}
-	}
-	//cerr << "ncount= " << ncount << endl;//REMOVE
-
-
 }
 
-YADE_PLUGIN ( ( CohesiveFrictionalContactLaw ) );
+YADE_PLUGIN ((CohesiveFrictionalContactLaw));
 
 
 
