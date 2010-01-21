@@ -104,7 +104,6 @@ namespace Wm3 {
 	template<class T> class DistVector3Segment3; typedef DistVector3Segment3<Real> DistVector3Segment3r;
 	template<class T> class DistVector3Tetrahedron3; typedef DistVector3Tetrahedron3<Real> DistVector3Tetrahedron3r;
 	template<class T> class DistVector3Triangle3; typedef DistVector3Triangle3<Real> DistVector3Triangle3r;
-	template<class T> class Eigen; typedef Eigen<Real> Eigenr;
 	template<class T> class Ellipse2; typedef Ellipse2<Real> Ellipse2r;
 	template<class T> class Ellipsoid3; typedef Ellipsoid3<Real> Ellipsoid3r;
 	template<class T> class EllipsoidGeodesic; typedef EllipsoidGeodesic<Real> EllipsoidGeodesicr;
