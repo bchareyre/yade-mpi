@@ -70,7 +70,7 @@ class UniaxialStrainer: public GlobalEngine {
 		virtual void action(Scene*);
 		UniaxialStrainer(){axis=2; asymmetry=0; currentStrainRate=0; originalLength=-1; limitStrain=0; notYetReversed=true; crossSectionArea=-1; needsInit=true; strain=avgStress=0; blockRotations=false; blockDisplacements=false; setSpeeds=false; strainRate=absSpeed=stopStrain=numeric_limits<Real>::quiet_NaN(); active=true; idleIterations=0; initAccelTime=-200;};
 		virtual ~UniaxialStrainer(){};
-		REGISTER_ATTRIBUTES(GlobalEngine,
+		YADE_CLASS_BASE_ATTRS(UniaxialStrainer,GlobalEngine,
 				(strainRate) 
 				(absSpeed)
 				(initAccelTime)
@@ -92,7 +92,6 @@ class UniaxialStrainer: public GlobalEngine {
 				(blockRotations) 
 				(setSpeeds)
 		);
-	REGISTER_CLASS_AND_BASE(UniaxialStrainer,GlobalEngine);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(UniaxialStrainer);

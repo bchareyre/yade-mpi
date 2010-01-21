@@ -28,12 +28,8 @@ class PartialEngine : public Engine
 		PartialEngine ();
 		virtual void action(Scene*);
 		virtual void applyCondition(Scene*) { throw; };
-	//	virtual bool isActivated();
-	protected :
-	REGISTER_ATTRIBUTES(Engine,(subscribedBodies));
-	REGISTER_CLASS_AND_BASE(PartialEngine,Engine);
+	YADE_CLASS_BASE_ATTRS(PartialEngine,Engine,(subscribedBodies));
 };
-
 REGISTER_SERIALIZABLE(PartialEngine);
 
 

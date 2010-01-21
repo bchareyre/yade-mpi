@@ -31,9 +31,12 @@ class InteractionPhysicsDispatcher : 	public Dispatcher2D
 		virtual void action(Scene*);
 		void explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i);
 
-	REGISTER_CLASS_NAME(InteractionPhysicsDispatcher);
-	REGISTER_BASE_CLASS_NAME(Dispatcher2D);
-	REGISTER_ATTRIBUTES(Dispatcher, /* no attributes here */);
+	//REGISTER_CLASS_NAME(InteractionPhysicsDispatcher);
+	//REGISTER_BASE_CLASS_NAME(Dispatcher2D);
+	//REGISTER_ATTRIBUTES(Dispatcher, /* no attributes here */);
+	YADE_CLASS_BASE_ATTRS_PY(InteractionPhysicsDispatcher,Dispatcher,/* no attrs */,
+		YADE_PY_DISPATCHER(InteractionPhysicsDispatcher)
+	);
 };
 
 REGISTER_SERIALIZABLE(InteractionPhysicsDispatcher);

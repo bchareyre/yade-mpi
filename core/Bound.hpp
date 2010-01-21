@@ -10,6 +10,7 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/core/Dispatcher.hpp>
 
 /*! Interface for approximate body locations in space
 
@@ -24,8 +25,13 @@ class Bound : public Serializable, public Indexable
 		Vector3r	 diffuseColor,min,max;
 		Bound(): diffuseColor(Vector3r(1,1,1)), min(Vector3r(0,0,0)), max(Vector3r(0,0,0)) {}
 
-	REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
-	REGISTER_CLASS_AND_BASE(Bound,Serializable Indexable);
+	//REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
+	//REGISTER_CLASS_AND_BASE(Bound,Serializable Indexable);
+	YADE_CLASS_BASE_ATTRS_PY(Bound,Serializable,(diffuseColor),
+		YADE_PY_TOPINDEXABLE(Bound)
+		.def_readonly("min",&Bound::min)
+		.def_readonly("max",&Bound::max)
+	);
 	REGISTER_INDEX_COUNTER(Bound);
 };
 REGISTER_SERIALIZABLE(Bound);

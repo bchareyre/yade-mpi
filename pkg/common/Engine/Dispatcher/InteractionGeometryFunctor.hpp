@@ -46,10 +46,10 @@ class InteractionGeometryFunctor : 	public Functor2D
 					>
 {
 	public: virtual ~InteractionGeometryFunctor();
-	REGISTER_CLASS_AND_BASE(InteractionGeometryFunctor,Functor2D);
-	REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
+	//REGISTER_CLASS_AND_BASE(InteractionGeometryFunctor,Functor2D);
+	//REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
+	YADE_CLASS_BASE_ATTRS(InteractionGeometryFunctor,Functor,/*no attrs*/);
 };
-
 REGISTER_SERIALIZABLE(InteractionGeometryFunctor);
 
 

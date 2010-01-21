@@ -10,7 +10,6 @@ class LawFunctor: public Functor2D <
 	public:
 		LawFunctor(){}
 		virtual ~LawFunctor();
-	REGISTER_CLASS_AND_BASE(LawFunctor,Functor2D);
 	/*! Convenience functions to get forces/torques quickly. */
 	void addForce (const body_id_t id, const Vector3r& f,Scene* rb){rb->forces.addForce (id,f);}
 	void addTorque(const body_id_t id, const Vector3r& t,Scene* rb){rb->forces.addTorque(id,t);}
@@ -21,7 +20,9 @@ class LawFunctor: public Functor2D <
 		addTorque(id1,(contactPoint-pos1).Cross(force),rb);
 		addTorque(id2,-(contactPoint-pos2).Cross(force),rb);
 	}
-	REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
+	//REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
+	//REGISTER_CLASS_AND_BASE(LawFunctor,Functor2D);
+	YADE_CLASS_BASE_ATTRS(LawFunctor,Functor,/*no attrs*/);
 };
 REGISTER_SERIALIZABLE(LawFunctor);
 	

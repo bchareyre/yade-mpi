@@ -44,9 +44,9 @@ class BoundDispatcher :	public Dispatcher2D
 		virtual bool isActivated(Scene*){ return activated; }
 		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(BoundDispatcher);
-	REGISTER_BASE_CLASS_NAME(Dispatcher2D);
-	REGISTER_ATTRIBUTES(Dispatcher,(activated)(sweepDist));
+	YADE_CLASS_BASE_ATTRS_PY(BoundDispatcher,Dispatcher,(activated)(sweepDist),
+		YADE_PY_DISPATCHER(BoundDispatcher)
+	);
 };
 REGISTER_SERIALIZABLE(BoundDispatcher);
 

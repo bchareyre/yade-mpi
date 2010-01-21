@@ -78,15 +78,12 @@ class Interaction : public Serializable
 		//! common initialization called from both constructor and reset()
 		void init();
 			
-	REGISTER_ATTRIBUTES(Serializable,
-		(id1)
-		(id2)
-		(iterMadeReal)
-		(interactionGeometry)
-		(interactionPhysics)
-		(cellDist)
+	YADE_CLASS_BASE_ATTRS_PY(Interaction,Serializable,(id1)(id2)(iterMadeReal)(interactionGeometry)(interactionPhysics)(cellDist),
+		.def_readwrite("phys",&Interaction::interactionGeometry)
+		.def_readwrite("geom",&Interaction::interactionPhysics)
+		.def_readonly("cellDist",&Interaction::cellDist)
+		.add_property("isReal",&Interaction::isReal)
 	);
-	REGISTER_CLASS_AND_BASE(Interaction,Serializable);
 };
 
 REGISTER_SERIALIZABLE(Interaction);

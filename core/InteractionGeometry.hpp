@@ -11,13 +11,17 @@
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/core/Dispatcher.hpp>
 
 class InteractionGeometry : public Serializable, public Indexable
 {
-	REGISTER_CLASS_NAME(InteractionGeometry);
-	REGISTER_BASE_CLASS_NAME(Serializable Indexable);
+	//REGISTER_CLASS_NAME(InteractionGeometry);
+	//REGISTER_BASE_CLASS_NAME(Serializable Indexable);
+	//REGISTER_ATTRIBUTES(Serializable,/*no attributes either*/); // keep this line here
+	YADE_CLASS_BASE_ATTRS_PY(InteractionGeometry,Serializable,/*no attrs*/,
+		YADE_PY_TOPINDEXABLE(InteractionGeometry)
+	);
 	REGISTER_INDEX_COUNTER(InteractionGeometry);
-	REGISTER_ATTRIBUTES(Serializable,/*no attributes either*/); // keep this line here
 };
 
 REGISTER_SERIALIZABLE(InteractionGeometry);

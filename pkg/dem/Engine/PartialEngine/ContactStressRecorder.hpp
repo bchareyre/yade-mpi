@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include <yade/pkg-common/Recorder.hpp>
-
-#include <string>
-#include <fstream>
+#include<yade/pkg-common/Recorder.hpp>
+#include<string>
+#include<fstream>
 
 class TriaxialCompressionEngine;
+class Shape;
 // class SampleCapillaryPressureEngine;
 
 

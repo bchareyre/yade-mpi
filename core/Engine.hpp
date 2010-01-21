@@ -11,10 +11,16 @@
 #pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
-#include"Omega.hpp"
+#include<yade/core/Omega.hpp>
 #include<yade/core/Timing.hpp>
 
+#include<boost/foreach.hpp>
+#ifndef FOREACH
+#define FOREACH BOOST_FOREACH
+#endif
+
 class Body;
+class Scene;
 
 class Engine: public Serializable{
 	public:
@@ -31,8 +37,20 @@ class Engine: public Serializable{
 	
 		virtual bool isActivated(Scene*) { return true; };
 		virtual void action(Scene*) { throw; };
-	REGISTER_ATTRIBUTES(Serializable,(label));
-	REGISTER_CLASS_AND_BASE(Engine,Serializable);
+	private:
+		// py access funcs	
+		TimingInfo::delta timingInfo_nsec_get(){return timingInfo.nsec;};
+		void timingInfo_nsec_set(TimingInfo::delta d){ timingInfo.nsec=d;}
+		long timingInfo_nExec_get(){return timingInfo.nExec;};
+		void timingInfo_nExec_set(long d){ timingInfo.nExec=d;}
+		//void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(scene); }
+
+	YADE_CLASS_BASE_ATTRS_PY(Engine,Serializable,(label),
+		.add_property("execTime",&Engine::timingInfo_nsec_get,&Engine::timingInfo_nsec_set)
+		.add_property("execCount",&Engine::timingInfo_nExec_get,&Engine::timingInfo_nExec_set)
+		.def_readonly("timingDeltas",&Engine::timingDeltas)
+		//.def("__call__",&Engine::explicitAction);
+	)
 };
 REGISTER_SERIALIZABLE(Engine);
 

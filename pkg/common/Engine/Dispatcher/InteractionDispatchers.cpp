@@ -3,6 +3,17 @@
 YADE_PLUGIN((InteractionDispatchers));
 CREATE_LOGGER(InteractionDispatchers);
 
+//! Pseudo-ctor for InteractionDispatchers, using lists of functors (might be turned into real ctor, perhaps)
+shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
+	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
+	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
+	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
+	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
+	return instance;
+}
+
+
+
 // #define IDISP_TIMING
 
 #ifdef IDISP_TIMING

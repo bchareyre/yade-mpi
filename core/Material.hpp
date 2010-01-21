@@ -4,6 +4,7 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 #include<yade/core/State.hpp>
+#include<yade/core/Dispatcher.hpp>
 
 
 class Scene;
@@ -41,10 +42,11 @@ class Material: public Serializable, public Indexable{
 		static const shared_ptr<Material> byLabel(const std::string& label, Scene* scene=NULL);
 		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<Scene> scene) {return byLabel(label,scene.get());}
 
-	//REGISTER_CLASS_AND_BASE(Material,Serializable);
+	//REGISTER_CLASS_AND_BASE(Material,Serializable Indexable);
 	//REGISTER_ATTRIBUTES(Serializable,(id)(label)(density));
 	YADE_CLASS_BASE_ATTRS_PY(Material,Serializable,(id)(label)(density),
 		.def("newAssocState",&Material::newAssocState)
+		YADE_PY_TOPINDEXABLE(Material)
 	);
 	REGISTER_INDEX_COUNTER(Material);
 };

@@ -10,6 +10,7 @@
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
+#include<yade/core/Dispatcher.hpp>
 
 #define BV_FUNCTOR_CACHE
 
@@ -27,10 +28,13 @@ class Shape : public Serializable, public Indexable
 			shared_ptr<BoundFunctor> boundFunctor;
 		#endif
 
-/// Serialization
-	REGISTER_ATTRIBUTES(Serializable,(diffuseColor)(wire)(highlight));
-	REGISTER_CLASS_AND_BASE(Shape,Serializable Indexable);
-/// Indexable
+	/// Serialization
+	//REGISTER_ATTRIBUTES(Serializable,(diffuseColor)(wire)(highlight));
+	//REGISTER_CLASS_AND_BASE(Shape,Serializable Indexable);
+	/// Indexable
+	YADE_CLASS_BASE_ATTRS_PY(Shape,Serializable,(diffuseColor)(wire)(highlight),
+		YADE_PY_TOPINDEXABLE(Shape)
+	);
 	REGISTER_INDEX_COUNTER(Shape);
 };
 REGISTER_SERIALIZABLE(Shape);

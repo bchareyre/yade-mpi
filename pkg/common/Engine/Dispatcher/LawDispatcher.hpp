@@ -16,7 +16,10 @@ class LawDispatcher:
 	>{
 		public:
 		virtual void action(Scene*);
-		REGISTER_CLASS_AND_BASE(LawDispatcher,Dispatcher2D);
+		//REGISTER_CLASS_AND_BASE(LawDispatcher,Dispatcher2D);
+		YADE_CLASS_BASE_ATTRS_PY(LawDispatcher,Dispatcher,/* no attrs */,
+			YADE_PY_DISPATCHER(LawDispatcher)
+		);
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(LawDispatcher);

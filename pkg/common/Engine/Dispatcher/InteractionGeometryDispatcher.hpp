@@ -41,9 +41,8 @@ class InteractionGeometryDispatcher :	public Dispatcher2D
 		virtual void action(Scene*);
 		shared_ptr<Interaction> explicitAction(const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool force);
 		InteractionGeometryDispatcher(): alreadyWarnedNoCollider(false){}
-
-	REGISTER_CLASS_AND_BASE(InteractionGeometryDispatcher,Dispatcher2D);
-	REGISTER_ATTRIBUTES(Dispatcher,/* no attributes here*/ );
+	YADE_CLASS_BASE_ATTRS_PY(InteractionGeometryDispatcher,Dispatcher,/* no attrs here*/,
+		YADE_PY_DISPATCHER(InteractionGeometryDispatcher));
 	DECLARE_LOGGER;
 };
 

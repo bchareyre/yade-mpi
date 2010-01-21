@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "Engine.hpp"
-#include "Functor.hpp"
-#include<yade/core/Omega.hpp>
-#include<yade/lib-multimethods/DynLibDispatcher.hpp>
 #include<boost/lexical_cast.hpp>
 
-class Dispatcher : public Engine
+#include<yade/core/Engine.hpp>
+#include<yade/core/Functor.hpp>
+#include<yade/core/Omega.hpp>
+#include<yade/lib-multimethods/DynLibDispatcher.hpp>
+
+class Dispatcher: public Engine
 {
 	public:
 		vector<vector<string> >		functorNames; // public for python interface; since there is getFunctorArguments returning RW(!) reference to this, why have it private anyway?!
@@ -49,13 +50,18 @@ class Dispatcher : public Engine
 		virtual int getDimension() { throw; };
 		virtual string getBaseClassType(unsigned int ) { throw; };
 
-
-	protected:
-		virtual void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(Engine,(functorNames)(functorArguments));
-	REGISTER_CLASS_AND_BASE(Dispatcher,Engine);
+	virtual void postProcessAttributes(bool deserializing);
+	YADE_CLASS_BASE_ATTRS(Dispatcher,Engine,(functorNames)(functorArguments));
 };
 REGISTER_SERIALIZABLE(Dispatcher);
+
+
+// HELPER MACROS
+// supposed to be passed to YADE_CLASS_BASE_ATTRS_PY as 4th argument; takes class name as arg
+#define YADE_PY_DISPATCHER(DispatcherT) .def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>).def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
+
+
+// HELPER FUNCTIONS
 
 /*! Function returning class name (as string) for given index and topIndexable (top-level indexable, such as Shape, Material and so on)
 This function exists solely for debugging, is quite slow: it has to traverse all classes and ask for inheritance information.
@@ -80,6 +86,44 @@ std::string Dispatcher_indexToClassName(int idx){
 	}
 	throw runtime_error("No class with index "+boost::lexical_cast<string>(idx)+" found (top-level indexable is "+topName+")");
 }
+
+//! Return class index of given indexable
+template<typename TopIndexable>
+int Indexable_getClassIndex(const shared_ptr<TopIndexable> i){return i->getClassIndex();}
+
+//! Return sequence (hierarchy) of class indices of given indexable; optionally convert to names
+template<typename TopIndexable>
+python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, bool convertToNames){
+	int depth=1; python::list ret; int idx0=i->getClassIndex();
+	if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx0));
+	else ret.append(idx0);
+	if(idx0<0) return ret; // don't continue and call getBaseClassIndex(), since we are at the top already
+	while(true){
+		int idx=i->getBaseClassIndex(depth++);
+		if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx));
+		else ret.append(idx);
+		if(idx<0) return ret;
+	}
+}
+
+
+// Dispatcher is not a template, hence converting this into a real constructor would be complicated; keep it separated, at least for now...
+//! Create dispatcher of given type, with functors given as list in argument
+template<typename DispatcherT>
+shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typename DispatcherT::functorType> >& functors){
+	shared_ptr<DispatcherT> instance(new DispatcherT);
+	FOREACH(shared_ptr<typename DispatcherT::functorType> functor,functors) instance->add(functor);
+	return instance;
+}
+
+//! Return functors of this dispatcher, as list of functors of appropriate type
+template<typename DispatcherT>
+std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
+	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
+	FOREACH(const shared_ptr<Functor>& functor, self->functorArguments){ shared_ptr<typename DispatcherT::functorType> functorRightType(dynamic_pointer_cast<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
+	return ret;
+}
+
 
 
 template
@@ -238,7 +282,7 @@ class Dispatcher2D : public Dispatcher,
 				return "";
 		}
 
-	protected :
+	public:
 		void postProcessAttributes(bool deserializing)
 		{
 			Dispatcher::postProcessAttributes(deserializing);

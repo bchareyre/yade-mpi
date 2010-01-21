@@ -110,7 +110,7 @@ def initTest():
 		O.wait();
 		O.loadTmp('initial')
 		print "Reversing plot data"; plot.reverseData()
-	strainer['strainRate']=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
+	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
 	try:
 		from yade import qt
 		renderer=qt.Renderer()
@@ -128,12 +128,12 @@ def stopIfDamaged():
 	global mode
 	if O.iter<2 or not plot.data.has_key('sigma'): return # do nothing at the very beginning
 	sigma,eps=plot.data['sigma'],plot.data['eps']
-	extremum=max(sigma) if (strainer['strainRate']>0) else min(sigma)
+	extremum=max(sigma) if (strainer.strainRate>0) else min(sigma)
 	minMaxRatio=0.5 if mode=='tension' else 0.5
 	if extremum==0: return
-	print O.tags['id'],mode,strainer['strain'],sigma[-1]
+	print O.tags['id'],mode,strainer.strain,sigma[-1]
 	import sys;	sys.stdout.flush()
-	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer['strain'])>5e-3:
+	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>5e-3:
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
 			O.save('/tmp/uniax-tension.xml.bz2')
@@ -154,7 +154,7 @@ def stopIfDamaged():
 			sys.exit(0)
 		
 def addPlotData():
-	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer['strain'],'sigma':strainer['avgStress']+isoPrestress,
+	yade.plot.addData({'t':O.time,'i':O.iter,'eps':strainer.strain,'sigma':strainer.avgStress+isoPrestress,
 		'sigma.25':utils.forcesOnCoordPlane(coord_25,axis)[axis]/area_25+isoPrestress,
 		'sigma.50':utils.forcesOnCoordPlane(coord_50,axis)[axis]/area_50+isoPrestress,
 		'sigma.75':utils.forcesOnCoordPlane(coord_75,axis)[axis]/area_75+isoPrestress,

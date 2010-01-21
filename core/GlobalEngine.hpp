@@ -15,8 +15,7 @@ class GlobalEngine : public Engine
 	public :
 		GlobalEngine() {};
 		virtual ~GlobalEngine() {};
-	REGISTER_ATTRIBUTES(Engine,/* no own attributes*/);
-	REGISTER_CLASS_AND_BASE(GlobalEngine,Engine);
+	YADE_CLASS_BASE_ATTRS(GlobalEngine,Engine,/* no own attrs */);
 };
 REGISTER_SERIALIZABLE(GlobalEngine);
 

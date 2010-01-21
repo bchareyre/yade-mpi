@@ -45,8 +45,9 @@ class BoundFunctor : public Functor2D
 				>
 {	
 	public: virtual ~BoundFunctor();
-	REGISTER_CLASS_AND_BASE(BoundFunctor,Functor2D);
-	REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
+	//REGISTER_CLASS_AND_BASE(BoundFunctor,Functor2D);
+	//REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
+	YADE_CLASS_BASE_ATTRS(BoundFunctor,Functor,/*no attrs*/);
 };
 
 REGISTER_SERIALIZABLE(BoundFunctor);

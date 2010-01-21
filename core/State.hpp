@@ -74,7 +74,11 @@ class State: public Serializable{
 
 	State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY),pos(se3.position),vel(Vector3r::ZERO),accel(Vector3r::ZERO),mass(0.),ori(se3.orientation),angVel(Vector3r::ZERO),angAccel(Vector3r::ZERO),angMom(Vector3r::ZERO),inertia(Vector3r::ZERO),refPos(Vector3r::ZERO),refOri(Quaternionr::IDENTITY),blockedDOFs(DOF_NONE){}
 
-	REGISTER_CLASS_AND_BASE(State,Serializable);
-	REGISTER_ATTRIBUTES(Serializable,(pos)(vel)(accel)(mass)(ori)(angVel)(angAccel)(angMom)(inertia)(refPos)(refOri)(blockedDOFs));
+	YADE_CLASS_BASE_ATTRS_PY(State,Serializable,/* pos+ori together */(se3)(vel)(accel)(mass)(angVel)(angAccel)(angMom)(inertia)(refPos)(refOri)(blockedDOFs),
+		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
+		// references must be set using wrapper funcs
+		.add_property("pos",&State::pos_get,&State::pos_set).add_property("ori",&State::ori_get,&State::ori_set) 
+	)
+
 };
 REGISTER_SERIALIZABLE(State);

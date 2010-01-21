@@ -63,53 +63,6 @@ using namespace std;
 #include<yade/extra/boost_python_len.hpp>
 
 
-/*!
-
-	FIXME: outdated syntax
-	
-	A regular class (not Omega) is instantiated like this:
-
-		RootClass('optional class name as quoted string',attribute1=value1,attribute2=value2,...)
-		
-	if class name is not given, the RootClass itself is instantiated
-
-		p=Material() # p is now instance of Material
-		p=Material('FrictMat') # p is now instance of RigidBodyParameters, which has PhysicalParameters as the "root" class
-		p=Material('FrictMat',mass=100,se3=(Vector3(1,1,2),Quaternion.IDENTITY)) # convenience constructor
-
-	The last statement is equivalent to:
-
-		p=Material('FrictMat')
-		p['mass']=100; 
-		p['se3']=[1,1,2,1,0,0,0]
-
-	Class attributes are those that are registered as serializable, are accessed using the [] operator and are always read-write (be careful)
-
-		p['se3'] # this will show you the se3 attribute inside p
-		p['se3']=[1,2,3,1,0,0,0] # this sets se3 of p
-
-	Those attributes that are not fundamental types (strings, numbers, booleans, se3, vectors, quaternions, arrays of numbers, arrays of strings) can be accessed only through explicit python data members, for example:
-		
-		b=Body()
-		b.mold=Shape("Sphere",radius=1)
-		b.shape=GeometricalModel("SphereModel",radius=1)
-		b.mold # will give you the shape of body
-	
-	Instances can be queried about attributes and data members they have:
-
-		b.keys() # serializable attributes, accessible via b['attribute']
-		dir(b) # python data members, accessible via b.attribute; the __something__ attributes are python internal attributes/metods -- methods are just callable members
-
-	Dispatcher class has special constructor (for convenience):
-
-		m=Dispatcher('class name as string',[list of engine units])
-
-	and it is equivalent to
-
-		m=MetaEntine('class name as string')
-		m.functors=[list of engine units]
-
-*/
 
 #ifdef YADE_LOG4CXX
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");
@@ -545,58 +498,8 @@ class pyOmega{
 
 class pySTLImporter : public STLImporter {};
 
-
-TimingInfo::delta Engine_timingInfo_nsec_get(const shared_ptr<Engine>& e){return e->timingInfo.nsec;}; void Engine_timingInfo_nsec_set(const shared_ptr<Engine>& e, TimingInfo::delta d){ e->timingInfo.nsec=d;}
-long Engine_timingInfo_nExec_get(const shared_ptr<Engine>& e){return e->timingInfo.nExec;}; void Engine_timingInfo_nExec_set(const shared_ptr<Engine>& e, long d){ e->timingInfo.nExec=d;}
-void Engine_action(const shared_ptr<Engine>& e){ e->scene=Omega::instance().getScene().get(); e->action(e->scene); }
-
-shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
-	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
-	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
-	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
-	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
-	return instance;
-}
-
-// stupid; Dispatcher is not a template, hence converting this into a real constructor would be complicated; keep it here.
-template<typename DispatcherT>
-shared_ptr<DispatcherT> Dispatcher_ctor_list(const std::vector<shared_ptr<typename DispatcherT::functorType> >& functors){
-	shared_ptr<DispatcherT> instance(new DispatcherT);
-	FOREACH(shared_ptr<typename DispatcherT::functorType> functor,functors) instance->add(functor);
-	return instance;
-}
-// same applies here
-template<typename DispatcherT>
-std::vector<shared_ptr<typename DispatcherT::functorType> > Dispatcher_functors_get(shared_ptr<DispatcherT> self){
-	std::vector<shared_ptr<typename DispatcherT::functorType> > ret;
-	FOREACH(const shared_ptr<Functor>& functor, self->functorArguments){ shared_ptr<typename DispatcherT::functorType> functorRightType(dynamic_pointer_cast<typename DispatcherT::functorType>(functor)); if(!functorRightType) throw logic_error("Internal error: Dispatcher of type "+self->getClassName()+" did not contain Functor of the required type "+typeid(typename DispatcherT::functorType).name()+"?"); ret.push_back(functorRightType); }
-	return ret;
-}
-
-template<typename TopIndexable>
-int Indexable_getClassIndex(const shared_ptr<TopIndexable> i){return i->getClassIndex();}
-template<typename TopIndexable>
-python::list Indexable_getClassIndices(const shared_ptr<TopIndexable> i, bool convertToNames){
-	int depth=1; python::list ret; int idx0=i->getClassIndex();
-	if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx0));
-	else ret.append(idx0);
-	if(idx0<0) return ret; // don't continue and call getBaseClassIndex(), since we are at the top already
-	while(true){
-		int idx=i->getBaseClassIndex(depth++);
-		if(convertToNames) ret.append(Dispatcher_indexToClassName<TopIndexable>(idx));
-		else ret.append(idx);
-		if(idx<0) return ret;
-	}
-}
-		
-// ParallelEngine
-shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); instance->slaves_set(slaves); return instance; }
-
 shared_ptr<Shape> Body_shape_deprec_get(const shared_ptr<Body>& b){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); return b->shape; }
 void Body_shape_deprec_set(const shared_ptr<Body>& b, shared_ptr<Shape> ig){ LOG_WARN("Body().mold and Body().geom attributes are deprecated, use 'shape' instead."); b->shape=ig; }
-
-long Interaction_getId1(const shared_ptr<Interaction>& i){ return (long)i->getId1(); }
-long Interaction_getId2(const shared_ptr<Interaction>& i){ return (long)i->getId2(); }
 
 void FileGenerator_generate(const shared_ptr<FileGenerator>& fg, string outFile){ fg->setFileName(outFile); fg->setSerializationLibrary("XMLFormatManager"); bool ret=fg->generateAndSave(); LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<fg->message); if(ret==false) throw runtime_error("Generator reported error: "+fg->message); };
 void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::instance().tmpFilename()+".xml.bz2"); LOG_DEBUG("Using temp file "<<xml); FileGenerator_generate(fg,xml); pyOmega().load(xml); }
@@ -710,6 +613,9 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pySTLImporter>("STLImporter")
 		.def("ymport",&pySTLImporter::import);
 
+// TODO: some classes must have special things declared inside YADE_CLASS_BASE_ATTRS_PY
+// 1. dispatchers (DONE) 2. functors (DONE) 3. indexables (DONE?)
+
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
 	Serializable().pyRegisterClass(python::scope());
@@ -724,6 +630,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("_prop_get",&Serializable::pyGetAttr).def("_prop_set",&Serializable::pySetAttr)
 		;
 #endif
+#if 0
 	python::class_<Engine, shared_ptr<Engine>, python::bases<Serializable>, noncopyable >("Engine",python::no_init)
 		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
 		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
@@ -731,12 +638,18 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__call__",&Engine_action);
 	python::class_<GlobalEngine,shared_ptr<GlobalEngine>, python::bases<Engine>, noncopyable>("GlobalEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<GlobalEngine>));
 	python::class_<PartialEngine,shared_ptr<PartialEngine>, python::bases<Engine>, noncopyable>("PartialEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<PartialEngine>));
+#endif
+
+#if 0
 	python::class_<Functor, shared_ptr<Functor>, python::bases<Serializable>, noncopyable >("Functor",python::no_init)
 		.def_readonly("timingDeltas",&Functor::timingDeltas)
 		.add_property("bases",&Functor::getFunctorTypes);
-	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
+#endif
+
 	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData).def("reset",&TimingDeltas::reset);
+
 #if 0
+	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
 	python::class_<Cell,shared_ptr<Cell>, python::bases<Serializable>, noncopyable>("Cell",python::no_init)
 		.def_readwrite("refSize",&Cell::refSize)
 		.def_readwrite("trsf",&Cell::trsf)
@@ -745,7 +658,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		//.def_readwrite("Hsize",&Cell::Hsize)
 		//.add_property("size",&Cell::getSize,python::return_value_policy<python::return_internal_referece>()
 	;
-#endif
 	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers")
 		.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
 		.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher)
@@ -754,21 +666,24 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<ParallelEngine,shared_ptr<ParallelEngine>, python::bases<Engine>, noncopyable>("ParallelEngine")
 		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
 		.add_property("slaves",&ParallelEngine::slaves_get,&ParallelEngine::slaves_set);
+#endif
 
+#if 0
 	#define EXPOSE_DISPATCHER(DispatcherT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>).def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
 		EXPOSE_DISPATCHER(BoundDispatcher)
 		EXPOSE_DISPATCHER(InteractionGeometryDispatcher)
 		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher)
 		EXPOSE_DISPATCHER(LawDispatcher)
 	#undef EXPOSE_DISPATCHER
-
+#endif
+#if 0
 	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<Functor>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
 		EXPOSE_FUNCTOR(BoundFunctor)
 		EXPOSE_FUNCTOR(InteractionGeometryFunctor)
 		EXPOSE_FUNCTOR(InteractionPhysicsFunctor)
 		EXPOSE_FUNCTOR(LawFunctor)
 	#undef EXPOSE_FUNCTOR
-		
+#endif
 	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>)).def("clone",&Serializable_clone<cxxName>,python::arg("attrs")=python::dict())
 	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
 	// expose indexable class, with access to the index
@@ -790,16 +705,21 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("isClumpMember",&Body::isClumpMember)
 		.add_property("isClump",&Body::isClump);
 #endif
+
+#if 0
 	EXPOSE_CXX_CLASS_IX(Shape);
 	EXPOSE_CXX_CLASS_IX(Bound)
 		.def_readonly("min",&Bound::min)
 		.def_readonly("max",&Bound::max);
-#if 0
 	EXPOSE_CXX_CLASS_IX(Material)
 		.def_readwrite("label",&Material::label)
 		.def("newAssocState",&Material::newAssocState)
 		;
+	EXPOSE_CXX_CLASS_IX(InteractionPhysics);
+	EXPOSE_CXX_CLASS_IX(InteractionGeometry);
 #endif
+
+#if 0
 	EXPOSE_CXX_CLASS(State)
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
 		.add_property("pos",&State::pos_get,&State::pos_set)
@@ -807,6 +727,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def_readwrite("refPos",&State::refPos)
 		.add_property("displ",&State::displ)
 		.add_property("rot",&State::rot);
+#endif
+
+#if 0
 	// interaction
 	EXPOSE_CXX_CLASS(Interaction)
 		.def_readwrite("phys",&Interaction::interactionPhysics)
@@ -815,11 +738,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("id2",&Interaction_getId2)
 		.add_property("isReal",&Interaction::isReal)
 		.add_property("cellDist",&Interaction::cellDist);
-	EXPOSE_CXX_CLASS_IX(InteractionPhysics);
-	EXPOSE_CXX_CLASS_IX(InteractionGeometry);
+#endif
+
 	EXPOSE_CXX_CLASS(FileGenerator)
 		.def("generate",&FileGenerator_generate)
 		.def("load",&FileGenerator_load);
+
 	python::scope().attr("O")=pyOmega();
 }
 

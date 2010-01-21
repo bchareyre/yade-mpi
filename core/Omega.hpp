@@ -38,9 +38,7 @@
 #include<yade/lib-loki/Singleton.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
 
-
 #include "SimulationFlow.hpp"
-#include "Body.hpp"
 
 #ifndef FOREACH
 #	define FOREACH BOOST_FOREACH
