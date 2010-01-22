@@ -12,7 +12,6 @@
 #include <utility>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-triangulation/Tesselation.h>
-//#include<yade/lib-pyutil/numpy.hpp>
 #include<boost/python.hpp>
 #include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 #include<yade/extra/boost_python_len.hpp>
@@ -38,13 +37,15 @@ public:
 	unsigned int n_spheres;
 	bool rad_divided;
 	bool bounded;
+	CGT::Point Pmin;
+	CGT::Point Pmax;
 
 	TesselationWrapper();
 	~TesselationWrapper();
     
     	/// Insert a sphere, "id" will be used by some getters to retrieve spheres
     	bool insert(double x, double y, double z, double rad, unsigned int id);
-	/// A faster version of insert
+	/// A faster version of insert, inserting all spheres in scene
 	bool insertSceneSpheres(const Scene* scene);
 	/// Move one sphere to the new position (x,y,z) and maintain triangulation (invalidates the tesselation)
 	bool move (double x, double y, double z, double rad, unsigned int id);
