@@ -81,6 +81,7 @@ class CpmState: public State {
 };
 REGISTER_SERIALIZABLE(CpmState);
 
+
 /* This class holds information associated with each body */
 class CpmMat: public FrictMat {
 	public:
@@ -98,9 +99,18 @@ class CpmMat: public FrictMat {
 		};
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
-		//REGISTER_ATTRIBUTES(FrictMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
-		//REGISTER_CLASS_AND_BASE(CpmMat,FrictMat);
-		YADE_CLASS_BASE_ATTRS(CpmMat,FrictMat,(G_over_E)(sigmaT)(neverDamage)(epsCrackOnset)(relDuctility)(dmgTau)(dmgRateExp)(plTau)(plRateExp)(isoPrestress));
+		YADE_CLASS_BASE_DOC_ATTRS(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes.",
+			((G_over_E,"Ratio of normal/shear stiffness at interaction level [-]"))
+			((sigmaT,"Initial cohesion [Pa]"))
+			((neverDamage,"If true, no damage will occur (for testing only)."))
+			((epsCrackOnset,"Limit elastic strain [-]"))
+			((relDuctility,"Relative ductility, for damage evolution law peak right-tangent. [-]"))
+			((dmgTau,"Characteristic time for normal viscosity. [s]"))
+			((dmgRateExp,"Exponent for normal viscosity function. [-]"))
+			((plTau,"Characteristic time for visco-plasticity. [s]"))
+			((plRateExp,"Exponent for visco-plasticity function. [-]"))
+			((isoPrestress,"Isotropic prestress of the whole speciment. [Pa]"))
+		);
 		REGISTER_CLASS_INDEX(CpmMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(CpmMat);

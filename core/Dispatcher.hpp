@@ -51,14 +51,17 @@ class Dispatcher: public Engine
 		virtual string getBaseClassType(unsigned int ) { throw; };
 
 	virtual void postProcessAttributes(bool deserializing);
-	YADE_CLASS_BASE_ATTRS(Dispatcher,Engine,(functorNames)(functorArguments));
+	YADE_CLASS_BASE_DOC_ATTRS(Dispatcher,Engine,"Engine dispatching control to its associated functors, based on types of argument it receives.",
+		((functorNames,"Names of functor classes"))
+		((functorArguments,"Instances of functors"))
+	);
 };
 REGISTER_SERIALIZABLE(Dispatcher);
 
 
 // HELPER MACROS
-// supposed to be passed to YADE_CLASS_BASE_ATTRS_PY as 4th argument; takes class name as arg
-#define YADE_PY_DISPATCHER(DispatcherT) .def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>).def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
+// supposed to be passed to YADE_CLASS_BASE_DOC_ATTRS_PY in the 5th argument; takes class name as arg
+#define YADE_PY_DISPATCHER(DispatcherT) .def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>,"Functors objects associated with this dispatcher.").def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
 
 
 // HELPER FUNCTIONS

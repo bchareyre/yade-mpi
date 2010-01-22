@@ -74,11 +74,22 @@ class State: public Serializable{
 
 	State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY),pos(se3.position),vel(Vector3r::ZERO),accel(Vector3r::ZERO),mass(0.),ori(se3.orientation),angVel(Vector3r::ZERO),angAccel(Vector3r::ZERO),angMom(Vector3r::ZERO),inertia(Vector3r::ZERO),refPos(Vector3r::ZERO),refOri(Quaternionr::IDENTITY),blockedDOFs(DOF_NONE){}
 
-	YADE_CLASS_BASE_ATTRS_PY(State,Serializable,/* pos+ori together */(se3)(vel)(accel)(mass)(angVel)(angAccel)(angMom)(inertia)(refPos)(refOri)(blockedDOFs),
-		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
+	YADE_CLASS_BASE_DOC_ATTRS_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
+		((se3,"Position and orientation as one object."))
+		((vel,"Current linear velocity."))
+		((accel,"Current acceleration."))
+		((mass,"Mass of this body"))
+		((angVel,"Current angular velocity"))
+		((angAccel,"Current angular acceleration"))
+		((angMom,"Current angular momentum"))
+		((inertia,"Inertia of associated body, in local coordinate system."))
+		((refPos,"Reference position"))
+		((refOri,"Reference orientation"))
+		((blockedDOFs,"[Will be overridden]")),
+		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always zero, regardless of applied force/torque. List of any combination of 'x','y','z','rx','ry','rz'.")
 		// references must be set using wrapper funcs
-		.add_property("pos",&State::pos_get,&State::pos_set).add_property("ori",&State::ori_get,&State::ori_set) 
-	)
-
+		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")
+		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.") 
+	);
 };
 REGISTER_SERIALIZABLE(State);

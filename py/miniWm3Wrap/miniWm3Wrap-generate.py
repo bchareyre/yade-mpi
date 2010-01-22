@@ -36,7 +36,8 @@ mb.decls(lambda d: 'Matrix2' in str(d) or 'Vector4' in str(d)).exclude()
 mb.member_operators(lambda o: o.symbol=='[]').exclude()
 # exclude From/To Euler angles, since we don't need it
 mb.member_functions(lambda f: 'Euler' in str(f)).exclude()
-##
+## exclude free functions
+mb.decls(lambda d: d.name in ('componentMaxVector','componentMinVector','componentSum','diagDiv','diagMult','quaternionFromAxes','quaternionToAxes','quaternionToEulerAngles','quaterniontoGLMatrix','unitVectorsAngle')).exclude()
 
 
 # register manual wraps

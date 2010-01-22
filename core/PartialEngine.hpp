@@ -28,7 +28,9 @@ class PartialEngine : public Engine
 		PartialEngine ();
 		virtual void action(Scene*);
 		virtual void applyCondition(Scene*) { throw; };
-	YADE_CLASS_BASE_ATTRS(PartialEngine,Engine,(subscribedBodies));
+	YADE_CLASS_BASE_DOC_ATTRS(PartialEngine,Engine,"Engine affecting only particular bodies in the simulation.",
+		((subscribedBodies,"Bodies affected by this PartialEngine."))
+	);
 };
 REGISTER_SERIALIZABLE(PartialEngine);
 

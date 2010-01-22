@@ -507,6 +507,9 @@ void FileGenerator_load(const shared_ptr<FileGenerator>& fg){ string xml(Omega::
 BOOST_PYTHON_MODULE(wrapper)
 {
 	python::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
+
+	python::docstring_options docopt; docopt.enable_all(); docopt.disable_cpp_signatures();
+
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")
 		.add_property("stopAtIter",&pyOmega::stopAtIter_get,&pyOmega::stopAtIter_set,"Get/set number of iteration after which the simulation will stop.")
@@ -591,16 +594,16 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("next",&pyInteractionIterator::pyNext);
 
 	python::class_<pyForceContainer>("ForceContainer",python::init<pyForceContainer&>())
-		.def("f",&pyForceContainer::force_get)
-		.def("t",&pyForceContainer::torque_get)
-		.def("m",&pyForceContainer::torque_get)
-		.def("move",&pyForceContainer::move_get)
-		.def("rot",&pyForceContainer::rot_get)
-		.def("addF",&pyForceContainer::force_add)
-		.def("addT",&pyForceContainer::torque_add)
-		.def("addMove",&pyForceContainer::move_add)
-		.def("addRot",&pyForceContainer::rot_add)
-		.add_property("syncCount",&pyForceContainer::syncCount_get,&pyForceContainer::syncCount_set)
+		.def("f",&pyForceContainer::force_get,(python::arg("id")),"Force applied on body.")
+		.def("t",&pyForceContainer::torque_get,(python::arg("id")),"Torque applied on body.")
+		.def("m",&pyForceContainer::torque_get,(python::arg("id")),"Deprecated alias for t (torque).")
+		.def("move",&pyForceContainer::move_get,(python::arg("id")),"Displacement applied on body.")
+		.def("rot",&pyForceContainer::rot_get,(python::arg("id")),"Rotation applied on body.")
+		.def("addF",&pyForceContainer::force_add,(python::arg("id"),python::arg("f")),"Apply force on body (accumulates).")
+		.def("addT",&pyForceContainer::torque_add,(python::arg("id"),python::arg("t")),"Apply torque on body (accumulates).")
+		.def("addMove",&pyForceContainer::move_add,(python::arg("id"),python::arg("m")),"Apply displacement on body (accumulates).")
+		.def("addRot",&pyForceContainer::rot_add,(python::arg("id"),python::arg("r")),"Apply rotation on body (accumulates).")
+		.add_property("syncCount",&pyForceContainer::syncCount_get,&pyForceContainer::syncCount_set,"Number of synchronizations  of ForceContainer (cummulative); if significantly higher than number of steps, there might be unnecessary syncs hurting performance.")
 		;
 
 	python::class_<pyMaterialContainer>("MaterialContainer",python::init<pyMaterialContainer&>())
@@ -613,136 +616,22 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pySTLImporter>("STLImporter")
 		.def("ymport",&pySTLImporter::import);
 
-// TODO: some classes must have special things declared inside YADE_CLASS_BASE_ATTRS_PY
-// 1. dispatchers (DONE) 2. functors (DONE) 3. indexables (DONE?)
 
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
 	Serializable().pyRegisterClass(python::scope());
-#if 0
-	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
-		.add_property("name",&Serializable::getClassName).def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
-		.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
-		.def("updateAttrs",&Serializable::pyUpdateAttrs).def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs)
-		.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict())
-		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
-		// aliases for __getitem__ and __setitem__, but they are used by the property generator code and can be useful if we deprecate the object['attr'] type of access
-		.def("_prop_get",&Serializable::pyGetAttr).def("_prop_set",&Serializable::pySetAttr)
-		;
-#endif
-#if 0
-	python::class_<Engine, shared_ptr<Engine>, python::bases<Serializable>, noncopyable >("Engine",python::no_init)
-		.add_property("execTime",&Engine_timingInfo_nsec_get,&Engine_timingInfo_nsec_set)
-		.add_property("execCount",&Engine_timingInfo_nExec_get,&Engine_timingInfo_nExec_set)
-		.def_readonly("timingDeltas",&Engine::timingDeltas)
-		.def("__call__",&Engine_action);
-	python::class_<GlobalEngine,shared_ptr<GlobalEngine>, python::bases<Engine>, noncopyable>("GlobalEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<GlobalEngine>));
-	python::class_<PartialEngine,shared_ptr<PartialEngine>, python::bases<Engine>, noncopyable>("PartialEngine").def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<PartialEngine>));
-#endif
 
-#if 0
-	python::class_<Functor, shared_ptr<Functor>, python::bases<Serializable>, noncopyable >("Functor",python::no_init)
-		.def_readonly("timingDeltas",&Functor::timingDeltas)
-		.add_property("bases",&Functor::getFunctorTypes);
-#endif
+	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData,"Get timing data as list of tuples (label, execTime[nsec], execCount) (one tuple per checkpoint)").def("reset",&TimingDeltas::reset,"Reset timing information");
 
-	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData).def("reset",&TimingDeltas::reset);
-
-#if 0
-	python::class_<Dispatcher, shared_ptr<Dispatcher>, python::bases<Engine>, noncopyable>("Dispatcher",python::no_init);
-	python::class_<Cell,shared_ptr<Cell>, python::bases<Serializable>, noncopyable>("Cell",python::no_init)
-		.def_readwrite("refSize",&Cell::refSize)
-		.def_readwrite("trsf",&Cell::trsf)
-		.def_readwrite("velGrad",&Cell::velGrad)
-		.def_readonly("size",&Cell::getSize_copy)
-		//.def_readwrite("Hsize",&Cell::Hsize)
-		//.add_property("size",&Cell::getSize,python::return_value_policy<python::return_internal_referece>()
-	;
-	python::class_<InteractionDispatchers,shared_ptr<InteractionDispatchers>, python::bases<Engine>, noncopyable >("InteractionDispatchers")
-		.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
-		.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher)
-		.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher)
-		.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher);
-	python::class_<ParallelEngine,shared_ptr<ParallelEngine>, python::bases<Engine>, noncopyable>("ParallelEngine")
-		.def("__init__",python::make_constructor(ParallelEngine_ctor_list))
-		.add_property("slaves",&ParallelEngine::slaves_get,&ParallelEngine::slaves_set);
-#endif
-
-#if 0
-	#define EXPOSE_DISPATCHER(DispatcherT) python::class_<DispatcherT, shared_ptr<DispatcherT>, python::bases<Dispatcher>, noncopyable >(#DispatcherT).def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>).def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
-		EXPOSE_DISPATCHER(BoundDispatcher)
-		EXPOSE_DISPATCHER(InteractionGeometryDispatcher)
-		EXPOSE_DISPATCHER(InteractionPhysicsDispatcher)
-		EXPOSE_DISPATCHER(LawDispatcher)
-	#undef EXPOSE_DISPATCHER
-#endif
-#if 0
-	#define EXPOSE_FUNCTOR(FunctorT) python::class_<FunctorT, shared_ptr<FunctorT>, python::bases<Functor>, noncopyable>(#FunctorT).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<FunctorT>));
-		EXPOSE_FUNCTOR(BoundFunctor)
-		EXPOSE_FUNCTOR(InteractionGeometryFunctor)
-		EXPOSE_FUNCTOR(InteractionPhysicsFunctor)
-		EXPOSE_FUNCTOR(LawFunctor)
-	#undef EXPOSE_FUNCTOR
-#endif
 	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>)).def("clone",&Serializable_clone<cxxName>,python::arg("attrs")=python::dict())
 	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
 	// expose indexable class, with access to the index
 	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("dispIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").def("dispHierarchy",&Indexable_getClassIndices<className>,(python::arg("names")=true),"Return list of dispatch classes (from down upwards), starting with the class instance itself, top-level indexable at last. If names is true (default), return class names rather than numerical indices.")
 
-#if 0
-	EXPOSE_CXX_CLASS(Body)
-		// mold and geom are deprecated:
-		.add_property("mold",&Body_shape_deprec_get,&Body_shape_deprec_set)
-		.add_property("geom",&Body_shape_deprec_get,&Body_shape_deprec_set)
-		.def_readwrite("shape",&Body::shape)
-		.def_readwrite("bound",&Body::bound)
-		.def_readwrite("mat",&Body::material)
-		.def_readwrite("state",&Body::state)
-		.def_readwrite("dynamic",&Body::isDynamic)
-		.def_readonly("id",&Body::id)
-		.def_readwrite("mask",&Body::groupMask)
-		.add_property("isStandalone",&Body::isStandalone)
-		.add_property("isClumpMember",&Body::isClumpMember)
-		.add_property("isClump",&Body::isClump);
-#endif
-
-#if 0
-	EXPOSE_CXX_CLASS_IX(Shape);
-	EXPOSE_CXX_CLASS_IX(Bound)
-		.def_readonly("min",&Bound::min)
-		.def_readonly("max",&Bound::max);
-	EXPOSE_CXX_CLASS_IX(Material)
-		.def_readwrite("label",&Material::label)
-		.def("newAssocState",&Material::newAssocState)
-		;
-	EXPOSE_CXX_CLASS_IX(InteractionPhysics);
-	EXPOSE_CXX_CLASS_IX(InteractionGeometry);
-#endif
-
-#if 0
-	EXPOSE_CXX_CLASS(State)
-		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set)
-		.add_property("pos",&State::pos_get,&State::pos_set)
-		.add_property("ori",&State::ori_get,&State::ori_set)
-		.def_readwrite("refPos",&State::refPos)
-		.add_property("displ",&State::displ)
-		.add_property("rot",&State::rot);
-#endif
-
-#if 0
-	// interaction
-	EXPOSE_CXX_CLASS(Interaction)
-		.def_readwrite("phys",&Interaction::interactionPhysics)
-		.def_readwrite("geom",&Interaction::interactionGeometry)
-		.add_property("id1",&Interaction_getId1)
-		.add_property("id2",&Interaction_getId2)
-		.add_property("isReal",&Interaction::isReal)
-		.add_property("cellDist",&Interaction::cellDist);
-#endif
 
 	EXPOSE_CXX_CLASS(FileGenerator)
-		.def("generate",&FileGenerator_generate)
-		.def("load",&FileGenerator_load);
+		.def("generate",&FileGenerator_generate,"Generate scene, save to file")
+		.def("load",&FileGenerator_load,"Generate scene, save to temporary file and load immediately");
 
 	python::scope().attr("O")=pyOmega();
 }

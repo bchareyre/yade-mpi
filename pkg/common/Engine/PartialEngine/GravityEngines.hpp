@@ -11,7 +11,9 @@ class GravityEngine: public GlobalEngine{
 		GravityEngine(): gravity(Vector3r::ZERO){};
 		virtual ~GravityEngine(){};
 		virtual void action(Scene*);
-	YADE_CLASS_BASE_ATTRS(GravityEngine,GlobalEngine,(gravity));
+	YADE_CLASS_BASE_DOC_ATTRS(GravityEngine,GlobalEngine,"Engine applying constant acceleration to all bodies.",
+		((gravity,"Acceleration [kgms⁻²]"))
+	);
 };
 REGISTER_SERIALIZABLE(GravityEngine);
 
@@ -31,7 +33,11 @@ class CentralGravityEngine: public GlobalEngine {
 		CentralGravityEngine(){ reciprocal=false; }
 		virtual ~CentralGravityEngine(){};
 		virtual void action(Scene*);
-	YADE_CLASS_BASE_ATTRS(CentralGravityEngine,GlobalEngine,(centralBody)(accel)(reciprocal));
+	YADE_CLASS_BASE_DOC_ATTRS(CentralGravityEngine,GlobalEngine,"Engine applying acceleration to all bodies, towards a central body.",
+		((centralBody,"The body towards which all other bodies are attracted"))
+		((accel,"Acceleration magnitude [kgms⁻²]"))
+		((reciprocal,"If true, acceleration will be applied on the central body as well (default: false)."))
+	);
 };
 REGISTER_SERIALIZABLE(CentralGravityEngine);
 
@@ -49,7 +55,11 @@ class AxialGravityEngine: public GlobalEngine {
 		AxialGravityEngine(){ }
 		virtual ~AxialGravityEngine(){};
 		virtual void action(Scene*);
-	YADE_CLASS_BASE_ATTRS(AxialGravityEngine,GlobalEngine,(axisPoint)(axisDirection)(acceleration));
+	YADE_CLASS_BASE_DOC_ATTRS(AxialGravityEngine,GlobalEngine,"Apply acceleration (independent of distance) directed towards an axis.",
+		((axisPoint,"Point through which the axis is passing."))
+		((axisDirection,"direction of the gravity axis (will be normalized automatically)"))
+		((acceleration,"Acceleration magnitude [kgms⁻²]"))
+	);
 };
 REGISTER_SERIALIZABLE(AxialGravityEngine);
 

@@ -15,10 +15,8 @@
 
 class InteractionPhysics : public Serializable, public Indexable
 {
-	//REGISTER_CLASS_NAME(InteractionPhysics);
-	//REGISTER_BASE_CLASS_NAME(Serializable Indexable);
-	//REGISTER_ATTRIBUTES(Serializable,/* no attributes either */);
-	YADE_CLASS_BASE_ATTRS_PY(InteractionPhysics,Serializable,/*no attrs*/,
+	YADE_CLASS_BASE_DOC_ATTRS_PY(InteractionPhysics,Serializable,"Physical (material) properties of interaction.",
+		/*no attrs*/,
 		YADE_PY_TOPINDEXABLE(InteractionPhysics)
 	);
 	REGISTER_INDEX_COUNTER(InteractionPhysics);

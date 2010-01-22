@@ -60,15 +60,7 @@ namespace{
 	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
 #endif
 
-
-
 #define _REGISTER_ATTRIBUTES_REPEAT(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
-//! create member function that register attributes; must be parenthesized, without commas: (attr1) (attr2) (attr3) ...
-//#define REGISTER_ATTRIBUTES(attrs) protected: void registerAttributes(){ REGISTER_ATTRIBUTES_MANY(attrs) }
-//! Same as REGISTER_ATTRIBUTES, but with first argument of base class, of which registerAttributes will be called first
-
-// without python
-// #define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
 
 #include<boost/python.hpp>
 
@@ -85,7 +77,7 @@ namespace{
 #define _PYKEYS_ATTR(x,y,z) ret.append(BOOST_PP_STRINGIZE(z));
 #define _PYHASKEY_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) return true;
 #define _PYDICT_ATTR(x,y,z) ret[BOOST_PP_STRINGIZE(z)]=boost::python::object(z);
-#define _PYCLASS_DEF(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(z),&thisClass::z)
+#define _PYATTR_DEF(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(2,0,z)),&thisClass::BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
 
 #define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
 	public: boost::python::object pyGetAttr(const std::string& key) const{ BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } \
@@ -94,13 +86,14 @@ namespace{
 	bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); return baseClass::pyHasKey(key); } \
 	boost::python::dict pyDict() const { boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; }
 
-#define YADE_CLASS_BASE_ATTRS_PY(thisClass,baseClass,attrs,extras) \
-	REGISTER_ATTRIBUTES(baseClass,attrs) \
+#define _STRIPDOC(x,y,z) (BOOST_PP_TUPLE_ELEM(2,0,z))
+#define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) \
+	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC,~,attrs)) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
-	virtual void pyRegisterClass(python::object _scope) const { if(getClassName()!=#thisClass) return; boost::python::scope thisScope(_scope); boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYCLASS_DEF,thisClass,attrs) extras ; }
+	virtual void pyRegisterClass(python::object _scope) const { if(getClassName()!=#thisClass) return; boost::python::scope thisScope(_scope); boost::python::docstring_options docopt; docopt.enable_all(); docopt.disable_cpp_signatures(); boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) extras ; }
 
-#define YADE_CLASS_BASE_ATTRS(thisClass,baseClass,attrs) \
-	YADE_CLASS_BASE_ATTRS_PY(thisClass,baseClass,attrs,)
+#define YADE_CLASS_BASE_DOC_ATTRS(thisClass,baseClass,docString,attrs) \
+	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,)
 
 
 // for both fundamental and non-fundamental cases
@@ -181,14 +174,14 @@ class Serializable : public Factorable
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
 		virtual void pyRegisterClass(boost::python::object _scope) const {
 			// hack (string comparison), to catch method that is not overridden
-			if(getClassName()!="Serializable"){ if(getenv("YADE_DEBUG")){std::cerr<<"WARN: class "+getClassName()+" did not register with YADE_CLASS_BASE_ATTRS"<<std::endl;} /* throw logic_error("Class "+getClassName()+" did not register with YADE_CLASS_BASE_ATTRS."); */ return; }
+			if(getClassName()!="Serializable"){ if(getenv("YADE_DEBUG")){std::cerr<<"WARN: class "+getClassName()+" did not register with YADE_CLASS_BASE_DOC_ATTRS"<<std::endl;} /* throw logic_error("Class "+getClassName()+" did not register with YADE_CLASS_BASE_ATTRS."); */ return; }
 			// called properly
 			boost::python::scope thisScope(_scope); 
 			python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
-				.add_property("name",&Serializable::getClassName).def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true))
+				.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")
 				.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
-				.def("updateAttrs",&Serializable::pyUpdateAttrs).def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs)
-				.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict())
+				.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary").def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs,"Update object attributes from given dictionary, skipping those that the instance doesn't have")
+				.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict(),"Update object attributes from given dictionary, skipping those that the instance doesn't have")
 				.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
 				;
 		}

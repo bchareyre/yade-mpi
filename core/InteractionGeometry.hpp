@@ -15,10 +15,8 @@
 
 class InteractionGeometry : public Serializable, public Indexable
 {
-	//REGISTER_CLASS_NAME(InteractionGeometry);
-	//REGISTER_BASE_CLASS_NAME(Serializable Indexable);
-	//REGISTER_ATTRIBUTES(Serializable,/*no attributes either*/); // keep this line here
-	YADE_CLASS_BASE_ATTRS_PY(InteractionGeometry,Serializable,/*no attrs*/,
+	YADE_CLASS_BASE_DOC_ATTRS_PY(InteractionGeometry,Serializable,"Geometrical configuration of interaction",
+		/*no attrs*/,
 		YADE_PY_TOPINDEXABLE(InteractionGeometry)
 	);
 	REGISTER_INDEX_COUNTER(InteractionGeometry);

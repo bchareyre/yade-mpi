@@ -42,10 +42,11 @@ class Material: public Serializable, public Indexable{
 		static const shared_ptr<Material> byLabel(const std::string& label, Scene* scene=NULL);
 		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<Scene> scene) {return byLabel(label,scene.get());}
 
-	//REGISTER_CLASS_AND_BASE(Material,Serializable Indexable);
-	//REGISTER_ATTRIBUTES(Serializable,(id)(label)(density));
-	YADE_CLASS_BASE_ATTRS_PY(Material,Serializable,(id)(label)(density),
-		.def("newAssocState",&Material::newAssocState)
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Material,Serializable,"Material properties of a body",
+		((id,"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise."))
+		((label,"Textual identifier for this material; can be used for shared materials lookup."))
+		((density,"Density of the material [kg/m³]")),
+		.def("newAssocState",&Material::newAssocState,"Return new State instance, which is associated to this Material. Some Material have special requirement on Body::state type.")
 		YADE_PY_TOPINDEXABLE(Material)
 	);
 	REGISTER_INDEX_COUNTER(Material);

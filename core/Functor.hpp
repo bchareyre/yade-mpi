@@ -25,11 +25,10 @@ class Functor : public Serializable
 	// label to be able to retrieve an engine unit by its label
 	string label; 
 	virtual ~Functor(); // defined in Dispatcher.cpp
-	//REGISTER_CLASS_AND_BASE(Functor,Serializable);
-	//REGISTER_ATTRIBUTES(Serializable,(label));
-	YADE_CLASS_BASE_ATTRS_PY(Functor,Serializable,(label),
-		.def_readonly("timingDeltas",&Functor::timingDeltas)
-		.add_property("bases",&Functor::getFunctorTypes);
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Functor,Serializable,"Function-like object that is called by Dispatcher, if types of arguments match those the Functor declares to accept.",
+		((label,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+		.def_readonly("timingDeltas",&Functor::timingDeltas,"Detailed information about timing inside the Dispatcher itself. Empty unless enabled in the source code and O.timingEnabled==True.")
+		.add_property("bases",&Functor::getFunctorTypes,"Ordered list of types (as strings) this functor accepts.")
 	);	
 };
 REGISTER_SERIALIZABLE(Functor);

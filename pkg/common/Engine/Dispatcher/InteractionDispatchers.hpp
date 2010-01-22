@@ -16,11 +16,14 @@ class InteractionDispatchers: public GlobalEngine {
 		shared_ptr<InteractionGeometryDispatcher> geomDispatcher;
 		shared_ptr<InteractionPhysicsDispatcher> physDispatcher;
 		shared_ptr<LawDispatcher> lawDispatcher;
-		YADE_CLASS_BASE_ATTRS_PY(InteractionDispatchers,GlobalEngine,(geomDispatcher)(physDispatcher)(lawDispatcher),
-			.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists))
-			//.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher)
-			//.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher)
-			//.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher);
+		YADE_CLASS_BASE_DOC_ATTRS_PY(InteractionDispatchers,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.",
+			((geomDispatcher,"[will be overridden]"))
+			((physDispatcher,"[will be overridden]"))
+			((lawDispatcher,"[will be overridden]")),
+			.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists),"Construct from 3 lists of functors, which will be given to geomDispatcher, physDispatcher, lawDispatcher in that order.")
+			.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher,"InteractionGeometryDispatcher object that is used for dispatch.")
+			.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher,"InteractionPhysicsDispatcher object used for dispatch.")
+			.def_readonly("lawDispatcher",&InteractionDispatchers::lawDispatcher,"LawDispatcher object used for dispatch.");
 		);
 		DECLARE_LOGGER;
 };

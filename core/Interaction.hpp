@@ -78,11 +78,16 @@ class Interaction : public Serializable
 		//! common initialization called from both constructor and reset()
 		void init();
 			
-	YADE_CLASS_BASE_ATTRS_PY(Interaction,Serializable,(id1)(id2)(iterMadeReal)(interactionGeometry)(interactionPhysics)(cellDist),
-		.def_readwrite("phys",&Interaction::interactionGeometry)
-		.def_readwrite("geom",&Interaction::interactionPhysics)
-		.def_readonly("cellDist",&Interaction::cellDist)
-		.add_property("isReal",&Interaction::isReal)
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Interaction,Serializable,"Interaction between pair of bodies.",
+		((id1,"Id of the 1st body in this interaction."))
+		((id2,"Id of the 2nd body in this interaction"))
+		((iterMadeReal,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created."))
+		((interactionGeometry,"Geometry part of the interaction."))
+		((interactionPhysics,"Physical (material) part of the interaction."))
+		((cellDist,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its Body::state::pos coordinates for this interaction to exist. Assigned by the collider.")),
+		.def_readwrite("geom",&Interaction::interactionGeometry,"Shorthand for interactionGeometry")
+		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for interactionPhysics")
+		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
 	);
 };
 

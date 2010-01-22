@@ -94,7 +94,9 @@ class Cell: public Serializable{
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
 	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
-	YADE_CLASS_BASE_ATTRS_PY(Cell,Serializable,(refSize)(trsf)(velGrad),.def_readonly("size",&Cell::getSize_copy));
-	//void pyRegisterClass() const { boost::python::class_<Cell,shared_ptr<Cell>,boost::python::bases<Serializable>,boost::noncopyable>("Cell").def_readwrite("refSize",&Cell::refSize) ; }
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
+		((refSize,"Reference size of the cell"))((trsf,"Current transformation matrix of the cell"))((velGrad,"Velocity gradient of the transformation; used in NewtonIntegrator.")),
+		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")
+	);
 };
 REGISTER_SERIALIZABLE(Cell);

@@ -44,7 +44,9 @@ class BoundDispatcher :	public Dispatcher2D
 		virtual bool isActivated(Scene*){ return activated; }
 		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_ATTRS_PY(BoundDispatcher,Dispatcher,(activated)(sweepDist),
+	YADE_CLASS_BASE_DOC_ATTRS_PY(BoundDispatcher,Dispatcher,"Dispatcher for creating/updating Body::bound objects.",
+		((activated,"Whether the engine is activated (only should be changed by the collider)"))
+		((sweepDist,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider).")),
 		YADE_PY_DISPATCHER(BoundDispatcher)
 	);
 };

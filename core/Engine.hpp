@@ -43,14 +43,15 @@ class Engine: public Serializable{
 		void timingInfo_nsec_set(TimingInfo::delta d){ timingInfo.nsec=d;}
 		long timingInfo_nExec_get(){return timingInfo.nExec;};
 		void timingInfo_nExec_set(long d){ timingInfo.nExec=d;}
-		//void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(scene); }
+		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(scene); }
 
-	YADE_CLASS_BASE_ATTRS_PY(Engine,Serializable,(label),
-		.add_property("execTime",&Engine::timingInfo_nsec_get,&Engine::timingInfo_nsec_set)
-		.add_property("execCount",&Engine::timingInfo_nExec_get,&Engine::timingInfo_nExec_set)
-		.def_readonly("timingDeltas",&Engine::timingDeltas)
-		//.def("__call__",&Engine::explicitAction);
-	)
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
+		((label,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+		.add_property("execTime",&Engine::timingInfo_nsec_get,&Engine::timingInfo_nsec_set,"Cummulative time this Engine took to run (only used if O.timingEnabled==True).")
+		.add_property("execCount",&Engine::timingInfo_nExec_get,&Engine::timingInfo_nExec_set,"Cummulative count this engine was run (only used if O.timingEnabled==True).")
+		.def_readonly("timingDeltas",&Engine::timingDeltas,"Detailed information about timing inside the Engine itself. Empty unless enabled in the source code and O.timingEnabled==True.")
+		.def("__call__",&Engine::explicitAction)
+	);
 };
 REGISTER_SERIALIZABLE(Engine);
 

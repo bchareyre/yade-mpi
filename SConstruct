@@ -7,7 +7,7 @@
 #
 # Type "scons -h" for yade-specific options and "scons -H" for scons' options. Note that yade options will be remembered (saved in scons.config) so that you need to specify them only for the first time. Like this, for example:
 #
-#	scons -j2 pretty=1 debug=0 optimize=1 profile=1 exclude=extra,lattice,snow
+#	scons -j2 brief=1 debug=0 optimize=1 profile=1 exclude=extra,lattice,snow
 #
 # Next time, you can simply run "scons" or "scons -j4" (for 4-parallel builds) to rebuild targets that need it. IF YOU NEED TO READ CODE IN THIS FILE, SOMETHING IS BROKEN AND YOU SHOULD REALLY TELL ME.
 #
@@ -156,7 +156,6 @@ opts.AddVariables(
 	('SHCCFLAGS','Additional compiler flags for linking (for plugins).',None,None,Split),
 	BoolVariable('QUAD_PRECISION','typedef Real as long double (=quad)',0),
 	BoolVariable('brief',"Don't show commands being run, only what files are being compiled/linked/installed",True),
-	BoolVariable('pretty',"Deprecated alias for 'brief', don't use.",True),
 	BoolVariable('useMiniWm3','use local miniWm3 library instead of Wm3Foundation',1),
 	#BoolVariable('useLocalQGLViewer','use in-tree QGLViewer library instead of the one installed in system',1),
 )
@@ -402,7 +401,7 @@ env.SourceCode(".",None) # skip dotted directories
 SetOption('num_jobs',env['jobs'])
 
 ### SHOWING OUTPUT
-if env['pretty']:
+if env['brief']:
 	## http://www.scons.org/wiki/HidingCommandLinesInOutput
 	env.Replace(CXXCOMSTR='C ${SOURCES}', # → ${TARGET.file}')
 		CCOMSTR='C ${SOURCES}',

@@ -28,11 +28,10 @@ class Shape : public Serializable, public Indexable
 			shared_ptr<BoundFunctor> boundFunctor;
 		#endif
 
-	/// Serialization
-	//REGISTER_ATTRIBUTES(Serializable,(diffuseColor)(wire)(highlight));
-	//REGISTER_CLASS_AND_BASE(Shape,Serializable Indexable);
-	/// Indexable
-	YADE_CLASS_BASE_ATTRS_PY(Shape,Serializable,(diffuseColor)(wire)(highlight),
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Shape,Serializable,"Geometry of a body",
+		((diffuseColor,"Color for rendering (normalized RGB)."))
+		((wire,"Whether this Shape is rendered using color surfaces, or only wireframe (can still be overridden by global config of the renderer)."))
+		((highlight,"Whether this Shape will be highlighted when rendered.")),
 		YADE_PY_TOPINDEXABLE(Shape)
 	);
 	REGISTER_INDEX_COUNTER(Shape);

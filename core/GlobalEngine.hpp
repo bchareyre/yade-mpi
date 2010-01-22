@@ -15,7 +15,7 @@ class GlobalEngine : public Engine
 	public :
 		GlobalEngine() {};
 		virtual ~GlobalEngine() {};
-	YADE_CLASS_BASE_ATTRS(GlobalEngine,Engine,/* no own attrs */);
+	YADE_CLASS_BASE_DOC_ATTRS(GlobalEngine,Engine,"Engine that will generally affect the whole simulation (contrary to PartialEngine).",/* no own attrs */);
 };
 REGISTER_SERIALIZABLE(GlobalEngine);
 

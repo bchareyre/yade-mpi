@@ -27,10 +27,10 @@ class Bound : public Serializable, public Indexable
 
 	//REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
 	//REGISTER_CLASS_AND_BASE(Bound,Serializable Indexable);
-	YADE_CLASS_BASE_ATTRS_PY(Bound,Serializable,(diffuseColor),
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",((diffuseColor,"Color for rendering this object")),
 		YADE_PY_TOPINDEXABLE(Bound)
-		.def_readonly("min",&Bound::min)
-		.def_readonly("max",&Bound::max)
+		.def_readonly("min",&Bound::min,"Lower corner of box containing this bound (hence the body as well)")
+		.def_readonly("max",&Bound::max,"Upper corner of box containing this bound (hence the body as well)")
 	);
 	REGISTER_INDEX_COUNTER(Bound);
 };

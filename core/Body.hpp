@@ -104,14 +104,15 @@ class Body : public Serializable
 	//protected:
 	//	REGISTER_ATTRIBUTES(Serializable,(id)(groupMask)(isDynamic)(material)(state)(shape)(bound)(clumpId));
 	//REGISTER_CLASS_AND_BASE(Body,Serializable);
-	YADE_CLASS_BASE_ATTRS_PY(Body,Serializable,(id)(groupMask)(isDynamic)(material)(state)(shape)(bound)(clumpId),
-		.def_readwrite("mat",&Body::material)
-		.def_readwrite("dynamic",&Body::isDynamic)
-		.def_readonly("id",&Body::id) // should overwrite def_readwrite("id",...) earlier
-		.def_readwrite("mask",&Body::groupMask)
-		.add_property("isStandalone",&Body::isStandalone)
-		.add_property("isClumpMember",&Body::isClumpMember)
-		.add_property("isClump",&Body::isClump);
+	YADE_CLASS_BASE_DOC_ATTRS_PY(Body,Serializable,"Basic element of simulation; interacts with other bodies.",
+		((id,"[will be overridden]"))((groupMask,"Bitmask for determining interactions"))((isDynamic,"Whether this body will be moved by forces"))((material,"Material instance associated with this body"))((state,"Physical state"))((shape,"Shape of this body"))((bound,"Bound of this body"))((clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see Body().isStandalone, Body().isClump, Body().isClumpMember properties")),
+		.def_readwrite("mat",&Body::material,"Shorthand for material")
+		.def_readwrite("dynamic",&Body::isDynamic,"Shorthand for isDynamic")
+		.def_readonly("id",&Body::id,"Unique id of this body") // should overwrite def_readwrite("id",...) earlier
+		.def_readwrite("mask",&Body::groupMask,"Shorthand for groupMask")
+		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
+		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")
+		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise");
 	);
 };
 REGISTER_SERIALIZABLE(Body);

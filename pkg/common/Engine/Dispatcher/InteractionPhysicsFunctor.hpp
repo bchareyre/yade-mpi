@@ -37,9 +37,7 @@ class InteractionPhysicsFunctor : 	public Functor2D
 					>
 {
 	public: virtual ~InteractionPhysicsFunctor();
-	//REGISTER_CLASS_AND_BASE(InteractionPhysicsFunctor,Functor2D);
-	//REGISTER_ATTRIBUTES(Functor, /* no attributes here */ );
-	YADE_CLASS_BASE_ATTRS(InteractionPhysicsFunctor,Functor,/*no attrs*/);
+	YADE_CLASS_BASE_DOC_ATTRS(InteractionPhysicsFunctor,Functor,"Functor for creating/updating Interaction::interactionPhysics objects.",/*no attrs*/);
 
 };
 REGISTER_SERIALIZABLE(InteractionPhysicsFunctor);

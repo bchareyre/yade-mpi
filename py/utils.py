@@ -59,7 +59,7 @@ def loadVars(mark=None):
 
 
 def SpherePWaveTimeStep(radius,density,young):
-	r"""Compute P-wave critical timestep for a single (presumably representative) sphere, using formula for P-Wave propagation speed :math:`\Delta t_{c}=\frac{r}{E/\rho}`.
+	r"""Compute P-wave critical timestep for a single (presumably representative) sphere, using formula for P-Wave propagation speed :math:`\Delta t_{c}=\frac{r}{\sqrt{E/\rho}}`.
 	If you want to compute minimum critical timestep for all spheres in the simulation, use utils.PWaveTimeStep() instead.
 	
 	>>> SpherePWaveTimeStep(1e-3,2400,30e9)

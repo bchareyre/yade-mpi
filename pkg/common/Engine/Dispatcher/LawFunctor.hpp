@@ -20,9 +20,7 @@ class LawFunctor: public Functor2D <
 		addTorque(id1,(contactPoint-pos1).Cross(force),rb);
 		addTorque(id2,-(contactPoint-pos2).Cross(force),rb);
 	}
-	//REGISTER_ATTRIBUTES(Functor,/* no attributes here */);
-	//REGISTER_CLASS_AND_BASE(LawFunctor,Functor2D);
-	YADE_CLASS_BASE_ATTRS(LawFunctor,Functor,/*no attrs*/);
+	YADE_CLASS_BASE_DOC_ATTRS(LawFunctor,Functor,"Functor for applying constitutive laws on interaction.",/*no attrs*/);
 };
 REGISTER_SERIALIZABLE(LawFunctor);
 	
