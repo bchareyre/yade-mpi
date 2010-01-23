@@ -80,9 +80,12 @@ class NewtonIntegrator : public GlobalEngine{
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif
 		}
-
-	REGISTER_ATTRIBUTES(GlobalEngine,(damping)(maxVelocitySq)(exactAsphericalRot)(homotheticCellResize));
-	REGISTER_CLASS_AND_BASE(NewtonIntegrator,GlobalEngine);
+	YADE_CLASS_BASE_DOC_ATTRS(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
+		((damping,"damping coefficient for Cundall's non viscous damping [-]"))
+		((maxVelocitySq,"store square of max. velocity, for informative purposes; computed again at every step. Updated automatically."))
+		((exactAsphericalRot,"Enable of the exact aspherical body rotation integrator"))
+		((homotheticCellResize,"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled (default), 1: position update, 2: velocity update."))
+	);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(NewtonIntegrator);

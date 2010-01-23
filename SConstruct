@@ -340,6 +340,8 @@ if not env.GetOption('clean'):
 		and conf.CheckIPython() # not needed now: and conf.CheckScientificPython()
 		and CheckLib_maybeMT(conf,'boost_python','boost/python.hpp','c++','boost::python::scope();')
 		and conf.CheckCXXHeader(['Python.h','numpy/ndarrayobject.h'],'<>'))
+	# for installable stript's shebang ( http://en.wikipedia.org/wiki/Shebang_(Unix) )
+	env['pyExecutable']=sys.executable
 
 	if not ok:
 		print "\nOne of the essential libraries above was not found, unable to continue.\n\nCheck `%s' for possible causes, note that there are options that you may need to customize:\n\n"%(buildDir+'/config.log')+opts.GenerateHelpText(env)

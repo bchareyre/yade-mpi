@@ -45,17 +45,16 @@ class Facet : public Shape {
 		vector<Real> edgeAdjHalfAngle;
 	#endif
 
-	DECLARE_LOGGER;
+	void postProcessAttributes(bool deserializing);
 
-	REGISTER_ATTRIBUTES(Shape,(vertices)
+	YADE_CLASS_BASE_DOC_ATTRS(Facet,Shape,"Facet (triangular particle) geometry.",
+		((vertices,"Vertex positions in local coordinates."))
 		#ifdef FACET_TOPO
-			(edgeAdjIds)(edgeAdjHalfAngle)
+		((edgeAdjIds,"Facet id's that are adjacent to respective edges [experimental]"))
+		((edgeAdjHalfAngle,"half angle between normals of this facet and the adjacent facet [experimental]"))
 		#endif
 	);
-	protected: void postProcessAttributes(bool deserializing);
-	REGISTER_CLASS_NAME(Facet);
-	REGISTER_BASE_CLASS_NAME(Shape);
-
+	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Facet,Shape);
 };
 

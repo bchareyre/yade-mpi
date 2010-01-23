@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!${pyExecutable}
 # encoding: utf-8
 # syntax:python
 

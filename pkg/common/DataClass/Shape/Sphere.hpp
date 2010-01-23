@@ -19,10 +19,11 @@ class Sphere : public Shape
 		Sphere(Real _radius): radius(_radius){ createIndex(); }
 		virtual ~Sphere ();
 
-	REGISTER_ATTRIBUTES(Shape,(radius));
-	REGISTER_CLASS_NAME(Sphere);
-	REGISTER_BASE_CLASS_NAME(Shape);
+	YADE_CLASS_BASE_DOC_ATTRS(Sphere,Shape,"Geometry of spherical particle.",
+		((radius,"Radius [m]"))
+	);
 	REGISTER_CLASS_INDEX(Sphere,Shape);
+
 };
 
 REGISTER_SERIALIZABLE(Sphere);
