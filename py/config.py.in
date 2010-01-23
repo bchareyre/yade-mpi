@@ -4,7 +4,7 @@ Compile-time configuration for yade.
 Template file is processed by scons to create the actual configuration at build-time.
 """
 import os
-prefix='${runtimePREFIX}' 
+prefix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX']
 suffix='${SUFFIX}'
 libstdcxx='${libstdcxx}'
 features='${features}'.split(',')

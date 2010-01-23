@@ -8,6 +8,7 @@
 #pragma once
 
 #include<yade/core/GlobalEngine.hpp>
+#include<yade/core/Interaction.hpp>
 #include<Wm3Vector3.h>
 #ifdef YADE_OPENMP
 	#include<omp.h>

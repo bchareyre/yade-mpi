@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include <yade/core/Bound.hpp>
-#include "GlobalEngine.hpp"
+#include<yade/core/Bound.hpp>
+#include<yade/core/Interaction.hpp>
+#include<yade/core/GlobalEngine.hpp>
 
 class Collider : public GlobalEngine
 {
