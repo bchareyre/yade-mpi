@@ -27,6 +27,7 @@
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<yade/lib-pyutil/gil.hpp>
 #include<yade/lib-pyutil/raw_constructor.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/ThreadRunner.hpp>
 #include<yade/core/FileGenerator.hpp>
@@ -509,7 +510,7 @@ BOOST_PYTHON_MODULE(wrapper)
 {
 	python::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
 
-	python::docstring_options docopt; docopt.enable_all(); docopt.disable_cpp_signatures();
+	YADE_SET_DOCSTRING_OPTS;
 
 	python::class_<pyOmega>("Omega")
 		.add_property("iter",&pyOmega::iter,"Get current step number")

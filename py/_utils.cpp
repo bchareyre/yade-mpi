@@ -9,6 +9,7 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/lib-computational-geometry/Hull2d.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
 #include<cmath>
 #include<yade/pkg-dem/ViscoelasticPM.hpp>
 
@@ -422,7 +423,8 @@ BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
 	import_array();
 
-	python::docstring_options docopt; docopt.enable_all(); docopt.disable_cpp_signatures();
+	YADE_SET_DOCSTRING_OPTS;
+
 
 	def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
 	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers"),"Return coordinates of box enclosing all bodies\n centers: do not take sphere radii in account, only their centroids (default=False)\n cutoff: 0-1 number by which the box will be scaled around its center (default=0)"));

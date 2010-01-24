@@ -30,6 +30,7 @@
 #include<iostream>
 #include<yade/lib-factory/Factorable.hpp>
 #include<yade/lib-pyutil/raw_constructor.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
 #include"SerializationExceptions.hpp"
 #include"Archive.hpp"
 
@@ -90,7 +91,7 @@ namespace{
 #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) \
 	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC,~,attrs)) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
-	virtual void pyRegisterClass(python::object _scope) const { if(getClassName()!=#thisClass) return; boost::python::scope thisScope(_scope); boost::python::docstring_options docopt; docopt.enable_all(); docopt.disable_cpp_signatures(); boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) extras ; }
+	virtual void pyRegisterClass(python::object _scope) const { if(getClassName()!=#thisClass) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) extras ; }
 
 #define YADE_CLASS_BASE_DOC_ATTRS(thisClass,baseClass,docString,attrs) \
 	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,)
