@@ -67,7 +67,7 @@ void OpenGLRenderingEngine::init(){
 	glutInitDone=true;
 }
 
-void OpenGLRenderingEngine::setBodiesRefSe3(const shared_ptr<Scene>& scene){
+void OpenGLRenderingEngine::setBodiesRefSe3(){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
 	scene->cell->refSize=scene->cell->getSize();

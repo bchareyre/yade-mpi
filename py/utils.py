@@ -93,9 +93,9 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	else: raise TypeError("The 'material' argument must be None (for defaultMaterial), string (for shared material label), int (for shared material id) or Material instance.");
 	## resets state (!!)
 	if resetState: b.state=b.mat.newAssocState()
-	mass=volume*b.mat['density']
-	b.state['mass'],b.state['inertia']=mass,geomInertia*b.mat['density']
-	if not noBound: b.bound=Bound('Aabb',diffuseColor=[0,1,0])
+	mass=volume*b.mat.density
+	b.state.mass,b.state.inertia=mass,geomInertia*b.mat.density
+	if not noBound: b.bound=Aabb(diffuseColor=[0,1,0])
 
 def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,material=-1):
 	"""Create sphere with given parameters; mass and inertia computed automatically.
@@ -131,11 +131,11 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	Instance of material can be given::
 
 		>>> s1=sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElastMat(young=30e9,density=2e3))
-		>>> s1.shape['wire']
+		>>> s1.shape.wire
 		False
-		>>> s1.shape['diffuseColor']
+		>>> s1.shape.diffuseColor
 		Vector3(0,1,0)
-		>>> s1.mat['density']
+		>>> s1.mat.density
 		2000.0
 
 	Material can be given by label::
@@ -143,9 +143,9 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 		>>> O.materials.append(FrictMat(young=10e9,poisson=.11,label='myMaterial'))
 		1
 		>>> s2=sphere([0,0,2],1,material='myMaterial')
-		>>> s2.mat['label']
+		>>> s2.mat.label
 		'myMaterial'
-		>>> s2.mat['poisson']
+		>>> s2.mat.poisson
 		0.11
 
 	Finally, material can be a callable object (taking no arguments), which returns a Material instance.
@@ -222,8 +222,8 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	b=Body()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.shape=Shape('Facet',diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
-	b.shape['vertices']=vertices
+	b.shape=Facet(diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape.vertices=vertices
 	b.shape.postProcessAttributes(True)
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
@@ -344,7 +344,7 @@ def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 		for j in [0,1]:
 			center[axis]=extrema[j][axis]+(j-.5)*thickness
 			walls.append(box(center=center,extents=extents,dynamic=False,**kw))
-			walls[-1].shape['wire']=True
+			walls[-1].shape.wire=True
 	return walls
 
 
@@ -388,7 +388,7 @@ def randomizeColors(onlyDynamic=False):
 	"""
 	for b in O.bodies:
 		color=(random.random(),random.random(),random.random())
-		if b['isDynamic'] or not onlyDynamic: b.shape['diffuseColor']=color
+		if b.dynamic or not onlyDynamic: b.shape.diffuseColor=color
 
 
 
@@ -402,7 +402,7 @@ def spheresToFile(filename,consider=lambda id: True):
 	count=0
 	for b in o.bodies:
 		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
-		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape['radius']))
+		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape.radius))
 		count+=1
 	out.close()
 	return count

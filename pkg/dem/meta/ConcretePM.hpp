@@ -54,64 +54,45 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg-common/LawFunctor.hpp>
 
 /* Cpm state information about each body.
-
 None of that is used for computation (at least not now), only for post-processing.
-
 */
 class CpmState: public State {
-	public:
-		//! volumetric strain around this body
-		Real epsVolumetric;
-		//! number of (cohesive) contacts that damaged completely
-		int numBrokenCohesive;
-		//! number of contacts with this body
-		int numContacts;
-		//! average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)
-		Real normDmg;
-		//! plastic strain on contacts already deleted
-		Real epsPlBroken;
-		//! sum of plastic strains normalized by number of contacts
-		Real normEpsPl;
-		//! stresses on the particle
-		Vector3r sigma,tau;
-
-	CpmState(): epsVolumetric(0.), numBrokenCohesive(0), numContacts(0), normDmg(0.), epsPlBroken(0.), normEpsPl(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) { };
-	REGISTER_ATTRIBUTES(State, (epsVolumetric) (numBrokenCohesive) (numContacts) (normDmg) (epsPlBroken) (normEpsPl) (sigma) (tau));
-	REGISTER_CLASS_AND_BASE(CpmState,State);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CpmState,State,"Cpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
+		((Real,epsVolumetric,0,"Volumetric strain around this body (unused for now)"))
+		((int,numBrokenCohesive,0,"Number of (cohesive) contacts that damaged completely"))
+		((int,numContacts,0,"Number of contacts with this body"))
+		((Real,normDmg,0,"Average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)"))
+		((Real,epsPlBroken,0,"Plastic strain on contacts already deleted (bogus values)"))
+		((Real,normEpsPl,0,"Sum of plastic strains normalized by number of contacts (bogus values)"))
+		((Vector3r,sigma,Vector3r::ZERO,"Normal stresses on the particle"))
+		((Vector3r,tau,Vector3r::ZERO,"Shear stresses on the particle.")),
+		/*ctor*/,
+		/*py*/
+	);
 };
 REGISTER_SERIALIZABLE(CpmState);
-
 
 /* This class holds information associated with each body */
 class CpmMat: public FrictMat {
 	public:
-		/* nonelastic material parameters; meaning clarified in CpmPhys, under same names */
-		Real sigmaT, epsCrackOnset, relDuctility, G_over_E, dmgTau, dmgRateExp, plTau, plRateExp, isoPrestress;
-		//! Contacts won't receive any damage (CpmPhys::neverDamage=true); defaults to false
-		bool neverDamage;
-		CpmMat() {
-			createIndex(); density=4800;
-			// init to signaling_NaN to force crash if not initialized (better than unknowingly using garbage values)
-			sigmaT=epsCrackOnset=relDuctility=G_over_E=std::numeric_limits<Real>::signaling_NaN();
-			neverDamage=false;
-			dmgTau=-1; dmgRateExp=0; plTau=-1; plRateExp=-1; // disable visco-damage and visco-plasticity
-			isoPrestress=0;
-		};
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
-		YADE_CLASS_BASE_DOC_ATTRS(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes.",
-			((G_over_E,"Ratio of normal/shear stiffness at interaction level [-]"))
-			((sigmaT,"Initial cohesion [Pa]"))
-			((neverDamage,"If true, no damage will occur (for testing only)."))
-			((epsCrackOnset,"Limit elastic strain [-]"))
-			((relDuctility,"Relative ductility, for damage evolution law peak right-tangent. [-]"))
-			((dmgTau,"Characteristic time for normal viscosity. [s]"))
-			((dmgRateExp,"Exponent for normal viscosity function. [-]"))
-			((plTau,"Characteristic time for visco-plasticity. [s]"))
-			((plRateExp,"Exponent for visco-plasticity function. [-]"))
-			((isoPrestress,"Isotropic prestress of the whole speciment. [Pa]"))
-		);
-		REGISTER_CLASS_INDEX(CpmMat,FrictMat);
+
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. (note: density is initialized to 4800 automatically)",
+		((Real,G_over_E,NaN,"Ratio of normal/shear stiffness at interaction level [-]"))
+		((Real,sigmaT,NaN,"Initial cohesion [Pa]"))
+		((bool,neverDamage,false,"If true, no damage will occur (for testing only)."))
+		((Real,epsCrackOnset,NaN,"Limit elastic strain [-]"))
+		((Real,relDuctility,NaN,"Relative ductility, for damage evolution law peak right-tangent. [-]"))
+		((Real,dmgTau,((void)"deactivated if negative",-1),"Characteristic time for normal viscosity. [s]"))
+		((Real,dmgRateExp,0,"Exponent for normal viscosity function. [-]"))
+		((Real,plTau,((void)"deactivated if negative",-1),"Characteristic time for visco-plasticity. [s]"))
+		((Real,plRateExp,0,"Exponent for visco-plasticity function. [-]"))
+		((Real,isoPrestress,0,"Isotropic prestress of the whole specimen. [Pa]")),
+		createIndex(); density=4800,
+		/*py*/
+	);
+	REGISTER_CLASS_INDEX(CpmMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(CpmMat);
 
@@ -123,107 +104,52 @@ REGISTER_SERIALIZABLE(CpmMat);
  *
  */
 class CpmPhys: public NormShearPhys {
-	private:
 	public:
-		/*! Fundamental parameters (constants) */
-		Real
-			//! normal modulus (stiffness / crossSection)
-			E,
-			//! shear modulus
-			G,
-			//! tangens of internal friction angle
-			tanFrictionAngle, 
-			//! virgin material cohesion
-			undamagedCohesion,
-			//! equivalent cross-section associated with this contact
-			crossSection,
-			//! strain at which the material starts to behave non-linearly
-			epsCrackOnset,
-			//! strain where the damage-evolution law tangent from the top (epsCrackOnset) touches the axis;
-			/// since the softening law is exponential, this doesn't mean that the contact is fully damaged at this point,
-			/// that happens only asymptotically 
-			epsFracture,
-			//! characteristic time for damage (if non-positive, the law without rate-dependence is used)
-			dmgTau,
-			//! exponent in the rate-dependent damage evolution
-			dmgRateExp,
-			//! damage strain (at previous or current step)
-			dmgStrain,
-			//! damage viscous overstress (at previous step or at current step)
-			dmgOverstress,
-			//! characteristic time for viscoplasticity (if non-positive, no rate-dependence for shear)
-			plTau,
-			//! exponent in the rate-dependent viscoplasticity
-			plRateExp,
-			//! "prestress" of this link (used to simulate isotropic stress)
-			isoPrestress;
-		/*! Up to now maximum normal strain (semi-norm), non-decreasing in time. */
-		Real kappaD;
-		//! normal plastic strain (initially zero)
-		Real epsNPl;
-		/*! Transversal strain (perpendicular to the contact axis) */
-		Real epsTrans;
-		/*! if not cohesive, interaction is deleted when distance is greater than zero. */
-		bool isCohesive;
-		/*! the damage evlution function will always return virgin state */
-		bool neverDamage;
-		/*! cummulative shear plastic strain measure (scalar) on this contact */
-		Real epsPlSum;
-		//! debugging, to see convergence rate
 		static long cummBetaIter, cummBetaCount;
-
 		/*! auxiliary variable for visualization, recalculated in Law2_Dem3DofGeom_CpmPhys_Cpm at every iteration */
 		// Fn and Fs are also stored as Vector3r normalForce, shearForce in NormShearPhys 
 		Real omega, Fn, sigmaN, epsN, relResidualStrength; Vector3r epsT, sigmaT, Fs;
-
 
 		static Real solveBeta(const Real c, const Real N);
 		Real computeDmgOverstress(Real dt);
 		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
 
-
-
-		CpmPhys(): NormShearPhys(),E(0), G(0), tanFrictionAngle(0), undamagedCohesion(0), crossSection(0), dmgTau(-1), dmgRateExp(0), dmgStrain(0), plTau(-1), plRateExp(0), isoPrestress(0.), kappaD(0.), epsNPl(0.), epsTrans(0.), epsPlSum(0.) { createIndex(); epsT=Vector3r::ZERO; isCohesive=false; neverDamage=false; omega=0; Fn=0; Fs=Vector3r::ZERO; epsPlSum=0; dmgOverstress=0; }
 		virtual ~CpmPhys();
-
-		REGISTER_ATTRIBUTES(NormShearPhys,
-			(E)
-			(G)
-			(tanFrictionAngle)
-			(undamagedCohesion)
-			(crossSection)
-			(epsCrackOnset)
-			(epsFracture)
-			(dmgTau)
-			(dmgRateExp)
-			(dmgStrain)
-			(dmgOverstress)
-			(plTau)
-			(plRateExp)
-			(isoPrestress)
-
-			(cummBetaIter)
-			(cummBetaCount)
-
-			(kappaD)
-			(epsNPl)
-			(neverDamage)
-			(epsT)
-			(epsTrans)
-			(epsPlSum)
-
-			(isCohesive)
-
-			// auxiliary params to make them accessible from python
-			(omega)
-			(Fn)
-			(Fs)
-			(epsN)
-			(sigmaN)
-			(sigmaT)
-			(relResidualStrength)
+		YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_CpmPhys_Cpm, that includes damage effects and chages of parameters inside CpmPhys",
+			((Real,E,NaN,"normal modulus (stiffness / crossSection) [Pa]"))
+			((Real,G,NaN,"shear modulus [Pa]"))
+			((Real,tanFrictionAngle,NaN,"tangens of internal friction angle [-]"))
+			((Real,undamagedCohesion,NaN,"virgin material cohesion [Pa]"))
+			((Real,crossSection,NaN,"equivalent cross-section associated with this contact [m²]"))
+			((Real,epsCrackOnset,NaN,"strain at which the material starts to behave non-linearly"))
+			((Real,epsFracture,NaN,"strain where the damage-evolution law tangent from the top (epsCrackOnset) touches the axis; since the softening law is exponential, this doesn't mean that the contact is fully damaged at this point, that happens only asymptotically"))
+			((Real,dmgTau,-1,"characteristic time for damage (if non-positive, the law without rate-dependence is used)"))
+			((Real,dmgRateExp,0,"exponent in the rate-dependent damage evolution"))
+			((Real,dmgStrain,0,"damage strain (at previous or current step)"))
+			((Real,dmgOverstress,0,"damage viscous overstress (at previous step or at current step)"))
+			((Real,plTau,-1,"characteristic time for viscoplasticity (if non-positive, no rate-dependence for shear)"))
+			((Real,plRateExp,0,"exponent in the rate-dependent viscoplasticity"))
+			((Real,isoPrestress,0,"\"prestress\" of this link (used to simulate isotropic stress)"))
+			((Real,kappaD,0,"Up to now maximum normal strain (semi-norm), non-decreasing in time."))
+			((Real,epsNPl,0,"normal plastic strain (initially zero)"))
+			((bool,neverDamage,false,"the damage evolution function will always return virgin state"))
+			((Real,epsTrans,0,"Transversal strain (perpendicular to the contact axis)"))
+			((Real,epsPlSum,0,"cummulative shear plastic strain measure (scalar) on this contact"))
+			((bool,isCohesive,false,"if not cohesive, interaction is deleted when distance is greater than zero."))
+			,
+			createIndex(); epsT=Fs=Vector3r::ZERO; Fn=0; omega=0;
+			,
+			.def_readonly("omega",&CpmPhys::omega,"Damage internal variable")
+			.def_readonly("epsT",&CpmPhys::epsT,"Transversal strain (not used)")
+			.def_readonly("Fn",&CpmPhys::Fn,"Magnitude of normal force.")
+			.def_readonly("Fs",&CpmPhys::Fs,"Magnitude of shear force")
+			.def_readonly("epsN",&CpmPhys::epsN,"Current normal strain")
+			.def_readonly("sigmaN",&CpmPhys::sigmaN,"Current normal stress")
+			.def_readonly("sigmaT",&CpmPhys::sigmaT,"Current shear stress")
+			.def_readonly("relResidualStrength",&CpmPhys::relResidualStrength,"Relative residual strength")
+			.def_readonly("cummBetaIter",&CpmPhys::cummBetaIter,"Cummulative number of iterations inside CpmMat::solveBeta (for debugging).")
+			.def_readonly("cummBetaCount",&CpmPhys::cummBetaCount,"Cummulative number of calls of CpmMat::solveBeta (for debugging).")
 		);
-	REGISTER_CLASS_AND_BASE(CpmPhys,NormShearPhys);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(CpmPhys,NormShearPhys);
 };
@@ -234,23 +160,16 @@ REGISTER_SERIALIZABLE(CpmPhys);
  *
  * */
 class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsFunctor{
-	private:
 	public:
-		//! Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive.
 		long cohesiveThresholdIter;
-
-		Ip2_CpmMat_CpmMat_CpmPhys(){
-			cohesiveThresholdIter=10; // create cohesive interactions in first 10 steps by default
-		}
-
+		// create cohesive interactions in first 10 steps by default
+		Ip2_CpmMat_CpmMat_CpmPhys(): cohesiveThresholdIter(10) {	}
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
-		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,
-			(cohesiveThresholdIter)
-		);
-
 		FUNCTOR2D(CpmMat,CpmMat);
-		REGISTER_CLASS_AND_BASE(Ip2_CpmMat_CpmMat_CpmPhys,InteractionPhysicsFunctor);
 		DECLARE_LOGGER;
+		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,InteractionPhysicsFunctor,"Convert 2 CpmMat instances to CpmPhys with corresponding parameters.",
+			((cohesiveThresholdIter,"Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive (10 by default)."))
+		);
 };
 REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 
@@ -259,60 +178,31 @@ REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
 class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	public:
 	/*! Damage evolution law */
-	static Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
+	Real funcG(const Real& kappaD, const Real& epsCrackOnset, const Real& epsFracture, const bool& neverDamage) {
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
 		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 	}
-		//! yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log
-		static int yieldSurfType;
-		//! scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)
-		static Real yieldLogSpeed;
-		//! horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)
-		static Real yieldEllipseShift;
-		//! damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞
-		static Real omegaThreshold;
-		//! Strain at which softening in compression starts (set to 0. (default) or positive value to deactivate)
-		static Real epsSoft;
-		//! Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, 1=no softening, >1=hardening)
-		static Real relKnSoft;
-		Law2_Dem3DofGeom_CpmPhys_Cpm() { }
-		void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
-		// utility functions
-		//! Update avgStress on all bodies (called from VTKRecorder and yade.eudoxos.particleConfinement)
-		//! Might be anywhere else as well (static method)
-		static void updateBodiesState(Scene*);
+
+	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+
+	// utility functions
+	//! Update avgStress on all bodies (called from VTKRecorder and yade.eudoxos.particleConfinement)
+	//! Might be anywhere else as well (static method)
+	static void updateBodiesState(Scene*);
+
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor);
-	REGISTER_ATTRIBUTES(LawFunctor,(yieldSurfType)(yieldLogSpeed)(yieldEllipseShift)(omegaThreshold)(epsSoft)(relKnSoft));
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the Cpm model.",
+		((int,yieldSurfType,2,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
+		((Real,yieldLogSpeed,.1,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
+		((Real,yieldEllipseShift,NaN,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
+		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
+		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),"Strain at which softening in compression starts (non-negative to deactivate)"))
+		((Real,relKnSoft,.25,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
+		/*ctor*/,/*py*/
+	);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
-
-//deprecated code
-#if 0
-/* Engine encompassing several computations looping over all bodies/interactions
- *
- * * Compute and store unbalanced force over the whole simulation.
- * * Compute and store volumetric strain for every body.
- *
- * May be extended in the future to compute global stiffness etc as well.
- */
-class CpmGlobalCharacteristics: public PeriodicEngine{
-	public:
-		bool useMaxForce; // use maximum unbalanced force instead of mean unbalanced force
-		Real unbalancedForce;
-		void compute(Scene* rb, bool useMax=false);
-		virtual void action(Scene* rb){compute(rb,useMaxForce);}
-		CpmGlobalCharacteristics(){};
-	REGISTER_ATTRIBUTES(PeriodicEngine,
-		(unbalancedForce)
-		(useMaxForce)
-	);
-	DECLARE_LOGGER;
-	REGISTER_CLASS_AND_BASE(CpmGlobalCharacteristics,PeriodicEngine);
-};
-REGISTER_SERIALIZABLE(CpmGlobalCharacteristics);
-#endif
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>

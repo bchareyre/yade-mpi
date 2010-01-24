@@ -11,21 +11,19 @@
  */
 class RotationEngine : public PartialEngine
 {
-	public :
+	public:
 		RotationEngine();
-
 		Real angularVelocity;
-		//! axis of rotation (direction); will be normalized by the engine
 		Vector3r rotationAxis;
 		bool rotateAroundZero;
 		Vector3r zeroPoint;
-
 		void applyCondition(Scene * );
-
-	protected :
-	REGISTER_ATTRIBUTES(PartialEngine,(angularVelocity)(rotationAxis)(rotateAroundZero)(zeroPoint));
-	REGISTER_CLASS_NAME(RotationEngine);
-	REGISTER_BASE_CLASS_NAME(PartialEngine);
+	YADE_CLASS_BASE_DOC_ATTRS(RotationEngine,PartialEngine,"Engine applying rotation (by setting angular velocity) to subscribed bodies. If rotateAroundZero is set, then each body is also displaced around zeroPoint.",
+		((angularVelocity,"Angular velocity. [rad/s]"))
+		((rotationAxis,"Axis of rotation (direction); will be normalized automatically."))
+		((rotateAroundZero,"If True, bodies will not rotate around their centroids, but rather around ``zeroPoint``."))
+		((zeroPoint,"Point around which bodies will rotate if ``rotateAroundZero`` is True"))
+	);
 };
 REGISTER_SERIALIZABLE(RotationEngine);
 
@@ -36,15 +34,17 @@ class SpiralEngine:public PartialEngine{
 		SpiralEngine():angularVelocity(0.),linearVelocity(0.),axis(Vector3r::UNIT_X),axisPt(0,0,0),angleTurned(0.){}
 		Real angularVelocity;
 		Real linearVelocity;
-		//! axis of translation and rotation (direction); will be normalized by the engine
 		Vector3r axis;
-		//! a point on the axis, to position it in space properly
 		Vector3r axisPt;
-		//! how much have we turned so far
 		Real angleTurned;
 	virtual void applyCondition(Scene*);
-	REGISTER_CLASS_AND_BASE(SpiralEngine,PartialEngine);
-	REGISTER_ATTRIBUTES(PartialEngine,(angularVelocity)(linearVelocity)(axis)(axisPt)(angleTurned));
+	YADE_CLASS_BASE_DOC_ATTRS(SpiralEngine,PartialEngine,"Engine applying both rotation and translation, along the same axis, whence the name SpiralEngine",
+		((angularVelocity,"Angular velocity [rad/s]"))
+		((linearVelocity,"Linear velocity [m/s]"))
+		((axis,"Axis of translation and rotation; will be normalized by the engine."))
+		((axisPt,"A point on the axis, to position it in space properly."))
+		((angleTurned,"How much have we turned so far. |yupdate| [rad]"))
+	)
 };
 REGISTER_SERIALIZABLE(SpiralEngine);
 
@@ -59,18 +59,18 @@ class InterpolatingSpiralEngine: public SpiralEngine{
 	//! holder of interpolation state, should not be touched by the user.
 	size_t _pos;
 	public:
-		//! list of times at which velocities are given; must be increasing
 		vector<Real> times;
-		//! list of angular velocities; manadatorily of same length as times
 		vector<Real> angularVelocities;
-		//! wrap t if t>times_n, i.e. t_wrapped=t-N*(times_n-times_0)
 		bool wrap;
-		//! axial translation per radian turn (can be negative)
 		Real slope;
 		InterpolatingSpiralEngine(): _pos(0), wrap(false), slope(0){}
 		virtual void applyCondition(Scene* rb);
-	REGISTER_CLASS_AND_BASE(InterpolatingSpiralEngine,SpiralEngine);
-	REGISTER_ATTRIBUTES(SpiralEngine,(times)(angularVelocities)(wrap)(slope));
+	YADE_CLASS_BASE_DOC_ATTRS(InterpolatingSpiralEngine,SpiralEngine,"Engine applying spiral motion, finding current angular velocity by linearly interpolating in times and velocities and translation by using slope parameter. \n\n The interpolation assumes the margin value before the first time point and last value after the last time point. If wrap is specified, time will wrap around the last times value to the first one (note that no interpolation between last and first values is done).",
+		((times,"List of time points at which velocities are given; must be increasing [s]"))
+		((angularVelocities,"List of angular velocities; manadatorily of same length as times. [rad/s]"))
+		((wrap,"Wrap t if t>times_n, i.e. t_wrapped=t-N*(times_n-times_0)"))
+		((slope,"Axial translation per radian turn (can be negative) [m/rad]"))
+	);
 };
 REGISTER_SERIALIZABLE(InterpolatingSpiralEngine);
 

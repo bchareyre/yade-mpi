@@ -29,6 +29,7 @@ class Bound : public Serializable, public Indexable
 	//REGISTER_CLASS_AND_BASE(Bound,Serializable Indexable);
 	YADE_CLASS_BASE_DOC_ATTRS_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",((diffuseColor,"Color for rendering this object")),
 		YADE_PY_TOPINDEXABLE(Bound)
+		// we want those to be accessible from python, but not serialized
 		.def_readonly("min",&Bound::min,"Lower corner of box containing this bound (hence the body as well)")
 		.def_readonly("max",&Bound::max,"Upper corner of box containing this bound (hence the body as well)")
 	);

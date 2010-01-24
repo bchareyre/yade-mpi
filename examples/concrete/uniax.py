@@ -120,8 +120,8 @@ def initTest():
 	print "init done, will now run."
 	O.step(); O.step(); # to create initial contacts
 	# now reset the interaction radius and go ahead
-	ss2d3dg['distFactor']=-1.
-	is2aabb['aabbEnlargeFactor']=-1.
+	ss2d3dg.distFactor=-1.
+	is2aabb.aabbEnlargeFactor=-1.
 	O.run()
 
 def stopIfDamaged():
@@ -148,7 +148,7 @@ def stopIfDamaged():
 			ft,fc=max(sigma),min(sigma)
 			print 'Strengths fc=%g, ft=%g, |fc/ft|=%g'%(fc,ft,abs(fc/ft))
 			title=O.tags['description'] if 'description' in O.tags.keys() else O.tags['params']
-			print'gnuplot',plot.saveGnuplot(O.tags['id'],title=title)
+			print 'gnuplot',plot.saveGnuplot(O.tags['id'],title=title)
 			print 'Bye.'
 			# O.pause()
 			sys.exit(0)

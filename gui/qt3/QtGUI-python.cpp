@@ -18,7 +18,7 @@ bool qtGuiIsActive(){return (bool)YadeQtMainWindow::self; }
 void qtGuiActivate(){
 	if(qtGuiIsActive()) return;
 	QtGUI* gui=new QtGUI();
-	if(!gui->checkDisplay(/* quiet */ false) || !gui->runNaked()){
+	if(!gui->checkDisplay(/* quiet */ true) || !gui->runNaked()){
 		PyErr_SetString(PyExc_ImportError,"Qt3 GUI could not be activated.");
 		python::throw_error_already_set();
 	}
@@ -29,7 +29,6 @@ YadeQtMainWindow* ensuredMainWindow(){if(!qtGuiIsActive()){qtGuiActivate(); whil
 void centerViews(void){ensuredMainWindow()->centerViews();}
 void Quit(void){ if(YadeQtMainWindow::self) YadeQtMainWindow::self->Quit(); }
 shared_ptr<OpenGLRenderingEngine> ensuredRenderer(){ensuredMainWindow()->ensureRenderer(); return ensuredMainWindow()->renderer;}
-void OpenGLRenderingEngine_setBodiesRefSe3(const shared_ptr<OpenGLRenderingEngine>& self){ self->setBodiesRefSe3(Omega::instance().getScene()); }
 
 #define POST_SYNTH_EVENT(EVT,checker) void evt##EVT(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_##EVT)); bool wait=true; if(wait){while(!(bool)(ensuredMainWindow()->checker)) usleep(50000);} }
 POST_SYNTH_EVENT(CONTROLLER,controller);
@@ -106,9 +105,6 @@ BOOST_PYTHON_MODULE(_qt){
 	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
 	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI from within python.");
 	def("views",getAllViews);
-
-	python::class_<OpenGLRenderingEngine, shared_ptr<OpenGLRenderingEngine>, python::bases<Serializable>, noncopyable>("OpenGLRenderingEngine")
-		.def("setRefSe3",&OpenGLRenderingEngine_setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
 
 	boost::python::class_<pyGLViewer>("GLViewer")
 		.def(python::init<unsigned>())

@@ -269,7 +269,7 @@ void SimulationController::pbCenterSceneClicked() { YadeQtMainWindow::self->cent
 void SimulationController::closeEvent(QCloseEvent *){ /* switch to async run if running */ if(syncRunning) cbSyncToggled(false); YadeQtMainWindow::self->Quit(); emit closeSignal(); }
 void SimulationController::pbStopClicked() { Omega::instance().stopSimulationLoop(); syncRunning=false; }
 void SimulationController::pbOneSimulationStepClicked(){pbStopClicked();Omega::instance().spawnSingleSimulationLoop();}
-void SimulationController::pbReferenceClicked() {if(YadeQtMainWindow::self->renderer) YadeQtMainWindow::self->renderer->setBodiesRefSe3(Omega::instance().getScene());}
+void SimulationController::pbReferenceClicked() {if(YadeQtMainWindow::self->renderer) YadeQtMainWindow::self->renderer->setBodiesRefSe3();}
 void SimulationController::pbStart2Clicked() { pbStartClicked(); }
 void SimulationController::pbStartClicked(){
 	restartTimer();

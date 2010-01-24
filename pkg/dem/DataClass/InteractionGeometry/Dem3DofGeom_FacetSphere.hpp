@@ -30,8 +30,12 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	Vector3r localFacetNormal;
 	// effective radius of sphere
 	Real effR2;
-	REGISTER_ATTRIBUTES(Dem3DofGeom,(cp1pt)(cp2rel)(localFacetNormal)(effR2) );
-	REGISTER_CLASS_AND_BASE(Dem3DofGeom_FacetSphere,Dem3DofGeom);
+	YADE_CLASS_BASE_DOC_ATTRS(Dem3DofGeom_FacetSphere,Dem3DofGeom,"Class representing facet+sphere in contact which computes 3 degrees of freedom (normal and shear deformation).",
+		((cp1pt,"Reference contact point on the facet in facet-local coords."))
+		((cp2rel,"Orientation between +x and the reference contact point (on the sphere) in sphere-local coords"))
+		((localFacetNormal,"Unit normal of the facet plane in facet-local coordinates"))
+		((effR2,"Effective radius of sphere"))
+	);
 	REGISTER_CLASS_INDEX(Dem3DofGeom_FacetSphere,Dem3DofGeom);
 	DECLARE_LOGGER;
 	friend class Gl1_Dem3DofGeom_FacetSphere;

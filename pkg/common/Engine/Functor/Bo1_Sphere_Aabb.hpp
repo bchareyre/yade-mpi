@@ -17,8 +17,9 @@ class Bo1_Sphere_Aabb : public BoundFunctor
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
 		double aabbEnlargeFactor;
 	FUNCTOR2D(Sphere,Aabb);
-	REGISTER_ATTRIBUTES(BoundFunctor,(aabbEnlargeFactor));
-	REGISTER_CLASS_AND_BASE(Bo1_Sphere_Aabb,BoundFunctor);
+	YADE_CLASS_BASE_DOC_ATTRS(Bo1_Sphere_Aabb,BoundFunctor,"Functor creating Aabb from Sphere",
+		((aabbEnlargeFactor,"Relative enlargement of the bounding box (e.g. for distant interaction detection); deactivated if negative, which is the default."))
+	);
 };
 
 REGISTER_SERIALIZABLE(Bo1_Sphere_Aabb);

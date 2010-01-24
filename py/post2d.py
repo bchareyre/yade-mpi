@@ -27,10 +27,10 @@ This example can be found in examples/concrete/uniax-post.py ::
  # flattener that project to the xz plane
  flattener=post2d.AxisFlatten(useRef=False,axis=1)
  # return scalar given a Body instance
- extractDmg=lambda b: b.state['normDmg']
+ extractDmg=lambda b: b.state.normDmg
  # will call flattener.planar implicitly
- # the same as: extractVelocity=lambda b: flattener.planar(b,b.state['vel'])
- extractVelocity=lambda b: b.state['vel']
+ # the same as: extractVelocity=lambda b: flattener.planar(b,b.state.vel)
+ extractVelocity=lambda b: b.state.vel
 
  # create new figure
  pylab.figure()
@@ -164,7 +164,7 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 	nDim=0
 	for b in O.bodies:
 		if onlyDynamic and not b.dynamic: continue
-		if b.shape.name!='Sphere': continue
+		if not isinstance(b.shape,Sphere): continue
 		xy,d=flattener(b),extractor(b)
 		if xy==None or d==None: continue
 		if nDim==0: nDim=1 if isinstance(d,float) else 2

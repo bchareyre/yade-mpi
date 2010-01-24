@@ -87,11 +87,23 @@ namespace{
 	bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); return baseClass::pyHasKey(key); } \
 	boost::python::dict pyDict() const { boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; }
 
-#define _STRIPDOC(x,y,z) (BOOST_PP_TUPLE_ELEM(2,0,z))
+#define _STRIPDOC2(x,y,z) (BOOST_PP_TUPLE_ELEM(2,0,z))
 #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) \
-	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC,~,attrs)) \
+	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC2,~,attrs)) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
-	virtual void pyRegisterClass(python::object _scope) const { if(getClassName()!=#thisClass) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) extras ; }
+	virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) extras ; }
+// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
+
+#define _STRIPDECL4(x,y,z) (( BOOST_PP_TUPLE_ELEM(4,1,z),BOOST_PP_TUPLE_ELEM(4,3,z) " :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "`" ))
+// return type name; (for declaration)
+#define _ATTR_DECL(x,y,z) BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
+// return name(default), (for initializers list); TRICKY: last one must not have the comma
+#define _ATTR_INI(x,maxIndex,i,z) BOOST_PP_TUPLE_ELEM(4,1,z)(BOOST_PP_TUPLE_ELEM(4,2,z)) BOOST_PP_COMMA_IF(BOOST_PP_NOT_EQUAL(maxIndex,i))
+// attrDecl is (type,name,defaultValue,docString)
+#define YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(thisClass,baseClass,docString,attrDecls,ctor,extras) \
+	public: BOOST_PP_SEQ_FOR_EACH(_ATTR_DECL,~,attrDecls) /* attribute declarations */ \
+	thisClass(): BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(attrDecls)),attrDecls) { ctor ; } /* ctor, with initialization of defaults */ \
+	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),extras)
 
 #define YADE_CLASS_BASE_DOC_ATTRS(thisClass,baseClass,docString,attrs) \
 	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,)
@@ -173,10 +185,10 @@ class Serializable : public Factorable
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
+		// this check can be probably removed at some point
+		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const { if(getClassName()!=thisClassName){ std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTRS yet"<<std::endl; return false; } return true; }
 		virtual void pyRegisterClass(boost::python::object _scope) const {
-			// hack (string comparison), to catch method that is not overridden
-			if(getClassName()!="Serializable"){ if(getenv("YADE_DEBUG")){std::cerr<<"WARN: class "+getClassName()+" did not register with YADE_CLASS_BASE_DOC_ATTRS"<<std::endl;} /* throw logic_error("Class "+getClassName()+" did not register with YADE_CLASS_BASE_ATTRS."); */ return; }
-			// called properly
+			if(!checkPyClassRegistersItself("Serializable")) return;
 			boost::python::scope thisScope(_scope); 
 			python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
 				.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")

@@ -35,8 +35,12 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 		Real slipToDisplacementTMax(Real displacementTMax);
 		/********* end API ***********/
 
-	REGISTER_ATTRIBUTES(Dem3DofGeom,(effR1)(effR2)(cp1rel)(cp2rel));
-	REGISTER_CLASS_AND_BASE(Dem3DofGeom_SphereSphere,Dem3DofGeom);
+	YADE_CLASS_BASE_DOC_ATTRS(Dem3DofGeom_SphereSphere,Dem3DofGeom,"Class representing 2 spheres in contact which computes 3 degrees of freedom (normal and shear deformation).",
+		((effR1,"Effective radius of sphere #1; can be smaller/larger than refR1 (the actual radius), but quasi-constant throughout interaction life"))
+		((effR2,"Same as effR1, but for sphere #2."))
+		((cp1rel,"Sphere's #1 relative orientation of the contact point with regards to sphere-local +x axis (quasi-constant)"))
+		((cp2rel,"Same as cp1rel, but for sphere #2."))
+	);
 	REGISTER_CLASS_INDEX(Dem3DofGeom_SphereSphere,Dem3DofGeom);
 	friend class Gl1_Dem3DofGeom_SphereSphere;
 	friend class Ig2_Sphere_Sphere_Dem3DofGeom;
@@ -53,8 +57,9 @@ class Dem6DofGeom_SphereSphere: public Dem3DofGeom_SphereSphere{
 	virtual ~Dem6DofGeom_SphereSphere();
 	Dem6DofGeom_SphereSphere(const Dem3DofGeom_SphereSphere& ss): Dem3DofGeom_SphereSphere(ss){ createIndex(); }
 	Dem6DofGeom_SphereSphere(){ createIndex(); }
-	REGISTER_ATTRIBUTES(Dem3DofGeom_SphereSphere,(initRelOri12));
-	REGISTER_CLASS_AND_BASE(Dem6DofGeom_SphereSphere,Dem3DofGeom_SphereSphere);
+	YADE_CLASS_BASE_DOC_ATTRS(Dem6DofGeom_SphereSphere,Dem3DofGeom_SphereSphere,"Class representing 2 sphere in contact which computes 6 degrees of freedom (normal, shear, bending and twisting deformation)",
+		((initRelOri12,"Initial relative orientation of spheres, used for bending and twisting computation."))
+	);
 	REGISTER_CLASS_INDEX(Dem6DofGeom_SphereSphere,Dem3DofGeom_SphereSphere);
 };
 REGISTER_SERIALIZABLE(Dem6DofGeom_SphereSphere);
@@ -77,15 +82,15 @@ class Ig2_Sphere_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	public:
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(	const shared_ptr<Shape>&, const shared_ptr<Shape>&, const State&, const State&, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>&){throw runtime_error("goReverse on symmetric functor should never be called!");}
-		//! Factor of sphere radius such that sphere "touch" if their centers are not further than distFactor*(r1+r2);
-		//! if negative, equilibrium distance is the sum of the sphere's radii, which is the default.
 		Real distFactor;
 		Ig2_Sphere_Sphere_Dem3DofGeom(): distFactor(-1.) {}
 	FUNCTOR2D(Sphere,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Sphere,Sphere);
-	REGISTER_CLASS_AND_BASE(Ig2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
-	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(distFactor));
 	DECLARE_LOGGER;
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Sphere_Sphere_Dem3DofGeom,InteractionGeometryFunctor,
+		"Functor handling contact of 2 spheres, producing Dem3DofGeom instance",
+		((distFactor,"Factor of sphere radius such that sphere \"touch\" if their centers are not further than distFactor*(r1+r2); if negative, equilibrium distance is the sum of the sphere's radii, which is the default."))
+	);
 };
 REGISTER_SERIALIZABLE(Ig2_Sphere_Sphere_Dem3DofGeom);
 

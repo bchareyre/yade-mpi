@@ -31,11 +31,11 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 	imp = STLImporter()
 	facets=imp.ymport(file)
 	for b in facets:
-		b['isDynamic']=dynamic
+		b.dynamic=dynamic
 		b.shape.postProcessAttributes(True)
-		b.shape['diffuseColor']=color if color else utils.randomColor()
-		b.shape['wire']=wire
-		b.shape['highlight']=highlight
+		b.shape.diffuseColor=color if color else utils.randomColor()
+		b.shape.wire=wire
+		b.shape.highlight=highlight
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
 	return facets
 

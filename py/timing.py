@@ -9,10 +9,10 @@ from yade import *
 
 def _resetEngine(e):
 	if e.timingDeltas: e.timingDeltas.reset()
-	if e.__class__.__name__=='EngineUnit': return
-	if e.__class__.__name__=='MetaEngine':
+	if isinstance(e,Functor): return
+	if isinstance(e,Dispatcher):
 		for f in e.functors: _resetEngine(f)
-	elif e.__class__.__name__=='ParallelEngine':
+	elif isinstance(e,ParallelEngine):
 		for s in e.slaves: _resetEngine(s)
 	e.execTime,e.execCount=0,0
 
@@ -49,19 +49,19 @@ def _delta_stats(deltas,totalTime,level):
 def _engines_stats(engines,totalTime,level):
 	lines=0; hereLines=0
 	for e in engines:
-		if e.__class__.__name__!='EngineUnit': print _formatLine(u'"'+e['label']+'"' if e['label'] else e.name,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
+		if not isinstance(e,Functor): print _formatLine(u'"'+e['label']+'"' if e['label'] else e.name,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
 		if e.timingDeltas: 
-			if e.__class__.__name__=='EngineUnit':
+			if isinstance(e,Functor):
 				print _formatLine(e.name,-1,-1,-1,level); lines+=1; hereLines+=1
 				execTime=sum([d[1] for d in e.timingDeltas.data])
 			else: execTime=e.execTime
 			lines+=_delta_stats(e.timingDeltas,execTime,level+1)
-		if e.__class__.__name__=='MetaEngine': lines+=_engines_stats(e.functors,e.execTime,level+1)
-		if e.__class__.__name__=='InteractionDispatcher':
+		if isinstance(e,Dispatcher): lines+=_engines_stats(e.functors,e.execTime,level+1)
+		if isinstance(e,InteractionDispatcher):
 			lines+=_engines_stats(e.geomDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.physDispatcher.functors,e.execTime,level+1)
 			lines+=_engines_stats(e.lawDispatcher.functors,e.execTime,level+1)
-		elif e.__class__.__name__=='ParallelEngine': lines+=_engines_stats(e.slave,e.execTime,level+1)
+		elif isinstance(e,ParallelEngine): lines+=_engines_stats(e.slave,e.execTime,level+1)
 	if hereLines>1:
 		print _formatLine('TOTAL',totalTime,-1,totalTime,level); lines+=1
 	return lines

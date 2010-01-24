@@ -10,6 +10,7 @@
 using namespace Wm3;
 
 #include"yadeWm3.hpp"
+#include<limits>
 
 
 /*************************************** OPERATORS *********************************************/
@@ -72,6 +73,8 @@ class Se3
 typedef Se3<float> Se3f;
 typedef Se3<double> Se3d;
 typedef Se3<Real> Se3r;
+
+const Real NaN(std::numeric_limits<Real>::signaling_NaN());
 
 /************************************* end SE3 class ****************************/
 

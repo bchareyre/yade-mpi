@@ -21,8 +21,7 @@ class Aabb : public Bound{
 		Aabb();
 		virtual ~Aabb();
 	
-	REGISTER_CLASS_AND_BASE(Aabb,Bound);	
-	REGISTER_ATTRIBUTES(Bound, (min)(max) );  // not necessary to store min and max, but it is handy for debugging/python inspection 
+	YADE_CLASS_BASE_DOC_ATTRS(Aabb,Bound,"Axis-aligned bounding box, for use with InsertionSortCollider. (This class is quasi-redundant since min,max are already contained in Bound itself. That might change at some point, though.)",/* no attrs */);
 	REGISTER_CLASS_INDEX(Aabb,Bound);
 };
 REGISTER_SERIALIZABLE(Aabb);

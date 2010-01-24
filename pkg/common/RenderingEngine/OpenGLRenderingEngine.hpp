@@ -40,7 +40,7 @@ class OpenGLRenderingEngine : public Serializable
 
 		void drawPeriodicCell();
 
-		void setBodiesRefSe3(const shared_ptr<Scene>& scene);
+		void setBodiesRefSe3();
 
 		struct BodyDisp{
 			Vector3r pos;
@@ -95,11 +95,32 @@ class OpenGLRenderingEngine : public Serializable
 
 		void renderAllInteractionsWire();
 	
-	protected :
-		void postProcessAttributes(bool deserializing);
-	REGISTER_ATTRIBUTES(Serializable,(scaleDisplacements)(displacementScale)(scaleRotations)(rotationScale)(Light_position)(Background_color)(Body_wire)(Show_DOF)(Show_ID)(Body_state)(Body_bounding_volume)(Body_interacting_geom)
-		(Interaction_wire)(Interaction_geometry)(Interaction_physics)(Draw_mask)(Draw_inside)(clipPlaneSe3)(clipPlaneActive)(selectBodyLimit)(intrAllWire));
-	REGISTER_CLASS_AND_BASE(OpenGLRenderingEngine,Serializable);
+	public: void postProcessAttributes(bool deserializing);
+
+	YADE_CLASS_BASE_DOC_ATTRS_PY(OpenGLRenderingEngine,Serializable,"Class responsible for rendering scene on OpenGL devices.",
+		((scaleDisplacements,"Whether to scale (artificially enlarge) displacements, so that they become better visible"))
+		((displacementScale,"Relative stretch of current body position from its reference position (independently in 3 dimensions), if scaleDisplacements is set."))
+		((scaleRotations,"Whether to scale (artificially enlarge) rotations, so that they become better visible"))
+		((rotationScale,"Relative growth of current body rotation from its reference orientation (independently in 3 dimensions), if scaleRotations is set."))
+		((Light_position,"Position of OpenGL light source in the scene."))
+		((Background_color,"Color of the backgroud canvas (RGB)"))
+		((Body_wire,"Render all bodies with wire only (faster)"))
+		((Show_DOF,"Show which degrees of freedom are blocked for each body"))
+		((Show_ID,"Show body id's"))
+		((Body_state,"Render body state [deprecated]"))
+		((Body_bounding_volume,"Render body bound"))
+		((Body_interacting_geom,"Render body shape"))
+		((Interaction_wire,"??"))
+		((Interaction_geometry,"Render geometry of interaction"))
+		((Interaction_physics,"Render Interaction::interactionPhysics"))
+		((Draw_mask,"Bitmask for showing only bodies where ((Draw_mask & Body::groupMask)!=0)"))
+		((Draw_inside,"??"))
+		((clipPlaneSe3,"Position and orientation of clipping planes"))
+		((clipPlaneActive,"Activate/deactivate respective clipping planes"))
+		((selectBodyLimit,"Limit number of bodies to allow picking body with mouse (performance reasons)"))
+		((intrAllWire,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
+		.def("setRefSe3",&OpenGLRenderingEngine::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
+	);
 };
 REGISTER_SERIALIZABLE(OpenGLRenderingEngine);
 

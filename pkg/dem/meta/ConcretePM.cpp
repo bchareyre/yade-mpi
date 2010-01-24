@@ -131,16 +131,6 @@ Real CpmPhys::computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real
 
 /********************** Law2_Dem3DofGeom_CpmPhys_Cpm ****************************/
 
-/// yield surface parameters
-int  Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSurfType=2;
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldLogSpeed=.1;
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldEllipseShift=0.; // deprecated
-/// compressive plasticity parameters
-// approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::epsSoft=-3e-3; // deactivated if >=0
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::relKnSoft=.25;
-// >=1. to deactivate (never delete damaged contacts)
-Real Law2_Dem3DofGeom_CpmPhys_Cpm::omegaThreshold=1.;
 
 #ifdef YADE_CPM_FULL_MODEL_AVAILABLE
 	#include"../../../../brefcom-mm.hh"
@@ -312,56 +302,6 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 	}
 #endif
 
-/********************** CpmGlobalCharacteristics ****************************/
-/*** DEPRECATED ***/
-#if 0
-CREATE_LOGGER(CpmGlobalCharacteristics);
-void CpmGlobalCharacteristics::compute(Scene* rb, bool useMaxForce){
-	rb->forces.sync();
-
-	// 1. reset volumetric strain (cummulative in the next loop)
-	// 2. get maximum force on a body and sum of all forces (for averaging)
-	Real sumF=0,maxF=0,currF;
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-	CpmMat* bpp(YADE_CAST<CpmMat*>(b->physicalParameters.get()));
-		bpp->epsVolumetric=0;
-		bpp->numContacts=0;
-		currF=rb->forces.getForce(b->id).Length(); maxF=max(currF,maxF); sumF+=currF;
-	}
-	Real meanF=sumF/rb->bodies->size(); 
-
-	// commulate normal strains from contacts
-	// get max force on contacts
-	Real maxContactF=0;
-	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
-		if(!I->isReal()) continue;
-		shared_ptr<CpmPhys> BC=YADE_PTR_CAST<CpmPhys>(I->interactionPhysics); assert(BC);
-		maxContactF=max(maxContactF,max(BC->Fn,BC->Fs.Length()));
-		CpmMat* bpp1(YADE_CAST<CpmMat*>(Body::byId(I->getId1())->physicalParameters.get()));
-		CpmMat* bpp2(YADE_CAST<CpmMat*>(Body::byId(I->getId2())->physicalParameters.get()));
-		bpp1->epsVolumetric+=BC->epsN; bpp1->numContacts+=1;
-		bpp2->epsVolumetric+=BC->epsN; bpp2->numContacts+=1;
-	}
-	unbalancedForce=(useMaxForce?maxF:meanF)/maxContactF;
-
-	FOREACH(const shared_ptr<Interaction>& I, *rb->interactions){
-		if(!I->isReal()) continue;
-		shared_ptr<CpmPhys> BC=YADE_PTR_CAST<CpmPhys>(I->interactionPhysics); assert(BC);
-		CpmMat* bpp1(YADE_CAST<CpmMat*>(Body::byId(I->getId1())->physicalParameters.get()));
-		CpmMat* bpp2(YADE_CAST<CpmMat*>(Body::byId(I->getId2())->physicalParameters.get()));
-		Real epsVolAvg=.5*((3./bpp1->numContacts)*bpp1->epsVolumetric+(3./bpp2->numContacts)*bpp2->epsVolumetric);
-		BC->epsTrans=(epsVolAvg-BC->epsN)/2.;
-		//TRVAR5(I->getId1(),I->getId2(),BC->epsTrans,(3./bpp1->numContacts)*bpp1->epsVolumetric,(3./bpp2->numContacts)*bpp2->epsVolumetric);
-		//TRVAR4(bpp1->numContacts,bpp1->epsVolumetric,bpp2->numContacts,bpp2->epsVolumetric);
-	}
-	#if 0
-		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
-			CpmMat* bpp(YADE_PTR_CAST<CpmMat>(b->physicalParameters.get()));
-			bpp->epsVolumeric*=3/bpp->numContacts;
-		}
-	#endif
-}
-#endif
 
 /********************** CpmStateUpdater ****************************/
 CREATE_LOGGER(CpmStateUpdater);
