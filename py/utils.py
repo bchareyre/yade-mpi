@@ -247,6 +247,9 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	
 	
 	#Defense from zero dimensions
+	if (wallMask>63):
+		print "wallMask must be 63 or less"
+		wallMask=63
 	if (extents[0]==0):
 		wallMask=1
 	elif (extents[1]==0):
@@ -278,7 +281,7 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	if wallMask&32: ret+=doWall(E,H,G,F)
 	return ret
 	
-def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,closed=1,**kw):
+def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,wallMask=7,closed=1,**kw):
 	"""
 	Create arbitrarily-aligned cylinder composed of facets, with given center, radius, height and orientation.
 	Return List of facets forming the cylinder;
@@ -289,17 +292,20 @@ def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,c
 			- `height`: cylinder height;
 			- `orientation`: orientation of the cylinder in quaternion format;
 			- `segmentsNumber`: the number of edges on the cylinder surface, the minimum is 5;
-			- `closed`: defines, whether cylinder is closed from the ends or not;
+			- `wallMask`: bitmask; determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
 			- `**kw`: passed to utils.facet;
 	"""
 	
 	#Defense from zero dimensions
-	if (segmentsNumber<5):
-		raise RuntimeError("The segmentsNumber should be at least 5");
+	if (segmentsNumber<3):
+		raise RuntimeError("The segmentsNumber should be at least 3");
 	if (height<=0):
 		raise RuntimeError("The height should have the positive value");
 	if (radius<=0):
 		raise RuntimeError("The radius should have the positive value");
+	if (wallMask>7):
+		print "wallMask must be 7 or less"
+		wallMask=7
 	"""___________________________"""
 	import numpy
 	anglesInRad = numpy.linspace(0, 2.0*math.pi, segmentsNumber+1, endpoint=True)
@@ -316,16 +322,19 @@ def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,c
 	for i in range(0,len(P1)):
 		P1[i]=qTemp.Rotate(P1[i])+Vector3(center[0],center[1],center[2])
 		P2[i]=qTemp.Rotate(P2[i])+Vector3(center[0],center[1],center[2])
+		
 	ret=[]
 	for i in range(2,len(P1)):
-		if (closed==1):
+		if wallMask&2:
 			ret.append(facet((P1[0],P1[i],P1[i-1]),**kw))
+		if wallMask&1:
 			ret.append(facet((P2[0],P2[i-1],P2[i]),**kw))
-		ret.append(facet((P1[i],P2[i],P2[i-1]),**kw))
-		ret.append(facet((P2[i-1],P1[i-1],P1[i]),**kw))
+		if wallMask&4:
+			ret.append(facet((P1[i],P2[i],P2[i-1]),**kw))
+			ret.append(facet((P2[i-1],P1[i-1],P1[i]),**kw))
 	return ret
 	
-
+	
 def aabbWalls(extrema=None,thickness=None,oversizeFactor=1.5,**kw):
 	"""Return 6 boxes that will wrap existing packing as walls from all sides;
 	extrema are extremal points of the Aabb of the packing (will be calculated if not specified)

@@ -58,7 +58,7 @@ O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o
 """ Example of utils.facetCylinder usage, RotationEngine example see below"""
 q1 = Quaternion(Vector3(0,0,1),(3.14159/2))
 o1,o_angl = q1.ToAxisAngle()
-rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,(o1[0],o1[1],o1[2],o_angl),closed=0,segmentsNumber=10,**kwBoxes))
+rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,(o1[0],o1[1],o1[2],o_angl),wallMask=4,segmentsNumber=10,**kwBoxes))
 
 """Import regular-sphere-pack.mesh into the YADE simulation"""
 O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
