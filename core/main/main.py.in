@@ -32,14 +32,34 @@ if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
 
 sys.stderr.write('Welcome to Yade '+version+'\n')
 
-# initialization and c++ plugins import
-import yade
-# other parts we will need soon
-import yade.config
-import yade.wrapper
-import yade.log
-import yade.system
+try:
+	# initialization and c++ plugins import
+	import yade
+	# other parts we will need soon
+	import yade.config
+	import yade.wrapper
+	import yade.log
+	import yade.system
 #import yade.plot
+except AttributeError:
+	print """
+==========================================
+======== ERROR: read carefully! ==========
+==========================================
+
+There was AttributeError while importing yade module.
+If you are running Ubuntu 9.10 (karmic), you just hit a known bug
+https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688
+
+You can work around this bug by using the following command
+(as per https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688/comments/6):
+
+sudo add-apt-repository ppa:ajmitch/ppa && sudo apt-get update && sudo apt-get upgrade
+
+No need to recompile afterwards.
+"""
+	sys.exit(1)
+
 
 # continue option processing
 

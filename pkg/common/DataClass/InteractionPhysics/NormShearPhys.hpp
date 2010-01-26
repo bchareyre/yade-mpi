@@ -6,13 +6,11 @@
 
 class NormPhys:public InteractionPhysics {
 	public:
-		Real kn;
-		Vector3r normalForce;
-		NormPhys(): normalForce(Vector3r::ZERO) {createIndex(); }
 		virtual ~NormPhys();
-	YADE_CLASS_BASE_DOC_ATTRS(NormPhys,InteractionPhysics,"Abstract class for interactions that have normal stiffness.",
-		((kn,"Normal stiffness"))
-		((normalForce,"Normal force after previous step."))
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(NormPhys,InteractionPhysics,"Abstract class for interactions that have normal stiffness.",
+		((Real,kn,NaN,"Normal stiffness"))
+		((Vector3r,normalForce,Vector3r::ZERO,"Normal force after previous step.")),
+		createIndex(),
 	);
 	REGISTER_CLASS_INDEX(NormPhys,InteractionPhysics);
 };
@@ -20,13 +18,12 @@ REGISTER_SERIALIZABLE(NormPhys);
 
 class NormShearPhys: public NormPhys{
 	public:
-		Real ks;
-		Vector3r shearForce;
-		NormShearPhys(): shearForce(Vector3r::ZERO){ createIndex(); }
 		virtual ~NormShearPhys();
-	YADE_CLASS_BASE_DOC_ATTRS(NormShearPhys,NormPhys,"Abstract class for interactions that have shear stiffnesses, in addition to normal stiffness. This class is used in the PFC3d-style stiffness timestepper.",
-		((ks,"Shear stiffness"))
-		((shearForce,"Shear force after previous step"))
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(NormShearPhys,NormPhys,
+		"Abstract class for interactions that have shear stiffnesses, in addition to normal stiffness. This class is used in the PFC3d-style stiffness timestepper.",
+		((Real,ks,NaN,"Shear stiffness"))
+		((Vector3r,shearForce,Vector3r::ZERO,"Shear force after previous step")),
+		createIndex(),
 	);
 	REGISTER_CLASS_INDEX(NormShearPhys,NormPhys);
 };

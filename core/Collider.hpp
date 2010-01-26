@@ -40,12 +40,7 @@ class Collider : public GlobalEngine
 		Currently used from Shop::flipCell, which changes cell information for bodies.
 		*/
 		virtual void invalidatePersistentData(){}
-
-	protected:
-
-	REGISTER_CLASS_NAME(Collider);	
-	REGISTER_BASE_CLASS_NAME(GlobalEngine);
+	YADE_CLASS_BASE_DOC_ATTRS(Collider,GlobalEngine,"Abstract class for finding spatial collisions between bodies.",);
 };
-
 REGISTER_SERIALIZABLE(Collider);
 
