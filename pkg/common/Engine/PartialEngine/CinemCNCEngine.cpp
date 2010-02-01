@@ -8,7 +8,8 @@
 
 
 #include "CinemCNCEngine.hpp"
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+// #include<yade/pkg-common/RigidBodyParameters.hpp> , remplace par : 
+#include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Scene.hpp>
@@ -22,6 +23,9 @@ CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontb
 	firstRun=true;
 	shearSpeed=0;
 	alpha=Mathr::PI/2.0;;
+	gamma_save.resize(0);
+	temoin_save.resize(0);
+	temoin=0;
 	gamma=0;
 	gammalim=0;
 	id_boxhaut=3;
@@ -34,16 +38,15 @@ CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontb
 	F_0=0;
 	Key="";
 	it_depart=0;
-	k=1;
 	LOG=0;
 	wallDamping = 0.2;
 	coeff_dech=1.0;
 }
 
 
-void CinemCNCEngine::applyCondition(Body * body)
+void CinemCNCEngine::applyCondition(Scene * ncb)
 {
-	if(LOG)	cout << "debut applyCondi !!" << endl;
+	if(LOG)	cout << "debut applyCondi du CNCEngine !!" << endl;
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);
 	frontbox = Body::byId(id_boxfront);
@@ -51,16 +54,18 @@ void CinemCNCEngine::applyCondition(Body * body)
 	topbox = Body::byId(id_boxhaut);
 	boxbas = Body::byId(id_boxbas);
 	
-	
+	if(LOG)	cout << "gamma = " << lexical_cast<string>(gamma) << "  et gammalim = " << lexical_cast<string>(gammalim) << endl;
 	if(gamma<=gammalim)
 	{
-		if(temoin==0 || ( (Omega::instance().getCurrentIteration() - it_depart) % k ==0) )
+		if(LOG)	cout << "Je suis bien dans la partie gamma < gammalim" << endl;
+		if(temoin==0)
 
 		{
 			if(LOG) cout << "Je veux maintenir la Force a F_0 = : " << F_0 << endl; 
-			letMove(body);
 			temoin=1;
 		}
+		letMove(ncb);
+
 	}
 	else if (temoin<2)
 	{
@@ -75,11 +80,20 @@ void CinemCNCEngine::applyCondition(Body * body)
 		Omega::instance().stopSimulationLoop();
 	}
 
+	for(unsigned int j=0;j<gamma_save.size();j++)
+	{
+		if ((gamma > gamma_save[j]) && (temoin_save[j]==0))
+		{
+			stopMovement();		// reset of all the speeds before the save
+			Omega::instance().saveSimulation(Key+"_"+lexical_cast<string> (floor(gamma*1000)) +"_" +lexical_cast<string> (floor(gamma*10000)-10*floor(gamma*1000))+ "mmsheared.xml");
+			temoin_save[j]=1;
+		}
+	}
+
 }
 
-void CinemCNCEngine::letMove(Body * body)
+void CinemCNCEngine::letMove(Scene * ncb)
 {
-	Scene * ncb = YADE_CAST<Scene*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
@@ -89,32 +103,27 @@ void CinemCNCEngine::letMove(Body * body)
 	Real dx = shearSpeed * dt;
 
 
-	Real Ysup = (topbox->physicalParameters.get())->se3.position.Y();
-	Real Ylat = (leftbox->physicalParameters.get())->se3.position.Y();
+	Real Ysup = topbox->state->pos.Y();
+	Real Ylat = leftbox->state->pos.Y();
 
 // 	Changes in vertical and horizontal position :
 
 	
-	(topbox->physicalParameters.get())->se3.position += Vector3r(dx,deltaU,0);
+	topbox->state->pos += Vector3r(dx,deltaU,0);
 
-	(leftbox->physicalParameters.get())->se3.position += Vector3r(dx/2.0,deltaU/2.0,0);
-	(rightbox->physicalParameters.get())->se3.position += Vector3r(dx/2.0,deltaU/2.0,0);
+	leftbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
+	rightbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
 	if(LOG)	cout << "deltaU reellemt applique :" << deltaU << endl;
-	if(LOG)	cout << "qui nous a emmene en : y = " << ((topbox->physicalParameters.get())->se3.position).Y() << endl;
-	if(LOG)	cout << "soit un decalage par rapport a position intiale : " << ((topbox->physicalParameters.get())->se3.position.Y()) - Y0 << endl;
+	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).Y() << endl;
+	if(LOG)	cout << "soit un decalage par rapport a position intiale : " << (topbox->state->pos.Y()) - Y0 << endl;
 	
-	Real Ysup_mod = (topbox->physicalParameters.get())->se3.position.Y();
-	Real Ylat_mod = (leftbox->physicalParameters.get())->se3.position.Y();
+	Real Ysup_mod = topbox->state->pos.Y();
+	Real Ylat_mod = leftbox->state->pos.Y();
 
 //	with the corresponding velocities :
-	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(topbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed,deltaU/dt,0);
-
-	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed/2.0,deltaU/(2.0*dt),0);
-
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed/2.0,deltaU/(2.0*dt),0);
+	topbox->state->vel = Vector3r(shearSpeed,deltaU/dt,0);
+	leftbox->state->vel = Vector3r(shearSpeed/2.0,deltaU/(2.0*dt),0);
+	rightbox->state->vel = Vector3r(shearSpeed/2.0,deltaU/(2.0*dt),0);
 
 //	Then computation of the angle of the rotation to be done :
 	computeAlpha();
@@ -132,13 +141,11 @@ void CinemCNCEngine::letMove(Body * body)
 	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
 
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
-	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;
-	rb->angularVelocity	= Vector3r(0,0,1)*dalpha/dt;
+	leftbox->state->ori	= qcorr*leftbox->state->ori;
+	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;
-	rb->angularVelocity	= Vector3r(0,0,1)*dalpha/dt;
+	rightbox->state->ori	= qcorr*rightbox->state->ori;
+	rightbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
 	gamma+=dx;
 }
@@ -147,8 +154,8 @@ void CinemCNCEngine::letMove(Body * body)
 void CinemCNCEngine::computeAlpha()
 {
 	Quaternionr orientationLeftBox,orientationRightBox;
-	orientationLeftBox = (dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get()) )->se3.orientation;
-	orientationRightBox = (dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get()) )->se3.orientation;
+	orientationLeftBox = leftbox->state->ori;
+	orientationRightBox = rightbox->state->ori;
 	if(orientationLeftBox!=orientationRightBox)
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
@@ -183,7 +190,7 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 		
 		it_depart = Omega::instance().getCurrentIteration();
 		alpha=Mathr::PI/2.0;;
-		Y0 = (topbox->physicalParameters.get())->se3.position.Y();
+		Y0 = topbox->state->pos.Y();
 		cout << "Y0 initialise à : " << Y0 << endl;
 		F_0 = F_sup.Y();
 		cout << "F_0 initialise à : " << F_0 << endl;
@@ -200,7 +207,7 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 	}
 	else
 	{
-		Real Ycourant = (topbox->physicalParameters.get())->se3.position.Y();
+		Real Ycourant = topbox->state->pos.Y();
 		deltaU = ( F_sup.Y() - F_0 )/(stiffness);
 		if(LOG) cout << "Lors du calcul de DU (utile pour deltaU) : F_0 = " << F_0 << "; Y0 = " << Y0 << "; Ycourant = " << Ycourant << endl;
 	}
@@ -235,18 +242,15 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 void CinemCNCEngine::stopMovement()
 {
 	// annulation de la vitesse de la plaque du haut
-	RigidBodyParameters * rb = YADE_CAST<RigidBodyParameters*>(topbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
+	topbox->state->vel	=  Vector3r(0,0,0);
 
 	// de la plaque gauche
-	rb = YADE_CAST<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
-	rb->angularVelocity	=  Vector3r(0,0,0);
+	leftbox->state->vel	=  Vector3r(0,0,0);
+	leftbox->state->angVel	=  Vector3r(0,0,0);
 
 	// de la plaque droite
-	rb = YADE_CAST<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
-	rb->angularVelocity	=  Vector3r(0,0,0);
+	rightbox->state->vel	=  Vector3r(0,0,0);
+	rightbox->state->angVel	=  Vector3r(0,0,0);
 }
 
 void CinemCNCEngine::computeStiffness(Scene* ncb)
@@ -283,5 +287,4 @@ void CinemCNCEngine::computeStiffness(Scene* ncb)
 
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
 

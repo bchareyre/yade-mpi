@@ -21,14 +21,14 @@
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>
 
-#include <yade/pkg-dem/PositionRecorder.hpp>
-#include <yade/pkg-dem/PositionSnapshot.hpp>
-#include <yade/pkg-dem/ForceRecorder.hpp>
-#include <yade/pkg-dem/ForceSnapshot.hpp>
+// #include <yade/pkg-dem/PositionRecorder.hpp>
+// #include <yade/pkg-dem/PositionSnapshot.hpp>
+// #include <yade/pkg-dem/ForceRecorder.hpp>
+// #include <yade/pkg-dem/ForceSnapshot.hpp>
 
-#include<yade/pkg-common/BoxModel.hpp>
+// #include<yade/pkg-common/BoxModel.hpp>
 #include<yade/pkg-common/Aabb.hpp>
-#include<yade/pkg-common/SphereModel.hpp>
+// #include<yade/pkg-common/SphereModel.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -53,7 +53,7 @@
 #include <utility>
 
 using namespace std;
-YADE_REQUIRE_FEATURE(geometricalmodel);
+// YADE_REQUIRE_FEATURE(geometricalmodel);
 
 SimpleShear::SimpleShear () : FileGenerator()
 {
@@ -105,10 +105,9 @@ bool SimpleShear::generate()
 {
 	rootBody = shared_ptr<Scene>(new Scene);
 	createActors(rootBody);
-	positionRootBody(rootBody);
 
 
-// BoxModel walls
+// Box walls
 	shared_ptr<Body> w1;	// The left one :
 	createBox(w1,Vector3r(-thickness/2.0,(height)/2.0,0),Vector3r(thickness/2.0,5*(height/2.0+thickness),profondeur/2.0));
 	rootBody->bodies->insert(w1);
@@ -116,7 +115,7 @@ bool SimpleShear::generate()
 
 	shared_ptr<Body> w2;	// The lower one :
 	createBox(w2,Vector3r(width/2.0,-thickness/2.0,0),Vector3r(width/2.0,thickness/2.0,profondeur/2.0));
-	YADE_CAST<CohesiveFrictionalMat*>(w2->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
+	YADE_PTR_CAST<FrictMat> (w2->material)->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-inferior wall)=phi(sphere-sphere)
 	rootBody->bodies->insert(w2);
 
 	shared_ptr<Body> w3;	// The right one
@@ -125,15 +124,14 @@ bool SimpleShear::generate()
 
 	shared_ptr<Body> w4; // The upper one
 	createBox(w4,Vector3r(width/2.0,height+thickness/2.0,0),Vector3r(width/2.0,thickness/2.0,profondeur/2.0));
-	YADE_CAST<CohesiveFrictionalMat*>(w4->physicalParameters.get())->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0;; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
-	rootBody->bodies->insert(w4);
+	YADE_PTR_CAST<FrictMat> (w4->material)->frictionAngle = sphereFrictionDeg * Mathr::PI/180.0; // so that we have phi(spheres-superior wall)=phi(sphere-sphere)
 
-// To close the front and the bottom of the box 
-	shared_ptr<Body> w5;
+// To close the front and the back of the box 
+	shared_ptr<Body> w5;	// behind
 	createBox(w5,Vector3r(width/2.0,height/2.0,-profondeur/2.0-thickness/2.0),	Vector3r(2.5*width/2.0,height/2.0+thickness,thickness/2.0));
 	rootBody->bodies->insert(w5);
 
-	shared_ptr<Body> w6;
+	shared_ptr<Body> w6;	// the front
 	createBox(w6,Vector3r(width/2.0,height/2.0,profondeur/2.0+thickness/2.0),
 	Vector3r(2.5*width/2.0,height/2.0+thickness,thickness/2.0));
 	rootBody->bodies->insert(w6);
@@ -165,52 +163,56 @@ bool SimpleShear::generate()
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
+	shared_ptr<CohesiveFrictionalMat> mat(new CohesiveFrictionalMat);
 	shared_ptr<Aabb> aabb(new Aabb);
-	shared_ptr<SphereModel> gSphere(new SphereModel);
+// 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	Quaternionr q;
+	Quaternionr q;	// to define the initial orientation of the sphere
 	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= true;
-	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
-	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
-	physics->se3			= Se3r(position,q);
-	physics->young			= sphereYoungModulus;
-	physics->poisson		= spherePoissonRatio;
-	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
-	physics->isCohesive		= 1;
+	body->state->pos		=position;
+	body->state->ori		=q;
+	body->state->vel		=Vector3r(0,0,0);
+	body->state->angVel		=Vector3r(0,0,0);
+
+	Real masse			=4.0/3.0*Mathr::PI*radius*radius*radius*density;
+	body->state->mass		=masse;
+	body->state->inertia		= Vector3r(2.0/5.0*masse*radius*radius,2.0/5.0*masse*radius*radius,2.0/5.0*masse*radius*radius);
+
+	mat->young			= sphereYoungModulus;
+	mat->poisson			= spherePoissonRatio;
+	mat->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
+	mat->isCohesive			= 1;
+	body->material = mat;
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
 
-	gSphere->radius			= radius;
+/*	gSphere->radius			= radius;
 	// de quoi avoir des bandes (huit en largeur) de couleur differentes :
 	gSphere->diffuseColor		= ((int)(Mathr::Floor(8*position.X()/width)))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
 	gSphere->wire			= false;
-	gSphere->shadowCaster		= true;
+	gSphere->shadowCaster		= true;*/
 	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 
-	body->shape	= iSphere;
-	body->geometricalModel		= gSphere;
-	body->bound		= aabb;
-	body->physicalParameters	= physics;
+	body->shape			= iSphere;
+// 	body->geometricalModel		= gSphere;
+	body->bound			= aabb;
 }
 
 
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
+	shared_ptr<CohesiveFrictionalMat> mat(new CohesiveFrictionalMat);
 	shared_ptr<Aabb> aabb(new Aabb);
-	shared_ptr<BoxModel> gBox(new BoxModel);
+// 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
+
 	
 	
 	Quaternionr q;
@@ -218,53 +220,48 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 
 	body->isDynamic			= false;
 	
-	physics->angularVelocity	= Vector3r(0,0,0);
-	physics->velocity		= Vector3r(0,0,0);
-	physics->mass			= extents[0]*extents[1]*extents[2]*density*2; 
-	physics->inertia		= Vector3r(
-							  physics->mass*(extents[1]*extents[1]+extents[2]*extents[2])/3
-							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
-							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
-						);
-	//physics->mass			= 0;
-	//physics->inertia		= Vector3r(0,0,0);
-	physics->se3			= Se3r(position,q);
-	physics->young			= boxYoungModulus;
-	physics->poisson		= boxPoissonRatio;
-	physics->frictionAngle		= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
-	physics->isCohesive		= 1;
+	body->state->angVel		= Vector3r(0,0,0);
+	body->state->vel		= Vector3r(0,0,0);
+// 	NB : mass and inertia not defined because not used, since Box are not dynamics
+	body->state->pos		= position;
+	body->state->ori			= q;
+
+	mat->young		= boxYoungModulus;
+	mat->poisson	= boxPoissonRatio;
+	mat->frictionAngle	= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
+	mat->isCohesive	= 1;
+	body->material = mat;
 
 	aabb->diffuseColor		= Vector3r(1,0,0);
 
-	gBox->extents			= extents;
+/*	gBox->extents			= extents;
 	gBox->diffuseColor		= Vector3r(1,0,0);
 	gBox->wire			= true;
-	gBox->shadowCaster		= false;
+	gBox->shadowCaster		= false;*/
 	
 	iBox->extents			= extents;
 	iBox->diffuseColor		= Vector3r(1,0,0);
 
-	body->bound		= aabb;
-	body->shape	= iBox;
-	body->geometricalModel		= gBox;
-	body->physicalParameters	= physics;
+	body->bound			= aabb;
+	body->shape			= iBox;
+// 	body->geometricalModel		= gBox;
 }
 
 
 void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 {
 
-	shared_ptr<PositionSnapshot> possnap = shared_ptr<PositionSnapshot>(new PositionSnapshot);
-	possnap->list_id.clear();
-	possnap->list_id.push_back(5);
-	possnap->list_id.push_back(10);
-	possnap->outputFile="../data/PosSnapshot";
-
-	shared_ptr<ForceSnapshot> forcesnap = shared_ptr<ForceSnapshot>(new ForceSnapshot);
-	forcesnap->list_id.clear();
-	forcesnap->list_id.push_back(5);
-	forcesnap->list_id.push_back(10);
-	forcesnap->outputFile="../data/ForceSnapshot";
+// 	shared_ptr<PositionSnapshot> possnap = shared_ptr<PositionSnapshot>(new PositionSnapshot);
+// 	possnap->list_id.clear();
+// 	possnap->list_id.push_back(5);
+// 	possnap->list_id.push_back(10);
+// 	possnap->outputFile="../data/PosSnapshot";
+// 
+// 	shared_ptr<ForceSnapshot> forcesnap = shared_ptr<ForceSnapshot>(new ForceSnapshot);
+// 	forcesnap->list_id.clear();
+// 	forcesnap->list_id.push_back(5);
+// 	forcesnap->list_id.push_back(10);
+// 	forcesnap->outputFile="../data/ForceSnapshot";
 
 	shared_ptr<CinemDNCEngine> kinematic = shared_ptr<CinemDNCEngine>(new CinemDNCEngine);
 	kinematic->shearSpeed  = shearSpeed;
@@ -311,28 +308,6 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 // 	rootBody->engines.push_back(forcesnap);
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(boundDispatcher);
-}
-
-
-void SimpleShear::positionRootBody(shared_ptr<Scene>& rootBody) 
-{
-	rootBody->isDynamic		= false;
-	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
-	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
-	physics->se3				= Se3r(Vector3r(0,0,0),q);
-	physics->mass				= 0;
-	physics->velocity			= Vector3r(0,0,0);
-	physics->acceleration			= Vector3r::ZERO;
-		
-	
-	shared_ptr<Aabb> aabb(new Aabb);
-	aabb->diffuseColor			= Vector3r(0,0,1);
-	
-	rootBody->bound		= YADE_PTR_CAST<Bound>(aabb);
-	rootBody->physicalParameters 		= physics;
 }
 
 
@@ -385,18 +360,31 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 	if(importFilename.size() != 0 && filesystem::exists(importFilename) )
 	{
 		ifstream loadFile(importFilename.c_str()); // cree l'objet loadFile de la classe ifstream qui va permettre de lire ce qu'il y a dans importFilename
-		Real zJF;
+
+// 		Real zJF;
+// 		while( !loadFile.eof() )	// tant qu'on n'est pas a la fin du fichier
+// 		{
+// 			BasicSphere s;		// l'elt de la liste sphere_list (= la sphere) que l'on va lire maintenant
+// 			loadFile >> s.first.X();// le X de la position de son centre
+// 			loadFile >>  zJF;
+// 			s.first.Z()=zJF - profondeur/2.0;// le Z de la position de son centre
+// 			loadFile >> s.first.Y();// le Y de la position de son centre
+// 			loadFile >> s.second;	// son rayon
+// 			sphere_list.push_back(s);
+// 			nombre++;
+// 		}
+		Real it;
 		while( !loadFile.eof() )	// tant qu'on n'est pas a la fin du fichier
 		{
 			BasicSphere s;		// l'elt de la liste sphere_list (= la sphere) que l'on va lire maintenant
-			loadFile >> s.first.X();// le X de la position de son centre
-			loadFile >>  zJF;
-			s.first.Z()=zJF - profondeur/2.0;// le Z de la position de son centre
+			loadFile >> it;
+			loadFile >> s.second;	// son rayon	
+			loadFile >> s.first.X();
 			loadFile >> s.first.Y();// le Y de la position de son centre
-			loadFile >> s.second;	// son rayon
+			loadFile >> s.first.Z();// le Z de la position de son centre
 			sphere_list.push_back(s);
 			nombre++;
-		}
+		}		
 		return std::make_pair(std::string("Echantillon correctement genere : " + lexical_cast<string>(nombre) + " billes"),true);
 	}
 	else

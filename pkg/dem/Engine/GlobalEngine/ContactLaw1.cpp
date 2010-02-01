@@ -74,7 +74,7 @@ void ContactLaw1::action(Scene* ncb)
 		Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
 
 		Real un = currentContactGeometry->penetrationDepth; // compte positivement lorsq vraie interpenetration
-// 		cout << "un = " << un << "  previousun = " << previousun << "  previousFn =" << previousFn << endl;
+// 		cout << "un = " << un << " alors que unMax = "<< currentContactPhysics->unMax << " et previousun = " << previousun << " et previousFn =" << previousFn << endl;
 		if(un > currentContactPhysics->unMax)	// on est en charge, et au delà et sur la "droite principale"
 			{
 			Fn = kn*un;
@@ -219,16 +219,6 @@ void ContactLaw1::action(Scene* ncb)
 /////	Real angle_twist(angle * axis.Dot(currentContactGeometry->normal) );
 /////	Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
 //////* no creep	
-////////////////////////////// CREEP START ///////////////////////////
-/////			Real viscosity_twist = viscosity * std::pow((2 * std::min(currentContactGeometry->radius1,currentContactGeometry->radius2)),2) / 16.0;
-/////			Real angle_twist_creeped = angle_twist * (1 - dt/viscosity_twist);
-/////			Quaternionr q_twist(currentContactGeometry->normal , angle_twist);
-/////			//Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist*0.996);
-/////			Quaternionr q_twist_creeped(currentContactGeometry->normal , angle_twist_creeped);
-/////			Quaternionr q_twist_delta(q_twist_creeped * q_twist.Conjugate() );
-/////			// modify the initialRelativeOrientation to substract some twisting
-/////			currentContactPhysics->initialRelativeOrientation = currentContactPhysics->initialRelativeOrientation * q_twist_delta;
-////////////////////////////// CREEP END /////////////////////////////
 /////*/
 /////	Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
 /////
@@ -304,6 +294,7 @@ void ContactLaw1::action(Scene* ncb)
             }
         }
     }
+// 	cout << " En tout :"<< nbreInteracTot << "interactions (reelles)" << endl;
     //cerr << "ncount= " << ncount << endl;//REMOVE
 // 	cout << momentAlwaysElastic << endl;
 // 	cout << "Sur " << nbreInteracTot << " interactions (reelles) " << nbreInteracMomPlastif << " se sont vues corriger leur moment" << endl;

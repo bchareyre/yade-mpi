@@ -49,7 +49,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_FrictPhys_Basic);
 
 This class serves also as tutorial and is documented in detail at
 
-	http://yade.wikia.com/wiki/ConstitutiveLawHowto
+	https://yade-dem.org/index.php/ConstitutiveLawHowto
 */
 class Law2_Dem3DofGeom_FrictPhys_Basic: public LawFunctor{
 	public:

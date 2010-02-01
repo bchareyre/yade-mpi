@@ -63,7 +63,6 @@ class SimpleShear : public FileGenerator
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius);
 		void createActors(shared_ptr<Scene>& rootBody);
-		void positionRootBody(shared_ptr<Scene>& rootBody);
 		//method to create a list (containing the positions of centers and radii) of n non interpenetrating spheres, occupying a rectangle with a given (rather high) porosity (issued from TriaxialTest) :
 		string GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowerCorner,Vector3r upperCorner,long number,Real rad_std_dev, Real porosity);
 // 		to create the same list but by reading a text file containing the informations :

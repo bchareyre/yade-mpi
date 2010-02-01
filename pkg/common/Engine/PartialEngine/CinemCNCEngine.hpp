@@ -47,7 +47,6 @@ class CinemCNCEngine : public PartialEngine
 
 		int	temoin,it_stop
 			,it_depart	// the number of the first it at which plates are moved
-			,k		// plates are moved only all "k" iterations to let the sample relax
 			;
 		Vector3r prevF_sup;	// the force acting on the upper plate at the previous time step
 					
@@ -61,7 +60,7 @@ class CinemCNCEngine : public PartialEngine
 		shared_ptr<Body> boxbas;
 	public :
 		CinemCNCEngine();
-		void	applyCondition(Body * body)
+		void	applyCondition(Scene * body)
 			,computeAlpha()
 			;
 
@@ -70,6 +69,10 @@ class CinemCNCEngine : public PartialEngine
 			,max_vel	// to compute the maximum correction displacement that could be imposed in one time step to the upper plate
 			,wallDamping
 			;
+
+		std::vector<Real>	gamma_save	// the values of gamma, in meters, at which a save is performed
+					,temoin_save
+					;
 
 		bool LOG;		//controls messages output on screen
 
@@ -84,8 +87,8 @@ class CinemCNCEngine : public PartialEngine
 
 
 	protected :
-		REGISTER_ATTRIBUTES(PartialEngine,(shearSpeed)(gammalim)(prevF_sup)(firstRun)(id_boxhaut)(id_boxbas)(id_boxleft)(id_boxright)(id_boxfront)(id_boxback)(Y0)(F_0)(k)(max_vel)(wallDamping)(Key)(LOG)(coeff_dech));
-		void letMove(Body* body);
+		REGISTER_ATTRIBUTES(PartialEngine,(shearSpeed)(gammalim)(gamma)(gamma_save)(temoin_save)(prevF_sup)(firstRun)(id_boxhaut)(id_boxbas)(id_boxleft)(id_boxright)(id_boxfront)(id_boxback)(Y0)(F_0)(max_vel)(wallDamping)(Key)(LOG)(coeff_dech));
+		void letMove(Scene* body);
 		void computeDu(Scene* ncb);
 		void stopMovement();		// to cancel all the velocities when gammalim is reached
 		void computeStiffness(Scene* ncb);
