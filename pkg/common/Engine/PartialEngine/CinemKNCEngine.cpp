@@ -5,11 +5,12 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-YADE_REQUIRE_FEATURE(physpar)
+
 
 
 #include "CinemKNCEngine.hpp"
-#include<yade/pkg-common/RigidBodyParameters.hpp>
+// #include<yade/pkg-common/RigidBodyParameters.hpp>
+#include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Scene.hpp>
@@ -38,7 +39,7 @@ CinemKNCEngine::CinemKNCEngine() : leftbox(new Body), rightbox(new Body), frontb
 }
 
 
-void CinemKNCEngine::applyCondition(Body * body)
+void CinemKNCEngine::applyCondition(Scene * ncb)
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;
 	leftbox = Body::byId(id_boxleft);
@@ -52,7 +53,7 @@ void CinemKNCEngine::applyCondition(Body * body)
 
 	if(gamma<=gammalim)
 	{
-		letMove(body);
+		letMove(ncb);
 		if(temoin==0)
 		{
 			temoin=1;
@@ -73,9 +74,8 @@ void CinemKNCEngine::applyCondition(Body * body)
 
 }
 
-void CinemKNCEngine::letMove(Body * body)
+void CinemKNCEngine::letMove(Scene * ncb)
 {
-	Scene * ncb = YADE_CAST<Scene*>(body);
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	if(LOG) cout << "It : " << Omega::instance().getCurrentIteration() << endl;
@@ -85,28 +85,23 @@ void CinemKNCEngine::letMove(Body * body)
 	Real dx = shearSpeed * dt;
 
 
-	Real Ysup = (topbox->physicalParameters.get())->se3.position.Y();
-	Real Ylat = (leftbox->physicalParameters.get())->se3.position.Y();
+	Real Ysup = topbox->state->pos.Y();
+	Real Ylat = leftbox->state->pos.Y();
 
 // 	Changes in vertical and horizontal position :
 
-	(topbox->physicalParameters.get())->se3.position += Vector3r(dx,deltaH,0);
+	topbox->state->pos += Vector3r(dx,deltaH,0);
 
-	(leftbox->physicalParameters.get())->se3.position += Vector3r(dx/2.0,deltaH/2.0,0);
-	(rightbox->physicalParameters.get())->se3.position += Vector3r(dx/2.0,deltaH/2.0,0);
+	leftbox->state->pos += Vector3r(dx/2.0,deltaH/2.0,0);
+	rightbox->state->pos += Vector3r(dx/2.0,deltaH/2.0,0);
 	
-	Real Ysup_mod = (topbox->physicalParameters.get())->se3.position.Y();
-	Real Ylat_mod = (leftbox->physicalParameters.get())->se3.position.Y();
+	Real Ysup_mod = topbox->state->pos.Y();
+	Real Ylat_mod = leftbox->state->pos.Y();
 
 //	with the corresponding velocities :
-	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(topbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed,deltaH/dt,0);
-
-	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed/2.0,deltaH/(2.0*dt),0);
-
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed/2.0,deltaH/(2.0*dt),0);
+	topbox->state->vel = Vector3r(shearSpeed,deltaH/dt,0);
+	leftbox->state->vel = Vector3r(shearSpeed/2.0,deltaH/(2.0*dt),0);
+	rightbox->state->vel = Vector3r(shearSpeed/2.0,deltaH/(2.0*dt),0);
 
 //	Then computation of the angle of the rotation to be done :
 	if (alpha == Mathr::PI/2.0)	// Case of the very beginning
@@ -124,15 +119,11 @@ void CinemKNCEngine::letMove(Body * body)
 	if(LOG)
 		cout << "Quaternion associe a la rotation incrementale : " << qcorr.W() << " " << qcorr.X() << " " << qcorr.Y() << " " << qcorr.Z() << endl;
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
-	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;
-	if(LOG)
-		cout << "Quaternion d'orientation plaq gauche apres correc : "<<rb->se3.orientation.W() << " " << rb->se3.orientation.X() << " " << rb->se3.orientation.Y() << " " << rb->se3.orientation.Z() << endl;
-	rb->angularVelocity	= Vector3r(0,0,1)*dalpha/dt;
+	leftbox->state->ori	= qcorr*leftbox->state->ori;
+	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;
-	rb->angularVelocity	= Vector3r(0,0,1)*dalpha/dt;
+	rightbox->state->ori	= qcorr*rightbox->state->ori;
+	rightbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
 	gamma+=dx;
 }
@@ -140,8 +131,8 @@ void CinemKNCEngine::letMove(Body * body)
 void CinemKNCEngine::computeAlpha()
 {
 	Quaternionr orientationLeftBox,orientationRightBox;
-	orientationLeftBox = (dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get()) )->se3.orientation;
-	orientationRightBox = (dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get()) )->se3.orientation;
+	orientationLeftBox = leftbox->state->ori;
+	orientationRightBox = rightbox->state->ori;
 	if(orientationLeftBox!=orientationRightBox)
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
@@ -170,13 +161,13 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 				{
 					myLdc =  YADE_PTR_CAST<RockJointLaw> ( *itFirst );
 					coeff_dech = myLdc ->coeff_dech;
-					if(LOG) cout << "My ContactLaw engine found, de coeff_dech = " << coeff_dech << endl;
+					if(LOG) cout << "RockJointLaw engine found, with coeff_dech = " << coeff_dech << endl;
 				}
 			}
 		}
 
 		alpha=Mathr::PI/2.0;;
-		Y0 = (topbox->physicalParameters.get())->se3.position.Y();
+		Y0 = topbox->state->pos.Y();
 		cout << "Y0 initialise à : " << Y0 << endl;
 		F_0 = F_sup.Y();
 		prevF_sup=F_sup;
@@ -184,17 +175,17 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 	}
 		
 // Computation of the current dimensions of the box : //
-	Real Xleft = (leftbox->physicalParameters.get())->se3.position.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
-	Real Xright = (rightbox->physicalParameters.get())->se3.position.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
+	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
+	Real Xright = rightbox->state->pos.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
 
-	Real Zfront = (frontbox->physicalParameters.get())->se3.position.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
-	Real Zback = (backbox->physicalParameters.get())->se3.position.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
+	Real Zfront = frontbox->state->pos.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
+	Real Zback = backbox->state->pos.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //
 
 	computeStiffness(ncb);
-	Real Hcurrent = (topbox->physicalParameters.get())->se3.position.Y();
+	Real Hcurrent = topbox->state->pos.Y();
 	Real Fdesired = F_0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired
 
 // Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de RockJointLaw :
@@ -230,18 +221,15 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 void CinemKNCEngine::stopMovement()
 {
 	// annulation de la vitesse de la plaque du haut
-	RigidBodyParameters * rb = YADE_CAST<RigidBodyParameters*>(topbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
+	topbox->state->vel		=  Vector3r(0,0,0);
 
 	// de la plaque gauche
-	rb = YADE_CAST<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
-	rb->angularVelocity	=  Vector3r(0,0,0);
+	leftbox->state->vel		=  Vector3r(0,0,0);
+	leftbox->state->angVel		=  Vector3r(0,0,0);
 
 	// de la plaque droite
-	rb = YADE_CAST<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
-	rb->angularVelocity	=  Vector3r(0,0,0);
+	rightbox->state->vel		=  Vector3r(0,0,0);
+	rightbox->state->angVel		=  Vector3r(0,0,0);
 }
 
 void CinemKNCEngine::computeStiffness(Scene* ncb)
@@ -275,5 +263,5 @@ void CinemKNCEngine::computeStiffness(Scene* ncb)
 
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+// YADE_REQUIRE_FEATURE(PHYSPAR);
 

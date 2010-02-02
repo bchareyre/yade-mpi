@@ -37,8 +37,8 @@ RockJointLawRelationships::RockJointLawRelationships()
 //
 //
 
-void RockJointLawRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalMat
-					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalMat
+void RockJointLawRelationships::go(	  const shared_ptr<Material>& b1 // CohesiveFrictionalMat
+					, const shared_ptr<Material>& b2 // CohesiveFrictionalMat
 					, const shared_ptr<Interaction>& interaction)
 {
 	CohesiveFrictionalMat* sdec1 = static_cast<CohesiveFrictionalMat*>(b1.get());
@@ -95,10 +95,10 @@ void RockJointLawRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 /
 			{
 			
 				// FIXME - not sure: do I need to repeat it here [1] ?
-				contactPhysics->initialOrientation1	= sdec1->se3.orientation;
-				contactPhysics->initialOrientation2	= sdec2->se3.orientation;
-				contactPhysics->initialPosition1    = sdec1->se3.position;
-				contactPhysics->initialPosition2    = sdec2->se3.position;
+				contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
+				contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
+				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
+				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 				contactPhysics->kr = Kr;
 				contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
@@ -125,10 +125,10 @@ void RockJointLawRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 /
 			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
 
 			// FIXME - or here [1] ?
-			contactPhysics->initialOrientation1	= sdec1->se3.orientation;
-			contactPhysics->initialOrientation2	= sdec2->se3.orientation;
-			contactPhysics->initialPosition1    = sdec1->se3.position;
-			contactPhysics->initialPosition2    = sdec2->se3.position;
+			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
+			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
+			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
+			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 			contactPhysics->kr = Kr;
 			contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
@@ -151,10 +151,10 @@ void RockJointLawRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 /
 			{ 
 				//setCohesionNow = false;
 
-			contactPhysics->initialOrientation1 = sdec1->se3.orientation;
-			contactPhysics->initialOrientation2 = sdec2->se3.orientation;
-			contactPhysics->initialPosition1    = sdec1->se3.position;
-			contactPhysics->initialPosition2    = sdec2->se3.position;
+			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
+			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
+			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
+			contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
 			Real Da 	= interactionGeometry->radius1; // FIXME - multiply by factor of sphere interaction distance (so sphere interacts at bigger range that its geometrical size)
 			Real Db 	= interactionGeometry->radius2; // FIXME - as above
 			Real Kr = betaR*std::pow((Da+Db)/2.0,2)*contactPhysics->ks;
@@ -190,4 +190,4 @@ void RockJointLawRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 /
 };
 YADE_PLUGIN((RockJointLawRelationships));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+// YADE_REQUIRE_FEATURE(PHYSPAR);

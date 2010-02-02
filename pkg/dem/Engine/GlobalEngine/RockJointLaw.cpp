@@ -10,7 +10,6 @@
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/RockJointPhys.hpp>
-#include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -56,8 +55,9 @@ void RockJointLaw::action(Scene* ncb)
 		if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 			continue; // skip other groups,
 
-		CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
-		CohesiveFrictionalMat* de2 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id2]->physicalParameters.get());
+// 		CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
+		State* de1 = Body::byId(id1,ncb)->state.get();
+		State* de2 = Body::byId(id2,ncb)->state.get();
 		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
 		RockJointPhys* currentContactPhysics = YADE_CAST<RockJointPhys*> (contact->interactionPhysics.get());
 
@@ -128,7 +128,7 @@ void RockJointLaw::action(Scene* ncb)
 
 		axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
 		shearForce 	       -= shearForce.Cross(axis);
-		angle 			= dt*0.5*currentContactGeometry->normal.Dot(de1->angularVelocity+de2->angularVelocity);
+		angle 			= dt*0.5*currentContactGeometry->normal.Dot(de1->angVel+de2->angVel);
 		axis 			= angle*currentContactGeometry->normal;
 		shearForce 	       -= shearForce.Cross(axis);
 
@@ -142,7 +142,7 @@ void RockJointLaw::action(Scene* ncb)
                 //
                 // 		currentContactPhysics->shearForce	= currentContactPhysics->shearForce*q;
                 //
-                // 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angularVelocity+de2->angularVelocity);
+                // 		angle					= dt*0.5*currentContactGeometry->normal.dot(de1->angVel+de2->angVel);
                 // 		axis					= currentContactGeometry->normal;
                 // 		q.fromAngleAxis(angle,axis);
                 // 		currentContactPhysics->shearForce	= q*currentContactPhysics->shearForce;
@@ -158,7 +158,7 @@ void RockJointLaw::action(Scene* ncb)
 		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
                 Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
                 Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
-                Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
+                Vector3r relativeVelocity		= (de2->vel+de2->angVel.Cross(_c2x_)) - (de1->vel+de1->angVel.Cross(_c1x_));
                 Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
                 Vector3r shearDisplacement		= shearVelocity*dt;
 
@@ -307,5 +307,5 @@ void RockJointLaw::action(Scene* ncb)
 
 YADE_PLUGIN((RockJointLaw));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+// YADE_REQUIRE_FEATURE(PHYSPAR);
 

@@ -6,7 +6,6 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/yadeWm3Extra.hpp>
 #include<yade/lib-miniWm3/Wm3Math.h>
@@ -28,7 +27,7 @@ CinemDNCEngine::CinemDNCEngine() : leftbox(new Body), rightbox(new Body), topbox
 }
 
 
-void CinemDNCEngine::applyCondition(Scene * body)
+void CinemDNCEngine::applyCondition(Scene * ncb)
 {
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);
@@ -63,30 +62,25 @@ void CinemDNCEngine::applyCondition(Scene * body)
 }
 
 
-void CinemDNCEngine::letMove(MetaBody * ncb)
+void CinemDNCEngine::letMove(Scene * ncb)
 {
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 	Real dt = Omega::instance().getTimeStep();
 	Real dx = shearSpeed * dt;
 
-	(topbox->physicalParameters.get())->se3.position += Vector3r(dx,0,0);
+	topbox->state->pos += Vector3r(dx,0,0);
 
-	(leftbox->physicalParameters.get())->se3.position += Vector3r(dx/2.0,0,0);
-	(rightbox->physicalParameters.get())->se3.position += Vector3r(dx/2.0,0,0);
+	leftbox->state->pos += Vector3r(dx/2.0,0,0);
+	rightbox->state->pos += Vector3r(dx/2.0,0,0);
 
-	Real Ysup = (topbox->physicalParameters.get())->se3.position.Y();
-	Real Ylat = (leftbox->physicalParameters.get())->se3.position.Y();
+	Real Ysup = topbox->state->pos.Y();
+	Real Ylat = leftbox->state->pos.Y();
 
 
 //	with the corresponding velocities :
-	RigidBodyParameters * rb = dynamic_cast<RigidBodyParameters*>(topbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed,0,0);
-
-	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed/2.0,0,0);
-
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->velocity = Vector3r(shearSpeed/2.0,0,0);
+	topbox->state->vel = Vector3r(shearSpeed,0,0);
+	leftbox->state->vel = Vector3r(shearSpeed/2.0,0,0);
+	rightbox->state->vel = Vector3r(shearSpeed/2.0,0,0);
 
 //	Then computation of the angle of the rotation to be done :
 	computeAlpha();
@@ -104,13 +98,11 @@ void CinemDNCEngine::letMove(MetaBody * ncb)
 	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
 
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
-	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;
-	rb->angularVelocity	= Vector3r(0,0,1)*dalpha/dt;
+	leftbox->state->ori	= qcorr*leftbox->state->ori;
+	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;
-	rb->angularVelocity	= Vector3r(0,0,1)*dalpha/dt;
+	rightbox->state->ori	= qcorr*rightbox->state->ori;
+	rightbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
 
 	gamma+=dx;
 }
@@ -119,8 +111,8 @@ void CinemDNCEngine::letMove(MetaBody * ncb)
 void CinemDNCEngine::computeAlpha()
 {
 	Quaternionr orientationLeftBox,orientationRightBox;
-	orientationLeftBox = (dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get()) )->se3.orientation;
-	orientationRightBox = (dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get()) )->se3.orientation;
+	orientationLeftBox = leftbox->state->ori;
+	orientationRightBox = rightbox->state->ori;
 	if(orientationLeftBox!=orientationRightBox)
 	{
 		cout << "WARNING !!! your lateral boxes have not the same orientation, you're not in the case of a box imagined for creating these engines" << endl;
@@ -134,20 +126,17 @@ void CinemDNCEngine::computeAlpha()
 void CinemDNCEngine::stopMovement()
 {
 	// annulation de la vitesse de la plaque du haut
-	RigidBodyParameters * rb = YADE_CAST<RigidBodyParameters*>(topbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
+	topbox->state->vel	=  Vector3r(0,0,0);
 
 	// de la plaque gauche
-	rb = YADE_CAST<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
-	rb->angularVelocity	=  Vector3r(0,0,0);
+	leftbox->state->vel	=  Vector3r(0,0,0);
+	leftbox->state->angVel	=  Vector3r(0,0,0);
 
 	// de la plaque droite
-	rb = YADE_CAST<RigidBodyParameters*>(rightbox->physicalParameters.get());
-	rb->velocity		=  Vector3r(0,0,0);
-	rb->angularVelocity	=  Vector3r(0,0,0);
+	rightbox->state->vel	=  Vector3r(0,0,0);
+	rightbox->state->angVel	=  Vector3r(0,0,0);
 }
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+// YADE_REQUIRE_FEATURE(PHYSPAR);
 
