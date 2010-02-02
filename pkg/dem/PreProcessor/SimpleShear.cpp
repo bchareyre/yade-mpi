@@ -47,7 +47,7 @@
 #include<yade/core/Body.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-#include<yade/pkg-common/StateMetaEngine.hpp>
+// #include<yade/pkg-common/StateMetaEngine.hpp>
 
 #include <boost/filesystem/convenience.hpp>
 #include <utility>

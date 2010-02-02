@@ -48,5 +48,5 @@ RockJointPhys::~RockJointPhys()
 
 YADE_PLUGIN((RockJointPhys));
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+// YADE_REQUIRE_FEATURE(PHYSPAR);
 
