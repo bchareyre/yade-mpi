@@ -337,7 +337,7 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowe
 			if (!overlap)
 			{
 				sphere_list.push_back(s);
-				cout << "j'ai bien rajoute une sphere dans la liste" << endl;
+// 				cout << "j'ai bien rajoute une sphere dans la liste" << endl;
 				break;
 			}
 		}
@@ -396,5 +396,5 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
+// YADE_REQUIRE_FEATURE(PHYSPAR);
 
