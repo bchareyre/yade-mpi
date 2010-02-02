@@ -94,12 +94,9 @@ class Shop{
 		//! Calculate inscribed circle center of trianlge
 		static Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vector3r& v2);
 
-		#ifdef YADE_PHYSPAR
 		/// Get viscoelastic parameters kn,cn,ks,cs from analytical solution of
 		/// a problem of interaction of pair spheres with mass m, collision
 		/// time tc and restitution coefficients en,es.
-	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticBodyParameters> b);
-		#endif
 	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticMat> b);
 
 		//! Get unbalanced force of the whole simulation

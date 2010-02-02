@@ -358,7 +358,6 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		shared_ptr<Wall> wall(new Wall);
 		wall->sense=0; // interact from both sides, since unspecified here
 		wall->axis=ax0;
-		// Wall has no geometricalModel, skip assignment to body->geometricalModel
 		body->shape=wall;
 	}
 }

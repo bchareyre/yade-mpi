@@ -344,14 +344,6 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	iSphere->wire			= false;
 	
 	body->shape	= iSphere;
-// 	#ifdef YADE_GEOMETRICALMODEL
-// 		gSphere->radius			= radius;
-// 	//	gSphere->diffuseColor		= ((int)(position[0]*400.0))%2?Vector3r(0.7,0.7,0.7):Vector3r(0.45,0.45,0.45);
-// 		gSphere->diffuseColor		= spheresColor;
-// 		gSphere->wire			= false;
-// 		gSphere->shadowCaster		= true;
-// 		body->geometricalModel		= gSphere;
-// 	#endif
 	body->bound		= aabb;
 	body->material	= physics;
 }

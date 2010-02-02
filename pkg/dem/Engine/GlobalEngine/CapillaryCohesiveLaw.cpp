@@ -22,8 +22,6 @@
 #include <Wm3Vector3.h>
 #include <yade/lib-base/yadeWm3.hpp>
 
-#include <yade/core/GeometricalModel.hpp>
-
 
 #include <iostream>
 #include <fstream>
@@ -31,7 +29,7 @@
 using namespace std;
 
 
-CapillaryCohesiveLaw::CapillaryCohesiveLaw() : InteractionSolver()
+CapillaryCohesiveLaw::CapillaryCohesiveLaw() : GlobalEngine()
 {
         sdecGroupMask=1;
 

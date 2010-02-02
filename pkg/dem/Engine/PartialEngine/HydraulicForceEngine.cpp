@@ -77,7 +77,6 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
                     {
 								ncb->forces.addForce(b->getId(),Vector3r(0,5,0));
                     }
-                    // else  b->geometricalModel->diffuseColor= Vector3r(0.5,0.9,0.3);
                 }
             }
         }

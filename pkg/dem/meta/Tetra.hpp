@@ -6,7 +6,7 @@
 
 #include<yade/core/Shape.hpp>
 #include<yade/core/InteractionGeometry.hpp>
-#include<yade/core/InteractionSolver.hpp>
+#include<yade/core/GlobalEngine.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/BoundFunctor.hpp>
@@ -99,18 +99,18 @@ REGISTER_SERIALIZABLE(TetraAABB);
 
 /*! Calculate physical response based on penetration configuration given by TetraBang. */
 
-class TetraLaw: public InteractionSolver {
+class TetraLaw: public GlobalEngine {
 	public:
-		TetraLaw():InteractionSolver(){};
+		TetraLaw():GlobalEngine(){};
 
 		int sdecGroupMask; // probably unused?!
 
 		void action(Scene*);
 
 	DECLARE_LOGGER;
-	REGISTER_ATTRIBUTES(InteractionSolver,/* nothing*/);
+	REGISTER_ATTRIBUTES(GlobalEngine,/* nothing*/);
 	REGISTER_CLASS_NAME(TetraLaw);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 REGISTER_SERIALIZABLE(TetraLaw);
 

@@ -74,8 +74,6 @@ void TriaxialStateRecorder::action (Scene * ncb )
 	{
 		const shared_ptr<Body>& b = *bi;
 
-		//int geometryIndex = b->geometricalModel->getClassIndex();
-
 		if ( b->isDynamic )
 		{
 			const Vector3r& v = b->state->vel;

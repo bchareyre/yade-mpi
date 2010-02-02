@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include<yade/core/InteractionSolver.hpp>
+#include<yade/core/GlobalEngine.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
 
-class CohesiveFrictionalContactLaw : public InteractionSolver
+class CohesiveFrictionalContactLaw : public GlobalEngine
 {
 /// Attributes
 	public :
@@ -27,9 +27,9 @@ class CohesiveFrictionalContactLaw : public InteractionSolver
 		CohesiveFrictionalContactLaw();
 		void action(Scene*);
 
-	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(erosionActivated)(detectBrokenBodies)(always_use_moment_law)(shear_creep)(twist_creep)(creep_viscosity));
+	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(erosionActivated)(detectBrokenBodies)(always_use_moment_law)(shear_creep)(twist_creep)(creep_viscosity));
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactLaw);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(CohesiveFrictionalContactLaw);

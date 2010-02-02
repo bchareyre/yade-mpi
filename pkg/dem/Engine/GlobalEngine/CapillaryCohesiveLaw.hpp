@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <yade/core/InteractionSolver.hpp>
+#include <yade/core/GlobalEngine.hpp>
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
@@ -68,7 +68,7 @@ class BodiesMenisciiList
 };
 
 
-class CapillaryCohesiveLaw : public InteractionSolver
+class CapillaryCohesiveLaw : public GlobalEngine
 {
 	public :
 		int sdecGroupMask;
@@ -81,10 +81,10 @@ class CapillaryCohesiveLaw : public InteractionSolver
 						
 		CapillaryCohesiveLaw();
 		void action(Scene * ncb);
-		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(CapillaryPressure)(fusionDetection)(binaryFusion));
+		REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(CapillaryPressure)(fusionDetection)(binaryFusion));
 		virtual void postProcessAttributes(bool deserializing);
 	REGISTER_CLASS_NAME(CapillaryCohesiveLaw);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 
 };
 

@@ -16,7 +16,7 @@
 Vector3r translation_vect_ ( 0.10,0,0 );
 
 
-CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : InteractionSolver()
+CohesiveFrictionalContactLaw::CohesiveFrictionalContactLaw() : GlobalEngine()
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;

@@ -320,7 +320,6 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
 		if ( ( *bi )->isDynamic )
 		{
 			( static_cast<Sphere*> ( ( *bi )->shape.get() ) )->radius *= multiplier;
-			//( static_cast<SphereModel*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
 				(*bi)->state->mass*=pow(multiplier,3);
 				(*bi)->state->inertia*=pow(multiplier,5);
 

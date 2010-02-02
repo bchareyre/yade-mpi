@@ -35,7 +35,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'PartialEngine.cpp',
 			'FileGenerator.cpp',
 			'FrontEnd.cpp',
-			'GeometricalModel.cpp',
 			'Shape.cpp',
 			'Interaction.cpp',
 			'InteractionContainer.cpp',
@@ -54,7 +53,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'containers/InteractionVecMap.cpp',
 			'corePlugins.cpp'			
 			]
-			+(['PhysicalParameters.cpp'] if 'physpar' in env['features'] else [])
 			),
 		LIBS=env['LIBS']+[
 			'yade-support',

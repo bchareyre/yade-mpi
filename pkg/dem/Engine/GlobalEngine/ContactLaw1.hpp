@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/InteractionSolver.hpp>
+#include<yade/core/GlobalEngine.hpp>
 
 #include <set>
 #include <boost/tuple/tuple.hpp>
@@ -26,7 +26,7 @@ To use it you should also use :
  */
 
 
-class ContactLaw1 : public InteractionSolver
+class ContactLaw1 : public GlobalEngine
 {
 /// Attributes
 	public :
@@ -37,9 +37,9 @@ class ContactLaw1 : public InteractionSolver
 	
 		ContactLaw1();
 		void action(Scene*);
-	REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
+	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
 	REGISTER_CLASS_NAME(ContactLaw1);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(ContactLaw1);

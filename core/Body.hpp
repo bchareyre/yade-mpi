@@ -10,7 +10,6 @@
 #pragma once
 
 #include<iostream>
-#include"GeometricalModel.hpp"
 #include"Shape.hpp"
 #include"Bound.hpp"
 #include"State.hpp"

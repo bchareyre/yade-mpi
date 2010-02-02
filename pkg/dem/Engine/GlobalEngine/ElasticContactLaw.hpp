@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/InteractionSolver.hpp>
+#include<yade/core/GlobalEngine.hpp>
 
 // only to see whether SCG_SHEAR is defined, may be removed in the future
 #include<yade/pkg-dem/ScGeom.hpp>
@@ -70,7 +70,7 @@ class Law2_Dem6DofGeom_FrictPhys_Beam: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_Dem6DofGeom_FrictPhys_Beam);
 
-class ElasticContactLaw : public InteractionSolver
+class ElasticContactLaw : public GlobalEngine
 {
 /// Attributes
 	private :
@@ -88,13 +88,13 @@ class ElasticContactLaw : public InteractionSolver
 
 		shared_ptr<Law2_ScGeom_FrictPhys_Basic> functor;
 
-		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(momentRotationLaw)(neverErase)
+		REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(neverErase)
 		#ifdef SCG_SHEAR
 			(useShear)
 		#endif
 	);
 	REGISTER_CLASS_NAME(ElasticContactLaw);
-	REGISTER_BASE_CLASS_NAME(InteractionSolver);
+	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(ElasticContactLaw);

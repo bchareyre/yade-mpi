@@ -19,7 +19,7 @@
 Vector3r translation_vect (0.10,0,0);
 
 
-ContactLaw1::ContactLaw1() : InteractionSolver()
+ContactLaw1::ContactLaw1() : GlobalEngine()
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;

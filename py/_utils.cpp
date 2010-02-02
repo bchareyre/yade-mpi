@@ -426,9 +426,6 @@ BOOST_PYTHON_MODULE(_utils){
 	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));
 	def("elasticEnergy",elasticEnergyInAABB);
 	def("inscribedCircleCenter",inscribedCircleCenter);
-	#ifdef YADE_PHYSPAR
-		def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
-	#endif
 	def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
 	def("kineticEnergy",Shop__kineticEnergy);

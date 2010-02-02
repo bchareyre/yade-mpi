@@ -1123,19 +1123,6 @@ Vector3r Shop::inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, con
 	return v0+((v2-v0)*(v1-v0).Length()+(v1-v0)*(v2-v0).Length())/((v1-v0).Length()+(v2-v1).Length()+(v0-v2).Length());
 }
 
-#ifdef YADE_PHYSPAR
-void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticBodyParameters> b)
-{
-    b->kn = m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(en),2) );
-    b->cn = -2.0*m/tc * Mathr::Log(en);
-    b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
-    b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
-
-    if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
-    if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
-}
-#endif
-
 void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticMat> b)
 {
     b->kn = m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(en),2) );
