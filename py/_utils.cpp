@@ -171,20 +171,6 @@ Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vec
 {
 	return Shop::inscribedCircleCenter(v0,v1,v2);
 }
-#ifdef YADE_PHYSPAR
-#include<yade/pkg-dem/SimpleViscoelasticBodyParameters.hpp>
-	python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
-	{
-		 shared_ptr<SimpleViscoelasticBodyParameters> b = shared_ptr<SimpleViscoelasticBodyParameters>(new SimpleViscoelasticBodyParameters());
-		 Shop::getViscoelasticFromSpheresInteraction(m,tc,en,es,b);
-		python::dict d;
-		d["kn"]=b->kn;
-		d["cn"]=b->cn;
-		d["ks"]=b->ks;
-		d["cs"]=b->cs;
-		 return d;
-	}
-#endif
 python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
 {
 	shared_ptr<SimpleViscoelasticMat> b = shared_ptr<SimpleViscoelasticMat>(new SimpleViscoelasticMat());

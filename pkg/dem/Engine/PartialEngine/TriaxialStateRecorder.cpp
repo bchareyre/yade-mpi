@@ -13,7 +13,6 @@
 //#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/pkg-common/Sphere.hpp>
-//#include <yade/pkg-common/SphereModel.hpp>
 
 //#include <yade/pkg-dem/ScGeom.hpp>
 //#include <yade/pkg-dem/FrictPhys.hpp>

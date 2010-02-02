@@ -11,10 +11,6 @@
 #include<yade/pkg-common/SpatialQuickSortCollider.hpp>
 #include<yade/pkg-dem/STLImporter.hpp>
 #include<yade/pkg-common/Facet.hpp>
-#ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/FacetModel.hpp>
-	#include<yade/pkg-common/SphereModel.hpp>
-#endif
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
@@ -179,15 +175,6 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 
-	#ifdef YADE_GEOMETRICALMODEL
-		shared_ptr<SphereModel> gSphere(new SphereModel);
-		gSphere->radius			= radius;
-		gSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
-		gSphere->wire			= false;
-		gSphere->shadowCaster		= true;
-		body->geometricalModel		= gSphere;
-	#endif
-	
 	iSphere->radius			= radius;
 	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
 

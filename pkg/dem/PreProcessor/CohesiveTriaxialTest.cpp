@@ -19,10 +19,6 @@
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
-#ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/SphereModel.hpp>
-	#include<yade/pkg-common/BoxModel.hpp>
-#endif
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
@@ -290,9 +286,6 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
 	shared_ptr<Aabb> aabb(new Aabb);
-// 	#ifdef YADE_GEOMETRICALMODEL
-// 		shared_ptr<SphereModel> gSphere(new SphereModel);
-// 	#endif
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());

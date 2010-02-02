@@ -34,19 +34,9 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 		Vector3r icc = Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<Facet> iFacet(new Facet);
 		iFacet->diffuseColor    = Vector3r(0.8,0.3,0.3);
-		#ifdef YADE_GEOMETRICALMODEL
-			shared_ptr<FacetModel> gFacet(new FacetModel);
-			gFacet->diffuseColor    = Vector3r(0.5,0.5,0.5);
-			gFacet->wire	    = wire;
-			gFacet->shadowCaster    = true;
-			(*bodies)[b_id]->geometricalModel	= gFacet;
-		#endif
 		for (int j=0; j<3; ++j)
 		{   
 				iFacet->vertices.push_back(v[j]-icc);
-				#ifdef YADE_GEOMETRICALMODEL
-					gFacet->vertices.push_back(v[j]-icc);
-				#endif
 		}
 		//iFacet->postProcessAttributes(true); //postProcessAttributes is protected
 		shared_ptr<Body> b(new Body());

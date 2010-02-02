@@ -48,7 +48,6 @@
 #include<yade/pkg-common/Aabb.hpp>
 
 #include<yade/pkg-common/BoundFunctor.hpp>
-#include<yade/pkg-common/InteractingGeometryEngineUnit.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>

@@ -13,11 +13,6 @@
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
 
-#ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/SphereModel.hpp>
-	#include<yade/pkg-common/BoxModel.hpp>
-#endif
-
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ElastMat.hpp>

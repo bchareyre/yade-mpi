@@ -13,9 +13,6 @@
 #include"GeometricalModel.hpp"
 #include"Shape.hpp"
 #include"Bound.hpp"
-#ifdef YADE_PHYSPAR
-	#include"PhysicalParameters.hpp"
-#endif
 #include"State.hpp"
 #include"Material.hpp"
 
@@ -73,19 +70,10 @@ class Body : public Serializable
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
-		#ifdef YADE_PHYSPAR
-			/// here are stored physical things that describe the Body: mass, stiffness
-			shared_ptr<PhysicalParameters>	physicalParameters;
-		#else
-			//! material of the body; might be shared among bodies (via shared_ptr)
-			shared_ptr<Material> material;
-			//! state of the body
-			shared_ptr<State> state;
-		#endif
-		#ifdef YADE_GEOMETRICALMODEL
-			/// the 'perfect' representation of body's geometry: Polyhedron, BoxModel
-			shared_ptr<GeometricalModel>	geometricalModel;
-		#endif
+		//! material of the body; might be shared among bodies (via shared_ptr)
+		shared_ptr<Material> material;
+		//! state of the body
+		shared_ptr<State> state;
 		/// description of how this body interacts with others, like: SphereHierarchy, Box
 		shared_ptr<Shape> shape;
 		/// Bound is used for quick detection of potential interactions, that can be: Aabb, K-Dop

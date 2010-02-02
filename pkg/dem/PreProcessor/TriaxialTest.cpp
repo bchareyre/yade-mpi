@@ -353,12 +353,6 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
 		iFacet->diffuseColor=Vector3r(1,1,1);
 		body->shape=iFacet;
-		#ifdef YADE_GEOMETRICALMODEL
-			shared_ptr<FacetModel> facet(new FacetModel);
-			for(int i=0; i<3; i++){ facet->vertices.push_back(v[i]-cog);}
-			facet->wire=true;
-			body->geometricalModel=facet;
-		#endif
 	}
 	if(wallWalls){
 		shared_ptr<Wall> wall(new Wall);

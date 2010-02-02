@@ -16,9 +16,6 @@
 
 
 #include<yade/core/Scene.hpp>
-#ifdef YADE_GEOMETRICALMODEL
-	#include<yade/pkg-common/SphereModel.hpp>
-#endif
 
 CREATE_LOGGER(TriaxialStressController);
 
@@ -324,9 +321,6 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
 		{
 			( static_cast<Sphere*> ( ( *bi )->shape.get() ) )->radius *= multiplier;
 			//( static_cast<SphereModel*> ( ( *bi )->geometricalModel.get() ) )->radius *= multiplier;
-			#ifdef YADE_GEOMETRICALMODEL
-				SphereModel* s = dynamic_cast<SphereModel*> ( ( *bi )->geometricalModel.get() ); if(s) s->radius *= multiplier;
-			#endif
 				(*bi)->state->mass*=pow(multiplier,3);
 				(*bi)->state->inertia*=pow(multiplier,5);
 

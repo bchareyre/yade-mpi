@@ -362,9 +362,6 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
 	shared_ptr<FrictMat> physics(new FrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
-// 	#ifdef YADE_GEOMETRICALMODEL
-// 		shared_ptr<BoxModel> gBox(new BoxModel);	
-// 	#endif
 	shared_ptr<Box> iBox(new Box);
 	
 	Quaternionr q;

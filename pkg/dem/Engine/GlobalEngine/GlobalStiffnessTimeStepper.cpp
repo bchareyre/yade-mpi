@@ -39,8 +39,6 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 {
 	const State* sdec=body->state.get();
 	
-	// SphereModel* sphere = static_cast<SphereModel*>(body->geometricalModel.get());
-	
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
 
