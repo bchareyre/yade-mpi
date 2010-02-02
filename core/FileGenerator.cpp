@@ -7,15 +7,12 @@
 #include<yade/lib-multimethods/MultiMethodsExceptions.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 
+#include<yade/core/Omega.hpp>
+#include<yade/lib-pyutil/gil.hpp>
+
 #include"FileGenerator.hpp"
 
 CREATE_LOGGER(FileGenerator);
-
-FileGenerator::FileGenerator () : Serializable() 
-{
-	outputFileName = "./scene.xml";
-	serializationDynlib = "XMLFormatManager";
-}
 
 
 FileGenerator::~FileGenerator () 
@@ -95,3 +92,16 @@ void FileGenerator::singleAction()
 	setReturnValue(st);
 };
 
+void FileGenerator::pyGenerate(const string& out){
+	setFileName(out);
+	bool ret=generateAndSave();
+	LOG_INFO((ret?"SUCCESS:\n":"FAILURE:\n")<<message);
+	if(ret==false) throw runtime_error(getClassName()+" reported error: "+message);
+}
+void FileGenerator::pyLoad(){
+	string xml(Omega::instance().tmpFilename()+".xml.bz2");
+	// LOG_DEBUG("Using temp file "<<xml);
+	pyGenerate(xml);
+	//this is ugly hack, yes...
+	pyRunString("yade.wrapper.Omega().load('"+xml+"')");
+}

@@ -629,11 +629,11 @@ BOOST_PYTHON_MODULE(wrapper)
 	// expose indexable class, with access to the index
 	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("dispIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").def("dispHierarchy",&Indexable_getClassIndices<className>,(python::arg("names")=true),"Return list of dispatch classes (from down upwards), starting with the class instance itself, top-level indexable at last. If names is true (default), return class names rather than numerical indices.")
 
-
+#if 0
 	EXPOSE_CXX_CLASS(FileGenerator)
 		.def("generate",&FileGenerator_generate,"Generate scene, save to file")
 		.def("load",&FileGenerator_load,"Generate scene, save to temporary file and load immediately");
-
+#endif
 	python::scope().attr("O")=pyOmega();
 }
 

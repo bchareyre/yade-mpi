@@ -35,8 +35,9 @@ def resetData():
 plotDataCollector=None
 from yade import *
 
+# no longer used
 maxDataLen=1000
-
+## no longer used
 def reduceData(l):
 	"""If we have too much data, take every second value and double the step for DateGetterEngine. This will keep the samples equidistant.
 	"""
@@ -69,7 +70,7 @@ def addData(*d_in,**kw):
 	import numpy
 	if len(data)>0: numSamples=len(data[data.keys()[0]])
 	else: numSamples=0
-	reduceData(numSamples)
+	#reduceData(numSamples)
 	nan=float('nan')
 	d=(d_in[0] if len(d_in)>0 else {})
 	d.update(**kw)

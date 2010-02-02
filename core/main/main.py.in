@@ -21,8 +21,8 @@ par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script
 par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
 par.add_option('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
-if 'log4cxx' in features:
-	par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.',action='count',dest='verbosity')
+par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.'+
+	('' if 'log4cxx' in features else " (Since this build doesn't use log4cxx, this option will only have effect if repeated twice (-vv), equivalent to setting YADE_DEBUG environment variable)"),action='count',dest='verbosity')
 if debug:
 	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
 

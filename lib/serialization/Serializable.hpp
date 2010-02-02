@@ -102,7 +102,7 @@ namespace{
 // attrDecl is (type,name,defaultValue,docString)
 #define YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(thisClass,baseClass,docString,attrDecls,ctor,extras) \
 	public: BOOST_PP_SEQ_FOR_EACH(_ATTR_DECL,~,attrDecls) /* attribute declarations */ \
-	thisClass(): BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(attrDecls)),attrDecls) { ctor ; } /* ctor, with initialization of defaults */ \
+	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(attrDecls)),attrDecls) { ctor ; } /* ctor, with initialization of defaults */ \
 	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),extras)
 
 #define YADE_CLASS_BASE_DOC_ATTRS(thisClass,baseClass,docString,attrs) \

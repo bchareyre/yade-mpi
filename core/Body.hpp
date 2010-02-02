@@ -87,10 +87,6 @@ class Body : public Serializable
 		Body ();
 		Body (body_id_t newId, int newGroup);
 
-	// Serialization
-	//protected:
-	//	REGISTER_ATTRIBUTES(Serializable,(id)(groupMask)(isDynamic)(material)(state)(shape)(bound)(clumpId));
-	//REGISTER_CLASS_AND_BASE(Body,Serializable);
 	YADE_CLASS_BASE_DOC_ATTRS_PY(Body,Serializable,"Basic element of simulation; interacts with other bodies.",
 		((id,"[will be overridden]"))((groupMask,"Bitmask for determining interactions"))((isDynamic,"Whether this body will be moved by forces"))((material,"Material instance associated with this body"))((state,"Physical state"))((shape,"Shape of this body"))((bound,"Bound of this body"))((clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see Body().isStandalone, Body().isClump, Body().isClumpMember properties")),
 		.def_readwrite("mat",&Body::material,"Shorthand for material")

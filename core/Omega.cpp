@@ -165,7 +165,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 	/* python classes must be registered such that base classes come before derived ones;
 	for now, just loop until we succeed; proper solution will be to build graphs of classes
 	and traverse it from the top. It will be done once all classes are pythonable. */
-	for(int i=0; i<100; i++){
+	for(int i=0; i<100 && pythonables.size()>0; i++){
 		if(getenv("YADE_DEBUG")) cerr<<endl<<"[[[ Round "<<i<<" ]]]: ";
 		std::list<string> done;
 		for(std::list<string>::iterator I=pythonables.begin(); I!=pythonables.end(); ){

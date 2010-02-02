@@ -22,24 +22,6 @@ YADE_PLUGIN((VTKRecorder));
 YADE_REQUIRE_FEATURE(VTK)
 CREATE_LOGGER(VTKRecorder);
 
-VTKRecorder::VTKRecorder() 
-{ 
-	/* we always want to save the first state as well */ 
-	initRun=true; 
-	compress=false;
-	skipFacetIntr=true;
-	skipNondynamic=false;
-}
-
-VTKRecorder::~VTKRecorder()
-{
-	
-}
-
-void VTKRecorder::init(Scene* rootBody)
-{
-}
-
 void VTKRecorder::action(Scene* rootBody)
 {
 	vector<bool> recActive(REC_SENTINEL,false);

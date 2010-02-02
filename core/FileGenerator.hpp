@@ -20,10 +20,7 @@ class FileGenerator
 {
 	protected :
 		shared_ptr<Scene>	 rootBody;
-
-		string			 outputFileName
-					,serializationDynlib;
-	
+		string serializationDynlib;
 	public :
 		bool generateAndSave();
 		void setFileName(const string& fileName);
@@ -33,20 +30,23 @@ class FileGenerator
 		//! Describes the result in a user-readable form.
 		std::string message;
 		
-		FileGenerator ();
 		virtual ~FileGenerator ();
-		
 		virtual void singleAction();
-
 	protected :
 	//! Returns whether the generation was successful; message for user is in FileGenerator::message
 	virtual bool generate();
 
-	REGISTER_ATTRIBUTES(Serializable,(outputFileName)(serializationDynlib));
-	DECLARE_LOGGER;
-	REGISTER_CLASS_AND_BASE(FileGenerator,Serializable);
-};
+	void pyGenerate(const string& out);
+	void pyLoad();
 
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(FileGenerator,Serializable,"Base class for scene generators, preprocessors.",
+		((string,outputFileName,"./scene.xml","Filename to write resulting simulation to")),
+		/* ctor */ serializationDynlib="XMLFormatManager";,
+		.def("generate",&FileGenerator::pyGenerate,(python::arg("out")),"Generate scene, save to given file")
+		.def("load",&FileGenerator::pyLoad,"Generate scene, save to temporary file and load immediately");
+	);
+	DECLARE_LOGGER;
+};
 REGISTER_SERIALIZABLE(FileGenerator);
 
 

@@ -4,23 +4,16 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/PeriodicEngines.hpp>
 #include<yade/lib-pyutil/gil.hpp>
-/* Execute a python command (in addPlotDataCall) periodically, with defined (and adjustable) periodicity.
- *
- * Period constraints are iterInterval and timeInterval. When either of them is exceeded, the addPlotDataCall is run.
- *
- * Thie engine is primarily conceived for collecting data for yade.plot plots during simulations, hence the name.
- */
-class PeriodicPythonRunner: public StretchPeriodicEngine {
-	private:
-		string command;
-	public :
-		PeriodicPythonRunner(): command("pass"){};
-		/* virtual bool isActivated: not overridden, StretchPeriodicEngine handles that */
-		virtual void action(Scene* b){ pyRunString(command); }
-	REGISTER_ATTRIBUTES(StretchPeriodicEngine,(command));
-	REGISTER_CLASS_NAME(PeriodicPythonRunner);
-	REGISTER_BASE_CLASS_NAME(StretchPeriodicEngine);
-};
 
+class PeriodicPythonRunner: public PeriodicEngine {
+	public :
+		/* virtual bool isActivated: not overridden, PeriodicEngine handles that */
+		virtual void action(Scene* b){ if(command.size()>0) pyRunString(command); }
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(PeriodicPythonRunner,PeriodicEngine,
+		"Execute a python command (in addPlotDataCall) periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
+		((string,command,"","Command to be run by python interpreter. Not run if empty."))
+		,,
+	);
+};
 REGISTER_SERIALIZABLE(PeriodicPythonRunner);
 
