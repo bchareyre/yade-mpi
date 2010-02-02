@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ContactLaw1Interaction.hpp"
+#include "RockJointPhys.hpp"
 
 
-ContactLaw1Interaction::ContactLaw1Interaction()
+RockJointPhys::RockJointPhys()
 {
 	createIndex();
 
@@ -28,7 +28,7 @@ ContactLaw1Interaction::ContactLaw1Interaction()
 
 }
 
-void ContactLaw1Interaction::SetBreakingState()
+void RockJointPhys::SetBreakingState()
 {
 	
 	//if (fragile) {
@@ -36,17 +36,17 @@ void ContactLaw1Interaction::SetBreakingState()
 	
 }
 
-ContactLaw1Interaction::~ContactLaw1Interaction()
+RockJointPhys::~RockJointPhys()
 {
 }
 
-// void ContactLaw1Interaction::postProcessAttributes(bool)
+// void RockJointPhys::postProcessAttributes(bool)
 // {
 // 
 // }
 
 
-YADE_PLUGIN((ContactLaw1Interaction));
+YADE_PLUGIN((RockJointPhys));
 
 YADE_REQUIRE_FEATURE(PHYSPAR);
 

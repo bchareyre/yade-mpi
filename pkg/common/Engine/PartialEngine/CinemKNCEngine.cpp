@@ -166,9 +166,9 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
 			for ( ;itFirst!=itLast; ++itFirst )
 			{
-				if ( ( *itFirst )->getClassName() == "ContactLaw1" ) 
+				if ( ( *itFirst )->getClassName() == "RockJointLaw" ) 
 				{
-					myLdc =  YADE_PTR_CAST<ContactLaw1> ( *itFirst );
+					myLdc =  YADE_PTR_CAST<RockJointLaw> ( *itFirst );
 					coeff_dech = myLdc ->coeff_dech;
 					if(LOG) cout << "My ContactLaw engine found, de coeff_dech = " << coeff_dech << endl;
 				}
@@ -197,7 +197,7 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 	Real Hcurrent = (topbox->physicalParameters.get())->se3.position.Y();
 	Real Fdesired = F_0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired
 
-// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de ContactLaw1 :
+// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de RockJointLaw :
 	if( F_sup.Y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
 		stiffness *= coeff_dech;
 

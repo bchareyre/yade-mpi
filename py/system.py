@@ -105,6 +105,10 @@ _deprecated={
 	'Law2_Dem3Dof_Elastic_Elastic':'Law2_Dem3Dof_FrictPhys_Basic', # Sun Jan 10 10:00:25 2010, vaclav@flux
 	'Law2_Dem3Dof_FrictPhys_Basic':'Law2_Dem3DofGeom_FrictPhys_Basic', # Sun Jan 10 10:01:27 2010, vaclav@flux
 	'Ip2_FrictMat_FrictMat_NormShearPhys':'Ip2_FrictMat_FrictMat_FrictPhys', # Sun Jan 10 10:07:40 2010, vaclav@flux
+	'ContactLaw1':'RockJointLaw', # Tue Feb  2 14:53:49 2010, jduriez@c1solimara-l
+	'ContactLaw1':'RockJointLaw', # Tue Feb  2 14:54:40 2010, jduriez@c1solimara-l
+	'ContactLaw1Interaction':'RockJointPhys', # Tue Feb  2 14:55:34 2010, jduriez@c1solimara-l
+	'CL1Relationships':'RockJointLawRelationships', # Tue Feb  2 14:58:02 2010, jduriez@c1solimara-l
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"CL1Relationships.hpp"
+#include"RockJointLawRelationships.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ContactLaw1Interaction.hpp>
+#include<yade/pkg-dem/RockJointPhys.hpp>
 // #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> ScGeom !!?
 // #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
@@ -16,7 +16,7 @@
 #include<yade/core/Scene.hpp>
 
 
-CL1Relationships::CL1Relationships()
+RockJointLawRelationships::RockJointLawRelationships()
 {
 	betaR = 0.12;
 	setCohesionNow = false;
@@ -37,7 +37,7 @@ CL1Relationships::CL1Relationships()
 //
 //
 
-void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalMat
+void RockJointLawRelationships::go(	  const shared_ptr<PhysicalParameters>& b1 // CohesiveFrictionalMat
 					, const shared_ptr<PhysicalParameters>& b2 // CohesiveFrictionalMat
 					, const shared_ptr<Interaction>& interaction)
 {
@@ -58,8 +58,8 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 		if(!interaction->interactionPhysics)
 		{
 //std::cerr << " isNew, id1: " << interaction->getId1() << " id2: " << interaction->getId2()  << "\n";
-			interaction->interactionPhysics = shared_ptr<ContactLaw1Interaction>(new ContactLaw1Interaction());
-			ContactLaw1Interaction* contactPhysics = YADE_CAST<ContactLaw1Interaction*>(interaction->interactionPhysics.get());
+			interaction->interactionPhysics = shared_ptr<RockJointPhys>(new RockJointPhys());
+			RockJointPhys* contactPhysics = YADE_CAST<RockJointPhys*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -141,7 +141,7 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 		{	
 			// FIXME - are those lines necessary ???? what they are doing in fact ???
 			// ANSWER - they are used when you setCohesionNow (contact isNew not)
-			ContactLaw1Interaction* contactPhysics = YADE_CAST<ContactLaw1Interaction*>(interaction->interactionPhysics.get());
+			RockJointPhys* contactPhysics = YADE_CAST<RockJointPhys*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
@@ -188,6 +188,6 @@ void CL1Relationships::go(	  const shared_ptr<PhysicalParameters>& b1 // Cohesiv
 	}
 #endif
 };
-YADE_PLUGIN((CL1Relationships));
+YADE_PLUGIN((RockJointLawRelationships));
 
 YADE_REQUIRE_FEATURE(PHYSPAR);

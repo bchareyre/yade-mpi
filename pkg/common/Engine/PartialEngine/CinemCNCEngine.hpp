@@ -13,7 +13,7 @@
 #include<yade/core/Body.hpp>
 #include <Wm3Vector3.h>
 #include<yade/lib-base/yadeWm3.hpp>
-#include<yade/pkg-dem/ContactLaw1.hpp>
+#include<yade/pkg-dem/RockJointLaw.hpp>
 
 
 /*! \brief To apply a constant normal stress shear for a parallelogram box (simple shear)
@@ -33,8 +33,8 @@ Nota : not only the positions of walls are updated but also their speeds, which 
 class CinemCNCEngine : public PartialEngine
 {
 	private :
-		shared_ptr<ContactLaw1> myLdc;
-		Real	coeff_dech;	// in the case of the use of "ContactLaw1" for ex where kn(unload)#kn(load). The engine cares to find the value at the first run
+		shared_ptr<RockJointLaw> myLdc;
+		Real	coeff_dech;	// in the case of the use of "RockJointLaw" for ex where kn(unload)#kn(load). The engine cares to find the value at the first run
 		Real	alpha	// angle from the lower plate to the left box (trigo wise), the Engine finds itself its value
 			,dalpha	// the increment over alpha, due to vertical displacement of upper box
 			,gamma	// horizontal displacement done since the launch of the calcul first step

@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "ContactLaw1.hpp"
+#include "RockJointLaw.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/ContactLaw1Interaction.hpp>
+#include<yade/pkg-dem/RockJointPhys.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
@@ -19,7 +19,11 @@
 Vector3r translation_vect (0.10,0,0);
 
 
-ContactLaw1::ContactLaw1() : GlobalEngine()
+// <<<<<<< TREE
+RockJointLaw::RockJointLaw() : GlobalEngine()
+// =======
+// ContactLaw1::ContactLaw1() : GlobalEngine()
+// >>>>>>> MERGE-SOURCE
 {
 	sdecGroupMask=1;
 	momentRotationLaw = true;
@@ -29,7 +33,7 @@ ContactLaw1::ContactLaw1() : GlobalEngine()
 
 
 
-void ContactLaw1::action(Scene* ncb)
+void RockJointLaw::action(Scene* ncb)
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
@@ -55,7 +59,7 @@ void ContactLaw1::action(Scene* ncb)
 		CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
 		CohesiveFrictionalMat* de2 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id2]->physicalParameters.get());
 		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
-		ContactLaw1Interaction* currentContactPhysics = YADE_CAST<ContactLaw1Interaction*> (contact->interactionPhysics.get());
+		RockJointPhys* currentContactPhysics = YADE_CAST<RockJointPhys*> (contact->interactionPhysics.get());
 
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
@@ -301,7 +305,7 @@ void ContactLaw1::action(Scene* ncb)
 
 }
 
-YADE_PLUGIN((ContactLaw1));
+YADE_PLUGIN((RockJointLaw));
 
 YADE_REQUIRE_FEATURE(PHYSPAR);
 
