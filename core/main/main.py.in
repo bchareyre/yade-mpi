@@ -18,7 +18,7 @@ if v[0]==2 and v[1]<=5:
 # handle command-line options first
 import optparse
 par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(version,','.join(features)))
-par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores.',dest='threads',type='int')
+par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
 par.add_option('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
 if 'log4cxx' in features:

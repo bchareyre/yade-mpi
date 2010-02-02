@@ -15,7 +15,14 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.SharedLibrary('boot',['main/pyboot.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+['yade-support','core'])
 ])
 
-env.InstallAs('$PREFIX/bin/yade$SUFFIX-cxx',env.Program('yade',['main/main.cpp'],LIBS=env['LIBS']+['yade-support','core'],CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['version']+'\\"'),]))
+# env.InstallAs('$PREFIX/bin/yade$SUFFIX-cxx',env.Program('yade',['main/main.cpp'],LIBS=env['LIBS']+['yade-support','core'],CPPDEFINES=env['CPPDEFINES']+[('YADE_VERSION','\\"'+env['version']+'\\"'),]))
+## remove old executable
+## might be removed in the future
+import os.path, os
+cxxExec=env.subst('$PREFIX/bin/yade$SUFFIX-cxx')
+if os.path.exists(cxxExec):
+	print "Deleting old executable",cxxExec
+	os.remove(cxxExec)
 
 env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 	env.SharedLibrary('core',

@@ -5,7 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+YADE_REQUIRE_FEATURE(physpar)
 
 #include "CinemCNCEngine.hpp"
 // #include<yade/pkg-common/RigidBodyParameters.hpp> , remplace par : 

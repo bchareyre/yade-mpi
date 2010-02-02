@@ -1,3 +1,7 @@
+/******
+deprecated file, will be removed
+*******/
+
 //#include<Python.h>
 #include<boost/thread/thread.hpp>
 #include<boost/python.hpp>
@@ -82,9 +86,10 @@ void PythonUI::pythonSession(){
 		LOG_DEBUG("Got Global Interpreter Lock, good.");
 		/* import yade (for startUI()) and yade.runtime (initially empty) namespaces */
 		string prefix=getenv("YADE_PREFIX")?getenv("YADE_PREFIX"):PREFIX;
-		PyRun_SimpleString(("import sys; sys.path.insert(0,'"+prefix+"/lib/yade" SUFFIX "/py')").c_str());
-		PyRun_SimpleString("import yade");
-		PyRun_SimpleString("from __future__ import division");
+		// already done in main
+		//PyRun_SimpleString(("import sys; sys.path.insert(0,'"+prefix+"/lib/yade" SUFFIX "/py')").c_str());
+		//PyRun_SimpleString("import yade");
+		//PyRun_SimpleString("from __future__ import division");
 
 		std::string features("[");
 		#ifdef YADE_OPENMP

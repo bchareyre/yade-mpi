@@ -1,3 +1,7 @@
+/*****
+deprecated faile, will be removed 
+*****/
+
 /*************************************************************************
 *  Copyright (C) 2004 by Olivier Galizzi                                 *
 *  olivier.galizzi@imag.fr                                               *
@@ -197,9 +201,6 @@ int main(int argc, char *argv[])
 
 	Omega::instance().yadeConfigPath = configPath; 
 	filesystem::path yadeConfigPath  = filesystem::path(Omega::instance().yadeConfigPath, filesystem::native);
-#if 0
-	filesystem::path yadeConfigFile  = filesystem::path(Omega::instance().yadeConfigPath + "/preferences.xml", filesystem::native);
-#endif
 
 
 	/* see http://www.python.org/dev/peps/pep-0311 for threading with Python embedded */
@@ -229,26 +230,18 @@ int main(int argc, char *argv[])
 		}
 	#endif
 
-	#if 0	
-		LOG_INFO("Loading "<<yadeConfigFile.string()); IOFormatManager::loadFromFile("XMLFormatManager",yadeConfigFile.string(),"preferences",Omega::instance().preferences);
-	#endif
-
 	LOG_INFO("Loading plugins");
 
-	vector<string> pluginDirs;
 	// set YADE_PREFIX to use prefix different from the one compiled-in; used for testing deb package when not installed
-	if(getenv("YADE_PREFIX")){
-		pluginDirs.push_back(getenv("YADE_PREFIX")+string("/lib/yade" SUFFIX "/plugins"));
-		pluginDirs.push_back(getenv("YADE_PREFIX")+string("/lib/yade" SUFFIX "/gui"));
-		pluginDirs.push_back(getenv("YADE_PREFIX")+string("/lib/yade" SUFFIX "/extra"));
-	} else {
-		pluginDirs.push_back(PREFIX+string("/lib/yade" SUFFIX "/plugins"));
-		pluginDirs.push_back(PREFIX+string("/lib/yade" SUFFIX "/gui"));
-		pluginDirs.push_back(PREFIX+string("/lib/yade" SUFFIX "/extra"));
-	}
-	//	pluginDirs.push_back((otherPrefix.empty() ? string(PREFIX) : otherPrefix ) + string("/lib/yade" SUFFIX "/plugins"));
-	//pluginDirs.push_back((otherPrefix.empty() ? string(PREFIX) : otherPrefix ) + string("/lib/yade" SUFFIX "/gui"));
-	//pluginDirs.push_back((otherPrefix.empty() ? string(PREFIX) : otherPrefix ) + string("/lib/yade" SUFFIX "/extra"));
+	string prefix=getenv("YADE_PREFIX")?getenv("YADE_PREFIX"):PREFIX;
+	PyRun_SimpleString(("import sys; sys.path.insert(0,'"+prefix+"/lib/yade" SUFFIX "/py')").c_str());
+	PyRun_SimpleString("import yade");
+	PyRun_SimpleString("from __future__ import division");
+
+	vector<string> pluginDirs;
+	pluginDirs.push_back(prefix+string("/lib/yade" SUFFIX "/plugins"));
+	pluginDirs.push_back(prefix+string("/lib/yade" SUFFIX "/gui"));
+	pluginDirs.push_back(prefix+string("/lib/yade" SUFFIX "/extra"));
 	Omega::instance().scanPlugins(pluginDirs);
 	Omega::instance().init();
 
