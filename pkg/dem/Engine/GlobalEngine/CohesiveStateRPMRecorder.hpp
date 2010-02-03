@@ -6,26 +6,14 @@
 #include <yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include <yade/pkg-dem/RockPM.hpp>
 
-
 class CohesiveStateRPMRecorder: public Recorder {
-	public:
-		int numberCohesiveContacts;
-		CohesiveStateRPMRecorder(); 
-		~CohesiveStateRPMRecorder();
-		void init(Scene*);
-		virtual void action(Scene*);
-		
-	private:
 		std::ofstream outFile;
-		
-	REGISTER_ATTRIBUTES(Recorder,(numberCohesiveContacts));
-	REGISTER_CLASS_AND_BASE(CohesiveStateRPMRecorder,Recorder);
+	public:
+		virtual void action(Scene*);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CohesiveStateRPMRecorder,Recorder,
+		"Store number of cohesive contacts in RPM model to file.",
+		((int,numberCohesiveContacts,0,"Number of cohesive contacts found at last run. [-]")),
+		initRun=true;,);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(CohesiveStateRPMRecorder);
-
-	/*
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CohesiveStateRPMRecorder,Recorder,"This class is for storing the number of a cohesive contacts in RPM model to file. Class derived from Recorder",
-		(( int,numberCohesiveContacts,0,"The number of cohesive contacts [-]")),
-		initRun=true;,);
-	*/

@@ -3,17 +3,6 @@
 YADE_PLUGIN((CohesiveStateRPMRecorder));
 CREATE_LOGGER(CohesiveStateRPMRecorder);
 
-CohesiveStateRPMRecorder::CohesiveStateRPMRecorder():Recorder(){
-	initRun=true;												//We want to save the data in the beginning
-	numberCohesiveContacts=0;
-}
-
-CohesiveStateRPMRecorder::~CohesiveStateRPMRecorder() {
-}
-
-void CohesiveStateRPMRecorder::init(Scene* rootBody) {
-}
-
 void CohesiveStateRPMRecorder::action(Scene* rootBody) {
 	numberCohesiveContacts=0;
 	//Check all interactions

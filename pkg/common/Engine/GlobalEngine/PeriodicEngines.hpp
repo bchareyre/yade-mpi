@@ -8,6 +8,7 @@
 class PeriodicEngine:  public GlobalEngine {
 	public:
 		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
+		virtual ~PeriodicEngine(); // vtable
 		virtual bool isActivated(Scene*){
 			Real virtNow=Omega::instance().getSimulationTime();
 			Real realNow=getClock();
