@@ -24,3 +24,8 @@ class CohesiveStateRPMRecorder: public Recorder {
 };
 REGISTER_SERIALIZABLE(CohesiveStateRPMRecorder);
 
+	/*
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CohesiveStateRPMRecorder,Recorder,"This class is for storing the number of a cohesive contacts in RPM model to file. Class derived from Recorder",
+		(( int,numberCohesiveContacts,0,"The number of cohesive contacts [-]")),
+		initRun=true;,);
+	*/
