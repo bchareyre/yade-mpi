@@ -378,6 +378,8 @@ if not env.GetOption('clean'):
 		ok=conf.CheckCXXHeader('Eigen/Core')
 		ok=conf.CheckCXXHeader('Eigen/Array')
 		ok=conf.CheckCXXHeader('Eigen/Geometry')
+		ok=conf.CheckCXXHeader('Eigen/Cholesky')
+		ok=conf.CheckCXXHeader('Eigen/LU')
 		if not ok: featureNotOK('eigen',note="You might have to add eigen header directory (e.g. /usr/include/eigen2) to CPPPATH.")
 
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
