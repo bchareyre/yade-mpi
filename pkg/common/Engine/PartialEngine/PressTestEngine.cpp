@@ -8,10 +8,10 @@ void PressTestEngine::applyCondition(Scene * ncb){
 		if (curentDirection==forward) { 										 ///<Forward direction of the press
 			FOREACH(body_id_t id, subscribedBodies){
 				assert(ncb->bodies->exists(id));
-				currentVerticalForce = ncb->forces.getForce(id)[2]; ///<Define current vertical force
-				minimalForce = maxVerticalForce*0.1;						 ///<Define minimal edge of the force (10% from Maximal)
-				minimalPredictedForce = predictedForce*0.1;			 ///<Define minimal edge of the Predicted force (10% from Predicted)
-				if (currentVerticalForce > maxVerticalForce) {	 ///<Force increasing. Press is working normally
+				currentVerticalForce = ncb->forces.getForce(id)[2]; 	///<Define current vertical force
+				minimalForce = maxVerticalForce*0.1;									///<Define minimal edge of the force (10% from Maximal)
+				minimalPredictedForce = predictedForce*0.1;						///<Define minimal edge of the Predicted force (10% from Predicted)
+				if (currentVerticalForce > maxVerticalForce) {				///<Force increasing. Press is working normally
 					maxVerticalForce = currentVerticalForce;
 				} else if ((currentVerticalForce<=(minimalForce))&&(maxVerticalForce>minimalPredictedForce)) {
 					/**
