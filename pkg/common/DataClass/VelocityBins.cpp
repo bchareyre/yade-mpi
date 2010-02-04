@@ -108,7 +108,7 @@ void VelocityBins::setBins(Scene* rootBody, Real currMaxVelSq, Real refSweepLeng
 		}
 	}
 #else
-	void VelocityBins::binVelSqInitialize(Real vSqInit=0.){ FOREACH(Bin& bin, bins) bin.currMaxVelSq=vSqInit; }
+	void VelocityBins::binVelSqInitialize(Real vSqInit){ FOREACH(Bin& bin, bins) bin.currMaxVelSq=vSqInit; }
 	void VelocityBins::binVelSqUse(body_id_t id, Real velSq){
 		Real& maxVelSq(bins[bodyBins[id]].currMaxVelSq);
 		maxVelSq=max(maxVelSq,velSq);
