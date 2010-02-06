@@ -55,9 +55,6 @@ class Clump: public Body {
 		//! mapping of body IDs to their relative positions; replaces members and subSe3s;
 	public:
 		typedef std::map<body_id_t,Se3r> memberMap;
-		memberMap members;
-
-		Clump();
 		virtual ~Clump(){};
 		//! \brief add Body to the Clump
 		void add(body_id_t);
@@ -76,8 +73,11 @@ class Clump: public Body {
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Matrix3r& T);
 		//! Recalculate body's inertia tensor in rotated coordinates.
 		static Matrix3r inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot);
-	REGISTER_ATTRIBUTES(Body,(members));
-	REGISTER_CLASS_AND_BASE(Clump,Body);
+	
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Clump,Body,"Rigid aggregate of bodies",
+		((memberMap,members,,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)")),
+		/*ctor*/isDynamic=true;,
+		/*py*/);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Clump);
@@ -87,11 +87,9 @@ REGISTER_SERIALIZABLE(Clump);
 class ClumpMemberMover: public PartialEngine {
 	public:
 		//! Interates over rootBody->bodies and calls Clump::moveSubBodies() for clumps.
-		virtual void applyCondition(Scene* rootBody);
-		ClumpMemberMover();
+		virtual void applyCondition(Scene*);
 		virtual ~ClumpMemberMover(){};
-	REGISTER_CLASS_AND_BASE(ClumpMemberMover,PartialEngine);
-	REGISTER_ATTRIBUTES(PartialEngine,/*nothing here*/);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(ClumpMemberMover,PartialEngine,"Update Clump::members positions and orientations so that Clump behaves as rigid body. This engine is only used internally by NewtonIntegrator, not directly.",/*attrs*/,/*ctor*/,/*py*/);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ClumpMemberMover);

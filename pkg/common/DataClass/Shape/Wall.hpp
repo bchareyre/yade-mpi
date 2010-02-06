@@ -7,14 +7,13 @@
 /*! Object representing infinite plane aligned with the coordinate system (axis-aligned wall). */
 class Wall: public Shape{
 	public:
-		Wall(){ createIndex(); }
 		virtual ~Wall(); // vtable
-		//! Which side of the wall interacts: -1 for negative only, 0 for both, +1 for positive only
-		int sense;
-		//! Axis of the normal; can be 0,1,2 for +x, +y, +z respectively (Body's orientation is disregarded for walls)
-		int axis;
-	REGISTER_ATTRIBUTES(Shape,(sense)(axis));
-	REGISTER_CLASS_AND_BASE(Wall,Shape);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Wall,Shape,"Object representing infinite plane aligned with the coordinate system (axis-aligned wall).",
+		((int,sense,0,"Which side of the wall interacts: -1 for negative only, 0 for both, +1 for positive only"))
+		((int,axis,0,"Axis of the normal; can be 0,1,2 for +x, +y, +z respectively (Body's orientation is disregarded for walls)")),
+		/*ctor*/createIndex();,
+		/*py*/
+	);
 	REGISTER_CLASS_INDEX(Wall,Shape);
 };	
 REGISTER_SERIALIZABLE(Wall);
@@ -25,7 +24,7 @@ class Bo1_Wall_Aabb: public BoundFunctor{
 	public:
 		virtual void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 	FUNCTOR2D(Wall,Aabb);
-	REGISTER_CLASS_AND_BASE(Bo1_Wall_Aabb,BoundFunctor);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Bo1_Wall_Aabb,BoundFunctor,"Creates/updates an Aabb of a wall",,,);
 };
 REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 #ifdef YADE_OPENGL
@@ -36,8 +35,9 @@ REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 		RENDERS(Wall);
-		REGISTER_ATTRIBUTES(GlShapeFunctor,(div));
-		REGISTER_CLASS_AND_BASE(Gl1_Wall,GlShapeFunctor);
+		YADE_CLASS_BASE_DOC_ATTRS(Gl1_Wall,GlShapeFunctor,"Renders :yref:`Wall` object",
+			((div,"|ystatic| Number of divisions of the wall inside visible scene part. :ydefault:`20`"))
+		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Wall);
 #endif

@@ -35,7 +35,7 @@ There are other classes, which are not strictly necessary:
    interactions they are involved in. It is probably quite useless now since volumetricStrain
 	is not used in the constitutive law anymore.
 
- * GLDrawCpmPhys draws interaction physics (color for damage and a few other); rarely used, though.
+ * Gl1_CpmPhys draws interaction physics (color for damage and a few other); rarely used, though.
 
  * CpmStateUpdater changes bodies' colors depending on average damage of their interactions
    and number of interactions that were already fully broken and have disappeared. This engine
@@ -206,31 +206,39 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 
 #ifdef YADE_OPENGL
 	#include<yade/pkg-common/GLDrawFunctors.hpp>
-	class GLDrawCpmPhys: public GlInteractionPhysicsFunctor {
+	class Gl1_CpmPhys: public GlInteractionPhysicsFunctor {
 		public: virtual void go(const shared_ptr<InteractionPhysics>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
-		virtual ~GLDrawCpmPhys() {};
-		REGISTER_ATTRIBUTES(Serializable,(contactLine)(dmgLabel)(dmgPlane)(epsT)(epsTAxes)(normal)(colorStrain)(epsNLabel));
+		virtual ~Gl1_CpmPhys() {};
 		RENDERS(CpmPhys);
-		REGISTER_CLASS_AND_BASE(GLDrawCpmPhys,GlInteractionPhysicsFunctor);
 		DECLARE_LOGGER;
 		static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
+		YADE_CLASS_BASE_DOC_ATTRS(Gl1_CpmPhys,GlInteractionPhysicsFunctor,"Render :yref:`CpmPhys` objects of interactions.",
+			((contactLine,"Show contact line :ydefault:`true` "))
+			((dmgLabel,"Numerically show contact damage parameter :ydefault:`true` "))
+			((dmgPlane,"[what is this?] :ydefault:`false`"))
+			((epsT,"Show shear strain :ydefault:`false`"))
+			((epsTAxes,"Show axes of shear plane :ydefault:`false`"))
+			((normal,"Show contact normal :ydefault:`false` "))
+			((colorStrain,"Render elements using transverse strain (relative to max elastic strain) [no longer used] :ydefault:`false` "))
+			((epsNLabel,"Numerically show normal strain :ydefault:`false` "))
+		);
 	};
-	REGISTER_SERIALIZABLE(GLDrawCpmPhys);
+	REGISTER_SERIALIZABLE(Gl1_CpmPhys);
 #endif
 
 class CpmStateUpdater: public PeriodicEngine {
 	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {} };
 	public:
-		//! average residual strength
-		static Real avgRelResidual;
-		//! maximum damage over all contacts
-		static Real maxOmega;
-		CpmStateUpdater(){maxOmega=0; /* run at the very beginning */ initRun=true;}
 		virtual void action(Scene* rb){ update(rb); }
 		static void update(Scene* rb=NULL);
+	static Real avgRelResidual;
+	static Real maxOmega;
+	CpmStateUpdater(){ initRun=true;}
+	YADE_CLASS_BASE_DOC_ATTRS(CpmStateUpdater,PeriodicEngine,"Changes bodies' colors depending on average damage of their interactions and number of interactions that were already fully broken and have disappeared. This engine contains its own loop (2 loops, more precisely) over all bodies and should be run periodically to update colors during the simulation, if desired.",
+		((avgRelResidual,"Average residual strength at last run."))
+		((maxOmega,"Globally maximum damage parameter at last run."))
+	);
 	DECLARE_LOGGER;
-	REGISTER_ATTRIBUTES(PeriodicEngine,(maxOmega)(avgRelResidual));
-	REGISTER_CLASS_AND_BASE(CpmStateUpdater,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(CpmStateUpdater);
 

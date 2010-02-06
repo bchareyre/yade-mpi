@@ -86,7 +86,7 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 	return ret;
 }
 
-#ifdef COLLIDE_STRIDED
+// STRIDE
 	bool InsertionSortCollider::isActivated(Scene*){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
@@ -104,7 +104,6 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		scene->interactions->erasePending(*this,scene);
 		return false;
 	}
-#endif
 
 void InsertionSortCollider::action(Scene* scene){
 	#ifdef ISC_TIMING
@@ -148,8 +147,9 @@ void InsertionSortCollider::action(Scene* scene){
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
 		if(periodic) for(int i=0; i<3; i++) BB[i].updatePeriodicity(scene); 
+		
 
-		#ifdef COLLIDE_STRIDED
+		// STRIDE
 			// get the BoundDispatcher and turn it off; we will call it ourselves
 			if(!boundDispatcher){
 				FOREACH(shared_ptr<Engine>& e, scene->engines){ boundDispatcher=dynamic_pointer_cast<BoundDispatcher>(e); if(boundDispatcher) break; }
@@ -163,10 +163,9 @@ void InsertionSortCollider::action(Scene* scene){
 					if(!newton){ LOG_FATAL("Unable to locate NewtonIntegrator within engines, aborting."); abort(); }
 				}
 			}
-		#endif
 	ISC_CHECKPOINT("init");
 
-		#ifdef COLLIDE_STRIDED
+		// STRIDE
 			// get us ready for strides, if they were deactivated
 			if(!strideActive && sweepLength>0 && newton->maxVelocitySq>=0){ // maxVelocitySq is a really computed value
 				strideActive=true;
@@ -197,7 +196,6 @@ void InsertionSortCollider::action(Scene* scene){
 				}
 			}
 			boundDispatcher->action(scene);
-		#endif
 
 	ISC_CHECKPOINT("bound");
 

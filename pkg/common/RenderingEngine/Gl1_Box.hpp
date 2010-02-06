@@ -10,14 +10,11 @@
 
 #include<yade/pkg-common/GLDrawFunctors.hpp>
 
-class Gl1_Box : public GlShapeFunctor
-{
+class Gl1_Box : public GlShapeFunctor{
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-
 	RENDERS(Box);
-	REGISTER_CLASS_NAME(Gl1_Box);
-	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
+	YADE_CLASS_BASE_DOC_ATTRS(Gl1_Box,GlShapeFunctor,"Renders :yref:`Box` object",);
 };
 
 REGISTER_SERIALIZABLE(Gl1_Box);

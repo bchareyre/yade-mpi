@@ -18,12 +18,6 @@
 class Facet : public Shape {
     public:
 	
-	// Registered attributes
-		
-	/// Vertex positions in the local reference frame
-	vector<Vector3r> vertices;
-
-	Facet();
 	virtual ~Facet();
 	
 	// Postprocessed attributes 
@@ -38,25 +32,21 @@ class Facet : public Shape {
 	Real vl[3];
 	/// Unit vertice vectors
 	Vector3r vu[3];
-	#ifdef FACET_TOPO
-		//! facet id's that are adjacent to respective edges
-		vector<body_id_t> edgeAdjIds;
-		//! half angle between normals of this facet and the adjacent facet
-		vector<Real> edgeAdjHalfAngle;
-	#endif
 
 	void postProcessAttributes(bool deserializing);
 
-	YADE_CLASS_BASE_DOC_ATTRS(Facet,Shape,"Facet (triangular particle) geometry.",
-		((vertices,"Vertex positions in local coordinates."))
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Facet,Shape,"Facet (triangular particle) geometry.",
+		((vector<Vector3r>,vertices,,"Vertex positions in local coordinates."))
 		#ifdef FACET_TOPO
-		((edgeAdjIds,"Facet id's that are adjacent to respective edges [experimental]"))
-		((edgeAdjHalfAngle,"half angle between normals of this facet and the adjacent facet [experimental]"))
+		((vector<body_id_t>,edgeAdjIds,vector<body_id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
+		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),"half angle between normals of this facet and the adjacent facet [experimental]"))
 		#endif
+		,
+		/* ctor */ createIndex(); ,
+		/* py */
 	);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Facet,Shape);
 };
-
 REGISTER_SERIALIZABLE(Facet);
 

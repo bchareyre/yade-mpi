@@ -6,7 +6,7 @@
 
 YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(CpmPhys)(Law2_Dem3DofGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
-		(GLDrawCpmPhys)
+		(Gl1_CpmPhys)
 	#endif	
 		(CpmStateUpdater));
 
@@ -226,23 +226,23 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 }
 
 #ifdef YADE_OPENGL
-	/********************** GLDrawCpmPhys ****************************/
+	/********************** Gl1_CpmPhys ****************************/
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	#include<yade/lib-opengl/GLUtils.hpp>
 
-	CREATE_LOGGER(GLDrawCpmPhys);
+	CREATE_LOGGER(Gl1_CpmPhys);
 
-	bool GLDrawCpmPhys::contactLine=true;
-	bool GLDrawCpmPhys::dmgLabel=true;
-	bool GLDrawCpmPhys::dmgPlane=false;
-	bool GLDrawCpmPhys::epsNLabel=true;
-	bool GLDrawCpmPhys::epsT=false;
-	bool GLDrawCpmPhys::epsTAxes=false;
-	bool GLDrawCpmPhys::normal=false;
-	bool GLDrawCpmPhys::colorStrain=false;
+	bool Gl1_CpmPhys::contactLine=true;
+	bool Gl1_CpmPhys::dmgLabel=true;
+	bool Gl1_CpmPhys::dmgPlane=false;
+	bool Gl1_CpmPhys::epsNLabel=true;
+	bool Gl1_CpmPhys::epsT=false;
+	bool Gl1_CpmPhys::epsTAxes=false;
+	bool Gl1_CpmPhys::normal=false;
+	bool Gl1_CpmPhys::colorStrain=false;
 
 
-	void GLDrawCpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
+	void Gl1_CpmPhys::go(const shared_ptr<InteractionPhysics>& ip, const shared_ptr<Interaction>& i, const shared_ptr<Body>& b1, const shared_ptr<Body>& b2, bool wireFrame){
 		const shared_ptr<CpmPhys>& BC=static_pointer_cast<CpmPhys>(ip);
 		const shared_ptr<Dem3DofGeom>& geom=YADE_PTR_CAST<Dem3DofGeom>(i->interactionGeometry);
 

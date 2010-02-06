@@ -8,27 +8,19 @@
 
 #pragma once
 
-
 #include<yade/core/Shape.hpp>
 
 
-class Box : public Shape
-{
-	public :
-		Vector3r extents;
-
-		Box ();
+class Box: public Shape{
+	public:
 		Box(const Vector3r& _extents): extents(_extents){}
-		virtual ~Box ();	
-	
-	REGISTER_ATTRIBUTES(Shape,(extents));
+		virtual ~Box ();
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Box,Shape,"Box (cuboid) particle geometry. (Avoid using in new code, prefer :yref:`Facet` instead.",
+		((Vector3r,extents,,"Half-size of the cuboid")),
+	/* ctor */ createIndex();,
+	/* py */);
 	REGISTER_CLASS_INDEX(Box,Shape);
-	REGISTER_CLASS_NAME(Box);
-	REGISTER_BASE_CLASS_NAME(Shape);
-
-
 };
-
 REGISTER_SERIALIZABLE(Box);
 
 

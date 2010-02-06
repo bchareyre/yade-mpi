@@ -9,7 +9,6 @@ class Dem3DofGeom_WallSphere: public Dem3DofGeom{
 	Vector3r contPtInTgPlane2() const { return Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(se32.orientation*cp2rel,effR2,-normal);}
 
 	public:
-		Dem3DofGeom_WallSphere(){ createIndex();}
 		virtual ~Dem3DofGeom_WallSphere();
 		/******* API ********/
 		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
@@ -20,14 +19,14 @@ class Dem3DofGeom_WallSphere: public Dem3DofGeom{
 		void setTgPlanePts(const Vector3r&, const Vector3r&);
 		void relocateContactPoints(){ relocateContactPoints(contPtInTgPlane1(),contPtInTgPlane2()); }
 		void relocateContactPoints(const Vector3r& p1, const Vector3r& p2);
-	//! initial contact point on the wall, relative to the current contact point
-	Vector3r cp1pt;
-	//! orientation between +x and the reference contact point (on the sphere) in sphere-local coords
-	Quaternionr cp2rel;
-	// effective radius of sphere
-	Real effR2;
-	REGISTER_ATTRIBUTES(Dem3DofGeom,(cp1pt)(cp2rel)(effR2));
-	REGISTER_CLASS_AND_BASE(Dem3DofGeom_WallSphere,Dem3DofGeom);
+
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Dem3DofGeom_WallSphere,Dem3DofGeom,"Representation of contact between wall and sphere, based on Dem3DofGeom.",
+		((Vector3r,cp1pt,,"initial contact point on the wall, relative to the current contact point"))
+		((Quaternionr,cp2rel,,"orientation between +x and the reference contact point (on the sphere) in sphere-local coords"))
+		((Real,effR2,,"effective radius of sphere")),
+		/*ctor*/ createIndex(); ,
+		/*py*/
+	);
 	REGISTER_CLASS_INDEX(Dem3DofGeom_WallSphere,Dem3DofGeom);
 	DECLARE_LOGGER;
 	friend class Gl1_Dem3DofGeom_WallSphere;
@@ -42,8 +41,13 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_WallSphere);
 			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 			static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
 		RENDERS(Dem3DofGeom_WallSphere);
-		REGISTER_CLASS_AND_BASE(Gl1_Dem3DofGeom_WallSphere,GlInteractionGeometryFunctor);
-		REGISTER_ATTRIBUTES(GlInteractionGeometryFunctor, (normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel) );
+		YADE_CLASS_BASE_DOC_ATTRS(Gl1_Dem3DofGeom_WallSphere,GlInteractionGeometryFunctor,"Render interaction of wall and sphere (represented by Dem3DofGeom_WallSphere)",
+			((normal,"Render interaction normal"))
+			((rolledPoints,"Render points rolled on the spheres (tracks the original contact point)"))
+			((unrolledPoints,"Render original contact points unrolled to the contact plane"))
+			((shear,"Render shear line in the contact plane"))
+			((shearLabel,"Render shear magnitude as number"))
+		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_WallSphere);
 #endif

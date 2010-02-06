@@ -50,8 +50,13 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_FacetSphere);
 			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 			static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
 		RENDERS(Dem3DofGeom_FacetSphere);
-		REGISTER_CLASS_AND_BASE(Gl1_Dem3DofGeom_FacetSphere,GlInteractionGeometryFunctor);
-		REGISTER_ATTRIBUTES(GlInteractionGeometryFunctor, (normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel) );
+		YADE_CLASS_BASE_DOC_ATTRS(Gl1_Dem3DofGeom_FacetSphere,GlInteractionGeometryFunctor,"Render interaction of facet and sphere (represented by Dem3DofGeom_FacetSphere)",
+			((normal,"Render interaction normal"))
+			((rolledPoints,"Render points rolled on the sphere & facet (original contact point)"))
+			((unrolledPoints,"Render original contact points unrolled to the contact plane"))
+			((shear,"Render shear line in the contact plane"))
+			((shearLabel,"Render shear magnitude as number"))
+		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_FacetSphere);
 #endif
@@ -71,13 +76,12 @@ class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 			LOG_ERROR("!! goReverse maybe doesn't work in Ig2_Facet_Sphere_Dem3DofGeom. InteractionGeometryDispatcher should swap interaction members first and call go(...) afterwards.");
 		}
 
-		//! Reduce the facet's size, probably to avoid singularities at common facets' edges (?)
-		Real shrinkFactor;
-		Ig2_Facet_Sphere_Dem3DofGeom(): shrinkFactor(0.) {}
 	FUNCTOR2D(Facet,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
-	REGISTER_CLASS_AND_BASE(Ig2_Facet_Sphere_Dem3DofGeom,InteractionGeometryFunctor);
-	REGISTER_ATTRIBUTES(InteractionGeometryFunctor,(shrinkFactor));
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Ig2_Facet_Sphere_Dem3DofGeom,InteractionGeometryFunctor,"Compute geometry of facet-sphere contact with normal and shear DOFs. As in all other Dem3DofGeom-related classes, total formulation of both shear and normal deformations is used. See :yref:`Dem3DofGeom_FacetSphere` for more information.",
+		// unused: ((Real,shrinkFactor,0.,"Reduce the facet's size, probably to avoid singularities at common facets' edges (?)"))
+		,,
+	);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ig2_Facet_Sphere_Dem3DofGeom);

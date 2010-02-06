@@ -14,9 +14,6 @@ CREATE_LOGGER(ClumpMemberMover);
  ************************************* ClumpMemberMover ******************************
  **************************************************************************************/
 
-// Constructor must be in the .cpp file (?)
-ClumpMemberMover::ClumpMemberMover(){/*createIndex();*/ }
-
 /*! We only call clump's method, since it belongs there logically. It makes encapsulation of private members nicer, too.
  * _param pp passed by the dispatcher
  * _param clump passed by the dispatcher
@@ -35,28 +32,6 @@ void ClumpMemberMover::applyCondition(Scene* rootBody){
 /**************************************************************************************
  ******************************************** Clump ***********************************
  **************************************************************************************/
-
-/*! Create zero'ed RigidBodyParameters; they should not be manipulated directly, since they are all calculated in Clump::update.
- * @todo do we need to do the same for GeomtricalModel, Shape and Bound? They will never be used. Sort that out for sure.
- * @bug setting Clump::isDynamic in constructor is not enough (as if it were modified somewhere), must be set explicitly by the user after construction (why?)
- */
-Clump::Clump(): Body(){
-	isDynamic=true;
-	state=shared_ptr<State>(new State);
-
-	// these will not be defined for the moment...
-#if 0
-	bound=shared_ptr<Aabb>(new Aabb);
-	bound->diffuseColor=Vector3r(1,0,0);
-
-	shape=shared_ptr<Shape>(new Shape);
-	shape->diffuseColor=Vector3r(0,0,0);
-
-	geometricalModel=shared_ptr<GeometricalModel>(new GeometricalModel);
-	geometricalModel->diffuseColor=Vector3r(0,0,0); geometricalModel->wire=false; geometricalModel->visible=false; geometricalModel->shadowCaster=false;
-#endif
-
-}
 
 /*! @pre Body must be dynamic.
  * @pre Body must not be part or this clump already.

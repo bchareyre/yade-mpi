@@ -9,15 +9,6 @@
 
 CREATE_LOGGER(Facet);
 
-Facet::Facet() : Shape()
-{
-	createIndex();
-	#ifdef FACET_TOPO
-		edgeAdjIds.resize(3,Body::ID_NONE);	
-		edgeAdjHalfAngle.resize(3,0);
-	#endif
-}
-
 Facet::~Facet()
 {
 }

@@ -67,8 +67,8 @@ class Indexable
 	private: static int& getClassIndexStatic()       { static int index = -1; return index; }\
 	public: virtual int& getClassIndex()             { return getClassIndexStatic(); }       \
 	public: virtual const int& getClassIndex() const { return getClassIndexStatic(); }       \
-	public: virtual int& getBaseClassIndex(int)             { throw std::logic_error("Class " #SomeClass " should not have called createIndex() in its ctor (since it is a top-level indexable, using REGISTER_INDEX_COUNTER"); } \
-	public: virtual const int& getBaseClassIndex(int) const { throw std::logic_error("Class " #SomeClass " should not have called createIndex() in its ctor (since it is a top-level indexable, using REGISTER_INDEX_COUNTER"); } \
+	public: virtual int& getBaseClassIndex(int)             { throw std::logic_error("One of the following errors was detected:\n(1) Class " #SomeClass " called createIndex() in its ctor (but it shouldn't, being a top-level indexable; only use REGISTER_INDEX_COUNTER, but not createIndex()).\n(2) Some DerivedClass deriving from " #SomeClass " forgot to use REGISTER_CLASS_INDEX(DerivedClass," #SomeClass ").\nPlease fix that and come back again." ); } \
+	public: virtual const int& getBaseClassIndex(int) const { throw std::logic_error("One of the following errors was detected:\n(1) Class " #SomeClass " called createIndex() in its ctor (but it shouldn't, being a top-level indexable; only use REGISTER_INDEX_COUNTER, but not createIndex()).\n(2) Some DerivedClass deriving from " #SomeClass " forgot to use REGISTER_CLASS_INDEX(DerivedClass," #SomeClass ").\nPlease fix that and come back again." ); } \
 	private: static int& getMaxCurrentlyUsedIndexStatic() { static int maxCurrentlyUsedIndex = -1; return maxCurrentlyUsedIndex; } \
 	public: virtual const int& getMaxCurrentlyUsedClassIndex() const {  \
 		SomeClass * Indexable##SomeClass = 0;                            \

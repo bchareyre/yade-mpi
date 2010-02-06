@@ -14,13 +14,12 @@ class Gl1_Facet : public GlShapeFunctor
 {	
 	//! render facet's and edges' normals
 	static bool normals;
-	public :
+	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-
 	RENDERS(Facet);
-	REGISTER_CLASS_NAME(Gl1_Facet);
-	REGISTER_BASE_CLASS_NAME(GlShapeFunctor);
-	REGISTER_ATTRIBUTES(GlShapeFunctor,(normals));
+	YADE_CLASS_BASE_DOC_ATTRS(Gl1_Facet,GlShapeFunctor,"Renders :yref:`Facet` object",
+		((normals,"|ystatic| Also render facets' and edges' normals. :ydefault:`false`"))
+	);
 };
 
 REGISTER_SERIALIZABLE(Gl1_Facet);

@@ -14,7 +14,8 @@ class Scene;
 class ForceResetter: public GlobalEngine{
 	public:
 		virtual void action(Scene*);
-	REGISTER_CLASS_AND_BASE(ForceResetter,GlobalEngine);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(ForceResetter,GlobalEngine,"Reset all forces stored in Scene::forces (``O.forces`` in python). Typically, this is the first engine to be run at every step.",
+	/* attrs */, /*ctor*/, /*py*/);
 };
 REGISTER_SERIALIZABLE(ForceResetter);
 

@@ -12,16 +12,11 @@
 #include<yade/pkg-common/BoundFunctor.hpp>
 
 
-class Bo1_Box_Aabb : public BoundFunctor
-{
-	public :
-		void go(	  const shared_ptr<Shape>& cm
-				, shared_ptr<Bound>& bv
-				, const Se3r& se3
-				, const Body*	);
+class Bo1_Box_Aabb : public BoundFunctor{
+	public:
+		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 	FUNCTOR2D(Box,Aabb);
-	REGISTER_CLASS_NAME(Bo1_Box_Aabb);
-	REGISTER_BASE_CLASS_NAME(BoundFunctor);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Bo1_Box_Aabb,BoundFunctor,"Create/update an Aabb from a box.",,,);
 };
 
 REGISTER_SERIALIZABLE(Bo1_Box_Aabb);

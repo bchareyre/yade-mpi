@@ -20,6 +20,7 @@ class Shape : public Serializable, public Indexable
 {
 	public :
 		Shape(): diffuseColor(Vector3r(1,1,1)), wire(false), highlight(false) {}
+		~Shape(); // vtable
 		Vector3r diffuseColor;
 		bool wire;
 		bool highlight;

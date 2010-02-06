@@ -10,20 +10,16 @@
 
 #include<yade/core/Shape.hpp>
 
-class Sphere : public Shape
-{
-	public :
-		Real radius;
-
-		Sphere();
+class Sphere: public Shape{
+	public:
 		Sphere(Real _radius): radius(_radius){ createIndex(); }
 		virtual ~Sphere ();
-
-	YADE_CLASS_BASE_DOC_ATTRS(Sphere,Shape,"Geometry of spherical particle.",
-		((radius,"Radius [m]"))
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Sphere,Shape,"Geometry of spherical particle.",
+		((Real,radius,NaN,"Radius [m]")),
+		createIndex(); /*ctor*/,
+		/*py*/
 	);
 	REGISTER_CLASS_INDEX(Sphere,Shape);
-
 };
 
 REGISTER_SERIALIZABLE(Sphere);

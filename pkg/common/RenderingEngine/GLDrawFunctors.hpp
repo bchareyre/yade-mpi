@@ -25,8 +25,7 @@ class GlBoundFunctor: public Functor1D<void, TYPELIST_2(const shared_ptr<Bound>&
 		virtual ~GlBoundFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GlBoundFunctor);
-	REGISTER_BASE_CLASS_NAME(Functor1D);
+	YADE_CLASS_BASE_DOC_ATTRS(GlBoundFunctor,Functor,"Abstract functor for rendering :yref:`Body::bound` objects.",/*attrs*/);
 };
 REGISTER_SERIALIZABLE(GlBoundFunctor);
 
@@ -35,8 +34,7 @@ class GlShapeFunctor: public Functor1D<void, TYPELIST_4(const shared_ptr<Shape>&
 		virtual ~GlShapeFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GlShapeFunctor);
-	REGISTER_BASE_CLASS_NAME(Functor1D);
+	YADE_CLASS_BASE_DOC_ATTRS(GlShapeFunctor,Functor,"Abstract functor for rendering :yref:`Body::shape` objects.",/*attrs*/);
 };
 REGISTER_SERIALIZABLE(GlShapeFunctor);
 
@@ -45,8 +43,7 @@ class GlInteractionGeometryFunctor: public Functor1D<void,TYPELIST_5(const share
 		virtual ~GlInteractionGeometryFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GlInteractionGeometryFunctor);
-	REGISTER_BASE_CLASS_NAME(Functor1D);
+	YADE_CLASS_BASE_DOC_ATTRS(GlInteractionGeometryFunctor,Functor,"Abstract functor for rendering :yref:`Interaction::interactionGeometry` objects.",/*attrs*/);
 };
 REGISTER_SERIALIZABLE(GlInteractionGeometryFunctor);
 
@@ -55,8 +52,7 @@ class GlInteractionPhysicsFunctor: public Functor1D<void, TYPELIST_5(const share
 		virtual ~GlInteractionPhysicsFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GlInteractionPhysicsFunctor);
-	REGISTER_BASE_CLASS_NAME(Functor1D);
+	YADE_CLASS_BASE_DOC_ATTRS(GlInteractionPhysicsFunctor,Functor,"Abstract functor for rendering :yref:`Interaction::interactionPhysics` objects.",/*attrs*/);
 };
 REGISTER_SERIALIZABLE(GlInteractionPhysicsFunctor);
 
@@ -65,8 +61,7 @@ class GlStateFunctor: public Functor1D<void,TYPELIST_1(const shared_ptr<State>&/
 		virtual ~GlStateFunctor() {};
 		virtual string renders() const { std::cerr<<"Unregistered gldraw class.\n"; throw; };
 		virtual void initgl(){/*WARNING: it must deal with static members, because it is called from another instance!*/};
-	REGISTER_CLASS_NAME(GlStateFunctor);
-	REGISTER_BASE_CLASS_NAME(Functor1D);
+	YADE_CLASS_BASE_DOC_ATTRS(GlStateFunctor,Functor,"Abstract functor for rendering :yref:`Body::state` objects.",/*attrs*/);
 };
 REGISTER_SERIALIZABLE(GlStateFunctor);
 

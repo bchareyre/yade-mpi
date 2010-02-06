@@ -8,12 +8,6 @@
 
 #include "Box.hpp"
 
-
-Box::Box () : Shape()
-{		
-	createIndex();
-}
-
 Box::~Box ()
 {		
 }

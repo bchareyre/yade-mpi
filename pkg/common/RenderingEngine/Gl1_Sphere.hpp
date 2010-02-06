@@ -23,9 +23,14 @@ class Gl1_Sphere : public GlShapeFunctor{
 		void initGlLists(void);
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+	YADE_CLASS_BASE_DOC_ATTRS(Gl1_Sphere,GlShapeFunctor,"Renders :yref:`Sphere` object",
+		((wire,"|ystatic| Only show wireframe (controlled by ``glutSlices`` and ``glutStacks``. :ydefault:`false`"))
+		((stripes,"|ystatic| In non-wire rendering, show stripes clearly showing particle rotation. :ydefault:`false` "))
+		((glutNormalize,"|ystatic| Fix normals for non-wire rendering; see `http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html`_ :ydefault:`true`"))
+		((glutSlices,"|ystatic| Number of sphere slices; not used with ``stripes`` (see `glut{Solid,Wire}Sphere reference<http://www.opengl.org/documentation/specs/glut/spec3/node81.html>`_) :ydefault:`12` "))
+		((glutStacks,"|ystatic| Number of sphere stacks; not used with ``stripes`` (see `glut{Solid,Wire}Sphere reference<http://www.opengl.org/documentation/specs/glut/spec3/node81.html>`_) :ydefault:`6` "))
+	);
 	RENDERS(Sphere);
-	REGISTER_ATTRIBUTES(Serializable,(wire)(glutNormalize)(glutSlices)(glutStacks)(stripes));
-	REGISTER_CLASS_AND_BASE(Gl1_Sphere,GlShapeFunctor);
 };
 
 REGISTER_SERIALIZABLE(Gl1_Sphere);

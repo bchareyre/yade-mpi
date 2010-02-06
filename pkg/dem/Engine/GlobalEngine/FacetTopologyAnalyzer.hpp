@@ -47,19 +47,17 @@ class FacetTopologyAnalyzer: public GlobalEngine{
 		};
 	};
 	public:
-		//! Axis along which to do the initial vertex sort
-		Vector3r projectionAxis;
-		//! maximum distance of "identical" vertices, relative to minimum facet size
-		Real relTolerance;
-		//! how many common edges were identified during last run
-		long commonEdgesFound;
-		//! how many common vertices were identified during last run
-		long commonVerticesFound;
-	void action(Scene*); 
-	FacetTopologyAnalyzer(): projectionAxis(Vector3r::UNIT_X), relTolerance(1e-4), commonEdgesFound(0), commonVerticesFound(0) {}
+		void action(Scene*); 
+
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(FacetTopologyAnalyzer,GlobalEngine,"Initializer for filling adjacency geometry data for facets.\n\nCommon vertices and common edges are identified and mutual angle between facet faces is written to Facet instances. If facets don't move with respect to each other, this must be done only at the beginng.",
+		((Vector3r,projectionAxis,Vector3r::UNIT_X,"Axis along which to do the initial vertex sort"))
+		((Real,relTolerance,1e-4,"maximum distance of 'identical' vertices, relative to minimum facet size"))
+		((long,commonEdgesFound,0,"how many common edges were identified during last run. |yupdate|"))
+		((long,commonVerticesFound,0,"how many common vertices were identified during last run. |yupdate|")),
+		/*ctor*/,
+		/*py*/
+	);
 	DECLARE_LOGGER;
-	REGISTER_CLASS_AND_BASE(FacetTopologyAnalyzer,GlobalEngine);
-	REGISTER_ATTRIBUTES(GlobalEngine, (projectionAxis)(relTolerance)(commonEdgesFound)(commonVerticesFound));
 };
 REGISTER_SERIALIZABLE(FacetTopologyAnalyzer);
 

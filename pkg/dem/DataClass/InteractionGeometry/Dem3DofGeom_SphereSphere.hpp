@@ -71,8 +71,13 @@ REGISTER_SERIALIZABLE(Dem6DofGeom_SphereSphere);
 			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 			static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
 		RENDERS(Dem3DofGeom_SphereSphere);
-		REGISTER_CLASS_AND_BASE(Gl1_Dem3DofGeom_SphereSphere,GlInteractionGeometryFunctor);
-		REGISTER_ATTRIBUTES(GlInteractionGeometryFunctor,(normal)(rolledPoints)(unrolledPoints)(shear)(shearLabel));
+		YADE_CLASS_BASE_DOC_ATTRS(Gl1_Dem3DofGeom_SphereSphere,GlInteractionGeometryFunctor,"Render interaction of 2 spheres (represented by Dem3DofGeom_SphereSphere)",
+			((normal,"Render interaction normal"))
+			((rolledPoints,"Render points rolled on the spheres (tracks the original contact point)"))
+			((unrolledPoints,"Render original contact points unrolled to the contact plane"))
+			((shear,"Render shear line in the contact plane"))
+			((shearLabel,"Render shear magnitude as number"))
+		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_SphereSphere);
 #endif

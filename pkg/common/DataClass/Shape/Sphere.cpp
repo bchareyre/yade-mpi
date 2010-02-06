@@ -8,11 +8,6 @@
 
 #include "Sphere.hpp"
 
-Sphere::Sphere () : Shape(), radius(0.0)
-{
-	createIndex();
-}
-
 Sphere::~Sphere ()
 {
 }

@@ -10,20 +10,12 @@
 
 #include <yade/pkg-common/BoundFunctor.hpp>
 
-class Bo1_Facet_Aabb : public BoundFunctor
-{
-	public :
-		void go(	  const shared_ptr<Shape>& cm
-				, shared_ptr<Bound>& bv
-				, const Se3r& se3
-				, const Body*	);
-	
+class Bo1_Facet_Aabb : public BoundFunctor{
+	public:
+		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 	FUNCTOR2D(Facet,Aabb);
-	
-	REGISTER_CLASS_NAME(Bo1_Facet_Aabb);
-	REGISTER_BASE_CLASS_NAME(BoundFunctor);
+	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Bo1_Facet_Aabb,BoundFunctor,"Creates/updates an Aabb of a facet",,,);
 };
-
 REGISTER_SERIALIZABLE(Bo1_Facet_Aabb);
 
 
