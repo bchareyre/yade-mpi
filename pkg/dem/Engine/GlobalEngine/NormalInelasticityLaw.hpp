@@ -18,16 +18,16 @@
 This contact Law is inspired by CohesiveFrictionalContactLaw (inspired itselve directly from the work of Plassiard & Belheine, see the corresponding articles in "Annual Report 2006" in http://geo.hmg.inpg.fr/frederic/Discrete_Element_Group_FVD.html for example). It allows so to set moments, cohesion, tension limit and (that's the difference) inelastic unloadings in compression between bodies.
 All that concerned brokenBodies (this flag and the erosionactivated one) and the useless "iter" has been suppressed.
 
-The Relationsships corresponding are RockJointLawRelationships, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions
+The Relationsships corresponding are Ip2_2xCohFrictMat_NormalInelasticityPhys, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions
 To use it you should also use :
 - CohesiveFrictionalMat for the bodies, with "isCohesive" = 1 (A verifier ce dernier point)
-- RockJointLawRelationships (=> which involves interactions of "RockJointPhys" type)
+- Ip2_2xCohFrictMat_NormalInelasticityPhys (=> which involves interactions of "NormalInelasticityPhys" type)
 
  */
 
 
 // <<<<<<< TREE
-class RockJointLaw : public GlobalEngine
+class NormalInelasticityLaw : public GlobalEngine
 // =======
 // class ContactLaw1 : public GlobalEngine
 // >>>>>>> MERGE-SOURCE
@@ -39,11 +39,11 @@ class RockJointLaw : public GlobalEngine
 		bool momentRotationLaw;
 		bool momentAlwaysElastic;	// if true the value of the momentum (computed only if momentRotationLaw !!) is not limited by a plastic threshold
 	
-		RockJointLaw();
+		NormalInelasticityLaw();
 		void action(Scene*);
 // <<<<<<< TREE
 	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
-	REGISTER_CLASS_NAME(RockJointLaw);
+	REGISTER_CLASS_NAME(NormalInelasticityLaw);
 	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 // =======
 // 	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
@@ -52,6 +52,6 @@ class RockJointLaw : public GlobalEngine
 // >>>>>>> MERGE-SOURCE
 };
 
-REGISTER_SERIALIZABLE(RockJointLaw);
+REGISTER_SERIALIZABLE(NormalInelasticityLaw);
 
 

@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "RockJointLaw.hpp"
+#include "NormalInelasticityLaw.hpp"
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/RockJointPhys.hpp>
+#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -19,7 +19,7 @@ Vector3r translation_vect (0.10,0,0);
 
 
 // <<<<<<< TREE
-RockJointLaw::RockJointLaw() : GlobalEngine()
+NormalInelasticityLaw::NormalInelasticityLaw() : GlobalEngine()
 // =======
 // ContactLaw1::ContactLaw1() : GlobalEngine()
 // >>>>>>> MERGE-SOURCE
@@ -32,7 +32,7 @@ RockJointLaw::RockJointLaw() : GlobalEngine()
 
 
 
-void RockJointLaw::action(Scene* ncb)
+void NormalInelasticityLaw::action(Scene* ncb)
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 
@@ -59,7 +59,7 @@ void RockJointLaw::action(Scene* ncb)
 		State* de1 = Body::byId(id1,ncb)->state.get();
 		State* de2 = Body::byId(id2,ncb)->state.get();
 		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
-		RockJointPhys* currentContactPhysics = YADE_CAST<RockJointPhys*> (contact->interactionPhysics.get());
+		NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (contact->interactionPhysics.get());
 
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
@@ -305,7 +305,7 @@ void RockJointLaw::action(Scene* ncb)
 
 }
 
-YADE_PLUGIN((RockJointLaw));
+YADE_PLUGIN((NormalInelasticityLaw));
 
 // YADE_REQUIRE_FEATURE(PHYSPAR);
 

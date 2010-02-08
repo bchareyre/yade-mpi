@@ -179,10 +179,10 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
 			for ( ;itFirst!=itLast; ++itFirst )
 			{
-				if ( ( *itFirst )->getClassName() == "RockJointLaw" ) 
+				if ( ( *itFirst )->getClassName() == "NormalInelasticityLaw" ) 
 				{
-					if(LOG) cout << "RockJointLaw engine found" << endl;
-					myLdc =  YADE_PTR_CAST<RockJointLaw> ( *itFirst );
+					if(LOG) cout << "NormalInelasticityLaw engine found" << endl;
+					myLdc =  YADE_PTR_CAST<NormalInelasticityLaw> ( *itFirst );
 					coeff_dech = myLdc ->coeff_dech;
 				}
 			}

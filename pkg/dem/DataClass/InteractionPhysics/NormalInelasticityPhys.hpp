@@ -10,12 +10,12 @@
 
 #include<yade/pkg-dem/FrictPhys.hpp>
 
-/*! \brief Interaction for using RockJointLaw
+/*! \brief Interaction for using NormalInelasticityLaw
 
 This interaction is similar to CohesiveFrictionalContactInteraction. Among the differences are the unMax, previousun and previousFn (allowing to describe the inelastic unloadings in compression), no more shear and tension Adhesion, no more "fragile", "cohesionBroken" and "cohesionDisablesFriction"
  */
 
-class RockJointPhys : public FrictPhys
+class NormalInelasticityPhys : public FrictPhys
 {
 	public :
 		Real		unMax,		// the maximum value of penetration depth of the history of this interaction
@@ -31,17 +31,17 @@ class RockJointPhys : public FrictPhys
 		Vector3r	initialPosition1,initialPosition2;
 
 	
-		RockJointPhys();
-		virtual ~RockJointPhys();
+		NormalInelasticityPhys();
+		virtual ~NormalInelasticityPhys();
 		void SetBreakingState ();
 	REGISTER_ATTRIBUTES(FrictPhys,(unMax)(previousun)(previousFn)(initialOrientation1)(initialOrientation2)(orientationToContact1)(orientationToContact2)(currentContactOrientation)(initialContactOrientation)(initialPosition1)(initialPosition2)(forMaxMoment)(kr));
-	REGISTER_CLASS_NAME(RockJointPhys);
+	REGISTER_CLASS_NAME(NormalInelasticityPhys);
 	REGISTER_BASE_CLASS_NAME(FrictPhys);
 
-	REGISTER_CLASS_INDEX(RockJointPhys,FrictPhys);
+	REGISTER_CLASS_INDEX(NormalInelasticityPhys,FrictPhys);
 
 };
 
-REGISTER_SERIALIZABLE(RockJointPhys);
+REGISTER_SERIALIZABLE(NormalInelasticityPhys);
 
 

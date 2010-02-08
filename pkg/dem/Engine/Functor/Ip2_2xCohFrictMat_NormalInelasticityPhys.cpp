@@ -6,9 +6,9 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"RockJointLawRelationships.hpp"
+#include"Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/RockJointPhys.hpp>
+#include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 // #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> ScGeom !!?
 // #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
@@ -16,7 +16,7 @@
 #include<yade/core/Scene.hpp>
 
 
-RockJointLawRelationships::RockJointLawRelationships()
+Ip2_2xCohFrictMat_NormalInelasticityPhys::Ip2_2xCohFrictMat_NormalInelasticityPhys()
 {
 	betaR = 0.12;
 	setCohesionNow = false;
@@ -37,7 +37,7 @@ RockJointLawRelationships::RockJointLawRelationships()
 //
 //
 
-void RockJointLawRelationships::go(	  const shared_ptr<Material>& b1 // CohesiveFrictionalMat
+void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>& b1 // CohesiveFrictionalMat
 					, const shared_ptr<Material>& b2 // CohesiveFrictionalMat
 					, const shared_ptr<Interaction>& interaction)
 {
@@ -58,8 +58,8 @@ void RockJointLawRelationships::go(	  const shared_ptr<Material>& b1 // Cohesive
 		if(!interaction->interactionPhysics)
 		{
 //std::cerr << " isNew, id1: " << interaction->getId1() << " id2: " << interaction->getId2()  << "\n";
-			interaction->interactionPhysics = shared_ptr<RockJointPhys>(new RockJointPhys());
-			RockJointPhys* contactPhysics = YADE_CAST<RockJointPhys*>(interaction->interactionPhysics.get());
+			interaction->interactionPhysics = shared_ptr<NormalInelasticityPhys>(new NormalInelasticityPhys());
+			NormalInelasticityPhys* contactPhysics = YADE_CAST<NormalInelasticityPhys*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -141,7 +141,7 @@ void RockJointLawRelationships::go(	  const shared_ptr<Material>& b1 // Cohesive
 		{	
 			// FIXME - are those lines necessary ???? what they are doing in fact ???
 			// ANSWER - they are used when you setCohesionNow (contact isNew not)
-			RockJointPhys* contactPhysics = YADE_CAST<RockJointPhys*>(interaction->interactionPhysics.get());
+			NormalInelasticityPhys* contactPhysics = YADE_CAST<NormalInelasticityPhys*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
@@ -188,6 +188,6 @@ void RockJointLawRelationships::go(	  const shared_ptr<Material>& b1 // Cohesive
 	}
 #endif
 };
-YADE_PLUGIN((RockJointLawRelationships));
+YADE_PLUGIN((Ip2_2xCohFrictMat_NormalInelasticityPhys));
 
 // YADE_REQUIRE_FEATURE(PHYSPAR);

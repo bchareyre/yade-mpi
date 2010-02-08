@@ -110,6 +110,9 @@ _deprecated={
 	'ContactLaw1Interaction':'RockJointPhys', # Tue Feb  2 14:55:34 2010, jduriez@c1solimara-l
 	'CL1Relationships':'RockJointLawRelationships', # Tue Feb  2 14:58:02 2010, jduriez@c1solimara-l
 	'GLDrawCpmPhys':'Gl1_CpmPhys', # Sat Feb  6 14:46:08 2010, vaclav@flux
+	'RockJointLaw':'NormalInelasticityLaw', # Mon Feb  8 11:17:00 2010, jduriez@c1solimara-l
+	'RockJointPhys':'NormalInelasticityPhys', # Mon Feb  8 11:17:35 2010, jduriez@c1solimara-l
+	'RockJointLawRelationships':'Ip2_2xCohFrictMat_NormalInelasticityPhys', # Mon Feb  8 11:17:59 2010, jduriez@c1solimara-l
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

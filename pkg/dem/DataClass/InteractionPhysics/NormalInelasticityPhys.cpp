@@ -6,10 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "RockJointPhys.hpp"
+#include "NormalInelasticityPhys.hpp"
 
 
-RockJointPhys::RockJointPhys()
+NormalInelasticityPhys::NormalInelasticityPhys()
 {
 	createIndex();
 
@@ -28,7 +28,7 @@ RockJointPhys::RockJointPhys()
 
 }
 
-void RockJointPhys::SetBreakingState()
+void NormalInelasticityPhys::SetBreakingState()
 {
 	
 	//if (fragile) {
@@ -36,17 +36,17 @@ void RockJointPhys::SetBreakingState()
 	
 }
 
-RockJointPhys::~RockJointPhys()
+NormalInelasticityPhys::~NormalInelasticityPhys()
 {
 }
 
-// void RockJointPhys::postProcessAttributes(bool)
+// void NormalInelasticityPhys::postProcessAttributes(bool)
 // {
 // 
 // }
 
 
-YADE_PLUGIN((RockJointPhys));
+YADE_PLUGIN((NormalInelasticityPhys));
 
 // YADE_REQUIRE_FEATURE(PHYSPAR);
 

@@ -16,8 +16,8 @@
 #include <yade/lib-miniWm3/Wm3Math.h>
 
 #include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
-#include <yade/pkg-dem/RockJointLaw.hpp>
-#include <yade/pkg-dem/RockJointLawRelationships.hpp>
+#include <yade/pkg-dem/NormalInelasticityLaw.hpp>
+#include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>
 
@@ -272,7 +272,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
-	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new RockJointLawRelationships);
+	shared_ptr<InteractionPhysicsFunctor> CL1Rel(new Ip2_2xCohFrictMat_NormalInelasticityPhys);
 	interactionPhysicsDispatcher->add(CL1Rel);
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
@@ -298,7 +298,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new RockJointLaw));
+	rootBody->engines.push_back(shared_ptr<Engine>(new NormalInelasticityLaw));
 	if(gravApplied)
 		rootBody->engines.push_back(gravityCondition);
 	if(shearApplied)

@@ -10,16 +10,16 @@
 
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 
-/*! \brief The RelationShips for using RockJointLaw
+/*! \brief The RelationShips for using NormalInelasticityLaw
 
-In these RelationShips all the attributes of the interactions (which are of RockJointPhys type) are computed.
+In these RelationShips all the attributes of the interactions (which are of NormalInelasticityPhys type) are computed.
 WARNING : as in the others Relationships most of the attributes are computed only once : when the interaction is "new"
  */
 
-class RockJointLawRelationships : public InteractionPhysicsFunctor
+class Ip2_2xCohFrictMat_NormalInelasticityPhys : public InteractionPhysicsFunctor
 {
 	public :
-		RockJointLawRelationships();
+		Ip2_2xCohFrictMat_NormalInelasticityPhys();
 
 		virtual void go(	const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
@@ -35,11 +35,11 @@ class RockJointLawRelationships : public InteractionPhysicsFunctor
 		long iter;//REMOVE THIS
 
 	FUNCTOR2D(CohesiveFrictionalMat,CohesiveFrictionalMat);
-	REGISTER_CLASS_NAME(RockJointLawRelationships);
+	REGISTER_CLASS_NAME(Ip2_2xCohFrictMat_NormalInelasticityPhys);
 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
 	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(betaR)(setCohesionNow)(setCohesionOnNewContacts));
 };
 
-REGISTER_SERIALIZABLE(RockJointLawRelationships);
+REGISTER_SERIALIZABLE(Ip2_2xCohFrictMat_NormalInelasticityPhys);
 
 
