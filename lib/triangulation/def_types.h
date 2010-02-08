@@ -17,7 +17,7 @@
 
 #include <boost/static_assert.hpp>
 
-#define FLOW_ENGINE
+//#define FLOW_ENGINE
 
 
 namespace CGT{
@@ -40,11 +40,13 @@ typedef Traits::Triangle_3								Triangle;
 typedef Traits::Tetrahedron_3								Tetraedre;
 // typedef std::vector<double>								VectorD;
 
-using namespace std;
+//using namespace std;
 
 class Cell_Info : public Point/*, public Vecteur*/ {
 
+	public:
 	Real s;// stockage d'une valeur scalaire (ex. d�viateur) pour affichage
+	bool isFictious;
 #ifdef FLOW_ENGINE
 	Real t;
 	int fict;
@@ -57,10 +59,6 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 // 	std::vector<double> flow_rate;
 	std::vector<double> module_permeability;
 // 	std::vector<Vecteur> vec_forces;
-#endif
-public:
-	bool isFictious;
-#ifdef FLOW_ENGINE
 	Cell_Info (void)
 	{
 		module_permeability.resize(4, 0);
@@ -70,10 +68,8 @@ public:
 		isInside = false;
 		inv_sum_k=0;
 		isFictious = false; isInferior = false; isSuperior = false; isLateral = false; isvisited = false; isExternal=false;
-	}
-	
+	}	
 	double inv_sum_k;
-
 	bool isInside;
 	bool isInferior;
 	bool isSuperior;
@@ -81,12 +77,11 @@ public:
 	bool isvisited;
 	bool isExternal;
 // 	bool isBizarre;
+	Cell_Info& operator= (const std::vector<double> &v) { for (int i=0; i<4;i++) module_permeability[i]= v[i]; return *this; }
 #endif
 	Cell_Info& operator= (const Point &p) { Point::operator= (p); return *this; }
 	//Info& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
-#ifdef FLOW_ENGINE
-	Cell_Info& operator= (const vector<double> &v) { for (int i=0; i<4;i++) module_permeability[i]= v[i]; return *this; }
-#endif
+
 	Cell_Info& operator= (const float &scalar) { s=scalar; return *this; }
 // 	Cell_Info& operator= (const float &scalar) { VolumeVariation=scalar; return *this; }
 	inline Real x (void) {return Point::x();}
@@ -102,11 +97,11 @@ public:
 	inline int& fictious (void) {return fict;}
 	inline double& p (void) {return pression;}
 	
-	inline vector<double>& k_norm (void) {return module_permeability;}
-	inline vector< Vecteur >& k_vector (void) {return direction_permeability;}
+	inline std::vector<double>& k_norm (void) {return module_permeability;}
+	inline std::vector< Vecteur >& k_vector (void) {return direction_permeability;}
 	
-	inline vector<Vecteur>& force (void) {return cell_force;}
-	inline vector<double>& Rh (void) {return RayHydr;}
+	inline std::vector<Vecteur>& force (void) {return cell_force;}
+	inline std::vector<double>& Rh (void) {return RayHydr;}
 // 	inline vector<Vecteur>& F (void) {return vec_forces;}
 // 	inline vector<double>& Q (void) {return flow_rate;}
 // 	inline vector<Real>& d (void) {return distance;}
@@ -125,9 +120,7 @@ class Vertex_Info : /*public Point,*/ public Vecteur {
 
 public:
 	bool isFictious;
-#ifdef FLOW_ENGINE
-	Vecteur forces;
-#endif
+
 	//Info& operator= (const Point &p) { Point::operator= (p); return *this; }
 	Vertex_Info& operator= (const Vecteur &u) { Vecteur::operator= (u); return *this; }
 	Vertex_Info& operator= (const float &scalar) { s=scalar; return *this; }
@@ -141,7 +134,9 @@ public:
 	inline Real& f (void) {return s;}
 	inline Real& v (void) {return vol;}
 	inline unsigned int& id (void) {return i;}
+	
 #ifdef FLOW_ENGINE
+	Vecteur forces;
 	inline Vecteur& force (void) {return forces;}
 #endif
 	//operator Point& (void) {return (Point&) *this;}

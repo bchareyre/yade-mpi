@@ -17,6 +17,9 @@
 #include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 #include<yade/lib-triangulation/TriaxialState.h>
 #include <yade/lib-triangulation/Tenseur3.h>
+#include<boost/iostreams/filtering_stream.hpp>
+#include<boost/iostreams/filter/bzip2.hpp>
+#include<boost/iostreams/device/file.hpp>
 
 YADE_PLUGIN((MicroMacroAnalyser));
 YADE_REQUIRE_FEATURE(CGAL)
@@ -29,8 +32,12 @@ MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()
 	analyser->SetNO_ZERO_ID(false);
 	interval = 100;
 	outputFile = "MicroMacroAnalysis";
-	stateFileName = "./snapshots/state";
+	stateFileName = "state";
 	initialized = false;
+	incrtNumber=1;
+	stateNumber=0;
+	compDeformation=false;
+	compIncrt=false;
 }
 
 //MicroMacroAnalyser::~MicroMacroAnalyser(){ delete analyser;}
@@ -47,12 +54,33 @@ void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 void MicroMacroAnalyser::action(Scene* scene)
 {
 	//cerr << "MicroMacroAnalyser::action(Scene* scene) (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
-	if (!initialized) {setState(1,true,false); initialized=true;}
-	else if (Omega::instance().getCurrentIteration() % interval == 0) {
-		setState(2, true, true);
-		analyser->ComputeParticlesDeformation();
-		//for (int i=0; i<analyser->ParticleDeformation.size();i++) cerr<< analyser->ParticleDeformation[i]<<endl;
-		analyser->DefToFile();		
+	if (!triaxialCompressionEngine) {
+		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
+		for (;itFirst!=itLast; ++itFirst) {
+			if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {
+				LOG_DEBUG("stress controller engine found");
+				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}
+		}
+		if (!triaxialCompressionEngine) LOG_ERROR("stress controller engine not found");
+	}
+	if (triaxialCompressionEngine->strain[0]==0) return;// no deformation yet
+	if (!initialized) {
+		setState(1,true,false);
+		//Check file here again, to make sure we write to the correct file when filename is modified after the scene is loaded
+		bool file_exists = std::ifstream(outputFile.c_str());
+		ofile.open(outputFile.c_str(), std::ios::app);
+		if (!file_exists) ofile<<"iteration eps1w eps2w eps3w eps11g eps22g eps33g eps12g eps13g eps23g"<< endl;
+		initialized=true;
+	} else if (Omega::instance().getCurrentIteration() % interval == 0) {
+		setState(2, true, compIncrt);
+		if (compDeformation) {
+			analyser->ComputeParticlesDeformation();
+			//for (int i=0; i<analyser->ParticleDeformation.size();i++) cerr<< analyser->ParticleDeformation[i]<<endl;
+			ostringstream oss;
+			oss<<"deformation"<<incrtNumber++<<".vtk";
+			analyser->DefToFile(oss.str().c_str());
+		}
 		CGT::Tenseur_sym3 epsg(analyser->grad_u_total);
 		ofile << Omega::instance().getCurrentIteration() << analyser->Delta_epsilon(1,1)<<" "<<analyser->Delta_epsilon(2,2)<<" "<<analyser->Delta_epsilon(3,3)<<" "<<epsg(1,1)<<" "<<epsg(2,2)<< " "<<epsg(3,3)<<" "<<epsg(1,2)<<" "<<epsg(1,3)<<" "<<epsg(2,3)<<endl;
 		analyser->SwitchStates();
@@ -60,35 +88,26 @@ void MicroMacroAnalyser::action(Scene* scene)
 	//cerr << "ENDOF MicroMacro::action" << endl;
 }
 
-
-
 void MicroMacroAnalyser::setState(unsigned int state, bool save_states, bool computeIncrement)
 {
 	LOG_INFO("MicroMacroAnalyser::setState");
-	Scene* scene=Omega::instance().getScene().get();
-	if (!triaxialCompressionEngine) {
-		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
-		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
-		for (;itFirst!=itLast; ++itFirst) {
-			if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {   //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
-				LOG_DEBUG("stress controller engine found");
-				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);
-				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
-			}
-		}
-		if (!triaxialCompressionEngine) LOG_ERROR("stress controller engine not found");
-	}	
 	CGT::TriaxialState& TS = makeState(state, false);
-	if (state == 2 && computeIncrement) {
-		analyser->SetForceIncrements();
-		analyser->SetDisplacementIncrements();
+	if (state == 2) {
+		analyser->Delta_epsilon(3,3) = analyser->TS1->eps3 - analyser->TS0->eps3;
+		analyser->Delta_epsilon(1,1) = analyser->TS1->eps1 - analyser->TS0->eps1;
+		analyser->Delta_epsilon(2,2) = analyser->TS1->eps2 - analyser->TS0->eps2;
+		if (computeIncrement) {
+			analyser->SetForceIncrements();
+			analyser->SetDisplacementIncrements();
+		}
 	}
 	if (save_states) {
 		ostringstream oss;
-		oss<<stateFileName<<"_"<<Omega::instance().getCurrentIteration();
-		TS.to_file(oss.str().c_str());
+		//oss<<stateFileName<<"_"<<Omega::instance().getCurrentIteration();
+		oss<<stateFileName<<"_"<<stateNumber++;
+		TS.to_file(oss.str().c_str(),/*use bz2?*/ true);
 	}
-	cerr << "ENDOF MicroMacroAnalyser::setState" << endl;
+	LOG_DEBUG("ENDOF MicroMacroAnalyser::setState");
 }
 
 //Copy simulation data in the triaxialState structure
@@ -110,11 +129,12 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	BodyContainer::iterator biEnd = bodies->end();
 	BodyContainer::iterator bi = biBegin;
 	Ng = 0;
-
+	vector<body_id_t> fictiousVtx;
 	for (; bi!=biEnd ; ++bi) {
-		body_id_t Idg = (*bi)->getId();
+		const body_id_t Idg = (*bi)->getId();
 		TS.grains[Idg].id = Idg;
-		if (!(*bi)->isDynamic) TS.grains[Idg].isSphere = false;
+		if (!(*bi)->isDynamic) {
+			TS.grains[Idg].isSphere = false; fictiousVtx.push_back(Idg);}
 		else {//then it is a sphere (not a wall)
 			++Ng;
 			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
@@ -122,9 +142,11 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			const Vector3r& pos = (*bi)->state->pos;
 			Real rad = s->radius;
 
-			TS.grains[Idg].sphere = CGT::Sphere(CGT::Point(pos[0],pos[1],pos[2]),  rad);
+			TS.grains[Idg].sphere = CGT::Sphere(CGT::Point(pos[0],pos[1],pos[2]),rad);
 //    TS.grains[Idg].translation = trans;
-//    grains[Idg].rotation = rot;
+			Vector3r axis; Real angle;
+			(*bi)->state->ori.ToAxisAngle (axis, angle); axis*=angle;
+			TS.grains[Idg].rotation = CGT::Vecteur(axis[0],axis[1],axis[2]);
 			TS.box.base = CGT::Point(min(TS.box.base.x(), pos.X()-rad),
 					min(TS.box.base.y(), pos.Y()-rad),
 					    min(TS.box.base.z(), pos.Z()-rad));
@@ -134,9 +156,23 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			TS.mean_radius += TS.grains[Idg].sphere.weight();
 		}
 	}
-
 	TS.mean_radius /= Ng;//rayon moyen
 	LOG_INFO(" loaded : " << Ng << " grains with mean radius = " << TS.mean_radius);
+		
+	if (fictiousVtx.size()>=6){//boxes found, simulate them with big spheres
+		CGT::Point& Pmin = TS.box.base; CGT::Point& Pmax = TS.box.sommet; 
+		Real FAR = 1e4;
+		TS.grains[fictiousVtx[0]].sphere = CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.x()-Pmin.x()));
+		TS.grains[fictiousVtx[1]].sphere = CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.x()-Pmin.x()));
+		TS.grains[fictiousVtx[2]].sphere =
+		CGT::Sphere(CGT::Point(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.y()-Pmin.y()));
+		TS.grains[fictiousVtx[3]].sphere =
+		CGT::Sphere(CGT::Point(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z())),FAR*(Pmax.y()-Pmin.y()));
+		TS.grains[fictiousVtx[4]].sphere =
+		CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y())),FAR*(Pmax.y()-Pmin.y()));
+		TS.grains[fictiousVtx[5]].sphere =
+		CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y())),FAR*(Pmax.y()-Pmin.y()));
+	}
 
 	InteractionContainer::iterator ii    = scene->interactions->begin();
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
@@ -185,7 +221,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	TS.porom = analyser->ComputeMacroPorosity();//find_parameter("porom=", Statefile);
 	TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
 	if (filename!=NULL) {
-		ostringstream oss;
+		//ostringstream oss;
 		TS.to_file(filename);
 	}
 	return TS;

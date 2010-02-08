@@ -8,7 +8,7 @@
 //#include <tchar.h>
 #include <time.h>
 
-using namespace std;
+//using namespace std;
 
 //// crt_clock.c
 ///* This example prompts for how long
@@ -84,7 +84,7 @@ public:
     void     start();
     void     stop ();
     void     reset();
-	void	 top(string Texte);
+    void     top(std::string Texte);
     bool     is_running() const { return running; }
 
     double   time()       const;

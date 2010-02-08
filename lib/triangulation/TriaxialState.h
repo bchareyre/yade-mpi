@@ -15,6 +15,11 @@
 #include "Tesselation.h"
 #include <vector>
 
+/*! \class TriaxialState
+ * \brief A storage class with ascii input/output for bodies, contacts, and macro-variables. Yade packings are first converted to this object type, before being processed in KinematicLocalisationAnalyser.
+ * 
+ */
+
 namespace CGT{
 using namespace std;
 
@@ -62,7 +67,7 @@ public:
 	~TriaxialState(void);
 		
 	bool from_file(const char* filename);
-	bool to_file(const char* filename);
+	bool to_file(const char* filename, bool bz2=false);
 	bool inside(Real x, Real y, Real z);
 	bool inside(Vecteur v);
 	bool inside(Point p);

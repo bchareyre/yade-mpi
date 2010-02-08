@@ -103,7 +103,7 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_na
 	std::ostringstream file_name1, file_name0;
 	file_name1 << (string)(base_file_name) << n1;
 	file_name0 << (string)(base_file_name) << n0;
-	cout << "file names : " << file_name0.str().c_str() << ", " << file_name1.str().c_str() << endl;
+	//cout << "file names : " << file_name0.str().c_str() << ", " << file_name1.str().c_str() << endl;
 	TS1->from_file(file_name1.str().c_str());
 	TS0->from_file(file_name0.str().c_str());
 
@@ -194,18 +194,21 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 	ComputeParticlesDeformation();
 	Tesselation& Tes = TS1->tesselation();
 	RTriangulation& Tri = Tes.Triangulation();
-	basicVTKwritter vtk((unsigned int)(Tri.number_of_vertices()), (unsigned int)(Tri.number_of_finite_cells()));
+		
+	//basicVTKwritter vtk((unsigned int)(Tri.number_of_vertices()), (unsigned int)(Tri.number_of_finite_cells()));
+	basicVTKwritter vtk(n_real_vertices, n_real_cells);
 	vtk.open(output_file_name, "test bidon"); // <- what a pretty comment!
 
 	vtk.begin_vertices();
 	RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin();
-	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) vtk.file <<  V_it->point().point() << endl;
+	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) if (!V_it->info().isFictious) vtk.file <<  V_it->point().point() << endl;
 	vtk.end_vertices();
 
 	vtk.begin_cells();
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
+	//FIXME : Preconditions : scene has 6 boxes with ids 0-5, and bodies are listed in ascending ids order
 	for (; cell != Tri.finite_cells_end(); ++cell) {
-		vtk.write_cell(
+		if (!cell->info().isFictious) vtk.write_cell(
 			cell->vertex(0)->info().id()-6,
 			cell->vertex(1)->info().id()-6,
 			cell->vertex(2)->info().id()-6,
@@ -217,16 +220,20 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 	vtk.begin_data("Strain_matrix", POINT_DATA, TENSORS, FLOAT);
 	V_it = Tri.finite_vertices_begin();
 	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) {
-		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
-		vtk.file << ParticleDeformation[V_it->info().id()] << endl;
+		if (!V_it->info().isFictious)  {
+			Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
+			vtk.file << ParticleDeformation[V_it->info().id()] << endl;}
 	}
 	vtk.end_data();
 
 	vtk.begin_data("Strain_deviator", POINT_DATA, SCALARS, FLOAT);
 	V_it = Tri.finite_vertices_begin();
 	for (; V_it !=  Tri.finite_vertices_end(); ++V_it) {
-		Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
-		vtk.write_data((float) epsilon.Deviatoric().Norme());
+		if (!V_it->info().isFictious)  {
+			Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
+			
+			//vtk.write_data((float) epsilon.Deviatoric().Norme());}
+			vtk.write_data((float) epsilon.Deviatoric()(1,1)-epsilon.Deviatoric()(0,0));}
 	}
 	vtk.end_data();
 
@@ -468,7 +475,7 @@ Real KinematicLocalisationAnalyser::Neighbor_anisotropy(TriaxialState& state)
 vector<pair<Real,Real> >& KinematicLocalisationAnalyser::
 NormalDisplacementDistribution(vector<Edge_iterator>& edges, vector<pair<Real,Real> > &row)
 {
-	cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
+	//cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
 	row.clear();
 	row.resize(linear_discretisation+1);
 	vector<Real> Un_values;
@@ -480,7 +487,7 @@ NormalDisplacementDistribution(vector<Edge_iterator>& edges, vector<pair<Real,Re
 	vector<Edge_iterator>::iterator ed_end = edges.end();
 	long val_count = 0;
 
-	cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
+	//cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
 	for (vector<Edge_iterator>::iterator ed_it = edges.begin();
 			ed_it!=ed_end; ++ed_it) {
 		Vh1= (*ed_it)->first->vertex((*ed_it)->second);
@@ -504,22 +511,22 @@ NormalDisplacementDistribution(vector<Edge_iterator>& edges, vector<pair<Real,Re
 		Un_values[val_count++] = Un;
 		//cerr << "Un=" << Un << " U=" << U << " branch=" << branch <<  endl;
 	}
-	cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
+	//cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
 
 	Real DUN = (UNmax-UNmin) /linear_discretisation;
 	for (int i = 0; i <= linear_discretisation; ++i) {
 		row[i].first = UNmin+ (i+0.5) *DUN;
 		row[i].second = 0;
 	}
-	cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
+	//cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
 
 	val_count = val_count-1;
-	cerr << "nval=" << val_count << " reserved=" << edges.size() << endl;
+	//cerr << "nval=" << val_count << " reserved=" << edges.size() << endl;
 	for (; val_count>=0; --val_count) {
 		//cerr << "n_debug0=" << n_debug << endl;   /// DEBUG LINE  ///
 		row[(int)((Un_values[val_count]-UNmin) /DUN)].second += 1;
 	}
-	cerr << "DUN=" << DUN << " UNmin=" << UNmin << " UNmax=" << UNmax << endl;
+	//cerr << "DUN=" << DUN << " UNmin=" << UNmin << " UNmax=" << UNmax << endl;
 	return row;
 	//cerr << "n_debug=" << n_debug++ << endl;   /// DEBUG LINE  ///
 }
@@ -678,7 +685,7 @@ AllNeighborDistributionToFile(ofstream& output_file)
 void KinematicLocalisationAnalyser::
 SetForceIncrements(void)    //WARNING : This function will modify the contact lists : add virtual (lost)) contacts in state 1 and modify old_force and force in state 0, execute this function after all other force analysis functions if you want to avoid problems
 {
-	if (true) cerr << "SetForceIncrements"<< endl;
+	//if (true) cerr << "SetForceIncrements"<< endl;
 //  vector< pair<Real, Real> > row;
 //  row.resize ( sphere_discretisation );
 //  Real DZ = 1.0/sphere_discretisation;
@@ -698,7 +705,7 @@ SetForceIncrements(void)    //WARNING : This function will modify the contact li
 		if (TS0->contacts[i]->status == TriaxialState::Contact::LOST) ++lost_in_state0;
 	}
 	for (int i = 0; i < Nc1; ++i) TS1->contacts[i]->visited = false;
-	cerr << "Nc1 "<<Nc1<<", Nc0 "<<Nc0<<" ("<<Nc0-lost_in_state0<<" real)"<<endl;
+	//cerr << "Nc1 "<<Nc1<<", Nc0 "<<Nc0<<" ("<<Nc0-lost_in_state0<<" real)"<<endl;
 	for (int i = 0; i < Nc0; ++i) {
 		// cerr << 1;
 		if (TS0->contacts[i]->status != TriaxialState::Contact::LOST) {
@@ -747,8 +754,6 @@ SetForceIncrements(void)    //WARNING : This function will modify the contact li
 			++n_new;
 		}
 	}
-	//cerr << 7;
-	if (true) cerr << "Contact Status : "<< n_persistent << " persistent, "<< n_new << " new, "<< n_lost << " lost"<< endl;
 	/*
 	RGrid1D table;
 
@@ -828,13 +833,25 @@ Vecteur KinematicLocalisationAnalyser::Deplacement(Finite_cells_iterator cell, i
 {
 	Vecteur v(0.f, 0.f, 0.f);
 	int id;// ident. de la particule
+
+	Vecteur fixedPoint = 0.5*((TS0->box.base-CGAL::ORIGIN)+(TS0->box.sommet-CGAL::ORIGIN));
 	for (int i=0; i<4; i++) {
 		//  char msg [256];
 		if (i!=facet) {
 			id = cell->vertex(i)->info().id();
+			Vecteur meanFieldDisp =Vecteur(TS0->grain(id).sphere.point().x(), TS0->grain(id).sphere.point().y(), TS0->grain(id).sphere.point().z())-fixedPoint;
+			if (1){//fluctuations
+				meanFieldDisp = Vecteur(
+				meanFieldDisp[0]*(TS1->larg-TS0->larg)/TS0->larg,
+				meanFieldDisp[1]*(TS1->haut-TS0->haut)/TS0->haut,
+				meanFieldDisp[2]*(TS1->prof-TS0->prof)/TS0->prof);
+			} else meanFieldDisp=Vecteur(0,0,0);
 			if (consecutive)
-				v = v + TS1->grain(id).translation;
-			else  v = v + (TS1->grain(id).sphere.point() - TS0->grain(id).sphere.point());
+				v = v + TS1->grain(id).translation-meanFieldDisp;
+			else  {
+				v = v + (TS1->grain(id).sphere.point() - TS0->grain(id).sphere.point()-meanFieldDisp);
+				
+			}
 
 			//for tests with affine displacement field
 			//if ((TS1->grain(id).sphere.point().y()+TS1->grain(id).sphere.point().z())>0.035)//a discontinuity
@@ -975,57 +992,48 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 
 	//Compute Voronoi tesselation (i.e. voronoi center of each cell)
 	if (!Tes.Computed()) Tes.Compute();
-	//cerr << "ParticleDeformation.size() = " << ParticleDeformation.size() << endl;
 	if (ParticleDeformation.size() != (Tes.Max_id() + 1)) {
-		//cerr << "resize to " << Tes.Max_id() + 1 << endl;
 		ParticleDeformation.clear();
 		ParticleDeformation.resize(Tes.Max_id() + 1);
 	}
-	//cerr << "ENDOF ParticleDeformation.size() = " << ParticleDeformation.size() << endl;
 	//reset volumes and tensors of each particle
-	for (RTriangulation::Finite_vertices_iterator  V_it =
-				Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
+	n_real_vertices = 0;
+	for (RTriangulation::Finite_vertices_iterator  V_it=Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
 		//cerr << V_it->info().id() << endl;
 		V_it->info().v() =0;//WARNING : this will erase previous values if some have been computed
 		ParticleDeformation[V_it->info().id()]=NULL_TENSEUR3;
+		if (!V_it->info().isFictious) ++n_real_vertices;
 	}
-	//cerr << "RTriangulation::Finite_vertices_iterator  V_it  = " << ParticleDeformation.size() << endl;
-
 	Finite_cells_iterator cell = Tri.finite_cells_begin();
 	Finite_cells_iterator cell0 = Tri.finite_cells_end();
-
-
+	
 	//Compute grad_u and volumes of all cells in the triangulation, and assign them to each of the vertices ( volume*grad_u is added here rather than grad_u, the weighted average is computed later )
-	//cerr << "for ( ; cell != cell0; cell++ )" << endl;
+	//define the number of non-fictious cells, i.e. not in contact with a boundary
+	n_real_cells=0;
 	for (; cell != cell0; cell++) { // calcule la norme du d�viateur dans chaque cellule
-		//cerr << "ij=" <<ij++<<endl;
-		//cerr << "ij2=" <<ij2++<<endl;
-		//if (!cell->info()->isFictious) //FIXME
-		Grad_u(cell, grad_u, false);   // false : don't divide by volume, here grad_u = volume of cell * average grad_u in cell, the final value is divided by the total volume later (see below)
-		//cerr << "grad_u=" << grad_u << endl;
-		v = Tri.tetrahedron(cell).volume();
-		grad_u_total += grad_u;
-		v_total += v;
-		for (unsigned int index=0; index<4; index++) {
-			cell->vertex(index)->info().v() += v;   //WARNING2 : this will affect values which differ from the volumes of voronoi cells
-			//cerr << "ParticleDeformation[cell->vertex (" << cell->vertex ( index )->info().id() << ")"<< endl;
-			ParticleDeformation[cell->vertex(index)->info().id()] += grad_u;
+		cell->info().isFictious = (cell->vertex(0)->info().isFictious || cell->vertex(1)->info().isFictious || cell->vertex(2)->info().isFictious || cell->vertex(3)->info().isFictious);
+		if (!cell->info().isFictious) { 
+			Grad_u(cell, grad_u, false);   // false : don't divide by volume, here grad_u = volume of cell * average grad_u in cell, the final value is divided by the total volume later (see below)
+			//cerr << "grad_u=" << grad_u << endl;
+			v = Tri.tetrahedron(cell).volume();
+			grad_u_total += grad_u; v_total += v; ++n_real_cells;
+			for (unsigned int index=0; index<4; index++) {
+				cell->vertex(index)->info().v() += v;   //WARNING2 : this will affect values which differ from the volumes of voronoi cells
+				//cerr << "ParticleDeformation[cell->vertex (" << cell->vertex ( index )->info().id() << ")"<< endl;
+				ParticleDeformation[cell->vertex(index)->info().id()] += grad_u;
+			}
 		}
 	}
-
-	//Delete volume and grad_u for particles on the border FIXME : replace that using isFictious flags?
-	Tesselation::Vector_Vertex border_vertices;
-	Tes.Voisins(Tri.infinite_vertex(), border_vertices);
-	unsigned int l = border_vertices.size();
-	//cerr << "l=" << l << endl;
-
-	//cerr << "for ( ; cell != cell0; cell++ )" << endl;
-	for (unsigned int i=0; i<l; ++i) {
-		//cerr << "border " << i << endl;
-		border_vertices[i]->info().v() =0;
-
-		ParticleDeformation[border_vertices[i]->info().id()]=NULL_TENSEUR3;
-	}
+	//Do we delete volume and grad_u for particles on the border?
+//  Tesselation::Vector_Vertex border_vertices;
+//  Tes.Voisins(Tri.infinite_vertex(), border_vertices);
+//  unsigned int l = border_vertices.size();
+//  for (unsigned int i=0; i<l; ++i) {
+//   //cerr << "border " << i << endl;
+//   border_vertices[i]->info().v() =0;
+//
+//   ParticleDeformation[border_vertices[i]->info().id()]=NULL_TENSEUR3;
+//  }
 
 	//Divide sum(v*grad_u) by sum(v) to get the average grad_u on each particle
 	for (RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
@@ -1035,11 +1043,12 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 		if (V_it->info().v()) ParticleDeformation[V_it->info().id()]/=V_it->info().v();
 	}
 	grad_u_total_g /= v_total_g;
+	if(0){
 	cerr << "sym_grad_u_total_g (wrong averaged strain):"<< endl << Tenseur_sym3(grad_u_total_g) << endl;
-
 	if (v_total) grad_u_total /= v_total;
 	cerr << "Total volume = " << v_total << ", grad_u = " << endl << grad_u_total << endl << "sym_grad_u (true average strain): " << endl << Tenseur_sym3(grad_u_total) << endl;
 	cerr << "Macro strain : "<< endl << Delta_epsilon << endl;
+	}
 	return ParticleDeformation;
 }
 

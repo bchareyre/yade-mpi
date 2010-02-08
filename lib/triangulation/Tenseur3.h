@@ -8,7 +8,7 @@
 
 namespace CGT {
 
-using namespace std;
+//using namespace std;
 
 //class Vecteur;// Classe externe
 

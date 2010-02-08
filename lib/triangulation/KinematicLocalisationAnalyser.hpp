@@ -73,7 +73,7 @@ class KinematicLocalisationAnalyser
 		void Grad_u ( Finite_cells_iterator cell, Tenseur3& T, bool vol_divide=true );
 		/// Compute grad_u for all particles, by summing grad_u of all adjaent cells using current states
 		const vector<Tenseur3>& ComputeParticlesDeformation (void);
-		/// Do everything in one step by giving the current (file1) and reference (file0) positions 
+		/// Do everything in one step by giving some final (file1) and initial (file0) positions 
 		const vector<Tenseur3>& ComputeParticlesDeformation(const char* state_file1, const char* state_file0);
 		///Compute porisity from cumulated spheres volumes and positions of boxes
 		Real ComputeMacroPorosity (void );
@@ -110,7 +110,7 @@ class KinematicLocalisationAnalyser
 		Real v_solid_total;//solid volume in the box
 		Real v_total;//volume of the box
 		Real v_total_g;//summed volumes of extended grain cells
-		long n_persistent, n_new, n_lost;
+		long n_persistent, n_new, n_lost, n_real_cells, n_real_vertices;
 
 
 

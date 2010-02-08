@@ -6,15 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
-
-
 #include "TriaxialState.h"
 #include <math.h>
 
 #ifdef USE_OGL_VIEW
 #include "../vueGL/vue3d.h"
 #endif
+
+
+#include<boost/iostreams/filtering_stream.hpp>
+#include<boost/iostreams/filter/bzip2.hpp>
+#include<boost/iostreams/device/file.hpp>
 
 namespace CGT {
 
@@ -29,40 +31,19 @@ TriaxialState::~TriaxialState(void)
 
 Real TriaxialState::find_parameter (const char* parameter_name, ifstream& file)
 {
-	/*long starting_position = file.tellg();
-	file.seekg (0, ios::end);
-	long length = file.tellg();
-	file.seekg (starting_position, ios::beg);*/
-	
-	/*if (starting_position == -1) starting_position=0;
-	cout << "starting position: " << starting_position << endl;
-	bool restarted = false;
-	if (file.tellg()==-1) {
-		file.seekg( 0, ios::beg );}*/
-
 	string buffer;
 	Real value;
 	file >> buffer;
 	bool test = (buffer == string(parameter_name));
-	cout << "buffer0 " << buffer << " test0: "<< test << endl;
 	while (!test)
 	{
 		buffer.clear();
 		file >> buffer;
-		//if (buffer.compare(string(" "))==0 || buffer.empty()) continue;
-		/*if (file.eof() && !restarted) {
-		cout << "restarted1" << endl;
-		file.seekg( 0 );
-		restarted= true;}*/
-		//test = ((!buffer.empty() && (buffer.compare(string(parameter_name))== 0)) || file.eof());
 		test = ( buffer == string(parameter_name) || file.eof());
-		//test = ( buffer == string(parameter_name) || length <= file.tellg());
-		//cout << "buffer1 " << buffer << " test: "<< test << endl;
 	}
 	if (!file.eof()) file >> value;
 	else value = 0;
-	cout << string(parameter_name) << value << endl;
-	//file.seekg( starting_position, ios::beg );
+// 	cout << string(parameter_name) << value << endl;
 	return value;
 }
 
@@ -121,12 +102,13 @@ Tesselation& TriaxialState::Tesselate (void)
 		Tes.Clear();
 		GrainIterator git = grains_begin();
 		GrainIterator last = grains_end();
+		Tes.vertexHandles.resize(grains.size()+ NO_ZERO_ID ? 1 : 0);
 		for (; git!=last; ++git) {
-			if (git->id != -1 && git->isSphere)	
-				Vertex_handle vh = Tes.insert(git->sphere.x(), git->sphere.y(), git->sphere.z(), git->sphere.weight(), git->id);
+			if (git->id != -1 /*&& git->isSphere*/)	Tes.vertexHandles[git->id] = Tes.insert(git->sphere.x(), git->sphere.y(), git->sphere.z(), git->sphere.weight(),git->id,!git->isSphere);
 			//vh->->info() = git->translation; FIXME : this could define displacements in the triangulation itself
 //			cerr << "Tes.insert(git->sphere.x(), git->sphere.y(), git->sphere.z(), git->sphere.weight(), git->id);" << endl;
 		}
+		Tes.redirected = true;//vertexHandle has been filled here, no need to do it again
 		tesselated = true;
 		cerr << "Triangulated Grains : " << Tes.Triangulation().number_of_vertices() << endl;
 	}
@@ -162,7 +144,7 @@ bool TriaxialState::from_file(const char* filename)
 {
 	reset();
 	ifstream Statefile(filename);
-	cout << filename << endl;
+// 	cout << filename << endl;
 	if (!Statefile.is_open()) {
 		cout << "Error opening files";
 		return false;
@@ -175,6 +157,7 @@ bool TriaxialState::from_file(const char* filename)
 
 
 	long Idg;
+	long Ns=0;//number of spheres (excluding fictious ones))
 	Statefile >> Ng;
 	//Real x, y, z, rad; //coordonn�es/rayon
 	//Real tx, ty, tz;
@@ -211,10 +194,10 @@ bool TriaxialState::from_file(const char* filename)
 		box.sommet = Point(max(box.sommet.x(), pos.x()+rad),
 						   max(box.sommet.y(), pos.y()+rad),
 						   max(box.sommet.z(), pos.z()+rad));
-		mean_radius += grains[Idg].sphere.weight();
+		if (isSphere) {mean_radius += grains[Idg].sphere.weight(); ++Ns;}
 		//cout << "Idg: "<< Idg << " sphere: " << grains[Idg].sphere << " trans: " << grains[Idg].translation << endl;
 	}
-	mean_radius /= Ng;//rayon moyen
+	mean_radius /= Ns;//rayon moyen
 	//cout << filename << " loaded : " << Ng << " grains with mean radius = " << mean_radius << endl;
 
 	long id1, id2;
@@ -225,7 +208,6 @@ bool TriaxialState::from_file(const char* filename)
 	contacts.resize(Nc);
 
 	for (long i=0 ; i < Nc ; ++i) {
-		cout << "hereNc"<<Nc<<"/"<<i<<endl;
 		Contact* c = new Contact;
 		Statefile >> id1 >> id2 >> normal >> c_pos >> old_fn >> old_fs >> fn >> fs >> frictional_work >> stat;
 		
@@ -248,7 +230,6 @@ bool TriaxialState::from_file(const char* filename)
 	}
 
 	//cout << "c_pos=" << contacts[10]->position << " old_fn=" << contacts[10]->old_fn << " normal=" << contacts[10]->normal << endl;
-	cout << "here0"<<endl;
 	//rfric = find_parameter("rfric=", Statefile);// � remettre quand les fichiers n'auront plus l'espace de trop...
 	Eyn = find_parameter("Eyn", Statefile);
 	Eys = find_parameter("Eys", Statefile);
@@ -265,7 +246,6 @@ bool TriaxialState::from_file(const char* filename)
 	ratio_f = find_parameter("ratio_f", Statefile);
 	vit = find_parameter("vit", Statefile);
 	Statefile.close();
-	cout << "here1"<<endl;
 	//cout << endl << "wszzh= " << wszzh << endl;
 
 	/*GrainIterator grains_end = grains.end();
@@ -279,29 +259,29 @@ bool TriaxialState::from_file(const char* filename)
 	return true;
 }
 
-
-
-bool TriaxialState::to_file(const char* filename)
+bool TriaxialState::to_file(const char* filename, bool bz2)
 {
-	ofstream Statefile (filename);
-	cout << filename << endl;
-	if (!Statefile.is_open())	{
-		cout << "Error opening files";
+	//string fname (filename);
+	
+	// use bzipped files
+	boost::iostreams::filtering_ostream Statefile;
+	
+	//if(boost::algorithm::ends_with(filename,".bz2")) Statefile.push(iostreams::bzip2_compressor());
+	if (bz2) Statefile.push(boost::iostreams::bzip2_compressor());
+	Statefile.push(boost::iostreams::file_sink(string(filename)+".bz2"));
+	// Don't use bzipped files
+	//ofstream Statefile (filename);
+	//if (!Statefile.is_open())	{
+	if(!Statefile.good()) {
+		cerr << "Error opening files";
 		return false;	}
 
 		long Id_max = grains.size()-1;
 		Statefile << Id_max << endl;
-// 		Point pos;
-// 		mean_radius=0;
-// 		Vecteur trans, rot;
-		//Real rad; //coordonn�es/rayon
-
-		
 		for (long Idg=0 ; Idg <= Id_max ; ++Idg) 
 		{
 			Statefile << grains[Idg].id <<	" " << grains[Idg].sphere.point() << " " << grains[Idg].sphere.weight() << " " << grains[Idg].translation << " " << grains[Idg].rotation << " "<<grains[Idg].isSphere << endl;
 		}
-		
 		long Nc = contacts.size();
 		Statefile << Nc << endl;
 		for (long i=0 ; i < Nc ; ++i)
@@ -310,8 +290,7 @@ bool TriaxialState::to_file(const char* filename)
 		}
 
 		Statefile << "Eyn " << Eyn << " Eys " << Eys << " wszzh " << wszzh << " wsxxd " << wsxxd << " wsyyfa " << wsyyfa << " eps3 " << eps3 << " eps1 " << eps1 << " eps2 " << eps2 << " porom " << porom << " haut " << haut << " larg " << larg << " prof " << prof << " ratio_f " << ratio_f << " vit " << vit << endl;
-
-		Statefile.close();
+//		Statefile.close();
 		return true;
 }
 

@@ -1,4 +1,4 @@
-#include "TesselationWrapper.h"
+#include "TesselationWrapperOOT.h"
 #include <iostream>
 
 using namespace std;
@@ -35,7 +35,6 @@ int main ( int argc, char *argv[ ], char *envp[ ] )
  	cout << T1.insert(0.2 ,0.2 ,0.2 ,0.1,12) << endl;
  	cout << T1.insert(0.2 ,0   ,0.2 ,0.1,13) << endl;
  	cout << T1.insert(0.1 ,0.1   ,0.1 ,0.01,14) << endl;
-
 	cout << T1.insert(0.2071, 0.2071, 0.2071, 0.2071,6) << endl;
 	cout << T1.insert(0.7929, 0.2071, 0.7929, 0.2071,7) << endl;
 	cout << T1.insert(0.7929, 0.7929, 0.2071, 0.2071,8) << endl;
@@ -45,11 +44,8 @@ int main ( int argc, char *argv[ ], char *envp[ ] )
 	cout << T1.insert(0.5000, 0.5000, 0.2071, 0.2071,12) << endl;
 	cout << T1.insert(0.5000, 0.5000, 0.7929, 0.2071,13) << endl;
 	cout << T1.insert(0.5000, 0.2071, 0.5000, 0.2071,14) << endl;
-
 	cout << T1.insert(0.2071, 0.5000, 0.5000, 0.2071,15) << endl;
-
 	cout << T1.insert(0.7929, 0.5000, 0.5000, 0.2071,16) << endl;
-
 	cout << T1.insert(0.5000, 0.7929, 0.5000, 0.2071,17) << endl;
 	
 	T1.AddBoundingPlanes();
@@ -58,7 +54,6 @@ int main ( int argc, char *argv[ ], char *envp[ ] )
 	for (int i =1; i<15; ++i) {
 	cout << "sphere " << i << " v=" << T1.Volume(i) << endl;
 	}
-	
 	cout << T1.Tes->Triangulation() << endl;
 // 	cout << "sphere 1 : v=" << T1.Volume(2) << endl;
 // 	cout << "sphere 1 : v=" << T1.Volume(3) << endl;

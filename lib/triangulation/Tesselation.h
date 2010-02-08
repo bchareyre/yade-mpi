@@ -34,13 +34,12 @@ private:
 	RTriangulation* Tes; //=NULL ou Tri selon le constructeur appell�, permet au destructeur
 						 //de savoir s'il faut d�truire la Triangulation ou non
 	bool computed;
-	bool redirected;//is vertexHandles filled with current vertex pointers? 	
-
 public:
 	Real TotalFiniteVoronoiVolume;
 	Real TotalInternalVoronoiVolume;
 	Real TotalInternalVoronoiPorosity;
-	Vector_Vertex vertexHandles;///This is a redirection vector to get vertex pointers by spheres id
+	Vector_Vertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
+	bool redirected;//is vertexHandles filled with current vertex pointers? 	
 
 
 	//Fonctions

@@ -63,6 +63,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	BodyContainer::iterator bi = biBegin;
 
 	body_id_t Ng = 0;
+	body_id_t MaxId=0;
 	TW.mean_radius = 0;
 	for (; bi!=biEnd ; ++bi) {
 		if ((*bi)->isDynamic) { //then it is a sphere (not a wall) FIXME : need test if isSphere
@@ -75,11 +76,14 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			TW.Pmin = CGT::Point(min(TW.Pmin.x(),pos.X()-rad),min(TW.Pmin.y(), pos.Y()-rad),min(TW.Pmin.z(), pos.Z()-rad));
 			TW.Pmax = CGT::Point(max(TW.Pmax.x(),pos.X()+rad),max(TW.Pmax.y(),pos.Y()+rad),max(TW.Pmax.z(),pos.Z()+rad));
 			Ng++; TW.mean_radius += rad;
+			MaxId = max(MaxId,(*bi)->getId());
 		}
 	}
 	TW.mean_radius /= Ng; TW.rad_divided = true;
 	spheres.resize(Ng);
 	pointsPtrs.resize(Ng);
+	Tes.vertexHandles.resize(MaxId+1);
+	Tes.redirected = 1;
 	std::random_shuffle(pointsPtrs.begin(), pointsPtrs.end());
 	spatial_sort(pointsPtrs.begin(),pointsPtrs.end(), RTraits_for_spatial_sort()/*, CGT::RTriangulation::Weighted_point*/);
 

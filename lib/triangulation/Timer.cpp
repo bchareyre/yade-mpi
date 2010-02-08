@@ -1,6 +1,8 @@
 #include <string.h>
 #include "Timer.h"
 
+using namespace std;
+
 Real_timer::Real_timer() : T1(0), T2(0), elapsed(0.0), started(0.0), interv(0), running(true)
 {
 	T1 = clock();

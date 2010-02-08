@@ -18,6 +18,8 @@ Tesselation::Tesselation ( void )
 	TotalInternalVoronoiPorosity=0;
 	TotalInternalVoronoiVolume=0;
 	redirected = false;
+	//FIXME : find a better way to avoid segfault when insert() is used before resizing this vector
+	vertexHandles.resize(1000000);
 
 }
 
@@ -59,13 +61,13 @@ void Tesselation::Clear ( void )
 
 Vertex_handle Tesselation::insert ( Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious )
 {
-
 	Vertex_handle Vh;
-	Vh = Tri->insert ( Sphere ( Point ( x,y,z ),pow ( rad,2 ) ) );
+	Vh = Tri->insert(Sphere(Point(x,y,z),pow(rad,2)));
 	if ( Vh!=NULL )
 	{
 		Vh->info() = id;
 		Vh->info().isFictious = isFictious;
+		vertexHandles[id] = Vh;
 		if ( !isFictious ) max_id = std::max ( max_id, id );
 	}
 	else cout << id <<  " : Vh==NULL!!" << endl;
@@ -95,7 +97,7 @@ bool Tesselation::redirect ( void )
 	if ( !redirected )
 	{
 		//Set size of the redirection vector
-		if ( ( max_id+1 ) > vertexHandles.size() )
+		if ( ( max_id+1 ) != vertexHandles.size() )
 		{
 			vertexHandles.resize ( max_id+1 );
 			//cout << "resized " << max_id+1 << endl;
@@ -109,8 +111,7 @@ bool Tesselation::redirect ( void )
 			//std::cout<< "Cell " << V_it->info().id() << ": v=" << V_it->info().v() << std::endl;
 		}
 		redirected = true;
-
-	}
+	} else return false;
 	return true;
 }
 
