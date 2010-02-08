@@ -16,33 +16,38 @@
 // class FlowBoundingSphere;
 // class Tesselation;
 
-class FlowEngine : public PartialEngine 
+class FlowEngine : public PartialEngine
 {
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<CGT::FlowBoundingSphere> flow;
 // 		FlowBoundingSphere* flow;
 		//Tesselation* Tes;
+		string key;
 	public :
 
 		Vector3r gravity;
 		bool isActivated;
 		bool first;
 
-		int PermuteInterval;
-		int current_state;
+		int PermuteInterval,
+		current_state;
+		double permeability_factor;
 		int previous_state;
-		bool currentTes;
+		bool currentTes
+		,compute_K
+		,unload
+		,tess_based_force;
+		Real loadFactor;
+		int cons;
+		
 		
 		Real wall_thickness;
-		
-		bool Pressures_Initialized;
 
 		double P_zero;
 		
-		
-		
 		void Triangulate ( Scene* ncb );
+		void AddBoundary ( Scene* ncb );
 		void Initialize ( Scene* ncb, double P_zero );
 		void UpdateVolumes ( Scene* ncb );
 		void Initialize_volumes ( Scene* ncb );
@@ -50,15 +55,16 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell_double_fictious (CGT::Cell_handle cell, Scene* ncb);
 		Real Volume_cell_triple_fictious (CGT::Cell_handle cell, Scene* ncb);
 		Real Volume_cell (CGT::Cell_handle cell, Scene* ncb);
-// 		void NewTriangulation ( Scene* ncb, Tesselation& t1, Tesselation& t2, int currentTes );
+		void NewTriangulation ( Scene* ncb );
 		
 		FlowEngine();
 		virtual ~FlowEngine();
 	
 		virtual void applyCondition(Scene*);
+		
+		REGISTER_ATTRIBUTES(PartialEngine,(isActivated)(first)(currentTes)(P_zero)(PermuteInterval)(compute_K)(permeability_factor)(loadFactor)(unload)(tess_based_force));
 	
 	protected :
-	REGISTER_ATTRIBUTES(PartialEngine,/*(gravity)*/(isActivated));
 	REGISTER_CLASS_NAME(FlowEngine);
 	REGISTER_BASE_CLASS_NAME(PartialEngine);
 	
