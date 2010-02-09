@@ -26,7 +26,7 @@ public:
 	typedef std::vector<Cell_handle>	Vector_Cell;
 	typedef std::list<Point>		List_Point;
 	typedef Vector_Cell::iterator		VCell_iterator;
-	unsigned int max_id;
+	int max_id;
 	//Donn�es
 
 private:

@@ -13,20 +13,19 @@ Tesselation::Tesselation ( void )
 	Tri = new RTriangulation;
 	Tes = Tri;
 	computed = false;
-	max_id = 0;
+	max_id = -1;
 	TotalFiniteVoronoiVolume=0;
 	TotalInternalVoronoiPorosity=0;
 	TotalInternalVoronoiVolume=0;
 	redirected = false;
 	//FIXME : find a better way to avoid segfault when insert() is used before resizing this vector
 	vertexHandles.resize(1000000);
-
 }
 
 Tesselation::Tesselation ( RTriangulation &T )
-		: Tri ( &T ), Tes ( &T ), computed ( true )
+		: Tri ( &T ), Tes ( &T ), computed ( false )
 {
-//  std::cout << "Tesselation(RTriangulation &T)" << std::endl;
+	std::cout << "Tesselation(RTriangulation &T)" << std::endl;
 	Compute();
 }
 
@@ -44,21 +43,6 @@ void Tesselation::Clear ( void )
 	vertexHandles.clear();
 }
 
-// bool Tesselation::insert ( Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious )
-// {
-//  Vertex_handle Vh;
-//  Vh = Tri->insert ( Sphere ( Point ( x,y,z ),pow ( rad,2 ) ) );
-//  if ( Vh!=NULL )
-//  {
-//   Vh->info() = id;
-//   Vh->info().isFictious = isFictious;
-//   if ( !isFictious ) max_id = std::max ( max_id, id );
-//  }
-//  else return false;
-//  return true;
-// }
-
-
 Vertex_handle Tesselation::insert ( Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious )
 {
 	Vertex_handle Vh;
@@ -68,12 +52,11 @@ Vertex_handle Tesselation::insert ( Real x, Real y, Real z, Real rad, unsigned i
 		Vh->info() = id;
 		Vh->info().isFictious = isFictious;
 		vertexHandles[id] = Vh;
-		if ( !isFictious ) max_id = std::max ( max_id, id );
+		/*if ( !isFictious ) */max_id = std::max ( max_id, (int) id );
 	}
 	else cout << id <<  " : Vh==NULL!!" << endl;
 	return Vh;
 }
-
 
 Vertex_handle Tesselation::move ( Real x, Real y, Real z, Real rad, unsigned int id )
 {
@@ -97,19 +80,18 @@ bool Tesselation::redirect ( void )
 	if ( !redirected )
 	{
 		//Set size of the redirection vector
-		if ( ( max_id+1 ) != vertexHandles.size() )
-		{
-			vertexHandles.resize ( max_id+1 );
-			//cout << "resized " << max_id+1 << endl;
-		}
+		if ( ( max_id+1 ) != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
 		//cout << "!redirected" << endl;
+		max_id = 0;
 		Finite_vertices_iterator vertices_end = Tri->finite_vertices_end ();
 		for ( Finite_vertices_iterator V_it = Tri->finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
 		{
-			vertexHandles[V_it->info().id() ]= V_it;
+			vertexHandles[V_it->info().id()]= V_it;
+			max_id = max(max_id, (int) V_it->info().id());
 			//if ( ! ( V_it->info().isFictious ) ) vertexHandles[V_it->info().id() ]= V_it;
 			//std::cout<< "Cell " << V_it->info().id() << ": v=" << V_it->info().v() << std::endl;
 		}
+		if ( ( max_id+1 ) != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
 		redirected = true;
 	} else return false;
 	return true;
@@ -165,8 +147,8 @@ void Tesselation::Compute ()
 {
 
 //  std::cout << "Tesselation::Compute ()" << std::endl;
+	redirect();
 	Finite_cells_iterator cell_end = Tri->finite_cells_end();
-
 	for ( Finite_cells_iterator cell = Tri->finite_cells_begin(); cell != cell_end; cell++ )
 	{
 
@@ -192,7 +174,7 @@ void Tesselation::Compute ()
 		//  <<  cell->vertex(3)->info().id() << "(center : " << (Point) cell->info() << ")" << endl;
 	}
 
-
+	
 	computed = true;
 }
 
@@ -472,9 +454,6 @@ void Tesselation::ComputeVolumes ( void )
 //  Voisins(Tri->infinite_vertex (), boarder_vertices);
 //  unsigned int l = boarder_vertices.size();
 //  for (unsigned int i=0; i<l; ++i)  boarder_vertices[i]->info().v()=0;
-
-
-	redirect();
 //  cout << "TotalVolume : " << TotalFiniteVoronoiVolume << endl;
 }
 

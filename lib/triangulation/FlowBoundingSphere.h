@@ -1,24 +1,20 @@
-
 #ifndef _FLOWBOUNDINGSPHERE_H
 #define _FLOWBOUNDINGSPHERE_H
 
-
-#ifdef XVIEW
-	#include "Vue3D.h"
-#endif
-
-// #include "Empilement.h"
 #include "Operations.h"
-// #include "Commandes_Spheres.h"
 #include "Timer.h"
 #include "Tesselation.h"
-
 #include "basicVTKwritter.hpp"
 #include "Timer.h"
-
 #include "stdafx.h"
-#include "Deformation.h"
 #include "Empilement.h"
+
+#ifdef XVIEW
+#include "Vue3D.h"
+#endif
+
+#ifdef FLOW_ENGINE
+
 
 namespace CGT{
 
@@ -27,27 +23,27 @@ struct Boundary
 	Point p;
 	Vecteur normal;
 	int coordinate;
-	bool condition;//condition=1, pressure is imposed // condition=0, flow is imposed
+	bool flowCondition;//flowCondition=0, pressure is imposed // flowCondition=1, flow is imposed
+	Real value;
 };
 
 class FlowBoundingSphere
 {
 	public:
-// 		FlowBoundingSphere( );
+ 		FlowBoundingSphere();
 		
 		int x_min_id, x_max_id, y_min_id, y_max_id, z_min_id, z_max_id;
+		int* boundsIds [6];
 		bool currentTes;
-// 		double Vsolid_tot, Vtotalissimo, Vporale, Ssolid_tot;
 		
 		Boundary boundaries [6];
 		short id_offset;
-// 		Boundary& boundary ( int b ) {return boundaries[b-id_offset];}
+ 		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		
 		void insert ( Real x, Real y, Real z, Real radius, int id );
 		void Localize ();
 		void Compute_Permeability();
 		void AddBoundingPlanes();
-		void AddBoundingPlanes ( Real center[3], Real Extents[3],int id );
 		void DisplayStatistics();
 		void Tesselate();
 		void GaussSeidel ( );
@@ -60,30 +56,22 @@ class FlowBoundingSphere
 		double x_min, x_max, y_min, y_max, z_min, z_max, Rmoy;
 		Real Vsolid_tot, Vtotalissimo, Vporale, Ssolid_tot;
 		double k_factor; //permeability moltiplicator
-		string key; //to give to consolidation files a name with iteration number
-		vector<double> Pressures; //for automatic write maximum pressures during consolidation
+		std::string key; //to give to consolidation files a name with iteration number
+		std::vector<double> Pressures; //for automatic write maximum pressures during consolidation
 		bool tess_based_force; //allow the force computation method to be chosen from FlowEngine
 		
 		double P_SUP, P_INF, P_INS;
 
-		void AddBoundingPlanes ( Tesselation& Tes);
-		
 		void AddBoundingPlanes ( Tesselation& Tes, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max );
 
 		void Compute_Action ( );
 
 		void Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
 
-		void Localize ( RTriangulation& Tri );
-
 		void DisplayStatistics ( RTriangulation& Tri );
-
-		void Compute_Forces ( RTriangulation& Tri );
 
 		Vecteur external_force_single_fictious ( Cell_handle cell );
 		
-		void UpdateVolumes ( RTriangulation& Tri, vector<double>& X,  vector<double>& Y,  vector<double>& Z, vector<double>& X2,  vector<double>& Y2,  vector<double>& Z2 );
-
 		void SpheresFileCreator ();
 		
 		void Analytical_Consolidation ( );
@@ -91,22 +79,17 @@ class FlowBoundingSphere
 		void Boundary_Conditions ( RTriangulation& Tri );
 		
 		void Initialize_pressures ( );
-
-		void GaussSeidel ( RTriangulation& Tri );
-
+		
 		void save_vtk_file ( RTriangulation &T );
 
 		void MGPost ( RTriangulation& Tri );
 #ifdef XVIEW
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
-
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
 #endif
 		void Permeameter ( RTriangulation& Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
 
-		void Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, string key );
-
-		void Compute_Permeability ( RTriangulation& Tri );
+		void Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, std::string key );
 		
 		double Compute_HydraulicRadius ( RTriangulation& Tri, Cell_handle cell, int j );
 
@@ -151,4 +134,6 @@ class FlowBoundingSphere
 
 
 } //namespace CGT
+#endif //FLOW_ENGINE
+
 #endif
