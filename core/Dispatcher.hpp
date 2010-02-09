@@ -17,9 +17,6 @@
 
 class Dispatcher: public Engine
 {
-	public:
-		vector<vector<string> >		functorNames; // public for python interface; since there is getFunctorArguments returning RW(!) reference to this, why have it private anyway?!
-		list<shared_ptr<Functor> >	functorArguments;
 	protected:
 		void storeFunctorArguments(shared_ptr<Functor> eu);
 
@@ -43,7 +40,6 @@ class Dispatcher: public Engine
 		shared_ptr<Functor> findFunctorArguments(const string& libName);
 		void clear();
 		
-		Dispatcher();
 		virtual ~Dispatcher();
 		
 		virtual string getFunctorType() { throw; };
@@ -51,9 +47,10 @@ class Dispatcher: public Engine
 		virtual string getBaseClassType(unsigned int ) { throw; };
 
 	virtual void postProcessAttributes(bool deserializing);
+
 	YADE_CLASS_BASE_DOC_ATTRS(Dispatcher,Engine,"Engine dispatching control to its associated functors, based on types of argument it receives.",
-		((functorNames,"Names of functor classes"))
-		((functorArguments,"Instances of functors"))
+		((vector<vector<string> >,functorNames,,"Names of functor classes"))
+		((list<shared_ptr<Functor> >,functorArguments,,"Instances of functors"))
 	);
 };
 REGISTER_SERIALIZABLE(Dispatcher);

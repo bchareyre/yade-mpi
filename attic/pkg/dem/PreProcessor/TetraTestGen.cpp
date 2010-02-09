@@ -21,17 +21,17 @@ bool TetraTestGen::generate()
 	rootBody=Shop::rootBody();
 
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
-	boundDispatcher->add(new TetraAABB);
+	boundDispatcher->add(new Bo1_Tetra_Aabb);
 	rootBody->initializers.push_back(boundDispatcher);
 	rootBody->engines.clear();
 	rootBody->engines.push_back(shared_ptr<Engine>(new ForceResetter));
 	rootBody->engines.push_back(boundDispatcher);
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
-	interactionGeometryDispatcher->add(new Tetra2TetraBang);
+	interactionGeometryDispatcher->add(new Ig2_Tetra_Tetra_TTetraGeom);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	// do not add any InteractionPhysicsDispatcher
-	shared_ptr<TetraLaw> constitutiveLaw(new TetraLaw);
+	shared_ptr<TetraVolumetricLaw> constitutiveLaw(new TetraVolumetricLaw);
 	rootBody->engines.push_back(constitutiveLaw);
 
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);

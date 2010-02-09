@@ -8,9 +8,6 @@
 
 #include "Aabb.hpp"
 
-Aabb::Aabb(): Bound(){ createIndex(); }
-
 Aabb::~Aabb(){}
-
 YADE_PLUGIN((Aabb));
 

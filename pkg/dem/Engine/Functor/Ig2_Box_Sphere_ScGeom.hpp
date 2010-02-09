@@ -30,15 +30,9 @@ class Ig2_Box_Sphere_ScGeom : public InteractionGeometryFunctor
 					const Vector3r& shift2,
 					const bool& force,
 					const shared_ptr<Interaction>& c);
-
-	REGISTER_CLASS_NAME(Ig2_Box_Sphere_ScGeom);
-	REGISTER_BASE_CLASS_NAME(InteractionGeometryFunctor);
-
+	YADE_CLASS_BASE_DOC(Ig2_Box_Sphere_ScGeom,InteractionGeometryFunctor,"Create an interaction geometry :yref:`ScGeom` from :yref:`Box` and :yref:`Sphere`")
 	FUNCTOR2D(Box,Sphere);
-
 	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
 };
-
 REGISTER_SERIALIZABLE(Ig2_Box_Sphere_ScGeom);
-
 

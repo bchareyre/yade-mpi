@@ -35,15 +35,14 @@ class Facet : public Shape {
 
 	void postProcessAttributes(bool deserializing);
 
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Facet,Shape,"Facet (triangular particle) geometry.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Facet,Shape,"Facet (triangular particle) geometry.",
 		((vector<Vector3r>,vertices,,"Vertex positions in local coordinates."))
 		#ifdef FACET_TOPO
 		((vector<body_id_t>,edgeAdjIds,vector<body_id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
 		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),"half angle between normals of this facet and the adjacent facet [experimental]"))
 		#endif
 		,
-		/* ctor */ createIndex(); ,
-		/* py */
+		/* ctor */ createIndex();
 	);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Facet,Shape);

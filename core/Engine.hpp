@@ -26,13 +26,10 @@ class Engine: public Serializable{
 	public:
 		// pointer to the simulation, set at every step by Scene::moveToNextTimeStep
 		Scene* scene;
-		//! user-definable label, to convenienty retrieve this particular engine instance even if multiple engines of the same type exist
-		string label;
 		//! high-level profiling information; not serializable
 		TimingInfo timingInfo; 
 		//! precise profiling information (timing of fragments of the engine)
 		shared_ptr<TimingDeltas> timingDeltas;
-		Engine(): scene(NULL) {};
 		virtual ~Engine() {};
 	
 		virtual bool isActivated(Scene*) { return true; };
@@ -45,8 +42,10 @@ class Engine: public Serializable{
 		void timingInfo_nExec_set(long d){ timingInfo.nExec=d;}
 		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(scene); }
 
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
-		((label,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
+		((string,label,,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+		/* ctor */ scene=NULL,
+		/* py */
 		.add_property("execTime",&Engine::timingInfo_nsec_get,&Engine::timingInfo_nsec_set,"Cummulative time this Engine took to run (only used if O.timingEnabled==True).")
 		.add_property("execCount",&Engine::timingInfo_nExec_get,&Engine::timingInfo_nExec_set,"Cummulative count this engine was run (only used if O.timingEnabled==True).")
 		.def_readonly("timingDeltas",&Engine::timingDeltas,"Detailed information about timing inside the Engine itself. Empty unless enabled in the source code and O.timingEnabled==True.")

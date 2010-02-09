@@ -34,10 +34,12 @@
 #include "DynLibManager.hpp"
 
 /*! define the following macro to enable experimenta boost::serialization support
-	Slows the compilation down about 10×, and doesn't work.
+	Slows the compilation down about 2×.
 	Python wrapper defines O.saveXML('file.xml') to try it out.
+	Loading is not yet implemented (should be easy)
 */
-// #define YADE_BOOST_SERIALIZATION
+
+//#define YADE_BOOST_SERIALIZATION
 
 #ifdef YADE_BOOST_SERIALIZATION
 	//#include<boost/archive/binary_oarchive.hpp>
@@ -181,7 +183,7 @@ class ClassFactory : public Singleton<ClassFactory>
  */
 
 #ifdef YADE_BOOST_SERIALIZATION
-	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z);
+	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z) BOOST_CLASS_EXPORT(z); BOOST_SERIALIZATION_FACTORY_0(z);
 #else
 	#define _YADE_PLUGIN_BOOST_REGISTER(x,y,z)
 #endif

@@ -13,20 +13,7 @@
 #include<yade/core/Functor.hpp>
 #include <string>
 
-/*! \brief
-	Abstract interface for all classes that build InteractionPhysics from two interacting Body's PhysicalParameters
-
-	When an interaction is more complicated than its geometry, a class InteractionPhysics can be build to describe
-	the stiffness or other parmeters of this interaction.
-	 
-	Currently it is only used for MacroMicroElasticRelationships
-
-	\param const shared_ptr<PhysicalParameters>&	first interacting Body
-	\param const shared_ptr<PhysicalParameters>&	second interacting Body
-	\return shared_ptr<Interaction>&		it returns the InteractionPhysic's part of Interaction (given as last argument to the function)
-	
-*/
-
+//! Abstract interface for all classes that build InteractionPhysics from two interacting Body's PhysicalParameters
 class InteractionPhysicsFunctor : 	public Functor2D
 					<
 		 				void ,
@@ -37,7 +24,7 @@ class InteractionPhysicsFunctor : 	public Functor2D
 					>
 {
 	public: virtual ~InteractionPhysicsFunctor();
-	YADE_CLASS_BASE_DOC_ATTRS(InteractionPhysicsFunctor,Functor,"Functor for creating/updating Interaction::interactionPhysics objects.",/*no attrs*/);
+	YADE_CLASS_BASE_DOC(InteractionPhysicsFunctor,Functor,"Functor for creating/updating :yref:`Interaction::interactionPhysics` objects.");
 
 };
 REGISTER_SERIALIZABLE(InteractionPhysicsFunctor);

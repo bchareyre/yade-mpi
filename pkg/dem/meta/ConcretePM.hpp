@@ -57,7 +57,7 @@ There are other classes, which are not strictly necessary:
 None of that is used for computation (at least not now), only for post-processing.
 */
 class CpmState: public State {
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CpmState,State,"Cpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
+	YADE_CLASS_BASE_DOC_ATTRS(CpmState,State,"Cpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
 		((Real,epsVolumetric,0,"Volumetric strain around this body (unused for now)"))
 		((int,numBrokenCohesive,0,"Number of (cohesive) contacts that damaged completely"))
 		((int,numContacts,0,"Number of contacts with this body"))
@@ -65,9 +65,7 @@ class CpmState: public State {
 		((Real,epsPlBroken,0,"Plastic strain on contacts already deleted (bogus values)"))
 		((Real,normEpsPl,0,"Sum of plastic strains normalized by number of contacts (bogus values)"))
 		((Vector3r,sigma,Vector3r::ZERO,"Normal stresses on the particle"))
-		((Vector3r,tau,Vector3r::ZERO,"Shear stresses on the particle.")),
-		/*ctor*/,
-		/*py*/
+		((Vector3r,tau,Vector3r::ZERO,"Shear stresses on the particle."))
 	);
 };
 REGISTER_SERIALIZABLE(CpmState);
@@ -78,7 +76,7 @@ class CpmMat: public FrictMat {
 		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CpmState); }
 		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CpmState*>(s); }
 
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. (note: density is initialized to 4800 automatically)",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmMat,FrictMat,"Concrete material, for use with other Cpm classes. \n\n.. note::\n\tdensity is initialized to 4800 automatically",
 		((Real,G_over_E,NaN,"Ratio of normal/shear stiffness at interaction level [-]"))
 		((Real,sigmaT,NaN,"Initial cohesion [Pa]"))
 		((bool,neverDamage,false,"If true, no damage will occur (for testing only)."))
@@ -89,8 +87,7 @@ class CpmMat: public FrictMat {
 		((Real,plTau,((void)"deactivated if negative",-1),"Characteristic time for visco-plasticity. [s]"))
 		((Real,plRateExp,0,"Exponent for visco-plasticity function. [-]"))
 		((Real,isoPrestress,0,"Isotropic prestress of the whole specimen. [Pa]")),
-		createIndex(); density=4800,
-		/*py*/
+		createIndex(); density=4800;
 	);
 	REGISTER_CLASS_INDEX(CpmMat,FrictMat);
 };
@@ -115,7 +112,7 @@ class CpmPhys: public NormShearPhys {
 		Real computeViscoplScalingFactor(Real sigmaTNorm, Real sigmaTYield,Real dt);
 
 		virtual ~CpmPhys();
-		YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_CpmPhys_Cpm, that includes damage effects and chages of parameters inside CpmPhys",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CpmPhys,NormShearPhys,"Representation of a single interaction of the Cpm type: storage for relevant parameters.\n\n Evolution of the contact is governed by Law2_Dem3DofGeom_CpmPhys_Cpm, that includes damage effects and chages of parameters inside CpmPhys",
 			((Real,E,NaN,"normal modulus (stiffness / crossSection) [Pa]"))
 			((Real,G,NaN,"shear modulus [Pa]"))
 			((Real,tanFrictionAngle,NaN,"tangens of internal friction angle [-]"))
@@ -161,14 +158,11 @@ REGISTER_SERIALIZABLE(CpmPhys);
  * */
 class Ip2_CpmMat_CpmMat_CpmPhys: public InteractionPhysicsFunctor{
 	public:
-		long cohesiveThresholdIter;
-		// create cohesive interactions in first 10 steps by default
-		Ip2_CpmMat_CpmMat_CpmPhys(): cohesiveThresholdIter(10) {	}
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
 		FUNCTOR2D(CpmMat,CpmMat);
 		DECLARE_LOGGER;
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_CpmMat_CpmMat_CpmPhys,InteractionPhysicsFunctor,"Convert 2 CpmMat instances to CpmPhys with corresponding parameters.",
-			((cohesiveThresholdIter,"Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive (10 by default)."))
+			((long,cohesiveThresholdIter,10,"Should new contacts be cohesive? They will before this iter#, they will not be afterwards. If 0, they will never be. If negative, they will always be created as cohesive (10 by default)."))
 		);
 };
 REGISTER_SERIALIZABLE(Ip2_CpmMat_CpmMat_CpmPhys);
@@ -191,14 +185,13 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 	static void updateBodiesState(Scene*);
 
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the Cpm model.",
+	YADE_CLASS_BASE_DOC_ATTRS(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the Cpm model.",
 		((int,yieldSurfType,2,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
 		((Real,yieldLogSpeed,.1,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
 		((Real,yieldEllipseShift,NaN,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
 		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
 		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),"Strain at which softening in compression starts (non-negative to deactivate)"))
-		((Real,relKnSoft,.25,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
-		/*ctor*/,/*py*/
+		((Real,relKnSoft,.25,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)"))
 	);
 	DECLARE_LOGGER;
 };
@@ -211,16 +204,15 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 		virtual ~Gl1_CpmPhys() {};
 		RENDERS(CpmPhys);
 		DECLARE_LOGGER;
-		static bool contactLine,dmgLabel,dmgPlane,epsT,epsTAxes,normal,colorStrain,epsNLabel;
-		YADE_CLASS_BASE_DOC_ATTRS(Gl1_CpmPhys,GlInteractionPhysicsFunctor,"Render :yref:`CpmPhys` objects of interactions.",
-			((contactLine,"Show contact line :ydefault:`true` "))
-			((dmgLabel,"Numerically show contact damage parameter :ydefault:`true` "))
-			((dmgPlane,"[what is this?] :ydefault:`false`"))
-			((epsT,"Show shear strain :ydefault:`false`"))
-			((epsTAxes,"Show axes of shear plane :ydefault:`false`"))
-			((normal,"Show contact normal :ydefault:`false` "))
-			((colorStrain,"Render elements using transverse strain (relative to max elastic strain) [no longer used] :ydefault:`false` "))
-			((epsNLabel,"Numerically show normal strain :ydefault:`false` "))
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_CpmPhys,GlInteractionPhysicsFunctor,"Render :yref:`CpmPhys` objects of interactions.",
+			((bool,contactLine,true,"Show contact line"))
+			((bool,dmgLabel,true,"Numerically show contact damage parameter"))
+			((bool,dmgPlane,false,"[what is this?]"))
+			((bool,epsT,false,"Show shear strain "))
+			((bool,epsTAxes,false,"Show axes of shear plane "))
+			((bool,normal,false,"Show contact normal"))
+			((bool,colorStrain,false,"Render elements using transverse strain (relative to max elastic strain) [no longer used]"))
+			((bool,epsNLabel,false,"Numerically show normal strain"))
 		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_CpmPhys);
@@ -230,13 +222,11 @@ class CpmStateUpdater: public PeriodicEngine {
 	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {} };
 	public:
 		virtual void action(Scene* rb){ update(rb); }
-		static void update(Scene* rb=NULL);
-	static Real avgRelResidual;
-	static Real maxOmega;
-	CpmStateUpdater(){ initRun=true;}
-	YADE_CLASS_BASE_DOC_ATTRS(CpmStateUpdater,PeriodicEngine,"Changes bodies' colors depending on average damage of their interactions and number of interactions that were already fully broken and have disappeared. This engine contains its own loop (2 loops, more precisely) over all bodies and should be run periodically to update colors during the simulation, if desired.",
-		((avgRelResidual,"Average residual strength at last run."))
-		((maxOmega,"Globally maximum damage parameter at last run."))
+		void update(Scene* rb=NULL);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmStateUpdater,PeriodicEngine,"Changes bodies' colors depending on average damage of their interactions and number of interactions that were already fully broken and have disappeared. This engine contains its own loop (2 loops, more precisely) over all bodies and should be run periodically to update colors during the simulation, if desired.",
+		((Real,avgRelResidual,NaN,"Average residual strength at last run."))
+		((Real,maxOmega,NaN,"Globally maximum damage parameter at last run.")),
+		initRun=true;
 	);
 	DECLARE_LOGGER;
 };

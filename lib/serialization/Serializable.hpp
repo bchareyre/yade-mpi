@@ -73,6 +73,7 @@ namespace{
 	boost::python::dict pyDict() { return boost::python::dict(); }
 };
 
+// loop bodies for attribute access
 #define _PYGET_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) return boost::python::object(z);
 #define _PYSET_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) {z=boost::python::extract<typeof(z)>(value); return; }
 #define _PYKEYS_ATTR(x,y,z) ret.append(BOOST_PP_STRINGIZE(z));
@@ -80,6 +81,7 @@ namespace{
 #define _PYDICT_ATTR(x,y,z) ret[BOOST_PP_STRINGIZE(z)]=boost::python::object(z);
 #define _PYATTR_DEF(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(2,0,z)),&thisClass::BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
 
+// register class attributes, putting them to both python ['attr'] access functions and yade::serialization (and boost::serialization, if enabled)
 #define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
 	public: boost::python::object pyGetAttr(const std::string& key) const{ BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } \
 	void pySetAttr(const std::string& key, const boost::python::object& value){  BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); baseClass::pySetAttr(key,value); } \
@@ -87,27 +89,47 @@ namespace{
 	bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); return baseClass::pyHasKey(key); } \
 	boost::python::dict pyDict() const { boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; }
 
+// filter away 2nd element of a 2-tuple
 #define _STRIPDOC2(x,y,z) (BOOST_PP_TUPLE_ELEM(2,0,z))
 #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) \
 	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC2,~,attrs)) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
 	virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) extras ; }
-// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
+	// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
 
 #define _STRIPDECL4(x,y,z) (( BOOST_PP_TUPLE_ELEM(4,1,z),BOOST_PP_TUPLE_ELEM(4,3,z) " :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "`" ))
 // return type name; (for declaration)
 #define _ATTR_DECL(x,y,z) BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
 // return name(default), (for initializers list); TRICKY: last one must not have the comma
-#define _ATTR_INI(x,maxIndex,i,z) BOOST_PP_TUPLE_ELEM(4,1,z)(BOOST_PP_TUPLE_ELEM(4,2,z)) BOOST_PP_COMMA_IF(BOOST_PP_NOT_EQUAL(maxIndex,i))
+#define _ATTR_INI(x,maxIndex,i,z) BOOST_PP_TUPLE_ELEM(2,0,z)(BOOST_PP_TUPLE_ELEM(2,1,z)) BOOST_PP_COMMA_IF(BOOST_PP_NOT_EQUAL(maxIndex,i))
 // attrDecl is (type,name,defaultValue,docString)
-#define YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(thisClass,baseClass,docString,attrDecls,ctor,extras) \
+
+#define _DECLINI4(x,y,z) (( BOOST_PP_TUPLE_ELEM(4,1,z),BOOST_PP_TUPLE_ELEM(4,2,z) ))
+
+#define YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(thisClass,baseClass,docString,attrDecls,inits,ctor,extras) \
 	public: BOOST_PP_SEQ_FOR_EACH(_ATTR_DECL,~,attrDecls) /* attribute declarations */ \
-	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(attrDecls)),attrDecls) { ctor ; } /* ctor, with initialization of defaults */ \
+	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(inits attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(inits attrDecls)), inits BOOST_PP_SEQ_FOR_EACH(_DECLINI4,~,attrDecls)) { ctor ; } /* ctor, with initialization of defaults */ \
 	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),extras)
 
-#define YADE_CLASS_BASE_DOC_ATTRS(thisClass,baseClass,docString,attrs) \
-	YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,)
+#define _STATATTR_PY(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,1,z)), &thisClass::BOOST_PP_TUPLE_ELEM(4,1,z), "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
+#define _STATATTR_DECL(x,y,z) static BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
+#define _STRIP_TYPE_DEFAULT_DOC(x,y,z) (BOOST_PP_TUPLE_ELEM(4,1,z))
 
+#define YADE_CLASS_BASE_DOC_STATICATTRS(thisClass,baseClass,docString,attrs)\
+	public: BOOST_PP_SEQ_FOR_EACH(_STATATTR_DECL,~,attrs) /* attribute declarations */ \
+	/* no ctor */ \
+	REGISTER_CLASS_AND_BASE(thisClass,baseClass); \
+	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIP_TYPE_DEFAULT_DOC,~,attrs)) \
+	virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
+		boost::python::object _klass=boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString) \
+		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
+	}
+
+// attrs is (type,name,init-value,docstring)
+#define YADE_CLASS_BASE_DOC(klass,base,doc)                             YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,,,,)
+#define YADE_CLASS_BASE_DOC_ATTRS(klass,base,doc,attrs)                 YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,,)
+#define YADE_CLASS_BASE_DOC_ATTRS_CTOR(klass,base,doc,attrs,ctor)       YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,ctor,)
+#define YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(klass,base,doc,attrs,ctor,py) YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,ctor,py)
 
 // for both fundamental and non-fundamental cases
 #define REGISTER_SERIALIZABLE_GENERIC(name,isFundamental) 						\
@@ -122,6 +144,9 @@ namespace{
 #define REGISTER_CUSTOM_CLASS(name,sname,isFundamental) 					\
 	REGISTER_FACTORABLE(sname);								\
 	REGISTER_SERIALIZABLE_DESCRIPTOR(name,sname,SerializableTypes::CUSTOM_CLASS,isFundamental);
+
+
+
 
 // helper functions
 template <typename T>
@@ -161,8 +186,8 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 
 class Serializable : public Factorable
 {
-	public :
-		typedef list< shared_ptr<Archive> >	Archives;
+public :
+	typedef list< shared_ptr<Archive> >	Archives;
 		Serializable() {};
 		virtual ~Serializable() {};
 	
@@ -186,7 +211,7 @@ class Serializable : public Factorable
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
 		// this check can be probably removed at some point
-		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const { if(getClassName()!=thisClassName){ std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTRS yet"<<std::endl; return false; } return true; }
+		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const { if(getClassName()!=thisClassName){ std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR* yet"<<std::endl; return false; } return true; }
 		virtual void pyRegisterClass(boost::python::object _scope) const {
 			if(!checkPyClassRegistersItself("Serializable")) return;
 			boost::python::scope thisScope(_scope); 

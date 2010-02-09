@@ -24,12 +24,10 @@
 class PartialEngine : public Engine
 {
 	public :
-		std::vector<int> subscribedBodies; /// Lists of bodies whose state will be modified by deux ex machina
-		PartialEngine ();
 		virtual void action(Scene*);
 		virtual void applyCondition(Scene*) { throw; };
 	YADE_CLASS_BASE_DOC_ATTRS(PartialEngine,Engine,"Engine affecting only particular bodies in the simulation.",
-		((subscribedBodies,"Bodies affected by this PartialEngine."))
+		((std::vector<int>,subscribedBodies,,":yref:`Ids<Body::id>` of bodies affected by this PartialEngine."))
 	);
 };
 REGISTER_SERIALIZABLE(PartialEngine);

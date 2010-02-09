@@ -12,7 +12,6 @@
 
 #include<yade/core/Scene.hpp>
 
-Interaction::Interaction(): id1(0), id2(0), cellDist(Vector3<int>(0,0,0)) { init(); }
 Interaction::Interaction(body_id_t newId1,body_id_t newId2): id1(newId1), id2(newId2), cellDist(Vector3<int>(0,0,0)){ reset(); }
 
 bool Interaction::isFresh(Scene* rb){ return iterMadeReal==rb->currentIteration;}

@@ -39,7 +39,7 @@ class FileGenerator
 	void pyGenerate(const string& out);
 	void pyLoad();
 
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(FileGenerator,Serializable,"Base class for scene generators, preprocessors.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(FileGenerator,Serializable,"Base class for scene generators, preprocessors.",
 		((string,outputFileName,"./scene.xml","Filename to write resulting simulation to")),
 		/* ctor */ serializationDynlib="XMLFormatManager";,
 		.def("generate",&FileGenerator::pyGenerate,(python::arg("out")),"Generate scene, save to given file")

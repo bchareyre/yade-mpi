@@ -3,6 +3,10 @@
 #include "InteractionVecMap.hpp"
 #include <iostream>
 
+#ifdef YADE_BOOST_SERIALIZATION
+	BOOST_CLASS_EXPORT(InteractionVecMap);
+#endif
+
 
 InteractionVecMapIterator::InteractionVecMapIterator() : InteractionContainerIterator()
 {

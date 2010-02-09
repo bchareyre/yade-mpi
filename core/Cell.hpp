@@ -20,14 +20,6 @@ The transformation has normal part and rotation/shear part. the shearPt, unshear
 
 class Cell: public Serializable{
 	public:
-		Cell(): refSize(Vector3r(1,1,1)), trsf(Matrix3r::IDENTITY), velGrad(Matrix3r::ZERO){ integrateAndUpdate(0); }
-				
-		//! size of the reference cell
-		Vector3r refSize;
-		Matrix3r trsf;
-		Matrix3r velGrad;
-		//Matrix3r Hsize;
-
 	//! Get current size (refSize × normal strain)
 	const Vector3r& getSize() const { return _size; }
 	//! Return copy of the current size (used only by the python wrapper)
@@ -94,8 +86,16 @@ class Cell: public Serializable{
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
 	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
-		((refSize,"Reference size of the cell"))((trsf,"Current transformation matrix of the cell"))((velGrad,"Velocity gradient of the transformation; used in NewtonIntegrator.")),
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY
+		(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
+
+		((Vector3r,refSize,Vector3r(1,1,1),"Reference size of the cell"))
+		((Matrix3r,trsf,Matrix3r::IDENTITY,"Current transformation matrix of the cell"))
+		((Matrix3r,velGrad,Matrix3r::ZERO,"Velocity gradient of the transformation; used in NewtonIntegrator.")),
+
+		/*ctor*/ integrateAndUpdate(0),
+
+		/*py*/
 		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")
 	);
 };

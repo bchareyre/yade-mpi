@@ -8,9 +8,6 @@
 
 #include "PartialEngine.hpp"
 
-PartialEngine::PartialEngine() : Engine() {
-	subscribedBodies.resize(0); // what is this good for?
-}
 void PartialEngine::action(Scene* b) {
 	this->applyCondition(b);
 }

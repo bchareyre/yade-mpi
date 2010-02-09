@@ -22,10 +22,6 @@ class Scene;
 class Interaction : public Serializable
 {
 	private	:
-		body_id_t id1,id2;
-		//! Step number at which the interaction was fully created (interactionGeometry and interactionPhysics).
-		//! Should be touched only by InteractionPhysicsDispatcher and InteractionDispatchers, making them friends therefore
-		long iterMadeReal;
 		friend class InteractionPhysicsDispatcher;
 		friend class InteractionDispatchers;
 	public :
@@ -38,20 +34,6 @@ class Interaction : public Serializable
 		//! NOTE : TriangulationCollider needs this (nothing else)
 		bool isNeighbor;
 
-		/*! relative distance between bodies, given in (Scene::cellSize) units
-			Position of id1 must be incremented by that distance so that there is spatial interaction 
-
-			NOTE (tricky): cellDist must survive Interaction::reset(), it is only initialized in ctor
-			Interaction that was cancelled by the constitutive law, was reset() and became only potential
-			must have the priod information if the geometric functor again makes it real. Good to know after
-			few days of debugging that :-)
-		*/
-		Vector3<int> cellDist;
-
-		shared_ptr<InteractionGeometry> interactionGeometry;
-		shared_ptr<InteractionPhysics> interactionPhysics;
-
-		Interaction ();
 		Interaction(body_id_t newId1,body_id_t newId2);
 
 		const body_id_t& getId1() const {return id1;};
@@ -78,15 +60,19 @@ class Interaction : public Serializable
 		//! common initialization called from both constructor and reset()
 		void init();
 			
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Interaction,Serializable,"Interaction between pair of bodies.",
-		((id1,"Id of the 1st body in this interaction."))
-		((id2,"Id of the 2nd body in this interaction"))
-		((iterMadeReal,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created."))
-		((interactionGeometry,"Geometry part of the interaction."))
-		((interactionPhysics,"Physical (material) part of the interaction."))
-		((cellDist,"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its Body::state::pos coordinates for this interaction to exist. Assigned by the collider.")),
-		.def_readwrite("geom",&Interaction::interactionGeometry,"Shorthand for interactionGeometry")
-		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for interactionPhysics")
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
+		((body_id_t,id1,0,"[override below]"))
+		((body_id_t,id2,0,"[override below]"))
+		((long,iterMadeReal,-1,"Step number at which the interaction was fully (in the sense of interactionGeometry and interactionPhysics) created. (Should be touched only by :yref:`InteractionPhysicsDispatcher` and :yref:`InteractionDispatchers`, therefore they are made friends of Interaction"))
+		((shared_ptr<InteractionGeometry>,interactionGeometry,,"Geometry part of the interaction."))
+		((shared_ptr<InteractionPhysics>,interactionPhysics,,"Physical (material) part of the interaction."))
+		((Vector3<int>,cellDist,Vector3<int>(0,0,0),"Distance of bodies in cell size units, if using periodic boundary conditions; id2 is shifted by this number of cells from its :yref:`State::pos` coordinates for this interaction to exist. Assigned by the collider.\n\n.. warning::\n\t(internal)  cellDist must survive Interaction::reset(), it is only initialized in ctor. Interaction that was cancelled by the constitutive law, was reset() and became only potential must have the priod information if the geometric functor again makes it real. Good to know after few days of debugging that :-)")),
+		/* ctor */ init(),
+		/*py*/
+		.def_readwrite("geom",&Interaction::interactionGeometry,"Shorthand for :yref:`Interaction::interactionGeometry`")
+		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for :yref:`Interaction::`interactionPhysics`")
+		.def_readonly("id1",&Interaction::id1,":yref:`Id<Body::id>` of the first body in this interaction.")
+		.def_readonly("id2",&Interaction::id2,":yref:`Id<Body::id>` of the second body in this interaction.")
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
 	);
 };

@@ -10,12 +10,10 @@
 
 #include "Engine.hpp"
 
-class GlobalEngine : public Engine
-{
+class GlobalEngine: public Engine{
 	public :
-		GlobalEngine() {};
 		virtual ~GlobalEngine() {};
-	YADE_CLASS_BASE_DOC_ATTRS(GlobalEngine,Engine,"Engine that will generally affect the whole simulation (contrary to PartialEngine).",/* no own attrs */);
+	YADE_CLASS_BASE_DOC(GlobalEngine,Engine,"Engine that will generally affect the whole simulation (contrary to PartialEngine).");
 };
 REGISTER_SERIALIZABLE(GlobalEngine);
 

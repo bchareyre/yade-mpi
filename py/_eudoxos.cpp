@@ -90,7 +90,7 @@ void velocityTowardsAxis(const Vector3r& axisPoint, const Vector3r& axisDirectio
 BOOST_PYTHON_FUNCTION_OVERLOADS(velocityTowardsAxis_overloads,velocityTowardsAxis,3,5);
 
 void particleConfinement(){
-	CpmStateUpdater::update();
+	CpmStateUpdater csu; csu.update();
 }
 
 python::dict testNumpy(){

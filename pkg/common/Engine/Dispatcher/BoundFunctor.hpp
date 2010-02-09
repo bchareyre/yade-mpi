@@ -45,7 +45,7 @@ class BoundFunctor : public Functor2D
 				>
 {	
 	public: virtual ~BoundFunctor();
-	YADE_CLASS_BASE_DOC_ATTRS(BoundFunctor,Functor,"Functor for creating/updating Body::bound.",/*no attrs*/);
+	YADE_CLASS_BASE_DOC(BoundFunctor,Functor,"Functor for creating/updating :yref:`Body::bound`.");
 };
 
 REGISTER_SERIALIZABLE(BoundFunctor);

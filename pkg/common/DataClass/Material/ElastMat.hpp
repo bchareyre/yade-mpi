@@ -5,13 +5,11 @@
 /*! Elastic material */
 class ElastMat: public Material{
 	public:
-	Real young;
-	Real poisson;
-	ElastMat(): young(1e9),poisson(.25) { createIndex(); }
 	virtual ~ElastMat();
-	YADE_CLASS_BASE_DOC_ATTRS(ElastMat,Material,"Purely elastic material.",
-		((young,"Young's modulus [Pa]"))
-		((poisson,"Poisson's ratio [-]"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ElastMat,Material,"Purely elastic material.",
+		((Real,young,1e9,"Young's modulus [Pa]"))
+		((Real,poisson,.25,"Poisson's ratio [-]")),
+		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(ElastMat,Material);
 };
@@ -20,11 +18,10 @@ REGISTER_SERIALIZABLE(ElastMat);
 /*! Granular material */
 class FrictMat: public ElastMat{
 	public:
-	Real frictionAngle;
-	FrictMat(): frictionAngle(.5){ createIndex(); }
 	virtual ~FrictMat();
-	YADE_CLASS_BASE_DOC_ATTRS(FrictMat,ElastMat,"Material with internal friction.",
-		((frictionAngle,"Internal friction angle (in radians) [-]"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictMat,ElastMat,"Material with internal friction.",
+		((Real,frictionAngle,.5,"Internal friction angle (in radians) [-]")),
+		createIndex();
 	);
 	REGISTER_CLASS_INDEX(FrictMat,ElastMat);
 };

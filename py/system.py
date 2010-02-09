@@ -113,6 +113,11 @@ _deprecated={
 	'RockJointLaw':'NormalInelasticityLaw', # Mon Feb  8 11:17:00 2010, jduriez@c1solimara-l
 	'RockJointPhys':'NormalInelasticityPhys', # Mon Feb  8 11:17:35 2010, jduriez@c1solimara-l
 	'RockJointLawRelationships':'Ip2_2xCohFrictMat_NormalInelasticityPhys', # Mon Feb  8 11:17:59 2010, jduriez@c1solimara-l
+	'TetraBang':'TTetraGeom', # Tue Feb  9 10:21:24 2010, vaclav@flux
+	'TetraMold':'Tetra', # Tue Feb  9 10:22:15 2010, vaclav@flux
+	'TetraAABB':'Bo1_Tetra_Aabb', # Tue Feb  9 10:22:33 2010, vaclav@flux
+	'Tetra2TetraBang':'Ig2_Tetra_Tetra_TTetraGeom', # Tue Feb  9 10:23:19 2010, vaclav@flux
+	'TetraLaw':'TetraVolumetricLaw', # Tue Feb  9 10:24:10 2010, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

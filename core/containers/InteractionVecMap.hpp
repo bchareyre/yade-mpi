@@ -54,6 +54,7 @@ class InteractionVecMap : public InteractionContainer
 
 		virtual unsigned int size();
 
+	REGISTER_ATTRIBUTES(InteractionContainer,);
 	REGISTER_CLASS_NAME(InteractionVecMap);
 	REGISTER_BASE_CLASS_NAME(InteractionContainer);
 

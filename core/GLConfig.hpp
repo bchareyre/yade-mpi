@@ -19,7 +19,6 @@ class GLConfig: public Serializable{
 	Vector3r displacementScale; Real rotationScale;
 	vector<Se3r> clipPlaneSe3;
 	vector<int> clipPlaneActive; // should be bool, but serialization doesn't handle vector<bool>
-	const int clipPlaneNum;
 
 	// not saved
 	Vector3r highlightEmission0;

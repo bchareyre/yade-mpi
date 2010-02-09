@@ -14,10 +14,10 @@ class FrictPhys: public NormShearPhys
 				,frictionAngle 			// angle of friction, according to Coulumb criterion
 				;	
 		virtual ~FrictPhys();
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(FrictPhys,NormShearPhys,"Interaction with friction",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(FrictPhys,NormShearPhys,"Interaction with friction",
 		((Vector3r,prevNormal,Vector3r::ZERO,"unit normal of the contact plane in previous step"))
 		((Real,tangensOfFrictionAngle,NaN,"tan of angle of friction")),
-		createIndex(),
+		createIndex()
 	);
 	REGISTER_CLASS_INDEX(FrictPhys,NormShearPhys);
 };

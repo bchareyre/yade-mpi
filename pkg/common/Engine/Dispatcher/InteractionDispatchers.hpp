@@ -11,15 +11,17 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 class InteractionDispatchers: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
 	public:
-		InteractionDispatchers();
 		virtual void action(Scene*);
-		shared_ptr<InteractionGeometryDispatcher> geomDispatcher;
-		shared_ptr<InteractionPhysicsDispatcher> physDispatcher;
-		shared_ptr<LawDispatcher> lawDispatcher;
-		YADE_CLASS_BASE_DOC_ATTRS_PY(InteractionDispatchers,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.",
-			((geomDispatcher,"[will be overridden]"))
-			((physDispatcher,"[will be overridden]"))
-			((lawDispatcher,"[will be overridden]")),
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionDispatchers,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.",
+			((shared_ptr<InteractionGeometryDispatcher>,geomDispatcher,new InteractionGeometryDispatcher,"[will be overridden]"))
+			((shared_ptr<InteractionPhysicsDispatcher>,physDispatcher,new InteractionPhysicsDispatcher,"[will be overridden]"))
+			((shared_ptr<LawDispatcher>,lawDispatcher,new LawDispatcher,"[will be overridden]")),
+			/*ctor*/ alreadyWarnedNoCollider=false;
+				#ifdef IDISP_TIMING
+					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+				#endif
+			,
+			/*py*/
 			.def("__init__",python::make_constructor(InteractionDispatchers_ctor_lists),"Construct from 3 lists of functors, which will be given to geomDispatcher, physDispatcher, lawDispatcher in that order.")
 			.def_readonly("geomDispatcher",&InteractionDispatchers::geomDispatcher,"InteractionGeometryDispatcher object that is used for dispatch.")
 			.def_readonly("physDispatcher",&InteractionDispatchers::physDispatcher,"InteractionPhysicsDispatcher object used for dispatch.")

@@ -16,23 +16,10 @@
 
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw)(Law2_Dem6DofGeom_FrictPhys_Beam));
 
-ElasticContactLaw::ElasticContactLaw() : GlobalEngine()
-{
-	sdecGroupMask=1;
-	momentRotationLaw = true;
-	neverErase = false;
-	#ifdef SCG_SHEAR
-		useShear=false;
-	#endif
-}
-
-
-
 
 void ElasticContactLaw::action(Scene* rootBody)
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
-	functor->momentRotationLaw=momentRotationLaw;
 	functor->sdecGroupMask=sdecGroupMask;
 	#ifdef SCG_SHEAR
 		functor->useShear=useShear;

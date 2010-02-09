@@ -27,28 +27,28 @@ class PeriodicEngine:  public GlobalEngine {
 			}
 			return false;
 		}
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(PeriodicEngine,GlobalEngine,
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PeriodicEngine,GlobalEngine,
 		"Run Engine::action with given fixed periodicity real time (=wall clock time, computation time), \
 		virtual time (simulation time), iteration number), by setting any of those criteria \
 		(virtPeriod, realPeriod, iterPeriod) to a positive value. They are all negative (inactive)\
-		by default. \
+		by default.\n\n\
 		\
 		The number of times this engine is activated can be limited by setting nDo>0. If the number of activations \
-		will have been already reached, no action will be called even if an active period has elapsed. \
+		will have been already reached, no action will be called even if an active period has elapsed. \n\n\
 		\
 		If initRun is set (false by default), the engine will run when called for the first time; otherwise it will only \
 		start counting period (realLast etc interal variables) from that point, but without actually running, and will run \
-		only once a period has elapsed since the initial run. \
+		only once a period has elapsed since the initial run. \n\n\
 		\
-		This class should be used directly; rather, derive your own engine which you want to be run periodically. \
+		This class should be used directly; rather, derive your own engine which you want to be run periodically. \n\n\
 		\
 		Derived engines should override Engine::action(Scene*), which will be called periodically. If the derived Engine \
 		overrides also Engine::isActivated, it should also take in account return value from PeriodicEngine::isActivated, \
-		since otherwise the periodicity will not be functional. \
+		since otherwise the periodicity will not be functional. \n\n\
 		\
-		Example with PeriodicPythonRunner, which derives from PeriodicEngine; likely to be encountered in python scripts):: \
+		Example with PeriodicPythonRunner, which derives from PeriodicEngine; likely to be encountered in python scripts):: \n\n\
 		\
-			PeriodicPythonRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\
+			PeriodicPythonRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\n\n\
 		\
 		will print iteration number every 10000 iterations or every 5 seconds of wall clock time, whiever comes first since it was \
 		last run.",
@@ -61,7 +61,7 @@ class PeriodicEngine:  public GlobalEngine {
 		((Real,realLast,0,"Tracks real time of last run |yupdate|."))
 		((long,iterLast,0,"Tracks step number of last run |yupdate|."))
 		((long,nDone,0,"Track number of executions (cummulative) |yupdate|.")),
-		/* this will be put inside the ctor */ realLast=getClock(),
+		/* this will be put inside the ctor */ realLast=getClock();
 	);
 };
 REGISTER_SERIALIZABLE(PeriodicEngine);

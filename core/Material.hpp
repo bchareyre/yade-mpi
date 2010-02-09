@@ -15,15 +15,7 @@ The other data are now in the State class.
 */
 class Material: public Serializable, public Indexable{
 	public:
-		Material(): id(-1), density(1000){ }
 		virtual ~Material();
-		//! global id of the material; if >= 0, the material is shared and can be found under this index in Scene::materials
-		//! (necessary since yade::serialization doesn't track shared pointers)
-		int id;
-		//! textual name of material; if shared, can be looked up by that name
-		std::string label;
-		//! material density; used to compute mass from geometry of the body
-		Real density;
 
 		//! Function to return empty default-initialized instance of State that 
 		// is supposed to go along with this Material. Don't override unless you need
@@ -42,10 +34,12 @@ class Material: public Serializable, public Indexable{
 		static const shared_ptr<Material> byLabel(const std::string& label, Scene* scene=NULL);
 		static const shared_ptr<Material> byLabel(const std::string& label, shared_ptr<Scene> scene) {return byLabel(label,scene.get());}
 
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Material,Serializable,"Material properties of a body",
-		((id,"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise."))
-		((label,"Textual identifier for this material; can be used for shared materials lookup."))
-		((density,"Density of the material [kg/m³]")),
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Material,Serializable,"Material properties of a :yref:`body<Body>`.",
+		((int,id,((void)"not shared",-1),"Numeric id of this material; is non-negative only if this Material is shared (i.e. in O.materials), -1 otherwise. (necessary since yade::serialization doesn't track shared pointers)"))
+		((string,label,,"Textual identifier for this material; can be used for shared materials lookup in :yref:`MaterialContainer`."))
+		((Real,density,1000,"Density of the material [kg/m³]")),
+		/* ctor */,
+		/*py*/
 		.def("newAssocState",&Material::newAssocState,"Return new State instance, which is associated to this Material. Some Material have special requirement on Body::state type.")
 		YADE_PY_TOPINDEXABLE(Material)
 	);

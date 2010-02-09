@@ -15,9 +15,10 @@ class TranslationEngine : public PartialEngine {
 	public:
 		virtual void applyCondition(Scene *);
 		virtual void postProcessAttributes(bool deserializing){ if(deserializing) translationAxis.Normalize(); }
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(TranslationEngine,PartialEngine,"This engine is the base class for different engines, which require any kind of motion.",
+	YADE_CLASS_BASE_DOC_ATTRS(TranslationEngine,PartialEngine,"This engine is the base class for different engines, which require any kind of motion.",
 		((Real,velocity,,"Velocity [m/s]"))
-		((Vector3r,translationAxis,,"Direction [Vector3]")),,);
+		((Vector3r,translationAxis,,"Direction [Vector3]"))
+	);
 };
 REGISTER_SERIALIZABLE(TranslationEngine);
 

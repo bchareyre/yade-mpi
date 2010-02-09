@@ -473,8 +473,19 @@ class pyOmega{
 	void saveXML(string filename){
 		std::ofstream ofs(filename.c_str());
 		boost::archive::xml_oarchive oa(ofs);
-		shared_ptr<Scene> YadeSimulation=OMEGA.getScene();
-		oa << YadeSimulation;
+		const shared_ptr<Scene>& scene=OMEGA.getScene();
+		oa << BOOST_SERIALIZATION_NVP(scene);
+	}
+	void loadXML(string filename){
+#if 0
+		std::ifstream ifs(filename.c_str());
+		boost::archive::xml_iarchive ia(ifs);
+		Scene* s(new Scene);
+		ia >> *s;
+		shared_ptr<Scene> s2(s);
+		OMEGA.setScene(s2);
+#endif
+		throw runtime_error("Not yet implemented");
 	}
 	#endif
 	
@@ -557,12 +568,13 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(python::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
-			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] function saving to XML file using boost::serialization.")
+			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] save to XML using boost::serialization.")
+			.def("loadXML",&pyOmega::saveXML,"[EXPERIMENTAL] load from XML using boost::serialization.")
 		#endif
 		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
 		.def("tmpFilename",&pyOmega::tmpFilename,"Return unique name of file in temporary directory which will be deleted when yade exits.")
 		;
-	python::class_<pyTags>("TagsWrapper",python::init<pyTags&>())
+	python::class_<pyTags>("TagsWrapper","Container emulating dictionary semantics for accessing tags associated with simulation. Tags are accesed by strings.",python::init<pyTags&>())
 		.def("__getitem__",&pyTags::getItem)
 		.def("__setitem__",&pyTags::setItem)
 		.def("keys",&pyTags::keys)
@@ -580,7 +592,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pyBodyIterator>("BodyIterator",python::init<pyBodyIterator&>())
 		.def("__iter__",&pyBodyIterator::pyIter)
 		.def("next",&pyBodyIterator::pyNext);
-	python::class_<pyInteractionContainer>("InteractionContainer",python::init<pyInteractionContainer&>())
+	python::class_<pyInteractionContainer>("InteractionContainer","Access to :yref:`interactions<Interaction>` of simulation, by using \n\n#. id's of both :yref:`Bodies<Body>` of the interactions, e.g. ``O.interactions[23,65]``\n#. iteraction over the whole container::\n\n\tfor i in O.interactions: print i.id1,i.id2\n\n.. note::\n\tIteration silently skips interactions that are not :yref:`real<Interaction.isReal>`.",python::init<pyInteractionContainer&>())
 		.def("__iter__",&pyInteractionContainer::pyIter)
 		.def("__getitem__",&pyInteractionContainer::pyGetitem)
 		.def("__len__",&pyInteractionContainer::len)
@@ -607,7 +619,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("syncCount",&pyForceContainer::syncCount_get,&pyForceContainer::syncCount_set,"Number of synchronizations  of ForceContainer (cummulative); if significantly higher than number of steps, there might be unnecessary syncs hurting performance.")
 		;
 
-	python::class_<pyMaterialContainer>("MaterialContainer",python::init<pyMaterialContainer&>())
+	python::class_<pyMaterialContainer>("MaterialContainer","Container for :yref:`Materials<Material>`. A material can be accessed using \n\n #. numerical index in range(0,len(cont)), like cont[2]; \n #. textual label that was given to the material, like cont['steel']. This etails traversing all materials and should not be used frequently.",python::init<pyMaterialContainer&>())
 		.def("append",&pyMaterialContainer::append,"Add new shared material; changes its id and return it.")
 		.def("append",&pyMaterialContainer::appendList,"Append list of Material instances, return list of ids.")
 		.def("__getitem__",&pyMaterialContainer::getitem_id)

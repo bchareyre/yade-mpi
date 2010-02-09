@@ -43,12 +43,6 @@ void SpiralEngine::applyCondition(Scene* rb){
 	}
 }
 
-RotationEngine::RotationEngine(){
-	rotateAroundZero = false;
-	zeroPoint = Vector3r(0,0,0);
-}
-
-
 
 void RotationEngine::applyCondition(Scene*){
    rotationAxis.Normalize();

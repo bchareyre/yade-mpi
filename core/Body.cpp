@@ -20,11 +20,5 @@ const body_id_t Body::ID_NONE=body_id_t(-1);
 const shared_ptr<Body>& Body::byId(body_id_t _id, Scene* rb){return (*((rb?rb:Omega::instance().getScene().get())->bodies))[_id];}
 const shared_ptr<Body>& Body::byId(body_id_t _id, shared_ptr<Scene> rb){return (*(rb->bodies))[_id];}
 
-#ifdef YADE_BOOST_SERIALIZATION
-	BOOST_CLASS_EXPORT(Body);
-#endif
-
-// we must initialize id = 0, otherwise BodyContainer will crash.
-Body::Body(): id(Body::ID_NONE),groupMask(1),clumpId(ID_NONE), state(shared_ptr<State>(new State)){}
-Body::Body(body_id_t newId, int newGroup): id(newId), groupMask(newGroup), clumpId(ID_NONE), state(shared_ptr<State>(new State)){}
+Body::Body(body_id_t newId, int newGroup): id(newId), groupMask(newGroup), state(shared_ptr<State>(new State)), clumpId(ID_NONE){}
 

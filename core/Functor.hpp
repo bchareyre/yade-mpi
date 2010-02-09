@@ -22,11 +22,10 @@ class Functor : public Serializable
 	shared_ptr<TimingDeltas> timingDeltas;
 	//! updated before every dispatch loop by the dispatcher; DO NOT ABUSE access to scene, except for getting global variables like scene->dt.
 	Scene* scene;
-	// label to be able to retrieve an engine unit by its label
-	string label; 
 	virtual ~Functor(); // defined in Dispatcher.cpp
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Functor,Serializable,"Function-like object that is called by Dispatcher, if types of arguments match those the Functor declares to accept.",
-		((label,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Functor,Serializable,"Function-like object that is called by Dispatcher, if types of arguments match those the Functor declares to accept.",
+		((string,label,,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),
+		/*ctor*/,
 		.def_readonly("timingDeltas",&Functor::timingDeltas,"Detailed information about timing inside the Dispatcher itself. Empty unless enabled in the source code and O.timingEnabled==True.")
 		.add_property("bases",&Functor::getFunctorTypes,"Ordered list of types (as strings) this functor accepts.")
 	);	

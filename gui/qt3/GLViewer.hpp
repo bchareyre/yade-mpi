@@ -28,7 +28,7 @@
  * * Alt-1,Alt-2,... adds/removes the respective plane to bound group:
  * 	mutual positions+orientations of planes in the group are maintained when one of those planes is manipulated
  *
- * Clip plane number is 3; change OpenGLRenderingEngine::clipPlaneNum, complete switches "|| ..." in keyPressEvent
+ * Clip plane number is 3; change YADE_RENDERER_NUM_CLIP_PLANE, complete switches "|| ..." in keyPressEvent
  * and recompile to have more.
  */
 class GLViewer : public QGLViewer

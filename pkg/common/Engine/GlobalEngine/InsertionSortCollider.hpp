@@ -177,7 +177,7 @@ class InsertionSortCollider: public Collider{
 	vector<body_id_t> probeBoundingVolume(const Bound&);
 
 	virtual void action(Scene*);
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(InsertionSortCollider,Collider,"\
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InsertionSortCollider,Collider,"\
 		Collider with O(n log(n)) complexity, using :yref:`Aabb` for bounds.\
 		\n\n\
 		At the initial step, Bodies' bounds (along sortAxis) are first std::sort'ed along one axis (sortAxis), then collided. The initial sort has :math:`O(n^2)` complexity, see `Colliders' performance <https://yade-dem.org/index.php/Colliders_performace>`_ for some information (There are scripts in examples/collider-perf for measurements). \

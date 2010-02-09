@@ -16,8 +16,8 @@ class LawDispatcher:
 	>{
 		public:
 		virtual void action(Scene*);
-	YADE_CLASS_BASE_DOC_ATTRS_PY(LawDispatcher,Dispatcher,"Dispatcher for applying constitutive laws on interaction.",/* no attrs */,
-		YADE_PY_DISPATCHER(LawDispatcher)
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LawDispatcher,Dispatcher,"Dispatcher for applying constitutive laws on :yref:`interactions<Interaction>`.",/*attrs*/,/*ctor*/,
+		/*py*/YADE_PY_DISPATCHER(LawDispatcher)
 	);
 	DECLARE_LOGGER;
 };

@@ -17,10 +17,9 @@ class Recorder: public PeriodicEngine{
 			}
 			return false;
 		}
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Recorder,PeriodicEngine,"Engine periodically storing some data to (one) external file. In addition PeriodicEngine, it handles opening the file as needed. See :yref:`PeriodicEngine` for controlling periodicity.",
+	YADE_CLASS_BASE_DOC_ATTRS(Recorder,PeriodicEngine,"Engine periodically storing some data to (one) external file. In addition PeriodicEngine, it handles opening the file as needed. See :yref:`PeriodicEngine` for controlling periodicity.",
 		((std::string,file,,"Name of file to save to; must not be empty."))
 		((bool,truncate,false,"Whether to delete current file contents, if any, when opening (false by default)"))
-		,,
 	);
 };
 REGISTER_SERIALIZABLE(Recorder);

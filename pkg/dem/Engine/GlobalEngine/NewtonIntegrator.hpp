@@ -56,36 +56,25 @@ class NewtonIntegrator : public GlobalEngine{
 	// whether the cell has changed from the previous step
 	bool cellChanged;
 
-
-
 	public:
-		///damping coefficient for Cundall's non viscous damping
-		Real damping;
-		/// store square of max. velocity, for informative purposes; computed again at every step
-		Real maxVelocitySq;
-		/// Enable of the exact aspherical body rotation integrator
-		bool exactAsphericalRot;
-		//! Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled (default), 1: position update, 2: velocity update.
-		int homotheticCellResize;
 		//! Store transformation increment for the current step (updated automatically)
 		Matrix3r cellTrsfInc;
-
 		#ifdef YADE_OPENMP
 			vector<Real> threadMaxVelocitySq;
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action(Scene *);		
-		NewtonIntegrator(): prevCellSize(Vector3r::ZERO),damping(0.2), maxVelocitySq(-1), exactAsphericalRot(false), homotheticCellResize(0){
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
+		((Real,damping,0.2,"damping coefficient for Cundall's non viscous damping [-]"))
+		((Real,maxVelocitySq,NaN,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
+		((bool,exactAsphericalRot,false,"Enable of the exact aspherical body rotation integrator."))
+		((int,homotheticCellResize,((void)"disabled",0),"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled, 1: position update, 2: velocity update.")),
+		/*ctor*/
+			prevCellSize=Vector3r::ZERO;
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif
-		}
-	YADE_CLASS_BASE_DOC_ATTRS(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
-		((damping,"damping coefficient for Cundall's non viscous damping [-]"))
-		((maxVelocitySq,"store square of max. velocity, for informative purposes; computed again at every step. Updated automatically."))
-		((exactAsphericalRot,"Enable of the exact aspherical body rotation integrator"))
-		((homotheticCellResize,"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled (default), 1: position update, 2: velocity update."))
 	);
 	DECLARE_LOGGER;
 };

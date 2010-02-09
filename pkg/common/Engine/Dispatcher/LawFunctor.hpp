@@ -8,7 +8,6 @@ class LawFunctor: public Functor2D <
 		void, TYPELIST_4(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*)
 	>{
 	public:
-		LawFunctor(){}
 		virtual ~LawFunctor();
 	/*! Convenience functions to get forces/torques quickly. */
 	void addForce (const body_id_t id, const Vector3r& f,Scene* rb){rb->forces.addForce (id,f);}
@@ -20,7 +19,7 @@ class LawFunctor: public Functor2D <
 		addTorque(id1,(contactPoint-pos1).Cross(force),rb);
 		addTorque(id2,-(contactPoint-pos2).Cross(force),rb);
 	}
-	YADE_CLASS_BASE_DOC_ATTRS(LawFunctor,Functor,"Functor for applying constitutive laws on interaction.",/*no attrs*/);
+	YADE_CLASS_BASE_DOC(LawFunctor,Functor,"Functor for applying constitutive laws on :yref:`interactions<Interaction>`.");
 };
 REGISTER_SERIALIZABLE(LawFunctor);
 	

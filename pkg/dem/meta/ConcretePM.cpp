@@ -305,8 +305,8 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 
 /********************** CpmStateUpdater ****************************/
 CREATE_LOGGER(CpmStateUpdater);
-Real CpmStateUpdater::maxOmega=0.;
-Real CpmStateUpdater::avgRelResidual=0.;
+//Real CpmStateUpdater::maxOmega=0.;
+//Real CpmStateUpdater::avgRelResidual=0.;
 
 void CpmStateUpdater::update(Scene* _scene){
 	Scene *scene=_scene?_scene:Omega::instance().getScene().get();

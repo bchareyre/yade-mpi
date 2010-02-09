@@ -26,22 +26,11 @@
 
 class Scene;
 
-/*! \brief Abstract interface for bodies stored in BodyContainer, Body represents the atomic element of simulation.
- */
-class Body : public Serializable
-{
-	public	:
-		body_id_t id;
-		/*! group to which body belongs (maybe vector<int> , to allow multiple groups?)
-		 * we can use them to make group one yellow, and group two red, or to record data
-		 * from some selected bodies */
-		int groupMask;
+class Body: public Serializable{
 	public	:
 		/*! \brief Numerical type for ::Body::id.
 		 * \bug  Current code mixes signed and unsigned int, this might be a way to enforce consistence. */
 		// typedef unsigned int id_t;
-		//! Clump of which this body makes part. If it is not part of a clump, set to Body::ID_NONE.
-		body_id_t clumpId;
 		//! symbolic constant for body that doesn't exist.
 		static const body_id_t ID_NONE;
 		//! get Body pointer given its id. 
@@ -69,33 +58,30 @@ class Body : public Serializable
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
-		//! material of the body; might be shared among bodies (via shared_ptr)
-		shared_ptr<Material> material;
-		//! state of the body
-		shared_ptr<State> state;
-		/// description of how this body interacts with others, like: SphereHierarchy, Box
-		shared_ptr<Shape> shape;
-		/// Bound is used for quick detection of potential interactions, that can be: Aabb, K-Dop
-		shared_ptr<Bound>	bound;
-
-		/*! isDynamic is true if the state of the body is not modified by a kinematicEngine.
-		 * It is useful for example for collision detection : if two colliding bodies are only
-		 * kinematic then it is useless to modelise their contact */
-		bool isDynamic;
-	
 		// Constructor/Destructor
-		Body ();
 		Body (body_id_t newId, int newGroup);
 
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Body,Serializable,"Basic element of simulation; interacts with other bodies.",
-		((id,"[will be overridden]"))((groupMask,"Bitmask for determining interactions"))((isDynamic,"Whether this body will be moved by forces"))((material,"Material instance associated with this body"))((state,"Physical state"))((shape,"Shape of this body"))((bound,"Bound of this body"))((clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see Body().isStandalone, Body().isClump, Body().isClumpMember properties")),
-		.def_readwrite("mat",&Body::material,"Shorthand for material")
-		.def_readwrite("dynamic",&Body::isDynamic,"Shorthand for isDynamic")
-		.def_readonly("id",&Body::id,"Unique id of this body") // should overwrite def_readwrite("id",...) earlier
-		.def_readwrite("mask",&Body::groupMask,"Shorthand for groupMask")
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
+		((body_id_t,id,Body::ID_NONE,"[will be overridden]"))
+		((int,groupMask,1,"Bitmask for determining interactions."))
+		((bool,isDynamic,true,"Whether this body will be moved by forces."))
+
+		((shared_ptr<Material>,material,,":yref:`Material` instance associated with this body."))
+		((shared_ptr<State>,state,new State,"Physical :yref:`state<State>`."))
+		((shared_ptr<Shape>,shape,,"Geometrical :yref:`Shape`."))
+		((shared_ptr<Bound>,bound,,":yref:`Bound`, approximating volume for the purposes of collision detection."))
+
+		((int,clumpId,Body::ID_NONE,"[will be overridden]")),
+		/* ctor */,
+		/* py */
+		.def_readonly("id",&Body::id,"Unique id of this body") // overwrites automatic def_readwrite("id",...) earlier
+		.def_readonly("clumpId",&Body::clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped` instead.")
+		.def_readwrite("mat",&Body::material,"Shorthand for :yref:`Body::material`")
+		.def_readwrite("dynamic",&Body::isDynamic,"Shorthand for :yref:`Body::isDynamic`")
+		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")
 		.add_property("isStandalone",&Body::isStandalone,"True if this body is neither clump, nor clump member; false otherwise.")
 		.add_property("isClumpMember",&Body::isClumpMember,"True if this body is clump member, false otherwise.")
-		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise");
+		.add_property("isClump",&Body::isClump,"True if this body is clump itself, false otherwise.");
 	);
 };
 REGISTER_SERIALIZABLE(Body);

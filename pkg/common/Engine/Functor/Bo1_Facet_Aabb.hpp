@@ -14,7 +14,7 @@ class Bo1_Facet_Aabb : public BoundFunctor{
 	public:
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 	FUNCTOR2D(Facet,Aabb);
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Bo1_Facet_Aabb,BoundFunctor,"Creates/updates an Aabb of a facet",,,);
+	YADE_CLASS_BASE_DOC(Bo1_Facet_Aabb,BoundFunctor,"Creates/updates an :yref:`Aabb` of a :yref:`facet`.");
 };
 REGISTER_SERIALIZABLE(Bo1_Facet_Aabb);
 

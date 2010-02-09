@@ -15,9 +15,10 @@
 
 class InteractionPhysics : public Serializable, public Indexable
 {
-	YADE_CLASS_BASE_DOC_ATTRS_PY(InteractionPhysics,Serializable,"Physical (material) properties of interaction.",
-		/*no attrs*/,
-		YADE_PY_TOPINDEXABLE(InteractionPhysics)
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionPhysics,Serializable,"Physical (material) properties of :yref:`interaction<Interaction>`.",
+		/*attrs*/,
+		/*ctor*/,
+		/*py*/YADE_PY_TOPINDEXABLE(InteractionPhysics)
 	);
 	REGISTER_INDEX_COUNTER(InteractionPhysics);
 };

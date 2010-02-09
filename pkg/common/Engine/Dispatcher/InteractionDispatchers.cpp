@@ -13,7 +13,6 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 }
 
 
-
 // #define IDISP_TIMING
 
 #ifdef IDISP_TIMING
@@ -21,18 +20,6 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 #else
 	#define IDISP_CHECKPOINT(cpt)
 #endif
-
-
-
-InteractionDispatchers::InteractionDispatchers(){
-	geomDispatcher=shared_ptr<InteractionGeometryDispatcher>(new InteractionGeometryDispatcher);
-	physDispatcher=shared_ptr<InteractionPhysicsDispatcher>(new InteractionPhysicsDispatcher);
-	lawDispatcher=shared_ptr<LawDispatcher>(new LawDispatcher);
-	alreadyWarnedNoCollider=false;
-	#ifdef IDISP_TIMING
-		timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
-	#endif
-}
 
 #define DISPATCH_CACHE
 

@@ -23,29 +23,10 @@ YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(OpenGLRenderingEngine);
 
 bool OpenGLRenderingEngine::glutInitDone=false;
-size_t OpenGLRenderingEngine::selectBodyLimit=500;
+const int OpenGLRenderingEngine::numClipPlanes;
 
-OpenGLRenderingEngine::OpenGLRenderingEngine(): clipPlaneNum(3){
-	Show_DOF = false;
-	Show_ID = false;
-	Body_state = false;
-	Body_bounding_volume = false;
-	Body_interacting_geom = true;
-	Body_wire = false;
-	Interaction_wire = false;
-	intrAllWire=false;
-	Draw_inside = true;
-	Draw_mask = ~0;
-	Light_position = Vector3r(75.0,130.0,0.0);
-	Background_color = Vector3r(0.2,0.2,0.2);
-	Interaction_geometry = false;
-	Interaction_physics = false;
+void OpenGLRenderingEngine::init(){
 
-	scaleDisplacements=false; scaleRotations=false;
-	displacementScale=Vector3r(1,1,1); rotationScale=1;
-
-	for(int i=0; i<clipPlaneNum; i++){clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)); clipPlaneActive.push_back(false); clipPlaneNormals.push_back(Vector3r(1,0,0));}
-	
 	map<string,DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
 	map<string,DynlibDescriptor>::const_iterator diEnd = Omega::instance().getDynlibsDescriptor().end();
 	for(;di!=diEnd;++di){
@@ -56,11 +37,7 @@ OpenGLRenderingEngine::OpenGLRenderingEngine(): clipPlaneNum(3){
 		if (Omega::instance().isInheritingFrom((*di).first,"GlInteractionPhysicsFunctor")) addInteractionPhysicsFunctor((*di).first);
 	}
 	postProcessAttributes(true);
-}
 
-OpenGLRenderingEngine::~OpenGLRenderingEngine(){}
-
-void OpenGLRenderingEngine::init(){
 	if (glutInitDone) return;
 	glutInit(&Omega::instance().origArgc,Omega::instance().origArgv);
 	/* transparent spheres (still not working): glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); */
@@ -103,8 +80,8 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
 };
 
 bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
-	if(clipPlaneNum<1) return false;
-	for(int i=0;i<clipPlaneNum;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).Dot(clipPlaneNormals[i])<0) return true;
+	if(numClipPlanes<1) return false;
+	for(int i=0;i<numClipPlanes;i++) if(clipPlaneActive[i]&&(p-clipPlaneSe3[i].position).Dot(clipPlaneNormals[i])<0) return true;
 	return false;
 }
 
@@ -185,8 +162,8 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 	glPopMatrix();	
 
 	// clipping
-	assert(clipPlaneNormals.size()==(size_t)clipPlaneNum);
-	for(size_t i=0;i<(size_t)clipPlaneNum; i++){
+	assert(clipPlaneNormals.size()==(size_t)numClipPlanes);
+	for(size_t i=0;i<(size_t)numClipPlanes; i++){
 		// someone could have modified those from python and truncate the vectors; fill those here in that case
 		if(i==clipPlaneSe3.size()) clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY));
 		if(i==clipPlaneActive.size()) clipPlaneActive.push_back(false);

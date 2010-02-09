@@ -10,22 +10,15 @@
  */
 class SnapshotEngine: public PeriodicEngine{
 	public:
-		//! Basename for snapshots
-		string fileBase;
-		//! Number appended to fileBase
-		int counter;
-		//! The GLView number that we save (default: 0, i.e. primary view)
-		int viewNo;
-		//! Silently return if selected view doesn't exist (default: true)
-		bool ignoreErrors;
-		//! files that have been created so far
-		vector<string> savedSnapshots;
-		//! number of msec to sleep after snapshot (to prevent 3d hw problems)
-		int msecSleep;
-	SnapshotEngine():counter(0),viewNo(0),ignoreErrors(true),msecSleep(0){}
 	virtual void action(Scene*);
-	REGISTER_ATTRIBUTES(PeriodicEngine,(fileBase)(counter)(viewNo)(ignoreErrors)(savedSnapshots)(msecSleep));
+	YADE_CLASS_BASE_DOC_ATTRS(SnapshotEngine,PeriodicEngine,"Periodically save snapshots of GLView(s) as .png files. Files are named *fileBase*+*counter*+'.png' (counter is left-padded by 0s, i.e. snap0004.png)",
+		((string,fileBase,"","Basename for snapshots"))
+		((int,counter,0,"Number appended to fileBase |yupdate|"))
+		((int,viewNo,((void)"primary view",0),"The GLView number that we save."))
+		((bool,ignoreErrors,true,"Silently return if selected view doesn't exist"))
+		((vector<string>,savedSnapshots,,"Files that have been created so far"))
+		((int,msecSleep,0,"number of msec to sleep after snapshot (to prevent 3d hw problems) [ms]"))
+	);
 	DECLARE_LOGGER;
-	REGISTER_CLASS_AND_BASE(SnapshotEngine,PeriodicEngine);
 };
 REGISTER_SERIALIZABLE(SnapshotEngine);

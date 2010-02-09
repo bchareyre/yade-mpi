@@ -31,18 +31,10 @@ class SpatialQuickSortCollider : public Collider {
 
 	vector<shared_ptr<AABBBound> > rank;
 
-    public:
-
-	SpatialQuickSortCollider();
-	virtual ~SpatialQuickSortCollider();
-
-	virtual void action(Scene*);
-
-	REGISTER_ATTRIBUTES(Collider,);
+   public:
+		virtual void action(Scene*);
+	YADE_CLASS_BASE_DOC(SpatialQuickSortCollider,Collider,"Collider using quicksort along axes at each step, using :yref:`Aabb` bounds. \n\n Its performance is lower than that of :yref:`InsertionSortCollider` (see `Colliders' performance <https://yade-dem.org/index.php/Colliders_performace>`_), but the algorithm is simple enought to make it good for checking other collider's correctness.");
 	DECLARE_LOGGER;
-	REGISTER_CLASS_NAME(SpatialQuickSortCollider);
-	REGISTER_BASE_CLASS_NAME(Collider);
-
 };
 REGISTER_SERIALIZABLE(SpatialQuickSortCollider);
 

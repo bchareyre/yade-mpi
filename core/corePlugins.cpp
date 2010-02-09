@@ -1,3 +1,19 @@
 #include<yade/lib-factory/ClassFactory.hpp>
 // make core classes known to the class factory
-YADE_PLUGIN((Body)(Bound)(Cell)(Collider)(DataRecorder)(Dispatcher)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(InteractionGeometry)(InteractionPhysics)(Material)(PartialEngine)(PeriodicEngine)(Shape)(State));
+#include<yade/core/Body.hpp>
+#include<yade/core/Bound.hpp>
+#include<yade/core/Cell.hpp>
+#include<yade/core/Collider.hpp>
+#include<yade/core/Dispatcher.hpp>
+#include<yade/core/Engine.hpp>
+#include<yade/core/FileGenerator.hpp>
+#include<yade/core/Functor.hpp>
+#include<yade/core/GlobalEngine.hpp>
+#include<yade/core/Interaction.hpp>
+#include<yade/core/InteractionGeometry.hpp>
+#include<yade/core/InteractionPhysics.hpp>
+#include<yade/core/Material.hpp>
+#include<yade/core/PartialEngine.hpp>
+#include<yade/core/Shape.hpp>
+#include<yade/core/State.hpp>
+YADE_PLUGIN((Body)(Bound)(Cell)(Collider)(Dispatcher)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(InteractionGeometry)(InteractionPhysics)(Material)(PartialEngine)(Shape)(State));

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(PeriController))
+YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController))
 
 
 CREATE_LOGGER(PeriIsoCompressor);

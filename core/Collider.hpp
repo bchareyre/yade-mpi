@@ -15,7 +15,6 @@
 class Collider : public GlobalEngine
 {
 	public :
-		Collider();
 		virtual ~Collider();
 		/*! To probe the Bound on a bodies presense.
 		 *
@@ -40,7 +39,7 @@ class Collider : public GlobalEngine
 		Currently used from Shop::flipCell, which changes cell information for bodies.
 		*/
 		virtual void invalidatePersistentData(){}
-	YADE_CLASS_BASE_DOC_ATTRS(Collider,GlobalEngine,"Abstract class for finding spatial collisions between bodies.",);
+	YADE_CLASS_BASE_DOC(Collider,GlobalEngine,"Abstract class for finding spatial collisions between bodies.");
 };
 REGISTER_SERIALIZABLE(Collider);
 

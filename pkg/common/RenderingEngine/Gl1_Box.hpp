@@ -14,7 +14,7 @@ class Gl1_Box : public GlShapeFunctor{
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 	RENDERS(Box);
-	YADE_CLASS_BASE_DOC_ATTRS(Gl1_Box,GlShapeFunctor,"Renders :yref:`Box` object",);
+	YADE_CLASS_BASE_DOC(Gl1_Box,GlShapeFunctor,"Renders :yref:`Box` object");
 };
 
 REGISTER_SERIALIZABLE(Gl1_Box);

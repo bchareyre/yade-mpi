@@ -123,8 +123,8 @@ another would be HerzMindlinContactModel
 		}
 		else
 #endif			
-		if(dynamic_cast<TetraBang*>(interaction->interactionGeometry.get()) && !interaction->interactionPhysics){
-			// TetraLaw doesn't use InteractionPhysics anyway, it accesses bodies' parameters directly
+		if(dynamic_cast<TTetraGeom*>(interaction->interactionGeometry.get()) && !interaction->interactionPhysics){
+			// TetraVolumetricLaw doesn't use InteractionPhysics anyway, it accesses bodies' parameters directly
 			interaction->interactionPhysics=shared_ptr<InteractionPhysics>(new InteractionPhysics);
 		}
 	}

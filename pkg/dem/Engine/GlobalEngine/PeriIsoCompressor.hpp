@@ -9,7 +9,7 @@ class PeriIsoCompressor: public GlobalEngine{
 	Real currUnbalanced;
 	public:
 		void action(Scene*);
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(PeriIsoCompressor,GlobalEngine,"Compress/decompress cloud of spheres by controlling periodic cell size until it reaches prescribed average stress, then moving to next stress value in given stress series.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PeriIsoCompressor,GlobalEngine,"Compress/decompress cloud of spheres by controlling periodic cell size until it reaches prescribed average stress, then moving to next stress value in given stress series.",
 		((vector<Real>,stresses,,"Stresses that should be reached, one after another"))
 		((Real,charLen,-1.,"Characteristic length, should be something like mean particle diameter (default -1=invalid value))"))
 		((Real,maxSpan,-1.,"Maximum body span in terms of bbox, to prevent periodic cell getting too small. |ycomp|"))
@@ -45,7 +45,7 @@ class PeriTriaxController: public GlobalEngine{
 	public:
 		virtual void action(Scene*);
 		void strainStressStiffUpdate();
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(PeriTriaxController,GlobalEngine,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
+	YADE_CLASS_BASE_DOC_ATTRS(PeriTriaxController,GlobalEngine,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
 		((bool,reversedForces,false,"For broken constitutive laws, normalForce and shearForce on interactions are in the reverse sense. see `bugreport <https://bugs.launchpad.net/yade/+bug/493102>`_"))
 		((bool,dynCell,false,"Imposed stress can be controlled using the packing stiffness or by applying the laws of dynamic (dynCell=true). Don't forget to assign a mass to the cell (PeriTriaxController->mass)."))
 		((Vector3r,goal,Vector3r::ZERO,"Desired stress or strain values (depending on stressMask), strains defined as ``strain(i)=log(Fii)``"))
@@ -65,9 +65,7 @@ class PeriTriaxController: public GlobalEngine{
 		((Vector3r,stiff,Vector3r::ZERO,"average stiffness (only every globUpdate steps recomputed from interactions) |yupdate|"))
 		((Real,currUnbalanced,NaN,"current unbalanced force (updated every globUpdate) |yupdate|"))
 		((Vector3r,prevGrow,Vector3r::ZERO,"previous cell grow"))
-		((Real,mass,NaN,"mass of the cell (user set)")),
-		/* ctor */,
-		/* py */
+		((Real,mass,NaN,"mass of the cell (user set)"))
 	);
 	DECLARE_LOGGER;
 };

@@ -9,10 +9,9 @@ class PeriodicPythonRunner: public PeriodicEngine {
 	public :
 		/* virtual bool isActivated: not overridden, PeriodicEngine handles that */
 		virtual void action(Scene* b){ if(command.size()>0) pyRunString(command); }
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(PeriodicPythonRunner,PeriodicEngine,
-		"Execute a python command (in addPlotDataCall) periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
+	YADE_CLASS_BASE_DOC_ATTRS(PeriodicPythonRunner,PeriodicEngine,
+		"Execute a python command periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
 		((string,command,"","Command to be run by python interpreter. Not run if empty."))
-		,,
 	);
 };
 REGISTER_SERIALIZABLE(PeriodicPythonRunner);

@@ -14,15 +14,6 @@ Functor::~Functor(){}; // vtable
 #include<algorithm>
 #include<vector>
 
-YADE_PLUGIN((Functor)(Dispatcher));
-
-
-Dispatcher::Dispatcher()
-{
-	functorNames.clear();
-	functorArguments.clear();
-}
-
 
 Dispatcher::~Dispatcher()
 {

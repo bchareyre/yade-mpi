@@ -35,19 +35,15 @@ class BoundDispatcher :	public Dispatcher2D
 					>
 {
 	public :
-		// selectively turn off this engine (from within the collider, for instance)
-		bool activated;
-		//! bounding box will be enlarged by this amount in all 3 dimensions; must be non-negative;
-		Real sweepDist;
-		BoundDispatcher(): activated(true), sweepDist(0) {}
 		virtual void action(Scene*);
 		virtual bool isActivated(Scene*){ return activated; }
 		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
-	YADE_CLASS_BASE_DOC_ATTRS_PY(BoundDispatcher,Dispatcher,"Dispatcher for creating/updating Body::bound objects.",
-		((activated,"Whether the engine is activated (only should be changed by the collider)"))
-		((sweepDist,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider).")),
-		YADE_PY_DISPATCHER(BoundDispatcher)
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(BoundDispatcher,Dispatcher,"Dispatcher for creating/updating Body::bound objects.",
+		((bool,activated,true,"Whether the engine is activated (only should be changed by the collider)"))
+		((Real,sweepDist,0,"Distance by which enlarge all bounding boxes, to prevent collider from being run at every step (only should be changed by the collider).")),
+		/*ctor*/,
+		/*py*/YADE_PY_DISPATCHER(BoundDispatcher)
 	);
 };
 REGISTER_SERIALIZABLE(BoundDispatcher);

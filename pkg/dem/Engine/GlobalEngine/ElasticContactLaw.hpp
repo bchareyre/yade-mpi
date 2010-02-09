@@ -20,27 +20,15 @@
 
 class Law2_ScGeom_FrictPhys_Basic: public LawFunctor{
 	public:
-	virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
-	int sdecGroupMask;
-	bool momentRotationLaw;	
-	bool neverErase;	
-
-	#ifdef SCG_SHEAR
-		bool useShear;
-	#endif
-	
-	Law2_ScGeom_FrictPhys_Basic(): sdecGroupMask(1), momentRotationLaw(true), neverErase(false)
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_FrictPhys_Basic,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom`.",
+		((int,sdecGroupMask,1,"Bitmask for allowing collision between particles :yref:`Body::groupMask`"))
+		((bool,neverErase,false,"Keep interactions even if particles go away from each other [for debugging?]"))
 		#ifdef SCG_SHEAR
-			, useShear(false)
-		#endif
-		{}
-	FUNCTOR2D(ScGeom,FrictPhys);
-	REGISTER_CLASS_AND_BASE(Law2_ScGeom_FrictPhys_Basic,LawFunctor);
-	REGISTER_ATTRIBUTES(LawFunctor,(sdecGroupMask)(momentRotationLaw)(neverErase)
-		#ifdef SCG_SHEAR
-			(useShear)
+			((bool,useShear,false,"Use ScGeom::updateShear rather than ScGeom::updateShearForce for shear force computation."))
 		#endif
 	);
+	FUNCTOR2D(ScGeom,FrictPhys);
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_FrictPhys_Basic);
@@ -55,8 +43,7 @@ class Law2_Dem3DofGeom_FrictPhys_Basic: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
 		FUNCTOR2D(Dem3DofGeom,FrictPhys);
-		REGISTER_CLASS_AND_BASE(Law2_Dem3DofGeom_FrictPhys_Basic,LawFunctor);
-		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
+		YADE_CLASS_BASE_DOC(Law2_Dem3DofGeom_FrictPhys_Basic,LawFunctor,"Constitutive law for linear compression, no tension, and linear plasticity surface.\n\nThis class serves also as tutorial and is documented in detail at https://yade-dem.org/index.php/ConstitutiveLawHowto.");
 };
 REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_FrictPhys_Basic);
 
@@ -64,37 +51,22 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_FrictPhys_Basic);
 class Law2_Dem6DofGeom_FrictPhys_Beam: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
-		FUNCTOR2D(Dem6DofGeom,FrictPhys);
-		REGISTER_CLASS_AND_BASE(Law2_Dem6DofGeom_FrictPhys_Beam,LawFunctor);
-		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
+	FUNCTOR2D(Dem6DofGeom,FrictPhys);
+	YADE_CLASS_BASE_DOC(Law2_Dem6DofGeom_FrictPhys_Beam,LawFunctor,"Class for demonstrating beam-like behavior of contact (normal, shear, bend and twist) [broken][experimental]");
 };
 REGISTER_SERIALIZABLE(Law2_Dem6DofGeom_FrictPhys_Beam);
 
-class ElasticContactLaw : public GlobalEngine
-{
-/// Attributes
-	private :
-	public :
-		int sdecGroupMask;
-		bool momentRotationLaw;
-		///Turn this true if another constitutive law is taking care of removing interactions :
-		bool neverErase;
-		#ifdef SCG_SHEAR
-			bool useShear;
-		#endif
-	
-		ElasticContactLaw();
-		void action(Scene*);
-
+class ElasticContactLaw : public GlobalEngine{
 		shared_ptr<Law2_ScGeom_FrictPhys_Basic> functor;
-
-		REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(neverErase)
+	public :
+		void action(Scene*);
+	YADE_CLASS_BASE_DOC_ATTRS(ElasticContactLaw,GlobalEngine,"[DEPRECATED] Loop over interactions applying :yref:`Law2_ScGeom_FrictPhys_Basic` on all interactions.\n\n.. note::\n  Use :yref:`InteractionDispatchers` and :yref:`Law2_ScGeom_FrictPhys_Basic` instead of this class for performance reasons.",
+		((int,sdecGroupMask,1,"Bitmask for allowing collision between particles :yref:`Body::groupMask`"))
+		((bool,neverErase,false,"Keep interactions even if particles go away from each other [for debugging?]"))
 		#ifdef SCG_SHEAR
-			(useShear)
+			((bool,useShear,false,"Use ScGeom::updateShear rather than ScGeom::updateShearForce for shear force computation."))
 		#endif
 	);
-	REGISTER_CLASS_NAME(ElasticContactLaw);
-	REGISTER_BASE_CLASS_NAME(GlobalEngine);
 };
 
 REGISTER_SERIALIZABLE(ElasticContactLaw);

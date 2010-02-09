@@ -2,13 +2,16 @@
 
 #include"Tetra.hpp"
 
-YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB) 
-	/* some code in cpp (this file): */ (TetraLaw) (Tetra2TetraBang)
+YADE_PLUGIN(/* self-contained in hpp: */ (Tetra) (TTetraGeom) (Bo1_Tetra_Aabb) 
+	/* some code in cpp (this file): */ (TetraVolumetricLaw) (Ig2_Tetra_Tetra_TTetraGeom)
 	#ifdef YADE_OPENGL
 		(Gl1_Tetra)
 	#endif	
 	);
 
+Tetra::~Tetra(){}
+TTetraGeom::~TTetraGeom(){}
+Bo1_Tetra_Aabb::~Bo1_Tetra_Aabb(){}
 
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Omega.hpp>
@@ -23,9 +26,9 @@ YADE_PLUGIN(/* self-contained in hpp: */ (TetraMold) (TetraBang) (TetraAABB)
 //#include"Intersection/Wm3IntrTetrahedron3Tetrahedron3.cpp"
 //#include"Intersection/Wm3Intersector.cpp"
 
-CREATE_LOGGER(Tetra2TetraBang);
+CREATE_LOGGER(Ig2_Tetra_Tetra_TTetraGeom);
 
-/*! Calculate configuration of TetraMold - TetraMold intersection.
+/*! Calculate configuration of Tetra - Tetra intersection.
  *
  * Wildmagick's functions are used here: intersection is returned as a set of tetrahedra (may be empty, inwhich case there is no real intersection).
  * Then we calcualte volumetric proeprties of this intersection volume: inertia, centroid, volume.
@@ -38,21 +41,21 @@ CREATE_LOGGER(Tetra2TetraBang);
  *
  * Strain will be then approximated by equivalentPenetrationDepth/.5*(maxPenetrationDepthA+maxPenetrationDepthB) (the average of A and B)
  *
- * All the relevant results are fed into TetraBang which is passed to TetraLaw later that makes actual use of all this.
+ * All the relevant results are fed into TTetraGeom which is passed to TetraVolumetricLaw later that makes actual use of all this.
  *
  * @todo thoroughly test this for numerical correctness.
  *
  */
-bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
+bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
 	const Se3r& se31=state1.se3; const Se3r& se32=state2.se3;
-	TetraMold* A = static_cast<TetraMold*>(cm1.get());
-	TetraMold* B = static_cast<TetraMold*>(cm2.get());
+	Tetra* A = static_cast<Tetra*>(cm1.get());
+	Tetra* B = static_cast<Tetra*>(cm2.get());
 	//return false;
 	
-	shared_ptr<TetraBang> bang;
+	shared_ptr<TTetraGeom> bang;
 	// depending whether it's a new interaction: create new one, or use the existing one.
-	if (!interaction->interactionGeometry) bang=shared_ptr<TetraBang>(new TetraBang());
-	else bang=YADE_PTR_CAST<TetraBang>(interaction->interactionGeometry);	
+	if (!interaction->interactionGeometry) bang=shared_ptr<TTetraGeom>(new TTetraGeom());
+	else bang=YADE_PTR_CAST<TTetraGeom>(interaction->interactionGeometry);	
 	interaction->interactionGeometry=bang;
 	
 	// use wildmagick's intersection routine?
@@ -89,15 +92,15 @@ bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& c
 		}
 	#endif
 
-	// transform to global coordinates, build TetraMold objects
-	TetraMold tA(se31.orientation*A->v[0]+se31.position,se31.orientation*A->v[1]+se31.position,se31.orientation*A->v[2]+se31.position,se31.orientation*A->v[3]+se31.position);
-	TetraMold tB(se32.orientation*B->v[0]+se32.position+shift2,se32.orientation*B->v[1]+se32.position+shift2,se32.orientation*B->v[2]+se32.position+shift2,se32.orientation*B->v[3]+se32.position+shift2);
+	// transform to global coordinates, build Tetra objects
+	Tetra tA(se31.orientation*A->v[0]+se31.position,se31.orientation*A->v[1]+se31.position,se31.orientation*A->v[2]+se31.position,se31.orientation*A->v[3]+se31.position);
+	Tetra tB(se32.orientation*B->v[0]+se32.position+shift2,se32.orientation*B->v[1]+se32.position+shift2,se32.orientation*B->v[2]+se32.position+shift2,se32.orientation*B->v[3]+se32.position+shift2);
 	// calculate intersection
 	#if 0
-		tB=TetraMold(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
-		tA=TetraMold(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
+		tB=Tetra(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
+		tA=Tetra(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
 	#endif
-	list<TetraMold> tAB=Tetra2TetraIntersection(tA,tB);
+	list<Tetra> tAB=Tetra2TetraIntersection(tA,tB);
 	if(tAB.size()==0) { /* LOG_DEBUG("No intersection."); */ return false;} //no intersecting volume
 
 	Real V(0); // volume of intersection (cummulative)
@@ -106,7 +109,7 @@ bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& c
 	Vector3r tt[4]; for(int i=0; i<4; i++) tt[i]=tA.v[i];
 	//DEBUG TRWM3VEC(tt[0]); TRWM3VEC(tt[1]); TRWM3VEC(tt[2]); TRWM3VEC(tt[3]); TRVAR1(TetrahedronVolume(tA.v)); TRVAR1(TetrahedronVolume(tt)); TRWM3MAT(TetrahedronInertiaTensor(tA.v));
 
-	for(list<TetraMold>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	for(list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		Real dV=TetrahedronVolume(II->v);
 		V+=dV;
 		//DEBUG TRVAR1(dV); TRWM3VEC(II->v[0]); TRWM3VEC(II->v[1]); TRWM3VEC(II->v[2]); TRWM3VEC(II->v[3]); LOG_TRACE("====")
@@ -117,7 +120,7 @@ bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& c
 		// I is purely geometrical (as if with unit density)
 	
 	// get total 
-	Vector3r dist;	for(list<TetraMold>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	Vector3r dist;	for(list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		II->v[0]-=centroid; II->v[1]-=centroid; II->v[2]-=centroid; II->v[3]-=centroid;
 		dist=(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25-centroid;
 		/* use parallel axis theorem */ 
@@ -188,17 +191,6 @@ bool Tetra2TetraBang::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& c
 	return true;
 }
 
-bool Tetra2TetraBang::goReverse(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1,const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& interaction){
-	// reverse only normal direction, otherwise use the inverse contact
-	bool isInteracting=go(cm2,cm1,state2,state1,-shift2,force,interaction);
-	if(isInteracting){
-		TetraBang* bang=static_cast<TetraBang*>(interaction->interactionGeometry.get());
-		bang->normal*=-1;
-	}
-	return isInteracting;
-}
-
-
 /*! Calculate intersection o Tetrahedron A and B as union of set (std::list) of 4hedra.
  *
  * intersecting tetrahedra A and B
@@ -211,9 +203,9 @@ bool Tetra2TetraBang::goReverse(const shared_ptr<Shape>& cm1,const shared_ptr<Sh
  * return S
  *
  */
-list<TetraMold> Tetra2TetraBang::Tetra2TetraIntersection(const TetraMold& A, const TetraMold& B){
+list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, const Tetra& B){
 	// list of 4hedra to split; initially A
-	list<TetraMold> ret; ret.push_back(A);
+	list<Tetra> ret; ret.push_back(A);
 	/* I is vertex index at B;
 	 * clipping face is [i i1 i2], normal points away from i3 */
 	int i,i1,i2,i3;
@@ -227,21 +219,21 @@ list<TetraMold> Tetra2TetraBang::Tetra2TetraIntersection(const TetraMold& A, con
 		const Vector3r& P(B.v[i]); // reference point on the plane
 		normal=(B.v[i1]-P).Cross(B.v[i2]-P); normal.Normalize(); // normal
 		if((B.v[i3]-P).Dot(normal)>0) normal*=-1; // outer normal
-		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<TetraMold>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
-		for(list<TetraMold>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
-			list<TetraMold> splitDecomposition=TetraClipByPlane(*I,P,normal);
+		/* TRWM3VEC(P); TRWM3VEC(normal); LOG_TRACE("DUMP initial tetrahedron list:"); for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump(); */
+		for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
+			list<Tetra> splitDecomposition=TetraClipByPlane(*I,P,normal);
 			// replace current list element by the result of decomposition;
 			// I points after the erased one, so decomposed 4hedra will not be touched in this iteration, just as we want.
 			// Since it will be incremented by I++ at the end of the cycle, compensate for that by I--;
 			I=ret.erase(I); ret.insert(I,splitDecomposition.begin(),splitDecomposition.end()); /* I--; */
-			/* LOG_TRACE("DUMP current tetrahedron list:"); for(list<TetraMold>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump();*/ 
+			/* LOG_TRACE("DUMP current tetrahedron list:"); for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); I++) (*I).dump();*/ 
 		}
 	}
 	//exit(0);
 	return ret;
 }
 
-/*! Clip TetraMold T by plane give by point P and outer normal n.
+/*! Clip Tetra T by plane give by point P and outer normal n.
  *
  * Algorithm: 
  *
@@ -269,9 +261,9 @@ list<TetraMold> Tetra2TetraBang::Tetra2TetraIntersection(const TetraMold& A, con
  *
  * http://members.tripod.com/~Paul_Kirby/vector/Vplanelineint.html
  */
-list<TetraMold> Tetra2TetraBang::TetraClipByPlane(const TetraMold& T, const Vector3r& P, const Vector3r& normal){
+list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& normal){
 	
-	list<TetraMold> ret;
+	list<Tetra> ret;
 	// scaling factor for Mathr::EPSILON: average edge length
 	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).Length();
 
@@ -314,37 +306,37 @@ list<TetraMold> Tetra2TetraBang::TetraClipByPlane(const TetraMold& T, const Vect
 		#define _BD PTPT(1,3)
 		#define _CD PTPT(2,3)
 		// -+++ → 1Δ [A AB AC AD]
-		if(NEG==1 && POS==3){ret.push_back(TetraMold(_A,_AB,_AC,_AD)); return ret;}
+		if(NEG==1 && POS==3){ret.push_back(Tetra(_A,_AB,_AC,_AD)); return ret;}
 		// -++0 → 1Δ [A AB AC D]
-		if(NEG==1 && POS==2 && ZER==1){ret.push_back(TetraMold(_A,_AB,_AC,_D)); return ret;}
+		if(NEG==1 && POS==2 && ZER==1){ret.push_back(Tetra(_A,_AB,_AC,_D)); return ret;}
 		//	-+00 → 1Δ [A AB C D]
-		if(NEG==1 && POS==1 && ZER==2){ret.push_back(TetraMold(_A,_AB,_C,_D)); return ret;}
+		if(NEG==1 && POS==1 && ZER==2){ret.push_back(Tetra(_A,_AB,_C,_D)); return ret;}
 		// --++ → 3Δ [A AC AD B BC BD] ⇒ (e.g.) [A AC AD B] [B BC BD AD] [B AD AC BC]
 		if(NEG==2 && POS ==2){
 			// [A AC AD B]
-			ret.push_back(TetraMold(_A,_AC,_AD,_B));
+			ret.push_back(Tetra(_A,_AC,_AD,_B));
 			// [B BC BD AD]
-			ret.push_back(TetraMold(_B,_BC,_BD,_AD));
+			ret.push_back(Tetra(_B,_BC,_BD,_AD));
 			// [B AD AC BC]
-			ret.push_back(TetraMold(_B,_AD,_AC,_BC));
+			ret.push_back(Tetra(_B,_AD,_AC,_BC));
 			return ret;
 		}
 		// --+0 → 2Δ [A B AC BC D] ⇒ (e.g.) [A AC BC D] [B BC A D] 
 		if(NEG==2 && POS==1 && ZER==1){
 			// [A AC BC D]
-			ret.push_back(TetraMold(_A,_AC,_BC,_D));
+			ret.push_back(Tetra(_A,_AC,_BC,_D));
 			// [B BC A D]
-			ret.push_back(TetraMold(_B,_BC,_A,_D));
+			ret.push_back(Tetra(_B,_BC,_A,_D));
 			return ret;
 		}
 		// ---+ → 3Δ [A B C AD BD CD] ⇒ (e.g.) [A B C AD] [AD BD CD B] [AD C B BD]
 		if(NEG==3 && POS==1){
 			//[A B C AD]
-			ret.push_back(TetraMold(_A,_B,_C,_AD));
+			ret.push_back(Tetra(_A,_B,_C,_AD));
 			//[AD BD CD B]
-			ret.push_back(TetraMold(_AD,_BD,_CD,_B));
+			ret.push_back(Tetra(_AD,_BD,_CD,_B));
 			//[AD C B BD]
-			ret.push_back(TetraMold(_AD,_C,_B,_BD));
+			ret.push_back(Tetra(_AD,_C,_B,_BD));
 			return ret;
 		}
 		#undef _A
@@ -367,25 +359,23 @@ list<TetraMold> Tetra2TetraBang::TetraClipByPlane(const TetraMold& T, const Vect
 	return(ret); // prevent warning
 }
 
-CREATE_LOGGER(TetraLaw);
+CREATE_LOGGER(TetraVolumetricLaw);
 
-/*! Apply forces on tetrahedra in collision based on geometric configuration provided by Tetra2TetraBang.
+/*! Apply forces on tetrahedra in collision based on geometric configuration provided by Ig2_Tetra_Tetra_TTetraGeom.
  *
  * DO NOT USE, probably doesn't work.
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
-void TetraLaw::action(Scene* rootBody)
+void TetraVolumetricLaw::action(Scene* rootBody)
 {
 	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
-		// normally, we would test isReal(), but TetraLaw doesn't use interactionPhysics at all
-		if (!I->interactionGeometry) continue; // Tetra2TetraBang::go returned false for this interaction, skip it
-		const shared_ptr<TetraBang>& contactGeom(dynamic_pointer_cast<TetraBang>(I->interactionGeometry));
+		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use interactionPhysics at all
+		if (!I->interactionGeometry) continue; // Ig2_Tetra_Tetra_TTetraGeom::go returned false for this interaction, skip it
+		const shared_ptr<TTetraGeom>& contactGeom(dynamic_pointer_cast<TTetraGeom>(I->interactionGeometry));
 		if(!contactGeom) continue;
 
 		const body_id_t idA=I->getId1(), idB=I->getId2();
 		const shared_ptr<Body>& A=Body::byId(idA), B=Body::byId(idB);
 			
-		if(!(A->getGroupMask()&B->getGroupMask()&sdecGroupMask)) continue; // no bits overlap in masks, skip this one
-
 		const shared_ptr<ElastMat>& physA(dynamic_pointer_cast<ElastMat>(A->material));
 		const shared_ptr<ElastMat>& physB(dynamic_pointer_cast<ElastMat>(B->material));
 		
@@ -419,7 +409,7 @@ void TetraLaw::action(Scene* rootBody)
 	{
 		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
 		glColor3v(cm->diffuseColor);
-		TetraMold* t=static_cast<TetraMold*>(cm.get());
+		Tetra* t=static_cast<Tetra*>(cm.get());
 		if (0) { // wireframe, as for Tetrahedron
 			glDisable(GL_LIGHTING);
 			glBegin(GL_LINES);
@@ -565,7 +555,7 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v){
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	//const shared_ptr<RigidBodyParameters>& rbp(YADE_PTR_CAST<RigidBodyParameters>(tetraBody->physicalParameters));
 	State* rbp=tetraBody->state.get();
-	const shared_ptr<TetraMold>& tMold(dynamic_pointer_cast<TetraMold>(tetraBody->shape));
+	const shared_ptr<Tetra>& tMold(dynamic_pointer_cast<Tetra>(tetraBody->shape));
 
 	#define v0 tMold->v[0]
 	#define v1 tMold->v[1]

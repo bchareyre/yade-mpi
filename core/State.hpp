@@ -16,32 +16,16 @@ The other data are now in the Material class.
 */
 class State: public Serializable{
 	public:
-		Se3r se3;
-
-		/// linear motion
+		/// linear motion (references to inside se3)
 		Vector3r& pos;
-		Vector3r vel;
-		Vector3r accel;
-		Real mass;
-
-		/// rotational motion
+		/// rotational motion (reference to inside se3)
 		Quaternionr& ori;
-		Vector3r angVel;
-		Vector3r angAccel;
-		Vector3r angMom;
-		Vector3r inertia;
-		//
-		/// reference values
-		Vector3r refPos;
-		Quaternionr refOri;
 
 		//! mutex for updating the parameters from within the interaction loop (only used rarely)
 		boost::mutex updateMutex;
 
 		
-		//! Bitmask for degrees of freedom where velocity will be always zero, regardless of applied forces
-		unsigned blockedDOFs; 
-		// bits
+		// bits for blockedDOFs
 		enum {DOF_NONE=0,DOF_X=1,DOF_Y=2,DOF_Z=4,DOF_RX=8,DOF_RY=16,DOF_RZ=32};
 		//! shorthand for all DOFs blocked
 		static const unsigned DOF_ALL=DOF_X|DOF_Y|DOF_Z|DOF_RX|DOF_RY|DOF_RZ;
@@ -72,20 +56,25 @@ class State: public Serializable{
 
 
 
-	State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY),pos(se3.position),vel(Vector3r::ZERO),accel(Vector3r::ZERO),mass(0.),ori(se3.orientation),angVel(Vector3r::ZERO),angAccel(Vector3r::ZERO),angMom(Vector3r::ZERO),inertia(Vector3r::ZERO),refPos(Vector3r::ZERO),refOri(Quaternionr::IDENTITY),blockedDOFs(DOF_NONE){}
+	//State(): se3(Vector3r::ZERO,Quaternionr::IDENTITY),pos(se3.position),vel(Vector3r::ZERO),accel(Vector3r::ZERO),mass(0.),ori(se3.orientation),angVel(Vector3r::ZERO),angAccel(Vector3r::ZERO),angMom(Vector3r::ZERO),inertia(Vector3r::ZERO),refPos(Vector3r::ZERO),refOri(Quaternionr::IDENTITY),blockedDOFs(DOF_NONE){}
 
-	YADE_CLASS_BASE_DOC_ATTRS_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
-		((se3,"Position and orientation as one object."))
-		((vel,"Current linear velocity."))
-		((accel,"Current acceleration."))
-		((mass,"Mass of this body"))
-		((angVel,"Current angular velocity"))
-		((angAccel,"Current angular acceleration"))
-		((angMom,"Current angular momentum"))
-		((inertia,"Inertia of associated body, in local coordinate system."))
-		((refPos,"Reference position"))
-		((refOri,"Reference orientation"))
-		((blockedDOFs,"[Will be overridden]")),
+	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
+		((Se3r,se3,Se3r(Vector3r::ZERO,Quaternionr::IDENTITY),"Position and orientation as one object."))
+		((Vector3r,vel,Vector3r::ZERO,"Current linear velocity."))
+		((Vector3r,accel,Vector3r::ZERO,"Current acceleration."))
+		((Real,mass,0,"Mass of this body"))
+		((Vector3r,angVel,Vector3r::ZERO,"Current angular velocity"))
+		((Vector3r,angAccel,Vector3r::ZERO,"Current angular acceleration"))
+		((Vector3r,angMom,Vector3r::ZERO,"Current angular momentum"))
+		((Vector3r,inertia,Vector3r::ZERO,"Inertia of associated body, in local coordinate system."))
+		((Vector3r,refPos,Vector3r::ZERO,"Reference position"))
+		((Quaternionr,refOri,Quaternionr::IDENTITY,"Reference orientation"))
+		((unsigned,blockedDOFs,,"[Will be overridden]")),
+		/* additional initializers */
+			((pos,se3.position))
+			((ori,se3.orientation)),
+		/* ctor */,
+		/*py*/
 		.add_property("blockedDOFs",&State::blockedDOFs_vec_get,&State::blockedDOFs_vec_set,"Degress of freedom where linear/angular velocity will be always zero, regardless of applied force/torque. List of any combination of 'x','y','z','rx','ry','rz'.")
 		// references must be set using wrapper funcs
 		.add_property("pos",&State::pos_get,&State::pos_set,"Current position.")

@@ -13,12 +13,10 @@
 class Bo1_Sphere_Aabb : public BoundFunctor
 {
 	public :
-		Bo1_Sphere_Aabb(): aabbEnlargeFactor(-1.) {}
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
-		double aabbEnlargeFactor;
 	FUNCTOR2D(Sphere,Aabb);
-	YADE_CLASS_BASE_DOC_ATTRS(Bo1_Sphere_Aabb,BoundFunctor,"Functor creating Aabb from Sphere",
-		((aabbEnlargeFactor,"Relative enlargement of the bounding box (e.g. for distant interaction detection); deactivated if negative, which is the default."))
+	YADE_CLASS_BASE_DOC_ATTRS(Bo1_Sphere_Aabb,BoundFunctor,"Functor creating :yref:`Aabb` from :yref:`Sphere`.",
+		((Real,aabbEnlargeFactor,((void)"deactivated",-1),"Relative enlargement of the bounding box (e.g. for distant interaction detection); deactivated if negative."))
 	);
 };
 

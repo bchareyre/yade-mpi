@@ -9,7 +9,15 @@
 *************************************************************************/
 
 #include "InteractionContainer.hpp"
-#include<omp.h>
+
+#ifdef YADE_OPENMP
+	#include<omp.h>
+#endif
+
+#ifdef YADE_BOOST_SERIALIZATION
+	BOOST_CLASS_EXPORT(InteractionContainer);
+#endif
+
 
 void InteractionContainer::requestErase(body_id_t id1, body_id_t id2, bool force){
 	find(id1,id2)->reset(); IdsForce v={id1,id2,force};

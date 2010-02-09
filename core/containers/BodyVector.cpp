@@ -1,6 +1,11 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 #include<yade/core/BodyVector.hpp>
 
+#ifdef YADE_BOOST_SERIALIZATION
+	BOOST_CLASS_EXPORT(BodyVector);
+#endif
+
+
 unsigned int BodyVector::findFreeId(){
 	unsigned int max=bodies.size();
 	for(; lowestFree<max; lowestFree++){

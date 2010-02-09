@@ -8,6 +8,7 @@
 #include<yade/pkg-dem/Shop.hpp>
 
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
+
 void ForceEngine::applyCondition(Scene*){
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(scene->bodies->exists(id));

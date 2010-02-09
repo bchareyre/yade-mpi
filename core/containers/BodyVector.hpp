@@ -37,6 +37,7 @@ class BodyVector: public BodyContainer{
 		virtual BodyContainer::iterator end()  { shared_ptr<BodyVectorIterator> it(new BodyVectorIterator); it->i=bodies.end();   return BodyContainer::iterator(it); }
 		virtual unsigned int size() const { return bodies.size(); }
 	REGISTER_CLASS_AND_BASE(BodyVector,BodyContainer);
+	REGISTER_ATTRIBUTES(BodyContainer,/* no attrs*/);
 };
 REGISTER_SERIALIZABLE(BodyVector);
 

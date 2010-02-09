@@ -241,7 +241,6 @@ void Shop::init(){
 	setDefault("param_damping",.2);
 	setDefault("param_gravity",Vector3r(0,0,-10));
 	setDefault<int>("param_timeStepUpdateInterval",300);
-	setDefault("param_momentRotationLaw",true);
 
 	setDefault("param_pythonInitExpr",string("print 'Hello world!'"));
 	setDefault("param_pythonRunExpr",string(""));
@@ -263,7 +262,7 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	shared_ptr<BoundDispatcher> boundDispatcher	= shared_ptr<BoundDispatcher>(new BoundDispatcher);
 	boundDispatcher->add(new Bo1_Sphere_Aabb);
 	boundDispatcher->add(new Bo1_Box_Aabb);
-	boundDispatcher->add(new TetraAABB);
+	boundDispatcher->add(new Bo1_Tetra_Aabb);
 	rootBody->initializers.push_back(boundDispatcher);
 
 	//engines
@@ -291,7 +290,7 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 	shared_ptr<InteractionGeometryDispatcher> interactionGeometryDispatcher(new InteractionGeometryDispatcher);
 	interactionGeometryDispatcher->add(new Ig2_Sphere_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(new Ig2_Box_Sphere_ScGeom);
-	interactionGeometryDispatcher->add(new Tetra2TetraBang);
+	interactionGeometryDispatcher->add(new Ig2_Tetra_Tetra_TTetraGeom);
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
@@ -300,7 +299,6 @@ void Shop::rootBodyActors(shared_ptr<Scene> rootBody){
 		
 	shared_ptr<ElasticContactLaw> constitutiveLaw(new ElasticContactLaw);
 	constitutiveLaw->sdecGroupMask = getDefault<int>("body_sdecGroupMask");
-	constitutiveLaw->momentRotationLaw = getDefault<bool>("param_momentRotationLaw");
 	rootBody->engines.push_back(constitutiveLaw);
 
 	if(getDefault<Vector3r>("param_gravity")!=Vector3r(0,0,0)){
@@ -362,7 +360,7 @@ shared_ptr<Body> Shop::tetra(Vector3r v_global[4], shared_ptr<Material> mat){
 	body->state->mass=body->material->density*TetrahedronVolume(v);
 	// inertia will be calculated below, by TetrahedronWithLocalAxesPrincipal
 	body->bound=shared_ptr<Aabb>(new Aabb);
-	body->shape=shared_ptr<TetraMold>(new TetraMold(v[0],v[1],v[2],v[3]));
+	body->shape=shared_ptr<Tetra>(new Tetra(v[0],v[1],v[2],v[3]));
 	// make local axes coincident with principal axes
 	TetrahedronWithLocalAxesPrincipal(body);
 	return body;

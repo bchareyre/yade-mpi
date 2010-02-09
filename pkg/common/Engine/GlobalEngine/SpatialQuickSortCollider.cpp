@@ -13,15 +13,6 @@
 
 YADE_PLUGIN((SpatialQuickSortCollider));
 
-SpatialQuickSortCollider::SpatialQuickSortCollider() : Collider()
-{
-}
-
-SpatialQuickSortCollider::~SpatialQuickSortCollider()
-{
-
-}
-
 void SpatialQuickSortCollider::action(Scene* ncb)
 {
 	if(ncb->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }

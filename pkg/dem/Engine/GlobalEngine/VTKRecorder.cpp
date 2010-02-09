@@ -79,7 +79,7 @@ void VTKRecorder::action(Scene* rootBody)
 	intrAbsForceT->SetName("absForceT");
 
 	// extras for CPM
-	if(recActive[REC_CPM]) CpmStateUpdater::update(rootBody);
+	if(recActive[REC_CPM]) { CpmStateUpdater csu; csu.update(rootBody); }
 	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
 	cpmDamage->SetNumberOfComponents(1);
 	cpmDamage->SetName("cpmDamage");

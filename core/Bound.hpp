@@ -19,19 +19,17 @@
 
 */
 
-class Bound : public Serializable, public Indexable
-{
-	public :
-		Vector3r	 diffuseColor,min,max;
-		Bound(): diffuseColor(Vector3r(1,1,1)), min(Vector3r(0,0,0)), max(Vector3r(0,0,0)) {}
-
-	//REGISTER_ATTRIBUTES(Serializable,(diffuseColor));
-	//REGISTER_CLASS_AND_BASE(Bound,Serializable Indexable);
-	YADE_CLASS_BASE_DOC_ATTRS_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",((diffuseColor,"Color for rendering this object")),
+class Bound: public Serializable, public Indexable{
+	public:
+		Vector3r min,max;
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
+		((Vector3r,diffuseColor,Vector3r(1,1,1),"Color for rendering this object")),
+		/* ctor*/ min=max=Vector3r::ZERO,
+		/*py*/
 		YADE_PY_TOPINDEXABLE(Bound)
 		// we want those to be accessible from python, but not serialized
-		.def_readonly("min",&Bound::min,"Lower corner of box containing this bound (hence the body as well)")
-		.def_readonly("max",&Bound::max,"Upper corner of box containing this bound (hence the body as well)")
+		.def_readonly("min",&Bound::min,"Lower corner of box containing this bound (and the :yref:`Body` as well)")
+		.def_readonly("max",&Bound::max,"Upper corner of box containing this bound (and the :yref:`Body` as well)")
 	);
 	REGISTER_INDEX_COUNTER(Bound);
 };

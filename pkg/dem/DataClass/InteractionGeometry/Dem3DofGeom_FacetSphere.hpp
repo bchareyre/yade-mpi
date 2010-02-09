@@ -11,7 +11,6 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	Vector3r contPtInTgPlane2() const { return Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(se32.orientation*cp2rel,effR2,-normal);}
 
 	public:
-		Dem3DofGeom_FacetSphere(){ createIndex();}
 		virtual ~Dem3DofGeom_FacetSphere();
 		/******* API ********/
 		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
@@ -22,19 +21,12 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 		void setTgPlanePts(const Vector3r&, const Vector3r&);
 		void relocateContactPoints(){ relocateContactPoints(contPtInTgPlane1(),contPtInTgPlane2()); }
 		void relocateContactPoints(const Vector3r& p1, const Vector3r& p2);
-	//! reference contact point on the facet in facet-local coords
-	Vector3r cp1pt;
-	//! orientation between +x and the reference contact point (on the sphere) in sphere-local coords
-	Quaternionr cp2rel;
-	//! unit normal of the facet plane in facet-local coordinates
-	Vector3r localFacetNormal;
-	// effective radius of sphere
-	Real effR2;
-	YADE_CLASS_BASE_DOC_ATTRS(Dem3DofGeom_FacetSphere,Dem3DofGeom,"Class representing facet+sphere in contact which computes 3 degrees of freedom (normal and shear deformation).",
-		((cp1pt,"Reference contact point on the facet in facet-local coords."))
-		((cp2rel,"Orientation between +x and the reference contact point (on the sphere) in sphere-local coords"))
-		((localFacetNormal,"Unit normal of the facet plane in facet-local coordinates"))
-		((effR2,"Effective radius of sphere"))
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Dem3DofGeom_FacetSphere,Dem3DofGeom,"Class representing facet+sphere in contact which computes 3 degrees of freedom (normal and shear deformation).",
+		((Vector3r,cp1pt,,"Reference contact point on the facet in facet-local coords."))
+		((Quaternionr,cp2rel,,"Orientation between +x and the reference contact point (on the sphere) in sphere-local coords"))
+		((Vector3r,localFacetNormal,,"Unit normal of the facet plane in facet-local coordinates"))
+		((Real,effR2,,"Effective radius of sphere")),
+		/*ctor*/ createIndex();
 	);
 	REGISTER_CLASS_INDEX(Dem3DofGeom_FacetSphere,Dem3DofGeom);
 	DECLARE_LOGGER;
@@ -48,14 +40,13 @@ REGISTER_SERIALIZABLE(Dem3DofGeom_FacetSphere);
 	class Gl1_Dem3DofGeom_FacetSphere:public GlInteractionGeometryFunctor{
 		public:
 			virtual void go(const shared_ptr<InteractionGeometry>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
-			static bool normal,rolledPoints,unrolledPoints,shear,shearLabel;
 		RENDERS(Dem3DofGeom_FacetSphere);
-		YADE_CLASS_BASE_DOC_ATTRS(Gl1_Dem3DofGeom_FacetSphere,GlInteractionGeometryFunctor,"Render interaction of facet and sphere (represented by Dem3DofGeom_FacetSphere)",
-			((normal,"Render interaction normal"))
-			((rolledPoints,"Render points rolled on the sphere & facet (original contact point)"))
-			((unrolledPoints,"Render original contact points unrolled to the contact plane"))
-			((shear,"Render shear line in the contact plane"))
-			((shearLabel,"Render shear magnitude as number"))
+		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Dem3DofGeom_FacetSphere,GlInteractionGeometryFunctor,"Render interaction of facet and sphere (represented by Dem3DofGeom_FacetSphere)",
+			((bool,normal,false,"Render interaction normal"))
+			((bool,rolledPoints,false,"Render points rolled on the sphere & facet (original contact point)"))
+			((bool,unrolledPoints,false,"Render original contact points unrolled to the contact plane"))
+			((bool,shear,false,"Render shear line in the contact plane"))
+			((bool,shearLabel,false,"Render shear magnitude as number"))
 		);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Dem3DofGeom_FacetSphere);
@@ -78,9 +69,8 @@ class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 
 	FUNCTOR2D(Facet,Sphere);
 	DEFINE_FUNCTOR_ORDER_2D(Facet,Sphere);
-	YADE_CLASS_BASE_DOC_ATTRDECL_CTOR_PY(Ig2_Facet_Sphere_Dem3DofGeom,InteractionGeometryFunctor,"Compute geometry of facet-sphere contact with normal and shear DOFs. As in all other Dem3DofGeom-related classes, total formulation of both shear and normal deformations is used. See :yref:`Dem3DofGeom_FacetSphere` for more information.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_Dem3DofGeom,InteractionGeometryFunctor,"Compute geometry of facet-sphere contact with normal and shear DOFs. As in all other Dem3DofGeom-related classes, total formulation of both shear and normal deformations is used. See :yref:`Dem3DofGeom_FacetSphere` for more information.",
 		// unused: ((Real,shrinkFactor,0.,"Reduce the facet's size, probably to avoid singularities at common facets' edges (?)"))
-		,,
 	);
 	DECLARE_LOGGER;
 };
