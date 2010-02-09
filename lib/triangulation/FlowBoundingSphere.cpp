@@ -9,7 +9,7 @@
 #include "vector"
 #include "def_types.h"
 
-#define XVIEW
+//#define XVIEW
 #include "FlowBoundingSphere.h"//include after #define XVIEW
 
 #define FAST
