@@ -13,8 +13,6 @@
 
 #include "SimpleShear.hpp"
 
-#include <yade/lib-miniWm3/Wm3Math.h>
-
 #include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include <yade/pkg-dem/NormalInelasticityLaw.hpp>
 #include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>

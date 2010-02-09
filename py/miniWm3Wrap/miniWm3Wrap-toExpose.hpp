@@ -1,5 +1,4 @@
-#include<base/yadeWm3.hpp>
-#include<base/yadeWm3Extra.hpp>
+#include<base/Math.hpp>
 //#include<boost/lexical_cast.hpp>
 #include<string>
 
@@ -10,7 +9,6 @@ namespace pyplusplus{ namespace aliases {
 	typedef Vector2r Vector2;
 	typedef Quaternionr Quaternion;
 	typedef Matrix3r Matrix3;
-	typedef Matrix2r Matrix2;
 }}
 // instantiate those types so that they are exposed
 // but name them noexpose_*, as we ask for exclusion of such things in the wrapper script

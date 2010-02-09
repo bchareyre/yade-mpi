@@ -20,8 +20,7 @@
 using namespace std;
 using namespace boost;
 
-#include<yade/lib-base/yadeWm3.hpp>
-#include<Wm3Vector2.h>
+#include<yade/lib-base/Math.hpp>
 typedef Wm3::Vector2<int> Vector2i;
 
 

@@ -11,8 +11,7 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Body.hpp>
-#include <Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 /*! \brief To apply a constant normal rigidity shear for a parallelogram box (simple shear)

@@ -9,7 +9,7 @@
 
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Interaction.hpp>
-#include<Wm3Vector3.h>
+#include<yade/lib-base/Math.hpp>
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif

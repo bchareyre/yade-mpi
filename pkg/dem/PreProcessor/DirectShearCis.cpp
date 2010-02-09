@@ -13,8 +13,6 @@
 
 #include "DirectShearCis.hpp"
 
-#include <yade/lib-miniWm3/Wm3Math.h>
-
 #include <yade/pkg-dem/BodyMacroParameters.hpp>
 #include <yade/pkg-dem/ElasticContactLaw.hpp>
 #include <yade/pkg-dem/MacroMicroElasticRelationships.hpp>

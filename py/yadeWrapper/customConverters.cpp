@@ -25,8 +25,7 @@
 #include<iostream>
 #include<map>
 
-#include<yade/lib-base/yadeWm3.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 
 #include<yade/core/Engine.hpp>
 

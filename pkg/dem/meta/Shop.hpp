@@ -9,9 +9,7 @@
 #include<boost/any.hpp>
 #include<boost/lambda/lambda.hpp>
 
-#include<Wm3Vector3.h>
-#include<Wm3Quaternion.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/lib-base/Logging.hpp>
 #include<yade/core/Body.hpp>
 

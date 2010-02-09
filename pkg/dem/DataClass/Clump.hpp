@@ -6,7 +6,7 @@
 #include<map>
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/core/PartialEngine.hpp>
 
 

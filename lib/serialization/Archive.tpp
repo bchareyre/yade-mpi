@@ -9,15 +9,7 @@
 *************************************************************************/
 
 
-#include <Wm3Vector2.h>
-#include <Wm3Vector3.h>
-#include <Wm3Vector4.h>
-#include <Wm3Matrix2.h>
-#include <Wm3Matrix3.h>
-#include <Wm3Matrix4.h>
-#include <Wm3Quaternion.h>
-#include<yade/lib-base/yadeWm3.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 
 #include<boost/type_traits.hpp>
 
@@ -59,18 +51,9 @@ bool isFundamental(Type& )
 			typeid(Type)==typeid(Vector3<unsigned int>)		||
 			typeid(Type)==typeid(Vector3<signed long>)		||
 			typeid(Type)==typeid(Vector3<unsigned long>)		||
-			typeid(Type)==typeid(Vector4f)		||
-			typeid(Type)==typeid(Vector4d)		||
-			typeid(Type)==typeid(Vector4<long double>)		||
-			typeid(Type)==typeid(Matrix2f)		||
-			typeid(Type)==typeid(Matrix2d)		||
-			typeid(Type)==typeid(Matrix2<long double>)		||
 			typeid(Type)==typeid(Matrix3f)		||
 			typeid(Type)==typeid(Matrix3d)		||
 			typeid(Type)==typeid(Matrix3<long double>)		||
-			typeid(Type)==typeid(Matrix4f)		||
-			typeid(Type)==typeid(Matrix4d)		||
-			typeid(Type)==typeid(Matrix4<long double>)		||
 			typeid(Type)==typeid(Quaternionf)	||
 			typeid(Type)==typeid(Quaterniond)	||
 			typeid(Type)==typeid(Quaternion<long double>)	||

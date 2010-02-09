@@ -7,7 +7,6 @@
 #include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 #include<yade/lib-pyutil/gil.hpp>
-#include<Wm3Math.h>
 
 using namespace std;
 

@@ -1,4 +1,4 @@
-#include "yadeWm3Extra.hpp"
+#include "yadeWm3Extra_dont_include_directly.hpp"
 // for std::min and std::max
 #include<cstdlib>
 
@@ -30,16 +30,6 @@ __attribute__((deprecated)) Vector3d operator*(const Vector3d& v, const float s)
 std::ostream & operator<< (std::ostream &os, const Vector3r &v){ return os << v[0] << " " << v[1] << " " << v[2];}
 std::ostream & operator<< (std::ostream &os, const Quaternionr &q){ Vector3r axis; Real angle; q.ToAxisAngle(axis,angle); return os<<axis<<" "<<angle;}
 
-template<class RealType1, class RealType2>
-Vector4<RealType2> operator* (RealType1 fScalar, const Vector4<RealType2>& rkV){ return Vector4<RealType2>(fScalar*rkV[0],fScalar*rkV[1],fScalar*rkV[2],fScalar*rkV[3]);}
-
-
-
-Matrix2r operator*(Real fScalar, const Matrix2r& rkM){return rkM*fScalar;}
-// v^T * M
-Vector2r operator*(const Vector2r& rkV, const Matrix2r& rkM){
-	 return Vector2r(rkV[0]*rkM[0][0] + rkV[1]*rkM[1][0],rkV[0]*rkM[0][1] + rkV[1]*rkM[1][1]);
-}
 
 // c * M
 Matrix3r operator* (Real fScalar, const Matrix3r& rkM){return rkM*fScalar;}
@@ -49,17 +39,6 @@ Vector3r operator* (const Vector3r rkV, const Matrix3r rkM){
 	rkV[0]*rkM[0][1] + rkV[1]*rkM[1][1] + rkV[2]*rkM[2][1],
 	rkV[0]*rkM[0][2] + rkV[1]*rkM[1][2] + rkV[2]*rkM[2][2]);
 }
-
-// c * M
-Matrix4r operator* (Real fScalar, const Matrix4r& rkM){return rkM*fScalar;}
-// v^T * M
-Vector4r operator* (const Vector4r& rkV, const Matrix4r& rkM){
-	return Vector4r(rkV[0]*rkM[0][0]+rkV[1]*rkM[1][0]+rkV[2]*rkM[2][0]+rkV[3]*rkM[3][0],
-	rkV[0]*rkM[0][1]+rkV[1]*rkM[1][1]+rkV[2]*rkM[2][1]+rkV[3]*rkM[3][1],
-	rkV[0]*rkM[0][2]+rkV[1]*rkM[1][2]+rkV[2]*rkM[2][2]+rkV[3]*rkM[3][2],
-	rkV[0]*rkM[0][3]+rkV[1]*rkM[1][3]+rkV[2]*rkM[2][3]+rkV[3]*rkM[3][3]);
-}
-
 
 template<class RealType1, class RealType2>
 Quaternion<RealType2> operator* (RealType1 fScalar, const Quaternion<RealType2>& rkQ){
@@ -121,26 +100,7 @@ Vector3r diagMult (const Vector3r& a, const Vector3r& rkV)  {	return Vector3r(a.
 Vector3r diagDiv (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(a.X()/rkV.X(),a.Y()/rkV.Y(),a.Z()/rkV.Z()); }
 Real unitVectorsAngle(const Vector3r& a, const Vector3r& rkV)  { return Mathr::ACos(a.Dot(rkV)); }
 
-
 Real componentSum(const Vector3r& v){return v[0]+v[1]+v[2];}
-
-
-
-/*Vector4r std::maxVector (const Vector4r& rkV) const;
-Vector4r std::minVector (const Vector4r& rkV) const;
-Vector4r multDiag (const Vector4r& rkV) const;*/
-Vector4r componentMaxVector (const Vector4r& a, const Vector4r& rkV) {return Vector4r(std::max(a.X(),rkV.X()),std::max(a.Y(),rkV.Y()),std::max(a.Z(),rkV.Z()),std::max(a.W(),rkV.W()));}
-Vector4r componentMinVector (const Vector4r& a, const Vector4r& rkV) {return Vector4r(std::min(a.X(),rkV.X()),std::min(a.Y(),rkV.Y()),std::min(a.Z(),rkV.Z()),std::min(a.W(),rkV.W()));}
-Vector4r diagMult (const Vector4r& a, const Vector4r& rkV) {return Vector4r(a.X()*rkV.X(),a.Y()*rkV.Y(),a.Z()*rkV.Z(),a.W()*rkV.W());}
-//template<class RealType1, class RealType2>
-
-
-/*void toAxes (Vector3r& axis1, Vector3r& axis2, Vector3r& axis3) const; 
-void fromAxes (const Vector3r& axis1,const Vector3r& axis2,const Vector3r& axis3); 
-void toGLMatrix(RealType m[16]) const;
-void toEulerAngles (Vector3r& eulerAngles,RealType threshold = 1e-06f) const;
-Vector3r operator* (const Vector3r& v) const;*/
-
 
 Quaternionr quaternionFromAxes (const Vector3r& axis1,const Vector3r& axis2,const Vector3r& axis3){
 	Matrix3r m;

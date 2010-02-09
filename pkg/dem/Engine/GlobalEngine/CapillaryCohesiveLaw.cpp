@@ -19,8 +19,7 @@
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
-#include <Wm3Vector3.h>
-#include <yade/lib-base/yadeWm3.hpp>
+#include <yade/lib-base/Math.hpp>
 
 
 #include <iostream>

@@ -18,7 +18,7 @@
 #include"InteractionContainer.hpp"
 #include"Interaction.hpp"
 
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/lib-multimethods/Indexable.hpp>
 
@@ -75,7 +75,7 @@ class Body: public Serializable{
 		/* ctor */,
 		/* py */
 		.def_readonly("id",&Body::id,"Unique id of this body") // overwrites automatic def_readwrite("id",...) earlier
-		.def_readonly("clumpId",&Body::clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped` instead.")
+		.def_readonly("clumpId",&Body::clumpId,"Id of clump this body makes part of; invalid number if not part of clump; see :yref:`Body::isStandalone`, :yref:`Body::isClump`, :yref:`Body::isClumpMember` properties. \n\n This property is not meant to be modified directly from Python, use :yref:`O.bodies.appendClumped<BodyContainer.appendClumped>` instead.")
 		.def_readwrite("mat",&Body::material,"Shorthand for :yref:`Body::material`")
 		.def_readwrite("dynamic",&Body::isDynamic,"Shorthand for :yref:`Body::isDynamic`")
 		.def_readwrite("mask",&Body::groupMask,"Shorthand for :yref:`Body::groupMask`")

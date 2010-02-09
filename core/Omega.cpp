@@ -12,8 +12,7 @@
 #include"Scene.hpp"
 #include"TimeStepper.hpp"
 #include"ThreadRunner.hpp"
-#include<Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/lib-serialization/FormatChecker.hpp>
 #include<yade/lib-multimethods/FunctorWrapper.hpp>

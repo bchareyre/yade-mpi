@@ -3,7 +3,7 @@
 
 #include<string.h>
 #include<vector>
-#include<Wm3Vector3.h>
+#include<yade/lib-base/Math.hpp>
 // for body_id_t
 #include<yade/core/Interaction.hpp>
 

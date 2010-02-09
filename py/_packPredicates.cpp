@@ -2,10 +2,8 @@
 #include<boost/python.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/yadeWm3.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 // #include<yade/gui-py/_utils.hpp> // will be: yade/lib-py/_utils.hpp> at some point
-#include<Wm3Vector3.h>
 
 using namespace boost;
 using namespace std;

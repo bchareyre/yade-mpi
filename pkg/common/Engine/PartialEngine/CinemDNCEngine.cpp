@@ -7,8 +7,7 @@
 *************************************************************************/
 
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
-#include<yade/lib-miniWm3/Wm3Math.h>
+#include<yade/lib-base/Math.hpp>
 
 #include"CinemDNCEngine.hpp"
 

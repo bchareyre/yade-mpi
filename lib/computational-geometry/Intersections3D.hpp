@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include <Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 	void lineClosestApproach (const Vector3r pa, const Vector3r ua, const Vector3r pb, const Vector3r ub, Real &alpha, Real &beta);
 

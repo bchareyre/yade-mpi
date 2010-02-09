@@ -10,7 +10,7 @@
 
 #include<yade/core/FileGenerator.hpp>
 #include <Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 //class ForceRecorder;
 //class AveragePositionRecorder;

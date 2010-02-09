@@ -10,7 +10,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 #include<yade/pkg-common/VelocityBins.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 
 
 

@@ -10,8 +10,7 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/PartialEngine.hpp>
-#include<Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 /*! \brief To apply a zero normal displacement shear for a parallelogram box
 

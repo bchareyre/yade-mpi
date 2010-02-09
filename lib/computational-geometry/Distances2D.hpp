@@ -8,8 +8,7 @@
 
 #pragma once
 
-#include <Wm3Vector2.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 #include <vector>
 

@@ -7,7 +7,7 @@
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/core/Omega.hpp>
 
 

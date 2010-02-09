@@ -10,8 +10,7 @@
 #define SAMPLE_CAPILLARY_PRESSURE_ENGINE_HPP
 
 #include<yade/core/PartialEngine.hpp>
-#include <Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include <string>
 

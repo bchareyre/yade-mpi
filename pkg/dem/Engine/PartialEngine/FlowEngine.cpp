@@ -8,7 +8,7 @@
 
 #include "FlowEngine.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/Wall.hpp>

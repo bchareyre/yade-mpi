@@ -13,8 +13,7 @@
 #include<yade/core/Timing.hpp>
 #include<yade/core/TimeStepper.hpp>
 
-#include<Wm3Math.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<boost/foreach.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/algorithm/string.hpp>

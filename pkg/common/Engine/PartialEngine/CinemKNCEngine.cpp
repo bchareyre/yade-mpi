@@ -9,13 +9,11 @@
 
 
 #include "CinemKNCEngine.hpp"
-// #include<yade/pkg-common/RigidBodyParameters.hpp>
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
-#include <yade/lib-miniWm3/Wm3Math.h>
+#include<yade/lib-base/Math.hpp>
 
 
 CinemKNCEngine::CinemKNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)

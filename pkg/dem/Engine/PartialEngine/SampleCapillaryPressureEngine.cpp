@@ -12,7 +12,7 @@
 #include<yade/core/Omega.hpp>
 //#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace boost;

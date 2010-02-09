@@ -33,8 +33,7 @@
 #include <boost/thread/thread.hpp>
 #include <iostream>
 
-#include<Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/lib-loki/Singleton.hpp>
 #include<yade/lib-factory/ClassFactory.hpp>
 

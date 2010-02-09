@@ -21,10 +21,6 @@ Bo1_Tetra_Aabb::~Bo1_Tetra_Aabb(){}
 
 #include<yade/pkg-common/Aabb.hpp>
 
-//#include<Wm3Tetrahedron3.h>
-//#include<Wm3IntrTetrahedron3Tetrahedron3.h> // not necessary since the cpp includes it as well
-//#include"Intersection/Wm3IntrTetrahedron3Tetrahedron3.cpp"
-//#include"Intersection/Wm3Intersector.cpp"
 
 CREATE_LOGGER(Ig2_Tetra_Tetra_TTetraGeom);
 

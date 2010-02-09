@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/Shape.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Functor.hpp>
 #include<yade/core/State.hpp>

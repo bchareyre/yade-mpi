@@ -9,7 +9,7 @@
 #include "TriaxialCompressionEngine.hpp"
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<boost/lexical_cast.hpp>
 #include<boost/lambda/lambda.hpp>
 #include<yade/pkg-dem/Shop.hpp>

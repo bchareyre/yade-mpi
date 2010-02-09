@@ -21,9 +21,8 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <unistd.h>
-#include <Wm3Math.h>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<boost/version.hpp>
 #include<boost/foreach.hpp>
 #	ifndef FOREACH

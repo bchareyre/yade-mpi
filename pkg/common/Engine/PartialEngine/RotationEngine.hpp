@@ -3,8 +3,7 @@
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
-#include<Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 /*! Engine applying rotation (by setting angular velocity) to subscribed bodies.
  * If rotateAroundZero is set, then each body is also displaced around zeroPoint.

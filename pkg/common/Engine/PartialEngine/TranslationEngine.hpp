@@ -9,7 +9,7 @@
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 class TranslationEngine : public PartialEngine {
 	public:

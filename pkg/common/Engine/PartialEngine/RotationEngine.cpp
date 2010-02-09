@@ -4,7 +4,7 @@
 
 #include"RotationEngine.hpp"
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/pkg-dem/Shop.hpp>
 
 #include<yade/pkg-common/LinearInterpolate.hpp>

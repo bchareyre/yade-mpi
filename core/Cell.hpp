@@ -1,5 +1,4 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
-// #include<yade/lib-base/yadeWm3Extra.hpp>
 
 /*! Periodic cell parameters and routines. Usually instantiated as Scene::cell.
 
@@ -16,7 +15,7 @@ The transformation has normal part and rotation/shear part. the shearPt, unshear
 #pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 
 class Cell: public Serializable{
 	public:

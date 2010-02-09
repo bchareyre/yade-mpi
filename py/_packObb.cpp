@@ -6,8 +6,7 @@
 #include<boost/foreach.hpp>
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/yadeWm3.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<vector>
 #include<stdexcept>
 using namespace boost;

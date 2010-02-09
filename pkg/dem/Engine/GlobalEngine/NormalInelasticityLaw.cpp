@@ -13,8 +13,6 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-#include <yade/lib-miniWm3/Wm3Math.h>
-
 Vector3r translation_vect (0.10,0,0);
 
 

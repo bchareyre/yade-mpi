@@ -17,7 +17,7 @@ using namespace boost;
 #endif
 
 #include<yade/lib-base/Logging.hpp>
-#include<yade/lib-base/yadeWm3Extra.hpp>
+#include<yade/lib-base/Math.hpp>
 
 /*! Class representing geometry of spherical packing, with some utility functions.
 

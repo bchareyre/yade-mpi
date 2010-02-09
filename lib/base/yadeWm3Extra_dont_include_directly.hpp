@@ -2,14 +2,11 @@
 
 #include<Wm3Vector2.h>
 #include<Wm3Vector3.h>
-#include<Wm3Vector4.h>
-#include<Wm3Matrix2.h>
 #include<Wm3Matrix3.h>
-#include<Wm3Matrix4.h>
 #include<Wm3Quaternion.h>
 using namespace Wm3;
 
-#include"yadeWm3.hpp"
+#include"yadeWm3_dont_include_directly.hpp"
 #include<limits>
 
 
@@ -19,23 +16,11 @@ Vector2r operator*(Real fScalar, const Vector2r& rkV);
 template<class RealType1, class RealType2>
 Vector3<RealType2> operator* (RealType1 fScalar, const Vector3<RealType2>& rkV);
 
-/*__attribute__((deprecated)) Vector3f operator*(const double s, const Vector3f& v);
-__attribute__((deprecated)) Vector3d operator*(const float s, const Vector3d& v);
-__attribute__((deprecated)) Vector3f operator*(const Vector3f& v, const double s);
-__attribute__((deprecated)) Vector3d operator*(const Vector3d& v, const float s);*/
-
 std::ostream & operator<< (std::ostream &os, const Vector3r &v);
 std::ostream & operator<< (std::ostream &os, const Quaternionr &q);
 
-template<class RealType1, class RealType2>
-Vector4<RealType2> operator* (RealType1 fScalar, const Vector4<RealType2>& rkV);
-
-Matrix2r operator*(Real fScalar, const Matrix2r& rkM);
-Vector2r operator*(const Vector2r& rkV, const Matrix2r& rkM);
 Matrix3r operator*(Real fScalar, const Matrix3r& rkM);
 Vector3r operator*(const Vector3r rkV, const Matrix3r rkM);
-Matrix4r operator*(Real fScalar, const Matrix4r& rkM);
-Vector4r operator*(const Vector4r& rkV, const Matrix4r& rkM);
 
 template<class RealType1, class RealType2>
 Quaternion<RealType2> operator* (RealType1 fScalar, const Quaternion<RealType2>& rkQ);
@@ -74,26 +59,15 @@ typedef Se3<float> Se3f;
 typedef Se3<double> Se3d;
 typedef Se3<Real> Se3r;
 
+__attribute__((unused))
 const Real NaN(std::numeric_limits<Real>::signaling_NaN());
 
 /************************************* end SE3 class ****************************/
 
 
-/*Vector2 std::maxVector (const Vector2& rkV) const;
-Vector2 std::minVector (const Vector2& rkV) const;
-Vector2 multDiag (const Vector2& rkV) const;*/
-
 Vector2r componentMaxVector(const Vector2r& a, const Vector2r& rkV);
 Vector2r componentMinVector(const Vector2r& a, const Vector2r& rkV);
 Vector2r diagMult(const Vector2r& a, const Vector2r& rkV);
-
-
-
-/*RealType angleBetweenUnitVectors(const Vector3r& rkV) const;
-Vector3r std::maxVector (const Vector3r& rkV) const;
-Vector3r std::minVector (const Vector3r& rkV) const;
-Vector3r multDiag (const Vector3r& rkV) const;
-Vector3r divDiag (const Vector3r& rkV) const;*/
 
 Vector3r componentMaxVector (const Vector3r& a, const Vector3r& rkV);
 Vector3r componentMinVector (const Vector3r& a, const Vector3r& rkV);
@@ -103,22 +77,6 @@ Real unitVectorsAngle(const Vector3r& a, const Vector3r& rkV);
 
 Real componentSum(const Vector3r& v);
 
-
-
-/*Vector4r std::maxVector (const Vector4r& rkV) const;
-Vector4r std::minVector (const Vector4r& rkV) const;
-Vector4r multDiag (const Vector4r& rkV) const;*/
-Vector4r componentMaxVector (const Vector4r& a, const Vector4r& rkV);
-Vector4r componentMinVector (const Vector4r& a, const Vector4r& rkV);
-Vector4r diagMult (const Vector4r& a, const Vector4r& rkV);
-//template<class RealType1, class RealType2>
-
-
-/*void toAxes (Vector3r& axis1, Vector3r& axis2, Vector3r& axis3) const; 
-void fromAxes (const Vector3r& axis1,const Vector3r& axis2,const Vector3r& axis3); 
-void toGLMatrix(RealType m[16]) const;
-void toEulerAngles (Vector3r& eulerAngles,RealType threshold = 1e-06f) const;
-Vector3r operator* (const Vector3r& v) const;*/
 
 
 Quaternionr quaternionFromAxes (const Vector3r& axis1,const Vector3r& axis2,const Vector3r& axis3);
@@ -171,8 +129,3 @@ void serialize(Archive & ar, Se3r & g, const unsigned int version){
 
 #endif /* __GCCXML */
 
-#if 0
-#include<yade/lib-QGLViewer/qglviewer.h>
-inline qglviewer::Vec toQGLViewierVec(Vector3r v){return qglviewer::Vec(v[0],v[1],v[2]);};
-inline Vector3r       toVec(qglviewer::Vec v){return Vector3r(v[0],v[1],v[2]);};
-#endif

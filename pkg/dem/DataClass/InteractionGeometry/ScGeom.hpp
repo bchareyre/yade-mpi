@@ -5,7 +5,7 @@
 
 #include<yade/core/InteractionGeometry.hpp>
 #include<yade/core/State.hpp>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 /*! Class representing geometry of two spheres in contact.
  *

@@ -13,7 +13,7 @@
 #endif
 
 #include<Wm3Vector3.h>
-#include<yade/lib-base/yadeWm3.hpp>
+#include<yade/lib-base/Math.hpp>
 
 #include<GL/gl.h>
 #include<GL/glut.h>

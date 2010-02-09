@@ -12,9 +12,6 @@
 #include<yade/pkg-common/BoundFunctor.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 
-#include<Wm3Math.h>
-#include<Wm3Vector3.h>
-
 
 /* Our mold of tetrahedron: just 4 vertices.
  *
