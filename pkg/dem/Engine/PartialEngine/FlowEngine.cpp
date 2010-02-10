@@ -35,7 +35,6 @@ FlowEngine::FlowEngine() : gravity ( Vector3r::ZERO ), isActivated ( true )
 	compute_K=true;
 	unload=false;
 	tess_based_force=true;
-	key="";
 	flow = shared_ptr<CGT::FlowBoundingSphere> ( new CGT::FlowBoundingSphere );
 }
 
@@ -66,10 +65,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 		}
 
 		current_state = triaxialCompressionEngine->currentState;
-		
-// 		triaxialCompressionEngine->Key = key;
-		key = triaxialCompressionEngine->Key;
-		flow->key=key;
+		flow->key = triaxialCompressionEngine->Key;
 
 		if ( !first && current_state==3 )
 		{
@@ -109,7 +105,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			int j = Omega::instance().getCurrentIteration();
 // 			int j = Omega::instance().getSimulationTime();
 			char file [50];
-			string consol = key+"%d_Consol";
+			string consol = flow->key+"%d_Consol";
 			const char* keyconsol = consol.c_str();
 			sprintf (file, keyconsol, j);
 			char *g = file;
@@ -148,10 +144,12 @@ void FlowEngine::applyCondition ( Scene* ncb )
 		else if ( current_state==3 )
 		{
 			Initialize ( ncb, P_zero );
-
-			flow->Localize ();
-
-			/** definition des conditions aux limites, test sur les parois -----A AJOUTER------- ***/
+			
+			cout << "ok2" << endl;
+			
+			Oedometer_Boundary_Conditions();
+			
+			cout << "ok3" << endl;
 
 			flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
 			
@@ -174,7 +172,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			}
 			cout << y << " deltaV initialised -----------------" << endl;
 
-			if (compute_K) {flow->Sample_Permeability ( flow->T[currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, key );}
+			if (compute_K) {flow->Sample_Permeability ( flow->T[currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 
 			double P_ext=0, P_int=0.0;
 
@@ -195,30 +193,41 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			
 			triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)*loadFactor;
 			
-			flow->Analytical_Consolidation();
+// 			flow->Analytical_Consolidation();
 
 			first = false;cons=0;
 		}
 	}
 }
 
+void FlowEngine::Oedometer_Boundary_Conditions()
+{
+	flow->boundary ( flow->y_min_id ).flowCondition=0;
+	flow->boundary ( flow->y_max_id ).flowCondition=0;
+	flow->boundary ( flow->y_min_id ).value=0;
+	flow->boundary ( flow->y_max_id ).value=1;
+}
+
 void FlowEngine::Initialize ( Scene* ncb, double P_zero )
 {
-	/*flow->*/
 	currentTes=0;
 	flow->currentTes=currentTes;
 
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
-	Triangulate ( ncb );
-
 	AddBoundary ( ncb );
-
-	flow->Tesselate();
+	Triangulate ( ncb );
+	
+	cout << endl << "Tesselating------" << endl << endl;
+	flow->T[currentTes].Compute();
 
 	flow->Fictious_cells();
+	
+	flow->Localize ();
 
 	Initialize_volumes ( ncb );
+	
+	cout << "ok1" << endl;
 }
 
 void FlowEngine::AddBoundary ( Scene* ncb )
@@ -244,11 +253,20 @@ void FlowEngine::AddBoundary ( Scene* ncb )
 
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 
-			flow->AddBoundingPlanes ( center, Extent, id );
-
+// 			flow->AddBoundingPlanes ( center, Extent, id );
+			
+			flow->x_min = min ( flow->x_min, center[0]);
+			flow->x_max = max ( flow->x_max, center[0]);
+			flow->y_min = min ( flow->y_min, center[1]);
+			flow->y_max = max ( flow->y_max, center[1]);
+			flow->z_min = min ( flow->z_min, center[2]);
+			flow->z_max = max ( flow->z_max, center[2]);
+			
 			contator+=1;
 		}
 	}
+	
+	flow->AddBoundingPlanes();
 
 	cout << contator << " walls inserted -------- ADDED BOUNDING PLANES" << endl;
 }
@@ -271,16 +289,20 @@ void FlowEngine::Triangulate ( Scene* ncb )
 		{
 			Sphere* s=YADE_CAST<Sphere*> ( b->shape.get() );
 			const body_id_t& id = b->getId();
-			
-// 			input.push_back(b->state->pos[0],b->state->pos[1],b->state->pos[2],s->radius );
-
-			/*const */Real rad = s->radius;
-
+			Real rad = s->radius;
 			Real x = b->state->pos[0];
 			Real y = b->state->pos[1];
 			Real z = b->state->pos[2];
-// 		cout << "position sphere [" << id << "] = " << x << ", " << y << ", " << z << endl;
-			flow->insert ( x, y, z, rad, id );
+			
+			flow->T[currentTes].insert(x, y, z, rad, id);
+			
+// 			flow->x_min = min ( flow->x_min, x-rad );
+// 			flow->x_max = max ( flow->x_max, x+rad );
+// 			flow->y_min = min ( flow->y_min, y-rad );
+// 			flow->y_max = max ( flow->y_max, y+rad );
+// 			flow->z_min = min ( flow->z_min, z-rad );
+// 			flow->z_max = max ( flow->z_max, z+rad );
+			
 			contator+=1;
 		}
 	}
@@ -313,9 +335,10 @@ void FlowEngine::NewTriangulation ( Scene* ncb )
 
 	AddBoundary ( ncb );
 
-	flow->Tesselate();
-
-	flow->Fictious_cells();
+// 	flow->Tesselate();
+	flow->T[currentTes].Compute();
+	
+// 	flow->Fictious_cells();
 
 	flow->Localize ();
 	

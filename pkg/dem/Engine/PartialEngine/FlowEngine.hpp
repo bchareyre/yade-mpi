@@ -23,7 +23,6 @@ class FlowEngine : public PartialEngine
 		shared_ptr<CGT::FlowBoundingSphere> flow;
 // 		FlowBoundingSphere* flow;
 		//Tesselation* Tes;
-		string key;
 	public :
 
 		Vector3r gravity;
@@ -56,6 +55,7 @@ class FlowEngine : public PartialEngine
 		Real Volume_cell_triple_fictious (CGT::Cell_handle cell, Scene* ncb);
 		Real Volume_cell (CGT::Cell_handle cell, Scene* ncb);
 		void NewTriangulation ( Scene* ncb );
+		void Oedometer_Boundary_Conditions();
 		
 		FlowEngine();
 		virtual ~FlowEngine();

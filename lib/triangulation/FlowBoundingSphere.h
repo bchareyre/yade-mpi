@@ -12,7 +12,7 @@
 #ifdef XVIEW
 #include "Vue3D.h"
 #endif
-
+#define FLOW_ENGINE
 #ifdef FLOW_ENGINE
 
 
@@ -30,6 +30,7 @@ struct Boundary
 class FlowBoundingSphere
 {
 	public:
+		virtual ~FlowBoundingSphere();
  		FlowBoundingSphere();
 		
 		int x_min_id, x_max_id, y_min_id, y_max_id, z_min_id, z_max_id;
@@ -40,12 +41,14 @@ class FlowBoundingSphere
 		short id_offset;
  		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		
-		void insert ( Real x, Real y, Real z, Real radius, int id );
+// 		void insert ( Real x, Real y, Real z, Real radius, int id );
 		void Localize ();
 		void Compute_Permeability();
 		void AddBoundingPlanes();
+		
+		void AddBoundingPlanes(Real center[3], Real Extents[3], int id);
+		
 		void DisplayStatistics();
-		void Tesselate();
 		void GaussSeidel ( );
 		void Compute_Forces ();
 		double surface_external_triple_fictious ( Real position[3], Cell_handle cell, Boundary b );
@@ -74,7 +77,7 @@ class FlowBoundingSphere
 		
 		void SpheresFileCreator ();
 		
-		void Analytical_Consolidation ( );
+// 		void Analytical_Consolidation ( );
 		
 		void Boundary_Conditions ( RTriangulation& Tri );
 		
