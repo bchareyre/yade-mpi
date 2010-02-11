@@ -38,6 +38,8 @@ void OpenGLRenderingEngine::init(){
 	}
 	postProcessAttributes(true);
 
+	clipPlaneNormals.resize(numClipPlanes);
+
 	if (glutInitDone) return;
 	glutInit(&Omega::instance().origArgc,Omega::instance().origArgv);
 	/* transparent spheres (still not working): glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); */

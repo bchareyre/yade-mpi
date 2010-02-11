@@ -45,12 +45,12 @@ class OpenGLRenderingEngine : public Serializable
 		// updated after every call to render
 		shared_ptr<Scene> scene; 
 
-		DynLibDispatcher< InteractionGeometry , GlInteractionGeometryFunctor, void , TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>& , const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionGeometryDispatcher;
-		DynLibDispatcher< InteractionPhysics  , GlInteractionPhysicsFunctor,  void , TYPELIST_5(const shared_ptr<InteractionPhysics>& , const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool) > interactionPhysicsDispatcher;
+		DynLibDispatcher<InteractionGeometry, GlInteractionGeometryFunctor, void, TYPELIST_5(const shared_ptr<InteractionGeometry>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)> interactionGeometryDispatcher;
+		DynLibDispatcher<InteractionPhysics, GlInteractionPhysicsFunctor, void, TYPELIST_5(const shared_ptr<InteractionPhysics>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool)> interactionPhysicsDispatcher;
 
-		DynLibDispatcher< State  , GlStateFunctor,               void , TYPELIST_1(const shared_ptr<State>&) > stateDispatcher;
-		DynLibDispatcher< Bound      , GlBoundFunctor,      void , TYPELIST_2(const shared_ptr<Bound>&, Scene*) > boundDispatcher;
-		DynLibDispatcher< Shape , GlShapeFunctor, void , TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&) > shapeDispatcher;
+		DynLibDispatcher<State, GlStateFunctor, void, TYPELIST_1(const shared_ptr<State>&)> stateDispatcher;
+		DynLibDispatcher<Bound, GlBoundFunctor, void, TYPELIST_2(const shared_ptr<Bound>&, Scene*)> boundDispatcher;
+		DynLibDispatcher<Shape, GlShapeFunctor, void, TYPELIST_4(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&)> shapeDispatcher;
 
 		vector<vector<string> >
 			stateFunctorNames,
@@ -95,11 +95,11 @@ class OpenGLRenderingEngine : public Serializable
 		((bool,Show_ID,false,"Show body id's"))
 		((bool,Body_state,false,"Render body state [deprecated]"))
 		((bool,Body_bounding_volume,false,"Render body bound"))
-		((bool,Body_interacting_geom,false,"Render body shape"))
+		((bool,Body_interacting_geom,true,"Render body shape"))
 		((bool,Interaction_wire,false,"??"))
 		((bool,Interaction_geometry,false,"Render :yref:`geometry of interaction<Interaction::interactionGeometry>`"))
 		((bool,Interaction_physics,false,"Render :yref:`Interaction::interactionPhysics`"))
-		((int,Draw_mask,0,"Bitmask for showing only bodies where ((Draw_mask & Body::groupMask)!=0)"))
+		((int,Draw_mask,((void)"draw everything",~0),"Bitmask for showing only bodies where ((Draw_mask & Body::groupMask)!=0)"))
 		((bool,Draw_inside,true,"??"))
 		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)),"Position and orientation of clipping planes"))
 		((vector<int>,clipPlaneActive,vector<int>(numClipPlanes,0),"Activate/deactivate respective clipping planes"))
