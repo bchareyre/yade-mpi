@@ -64,7 +64,7 @@ class ElasticContactLaw : public GlobalEngine{
 		((int,sdecGroupMask,1,"Bitmask for allowing collision between particles :yref:`Body::groupMask`"))
 		((bool,neverErase,false,"Keep interactions even if particles go away from each other [for debugging?]"))
 		#ifdef SCG_SHEAR
-			((bool,useShear,false,"Use ScGeom::updateShear rather than ScGeom::updateShearForce for shear force computation."))
+			((bool,useShear,false,"Use :yref:`ScGeom`::updateShear rather than :yref:`ScGeom`::updateShearForce for shear force computation."))
 		#endif
 	);
 };
