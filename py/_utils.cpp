@@ -147,19 +147,24 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interaction
 python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
 	const shared_ptr<Scene>& rb=Omega::instance().getScene();
-	vector<int> bodyNumInta; bodyNumInta.resize(rb->bodies->size(),-1 /* uninitialized */);
-	int maxInta=0;
+	vector<int> bodyNumIntr; bodyNumIntr.resize(rb->bodies->size(),0);
+	int maxIntr=0;
 	FOREACH(const shared_ptr<Interaction>& i, *rb->interactions){
 		if(!i->isReal()) continue;
 		const body_id_t id1=i->getId1(), id2=i->getId2(); const shared_ptr<Body>& b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
-		if(useBB && isInBB(b1->state->pos,bbMin,bbMax)) bodyNumInta[id1]=bodyNumInta[id1]>0?bodyNumInta[id1]+1:1;
-		if(useBB && isInBB(b2->state->pos,bbMin,bbMax)) bodyNumInta[id2]=bodyNumInta[id2]>0?bodyNumInta[id2]+1:1;
-		maxInta=max(max(maxInta,bodyNumInta[b1->getId()]),bodyNumInta[b2->getId()]);
+		if((useBB && isInBB(b1->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id1]+=1;
+		if((useBB && isInBB(b2->state->pos,bbMin,bbMax)) || !useBB) bodyNumIntr[id2]+=1;
+		maxIntr=max(max(maxIntr,bodyNumIntr[b1->getId()]),bodyNumIntr[b2->getId()]);
 	}
-	vector<int> bins; bins.resize(maxInta+1);
-	for(size_t id=0; id<bodyNumInta.size(); id++){ if(bodyNumInta[id]>=0) bins[bodyNumInta[id]]+=1; }
+	vector<int> bins; bins.resize(maxIntr+1,0);
+	for(size_t id=0; id<bodyNumIntr.size(); id++){
+		if(bodyNumIntr[id]>0) bins[bodyNumIntr[id]]+=1;
+		// 0 is handled specially: add body to the 0 bin only if it is inside the bb requested (if applicable)
+		// otherwise don't do anything, since it is outside the volume of interest
+		else if((useBB && isInBB(Body::byId(id,rb)->state->pos,bbMin,bbMax)) || !useBB) bins[0]+=1;
+	}
 	python::list count,num;
-	for(size_t n=1; n<bins.size(); n++){
+	for(size_t n=0; n<bins.size(); n++){
 		if(bins[n]==0) continue;
 		num.append(n); count.append(bins[n]);
 	}
