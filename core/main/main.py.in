@@ -25,6 +25,7 @@ par.add_option('-v',help='Increase logging verbosity; first occurence sets defau
 	('' if 'log4cxx' in features else " (Since this build doesn't use log4cxx, this option will only have effect if repeated twice (-vv), equivalent to setting YADE_DEBUG environment variable)"),action='count',dest='verbosity')
 if debug:
 	par.add_option('--no-gdb',help='Do not show backtrace when yade crashes.',dest='noGdb',action='store_true',)
+par.add_option('-n',help="Run without graphical interface (equivalent to unsetting the DISPLAY environment variable)",dest='nogui',action='store_true')
 
 opts,args=par.parse_args()
 # c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
@@ -77,11 +78,12 @@ yade.system.runServers()
 
 # open GUI if possible
 qtEnabled=False
-try:
-	import yade.qt
-	qtEnabled=True
-	yade.qt.Controller()
-except ImportError: pass
+if not opts.nogui:
+	try:
+		import yade.qt
+		qtEnabled=True
+	except ImportError: pass
+
 
 # prepare nice namespace for users
 from yade import *
@@ -89,6 +91,7 @@ from math import *
 
 # something to run?
 if len(args)>0:
+	if qtEnabled: yade.qt.Controller()
 	if args[0].endswith('.xml') or args[0].endswith('.xml.bz2'):
 		if len(args)>1: raise RuntimeError('Extra arguments to XML simulation to run: '+' '.join(args[1:]))
 		sys.stderr.write("Running simulation "+args[0]+'\n')

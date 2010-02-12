@@ -73,7 +73,7 @@ int QtGUI::run(int argc, char *argv[])
 
 bool QtGUI::checkDisplay(bool quiet){
 	bool ret=(XOpenDisplay(NULL)!=0);
-	if(!ret) LOG_ERROR("Unable to open display `"<<getenv("DISPLAY")<<"'.");
+	if(!ret && !quiet) LOG_ERROR("Unable to open display `"<<getenv("DISPLAY")<<"'.");
 	return ret;
 }
 
@@ -83,7 +83,7 @@ bool QtGUI::runNaked(){
 			LOG_ERROR("$DISPLAY environment var not set, not starting qt3 gui.");
 			return false;
 		};
-		LOG_INFO("Creating QApplication");
+		LOG_DEBUG("Creating QApplication");
 		XInitThreads();
 		int argc=0;
 	   app=new QApplication(argc,(char**)NULL);

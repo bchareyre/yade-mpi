@@ -53,25 +53,21 @@ YadeQtMainWindow::YadeQtMainWindow() : YadeQtGeneratedMainWindow()
 	preferences = shared_ptr<QtGUIPreferences>(new QtGUIPreferences);
 	filesystem::path yadeQtGUIPrefPath = filesystem::path( Omega::instance().yadeConfigPath + "/QtGUIPreferences.xml", filesystem::native);
 
-	if ( !filesystem::exists( yadeQtGUIPrefPath ) )
-	{
+	bool configLoaded=false;
+	try {
+		if (filesystem::exists(yadeQtGUIPrefPath)){
+			LOG_INFO("Loading configuration file: "<<yadeQtGUIPrefPath.string()<<".")
+			IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+		}
+		configLoaded=true;
+	} catch (...){}
+	if(!configLoaded){
 		preferences->mainWindowPositionX	= 50;
 		preferences->mainWindowPositionY	= 50;
 		preferences->mainWindowSizeX		= 150; preferences->mainWindowSizeY		= 150;
-		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
-	}
-
-	try
-	{
-		LOG_INFO("Loading configuration file: "<<yadeQtGUIPrefPath.string()<<".")
-		IOFormatManager::loadFromFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
-	}
-	catch(SerializableError&)
-	{
-		preferences->mainWindowPositionX	= 50;
-		preferences->mainWindowPositionY	= 50;
-		preferences->mainWindowSizeX		= 150; preferences->mainWindowSizeY		= 150;
-		IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+		try{
+			IOFormatManager::saveToFile("XMLFormatManager",yadeQtGUIPrefPath.string(),"preferences",preferences);
+		}catch(...){}
 	}
 
 	resize(preferences->mainWindowSizeX,preferences->mainWindowSizeY);

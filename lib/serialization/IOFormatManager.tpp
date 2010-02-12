@@ -58,7 +58,9 @@ template<typename Type>
 void IOFormatManager::saveToFile(const string& libName, const string& fileName,const string& name, Type& t){
 	iostreams::filtering_ostream out;
 	if(boost::algorithm::ends_with(fileName,".bz2")) out.push(iostreams::bzip2_compressor());
-	out.push(iostreams::file_sink(fileName));
+	iostreams::file_sink sink(fileName);
+	if(!sink.is_open()) throw std::runtime_error("Unable to open file '"+fileName+"' for writing.");
+	out.push(sink);
 	if(!out.good()) throw SerializableError(IOManagerExceptions::FileNotGood);
 	saveToStream(libName,out,name,t);
 }

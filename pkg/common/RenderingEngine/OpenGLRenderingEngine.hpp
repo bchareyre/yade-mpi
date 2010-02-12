@@ -19,7 +19,7 @@ class OpenGLRenderingEngine : public Serializable
 		bool pointClipped(const Vector3r& p);
 		vector<Vector3r> clipPlaneNormals;
 		void setBodiesDispInfo();
-		static bool glutInitDone;
+		static bool initDone;
 		Vector3r viewDirection; // updated from GLViewer regularly
 		GLViewInfo viewInfo; // update from GLView regularly
 		Vector3r highlightEmission0;
@@ -105,7 +105,7 @@ class OpenGLRenderingEngine : public Serializable
 		((vector<int>,clipPlaneActive,vector<int>(numClipPlanes,0),"Activate/deactivate respective clipping planes"))
 		((size_t,selectBodyLimit,1000,"Limit number of bodies to allow picking body with mouse (performance reasons)"))
 		((bool,intrAllWire,false,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
-		/*ctor*/ init(); ,
+		/*ctor*/ ,
 		/*py*/
 		.def("setRefSe3",&OpenGLRenderingEngine::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
 	);

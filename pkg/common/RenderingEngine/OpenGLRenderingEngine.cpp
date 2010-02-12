@@ -22,7 +22,7 @@ YADE_PLUGIN((OpenGLRenderingEngine));
 YADE_REQUIRE_FEATURE(OPENGL)
 CREATE_LOGGER(OpenGLRenderingEngine);
 
-bool OpenGLRenderingEngine::glutInitDone=false;
+bool OpenGLRenderingEngine::initDone=false;
 const int OpenGLRenderingEngine::numClipPlanes;
 
 void OpenGLRenderingEngine::init(){
@@ -40,10 +40,16 @@ void OpenGLRenderingEngine::init(){
 
 	clipPlaneNormals.resize(numClipPlanes);
 
-	if (glutInitDone) return;
-	glutInit(&Omega::instance().origArgc,Omega::instance().origArgv);
-	/* transparent spheres (still not working): glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); */
-	glutInitDone=true;
+	initgl();
+
+	static bool glutInitDone=false;
+	if(!glutInitDone){
+		glutInit(&Omega::instance().origArgc,Omega::instance().origArgv);
+		/* transparent spheres (still not working): glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_ALPHA); glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE); */
+		glutInitDone=true;
+	}
+
+	initDone=true;
 }
 
 void OpenGLRenderingEngine::setBodiesRefSe3(){
@@ -130,7 +136,8 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 
 void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t selection /* not sure. maybe a list of selections, or maybe bodies themselves should remember if they are selected? */) {
 
-	assert(glutInitDone);
+	if(!initDone) init();
+	assert(initDone);
 	current_selection = selection;
 
 	scene=_scene;

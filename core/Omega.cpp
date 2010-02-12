@@ -316,10 +316,12 @@ void Omega::saveSimulation(const string name)
 		FormatChecker::format=FormatChecker::XML;
 		IOFormatManager::saveToFile("XMLFormatManager",name,"scene",scene);
 	}
-	else if(algorithm::ends_with(name,".yade")){
-		FormatChecker::format=FormatChecker::BIN;
-		IOFormatManager::saveToFile("BINFormatManager",name,"scene",scene);
-	}
+	#if 0
+		else if(algorithm::ends_with(name,".yade")){
+			FormatChecker::format=FormatChecker::BIN;
+			IOFormatManager::saveToFile("BINFormatManager",name,"scene",scene);
+		}
+	#endif
 	else if(algorithm::starts_with(name,":memory:")){
 		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
 		ostringstream oss;
@@ -327,7 +329,7 @@ void Omega::saveSimulation(const string name)
 		memSavedSimulations[name]=oss.str();
 	}
 	else {
-		throw runtime_error("Filename extension not recognized in `"+name+"'");
+		throw runtime_error("File format not recognized: `"+name+"' (admissible filename patterns: :memory:* *.xml *.xml.bz2)");
 	}
 }
 

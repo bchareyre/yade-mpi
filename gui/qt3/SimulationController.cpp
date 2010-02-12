@@ -238,26 +238,15 @@ void SimulationController::loadSimulationFromFileName(const std::string& fileNam
 void SimulationController::pbSaveClicked()
 {
 	pbStopClicked();
-
 	string selectedFilter;
 	std::vector<string> filters;
-	filters.push_back("Yade Binary File (*.yade)");
-	filters.push_back("XML Yade File (*.xml *.xml.gz *.xml.bz2)");
-	string fileName = FileDialog::getSaveFileName(".", filters, "Specify file name to save", parentWorkspace, selectedFilter );
-
-	if(fileName.size()!=0  && (fileName != "/")&& (fileName != "."))
-	{
-
-		if(filesystem::extension(fileName)=="") // user forgot to specify extension - fix it.
-			fileName+=".xml";
-
-		cerr << "saving simulation: " << fileName << "\n";
+	// filters.push_back("Yade Binary File (*.yade)");
+	filters.push_back("XML Yade File (*.xml *.xml.bz2)"); // *.xml.gz 
+	string fileName=FileDialog::getSaveFileName(".", filters, "Specify file name to save", parentWorkspace, selectedFilter );
+	try{
 		Omega::instance().saveSimulation(fileName);
-
-	}
-	else
-	{
-		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog("Save aborted (check file extension).",NULL));
+	}catch(std::exception& e){
+		shared_ptr<MessageDialog> md = shared_ptr<MessageDialog>(new MessageDialog(string("Error: ")+e.what(),NULL));
 		md->exec(); 
 	}
 }
