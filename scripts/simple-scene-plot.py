@@ -20,12 +20,7 @@ O.engines=[
 	###
 	### You want snapshot to be taken every 1 sec (realTimeLim) or every 50 iterations (iterLim),
 	### whichever comes soones. virtTimeLim attribute is unset, hence virtual time period is not taken into account.
-	### If there is too much data, they will be reduced automatically (every second number will be ditched) but
-	### the upper limit will always be guarded. 
-	### 
-	### The engine _must_ be labeled 'plotDataCollector', so that the reducer may find it and adjust its periods if necessary.
-	###
-	PeriodicPythonRunner(iterPeriod=20,command='myAddPlotData()',label='plotDataCollector')
+	PeriodicPythonRunner(iterPeriod=20,command='myAddPlotData()')
 ]
 from yade import utils
 O.bodies.append(utils.box(center=[0,0,0],extents=[.5,.5,.5],dynamic=False,color=[1,0,0]))
@@ -48,11 +43,12 @@ plot.plots={'i':('t'),'t':('z_sph','|||',('v_sph','go-'),'z_sph_half')}
 ## it should add data with the labels that we will plot
 ## if a datum is not specified (but exists), it will be NaN and will not be plotted
 def myAddPlotData():
-	## store some numbers under some labels
 	sph=O.bodies[1]
+	## store some numbers under some labels
 	plot.addData(t=O.time,i=O.iter,z_sph=sph.state.pos[2],z_sph_half=.5*sph.state.pos[2],v_sph=sqrt(sum([v**2 for v in sph.state['vel']])))
 
 O.run(int(2./O.dt),True);
 print "Now calling plot.plot() to show the figures (close them to continue)."
 plot.plot()
 plot.saveGnuplot('/tmp/a')
+## you can also access the data in plot.data['i'], plot.data['t'] etc, under the labels they were saved.
