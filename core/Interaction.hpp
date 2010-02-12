@@ -70,7 +70,7 @@ class Interaction : public Serializable
 		/* ctor */ init(),
 		/*py*/
 		.def_readwrite("geom",&Interaction::interactionGeometry,"Shorthand for :yref:`Interaction::interactionGeometry`")
-		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for :yref:`Interaction::`interactionPhysics`")
+		.def_readwrite("phys",&Interaction::interactionPhysics,"Shorthand for :yref:`Interaction::interactionPhysics`")
 		.def_readonly("id1",&Interaction::id1,":yref:`Id<Body::id>` of the first body in this interaction.")
 		.def_readonly("id2",&Interaction::id2,":yref:`Id<Body::id>` of the second body in this interaction.")
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")

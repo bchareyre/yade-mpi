@@ -125,6 +125,40 @@ namespace{
 		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
 	}
 
+/* Macros for registering classes in python, serialization framework, class factory. These macros create default (parameterless) constructor, declare all attributes (delete those from the class elsewhere) and initialize them at construction time.
+
+Each part of macro name is one argument you have to provide:
+
+CLASS: class name (without quotes)
+BASE: base class name (without quotes)
+DOC: docstring for this class (quoted; uses the special text syntax, see below)
+ATTRS: list of attributes ((type,attributeName,defaultValue,"documentation for the attribute"))
+	type is c++ type
+	attributeName: the identifier name; it will appear under the same name in python
+	defaultValue: value that will be set by the default ctor; can be empty. Is automatically documented.
+	documentation: arbitrary string, NOT EMPTY. Can contain the following strings (including the |pipes|):
+		|yupdate| will expand to (updated automatically); use for attributes that are, well, updated automatically at every step for instance
+		|ycompute| will expand to (computed automatically); use for attributes that are computed (at the beginning, for instance, and there is no point in setting them)
+		[m²]: specify dimensions for all attributes where this is appropriate
+CTOR: what should be run in the default ctor; for some classes, this will be createIndex();, mostly it will be nothing
+PY: extra initializations for python, mostly nothing
+INIT: sequence of ((attribute,value)) to be intiialized with the default ctor; useful for initialization of references or constants, which cannot be done in the ctor
+
+Pick the simplest macro you need (equivalent to passing empty arguments):
+
+YADE_CLASS_BASE_DOC
+YADE_CLASS_BASE_DOC_ATTRS
+YADE_CLASS_BASE_DOC_ATTRS_CTOR
+YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY
+YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY
+
+documentation text syntax
+-------------------------
+Erite plain text. Paragraphs are separated by empty lines (\n\n in c strings). Use hyperlinks abundantly in both class and attribute documentation, with the special :yref:`target` syntax: :yref:`Body` will expand to hyperlink to the Body class documentation, :yref:`dynamic<Body::dynamic>` will the hyperlink to Body::dynamic, but text will show 'dynamic'.
+
+(Note: for classes with static data members (Gl1_*), there is a special YADE_CLASS_BASE_DOC_STATICATTRS. Those mentioned above will not do.)
+
+*/
 // attrs is (type,name,init-value,docstring)
 #define YADE_CLASS_BASE_DOC(klass,base,doc)                             YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,,,,)
 #define YADE_CLASS_BASE_DOC_ATTRS(klass,base,doc,attrs)                 YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,,)
