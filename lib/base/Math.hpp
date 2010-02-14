@@ -11,7 +11,7 @@
 
 		good luck
 	*/
-	#warning @@@@@@@@@@ Using wrapper around eigen to emulate wm3; this is EXPERIMENTAL for developers only; numerical results might very well be garbage. @@@@@@@@@@
+	//#warning @@@@@@@@@@ Using wrapper around eigen to emulate wm3; this is EXPERIMENTAL for developers only; numerical results might very well be garbage. @@@@@@@@@@
 	#include<yade/lib-base/yadeMath.hpp>
 #else
 	#include<yade/lib-base/yadeWm3Extra_dont_include_directly.hpp>

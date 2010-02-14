@@ -224,7 +224,7 @@ void InsertionSortCollider::action(Scene* scene){
 		if(b){
 			const shared_ptr<Bound>& bv=b->bound;
 			if(bv) { memcpy(&minima[3*id],&bv->min,3*sizeof(Real)); memcpy(&maxima[3*id],&bv->max,3*sizeof(Real)); } // ⇐ faster than 6 assignments 
-			else{ const Vector3r& pos=b->state->pos; memcpy(&minima[3*id],pos,3*sizeof(Real)); memcpy(&maxima[3*id],pos,3*sizeof(Real)); }
+			else{ const Vector3r& pos=b->state->pos; memcpy(&minima[3*id],&pos,3*sizeof(Real)); memcpy(&maxima[3*id],&pos,3*sizeof(Real)); }
 		} else { memset(&minima[3*id],0,3*sizeof(Real)); memset(&maxima[3*id],0,3*sizeof(Real)); }
 	}
 

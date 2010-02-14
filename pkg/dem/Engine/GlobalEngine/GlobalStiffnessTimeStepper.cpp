@@ -42,7 +42,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
 
-	if(! ( /* sphere && */ sdec && stiffness) )
+	if(! ( /* sphere && */ sdec && stiffness==Vector3r::ZERO) )
 		return; // not possible to compute!
 	//cerr << "return; // not possible to compute!" << endl;
 // 	Real Dab  	= sphere->radius;
@@ -175,8 +175,8 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 		stiffnesses.resize(size); Rstiffnesses.resize(size);
 	}
 	/* reset stored values */
-	memset(stiffnesses[0], 0,sizeof(Vector3r)*size);
-	memset(Rstiffnesses[0],0,sizeof(Vector3r)*size);
+	memset(& stiffnesses[0],0,sizeof(Vector3r)*size);
+	memset(&Rstiffnesses[0],0,sizeof(Vector3r)*size);
 	FOREACH(const shared_ptr<Interaction>& contact, *rb->interactions){
 		if(!contact->isReal()) continue;
 

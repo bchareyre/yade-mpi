@@ -12,290 +12,290 @@
 
 namespace bp = boost::python;
 
-static boost::python::tuple ToAxisAngle_0ab7c6483b74dde2c1f8a9e7e124e074( ::Wm3::Matrix3< double > const & inst ){
-    Wm3::Vector3<double> rkAxis2;
+static boost::python::tuple ToAxisAngle_0ab7c6483b74dde2c1f8a9e7e124e074( Matrix3< double > const & inst ){
+    Vector3<double> rkAxis2;
     double rfAngle2;
     inst.ToAxisAngle(rkAxis2, rfAngle2);
     return bp::make_tuple( rkAxis2, rfAngle2 );
 }
 
-static boost::python::tuple ToAxisAngle_2c4febac34e606b4a98de72d9f8161c9( ::Wm3::Quaternion< double > const & inst ){
-    Wm3::Vector3<double> rkAxis2;
+static boost::python::tuple ToAxisAngle_2c4febac34e606b4a98de72d9f8161c9( Quaternion< double > const & inst ){
+    Vector3<double> rkAxis2;
     double rfAngle2;
     inst.ToAxisAngle(rkAxis2, rfAngle2);
     return bp::make_tuple( rkAxis2, rfAngle2 );
 }
 
 BOOST_PYTHON_MODULE(miniWm3Wrap){
-    { //::Wm3::Matrix3< double >
-        typedef bp::class_< Wm3::Matrix3< double > > Matrix3_exposer_t;
+    { //Matrix3< double >
+        typedef bp::class_< Matrix3< double > > Matrix3_exposer_t;
         Matrix3_exposer_t Matrix3_exposer = Matrix3_exposer_t( "Matrix3", bp::init< bp::optional< bool > >(( bp::arg("bZero")=(bool)(true) )) );
         bp::scope Matrix3_scope( Matrix3_exposer );
-        bp::implicitly_convertible< bool, Wm3::Matrix3< double > >();
-        Matrix3_exposer.def( bp::init< Wm3::Matrix3< double > const & >(( bp::arg("rkM") )) );
+        bp::implicitly_convertible< bool, Matrix3< double > >();
+        Matrix3_exposer.def( bp::init< Matrix3< double > const & >(( bp::arg("rkM") )) );
         Matrix3_exposer.def( bp::init< double, double, double, double, double, double, double, double, double >(( bp::arg("fM00"), bp::arg("fM01"), bp::arg("fM02"), bp::arg("fM10"), bp::arg("fM11"), bp::arg("fM12"), bp::arg("fM20"), bp::arg("fM21"), bp::arg("fM22") )) );
         Matrix3_exposer.def( bp::init< double const *, bool >(( bp::arg("afEntry"), bp::arg("bRowMajor") )) );
-        Matrix3_exposer.def( bp::init< Wm3::Vector3< double > const &, Wm3::Vector3< double > const &, Wm3::Vector3< double > const &, bool >(( bp::arg("rkU"), bp::arg("rkV"), bp::arg("rkW"), bp::arg("bColumns") )) );
-        Matrix3_exposer.def( bp::init< Wm3::Vector3< double > const *, bool >(( bp::arg("akV"), bp::arg("bColumns") )) );
+        Matrix3_exposer.def( bp::init< Vector3< double > const &, Vector3< double > const &, Vector3< double > const &, bool >(( bp::arg("rkU"), bp::arg("rkV"), bp::arg("rkW"), bp::arg("bColumns") )) );
+        Matrix3_exposer.def( bp::init< Vector3< double > const *, bool >(( bp::arg("akV"), bp::arg("bColumns") )) );
         Matrix3_exposer.def( bp::init< double, double, double >(( bp::arg("fM00"), bp::arg("fM11"), bp::arg("fM22") )) );
-        Matrix3_exposer.def( bp::init< Wm3::Vector3< double > const &, double >(( bp::arg("rkAxis"), bp::arg("fAngle") )) );
-        Matrix3_exposer.def( bp::init< Wm3::Vector3< double > const &, Wm3::Vector3< double > const & >(( bp::arg("rkU"), bp::arg("rkV") )) );
-        { //::Wm3::Matrix3< double >::Adjoint
+        Matrix3_exposer.def( bp::init< Vector3< double > const &, double >(( bp::arg("rkAxis"), bp::arg("fAngle") )) );
+        Matrix3_exposer.def( bp::init< Vector3< double > const &, Vector3< double > const & >(( bp::arg("rkU"), bp::arg("rkV") )) );
+        { //Matrix3< double >::Adjoint
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*Adjoint_function_type )(  ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*Adjoint_function_type )(  ) const;
             
             Matrix3_exposer.def( 
                 "Adjoint"
-                , Adjoint_function_type( &::Wm3::Matrix3< double >::Adjoint ) );
+                , Adjoint_function_type( &Matrix3< double >::Adjoint ) );
         
         }
-        { //::Wm3::Matrix3< double >::Determinant
+        { //Matrix3< double >::Determinant
         
-            typedef Wm3::Matrix3< double > exported_class_t;
+            typedef Matrix3< double > exported_class_t;
             typedef double ( exported_class_t::*Determinant_function_type )(  ) const;
             
             Matrix3_exposer.def( 
                 "Determinant"
-                , Determinant_function_type( &::Wm3::Matrix3< double >::Determinant ) );
+                , Determinant_function_type( &Matrix3< double >::Determinant ) );
         
         }
-        { //::Wm3::Matrix3< double >::DiagonalTimes
+        { //Matrix3< double >::DiagonalTimes
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*DiagonalTimes_function_type )( ::Wm3::Vector3< double > const & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*DiagonalTimes_function_type )( Vector3< double > const & ) const;
             
             Matrix3_exposer.def( 
                 "DiagonalTimes"
-                , DiagonalTimes_function_type( &::Wm3::Matrix3< double >::DiagonalTimes )
+                , DiagonalTimes_function_type( &Matrix3< double >::DiagonalTimes )
                 , ( bp::arg("rkDiag") ) );
         
         }
-        { //::Wm3::Matrix3< double >::EigenDecomposition
+        { //Matrix3< double >::EigenDecomposition
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*EigenDecomposition_function_type )( ::Wm3::Matrix3< double > &,::Wm3::Matrix3< double > & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef void ( exported_class_t::*EigenDecomposition_function_type )( Matrix3< double > &,Matrix3< double > & ) const;
             
             Matrix3_exposer.def( 
                 "EigenDecomposition"
-                , EigenDecomposition_function_type( &::Wm3::Matrix3< double >::EigenDecomposition )
+                , EigenDecomposition_function_type( &Matrix3< double >::EigenDecomposition )
                 , ( bp::arg("rkRot"), bp::arg("rkDiag") ) );
         
         }
-        { //::Wm3::Matrix3< double >::FromAxisAngle
+        { //Matrix3< double >::FromAxisAngle
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > & ( exported_class_t::*FromAxisAngle_function_type )( ::Wm3::Vector3< double > const &,double ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > & ( exported_class_t::*FromAxisAngle_function_type )( Vector3< double > const &,double ) ;
             
             Matrix3_exposer.def( 
                 "FromAxisAngle"
-                , FromAxisAngle_function_type( &::Wm3::Matrix3< double >::FromAxisAngle )
+                , FromAxisAngle_function_type( &Matrix3< double >::FromAxisAngle )
                 , ( bp::arg("rkAxis"), bp::arg("fAngle") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Matrix3< double >::GetColumn
+        { //Matrix3< double >::GetColumn
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Vector3< double > ( exported_class_t::*GetColumn_function_type )( int ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Vector3< double > ( exported_class_t::*GetColumn_function_type )( int ) const;
             
             Matrix3_exposer.def( 
                 "GetColumn"
-                , GetColumn_function_type( &::Wm3::Matrix3< double >::GetColumn )
+                , GetColumn_function_type( &Matrix3< double >::GetColumn )
                 , ( bp::arg("iCol") ) );
         
         }
-        { //::Wm3::Matrix3< double >::GetColumnMajor
+        { //Matrix3< double >::GetColumnMajor
         
-            typedef Wm3::Matrix3< double > exported_class_t;
+            typedef Matrix3< double > exported_class_t;
             typedef void ( exported_class_t::*GetColumnMajor_function_type )( double * ) const;
             
             Matrix3_exposer.def( 
                 "GetColumnMajor"
-                , GetColumnMajor_function_type( &::Wm3::Matrix3< double >::GetColumnMajor )
+                , GetColumnMajor_function_type( &Matrix3< double >::GetColumnMajor )
                 , ( bp::arg("afCMajor") ) );
         
         }
-        { //::Wm3::Matrix3< double >::GetRow
+        { //Matrix3< double >::GetRow
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Vector3< double > ( exported_class_t::*GetRow_function_type )( int ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Vector3< double > ( exported_class_t::*GetRow_function_type )( int ) const;
             
             Matrix3_exposer.def( 
                 "GetRow"
-                , GetRow_function_type( &::Wm3::Matrix3< double >::GetRow )
+                , GetRow_function_type( &Matrix3< double >::GetRow )
                 , ( bp::arg("iRow") ) );
         
         }
-        { //::Wm3::Matrix3< double >::Inverse
+        { //Matrix3< double >::Inverse
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*Inverse_function_type )(  ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*Inverse_function_type )(  ) const;
             
             Matrix3_exposer.def( 
                 "Inverse"
-                , Inverse_function_type( &::Wm3::Matrix3< double >::Inverse ) );
+                , Inverse_function_type( &Matrix3< double >::Inverse ) );
         
         }
-        { //::Wm3::Matrix3< double >::MakeDiagonal
+        { //Matrix3< double >::MakeDiagonal
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > & ( exported_class_t::*MakeDiagonal_function_type )( double,double,double ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > & ( exported_class_t::*MakeDiagonal_function_type )( double,double,double ) ;
             
             Matrix3_exposer.def( 
                 "MakeDiagonal"
-                , MakeDiagonal_function_type( &::Wm3::Matrix3< double >::MakeDiagonal )
+                , MakeDiagonal_function_type( &Matrix3< double >::MakeDiagonal )
                 , ( bp::arg("fM00"), bp::arg("fM11"), bp::arg("fM22") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Matrix3< double >::MakeIdentity
+        { //Matrix3< double >::MakeIdentity
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > & ( exported_class_t::*MakeIdentity_function_type )(  ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > & ( exported_class_t::*MakeIdentity_function_type )(  ) ;
             
             Matrix3_exposer.def( 
                 "MakeIdentity"
-                , MakeIdentity_function_type( &::Wm3::Matrix3< double >::MakeIdentity )
+                , MakeIdentity_function_type( &Matrix3< double >::MakeIdentity )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Matrix3< double >::MakeTensorProduct
+        { //Matrix3< double >::MakeTensorProduct
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > & ( exported_class_t::*MakeTensorProduct_function_type )( ::Wm3::Vector3< double > const &,::Wm3::Vector3< double > const & ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > & ( exported_class_t::*MakeTensorProduct_function_type )( Vector3< double > const &,Vector3< double > const & ) ;
             
             Matrix3_exposer.def( 
                 "MakeTensorProduct"
-                , MakeTensorProduct_function_type( &::Wm3::Matrix3< double >::MakeTensorProduct )
+                , MakeTensorProduct_function_type( &Matrix3< double >::MakeTensorProduct )
                 , ( bp::arg("rkU"), bp::arg("rkV") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Matrix3< double >::MakeZero
+        { //Matrix3< double >::MakeZero
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > & ( exported_class_t::*MakeZero_function_type )(  ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > & ( exported_class_t::*MakeZero_function_type )(  ) ;
             
             Matrix3_exposer.def( 
                 "MakeZero"
-                , MakeZero_function_type( &::Wm3::Matrix3< double >::MakeZero )
+                , MakeZero_function_type( &Matrix3< double >::MakeZero )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Matrix3< double >::Orthonormalize
+        { //Matrix3< double >::Orthonormalize
         
-            typedef Wm3::Matrix3< double > exported_class_t;
+            typedef Matrix3< double > exported_class_t;
             typedef void ( exported_class_t::*Orthonormalize_function_type )(  ) ;
             
             Matrix3_exposer.def( 
                 "Orthonormalize"
-                , Orthonormalize_function_type( &::Wm3::Matrix3< double >::Orthonormalize ) );
+                , Orthonormalize_function_type( &Matrix3< double >::Orthonormalize ) );
         
         }
-        { //::Wm3::Matrix3< double >::QDUDecomposition
+        { //Matrix3< double >::QDUDecomposition
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*QDUDecomposition_function_type )( ::Wm3::Matrix3< double > &,::Wm3::Matrix3< double > &,::Wm3::Matrix3< double > & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef void ( exported_class_t::*QDUDecomposition_function_type )( Matrix3< double > &,Matrix3< double > &,Matrix3< double > & ) const;
             
             Matrix3_exposer.def( 
                 "QDUDecomposition"
-                , QDUDecomposition_function_type( &::Wm3::Matrix3< double >::QDUDecomposition )
+                , QDUDecomposition_function_type( &Matrix3< double >::QDUDecomposition )
                 , ( bp::arg("rkQ"), bp::arg("rkD"), bp::arg("rkU") ) );
         
         }
-        { //::Wm3::Matrix3< double >::QForm
+        { //Matrix3< double >::QForm
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef double ( exported_class_t::*QForm_function_type )( ::Wm3::Vector3< double > const &,::Wm3::Vector3< double > const & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef double ( exported_class_t::*QForm_function_type )( Vector3< double > const &,Vector3< double > const & ) const;
             
             Matrix3_exposer.def( 
                 "QForm"
-                , QForm_function_type( &::Wm3::Matrix3< double >::QForm )
+                , QForm_function_type( &Matrix3< double >::QForm )
                 , ( bp::arg("rkU"), bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Matrix3< double >::SetColumn
+        { //Matrix3< double >::SetColumn
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*SetColumn_function_type )( int,::Wm3::Vector3< double > const & ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef void ( exported_class_t::*SetColumn_function_type )( int,Vector3< double > const & ) ;
             
             Matrix3_exposer.def( 
                 "SetColumn"
-                , SetColumn_function_type( &::Wm3::Matrix3< double >::SetColumn )
+                , SetColumn_function_type( &Matrix3< double >::SetColumn )
                 , ( bp::arg("iCol"), bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Matrix3< double >::SetRow
+        { //Matrix3< double >::SetRow
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*SetRow_function_type )( int,::Wm3::Vector3< double > const & ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef void ( exported_class_t::*SetRow_function_type )( int,Vector3< double > const & ) ;
             
             Matrix3_exposer.def( 
                 "SetRow"
-                , SetRow_function_type( &::Wm3::Matrix3< double >::SetRow )
+                , SetRow_function_type( &Matrix3< double >::SetRow )
                 , ( bp::arg("iRow"), bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Matrix3< double >::SingularValueComposition
+        { //Matrix3< double >::SingularValueComposition
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*SingularValueComposition_function_type )( ::Wm3::Matrix3< double > const &,::Wm3::Matrix3< double > const &,::Wm3::Matrix3< double > const & ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef void ( exported_class_t::*SingularValueComposition_function_type )( Matrix3< double > const &,Matrix3< double > const &,Matrix3< double > const & ) ;
             
             Matrix3_exposer.def( 
                 "SingularValueComposition"
-                , SingularValueComposition_function_type( &::Wm3::Matrix3< double >::SingularValueComposition )
+                , SingularValueComposition_function_type( &Matrix3< double >::SingularValueComposition )
                 , ( bp::arg("rkL"), bp::arg("rkS"), bp::arg("rkR") ) );
         
         }
-        { //::Wm3::Matrix3< double >::SingularValueDecomposition
+        { //Matrix3< double >::SingularValueDecomposition
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef void ( exported_class_t::*SingularValueDecomposition_function_type )( ::Wm3::Matrix3< double > &,::Wm3::Matrix3< double > &,::Wm3::Matrix3< double > & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef void ( exported_class_t::*SingularValueDecomposition_function_type )( Matrix3< double > &,Matrix3< double > &,Matrix3< double > & ) const;
             
             Matrix3_exposer.def( 
                 "SingularValueDecomposition"
-                , SingularValueDecomposition_function_type( &::Wm3::Matrix3< double >::SingularValueDecomposition )
+                , SingularValueDecomposition_function_type( &Matrix3< double >::SingularValueDecomposition )
                 , ( bp::arg("rkL"), bp::arg("rkS"), bp::arg("rkR") ) );
         
         }
-        { //::Wm3::Matrix3< double >::Slerp
+        { //Matrix3< double >::Slerp
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( *Slerp_function_type )( double,::Wm3::Matrix3< double > const &,::Wm3::Matrix3< double > const & );
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( *Slerp_function_type )( double,Matrix3< double > const &,Matrix3< double > const & );
             
             Matrix3_exposer.def( 
                 "Slerp"
-                , Slerp_function_type( &::Wm3::Matrix3< double >::Slerp )
+                , Slerp_function_type( &Matrix3< double >::Slerp )
                 , ( bp::arg("fT"), bp::arg("rkR0"), bp::arg("rkR1") ) );
         
         }
-        { //::Wm3::Matrix3< double >::TimesDiagonal
+        { //Matrix3< double >::TimesDiagonal
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*TimesDiagonal_function_type )( ::Wm3::Vector3< double > const & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*TimesDiagonal_function_type )( Vector3< double > const & ) const;
             
             Matrix3_exposer.def( 
                 "TimesDiagonal"
-                , TimesDiagonal_function_type( &::Wm3::Matrix3< double >::TimesDiagonal )
+                , TimesDiagonal_function_type( &Matrix3< double >::TimesDiagonal )
                 , ( bp::arg("rkDiag") ) );
         
         }
-        { //::Wm3::Matrix3< double >::TimesTranspose
+        { //Matrix3< double >::TimesTranspose
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*TimesTranspose_function_type )( ::Wm3::Matrix3< double > const & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*TimesTranspose_function_type )( Matrix3< double > const & ) const;
             
             Matrix3_exposer.def( 
                 "TimesTranspose"
-                , TimesTranspose_function_type( &::Wm3::Matrix3< double >::TimesTranspose )
+                , TimesTranspose_function_type( &Matrix3< double >::TimesTranspose )
                 , ( bp::arg("rkM") ) );
         
         }
-        { //::Wm3::Matrix3< double >::ToAxisAngle
+        { //Matrix3< double >::ToAxisAngle
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef boost::python::tuple ( *ToAxisAngle_function_type )( ::Wm3::Matrix3<double> const & );
+            typedef Matrix3< double > exported_class_t;
+            typedef boost::python::tuple ( *ToAxisAngle_function_type )( Matrix3<double> const & );
             
             Matrix3_exposer.def( 
                 "ToAxisAngle"
@@ -303,42 +303,42 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
                 , ( bp::arg("inst") ) );
         
         }
-        { //::Wm3::Matrix3< double >::Transpose
+        { //Matrix3< double >::Transpose
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*Transpose_function_type )(  ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*Transpose_function_type )(  ) const;
             
             Matrix3_exposer.def( 
                 "Transpose"
-                , Transpose_function_type( &::Wm3::Matrix3< double >::Transpose ) );
+                , Transpose_function_type( &Matrix3< double >::Transpose ) );
         
         }
-        { //::Wm3::Matrix3< double >::TransposeTimes
+        { //Matrix3< double >::TransposeTimes
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > ( exported_class_t::*TransposeTimes_function_type )( ::Wm3::Matrix3< double > const & ) const;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > ( exported_class_t::*TransposeTimes_function_type )( Matrix3< double > const & ) const;
             
             Matrix3_exposer.def( 
                 "TransposeTimes"
-                , TransposeTimes_function_type( &::Wm3::Matrix3< double >::TransposeTimes )
+                , TransposeTimes_function_type( &Matrix3< double >::TransposeTimes )
                 , ( bp::arg("rkM") ) );
         
         }
         Matrix3_exposer.def( bp::self != bp::self );
-        { //::Wm3::Matrix3< double >::operator()
+        { //Matrix3< double >::operator()
         
-            typedef Wm3::Matrix3< double > exported_class_t;
+            typedef Matrix3< double > exported_class_t;
             typedef double ( exported_class_t::*__call___function_type )( int,int ) const;
             
             Matrix3_exposer.def( 
                 "__call__"
-                , __call___function_type( &::Wm3::Matrix3< double >::operator() )
+                , __call___function_type( &Matrix3< double >::operator() )
                 , ( bp::arg("iRow"), bp::arg("iCol") ) );
         
         }
         Matrix3_exposer.def( bp::self * bp::self );
         Matrix3_exposer.def( bp::self * bp::other< double >() );
-        Matrix3_exposer.def( bp::self * bp::other< Wm3::Vector3< double > >() );
+        Matrix3_exposer.def( bp::self * bp::other< Vector3< double > >() );
         Matrix3_exposer.def( bp::self *= bp::other< double >() );
         Matrix3_exposer.def( bp::self + bp::self );
         Matrix3_exposer.def( bp::self += bp::self );
@@ -349,14 +349,14 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Matrix3_exposer.def( bp::self /= bp::other< double >() );
         Matrix3_exposer.def( bp::self < bp::self );
         Matrix3_exposer.def( bp::self <= bp::self );
-        { //::Wm3::Matrix3< double >::operator=
+        { //Matrix3< double >::operator=
         
-            typedef Wm3::Matrix3< double > exported_class_t;
-            typedef ::Wm3::Matrix3< double > & ( exported_class_t::*assign_function_type )( ::Wm3::Matrix3< double > const & ) ;
+            typedef Matrix3< double > exported_class_t;
+            typedef Matrix3< double > & ( exported_class_t::*assign_function_type )( Matrix3< double > const & ) ;
             
             Matrix3_exposer.def( 
                 "assign"
-                , assign_function_type( &::Wm3::Matrix3< double >::operator= )
+                , assign_function_type( &Matrix3< double >::operator= )
                 , ( bp::arg("rkM") )
                 , bp::return_self< >() );
         
@@ -370,231 +370,231 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Matrix3_exposer.add_property("ZERO",::Matrix3r_ZERO).add_property("IDENTITY",::Matrix3r_IDENTITY);
     }
 
-    { //::Wm3::Quaternion< double >
-        typedef bp::class_< Wm3::Quaternion< double > > Quaternion_exposer_t;
+    { //Quaternion< double >
+        typedef bp::class_< Quaternion< double > > Quaternion_exposer_t;
         Quaternion_exposer_t Quaternion_exposer = Quaternion_exposer_t( "Quaternion", bp::init< >() );
         bp::scope Quaternion_scope( Quaternion_exposer );
         Quaternion_exposer.def( bp::init< double, double, double, double >(( bp::arg("fW"), bp::arg("fX"), bp::arg("fY"), bp::arg("fZ") )) );
-        Quaternion_exposer.def( bp::init< Wm3::Quaternion< double > const & >(( bp::arg("rkQ") )) );
-        Quaternion_exposer.def( bp::init< Wm3::Matrix3< double > const & >(( bp::arg("rkRot") )) );
-        bp::implicitly_convertible< Wm3::Matrix3< double > const &, Wm3::Quaternion< double > >();
-        Quaternion_exposer.def( bp::init< Wm3::Vector3< double > const &, double >(( bp::arg("rkAxis"), bp::arg("fAngle") )) );
-        Quaternion_exposer.def( bp::init< Wm3::Vector3< double > const * >(( bp::arg("akRotColumn") )) );
-        bp::implicitly_convertible< Wm3::Vector3< double > const *, Wm3::Quaternion< double > >();
-        { //::Wm3::Quaternion< double >::Align
+        Quaternion_exposer.def( bp::init< Quaternion< double > const & >(( bp::arg("rkQ") )) );
+        Quaternion_exposer.def( bp::init< Matrix3< double > const & >(( bp::arg("rkRot") )) );
+        bp::implicitly_convertible< Matrix3< double > const &, Quaternion< double > >();
+        Quaternion_exposer.def( bp::init< Vector3< double > const &, double >(( bp::arg("rkAxis"), bp::arg("fAngle") )) );
+        Quaternion_exposer.def( bp::init< Vector3< double > const * >(( bp::arg("akRotColumn") )) );
+        bp::implicitly_convertible< Vector3< double > const *, Quaternion< double > >();
+        { //Quaternion< double >::Align
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*Align_function_type )( ::Wm3::Vector3< double > const &,::Wm3::Vector3< double > const & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*Align_function_type )( Vector3< double > const &,Vector3< double > const & ) ;
             
             Quaternion_exposer.def( 
                 "Align"
-                , Align_function_type( &::Wm3::Quaternion< double >::Align )
+                , Align_function_type( &Quaternion< double >::Align )
                 , ( bp::arg("rkV1"), bp::arg("rkV2") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::Conjugate
+        { //Quaternion< double >::Conjugate
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > ( exported_class_t::*Conjugate_function_type )(  ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > ( exported_class_t::*Conjugate_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Conjugate"
-                , Conjugate_function_type( &::Wm3::Quaternion< double >::Conjugate ) );
+                , Conjugate_function_type( &Quaternion< double >::Conjugate ) );
         
         }
-        { //::Wm3::Quaternion< double >::DecomposeSwingTimesTwist
+        { //Quaternion< double >::DecomposeSwingTimesTwist
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*DecomposeSwingTimesTwist_function_type )( ::Wm3::Vector3< double > const &,::Wm3::Quaternion< double > &,::Wm3::Quaternion< double > & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef void ( exported_class_t::*DecomposeSwingTimesTwist_function_type )( Vector3< double > const &,Quaternion< double > &,Quaternion< double > & ) ;
             
             Quaternion_exposer.def( 
                 "DecomposeSwingTimesTwist"
-                , DecomposeSwingTimesTwist_function_type( &::Wm3::Quaternion< double >::DecomposeSwingTimesTwist )
+                , DecomposeSwingTimesTwist_function_type( &Quaternion< double >::DecomposeSwingTimesTwist )
                 , ( bp::arg("rkV1"), bp::arg("rkSwing"), bp::arg("rkTwist") ) );
         
         }
-        { //::Wm3::Quaternion< double >::DecomposeTwistTimesSwing
+        { //Quaternion< double >::DecomposeTwistTimesSwing
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*DecomposeTwistTimesSwing_function_type )( ::Wm3::Vector3< double > const &,::Wm3::Quaternion< double > &,::Wm3::Quaternion< double > & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef void ( exported_class_t::*DecomposeTwistTimesSwing_function_type )( Vector3< double > const &,Quaternion< double > &,Quaternion< double > & ) ;
             
             Quaternion_exposer.def( 
                 "DecomposeTwistTimesSwing"
-                , DecomposeTwistTimesSwing_function_type( &::Wm3::Quaternion< double >::DecomposeTwistTimesSwing )
+                , DecomposeTwistTimesSwing_function_type( &Quaternion< double >::DecomposeTwistTimesSwing )
                 , ( bp::arg("rkV1"), bp::arg("rkTwist"), bp::arg("rkSwing") ) );
         
         }
-        { //::Wm3::Quaternion< double >::Dot
+        { //Quaternion< double >::Dot
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef double ( exported_class_t::*Dot_function_type )( ::Wm3::Quaternion< double > const & ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef double ( exported_class_t::*Dot_function_type )( Quaternion< double > const & ) const;
             
             Quaternion_exposer.def( 
                 "Dot"
-                , Dot_function_type( &::Wm3::Quaternion< double >::Dot )
+                , Dot_function_type( &Quaternion< double >::Dot )
                 , ( bp::arg("rkQ") ) );
         
         }
-        { //::Wm3::Quaternion< double >::Exp
+        { //Quaternion< double >::Exp
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > ( exported_class_t::*Exp_function_type )(  ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > ( exported_class_t::*Exp_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Exp"
-                , Exp_function_type( &::Wm3::Quaternion< double >::Exp ) );
+                , Exp_function_type( &Quaternion< double >::Exp ) );
         
         }
-        { //::Wm3::Quaternion< double >::FromAxisAngle
+        { //Quaternion< double >::FromAxisAngle
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*FromAxisAngle_function_type )( ::Wm3::Vector3< double > const &,double ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*FromAxisAngle_function_type )( Vector3< double > const &,double ) ;
             
             Quaternion_exposer.def( 
                 "FromAxisAngle"
-                , FromAxisAngle_function_type( &::Wm3::Quaternion< double >::FromAxisAngle )
+                , FromAxisAngle_function_type( &Quaternion< double >::FromAxisAngle )
                 , ( bp::arg("rkAxis"), bp::arg("fAngle") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::FromRotationMatrix
+        { //Quaternion< double >::FromRotationMatrix
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*FromRotationMatrix_function_type )( ::Wm3::Matrix3< double > const & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*FromRotationMatrix_function_type )( Matrix3< double > const & ) ;
             
             Quaternion_exposer.def( 
                 "FromRotationMatrix"
-                , FromRotationMatrix_function_type( &::Wm3::Quaternion< double >::FromRotationMatrix )
+                , FromRotationMatrix_function_type( &Quaternion< double >::FromRotationMatrix )
                 , ( bp::arg("rkRot") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::FromRotationMatrix
+        { //Quaternion< double >::FromRotationMatrix
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*FromRotationMatrix_function_type )( ::Wm3::Vector3< double > const * ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*FromRotationMatrix_function_type )( Vector3< double > const * ) ;
             
             Quaternion_exposer.def( 
                 "FromRotationMatrix"
-                , FromRotationMatrix_function_type( &::Wm3::Quaternion< double >::FromRotationMatrix )
+                , FromRotationMatrix_function_type( &Quaternion< double >::FromRotationMatrix )
                 , ( bp::arg("akRotColumn") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::Intermediate
+        { //Quaternion< double >::Intermediate
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*Intermediate_function_type )( ::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*Intermediate_function_type )( Quaternion< double > const &,Quaternion< double > const &,Quaternion< double > const & ) ;
             
             Quaternion_exposer.def( 
                 "Intermediate"
-                , Intermediate_function_type( &::Wm3::Quaternion< double >::Intermediate )
+                , Intermediate_function_type( &Quaternion< double >::Intermediate )
                 , ( bp::arg("rkQ0"), bp::arg("rkQ1"), bp::arg("rkQ2") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::Inverse
+        { //Quaternion< double >::Inverse
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > ( exported_class_t::*Inverse_function_type )(  ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > ( exported_class_t::*Inverse_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Inverse"
-                , Inverse_function_type( &::Wm3::Quaternion< double >::Inverse ) );
+                , Inverse_function_type( &Quaternion< double >::Inverse ) );
         
         }
-        { //::Wm3::Quaternion< double >::Length
+        { //Quaternion< double >::Length
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*Length_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Length"
-                , Length_function_type( &::Wm3::Quaternion< double >::Length ) );
+                , Length_function_type( &Quaternion< double >::Length ) );
         
         }
-        { //::Wm3::Quaternion< double >::Log
+        { //Quaternion< double >::Log
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > ( exported_class_t::*Log_function_type )(  ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > ( exported_class_t::*Log_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Log"
-                , Log_function_type( &::Wm3::Quaternion< double >::Log ) );
+                , Log_function_type( &Quaternion< double >::Log ) );
         
         }
-        { //::Wm3::Quaternion< double >::Normalize
+        { //Quaternion< double >::Normalize
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*Normalize_function_type )(  ) ;
             
             Quaternion_exposer.def( 
                 "Normalize"
-                , Normalize_function_type( &::Wm3::Quaternion< double >::Normalize ) );
+                , Normalize_function_type( &Quaternion< double >::Normalize ) );
         
         }
-        { //::Wm3::Quaternion< double >::Rotate
+        { //Quaternion< double >::Rotate
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Vector3< double > ( exported_class_t::*Rotate_function_type )( ::Wm3::Vector3< double > const & ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef Vector3< double > ( exported_class_t::*Rotate_function_type )( Vector3< double > const & ) const;
             
             Quaternion_exposer.def( 
                 "Rotate"
-                , Rotate_function_type( &::Wm3::Quaternion< double >::Rotate )
+                , Rotate_function_type( &Quaternion< double >::Rotate )
                 , ( bp::arg("rkVector") ) );
         
         }
-        { //::Wm3::Quaternion< double >::Slerp
+        { //Quaternion< double >::Slerp
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*Slerp_function_type )( double,::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*Slerp_function_type )( double,Quaternion< double > const &,Quaternion< double > const & ) ;
             
             Quaternion_exposer.def( 
                 "Slerp"
-                , Slerp_function_type( &::Wm3::Quaternion< double >::Slerp )
+                , Slerp_function_type( &Quaternion< double >::Slerp )
                 , ( bp::arg("fT"), bp::arg("rkP"), bp::arg("rkQ") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::SlerpExtraSpins
+        { //Quaternion< double >::SlerpExtraSpins
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*SlerpExtraSpins_function_type )( double,::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const &,int ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*SlerpExtraSpins_function_type )( double,Quaternion< double > const &,Quaternion< double > const &,int ) ;
             
             Quaternion_exposer.def( 
                 "SlerpExtraSpins"
-                , SlerpExtraSpins_function_type( &::Wm3::Quaternion< double >::SlerpExtraSpins )
+                , SlerpExtraSpins_function_type( &Quaternion< double >::SlerpExtraSpins )
                 , ( bp::arg("fT"), bp::arg("rkP"), bp::arg("rkQ"), bp::arg("iExtraSpins") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::Squad
+        { //Quaternion< double >::Squad
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*Squad_function_type )( double,::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const &,::Wm3::Quaternion< double > const & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*Squad_function_type )( double,Quaternion< double > const &,Quaternion< double > const &,Quaternion< double > const &,Quaternion< double > const & ) ;
             
             Quaternion_exposer.def( 
                 "Squad"
-                , Squad_function_type( &::Wm3::Quaternion< double >::Squad )
+                , Squad_function_type( &Quaternion< double >::Squad )
                 , ( bp::arg("fT"), bp::arg("rkQ0"), bp::arg("rkA0"), bp::arg("rkA1"), bp::arg("rkQ1") )
                 , bp::return_self< >() );
         
         }
-        { //::Wm3::Quaternion< double >::SquaredLength
+        { //Quaternion< double >::SquaredLength
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*SquaredLength_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "SquaredLength"
-                , SquaredLength_function_type( &::Wm3::Quaternion< double >::SquaredLength ) );
+                , SquaredLength_function_type( &Quaternion< double >::SquaredLength ) );
         
         }
-        { //::Wm3::Quaternion< double >::ToAxisAngle
+        { //Quaternion< double >::ToAxisAngle
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef boost::python::tuple ( *ToAxisAngle_function_type )( ::Wm3::Quaternion<double> const & );
+            typedef Quaternion< double > exported_class_t;
+            typedef boost::python::tuple ( *ToAxisAngle_function_type )( Quaternion<double> const & );
             
             Quaternion_exposer.def( 
                 "ToAxisAngle"
@@ -602,66 +602,66 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
                 , ( bp::arg("inst") ) );
         
         }
-        { //::Wm3::Quaternion< double >::ToRotationMatrix
+        { //Quaternion< double >::ToRotationMatrix
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*ToRotationMatrix_function_type )( ::Wm3::Matrix3< double > & ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef void ( exported_class_t::*ToRotationMatrix_function_type )( Matrix3< double > & ) const;
             
             Quaternion_exposer.def( 
                 "ToRotationMatrix"
-                , ToRotationMatrix_function_type( &::Wm3::Quaternion< double >::ToRotationMatrix )
+                , ToRotationMatrix_function_type( &Quaternion< double >::ToRotationMatrix )
                 , ( bp::arg("rkRot") ) );
         
         }
-        { //::Wm3::Quaternion< double >::ToRotationMatrix
+        { //Quaternion< double >::ToRotationMatrix
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef void ( exported_class_t::*ToRotationMatrix_function_type )( ::Wm3::Vector3< double > * ) const;
+            typedef Quaternion< double > exported_class_t;
+            typedef void ( exported_class_t::*ToRotationMatrix_function_type )( Vector3< double > * ) const;
             
             Quaternion_exposer.def( 
                 "ToRotationMatrix"
-                , ToRotationMatrix_function_type( &::Wm3::Quaternion< double >::ToRotationMatrix )
+                , ToRotationMatrix_function_type( &Quaternion< double >::ToRotationMatrix )
                 , ( bp::arg("akRotColumn") ) );
         
         }
-        { //::Wm3::Quaternion< double >::W
+        { //Quaternion< double >::W
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*W_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "W"
-                , W_function_type( &::Wm3::Quaternion< double >::W ) );
+                , W_function_type( &Quaternion< double >::W ) );
         
         }
-        { //::Wm3::Quaternion< double >::X
+        { //Quaternion< double >::X
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*X_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "X"
-                , X_function_type( &::Wm3::Quaternion< double >::X ) );
+                , X_function_type( &Quaternion< double >::X ) );
         
         }
-        { //::Wm3::Quaternion< double >::Y
+        { //Quaternion< double >::Y
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*Y_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Y"
-                , Y_function_type( &::Wm3::Quaternion< double >::Y ) );
+                , Y_function_type( &Quaternion< double >::Y ) );
         
         }
-        { //::Wm3::Quaternion< double >::Z
+        { //Quaternion< double >::Z
         
-            typedef Wm3::Quaternion< double > exported_class_t;
+            typedef Quaternion< double > exported_class_t;
             typedef double ( exported_class_t::*Z_function_type )(  ) const;
             
             Quaternion_exposer.def( 
                 "Z"
-                , Z_function_type( &::Wm3::Quaternion< double >::Z ) );
+                , Z_function_type( &Quaternion< double >::Z ) );
         
         }
         Quaternion_exposer.def( bp::self != bp::self );
@@ -677,14 +677,14 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Quaternion_exposer.def( bp::self /= bp::other< double >() );
         Quaternion_exposer.def( bp::self < bp::self );
         Quaternion_exposer.def( bp::self <= bp::self );
-        { //::Wm3::Quaternion< double >::operator=
+        { //Quaternion< double >::operator=
         
-            typedef Wm3::Quaternion< double > exported_class_t;
-            typedef ::Wm3::Quaternion< double > & ( exported_class_t::*assign_function_type )( ::Wm3::Quaternion< double > const & ) ;
+            typedef Quaternion< double > exported_class_t;
+            typedef Quaternion< double > & ( exported_class_t::*assign_function_type )( Quaternion< double > const & ) ;
             
             Quaternion_exposer.def( 
                 "assign"
-                , assign_function_type( &::Wm3::Quaternion< double >::operator= )
+                , assign_function_type( &Quaternion< double >::operator= )
                 , ( bp::arg("rkQ") )
                 , bp::return_self< >() );
         
@@ -692,154 +692,154 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Quaternion_exposer.def( bp::self == bp::self );
         Quaternion_exposer.def( bp::self > bp::self );
         Quaternion_exposer.def( bp::self >= bp::self );
-        Quaternion_exposer.def( bp::self * bp::other< Wm3::Vector3< double > >() );
+        Quaternion_exposer.def( bp::self * bp::other< Vector3< double > >() );
         Quaternion_exposer.def( bp::self_ns::str( bp::self ) );
         Quaternion_exposer.def("__len__",&::Quaternion_len).staticmethod("__len__").def("__setitem__",&::Quaternion_set_item).def("__getitem__",&::Quaternion_get_item).def("__str__",&::Quaternion_str).def("__repr__",&::Quaternion_str);
         Quaternion_exposer.add_property("ZERO",::Quaternionr_ZERO).add_property("IDENTITY",::Quaternionr_IDENTITY);
     }
 
-    { //::Wm3::Vector2< double >
-        typedef bp::class_< Wm3::Vector2< double > > Vector2_exposer_t;
+    { //Vector2< double >
+        typedef bp::class_< Vector2< double > > Vector2_exposer_t;
         Vector2_exposer_t Vector2_exposer = Vector2_exposer_t( "Vector2", bp::init< >() );
         bp::scope Vector2_scope( Vector2_exposer );
         Vector2_exposer.def( bp::init< double, double >(( bp::arg("fX"), bp::arg("fY") )) );
         Vector2_exposer.def( bp::init< double const * >(( bp::arg("afTuple") )) );
-        bp::implicitly_convertible< double const *, Wm3::Vector2< double > >();
-        Vector2_exposer.def( bp::init< Wm3::Vector2< double > const & >(( bp::arg("rkV") )) );
-        { //::Wm3::Vector2< double >::ComputeExtremes
+        bp::implicitly_convertible< double const *, Vector2< double > >();
+        Vector2_exposer.def( bp::init< Vector2< double > const & >(( bp::arg("rkV") )) );
+        { //Vector2< double >::ComputeExtremes
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef void ( *ComputeExtremes_function_type )( int,::Wm3::Vector2< double > const *,::Wm3::Vector2< double > &,::Wm3::Vector2< double > & );
+            typedef Vector2< double > exported_class_t;
+            typedef void ( *ComputeExtremes_function_type )( int,Vector2< double > const *,Vector2< double > &,Vector2< double > & );
             
             Vector2_exposer.def( 
                 "ComputeExtremes"
-                , ComputeExtremes_function_type( &::Wm3::Vector2< double >::ComputeExtremes )
+                , ComputeExtremes_function_type( &Vector2< double >::ComputeExtremes )
                 , ( bp::arg("iVQuantity"), bp::arg("akPoint"), bp::arg("rkMin"), bp::arg("rkMax") ) );
         
         }
-        { //::Wm3::Vector2< double >::Dot
+        { //Vector2< double >::Dot
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef double ( exported_class_t::*Dot_function_type )( ::Wm3::Vector2< double > const & ) const;
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*Dot_function_type )( Vector2< double > const & ) const;
             
             Vector2_exposer.def( 
                 "Dot"
-                , Dot_function_type( &::Wm3::Vector2< double >::Dot )
+                , Dot_function_type( &Vector2< double >::Dot )
                 , ( bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Vector2< double >::DotPerp
+        { //Vector2< double >::DotPerp
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef double ( exported_class_t::*DotPerp_function_type )( ::Wm3::Vector2< double > const & ) const;
+            typedef Vector2< double > exported_class_t;
+            typedef double ( exported_class_t::*DotPerp_function_type )( Vector2< double > const & ) const;
             
             Vector2_exposer.def( 
                 "DotPerp"
-                , DotPerp_function_type( &::Wm3::Vector2< double >::DotPerp )
+                , DotPerp_function_type( &Vector2< double >::DotPerp )
                 , ( bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Vector2< double >::GenerateOrthonormalBasis
+        { //Vector2< double >::GenerateOrthonormalBasis
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef void ( *GenerateOrthonormalBasis_function_type )( ::Wm3::Vector2< double > &,::Wm3::Vector2< double > &,bool );
+            typedef Vector2< double > exported_class_t;
+            typedef void ( *GenerateOrthonormalBasis_function_type )( Vector2< double > &,Vector2< double > &,bool );
             
             Vector2_exposer.def( 
                 "GenerateOrthonormalBasis"
-                , GenerateOrthonormalBasis_function_type( &::Wm3::Vector2< double >::GenerateOrthonormalBasis )
+                , GenerateOrthonormalBasis_function_type( &Vector2< double >::GenerateOrthonormalBasis )
                 , ( bp::arg("rkU"), bp::arg("rkV"), bp::arg("bUnitLengthV") ) );
         
         }
-        { //::Wm3::Vector2< double >::GetBarycentrics
+        { //Vector2< double >::GetBarycentrics
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef void ( exported_class_t::*GetBarycentrics_function_type )( ::Wm3::Vector2< double > const &,::Wm3::Vector2< double > const &,::Wm3::Vector2< double > const &,double * ) const;
+            typedef Vector2< double > exported_class_t;
+            typedef void ( exported_class_t::*GetBarycentrics_function_type )( Vector2< double > const &,Vector2< double > const &,Vector2< double > const &,double * ) const;
             
             Vector2_exposer.def( 
                 "GetBarycentrics"
-                , GetBarycentrics_function_type( &::Wm3::Vector2< double >::GetBarycentrics )
+                , GetBarycentrics_function_type( &Vector2< double >::GetBarycentrics )
                 , ( bp::arg("rkV0"), bp::arg("rkV1"), bp::arg("rkV2"), bp::arg("afBary") ) );
         
         }
-        { //::Wm3::Vector2< double >::Length
+        { //Vector2< double >::Length
         
-            typedef Wm3::Vector2< double > exported_class_t;
+            typedef Vector2< double > exported_class_t;
             typedef double ( exported_class_t::*Length_function_type )(  ) const;
             
             Vector2_exposer.def( 
                 "Length"
-                , Length_function_type( &::Wm3::Vector2< double >::Length ) );
+                , Length_function_type( &Vector2< double >::Length ) );
         
         }
-        { //::Wm3::Vector2< double >::Normalize
+        { //Vector2< double >::Normalize
         
-            typedef Wm3::Vector2< double > exported_class_t;
+            typedef Vector2< double > exported_class_t;
             typedef double ( exported_class_t::*Normalize_function_type )(  ) ;
             
             Vector2_exposer.def( 
                 "Normalize"
-                , Normalize_function_type( &::Wm3::Vector2< double >::Normalize ) );
+                , Normalize_function_type( &Vector2< double >::Normalize ) );
         
         }
-        { //::Wm3::Vector2< double >::Orthonormalize
+        { //Vector2< double >::Orthonormalize
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef void ( *Orthonormalize_function_type )( ::Wm3::Vector2< double > &,::Wm3::Vector2< double > & );
+            typedef Vector2< double > exported_class_t;
+            typedef void ( *Orthonormalize_function_type )( Vector2< double > &,Vector2< double > & );
             
             Vector2_exposer.def( 
                 "Orthonormalize"
-                , Orthonormalize_function_type( &::Wm3::Vector2< double >::Orthonormalize )
+                , Orthonormalize_function_type( &Vector2< double >::Orthonormalize )
                 , ( bp::arg("rkU"), bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Vector2< double >::Perp
+        { //Vector2< double >::Perp
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef ::Wm3::Vector2< double > ( exported_class_t::*Perp_function_type )(  ) const;
+            typedef Vector2< double > exported_class_t;
+            typedef Vector2< double > ( exported_class_t::*Perp_function_type )(  ) const;
             
             Vector2_exposer.def( 
                 "Perp"
-                , Perp_function_type( &::Wm3::Vector2< double >::Perp ) );
+                , Perp_function_type( &Vector2< double >::Perp ) );
         
         }
-        { //::Wm3::Vector2< double >::SquaredLength
+        { //Vector2< double >::SquaredLength
         
-            typedef Wm3::Vector2< double > exported_class_t;
+            typedef Vector2< double > exported_class_t;
             typedef double ( exported_class_t::*SquaredLength_function_type )(  ) const;
             
             Vector2_exposer.def( 
                 "SquaredLength"
-                , SquaredLength_function_type( &::Wm3::Vector2< double >::SquaredLength ) );
+                , SquaredLength_function_type( &Vector2< double >::SquaredLength ) );
         
         }
-        { //::Wm3::Vector2< double >::UnitPerp
+        { //Vector2< double >::UnitPerp
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef ::Wm3::Vector2< double > ( exported_class_t::*UnitPerp_function_type )(  ) const;
+            typedef Vector2< double > exported_class_t;
+            typedef Vector2< double > ( exported_class_t::*UnitPerp_function_type )(  ) const;
             
             Vector2_exposer.def( 
                 "UnitPerp"
-                , UnitPerp_function_type( &::Wm3::Vector2< double >::UnitPerp ) );
+                , UnitPerp_function_type( &Vector2< double >::UnitPerp ) );
         
         }
-        { //::Wm3::Vector2< double >::X
+        { //Vector2< double >::X
         
-            typedef Wm3::Vector2< double > exported_class_t;
+            typedef Vector2< double > exported_class_t;
             typedef double ( exported_class_t::*X_function_type )(  ) const;
             
             Vector2_exposer.def( 
                 "X"
-                , X_function_type( &::Wm3::Vector2< double >::X ) );
+                , X_function_type( &Vector2< double >::X ) );
         
         }
-        { //::Wm3::Vector2< double >::Y
+        { //Vector2< double >::Y
         
-            typedef Wm3::Vector2< double > exported_class_t;
+            typedef Vector2< double > exported_class_t;
             typedef double ( exported_class_t::*Y_function_type )(  ) const;
             
             Vector2_exposer.def( 
                 "Y"
-                , Y_function_type( &::Wm3::Vector2< double >::Y ) );
+                , Y_function_type( &Vector2< double >::Y ) );
         
         }
         Vector2_exposer.def( bp::self != bp::self );
@@ -854,14 +854,14 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Vector2_exposer.def( bp::self /= bp::other< double >() );
         Vector2_exposer.def( bp::self < bp::self );
         Vector2_exposer.def( bp::self <= bp::self );
-        { //::Wm3::Vector2< double >::operator=
+        { //Vector2< double >::operator=
         
-            typedef Wm3::Vector2< double > exported_class_t;
-            typedef ::Wm3::Vector2< double > & ( exported_class_t::*assign_function_type )( ::Wm3::Vector2< double > const & ) ;
+            typedef Vector2< double > exported_class_t;
+            typedef Vector2< double > & ( exported_class_t::*assign_function_type )( Vector2< double > const & ) ;
             
             Vector2_exposer.def( 
                 "assign"
-                , assign_function_type( &::Wm3::Vector2< double >::operator= )
+                , assign_function_type( &Vector2< double >::operator= )
                 , ( bp::arg("rkV") )
                 , bp::return_self< >() );
         
@@ -879,160 +879,160 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 
     custom_Vector3r_from_tuple();
 
-    { //::Wm3::Vector3< double >
-        typedef bp::class_< Wm3::Vector3< double > > Vector3_exposer_t;
+    { //Vector3< double >
+        typedef bp::class_< Vector3< double > > Vector3_exposer_t;
         Vector3_exposer_t Vector3_exposer = Vector3_exposer_t( "Vector3", bp::init< >() );
         bp::scope Vector3_scope( Vector3_exposer );
         Vector3_exposer.def( bp::init< double, double, double >(( bp::arg("fX"), bp::arg("fY"), bp::arg("fZ") )) );
         Vector3_exposer.def( bp::init< double const * >(( bp::arg("afTuple") )) );
-        bp::implicitly_convertible< double const *, Wm3::Vector3< double > >();
-        Vector3_exposer.def( bp::init< Wm3::Vector3< double > const & >(( bp::arg("rkV") )) );
-        { //::Wm3::Vector3< double >::ComputeExtremes
+        bp::implicitly_convertible< double const *, Vector3< double > >();
+        Vector3_exposer.def( bp::init< Vector3< double > const & >(( bp::arg("rkV") )) );
+        { //Vector3< double >::ComputeExtremes
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef void ( *ComputeExtremes_function_type )( int,::Wm3::Vector3< double > const *,::Wm3::Vector3< double > &,::Wm3::Vector3< double > & );
+            typedef Vector3< double > exported_class_t;
+            typedef void ( *ComputeExtremes_function_type )( int,Vector3< double > const *,Vector3< double > &,Vector3< double > & );
             
             Vector3_exposer.def( 
                 "ComputeExtremes"
-                , ComputeExtremes_function_type( &::Wm3::Vector3< double >::ComputeExtremes )
+                , ComputeExtremes_function_type( &Vector3< double >::ComputeExtremes )
                 , ( bp::arg("iVQuantity"), bp::arg("akPoint"), bp::arg("rkMin"), bp::arg("rkMax") ) );
         
         }
-        { //::Wm3::Vector3< double >::Cross
+        { //Vector3< double >::Cross
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef ::Wm3::Vector3< double > ( exported_class_t::*Cross_function_type )( ::Wm3::Vector3< double > const & ) const;
+            typedef Vector3< double > exported_class_t;
+            typedef Vector3< double > ( exported_class_t::*Cross_function_type )( Vector3< double > const & ) const;
             
             Vector3_exposer.def( 
                 "Cross"
-                , Cross_function_type( &::Wm3::Vector3< double >::Cross )
+                , Cross_function_type( &Vector3< double >::Cross )
                 , ( bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Vector3< double >::Dot
+        { //Vector3< double >::Dot
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef double ( exported_class_t::*Dot_function_type )( ::Wm3::Vector3< double > const & ) const;
+            typedef Vector3< double > exported_class_t;
+            typedef double ( exported_class_t::*Dot_function_type )( Vector3< double > const & ) const;
             
             Vector3_exposer.def( 
                 "Dot"
-                , Dot_function_type( &::Wm3::Vector3< double >::Dot )
+                , Dot_function_type( &Vector3< double >::Dot )
                 , ( bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Vector3< double >::GenerateOrthonormalBasis
+        { //Vector3< double >::GenerateOrthonormalBasis
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef void ( *GenerateOrthonormalBasis_function_type )( ::Wm3::Vector3< double > &,::Wm3::Vector3< double > &,::Wm3::Vector3< double > &,bool );
+            typedef Vector3< double > exported_class_t;
+            typedef void ( *GenerateOrthonormalBasis_function_type )( Vector3< double > &,Vector3< double > &,Vector3< double > &,bool );
             
             Vector3_exposer.def( 
                 "GenerateOrthonormalBasis"
-                , GenerateOrthonormalBasis_function_type( &::Wm3::Vector3< double >::GenerateOrthonormalBasis )
+                , GenerateOrthonormalBasis_function_type( &Vector3< double >::GenerateOrthonormalBasis )
                 , ( bp::arg("rkU"), bp::arg("rkV"), bp::arg("rkW"), bp::arg("bUnitLengthW") ) );
         
         }
-        { //::Wm3::Vector3< double >::GetBarycentrics
+        { //Vector3< double >::GetBarycentrics
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef void ( exported_class_t::*GetBarycentrics_function_type )( ::Wm3::Vector3< double > const &,::Wm3::Vector3< double > const &,::Wm3::Vector3< double > const &,::Wm3::Vector3< double > const &,double * ) const;
+            typedef Vector3< double > exported_class_t;
+            typedef void ( exported_class_t::*GetBarycentrics_function_type )( Vector3< double > const &,Vector3< double > const &,Vector3< double > const &,Vector3< double > const &,double * ) const;
             
             Vector3_exposer.def( 
                 "GetBarycentrics"
-                , GetBarycentrics_function_type( &::Wm3::Vector3< double >::GetBarycentrics )
+                , GetBarycentrics_function_type( &Vector3< double >::GetBarycentrics )
                 , ( bp::arg("rkV0"), bp::arg("rkV1"), bp::arg("rkV2"), bp::arg("rkV3"), bp::arg("afBary") ) );
         
         }
-        { //::Wm3::Vector3< double >::Length
+        { //Vector3< double >::Length
         
-            typedef Wm3::Vector3< double > exported_class_t;
+            typedef Vector3< double > exported_class_t;
             typedef double ( exported_class_t::*Length_function_type )(  ) const;
             
             Vector3_exposer.def( 
                 "Length"
-                , Length_function_type( &::Wm3::Vector3< double >::Length ) );
+                , Length_function_type( &Vector3< double >::Length ) );
         
         }
-        { //::Wm3::Vector3< double >::Normalize
+        { //Vector3< double >::Normalize
         
-            typedef Wm3::Vector3< double > exported_class_t;
+            typedef Vector3< double > exported_class_t;
             typedef double ( exported_class_t::*Normalize_function_type )(  ) ;
             
             Vector3_exposer.def( 
                 "Normalize"
-                , Normalize_function_type( &::Wm3::Vector3< double >::Normalize ) );
+                , Normalize_function_type( &Vector3< double >::Normalize ) );
         
         }
-        { //::Wm3::Vector3< double >::Orthonormalize
+        { //Vector3< double >::Orthonormalize
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef void ( *Orthonormalize_function_type )( ::Wm3::Vector3< double > &,::Wm3::Vector3< double > &,::Wm3::Vector3< double > & );
+            typedef Vector3< double > exported_class_t;
+            typedef void ( *Orthonormalize_function_type )( Vector3< double > &,Vector3< double > &,Vector3< double > & );
             
             Vector3_exposer.def( 
                 "Orthonormalize"
-                , Orthonormalize_function_type( &::Wm3::Vector3< double >::Orthonormalize )
+                , Orthonormalize_function_type( &Vector3< double >::Orthonormalize )
                 , ( bp::arg("rkU"), bp::arg("rkV"), bp::arg("rkW") ) );
         
         }
-        { //::Wm3::Vector3< double >::Orthonormalize
+        { //Vector3< double >::Orthonormalize
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef void ( *Orthonormalize_function_type )( ::Wm3::Vector3< double > * );
+            typedef Vector3< double > exported_class_t;
+            typedef void ( *Orthonormalize_function_type )( Vector3< double > * );
             
             Vector3_exposer.def( 
                 "Orthonormalize"
-                , Orthonormalize_function_type( &::Wm3::Vector3< double >::Orthonormalize )
+                , Orthonormalize_function_type( &Vector3< double >::Orthonormalize )
                 , ( bp::arg("akV") ) );
         
         }
-        { //::Wm3::Vector3< double >::SquaredLength
+        { //Vector3< double >::SquaredLength
         
-            typedef Wm3::Vector3< double > exported_class_t;
+            typedef Vector3< double > exported_class_t;
             typedef double ( exported_class_t::*SquaredLength_function_type )(  ) const;
             
             Vector3_exposer.def( 
                 "SquaredLength"
-                , SquaredLength_function_type( &::Wm3::Vector3< double >::SquaredLength ) );
+                , SquaredLength_function_type( &Vector3< double >::SquaredLength ) );
         
         }
-        { //::Wm3::Vector3< double >::UnitCross
+        { //Vector3< double >::UnitCross
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef ::Wm3::Vector3< double > ( exported_class_t::*UnitCross_function_type )( ::Wm3::Vector3< double > const & ) const;
+            typedef Vector3< double > exported_class_t;
+            typedef Vector3< double > ( exported_class_t::*UnitCross_function_type )( Vector3< double > const & ) const;
             
             Vector3_exposer.def( 
                 "UnitCross"
-                , UnitCross_function_type( &::Wm3::Vector3< double >::UnitCross )
+                , UnitCross_function_type( &Vector3< double >::UnitCross )
                 , ( bp::arg("rkV") ) );
         
         }
-        { //::Wm3::Vector3< double >::X
+        { //Vector3< double >::X
         
-            typedef Wm3::Vector3< double > exported_class_t;
+            typedef Vector3< double > exported_class_t;
             typedef double ( exported_class_t::*X_function_type )(  ) const;
             
             Vector3_exposer.def( 
                 "X"
-                , X_function_type( &::Wm3::Vector3< double >::X ) );
+                , X_function_type( &Vector3< double >::X ) );
         
         }
-        { //::Wm3::Vector3< double >::Y
+        { //Vector3< double >::Y
         
-            typedef Wm3::Vector3< double > exported_class_t;
+            typedef Vector3< double > exported_class_t;
             typedef double ( exported_class_t::*Y_function_type )(  ) const;
             
             Vector3_exposer.def( 
                 "Y"
-                , Y_function_type( &::Wm3::Vector3< double >::Y ) );
+                , Y_function_type( &Vector3< double >::Y ) );
         
         }
-        { //::Wm3::Vector3< double >::Z
+        { //Vector3< double >::Z
         
-            typedef Wm3::Vector3< double > exported_class_t;
+            typedef Vector3< double > exported_class_t;
             typedef double ( exported_class_t::*Z_function_type )(  ) const;
             
             Vector3_exposer.def( 
                 "Z"
-                , Z_function_type( &::Wm3::Vector3< double >::Z ) );
+                , Z_function_type( &Vector3< double >::Z ) );
         
         }
         Vector3_exposer.def( bp::self != bp::self );
@@ -1047,14 +1047,14 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Vector3_exposer.def( bp::self /= bp::other< double >() );
         Vector3_exposer.def( bp::self < bp::self );
         Vector3_exposer.def( bp::self <= bp::self );
-        { //::Wm3::Vector3< double >::operator=
+        { //Vector3< double >::operator=
         
-            typedef Wm3::Vector3< double > exported_class_t;
-            typedef ::Wm3::Vector3< double > & ( exported_class_t::*assign_function_type )( ::Wm3::Vector3< double > const & ) ;
+            typedef Vector3< double > exported_class_t;
+            typedef Vector3< double > & ( exported_class_t::*assign_function_type )( Vector3< double > const & ) ;
             
             Vector3_exposer.def( 
                 "assign"
-                , assign_function_type( &::Wm3::Vector3< double >::operator= )
+                , assign_function_type( &Vector3< double >::operator= )
                 , ( bp::arg("rkV") )
                 , bp::return_self< >() );
         
@@ -1065,7 +1065,7 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
         Vector3_exposer.staticmethod( "ComputeExtremes" );
         Vector3_exposer.staticmethod( "GenerateOrthonormalBasis" );
         Vector3_exposer.staticmethod( "Orthonormalize" );
-        Vector3_exposer.def( bp::self * bp::other< Wm3::Matrix3< double > >() );
+        Vector3_exposer.def( bp::self * bp::other< Matrix3< double > >() );
         Vector3_exposer.def( bp::self_ns::str( bp::self ) );
         Vector3_exposer.def("__len__",&::Vector3_len)   .staticmethod("__len__").def("__setitem__",&::Vector3_set_item)   .def("__getitem__",&::Vector3_get_item)   .def("__str__",&::Vector3_str)   .def("__repr__",&::Vector3_str);
         Vector3_exposer.add_property("ZERO",::Vector3r_ZERO).add_property("UNIT_X",::Vector3r_UNIT_X).add_property("UNIT_Y",::Vector3r_UNIT_Y).add_property("UNIT_Z",::Vector3r_UNIT_Z).add_property("ONE",::Vector3r_ONE);
