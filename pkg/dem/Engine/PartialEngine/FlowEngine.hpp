@@ -12,10 +12,6 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/lib-triangulation/FlowBoundingSphere.h>
 
-// class TriaxialCompressionEngine;
-// class FlowBoundingSphere;
-// class Tesselation;
-
 class FlowEngine : public PartialEngine
 {
 	private:

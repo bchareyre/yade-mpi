@@ -5,6 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef FLOW_ENGINE
 
 #include "FlowEngine.hpp"
 #include<yade/core/Scene.hpp>
@@ -14,13 +15,8 @@
 #include<yade/pkg-common/Wall.hpp>
 #include<yade/pkg-common/Box.hpp>
 
-#include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
-
-#include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
-#include<yade/lib-triangulation/FlowBoundingSphere.h>
-
 YADE_REQUIRE_FEATURE (CGAL);
-CREATE_LOGGER ( FlowEngine );
+CREATE_LOGGER (FlowEngine);
 
 std::ofstream plotFile ( "plot2",std::ios::out );
 
@@ -35,7 +31,7 @@ FlowEngine::FlowEngine() : gravity ( Vector3r::ZERO ), isActivated ( true )
 	compute_K=true;
 	unload=false;
 	tess_based_force=true;
-	flow = shared_ptr<CGT::FlowBoundingSphere> ( new CGT::FlowBoundingSphere );
+	flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);
 }
 
 
@@ -574,6 +570,8 @@ Real FlowEngine::Volume_cell ( CGT::Cell_handle cell, Scene* ncb )
 }
 
 YADE_PLUGIN ( ( FlowEngine ) );
+#endif //FLOW_ENGINE
+
 // YADE_REQUIRE_FEATURE(PHYSPAR);
 
 // 		if ( !cell->info().isFictious )

@@ -17,7 +17,7 @@
 #ifdef XVIEW
 #include "Vue3D.h"
 #endif
-#define FLOW_ENGINE
+
 #ifdef FLOW_ENGINE
 
 using namespace std;

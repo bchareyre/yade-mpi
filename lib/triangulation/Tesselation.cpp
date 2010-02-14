@@ -80,7 +80,7 @@ bool Tesselation::redirect ( void )
 	if ( !redirected )
 	{
 		//Set size of the redirection vector
-		if ( ( max_id+1 ) != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
+		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
 		//cout << "!redirected" << endl;
 		max_id = 0;
 		Finite_vertices_iterator vertices_end = Tri->finite_vertices_end ();
@@ -91,7 +91,7 @@ bool Tesselation::redirect ( void )
 			//if ( ! ( V_it->info().isFictious ) ) vertexHandles[V_it->info().id() ]= V_it;
 			//std::cout<< "Cell " << V_it->info().id() << ": v=" << V_it->info().v() << std::endl;
 		}
-		if ( ( max_id+1 ) != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
+		if ( (unsigned int)max_id+1 != vertexHandles.size() ) vertexHandles.resize ( max_id+1 );
 		redirected = true;
 	} else return false;
 	return true;
