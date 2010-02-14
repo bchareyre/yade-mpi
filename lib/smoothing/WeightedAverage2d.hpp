@@ -21,7 +21,6 @@ using namespace std;
 using namespace boost;
 
 #include<yade/lib-base/Math.hpp>
-typedef Wm3::Vector2<int> Vector2i;
 
 
 template<typename T>

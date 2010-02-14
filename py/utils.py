@@ -287,13 +287,13 @@ def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,w
 	Return List of facets forming the cylinder;
 	
 	:Parameters:
-			- `center`: center of the created cylinder; (X,Y,Z) coordinates;
-			- `radius`: cylinder radius;
-			- `height`: cylinder height;
-			- `orientation`: orientation of the cylinder in quaternion format;
-			- `segmentsNumber`: the number of edges on the cylinder surface, the minimum is 5;
-			- `wallMask`: bitmask; determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
-			- `**kw`: passed to utils.facet;
+			`center`: center of the created cylinder; (X,Y,Z) coordinates;
+			`radius`: cylinder radius;
+			`height`: cylinder height;
+			`orientation`: orientation of the cylinder in quaternion format;
+			`segmentsNumber`: the number of edges on the cylinder surface, the minimum is 5;
+			`wallMask`: bitmask; determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
+			`**kw`: passed to utils.facet;
 	"""
 	
 	#Defense from zero dimensions

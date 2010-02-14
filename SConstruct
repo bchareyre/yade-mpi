@@ -139,7 +139,7 @@ opts.AddVariables(
 	BoolVariable('optimize','Turn on heavy optimizations',defOptions['optimize']),
 	ListVariable('exclude','Yade components that will not be built','none',names=['gui','extra','common','dem','lattice','snow']),
 	EnumVariable('PGO','Whether to "gen"erate or "use" Profile-Guided Optimization','',['','gen','use'],{'no':'','0':'','false':''},1),
-	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','eigen','never_use_this_one']),
+	ListVariable('features','Optional features that are turned on','log4cxx,opengl,gts,openmp,vtk',names=['opengl','log4cxx','cgal','openmp','gts','vtk','python','eigen','nowm3','never_use_this_one']),
 	('jobs','Number of jobs to run at the same time (same as -j, but saved)',4,None,int),
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
@@ -388,6 +388,8 @@ if not env.GetOption('clean'):
 		ok=conf.CheckCXXHeader('Eigen/Cholesky')
 		ok=conf.CheckCXXHeader('Eigen/LU')
 		if not ok: featureNotOK('eigen',note="You might have to add eigen header directory (e.g. /usr/include/eigen2) to CPPPATH.")
+	if 'nowm3' in env['features'] and 'eigen' not in env['features']:
+		featureNotOK("You selected the 'nowm3' feature; you MUST also select the 'eigen' feature in such case.")
 
 	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 

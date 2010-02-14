@@ -7,6 +7,11 @@
 // for body_id_t
 #include<yade/core/Interaction.hpp>
 
+#include<boost/static_assert.hpp>
+// make sure that (void*)&vec[0]==(void*)&vec
+BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
+
+
 #ifdef YADE_OPENMP
 
 #include<omp.h>
@@ -128,18 +133,18 @@ class ForceContainer{
 		// perhaps should be private and friend Scene or whatever the only caller should be
 		void reset(){
 			for(int thread=0; thread<nThreads; thread++){
-				memset(_forceData [thread][0],0,sizeof(Vector3r)*size);
-				memset(_torqueData[thread][0],0,sizeof(Vector3r)*size);
+				memset(&_forceData [thread][0],0,sizeof(Vector3r)*size);
+				memset(&_torqueData[thread][0],0,sizeof(Vector3r)*size);
 				if(moveRotUsed){
-					memset(_moveData  [thread][0],0,sizeof(Vector3r)*size);
-					memset(_rotData   [thread][0],0,sizeof(Vector3r)*size);
+					memset(&_moveData  [thread][0],0,sizeof(Vector3r)*size);
+					memset(&_rotData   [thread][0],0,sizeof(Vector3r)*size);
 				}
 			}
-			memset(_force [0], 0,sizeof(Vector3r)*size);
-			memset(_torque[0], 0,sizeof(Vector3r)*size);
+			memset(&_force [0], 0,sizeof(Vector3r)*size);
+			memset(&_torque[0], 0,sizeof(Vector3r)*size);
 			if(moveRotUsed){
-				memset(_move  [0], 0,sizeof(Vector3r)*size);
-				memset(_rot   [0], 0,sizeof(Vector3r)*size);
+				memset(&_move  [0], 0,sizeof(Vector3r)*size);
+				memset(&_rot   [0], 0,sizeof(Vector3r)*size);
 			}
 			synced=true; moveRotUsed=false;
 		}
@@ -174,11 +179,11 @@ class ForceContainer {
 		void  addRot(body_id_t id,const Vector3r& f){ensureSize(id); moveRotUsed=true; _rot[id]+=f;}
 		//! Set all forces to zero
 		void reset(){
-			memset(_force [0],0,sizeof(Vector3r)*size);
-			memset(_torque[0],0,sizeof(Vector3r)*size);
+			memset(&_force [0],0,sizeof(Vector3r)*size);
+			memset(&_torque[0],0,sizeof(Vector3r)*size);
 			if(moveRotUsed){
-				memset(_move  [0],0,sizeof(Vector3r)*size);
-				memset(_rot   [0],0,sizeof(Vector3r)*size);
+				memset(&_move  [0],0,sizeof(Vector3r)*size);
+				memset(&_rot   [0],0,sizeof(Vector3r)*size);
 				moveRotUsed=false;
 			}
 		}

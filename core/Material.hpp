@@ -40,7 +40,7 @@ class Material: public Serializable, public Indexable{
 		((Real,density,1000,"Density of the material [kg/m³]")),
 		/* ctor */,
 		/*py*/
-		.def("newAssocState",&Material::newAssocState,"Return new State instance, which is associated to this Material. Some Material have special requirement on Body::state type.")
+		.def("newAssocState",&Material::newAssocState,"Return new :yref:`State` instance, which is associated with this :yref:`Material`. Some materials have special requirement on :yref:`Body::state` type and calling this function when the body is created will ensure that they match. (This is done automatically if you use utils.sphere, … functions from python).")
 		YADE_PY_TOPINDEXABLE(Material)
 	);
 	REGISTER_INDEX_COUNTER(Material);
