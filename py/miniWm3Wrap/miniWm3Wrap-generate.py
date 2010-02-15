@@ -12,8 +12,8 @@ from pyplusplus import function_transformers as FT
 #Creating an instance of class that will help you to expose your declarations
 mb = module_builder.module_builder_t( [os.path.abspath("miniWm3Wrap-toExpose.hpp")]
                                       , working_directory=r"."
-                                      , include_paths=['../../lib','../../lib/miniWm3','/usr/include']
-                                      , define_symbols=['USE_MINIWM3'] )
+                                      , include_paths=['../../lib','../../lib/miniWm3','../../../build-trunk-dbg/include/yade-trunk','/usr/include']
+                                      , define_symbols=['USE_MINIWM3','YADE_EIGEN'] )
 # exclude exerything first
 mb.decls().exclude()
 # include what is in Wm3
@@ -30,14 +30,25 @@ mb.casting_operators().exclude()
 # exclude functions&operators returning double& (not representable)
 mb.member_functions(return_type='double &').exclude()
 mb.global_ns.operators(return_type='double &').exclude() # global_ns is a bug workaround: http://www.mail-archive.com/cplusplus-sig@python.org/msg00730.html
-# exclude everything (member functions, operators, ...) taking or returning types we do not wrap
-mb.decls(lambda d: 'Matrix2' in str(d) or 'Vector4' in str(d)).exclude()
+## exclude everything (member functions, operators, ...) taking or returning types we do not wrap
+## mb.decls(lambda d: 'Matrix2' in str(d) or 'Vector4' in str(d)).exclude()
 # exclude operator[] since we implement __getitem__/__setitem__ by ourselves
 mb.member_operators(lambda o: o.symbol=='[]').exclude()
 # exclude From/To Euler angles, since we don't need it
 mb.member_functions(lambda f: 'Euler' in str(f)).exclude()
 ## exclude free functions
 mb.decls(lambda d: d.name in ('componentMaxVector','componentMinVector','componentSum','diagDiv','diagMult','quaternionFromAxes','quaternionToAxes','quaternionToEulerAngles','quaterniontoGLMatrix','unitVectorsAngle')).exclude()
+
+
+## exclude what is not in the wm3-eigen glue
+if 1:
+	undef="""
+Adjoint DiagonalTimes GetColumnMajor Orthonormalize QDUDecomposition QForm SingularValueComposition SingularValueDecomposition Slerp TimesDiagonal TimesTranspose TransposeTimes MakeTensorProduct
+DecomposeSwingTimesTwist DecomposeTwistTimesSwing Exp FromRotationMatrix Intermediate Log SlerpExtraSpins Squad
+ComputeExtremes DotPerp GenerateOrthonormalBasis GetBarycentrics Orthonormalize Perp UnitPerp
+ComputeExtremes GenerateOrthonormalBasis GetBarycentrics Orthonormalize
+MakeDiagonal MakeZero MakeIdentity""".split()
+	mb.member_functions(lambda d: d.name in undef).exclude()
 
 
 # register manual wraps
@@ -50,7 +61,7 @@ m3.add_registration_code('def("__len__",&::Matrix3_len).staticmethod("__len__") 
 
 ## workarounds for def_readonly on static members
 # disabled, doesn't work on types (e.g. Vector3.ZERO), must pass instance (e.g. Vector3().ZERO)
-if 1:
+if 0:
 	mb.decls(lambda d: 'UNIT_' in str(d) or 'ZERO' in str(d) or 'IDENTITY' in str(d) or 'ONE' in str(d)).exclude()
 	v2.add_registration_code('.'.join('add_property("%s",::Vector2r_%s)'%(prop,prop) for prop in ('ZERO','UNIT_X','UNIT_Y','ONE')))
 	v3.add_registration_code('.'.join('add_property("%s",::Vector3r_%s)'%(prop,prop) for prop in ('ZERO','UNIT_X','UNIT_Y','UNIT_Z','ONE')))
@@ -83,4 +94,7 @@ for f in toClean:
 		except IOError: pass
 ## remove absolute path from the generated file (ugly, oh well)
 os.system(r"perl -pi -e 's@^#include\s*\"/.*/(.*)\"\s*$@#include \"\1\"\n@' miniWm3Wrap.cpp")
+os.system(r"perl -pi -e 's@(::)?Wm3::@@g' miniWm3Wrap.cpp")
+os.system(r"perl -pi -e 's@^.*double const \*.*$@@' miniWm3Wrap.cpp")
+os.system(r"perl -pi -e 's@^.*implicitly_convertible.*$@@' miniWm3Wrap.cpp")
 

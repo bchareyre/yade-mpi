@@ -3,6 +3,7 @@
 #pragma once
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Interaction.hpp>
+#include<yade/core/Body.hpp>
 
 /*! Homogeneous gravity field; applies gravity×mass force on all bodies. */
 class GravityEngine: public GlobalEngine{
