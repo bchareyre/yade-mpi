@@ -226,8 +226,6 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 
 	//  Boundary_Conditions ( Tri );
 
-	P_SUP = 1, P_INF = 0, P_INS=0;
-
 	Initialize_pressures();
 
 	GaussSeidel();
@@ -237,7 +235,7 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 	/** END GAUSS SEIDEL */
 
 	char *file = "Permeability";
-	Permeameter ( Tri, P_INF, P_SUP, SectionArea, H, file );
+	Permeameter ( Tri, boundary ( y_min_id ).value, boundary ( y_max_id ).value, SectionArea, H, file );
 	clock.top ( "Permeameter" );
 
 	Compute_Forces();
@@ -382,30 +380,26 @@ void FlowBoundingSphere::Localize()
 
 	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )
 	{
-// 		cell->info().fictious() = 0;
+		cell->info().fictious() = 0;
 		pass = 0;
 		for ( int i=0;i<4;i++ )
 		{
 			V = cell->vertex ( i );
 			if ( V->info().isFictious )
 			{
-// 				cell->info().fictious() ++;
+				cell->info().fictious() ++;
 				pass = 1;
-				//FIXME : remove the isFictious flag and use cell->info().fictious() instead
-// 				cell->info().isFictious = true;
 				
-				Boundary& bi = boundary ( V->info().id() );
-				//     Boundary& bi = boundaries [V->info().id()];
-
-				if ( bi.flowCondition )
+				// Boundary& bi = boundary ( V->info().id() );
+				// if ( bi.flowCondition )
+				if ( V->info().id() != y_min_id && V->info().id() != y_max_id)
 				{
-					// Inf/Sup has priority
 					if ( !cell->info().isSuperior && !cell->info().isInferior )
 					{
-						cell->info().isLateral = true;
+						cell->info().isLateral = true;cell->info().isInside=false; cell->info().isInferior=false; cell->info().isSuperior=false;
 #ifdef XVIEW
 						Vue1.SetSpheresColor ( 0.1,0.95,0.1,1 );
-						Vue1.Dessine_Sphere ( cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4 );
+						Vue1.Dessine_Sphere (cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4 );
 #endif
 					}
 				}
@@ -413,9 +407,12 @@ void FlowBoundingSphere::Localize()
 				{
 					if ( V->info().id() == y_min_id )
 					{
-						cell->info().isInferior=true; cell->info().isLateral=false; cell->info().isSuperior=false;
+						cell->info().isInferior=true; cell->info().isLateral=false; cell->info().isSuperior=false;cell->info().isInside=false;
 					}
-					else {cell->info().isSuperior=true;cell->info().isLateral=false;cell->info().isInferior=false;}
+					else{
+						cell->info().isSuperior=true;cell->info().isLateral=false;
+						cell->info().isInferior=false;cell->info().isInside=false;
+					}
 #ifdef XVIEW
 					Vue1.SetSpheresColor ( 1,0.1,0.1,1 );
 					Vue1.Dessine_Sphere ( cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4 );
@@ -423,7 +420,7 @@ void FlowBoundingSphere::Localize()
 				}
 			}
 		}
-		//if (!pass) cell->info().isInside=true;
+		if (!pass) cell->info().isInside=true;
 	}
 	cout << "Localised -------------" << endl;
 }
@@ -491,8 +488,6 @@ void FlowBoundingSphere::Compute_Permeability()
 			//    else if ( Tri.is_infinite ( neighbour_cell )) k = 0;//connection to an infinite cells
 		}
 		cell->info().isvisited = !ref;
-		//    for (int y=0;y<4;y++) cout << "Permeability " << y << " = " << (cell->info().k_norm())[y] << endl;
-		//    for ( int y=0;y<4;y++ ) kFile << y << " = " << ( cell->info().k_norm() ) [y] << endl;
 	}
 	cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
 
@@ -825,7 +820,7 @@ void FlowBoundingSphere::Compute_Forces()
 	{
 		if ( !v->info().isFictious )
 		{
-			cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
+// 			cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
 			TotalForce = TotalForce + v->info().forces;
 		}
 		else
@@ -1480,7 +1475,7 @@ void FlowBoundingSphere::Initialize_pressures()
 	// 		else cell->info().p() =0;//FIXME : assign better values for faster convergence?
 	// 	}
 
-	for ( int bound=0; bound<6;bound++ )
+	for ( int bound=0;bound<6;bound++ )
 	{
 		int& id = *boundsIds[bound];
 		Boundary& bi = boundary ( id );
@@ -1490,7 +1485,8 @@ void FlowBoundingSphere::Initialize_pressures()
 			tmp_cells.resize ( 1000 );
 			Tesselation::VCell_iterator cells_it = tmp_cells.begin();
 			Tesselation::VCell_iterator cells_end = Tri.incident_cells ( T[currentTes].vertexHandles[id],cells_it );
-			for ( Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++ ) ( *it )->info().p() = bi.value;
+			for ( Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++ )
+				( *it )->info().p() = bi.value;
 		}
 	}
 }
@@ -1554,12 +1550,12 @@ void FlowBoundingSphere::GaussSeidel()
 
 		if ( j % 1000 == 0 )
 		{
-			cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
+			cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
 			cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
 			//     save_vtk_file ( Tri );
 		}
 	}
-	while ( ( dp_max/p_max ) > tolerance  /*( dp_max > tolerance )*//* &&*/ /*( j<50 )*/ );
+	while ( ( dp_max/*/p_max*/ ) > tolerance  /*( dp_max > tolerance )*//* &&*/ /*( j<50 )*/ );
 	//   cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
 	//   cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
 }
@@ -1587,7 +1583,7 @@ void FlowBoundingSphere::Permeameter ( RTriangulation &Tri, double P_Inf, double
 				{
 					//PRESSION_EXT=P_Inf;
 					//Qout = Qout + ( cell->info().k_vector() ) [j2]* ( cell->info().p()-PRESSION_EXT );
-					cout << "outFlow : "<< ( cell->info().k_norm() ) [j2]* ( neighbour_cell->info().p()-cell->info().p() ) <<endl;
+// 					cout << "outFlow : "<< ( cell->info().k_norm() ) [j2]* ( neighbour_cell->info().p()-cell->info().p() ) <<endl;
 					Qout = Qout + ( cell->info().k_norm() ) [j2]* ( neighbour_cell->info().p()-cell->info().p() );
 					cellQout+=1;/*( cell->info().k_vector() ) [j2]* ( cell->info().p()-PRESSION_EXT )*/;
 					p_out_max = std::max ( cell->info().p(), p_out_max );
@@ -1838,7 +1834,11 @@ void FlowBoundingSphere::Sample_Permeability ( RTriangulation& Tri, double x_Min
 
 	double DeltaY = y_Max-y_Min;
 
-	P_SUP = 1.0; P_INF = 0.0; P_INS = 0.0;
+	boundary ( y_min_id ).flowCondition=0;
+	boundary ( y_max_id ).flowCondition=0;
+	boundary ( y_min_id ).value=0;
+	boundary ( y_max_id ).value=1;
+// 	P_SUP = 1.0; P_INF = 0.0; P_INS = 0.0;
 
 	Initialize_pressures();
 
@@ -1847,7 +1847,7 @@ void FlowBoundingSphere::Sample_Permeability ( RTriangulation& Tri, double x_Min
 	char *kk;
 	kk = ( char* ) key.c_str();
 
-	Permeameter ( Tri, P_INF, P_SUP, Section, DeltaY, kk );
+	Permeameter ( Tri, boundary ( y_min_id ).value, boundary ( y_max_id ).value, Section, DeltaY, kk );
 }
 
 void FlowBoundingSphere::AddBoundingPlanes ( Real center[3], Real Extents[3], int id )
@@ -1951,31 +1951,37 @@ void FlowBoundingSphere::AddBoundingPlanes()
 	boundaries[0].p = Corner_min;
 	boundaries[0].normal = Vecteur ( 0,1,0 );
 	boundaries[0].coordinate = 1;
+	cout << "Bottom boundary has been created. ID = " << y_min_id << endl;
 
 	Tes.insert ( 0.5* ( Corner_min.x() +Corner_max.x() ), Corner_max.y() +FAR* ( Corner_max.x()-Corner_min.x() ), 0.5* ( Corner_max.z()-Corner_min.z() ), FAR* ( Corner_max.x()-Corner_min.x() ), y_max_id, true );
 	boundaries[1].p = Corner_max;
 	boundaries[1].normal = Vecteur ( 0,-1,0 );
 	boundaries[1].coordinate = 1;
+	cout << "Top boundary has been created. ID = " << y_max_id << endl;
 
 	Tes.insert ( Corner_min.x()-FAR* ( Corner_max.y()-Corner_min.y() ), 0.5* ( Corner_max.y()-Corner_min.y() ), 0.5* ( Corner_max.z()-Corner_min.z() ), FAR* ( Corner_max.y()-Corner_min.y() ), x_min_id, true );
 	boundaries[2].p = Corner_min;
 	boundaries[2].normal = Vecteur ( 1,0,0 );
 	boundaries[2].coordinate = 0;
+	cout << "Left boundary has been created. ID = " << x_min_id << endl;
 
 	Tes.insert ( Corner_max.x() +FAR* ( Corner_max.y()-Corner_min.y() ), 0.5* ( Corner_max.y()-Corner_min.y() ), 0.5* ( Corner_max.z()-Corner_min.z() ), FAR* ( Corner_max.y()-Corner_min.y() ), x_max_id, true );
 	boundaries[3].p = Corner_max;
 	boundaries[3].normal = Vecteur ( -1,0,0 );
 	boundaries[3].coordinate = 0;
+	cout << "Right boundary has been created. ID = " << x_max_id << endl;
 
 	Tes.insert ( 0.5* ( Corner_min.x() +Corner_max.x() ), 0.5* ( Corner_max.y()-Corner_min.y() ), Corner_min.z()-FAR* ( Corner_max.y()-Corner_min.y() ), FAR* ( Corner_max.y()-Corner_min.y() ), z_min_id, true );
 	boundaries[4].p = Corner_min;
 	boundaries[4].normal = Vecteur ( 0,0,1 );
 	boundaries[4].coordinate = 2;
+	cout << "Front boundary has been created. ID = " << z_min_id << endl;
 
 	Tes.insert ( 0.5* ( Corner_min.x() +Corner_max.x() ), 0.5* ( Corner_max.y()-Corner_min.y() ), Corner_max.z() +FAR* ( Corner_max.y()-Corner_min.y() ), FAR* ( Corner_max.y()-Corner_min.y() ), z_max_id, true );
 	boundaries[5].p = Corner_max;
 	boundaries[5].normal = Vecteur ( 0,0,-1 );
 	boundaries[5].coordinate = 2;
+	cout << "Back boundary has been created. ID = " << z_max_id << endl;
 
 	for ( int k=0;k<6;k++ )
 	{

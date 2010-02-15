@@ -6,6 +6,10 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+// #define FLOW_ENGINE
+
+#ifdef FLOW_ENGINE
+
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>
@@ -17,29 +21,16 @@ class FlowEngine : public PartialEngine
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<CGT::FlowBoundingSphere> flow;
-// 		FlowBoundingSphere* flow;
-		//Tesselation* Tes;
 	public :
 
 		Vector3r gravity;
-		bool isActivated;
 		bool first;
 
-		int PermuteInterval,
-		current_state;
-		double permeability_factor;
-		int previous_state;
-		bool currentTes
-		,compute_K
-		,unload
-		,tess_based_force;
-		Real loadFactor;
-		int cons;
-		
+		int current_state
+		,previous_state
+		,cons;
 		
 		Real wall_thickness;
-
-		double P_zero;
 		
 		void Triangulate ( Scene* ncb );
 		void AddBoundary ( Scene* ncb );
@@ -53,21 +44,23 @@ class FlowEngine : public PartialEngine
 		void NewTriangulation ( Scene* ncb );
 		void Oedometer_Boundary_Conditions();
 		
-		FlowEngine();
 		virtual ~FlowEngine();
 	
 		virtual void applyCondition(Scene*);
 		
-		REGISTER_ATTRIBUTES(PartialEngine,(isActivated)(first)(currentTes)(P_zero)(PermuteInterval)(compute_K)(permeability_factor)(loadFactor)(unload)(tess_based_force));
-	
-	protected :
-	REGISTER_CLASS_NAME(FlowEngine);
-	REGISTER_BASE_CLASS_NAME(PartialEngine);
-	
+		YADE_CLASS_BASE_DOC_ATTRS(FlowEngine,PartialEngine,"An engine to solve the flow problem in saturated granular media",
+					((bool,isActivated,true,"Activates Flow Engine "))
+					((bool,currentTes,false,"Identifies the current triangulation/tesselation of pore space"))
+					((double,P_zero,0,"Initial internal pressure for oedometer test"))
+					((int,PermuteInterval,100000,"Pore space re-triangulation period"))
+					((bool,compute_K,true,"Activates permeability measure within a granular sample"))
+					((double,permeability_factor,1.0,"a permability multiplicator"))
+					((Real,loadFactor,1.5,"Load multiplicator for oedometer test"))
+					((bool,unload,false,"Remove the load in oedometer test"))
+					((bool,tess_based_force,true,"true=force computation based on tessalation, false=force computation based on triangulation")));
 	DECLARE_LOGGER;
 };
 
-
 REGISTER_SERIALIZABLE(FlowEngine);
 
-
+#endif

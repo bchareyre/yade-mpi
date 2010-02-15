@@ -20,27 +20,13 @@ CREATE_LOGGER (FlowEngine);
 
 std::ofstream plotFile ( "plot2",std::ios::out );
 
-FlowEngine::FlowEngine() : gravity ( Vector3r::ZERO ), isActivated ( true )
-{
-	first = true;
-	currentTes = 0;
-	P_zero=0;
-	PermuteInterval = 100000;
-	permeability_factor=1.0;
-	loadFactor=1.0;
-	compute_K=true;
-	unload=false;
-	tess_based_force=true;
-	flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);
-}
-
-
 FlowEngine::~FlowEngine()
 {
 }
 
 void FlowEngine::applyCondition ( Scene* ncb )
 {
+	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;}
 	if ( !isActivated ) return;
 	else
 	{
@@ -141,57 +127,34 @@ void FlowEngine::applyCondition ( Scene* ncb )
 		{
 			Initialize ( ncb, P_zero );
 			
-			cout << "ok2" << endl;
-			
-			Oedometer_Boundary_Conditions();
-			
-			cout << "ok3" << endl;
-
 			flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
-			
+
 			flow->k_factor = permeability_factor;
-
 			flow->Compute_Permeability ();
-
-			cout << "Vtotalissimo = " << flow->Vtotalissimo << " Vsolid_tot = " << flow->Vsolid_tot << " Vporale2 = " << flow->Vporale  << " Ssolid_tot = " << flow->Ssolid_tot << endl << endl;
 
 			flow->DisplayStatistics ();
 
 			CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
-
 			int y=0;
 			for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 			{
-// 				cell->info().p() = P_zero;
-				cell->info().dv() = 0;
+				cell->info().dv() = 0; cell->info().p() = 0;
 				y++;
 			}
 			cout << y << " deltaV initialised -----------------" << endl;
 
 			if (compute_K) {flow->Sample_Permeability ( flow->T[currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 
-			double P_ext=0, P_int=0.0;
-
-			flow->P_SUP=P_ext; flow->P_INF=P_ext; flow->P_INS=P_int;
-			
-			flow->Initialize_pressures( );
+			Oedometer_Boundary_Conditions();
+			flow->Initialize_pressures();
 			
 			flow->GaussSeidel ( );
 			
 			plotFile << "unset key" << endl;
 			
-			triaxialCompressionEngine->wall_left_activated=0;
-			triaxialCompressionEngine->wall_right_activated=0;
-			triaxialCompressionEngine->wall_front_activated=0;
-			triaxialCompressionEngine->wall_back_activated=0;
-			triaxialCompressionEngine->wall_top_activated=1;
-			triaxialCompressionEngine->wall_bottom_activated=1;
-			
-			triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)*loadFactor;
-			
 // 			flow->Analytical_Consolidation();
 
-			first = false;cons=0;
+			first = false; cons=0;
 		}
 	}
 }
@@ -201,7 +164,16 @@ void FlowEngine::Oedometer_Boundary_Conditions()
 	flow->boundary ( flow->y_min_id ).flowCondition=0;
 	flow->boundary ( flow->y_max_id ).flowCondition=0;
 	flow->boundary ( flow->y_min_id ).value=0;
-	flow->boundary ( flow->y_max_id ).value=1;
+	flow->boundary ( flow->y_max_id ).value=0;
+	
+	triaxialCompressionEngine->wall_left_activated=0;
+	triaxialCompressionEngine->wall_right_activated=0;
+	triaxialCompressionEngine->wall_front_activated=0;
+	triaxialCompressionEngine->wall_back_activated=0;
+	triaxialCompressionEngine->wall_top_activated=1;
+	triaxialCompressionEngine->wall_bottom_activated=1;
+
+	triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)*loadFactor;
 }
 
 void FlowEngine::Initialize ( Scene* ncb, double P_zero )
@@ -217,13 +189,11 @@ void FlowEngine::Initialize ( Scene* ncb, double P_zero )
 	cout << endl << "Tesselating------" << endl << endl;
 	flow->T[currentTes].Compute();
 
-	flow->Fictious_cells();
+// 	flow->Fictious_cells();
 	
 	flow->Localize ();
 
 	Initialize_volumes ( ncb );
-	
-	cout << "ok1" << endl;
 }
 
 void FlowEngine::AddBoundary ( Scene* ncb )
@@ -233,38 +203,27 @@ void FlowEngine::AddBoundary ( Scene* ncb )
 	shared_ptr<Box> bx ( new Box );
 	int Bx_Index = bx->getClassIndexStatic();
 
-	int contator=0;
-
 	FOREACH ( const shared_ptr<Body>& b, *ncb->bodies )
 	{
 		if ( !b ) continue;
 		if ( b->shape->getClassIndex() == Bx_Index )
 		{
 			Box* w = YADE_CAST<Box*> ( b->shape.get() );
-
 			const body_id_t& id = b->getId();
-			cout << "is it a wall?? id == " << id << endl;
-
 			Real center [3], Extent[3];
-
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 
 // 			flow->AddBoundingPlanes ( center, Extent, id );
-			
-			flow->x_min = min ( flow->x_min, center[0]);
-			flow->x_max = max ( flow->x_max, center[0]);
-			flow->y_min = min ( flow->y_min, center[1]);
-			flow->y_max = max ( flow->y_max, center[1]);
-			flow->z_min = min ( flow->z_min, center[2]);
-			flow->z_max = max ( flow->z_max, center[2]);
-			
-			contator+=1;
+			flow->x_min = min ( flow->x_min, center[0]-wall_thickness);
+			flow->x_max = max ( flow->x_max, center[0]+wall_thickness);
+			flow->y_min = min ( flow->y_min, center[1]-wall_thickness);
+			flow->y_max = max ( flow->y_max, center[1]+wall_thickness);
+			flow->z_min = min ( flow->z_min, center[2]-wall_thickness);
+			flow->z_max = max ( flow->z_max, center[2]+wall_thickness);
 		}
 	}
 	
 	flow->AddBoundingPlanes();
-
-	cout << contator << " walls inserted -------- ADDED BOUNDING PLANES" << endl;
 }
 
 void FlowEngine::Triangulate ( Scene* ncb )
@@ -275,8 +234,6 @@ void FlowEngine::Triangulate ( Scene* ncb )
 
 	int Sph_Index = sph->getClassIndexStatic();
 	int contator = 0;
-
-// 	std::list<CGT::Point> input;
 	
 	FOREACH ( const shared_ptr<Body>& b, *ncb->bodies )
 	{
@@ -292,21 +249,14 @@ void FlowEngine::Triangulate ( Scene* ncb )
 			
 			flow->T[currentTes].insert(x, y, z, rad, id);
 			
-// 			flow->x_min = min ( flow->x_min, x-rad );
-// 			flow->x_max = max ( flow->x_max, x+rad );
-// 			flow->y_min = min ( flow->y_min, y-rad );
-// 			flow->y_max = max ( flow->y_max, y+rad );
-// 			flow->z_min = min ( flow->z_min, z-rad );
-// 			flow->z_max = max ( flow->z_max, z+rad );
-			
 			contator+=1;
 		}
 	}
 	cout << contator << "spheres inserted " << endl;
 
-	double SectionArea = ( flow->x_max-flow->x_min ) * ( flow->z_max-flow->z_min );
+	double SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
 
-	cout << "section area = " << SectionArea << endl;
+	cout << "Section area = " << SectionArea << endl;
 // 	cout << "Rmoy " << Rmoy << endl;
 	cout << "x_min = " << flow->x_min << endl;
 	cout << "x_max = " << flow->x_max << endl;
@@ -314,7 +264,6 @@ void FlowEngine::Triangulate ( Scene* ncb )
 	cout << "y_min = " << flow->y_min << endl;
 	cout << "z_min = " << flow->z_min << endl;
 	cout << "z_max = " << flow->z_max << endl;
-// 	cout << "SectionArea = " << SectionArea << endl;
 }
 
 void FlowEngine::NewTriangulation ( Scene* ncb )
@@ -355,7 +304,6 @@ void FlowEngine::NewTriangulation ( Scene* ncb )
 void FlowEngine::Initialize_volumes ( Scene* ncb )
 {
 	CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
-
 	for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
@@ -374,39 +322,31 @@ void FlowEngine::UpdateVolumes ( Scene* ncb )
 	cout << "Updating volumes.............." << endl;
 
 	Real deltaT = ncb->dt;
-
-	cout << "deltaT = " << deltaT << endl;
-
 	CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
-
 	for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
-			case ( 3 ) :
+			case ( 3 ):
 			{
 				cell->info().dv() = ( Volume_cell_triple_fictious ( cell,ncb ) - cell->info().volume() ) /deltaT;
 				cell->info().volume() = Volume_cell_triple_fictious ( cell,ncb );
-			}
-			break;
+			}break;
 			case ( 2 ) :
 			{
 				cell->info().dv() = ( Volume_cell_double_fictious ( cell,ncb )-cell->info().volume() ) /deltaT;
 				cell->info().volume() = Volume_cell_double_fictious ( cell,ncb );
-			}
-			break;
+			}break;
 			case ( 1 ) :
 			{
 				cell->info().dv() = ( Volume_cell_single_fictious ( cell,ncb )-cell->info().volume() ) /deltaT;
 				cell->info().volume() = Volume_cell_single_fictious ( cell,ncb );
-			}
-			break;
+			}break;
 			case ( 0 ) :
 			{
 				cell->info().dv() = ( Volume_cell ( cell,ncb )-cell->info().volume() ) /deltaT;
 				cell->info().volume() = Volume_cell ( cell,ncb );
-			}
-			break;
+			}break;
 		}
 	}
 }
