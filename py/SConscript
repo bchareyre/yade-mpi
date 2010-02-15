@@ -46,8 +46,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[
 # 3rd party modules:
 # ==================
 env.Install('$PREFIX/lib/yade$SUFFIX/py',[
-	#env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/'],LIBS=env['LIBS']+['core']),
-	env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/manualWrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/'],LIBS=env['LIBS']+['core']),
+	env.SharedLibrary('miniWm3Wrap',['miniWm3Wrap/manualWrap.cpp' if 'nowm3' in env['features'] else 'miniWm3Wrap/miniWm3Wrap.cpp'],SHLIBPREFIX='',CPPPATH=env['CPPPATH']+['../lib/'],LIBS=env['LIBS']+['core']),
 ])
 
 if 'YADE_GTS' in env['CPPDEFINES']:
