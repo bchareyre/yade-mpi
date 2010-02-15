@@ -102,7 +102,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 		else {
 			v->info() = (const unsigned int) p->second;
 			//Vh->info().isFictious = false;//false is the default
-			Tes.max_id = std::max(Tes.max_id,(const unsigned int) p->second);
+			Tes.max_id = std::max(Tes.max_id, p->second);
 			Tes.vertexHandles[p->second]=v;
 			hint=v->cell();
 			++TW.n_spheres;
