@@ -29,7 +29,12 @@ par.add_option('-n',help="Run without graphical interface (equivalent to unsetti
 
 opts,args=par.parse_args()
 # c++ boot code checks for YADE_DEBUG at some places; debug verbosity is equivalent
+# do this early, to have debug messages in the boot code (plugin registration etc)
 if opts.verbosity>1: os.environ['YADE_DEBUG']='1'
+
+# this must be done before loading yade libs ("import yade" below)
+# has no effeect after libgomp initializes
+if opts.threads: os.environ['OMP_NUM_THREADS']=str(opts.threads)
 
 sys.stderr.write('Welcome to Yade '+version+'\n')
 
@@ -64,8 +69,6 @@ No need to recompile afterwards.
 
 # continue option processing
 
-if opts.threads:
-	os.environ['OMP_NUM_THREADS']=str(opts.threads)
 if opts.nice:
 	os.nice(opts.nice)
 if yade.config.debug and opts.noGdb:
