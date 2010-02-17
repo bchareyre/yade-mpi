@@ -65,40 +65,27 @@ class FlowBoundingSphere
 		Real minPermLength; //min branch length for Poiseuille
 		
 		double P_SUP, P_INF, P_INS;
-
 		void AddBoundingPlanes ( Tesselation& Tes, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max );
-
 		void Compute_Action ( );
-
 		void Compute_Action ( int argc, char *argv[ ], char *envp[ ] );
-
 		void DisplayStatistics ( RTriangulation& Tri );
-
 		Vecteur external_force_single_fictious ( Cell_handle cell );
-		
 		void SpheresFileCreator ();
-		
 // 		void Analytical_Consolidation ( );
 		
 		void Boundary_Conditions ( RTriangulation& Tri );
-		
 		void Initialize_pressures ( );
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
-		
 		void save_vtk_file ( RTriangulation &T );
-
 		void MGPost ( RTriangulation& Tri );
 #ifdef XVIEW
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
 #endif
 		void Permeameter ( RTriangulation& Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
-
 		void Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, std::string key );
-		
 		double Compute_HydraulicRadius ( RTriangulation& Tri, Cell_handle cell, int j );
-
 		void PermeameterCurve ( RTriangulation& Tri, char *filename, Real time );
 
 		double dotProduct ( Vecteur x, Vecteur y );
@@ -134,7 +121,7 @@ class FlowBoundingSphere
 		
 		void SliceField ( RTriangulation& Tri );
 
-		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
+		Tesselation& Interpolate ( Tesselation& Tes, Tesselation& NewTes );
 		
 		double volume_single_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
 		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
@@ -142,9 +129,7 @@ class FlowBoundingSphere
 		double volume_double_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
 		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
 		double volume_double_fictious_pore (Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point& PV1, Point& PV2, Vecteur& facetSurface);
-		
 };
-
 
 } //namespace CGT
 #endif //FLOW_ENGINE
