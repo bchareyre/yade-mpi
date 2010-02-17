@@ -12,7 +12,7 @@ namespace CGT {
 
 //class Vecteur;// Classe externe
 
-#define NORMALIZE(vecteur) ((vecteur) = (vecteur)*(1/sqrt(pow((vecteur)[0],2)+pow((vecteur)[1],2)+pow((vecteur)[2],2))))
+#define NORMALIZE(vecteur) ((vecteur) = (vecteur)*(1.0/sqrt(pow((vecteur)[0],2)+pow((vecteur)[1],2)+pow((vecteur)[2],2))))
 
 class Tens;
 class Tenseur3;

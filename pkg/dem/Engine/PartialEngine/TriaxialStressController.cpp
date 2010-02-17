@@ -328,19 +328,20 @@ void TriaxialStressController::controlInternalStress ( Scene* ncb, Real multipli
 	// << "bouclesurInteraction" << endl;
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end();
-	for ( ; ii!=iiEnd ; ++ii )
+	for (; ii!=iiEnd ; ++ii)
 	{
-		if ( ( *ii )->isReal() )
-		{
-			ScGeom* contact = static_cast<ScGeom*> ( ( *ii )->interactionGeometry.get() );
+		if ((*ii)->isReal()) {
+			ScGeom* contact = static_cast<ScGeom*>((*ii)->interactionGeometry.get());
 			//      if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
 			//   contact->radius1 *= multiplier;
 			//      if ((*(ncb->bodies))[(*ii)->getId2()]->isDynamic)
 			//   contact->radius2 *= multiplier;
-			if ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->isDynamic )
-				contact->radius1 = static_cast<Sphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId1() ]->shape.get() )->radius;
-			if ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->isDynamic )
-				contact->radius2 = static_cast<Sphere*> ( ( * ( ncb->bodies ) ) [ ( *ii )->getId2() ]->shape.get() )->radius;
+			if ((*(ncb->bodies))[(*ii)->getId1()]->isDynamic)
+				contact->radius1 = static_cast<Sphere*>((* (ncb->bodies))[(*ii)->getId1()]->shape.get())->radius;
+			if ((* (ncb->bodies))[(*ii)->getId2()]->isDynamic)
+				contact->radius2 = static_cast<Sphere*>((* (ncb->bodies))[(*ii)->getId2()]->shape.get())->radius;
+			const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->interactionPhysics);
+			contactPhysics->kn*=multiplier; contactPhysics->ks*=multiplier;
 		}
 	}
 }

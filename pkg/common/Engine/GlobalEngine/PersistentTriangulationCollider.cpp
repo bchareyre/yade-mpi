@@ -4,7 +4,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
+#include<yade/pkg-dem/TesselationWrapper.hpp>
 #include"PersistentTriangulationCollider.hpp"
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>
@@ -14,10 +14,11 @@
 #include<vector>
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-dem/TesselationWrapper.hpp>
+
 
 YADE_REQUIRE_FEATURE(CGAL)
-
+using namespace std;
+		
 PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
 {
 	noTransientIfPersistentExists=false;

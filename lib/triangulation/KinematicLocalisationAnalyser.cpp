@@ -36,6 +36,7 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser()
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
 	consecutive = true;
+	bz2=true;
 	TS1=new TriaxialState;
 	TS0=new TriaxialState;
 }
@@ -47,53 +48,55 @@ KinematicLocalisationAnalyser::~KinematicLocalisationAnalyser()
 	delete(TS0);
 }
 
-KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char*
-		state_file1)
+KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* state_file1, bool usebz2)
 {
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
 	consecutive = true;
+	bz2=true;
 	TS1 = new(TriaxialState);
 	TS0 = NULL;
-	TS1->from_file(state_file1);
+	TS1->from_file(state_file1,/*use bz2?*/ bz2);
 }
 
 KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char*
-		state_file1, const char* state_file0, bool consecutive_files)
+		state_file1, const char* state_file0, bool consecutive_files, bool usebz2)
 {
 	consecutive = consecutive_files;
+	bz2 = usebz2;
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
 	TS1 = new(TriaxialState);
 	TS0 = new(TriaxialState);
-	TS1->from_file(state_file1);
-	TS0->from_file(state_file0);
+	TS1->from_file(state_file1,/*use bz2?*/ bz2);
+	TS0->from_file(state_file0,/*use bz2?*/ bz2);
 
 	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
 }
 
-const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformation(const char* state_file1, const char* state_file0)
+const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformation(const char* state_file1, const char* state_file0, bool usebz2)
 {
 	consecutive = false;
-	TS1->from_file(state_file1);
-	TS0->from_file(state_file0);
+	bz2 = usebz2;
+	TS1->from_file(state_file1,/*use bz2?*/ bz2);
+	TS0->from_file(state_file0,/*use bz2?*/ bz2);
 	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
-	ComputeParticlesDeformation();
 	return ComputeParticlesDeformation();
 }
 
 
-KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_name, int n0, int n1)
+KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_name, int n0, int n1, bool usebz2)
 {
 	file_number_1 = n1;
 	file_number_0 = n0;
 	base_file_name = string(base_name);
 
 	consecutive = ((n1-n0)==1);
+	bz2 = usebz2;
 	sphere_discretisation = SPHERE_DISCRETISATION;
 	linear_discretisation = LINEAR_DISCRETISATION;
 	TS1 = new(TriaxialState);
@@ -104,8 +107,9 @@ KinematicLocalisationAnalyser::KinematicLocalisationAnalyser(const char* base_na
 	file_name1 << (string)(base_file_name) << n1;
 	file_name0 << (string)(base_file_name) << n0;
 	//cout << "file names : " << file_name0.str().c_str() << ", " << file_name1.str().c_str() << endl;
-	TS1->from_file(file_name1.str().c_str());
-	TS0->from_file(file_name0.str().c_str());
+	
+	TS1->from_file(file_name1.str().c_str(), bz2);
+	TS0->from_file(file_name0.str().c_str(), bz2);
 
 	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
@@ -128,19 +132,19 @@ bool KinematicLocalisationAnalyser::SetFileNumbers(int n0, int n1)
 	if (file_number_0 != n0) {
 		if (file_number_1 != n0) {
 			//file_name = base_file_name + n0;
-			bf0 = TS0->from_file((base_file_name +_itoa(file_number_0)).c_str());
+			bf0 = TS0->from_file((base_file_name +_itoa(file_number_0)).c_str(), bz2);
 		} else {
 			delete(TS0);
 			TS0 = TS1;
 			bf0=true;
 			TS1 = new(TriaxialState);
 			//file_name = base_file_name + string(n1);
-			bf1 = TS1->from_file((base_file_name + _itoa(file_number_1)).c_str());
+			bf1 = TS1->from_file((base_file_name + _itoa(file_number_1)).c_str(), bz2);
 		}
 	} else if (n1 != file_number_1) {
 		//file_name = base_file_name + string(n1);
 		bf0 = true;
-		bf1 = TS1->from_file((base_file_name + _itoa(file_number_1)).c_str());}
+		bf1 = TS1->from_file((base_file_name + _itoa(file_number_1)).c_str(), bz2);}
 	file_number_1 = n1;
 	file_number_0 = n0;
 	consecutive = ((n1-n0) ==1);
@@ -232,8 +236,8 @@ bool KinematicLocalisationAnalyser::DefToFile(const char* output_file_name)
 		if (!V_it->info().isFictious)  {
 			Tenseur_sym3 epsilon(ParticleDeformation[V_it->info().id()]);
 			
-			//vtk.write_data((float) epsilon.Deviatoric().Norme());}
-			vtk.write_data((float) epsilon.Deviatoric()(1,1)-epsilon.Deviatoric()(0,0));}
+			vtk.write_data((float) epsilon.Deviatoric().Norme());}
+			//vtk.write_data((float) epsilon.Deviatoric()(1,1)-epsilon.Deviatoric()(0,0));}
 	}
 	vtk.end_data();
 
@@ -992,7 +996,7 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::ComputeParticlesDeformati
 
 	//Compute Voronoi tesselation (i.e. voronoi center of each cell)
 	if (!Tes.Computed()) Tes.Compute();
-	if (ParticleDeformation.size() != (Tes.Max_id() + 1)) {
+	if (ParticleDeformation.size() != (unsigned int)(Tes.Max_id() + 1)) {
 		ParticleDeformation.clear();
 		ParticleDeformation.resize(Tes.Max_id() + 1);
 	}

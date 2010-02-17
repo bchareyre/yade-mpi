@@ -14,6 +14,7 @@
 
 #include "Tesselation.h"
 #include <vector>
+#include<boost/iostreams/filtering_stream.hpp>
 
 /*! \class TriaxialState
  * \brief A storage class with ascii input/output for bodies, contacts, and macro-variables. Yade packings are first converted to this object type, before being processed in KinematicLocalisationAnalyser.
@@ -66,12 +67,13 @@ public:
 	TriaxialState(void);
 	~TriaxialState(void);
 		
-	bool from_file(const char* filename);
+	bool from_file(const char* filename, bool bz2=false);
 	bool to_file(const char* filename, bool bz2=false);
 	bool inside(Real x, Real y, Real z);
 	bool inside(Vecteur v);
 	bool inside(Point p);
 	static Real find_parameter (const char* parameter_name, const char* filename);
+	static Real find_parameter (const char* parameter_name, boost::iostreams::filtering_istream& file);
 	static Real find_parameter (const char* parameter_name, ifstream& file);
 	void reset (void);
 

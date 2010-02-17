@@ -86,7 +86,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		Real frictionAngleDegree;
 		//! Value of porosity chosen by the user
 		Real fixedPorosity;
-		
+		//! Max value of stress during the simulation (for post-processing)
+		Real maxStress;
 
 		//! Previous state (used to detect manual changes of the state in .xml)
 		stateNum previousState;
@@ -122,7 +123,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 
 	protected :
 		virtual void postProcessAttributes(bool);
-	REGISTER_ATTRIBUTES(TriaxialStressController,(strainRate)(currentStrainRate)/*(Phase1)*/(UnbalancedForce)(StabilityCriterion)(translationAxis)/*(compressionActivated)*/(autoCompressionActivation)(autoStopSimulation)(testEquilibriumInterval)(currentState)(previousState)(sigmaIsoCompaction)(previousSigmaIso)(sigmaLateralConfinement)(Key)(noFiles)(frictionAngleDegree)(epsilonMax)(uniaxialEpsilonCurr)(isotropicCompaction)(spheresVolume)(fixedPorosity));
+		REGISTER_ATTRIBUTES(TriaxialStressController,(strainRate)(currentStrainRate)/*(Phase1)*/(UnbalancedForce)(StabilityCriterion)(translationAxis)/*(compressionActivated)*/(autoCompressionActivation)(autoStopSimulation)(testEquilibriumInterval)(currentState)(previousState)(sigmaIsoCompaction)(previousSigmaIso)(sigmaLateralConfinement)(Key)(noFiles)(frictionAngleDegree)(epsilonMax)(uniaxialEpsilonCurr)(isotropicCompaction)(spheresVolume)(fixedPorosity)(maxStress));
 
 	REGISTER_CLASS_NAME(TriaxialCompressionEngine);
 	REGISTER_BASE_CLASS_NAME(TriaxialStressController);

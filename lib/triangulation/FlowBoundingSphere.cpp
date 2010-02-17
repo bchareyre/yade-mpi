@@ -12,20 +12,27 @@
 //#define XVIEW
 #include "FlowBoundingSphere.h"//include after #define XVIEW
 
-#define FAST
-#define TESS_BASED_FORCES
 #ifdef XVIEW
 #include "Vue3D.h"
 #endif
 
 #ifdef FLOW_ENGINE
 
+#define FAST
+#define TESS_BASED_FORCES
+
 using namespace std;
 namespace CGT
 {
 
+const bool DEBUG_OUT = false;
+	
 const double RELAX = 1.9;
-const double TOLERANCE = 1e-08;
+const double TOLERANCE = 1e-06;
+const double ONE_THIRD = 1.0/3.0;
+//! Use this factor, or minLength, to reduce max permeability values (see usage below))
+const double MAXK_DIV_KMEAN = 5000;
+const double minLength = 0.20;//percentage of mean rad
 
 //! Factors including the effect of 1/2 symmetry in hydraulic radii
 Real multSym1 = 1/pow ( 2,0.25 );
@@ -34,9 +41,9 @@ Real multSym2 = 1/pow ( 4,0.25 );
 bool SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
 double FAR = 500;
 
-int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
-int permutations_facet [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
-int permutations_vertices [4][4] = {{0,1,2,3},{1,2,0,3},{2,0,1,3},{3,2,1,0}};
+const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
+const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
+const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
 
 vector<double> Pressures;
 
@@ -63,6 +70,7 @@ FlowBoundingSphere::FlowBoundingSphere()
 	x_min = 1000.0, x_max = -10000.0, y_min = 1000.0, y_max = -10000.0, z_min = 1000.0, z_max = -10000.0;
 	currentTes = 0; tess_based_force = true;
 	for ( int i=0;i<6;i++ ) boundsIds[i] = 0;
+	minPermLength=-1;
 }
 
 void FlowBoundingSphere::Compute_Action()
@@ -88,10 +96,9 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 	double x, y, z, r, wx, wc;
 	int nOfSpheres = 0;
 
-	ifstream loadFile ( argc==1 ? "cube" : argv[1] ); // cree l'objet loadFile de la classe ifstream qui va permettre de lire importFilename
-	int nPeriods = ( argc>2 ) ? atoi ( argv[2] ) : 1;
 
-	Real rayon = 0;
+	ifstream loadFile ( argc==1 ? "cube" : argv[1] ); // cree l'objet loadFile de la classe ifstream qui va permettre de lire importFilename
+// 	Real rayon = 0;
 // 	x_min = 1000.0, x_max = -10000.0, y_min = 1000.0, y_max = -10000.0, z_min = 1000.0, z_max = -10000.0; Rmoy=0;
 	while ( !loadFile.eof() ) // tant qu'on n'est pas a la fin du fichier
 	{
@@ -110,6 +117,7 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 		z_max = max ( z_max,z+r );
 	}
 	Rmoy /= nOfSpheres;
+	minPermLength = Rmoy*minLength;
 
 	Vertex_handle Vh;
 	int V = X.size();
@@ -129,67 +137,12 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 		Vue1.Dessine_Sphere ( X[i],Y[i],Z[i], R[i], 15 );
 #endif
 	}
-	if ( 0 )  ///Periodic duplication
-	{
-		cout << "nperiods = " << nPeriods << endl;
-		Real pdx=x_max-x_min;
-		Real pdy=y_max-y_min;
-		Real pdz=z_max-z_min;
-		//pdx*=1.001;pdy*=1.001;pdz*=1.001;
-		int V2=V;
-		H = nPeriods* ( y_max - y_min );
-		for ( int npx=0; npx<nPeriods; npx++ )
-		{
-			for ( int npy=0; npy<nPeriods; npy++ )
-			{
-				for ( int npz=0; npz<nPeriods; npz++ )
-				{
-					if ( ( npx+npy+npz ) > 0 )
-					{
-						for ( int ng=0; ng<V; ng++ )
-						{
-							///A random noise on coordinates is needed to avoid CGAL crash on periodic packings
-							double x = X[ng]+ ( npx+0.01*Rmoy*Rand_d() ) *pdx;
-							double y = Y[ng]+ ( npy+0.01*Rmoy*Rand_d() ) *pdy;
-							double z = Z[ng]+ ( npz+0.01*Rmoy*Rand_d() ) *pdz;
-							double r = R[ng];
-							//cout << "inserting "<< x<<" "<<y<<" "<<z<<" "<< r <<" "<<V2<<endl;
-							Vh = Tes.insert ( x,y,z, r, V2++ );
-#ifdef XVIEW
-							Vue1.Dessine_Sphere ( x,y,z, r, 15 );
-#endif
-							//cout << V2 << "inserted" << endl;
-							x_min = min ( x_min,Vh->point() [0]-R[ng] );
-							x_max = max ( x_max,Vh->point() [0]+R[ng] );
-							y_min = min ( y_min,Vh->point() [1]-R[ng] );
-							y_max = max ( y_max,Vh->point() [1]+R[ng] );
-							z_min = min ( z_min,Vh->point() [2]-R[ng] );
-							z_max = max ( z_max,Vh->point() [2]+R[ng] );
-						}
-					}
-				}
-			}
-		}
-		cout << nPeriods<<" period(s) triangulated"<<endl;
-	}
-
-
-	H = y_max-y_min;
+		H = y_max-y_min;
 	SectionArea = ( x_max-x_min ) * ( z_max-z_min );
-
 	clock.top ( "loading spheres + Triangulation" );
 
 	Tes.Compute();
 	clock.top ( "tesselation" );
-
-	cout << "Rmoy " << Rmoy << endl;
-	cout << "x_min = " << x_min << endl;
-	cout << "x_max = " << x_max << endl;
-	cout << "y_max = " << y_max << endl;
-	cout << "y_min = " << y_min << endl;
-	cout << "z_min = " << z_min << endl;
-	cout << "z_max = " << z_max << endl;
-	cout << "SectionArea = " << SectionArea << endl;
 
 	boundary ( y_min_id ).flowCondition=0;
 	boundary ( y_max_id ).flowCondition=0;
@@ -223,7 +176,6 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 	clock.top ( "DisplayStatistics" );
 
 	/** START GAUSS SEIDEL */
-
 	//  Boundary_Conditions ( Tri );
 
 	Initialize_pressures();
@@ -240,19 +192,14 @@ void FlowBoundingSphere::Compute_Action ( int argc, char *argv[ ], char *envp[ ]
 
 	Compute_Forces();
 	clock.top ( "Compute_Forces" );
-
-	//  oFile << factor << " " << Permeability << endl;
-
-	//  save_vtk_file ( Tri );
-
+	
+	
 	/** VISUALISATION FILES **/
-
+	//  save_vtk_file ( Tri );
 	//   PermeameterCurve ( Tri );
-
 	MGPost ( Tri );
 
 	///*** VUE 3D ***///
-
 	//Vue1.SetCouleurSegments ( 0,10,0 );
 	//  Dessine_Triangulation ( Vue1, Tes.Triangulation() );
 #ifdef XVIEW
@@ -273,6 +220,7 @@ void FlowBoundingSphere::SpheresFileCreator()
 	}
 }
 
+/// FIXME : put this sort of interesting code in your own code library, not here
 // void FlowBoundingSphere::Analytical_Consolidation()
 // {
 // //   std::ofstream oFile ( "Analytical_Consolidation",std::ios::out );
@@ -315,38 +263,29 @@ void FlowBoundingSphere::SpheresFileCreator()
 //  }
 // }
 
-void FlowBoundingSphere::Boundary_Conditions ( RTriangulation& Tri )
+void FlowBoundingSphere::Boundary_Conditions(RTriangulation& Tri)
 {
 	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
-
-	for ( Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++ )
-	{
-		if ( V_it->info().isFictious )
-		{
-			//     if ( boundary ( V_it->info().id() ).coordinate == 1 )
-			if ( boundaries[V_it->info().id() ].coordinate == 1 )
+	//FIXME You can't use a loop on vertices and v->cell to visit cells, it returns random cells (possibly lateral cells)
+	for (Finite_vertices_iterator V_it = Tri.finite_vertices_begin(); V_it !=  vertices_end; V_it++) {
+		if (V_it->info().isFictious) {
+			if (boundary(V_it->info().id()).coordinate == 1)
+				//if ( boundaries[V_it->info().id() ].coordinate == 1 )
 			{
-				//      boundary ( V_it->info().id() ).flowCondition = 1;
-				boundaries[V_it->info().id() ].flowCondition = 1;
-				if ( boundaries[V_it->info().id() ].p == Corner_min )
-				{
+				boundary(V_it->info().id()).flowCondition = 1;
+//     boundaries[V_it->info().id() ].flowCondition = 1;
+				if (boundaries[V_it->info().id()].p == Corner_min) {
 					V_it->cell()->info().p() = P_INF;
 					V_it->cell()->info().isExternal = true;
-				}
-				else
-				{
+				} else {
 					V_it->cell()->info().p() = P_SUP;
 					V_it->cell()->info().isExternal = true;
 				}
-			}
-			else
-			{
-				boundaries[V_it->info().id() ].flowCondition = 0;
-				//      boundary ( V_it->info().id() ).flowCondition = 0;
+			} else {
+				boundary(V_it->info().id()).flowCondition = 0;
 				V_it->cell()->info().p() = V_it->cell()->info().y();
 			}
-		}
-		else {V_it->cell()->info().p() = V_it->cell()->info().y();}
+		} else {V_it->cell()->info().p() = V_it->cell()->info().y();}
 	}
 }
 
@@ -373,46 +312,50 @@ void FlowBoundingSphere::Interpolate ( Tesselation& Tes, Tesselation& NewTes )
 void FlowBoundingSphere::Localize()
 {
 	Vertex_handle V;
-	bool pass = 0;
+	int pass = 0;
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	cout << "Localizing..." << endl;
 
+
 	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )
 	{
-		cell->info().fictious() = 0;
+// 		cell->info().fictious() = 0;
+
 		pass = 0;
 		for ( int i=0;i<4;i++ )
 		{
 			V = cell->vertex ( i );
 			if ( V->info().isFictious )
 			{
-				cell->info().fictious() ++;
-				pass = 1;
-				
-				// Boundary& bi = boundary ( V->info().id() );
-				// if ( bi.flowCondition )
-				if ( V->info().id() != y_min_id && V->info().id() != y_max_id)
+// 				cell->info().fictious() ++;
+				++pass;
+				//FIXME : remove the isFictious flag and use cell->info().fictious() instead
+// 				cell->info().isFictious = true;				
+				Boundary& bi = boundary(V->info().id());
+				//     Boundary& bi = boundaries [V->info().id()];
+
+				if ( bi.flowCondition )
 				{
+					// Inf/Sup has priority
 					if ( !cell->info().isSuperior && !cell->info().isInferior )
 					{
-						cell->info().isLateral = true;cell->info().isInside=false; cell->info().isInferior=false; cell->info().isSuperior=false;
+						cell->info().isLateral = true;
+						cell->info().isInferior=false;
+						cell->info().isSuperior=false;
 #ifdef XVIEW
 						Vue1.SetSpheresColor ( 0.1,0.95,0.1,1 );
-						Vue1.Dessine_Sphere (cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4 );
+						Vue1.Dessine_Sphere ( cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4 );
 #endif
 					}
 				}
 				else
 				{
-					if ( V->info().id() == y_min_id )
+					if ( (unsigned int) V->info().id() == y_min_id )
 					{
-						cell->info().isInferior=true; cell->info().isLateral=false; cell->info().isSuperior=false;cell->info().isInside=false;
+						cell->info().isInferior=true; cell->info().isLateral=false; cell->info().isSuperior=false;
 					}
-					else{
-						cell->info().isSuperior=true;cell->info().isLateral=false;
-						cell->info().isInferior=false;cell->info().isInside=false;
-					}
+					else {cell->info().isSuperior=true;cell->info().isLateral=false;cell->info().isInferior=false;}
 #ifdef XVIEW
 					Vue1.SetSpheresColor ( 1,0.1,0.1,1 );
 					Vue1.Dessine_Sphere ( cell->info().x(), cell->info().y(), cell->info().z(), 0.02 , 4 );
@@ -420,7 +363,8 @@ void FlowBoundingSphere::Localize()
 				}
 			}
 		}
-		if (!pass) cell->info().isInside=true;
+		cell->info().fictious()=pass;
+		if (!pass) cell->info().isInside=true; else cell->info().isInside=false;
 	}
 	cout << "Localised -------------" << endl;
 }
@@ -441,10 +385,11 @@ void FlowBoundingSphere::Compute_Permeability()
 
 	Vecteur n;
 
-	std::ofstream oFile ( "Hydraulic_Radius" ,std::ios::out );
+
+	std::ofstream oFile("Hydraulic_Radius" ,std::ios::out);
 	//   std::ofstream kFile ( "Permeability" ,std::ios::out );
-	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )
-	{
+	Real meanK=0; Real infiniteK=1e10;
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
 		p1 = cell->info();
 		for ( int j=0; j<4; j++ )
 		{
@@ -453,43 +398,50 @@ void FlowBoundingSphere::Compute_Permeability()
 			if ( !Tri.is_infinite ( neighbour_cell ) && neighbour_cell->info().isvisited==ref )
 			{
 				Bizarre = false;
-
 				pass+=1;
-
-				Rhv = Compute_HydraulicRadius ( Tri, cell, j );
-
-				if ( Rhv<0 ) NEG++; else POS++;
-
-				( cell->info().Rh() ) [j]=Rhv;
-				( neighbour_cell->info().Rh() ) [Tri.mirror_index ( cell, j ) ]= Rhv;
-
-				oFile << pass << " " << Rhv << endl;
-
+				Rhv = Compute_HydraulicRadius(Tri, cell, j);
+				if (Rhv<0) NEG++; else POS++;
+				(cell->info().Rh())[j]=Rhv;
+				(neighbour_cell->info().Rh())[Tri.mirror_index(cell, j)]= Rhv;
+				if (DEBUG_OUT)
+				oFile << pass << " " << Rhv << " "<<cell->vertex(facetVertices[j][0])->point()
+						<< " "<<cell->vertex(facetVertices[j][1])->point() << " "<<cell->vertex(facetVertices[j][2])->point()<<endl;
 				Vecteur l = p1 - p2;
-				distance = sqrt ( l.squared_length() );
-
+				distance = sqrt(l.squared_length());
 				n = l/distance;
-
 				radius = 2* Rhv;
 
-				if ( radius==0 ) {cout << "INS-INS PROBLEM!!!!!!!" << endl;}
+				if (radius==0) {cout << "INS-INS PROBLEM!!!!!!!" << endl;}
 
-				if ( distance!=0 )
-				{
-					k = ( M_PI * pow ( radius,4 ) ) / ( 8*viscosity*distance );
-				}
-				else  k = 10000;
-
-				( cell->info().k_norm() ) [j]= k*k_factor;
-				( cell->info().k_vector() ) [j]= k*n;
-				( neighbour_cell->info().k_norm() ) [Tri.mirror_index ( cell, j ) ]= k*k_factor;
-				( neighbour_cell->info().k_vector() ) [Tri.mirror_index ( cell, j ) ]= ( -k ) *n;
+				if (distance!=0) {
+					if (minPermLength>0) distance=max(minPermLength,distance);
+					k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
+					meanK += k;
+				} else  k = infiniteK;//Will be corrected in the next loop
+// 				cout << "k="<<k<<endl;
+				(cell->info().k_norm())[j]= k*k_factor;
+// 				(cell->info().facetSurf())[j]= k*n;
+				(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
+// 				(neighbour_cell->info().facetSurf())[Tri.mirror_index(cell, j)]= (-k) *n;
 			}
 			//    else if ( Tri.is_infinite ( neighbour_cell )) k = 0;//connection to an infinite cells
 		}
 		cell->info().isvisited = !ref;
+
+		//    for (int y=0;y<4;y++) cout << "Permeability " << y << " = " << (cell->info().k_norm())[y] << endl;
+		//    for ( int y=0;y<4;y++ ) kFile << y << " = " << ( cell->info().k_norm() ) [y] << endl;
 	}
-	cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
+	
+	// A loop to reduce K maxima, needs a better equation : the mean value is influenced by the very big K
+	meanK /= pass;
+	Real maxKdivKmean = MAXK_DIV_KMEAN;
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		for (int j=0; j<4; j++) {
+// 			if (cell->info().k_norm()[j]>maxKdivKmean*meanK) cerr <<"Adjusting permeability : " <<cell->info().k_norm()[j]<<" > "<<maxKdivKmean<<" * "<<meanK<<endl;
+			(cell->info().k_norm())[j] = min(cell->info().k_norm()[j], maxKdivKmean*meanK);
+		}
+	}
+	if (DEBUG_OUT)	cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
 
 	Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
 	Real Vgrains = 0;
@@ -504,11 +456,10 @@ void FlowBoundingSphere::Compute_Permeability()
 		}
 	}
 
-	Real Vtotale = ( x_max-x_min ) * ( y_max-y_min ) * ( z_max-z_min );
-
-	cout << grains << " grains ---> " << "Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << Vtotale-Vgrains << endl;
-
-	cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
+	Real Vtotale = (x_max-x_min) * (y_max-y_min) * (z_max-z_min);
+	if (DEBUG_OUT) {
+	cout<<grains<<"grains - " <<"Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << Vtotale-Vgrains << endl;
+	cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;}
 }
 
 void FlowBoundingSphere::DisplayStatistics()
@@ -517,52 +468,73 @@ void FlowBoundingSphere::DisplayStatistics()
 	DisplayStatistics ( Tri );
 }
 
-
 void FlowBoundingSphere::DisplayStatistics ( RTriangulation& Tri )
 {
 	int Zero =0, Inside=0, Superior=0, Inferior=0, Lateral=0, Fictious=0;
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
-
-	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )
-	{
+	for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ ) {
 		int zeros =0;
 		for ( int j=0; j!=4; j++ )
 			{if ( ( cell->info().k_norm() ) [j]==0 ) {zeros+=1;}}
-
 		if ( zeros==4 ) {Zero+=1;}
 		if ( !cell->info().fictious() ) {Inside+=1;}
-		else
-		{
+		else {
 			Fictious+=1;
 			if ( cell->info().isSuperior ) Superior+=1;
 			else if ( cell->info().isInferior ) Inferior+=1;
-			else Lateral+=1;
-		}
+			else Lateral+=1;}
 	}
-
 	cout << "zeros = " << Zero << endl;
-
 	int fict=0, real=0;
-
 	for ( Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v )
 	{
 		if ( v->info().isFictious ) fict+=1; else real+=1;
 	}
-
 	long Vertices = Tri.number_of_vertices();
 	cout << "There are " << Vertices << " vertices, dont " << fict << " fictious et " << real << " reeeeeel" << std::endl;
-
 	long Cells = Tri.number_of_finite_cells();
 	cout << "There are " << Cells << " cells " << std::endl;
-
 	long Facets = Tri.number_of_finite_facets();
 	cout << "There are " << Facets << " facets " << std::endl;
-
 	cout << "There are " << Inside << " cells INSIDE." << endl;
 	cout << "There are " << Lateral << " cells LATERAL." << endl;
 	cout << "There are " << Inferior << " cells INFERIOR." << endl;
 	cout << "There are " << Superior << " cells SUPERIOR." << endl;
 	cout << "There are " << Fictious << " cells FICTIOUS." << endl;
+}
+
+void FlowBoundingSphere::ComputeTetrahedralForces()
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	Vecteur nullVect(0,0,0);
+	bool ref = Tri.finite_cells_begin()->info().isvisited;
+	
+	Cell_handle neighbour_cell; Vertex_handle mirror_vertex;
+	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+		for (int j=0; j<4; j++) if (!Tri.is_infinite(cell->neighbor(j)) && cell->neighbor(j)->info().isvisited==ref) {
+				neighbour_cell = cell->neighbor(j);
+				const Vecteur& Surfk = cell->info().facetSurfaces[j];
+				/// handle fictious vertex since we can get the projected surface easily here
+				if (cell->vertex(j)->info().isFictious) {
+					Real projSurf=abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
+					cell->vertex(j)->info().forces = cell->vertex(j)->info().forces -projSurf*boundary(cell->vertex(j)->info().id()).normal*cell->info().p();
+				}
+				/// handle the opposite fictious vertex (remember each facet is seen only once)
+				mirror_vertex = neighbour_cell->vertex(Tri.mirror_index(cell,j));
+				Vertex_Info& info = neighbour_cell->vertex(Tri.mirror_index(cell,j))->info();
+				if (info.isFictious) {
+					Real projSurf=abs(Surfk[boundary(info.id()).coordinate]);
+					info.forces = info.forces - projSurf*boundary(info.id()).normal*neighbour_cell->info().p();
+				}
+				/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
+				Vecteur Facet_Force = (neighbour_cell->info().p()-cell->info().p())*Surfk*cell->info().solidSurfaces[j][3];
+				for (int y=0; y<3;y++) {
+					cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + Facet_Force*cell->info().solidSurfaces[j][y];
+				}
+			}
+		cell->info().isvisited=!ref;
+	}
 }
 
 void FlowBoundingSphere::Compute_Forces()
@@ -571,23 +543,24 @@ void FlowBoundingSphere::Compute_Forces()
 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	Vecteur nullVect ( 0,0,0 );
 	Vecteur TotalForce = nullVect;
+	
+	Real_timer clock;
+	clock.start();
+	clock.top ( "start" );
+	//reset forces
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {v->info().forces=nullVect;}
+
 
 	bool ref = Tri.finite_cells_begin()->info().isvisited;
 	// #ifndef TESS_BASED_FORCES
 	if ( !tess_based_force )
 	{
-		for ( Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v ) {v->info().forces=nullVect;}
-
 		Cell_handle neighbour_cell;
 		Vertex_handle V;
-
 		Point p1, p2;
-
 		Vecteur Cell_Force= nullVect, Vertex_force= nullVect;
-
 		Real invSsolid;
 		int fict =0, V_fict=0;
-
 		bool single_external_force, double_external_force, triple_external_force;
 		bool VV [3];
 
@@ -645,6 +618,7 @@ void FlowBoundingSphere::Compute_Forces()
 						if ( !VV[1] ) {SW[1]=Vertices[2];SW[2]=Vertices[1];}
 						else if ( !VV[0] ) {SW[0]=Vertices[2];SW[2]=Vertices[0];}
 
+
 						Sk = surface_solid_fictious_facet ( SW[0],SW[1],SW[2] );
 					}
 					else
@@ -652,7 +626,7 @@ void FlowBoundingSphere::Compute_Forces()
 						Sk = sqrt ( t.squared_area() );
 						for ( int y=0;y<3;y++ )
 						{
-							Sk-=surface_solid_facet ( facet_spheres[permutations_facet[y][0]], facet_spheres[permutations_facet[y][1]], facet_spheres[permutations_facet[y][2]] );
+							Sk-=surface_solid_facet ( facet_spheres[permut3[y][0]], facet_spheres[permut3[y][1]], facet_spheres[permut3[y][2]] );
 						}
 					}
 
@@ -719,10 +693,10 @@ void FlowBoundingSphere::Compute_Forces()
 			//    {
 			//     if ( !cell->info().isSuperior && !cell->info().isInferior )
 			//     {
-			//      Ssolid_portion[q] = fast_spherical_triangle_area ( V[permutations_vertices[q][0]],V[permutations_vertices[q][1]],V[permutations_vertices[q][2]],V[permutations_vertices[q][3]] );
+			//      Ssolid_portion[q] = fast_spherical_triangle_area ( V[permut4[q][0]],V[permut4[q][1]],V[permut4[q][2]],V[permut4[q][3]] );
 			//     }
 			//    }
-			//    else {Ssolid_portion[q] = fast_spherical_triangle_area ( V[permutations_vertices[q][0]],V[permutations_vertices[q][1]],V[permutations_vertices[q][2]],V[permutations_vertices[q][3]] );}
+			//    else {Ssolid_portion[q] = fast_spherical_triangle_area ( V[permut4[q][0]],V[permut4[q][1]],V[permut4[q][2]],V[permut4[q][3]] );}
 			//   }
 
 
@@ -738,9 +712,10 @@ void FlowBoundingSphere::Compute_Forces()
 							        ( cell, boundaries [cell->vertex ( q )->info().id() ] );
 						if ( double_external_force ) Ssolid_portion[q] = surface_external_double_fictious ( cell, boundaries [cell->vertex ( q )->info().id() ] );
 						if ( triple_external_force ) Ssolid_portion[q] = surface_external_triple_fictious ( cell, boundaries [cell->vertex ( q )->info().id() ] );
+
 					}
 				}
-				else Ssolid_portion[q] = fast_spherical_triangle_area ( V[permutations_vertices[q][0]], V[permutations_vertices[q][1]], V[permutations_vertices[q][2]], V[permutations_vertices[q][3]] );
+				else Ssolid_portion[q] = fast_spherical_triangle_area ( V[permut4[q][0]], V[permut4[q][1]], V[permut4[q][2]], V[permut4[q][3]] );
 			}
 
 			for ( int k=0;k<4;k++ ) Ssolid += Ssolid_portion[k];
@@ -762,11 +737,6 @@ void FlowBoundingSphere::Compute_Forces()
 	// #else
 	else
 	{
-		for ( Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v )
-		{
-			v->info().forces = nullVect;
-		}
-
 		Real fsurf = 0.5;//= 0.5/-0.5 for defining the direction of branch vector, "0.5" is for the average pressure
 		///FIXME :all facets computed twice : the forces are x2, it needs a "visited" check before computing anything
 		for ( Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++ )
@@ -797,11 +767,11 @@ void FlowBoundingSphere::Compute_Forces()
 					// 				{
 					for ( int jj=0; jj<3; jj++ )
 					{
-						if ( !vertices[permutations_facet[jj][0]]->info().isFictious || !vertices[permutations_facet[jj][1]]->info().isFictious )
+						if ( !vertices[permut3[jj][0]]->info().isFictious || !vertices[permut3[jj][1]]->info().isFictious )
 						{
-							int& i1 = permutations_facet[jj][0];
-							int& i2 = permutations_facet[jj][1];
-							int& i3 = permutations_facet[jj][2];
+							const int& i1 = permut3[jj][0];
+							const int& i2 = permut3[jj][1];
+							const int& i3 = permut3[jj][2];
 							Vecteur surface = 0.5*CGAL::cross_product ( middles[i3]-c1,middles[i3]-c2 );
 
 							if ( surface* ( vertices[i2]->point()-vertices[i1]->point() ) <0 ) fsurf = -0.5; else fsurf = 0.5;     ///= 0.5/-0.5 for defining the direction of branch vector, "0.5" is for the mean pressure
@@ -816,19 +786,35 @@ void FlowBoundingSphere::Compute_Forces()
 		}
 
 	}
+// 	if (DEBUG_OUT) {
+	cout << "normal scheme" <<endl;
 	for ( Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v )
 	{
-		if ( !v->info().isFictious )
-		{
-// 			cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
-			TotalForce = TotalForce + v->info().forces;
-		}
-		else
-		{
-			if ( boundary ( v->info().id() ).flowCondition==1 ) TotalForce = TotalForce + v->info().forces;
-			cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
-		}
+		if ( !v->info().isFictious ) {
+			if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
+			TotalForce = TotalForce + v->info().forces;}
+			else	{
+				if ( boundary ( v->info().id() ).flowCondition==1 ) TotalForce = TotalForce + v->info().forces;
+				if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;}
 	}
+	cout << "TotalForce = "<< TotalForce << endl;
+	clock.top ( "tri/tess force calculation" );
+	//reset forces
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {v->info().forces=nullVect;}
+	ComputeTetrahedralForces();
+// 	if (DEBUG_OUT) {
+	cout << "tetrahedral scheme" <<endl;
+	TotalForce = nullVect;
+	for ( Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v )
+	{
+		if ( !v->info().isFictious ) {
+			if (DEBUG_OUT) cout << "id = " << v->info().id() << " force = " << v->info().forces << endl;
+			TotalForce = TotalForce + v->info().forces;}
+		else	{
+			if ( boundary ( v->info().id() ).flowCondition==1 ) TotalForce = TotalForce + v->info().forces;
+			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;}
+	}
+	clock.top ( "facets force calculation" );
 	cout << "TotalForce = "<< TotalForce << endl;
 }
 
@@ -1078,7 +1064,40 @@ double FlowBoundingSphere::volume_double_fictious_pore ( Vertex_handle SV1, Vert
 	return ( Vpore );
 }
 
-double FlowBoundingSphere::volume_single_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 )
+//Fast version, assign surface of facet for future forces calculations
+double FlowBoundingSphere::volume_double_fictious_pore (Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point& PV1, Point& PV2, Vecteur& facetSurface)
+{
+	double A [3], B[3]/*, C[3]*/;
+	  Boundary &bi1 = boundary ( SV1->info().id() );
+	  Boundary &bi2 = boundary ( SV2->info().id() );
+
+// 	Boundary &bi1 = boundaries [SV1->info().id() ];
+// 	Boundary &bi2 = boundaries [SV2->info().id() ];
+
+	for ( int m=0;m<3;m++ ) {A[m]=B[m]= SV3->point()[m];}
+	A[bi1.coordinate]=bi1.p[bi1.coordinate];
+	B[bi2.coordinate]=bi2.p[bi2.coordinate];
+	Point AA ( A[0],A[1],A[2] );
+	Point BB ( B[0],B[1],B[2] );
+
+	facetSurface = CGAL::cross_product(SV3->point()-AA,SV3->point()-BB);
+	if (facetSurface*(PV2-PV1) > 0) facetSurface = -1.0*facetSurface;
+	Real Vtot = abs(facetSurface*(PV1-PV2))*ONE_THIRD;
+	
+	Real Vsolid1 = spherical_triangle_volume ( SV3->point(), AA, PV1, PV2 );
+	Real Vsolid2 = spherical_triangle_volume ( SV3->point(), BB, PV1, PV2 );
+
+	Real Vpore = Vtot - Vsolid1 - Vsolid2;
+// 	if (Vpore<0) cerr << "Vpore<0"<<endl; else cerr << "Vpore>0"<<endl;
+
+	Vtotalissimo += Vtot;
+	Vporale += Vpore;
+	Vsolid_tot += Vsolid1 + Vsolid2;
+
+	return ( Vpore );
+}
+
+double FlowBoundingSphere::volume_single_fictious_pore ( const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface)
 {
 	double A [3], B[3];
 
@@ -1091,6 +1110,46 @@ double FlowBoundingSphere::volume_single_fictious_pore ( Vertex_handle SV1, Vert
 	A[bi1.coordinate]=bi1.p[bi1.coordinate];
 	B[bi1.coordinate]=bi1.p[bi1.coordinate];
 
+	Point AA ( A[0],A[1],A[2] );
+	Point BB ( B[0],B[1],B[2] );
+	facetSurface = surface_single_fictious_facet(SV1,SV2,SV3);
+	if (facetSurface*(PV2-PV1) > 0) facetSurface = -1.0*facetSurface;
+	Real Vtot=ONE_THIRD*abs(facetSurface*(PV1-PV2));
+			
+	Sphere A1 ( AA, 0 );
+	Sphere B1 ( BB, 0 );
+	Sphere& SW2 = SV2->point();
+	Sphere& SW3 = SV3->point();
+
+	Real Vsolid1 = spherical_triangle_volume ( SW2, AA, PV1, PV2 )+spherical_triangle_volume ( SW2, SW3, PV1, PV2 );
+	Real Vsolid2 = spherical_triangle_volume ( SW3, BB, PV1, PV2 )+spherical_triangle_volume ( SW3, SW2, PV1, PV2 );
+
+	Real Vpore = Vtot - Vsolid1 - Vsolid2 ;
+// 	if (Vpore<0) {
+// 		cerr << "Vpore2<0"<<endl;}
+// 	else cerr << "Vpore2>0"<<endl;
+
+	Vsolid_tot += Vsolid1 + Vsolid2;
+	Vtotalissimo += Vtot;
+	Vporale += Vpore;
+
+	return ( Vpore );
+}
+
+
+double FlowBoundingSphere::volume_single_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 )
+{
+	double A [3], B[3];
+
+	//   Boundary &bi1 = boundary ( SV1->info().id() );
+	Boundary &bi1 = boundaries [SV1->info().id() ];
+
+	for ( int m=0;m<3;m++ ) {A[m]= ( SV2->point() ) [m];}
+	for ( int m=0;m<3;m++ ) {B[m]= ( SV3->point() ) [m];}
+
+	A[bi1.coordinate]=bi1.p[bi1.coordinate];
+	B[bi1.coordinate]=bi1.p[bi1.coordinate];
+		
 	Point AA ( A[0],A[1],A[2] );
 	Point BB ( B[0],B[1],B[2] );
 
@@ -1116,39 +1175,39 @@ double FlowBoundingSphere::volume_single_fictious_pore ( Vertex_handle SV1, Vert
 
 double FlowBoundingSphere::Compute_HydraulicRadius ( RTriangulation& Tri, Cell_handle cell, int j )
 {
-	Cell_handle neighbour_cell = cell->neighbor ( j );
 
+	Cell_handle neighbour_cell = cell->neighbor(j);
+	if (Tri.is_infinite(neighbour_cell)) return 0;
 	Point p1 = cell->info();
 	Point p2 = neighbour_cell->info();
 
 	Vertex_handle SV1, SV2, SV3;
 
-	double Vtot=0, Vsolid=0, Vpore=0, Vsolid1=0, Vsolid2=0, Vol1=0, Vol2=0;
+	double Vtot=0, Vsolid=0, Vpore=0, Vsolid1=0, Vsolid2=0;
 
 	int F1=0, F2=0, Re1=0, Re2=0;
+	//indices relative to the facet
+	int facetRe1, facetRe2, facetRe3, facetF1, facetF2;
 	int fictious_vertex=0, real_vertex=0;
 
 	double Ssolid1=0, Ssolid1n=0, Ssolid2=0, Ssolid2n=0, Ssolid3=0, Ssolid3n=0, Ssolid=0;
 
-	bool fictious_solid = false;
+	//bool fictious_solid = false;
 
 	Sphere v [3];
 	Vertex_handle W [3];
 	for ( int kk=0; kk<3; kk++ )
 	{
-
-		W[kk] = cell->vertex ( facetVertices[j][kk] );
-		v[kk] = cell->vertex ( facetVertices[j][kk] )->point();
-		if ( W[kk]->info().isFictious )
-		{
-			if ( fictious_vertex==0 ) {F1=facetVertices[j][kk];}
-			else {F2 = facetVertices[j][kk];}
+		W[kk] = cell->vertex(facetVertices[j][kk]);
+		v[kk] = cell->vertex(facetVertices[j][kk])->point();
+		if (W[kk]->info().isFictious) {
+			if (fictious_vertex==0) {F1=facetVertices[j][kk]; facetF1=kk;}
+			else {F2 = facetVertices[j][kk]; facetF2=kk;}
 			fictious_vertex +=1;
-		}
-		else
-		{
-			if ( real_vertex==0 ) {Re1=facetVertices[j][kk];}
-			else if ( real_vertex==1 ) Re2=facetVertices[j][kk];
+		} else {
+			if (real_vertex==0) {Re1=facetVertices[j][kk];facetRe1=kk; }
+			else if (real_vertex==1) {Re2=facetVertices[j][kk]; facetRe2=kk;}
+			else if (real_vertex==2) {Re2=facetVertices[j][kk]; facetRe3=kk;}
 			real_vertex+=1;
 		}
 	}
@@ -1159,16 +1218,14 @@ double FlowBoundingSphere::Compute_HydraulicRadius ( RTriangulation& Tri, Cell_h
 		double A [3], B[3], C[3];
 
 		/**PORE VOLUME**/
-		Vpore = volume_double_fictious_pore ( cell->vertex ( F1 ), cell->vertex ( F2 ), cell->vertex ( Re1 ), p1 );
-		Vpore += volume_double_fictious_pore ( cell->vertex ( F1 ), cell->vertex ( F2 ), cell->vertex ( Re1 ), p2 );
+		Vpore = volume_double_fictious_pore(cell->vertex(F1), cell->vertex(F2), cell->vertex(Re1), p1,p2, cell->info().facetSurfaces[j]);
 		/** **/
 
 		/**PORE SOLID SURFACE**/
-		Boundary &bi1 = boundaries [cell->vertex ( F1 )->info().id() ];
-		Boundary &bi2 = boundaries [cell->vertex ( F2 )->info().id() ];
-		//    Boundary &bi1 = boundary ( cell->vertex ( F1 )->info().id() );
-		//    Boundary &bi2 = boundary ( cell->vertex ( F2 )->info().id() );
-		for ( int m=0;m<3;m++ ) {A[m]=B[m]=C[m]= ( cell->vertex ( Re1 )->point() ) [m];}
+
+		Boundary &bi1 = boundary(cell->vertex(F1)->info().id());
+		Boundary &bi2 = boundary(cell->vertex(F2)->info().id());
+		for (int m=0;m<3;m++) {A[m]=B[m]=C[m]= (cell->vertex(Re1)->point())[m];}
 
 		A[bi1.coordinate]=bi1.p[bi1.coordinate];
 		B[bi2.coordinate]=bi2.p[bi2.coordinate];
@@ -1178,119 +1235,85 @@ double FlowBoundingSphere::Compute_HydraulicRadius ( RTriangulation& Tri, Cell_h
 		Point BB ( B[0],B[1],B[2] );
 		Point CC ( C[0],C[1],C[2] );
 
-		Sphere A1 ( AA, 0 );
-		Sphere B1 ( BB, 0 );
-		Sphere C1 ( CC, 0 );
-		Ssolid1 = fast_spherical_triangle_area ( cell->vertex ( Re1 )->point(), A1, B1, p1 );
-		Ssolid1n = fast_spherical_triangle_area ( cell->vertex ( Re1 )->point(), A1, B1, p2 );
-		if ( bi1.coordinate!=1 && !SLIP_ON_LATERALS )
-		{
-			Triangle t ( p1, A1, C1 );
-			Ssolid2 = sqrt ( t.squared_area() );
-			if ( !Tri.is_infinite ( neighbour_cell ) )
-			{
-				Triangle t2 ( p2, A1, C1 );
-				Ssolid2n = sqrt ( t2.squared_area() );
-			}
-		}
+		Sphere A1(AA, 0);
+		Sphere B1(BB, 0);
+		Sphere C1(CC, 0);
+		//FIXME : we are computing triangle area twice here, because its computed in volume_double_fictious already -> optimize
+		Ssolid1 = fast_spherical_triangle_area(cell->vertex(Re1)->point(), AA, p1, p2);
+		Ssolid1n = fast_spherical_triangle_area(cell->vertex(Re1)->point(), BB, p1, p2);
+		cell->info().solidSurfaces[j][facetRe1]=Ssolid1+Ssolid1n;
+		//area vector of triangle (p1,sphere,p2)
+		Vecteur p1p2v1Surface = 0.5*CGAL::cross_product(p1-p2,cell->vertex(Re1)->point()-p2);
+		if (bi1.flowCondition && !SLIP_ON_LATERALS) {
+			//projection on bondary 1
+			Ssolid2 = abs(p1p2v1Surface[bi1.coordinate]);
+			cell->info().solidSurfaces[j][facetF1]=Ssolid2;
+		} else cell->info().solidSurfaces[j][facetF1]=0;
 
-		if ( bi2.coordinate!=1 && !SLIP_ON_LATERALS )
-		{
-			//FIXME : no triangle : compute v1.cross(v2) and take component bi2.coordinate (here and everywhere!)
-			Triangle t ( p1, B1, C1 );
-			Ssolid3 = sqrt ( t.squared_area() );
-			if ( !Tri.is_infinite ( neighbour_cell ) )
-			{
-				Triangle t2 ( p2, B1, C1 );
-				Ssolid3n = sqrt ( t2.squared_area() );
-
-			}
-		}
+		if (bi2.flowCondition && !SLIP_ON_LATERALS) {
+			//projection on bondary 2
+			Ssolid3 = abs(p1p2v1Surface[bi2.coordinate]);
+			cell->info().solidSurfaces[j][facetF2]=Ssolid3;
+		} else cell->info().solidSurfaces[j][facetF2]=0;
 	}
 
-	else
-	{
-		if ( fictious_vertex==1 )
-		{
-			SV1 = cell->vertex ( F1 );
-			SV2 = cell->vertex ( Re1 );
-			SV3 = cell->vertex ( Re2 );
-			Vpore = volume_single_fictious_pore ( SV1, SV2, SV3, p1 );
-			Vpore += volume_single_fictious_pore ( SV1, SV2, SV3, p2 );
-			//     Boundary &bi1 = boundary ( SV1->info().id() );
-			Boundary &bi1 = boundaries [SV1->info().id() ];
-			if ( bi1.coordinate!=1 && !SLIP_ON_LATERALS ) fictious_solid = true;
-
-		}
-		else
-		{
-			Vol1 = ( Tetraedre ( v[0], v[1], v[2], p1 ) ).volume();
-			Vol2 = ( Tetraedre ( v[0], v[1], v[2], p2 ) ).volume();
+	else {
+		if (fictious_vertex==1) {
+			SV1 = cell->vertex(F1);
+			SV2 = cell->vertex(Re1);
+			SV3 = cell->vertex(Re2);
+			Vpore = volume_single_fictious_pore(SV1, SV2, SV3, p1,p2, cell->info().facetSurfaces[j]);
+			Boundary &bi1 = boundary(SV1->info().id());
+			if (bi1.flowCondition && !SLIP_ON_LATERALS) {
+				Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point()-SV3->point())[bi1.coordinate]);
+				cell->info().solidSurfaces[j][facetF1]=Ssolid1;
+			}
+			Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
+			Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
+			cell->info().solidSurfaces[j][facetRe1]=Ssolid2+Ssolid2n;
+			Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
+			Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
+			cell->info().solidSurfaces[j][facetRe2]=Ssolid3+Ssolid3n;
+		} else {
+			SV1 = W[0]; SV2 = W[1]; SV3 = W[2];
+			cell->info().facetSurfaces[j]=0.5*CGAL::cross_product(SV1->point()-SV3->point(),SV2->point()-SV3->point());
+			if (cell->info().facetSurfaces[j]*(p2-p1) > 0) cell->info().facetSurfaces[j] = -1.0*cell->info().facetSurfaces[j];
+			Vtot = abs(ONE_THIRD*cell->info().facetSurfaces[j]*(p1-p2));
 
 			Vsolid1=0;Vsolid2=0;
-			for ( int i=0;i<3;i++ )
-			{
-				Vsolid1 += spherical_triangle_volume ( v[permutations_facet[i][0]],v[permutations_facet[i][1]],v[permutations_facet[i][2]],p1 );
-				Vsolid2 += spherical_triangle_volume ( v[permutations_facet[i][0]],v[permutations_facet[i][1]],v[permutations_facet[i][2]],p2 );
+			for (int i=0;i<3;i++) {
+				Vsolid1 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][1]],p1,p2);
+				Vsolid2 += spherical_triangle_volume(v[permut3[i][0]],v[permut3[i][2]],p1,p2);
 			}
-
-			if ( ( Vol1*Vol2 ) > 0 )
-			{
-				Bizarre = true;
-				Vsolid = std::abs ( Vsolid1 - Vsolid2 );
-			}
-			else
-			{
-				Bizarre = false;
-				Vsolid = Vsolid1 + Vsolid2;
-			}
-			Vtot = std::abs ( Vol1 - Vol2 );
-
+			Vsolid = Vsolid1 + Vsolid2;
 			Vsolid_tot += Vsolid;
 			Vtotalissimo += Vtot;
 
 			Vpore = Vtot - Vsolid;
-
 			Vporale += Vpore;
 
-			SV1 = W[0]; SV2 = W[1]; SV3 = W[2];
-			fictious_solid = true;
+			Ssolid1 = fast_spherical_triangle_area(SV1->point(), SV2->point(), p1, p2);
+			Ssolid1n = fast_spherical_triangle_area(SV1->point(), SV3->point(), p1, p2);
+			cell->info().solidSurfaces[j][0]=Ssolid1+Ssolid1n;
+			Ssolid2 = fast_spherical_triangle_area(SV2->point(),SV1->point(),p1, p2);
+			Ssolid2n = fast_spherical_triangle_area(SV2->point(),SV3->point(),p1, p2);
+			cell->info().solidSurfaces[j][1]=Ssolid2+Ssolid2n;
+			Ssolid3 = fast_spherical_triangle_area(SV3->point(),SV2->point(),p1, p2);
+			Ssolid3n = fast_spherical_triangle_area(SV3->point(),SV1->point(),p1, p2);
+			cell->info().solidSurfaces[j][2]=Ssolid3+Ssolid3n;
 		}
-
-		if ( fictious_solid )
-		{
-			Ssolid1 = fast_spherical_triangle_area ( SV1->point(), SV2->point(), SV3->point(), p1 );
-			Ssolid1n = fast_spherical_triangle_area ( SV1->point(), SV2->point(), SV3->point(), p2 );
-		}
-		Ssolid2 = fast_spherical_triangle_area ( SV2->point(),SV1->point(),SV3->point(), p1 );
-		Ssolid2n = fast_spherical_triangle_area ( SV2->point(),SV1->point(),SV3->point(), p2 );
-		Ssolid3 = fast_spherical_triangle_area ( SV3->point(),SV2->point(),SV1->point(), p1 );
-		Ssolid3n = fast_spherical_triangle_area ( SV3->point(),SV2->point(),SV1->point(), p2 );
 	}
-
-	if ( Bizarre )
-	{
-		Ssolid += std::abs ( Ssolid2 - Ssolid2n );
-		Ssolid += std::abs ( Ssolid1 - Ssolid1n );
-		Ssolid += std::abs ( Ssolid3 - Ssolid3n );
-
-	}
-	else
-	{
-		Ssolid += std::abs ( Ssolid1 + Ssolid1n );
-		Ssolid += std::abs ( Ssolid2 + Ssolid2n );
-		Ssolid += std::abs ( Ssolid3 + Ssolid3n );
-	}
-
+	Ssolid = Ssolid1+Ssolid1n+Ssolid2+Ssolid2n+Ssolid3+Ssolid3n;
+	cell->info().solidSurfaces[j][3]=1.0/Ssolid;
 	Ssolid_tot += Ssolid;
-	//FIXME : is it the correct way to consider symetry
-
-	if ( SLIP_ON_LATERALS && fictious_vertex>0 )
-	{
+	
+	//handle symmetry (tested ok)
+	if (/*SLIP_ON_LATERALS &&*/ fictious_vertex>0) {
 		//! Include a multiplier so that permeability will be K/2 or K/4 in symmetry conditions
 		Real mult= fictious_vertex==1 ? multSym1 : multSym2;
 		return Vpore/Ssolid*mult;
-	}
+	}	
+// 	cout << "Vpore " << Vpore << ", Ssolid "<<Ssolid<<endl;
 	return Vpore/Ssolid;
 }
 
@@ -1304,32 +1327,38 @@ double FlowBoundingSphere::dotProduct ( Vecteur x, Vecteur y )
 	return sum;
 }
 
-double FlowBoundingSphere::crossProduct ( double x[3], double y[3] )
+
+Vecteur FlowBoundingSphere::surface_double_fictious_facet ( Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3 )
 {
-
-	double sq_normeX = sqrt ( x[0]*x[0]+ x[1]*x[1]+ x[2]*x[2] );
-	double sq_normeY = sqrt ( y[0]*y[0]+ y[1]*y[1]+ y[2]*y[2] );
-
-	double cosTeta = ( x[0]*y[0]+x[1]*y[1]+x[2]*y[2] ) / ( ( sq_normeY * sq_normeX ) );
-
-	double Teta = acos ( cosTeta );
-
-	double cPmodule = ( sq_normeX*sq_normeY ) * sin ( Teta );
-
-	return cPmodule;
+	//This function is correct only with axis-aligned boundaries
+	const Boundary &bi1 = boundary ( fSV1->info().id() );
+	const Boundary &bi2 = boundary ( fSV2->info().id() );
+	double area=(bi1.p[bi1.coordinate]-SV3->point()[bi1.coordinate])*(bi2.p[bi2.coordinate]-SV3->point()[bi2.coordinate]);
+	double	surf [3] = {1,1,1};	
+	surf[bi1.coordinate]=0; surf[bi2.coordinate]=0;
+	return area*Vecteur(surf[0],surf[1],surf[2]);
 }
+
+Vecteur FlowBoundingSphere::surface_single_fictious_facet ( Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3 )
+{
+	//This function is correct only with axis-aligned boundaries
+	const Boundary &bi1 = boundary ( fSV1->info().id() );
+// 	const Boundary &bi2 = boundary ( fSV2->info().id() );
+	Vecteur mean_height = (bi1.p[bi1.coordinate]-0.5*(SV3->point()[bi1.coordinate]+SV2->point()[bi1.coordinate]))*bi1.normal;
+	return CGAL::cross_product(mean_height,SV3->point()-SV2->point());
+}
+
+
 
 double FlowBoundingSphere::surface_solid_fictious_facet ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3 )
 {
 	double A [3], B [3];
 
+
 	for ( int m=0;m<3;m++ ) {A[m]=B[m]= ( SV3->point() ) [m];}
 
-	//   Boundary &bi1 = boundary ( SV1->info().id() );
-	//   Boundary &bi2 = boundary ( SV2->info().id() );
-
-	Boundary &bi1 = boundaries [SV1->info().id() ];
-	Boundary &bi2 = boundaries [SV2->info().id() ];
+	const Boundary &bi1 = boundary ( SV1->info().id() );
+	const Boundary &bi2 = boundary ( SV2->info().id() );
 
 	A[bi1.coordinate]=bi1.p[bi1.coordinate];
 	B[bi2.coordinate]=bi2.p[bi2.coordinate];
@@ -1351,7 +1380,7 @@ double FlowBoundingSphere::surface_solid_facet ( Sphere ST1, Sphere ST2, Sphere 
 {
 	double Area;
 
-	double squared_rayon = ST1.weight();
+	double squared_radius = ST1.weight();
 
 	Vecteur v12 = ST2.point() - ST1.point();
 	Vecteur v13 = ST3.point() - ST1.point();
@@ -1362,90 +1391,68 @@ double FlowBoundingSphere::surface_solid_facet ( Sphere ST1, Sphere ST2, Sphere 
 	double cosA = v12*v13 / ( sqrt ( norme13 * norme12 ) );
 	double A = acos ( cosA );
 
-	Area = ( A/ ( 2*M_PI ) ) * ( M_PI * squared_rayon );
-
+	Area = ( A/ ( 2*M_PI ) ) * ( M_PI * squared_radius );
 	return Area;
 }
 
-double FlowBoundingSphere::spherical_triangle_volume ( Sphere ST1, Sphere ST2, Sphere ST3, Point PT1 )
+
+double FlowBoundingSphere::spherical_triangle_volume ( const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3 )
 {
 	double rayon = sqrt ( ST1.weight() );
 	if ( rayon == 0.0 ) return 0.0;
 
-	return ( ( 0.3333333 * rayon ) * ( fast_spherical_triangle_area ( ST1, ST2, ST3, PT1 ) ) ) ;
+	return ( ( ONE_THIRD * rayon ) * ( fast_spherical_triangle_area ( ST1, PT1, PT2, PT3 ) ) ) ;
 }
 
-double FlowBoundingSphere::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
-{
-	double rayon = STA1.weight();
-	if ( rayon == 0.0 ) return 0.0;
+// double FlowBoundingSphere::spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
+// {
+// 	double rayon = STA1.weight();
+// 	if ( rayon == 0.0 ) return 0.0;
+// 
+// 	Vecteur v12 = STA2.point() - STA1.point();
+// 	Vecteur v13 = STA3.point() - STA1.point();
+// 	Vecteur v14 = PTA1 - STA1.point();
+// 
+// 	double norme12 = ( v12.squared_length() );
+// 	double norme13 = ( v13.squared_length() );
+// 	double norme14 = ( v14.squared_length() );
+// 
+// 	double cosA = v12*v13 / sqrt ( ( norme13 * norme12 ) );
+// 	double cosB = v12*v14 / sqrt ( ( norme14 * norme12 ) );
+// 	double cosC = v14*v13 / sqrt ( ( norme13 * norme14 ) );
+// 
+// 	double A = acos ( cosA );
+// 	double B = acos ( cosB );
+// 	double C = acos ( cosC );
+// 	if ( A==0 || B==0 || C==0 ) return 0;
+// 
+// 	double a = acos ( ( cosA - cosB * cosC ) / ( sin ( B ) * sin ( C ) ) );
+// 	double b = acos ( ( cosB - cosC * cosA ) / ( sin ( C ) * sin ( A ) ) );
+// 	double c = acos ( ( cosC - cosA * cosB ) / ( sin ( A ) * sin ( B ) ) );
+// 
+// 	double aire_triangle_spherique = rayon * ( a + b + c - M_PI );
+// 
+// 	return  aire_triangle_spherique;
+// }
 
-	Vecteur v12 = STA2.point() - STA1.point();
-	Vecteur v13 = STA3.point() - STA1.point();
-	Vecteur v14 = PTA1 - STA1.point();
-
-	double norme12 = ( v12.squared_length() );
-	double norme13 = ( v13.squared_length() );
-	double norme14 = ( v14.squared_length() );
-
-	double cosA = v12*v13 / sqrt ( ( norme13 * norme12 ) );
-	double cosB = v12*v14 / sqrt ( ( norme14 * norme12 ) );
-	double cosC = v14*v13 / sqrt ( ( norme13 * norme14 ) );
-
-	double A = acos ( cosA );
-	double B = acos ( cosB );
-	double C = acos ( cosC );
-	if ( A==0 || B==0 || C==0 ) return 0;
-
-	double a = acos ( ( cosA - cosB * cosC ) / ( sin ( B ) * sin ( C ) ) );
-	double b = acos ( ( cosB - cosC * cosA ) / ( sin ( C ) * sin ( A ) ) );
-	double c = acos ( ( cosC - cosA * cosB ) / ( sin ( A ) * sin ( B ) ) );
-
-	double aire_triangle_spherique = rayon * ( a + b + c - M_PI );
-
-	return  aire_triangle_spherique;
-}
-
-double FlowBoundingSphere::fast_spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 )
+Real FlowBoundingSphere::fast_solid_angle ( const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3 )
 {
 	//! This function needs to be fast because it is used heavily. Avoid using vector operations which require constructing vectors (~50% of cpu time in the non-fast version), and compute angle using the 3x faster formula of Oosterom and StrackeeVan Oosterom, A; Strackee, J (1983). "The Solid Angle of a Plane Triangle". IEEE Trans. Biom. Eng. BME-30 (2): 125-126. (or check http://en.wikipedia.org/wiki/Solid_angle)
 	using namespace CGAL;
-#ifndef FAST
-	return spherical_triangle_area ( STA1, STA2, STA3, PTA1 );
-#endif
-
-	double rayon2 = STA1.weight();
-	if ( rayon2 == 0.0 ) return 0.0;
-
-	//  int other_vertices [3];
-	//  int k=0;
-	//  for ( int i = 0; i<4; i++ ) other_vertices[k++] = ( i!=vertex ) ? i : ++i;
-
 	double M[3][3];
-
-	//  for (int j=0; j<3; j++)
-	//  {
-	//   M[j][0] = (cell->vertex ( other_vertices[0] )->point().point())[j] - (cell->vertex ( vertex )->point().point())[j];
-	//   M[j][1] = (cell->vertex ( other_vertices[1] )->point().point())[j] - (cell->vertex ( vertex )->point().point())[j];
-	//   M[j][2] = (cell->vertex ( other_vertices[2] )->point().point())[j] - (cell->vertex ( vertex )->point().point())[j];
-
-	M[0][0] = STA2.x() - STA1.x();
-	M[0][1] = STA3.x() - STA1.x();
-	M[0][2] = PTA1.x() - STA1.x();
-
-	M[1][0] = STA2.y() - STA1.y();
-	M[1][1] = STA3.y() - STA1.y();
-	M[1][2] = PTA1.y() - STA1.y();
-
-	M[2][0] = STA2.z() - STA1.z();
-	M[2][1] = STA3.z() - STA1.z();
-	M[2][2] = PTA1.z() - STA1.z();
-	//  }
-
-	///
+	M[0][0] = PTA1.x() - STA1.x();
+	M[0][1] = PTA2.x() - STA1.x();
+	M[0][2] = PTA3.x() - STA1.x();
+	M[1][0] = PTA1.y() - STA1.y();
+	M[1][1] = PTA2.y() - STA1.y();
+	M[1][2] = PTA3.y() - STA1.y();
+	M[2][0] = PTA1.z() - STA1.z();
+	M[2][1] = PTA2.z() - STA1.z();
+	M[2][2] = PTA3.z() - STA1.z();
+	
 	double detM = M[0][0]* ( M[1][1]*M[2][2]-M[2][1]*M[1][2] ) +
-	              M[1][0]* ( M[2][1]*M[0][2]-M[0][1]*M[2][2] ) +
-	              M[2][0]* ( M[0][1]*M[1][2]-M[1][1]*M[0][2] );
+			M[1][0]* ( M[2][1]*M[0][2]-M[0][1]*M[2][2] ) +
+			M[2][0]* ( M[0][1]*M[1][2]-M[1][1]*M[0][2] );
 
 	double pv12N2 = pow ( M[0][0],2 ) +pow ( M[1][0],2 ) +pow ( M[2][0],2 );
 	double pv13N2 = pow ( M[0][1],2 ) +pow ( M[1][1],2 ) +pow ( M[2][1],2 );
@@ -1460,14 +1467,24 @@ double FlowBoundingSphere::fast_spherical_triangle_area ( Sphere STA1, Sphere ST
 	double cp23 = ( M[0][1]*M[0][2]+M[1][1]*M[1][2]+M[2][1]*M[2][2] );
 
 	double ratio = detM/ ( pv12N*pv13N*pv14N+cp12*pv14N+cp13*pv13N+cp23*pv12N );
+	return abs (2*atan(ratio));
+}
 
-	return abs ( rayon2 * 2*atan ( ratio ) );
+double FlowBoundingSphere::fast_spherical_triangle_area ( const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1 )
+{
+	using namespace CGAL;
+#ifndef FAST
+	return spherical_triangle_area ( STA1, STA2, STA3, PTA1 );
+#endif
+
+	double rayon2 = STA1.weight();
+	if ( rayon2 == 0.0 ) return 0.0;
+	return rayon2 * fast_solid_angle(STA1,STA2,STA3,PTA1);
 }
 
 void FlowBoundingSphere::Initialize_pressures()
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-
 	// 	Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	//
 	// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
@@ -1475,7 +1492,7 @@ void FlowBoundingSphere::Initialize_pressures()
 	// 		else cell->info().p() =0;//FIXME : assign better values for faster convergence?
 	// 	}
 
-	for ( int bound=0;bound<6;bound++ )
+	for ( int bound=0; bound<6;bound++ )
 	{
 		int& id = *boundsIds[bound];
 		Boundary& bi = boundary ( id );
@@ -1485,8 +1502,7 @@ void FlowBoundingSphere::Initialize_pressures()
 			tmp_cells.resize ( 1000 );
 			Tesselation::VCell_iterator cells_it = tmp_cells.begin();
 			Tesselation::VCell_iterator cells_end = Tri.incident_cells ( T[currentTes].vertexHandles[id],cells_it );
-			for ( Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++ )
-				( *it )->info().p() = bi.value;
+			for ( Tesselation::VCell_iterator it = tmp_cells.begin(); it != cells_end; it++ ) ( *it )->info().p() = bi.value;
 		}
 	}
 }
@@ -1515,8 +1531,7 @@ void FlowBoundingSphere::GaussSeidel()
 			m=0, n=0;
 
 			//    if ((!cell->info().isSuperior && !cell->info().isInferior)) {
-			if ( !cell->info().fictious() || cell->info().isLateral )
-			{
+			if (!cell->info().fictious() || cell->info().isLateral) {
 				cell2++;
 				for ( int j2=0; j2<4; j2++ )
 				{
@@ -1528,10 +1543,9 @@ void FlowBoundingSphere::GaussSeidel()
 				}
 
 				dp = cell->info().p();
-				if ( n!=0 )
-				{
+				if (n!=0) {
 					//     cell->info().p() =   - ( cell->info().dv() - m ) / ( n );
-					cell->info().p() = ( - ( cell->info().dv() - m ) / ( n ) - cell->info().p() ) * relax + cell->info().p();
+					cell->info().p() = (- (cell->info().dv() - m) / (n) - cell->info().p()) * relax + cell->info().p();
 				}
 
 				dp -= cell->info().p();
@@ -1554,10 +1568,20 @@ void FlowBoundingSphere::GaussSeidel()
 			cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
 			//     save_vtk_file ( Tri );
 		}
-	}
-	while ( ( dp_max/*/p_max*/ ) > tolerance  /*( dp_max > tolerance )*//* &&*/ /*( j<50 )*/ );
+	} while ((dp_max/p_max) > tolerance  /*( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
 	//   cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
-	//   cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
+	cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
+	
+	//Display fluxes?
+// 	bool ref =  Tri.finite_cells_begin()->info().isvisited;
+// 	for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+// 		for (int i =0;i<4;i++) {
+// 			if (cell->neighbor(i)->info().isvisited == ref) {
+// 				cout <<"nodes : "<<(Point) cell->info()<< " "<<(Point) cell->neighbor(i)->info()<<", p1/p2 : " <<cell->info().p()<<"/"<<cell->neighbor(i)->info().p()<<", permeability : "<<cell->info().k_norm()[i]<<" flux : "<< cell->info().k_norm()[i]*(cell->info().p()-cell->neighbor(i)->info().p())<<endl;
+// 			}
+// 		}
+// 		cell->info().isvisited = !ref;
+// 	}
 }
 
 
@@ -1582,10 +1606,10 @@ void FlowBoundingSphere::Permeameter ( RTriangulation &Tri, double P_Inf, double
 				if ( neighbour_cell->info().isInferior )
 				{
 					//PRESSION_EXT=P_Inf;
-					//Qout = Qout + ( cell->info().k_vector() ) [j2]* ( cell->info().p()-PRESSION_EXT );
+					//Qout = Qout + ( cell->info().facetSurf() ) [j2]* ( cell->info().p()-PRESSION_EXT );
 // 					cout << "outFlow : "<< ( cell->info().k_norm() ) [j2]* ( neighbour_cell->info().p()-cell->info().p() ) <<endl;
 					Qout = Qout + ( cell->info().k_norm() ) [j2]* ( neighbour_cell->info().p()-cell->info().p() );
-					cellQout+=1;/*( cell->info().k_vector() ) [j2]* ( cell->info().p()-PRESSION_EXT )*/;
+					cellQout+=1;/*( cell->info().facetSurf() ) [j2]* ( cell->info().p()-PRESSION_EXT )*/;
 					p_out_max = std::max ( cell->info().p(), p_out_max );
 					p_out_min = std::min ( cell->info().p(), p_out_min );
 					p_out_moy += cell->info().p();
@@ -1593,7 +1617,7 @@ void FlowBoundingSphere::Permeameter ( RTriangulation &Tri, double P_Inf, double
 				if ( neighbour_cell->info().isSuperior )
 				{
 					//      PRESSION_EXT=P_Sup;
-					//Qin = Qin + ( cell->info().k_vector() ) [j2]* ( cell->info().p()-PRESSION_EXT );
+					//Qin = Qin + ( cell->info().facetSurf() ) [j2]* ( cell->info().p()-PRESSION_EXT );
 					Qin = Qin + ( cell->info().k_norm() ) [j2]* ( cell->info().p()-neighbour_cell->info().p() );
 					cellQin+=1;
 					p_in_max = std::max ( cell->info().p(), p_in_max );
@@ -1630,8 +1654,6 @@ void FlowBoundingSphere::Permeameter ( RTriangulation &Tri, double P_Inf, double
 	double Ks= ( Vdarcy ) /GradH;
 
 	double k= Ks*viscosity/ ( density*gravity );
-
-	double k_darcy = Vdarcy*viscosity/ ( GradP );
 
 	cout << "The incoming average flow rate is = " << Qin << " m^3/s " << endl;
 	kFile << "The incoming average flow rate is = " << Qin << " m^3/s " << endl;
@@ -1847,20 +1869,17 @@ void FlowBoundingSphere::Sample_Permeability ( RTriangulation& Tri, double x_Min
 	char *kk;
 	kk = ( char* ) key.c_str();
 
-	Permeameter ( Tri, boundary ( y_min_id ).value, boundary ( y_max_id ).value, Section, DeltaY, kk );
+	Permeameter ( Tri, P_INF, P_SUP, Section, DeltaY, kk );
 }
 
 void FlowBoundingSphere::AddBoundingPlanes ( Real center[3], Real Extents[3], int id )
 {
 	Tesselation& Tes = T[currentTes];
 	bool minimum=false;
-
 	Corner_min = Point ( x_min, y_min, z_min );
 	Corner_max = Point ( x_max, y_max, z_max );
-
 	Real min_coord = min ( Extents[0],min ( Extents[1],Extents[2] ) );
 	int coord=0;
-
 	if ( min_coord==Extents[0] )
 	{
 		coord=0;
@@ -1876,13 +1895,9 @@ void FlowBoundingSphere::AddBoundingPlanes ( Real center[3], Real Extents[3], in
 		coord=2;
 		if ( ( abs ( center[2] )-abs ( center[0] ) ) <0 ) minimum=true; else minimum=false;
 	}
-
 	double FAR = 50;
-
 	if ( minimum ) boundaries[id].p = Corner_min; else boundaries[id].p = Corner_max;
-
 	boundaries[id].coordinate = coord;
-
 	switch ( coord )
 	{
 		case ( 0 ) :
@@ -1982,7 +1997,7 @@ void FlowBoundingSphere::AddBoundingPlanes()
 	boundaries[5].normal = Vecteur ( 0,0,-1 );
 	boundaries[5].coordinate = 2;
 	cout << "Back boundary has been created. ID = " << z_max_id << endl;
-
+	
 	for ( int k=0;k<6;k++ )
 	{
 		boundaries[k].flowCondition = 1;

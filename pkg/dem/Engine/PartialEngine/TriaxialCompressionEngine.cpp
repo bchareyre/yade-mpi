@@ -55,6 +55,7 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(str
 
 	isotropicCompaction=false;
  	boxVolume=0;
+	maxStress =0;
 
 //	calculatedPorosity=1.1;	
 
@@ -191,8 +192,6 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 
 void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 {
-
-
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if ( firstRun )
 	{
@@ -203,9 +202,6 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && isotropicCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
 		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING && isotropicCompaction == false ) doStateTransition (ncb, STATE_TRIAX_LOADING );
 		if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false ) doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
-		
-
-
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
@@ -225,37 +221,32 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 			Shop::saveSpheresToFile ( fileName );
 		}
 		saveSimulation = false;
-
-	}
-	
+	}	
 	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
 	{
 		updateParameters ( ncb );
+		maxStress = max(maxStress,stress[wall_top][1]);
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
-	}
-	
+	}	
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{		
 		Omega::instance().stopSimulationLoop();
 		return;
 	}
-
 	TriaxialStressController::applyCondition ( ncb );
 
-	
 	if ( currentState==STATE_TRIAX_LOADING )
 	{
 		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
 		{
-			LOG_INFO ("Compression started");
+			LOG_INFO ("Triax Compression started");
 		}
-		// if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
+		if (Omega::instance().getCurrentIteration() % 100 == 0) LOG_DEBUG("Compression active.");
 		Real dt = Omega::instance().getTimeStep();
 		 
 		if (abs(epsilonMax) > abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003; // !!! if unloading (?)
 			//else currentStrainRate = strainRate;
-
 			/* Move top and bottom wall according to strain rate */
 			State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 			p_bottom->pos += 0.5*currentStrainRate*height*translationAxis*dt;
@@ -271,10 +262,8 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
 		{
 			LOG_INFO ("Compression started");
-		}
-		
+		}		
 		Real dt = Omega::instance().getTimeStep();
-
 		State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 		State* p_top=Body::byId(wall_top_id,ncb)->state.get();
 		State* p_left=Body::byId(wall_left_id,ncb)->state.get();
@@ -285,10 +274,8 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		/* Move top and bottom wall according to strain rate */
 		p_bottom->pos += 0.5*strainRate*height*translationAxis*dt;
 		p_top->pos -= 0.5*strainRate*height*translationAxis*dt;
-
 		p_back->pos += 0.5*strainRate*depth*translationAxisz*dt;
 		p_front->pos -= 0.5*strainRate*depth*translationAxisz*dt;
-
 		p_left->pos += 0.5*strainRate*width*translationAxisx*dt;
 		p_right->pos -= 0.5*strainRate*width*translationAxisx*dt;
 	}
@@ -298,17 +285,14 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 void TriaxialCompressionEngine::setContactProperties(Scene * ncb, Real frictionDegree)
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-			
 	BodyContainer::iterator bi = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
-	
 	for ( ; bi!=biEnd; ++bi)	
 	{	
 		shared_ptr<Body> b = *bi;
 		if (b->isDynamic)
 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
-		
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end(); 
 	for(  ; ii!=iiEnd ; ++ii ) {
@@ -321,9 +305,8 @@ void TriaxialCompressionEngine::setContactProperties(Scene * ncb, Real frictionD
 
 		Real fa 	= sdec1->frictionAngle;
 		Real fb 	= sdec2->frictionAngle;
-
 		contactPhysics->frictionAngle			= std::min(fa,fb);
-		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
+		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 	}
 } 
 

@@ -6,10 +6,6 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-// #define FLOW_ENGINE
-
-#ifdef FLOW_ENGINE
-
 #pragma once
 
 #include<yade/core/PartialEngine.hpp>

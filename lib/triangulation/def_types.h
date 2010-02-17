@@ -53,17 +53,21 @@ class Cell_Info : public Point/*, public Vecteur*/ {
  	Real VolumeVariation;
 	double pression; //stockage d'une valeur de pression pour chaque cellule
 	
-	std::vector<Vecteur> direction_permeability; //stockage de 4 valeurs de permeabilité pour chaque cellule
+	// Surface vectors of facets, pointing from outside toward inside the cell
+	std::vector<Vecteur> facetSurfaces;
 	std::vector<Vecteur> cell_force;
 	std::vector<double> RayHydr;
 // 	std::vector<double> flow_rate;
 	std::vector<double> module_permeability;
+	// In-facet partial surfaces of spheres. [i][j] is for sphere facet "i" and sphere facetVertices[i][j]. Last component for 1/sum_surfaces in the facet.
+	double solidSurfaces [4][4];
 // 	std::vector<Vecteur> vec_forces;
 	Cell_Info (void)
 	{
 		module_permeability.resize(4, 0);
 		cell_force.resize(4);
-		direction_permeability.resize(4);
+		facetSurfaces.resize(4);
+		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		RayHydr.resize(4, 0);
 		isInside = false;
 		inv_sum_k=0;
@@ -98,7 +102,7 @@ class Cell_Info : public Point/*, public Vecteur*/ {
 	inline double& p (void) {return pression;}
 	
 	inline std::vector<double>& k_norm (void) {return module_permeability;}
-	inline std::vector< Vecteur >& k_vector (void) {return direction_permeability;}
+	inline std::vector< Vecteur >& facetSurf (void) {return facetSurfaces;}
 	
 	inline std::vector<Vecteur>& force (void) {return cell_force;}
 	inline std::vector<double>& Rh (void) {return RayHydr;}
@@ -133,7 +137,7 @@ public:
 	inline Real uz (void) {return Vecteur::z();}
 	inline Real& f (void) {return s;}
 	inline Real& v (void) {return vol;}
-	inline unsigned int& id (void) {return i;}
+	inline const unsigned int& id (void) const {return i;}
 	
 #ifdef FLOW_ENGINE
 	Vecteur forces;

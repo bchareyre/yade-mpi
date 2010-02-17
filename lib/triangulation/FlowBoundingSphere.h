@@ -62,6 +62,7 @@ class FlowBoundingSphere
 		std::string key; //to give to consolidation files a name with iteration number
 		std::vector<double> Pressures; //for automatic write maximum pressures during consolidation
 		bool tess_based_force; //allow the force computation method to be chosen from FlowEngine
+		Real minPermLength; //min branch length for Poiseuille
 		
 		double P_SUP, P_INF, P_INS;
 
@@ -82,6 +83,8 @@ class FlowBoundingSphere
 		void Boundary_Conditions ( RTriangulation& Tri );
 		
 		void Initialize_pressures ( );
+		/// Define forces using the same averaging volumes as for permeability
+		void ComputeTetrahedralForces();
 		
 		void save_vtk_file ( RTriangulation &T );
 
@@ -100,9 +103,11 @@ class FlowBoundingSphere
 
 		double dotProduct ( Vecteur x, Vecteur y );
 
-		double crossProduct ( double x[3], double y[3] );
+// 		double crossProduct ( double x[3], double y[3] );
 
 		double surface_solid_facet ( Sphere ST1, Sphere ST2, Sphere ST3 );
+		Vecteur surface_double_fictious_facet ( Vertex_handle fSV1, Vertex_handle fSV2, Vertex_handle SV3 );
+		Vecteur surface_single_fictious_facet ( Vertex_handle fSV1, Vertex_handle SV2, Vertex_handle SV3 );
 		
 		double surface_solid_fictious_facet ( Vertex_handle ST1, Vertex_handle ST2, Vertex_handle ST3 );
 		
@@ -119,11 +124,12 @@ class FlowBoundingSphere
 		void Build_Tessalation ( RTriangulation& Tri );
 
 		double spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
-
-		double fast_spherical_triangle_area ( Sphere STA1, Sphere STA2, Sphere STA3, Point PTA1 );
-
-		double spherical_triangle_volume ( Sphere ST1, Sphere ST2, Sphere ST3, Point PT1 );
-
+		
+		double fast_spherical_triangle_area ( const Sphere& STA1, const Point& STA2, const Point& STA3, const Point& PTA1 );
+// 		Real solid_angle ( const Point& STA1, const Point& STA2, const Point& STA3, const Point& PTA1 );
+		double spherical_triangle_volume ( const Sphere& ST1, const Point& PT1, const Point& PT2, const Point& PT3 );
+		Real fast_solid_angle ( const Point& STA1, const Point& PTA1, const Point& PTA2, const Point& PTA3 );
+		
 		bool isInsideSphere ( RTriangulation& Tri, double x, double y, double z );
 		
 		void SliceField ( RTriangulation& Tri );
@@ -131,8 +137,12 @@ class FlowBoundingSphere
 		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
 		
 		double volume_single_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
-		
+		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
+		double volume_single_fictious_pore ( const Vertex_handle& SV1, const Vertex_handle& SV2, const Vertex_handle& SV3, const Point& PV1,  const Point& PV2, Vecteur& facetSurface);
 		double volume_double_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
+		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)
+		double volume_double_fictious_pore (Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point& PV1, Point& PV2, Vecteur& facetSurface);
+		
 };
 
 

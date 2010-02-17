@@ -40,7 +40,7 @@ Vecteur operator* (Tens& tens, Vecteur& vect)
 
 Vecteur& NormalizedVecteur (Vecteur& vect)
 {
-	vect = vect*(1/sqrt(pow(vect.x(),2)+pow(vect.y(),2)+pow(vect.z(),2)));
+	vect = vect*(1.0/sqrt(pow(vect.x(),2)+pow(vect.y(),2)+pow(vect.z(),2)));
 	return vect;
 }
 
@@ -102,7 +102,7 @@ Tenseur3 &Tenseur3::operator/=(Real d)
 {	
 	if (d!=0)
 	{
-		d = 1/d;
+		d = 1.0/d;
 		for (int i=0; i<3; i++)
 		{
 			for (int j=0; j<3; j++) T[i][j] *= d;
@@ -178,7 +178,7 @@ Tenseur_sym3 &Tenseur_sym3::operator=(const Tenseur_sym3& source)
 Tenseur_sym3 &Tenseur_sym3::operator/=(Real d)
 {
 	if (d!=0) {
-		d=1/d;
+		d=1.0/d;
 		for (int i=0; i<6; i++)	T[i]*= d;}
 	return *this;
 }

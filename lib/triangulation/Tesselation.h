@@ -58,7 +58,7 @@ public:
 	bool redirect (void);
 	///Remove a sphere
 	bool remove (unsigned int id); 
-	unsigned int Max_id (void) {return max_id;}
+	int Max_id (void) {return max_id;}
 	
 	void	Compute ();	//Calcule le centres de Voronoi pour chaque cellule
 	void	Invalidate () {computed=false;}  //Set the tesselation as "not computed" (computed=false), this will launch 						//tesselation internaly when using functions like computeVolumes())

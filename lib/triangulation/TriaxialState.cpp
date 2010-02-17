@@ -47,6 +47,24 @@ Real TriaxialState::find_parameter (const char* parameter_name, ifstream& file)
 	return value;
 }
 
+Real TriaxialState::find_parameter (const char* parameter_name, boost::iostreams::filtering_istream& file)
+{
+	string buffer;
+	Real value;
+	file >> buffer;
+	bool test = (buffer == string(parameter_name));
+	while (!test)
+	{
+		buffer.clear();
+		file >> buffer;
+		test = ( buffer == string(parameter_name) || file.eof());
+	}
+	if (!file.eof()) file >> value;
+	else value = 0;
+// 	cout << string(parameter_name) << value << endl;
+	return value;
+}
+
 Real TriaxialState::find_parameter (const char* parameter_name, const char* filename)
 {
 	ifstream statefile (filename);
@@ -140,22 +158,30 @@ bool TriaxialState::inside(Point p)
 	return TriaxialState::inside(p.x(), p.y(), p.z());
 }
 
-bool TriaxialState::from_file(const char* filename)
+bool TriaxialState::from_file(const char* filename, bool bz2)
 {
 	reset();
-	ifstream Statefile(filename);
-// 	cout << filename << endl;
-	if (!Statefile.is_open()) {
-		cout << "Error opening files";
-		return false;
-	}
-
-	//int a=0;
+	
+//	// Don't use bzipped files
+//	// 	cout << filename << endl;
+//	ifstream Statefile(filename);
+// 	if (!Statefile.is_open()) {
+// 		cout << "Error opening files";
+// 		return false;
+// 	}
+	
+//	// Use bzipped files
+	
+	boost::iostreams::filtering_istream Statefile;
+	if (bz2) {
+		Statefile.push(boost::iostreams::bzip2_decompressor());
+		Statefile.push(boost::iostreams::file_source(string(filename)+".bz2"));}
+	else Statefile.push(boost::iostreams::file_source(string(filename)));
+	if(!Statefile.good()) {cerr << "Error opening files"; return false;}
+		
 #ifdef USE_OGL_VIEW
 	Vue3D Vue1;
 #endif
-
-
 	long Idg;
 	long Ns=0;//number of spheres (excluding fictious ones))
 	Statefile >> Ng;
@@ -245,7 +271,11 @@ bool TriaxialState::from_file(const char* filename)
 	prof = find_parameter("prof", Statefile);
 	ratio_f = find_parameter("ratio_f", Statefile);
 	vit = find_parameter("vit", Statefile);
-	Statefile.close();
+	
+// 	//Don't use bzipped files
+// 	Statefile.close();
+	
+	
 	//cout << endl << "wszzh= " << wszzh << endl;
 
 	/*GrainIterator grains_end = grains.end();
@@ -267,8 +297,10 @@ bool TriaxialState::to_file(const char* filename, bool bz2)
 	boost::iostreams::filtering_ostream Statefile;
 	
 	//if(boost::algorithm::ends_with(filename,".bz2")) Statefile.push(iostreams::bzip2_compressor());
-	if (bz2) Statefile.push(boost::iostreams::bzip2_compressor());
-	Statefile.push(boost::iostreams::file_sink(string(filename)+".bz2"));
+	if (bz2) {
+		Statefile.push(boost::iostreams::bzip2_compressor());
+		Statefile.push(boost::iostreams::file_sink(string(filename)+".bz2"));}
+	else Statefile.push(boost::iostreams::file_sink(string(filename)));
 	// Don't use bzipped files
 	//ofstream Statefile (filename);
 	//if (!Statefile.is_open())	{
@@ -290,6 +322,7 @@ bool TriaxialState::to_file(const char* filename, bool bz2)
 		}
 
 		Statefile << "Eyn " << Eyn << " Eys " << Eys << " wszzh " << wszzh << " wsxxd " << wsxxd << " wsyyfa " << wsyyfa << " eps3 " << eps3 << " eps1 " << eps1 << " eps2 " << eps2 << " porom " << porom << " haut " << haut << " larg " << larg << " prof " << prof << " ratio_f " << ratio_f << " vit " << vit << endl;
+//	 	//Don't use bzipped files
 //		Statefile.close();
 		return true;
 }

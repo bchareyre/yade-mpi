@@ -32,22 +32,24 @@ class KinematicLocalisationAnalyser
 		typedef vector<vector<vector<Real> > > RGrid3D;
 
 		KinematicLocalisationAnalyser();
-		KinematicLocalisationAnalyser ( const char* state_file1 );
-		KinematicLocalisationAnalyser ( const char* state_file1, const char* state_file0, bool consecutive_files = true );
-		KinematicLocalisationAnalyser ( const char* base_name, int file_number0, int file_number1 );
+		KinematicLocalisationAnalyser ( const char* state_file1, bool usebz2 = true );
+		KinematicLocalisationAnalyser ( const char* state_file1, const char* state_file0, bool consecutive_files = true, bool usebz2 = true);
+		KinematicLocalisationAnalyser ( const char* base_name, int file_number0, int file_number1, bool usebz2 = true);
 
 		~KinematicLocalisationAnalyser();
 
-		void SetBaseFileName ( string name );
-		bool SetFileNumbers ( int n0, int n1 );
+		void SetBaseFileName (string name);
+		bool SetFileNumbers (int n0, int n1);
 		void SetConsecutive (bool);
 		void SetNO_ZERO_ID (bool);
-		void SwitchStates ( void );
+		void SwitchStates (void);
 		
 
 		bool DistribsToFile (const char* output_file_name);
 		///Write the averaged deformation on each grain in a file (vertices and cells lists included in the file), no need to call ComputeParticlesDeformation()
 		bool DefToFile (const char* output_file_name = "deformations");
+		///Save/Load states using bz2 compression
+		bool bz2;
 		ofstream& ContactDistributionToFile ( ofstream& output_file );
 		ofstream& AllNeighborDistributionToFile ( ofstream& output_file );
 		ofstream& StrictNeighborDistributionToFile ( ofstream& output_file );
@@ -74,7 +76,7 @@ class KinematicLocalisationAnalyser
 		/// Compute grad_u for all particles, by summing grad_u of all adjaent cells using current states
 		const vector<Tenseur3>& ComputeParticlesDeformation (void);
 		/// Do everything in one step by giving some final (file1) and initial (file0) positions 
-		const vector<Tenseur3>& ComputeParticlesDeformation(const char* state_file1, const char* state_file0);
+		const vector<Tenseur3>& ComputeParticlesDeformation(const char* state_file1, const char* state_file0, bool usebz2 = true);
 		///Compute porisity from cumulated spheres volumes and positions of boxes
 		Real ComputeMacroPorosity (void );
 

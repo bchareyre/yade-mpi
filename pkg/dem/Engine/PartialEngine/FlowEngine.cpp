@@ -509,7 +509,7 @@ Real FlowEngine::Volume_cell ( CGT::Cell_handle cell, Scene* ncb )
 	return abs ( Volume );
 }
 
-YADE_PLUGIN ( ( FlowEngine ) );
+YADE_PLUGIN ((FlowEngine));
 #endif //FLOW_ENGINE
 
 // YADE_REQUIRE_FEATURE(PHYSPAR);

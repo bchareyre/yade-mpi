@@ -35,8 +35,6 @@ class TriaxialStressController : public PartialEngine
 		enum { wall_bottom=0, wall_top, wall_left, wall_right, wall_front, wall_back };
 		//! real index values of walls in the Scene
 		int wall_id [6];
-		//! Defines the prescibed resultant force 
-		//Vector3r		force;	
 		//! Stores the value of the translation at the previous time step, stiffness, and normal
 		Vector3r	previousTranslation [6];
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
