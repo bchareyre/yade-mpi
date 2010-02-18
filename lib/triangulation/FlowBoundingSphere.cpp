@@ -12,7 +12,7 @@
 #include "FlowBoundingSphere.h"//include after #define XVIEW
 
 #ifdef XVIEW
-#include "Vue3D.h"
+//#include "Vue3D.h" //FIXME implicit dependencies will look for this class (out of tree) even ifndef XVIEW
 #endif
 
 #ifdef FLOW_ENGINE

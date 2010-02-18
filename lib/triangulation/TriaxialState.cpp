@@ -8,12 +8,6 @@
 
 #include "TriaxialState.h"
 #include <math.h>
-
-#ifdef USE_OGL_VIEW
-#include "../vueGL/vue3d.h"
-#endif
-
-
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
@@ -178,10 +172,7 @@ bool TriaxialState::from_file(const char* filename, bool bz2)
 		Statefile.push(boost::iostreams::file_source(string(filename)+".bz2"));}
 	else Statefile.push(boost::iostreams::file_source(string(filename)));
 	if(!Statefile.good()) {cerr << "Error opening files"; return false;}
-		
-#ifdef USE_OGL_VIEW
-	Vue3D Vue1;
-#endif
+	
 	long Idg;
 	long Ns=0;//number of spheres (excluding fictious ones))
 	Statefile >> Ng;
