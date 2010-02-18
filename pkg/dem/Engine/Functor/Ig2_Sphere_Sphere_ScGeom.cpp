@@ -10,12 +10,6 @@
 #include<yade/lib-base/Math.hpp>
 #include<yade/core/Omega.hpp>
 
-
-Ig2_Sphere_Sphere_ScGeom::Ig2_Sphere_Sphere_ScGeom()
-{
-	interactionDetectionFactor = 1;
-}
-
 bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 							const shared_ptr<Shape>& cm2,
 							const State& state1, const State& state2, const Vector3r& shift2, const bool& force,
@@ -50,7 +44,6 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 	}
 	return false;
 }
-
 
 bool Ig2_Sphere_Sphere_ScGeom::goReverse(	const shared_ptr<Shape>& cm1,
 								const shared_ptr<Shape>& cm2,

@@ -15,11 +15,6 @@
 
 CREATE_LOGGER(Ig2_Facet_Sphere_ScGeom);
 
-Ig2_Facet_Sphere_ScGeom::Ig2_Facet_Sphere_ScGeom() 
-{
-	shrinkFactor=0;
-}
-
 bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 							const shared_ptr<Shape>& cm2,
 							const State& state1,

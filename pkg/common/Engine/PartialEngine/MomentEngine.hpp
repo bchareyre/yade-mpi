@@ -11,13 +11,11 @@
 #include<yade/core/PartialEngine.hpp>
 
 class MomentEngine: public PartialEngine{
-	public :
-		Vector3r moment;
-		MomentEngine();
-		virtual ~MomentEngine();
+	public:
 		virtual void applyCondition(Scene*);
-	REGISTER_ATTRIBUTES(PartialEngine,(moment));
-	REGISTER_CLASS_AND_BASE(MomentEngine,PartialEngine);
+	YADE_CLASS_BASE_DOC_ATTRS(MomentEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step.",
+		((Vector3r,moment,Vector3r::ZERO,"Torque value to be applied."))
+	);
 };
 REGISTER_SERIALIZABLE(MomentEngine);
 

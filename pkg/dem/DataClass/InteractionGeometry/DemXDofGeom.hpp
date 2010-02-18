@@ -7,7 +7,7 @@
 	It might be removed in the future. */
 class GenericSpheresContact: public InteractionGeometry{
 	YADE_CLASS_BASE_DOC_ATTRS(GenericSpheresContact,InteractionGeometry,
-		"Class uniting ScGeom and Dem3DofGeom, for the purposes of GlobalSittnessTimeStepper. (It might be removed inthe future). Do not use this class directly.",
+		"Class uniting :yref:`ScGeom` and :yref:`Dem3DofGeom`, for the purposes of :yref:`GlobalStiffnessTimeStepper`. (It might be removed inthe future). Do not use this class directly.",
 		((Vector3r,normal,,"Unit vector oriented along the interaction. |yupdate|"))
 		((Real,refR1,,"Reference radius of particle #1. |ycomp|"))
 		((Real,refR2,,"Reference radius of particle #2. |ycomp|"))
