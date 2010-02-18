@@ -56,9 +56,10 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			),
 		LIBS=env['LIBS']+[
 			'yade-support',
-			'miniWm3',
 			'rt', # realtime lib, for clock_gettime 
 			]+
-			(['$QGLVIEWER_LIB','yade-opengl'] if 'YADE_OPENGL' in env['CPPDEFINES'] else []),
+			(['$QGLVIEWER_LIB','yade-opengl'] if 'YADE_OPENGL' in env['CPPDEFINES'] else [])
+			+(['miniWm3'] if 'nowm3' not in env['features'] else [])
+			,
 	)
 ])

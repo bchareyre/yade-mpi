@@ -53,8 +53,8 @@ if 'opengl' in env['features']:
 	yadeStaticOrSharedLib('yade-opengl',env.Combine('yade-opengl.cpp',['opengl/FpsTracker.cpp','opengl/GLTextLabel.cpp','opengl/GLWindow.cpp','opengl/GLWindowsManager.cpp','opengl/GLUtils.cpp']),LIBS=env['LIBS']+['glut','GL','$QGLVIEWER_LIB']),
 #env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary
 yadeStaticOrSharedLib('yade-support',[
-	env.Combine('yade-support.cpp',['base/yadeEigenWrapper.cpp' if 'nowm3' in env['features'] else 'base/yadeWm3Extra.cpp',
-			'computational-geometry/MarchingCube.cpp',
+	env.Combine('yade-support.cpp',(['base/yadeEigenWrapper.cpp'] if 'nowm3' in env['features'] else ['base/yadeWm3Extra.cpp'])+
+		['computational-geometry/MarchingCube.cpp',
 			'factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
 			'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 			'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp',
@@ -70,9 +70,10 @@ yadeStaticOrSharedLib('yade-support',[
 ###### 3rd party libs
 #######################
 
-yadeStaticOrSharedLib('miniWm3',
-	env.Combine('miniWm3.cpp',['miniWm3/Wm3Math.cpp','miniWm3/Wm3Matrix3.cpp','miniWm3/Wm3Quaternion.cpp','miniWm3/Wm3Vector3.cpp','miniWm3/Wm3Vector2.cpp','miniWm3/Wm3Memory.cpp','miniWm3/Wm3String.cpp','miniWm3/Wm3System.cpp']),
-	# miniWm3 cannot link with itself, filter it out.
-	LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
-	# miniWm3 will be always optimized and without debugging info, even in debug builds; suppress all warnings
-	CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w'])
+if not 'nowm3' in env['features']:
+	yadeStaticOrSharedLib('miniWm3',
+		env.Combine('miniWm3.cpp',['miniWm3/Wm3Math.cpp','miniWm3/Wm3Matrix3.cpp','miniWm3/Wm3Quaternion.cpp','miniWm3/Wm3Vector3.cpp','miniWm3/Wm3Vector2.cpp','miniWm3/Wm3Memory.cpp','miniWm3/Wm3String.cpp','miniWm3/Wm3System.cpp']),
+		# miniWm3 cannot link with itself, filter it out.
+		LIBS=filter(lambda l: l!='miniWm3',env['LIBS']),
+		# miniWm3 will be always optimized and without debugging info, even in debug builds; suppress all warnings
+		CXXFLAGS=env['CXXFLAGS']+['-O3','-g0','-w'])

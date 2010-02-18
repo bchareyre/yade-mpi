@@ -391,7 +391,7 @@ if not env.GetOption('clean'):
 	if 'nowm3' in env['features'] and 'eigen' not in env['features']:
 		featureNotOK("You selected the 'nowm3' feature; you MUST also select the 'eigen' feature in such case.")
 
-	if env['useMiniWm3']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
+	if env['useMiniWm3'] and not 'nowm3' in env['features']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 
 	env.Append(CPPDEFINES=['YADE_'+f.upper() for f in env['features']])
 
