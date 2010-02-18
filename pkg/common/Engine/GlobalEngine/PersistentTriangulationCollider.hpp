@@ -7,16 +7,12 @@
 *************************************************************************/
 
 #pragma once
-
 #include<yade/core/Collider.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include <list>
 #include <set>
 #include <vector>
 #include <algorithm>
-
-#include<yade/pkg-dem/TesselationWrapper.hpp>
-
 
 /*! \brief Collision detection engine based on regular triangulation.
  
@@ -26,8 +22,8 @@
  	Also needed : uncommenting lines in core/Interaction.cpp and core/Interaction.hpp (see NOTE:TriangulationCollider
  */
 
+class TesselationWrapper;
 
-using namespace std;
 
 class PersistentTriangulationCollider : public Collider
 {
@@ -59,22 +55,22 @@ class PersistentTriangulationCollider : public Collider
 		unsigned int nbObjects;
 
 		/// Aabb extremity of the sphere number "id" projected onto the X axis
-		vector<shared_ptr<AABBBound> > xBounds;
+		std::vector<shared_ptr<AABBBound> > xBounds;
 
 		/// Aabb extremity of the sphere number "id" projected onto the Y axis
-		vector<shared_ptr<AABBBound> > yBounds;
+		std::vector<shared_ptr<AABBBound> > yBounds;
 
 		/// Aabb extremity of the sphere number "id" projected onto the Z axis
-		vector<shared_ptr<AABBBound> > zBounds;
+		std::vector<shared_ptr<AABBBound> > zBounds;
 
 		// collection of Aabb that are in interaction
 		//protected : vector< set<unsigned int> > overlappingBB;
 		shared_ptr<InteractionContainer> interactions;
 		/// upper right corner of the Aabb of the objects =>  for spheres = center[i]-radius
-		vector<Real> maxima;
+		std::vector<Real> maxima;
 
 		/// lower left corner of the Aabb of the objects =>  for spheres = center[i]+radius
-		vector<Real> minima;
+		std::vector<Real> minima;
 
 		/// Used the first time broadInteractionTest is called, to initialize and sort the xBounds, yBounds,
 		/// and zBounds arrays and to initialize the overlappingBB collection

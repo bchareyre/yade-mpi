@@ -18,17 +18,22 @@ class Body;
 class TimeStepper : public GlobalEngine
 {
 	public :
-		bool active;
-		unsigned int timeStepUpdateInterval;
+// 		bool active;
+// 		unsigned int timeStepUpdateInterval;
 
-		TimeStepper();
+// 		TimeStepper();
 		virtual void computeTimeStep(Scene* ) { throw; };
 		virtual bool isActivated(Scene*);
 		virtual void action(Scene* b) { computeTimeStep(b);} ;
 		void setActive(bool a, int nb=-1);
-
+		
+		YADE_CLASS_BASE_DOC_ATTRS(
+			TimeStepper,GlobalEngine,"Engine defining time-step (fundamental class)",
+			((bool,active,true,"is the engine active?"))
+			((unsigned int,timeStepUpdateInterval,1,"dt update interval")));
+/*
 	REGISTER_ATTRIBUTES(GlobalEngine,(active)(timeStepUpdateInterval));
-	REGISTER_CLASS_AND_BASE(TimeStepper,GlobalEngine);
+	REGISTER_CLASS_AND_BASE(TimeStepper,GlobalEngine);*/
 };
 
 REGISTER_SERIALIZABLE(TimeStepper);

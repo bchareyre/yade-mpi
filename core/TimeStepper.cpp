@@ -12,11 +12,11 @@
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Scene.hpp>
 
-TimeStepper::TimeStepper() : GlobalEngine()
-{	
-	active = true;
-	timeStepUpdateInterval = 1;
-}
+// TimeStepper::TimeStepper() : GlobalEngine()
+// {	
+// 	active = true;
+// 	timeStepUpdateInterval = 1;
+// }
 
 
 bool TimeStepper::isActivated(Scene* mb)

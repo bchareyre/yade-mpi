@@ -12,14 +12,11 @@
 
 
 /*! \brief Compute the critical timestep of the leap-frog scheme based on global stiffness of bodies
-
-		
-	See usage details in TriaxialTest documentation (TriaxialTest is also a good example of how to use this class)		
+	See usage details in TriaxialTest documentation (TriaxialTest is also a good example of how to use this class)
  */
 
 class Interaction;
 class BodyContainer;
-//class MacroMicroElasticRelationships;
 class Scene;
 
 class GlobalStiffnessTimeStepper : public TimeStepper
@@ -29,31 +26,25 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		vector<Vector3r> Rstiffnesses;
 		void computeStiffnesses(Scene*);
 
-		Real		newDt, previousDt;
+		Real		newDt;
 		bool		computedSomething,
-				computedOnce;
-		//shared_ptr<MacroMicroElasticRelationships> sdecContactModel;
-
+ 				computedOnce;
 		void findTimeStepFromBody(const shared_ptr<Body>& body, Scene * ncb);
-		void findTimeStepFromInteraction(const shared_ptr<Interaction>& , shared_ptr<BodyContainer>&);
-
+	
 	public :
-		int sdecGroupMask; // FIXME - we should find a way to clean groupmask stuff
-		//! defaultDt is used as default AND as max value of the timestep
-		Real defaultDt;
+		int sdecGroupMask; // FIXME - to be removed -> not used here but set in preprocessors, removing breaks compilation.
 		//! used as a multiplier on the theoretical critical timestep (compensate some approximations in the computation)
-		Real timestepSafetyCoefficient;
-
-		GlobalStiffnessTimeStepper();
 		virtual ~GlobalStiffnessTimeStepper();
 	
 		virtual void computeTimeStep(Scene*);
 		virtual bool isActivated(Scene*);
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(
+			GlobalStiffnessTimeStepper,TimeStepper,"An engine assigning the time-step as a fraction of the minimum eigen-period in the problem",
+			((Real,defaultDt,1,"used as default AND as max value of the timestep"))
+			((Real,previousDt,1,"last computed dt |yupdate|"))
+			((Real,timestepSafetyCoefficient,0.8,"safety factor between the minimum eigen-period and the final assigned dt (less than 1))")),
+			computedOnce=false;)
 		DECLARE_LOGGER;
-
-	REGISTER_ATTRIBUTES(TimeStepper,(sdecGroupMask)(defaultDt)(previousDt)(timestepSafetyCoefficient)(computedOnce));
-	REGISTER_CLASS_NAME(GlobalStiffnessTimeStepper);
-	REGISTER_BASE_CLASS_NAME(TimeStepper);
 };
 
 REGISTER_SERIALIZABLE(GlobalStiffnessTimeStepper);
