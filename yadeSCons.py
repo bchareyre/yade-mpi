@@ -62,10 +62,10 @@ def scanAllPlugins(cacheFile,feats):
 				for l in open(ff):
 					if re.match(r'\s*#endif.*$',l): skipping=False; continue
 					if skipping: continue
-					m=re.match(r'\s*#ifdef\s*YADE_(.*)\s*$',l)
+					m=re.match(r'\s*#(ifdef|ifndef)\s*YADE_(.*)\s*$',l)
 					if m:
-						feat=m.group(1).lower()
-						if feat not in features: skipping=True
+						cond,feat=m.group(1),m.group(2).lower()
+						if (cond=='ifdef' and feat not in features) or (cond=='ifndef' and feat in features): skipping=True
 					if re.match(r'\s*YADE_PLUGIN\(.*',l): isPlugin=True
 					m=re.match(r'^\s*#include\s*<yade/([^/]*)/(.*)>.*$',l)
 					if m:
