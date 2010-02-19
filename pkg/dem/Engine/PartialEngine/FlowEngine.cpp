@@ -19,15 +19,9 @@
 YADE_REQUIRE_FEATURE (CGAL);
 CREATE_LOGGER (FlowEngine);
 
-std::ofstream cons_DAMP ("cons_DAMP", std::ios::out);
-std::ofstream cons_NONDAMP ("cons_NONDAMP", std::ios::out);
-std::ofstream settle_DAMP ("settle_DAMP", std::ios::out);
-std::ofstream settle_NONDAMP ("settle_NONDAMP", std::ios::out);
-
 FlowEngine::~FlowEngine()
 {
 }
-
 void FlowEngine::applyCondition ( Scene* ncb )
 {
 	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;}
@@ -96,11 +90,6 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			char *g = file;
 			
 			flow->PermeameterCurve(flow->T[currentTes].Triangulation(), g, time);
-			
-			if (damped) {cons_DAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
-			if (!damped){cons_NONDAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
-			if (damped) {settle_DAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
-			if (!damped) {settle_NONDAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
 			
 			if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 			{

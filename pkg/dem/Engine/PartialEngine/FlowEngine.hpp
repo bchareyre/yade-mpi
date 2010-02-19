@@ -59,7 +59,7 @@ class FlowEngine : public PartialEngine
 					((Real,loadFactor,1.5,"Load multiplicator for oedometer test"))
 					((bool,unload,false,"Remove the load in oedometer test"))
 					((bool,tess_based_force,true,"true=force computation based on tessalation, false=force computation based on triangulation")));
-	DECLARE_LOGGER;
+		DECLARE_LOGGER;
 };
 
 REGISTER_SERIALIZABLE(FlowEngine);
