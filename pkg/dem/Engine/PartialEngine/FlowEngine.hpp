@@ -12,6 +12,8 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include<yade/lib-triangulation/FlowBoundingSphere.h>
 
+#ifdef FLOW_ENGINE
+
 class FlowEngine : public PartialEngine
 {
 	private:
@@ -20,7 +22,7 @@ class FlowEngine : public PartialEngine
 	public :
 
 		Vector3r gravity;
-		bool first;
+// 		bool first;
 
 		int current_state
 		,previous_state
@@ -46,6 +48,9 @@ class FlowEngine : public PartialEngine
 		
 		YADE_CLASS_BASE_DOC_ATTRS(FlowEngine,PartialEngine,"An engine to solve the flow problem in saturated granular media",
 					((bool,isActivated,true,"Activates Flow Engine "))
+					((bool,first,true,"Controls the initialization/update phases"))
+					((bool, damped, true, ""))
+					((bool, slip_boundary, false, "Controls friction condition on lateral walls"))
 					((bool,currentTes,false,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,"Initial internal pressure for oedometer test"))
 					((int,PermuteInterval,100000,"Pore space re-triangulation period"))

@@ -36,6 +36,7 @@ class FlowBoundingSphere
 		int x_min_id, x_max_id, y_min_id, y_max_id, z_min_id, z_max_id;
 		int* boundsIds [6];
 		bool currentTes;
+		bool SLIP_ON_LATERALS;
 		
 		Boundary boundaries [6];
 		short id_offset;

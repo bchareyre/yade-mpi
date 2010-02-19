@@ -5,7 +5,6 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#ifdef FLOW_ENGINE
 
 #include "FlowEngine.hpp"
 #include<yade/core/Scene.hpp>
@@ -15,10 +14,15 @@
 #include<yade/pkg-common/Wall.hpp>
 #include<yade/pkg-common/Box.hpp>
 
+#ifdef FLOW_ENGINE
+
 YADE_REQUIRE_FEATURE (CGAL);
 CREATE_LOGGER (FlowEngine);
 
-std::ofstream plotFile ( "plot2",std::ios::out );
+std::ofstream cons_DAMP ("cons_DAMP", std::ios::out);
+std::ofstream cons_NONDAMP ("cons_NONDAMP", std::ios::out);
+std::ofstream settle_DAMP ("settle_DAMP", std::ios::out);
+std::ofstream settle_NONDAMP ("settle_NONDAMP", std::ios::out);
 
 FlowEngine::~FlowEngine()
 {
@@ -47,7 +51,6 @@ void FlowEngine::applyCondition ( Scene* ncb )
 		}
 
 		current_state = triaxialCompressionEngine->currentState;
-		flow->key = triaxialCompressionEngine->Key;
 
 		if ( !first && current_state==3 )
 		{
@@ -92,11 +95,12 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			sprintf (file, keyconsol, j);
 			char *g = file;
 			
-// 			string pressures = +"%d_Consol";
 			flow->PermeameterCurve(flow->T[currentTes].Triangulation(), g, time);
-			plotFile << j << " " << flow->Pressures[cons] << endl; cons++;
-// 			plotFile << "replot '" << j << "_Consol' using 2:0" << endl;
 			
+			if (damped) {cons_DAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
+			if (!damped){cons_NONDAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
+			if (damped) {settle_DAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
+			if (!damped) {settle_NONDAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
 			
 			if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 			{
@@ -128,6 +132,8 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			Initialize ( ncb, P_zero );
 			
 			flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
+			
+			flow->SLIP_ON_LATERALS=slip_boundary;
 
 			flow->k_factor = permeability_factor;
 			flow->Compute_Permeability ();
@@ -143,6 +149,8 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			}
 			cout << y << " deltaV initialised -----------------" << endl;
 
+			flow->key = triaxialCompressionEngine->Key;
+			
 			if (compute_K) {flow->Sample_Permeability ( flow->T[currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 
 			Oedometer_Boundary_Conditions();
@@ -150,10 +158,10 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			
 			flow->GaussSeidel ( );
 			
-			plotFile << "unset key" << endl;
+// 			plotFile << "unset key" << endl;
+			
 			
 // 			flow->Analytical_Consolidation();
-
 			first = false; cons=0;
 		}
 	}

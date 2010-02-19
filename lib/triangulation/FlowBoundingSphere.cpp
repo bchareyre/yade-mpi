@@ -27,6 +27,7 @@ namespace CGT
 const bool DEBUG_OUT = false;
 
 const double RELAX = 1.9;
+
 const double TOLERANCE = 1e-06;
 const double ONE_THIRD = 1.0/3.0;
 //! Use this factor, or minLength, to reduce max permeability values (see usage below))
@@ -36,7 +37,7 @@ const double minLength = 0.20;//percentage of mean rad
 //! Factors including the effect of 1/2 symmetry in hydraulic radii
 const Real multSym1 = 1/pow(2,0.25);
 const Real multSym2 = 1/pow(4,0.25);
-const bool SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
+
 const double FAR = 500;
 const int facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
@@ -68,6 +69,7 @@ FlowBoundingSphere::FlowBoundingSphere()
         tess_based_force = true;
         for (int i=0;i<6;i++) boundsIds[i] = 0;
         minPermLength=-1;
+	SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
 }
 
 void FlowBoundingSphere::Compute_Action()
@@ -290,7 +292,7 @@ void FlowBoundingSphere::Localize()
         int pass = 0;
         RTriangulation& Tri = T[currentTes].Triangulation();
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
-        cout << "Localizing..." << endl;	
+        cout << "Localizing..." << endl;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 pass = 0;
                 for (int i=0;i<4;i++) {
@@ -301,7 +303,8 @@ void FlowBoundingSphere::Localize()
                                 Boundary& bi = boundary(V->info().id());
                                 //     Boundary& bi = boundaries [V->info().id()];
 
-                                if (bi.flowCondition) {
+//                                 if (bi.flowCondition) {
+                                if ( V->info().id() != /*(unsigned int)*/ y_min_id && V->info().id() != y_max_id) {
                                         // Inf/Sup has priority
                                         if (!cell->info().isSuperior && !cell->info().isInferior) {
                                                 cell->info().isLateral = true;
@@ -352,9 +355,8 @@ void FlowBoundingSphere::Compute_Permeability()
 
         Vecteur n;
 
-
-        std::ofstream oFile("Hydraulic_Radius" ,std::ios::out);
-        //   std::ofstream kFile ( "Permeability" ,std::ios::out );
+        std::ofstream oFile( "Hydraulic_Radius",std::ios::out);
+        std::ofstream kFile ( "Permeability" ,std::ios::out );
         Real meanK=0;
         Real infiniteK=1e10;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
@@ -987,20 +989,6 @@ double FlowBoundingSphere::surface_external_single_fictious(Cell_handle cell, Bo
         return sk;
 }
 
-//  double FlowBoundingSphere::epsilon_V_triple_fictious ( Cell_handle cell )
-//  {
-//   Boundary b;
-//
-//   for (int g=0;g<4;g++)
-//   {
-//    if (cell->vertex(g)->info().isFictious)
-//    {
-//     b = boundary ( cell->vertex ( g )->info().id() );
-//     double sk = surface_external_triple_fictious (cell,b);
-//    }
-//   }
-//  }
-
 void FlowBoundingSphere::Fictious_cells()
 {
         Finite_cells_iterator cell_end = T[currentTes].Triangulation().finite_cells_end();
@@ -1046,7 +1034,6 @@ double FlowBoundingSphere::volume_double_fictious_pore(Vertex_handle SV1, Vertex
         B[bi2.coordinate]=bi2.p[bi2.coordinate];
         C[bi1.coordinate]=bi1.p[bi1.coordinate];
         C[bi2.coordinate]=bi2.p[bi2.coordinate];
-
 
         //  cout << "A = " << A[0] << " " << A[1] << " " << A[2] << endl;
         //  cout << "B = " << B[0] << " " << B[1] << " " << B[2] << endl;
@@ -1197,22 +1184,20 @@ double FlowBoundingSphere::volume_single_fictious_pore(Vertex_handle SV1, Vertex
 
 double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_handle cell, int j)
 {
-
-        Cell_handle neighbour_cell = cell->neighbor(j);
-        if (Tri.is_infinite(neighbour_cell)) return 0;
+        if (Tri.is_infinite(cell->neighbor(j))) return 0;
         Point p1 = cell->info();
-        Point p2 = neighbour_cell->info();
+        Point p2 = cell->neighbor(j)->info();
 
         Vertex_handle SV1, SV2, SV3;
 
         double Vtot=0, Vsolid=0, Vpore=0, Vsolid1=0, Vsolid2=0;
 
-        int F1=0, F2=0, Re1=0, Re2=0;
-        //indices relative to the facet
-        int facetRe1=0, facetRe2=0, facetRe3=0, facetF1=0, facetF2=0;
-        int fictious_vertex=0, real_vertex=0;
+        int F1=0, F2=0, Re1=0, Re2=0; //values between 0..3, refers to one cell's fictious(F)/real(Re) vertices
+        int facetRe1=0, facetRe2=0, facetRe3=0, facetF1=0, facetF2=0; //indices relative to the facet
+        int fictious_vertex=0, real_vertex=0; //counts total fictious/real vertices
 
         double Ssolid1=0, Ssolid1n=0, Ssolid2=0, Ssolid2n=0, Ssolid3=0, Ssolid3n=0, Ssolid=0;
+	//solid portions within a pore, for cell () and neighbour_cell (+n). Ssolid total solid surface
 
         //bool fictious_solid = false;
 
@@ -1250,7 +1235,7 @@ double FlowBoundingSphere::Compute_HydraulicRadius(RTriangulation& Tri, Cell_han
                 double A [3], B[3], C[3];
 
                 /**PORE VOLUME**/
-                Vpore = volume_double_fictious_pore(cell->vertex(F1), cell->vertex(F2), cell->vertex(Re1), p1,p2, cell->info().facetSurfaces[j]);
+                Vpore = volume_double_fictious_pore(cell->vertex(F1), cell->vertex(F2), cell->vertex(Re1), p1, p2, cell->info().facetSurfaces[j]);
                 /** **/
 
                 /**PORE SOLID SURFACE**/
@@ -1606,7 +1591,7 @@ void FlowBoundingSphere::GaussSeidel()
                         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
                         //     save_vtk_file ( Tri );
                 }
-        } while ((dp_max/p_max) > tolerance  /*( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
+        } while (((dp_max/p_max) > tolerance) && ( dp_max > tolerance )/* &&*/ /*( j<50 )*/);
         //   cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
 
@@ -1855,7 +1840,10 @@ void FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, R
                 P_ave[k]/= (m+n+o);
                 consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
                 if (k==15) Pressures.push_back(P_ave[k]);
-                n=0; m=0; o=0; k++;
+                n=0;
+                m=0;
+                o=0;
+                k++;
         }
 }
 
@@ -1869,7 +1857,6 @@ void FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min,d
         boundary(y_max_id).flowCondition=0;
         boundary(y_min_id).value=0;
         boundary(y_max_id).value=1;
-//  P_SUP = 1.0; P_INF = 0.0; P_INS = 0.0;
 
         Initialize_pressures();
 
@@ -1878,7 +1865,7 @@ void FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min,d
         char *kk;
         kk = (char*) key.c_str();
 
-        Permeameter(Tri, P_INF, P_SUP, Section, DeltaY, kk);
+        Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
 }
 
 void FlowBoundingSphere::AddBoundingPlanes(Real center[3], Real Extents[3], int id)
