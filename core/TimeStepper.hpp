@@ -15,13 +15,8 @@
 
 class Body;
 
-class TimeStepper : public GlobalEngine
-{
-	public :
-// 		bool active;
-// 		unsigned int timeStepUpdateInterval;
-
-// 		TimeStepper();
+class TimeStepper: public GlobalEngine{
+	public:
 		virtual void computeTimeStep(Scene* ) { throw; };
 		virtual bool isActivated(Scene*);
 		virtual void action(Scene* b) { computeTimeStep(b);} ;
@@ -31,9 +26,6 @@ class TimeStepper : public GlobalEngine
 			TimeStepper,GlobalEngine,"Engine defining time-step (fundamental class)",
 			((bool,active,true,"is the engine active?"))
 			((unsigned int,timeStepUpdateInterval,1,"dt update interval")));
-/*
-	REGISTER_ATTRIBUTES(GlobalEngine,(active)(timeStepUpdateInterval));
-	REGISTER_CLASS_AND_BASE(TimeStepper,GlobalEngine);*/
 };
 
 REGISTER_SERIALIZABLE(TimeStepper);
