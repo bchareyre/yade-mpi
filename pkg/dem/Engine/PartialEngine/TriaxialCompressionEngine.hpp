@@ -43,6 +43,8 @@
  * Transition from (UNLOADING to LOADING) or from (COMPACTION to LOADING: if UNLOADING is skipped) is
  *   done automatically if autoCompressionActivation=true;
  * Both autoUnload and autoCompressionActivation are true by default.
+ * 
+ * NOTE: This engine handles many different manipulations, including some save/reload with attributes modified manually in between. Please don't modify the algorithms, even if they look strange (especially test sequences) without notifying me and getting explicit approval. A typical situation is somebody generates a sample with !autoCompressionActivation and run : he wants a saved simulation at the end. He then reload the saved state, modify some parameters, set autoCompressionActivation=true, and run. He should get the compression test 
  *
  */
 

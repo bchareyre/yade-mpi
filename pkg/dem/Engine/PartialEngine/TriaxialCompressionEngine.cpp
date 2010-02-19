@@ -77,7 +77,6 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
 		previousSigmaIso=sigma_iso;
-
 	}
 	else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && nextState==STATE_TRIAX_LOADING){
 		sigma_iso=sigmaLateralConfinement;
@@ -108,6 +107,8 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 		// stop simulation here, since nothing will happen from now on
 		Phase1End = (currentState==STATE_ISO_COMPACTION ? "compacted" : "unloaded");
 		if(!noFiles) Shop::saveSpheresToFile("/tmp/limbo.spheres");
+		// Please keep this saving process intact, I'm tired of running 3 days simulations and getting nothing at the end!
+		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 	}
 	else if( nextState==STATE_FIXED_POROSITY_COMPACTION){		
 		internalCompaction = false;
@@ -126,17 +127,10 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 {
 	UnbalancedForce=ComputeUnbalancedForce ( ncb );
 
-	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION )
+	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION || autoCompressionActivation)
 	{
 		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)
 		//ANSWER TO FIXME : yes we need that because we want to start compression from LIMBO most of the time
-
-
-		//if ((Omega::instance().getCurrentIteration() % computeStressStrainInterval) == 0){ //NOTE : We don't need that because computeStressStrain(ncb) is done in StressController
-		// computeStressStrain(ncb);
-		//TRVAR5(UnbalancedForce,StabilityCriterion,meanStress,sigma_iso,abs((meanStress-sigma_iso)/sigma_iso));
-		//}
-
 		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && isotropicCompaction==false )
 		{
 			// only go to UNLOADING if it is needed (hard float comparison... :-| )
@@ -144,12 +138,10 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 				doStateTransition (ncb, STATE_ISO_UNLOADING );
 				computeStressStrain ( ncb ); // update stress and strain
 			}
-			else if(currentState==STATE_ISO_COMPACTION && autoCompressionActivation){
+			// Preserve transition from LIMBO to something, I need that! (BC)
+			else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && autoCompressionActivation){
 				doStateTransition (ncb, STATE_TRIAX_LOADING );
 				computeStressStrain ( ncb ); // update stress and strain
-			}
-			else if ( currentState==STATE_ISO_UNLOADING && autoCompressionActivation ) {
-				doStateTransition (ncb, STATE_TRIAX_LOADING ); computeStressStrain ( ncb );
 			}
 			// stop simulation if unloaded and compression is not activate automatically
 			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
@@ -206,7 +198,12 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
 	}
-
+	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
+	{
+		updateParameters ( ncb );
+		maxStress = max(maxStress,stress[wall_top][1]);
+		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
+	}	
 	if ( saveSimulation )
 	{
 		if(!noFiles){
@@ -221,13 +218,7 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 			Shop::saveSpheresToFile ( fileName );
 		}
 		saveSimulation = false;
-	}	
-	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
-	{
-		updateParameters ( ncb );
-		maxStress = max(maxStress,stress[wall_top][1]);
-		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
-	}	
+	}
 	if ( currentState==STATE_LIMBO && autoStopSimulation )
 	{		
 		Omega::instance().stopSimulationLoop();
@@ -245,7 +236,7 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		Real dt = Omega::instance().getTimeStep();
 		 
 		if (abs(epsilonMax) > abs(strain[1])) {
-			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003; // !!! if unloading (?)
+			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003;
 			//else currentStrainRate = strainRate;
 			/* Move top and bottom wall according to strain rate */
 			State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
