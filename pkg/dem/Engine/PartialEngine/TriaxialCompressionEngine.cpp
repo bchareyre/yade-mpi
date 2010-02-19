@@ -56,21 +56,16 @@ TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(str
 	isotropicCompaction=false;
  	boxVolume=0;
 	maxStress =0;
-
-//	calculatedPorosity=1.1;	
-
 }
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
 {	
 }
 
-
 void TriaxialCompressionEngine::postProcessAttributes(bool deserializing)
 {
 	if(deserializing) translationAxis.Normalize();
 }
-
 
 void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextState){
 
@@ -158,26 +153,6 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 			Omega::instance().stopSimulationLoop();
 			return;
 		}
-
-#if 0
-		//This is a hack in order to allow subsequent run without activating compression - like for the YADE-COMSOL coupling
-		if ( !compressionActivated )
-		{
-			//   vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-			//   vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
-			//   for (;itFirst!=itLast; ++itFirst) {
-			//    if ((*itFirst)->getClassName() == "CohesiveFrictionalRelationships")
-			//     (static_cast<CohesiveFrictionalRelationships*> ( (*itFirst).get()))->setCohesionNow = true;
-			//   }
-			internalCompaction = false;
-			Phase1 = true;
-			string fileName = "./" + Phase1End + "_" +
-							  lexical_cast<string> ( Omega::instance().getCurrentIteration() ) + ".xml";
-			cerr << "saving snapshot: " << fileName << " ...";
-			Omega::instance().saveSimulation ( fileName );
-			Omega::instance().stopSimulationLoop();
-		}
-#endif
 	}
 }
 
@@ -237,7 +212,6 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		 
 		if (abs(epsilonMax) > abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003;
-			//else currentStrainRate = strainRate;
 			/* Move top and bottom wall according to strain rate */
 			State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 			p_bottom->pos += 0.5*currentStrainRate*height*translationAxis*dt;
@@ -247,7 +221,6 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 			Omega::instance().stopSimulationLoop();
 		}
 	}
-
 	if ( currentState==STATE_FIXED_POROSITY_COMPACTION )
 	{
 		if ( Omega::instance().getCurrentIteration() % 100 == 0 )
