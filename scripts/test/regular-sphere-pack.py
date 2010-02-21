@@ -1,4 +1,4 @@
-from yade import pack,ymport
+from yade import pack,ymport,export
 
 """ This script demonstrates how to use 2 components of creating packings:
 
@@ -66,6 +66,11 @@ O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates fa
 """Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation"""
 O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=[-7.0,-7.0,-5.9],scale=1.0,color=(1,0,1),**kw))
 
+"""spheresToFile saves coordinates and radiuses of all spheres of the simulation into the text file"""
+print "Saved into the OutFile " + str (export.spheresToFile("OutFile")) + " spheres";
+
+"""spheresFromFile function imports coordinates and radiuses of all spheres of the simulation into the text file"""
+O.bodies.append(ymport.spheresFromFile('regular-sphere-pack-FromFile',shift=[6.0,6.0,-2.9],scale=0.7,color=(1,1,1),**kw))
 
 try:
 	from yade import qt

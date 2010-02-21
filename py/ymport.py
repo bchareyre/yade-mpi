@@ -7,23 +7,20 @@ from miniWm3Wrap import *
 from yade import utils
 
 
-def ascii(filename,scale=1.,wenjieFormat=False,**kw):
+def spheresFromFile(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
-
-	filename is the file holding ASCII numbers (at least 4 colums that hold x_center, y_center, z_center, radius).
-	All remaining arguments are passed the the yade.utils.sphere function that creates the bodies.
-
-	wenjieFormat will skip all lines that have exactly 5 numbers and where the 4th one is exactly 1.0 -
-	this was used by a fellow developer called Wenjie to mark box elements.
-	
-	Returns list of body ids that were inserted into simulation."""
-	from yade.utils import sphere
-	o=Omega()
+	filename is the file which has 4 colums [x, y, z, radius].
+	All remaining arguments are passed the the yade.utils.sphere function which creates bodies.
+	Comments, started from # are supported
+	"""
+	infile = open(fileName,"r")
+	lines = infile.readlines()
+	infile.close()
 	ret=[]
-	for l in open(filename):
-		ss=[float(i) for i in l.split()]
-		if wenjieFormat and len(ss)==5 and ss[4]==1.0: continue
-		ret.append(sphere([scale*ss[0],scale*ss[1],scale*ss[2]],scale*ss[3],**kw))
+	for line in lines:
+		data = line.split()
+		if (data[0][0] != "#"):
+			ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
 def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=0):

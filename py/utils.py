@@ -399,23 +399,6 @@ def randomizeColors(onlyDynamic=False):
 		color=(random.random(),random.random(),random.random())
 		if b.dynamic or not onlyDynamic: b.shape.diffuseColor=color
 
-
-
-def spheresToFile(filename,consider=lambda id: True):
-	"""Save sphere coordinates into ASCII file; the format of the line is: x y z r.
-	Non-spherical bodies are silently skipped.
-	
-	Returns number of spheres that were written."""
-	o=Omega()
-	out=open(filename,'w')
-	count=0
-	for b in o.bodies:
-		if not b.shape or not b.shape.name=='Sphere' or not consider(b.id): continue
-		out.write('%g\t%g\t%g\t%g\n'%(b.phys.pos[0],b.phys.pos[1],b.phys.pos[2],b.shape.radius))
-		count+=1
-	out.close()
-	return count
-
 def avgNumInteractions(cutoff=0.):
 	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 	return sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
@@ -577,7 +560,7 @@ def sumBexTorques(*args,**kw):
 def spheresFromFile(*args,**kw):
 	_deprecatedUtilsFunction('spheresFromFile','yade.import.text')
 	import yade.ymport
-	return yade.ymport.text(*args,**kw)
+	return yade.ymport.spheresFromFile(*args,**kw)
 def import_stl_geometry(*args,**kw):
 	_deprecatedUtilsFunction('import_stl_geometry','yade.import.stl')
 	import yade.ymport

@@ -1,3 +1,6 @@
+"""
+Export geometry to various formats.
+"""
 # encoding: utf-8
 from yade.wrapper import *
 
@@ -117,3 +120,26 @@ class VTKWriter:
 		outFile.close()
 		self.snapCount+=1
 
+def spheresToFile(filename, consider=lambda id: True):
+	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
+	Non-spherical bodies are silently skipped.
+	Returns number of spheres which were written.
+	Example added to scripts/test/regular-sphere-pack.py
+	"""
+	O=Omega()
+	
+	try:
+		out=open(filename,'w')
+	except:
+		raise RuntimeError("Problem to write into the file")
+	
+	count=0
+	for b in O.bodies:
+		try:
+			if ((b.shape.name=="Sphere") and consider(b.id)):
+				out.write('%g\t%g\t%g\t%g\n'%(b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape['radius']))
+				count+=1
+		except AttributeError:
+			pass
+	out.close()
+	return count

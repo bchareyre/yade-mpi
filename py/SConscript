@@ -24,6 +24,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.AlwaysBuild(env.ScanReplace('config.py.in')),
 	env.File('utils.py'),
 	env.File('ymport.py'),
+	env.File('export.py'),
 	env.File('eudoxos.py'),
 	env.File('plot.py'),
 	env.File('linterpolation.py'),
