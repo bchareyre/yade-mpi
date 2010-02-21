@@ -44,7 +44,7 @@ for part in [
 	]: O.bodies.appendClumped(part)
 
 
-""" Example of utils.facetBox usage """
+# Example of utils.facetBox usage 
 q1 = Quaternion(Vector3(0,0,1),(3.14159/3))
 o1,o_angl = q1.ToAxisAngle()
 O.bodies.append(utils.facetBox((12,0,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
@@ -55,22 +55,22 @@ q1 = Quaternion(Vector3(0,0,1),(3.14159))
 o1,o_angl = q1.ToAxisAngle()
 O.bodies.append(utils.facetBox((-12,-12,-6+0.9),(1,0.7,0.9),(o1[0],o1[1],o1[2],o_angl),**kwBoxes))
 
-""" Example of utils.facetCylinder usage, RotationEngine example see below"""
+# Example of utils.facetCylinder usage, RotationEngine example see below
 q1 = Quaternion(Vector3(0,0,1),(3.14159/2))
 o1,o_angl = q1.ToAxisAngle()
 rotateIDs=O.bodies.append(utils.facetCylinder((6.0,6.0,-4.0),2.0,4.0,(o1[0],o1[1],o1[2],o_angl),wallMask=4,segmentsNumber=10,**kwBoxes))
 
-"""Import regular-sphere-pack.mesh into the YADE simulation"""
+# Import regular-sphere-pack.mesh into the YADE simulation
 O.bodies.append(ymport.gmsh('regular-sphere-pack.mesh',**kwMeshes))#generates facets from the mesh file
 
-"""Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation"""
+# Import regular-sphere-pack-LSMGenGeo.geo into the YADE simulation
 O.bodies.append(ymport.gengeoFile('regular-sphere-pack-LSMGenGeo.geo',shift=[-7.0,-7.0,-5.9],scale=1.0,color=(1,0,1),**kw))
 
-"""spheresToFile saves coordinates and radiuses of all spheres of the simulation into the text file"""
-print "Saved into the OutFile " + str (export.spheresToFile("OutFile")) + " spheres";
+# spheresToFile saves coordinates and radiuses of all spheres of the simulation into the text file
+print "Saved into the OutFile " + str (export.text("OutFile")) + " spheres";
 
-"""spheresFromFile function imports coordinates and radiuses of all spheres of the simulation into the text file"""
-O.bodies.append(ymport.spheresFromFile('regular-sphere-pack-FromFile',shift=[6.0,6.0,-2.9],scale=0.7,color=(1,1,1),**kw))
+# spheresFromFile function imports coordinates and radiuses of all spheres of the simulation into the text file"""
+O.bodies.append(ymport.text('regular-sphere-pack-FromFile',shift=[6.0,6.0,-2.9],scale=0.7,color=(1,1,1),**kw))
 
 try:
 	from yade import qt

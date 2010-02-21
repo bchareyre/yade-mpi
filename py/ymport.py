@@ -7,11 +7,11 @@ from miniWm3Wrap import *
 from yade import utils
 
 
-def spheresFromFile(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
+def text(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
 	filename is the file which has 4 colums [x, y, z, radius].
 	All remaining arguments are passed the the yade.utils.sphere function which creates bodies.
-	Comments, started from # are supported
+	Lines starting with # are skipped
 	"""
 	infile = open(fileName,"r")
 	lines = infile.readlines()
@@ -19,8 +19,8 @@ def spheresFromFile(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	ret=[]
 	for line in lines:
 		data = line.split()
-		if (data[0][0] != "#"):
-			ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
+		if (data[0][0] == "#"): continue
+		ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
 def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=0):

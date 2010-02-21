@@ -120,7 +120,7 @@ class VTKWriter:
 		outFile.close()
 		self.snapCount+=1
 
-def spheresToFile(filename, consider=lambda id: True):
+def text(filename, consider=lambda id: True):
 	"""Save sphere coordinates into a text file; the format of the line is: x y z r.
 	Non-spherical bodies are silently skipped.
 	Returns number of spheres which were written.
