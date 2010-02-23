@@ -268,7 +268,7 @@ void TriaxialStressController::applyCondition(Scene* ncb)
  */
 void TriaxialStressController::computeStressStrain(Scene* ncb)
 {
-	ncb->force.sync();
+	ncb->forces.sync();
 
 	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
