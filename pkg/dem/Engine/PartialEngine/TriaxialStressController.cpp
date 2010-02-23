@@ -125,6 +125,8 @@ void TriaxialStressController::updateStiffness (Scene * ncb)
 
 void TriaxialStressController::controlExternalStress(int wall, Scene* ncb, Vector3r resultantForce, State* p, Real wall_max_vel)
 {
+	ncb->forces.sync();
+
 	Real translation=normal[wall].Dot( getForce(ncb,wall_id[wall]) - resultantForce); 
 	//bool log=((wall==3) && (Omega::instance().getCurrentIteration()%200==0));
 	const bool log=false;
@@ -266,6 +268,8 @@ void TriaxialStressController::applyCondition(Scene* ncb)
  */
 void TriaxialStressController::computeStressStrain(Scene* ncb)
 {
+	ncb->force.sync();
+
 	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
 	State* p_left=Body::byId(wall_left_id,ncb)->state.get();
