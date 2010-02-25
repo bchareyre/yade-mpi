@@ -237,12 +237,16 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 	Return list of facets forming the box;
 	
 	:Parameters:
-			- `center`: center of the created box; (X,Y,Z) coordinates;
-			- `extents`: lengths of the box sides; (eX,eY,eZ);
-			- `orientation`: orientation of the box in quaternion format;
-			- `extents`: lengths of the box sides; (eX,eY,eZ);
-			- `wallMask`: bitmask; determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls;
-			- `**kw`: passed to utils.facet;
+			`center`: Vector3
+				center of the created box
+			`extents`: (eX,eY,eZ)
+				lengths of the box sides
+			`orientation`: quaternion
+				orientation of the box
+			`wallMask`: bitmask
+				determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls;
+			`**kw`: (unused keyword arguments)
+				passed to utils.facet
 	"""
 	
 	
