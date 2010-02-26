@@ -9,24 +9,6 @@
 #include "NormalInelasticityPhys.hpp"
 
 
-// NormalInelasticityPhys::NormalInelasticityPhys()
-// {
-// 	createIndex();
-// 
-// // assign neutral value	
-// 	orientationToContact1 = Quaternionr(1.0,0.0,0.0,0.0);
-// 	orientationToContact2 = Quaternionr(1.0,0.0,0.0,0.0);
-// 	initialOrientation1 = Quaternionr(1.0,0.0,0.0,0.0);
-// 	initialOrientation2 = Quaternionr(1.0,0.0,0.0,0.0);
-// 	kr = 0;
-// 	currentContactOrientation = Quaternionr(1.0,0.0,0.0,0.0);
-// 	initialContactOrientation = Quaternionr(1.0,0.0,0.0,0.0);
-// 	initialPosition1=initialPosition2=Vector3r(1,0,0);
-// 	unMax = 0;
-// 	previousun = 0;
-// 	previousFn = 0;
-// 
-// }
 
 void NormalInelasticityPhys::SetBreakingState()
 {
@@ -40,13 +22,6 @@ NormalInelasticityPhys::~NormalInelasticityPhys()
 {
 }
 
-// void NormalInelasticityPhys::postProcessAttributes(bool)
-// {
-// 
-// }
-
 
 YADE_PLUGIN((NormalInelasticityPhys));
-
-// YADE_REQUIRE_FEATURE(PHYSPAR);
 

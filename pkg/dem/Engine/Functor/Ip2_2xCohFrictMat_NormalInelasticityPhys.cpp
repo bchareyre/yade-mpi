@@ -14,18 +14,6 @@
 #include<yade/core/Scene.hpp>
 
 
-// Ip2_2xCohFrictMat_NormalInelasticityPhys::Ip2_2xCohFrictMat_NormalInelasticityPhys()
-// {
-// 	betaR = 0.12;
-// 	setCohesionNow = false;
-// 	setCohesionOnNewContacts = false;
-// 	cohesionDefinitionIteration = -1; 
-// 
-// //		elasticRollingLimit = ;
-// }
-
-
-
 //
 //
 //
@@ -187,5 +175,3 @@ void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>&
 #endif
 };
 YADE_PLUGIN((Ip2_2xCohFrictMat_NormalInelasticityPhys));
-
-// YADE_REQUIRE_FEATURE(PHYSPAR);

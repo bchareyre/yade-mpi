@@ -5,39 +5,14 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-// YADE_REQUIRE_FEATURE(physpar)
+YADE_PLUGIN((CinemCNCEngine));
 
 #include "CinemCNCEngine.hpp"
-// #include<yade/pkg-common/RigidBodyParameters.hpp> , remplace par : 
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Scene.hpp>
 #include <yade/lib-base/Math.hpp>
-
-
-// CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
-// {
-// 	firstRun=true;
-// 	shearSpeed=0;
-// 	alpha=Mathr::PI/2.0;;
-// 	gamma_save.resize(0);
-// 	temoin_save.resize(0);
-// 	temoin=0;
-// 	gamma=0;
-// 	gammalim=0;
-// 	id_topbox=3;
-// 	id_boxbas=1;
-// 	id_boxleft=0;
-// 	id_boxright=2;
-// 	id_boxfront=5;
-// 	id_boxback=4;
-// 	F_0=0;
-// 	Key="";
-// 	LOG=0;
-// 	wallDamping = 0.2;
-// 	coeff_dech=1.0;
-// }
 
 
 void CinemCNCEngine::applyCondition(Scene * ncb)

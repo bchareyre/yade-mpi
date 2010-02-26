@@ -45,7 +45,6 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	Vector3r dim=maximum-minimum;
 	return python::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(aabbExtrema_overloads,aabbExtrema,0,2);
 
 python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 	python::tuple extrema=aabbExtrema();
@@ -418,7 +417,7 @@ BOOST_PYTHON_MODULE(_utils){
 
 
 	def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
-	def("aabbExtrema",aabbExtrema,aabbExtrema_overloads(args("cutoff","centers"),"Return coordinates of box enclosing all bodies\n centers: do not take sphere radii in account, only their centroids (default=False)\n cutoff: 0-1 number by which the box will be scaled around its center (default=0)"));
+	def("aabbExtrema",aabbExtrema,(python::arg("cutoff")=0.0,python::arg("centers")=false),"Return coordinates of box enclosing all bodies\n\n:Parameters:\n\tcenters : bool\n\t\tdo not take sphere radii in account, only their centroids\n\tcutoff : float ∈〈0…1〉\n\t\trelative dimension by which the box will be cut away at its boundaries.\n\n:return: (lower corner, upper corner) as (Vector3,Vector3)\n");
 	def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
 	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
