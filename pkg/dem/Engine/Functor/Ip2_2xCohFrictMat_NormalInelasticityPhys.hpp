@@ -19,25 +19,23 @@ WARNING : as in the others Relationships most of the attributes are computed onl
 class Ip2_2xCohFrictMat_NormalInelasticityPhys : public InteractionPhysicsFunctor
 {
 	public :
-		Ip2_2xCohFrictMat_NormalInelasticityPhys();
+// 		Ip2_2xCohFrictMat_NormalInelasticityPhys();
 
 		virtual void go(	const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-
-		Real 		betaR;	// a parameter for computing the maximum value of momentum
-					// FIXME : should be better in an other place ?? (like the bodies parameters ?) but for me it was here finally the better place...
-
-		bool		setCohesionNow,
-				setCohesionOnNewContacts;
 				
-		int cohesionDefinitionIteration;
-		long iter;//REMOVE THIS
+		int cohesionDefinitionIteration; //useful is you want to use setCohesionNow
 
 	FUNCTOR2D(CohesiveFrictionalMat,CohesiveFrictionalMat);
-	REGISTER_CLASS_NAME(Ip2_2xCohFrictMat_NormalInelasticityPhys);
-	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
-	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(betaR)(setCohesionNow)(setCohesionOnNewContacts));
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_NormalInelasticityPhys,
+				  InteractionPhysicsFunctor,
+				  "The RelationShips for using NormalInelasticityLaw\n \n In these RelationShips all the attributes of the interactions (which are of NormalInelasticityPhys type) are computed. \n WARNING : as in the others Relationships most of the attributes are computed only once : when the interaction is (new)",
+				  ((Real,betaR,0.12,"Parameter for computing the torque-stifness : T-stifness = betaR * Rmoy^2"))
+				  ((bool,setCohesionNow,false,""))
+				  ((bool,setCohesionOnNewContacts,false,"")),
+				cohesionDefinitionIteration=-1;
+				  );
 };
 
 REGISTER_SERIALIZABLE(Ip2_2xCohFrictMat_NormalInelasticityPhys);

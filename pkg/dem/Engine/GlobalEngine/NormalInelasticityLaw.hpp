@@ -13,43 +13,24 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-/*! \brief Contact law including cohesion, moment transfer and inelastic compression behaviour
-
-This contact Law is inspired by CohesiveFrictionalContactLaw (inspired itselve directly from the work of Plassiard & Belheine, see the corresponding articles in "Annual Report 2006" in http://geo.hmg.inpg.fr/frederic/Discrete_Element_Group_FVD.html for example). It allows so to set moments, cohesion, tension limit and (that's the difference) inelastic unloadings in compression between bodies.
-All that concerned brokenBodies (this flag and the erosionactivated one) and the useless "iter" has been suppressed.
-
-The Relationsships corresponding are Ip2_2xCohFrictMat_NormalInelasticityPhys, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions
-To use it you should also use :
-- CohesiveFrictionalMat for the bodies, with "isCohesive" = 1 (A verifier ce dernier point)
-- Ip2_2xCohFrictMat_NormalInelasticityPhys (=> which involves interactions of "NormalInelasticityPhys" type)
+/*! \brief 
 
  */
 
 
-// <<<<<<< TREE
 class NormalInelasticityLaw : public GlobalEngine
-// =======
-// class ContactLaw1 : public GlobalEngine
-// >>>>>>> MERGE-SOURCE
 {
 /// Attributes
 	public :
-		int sdecGroupMask;
-		Real coeff_dech;	// = kn(unload) / kn(load)
-		bool momentRotationLaw;
-		bool momentAlwaysElastic;	// if true the value of the momentum (computed only if momentRotationLaw !!) is not limited by a plastic threshold
-	
-		NormalInelasticityLaw();
 		void action(Scene*);
-// <<<<<<< TREE
-	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
-	REGISTER_CLASS_NAME(NormalInelasticityLaw);
-	REGISTER_BASE_CLASS_NAME(GlobalEngine);
-// =======
-// 	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(coeff_dech)(momentAlwaysElastic));
-// 	REGISTER_CLASS_NAME(ContactLaw1);
-// 	REGISTER_BASE_CLASS_NAME(GlobalEngine);
-// >>>>>>> MERGE-SOURCE
+	YADE_CLASS_BASE_DOC_ATTRS(NormalInelasticityLaw,
+				  GlobalEngine,
+				  "Contact law including cohesion, moment transfer and inelastic compression behaviour\n\n This contact Law is inspired by CohesiveFrictionalContactLaw (inspired itselve directly from the work of Plassiard & Belheine, see the corresponding articles in (Annual Report 2006) in http://geo.hmg.inpg.fr/frederic/Discrete_Element_Group_FVD.html for example).\n It allows so to set moments, cohesion, tension limit and (that's the difference) inelastic unloadings in compression between bodies. All that concerned brokenBodies (this flag and the erosionactivated one) and the useless 'iter' has been suppressed.\n The Relationsships corresponding are Ip2_2xCohFrictMat_NormalInelasticityPhys, where the rigidities, the friction angles (with their tan()), and the orientations of the interactions are calculated. No more cohesion and tension limits are computed for all the interactions.\n To use it you should also use :\n- CohesiveFrictionalMat for the bodies, with 'isCohesive' = 1 (A verifier ce dernier point)\n- Ip2_2xCohFrictMat_NormalInelasticityPhys (=> which involves interactions of 'NormalInelasticityPhys' type)",
+				  ((int,sdecGroupMask,1,"?"))
+				  ((Real,coeff_dech,1.0,"=kn(unload) / kn(load)"))
+				  ((bool,momentRotationLaw,true,"boolean, true=> computation of a torque (against relative rotation) exchanged between particles"))
+				  ((bool,momentAlwaysElastic,false,"boolean, true=> the torque (computed only if momentRotationLaw !!) is not limited by a plastic threshold"))
+				  );
 };
 
 REGISTER_SERIALIZABLE(NormalInelasticityLaw);

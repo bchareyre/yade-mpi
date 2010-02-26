@@ -17,16 +17,16 @@ Vector3r translation_vect (0.10,0,0);
 
 
 // <<<<<<< TREE
-NormalInelasticityLaw::NormalInelasticityLaw() : GlobalEngine()
-// =======
-// ContactLaw1::ContactLaw1() : GlobalEngine()
-// >>>>>>> MERGE-SOURCE
-{
-	sdecGroupMask=1;
-	momentRotationLaw = true;
-	coeff_dech=1.0;
-	momentAlwaysElastic=false;
-}
+// NormalInelasticityLaw::NormalInelasticityLaw() : GlobalEngine()
+// // =======
+// // ContactLaw1::ContactLaw1() : GlobalEngine()
+// // >>>>>>> MERGE-SOURCE
+// {
+// 	sdecGroupMask=1;
+// 	momentRotationLaw = true;
+// 	coeff_dech=1.0;
+// 	momentAlwaysElastic=false;
+// }
 
 
 

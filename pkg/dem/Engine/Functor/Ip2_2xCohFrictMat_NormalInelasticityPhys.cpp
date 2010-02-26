@@ -9,22 +9,20 @@
 #include"Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/NormalInelasticityPhys.hpp>
-// #include<yade/pkg-dem/SDECLinkGeometry.hpp> // FIXME - I can't dispatch by SDECLinkGeometry <-> ScGeom !!?
-// #include<yade/pkg-dem/SDECLinkPhysics.hpp> // FIXME
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
 
-Ip2_2xCohFrictMat_NormalInelasticityPhys::Ip2_2xCohFrictMat_NormalInelasticityPhys()
-{
-	betaR = 0.12;
-	setCohesionNow = false;
-	setCohesionOnNewContacts = false;
-	cohesionDefinitionIteration = -1; 
-
-//		elasticRollingLimit = ;
-}
+// Ip2_2xCohFrictMat_NormalInelasticityPhys::Ip2_2xCohFrictMat_NormalInelasticityPhys()
+// {
+// 	betaR = 0.12;
+// 	setCohesionNow = false;
+// 	setCohesionOnNewContacts = false;
+// 	cohesionDefinitionIteration = -1; 
+// 
+// //		elasticRollingLimit = ;
+// }
 
 
 

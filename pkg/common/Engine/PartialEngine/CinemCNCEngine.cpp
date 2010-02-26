@@ -16,31 +16,28 @@
 #include <yade/lib-base/Math.hpp>
 
 
-CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
-{
-	prevF_sup=Vector3r(0,0,0);
-	firstRun=true;
-	shearSpeed=0;
-	alpha=Mathr::PI/2.0;;
-	gamma_save.resize(0);
-	temoin_save.resize(0);
-	temoin=0;
-	gamma=0;
-	gammalim=0;
-	id_boxhaut=3;
-	id_boxbas=1;
-	id_boxleft=0;
-	id_boxright=2;
-	id_boxfront=5;
-	id_boxback=4;
-	Y0=0;
-	F_0=0;
-	Key="";
-	it_depart=0;
-	LOG=0;
-	wallDamping = 0.2;
-	coeff_dech=1.0;
-}
+// CinemCNCEngine::CinemCNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
+// {
+// 	firstRun=true;
+// 	shearSpeed=0;
+// 	alpha=Mathr::PI/2.0;;
+// 	gamma_save.resize(0);
+// 	temoin_save.resize(0);
+// 	temoin=0;
+// 	gamma=0;
+// 	gammalim=0;
+// 	id_topbox=3;
+// 	id_boxbas=1;
+// 	id_boxleft=0;
+// 	id_boxright=2;
+// 	id_boxfront=5;
+// 	id_boxback=4;
+// 	F_0=0;
+// 	Key="";
+// 	LOG=0;
+// 	wallDamping = 0.2;
+// 	coeff_dech=1.0;
+// }
 
 
 void CinemCNCEngine::applyCondition(Scene * ncb)
@@ -50,7 +47,7 @@ void CinemCNCEngine::applyCondition(Scene * ncb)
 	rightbox = Body::byId(id_boxright);
 	frontbox = Body::byId(id_boxfront);
 	backbox = Body::byId(id_boxback);
-	topbox = Body::byId(id_boxhaut);
+	topbox = Body::byId(id_topbox);
 	boxbas = Body::byId(id_boxbas);
 	
 	if(LOG)	cout << "gamma = " << lexical_cast<string>(gamma) << "  et gammalim = " << lexical_cast<string>(gammalim) << endl;
@@ -114,7 +111,6 @@ void CinemCNCEngine::letMove(Scene * ncb)
 	rightbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
 	if(LOG)	cout << "deltaU reellemt applique :" << deltaU << endl;
 	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).Y() << endl;
-	if(LOG)	cout << "soit un decalage par rapport a position intiale : " << (topbox->state->pos.Y()) - Y0 << endl;
 	
 	Real Ysup_mod = topbox->state->pos.Y();
 	Real Ylat_mod = leftbox->state->pos.Y();
@@ -168,7 +164,7 @@ void CinemCNCEngine::computeAlpha()
 
 void CinemCNCEngine::computeDu(Scene* ncb)
 {
-	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_boxhaut);
+	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_topbox);
 	
 	if(firstRun)
 	{
@@ -187,14 +183,9 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 			}
 		}
 		
-		it_depart = Omega::instance().getCurrentIteration();
 		alpha=Mathr::PI/2.0;;
-		Y0 = topbox->state->pos.Y();
-		cout << "Y0 initialise à : " << Y0 << endl;
 		F_0 = F_sup.Y();
 		cout << "F_0 initialise à : " << F_0 << endl;
-		prevF_sup=F_sup;
-		previousdeltaU=0.0;
 		firstRun=false;
 	}
 	
@@ -208,11 +199,10 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 	{
 		Real Ycourant = topbox->state->pos.Y();
 		deltaU = ( F_sup.Y() - F_0 )/(stiffness);
-		if(LOG) cout << "Lors du calcul de DU (utile pour deltaU) : F_0 = " << F_0 << "; Y0 = " << Y0 << "; Ycourant = " << Ycourant << endl;
+		if(LOG) cout << "Lors du calcul de DU (utile pour deltaU) : F_0 = " << F_0 << "; Ycourant = " << Ycourant << endl;
 	}
 
 
-	if(LOG)	cout << "PrevF_sup : " << prevF_sup << "	F sup : " << F_sup.Y() << endl;
 	if(LOG)	cout << "deltaU a permettre normalemt :" << deltaU << endl;
 
 // 	Il va falloir prendre en compte la loi de contact qui induit une rigidite plus grande en decharge qu'en charge
@@ -224,8 +214,6 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 
 	deltaU = (1-wallDamping)*deltaU;
 	if(LOG)	cout << "deltaU apres amortissement :" << deltaU << endl;
-// 	deltaU += 0.7*previousdeltaU;
-	if(LOG)	cout << "deltaU apres correction avec previousdeltaU :" << deltaU << endl;
 	if(abs(deltaU) > max_vel*Omega::instance().getTimeStep())
 	{
 		if(LOG)	cout << "v induite pour cet it n° " <<Omega::instance().getCurrentIteration()<<" : " << deltaU/Omega::instance().getTimeStep() << endl;
@@ -234,8 +222,6 @@ void CinemCNCEngine::computeDu(Scene* ncb)
 		if(LOG)	cout << "Correction appliquee pour ne pas depasser vmax(comp) = " << max_vel << endl;
 	}
 
-	previousdeltaU=deltaU;
-	prevF_sup=F_sup;	// Now the value of prevF_sup is used for computing deltaU, it is actualized
 }
 
 void CinemCNCEngine::stopMovement()
@@ -269,7 +255,7 @@ void CinemCNCEngine::computeStiffness(Scene* ncb)
 			if (fn!=0)
 			{
 				int id1 = contact->getId1(), id2 = contact->getId2();
-				if ( id_boxhaut==id1 || id_boxhaut==id2 )
+				if ( id_topbox==id1 || id_topbox==id2 )
 					{
 						FrictPhys* currentContactPhysics =
 						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
