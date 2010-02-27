@@ -110,6 +110,7 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("Align",&Quaternionr::Align,((bp::arg("v1"),bp::arg("v2"))))
 		.def("Conjugate",&Quaternionr::Conjugate)
 		.def("FromAxisAngle",&Quaternionr::FromAxisAngle,((bp::arg("axis"),bp::arg("angle"))),bp::return_self<>())
+		.def("Rotate",&Quaternionr::Rotate,((bp::arg("v"))))
 		.def("Inverse",&Quaternionr::Inverse)
 		.def("Length",&Quaternionr::Length)
 		.def("Normalize",&Quaternionr::Normalize)
