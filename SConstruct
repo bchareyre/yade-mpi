@@ -390,8 +390,9 @@ if not env.GetOption('clean'):
 		if not ok: featureNotOK('eigen',note="You might have to add eigen header directory (e.g. /usr/include/eigen2) to CPPPATH.")
 	if 'nowm3' in env['features'] and 'eigen' not in env['features']:
 		featureNotOK("You selected the 'nowm3' feature; you MUST also select the 'eigen' feature in such case.")
-	# this should fix eigen crashes at runtime
-	if 'nowm3' in env['features']: env.Append(CPPDEFINES=['EIGEN_DONT_ALIGN','EIGEN_DONT_VECTORIZE'])
+	# different macros for different versions of eigen:
+	#  http://bitbucket.org/eigen/eigen/issue/96/eigen_dont_align-doesnt-exist-in-205-but-appears-in-web
+	if 'nowm3' in env['features']: env.Append(CPPDEFINES=['EIGEN_DONT_VECTORIZE','EIGEN_DONT_ALIGN','EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT'])
 
 	if env['useMiniWm3'] and not 'nowm3' in env['features']: env.Append(LIBS='miniWm3',CPPDEFINES=['MINIWM3'])
 

@@ -35,7 +35,7 @@ int Quaternion_len(){return 4;}
 int Matrix3_len(){return 9;}
 #undef IDX_CHECK
 
-#if 1
+#if 0
 	// workarounds for static methods; disabled for now, see comment in miniWm3Wrap-generate.py
 	#define _WORKAROUND(clss,member) clss clss##_##member(const clss& self){return clss::member;}
 	_WORKAROUND(Vector2r,ONE); _WORKAROUND(Vector2r,UNIT_X); _WORKAROUND(Vector2r,UNIT_Y); _WORKAROUND(Vector2r,ZERO);
