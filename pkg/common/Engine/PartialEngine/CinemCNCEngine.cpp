@@ -5,7 +5,6 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-YADE_PLUGIN((CinemCNCEngine));
 
 #include "CinemCNCEngine.hpp"
 #include<yade/core/State.hpp>
@@ -14,6 +13,7 @@ YADE_PLUGIN((CinemCNCEngine));
 #include<yade/core/Scene.hpp>
 #include <yade/lib-base/Math.hpp>
 
+YADE_PLUGIN((CinemCNCEngine));
 
 void CinemCNCEngine::applyCondition(Scene * ncb)
 {
