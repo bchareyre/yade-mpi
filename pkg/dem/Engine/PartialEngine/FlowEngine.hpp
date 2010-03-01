@@ -58,6 +58,10 @@ class FlowEngine : public PartialEngine
 					((double,permeability_factor,1.0,"a permability multiplicator"))
 					((Real,loadFactor,1.5,"Load multiplicator for oedometer test"))
 					((bool,unload,false,"Remove the load in oedometer test"))
+					((double, K, 0, "Permeability of the sample"))
+					((bool, ComputeFlow, 1,"If false only triangulation is done, if true flow problem is solved"))
+					((double, MaxPressure, 0, "Maximal value of water pressure within the sample"))
+					((double, currentStress, 0, "Current value of normal stress"))
 					((bool,tess_based_force,true,"true=force computation based on tessalation, false=force computation based on triangulation")));
 		DECLARE_LOGGER;
 };

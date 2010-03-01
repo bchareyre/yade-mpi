@@ -84,10 +84,10 @@ class FlowBoundingSphere
 		void Dessine_Triangulation ( Vue3D &Vue, RTriangulation &T );
 		void Dessine_Short_Tesselation ( Vue3D &Vue, Tesselation &Tes );
 #endif
-		void Permeameter ( RTriangulation& Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
-		void Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, std::string key );
+		double Permeameter ( RTriangulation& Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
+		double Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, std::string key );
 		double Compute_HydraulicRadius ( RTriangulation& Tri, Cell_handle cell, int j );
-		void PermeameterCurve ( RTriangulation& Tri, char *filename, Real time );
+		double PermeameterCurve ( RTriangulation& Tri, char *filename, Real time );
 
 		double dotProduct ( Vecteur x, Vecteur y );
 

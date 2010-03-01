@@ -167,7 +167,7 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
 
         /** END GAUSS SEIDEL */
         char* file ("Permeability");
-        Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, SectionArea, H, file);
+        double ks = Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, SectionArea, H, file);
         clock.top("Permeameter");
 
         Compute_Forces();
@@ -355,8 +355,8 @@ void FlowBoundingSphere::Compute_Permeability()
 
         Vecteur n;
 
-        std::ofstream oFile( "Hydraulic_Radius",std::ios::out);
-        std::ofstream kFile ( "Permeability" ,std::ios::out );
+//         std::ofstream oFile( "Hydraulic_Radius",std::ios::out);
+//         std::ofstream kFile ( "Permeability" ,std::ios::out );
         Real meanK=0;
         Real infiniteK=1e10;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
@@ -371,9 +371,9 @@ void FlowBoundingSphere::Compute_Permeability()
                                 else POS++;
                                 (cell->info().Rh())[j]=Rhv;
                                 (neighbour_cell->info().Rh())[Tri.mirror_index(cell, j)]= Rhv;
-                                if (DEBUG_OUT)
-                                        oFile << pass << " " << Rhv << " "<<cell->vertex(facetVertices[j][0])->point()
-                                        << " "<<cell->vertex(facetVertices[j][1])->point() << " "<<cell->vertex(facetVertices[j][2])->point()<<endl;
+//                                 if (DEBUG_OUT)
+//                                         oFile << pass << " " << Rhv << " "<<cell->vertex(facetVertices[j][0])->point()
+//                                         << " "<<cell->vertex(facetVertices[j][1])->point() << " "<<cell->vertex(facetVertices[j][2])->point()<<endl;
                                 Vecteur l = p1 - p2;
                                 distance = sqrt(l.squared_length());
                                 n = l/distance;
@@ -1608,7 +1608,7 @@ void FlowBoundingSphere::GaussSeidel()
 }
 
 
-void FlowBoundingSphere::Permeameter(RTriangulation &Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file)
+double FlowBoundingSphere::Permeameter(RTriangulation &Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file)
 {
         std::ofstream kFile(file, std::ios::out);
 
@@ -1686,6 +1686,8 @@ void FlowBoundingSphere::Permeameter(RTriangulation &Tri, double P_Inf, double P
         cout << "The permeability of the sample is = " << k << " m^2" <<endl;
         kFile << "The permeability of the sample is = " << k << " m^2" <<endl;
         //   cout << "The Darcy permeability of the sample is = " << k_darcy/0.987e-12 << " darcys" << endl;
+	
+	return Ks;
 }
 
 void FlowBoundingSphere::save_vtk_file(RTriangulation &T)
@@ -1801,7 +1803,7 @@ void FlowBoundingSphere::GenerateVoxelFile(RTriangulation& Tri)
         }
 }
 
-void FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, Real time)
+double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, Real time)
 {
         /** CONSOLIDATION CURVES **/
         Cell_handle permeameter;
@@ -1839,15 +1841,13 @@ void FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, R
                 //    cout << "P_ave[" << k << "] = " << P_ave[k]/ ( m+n+o ) << " n = " << n << " m = " << m << " o = " << o << endl;
                 P_ave[k]/= (m+n+o);
                 consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
-                if (k==15) Pressures.push_back(P_ave[k]);
-                n=0;
-                m=0;
-                o=0;
-                k++;
-        }
+                if (k==intervals/2) Pressures.push_back(P_ave[k]);
+                n=0, m=0, o=0; k++;
+	}
+	return P_ave[intervals/2];
 }
 
-void FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, string key)
+double FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, string key)
 {
         double Section = (x_Max-x_Min) * (z_Max-z_Min);
 
@@ -1865,7 +1865,7 @@ void FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min,d
         char *kk;
         kk = (char*) key.c_str();
 
-        Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
+        return Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, Section, DeltaY, kk);
 }
 
 void FlowBoundingSphere::AddBoundingPlanes(Real center[3], Real Extents[3], int id)

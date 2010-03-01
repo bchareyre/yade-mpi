@@ -22,6 +22,12 @@ CREATE_LOGGER (FlowEngine);
 FlowEngine::~FlowEngine()
 {
 }
+
+std::ofstream plot ("pressurees.txt", std::ios::out);
+// std::ofstream cons_NONDAMP ("cons_NONDAMP_SLIP", std::ios::out);
+// std::ofstream settle_DAMP ("settle_DAMP_SLIP", std::ios::out);
+// std::ofstream settle_NONDAMP ("settle_NONDAMP_SLIP", std::ios::out);
+
 void FlowEngine::applyCondition ( Scene* ncb )
 {
 	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;}
@@ -44,6 +50,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			if ( !triaxialCompressionEngine ) cout << "stress controller engine NOT found" << endl;
 		}
 
+		currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
 		current_state = triaxialCompressionEngine->currentState;
 
 		if ( !first && current_state==3 )
@@ -58,19 +65,19 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			
 			flow->GaussSeidel ( );
 			
-			flow->MGPost(flow->T[currentTes].Triangulation());
+// 			flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
 			flow->tess_based_force=tess_based_force;
 			flow->Compute_Forces ( );
 
 			///End Compute flow and forces
 
-			CGT::Finite_vertices_iterator vertices_end = flow->T[currentTes].Triangulation().finite_vertices_end ();
+			CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end ();
 
 			Vector3r f;
 			int id;
 
-			for ( CGT::Finite_vertices_iterator V_it = flow->T[currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
+			for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
 			{
 				id = V_it->info().id();
 				for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
@@ -89,11 +96,17 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			sprintf (file, keyconsol, j);
 			char *g = file;
 			
-			flow->PermeameterCurve(flow->T[currentTes].Triangulation(), g, time);
+			MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time);
+			plot << j << " " << MaxPressure << endl;
+			
+// 			if (damped) {cons_DAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
+// 			if (!damped){cons_NONDAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
+// 			if (damped) {settle_DAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
+// 			if (!damped) {settle_NONDAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
 			
 			if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 			{
-// 				flow->Sample_Permeability ( flow->T[currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max );
+// 				K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max );
 				
 				cout << endl << "---NEW TRIANGULATION---" << endl << endl;
 				
@@ -105,10 +118,10 @@ void FlowEngine::applyCondition ( Scene* ncb )
 
 				std::ofstream PFile ( "NewTriangulation_Pressures",std::ios::out );
 
-				CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
+				CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 				int j=0;
 				
-				for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+				for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 				{
 					PFile << ++j << " " << cell->info().p() << endl;
 				}
@@ -129,9 +142,9 @@ void FlowEngine::applyCondition ( Scene* ncb )
 
 			flow->DisplayStatistics ();
 
-			CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
+			CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 			int y=0;
-			for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+			for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 			{
 				cell->info().dv() = 0; cell->info().p() = 0;
 				y++;
@@ -140,7 +153,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 
 			flow->key = triaxialCompressionEngine->Key;
 			
-			if (compute_K) {flow->Sample_Permeability ( flow->T[currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+			if (compute_K) {K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 
 			Oedometer_Boundary_Conditions();
 			flow->Initialize_pressures();
@@ -175,8 +188,8 @@ void FlowEngine::Oedometer_Boundary_Conditions()
 
 void FlowEngine::Initialize ( Scene* ncb, double P_zero )
 {
-	currentTes=0;
-	flow->currentTes=currentTes;
+	flow->currentTes=0;
+	currentTes=flow->currentTes;
 
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
@@ -184,9 +197,7 @@ void FlowEngine::Initialize ( Scene* ncb, double P_zero )
 	Triangulate ( ncb );
 	
 	cout << endl << "Tesselating------" << endl << endl;
-	flow->T[currentTes].Compute();
-
-// 	flow->Fictious_cells();
+	flow->T[flow->currentTes].Compute();
 	
 	flow->Localize ();
 
@@ -244,7 +255,7 @@ void FlowEngine::Triangulate ( Scene* ncb )
 			Real y = b->state->pos[1];
 			Real z = b->state->pos[2];
 			
-			flow->T[currentTes].insert(x, y, z, rad, id);
+			flow->T[flow->currentTes].insert(x, y, z, rad, id);
 			
 			contator+=1;
 		}
@@ -267,18 +278,17 @@ void FlowEngine::NewTriangulation ( Scene* ncb )
 {
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
-// 	flow->currentTes=!currentTes;
-	currentTes=!currentTes;
-	flow->currentTes=currentTes;
+	flow->currentTes=!flow->currentTes;
+	currentTes = flow->currentTes;
 
-	flow->T[currentTes].Clear();
+	flow->T[flow->currentTes].Clear();
 
 	Triangulate ( ncb );
 
 	AddBoundary ( ncb );
 
 // 	flow->Tesselate();
-	flow->T[currentTes].Compute();
+	flow->T[flow->currentTes].Compute();
 	
 // 	flow->Fictious_cells();
 
@@ -290,18 +300,18 @@ void FlowEngine::NewTriangulation ( Scene* ncb )
 
 // 	flow->Sample_Permeability ( t2.Triangulation(), x_min, x_max, z_min, z_max, y_max, y_min );
 
-	flow->Interpolate ( flow->T[!currentTes], flow->T[currentTes] );
+	flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 
-// 	currentTes = !currentTes;
+// 	flow->currentTes = !flow->currentTes;
 
-// 	flow->T[currentTes] = flow->T[currentTes];
-// 	t2 = flow->T[!currentTes];
+// 	flow->T[flow->currentTes] = flow->T[flow->currentTes];
+// 	t2 = flow->T[!flow->currentTes];
 }
 
 void FlowEngine::Initialize_volumes ( Scene* ncb )
 {
-	CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
-	for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
@@ -319,8 +329,8 @@ void FlowEngine::UpdateVolumes ( Scene* ncb )
 	cout << "Updating volumes.............." << endl;
 
 	Real deltaT = ncb->dt;
-	CGT::Finite_cells_iterator cell_end = flow->T[currentTes].Triangulation().finite_cells_end();
-	for ( CGT::Finite_cells_iterator cell = flow->T[currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
