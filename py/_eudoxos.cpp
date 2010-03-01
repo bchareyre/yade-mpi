@@ -109,14 +109,86 @@ python::dict testNumpy(){
 	ret["vel"]=vel;
 	return ret;
 }
+#ifdef YADE_VTK
 
+#include<vtkPointLocator.h>
+#include<vtkIdList.h>
+#include<vtkUnstructuredGrid.h>
+#include<vtkPoints.h>
+
+/* Fastly locate interactions withing given distance from a given point. See python docs for details. */
+class InteractionLocator{
+	// object doing the work, see http://www.vtk.org/doc/release/5.2/html/a01048.html
+	vtkPointLocator *locator;
+	// used by locator
+	vtkUnstructuredGrid* grid;
+	vtkPoints* points;
+	// maps vtk's id to Interaction objects
+	vector<shared_ptr<Interaction> > intrs;
+	// axis-aligned bounds of all interactions
+	Vector3r mn,mx;
+	// count of interactions we hold
+	int cnt;
+	public:
+	InteractionLocator(){
+		// traverse all real interactions in the current simulation
+		// add them to points, create grid with those points
+		// store shared_ptr's to interactions in intrs separately
+		Scene* scene=Omega::instance().getScene().get();
+		locator=vtkPointLocator::New();
+		points=vtkPoints::New();
+		FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+			if(!i->isReal()) continue;
+			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->interactionGeometry.get());
+			if(!ge) continue;
+			const Vector3r& cp(ge->contactPoint);
+			int id=points->InsertNextPoint(cp[0],cp[1],cp[2]);
+			if(intrs.size()<=(size_t)id){intrs.resize(id+1000);}
+			intrs[id]=i;
+		}
+		double bb[6];
+		points->ComputeBounds(); points->GetBounds(bb);
+		mn=Vector3r(bb[0],bb[2],bb[4]); mx=Vector3r(bb[1],bb[3],bb[5]);
+		cnt=points->GetNumberOfPoints();
+
+		grid=vtkUnstructuredGrid::New();
+		grid->SetPoints(points);
+		locator->SetDataSet(grid);
+		locator->BuildLocator();
+	}
+	// cleanup
+	~InteractionLocator(){ locator->Delete(); points->Delete(); grid->Delete(); }
+
+	python::list intrsWithinDistance(const Vector3r& pt, Real radius){
+		vtkIdList *ids=vtkIdList::New();
+		locator->FindPointsWithinRadius(radius,pt,ids);
+		int numIds=ids->GetNumberOfIds();
+		python::list ret;
+		for(int i=0; i<numIds; i++){
+			// LOG_TRACE("Add "<<i<<"th id "<<ids->GetId(i));
+			ret.append(intrs[ids->GetId(i)]);
+		}
+		return ret;
+	}
+	python::tuple getBounds(){ return python::make_tuple(mn,mx);}
+	int getCnt(){ return cnt; }
+};
+#endif
 
 BOOST_PYTHON_MODULE(_eudoxos){
 	import_array();
+	YADE_SET_DOCSTRING_OPTS;
 	def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
 	def("yieldSigmaTMagnitude",yieldSigmaTMagnitude);
 	// def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
 	def("particleConfinement",particleConfinement);
 	def("testNumpy",testNumpy);
+#ifdef YADE_VTK
+	class_<InteractionLocator>("InteractionLocator","Locate all (real) interactions in space by their :yref:`contact point<Dem3DofGeom::contactPoint>`. When constructed, all real interactions are spatially indexed (uses vtkPointLocator internally). Use intrsWithinDistance to use those data. \n\n.. note::\n\tData might become inconsistent with real simulation state if simulation is being run between creation of this object and spatial queries.")
+		.def("intrsWithinDistance",&InteractionLocator::intrsWithinDistance,((python::arg("point"),python::arg("maxDist"))),"Return list of real interactions that are not further than *maxDist* from *point*.")
+		.add_property("bounds",&InteractionLocator::getBounds,"Return coordinates of lower and uppoer corner of axis-aligned abounding box of all interactions")
+		.add_property("count",&InteractionLocator::getCnt,"Number of interactions held")
+	;
+#endif
 }
 

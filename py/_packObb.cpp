@@ -7,6 +7,8 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-base/Math.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
+
 #include<vector>
 #include<stdexcept>
 using namespace boost;
@@ -70,6 +72,7 @@ python::tuple bestFitOBB_py(const python::tuple& _pts){
 }
 
 BOOST_PYTHON_MODULE(_packObb){
+	YADE_SET_DOCSTRING_OPTS;
 	python::scope().attr("__doc__")="Computation of oriented bounding box for cloud of points.";
 	python::def("cloudBestFitOBB",bestFitOBB_py,"Return (Vector3 center, Vector3 halfSize, Quaternion orientation) of\nbest-fit oriented bounding-box for given tuple of points\n(uses brute-force velome minimization, do not use for very large clouds).");
 };

@@ -262,7 +262,7 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 		wallMask=16
 	if (((extents[0]==0) and (extents[1]==0)) or ((extents[0]==0) and (extents[2]==0)) or ((extents[1]==0) and (extents[2]==0))):
 		raise RuntimeError("Please, specify at least 2 none-zero dimensions in extents!");
-	"""___________________________"""
+	# ___________________________
 	
 	mn,mx=[-extents[i] for i in 0,1,2],[extents[i] for i in 0,1,2]
 	def doWall(a,b,c,d):
@@ -291,13 +291,20 @@ def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,w
 	Return List of facets forming the cylinder;
 	
 	:Parameters:
-			`center`: center of the created cylinder; (X,Y,Z) coordinates;
-			`radius`: cylinder radius;
-			`height`: cylinder height;
-			`orientation`: orientation of the cylinder in quaternion format;
-			`segmentsNumber`: the number of edges on the cylinder surface, the minimum is 5;
-			`wallMask`: bitmask; determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
-			`**kw`: passed to utils.facet;
+			`center`: Vector3
+				center of the created cylinder
+			`radius`: float
+				cylinder radius
+			`height`: float
+				cylinder height
+			`orientation`: Quaternion
+				orientation of the cylinder
+			`segmentsNumber`: int
+				number of edges on the cylinder surface (>=5)
+			`wallMask`: bitmask
+				determines which walls will be created, in the order up (1), down (2), side (4). The numbers are ANDed; the default 7 means to create all walls;
+			`**kw`: (unused keyword arguments)
+				passed to utils.facet;
 	"""
 	
 	#Defense from zero dimensions
@@ -310,7 +317,7 @@ def facetCylinder(center,radius,height,orientation=[1,0,0,0],segmentsNumber=10,w
 	if (wallMask>7):
 		print "wallMask must be 7 or less"
 		wallMask=7
-	"""___________________________"""
+	# ___________________________
 	import numpy
 	anglesInRad = numpy.linspace(0, 2.0*math.pi, segmentsNumber+1, endpoint=True)
 	P1=[]; P2=[]

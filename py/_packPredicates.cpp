@@ -3,6 +3,8 @@
 #include<yade/extra/boost_python_len.hpp>
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-base/Math.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
+
 // #include<yade/gui-py/_utils.hpp> // will be: yade/lib-py/_utils.hpp> at some point
 
 using namespace boost;
@@ -321,6 +323,7 @@ public:
 
 BOOST_PYTHON_MODULE(_packPredicates){
 	python::scope().attr("__doc__")="Spatial predicates for volumes (defined analytically or by triangulation).";
+	YADE_SET_DOCSTRING_OPTS;
 	// base predicate class
 	python::class_<PredicateWrap,/* necessary, as methods are pure virtual*/ boost::noncopyable>("Predicate")
 		.def("__call__",python::pure_virtual(&Predicate::operator()))

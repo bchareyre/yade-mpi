@@ -13,6 +13,52 @@ from yade.wrapper import *
 from math import *
 from yade._eudoxos import * ## c++ implementations
 
+
+class IntrSmooth3d():
+	r"""Return spatially weigted gaussian average of arbitrary quantity defined on interactions.
+
+	At construction time, all real interactions are put inside spatial grid, permitting fast search for
+	points in neighbourhood defined by distance.
+
+	Parameters for the distribution are standard deviation :math:`\sigma` and relative cutoff distance
+	*relThreshold* (3 by default) which will discard points farther than *relThreshold* :math:`\times \sigma`.
+
+	Given central point :math:`p_0`, points are weighted by gaussian function
+
+	.. math::
+
+		\rho(p_0,p)=\frac{1}{\sigma\sqrt{2\pi}}\exp\left(\frac{-||p_0-p||^2}{2\sigma^2}\right)
+
+	To get the averaged value, simply call the instance, passing central point and callable object which received interaction object and returns the desired quantity:
+
+		>>> is3d=IntrSmooth3d(0.003)
+		>>> is3d(Vector3r(0,0,0),lambda i: i.phys.omega)
+	
+	"""
+	def __init__(self,stDev):
+		self.locator=InteractionLocator()
+		self.stDev=stDev
+		self.relThreshold=3.
+		self.sqrt2pi=sqrt(2*pi)
+		import yade.config
+		if not 'vtk' in yade.config.features: raise RuntimeError("IntrSmooth3d is only function with VTK-enabled builds.")
+	def _ptpt2weight(self,pt0,pt1):
+		distSq=(pt0-pt1).SquaredLength()
+		return (1./(self.stDev*self.sqrt2pi))*exp(-distSq/(2*self.stDev*self.stDev))
+	def bounds(self): return self.locator.bounds()
+	def count(self): return self.locator.count()
+	def __call__(self,pt,extr):
+		intrs=self.locator.intrsWithinDistance(pt,self.stDev*self.relThreshold)
+		if len(intrs)==0: return float('nan')
+		weights,val=0.,0.
+		for i in intrs:
+			weight=self._ptpt2weight(pt,i.geom.contactPoint)
+			val+=weight*extr(i)
+			weights+=weight
+			#print i,weight,extr(i)
+		return val/weights
+		
+
 def estimateStress(strain,cutoff=0.):
 	"""Use summed stored energy in contacts to compute macroscopic stress over the same volume, provided known strain."""
 	# E=(1/2)σεAl # global stored energy

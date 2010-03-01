@@ -1,9 +1,11 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #include<yade/pkg-dem/SpherePack.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
 
 BOOST_PYTHON_MODULE(_packSpheres){
 	python::scope().attr("__doc__")="Creation, manipulation, IO for generic sphere packings.";
+	YADE_SET_DOCSTRING_OPTS;
 	python::class_<SpherePack>("SpherePack","Set of spheres as centers and radii",python::init<python::optional<python::list> >(python::args("list"),"Empty constructor, optionally taking list [ ((cx,cy,cz),r), … ] for initial data." ))
 		.def("add",&SpherePack::add,"Add single sphere to packing, given center as 3-tuple and radius")
 		.def("toList",&SpherePack::toList,"Return packing data as python list.")
