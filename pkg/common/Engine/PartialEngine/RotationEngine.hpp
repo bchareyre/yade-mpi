@@ -4,6 +4,9 @@
 
 #include<yade/core/PartialEngine.hpp>
 #include<yade/lib-base/Math.hpp>
+#ifdef YADE_OPENMP
+	#include<omp.h>
+#endif
 
 /*! Engine applying rotation (by setting angular velocity) to subscribed bodies.
  * If rotateAroundZero is set, then each body is also displaced around zeroPoint.

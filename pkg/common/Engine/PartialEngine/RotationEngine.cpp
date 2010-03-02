@@ -45,10 +45,17 @@ void SpiralEngine::applyCondition(Scene* rb){
 
 
 void RotationEngine::applyCondition(Scene*){
-   rotationAxis.Normalize();
+	rotationAxis.Normalize();
 	Quaternionr q;
 	q.FromAxisAngle(rotationAxis,angularVelocity*scene->dt);
+	#ifdef YADE_OPENMP
+	const long size=subscribedBodies.size();
+	#pragma omp parallel for schedule(static)
+	for(long i=0; i<size; i++){
+		const body_id_t& id=subscribedBodies[i];
+	#else
 	FOREACH(body_id_t id,subscribedBodies){
+	#endif
 		State* rb=Body::byId(id,scene)->state.get();
 		rb->angVel=rotationAxis*angularVelocity;
 		if(rotateAroundZero){
@@ -56,8 +63,8 @@ void RotationEngine::applyCondition(Scene*){
 			rb->pos=q*l+zeroPoint; 
 			rb->vel=rb->angVel.Cross(l);
 		}
-		rb->ori=q*rb->ori;
-		rb->ori.Normalize();
+	rb->ori=q*rb->ori;
+	rb->ori.Normalize();
 	}
 }
 
