@@ -18,7 +18,15 @@ void GravityEngine::action(Scene*){
 	 *
 	 * The choice is to skip (b->isClumpMember()) or (b->isClump()). We rather skip members,
 	 * since that will apply smaller number of forces. */
+	#ifdef YADE_OPENMP
+		const BodyContainer& bodies=*(scene->bodies.get());
+		const long size=(long)bodies.size();
+		#pragma omp parallel for schedule(static)
+		for(long i=0; i<size; i++){
+			const shared_ptr<Body>& b(bodies[i]);
+	#else
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	#endif
 		if(!b || b->isClumpMember()) continue;
 		scene->forces.addForce(b->getId(),gravity*b->state->mass);
 	}

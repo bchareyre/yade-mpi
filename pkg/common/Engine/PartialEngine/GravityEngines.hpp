@@ -4,6 +4,9 @@
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Body.hpp>
+#ifdef YADE_OPENMP
+	#include<omp.h>
+#endif
 
 /*! Homogeneous gravity field; applies gravity×mass force on all bodies. */
 class GravityEngine: public GlobalEngine{
