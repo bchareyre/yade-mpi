@@ -14,17 +14,6 @@
 #include<yade/lib-base/Math.hpp>
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
-/*! \brief To apply a constant normal rigidity shear for a parallelogram box (simple shear)
-
-This engine, used in simulations issued from "DirectShearCis" Preprocessor, allows to translate horizontally the upper plate while the lateral ones rotate so that they always keep contact with the lower and upper walls
-In fact the upper plate can move not only horizontally but also vertically, so that the normal rigidity defined by DeltaF(upper plate)/DeltaU(upper plate) = constant (= KnC defined by the user)
-The movement is moreover controlled by the user via a "shearSpeed" which will be the speed of the upper wall, and by a maximum value of horizontal displacement "gammalim", after which the shear stops.
-
-
-Nota : not only the positions of walls are updated but also their speeds, which is all but useless considering the fact that in the contact laws these velocities of bodies are used to compute values of tangential relative displacements
-
-!!WARNING!! : But, because of this last point, if you want to use later saves of simulations executed with this Engine, but without that stopMovement was executed, your boxes will keep their speeds => you will have to cancel them "by hand" in the .xml
-*/
 
 
 class CinemKNCEngine : public PartialEngine

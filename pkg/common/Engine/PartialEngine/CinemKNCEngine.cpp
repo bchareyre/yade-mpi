@@ -18,24 +18,6 @@
 YADE_PLUGIN((CinemKNCEngine));
 
 
-// CinemKNCEngine::CinemKNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
-// {
-// 	firstRun=true;
-// 	shearSpeed=0;
-// 	alpha=Mathr::PI/2.0;;
-// 	gamma=0;
-// 	gammalim=0;
-// 	id_topbox=3;
-// 	id_boxbas=1;
-// 	id_boxleft=0;
-// 	id_boxright=2;
-// 	id_boxfront=5;
-// 	id_boxback=4;
-// 	F_0=0;
-// 	Key="";
-// }
-
-
 void CinemKNCEngine::applyCondition(Scene * ncb)
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;
@@ -46,8 +28,6 @@ void CinemKNCEngine::applyCondition(Scene * ncb)
 	topbox = Body::byId(id_topbox);
 	boxbas = Body::byId(id_boxbas);
 	
-// 	shared_ptr<BodyContainer> bodies = ncb->bodies;
-
 	if(gamma<=gammalim)
 	{
 		letMove(ncb);
@@ -256,6 +236,4 @@ void CinemKNCEngine::computeStiffness(Scene* ncb)
 }
 
 
-
-// YADE_REQUIRE_FEATURE(PHYSPAR);
 
