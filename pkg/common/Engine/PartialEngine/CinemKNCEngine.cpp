@@ -15,26 +15,25 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
+YADE_PLUGIN((CinemKNCEngine));
 
-CinemKNCEngine::CinemKNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
-{
-	prevF_sup=Vector3r(0,0,0);
-	firstRun=true;
-	shearSpeed=0;
-	alpha=Mathr::PI/2.0;;
-	gamma=0;
-	gammalim=0;
-	id_boxhaut=3;
-	id_boxbas=1;
-	id_boxleft=0;
-	id_boxright=2;
-	id_boxfront=5;
-	id_boxback=4;
-	Y0=0;
-	F_0=0;
-	KnC=10.0e6;
-	Key="";
-}
+
+// CinemKNCEngine::CinemKNCEngine() : leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
+// {
+// 	firstRun=true;
+// 	shearSpeed=0;
+// 	alpha=Mathr::PI/2.0;;
+// 	gamma=0;
+// 	gammalim=0;
+// 	id_topbox=3;
+// 	id_boxbas=1;
+// 	id_boxleft=0;
+// 	id_boxright=2;
+// 	id_boxfront=5;
+// 	id_boxback=4;
+// 	F_0=0;
+// 	Key="";
+// }
 
 
 void CinemKNCEngine::applyCondition(Scene * ncb)
@@ -44,7 +43,7 @@ void CinemKNCEngine::applyCondition(Scene * ncb)
 	rightbox = Body::byId(id_boxright);
 	frontbox = Body::byId(id_boxfront);
 	backbox = Body::byId(id_boxback);
-	topbox = Body::byId(id_boxhaut);
+	topbox = Body::byId(id_topbox);
 	boxbas = Body::byId(id_boxbas);
 	
 // 	shared_ptr<BodyContainer> bodies = ncb->bodies;
@@ -145,7 +144,7 @@ void CinemKNCEngine::computeAlpha()
 void CinemKNCEngine::computeDu(Scene* ncb)
 {
 
-	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_boxhaut);
+	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_topbox);
 	
 	if(firstRun)
 	{
@@ -168,7 +167,6 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 		Y0 = topbox->state->pos.Y();
 		cout << "Y0 initialise à : " << Y0 << endl;
 		F_0 = F_sup.Y();
-		prevF_sup=F_sup;
 		firstRun=false;
 	}
 		
@@ -200,7 +198,6 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 		deltaH = ( F_sup.Y() - ( Fdesired ))/(stiffness+KnC* 1.0e9 * Scontact);
 	}
 
-	if(LOG) cout << "PrevF_sup : " << prevF_sup << "	F sup : " << F_sup.Y() << endl;
 	if(LOG) cout << "Alors q je veux KnC = " << KnC << " depuis F_0 = " << F_0 << " et Y0 = " << Y0 << endl;
 	if(LOG) cout << "deltaH a permettre normalement :" << deltaH << endl;
 
@@ -213,7 +210,6 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 		if(LOG) cout << "Correction appliquee pour ne pas depasser vmax(comp)" << endl;
 	}
 
-	prevF_sup=F_sup;	// Now the value of prevF_sup is used for computing deltaH, it is actualized
 }
 
 void CinemKNCEngine::stopMovement()
@@ -246,7 +242,7 @@ void CinemKNCEngine::computeStiffness(Scene* ncb)
 			if (fn!=0)
 			{
 				int id1 = contact->getId1(), id2 = contact->getId2();
-				if ( id_boxhaut==id1 || id_boxhaut==id2 )
+				if ( id_topbox==id1 || id_topbox==id2 )
 					{
 						FrictPhys* currentContactPhysics =
 						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
