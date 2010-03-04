@@ -24,7 +24,7 @@ if 'opengl' in env['features']:
 				'$QGLVIEWER_LIB'],
 			CPPPATH=env['CPPPATH']+['qt3']
 		),
-		env.SharedLibrary('SnapshotEngine',['qt3/SnapshotEngine.cpp'],LIBS=env['LIBS']+['QtGUI','$QGLVIEWER_LIB'],CPPPATH=env['CPPPATH']+['qt3']),
+		env.SharedLibrary('SnapshotEngine',['qt3/SnapshotEngine.cpp'],LIBS=env['LIBS']+['QtGUI','$QGLVIEWER_LIB','PeriodicEngines'],CPPPATH=env['CPPPATH']+['qt3']),
 	])
 
 	env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
