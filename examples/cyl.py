@@ -33,14 +33,14 @@ sp=pack.SpherePack(); wd=cylRd*sqrt(2); rMean=(.2*wd*wd*cylHt/(nSpheres*(4/3.)*p
 print 'Generating cloud…'
 sp.makeCloud((-wd/2,-wd/2,-.5*cylHt),(wd/2,wd/2,.5*cylHt),rMean,0,int(nSpheres),False)
 sp.rotate((1,0,0),-pi/4)
-O.bodies.append([utils.sphere(s[0],s[1],density=3000) for s in sp])
+O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 
 O.engines=[
 	ForceResetter(),
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InsertionSortCollider(nBins=5,sweepLength=.1*rMean),
 	InteractionDispatchers(
-		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),

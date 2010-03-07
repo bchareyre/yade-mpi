@@ -62,7 +62,7 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
-		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),

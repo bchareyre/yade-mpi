@@ -53,7 +53,7 @@ colors=(1,0,0),(0,0,1)
 for i in (0,1): # red and blue spheres
 	sp=pack.SpherePack(); bb=bboxes[i]; vol=(bb[1][0]-bb[0][0])*(bb[1][1]-bb[0][1])*(bb[1][2]-bb[0][2])
 	sp.makeCloud(bb[0],bb[1],sphRad,sphRadFuzz,int(.25*vol/((4./3)*pi*sphRad**3)),False)
-	O.bodies.append([utils.sphere(s[0],s[1],density=3000,color=colors[i]) for s in sp])
+	O.bodies.append([utils.sphere(s[0],s[1],color=colors[i]) for s in sp])
 
 print "Numer of grains",len(O.bodies)-len(millIds)
 
@@ -64,12 +64,12 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
-		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
-	GravityEngine(gravity=(0,0,-3e4)), # gravity artificially high, to make it faster going ;-)
-	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-120,subscribedBodies=millIds),
+	GravityEngine(gravity=(0,0,-50)), # gravity artificially high, to make it faster going ;-)
+	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(1,0,0),angularVelocity=-20,subscribedBodies=millIds),
 	SnapshotEngine(iterPeriod=30,fileBase='/tmp/mill-',viewNo=0,label='snapshooter'),
 	NewtonIntegrator(damping=.3),
 ]

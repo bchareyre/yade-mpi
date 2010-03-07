@@ -23,7 +23,7 @@ def text(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 		ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
-def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=0):
+def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1):
 	""" Import geometry from stl file, create facets and return list of their ids."""
 	imp = STLImporter()
 	facets=imp.ymport(file)

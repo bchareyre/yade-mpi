@@ -3,10 +3,9 @@
 
 from yade import utils
 import random
+from yade import ymport
 
 ## PhysicalParameters 
-Young = 15e6
-Poisson = 0.2
 
 ## Variant of mesh
 mesh = 'coarse'
@@ -17,8 +16,7 @@ mesh = 'coarse'
 o=Omega() 
 
 ## Import geometry 
-rod = utils.import_stl_geometry('rod-'+mesh+'.stl',wire=True,young=Young,poisson=Poisson)
-shrinkFactor=0.005
+rod = O.bodies.append(ymport.stl('rod-'+mesh+'.stl',wire=True))
 
 # Spheres
 sphereRadius = 0.01
@@ -33,10 +31,10 @@ for i in xrange(nbSpheres[0]):
 			r = random.uniform(sphereRadius,sphereRadius*0.9)
 			dynamic = True
 			color=[0.51,0.52,0.4]
-			if (i==0 or i==nbSpheres[0]-1 or j==nbSpheres[1]-1 or k==0 or k==nbSpheres[2]-1): 
+			if (i==0 or i==nbSpheres[0]-1 or j==nbSpheres[1]-1 or k==0 or k==nbSpheres[2]-1):
 				dynamic = False
 				color=[0.21,0.22,0.1]
-			o.bodies.append(utils.sphere([x,y,z],r,young=Young,poisson=Poisson,density=2400,color=color,dynamic=dynamic))
+			o.bodies.append(utils.sphere([x,y,z],r,color=color,dynamic=dynamic))
 print "done\n"
 
 ## Estimate time step
@@ -60,15 +58,11 @@ o.engines=[
 	]),
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),
-	## Create geometry information about each potential collision.
-	InteractionGeometryDispatcher([
-		Ig2_Sphere_Sphere_ScGeom(),
-		Ig2_Facet_Sphere_ScGeom()
-	]),
-	## Create physical information about the interaction.
-	InteractionPhysicsDispatcher([MacroMicroElasticRelationships()]),
-    ## Constitutive law
-	ElasticContactLaw(),
+	InteractionDispatchers(
+		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom()],
+		[Ip2_FrictMat_FrictMat_FrictPhys()],
+		[Law2_Dem3DofGeom_FrictPhys_Basic()],
+	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
 	## Motion equation
@@ -76,13 +70,9 @@ o.engines=[
 	## Apply kinematics to rod
 	TranslationEngine(subscribedBodies=rod,translationAxis=[0,-1,0],velocity=0.075),
 	## Save force on rod
-	ForceRecorder(startId=0,endId=len(rod)-1,outputFile='force-'+mesh+'.dat',interval=50),	
-	## Save positions
-	SQLiteRecorder(recorders=['se3'],dbFile='positions-'+mesh+'.sqlite',iterPeriod=100)
-
+	ForceRecorder(subscribedBodies=rod,file='force-'+mesh+'.dat',iterPeriod=50),	
 ]
 
-o.save('/tmp/scene.xml.bz2');
 
 import sys,time
 

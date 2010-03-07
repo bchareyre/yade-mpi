@@ -23,6 +23,11 @@ tc = 0.001
 en = 0.3
 es = 0.3
 
+## Materials
+params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
+facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+sphereMat=O.materials.append(SimpleViscoelasticMat(density=Density,frictionAngle=frictionAngle,**params))
+
 ### Creating the Buldozer Knife
 ### from facets, using GTS
 Knife=[]
@@ -31,8 +36,8 @@ for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
 	
 KnifeP=[Knife,[p+Vector3(0,lengthKnife,0) for p in Knife]]
 KnifePoly=pack.sweptPolylines2gtsSurface(KnifeP,threshold=1e-4)
-KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False,frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters",**utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)))
-O.bodies.append(utils.facetBox((0,0,radiusKnife),(lengthKnife*3,lengthKnife*3,lengthKnife),wallMask=16,color=(1,1,1),wire=False,frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters",**utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)))
+KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False,material=facetMat))
+O.bodies.append(utils.facetBox((0,0,radiusKnife),(lengthKnife*3,lengthKnife*3,lengthKnife),wallMask=16,color=(1,1,1),wire=False,material=facetMat))
 
 
 ### Creating the material for buldozer
@@ -43,11 +48,11 @@ colorsph1.Normalize();
 colorsph2.Normalize();
 colorSph=colorsph1
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
-	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph,density=Density,frictionAngle=frictionAngle, physParamsClass="SimpleViscoelasticBodyParameters"))
+	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph,material=sphereMat))
 	for id in ids_spheres[1]:
 		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.phys['mass'],tc,en,es)
-		s.phys['kn'],s.phys['cn'],s.phys['ks'],s.phys['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+		p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
+		s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:
@@ -63,8 +68,8 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
-		[SimpleViscoelasticRelationships()],
-		[ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw()],
+		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
+		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),
 	GravityEngine(gravity=[0,0,-9.8]),
 	TranslationEngine(translationAxis=[1,0,0],velocity=2,subscribedBodies=KnifeIDs), # Buldozer motion

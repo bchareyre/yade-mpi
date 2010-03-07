@@ -1,6 +1,7 @@
 # -*- encoding=utf-8 -*-
 
 from yade import utils
+from yade import ymport
 
 ## Omega
 o=Omega() 
@@ -15,7 +16,10 @@ es = 0.3
 
 ## Import wall's geometry
 params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-walls = utils.import_stl_geometry('ring.stl',frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters",**params)
+facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+sphereMat=O.materials.append(SimpleViscoelasticMat(density=Density,frictionAngle=frictionAngle,**params))
+
+walls = O.bodies.append(ymport.stl('ring.stl',material=facetMat))
 
 def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylinderOrigin,cylinderSlope):
 	spheresCount=0
@@ -26,9 +30,9 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					x = cylinderOrigin[0]+2*r*sphereRadius*cos(dfi*a)
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
-					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,density=Density,frictionAngle=frictionAngle,physParamsClass="SimpleViscoelasticBodyParameters")
-					p=utils.getViscoelasticFromSpheresInteraction(s.phys['mass'],tc,en,es)
-					s.phys['kn'],s.phys['cn'],s.phys['ks'],s.phys['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,material=sphereMat)
+					p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
+					s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
 					o.bodies.append(s)
 					spheresCount+=1
 	return spheresCount
@@ -57,19 +61,15 @@ o.engines=[
 
 	## Using bounding boxes find possible body collisions.
 	InsertionSortCollider(),
-
-	## Create geometry information about each potential collision.
-	InteractionGeometryDispatcher([
-		Ig2_Sphere_Sphere_ScGeom(),
-		Ig2_Facet_Sphere_ScGeom()
-	]),
-
-	## Create physical information about the interaction.
-	InteractionPhysicsDispatcher([SimpleViscoelasticRelationships()]),
-
-    ## Constitutive law
-	ConstitutiveLawDispatcher([ef2_Spheres_Viscoelastic_SimpleViscoelasticContactLaw()]),
-
+	# Interactions
+	InteractionDispatchers(
+		## Create geometry information about each potential collision.
+		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
+		## Create physical information about the interaction.
+		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
+		## Constitutive law
+		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
 	## Cundall damping must been disabled!
@@ -82,7 +82,7 @@ o.engines=[
 
 for b in o.bodies:
     if b.shape.name=='Sphere':
-        b.phys.blockedDOFs=['z']
+        b.state.blockedDOFs=['z']
 
 o.dt=0.2*tc
 
