@@ -192,16 +192,16 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 				spheresVolume += 1.3333333*Mathr::PI*pow ( sphere->radius, 3 );
 			}
 		}
-		max_vel1=3 * width /(depth+width+depth)*max_vel;				
-		max_vel2=3 * height /(depth+width+depth)*max_vel;
-		max_vel3 =3 * depth /(depth+width+depth)*max_vel;
+		max_vel1=3 * width /(height+width+depth)*max_vel;				
+		max_vel2=3 * height /(height+width+depth)*max_vel;
+		max_vel3 =3 * depth /(height+width+depth)*max_vel;
 		firstRun = false;
 	}
 
 	// NOT JUST at the first run, since sigma_iso may be changed
 	// if the TriaxialCompressionEngine is used, sigma_iso is attributed to sigma1, sigma2 and sigma3
 	if (isAxisymetric){
-		sigma1=sigma2=sigma3=sigma_iso;		
+		sigma1=sigma2=sigma3=sigma_iso;
 	}
 
 
