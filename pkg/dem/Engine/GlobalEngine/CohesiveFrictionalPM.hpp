@@ -19,7 +19,7 @@ Features of the interaction law:
 
 2.  If useAlphaBeta=True, users have to input Alpha=Ks/Kn, Beta=Kr/(Ks*meanRadius^2), eta=MtPlastic/(meanRadius*Fn) as defined in Plassiard et al. (Granular Matter, 2009) A spherical discrete element model.
 
-3.  Users can input a tensile strength ( FnMax = tensileStrength*) and a cohesion ( FsMax = cohesion*(Ks*meanRadius))
+3.  Users can input a tensile strength ( FnMax = tensileStrength*pi*Rmin^2 ) and a cohesion ( FsMax = cohesion*pi*Rmin^2 )
 
   Remark: - This contact law works well in the case of sphere/sphere and sphere/box interaction as it uses ScGeom to compute the interaction geometry (suitable for the triaxialTest) 
 	  - It has not been tested for sphere/facet or sphere/wall interactions and could be updated to be used by DemXDofGeom
