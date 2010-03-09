@@ -163,7 +163,7 @@ void TriaxialStressController::applyCondition(Scene* ncb)
 	// sync thread storage of ForceContainer
 	ncb->forces.sync(); 
 	
-	if(thickness<0) thickness=YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,ncb)->shape)->extents.Y();
+	if(thickness<0) thickness=2.0*YADE_PTR_CAST<Box>(Body::byId(wall_bottom_id,ncb)->shape)->extents.Y();
 
 	State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
 	State* p_top=Body::byId(wall_top_id,ncb)->state.get();
