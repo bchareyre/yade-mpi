@@ -54,7 +54,7 @@ This example can be found in examples/concrete/uniax-post.py ::
  pylab.show()
 
 """
-from yade import *
+from yade.wrapper import *
 
 class Flatten:
 	"""Abstract class for converting 3d point into 2d. Used by post2d.data2d."""
@@ -71,11 +71,18 @@ class SpiralFlatten(Flatten):
 	"""Class converting 3d point to 2d based on projection from spiral.
 	The y-axis in the projection corresponds to the rotation axis"""
 	def __init__(self,useRef,thetaRange,dH_dTheta,axis=2,periodStart=0):
-		"""@param useRef: use reference positions rather than actual positions
-		@param thetaRange: (thetaMin,thetaMax) tuple; bodies outside this range will be discarded
-		@param dH_dTheta: inclination of the spiral (per radian)
-		@param axis: axis of rotation of the spiral
-		@param periodStart: height of the spiral for zero angle
+		"""
+		:parameters:
+			`useRef`: bool
+				use reference positions rather than actual positions
+			`thetaRange`: (thetaMin,thetaMax) tuple
+				bodies outside this range will be discarded
+			`dH_dTheta`:float
+				inclination of the spiral (per radian)
+			`axis`: {0,1,2}
+				axis of rotation of the spiral
+			`periodStart`: float
+				height of the spiral for zero angle
 		"""
 		self.useRef,self.thetaRange,self.dH_dTheta,self.axis,self.periodStart=useRef,thetaRange,dH_dTheta,axis,periodStart
 		self.ax1,self.ax2=(axis+1)%3,(axis+2)%3
@@ -102,8 +109,9 @@ class CylinderFlatten(Flatten):
 	The y-axis in the projection corresponds to the rotation axis; the x-axis is distance form the axis.
 	"""
 	def __init__(self,useRef,axis=2):
-		"""@param useRef: use reference positions rather than actual positions.
-		@param axis of the cylinder (0, 1 or 2)
+		"""
+		:param useRef: (bool) use reference positions rather than actual positions
+		:param axis: axis of the cylinder, ∈{0,1,2}
 		"""
 		if axis not in (0,1,2): raise IndexError("axis must be one of 0,1,2 (not %d)"%axis)
 		self.useRef,self.axis=useRef,axis
@@ -128,8 +136,13 @@ class CylinderFlatten(Flatten):
 
 class AxisFlatten(Flatten):
 	def __init__(self,useRef,axis=2):
-		"""@param useRef: use reference positions rather than actual positions.
-		@param axis: axis normal to the plane (0, 1 or 2); the return value will be simply position with this component dropped."""
+		"""
+		:parameters:
+			`useRef`: bool
+				use reference positions rather than actual positions.
+			`axis`: {0,1,2}
+				axis normal to the plane; the return value will be simply position with this component dropped.
+		"""
 		if axis not in (0,1,2): raise IndexError("axis must be one of 0,1,2 (not %d)"%axis)
 		self.useRef,self.axis=useRef,axis
 		self.ax1,self.ax2=(self.axis+1)%3,(self.axis+2)%3
@@ -146,18 +159,29 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 	return either discrete array of positions and values, or smoothed data, depending on whether the stDev
 	value is specified.
 
-	@param extractor: callable object that receives Body instance; it should return scalar, a 2-tuple (vector fields) or None (to skip that body)
-	@param flattener: callable object that receives Body instance and returns its 2d coordinates or None (to skip that body)
-	@param onlyDynamic: skip all non-dynamic bodies
-	@param stDev: standard deviation for averaging, enables smoothing; None (default) means raw mode.
-	@param relThreshold: threshold for the gaussian weight function relative to stDev (smooth mode only)
-	@param div: 2-tuple specifying number of cells for the gaussian grid (smooth mode only)
-	@param margin: 2-tuple specifying margin around bounding box for data (smooth mode only)
-	@return: Dictionary always containing keys 'type' (one of 'rawScalar','rawVector','smoothScalar','smoothVector', depending on value of smooth and on return value from extractor), 'x', 'y', 'bbox'.
-	
-		Raw data further contains 'radii'.
+	:parameters:
+		`extractor`: callable
+			receives Body instance, should return scalar, a 2-tuple (vector fields) or None (to skip that body)
+		`flattener`: callable
+			receives Body instance and returns its 2d coordinates or None (to skip that body)
+		`onlyDynamic`: bool
+			skip all non-dynamic bodies
+		`stDev`: float or *None*
+			standard deviation for averaging, enables smoothing; None (default) means raw mode.
+		`relThreshold`: float
+			threshold for the gaussian weight function relative to stDev (smooth mode only)
+		`div`: (int,int)
+			number of cells for the gaussian grid (smooth mode only)
+		`margin`: (float,float)
+			margin around bounding box for data (smooth mode only)
 
-		Scalar fields contain 'val' (value from extractor), vector fields have 'valX' and 'valY' (2 components returned by the extractor).
+	:return: dictionary
+	
+	Returned dictionary always containing keys 'type' (one of 'rawScalar','rawVector','smoothScalar','smoothVector', depending on value of smooth and on return value from extractor), 'x', 'y', 'bbox'.
+	
+	Raw data further contains 'radii'.
+	
+	Scalar fields contain 'val' (value from *extractor*), vector fields have 'valX' and 'valY' (2 components returned by the *extractor*).
 	"""
 	from miniWm3Wrap import Vector3
 	xx,yy,dd1,dd2,rr=[],[],[],[],[]
@@ -211,10 +235,15 @@ def plot(data,axes=None,alpha=.5,clabel=True,**kw):
 
 	For vector data (raw or smooth), plot quiver (vector field), with arrows colored by the magnitude.
 
-	@param axes: matplotlib.axes instance to plot to; if None, will be created from scratch
-	@param data: return value from post2d.data
-	@param clabel: show contour labels (smooth mode only)
-	@return: tuple of (axes,mappable); mappable can be used in further calls to pylab.colorbar
+	:parameters:
+		`axes`: matplotlib.axes instance
+			axes where the figure will be plotted; if None, will be created from scratch.
+		`data`:
+			value returned by :yref:`yade.post2d.data`
+		`clable`: bool
+			show contour labels (smooth mode only)
+
+	:return: tuple of (axes,mappable); mappable can be used in further calls to pylab.colorbar.
 	"""
 	import pylab,math
 	if not axes: axes=pylab.gca()

@@ -60,7 +60,7 @@ def loadVars(mark=None):
 
 def SpherePWaveTimeStep(radius,density,young):
 	r"""Compute P-wave critical timestep for a single (presumably representative) sphere, using formula for P-Wave propagation speed :math:`\Delta t_{c}=\frac{r}{\sqrt{E/\rho}}`.
-	If you want to compute minimum critical timestep for all spheres in the simulation, use utils.PWaveTimeStep() instead.
+	If you want to compute minimum critical timestep for all spheres in the simulation, use :yref:`yade.utils.PWaveTimeStep` instead.
 	
 	>>> SpherePWaveTimeStep(1e-3,2400,30e9)
 	2.8284271247461903e-07
@@ -177,7 +177,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 		`extents`: Vector3
 			half-sizes along x,y,z axes
 	
-	See utils.sphere's documentation for meaning of other parameters."""
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
 	b.shape=Shape('Box',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=8*extents[0]*extents[1]*extents[2]
@@ -198,7 +198,7 @@ def wall(position,axis,sense=0,color=None,material=-1):
 		`sense`: ∈{-1,0,1}
 			sense in which to interact (0: both, -1: negative, +1: positive; see Wall reference documentation)
 
-	See utils.sphere's documentation for meaning of other parameters."""
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
 	b.shape=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
 	_commonBodySetup(b,0,Vector3(0,0,0),material)
@@ -218,7 +218,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 		`noBound`:
 			do not assign Body().bound
 	
-	See utils.sphere's documentation for meaning of other parameters."""
+	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
@@ -230,11 +230,11 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	b.dynamic=dynamic
 	return b
 
-def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
+def facetBox(center,extents,orientation=Quaternion.IDENTITY,wallMask=63,**kw):
 	"""
 	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
-	Return list of facets forming the box;
+
 	
 	:Parameters:
 			`center`: Vector3
@@ -247,6 +247,8 @@ def facetBox(center,extents,orientation=[1,0,0,0],wallMask=63,**kw):
 				determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls;
 			`**kw`: (unused keyword arguments)
 				passed to utils.facet
+
+	:Returns: list of facets forming the box.
 	"""
 	
 	
@@ -455,7 +457,10 @@ def encodeVideoFromFrames(frameSpec,out,renameNotOverwrite=True,fps=24):
 
 	:parameters:
 		`frameSpec`: wildcard | sequence of filenames
-			If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order. B{Warning:} GStreamer is picky about the wildcard; if you pass a wrong one, if will not complain, but silently stall.
+			If string, wildcard in format understood by GStreamer's multifilesrc plugin (e.g. '/tmp/frame-%04d.png'). If list or tuple, filenames to be encoded in given order.
+			
+			.. warning::
+				GStreamer is picky about the wildcard; if you pass a wrong one, if will not complain, but silently stall.
 		`out`: filename
 			file to save video into
 		`renameNotOverwrite`: bool
@@ -601,6 +606,8 @@ if such colum is absent, description will be built by concatenating column names
 Empty lines within the file are ignored (although counted); ``#`` starts comment till the end of line. Number of blank-separated columns must be the same for all non-empty lines.
 
 A special value ``=`` can be used instead of parameter value; value from the previous non-empty line will be used instead (works recursively).
+
+This class is used by :yref:`yade.utils.readParamsFromTable`.
 	"""
 	def __init__(self,file):
 		"Setup the reader class, read data into memory."
@@ -676,7 +683,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=False,unknownOk=False,**kw)
 
 	Assigned tags:
 
-	* *description* column is assigned to Omega().tags['description']; this column is synthesized if absent (see :ref:`TableParamReader`)
+	* *description* column is assigned to Omega().tags['description']; this column is synthesized if absent (see :yref:`yade.utils.TableParamReader`)
 	* Omega().tags['params']="name1=val1,name2=val2,…"
 	* Omega().tags['defaultParams']="unassignedName1=defaultValue1,…"
 

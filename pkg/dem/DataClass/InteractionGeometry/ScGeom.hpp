@@ -40,7 +40,7 @@ class ScGeom: public GenericSpheresContact {
 		/* ctor */ createIndex();,
 		/* py */
 	);
-	REGISTER_CLASS_INDEX(ScGeom,InteractionGeometry);
+	REGISTER_CLASS_INDEX(ScGeom,GenericSpheresContact);
 };
 REGISTER_SERIALIZABLE(ScGeom);
 

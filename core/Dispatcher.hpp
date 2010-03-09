@@ -149,7 +149,7 @@ class Dispatcher1D : public Dispatcher,
 		typedef FunctorType functorType;
 		typedef DynLibDispatcher<TYPELIST_1(baseClass),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry> dispatcherBase;
 
-		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass>& arg){ return getExecutor(arg); }
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass> arg){ return getExecutor(arg); }
 		python::dict dump(bool convertIndicesToNames){
 			python::dict ret;
 			FOREACH(const DynLibDispatcher_Item1D& item, dispatcherBase::dataDispatchMatrix1D()){
@@ -233,7 +233,7 @@ class Dispatcher2D : public Dispatcher,
 		typedef baseClass2 argType2;
 		typedef FunctorType functorType;
 		typedef DynLibDispatcher<TYPELIST_2(baseClass1,baseClass2),FunctorType,FunctorReturnType,FunctorArguments,autoSymmetry> dispatcherBase;
-		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1>& arg1, shared_ptr<baseClass2>& arg2){ return getExecutor(arg1,arg2); }
+		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass1> arg1, shared_ptr<baseClass2> arg2){ return getExecutor(arg1,arg2); }
 		python::dict dump(bool convertIndicesToNames){
 			python::dict ret;
 			FOREACH(const DynLibDispatcher_Item2D& item, dispatcherBase::dataDispatchMatrix2D()){

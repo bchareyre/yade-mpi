@@ -425,28 +425,28 @@ BOOST_PYTHON_MODULE(_utils){
 		def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
 	#endif
 	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("Aabb"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
-	def("setRefSe3",setRefSe3,"Set reference positions and orientation of all bodies equal to their current ones.");
+	def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
 	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));
 	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));
 	def("elasticEnergy",elasticEnergyInAABB);
-	def("inscribedCircleCenter",inscribedCircleCenter);
+	def("inscribedCircleCenter",inscribedCircleCenter,(python::arg("v1"),python::arg("v2"),python::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
 	def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
 	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
 	def("kineticEnergy",Shop__kineticEnergy);
 	def("sumForces",sumForces);
 	def("sumTorques",sumTorques);
 	def("sumFacetNormalForces",sumFacetNormalForces,(python::arg("axis")=-1));
-	def("forcesOnPlane",forcesOnPlane);
+	def("forcesOnPlane",forcesOnPlane,(python::arg("planePt"),python::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:Parameters:\n\t`planePt`: Vector3\n\t\tAny point on the plane\n\t`normal`: Vector3\n\t\tPlane normal (may not be normalized).\n");
 	def("forcesOnCoordPlane",forcesOnCoordPlane);
 	def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
-	def("createInteraction",Shop__createExplicitInteraction);
+	def("createInteraction",Shop__createExplicitInteraction,(python::arg("id1"),python::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`InteractionGeometryDispatcher` and :yref:`InteractionPhysicsDispatcher` (might be both hidden in :yref:`InteractionDispatchers`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<InteractionGeometryDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning::\n\tThis function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
 	def("spiralProject",spiralProject,(python::arg("pt"),python::arg("dH_dTheta"),python::arg("axis")=2,python::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),python::arg("theta0")=0));
 	def("pointInsidePolygon",pointInsidePolygon);
 	def("scalarOnColorScale",Shop::scalarOnColorScale);
-	def("highlightNone",highlightNone);
-	def("wireAll",wireAll);
-	def("wireNone",wireNone);
-	def("wireNoSpheres",wireNoSpheres);
+	def("highlightNone",highlightNone,"Reset :yref:`highlight<Shape::highlight>` on all bodies.");
+	def("wireAll",wireAll,"Set :yref:`Shape::wire` on all bodies to True, rendering them with wireframe only.");
+	def("wireNone",wireNone,"Set :yref:`Shape::wire` on all bodies to False, rendering them as solids.");
+	def("wireNoSpheres",wireNoSpheres,"Set :yref:`Shape::wire` to True on non-spherical bodies (:yref:`Facets<Facet>`, :yref:`Walls<Wall>`).");
 	def("flipCell",&Shop::flipCell,(python::arg("flip")=Matrix3r::ZERO));
 }
 

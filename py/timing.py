@@ -1,10 +1,12 @@
 # encoding: utf-8
 # 2008 © Václav Šmilauer <eudoxos@arcig.cz>
 """Functions for accessing timing information stored in engines and functors.
-See https://yade.hmg.inpg.fr/index.php/Speed_profiling_using_TimingInfo_and_TimingDeltas_classes
-for more details on usage."""
 
-from yade import *
+See :ref:`timing` section of the programmer's manual, `wiki page <http://yade-dem.org/index.php/Speed_profiling_using_TimingInfo_and_TimingDeltas_classes>`_ for some examples.
+
+"""
+
+from yade.wrapper import *
 
 
 def _resetEngine(e):
@@ -67,8 +69,10 @@ def _engines_stats(engines,totalTime,level):
 	return lines
 
 def stats():
-	"""Print summary table of timing information from engines and functors. Absolute times as well as percentages are given. Sample output::
-	
+	"""Print summary table of timing information from engines and functors. Absolute times as well as percentages are given. Sample output:
+
+	.. code-block:: none
+
 		Name                                                    Count                 Time            Rel. time
 		-------------------------------------------------------------------------------------------------------
 		ForceResetter                      400               9449μs                0.01%      
@@ -88,6 +92,7 @@ def stats():
 		"plotDataCollector"                                 160              64284μs                0.06%      
 		"damageChecker"                                       9               3272μs                0.00%      
 		TOTAL                                                            102077490μs              100.00%      
+
 	"""
 	print 'Name'.ljust(_statCols['label'])+' '+'Count'.rjust(_statCols['count'])+' '+'Time'.rjust(_statCols['time'])+' '+'Rel. time'.rjust(_statCols['relTime'])
 	print '-'*(sum([_statCols[k] for k in _statCols])+len(_statCols)-1)

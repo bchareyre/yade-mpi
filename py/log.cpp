@@ -1,6 +1,7 @@
 #include<boost/python.hpp>
 #include<string>
 #include<yade/lib-base/Logging.hpp>
+#include<yade/lib-pyutil/doc_opts.hpp>
 using namespace boost;
 enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 
@@ -51,8 +52,11 @@ enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 
 BOOST_PYTHON_MODULE(log){
 	python::scope().attr("__doc__") = "Acess and manipulation of log4cxx loggers.";
-	python::def("setLevel",logSetLevel,"Set minimum severity level (constants TRACE,DEBUG,INFO,WARN,ERROR,FATAL) for given logger\nleading 'yade.' will be appended automatically to the logger name; if logger is '', the root logger 'yade' will be operated on.");
-	python::def("loadConfig",logLoadConfig,"Load configuration from file (log4cxx::PropertyConfigurator::configure)");
+
+	YADE_SET_DOCSTRING_OPTS;
+
+	python::def("setLevel",logSetLevel,(python::arg("logger"),python::arg("level")),"Set minimum severity *level* (constants ``TRACE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL``) for given logger. \nLeading 'yade.' will be appended automatically to the logger name; if logger is '', the root logger 'yade' will be operated on.");
+	python::def("loadConfig",logLoadConfig,(python::arg("fileName")),"Load configuration from file (log4cxx::PropertyConfigurator::configure)");
 	python::scope().attr("TRACE")=(int)ll_TRACE;
 	python::scope().attr("DEBUG")=(int)ll_DEBUG;
 	python::scope().attr("INFO")= (int)ll_INFO;

@@ -1,16 +1,19 @@
 # encoding: utf-8
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+
 """
 Creating packings and filling volumes defined by boundary representation or constructive solid geometry.
 
 For examples, see
-	- scripts/test/gts-horse.py
-	- scripts/test/gts-operators.py
-	- scripts/test/gts-random-pack-obb.py
-	- scripts/test/gts-random-pack.py
-	- scripts/test/pack-cloud.py
-	- scripts/test/pack-predicates.py
-	- scripts/test/regular-sphere-pack.py
+
+* :ysrc:`scripts/test/gts-horse.py`
+* :ysrc:`scripts/test/gts-operators.py`
+* :ysrc:`scripts/test/gts-random-pack-obb.py`
+* :ysrc:`scripts/test/gts-random-pack.py`
+* :ysrc:`scripts/test/pack-cloud.py`
+* :ysrc:`scripts/test/pack-predicates.py`
+* :ysrc:`scripts/test/regular-sphere-pack.py`
+
 """
 
 import itertools,warnings
@@ -19,7 +22,8 @@ from math import sqrt
 from yade import utils
 
 from miniWm3Wrap import *
-from yade import *
+from yade.wrapper import *
+
 
 ## compatibility hack for python 2.5 (21/8/2009)
 ## can be safely removed at some point
@@ -58,9 +62,10 @@ class inGtsSurface_py(Predicate):
 		surf=gts.read(open('horse.gts'))
 		inGtsSurface(surf)
 
-	Note: padding is optionally supported by testing 6 points along the axes in the pad distance. This
-	must be enabled in the ctor by saying doSlowPad=True. If it is not enabled and pad is not zero,
-	warning is issued.
+	.. note::
+		Padding is optionally supported by testing 6 points along the axes in the pad distance. This
+		must be enabled in the ctor by saying doSlowPad=True. If it is not enabled and pad is not zero,
+		warning is issued.
 	"""
 	def __init__(self,surf,noPad=False):
 		# call base class ctor; necessary for virtual methods to work as expected.
