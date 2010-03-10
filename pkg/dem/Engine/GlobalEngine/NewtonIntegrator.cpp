@@ -176,16 +176,30 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 	}
 
 }
+
 inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt )
 {
 	blockRotateDOFs(state->blockedDOFs, state->angAccel);
 	state->angVel+=dt*state->angAccel;
-	Vector3r axis = state->angVel; Real angle = axis.Normalize();
-	Quaternionr q; q.FromAxisAngle ( axis,angle*dt );
-	state->ori = q*state->ori;
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::ZERO){ Vector3r r(scene->forces.getRot(id)); Real norm=r.Normalize(); Quaternionr q; q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
+	Vector3r axis = state->angVel;
+	
+	if (axis!=Vector3r::ZERO) {							//If we have an angular velocity, we make a rotation
+		Quaternionr q;
+		Real angle = axis.Normalize();
+		q.FromAxisAngle ( axis,angle*dt );
+		state->ori = q*state->ori;
+	}
+	
+	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::ZERO) {
+		Quaternionr q;
+		Vector3r r(scene->forces.getRot(id));
+		Real norm=r.Normalize();
+		q.FromAxisAngle(r,norm);
+		state->ori=q*state->ori;
+	}
 	state->ori.Normalize();
 }
+
 void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, const body_id_t& id, const Real& dt, const Vector3r& M){
 	Matrix3r A; state->ori.Conjugate().ToRotationMatrix(A); // rotation matrix from global to local r.f.
 	const Vector3r l_n = state->angMom + dt/2 * M; // global angular momentum at time n
@@ -200,7 +214,14 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
 	state->ori+=dt*dotQ_half; // Q at time n+1
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::ZERO){ Vector3r r(scene->forces.getRot(id)); Real norm=r.Normalize(); Quaternionr q; q.FromAxisAngle(r,norm); state->ori=q*state->ori; }
+
+	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::ZERO) {
+		Vector3r r(scene->forces.getRot(id));
+		Real norm=r.Normalize();
+		Quaternionr q;
+		q.FromAxisAngle(r,norm);
+		state->ori=q*state->ori;
+	}
 	state->ori.Normalize(); 
 }
 	
