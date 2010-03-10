@@ -144,7 +144,7 @@ opts.AddVariables(
 	#('extraModules', 'Extra directories with their own SConscript files (must be in-tree) (whitespace separated)',None,None,Split),
 	('buildPrefix','Where to create build-[version][variant] directory for intermediary files','..'),
 	EnumVariable('linkStrategy','How to link plugins together',defOptions['linkStrategy'],['per-class','per-pkg[broken]','monolithic','static[broken]']),
-	('chunkSize','Maximum files to compile in one translation unit when building plugins.',7,None,int),
+	('chunkSize','Maximum files to compile in one translation unit when building plugins. (unlimited if <= 0)',7,None,int),
 	('version','Yade version (if not specified, guess will be attempted)',None),
 	('realVersion','Revision (usually bzr revision); guessed automatically unless specified',None),
 	('CPPPATH', 'Additional paths for the C preprocessor (colon-separated)','/usr/include/vtk-5.2:/usr/include/vtk-5.4:/usr/include/eigen2'),
@@ -457,9 +457,12 @@ if env['debug']: env.Append(CXXFLAGS='-ggdb2',CPPDEFINES=['YADE_DEBUG'])
 else: env.Append(CXXFLAGS='-O3')
 if 'openmp' in env['features']: env.Append(CXXFLAGS='-fopenmp',LIBS='gomp',CPPDEFINES='YADE_OPENMP')
 if env['optimize']:
-	env.Append(CXXFLAGS=Split('-O3 -march=%s'%env['march']),
-		CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
 	# NDEBUG is used in /usr/include/assert.h: when defined, asserts() are no-ops
+	env.Append(CXXFLAGS=['-O3'],CPPDEFINES=[('YADE_CAST','static_cast'),('YADE_PTR_CAST','static_pointer_cast'),'NDEBUG'])
+	# do not state architecture if not provided
+	# used for debian packages, where 'native' would generate instructions outside the package architecture
+	# (such as SSE instructions on i386 builds, if the builder supports them)
+	if env.has_key('march') and env['march']: env.Append(CXXFLAGS=['-march=%s'%env['march']]),
 else:
 	env.Append(CPPDEFINES=[('YADE_CAST','dynamic_cast'),('YADE_PTR_CAST','dynamic_pointer_cast')])
 
