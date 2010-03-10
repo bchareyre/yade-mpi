@@ -185,14 +185,18 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 	else {
 		ss=shared_ptr<Dem3DofGeom_SphereSphere>(new Dem3DofGeom_SphereSphere());
 		c->interactionGeometry=ss;
+		
 		// constants
 		if(distFactor>0) ss->refLength=dist;
 		else ss->refLength=s1->radius+s2->radius;
 		ss->refR1=s1->radius; ss->refR2=s2->radius;
+		
 		Real penetrationDepth=s1->radius+s2->radius-ss->refLength;
+		
 		if(Omega::instance().getCurrentIteration()<=10){
 			ss->effR1=s1->radius-.5*penetrationDepth; ss->effR2=s2->radius-.5*penetrationDepth;
 		} else {ss->effR1=s1->radius; ss->effR2=s2->radius;}
+		
 		// for bending only: ss->initRelOri12=state1.ori.Conjugate()*state2.ori;
 		// quasi-constants
 		ss->cp1rel.Align(Vector3r::UNIT_X,state1.ori.Conjugate()*normal);

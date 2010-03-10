@@ -30,6 +30,7 @@ class Dem3DofGeom: public GenericSpheresContact{
 		virtual Real displacementN();
 		virtual Vector3r displacementT(){throw;}
 		virtual Real slipToDisplacementTMax(Real displacementTMax){throw;}; // plasticity
+		virtual Real penetrationDepth(){throw;};
 		// reference radii, for contact stiffness computation; set to negative for nonsense values
 		// end API
 
