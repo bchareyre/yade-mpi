@@ -9,10 +9,10 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
-#include"CinemDNCEngine.hpp"
+#include"KinemCNDEngine.hpp"
 
 
-CinemDNCEngine::CinemDNCEngine() : leftbox(new Body), rightbox(new Body), topbox(new Body)
+KinemCNDEngine::KinemCNDEngine() : leftbox(new Body), rightbox(new Body), topbox(new Body)
 {
 	gamma_save.resize(0);
 	temoin_save.resize(0);
@@ -26,7 +26,7 @@ CinemDNCEngine::CinemDNCEngine() : leftbox(new Body), rightbox(new Body), topbox
 }
 
 
-void CinemDNCEngine::applyCondition(Scene * ncb)
+void KinemCNDEngine::applyCondition(Scene * ncb)
 {
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);
@@ -61,7 +61,7 @@ void CinemDNCEngine::applyCondition(Scene * ncb)
 }
 
 
-void CinemDNCEngine::letMove(Scene * ncb)
+void KinemCNDEngine::letMove(Scene * ncb)
 {
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 	Real dt = Omega::instance().getTimeStep();
@@ -107,7 +107,7 @@ void CinemDNCEngine::letMove(Scene * ncb)
 }
 
 
-void CinemDNCEngine::computeAlpha()
+void KinemCNDEngine::computeAlpha()
 {
 	Quaternionr orientationLeftBox,orientationRightBox;
 	orientationLeftBox = leftbox->state->ori;
@@ -122,7 +122,7 @@ void CinemDNCEngine::computeAlpha()
 	alpha=Mathr::PI/2.0-angle;		// right if the initial orientation of the body (on the beginning of the simulation) is q =(1,0,0,0) = FromAxisAngle((0,0,1),0)
 }
 
-void CinemDNCEngine::stopMovement()
+void KinemCNDEngine::stopMovement()
 {
 	// annulation de la vitesse de la plaque du haut
 	topbox->state->vel	=  Vector3r(0,0,0);

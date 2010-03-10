@@ -6,21 +6,18 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-
-
-#include "CinemKNCEngine.hpp"
+#include "KinemCNLEngine.hpp"
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-base/Math.hpp>
+#include <yade/lib-base/Math.hpp>
 
-YADE_PLUGIN((CinemKNCEngine));
+YADE_PLUGIN((KinemCNLEngine));
 
-
-void CinemKNCEngine::applyCondition(Scene * ncb)
+void KinemCNLEngine::applyCondition(Scene * ncb)
 {
-	if(LOG) cerr << "debut applyCondi !!" << endl;
+	if(LOG)	cout << "debut applyCondi du CNCEngine !!" << endl;
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);
 	frontbox = Body::byId(id_boxfront);
@@ -28,13 +25,18 @@ void CinemKNCEngine::applyCondition(Scene * ncb)
 	topbox = Body::byId(id_topbox);
 	boxbas = Body::byId(id_boxbas);
 	
+	if(LOG)	cout << "gamma = " << lexical_cast<string>(gamma) << "  et gammalim = " << lexical_cast<string>(gammalim) << endl;
 	if(gamma<=gammalim)
 	{
-		letMove(ncb);
+		if(LOG)	cout << "Je suis bien dans la partie gamma < gammalim" << endl;
 		if(temoin==0)
+
 		{
+			if(LOG) cout << "Je veux maintenir la Force a F_0 = : " << F_0 << endl; 
 			temoin=1;
 		}
+		letMove(ncb);
+
 	}
 	else if (temoin<2)
 	{
@@ -49,13 +51,23 @@ void CinemKNCEngine::applyCondition(Scene * ncb)
 		Omega::instance().stopSimulationLoop();
 	}
 
+	for(unsigned int j=0;j<gamma_save.size();j++)
+	{
+		if ((gamma > gamma_save[j]) && (temoin_save[j]==0))
+		{
+			stopMovement();		// reset of all the speeds before the save
+			Omega::instance().saveSimulation(Key+"_"+lexical_cast<string> (floor(gamma*1000)) +"_" +lexical_cast<string> (floor(gamma*10000)-10*floor(gamma*1000))+ "mmsheared.xml");
+			temoin_save[j]=1;
+		}
+	}
+
 }
 
-void CinemKNCEngine::letMove(Scene * ncb)
+void KinemCNLEngine::letMove(Scene * ncb)
 {
 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
-	if(LOG) cout << "It : " << Omega::instance().getCurrentIteration() << endl;
+	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
 	computeDu(ncb);
 
 	Real dt = Omega::instance().getTimeStep();
@@ -67,20 +79,24 @@ void CinemKNCEngine::letMove(Scene * ncb)
 
 // 	Changes in vertical and horizontal position :
 
-	topbox->state->pos += Vector3r(dx,deltaH,0);
+	
+	topbox->state->pos += Vector3r(dx,deltaU,0);
 
-	leftbox->state->pos += Vector3r(dx/2.0,deltaH/2.0,0);
-	rightbox->state->pos += Vector3r(dx/2.0,deltaH/2.0,0);
+	leftbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
+	rightbox->state->pos += Vector3r(dx/2.0,deltaU/2.0,0);
+	if(LOG)	cout << "deltaU reellemt applique :" << deltaU << endl;
+	if(LOG)	cout << "qui nous a emmene en : y = " <<(topbox->state->pos).Y() << endl;
 	
 	Real Ysup_mod = topbox->state->pos.Y();
 	Real Ylat_mod = leftbox->state->pos.Y();
 
 //	with the corresponding velocities :
-	topbox->state->vel = Vector3r(shearSpeed,deltaH/dt,0);
-	leftbox->state->vel = Vector3r(shearSpeed/2.0,deltaH/(2.0*dt),0);
-	rightbox->state->vel = Vector3r(shearSpeed/2.0,deltaH/(2.0*dt),0);
+	topbox->state->vel = Vector3r(shearSpeed,deltaU/dt,0);
+	leftbox->state->vel = Vector3r(shearSpeed/2.0,deltaU/(2.0*dt),0);
+	rightbox->state->vel = Vector3r(shearSpeed/2.0,deltaU/(2.0*dt),0);
 
 //	Then computation of the angle of the rotation to be done :
+	computeAlpha();
 	if (alpha == Mathr::PI/2.0)	// Case of the very beginning
 	{
 		dalpha = - Mathr::ATan( dx / (Ysup_mod -Ylat_mod) );
@@ -90,11 +106,10 @@ void CinemKNCEngine::letMove(Scene * ncb)
 		Real A = (Ysup_mod - Ylat_mod) * 2.0*Mathr::Tan(alpha) / (2.0*(Ysup - Ylat) + dx*Mathr::Tan(alpha) );
 		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
 	}
-
+	
 	Quaternionr qcorr;
 	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
-	if(LOG)
-		cout << "Quaternion associe a la rotation incrementale : " << qcorr.W() << " " << qcorr.X() << " " << qcorr.Y() << " " << qcorr.Z() << endl;
+
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
 	leftbox->state->ori	= qcorr*leftbox->state->ori;
 	leftbox->state->angVel	= Vector3r(0,0,1)*dalpha/dt;
@@ -105,7 +120,8 @@ void CinemKNCEngine::letMove(Scene * ncb)
 	gamma+=dx;
 }
 	
-void CinemKNCEngine::computeAlpha()
+
+void KinemCNLEngine::computeAlpha()
 {
 	Quaternionr orientationLeftBox,orientationRightBox;
 	orientationLeftBox = leftbox->state->ori;
@@ -121,9 +137,8 @@ void CinemKNCEngine::computeAlpha()
 }
 
 
-void CinemKNCEngine::computeDu(Scene* ncb)
+void KinemCNLEngine::computeDu(Scene* ncb)
 {
-
 	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_topbox);
 	
 	if(firstRun)
@@ -136,78 +151,71 @@ void CinemKNCEngine::computeDu(Scene* ncb)
 			{
 				if ( ( *itFirst )->getClassName() == "NormalInelasticityLaw" ) 
 				{
+					if(LOG) cout << "NormalInelasticityLaw engine found" << endl;
 					myLdc =  YADE_PTR_CAST<NormalInelasticityLaw> ( *itFirst );
 					coeff_dech = myLdc ->coeff_dech;
-					if(LOG) cout << "NormalInelasticityLaw engine found, with coeff_dech = " << coeff_dech << endl;
 				}
 			}
 		}
-
+		
 		alpha=Mathr::PI/2.0;;
-		Y0 = topbox->state->pos.Y();
-		cout << "Y0 initialise à : " << Y0 << endl;
 		F_0 = F_sup.Y();
+		cout << "F_0 initialise à : " << F_0 << endl;
 		firstRun=false;
 	}
-		
-// Computation of the current dimensions of the box : //
-	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
-	Real Xright = rightbox->state->pos.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
-
-	Real Zfront = frontbox->state->pos.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
-	Real Zback = backbox->state->pos.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
-
-	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
-// End of computation of the current dimensions of the box //
-
+	
 	computeStiffness(ncb);
-	Real Hcurrent = topbox->state->pos.Y();
-	Real Fdesired = F_0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired
-
-// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de NormalInelasticityLaw :
-	if( F_sup.Y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
-		stiffness *= coeff_dech;
-
-	if( (KnC==0) && (stiffness==0) )
+	if( (stiffness==0) )
 	{
-		deltaH=0;
-		cerr << "KnC et stiffness(sample) = 0 => DNC en fait et non CNC..." << endl;
+		deltaU=0;
+		cerr << "stiffness(sample) = 0 => DNC en fait <=> à CNC..." << endl;
 	}
 	else
 	{
-		deltaH = ( F_sup.Y() - ( Fdesired ))/(stiffness+KnC* 1.0e9 * Scontact);
+		Real Ycourant = topbox->state->pos.Y();
+		deltaU = ( F_sup.Y() - F_0 )/(stiffness);
+		if(LOG) cout << "Lors du calcul de DU (utile pour deltaU) : F_0 = " << F_0 << "; Ycourant = " << Ycourant << endl;
 	}
 
-	if(LOG) cout << "Alors q je veux KnC = " << KnC << " depuis F_0 = " << F_0 << " et Y0 = " << Y0 << endl;
-	if(LOG) cout << "deltaH a permettre normalement :" << deltaH << endl;
 
-	deltaH = (1-wallDamping)*deltaH;
-	if(LOG)	cout << "deltaH apres amortissement :" << deltaH << endl;
+	if(LOG)	cout << "deltaU a permettre normalemt :" << deltaU << endl;
 
-	if(abs(deltaH) > max_vel*Omega::instance().getTimeStep())
+// 	Il va falloir prendre en compte la loi de contact qui induit une rigidite plus grande en decharge qu'en charge
+	if(deltaU>0)
 	{
-		deltaH=deltaH/abs(deltaH)*max_vel*Omega::instance().getTimeStep();
-		if(LOG) cout << "Correction appliquee pour ne pas depasser vmax(comp)" << endl;
+		deltaU/=coeff_dech;
+		if(LOG) cout << "Comme deltaU>0 => decharge, il est divise par " << coeff_dech << endl;
+	}
+
+	deltaU = (1-wallDamping)*deltaU;
+	if(LOG)	cout << "deltaU apres amortissement :" << deltaU << endl;
+	if(abs(deltaU) > max_vel*Omega::instance().getTimeStep())
+	{
+		if(LOG)	cout << "v induite pour cet it n° " <<Omega::instance().getCurrentIteration()<<" : " << deltaU/Omega::instance().getTimeStep() << endl;
+		deltaU=deltaU/abs(deltaU)*max_vel*Omega::instance().getTimeStep();
+		
+		if(LOG)	cout << "Correction appliquee pour ne pas depasser vmax(comp) = " << max_vel << endl;
 	}
 
 }
 
-void CinemKNCEngine::stopMovement()
+void KinemCNLEngine::stopMovement()
 {
 	// annulation de la vitesse de la plaque du haut
-	topbox->state->vel		=  Vector3r(0,0,0);
+	topbox->state->vel	=  Vector3r(0,0,0);
 
 	// de la plaque gauche
-	leftbox->state->vel		=  Vector3r(0,0,0);
-	leftbox->state->angVel		=  Vector3r(0,0,0);
+	leftbox->state->vel	=  Vector3r(0,0,0);
+	leftbox->state->angVel	=  Vector3r(0,0,0);
 
 	// de la plaque droite
-	rightbox->state->vel		=  Vector3r(0,0,0);
-	rightbox->state->angVel		=  Vector3r(0,0,0);
+	rightbox->state->vel	=  Vector3r(0,0,0);
+	rightbox->state->angVel	=  Vector3r(0,0,0);
 }
 
-void CinemKNCEngine::computeStiffness(Scene* ncb)
+void KinemCNLEngine::computeStiffness(Scene* ncb)
 {
+	int nbre_contacts = 0;
 	stiffness=0.0;
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end();
@@ -227,13 +235,16 @@ void CinemKNCEngine::computeStiffness(Scene* ncb)
 						FrictPhys* currentContactPhysics =
 						static_cast<FrictPhys*> ( contact->interactionPhysics.get() );
 						stiffness  += currentContactPhysics->kn;
+						nbre_contacts += 1;
 					}
 			}
 		}
 	}
+	if(LOG)	cout << "nbre billes en contacts : " << nbre_contacts << endl;
 	if(LOG)	cout << "rigidite echantillon calculee : " << stiffness << endl;
 
 }
+
 
 
 

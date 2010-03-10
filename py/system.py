@@ -118,6 +118,12 @@ _deprecated={
 	'TetraAABB':'Bo1_Tetra_Aabb', # Tue Feb  9 10:22:33 2010, vaclav@flux
 	'Tetra2TetraBang':'Ig2_Tetra_Tetra_TTetraGeom', # Tue Feb  9 10:23:19 2010, vaclav@flux
 	'TetraLaw':'TetraVolumetricLaw', # Tue Feb  9 10:24:10 2010, vaclav@flux
+	'OldName':'NewName', # Wed Mar 10 12:23:10 2010, jduriez@c1solimara-l
+	'DirecResearchEngine':'Disp2DPropLoadEngine', # Wed Mar 10 12:23:42 2010, jduriez@c1solimara-l
+	'CinemCNCEngine':'KinemCNLEngine', # Wed Mar 10 12:33:36 2010, jduriez@c1solimara-l
+	'CinemKNCEngine':'KinemCNSEngine', # Wed Mar 10 12:34:01 2010, jduriez@c1solimara-l
+	'CinemDNCEngine':'KinemCNDEngine', # Wed Mar 10 12:34:27 2010, jduriez@c1solimara-l
+	'CinemDTCEngine':'KinemCTDEngine', # Wed Mar 10 12:34:37 2010, jduriez@c1solimara-l
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

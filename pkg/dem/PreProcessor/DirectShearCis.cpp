@@ -42,7 +42,7 @@
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/CinemDNCEngine.hpp>
+#include<yade/pkg-common/KinemCNDEngine.hpp>
 
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
@@ -270,7 +270,7 @@ void DirectShearCis::createActors(shared_ptr<Scene>& rootBody)
 	forcesnap->list_id.push_back(10);
 	forcesnap->outputFile="../data/ForceSnapshot";
 
-	shared_ptr<CinemDNCEngine> kinematic = shared_ptr<CinemDNCEngine>(new CinemDNCEngine);
+	shared_ptr<KinemCNDEngine> kinematic = shared_ptr<KinemCNDEngine>(new KinemCNDEngine);
 	kinematic->shearSpeed  = shearSpeed;
 
 	

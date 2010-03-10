@@ -18,7 +18,7 @@ This engine, used in simulations issued from "SimpleShear" Preprocessor, allows 
 */
 
 
-class CinemDNCEngine : public PartialEngine
+class KinemCNDEngine : public PartialEngine
 {
 	private :
 		Real	alpha	// angle from the lower plate to the left box (trigo wise), the Engine finds itself its value
@@ -36,7 +36,7 @@ class CinemDNCEngine : public PartialEngine
 
 
 	public :
-		CinemDNCEngine();
+		KinemCNDEngine();
 		void applyCondition(Scene * body),
 			computeAlpha();
 
@@ -53,10 +53,10 @@ class CinemDNCEngine : public PartialEngine
 
 	protected :
 	REGISTER_ATTRIBUTES(PartialEngine,(shearSpeed)(gammalim)(gamma)(gamma_save)(temoin_save)(id_boxhaut)(id_boxleft)(id_boxright)(Key));
-	REGISTER_CLASS_NAME(CinemDNCEngine);
+	REGISTER_CLASS_NAME(KinemCNDEngine);
 	REGISTER_BASE_CLASS_NAME(PartialEngine);
 };
 
-REGISTER_SERIALIZABLE(CinemDNCEngine);
+REGISTER_SERIALIZABLE(KinemCNDEngine);
 
 
