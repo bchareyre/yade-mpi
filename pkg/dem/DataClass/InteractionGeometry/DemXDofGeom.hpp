@@ -30,7 +30,6 @@ class Dem3DofGeom: public GenericSpheresContact{
 		virtual Real displacementN();
 		virtual Vector3r displacementT(){throw;}
 		virtual Real slipToDisplacementTMax(Real displacementTMax){throw;}; // plasticity
-		virtual Real penetrationDepth(){throw;};
 		// reference radii, for contact stiffness computation; set to negative for nonsense values
 		// end API
 
@@ -41,6 +40,14 @@ class Dem3DofGeom: public GenericSpheresContact{
 		}
 		Vector3r strainT(){return displacementT()/refLength;}
 		Real slipToStrainTMax(Real strainTMax){return slipToDisplacementTMax(strainTMax*refLength)/refLength;}
+		
+		Real penetrationDepth(){
+			if (refR1>0) {																	//If we have both radiuses: Sphere-Sphere
+			return (refR1+refR2)-refLength-displacementN();
+			} else {																				//If we have only 1 radius: Sphere-Facet
+				return refR2-refLength-displacementN();
+			}
+		}
 
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Dem3DofGeom,GenericSpheresContact,
 			"Abstract base class for representing contact geometry of 2 elements that has 3 degrees of freedom: normal (1 component) and shear (Vector3r, but in plane perpendicular to the normal).",

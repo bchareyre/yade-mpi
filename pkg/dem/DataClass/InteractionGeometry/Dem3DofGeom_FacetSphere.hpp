@@ -16,7 +16,6 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
 		virtual Vector3r displacementT(){ relocateContactPoints(); return contPtInTgPlane2()-contPtInTgPlane1(); }
 		virtual Real slipToDisplacementTMax(Real displacementTMax);
-		Real penetrationDepth() {return refR2-refLength-displacementN();}
 		/***** end API ******/
 
 		void setTgPlanePts(const Vector3r&, const Vector3r&);

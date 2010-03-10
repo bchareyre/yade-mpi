@@ -28,7 +28,6 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 			#endif
 		}
 		Real slipToDisplacementTMax(Real displacementTMax);
-		Real penetrationDepth() {return (refR1+refR2)-refLength-displacementN();}
 		/********* end API ***********/
 
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Dem3DofGeom_SphereSphere,Dem3DofGeom,"Class representing 2 spheres in contact which computes 3 degrees of freedom (normal and shear deformation).",
