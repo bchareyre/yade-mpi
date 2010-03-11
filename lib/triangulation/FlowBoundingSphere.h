@@ -37,6 +37,7 @@ class FlowBoundingSphere
 		int* boundsIds [6];
 		bool currentTes;
 		bool SLIP_ON_LATERALS;
+		double TOLERANCE;
 		
 		Boundary boundaries [6];
 		short id_offset;
@@ -75,7 +76,7 @@ class FlowBoundingSphere
 // 		void Analytical_Consolidation ( );
 		
 		void Boundary_Conditions ( RTriangulation& Tri );
-		void Initialize_pressures ( );
+		void Initialize_pressures ( double P_zero );
 		/// Define forces using the same averaging volumes as for permeability
 		void ComputeTetrahedralForces();
 		void save_vtk_file ( RTriangulation &T );

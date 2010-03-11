@@ -19,50 +19,44 @@ class FlowEngine : public PartialEngine
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<CGT::FlowBoundingSphere> flow;
-	public :
-
+	public :		
 		Vector3r gravity;
-// 		bool first;
-
-		int current_state
-		,previous_state
-		,cons;
-		
+		int current_state;
 		Real wall_thickness;
+		bool Update_Triangulation;
 		
 		void Triangulate ( Scene* ncb );
 		void AddBoundary ( Scene* ncb );
-		void Initialize ( Scene* ncb, double P_zero );
+		void Build_Triangulation ( Scene* ncb, double P_zero );
 		void UpdateVolumes ( Scene* ncb );
 		void Initialize_volumes ( Scene* ncb );
 		Real Volume_cell_single_fictious (CGT::Cell_handle cell, Scene* ncb);
 		Real Volume_cell_double_fictious (CGT::Cell_handle cell, Scene* ncb);
 		Real Volume_cell_triple_fictious (CGT::Cell_handle cell, Scene* ncb);
 		Real Volume_cell (CGT::Cell_handle cell, Scene* ncb);
-		void NewTriangulation ( Scene* ncb );
 		void Oedometer_Boundary_Conditions();
 		
 		virtual ~FlowEngine();
 	
 		virtual void applyCondition(Scene*);
 		
-		YADE_CLASS_BASE_DOC_ATTRS(FlowEngine,PartialEngine,"An engine to solve the flow problem in saturated granular media",
-					((bool,isActivated,true,"Activates Flow Engine "))
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
+					((bool,isActivated,true,"Activates Flow Engine"))
 					((bool,first,true,"Controls the initialization/update phases"))
-					((bool, damped, true, ""))
 					((bool, slip_boundary, false, "Controls friction condition on lateral walls"))
 					((bool,currentTes,false,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,"Initial internal pressure for oedometer test"))
+					((double,Tolerance,1e-06,"Gauss-Seidel Tolerance"))
 					((int,PermuteInterval,100000,"Pore space re-triangulation period"))
 					((bool,compute_K,true,"Activates permeability measure within a granular sample"))
 					((double,permeability_factor,1.0,"a permability multiplicator"))
 					((Real,loadFactor,1.5,"Load multiplicator for oedometer test"))
-					((bool,unload,false,"Remove the load in oedometer test"))
 					((double, K, 0, "Permeability of the sample"))
 					((bool, ComputeFlow, 1,"If false only triangulation is done, if true flow problem is solved"))
 					((double, MaxPressure, 0, "Maximal value of water pressure within the sample"))
 					((double, currentStress, 0, "Current value of normal stress"))
-					((bool,tess_based_force,true,"true=force computation based on tessalation, false=force computation based on triangulation")));
+					((bool,tess_based_force,true,"true=force computation based on tessalation, false=force computation based on triangulation")),
+					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
 		DECLARE_LOGGER;
 };
 

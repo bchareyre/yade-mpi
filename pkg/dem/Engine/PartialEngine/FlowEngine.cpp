@@ -23,148 +23,80 @@ FlowEngine::~FlowEngine()
 {
 }
 
-std::ofstream plot ("pressurees.txt", std::ios::out);
-// std::ofstream cons_NONDAMP ("cons_NONDAMP_SLIP", std::ios::out);
-// std::ofstream settle_DAMP ("settle_DAMP_SLIP", std::ios::out);
-// std::ofstream settle_NONDAMP ("settle_NONDAMP_SLIP", std::ios::out);
-
 void FlowEngine::applyCondition ( Scene* ncb )
 {
-	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;}
+	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;Update_Triangulation=false;}
 	if ( !isActivated ) return;
 	else
 	{
+		timingDeltas->start();
+		
 		if ( !triaxialCompressionEngine )
-		{
-			vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
-
-			for ( ;itFirst!=itLast; ++itFirst )
-			{
-				if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" )
-				{
-					cout << "stress controller engine found - FlowEngine" << endl;
-					triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
-				}
-			}
-			if ( !triaxialCompressionEngine ) cout << "stress controller engine NOT found" << endl;
-		}
+		{vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();for ( ;itFirst!=itLast; ++itFirst ){
+		if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ){
+		cout << "stress controller engine found - FlowEngine" << endl;
+		triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );}}
+		if ( !triaxialCompressionEngine ) cout << "stress controller engine NOT found" << endl;}
 
 		currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
 		current_state = triaxialCompressionEngine->currentState;
 
-		if ( !first && current_state==3 )
+		if ( current_state==3 )
 		{
-			if (unload) {triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)/loadFactor;}
+			if ( first || Update_Triangulation ) { Build_Triangulation( ncb, P_zero );}
+// 			else
+// 			{
+				timingDeltas->checkpoint("Triangulating");
+				
+				UpdateVolumes ( ncb );
 			
-			UpdateVolumes ( ncb );
-			
-			cout << "simulation time = " << ncb->simulationTime << endl;
+				timingDeltas->checkpoint("Update_Volumes");
 			
 			///Compute flow and and forces here
 			
-			flow->GaussSeidel ( );
+				flow->GaussSeidel ( );
+			
+				timingDeltas->checkpoint("Gauss-Seidel");
 			
 // 			flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
-			flow->tess_based_force=tess_based_force;
-			flow->Compute_Forces ( );
+				flow->tess_based_force=tess_based_force;
+				flow->Compute_Forces ( );
+			
+				timingDeltas->checkpoint("Compute_Forces");
 
 			///End Compute flow and forces
 
-			CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end ();
-
-			Vector3r f;
-			int id;
-
-			for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
-			{
-				id = V_it->info().id();
-				for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
-
-				ncb->forces.addForce ( id, f );
-				//ncb->forces.addTorque(id,t);
-			}
-			
-			Real time = Omega::instance().getSimulationTime();
-			
-			int j = Omega::instance().getCurrentIteration();
-// 			int j = Omega::instance().getSimulationTime();
-			char file [50];
-			string consol = flow->key+"%d_Consol";
-			const char* keyconsol = consol.c_str();
-			sprintf (file, keyconsol, j);
-			char *g = file;
-			
-			MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time);
-			plot << j << " " << MaxPressure << endl;
-			
-// 			if (damped) {cons_DAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
-// 			if (!damped){cons_NONDAMP << j << " " << time << " " << flow->Pressures[cons] << endl; cons++;}
-// 			if (damped) {settle_DAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
-// 			if (!damped) {settle_NONDAMP << j << " " << time << " " << triaxialCompressionEngine->uniaxialEpsilonCurr << endl;}
-			
-			if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
-			{
-// 				K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max );
-				
-				cout << endl << "---NEW TRIANGULATION---" << endl << endl;
-				
-				NewTriangulation ( ncb );
-
-				cout << "Vtotalissimo = " << flow->Vtotalissimo << " Vsolid_tot = " << flow->Vsolid_tot << " Vporale2 = " << flow->Vporale  << " Ssolid_tot = " << flow->Ssolid_tot << endl << endl;
-
-				flow->DisplayStatistics ();
-
-				std::ofstream PFile ( "NewTriangulation_Pressures",std::ios::out );
-
-				CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-				int j=0;
-				
-				for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
+				CGT::Finite_vertices_iterator vertices_end = flow->T[flow->currentTes].Triangulation().finite_vertices_end ();
+				Vector3r f;int id;
+				for ( CGT::Finite_vertices_iterator V_it = flow->T[flow->currentTes].Triangulation().finite_vertices_begin (); V_it !=  vertices_end; V_it++ )
 				{
-					PFile << ++j << " " << cell->info().p() << endl;
+					id = V_it->info().id();
+					for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
+					ncb->forces.addForce ( id, f );
+				//ncb->forces.addTorque(id,t);
 				}
-
-				Initialize_volumes ( ncb );
-			}
-		}
-		else if ( current_state==3 )
-		{
-			Initialize ( ncb, P_zero );
+				timingDeltas->checkpoint("Applying Forces");
 			
-			flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
+				Real time = Omega::instance().getSimulationTime();
 			
-			flow->SLIP_ON_LATERALS=slip_boundary;
-
-			flow->k_factor = permeability_factor;
-			flow->Compute_Permeability ();
-
-			flow->DisplayStatistics ();
-
-			CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
-			int y=0;
-			for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
-			{
-				cell->info().dv() = 0; cell->info().p() = 0;
-				y++;
-			}
-			cout << y << " deltaV initialised -----------------" << endl;
-
-			flow->key = triaxialCompressionEngine->Key;
-			
-			if (compute_K) {K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
-
-			Oedometer_Boundary_Conditions();
-			flow->Initialize_pressures();
-			
-			flow->GaussSeidel ( );
-			
-// 			plotFile << "unset key" << endl;
-			
-			
-// 			flow->Analytical_Consolidation();
-			first = false; cons=0;
+				int j = Omega::instance().getCurrentIteration();
+// 				int j = Omega::instance().getSimulationTime();
+				char file [50];
+				string consol = flow->key+"%d_Consol";
+				const char* keyconsol = consol.c_str();
+				sprintf (file, keyconsol, j);
+				char *g = file;
+				timingDeltas->checkpoint("Writing cons_files");
+				
+				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time);
+				
+				if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
+				{ Update_Triangulation = true; }
+				
+				timingDeltas->checkpoint("Storing Max Pressure");
+				
+// 			}
 		}
 	}
 }
@@ -186,11 +118,22 @@ void FlowEngine::Oedometer_Boundary_Conditions()
 	triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)*loadFactor;
 }
 
-void FlowEngine::Initialize ( Scene* ncb, double P_zero )
+void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
 {
-	flow->currentTes=0;
+	if (first)
+	{
+		flow->currentTes=0;
+		flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
+		flow->SLIP_ON_LATERALS=slip_boundary;
+		flow->key = triaxialCompressionEngine->Key;
+		flow->TOLERANCE=Tolerance;
+	}
+	else 
+	{
+		if (compute_K) {K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		flow->currentTes=!flow->currentTes;
+	}
 	currentTes=flow->currentTes;
-
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
 	AddBoundary ( ncb );
@@ -201,7 +144,26 @@ void FlowEngine::Initialize ( Scene* ncb, double P_zero )
 	
 	flow->Localize ();
 
+	flow->k_factor = permeability_factor;
+	flow->Compute_Permeability ();
+
+	if (first)
+	{
+		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
+		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
+		if (compute_K) { K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		Oedometer_Boundary_Conditions();
+		first=!first;
+	}
+	else 
+	{
+		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
+		Update_Triangulation=!Update_Triangulation;
+	}
+
+	flow->Initialize_pressures( P_zero );
 	Initialize_volumes ( ncb );
+	flow->DisplayStatistics ();
 }
 
 void FlowEngine::AddBoundary ( Scene* ncb )
@@ -217,7 +179,7 @@ void FlowEngine::AddBoundary ( Scene* ncb )
 		if ( b->shape->getClassIndex() == Bx_Index )
 		{
 			Box* w = YADE_CAST<Box*> ( b->shape.get() );
-			const body_id_t& id = b->getId();
+// 			const body_id_t& id = b->getId();
 			Real center [3], Extent[3];
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
 
@@ -236,8 +198,6 @@ void FlowEngine::AddBoundary ( Scene* ncb )
 
 void FlowEngine::Triangulate ( Scene* ncb )
 {
-	cout << "Triangulating------" << endl;
-
 	shared_ptr<Sphere> sph ( new Sphere );
 
 	int Sph_Index = sph->getClassIndexStatic();
@@ -260,8 +220,6 @@ void FlowEngine::Triangulate ( Scene* ncb )
 			contator+=1;
 		}
 	}
-	cout << contator << "spheres inserted " << endl;
-
 	double SectionArea = ( flow->x_max - flow->x_min ) * ( flow->z_max-flow->z_min );
 
 	cout << "Section area = " << SectionArea << endl;
@@ -272,40 +230,6 @@ void FlowEngine::Triangulate ( Scene* ncb )
 	cout << "y_min = " << flow->y_min << endl;
 	cout << "z_min = " << flow->z_min << endl;
 	cout << "z_max = " << flow->z_max << endl;
-}
-
-void FlowEngine::NewTriangulation ( Scene* ncb )
-{
-	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
-
-	flow->currentTes=!flow->currentTes;
-	currentTes = flow->currentTes;
-
-	flow->T[flow->currentTes].Clear();
-
-	Triangulate ( ncb );
-
-	AddBoundary ( ncb );
-
-// 	flow->Tesselate();
-	flow->T[flow->currentTes].Compute();
-	
-// 	flow->Fictious_cells();
-
-	flow->Localize ();
-	
-	flow->k_factor=permeability_factor;
-
-	flow->Compute_Permeability ( );
-
-// 	flow->Sample_Permeability ( t2.Triangulation(), x_min, x_max, z_min, z_max, y_max, y_min );
-
-	flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
-
-// 	flow->currentTes = !flow->currentTes;
-
-// 	flow->T[flow->currentTes] = flow->T[flow->currentTes];
-// 	t2 = flow->T[!flow->currentTes];
 }
 
 void FlowEngine::Initialize_volumes ( Scene* ncb )

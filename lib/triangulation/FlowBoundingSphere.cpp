@@ -28,7 +28,7 @@ const bool DEBUG_OUT = false;
 
 const double RELAX = 1.9;
 
-const double TOLERANCE = 1e-06;
+
 const double ONE_THIRD = 1.0/3.0;
 //! Use this factor, or minLength, to reduce max permeability values (see usage below))
 const double MAXK_DIV_KMEAN = 5000;
@@ -70,6 +70,7 @@ FlowBoundingSphere::FlowBoundingSphere()
         for (int i=0;i<6;i++) boundsIds[i] = 0;
         minPermLength=-1;
 	SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
+	TOLERANCE = 1e-06;
 }
 
 void FlowBoundingSphere::Compute_Action()
@@ -161,7 +162,8 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
         clock.top("DisplayStatistics");
         /** START GAUSS SEIDEL */
         //  Boundary_Conditions ( Tri );
-        Initialize_pressures();
+	double P_zero = abs((boundary(y_min_id).value-boundary(y_max_id).value)/2);
+        Initialize_pressures( P_zero );
         GaussSeidel();
         clock.top("GaussSeidel");
 
@@ -300,7 +302,7 @@ void FlowBoundingSphere::Localize()
                         if (V->info().isFictious) {
                                 ++pass;
                                 //FIXME : remove the isFictious flag and use cell->info().fictious() instead
-                                Boundary& bi = boundary(V->info().id());
+//                                 Boundary& bi = boundary(V->info().id());
                                 //     Boundary& bi = boundaries [V->info().id()];
 
 //                                 if (bi.flowCondition) {
@@ -1507,15 +1509,13 @@ double FlowBoundingSphere::fast_spherical_triangle_area(const Sphere& STA1, cons
         return rayon2 * fast_solid_angle(STA1,STA2,STA3,PTA1);
 }
 
-void FlowBoundingSphere::Initialize_pressures()
+void FlowBoundingSphere::Initialize_pressures( double P_zero )
 {
         RTriangulation& Tri = T[currentTes].Triangulation();
-        //  Finite_cells_iterator cell_end = Tri.finite_cells_end();
-        //
-        //  for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
-        //   if (cell->info().fictious()) cell->info().p() = boundary(cell->info().id()).value;
-        //   else cell->info().p() =0;//FIXME : assign better values for faster convergence?
-        //  }
+        Finite_cells_iterator cell_end = Tri.finite_cells_end();
+	
+        for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
+	{if (!cell->info().fictious()) cell->info().p() = P_zero;}
 
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
@@ -1858,7 +1858,8 @@ double FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min
         boundary(y_min_id).value=0;
         boundary(y_max_id).value=1;
 
-        Initialize_pressures();
+	double P_zero = abs((boundary(y_min_id).value-boundary(y_max_id).value)/2);
+        Initialize_pressures( P_zero );
 
         GaussSeidel();
 
