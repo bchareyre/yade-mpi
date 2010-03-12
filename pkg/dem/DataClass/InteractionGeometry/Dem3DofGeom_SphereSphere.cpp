@@ -40,9 +40,12 @@ Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& from
  * @note It is not checked whether planePt relly lies on the tangent plane. If not, result will be incorrect.
  */
 Quaternionr Dem3DofGeom_SphereSphere::rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& planeNormal){
-	Vector3r axis=planeNormal.Cross(planePt); axis.Normalize();
-	Real angle=planePt.Length()/radius;
-	Quaternionr normal2pt(axis,angle);
+	Quaternionr normal2pt;
+	if (planePt!=Vector3r::ZERO) {
+		Vector3r axis=planeNormal.Cross(planePt); axis.Normalize();
+		Real angle=planePt.Length()/radius;
+		normal2pt.FromAxisAngle(axis,angle);
+	}
 	Quaternionr ret; ret.Align(Vector3r::UNIT_X,normal2pt*planeNormal);
 	return ret;
 }
