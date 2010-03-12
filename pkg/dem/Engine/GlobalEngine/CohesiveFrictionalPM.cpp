@@ -22,14 +22,13 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	Real dt = Omega::instance().getTimeStep();
 	
 	Real displN = geom->penetrationDepth; // NOTE: the sign for penetrationdepth is different from ScGeom and Dem3DofGeom: geom->penetrationDepth>0 when spheres interpenetrate
-	Real D = 0; // initial interparticular distance
 	Real Dtensile=phys->FnMax/phys->kn;
 	Real Dsoftening = phys->strengthSoftening*Dtensile; 
 	
 	/*to set the equilibrium distance between all cohesive elements when they first meet*/
-	if ( contact->isFresh(rootBody) && phys->isCohesive) { phys->initD = displN; phys->normalForce = Vector3r::ZERO; phys->shearForce = Vector3r::ZERO;}
+	if ( contact->isFresh(rootBody) ) { phys->initD = displN; phys->normalForce = Vector3r::ZERO; phys->shearForce = Vector3r::ZERO;}
 	
-	D = displN - phys->initD; // displacement is computed depending on the equilibrium distance
+	Real D = displN - phys->initD; // interparticular distance is computed depending on the equilibrium distance (which is 0 for non cohesive interactions)
 	
 	/* Determination of interaction */
 	if (D < 0){ //spheres do not touch 
@@ -45,7 +44,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 		
 	if ((D < 0) && (abs(D) > Dtensile)) { //to take into account strength softening
 	  Dsoft = D+Dtensile; // Dsoft<0 for a negative value of Fn (attractive force)
-	  Fn = phys->FnMax+(phys->kn/phys->strengthSoftening)*Dsoft; // computes FnMax - FnSoftening
+	  Fn = -(phys->FnMax+(phys->kn/phys->strengthSoftening)*Dsoft); // computes FnMax - FnSoftening
 	}
 	else {
 	  Fn = phys->kn*D;
@@ -69,8 +68,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	Real maxFs = abs(Fn)*phys->tanFrictionAngle + phys->FsMax;
 		
 	if (Fs.SquaredLength() > maxFs*maxFs){ 
-	  phys->isCohesive=false; //if not already false to delete cohesive interactions
-	  Fs*=maxFs/Fs.Length(); // to fix the shear force to its yielding value with the right sign
+	  Fs*=maxFs/Fs.Length(); // to fix the shear force to its yielding value
 	}
 	phys->shearForce = Fs; 
 	
