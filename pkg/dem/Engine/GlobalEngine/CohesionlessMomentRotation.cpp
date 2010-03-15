@@ -227,42 +227,8 @@ void Ip2_MomentMat_MomentMat_MomentPhys::go(const shared_ptr<Material>& b1, cons
 	interaction->interactionPhysics = contactPhysics;
 }
 
-
-
-/* Moment Phys */		
-MomentPhys::MomentPhys()
-{
-	createIndex();
-	frictionAngle = 0;
-	tanFrictionAngle = 0;
-	Eta = 0;
-	prevNormal = Vector3r(0,0,0);
-	
-	moment_twist = Vector3r(0,0,0);
-	moment_bending = Vector3r(0,0,0);
-	
-	shear = Vector3r(0,0,0);
-	cumulativeRotation =0; 
-// assign neutral value	
-	initialOrientation1 = Quaternionr(1.0,0.0,0.0,0.0);
-	initialOrientation2 = Quaternionr(1.0,0.0,0.0,0.0);
-	kr = 0;
-}
-
 MomentPhys::~MomentPhys(){}
 
-/* Ip2_BMP_BMP_MomentPhys */
-Ip2_MomentMat_MomentMat_MomentPhys::Ip2_MomentMat_MomentMat_MomentPhys()
-{
-	userInputStiffness = false;
-	useAlphaBeta = false;
-	Alpha = 0;
-	Beta = 0;	
-	Knormal = 0;
-	Krotate = 0;
-	Kshear= 0;
-
-}
 Ip2_MomentMat_MomentMat_MomentPhys::~Ip2_MomentMat_MomentMat_MomentPhys(){};
 
 

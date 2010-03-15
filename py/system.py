@@ -124,6 +124,7 @@ _deprecated={
 	'CinemKNCEngine':'KinemCNSEngine', # Wed Mar 10 12:34:01 2010, jduriez@c1solimara-l
 	'CinemDNCEngine':'KinemCNDEngine', # Wed Mar 10 12:34:27 2010, jduriez@c1solimara-l
 	'CinemDTCEngine':'KinemCTDEngine', # Wed Mar 10 12:34:37 2010, jduriez@c1solimara-l
+	'Ip2_BMP_BMP_CSPhys':'Ip2_2xFrictMat_CSPhys', # Wed Mar 10 15:08:56 2010, eudoxos@frigo
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

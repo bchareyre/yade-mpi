@@ -175,8 +175,8 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 				std::list<string>::iterator prev=I++;
 				pythonables.erase(prev);
 			} catch (...){
-				if(getenv("YADE_DEBUG")) cerr<<"["<<*I<<"]";
-				//boost::python::handle_exception();
+				if(getenv("YADE_DEBUG")){ cerr<<"["<<*I<<"]"; PyErr_Print(); }
+				boost::python::handle_exception();
 				I++;
 			}
 		}

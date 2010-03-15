@@ -16,33 +16,29 @@ class Law2_Dem3Dof_CSPhys_CundallStrack: public LawFunctor{
 	public:
 		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 		FUNCTOR2D(Dem3DofGeom,CSPhys);
-		REGISTER_CLASS_AND_BASE(Law2_Dem3Dof_CSPhys_CundallStrack,LawFunctor);
-		REGISTER_ATTRIBUTES(LawFunctor,/*nothing here*/);
+		YADE_CLASS_BASE_DOC(Law2_Dem3Dof_CSPhys_CundallStrack,LawFunctor,"Basic constitutive law published originally by Cundall&Strack; it has normal and shear stiffnesses (Kn, Kn) and dry Coulomb friction. Operates on associated :yref:`Dem3DofGeom` and :yref:`CSPhys` instances.");
 		DECLARE_LOGGER;	
 };
 REGISTER_SERIALIZABLE(Law2_Dem3Dof_CSPhys_CundallStrack);
 
-class Ip2_BMP_BMP_CSPhys: public InteractionPhysicsFunctor{
+class Ip2_2xFrictMat_CSPhys: public InteractionPhysicsFunctor{
 	public:
-
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
-		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,);
 		FUNCTOR2D(FrictMat,FrictMat);
-		REGISTER_CLASS_AND_BASE(Ip2_BMP_BMP_CSPhys,InteractionPhysicsFunctor);
+		YADE_CLASS_BASE_DOC(Ip2_2xFrictMat_CSPhys,InteractionPhysicsFunctor,"Functor creating :yref:`CSPhys` from  two :yref:`FrictMat`. See :yref:`Law2_Dem3Dof_CSPhys_CundallStrack` for details.");
 		DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(Ip2_BMP_BMP_CSPhys);
+REGISTER_SERIALIZABLE(Ip2_2xFrictMat_CSPhys);
 
 
 class CSPhys: public NormShearPhys {
-	private:
 	public:
-		Real frictionAngle, tanFrictionAngle; 
-		CSPhys(): NormShearPhys(), frictionAngle(0),tanFrictionAngle(0){ createIndex(); }
 	virtual ~CSPhys();
-
-	REGISTER_ATTRIBUTES(NormShearPhys,(tanFrictionAngle) (frictionAngle));
-	REGISTER_CLASS_AND_BASE(CSPhys,NormShearPhys);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CSPhys,NormShearPhys,"Physical properties for :yref:`Cundall&Strack constitutive law<Law2_Dem3Dof_CSPhys_CundallStrack>`, created by :yref:`Ip2_2xFrictMat_CSPhys`.",
+		((Real,frictionAngle,NaN,"Friction angle of the interaction. |ycomp|"))
+		((Real,tanFrictionAngle,NaN,"Precomputed tangent of :yref:`CSPhys::frictionAngle`. |ycomp|")),
+		createIndex();
+	);
 	REGISTER_CLASS_INDEX(CSPhys,NormShearPhys);
 };
 REGISTER_SERIALIZABLE(CSPhys);

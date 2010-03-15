@@ -5,7 +5,7 @@
 #include<yade/pkg-dem/DemXDofGeom.hpp>
 //! tested in scripts/test/CundallStrack.py
 
-YADE_PLUGIN((Law2_Dem3Dof_CSPhys_CundallStrack)(Ip2_BMP_BMP_CSPhys)(CSPhys));
+YADE_PLUGIN((Law2_Dem3Dof_CSPhys_CundallStrack)(Ip2_2xFrictMat_CSPhys)(CSPhys));
 
 
 
@@ -33,9 +33,9 @@ void Law2_Dem3Dof_CSPhys_CundallStrack::go(shared_ptr<InteractionGeometry>& ig, 
 	
 }
 
-CREATE_LOGGER(Ip2_BMP_BMP_CSPhys);
+CREATE_LOGGER(Ip2_2xFrictMat_CSPhys);
 
-void Ip2_BMP_BMP_CSPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
+void Ip2_2xFrictMat_CSPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
 	
 	if(interaction->interactionPhysics) return; 
 

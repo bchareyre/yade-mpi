@@ -26,7 +26,7 @@ o.engines=[
 		Ig2_Sphere_Sphere_Dem3DofGeom()
 	]),
 	InteractionPhysicsDispatcher(
-		[Ip2_BMP_BMP_CSPhys()]
+		[Ip2_2xFrictMat_CSPhys()]
 	),
 
 	LawDispatcher([Law2_Dem3Dof_CSPhys_CundallStrack()]),

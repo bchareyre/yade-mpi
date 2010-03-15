@@ -1,6 +1,8 @@
 #include"SnapshotEngine.hpp"
 #include<sstream>
 #include<iomanip>
+#include<boost/algorithm/string/case_conv.hpp>
+
 CREATE_LOGGER(SnapshotEngine);
 YADE_PLUGIN((SnapshotEngine));
 void SnapshotEngine::action(Scene* rb){
@@ -9,9 +11,9 @@ void SnapshotEngine::action(Scene* rb){
 		if(!ignoreErrors) throw invalid_argument("View #"+lexical_cast<string>(viewNo)+" (SnapshotEngine::viewNo) doesn't exist.");
 		return;
 	}
-	ostringstream fss; fss<<fileBase<<setw(4)<<setfill('0')<<counter++<<".png";
+	ostringstream fss; fss<<fileBase<<setw(4)<<setfill('0')<<counter++<<"."<<boost::algorithm::to_lower_copy(format);
 	LOG_DEBUG("GL view #"<<viewNo<<" → "<<fss.str())
-	glv->setSnapshotFormat("PNG");
+	glv->setSnapshotFormat(format);
 	glv->nextFrameSnapshotFilename=fss.str();
 	// wait for the renderer to save the frame (will happen at next postDraw)
 	timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=10000000; /* 10 ms */

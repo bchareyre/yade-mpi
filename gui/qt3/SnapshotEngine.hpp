@@ -12,6 +12,7 @@ class SnapshotEngine: public PeriodicEngine{
 	public:
 	virtual void action(Scene*);
 	YADE_CLASS_BASE_DOC_ATTRS(SnapshotEngine,PeriodicEngine,"Periodically save snapshots of GLView(s) as .png files. Files are named *fileBase*+*counter*+'.png' (counter is left-padded by 0s, i.e. snap0004.png)",
+		((string,format,"PNG","Format of snapshots (one of JPEG, PNG, EPS, PS, PPM, BMP) `QGLViewer documentation <http://www.libqglviewer.com/refManual/classQGLViewer.html#abbb1add55632dced395e2f1b78ef491c>`_. File extension will be lowercased *format*. Validity of format is not checked."))
 		((string,fileBase,"","Basename for snapshots"))
 		((int,counter,0,"Number appended to fileBase |yupdate|"))
 		((int,viewNo,((void)"primary view",0),"The GLView number that we save."))

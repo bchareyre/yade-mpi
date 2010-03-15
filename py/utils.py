@@ -70,7 +70,14 @@ def SpherePWaveTimeStep(radius,density,young):
 
 def randomColor(): return Vector3(random.random(),random.random(),random.random())
 
-def typedEngine(name): return [e for e in Omega().engines if e.name==name][0]
+def typedEngine(name):
+	"""Return first engine from current O.engines, identified by its type (as string). For example:
+
+	>>> O.engines=[InsertionSortCollider(),NewtonIntegrator(),GravityEngine()]
+	>>> utils.typedEngine("NewtonIntegrator") == O.engines[1]
+	True
+	"""
+	return [e for e in Omega().engines if e.name==name][0]
 
 def downCast(obj,newClassName):
 	"""Cast given object to class deriving from the same yade root class and copy all parameters from given object.

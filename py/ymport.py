@@ -42,10 +42,10 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	scale factor scales the given data.
 	
 	Remaining **kw arguments are passed to utils.facet; 
-	mesh files can be easily created with GMSH http://www.geuz.org/gmsh/
-	Example added to scripts/test/regular-sphere-pack.py
+	mesh files can be easily created with `GMSH <http://www.geuz.org/gmsh/>`_.
+	Example added to :ysrc:`scripts/test/regular-sphere-pack.py`
 	
-	Additional examples of mesh-files can be downloaded here
+	Additional examples of mesh-files can be downloaded from 
 	http://www-roc.inria.fr/gamma/download/download.php
 	"""
 	infile = open(meshfile,"r")
@@ -99,18 +99,17 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
 	shift[X,Y,Z] parameter moves the specimen.
 	scale factor scales the given data.
-	Remaining **kw arguments are passed to utils.sphere; 
+	Remaining **kw arguments are passed to :yref:`yade.utils.sphere`; 
 	
 	LSMGenGeo library allows to create pack of spheres
 	with given [Rmin:Rmax] with null stress inside the specimen.
-	Can be usefull for Mining Rock simulation.
+	Can be useful for Mining Rock simulation.
 	
-	Example added to scripts/test/regular-sphere-pack.py
-	Example of LSMGenGeo library using is added to genCylLSM.py
+	Example: :ysrc:`scripts/test/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
 	
-	https://answers.launchpad.net/esys-particle/+faq/877
-	http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
-	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
+	* https://answers.launchpad.net/esys-particle/+faq/877
+	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
+	* https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
 	from yade.utils import sphere
 
 	infile = open(fileName,"r")
@@ -127,18 +126,17 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 def gengeo(mntable,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo library and creates spheres.
 	shift[X,Y,Z] parameter moves the specimen.
-	Remaining **kw arguments are passed to utils.sphere; 
+	Remaining **kw arguments are passed to :yref:`yade.utils.sphere`; 
 	
 	LSMGenGeo library allows to create pack of spheres
 	with given [Rmin:Rmax] with null stress inside the specimen.
-	Can be usefull for Mining Rock simulation.
+	Can be useful for Mining Rock simulation.
 	
-	Example added to scripts/test/regular-sphere-pack.py
-	Example of LSMGenGeo library using is added to genCylLSM.py
+	Example: :ysrc:`scripts/test/regular-sphere-pack.py`, usage of LSMGenGeo library in :ysrc:`scripts/test/genCylLSM.py`.
 	
-	https://answers.launchpad.net/esys-particle/+faq/877
-	http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
-	https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
+	* https://answers.launchpad.net/esys-particle/+faq/877
+	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
+	* https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
 	from GenGeo import MNTable3D,Sphere
 	
 	ret=[]

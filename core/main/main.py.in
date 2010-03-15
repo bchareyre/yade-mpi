@@ -54,15 +54,17 @@ except AttributeError:
 ==========================================
 
 There was AttributeError while importing yade module.
-If you are running Ubuntu 9.10 (karmic), you just hit a known bug
+If you are running Ubuntu 9.10 (karmic) or 10.04 (lucid),
+you just hit a known bug
 https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688
 
-You can work around this bug by using the following command
-(as per https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688/comments/6):
+You can work around this bug by updating boost from yade's updated repository
+(as per https://bugs.launchpad.net/ubuntu/+source/boost1.38/+bug/457688/comments/6)
+by issuing the following command:
 
-sudo add-apt-repository ppa:ajmitch/ppa && sudo apt-get update && sudo apt-get upgrade
+  sudo add-apt-repository ppa:yade-users/external && sudo apt-get update && sudo apt-get upgrade
 
-No need to recompile afterwards.
+You should not need to recompile afterwards.
 """
 	sys.exit(1)
 
