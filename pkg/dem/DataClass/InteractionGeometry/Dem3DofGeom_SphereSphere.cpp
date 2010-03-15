@@ -45,9 +45,10 @@ Quaternionr Dem3DofGeom_SphereSphere::rollPlanePtToSphere(const Vector3r& planeP
 		Vector3r axis=planeNormal.Cross(planePt); axis.Normalize();
 		Real angle=planePt.Length()/radius;
 		normal2pt.FromAxisAngle(axis,angle);
+		Quaternionr ret; return ret.Align(Vector3r::UNIT_X,normal2pt*planeNormal);
+	} else {
+		return Quaternionr::IDENTITY;
 	}
-	Quaternionr ret; ret.Align(Vector3r::UNIT_X,normal2pt*planeNormal);
-	return ret;
 }
 
 
