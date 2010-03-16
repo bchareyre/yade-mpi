@@ -4,11 +4,12 @@ YADE_PLUGIN((InteractionDispatchers));
 CREATE_LOGGER(InteractionDispatchers);
 
 //! Pseudo-ctor for InteractionDispatchers, using lists of functors (might be turned into real ctor, perhaps)
-shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff){
+shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::vector<shared_ptr<InteractionGeometryFunctor> >& gff, const std::vector<shared_ptr<InteractionPhysicsFunctor> >& pff, const std::vector<shared_ptr<LawFunctor> >& cff /*, const std::vector<shared_ptr<IntrCallback> >& cbs*/){
 	shared_ptr<InteractionDispatchers> instance(new InteractionDispatchers);
 	FOREACH(shared_ptr<InteractionGeometryFunctor> gf, gff) instance->geomDispatcher->add(gf);
 	FOREACH(shared_ptr<InteractionPhysicsFunctor> pf, pff) instance->physDispatcher->add(pf);
 	FOREACH(shared_ptr<LawFunctor> cf, cff) instance->lawDispatcher->add(cf);
+	// FOREACH(shared_ptr<IntrCallback> cb, cbs) instance->callbacks.push_back(cb);
 	return instance;
 }
 
@@ -31,12 +32,28 @@ void InteractionDispatchers::action(Scene*){
 		LOG_WARN("Interactions pending erase found (erased), no collider being used?");
 		alreadyWarnedNoCollider=true;
 	}
+	// update Scene* of the dispatchers
 	geomDispatcher->scene=physDispatcher->scene=lawDispatcher->scene=scene;
-	geomDispatcher->updateScenePtr();
-	physDispatcher->updateScenePtr();
-	lawDispatcher->updateScenePtr();
-	// transformed cell size 
+	// ask dispatchers to update Scene* of their functors
+	geomDispatcher->updateScenePtr(); physDispatcher->updateScenePtr(); lawDispatcher->updateScenePtr();
+	/*
+		initialize callbacks; they return pointer (used only in this timestep) to the function to be called
+		returning NULL deactivates the callback in this timestep
+	*/
+	// pair of callback object and pointer to the function to be called
+	vector<IntrCallback::FuncPtr> callbackPtrs;
+	FOREACH(const shared_ptr<IntrCallback> cb, callbacks){
+		cb->scene=scene;
+		callbackPtrs.push_back(cb->stepInit());
+	}
+	assert(callbackPtrs.size()==callbacks.size());
+	size_t callbacksSize=callbacks.size();
+
+	// precompute transformed cell size 
 	Vector3r cellSize; if(scene->isPeriodic) cellSize=scene->cell->trsf*scene->cell->refSize;
+
+	// force removal of interactions that were not encountered by the collider
+	// (only for some kinds of colliders; see comment for InteractionContainer::iterColliderLastRun)
 	bool removeUnseenIntrs=(scene->interactions->iterColliderLastRun>=0 && scene->interactions->iterColliderLastRun==scene->currentIteration);
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();
@@ -56,12 +73,6 @@ void InteractionDispatchers::action(Scene*){
 			const shared_ptr<Body>& b2_=Body::byId(I->getId2(),scene);
 
 			if(!b1_ || !b2_){ LOG_DEBUG("Body #"<<(b1_?I->getId2():I->getId1())<<" vanished, erasing intr #"<<I->getId1()<<"+#"<<I->getId2()<<"!"); scene->interactions->requestErase(I->getId1(),I->getId2(),/*force*/true); continue; }
-
-			// already in Collider::mayCollider, no need to check here anymore
-			#if 0
-				// go fast if this pair of bodies cannot interact at all
-				if((b1_->getGroupMask() & b2_->getGroupMask())==0) continue;
-			#endif
 
 			// we know there is no geometry functor already, take the short path
 			if(!I->functorCache.geomExists) { assert(!I->isReal()); continue; }
@@ -92,11 +103,13 @@ void InteractionDispatchers::action(Scene*){
 
 				// in sheared cell, apply shear on the mutual position as well
 				shift2=scene->cell->shearPt(shift2);
-				//suggested change to avoid one matrix multiplication (with Hsize updated in cell ofc), I'll make the change cleanly if ok. Same sorts of simplifications are possible in many places. Just putting one example here.
-				// Hsize will contain colums with transformed base vectors
-// 				Matrix3r Hsize(scene->cell->refSize[0],scene->cell->refSize[1],scene->cell->refSize[2]); Hsize=scene->cell->trsf*Hsize;
-// 				Vector3r shift3((Real) I->cellDist[0]*Hsize.GetColumn(0)+(Real)I->cellDist[1]*Hsize.GetColumn(1)+(Real)I->cellDist[2]*Hsize.GetColumn(2));
-// 				if ((Omega::instance().getCurrentIteration() % 100 == 0)) LOG_DEBUG(shift2 << " vs " << shift3);
+				/* suggested change to avoid one matrix multiplication (with Hsize updated in cell ofc), I'll make the change cleanly if ok.
+					Same sorts of simplifications are possible in many places. Just putting one example here.
+					Hsize will contain colums with transformed base vectors
+					Matrix3r Hsize(scene->cell->refSize[0],scene->cell->refSize[1],scene->cell->refSize[2]); Hsize=scene->cell->trsf*Hsize;
+					Vector3r shift3((Real) I->cellDist[0]*Hsize.GetColumn(0)+(Real)I->cellDist[1]*Hsize.GetColumn(1)+(Real)I->cellDist[2]*Hsize.GetColumn(2));
+					if ((Omega::instance().getCurrentIteration() % 100 == 0)) LOG_DEBUG(shift2 << " vs " << shift3);
+				*/
 
 				geomCreated=I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/false,I);
 			}
@@ -155,5 +168,11 @@ void InteractionDispatchers::action(Scene*){
 			lawDispatcher->operator()(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
 			if(!I->isReal() && I->isFresn(scene)) LOG_WARN("Law functor deleted interaction that was just created. Please report bug: either this message is spurious, or the functor (or something else) is buggy.");
 		#endif
+
+		// process callbacks for this interaction
+		if(!I->isReal()) continue; // it is possible that Law2_ functor called requestErase, hence this check
+		for(size_t i=0; i<callbacksSize; i++){
+			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}
+	}
 }

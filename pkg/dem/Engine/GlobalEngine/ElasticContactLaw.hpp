@@ -20,7 +20,7 @@
 
 class Law2_ScGeom_FrictPhys_Basic: public LawFunctor{
 	public:
-		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
+		virtual void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene*);
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_FrictPhys_Basic,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom`.",
 		((int,sdecGroupMask,1,"Bitmask for allowing collision between particles :yref:`Body::groupMask`"))
 		((bool,neverErase,false,"Keep interactions even if particles go away from each other [for debugging?]"))

@@ -98,14 +98,14 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 			fastestBodyMaxDist+=sqrt(newton->maxVelocitySq)*scene->dt;
 			if(fastestBodyMaxDist>=sweepLength) return true;
 		}
-		if(BB[0].size!=2*scene->bodies->size()) return true;
+		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
 		// we wouldn't run in this step; in that case, just delete pending interactions
 		// this is done in ::action normally, but it would make the call counters not reflect the stride
 		scene->interactions->erasePending(*this,scene);
 		return false;
 	}
 
-void InsertionSortCollider::action(Scene* scene){
+void InsertionSortCollider::action(Scene*){
 	#ifdef ISC_TIMING
 		timingDeltas->start();
 	#endif
@@ -142,7 +142,7 @@ void InsertionSortCollider::action(Scene* scene){
 			}
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
-		assert(BB[0].size==2*scene->bodies->size());
+		assert((size_t)BB[0].size==2*scene->bodies->size());
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);

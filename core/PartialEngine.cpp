@@ -8,6 +8,6 @@
 
 #include "PartialEngine.hpp"
 
-void PartialEngine::action(Scene* b) {
-	this->applyCondition(b);
+void PartialEngine::action(Scene*) {
+	this->applyCondition(scene);
 }

@@ -15,14 +15,14 @@ void UniaxialStrainer::init(){
 	assert(posIds.size()>0);
 	assert(negIds.size()>0);
 	posCoords.clear(); negCoords.clear();
-	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); posCoords.push_back(b->state->pos[axis]);
+	FOREACH(body_id_t id,posIds){ const shared_ptr<Body>& b=Body::byId(id,scene); posCoords.push_back(b->state->pos[axis]);
 		if(blockDisplacements && blockRotations) b->isDynamic=false;
 		else{
 			if(!blockDisplacements) b->state->blockedDOFs=State::axisDOF(axis); else b->state->blockedDOFs=State::DOF_XYZ;
 			if(blockRotations) b->state->blockedDOFs|=State::DOF_RXRYRZ;
 		}
 	}
-	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,rootBody); negCoords.push_back(b->state->pos[axis]);
+	FOREACH(body_id_t id,negIds){ const shared_ptr<Body>& b=Body::byId(id,scene); negCoords.push_back(b->state->pos[axis]);
 		if(blockDisplacements && blockRotations) b->isDynamic=false;
 		else{
 			if(!blockDisplacements) b->state->blockedDOFs=State::axisDOF(axis); else b->state->blockedDOFs=State::DOF_XYZ;
@@ -69,7 +69,7 @@ void UniaxialStrainer::init(){
 		}
 		assert(p1>p0);
 		// set speeds for particles on the boundary
-		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 			// skip bodies on the boundary, since those will have their positions updated directly
 			if(std::find(posIds.begin(),posIds.end(),b->id)!=posIds.end() || std::find(negIds.begin(),negIds.end(),b->id)!=negIds.end()) { continue; }
 			Real p=axisCoord(b->id);
@@ -98,14 +98,13 @@ void UniaxialStrainer::init(){
 			LOG_INFO("Setting crossSectionArea="<<crossSectionArea<<", using axes #"<<axis2<<" and #"<<axis3<<".");
 		} else {
 			crossSectionArea=1.;
-			LOG_WARN("No Axis Aligned Bounding BoxModel for rootBody, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
+			LOG_WARN("No Axis Aligned Bounding BoxModel for scene, using garbage value ("<<crossSectionArea<<") for crossSectionArea!");
 		}
 	}
 	assert(crossSectionArea>0);
 }
 
-void UniaxialStrainer::action(Scene* _rootBody){
-	rootBody=_rootBody;
+void UniaxialStrainer::action(Scene*){
 	if(needsInit) init();
 	// postconditions for initParams
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size() && originalLength>0 && crossSectionArea>0);
@@ -126,7 +125,7 @@ void UniaxialStrainer::action(Scene* _rootBody){
 			dAX=originalLength*(stopStrain+1)-axialLength;
 			LOG_INFO("Reached stopStrain "<<stopStrain<<", deactivating self and stopping in "<<idleIterations+1<<" iterations.");
 			this->active=false;
-			rootBody->stopAtIteration=Omega::instance().getCurrentIteration()+1+idleIterations;
+			scene->stopAtIteration=Omega::instance().getCurrentIteration()+1+idleIterations;
 		}
 	}
 	if(asymmetry==0) dAX*=.5; // apply half on both sides if straining symetrically
@@ -158,7 +157,7 @@ void UniaxialStrainer::action(Scene* _rootBody){
 
 void UniaxialStrainer::computeAxialForce(){
 	sumPosForces=sumNegForces=0;
-	rootBody->forces.sync();
-	FOREACH(body_id_t id, negIds) sumNegForces+=rootBody->forces.getForce(id)[axis];
-	FOREACH(body_id_t id, posIds) sumPosForces-=rootBody->forces.getForce(id)[axis];
+	scene->forces.sync();
+	FOREACH(body_id_t id, negIds) sumNegForces+=scene->forces.getForce(id)[axis];
+	FOREACH(body_id_t id, posIds) sumPosForces-=scene->forces.getForce(id)[axis];
 }

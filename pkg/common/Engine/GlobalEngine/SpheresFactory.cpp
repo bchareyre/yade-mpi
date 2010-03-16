@@ -49,11 +49,11 @@ SpheresFactory::~SpheresFactory()
 	
 }
 
-void SpheresFactory::action(Scene* ncb)
+void SpheresFactory::action(Scene*)
 {
 	if (first_run)
 	{
-		FOREACH(shared_ptr<Engine> eng, ncb->engines)
+		FOREACH(shared_ptr<Engine> eng, scene->engines)
 		{
 			bI=dynamic_cast<Collider*>(eng.get());
 			if (bI) break;
@@ -63,7 +63,7 @@ void SpheresFactory::action(Scene* ncb)
 			LOG_FATAL("Can't find Collider." );
 			return;
 		}
-		iGME=dynamic_cast<InteractionGeometryDispatcher*>(ncb->engineByName("InteractionGeometryDispatcher").get());
+		iGME=dynamic_cast<InteractionGeometryDispatcher*>(scene->engineByName("InteractionGeometryDispatcher").get());
 		if (!iGME) 
 		{
 			LOG_FATAL("Can't find InteractionGeometryDispatcher." );
@@ -105,9 +105,9 @@ void SpheresFactory::action(Scene* ncb)
 		}
 		else
 		{
-			ncb->bodies->insert(sphere);
+			scene->bodies->insert(sphere);
 		}
-		//bI->action(ncb);
+		//bI->action(scene);
 		return;
 	}
 	LOG_WARN("Can't placing sphere during " << maxAttempts << " attemps.");

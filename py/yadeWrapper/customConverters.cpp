@@ -33,6 +33,7 @@
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
+#include<yade/pkg-common/Callbacks.hpp>
 
 
 
@@ -141,15 +142,25 @@ BOOST_PYTHON_MODULE(_customConverters){
 	// StrArrayMap (typedef for std::map<std::string,numpy_boost>) → python dictionary
 	//custom_StrArrayMap_to_dict();
 	// register from-python converter and to-python converter
-	custom_vector_from_seq<int>(); to_python_converter<std::vector<int>, custom_vector_to_list<int> >();
-	custom_vector_from_seq<Real>(); to_python_converter<std::vector<Real>, custom_vector_to_list<Real> >();
-	custom_vector_from_seq<Se3r>(); to_python_converter<std::vector<Se3r>, custom_vector_to_list<Se3r> >();
-	custom_vector_from_seq<Vector3r>(); to_python_converter<std::vector<Vector3r>, custom_vector_to_list<Vector3r> >();
-	custom_vector_from_seq<std::string>(); to_python_converter<std::vector<std::string>, custom_vector_to_list<std::string> >();
-	custom_vector_from_seq<shared_ptr<Body> >(); to_python_converter<std::vector<shared_ptr<Body> >, custom_vector_to_list<shared_ptr<Body> > >();
-	custom_vector_from_seq<shared_ptr<Engine> >(); to_python_converter<std::vector<shared_ptr<Engine> >, custom_vector_to_list<shared_ptr<Engine> > >();
-	custom_vector_from_seq<shared_ptr<Material> >(); to_python_converter<std::vector<shared_ptr<Material> >, custom_vector_to_list<shared_ptr<Material> > >();
-	custom_vector_from_seq<shared_ptr<Serializable> >(); to_python_converter<std::vector<shared_ptr<Serializable> >, custom_vector_to_list<shared_ptr<Serializable> > >();
+
+	// register 2-way conversion between c++ vector and python homogeneous sequence (list/tuple) of corresponding type
+	#define VECTOR_SEQ_CONV(Type) custom_vector_from_seq<Type>(); to_python_converter<std::vector<Type>, custom_vector_to_list<Type> >();
+		VECTOR_SEQ_CONV(int);
+		VECTOR_SEQ_CONV(Real);
+		VECTOR_SEQ_CONV(Se3r);
+		VECTOR_SEQ_CONV(Vector3r);
+		VECTOR_SEQ_CONV(std::string);
+		VECTOR_SEQ_CONV(shared_ptr<Body>);
+		VECTOR_SEQ_CONV(shared_ptr<Engine>);
+		VECTOR_SEQ_CONV(shared_ptr<Material>);
+		VECTOR_SEQ_CONV(shared_ptr<Serializable>);
+		VECTOR_SEQ_CONV(shared_ptr<BoundFunctor>);
+		VECTOR_SEQ_CONV(shared_ptr<InteractionGeometryFunctor>);
+		VECTOR_SEQ_CONV(shared_ptr<InteractionPhysicsFunctor>);
+		VECTOR_SEQ_CONV(shared_ptr<LawFunctor>);
+		VECTOR_SEQ_CONV(shared_ptr<IntrCallback>);
+		VECTOR_SEQ_CONV(shared_ptr<BodyCallback>);
+	#undef VECTOR_SEQ_CONV
 
 	import_array();
 	to_python_converter<numpy_boost<Real,1>, custom_numpyBoost_to_py<Real,1> >();
@@ -157,13 +168,6 @@ BOOST_PYTHON_MODULE(_customConverters){
 	to_python_converter<numpy_boost<int,1>, custom_numpyBoost_to_py<int,1> >();
 	to_python_converter<numpy_boost<int,2>, custom_numpyBoost_to_py<int,2> >();
 
-
-  #define VECTOR_ENGINE_UNIT(ENGINE_UNIT) custom_vector_from_seq<shared_ptr<ENGINE_UNIT> >(); to_python_converter<std::vector<shared_ptr<ENGINE_UNIT> >,custom_vector_to_list<shared_ptr<ENGINE_UNIT> > >();
-		VECTOR_ENGINE_UNIT(BoundFunctor)
-		VECTOR_ENGINE_UNIT(InteractionGeometryFunctor)
-		VECTOR_ENGINE_UNIT(InteractionPhysicsFunctor)
-		VECTOR_ENGINE_UNIT(LawFunctor)
-	#undef VECTOR_ENGINE_UNIT
 }
 
 

@@ -34,9 +34,9 @@ void CapillaryRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryRecorder::isActivated(Scene* rootBody)
+bool CapillaryRecorder::isActivated(Scene*)
 {
-	return ((rootBody->currentIteration % interval == 0) && (ofile));
+	return ((scene->currentIteration % interval == 0) && (ofile));
 }
 
 

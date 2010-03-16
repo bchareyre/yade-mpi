@@ -13,14 +13,14 @@
 
 YADE_PLUGIN((SpatialQuickSortCollider));
 
-void SpatialQuickSortCollider::action(Scene* ncb)
+void SpatialQuickSortCollider::action(Scene*)
 {
-	if(ncb->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }
-	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	if(scene->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }
+	const shared_ptr<BodyContainer>& bodies = scene->bodies;
 
 	// This collider traverses all interactions at every step, therefore all interactions
 	// that were requested for erase might be erased here and will be recreated if necessary.
-	ncb->interactions->unconditionalErasePending();
+	scene->interactions->unconditionalErasePending();
 
 	size_t nbElements=bodies->size();
 	if (nbElements!=rank.size())
@@ -47,8 +47,8 @@ void SpatialQuickSortCollider::action(Scene* ncb)
 		i++;
 	}
 	
-	const shared_ptr<InteractionContainer>& interactions=ncb->interactions;
-	ncb->interactions->iterColliderLastRun=ncb->currentIteration;
+	const shared_ptr<InteractionContainer>& interactions=scene->interactions;
+	scene->interactions->iterColliderLastRun=scene->currentIteration;
 
 	sort(rank.begin(), rank.end(), xBoundComparator()); // sotring along X
 
@@ -74,7 +74,7 @@ void SpatialQuickSortCollider::action(Scene* ncb)
 					interaction = shared_ptr<Interaction>(new Interaction(id,id2) );
 					interactions->insert(interaction);
 				}
-				interaction->iterLastSeen=ncb->currentIteration; 
+				interaction->iterLastSeen=scene->currentIteration; 
 			}
 	    }
 	}

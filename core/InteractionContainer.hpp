@@ -86,6 +86,9 @@ class InteractionContainer : public Serializable
 {
 	public :
 		boost::mutex	drawloopmutex;
+		// iteration number when the collider was last run;
+		// set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionDispatchers (such as SpatialQuickSortCollider)
+		// other colliders (such as InsertionSortCollider) set it it -1, which is the default
 		long iterColliderLastRun;
 
 		InteractionContainer(): iterColliderLastRun(-1), serializeSorted(false) {

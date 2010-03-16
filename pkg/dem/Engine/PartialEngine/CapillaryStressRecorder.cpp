@@ -52,18 +52,18 @@ void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryStressRecorder::isActivated(Scene* rootBody)
+bool CapillaryStressRecorder::isActivated(Scene*)
 {
-	return ((rootBody->currentIteration % interval == 0) && (ofile));
+	return ((scene->currentIteration % interval == 0) && (ofile));
 }
 
 
-void CapillaryStressRecorder::action(Scene * ncb)
+void CapillaryStressRecorder::action(Scene*)
 {
 	if ( !triaxialCompressionEngine )
 	{
-		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 		for ( ;itFirst!=itLast; ++itFirst )
 		{
 			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine")
@@ -76,17 +76,17 @@ void CapillaryStressRecorder::action(Scene * ncb)
 		}
 		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
 	}
-// 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 )) triaxialCompressionEngine->computeStressStrain ( ncb );	
+// 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 )) triaxialCompressionEngine->computeStressStrain ( scene );	
 
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 		
 	Real f1_cap_x=0, f1_cap_y=0, f1_cap_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
 	
 	Real sig11_cap=0, sig22_cap=0, sig33_cap=0, sig12_cap=0, sig13_cap=0,
 	sig23_cap=0, Vwater = 0, CapillaryPressure = 0;
 	
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-        InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+        InteractionContainer::iterator iiEnd = scene->interactions->end();
         
         int j = 0;
         

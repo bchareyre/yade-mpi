@@ -24,7 +24,7 @@ PositionOrientationRecorder::PositionOrientationRecorder() {
 	iterPeriod=50;
 }
 
-void PositionOrientationRecorder::action(Scene * ncb){
+void PositionOrientationRecorder::action(Scene*){
 	ostringstream oss;
 	oss<<setfill('0')<<outputFile<<"_"<<setw(7)<<Omega::instance().getCurrentIteration();
 	string fileBase=oss.str();
@@ -37,8 +37,8 @@ void PositionOrientationRecorder::action(Scene * ncb){
 	if(!ofile.good()){ LOG_ERROR("Snapshot "<<fileBase<<".bz2 could not be opened for writing (skipping)!"); return; }
 	if(saveRgb && !rgbFile.good()){ LOG_ERROR("Snapshot "<<fileBase<<".rgb.bz2 could not be opened for writing (skipping)!"); return; }
 	LOG_INFO("Snapshot "<<fileBase<<".bz2"<<(saveRgb?" (+rgb)":""));
-	BodyContainer::iterator biEnd = ncb->bodies->end();
-	for(BodyContainer::iterator bi    = ncb->bodies->begin(); bi!=biEnd; ++bi){
+	BodyContainer::iterator biEnd = scene->bodies->end();
+	for(BodyContainer::iterator bi    = scene->bodies->begin(); bi!=biEnd; ++bi){
 		const Se3r& se3=(*bi)->state->se3;
 		ofile<<se3.position[0]<<" "<<se3.position[1]<<" "<<se3.position[2]<<" "<<se3.orientation[0]<<" "<<se3.orientation[1]<<" "<<se3.orientation[2]<<" "<<se3.orientation[3]<<endl;
 		if(saveRgb && (*bi)->shape) {

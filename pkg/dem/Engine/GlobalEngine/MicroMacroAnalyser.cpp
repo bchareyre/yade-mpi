@@ -51,7 +51,7 @@ void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 	}
 }
 
-void MicroMacroAnalyser::action(Scene* scene)
+void MicroMacroAnalyser::action(Scene*)
 {
 	//cerr << "MicroMacroAnalyser::action(Scene* scene) (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
 	if (!triaxialCompressionEngine) {

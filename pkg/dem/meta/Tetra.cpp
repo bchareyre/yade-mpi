@@ -361,9 +361,9 @@ CREATE_LOGGER(TetraVolumetricLaw);
  *
  * DO NOT USE, probably doesn't work.
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
-void TetraVolumetricLaw::action(Scene* rootBody)
+void TetraVolumetricLaw::action(Scene*)
 {
-	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use interactionPhysics at all
 		if (!I->interactionGeometry) continue; // Ig2_Tetra_Tetra_TTetraGeom::go returned false for this interaction, skip it
 		const shared_ptr<TTetraGeom>& contactGeom(dynamic_pointer_cast<TTetraGeom>(I->interactionGeometry));
@@ -392,10 +392,10 @@ void TetraVolumetricLaw::action(Scene* rootBody)
 		TRWM3VEC(F);
 		TRWM3VEC((A->state->pos-contactGeom->contactPoint).Cross(F));
 
-		rootBody->forces.addForce (idA,-F);
-		rootBody->forces.addForce (idB, F);
-		rootBody->forces.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).Cross(F));
-		rootBody->forces.addTorque(idB, (B->state->pos-contactGeom->contactPoint).Cross(F));
+		scene->forces.addForce (idA,-F);
+		scene->forces.addForce (idB, F);
+		scene->forces.addTorque(idA,-(A->state->pos-contactGeom->contactPoint).Cross(F));
+		scene->forces.addTorque(idB, (B->state->pos-contactGeom->contactPoint).Cross(F));
 	}
 }
 

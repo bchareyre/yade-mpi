@@ -17,4 +17,4 @@
 #include<yade/core/Shape.hpp>
 #include<yade/core/State.hpp>
 #include<yade/core/TimeStepper.hpp>
-YADE_PLUGIN((Body)(Bound)(Cell)(Collider)(Dispatcher)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(InteractionGeometry)(InteractionPhysics)(Material)(PartialEngine)(Shape)(State)(TimeStepper));
+YADE_PLUGIN((Body)(Bound)(Cell)(Collider)(Dispatcher)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(InteractionGeometry)(InteractionPhysics)(IntrCallback)(Material)(PartialEngine)(Shape)(State)(TimeStepper));

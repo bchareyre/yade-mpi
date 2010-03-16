@@ -214,7 +214,7 @@ class pyForceContainer{
 		shared_ptr<Scene> scene;
 	public:
 		pyForceContainer(shared_ptr<Scene> _scene): scene(_scene) { }
-		void checkId(long id){ if(id<0 || id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* never reached */ throw; } }
+		void checkId(long id){ if(id<0 || (size_t)id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); python::throw_error_already_set(); /* never reached */ throw; } }
 		Vector3r force_get(long id){  checkId(id); scene->forces.sync(); return scene->forces.getForce(id); }
 		Vector3r torque_get(long id){ checkId(id); scene->forces.sync(); return scene->forces.getTorque(id); }
 		Vector3r move_get(long id){   checkId(id); scene->forces.sync(); return scene->forces.getMove(id); }
@@ -477,14 +477,11 @@ class pyOmega{
 		oa << BOOST_SERIALIZATION_NVP(scene);
 	}
 	void loadXML(string filename){
-#if 0
 		std::ifstream ifs(filename.c_str());
 		boost::archive::xml_iarchive ia(ifs);
-		Scene* s(new Scene);
-		ia >> *s;
-		shared_ptr<Scene> s2(s);
+		shared_ptr<Scene> scene(new Scene);
+		ia >> BOOST_SERIALIZATION_NVP(scene); // this might work…
 		OMEGA.setScene(s2);
-#endif
 		throw runtime_error("Not yet implemented");
 	}
 	#endif

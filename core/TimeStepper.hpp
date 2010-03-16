@@ -19,7 +19,7 @@ class TimeStepper: public GlobalEngine{
 	public:
 		virtual void computeTimeStep(Scene* ) { throw; };
 		virtual bool isActivated(Scene*);
-		virtual void action(Scene* b) { computeTimeStep(b);} ;
+		virtual void action(Scene*) { computeTimeStep(scene);} ;
 		void setActive(bool a, int nb=-1);
 		
 		YADE_CLASS_BASE_DOC_ATTRS(

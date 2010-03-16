@@ -75,6 +75,16 @@ void NewtonIntegrator::action(Scene*)
 	haveBins=(bool)velocityBins;
 	if(haveBins) velocityBins->binVelSqInitialize(maxVelocitySq);
 
+	// setup callbacks
+	vector<BodyCallback::FuncPtr> callbackPtrs;
+	FOREACH(const shared_ptr<BodyCallback> cb, callbacks){
+		cb->scene=scene;
+		callbackPtrs.push_back(cb->stepInit());
+	}
+	assert(callbackPtrs.size()==callbacks.size());
+	size_t callbacksSize=callbacks.size();
+
+
 	#ifdef YADE_OPENMP
 		FOREACH(Real& thrMaxVSq, threadMaxVelocitySq) { thrMaxVSq=0; }
 		const BodyContainer& bodies=*(scene->bodies.get());
@@ -150,6 +160,11 @@ void NewtonIntegrator::action(Scene*)
 				static_cast<Clump*>(b.get())->moveMembers();
 			}
 			saveMaximaVelocity(scene,id,state);
+
+			// process callbacks
+			for(size_t i=0; i<callbacksSize; i++){
+				if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),b.get());
+			}
 	}
 	#ifdef YADE_OPENMP
 		FOREACH(const Real& thrMaxVSq, threadMaxVelocitySq) { maxVelocitySq=max(maxVelocitySq,thrMaxVSq); }

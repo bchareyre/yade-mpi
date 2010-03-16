@@ -18,10 +18,9 @@
  */
 class UniaxialStrainer: public GlobalEngine {
 	private:
-		Scene* rootBody;
 		bool needsInit;
 		void computeAxialForce();
-		Real& axisCoord(body_id_t id){ return Body::byId(id,rootBody)->state->pos[axis]; };
+		Real& axisCoord(body_id_t id){ return Body::byId(id,scene)->state->pos[axis]; };
 		void init();
 	public:
 		virtual bool isActivated(Scene*){return active;}

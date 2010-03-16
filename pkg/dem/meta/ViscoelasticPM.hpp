@@ -16,7 +16,7 @@
 class SimpleViscoelasticMat : public Material {	
 	public:
 		virtual ~SimpleViscoelasticMat();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SimpleViscoelasticMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<SimpleViscoelasticMat::kn>, :yref:`cn<SimpleViscoelasticMat::cn>`,  :yref:`ks<SimpleViscoelasticMat::ks>`,  :yref:`cs<SimpleViscoelasticMat::cs>` from analytical solution of a pair spheres interaction problem.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SimpleViscoelasticMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<SimpleViscoelasticMat::kn>`, :yref:`cn<SimpleViscoelasticMat::cn>`,  :yref:`ks<SimpleViscoelasticMat::ks>`,  :yref:`cs<SimpleViscoelasticMat::cs>` from analytical solution of a pair spheres interaction problem.",
 		((Real,kn,NaN,"Normal elastic stiffness"))
 		((Real,cn,NaN,"Normal viscous constant"))
 		((Real,ks,NaN,"Shear elastic stiffness"))

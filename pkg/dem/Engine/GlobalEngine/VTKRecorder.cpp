@@ -22,7 +22,7 @@ YADE_PLUGIN((VTKRecorder));
 YADE_REQUIRE_FEATURE(VTK)
 CREATE_LOGGER(VTKRecorder);
 
-void VTKRecorder::action(Scene* rootBody)
+void VTKRecorder::action(Scene*)
 {
 	vector<bool> recActive(REC_SENTINEL,false);
 	FOREACH(string& rec, recorders){
@@ -79,7 +79,7 @@ void VTKRecorder::action(Scene* rootBody)
 	intrAbsForceT->SetName("absForceT");
 
 	// extras for CPM
-	if(recActive[REC_CPM]) { CpmStateUpdater csu; csu.update(rootBody); }
+	if(recActive[REC_CPM]) { CpmStateUpdater csu; csu.update(scene); }
 	vtkSmartPointer<vtkFloatArray> cpmDamage = vtkSmartPointer<vtkFloatArray>::New();
 	cpmDamage->SetNumberOfComponents(1);
 	cpmDamage->SetName("cpmDamage");
@@ -95,11 +95,11 @@ void VTKRecorder::action(Scene* rootBody)
 
 	if(recActive[REC_INTR]){
 		// save body positions, referenced by ids by vtkLine
-		FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 			const Vector3r& pos=b->state->pos;
 			intrBodyPos->InsertNextPoint(pos[0],pos[1],pos[2]);
 		}
-		FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			if(!I->isReal()) continue;
 			if(skipFacetIntr){
 				if(!(dynamic_cast<Sphere*>(Body::byId(I->getId1())->shape.get()))) continue;
@@ -124,7 +124,7 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 	}
 
-	FOREACH(const shared_ptr<Body>& b, *rootBody->bodies){
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 
 		if (recActive[REC_SPHERES])
@@ -222,7 +222,7 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
-		string fn=fileName+"spheres."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
+		string fn=fileName+"spheres."+lexical_cast<string>(scene->currentIteration)+".vtu";
 		writer->SetFileName(fn.c_str());
 		writer->SetInput(spheresUg);
 		writer->Write();	
@@ -235,7 +235,7 @@ void VTKRecorder::action(Scene* rootBody)
 		if (recActive[REC_COLORS]) facetsUg->GetCellData()->AddArray(facetsColors);
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
-		string fn=fileName+"facets."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
+		string fn=fileName+"facets."+lexical_cast<string>(scene->currentIteration)+".vtu";
 		writer->SetFileName(fn.c_str());
 		writer->SetInput(facetsUg);
 		writer->Write();	
@@ -251,7 +251,7 @@ void VTKRecorder::action(Scene* rootBody)
 		}
 		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		if(compress) writer->SetCompressor(compressor);
-		string fn=fileName+"intrs."+lexical_cast<string>(rootBody->currentIteration)+".vtu";
+		string fn=fileName+"intrs."+lexical_cast<string>(scene->currentIteration)+".vtu";
 		writer->SetFileName(fn.c_str());
 		writer->SetInput(intrUg);
 		writer->Write();	
@@ -261,7 +261,7 @@ void VTKRecorder::action(Scene* rootBody)
 	//multiblockDataset->SetBlock(0, spheresUg );
 	//multiblockDataset->SetBlock(1, facetsUg );
 	//vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer = vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
-	//string fn=fileName+lexical_cast<string>(rootBody->currentIteration)+".vtm";
+	//string fn=fileName+lexical_cast<string>(scene->currentIteration)+".vtm";
 	//writer->SetFileName(fn.c_str());
 	//writer->SetInput(multiblockDataset);
 	//writer->Write();	

@@ -3,11 +3,11 @@
 YADE_PLUGIN((ForceRecorder));
 CREATE_LOGGER(ForceRecorder);
 
-void ForceRecorder::action(Scene * ncb){
+void ForceRecorder::action(Scene*){
 	totalForce=Vector3r::ZERO;
 	FOREACH(body_id_t id, subscribedBodies){
-		assert(ncb->bodies->exists(id)); 
-		totalForce+=ncb->forces.getForce(id);
+		assert(scene->bodies->exists(id)); 
+		totalForce+=scene->forces.getForce(id);
 	};
 	
 	//Save data to a file

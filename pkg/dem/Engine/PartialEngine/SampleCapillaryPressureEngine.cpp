@@ -50,12 +50,12 @@ SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 }
 
 
-void SampleCapillaryPressureEngine::updateParameters(Scene * ncb)
+void SampleCapillaryPressureEngine::updateParameters(Scene * scene)
 {
 	//cerr << "updateParameters" << endl;
-// 	Scene * ncb = static_cast<Scene*>(body);
+// 	Scene * scene = static_cast<Scene*>(body);
 
-	UnbalancedForce = ComputeUnbalancedForce(ncb);
+	UnbalancedForce = ComputeUnbalancedForce(scene);
 
 	if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 
@@ -68,7 +68,7 @@ void SampleCapillaryPressureEngine::updateParameters(Scene * ncb)
 	if ( Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated)
 	
 	{
-		Real S = meanStress; // revoir ici comment acceder à computeStress(ncb);
+		Real S = meanStress; // revoir ici comment acceder à computeStress(scene);
 		//abs ( (meanStress-sigma_iso ) /sigma_iso ) <0.005
 
 		cerr << "Smoy = " << meanStress << endl;
@@ -82,7 +82,7 @@ void SampleCapillaryPressureEngine::updateParameters(Scene * ncb)
 			cerr << "saving snapshot: " << fileName << " ...";
 			Omega::instance().saveSimulation(fileName);
 			
-			//recordStructure(ncb, Omega::instance().getCurrentIteration());
+			//recordStructure(scene, Omega::instance().getCurrentIteration());
 
 			pressureVariationActivated = true;
 		}
@@ -98,21 +98,21 @@ void SampleCapillaryPressureEngine::updateParameters(Scene * ncb)
 	//cerr << "fin updateParameters" << endl;
 }
 	
-void SampleCapillaryPressureEngine::applyCondition(Scene * ncb)
+void SampleCapillaryPressureEngine::applyCondition(Scene*)
 {	
 	//cerr << "applyConditionSampleCapillaryPressure" << endl;
-// 	Scene* ncb = static_cast<Scene*>(body);
+// 	Scene* scene = static_cast<Scene*>(body);
 
-	updateParameters(ncb);
+	updateParameters(scene);
 	
-	TriaxialStressController::applyCondition(ncb);
+	TriaxialStressController::applyCondition(scene);
 
 	//cerr << "1" << endl;
 
 		if (pressureVariationActivated)
 		
 		{
-			//if ((Omega::instance().getCurrentIteration()) % pressureIntervalRec == 0) recordStructure(ncb, Omega::instance().getCurrentIteration());
+			//if ((Omega::instance().getCurrentIteration()) % pressureIntervalRec == 0) recordStructure(scene, Omega::instance().getCurrentIteration());
 
 			if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "pressure variation!!" << endl;
 		
@@ -131,10 +131,10 @@ void SampleCapillaryPressureEngine::applyCondition(Scene * ncb)
 		if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "capillary pressure = " << Pressure << endl;
 		
 		//cerr << "3" << endl;
-		capillaryCohesiveLaw->action(ncb);
+		capillaryCohesiveLaw->action(scene);
 		//cerr << "4" << endl;	
 		
-		UnbalancedForce = ComputeUnbalancedForce(ncb);
+		UnbalancedForce = ComputeUnbalancedForce(scene);
 } 
 
 //YADE_REQUIRE_FEATURE(PHYSPAR);

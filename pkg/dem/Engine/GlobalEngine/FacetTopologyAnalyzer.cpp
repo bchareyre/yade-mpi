@@ -6,17 +6,17 @@
 CREATE_LOGGER(FacetTopologyAnalyzer);
 YADE_PLUGIN((FacetTopologyAnalyzer));
 #ifndef FACET_TOPO
-void FacetTopologyAnalyzer::action(Scene* rb){
+void FacetTopologyAnalyzer::action(Scene*){
 	throw runtime_error("FACET_TOPO was not enabled in Facet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.");
 }
 #else
-void FacetTopologyAnalyzer::action(Scene* rb){
+void FacetTopologyAnalyzer::action(Scene*){
 	commonEdgesFound=0;
 	LOG_DEBUG("Projection axis for analysis is "<<projectionAxis);
 	vector<shared_ptr<VertexData> > vv;
 	// minimum facet edge length (tolerance scale)
 	Real minSqLen=numeric_limits<Real>::infinity();
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		shared_ptr<Facet> f=dynamic_pointer_cast<Facet>(b->shape);
 		if(!f) continue;
 		const Vector3r& pos=b->state->pos;
@@ -62,7 +62,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 	LOG_DEBUG("Found "<<maxVertexId<<" unique vertices.");
 	commonVerticesFound=maxVertexId;
 	// add FacetTopology for all facets; index within the topo array is the body id
-	vector<shared_ptr<FacetTopology> > topo(rb->bodies->size()); // initialized with the default ctor
+	vector<shared_ptr<FacetTopology> > topo(scene->bodies->size()); // initialized with the default ctor
 	FOREACH(shared_ptr<VertexData>& v, vv){
 		if(!topo[v->id]) topo[v->id]=shared_ptr<FacetTopology>(new FacetTopology(v->id));
 		topo[v->id]->vertices[v->vertexNo]=v->vertexId;
@@ -115,7 +115,7 @@ void FacetTopologyAnalyzer::action(Scene* rb){
 				}
 			}
 			// add adjacency information to the facet itself
-			Facet *f1=YADE_CAST<Facet*>((*rb->bodies)[ti->id]->shape.get()), *f2=YADE_CAST<Facet*>((*rb->bodies)[tj->id]->shape.get());
+			Facet *f1=YADE_CAST<Facet*>((*scene->bodies)[ti->id]->shape.get()), *f2=YADE_CAST<Facet*>((*scene->bodies)[tj->id]->shape.get());
 			f1->edgeAdjIds[ei]=ti->id; f2->edgeAdjIds[ej]=tj->id;
 			// normals are in the sense of vertex rotation (right-hand rule); therefore, if vertices of the adjacent edge are opposite on each facet, normals are in the same direction
 			bool invNormals=(ti->vertices[ei]==tj->vertices[ej]);

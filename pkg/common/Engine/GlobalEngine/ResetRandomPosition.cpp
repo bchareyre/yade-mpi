@@ -43,11 +43,11 @@ ResetRandomPosition::~ResetRandomPosition()
 	
 }
 
-void ResetRandomPosition::action(Scene* ncb)
+void ResetRandomPosition::action(Scene*)
 {
 	if (first_run)
 	{
-		FOREACH(shared_ptr<Engine> eng, ncb->engines)
+		FOREACH(shared_ptr<Engine> eng, scene->engines)
 		{
 			bI=dynamic_cast<Collider*>(eng.get());
 			if (bI) break;
@@ -57,10 +57,10 @@ void ResetRandomPosition::action(Scene* ncb)
 			LOG_FATAL("Can't find Collider." );
 			return;
 		}
-		iGME=dynamic_cast<InteractionGeometryDispatcher*>(ncb->engineByName("InteractionGeometryDispatcher").get());
+		iGME=dynamic_cast<InteractionGeometryDispatcher*>(scene->engineByName("InteractionGeometryDispatcher").get());
 		if (!iGME) 
 		{
-			InteractionDispatchers* iDsp=dynamic_cast<InteractionDispatchers*>(ncb->engineByName("InteractionDispatchers").get());
+			InteractionDispatchers* iDsp=dynamic_cast<InteractionDispatchers*>(scene->engineByName("InteractionDispatchers").get());
 			if (!iDsp)
 			{
 				LOG_FATAL("Can't find nor InteractionGeometryDispatcher nor InteractionDispatchers." );

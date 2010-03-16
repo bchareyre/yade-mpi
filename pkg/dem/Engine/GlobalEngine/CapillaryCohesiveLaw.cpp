@@ -78,27 +78,27 @@ MeniscusParameters::~MeniscusParameters()
 
 
 //FIXME : remove bool first !!!!!
-void CapillaryCohesiveLaw::action(Scene* ncb)
+void CapillaryCohesiveLaw::action(Scene*)
 {
 //	cerr << "capillaryLawAction" << endl;
         //compteur1 = 0;
         //compteur2 = 0;
         //cerr << "CapillaryCohesiveLaw::action" << endl;
 
-//         Scene * ncb = static_cast<Scene*>(body);
-        shared_ptr<BodyContainer>& bodies = ncb->bodies;
+//         Scene * scene = static_cast<Scene*>(body);
+        shared_ptr<BodyContainer>& bodies = scene->bodies;
 
         if (fusionDetection) {
                 if (!bodiesMenisciiList.initialized)
-                        bodiesMenisciiList.prepare(ncb);
+                        bodiesMenisciiList.prepare(scene);
                 //bodiesMenisciiList.display();
         }
 
 
         /// Non Permanents Links ///
 
-        InteractionContainer::iterator ii    = ncb->interactions->begin();
-        InteractionContainer::iterator iiEnd = ncb->interactions->end();
+        InteractionContainer::iterator ii    = scene->interactions->begin();
+        InteractionContainer::iterator iiEnd = scene->interactions->end();
 
         /// initialisation du volume avant calcul
         //Real Vtotal = 0;
@@ -214,7 +214,7 @@ void CapillaryCohesiveLaw::action(Scene* ncb)
                                         if (fusionDetection)
                                                 bodiesMenisciiList.remove((*ii));
                                         currentContactPhysics->meniscus = false;
-					ncb->interactions->requestErase(id1,id2);
+					scene->interactions->requestErase(id1,id2);
                                         //cerr <<"currentContactPhysics->meniscus = false;"<<endl;
                                 }
 
@@ -241,9 +241,9 @@ void CapillaryCohesiveLaw::action(Scene* ncb)
         }
 
         if (fusionDetection)
-                checkFusion(ncb);
+                checkFusion(scene);
 
-        for(ii= ncb->interactions->begin(); ii!=iiEnd ; ++ii ) 
+        for(ii= scene->interactions->begin(); ii!=iiEnd ; ++ii ) 
 	{	//cerr << "interaction " << ii << endl;
                 if ((*ii)->isReal()) 
 		{
@@ -265,8 +265,8 @@ void CapillaryCohesiveLaw::action(Scene* ncb)
 					else if (currentContactPhysics->fusionNumber !=0)
 						currentContactPhysics->Fcap /= (currentContactPhysics->fusionNumber+1);
                                 }
-											ncb->forces.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
-											ncb->forces.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
+											scene->forces.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
+											scene->forces.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
 
 				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
 
@@ -288,12 +288,12 @@ void capillarylaw::fill(const char* filename)
 
 }
 
-void CapillaryCohesiveLaw::checkFusion(Scene * ncb)
+void CapillaryCohesiveLaw::checkFusion(Scene * scene)
 {
 
 	//Reset fusion numbers
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-        InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+        InteractionContainer::iterator iiEnd = scene->interactions->end();
         for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->fusionNumber=0;
 	
 	
@@ -604,17 +604,17 @@ std::ostream& operator<<(std::ostream& os, Tableau& T)
         return os;
 }
 
-BodiesMenisciiList::BodiesMenisciiList(Scene * ncb)
+BodiesMenisciiList::BodiesMenisciiList(Scene * scene)
 {
 	initialized=false;
-	prepare(ncb);
+	prepare(scene);
 }
 
-bool BodiesMenisciiList::prepare(Scene * ncb)
+bool BodiesMenisciiList::prepare(Scene * scene)
 {
 	//cerr << "preparing bodiesInteractionsList" << endl;
 	interactionsOnBody.clear();
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	
 	body_id_t MaxId = -1;
 	BodyContainer::iterator bi    = bodies->begin();
@@ -629,8 +629,8 @@ bool BodiesMenisciiList::prepare(Scene * ncb)
 		interactionsOnBody[i].clear();
 	}
 	
-        InteractionContainer::iterator ii    = ncb->interactions->begin();
-        InteractionContainer::iterator iiEnd = ncb->interactions->end();
+        InteractionContainer::iterator ii    = scene->interactions->begin();
+        InteractionContainer::iterator iiEnd = scene->interactions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal()) {
                 	if (static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);

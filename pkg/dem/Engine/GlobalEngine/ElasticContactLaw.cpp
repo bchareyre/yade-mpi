@@ -17,7 +17,7 @@
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_Basic)(Law2_Dem3DofGeom_FrictPhys_Basic)(ElasticContactLaw)(Law2_Dem6DofGeom_FrictPhys_Beam));
 
 
-void ElasticContactLaw::action(Scene* rootBody)
+void ElasticContactLaw::action(Scene*)
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
 	functor->sdecGroupMask=sdecGroupMask;
@@ -25,13 +25,13 @@ void ElasticContactLaw::action(Scene* rootBody)
 		functor->useShear=useShear;
 	#endif
 	functor->neverErase=neverErase;
-	FOREACH(const shared_ptr<Interaction>& I, *rootBody->interactions){
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
 		#ifdef YADE_DEBUG
 			// these checks would be redundant in the functor (LawDispatcher does that already)
 			if(!dynamic_cast<ScGeom*>(I->interactionGeometry.get()) || !dynamic_cast<FrictPhys*>(I->interactionPhysics.get())) continue;	
 		#endif
-			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), rootBody);
+			functor->go(I->interactionGeometry, I->interactionPhysics, I.get(), scene);
 	}
 }
 

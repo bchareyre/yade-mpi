@@ -10,6 +10,7 @@
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/lib-base/Math.hpp>
+#include<yade/pkg-common/Callbacks.hpp>
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
@@ -69,7 +70,9 @@ class NewtonIntegrator : public GlobalEngine{
 		((Real,damping,0.2,"damping coefficient for Cundall's non viscous damping [-]"))
 		((Real,maxVelocitySq,NaN,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
 		((bool,exactAsphericalRot,false,"Enable of the exact aspherical body rotation integrator."))
-		((int,homotheticCellResize,((void)"disabled",0),"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled, 1: position update, 2: velocity update.")),
+		((int,homotheticCellResize,((void)"disabled",0),"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled, 1: position update, 2: velocity update."))
+		((vector<shared_ptr<BodyCallback> >,callbacks,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
+		,
 		/*ctor*/
 			prevCellSize=Vector3r::ZERO;
 			#ifdef YADE_OPENMP

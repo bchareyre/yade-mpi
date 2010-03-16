@@ -16,14 +16,14 @@
 Vector3r translation_vect (0.10,0,0);
 
 
-void NormalInelasticityLaw::action(Scene* ncb)
+void NormalInelasticityLaw::action(Scene*)
 {
-    shared_ptr<BodyContainer>& bodies = ncb->bodies;
+    shared_ptr<BodyContainer>& bodies = scene->bodies;
 
     Real dt = Omega::instance().getTimeStep();
 
-    InteractionContainer::iterator ii    = ncb->interactions->begin();
-    InteractionContainer::iterator iiEnd = ncb->interactions->end();
+    InteractionContainer::iterator ii    = scene->interactions->begin();
+    InteractionContainer::iterator iiEnd = scene->interactions->end();
 	int nbreInteracTot=0;
 	int nbreInteracMomPlastif=0;
     for (  ; ii!=iiEnd ; ++ii )
@@ -40,14 +40,14 @@ void NormalInelasticityLaw::action(Scene* ncb)
 			continue; // skip other groups,
 
 // 		CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
-		State* de1 = Body::byId(id1,ncb)->state.get();
-		State* de2 = Body::byId(id2,ncb)->state.get();
+		State* de1 = Body::byId(id1,scene)->state.get();
+		State* de2 = Body::byId(id2,scene)->state.get();
 		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
 		NormalInelasticityPhys* currentContactPhysics = YADE_CAST<NormalInelasticityPhys*> (contact->interactionPhysics.get());
 
 		Vector3r& shearForce 			= currentContactPhysics->shearForce;
 
-		if (contact->isFresh(ncb))
+		if (contact->isFresh(scene))
 			{
 			shearForce			= Vector3r::ZERO;
 			currentContactPhysics->previousun=0.0;
@@ -93,7 +93,7 @@ void NormalInelasticityLaw::action(Scene* ncb)
                 //currentContactPhysics->SetBreakingState();
 
 
-					 ncb->interactions->requestErase(contact->getId1(),contact->getId2());
+					 scene->interactions->requestErase(contact->getId1(),contact->getId2());
 					 // probably not useful anymore
                 currentContactPhysics->normalForce = Vector3r::ZERO;
                 currentContactPhysics->shearForce = Vector3r::ZERO;
@@ -191,10 +191,10 @@ void NormalInelasticityLaw::action(Scene* ncb)
                 //  cerr << "shearForce " << shearForce << endl;
                 // cerr << "f= " << f << endl;
                 // it will be some macro(	body->physicalActions,	ActionType , bodyId )
-					ncb->forces.addForce (id1,-f);
-					ncb->forces.addForce (id2,+f);
-					ncb->forces.addTorque(id1,-c1x.Cross(f));
-					ncb->forces.addTorque(id2, c2x.Cross(f));
+					scene->forces.addForce (id1,-f);
+					scene->forces.addForce (id2,+f);
+					scene->forces.addTorque(id1,-c1x.Cross(f));
+					scene->forces.addTorque(id2, c2x.Cross(f));
 
 /////	/// Moment law					 	 ///
 /////		if(momentRotationLaw /*&& currentContactPhysics->cohesionBroken == false*/ )
@@ -225,8 +225,8 @@ void NormalInelasticityLaw::action(Scene* ncb)
 /////
 /////	Vector3r moment = moment_twist + moment_bending;
 /////
-/////			static_cast<Momentum*>( ncb->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += moment;
-/////			static_cast<Momentum*>( ncb->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= moment;
+/////			static_cast<Momentum*>( scene->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += moment;
+/////			static_cast<Momentum*>( scene->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= moment;
 /////		}
 /////	/// Moment law	END				 	 ///
 
@@ -273,8 +273,8 @@ void NormalInelasticityLaw::action(Scene* ncb)
 					nbreInteracMomPlastif++;
 					}
 			}
-			ncb->forces.addTorque(id1,-moment);
-			ncb->forces.addTorque(id2,+moment);
+			scene->forces.addTorque(id1,-moment);
+			scene->forces.addTorque(id2,+moment);
 		}
 	/// Moment law	END				 	 ///
 
