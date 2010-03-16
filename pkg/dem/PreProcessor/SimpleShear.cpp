@@ -37,7 +37,7 @@
 
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-common/KinemCNDEngine.hpp>
+#include<yade/pkg-dem/KinemCNDEngine.hpp>
 
 
 #include<yade/pkg-common/InteractionGeometryDispatcher.hpp>

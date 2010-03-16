@@ -52,6 +52,7 @@ class KinemCNDEngine : public PartialEngine
 		string Key;
 
 	protected :
+// 		YADE_CLASS_BASE_DOCS_ATTRS(KinemCNDEngine,PartialEngine
 	REGISTER_ATTRIBUTES(PartialEngine,(shearSpeed)(gammalim)(gamma)(gamma_save)(temoin_save)(id_boxhaut)(id_boxleft)(id_boxright)(Key));
 	REGISTER_CLASS_NAME(KinemCNDEngine);
 	REGISTER_BASE_CLASS_NAME(PartialEngine);

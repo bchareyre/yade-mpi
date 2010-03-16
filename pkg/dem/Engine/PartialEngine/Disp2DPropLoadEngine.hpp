@@ -6,8 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef DIRECRESEARCHENGINE_HPP
-#define DIRECRESEARCHENGINE_HPP
+#pragma once
 
 #include<yade/core/Omega.hpp>
 #include<yade/core/PartialEngine.hpp>
@@ -78,6 +77,4 @@ class Disp2DPropLoadEngine : public PartialEngine
 };
 
 REGISTER_SERIALIZABLE(Disp2DPropLoadEngine);
-
-#endif
 
