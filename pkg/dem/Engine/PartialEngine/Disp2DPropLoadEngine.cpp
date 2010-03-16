@@ -9,28 +9,11 @@
 
 #include "Disp2DPropLoadEngine.hpp"
 #include<yade/core/State.hpp>
-#include<yade/pkg-common/Force.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/core/Scene.hpp>
-// #include<yade/lib-base/yadeWm3Extra.hpp>
 #include <yade/lib-miniWm3/Wm3Math.h>
 
 
-YADE_REQUIRE_FEATURE(PHYSPAR);
-
-Disp2DPropLoadEngine::Disp2DPropLoadEngine() : actionForce(new Force), leftbox(new Body), rightbox(new Body), frontbox(new Body), backbox(new Body), topbox(new Body), boxbas(new Body)
-{
-	firstIt=true;
-	v=0.0;
-	alpha=Mathr::PI/2.0;;
-	id_topbox=3;
-	id_boxbas=1;
-	id_boxleft=0;
-	id_boxright=2;
-	id_boxfront=5;
-	id_boxback=4;
-	Key="";
-}
 
 void Disp2DPropLoadEngine::postProcessAttributes(bool deserializing)
 {
@@ -39,26 +22,11 @@ void Disp2DPropLoadEngine::postProcessAttributes(bool deserializing)
 		std::string outputFile="DirSearch" + Key + "Yade";
 		bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
-		if (!file_exists) ofile<<"theta (!angle ds plan (gamma,-du) )dtau (kPa) dsigma (kPa) dgamma (m) du (m) tau0 (kPa) sigma0 (kPa) d2W coordSs0 coordTot0 coordSsF coordTotF (Yade)" << endl;
+		if (!file_exists) ofile<<"theta (!angle in plane (gamma,-du) ) dtau (kPa) dsigma (kPa) dgamma (m) du (m) tau0 (kPa) sigma0 (kPa) d2W coordSs0 coordTot0 coordSsF coordTotF (Yade)" << endl;
 	}
 }
 
 
-void Disp2DPropLoadEngine::registerAttributes()
-{
-	DeusExMachina::registerAttributes();
-	REGISTER_ATTRIBUTE(id_topbox);
-	REGISTER_ATTRIBUTE(id_boxbas);
-	REGISTER_ATTRIBUTE(id_boxleft);
-	REGISTER_ATTRIBUTE(id_boxright);
-	REGISTER_ATTRIBUTE(id_boxfront);
-	REGISTER_ATTRIBUTE(id_boxback);
-	REGISTER_ATTRIBUTE(v);
-	REGISTER_ATTRIBUTE(theta);
-	REGISTER_ATTRIBUTE(nbre_iter);
-	REGISTER_ATTRIBUTE(Key);
-	REGISTER_ATTRIBUTE(LOG);
-}
 
 
 void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
@@ -88,7 +56,7 @@ void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
 		InteractionContainer::iterator iiEnd = ncb->interactions->end();
         	for(  ; ii!=iiEnd ; ++ii ) 
         	{
-        		if ((*ii)->isReal)
+        		if ((*ii)->isReal())
                 	{
 				TotInt++;
 				const shared_ptr<Body>& b1 = Body::byId( (*ii)->getId1() );
@@ -119,7 +87,6 @@ void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
 
 void Disp2DPropLoadEngine::letDisturb(Scene* ncb)
 {
-// 	shared_ptr<BodyContainer> bodies = ncb->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
 	dgamma=cos(theta*Mathr::PI/180.0)*v*dt;
@@ -129,7 +96,6 @@ void Disp2DPropLoadEngine::letDisturb(Scene* ncb)
 	Real Ylat = leftbox->state->pos.Y();
 
 // 	Changes in vertical and horizontal position :
-
 	topbox->state->pos += Vector3r(dgamma,dh,0);
 
 	leftbox->state->pos += Vector3r(dgamma/2.0,dh/2.0,0);
@@ -163,13 +129,9 @@ void Disp2DPropLoadEngine::letDisturb(Scene* ncb)
 		cout << "Quaternion associe a la rotation incrementale : " << qcorr.W() << " " << qcorr.X() << " " << qcorr.Y() << " " << qcorr.Z() << endl;
 
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
-/*	rb = dynamic_cast<RigidBodyParameters*>(leftbox->physicalParameters.get());
-	rb->se3.orientation	= qcorr*rb->se3.orientation;*/
 	leftbox->state->ori = qcorr*leftbox->state->ori;
 	leftbox->state->angVel = Vector3r(0,0,1)*dalpha/dt;
 
-
-	rb = dynamic_cast<RigidBodyParameters*>(rightbox->physicalParameters.get());
 	rightbox->state->ori = qcorr*leftbox->state->ori;
 	rightbox->state->angVel = Vector3r(0,0,1)*dalpha/dt;
 
@@ -196,11 +158,9 @@ void Disp2DPropLoadEngine::computeAlpha()
 void Disp2DPropLoadEngine::stopMovement()
 {
 	// annulation de la vitesse de la plaque du haut
-// 	RigidBodyParameters * rb = YADE_CAST<RigidBodyParameters*>(topbox->physicalParameters.get());
 	topbox->state->vel	=  Vector3r(0,0,0);
 
 	// de la plaque gauche
-// 	rb = YADE_CAST<RigidBodyParameters*>(leftbox->physicalParameters.get());
 	leftbox->state->vel	=  Vector3r(0,0,0);
 	leftbox->state->angVel	=  Vector3r(0,0,0);
 
@@ -212,7 +172,7 @@ void Disp2DPropLoadEngine::stopMovement()
 
 void Disp2DPropLoadEngine::saveData(Scene* ncb)
 {
-	Real Xleft = leftbox->state->position.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
+	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
 
 	Real Xright = rightbox->state->pos.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
 
@@ -229,7 +189,7 @@ void Disp2DPropLoadEngine::saveData(Scene* ncb)
 		;
         for(  ; ii!=iiEnd ; ++ii ) 
         {
-        	if ((*ii)->isReal)
+        	if ((*ii)->isReal())
                 {
 			TotInt++;
 			const shared_ptr<Body>& b1 = Body::byId( (*ii)->getId1() );
@@ -242,7 +202,7 @@ void Disp2DPropLoadEngine::saveData(Scene* ncb)
 	Real	coordSs = OnlySsInt/8590,	// 8590 is the number of spheres in the CURRENT case
 		coordTot = TotInt / 8596;	// 8596 is the number of bodies in the CURRENT case
 
-	Vector3r& F_sup = ncb->forces.getForce(id_topbox);
+	Vector3r F_sup = ncb->forces.getForce(id_topbox);
 
 	Real	dFn=F_sup.Y()-Fn0	// OK pour le signe
 		,dFt=(F_sup.X()-Ft0)

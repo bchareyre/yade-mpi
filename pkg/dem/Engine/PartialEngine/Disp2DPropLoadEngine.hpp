@@ -15,22 +15,11 @@
 #include <Wm3Vector3.h>
 // #include<yade/lib-base/yadeWm3.hpp>
 
-/*! \brief To disturb a sample in a given direction (initial aim : directionnal research for d²w)
-
-The aim of this engine is to perform what is called a "directionnal research" over a sample. That is to say : considering a sample in a given state, disturbing it in all the directions (directions in the stresses plane for example)
-
-In fact this Engine disturbs in only one direction
-The control will be done in displacements in fact since it is much more easier
-Nota : not only the positions of walls are updated but also their speeds, which is all but useless considering the fact that in the contact laws these velocities of bodies are used to compute values of tangential relative displacements
-
-!!WARNING!! : But, because of this last point, if you want to use later saves of simulations executed with this Engine, but without that stopMovement was executed, your boxes will keep their speeds => you will have to cancel them "by hand" in the .xml
-*/
 
 
-class Disp2DPropLoadEngine : public DeusExMachina
+class Disp2DPropLoadEngine : public PartialEngine
 {
 	private :
-		shared_ptr<PhysicalAction> actionForce;
 		Real	dgamma	// the increment of horizontal displacement in one timestep, part of the disturbation
 			,dh	// the increment of vertical displacement in one timestep, part of the disturbation
 			,H0	// the height of the top box, at the beginnig of the application of the disturbation
@@ -61,38 +50,34 @@ class Disp2DPropLoadEngine : public DeusExMachina
 
 
 	public :
-		Disp2DPropLoadEngine();
 		void 	applyCondition(Scene* ncb)
 			,computeAlpha()
 			;
-
-		Real	v	// the speed at which the perturbation is imposed
-			,theta	// the angle, in a (gamma,h) plane from the gamma - axis to the perturbation vector (trigo wise), in degrees For example v = 0.3 - | (0.3-0.04)*sin(theta) | => 0.3 in shear; 0.04 in compression (for 18/11)
-			;
-
-		int	nbre_iter	// the number of iterations of disturbation to perform
-			;
-		bool LOG;		//controls messages output on screen
-
-		body_id_t 	id_topbox,	// the id of the upper wall : defined in the constructor
-				id_boxbas,	// the id of the lower wall : defined in the constructor
-				id_boxleft,
-				id_boxright,
-				id_boxfront,
-				id_boxback;
-		string 	Key
-			;
-		
-
-
-	protected :
 		virtual void postProcessAttributes(bool deserializing);
-		void registerAttributes();
-	REGISTER_CLASS_NAME(Disp2DPropLoadEngine);
-	REGISTER_BASE_CLASS_NAME(DeusExMachina);
+
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Disp2DPropLoadEngine,PartialEngine,
+		"Disturbs a simple shear sample in a given displacement direction \n \n This engine allows to apply, on a simple shear sample, a loading controlled by du/dgamma = cste, which is equivalent to du + cste' * dgamma = 0 (proportionnal path loadings).\n To do so, the upper plate of the simple shear box is moved in a given direction (corresponding to a given du/dgamma), whereas lateral plates are moved so that the box remains closed.\n This engine can easily be used to perform directionnal probes, with a python script launching successivly the same .xml which contains this engine, after having modified the direction of loading (see *theta* attribute). That's why this Engine contains a *saveData* procedure which can save data on the state of the sample at the end of the loading (in case of successive loadings - for successive directions - through a python script, each line would correspond to one direction of loading).",
+		((body_id_t,id_topbox,3,"the id of the upper wall"))
+		((body_id_t,id_boxbas,1,"the id of the lower wall"))
+		((body_id_t,id_boxleft,0,"the id of the left wall"))
+		((body_id_t,id_boxright,2,"the id of the right wall"))
+		((body_id_t,id_boxfront,5,"the id of the wall in front of the sample"))
+		((body_id_t,id_boxback,4,"the id of the wall at the back of the sample"))
+		((Real,theta,0.0,"the angle, in a (gamma,h=-u) plane from the gamma - axis to the perturbation vector (trigo wise) [degrees]"))
+		((Real,v,0.0,"the speed at which the perturbation is imposed. In case of samples which are more sensitive to normal loadings than tangential ones, one possibility is to take v = V_shear - | (V_shear-V_comp)*sin(theta) | => v=V_shear in shear; V_comp in compression [m/s]"))
+		((int,nbre_iter,0,"the number of iterations of loading to perform"))
+		((string,Key,"","string to add at the names of the saved files, and of the output file filled by *saveData*"))
+		((bool,LOG,false,"boolean controling the output of messages on the screen")),
+		firstIt=true;
+		alpha=Mathr::PI/2.0;
+	)
+
+
+
+
 };
 
-REGISTER_SERIALIZABLE(Disp2DPropLoadEngine,false);
+REGISTER_SERIALIZABLE(Disp2DPropLoadEngine);
 
-#endif // DIRECRESEARCHENGINE_HPP
+#endif
 
