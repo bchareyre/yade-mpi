@@ -12,25 +12,13 @@
 #include"KinemCNDEngine.hpp"
 
 
-KinemCNDEngine::KinemCNDEngine() : leftbox(new Body), rightbox(new Body), topbox(new Body)
-{
-	gamma_save.resize(0);
-	temoin_save.resize(0);
-	temoinfin=0;
-	shearSpeed=0;
-	gamma=0;
-	gammalim=0;
-	id_boxhaut=3;
-	id_boxleft=0;
-	id_boxright=2;
-}
 
 
 void KinemCNDEngine::applyCondition(Scene * ncb)
 {
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);
-	topbox = Body::byId(id_boxhaut);
+	topbox = Body::byId(id_topbox);
 
 	if( ((shearSpeed > 0) && (gamma<=gammalim)) || ((shearSpeed < 0) /*&& (gamma>=gammalim)*/ ) )
 	{
