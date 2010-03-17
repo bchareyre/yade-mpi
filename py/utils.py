@@ -237,7 +237,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	b.dynamic=dynamic
 	return b
 
-def facetBox(center,extents,orientation=Quaternion.IDENTITY,wallMask=63,**kw):
+def facetBox(center,extents,orientation=Quaternion().IDENTITY,wallMask=63,**kw):
 	"""
 	Create arbitrarily-aligned box composed of facets, with given center, extents and orientation.
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.

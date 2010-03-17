@@ -71,12 +71,12 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	//Vector3r _c1x_	=  geom->radius1*geom->normal;
 	//Vector3r _c2x_	= -geom->radius2*geom->normal;
 	//Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
-	Vector3r relativeVelocity = (de2.vel+de2.angVel.Cross(c2x)) - (de1.vel+de1.angVel.Cross(c1x));
+	Vector3r relativeVelocity = (de1.vel+de1.angVel.Cross(c1x)) - (de2.vel+de2.angVel.Cross(c2x)) ;
 	Real normalVelocity	= geom.normal.Dot(relativeVelocity);
 	Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
-	shearForce -= (phys.ks*dt+phys.cs)*shearVelocity;
+	shearForce = (phys.ks*dt+phys.cs)*shearVelocity;
 
-	phys.normalForce = ( phys.kn * geom.penetrationDepth - phys.cn * normalVelocity ) * geom.normal;
+	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;
 
 	Real maxFs = phys.normalForce.SquaredLength() * std::pow(phys.tangensOfFrictionAngle,2);
