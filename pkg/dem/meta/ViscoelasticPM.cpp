@@ -74,7 +74,7 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	Vector3r relativeVelocity = (de1.vel+de1.angVel.Cross(c1x)) - (de2.vel+de2.angVel.Cross(c2x)) ;
 	Real normalVelocity	= geom.normal.Dot(relativeVelocity);
 	Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
-	shearForce = (phys.ks*dt+phys.cs)*shearVelocity;
+	shearForce += (phys.ks*dt+phys.cs)*shearVelocity;
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;
