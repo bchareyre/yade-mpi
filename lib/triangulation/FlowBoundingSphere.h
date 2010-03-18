@@ -123,7 +123,7 @@ class FlowBoundingSphere
 		
 		void SliceField ( RTriangulation& Tri );
 
-		Tesselation& Interpolate ( Tesselation& Tes, Tesselation& NewTes );
+		void Interpolate ( Tesselation& Tes, Tesselation& NewTes );
 		
 		double volume_single_fictious_pore ( Vertex_handle SV1, Vertex_handle SV2, Vertex_handle SV3, Point PV1 );
 		//Fast version, assign surface of facet for future forces calculations (pointing from PV2 to PV1)

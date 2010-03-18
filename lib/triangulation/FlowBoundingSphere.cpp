@@ -44,7 +44,7 @@ const int permut3 [3][3] = {{0,1,2},{1,2,0},{2,0,1}};
 const int permut4 [4][4] = {{0,1,2,3},{1,2,3,0},{2,3,0,1},{3,0,1,2}};
 
 vector<double> Pressures;
-
+int vtk_infinite_vertices, vtk_infinite_cells;
 /*static*/
 Point Corner_min;
 /*static*/
@@ -271,7 +271,7 @@ void FlowBoundingSphere::Boundary_Conditions(RTriangulation& Tri)
         }
 }
 
-Tesselation& FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
+void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
 {
         Cell_handle old_cell;
 
@@ -285,7 +285,7 @@ Tesselation& FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewT
                 new_cell->info().p() = old_cell->info().p();
                 //    new_cell->info().dv() = old_cell->info().dv();
         }
-        return NewTes;
+//         return NewTes;
 }
 
 void FlowBoundingSphere::Localize()
@@ -343,7 +343,8 @@ void FlowBoundingSphere::Localize()
 
 void FlowBoundingSphere::Compute_Permeability()
 {
-        RTriangulation& Tri = T[currentTes].Triangulation();
+        cout << "----Computing_Permeability------" << endl;
+	RTriangulation& Tri = T[currentTes].Triangulation();
         Vsolid_tot = 0, Vtotalissimo = 0, Vporale = 0, Ssolid_tot = 0;
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 
@@ -431,6 +432,7 @@ void FlowBoundingSphere::Compute_Permeability()
                 cout<<grains<<"grains - " <<"Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << Vtotale-Vgrains << endl;
                 cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
         }
+	cout << "-----Computed_Permeability-----" << endl;
 }
 
 void FlowBoundingSphere::DisplayStatistics()
@@ -479,6 +481,9 @@ void FlowBoundingSphere::DisplayStatistics(RTriangulation& Tri)
         cout << "There are " << Inferior << " cells INFERIOR." << endl;
         cout << "There are " << Superior << " cells SUPERIOR." << endl;
         cout << "There are " << Fictious << " cells FICTIOUS." << endl;
+	
+	vtk_infinite_vertices = fict;
+	vtk_infinite_cells = Fictious;
 }
 
 void FlowBoundingSphere::ComputeTetrahedralForces()
@@ -733,7 +738,6 @@ void FlowBoundingSphere::Compute_Forces()
         // #else
         else {
                 Real fsurf = 0.5;//= 0.5/-0.5 for defining the direction of branch vector, "0.5" is for the average pressure
-                ///FIXME :all facets computed twice : the forces are x2, it needs a "visited" check before computing anything
                 for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                         for (int kk=0; kk<4;kk++) {  //Loop on facets -- Compute forces
                                 if (cell->neighbor(kk)->info().isvisited==ref) {
@@ -1515,7 +1519,7 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
         Finite_cells_iterator cell_end = Tri.finite_cells_end();
 	
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++)
-	{if (!cell->info().fictious()) cell->info().p() = P_zero;}
+	{cell->info().p() = P_zero;cell->info().dv()=0;}
 
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
@@ -1587,12 +1591,12 @@ void FlowBoundingSphere::GaussSeidel()
                 j++;
 
                 if (j % 1000 == 0) {
-                        cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
-                        cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
+//                         cout << "pmax " << p_max << "; pmoy : " << p_moy << "; dpmax : " << dp_max << endl;
+//                         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
                         //     save_vtk_file ( Tri );
                 }
-        } while (((dp_max/p_max) > tolerance) && ( dp_max > tolerance )/* &&*/ /*( j<50 )*/);
-        //   cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
+        } while (((dp_max/p_max) > tolerance) /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
+        cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
 
         //Display fluxes?
@@ -1696,31 +1700,38 @@ void FlowBoundingSphere::save_vtk_file(RTriangulation &T)
         char filename[80];
         sprintf(filename,"out_%d.vtk", number++);
 
-        basicVTKwritter vtkfile((unsigned int) T.number_of_vertices(), (unsigned int) T.number_of_finite_cells());
+        basicVTKwritter vtkfile((unsigned int) T.number_of_vertices()-vtk_infinite_vertices, (unsigned int) T.number_of_finite_cells()-vtk_infinite_cells);
+
         vtkfile.open(filename,"test");
 
         vtkfile.begin_vertices();
         double x,y,z;
         for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v) {
-                x = (double)(v->point().point()[0]);
+		if (!v->info().isFictious){
+		x = (double)(v->point().point()[0]);
                 y = (double)(v->point().point()[1]);
                 z = (double)(v->point().point()[2]);
-                vtkfile.write_point(x,y,z);
+                vtkfile.write_point(x,y,z);}
         }
         vtkfile.end_vertices();
-
+	
         vtkfile.begin_cells();
         for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
-                vtkfile.write_cell(cell->vertex(0)->info().id(), cell->vertex(1)->info().id(), cell->vertex(2)->info().id(), cell->vertex(3)->info().id());
+		if (cell->info().fictious()==0){vtkfile.write_cell(cell->vertex(0)->info().id()-6, cell->vertex(1)->info().id()-6, cell->vertex(2)->info().id()-6, cell->vertex(3)->info().id()-6);}
         }
         vtkfile.end_cells();
-        vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
+	
+	vtkfile.begin_data("Force",POINT_DATA,SCALARS,FLOAT);
+	for (Finite_vertices_iterator v = T.finite_vertices_begin(); v != T.finite_vertices_end(); ++v)
+	{if (!v->info().isFictious) vtkfile.write_data((v->info().forces)[1]);}
+	vtkfile.end_data();
 
-        for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
-                vtkfile.write_data(cell->info().p());
-        }
-        vtkfile.end_data();
+	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
 
+	for (Finite_cells_iterator cell = T.finite_cells_begin(); cell != T.finite_cells_end(); ++cell) {
+		if (cell->info().fictious()==0){vtkfile.write_data(cell->info().p());}
+	}
+	vtkfile.end_data();
 }
 
 void FlowBoundingSphere::MGPost(RTriangulation& Tri)
@@ -1861,7 +1872,7 @@ double FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min
 	double P_zero = abs((boundary(y_min_id).value-boundary(y_max_id).value)/2);
         Initialize_pressures( P_zero );
 
-        GaussSeidel();
+	GaussSeidel();
 
         char *kk;
         kk = (char*) key.c_str();

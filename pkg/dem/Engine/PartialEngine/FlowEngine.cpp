@@ -54,9 +54,11 @@ void FlowEngine::applyCondition ( Scene* ncb )
 			
 			///Compute flow and and forces here
 			
-				flow->GaussSeidel ( );
+				if (!first) flow->GaussSeidel ( );
 			
 				timingDeltas->checkpoint("Gauss-Seidel");
+				
+				if (save_vtk) flow->save_vtk_file(flow->T[flow->currentTes].Triangulation());
 			
 // 			flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
@@ -76,6 +78,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 					ncb->forces.addForce ( id, f );
 				//ncb->forces.addTorque(id,t);
 				}
+				
 				timingDeltas->checkpoint("Applying Forces");
 			
 				Real time = Omega::instance().getSimulationTime();
@@ -95,6 +98,8 @@ void FlowEngine::applyCondition ( Scene* ncb )
 				{ Update_Triangulation = true; }
 				
 				timingDeltas->checkpoint("Storing Max Pressure");
+				
+				first=false;
 				
 // 			}
 		}
@@ -126,14 +131,18 @@ void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
 		flow->Vtotalissimo=0; flow->Vsolid_tot=0; flow->Vporale=0; flow->Ssolid_tot=0;
 		flow->SLIP_ON_LATERALS=slip_boundary;
 		flow->key = triaxialCompressionEngine->Key;
-		flow->TOLERANCE=Tolerance;
+		flow->k_factor = permeability_factor;
 	}
-	else 
+	else
 	{
-		if (compute_K) {K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
+		if (compute_K) {flow->TOLERANCE=1e-09; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		flow->currentTes=!flow->currentTes;
+		cout << "--------RETRIANGULATION-----------" << endl;
 	}
-	currentTes=flow->currentTes;
+// 	currentTes=flow->currentTes;
+	flow->T[flow->currentTes].Clear();
+	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
 	AddBoundary ( ncb );
@@ -144,16 +153,16 @@ void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
 	
 	flow->Localize ();
 
-	flow->k_factor = permeability_factor;
 	flow->Compute_Permeability ();
 
 	if (first)
 	{
 		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) { K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		if (compute_K) {flow->TOLERANCE=1e-09; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		Oedometer_Boundary_Conditions();
-		first=!first;
+		flow->Initialize_pressures( P_zero );
+		flow->TOLERANCE=Tolerance;
 	}
 	else 
 	{
@@ -161,7 +170,6 @@ void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
 		Update_Triangulation=!Update_Triangulation;
 	}
 
-	flow->Initialize_pressures( P_zero );
 	Initialize_volumes ( ncb );
 	flow->DisplayStatistics ();
 }
