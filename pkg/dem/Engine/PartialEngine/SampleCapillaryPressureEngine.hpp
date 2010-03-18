@@ -48,7 +48,7 @@ class SampleCapillaryPressureEngine : public TriaxialStressController
 		//shared_ptr<CapillaryCohesiveLaw>  capillaryCohesiveLaw;
 		CapillaryCohesiveLaw* capillaryCohesiveLaw;
 			
-		virtual void applyCondition(Scene * ncb);
+		virtual void action(Scene * ncb);
 		void updateParameters(Scene * ncb);
 		
 	REGISTER_ATTRIBUTES(TriaxialStressController,(PressureVariation)(Pressure)(UnbalancedForce)(StabilityCriterion)(SigmaPrecision)(pressureVariationActivated)(fusionDetection)(binaryFusion)(pressureIntervalRec));

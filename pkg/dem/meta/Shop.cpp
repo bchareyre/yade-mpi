@@ -382,6 +382,18 @@ void Shop::saveSpheresToFile(string fname){
 	f.close();
 }
 
+Real Shop::getSpheresVolume(){
+	const shared_ptr<Scene>& rootBody=Omega::instance().getScene();
+	Real vol=0;
+	FOREACH(shared_ptr<Body> b, *rootBody->bodies){
+		if (!b->isDynamic) continue;
+		shared_ptr<Sphere> intSph=YADE_PTR_CAST<Sphere>(b->shape);
+		vol += 4.18879020*pow(intSph->radius,3);
+	}
+	return vol;
+}
+
+
 vector<pair<Vector3r,Real> > Shop::loadSpheresFromFile(string fname, Vector3r& minXYZ, Vector3r& maxXYZ){
 	if(!boost::filesystem::exists(fname)) {
 		throw std::invalid_argument(string("File with spheres `")+fname+"' doesn't exist.");

@@ -23,48 +23,43 @@ class CohesiveFrictionalRelationships;
 CREATE_LOGGER(TriaxialCompressionEngine);
 YADE_PLUGIN((TriaxialCompressionEngine));
 
-TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(strain[1])
-{
-	translationAxis=TriaxialStressController::normal[wall_bottom_id];
-	translationAxisx=Vector3r(1,0,0);
-	translationAxisz=Vector3r(0,0,1);
-	strainRate=0;
-	currentStrainRate=0;
-	StabilityCriterion=0.001;
-	//Phase1=false;
-	currentState=STATE_UNINITIALIZED;
-	previousState=currentState;
-	UnbalancedForce = 1;
-	Key = "";
-	noFiles=false;
-	Phase1End = "Compacted";
-	FinalIterationPhase1 = 0;
-	Iteration = 0;
-	testEquilibriumInterval = 20;
-
-	autoUnload=true;
-	autoCompressionActivation=true;
-	autoStopSimulation=true;
-
-	UnbalancedForce = 1;
-	saveSimulation = false;
-	firstRun=true;
-	previousSigmaIso=sigma_iso;
-	frictionAngleDegree = -1;
-	epsilonMax = 0.5;
-
-	isotropicCompaction=false;
- 	boxVolume=0;
-	maxStress =0;
-}
+// TriaxialCompressionEngine::TriaxialCompressionEngine() : uniaxialEpsilonCurr(strain[1])
+// {
+// 	translationAxis=TriaxialStressController::normal[wall_bottom_id];
+// 	translationAxisx=Vector3r(1,0,0);
+// 	translationAxisz=Vector3r(0,0,1);
+// 	strainRate=0;
+// 	currentStrainRate=0;
+// 	StabilityCriterion=0.001;
+// 	//Phase1=false;
+// 	currentState=STATE_UNINITIALIZED;
+// 	previousState=currentState;
+// 	UnbalancedForce = 1;
+// 	Key = "";
+// 	noFiles=false;
+// 	Phase1End = "Compacted";
+// 	FinalIterationPhase1 = 0;
+// 	Iteration = 0;
+// 	testEquilibriumInterval = 20;
+// 
+// 	autoUnload=true;
+// 	autoCompressionActivation=true;
+// 	autoStopSimulation=true;
+// 
+// 	UnbalancedForce = 1;
+// 	saveSimulation = false;
+// 	firstRun=true;
+// 	previousSigmaIso=sigma_iso;
+// 	frictionAngleDegree = -1;
+// 	epsilonMax = 0.5;
+// 
+// 	fixedPoroCompaction=false;
+//  	boxVolume=0;
+// 	maxStress =0;
+// }
 
 TriaxialCompressionEngine::~TriaxialCompressionEngine()
 {	
-}
-
-void TriaxialCompressionEngine::postProcessAttributes(bool deserializing)
-{
-	if(deserializing) translationAxis.Normalize();
 }
 
 void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextState){
@@ -73,11 +68,11 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 		sigma_iso=sigmaIsoCompaction;
 		previousSigmaIso=sigma_iso;
 	}
-	else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && nextState==STATE_TRIAX_LOADING){
+	else if(nextState==STATE_TRIAX_LOADING){
 		sigma_iso=sigmaLateralConfinement;
 		previousSigmaIso=sigma_iso;		
 		internalCompaction = false;
-		if (frictionAngleDegree>0) setContactProperties(body, frictionAngleDegree);
+		if (frictionAngleDegree>0) setContactProperties(frictionAngleDegree);
 		height0 = height; depth0 = depth; width0 = width;
 		//compressionActivated = true;
 		wall_bottom_activated=false; wall_top_activated=false;
@@ -90,13 +85,14 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 		sigmaIsoCompaction = sigmaLateralConfinement;
 		previousSigmaIso=sigma_iso;
 		internalCompaction=false; // unloading will not change grain sizes
-		if (frictionAngleDegree>0) setContactProperties(body, frictionAngleDegree);
+		if (frictionAngleDegree>0) setContactProperties(frictionAngleDegree);
 		if(!firstRun && !noFiles) saveSimulation=true;
 		Phase1End = "Compacted";
 	}	
 	else if ((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING) && nextState==STATE_LIMBO) {
 	//urrentState==STATE_DIE_COMPACTION
 		internalCompaction = false;
+		if (frictionAngleDegree>0) setContactProperties(frictionAngleDegree);
 		height0 = height; depth0 = depth; width0 = width;
 		if(!noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
 		// stop simulation here, since nothing will happen from now on
@@ -122,11 +118,9 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 {
 	UnbalancedForce=ComputeUnbalancedForce ( ncb );
 
-	if ( currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION || autoCompressionActivation)
+	if (  currentState!=STATE_TRIAX_LOADING && currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION || autoCompressionActivation)
 	{
-		// FIXME: do we need this?? it makes sense to activate compression only during compaction!: || autoCompressionActivation)
-		//ANSWER TO FIXME : yes we need that because we want to start compression from LIMBO most of the time
-		if ( UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && isotropicCompaction==false )
+		if (UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && fixedPoroCompaction==false )
 		{
 			// only go to UNLOADING if it is needed (hard float comparison... :-| )
 			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
@@ -145,7 +139,7 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 			// huh?! this will never happen, because of the first condition...
 			else 
 			{ 
-			doStateTransition (ncb, STATE_LIMBO );
+				doStateTransition (ncb, STATE_LIMBO );
 			}
 		}
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
@@ -157,18 +151,16 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 }
 
 
-void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
+void TriaxialCompressionEngine::action ( Scene * ncb )
 {
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
-		/* FIXME: are these three if's mutually exclusive and are partition of all possibilities? */
-		//sigma_iso was changed, we need to rerun compaction
-
-		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && isotropicCompaction == false) doStateTransition (ncb, STATE_ISO_COMPACTION );
-		if ( previousState==STATE_LIMBO && currentState==STATE_TRIAX_LOADING && isotropicCompaction == false ) doStateTransition (ncb, STATE_TRIAX_LOADING );
-		if ( fixedPorosity<1 && currentState==STATE_UNINITIALIZED && isotropicCompaction!=false ) doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && !fixedPoroCompaction) doStateTransition (ncb, STATE_ISO_COMPACTION );
+		if (previousState!=STATE_TRIAX_LOADING && currentState==STATE_TRIAX_LOADING)
+			doStateTransition (ncb, STATE_TRIAX_LOADING );
+		if (fixedPorosity<1 && currentState==STATE_UNINITIALIZED && fixedPoroCompaction) doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
@@ -199,7 +191,7 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
 		Omega::instance().stopSimulationLoop();
 		return;
 	}
-	TriaxialStressController::applyCondition ( ncb );
+	TriaxialStressController::action ( ncb );
 
 	if ( currentState==STATE_TRIAX_LOADING )
 	{
@@ -246,29 +238,22 @@ void TriaxialCompressionEngine::applyCondition ( Scene * ncb )
  
 }
 
-void TriaxialCompressionEngine::setContactProperties(Scene * ncb, Real frictionDegree)
+void TriaxialCompressionEngine::setContactProperties(Real frictionDegree)
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	BodyContainer::iterator bi = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for ( ; bi!=biEnd; ++bi)	
-	{	
-		shared_ptr<Body> b = *bi;
+	scene = Omega::instance().getScene().get();
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
+	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
 		if (b->isDynamic)
 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-	InteractionContainer::iterator iiEnd = ncb->interactions->end(); 
-	for(  ; ii!=iiEnd ; ++ii ) {
-		if (!(*ii)->isReal()) continue;
-		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((*ii)->getId1())]->material);
-		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((*ii)->getId2())]->material);		
+	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
+		if (!ii->isReal()) continue;
+		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((ii)->getId1())]->material);
+		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((ii)->getId2())]->material);
 		//FIXME - why dynamic_cast fails here?
-		//const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>((*ii)->interactionPhysics);
-		const shared_ptr<FrictPhys>& contactPhysics = static_pointer_cast<FrictPhys>((*ii)->interactionPhysics);
-
-		Real fa 	= sdec1->frictionAngle;
-		Real fb 	= sdec2->frictionAngle;
+		FrictPhys* contactPhysics = YADE_CAST<FrictPhys*>((ii)->interactionPhysics.get());
+		Real fa = sdec1->frictionAngle;
+		Real fb = sdec2->frictionAngle;
 		contactPhysics->frictionAngle			= std::min(fa,fb);
 		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 	}

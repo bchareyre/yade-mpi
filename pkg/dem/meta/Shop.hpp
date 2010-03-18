@@ -82,6 +82,8 @@ class Shop{
 		//! Save spheres in the current simulation into a text file
 		static void saveSpheresToFile(string fileName);
 
+		//! Compute the total volume of spheres (FIXME : isDynamic => isSphere is assumed to avoid dynamic_casts, maybe improve that with class indexes)
+		static Real getSpheresVolume();
 
 		//! Estimate timestep based on P-wave propagation speed
 		static Real PWaveTimeStep(shared_ptr<Scene> rb=shared_ptr<Scene>());

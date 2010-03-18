@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
+#include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
@@ -21,31 +21,32 @@ class State;
 	detailed description...
 */
 
-class TriaxialStressController : public PartialEngine 
+class TriaxialStressController : public GlobalEngine 
 {
 	private :
-		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
-		bool firstRun;
+// 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
+		bool first;
 		inline const Vector3r getForce(Scene* rb, body_id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
 		
 		 	
 	public :
-		unsigned int stiffnessUpdateInterval, computeStressStrainInterval, radiusControlInterval;
+// 		unsigned int stiffnessUpdateInterval, computeStressStrainInterval, radiusControlInterval;
 		//! internal index values for retrieving walls
 		enum { wall_bottom=0, wall_top, wall_left, wall_right, wall_front, wall_back };
 		//! real index values of walls in the Scene
 		int wall_id [6];
+//   		vector<int> wall_id;
 		//! Stores the value of the translation at the previous time step, stiffness, and normal
 		Vector3r	previousTranslation [6];
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
 		vector<Real>	stiffness;
 		Real 		strain [3];
-		Real volumetricStrain;
+// 		Real volumetricStrain;
 		Vector3r	normal [6];
 		//! The values of stresses 
 		Vector3r	stress [6];
 		Vector3r	force [6];
-		Real		meanStress;
+// 		Real		meanStress;
 		//! Value of spheres volume (solid volume)
 		Real spheresVolume;
 		//! Value of box volume 
@@ -57,27 +58,27 @@ class TriaxialStressController : public PartialEngine
 		//Real UnbalancedForce;		
 				
 		//! wallDamping coefficient - wallDamping=0 implies a "perfect" control of the resultant force, wallDamping=1 means no movement
-		Real			wallDamping;
+// 		Real			wallDamping;
 		//! maximum displacement/cycle (usefull to prevent explosions when stiffness is very low...) 
 
-		Real			maxMultiplier;
-		Real			finalMaxMultiplier;
+// 		Real			maxMultiplier;
+// 		Real			finalMaxMultiplier;
 		//! switch between "external" (walls) and "internal" (growth of particles) compaction 
-		bool internalCompaction; 
+// 		bool internalCompaction; 
 		
 		
-		int &wall_bottom_id, &wall_top_id, &wall_left_id, &wall_right_id, &wall_front_id, &wall_back_id;
-		bool wall_bottom_activated, wall_top_activated, wall_left_activated, wall_right_activated, wall_front_activated, wall_back_activated;
-		Real height, width, depth, height0, width0, depth0;
-		Real thickness;
-		Real sigma_iso;
+// 		int &wall_bottom_id, &wall_top_id, &wall_left_id, &wall_right_id, &wall_front_id, &wall_back_id;
+// 		bool wall_bottom_activated, wall_top_activated, wall_left_activated, wall_right_activated, wall_front_activated, wall_back_activated;
+// 		Real height, width, depth, height0, width0, depth0;
+// 		Real thickness;
+// 		Real sigma_iso;
 		//! The three following parameters allow to perform an external stress control with different stress values for the three space directions.
-		Real sigma1;
-		Real sigma2;
-		Real sigma3;
+// 		Real sigma1;
+// 		Real sigma2;
+// 		Real sigma3;
 		//!"if (isAxisymetric)" (true by default) sigma_iso is attributed to sigma1, 2 and 3
-		bool isAxisymetric;
-		Real max_vel;
+// 		bool isAxisymetric;
+// 		Real max_vel;
 		//! The three following parameters allow to perform an external stress control with different stress values for the three space directions.
 		Real max_vel1;
 		Real max_vel2;
@@ -89,72 +90,94 @@ class TriaxialStressController : public PartialEngine
 		Real position_front;
 		Real position_back;
 
-		TriaxialStressController();
+// 		TriaxialStressController();
 		virtual ~TriaxialStressController();
 	
-		virtual void applyCondition(Scene*);
+		virtual void action(Scene*);
 		//! Regulate the stress applied on walls with flag wall_XXX_activated = true
 		void controlExternalStress(int wall, Scene* ncb, Vector3r resultantForce, State* p, Real wall_max_vel);
+		//! Regulate the mean stress by changing spheres size, WARNING : this function assumes that all dynamic bodies in the problem are spheres
 		void controlInternalStress(Scene* ncb, Real multiplier);
 		void updateStiffness(Scene* ncb);
 		void computeStressStrain(Scene* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
     		Real ComputeUnbalancedForce(Scene * ncb, bool maxUnbalanced=false);
-
-		DECLARE_LOGGER;
 		
-	REGISTER_ATTRIBUTES(PartialEngine,
-		(stiffnessUpdateInterval)
-		(radiusControlInterval)
-		(computeStressStrainInterval)
-		(wallDamping)
-		//	(force)
-		
-		//(UnbalancedForce)
-		(stiffness)
-		(wall_bottom_id)
-		(wall_top_id)
-		(wall_left_id)
-		(wall_right_id)
-		(wall_front_id)
-		(wall_back_id)
-		//	(wall_id)
-		(wall_bottom_activated)
-		(wall_top_activated)
-		(wall_left_activated)
-		(wall_right_activated)
-		(wall_front_activated)
-		(wall_back_activated)
-		
-		(thickness)
-		(height)
-		(width)
-		(depth)
-		(height0)
-		(width0)
-		(depth0)
-		
-		(sigma_iso)
-		(sigma1)
-		(sigma2)
-		(sigma3)
-		(isAxisymetric)
-		(maxMultiplier)
-		(finalMaxMultiplier)
-		(max_vel)
-		(max_vel1)
-		(max_vel2)
-		(max_vel3)
-		(previousStress)
-		(previousMultiplier)
-		(internalCompaction)
-
-		// needed for access from python
-		(meanStress)
-		(volumetricStrain)
-	);
-	REGISTER_CLASS_NAME(TriaxialStressController);
-	REGISTER_BASE_CLASS_NAME(PartialEngine);
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
+		TriaxialStressController,GlobalEngine,"An engine maintaining constant stresses on some boundaries of a parallepipedic packing."
+		,
+   		((unsigned int,stiffnessUpdateInterval,10,"target strain rate (./s)"))
+   		((unsigned int,radiusControlInterval,10,""))
+		((unsigned int,computeStressStrainInterval,10,""))
+		((Real,wallDamping,0.25,"wallDamping coefficient - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
+		((Real,thickness,-1,""))
+// 		((vector<int>,wall_id,vector<int>(6,0),"Real index values of walls in the scene."))
+		((int,wall_bottom_id,0,"id of boundary ; coordinate 1-"))
+		((int,wall_top_id,0,"id of boundary ; coordinate 1+"))
+		((int,wall_left_id,0,"id of boundary ; coordinate 0-"))
+		((int,wall_right_id,0,"id of boundary ; coordinate 0+"))
+		((int,wall_front_id,0,"id of boundary ; coordinate 2+"))
+		((int,wall_back_id,0,"id of boundary ; coordinate 2-"))
+		((bool,wall_bottom_activated,true,""))
+		((bool,wall_top_activated,true,""))
+		((bool,wall_left_activated,true,""))
+		((bool,wall_right_activated,true,""))
+		((bool,wall_front_activated,true,""))
+		((bool,wall_back_activated,true,""))		
+		((Real,height,0,""))
+		((Real,width,0,""))
+		((Real,depth,0,""))
+		((Real,height0,0,""))
+		((Real,width0,0,""))
+		((Real,depth0,0,""))		
+		((Real,sigma_iso,0,"applied confining stress (see :yref:'TriaxialStressController::isAxisymetric')"))
+		((Real,sigma1,0,"applied stress on axis 1 (see :yref:'TriaxialStressController::isAxisymetric') |ycomp|"))
+		((Real,sigma2,0,"applied stress on axis 2 (see :yref:'TriaxialStressController::isAxisymetric') |ycomp|"))
+		((Real,sigma3,0,"applied stress on axis 3 (see :yref:'TriaxialStressController::isAxisymetric') |ycomp|"))
+		((bool,isAxisymetric,true,"if true, sigma_iso is assigned to sigma1, 2 and 3"))
+		((Real,maxMultiplier,1.001,""))
+		((Real,finalMaxMultiplier,1.00001,""))
+		((Real,max_vel,0.001,"max walls velocity [m/s]"))
+		((Real,previousStress,0,""))
+		((Real,previousMultiplier,1,""))
+		((bool,internalCompaction,true,"Switch between 'external' (walls) and 'internal' (growth of particles) compaction."))
+		((Real,meanStress,0,""))
+		((Real,volumetricStrain,0,""))
+ 		,
+//    		/* extra initializers */
+//    		//((wall_id,vector<int>(6,0)))
+//    		((wall_bottom_id,wall_id[0]))
+// 		((wall_top_id,wall_id[1]))
+// 		((wall_left_id,wall_id[2]))
+// 		((wall_right_id,wall_id[3]))
+// 		((wall_front_id,wall_id[4]))
+// 		((wall_back_id,wall_id[5]))
+		,
+   		/* constructor */
+   		first = true;
+		stiffness.resize(6);
+		for (int i=0; i<6; ++i){
+// 			wall_id[i] = 0;
+			previousTranslation[i] = Vector3r::ZERO;
+			stiffness[i] = 0;
+			normal[i] = Vector3r::ZERO;}
+		for (int i=0; i<3; ++i) strain[i] = 0;
+		normal[wall_bottom].Y()=1;
+		normal[wall_top].Y()=-1;
+		normal[wall_left].X()=1;
+		normal[wall_right].X()=-1;
+		normal[wall_front].Z()=-1;
+		normal[wall_back].Z()=1;	
+		porosity=1;
+		,
+ 		.def_readonly("porosity",&TriaxialStressController::porosity,"")
+		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"")
+		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"|ycomp|")
+		.def_readonly("max_vel2",&TriaxialStressController::max_vel2,"|ycomp|")
+		.def_readonly("max_vel3",&TriaxialStressController::max_vel3,"|ycomp|")
+		//.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
+		 )
+		DECLARE_LOGGER;	
 };
 
 REGISTER_SERIALIZABLE(TriaxialStressController);
