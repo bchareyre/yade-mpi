@@ -376,6 +376,8 @@ class pyOmega{
 
 	void saveSpheres(std::string fileName){ Shop::saveSpheresToFile(fileName); }
 
+	double getSpheresVolume(){ return Shop::getSpheresVolume(); }
+	
 	python::list miscParams_get(){
 		python::list ret;
 		FOREACH(shared_ptr<Serializable>& s, OMEGA.getScene()->miscParams){
@@ -534,6 +536,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("tmpToFile",&pyOmega::tmpToFile,"Return XML of saveTmp'd simulation as string.")
 		.def("tmpToString",&pyOmega::tmpToString,"Save XML of saveTmp'd simulation in file.")
 		.def("saveSpheres",&pyOmega::saveSpheres,"Saves spherical bodies to external ASCII file, one sphere (x y z r) per line.")
+		.def("getSpheresVolume",&pyOmega::getSpheresVolume,"Compute the total volume of spheres in the simulation (might crash for now if dynamic bodies are not spheres)")
 		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation.\n@param nSteps how many steps to run, then stop.\n@param wait if True, doesn't return until the simulation will have stopped.")
 		.def("pause",&pyOmega::pause,"Stop simulation execution.\n(may be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
