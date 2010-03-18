@@ -100,7 +100,7 @@ class TriaxialTest : public FileGenerator
 				,saveAnimationSnapshots
 				,biaxial2dTest
 				//!flag to choose an isotropic compaction until a fixed porosity choosing a same translation speed for the six walls
-				,isotropicCompaction
+				,fixedPoroCompaction
 				//! do not create any files during run (.xml, .spheres, wall stress records)
 				,noFiles
 				// use Facets instead of Boxes for the walls
@@ -193,7 +193,7 @@ class TriaxialTest : public FileGenerator
 		(sigmaIsoCompaction)
 		(sigmaLateralConfinement)
 		(Key)
-		(isotropicCompaction)
+		(fixedPoroCompaction)
 		(fixedPorosity)
 		(fixedBoxDims)
 		(fast)

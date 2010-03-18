@@ -121,7 +121,7 @@ TriaxialTest::TriaxialTest () : FileGenerator()
 	biaxial2dTest=false;
 	radiusStdDev=0.3;
 	radiusMean=-1; // no radius specified
-	isotropicCompaction=false;
+	fixedPoroCompaction=false;
 	fixedPorosity = 1;
 	fast=false;
 	noFiles=false;
@@ -311,13 +311,14 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	body->state->pos=position;
 	shared_ptr<FrictMat> mat(new FrictMat);
 	mat->young			= sphereYoungModulus;
-	mat->poisson		= sphereKsDivKn;
+	mat->poisson			= sphereKsDivKn;
 	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+	//iSphere->diffuseColor		= Vector3r(0.4,0.1,0.1);
+	iSphere->diffuseColor           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	body->shape	= iSphere;
-	body->bound		= aabb;
+	body->bound	= aabb;
 	body->material	= mat;
 }
 
@@ -418,7 +419,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialcompressionEngine->noFiles=noFiles;
 	triaxialcompressionEngine->frictionAngleDegree = sphereFrictionDeg;
 	triaxialcompressionEngine->fixedPorosity = fixedPorosity;
-	triaxialcompressionEngine->isotropicCompaction = isotropicCompaction;	
+	triaxialcompressionEngine->fixedPoroCompaction = fixedPoroCompaction;	
 	// recording global stress
 	if(recordIntervalIter>0 && !noFiles){
 		triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
