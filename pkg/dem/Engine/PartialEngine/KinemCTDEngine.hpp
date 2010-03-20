@@ -36,7 +36,7 @@ class KinemCTDEngine : public PartialEngine
 	public :
 		virtual ~KinemCTDEngine();
 
-		void applyCondition(Scene *)
+		void action(Scene *)
 			,computeAlpha()
 			;
 

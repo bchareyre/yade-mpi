@@ -43,7 +43,7 @@ ResetRandomPosition::~ResetRandomPosition()
 	
 }
 
-void ResetRandomPosition::action(Scene*)
+void ResetRandomPosition::action()
 {
 	if (first_run)
 	{

@@ -59,7 +59,7 @@ REGISTER_SERIALIZABLE(Law2_Dem6DofGeom_FrictPhys_Beam);
 class ElasticContactLaw : public GlobalEngine{
 		shared_ptr<Law2_ScGeom_FrictPhys_Basic> functor;
 	public :
-		void action(Scene*);
+		void action();
 	YADE_CLASS_BASE_DOC_ATTRS(ElasticContactLaw,GlobalEngine,"[DEPRECATED] Loop over interactions applying :yref:`Law2_ScGeom_FrictPhys_Basic` on all interactions.\n\n.. note::\n  Use :yref:`InteractionDispatchers` and :yref:`Law2_ScGeom_FrictPhys_Basic` instead of this class for performance reasons.",
 		((int,sdecGroupMask,1,"Bitmask for allowing collision between particles :yref:`Body::groupMask`"))
 		((bool,neverErase,false,"Keep interactions even if particles go away from each other [for debugging?]"))

@@ -15,7 +15,7 @@ class GeometricalModelForceColorizer : public GlobalEngine
 	public :
 		GeometricalModelForceColorizer ();
 
-		virtual void action(Scene*);
+		virtual void action();
 		virtual bool isActivated(Scene*);
 	
 	REGISTER_CLASS_NAME(GeometricalModelForceColorizer);

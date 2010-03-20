@@ -37,12 +37,12 @@ HydraulicForceEngine::~HydraulicForceEngine()
 
 
 
-void HydraulicForceEngine::applyCondition(Scene* ncb)
+void HydraulicForceEngine::action()
 {
 
     if (isActivated)
     {
-        shared_ptr<BodyContainer>& bodies = ncb->bodies;
+        shared_ptr<BodyContainer>& bodies = scene->bodies;
         
         
         ///This commented is to artificially remove eroded (i.e. bond-breaked) grains by applying a force moving them away
@@ -75,7 +75,7 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
                     //cerr << "translate it" << endl;
                     if ((static_cast<CohesiveFrictionalMat*> (b->material.get()))->isBroken == true)
                     {
-								ncb->forces.addForce(b->getId(),Vector3r(0,5,0));
+								scene->forces.addForce(b->getId(),Vector3r(0,5,0));
                     }
                 }
             }
@@ -115,8 +115,8 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
 // 		    cerr << "f=" << f << " on " << id << endl;
                     //f /= -10000;
                     //t *= 0;
-						  	ncb->forces.addForce(id,f);
-							ncb->forces.addTorque(id,t);
+						  	scene->forces.addForce(id,f);
+							scene->forces.addTorque(id,t);
                 }
 		file.close();
             }
@@ -163,9 +163,9 @@ void HydraulicForceEngine::applyCondition(Scene* ncb)
 //             //if (p)
 // //             if (b->getId() == 67)
 // //             {
-// //             	static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += Vector3r((Real) -100000,(Real) 0,(Real) 0);
+// //             	static_cast<Force*>( scene->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += Vector3r((Real) -100000,(Real) 0,(Real) 0);
 // //             }
-//             //static_cast<Force*>( ncb->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += gravity * p->mass;
+//             //static_cast<Force*>( scene->physicalActions->find( b->getId() , actionParameterForce->getClassIndex() ).get() )->force += gravity * p->mass;
 //         }
     }
 }

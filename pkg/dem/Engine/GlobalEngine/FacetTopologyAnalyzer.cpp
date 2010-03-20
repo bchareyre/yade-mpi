@@ -6,11 +6,11 @@
 CREATE_LOGGER(FacetTopologyAnalyzer);
 YADE_PLUGIN((FacetTopologyAnalyzer));
 #ifndef FACET_TOPO
-void FacetTopologyAnalyzer::action(Scene*){
+void FacetTopologyAnalyzer::action(){
 	throw runtime_error("FACET_TOPO was not enabled in Facet.hpp at compile-time. Do not use FacetTopologyAnalyzer or recompile.");
 }
 #else
-void FacetTopologyAnalyzer::action(Scene*){
+void FacetTopologyAnalyzer::action(){
 	commonEdgesFound=0;
 	LOG_DEBUG("Projection axis for analysis is "<<projectionAxis);
 	vector<shared_ptr<VertexData> > vv;

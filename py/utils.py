@@ -73,6 +73,7 @@ def randomColor(): return Vector3(random.random(),random.random(),random.random(
 def typedEngine(name):
 	"""Return first engine from current O.engines, identified by its type (as string). For example:
 
+	>>> from yade import utils
 	>>> O.engines=[InsertionSortCollider(),NewtonIntegrator(),GravityEngine()]
 	>>> utils.typedEngine("NewtonIntegrator") == O.engines[1]
 	True

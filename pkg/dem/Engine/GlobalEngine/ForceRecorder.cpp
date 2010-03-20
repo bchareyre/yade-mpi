@@ -3,7 +3,7 @@
 YADE_PLUGIN((ForceRecorder));
 CREATE_LOGGER(ForceRecorder);
 
-void ForceRecorder::action(Scene*){
+void ForceRecorder::action(){
 	totalForce=Vector3r::ZERO;
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(scene->bodies->exists(id)); 

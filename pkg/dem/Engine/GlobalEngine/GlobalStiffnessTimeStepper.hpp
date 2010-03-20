@@ -37,7 +37,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 		virtual ~GlobalStiffnessTimeStepper();
 	
 		virtual void computeTimeStep(Scene*);
-		virtual bool isActivated(Scene*);
+		virtual bool isActivated();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(
 			GlobalStiffnessTimeStepper,TimeStepper,"An engine assigning the time-step as a fraction of the minimum eigen-period in the problem",
 			((Real,defaultDt,1,"used as default AND as max value of the timestep"))

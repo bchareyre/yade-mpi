@@ -15,7 +15,7 @@
 class StaticAttractionEngine : public PartialEngine
 {
 	public :
-		void applyCondition(Scene *);
+		void action(Scene *);
 		bool active;
 		StaticAttractionEngine() : active(true) {};
 		virtual bool isActivated(Scene*) { return active; };

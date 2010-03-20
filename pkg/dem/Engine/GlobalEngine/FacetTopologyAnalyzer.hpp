@@ -47,7 +47,7 @@ class FacetTopologyAnalyzer: public GlobalEngine{
 		};
 	};
 	public:
-		void action(Scene*); 
+		void action(); 
 
 	YADE_CLASS_BASE_DOC_ATTRS(FacetTopologyAnalyzer,GlobalEngine,"Initializer for filling adjacency geometry data for facets.\n\nCommon vertices and common edges are identified and mutual angle between facet faces is written to Facet instances. If facets don't move with respect to each other, this must be done only at the beginng.",
 		((Vector3r,projectionAxis,Vector3r::UNIT_X,"Axis along which to do the initial vertex sort"))

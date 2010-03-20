@@ -37,7 +37,7 @@ class TriaxialStateRecorder : public Recorder
 		//int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;
 
 		TriaxialStateRecorder ();
-		virtual void action(Scene*);
+		virtual void action();
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(Recorder,(porosity));
 

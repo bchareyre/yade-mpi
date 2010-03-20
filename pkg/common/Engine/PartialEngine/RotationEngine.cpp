@@ -11,23 +11,23 @@
 
 YADE_PLUGIN((RotationEngine)(SpiralEngine)(InterpolatingSpiralEngine));
 
-void InterpolatingSpiralEngine::applyCondition(Scene* rb){
-	Real virtTime=wrap ? Shop::periodicWrap(rb->simulationTime,*times.begin(),*times.rbegin()) : rb->simulationTime;
+void InterpolatingSpiralEngine::action(){
+	Real virtTime=wrap ? Shop::periodicWrap(scene->simulationTime,*times.begin(),*times.rbegin()) : scene->simulationTime;
 	angularVelocity=linearInterpolate<Real>(virtTime,times,angularVelocities,_pos);
 	linearVelocity=angularVelocity*slope;
-	SpiralEngine::applyCondition(rb);
+	SpiralEngine::action();
 }
 
-void SpiralEngine::applyCondition(Scene* rb){
+void SpiralEngine::action(){
 	Real dt=Omega::instance().getTimeStep();
 	axis.Normalize();
 	Quaternionr q;
 	q.FromAxisAngle(axis,angularVelocity*dt);
 	angleTurned+=angularVelocity*dt;
-	shared_ptr<BodyContainer> bodies = rb->bodies;
+	shared_ptr<BodyContainer> bodies = scene->bodies;
 	FOREACH(body_id_t id,subscribedBodies){
 		assert(id<(body_id_t)bodies->size());
-		Body* b=Body::byId(id,rb).get();
+		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
 		// translation
 		b->state->pos+=dt*linearVelocity*axis;
@@ -44,7 +44,7 @@ void SpiralEngine::applyCondition(Scene* rb){
 }
 
 
-void RotationEngine::applyCondition(Scene*){
+void RotationEngine::action(){
 	rotationAxis.Normalize();
 	Quaternionr q;
 	q.FromAxisAngle(rotationAxis,angularVelocity*scene->dt);
@@ -56,15 +56,15 @@ void RotationEngine::applyCondition(Scene*){
 	#else
 	FOREACH(body_id_t id,subscribedBodies){
 	#endif
-		State* rb=Body::byId(id,scene)->state.get();
-		rb->angVel=rotationAxis*angularVelocity;
+		State* state=Body::byId(id,scene)->state.get();
+		state->angVel=rotationAxis*angularVelocity;
 		if(rotateAroundZero){
-			const Vector3r l=rb->pos-zeroPoint;
-			rb->pos=q*l+zeroPoint; 
-			rb->vel=rb->angVel.Cross(l);
+			const Vector3r l=state->pos-zeroPoint;
+			state->pos=q*l+zeroPoint; 
+			state->vel=state->angVel.Cross(l);
 		}
-	rb->ori=q*rb->ori;
-	rb->ori.Normalize();
+	state->ori=q*state->ori;
+	state->ori.Normalize();
 	}
 }
 

@@ -35,7 +35,7 @@ class NodeRecorder : public DataRecorder
 
 		NodeRecorder ();
 
-		virtual void action(Scene*);
+		virtual void action();
 		virtual bool isActivated(Scene*);
 	REGISTER_ATTRIBUTES(DataRecorder,
 		(outputFile)

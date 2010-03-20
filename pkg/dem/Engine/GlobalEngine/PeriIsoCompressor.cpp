@@ -14,7 +14,7 @@ YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController))
 
 
 CREATE_LOGGER(PeriIsoCompressor);
-void PeriIsoCompressor::action(Scene*){
+void PeriIsoCompressor::action(){
 	if(!scene->isPeriodic){ LOG_FATAL("Being used on non-periodic simulation!"); throw; }
 	if(state>=stresses.size()) return;
 	// initialize values
@@ -152,7 +152,7 @@ CREATE_LOGGER(PeriTriaxController);
 
 
 
-void PeriTriaxController::action(Scene*)
+void PeriTriaxController::action()
 {
 	if (!scene->isPeriodic){ throw runtime_error("PeriTriaxController run on aperiodic simulation."); }
 	const Vector3r& cellSize=scene->cell->getSize();

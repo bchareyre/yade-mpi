@@ -17,7 +17,7 @@ KinemCTDEngine::~KinemCTDEngine()
 {
 }
 
-void KinemCTDEngine::applyCondition(Scene * ncb)
+void KinemCTDEngine::action(Scene * ncb)
 {
 
 	leftbox = Body::byId(id_boxleft);

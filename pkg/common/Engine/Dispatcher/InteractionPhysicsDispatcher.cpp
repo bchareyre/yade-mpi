@@ -23,7 +23,7 @@ void InteractionPhysicsDispatcher::explicitAction(shared_ptr<Material>& pp1, sha
 }
 
 
-void InteractionPhysicsDispatcher::action(Scene*)
+void InteractionPhysicsDispatcher::action()
 {
 	updateScenePtr();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;

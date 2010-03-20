@@ -28,7 +28,7 @@ class StrainRecorder : public DataRecorder
 
 		StrainRecorder ();
 
-		virtual void action(Scene*);
+		virtual void action();
 		virtual bool isActivated(Scene*);
 
 	protected :

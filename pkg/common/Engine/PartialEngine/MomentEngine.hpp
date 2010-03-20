@@ -12,7 +12,7 @@
 
 class MomentEngine: public PartialEngine{
 	public:
-		virtual void applyCondition(Scene*);
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(MomentEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step.",
 		((Vector3r,moment,Vector3r::ZERO,"Torque value to be applied."))
 	);

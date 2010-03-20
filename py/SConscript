@@ -34,6 +34,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.File('system.py'),
 	env.File('export.py'),
 	env.File('post2d.py'),
+	env.File('_extraDocs.py'),
 	#env.File('ww.py'),
 	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=['PythonUI']+linkPlugins(['Shop','BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'geometricalmodel' in env['features'] else [])+(['StateMetaEngine',] if 'physpar' in env['features'] else []))),
 	env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundFunctor InteractionGeometryFunctor InteractionPhysicsFunctor LawFunctor")))

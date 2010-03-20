@@ -3,7 +3,7 @@
 YADE_PLUGIN((CohesiveStateRPMRecorder));
 CREATE_LOGGER(CohesiveStateRPMRecorder);
 
-void CohesiveStateRPMRecorder::action(Scene*) {
+void CohesiveStateRPMRecorder::action() {
 	numberCohesiveContacts=0;
 	//Check all interactions
 	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){

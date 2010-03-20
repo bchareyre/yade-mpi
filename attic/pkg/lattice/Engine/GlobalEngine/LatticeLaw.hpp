@@ -30,7 +30,7 @@ class LatticeLaw : public InteractionSolver
 		Real respect_non_destroy;
 		LatticeLaw();
 		virtual ~LatticeLaw();
-		void action(Scene*);
+		void action();
 		REGISTER_ATTRIBUTES(InteractionSolver,
 			(roughEdges)
 			(ensure2D)

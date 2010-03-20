@@ -31,14 +31,15 @@ void SumIntrForcesCb::go(IntrCallback* _self, Interaction* i){
 }
 
 BodyCallback::FuncPtr SumBodyForcesCb::stepInit(){
-	cerr<<"{"<<(Real)force<<","<<(int)numBodies<<"}";
+	cerr<<"{"<<(Real)force<<","<<(int)numBodies<<",this="<<this<<",scene="<<scene<<",forces="<<&(scene->forces)<<"}";
 	force.reset(); numBodies.reset(); // reset accumulators
 	return &SumBodyForcesCb::go;
 }
 void SumBodyForcesCb::go(BodyCallback* _self, Body* b){
 	if(!b->isDynamic) return;
-	cerr<<"["<<omp_get_thread_num()<<",#"<<b->id<<"]";
 	SumBodyForcesCb* self=static_cast<SumBodyForcesCb*>(_self);
+	cerr<<"["<<omp_get_thread_num()<<",#"<<b->id<<",scene="<<self->scene<<"]";
+	cerr<<"[force="<<self->scene->forces.getForce(b->id)<<"]";
 	self->numBodies+=1;
 	//self->scene->forces.sync();
 	self->force+=self->scene->forces.getForce(b->id).Length();

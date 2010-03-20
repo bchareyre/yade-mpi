@@ -25,7 +25,7 @@ class HydraulicForceEngine : public PartialEngine
 	
 		HydraulicForceEngine();
 		virtual ~HydraulicForceEngine();
-		virtual void applyCondition(Scene*);
+		virtual void action();
 	
 	REGISTER_ATTRIBUTES(PartialEngine,(gravity)(isActivated)(dummyParameter)(HFinverted)(savePositions)(outputFile)(inputFile)(HFinversion_counter)(forceFactor));
 	REGISTER_CLASS_NAME(HydraulicForceEngine);

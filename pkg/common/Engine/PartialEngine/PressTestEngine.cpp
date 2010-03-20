@@ -3,12 +3,12 @@
 #include<yade/core/Scene.hpp>
 
 
-void PressTestEngine::applyCondition(Scene * ncb){
+void PressTestEngine::action(){
 	if (curentDirection != stop) {
 		if (curentDirection==forward) { 										 ///<Forward direction of the press
 			FOREACH(body_id_t id, subscribedBodies){
-				assert(ncb->bodies->exists(id));
-				currentVerticalForce = ncb->forces.getForce(id)[2]; 	///<Define current vertical force
+				assert(scene->bodies->exists(id));
+				currentVerticalForce = scene->forces.getForce(id)[2]; 	///<Define current vertical force
 				minimalForce = maxVerticalForce*0.1;									///<Define minimal edge of the force (10% from Maximal)
 				minimalPredictedForce = predictedForce*0.1;						///<Define minimal edge of the Predicted force (10% from Predicted)
 				if (currentVerticalForce > maxVerticalForce) {				///<Force increasing. Press is working normally
@@ -35,11 +35,11 @@ void PressTestEngine::applyCondition(Scene * ncb){
 					currentIterationAfterDestruction=0;
 				}
 			}
-			TranslationEngine::applyCondition(ncb);
+			TranslationEngine::action(scene);
 		} else if (curentDirection==backward) {							 ///<The press returns back to the normal position
 			if (currentIterationAfterDestruction > 0) {
 				currentIterationAfterDestruction--;
-				TranslationEngine::applyCondition(ncb);
+				TranslationEngine::action(scene);
 			} else {
 				curentDirection=stop;														///<If the press is in normal position -> STOP
 				Omega::instance().stopSimulationLoop();					///<Stop simulation loop

@@ -30,7 +30,7 @@ public :
     SimpleViscoelasticSpheresInteractionRecorder();
     ~SimpleViscoelasticSpheresInteractionRecorder();
 
-    virtual void action(Scene*);
+    virtual void action();
     bool isActivated(Scene*);
 
 protected :

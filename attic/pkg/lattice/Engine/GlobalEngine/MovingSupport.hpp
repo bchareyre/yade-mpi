@@ -37,7 +37,7 @@ class MovingSupport : public DataRecorder
 
 		MovingSupport ();
 
-		virtual void action(Scene*);
+		virtual void action();
 		virtual bool isActivated(Scene*);
 	REGISTER_ATTRIBUTES(DataRecorder,/*(sections)*/(sections_midpoints)(sections_halflength)(sections_directions)/*(first)(subscribedBodies)*/);
 	protected :

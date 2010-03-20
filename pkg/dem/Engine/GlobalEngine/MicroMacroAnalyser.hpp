@@ -41,7 +41,7 @@ class MicroMacroAnalyser : public GlobalEngine
 		std::string	 stateFileName;
 		
 		MicroMacroAnalyser();
-		void action(Scene*);
+		void action();
 		/// Set current state as initial (state=1) or final (state=2) congiguration for later kinematic analysis on the increment; if requested : save snapshots (with specific format) - possibly including contact forces increments on the state1->state2 interval
 		void setState(unsigned int state, bool save_states = false, bool computeIncrement = false);
 		/// Copy the current simulation in a TriaxialState structure. If filename!=NULL, save it to a file that can be reloaded later for computing strain increments, state must be 1 or 2.

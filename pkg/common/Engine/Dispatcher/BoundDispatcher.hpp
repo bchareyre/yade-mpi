@@ -35,8 +35,8 @@ class BoundDispatcher :	public Dispatcher2D
 					>
 {
 	public :
-		virtual void action(Scene*);
-		virtual bool isActivated(Scene*){ return activated; }
+		virtual void action();
+		virtual bool isActivated(){ return activated; }
 		shared_ptr<VelocityBins> velocityBins;
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(BoundDispatcher,Dispatcher,"Dispatcher for creating/updating Body::bound objects.",

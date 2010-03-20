@@ -7,7 +7,7 @@ YADE_PLUGIN((ParallelEngine));
 //! ParallelEngine's pseudo-ctor (factory), taking nested lists of slave engines (might be moved to real ctor perhaps)
 shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves){ shared_ptr<ParallelEngine> instance(new ParallelEngine); instance->slaves_set(slaves); return instance; }
 
-void ParallelEngine::action(Scene*){
+void ParallelEngine::action(){
 	// openMP warns if the iteration variable is unsigned...
 	const int size=(int)slaves.size();
 	#ifdef YADE_OPENMP
@@ -18,7 +18,7 @@ void ParallelEngine::action(Scene*){
 		FOREACH(const shared_ptr<Engine>& e, slaves[i]) {
 			//cerr<<"["<<omp_get_thread_num()<<":"<<e->getClassName()<<"]";
 			e->scene=scene;
-			if(e->isActivated(scene)) { e->action(scene); }
+			if(e->isActivated()) { e->action(); }
 		}
 	}
 }

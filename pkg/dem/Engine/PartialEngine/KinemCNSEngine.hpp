@@ -36,7 +36,7 @@ class KinemCNSEngine : public PartialEngine
 		shared_ptr<Body> topbox;
 		shared_ptr<Body> boxbas;
 	public :
-		void 	applyCondition(Scene * ncb)
+		void 	action(Scene * ncb)
 			,computeAlpha()
 			;
 

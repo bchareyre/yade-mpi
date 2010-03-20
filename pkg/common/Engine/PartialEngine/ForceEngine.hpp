@@ -7,7 +7,7 @@
 
 class ForceEngine: public PartialEngine{
 	public:
-		virtual void applyCondition(Scene*);
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(ForceEngine,PartialEngine,"Apply contact force on some particles at each step.",
 		((Vector3r,force,Vector3r::ZERO,"Force to apply."))
 	);
@@ -25,7 +25,7 @@ REGISTER_SERIALIZABLE(ForceEngine);
 class InterpolatingDirectedForceEngine: public ForceEngine{
 	size_t _pos;
 	public:
-		virtual void applyCondition(Scene*);
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InterpolatingDirectedForceEngine,ForceEngine,"Engine for applying force of varying magnitude but constant direction on subscribed bodies. times and magnitudes must have the same length, direction (normalized automatically) gives the orientation. \n\n\
 	\
 	As usual with interpolating engines: the first magnitude is used before the first time point, last magnitude is used after the last time point. Wrap specifies whether time wraps around the last time point to the first time point.",

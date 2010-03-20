@@ -23,7 +23,7 @@ FlowEngine::~FlowEngine()
 {
 }
 
-void FlowEngine::applyCondition ( Scene* ncb )
+void FlowEngine::action (Scene*)
 {
 	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;Update_Triangulation=false;}
 	if ( !isActivated ) return;
@@ -32,7 +32,7 @@ void FlowEngine::applyCondition ( Scene* ncb )
 		timingDeltas->start();
 		
 		if ( !triaxialCompressionEngine )
-		{vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();for ( ;itFirst!=itLast; ++itFirst ){
+		{vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();for ( ;itFirst!=itLast; ++itFirst ){
 		if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ){
 		cout << "stress controller engine found - FlowEngine" << endl;
 		triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );}}
@@ -43,12 +43,12 @@ void FlowEngine::applyCondition ( Scene* ncb )
 
 		if ( current_state==3 )
 		{
-			if ( first || Update_Triangulation ) { Build_Triangulation( ncb, P_zero );}
+			if ( first || Update_Triangulation ) { Build_Triangulation( scene, P_zero );}
 // 			else
 // 			{
 				timingDeltas->checkpoint("Triangulating");
 				
-				UpdateVolumes ( ncb );
+				UpdateVolumes ( scene );
 			
 				timingDeltas->checkpoint("Update_Volumes");
 			
@@ -75,8 +75,8 @@ void FlowEngine::applyCondition ( Scene* ncb )
 				{
 					id = V_it->info().id();
 					for ( int y=0;y<3;y++ ) f[y] = ( V_it->info().forces ) [y];
-					ncb->forces.addForce ( id, f );
-				//ncb->forces.addTorque(id,t);
+					scene->forces.addForce ( id, f );
+				//scene->forces.addTorque(id,t);
 				}
 				
 				timingDeltas->checkpoint("Applying Forces");
@@ -123,7 +123,7 @@ void FlowEngine::Oedometer_Boundary_Conditions()
 	triaxialCompressionEngine->sigma_iso=(triaxialCompressionEngine->sigma_iso)*loadFactor;
 }
 
-void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
+void FlowEngine::Build_Triangulation (double P_zero )
 {
 	if (first)
 	{
@@ -145,8 +145,8 @@ void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
 	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
-	AddBoundary ( ncb );
-	Triangulate ( ncb );
+	AddBoundary ( scene );
+	Triangulate ( scene );
 	
 	cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
@@ -170,18 +170,18 @@ void FlowEngine::Build_Triangulation ( Scene* ncb, double P_zero )
 		Update_Triangulation=!Update_Triangulation;
 	}
 
-	Initialize_volumes ( ncb );
+	Initialize_volumes ( scene );
 	flow->DisplayStatistics ();
 }
 
-void FlowEngine::AddBoundary ( Scene* ncb )
+void FlowEngine::AddBoundary ()
 {
 	cout << "Adding Boundary------" << endl;
 
 	shared_ptr<Box> bx ( new Box );
 	int Bx_Index = bx->getClassIndexStatic();
 
-	FOREACH ( const shared_ptr<Body>& b, *ncb->bodies )
+	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
 	{
 		if ( !b ) continue;
 		if ( b->shape->getClassIndex() == Bx_Index )
@@ -204,14 +204,14 @@ void FlowEngine::AddBoundary ( Scene* ncb )
 	flow->AddBoundingPlanes();
 }
 
-void FlowEngine::Triangulate ( Scene* ncb )
+void FlowEngine::Triangulate ()
 {
 	shared_ptr<Sphere> sph ( new Sphere );
 
 	int Sph_Index = sph->getClassIndexStatic();
 	int contator = 0;
 	
-	FOREACH ( const shared_ptr<Body>& b, *ncb->bodies )
+	FOREACH ( const shared_ptr<Body>& b, *scene->bodies )
 	{
 		if ( !b ) continue;
 		if ( b->shape->getClassIndex() ==  Sph_Index )
@@ -240,27 +240,27 @@ void FlowEngine::Triangulate ( Scene* ncb )
 	cout << "z_max = " << flow->z_max << endl;
 }
 
-void FlowEngine::Initialize_volumes ( Scene* ncb )
+void FlowEngine::Initialize_volumes ()
 {
 	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
 		switch ( cell->info().fictious() )
 		{
-			case ( 0 ) : cell->info().volume() = Volume_cell ( cell, ncb ); break;
-			case ( 1 ) : cell->info().volume() = Volume_cell_single_fictious ( cell, ncb ); break;
-			case ( 2 ) : cell->info().volume() = Volume_cell_double_fictious ( cell, ncb ); break;
-			case ( 3 ) : cell->info().volume() = Volume_cell_triple_fictious ( cell, ncb ); break;
+			case ( 0 ) : cell->info().volume() = Volume_cell ( cell, scene ); break;
+			case ( 1 ) : cell->info().volume() = Volume_cell_single_fictious ( cell, scene ); break;
+			case ( 2 ) : cell->info().volume() = Volume_cell_double_fictious ( cell, scene ); break;
+			case ( 3 ) : cell->info().volume() = Volume_cell_triple_fictious ( cell, scene ); break;
 		}
 	}
 	cout << "Volumes initialised." << endl;
 }
 
-void FlowEngine::UpdateVolumes ( Scene* ncb )
+void FlowEngine::UpdateVolumes ()
 {
 	cout << "Updating volumes.............." << endl;
 
-	Real deltaT = ncb->dt;
+	Real deltaT = scene->dt;
 	CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 	for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ )
 	{
@@ -268,29 +268,29 @@ void FlowEngine::UpdateVolumes ( Scene* ncb )
 		{
 			case ( 3 ):
 			{
-				cell->info().dv() = ( Volume_cell_triple_fictious ( cell,ncb ) - cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell_triple_fictious ( cell,ncb );
+				cell->info().dv() = ( Volume_cell_triple_fictious ( cell,scene ) - cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell_triple_fictious ( cell,scene );
 			}break;
 			case ( 2 ) :
 			{
-				cell->info().dv() = ( Volume_cell_double_fictious ( cell,ncb )-cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell_double_fictious ( cell,ncb );
+				cell->info().dv() = ( Volume_cell_double_fictious ( cell,scene )-cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell_double_fictious ( cell,scene );
 			}break;
 			case ( 1 ) :
 			{
-				cell->info().dv() = ( Volume_cell_single_fictious ( cell,ncb )-cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell_single_fictious ( cell,ncb );
+				cell->info().dv() = ( Volume_cell_single_fictious ( cell,scene )-cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell_single_fictious ( cell,scene );
 			}break;
 			case ( 0 ) :
 			{
-				cell->info().dv() = ( Volume_cell ( cell,ncb )-cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell ( cell,ncb );
+				cell->info().dv() = ( Volume_cell ( cell,scene )-cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell ( cell,scene );
 			}break;
 		}
 	}
 }
 
-Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell, Scene* ncb )
+Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 {
 	Real V[3][3];
 	int b=0;
@@ -303,14 +303,14 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell, Scene* ncb
 		if ( ! ( cell->vertex ( y )->info().isFictious ) )
 		{
 			const shared_ptr<Body>& sph = Body::byId
-			                              ( cell->vertex ( y )->info().id(), ncb );
+			                              ( cell->vertex ( y )->info().id(), scene );
 			for ( int g=0;g<3;g++ ) V[w][g]=sph->state->pos[g];
 			w++;
 		}
 		else
 		{
 			b = cell->vertex ( y )->info().id();
-			const shared_ptr<Body>& wll = Body::byId ( b , ncb );
+			const shared_ptr<Body>& wll = Body::byId ( b , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[i] = flow->boundaries[b].p[i];
 			Wall_point[flow->boundaries[b].coordinate] = wll->state->pos[flow->boundaries[b].coordinate]-wall_thickness;
 		}
@@ -329,7 +329,7 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell, Scene* ncb
 	return abs ( Volume );
 }
 
-Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell, Scene* ncb )
+Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 {
 	Real A[3], AS[3], AT[3];
 	Real B[3], BS[3], BT[3];
@@ -345,7 +345,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell, Scene* ncb
 		if ( cell->vertex ( g )->info().isFictious )
 		{
 			b[j] = cell->vertex ( g )->info().id();
-			const shared_ptr<Body>& wll = Body::byId ( b[j] , ncb );
+			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
 			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate] - wall_thickness;
 			j++;
@@ -353,13 +353,13 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell, Scene* ncb
 		else if ( first_sph )
 		{
 			const shared_ptr<Body>& sph1 = Body::byId
-			                               ( cell->vertex ( g )->info().id(), ncb );
+			                               ( cell->vertex ( g )->info().id(), scene );
 			for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=sph1->state->pos[k]; first_sph=false;}
 		}
 		else
 		{
 			const shared_ptr<Body>& sph2 = Body::byId
-			                               ( cell->vertex ( g )->info().id(), ncb );
+			                               ( cell->vertex ( g )->info().id(), scene );
 			for ( int k=0;k<3;k++ ) { B[k]=BS[k]=BT[k]=sph2->state->pos[k]; }
 		}
 	}
@@ -381,7 +381,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell, Scene* ncb
 	return abs ( Volume );
 }
 
-Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell, Scene* ncb )
+Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 {
 	Real A[3], AS[3], AT[3], AW[3];
 // 	CGT::Boundary b[3];
@@ -394,7 +394,7 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell, Scene* ncb
 		if ( cell->vertex ( g )->info().isFictious )
 		{
 			b[j] = cell->vertex ( g )->info().id();
-			const shared_ptr<Body>& wll = Body::byId ( b[j] , ncb );
+			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
 			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate]-wall_thickness;
 			j++;
@@ -402,7 +402,7 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell, Scene* ncb
 		else
 		{
 			const shared_ptr<Body>& sph = Body::byId
-			                              ( cell->vertex ( g )->info().id(), ncb );
+			                              ( cell->vertex ( g )->info().id(), scene );
 			for ( int k=0;k<3;k++ ) { A[k]=AS[k]=AT[k]=AW[k]=sph->state->pos[k];}
 		}
 	}
@@ -423,7 +423,7 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell, Scene* ncb
 	return abs ( Volume );
 }
 
-Real FlowEngine::Volume_cell ( CGT::Cell_handle cell, Scene* ncb )
+Real FlowEngine::Volume_cell ( CGT::Cell_handle cell)
 {
 	Vector3r A[4];
 	int j=0;
@@ -431,7 +431,7 @@ Real FlowEngine::Volume_cell ( CGT::Cell_handle cell, Scene* ncb )
 	for ( int y=0;y<4;y++ )
 	{
 		const shared_ptr<Body>& sph = Body::byId
-		                              ( cell->vertex ( y )->info().id(), ncb );
+		                              ( cell->vertex ( y )->info().id(), scene );
 		for ( int i=0;i<3;i++ ) A[j]=sph->state->pos;
 		j++;
 	}
@@ -460,7 +460,7 @@ YADE_PLUGIN ((FlowEngine));
 // // 				for ( int j=0; j<3;j++ ) id [j] = cell->vertex ( facetVertices[i][j] )->info().id();
 // // 				for ( int m=0; m<3;m++ )
 // // 				{
-// // 					const shared_ptr<Body>& b = Body::byId ( id[m], ncb );
+// // 					const shared_ptr<Body>& b = Body::byId ( id[m], scene );
 // //
 // // 					dx[m] = b->state->vel[0];
 // // 					dy[m] = b->state->vel[1];
@@ -489,8 +489,8 @@ YADE_PLUGIN ((FlowEngine));
 // 			if ( triple_fictious )
 // 			{
 // 				double deltaT = 1;
-// 				cell->info().dv() = (Volume_cell_double_fictious(cell,ncb)-cell->info().volume())/deltaT;
-// 				cell->info().volume() = Volume_cell_double_fictious(cell,ncb);
+// 				cell->info().dv() = (Volume_cell_double_fictious(cell,scene)-cell->info().volume())/deltaT;
+// 				cell->info().volume() = Volume_cell_double_fictious(cell,scene);
 /*
 int id_real_local=0,id_real_global=0,V_fict=0;
 double pos[3], surface=0;
@@ -502,7 +502,7 @@ for ( int g=0;g<4;g++ )
 		id_real_global=cell->vertex ( g )->info().id();
 	}
 }
-const shared_ptr<Body>& sph = Body::byId ( id_real_global, ncb );
+const shared_ptr<Body>& sph = Body::byId ( id_real_global, scene );
 for ( int i=0;i<3;i++ ) pos[i]=sph->state->pos[i];
 for ( int j=0;j<4;j++ )
 {
@@ -510,7 +510,7 @@ for ( int j=0;j<4;j++ )
 	{
 		CGT::Boundary b = flow->boundaries[cell->vertex ( j )->info().id() ];
 		const shared_ptr<Body>& wall = Body::byId
-				( cell->vertex ( j )->info().id(), ncb );
+				( cell->vertex ( j )->info().id(), scene );
 
 		surface = flow->surface_external_triple_fictious ( pos, cell, b );
 
@@ -525,8 +525,8 @@ for ( int j=0;j<4;j++ )
 // 			if ( double_fictious )
 // 			{
 // 				double deltaT = 1;
-// 				cell->info().dv() = (Volume_cell_double_fictious(cell,ncb)-cell->info().volume())/deltaT;
-// 				cell->info().volume() = Volume_cell_double_fictious(cell,ncb);
+// 				cell->info().dv() = (Volume_cell_double_fictious(cell,scene)-cell->info().volume())/deltaT;
+// 				cell->info().volume() = Volume_cell_double_fictious(cell,scene);
 // 				double A[3], AS[3], AT[3];
 // 				double B[3], BS[3], BT[3];
 // 				bool first=true, first_boundary=true;
@@ -539,7 +539,7 @@ for ( int j=0;j<4;j++ )
 // 					if ( !cell->vertex ( g )->info().isFictious && first )
 // 					{
 // 						const shared_ptr<Body>& sph1 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id(), ncb );
+// 						                               ( cell->vertex ( g )->info().id(), scene );
 // 						for ( int y=0;y<3;y++ )
 // 							{A[y] = sph1->state->pos[y]; AS[y]=A[y]; AT[y]=A[y];}
 // 						Vel_A = sph1->state->vel;
@@ -549,7 +549,7 @@ for ( int j=0;j<4;j++ )
 // 					else if ( !cell->vertex ( g )->info().isFictious )
 // 					{
 // 						const shared_ptr<Body>& sph2 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id(), ncb );
+// 						                               ( cell->vertex ( g )->info().id(), scene );
 // 						for ( int y=0;y<3;y++ )
 // 							{B[y] = ( cell->vertex ( g )->point() ) [y]; BS[y]=B[y]; BT[y]=B[y];}
 //
@@ -559,7 +559,7 @@ for ( int j=0;j<4;j++ )
 // 					{
 // 						b1 = flow->boundaries[cell->vertex ( g )->info().id() ];
 // 						const shared_ptr<Body>& wll1 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id() , ncb );
+// 						                               ( cell->vertex ( g )->info().id() , scene );
 //
 // 						Vel_W1=wll1->state->vel;
 // 						first_boundary=false;
@@ -568,7 +568,7 @@ for ( int j=0;j<4;j++ )
 // 					{
 // 						b2 = flow->boundaries[cell->vertex ( g )->info().id() ];
 // 						const shared_ptr<Body>& wll2 = Body::byId
-// 						                               ( cell->vertex ( g )->info().id() , ncb );
+// 						                               ( cell->vertex ( g )->info().id() , scene );
 //
 // 						Vel_W2=wll2->state->vel;
 // 					}
@@ -602,8 +602,8 @@ for ( int j=0;j<4;j++ )
 // 			if ( single_fictious )
 // 			{
 // 				double deltaT = 1;
-// 				cell->info().dv() = (Volume_cell_single_fictious(cell,ncb)-cell->info().volume())/deltaT;
-// 				cell->info().volume() = Volume_cell_single_fictious(cell,ncb);
+// 				cell->info().dv() = (Volume_cell_single_fictious(cell,scene)-cell->info().volume())/deltaT;
+// 				cell->info().volume() = Volume_cell_single_fictious(cell,scene);
 // 			}
 // 		}
 

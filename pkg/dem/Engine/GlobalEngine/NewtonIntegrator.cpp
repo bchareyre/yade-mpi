@@ -61,7 +61,7 @@ void NewtonIntegrator::saveMaximaVelocity(Scene* scene, const body_id_t& id, Sta
 	#endif
 }
 
-void NewtonIntegrator::action(Scene*)
+void NewtonIntegrator::action()
 {
 	scene->forces.sync();
 	Real dt=scene->dt;
@@ -77,7 +77,8 @@ void NewtonIntegrator::action(Scene*)
 
 	// setup callbacks
 	vector<BodyCallback::FuncPtr> callbackPtrs;
-	FOREACH(const shared_ptr<BodyCallback> cb, callbacks){
+	FOREACH(const shared_ptr<BodyCallback>& cb, callbacks){
+		cerr<<"<cb="<<cb.get()<<", setting cb->scene="<<scene<<">";
 		cb->scene=scene;
 		callbackPtrs.push_back(cb->stepInit());
 	}
@@ -163,6 +164,7 @@ void NewtonIntegrator::action(Scene*)
 
 			// process callbacks
 			for(size_t i=0; i<callbacksSize; i++){
+				cerr<<"<"<<b->id<<",cb="<<callbacks[i]<<",scene="<<callbacks[i]->scene<<">"; // <<",force="<<callbacks[i]->scene->forces.getForce(b->id)<<">";
 				if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),b.get());
 			}
 	}

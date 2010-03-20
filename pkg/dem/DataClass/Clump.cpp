@@ -18,8 +18,8 @@ CREATE_LOGGER(ClumpMemberMover);
  * _param pp passed by the dispatcher
  * _param clump passed by the dispatcher
  */
-void ClumpMemberMover::applyCondition(Scene* rootBody){
-	for(BodyContainer::iterator I=rootBody->bodies->begin(); I!=rootBody->bodies->end(); ++I){
+void ClumpMemberMover::action(){
+	for(BodyContainer::iterator I=scene->bodies->begin(); I!=scene->bodies->end(); ++I){
 		shared_ptr<Body> b = *I;
 		if(b->isClump()){
 			//LOG_TRACE("Applying movement to clump #"<<b->getId());

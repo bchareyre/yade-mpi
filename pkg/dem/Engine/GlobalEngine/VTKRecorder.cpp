@@ -22,7 +22,7 @@ YADE_PLUGIN((VTKRecorder));
 YADE_REQUIRE_FEATURE(VTK)
 CREATE_LOGGER(VTKRecorder);
 
-void VTKRecorder::action(Scene*)
+void VTKRecorder::action()
 {
 	vector<bool> recActive(REC_SENTINEL,false);
 	FOREACH(string& rec, recorders){

@@ -28,7 +28,7 @@ class GeometricalModelMetaEngine :	public Dispatcher2D
 					>
 {
 	public :
-		virtual void action(Scene*);
+		virtual void action();
 
 	REGISTER_CLASS_NAME(GeometricalModelMetaEngine);
 	REGISTER_BASE_CLASS_NAME(Dispatcher2D);

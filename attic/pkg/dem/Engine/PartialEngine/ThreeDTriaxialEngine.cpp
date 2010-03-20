@@ -84,7 +84,7 @@ ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 
 
 
-void ThreeDTriaxialEngine::applyCondition ( Scene * ncb )
+void ThreeDTriaxialEngine::action ( Scene * ncb )
 {
 
 	if ( firstRun )
@@ -132,7 +132,7 @@ void ThreeDTriaxialEngine::applyCondition ( Scene * ncb )
 	}
 	
 
-	TriaxialStressController::applyCondition ( ncb ); // this function is called to perform the external stress control
+	TriaxialStressController::action ( ncb ); // this function is called to perform the external stress control
 
 	Real dt = Omega::instance().getTimeStep();
 

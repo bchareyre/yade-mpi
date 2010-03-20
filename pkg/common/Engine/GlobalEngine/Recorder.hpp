@@ -10,8 +10,8 @@ class Recorder: public PeriodicEngine{
 		std::ofstream out;
 	public:
 		virtual ~Recorder(); // vtable
-		virtual bool isActivated(Scene* rb){
-			if(PeriodicEngine::isActivated(rb)){
+		virtual bool isActivated(){
+			if(PeriodicEngine::isActivated()){
 				if(!out.is_open()) openAndCheck();
 				return true;
 			}

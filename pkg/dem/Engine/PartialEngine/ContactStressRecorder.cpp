@@ -56,20 +56,20 @@ void ContactStressRecorder::postProcessAttributes ( bool deserializing )
 
 
 
-bool ContactStressRecorder::isActivated(Scene*)
+bool ContactStressRecorder::isActivated()
 {
-	return ( ( Omega::instance().getCurrentIteration() % interval == 0 ) && ( ofile ) );
+	return ( ( scene->currentIteration % interval == 0 ) && ( ofile ) );
 }
 
 
-void ContactStressRecorder::action ( Scene * ncb )
+void ContactStressRecorder::action ()
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
 	if ( !triaxCompEng )
 	{
-		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 		for ( ;itFirst!=itLast; ++itFirst )
 		{
 			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
@@ -88,8 +88,8 @@ void ContactStressRecorder::action ( Scene * ncb )
 	//, Vwater = 0,
 	Real kinematicE = 0;
 
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-	InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+	InteractionContainer::iterator iiEnd = scene->interactions->end();
 
 	Real j = 0;
 	Real FT[3][3] = {{0,0,0},{0,0,0},{0,0,0}};
@@ -296,7 +296,7 @@ void ContactStressRecorder::action ( Scene * ncb )
 
 	/// UnbalancedForce
 
-	Real equilibriumForce = triaxCompEng->ComputeUnbalancedForce ( ncb );
+	Real equilibriumForce = triaxCompEng->ComputeUnbalancedForce ( scene );
 //  Real equilibriumForce = sampleCapPressEng->ComputeUnbalancedForce(body);
 
 	if ( Omega::instance().getCurrentIteration() % 100 == 0 )

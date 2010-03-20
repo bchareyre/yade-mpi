@@ -16,7 +16,7 @@
 Vector3r translation_vect (0.10,0,0);
 
 
-void NormalInelasticityLaw::action(Scene*)
+void NormalInelasticityLaw::action()
 {
     shared_ptr<BodyContainer>& bodies = scene->bodies;
 

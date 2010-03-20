@@ -26,7 +26,7 @@ class TriaxialStressController : public GlobalEngine
 	private :
 // 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
 		bool first;
-		inline const Vector3r getForce(Scene* rb, body_id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of applyCondition */ }
+		inline const Vector3r getForce(Scene* rb, body_id_t id){ return rb->forces.getForce(id); /* needs sync, which is done at the beginning of action */ }
 		
 		 	
 	public :
@@ -93,15 +93,15 @@ class TriaxialStressController : public GlobalEngine
 // 		TriaxialStressController();
 		virtual ~TriaxialStressController();
 	
-		virtual void action(Scene*);
+		virtual void action();
 		//! Regulate the stress applied on walls with flag wall_XXX_activated = true
-		void controlExternalStress(int wall, Scene* ncb, Vector3r resultantForce, State* p, Real wall_max_vel);
+		void controlExternalStress(int wall, Vector3r resultantForce, State* p, Real wall_max_vel);
 		//! Regulate the mean stress by changing spheres size, WARNING : this function assumes that all dynamic bodies in the problem are spheres
-		void controlInternalStress(Scene* ncb, Real multiplier);
-		void updateStiffness(Scene* ncb);
-		void computeStressStrain(Scene* ncb); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
+		void controlInternalStress(Real multiplier);
+		void updateStiffness();
+		void computeStressStrain(); //Compute stresses on walls as "Vector3r stress[6]", compute meanStress, strain[3] and mean strain
 		//! Compute the mean/max unbalanced force in the assembly (normalized by mean contact force)
-    		Real ComputeUnbalancedForce(Scene * ncb, bool maxUnbalanced=false);
+    		Real ComputeUnbalancedForce(bool maxUnbalanced=false);
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		TriaxialStressController,GlobalEngine,"An engine maintaining constant stresses on some boundaries of a parallepipedic packing."

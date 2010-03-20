@@ -33,7 +33,7 @@ TriaxialStateRecorder::TriaxialStateRecorder () : Recorder(){
 	porosity = 1.;
 }
 
-void TriaxialStateRecorder::action (Scene * ncb )
+void TriaxialStateRecorder::action ()
 {
 	// at the beginning of the file; write column titles
 	if(out.tellp()==0){
@@ -43,8 +43,8 @@ void TriaxialStateRecorder::action (Scene * ncb )
 
 	if ( !triaxialCompressionEngine )
 	{
-		vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-		vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 		for ( ;itFirst!=itLast; ++itFirst )
 		{
 			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
@@ -57,7 +57,7 @@ void TriaxialStateRecorder::action (Scene * ncb )
 		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
 	}
 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 ) )
-		triaxialCompressionEngine->computeStressStrain ( ncb );
+		triaxialCompressionEngine->computeStressStrain ();
 
 
 
@@ -66,8 +66,8 @@ void TriaxialStateRecorder::action (Scene * ncb )
 	Real Vs=0, kinematicE = 0;
 	Real V = ( triaxialCompressionEngine->height ) * ( triaxialCompressionEngine->width ) * ( triaxialCompressionEngine->depth );
 
-	BodyContainer::iterator bi = ncb->bodies->begin();
-	BodyContainer::iterator biEnd = ncb->bodies->end();
+	BodyContainer::iterator bi = scene->bodies->begin();
+	BodyContainer::iterator biEnd = scene->bodies->end();
 
 	for ( ; bi!=biEnd; ++bi )
 
@@ -103,7 +103,7 @@ void TriaxialStateRecorder::action (Scene * ncb )
  	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
  	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
  	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce ( ncb ) ) << " "
+ 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce () ) << " "
  	<< lexical_cast<string> ( porosity ) << " "
  	<< lexical_cast<string> ( kinematicE )
  	<< endl;

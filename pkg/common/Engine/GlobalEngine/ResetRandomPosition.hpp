@@ -24,7 +24,7 @@ public:
 	virtual ~ResetRandomPosition();
 
 	/// @brief Create one sphere per call.
-	virtual void action(Scene*);
+	virtual void action();
 
 	/// @brief The geometry of the section on which spheres will be placed. 
 	vector<body_id_t> factoryFacets; 

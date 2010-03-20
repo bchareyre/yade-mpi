@@ -24,7 +24,7 @@ PositionOrientationRecorder::PositionOrientationRecorder() {
 	iterPeriod=50;
 }
 
-void PositionOrientationRecorder::action(Scene*){
+void PositionOrientationRecorder::action(){
 	ostringstream oss;
 	oss<<setfill('0')<<outputFile<<"_"<<setw(7)<<Omega::instance().getCurrentIteration();
 	string fileBase=oss.str();

@@ -28,7 +28,7 @@ class InteractionPhysicsDispatcher : 	public Dispatcher2D
 					>
 {		
 	public :
-		virtual void action(Scene*);
+		virtual void action();
 		void explicitAction(shared_ptr<Material>& pp1, shared_ptr<Material>& pp2, shared_ptr<Interaction>& i);
 	
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionPhysicsDispatcher,Dispatcher,"Dispatcher for creating/updating :yref:`Interaction::interactionPhysics` objects.",/*attrs*/,/*ctor*/,

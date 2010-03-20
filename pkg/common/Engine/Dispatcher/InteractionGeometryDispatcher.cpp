@@ -39,7 +39,7 @@ shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shar
 	}
 }
 
-void InteractionGeometryDispatcher::action(Scene*){
+void InteractionGeometryDispatcher::action(){
 	// Erase interaction that were requested for erase, but not processed by the collider, if any (and warn once about that, as it is suspicious)
 	if(scene->interactions->unconditionalErasePending()>0 && !alreadyWarnedNoCollider){
 		LOG_WARN("Interactions pending erase found, no collider being used?");

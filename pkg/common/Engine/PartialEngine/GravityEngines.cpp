@@ -11,7 +11,7 @@
 
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine));
 
-void GravityEngine::action(Scene*){
+void GravityEngine::action(){
 	/* skip bodies that are within a clump;
 	 * even if they are marked isDynamic==false, forces applied to them are passed to the clump, which is dynamic;
 	 * and since clump is a body with mass equal to the sum of masses of its components, it would have gravity applied twice.
@@ -32,7 +32,7 @@ void GravityEngine::action(Scene*){
 	}
 }
 
-void CentralGravityEngine::action(Scene*){
+void CentralGravityEngine::action(){
 	const Vector3r& centralPos=Body::byId(centralBody)->state->pos;
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || b->isClumpMember() || b->getId()==centralBody) continue; // skip clump members and central body
@@ -43,7 +43,7 @@ void CentralGravityEngine::action(Scene*){
 	}
 }
 
-void AxialGravityEngine::action(Scene*){
+void AxialGravityEngine::action(){
 	FOREACH(const shared_ptr<Body>&b, *scene->bodies){
 		if(!b || b->isClumpMember()) continue;
 		/* http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html */

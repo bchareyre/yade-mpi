@@ -25,7 +25,7 @@ class CohesiveFrictionalContactLaw : public GlobalEngine
 		long iter;/// used for checking if new iteration
 	
 		CohesiveFrictionalContactLaw();
-		void action(Scene*);
+		void action();
 
 	REGISTER_ATTRIBUTES(GlobalEngine,(sdecGroupMask)(momentRotationLaw)(erosionActivated)(detectBrokenBodies)(always_use_moment_law)(shear_creep)(twist_creep)(creep_viscosity));
 	REGISTER_CLASS_NAME(CohesiveFrictionalContactLaw);

@@ -29,7 +29,7 @@ public :
     MGPRecorder ();
     ~MGPRecorder ();
 
-    virtual void action(Scene*);
+    virtual void action();
     bool isActivated(Scene*);
 
 protected :

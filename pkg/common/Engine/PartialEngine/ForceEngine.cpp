@@ -9,18 +9,18 @@
 
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine));
 
-void ForceEngine::applyCondition(Scene*){
+void ForceEngine::action(){
 	FOREACH(body_id_t id, subscribedBodies){
 		assert(scene->bodies->exists(id));
 		scene->forces.addForce(id,force);
 	}
 }
 
-void InterpolatingDirectedForceEngine::applyCondition(Scene* scene){
+void InterpolatingDirectedForceEngine::action(){
 	Real virtTime=wrap ? Shop::periodicWrap(scene->simulationTime,*times.begin(),*times.rbegin()) : scene->simulationTime;
 	direction.Normalize(); 
 	force=linearInterpolate<Real>(virtTime,times,magnitudes,_pos)*direction;
-	ForceEngine::applyCondition(scene);
+	ForceEngine::action();
 }
 
 

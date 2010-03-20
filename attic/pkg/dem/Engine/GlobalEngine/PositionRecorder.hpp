@@ -24,7 +24,7 @@ class PositionRecorder : public DataRecorder
 	
 		PositionRecorder ();
 		~PositionRecorder ();
-		virtual void action(Scene*);
+		virtual void action();
 		virtual bool isActivated(Scene*);
 
 	protected :

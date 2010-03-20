@@ -12,7 +12,7 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 class InteractionDispatchers: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
 	public:
-		virtual void action(Scene*);
+		virtual void action();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionDispatchers,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.",
 			((shared_ptr<InteractionGeometryDispatcher>,geomDispatcher,new InteractionGeometryDispatcher,"[will be overridden]"))
 			((shared_ptr<InteractionPhysicsDispatcher>,physDispatcher,new InteractionPhysicsDispatcher,"[will be overridden]"))

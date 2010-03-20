@@ -18,7 +18,7 @@
 YADE_PLUGIN((KinemCNSEngine));
 
 
-void KinemCNSEngine::applyCondition(Scene * ncb)
+void KinemCNSEngine::action(Scene * ncb)
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;
 	leftbox = Body::byId(id_boxleft);

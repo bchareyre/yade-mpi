@@ -35,7 +35,7 @@ class Se3Interpolator: public PartialEngine {
 		virtual bool isActivated(Scene*){return !done;}
 		Se3Interpolator(): done(false), started(false), rotRelative(false), goalVirt(0), goalReal(0), goalIter(0) {};
 		virtual ~Se3Interpolator(){};
-		virtual void applyCondition(Scene* mb);
+		virtual void action(Scene* mb);
 	protected:
 		REGISTER_ATTRIBUTES(PartialEngine,
 			(done)

@@ -86,8 +86,8 @@ REGISTER_SERIALIZABLE(Clump);
 /*! Update ::Clump::members positions so that the Clump behaves as a rigid body. */
 class ClumpMemberMover: public PartialEngine {
 	public:
-		//! Interates over rootBody->bodies and calls Clump::moveSubBodies() for clumps.
-		virtual void applyCondition(Scene*);
+		//! Interates over scene->bodies and calls Clump::moveSubBodies() for clumps.
+		virtual void action();
 		virtual ~ClumpMemberMover(){};
 	YADE_CLASS_BASE_DOC(ClumpMemberMover,PartialEngine,"Update Clump::members positions and orientations so that Clump behaves as rigid body. This engine is only used internally by NewtonIntegrator, not directly.");
 	DECLARE_LOGGER;

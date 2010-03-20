@@ -104,7 +104,7 @@ void UniaxialStrainer::init(){
 	assert(crossSectionArea>0);
 }
 
-void UniaxialStrainer::action(Scene*){
+void UniaxialStrainer::action(){
 	if(needsInit) init();
 	// postconditions for initParams
 	assert(posIds.size()==posCoords.size() && negIds.size()==negCoords.size() && originalLength>0 && crossSectionArea>0);

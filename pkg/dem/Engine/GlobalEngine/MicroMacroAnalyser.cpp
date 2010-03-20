@@ -51,9 +51,9 @@ void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 	}
 }
 
-void MicroMacroAnalyser::action(Scene*)
+void MicroMacroAnalyser::action()
 {
-	//cerr << "MicroMacroAnalyser::action(Scene* scene) (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
+	//cerr << "MicroMacroAnalyser::action() (interval="<< interval <<", iteration="<< Omega::instance().getCurrentIteration()<<")" << endl;
 	if (!triaxialCompressionEngine) {
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
 		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();

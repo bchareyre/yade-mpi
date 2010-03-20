@@ -29,7 +29,7 @@ class MeasurePoisson : public DataRecorder
 		
 		MeasurePoisson ();
 
-		virtual void action(Scene*);
+		virtual void action();
 		virtual bool isActivated(Scene*);
 
 	REGISTER_ATTRIBUTES(DataRecorder,(outputFile)(interval)(horizontal)(vertical)(bottom)(upper)(left)(right));

@@ -75,7 +75,7 @@ class ThreeDTriaxialEngine : public TriaxialStressController
 		
 		std::string Key;//A code that is appended to file names to help distinguish between different simulations
 				
-		virtual void applyCondition(Scene * ncb);
+		virtual void action(Scene * ncb);
 		//void updateParameters(Scene * ncb);
 		
 		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)

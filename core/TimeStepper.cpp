@@ -12,9 +12,9 @@
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Scene.hpp>
 
-bool TimeStepper::isActivated(Scene* mb)
+bool TimeStepper::isActivated()
 {
-	return (active && (mb->currentIteration % timeStepUpdateInterval == 0));
+	return (active && (scene->currentIteration % timeStepUpdateInterval == 0));
 }
 
 

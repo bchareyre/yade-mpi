@@ -25,20 +25,20 @@ class FlowEngine : public PartialEngine
 		Real wall_thickness;
 		bool Update_Triangulation;
 		
-		void Triangulate ( Scene* ncb );
-		void AddBoundary ( Scene* ncb );
-		void Build_Triangulation ( Scene* ncb, double P_zero );
-		void UpdateVolumes ( Scene* ncb );
-		void Initialize_volumes ( Scene* ncb );
-		Real Volume_cell_single_fictious (CGT::Cell_handle cell, Scene* ncb);
-		Real Volume_cell_double_fictious (CGT::Cell_handle cell, Scene* ncb);
-		Real Volume_cell_triple_fictious (CGT::Cell_handle cell, Scene* ncb);
-		Real Volume_cell (CGT::Cell_handle cell, Scene* ncb);
+		void Triangulate ();
+		void AddBoundary ();
+		void Build_Triangulation (double P_zero );
+		void UpdateVolumes ();
+		void Initialize_volumes ();
+		Real Volume_cell_single_fictious (CGT::Cell_handle cell);
+		Real Volume_cell_double_fictious (CGT::Cell_handle cell);
+		Real Volume_cell_triple_fictious (CGT::Cell_handle cell);
+		Real Volume_cell (CGT::Cell_handle cell);
 		void Oedometer_Boundary_Conditions();
 		
 		virtual ~FlowEngine();
 	
-		virtual void applyCondition(Scene*);
+		virtual void action();
 		
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,"Activates Flow Engine"))

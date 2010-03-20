@@ -17,7 +17,7 @@
 
 CREATE_LOGGER(BoundDispatcher);
 
-void BoundDispatcher::action(Scene*)
+void BoundDispatcher::action()
 {
 	updateScenePtr();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;

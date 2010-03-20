@@ -34,7 +34,7 @@
  *   After the compression stage is over, engine should be disabled by 
  *   setting active=false;
  */
-void StaticAttractionEngine::applyCondition(Scene * ncb)
+void StaticAttractionEngine::action(Scene * ncb)
 {
 
 	BodyContainer::iterator bi    = ncb->bodies->begin();

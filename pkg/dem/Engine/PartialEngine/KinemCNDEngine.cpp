@@ -14,7 +14,7 @@
 
 
 
-void KinemCNDEngine::applyCondition(Scene * ncb)
+void KinemCNDEngine::action(Scene * ncb)
 {
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);

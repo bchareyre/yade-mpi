@@ -29,7 +29,7 @@ void Disp2DPropLoadEngine::postProcessAttributes(bool deserializing)
 
 
 
-void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
+void Disp2DPropLoadEngine::action()
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;
 	leftbox = Body::byId(id_boxleft);
@@ -44,7 +44,7 @@ void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
 		it_begin=Omega::instance().getCurrentIteration();
 		H0=topbox->state->pos.Y();
 		X0=topbox->state->pos.X();
-		Vector3r F_sup=ncb->forces.getForce(id_topbox);
+		Vector3r F_sup=scene->forces.getForce(id_topbox);
 		Fn0=F_sup.Y();
 		Ft0=F_sup.X();
 
@@ -52,8 +52,8 @@ void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
 			,TotInt=0	// the half number of all the real interactions, at the beginning of the perturbation
 			;
 
-		InteractionContainer::iterator ii    = ncb->interactions->begin();
-		InteractionContainer::iterator iiEnd = ncb->interactions->end();
+		InteractionContainer::iterator ii    = scene->interactions->begin();
+		InteractionContainer::iterator iiEnd = scene->interactions->end();
         	for(  ; ii!=iiEnd ; ++ii ) 
         	{
         		if ((*ii)->isReal())
@@ -74,18 +74,18 @@ void Disp2DPropLoadEngine::applyCondition(Scene* ncb)
 
 
 	if ( (Omega::instance().getCurrentIteration()-it_begin) < nbre_iter)
-	{	letDisturb(ncb);
+	{	letDisturb();
 	}
 	else if ( (Omega::instance().getCurrentIteration()-it_begin) == nbre_iter)
 	{
 		stopMovement();
 		string fileName=Key + "DR"+lexical_cast<string> (nbre_iter)+"ItAtV_"+lexical_cast<string> (v)+"done.xml";
 // 		Omega::instance().saveSimulation ( fileName );
-		saveData(ncb);
+		saveData();
 	}
 }
 
-void Disp2DPropLoadEngine::letDisturb(Scene* ncb)
+void Disp2DPropLoadEngine::letDisturb()
 {
 
 	Real dt = Omega::instance().getTimeStep();
@@ -170,7 +170,7 @@ void Disp2DPropLoadEngine::stopMovement()
 }
 
 
-void Disp2DPropLoadEngine::saveData(Scene* ncb)
+void Disp2DPropLoadEngine::saveData()
 {
 	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
 
@@ -181,8 +181,8 @@ void Disp2DPropLoadEngine::saveData(Scene* ncb)
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-        InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+        InteractionContainer::iterator iiEnd = scene->interactions->end();
 
 	Real	OnlySsInt=0	// the half number of real sphere-sphere (only) interactions, at the end of the perturbation
 		,TotInt=0	// the half number of all the real interactions, at the end of the perturbation
@@ -202,7 +202,7 @@ void Disp2DPropLoadEngine::saveData(Scene* ncb)
 	Real	coordSs = OnlySsInt/8590,	// 8590 is the number of spheres in the CURRENT case
 		coordTot = TotInt / 8596;	// 8596 is the number of bodies in the CURRENT case
 
-	Vector3r F_sup = ncb->forces.getForce(id_topbox);
+	Vector3r F_sup = scene->forces.getForce(id_topbox);
 
 	Real	dFn=F_sup.Y()-Fn0	// OK pour le signe
 		,dFt=(F_sup.X()-Ft0)

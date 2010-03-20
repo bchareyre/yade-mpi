@@ -52,13 +52,13 @@ void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryStressRecorder::isActivated(Scene*)
+bool CapillaryStressRecorder::isActivated()
 {
 	return ((scene->currentIteration % interval == 0) && (ofile));
 }
 
 
-void CapillaryStressRecorder::action(Scene*)
+void CapillaryStressRecorder::action()
 {
 	if ( !triaxialCompressionEngine )
 	{

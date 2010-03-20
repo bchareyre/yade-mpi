@@ -7,26 +7,14 @@
 *************************************************************************/
 
 #pragma once
-
 #include <vector>
-
 #include<yade/core/Engine.hpp>
 #include<yade/core/Body.hpp>
 
-/*! \brief Abstract interface for all dii ex machina.
-
-	All kinematic engines must derived from this class. A kinematic engine is used to modify the state of an object
-	(position,velocity ...) according to a predefined law (mathematical function, stored data ...) and not according
-	to a dynamic law as dynamic engines do. A kinematic engine contains a list of bodies to act on, and bodies can
-	subscribe to several dii ex machina.
-*/
-
-class PartialEngine : public Engine
-{
-	public :
-		virtual void action(Scene*);
-		virtual void applyCondition(Scene*) { throw; };
-	YADE_CLASS_BASE_DOC_ATTRS(PartialEngine,Engine,"Engine affecting only particular bodies in the simulation.",
+class PartialEngine: public Engine{
+	public:
+		virtual ~PartialEngine() {};
+	YADE_CLASS_BASE_DOC_ATTRS(PartialEngine,Engine,"Engine affecting only particular bodies in the simulation, defined by *subscribedBodies*.",
 		((std::vector<int>,subscribedBodies,,":yref:`Ids<Body::id>` of bodies affected by this PartialEngine."))
 	);
 };

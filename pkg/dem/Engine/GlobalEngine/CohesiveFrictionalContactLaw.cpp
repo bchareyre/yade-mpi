@@ -44,13 +44,13 @@ void outv ( Vector3r axis )
 	std::cout << " axis: " <<  axis[0] << " " << axis[1] << " " << axis[2] << ", length: " << axis.Length() << " | ";
 }
 
-void CohesiveFrictionalContactLaw::action ( Scene* ncb )
+void CohesiveFrictionalContactLaw::action ()
 {
-	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-	InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+	InteractionContainer::iterator iiEnd = scene->interactions->end();
 	for ( ; ii!=iiEnd ; ++ii )
 	{
 		//if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
@@ -76,7 +76,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 			ScGeom* currentContactGeometry  = YADE_CAST<ScGeom*> ( contact->interactionGeometry.get() );
 			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> ( contact->interactionPhysics.get() );
 			Vector3r& shearForce    = currentContactPhysics->shearForce;
-			if ( contact->isFresh ( ncb ) ) shearForce   = Vector3r::ZERO;
+			if ( contact->isFresh ( scene ) ) shearForce   = Vector3r::ZERO;
 
 			Real un     = currentContactGeometry->penetrationDepth;
 			Real Fn    = currentContactPhysics->kn*un;
@@ -88,7 +88,7 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 			   )
 			{
 				// BREAK due to tension
-				ncb->interactions->requestErase ( contact->getId1(),contact->getId2() );
+				scene->interactions->requestErase ( contact->getId1(),contact->getId2() );
 				// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 				currentContactPhysics->cohesionBroken = true;
 				currentContactPhysics->normalForce = Vector3r::ZERO;
@@ -160,10 +160,10 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 				//  cerr << "shearForce " << shearForce << endl;
 				// cerr << "f= " << f << endl;
 				// it will be some macro( body->physicalActions, ActionType , bodyId )
-				ncb->forces.addForce ( id1,-f );
-				ncb->forces.addForce ( id2, f );
-				ncb->forces.addTorque ( id1,-c1x.Cross ( f ) );
-				ncb->forces.addTorque ( id2, c2x.Cross ( f ) );
+				scene->forces.addForce ( id1,-f );
+				scene->forces.addForce ( id2, f );
+				scene->forces.addTorque ( id1,-c1x.Cross ( f ) );
+				scene->forces.addTorque ( id2, c2x.Cross ( f ) );
 
 
 
@@ -222,8 +222,8 @@ void CohesiveFrictionalContactLaw::action ( Scene* ncb )
 					Vector3r moment = moment_twist + moment_bending;
 					currentContactPhysics->moment_twist = moment_twist;
 					currentContactPhysics->moment_bending = moment_bending;
-					ncb->forces.addTorque ( id1,-moment );
-					ncb->forces.addTorque ( id2, moment );
+					scene->forces.addTorque ( id1,-moment );
+					scene->forces.addTorque ( id2, moment );
 				}
 				/// Moment law END       ///
 

@@ -39,8 +39,8 @@ class CapillaryStressRecorder : public Recorder
 
 		CapillaryStressRecorder ();
 
-		virtual void action(Scene*);
-		virtual bool isActivated(Scene*);
+		virtual void action();
+		virtual bool isActivated();
 	DECLARE_LOGGER;
 	REGISTER_ATTRIBUTES(Recorder,(outputFile)(interval)/*(wall_bottom_id)(wall_top_id)(wall_left_id)(wall_right_id)(wall_front_id)(wall_back_id)(height)(width)(depth)(thickness)(upperCorner)(lowerCorner)	*/);
 	protected :

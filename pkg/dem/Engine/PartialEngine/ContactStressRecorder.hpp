@@ -43,8 +43,8 @@ class ContactStressRecorder : public Recorder
 
 		ContactStressRecorder ();
 
-		virtual void action(Scene*);
-		virtual bool isActivated(Scene*);
+		virtual void action();
+		virtual bool isActivated();
 
 	protected :
 		virtual void postProcessAttributes(bool deserializing);

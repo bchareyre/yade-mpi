@@ -34,18 +34,18 @@ void CapillaryRecorder::postProcessAttributes(bool deserializing)
 
 
 
-bool CapillaryRecorder::isActivated(Scene*)
+bool CapillaryRecorder::isActivated()
 {
 	return ((scene->currentIteration % interval == 0) && (ofile));
 }
 
 
-void CapillaryRecorder::action(Scene * ncb)
+void CapillaryRecorder::action()
 {
 	Real fx=0, fy=0, fz=0;
 	
-	ncb->forces.sync();
-	Vector3r force=ncb->forces.getForce(bigBallId);
+	scene->forces.sync();
+	Vector3r force=scene->forces.getForce(bigBallId);
 	
 		
 		fx=force[0];
@@ -58,7 +58,7 @@ void CapillaryRecorder::action(Scene * ncb)
 	
 // 	//physicalParameters de bigBall
 // 	
-// 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
+// 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 // 	Material* bigBallpp =
 // 	static_cast<FrictMat*>((*bodies)[bigBallId]->material.get())
 // ; ;
@@ -68,8 +68,8 @@ void CapillaryRecorder::action(Scene * ncb)
 // 		Real Dintergranular = x - (R1+R2);	
 // 	
 // 	// capillary parameters
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-        InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+        InteractionContainer::iterator iiEnd = scene->interactions->end();
         
         Real Vtotal = 0;
         Real CapillaryPressure = 0;

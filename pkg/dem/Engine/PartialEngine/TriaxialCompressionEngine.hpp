@@ -56,7 +56,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		// should be "enum stateNum {...}" once this is fixed
 		enum {STATE_UNINITIALIZED, STATE_ISO_COMPACTION, STATE_ISO_UNLOADING, STATE_TRIAX_LOADING,  STATE_FIXED_POROSITY_COMPACTION, STATE_LIMBO};
 		
-		void doStateTransition(Scene *body, stateNum nextState);
+		void doStateTransition(stateNum nextState);
 		#define _STATE_CASE(ST) case ST: return #ST
 		string stateName(stateNum st){switch(st){ _STATE_CASE(STATE_UNINITIALIZED);_STATE_CASE(STATE_ISO_COMPACTION);_STATE_CASE(STATE_ISO_UNLOADING);_STATE_CASE(STATE_TRIAX_LOADING);_STATE_CASE(STATE_FIXED_POROSITY_COMPACTION);_STATE_CASE(STATE_LIMBO); default: return "<unknown state>"; } }
 		#undef _STATE_CASE
@@ -69,8 +69,8 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		bool firstRun;
 		int FinalIterationPhase1, Iteration/*, testEquilibriumInterval*/;//FIXME : what is that?
 		
-		virtual void action(Scene * ncb);
-		void updateParameters(Scene * ncb);
+		virtual void action();
+		void updateParameters();
 		
 		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)
 		void setContactProperties(Real frictionDegree);

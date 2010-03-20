@@ -87,7 +87,7 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 }
 
 // STRIDE
-	bool InsertionSortCollider::isActivated(Scene*){
+	bool InsertionSortCollider::isActivated(){
 		// activated if number of bodies changes (hence need to refresh collision information)
 		// or the time of scheduled run already came, or we were never scheduled yet
 		if(!strideActive) return true;
@@ -105,7 +105,7 @@ vector<body_id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		return false;
 	}
 
-void InsertionSortCollider::action(Scene*){
+void InsertionSortCollider::action(){
 	#ifdef ISC_TIMING
 		timingDeltas->start();
 	#endif
@@ -195,7 +195,8 @@ void InsertionSortCollider::action(Scene*){
 					newton->velocityBins->setBins(scene,newton->maxVelocitySq,sweepLength);
 				}
 			}
-			boundDispatcher->action(scene);
+			boundDispatcher->scene=scene;
+			boundDispatcher->action();
 
 	ISC_CHECKPOINT("bound");
 

@@ -4,15 +4,16 @@
 #include<time.h>
 #include<yade/core/GlobalEngine.hpp>
 #include<yade/core/Omega.hpp>
+#include<yade/core/Scene.hpp>
 
 class PeriodicEngine:  public GlobalEngine {
 	public:
 		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
 		virtual ~PeriodicEngine(); // vtable
-		virtual bool isActivated(Scene*){
-			Real virtNow=Omega::instance().getSimulationTime();
+		virtual bool isActivated(){
+			const Real& virtNow=scene->simulationTime;
 			Real realNow=getClock();
-			long iterNow=Omega::instance().getCurrentIteration();
+			const long& iterNow=scene->currentIteration;
 			if((nDo<0 || nDone<nDo) &&
 				((virtPeriod>0 && virtNow-virtLast>=virtPeriod) ||
 				 (realPeriod>0 && realNow-realLast>=realPeriod) ||
@@ -42,7 +43,7 @@ class PeriodicEngine:  public GlobalEngine {
 		\
 		This class should be used directly; rather, derive your own engine which you want to be run periodically. \n\n\
 		\
-		Derived engines should override Engine::action(Scene*), which will be called periodically. If the derived Engine \
+		Derived engines should override Engine::action(), which will be called periodically. If the derived Engine \
 		overrides also Engine::isActivated, it should also take in account return value from PeriodicEngine::isActivated, \
 		since otherwise the periodicity will not be functional. \n\n\
 		\
@@ -88,7 +89,7 @@ REGISTER_SERIALIZABLE(PeriodicEngine);
 		Real realLim, virtLim; long iterLim;
 		Real stretchFactor;
 		bool mayStretch;
-		virtual bool isActivated(Scene* rootBody){
+		virtual bool isActivated(){
 			assert(stretchFactor>0);
 			if(iterLim==0 && iterPeriod!=0){iterLim=iterPeriod;} else if(iterLim!=0 && iterPeriod==0){iterPeriod=iterLim;}
 			if(realLim==0 && realPeriod!=0){realLim=realPeriod;} else if(realLim!=0 && realPeriod==0){realPeriod=realLim;}
@@ -98,7 +99,7 @@ REGISTER_SERIALIZABLE(PeriodicEngine);
 			mayStretch=((virtPeriod<0 || (stretchFactor>1 ? stretchFactor*virtPeriod<=virtLim : stretchFactor*virtPeriod>=virtLim))
 			&& (realPeriod<0 || (stretchFactor>1 ? stretchFactor*realPeriod<=realLim : stretchFactor*realPeriod>=realLim))
 			&& (iterPeriod<0 || (stretchFactor>1 ? stretchFactor*iterPeriod<=iterLim : stretchFactor*iterPeriod>=iterLim)));
-			return PeriodicEngine::isActivated(rootBody);
+			return PeriodicEngine::isActivated();
 		}
 		REGISTER_ATTRIBUTES(PeriodicEngine,(realLim)(virtLim)(iterLim)(mayStretch)(stretchFactor));
 		REGISTER_CLASS_NAME(StretchPeriodicEngine);

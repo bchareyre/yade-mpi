@@ -221,7 +221,7 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 class CpmStateUpdater: public PeriodicEngine {
 	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {} };
 	public:
-		virtual void action(Scene*){ update(scene); }
+		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CpmStateUpdater,PeriodicEngine,"Update :yref:`CpmState` of bodies based on state variables in :yref:`CpmPhys` of interactions with this bod. In particular, bodies' colors and :yref:`CpmState::normDmg` depending on average :yref:`damage<CpmPhys::omega>` of their interactions and number of interactions that were already fully broken and have disappeared is updated. This engine contains its own loop (2 loops, more precisely) over all bodies and should be run periodically to update colors during the simulation, if desired.",
 		((Real,avgRelResidual,NaN,"Average residual strength at last run."))

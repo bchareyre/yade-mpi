@@ -13,7 +13,7 @@
  */
 class RotationEngine: public PartialEngine{
 	public:
-		virtual void applyCondition(Scene * );
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(RotationEngine,PartialEngine,"Engine applying rotation (by setting angular velocity) to subscribed bodies. If rotateAroundZero is set, then each body is also displaced around zeroPoint.",
 		((Real,angularVelocity,0,"Angular velocity. [rad/s]"))
 		((Vector3r,rotationAxis,Vector3r::UNIT_X,"Axis of rotation (direction); will be normalized automatically."))
@@ -27,7 +27,7 @@ REGISTER_SERIALIZABLE(RotationEngine);
  */
 class SpiralEngine:public PartialEngine{
 	public:
-	virtual void applyCondition(Scene*);
+	virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(SpiralEngine,PartialEngine,"Engine applying both rotation and translation, along the same axis, whence the name SpiralEngine",
 		((Real,angularVelocity,0,"Angular velocity [rad/s]"))
 		((Real,linearVelocity,0,"Linear velocity [m/s]"))
@@ -49,7 +49,7 @@ class InterpolatingSpiralEngine: public SpiralEngine{
 	//! holder of interpolation state, should not be touched by the user.
 	size_t _pos;
 	public:
-		virtual void applyCondition(Scene* rb);
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InterpolatingSpiralEngine,SpiralEngine,"Engine applying spiral motion, finding current angular velocity by linearly interpolating in times and velocities and translation by using slope parameter. \n\n The interpolation assumes the margin value before the first time point and last value after the last time point. If wrap is specified, time will wrap around the last times value to the first one (note that no interpolation between last and first values is done).",
 		((vector<Real>,times,,"List of time points at which velocities are given; must be increasing [s]"))
 		((vector<Real>,angularVelocities,,"List of angular velocities; manadatorily of same length as times. [rad/s]"))

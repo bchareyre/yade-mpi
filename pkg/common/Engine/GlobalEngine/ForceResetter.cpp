@@ -11,5 +11,5 @@
 
 YADE_PLUGIN((ForceResetter));
 
-void ForceResetter::action(Scene*){ scene->forces.reset(); }
+void ForceResetter::action(){ scene->forces.reset(); }
 

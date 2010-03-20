@@ -78,7 +78,7 @@ MeniscusParameters::~MeniscusParameters()
 
 
 //FIXME : remove bool first !!!!!
-void CapillaryCohesiveLaw::action(Scene*)
+void CapillaryCohesiveLaw::action()
 {
 //	cerr << "capillaryLawAction" << endl;
         //compteur1 = 0;
@@ -241,7 +241,7 @@ void CapillaryCohesiveLaw::action(Scene*)
         }
 
         if (fusionDetection)
-                checkFusion(scene);
+                checkFusion();
 
         for(ii= scene->interactions->begin(); ii!=iiEnd ; ++ii ) 
 	{	//cerr << "interaction " << ii << endl;
@@ -288,7 +288,7 @@ void capillarylaw::fill(const char* filename)
 
 }
 
-void CapillaryCohesiveLaw::checkFusion(Scene * scene)
+void CapillaryCohesiveLaw::checkFusion()
 {
 
 	//Reset fusion numbers

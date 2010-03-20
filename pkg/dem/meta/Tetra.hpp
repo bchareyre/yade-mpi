@@ -90,7 +90,7 @@ REGISTER_SERIALIZABLE(Bo1_Tetra_Aabb);
 
 class TetraVolumetricLaw: public GlobalEngine {
 	public:
-		void action(Scene*);
+		void action();
 	DECLARE_LOGGER;
 	YADE_CLASS_BASE_DOC(TetraVolumetricLaw,GlobalEngine,"Calculate physical response of 2 :yref:`tetrahedra<Tetra>` in interaction, based on penetration configuration given by :yref:`TTetraGeom`.");
 };

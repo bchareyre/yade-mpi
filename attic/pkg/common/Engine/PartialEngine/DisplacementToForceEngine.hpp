@@ -24,7 +24,7 @@ class DisplacementToForceEngine : public PartialEngine
 		DisplacementToForceEngine();
 		virtual ~DisplacementToForceEngine();
 
-		virtual void applyCondition(Scene *);
+		virtual void action(Scene *);
 
 	protected :
 		virtual void postProcessAttributes(bool);

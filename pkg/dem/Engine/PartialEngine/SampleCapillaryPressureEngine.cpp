@@ -41,7 +41,7 @@ SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 }
 
 
-void SampleCapillaryPressureEngine::updateParameters(Scene * scene)
+void SampleCapillaryPressureEngine::updateParameters()
 {
 	UnbalancedForce = ComputeUnbalancedForce(scene);
 	if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
@@ -67,10 +67,10 @@ void SampleCapillaryPressureEngine::updateParameters(Scene * scene)
 }
 	
 
-void SampleCapillaryPressureEngine::action(Scene*)
+void SampleCapillaryPressureEngine::action()
 {	
-	updateParameters(scene);
-	TriaxialStressController::action(scene);
+	updateParameters();
+	TriaxialStressController::action();
 	if (pressureVariationActivated)		
 		{
 			if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "pressure variation!!" << endl;
@@ -85,6 +85,7 @@ void SampleCapillaryPressureEngine::action(Scene*)
 		       capillaryCohesiveLaw->fusionDetection = fusionDetection;
 		       capillaryCohesiveLaw->binaryFusion = binaryFusion;}
 		if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "capillary pressure = " << Pressure << endl;
-		capillaryCohesiveLaw->action(scene);
+		capillaryCohesiveLaw->scene=scene;;
+		capillaryCohesiveLaw->action();
 		UnbalancedForce = ComputeUnbalancedForce(scene);
 }

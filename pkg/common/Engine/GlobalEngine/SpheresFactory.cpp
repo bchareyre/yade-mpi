@@ -49,7 +49,7 @@ SpheresFactory::~SpheresFactory()
 	
 }
 
-void SpheresFactory::action(Scene*)
+void SpheresFactory::action()
 {
 	if (first_run)
 	{

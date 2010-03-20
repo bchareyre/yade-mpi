@@ -8,8 +8,8 @@ shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const python::list& slaves);
 class ParallelEngine: public Engine {
 	public:
 		typedef vector<vector<shared_ptr<Engine> > > slaveContainer;
-		virtual void action(Scene*);
-		virtual bool isActivated(Scene*){return true;}
+		virtual void action();
+		virtual bool isActivated(){return true;}
 	// py access
 		boost::python::list slaves_get();
 		void slaves_set(const boost::python::list& slaves);

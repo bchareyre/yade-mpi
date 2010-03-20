@@ -9,7 +9,7 @@
 class CohesiveStateRPMRecorder: public Recorder {
 		std::ofstream outFile;
 	public:
-		virtual void action(Scene*);
+		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohesiveStateRPMRecorder,Recorder,
 		"Store number of cohesive contacts in RPM model to file.",
 		((int,numberCohesiveContacts,0,"Number of cohesive contacts found at last run. [-]")),

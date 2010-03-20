@@ -2,7 +2,7 @@
 #include "LawDispatcher.hpp"
 YADE_PLUGIN((LawDispatcher));
 CREATE_LOGGER(LawDispatcher);
-void LawDispatcher::action(Scene*){
+void LawDispatcher::action(){
 	updateScenePtr();
 	#ifdef YADE_OPENMP
 		const long size=scene->interactions->size();

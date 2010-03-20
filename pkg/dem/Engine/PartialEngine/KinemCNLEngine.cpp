@@ -15,7 +15,7 @@
 
 YADE_PLUGIN((KinemCNLEngine));
 
-void KinemCNLEngine::applyCondition(Scene * ncb)
+void KinemCNLEngine::action(Scene * ncb)
 {
 	if(LOG)	cout << "debut applyCondi du CNCEngine !!" << endl;
 	leftbox = Body::byId(id_boxleft);

@@ -24,7 +24,7 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 
 #define DISPATCH_CACHE
 
-void InteractionDispatchers::action(Scene*){
+void InteractionDispatchers::action(){
 	#ifdef IDISP_TIMING
 		timingDeltas->start();
 	#endif

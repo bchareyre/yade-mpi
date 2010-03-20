@@ -29,7 +29,7 @@ CapillaryPressureEngine::~CapillaryPressureEngine()
 
 
 
-void CapillaryPressureEngine::applyCondition(Scene*)
+void CapillaryPressureEngine::action()
 {		
 	//cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
 	
@@ -41,7 +41,8 @@ void CapillaryPressureEngine::applyCondition(Scene*)
 // 	cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
 // 	cerr << " PressureVariation = " << PressureVariation << endl;
 	
-	capillaryCohesiveLaw->action(scene);
+	capillaryCohesiveLaw->scene=scene;
+	capillaryCohesiveLaw->action();
 		
 	
 	

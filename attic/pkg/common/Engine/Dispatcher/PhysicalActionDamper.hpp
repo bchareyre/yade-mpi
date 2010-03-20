@@ -15,7 +15,7 @@
 class Body;
 class Scene;
 class PhysicalActionDamper: public Dispatcher1D<PhysicalParameters,PhysicalActionDamperUnit,void,TYPELIST_3(const shared_ptr<PhysicalParameters>&, const Body*, Scene*)>{
-	public: virtual void action(Scene*);
+	public: virtual void action();
 	REGISTER_CLASS_AND_BASE(PhysicalActionDamper,Dispatcher1D);
 };
 REGISTER_SERIALIZABLE(PhysicalActionDamper);

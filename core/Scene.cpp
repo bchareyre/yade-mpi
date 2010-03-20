@@ -75,7 +75,7 @@ void Scene::postProcessAttributes(bool deserializing){
 void Scene::moveToNextTimeStep(){
 	if(needsInitializers){
 		checkStateTypes();
-		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(!e->isActivated(this)) continue;e->action(this); } 
+		FOREACH(shared_ptr<Engine> e, initializers){ e->scene=this; if(!e->isActivated()) continue;e->action(); } 
 		forces.resize(bodies->size());
 		needsInitializers=false;
 	}
@@ -85,8 +85,8 @@ void Scene::moveToNextTimeStep(){
 	TimingInfo::delta last=TimingInfo::getNow(); // actually does something only if TimingInfo::enabled, no need to put the condition here
 	FOREACH(const shared_ptr<Engine>& e, engines){
 		e->scene=this;
-		if(!e->isActivated(this)) continue;
-		e->action(this);
+		if(!e->isActivated()) continue;
+		e->action();
 		if(TimingInfo_enabled) {TimingInfo::delta now=TimingInfo::getNow(); e->timingInfo.nsec+=now-last; e->timingInfo.nExec+=1; last=now;}
 	}
 	currentIteration++;

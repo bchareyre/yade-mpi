@@ -32,15 +32,15 @@ class Engine: public Serializable{
 		shared_ptr<TimingDeltas> timingDeltas;
 		virtual ~Engine() {};
 	
-		virtual bool isActivated(Scene*) { return true; };
-		virtual void action(Scene*) { throw; };
+		virtual bool isActivated() { return true; };
+		virtual void action() { throw; };
 	private:
 		// py access funcs	
 		TimingInfo::delta timingInfo_nsec_get(){return timingInfo.nsec;};
 		void timingInfo_nsec_set(TimingInfo::delta d){ timingInfo.nsec=d;}
 		long timingInfo_nExec_get(){return timingInfo.nExec;};
 		void timingInfo_nExec_set(long d){ timingInfo.nExec=d;}
-		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(scene); }
+		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(); }
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
 		((string,label,,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python (must be a valid python identifier).")),

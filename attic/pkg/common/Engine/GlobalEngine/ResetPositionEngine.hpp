@@ -18,7 +18,7 @@
  * */
 class ResetPositionEngine : public PeriodicEngine {
 	public:
-		void action(Scene*);
+		void action();
 		bool isActivated(Scene* rootBody) {if (first) return true; else return PeriodicEngine::isActivated(rootBody);}
 		ResetPositionEngine();
 

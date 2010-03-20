@@ -17,7 +17,7 @@ class DisplacementEngine : public PartialEngine
 	public :
 		Real displacement;
 		Vector3r translationAxis;
-		void applyCondition(Scene *);
+		void action(Scene *);
 		bool active;
 		DisplacementEngine():active(true){};
 		bool isActivated(Scene*);

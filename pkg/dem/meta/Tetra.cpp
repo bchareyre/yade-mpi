@@ -361,7 +361,7 @@ CREATE_LOGGER(TetraVolumetricLaw);
  *
  * DO NOT USE, probably doesn't work.
  * Comments on functionality limitations are in the code. It has not been tested at all!!! */
-void TetraVolumetricLaw::action(Scene*)
+void TetraVolumetricLaw::action()
 {
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		// normally, we would test isReal(), but TetraVolumetricLaw doesn't use interactionPhysics at all

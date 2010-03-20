@@ -503,7 +503,7 @@ class pyOmega{
 		Omega::instance().cleanupTemps();
 		exit(status);
 	}
-	void runEngine(const shared_ptr<Engine>& e){ LOG_WARN("Omega().runEngine(): deprecated, use __call__ method of the engine instance directly instead; will be removed in the future."); e->scene=OMEGA.getScene().get(); e->action(OMEGA.getScene().get()); }
+	void runEngine(const shared_ptr<Engine>& e){ LOG_WARN("Omega().runEngine(): deprecated, use __call__ method of the engine instance directly instead; will be removed in the future."); e->scene=OMEGA.getScene().get(); e->action(); }
 	std::string tmpFilename(){ return OMEGA.tmpFilename(); }
 };
 

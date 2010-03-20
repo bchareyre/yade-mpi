@@ -26,7 +26,7 @@ class CapillaryPressureEngine : public PartialEngine
 		//shared_ptr<CapillaryCohesiveLaw>  capillaryCohesiveLaw;
 		CapillaryCohesiveLaw* capillaryCohesiveLaw;
 				
-		void applyCondition(Scene * body);
+		void action();
 	REGISTER_ATTRIBUTES(PartialEngine,(PressureVariation)(Pressure));
 	REGISTER_CLASS_NAME(CapillaryPressureEngine);
 	REGISTER_BASE_CLASS_NAME(PartialEngine);

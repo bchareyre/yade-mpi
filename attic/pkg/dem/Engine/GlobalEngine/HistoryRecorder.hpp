@@ -22,7 +22,7 @@ public :
 	
 	HistoryRecorder ();
 	~HistoryRecorder ();
-	virtual void action(Scene*);
+	virtual void action();
 	virtual bool isActivated(Scene*);
 
 protected :

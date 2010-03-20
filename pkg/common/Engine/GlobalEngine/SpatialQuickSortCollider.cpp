@@ -13,7 +13,7 @@
 
 YADE_PLUGIN((SpatialQuickSortCollider));
 
-void SpatialQuickSortCollider::action(Scene*)
+void SpatialQuickSortCollider::action()
 {
 	if(scene->isPeriodic){ throw runtime_error("SpatialQuickSortCollider doesn't handle periodic boundaries."); }
 	const shared_ptr<BodyContainer>& bodies = scene->bodies;

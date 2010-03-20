@@ -30,7 +30,7 @@ class KinemCNDEngine : public PartialEngine
 
 
 	public :
-		void applyCondition(Scene *),
+		void action(Scene *),
 			computeAlpha();
 
 			;

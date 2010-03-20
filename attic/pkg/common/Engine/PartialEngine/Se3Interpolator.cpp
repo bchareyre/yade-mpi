@@ -5,7 +5,7 @@
 
 YADE_PLUGIN((Se3Interpolator))CREATE_LOGGER(Se3Interpolator);
 
-void Se3Interpolator::applyCondition(Scene* mb){
+void Se3Interpolator::action(Scene* mb){
 	assert(subscribedBodies.size()==1);
 	const shared_ptr<Body>&b=Body::byId(subscribedBodies[0],mb);
 	Omega& O=Omega::instance();

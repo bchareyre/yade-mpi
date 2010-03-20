@@ -65,7 +65,7 @@ class NewtonIntegrator : public GlobalEngine{
 		#endif
 		/// velocity bins (not used if not created)
 		shared_ptr<VelocityBins> velocityBins;
-		virtual void action(Scene *);		
+		virtual void action();		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
 		((Real,damping,0.2,"damping coefficient for Cundall's non viscous damping [-]"))
 		((Real,maxVelocitySq,NaN,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))

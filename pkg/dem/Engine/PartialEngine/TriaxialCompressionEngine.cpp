@@ -62,7 +62,7 @@ TriaxialCompressionEngine::~TriaxialCompressionEngine()
 {	
 }
 
-void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextState){
+void TriaxialCompressionEngine::doStateTransition(stateNum nextState){
 
 	if ( /* currentState==STATE_UNINITIALIZED && */ nextState==STATE_ISO_COMPACTION){
 		sigma_iso=sigmaIsoCompaction;
@@ -77,7 +77,7 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 		//compressionActivated = true;
 		wall_bottom_activated=false; wall_top_activated=false;
 		if(currentState==STATE_ISO_UNLOADING && !noFiles){ LOG_INFO("Speres -> /tmp/unloaded.spheres"); Shop::saveSpheresToFile("/tmp/unloaded.spheres"); }
-		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
+		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::action
 		Phase1End = "Unloaded";
 	}
 	else if(currentState==STATE_ISO_COMPACTION && nextState==STATE_ISO_UNLOADING){
@@ -94,12 +94,12 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 		internalCompaction = false;
 		if (frictionAngleDegree>0) setContactProperties(frictionAngleDegree);
 		height0 = height; depth0 = depth; width0 = width;
-		if(!noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
+		if(!noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::action
 		// stop simulation here, since nothing will happen from now on
 		Phase1End = (currentState==STATE_ISO_COMPACTION ? "compacted" : "unloaded");
 		if(!noFiles) Shop::saveSpheresToFile("/tmp/limbo.spheres");
 		// Please keep this saving process intact, I'm tired of running 3 days simulations and getting nothing at the end!
-		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::applyCondition
+		if(!firstRun && !noFiles) saveSimulation=true; // saving snapshot .xml will actually be done in ::action
 	}
 	else if( nextState==STATE_FIXED_POROSITY_COMPACTION){		
 		internalCompaction = false;
@@ -114,23 +114,23 @@ void TriaxialCompressionEngine::doStateTransition(Scene * body, stateNum nextSta
 	previousState=currentState; // should be always kept in sync, used to track manual changes to the .xml
 }
 
-void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
+void TriaxialCompressionEngine::updateParameters ()
 {
-	UnbalancedForce=ComputeUnbalancedForce ( ncb );
+	UnbalancedForce=ComputeUnbalancedForce ();
 
-	if (  currentState!=STATE_TRIAX_LOADING && currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION || autoCompressionActivation)
+	if (  (currentState!=STATE_TRIAX_LOADING && currentState==STATE_ISO_COMPACTION) || currentState==STATE_ISO_UNLOADING || currentState==STATE_FIXED_POROSITY_COMPACTION || autoCompressionActivation)
 	{
 		if (UnbalancedForce<=StabilityCriterion && abs ( ( meanStress-sigma_iso ) /sigma_iso ) <0.005 && fixedPoroCompaction==false )
 		{
 			// only go to UNLOADING if it is needed (hard float comparison... :-| )
 			if ( currentState==STATE_ISO_COMPACTION && autoUnload && sigmaLateralConfinement!=sigmaIsoCompaction ) {
-				doStateTransition (ncb, STATE_ISO_UNLOADING );
-				computeStressStrain ( ncb ); // update stress and strain
+				doStateTransition (STATE_ISO_UNLOADING );
+				computeStressStrain (); // update stress and strain
 			}
 			// Preserve transition from LIMBO to something, I need that! (BC)
 			else if((currentState==STATE_ISO_COMPACTION || currentState==STATE_ISO_UNLOADING || currentState==STATE_LIMBO) && autoCompressionActivation){
-				doStateTransition (ncb, STATE_TRIAX_LOADING );
-				computeStressStrain ( ncb ); // update stress and strain
+				doStateTransition (STATE_TRIAX_LOADING );
+				computeStressStrain (); // update stress and strain
 			}
 			// stop simulation if unloaded and compression is not activate automatically
 			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
@@ -139,7 +139,7 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 			// huh?! this will never happen, because of the first condition...
 			else 
 			{ 
-				doStateTransition (ncb, STATE_LIMBO );
+				doStateTransition (STATE_LIMBO );
 			}
 		}
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
@@ -151,23 +151,23 @@ void TriaxialCompressionEngine::updateParameters ( Scene * ncb )
 }
 
 
-void TriaxialCompressionEngine::action ( Scene * ncb )
+void TriaxialCompressionEngine::action()
 {
 	// here, we make sure to get consistent parameters, in case someone fiddled with the scene .xml manually
 	if ( firstRun )
 	{
 		LOG_INFO ( "First run, will initialize!" );
-		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && !fixedPoroCompaction) doStateTransition (ncb, STATE_ISO_COMPACTION );
+		if ( (sigmaIsoCompaction!=previousSigmaIso || currentState==STATE_UNINITIALIZED || currentState== STATE_LIMBO) && currentState!=STATE_TRIAX_LOADING && !fixedPoroCompaction) doStateTransition (STATE_ISO_COMPACTION );
 		if (previousState!=STATE_TRIAX_LOADING && currentState==STATE_TRIAX_LOADING)
-			doStateTransition (ncb, STATE_TRIAX_LOADING );
-		if (fixedPorosity<1 && currentState==STATE_UNINITIALIZED && fixedPoroCompaction) doStateTransition (ncb, STATE_FIXED_POROSITY_COMPACTION );
+			doStateTransition (STATE_TRIAX_LOADING );
+		if (fixedPorosity<1 && currentState==STATE_UNINITIALIZED && fixedPoroCompaction) doStateTransition (STATE_FIXED_POROSITY_COMPACTION );
 		previousState=currentState;
 		previousSigmaIso=sigma_iso;
 		firstRun=false; // change this only _after_ state transitions
 	}
 	if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
 	{
-		updateParameters ( ncb );
+		updateParameters ();
 		maxStress = max(maxStress,stress[wall_top][1]);
 		LOG_INFO("UnbalancedForce="<< UnbalancedForce<<", rel stress "<< abs ( ( meanStress-sigma_iso ) /sigma_iso ));
 	}	
@@ -191,7 +191,7 @@ void TriaxialCompressionEngine::action ( Scene * ncb )
 		Omega::instance().stopSimulationLoop();
 		return;
 	}
-	TriaxialStressController::action ( ncb );
+	TriaxialStressController::action();
 
 	if ( currentState==STATE_TRIAX_LOADING )
 	{
@@ -205,9 +205,9 @@ void TriaxialCompressionEngine::action ( Scene * ncb )
 		if (abs(epsilonMax) > abs(strain[1])) {
 			if ( currentStrainRate != strainRate ) currentStrainRate += ( strainRate-currentStrainRate ) *0.0003;
 			/* Move top and bottom wall according to strain rate */
-			State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
+			State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
 			p_bottom->pos += 0.5*currentStrainRate*height*translationAxis*dt;
-			State* p_top=Body::byId(wall_top_id,ncb)->state.get();
+			State* p_top=Body::byId(wall_top_id,scene)->state.get();
 			p_top->pos -= 0.5*currentStrainRate*height*translationAxis*dt;
 		} else {
 			Omega::instance().stopSimulationLoop();
@@ -220,12 +220,12 @@ void TriaxialCompressionEngine::action ( Scene * ncb )
 			LOG_INFO ("Compression started");
 		}		
 		Real dt = Omega::instance().getTimeStep();
-		State* p_bottom=Body::byId(wall_bottom_id,ncb)->state.get();
-		State* p_top=Body::byId(wall_top_id,ncb)->state.get();
-		State* p_left=Body::byId(wall_left_id,ncb)->state.get();
-		State* p_right=Body::byId(wall_right_id,ncb)->state.get();
-		State* p_front=Body::byId(wall_front_id,ncb)->state.get();
-		State* p_back=Body::byId(wall_back_id,ncb)->state.get();
+		State* p_bottom=Body::byId(wall_bottom_id,scene)->state.get();
+		State* p_top=Body::byId(wall_top_id,scene)->state.get();
+		State* p_left=Body::byId(wall_left_id,scene)->state.get();
+		State* p_right=Body::byId(wall_right_id,scene)->state.get();
+		State* p_front=Body::byId(wall_front_id,scene)->state.get();
+		State* p_back=Body::byId(wall_back_id,scene)->state.get();
 
 		/* Move top and bottom wall according to strain rate */
 		p_bottom->pos += 0.5*strainRate*height*translationAxis*dt;

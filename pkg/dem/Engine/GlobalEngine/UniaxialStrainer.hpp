@@ -23,7 +23,7 @@ class UniaxialStrainer: public GlobalEngine {
 		Real& axisCoord(body_id_t id){ return Body::byId(id,scene)->state->pos[axis]; };
 		void init();
 	public:
-		virtual bool isActivated(Scene*){return active;}
+		virtual bool isActivated(){ return active; }
 		Real sumPosForces,sumNegForces;
 		Real initAccelTime_s /* value always in s, computed from initAccelTime */;
 		//! how often to update forces (initialized automatically)
@@ -31,7 +31,7 @@ class UniaxialStrainer: public GlobalEngine {
 		/** coordinates of pos/neg bodies in the direction of axis */
 		vector<Real> posCoords,negCoords;
 
-		virtual void action(Scene*);
+		virtual void action();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(UniaxialStrainer,GlobalEngine,"Axial displacing two groups of bodies in the opposite direction with given strain rate.",
 			((Real,strainRate,NaN,"Rate of strain, starting at 0, linearly raising to strainRate. [-]"))
 			((Real,absSpeed,NaN,"alternatively, absolute speed of boundary motion can be specified; this is effective only at the beginning and if strainRate is not set; changing absSpeed directly during simulation wil have no effect. [ms⁻¹]"))

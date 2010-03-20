@@ -43,13 +43,13 @@ class Disp2DPropLoadEngine : public PartialEngine
 		shared_ptr<Body> backbox;
 		shared_ptr<Body> topbox;
 		shared_ptr<Body> boxbas;
-		void saveData(Scene* ncb);
-		void letDisturb(Scene* ncb);
+		void saveData();
+		void letDisturb();
 		void stopMovement();		// to cancel all the velocities
 
 
 	public :
-		void 	applyCondition(Scene* ncb)
+		void 	action()
 			,computeAlpha()
 			;
 		virtual void postProcessAttributes(bool deserializing);

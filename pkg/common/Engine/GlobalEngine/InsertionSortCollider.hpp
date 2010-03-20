@@ -169,14 +169,14 @@ class InsertionSortCollider: public Collider{
 		if(!periodic) return !spatialOverlap(id1,id2);
 		else { Vector3<int> periods; return !spatialOverlapPeri(id1,id2,rb,periods); }
 	}
-	virtual bool isActivated(Scene*);
+	virtual bool isActivated();
 
 	// force reinitialization at next run
 	virtual void invalidatePersistentData(){ for(int i=0; i<3; i++){ BB[i].vec.clear(); BB[i].size=0; }}
 
 	vector<body_id_t> probeBoundingVolume(const Bound&);
 
-	virtual void action(Scene*);
+	virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InsertionSortCollider,Collider,"\
 		Collider with O(n log(n)) complexity, using :yref:`Aabb` for bounds.\
 		\n\n\
