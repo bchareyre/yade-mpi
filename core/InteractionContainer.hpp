@@ -1,130 +1,84 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// 2004 © Olivier Galizzi <olivier.galizzi@imag.fr>
+// 2004 © Janek Kozicki <cosurgi@berlios.de>
+// 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #pragma once
 
 #include<yade/lib-serialization/Serializable.hpp>
 #include<boost/thread/mutex.hpp>
-#include<iostream>
-#include<boost/range.hpp>
-#include<omp.h>
 
-// BOOST_FOREACH compatibility
-#ifndef FOREACH
-#  define FOREACH BOOST_FOREACH
+#ifdef YADE_OPENMP
+	#include<omp.h>
 #endif
 
 #include<yade/core/Interaction.hpp>
 
-using namespace boost;
-using namespace std;
+#include<boost/foreach.hpp>
+#ifndef FOREACH
+#  define FOREACH BOOST_FOREACH
+#endif
 
-class InteractionContainerIterator 
-{
-	public :
-		InteractionContainerIterator() 		{};
-		virtual ~InteractionContainerIterator()	{};
-		
-		virtual bool isDifferent(const InteractionContainerIterator&)	{ throw;};
-		virtual void affect(const InteractionContainerIterator&)	{ throw;};
-		virtual void increment()					{ throw;};
-		virtual shared_ptr<Interaction> getValue()			{ throw;};
-		virtual shared_ptr<InteractionContainerIterator> createPtr()	{ throw;};
-};
+/* This InteractionContainer implementation stores interactions internally in 2 containers:
+a std::vector (which allows for const-time linear traversal) and
+std::vector of id1 holding std::map of id2 (allowing for fast search by id1,id2). Synchronization
+of both is handles by insert & erase methods.
 
+It was originally written by 2008 © Sergei Dorofeenko <sega@users.berlios.de>,
+later devirtualized and put here.
 
-class InteractionContainerIteratorPointer
-{
+Alternative implementations of InteractionContainer should implement the same API. Due to performance
+reasons, no base class with virtual methods defining such API programatically is defined (it could
+be possible to create class template for this, though).
+*/
+class InteractionContainer: public Serializable{
 	private :
-		shared_ptr<InteractionContainerIterator> ptr;
-		void allocate(const InteractionContainerIteratorPointer& bi)
-		{
-			if (ptr==0)
-				ptr = bi.get()->createPtr();
-		}
-
-
-	public  :
-		InteractionContainerIterator&			getRef()	{ return *ptr; };
-		InteractionContainerIterator&			getRef() const	{ return *ptr; };
-		shared_ptr<InteractionContainerIterator>	get()		{ return  ptr; };
-		shared_ptr<InteractionContainerIterator>	get() const	{ return  ptr; };
-
-		InteractionContainerIteratorPointer(const InteractionContainerIteratorPointer& bi) 
-		{
-			allocate(bi);
-			ptr->affect(bi.getRef());
-		};
-
-		InteractionContainerIteratorPointer(const shared_ptr<InteractionContainerIterator>& i) { ptr = i; };
-		InteractionContainerIteratorPointer()  { ptr = shared_ptr<InteractionContainerIterator>(); };
-
-		bool operator!=(const InteractionContainerIteratorPointer& bi) { return ptr->isDifferent(bi.getRef()); };
-		bool operator==(const InteractionContainerIteratorPointer& bi) { return !ptr->isDifferent(bi.getRef()); };
-		shared_ptr<Interaction>			operator*() { return ptr->getValue(); };	
-		InteractionContainerIteratorPointer&	operator++() { ptr->increment(); return *this; };
-		InteractionContainerIteratorPointer&	operator++(int); // disabled
-		InteractionContainerIteratorPointer&	operator=(const InteractionContainerIteratorPointer& bi)
-		{
-			allocate(bi);
-			ptr->affect(bi.getRef());
-			return *this;
-		};
-
-};
-
-
-
-class InteractionContainer : public Serializable
-{
+		typedef vector<shared_ptr<Interaction> > ContainerT;
+		vector<shared_ptr<Interaction> > intrs;
+		vector<map<body_id_t, unsigned int  > > vecmap;
+		unsigned int currentSize;
+		shared_ptr<Interaction> empty;
+		// used only during serialization/deserialization
+		vector<shared_ptr<Interaction> > interaction;
 	public :
-		boost::mutex	drawloopmutex;
-		// iteration number when the collider was last run;
-		// set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionDispatchers (such as SpatialQuickSortCollider)
-		// other colliders (such as InsertionSortCollider) set it it -1, which is the default
-		long iterColliderLastRun;
-
-		InteractionContainer(): iterColliderLastRun(-1), serializeSorted(false) {
+		InteractionContainer(): currentSize(0),serializeSorted(false),iterColliderLastRun(-1){
 			#ifdef YADE_OPENMP
 				threadsPendingErase.resize(omp_get_max_threads());
 			#endif
 		}
-		virtual ~InteractionContainer() {};
-
-		virtual bool insert(body_id_t /*id1*/,body_id_t /*id2*/)				{throw;};
-		virtual bool insert(shared_ptr<Interaction>&)						{throw;};
-		virtual void clear() 									{throw;};
-		virtual bool erase(body_id_t /*id1*/,body_id_t /*id2*/) 				{throw;};
-
-		virtual const shared_ptr<Interaction>& find(body_id_t /*id1*/,body_id_t /*id2*/) 	{throw;};
-
-		typedef InteractionContainerIteratorPointer iterator;
-      virtual InteractionContainer::iterator begin()						{throw;};
-      virtual InteractionContainer::iterator end()						{throw;};
-		virtual unsigned int size() 								{throw;};
-
-		virtual shared_ptr<Interaction>& operator[] (unsigned int) {throw;};
-		virtual const shared_ptr<Interaction>& operator[] (unsigned int) const {throw;};
-
-		// sort interactions before serializations; useful if comparing XML files from different runs (false by default)
-		bool serializeSorted;
+		void clear();
+		// iterators
+		typedef ContainerT::iterator iterator;
+		typedef ContainerT::const_iterator const_iterator;
+		iterator begin(){return intrs.begin();}
+     	iterator end()  {return intrs.end();}
+		const_iterator begin() const {return intrs.begin();}
+     	const_iterator end()   const {return intrs.end();}
+		// insertion/deletion
+		bool insert(body_id_t id1,body_id_t id2);
+		bool insert(const shared_ptr<Interaction>& i);
+		bool erase(body_id_t id1,body_id_t id2);
+		const shared_ptr<Interaction>& find(body_id_t id1,body_id_t id2);
+		// index access
+		shared_ptr<Interaction>& operator[](size_t id){return intrs[id];}
+		const shared_ptr<Interaction>& operator[](size_t id) const { return intrs[id];}
+		size_t size(){ return currentSize; }
+		// simulation API
 
 		//! Erase all non-real (in term of Interaction::isReal()) interactions
 		void eraseNonReal();
-		
-		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state)
-		//! and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
+
+		// mutual exclusion to avoid crashes in the rendering loop
+		boost::mutex drawloopmutex;
+		// sort interactions before serializations; useful if comparing XML files from different runs (false by default)
+		bool serializeSorted;
+		// iteration number when the collider was last run; set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionDispatchers (such as SpatialQuickSortCollider). Other colliders (such as InsertionSortCollider) set it it -1, which is the default
+		long iterColliderLastRun;
+		//! Ask for erasing the interaction given (from the constitutive law); this resets the interaction (to the initial=potential state) and collider should traverse pendingErase to decide whether to delete the interaction completely or keep it potential
 		void requestErase(body_id_t id1, body_id_t id2, bool force=false);
 		/*! List of pairs of interactions that will be (maybe) erased by the collider; if force==true, they will be deleted unconditionally.
 			
-			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you)
+			If accessed from within a parallel section, pendingEraseMutex must be locked (this is done inside requestErase for you).
+
 			If there is, at one point, a multi-threaded collider, pendingEraseMutex should be moved to the public part and used from there as well.
 		*/
 		struct IdsForce{ body_id_t id1; body_id_t id2; bool force; };
@@ -175,29 +129,11 @@ class InteractionContainer : public Serializable
 			#endif
 			return ret;
 		}
-	private :
-		// used only during serialization/deserialization
-		vector<shared_ptr<Interaction> > interaction;
-	protected :
-		virtual void preProcessAttributes(bool deserializing);
-		virtual void postProcessAttributes(bool deserializing);
+
+	virtual void preProcessAttributes(bool deserializing);
+	virtual void postProcessAttributes(bool deserializing);
+
 	REGISTER_ATTRIBUTES(Serializable,(interaction)(serializeSorted));
 	REGISTER_CLASS_AND_BASE(InteractionContainer,Serializable);
 };
-
 REGISTER_SERIALIZABLE(InteractionContainer);
-
-
-namespace boost{
-   template<> struct range_iterator<InteractionContainer>{ typedef InteractionContainer::iterator type; };
-   template<> struct range_const_iterator<InteractionContainer>{ typedef InteractionContainer::iterator type; };
-}
-inline InteractionContainer::iterator boost_range_begin(InteractionContainer& ic){ return ic.begin(); }
-inline InteractionContainer::iterator boost_range_end(InteractionContainer& ic){ return ic.end(); }
-namespace std{
-   template<> struct iterator_traits<InteractionContainer::iterator>{
-      typedef forward_iterator_tag iterator_category;
-      typedef shared_ptr<Interaction> reference;
-   };
-}
-

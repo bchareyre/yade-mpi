@@ -161,7 +161,7 @@ class InteractionLocator{
 
 	python::list intrsWithinDistance(const Vector3r& pt, Real radius){
 		vtkIdList *ids=vtkIdList::New();
-		locator->FindPointsWithinRadius(radius,pt,ids);
+		locator->FindPointsWithinRadius(radius,(const double*)(&pt),ids);
 		int numIds=ids->GetNumberOfIds();
 		python::list ret;
 		for(int i=0; i<numIds; i++){

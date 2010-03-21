@@ -1,69 +1,31 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*  Copyright (C) 2004 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
+// 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 
-#include "BodyContainer.hpp"
-#include "Body.hpp"
+#include<yade/core/BodyContainer.hpp>
+#include<yade/core/Body.hpp>
 
 #ifdef YADE_BOOST_SERIALIZATION
 	BOOST_CLASS_EXPORT(BodyContainer);
 #endif
 
-
-BodyContainer::BodyContainer()
-{ 
-	body.clear();
-}
-
-
-BodyContainer::~BodyContainer()
-{
-}
-
-
-void BodyContainer::preProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		body.clear();
+unsigned int BodyContainer::findFreeId(){
+	unsigned int max=body.size();
+	for(; lowestFree<max; lowestFree++){
+		if(!(bool)body[lowestFree]) return lowestFree;
 	}
-	else
-	{
-		body.clear();
-		BodyContainer::iterator i    = this->begin();
-		BodyContainer::iterator iEnd = this->end();
-		for( ; i!=iEnd ; ++i )
-			body.push_back(*i);
-	}
+	return body.size();
 }
 
-
-void BodyContainer::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		this->clear();
-		vector<shared_ptr<Body> >::iterator it    = body.begin();
-		vector<shared_ptr<Body> >::iterator itEnd = body.end();
-		for( ; it != itEnd ; ++it)
-			this->insert(*it);
-		body.clear();
-	}
-	else
-	{
-		body.clear();
-	}
+unsigned int BodyContainer::insert(shared_ptr<Body>& b){
+	body_id_t newId=findFreeId();
+	return insert(b,newId);
 }
 
-
-void BodyContainer::setId(shared_ptr<Body>& b, unsigned int newId)
-{
-	b->id = newId;
+unsigned int BodyContainer::insert(shared_ptr<Body>& b, unsigned int id){
+	assert(id>=0);
+	if((size_t)id>=body.size()) body.resize(id+1);
+	b->id=id;
+	body[id]=b;
+	return id;
 }
 
+BodyContainer::~BodyContainer(){}

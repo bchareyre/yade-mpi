@@ -49,8 +49,6 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'ThreadRunner.cpp',
 			'ThreadWorker.cpp',
 			'TimeStepper.cpp',
-			'containers/BodyVector.cpp',
-			'containers/InteractionVecMap.cpp',
 			'corePlugins.cpp'			
 			]
 			),

@@ -1,7 +1,7 @@
 # -*- encoding=utf-8 -*-
 from __future__ import division
 
-from yade import utils,plot,pack
+from yade import utils,plot,pack,timing
 import time, sys, os, copy
 
 """
@@ -100,6 +100,8 @@ plot.maxDataLen=4000
 
 O.saveTmp('initial');
 
+O.timingEnabled=True
+
 global mode
 mode='tension' if doModes & 1 else 'compression'
 
@@ -136,6 +138,8 @@ def stopIfDamaged():
 	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>5e-3:
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
+			timing.stats()
+			sys.exit(0)
 			O.save('/tmp/uniax-tension.xml.bz2')
 			print "Damaged, switching to compression... "; O.pause()
 			# important! initTest must be launched in a separate thread;

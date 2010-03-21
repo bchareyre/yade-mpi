@@ -40,9 +40,9 @@ PersistentTriangulationCollider::~PersistentTriangulationCollider()
 	delete Tes;
 }
 
-void PersistentTriangulationCollider::action ( Scene* ncb )
+void PersistentTriangulationCollider::action ()
 {
-	shared_ptr<BodyContainer> bodies=ncb->bodies;
+	shared_ptr<BodyContainer> bodies=scene->bodies;
 	bool triangulationIteration = false;
 
 //BEGIN VORONOI TESSELATION
@@ -91,7 +91,7 @@ void PersistentTriangulationCollider::action ( Scene* ncb )
 //ENDOF VORONOI TESSELATION
 
 
-	interactions = ncb->interactions;
+	interactions = scene->interactions;
 	InteractionContainer::iterator I_end = interactions->end();
 	for ( InteractionContainer::iterator I=interactions->begin(); I!=I_end; ++I )
 	{

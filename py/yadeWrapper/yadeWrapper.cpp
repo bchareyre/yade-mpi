@@ -501,6 +501,9 @@ class pyOmega{
 		else signal(SIGSEGV,termHandlerError);
 		// try to clean our mess
 		Omega::instance().cleanupTemps();
+		// flush all streams (so that in case we crash at exit, unflushed buffers are not lost)
+		fflush(NULL);
+		// attempt exit
 		exit(status);
 	}
 	void runEngine(const shared_ptr<Engine>& e){ LOG_WARN("Omega().runEngine(): deprecated, use __call__ method of the engine instance directly instead; will be removed in the future."); e->scene=OMEGA.getScene().get(); e->action(); }

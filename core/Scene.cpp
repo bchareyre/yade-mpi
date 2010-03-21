@@ -18,11 +18,9 @@
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<boost/algorithm/string.hpp>
 
+#include<yade/core/BodyContainer.hpp>
+#include<yade/core/InteractionContainer.hpp>
 
-/* this is meant to improve usability: Scene is ready by default (so is Omega by that token)
- * and different type of containers can still be used instead by explicit assignment */
-#include<yade/core/BodyVector.hpp>
-#include<yade/core/InteractionVecMap.hpp>
 
 // POSIX-only
 #include<pwd.h>
@@ -32,7 +30,7 @@
 // should be elsewhere, probably
 bool TimingInfo::enabled=false;
 
-Scene::Scene(): bodies(new BodyVector), interactions(new InteractionVecMap), cell(new Cell){	
+Scene::Scene(): bodies(new BodyContainer), interactions(new InteractionContainer), cell(new Cell){	
 	needsInitializers=true;
 	currentIteration=0;
 	simulationTime=0;
