@@ -7,6 +7,9 @@
 
 #include<cstdio>
 
+#include<yade/lib-pyutil/doc_opts.hpp>
+
+
 #ifdef YADE_LOG4CXX
 log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.QtGUI-python");
 #endif
@@ -96,6 +99,8 @@ python::list getAllViews(){
 };
 
 BOOST_PYTHON_MODULE(_qt){
+	YADE_SET_DOCSTRING_OPTS;
+
 	def("Generator",evtGENERATOR,"Start simulation generator");
 	def("Controller",evtCONTROLLER,"Start simulation controller");
 	def("View",evtVIEW,"Create new 3d view");
