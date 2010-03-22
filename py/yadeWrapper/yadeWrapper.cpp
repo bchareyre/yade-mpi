@@ -55,7 +55,6 @@
 #include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/Clump.hpp>
 
-
 using namespace boost;
 using namespace std;
 
@@ -258,11 +257,6 @@ class pyOmega{
 			rb=OMEGA.getScene();
 		}
 		assert(rb);
-		// if(!rb->physicalParameters){rb->physicalParameters=shared_ptr<PhysicalParameters>(new ParticleParameters);} /* PhysicalParameters crashes StateMetaEngine... why? */
-		// if(!rb->bound){rb->bound=shared_ptr<Aabb>(new Aabb);}
-		// initialized in constructor now: rb->bound->diffuseColor=Vector3r(1,1,1); 
-		//if(!OMEGA.getScene()){shared_ptr<Scene> mb=Shop::rootBody(); OMEGA.setScene(mb);}
-		/* this is not true if another instance of Omega is created; flag should be stored inside the Omega singleton for clean solution. */
 		if(!OMEGA.hasSimulationLoop()){
 			OMEGA.createSimulationLoop();
 		}
@@ -318,8 +312,8 @@ class pyOmega{
 	bool timingEnabled_get(){return TimingInfo::enabled;}
 	void timingEnabled_set(bool enabled){TimingInfo::enabled=enabled;}
 	// deprecated:
-		unsigned long forceSyncCount_get(){ LOG_WARN("O.bexSyncCount is deprecated, use O.forces.syncCount instead."); return OMEGA.getScene()->forces.syncCount;}
-		void forceSyncCount_set(unsigned long count){  LOG_WARN("O.bexSyncCount is deprecated, use O.forces.syncCount instead."); OMEGA.getScene()->forces.syncCount=count;}
+		unsigned long forceSyncCount_get(){ return OMEGA.getScene()->forces.syncCount;}
+		void forceSyncCount_set(unsigned long count){ OMEGA.getScene()->forces.syncCount=count;}
 
 	void run(long int numIter=-1,bool doWait=false){
 		if(numIter>0) OMEGA.getScene()->stopAtIteration=OMEGA.getCurrentIteration()+numIter;
@@ -425,7 +419,6 @@ class pyOmega{
 	pyBodyContainer bodies_get(void){assertRootBody(); return pyBodyContainer(OMEGA.getScene()->bodies); }
 	pyInteractionContainer interactions_get(void){assertRootBody(); return pyInteractionContainer(OMEGA.getScene()->interactions); }
 	
-	pyForceContainer bex_get(void){ LOG_WARN("O.bex is deprecated, use O.forces instead."); return pyForceContainer(OMEGA.getScene());}
 	pyForceContainer forces_get(void){return pyForceContainer(OMEGA.getScene());}
 	pyMaterialContainer materials_get(void){return pyMaterialContainer(OMEGA.getScene());}
 	
@@ -483,8 +476,8 @@ class pyOmega{
 		boost::archive::xml_iarchive ia(ifs);
 		shared_ptr<Scene> scene(new Scene);
 		ia >> BOOST_SERIALIZATION_NVP(scene); // this might work…
-		OMEGA.setScene(s2);
-		throw runtime_error("Not yet implemented");
+		OMEGA.setScene(scene);
+		//throw runtime_error("Not yet implemented");
 	}
 	#endif
 	
@@ -534,20 +527,19 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("load",&pyOmega::load,"Load simulation from file.")
 		.def("reload",&pyOmega::reload,"Reload current simulation")
 		.def("save",&pyOmega::save,"Save current simulation to file (should be .xml or .xml.bz2)")
-		.def("loadTmp",&pyOmega::loadTmp,(python::args("mark")=""),"Load simulation previously stored in memory by saveTmp.\n @param mark optionally distinguishes multiple saved simulations")
-		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp.\n @param mark optionally distinguishes different memory-saved simulations.")
-		.def("tmpToFile",&pyOmega::tmpToFile,"Return XML of saveTmp'd simulation as string.")
-		.def("tmpToString",&pyOmega::tmpToString,"Save XML of saveTmp'd simulation in file.")
-		.def("saveSpheres",&pyOmega::saveSpheres,"Saves spherical bodies to external ASCII file, one sphere (x y z r) per line.")
+		.def("loadTmp",&pyOmega::loadTmp,(python::args("mark")=""),"Load simulation previously stored in memory by saveTmp. *mark* optionally distinguishes multiple saved simulations")
+		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
+		.def("tmpToFile",&pyOmega::tmpToFile,(python::arg("fileName"),python::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
+		.def("tmpToString",&pyOmega::tmpToString,(python::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")
 		.def("getSpheresVolume",&pyOmega::getSpheresVolume,"Compute the total volume of spheres in the simulation (might crash for now if dynamic bodies are not spheres)")
-		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation.\n@param nSteps how many steps to run, then stop.\n@param wait if True, doesn't return until the simulation will have stopped.")
-		.def("pause",&pyOmega::pause,"Stop simulation execution.\n(may be called from within the loop, and it will stop after the current step).")
+		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.")
+		.def("pause",&pyOmega::pause,"Stop simulation execution. (May be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
 		.def("wait",&pyOmega::wait,"Don't return until the simulation will have been paused. (Returns immediately if not running).")
 		.def("reset",&pyOmega::reset,"Reset simulations completely (including another scene!).")
 		.def("resetThisScene",&pyOmega::resetThisScene,"Reset current scene.")
 		.def("switchScene",&pyOmega::switchScene,"Switch to alternative simulation (while keeping the old one). Calling the function again switches back to the first one. Note that most variables from the first simulation will still refer to the first simulation even after the switch\n(e.g. b=O.bodies[4]; O.switchScene(); [b still refers to the body in the first simulation here])")
-		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n For example: \n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider['nBins']=5 ## collider has become a variable after assignment to O.engines automatically)")
+		.def("labeledEngine",&pyOmega::labeled_engine_get,"Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in O.engines will assign respective global python variables according to labels.\n For example: \n\tO.engines=[InsertionSortCollider(label='collider')]\n\tcollider.nBins=5 ## collider has become a variable after assignment to O.engines automatically)")
 		.def("resetTime",&pyOmega::resetTime,"Reset simulation time: step number, virtual and real time. (Doesn't touch anything else, including timings).")
 		.def("plugins",&pyOmega::plugins_get,"Return list of all plugins registered in the class factory.")
 		.add_property("engines",&pyOmega::engines_get,&pyOmega::engines_set,"List of engines in the simulation (Scene::engines).")
@@ -556,15 +548,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.add_property("bodies",&pyOmega::bodies_get,"Bodies in the current simulation (container supporting index access by id and iteration)")
 		.add_property("interactions",&pyOmega::interactions_get,"Interactions in the current simulation (container supporting index acces by either (id1,id2) or interactionNumber and iteration)")
 		.add_property("materials",&pyOmega::materials_get,"Shared materials; they can be accessed by id or by label")
-		.add_property("bex",&pyOmega::bex_get,"[DEPRECATED] use O.forces instead.")
 		.add_property("forces",&pyOmega::forces_get,"ForceContainer (forces, torques, displacements) in the current simulation.")
 		.add_property("tags",&pyOmega::tags_get,"Tags (string=string dictionary) of the current simulation (container supporting string-index access/assignment)")
 		.def("childClassesNonrecursive",&pyOmega::listChildClassesNonrecursive,"Return list of all classes deriving from given class, as registered in the class factory")
 		.def("isChildClassOf",&pyOmega::isChildClassOf,"Tells whether the first class derives from the second one (both given as strings).")
-		.add_property("bodyContainer",&pyOmega::bodyContainer_get,&pyOmega::bodyContainer_set,"Get/set type of body container (as string); there must be no bodies.")
-		.add_property("interactionContainer",&pyOmega::interactionContainer_get,&pyOmega::interactionContainer_set,"Get/set type of interaction container (as string); there must be no interactions.")
 		.add_property("timingEnabled",&pyOmega::timingEnabled_get,&pyOmega::timingEnabled_set,"Globally enable/disable timing services (see documentation of yade.timing).")
-		.add_property("bexSyncCount",&pyOmega::forceSyncCount_get,&pyOmega::forceSyncCount_set,"[DEPRECATED] Counter for number of syncs in ForceContainer, for profiling purposes.")
+		.add_property("forceSyncCount",&pyOmega::forceSyncCount_get,&pyOmega::forceSyncCount_set,"Counter for number of syncs in ForceContainer, for profiling purposes.")
 		.add_property("numThreads",&pyOmega::numThreads_get /* ,&pyOmega::numThreads_set*/ ,"Get maximum number of threads openMP can use.")
 		.add_property("cell",&pyOmega::cell_get,"Periodic cell of the current scene (None if the scene is aperiodic).")
 		.add_property("periodic",&pyOmega::periodic_get,&pyOmega::periodic_set,"Get/set whether the scene is periodic or not (True/False).")

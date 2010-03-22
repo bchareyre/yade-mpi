@@ -76,7 +76,7 @@ class pyGLViewer{
 		void fitAABB(const Vector3r& min, const Vector3r& max){GLV; MUTEX; glv->camera()->fitBoundingBox(qglviewer::Vec(min[0],min[1],min[2]),qglviewer::Vec(max[0],max[1],max[2]));}
 		void fitSphere(const Vector3r& center,Real radius){GLV; MUTEX; glv->camera()->fitSphere(qglviewer::Vec(center[0],center[1],center[2]),radius);}
 		void showEntireScene(){GLV; MUTEX; glv->camera()->showEntireScene();}
-		void center(bool median=false){GLV; MUTEX; if(median)glv->centerMedianQuartile(); else glv->centerScene();}
+		void center(bool median){GLV; MUTEX; if(median)glv->centerMedianQuartile(); else glv->centerScene();}
 		python::tuple get_screenSize(){GLV; return python::make_tuple(glv->width(),glv->height());} void set_screenSize(python::tuple t){GLV; MUTEX; vector<int>* ii=new(vector<int>); ii->push_back(viewNo); ii->push_back(python::extract<int>(t[0])()); ii->push_back(python::extract<int>(t[1])()); QApplication::postEvent(ensuredMainWindow(),new QCustomEvent((QEvent::Type)YadeQtMainWindow::EVENT_RESIZE_VIEW,(void*)ii));}
 		string pyStr(){return string("<GLViewer for view #")+lexical_cast<string>(viewNo)+">";}
 		void saveDisplayParameters(size_t n){GLV; MUTEX; glv->saveDisplayParameters(n);}
@@ -87,8 +87,6 @@ class pyGLViewer{
 		#undef MUTEX
 		#undef GLV
 };
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(pyGLViewer_center_overloads,center,0,1);
-
 
 pyGLViewer evtVIEW(){QApplication::postEvent(ensuredMainWindow(),new QCustomEvent(YadeQtMainWindow::EVENT_VIEW)); size_t origViewNo=ensuredMainWindow()->glViews.size(); while(ensuredMainWindow()->glViews.size()!=origViewNo+1) usleep(50000); return pyGLViewer((*ensuredMainWindow()->glViews.rbegin())->viewId);}
 
@@ -101,37 +99,37 @@ python::list getAllViews(){
 BOOST_PYTHON_MODULE(_qt){
 	YADE_SET_DOCSTRING_OPTS;
 
-	def("Generator",evtGENERATOR,"Start simulation generator");
+	def("Generator",evtGENERATOR,"Start simulation generator (preprocessor interface)");
 	def("Controller",evtCONTROLLER,"Start simulation controller");
-	def("View",evtVIEW,"Create new 3d view");
-	def("center",centerViews,"Center all existing views.");
-	def("Renderer",ensuredRenderer,"Return wrapped OpenGLRenderingEngine; the renderer is constructed if necessary.");
-	def("close",Quit);
+	def("View",evtVIEW,"Create new 3d view.");
+	def("center",centerViews,"Center all views.");
+	def("Renderer",ensuredRenderer,"Return wrapped :yref:`OpenGLRenderingEngine`; the renderer is constructed if it doesn't exist yet.");
+	def("close",Quit,"Close all open qt windows.");
 	def("isActive",qtGuiIsActive,"Whether the Qt GUI is being used.");
-	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI from within python.");
-	def("views",getAllViews);
+	def("activate",qtGuiActivate,"Attempt to activate the Qt GUI.");
+	def("views",getAllViews,"Return list of all open :yref:`yade.qt.GLViewer` objects");
 
 	boost::python::class_<pyGLViewer>("GLViewer")
 		.def(python::init<unsigned>())
-		.add_property("upVector",&pyGLViewer::get_upVector,&pyGLViewer::set_upVector)
-		.add_property("lookAt",&pyGLViewer::get_lookAt,&pyGLViewer::set_lookAt)
-		.add_property("viewDir",&pyGLViewer::get_viewDir,&pyGLViewer::set_viewDir)
-		.add_property("eyePosition",&pyGLViewer::get_eyePosition,&pyGLViewer::set_eyePosition)
-		.add_property("grid",&pyGLViewer::get_grid,&pyGLViewer::set_grid)
-		.add_property("fps",&pyGLViewer::get_fps,&pyGLViewer::set_fps)
-		.add_property("axes",&pyGLViewer::get_axes,&pyGLViewer::set_axes)
-		.add_property("scale",&pyGLViewer::get_scale,&pyGLViewer::set_scale)
-		.add_property("sceneRadius",&pyGLViewer::get_sceneRadius,&pyGLViewer::set_sceneRadius)
-		.add_property("ortho",&pyGLViewer::get_orthographic,&pyGLViewer::set_orthographic)
-		.add_property("screenSize",&pyGLViewer::get_screenSize,&pyGLViewer::set_screenSize)
-		.add_property("timeDisp",&pyGLViewer::get_timeDisp,&pyGLViewer::set_timeDisp)
+		.add_property("upVector",&pyGLViewer::get_upVector,&pyGLViewer::set_upVector,"Vector that will be shown oriented up on the screen.")
+		.add_property("lookAt",&pyGLViewer::get_lookAt,&pyGLViewer::set_lookAt,"Point at which camera is directed.")
+		.add_property("viewDir",&pyGLViewer::get_viewDir,&pyGLViewer::set_viewDir,"Camera orientation (as vector).")
+		.add_property("eyePosition",&pyGLViewer::get_eyePosition,&pyGLViewer::set_eyePosition,"Camera position.")
+		.add_property("grid",&pyGLViewer::get_grid,&pyGLViewer::set_grid,"Display square grid in zero planes, as 3-tuple of bools for yz, xz, xy planes.")
+		.add_property("fps",&pyGLViewer::get_fps,&pyGLViewer::set_fps,"Show frames per second indicator.")
+		.add_property("axes",&pyGLViewer::get_axes,&pyGLViewer::set_axes,"Show arrows for axes.")
+		.add_property("scale",&pyGLViewer::get_scale,&pyGLViewer::set_scale,"Scale of the view (?)")
+		.add_property("sceneRadius",&pyGLViewer::get_sceneRadius,&pyGLViewer::set_sceneRadius,"Visible scene radius.")
+		.add_property("ortho",&pyGLViewer::get_orthographic,&pyGLViewer::set_orthographic,"Whether orthographic projection is used; if false, use perspective projection.")
+		.add_property("screenSize",&pyGLViewer::get_screenSize,&pyGLViewer::set_screenSize,"Size of the viewer's window, in scree pixels")
+		.add_property("timeDisp",&pyGLViewer::get_timeDisp,&pyGLViewer::set_timeDisp,"Time displayed on in the vindow; is a string composed of characters *r*, *v*, *i* standing respectively for real time, virtual time, iteration number.")
 		// .add_property("bgColor",&pyGLViewer::get_bgColor,&pyGLViewer::set_bgColor) // useless: OpenGLRenderingEngine::Background_color is used via openGL directly, bypassing QGLViewer background property
-		.def("fitAABB",&pyGLViewer::fitAABB)
-		.def("fitSphere",&pyGLViewer::fitSphere)
+		.def("fitAABB",&pyGLViewer::fitAABB,(python::arg("mn"),python::arg("mx")),"Adjust scene bounds so that Axis-aligned bounding box given by its lower and upper corners *mn*, *mx* fits in.")
+		.def("fitSphere",&pyGLViewer::fitSphere,(python::arg("center"),python::arg("radius")),"Adjust scene bounds so that sphere given by *center* and *radius* fits in.")
 		.def("showEntireScene",&pyGLViewer::showEntireScene)
-		.def("center",&pyGLViewer::center,pyGLViewer_center_overloads())
-		.def("saveState",&pyGLViewer::saveDisplayParameters)
-		.def("loadState",&pyGLViewer::useDisplayParameters)
+		.def("center",&pyGLViewer::center,(python::arg("median")=true),"Center view. View is centered either so that all bodies fit inside (*median*=False), or so that 75\% of bodies fit inside (*median*=True).")
+		.def("saveState",&pyGLViewer::saveDisplayParameters,(python::arg("slot")),"Save display parameters into numbered memory slot. Saves state for both :yref:`GLViewer<yade._qt.GLViewer>` and associated :yref:`OpenGLRenderingEngine`.")
+		.def("loadState",&pyGLViewer::useDisplayParameters,(python::arg("slot")),"Load display parameters from slot saved previously into, identified by its number.")
 		.def("__repr__",&pyGLViewer::pyStr).def("__str__",&pyGLViewer::pyStr)
 		;
 }

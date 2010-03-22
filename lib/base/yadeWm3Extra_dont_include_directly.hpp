@@ -112,6 +112,12 @@ void serialize(Archive & ar, Vector3r & g, const unsigned int version)
 }
 
 template<class Archive>
+void serialize(Archive & ar, Vector3<int> & g, const unsigned int version){
+	int &x=g[0], &y=g[1], &z=g[2];
+	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
+}
+
+template<class Archive>
 void serialize(Archive & ar, Quaternionr & g, const unsigned int version)
 {
 	Real &x=g[0], &y=g[1], &z=g[2], &w=g[2];
@@ -122,6 +128,14 @@ template<class Archive>
 void serialize(Archive & ar, Se3r & g, const unsigned int version){
 	Vector3r& position=g.position; Quaternionr& orientation=g.orientation;
 	ar & BOOST_SERIALIZATION_NVP(position) & BOOST_SERIALIZATION_NVP(orientation);
+}
+
+template<class Archive>
+void serialize(Archive & ar, Matrix3r & m, const unsigned int version){
+	Real &m00=m(0,0), &m01=m(0,1), &m02=m(0,2), &m10=m(1,0), &m11=m(1,1), &m12=m(1,2), &m20=m(2,0), &m21=m(2,1), &m22=m(2,2);
+	ar & BOOST_SERIALIZATION_NVP(m00) & BOOST_SERIALIZATION_NVP(m01) & BOOST_SERIALIZATION_NVP(m02) &
+		BOOST_SERIALIZATION_NVP(m10) & BOOST_SERIALIZATION_NVP(m11) & BOOST_SERIALIZATION_NVP(m12) &
+		BOOST_SERIALIZATION_NVP(m20) & BOOST_SERIALIZATION_NVP(m21) & BOOST_SERIALIZATION_NVP(m22);
 }
 
 } // namespace serialization

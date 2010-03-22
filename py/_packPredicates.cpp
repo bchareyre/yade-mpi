@@ -5,8 +5,6 @@
 #include<yade/lib-base/Math.hpp>
 #include<yade/lib-pyutil/doc_opts.hpp>
 
-// #include<yade/gui-py/_utils.hpp> // will be: yade/lib-py/_utils.hpp> at some point
-
 using namespace boost;
 using namespace std;
 #ifdef YADE_LOG4CXX
@@ -350,4 +348,3 @@ BOOST_PYTHON_MODULE(_packPredicates){
 			.add_property("surf",&inGtsSurface::surface,"The associated gts.Surface object.");
 	#endif
 }
-

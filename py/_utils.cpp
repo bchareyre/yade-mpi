@@ -15,24 +15,21 @@
 
 #include<numpy/ndarrayobject.h>
 
-// #include"_utils.hpp"
-
-
-
-using namespace boost::python;
+using namespace std;
+namespace py = boost::python;
 
 #ifdef YADE_LOG4CXX
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.utils");
 #endif
 
-python::tuple vec2tuple(const Vector3r& v){return boost::python::make_tuple(v[0],v[1],v[2]);}
-Vector3r tuple2vec(const python::tuple& t){return Vector3r(extract<double>(t[0])(),extract<double>(t[1])(),extract<double>(t[2])());}
+py::tuple vec2tuple(const Vector3r& v){return py::make_tuple(v[0],v[1],v[2]);}
+Vector3r tuple2vec(const py::tuple& t){return Vector3r(py::extract<double>(t[0])(),py::extract<double>(t[1])(),py::extract<double>(t[2])());}
 bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax){return p[0]>bbMin[0] && p[0]<bbMax[0] && p[1]>bbMin[1] && p[1]<bbMax[1] && p[2]>bbMin[2] && p[2]<bbMax[2];}
 
-bool ptInAABB(python::tuple p, python::tuple bbMin, python::tuple bbMax){return isInBB(tuple2vec(p),tuple2vec(bbMin),tuple2vec(bbMax));}
+bool ptInAABB(py::tuple p, py::tuple bbMin, py::tuple bbMax){return isInBB(tuple2vec(p),tuple2vec(bbMin),tuple2vec(bbMax));}
 
 /* \todo implement groupMask */
-python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
+py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
@@ -43,32 +40,32 @@ python::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 		maximum=componentMaxVector(maximum,b->state->pos+(centers?Vector3r::ZERO:rrr));
 	}
 	Vector3r dim=maximum-minimum;
-	return python::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
+	return py::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
 }
 
-python::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
-	python::tuple extrema=aabbExtrema();
-	Real minCoord=extract<double>(extrema[0][axis])(),maxCoord=extract<double>(extrema[1][axis])();
-	python::list minIds,maxIds;
+py::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
+	py::tuple extrema=aabbExtrema();
+	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();
+	py::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
 	}
-	return python::make_tuple(minIds,maxIds);
+	return py::make_tuple(minIds,maxIds);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2);
 
-python::tuple coordsAndDisplacements(int axis,python::tuple Aabb=python::tuple()){
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(Aabb)>0;
-	if(useBB){bbMin=extract<Vector3r>(Aabb[0])();bbMax=extract<Vector3r>(Aabb[1])();}
-	python::list retCoord,retDispl;
+py::tuple coordsAndDisplacements(int axis,py::tuple Aabb=py::tuple()){
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=py::len(Aabb)>0;
+	if(useBB){bbMin=py::extract<Vector3r>(Aabb[0])();bbMax=py::extract<Vector3r>(Aabb[1])();}
+	py::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getScene()->bodies){
 		if(useBB && !isInBB(b->state->pos,bbMin,bbMax)) continue;
 		retCoord.append(b->state->pos[axis]);
 		retDispl.append(b->state->pos[axis]-b->state->refPos[axis]);
 	}
-	return python::make_tuple(retCoord,retDispl);
+	return py::make_tuple(retCoord,retDispl);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(coordsAndDisplacements_overloads,coordsAndDisplacements,1,2);
 
@@ -81,8 +78,8 @@ void setRefSe3(){
 
 Real PWaveTimeStep(){return Shop::PWaveTimeStep();};
 
-Real elasticEnergyInAABB(python::tuple Aabb){
-	Vector3r bbMin=extract<Vector3r>(Aabb[0])(), bbMax=extract<Vector3r>(Aabb[1])();
+Real elasticEnergyInAABB(py::tuple Aabb){
+	Vector3r bbMin=py::extract<Vector3r>(Aabb[0])(), bbMax=py::extract<Vector3r>(Aabb[1])();
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	Real E=0;
 	FOREACH(const shared_ptr<Interaction>&i, *rb->interactions){
@@ -119,9 +116,9 @@ Real elasticEnergyInAABB(python::tuple Aabb){
  * If both bodies are _outside_ the aabb (if specified), the interaction is skipped.
  *
  */
-python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, python::tuple aabb=python::tuple(), Real minProjLen=1e-6){
+py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::tuple aabb=py::tuple(), Real minProjLen=1e-6){
 	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
 	shared_ptr<Scene> rb=Omega::instance().getScene();
@@ -137,14 +134,14 @@ python::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, p
 		int binNo=theta/binStep;
 		cummProj[binNo]+=nLen;
 	}
-	python::list val,binMid;
+	py::list val,binMid;
 	for(size_t i=0; i<(size_t)bins; i++){ val.append(cummProj[i]); binMid.append(i*binStep);}
-	return python::make_tuple(binMid,val);
+	return py::make_tuple(binMid,val);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,4);
 
-python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=python::len(aabb)>0; if(useBB){bbMin=extract<Vector3r>(aabb[0])();bbMax=extract<Vector3r>(aabb[1])();}
+py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
+	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
 	const shared_ptr<Scene>& rb=Omega::instance().getScene();
 	vector<int> bodyNumIntr; bodyNumIntr.resize(rb->bodies->size(),0);
 	int maxIntr=0;
@@ -162,12 +159,12 @@ python::tuple bodyNumInteractionsHistogram(python::tuple aabb=python::tuple()){
 		// otherwise don't do anything, since it is outside the volume of interest
 		else if((useBB && isInBB(Body::byId(id,rb)->state->pos,bbMin,bbMax)) || !useBB) bins[0]+=1;
 	}
-	python::list count,num;
+	py::list count,num;
 	for(size_t n=0; n<bins.size(); n++){
 		if(bins[n]==0) continue;
 		num.append(n); count.append(bins[n]);
 	}
-	return python::make_tuple(num,count);
+	return py::make_tuple(num,count);
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(bodyNumInteractionsHistogram_overloads,bodyNumInteractionsHistogram,0,1);
 
@@ -175,11 +172,11 @@ Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vec
 {
 	return Shop::inscribedCircleCenter(v0,v1,v2);
 }
-python::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
+py::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
 {
 	shared_ptr<SimpleViscoelasticMat> b = shared_ptr<SimpleViscoelasticMat>(new SimpleViscoelasticMat());
 	Shop::getViscoelasticFromSpheresInteraction(m,tc,en,es,b);
-	python::dict d;
+	py::dict d;
 	d["kn"]=b->kn;
 	d["cn"]=b->cn;
 	d["ks"]=b->ks;
@@ -205,13 +202,13 @@ void highlightNone(){
  * is position relative to axisPt; moment from moment is m; such moment per body is
  * projected onto axis.
  */
-Real sumTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
+Real sumTorques(py::tuple ids, const Vector3r& axis, const Vector3r& axisPt){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	rb->forces.sync();
 	Real ret=0;
-	size_t len=python::len(ids);
+	size_t len=py::len(ids);
 	for(size_t i=0; i<len; i++){
-		const Body* b=(*rb->bodies)[python::extract<int>(ids[i])].get();
+		const Body* b=(*rb->bodies)[py::extract<int>(ids[i])].get();
 		const Vector3r& m=rb->forces.getTorque(b->getId());
 		const Vector3r& f=rb->forces.getForce(b->getId());
 		Vector3r r=b->state->pos-axisPt;
@@ -225,13 +222,13 @@ Real sumTorques(python::tuple ids, const Vector3r& axis, const Vector3r& axisPt)
  * @param direction direction in which forces are summed
  *
  */
-Real sumForces(python::tuple ids, const Vector3r& direction){
+Real sumForces(py::tuple ids, const Vector3r& direction){
 	shared_ptr<Scene> rb=Omega::instance().getScene();
 	rb->forces.sync();
 	Real ret=0;
-	size_t len=python::len(ids);
+	size_t len=py::len(ids);
 	for(size_t i=0; i<len; i++){
-		body_id_t id=python::extract<int>(ids[i]);
+		body_id_t id=py::extract<int>(ids[i]);
 		const Vector3r& f=rb->forces.getForce(id);
 		ret+=direction.Dot(f);
 	}
@@ -295,8 +292,8 @@ void wireNoSpheres(){wireSome("noSpheres");}
  *
  * http://numpy.scipy.org/numpydoc/numpy-13.html told me how to use Numeric.array from c
  */
-bool pointInsidePolygon(python::tuple xy, python::object vertices){
-	Real testx=python::extract<double>(xy[0])(),testy=python::extract<double>(xy[1])();
+bool pointInsidePolygon(py::tuple xy, py::object vertices){
+	Real testx=py::extract<double>(xy[0])(),testy=py::extract<double>(xy[1])();
 	char** vertData; int rows, cols; PyArrayObject* vert=(PyArrayObject*)vertices.ptr();
 	int result=PyArray_As2D((PyObject**)&vert /* is replaced */ ,&vertData,&rows,&cols,PyArray_DOUBLE);
 	if(result!=0) throw invalid_argument("Unable to cast vertices to 2d array");
@@ -312,12 +309,12 @@ bool pointInsidePolygon(python::tuple xy, python::object vertices){
 
 #if 0
 /* Compute convex hull of given points, given as python list of Vector2 */
-python::list convexHull2d(const python::list& pts){
-	size_t l=python::len(pts);
-	python::list ret;
+py::list convexHull2d(const py::list& pts){
+	size_t l=py::len(pts);
+	py::list ret;
 	std::list<Vector2r> pts2;
 	for(size_t i=0; i<l; i++){
-		pts2.push_back(python::extract<Vector2r>(pts[i]));
+		pts2.push_back(py::extract<Vector2r>(pts[i]));
 		cerr<<*pts2.rbegin()<<endl;
 	}
 	ConvexHull2d ch2d(pts2);
@@ -394,10 +391,10 @@ Vector3r forcesOnCoordPlane(Real coord, int axis){
 }
 
 
-python::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
+py::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0){
 	Real r,h,theta;
 	boost::tie(r,h,theta)=Shop::spiralProject(pt,dH_dTheta,axis,periodStart,theta0);
-	return python::make_tuple(python::make_tuple(r,h),theta);
+	return py::make_tuple(py::make_tuple(r,h),theta);
 }
 //BOOST_PYTHON_FUNCTION_OVERLOADS(spiralProject_overloads,spiralProject,2,5);
 
@@ -407,7 +404,7 @@ shared_ptr<Interaction> Shop__createExplicitInteraction(body_id_t id1, body_id_t
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(unbalancedForce_overloads,Shop::unbalancedForce,0,1);
 Real Shop__kineticEnergy(){return Shop::kineticEnergy();}
-python::tuple Shop__totalForceInVolume(){Real stiff; Vector3r ret=Shop::totalForceInVolume(stiff); return python::make_tuple(ret,stiff); }
+py::tuple Shop__totalForceInVolume(){Real stiff; Vector3r ret=Shop::totalForceInVolume(stiff); return py::make_tuple(ret,stiff); }
 
 BOOST_PYTHON_MODULE(_utils){
 	// http://numpy.scipy.org/numpydoc/numpy-13.html mentions this must be done in module init, otherwise we will crash
@@ -416,38 +413,36 @@ BOOST_PYTHON_MODULE(_utils){
 	YADE_SET_DOCSTRING_OPTS;
 
 
-	def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
-	def("aabbExtrema",aabbExtrema,(python::arg("cutoff")=0.0,python::arg("centers")=false),"Return coordinates of box enclosing all bodies\n\n:Parameters:\n\tcenters : bool\n\t\tdo not take sphere radii in account, only their centroids\n\tcutoff : float ∈〈0…1〉\n\t\trelative dimension by which the box will be cut away at its boundaries.\n\n:return: (lower corner, upper corner) as (Vector3,Vector3)\n");
-	def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
-	def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
-	def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
+	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
+	py::def("aabbExtrema",aabbExtrema,(py::arg("cutoff")=0.0,py::arg("centers")=false),"Return coordinates of box enclosing all bodies\n\n:Parameters:\n\tcenters : bool\n\t\tdo not take sphere radii in account, only their centroids\n\tcutoff : float ∈〈0…1〉\n\t\trelative dimension by which the box will be cut away at its boundaries.\n\n:return: (lower corner, upper corner) as (Vector3,Vector3)\n");
+	py::def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
+	py::def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(py::args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
+	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");
 	#if 0
-		def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
+		py::def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
 	#endif
-	def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(args("Aabb"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
-	def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
-	def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(args("axis","mask","bins","aabb")));
-	def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(args("aabb")));
-	def("elasticEnergy",elasticEnergyInAABB);
-	def("inscribedCircleCenter",inscribedCircleCenter,(python::arg("v1"),python::arg("v2"),python::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
-	def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
-	def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(args("useMaxForce")));
-	def("kineticEnergy",Shop__kineticEnergy);
-	def("sumForces",sumForces);
-	def("sumTorques",sumTorques);
-	def("sumFacetNormalForces",sumFacetNormalForces,(python::arg("axis")=-1));
-	def("forcesOnPlane",forcesOnPlane,(python::arg("planePt"),python::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:Parameters:\n\t`planePt`: Vector3\n\t\tAny point on the plane\n\t`normal`: Vector3\n\t\tPlane normal (may not be normalized).\n");
-	def("forcesOnCoordPlane",forcesOnCoordPlane);
-	def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
-	def("createInteraction",Shop__createExplicitInteraction,(python::arg("id1"),python::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`InteractionGeometryDispatcher` and :yref:`InteractionPhysicsDispatcher` (might be both hidden in :yref:`InteractionDispatchers`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<InteractionGeometryDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning::\n\tThis function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
-	def("spiralProject",spiralProject,(python::arg("pt"),python::arg("dH_dTheta"),python::arg("axis")=2,python::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),python::arg("theta0")=0));
-	def("pointInsidePolygon",pointInsidePolygon);
-	def("scalarOnColorScale",Shop::scalarOnColorScale);
-	def("highlightNone",highlightNone,"Reset :yref:`highlight<Shape::highlight>` on all bodies.");
-	def("wireAll",wireAll,"Set :yref:`Shape::wire` on all bodies to True, rendering them with wireframe only.");
-	def("wireNone",wireNone,"Set :yref:`Shape::wire` on all bodies to False, rendering them as solids.");
-	def("wireNoSpheres",wireNoSpheres,"Set :yref:`Shape::wire` to True on non-spherical bodies (:yref:`Facets<Facet>`, :yref:`Walls<Wall>`).");
-	def("flipCell",&Shop::flipCell,(python::arg("flip")=Matrix3r::ZERO));
+	py::def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(py::args("Aabb"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
+	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
+	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
+	py::def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(py::args("aabb")));
+	py::def("elasticEnergy",elasticEnergyInAABB);
+	py::def("inscribedCircleCenter",inscribedCircleCenter,(py::arg("v1"),py::arg("v2"),py::arg("v3")),"Return center of inscribed circle for triangle given by its vertices *v1*, *v2*, *v3*.");
+	py::def("getViscoelasticFromSpheresInteraction",getViscoelasticFromSpheresInteraction);
+	py::def("unbalancedForce",&Shop::unbalancedForce,unbalancedForce_overloads(py::args("useMaxForce")));
+	py::def("kineticEnergy",Shop__kineticEnergy);
+	py::def("sumForces",sumForces);
+	py::def("sumTorques",sumTorques);
+	py::def("sumFacetNormalForces",sumFacetNormalForces,(py::arg("axis")=-1));
+	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:Parameters:\n\t`planePt`: Vector3\n\t\tAny point on the plane\n\t`normal`: Vector3\n\t\tPlane normal (may not be normalized).\n");
+	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
+	py::def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
+	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`InteractionGeometryDispatcher` and :yref:`InteractionPhysicsDispatcher` (might be both hidden in :yref:`InteractionDispatchers`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<InteractionGeometryDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning::\n\tThis function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
+	py::def("spiralProject",spiralProject,(py::arg("pt"),py::arg("dH_dTheta"),py::arg("axis")=2,py::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),py::arg("theta0")=0));
+	py::def("pointInsidePolygon",pointInsidePolygon);
+	py::def("scalarOnColorScale",Shop::scalarOnColorScale);
+	py::def("highlightNone",highlightNone,"Reset :yref:`highlight<Shape::highlight>` on all bodies.");
+	py::def("wireAll",wireAll,"Set :yref:`Shape::wire` on all bodies to True, rendering them with wireframe only.");
+	py::def("wireNone",wireNone,"Set :yref:`Shape::wire` on all bodies to False, rendering them as solids.");
+	py::def("wireNoSpheres",wireNoSpheres,"Set :yref:`Shape::wire` to True on non-spherical bodies (:yref:`Facets<Facet>`, :yref:`Walls<Wall>`).");
+	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r::ZERO));
 }
-
-

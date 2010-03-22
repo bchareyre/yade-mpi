@@ -59,7 +59,7 @@ install: build
 	###   (a) use fakeroot-tcp instead of fakeroot
 	###   (b) use just 1 job
 	#debug build
-	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=-1 linkStrategy=monolithic features=vtk,gts,log4cxx,opengl,openmp exclude=snow PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 march= debug=1
+	NO_SCONS_GET_RECENT= scons buildPrefix=debian runtimePREFIX=/usr version=${VERSION} brief=0 chunkSize=-1 linkStrategy=monolithic features=vtk,gts,log4cxx,opengl,openmp,boost-serialization exclude=snow PREFIX=debian/yade${_VERSION}-dbg/usr variant=-dbg optimize=0 march= debug=1
 	#optimized build
 	NO_SCONS_GET_RECENT= scons PREFIX=debian/yade${_VERSION}/usr variant='' optimize=1 debug=0
 	#install platform-independent files (docs, scripts, examples)
