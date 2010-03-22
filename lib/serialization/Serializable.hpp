@@ -67,7 +67,7 @@ namespace{
 
 namespace{
 	boost::python::object pyGetAttr(const std::string& key){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); /*never reached; avoids warning*/ throw; }
-	void pySetAttr(const std::string& key, const boost::python::object& /* value */){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
+	void pySetAttr(const std::string& key, const boost::python::object& /* value */){ PyErr_SetString(PyExc_AttributeError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); }
 	boost::python::list pyKeys(){ return boost::python::list();}
 	bool pyHasKey(const std::string&) { return false; }
 	boost::python::dict pyDict() { return boost::python::dict(); }
@@ -83,9 +83,10 @@ namespace{
 
 // register class attributes, putting them to both python ['attr'] access functions and yade::serialization (and boost::serialization, if enabled)
 #define REGISTER_ATTRIBUTES(baseClass,attrs) protected: void registerAttributes(){ baseClass::registerAttributes(); BOOST_PP_SEQ_FOR_EACH(_REGISTER_ATTRIBUTES_REPEAT,~,attrs) } _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
-	public: boost::python::object pyGetAttr(const std::string& key) const{ BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } \
-	void pySetAttr(const std::string& key, const boost::python::object& value){  BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); baseClass::pySetAttr(key,value); } \
-	boost::python::list pyKeys() const { boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; } \
+	public: boost::python::object pyGetAttr(const std::string& key) const{ cerr<<"WARN: object['"<<key<<"'] syntax is deprecated, use object."<<key<<" instead."<<endl; BOOST_PP_SEQ_FOR_EACH(_PYGET_ATTR,~,attrs); return baseClass::pyGetAttr(key); } \
+	void pySetAttr(const std::string& key, const boost::python::object& value) { cerr<<"WARN: object['"<<key<<"']=value syntax is deprecated, use object."<<key<<"=value instead."<<endl; pySetAttr_nowarn(key,value); } \
+	void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); baseClass::pySetAttr_nowarn(key,value); } \
+	/*FIXME: should return boost::python::set instead*/ boost::python::list pyKeys() const {  boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; } \
 	bool pyHasKey(const std::string& key) const { BOOST_PP_SEQ_FOR_EACH(_PYHASKEY_ATTR,~,attrs); return baseClass::pyHasKey(key); } \
 	boost::python::dict pyDict() const { boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; }
 
@@ -190,6 +191,7 @@ shared_ptr<T> Serializable_ctor_kwAttrs(const python::tuple& t, const python::di
 	if(python::len(t)==1){
 		python::extract<string> clss_(t[0]); if(!clss_.check()) throw runtime_error("First argument (if given) must be a string.");
 		clss=clss_();
+		cerr<<"WARN: Constructing class using the Serializable('"<<clss<<"') syntax is deprecated. Use directly "<<clss<<"() instead."<<endl;
 	}
 	shared_ptr<T> instance;
 	if(clss.empty()){ instance=shared_ptr<T>(new T); }
@@ -241,19 +243,20 @@ public :
 
 		virtual boost::python::object pyGetAttr(const std::string& key) const { return ::pyGetAttr(key); }
 		virtual void pySetAttr(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
+		virtual void pySetAttr_nowarn(const std::string& key, const boost::python::object& value){ ::pySetAttr(key,value); };
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
 		// this check can be probably removed at some point
-		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const { if(getClassName()!=thisClassName){ std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR* yet"<<std::endl; return false; } return true; }
+		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const { if(getClassName()!=thisClassName){ std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR*; will be inaccessible from python."<<std::endl; return false; } return true; }
 		virtual void pyRegisterClass(boost::python::object _scope) const {
 			if(!checkPyClassRegistersItself("Serializable")) return;
 			boost::python::scope thisScope(_scope); 
 			python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
 				.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")
-				.def("dict",&Serializable::pyDict).def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey).def("keys",&Serializable::pyKeys)
-				.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary").def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs,"Update object attributes from given dictionary, skipping those that the instance doesn't have")
-				.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict(),"Update object attributes from given dictionary, skipping those that the instance doesn't have")
+				.def("dict",&Serializable::pyDict,"Return dictionary of attributes.").def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey,"Predicate telling whether given attribute exists.").def("keys",&Serializable::pyKeys,"Return list of attribute names")
+				.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary").def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs,"Update object attributes from given dictionary, skipping those that the instance doesn't have. Return list of attributes that did *not* exist and were not updated.")
+				.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict(),"Return clone of the instance, created by copying values of all attributes.")
 				.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
 				;
 		}

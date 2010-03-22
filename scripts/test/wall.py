@@ -25,7 +25,7 @@ O.engines=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Wall_Aabb()]),
 	InsertionSortCollider(),
 	InteractionDispatchers(
-		[ef2_Sphere_Sphere_Dem3DofGeom(),ef2_Facet_Sphere_Dem3DofGeom(),ef2_Wall_Sphere_Dem3DofGeom()],
+		[Ig2_Sphere_Sphere_Dem3DofGeom(),Ig2_Facet_Sphere_Dem3DofGeom(),Ig2_Wall_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
@@ -38,7 +38,7 @@ O.save('/tmp/a.xml')
 O.saveTmp()
 
 from yade import log
-log.setLevel('ef2_Wall_Sphere_Dem3DofGeom',log.TRACE)
+log.setLevel('Ig2_Wall_Sphere_Dem3DofGeom',log.TRACE)
 
 O.run()
 #O.bodies.append([

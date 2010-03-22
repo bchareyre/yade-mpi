@@ -16,7 +16,7 @@ void Serializable::pyUpdateAttrs(const python::dict& d){
 	for(size_t i=0; i<ll; i++){
 		python::tuple t=python::extract<python::tuple>(l[i]);
 		string key=python::extract<string>(t[0]);
-		pySetAttr(key,t[1]);
+		pySetAttr_nowarn(key,t[1]);
 	}
 }
 
@@ -25,7 +25,7 @@ python::list Serializable::pyUpdateExistingAttrs(const python::dict& d){
 	for(size_t i=0; i<ll; i++){
 		python::tuple t=python::extract<python::tuple>(l[i]);
 		string key=python::extract<string>(t[0]);
-		if(pyHasKey(key)) pySetAttr(key,t[1]); else ret.append(t[0]);
+		if(pyHasKey(key)) pySetAttr_nowarn(key,t[1]); else ret.append(t[0]);
 	}
 	return ret; 
 }

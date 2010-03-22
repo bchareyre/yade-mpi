@@ -52,12 +52,12 @@ boot.initialize(plugins)
 import system
 system.setExitHandlers() # avoid backtrace if crash at finalization (log4cxx)
 
-# create types
-yadeTypes=system.cxxCtorsDict()
+# create proxies for deprecated classes
+deprecatedTypes=system.cxxCtorsDict()
 # insert those in the module namespace
-globals().update(yadeTypes)
+globals().update(deprecatedTypes)
 # declare what should be imported for "from yade import *"
-__all__=yadeTypes.keys()+['O']
+__all__=deprecatedTypes.keys()+['O']
 # fake miniWm3 and wrapper being in yade itself
 import miniWm3Wrap,wrapper
 from miniWm3Wrap import *

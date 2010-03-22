@@ -8,7 +8,7 @@ O.engines=[
 	InsertionSortCollider(),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(
-		[ef2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
@@ -32,7 +32,7 @@ O.run()
 O.saveTmp('init')
 
 from yade import log
-#log.setLevel("ef2_Facet_Sphere_Dem3DofGeom",log.TRACE)
+#log.setLevel("Ig2_Facet_Sphere_Dem3DofGeom",log.TRACE)
 if 0:
 	from yade import qt
 	renderer=qt.Renderer()

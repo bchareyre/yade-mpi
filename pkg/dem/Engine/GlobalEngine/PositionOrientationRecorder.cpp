@@ -18,12 +18,6 @@
 
 CREATE_LOGGER(PositionOrientationRecorder);
 
-PositionOrientationRecorder::PositionOrientationRecorder() {
-	outputFile = "positionorientation";
-	saveRgb=false;
-	iterPeriod=50;
-}
-
 void PositionOrientationRecorder::action(){
 	ostringstream oss;
 	oss<<setfill('0')<<outputFile<<"_"<<setw(7)<<Omega::instance().getCurrentIteration();
@@ -47,7 +41,5 @@ void PositionOrientationRecorder::action(){
 		}
 	}
 }
-
-
 YADE_PLUGIN((PositionOrientationRecorder));
 

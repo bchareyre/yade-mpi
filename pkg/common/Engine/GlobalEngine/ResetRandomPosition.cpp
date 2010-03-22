@@ -24,25 +24,6 @@ boost::variate_generator<boost::mt19937,boost::uniform_real<> >
 boost::variate_generator<boost::mt19937,boost::uniform_real<> >
 	ResetRandomPosition::randomSymmetricUnit(boost::mt19937(),boost::uniform_real<>(-1,1));
 
-ResetRandomPosition::ResetRandomPosition() 
-{
-	factoryFacets.clear();
-	point=Vector3r(0,0,0);
-	normal=Vector3r(0,1,0);
-    volumeSection=false;
-	maxAttempts=20;
-	velocity=Vector3r(0,0,0);
-	velocityRange=Vector3r(0,0,0);
-	angularVelocity=Vector3r(0,0,0);
-	angularVelocityRange=Vector3r(0,0,0);
-	first_run = true;
-}
-
-ResetRandomPosition::~ResetRandomPosition()
-{
-	
-}
-
 void ResetRandomPosition::action()
 {
 	if (first_run)

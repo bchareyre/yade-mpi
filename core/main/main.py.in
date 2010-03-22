@@ -19,6 +19,7 @@ if v[0]==2 and v[1]<=5:
 import optparse
 par=optparse.OptionParser(usage='%prog [options] [ simulation.xml[.bz2] | script.py [script options]]',prog='Yade',version='%s (%s)'%(version,','.join(features)),description="Yade: open-source platform for dynamic compuations. Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade. This is version %s (with features %s)."%(version,','.join(features)))
 par.add_option('-j','--threads',help='Number of OpenMP threads to run; defaults to number of cores. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type='int')
+par.add_option('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',action='store_true')
 par.add_option('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type='int')
 par.add_option('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
 par.add_option('-v',help='Increase logging verbosity; first occurence sets default logging level to info, second to debug, third to trace.'+
@@ -71,6 +72,9 @@ You should not need to recompile afterwards.
 
 # continue option processing
 
+if opts.updateScripts:
+	yade.system.updateScripts(args)
+	sys.exit(0)
 if opts.nice:
 	os.nice(opts.nice)
 if yade.config.debug and opts.noGdb:

@@ -1,9 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-#
-# FIXME: ParallelEngine is not currently wrapped in python
-#
-
 O.initializers=[
 	BoundDispatcher([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),
 	]

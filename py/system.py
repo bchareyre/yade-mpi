@@ -118,7 +118,6 @@ _deprecated={
 	'TetraAABB':'Bo1_Tetra_Aabb', # Tue Feb  9 10:22:33 2010, vaclav@flux
 	'Tetra2TetraBang':'Ig2_Tetra_Tetra_TTetraGeom', # Tue Feb  9 10:23:19 2010, vaclav@flux
 	'TetraLaw':'TetraVolumetricLaw', # Tue Feb  9 10:24:10 2010, vaclav@flux
-	'OldName':'NewName', # Wed Mar 10 12:23:10 2010, jduriez@c1solimara-l
 	'DirecResearchEngine':'Disp2DPropLoadEngine', # Wed Mar 10 12:23:42 2010, jduriez@c1solimara-l
 	'CinemCNCEngine':'KinemCNLEngine', # Wed Mar 10 12:33:36 2010, jduriez@c1solimara-l
 	'CinemKNCEngine':'KinemCNSEngine', # Wed Mar 10 12:34:01 2010, jduriez@c1solimara-l
@@ -129,6 +128,39 @@ _deprecated={
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 
+def updateScripts(scripts):
+	## Thanks goes to http://code.activestate.com/recipes/81330-single-pass-multiple-replace/
+	from UserDict import UserDict
+	import re,os
+	class Xlator(UserDict):
+		"An all-in-one multiple string substitution class; adapted to match only whole words"
+		def _make_regex(self): 
+			"Build a regular expression object based on the keys of the current dictionary"
+			return re.compile(r"(\b%s\b)" % "|".join(self.keys()))  ## adapted here 
+		def __call__(self, mo): 
+			"This handler will be invoked for each regex match"
+			# Count substitutions
+			self.count += 1 # Look-up string
+			return self[mo.string[mo.start():mo.end()]]
+		def xlat(self, text):
+			"Translate text, returns the modified text."
+			# Reset substitution counter
+			self.count = 0 
+			# Process text
+			return self._make_regex().sub(self, text)
+	# use the _deprecated dictionary for translation, but only when matching on words boundary
+	xlator=Xlator(_deprecated)
+	if len(scripts)==0: print "No scripts given to --update. Nothing to do."
+	for s in scripts:
+		if not s.endswith('.py'): raise RuntimeError("Refusing to do --update on file '"+s+"' (not *.py)")
+		txt=open(s).read()
+		txt2=xlator.xlat(txt)
+		if xlator.count==0: print "%s: already up-to-date."%s
+		else:
+			os.rename(s,s+'~')
+			out=open(s,'w'); out.write(txt2); out.close()
+			print "%s: %d subtitution%s made, backup in %s~"%(s,xlator.count,'s' if xlator.count>1 else '',s)
+				
 
 def cxxCtorsDict(proxyNamespace=__builtins__):
 	"""Return dictionary of class constructors for yade's c++ types, which should be used to update a namespace.
@@ -141,21 +173,28 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 	"""
 	proxyNamespace={}
 	# classes derived from wrappers (but not from Serializable directly)
-	for root in _pyRootClasses:
-		try:
-			rootType=wrapper.__dict__[root]
-		except KeyError:
-			print 'WARNING: class %s not defined'%root
-		for p in childClasses(root):
-			if proxyNamespace.has_key(p): continue
-			proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
-			_proxiedClasses.add(p)
-		# inject wrapped class itself into proxyNamespace
-		proxyNamespace[root]=rootType
+	#for root in _pyRootClasses:
+	#	try:
+	#		rootType=wrapper.__dict__[root]
+	#	except KeyError:
+	#		print 'WARNING: class %s not defined'%root
+	#	for p in childClasses(root):
+	#		if proxyNamespace.has_key(p): continue
+	#		proxyNamespace[p]=type(p,(rootType,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
+	#		_proxiedClasses.add(p)
+	#	# inject wrapped class itself into proxyNamespace
+	#	proxyNamespace[root]=rootType
 	# classes that derive just from Serializable: the remaining ones
-	for p in _allSerializables-_proxiedClasses-_pyRootClasses:
-		if proxyNamespace.has_key(p): continue
-		proxyNamespace[p]=type(p,(wrapper.Serializable,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
+	#for p in _allSerializables-_proxiedClasses-_pyRootClasses:
+	#	if proxyNamespace.has_key(p): continue
+	#	proxyNamespace[p]=type(p,(wrapper.Serializable,),{'__init__': lambda self,__subType_=p,*args,**kw: super(type(self),self).__init__(__subType_,*args,**kw)})
+
+	import yade.wrapper
+	for c in _allSerializables:
+		try:
+			proxyNamespace[c]=yade.wrapper.__dict__[c]
+		except KeyError: pass # not registered properly
+
 	# deprecated names
 	for oldName in _deprecated.keys():
 		class warnWrap:
@@ -163,8 +202,8 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 				# assert(proxyNamespace.has_key(_new))
 				self.old,self.new=_old,_new
 			def __call__(self,*args,**kw):
-				import warnings; warnings.warn("Class `%s' was renamed to (or replaced by) `%s', update your code!"%(self.old,self.new),DeprecationWarning,stacklevel=2);
-				return proxyNamespace[self.new](*args,**kw)
+				import warnings; warnings.warn("Class `%s' was renamed to (or replaced by) `%s', update your code! (you can run 'yade --update script.py' to do that automatically)"%(self.old,self.new),DeprecationWarning,stacklevel=2);
+				return yade.wrapper.__dict__[self.new](*args,**kw)
 		proxyNamespace[oldName]=warnWrap(oldName,_deprecated[oldName])
 	return proxyNamespace
 

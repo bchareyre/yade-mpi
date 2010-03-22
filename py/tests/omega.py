@@ -84,13 +84,13 @@ class TestMaterials(unittest.TestCase):
 		])
 	def testShared(self):
 		"shared_ptr's makes change in material immediate everywhere"
-		O.bodies[0].mat['young']=23423333
-		self.assert_(O.bodies[0].mat['young']==O.bodies[1].mat['young'])
+		O.bodies[0].mat.young=23423333
+		self.assert_(O.bodies[0].mat.young==O.bodies[1].mat.young)
 	def testSharedAfterReload(self):
 		"shared_ptr's are preserved when loading from XML (using a hack in MetaBody::postProcessAttributes)"
 		O.saveTmp(); O.loadTmp()
-		O.bodies[0].mat['young']=9087438484
-		self.assert_(O.bodies[0].mat['young']==O.bodies[1].mat['young'])
+		O.bodies[0].mat.young=9087438484
+		self.assert_(O.bodies[0].mat.young==O.bodies[1].mat.young)
 	def testLen(self):
 		"len(O.materials)"
 		self.assert_(len(O.materials)==2)

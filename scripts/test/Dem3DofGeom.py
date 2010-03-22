@@ -11,9 +11,9 @@ O.engines=[
 	]),
 	InsertionSortCollider(),
 	InteractionGeometryDispatcher([
-		ef2_Sphere_Sphere_Dem3DofGeom(),
-		ef2_Facet_Sphere_Dem3DofGeom(),
-		ef2_Wall_Sphere_Dem3DofGeom()
+		Ig2_Sphere_Sphere_Dem3DofGeom(),
+		Ig2_Facet_Sphere_Dem3DofGeom(),
+		Ig2_Wall_Sphere_Dem3DofGeom()
 	]),
 	#GravityEngine(gravity=(0,0,-10))
 	RotationEngine(rotationAxis=[0,1,0],angularVelocity=10,subscribedBodies=[1]),

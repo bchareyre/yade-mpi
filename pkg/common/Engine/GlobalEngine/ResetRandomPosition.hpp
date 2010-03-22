@@ -19,48 +19,12 @@ using namespace std;
 /// @brief Produces spheres over the course of a simulation. 
 class ResetRandomPosition : public PeriodicEngine {
 public:
-
-	ResetRandomPosition();
-	virtual ~ResetRandomPosition();
-
 	/// @brief Create one sphere per call.
 	virtual void action();
-
-	/// @brief The geometry of the section on which spheres will be placed. 
-	vector<body_id_t> factoryFacets; 
-
-    /// @brief Factory section may be a surface or volume (convex). 
-    /// By default it is a surface. To make its a volume set volumeSection=true
-    bool volumeSection;
-
-	/// @brief Max attemps to place sphere.
-	/// If placing the sphere in certain random position would cause an overlap with any other physical body in the model, SpheresFactory will try to find another position. Default 20 attempts allow.
-	int maxAttempts;
-
-	/// @brief Mean velocity of spheres.
-	Vector3r velocity;
-
-	/// @brief Half size of a velocities distribution interval.
-	/// New sphere will have random velocity within the range velocity±velocityRange.
-	Vector3r velocityRange;
-	
-	/// @brief Mean angularVelocity of spheres.
-	Vector3r angularVelocity;
-
-	/// @brief Half size of a angularVelocity distribution interval.
-	/// New sphere will have random angularVelocity within the range angularVelocity±angularVelocityRange.
-	Vector3r angularVelocityRange;
-
-	Vector3r point;
-	Vector3r normal;
-
-	std::vector< int >   subscribedBodies;
-
 private:
 	/// @brief Pointer to Collider.
 	/// It is necessary in order to probe the bounding volume for new sphere.
 	Collider* bI;
-	
 	/// @brief Pointer to InteractionGeometryDispatcher.
 	/// It is necessary in order to detect a real overlap with other bodies.
 	InteractionGeometryDispatcher* iGME;
@@ -68,10 +32,9 @@ private:
 	std::vector<shared_ptr<Body> > shiftedBodies;
 
 	bool first_run;
-
 	//bool generateNewPosition(const shared_ptr<Body>& b, Vector3r& new_position);
-    Vector3r generatePositionOnSurface();
-    Vector3r generatePositionInVolume();
+   Vector3r generatePositionOnSurface();
+   Vector3r generatePositionInVolume();
 
 	typedef	boost::variate_generator<boost::minstd_rand,boost::uniform_int<> > RandomInt;
 	shared_ptr<RandomInt> randomFacet;
@@ -82,19 +45,19 @@ private:
 		randomSymmetricUnit;
 
 	DECLARE_LOGGER;
-
-	REGISTER_ATTRIBUTES(PeriodicEngine,
-			(factoryFacets)
-			(subscribedBodies)
-			(point)
-			(normal)
-			(volumeSection)
-			(maxAttempts)
-			(velocity)
-			(velocityRange)
-			(angularVelocity)
-			(angularVelocityRange))
-	REGISTER_CLASS_AND_BASE(ResetRandomPosition, GlobalEngine);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ResetRandomPosition,GlobalEngine,"Creates spheres during simulation, placing them at random positions. Every time called, one new sphere will be created and inserted in the simulation.",
+		((vector<body_id_t>,factoryFacets,,"The geometry of the section where spheres will be placed; they will be placed on facets or in volume between them depending on *volumeSection* flag."))
+		((std::vector<int>,subscribedBodies,,"Affected bodies."))
+		((Vector3r,point,Vector3r::ZERO,"??"))
+		((Vector3r,normal,Vector3r(0,1,0),"??"))
+		((bool,volumeSection,((void)"define factory by facets.",false),"Create new spheres inside factory volume rather than on its surface."))
+		((int,maxAttempts,20,"Max attemps to place sphere. If placing the sphere in certain random position would cause an overlap with any other physical body in the model, SpheresFactory will try to find another position."))
+		((Vector3r,velocity,Vector3r::ZERO,"Mean velocity of spheres."))
+		((Vector3r,velocityRange,Vector3r::ZERO,"Half size of a velocities distribution interval. New sphere will have random velocity within the range velocity±velocityRange."))
+		((Vector3r,angularVelocity,Vector3r::ZERO,"Mean angularVelocity of spheres."))
+		((Vector3r,angularVelocityRange,Vector3r::ZERO,"Half size of a angularVelocity distribution interval. New sphere will have random angularVelocity within the range angularVelocity±angularVelocityRange.")),
+		first_run=true;
+	);
 };
 REGISTER_SERIALIZABLE(ResetRandomPosition);
 

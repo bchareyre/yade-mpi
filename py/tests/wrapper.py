@@ -15,32 +15,23 @@ from yade import system
 from yade import *
 
 
-rootClasses=set(['GlobalEngine','PartialEngine','Shape','Bound','InteractionGeometry','InteractionPhysics','FileGenerator','BoundFunctor','InteractionGeometryFunctor','InteractionPhysicsFunctor','LawFunctor','Material','State'])
 
 allClasses=system.childClasses('Serializable')
 
 class TestObjectInstantiation(unittest.TestCase):
 	def setUp(self):
 		pass # no setup needed for tests here
-	def testSerializableCtors(self):
-		# correct instances created with Serializable('Foo') syntax
-		for r in rootClasses:
-			obj=Serializable(r); self.assert_(obj.name==r,'Failed for '+r)
-	def testRootCtors(self):
+	def testClassCtors(self):
 		# correct instances created with Foo() syntax
-		for r in rootClasses:
-			obj=eval(r)(); self.assert_(obj.name==r,'Failed for '+r)
-	def testSerializableCtors_attrs_few(self):
-		# attributes passed when using the Serializable('Foo',attr1=value1,attr2=value2) syntax
-		gm=Serializable('Shape',wire=True); self.assert_(gm['wire']==True)
-	def testRootDerivedCtors(self):
-		# classes that are not root classes but derive from them can be instantiated by their name
-		for r in rootClasses:
-			for c in system.childClasses(r):
-				obj=eval(c)(); self.assert_(obj.name==c,'Failed for '+c)
+		for r in allClasses:
+			# this catch should be removed once all classes register with YADE_CLASS_BASE_DOC_* 
+			try:
+				obj=eval(r)();
+				self.assert_(obj.name==r,'Failed for '+r)
+			except NameError: pass
 	def testRootDerivedCtors_attrs_few(self):
 		# attributes passed when using the Foo(attr1=value1,attr2=value2) syntax
-		gm=Shape(wire=True); self.assert_(gm['wire']==True)
+		gm=Shape(wire=True); self.assert_(gm.wire==True)
 	# not applicable for OpenGL-less builds... seems all other classes do derive from something below Serializable
 	#def testNonderived_attrs_few(self):
 	#	# classes deriving just from Serializable can be instantiated by their name directly, including attributes
@@ -71,9 +62,9 @@ class TestObjectInstantiation(unittest.TestCase):
 		# dispatchers accept only correct functors
 		self.assertRaises(TypeError,lambda: LawDispatcher([Bo1_Sphere_Aabb()]))
 	def testInvalidAttr(self):
-		# accessing invalid attributes raises KeyError
-		self.assertRaises(KeyError,lambda: Sphere(attributeThatDoesntExist=42))
-		self.assertRaises(KeyError,lambda: Sphere()['attributeThatDoesntExist'])
+		# accessing invalid attributes raises AttributeError
+		self.assertRaises(AttributeError,lambda: Sphere(attributeThatDoesntExist=42))
+		self.assertRaises(AttributeError,lambda: Sphere().attributeThatDoesntExist)
 	
 class TestWm3Wrapper(unittest.TestCase):
 	def assertSeqAlmostEqual(self,v1,v2):

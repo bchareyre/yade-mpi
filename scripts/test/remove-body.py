@@ -11,7 +11,7 @@ O.engines=[
 	InsertionSortCollider(nBins=5,sweepLength=5e-3),
 	#SpatialQuickSortCollider(),
 	InteractionDispatchers(
-		[ef2_Facet_Sphere_Dem3DofGeom()],
+		[Ig2_Facet_Sphere_Dem3DofGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_Dem3DofGeom_FrictPhys_Basic()],
 	),
@@ -23,7 +23,7 @@ O.bodies.append([
 	utils.facet([[1,-1,0],[0,1,0,],[1,.5,.5]],dynamic=False,young=1e3)
 ])
 
-#GLDrawInteractingFacet(normals=True)
+#Gl1_Facet(normals=True)
 
 import random,sys
 

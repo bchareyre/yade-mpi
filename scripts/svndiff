@@ -1,1 +1,0 @@
-svn diff --old=svn://svn.berlios.de/yade/trunk@$1 --new=svn://svn.berlios.de/yade/trunk@$2
