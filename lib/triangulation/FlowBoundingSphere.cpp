@@ -8,6 +8,10 @@
 #include <utility>
 #include "vector"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
+
 //#define XVIEW
 #include "FlowBoundingSphere.h"//include after #define XVIEW
 
@@ -25,8 +29,6 @@ namespace CGT
 {
 
 const bool DEBUG_OUT = false;
-
-const double RELAX = 1.9;
 
 
 const double ONE_THIRD = 1.0/3.0;
@@ -71,6 +73,8 @@ FlowBoundingSphere::FlowBoundingSphere()
         minPermLength=-1;
 	SLIP_ON_LATERALS = true;//no-slip/symmetry conditions on lateral boundaries
 	TOLERANCE = 1e-06;
+	RELAX = 1.9;
+	ks=0;
 }
 
 void FlowBoundingSphere::Compute_Action()
@@ -169,7 +173,7 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
 
         /** END GAUSS SEIDEL */
         char* file ("Permeability");
-        double ks = Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, SectionArea, H, file);
+        ks = Permeameter(Tri, boundary(y_min_id).value, boundary(y_max_id).value, SectionArea, H, file);
         clock.top("Permeameter");
 
         Compute_Forces();
@@ -1536,7 +1540,8 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
 
 void FlowBoundingSphere::GaussSeidel()
 {
-        RTriangulation& Tri = T[currentTes].Triangulation();
+	std::ofstream iter ("Gauss_Iterations", std::ios::app);
+	RTriangulation& Tri = T[currentTes].Triangulation();
         int j = 0;
         double m, n, dp_max, p_max, sum_p, p_moy, dp_moy, dp, sum_dp;
         double tolerance = TOLERANCE;
@@ -1598,6 +1603,7 @@ void FlowBoundingSphere::GaussSeidel()
         } while (((dp_max/p_max) > tolerance) /*&& ( dp_max > tolerance )*//* &&*/ /*( j<50 )*/);
         cout << "pmax " << p_max << "; pmoy : " << p_moy << endl;
         cout << "iteration " << j <<"; erreur : " << dp_max/p_max << endl;
+	iter << j << " " << dp_max/p_max << endl;
 
         //Display fluxes?
 //  bool ref =  Tri.finite_cells_begin()->info().isvisited;
@@ -1698,7 +1704,8 @@ void FlowBoundingSphere::save_vtk_file(RTriangulation &T)
 {
         static unsigned int number = 0;
         char filename[80];
-        sprintf(filename,"out_%d.vtk", number++);
+	mkdir("./VTK", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        sprintf(filename,"./VTK/out_%d.vtk", number++);
 
         basicVTKwritter vtkfile((unsigned int) T.number_of_vertices()-vtk_infinite_vertices, (unsigned int) T.number_of_finite_cells()-vtk_infinite_cells);
 
@@ -1815,8 +1822,8 @@ void FlowBoundingSphere::GenerateVoxelFile(RTriangulation& Tri)
 }
 
 double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, Real time)
-{
-        /** CONSOLIDATION CURVES **/
+{	
+	/** CONSOLIDATION CURVES **/
         Cell_handle permeameter;
         int n=0;
         int k=0;
@@ -1856,6 +1863,24 @@ double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename,
                 n=0, m=0, o=0; k++;
 	}
 	return P_ave[intervals/2];
+}
+
+void FlowBoundingSphere::mplot (RTriangulation& Tri, char *filename)
+{
+	std::ofstream plot (filename, std::ios::out);
+	Cell_handle permeameter;
+	int intervals = 30;
+	double Rx = (x_max-x_min) /intervals;
+	double Ry = (y_max-y_min) /intervals;
+	double Z = (z_max+z_min)/2.0;
+	double Press = 0;
+	for (double Y=y_min; Y<y_max; Y=Y+Ry) {
+		for (double X=x_min; X<x_max; X=X+Rx) {
+				permeameter = Tri.locate(Point(X, Y, Z));
+				permeameter->info().p()<0? Press=0 : Press=permeameter->info().p();
+				plot << Y << " " << X << " " << Press << endl;
+		}
+	}
 }
 
 double FlowBoundingSphere::Sample_Permeability(RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, string key)

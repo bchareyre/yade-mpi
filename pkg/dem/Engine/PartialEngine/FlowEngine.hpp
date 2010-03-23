@@ -19,7 +19,7 @@ class FlowEngine : public PartialEngine
 	private:
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		shared_ptr<CGT::FlowBoundingSphere> flow;
-	public :		
+	public :	
 		Vector3r gravity;
 		int current_state;
 		Real wall_thickness;
@@ -43,11 +43,13 @@ class FlowEngine : public PartialEngine
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(FlowEngine,PartialEngine,"An engine to solve flow problem in saturated granular media",
 					((bool,isActivated,true,"Activates Flow Engine"))
 					((bool,first,true,"Controls the initialization/update phases"))
-					((bool,save_vtk,true,"Enable/disable vtk files creation to visualize pressure and force fields"))
+					((bool,save_vtk,false,"Enable/disable vtk files creation for visualization"))
+					((bool,save_mplot,false,"Enable/disable mplot files creation"))
 					((bool, slip_boundary, true, "Controls friction condition on lateral walls"))
 					((bool,currentTes,false,"Identifies the current triangulation/tesselation of pore space"))
 					((double,P_zero,0,"Initial internal pressure for oedometer test"))
 					((double,Tolerance,1e-06,"Gauss-Seidel Tolerance"))
+					((double,Relax,1.9,"Gauss-Seidel relaxation"))
 					((int,PermuteInterval,100000,"Pore space re-triangulation period"))
 					((bool,compute_K,true,"Activates permeability measure within a granular sample"))
 					((double,permeability_factor,1.0,"a permability multiplicator"))

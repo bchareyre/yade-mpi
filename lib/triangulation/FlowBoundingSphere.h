@@ -38,12 +38,14 @@ class FlowBoundingSphere
 		bool currentTes;
 		bool SLIP_ON_LATERALS;
 		double TOLERANCE;
+		double RELAX;
+		double ks; //Hydraulic Conductivity
 		
 		Boundary boundaries [6];
 		short id_offset;
  		Boundary& boundary (int b) {return boundaries[b-id_offset];}
 		
-// 		void insert ( Real x, Real y, Real z, Real radius, int id );
+		void mplot (RTriangulation& Tri, char *filename);
 		void Localize ();
 		void Compute_Permeability();
 		void AddBoundingPlanes();

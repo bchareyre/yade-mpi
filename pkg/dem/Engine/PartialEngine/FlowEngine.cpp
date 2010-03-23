@@ -14,6 +14,9 @@
 #include<yade/pkg-common/Wall.hpp>
 #include<yade/pkg-common/Box.hpp>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #ifdef FLOW_ENGINE
 
 YADE_REQUIRE_FEATURE (CGAL);
@@ -23,7 +26,7 @@ FlowEngine::~FlowEngine()
 {
 }
 
-void FlowEngine::action (Scene*)
+void FlowEngine::action ( )
 {
 	if (!flow) {flow = shared_ptr<CGT::FlowBoundingSphere> (new CGT::FlowBoundingSphere);first=true;Update_Triangulation=false;}
 	if ( !isActivated ) return;
@@ -43,24 +46,31 @@ void FlowEngine::action (Scene*)
 
 		if ( current_state==3 )
 		{
-			if ( first || Update_Triangulation ) { Build_Triangulation( scene, P_zero );}
+			if ( first || Update_Triangulation ) { Build_Triangulation( P_zero );}
 // 			else
 // 			{
 				timingDeltas->checkpoint("Triangulating");
 				
-				UpdateVolumes ( scene );
+				UpdateVolumes ( );
 			
 				timingDeltas->checkpoint("Update_Volumes");
 			
 			///Compute flow and and forces here
 			
 				if (!first) flow->GaussSeidel ( );
-			
 				timingDeltas->checkpoint("Gauss-Seidel");
+				
+				if (save_mplot){int j = Omega::instance().getCurrentIteration();
+				char plotfile [50];
+				mkdir("./mplot", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+				string visu_consol = "./mplot/"+flow->key+"%d_Visu_Consol";
+				const char* key_visu_consol = visu_consol.c_str();
+				sprintf (plotfile, key_visu_consol, j);	char *gg = plotfile;
+				flow->mplot(flow->T[flow->currentTes].Triangulation(), gg);}
 				
 				if (save_vtk) flow->save_vtk_file(flow->T[flow->currentTes].Triangulation());
 			
-// 			flow->MGPost(flow->T[flow->currentTes].Triangulation());
+// 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
 				flow->tess_based_force=tess_based_force;
 				flow->Compute_Forces ( );
@@ -86,7 +96,8 @@ void FlowEngine::action (Scene*)
 				int j = Omega::instance().getCurrentIteration();
 // 				int j = Omega::instance().getSimulationTime();
 				char file [50];
-				string consol = flow->key+"%d_Consol";
+				mkdir("./Consol", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+				string consol = "./Consol/"+flow->key+"%d_Consol";
 				const char* keyconsol = consol.c_str();
 				sprintf (file, keyconsol, j);
 				char *g = file;
@@ -145,8 +156,8 @@ void FlowEngine::Build_Triangulation (double P_zero )
 	flow->T[flow->currentTes].max_id=-1;
 	flow->x_min = 1000.0, flow->x_max = -10000.0, flow->y_min = 1000.0, flow->y_max = -10000.0, flow->z_min = 1000.0, flow->z_max = -10000.0;
 
-	AddBoundary ( scene );
-	Triangulate ( scene );
+	AddBoundary ( );
+	Triangulate ( );
 	
 	cout << endl << "Tesselating------" << endl << endl;
 	flow->T[flow->currentTes].Compute();
@@ -163,6 +174,7 @@ void FlowEngine::Build_Triangulation (double P_zero )
 		Oedometer_Boundary_Conditions();
 		flow->Initialize_pressures( P_zero );
 		flow->TOLERANCE=Tolerance;
+		flow->RELAX=Relax;
 	}
 	else 
 	{
@@ -170,7 +182,7 @@ void FlowEngine::Build_Triangulation (double P_zero )
 		Update_Triangulation=!Update_Triangulation;
 	}
 
-	Initialize_volumes ( scene );
+	Initialize_volumes ( );
 	flow->DisplayStatistics ();
 }
 
@@ -247,10 +259,10 @@ void FlowEngine::Initialize_volumes ()
 	{
 		switch ( cell->info().fictious() )
 		{
-			case ( 0 ) : cell->info().volume() = Volume_cell ( cell, scene ); break;
-			case ( 1 ) : cell->info().volume() = Volume_cell_single_fictious ( cell, scene ); break;
-			case ( 2 ) : cell->info().volume() = Volume_cell_double_fictious ( cell, scene ); break;
-			case ( 3 ) : cell->info().volume() = Volume_cell_triple_fictious ( cell, scene ); break;
+			case ( 0 ) : cell->info().volume() = Volume_cell ( cell ); break;
+			case ( 1 ) : cell->info().volume() = Volume_cell_single_fictious ( cell ); break;
+			case ( 2 ) : cell->info().volume() = Volume_cell_double_fictious ( cell ); break;
+			case ( 3 ) : cell->info().volume() = Volume_cell_triple_fictious ( cell ); break;
 		}
 	}
 	cout << "Volumes initialised." << endl;
@@ -268,23 +280,23 @@ void FlowEngine::UpdateVolumes ()
 		{
 			case ( 3 ):
 			{
-				cell->info().dv() = ( Volume_cell_triple_fictious ( cell,scene ) - cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell_triple_fictious ( cell,scene );
+				cell->info().dv() = ( Volume_cell_triple_fictious ( cell ) - cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell_triple_fictious ( cell );
 			}break;
 			case ( 2 ) :
 			{
-				cell->info().dv() = ( Volume_cell_double_fictious ( cell,scene )-cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell_double_fictious ( cell,scene );
+				cell->info().dv() = ( Volume_cell_double_fictious ( cell )-cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell_double_fictious ( cell );
 			}break;
 			case ( 1 ) :
 			{
-				cell->info().dv() = ( Volume_cell_single_fictious ( cell,scene )-cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell_single_fictious ( cell,scene );
+				cell->info().dv() = ( Volume_cell_single_fictious ( cell )-cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell_single_fictious ( cell );
 			}break;
 			case ( 0 ) :
 			{
-				cell->info().dv() = ( Volume_cell ( cell,scene )-cell->info().volume() ) /deltaT;
-				cell->info().volume() = Volume_cell ( cell,scene );
+				cell->info().dv() = ( Volume_cell ( cell )-cell->info().volume() ) /deltaT;
+				cell->info().volume() = Volume_cell ( cell );
 			}break;
 		}
 	}
