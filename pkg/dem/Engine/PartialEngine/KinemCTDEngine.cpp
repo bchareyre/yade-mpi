@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"KinemCTDEngine.hpp"
+#include<yade/pkg-dem/KinemCTDEngine.hpp>
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/core/Scene.hpp>

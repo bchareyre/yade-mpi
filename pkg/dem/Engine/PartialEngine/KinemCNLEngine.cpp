@@ -6,7 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "KinemCNLEngine.hpp"
+#include<yade/pkg-dem/KinemCNLEngine.hpp>
+
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
@@ -149,10 +150,10 @@ void KinemCNLEngine::computeDu(Scene* ncb)
 			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
 			for ( ;itFirst!=itLast; ++itFirst )
 			{
-				if ( ( *itFirst )->getClassName() == "NormalInelasticityLaw" ) 
+				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
 				{
-					if(LOG) cout << "NormalInelasticityLaw engine found" << endl;
-					myLdc =  YADE_PTR_CAST<NormalInelasticityLaw> ( *itFirst );
+					if(LOG) cout << "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity engine found" << endl;
+					myLdc =  YADE_PTR_CAST<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
 					coeff_dech = myLdc ->coeff_dech;
 				}
 			}
