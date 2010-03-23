@@ -12,14 +12,14 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Math.hpp>
-#include<yade/pkg-dem/NormalInelasticityLaw.hpp>
+#include<yade/pkg-dem/Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity.hpp>
 
 
 
 class KinemCNSEngine : public PartialEngine
 {
 	private :
-		shared_ptr<NormalInelasticityLaw> myLdc;
+		shared_ptr<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> myLdc;
 		Real	alpha	// angle from the lower plate to the left box (trigo wise), the Engine finds itself its value
 			,dalpha	// the increment over alpha
 			,deltaH	// the vertical increment of displacement to allow on the upper plate on this time step to verify the normal rigidity
@@ -65,7 +65,7 @@ class KinemCNSEngine : public PartialEngine
 		((Real,max_vel,1.0,"to limit the speed of the vertical displacements applied to control upper plate [m/s]"))
 		((string,Key,"","string to add at the names of the saved files"))
 		((bool,LOG,false,"boolean controling the output of messages on the screen"))
-		((Real,coeff_dech,1.0,"in the case of the use of 'NormalInelasticityLaw' for ex, where kn(unload)#kn(load). The engine cares to find the value at the first run"))
+		((Real,coeff_dech,1.0,"in the case of the use of 'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity' for ex, where kn(unload)#kn(load). The engine cares to find the value at the first run"))
 		((Real,wallDamping,0.2,"the vertical displacements done to maintain F equal to F_0 are in fact damped, through this wallDamping")),
 		alpha=Mathr::PI/2.0;
 		temoin=0;

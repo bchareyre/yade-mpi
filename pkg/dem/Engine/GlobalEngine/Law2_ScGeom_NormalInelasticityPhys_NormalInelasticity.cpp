@@ -6,17 +6,21 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "NormalInelasticityLaw.hpp"
+#include<yade/pkg-dem/Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity.hpp>
+
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
+YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
+
+
 Vector3r translation_vect (0.10,0,0);
 
 
-void NormalInelasticityLaw::action()
+void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
 {
     shared_ptr<BodyContainer>& bodies = scene->bodies;
 
@@ -288,6 +292,4 @@ void NormalInelasticityLaw::action()
 // 	cout << "Sur " << nbreInteracTot << " interactions (reelles) " << nbreInteracMomPlastif << " se sont vues corriger leur moment" << endl;
 
 }
-
-YADE_PLUGIN((NormalInelasticityLaw));
 

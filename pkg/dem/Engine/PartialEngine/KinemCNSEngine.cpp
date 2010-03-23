@@ -8,7 +8,8 @@
 
 
 
-#include "KinemCNSEngine.hpp"
+#include<yade/pkg-dem/KinemCNSEngine.hpp>
+
 #include<yade/core/State.hpp>
 #include<yade/pkg-common/Box.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
@@ -134,11 +135,11 @@ void KinemCNSEngine::computeDu(Scene* ncb)
 			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
 			for ( ;itFirst!=itLast; ++itFirst )
 			{
-				if ( ( *itFirst )->getClassName() == "NormalInelasticityLaw" ) 
+				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
 				{
-					myLdc =  YADE_PTR_CAST<NormalInelasticityLaw> ( *itFirst );
+					myLdc =  YADE_PTR_CAST<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> ( *itFirst );
 					coeff_dech = myLdc ->coeff_dech;
-					if(LOG) cout << "NormalInelasticityLaw engine found, with coeff_dech = " << coeff_dech << endl;
+					if(LOG) cout << "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity engine found, with coeff_dech = " << coeff_dech << endl;
 				}
 			}
 		}
@@ -164,7 +165,7 @@ void KinemCNSEngine::computeDu(Scene* ncb)
 	Real Hcurrent = topbox->state->pos.Y();
 	Real Fdesired = F_0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired
 
-// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de NormalInelasticityLaw :
+// Prise en compte de la difference de rigidite entre charge et decharge dans le cadre de Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity :
 	if( F_sup.Y() > Fdesired )	// cas ou l'on va monter la plaq <=> (normalemt) a une decharge
 		stiffness *= coeff_dech;
 

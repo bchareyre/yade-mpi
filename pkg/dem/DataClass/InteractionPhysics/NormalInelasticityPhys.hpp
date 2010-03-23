@@ -10,7 +10,7 @@
 
 #include<yade/pkg-dem/FrictPhys.hpp>
 
-/*! \brief Interaction for using NormalInelasticityLaw
+/*! \brief Interaction for using Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity
 
 This interaction is similar to CohesiveFrictionalContactInteraction. Among the differences are the unMax, previousun and previousFn (allowing to describe the inelastic unloadings in compression), no more shear and tension Adhesion, no more "fragile", "cohesionBroken" and "cohesionDisablesFriction"
  */
@@ -23,7 +23,7 @@ class NormalInelasticityPhys : public FrictPhys
 		virtual ~NormalInelasticityPhys();
 		void SetBreakingState ();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormalInelasticityPhys,FrictPhys,
-				 "Physics (of interaction) for using NormalInelasticityLaw",
+				 "Physics (of interaction) for using Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity",
 				 ((Real,unMax,0.0,"the maximum value of penetration depth of the history of this interaction"))
 				 ((Real,previousun,0.0,"the value of this un at the last time step"))
 				 ((Real,previousFn,0.0,"the value of the normal force at the last time step"))

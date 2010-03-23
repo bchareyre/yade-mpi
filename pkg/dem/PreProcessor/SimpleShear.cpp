@@ -14,7 +14,7 @@
 #include "SimpleShear.hpp"
 
 #include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
-#include <yade/pkg-dem/NormalInelasticityLaw.hpp>
+#include <yade/pkg-dem/Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity.hpp>
 #include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -296,7 +296,7 @@ void SimpleShear::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(shared_ptr<Engine>(new InsertionSortCollider));
 	rootBody->engines.push_back(interactionGeometryDispatcher);
 	rootBody->engines.push_back(interactionPhysicsDispatcher);
-	rootBody->engines.push_back(shared_ptr<Engine>(new NormalInelasticityLaw));
+	rootBody->engines.push_back(shared_ptr<Engine>(new Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 	if(gravApplied)
 		rootBody->engines.push_back(gravityCondition);
 	if(shearApplied)

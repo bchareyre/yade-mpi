@@ -14,6 +14,7 @@
 #include <yade/lib-miniWm3/Wm3Math.h>
 
 
+YADE_PLUGIN((Disp2DPropLoadEngine));
 
 void Disp2DPropLoadEngine::postProcessAttributes(bool deserializing)
 {

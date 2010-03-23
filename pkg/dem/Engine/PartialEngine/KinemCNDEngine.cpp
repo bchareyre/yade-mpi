@@ -9,10 +9,10 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
-#include"KinemCNDEngine.hpp"
+#include<yade/pkg-dem/KinemCNDEngine.hpp>
 
 
-
+YADE_PLUGIN((KinemCNDEngine));
 
 void KinemCNDEngine::action(Scene * ncb)
 {
