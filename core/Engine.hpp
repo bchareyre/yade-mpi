@@ -43,7 +43,7 @@ class Engine: public Serializable{
 		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(); }
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
-		((string,label,,"Textual label for this object; must be valid python identifier, you can refer to it directly fron python.")),
+		((string,label,,"Textual label for this object; must be valid python identifier, you can refer to it directly from python.")),
 		/* ctor */ scene=Omega::instance().getScene().get() ,
 		/* py */
 		.add_property("execTime",&Engine::timingInfo_nsec_get,&Engine::timingInfo_nsec_set,"Cummulative time this Engine took to run (only used if O.timingEnabled==True).")
