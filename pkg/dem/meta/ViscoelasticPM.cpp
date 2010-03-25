@@ -37,8 +37,8 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
 	SimpleViscoelasticPhys& phys=*static_cast<SimpleViscoelasticPhys*>(_phys.get());
 
-	int id1 = I->getId1();
-	int id2 = I->getId2();
+	const int id1 = I->getId1();
+	const int id2 = I->getId2();
 	
 	if (geom.penetrationDepth<0) {
 		rootBody->interactions->requestErase(id1,id2);
@@ -54,16 +54,16 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 
 	if (I->isFresh(rootBody)) shearForce=Vector3r(0,0,0);
 
-	Real dt = Omega::instance().getTimeStep();
+	const Real dt = Omega::instance().getTimeStep();
 
 	Vector3r axis = phys.prevNormal.Cross(geom.normal);
 	shearForce -= shearForce.Cross(axis);
-	Real angle = dt*0.5*geom.normal.Dot(de1.angVel + de2.angVel);
+	const Real angle = dt*0.5*geom.normal.Dot(de1.angVel + de2.angVel);
 	axis = angle*geom.normal;
 	shearForce -= shearForce.Cross(axis);
 
-	Vector3r c1x = (geom.contactPoint - de1.pos);
-	Vector3r c2x = (geom.contactPoint - de2.pos);
+	const Vector3r c1x = (geom.contactPoint - de1.pos);
+	const Vector3r c2x = (geom.contactPoint - de2.pos);
 	/// The following definition of c1x and c2x is to avoid "granular ratcheting" 
 	///  (see F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, 
 	///   "Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena",
@@ -71,10 +71,14 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	//Vector3r _c1x_	=  geom->radius1*geom->normal;
 	//Vector3r _c2x_	= -geom->radius2*geom->normal;
 	//Vector3r relativeVelocity		= (de2->velocity+de2->angularVelocity.Cross(_c2x_)) - (de1->velocity+de1->angularVelocity.Cross(_c1x_));
-	Vector3r relativeVelocity = (de1.vel+de1.angVel.Cross(c1x)) - (de2.vel+de2.angVel.Cross(c2x)) ;
-	Real normalVelocity	= geom.normal.Dot(relativeVelocity);
-	Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
-	shearForce += (phys.ks*dt+phys.cs)*shearVelocity;
+	const Vector3r relativeVelocity = (de1.vel+de1.angVel.Cross(c1x)) - (de2.vel+de2.angVel.Cross(c2x)) ;
+	const Real normalVelocity	= geom.normal.Dot(relativeVelocity);
+	const Vector3r shearVelocity	= relativeVelocity-normalVelocity*geom.normal;
+	// As Chiara Modenese suggest, we store the elastic part 
+	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
+	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
+	shearForce += phys.ks*dt*shearVelocity;
+	const Vector3r shearForceVisc = phys.cs*shearVelocity;
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;
@@ -86,7 +90,7 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 		shearForce *= maxFs;
 	}
 
-	Vector3r f = phys.normalForce + shearForce;
+	Vector3r f = phys.normalForce + shearForce + shearForceVisc;
 	addForce (id1,-f,rootBody);
 	addForce (id2, f,rootBody);
 	addTorque(id1,-c1x.Cross(f),rootBody);
