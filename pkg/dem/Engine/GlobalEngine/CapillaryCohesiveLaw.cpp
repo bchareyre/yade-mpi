@@ -278,8 +278,9 @@ void CapillaryCohesiveLaw::action()
                 //bodiesMenisciiList.display();
         //cerr << "end of capillarylaw" << endl;
 }
-/*capillarylaw::capillarylaw()
-{}*/
+
+capillarylaw::capillarylaw()
+{}
 
 void capillarylaw::fill(const char* filename)
 {
