@@ -19,38 +19,26 @@
 #include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
+YADE_PLUGIN((CapillaryStressRecorder));
 CREATE_LOGGER(CapillaryStressRecorder);
 
-CapillaryStressRecorder::CapillaryStressRecorder () : Recorder()
-
-{
-	outputFile = "";
-	interval = 1;
-	sphere_ptr = shared_ptr<Shape> (new Sphere);
-	SpheresClassIndex = sphere_ptr->getClassIndex();
-// 	height = 0;
-// 	width = 0;
-// 	depth = 0;
-// 	thickness = 0;
-	
-// 	upperCorner = Vector3r(0,0,0);
-// 	lowerCorner = Vector3r(0,0,0);
-	
-}
-
+//// related to OLD CODE!
+// CapillaryStressRecorder::CapillaryStressRecorder () : Recorder()
+// {
+// 	outputFile = "";
+// 	interval = 1;
+// // 	sphere_ptr = shared_ptr<Shape> (new Sphere);
+// // 	SpheresClassIndex = sphere_ptr->getClassIndex();
+// 
+// }
 
 void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
 {
 	if(deserializing)
 	{
-		//bool file_exists = std::ifstream (outputFile.c_str()); //if file does not exist, we will write colums titles
 		ofile.open(outputFile.c_str(), std::ios::app);
-		//if (!file_exists) ofile<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE" << endl;
-		
 	}
 }
-
-
 
 bool CapillaryStressRecorder::isActivated()
 {
@@ -60,6 +48,8 @@ bool CapillaryStressRecorder::isActivated()
 
 void CapillaryStressRecorder::action()
 {
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
+  
 	if ( !triaxialCompressionEngine )
 	{
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
@@ -67,36 +57,33 @@ void CapillaryStressRecorder::action()
 		for ( ;itFirst!=itLast; ++itFirst )
 		{
 			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine")
-// 			  || (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
 			{
 				LOG_DEBUG ( "stress controller engine found" );
 				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
-				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
 			}
 		}
 		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
 	}
-// 	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 )) triaxialCompressionEngine->computeStressStrain ( scene );	
-
-	shared_ptr<BodyContainer>& bodies = scene->bodies;
-		
+	
 	Real f1_cap_x=0, f1_cap_y=0, f1_cap_z=0, x1=0, y1=0, z1=0, x2=0, y2=0, z2=0;
 	
 	Real sig11_cap=0, sig22_cap=0, sig33_cap=0, sig12_cap=0, sig13_cap=0,
 	sig23_cap=0, Vwater = 0, CapillaryPressure = 0;
+	int j = 0;
 	
+// 	// should be written like this with rootBody declared previously or in the action(Scene* rootBody):
+// 	FOREACH(const shared_ptr<Interaction>& i, *rootBody->interactions){
+// 		if(!i->isReal()) continue;
+		
 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
-        
-        int j = 0;
-        
         for(  ; ii!=iiEnd ; ++ii ) 
         {
                 if ((*ii)->isReal())
                 {	
                 	const shared_ptr<Interaction>& interaction = *ii;
                 
-                	CapillaryParameters* meniscusParameters		= static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
+                	CapillaryParameters* meniscusParameters = static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
                         
                         if (meniscusParameters->meniscus)
                         {
@@ -115,18 +102,14 @@ void CapillaryStressRecorder::action()
 			Body* de1 = (*bodies)[id1].get();
 			Body* de2 = (*bodies)[id2].get();
 			
-// 			BodyMacroParameters* de1 		= static_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
 			x1 = de1->state->pos[0];
 			y1 = de1->state->pos[1];
 			z1 = de1->state->pos[2];
-
-
-// 			BodyMacroParameters* de2 		= static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
 			x2 = de2->state->pos[0];
 			y2 = de2->state->pos[1];
 			z2 = de2->state->pos[2];
 
-			///Calcul des contraintes capillaires "locales"
+			/// capillary stresses from contact forces
 			
 			sig11_cap = sig11_cap + f1_cap_x*(x1 - x2);
 			sig22_cap = sig22_cap + f1_cap_y*(y1 - y2);
@@ -135,7 +118,7 @@ void CapillaryStressRecorder::action()
 			sig13_cap = sig13_cap + f1_cap_x*(z1 - z2);
 			sig23_cap = sig23_cap + f1_cap_y*(z1 - z2);
 			
-			/// Calcul du volume d'eau
+			/// Liquid volume
 			
  			Vwater += meniscusParameters->Vmeniscus;
  			CapillaryPressure=meniscusParameters->CapillaryPressure;
@@ -145,76 +128,45 @@ void CapillaryStressRecorder::action()
                 }
         }	
 
-// 	if (Omega::instance().getCurrentIteration() % 10 == 0) 
-// 	{cerr << "interactions capillaires = " << j << endl;}
-
-	/// volume de l'echantillon
-// 	PhysicalParameters* p_bottom =
-// static_cast<PhysicalParameters*>((*bodies)[wall_bottom_id]->physicalParameters.
-// get());
-// 	PhysicalParameters* p_top   =	
-// static_cast<PhysicalParameters*>((*bodies)[wall_top_id]->physicalParameters.get(
-// ));
-// 	PhysicalParameters* p_left =
-// static_cast<PhysicalParameters*>((*bodies)[wall_left_id]->physicalParameters.get
-// ());
-// 	PhysicalParameters* p_right =
-// static_cast<PhysicalParameters*>((*bodies)[wall_right_id]->physicalParameters.
-// get());
-// 	PhysicalParameters* p_front =
-// static_cast<PhysicalParameters*>((*bodies)[wall_front_id]->physicalParameters.
-// get());
-// 	PhysicalParameters* p_back =
-// static_cast<PhysicalParameters*>((*bodies)[wall_back_id]->physicalParameters.get
-// ());
-// 	
-// 	
-// 	height = p_top->se3.position.Y() - p_bottom->se3.position.Y() -
-// thickness;
-// 	width = p_right->se3.position.X() - p_left->se3.position.X() -
-// thickness;
-// 	depth = p_front->se3.position.Z() - p_back->se3.position.Z() -
-// thickness;
-// 
-// 	Real Vech = (height) * (width) * (depth)
+	/// Sample volume
 
 	Real V = ( triaxialCompressionEngine->height ) * ( triaxialCompressionEngine->width ) * ( triaxialCompressionEngine->depth );
 
-	// degre de saturation/porosite	
+	/// Solid volume
+	Real Vs = 0, Rbody = 0, SR = 0;
+	
+	// should be written like this:
+// 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+// 	if(!b) continue;
+//	if(dynamic_cast<Sphere>(b->shape->get())){
+	  
 	BodyContainer::iterator bi = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
-	
-	Real Vs = 0, Rbody = 0, SR = 0;
-// 	int n = 0;
-	
-	for ( ; bi!=biEnd; ++bi) 
-	
-	{	
-		shared_ptr<Body> b = *bi;
-		
-		int geometryIndex = b->shape->getClassIndex();
-		//cerr << "model = " << geometryIndex << endl;
-		
-		if (geometryIndex == SpheresClassIndex)
-		{
-			Sphere* sphere =
-		static_cast<Sphere*>(b->shape.get());
-			Rbody = sphere->radius;
-			SR+=Rbody;
-			
-			Vs += 1.333*Mathr::PI*(Rbody*Rbody*Rbody);
-		}
+	for ( ; bi!=biEnd; ++bi) {
+	  
+	  shared_ptr<Body> b = *bi;
+	  Sphere* sphere = static_cast<Sphere*>(b->shape.get());
+	  
+// 	  // related to OLD CODE with SphereClassIndex!
+// 	  int geometryIndex = b->shape->getClassIndex();
+// 	  if ( geometryIndex == SpheresClassIndex ) {
+
+	  if (sphere) { // should be enough to distinguish spheres from walls (boxes) -> to be verified!
+	  
+	    Rbody = sphere->radius;
+	    SR+=Rbody;
+	    Vs += 1.333*Mathr::PI*(Rbody*Rbody*Rbody);
+	  }
 	}
 	
 	Real Vv = V - Vs;
 	
-	//Real n = Vv/Vech;
 	Real Sr = 100*Vwater/Vv;
 	if (Sr>100) Sr=100;
 	Real w = 100*Vwater/V;
 	if (w>(100*Vv/V)) w=100*(Vv/V);
 	
-	/// Calcul des contraintes "globales"
+	/// homogeneized capillary stresses
 	
 	Real SIG_11_cap=0, SIG_22_cap=0, SIG_33_cap=0, SIG_12_cap=0, SIG_13_cap=0, SIG_23_cap=0;
 	
@@ -238,8 +190,6 @@ void CapillaryStressRecorder::action()
 		<< endl;
 	
 }
-
-YADE_PLUGIN((CapillaryStressRecorder));
 
 //YADE_REQUIRE_FEATURE(PHYSPAR);
 

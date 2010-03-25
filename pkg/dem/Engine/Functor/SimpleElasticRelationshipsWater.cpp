@@ -14,11 +14,12 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
+YADE_PLUGIN((SimpleElasticRelationshipsWater));
 
-SimpleElasticRelationshipsWater::SimpleElasticRelationshipsWater()
-{
-
-}
+// SimpleElasticRelationshipsWater::SimpleElasticRelationshipsWater()
+// {
+// 
+// }
 
 void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //FrictMat
 					, const shared_ptr<Material>& b2 // FrictMat
@@ -89,7 +90,7 @@ void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //Frict
 	}
 
 };
-YADE_PLUGIN((SimpleElasticRelationshipsWater));
+
 
 
 

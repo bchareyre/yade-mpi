@@ -11,7 +11,6 @@
 //FIXME : dans triaxialStressController, changer le test de nullité de la force dans updateStiffness
 //FIXME : needs "requestErase" somewhere
 
-
 #include "CapillaryCohesiveLaw.hpp"
 #include <yade/pkg-common/ElastMat.hpp>
 #include <yade/pkg-dem/ScGeom.hpp>
@@ -25,23 +24,24 @@
 #include <iostream>
 #include <fstream>
 
+YADE_PLUGIN((CapillaryCohesiveLaw));
+
 using namespace std;
 
-
-CapillaryCohesiveLaw::CapillaryCohesiveLaw() : GlobalEngine()
-{
-        sdecGroupMask=1;
-
-        CapillaryPressure=0;
-        fusionDetection = false;
-        binaryFusion = true;
-
-		  // capillary setup moved to postProcessAttributes
-
-}
+// CapillaryCohesiveLaw::CapillaryCohesiveLaw() : GlobalEngine()
+// {
+//         sdecGroupMask=1;
+// 
+//         CapillaryPressure=0;
+//         fusionDetection = false;
+//         binaryFusion = true;
+// 
+// 		  // capillary setup moved to postProcessAttributes
+// 
+// }
 
 void CapillaryCohesiveLaw::postProcessAttributes(bool deserializing){
-	if(!deserializing) return;
+  if(!deserializing) return;
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
   capillary->fill("M(r=1)");
@@ -190,8 +190,7 @@ void CapillaryCohesiveLaw::action()
 			{	//cerr << "Pinterpol = "<< Pinterpol << endl;
 
                                 MeniscusParameters
-                                solution(capillary->Interpolate(R1,R2,
-                                                                Dinterpol, Pinterpol, currentContactPhysics->currentIndexes));
+                                solution(capillary->Interpolate(R1,R2,Dinterpol, Pinterpol, currentContactPhysics->currentIndexes));
 
                                 /// capillary adhesion force
 
@@ -279,8 +278,8 @@ void CapillaryCohesiveLaw::action()
                 //bodiesMenisciiList.display();
         //cerr << "end of capillarylaw" << endl;
 }
-capillarylaw::capillarylaw()
-{}
+/*capillarylaw::capillarylaw()
+{}*/
 
 void capillarylaw::fill(const char* filename)
 {

@@ -13,19 +13,30 @@
 class SimpleElasticRelationshipsWater : public InteractionPhysicsFunctor
 {
 	public :
-		SimpleElasticRelationshipsWater();
-
 		virtual void go(	const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
 
-	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/* */);
 	FUNCTOR2D(FrictMat,FrictMat);
-	REGISTER_CLASS_NAME(SimpleElasticRelationshipsWater);
-	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
-
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SimpleElasticRelationshipsWater,InteractionPhysicsFunctor, "RelationShips to use CapillaryV+CohesiveLaw\n\n In these RelationShips all the interaction attributes are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<InteractionPhysicsFunctor>`, most of the attributes are computed only once, when the interaction is new.",,;);
+	
 };
-
 REGISTER_SERIALIZABLE(SimpleElasticRelationshipsWater);
 
-
+//// OLD CODE!!!
+// class SimpleElasticRelationshipsWater : public InteractionPhysicsFunctor
+// {
+// 	public :
+// 		SimpleElasticRelationshipsWater();
+// 
+// 		virtual void go(	const shared_ptr<Material>& b1,
+// 					const shared_ptr<Material>& b2,
+// 					const shared_ptr<Interaction>& interaction);
+// 
+// 	REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,/* */);
+// 	FUNCTOR2D(FrictMat,FrictMat);
+// 	REGISTER_CLASS_NAME(SimpleElasticRelationshipsWater);
+// 	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
+// 
+// };
+// REGISTER_SERIALIZABLE(SimpleElasticRelationshipsWater);

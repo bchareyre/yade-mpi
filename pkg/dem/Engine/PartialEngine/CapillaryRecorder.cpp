@@ -16,13 +16,14 @@
 #include <yade/core/Scene.hpp>
 #include <boost/lexical_cast.hpp>
 
+YADE_PLUGIN((CapillaryRecorder));
+CREATE_LOGGER(CapillaryRecorder);
 
-CapillaryRecorder::CapillaryRecorder () : Recorder()
-{
-	outputFile = "";
-	interval = 1;
-}
-
+// CapillaryRecorder::CapillaryRecorder () : Recorder()
+// {
+// 	outputFile = "";
+// 	interval = 1;
+// }
 
 void CapillaryRecorder::postProcessAttributes(bool deserializing)
 {
@@ -31,7 +32,6 @@ void CapillaryRecorder::postProcessAttributes(bool deserializing)
 		ofile.open(outputFile.c_str());
 	}
 }
-
 
 
 bool CapillaryRecorder::isActivated()
@@ -45,29 +45,12 @@ void CapillaryRecorder::action()
 	Real fx=0, fy=0, fz=0;
 	
 	scene->forces.sync();
-	Vector3r force=scene->forces.getForce(bigBallId);
+	Vector3r force=scene->forces.getForce(sphereId);
 	
+	fx=force[0];
+	fy=force[1];
+	fz=force[2];
 		
-		fx=force[0];
-		fy=force[1];
-		fz=force[2];
-		
-	// R1 R2 -> geometricalModel // �modifier cf capllaryStressRecorder
-// 	Real R1 = 0.001;
-// 	Real R2 = 0.001;
-	
-// 	//physicalParameters de bigBall
-// 	
-// 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-// 	Material* bigBallpp =
-// 	static_cast<FrictMat*>((*bodies)[bigBallId]->material.get())
-// ; ;
-// 		
-// 		Real x = bigBallpp-> se3.position[0];
-// 		
-// 		Real Dintergranular = x - (R1+R2);	
-// 	
-// 	// capillary parameters
 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
         
@@ -80,7 +63,7 @@ void CapillaryRecorder::action()
                 {
                         const shared_ptr<Interaction>& interaction = *ii;
                          
-                        CapillaryParameters* meniscusParameters		= static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
+                        CapillaryParameters* meniscusParameters = static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
                         
                         if (meniscusParameters->meniscus)
                         {
@@ -91,7 +74,7 @@ void CapillaryRecorder::action()
                         
                         }
                         
-                        // else Vtotal = 0; // �voir!!!
+                        // else Vtotal = 0; // ???
                 }
         }	
 
@@ -105,8 +88,6 @@ void CapillaryRecorder::action()
 	
 	
 }
-
-YADE_PLUGIN((CapillaryRecorder));
 
 //YADE_REQUIRE_FEATURE(PHYSPAR);
 

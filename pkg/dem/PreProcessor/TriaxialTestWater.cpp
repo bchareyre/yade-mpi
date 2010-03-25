@@ -7,10 +7,6 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
-
-
-
 #include "TriaxialTestWater.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
@@ -402,8 +398,6 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	
 	interactionGeometryDispatcher->add(iS2IS4SContactGeometry);
 	interactionGeometryDispatcher->add("Ig2_Box_Sphere_ScGeom");
-	
-	
 
 	shared_ptr<InteractionPhysicsDispatcher> interactionPhysicsDispatcher(new InteractionPhysicsDispatcher);
 //	interactionPhysicsDispatcher->add("Ip2_FrictMat_FrictMat_FrictPhys");
@@ -505,18 +499,12 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	CapillaryStressRecorder);
 	capillaryStressRecorder -> outputFile 	= capillaryStressRecordFile + Key;
 	capillaryStressRecorder -> interval 	= recordIntervalIter;
-	capillaryStressRecorder-> thickness 	= thickness;
-// 	capillaryStressRecorder-> upperCorner 	= upperCorner;
-// 	capillaryStressRecorder-> lowerCorner 	= lowerCorner;
 
-//recording contact stress
+	//recording contact stress
 	contactStressRecorder = shared_ptr<ContactStressRecorder>(new
 	ContactStressRecorder);
 	contactStressRecorder -> outputFile 	= contactStressRecordFile + Key;
  	contactStressRecorder -> interval 	= recordIntervalIter;
- 	contactStressRecorder-> thickness 	= thickness;
-//  	contactStressRecorder-> upperCorner 	= upperCorner;
-//  	contactStressRecorder-> lowerCorner 	= lowerCorner;
 	
 	#if 0	
 	// moving walls to regulate the stress applied

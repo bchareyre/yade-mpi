@@ -17,56 +17,55 @@
 using namespace boost;
 using namespace std;
 
-SampleCapillaryPressureEngine::SampleCapillaryPressureEngine()
-{
-	capillaryCohesiveLaw = new CapillaryCohesiveLaw;
-	capillaryCohesiveLaw->CapillaryPressure= 0;
-	capillaryCohesiveLaw->sdecGroupMask = 2;	
-	StabilityCriterion=0.01;
-	SigmaPrecision = 0.001;
-	Phase1=false;
-	Phase1End = "Phase1End";
-	Iteration = 0;
-	UnbalancedForce = 0.01;
-	pressureVariationActivated=false;
-	Pressure = 0;
-	PressureVariation = 1000;
-	fusionDetection = true;
-	binaryFusion = true;	
-	pressureIntervalRec = 10000;
-}
+// SampleCapillaryPressureEngine::SampleCapillaryPressureEngine()
+// {
+// 	capillaryCohesiveLaw = new CapillaryCohesiveLaw;
+// 	capillaryCohesiveLaw->CapillaryPressure= 0;
+// 	capillaryCohesiveLaw->sdecGroupMask = 2;	
+// 	StabilityCriterion=0.01;
+// 	SigmaPrecision = 0.001;
+// 	Phase1=false;
+// 	Phase1End = "Phase1End";
+// 	Iteration = 0;
+// 	UnbalancedForce = 0.01;
+// 	pressureVariationActivated=false;
+// 	Pressure = 0;
+// 	PressureVariation = 1000;
+// 	fusionDetection = true;
+// 	binaryFusion = true;	
+// 	pressureIntervalRec = 10000;
+// }
 
 SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 {
 }
 
-
 void SampleCapillaryPressureEngine::updateParameters()
 {
 	UnbalancedForce = ComputeUnbalancedForce(scene);
-	if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
+	//if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 
-	if (!Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated)
-	{	
-		internalCompaction = false;
-		Phase1 = true;}
+	if (!Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated) {
+	  
+	  internalCompaction = false;
+	  Phase1 = true;
+	}
 	
-	if ( Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated)	
-	{
-		Real S = meanStress;
-		cerr << "Smoy = " << meanStress << endl;
-		if ((S > (sigma_iso - (sigma_iso*SigmaPrecision))) && (S < (sigma_iso + (sigma_iso*SigmaPrecision))))
-		{
-			string fileName = "../data/" + Phase1End + "_" + 
-			lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
-			cerr << "saving snapshot: " << fileName << " ...";
-			Omega::instance().saveSimulation(fileName);
-			pressureVariationActivated = true;
-		}	
+	if ( Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated) {
+	  
+	  Real S = meanStress;
+	  cerr << "Smoy = " << meanStress << endl;
+	  if ((S > (sigma_iso - (sigma_iso*SigmaPrecision))) && (S < (sigma_iso + (sigma_iso*SigmaPrecision)))) {
+	    
+	    string fileName = "../data/" + Phase1End + "_" + 
+	    lexical_cast<string>(Omega::instance().getCurrentIteration()) + ".xml";
+	    cerr << "saving snapshot: " << fileName << " ...";
+	    Omega::instance().saveSimulation(fileName);
+	    pressureVariationActivated = true;
+	  }	
 	}
 }
 	
-
 void SampleCapillaryPressureEngine::action()
 {	
 	updateParameters();
