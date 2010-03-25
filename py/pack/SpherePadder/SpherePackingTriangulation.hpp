@@ -1,5 +1,4 @@
-#ifndef SPHERE_PACKING_TRIANGULATION_HPP
-#define SPHERE_PACKING_TRIANGULATION_HPP
+#pragma once
 
 //#include <vector>
 #include <map>
@@ -125,6 +124,3 @@ void  current_tetrahedron_get_weighted_circumcenter(R1,R2,R3,R4,&x,&y,&z)
 
 };
 
-
-
-#endif // SPHERE_PACKING_TRIANGULATION_HPP

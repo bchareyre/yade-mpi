@@ -51,7 +51,7 @@ def _delta_stats(deltas,totalTime,level):
 def _engines_stats(engines,totalTime,level):
 	lines=0; hereLines=0
 	for e in engines:
-		if not isinstance(e,Functor): print _formatLine(u'"'+e['label']+'"' if e['label'] else e.name,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
+		if not isinstance(e,Functor): print _formatLine(u'"'+e.label+'"' if e.label else e.name,e.execTime,e.execCount,totalTime,level); lines+=1; hereLines+=1
 		if e.timingDeltas: 
 			if isinstance(e,Functor):
 				print _formatLine(e.name,-1,-1,-1,level); lines+=1; hereLines+=1

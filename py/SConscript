@@ -12,14 +12,15 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.SharedLibrary('_utils',['_utils.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
 		linkPlugins(['Shop','ConcretePM','Facet']),
 		]),
-	env.SharedLibrary('_packPredicates',['_packPredicates.cpp'],SHLIBPREFIX='',
+	env.SharedLibrary('_packPredicates',['pack/_packPredicates.cpp'],SHLIBPREFIX='',
 		# link to the symlink to the python module (created in lib/SConstruct; see explanation there)
 		LIBS=env['LIBS']+(['_gts__python-module'] if 'YADE_GTS' in env['CPPDEFINES'] else []),
 		),
-	env.SharedLibrary('_packSpheres',['_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
+	env.SharedLibrary('_packSpherePadder',env.Combine('packSpherePadder.cpp',['pack/_packSpherePadder.cpp','pack/SpherePadder/SpherePadder.cpp','pack/SpherePadder/TetraMesh.cpp','pack/SpherePadder/CellPartition.cpp']+(['pack/SpherePadder/SpherePackingTriangulation.cpp'] if 'cgal' in env['features'] else [])),SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(['SpherePack'])),
+	env.SharedLibrary('_packSpheres',['pack/_packSpheres.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+[
 		linkPlugins(['Shop','SpherePack']),
 		]),
-	env.SharedLibrary('_packObb',['_packObb.cpp'],SHLIBPREFIX=''),
+	env.SharedLibrary('_packObb',['pack/_packObb.cpp'],SHLIBPREFIX=''),
 	env.AlwaysBuild(env.ScanReplace('__init__.py.in')),
 	env.AlwaysBuild(env.ScanReplace('config.py.in')),
 	env.File('utils.py'),
@@ -29,14 +30,13 @@ env.Install('$PREFIX/lib/yade$SUFFIX/py/yade',[
 	env.File('plot.py'),
 	env.File('linterpolation.py'),
 	env.File('timing.py'),
-	env.File('pack.py'),
+	env.File('pack/pack.py'),
 	env.File('remote.py'),
 	env.File('system.py'),
 	env.File('export.py'),
 	env.File('post2d.py'),
 	env.File('_extraDocs.py'),
-	#env.File('ww.py'),
-	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=['PythonUI']+linkPlugins(['Shop','BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',]+(['GeometricalModelMetaEngine','InteractingGeometryMetaEngine',] if 'geometricalmodel' in env['features'] else [])+(['StateMetaEngine',] if 'physpar' in env['features'] else []))),
+	env.SharedLibrary('wrapper',['yadeWrapper/yadeWrapper.cpp'],SHLIBPREFIX='',LIBS=['PythonUI']+linkPlugins(['Shop','BoundDispatcher','InteractionGeometryDispatcher','InteractionPhysicsDispatcher','LawDispatcher','InteractionDispatchers','ParallelEngine','Clump','STLImporter',])),
 	env.SharedLibrary('_customConverters',['yadeWrapper/customConverters.cpp'],SHLIBPREFIX='',LIBS=env['LIBS']+linkPlugins(Split("BoundFunctor InteractionGeometryFunctor InteractionPhysicsFunctor LawFunctor")))
 ])
 env.Install('$PREFIX/lib/yade$SUFFIX/py/yade/tests',[

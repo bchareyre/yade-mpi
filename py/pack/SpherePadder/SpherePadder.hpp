@@ -10,15 +10,25 @@
 
 #pragma once
 
+#include<yade/lib-base/Logging.hpp>
+#include<yade/lib-base/Math.hpp>
+#include<yade/pkg-dem/SpherePack.hpp>
+
 #include "TetraMesh.hpp"
 #include "CellPartition.hpp"
-#include "SpherePackingTriangulation/SpherePackingTriangulation.hpp"
+#ifdef YADE_CGAL
+	#include "SpherePackingTriangulation.hpp"
+#endif
 #include <time.h>
 #include <set>
 #include <list>
 
-# define BEGIN_FUNCTION(arg) if (verbose) cout << "+--> " << (arg) << endl << flush
-# define END_FUNCTION        if (verbose) cout << "+-- Done <--+\n\n" << flush
+#include <boost/python.hpp>
+
+namespace py=boost::python;
+
+# define BEGIN_FUNCTION(arg) LOG_TRACE("+--> "<<arg)
+# define END_FUNCTION        LOG_TRACE("+-- Done <--+")
 
 #define FAIL_DET            0x01
 #define FAIL_DELTA          0x02
@@ -92,7 +102,9 @@ class SpherePadder
     protected:
                 
         vector<vector<id_type> >    combination;
-        SpherePackingTriangulation  triangulation;
+		#ifdef YADE_CGAL
+			SpherePackingTriangulation  triangulation;
+		#endif
         vector<tetra_porosity>      tetra_porosities;
         Criterion                   criterion;
     
@@ -111,7 +123,9 @@ class SpherePadder
         void         place_at_tetra_centers ();
         void         place_at_tetra_vertexes ();
         void         cancel_overlaps ();
-        unsigned int iter_densify(unsigned int nb_check = 20);
+		#ifdef YADE_CGAL
+			unsigned int iter_densify(unsigned int nb_check = 20);
+		#endif
         void         repack_null_radii();
     
     // some key functions 
@@ -135,35 +149,44 @@ class SpherePadder
         CellPartition    partition;
         list <id_type>   bounds;
     
-        bool verbose;
         bool Must_Stop;
 
+		  void init();
+
     public:
+	 	typedef CellPartition::Cell Cell;
+	 	DECLARE_LOGGER;
+	 	// read mesh from file
+		SpherePadder(const std::string& fileName, std::string meshType="");
+		SpherePadder(){ init(); }
+		~SpherePadder(){ if(mesh) delete mesh; }
    
         bool meshIsPlugged;
-
-        void ShutUp() { verbose = false; }
-        void Speak()  { verbose = true; }
 	
         void setRadiusRatio (double r, double rapp = 0.125);
+		  Real getRadiusRatio(){ return ratio; };
         void setRadiusRange (double min, double max);
+		  py::tuple getRadiusRange(){ return py::make_tuple(rmin,rmax); }
         void setMaxOverlapRate (double r) { max_overlap_rate = fabs(r); }
+		  Real getMaxOverlapRate(){ return max_overlap_rate; }
         void setVirtualRadiusFactor (double f) {virtual_radius_factor = fabs(f);}
+		  Real getVirtualRadiusFactor(){ return virtual_radius_factor; }
         void setMaxNumberOfSpheres (id_type max);
+		  id_type getMaxNumberOfSpheres(){ return criterion.nb_spheres_max; }
         void setMaxSolidFractioninProbe (double max, double x, double y,double z, double R);
+		  py::tuple getMaxSolidFractionInProbe(){ return py::make_tuple(criterion.solid_fraction_max,criterion.x,criterion.y,criterion.z,criterion.R); }
 
         vector<Sphere> & getSphereList() { return sphere;}
+        SpherePack getSpherePackObject();
         TetraMesh * getMesh() { return mesh; }
         id_type getNumberOfSpheres ();
         double getMeanSolidFraction (double x, double y, double z, double R);
 	
         void plugTetraMesh (TetraMesh * mesh);
-        void save_mgpost (const char* name);
+        void save_mgpost (std::string name);
         void save_tri_mgpost (const char* name);
         void save_Rxyz (const char* name);
     
-        SpherePadder ();
-
 	// Check functions only for debug (very slow!!)
         void detect_overlap ();
 

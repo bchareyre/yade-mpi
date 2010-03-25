@@ -21,8 +21,6 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/version.hpp>
 
-
-
 #include<yade/lib-base/Logging.hpp>
 #include<yade/lib-serialization-xml/XMLFormatManager.hpp>
 #include<yade/lib-pyutil/gil.hpp>
@@ -45,7 +43,6 @@
 #include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
 #include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
-#include<yade/pkg-common/Aabb.hpp>
 
 #include<yade/pkg-common/BoundFunctor.hpp>
 #include<yade/pkg-common/InteractionGeometryFunctor.hpp>
@@ -60,8 +57,6 @@ using namespace std;
 
 
 #include<yade/extra/boost_python_len.hpp>
-
-
 
 #ifdef YADE_LOG4CXX
 	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.python");

@@ -45,6 +45,7 @@ from _packPredicates import * ## imported in randomDensePack as well
 # import SpherePack
 from _packSpheres import *
 from _packObb import *
+from _packSpherePadder import *
 
 
 class inGtsSurface_py(Predicate):

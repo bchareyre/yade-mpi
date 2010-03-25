@@ -179,7 +179,8 @@ inline void NewtonIntegrator::leapfrogTranslate(Scene* scene, State* state, cons
 {
 	blockTranslateDOFs(state->blockedDOFs, state->accel);
 	state->vel+=dt*state->accel;
-	state->pos += state->vel*dt + scene->forces.getMove(id);
+	state->pos += state->vel*dt;
+	if(scene->forces.getMoveRotUsed()) state->pos+=scene->forces.getMove(id);
 	assert(homotheticCellResize>=0 && homotheticCellResize<=2);
 	if(homotheticCellResize>0){
 		//Vector3r dPos(scene->cell->getTrsfInc()*scene->cell->wrapShearedPt(state->pos));
@@ -223,7 +224,7 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	const Vector3r l_b_n = A*l_n; // local angular momentum at time n
 	const Vector3r angVel_b_n = diagDiv(l_b_n,state->inertia); // local angular velocity at time n
 	const Quaternionr dotQ_n=DotQ(angVel_b_n,state->ori); // dQ/dt at time n
-	const Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2   // FIXME: this is nonsense, quaternions cannot be meaningfully mutiplied by scalars, since they are not normalized afterwards (not pure rotation, but also skew); use slerp with parameter .5 to find half-way quaternion.
+	const Quaternionr Q_half = state->ori + dt/2 * dotQ_n; // Q at time n+1/2
 	state->angMom+=dt*M; // global angular momentum at time n+1/2
 	const Vector3r l_b_half = A*state->angMom; // local angular momentum at time n+1/2
 	Vector3r angVel_b_half = diagDiv(l_b_half,state->inertia); // local angular velocity at time n+1/2

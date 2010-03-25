@@ -7,19 +7,18 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-
-#ifndef CELL_PARTITION_HPP
-#define CELL_PARTITION_HPP
+#pragma once
 
 #include "TetraMesh.hpp"
 
-struct Cell
-{
-  vector<unsigned int> sphereId; 
-};
-
 class CellPartition
 {
+	public:
+		struct Cell
+		{
+		  vector<unsigned int> sphereId; 
+		};
+
   protected:
     
     vector<vector<vector<unsigned int> > > cellId;
@@ -54,6 +53,4 @@ class CellPartition
     unsigned int k_down() { return ( (current_k > 0) ? (current_k - 1) : 0 ); }
     unsigned int k_up  () { return ( (current_k < ksize - 1) ? (current_k + 1) : ksize - 1); }        
 };
-
-#endif // CELL_PARTITION_HPP
 

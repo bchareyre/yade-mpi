@@ -10,6 +10,11 @@
 
 #include "SpherePadder.hpp"
 
+CREATE_LOGGER(SpherePadder);
+
+#include<boost/algorithm/string.hpp>
+#include<stdexcept>
+
 int compare_neighbor_with_distance (const void * a, const void * b)
 {
   double d1 = (*(neighbor_with_distance *)a).distance;
@@ -35,8 +40,7 @@ int compareDouble (const void * a, const void * b)
   return ( *(double*)a > *(double*)b ) ? 1 :-1;
 }
 
-
-SpherePadder::SpherePadder()
+void SpherePadder::init()
 {
   vector <id_type> lst;
   id_type nb = 5;
@@ -63,7 +67,6 @@ SpherePadder::SpherePadder()
   n1 = n2 = n3 = n4 = n5 = n_densify = 0;
 
   // Default values
-  verbose = true;
   meshIsPlugged = false;
   RadiusDataIsOK = RadiusIsSet = false;
   max_overlap_rate = 1e-4;
@@ -74,6 +77,21 @@ SpherePadder::SpherePadder()
   Must_Stop = false;
   zmin = 1;
   gap_max = 0.0;
+  mesh=NULL;
+}
+
+SpherePadder::SpherePadder(const std::string& fileName, std::string meshType){
+	init();
+	if(meshType.empty()){
+		if(boost::algorithm::ends_with(fileName,".gmsh") || boost::algorithm::ends_with(fileName,".geo")) meshType="GMSH";
+		else if(boost::algorithm::ends_with(fileName,".inp")) meshType=="INP";
+		else throw std::invalid_argument("Unable to deduce mesh type from extension (should be *.gmsh or *.geo for GMSH, *.inp for INP); specify meshType explicitly.");
+	}
+	if(meshType!="GMSH" && meshType!="INP") throw std::invalid_argument("Unknown mesh type '"+meshType+"'. Must be one of GMSH, INP (case sensitive).");
+	TetraMesh* m=new TetraMesh; // dtor will delete
+	if(meshType=="GMSH") m->read_gmsh(fileName.c_str());
+	else if(meshType=="INP") m->read_inp(fileName.c_str());
+	plugTetraMesh(m);
 }
 
 
@@ -90,13 +108,10 @@ void SpherePadder::setRadiusRatio(double r, double rapp)
 	rmax = 2.0 * rmoy - rmin;
 	gap_max = rmin;
 	RadiusDataIsOK = true;
-	if (verbose)
-	{
-	  cout << "rmin  = " << rmin << endl;
-	  cout << "rmax  = " << rmax << endl;
-	  cout << "rmoy  = " << rmoy << endl;
-	  cout << "ratio = " << ratio << endl;
-	}
+	LOG_DEBUG("rmin  = " << rmin);
+	LOG_DEBUG("rmax  = " << rmax);
+	LOG_DEBUG("rmoy  = " << rmoy);
+	LOG_DEBUG("ratio = " << ratio);
   }
   else
   {
@@ -126,13 +141,10 @@ void SpherePadder::setRadiusRange(double min, double max)
   RadiusDataIsOK = true;
   RadiusIsSet = true;
 
-  if (verbose)
-  {
-	cout << "rmin  = " << rmin << endl;
-	cout << "rmax  = " << rmax << endl;
-	cout << "rmoy  = " << rmoy << endl;
-	cout << "ratio = " << ratio << endl;
-  }
+	LOG_DEBUG("rmin  = " << rmin);
+	LOG_DEBUG("rmax  = " << rmax);
+	LOG_DEBUG("rmoy  = " << rmoy);
+	LOG_DEBUG("ratio = " << ratio);
 }
 
 
@@ -169,16 +181,15 @@ id_type SpherePadder::getNumberOfSpheres()
 
 void SpherePadder::plugTetraMesh (TetraMesh * pluggedMesh)
 {
+	// delete old mesh
+	if(mesh) delete mesh;
   mesh = pluggedMesh;
   partition.init(*mesh);
   meshIsPlugged = true;
 
-  if (verbose)
-  {
-	cout << "mesh->mean_segment_length = " << mesh->mean_segment_length << endl;
-	cout << "mesh->min_segment_length  = " << mesh->min_segment_length << endl;
-	cout << "mesh->max_segment_length  = " << mesh->max_segment_length << endl;
-  }
+	LOG_DEBUG("mesh->mean_segment_length = " << mesh->mean_segment_length);
+	LOG_DEBUG("mesh->min_segment_length  = " << mesh->min_segment_length);
+	LOG_DEBUG("mesh->max_segment_length  = " << mesh->max_segment_length);
   
   if (!RadiusDataIsOK && RadiusIsSet && ratio != 0.0) setRadiusRatio(ratio); 
 }
@@ -215,26 +226,26 @@ void SpherePadder::pad_5 ()
 	if (sphere[i].R <= 0.0) ++nzero;
   }
 
-  if (verbose)
-  {
-	cout << "Summary:" << endl;
-	cout << "  Total number of spheres    = " << sphere.size()-nzero << endl;
-	cout << "  Number at nodes            = " << n1 << endl;
-	cout << "  Number at segments         = " << n2 << endl;
-	cout << "  Number near faces          = " << n3 << endl;
-	cout << "  Number near tetra centers  = " << n4 << endl;
-	cout << "  Number near tetra vextexes = " << n5 << endl;
-	cout << "  Number cancelled           = " << nzero << endl;
-  }
+	LOG_INFO("Summary:" << endl
+		<< "  Total number of spheres    = " << sphere.size()-nzero << endl
+		<< "  Number at nodes            = " << n1 << endl
+		<< "  Number at segments         = " << n2 << endl
+		<< "  Number near faces          = " << n3 << endl
+		<< "  Number near tetra centers  = " << n4 << endl
+		<< "  Number near tetra vextexes = " << n5 << endl
+		<< "  Number cancelled           = " << nzero);
   
   float time_used = (float)(stop_time - start_time) / 1000000.0;
-  if (verbose) cout << "Time used (pad5) = " << time_used << " s" << endl;
+  LOG_INFO("Time used (pad5) = " << time_used << " s");
   
 }
 
 
 void SpherePadder::densify() // makeDenser
 {
+#ifndef YADE_CGAL
+	throw std::runtime_error("Yade was built without CGAL, mesh densification impossible.");
+#else
   BEGIN_FUNCTION ("Densify");
   unsigned int added = 0;
   unsigned int nbfail = 0;
@@ -261,6 +272,7 @@ void SpherePadder::densify() // makeDenser
 	cout << "Final solid fraction = " << getMeanSolidFraction(criterion.x,criterion.y,criterion.z,criterion.R) << endl;
   
   END_FUNCTION;
+#endif
 }
 
 
@@ -291,7 +303,7 @@ void SpherePadder::repack_null_radii() // repack_boundaries
 //} 
 }
 
-
+#ifdef YADE_CGAL
 unsigned int SpherePadder::iter_densify (unsigned int nb_check)  // iter_MakeDenser
 {
   unsigned int nb_added = 0, total_added = 0;
@@ -399,6 +411,7 @@ unsigned int SpherePadder::iter_densify (unsigned int nb_check)  // iter_MakeDen
 
 return total_added;
 }
+#endif
 
 
 double SpherePadder::getMeanSolidFraction(double x, double y, double z, double R)
@@ -463,7 +476,7 @@ double SpherePadder::getMeanSolidFraction(double x, double y, double z, double R
   return (Vs/Vp);
 }
 
-
+#ifdef YADE_CGAL
 void SpherePadder::save_tri_mgpost (const char* name)
 {
   // triangulation
@@ -520,13 +533,13 @@ void SpherePadder::save_tri_mgpost (const char* name)
   << " </mgpost>" << endl;
 
 }
+#endif
 
-
-void SpherePadder::save_mgpost (const char* name)
+void SpherePadder::save_mgpost (std::string name)
 {
   BEGIN_FUNCTION ("Save mgp");
   
-  ofstream fmgpost(name);
+  ofstream fmgpost(name.c_str());
   
   double xtrans = mesh->xtrans;
   double ytrans = mesh->ytrans;
@@ -642,10 +655,7 @@ void SpherePadder::place_at_nodes ()
     partition.add(n,S.x,S.y,S.z);
   }
   
-  if (verbose)
-  {
-    cout << " Added = " << n1 << endl;
-  }
+   LOG_DEBUG(" Added = " << n1);
 		
   END_FUNCTION;
 }
@@ -688,10 +698,7 @@ void SpherePadder::place_at_segment_middle ()
     ++ns;
   }
 
-  if (verbose)
-  {
-	cout << " Added = " << n2 << endl;
-  }
+ 	LOG_DEBUG("Added = " << n2);
   
   END_FUNCTION;   
 }
@@ -732,10 +739,7 @@ void SpherePadder::place_at_faces ()
 	n3 += place_sphere_4contacts(S);
   }
 
-  if (verbose)
-  {
-	cout << " Added = " << n3 << endl;
-  }
+  LOG_DEBUG(" Added = " << n3);
 
   END_FUNCTION;  
 }
@@ -767,10 +771,7 @@ void SpherePadder::place_at_tetra_centers ()
 	n4 += place_sphere_4contacts(S);
   }
 
-  if (verbose)
-  {
-	cout << " Added = " << n4 << endl;
-  }
+  LOG_DEBUG(" Added = " << n4);
 
   END_FUNCTION;  
 }
@@ -811,10 +812,7 @@ void SpherePadder::place_at_tetra_vertexes ()
     }
   }
   
-  if (verbose)
-  {
-	cout << " Added = " << n5 << endl;
-  }
+  LOG_DEBUG(" Added = " << n5);
   
   END_FUNCTION; 
 }
@@ -1932,7 +1930,12 @@ void SpherePadder::rdf (unsigned int Npoint, unsigned int Nrmean)
 }
 
 
-
-
-
-
+SpherePack SpherePadder::getSpherePackObject(){
+	SpherePack ret;
+	Vector3r trans(getMesh()->xtrans,getMesh()->ytrans,getMesh()->ztrans);
+	for(size_t i=0; i<sphere.size(); i++){
+		if (sphere[i].type == VIRTUAL || sphere[i].R <= 0.0) continue;
+		ret.pack.push_back(SpherePack::Sph(Vector3r(sphere[i].x,sphere[i].y,sphere[i].z)+trans,sphere[i].R));
+	}
+	return ret;
+}
