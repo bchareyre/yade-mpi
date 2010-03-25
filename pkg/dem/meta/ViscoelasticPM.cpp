@@ -78,7 +78,7 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
 	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
 	shearForce += phys.ks*dt*shearVelocity;
-	const Vector3r shearForceVisc = phys.cs*shearVelocity;
+	Vector3r shearForceVisc = Vector3r::ZERO;
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;
@@ -88,6 +88,7 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	{
 		maxFs = Mathr::Sqrt(maxFs) / shearForce.Length();
 		shearForce *= maxFs;
+		shearForceVisc =  phys.cs*shearVelocity;
 	}
 
 	Vector3r f = phys.normalForce + shearForce + shearForceVisc;
