@@ -77,21 +77,28 @@ void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeom
 	// As Chiara Modenese suggest, we store the elastic part 
 	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
 	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
-	shearForce += phys.ks*dt*shearVelocity;
-	Vector3r shearForceVisc = Vector3r::ZERO;
+	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
+	Vector3r shearForceVisc = Vector3r::ZERO; // the viscous shear damping haven't a history because it is a function of the instant velocity 
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;
 
-	Real maxFs = phys.normalForce.SquaredLength() * std::pow(phys.tangensOfFrictionAngle,2);
+	const Real maxFs = phys.normalForce.SquaredLength() * std::pow(phys.tangensOfFrictionAngle,2);
 	if( shearForce.SquaredLength() > maxFs )
 	{
-		maxFs = Mathr::Sqrt(maxFs) / shearForce.Length();
-		shearForce *= maxFs;
-		shearForceVisc =  phys.cs*shearVelocity;
+		// Then Mohr-Coulomb is violated (so, we slip), 
+		// we have the max value of the shear force, so 
+		// we consider only friction damping.
+		const Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+		shearForce *= ratio;
+	} 
+	else 
+	{
+		// Then no slip occurs we consider friction damping + viscous damping.
+		shearForceVisc = phys.cs*shearVelocity; 
 	}
 
-	Vector3r f = phys.normalForce + shearForce + shearForceVisc;
+	const Vector3r f = phys.normalForce + shearForce + shearForceVisc;
 	addForce (id1,-f,rootBody);
 	addForce (id2, f,rootBody);
 	addTorque(id1,-c1x.Cross(f),rootBody);
