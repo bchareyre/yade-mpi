@@ -420,14 +420,14 @@ void GLViewer::draw()
 	if(!nextFrameSnapshotFilename.empty() && boost::algorithm::ends_with(nextFrameSnapshotFilename,".pdf")){
 		gl2psStream=fopen(nextFrameSnapshotFilename.c_str(),"wb");
 		if(!gl2psStream){ int err=errno; throw runtime_error(string("Error opening file ")+nextFrameSnapshotFilename+": "+strerror(err)); }
-		int sortType=(Omega::instance().getScene()->bodies->size()<100 ? GL2PS_BSP_SORT : GL2PS_SIMPLE_SORT);
+		LOG_DEBUG("Start saving snapshot to "<<nextFrameSnapshotFilename);
 		gl2psBeginPage(/*const char *title*/"Some title", /*const char *producer*/ "Yade",
 			/*GLint viewport[4]*/ NULL,
-			/*GLint format*/ GL2PS_PDF, /*GLint sort*/ sortType, /*GLint options*/GL2PS_SIMPLE_LINE_OFFSET|GL2PS_USE_CURRENT_VIEWPORT|GL2PS_TIGHT_BOUNDING_BOX|GL2PS_COMPRESS|GL2PS_OCCLUSION_CULL|GL2PS_NO_BLENDING, 
+			/*GLint format*/ GL2PS_PDF, /*GLint sort*/ GL2PS_BSP_SORT, /*GLint options*/GL2PS_SIMPLE_LINE_OFFSET|GL2PS_USE_CURRENT_VIEWPORT|GL2PS_TIGHT_BOUNDING_BOX|GL2PS_COMPRESS|GL2PS_OCCLUSION_CULL|GL2PS_NO_BLENDING, 
 			/*GLint colormode*/ GL_RGBA, /*GLint colorsize*/0, 
 			/*GL2PSrgba *colortable*/NULL, 
 			/*GLint nr*/0, /*GLint ng*/0, /*GLint nb*/0, 
-			/*GLint buffersize*/2048*2048, /*FILE *stream*/ gl2psStream,
+			/*GLint buffersize*/4096*4096 /* 16MB */, /*FILE *stream*/ gl2psStream,
 			/*const char *filename*/NULL);
 	}
 #endif
@@ -656,11 +656,13 @@ void GLViewer::postDraw(){
 	}
 	QGLViewer::postDraw();
 	if(!nextFrameSnapshotFilename.empty()){
-#ifdef YADE_GL2PS
-		if(boost::algorithm::ends_with(".pdf",nextFrameSnapshotFilename)){
-			gl2psEndPage();
-		} else
-#endif
+		#ifdef YADE_GL2PS
+			if(boost::algorithm::ends_with(nextFrameSnapshotFilename,".pdf")){
+				gl2psEndPage();
+				LOG_DEBUG("Finished saving snapshot to "<<nextFrameSnapshotFilename);
+				fclose(gl2psStream);
+			} else
+	#endif
 		{
 			// save the snapshot
 			saveSnapshot(QString(nextFrameSnapshotFilename),/*overwrite*/ true);
