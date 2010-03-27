@@ -33,7 +33,7 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 		Vector3r v[3]={tr[i],tr[i+1],tr[i+2]};
 		Vector3r icc = Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<Facet> iFacet(new Facet);
-		iFacet->diffuseColor    = Vector3r(0.8,0.3,0.3);
+		iFacet->color    = Vector3r(0.8,0.3,0.3);
 		for (int j=0; j<3; ++j)
 		{   
 				iFacet->vertices.push_back(v[j]-icc);

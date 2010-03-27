@@ -403,8 +403,8 @@ void TetraVolumetricLaw::action()
 	#include<yade/lib-opengl/OpenGLWrapper.hpp>
 	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool,const GLViewInfo&)
 	{
-		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
-		glColor3v(cm->diffuseColor);
+		glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+		glColor3v(cm->color);
 		Tetra* t=static_cast<Tetra*>(cm.get());
 		if (0) { // wireframe, as for Tetrahedron
 			glDisable(GL_LIGHTING);

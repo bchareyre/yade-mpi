@@ -142,7 +142,7 @@ void VTKRecorder::action()
 				if (recActive[REC_CLUMPIDS]) clumpIds->InsertNextValue(b->clumpId); 
 				if (recActive[REC_COLORS])
 				{
-					const Vector3r& color = sphere->diffuseColor;
+					const Vector3r& color = sphere->color;
 					float c[3] = {color[0],color[1],color[2]};
 					spheresColors->InsertNextTupleValue(c);
 				}
@@ -189,7 +189,7 @@ void VTKRecorder::action()
 				facetsCells->InsertNextCell(tri);
 				if (recActive[REC_COLORS])
 				{
-					const Vector3r& color = facet->diffuseColor;
+					const Vector3r& color = facet->color;
 					float c[3] = {color[0],color[1],color[2]};
 					facetsColors->InsertNextTupleValue(c);
 				}

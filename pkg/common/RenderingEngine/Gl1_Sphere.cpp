@@ -22,8 +22,8 @@ int Gl1_Sphere::glSphereList=-1;
 void Gl1_Sphere::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire2, const GLViewInfo&)
 {
 	Real r=(static_cast<Sphere*>(cm.get()))->radius;
-	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->diffuseColor[0],cm->diffuseColor[1],cm->diffuseColor[2]));
-	glColor3v(cm->diffuseColor);
+	glMaterialv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3f(cm->color[0],cm->color[1],cm->color[2]));
+	glColor3v(cm->color);
 	if(glutNormalize)	glPushAttrib(GL_NORMALIZE); // as per http://lists.apple.com/archives/Mac-opengl/2002/Jul/msg00085.html
 		if (wire || wire2) glutWireSphere(r,glutSlices,glutStacks);
 		else {

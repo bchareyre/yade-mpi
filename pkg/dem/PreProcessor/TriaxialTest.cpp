@@ -312,7 +312,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	iSphere->radius			= radius;
 	//iSphere->diffuseColor		= Vector3r(0.4,0.1,0.1);
-	iSphere->diffuseColor           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+	iSphere->color           = Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	body->shape	= iSphere;
 	body->bound	= aabb;
 	body->material	= mat;
@@ -336,7 +336,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		shared_ptr<Box> iBox(new Box);
 		iBox->extents			= extents;
 		iBox->wire			= wire;
-		iBox->diffuseColor		= Vector3r(1,1,1);
+		iBox->color		= Vector3r(1,1,1);
 		body->shape	= iBox;
 	}
 	// guess the orientation
@@ -348,7 +348,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<Facet> iFacet(new Facet);
 		for(int i=0; i<3; i++){ iFacet->vertices.push_back(v[i]-cog);}
-		iFacet->diffuseColor=Vector3r(1,1,1);
+		iFacet->color=Vector3r(1,1,1);
 		body->shape=iFacet;
 	}
 	if(wallWalls){

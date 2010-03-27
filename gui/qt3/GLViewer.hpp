@@ -94,6 +94,10 @@ class GLViewer : public QGLViewer
 		// if defined, snapshot will be saved to this file right after being drawn and the string will be reset.
 		// this way the caller will be notified of the frame being saved successfully.
 		string nextFrameSnapshotFilename;
+		#ifdef YADE_GL2PS
+			// output stream for gl2ps; initialized as needed
+			FILE* gl2psStream;
+		#endif
 
 		boost::posix_time::ptime getLastUserEvent();
 

@@ -26,9 +26,14 @@
 #include<yade/core/Interaction.hpp>
 #include<yade/core/DisplayParameters.hpp>
 #include<boost/filesystem/operations.hpp>
+#include<boost/algorithm/string.hpp>
 #include<boost/version.hpp>
 #include<boost/python.hpp>
 using namespace boost;
+
+#ifdef YADE_GL2PS
+	#include<gl2ps.h>
+#endif
 
 CREATE_LOGGER(GLViewer);
 
@@ -96,16 +101,11 @@ GLViewer::GLViewer(int id, shared_ptr<OpenGLRenderingEngine> _renderer, QWidget 
 	setKeyDescription(Qt::Key_Z,"Toggle XY grid (or: align manipulated clip plane normal with +Z)");
 	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
 	setKeyDescription(Qt::Key_S & Qt::ALT,   "Save QGLViewer state to /tmp/qglviewerState.xml");
-	setKeyDescription(Qt::Key_Delete,"(lattice) increase isoValue");
-	setKeyDescription(Qt::Key_Insert,"(lattice) decrease isoValue");
-	setKeyDescription(Qt::Key_Next,  "(lattice) increase isoThic");
-	setKeyDescription(Qt::Key_Prior, "(lattice) decrease isoThic");
-	setKeyDescription(Qt::Key_End,   "(lattice) decrease isoSec");
-	setKeyDescription(Qt::Key_Home,  "(lattice) increase isoSec");
 	setKeyDescription(Qt::Key_T,"Switch orthographic / perspective camera");
 	setKeyDescription(Qt::Key_O,"Set narrower field of view");
 	setKeyDescription(Qt::Key_P,"Set wider field of view");
 	setKeyDescription(Qt::Key_R,"Revolve around scene center");
+	setKeyDescription(Qt::Key_V,"Save PDF of the current view to /tmp/yade-snapshot-0001.pdf (whichever number is available first). (Must be compiled with the gl2ps feature.)");
 	setKeyDescription(Qt::Key_Plus,    "Cut plane increase");
 	setKeyDescription(Qt::Key_Minus,   "Cut plane decrease");
 	setKeyDescription(Qt::Key_Slash,   "Cut plane step decrease");
@@ -299,16 +299,15 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		}
 	}
 	else if(e->key()==Qt::Key_Period) grid_subdivision = !grid_subdivision;
-
-
-// FIXME BEGIN - arguments for GLDraw*ers should be from dialog box, not through Omega !!!
-	else if(e->key()==Qt::Key_Delete) Omega::instance().isoValue-=0.05;
-	else if(e->key()==Qt::Key_Insert) Omega::instance().isoValue+=0.05;
-	else if(e->key()==Qt::Key_Next)   Omega::instance().isoThick-=0.05;
-	else if(e->key()==Qt::Key_Prior)  Omega::instance().isoThick+=0.05;
-	else if(e->key()==Qt::Key_End)    Omega::instance().isoSec=std::max(0, Omega::instance().isoSec-1);//, std::cerr << Omega::instance().isoSec << "\n";
-	else if(e->key()==Qt::Key_Home)   Omega::instance().isoSec+=1;//, std::cerr << Omega::instance().isoSec << "\n";
-// FIXME END
+#ifdef YADE_GL2PS
+	else if(e->key()==Qt::Key_V){
+		for(int i=0; ;i++){
+			std::ostringstream fss; fss<<"/tmp/yade-snapshot-"<<setw(4)<<setfill('0')<<i<<".pdf";
+			if(!boost::filesystem::exists(fss.str())){ nextFrameSnapshotFilename=fss.str(); break; }
+		}
+		LOG_INFO("Will save snapshot to "<<nextFrameSnapshotFilename);
+	}
+#endif
 
 //////////////////////////////////////////////
 // FIXME that all should be in some nice GUI
@@ -417,6 +416,22 @@ void GLViewer::centerScene(){
 
 void GLViewer::draw()
 {
+#ifdef YADE_GL2PS
+	if(!nextFrameSnapshotFilename.empty() && boost::algorithm::ends_with(nextFrameSnapshotFilename,".pdf")){
+		gl2psStream=fopen(nextFrameSnapshotFilename.c_str(),"wb");
+		if(!gl2psStream){ int err=errno; throw runtime_error(string("Error opening file ")+nextFrameSnapshotFilename+": "+strerror(err)); }
+		int sortType=(Omega::instance().getScene()->bodies->size()<100 ? GL2PS_BSP_SORT : GL2PS_SIMPLE_SORT);
+		gl2psBeginPage(/*const char *title*/"Some title", /*const char *producer*/ "Yade",
+			/*GLint viewport[4]*/ NULL,
+			/*GLint format*/ GL2PS_PDF, /*GLint sort*/ sortType, /*GLint options*/GL2PS_SIMPLE_LINE_OFFSET|GL2PS_USE_CURRENT_VIEWPORT|GL2PS_TIGHT_BOUNDING_BOX|GL2PS_COMPRESS|GL2PS_OCCLUSION_CULL|GL2PS_NO_BLENDING, 
+			/*GLint colormode*/ GL_RGBA, /*GLint colorsize*/0, 
+			/*GL2PSrgba *colortable*/NULL, 
+			/*GLint nr*/0, /*GLint ng*/0, /*GLint nb*/0, 
+			/*GLint buffersize*/2048*2048, /*FILE *stream*/ gl2psStream,
+			/*const char *filename*/NULL);
+	}
+#endif
+
 	qglviewer::Vec vd=camera()->viewDirection(); renderer->viewDirection=Vector3r(vd[0],vd[1],vd[2]);
 	if(Omega::instance().getScene()){
 		int selection = selectedName();
@@ -641,8 +656,15 @@ void GLViewer::postDraw(){
 	}
 	QGLViewer::postDraw();
 	if(!nextFrameSnapshotFilename.empty()){
-		// save the snapshot
-		saveSnapshot(QString(nextFrameSnapshotFilename),/*overwrite*/ true);
+#ifdef YADE_GL2PS
+		if(boost::algorithm::ends_with(".pdf",nextFrameSnapshotFilename)){
+			gl2psEndPage();
+		} else
+#endif
+		{
+			// save the snapshot
+			saveSnapshot(QString(nextFrameSnapshotFilename),/*overwrite*/ true);
+		}
 		// notify the caller that it is done already (probably not an atomic op :-|, though)
 		nextFrameSnapshotFilename.clear();
 	}

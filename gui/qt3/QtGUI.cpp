@@ -21,8 +21,9 @@
 //#endif
 #include<qapplication.h>
 
-#include<yade/gui-py/PythonUI.hpp>
+//#include<yade/gui-py/PythonUI.hpp>
 #include<boost/thread.hpp>
+#include<stdexcept>
 
 QtGUI* QtGUI::self=NULL;
 QApplication* QtGUI::app=NULL;
@@ -39,6 +40,8 @@ void QtGUI::help(){
 
 int QtGUI::run(int argc, char *argv[])
 {
+	throw std::runtime_error("QtGUI::run should not be called!");
+#if 0
 	int ch;
 	while( ( ch = getopt(argc,argv,"+hw") ) != -1)
 		switch(ch){
@@ -69,6 +72,7 @@ int QtGUI::run(int argc, char *argv[])
 	int res =  app->exec();
 	delete mainWindow;
 	return res;
+#endif
 }
 
 bool QtGUI::checkDisplay(bool quiet){

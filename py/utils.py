@@ -93,8 +93,9 @@ def _commonBodySetup(b,volume,geomInertia,material,noBound=False,resetState=True
 	"""Assign common body parameters."""
 	#if 'physParamsClass' in matKw.keys(): raise ArgumentError("You as passing physParamsClass as argument, but it is no longer used. Use material instead.")
 	#if 'materialClass' in matKw.keys(): raise ArgumentError("You as passing materialClass as argument, but it is no longer used. Use material instead.")
-	if material==-1 and len(O.materials)==0: O.materials.append(defaultMaterial());
-	if isinstance(material,int): b.mat=O.materials[material]
+	if isinstance(material,int):
+		if material<0 and len(O.materials)==0: O.materials.append(defaultMaterial());
+		b.mat=O.materials[material]
 	elif isinstance(material,str): b.mat=O.materials[material]
 	elif isinstance(material,Material): b.mat=material
 	elif callable(material): b.mat=material()
@@ -141,7 +142,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 		>>> s1=sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElastMat(young=30e9,density=2e3))
 		>>> s1.shape.wire
 		False
-		>>> s1.shape.diffuseColor
+		>>> s1.shape.color
 		Vector3(0,1,0)
 		>>> s1.mat.density
 		2000.0
@@ -170,7 +171,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 
 	"""
 	b=Body()
-	b.shape=Sphere(radius=radius,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Sphere(radius=radius,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=(4./3)*math.pi*radius**3
 	geomInert=(2./5.)*V*radius**2
 	_commonBodySetup(b,V,Vector3(geomInert,geomInert,geomInert),material)
@@ -187,7 +188,7 @@ def box(center,extents,orientation=[1,0,0,0],dynamic=True,wire=False,color=None,
 	
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
-	b.shape=Shape('Box',extents=extents,diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Box(extents=extents,color=color if color else randomColor(),wire=wire,highlight=highlight)
 	V=8*extents[0]*extents[1]*extents[2]
 	geomInert=Vector3(4*(extents[1]**2+extents[2]**2),4*(extents[0]**2+extents[2]**2),4*(extents[0]**2+extents[1]**2))
 	_commonBodySetup(b,V,geomInert,material)
@@ -208,7 +209,7 @@ def wall(position,axis,sense=0,color=None,material=-1):
 
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
-	b.shape=Wall(sense=sense,axis=axis,diffuseColor=color if color else randomColor())
+	b.shape=Wall(sense=sense,axis=axis,color=color if color else randomColor())
 	_commonBodySetup(b,0,Vector3(0,0,0),material)
 	if isinstance(position,(int,long,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
@@ -230,7 +231,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	b=Body()
 	center=inscribedCircleCenter(vertices[0],vertices[1],vertices[2])
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
-	b.shape=Facet(diffuseColor=color if color else randomColor(),wire=wire,highlight=highlight)
+	b.shape=Facet(color=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.shape.vertices=vertices
 	b.shape.postProcessAttributes(True)
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
@@ -412,13 +413,13 @@ def fractionalBox(fraction=1.,minMax=None):
 
 
 def randomizeColors(onlyDynamic=False):
-	"""Assign random colors to Shape::diffuseColor.
+	"""Assign random colors to :yref:`Shape::color`.
 
 	If onlyDynamic is true, only dynamic bodies will have the color changed.
 	"""
 	for b in O.bodies:
 		color=(random.random(),random.random(),random.random())
-		if b.dynamic or not onlyDynamic: b.shape.diffuseColor=color
+		if b.dynamic or not onlyDynamic: b.shape.color=color
 
 def avgNumInteractions(cutoff=0.):
 	nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))

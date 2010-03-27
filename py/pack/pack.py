@@ -221,7 +221,7 @@ def filterSpherePack(predicate,spherePack,**kw):
 		if predicate(s[0],s[1]): ret+=[utils.sphere(s[0],radius=s[1],**kw)]
 	return ret
 
-def randomDensePack(predicate,radius,material=0,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None):
+def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=True,memoDbg=False,color=None):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The priodicity depens on whether	the spheresInCell parameter is given.
 

@@ -336,7 +336,7 @@ void TriaxialTestWater::createSphere(shared_ptr<Body>& body, Vector3r position, 
 	aabb->diffuseColor		= Vector3r(0,1,0);
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
+	iSphere->color		= Vector3r(Mathr::UnitRandom(),Mathr::UnitRandom(),Mathr::UnitRandom());
 	iSphere->wire			= false;
 	
 	body->shape	= iSphere;
@@ -377,7 +377,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	aabb->diffuseColor		= Vector3r(1,0,0);
 	
 	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3r(1,1,1);
+	iBox->color		= Vector3r(1,1,1);
 	iBox->wire			= wire;
 
 	body->bound		= aabb;

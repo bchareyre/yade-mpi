@@ -200,7 +200,7 @@ def data(extractor,flattener,onlyDynamic=True,stDev=None,relThreshold=3.,div=(50
 			dd1.append(d1); dd2.append(d2)
 		else:
 			raise RuntimeError("Extractor must return float or 2 or 3 (not %d) floats"%nDim)
-		xx.append(xy[0]); yy.append(xy[1]); rr.append(b.shape['radius'])
+		xx.append(xy[0]); yy.append(xy[1]); rr.append(b.shape.radius)
 	if stDev==None:
 		bbox=(min(xx),min(yy)),(max(xx),max(yy))
 		if nDim==1: return {'type':'rawScalar','x':xx,'y':yy,'val':dd1,'radii':rr,'bbox':bbox}

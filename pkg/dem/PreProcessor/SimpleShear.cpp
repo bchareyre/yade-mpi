@@ -195,7 +195,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 	gSphere->shadowCaster		= true;*/
 	
 	iSphere->radius			= radius;
-	iSphere->diffuseColor		= Vector3r(0.8,0.3,0.3);
+	iSphere->color		= Vector3r(0.8,0.3,0.3);
 
 	body->shape			= iSphere;
 // 	body->geometricalModel		= gSphere;
@@ -238,7 +238,7 @@ void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r 
 	gBox->shadowCaster		= false;*/
 	
 	iBox->extents			= extents;
-	iBox->diffuseColor		= Vector3r(1,0,0);
+	iBox->color		= Vector3r(1,0,0);
 
 	body->bound			= aabb;
 	body->shape			= iBox;

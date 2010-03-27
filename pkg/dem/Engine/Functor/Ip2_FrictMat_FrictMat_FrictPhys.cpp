@@ -20,8 +20,8 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 					, const shared_ptr<Material>& b2
 					, const shared_ptr<Interaction>& interaction)
 {
-	if(!interaction->interactionPhysics)
-	{
+	if(interaction->interactionPhysics) return;
+
 		const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(b1);
 		const shared_ptr<FrictMat>& mat2 = YADE_PTR_CAST<FrictMat>(b2);
 		if (!interaction->interactionPhysics)
@@ -51,8 +51,6 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 		contactPhysics->kn = Kn;
 		contactPhysics->ks = Ks;
 		return;
-	}
-	throw runtime_error("Ip2_FrictMat_FrictMat_FrictPhys currently fails for non-ScGeom geometry!");
 };
 YADE_PLUGIN((Ip2_FrictMat_FrictMat_FrictPhys));
 
