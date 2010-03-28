@@ -83,29 +83,43 @@ class OpenGLRenderingEngine : public Serializable
 	
 	public: void postProcessAttributes(bool deserializing);
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(OpenGLRenderingEngine,Serializable,"Class responsible for rendering scene on OpenGL devices.",
-		((bool,scaleDisplacements,false,"Whether to scale (artificially enlarge) displacements, so that they become better visible"))
-		((Vector3r,displacementScale,Vector3r::ONE,"Relative stretch of current body position from its reference position (independently in 3 dimensions), if scaleDisplacements is set."))
-		((bool,scaleRotations,false,"Whether to scale (artificially enlarge) rotations, so that they become better visible"))
-		((Real,rotationScale,1,"Relative growth of current body rotation from its reference orientation (independently in 3 dimensions), if scaleRotations is set."))
-		((Vector3r,Light_position,Vector3r(75,130,0),"Position of OpenGL light source in the scene."))
-		((Vector3r,Background_color,Vector3r(.2,.2,.2),"Color of the backgroud canvas (RGB)"))
-		((bool,Body_wire,false,"Render all bodies with wire only (faster)"))
-		((bool,Show_DOF,false,"Show which degrees of freedom are blocked for each body"))
-		((bool,Show_ID,false,"Show body id's"))
-		((bool,Body_state,false,"Render body state [deprecated]"))
-		((bool,Body_bounding_volume,false,"Render body bound"))
-		((bool,Body_interacting_geom,true,"Render body shape"))
-		((bool,Interaction_wire,false,"??"))
-		((bool,Interaction_geometry,false,"Render :yref:`geometry of interaction<Interaction::interactionGeometry>`"))
-		((bool,Interaction_physics,false,"Render :yref:`Interaction::interactionPhysics`"))
-		((int,Draw_mask,((void)"draw everything",~0),"Bitmask for showing only bodies where ((Draw_mask & Body::groupMask)!=0)"))
-		((bool,Draw_inside,true,"??"))
+	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderingEngine,Serializable,"Class responsible for rendering scene on OpenGL devices.",
+		((Vector3r,dispScale,((void)"disable scaling",Vector3r::ONE),"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
+		((Real,rotScale,((void)"disable scaling",1.),"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))
+		((Vector3r,lightPos,Vector3r(75,130,0),"Position of OpenGL light source in the scene."))
+		((Vector3r,bgColor,Vector3r(.2,.2,.2),"Color of the backgroud canvas (RGB)"))
+		((bool,wire,false,"Render all bodies with wire only (faster)"))
+		((bool,dof,false,"Show which degrees of freedom are blocked for each body"))
+		((bool,id,false,"Show body id's"))
+		((bool,bound,false,"Render body :yref:`Bound`"))
+		((bool,shape,true,"Render body :yref:`Shape`"))
+		((bool,intrWire,false,"If rendering interactions, use only wires to represent them."))
+		((bool,intrGeom,false,"Render :yref:`Interaction::interactionGeometry` objects."))
+		((bool,intrPhys,false,"Render :yref:`Interaction::interactionPhysics` objects"))
+		((int,mask,((void)"draw everything",~0),"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
 		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)),"Position and orientation of clipping planes"))
 		((vector<int>,clipPlaneActive,vector<int>(numClipPlanes,0),"Activate/deactivate respective clipping planes"))
 		((size_t,selectBodyLimit,1000,"Limit number of bodies to allow picking body with mouse (performance reasons)"))
 		((bool,intrAllWire,false,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),
-		/*ctor*/ ,
+		/*deprec*/
+			((Light_position,lightPos,))
+			((Background_color,bgColor,))
+			((Body_wire,wire,))
+			((Show_DOF,dof,))
+			((Show_ID,id,))
+			((Body_bounding_volume,bound,))
+			((Body_interacting_geom,shape,))
+			((Interaction_wire,intrWire,))
+			((Interaction_geometry,intrGeom,))
+			((Interaction_physics,intrPhys,))
+			((Draw_mask,mask,))
+			((displacementScale,dispScale,))
+			((rotationScale,rotScale,))
+			((scaleDisplacements,id,"! This option is no longer necessary, set dispScale to value different from (1,1,1) to have scaling applied."))
+			((scaleRotations,id,"! This option is no longer necessary, set rotScale to value different from 1.0 to have scaling applied."))
+		,
+		/*init*/,
+		/*ctor*/,
 		/*py*/
 		.def("setRefSe3",&OpenGLRenderingEngine::setBodiesRefSe3,"Make current positions and orientation reference for scaleDisplacements and scaleRotations.");
 	);

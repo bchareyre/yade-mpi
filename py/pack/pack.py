@@ -115,13 +115,11 @@ def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
 	If threshold is given (>0), then
 
 	* degenerate faces (with edges shorter than threshold) will not be created
-	* gts.Surface().cleanup(threshold) will be called before returning, which merges vertices mutually
-		closer than threshold. In case your pts are closed (last point concident with the first one)
-		this will the surface strip of triangles. If you additionally have capStart==True and capEnd==True,
-		the surface will be closed.
+	* gts.Surface().cleanup(threshold) will be called before returning, which merges vertices mutually closer than threshold. In case your pts are closed (last point concident with the first one) this will the surface strip of triangles. If you additionally have capStart==True and capEnd==True, the surface will be closed.
 
-	Note: capStart and capEnd make the most naive polygon triangulation (diagonals) and will perhaps fail
-	for non-convex sections.
+	.. note:: capStart and capEnd make the most naive polygon triangulation (diagonals) and will perhaps fail for non-convex sections.
+
+	.. warning:: the algorithm connects points sequentially; if two polylines are mutually rotated or have inverse sense, the algorithm will not detect it and connect them regardless in their given order.
 	"""
 	if not len(set([len(pts1) for pts1 in pts]))==1: raise RuntimeError("Polylines must be all of the same length!")
 	vtxs=[[gts.Vertex(x,y,z) for x,y,z in pts1] for pts1 in pts]

@@ -75,7 +75,7 @@ namespace{
 
 #define _DEPREC_OLDNAME(x) BOOST_PP_TUPLE_ELEM(3,0,x)
 #define _DEPREC_NEWNAME(x) BOOST_PP_TUPLE_ELEM(3,1,x)
-#define _DEPREC_COMMENT(x) BOOST_PP_TUPLE_ELEM(3,2,x)
+#define _DEPREC_COMMENT(x) BOOST_PP_TUPLE_ELEM(3,2,x) "" // if the argument is omited, return empty string instead of nothing
 
 // loop bodies for attribute access
 #define _PYGET_ATTR(x,y,z) if(key==BOOST_PP_STRINGIZE(z)) return boost::python::object(z);
@@ -86,7 +86,7 @@ namespace{
 #define _PYHASKEY_ATTR_DEPREC(x,thisClass,z) if(key==BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z))) return true;
 #define _PYDICT_ATTR(x,y,z) ret[BOOST_PP_STRINGIZE(z)]=boost::python::object(z);
 #define _PYATTR_DEF(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(2,0,z)),&thisClass::BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
-#define _PYATTR_DEPREC_DEF(x,thisClass,z) .add_property(BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z)),&thisClass::BOOST_PP_CAT(_getDeprec_,_DEPREC_OLDNAME(z)),&thisClass::BOOST_PP_CAT(_setDeprec_,_DEPREC_OLDNAME(z)),"Deprecated alias for :yref:`" BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(z)) "<" BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(z)) ">` (" _DEPREC_COMMENT(z) ")")
+#define _PYATTR_DEPREC_DEF(x,thisClass,z) .add_property(BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z)),&thisClass::BOOST_PP_CAT(_getDeprec_,_DEPREC_OLDNAME(z)),&thisClass::BOOST_PP_CAT(_setDeprec_,_DEPREC_OLDNAME(z)),"|ydeprecated| alias for :yref:`" BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(z)) "<" BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(z)) ">` (" _DEPREC_COMMENT(z) ")")
 
 // register class attributes, putting them to both python ['attr'] access functions and yade::serialization (and boost::serialization, if enabled)
 #define REGISTER_ATTRIBUTES(baseClass,attrs) REGISTER_ATTRIBUTES_DEPREC(_SOME_CLASS,baseClass,attrs,)
@@ -266,19 +266,11 @@ public :
 		virtual boost::python::list pyKeys() const {return ::pyKeys(); };
 		virtual bool pyHasKey(const std::string& key) const {return ::pyHasKey(key);}
 		virtual boost::python::dict pyDict() const { return ::pyDict(); }
-		// this check can be probably removed at some point
-		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const { if(getClassName()!=thisClassName){ std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR*; will be inaccessible from python."<<std::endl; return false; } return true; }
-		virtual void pyRegisterClass(boost::python::object _scope) const {
-			if(!checkPyClassRegistersItself("Serializable")) return;
-			boost::python::scope thisScope(_scope); 
-			python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
-				.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")
-				.def("dict",&Serializable::pyDict,"Return dictionary of attributes.").def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey,"Predicate telling whether given attribute exists.").def("keys",&Serializable::pyKeys,"Return list of attribute names")
-				.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary").def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs,"Update object attributes from given dictionary, skipping those that the instance doesn't have. Return list of attributes that did *not* exist and were not updated.")
-				.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict(),"Return clone of the instance, created by copying values of all attributes.")
-				.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
-				;
-		}
+		// check whether the class registers itself or whether it calls virtual function of some base class;
+		// that means that the class doesn't register itself properly
+		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const;
+		// perform class registration; overridden in all classes
+		virtual void pyRegisterClass(boost::python::object _scope) const;
 		
 		//! update attributes from dictionary
 		void pyUpdateAttrs(const boost::python::dict& d);

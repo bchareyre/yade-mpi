@@ -2,7 +2,6 @@ tags
 scons.current-profile
 scons.profile-*
 .project
-./doc/doxygen
 VERSION
 yade.1
 debian/changelog

@@ -11,6 +11,32 @@
 #include "Serializable.hpp"
 
 
+void Serializable::pyRegisterClass(boost::python::object _scope) const {
+	if(!checkPyClassRegistersItself("Serializable")) return;
+	boost::python::scope thisScope(_scope); 
+	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")
+		.add_property("name",&Serializable::getClassName,"Name of the class").def("__str__",&Serializable::pyStr).def("__repr__",&Serializable::pyStr).def("postProcessAttributes",&Serializable::postProcessAttributes,(python::arg("deserializing")=true),"Call Serializable::postProcessAttributes c++ method.")
+		.def("dict",&Serializable::pyDict,"Return dictionary of attributes.").def("__getitem__",&Serializable::pyGetAttr).def("__setitem__",&Serializable::pySetAttr).def("has_key",&Serializable::pyHasKey,"Predicate telling whether given attribute exists.").def("keys",&Serializable::pyKeys,"Return list of attribute names")
+		.def("updateAttrs",&Serializable::pyUpdateAttrs,"Update object attributes from given dictionary").def("updateExistingAttrs",&Serializable::pyUpdateExistingAttrs,"Update object attributes from given dictionary, skipping those that the instance doesn't have. Return list of attributes that did *not* exist and were not updated.")
+		.def("clone",&Serializable_clone<Serializable>,python::arg("attrs")=python::dict(),"Return clone of the instance, created by copying values of all attributes.")
+		/* boost::python pickling support, as per http://www.boost.org/doc/libs/1_42_0/libs/python/doc/v2/pickle.html */ 
+		.def("__getstate__",&Serializable::pyDict).def("__setstate__",&Serializable::pyUpdateAttrs)
+		.add_property("__safe_for_unpickling__",&Serializable::getClassName,"just define the attr, return some bogus data")
+		.add_property("__getstate_manages_dict__",&Serializable::getClassName,"just define the attr, return some bogus data")
+		// constructor with dictionary of attributes
+		.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<Serializable>))
+		;
+}
+
+bool Serializable::checkPyClassRegistersItself(const std::string& thisClassName) const {
+	if(getClassName()!=thisClassName){
+		std::cerr<<"FIXME: class "+getClassName()+" does not register with YADE_CLASS_BASE_DOC_ATTR*; will be inaccessible from python."<<std::endl; return false;
+	}
+	return true;
+}
+
+
+
 void Serializable::pyUpdateAttrs(const python::dict& d){
 	python::list l=d.items(); size_t ll=python::len(l);
 	for(size_t i=0; i<ll; i++){

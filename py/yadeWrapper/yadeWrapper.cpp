@@ -90,7 +90,7 @@ class pyBodyContainer{
 	}
 	body_id_t append(shared_ptr<Body> b){
 		// shoud be >=0, but Body is by default created with id 0... :-|
-		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+"set; appending such body (for the second time) is not allowed.").c_str()); python::throw_error_already_set(); }
+		if(b->getId()>=0){ PyErr_SetString(PyExc_IndexError,("Body already has id "+lexical_cast<string>(b->getId())+" set; appending such body (for the second time) is not allowed.").c_str()); python::throw_error_already_set(); }
 		return proxee->insert(b);
 	}
 	vector<body_id_t> appendList(vector<shared_ptr<Body> > bb){

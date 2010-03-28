@@ -80,7 +80,7 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
 		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 		//if(b->shape->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
 			glPushName(b->getId());
-			shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire,viewInfo);
+			shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
 			glPopName();
 		//}
 		glPopMatrix();
@@ -96,6 +96,8 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 
 void OpenGLRenderingEngine::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
+	bool scaleRotations=(rotScale!=1.0);
+	bool scaleDisplacements=(dispScale!=Vector3r::ONE);
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->state) continue;
 		size_t id=b->getId();
@@ -107,12 +109,12 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 		if(!(scaleDisplacements||scaleRotations||scene->isPeriodic)){ bodyDisp[id].pos=pos; bodyDisp[id].ori=ori; continue; }
 		// apply scaling
 		bodyDisp[id].pos=cellPos; // point of reference (inside the cell for periodic)
-		if(scaleDisplacements) bodyDisp[id].pos+=diagMult(displacementScale,pos-refPos); // add scaled translation to the point of reference
+		if(scaleDisplacements) bodyDisp[id].pos+=diagMult(dispScale,pos-refPos); // add scaled translation to the point of reference
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
 			Quaternionr relRot=refOri.Conjugate()*ori;
 			Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle);
-			angle*=rotationScale;
+			angle*=rotScale;
 			bodyDisp[id].ori=refOri*Quaternionr(axis,angle);
 		}
 	}
@@ -124,7 +126,7 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		Vector3r size=scene->cell->getSize();
-		if(scaleDisplacements) size+=diagMult(displacementScale,size-scene->cell->refSize);
+		if(dispScale!=Vector3r::ONE) size+=diagMult(dispScale,size-scene->cell->refSize);
 		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
 		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
 		glScalev(size);
@@ -154,10 +156,10 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 		
 
 	// Draw light source
-	const GLfloat pos[4]	= {Light_position[0],Light_position[1],Light_position[2],1.0};
+	const GLfloat pos[4]	= {lightPos[0],lightPos[1],lightPos[2],1.0};
 	const GLfloat ambientColor[4]={0.5,0.5,0.5,1.0};	
 	//const GLfloat specularColor[4]={0.5,0.5,0.5,1.0};	
-	glClearColor(Background_color[0],Background_color[1],Background_color[2],1.0);
+	glClearColor(bgColor[0],bgColor[1],bgColor[2],1.0);
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColor);
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1); // important: do lighting calculations on both sides of polygons
@@ -165,7 +167,7 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 	glEnable(GL_LIGHT0);
 	glDisable(GL_LIGHTING);
 	glPushMatrix();
-		glTranslatef(Light_position[0],Light_position[1],Light_position[2]);
+		glTranslatef(lightPos[0],lightPos[1],lightPos[2]);
 		glColor3f(1.0,1.0,1.0);
 		glutSolidSphere(3,10,10);
 	glPopMatrix();	
@@ -187,16 +189,16 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 
 	drawPeriodicCell();
 
-	if (Show_DOF || Show_ID) renderDOF_ID();
-	if (Body_bounding_volume) renderBoundingVolume();
-	if (Body_interacting_geom){
+	if (dof || id) renderDOF_ID();
+	if (bound) renderBoundingVolume();
+	if (shape){
 		glEnable(GL_LIGHTING);
 		glEnable(GL_CULL_FACE);
 		renderShape();
 	}
 	if (intrAllWire) renderAllInteractionsWire();
-	if (Interaction_geometry) renderInteractionGeometry();
-	if (Interaction_physics) renderInteractionPhysics();
+	if (intrGeom) renderInteractionGeometry();
+	if (intrPhys) renderInteractionPhysics();
 }
 
 void OpenGLRenderingEngine::renderAllInteractionsWire(){
@@ -218,28 +220,28 @@ void OpenGLRenderingEngine::renderDOF_ID(){
 	const GLfloat ambientColorUnselected[4]={0.5,0.5,0.5,1.0};	
 	FOREACH(const shared_ptr<Body> b, *scene->bodies){
 		if(!b) continue;
-		if(b->shape && ((b->getGroupMask() & Draw_mask) || b->getGroupMask()==0)){
+		if(b->shape && ((b->getGroupMask() & mask) || b->getGroupMask()==0)){
 			if(b->state /* && FIXME: !b->physicalParameters->isDisplayed */) continue;
-			if(!Show_ID && b->state->blockedDOFs==0) continue;
+			if(!id && b->state->blockedDOFs==0) continue;
 			const Se3r& se3=b->state->se3; // FIXME: should be dispSe3
 			glPushMatrix();
 			glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
 			if(current_selection==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
 			{ // write text
-				glColor3f(1.0-Background_color[0],1.0-Background_color[1],1.0-Background_color[2]);
+				glColor3f(1.0-bgColor[0],1.0-bgColor[1],1.0-bgColor[2]);
 				unsigned DOF = b->state->blockedDOFs;
-				std::string dof = std::string("") 
+				std::string sDof = std::string("") 
 										+ (((DOF & State::DOF_X )!=0)?"X":" ")
 										+ (((DOF & State::DOF_Y )!=0)?"Y":" ")
 										+ (((DOF & State::DOF_Z )!=0)?"Z":" ")
 										+ (((DOF & State::DOF_RX)!=0)?"RX":"  ")
 										+ (((DOF & State::DOF_RY)!=0)?"RY":"  ")
 										+ (((DOF & State::DOF_RZ)!=0)?"RZ":"  ");
-				std::string id = boost::lexical_cast<std::string>(b->getId());
-				std::string str("");
-				if(Show_DOF && Show_ID) id += " ";
-				if(Show_ID) str += id;
-				if(Show_DOF) str += dof;
+				std::string sId = boost::lexical_cast<std::string>(b->getId());
+				std::string str;
+				if(dof && id) id += " ";
+				if(id) str += sId;
+				if(dof) str += sDof;
 				glPushMatrix();
 				glRasterPos2i(0,0);
 				for(unsigned int i=0;i<str.length();i++)
@@ -259,7 +261,7 @@ void OpenGLRenderingEngine::renderInteractionGeometry(){
 			if(!I->interactionGeometry) continue;
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			if(!(bodyDisp[I->getId1()].isDisplayed||bodyDisp[I->getId2()].isDisplayed)) continue;
-			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,Interaction_wire); glPopMatrix();
+			glPushMatrix(); interactionGeometryDispatcher(I->interactionGeometry,I,b1,b2,intrWire); glPopMatrix();
 		}
 	}
 }
@@ -273,7 +275,7 @@ void OpenGLRenderingEngine::renderInteractionPhysics(){
 			const shared_ptr<Body>& b1=Body::byId(I->getId1(),scene), b2=Body::byId(I->getId2(),scene);
 			body_id_t id1=I->getId1(), id2=I->getId2();
 			if(!(bodyDisp[id1].isDisplayed||bodyDisp[id2].isDisplayed)) continue;
-			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,Interaction_wire); glPopMatrix();
+			glPushMatrix(); interactionPhysicsDispatcher(I->interactionPhysics,I,b1,b2,intrWire); glPopMatrix();
 		}
 	}
 }
@@ -282,7 +284,7 @@ void OpenGLRenderingEngine::renderBoundingVolume(){
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
-		if(b->bound && ((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)){
+		if(b->bound && ((b->getGroupMask()&mask) || b->getGroupMask()==0)){
 			glPushMatrix(); boundDispatcher(b->bound,scene.get()); glPopMatrix();
 		}
 	}
@@ -319,7 +321,7 @@ void OpenGLRenderingEngine::renderShape()
 		if(!bodyDisp[b->getId()].isDisplayed) continue;
 		Vector3r pos=bodyDisp[b->getId()].pos;
 		Quaternionr ori=bodyDisp[b->getId()].ori;
-		if(!b->shape || !((b->getGroupMask()&Draw_mask) || b->getGroupMask()==0)) continue;
+		if(!b->shape || !((b->getGroupMask()&mask) || b->getGroupMask()==0)) continue;
 		glPushMatrix();
 			Real angle;	Vector3r axis;	ori.ToAxisAngle(axis,angle);	
 			glTranslatef(pos[0],pos[1],pos[2]);
@@ -331,18 +333,18 @@ void OpenGLRenderingEngine::renderShape()
 				glColor4(h[0],h[1],h[2],.2);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 				///
-				shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire,viewInfo);
+				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
 				///
 				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
 				glColor3v(Vector3r::ZERO);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 			} else {
-				shapeDispatcher(b->shape,b->state,Body_wire || b->shape->wire,viewInfo);
+				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
 			}
 		glPopMatrix();
 		if(current_selection==b->getId() || b->shape->highlight){
-			if(!b->bound || Body_wire || b->shape->wire) GLUtils::GLDrawInt(b->getId(),pos);
+			if(!b->bound || wire || b->shape->wire) GLUtils::GLDrawInt(b->getId(),pos);
 			else {
 				// move the label towards the camera by the bounding box so that it is not hidden inside the body
 				const Vector3r& mn=b->bound->min; const Vector3r& mx=b->bound->max; const Vector3r& p=pos;
@@ -372,7 +374,7 @@ void OpenGLRenderingEngine::renderShape()
 					glPushMatrix();
 						glTranslatev(pt);
 						glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
-						shapeDispatcher(b->shape,b->state,/*Body_wire*/ true, viewInfo);
+						shapeDispatcher(b->shape,b->state,/*wire*/ true, viewInfo);
 					glPopMatrix();
 				}
 			}

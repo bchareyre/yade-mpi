@@ -116,8 +116,7 @@ def initTest():
 	try:
 		from yade import qt
 		renderer=qt.Renderer()
-		renderer['scaleDisplacements']=True
-		renderer['displacementScale']=(1000,1000,1000) if mode=='tension' else (100,100,100)
+		renderer.dispScale=(1000,1000,1000) if mode=='tension' else (100,100,100)
 	except ImportError: pass
 	print "init done, will now run."
 	O.step(); O.step(); # to create initial contacts

@@ -58,7 +58,7 @@ REGISTER_SERIALIZABLE(Dispatcher);
 
 // HELPER MACROS
 // supposed to be passed to YADE_CLASS_BASE_DOC_ATTRS_PY in the 5th argument; takes class name as arg
-#define YADE_PY_DISPATCHER(DispatcherT) .def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>)).add_property("functors",&Dispatcher_functors_get<DispatcherT>,"Functors objects associated with this dispatcher.").def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
+#define YADE_PY_DISPATCHER(DispatcherT) .def("__init__",python::make_constructor(Dispatcher_ctor_list<DispatcherT>),"Construct with list of associated functors.").add_property("functors",&Dispatcher_functors_get<DispatcherT>,"Functors objects associated with this dispatcher.").def("dispMatrix",&DispatcherT::dump,python::arg("names")=true,"Return dictionary with contents of the dispatch matrix.").def("dispFunctor",&DispatcherT::getFunctor,"Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");
 
 
 // HELPER FUNCTIONS
