@@ -14,7 +14,11 @@ IntrCallback::FuncPtr SumIntrForcesCb::stepInit(){
 
 	cerr<<"("<<(Real)force<<","<<(int)numIntr<<")";
 	// reset accumulators
+#ifdef YADE_OPENMP
 	force.reset(); numIntr.reset();
+#else
+	force.reset(0);numIntr.reset(0);
+#endif
 	// return function pointer
 	return &SumIntrForcesCb::go;
 }
@@ -32,13 +36,19 @@ void SumIntrForcesCb::go(IntrCallback* _self, Interaction* i){
 
 BodyCallback::FuncPtr SumBodyForcesCb::stepInit(){
 	cerr<<"{"<<(Real)force<<","<<(int)numBodies<<",this="<<this<<",scene="<<scene<<",forces="<<&(scene->forces)<<"}";
+#ifdef YADE_OPENMP
 	force.reset(); numBodies.reset(); // reset accumulators
+#else
+	force.reset(0);numBodies.reset(0);
+#endif
 	return &SumBodyForcesCb::go;
 }
 void SumBodyForcesCb::go(BodyCallback* _self, Body* b){
 	if(!b->isDynamic) return;
 	SumBodyForcesCb* self=static_cast<SumBodyForcesCb*>(_self);
+#ifdef YADE_OPENMP
 	cerr<<"["<<omp_get_thread_num()<<",#"<<b->id<<",scene="<<self->scene<<"]";
+#endif
 	cerr<<"[force="<<self->scene->forces.getForce(b->id)<<"]";
 	self->numBodies+=1;
 	//self->scene->forces.sync();
