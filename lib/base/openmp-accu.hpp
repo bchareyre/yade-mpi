@@ -25,12 +25,12 @@ class OpenMPAccumulator{
 };
 #else 
 // single-threaded version of the accumulator above
-template<typename T>
+template<typename T, T* zeroValue>
 class OpenMPAccumulator{
 	T data;
 public:
 	void operator+=(const T& val){ data+=val; }
 	operator T(){ return data; }
-	void reset(const T& zeroValue){ data=zeroValue; }
+	void reset(){ data=*zeroValue; }
 };
 #endif
