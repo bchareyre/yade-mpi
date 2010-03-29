@@ -127,7 +127,7 @@ def onBodySelect(id):
 	print "Selected:",id
 	utils.highlightNone()
 	for i in O.interactions.withBody(id):
-		O.bodies[i.id2 if i.id1==id else i.id1].shape['highlight']=True
+		O.bodies[i.id2 if i.id1==id else i.id1].shape.highlight=True
 		print i.id1,i.id2,i.phys,i.geom
 
 from yade import qt
