@@ -47,7 +47,7 @@ clean:
 	## remove builddirs and installation directories
 	rm -rf debian/build-* `find debian/ -name 'yade-*' -type d`
 	## keep this, it takes very little space and annoyingly wipes local configs
-	#rm -rf scons.profile* scons.current-profile
+	for f in scons.profile*; do mv $$f $$f~old; done
 	dh_clean 
 
 install: build

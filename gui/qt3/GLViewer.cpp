@@ -421,9 +421,11 @@ void GLViewer::draw()
 		gl2psStream=fopen(nextFrameSnapshotFilename.c_str(),"wb");
 		if(!gl2psStream){ int err=errno; throw runtime_error(string("Error opening file ")+nextFrameSnapshotFilename+": "+strerror(err)); }
 		LOG_DEBUG("Start saving snapshot to "<<nextFrameSnapshotFilename);
+		size_t nBodies=Omega::instance().getScene()->bodies->size();
+		int sortAlgo=(nBodies<100 ? GL2PS_BSP_SORT : GL2PS_SIMPLE_SORT);
 		gl2psBeginPage(/*const char *title*/"Some title", /*const char *producer*/ "Yade",
 			/*GLint viewport[4]*/ NULL,
-			/*GLint format*/ GL2PS_PDF, /*GLint sort*/ GL2PS_BSP_SORT, /*GLint options*/GL2PS_SIMPLE_LINE_OFFSET|GL2PS_USE_CURRENT_VIEWPORT|GL2PS_TIGHT_BOUNDING_BOX|GL2PS_COMPRESS|GL2PS_OCCLUSION_CULL|GL2PS_NO_BLENDING, 
+			/*GLint format*/ GL2PS_PDF, /*GLint sort*/ sortAlgo, /*GLint options*/GL2PS_SIMPLE_LINE_OFFSET|GL2PS_USE_CURRENT_VIEWPORT|GL2PS_TIGHT_BOUNDING_BOX|GL2PS_COMPRESS|GL2PS_OCCLUSION_CULL|GL2PS_NO_BLENDING, 
 			/*GLint colormode*/ GL_RGBA, /*GLint colorsize*/0, 
 			/*GL2PSrgba *colortable*/NULL, 
 			/*GLint nr*/0, /*GLint ng*/0, /*GLint nb*/0, 

@@ -6,10 +6,11 @@
 #include<yade/core/BodyContainer.hpp>
 #include<yade/core/State.hpp>
 
-YADE_PLUGIN((Clump)(ClumpMemberMover));
+YADE_PLUGIN((Clump)/*(ClumpMemberMover)*/);
 CREATE_LOGGER(Clump);
-CREATE_LOGGER(ClumpMemberMover);
 
+#if 0
+CREATE_LOGGER(ClumpMemberMover);
 /**************************************************************************************
  ************************************* ClumpMemberMover ******************************
  **************************************************************************************/
@@ -28,6 +29,7 @@ void ClumpMemberMover::action(){
 	}
 	//if(!clump->isDynamic) return; // perhaps clump that has been desactivated?!
 }
+#endif
 
 /**************************************************************************************
  ******************************************** Clump ***********************************

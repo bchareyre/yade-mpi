@@ -82,7 +82,8 @@ class Clump: public Body {
 };
 REGISTER_SERIALIZABLE(Clump);
 
-
+// NewtonIntegrator calls Clump::moveMembers directly, no need for a dedicated engine
+#if 0
 /*! Update ::Clump::members positions so that the Clump behaves as a rigid body. */
 class ClumpMemberMover: public PartialEngine {
 	public:
@@ -93,4 +94,4 @@ class ClumpMemberMover: public PartialEngine {
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(ClumpMemberMover);
-
+#endif

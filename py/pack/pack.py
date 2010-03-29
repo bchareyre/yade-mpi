@@ -112,14 +112,14 @@ def gtsSurface2Facets(surf,**kw):
 def sweptPolylines2gtsSurface(pts,threshold=0,capStart=False,capEnd=False):
 	"""Create swept suface (as GTS triangulation) given same-length sequences of points (as 3-tuples).
 
-	If threshold is given (>0), then
+If threshold is given (>0), then
 
-	* degenerate faces (with edges shorter than threshold) will not be created
-	* gts.Surface().cleanup(threshold) will be called before returning, which merges vertices mutually closer than threshold. In case your pts are closed (last point concident with the first one) this will the surface strip of triangles. If you additionally have capStart==True and capEnd==True, the surface will be closed.
+* degenerate faces (with edges shorter than threshold) will not be created
+* gts.Surface().cleanup(threshold) will be called before returning, which merges vertices mutually closer than threshold. In case your pts are closed (last point concident with the first one) this will the surface strip of triangles. If you additionally have capStart==True and capEnd==True, the surface will be closed.
 
-	.. note:: capStart and capEnd make the most naive polygon triangulation (diagonals) and will perhaps fail for non-convex sections.
+.. note:: capStart and capEnd make the most naive polygon triangulation (diagonals) and will perhaps fail for non-convex sections.
 
-	.. warning:: the algorithm connects points sequentially; if two polylines are mutually rotated or have inverse sense, the algorithm will not detect it and connect them regardless in their given order.
+.. warning:: the algorithm connects points sequentially; if two polylines are mutually rotated or have inverse sense, the algorithm will not detect it and connect them regardless in their given order.
 	"""
 	if not len(set([len(pts1) for pts1 in pts]))==1: raise RuntimeError("Polylines must be all of the same length!")
 	vtxs=[[gts.Vertex(x,y,z) for x,y,z in pts1] for pts1 in pts]
@@ -193,15 +193,17 @@ def regularHexa(predicate,radius,gap,**kw):
 	Created spheres will have given radius and will be separated by gap space."""
 	ret=[]
 	a=2*radius+gap
-	h=a*sqrt(3)/2.
+	# thanks to Nasibeh Moradi for finding bug here:
+	# http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01424.html
+	hy,hz=a*sqrt(3)/2.,a*sqrt(6)/3.
 	mn,mx=predicate.aabb()
 	dim=[mx[i]-mn[i] for i in 0,1,2]
 	if(max(dim)==float('inf')): raise ValueError("Aabb of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
-	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/h)+1),range(0,int(dim[2]/h)+1)]
+	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/hy)+1),range(0,int(dim[2]/hz)+1)]
 	for i,j,k in itertools.product(ii,jj,kk):
-		x,y,z=mn[0]+radius+i*a,mn[1]+radius+j*h,mn[2]+radius+k*h
+		x,y,z=mn[0]+radius+i*a,mn[1]+radius+j*hy,mn[2]+radius+k*hz
 		if j%2==0: x+= a/2. if k%2==0 else -a/2.
-		if k%2!=0: x+=a/2.; y+=h/2.
+		if k%2!=0: x+=a/2.; y+=hy/2.
 		if predicate((x,y,z),radius): ret+=[utils.sphere((x,y,z),radius=radius,**kw)]
 	return ret
 
