@@ -29,21 +29,10 @@ class TriaxialStateRecorder : public Recorder
 		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
 		bool changed;
 	public :
-		Real 		porosity;
-		
-		//Real height, width, depth;
-		//Real thickness; // FIXME should retrieve "extents" of a Box
-		
-		//int wall_bottom_id, wall_top_id, wall_left_id, wall_right_id, wall_front_id, wall_back_id;
-
-		TriaxialStateRecorder ();
+		virtual ~TriaxialStateRecorder ();
 		virtual void action();
+	YADE_CLASS_BASE_DOC_ATTRS(TriaxialStateRecorder,Recorder,"Engine recording triaxial variables (needs :yref:TriaxialCompressionEngine present in the simulation).",
+		((Real,porosity,1,"porosity of the packing [-]")));
 	DECLARE_LOGGER;
-	REGISTER_ATTRIBUTES(Recorder,(porosity));
-
-	protected :
-	REGISTER_CLASS_AND_BASE(TriaxialStateRecorder,Recorder);
 };
 REGISTER_SERIALIZABLE(TriaxialStateRecorder);
-
-
