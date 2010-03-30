@@ -332,10 +332,10 @@ BOOST_PYTHON_MODULE(_packPredicates){
 	// boolean operations
 	python::class_<PredicateBoolean,python::bases<Predicate>,boost::noncopyable>("PredicateBoolean","Boolean operation on 2 predicates (abstract class)",python::no_init)
 		.add_property("A",&PredicateBoolean::getA).add_property("B",&PredicateBoolean::getB);
-	python::class_<PredicateUnion,python::bases<PredicateBoolean> >("PredicateUnion","Union of 2 predicates",python::init<python::object,python::object>());
-	python::class_<PredicateIntersection,python::bases<PredicateBoolean> >("PredicateIntersection","Intersection of 2 predicates",python::init<python::object,python::object >());
-	python::class_<PredicateDifference,python::bases<PredicateBoolean> >("PredicateDifference","Difference of 2 predicates",python::init<python::object,python::object >());
-	python::class_<PredicateSymmetricDifference,python::bases<PredicateBoolean> >("PredicateSymmetricDifference","SymmetricDifference of 2 predicates",python::init<python::object,python::object >());
+	python::class_<PredicateUnion,python::bases<PredicateBoolean> >("PredicateUnion","Union (non-exclusive disjunction) of 2 predicates. A point has to be inside any of the two predicates to be inside. Can be constructed using the ``|`` operator on predicates: ``pred1 | pred2``.",python::init<python::object,python::object>());
+	python::class_<PredicateIntersection,python::bases<PredicateBoolean> >("PredicateIntersection","Intersection (conjunction) of 2 predicates. A point has to be inside both predicates. Can be constructed using the ``&`` operator on predicates: ``pred1 & pred2``.",python::init<python::object,python::object >());
+	python::class_<PredicateDifference,python::bases<PredicateBoolean> >("PredicateDifference","Difference (conjunction with negative predicate) of 2 predicates. A point has to be inside the first and outside the second predicate. Can be constructed using the ``-`` operator on predicates: ``pred1 - pred2``.",python::init<python::object,python::object >());
+	python::class_<PredicateSymmetricDifference,python::bases<PredicateBoolean> >("PredicateSymmetricDifference","SymmetricDifference (exclusive disjunction) of 2 predicates. A point has to be in exactly one predicate of the two. Can be constructed using the ``^`` operator on predicates: ``pred1 ^ pred2``.",python::init<python::object,python::object >());
 	// primitive predicates
 	python::class_<inSphere,python::bases<Predicate> >("inSphere","Sphere predicate.",python::init<const Vector3r&,Real>(python::args("center","radius"),"Ctor taking center (as a 3-tuple) and radius"));
 	python::class_<inAlignedBox,python::bases<Predicate> >("inAlignedBox","Axis-aligned box predicate",python::init<const Vector3r&,const Vector3r&>(python::args("minAABB","maxAABB"),"Ctor taking minumum and maximum points of the box (as 3-tuples)."));
