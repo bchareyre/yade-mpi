@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"SimpleElasticRelationshipsWater.hpp"
+#include"Ip2_Frictmat_FrictMat_CapillaryLawPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
@@ -14,14 +14,9 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((SimpleElasticRelationshipsWater));
+YADE_PLUGIN((Ip2_Frictmat_FrictMat_CapillaryLawPhys));
 
-// SimpleElasticRelationshipsWater::SimpleElasticRelationshipsWater()
-// {
-// 
-// }
-
-void SimpleElasticRelationshipsWater::go( const shared_ptr<Material>& b1 //FrictMat
+void Ip2_Frictmat_FrictMat_CapillaryLawPhys::go( const shared_ptr<Material>& b1 //FrictMat
 					, const shared_ptr<Material>& b2 // FrictMat
 					, const shared_ptr<Interaction>& interaction)
 {

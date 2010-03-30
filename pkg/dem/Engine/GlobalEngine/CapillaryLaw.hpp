@@ -1,5 +1,5 @@
 //
-// C++ Interface: CapillaryCohesiveLaw
+// C++ Interface: CapillaryLaw
 /*************************************************************************
 *  Copyright (C) 2006 by luc Scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
@@ -84,7 +84,7 @@ class BodiesMenisciiList
 };
 
 /// This is the constitutive law
-// class CapillaryCohesiveLaw : public InteractionSolver
+// class CapillaryLaw : public InteractionSolver
 // {
 // 	public :
 // 		int sdecGroupMask;
@@ -95,16 +95,16 @@ class BodiesMenisciiList
 // 		shared_ptr<capillarylaw> capillary;
 // 		BodiesMenisciiList bodiesMenisciiList;
 // 						
-// 		CapillaryCohesiveLaw();
+// 		CapillaryLaw();
 // 		void action(Scene * ncb);
 // 		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(CapillaryPressure)(fusionDetection)(binaryFusion));
 // 		virtual void postProcessAttributes(bool deserializing);
-// 	REGISTER_CLASS_NAME(CapillaryCohesiveLaw);
+// 	REGISTER_CLASS_NAME(CapillaryLaw);
 // 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
 // 
 // };
 
-class CapillaryCohesiveLaw : public GlobalEngine
+class CapillaryLaw : public GlobalEngine
 {
 	public :
 		void checkFusion();
@@ -114,7 +114,7 @@ class CapillaryCohesiveLaw : public GlobalEngine
 		void action();
 		virtual void postProcessAttributes(bool deserializing);
 		
-	YADE_CLASS_BASE_DOC_ATTRS(CapillaryCohesiveLaw,GlobalEngine,"Rk: deprecated -> needs some work to be conform to the new formalism! This law allows to take into account capillary cohesion between spheres as a result of interparticular liquid bridges (menisci). refs: 1- infrench, (lot of documentation) L. Scholtes, PhD thesis -> http://tel.archives-ouvertes.fr/tel-00363961/en/ - 2 in english (less documentation) L. Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75. The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry. The control parameter is the capillary pressure (or suction) Uc = Cgas - Uliquid. Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of the defined capillary pressure and of the interacting geometry (spheres radii and interparticular distance).",
+	YADE_CLASS_BASE_DOC_ATTRS(CapillaryLaw,GlobalEngine,"Rk: deprecated -> needs some work to be conform to the new formalism! This law allows to take into account capillary cohesion between spheres as a result of interparticular liquid bridges (menisci). refs: 1- infrench, (lot of documentation) L. Scholtes, PhD thesis -> http://tel.archives-ouvertes.fr/tel-00363961/en/ - 2 in english (less documentation) L. Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75. The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry. The control parameter is the capillary pressure (or suction) Uc = Cgas - Uliquid. Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of the defined capillary pressure and of the interacting geometry (spheres radii and interparticular distance).",
 				  ((int,sdecGroupMask,1,"? the interaction only considers particles with same mask ?"))
 				  ((Real,CapillaryPressure,0.,"Value of the capillary pressure Uc defines as Ugas-Uliquid"))
 				  ((bool,fusionDetection,false,"If true potential menisci overlaps are checked"))
@@ -163,7 +163,7 @@ class capillarylaw
 		void fill (const char* filename);
 };
 
-REGISTER_SERIALIZABLE(CapillaryCohesiveLaw);
+REGISTER_SERIALIZABLE(CapillaryLaw);
 
 
 

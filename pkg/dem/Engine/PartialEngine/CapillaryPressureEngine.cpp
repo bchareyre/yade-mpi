@@ -7,40 +7,28 @@
 *************************************************************************/
 
 #include "CapillaryPressureEngine.hpp"
-#include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
+#include <yade/pkg-dem/CapillaryLaw.hpp>
 #include <yade/core/Scene.hpp>
 
 YADE_PLUGIN((CapillaryPressureEngine));
+CREATE_LOGGER(CapillaryPressureEngine);
 
 using namespace boost; // ???
 using namespace std; // ???
-
-// CapillaryPressureEngine::CapillaryPressureEngine()
-// {	
-// 	//cerr << "constructeur PressureEngine" << endl;
-// 	capillaryCohesiveLaw = new CapillaryCohesiveLaw;
-// 	capillaryCohesiveLaw->sdecGroupMask = 2; // absolument n�cessaire !!!
-// 	
-// }
 
 CapillaryPressureEngine::~CapillaryPressureEngine()
 {
 }
 
 void CapillaryPressureEngine::action()
-{		
-	//cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
-	
+{
 	capillaryCohesiveLaw->CapillaryPressure = Pressure;
 	if (Pressure<100000) Pressure += PressureVariation;
 	//capillaryCohesiveLaw->CapillaryPressure += PressureVariation;
-	
-// 	cerr << " CapillaryPressure = " << capillaryCohesiveLaw->CapillaryPressure << endl;
-// 	cerr << " PressureVariation = " << PressureVariation << endl;
 	
 	capillaryCohesiveLaw->scene=scene;
 	capillaryCohesiveLaw->action();
 	
 }
-//YADE_REQUIRE_FEATURE(PHYSPAR);
 
+//YADE_REQUIRE_FEATURE(PHYSPAR);

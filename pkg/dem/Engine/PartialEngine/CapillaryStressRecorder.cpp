@@ -7,12 +7,10 @@
 *************************************************************************/
 
 #include "CapillaryStressRecorder.hpp"
-//#include <yade/pkg-common/RigidBodyParameters.hpp>
-//#include <yade/pkg-common/ParticleParameters.hpp>
 #include <yade/pkg-common/Sphere.hpp>
 #include <yade/pkg-common/ElastMat.hpp>
 #include <yade/pkg-dem/CapillaryParameters.hpp>
-#include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
+#include <yade/pkg-dem/CapillaryLaw.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 
 #include <yade/core/Omega.hpp>
@@ -22,34 +20,14 @@
 YADE_PLUGIN((CapillaryStressRecorder));
 CREATE_LOGGER(CapillaryStressRecorder);
 
-//// related to OLD CODE!
-// CapillaryStressRecorder::CapillaryStressRecorder () : Recorder()
-// {
-// 	outputFile = "";
-// 	interval = 1;
-// // 	sphere_ptr = shared_ptr<Shape> (new Sphere);
-// // 	SpheresClassIndex = sphere_ptr->getClassIndex();
-// 
-// }
-
-void CapillaryStressRecorder::postProcessAttributes(bool deserializing)
-{
-	if(deserializing)
-	{
-		ofile.open(outputFile.c_str(), std::ios::app);
-	}
-}
-
-bool CapillaryStressRecorder::isActivated()
-{
-	return ((scene->currentIteration % interval == 0) && (ofile));
-}
-
-
 void CapillaryStressRecorder::action()
 {
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
   
+	// at the beginning of the file; write column titles
+	if(out.tellp()==0){
+		out<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE"<<endl;
+	}
 	if ( !triaxialCompressionEngine )
 	{
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
@@ -177,7 +155,7 @@ void CapillaryStressRecorder::action()
 	SIG_13_cap = sig13_cap/V;
 	SIG_23_cap = sig23_cap/V;
 	
-	ofile << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
+	out << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
 		<< lexical_cast<string>(SIG_11_cap) << " " 
 		<< lexical_cast<string>(SIG_22_cap) << " " 
 		<< lexical_cast<string>(SIG_33_cap) << " " 

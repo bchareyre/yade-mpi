@@ -10,9 +10,9 @@
 #include "TriaxialTestWater.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
+#include <yade/pkg-dem/CapillaryLaw.hpp>
 // #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
-#include<yade/pkg-dem/SimpleElasticRelationshipsWater.hpp>
+#include<yade/pkg-dem/Ip2_Frictmat_FrictMat_CapillaryLawPhys.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -21,7 +21,6 @@
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
 #include <yade/pkg-dem/CapillaryStressRecorder.hpp>
-#include <yade/pkg-dem/ContactStressRecorder.hpp>
 
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
@@ -95,7 +94,6 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
 	WallStressRecordFile = "./WallStresses"+Key;
 	capillaryStressRecordFile	= "./CapillaryStresses"+Key;
-	contactStressRecordFile	= "./ContactStresses"+Key;
 
 	rotationBlocked = false;
 	//	boxWalls 		= false;
@@ -405,7 +403,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW
-	shared_ptr<InteractionPhysicsFunctor> ss(new SimpleElasticRelationshipsWater);
+	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_Frictmat_FrictMat_CapillaryLawPhys);
 	interactionPhysicsDispatcher->add(ss);
 	
 		
@@ -420,31 +418,6 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<GravityEngine> gravityCondition(new GravityEngine);
 	gravityCondition->gravity = gravity;
 	
-// 	shared_ptr<CundallNonViscousForceDamping> actionForceDamping(new CundallNonViscousForceDamping);
-// 	actionForceDamping->damping = dampingForce;
-// 	shared_ptr<CundallNonViscousMomentumDamping> actionMomentumDamping(new CundallNonViscousMomentumDamping);
-// 	actionMomentumDamping->damping = dampingMomentum;
-// 	shared_ptr<PhysicalActionDamper> actionDampingDispatcher(new PhysicalActionDamper);
-// 	actionDampingDispatcher->add(actionForceDamping);
-// 	actionDampingDispatcher->add(actionMomentumDamping);
-// 	
-// 	shared_ptr<PhysicalActionApplier> applyActionDispatcher(new PhysicalActionApplier);
-// 	applyActionDispatcher->add("NewtonsForceLaw");
-// 	applyActionDispatcher->add("NewtonsMomentumLaw");
-// 		
-// 	shared_ptr<StateMetaEngine> positionIntegrator(new StateMetaEngine);
-// 	positionIntegrator->add("LeapFrogPositionIntegrator");
-// 	shared_ptr<StateMetaEngine> orientationIntegrator(new StateMetaEngine);
-// 	orientationIntegrator->add("LeapFrogOrientationIntegrator");
-
-	//shared_ptr<ElasticCriterionTimeStepper> sdecTimeStepper(new ElasticCriterionTimeStepper);
-	//sdecTimeStepper->sdecGroupMask = 2;
-	//sdecTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-	
-	//shared_ptr<StiffnessMatrixTimeStepper> stiffnessMatrixTimeStepper(new StiffnessMatrixTimeStepper);
-	//stiffnessMatrixTimeStepper->sdecGroupMask = 2;
-	//stiffnessMatrixTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
-	
 	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper(new GlobalStiffnessTimeStepper);
 	globalStiffnessTimeStepper->sdecGroupMask = 2;
 	globalStiffnessTimeStepper->timeStepUpdateInterval = timeStepUpdateInterval;
@@ -456,7 +429,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	
 
 	// capillary
-	shared_ptr<CapillaryCohesiveLaw> capillaryCohesiveLaw(new CapillaryCohesiveLaw); 
+	shared_ptr<CapillaryLaw> capillaryCohesiveLaw(new CapillaryLaw); 
 	capillaryCohesiveLaw->sdecGroupMask = 2;	
 	capillaryCohesiveLaw->CapillaryPressure = CapillaryPressure;
 // 	capillaryCohesiveLaw->fusionDetection = fusionDetection;
@@ -487,25 +460,17 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 		
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
-// recording global stress
-	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
-	TriaxialStateRecorder);
+	// recording global stress
+	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new TriaxialStateRecorder);
 	triaxialStateRecorder-> file 		= WallStressRecordFile + Key;
-	triaxialStateRecorder-> iterPeriod 		= recordIntervalIter;
+	triaxialStateRecorder-> iterPeriod	= recordIntervalIter;
 	//triaxialStateRecorderer-> thickness 		= thickness;
 
 	// recording capillary stress
-	capillaryStressRecorder = shared_ptr<CapillaryStressRecorder>(new
-	CapillaryStressRecorder);
-	capillaryStressRecorder -> outputFile 	= capillaryStressRecordFile + Key;
-	capillaryStressRecorder -> interval 	= recordIntervalIter;
+	capillaryStressRecorder = shared_ptr<CapillaryStressRecorder>(new CapillaryStressRecorder);
+	capillaryStressRecorder -> file		= capillaryStressRecordFile + Key;
+	capillaryStressRecorder -> iterPeriod	= recordIntervalIter;
 
-	//recording contact stress
-	contactStressRecorder = shared_ptr<ContactStressRecorder>(new
-	ContactStressRecorder);
-	contactStressRecorder -> outputFile 	= contactStressRecordFile + Key;
- 	contactStressRecorder -> interval 	= recordIntervalIter;
-	
 	#if 0	
 	// moving walls to regulate the stress applied
 	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
@@ -542,7 +507,6 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	}
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	rootBody->engines.push_back(triaxialStateRecorder);
-	rootBody->engines.push_back(contactStressRecorder);
 	//rootBody->engines.push_back(gravityCondition);
 	
 	rootBody->engines.push_back(shared_ptr<Engine> (new NewtonIntegrator));

@@ -126,6 +126,10 @@ _deprecated={
 	'Ip2_BMP_BMP_CSPhys':'Ip2_2xFrictMat_CSPhys', # Wed Mar 10 15:08:56 2010, eudoxos@frigo
 	'CinemDTCEngine':'KinemCTDEngine', # Tue Mar 16 13:54:21 2010, jduriez@c1solimara-l
 	'NormalInelasticityLaw':'Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity', # Wed Mar 17 15:50:59 2010, jduriez@c1solimara-l
+	'OldName':'NewName', # Tue Mar 30 14:11:13 2010, sch50p@fluent-ph
+	'CapillaryCohesiveLaw':'CapillaryLaw', # Tue Mar 30 14:11:36 2010, sch50p@fluent-ph
+	'Simplecd':'/home/sch50p/YADE-bzr/yade/pkg/dem/PreProcessor', # Tue Mar 30 14:13:03 2010, sch50p@fluent-ph
+	'SimpleElasticRelationshipsWater':'Ip2_Frictmat_FrictMat_CapillaryLawPhys', # Tue Mar 30 14:20:36 2010, sch50p@fluent-ph
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

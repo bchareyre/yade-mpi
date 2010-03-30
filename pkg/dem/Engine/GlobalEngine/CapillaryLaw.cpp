@@ -11,7 +11,7 @@
 //FIXME : dans triaxialStressController, changer le test de nullité de la force dans updateStiffness
 //FIXME : needs "requestErase" somewhere
 
-#include "CapillaryCohesiveLaw.hpp"
+#include "CapillaryLaw.hpp"
 #include <yade/pkg-common/ElastMat.hpp>
 #include <yade/pkg-dem/ScGeom.hpp>
 
@@ -24,11 +24,11 @@
 #include <iostream>
 #include <fstream>
 
-YADE_PLUGIN((CapillaryCohesiveLaw));
+YADE_PLUGIN((CapillaryLaw));
 
 using namespace std;
 
-// CapillaryCohesiveLaw::CapillaryCohesiveLaw() : GlobalEngine()
+// CapillaryLaw::CapillaryLaw() : GlobalEngine()
 // {
 //         sdecGroupMask=1;
 // 
@@ -40,7 +40,7 @@ using namespace std;
 // 
 // }
 
-void CapillaryCohesiveLaw::postProcessAttributes(bool deserializing){
+void CapillaryLaw::postProcessAttributes(bool deserializing){
   if(!deserializing) return;
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
@@ -78,12 +78,12 @@ MeniscusParameters::~MeniscusParameters()
 
 
 //FIXME : remove bool first !!!!!
-void CapillaryCohesiveLaw::action()
+void CapillaryLaw::action()
 {
 //	cerr << "capillaryLawAction" << endl;
         //compteur1 = 0;
         //compteur2 = 0;
-        //cerr << "CapillaryCohesiveLaw::action" << endl;
+        //cerr << "CapillaryLaw::action" << endl;
 
 //         Scene * scene = static_cast<Scene*>(body);
         shared_ptr<BodyContainer>& bodies = scene->bodies;
@@ -288,7 +288,7 @@ void capillarylaw::fill(const char* filename)
 
 }
 
-void CapillaryCohesiveLaw::checkFusion()
+void CapillaryLaw::checkFusion()
 {
 
 	//Reset fusion numbers

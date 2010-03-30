@@ -20,7 +20,6 @@ class TriaxialStressController;
 class TriaxialCompressionEngine;
 class TriaxialStateRecorder;
 class CapillaryStressRecorder;
-class ContactStressRecorder;
 
 /*! \brief Isotropic compression + triaxial compression test
 
@@ -124,7 +123,6 @@ class TriaxialTestWater : public FileGenerator
 		shared_ptr<TriaxialStressController> triaxialstressController;
 		shared_ptr<TriaxialStateRecorder> triaxialStateRecorder;
 		shared_ptr<CapillaryStressRecorder> capillaryStressRecorder;
-		shared_ptr<ContactStressRecorder> contactStressRecorder;
 			
 		void createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents,bool wire);
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);

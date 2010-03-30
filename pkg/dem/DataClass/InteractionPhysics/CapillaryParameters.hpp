@@ -15,7 +15,7 @@ class CapillaryParameters : public FrictPhys
 		
 		virtual ~CapillaryParameters();
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryParameters,FrictPhys,"Physics (of interaction) for CapillaryCohesiveLaw. Rk: deprecated -> needs some work to be conform to the new formalism!",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryParameters,FrictPhys,"Physics (of interaction) for CapillaryLaw. Rk: deprecated -> needs some work to be conform to the new formalism!",
 				 ((bool,meniscus,false,"Presence of a meniscus if true"))
 				 ((Real,CapillaryPressure,0.,"Value of the capillary pressure Uc defines as Ugas-Uliquid"))
 				 ((Real,Vmeniscus,0.,"Volume of the menicus"))

@@ -11,40 +11,23 @@
 #include <yade/core/PartialEngine.hpp>
 #include <yade/lib-base/Math.hpp>
 
-class CapillaryCohesiveLaw;
+class CapillaryLaw;
 
 class CapillaryPressureEngine : public PartialEngine
 {
 	public :
-		shared_ptr<CapillaryCohesiveLaw>  capillaryCohesiveLaw;
-		//CapillaryCohesiveLaw* capillaryCohesiveLaw;
+		shared_ptr<CapillaryLaw>  capillaryCohesiveLaw;
+		//CapillaryLaw* capillaryCohesiveLaw; // which one is right?
 		
 		void action();
 		virtual ~CapillaryPressureEngine();
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryPressureEngine,PartialEngine,"Rk: this engine is deprecated and probably not very useful! It was designed to produce a variation of the capillary pressure (see CapillaryCohesiveLaw).",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryPressureEngine,PartialEngine,"Rk: this engine is deprecated and probably not very useful! It was designed to produce a variation of the capillary pressure (see CapillaryLaw).",
 		((Real,Pressure,0.,"Initial value of the capillary pressure Uc = Ugas-Uliquid. [Pa]."))
 		((Real,PressureVariation,0.,"Variation of the capillary pressure (each iteration). [Pa]")),
 		;
 		);
+	DECLARE_LOGGER;
 };
-REGISTER_SERIALIZABLE(CapillaryPressureEngine);
 
-//// OLD CODE!!!!
-// class CapillaryPressureEngine : public PartialEngine
-// {
-// 	public :
-// 		CapillaryPressureEngine();
-// 		virtual ~CapillaryPressureEngine();
-// 		
-// 		Real PressureVariation;
-// 		Real Pressure;
-// 		//shared_ptr<CapillaryCohesiveLaw>  capillaryCohesiveLaw;
-// 		CapillaryCohesiveLaw* capillaryCohesiveLaw;
-// 				
-// 		void action();
-// 	REGISTER_ATTRIBUTES(PartialEngine,(PressureVariation)(Pressure));
-// 	REGISTER_CLASS_NAME(CapillaryPressureEngine);
-// 	REGISTER_BASE_CLASS_NAME(PartialEngine);
-// };
-// REGISTER_SERIALIZABLE(CapillaryPressureEngine);
+REGISTER_SERIALIZABLE(CapillaryPressureEngine);

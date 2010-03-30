@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "SampleCapillaryPressureEngine.hpp"
-#include <yade/pkg-dem/CapillaryCohesiveLaw.hpp>
+#include <yade/pkg-dem/CapillaryLaw.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
@@ -17,24 +17,8 @@
 using namespace boost;
 using namespace std;
 
-// SampleCapillaryPressureEngine::SampleCapillaryPressureEngine()
-// {
-// 	capillaryCohesiveLaw = new CapillaryCohesiveLaw;
-// 	capillaryCohesiveLaw->CapillaryPressure= 0;
-// 	capillaryCohesiveLaw->sdecGroupMask = 2;	
-// 	StabilityCriterion=0.01;
-// 	SigmaPrecision = 0.001;
-// 	Phase1=false;
-// 	Phase1End = "Phase1End";
-// 	Iteration = 0;
-// 	UnbalancedForce = 0.01;
-// 	pressureVariationActivated=false;
-// 	Pressure = 0;
-// 	PressureVariation = 1000;
-// 	fusionDetection = true;
-// 	binaryFusion = true;	
-// 	pressureIntervalRec = 10000;
-// }
+YADE_PLUGIN((SampleCapillaryPressureEngine));
+CREATE_LOGGER(SampleCapillaryPressureEngine);
 
 SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 {
@@ -43,7 +27,6 @@ SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine()
 void SampleCapillaryPressureEngine::updateParameters()
 {
 	UnbalancedForce = ComputeUnbalancedForce(scene);
-	//if (Omega::instance().getCurrentIteration() % 100 == 0) cerr << "UnbalancedForce=" << UnbalancedForce << endl;
 
 	if (!Phase1 && UnbalancedForce<=StabilityCriterion && !pressureVariationActivated) {
 	  
@@ -88,3 +71,5 @@ void SampleCapillaryPressureEngine::action()
 		capillaryCohesiveLaw->action();
 		UnbalancedForce = ComputeUnbalancedForce(scene);
 }
+
+//YADE_REQUIRE_FEATURE(PHYSPAR);
