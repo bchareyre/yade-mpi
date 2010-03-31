@@ -25,33 +25,33 @@ CREATE_LOGGER(ThreeDTriaxialEngine);
 YADE_PLUGIN((ThreeDTriaxialEngine));
 
 
-ThreeDTriaxialEngine::ThreeDTriaxialEngine()
-{
-	translationAxisy=Vector3r(0,1,0);
-	translationAxisx=Vector3r(1,0,0);
-	translationAxisz=Vector3r(0,0,1);
-	strainRate1=0;
-	currentStrainRate1=0;
-	strainRate2=0;
-	currentStrainRate2=0;
-	strainRate2=0;
-	currentStrainRate2=0;
-	//StabilityCriterion=0.001;
-	UnbalancedForce = 1;
-	Key = "";
-	//Iteration = 0;
-	//testEquilibriumInterval = 20;
-	firstRun=true;
-	frictionAngleDegree = -1;
-	updateFrictionAngle=false;
-
-	stressControl_1=false;
-	stressControl_2=false;
-	stressControl_3=false;
-
- 	boxVolume=0;
-
-}
+// ThreeDTriaxialEngine::ThreeDTriaxialEngine()
+// {
+// 	translationAxisy=Vector3r(0,1,0);
+// 	translationAxisx=Vector3r(1,0,0);
+// 	translationAxisz=Vector3r(0,0,1);
+// 	strainRate1=0;
+// 	currentStrainRate1=0;
+// 	strainRate2=0;
+// 	currentStrainRate2=0;
+// 	strainRate2=0;
+// 	currentStrainRate2=0;
+// 	//StabilityCriterion=0.001;
+// 	UnbalancedForce = 1;
+// 	Key = "";
+// 	//Iteration = 0;
+// 	//testEquilibriumInterval = 20;
+// 	firstRun=true;
+// 	frictionAngleDegree = -1;
+// 	updateFrictionAngle=false;
+// 
+// 	stressControl_1=false;
+// 	stressControl_2=false;
+// 	stressControl_3=false;
+// 
+//  	boxVolume=0;
+// 
+// }
 
 ThreeDTriaxialEngine::~ThreeDTriaxialEngine()
 {	
@@ -87,27 +87,14 @@ void ThreeDTriaxialEngine::action()
 		wall_front_activated=false; wall_back_activated=false;
 		}
 
-		internalCompaction=false;  //is needed to avoid a control for internal compaction by the TriaxialStressController engine
+		//internalCompaction=false;  //is needed to avoid a control for internal compaction by the TriaxialStressController engine
 		
-		//isTriaxialCompression=false;
 		isAxisymetric=false; //is needed to avoid a stress control according the parameter sigma_iso (but according to sigma1, sigma2 and sigma3)
 	
 		firstRun=false;
 
 	}
 
-	
-	/*if ( Omega::instance().getCurrentIteration() % testEquilibriumInterval == 0 )
-	{
-	  //updateParameters ( ncb );
-		computeStressStrain ( ncb );
-
-		UnbalancedForce=ComputeUnbalancedForce ( ncb );
-
-		LOG_INFO("UnbalancedForce="<< UnbalancedForce);
-	
-	}*/
-	
 	
 	Real dt = Omega::instance().getTimeStep();
 
@@ -159,7 +146,7 @@ void ThreeDTriaxialEngine::action()
 		max_vel3 = 0.5*currentStrainRate3*depth;
 	}
 	
-	TriaxialStressController::action(); // this function is called to perform the external stress control
+	TriaxialStressController::action(); // this function is called to perform the external stress control or the internal compaction
 
 }
 
@@ -171,18 +158,7 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 		if (b->isDynamic)
 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}
-			
-// 	BodyContainer::iterator bi = bodies->begin();
-// 	BodyContainer::iterator biEnd = bodies->end();
-// 	
-// 	for ( ; bi!=biEnd; ++bi)	
-// 	{	
-// 		shared_ptr<Body> b = *bi;
-// 		if (b->isDynamic)
-// 
-// 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
-// 	}
-	
+				
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
 		if (!ii->isReal()) continue;
 		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((ii)->getId1())]->material);
@@ -195,22 +171,6 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 	}
   
-// 	InteractionContainer::iterator ii    = ncb->interactions->begin();
-// 	InteractionContainer::iterator iiEnd = ncb->interactions->end(); 
-// 	for(  ; ii!=iiEnd ; ++ii ) {
-// 		if (!(*ii)->isReal()) continue;
-// 		
-// 		const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((*ii)->getId1())]->material);
-// 		const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>((*bodies)[(body_id_t) ((*ii)->getId2())]->material);
-// 		
-// 		const shared_ptr<FrictPhys>& contactPhysics = static_pointer_cast<FrictPhys>((*ii)->interactionPhysics);
-// 
-// 		Real fa 	= sdec1->frictionAngle;
-// 		Real fb 	= sdec2->frictionAngle;
-// 
-// 		contactPhysics->frictionAngle			= std::min(fa,fb);
-// 		contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
-//	}
 } 
 
 

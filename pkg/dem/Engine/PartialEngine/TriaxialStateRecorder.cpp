@@ -9,7 +9,8 @@
 *************************************************************************/
 
 #include "TriaxialStateRecorder.hpp"
-#include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
+// #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include <yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-common/Sphere.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
@@ -26,28 +27,30 @@ void TriaxialStateRecorder::action ()
 	if(out.tellp()==0){
 		out<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE"<<endl;
 	}
-	if ( !triaxialCompressionEngine )
+
+	if ( !triaxialStressController )
 	{
 		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
 		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 		for ( ;itFirst!=itLast; ++itFirst )
 		{
-			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" ) //|| (*itFirst)->getBaseClassName() == "TriaxialCompressionEngine")
+
+			if ( ( *itFirst )->getClassName() == "TriaxialCompressionEngine" || ( *itFirst )->getClassName() == "ThreeDTriaxialEngine" )
 			{
 				LOG_DEBUG ( "stress controller engine found" );
-				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> ( *itFirst );
+				triaxialStressController =  YADE_PTR_CAST<TriaxialStressController> ( *itFirst );
 				//triaxialCompressionEngine = shared_ptr<TriaxialCompressionEngine> (static_cast<TriaxialCompressionEngine*> ( (*itFirst).get()));
 			}
 		}
-		if ( !triaxialCompressionEngine ) LOG_DEBUG ( "stress controller engine NOT found" );
+		if ( !triaxialStressController ) LOG_DEBUG ( "stress controller engine NOT found" );
 	}
-	if ( ! ( Omega::instance().getCurrentIteration() % triaxialCompressionEngine->computeStressStrainInterval == 0 ) )
-		triaxialCompressionEngine->computeStressStrain ();
+	if ( ! ( Omega::instance().getCurrentIteration() % triaxialStressController->computeStressStrainInterval == 0 ) )
+		triaxialStressController->computeStressStrain ();
 
 	/// Compute kinetic energy and porosity :
 
 	Real Vs=0, kinematicE = 0;
-	Real V = ( triaxialCompressionEngine->height ) * ( triaxialCompressionEngine->width ) * ( triaxialCompressionEngine->depth );
+	Real V = ( triaxialStressController->height ) * ( triaxialStressController->width ) * ( triaxialStressController->depth );
 
 	BodyContainer::iterator bi = scene->bodies->begin();
 	BodyContainer::iterator biEnd = scene->bodies->end();
@@ -65,13 +68,13 @@ void TriaxialStateRecorder::action ()
 	porosity = ( V - Vs ) /V;
 	
 	out << lexical_cast<string> ( Omega::instance().getCurrentIteration() ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[0] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[1] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->strain[2] ) << " "
- 	<< lexical_cast<string> ( triaxialCompressionEngine->ComputeUnbalancedForce () ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->stress[triaxialStressController->wall_right][0] ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->stress[triaxialStressController->wall_top][1] ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->stress[triaxialStressController->wall_front][2] ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->strain[0] ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->strain[1] ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->strain[2] ) << " "
+ 	<< lexical_cast<string> ( triaxialStressController->ComputeUnbalancedForce () ) << " "
  	<< lexical_cast<string> ( porosity ) << " "
  	<< lexical_cast<string> ( kinematicE )
  	<< endl;

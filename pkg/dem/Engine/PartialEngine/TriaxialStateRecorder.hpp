@@ -21,17 +21,18 @@
  */
 
 
-class TriaxialCompressionEngine;
+class TriaxialStressController;
 
 class TriaxialStateRecorder : public Recorder
 {
 	private :
-		shared_ptr<TriaxialCompressionEngine> triaxialCompressionEngine;
+		shared_ptr<TriaxialStressController> triaxialStressController; 
 		bool changed;
 	public :
 		virtual ~TriaxialStateRecorder ();
 		virtual void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(TriaxialStateRecorder,Recorder,"Engine recording triaxial variables (needs :yref:TriaxialCompressionEngine present in the simulation).",
+
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(TriaxialStateRecorder,Recorder,"Engine recording triaxial variables (needs :yref:TriaxialCompressionEngine or :yref:ThreeDTriaxialEngine present in the simulation).",
 		((Real,porosity,1,"porosity of the packing [-]")), //Is it really needed to have this value as a serializable?
 		initRun=true;
 		);
