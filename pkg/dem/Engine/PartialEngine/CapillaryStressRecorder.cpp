@@ -9,8 +9,8 @@
 #include "CapillaryStressRecorder.hpp"
 #include <yade/pkg-common/Sphere.hpp>
 #include <yade/pkg-common/ElastMat.hpp>
-#include <yade/pkg-dem/CapillaryParameters.hpp>
-#include <yade/pkg-dem/CapillaryLaw.hpp>
+#include <yade/pkg-dem/CapillaryPhys.hpp>
+#include <yade/pkg-dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
 #include <yade/pkg-dem/TriaxialCompressionEngine.hpp>
 
 #include <yade/core/Omega.hpp>
@@ -61,7 +61,7 @@ void CapillaryStressRecorder::action()
                 {	
                 	const shared_ptr<Interaction>& interaction = *ii;
                 
-                	CapillaryParameters* meniscusParameters = static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
+                	CapillaryPhys* meniscusParameters = static_cast<CapillaryPhys*>(interaction->interactionPhysics.get());
                         
                         if (meniscusParameters->meniscus)
                         {

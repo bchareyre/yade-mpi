@@ -7,15 +7,15 @@
 *************************************************************************/
 
 //Modifs : Parameters renamed as MeniscusParameters
-//id1/id2 classés pour que id1 soit toujours le plus petit grain, FIXME : angle de mouillage?
-//FIXME : dans triaxialStressController, changer le test de nullité de la force dans updateStiffness
+//id1/id2 as id1 is the smallest grain, FIXME : wetting angle?
+//FIXME : in triaxialStressController, change test about null force in updateStiffness
 //FIXME : needs "requestErase" somewhere
 
-#include "CapillaryLaw.hpp"
+#include "Law2_ScGeom_CapillaryPhys_Capillarity.hpp"
 #include <yade/pkg-common/ElastMat.hpp>
 #include <yade/pkg-dem/ScGeom.hpp>
 
-#include <yade/pkg-dem/CapillaryParameters.hpp>
+#include <yade/pkg-dem/CapillaryPhys.hpp>
 #include <yade/core/Omega.hpp>
 #include <yade/core/Scene.hpp>
 #include <yade/lib-base/Math.hpp>
@@ -24,11 +24,11 @@
 #include <iostream>
 #include <fstream>
 
-YADE_PLUGIN((CapillaryLaw));
+YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 
 using namespace std;
 
-// CapillaryLaw::CapillaryLaw() : GlobalEngine()
+// Law2_ScGeom_CapillaryPhys_Capillarity::Law2_ScGeom_CapillaryPhys_Capillarity() : GlobalEngine()
 // {
 //         sdecGroupMask=1;
 // 
@@ -40,7 +40,7 @@ using namespace std;
 // 
 // }
 
-void CapillaryLaw::postProcessAttributes(bool deserializing){
+void Law2_ScGeom_CapillaryPhys_Capillarity::postProcessAttributes(bool deserializing){
   if(!deserializing) return;
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw); // ????????
@@ -78,22 +78,19 @@ MeniscusParameters::~MeniscusParameters()
 
 
 //FIXME : remove bool first !!!!!
-void CapillaryLaw::action()
+void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 {
 //	cerr << "capillaryLawAction" << endl;
         //compteur1 = 0;
         //compteur2 = 0;
-        //cerr << "CapillaryLaw::action" << endl;
+        //cerr << "Law2_ScGeom_CapillaryPhys_Capillarity::action" << endl;
 
-//         Scene * scene = static_cast<Scene*>(body);
         shared_ptr<BodyContainer>& bodies = scene->bodies;
 
         if (fusionDetection) {
-                if (!bodiesMenisciiList.initialized)
-                        bodiesMenisciiList.prepare(scene);
+                if (!bodiesMenisciiList.initialized) bodiesMenisciiList.prepare(scene);
                 //bodiesMenisciiList.display();
         }
-
 
         /// Non Permanents Links ///
 
@@ -111,45 +108,31 @@ void CapillaryLaw::action()
                         unsigned int id1 = interaction->getId1();
                         unsigned int id2 = interaction->getId2();
 			
-			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
-                                continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
+			if( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  ) continue; // skip other groups, BTW: this is example of a good usage of 'continue' keyword
 			
-                        /// interaction geometry search
+                        /// interaction geometry search (this test is to compute capillarity only between spheres (probably a better way to do that)
 			int geometryIndex1 = (*bodies)[id1]->shape->getClassIndex(); // !!!
-                        //cerr << "geo1 =" << geometryIndex1 << endl;
                         int geometryIndex2 = (*bodies)[id2]->shape->getClassIndex();
-                        //cerr << "geo2 =" << geometryIndex2 << endl;
 
-                        if (!(geometryIndex1 == geometryIndex2))
-                                continue;
+                        if (!(geometryIndex1 == geometryIndex2)) continue;
 
-                        /// definition of interacting objects (not in contact)
-
-//                         BodyMacroParameters* de1 		=
-//                                 static_cast<BodyMacroParameters*>((*bodies)[id1]->physicalParameters.get());
-//                         BodyMacroParameters* de2 		=
-//                                 static_cast<BodyMacroParameters*>((*bodies)[id2]->physicalParameters.get());
-			
+                        /// definition of interacting objects (not necessarily in contact)
+	
 			Body* b1 = (*bodies)[id1].get();
 			Body* b2 = (*bodies)[id2].get();
 
-                        ScGeom* currentContactGeometry 	=
-                                static_cast<ScGeom*>(interaction->interactionGeometry.get());
-
-                        CapillaryParameters* currentContactPhysics 	=
-                                static_cast<CapillaryParameters*>(interaction->interactionPhysics.get());
+                        ScGeom* currentContactGeometry = static_cast<ScGeom*>(interaction->interactionGeometry.get());
+                        CapillaryPhys* currentContactPhysics = static_cast<CapillaryPhys*>(interaction->interactionPhysics.get());
 
                         /// Capillary components definition:
 
-                        Real liquidTension = 0.073; 	// superficial water tension N/m (20�C)
-
-                        //Real teta = 0;		// mouillage parfait (eau pure/billes de verre)
+                        Real liquidTension = 0.073; 	// superficial water tension N/m (0.073 is water tension at 20 Celsius degrees)
+                        //Real teta = 0;		// perfect wetting (as in the case of pure water and glass beads)
 
                         /// Interacting Grains:
-                        // definition du rapport tailleReelle/TailleYADE
-
-                        Real alpha=1; // OK si pas de gravite!!!
-
+                        // If you want to define a ratio between YADE sphere size and real sphere size (Rk: OK if no gravity is accounted for)
+                        Real alpha=1; 
+			
                         Real R1 = 0;
                         R1=alpha*std::min(currentContactGeometry->radius2,currentContactGeometry->radius1 ) ;
                         Real R2 = 0;
@@ -158,78 +141,57 @@ void CapillaryLaw::action()
 
                         /// intergranular distance
 
-                        Real D = alpha*(b2->state->pos-b1->state->pos).Length()-alpha*(                       currentContactGeometry->radius1+ currentContactGeometry->radius2);
-
-// 			Real intergranularDistance = currentContactGeometry->penetrationDepth;
-			//cerr << "D = " << intergranularDistance << endl;
+                        Real D = alpha*(b2->state->pos-b1->state->pos).Length()-alpha*(currentContactGeometry->radius1+ currentContactGeometry->radius2); // scGeom->penetrationDepth could probably be used here?
 
                         if ((currentContactGeometry->penetrationDepth>=0)||(D<=0)) //||(Omega::instance().getCurrentIteration() < 1) ) // a simplified way to define meniscii everywhere
 			{
-                                D=0;
-				//intergranularDistance = 0;	// def Fcap when spheres interpenetrate//FIXME : lead to wrong interpolation? D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
-                                if (fusionDetection && !currentContactPhysics->meniscus)                   bodiesMenisciiList.insert((*ii));
+                                D=0; // defines Fcap when spheres interpenetrate //FIXME : D<0 leads to wrong interpolation has D<0 has no solution in the interpolation : this is not physically interpretable!! even if, interpenetration << grain radius.
+                                if (fusionDetection && !currentContactPhysics->meniscus) bodiesMenisciiList.insert((*ii));
                                 currentContactPhysics->meniscus=true;
                         }
 
-			//currentContactPhysics->meniscus=true; /// a way to create menisci everywhere			
-
-                        //Real Dinterpol = -(intergranularDistance)/R2;
 			Real Dinterpol = D/R2;
+			
+			//currentContactPhysics->meniscus=true; /// a way to create menisci everywhere	
 
                         /// Suction (Capillary pressure):
 
                         Real Pinterpol =CapillaryPressure*(R2/liquidTension);
                         currentContactPhysics->CapillaryPressure = CapillaryPressure;
 
-                        //Real r = R2/R1;
-
                         /// Capillary solution finder:
                         //cerr << "solution finder " << endl;
 
                         if ((Pinterpol>=0) && (currentContactPhysics->meniscus==true)) 
 			{	//cerr << "Pinterpol = "<< Pinterpol << endl;
-
                                 MeniscusParameters
                                 solution(capillary->Interpolate(R1,R2,Dinterpol, Pinterpol, currentContactPhysics->currentIndexes));
 
                                 /// capillary adhesion force
 
                                 Real Finterpol = solution.F;
-                                Vector3r Fcap =
-                                        Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->
-                                        normal; /// unites !!!
+                                Vector3r Fcap = Finterpol*(2*Mathr::PI*(R2/alpha)*liquidTension)*currentContactGeometry->normal; /// unit !!!
 
                                 currentContactPhysics->Fcap = Fcap;
 
                                 /// meniscus volume
 
                                 Real Vinterpol = solution.V;
-                                currentContactPhysics->Vmeniscus =                                       Vinterpol*(R2*R2*R2)/(alpha*alpha*alpha);
+                                currentContactPhysics->Vmeniscus = Vinterpol*(R2*R2*R2)/(alpha*alpha*alpha);
 
-                                if (currentContactPhysics->Vmeniscus != 0) {
-                                        currentContactPhysics->meniscus = true;
-                                        //cerr <<"currentContactPhysics->meniscus = true;"<<endl;
+                                if (currentContactPhysics->Vmeniscus != 0) { 
+					currentContactPhysics->meniscus = true; 
+					//cerr <<"currentContactPhysics->meniscus = true;"<<endl;
                                 } else {
-                                        if (fusionDetection)
-                                                bodiesMenisciiList.remove((*ii));
-                                        currentContactPhysics->meniscus = false;
+					if (fusionDetection) bodiesMenisciiList.remove((*ii));
+					currentContactPhysics->meniscus = false;
 					scene->interactions->requestErase(id1,id2);
-                                        //cerr <<"currentContactPhysics->meniscus = false;"<<endl;
+					//cerr <<"currentContactPhysics->meniscus = false;"<<endl;
                                 }
 
                                 /// wetting angles
-                                /// wetting angles
                                 currentContactPhysics->Delta1 = max(solution.delta1,solution.delta2);
                                 currentContactPhysics->Delta2 = min(solution.delta1,solution.delta2);
-
-//                                 if (currentContactGeometry->radius2 > currentContactGeometry->radius1)
-// 				{
-//                                         currentContactPhysics->Delta1 = solution.delta1;
-//                                         currentContactPhysics->Delta2 = solution.delta2;
-//                                 } else {
-//                                         currentContactPhysics->Delta1 = solution.delta2;
-//                                         currentContactPhysics->Delta2 = solution.delta1;
-//                                 }
 
                                 currentContactPhysics->prevNormal = currentContactGeometry->normal;
 
@@ -239,14 +201,13 @@ void CapillaryLaw::action()
 			bodiesMenisciiList.remove((*ii));//
         }
 
-        if (fusionDetection)
-                checkFusion();
+        if (fusionDetection) checkFusion();
 
         for(ii= scene->interactions->begin(); ii!=iiEnd ; ++ii ) 
 	{	//cerr << "interaction " << ii << endl;
                 if ((*ii)->isReal()) 
 		{
-                        CapillaryParameters* currentContactPhysics	=	static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get());
+                        CapillaryPhys* currentContactPhysics	=	static_cast<CapillaryPhys*>((*ii)->interactionPhysics.get());
                         if (currentContactPhysics->meniscus) 
 			{
                                 if (fusionDetection) 
@@ -264,18 +225,15 @@ void CapillaryLaw::action()
 					else if (currentContactPhysics->fusionNumber !=0)
 						currentContactPhysics->Fcap /= (currentContactPhysics->fusionNumber+1);
                                 }
-											scene->forces.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
-											scene->forces.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
-
-				//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
-
+			scene->forces.addForce((*ii)->getId1(), currentContactPhysics->Fcap);
+			scene->forces.addForce((*ii)->getId2(),-currentContactPhysics->Fcap);
+			//cerr << "id1/id2 " << (*ii)->getId1() << "/" << (*ii)->getId2() << " Fcap= " << currentContactPhysics->Fcap << endl;
+			
                         }
-					 }
+		}
         }
 
-
-        //if (fusionDetection)
-                //bodiesMenisciiList.display();
+        //if (fusionDetection) bodiesMenisciiList.display();
         //cerr << "end of capillarylaw" << endl;
 }
 
@@ -288,14 +246,12 @@ void capillarylaw::fill(const char* filename)
 
 }
 
-void CapillaryLaw::checkFusion()
+void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 {
-
 	//Reset fusion numbers
 	InteractionContainer::iterator ii    = scene->interactions->begin();
         InteractionContainer::iterator iiEnd = scene->interactions->end();
-        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->fusionNumber=0;
-	
+        for( ; ii!=iiEnd ; ++ii ) if ((*ii)->isReal()) static_cast<CapillaryPhys*>((*ii)->interactionPhysics.get())->fusionNumber=0;
 	
 	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
 	Real angle1, angle2;
@@ -309,14 +265,14 @@ void CapillaryLaw::checkFusion()
 			for ( firstMeniscus=bodiesMenisciiList[i].begin(); firstMeniscus!=lastMeniscus; ++firstMeniscus )//FOR EACH MENISCUS ON THIS BODY...
 			{
 				//if (*firstMeniscus)->isReal();
-				CapillaryParameters* interactionPhysics1 = YADE_CAST<CapillaryParameters*>((*firstMeniscus)->interactionPhysics.get());
+				CapillaryPhys* interactionPhysics1 = YADE_CAST<CapillaryPhys*>((*firstMeniscus)->interactionPhysics.get());
 				currentMeniscus = firstMeniscus; ++currentMeniscus;
 				
 				if (i == (*firstMeniscus)->getId1()) angle1=interactionPhysics1->Delta1;//get angle of meniscus1 on body i
 				else angle1=interactionPhysics1->Delta2;
 
 				for ( ;currentMeniscus!= lastMeniscus; ++currentMeniscus) {//... CHECK FUSION WITH ALL OTHER MENISCII ON THE BODY
-					CapillaryParameters* interactionPhysics2 = YADE_CAST<CapillaryParameters*>((*currentMeniscus)->interactionPhysics.get());
+					CapillaryPhys* interactionPhysics2 = YADE_CAST<CapillaryPhys*>((*currentMeniscus)->interactionPhysics.get());
 
 					if (i == (*currentMeniscus)->getId1()) angle2=interactionPhysics2->Delta1;//get angle of meniscus2 on body i
 					else angle2=interactionPhysics2->Delta2;
@@ -389,9 +345,7 @@ MeniscusParameters capillarylaw::Interpolate(Real R1, Real R2, Real D, Real P, i
                 Real data_R = data_complete[i].R;
                 //cerr << "i = " << i << endl;
 
-                if (data_R > R)	// Attention � l'ordre ds lequel
-                        //vont �tre rang�s les tableau R (croissant)
-
+                if (data_R > R)	// Attention a l'ordre ds lequel vont etre ranges les tableau R (croissant)
                 {
                         Tableau& tab_inf=data_complete[i-1];
                         Tableau& tab_sup=data_complete[i];
@@ -445,7 +399,7 @@ Tableau::Tableau(const char* filename)
         for (int i=0; i<n_D; i++)
                 full_data.push_back(TableauD(file));
         file.close();
-        //cerr << *this;	// exemple d'utilisation de la fonction d'�criture (this est le pointeur vers l'objet courant)
+        //cerr << *this;	// exemple d'utilisation de la fonction d'ecriture (this est le pointeur vers l'objet courant)
 }
 
 Tableau::~Tableau()
@@ -487,10 +441,9 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
 }
 
 TableauD::TableauD()
-{} // ?? constructeur
+{} 
 
 TableauD::TableauD(ifstream& file)
-
 {
         int i=0;
         Real x;
@@ -513,7 +466,6 @@ TableauD::TableauD(ifstream& file)
 }
 
 MeniscusParameters TableauD::Interpolate3(Real P, int& index)
-
 {	//cerr << "interpolate3" << endl;
         MeniscusParameters result;
         int dataSize = data.size();
@@ -587,7 +539,7 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
 }
 
 TableauD::~TableauD()
-{} // ?? destructeur
+{}
 
 std::ostream& operator<<(std::ostream& os, Tableau& T)
 {
@@ -633,7 +585,7 @@ bool BodiesMenisciiList::prepare(Scene * scene)
         InteractionContainer::iterator iiEnd = scene->interactions->end();
         for(  ; ii!=iiEnd ; ++ii ) {
                 if ((*ii)->isReal()) {
-                	if (static_cast<CapillaryParameters*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);
+                	if (static_cast<CapillaryPhys*>((*ii)->interactionPhysics.get())->meniscus) insert(*ii);
                 }
         }
                 	

@@ -10,9 +10,9 @@
 #include "TriaxialTestWater.hpp"
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
-#include <yade/pkg-dem/CapillaryLaw.hpp>
+#include <yade/pkg-dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
 // #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
-#include<yade/pkg-dem/Ip2_Frictmat_FrictMat_CapillaryLawPhys.hpp>
+#include<yade/pkg-dem/Ip2_FrictMat_FrictMat_CapillaryPhys.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -403,7 +403,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	/// OLD
 	//interactionPhysicsDispatcher->add("BodyMacroParameters","BodyMacroParameters","MacroMicroElasticRelationshipsWater");
 	/// NEW
-	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_Frictmat_FrictMat_CapillaryLawPhys);
+	shared_ptr<InteractionPhysicsFunctor> ss(new Ip2_FrictMat_FrictMat_CapillaryPhys);
 	interactionPhysicsDispatcher->add(ss);
 	
 		
@@ -429,7 +429,7 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	
 
 	// capillary
-	shared_ptr<CapillaryLaw> capillaryCohesiveLaw(new CapillaryLaw); 
+	shared_ptr<Law2_ScGeom_CapillaryPhys_Capillarity> capillaryCohesiveLaw(new Law2_ScGeom_CapillaryPhys_Capillarity); 
 	capillaryCohesiveLaw->sdecGroupMask = 2;	
 	capillaryCohesiveLaw->CapillaryPressure = CapillaryPressure;
 // 	capillaryCohesiveLaw->fusionDetection = fusionDetection;

@@ -130,6 +130,11 @@ _deprecated={
 	'CapillaryCohesiveLaw':'CapillaryLaw', # Tue Mar 30 14:11:36 2010, sch50p@fluent-ph
 	'Simplecd':'/home/sch50p/YADE-bzr/yade/pkg/dem/PreProcessor', # Tue Mar 30 14:13:03 2010, sch50p@fluent-ph
 	'SimpleElasticRelationshipsWater':'Ip2_Frictmat_FrictMat_CapillaryLawPhys', # Tue Mar 30 14:20:36 2010, sch50p@fluent-ph
+	'OldName':'NewName', # Wed Mar 31 09:22:48 2010, sch50p@fluent-ph
+	'CapillaryLaw':'Law2_ScGeom_CapillaryPhys_Capillarity', # Wed Mar 31 09:23:36 2010, sch50p@fluent-ph
+	'CapillaryParameters':'CapillaryPhys', # Wed Mar 31 09:25:03 2010, sch50p@fluent-ph
+	'Ip2_FrictMat_FrictMat_CapillaryLawPhys':'Ip2_FrictMat_FrictMat_CapillaryPhys', # Wed Mar 31 09:26:04 2010, sch50p@fluent-ph
+	'Ip2_Frictmat_FrictMat_CapillaryLawPhys':'Ip2_FrictMat_FrictMat_CapillaryPhys', # Wed Mar 31 09:26:56 2010, sch50p@fluent-ph
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

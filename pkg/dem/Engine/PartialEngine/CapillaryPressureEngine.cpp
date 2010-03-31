@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "CapillaryPressureEngine.hpp"
-#include <yade/pkg-dem/CapillaryLaw.hpp>
+#include <yade/pkg-dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
 #include <yade/core/Scene.hpp>
 
 YADE_PLUGIN((CapillaryPressureEngine));

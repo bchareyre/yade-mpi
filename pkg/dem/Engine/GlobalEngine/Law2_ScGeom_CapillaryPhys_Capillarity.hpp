@@ -1,5 +1,5 @@
 //
-// C++ Interface: CapillaryLaw
+// C++ Interface: Law2_ScGeom_CapillaryPhys_Capillarity
 /*************************************************************************
 *  Copyright (C) 2006 by luc Scholtes                                    *
 *  luc.scholtes@hmg.inpg.fr                                              *
@@ -14,7 +14,6 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
-// ajouts
 #include <vector>
 #include <list>
 #include <utility>
@@ -23,13 +22,13 @@
 #include <string>
 
 /**
-This law allows to take into account capillary cohesion between spheres as a result of interparticular liquid bridges (menisci).
+This law allows to take into account capillary forces/effects between spheres coming from the presence of interparticular liquid bridges (menisci).
 refs:
 - (french, lot of documentation) L. Scholtes, PhD thesis -> http://tel.archives-ouvertes.fr/tel-00363961/en/
 - (english, less...) L. Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75 
 
-The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry
-The control parameter is the capillary pressure (or suction) Delta_u = u_gas - u_liquid
+The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry and must be placed in the bin directory (where yade exec file is situated) to be taken into account.
+The control parameter is the capillary pressure (or suction) Delta_u, defined as the difference between gas and liquid pressure: Delta_u = u_gas - u_liquid
 Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of Delta_u and the interacting geometry (spheres radii and interparticular distance)
 
 Rk: - the formulation is valid only for pendular menisci involving two grains (pendular regime).
@@ -39,7 +38,7 @@ Rk: - the formulation is valid only for pendular menisci involving two grains (p
 
 /// !!! This version is deprecated. It should be updated to the new formalism -> ToDo !!!
 
-/// a class to store meniscus parameters -> Rk: is it really needed since CapillaryParameters exist?
+/// a class to store meniscus parameters -> Rk: is it really needed since CapillaryPhys exist?
 class MeniscusParameters
 {
 public :
@@ -84,27 +83,7 @@ class BodiesMenisciiList
 };
 
 /// This is the constitutive law
-// class CapillaryLaw : public InteractionSolver
-// {
-// 	public :
-// 		int sdecGroupMask;
-// 		Real CapillaryPressure;
-// 		bool fusionDetection;//If yes, a BodiesMenisciiList is maintained and updated at each time step
-// 		bool binaryFusion;//if true, capillary forces are set to zero as soon as 1 fusion at least is detected
-// 		void checkFusion(Scene * ncb);
-// 		shared_ptr<capillarylaw> capillary;
-// 		BodiesMenisciiList bodiesMenisciiList;
-// 						
-// 		CapillaryLaw();
-// 		void action(Scene * ncb);
-// 		REGISTER_ATTRIBUTES(InteractionSolver,(sdecGroupMask)(CapillaryPressure)(fusionDetection)(binaryFusion));
-// 		virtual void postProcessAttributes(bool deserializing);
-// 	REGISTER_CLASS_NAME(CapillaryLaw);
-// 	REGISTER_BASE_CLASS_NAME(InteractionSolver);
-// 
-// };
-
-class CapillaryLaw : public GlobalEngine
+class Law2_ScGeom_CapillaryPhys_Capillarity : public GlobalEngine
 {
 	public :
 		void checkFusion();
@@ -114,9 +93,9 @@ class CapillaryLaw : public GlobalEngine
 		void action();
 		virtual void postProcessAttributes(bool deserializing);
 		
-	YADE_CLASS_BASE_DOC_ATTRS(CapillaryLaw,GlobalEngine,"Rk: deprecated -> needs some work to be conform to the new formalism! This law allows to take into account capillary cohesion between spheres as a result of interparticular liquid bridges (menisci). refs: 1- infrench, (lot of documentation) L. Scholtes, PhD thesis -> http://tel.archives-ouvertes.fr/tel-00363961/en/ - 2 in english (less documentation) L. Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75. The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry. The control parameter is the capillary pressure (or suction) Uc = Cgas - Uliquid. Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of the defined capillary pressure and of the interacting geometry (spheres radii and interparticular distance).",
+	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CapillaryPhys_Capillarity,GlobalEngine,"Rk: this engine is deprecated -> needs some work to be conform with the new formalism! This law allows to take into account capillary forces/effects between spheres coming from the presence of interparticular liquid bridges (menisci). refs: 1- infrench, (lot of documentation) L. Scholtes, PhD thesis -> http://tel.archives-ouvertes.fr/tel-00363961/en/ - 2 in english (less documentation) L. Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75. The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). These ASCII files contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry. The control parameter is the capillary pressure (or suction) Uc = Cgas - Uliquid. Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of the defined capillary pressure and of the interacting geometry (spheres radii and interparticular distance).",
 				  ((int,sdecGroupMask,1,"? the interaction only considers particles with same mask ?"))
-				  ((Real,CapillaryPressure,0.,"Value of the capillary pressure Uc defines as Ugas-Uliquid"))
+				  ((Real,CapillaryPressure,0.,"Value of the capillary pressure Uc defines as Uc=Ugas-Uliquid"))
 				  ((bool,fusionDetection,false,"If true potential menisci overlaps are checked"))
 				  ((bool,binaryFusion,true,"If true, capillary forces are set to zero as soon as, at least, 1 overlap (menisci fusion) is detected"))
 				  );
@@ -163,7 +142,7 @@ class capillarylaw
 		void fill (const char* filename);
 };
 
-REGISTER_SERIALIZABLE(CapillaryLaw);
+REGISTER_SERIALIZABLE(Law2_ScGeom_CapillaryPhys_Capillarity);
 
 
 

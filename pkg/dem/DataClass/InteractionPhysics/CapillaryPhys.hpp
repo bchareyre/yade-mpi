@@ -8,14 +8,14 @@
 #pragma once
 #include<yade/pkg-dem/FrictPhys.hpp>
 
-class CapillaryParameters : public FrictPhys
+class CapillaryPhys : public FrictPhys
 {
 	public :
 		int currentIndexes [4]; // used for faster interpolation (stores previous positions in tables)
 		
-		virtual ~CapillaryParameters();
+		virtual ~CapillaryPhys();
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryParameters,FrictPhys,"Physics (of interaction) for CapillaryLaw. Rk: deprecated -> needs some work to be conform to the new formalism!",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CapillaryPhys,FrictPhys,"Physics (of interaction) for Law2_ScGeom_CapillaryPhys_Capillarity. Rk: deprecated -> needs some work to be conform with the new formalism!",
 				 ((bool,meniscus,false,"Presence of a meniscus if true"))
 				 ((Real,CapillaryPressure,0.,"Value of the capillary pressure Uc defines as Ugas-Uliquid"))
 				 ((Real,Vmeniscus,0.,"Volume of the menicus"))
@@ -25,30 +25,10 @@ class CapillaryParameters : public FrictPhys
 				 ((short int,fusionNumber,0.,"Indicates the number of meniscii that overlap with this one"))
 				 ,createIndex();currentIndexes[0]=currentIndexes[1]=currentIndexes[2]=currentIndexes[3]=0;
 				 );
-	REGISTER_CLASS_INDEX(CapillaryParameters,FrictPhys);
+	REGISTER_CLASS_INDEX(CapillaryPhys,FrictPhys);
 };
-REGISTER_SERIALIZABLE(CapillaryParameters);
+REGISTER_SERIALIZABLE(CapillaryPhys);
 
-// class CapillaryParameters : public FrictPhys
-// {
-// 	public :	Real	 Vmeniscus
-// 				,CapillaryPressure
-// 				,Delta1
-// 				,Delta2;
-// 				
-// 		Vector3r	Fcap;
-// 						
-// 		bool 		meniscus;
-// 		short int	fusionNumber;//number of meniscii that are overlaping with this one
-// 		int		currentIndexes [4];// used for faster interpolation (stores previous positions in tables)
-// 				
-// 		CapillaryParameters();
-// 		virtual ~CapillaryParameters();
-// 	REGISTER_ATTRIBUTES(FrictPhys,(Vmeniscus)(CapillaryPressure)(Fcap)(Delta1)(Delta2)(meniscus)(fusionNumber));
-// 	REGISTER_CLASS_NAME(CapillaryParameters);
-// 	REGISTER_BASE_CLASS_NAME(FrictPhys);
-// };
-// 
-// REGISTER_SERIALIZABLE(CapillaryParameters);
+
 
 

@@ -6,17 +6,17 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"Ip2_Frictmat_FrictMat_CapillaryLawPhys.hpp"
+#include"Ip2_FrictMat_FrictMat_CapillaryPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include <yade/pkg-dem/CapillaryParameters.hpp>
+#include <yade/pkg-dem/CapillaryPhys.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((Ip2_Frictmat_FrictMat_CapillaryLawPhys));
+YADE_PLUGIN((Ip2_FrictMat_FrictMat_CapillaryPhys));
 
-void Ip2_Frictmat_FrictMat_CapillaryLawPhys::go( const shared_ptr<Material>& b1 //FrictMat
+void Ip2_FrictMat_FrictMat_CapillaryPhys::go( const shared_ptr<Material>& b1 //FrictMat
 					, const shared_ptr<Material>& b2 // FrictMat
 					, const shared_ptr<Interaction>& interaction)
 {
@@ -35,9 +35,9 @@ void Ip2_Frictmat_FrictMat_CapillaryLawPhys::go( const shared_ptr<Material>& b1 
  			const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>(b1);
  			const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>(b2);
 			
- 			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());
-//			interaction->interactionPhysics = shared_ptr<CapillaryParameters>(new CapillaryParameters());
-			const shared_ptr<CapillaryParameters>& contactPhysics = YADE_PTR_CAST<CapillaryParameters>(interaction->interactionPhysics);
+ 			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<CapillaryPhys>(new CapillaryPhys());
+//			interaction->interactionPhysics = shared_ptr<CapillaryPhys>(new CapillaryPhys());
+			const shared_ptr<CapillaryPhys>& contactPhysics = YADE_PTR_CAST<CapillaryPhys>(interaction->interactionPhysics);
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
