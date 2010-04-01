@@ -25,8 +25,20 @@ Features of the interaction law:
 	  - It has not been tested for sphere/facet or sphere/wall interactions and could be updated to be used by DemXDofGeom
 */
 
+/** This class holds information associated with each body state*/
+class CFpmState: public State {
+	YADE_CLASS_BASE_DOC_ATTRS(CFpmState,State,"CFpm state information about each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
+		((int,numBrokenCohesive,0,"Number of (cohesive) contacts that damaged completely"))
+	);
+};
+REGISTER_SERIALIZABLE(CFpmState);
+
 /** This class holds information associated with each body */
 class CFpmMat: public FrictMat {
+	public:
+		virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new CFpmState); }
+		virtual bool stateTypeOk(State* s) const { return (bool)dynamic_cast<CFpmState*>(s); }
+		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CFpmMat,FrictMat,"cohesive frictional material, for use with other CFpm classes",
 	  ((int,type,0,"Type of the particle. If particles of two different types interact, it will be with friction only (no cohesion).[-]")),
 	  createIndex();
@@ -54,8 +66,8 @@ class CFpmPhys: public NormShearPhys {
 		  ((Vector3r,prevNormal,Vector3r::ZERO,"Normal to the contact at previous time step."))
 		  ((Vector3r,moment_twist,Vector3r::ZERO," [N.m]"))
 		  ((Vector3r,moment_bending,Vector3r::ZERO," [N.m]"))
-		  ((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),"Use for moment computation."))
-		  ((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),"Use for moment computation."))
+		  ((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),"Used for moment computation."))
+		  ((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),"Used for moment computation."))
 		  ,
 		  createIndex();
 		  ,

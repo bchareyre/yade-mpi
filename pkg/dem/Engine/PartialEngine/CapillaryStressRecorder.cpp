@@ -26,7 +26,7 @@ void CapillaryStressRecorder::action()
   
 	// at the beginning of the file; write column titles
 	if(out.tellp()==0){
-		out<<"iteration s11 s22 s33 e11 e22 e33 unb_force porosity kineticE"<<endl;
+		out<<"iteration Scap11 Scap22 Scap33 Scap12 Scap13 Scap23 Uc Sr w"<<endl;
 	}
 	if ( !triaxialCompressionEngine )
 	{
