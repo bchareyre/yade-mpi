@@ -161,7 +161,7 @@ class TriaxialStressController : public GlobalEngine
 			previousTranslation[i] = Vector3r::ZERO;
 			stiffness[i] = 0;
 			normal[i] = Vector3r::ZERO;
-			strain[i]=0}
+			strain[i]=0;}
 		for (int i=0; i<3; ++i) strain[i] = 0;
 		normal[wall_bottom].Y()=1;
 		normal[wall_top].Y()=-1;
