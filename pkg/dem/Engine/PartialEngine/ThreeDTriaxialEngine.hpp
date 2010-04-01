@@ -50,7 +50,7 @@ class ThreeDTriaxialEngine : public TriaxialStressController
 		"The engine perform a triaxial compression with a control in direction 'i' in stress (if stressControl_i) else in strain.\n\n"
 		"For a stress control the imposed stress is specified by 'sigma_i' with a 'max_veli' depending on 'strainRatei'. To obtain the same strain rate in stress control than in strain control you need to set 'wallDamping = 0.8'.\n"
 		" For a strain control the imposed strain is specified by 'strainRatei'.\n"
-		"With this engine you can also perform internal compaction by growing the size of particles by using :yref:TriaxialStressController::controlInternalStress . For that, just switch on 'internalCompaction=1' and fix sigma_iso=value of mean pressure that you want at the end of the internal compaction.\n"
+		"With this engine you can also perform internal compaction by growing the size of particles by using :yref:`TriaxialStressController::controlInternalStress`. For that, just switch on 'internalCompaction=1' and fix sigma_iso=value of mean pressure that you want at the end of the internal compaction.\n"
 		,
 		((Real, strainRate1,0,"target strain rate in direction 1 (./s)"))
 		((Real, currentStrainRate1,0,"current strain rate in direction 1 - converging to :yref:'ThreeDTriaxialEngine::strainRate1' (./s)"))

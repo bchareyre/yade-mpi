@@ -53,6 +53,8 @@ There are other classes, which are not strictly necessary:
 #include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-common/LawFunctor.hpp>
 
+namespace py=boost::python;
+
 /* Cpm state information about each body.
 None of that is used for computation (at least not now), only for post-processing.
 */
@@ -176,22 +178,22 @@ class Law2_Dem3DofGeom_CpmPhys_Cpm: public LawFunctor{
 		if(kappaD<epsCrackOnset || neverDamage) return 0;
 		return 1.-(epsCrackOnset/kappaD)*exp(-(kappaD-epsCrackOnset)/epsFracture);
 	}
+	//! return |sigmaT| at plastic surface for given sigmaN etc; not used by the law itself
+	Real yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle);
 
 	void go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody);
 
-	// utility functions
-	//! Update avgStress on all bodies (called from VTKRecorder and yade.eudoxos.particleConfinement)
-	//! Might be anywhere else as well (static method)
-	static void updateBodiesState(Scene*);
-
 	FUNCTOR2D(Dem3DofGeom,CpmPhys);
-	YADE_CLASS_BASE_DOC_ATTRS(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_Dem3DofGeom_CpmPhys_Cpm,LawFunctor,"Constitutive law for the :ref:`cpm-model`.",
 		((int,yieldSurfType,2,"yield function: 0: mohr-coulomb (original); 1: parabolic; 2: logarithmic, 3: log+lin_tension, 4: elliptic, 5: elliptic+log"))
 		((Real,yieldLogSpeed,.1,"scaling in the logarithmic yield surface (should be <1 for realistic results; >=0 for meaningful results)"))
 		((Real,yieldEllipseShift,NaN,"horizontal scaling of the ellipse (shifts on the +x axis as interactions with +y are given)"))
 		((Real,omegaThreshold,((void)">=1. to deactivate, i.e. never delete any contacts",1.),"damage after which the contact disappears (<1), since omega reaches 1 only for strain →+∞"))
 		((Real,epsSoft,((void)"approximates confinement -20MPa precisely, -100MPa a little over, -200 and -400 are OK (secant)",-3e-3),"Strain at which softening in compression starts (non-negative to deactivate)"))
-		((Real,relKnSoft,.25,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)"))
+		((Real,relKnSoft,.25,"Relative rigidity of the softening branch in compression (0=perfect elastic-plastic, <0 softening, >0 hardening)")),
+		/*ctor*/,
+		.def("funcG",&Law2_Dem3DofGeom_CpmPhys_Cpm::funcG,(py::arg("kappaD"),py::arg("epsCrackOnset"),py::arg("epsFracture"),py::arg("neverDamage")=false),"Damage evolution law, evaluating the :math:`\\omega` parameter. :math:`\\kappa_D` is historically maximum strain, *epsCrackOnset* (:math:`\\varepsilon_0`) = :yref:`CpmMat.epsCrackOnset`, *epsFracture* = :yref:`CpmMat.epsFracture`; if *neverDamage* is ``True``, the value returned will always be 0 (no damage).")
+		.def("yieldSigmaTMagnitude",&Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude,(py::arg("sigmaN"),py::arg("omega"),py::arg("undamagedCohesion"),py::arg("tanFrictionAngle")),"Return radius of yield surface for given material and state parameters; uses attributes of the current instance (*yieldSurfType* etc), change them before calling if you need that.")
 	);
 	DECLARE_LOGGER;
 };

@@ -116,14 +116,13 @@ namespace{
 
 // filter away 2nd element of a 2-tuple
 #define _STRIPDOC2(x,y,z) (BOOST_PP_TUPLE_ELEM(2,0,z))
-#define YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,deprec,extras) \
+#define _YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,deprec,extras) \
 	REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC2,thisClass,attrs),deprec) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
 	/* accessors for deprecated attributes, with warnings */ BOOST_PP_SEQ_FOR_EACH(_ACCESS_DEPREC,thisClass,deprec) \
 	/* python class registration */ virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec) extras ; }
 	// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
-#define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) \
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,extras)
+// #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,,extras)
 
 #define _STRIPDECL4(x,y,z) (( BOOST_PP_TUPLE_ELEM(4,1,z),BOOST_PP_TUPLE_ELEM(4,3,z) " :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "`" ))
 // return type name; (for declaration)
@@ -134,13 +133,11 @@ namespace{
 
 #define _DECLINI4(x,y,z) (( BOOST_PP_TUPLE_ELEM(4,1,z),BOOST_PP_TUPLE_ELEM(4,2,z) ))
 
-#define YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(thisClass,baseClass,docString,attrDecls,inits,ctor,extras) \
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(thisClass,baseClass,docString,attrDecls,,inits,ctor,extras)
 // the most general here
 #define YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(thisClass,baseClass,docString,attrDecls,deprec,inits,ctor,extras) \
 	public: BOOST_PP_SEQ_FOR_EACH(_ATTR_DECL,~,attrDecls) /* attribute declarations */ \
 	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(inits attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(inits attrDecls)), inits BOOST_PP_SEQ_FOR_EACH(_DECLINI4,~,attrDecls)) { ctor ; } /* ctor, with initialization of defaults */ \
-	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),deprec,extras)
+	_YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),deprec,extras)
 
 #define _STATATTR_PY(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,1,z)), &thisClass::BOOST_PP_TUPLE_ELEM(4,1,z), "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
 #define _STATATTR_DECL(x,y,z) static BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
@@ -195,6 +192,7 @@ Erite plain text. Paragraphs are separated by empty lines (\n\n in c strings). U
 #define YADE_CLASS_BASE_DOC_ATTRS(klass,base,doc,attrs)                 YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,,)
 #define YADE_CLASS_BASE_DOC_ATTRS_CTOR(klass,base,doc,attrs,ctor)       YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,ctor,)
 #define YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(klass,base,doc,attrs,ctor,py) YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,,ctor,py)
+#define YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(klass,base,doc,attrs,inits,ctor,py) YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(klass,base,doc,attrs,,inits,ctor,py)
 
 // for both fundamental and non-fundamental cases
 #define REGISTER_SERIALIZABLE_GENERIC(name,isFundamental) 						\

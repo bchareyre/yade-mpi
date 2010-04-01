@@ -12,6 +12,8 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
+#include<boost/array.hpp>
+
 class Scene;
 class State;
 
@@ -37,7 +39,7 @@ class TriaxialStressController : public GlobalEngine
 		int wall_id [6];
 //   		vector<int> wall_id;
 		//! Stores the value of the translation at the previous time step, stiffness, and normal
-		Vector3r	previousTranslation [6];
+		boost::array<Vector3r,6> previousTranslation;
 		//! The value of stiffness (updated according to stiffnessUpdateInterval) 
 		vector<Real>	stiffness;
 		Real 		strain [3];
@@ -144,32 +146,24 @@ class TriaxialStressController : public GlobalEngine
 		((Real,meanStress,0,""))
 		((Real,volumetricStrain,0,""))
  		,
-//    		/* extra initializers */
-//    		//((wall_id,vector<int>(6,0)))
-//    		((wall_bottom_id,wall_id[0]))
-// 		((wall_top_id,wall_id[1]))
-// 		((wall_left_id,wall_id[2]))
-// 		((wall_right_id,wall_id[3]))
-// 		((wall_front_id,wall_id[4]))
-// 		((wall_back_id,wall_id[5]))
+			/* extra initializers */
 		,
    		/* constructor */
    		first = true;
-		stiffness.resize(6);
-		for (int i=0; i<6; ++i){
-// 			wall_id[i] = 0;
-			previousTranslation[i] = Vector3r::ZERO;
-			stiffness[i] = 0;
-			normal[i] = Vector3r::ZERO;
-			strain[i]=0;}
-		for (int i=0; i<3; ++i) strain[i] = 0;
-		normal[wall_bottom].Y()=1;
-		normal[wall_top].Y()=-1;
-		normal[wall_left].X()=1;
-		normal[wall_right].X()=-1;
-		normal[wall_front].Z()=-1;
-		normal[wall_back].Z()=1;	
-		porosity=1;
+			stiffness.resize(6);
+			previousTranslation.assign(Vector3r::ZERO);
+			for (int i=0; i<6; ++i){
+				normal[i] = stress[i] = force[i] = Vector3r::ZERO;
+				stiffness[i] = 0;
+			}
+			for (int i=0; i<3; ++i) strain[i] = 0;
+			normal[wall_bottom].Y()=1;
+			normal[wall_top].Y()=-1;
+			normal[wall_left].X()=1;
+			normal[wall_right].X()=-1;
+			normal[wall_front].Z()=-1;
+			normal[wall_back].Z()=1;	
+			porosity=1;
 		,
  		.def_readonly("porosity",&TriaxialStressController::porosity,"")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"")

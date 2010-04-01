@@ -186,6 +186,7 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 			else epsN+=sigmaSoft/E+(BC->isoPrestress-sigmaSoft)/(E*relKnSoft);
 		}
 		CPM_MATERIAL_MODEL
+		//cerr<<"kappaD="<<kappaD<<", epsN="<<epsN<<", neverDamage="<<neverDamage<<", epsCrackOnset="<<epsCrackOnset<<", epsFracture="<<epsFracture<<", omega="<<omega<<"="<<funcG(kappaD,epsCrackOnset,epsFracture,neverDamage);
 	#else
 		// simplified public model
 		epsN+=BC->isoPrestress/E;
@@ -224,6 +225,16 @@ void Law2_Dem3DofGeom_CpmPhys_Cpm::go(shared_ptr<InteractionGeometry>& _geom, sh
 
 	applyForceAtContactPoint(BC->normalForce+BC->shearForce, contGeom->contactPoint, I->getId1(), contGeom->se31.position, I->getId2(), contGeom->se32.position, scene);
 }
+
+Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega, Real undamagedCohesion, Real tanFrictionAngle){
+#ifdef CPM_MATERIAL_MODEL
+	return CPM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
+#else
+	//return max((Real)0.,undamagedCohesion*(1-omega)-sigmaN*tanFrictionAngle);
+	throw std::runtime_error("Full CPM model not available in this build");
+#endif
+}
+
 
 #ifdef YADE_OPENGL
 	/********************** Gl1_CpmPhys ****************************/

@@ -47,30 +47,6 @@ Real elasticEnergyDensityInAABB(python::tuple Aabb){
 }
 #endif
 
-/* yield surface for the CPM model; this is used only to make yield surface plot from python, for debugging */
-Real yieldSigmaTMagnitude(Real sigmaN, const shared_ptr<Law2_Dem3DofGeom_CpmPhys_Cpm>& functor){
-	#ifdef CPM_YIELD_SIGMA_T_MAGNITUDE
-		/* find first suitable interaction */
-		Scene* rootBody=Omega::instance().getScene().get();
-		shared_ptr<Interaction> I;
-		FOREACH(I, *rootBody->interactions){
-			if(I->isReal()) break;
-		}
-		if(!I->isReal()) {LOG_ERROR("No real interaction found, returning NaN!"); return NaN; }
-		CpmPhys* BC=dynamic_cast<CpmPhys*>(I->interactionPhysics.get());
-		if(!BC) {LOG_ERROR("Interaction physics is not a CpmPhys instance, returning NaN!"); return NaN;}
-		const Real &omega(BC->omega); const Real& undamagedCohesion(BC->undamagedCohesion); const Real& tanFrictionAngle(BC->tanFrictionAngle);
-		const Real& yieldLogSpeed(functor->yieldLogSpeed);
-		const int& yieldSurfType(functor->yieldSurfType);
-		const Real& yieldEllipseShift(functor->yieldEllipseShift);
-		return CPM_YIELD_SIGMA_T_MAGNITUDE(sigmaN);
-	#else
-		LOG_FATAL("CPM model not available in this build.");
-		throw;
-	#endif
-}
-
-
 // copied from _utils.cpp
 Vector3r tuple2vec(const py::tuple& t){return Vector3r(py::extract<double>(t[0])(),py::extract<double>(t[1])(),py::extract<double>(t[2])());}
 
@@ -182,7 +158,6 @@ BOOST_PYTHON_MODULE(_eudoxos){
 	import_array();
 	YADE_SET_DOCSTRING_OPTS;
 	py::def("velocityTowardsAxis",velocityTowardsAxis,velocityTowardsAxis_overloads(py::args("axisPoint","axisDirection","timeToAxis","subtractDist","perturbation")));
-	py::def("yieldSigmaTMagnitude",yieldSigmaTMagnitude);
 	// def("spiralSphereStresses2d",spiralSphereStresses2d,(python::arg("dH_dTheta"),python::arg("axis")=2));
 	py::def("particleConfinement",particleConfinement);
 	py::def("testNumpy",testNumpy);

@@ -486,6 +486,7 @@ if env['PLATFORM']=='darwin':
 	env.Append(FRAMEWORKS=['CoreServices','Carbon'])
 else:
 	env.Append(LINKFLAGS=['-rdynamic','-z','origin']) 
+	if not env['debug']: env.Append(SHLINKFLAGS=['-W,--strip-all'])
 
 # makes dynamic library loading easier (no LD_LIBRARY_PATH) and perhaps faster
 env.Append(RPATH=runtimeLibDirs)

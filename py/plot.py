@@ -16,13 +16,13 @@ import pylab
 
 data={} # global, common for all plots: {'name':[value,...],...}
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
-plotsFilled={} # same as plots but with standalone plot specs filled to tuples (used internally only)
-plotLines={} # dictionary x-name -> Line2d objects (that hopefully still correspond to yspec in plots)
-needsFullReplot=True
+"Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
+labels={}
+#plotLines={} # dictionary x-name -> Line2d objects (that hopefully still correspond to yspec in plots)
 
 def reset():
-	global data, plots, plotsFilled, plotLines, needsFullReplot
-	data={}; plots={}; plotsFilled={}; plotLines={}; needsFullReplot=True; 
+	global data, plots, labels # plotLines
+	data={}; plots={}; # plotLines={};
 	pylab.close('all')
 
 def resetData():
@@ -31,32 +31,18 @@ def resetData():
 
 # we could have a yplot class, that would hold: (yspec,...), (Line2d,Line2d,...) ?
 
-
 plotDataCollector=None
 from yade.wrapper import *
-
-# no longer used
-maxDataLen=1000
-## no longer used
-def reduceData(l):
-	"""If we have too much data, take every second value and double the step for DateGetterEngine. This will keep the samples equidistant.
-	"""
-	if l>maxDataLen:
-		global plotDataCollector
-		if not plotDataCollector: plotDataCollector=O.labeledEngine('plotDataCollector') # will raise RuntimeError if not found
-		if plotDataCollector.mayStretch: # may we double the period without getting over limits?
-			plotDataCollector.stretchFactor=2. # just to make sure
-			print "Reducing data: %d > %d"%(l,maxDataLen)
-			for d in data: data[d]=data[d][::2]
-			for attr in ['virtPeriod','realPeriod','iterPeriod']:
-				if(plotDataCollector[attr]>0): plotDataCollector[attr]=2*plotDataCollector[attr]
 
 def splitData():
 	"Make all plots discontinuous at this point (adds nan's to all data fields)"
 	addData({})
 
-
 def reverseData():
+	"""Reverse yade.plot.data order.
+	
+	Useful for tension-compression test, where the initial (zero) state is loaded and, to make data continuous, last part must *end* in the zero state.
+	"""
 	for k in data: data[k].reverse()
 
 def addData(*d_in,**kw):
@@ -81,63 +67,61 @@ def addData(*d_in,**kw):
 		if name in d: data[name].append(d[name]) #numpy.append(data[name],[d[name]],1)
 		else: data[name].append(nan)
 
-def addPointTypeSpecifier(o):
+def _addPointTypeSpecifier(o):
 	"""Add point type specifier to simple variable name"""
 	if type(o) in [tuple,list]: return o
 	else: return (o,'')
-def tuplifyYAxis(pp):
+def _tuplifyYAxis(pp):
 	"""convert one variable to a 1-tuple"""
 	if type(pp) in [tuple,list]: return pp
 	else: return (pp,)
+def _xlateLabel(l):
+	"Return translated label; return l itself if not in the labels dict."
+	global labels
+	if l in labels.keys(): return labels[l]
+	else: return l
 
-def show(): plot()
-
-def plot():
-	pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
+def plot(noShow=False):
+	"""Show current plot, returning the figure object.
+	
+	If *noShow* is true, figure will not be shown on screen at all.
+	
+	You can use 
+	
+		>>> from yade import plot
+		>>> plot.plot(noShow=True).saveFig('someFile.pdf')
+		
+	to save the figure to file automatically.
+	"""
+	if not noShow: pylab.ion() ## # no interactive mode (hmmm, I don't know why actually...)
 	for p in plots:
 		pylab.figure()
-		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
-		plotsFilled[p]=plots_p
+		plots_p=[_addPointTypeSpecifier(o) for o in _tuplifyYAxis(plots[p])]
 		plots_p_y1,plots_p_y2=[],[]; y1=True
 		for d in plots_p:
 			if d[0]=='|||':
 				y1=False; continue
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
-		plotLines[p]=pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y1],[]))
-		pylab.legend([_p[0] for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
-		pylab.ylabel(','.join([_p[0] for _p in plots_p_y1]))
+		#plotLines[p]=
+		pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y1],[]))
+		pylab.legend([_xlateLabel(_p[0]) for _p in plots_p_y1],loc=('upper left' if len(plots_p_y2)>0 else 'best'))
+		pylab.ylabel(','.join([_xlateLabel(_p[0]) for _p in plots_p_y1]))
 		if len(plots_p_y2)>0:
 			# try to move in the color palette a little further (magenta is 5th): r,g,b,c,m,y,k
 			origLinesColor=pylab.rcParams['lines.color']; pylab.rcParams['lines.color']='m'
 			# create the y2 axis
 			pylab.twinx()
-			plotLines[p]+=[pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y2],[]))]
-			pylab.legend([_p[0] for _p in plots_p_y2],loc='upper right')
+			#plotLines[p]+=
+			[pylab.plot(*sum([[data[p],data[d[0]],d[1]] for d in plots_p_y2],[]))]
+			pylab.legend([_xlateLabel(_p[0]) for _p in plots_p_y2],loc='upper right')
 			pylab.rcParams['lines.color']=origLinesColor
-			pylab.ylabel(','.join([_p[0] for _p in plots_p_y2]))
-		pylab.xlabel(p)
+			pylab.ylabel(','.join([_xlateLabel(_p[0]) for _p in plots_p_y2]))
+		pylab.xlabel(_xlateLabel(p))
 		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
-	pylab.show()
+	if not noShow: pylab.show()
+	return pylab.gcf() # return current figure
 updatePeriod=0
-def periodicUpdate(period):
-	import time
-	global updatePeriod
-	while updatePeriod>0:
-		doUpdate()
-		time.sleep(updatePeriod)
-def startUpdate(period=10):
-	global updatePeriod
-	updatePeriod=period
-	import threading
-	threading.Thread(target=periodicUpdate,args=(period,),name='Thread-update').start()
-def stopUpdate():
-	global updatePeriod
-	updatePeriod=0
-def doUpdate():
-	pylab.close('all')
-	plot()
-
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None,varData=False):
 	"""baseName: used for creating baseName.gnuplot (command file for gnuplot),
@@ -174,10 +158,10 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 	i=0
 	for p in plots:
 		# print p
-		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
+		plots_p=[_addPointTypeSpecifier(o) for o in _tuplifyYAxis(plots[p])]
 		if term in ['wxt','x11']: fPlot.write("set term %s %d persist\n"%(term,i))
 		else: fPlot.write("set term %s; set output '%s.%d.%s'\n"%(term,baseNameNoPath,i,extension))
-		fPlot.write("set xlabel '%s'\n"%p)
+		fPlot.write("set xlabel '%s'\n"%_xlateLabel(p))
 		fPlot.write("set grid\n")
 		fPlot.write("set datafile missing 'nan'\n")
 		if title: fPlot.write("set title '%s'\n"%title)
@@ -187,13 +171,13 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 				y1=False; continue
 			if y1: plots_y1.append(d)
 			else: plots_y2.append(d)
-		fPlot.write("set ylabel '%s'\n"%(','.join([_p[0] for _p in plots_y1]))) 
+		fPlot.write("set ylabel '%s'\n"%(','.join([_xlateLabel(_p[0]) for _p in plots_y1]))) 
 		if len(plots_y2)>0:
-			fPlot.write("set y2label '%s'\n"%(','.join([_p[0] for _p in plots_y2])))
+			fPlot.write("set y2label '%s'\n"%(','.join([_xlateLabel(_p[0]) for _p in plots_y2])))
 			fPlot.write("set y2tics\n")
 		ppp=[]
-		for pp in plots_y1: ppp.append(" %s using %d:%d title '← %s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,pp[0],p,))
-		for pp in plots_y2: ppp.append(" %s using %d:%d title '%s(%s) →' with lines axes x1y2"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,pp[0],p,))
+		for pp in plots_y1: ppp.append(" %s using %d:%d title '← %s(%s)' with lines"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,_xlateLabel(pp[0]),_xlateLabel(p),))
+		for pp in plots_y2: ppp.append(" %s using %d:%d title '%s(%s) →' with lines axes x1y2"%(dataFile,vars.index(p)+1,vars.index(pp[0])+1,_xlateLabel(pp[0]),_xlateLabel(p),))
 		fPlot.write("plot "+",".join(ppp)+"\n")
 		i+=1
 	fPlot.close()
