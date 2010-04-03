@@ -42,7 +42,7 @@ bool MGPRecorder::isActivated(Scene*)
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void MGPRecorder::action(Scene * ncb)
+void MGPRecorder::action()
 {
   shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

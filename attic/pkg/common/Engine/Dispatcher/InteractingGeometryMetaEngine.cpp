@@ -12,7 +12,7 @@
 #include<yade/core/Scene.hpp>
 
 YADE_REQUIRE_FEATURE(geometricalmodel);
-void InteractingGeometryMetaEngine::action(Scene* ncb)
+void InteractingGeometryMetaEngine::action()
 {
 	const shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

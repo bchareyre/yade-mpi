@@ -56,7 +56,7 @@ bool ForceRecorder::isActivated(Scene*)
 }
 
 
-void ForceRecorder::action(Scene * ncb)
+void ForceRecorder::action()
 {
 	if (first) init();
 	ncb->forces.sync();

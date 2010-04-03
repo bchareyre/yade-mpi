@@ -97,7 +97,7 @@ bool BeamRecorder::isActivated(Scene*)
 }
 
 
-void BeamRecorder::action(Scene * ncb)
+void BeamRecorder::action()
 {
 //	std::cerr << "BeamRecorder quits\n";
 //	return;

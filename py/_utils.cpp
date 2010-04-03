@@ -67,7 +67,6 @@ py::tuple coordsAndDisplacements(int axis,py::tuple Aabb=py::tuple()){
 	}
 	return py::make_tuple(retCoord,retDispl);
 }
-BOOST_PYTHON_FUNCTION_OVERLOADS(coordsAndDisplacements_overloads,coordsAndDisplacements,1,2);
 
 void setRefSe3(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
@@ -421,7 +420,7 @@ BOOST_PYTHON_MODULE(_utils){
 	#if 0
 		py::def("convexHull2d",convexHull2d,"Return 2d convex hull of list of 2d points, as list of polygon vertices.");
 	#endif
-	py::def("coordsAndDisplacements",coordsAndDisplacements,coordsAndDisplacements_overloads(py::args("Aabb"),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered."));
+	py::def("coordsAndDisplacements",coordsAndDisplacements,(python::arg("axis"),python::arg("Aabb")=python::tuple()),"Return tuple of 2 same-length lists for coordinates and displacements (coordinate minus reference coordinate) along given axis (1st arg); if the Aabb=((x_min,y_min,z_min),(x_max,y_max,z_max)) box is given, only bodies within this box will be considered.");
 	py::def("setRefSe3",setRefSe3,"Set reference :yref:`positions<State::refPos>` and :yref:`orientations<State::refOri>` of all :yref:`bodies<Body>` equal to their current :yref:`positions<State::pos>` and :yref:`orientations<State::ori>`.");
 	py::def("interactionAnglesHistogram",interactionAnglesHistogram,interactionAnglesHistogram_overloads(py::args("axis","mask","bins","aabb")));
 	py::def("bodyNumInteractionsHistogram",bodyNumInteractionsHistogram,bodyNumInteractionsHistogram_overloads(py::args("aabb")));

@@ -35,11 +35,11 @@ void PressTestEngine::action(){
 					currentIterationAfterDestruction=0;
 				}
 			}
-			TranslationEngine::action(scene);
+			TranslationEngine::action();
 		} else if (curentDirection==backward) {							 ///<The press returns back to the normal position
 			if (currentIterationAfterDestruction > 0) {
 				currentIterationAfterDestruction--;
-				TranslationEngine::action(scene);
+				TranslationEngine::action();
 			} else {
 				curentDirection=stop;														///<If the press is in normal position -> STOP
 				Omega::instance().stopSimulationLoop();					///<Stop simulation loop

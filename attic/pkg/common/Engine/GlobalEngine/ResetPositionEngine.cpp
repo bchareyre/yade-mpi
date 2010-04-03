@@ -25,7 +25,7 @@ ResetPositionEngine::ResetPositionEngine(){
 void ResetPositionEngine::postProcessAttributes(bool deserializing){}
 
 
-void ResetPositionEngine::action(Scene * ncb)
+void ResetPositionEngine::action()
 {
 	if (first) { initialize(ncb); return; }
 
@@ -41,7 +41,7 @@ void ResetPositionEngine::action(Scene * ncb)
 	}
 }
 
-void ResetPositionEngine::initialize(Scene * ncb)
+void ResetPositionEngine::initialize()
 {
 	first=false;
 	if (fileName=="")

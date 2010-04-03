@@ -11,7 +11,7 @@
 #include "PhysicalActionDamper.hpp"
 #include<yade/core/Scene.hpp>
 
-void PhysicalActionDamper::action(Scene* ncb){
+void PhysicalActionDamper::action(){
 	ncb->forces.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		operator()(b->physicalParameters,b.get(),ncb);

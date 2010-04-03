@@ -9,7 +9,7 @@
 #include"PhysicalActionApplier.hpp"
 #include<yade/core/Scene.hpp>
 
-void PhysicalActionApplier::action(Scene* ncb){
+void PhysicalActionApplier::action(){
 	ncb->forces.sync();
 	FOREACH(const shared_ptr<Body>& b, *ncb->bodies){
 		operator()(b->physicalParameters,b.get(),ncb);

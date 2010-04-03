@@ -38,7 +38,7 @@ bool VelocityRecorder::isActivated(Scene*)
 }
 
 
-void VelocityRecorder::action(Scene * ncb)
+void VelocityRecorder::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

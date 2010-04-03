@@ -12,7 +12,7 @@
 #include<yade/core/Scene.hpp>
 
 
-void StateMetaEngine::action(Scene* ncb)
+void StateMetaEngine::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	ncb->forces.sync();

@@ -38,7 +38,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 
 
 
-// void VolumicContactLaw::speedTest(Scene* ncb)
+// void VolumicContactLaw::speedTest()
 // {
 // //BEGIN SPEED TEST
 // 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
@@ -100,7 +100,7 @@ VolumicContactLaw::VolumicContactLaw() : InteractionSolver()
 // }
 
 
-void VolumicContactLaw::action(Scene* ncb)
+void VolumicContactLaw::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

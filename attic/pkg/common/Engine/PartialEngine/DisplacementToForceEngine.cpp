@@ -39,7 +39,7 @@ void DisplacementToForceEngine::postProcessAttributes(bool deserializing)
 
 
 
-void DisplacementToForceEngine::action(Scene * ncb)
+void DisplacementToForceEngine::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

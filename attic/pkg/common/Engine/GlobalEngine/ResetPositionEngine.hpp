@@ -39,7 +39,7 @@ class ResetPositionEngine : public PeriodicEngine {
 	private:
 		std::vector<Vector3r> ini_pos;
 		bool first;
-		void initialize(Scene * ncb);
+		void initialize();
 };
 
 REGISTER_SERIALIZABLE(ResetPositionEngine);

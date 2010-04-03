@@ -53,7 +53,7 @@ bool PositionSnapshot::isActivated(Scene*)
 
 
 
-void PositionSnapshot::action(Scene * ncb)
+void PositionSnapshot::action()
 {
 // 	copie de outputFile dans ce qui sera utilise pour le nom des fichiers resultats
 	nom_int=outputFile;

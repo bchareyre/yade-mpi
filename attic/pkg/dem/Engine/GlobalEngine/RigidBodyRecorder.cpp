@@ -38,7 +38,7 @@ bool RigidBodyRecorder::isActivated(Scene*)
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void RigidBodyRecorder::action(Scene * ncb)
+void RigidBodyRecorder::action()
 {
     shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

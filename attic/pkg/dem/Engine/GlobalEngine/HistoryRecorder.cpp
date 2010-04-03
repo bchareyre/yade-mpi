@@ -49,7 +49,7 @@ bool HistoryRecorder::isActivated(Scene*)
 
 
 
-void HistoryRecorder::action(Scene * ncb)
+void HistoryRecorder::action()
 {
   shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

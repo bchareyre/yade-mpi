@@ -28,7 +28,7 @@ bool GeometricalModelForceColorizer::isActivated(Scene*)
 }
 
 
-void GeometricalModelForceColorizer::action(Scene * ncb)
+void GeometricalModelForceColorizer::action()
 {
 	// FIXME the same in GLDrawLatticeBeamState.cpp
 	ncb->forces.sync();

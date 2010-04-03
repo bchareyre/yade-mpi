@@ -25,12 +25,12 @@ class KinemCNDEngine : public PartialEngine
 		shared_ptr<Body> rightbox;
 		shared_ptr<Body> topbox;
 
-		void letMove(Scene*);
+		void letMove();
 		void stopMovement();		// to cancel all the velocities when gammalim is reached
 
 
 	public :
-		void action(Scene *),
+		void action(),
 			computeAlpha();
 
 			;

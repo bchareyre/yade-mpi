@@ -57,7 +57,7 @@ bool ForceSnapshot::isActivated(Scene*)
 
 
 
-void ForceSnapshot::action(Scene * ncb)
+void ForceSnapshot::action()
 {
 // 	copie de outputFile dans ce qui sera utilise pour le nom des fichiers resultats
 	nom_int=outputFile;

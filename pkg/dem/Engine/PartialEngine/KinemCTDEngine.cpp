@@ -17,7 +17,7 @@ KinemCTDEngine::~KinemCTDEngine()
 {
 }
 
-void KinemCTDEngine::action(Scene * ncb)
+void KinemCTDEngine::action()
 {
 
 	leftbox = Body::byId(id_boxleft);
@@ -38,8 +38,8 @@ void KinemCTDEngine::action(Scene * ncb)
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //
 
-	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_topbox);
-	Real current_NormalForce=(ncb->forces.getForce(id_topbox)).Y();
+	scene->forces.sync(); Vector3r F_sup=scene->forces.getForce(id_topbox);
+	Real current_NormalForce=(scene->forces.getForce(id_topbox)).Y();
 	current_sigma=current_NormalForce/(1000.0*Scontact);	// so we have the current value of sigma, in kPa
 
 	if( ((compSpeed > 0) && (current_sigma < target_sigma)) || ((compSpeed < 0) && (current_sigma > target_sigma)) )
@@ -50,7 +50,7 @@ void KinemCTDEngine::action(Scene * ncb)
 			temoin=0;
 // 			cout << "Maintenant (toujours dans le if temoin!=0), temoin =" <<lexical_cast<string>(temoin) << endl;
 		}
-		letMove(ncb);
+		letMove();
 	}
 	else if (temoin==0)
 	{
@@ -82,7 +82,7 @@ void KinemCTDEngine::action(Scene * ncb)
 		
 }
 
-void KinemCTDEngine::letMove(Scene * ncb)
+void KinemCTDEngine::letMove()
 {
 	computeAlpha();
 	Real	dt = Omega::instance().getTimeStep()

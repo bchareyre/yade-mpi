@@ -19,7 +19,7 @@
 YADE_PLUGIN((KinemCNSEngine));
 
 
-void KinemCNSEngine::action(Scene * ncb)
+void KinemCNSEngine::action()
 {
 	if(LOG) cerr << "debut applyCondi !!" << endl;
 	leftbox = Body::byId(id_boxleft);
@@ -31,7 +31,7 @@ void KinemCNSEngine::action(Scene * ncb)
 	
 	if(gamma<=gammalim)
 	{
-		letMove(ncb);
+		letMove();
 		if(temoin==0)
 		{
 			temoin=1;
@@ -52,12 +52,12 @@ void KinemCNSEngine::action(Scene * ncb)
 
 }
 
-void KinemCNSEngine::letMove(Scene * ncb)
+void KinemCNSEngine::letMove()
 {
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = scene->bodies;
 
 	if(LOG) cout << "It : " << Omega::instance().getCurrentIteration() << endl;
-	computeDu(ncb);
+	computeDu();
 
 	Real dt = Omega::instance().getTimeStep();
 	Real dx = shearSpeed * dt;
@@ -122,17 +122,17 @@ void KinemCNSEngine::computeAlpha()
 }
 
 
-void KinemCNSEngine::computeDu(Scene* ncb)
+void KinemCNSEngine::computeDu()
 {
 
-	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_topbox);
+	scene->forces.sync(); Vector3r F_sup=scene->forces.getForce(id_topbox);
 	
 	if(firstRun)
 	{
 		if ( !myLdc )
 		{
-			vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 			for ( ;itFirst!=itLast; ++itFirst )
 			{
 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
@@ -161,7 +161,7 @@ void KinemCNSEngine::computeDu(Scene* ncb)
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //
 
-	computeStiffness(ncb);
+	computeStiffness();
 	Real Hcurrent = topbox->state->pos.Y();
 	Real Fdesired = F_0 + KnC * 1.0e9 * Scontact * (Hcurrent-Y0); // The value of the force desired
 
@@ -207,11 +207,11 @@ void KinemCNSEngine::stopMovement()
 	rightbox->state->angVel		=  Vector3r(0,0,0);
 }
 
-void KinemCNSEngine::computeStiffness(Scene* ncb)
+void KinemCNSEngine::computeStiffness()
 {
 	stiffness=0.0;
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-	InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+	InteractionContainer::iterator iiEnd = scene->interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal())

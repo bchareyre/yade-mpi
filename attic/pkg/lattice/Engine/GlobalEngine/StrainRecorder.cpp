@@ -44,7 +44,7 @@ bool StrainRecorder::isActivated(Scene*)
 }
 
 
-void StrainRecorder::action(Scene * ncb)
+void StrainRecorder::action()
 {
 //	std::cerr << "StrainRecorder quits\n";
 //	return;

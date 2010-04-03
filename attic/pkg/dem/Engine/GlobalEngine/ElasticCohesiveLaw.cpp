@@ -29,7 +29,7 @@ ElasticCohesiveLaw::ElasticCohesiveLaw() : InteractionSolver()
 }
 
 
-void ElasticCohesiveLaw::action(Scene* ncb)
+void ElasticCohesiveLaw::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 

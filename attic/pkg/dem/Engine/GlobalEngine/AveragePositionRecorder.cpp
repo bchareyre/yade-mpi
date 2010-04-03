@@ -42,7 +42,7 @@ bool AveragePositionRecorder::isActivated(Scene*)
 }
 
 
-void AveragePositionRecorder::action(Scene * ncb)
+void AveragePositionRecorder::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	

@@ -101,7 +101,7 @@ void ElasticCriterionTimeStepper::findTimeStepFromInteraction(const shared_ptr<I
 }
 
 
-void ElasticCriterionTimeStepper::computeTimeStep(Scene* ncb)
+void ElasticCriterionTimeStepper::computeTimeStep()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	shared_ptr<InteractionContainer>& interactions = ncb->interactions;

@@ -13,6 +13,8 @@
 #include<yade/lib-serialization/Serializable.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Timing.hpp>
+#include<yade/lib-base/Logging.hpp>
+#include<stdexcept>
 
 #include<boost/foreach.hpp>
 #ifndef FOREACH
@@ -33,7 +35,7 @@ class Engine: public Serializable{
 		virtual ~Engine() {};
 	
 		virtual bool isActivated() { return true; };
-		virtual void action() { throw; };
+		virtual void action();
 	private:
 		// py access funcs	
 		TimingInfo::delta timingInfo_nsec_get(){return timingInfo.nsec;};
@@ -41,6 +43,8 @@ class Engine: public Serializable{
 		long timingInfo_nExec_get(){return timingInfo.nExec;};
 		void timingInfo_nExec_set(long d){ timingInfo.nExec=d;}
 		void explicitAction(){ scene=Omega::instance().getScene().get(); this->action(); }
+
+	DECLARE_LOGGER;
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Engine,Serializable,"Basic execution unit of simulation, called from the simulation loop (O.engines)",
 		((string,label,,"Textual label for this object; must be valid python identifier, you can refer to it directly from python.")),

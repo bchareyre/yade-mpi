@@ -64,7 +64,7 @@ void TriaxialStressController::controlExternalStress(int wall, Vector3r resultan
 	p->se3.position += previousTranslation[wall];
 	// this is important is using VelocityBins. Otherwise the motion is never detected. Related to https://bugs.launchpad.net/yade/+bug/398089
 	p->vel=previousTranslation[wall]/scene->dt;
-	if(log)TRVAR2(previousTranslation,p->se3.position);
+	//if(log)TRVAR2(previousTranslation,p->se3.position);
 }
 
 void TriaxialStressController::action()

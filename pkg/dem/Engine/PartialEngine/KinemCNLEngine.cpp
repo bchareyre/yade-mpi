@@ -16,7 +16,7 @@
 
 YADE_PLUGIN((KinemCNLEngine));
 
-void KinemCNLEngine::action(Scene * ncb)
+void KinemCNLEngine::action()
 {
 	if(LOG)	cout << "debut applyCondi du CNCEngine !!" << endl;
 	leftbox = Body::byId(id_boxleft);
@@ -36,7 +36,7 @@ void KinemCNLEngine::action(Scene * ncb)
 			if(LOG) cout << "Je veux maintenir la Force a F_0 = : " << F_0 << endl; 
 			temoin=1;
 		}
-		letMove(ncb);
+		letMove();
 
 	}
 	else if (temoin<2)
@@ -64,12 +64,12 @@ void KinemCNLEngine::action(Scene * ncb)
 
 }
 
-void KinemCNLEngine::letMove(Scene * ncb)
+void KinemCNLEngine::letMove()
 {
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = scene->bodies;
 
 	if(LOG)	cout << "It : " << Omega::instance().getCurrentIteration() << endl;
-	computeDu(ncb);
+	computeDu();
 
 	Real dt = Omega::instance().getTimeStep();
 	Real dx = shearSpeed * dt;
@@ -138,16 +138,16 @@ void KinemCNLEngine::computeAlpha()
 }
 
 
-void KinemCNLEngine::computeDu(Scene* ncb)
+void KinemCNLEngine::computeDu()
 {
-	ncb->forces.sync(); Vector3r F_sup=ncb->forces.getForce(id_topbox);
+	scene->forces.sync(); Vector3r F_sup=scene->forces.getForce(id_topbox);
 	
 	if(firstRun)
 	{
 		if ( !myLdc )
 		{
-			vector<shared_ptr<Engine> >::iterator itFirst = ncb->engines.begin();
-			vector<shared_ptr<Engine> >::iterator itLast = ncb->engines.end();
+			vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+			vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
 			for ( ;itFirst!=itLast; ++itFirst )
 			{
 				if ( ( *itFirst )->getClassName() == "Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity" ) 
@@ -165,7 +165,7 @@ void KinemCNLEngine::computeDu(Scene* ncb)
 		firstRun=false;
 	}
 	
-	computeStiffness(ncb);
+	computeStiffness();
 	if( (stiffness==0) )
 	{
 		deltaU=0;
@@ -214,12 +214,12 @@ void KinemCNLEngine::stopMovement()
 	rightbox->state->angVel	=  Vector3r(0,0,0);
 }
 
-void KinemCNLEngine::computeStiffness(Scene* ncb)
+void KinemCNLEngine::computeStiffness()
 {
 	int nbre_contacts = 0;
 	stiffness=0.0;
-	InteractionContainer::iterator ii    = ncb->interactions->begin();
-	InteractionContainer::iterator iiEnd = ncb->interactions->end();
+	InteractionContainer::iterator ii    = scene->interactions->begin();
+	InteractionContainer::iterator iiEnd = scene->interactions->end();
 	for(  ; ii!=iiEnd ; ++ii )
 	{
 		if ((*ii)->isReal())

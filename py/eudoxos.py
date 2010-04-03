@@ -81,7 +81,11 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 	cutoff, if > 0., will take only smaller part (centered) or the specimen into account
 	"""
 	dd=[] # storage for linear regression parameters
-	import pylab,numpy,stats
+	import pylab,numpy
+	try:
+		import stats
+	except ImportError:
+		raise ImportError("Unable to import stats; install the python-stats package.")
 	from yade import utils
 	if cutoff>0: cut=utils.fractionalBox(fraction=1-cutoff)
 	for axis in [0,1,2]:
@@ -91,14 +95,16 @@ def estimatePoissonYoung(principalAxis,stress=0,plot=False,cutoff=0.):
 			w,dw=utils.coordsAndDisplacements(axis)
 		l,ll=stats.linregress(w,dw)[0:2] # use only tangent and section
 		dd.append((l,ll,min(w),max(w)))
-		if plot: pylab.plot(w,dw,'.',label='xyz'[axis])
+		if plot: pylab.plot(w,dw,'.',label=r'$\Delta %s(%s)$'%('xyz'[axis],'xyz'[axis]))
 	if plot:
 		for axis in [0,1,2]:
 			dist=dd[axis][-1]-dd[axis][-2]
 			c=numpy.linspace(dd[axis][-2]-.2*dist,dd[axis][-1]+.2*dist)
 			d=[dd[axis][0]*cc+dd[axis][1] for cc in c]
-			pylab.plot(c,d,label='interp '+'xyz'[axis])
-		pylab.legend()
+			pylab.plot(c,d,label=r'$\widehat{\Delta %s}(%s)$'%('xyz'[axis],'xyz'[axis]))
+		pylab.legend(loc='upper left')
+		pylab.xlabel(r'$x,\;y,\;z$')
+		pylab.ylabel(r'$\Delta x,\;\Delta y,\; \Delta z$')
 		pylab.show()
 	otherAxes=(principalAxis+1)%3,(principalAxis+2)%3
 	avgTransHomogenizedStrain=.5*(dd[otherAxes[0]][0]+dd[otherAxes[1]][0])

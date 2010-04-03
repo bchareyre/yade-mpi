@@ -45,7 +45,7 @@ bool PositionRecorder::isActivated(Scene*)
 
 
 
-void PositionRecorder::action(Scene * ncb)
+void PositionRecorder::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	Vector3r pos(Vector3r::ZERO);

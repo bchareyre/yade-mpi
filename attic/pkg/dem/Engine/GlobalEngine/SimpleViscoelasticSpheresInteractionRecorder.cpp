@@ -38,7 +38,7 @@ bool SimpleViscoelasticSpheresInteractionRecorder::isActivated(Scene*)
    return ((Omega::instance().getCurrentIteration() % interval == 0));
 }
 
-void SimpleViscoelasticSpheresInteractionRecorder::action(Scene * ncb)
+void SimpleViscoelasticSpheresInteractionRecorder::action()
 {
     shared_ptr<InteractionContainer>& interactions = ncb->interactions;
   

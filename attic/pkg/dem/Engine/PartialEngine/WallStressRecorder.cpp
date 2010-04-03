@@ -49,7 +49,7 @@ bool WallStressRecorder::isActivated(Scene*)
 }
 
 
-void WallStressRecorder::action(Scene * ncb)
+void WallStressRecorder::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 		

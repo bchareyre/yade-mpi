@@ -242,7 +242,7 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	}
 	state->ori.Normalize(); 
 }
-	
+// http://www.euclideanspace.com/physics/kinematics/angularvelocity/QuaternionDifferentiation2.pdf
 Quaternionr NewtonIntegrator::DotQ(const Vector3r& angVel, const Quaternionr& Q){
 	Quaternionr dotQ(Quaternionr::ZERO);
 	dotQ[0] = (-Q[1]*angVel[0]-Q[2]*angVel[1]-Q[3]*angVel[2])/2;

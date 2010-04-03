@@ -25,7 +25,7 @@ ElawSnowLayersDeformation::ElawSnowLayersDeformation() : InteractionSolver()
 }
 
 
-void ElawSnowLayersDeformation::action(Scene* ncb)
+void ElawSnowLayersDeformation::action()
 {
 	//return;
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;

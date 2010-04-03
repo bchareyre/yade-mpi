@@ -33,6 +33,7 @@ env.Install('$PREFIX/lib/yade$SUFFIX/lib',[
 			'Cell.cpp',
 			'Collider.cpp',
 			'PartialEngine.cpp',
+			'Engine.cpp',
 			'FileGenerator.cpp',
 			'FrontEnd.cpp',
 			'Interaction.cpp',

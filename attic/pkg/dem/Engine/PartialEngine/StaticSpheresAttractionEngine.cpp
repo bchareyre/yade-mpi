@@ -11,7 +11,7 @@
 #include <yade/pkg-common/Sphere.hpp>
 #include <yade/core/Scene.hpp>
 
-Real StaticSpheresAttractionEngine::getMaxDisplacement(Scene* ncb)
+Real StaticSpheresAttractionEngine::getMaxDisplacement()
 {
 	// calculation based on max normal force - FIXME not working satifactionary, currently
 	/*

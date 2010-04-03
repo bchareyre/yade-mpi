@@ -9,11 +9,11 @@
 #include"TranslationEngine.hpp"
 #include<yade/core/Scene.hpp>
 
-void TranslationEngine::action(Scene * ncb){
+void TranslationEngine::action(){
 	Real dt=Omega::instance().getTimeStep();
 	FOREACH(body_id_t id,subscribedBodies){
-		assert(id<(body_id_t)ncb->bodies->size());
-		Body* b=Body::byId(id,ncb).get();
+		assert(id<(body_id_t)scene->bodies->size());
+		Body* b=Body::byId(id,scene).get();
 		if(!b) continue;
 		b->state->pos+=dt*velocity*translationAxis;
 		b->state->vel=velocity*translationAxis;

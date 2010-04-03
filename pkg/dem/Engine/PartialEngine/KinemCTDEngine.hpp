@@ -31,12 +31,12 @@ class KinemCTDEngine : public PartialEngine
 		shared_ptr<Body> boxbas;
 		shared_ptr<Body> topbox;
 
-		void letMove(Scene*);
+		void letMove();
 
 	public :
 		virtual ~KinemCTDEngine();
 
-		void action(Scene *)
+		void action()
 			,computeAlpha()
 			;
 

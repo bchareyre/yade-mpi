@@ -14,7 +14,7 @@
 
 YADE_PLUGIN((KinemCNDEngine));
 
-void KinemCNDEngine::action(Scene * ncb)
+void KinemCNDEngine::action()
 {
 	leftbox = Body::byId(id_boxleft);
 	rightbox = Body::byId(id_boxright);
@@ -24,7 +24,7 @@ void KinemCNDEngine::action(Scene * ncb)
 	{
 		if(temoinfin!=0)
 			temoinfin=0;
-		letMove(ncb);
+		letMove();
 	}
 	else
 	{
@@ -49,9 +49,9 @@ void KinemCNDEngine::action(Scene * ncb)
 }
 
 
-void KinemCNDEngine::letMove(Scene * ncb)
+void KinemCNDEngine::letMove()
 {
-	shared_ptr<BodyContainer> bodies = ncb->bodies;
+	shared_ptr<BodyContainer> bodies = scene->bodies;
 	Real dt = Omega::instance().getTimeStep();
 	Real dx = shearSpeed * dt;
 

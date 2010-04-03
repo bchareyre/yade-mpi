@@ -79,7 +79,7 @@ bool NodeRecorder::isActivated(Scene*)
 }
 
 
-void NodeRecorder::action(Scene * ncb)
+void NodeRecorder::action()
 {
 //	std::cerr << "NodeRecorder quits\n";
 //	return;

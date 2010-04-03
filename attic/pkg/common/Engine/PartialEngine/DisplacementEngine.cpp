@@ -24,7 +24,7 @@ bool DisplacementEngine::isActivated(Scene*)
    return active;
 }
 
-void DisplacementEngine::action(Scene * ncb)
+void DisplacementEngine::action()
 {
 
 /// FIXME - that's a hack! more control needed from the GUI !

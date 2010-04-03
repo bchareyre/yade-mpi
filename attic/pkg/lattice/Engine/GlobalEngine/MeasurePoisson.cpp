@@ -45,7 +45,7 @@ bool MeasurePoisson::isActivated(Scene*)
 }
 
 
-void MeasurePoisson::action(Scene * ncb)
+void MeasurePoisson::action()
 {
 
 

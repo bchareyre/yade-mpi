@@ -1,8 +1,14 @@
 # -*- encoding=utf-8 -*-
 from __future__ import division
 
-from yade import utils,plot,pack,timing
+from yade import utils,plot,pack,timing,eudoxos
 import time, sys, os, copy
+
+#import matplotlib
+#matplotlib.rc('text',usetex=True)
+#matplotlib.rc('text.latex',preamble=r'\usepackage{concrete}\usepackage{euler}')
+
+
 
 """
 A fairly complex script performing uniaxial tension-compression test on hyperboloid-shaped specimen.
@@ -45,13 +51,13 @@ utils.readParamsFromTable(noTableOk=True, # unknownOk=True,
 	intRadius=1.5,
 	dtSafety=.8,
 	damping=0.4,
-	strainRateTension=.1,
+	strainRateTension=.05,
 	strainRateCompression=1,
 	setSpeeds=True,
 	# 1=tension, 2=compression (ANDed; 3=both)
 	doModes=3,
 
-	specimenLength=.2,
+	specimenLength=.15,
 	sphereRadius=3.5e-3,
 
 	# isotropic confinement (should be negative)
@@ -66,7 +72,8 @@ if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description
 # using spheres 7mm of diameter
 concreteId=O.materials.append(CpmMat(young=young,frictionAngle=frictionAngle,poisson=poisson,density=4800,sigmaT=sigmaT,relDuctility=relDuctility,epsCrackOnset=epsCrackOnset,G_over_E=G_over_E,isoPrestress=isoPrestress))
 
-spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
+#spheres=pack.randomDensePack(pack.inHyperboloid((0,0,-.5*specimenLength),(0,0,.5*specimenLength),.25*specimenLength,.17*specimenLength),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite',material=concreteId)
+spheres=pack.randomDensePack(pack.inAlignedBox((-.25*specimenLength,-.25*specimenLength,-.5*specimenLength),(.25*specimenLength,.25*specimenLength,.5*specimenLength)),spheresInCell=2000,radius=sphereRadius,memoizeDb='/tmp/triaxPackCache.sqlite')
 O.bodies.append(spheres)
 bb=utils.uniaxialTestFeatures()
 negIds,posIds,axis,crossSectionArea=bb['negIds'],bb['posIds'],bb['axis'],bb['area']
@@ -84,12 +91,12 @@ O.engines=[
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_Dem3DofGeom(distFactor=intRadius,label='ss2d3dg')],
 		[Ip2_CpmMat_CpmMat_CpmPhys()],
-		[Law2_Dem3DofGeom_CpmPhys_Cpm()],
+		[Law2_Dem3DofGeom_CpmPhys_Cpm(epsSoft=0)], # deactivated
 	),
 	NewtonIntegrator(damping=damping,label='damper'),
 	CpmStateUpdater(realPeriod=1),
 	UniaxialStrainer(strainRate=strainRateTension,axis=axis,asymmetry=0,posIds=posIds,negIds=negIds,crossSectionArea=crossSectionArea,blockDisplacements=False,blockRotations=False,setSpeeds=setSpeeds,label='strainer'),
-	PeriodicPythonRunner(virtPeriod=3e-5/strainRateTension,realPeriod=5,command='addPlotData()',label='plotDataCollector'),
+	PeriodicPythonRunner(virtPeriod=3e-5/strainRateTension,realPeriod=1,command='addPlotData()',label='plotDataCollector',initRun=True),
 	PeriodicPythonRunner(realPeriod=4,command='stopIfDamaged()',label='damageChecker'),
 ]
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
@@ -100,7 +107,7 @@ plot.maxDataLen=4000
 
 O.saveTmp('initial');
 
-O.timingEnabled=True
+O.timingEnabled=False
 
 global mode
 mode='tension' if doModes & 1 else 'compression'
@@ -132,14 +139,14 @@ def stopIfDamaged():
 	extremum=max(sigma) if (strainer.strainRate>0) else min(sigma)
 	minMaxRatio=0.5 if mode=='tension' else 0.5
 	if extremum==0: return
+	# uncomment to get graph for the very first time stopIfDamaged() is called
+	#eudoxos.estimatePoissonYoung(principalAxis=axis,stress=strainer.avgStress,plot=True,cutoff=0.3)
 	print O.tags['id'],mode,strainer.strain,sigma[-1]
 	import sys;	sys.stdout.flush()
-	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>5e-3:
+	if abs(sigma[-1]/extremum)<minMaxRatio or abs(strainer.strain)>(5e-3 if isoPrestress==0 else 5e-2):
 		if mode=='tension' and doModes & 2: # only if compression is enabled
 			mode='compression'
-			timing.stats()
-			sys.exit(0)
-			O.save('/tmp/uniax-tension.xml.bz2')
+			#O.save('/tmp/uniax-tension.xml.bz2')
 			print "Damaged, switching to compression... "; O.pause()
 			# important! initTest must be launched in a separate thread;
 			# otherwise O.load would wait for the iteration to finish,

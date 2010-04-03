@@ -74,7 +74,7 @@ bool MovingSupport::isActivated(Scene*)
 }
 
 
-void MovingSupport::action(Scene * ncb)
+void MovingSupport::action()
 	// FIXME: about "bool first":
 	// FIXME: maybe it could be added to initialiers, and called with a bool argument saying that the initialisation is performed. 
 {
