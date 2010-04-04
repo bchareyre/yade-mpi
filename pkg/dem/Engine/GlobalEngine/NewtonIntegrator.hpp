@@ -67,9 +67,9 @@ class NewtonIntegrator : public GlobalEngine{
 		shared_ptr<VelocityBins> velocityBins;
 		virtual void action();		
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
-		((Real,damping,0.2,"damping coefficient for Cundall's non viscous damping [-]"))
+		((Real,damping,0.2,"damping coefficient for Cundall's non viscous damping (see [Chareyre2005]_) [-]"))
 		((Real,maxVelocitySq,NaN,"store square of max. velocity, for informative purposes; computed again at every step. |yupdate|"))
-		((bool,exactAsphericalRot,false,"Enable of the exact aspherical body rotation integrator."))
+		((bool,exactAsphericalRot,false,"Enable of the exact aspherical body rotation integrator, using formulation from [Allen1989]_, pg. 89."))
 		((int,homotheticCellResize,((void)"disabled",0),"Enable artificially moving all bodies with the periodic cell, such that its resizes are isotropic. 0: disabled, 1: position update, 2: velocity update."))
 		((vector<shared_ptr<BodyCallback> >,callbacks,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
 		,

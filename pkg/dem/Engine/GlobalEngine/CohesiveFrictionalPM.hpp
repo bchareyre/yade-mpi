@@ -106,7 +106,7 @@ class Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM: public LawFunctor{
 		FUNCTOR2D(ScGeom,CFpmPhys);
 
 	YADE_CLASS_BASE_DOC_ATTRS(Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM,LawFunctor,"Constitutive law for the CFpm model.",
-		  ((bool,preventGranularRatcheting,false,"If true rotations are computed such as granular ratcheting is prevented. See F. ALONSO-MARROQUIN, R. GARCIA-ROJO, H.J. HERRMANN, Micro-mechanical investigation of granular ratcheting, in Cyclic Behaviour of Soils and Liquefaction Phenomena, ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)."))
+		  ((bool,preventGranularRatcheting,false,"If true rotations are computed such as granular ratcheting is prevented. See article [Alonso2004]_, pg. 3-10 -- and a lot more papers from the same authors)."))
 	);
 	DECLARE_LOGGER;	
 };
