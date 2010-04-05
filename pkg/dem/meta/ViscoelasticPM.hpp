@@ -30,17 +30,13 @@ REGISTER_SERIALIZABLE(SimpleViscoelasticMat);
 
 /// Interaction physics
 class SimpleViscoelasticPhys : public FrictPhys {
-	public :
-	    /// Normal viscous 
-	    Real cn;
-	    /// Shear viscous 
-	    Real cs;
-		SimpleViscoelasticPhys(){ createIndex(); }
+	public:
 		virtual ~SimpleViscoelasticPhys();
-	protected :
-	REGISTER_ATTRIBUTES(FrictPhys,(cn)(cs));
-	REGISTER_CLASS_AND_BASE(SimpleViscoelasticPhys,FrictPhys);
-	REGISTER_CLASS_INDEX(SimpleViscoelasticPhys,FrictPhys);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SimpleViscoelasticPhys,FrictPhys,"InteractionPhysics created from :yref:`SimpleViscoelasticMat`, for use with :yref:`Law2_Spheres_Viscoelastic_SimpleViscoelastic`.",
+		((Real,cn,NaN,"Normal viscous constant"))
+		((Real,cs,NaN,"Shear viscous constant")),
+		createIndex();
+	)
 };
 REGISTER_SERIALIZABLE(SimpleViscoelasticPhys);
 

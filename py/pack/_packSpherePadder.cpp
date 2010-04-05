@@ -23,7 +23,7 @@ BOOST_PYTHON_MODULE(_packSpherePadder){
 		;
 	#endif
 
-    py::class_<SpherePadder>("SpherePadder",py::init<std::string,std::string>((py::arg("fileName"),py::arg("meshType")=""),"Initialize using tetrahedral mesh stored in *fileName*. Type of file is determined by extension: .gmsh implies *meshType*='GMSH', .inp implies *meshType*='INP'. If the extension is different, specify *meshType* explicitly. Possible values are 'GMSH' and 'INP'."))
+    py::class_<SpherePadder>("SpherePadder","Geometrical algorithm for filling tetrahedral mesh with spheres; the algorithm was designed by Jean-François Jerier and is described in [Jerier2009]_.",py::init<std::string,std::string>((py::arg("fileName"),py::arg("meshType")=""),"Initialize using tetrahedral mesh stored in *fileName*. Type of file is determined by extension: .gmsh implies *meshType*='GMSH', .inp implies *meshType*='INP'. If the extension is different, specify *meshType* explicitly. Possible values are 'GMSH' and 'INP'."))
 
             .add_property("radiusRatio", &SpherePadder::getRadiusRatio,&SpherePadder::setRadiusRatio)
             .add_property("radiusRange", &SpherePadder::getRadiusRange,&SpherePadder::setRadiusRange)
