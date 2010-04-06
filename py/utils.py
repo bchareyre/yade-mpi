@@ -532,7 +532,7 @@ def vmData():
 	l=_procStatus('VmData'); ll=l.split(); assert(ll[2]=='kB')
 	return int(ll[1])
 
-def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
+def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 	"""Get some data about the current packing useful for uniaxial test:
 	
 #. Find the dimensions that is the longest (uniaxial loading axis)
@@ -549,13 +549,17 @@ def uniaxialTestFeatures(filename=None,areaSections=10,**kw):
 		if given, spheres will be loaded from this file (ASCII format); if not, current simulation will be used.
 	`areaSection`:
 		number of section that will be used to estimate cross-section
+	`axis`:
+		if given, force strained axis, rather than computing it from predominant length
 
 :return: dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
 	"""
 	if filename: ids=spheresFromFile(filename,**kw)
 	else: ids=[b.id for b in O.bodies]
 	mm,mx=aabbExtrema()
-	dim=aabbDim(); axis=list(dim).index(max(dim)) # list(dim) for compat with python 2.5 which didn't have index defined for tuples yet (appeared in 2.6 first)
+	dim=aabbDim();
+	if axis<0: axis=list(dim).index(max(dim)) # list(dim) for compat with python 2.5 which didn't have index defined for tuples yet (appeared in 2.6 first)
+	assert(axis in (0,1,2))
 	import numpy
 	areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
 	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=2.2)
