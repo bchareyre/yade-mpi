@@ -330,7 +330,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	shared_ptr<FrictMat> mat(new FrictMat);
 	mat->young			= sphereYoungModulus;
 	mat->poisson		= sphereKsDivKn;
-	mat->frictionAngle		= compactionFrictionDeg * Mathr::PI/180.0;
+	mat->frictionAngle		= boxFrictionDeg * Mathr::PI/180.0;
 	body->material=mat;
 	if(!facetWalls && !wallWalls){
 		shared_ptr<Box> iBox(new Box);
