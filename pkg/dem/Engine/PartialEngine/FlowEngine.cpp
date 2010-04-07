@@ -42,6 +42,7 @@ void FlowEngine::action ( )
 		if ( !triaxialCompressionEngine ) cout << "stress controller engine NOT found" << endl;}
 
 		currentStress = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
+		currentStrain = triaxialCompressionEngine->strain[1];
 		current_state = triaxialCompressionEngine->currentState;
 
 		if ( current_state==3 )
@@ -103,7 +104,7 @@ void FlowEngine::action ( )
 				char *g = file;
 				timingDeltas->checkpoint("Writing cons_files");
 				
-				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time);
+				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
 				
 				if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 				{ Update_Triangulation = true; }
@@ -149,6 +150,7 @@ void FlowEngine::Build_Triangulation (double P_zero )
 		cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
 		if (compute_K) {flow->TOLERANCE=1e-09; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		flow->currentTes=!flow->currentTes;
+		flow->TOLERANCE=Tolerance;
 		cout << "--------RETRIANGULATION-----------" << endl;
 	}
 // 	currentTes=flow->currentTes;
@@ -178,6 +180,7 @@ void FlowEngine::Build_Triangulation (double P_zero )
 	}
 	else 
 	{
+		Oedometer_Boundary_Conditions();
 		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 		Update_Triangulation=!Update_Triangulation;
 	}
@@ -202,14 +205,15 @@ void FlowEngine::AddBoundary ()
 // 			const body_id_t& id = b->getId();
 			Real center [3], Extent[3];
 			for ( int h=0;h<3;h++ ) {center[h] = b->state->pos[h]; Extent[h] = w->extents[h];}
+			wall_thickness = min(min(Extent[0],Extent[1]),Extent[2]);
 
 // 			flow->AddBoundingPlanes ( center, Extent, id );
-			flow->x_min = min ( flow->x_min, center[0]-wall_thickness);
-			flow->x_max = max ( flow->x_max, center[0]+wall_thickness);
-			flow->y_min = min ( flow->y_min, center[1]-wall_thickness);
-			flow->y_max = max ( flow->y_max, center[1]+wall_thickness);
-			flow->z_min = min ( flow->z_min, center[2]-wall_thickness);
-			flow->z_max = max ( flow->z_max, center[2]+wall_thickness);
+			flow->x_min = min ( flow->x_min, center[0]+wall_thickness);
+			flow->x_max = max ( flow->x_max, center[0]-wall_thickness);
+			flow->y_min = min ( flow->y_min, center[1]+wall_thickness);
+			flow->y_max = max ( flow->y_max, center[1]-wall_thickness);
+			flow->z_min = min ( flow->z_min, center[2]+wall_thickness);
+			flow->z_max = max ( flow->z_max, center[2]-wall_thickness);
 		}
 	}
 	
@@ -324,7 +328,7 @@ Real FlowEngine::Volume_cell_single_fictious ( CGT::Cell_handle cell)
 			b = cell->vertex ( y )->info().id();
 			const shared_ptr<Body>& wll = Body::byId ( b , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[i] = flow->boundaries[b].p[i];
-			Wall_point[flow->boundaries[b].coordinate] = wll->state->pos[flow->boundaries[b].coordinate]-wall_thickness;
+	Wall_point[flow->boundaries[b].coordinate] = wll->state->pos[flow->boundaries[b].coordinate]+(flow->boundaries[b].normal[flow->boundaries[b].coordinate])*wall_thickness;
 		}
 	}
 
@@ -359,7 +363,7 @@ Real FlowEngine::Volume_cell_double_fictious ( CGT::Cell_handle cell)
 			b[j] = cell->vertex ( g )->info().id();
 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
-			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate] - wall_thickness;
+			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate] +(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness;
 			j++;
 		}
 		else if ( first_sph )
@@ -408,7 +412,7 @@ Real FlowEngine::Volume_cell_triple_fictious ( CGT::Cell_handle cell)
 			b[j] = cell->vertex ( g )->info().id();
 			const shared_ptr<Body>& wll = Body::byId ( b[j] , scene );
 			for ( int i=0;i<3;i++ ) Wall_point[j][i] = flow->boundaries[b[j]].p[i];
-			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate]-wall_thickness;
+			Wall_point[j][flow->boundaries[b[j]].coordinate] = wll->state->pos[flow->boundaries[b[j]].coordinate]+(flow->boundaries[b[j]].normal[flow->boundaries[b[j]].coordinate])*wall_thickness;
 			j++;
 		}
 		else

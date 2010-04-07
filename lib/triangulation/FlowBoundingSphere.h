@@ -90,7 +90,7 @@ class FlowBoundingSphere
 		double Permeameter ( RTriangulation& Tri, double P_Inf, double P_Sup, double Section, double DeltaY, char *file );
 		double Sample_Permeability ( RTriangulation& Tri, double x_Min,double x_Max ,double y_Min,double y_Max,double z_Min,double z_Max, std::string key );
 		double Compute_HydraulicRadius ( RTriangulation& Tri, Cell_handle cell, int j );
-		double PermeameterCurve ( RTriangulation& Tri, char *filename, Real time );
+		double PermeameterCurve ( RTriangulation& Tri, char *filename, Real time, int intervals );
 
 		double dotProduct ( Vecteur x, Vecteur y );
 

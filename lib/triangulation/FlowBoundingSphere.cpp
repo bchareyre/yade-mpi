@@ -363,8 +363,8 @@ void FlowBoundingSphere::Compute_Permeability()
         Vecteur n;
 
 //         std::ofstream oFile( "Hydraulic_Radius",std::ios::out);
-//         std::ofstream kFile ( "Permeability" ,std::ios::out );
-        Real meanK=0;
+        std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
+        Real meanK=0, k_moy;
         Real infiniteK=1e10;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 p1 = cell->info();
@@ -393,29 +393,36 @@ void FlowBoundingSphere::Compute_Permeability()
                                 if (distance!=0) {
                                         if (minPermLength>0) distance=max(minPermLength,distance);
                                         k = (M_PI * pow(radius,4)) / (8*viscosity*distance);
-                                        meanK += k;
+//                                         meanK += k;
                                 } else  k = infiniteK;//Will be corrected in the next loop
 //     cout << "k="<<k<<endl;
                                 (cell->info().k_norm())[j]= k*k_factor;
 //     (cell->info().facetSurf())[j]= k*n;
                                 (neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
+				
+				meanK += 1/k;
+				
 //     (neighbour_cell->info().facetSurf())[Tri.mirror_index(cell, j)]= (-k) *n;
                         }
                         //    else if ( Tri.is_infinite ( neighbour_cell )) k = 0;//connection to an infinite cells
                 }
                 cell->info().isvisited = !ref;
 
-                //    for (int y=0;y<4;y++) cout << "Permeability " << y << " = " << (cell->info().k_norm())[y] << endl;
-                //    for ( int y=0;y<4;y++ ) kFile << y << " = " << ( cell->info().k_norm() ) [y] << endl;
+//                 for (int y=0;y<4;y++) cout << "Permeability " << y << " = " << (cell->info().k_norm())[y] << endl;
+		for ( int y=0;y<4;y++ ) kFile << ( cell->info().k_norm() ) [y] << endl;
         }
 
         // A loop to reduce K maxima, needs a better equation : the mean value is influenced by the very big K
+	kFile << "----------reduction reduction reduction---------" << endl;
         meanK /= pass;
+	k_moy = 1/meanK;
         Real maxKdivKmean = MAXK_DIV_KMEAN;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 for (int j=0; j<4; j++) {
 //    if (cell->info().k_norm()[j]>maxKdivKmean*meanK) cerr <<"Adjusting permeability : " <<cell->info().k_norm()[j]<<" > "<<maxKdivKmean<<" * "<<meanK<<endl;
-                        (cell->info().k_norm())[j] = min(cell->info().k_norm()[j], maxKdivKmean*meanK);
+//                         (cell->info().k_norm())[j] = min(cell->info().k_norm()[j], maxKdivKmean*meanK);
+			(cell->info().k_norm())[j] = min(cell->info().k_norm()[j], k_moy);
+			kFile << (cell->info().k_norm())[j] << endl;
                 }
         }
         if (DEBUG_OUT) cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
@@ -436,6 +443,7 @@ void FlowBoundingSphere::Compute_Permeability()
                 cout<<grains<<"grains - " <<"Vtotale = " << Vtotale << " Vgrains = " << Vgrains << " Vporale1 = " << Vtotale-Vgrains << endl;
                 cout << "Vtotalissimo = " << Vtotalissimo << " Vsolid_tot = " << Vsolid_tot << " Vporale2 = " << Vporale  << " Ssolid_tot = " << Ssolid_tot << endl<< endl;
         }
+
 	cout << "-----Computed_Permeability-----" << endl;
 }
 
@@ -1538,7 +1546,7 @@ void FlowBoundingSphere::Initialize_pressures( double P_zero )
         }
 }
 
-void FlowBoundingSphere::GaussSeidel()
+void FlowBoundingSphere::GaussSeidel ()
 {
 	std::ofstream iter ("Gauss_Iterations", std::ios::app);
 	RTriangulation& Tri = T[currentTes].Triangulation();
@@ -1566,7 +1574,7 @@ void FlowBoundingSphere::GaussSeidel()
                         m=0, n=0;
 
                         //    if ((!cell->info().isSuperior && !cell->info().isInferior)) {
-                        if (!cell->info().fictious() || cell->info().isLateral) {
+                        if ( !cell->info().fictious() || cell->info().isLateral ) {
                                 cell2++;
                                 for (int j2=0; j2<4; j2++) {
                                         if (!Tri.is_infinite(cell->neighbor(j2))) {
@@ -1821,8 +1829,8 @@ void FlowBoundingSphere::GenerateVoxelFile(RTriangulation& Tri)
         }
 }
 
-double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, Real time)
-{	
+double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename, Real time, int intervals)
+{
 	/** CONSOLIDATION CURVES **/
         Cell_handle permeameter;
         int n=0;
@@ -1831,16 +1839,16 @@ double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename,
         int o=0;
         vector<double> P_ave;
         std::ofstream consFile(filename, std::ios::out);
-        consFile << "j " << " time " << "p_ave " << endl;
-        int intervals = 30;
+//         consFile << "j " << " time " << "p_ave " << endl;
+//         int intervals = 30;
         double Rx = (x_max-x_min) /intervals;
         double Ry = (y_max-y_min) /intervals;
         double Rz = (z_max-z_min) /intervals;
 
-        for (double Y=y_min; Y<y_max; Y=Y+Ry) {
+	for (double Y=y_min; Y<=y_max+Ry/10; Y=Y+Ry) {
                 P_ave.push_back(0);
-                for (double X=x_min; X<x_max; X=X+Rx) {
-                        for (double Z=z_min; Z<z_max; Z=Z+Rz) {
+		for (double X=x_min; X<=x_max+Ry/10; X=X+Rx) {
+			for (double Z=z_min; Z<=z_max+Ry/10; Z=Z+Rz) {
                                 permeameter = Tri.locate(Point(X, Y, Z));
                                 if (permeameter->info().isInside) {
                                         n++;
@@ -1856,7 +1864,7 @@ double FlowBoundingSphere::PermeameterCurve(RTriangulation& Tri, char *filename,
                                 }
                         }
                 }
-                //    cout << "P_ave[" << k << "] = " << P_ave[k]/ ( m+n+o ) << " n = " << n << " m = " << m << " o = " << o << endl;
+//                 cout << "P_ave[" << k << "] = " << P_ave[k]/ ( m+n+o ) << " n = " << n << " m = " << m << " o = " << o << endl;
                 P_ave[k]/= (m+n+o);
                 consFile<<k<<" "<<time<<" "<<P_ave[k]<<endl;
                 if (k==intervals/2) Pressures.push_back(P_ave[k]);
