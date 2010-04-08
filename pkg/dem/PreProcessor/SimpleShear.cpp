@@ -14,7 +14,7 @@
 #include "SimpleShear.hpp"
 
 #include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
-#include <yade/pkg-dem/Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity.hpp>
+#include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 #include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include <yade/pkg-dem/PositionOrientationRecorder.hpp>

@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include<yade/pkg-dem/Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity.hpp>
+#include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 #include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
@@ -17,33 +17,31 @@
 YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 
 
-Vector3r translation_vect (0.10,0,0);
 
-
-void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
+void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplacer par :
+// void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
 {
-    shared_ptr<BodyContainer>& bodies = scene->bodies;
+	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
-    Real dt = Omega::instance().getTimeStep();
+	Real dt = Omega::instance().getTimeStep();
 
-    InteractionContainer::iterator ii    = scene->interactions->begin();
-    InteractionContainer::iterator iiEnd = scene->interactions->end();
-	int nbreInteracTot=0;
-	int nbreInteracMomPlastif=0;
-    for (  ; ii!=iiEnd ; ++ii )
-    {
-        //if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
-	if ((*ii)->isReal())
+	InteractionContainer::iterator ii    = scene->interactions->begin();	// a supprimer pr passage au go
+	InteractionContainer::iterator iiEnd = scene->interactions->end();	// a supprimer pr passage au go
+	int nbreInteracTot=0;// a supprimer pr passage au go
+	int nbreInteracMomPlastif=0;// a supprimer pr passage au go
+	for (  ; ii!=iiEnd ; ++ii )// a supprimer pr passage au go
+	{// a supprimer pr passage au go
+        if ((*ii)->interactionGeometry && (*ii)->interactionPhysics)
+	if ((*ii)->isReal())// a supprimer pr passage au go
 		{
 		nbreInteracTot++;
-		const shared_ptr<Interaction>& contact = *ii;
+		const shared_ptr<Interaction>& contact = *ii;// supprimable
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
-// 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
+		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
 		if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 			continue; // skip other groups,
 
-// 		CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
 		State* de1 = Body::byId(id1,scene)->state.get();
 		State* de2 = Body::byId(id2,scene)->state.get();
 		ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
@@ -71,17 +69,17 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
 			{
 			Fn = kn*un;
 			currentContactPhysics->unMax = std::abs(un);
-// 			cout << "je suis dans le calcul normal " << endl;
+			cout << "je suis dans le calcul normal " << endl;
 			}
 		else
 			{
 			Fn = previousFn + coeff_dech * kn * (un-previousun);	// Calcul incrémental de la nvlle force
-// 			cout << "je suis dans l'autre calcul" << endl;
+			cout << "je suis dans l'autre calcul" << endl;
 			if(std::abs(Fn) > std::abs(kn * un))		// verif qu'on ne depasse la courbe
 				Fn = kn*un;
 			if(Fn < 0.0 )	// verif qu'on reste positif FIXME ATTENTION ON S'EST FICHU DU NORMAL ADHESION !!!!
 				{Fn = 0;
-// 				cout << "j'ai corrige pour ne pas etre negatif" << endl;
+				cout << "j'ai corrige pour ne pas etre negatif" << endl;
 				}
 			}
 		
@@ -112,7 +110,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
                 Vector3r axis;
                 Real angle;
 
-                /// Here is the code with approximated rotations 	 ///
+//                 Here is the code with approximated rotations
 
 		axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
 		shearForce 	       -= shearForce.Cross(axis);
@@ -120,7 +118,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
 		axis 			= angle*currentContactGeometry->normal;
 		shearForce 	       -= shearForce.Cross(axis);
 
-                /// Here is the code with exact rotations 		 ///
+//                 Here is the code with exact rotationns
 
                 // 		Quaternionr q;
                 //
@@ -151,12 +149,8 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
                 Vector3r shearDisplacement		= shearVelocity*dt;
 
 
-///////////////////////// CREEP START (commented out) ///////////
-//	Real    viscosity = 300000.0;
-//	shearForce                            -= currentContactPhysics->ks*(shearDisplacement + shearForce*dt/viscosity);
-
 		shearForce -= currentContactPhysics->ks*shearDisplacement;
-///////////////////////// CREEP END /////////////////////////////
+/////////////////////// CREEP END /////////////////////////////
 
                 //  cerr << "shearForce = " << shearForce << endl;
                 Real maxFs = 0;
@@ -188,53 +182,16 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
 
                 
 
-                ////////// PFC3d SlipModel
+                //////// PFC3d SlipModel
 
                 Vector3r f				= currentContactPhysics->normalForce + shearForce;
-                // cerr << "currentContactPhysics->normalForce= " << currentContactPhysics->normalForce << endl;
-                //  cerr << "shearForce " << shearForce << endl;
-                // cerr << "f= " << f << endl;
-                // it will be some macro(	body->physicalActions,	ActionType , bodyId )
 					scene->forces.addForce (id1,-f);
 					scene->forces.addForce (id2,+f);
 					scene->forces.addTorque(id1,-c1x.Cross(f));
 					scene->forces.addTorque(id2, c2x.Cross(f));
 
-/////	/// Moment law					 	 ///
-/////		if(momentRotationLaw /*&& currentContactPhysics->cohesionBroken == false*/ )
-/////		{	
-/////			Quaternionr delta = ...
-/////
-/////	//This indentation is a rewrite of original equations (the two commented lines), should work exactly the same.
-///////Real elasticMoment = currentContactPhysics->kr * std::abs(angle); // positive value (*)
-/////
-/////	Real angle_twist(angle * axis.Dot(currentContactGeometry->normal) );
-/////	Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
-//////* no creep	
-/////*/
-/////	Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
-/////
-/////	Vector3r axis_bending(angle*axis - axis_twist);
-/////	Vector3r moment_bending(axis_bending * currentContactPhysics->kr);
-/////
-/////			/*
-/////			// We cannot have insanely big moment, so we take a min value of ELASTIC and PLASTIC moment.
-/////			Real avgRadius = 0.5 * (currentContactGeometry->radius1 + currentContactGeometry->radius2);
-/////			// FIXME - elasticRollingLimit is currently assumed to be 1.0
-/////			Real plasticMoment = currentContactPhysics->elasticRollingLimit * avgRadius * std::abs(Fn); // positive value (*)
-/////			Real moment(std::min(elasticMoment, plasticMoment)); // RESULT
-/////			*/
-/////
-///////Vector3r moment = axis * elasticMoment * (angle<0.0?-1.0:1.0); // restore sign. (*)
-/////
-/////	Vector3r moment = moment_twist + moment_bending;
-/////
-/////			static_cast<Momentum*>( scene->physicalActions->find( id1 , actionMomentum->getClassIndex() ).get() )->momentum += moment;
-/////			static_cast<Momentum*>( scene->physicalActions->find( id2 , actionMomentum->getClassIndex() ).get() )->momentum -= moment;
-/////		}
-/////	/// Moment law	END				 	 ///
 
-	/// Moment law					 	 ///
+	// Moment law					 	 ///
 		if(momentRotationLaw)
 		{
 			{// updates only orientation of contact (local coordinate system)
@@ -280,16 +237,16 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()
 			scene->forces.addTorque(id1,-moment);
 			scene->forces.addTorque(id2,+moment);
 		}
-	/// Moment law	END				 	 ///
+	// Moment law	END				 	 ///
 
                 currentContactPhysics->prevNormal = currentContactGeometry->normal;
-            }
-        }
+//             }
+//         }
     }
 // 	cout << " En tout :"<< nbreInteracTot << "interactions (reelles)" << endl;
     //cerr << "ncount= " << ncount << endl;//REMOVE
 // 	cout << momentAlwaysElastic << endl;
 // 	cout << "Sur " << nbreInteracTot << " interactions (reelles) " << nbreInteracMomPlastif << " se sont vues corriger leur moment" << endl;
-
 }
-
+}
+}

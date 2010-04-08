@@ -34,13 +34,13 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 		Real Vb 	= mat2->poisson;
 		
 		Real Da,Db; Vector3r normal;
-		//FIXME : dynamic casts here???!!!
+ 		//FIXME : dynamic casts here???!!!
 		ScGeom* scg=dynamic_cast<ScGeom*>(interaction->interactionGeometry.get());
 		Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(interaction->interactionGeometry.get());
 		if(scg){Da=scg->radius1; Db=scg->radius2; normal=scg->normal;}
 		else if(d3dg){Da=d3dg->refR1>0?d3dg->refR1:2*d3dg->refR2; Db=d3dg->refR2>0?d3dg->refR2:d3dg->refR1; normal=d3dg->normal;}
 		else throw runtime_error("Ip2_FrictMat_FrictMat_FrictPhys: geometry is neither ScGeom nor Dem3DofGeom");
-		//harmonic average of the two stiffnesses when (Di.Ei/2) is the stiffness of sphere "i"
+ 		//harmonic average of the two stiffnesses when (Di.Ei/2) is the stiffness of sphere "i"
 		Real Kn = 2*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);
 		//same for shear stiffness
 		Real Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);

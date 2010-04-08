@@ -12,7 +12,7 @@
 #include<yade/core/PartialEngine.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Math.hpp>
-#include<yade/pkg-dem/Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity.hpp>
+#include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 
 
