@@ -283,12 +283,13 @@ void FlowBoundingSphere::Interpolate(Tesselation& Tes, Tesselation& NewTes)
         RTriangulation& Tri = Tes.Triangulation();
         Finite_cells_iterator cell_end = NewTri.finite_cells_end();
         /*CALCULATION OF VORONOI CENTRES*/
-        if ( !NewTes.Computed() ) NewTes.Compute();
+//        if ( !NewTes.Computed() ) NewTes.Compute();
         for (Finite_cells_iterator new_cell = NewTri.finite_cells_begin(); new_cell != cell_end; new_cell++) {
                 old_cell = Tri.locate((Point) new_cell->info());
                 new_cell->info().p() = old_cell->info().p();
                 //    new_cell->info().dv() = old_cell->info().dv();
         }
+	Tes.Clear();
 //         return NewTes;
 }
 

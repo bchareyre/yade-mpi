@@ -58,6 +58,7 @@ class FlowEngine : public PartialEngine
 					((double, MaxPressure, 0, "Maximal value of water pressure within the sample"))
 					((double, currentStress, 0, "Current value of axial stress"))
 					((double, currentStrain, 0, "Current value of axial strain"))
+					((bool, Retriangulation, 0, "Enable/Disable sample retriangulation"))
 					((int, intervals, 30, "Number of layers for pressure measurements"))
 					((bool,tess_based_force,true,"true=force computation based on tessalation, false=force computation based on triangulation")),
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas));
