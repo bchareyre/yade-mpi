@@ -16,16 +16,14 @@
 class CohesiveFrictionalMat : public FrictMat
 {
 	public :
-		bool		isBroken;
-		bool		isCohesive;
-
-		CohesiveFrictionalMat ();
 		virtual ~CohesiveFrictionalMat ();
 
 /// Serialization
-	REGISTER_CLASS_NAME(CohesiveFrictionalMat);
-	REGISTER_BASE_CLASS_NAME(FrictMat);
-	REGISTER_ATTRIBUTES(FrictMat,(isBroken)(isCohesive));
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohesiveFrictionalMat,FrictMat,"",
+		((bool,isBroken,true,""))
+		((bool,isCohesive,true,"")),
+		createIndex();
+					);
 /// Indexable
 	REGISTER_CLASS_INDEX(CohesiveFrictionalMat,FrictMat);
 };

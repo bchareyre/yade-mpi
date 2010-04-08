@@ -8,12 +8,6 @@
 
 #include "CohesiveFrictionalMat.hpp"
 
-CohesiveFrictionalMat::CohesiveFrictionalMat () : FrictMat()
-{
-	createIndex();
-	isBroken=true;
-	isCohesive=true;
-}
 
 CohesiveFrictionalMat::~CohesiveFrictionalMat()
 {
