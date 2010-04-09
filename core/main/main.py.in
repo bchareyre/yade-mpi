@@ -141,7 +141,7 @@ if 1:
 					'"\e[23~": "\C-Uyade.qt.View();\C-M"', # F11
 					'"\e[21~": "\C-Uyade.qt.Controller(), yade.qt.View();\C-M"', # F10
 					'"\e[20~": "\C-Uyade.qt.Generator();\C-M"', #F9
-					'"\e[19~": "\C-Uyade.plot.plot();\C-M"', #F9
+					'"\e[19~": "\C-Uimport yade.plot; yade.plot.plot();\C-M"', #F9
 					'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
 					] if qtEnabled else [])
 			)

@@ -21,9 +21,9 @@ O.timingEnabled=True
 TriaxialTest(importFilename=spheresFile,fast=fast,noFiles=True).load()
 O.dt=utils.PWaveTimeStep()
 isc=O.engines[2]
-isc['sweepLength']=1e-1
+isc.sweepLength=1e-1
 
-if not fast: utils.replaceCollider(GlobalEngine(collider))
+if not fast: utils.replaceCollider(eval(collider))
 
 O.step()
 timing.stats()

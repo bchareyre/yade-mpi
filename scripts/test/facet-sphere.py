@@ -24,7 +24,7 @@ O.bodies.append([
 import random
 for i in range(0,100):
 	s=utils.sphere([random.gauss(0,1),random.gauss(0,1),random.uniform(1,2)],random.uniform(.02,.05))
-	s.state['vel']=Vector3(random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1))
+	s.state.vel=Vector3(random.gauss(0,.1),random.gauss(0,.1),random.gauss(0,.1))
 	O.bodies.append(s)
 
 O.dt=utils.PWaveTimeStep()

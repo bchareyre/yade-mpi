@@ -11,6 +11,15 @@ shared_ptr<InteractionDispatchers> InteractionDispatchers_ctor_lists(const std::
 
 class InteractionDispatchers: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
+	typedef std::pair<body_id_t, body_id_t> idPair;
+	// store interactions that should be deleted after loop in action, not later
+	#ifdef YADE_OPENMP
+		vector<list<idPair> > eraseAfterLoopIds;
+		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds[omp_get_thread_num()].push_back(idPair(id1,id2)); }
+	#else
+		list<idPair> eraseAfterLoopIds;
+		void eraseAfterLoop(body_id_t id1,body_id_t id2){ eraseAfterLoopIds.push_back(id_pair(id1,id2)); }
+	#endif
 	public:
 		virtual void action();
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InteractionDispatchers,GlobalEngine,"Unified dispatcher for handling interaction loop at every step, for parallel performance reasons.",
@@ -22,6 +31,9 @@ class InteractionDispatchers: public GlobalEngine {
 			/*ctor*/ alreadyWarnedNoCollider=false;
 				#ifdef IDISP_TIMING
 					timingDeltas=shared_ptr<TimingDeltas>(new TimingDeltas);
+				#endif
+				#ifdef YADE_OPENMP
+					eraseAfterLoopIds.resize(omp_get_max_threads());
 				#endif
 			,
 			/*py*/

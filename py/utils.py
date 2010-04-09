@@ -27,13 +27,14 @@ def saveVars(mark='',loadNow=False,**kw):
 
 	For example, variables a=5, b=66 and c=7.5e-4 are defined. To save those, use::
 
-		>>> saveVars('mark',a=1,b=2,c=3,loadNow=True)
+		>>> from yade import utils
+		>>> utils.saveVars('mark',a=1,b=2,c=3,loadNow=True)
 		>>> a,b,c
 		(1, 2, 3)
 
 	those variables will be save in the .xml file, when the simulation itself is saved. To recover those variables once the .xml is loaded again, use
 
-		>>> loadVars('mark')
+		>>> utils.loadVars('mark')
 
 	and they will be defined in the __builtin__ namespace (i.e. available from anywhere in the python code).
 
@@ -137,15 +138,16 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 	Creating default shared material if none exists neither is given::
 
 		>>> O.reset()
+		>>> from yade import utils
 		>>> len(O.materials)
 		0
-		>>> s0=sphere([2,0,0],1)
+		>>> s0=utils.sphere([2,0,0],1)
 		>>> len(O.materials)
 		1
 
 	Instance of material can be given::
 
-		>>> s1=sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElastMat(young=30e9,density=2e3))
+		>>> s1=utils.sphere([0,0,0],1,wire=False,color=(0,1,0),material=ElastMat(young=30e9,density=2e3))
 		>>> s1.shape.wire
 		False
 		>>> s1.shape.color
@@ -157,7 +159,7 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 
 		>>> O.materials.append(FrictMat(young=10e9,poisson=.11,label='myMaterial'))
 		1
-		>>> s2=sphere([0,0,2],1,material='myMaterial')
+		>>> s2=utils.sphere([0,0,2],1,material='myMaterial')
 		>>> s2.mat.label
 		'myMaterial'
 		>>> s2.mat.poisson
@@ -172,8 +174,8 @@ def sphere(center,radius,dynamic=True,wire=False,color=None,highlight=False,mate
 		>>> import random
 		>>> def matFactory(): return ElastMat(young=1e10*random.random(),density=1e3+1e3*random.random())
 		... 
-		>>> s3=sphere([0,2,0],1,material=matFactory)
-		>>> s4=sphere([1,2,0],1,material=matFactory)
+		>>> s3=utils.sphere([0,2,0],1,material=matFactory)
+		>>> s4=utils.sphere([1,2,0],1,material=matFactory)
 
 	"""
 	b=Body()

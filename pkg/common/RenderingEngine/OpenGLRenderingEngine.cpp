@@ -50,6 +50,8 @@ void OpenGLRenderingEngine::init(){
 	}
 
 	initDone=true;
+	int e=glGetError();
+	if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderingEngine::init returned GL error ")+lexical_cast<string>(e)).c_str());
 }
 
 void OpenGLRenderingEngine::setBodiesRefSe3(){

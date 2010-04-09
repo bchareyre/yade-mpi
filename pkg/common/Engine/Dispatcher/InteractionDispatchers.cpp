@@ -65,7 +65,7 @@ void InteractionDispatchers::action(){
 	#endif
 		#ifdef DISPATCH_CACHE
 			if(removeUnseenIntrs && !I->isReal() && I->iterLastSeen<scene->currentIteration) {
-				scene->interactions->requestErase(I->getId1(),I->getId2());
+				eraseAfterLoop(I->getId1(),I->getId2());
 				continue;
 			}
 
@@ -166,7 +166,7 @@ void InteractionDispatchers::action(){
 			physDispatcher->operator()(Body::byId(I->getId1(),scene)->material, Body::byId(I->getId2(),scene)->material,I);
 			// LawDispatcher
 			lawDispatcher->operator()(I->interactionGeometry,I->interactionPhysics,I.get(),scene);
-			if(!I->isReal() && I->isFresn(scene)) LOG_WARN("Law functor deleted interaction that was just created. Please report bug: either this message is spurious, or the functor (or something else) is buggy.");
+			if(!I->isReal() && I->isFresh(scene)) LOG_WARN("Law functor deleted interaction that was just created. Please report bug: either this message is spurious, or the functor (or something else) is buggy.");
 		#endif
 
 		// process callbacks for this interaction
@@ -175,4 +175,14 @@ void InteractionDispatchers::action(){
 			if(callbackPtrs[i]!=NULL) (*(callbackPtrs[i]))(callbacks[i].get(),I.get());
 		}
 	}
+	// process eraseAfterLoop
+	#ifdef YADE_OPENMP
+		FOREACH(list<idPair>& l, eraseAfterLoopIds){
+			FOREACH(idPair p,l) scene->interactions->erase(p.first,p.second);
+			l.clear();
+		}
+	#else
+		FOREACH(idPair p, eraseAfterLoopIds) scene->interactions->erase(p.first,p.second);
+		eraseAfterLoopIds.clear();
+	#endif
 }
