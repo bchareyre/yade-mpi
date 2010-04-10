@@ -25,8 +25,8 @@ es = 0.3
 
 ## Materials
 params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
-sphereMat=O.materials.append(SimpleViscoelasticMat(density=Density,frictionAngle=frictionAngle,**params))
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 
 ### Creating the Buldozer Knife
 ### from facets, using GTS
@@ -68,7 +68,7 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
-		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
+		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),
 	GravityEngine(gravity=[0,0,-9.8]),

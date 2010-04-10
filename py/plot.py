@@ -124,18 +124,25 @@ def plot(noShow=False):
 updatePeriod=0
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None,varData=False):
-	"""baseName: used for creating baseName.gnuplot (command file for gnuplot),
-			associated baseName.data (data) and output files (if applicable) in the form baseName.[plot number].extension
-		term: specify the gnuplot terminal;
-			defaults to x11, in which case gnuplot will draw persistent windows to screen and terminate
-			other useful terminals are 'png', 'cairopdf' and so on
-		extension: defaults to terminal name
-			fine for png for example; if you use 'cairopdf', you should also say extension='pdf' however
-		timestamp: append numeric time to the basename
-		varData: whether file to plot will be declared as variable or be in-place in the plot expression
-		comment: a user comment (may be multiline) that will be embedded in the control file
+	"""Save data added with :yref:`yade.plot.addData` into (compressed) file and create .gnuplot file that attempts to mimick plots specified with :yref:`yade.plot.plots`.
 
-		Returns name fo the gnuplot file created.
+:parameters:
+	baseName:
+		used for creating baseName.gnuplot (command file for gnuplot),
+		associated baseName.data (data) and output files (if applicable) in the form baseName.[plot number].extension
+	term:
+		specify the gnuplot terminal;
+		defaults to x11, in which case gnuplot will draw persistent windows to screen and terminate; other useful terminals are 'png', 'cairopdf' and so on
+	extension:
+		defaults to terminal name; fine for png for example; if you use 'cairopdf', you should also say extension='pdf' however
+	timestamp:
+		append numeric time to the basename
+	varData:
+		whether file to plot will be declared as variable or be in-place in the plot expression
+	comment:
+		a user comment (may be multiline) that will be embedded in the control file
+
+Returns name fo the gnuplot file created.
 	"""
 	import time,bz2
 	if len(data.keys())==0: raise RuntimeError("No data for plotting were saved.")

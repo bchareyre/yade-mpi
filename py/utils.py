@@ -536,15 +536,12 @@ def vmData():
 
 def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 	"""Get some data about the current packing useful for uniaxial test:
-	
+
 #. Find the dimensions that is the longest (uniaxial loading axis)
 
-#. Find the minimum cross-section area of the speciment by examining several (areaSections)
-	sections perpendicular to axis, computing area of the convex hull for each one. This will
-	work also for non-prismatic specimen.
+#. Find the minimum cross-section area of the specimen by examining several (areaSections) sections perpendicular to axis, computing area of the convex hull for each one. This will work also for non-prismatic specimen.
 
-#. Find the bodies that are on the negative/positive boundary, to which the straining condition
-	should be applied.
+#. Find the bodies that are on the negative/positive boundary, to which the straining condition should be applied.
 
 :parameters:
 	`filename`:

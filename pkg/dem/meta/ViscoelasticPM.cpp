@@ -5,20 +5,20 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-YADE_PLUGIN((SimpleViscoelasticMat)(SimpleViscoelasticPhys)(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys)(Law2_Spheres_Viscoelastic_SimpleViscoelastic));
+YADE_PLUGIN((ViscElMat)(ViscElPhys)(Ip2_ViscElMat_ViscElMat_ViscElPhys)(Law2_ScGeom_ViscElPhys_Basic));
 
-/* SimpleViscoelasticMat */
-SimpleViscoelasticMat::~SimpleViscoelasticMat(){}
+/* ViscElMat */
+ViscElMat::~ViscElMat(){}
 
-/* SimpleViscoelasticPhys */
-SimpleViscoelasticPhys::~SimpleViscoelasticPhys(){}
+/* ViscElPhys */
+ViscElPhys::~ViscElPhys(){}
 
-/* Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys */
-void Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
+/* Ip2_ViscElMat_ViscElMat_ViscElPhys */
+void Ip2_ViscElMat_ViscElMat_ViscElPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
 	if(interaction->interactionPhysics) return;
-	SimpleViscoelasticMat* sdec1 = static_cast<SimpleViscoelasticMat*>(b1.get());
-	SimpleViscoelasticMat* sdec2 = static_cast<SimpleViscoelasticMat*>(b2.get());
-	SimpleViscoelasticPhys* phys = new SimpleViscoelasticPhys();
+	ViscElMat* sdec1 = static_cast<ViscElMat*>(b1.get());
+	ViscElMat* sdec2 = static_cast<ViscElMat*>(b2.get());
+	ViscElPhys* phys = new ViscElPhys();
 	phys->kn = sdec1->kn * sdec2->kn / (sdec1->kn + sdec2->kn);
 	phys->ks = sdec1->ks * sdec2->ks / (sdec1->ks + sdec2->ks);
 	phys->cn = ( (sdec1->cn==0) ? 0 : 1/sdec1->cn ) + ( (sdec2->cn==0) ? 0 : 1/sdec2->cn );
@@ -28,14 +28,14 @@ void Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys::go(c
 	phys->tangensOfFrictionAngle = std::tan(std::min(sdec1->frictionAngle, sdec2->frictionAngle)); 
 	phys->shearForce = Vector3r(0,0,0);
 	phys->prevNormal = Vector3r(0,0,0);
-	interaction->interactionPhysics = shared_ptr<SimpleViscoelasticPhys>(phys);
+	interaction->interactionPhysics = shared_ptr<ViscElPhys>(phys);
 }
 
-/* Law2_Spheres_Viscoelastic_SimpleViscoelastic */
-void Law2_Spheres_Viscoelastic_SimpleViscoelastic::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
+/* Law2_ScGeom_ViscElPhys_Basic */
+void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, shared_ptr<InteractionPhysics>& _phys, Interaction* I, Scene* rootBody){
 
 	const ScGeom& geom=*static_cast<ScGeom*>(_geom.get());
-	SimpleViscoelasticPhys& phys=*static_cast<SimpleViscoelasticPhys*>(_phys.get());
+	ViscElPhys& phys=*static_cast<ViscElPhys*>(_phys.get());
 
 	const int id1 = I->getId1();
 	const int id2 = I->getId2();

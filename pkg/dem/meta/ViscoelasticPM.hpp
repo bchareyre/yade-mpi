@@ -13,10 +13,10 @@
  
 /// Material
 /// Note: Shop::getViscoelasticFromSpheresInteraction can get kn,cn,ks,cs from a analytical solution of a pair spheres interaction problem.
-class SimpleViscoelasticMat : public Material {	
+class ViscElMat : public Material {	
 	public:
-		virtual ~SimpleViscoelasticMat();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SimpleViscoelasticMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<SimpleViscoelasticMat::kn>`, :yref:`cn<SimpleViscoelasticMat::cn>`,  :yref:`ks<SimpleViscoelasticMat::ks>`,  :yref:`cs<SimpleViscoelasticMat::cs>` from analytical solution of a pair spheres interaction problem.",
+		virtual ~ViscElMat();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElMat,Material,"Material for simple viscoelastic model of contact.\n\n.. note::\n\t ``Shop::getViscoelasticFromSpheresInteraction`` (and :yref:`yade.utils.getViscoelasticFromSpheresInteraction` in python) compute :yref:`kn<ViscElMat::kn>`, :yref:`cn<ViscElMat::cn>`,  :yref:`ks<ViscElMat::ks>`,  :yref:`cs<ViscElMat::cs>` from analytical solution of a pair spheres interaction problem.",
 		((Real,kn,NaN,"Normal elastic stiffness"))
 		((Real,cn,NaN,"Normal viscous constant"))
 		((Real,ks,NaN,"Shear elastic stiffness"))
@@ -24,42 +24,42 @@ class SimpleViscoelasticMat : public Material {
 		((Real,frictionAngle,NaN,"Friction angle [rad]")),
 		createIndex();
 	);
-	REGISTER_CLASS_INDEX(SimpleViscoelasticMat,Material);
+	REGISTER_CLASS_INDEX(ViscElMat,Material);
 };
-REGISTER_SERIALIZABLE(SimpleViscoelasticMat);
+REGISTER_SERIALIZABLE(ViscElMat);
 
 /// Interaction physics
-class SimpleViscoelasticPhys : public FrictPhys {
+class ViscElPhys : public FrictPhys {
 	public:
-		virtual ~SimpleViscoelasticPhys();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SimpleViscoelasticPhys,FrictPhys,"InteractionPhysics created from :yref:`SimpleViscoelasticMat`, for use with :yref:`Law2_Spheres_Viscoelastic_SimpleViscoelastic`.",
+		virtual ~ViscElPhys();
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(ViscElPhys,FrictPhys,"InteractionPhysics created from :yref:`ViscElMat`, for use with :yref:`Law2_ScGeom_ViscElPhys_Basic`.",
 		((Real,cn,NaN,"Normal viscous constant"))
 		((Real,cs,NaN,"Shear viscous constant")),
 		createIndex();
 	)
 };
-REGISTER_SERIALIZABLE(SimpleViscoelasticPhys);
+REGISTER_SERIALIZABLE(ViscElPhys);
 
 /// Convert material to interaction physics.
 // Uses the rule of consecutively connection.
-class Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys: public InteractionPhysicsFunctor {
+class Ip2_ViscElMat_ViscElMat_ViscElPhys: public InteractionPhysicsFunctor {
 	public :
 		virtual void go(const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-	YADE_CLASS_BASE_DOC(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys,InteractionPhysicsFunctor,"Convert 2 instances of :yref:`SimpleViscoelasticMat` to :yref:`SimpleViscoelasticPhys` using the rule of consecutive connection.");
-	FUNCTOR2D(SimpleViscoelasticMat,SimpleViscoelasticMat);
+	YADE_CLASS_BASE_DOC(Ip2_ViscElMat_ViscElMat_ViscElPhys,InteractionPhysicsFunctor,"Convert 2 instances of :yref:`ViscElMat` to :yref:`ViscElPhys` using the rule of consecutive connection.");
+	FUNCTOR2D(ViscElMat,ViscElMat);
 
 };
-REGISTER_SERIALIZABLE(Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys);
+REGISTER_SERIALIZABLE(Ip2_ViscElMat_ViscElMat_ViscElPhys);
 
 /// Constitutive law
 /// This class provides linear viscoelastic contact model
-class Law2_Spheres_Viscoelastic_SimpleViscoelastic: public LawFunctor {
+class Law2_ScGeom_ViscElPhys_Basic: public LawFunctor {
 	public :
 		virtual void go(shared_ptr<InteractionGeometry>&, shared_ptr<InteractionPhysics>&, Interaction*, Scene*);
-	FUNCTOR2D(ScGeom,SimpleViscoelasticPhys);
-	YADE_CLASS_BASE_DOC(Law2_Spheres_Viscoelastic_SimpleViscoelastic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`SimpleViscoelasticPhys`.");
+	FUNCTOR2D(ScGeom,ViscElPhys);
+	YADE_CLASS_BASE_DOC(Law2_ScGeom_ViscElPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`ViscElPhys`.");
 };
-REGISTER_SERIALIZABLE(Law2_Spheres_Viscoelastic_SimpleViscoelastic);
+REGISTER_SERIALIZABLE(Law2_ScGeom_ViscElPhys_Basic);
 

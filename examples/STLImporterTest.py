@@ -11,8 +11,8 @@ es = 0.3
 
 ## Import wall's geometry
 params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
-facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
-sphereMat=O.materials.append(SimpleViscoelasticMat(density=Density,frictionAngle=frictionAngle,**params))
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) # **params sets kn, cn, ks, cs
+sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,**params))
 from yade import ymport
 fctIds=O.bodies.append(ymport.stl('baraban.stl',color=(1,0,0),material=facetMat))
 ## Spheres
@@ -46,7 +46,7 @@ O.engines=[
 		## Create geometry information about each potential collision.
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		## Create physical information about the interaction.
-		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
+		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		## Constitutive law
 		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),

@@ -16,9 +16,9 @@ density=2700
 kw=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
 params=utils.getViscoelasticFromSpheresInteraction(10e3,tc,en,es)
 # facets material
-facetMat=O.materials.append(SimpleViscoelasticMat(frictionAngle=frictionAngle,**params)) 
+facetMat=O.materials.append(ViscElMat(frictionAngle=frictionAngle,**params)) 
 # default spheres material
-dfltSpheresMat=O.materials.append(SimpleViscoelasticMat(density=density,frictionAngle=frictionAngle))
+dfltSpheresMat=O.materials.append(ViscElMat(density=density,frictionAngle=frictionAngle))
 
 O.dt=.2*tc # time step
 
@@ -50,7 +50,7 @@ O.engines=[
 	InsertionSortCollider(),
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
-		[Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys()],
+		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
 	),
 	GravityEngine(gravity=[0,0,-9.81]),

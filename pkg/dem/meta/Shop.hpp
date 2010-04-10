@@ -23,7 +23,7 @@
 class Scene;
 class Body;
 class SimpleViscoelasticBodyParameters;
-class SimpleViscoelasticMat;
+class ViscElMat;
 class FrictMat;
 
 using namespace std;
@@ -97,7 +97,7 @@ class Shop{
 		/// Get viscoelastic parameters kn,cn,ks,cs from analytical solution of
 		/// a problem of interaction of pair spheres with mass m, collision
 		/// time tc and restitution coefficients en,es.
-	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<SimpleViscoelasticMat> b);
+	    static void getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es, shared_ptr<ViscElMat> b);
 
 		//! Get unbalanced force of the whole simulation
 		static Real unbalancedForce(bool useMaxForce=false, Scene* _rb=NULL);

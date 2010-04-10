@@ -173,7 +173,7 @@ Vector3r inscribedCircleCenter(const Vector3r& v0, const Vector3r& v1, const Vec
 }
 py::dict getViscoelasticFromSpheresInteraction(Real m, Real tc, Real en, Real es)
 {
-	shared_ptr<SimpleViscoelasticMat> b = shared_ptr<SimpleViscoelasticMat>(new SimpleViscoelasticMat());
+	shared_ptr<ViscElMat> b = shared_ptr<ViscElMat>(new ViscElMat());
 	Shop::getViscoelasticFromSpheresInteraction(m,tc,en,es,b);
 	py::dict d;
 	d["kn"]=b->kn;
@@ -443,5 +443,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("wireAll",wireAll,"Set :yref:`Shape::wire` on all bodies to True, rendering them with wireframe only.");
 	py::def("wireNone",wireNone,"Set :yref:`Shape::wire` on all bodies to False, rendering them as solids.");
 	py::def("wireNoSpheres",wireNoSpheres,"Set :yref:`Shape::wire` to True on non-spherical bodies (:yref:`Facets<Facet>`, :yref:`Walls<Wall>`).");
-	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r::ZERO));
+	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r::ZERO),"Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that periodic cell defines by repetition or its corners regular grid of points in $R^3$; however, all cells generating identical grid are equivalent and can be flipped one over another. This necessiatates adjustment of :yref:`Interaction.cellDist` for interactions that cross boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is accessible as ``Shop::flipCell``.\n\n.. warning::\n\t This function is currently broken and should not be used.");
 }
