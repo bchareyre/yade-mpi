@@ -50,8 +50,12 @@ void OpenGLRenderingEngine::init(){
 	}
 
 	initDone=true;
-	int e=glGetError();
-	if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderingEngine::init returned GL error ")+lexical_cast<string>(e)).c_str());
+	// glGetError crashes at some machines?! Was never really useful, anyway.
+	// reported http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01482.html
+	#if 0
+		int e=glGetError();
+		if(e!=GL_NO_ERROR) throw runtime_error((string("OpenGLRenderingEngine::init returned GL error ")+lexical_cast<string>(e)).c_str());
+	#endif
 }
 
 void OpenGLRenderingEngine::setBodiesRefSe3(){
