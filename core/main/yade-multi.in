@@ -230,10 +230,11 @@ for i,l in enumerate(useLines):
 			logging.warning('WARNING: job #%d will use %d slots but only %d are available'%(i,nSlots,maxJobs))
 	jobs.append(JobInfo(i,params[l]['description'],'PARAM_TABLE=%s:%d DISPLAY= %s %s --threads=%d %s -x %s > %s 2>&1'%(table,l,' '.join(envVars),executable,int(nSlots),'--nice=%s'%nice if nice!=None else '',simul,pipes.quote(logFile)),logFile,nSlots))
 
+print "Master process pid",os.getpid()
+
 print "Job summary:"
 for job in jobs:
 	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nSlots==1 else '/%d'%job.nSlots),job.command
-print "Master process pid",os.getpid()
 sys.stdout.flush()
 
 httpLastServe=0

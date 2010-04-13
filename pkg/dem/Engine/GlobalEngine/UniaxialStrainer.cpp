@@ -2,6 +2,7 @@
 #include"UniaxialStrainer.hpp"
 #include<boost/foreach.hpp>
 
+#include<yade/core/Scene.hpp>
 #include<yade/core/InteractionContainer.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 

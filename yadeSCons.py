@@ -57,7 +57,7 @@ def scanAllPlugins(cacheFile,feats):
 				if not (f.endswith('.cpp') or f.endswith('.cc') or f.endswith('C')): continue
 				ff=root+'/'+f
 				linkDeps,featureDeps=set(),set()
-				isPlugin=True #False
+				isPlugin=True # False
 				skipping=False
 				for l in open(ff):
 					if re.match(r'\s*#endif.*$',l): skipping=False; continue

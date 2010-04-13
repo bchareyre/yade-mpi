@@ -9,14 +9,14 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
-#include<yade/core/PartialEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/core/Body.hpp>
 #include <Wm3Vector3.h>
 // #include<yade/lib-base/yadeWm3.hpp>
 
 
 
-class Disp2DPropLoadEngine : public PartialEngine
+class Disp2DPropLoadEngine : public BoundaryController
 {
 	private :
 		Real	dgamma	// the increment of horizontal displacement in one timestep, part of the disturbation
@@ -54,8 +54,8 @@ class Disp2DPropLoadEngine : public PartialEngine
 			;
 		virtual void postProcessAttributes(bool deserializing);
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Disp2DPropLoadEngine,PartialEngine,
-		"Disturbs a simple shear sample in a given displacement direction \n \n This engine allows to apply, on a simple shear sample, a loading controlled by du/dgamma = cste, which is equivalent to du + cste' * dgamma = 0 (proportionnal path loadings).\n To do so, the upper plate of the simple shear box is moved in a given direction (corresponding to a given du/dgamma), whereas lateral plates are moved so that the box remains closed.\n This engine can easily be used to perform directionnal probes, with a python script launching successivly the same .xml which contains this engine, after having modified the direction of loading (see *theta* attribute). That's why this Engine contains a *saveData* procedure which can save data on the state of the sample at the end of the loading (in case of successive loadings - for successive directions - through a python script, each line would correspond to one direction of loading).",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Disp2DPropLoadEngine,BoundaryController,
+		"Disturbs a simple shear sample in a given displacement direction\n\nThis engine allows to apply, on a simple shear sample, a loading controlled by du/dgamma = cste, which is equivalent to du + cste' * dgamma = 0 (proportionnal path loadings).\nTo do so, the upper plate of the simple shear box is moved in a given direction (corresponding to a given du/dgamma), whereas lateral plates are moved so that the box remains closed.\nThis engine can easily be used to perform directionnal probes, with a python script launching successivly the same .xml which contains this engine, after having modified the direction of loading (see *theta* attribute). That's why this Engine contains a *saveData* procedure which can save data on the state of the sample at the end of the loading (in case of successive loadings - for successive directions - through a python script, each line would correspond to one direction of loading).",
 		((body_id_t,id_topbox,3,"the id of the upper wall"))
 		((body_id_t,id_boxbas,1,"the id of the lower wall"))
 		((body_id_t,id_boxleft,0,"the id of the left wall"))

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 
@@ -23,7 +23,7 @@ class State;
 	detailed description...
 */
 
-class TriaxialStressController : public GlobalEngine 
+class TriaxialStressController : public BoundaryController
 {
 	private :
 // 		Real previousStress, previousMultiplier; //previous mean stress and size multiplier		
@@ -106,7 +106,7 @@ class TriaxialStressController : public GlobalEngine
     		Real ComputeUnbalancedForce(bool maxUnbalanced=false);
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
-		TriaxialStressController,GlobalEngine,"An engine maintaining constant stresses on some boundaries of a parallepipedic packing."
+		TriaxialStressController,BoundaryController,"An engine maintaining constant stresses on some boundaries of a parallepipedic packing."
 		,
    		((unsigned int,stiffnessUpdateInterval,10,"target strain rate (./s)"))
    		((unsigned int,radiusControlInterval,10,""))

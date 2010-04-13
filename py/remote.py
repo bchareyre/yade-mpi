@@ -27,6 +27,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 	The connection is authenticated by requiring a cookie.
 	Only connections from localhost (127.0.0.*) are allowed.
 	"""
+	from yade import *
 	def setup(self):
 		if not self.client_address[0].startswith('127.0.0'):
 			print "TCP Connection from non-127.0.0.* address %s rejected"%self.client_address[0]
@@ -46,6 +47,8 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 >>> """%(str(self.client_address[0]),self.client_address[1]))
   			return True
 		else:
+			import time
+			time.sleep(5)
 			print "invalid cookie"
 			return False
 	def displayhook(self,s):

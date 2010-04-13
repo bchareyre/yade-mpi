@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include<yade/core/GlobalEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 
-class PeriIsoCompressor: public GlobalEngine{
+class PeriIsoCompressor: public BoundaryController{
 	Real avgStiffness; Real maxDisplPerStep; Vector3r sumForces, sigma; 
 	Real currUnbalanced;
 	public:
 		void action();
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PeriIsoCompressor,GlobalEngine,"Compress/decompress cloud of spheres by controlling periodic cell size until it reaches prescribed average stress, then moving to next stress value in given stress series.",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PeriIsoCompressor,BoundaryController,"Compress/decompress cloud of spheres by controlling periodic cell size until it reaches prescribed average stress, then moving to next stress value in given stress series.",
 		((vector<Real>,stresses,,"Stresses that should be reached, one after another"))
 		((Real,charLen,-1.,"Characteristic length, should be something like mean particle diameter (default -1=invalid value))"))
 		((Real,maxSpan,-1.,"Maximum body span in terms of bbox, to prevent periodic cell getting too small. |ycomp|"))
@@ -41,11 +41,11 @@ strainStress[0] and strainStress[2] are stress values, and strainStress[1] is st
 See scripts/test/periodic-triax.py for a simple example.
 
 */
-class PeriTriaxController: public GlobalEngine{
+class PeriTriaxController: public BoundaryController{
 	public:
 		virtual void action();
 		void strainStressStiffUpdate();
-	YADE_CLASS_BASE_DOC_ATTRS(PeriTriaxController,GlobalEngine,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
+	YADE_CLASS_BASE_DOC_ATTRS(PeriTriaxController,BoundaryController,"Engine for independently controlling stress or strain in periodic simulations.\n\n``strainStress`` contains absolute values for the controlled quantity, and ``stressMask`` determines meaning of those values (0 for strain, 1 for stress): e.g. ``( 1<<0 | 1<<2 ) = 1 | 4 = 5`` means that ``strainStress[0]`` and ``strainStress[2]`` are stress values, and ``strainStress[1]`` is strain. \n\nSee scripts/test/periodic-triax.py for a simple example.",
 		((bool,reversedForces,false,"For broken constitutive laws, normalForce and shearForce on interactions are in the reverse sense. see `bugreport <https://bugs.launchpad.net/yade/+bug/493102>`_"))
 		((bool,dynCell,false,"Imposed stress can be controlled using the packing stiffness or by applying the laws of dynamic (dynCell=true). Don't forget to assign a mass to the cell (PeriTriaxController->mass)."))
 		((Vector3r,goal,Vector3r::ZERO,"Desired stress or strain values (depending on stressMask), strains defined as ``strain(i)=log(Fii)``"))

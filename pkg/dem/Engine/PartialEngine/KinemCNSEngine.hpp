@@ -9,14 +9,14 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
-#include<yade/core/PartialEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/core/Body.hpp>
 #include<yade/lib-base/Math.hpp>
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
 
 
-class KinemCNSEngine : public PartialEngine
+class KinemCNSEngine : public BoundaryController
 {
 	private :
 		shared_ptr<Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity> myLdc;
@@ -47,7 +47,7 @@ class KinemCNSEngine : public PartialEngine
 		void stopMovement();		// to cancel all the velocities when gammalim is reached
 		void computeStiffness();
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemCNSEngine,PartialEngine,
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemCNSEngine,BoundaryController,
 		"To apply a constant normal rigidity shear for a parallelogram box (simple shear)\n\nThis engine, useable in simulations implying one deformable parallelepipedic box (e.g. :yref:`SimpleShear` Preprocessor), allows to translate horizontally the upper plate while the lateral ones rotate so that they always keep contact with the lower and upper walls. The upper plate can move not only horizontally but also vertically, so that the normal rigidity defined by DeltaF(upper plate)/DeltaU(upper plate) = constant (= *KnC* defined by the user).\n\nThe movement is moreover controlled by the user via a *shearSpeed* which is the horizontal speed of the upper wall, and by a maximum value of horizontal displacement *gammalim* (of the upper plate), after which the shear stops.\n\n.. note::\n\t not only the positions of walls are updated but also their speeds, which is all but useless considering the fact that in the contact laws these velocities of bodies are used to compute values of tangential relative displacements.\n\n.. warning::\n\tBut, because of this last point, if you want to use later saves of simulations executed with this Engine, but without that stopMovement was executed, your boxes will keep their speeds => you will have to cancel them by hand in the .xml",
 		((Real,shearSpeed,0.0,"the speed at wich the shearing is performed : speed of the upper plate [m/s]"))
 		((Real,gammalim,0.0,"the value of tangential displacement (of upper plate) at wich the shearing is stopped [m]"))

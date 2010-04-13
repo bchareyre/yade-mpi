@@ -2,9 +2,9 @@
 #pragma once
 #include<fstream>
 #include<limits>
+#include<yade/core/Scene.hpp>
 #include<yade/pkg-dem/Shop.hpp>
-#include<yade/core/FileGenerator.hpp>
-#include<yade/core/GlobalEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 
 #ifndef FOREACH
 #define FOREACH BOOST_FOREACH
@@ -16,7 +16,7 @@
  *
  * This engine should be run once forces on particles have been computed.
  */
-class UniaxialStrainer: public GlobalEngine {
+class UniaxialStrainer: public BoundaryController {
 	private:
 		bool needsInit;
 		void computeAxialForce();
@@ -32,7 +32,7 @@ class UniaxialStrainer: public GlobalEngine {
 		vector<Real> posCoords,negCoords;
 
 		virtual void action();
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(UniaxialStrainer,GlobalEngine,"Axial displacing two groups of bodies in the opposite direction with given strain rate.",
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(UniaxialStrainer,BoundaryController,"Axial displacing two groups of bodies in the opposite direction with given strain rate.",
 			((Real,strainRate,NaN,"Rate of strain, starting at 0, linearly raising to strainRate. [-]"))
 			((Real,absSpeed,NaN,"alternatively, absolute speed of boundary motion can be specified; this is effective only at the beginning and if strainRate is not set; changing absSpeed directly during simulation wil have no effect. [ms⁻¹]"))
 			((Real,initAccelTime,-200,"Time for strain reaching the requested value (linear interpolation). If negative, the time is dt*(-initAccelTime), where dt is  the timestep at the first iteration. [s]"))

@@ -9,11 +9,11 @@
 #pragma once
 
 #include<yade/core/Omega.hpp>
-#include<yade/core/PartialEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/lib-base/Math.hpp>
 
 
-class KinemCNDEngine : public PartialEngine
+class KinemCNDEngine : public BoundaryController
 {
 	private :
 		Real	alpha	// angle from the lower plate to the left box (trigo wise), the Engine finds itself its value
@@ -37,7 +37,7 @@ class KinemCNDEngine : public PartialEngine
 
 	protected :
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemCNDEngine,PartialEngine,
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemCNDEngine,BoundaryController,
 			"To apply a constant normal displacement shear for a parallelogram box\n\n \tThis engine, designed for simulations implying a simple shear box (:yref:`SimpleShear` Preprocessor), allows to perform a constant normal displacement shear, by translating horizontally the upper plate, while the lateral ones rotate so that they always keep contact with the lower and upper walls.",
 			((Real,shearSpeed,0.0,"the speed at which the shear is performed : speed of the upper plate [m/s]"))
 			((Real,gammalim,0.0,"the value of the tangential displacement at wich the displacement is stopped [m]"))

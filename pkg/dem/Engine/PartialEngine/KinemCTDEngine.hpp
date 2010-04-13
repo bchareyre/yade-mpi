@@ -8,12 +8,12 @@
 
 #pragma once
 
-#include<yade/core/PartialEngine.hpp>
+#include<yade/pkg-common/BoundaryController.hpp>
 #include<yade/core/Body.hpp>
 #include<Wm3Vector3.h>
 
 
-class KinemCTDEngine : public PartialEngine
+class KinemCTDEngine : public BoundaryController
 {
 	private :
 		Real	alpha	// angle from the lower plate to the left box (trigo wise), the Engine finds itself its value
@@ -40,7 +40,7 @@ class KinemCTDEngine : public PartialEngine
 			,computeAlpha()
 			;
 
-		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemCTDEngine,PartialEngine,
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KinemCTDEngine,BoundaryController,
 			"To compress a simple shear sample by moving the upper box in a vertical way only, so that the tangential displacement (defined by the horizontal gap between the upper and lower boxes) remains constant.\n \t The lateral boxes move also to keep always contact. All that until this box is submitted to a given stress (=*target_sigma*). Moreover saves are executed at each value of stresses stored in the vector *sigma_save*, and at *target_sigma*",
 			((Real,compSpeed,0.0,"(vertical) speed of the upper box : >0 for real compression, <0 for unloading [m/s]"))
 			((std::vector<Real>,sigma_save,,"vector with the values of sigma at which a save of the simulation should be performed [kPa]"))
