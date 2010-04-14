@@ -25,12 +25,13 @@ BOOST_PYTHON_MODULE(_packSpherePadder){
 
     py::class_<SpherePadder>("SpherePadder","Geometrical algorithm for filling tetrahedral mesh with spheres; the algorithm was designed by Jean-François Jerier and is described in [Jerier2009]_.",py::init<std::string,std::string>((py::arg("fileName"),py::arg("meshType")=""),"Initialize using tetrahedral mesh stored in *fileName*. Type of file is determined by extension: .gmsh implies *meshType*='GMSH', .inp implies *meshType*='INP'. If the extension is different, specify *meshType* explicitly. Possible values are 'GMSH' and 'INP'."))
 
-            .add_property("radiusRatio", &SpherePadder::getRadiusRatio,&SpherePadder::setRadiusRatio)
-            .add_property("radiusRange", &SpherePadder::getRadiusRange,&SpherePadder::setRadiusRange)
+            .add_property("radiusRatio", &SpherePadder::getRadiusRatio,&SpherePadder::setRadiusRatio_simple)
+				.def("setRadiusRatio",&SpherePadder::setRadiusRatio,"Like radiusRatio, but taking 2nd parameter.")
+            .add_property("radiusRange", &SpherePadder::getRadiusRange,&SpherePadder::setRadiusRange_py)
             .add_property("maxOverlapRate", &SpherePadder::getMaxOverlapRate,&SpherePadder::setMaxOverlapRate)
             .add_property("virtualRadiusFactor", &SpherePadder::getVirtualRadiusFactor,&SpherePadder::setVirtualRadiusFactor)
             .add_property("maxNumberOfSpheres", &SpherePadder::getMaxNumberOfSpheres,&SpherePadder::setMaxNumberOfSpheres)
-            .add_property("maxSolidFractioninProbe", &SpherePadder::getMaxSolidFractionInProbe,&SpherePadder::setMaxSolidFractioninProbe)
+            .add_property("maxSolidFractioninProbe", &SpherePadder::getMaxSolidFractionInProbe,&SpherePadder::setMaxSolidFractioninProbe_py)
             .add_property("numberOfSpheres", &SpherePadder::getNumberOfSpheres)
             .def_readonly("meanSolidFraction",&SpherePadder::getMeanSolidFraction)
 

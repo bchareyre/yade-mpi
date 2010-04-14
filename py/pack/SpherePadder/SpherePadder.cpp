@@ -84,13 +84,15 @@ SpherePadder::SpherePadder(const std::string& fileName, std::string meshType){
 	init();
 	if(meshType.empty()){
 		if(boost::algorithm::ends_with(fileName,".gmsh") || boost::algorithm::ends_with(fileName,".geo")) meshType="GMSH";
-		else if(boost::algorithm::ends_with(fileName,".inp")) meshType=="INP";
-		else throw std::invalid_argument("Unable to deduce mesh type from extension (should be *.gmsh or *.geo for GMSH, *.inp for INP); specify meshType explicitly.");
+		else if(boost::algorithm::ends_with(fileName,".msh")) meshType="SpherePadder";
+		else if(boost::algorithm::ends_with(fileName,".inp")) meshType="INP";
+		else throw std::invalid_argument("Unable to deduce mesh type from extension (should be *.gmsh or *.geo for GMSH, *.inp for INP, *.msh for SpherePadder (native)); specify meshType explicitly.");
 	}
-	if(meshType!="GMSH" && meshType!="INP") throw std::invalid_argument("Unknown mesh type '"+meshType+"'. Must be one of GMSH, INP (case sensitive).");
 	TetraMesh* m=new TetraMesh; // dtor will delete
 	if(meshType=="GMSH") m->read_gmsh(fileName.c_str());
 	else if(meshType=="INP") m->read_inp(fileName.c_str());
+	else if(meshType=="SpherePadder") m->read(fileName.c_str());
+	else throw std::invalid_argument("Unknown mesh type '"+meshType+"'. Must be one of GMSH, INP, SpherePadder (case sensitive).");
 	plugTetraMesh(m);
 }
 
@@ -1484,7 +1486,7 @@ unsigned int SpherePadder::place_fifth_sphere(id_type s1, id_type s2, id_type s3
 
 				//Sphere S = sphere[id]; // save
 				//if (!place_sphere_4contacts(id)) sphere[id] = S;
-				cout << place_sphere_4contacts(id) << endl;;
+				// cout << place_sphere_4contacts(id) << endl;;
 // 				neighbor.clear();
 // 				build_sorted_list_of_neighbors(id, neighbor);
 // 				unsigned int n = 1;

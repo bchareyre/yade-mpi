@@ -1,14 +1,9 @@
-/*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*                                                                        *
-*  This program is free software; it is licensed under the terms of the  *
-*  GNU General Public License v2 or later. See file LICENSE for details. *
-*************************************************************************/
-
 #pragma once
-
 #include<yade/core/Shape.hpp>
+
+// HACK to work around https://bugs.launchpad.net/yade/+bug/528509
+// see comments there for explanation
+namespace yade{
 
 class Sphere: public Shape{
 	public:
@@ -21,6 +16,9 @@ class Sphere: public Shape{
 	REGISTER_CLASS_INDEX(Sphere,Shape);
 };
 
+}
+// necessary
+using namespace yade; 
+
+// must be outside yade namespace
 REGISTER_SERIALIZABLE(Sphere);
-
-

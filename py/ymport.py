@@ -123,7 +123,7 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 		ret.append(utils.sphere([shift[0]+scale*float(data[0]),shift[1]+scale*float(data[1]),shift[2]+scale*float(data[2])],scale*float(data[3]),**kw))
 	return ret
 
-def gengeo(mntable,shift=[0.0,0.0,0.0],scale=1.0,**kw):
+def gengeo(mntable,shift=Vector3().ZERO,scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo library and creates spheres.
 	shift[X,Y,Z] parameter moves the specimen.
 	Remaining **kw arguments are passed to :yref:`yade.utils.sphere`; 
@@ -137,8 +137,10 @@ def gengeo(mntable,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	* https://answers.launchpad.net/esys-particle/+faq/877
 	* http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
 	* https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/"""
-	from GenGeo import MNTable3D,Sphere
-	
+	try:
+		from GenGeo import MNTable3D,Sphere
+	except ImportError:
+		from gengeo import MNTable3D,Sphere
 	ret=[]
 	sphereList=mntable.getSphereListFromGroup(0)
 	for i in range(0, len(sphereList)):

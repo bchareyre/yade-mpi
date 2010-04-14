@@ -292,6 +292,8 @@ void TetraMesh::organize ()
 	// Display informations
 	cout << "nb Nodes = " << node.size() << endl;
 	cout << "nb Tetra = " << tetraedre.size() << endl;
+
+	if(node.size()==0) throw std::runtime_error("TetraMesh has 0 vertices (undetected error importing mesh file?)");
   
     cout << "Translate all nodes in such a manner that all coordinates are > 0" << endl;
 	// (Don't know if it is absolutly necessary)

@@ -3,35 +3,25 @@
 """Simple example to show the SpherePadder usage in the built-in python interpreter of yade.
 The sample is show with qt.View() but no computation can be done."""
 
-# For the moment, the module packing (ie. file packing.so) 
-# must copyed manually in the folder gui (of the dynamic libs tree)
-import packing
+from yade import pack
+from yade import config
 
-mesh = packing.TetraMesh()
-padder = packing.SpherePadder()
-
-mesh.read_gmsh('bench_1000.msh')
-padder.plugTetraMesh(mesh)
-
+padder=pack.SpherePadder('SpherePadder-test.msh')
 padder.setRadiusRatio(4.0,0.125)
-padder.setMaxOverlapRate(1.0e-4)
-padder.setVirtualRadiusFactor(100.0)
+padder.maxOverlapRate=1.0e-4
+padder.virtualRadiusFactor=100.0
 
 padder.pad_5()
 padder.place_virtual_spheres()
-padder.setMaxNumberOfSpheres(8500)
-padder.densify()
-padder.save_mgpost("mgp.out.001")
+padder.maxNumberOfSpheres=8500
 
-from yade import utils
-o=Omega()
+# would otherwise raise RuntimeError
+if 'CGAL' in config.features:
+	padder.densify()
 
-lst = packing.getSphereList(padder)
-for Sph in lst:
-  o.bodies.append(utils.sphere(center=[Sph[0],Sph[1],Sph[2]],radius=Sph[3]))
-
-o.bodies.append(utils.box(center=[0.0,-0.1,0.0],extents=[3.0,0.05,3.0]))
-
+#padder.save_mgpost("mgp.out.001")
+sp=padder.asSpherePack()
+O.bodies.append([utils.sphere(s[0],s[1]) for s in sp])
 from yade import qt
 qt.View()
 

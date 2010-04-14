@@ -60,11 +60,15 @@ struct Criterion
     double x,y,z,R;
 };
 
+// HACK to work around https://bugs.launchpad.net/yade/+bug/528509
+namespace SpherePadder_namespace{
 struct Sphere
 {
     double     x,y,z,R;
     SphereType type;
 };
+}
+using namespace SpherePadder_namespace;
 
 struct Neighbor
 {
@@ -164,8 +168,11 @@ class SpherePadder
         bool meshIsPlugged;
 	
         void setRadiusRatio (double r, double rapp = 0.125);
+		  // without the optional arg, for setting python property
+		  void setRadiusRatio_simple(double r){ setRadiusRatio(r); }
 		  Real getRadiusRatio(){ return ratio; };
         void setRadiusRange (double min, double max);
+		  void setRadiusRange_py(const py::tuple& t){ setRadiusRange(py::extract<double>(t[0]),py::extract<double>(t[1])); }
 		  py::tuple getRadiusRange(){ return py::make_tuple(rmin,rmax); }
         void setMaxOverlapRate (double r) { max_overlap_rate = fabs(r); }
 		  Real getMaxOverlapRate(){ return max_overlap_rate; }
@@ -174,6 +181,7 @@ class SpherePadder
         void setMaxNumberOfSpheres (id_type max);
 		  id_type getMaxNumberOfSpheres(){ return criterion.nb_spheres_max; }
         void setMaxSolidFractioninProbe (double max, double x, double y,double z, double R);
+		  void setMaxSolidFractioninProbe_py(const py::tuple& t){ setMaxSolidFractioninProbe(py::extract<double>(t[0]),py::extract<double>(t[1]),py::extract<double>(t[2]),py::extract<double>(t[3]),py::extract<double>(t[4])); }
 		  py::tuple getMaxSolidFractionInProbe(){ return py::make_tuple(criterion.solid_fraction_max,criterion.x,criterion.y,criterion.z,criterion.R); }
 
         vector<Sphere> & getSphereList() { return sphere;}

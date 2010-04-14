@@ -6,7 +6,7 @@ Be sure LSMGenGeo library is installed.
 
 The result is:
 	2 files:
-		"cyl.geo" is the geometry file which can be imported into YADE with import_LSMGenGeo_geometry() function
+		"cyl.geo" is the geometry file which can be imported into YADE with ymport.gengeoFile() function
 		"cyl.vtk" is the VTK-filed which can be opened by any VTK-based software, for example Paraview
 	spheres, imported into the YADE simulation, according to generated geometry
 
@@ -16,11 +16,16 @@ https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/
 from yade import pack,ymport
 from yade import utils
 from math import *
-from GenGeo import *
+
+try:
+	from GenGeo import *
+except ImportError:
+	from gengeo import *
+
 import sys
 
 fileName="cyl"
-radius=25
+radius=15
 length=100
 
 minRadius=0.5
@@ -72,7 +77,7 @@ O.materials.append(FrictMat(young=1e9,poisson=.25,frictionAngle=0.5,density=1e3)
 kw={'material':0}
 
 #Import the GenGeo geometry directly into the YADE simulation
-O.bodies.append(ymport.gengeo(mntable,moveTo=[-1.0,-1.0,-1.0],scale=2.0,color=(1,1,0),**kw))
+O.bodies.append(ymport.gengeo(mntable,shift=[-1.0,-1.0,-1.0],scale=2.0,color=(1,1,0),**kw))
 
 try:
 	from yade import qt
