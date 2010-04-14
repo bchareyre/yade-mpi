@@ -9,14 +9,13 @@ These classes are used internally in gui/py/PythonUI_rc.py and are not intended 
 import SocketServer
 import sys,time
 
-from yade.wrapper import *
+from yade import *
 
 class InfoSocketProvider(SocketServer.BaseRequestHandler):
 	"""Class providing dictionary of important simulation information,
 	without authenticating the access."""
 	def handle(self):
 		import pickle, os
-		O=Omega()
 		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,realtime=O.realtime,time=O.time,id=O.tags['id'] if O.tags.has_key('id') else None,threads=os.environ['OMP_NUM_THREADS'] if os.environ.has_key('OMP_NUM_THREADS') else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
 		self.request.send(pickle.dumps(ret))
 		
@@ -27,7 +26,6 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 	The connection is authenticated by requiring a cookie.
 	Only connections from localhost (127.0.0.*) are allowed.
 	"""
-	from yade import *
 	def setup(self):
 		if not self.client_address[0].startswith('127.0.0'):
 			print "TCP Connection from non-127.0.0.* address %s rejected"%self.client_address[0]
