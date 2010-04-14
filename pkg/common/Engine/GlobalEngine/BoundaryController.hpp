@@ -1,3 +1,4 @@
+# pragma once
 #include<yade/core/GlobalEngine.hpp>
 class BoundaryController: public GlobalEngine{
 	virtual void action();
