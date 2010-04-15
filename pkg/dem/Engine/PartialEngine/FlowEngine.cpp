@@ -48,8 +48,7 @@ void FlowEngine::action ( )
 		if ( current_state==3 )
 		{
 			if ( first || Update_Triangulation ) { Build_Triangulation( P_zero );}
-// 			else
-// 			{
+
 				timingDeltas->checkpoint("Triangulating");
 				
 				UpdateVolumes ( );
@@ -73,8 +72,8 @@ void FlowEngine::action ( )
 			
 // 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
-				flow->tess_based_force=tess_based_force;
-				flow->Compute_Forces ( );
+				flow->Compute_Forces();
+// 				flow->ComputeTetrahedralForces();
 			
 				timingDeltas->checkpoint("Compute_Forces");
 
@@ -107,14 +106,11 @@ void FlowEngine::action ( )
 				MaxPressure = flow->PermeameterCurve(flow->T[flow->currentTes].Triangulation(), g, time, intervals);
 				
 				if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
-// 				if (Retriangulation)
 				{ Update_Triangulation = true; }
 				
 				timingDeltas->checkpoint("Storing Max Pressure");
 				
 				first=false;
-				
-// 			}
 		}
 	}
 }
@@ -163,13 +159,16 @@ void FlowEngine::Build_Triangulation (double P_zero )
 	
 	flow->Localize ();
 
+	flow->meanK_LIMIT = meanK_correction;
+	flow->meanK_STAT = meanK_opt;
 	flow->Compute_Permeability ();
 
 	if (first)
 	{
 		CGT::Finite_cells_iterator cell_end = flow->T[flow->currentTes].Triangulation().finite_cells_end();
 		for ( CGT::Finite_cells_iterator cell = flow->T[flow->currentTes].Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){cell->info().dv() = 0; cell->info().p() = 0;}
-		if (compute_K) {flow->TOLERANCE=1e-09; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		Oedometer_Boundary_Conditions();
 		flow->Initialize_pressures( P_zero );
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
@@ -177,14 +176,13 @@ void FlowEngine::Build_Triangulation (double P_zero )
 	else 
 	{
 		cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
-		if (compute_K) {flow->TOLERANCE=1e-09; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
+		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
 		flow->TOLERANCE=Tolerance;
 		flow->Interpolate ( flow->T[!flow->currentTes], flow->T[flow->currentTes] );
 		Update_Triangulation=!Update_Triangulation;
-		Retriangulation=false;
+		Oedometer_Boundary_Conditions();
 	}
 
-	Oedometer_Boundary_Conditions();
 	Initialize_volumes ( );
 	flow->DisplayStatistics ();
 }

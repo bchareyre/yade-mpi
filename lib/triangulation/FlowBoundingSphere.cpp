@@ -33,7 +33,7 @@ const bool DEBUG_OUT = false;
 
 const double ONE_THIRD = 1.0/3.0;
 //! Use this factor, or minLength, to reduce max permeability values (see usage below))
-const double MAXK_DIV_KMEAN = 5000;
+const double MAXK_DIV_KMEAN = 1;
 const double minLength = 0.20;//percentage of mean rad
 
 //! Factors including the effect of 1/2 symmetry in hydraulic radii
@@ -75,6 +75,8 @@ FlowBoundingSphere::FlowBoundingSphere()
 	TOLERANCE = 1e-06;
 	RELAX = 1.9;
 	ks=0;
+	meanK_LIMIT= false;
+	meanK_STAT = false; K_opt_factor=0;
 }
 
 void FlowBoundingSphere::Compute_Action()
@@ -157,6 +159,7 @@ void FlowBoundingSphere::Compute_Action(int argc, char *argv[ ], char *envp[ ])
         /** PERMEABILITY **/
         /** START PERMEABILITY CALCULATION**/
         k_factor = 1;
+	
         Compute_Permeability();
         clock.top("Compute_Permeability");
         /** END PERMEABILITY CALCULATION**/
@@ -365,7 +368,7 @@ void FlowBoundingSphere::Compute_Permeability()
 
 //         std::ofstream oFile( "Hydraulic_Radius",std::ios::out);
         std::ofstream kFile ( "LocalPermeabilities" ,std::ios::app );
-        Real meanK=0, k_moy;
+	Real meanK=0, STDEV=0;
         Real infiniteK=1e10;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 p1 = cell->info();
@@ -401,33 +404,64 @@ void FlowBoundingSphere::Compute_Permeability()
 //     (cell->info().facetSurf())[j]= k*n;
                                 (neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= k*k_factor;
 				
-				meanK += 1/k;
-				
+				meanK += (cell->info().k_norm())[j];
+				kFile << ( cell->info().k_norm() )[j] << endl;
 //     (neighbour_cell->info().facetSurf())[Tri.mirror_index(cell, j)]= (-k) *n;
                         }
                         //    else if ( Tri.is_infinite ( neighbour_cell )) k = 0;//connection to an infinite cells
                 }
                 cell->info().isvisited = !ref;
-
-//                 for (int y=0;y<4;y++) cout << "Permeability " << y << " = " << (cell->info().k_norm())[y] << endl;
-		for ( int y=0;y<4;y++ ) kFile << ( cell->info().k_norm() ) [y] << endl;
         }
+	meanK /= pass;
+	if (DEBUG_OUT) cout << "PassCompK = " << pass << endl;
 
         // A loop to reduce K maxima, needs a better equation : the mean value is influenced by the very big K
-	kFile << "----------reduction reduction reduction---------" << endl;
-        meanK /= pass;
-	k_moy = 1/meanK;
+
         Real maxKdivKmean = MAXK_DIV_KMEAN;
+	ref = Tri.finite_cells_begin()->info().isvisited; pass=0;
         for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
                 for (int j=0; j<4; j++) {
-//    if (cell->info().k_norm()[j]>maxKdivKmean*meanK) cerr <<"Adjusting permeability : " <<cell->info().k_norm()[j]<<" > "<<maxKdivKmean<<" * "<<meanK<<endl;
-//                         (cell->info().k_norm())[j] = min(cell->info().k_norm()[j], maxKdivKmean*meanK);
-			(cell->info().k_norm())[j] = min(cell->info().k_norm()[j], k_moy);
-			kFile << (cell->info().k_norm())[j] << endl;
+			neighbour_cell = cell->neighbor(j);
+			if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref){
+			pass++;
+			if (meanK_LIMIT) {
+				kFile << "--Correction--MEANKTHRESHOLD--" << endl;
+				(cell->info().k_norm())[j] = min(cell->info().k_norm()[j], maxKdivKmean*meanK);
+				kFile << (cell->info().k_norm())[j] << endl;}
+				STDEV += pow(((cell->info().k_norm())[j]-meanK),2);
+			}
                 }
         }
-        if (DEBUG_OUT) cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
+	STDEV = sqrt(STDEV/pass);
+	
+	if (DEBUG_OUT) cout << "PassKcorrect = " << pass << endl;
+	if (DEBUG_OUT) cout << "POS = " << POS << " NEG = " << NEG << " pass = " << pass << endl;
+	
+	if (meanK_STAT)
+	{
+		cout << "STATISTIC K" << endl;
+		double k_min = 0;
+		double k_max = meanK + K_opt_factor*STDEV;
 
+		cout << "Kmoy = " << meanK << " Standard Deviation = " << STDEV << endl;
+		cout << "kmin = " << k_min << " kmax = " << k_max << endl;
+	
+		ref = Tri.finite_cells_begin()->info().isvisited;
+		pass=0;
+		for (Finite_cells_iterator cell = Tri.finite_cells_begin(); cell != cell_end; cell++) {
+			for (int j=0; j<4; j++) {neighbour_cell = cell->neighbor(j);
+				if (!Tri.is_infinite(neighbour_cell) && neighbour_cell->info().isvisited==ref){
+					pass+=1;
+// 					if ((cell->info().k_norm())[j]<k_min) 
+// 					{(cell->info().k_norm())[j]=k_min;(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= (cell->info().k_norm())[j];}
+					if ((cell->info().k_norm())[j]>k_max)
+					{(cell->info().k_norm())[j]=k_max;(neighbour_cell->info().k_norm())[Tri.mirror_index(cell, j)]= (cell->info().k_norm())[j];}
+				}
+			}cell->info().isvisited=!ref;
+		}
+		if (DEBUG_OUT) cout << "PassKopt = " << pass << endl;
+	}
+	
         Finite_vertices_iterator vertices_end = Tri.finite_vertices_end();
         Real Vgrains = 0;
         int grains=0;
@@ -532,6 +566,17 @@ void FlowBoundingSphere::ComputeTetrahedralForces()
                         }
                 cell->info().isvisited=!ref;
         }
+	cout << "tetrahedral scheme" <<endl;
+	Vecteur TotalForce = nullVect;
+	for (Finite_vertices_iterator v = Tri.finite_vertices_begin(); v != Tri.finite_vertices_end(); ++v) {
+		if (!v->info().isFictious) {
+			TotalForce = TotalForce + v->info().forces;
+		} else {
+			if (boundary(v->info().id()).flowCondition==1) TotalForce = TotalForce + v->info().forces;
+			if (DEBUG_OUT) cout << "fictious_id = " << v->info().id() << " force = " << v->info().forces << endl;
+		}
+	}
+	cout << "TotalForce = "<< TotalForce << endl;
 }
 
 void FlowBoundingSphere::Compute_Forces()
