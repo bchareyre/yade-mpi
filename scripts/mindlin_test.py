@@ -61,7 +61,7 @@ plot.plots={'un':('fn')}
 def myAddPlotData():
 	i=O.interactions[0,1]
 	## store some numbers under some labels
-	plot.addData(fn=i.phys.normalForce[0],step=O.iter,un=2*s0.shape['radius']-s1.state.pos[0]-s0.state.pos[0],kn=i.phys.kn)	
+	plot.addData(fn=i.phys.normalForce[0],step=O.iter,un=2*s0.shape.radius-s1.state.pos[0]+s0.state.pos[0],kn=i.phys.kn)	
 
 O.run(50,True);
 print "Now calling plot.plot() to show the figure."

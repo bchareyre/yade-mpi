@@ -21,6 +21,7 @@ YADE_PLUGIN((Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity));
 void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplacer par :
 // void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::go(shared_ptr<InteractionGeometry>& iG, shared_ptr<InteractionPhysics>& iP, Interaction* contact, Scene* scene)
 {
+// 	cout << "\n Nvlle it :"<< endl;
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
 	Real dt = Omega::instance().getTimeStep();
@@ -38,7 +39,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 		const shared_ptr<Interaction>& contact = *ii;// supprimable
 		int id1 = contact->getId1();
 		int id2 = contact->getId2();
-		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
+// 		cout << "contact entre " << id1 << " et " << id2 << " reel ? " << contact->isReal() << endl;
 		if ( !( (*bodies)[id1]->getGroupMask() & (*bodies)[id2]->getGroupMask() & sdecGroupMask)  )
 			continue; // skip other groups,
 
@@ -61,6 +62,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 		Real previousun = currentContactPhysics->previousun;
 		Real previousFn = currentContactPhysics->previousFn;
 		Real kn = currentContactPhysics->kn;
+// 		cout << "Valeur de kn : " << kn << endl;
 		Real Fn; // la valeur de Fn qui va etre calculee selon différentes manieres puis affectee
 
 		Real un = currentContactGeometry->penetrationDepth; // compte positivement lorsq vraie interpenetration
@@ -69,17 +71,17 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 			{
 			Fn = kn*un;
 			currentContactPhysics->unMax = std::abs(un);
-			cout << "je suis dans le calcul normal " << endl;
+// 			cout << "je suis dans le calcul normal " << endl;
 			}
 		else
 			{
 			Fn = previousFn + coeff_dech * kn * (un-previousun);	// Calcul incrémental de la nvlle force
-			cout << "je suis dans l'autre calcul" << endl;
+// 			cout << "je suis dans l'autre calcul" << endl;
 			if(std::abs(Fn) > std::abs(kn * un))		// verif qu'on ne depasse la courbe
 				Fn = kn*un;
 			if(Fn < 0.0 )	// verif qu'on reste positif FIXME ATTENTION ON S'EST FICHU DU NORMAL ADHESION !!!!
 				{Fn = 0;
-				cout << "j'ai corrige pour ne pas etre negatif" << endl;
+// 				cout << "j'ai corrige pour ne pas etre negatif" << endl;
 				}
 			}
 		
@@ -150,45 +152,33 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 
 
 		shearForce -= currentContactPhysics->ks*shearDisplacement;
-/////////////////////// CREEP END /////////////////////////////
 
-                //  cerr << "shearForce = " << shearForce << endl;
                 Real maxFs = 0;
                 Real Fs = currentContactPhysics->shearForce.Length();
                 maxFs = std::max((Real) 0,Fn*currentContactPhysics->tangensOfFrictionAngle);
                 
                 if ( Fs  > maxFs )
                 {
-			
-                    
+
 			currentContactPhysics->SetBreakingState();
 
-                    //     maxFs = currentContactPhysics->shearAdhesion;
-                    //    if (!currentContactPhysics->cohesionDisablesFriction && un>0)
-                    //         maxFs += Fn * currentContactPhysics->tangensOfFrictionAngle;
+			maxFs = max((Real) 0, Fn * currentContactPhysics->tangensOfFrictionAngle);
 
-                    	maxFs = max((Real) 0, Fn * currentContactPhysics->tangensOfFrictionAngle);
-
-                    //cerr << "currentContactPhysics->tangensOfFrictionAngle = " << currentContactPhysics->tangensOfFrictionAngle << endl;
-                    // cerr << "maxFs = " << maxFs << endl;
-
-                    	maxFs = maxFs / Fs;
-                    // cerr << "maxFs = " << maxFs << endl;
-                    	if (maxFs>1)
+			maxFs = maxFs / Fs;
+			if (maxFs>1)
                         	cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
                     	shearForce *= maxFs;
 			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::ZERO;
                 }
 
-                
 
                 //////// PFC3d SlipModel
 
-                Vector3r f				= currentContactPhysics->normalForce + shearForce;
-					scene->forces.addForce (id1,-f);
-					scene->forces.addForce (id2,+f);
-					scene->forces.addTorque(id1,-c1x.Cross(f));
-					scene->forces.addTorque(id2, c2x.Cross(f));
+                Vector3r f	= currentContactPhysics->normalForce + shearForce;
+		scene->forces.addForce (id1,-f);
+		scene->forces.addForce (id2,+f);
+		scene->forces.addTorque(id1,-c1x.Cross(f));
+		scene->forces.addTorque(id2, c2x.Cross(f));
 
 
 	// Moment law					 	 ///
