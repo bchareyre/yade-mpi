@@ -64,6 +64,7 @@ namespace{
 #define _REGISTER_ATTRIBUTES_REPEAT(x,y,z) registerAttribute(BOOST_PP_STRINGIZE(z),z);
 
 #include<boost/python.hpp>
+#include<boost/type_traits/integral_constant.hpp>
 
 namespace{
 	boost::python::object pyGetAttr(const std::string& key){ PyErr_SetString(PyExc_KeyError,(std::string("No such attribute: ")+key+".").c_str()); boost::python::throw_error_already_set(); /*never reached; avoids warning*/ throw; }
@@ -88,7 +89,7 @@ namespace{
 // 	http://www.boost.org/doc/libs/1_42_0/libs/python/doc/v2/faq.html#topythonconversionfailed
 // for reason why the original def_readwrite will not work:
 // #define _PYATTR_DEF(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(2,0,z)),&thisClass::BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
-#define _PYATTR_DEF(x,thisClass,z) DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
+#define _PYATTR_DEF(x,thisClass,z) _DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
 //
 // return reference for vector and matrix types to allow things like
 // O.bodies.pos[1].state.vel[2]=0 
@@ -103,9 +104,22 @@ namespace{
 // OTOH got sequences of non-shared types, it sill (silently) fail:
 // f=Facet(); f.vertices[1][0]=4 
 //
+// see http://www.boost.org/doc/libs/1_42_0/libs/type_traits/doc/html/boost_typetraits/background.html
+// about how this works
+namespace yade{
+	// by default, do not return reference; return value instead
+	template<typename T> struct py_wrap_ref: public boost::false_type{};
+	// specialize for types that should be returned as references
+	template<> struct py_wrap_ref<Vector3r>: public boost::true_type{};
+	template<> struct py_wrap_ref<Vector3i>: public boost::true_type{};
+	template<> struct py_wrap_ref<Vector2r>: public boost::true_type{};
+	template<> struct py_wrap_ref<Vector2i>: public boost::true_type{};
+	template<> struct py_wrap_ref<Quaternionr>: public boost::true_type{};
+	template<> struct py_wrap_ref<Matrix3r>: public boost::true_type{};
+};
 #define _DEF_READWRITE_BY_VALUE(thisClass,attr,doc) add_property(/*attr name*/BOOST_PP_STRINGIZE(attr),/*read access*/boost::python::make_getter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*write access*/boost::python::make_setter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*docstring*/doc)
-#define _TYPE_RETURNED_AS_REFERENCE(tt) typeid(tt)==typeid(Vector3r) || typeid(tt)==typeid(Vector3i) || typeid(tt)==typeid(Quaternionr) || typeid(tt)==typeid(Vector2r) || typeid(tt)==typeid(Vector2i) || typeid(tt)==typeid(Matrix3r)
-#define DEF_READWRITE_CUSTOM(thisClass,attr,doc) { if(_TYPE_RETURNED_AS_REFERENCE(thisClass::attr)) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE(thisClass,attr,doc); }
+// the conditional should be eliminated by compiler at compile-time, as it depends only on types, not their values
+#define _DEF_READWRITE_CUSTOM(thisClass,attr,doc) { if(yade::py_wrap_ref<typeof(thisClass::attr)>::value) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE(thisClass,attr,doc); }
 
 // macros for deprecated attribute access
 // gcc<=4.3 is not able to compile this code; we will just not generate any code for deprecated attributes in such case
@@ -162,7 +176,7 @@ namespace{
 	_YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),deprec,extras)
 
 #define _DEF_READWRITE_STATIC(thisClass,attr,doc)
-#define _STATATTR_PY(x,thisClass,z) DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
+#define _STATATTR_PY(x,thisClass,z) _DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
 #define _STATATTR_DECL(x,y,z) static BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
 #define _STRIP_TYPE_DEFAULT_DOC(x,y,z) (BOOST_PP_TUPLE_ELEM(4,1,z))
 
