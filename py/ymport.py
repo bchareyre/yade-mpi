@@ -24,7 +24,7 @@ def text(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	return ret
 
 def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,material=-1):
-	""" Import geometry from stl file, create facets and return list of their ids."""
+	""" Import geometry from stl file, return list of created facets."""
 	imp = STLImporter()
 	facets=imp.ymport(file)
 	for b in facets:
@@ -35,6 +35,14 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 		b.shape.highlight=highlight
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)
 	return facets
+
+def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
+	""" Read given meshfile in gts format, apply scale and shift (in this order); return list of corresponding facets. **kw is passed to :yref:`utils.facet`."""
+	import gts,yade.pack
+	surf=gts.read(open(meshfile))
+	surf.scale(scale)
+	surf.translate(shift) 
+	yade.pack.gtsSurface2Facets(surf,**kw)
 
 def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from mesh file and creates facets.

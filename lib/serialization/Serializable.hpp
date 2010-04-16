@@ -34,6 +34,8 @@
 #include"SerializationExceptions.hpp"
 #include"Archive.hpp"
 
+#include<yade/lib-base/Math.hpp>
+
 
 using namespace boost;
 using namespace std;
@@ -86,9 +88,24 @@ namespace{
 // 	http://www.boost.org/doc/libs/1_42_0/libs/python/doc/v2/faq.html#topythonconversionfailed
 // for reason why the original def_readwrite will not work:
 // #define _PYATTR_DEF(x,thisClass,z) .def_readwrite(BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(2,0,z)),&thisClass::BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
-#define _PYATTR_DEF(x,thisClass,z) .DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
-#define DEF_READWRITE_CUSTOM(thisClass,attr,doc) add_property(/*attr name*/BOOST_PP_STRINGIZE(attr),/*read access*/boost::python::make_getter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*write access*/boost::python::make_setter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*docstring*/doc)
-
+#define _PYATTR_DEF(x,thisClass,z) DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(2,0,z),BOOST_PP_TUPLE_ELEM(2,1,z))
+//
+// return reference for vector and matrix types to allow things like
+// O.bodies.pos[1].state.vel[2]=0 
+// returning value would only change copy of velocity, without propagating back to the original
+//
+// see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg03406.html
+//
+// note that for sequences (like vector<> etc), values are returned; but in case of 
+// vector of shared_ptr's, things inside are still shared, so
+// O.engines[2].gravity=(0,0,9.33) will work
+//
+// OTOH got sequences of non-shared types, it sill (silently) fail:
+// f=Facet(); f.vertices[1][0]=4 
+//
+#define _DEF_READWRITE_BY_VALUE(thisClass,attr,doc) add_property(/*attr name*/BOOST_PP_STRINGIZE(attr),/*read access*/boost::python::make_getter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*write access*/boost::python::make_setter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*docstring*/doc)
+#define _TYPE_RETURNED_AS_REFERENCE(tt) typeid(tt)==typeid(Vector3r) || typeid(tt)==typeid(Vector3i) || typeid(tt)==typeid(Quaternionr) || typeid(tt)==typeid(Vector2r) || typeid(tt)==typeid(Vector2i) || typeid(tt)==typeid(Matrix3r)
+#define DEF_READWRITE_CUSTOM(thisClass,attr,doc) { if(_TYPE_RETURNED_AS_REFERENCE(thisClass::attr)) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE(thisClass,attr,doc); }
 
 // macros for deprecated attribute access
 // gcc<=4.3 is not able to compile this code; we will just not generate any code for deprecated attributes in such case
@@ -125,7 +142,7 @@ namespace{
 	REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC2,thisClass,attrs),deprec) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
 	/* accessors for deprecated attributes, with warnings */ BOOST_PP_SEQ_FOR_EACH(_ACCESS_DEPREC,thisClass,deprec) \
-	/* python class registration */ virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs) BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec) extras ; }
+	/* python class registration */ virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()); BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs); (void) _classObj BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec); (void) _classObj extras ; }
 	// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
 // #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,,extras)
 
@@ -144,7 +161,8 @@ namespace{
 	thisClass() BOOST_PP_IF(BOOST_PP_SEQ_SIZE(inits attrDecls),:,) BOOST_PP_SEQ_FOR_EACH_I(_ATTR_INI,BOOST_PP_DEC(BOOST_PP_SEQ_SIZE(inits attrDecls)), inits BOOST_PP_SEQ_FOR_EACH(_DECLINI4,~,attrDecls)) { ctor ; } /* ctor, with initialization of defaults */ \
 	_YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),deprec,extras)
 
-#define _STATATTR_PY(x,thisClass,z) .DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
+#define _DEF_READWRITE_STATIC(thisClass,attr,doc)
+#define _STATATTR_PY(x,thisClass,z) DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
 #define _STATATTR_DECL(x,y,z) static BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
 #define _STRIP_TYPE_DEFAULT_DOC(x,y,z) (BOOST_PP_TUPLE_ELEM(4,1,z))
 
@@ -154,7 +172,7 @@ namespace{
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass); \
 	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIP_TYPE_DEFAULT_DOC,~,attrs)) \
 	virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
-		boost::python::object _klass=boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable>(#thisClass,docString) \
+		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); \
 		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
 	}
 
