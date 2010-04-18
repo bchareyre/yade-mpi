@@ -4,7 +4,6 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include<yade/pkg-dem/TesselationWrapper.hpp>
 #include"PersistentTriangulationCollider.hpp"
 #include<yade/core/Body.hpp>
 #include<yade/core/Scene.hpp>
@@ -19,20 +18,19 @@
 YADE_REQUIRE_FEATURE(CGAL)
 using namespace std;
 		
-PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
-{
-	noTransientIfPersistentExists=false;
-	haveDistantTransient=false;
-	isTriangulated = false;
-	Tes = new ( TesselationWrapper );
-
-	nbObjects=0;
-	xBounds.clear();
-	yBounds.clear();
-	zBounds.clear();
-	minima.clear();
-	maxima.clear();
-}
+// PersistentTriangulationCollider::PersistentTriangulationCollider() : Collider()
+// {
+// 	haveDistantTransient=false;
+// 	isTriangulated = false;
+// 	Tes = new ( TesselationWrapper );
+// 
+// 	nbObjects=0;
+// 	xBounds.clear();
+// 	yBounds.clear();
+// 	zBounds.clear();
+// 	minima.clear();
+// 	maxima.clear();
+// }
 
 
 PersistentTriangulationCollider::~PersistentTriangulationCollider()
@@ -130,7 +128,7 @@ void PersistentTriangulationCollider::action ()
 		I_end = interactions->end();
 		for ( InteractionContainer::iterator I=interactions->begin(); I!=I_end; ++I )
 		{
-			if ( ( ! ( *I )->isNeighbor ) && ( haveDistantTransient ? ! ( *I )->isReal() : true ) )
+			if (!(*I)->isNeighbor && !(haveDistantTransient && ( *I )->isReal()))//FIXME : isReal correct to check that the interaction has not been "requestErased"?
 			{
 				toErase.push_back ( pair<unsigned int,unsigned int> ( ( *I )->getId1() , ( *I )->getId2() ) );
 				//cerr << "to delete " << ( *I )->getId1() << "-" << ( *I )->getId2() << "(isNeighbor=" << ( *I )->isNeighbor<< endl;
@@ -145,7 +143,6 @@ void PersistentTriangulationCollider::action ()
 			//cerr << "deleted " << it->first << "-" << it->second<<endl;
 		}
 	}
-
 }
 
 YADE_PLUGIN((PersistentTriangulationCollider));

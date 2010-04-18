@@ -126,15 +126,7 @@ double thickness = 0;
 //  Finite_edges_iterator facet_it; //an edge in a triangulation is a facet in corresponding tesselation, remember...
 //That explain the name.
 
-TesselationWrapper::TesselationWrapper()
-{
-	Tes = new CGT::Tesselation;
-	inf = 1e10;
-	clear();
-	facet_begin = Tes->Triangulation().finite_edges_begin();
-	facet_end = Tes->Triangulation().finite_edges_end();
-	facet_it = Tes->Triangulation().finite_edges_begin();
-}
+
 
 TesselationWrapper::~TesselationWrapper() { delete Tes;}
 

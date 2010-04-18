@@ -13,34 +13,20 @@
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 #include <yade/pkg-common/Sphere.hpp>
-#include "MicroMacroAnalyser.hpp"
 #include<yade/lib-triangulation/KinematicLocalisationAnalyser.hpp>
 #include<yade/lib-triangulation/TriaxialState.h>
 #include <yade/lib-triangulation/Tenseur3.h>
 #include<boost/iostreams/filtering_stream.hpp>
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
+#include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
+#include "MicroMacroAnalyser.hpp"
 
 YADE_PLUGIN((MicroMacroAnalyser));
 YADE_REQUIRE_FEATURE(CGAL)
 CREATE_LOGGER(MicroMacroAnalyser);
 
-MicroMacroAnalyser::MicroMacroAnalyser() : GlobalEngine()
-{
-	analyser = shared_ptr<CGT::KinematicLocalisationAnalyser> (new CGT::KinematicLocalisationAnalyser);
-	analyser->SetConsecutive(true);
-	analyser->SetNO_ZERO_ID(false);
-	interval = 100;
-	outputFile = "MicroMacroAnalysis";
-	stateFileName = "state";
-	initialized = false;
-	incrtNumber=1;
-	stateNumber=0;
-	compDeformation=false;
-	compIncrt=false;
-}
-
-//MicroMacroAnalyser::~MicroMacroAnalyser(){ delete analyser;}
+MicroMacroAnalyser::~MicroMacroAnalyser(){ /*delete analyser;*/} //no need, its a shared_ptr now...
 
 void MicroMacroAnalyser::postProcessAttributes(bool deserializing)
 {

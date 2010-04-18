@@ -13,6 +13,7 @@
 #include <set>
 #include <vector>
 #include <algorithm>
+#include<yade/pkg-dem/TesselationWrapper.hpp>
 
 /*! \brief Collision detection engine based on regular triangulation.
  
@@ -27,93 +28,24 @@ class TesselationWrapper;
 
 class PersistentTriangulationCollider : public Collider
 {
-	private :
-	
+	private :	
 		TesselationWrapper* Tes;	
-		// represent an extrmity of an Axis ALigned bounding box
-		struct AABBBound
-		{
-			AABBBound(int i, char l) : id(i),lower(l) {};
-			int		id;		// Aabb of the "id" shpere
-			char		lower;		// is it the lower or upper bound of the Aabb
-			Real		value;		// value of the bound
-		};
-		// strucuture that compare 2 AABBBounds => used in the sort algorithm
-		struct AABBBoundComparator
-		{
-			bool operator() (shared_ptr<AABBBound> b1, shared_ptr<AABBBound> b2)
-			{
-				return b1->value<b2->value;
-			}
-		};
 
-	protected :
-		/// number of potential interactions = number of interacting Aabb
-		int nbPotentialInteractions;
-
-		/// number of Aabb
-		unsigned int nbObjects;
-
-		/// Aabb extremity of the sphere number "id" projected onto the X axis
-		std::vector<shared_ptr<AABBBound> > xBounds;
-
-		/// Aabb extremity of the sphere number "id" projected onto the Y axis
-		std::vector<shared_ptr<AABBBound> > yBounds;
-
-		/// Aabb extremity of the sphere number "id" projected onto the Z axis
-		std::vector<shared_ptr<AABBBound> > zBounds;
-
-		// collection of Aabb that are in interaction
-		//protected : vector< set<unsigned int> > overlappingBB;
-		shared_ptr<InteractionContainer> interactions;
-		/// upper right corner of the Aabb of the objects =>  for spheres = center[i]-radius
-		std::vector<Real> maxima;
-
-		/// lower left corner of the Aabb of the objects =>  for spheres = center[i]+radius
-		std::vector<Real> minima;
-
-		/// Used the first time broadInteractionTest is called, to initialize and sort the xBounds, yBounds,
-		/// and zBounds arrays and to initialize the overlappingBB collection
-		void updateIds(unsigned int nbElements);
-
-		/// Permutation sort the xBounds, yBounds, zBounds arrays according to the "value" field
-		/// Calls updateOverlapingBBSet every time a permutation between 2 Aabb i and j occurs
-		void sortBounds(vector<shared_ptr<AABBBound> >& bounds, int nbElements);
-
-		/// Tests if the AABBi and AABBj really overlap.
-		/// If yes, adds the pair (id1,id2) to the collection of overlapping AABBs
-		/// If no, removes the (id1,id2) to the collection of overlapping AABBs if necessary
-		void updateOverlapingBBSet(int id1,int id2);
-
-		/// update the "value" field of the xBounds, yBounds, zBounds arrays
-		void updateBounds(int nbElements);
-
-		/// Used the first time broadInteractionTest is called
-		/// It is necessary to initialise the overlapping Aabb collection because this collection is only
-		/// incrementally udated each time step
-		void findOverlappingBB(vector<shared_ptr<AABBBound> >& bounds, int nbElements);
-
-	public :
-		PersistentTriangulationCollider();
-
+	public :		
 		virtual ~PersistentTriangulationCollider();
-
-		/// return a list "interactions" of pairs of Body which Bounding volume are in potential interaction
+		/// return a list "interactions" of pairs of Body which bounding spheres are overlapping
 		void action();
-
-		//! When creating transient interaction, look first if a persistent link between the pair in question exists; in that case, skip it.
-		bool noTransientIfPersistentExists;
-		//! Don't break transient interaction once bodies don't overlap anymore; material law will be responsible for breaking it.
-		bool haveDistantTransient;
 		//! this flag is used to check if the packing has been triangulated
 		bool isTriangulated;
-
-	REGISTER_ATTRIBUTES(Collider,(noTransientIfPersistentExists)(haveDistantTransient));
-	REGISTER_CLASS_NAME(PersistentTriangulationCollider);
-	REGISTER_BASE_CLASS_NAME(Collider);
-
+		shared_ptr<InteractionContainer> interactions;
+		
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(
+		PersistentTriangulationCollider,Collider,"Collision detection engine based on regular triangulation. Handles spheres and flat boundaries (considered as infinite-sized bounding spheres).",
+		((bool,haveDistantTransient,false,"Keep distant interactions? If True, don't delete interactions once bodies don't overlap anymore; constitutive laws will be responsible for requesting deletion. If False, delete as soon as there is no object penetration."))
+		,
+		isTriangulated = false;
+		Tes = new (TesselationWrapper);
+  	,);
 };
 
 REGISTER_SERIALIZABLE(PersistentTriangulationCollider);
-
-

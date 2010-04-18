@@ -13,8 +13,8 @@
 #include<yade/core/Scene.hpp>
 #include<yade/lib-triangulation/Tesselation.h>
 #include<boost/python.hpp>
-#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 #include<yade/extra/boost_python_len.hpp>
+#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 
 /*! \class TesselationWrapper
  * \brief Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.
@@ -33,14 +33,12 @@ class TesselationWrapper : public GlobalEngine{
 public:
 
 	CGT::Tesselation* Tes;
-	double mean_radius;
-	unsigned int n_spheres;
+	double mean_radius, inf;
 	bool rad_divided;
 	bool bounded;
 	CGT::Point Pmin;
 	CGT::Point Pmax;
-
-	TesselationWrapper();
+	
 	~TesselationWrapper();
     
     	/// Insert a sphere, "id" will be used by some getters to retrieve spheres
@@ -98,16 +96,23 @@ public:
 // 	}
 
 	
-private:
+public:
 	/// edge iterators are used for returning tesselation "facets", i.e. spheres with a common branch in the triangulation, convert CGAL::edge to int pair (b1->id, b2->id)
 	CGT::Finite_edges_iterator facet_begin;
 	CGT::Finite_edges_iterator facet_end;
 	CGT::Finite_edges_iterator facet_it;
 	MicroMacroAnalyser mma;
-public:	
-	REGISTER_ATTRIBUTES(GlobalEngine,(n_spheres));
-	REGISTER_CLASS_NAME(TesselationWrapper);
-	REGISTER_BASE_CLASS_NAME(GlobalEngine);
+	
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(TesselationWrapper,GlobalEngine,"Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.",
+	((unsigned int,n_spheres,0,"|ycomp|"))
+	,/*ctor*/
+  	Tes = new CGT::Tesselation;
+	clear();
+	facet_begin = Tes->Triangulation().finite_edges_begin();
+	facet_end = Tes->Triangulation().finite_edges_end();
+	facet_it = Tes->Triangulation().finite_edges_begin();
+	,/*py*/
+	);	
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(TesselationWrapper);
