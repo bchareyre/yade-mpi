@@ -5,16 +5,16 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include "TriaxialTest.hpp"
+
 
 #include<yade/pkg-dem/ElasticContactLaw.hpp>
 #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
-#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
+#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -47,83 +47,85 @@
 #include<yade/pkg-dem/SpherePack.hpp>
 //#include<yade/pkg-dem/MicroMacroAnalyser.hpp>
 
+#include "TriaxialTest.hpp"
 CREATE_LOGGER(TriaxialTest);
+YADE_PLUGIN((TriaxialTest));
 
 using namespace boost;
 using namespace std;
 
-TriaxialTest::TriaxialTest () : FileGenerator()
-{
-	lowerCorner 		= Vector3r(0,0,0);
-	upperCorner 		= Vector3r(1,1,1);
-	thickness 		= 0.001;
-	importFilename          = ""; // oh, PLEASE, keep this empty -- i.e., by default, generate spheres in the box, not load them.
-	Key			="";
-	outputFileName 		= "./TriaxialTest"+Key+".xml";
-	//nlayers = 1;
-	wall_top 		= true;
-	wall_bottom 		= true;
-	wall_1			= true;
-	wall_2			= true;
-	wall_3			= true;
-	wall_4			= true;
-	wall_top_wire 		= true;
-	wall_bottom_wire	= true;
-	wall_1_wire		= true;
-	wall_2_wire		= true;
-	wall_3_wire		= true;
-	wall_4_wire		= true;
-	spheresColor		= Vector3r(0.8,0.3,0.3);
-	spheresRandomColor	= false;
-	recordIntervalIter	= 20;
-	saveAnimationSnapshots = false;
-	AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
-	WallStressRecordFile = "./WallStresses"+Key;
-
-	rotationBlocked 	= false;
-	boxWalls 		= true;
-	internalCompaction	=false;
-	dampingForce 		= 0.2;
-	dampingMomentum 	= 0.2;
-	defaultDt 		= -1;
-	
-	timeStepUpdateInterval = 50;
-	timeStepOutputInterval = 50;
-	wallStiffnessUpdateInterval = 10;
-	radiusControlInterval 	= 10;
-	numberOfGrains 		= 400;
-	strainRate 		= 0.1;
-	maxWallVelocity		=10;
-	StabilityCriterion 	= 0.01;
-	autoCompressionActivation = true;
-	autoUnload 		= true;
-	autoStopSimulation 	= false;
-	maxMultiplier 		= 1.01;
-	finalMaxMultiplier 	= 1.001;	
-	sphereYoungModulus  	= 15000000.0;
-	sphereKsDivKn  	= 0.5;	
-	sphereFrictionDeg 	= 18.0;
-	compactionFrictionDeg   = sphereFrictionDeg;
-	density			= 2600;
-	
-	boxYoungModulus   	= 15000000.0;
-	boxKsDivKn  	= 0.2;
-	boxFrictionDeg   	= 0.f;
-	gravity 		= Vector3r(0,-9.81,0);
-	
-	sigmaIsoCompaction = 50000;
-	sigmaLateralConfinement=sigmaIsoCompaction;
-	wallOversizeFactor=1.3;
-	biaxial2dTest=false;
-	radiusStdDev=0.3;
-	radiusMean=-1; // no radius specified
-	fixedPoroCompaction=false;
-	fixedPorosity = 1;
-	fast=false;
-	noFiles=false;
-	facetWalls=false;
-	wallWalls=false;
-}
+// TriaxialTest::TriaxialTest () : FileGenerator()
+// {
+// 	lowerCorner 		= Vector3r(0,0,0);
+// 	upperCorner 		= Vector3r(1,1,1);
+// 	thickness 		= 0.001;
+// 	importFilename          = ""; // oh, PLEASE, keep this empty -- i.e., by default, generate spheres in the box, not load them.
+// 	Key			="";
+// 	outputFileName 		= "./TriaxialTest"+Key+".xml";
+// 	//nlayers = 1;
+// 	wall_top 		= true;
+// 	wall_bottom 		= true;
+// 	wall_1			= true;
+// 	wall_2			= true;
+// 	wall_3			= true;
+// 	wall_4			= true;
+// 	wall_top_wire 		= true;
+// 	wall_bottom_wire	= true;
+// 	wall_1_wire		= true;
+// 	wall_2_wire		= true;
+// 	wall_3_wire		= true;
+// 	wall_4_wire		= true;
+// 	spheresColor		= Vector3r(0.8,0.3,0.3);
+// 	spheresRandomColor	= false;
+// 	recordIntervalIter	= 20;
+// 	saveAnimationSnapshots = false;
+// 	AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
+// 	WallStressRecordFile = "./WallStresses"+Key;
+// 
+// 	rotationBlocked 	= false;
+// 	boxWalls 		= true;
+// 	internalCompaction	=false;
+// 	dampingForce 		= 0.2;
+// 	dampingMomentum 	= 0.2;
+// 	defaultDt 		= -1;
+// 	
+// 	timeStepUpdateInterval = 50;
+// 	timeStepOutputInterval = 50;
+// 	wallStiffnessUpdateInterval = 10;
+// 	radiusControlInterval 	= 10;
+// 	numberOfGrains 		= 400;
+// 	strainRate 		= 0.1;
+// 	maxWallVelocity		=10;
+// 	StabilityCriterion 	= 0.01;
+// 	autoCompressionActivation = true;
+// 	autoUnload 		= true;
+// 	autoStopSimulation 	= false;
+// 	maxMultiplier 		= 1.01;
+// 	finalMaxMultiplier 	= 1.001;	
+// 	sphereYoungModulus  	= 15000000.0;
+// 	sphereKsDivKn  	= 0.5;	
+// 	sphereFrictionDeg 	= 18.0;
+// 	compactionFrictionDeg   = sphereFrictionDeg;
+// 	density			= 2600;
+// 	
+// 	boxYoungModulus   	= 15000000.0;
+// 	boxKsDivKn  	= 0.2;
+// 	boxFrictionDeg   	= 0.f;
+// 	gravity 		= Vector3r(0,-9.81,0);
+// 	
+// 	sigmaIsoCompaction = 50000;
+// 	sigmaLateralConfinement=sigmaIsoCompaction;
+// 	wallOversizeFactor=1.3;
+// 	biaxial2dTest=false;
+// 	radiusStdDev=0.3;
+// 	radiusMean=-1; // no radius specified
+// 	fixedPoroCompaction=false;
+// 	fixedPorosity = 1;
+// 	fast=false;
+// 	noFiles=false;
+// 	facetWalls=false;
+// 	wallWalls=false;
+// }
 
 TriaxialTest::~TriaxialTest () {}
 
@@ -135,10 +137,6 @@ bool TriaxialTest::generate()
 	{
 		message="Biaxial test can be generated only if Z size is more than 8 times smaller than X size";
 		return false;
-	}
-	if((facetWalls||wallWalls) && !fast){
-		LOG_WARN("Turning TriaxialTest::fast on, since facetWalls or wallWalls were selected.");
-		fast=true;
 	}
 	if(facetWalls&&wallWalls){ LOG_WARN("Turning TriaxialTest::facetWalls off, since wallWalls were selected as well."); }
 	
@@ -439,7 +437,7 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	rootBody->engines.push_back(boundDispatcher);
 	shared_ptr<InsertionSortCollider> collider(new InsertionSortCollider);
 	rootBody->engines.push_back(collider);
-	if(fast){
+// 	if(fast){ // The old code was doing the same slower, still here in case we want to make comparisons again
 		collider->sweepLength=.05*radiusMean;
 		collider->nBins=5; collider->binCoeff=2; /* gives a 2^5=32× difference between the lower and higher bin sweep lengths */
 		shared_ptr<InteractionDispatchers> ids(new InteractionDispatchers);
@@ -453,14 +451,14 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 				ids->lawDispatcher->add(shared_ptr<Law2_Dem3DofGeom_FrictPhys_Basic>(new Law2_Dem3DofGeom_FrictPhys_Basic));
 			}
 		rootBody->engines.push_back(ids);
-	} else {
-		assert(!facetWalls);
-		rootBody->engines.push_back(interactionGeometryDispatcher);
-		rootBody->engines.push_back(interactionPhysicsDispatcher);
-		shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
-		elasticContactLaw->sdecGroupMask = 2;
-		rootBody->engines.push_back(elasticContactLaw);
-	}
+// 	} else {
+// 		assert(!facetWalls);
+// 		rootBody->engines.push_back(interactionGeometryDispatcher);
+// 		rootBody->engines.push_back(interactionPhysicsDispatcher);
+// 		shared_ptr<ElasticContactLaw> elasticContactLaw(new ElasticContactLaw);
+// 		elasticContactLaw->sdecGroupMask = 2;
+// 		rootBody->engines.push_back(elasticContactLaw);
+// 	}
 	rootBody->engines.push_back(globalStiffnessTimeStepper);
 	rootBody->engines.push_back(triaxialcompressionEngine);
 	if(recordIntervalIter>0 && !noFiles) rootBody->engines.push_back(triaxialStateRecorder);
@@ -480,4 +478,3 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 void TriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 }
-YADE_PLUGIN((TriaxialTest));
