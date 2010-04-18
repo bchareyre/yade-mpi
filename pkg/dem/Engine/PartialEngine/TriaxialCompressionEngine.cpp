@@ -136,11 +136,6 @@ void TriaxialCompressionEngine::updateParameters ()
 			else if (currentState==STATE_ISO_UNLOADING && !autoCompressionActivation){
 				Omega::instance().stopSimulationLoop();
 			}
-			// huh?! this will never happen, because of the first condition...
-			else 
-			{ 
-				doStateTransition (STATE_LIMBO );
-			}
 		}
 		else if ( porosity<=fixedPorosity && currentState==STATE_FIXED_POROSITY_COMPACTION )
 		{
