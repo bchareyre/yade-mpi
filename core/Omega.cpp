@@ -283,11 +283,6 @@ void Omega::loadSimulation(){
 			resetScene();
 			RenderMutexLock lock; IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"scene",scene);
 		}
-		else if(algorithm::ends_with(simulationFileName,".yade")){
-			joinSimulationLoop();
-			resetScene();
-			RenderMutexLock lock; IOFormatManager::loadFromFile("BINFormatManager",simulationFileName,"scene",scene);
-		}
 		else if(algorithm::starts_with(simulationFileName,":memory:")){
 			if(memSavedSimulations.count(simulationFileName)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+simulationFileName);
 			istringstream iss(memSavedSimulations[simulationFileName]);
@@ -316,12 +311,6 @@ void Omega::saveSimulation(const string name)
 		FormatChecker::format=FormatChecker::XML;
 		IOFormatManager::saveToFile("XMLFormatManager",name,"scene",scene);
 	}
-	#if 0
-		else if(algorithm::ends_with(name,".yade")){
-			FormatChecker::format=FormatChecker::BIN;
-			IOFormatManager::saveToFile("BINFormatManager",name,"scene",scene);
-		}
-	#endif
 	else if(algorithm::starts_with(name,":memory:")){
 		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
 		ostringstream oss;

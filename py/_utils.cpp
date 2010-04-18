@@ -413,7 +413,7 @@ BOOST_PYTHON_MODULE(_utils){
 
 
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
-	py::def("aabbExtrema",aabbExtrema,(py::arg("cutoff")=0.0,py::arg("centers")=false),"Return coordinates of box enclosing all bodies\n\n:Parameters:\n\tcenters : bool\n\t\tdo not take sphere radii in account, only their centroids\n\tcutoff : float ∈〈0…1〉\n\t\trelative dimension by which the box will be cut away at its boundaries.\n\n:return: (lower corner, upper corner) as (Vector3,Vector3)\n");
+	py::def("aabbExtrema",aabbExtrema,(py::arg("cutoff")=0.0,py::arg("centers")=false),"Return coordinates of box enclosing all bodies\n\n:Parameters:\n\tcenters : bool\n\t\tdo not take sphere radii in account, only their centroids\n\tcutoff : float ∈〈0…1〉\n\t\trelative dimension by which the box will be cut away at its boundaries.\n\n\n:return: (lower corner, upper corner) as (Vector3,Vector3)\n\n");
 	py::def("ptInAABB",ptInAABB,"Return True/False whether the point (3-tuple) p is within box given by its min (3-tuple) and max (3-tuple) corners");
 	py::def("negPosExtremeIds",negPosExtremeIds,negPosExtremeIds_overloads(py::args("axis","distFactor"),"Return list of ids for spheres (only) that are on extremal ends of the specimen along given axis; distFactor multiplies their radius so that sphere that do not touch the boundary coordinate can also be returned."));
 	py::def("approxSectionArea",approxSectionArea,"Compute area of convex hull when when taking (swept) spheres crossing the plane at coord, perpendicular to axis.");

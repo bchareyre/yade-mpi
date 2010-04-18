@@ -92,10 +92,124 @@ python::dict testNumpy(){
 	ret["vel"]=vel;
 	return ret;
 }
+
+#if 0
+/* Compute stress tensor on each particle */
+void particleMacroStress(void){
+	Scene* scene=Omega::instance().getScene().get();
+	// find interactions of each particle
+	std::vector<std::list<body_id_t> > bIntr(scene->bodies->size());
+	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+		if(!i->isReal) continue;
+		// only contacts between 2 spheres
+		Sphere* s1=dynamic_cast<Sphere*>(Body::byId(i->getId1(),scene)->shape.get())
+		Sphere* s2=dynamic_cast<Sphere*>(Body::byId(i->getId2(),scene)->shape.get())
+		if(!s1 || !s2) continue;
+		bIntr[i.getId1()].push_back(i.getId2());
+		bIntr[i.getId2()].push_back(i.getId1());
+	}
+	for(body_id_t id1=0; id1<(body_id_t)bIntr.size(); id1++){
+		if(bIntr[id1].size()==0) continue;
+		Matrix3r ss(Matrix3r::ZERO); // stress tensor on current particle
+		FOREACH(body_id_t id2, bIntr[id1]){
+			const shared_ptr<Interaction> i=scene->interactions->find(id1,id2);
+			assert(i);
+			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(i->interactionGeometry);
+			CpmPhys* phys=YADE_CAST<CpmPhys*>(i->interactionPhysics);
+			Real d=(geom->se31->pos-geom->se32->pos).Length(); // current contact length
+			const Vector3r& n=geom->normal;
+			const Real& A=phys->crossSection;
+			const Vector3r& sigmaT=phys->sigmaT;
+			const Real& sigmaN=phys->sigmaN;
+			for(int i=0; i<3; i++) for(int j=0;j<3; j++){
+				ss[i][j]=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
+			}
+		}
+		// divide ss by V of the particle
+		// FIXME: for now, just use 2*(4/3)*π*r³ (.5 porosity)
+		ss*=1/(2*(4/3)*Mathr::PI*);
+	}
+}
+#endif
+#include<yade/lib-smoothing/WeightedAverage2d.hpp>
+/* Fastly locate interactions within given distance from a point in 2d (projected to plane) */
+struct SpiralInteractionLocator2d{
+	struct FlatInteraction{ Real r,h,theta; shared_ptr<Interaction> i; FlatInteraction(Real _r, Real _h, Real _theta, const shared_ptr<Interaction>& _i): r(_r), h(_h), theta(_theta), i(_i){}; };
+	shared_ptr<GridContainer<FlatInteraction> > grid;
+	Real thetaSpan;
+	int axis;
+	SpiralInteractionLocator2d(Real dH_dTheta, int _axis, Real theta0): axis(_axis){
+		Scene* scene=Omega::instance().getScene().get();
+		Real inf=std::numeric_limits<Real>::infinity();
+		Vector2r lo=Vector2r(inf,inf), hi(-inf,-inf);
+		Real minD0(inf),maxD0(-inf);
+		Real minTheta(inf), maxTheta(-inf);
+		std::list<FlatInteraction> intrs;
+		// first pass: find extrema for positions and interaction lengths, build interaction list
+		FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+			Dem3DofGeom* ge=dynamic_cast<Dem3DofGeom*>(i->interactionGeometry.get());
+			CpmPhys* ph=dynamic_cast<CpmPhys*>(i->interactionPhysics.get());
+			if(!ge || !ph) continue;
+			Real r,h,theta;
+			boost::tie(r,h,theta)=Shop::spiralProject(ge->contactPoint,dH_dTheta,axis,NaN,theta0);
+			lo=componentMinVector(lo,Vector2r(r,h)); hi=componentMaxVector(hi,Vector2r(r,h));
+			minD0=min(minD0,ge->refLength); maxD0=max(maxD0,ge->refLength);
+			minTheta=min(minTheta,theta); maxTheta=max(maxTheta,theta);
+			intrs.push_back(FlatInteraction(r,h,theta,i));
+		}
+		// create grid, put interactions inside
+		Vector2i nCells=Vector2i(max(10,(int)((hi[0]-lo[0])/(2*minD0))),max(10,(int)((hi[1]-lo[1])/(2*minD0))));
+		Vector2r hair=1e-2*Vector2r((hi[0]-lo[0])/nCells[0],(hi[1]-lo[1])/nCells[1]); // avoid rounding issue on boundary, enlarge by 1/100 cell size on each side
+		grid=shared_ptr<GridContainer<FlatInteraction> >(new GridContainer<FlatInteraction>(lo-hair,hi+hair,nCells));
+		FOREACH(const FlatInteraction& fi, intrs){
+			grid->add(fi,Vector2r(fi.r,fi.h));
+		}
+		thetaSpan=maxTheta-minTheta;
+	}
+	py::list intrsAroundPt(const Vector2r& pt, Real radius){
+		py::list ret;
+		FOREACH(const Vector2i& v, grid->circleFilter(pt,radius)){
+			FOREACH(const FlatInteraction& fi, grid->grid[v[0]][v[1]]){
+				if((pow(fi.r-pt[0],2)+pow(fi.h-pt[1],2))>radius*radius) continue; // too far
+				ret.append(fi.i);
+			}
+		}
+		return ret;
+	}
+	// return macroscopic stress around interactions that project around given point
+	// stresses are rotated around axis back by theta angle
+	Matrix3r macroStressAroundPt(const Vector2r& pt, Real radius){
+		Matrix3r ss(Matrix3r::ZERO);
+		FOREACH(const Vector2i& v, grid->circleFilter(pt,radius)){
+			FOREACH(const FlatInteraction& fi, grid->grid[v[0]][v[1]]){
+				if((pow(fi.r-pt[0],2)+pow(fi.h-pt[1],2))>radius*radius) continue; // too far
+				Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(fi.i->interactionGeometry.get());
+				CpmPhys* phys=YADE_CAST<CpmPhys*>(fi.i->interactionPhysics.get());
+				// transformation matrix, to rotate to the plane
+				Vector3r ax(Vector3r::ZERO); ax[axis]=1.;
+				Quaternionr q; q.FromAxisAngle(ax,fi.theta); q=q.Conjugate();
+				Matrix3r TT; q.ToRotationMatrix(TT);
+				//
+				Real d=(geom->se31.position-geom->se32.position).Length(); // current contact length
+				const Vector3r& n=TT*geom->normal;
+				const Real& A=phys->crossSection;
+				const Vector3r& sigmaT=TT*phys->sigmaT;
+				const Real& sigmaN=phys->sigmaN;
+				for(int i=0; i<3; i++) for(int j=0;j<3; j++){
+					ss[i][j]+=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
+				}
+			}
+		}
+		// divide by approx spatial volume over which we averaged:
+		// spiral cylinder with two half-spherical caps at ends
+		ss*=1/((4/3.)*Mathr::PI*pow(radius,3)+Mathr::PI*pow(radius,2)*(thetaSpan*pt[0]-2*radius)); 
+		return ss;
+	}
+};
+
 #ifdef YADE_VTK
 
-
-/* Fastly locate interactions withing given distance from a given point. See python docs for details. */
+/* Fastly locate interactions within given distance from a given point. See python docs for details. */
 class InteractionLocator{
 	// object doing the work, see http://www.vtk.org/doc/release/5.2/html/a01048.html
 	vtkPointLocator *locator;
@@ -168,4 +282,10 @@ BOOST_PYTHON_MODULE(_eudoxos){
 		.add_property("count",&InteractionLocator::getCnt,"Number of interactions held")
 	;
 #endif
+	py::class_<SpiralInteractionLocator2d>("SpiralInteractionLocator2d",
+		"Locate all real interactions in 2d plane (reduced by spiral projection from 3d, using ``Shop::spiralProject``, which is the same as :yref:`yade.utils.spiralProject`) using their :yref:`contact points<Dem3DofGeom::contactPoint>`. \n\n.. note::\n\tDo not run simulation while using this object.",
+		python::init<Real,int,Real>((python::arg("dH_dTheta"),python::arg("axis")=0,python::arg("theta0")=0),":Parameters:\n\n\tdH_dTheta: float\n\t\tSpiral inclination, i.e. height increase per 1 radian turn;\n\taxis: int\n\t\tAxis of rotation (0=x,1=y,2=z)\n\ttheta: float\n\t\tSpiral angle at zero height (theta intercept)\n\n")
+	)
+		.def("intrsAroundPt",&SpiralInteractionLocator2d::intrsAroundPt,(python::arg("pt2d"),python::arg("radius")),"Return list of interaction objects that are not further from *pt2d* than *radius* in the projection plane")
+		.def("macroStressAroundPt",&SpiralInteractionLocator2d::macroStressAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point, rotating the interaction to the projection plane first. The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates.\n\n$\\sigma^{T}$ and $n$ are transformed by angle $\\theta$ as given by :yref:`utils.spiralProject`.");
 }

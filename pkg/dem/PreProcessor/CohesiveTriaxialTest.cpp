@@ -26,7 +26,7 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-dem/HydraulicForceEngine.hpp>
+// #include<yade/pkg-dem/HydraulicForceEngine.hpp>
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
@@ -416,8 +416,8 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	
-	shared_ptr<HydraulicForceEngine> hydraulicForceEngine = shared_ptr<HydraulicForceEngine> (new HydraulicForceEngine);
-	hydraulicForceEngine->dummyParameter = true;
+	// shared_ptr<HydraulicForceEngine> hydraulicForceEngine = shared_ptr<HydraulicForceEngine> (new HydraulicForceEngine);
+	// hydraulicForceEngine->dummyParameter = true;
 		
 	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	

@@ -464,15 +464,28 @@ class pyOmega{
 		std::ofstream ofs(filename.c_str());
 		boost::archive::xml_oarchive oa(ofs);
 		const shared_ptr<Scene>& scene=OMEGA.getScene();
-		oa << BOOST_SERIALIZATION_NVP(scene);
+		oa << boost::serialization::make_nvp("scene",*scene);
 	}
 	void loadXML(string filename){
 		std::ifstream ifs(filename.c_str());
 		boost::archive::xml_iarchive ia(ifs);
 		shared_ptr<Scene> scene(new Scene);
-		ia >> BOOST_SERIALIZATION_NVP(scene); // this might work…
+		ia >> boost::serialization::make_nvp("scene",*scene);
 		OMEGA.setScene(scene);
-		//throw runtime_error("Not yet implemented");
+	}
+	// binary format
+	void saveBin(string filename){
+		std::ofstream ofs(filename.c_str());
+		boost::archive::binary_oarchive oa(ofs);
+		const shared_ptr<Scene>& scene=OMEGA.getScene();
+		oa << boost::serialization::make_nvp("scene",*scene);
+	}
+	void loadBin(string filename){
+		std::ifstream ifs(filename.c_str());
+		boost::archive::binary_iarchive ia(ifs);
+		shared_ptr<Scene> scene(new Scene);
+		ia >> boost::serialization::make_nvp("scene",*scene);
+		OMEGA.setScene(scene);
 	}
 	#endif
 	
@@ -556,7 +569,9 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] save to XML using boost::serialization.")
-			.def("loadXML",&pyOmega::saveXML,"[EXPERIMENTAL] load from XML using boost::serialization.")
+			.def("loadXML",&pyOmega::loadXML,"[EXPERIMENTAL] load from XML using boost::serialization.")
+			.def("saveBin",&pyOmega::saveBin,"[EXPERIMENTAL] save to binary file using boost::serialization.")
+			.def("loadBin",&pyOmega::loadBin,"[EXPERIMENTAL] load from binary file using boost::serialization.")
 		#endif
 		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
 		.def("tmpFilename",&pyOmega::tmpFilename,"Return unique name of file in temporary directory which will be deleted when yade exits.")

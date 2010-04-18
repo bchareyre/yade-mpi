@@ -552,6 +552,10 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,**kw):
 		if given, force strained axis, rather than computing it from predominant length
 
 :return: dictionary with keys 'negIds', 'posIds', 'axis', 'area'.
+
+.. warning::
+	The function :yref:`yade.utils.approxSectionArea` uses convex hull algorithm to find the area, but the implementation is reported to be *buggy* (bot works in some cases). Always check this number, or fix the convex hull algorithm (it is documented in the source, see :ysrc:`py/_utils.cpp`).
+
 	"""
 	if filename: ids=spheresFromFile(filename,**kw)
 	else: ids=[b.id for b in O.bodies]
