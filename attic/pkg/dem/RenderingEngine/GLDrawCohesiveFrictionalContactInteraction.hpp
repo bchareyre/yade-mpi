@@ -22,7 +22,7 @@ class GLDrawCohesiveFrictionalContactInteraction : public GlInteractionPhysicsFu
 		void drawFlatText(const Vector3r pos,const std::string txt);
 		Vector3r drawRotationAxis(const Quaternionr q,const std::string txt,const Vector3r pos,const Real size,const Vector3r color);
 
-	RENDERS(CohesiveFrictionalContactInteraction);
+	RENDERS(CohFrictPhys);
 	REGISTER_CLASS_NAME(GLDrawCohesiveFrictionalContactInteraction);
 	REGISTER_BASE_CLASS_NAME(GlInteractionPhysicsFunctor);
 };

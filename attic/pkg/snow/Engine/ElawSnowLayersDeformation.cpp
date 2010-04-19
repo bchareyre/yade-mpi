@@ -7,9 +7,9 @@
 *************************************************************************/
 
 #include"ElawSnowLayersDeformation.hpp"
-#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
+#include<yade/pkg-dem/CohFrictPhys.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
@@ -51,10 +51,10 @@ void ElawSnowLayersDeformation::action()
 
 			std::cerr << __FILE__ << " " << id1 << " " << id2 << "\n";
 
-			CohesiveFrictionalMat* de1 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id1]->physicalParameters.get());
-			CohesiveFrictionalMat* de2 			= YADE_CAST<CohesiveFrictionalMat*>((*bodies)[id2]->physicalParameters.get());
+			CohFrictMat* de1 			= YADE_CAST<CohFrictMat*>((*bodies)[id1]->physicalParameters.get());
+			CohFrictMat* de2 			= YADE_CAST<CohFrictMat*>((*bodies)[id2]->physicalParameters.get());
 //			ScGeom* currentContactGeometry		= YADE_CAST<ScGeom*>(contact->interactionGeometry.get());
-			CohesiveFrictionalContactInteraction* currentContactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*> (contact->interactionPhysics.get());
+			CohFrictPhys* currentContactPhysics = YADE_CAST<CohFrictPhys*> (contact->interactionPhysics.get());
 
 			BssSnowGrain* b1 = dynamic_cast<BssSnowGrain*>((*bodies)[id1]->shape.get());
 			BssSnowGrain* b2 = dynamic_cast<BssSnowGrain*>((*bodies)[id2]->shape.get());

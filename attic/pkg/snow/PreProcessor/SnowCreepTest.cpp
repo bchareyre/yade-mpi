@@ -13,8 +13,8 @@
 #include "SnowCreepTest.hpp"
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include<yade/pkg-dem/Ip2_2xCohFrictMat_CohFrictPhys.hpp>
+#include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/SDECLinkPhysics.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
@@ -36,7 +36,6 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-#include<yade/pkg-dem/HydraulicForceEngine.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
 #include<yade/pkg-common/PhysicalActionApplier.hpp>
@@ -373,7 +372,7 @@ bool SnowCreepTest::generate()
 void SnowCreepTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
+	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -425,7 +424,7 @@ void SnowCreepTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real
 void SnowCreepTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
+	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
@@ -492,7 +491,7 @@ void SnowCreepTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionGeometryFunctor> s2(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s2);
 
-	shared_ptr<CohesiveFrictionalRelationships> cohesiveFrictionalRelationships = shared_ptr<CohesiveFrictionalRelationships> (new CohesiveFrictionalRelationships);
+	shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> cohesiveFrictionalRelationships = shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> (new Ip2_2xCohFrictMat_CohFrictPhys);
 	cohesiveFrictionalRelationships->shearCohesion = shearCohesion;
 	cohesiveFrictionalRelationships->normalCohesion = normalCohesion;
 	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
@@ -567,12 +566,8 @@ void SnowCreepTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	
-	shared_ptr<HydraulicForceEngine> hydraulicForceEngine = shared_ptr<HydraulicForceEngine> (new HydraulicForceEngine);
-	hydraulicForceEngine->dummyParameter = true;
-		
-	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
-	
-// recording global stress
+
+	// recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
 	TriaxialStateRecorder);
 	triaxialStateRecorder-> outputFile 	= WallStressRecordFile;
@@ -581,7 +576,6 @@ void SnowCreepTest::createActors(shared_ptr<Scene>& rootBody)
 	
 	
 	// moving walls to regulate the stress applied
-	//cerr << "triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);" << std::endl;
 	triaxialstressController = shared_ptr<TriaxialStressController> (new TriaxialStressController);
 	triaxialstressController-> stiffnessUpdateInterval = 20;// = recordIntervalIter
 	triaxialstressController-> sigma_iso = sigma_iso;

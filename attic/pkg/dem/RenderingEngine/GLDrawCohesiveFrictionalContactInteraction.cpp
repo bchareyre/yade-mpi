@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "GLDrawCohesiveFrictionalContactInteraction.hpp"
-#include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
+#include<yade/pkg-dem/CohFrictPhys.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-common/NormShearPhys.hpp>
 #include<yade/pkg-dem/FrictPhys.hpp>
@@ -99,7 +99,7 @@ void GLDrawCohesiveFrictionalContactInteraction::go(
 	if(!i->isReal()) return;
 	isReal=i->isReal();
 
-	CohesiveFrictionalContactInteraction*    ph = static_cast<CohesiveFrictionalContactInteraction*>(ih.get());
+	CohFrictPhys*    ph = static_cast<CohFrictPhys*>(ih.get());
 	ScGeom*    sc = static_cast<ScGeom*>(i->interactionGeometry.get());
 	Vector3r pos1   = b1->physicalParameters->se3.position;
 	Vector3r pos2   = b2->physicalParameters->se3.position;
