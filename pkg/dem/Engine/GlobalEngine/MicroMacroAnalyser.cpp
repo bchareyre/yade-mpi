@@ -77,7 +77,7 @@ void MicroMacroAnalyser::action()
 void MicroMacroAnalyser::setState(unsigned int state, bool save_states, bool computeIncrement)
 {
 	LOG_INFO("MicroMacroAnalyser::setState");
-	CGT::TriaxialState& TS = makeState(state, false);
+	CGT::TriaxialState& TS = makeState(state);
 	if (state == 2) {
 		analyser->Delta_epsilon(3,3) = analyser->TS1->eps3 - analyser->TS0->eps3;
 		analyser->Delta_epsilon(1,1) = analyser->TS1->eps1 - analyser->TS0->eps1;
@@ -144,7 +144,6 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	}
 	TS.mean_radius /= Ng;//rayon moyen
 	LOG_INFO(" loaded : " << Ng << " grains with mean radius = " << TS.mean_radius);
-		
 	if (fictiousVtx.size()>=6){//boxes found, simulate them with big spheres
 		CGT::Point& Pmin = TS.box.base; CGT::Point& Pmax = TS.box.sommet; 
 		Real FAR = 1e4;
@@ -159,7 +158,6 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 		TS.grains[fictiousVtx[5]].sphere =
 		CGT::Sphere(CGT::Point(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y())),FAR*(Pmax.y()-Pmin.y()));
 	}
-
 	InteractionContainer::iterator ii    = scene->interactions->begin();
 	InteractionContainer::iterator iiEnd = scene->interactions->end();
 	for (; ii!=iiEnd ; ++ii) {
@@ -194,22 +192,31 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 			c->frictional_work = 0;
 		}
 	}
-	//Save various parameters
-	TS.wszzh = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];//find_parameter("wszzh=", Statefile);
-	TS.wsxxd = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0];//find_parameter("wsxxd=", Statefile);
-	TS.wsyyfa = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2];//find_parameter("wsyyfa=", Statefile);
-	TS.eps3 = triaxialCompressionEngine->strain[2];//find_parameter("eps3=", Statefile);
-	TS.eps1 = triaxialCompressionEngine->strain[0];//find_parameter("eps1=", Statefile);
-	TS.eps2 = triaxialCompressionEngine->strain[1];//find_parameter("eps2=", Statefile);
-	TS.haut = triaxialCompressionEngine->height;//find_parameter("haut=", Statefile);
-	TS.larg = triaxialCompressionEngine->width;//find_parameter("larg=", Statefile);
-	TS.prof = triaxialCompressionEngine->depth;//find_parameter("prof=", Statefile);
-	TS.porom = analyser->ComputeMacroPorosity();//find_parameter("porom=", Statefile);
-	TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
-	if (filename!=NULL) {
-		//ostringstream oss;
-		TS.to_file(filename);
+	//Save various parameters if triaxialCompressionEngine is defined
+	if (!triaxialCompressionEngine) {
+		vector<shared_ptr<Engine> >::iterator itFirst = scene->engines.begin();
+		vector<shared_ptr<Engine> >::iterator itLast = scene->engines.end();
+		for (;itFirst!=itLast; ++itFirst) {
+			if ((*itFirst)->getClassName() == "TriaxialCompressionEngine") {
+				LOG_DEBUG("stress controller engine found");
+				triaxialCompressionEngine =  YADE_PTR_CAST<TriaxialCompressionEngine> (*itFirst);}
+		}
+		if (!triaxialCompressionEngine) LOG_ERROR("stress controller engine not found");}
+	
+	if (triaxialCompressionEngine) {
+		TS.wszzh = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_top][1];
+		TS.wsxxd = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_right][0];
+		TS.wsyyfa = triaxialCompressionEngine->stress[triaxialCompressionEngine->wall_front][2];
+		TS.eps3 = triaxialCompressionEngine->strain[2];//find_parameter("eps3=", Statefile);
+		TS.eps1 = triaxialCompressionEngine->strain[0];//find_parameter("eps1=", Statefile);
+		TS.eps2 = triaxialCompressionEngine->strain[1];//find_parameter("eps2=", Statefile);
+		TS.haut = triaxialCompressionEngine->height;//find_parameter("haut=", Statefile);
+		TS.larg = triaxialCompressionEngine->width;//find_parameter("larg=", Statefile);
+		TS.prof = triaxialCompressionEngine->depth;//find_parameter("prof=", Statefile);
+		TS.porom = 0/*analyser->ComputeMacroPorosity() crasher?*/;//find_parameter("porom=", Statefile);
+		TS.ratio_f = triaxialCompressionEngine-> ComputeUnbalancedForce(scene);  //find_parameter("ratio_f=", Statefile);
 	}
+	if (filename!=NULL) TS.to_file(filename);
 	return TS;
 }
 

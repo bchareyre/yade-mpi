@@ -78,22 +78,7 @@ public:
 	/// make the current state the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get only volmumes and porosity
 	void setState (bool state=0);	
 	/// return python array containing voronoi volumes, per-particle porosity, and optionaly per-particle deformation, if states 0 and 1 have been assigned 
-	boost::python::dict getVolPoroDef(bool deformation);//{
-// 		Scene* scene=Omega::instance().getScene().get();
-// 		int dim1[]={scene->bodies->size()};
-// 		int dim2[]={scene->bodies->size(),3};
-// 		numpy_boost<Real,1> mass(dim1);
-// 		numpy_boost<Real,2> vel(dim2);
-// 		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-// 			if(!b) continue;
-// 			mass[b->getId()]=b->state->mass;
-// 			VECTOR3R_TO_NUMPY(vel[b->getId()],b->state->vel);
-// 		}
-// 		python::dict ret;
-// 		ret["mass"]=mass;
-// 		ret["vel"]=vel;
-// 		return ret;
-// 	}
+	boost::python::dict getVolPoroDef(bool deformation);//FIXME ; unexplained crash for now
 
 	
 public:
@@ -111,7 +96,10 @@ public:
 	facet_begin = Tes->Triangulation().finite_edges_begin();
 	facet_end = Tes->Triangulation().finite_edges_end();
 	facet_it = Tes->Triangulation().finite_edges_begin();
+	inf=1e10;
 	,/*py*/
+ 	.def("setState",&TesselationWrapper::setState,(python::arg("state")=0),"Make the current state the initial (0) or final (1) configuration for the definition of displacement increments, use only state=0 if you just want to get only volmumes and porosity.")
+	.def("getVolPoroDef",&TesselationWrapper::getVolPoroDef,(python::arg("deformation")=false),"Return a table with per-sphere computed quantities. Include deformations on the increment defined by states 0 and 1 if deformation=True (make sure to define states 0 and 1 consistently).")
 	);	
 	DECLARE_LOGGER;
 };

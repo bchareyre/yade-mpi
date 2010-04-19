@@ -112,11 +112,8 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 }
 
 
-// static CGT::Point Pmin;
-// static CGT::Point Pmax;
-
 // is this a joke?? #include<limits> std::numeric_limits<double>::infinity();
-__attribute__((unused)) static double inf = 1e10; 
+//__attribute__((unused)) static double inf = 1e10; 
 double pminx=0;
 double pminy=0;
 double pminz=0;
@@ -316,14 +313,18 @@ void TesselationWrapper::setState (bool state){ mma.setState(state ? 2 : 1);}
 python::dict TesselationWrapper::getVolPoroDef(bool deformation)
 {
 		Scene* scene=Omega::instance().getScene().get();
-		CGT::Tesselation* pTes;
+		delete Tes;
+		CGT::TriaxialState* ts;
 		if (deformation){//use the final state to compute volumes
 			mma.analyser->ComputeParticlesDeformation();
-			pTes = &mma.analyser->TS1->tesselation();}
-		else pTes = &mma.analyser->TS0->tesselation();//no reason to use the final state if we don't want to compute deformations, keep using the initial
-		CGT::Tesselation& Tes = *pTes;
-		CGT::RTriangulation& Tri = Tes.Triangulation();
-		if (!scene->isPeriodic) AddBoundingPlanes();
+			Tes = &mma.analyser->TS1->tesselation();
+			ts = mma.analyser->TS1;
+			}
+		else {	Tes = &mma.analyser->TS0->tesselation();//no reason to use the final state if we don't want to compute deformations, keep using the initial
+			ts = mma.analyser->TS0;}
+		CGT::RTriangulation& Tri = Tes->Triangulation();
+		Pmin=ts->box.base; Pmax=ts->box.sommet;
+		//if (!scene->isPeriodic) AddBoundingPlanes();
 		ComputeVolumes();
 		int bodiesDim = scene->bodies->size();
 		int dim1[]={bodiesDim};
