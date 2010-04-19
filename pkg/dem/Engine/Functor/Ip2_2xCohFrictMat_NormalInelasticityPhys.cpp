@@ -9,7 +9,7 @@
 #include"Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/NormalInelasticityPhys.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
@@ -23,12 +23,12 @@
 //
 //
 
-void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>& b1 // CohesiveFrictionalMat
-					, const shared_ptr<Material>& b2 // CohesiveFrictionalMat
+void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>& b1 // CohFrictMat
+					, const shared_ptr<Material>& b2 // CohFrictMat
 					, const shared_ptr<Interaction>& interaction)
 {
-	CohesiveFrictionalMat* sdec1 = static_cast<CohesiveFrictionalMat*>(b1.get());
-	CohesiveFrictionalMat* sdec2 = static_cast<CohesiveFrictionalMat*>(b2.get());
+	CohFrictMat* sdec1 = static_cast<CohFrictMat*>(b1.get());
+	CohFrictMat* sdec2 = static_cast<CohFrictMat*>(b2.get());
 	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once

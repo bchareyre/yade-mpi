@@ -27,7 +27,7 @@ class Ip2_2xCohFrictMat_NormalInelasticityPhys : public InteractionPhysicsFuncto
 				
 		int cohesionDefinitionIteration; //useful is you want to use setCohesionNow
 
-	FUNCTOR2D(CohesiveFrictionalMat,CohesiveFrictionalMat);
+	FUNCTOR2D(CohFrictMat,CohFrictMat);
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_NormalInelasticityPhys,
 				  InteractionPhysicsFunctor,
 				  "The RelationShips for using Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity\n\n In these RelationShips all the attributes of the interactions (which are of NormalInelasticityPhys type) are computed. \n\n.. warning::\n\tas in the others :yref:`Ip2 functors<InteractionPhysicsFunctor>`, most of the attributes are computed only once, when the interaction is new.",

@@ -12,7 +12,7 @@
 
 /*! \brief Interaction for using Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity
 
-This interaction is similar to CohesiveFrictionalContactInteraction. Among the differences are the unMax, previousun and previousFn (allowing to describe the inelastic unloadings in compression), no more shear and tension Adhesion, no more "fragile", "cohesionBroken" and "cohesionDisablesFriction"
+This interaction is similar to CohFrictPhys. Among the differences are the unMax, previousun and previousFn (allowing to describe the inelastic unloadings in compression), no more shear and tension Adhesion, no more "fragile", "cohesionBroken" and "cohesionDisablesFriction"
  */
 
 class NormalInelasticityPhys : public FrictPhys
