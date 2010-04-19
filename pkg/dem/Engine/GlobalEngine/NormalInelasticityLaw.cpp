@@ -8,7 +8,7 @@
 
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 
-#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/ScGeom.hpp>
 #include<yade/pkg-dem/NormalInelasticityPhys.hpp>
 #include<yade/core/Omega.hpp>
