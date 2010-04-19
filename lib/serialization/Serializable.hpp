@@ -48,15 +48,20 @@ using namespace ArchiveTypes;
                 registerAttribute( #attribute, attribute );
 
 
+
+
+
 // placeholder function for registration with empty base
 namespace{
 	void registerAttributes(){}
 };
 
 #ifdef YADE_BOOST_SERIALIZATION
+	// uncomment to completely replace yade's serialization while loading/saving simulations everywhere
+	// #define YADE_SERIALIZE_USING_BOOST
 	#define _REGISTER_BOOST_ATTRIBUTES_REPEAT(x,y,z) ar & BOOST_SERIALIZATION_NVP(z);
 	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
-		friend class boost::serialization::access; private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ preProcessAttributes(ArchiveT::is_loading::value); ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass); BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) postProcessAttributes(ArchiveT::is_loading::value); }
+		friend class boost::serialization::access; private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass); preProcessAttributes(ArchiveT::is_loading::value); BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) postProcessAttributes(ArchiveT::is_loading::value); }
 #else
 	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
 #endif

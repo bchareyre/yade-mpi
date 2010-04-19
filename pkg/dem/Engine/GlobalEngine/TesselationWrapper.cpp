@@ -114,7 +114,9 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 
 // static CGT::Point Pmin;
 // static CGT::Point Pmax;
-static double inf = 1e10;
+
+// is this a joke?? #include<limits> std::numeric_limits<double>::infinity();
+__attribute__((unused)) static double inf = 1e10; 
 double pminx=0;
 double pminy=0;
 double pminz=0;

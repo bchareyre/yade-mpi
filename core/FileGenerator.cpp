@@ -9,6 +9,7 @@
 
 #include<yade/core/Omega.hpp>
 #include<yade/lib-pyutil/gil.hpp>
+#include<yade/lib-serialization/ObjectIO.hpp>
 
 #include"FileGenerator.hpp"
 
@@ -68,7 +69,11 @@ bool FileGenerator::generateAndSave()
 		setProgress(1.0);
 		try
 		{
-			IOFormatManager::saveToFile(serializationDynlib, outputFileName, "scene", rootBody);
+			#ifdef YADE_SERIALIZE_USING_BOOST
+				yade::ObjectIO::save(outputFileName,"scene",rootBody);
+			#else
+				IOFormatManager::saveToFile(serializationDynlib, outputFileName, "scene", rootBody);
+			#endif
 		}
 		catch(SerializableError& e)
 		{

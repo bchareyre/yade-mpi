@@ -14,7 +14,6 @@
 #include<yade/core/Body.hpp>
 #include<yade/core/Interaction.hpp>
 #include<yade/core/Scene.hpp>
-#include<yade/lib-serialization/IOFormatManager.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/pkg-common/BoundDispatcher.hpp>
 #include<yade/pkg-common/CundallNonViscousDamping.hpp>

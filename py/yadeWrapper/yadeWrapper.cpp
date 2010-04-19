@@ -38,23 +38,21 @@
 #include<yade/core/Functor.hpp>
 #include<yade/pkg-common/ParallelEngine.hpp>
 
-#include<yade/pkg-common/BoundDispatcher.hpp>
-#include<yade/pkg-common/InteractionGeometryDispatcher.hpp>
-#include<yade/pkg-common/InteractionPhysicsDispatcher.hpp>
-#include<yade/pkg-common/LawDispatcher.hpp>
 #include<yade/pkg-common/InteractionDispatchers.hpp>
 
-#include<yade/pkg-common/BoundFunctor.hpp>
-#include<yade/pkg-common/InteractionGeometryFunctor.hpp>
-#include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
-#include<yade/pkg-common/LawFunctor.hpp>
-
-#include<yade/pkg-dem/Shop.hpp>
+// #include<yade/pkg-dem/Shop.hpp>
 #include<yade/pkg-dem/Clump.hpp>
+
+// local copy
+#include<boost/math/nonfinite_num_facets.hpp>
+
+#include<locale>
+#include<boost/archive/codecvt_null.hpp>
 
 using namespace boost;
 using namespace std;
 
+#include<yade/lib-serialization/ObjectIO.hpp>
 
 #include<yade/extra/boost_python_len.hpp>
 
@@ -363,9 +361,7 @@ class pyOmega{
 		LOG_DEBUG("SAVE!");
 	}
 
-	void saveSpheres(std::string fileName){ Shop::saveSpheresToFile(fileName); }
-
-	double getSpheresVolume(){ return Shop::getSpheresVolume(); }
+	// double getSpheresVolume(){ return Shop::getSpheresVolume(); }
 	
 	python::list miscParams_get(){
 		python::list ret;
@@ -460,31 +456,13 @@ class pyOmega{
 		void numThreads_set(int n){ LOG_WARN("Yade was compiled without openMP support, changing number of threads will have no effect."); }
 	#endif
 	#ifdef YADE_BOOST_SERIALIZATION
-	void saveXML(string filename){
-		std::ofstream ofs(filename.c_str());
-		boost::archive::xml_oarchive oa(ofs);
+	void saveBoost(string filename){
 		const shared_ptr<Scene>& scene=OMEGA.getScene();
-		oa << boost::serialization::make_nvp("scene",*scene);
+		yade::ObjectIO::save(filename,"scene",scene);
 	}
-	void loadXML(string filename){
-		std::ifstream ifs(filename.c_str());
-		boost::archive::xml_iarchive ia(ifs);
+	void loadBoost(string filename){
 		shared_ptr<Scene> scene(new Scene);
-		ia >> boost::serialization::make_nvp("scene",*scene);
-		OMEGA.setScene(scene);
-	}
-	// binary format
-	void saveBin(string filename){
-		std::ofstream ofs(filename.c_str());
-		boost::archive::binary_oarchive oa(ofs);
-		const shared_ptr<Scene>& scene=OMEGA.getScene();
-		oa << boost::serialization::make_nvp("scene",*scene);
-	}
-	void loadBin(string filename){
-		std::ifstream ifs(filename.c_str());
-		boost::archive::binary_iarchive ia(ifs);
-		shared_ptr<Scene> scene(new Scene);
-		ia >> boost::serialization::make_nvp("scene",*scene);
+		yade::ObjectIO::load(filename,"scene",scene);
 		OMEGA.setScene(scene);
 	}
 	#endif
@@ -539,7 +517,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
 		.def("tmpToFile",&pyOmega::tmpToFile,(python::arg("fileName"),python::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
 		.def("tmpToString",&pyOmega::tmpToString,(python::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")
-		.def("getSpheresVolume",&pyOmega::getSpheresVolume,"Compute the total volume of spheres in the simulation (might crash for now if dynamic bodies are not spheres)")
+		//.def("getSpheresVolume",&pyOmega::getSpheresVolume,"Compute the total volume of spheres in the simulation (might crash for now if dynamic bodies are not spheres)")
 		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.")
 		.def("pause",&pyOmega::pause,"Stop simulation execution. (May be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
@@ -568,10 +546,14 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("exitNoBacktrace",&pyOmega::exitNoBacktrace,(python::arg("status")=0),"Disable SEGV handler and exit, optionally with given status number.")
 		.def("disableGdb",&pyOmega::disableGdb,"Revert SEGV and ABRT handlers to system defaults.")
 		#ifdef YADE_BOOST_SERIALIZATION
+#if 0
 			.def("saveXML",&pyOmega::saveXML,"[EXPERIMENTAL] save to XML using boost::serialization.")
 			.def("loadXML",&pyOmega::loadXML,"[EXPERIMENTAL] load from XML using boost::serialization.")
 			.def("saveBin",&pyOmega::saveBin,"[EXPERIMENTAL] save to binary file using boost::serialization.")
 			.def("loadBin",&pyOmega::loadBin,"[EXPERIMENTAL] load from binary file using boost::serialization.")
+#endif
+			.def("load2",&pyOmega::loadBoost,"[EXPERIMENTAL] load using boost::serialization (handles compression, XML/binary)")
+			.def("save2",&pyOmega::saveBoost,"[EXPERIMENTAL] save using boost::serialization (handles compression, XML/binary)")
 		#endif
 		.def("runEngine",&pyOmega::runEngine,"Run given engine exactly once; simulation time, step number etc. will not be incremented (use only if you know what you do).")
 		.def("tmpFilename",&pyOmega::tmpFilename,"Return unique name of file in temporary directory which will be deleted when yade exits.")
@@ -631,17 +613,11 @@ BOOST_PYTHON_MODULE(wrapper)
 	python::class_<pySTLImporter>("STLImporter")
 		.def("ymport",&pySTLImporter::import);
 
-
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
 	Serializable().pyRegisterClass(python::scope());
 
 	python::class_<TimingDeltas, shared_ptr<TimingDeltas>, noncopyable >("TimingDeltas").add_property("data",&TimingDeltas::pyData,"Get timing data as list of tuples (label, execTime[nsec], execCount) (one tuple per checkpoint)").def("reset",&TimingDeltas::reset,"Reset timing information");
-
-	#define EXPOSE_CXX_CLASS_RENAMED(cxxName,pyName) python::class_<cxxName,shared_ptr<cxxName>, python::bases<Serializable>, noncopyable>(#pyName).def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<cxxName>)).def("clone",&Serializable_clone<cxxName>,python::arg("attrs")=python::dict())
-	#define EXPOSE_CXX_CLASS(className) EXPOSE_CXX_CLASS_RENAMED(className,className)
-	// expose indexable class, with access to the index
-	#define EXPOSE_CXX_CLASS_IX(className) EXPOSE_CXX_CLASS(className).add_property("dispIndex",&Indexable_getClassIndex<className>,"Return class index of this instance.").def("dispHierarchy",&Indexable_getClassIndices<className>,(python::arg("names")=true),"Return list of dispatch classes (from down upwards), starting with the class instance itself, top-level indexable at last. If names is true (default), return class names rather than numerical indices.")
 
 	python::scope().attr("O")=pyOmega();
 }

@@ -36,7 +36,7 @@ class Facet : public Shape {
 	void postProcessAttributes(bool deserializing);
 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Facet,Shape,"Facet (triangular particle) geometry.",
-		((vector<Vector3r>,vertices,,"Vertex positions in local coordinates."))
+		((vector<Vector3r>,vertices,vector<Vector3r>(3),"Vertex positions in local coordinates."))
 		#ifdef FACET_TOPO
 		((vector<body_id_t>,edgeAdjIds,vector<body_id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
 		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),"half angle between normals of this facet and the adjacent facet [experimental]"))

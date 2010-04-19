@@ -105,7 +105,8 @@ O.engines=[
 plot.plots={'eps':('sigma',)} #'sigma.25','sigma.50','sigma.75')}
 plot.maxDataLen=4000
 
-O.saveTmp('initial');
+#O.saveTmp('initial');
+O.saveXML('/tmp/init.xml')
 
 O.timingEnabled=False
 
@@ -117,7 +118,8 @@ def initTest():
 	print "init"
 	if O.iter>0:
 		O.wait();
-		O.loadTmp('initial')
+		#O.loadTmp('initial')
+		O.loadXML('/tmp/init.xml')
 		print "Reversing plot data"; plot.reverseData()
 	strainer.strainRate=abs(strainRateTension) if mode=='tension' else -abs(strainRateCompression)
 	try:

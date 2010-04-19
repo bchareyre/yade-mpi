@@ -26,6 +26,9 @@
 #include<boost/version.hpp>
 #include<boost/python.hpp>
 
+#include<yade/lib-serialization/ObjectIO.hpp>
+
+
 #include<cxxabi.h>
 
 #if BOOST_VERSION<103500
@@ -263,12 +266,20 @@ void Omega::loadSimulationFromStream(std::istream& stream){
 	LOG_DEBUG("Loading simulation from stream.");
 	resetScene();
 	RenderMutexLock lock;
-	IOFormatManager::loadFromStream("XMLFormatManager",stream,"scene",scene);
+	#ifdef YADE_SERIALIZE_USING_BOOST
+		yade::ObjectIO::load<typeof(scene),boost::archive::xml_iarchive>(stream,"scene",scene);
+	#else
+		IOFormatManager::loadFromStream("XMLFormatManager",stream,"scene",scene);
+	#endif
 }
 
 void Omega::saveSimulationToStream(std::ostream& stream){
 	LOG_DEBUG("Saving simulation to stream.");
-	IOFormatManager::saveToStream("XMLFormatManager",stream,"scene",scene);
+	#ifdef YADE_SERIALIZE_USING_BOOST
+		yade::ObjectIO::save<typeof(scene),boost::archive::xml_oarchive>(stream,"scene",scene);
+	#else
+		IOFormatManager::saveToStream("XMLFormatManager",stream,"scene",scene);
+	#endif
 }
 
 void Omega::loadSimulation(){
@@ -281,14 +292,24 @@ void Omega::loadSimulation(){
 		if(algorithm::ends_with(simulationFileName,".xml") || algorithm::ends_with(simulationFileName,".xml.gz") || algorithm::ends_with(simulationFileName,".xml.bz2")){
 			joinSimulationLoop(); // stop current simulation if running
 			resetScene();
-			RenderMutexLock lock; IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"scene",scene);
+			RenderMutexLock lock;
+			#ifdef YADE_SERIALIZE_USING_BOOST
+				yade::ObjectIO::load(simulationFileName,"scene",scene);
+			#else
+				IOFormatManager::loadFromFile("XMLFormatManager",simulationFileName,"scene",scene);
+			#endif
 		}
 		else if(algorithm::starts_with(simulationFileName,":memory:")){
 			if(memSavedSimulations.count(simulationFileName)==0) throw runtime_error("Cannot load nonexistent memory-saved simulation "+simulationFileName);
 			istringstream iss(memSavedSimulations[simulationFileName]);
 			joinSimulationLoop();
 			resetScene();
-			RenderMutexLock lock; IOFormatManager::loadFromStream("XMLFormatManager",iss,"scene",scene);
+			RenderMutexLock lock;
+			#ifdef YADE_SERIALIZE_USING_BOOST
+				yade::ObjectIO::load<typeof(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
+			#else
+				IOFormatManager::loadFromStream("XMLFormatManager",iss,"scene",scene);
+			#endif
 		}
 		else throw runtime_error("Extension of file to load not recognized "+simulationFileName);
 	}
@@ -308,13 +329,21 @@ void Omega::saveSimulation(const string name)
 	LOG_INFO("Saving file " << name);
 
 	if(algorithm::ends_with(name,".xml") || algorithm::ends_with(name,".xml.bz2")){
-		FormatChecker::format=FormatChecker::XML;
-		IOFormatManager::saveToFile("XMLFormatManager",name,"scene",scene);
+		#ifdef YADE_SERIALIZE_USING_BOOST
+			yade::ObjectIO::save(name,"scene",scene);
+		#else
+			FormatChecker::format=FormatChecker::XML;
+			IOFormatManager::saveToFile("XMLFormatManager",name,"scene",scene);
+		#endif
 	}
 	else if(algorithm::starts_with(name,":memory:")){
 		if(memSavedSimulations.count(simulationFileName)>0) LOG_INFO("Overwriting in-memory saved simulation "<<name);
 		ostringstream oss;
-		IOFormatManager::saveToStream("XMLFormatManager",oss,"scene",scene);
+		#ifdef YADE_SERIALIZE_USING_BOOST
+			yade::ObjectIO::save<typeof(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
+		#else
+			IOFormatManager::saveToStream("XMLFormatManager",oss,"scene",scene);
+		#endif
 		memSavedSimulations[name]=oss.str();
 	}
 	else {

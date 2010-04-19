@@ -23,6 +23,7 @@
 #include<boost/algorithm/string.hpp>
 #include<boost/version.hpp>
 #include<boost/python.hpp>
+#include<yade/lib-serialization/ObjectIO.hpp>
 using namespace boost;
 
 #ifdef YADE_GL2PS
@@ -171,7 +172,13 @@ void GLViewer::useDisplayParameters(size_t n){
 	if(dispParams.size()<=(size_t)n){LOG_ERROR("Display parameters #"<<n<<" don't exist (number of entries "<<dispParams.size()<<")"); return;}
 	const shared_ptr<DisplayParameters>& dp=dispParams[n];
 	string val;
-	if(dp->getValue("OpenGLRenderingEngine",val)){ istringstream oglre(val); IOFormatManager::loadFromStream("XMLFormatManager",oglre,"renderer",renderer);}
+	if(dp->getValue("OpenGLRenderingEngine",val)){ istringstream oglre(val);
+		#ifdef YADE_SERIALIZE_USING_BOOST 
+			yade::ObjectIO::load<typeof(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
+		#else
+			IOFormatManager::loadFromStream("XMLFormatManager",oglre,"renderer",renderer);
+		#endif
+	}
 	else { LOG_WARN("OpenGLRenderingEngine configuration not found in display parameters, skipped.");}
 	if(dp->getValue("GLViewer",val)){ GLViewer::setState(val);}
 	else { LOG_WARN("GLViewer configuration not found in display parameters, skipped."); }
@@ -182,7 +189,12 @@ void GLViewer::saveDisplayParameters(size_t n){
 	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;
 	if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
 	shared_ptr<DisplayParameters>& dp=dispParams[n];
-	ostringstream oglre; IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
+	ostringstream oglre;
+	#ifdef YADE_SERIALIZE_USING_BOOST
+		yade::ObjectIO::save<typeof(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
+	#else
+		IOFormatManager::saveToStream("XMLFormatManager",oglre,"renderer",renderer);
+	#endif
 	dp->setValue("OpenGLRenderingEngine",oglre.str());
 	dp->setValue("GLViewer",GLViewer::getState());
 }
