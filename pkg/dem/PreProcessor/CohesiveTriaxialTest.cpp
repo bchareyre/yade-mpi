@@ -25,11 +25,6 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
-<<<<<<< TREE
-//#include<yade/pkg-dem/HydraulicForceEngine.hpp>
-=======
-// #include<yade/pkg-dem/HydraulicForceEngine.hpp>
->>>>>>> MERGE-SOURCE
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>

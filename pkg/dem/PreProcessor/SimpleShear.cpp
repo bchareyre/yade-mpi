@@ -13,7 +13,7 @@
 
 #include "SimpleShear.hpp"
 
-#include <yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include <yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 #include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
@@ -160,7 +160,7 @@ bool SimpleShear::generate()
 void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohesiveFrictionalMat> mat(new CohesiveFrictionalMat);
+	shared_ptr<CohFrictMat> mat(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
@@ -205,7 +205,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 void SimpleShear::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents)
 {
 	body = shared_ptr<Body>(new Body(0,1));
-	shared_ptr<CohesiveFrictionalMat> mat(new CohesiveFrictionalMat);
+	shared_ptr<CohFrictMat> mat(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 // 	shared_ptr<BoxModel> gBox(new BoxModel);
 	shared_ptr<Box> iBox(new Box);
