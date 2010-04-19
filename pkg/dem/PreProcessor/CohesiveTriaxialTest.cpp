@@ -9,8 +9,8 @@
 #include "CohesiveTriaxialTest.hpp"
 
 #include<yade/pkg-dem/CohesiveFrictionalContactLaw.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalRelationships.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include<yade/pkg-dem/Ip2_2xCohFrictMat_CohFrictPhys.hpp>
+#include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 #include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
@@ -25,7 +25,11 @@
 #include<yade/pkg-common/BoundDispatcher.hpp>
 
 #include<yade/pkg-common/GravityEngines.hpp>
+<<<<<<< TREE
+//#include<yade/pkg-dem/HydraulicForceEngine.hpp>
+=======
 // #include<yade/pkg-dem/HydraulicForceEngine.hpp>
+>>>>>>> MERGE-SOURCE
 #include<yade/pkg-dem/NewtonIntegrator.hpp>
 #include<yade/pkg-dem/Ig2_Sphere_Sphere_ScGeom.hpp>
 #include<yade/pkg-dem/Ig2_Box_Sphere_ScGeom.hpp>
@@ -283,7 +287,7 @@ bool CohesiveTriaxialTest::generate()
 void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real radius, bool dynamic )
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
+	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
@@ -327,7 +331,7 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r extents, bool wire)
 {
 	body = shared_ptr<Body>(new Body(body_id_t(0),2));
-	shared_ptr<CohesiveFrictionalMat> physics(new CohesiveFrictionalMat);
+	shared_ptr<CohFrictMat> physics(new CohFrictMat);
 	shared_ptr<Aabb> aabb(new Aabb);
 
 	shared_ptr<Box> iBox(new Box);
@@ -375,7 +379,7 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	shared_ptr<InteractionGeometryFunctor> s2(new Ig2_Box_Sphere_ScGeom);
 	interactionGeometryDispatcher->add(s2);
 
-	shared_ptr<CohesiveFrictionalRelationships> cohesiveFrictionalRelationships = shared_ptr<CohesiveFrictionalRelationships> (new CohesiveFrictionalRelationships);
+	shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> cohesiveFrictionalRelationships = shared_ptr<Ip2_2xCohFrictMat_CohFrictPhys> (new Ip2_2xCohFrictMat_CohFrictPhys);
 	cohesiveFrictionalRelationships->shearCohesion = shearCohesion;
 	cohesiveFrictionalRelationships->normalCohesion = normalCohesion;
 	cohesiveFrictionalRelationships->setCohesionOnNewContacts = setCohesionOnNewContacts;
@@ -415,12 +419,8 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	triaxialcompressionEngine->internalCompaction = internalCompaction;
 	triaxialcompressionEngine->maxMultiplier = maxMultiplier;
 	
-	// shared_ptr<HydraulicForceEngine> hydraulicForceEngine = shared_ptr<HydraulicForceEngine> (new HydraulicForceEngine);
-	// hydraulicForceEngine->dummyParameter = true;
-		
-	//cerr << "fin de section triaxialcompressionEngine = shared_ptr<TriaxialCompressionEngine> (new TriaxialCompressionEngine);" << std::endl;
 	
-// recording global stress
+	// recording global stress
 	triaxialStateRecorder = shared_ptr<TriaxialStateRecorder>(new
 	TriaxialStateRecorder);
 	triaxialStateRecorder-> file 	= WallStressRecordFile;

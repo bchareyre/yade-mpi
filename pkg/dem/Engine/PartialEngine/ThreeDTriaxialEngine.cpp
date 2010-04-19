@@ -19,7 +19,7 @@
 #include<yade/pkg-dem/FrictPhys.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
 
-class CohesiveFrictionalRelationships;
+class Ip2_2xCohFrictMat_CohFrictPhys;
 
 CREATE_LOGGER(ThreeDTriaxialEngine);
 YADE_PLUGIN((ThreeDTriaxialEngine));

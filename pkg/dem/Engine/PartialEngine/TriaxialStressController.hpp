@@ -146,25 +146,25 @@ class TriaxialStressController : public BoundaryController
 		((Real,meanStress,0,""))
 		((Real,volumetricStrain,0,""))
  		,
-			/* extra initializers */
+		/* extra initializers */
 		,
    		/* constructor */
    		first = true;
-			stiffness.resize(6);
-			previousTranslation.assign(Vector3r::ZERO);
+		stiffness.resize(6);
+		previousTranslation.assign(Vector3r::ZERO);
 			for (int i=0; i<6; ++i){
 				normal[i] = stress[i] = force[i] = Vector3r::ZERO;
 				stiffness[i] = 0;
 			}
-			for (int i=0; i<3; ++i) strain[i] = 0;
-			normal[wall_bottom].Y()=1;
-			normal[wall_top].Y()=-1;
-			normal[wall_left].X()=1;
-			normal[wall_right].X()=-1;
-			normal[wall_front].Z()=-1;
-			normal[wall_back].Z()=1;	
-			porosity=1;
+		normal[wall_bottom].Y()=1;
+		normal[wall_top].Y()=-1;
+		normal[wall_left].X()=1;
+		normal[wall_right].X()=-1;
+		normal[wall_front].Z()=-1;
+		normal[wall_back].Z()=1;	
+		porosity=1;
 		,
+		.def_readonly("strain",&TriaxialStressController::strain,"")
  		.def_readonly("porosity",&TriaxialStressController::porosity,"")
 		.def_readonly("boxVolume",&TriaxialStressController::boxVolume,"")
 		.def_readonly("max_vel1",&TriaxialStressController::max_vel1,"|ycomp|")
