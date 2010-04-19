@@ -568,6 +568,7 @@ if not env.GetOption('clean'):
 	if os.path.exists(boostDir+'/python'): os.remove(boostDir+'/python') # remove deprecated symlink from previous line that can break things if it is left there; remove this at some point in the future
 	mkSymlink(buildDir+'/include/yade-'+env['version']+'/indexing_suite','py/3rd-party/boost-python-indexing-suite-v2-noSymlinkHeaders')
 	mkSymlink(boostDir+'/math','extra/floating_point_utilities_v3/boost/math')
+	mkSymlink(boostDir+'/introspection','extra/introspection/boost/introspection')
 	#env.InstallAs(env['PREFIX']+'/include/yade-'+env['version']+'/boost/foreach.hpp',foreachTarget)
 	env.Default(env.Alias('install',['$PREFIX/bin','$PREFIX/lib'])) # build and install everything that should go to instDirs, which are $PREFIX/{bin,lib} (uses scons' Install)
 

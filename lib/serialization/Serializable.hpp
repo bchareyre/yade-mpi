@@ -36,6 +36,9 @@
 
 #include<yade/lib-base/Math.hpp>
 
+// local copy
+#include<boost/introspection/has_member_function.hpp>
+
 
 using namespace boost;
 using namespace std;
@@ -61,7 +64,14 @@ namespace{
 	// #define YADE_SERIALIZE_USING_BOOST
 	#define _REGISTER_BOOST_ATTRIBUTES_REPEAT(x,y,z) ar & BOOST_SERIALIZATION_NVP(z);
 	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) \
-		friend class boost::serialization::access; private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass); preProcessAttributes(ArchiveT::is_loading::value); BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) postProcessAttributes(ArchiveT::is_loading::value); }
+		friend class boost::serialization::access; \
+		private: template<class ArchiveT> void serialize(ArchiveT & ar, unsigned int version){ \
+			ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(baseClass);  \
+			/* will not work if preProcessAttributes is not virtual (it will not be called, but will be compile-time error, since this->preProcessAttributes will be undefined */ \
+			if(boost::introspection::has_non_const_member_function_preProcessAttributes<typeof(*this)>::value) this->preProcessAttributes(ArchiveT::is_loading::value); \
+			BOOST_PP_SEQ_FOR_EACH(_REGISTER_BOOST_ATTRIBUTES_REPEAT,~,attrs) \
+			if(boost::introspection::has_non_const_member_function_postProcessAttributes<typeof(*this)>::value) this->postProcessAttributes(ArchiveT::is_loading::value); \
+		}
 #else
 	#define _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs)
 #endif
@@ -288,7 +298,13 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 	return inst;
 }
 
-
+// support templates for boost::introspection::has_member_function
+// signature bool(bool) MUST match actual functions (i.e. returning bool, taking bool as parameter)
+// creates boost::introspection::has_non_const_member_function_preProcessAttributes<class>
+// which is used to detect that method in serialization code (if using boost::serialization)
+// inside attribute registration macros above
+BOOST_HAS_NON_CONST_MEMBER_FUNCTION(preProcessAttributes,bool(bool))
+BOOST_HAS_NON_CONST_MEMBER_FUNCTION(postProcessAttributes,bool(bool))
 
 class Serializable : public Factorable
 {
