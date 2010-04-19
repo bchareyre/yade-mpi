@@ -6,28 +6,19 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include "CohFrictPhys.hpp"
 
-#pragma once
+void CohFrictPhys::SetBreakingState()
+{	
+	if (fragile) {
+		cohesionBroken = true;
+		normalAdhesion = 0;
+		shearAdhesion = 0;}	
+}
 
-
-#include<yade/pkg-common/ElastMat.hpp>
-
-
-class CohesiveFrictionalMat : public FrictMat
+CohFrictPhys::~CohFrictPhys()
 {
-	public :
-		virtual ~CohesiveFrictionalMat ();
-
-/// Serialization
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(CohesiveFrictionalMat,FrictMat,"",
-		((bool,isBroken,true,""))
-		((bool,isCohesive,true,"")),
-		createIndex();
-					);
-/// Indexable
-	REGISTER_CLASS_INDEX(CohesiveFrictionalMat,FrictMat);
-};
-
-REGISTER_SERIALIZABLE(CohesiveFrictionalMat);
+}
+YADE_PLUGIN((CohFrictPhys));
 
 

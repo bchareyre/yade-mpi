@@ -6,32 +6,19 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include"CohesiveFrictionalRelationships.hpp"
+#include"Ip2_2xCohFrictMat_CohFrictPhys.hpp"
 #include<yade/pkg-dem/ScGeom.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalContactInteraction.hpp>
-#include<yade/pkg-dem/CohesiveFrictionalMat.hpp>
+#include<yade/pkg-dem/CohFrictPhys.hpp>
+#include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/core/Omega.hpp>
 #include<yade/core/Scene.hpp>
 
-
-CohesiveFrictionalRelationships::CohesiveFrictionalRelationships()
-{
-		normalCohesion = 10000000;
-		shearCohesion = 10000000;
-		setCohesionNow = false;
-		setCohesionOnNewContacts = false;
-		cohesionDefinitionIteration = -1; 
-
-//		elasticRollingLimit = ;
-}
-
-
-void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // CohesiveFrictionalMat
-		, const shared_ptr<Material>& b2 // CohesiveFrictionalMat
+void Ip2_2xCohFrictMat_CohFrictPhys::go(	  const shared_ptr<Material>& b1 // CohFrictMat
+		, const shared_ptr<Material>& b2 // CohFrictMat
 					, const shared_ptr<Interaction>& interaction)
 {
-	CohesiveFrictionalMat* sdec1 = static_cast<CohesiveFrictionalMat*>(b1.get());
-	CohesiveFrictionalMat* sdec2 = static_cast<CohesiveFrictionalMat*>(b2.get());
+	CohFrictMat* sdec1 = static_cast<CohFrictMat*>(b1.get());
+	CohFrictMat* sdec2 = static_cast<CohFrictMat*>(b2.get());
 	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
 	
 	//Create cohesive interractions only once
@@ -47,8 +34,8 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // Co
 		if(!interaction->interactionPhysics)
 		{
 //std::cerr << " isNew, id1: " << interaction->getId1() << " id2: " << interaction->getId2()  << "\n";
-			interaction->interactionPhysics = shared_ptr<CohesiveFrictionalContactInteraction>(new CohesiveFrictionalContactInteraction());
-			CohesiveFrictionalContactInteraction* contactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*>(interaction->interactionPhysics.get());
+			interaction->interactionPhysics = shared_ptr<CohFrictPhys>(new CohFrictPhys());
+			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->interactionPhysics.get());
 
 			Real Ea 	= sdec1->young;
 			Real Eb 	= sdec2->young;
@@ -94,17 +81,6 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // Co
 				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
 				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
 				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
-
-
-//if((interaction->getId1()==7 && interaction->getId2()==12)||(interaction->getId1()==12 && interaction->getId2()==7)){
-//Vector3r axis0;
-//Real angle0;
-//contactPhysics->initialRelativeOrientation.ToAxisAngle(axis0,angle0);
-//std::cout << "-----------------------\n"
-//                                               << " ax0: " <<  axis0[0] << " " << axis0[1] << " " << axis0[2] << " an0: " << angle0 << "\n";
-//}
-
-				//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 			}
 
 			contactPhysics->prevNormal 			= interactionGeometry->normal;
@@ -130,7 +106,7 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // Co
 		{	
 			// FIXME - are those lines necessary ???? what they are doing in fact ???
 			// ANSWER - they are used when you setCohesionNow (contact isNew not)
-			CohesiveFrictionalContactInteraction* contactPhysics = YADE_CAST<CohesiveFrictionalContactInteraction*>(interaction->interactionPhysics.get());
+			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->interactionPhysics.get());
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
@@ -155,18 +131,12 @@ void CohesiveFrictionalRelationships::go(	  const shared_ptr<Material>& b1 // Co
 			contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
 			contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;
 			contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
-//Vector3r axis0;
-//Real angle0;
-//contactPhysics->initialRelativeOrientation.ToAxisAngle(axis0,angle0);
-//std::cout << "id1: " << interaction->getId1() << " id2: " << interaction->getId2() << " | "
-//                                               << " ax0: " <<  axis0[0] << " " << axis0[1] << " " << axis0[2] << ", an0: " << angle0 << "\n";
-				//contactPhysics->elasticRollingLimit = elasticRollingLimit;
 			}
 		}	
 		
 	}
 };
-YADE_PLUGIN((CohesiveFrictionalRelationships));
+YADE_PLUGIN((Ip2_2xCohFrictMat_CohFrictPhys));
 
 
 

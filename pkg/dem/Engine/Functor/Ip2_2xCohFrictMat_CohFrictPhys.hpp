@@ -10,30 +10,26 @@
 
 #include<yade/pkg-common/InteractionPhysicsFunctor.hpp>
 
-class CohesiveFrictionalRelationships : public InteractionPhysicsFunctor
+class Ip2_2xCohFrictMat_CohFrictPhys : public InteractionPhysicsFunctor
 {
 	public :
-		CohesiveFrictionalRelationships();
-
 		virtual void go(	const shared_ptr<Material>& b1,
 					const shared_ptr<Material>& b2,
 					const shared_ptr<Interaction>& interaction);
-
-		Real 		normalCohesion,
-				shearCohesion;
-
-		bool		setCohesionNow,
-				setCohesionOnNewContacts;
-				
 		int cohesionDefinitionIteration;
-		long iter;//REMOVE THIS
-
-		REGISTER_ATTRIBUTES(InteractionPhysicsFunctor,(normalCohesion)(shearCohesion)(setCohesionNow)(setCohesionOnNewContacts));
-	FUNCTOR2D(CohesiveFrictionalMat,CohesiveFrictionalMat);
-	REGISTER_CLASS_NAME(CohesiveFrictionalRelationships);
-	REGISTER_BASE_CLASS_NAME(InteractionPhysicsFunctor);
+		
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xCohFrictMat_CohFrictPhys,InteractionPhysicsFunctor,
+		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom_CohFrictPhys_ElasticPlastic`.",
+		((bool,setCohesionNow,false,""))
+		((bool,setCohesionOnNewContacts,false,""))
+		((Real,normalCohesion,10000000,""))
+		((Real,shearCohesion,10000000,""))
+		,
+		cohesionDefinitionIteration = -1; 
+		);
+	FUNCTOR2D(CohFrictMat,CohFrictMat);
 };
 
-REGISTER_SERIALIZABLE(CohesiveFrictionalRelationships);
+REGISTER_SERIALIZABLE(Ip2_2xCohFrictMat_CohFrictPhys);
 
 

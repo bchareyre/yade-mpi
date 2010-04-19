@@ -6,14 +6,14 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "CohesiveFrictionalMat.hpp"
+#include "CohFrictMat.hpp"
 
 
-CohesiveFrictionalMat::~CohesiveFrictionalMat()
+CohFrictMat::~CohFrictMat()
 {
 }
 
-YADE_PLUGIN((CohesiveFrictionalMat));
+YADE_PLUGIN((CohFrictMat));
 
 
 
