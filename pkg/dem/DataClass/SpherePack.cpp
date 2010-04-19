@@ -82,8 +82,9 @@ long SpherePack::makeCloud(Vector3r mn, Vector3r mx, Real rMean, Real rRelFuzz, 
 	static boost::minstd_rand randGen(TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<> > rnd(randGen, boost::uniform_real<>(0,1));
 	if (porosity>0) {//cloud porosity is assigned, ignore the given value of rMean
+		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²) 
 		Vector3r dimensions=mx-mn; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
-		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*num),1/3.);}	
+		rMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*(1+rRelFuzz*rRelFuzz)*num),1/3.);}	
 	const int maxTry=1000;
 	Vector3r size=mx-mn;
 	if(periodic)(cellSize=size);
