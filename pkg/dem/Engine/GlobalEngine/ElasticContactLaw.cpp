@@ -21,9 +21,7 @@ void ElasticContactLaw::action()
 {
 	if(!functor) functor=shared_ptr<Law2_ScGeom_FrictPhys_Basic>(new Law2_ScGeom_FrictPhys_Basic);
 	functor->sdecGroupMask=sdecGroupMask;
-	#ifdef SCG_SHEAR
-		functor->useShear=useShear;
-	#endif
+	functor->useShear=useShear;
 	functor->neverErase=neverErase;
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 		if(!I->isReal()) continue;
@@ -39,60 +37,37 @@ void ElasticContactLaw::action()
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
 void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
 	Real dt = Omega::instance().getTimeStep();
-
-			int id1 = contact->getId1(), id2 = contact->getId2();
-			// FIXME: mask handling should move to LawFunctor itself, outside the functors
-			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
-			ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
-			FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());			
-						
-			if(currentContactGeometry->penetrationDepth <0)
-			{
-				if (neverErase) {
-					currentContactPhysics->shearForce = Vector3r::ZERO;
-					currentContactPhysics->normalForce = Vector3r::ZERO;}
-				else 	ncb->interactions->requestErase(id1,id2);
-				return;
-			}	
-	
-			State* de1 = Body::byId(id1,ncb)->state.get();
-			State* de2 = Body::byId(id2,ncb)->state.get();
-
-			Vector3r& shearForce 			= currentContactPhysics->shearForce;
-	
-			// no need for this, initialized to Vector3r::ZERO in NormShearPhys ctor
-			// if (contact->isFresh(ncb)) shearForce=Vector3r(0,0,0);
-					
-			Real un=currentContactGeometry->penetrationDepth;
-			TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
-			currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
-	
-			#ifdef SCG_SHEAR
-				if(useShear){
-					currentContactGeometry->updateShear(de1,de2,dt);
-					shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
-				} else {
-			#endif
-					currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
-			#ifdef SCG_SHEAR
-				}
-			#endif
-
-			
-			// PFC3d SlipModel, is using friction angle. CoulombCriterion
-			Real maxFs = currentContactPhysics->normalForce.SquaredLength() * std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-			if( shearForce.SquaredLength() > maxFs )
-			{
-				Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
-				shearForce *= ratio;
-				#ifdef SCG_SHEAR
-					// in this case, total shear displacement must be updated as well
-					if(useShear) currentContactGeometry->shear*=ratio;
-				#endif
-			}
-	
-			applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce , currentContactGeometry->contactPoint , id1 , de1->se3.position , id2 , de2->se3.position , ncb);
-			currentContactPhysics->prevNormal = currentContactGeometry->normal;
+	int id1 = contact->getId1(), id2 = contact->getId2();
+// 			// FIXME: mask handling should move to LawFunctor itself, outside the functors
+// 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
+	ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
+	FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());
+	if(currentContactGeometry->penetrationDepth <0){
+		if (neverErase) {
+			currentContactPhysics->shearForce = Vector3r::ZERO;
+			currentContactPhysics->normalForce = Vector3r::ZERO;}
+		else 	ncb->interactions->requestErase(id1,id2);
+		return;}
+	State* de1 = Body::byId(id1,ncb)->state.get();
+	State* de2 = Body::byId(id2,ncb)->state.get();
+	Vector3r& shearForce = currentContactPhysics->shearForce;
+	Real un=currentContactGeometry->penetrationDepth;
+	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
+	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
+	if(useShear){
+		currentContactGeometry->updateShear(de1,de2,dt);
+		shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
+	} else {
+		currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);}
+	// PFC3d SlipModel, is using friction angle. CoulombCriterion
+	Real maxFs = currentContactPhysics->normalForce.SquaredLength()*
+			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
+	if( shearForce.SquaredLength() > maxFs ){
+		Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+		shearForce *= ratio;
+		if(useShear) currentContactGeometry->shear*=ratio;}
+	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
+	currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }
 
 // same as elasticContactLaw, but using Dem3DofGeom
