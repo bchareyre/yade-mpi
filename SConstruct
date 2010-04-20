@@ -233,7 +233,7 @@ if len(sys.argv)>1 and ('clean' in sys.argv) or ('tags' in sys.argv) or ('doc' i
 		else: print "Nothing to clean: %s."%buildDir
 		sys.argv.remove('clean')
 	if 'tags' in sys.argv:
-		cmd="ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=attic --exclude=doc --exclude=scons-local --exclude=include --exclude=debian --exclude='*.so' --langmap=c++:+.inl,c++:+.tpp,c++:+.ipp"
+		cmd="ctags -R --extra=+q --fields=+n --exclude='.*' --exclude=attic --exclude=doc --exclude=scons-local --exclude=include --exclude=debian --exclude='*.so' --exclude='*.s' --exclude='*.ii' --langmap=c++:+.inl,c++:+.tpp,c++:+.ipp"
 		print cmd; os.system(cmd)
 		sys.argv.remove('tags')
 	if 'doc' in sys.argv:

@@ -36,8 +36,10 @@
 
 #include<yade/lib-base/Math.hpp>
 
+#ifdef YADE_BOOST_SERIALIZATION
 // local copy
-#include<boost/introspection/has_member_function.hpp>
+	#include<boost/introspection/has_member_function.hpp>
+#endif
 
 
 using namespace boost;
@@ -298,6 +300,7 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 	return inst;
 }
 
+#ifdef YADE_BOOST_SERIALIZATION
 // support templates for boost::introspection::has_member_function
 // signature bool(bool) MUST match actual functions (i.e. returning bool, taking bool as parameter)
 // creates boost::introspection::has_non_const_member_function_preProcessAttributes<class>
@@ -305,6 +308,7 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 // inside attribute registration macros above
 BOOST_HAS_NON_CONST_MEMBER_FUNCTION(preProcessAttributes,bool(bool))
 BOOST_HAS_NON_CONST_MEMBER_FUNCTION(postProcessAttributes,bool(bool))
+#endif
 
 class Serializable : public Factorable
 {
