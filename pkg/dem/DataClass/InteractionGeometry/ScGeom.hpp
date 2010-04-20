@@ -39,6 +39,7 @@ class ScGeom: public GenericSpheresContact {
 		/* extra initializers */ ((radius1,GenericSpheresContact::refR1)) ((radius2,GenericSpheresContact::refR2)),
 		/* ctor */ createIndex();,
 		/* py */
+		.def_readwrite("penetrationDepth",&ScGeom::penetrationDepth,"documentation")
 	);
 	REGISTER_CLASS_INDEX(ScGeom,GenericSpheresContact);
 };
