@@ -27,7 +27,7 @@ refs:
 - (french, lot of documentation) L. Scholtes, PhD thesis -> http://tel.archives-ouvertes.fr/tel-00363961/en/
 - (english, less...) L. Scholtes et al. Micromechanics of granular materials with capillary effects. International Journal of Engineering Science 2009,(47)1, 64-75 
 
-The law needs ascii files M(r=i) with i=R1/R2 to work (see in yade/extra/capillaryFiles). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry and must be placed in the bin directory (where yade exec file is situated) to be taken into account.
+The law needs ascii files M(r=i) with i=R1/R2 to work (downloaded from https://yade-dem.org/wiki/CapillaryTriaxialTest). They contain a set of results from the resolution of the Laplace-Young equation for different configurations of the interacting geometry and must be placed in the bin directory (where yade exec file is situated) to be taken into account.
 The control parameter is the capillary pressure (or suction) Delta_u, defined as the difference between gas and liquid pressure: Delta_u = u_gas - u_liquid
 Liquid bridges properties (volume V, extent over interacting grains delta1 and delta2) are computed as a result of Delta_u and the interacting geometry (spheres radii and interparticular distance)
 

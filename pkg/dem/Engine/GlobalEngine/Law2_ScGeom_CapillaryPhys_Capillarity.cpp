@@ -391,7 +391,7 @@ Tableau::Tableau(const char* filename)
 		static bool first=true;
 		if(first)
 		{
-	                cout << "WARNING: cannot open files used for capillary law, all forces will be null. Instructions on how to download and install them is found here : http://yade-dem.org/index.php/CapillaryTriaxialTest." << endl;
+	                cout << "WARNING: cannot open files used for capillary law, all forces will be null. Instructions on how to download and install them is found here : https://yade-dem.org/wiki/CapillaryTriaxialTest." << endl;
 			first=false;
 		}
 		return;
