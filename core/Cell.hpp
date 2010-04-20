@@ -84,18 +84,26 @@ class Cell: public Serializable{
 	static Real wrapNum(const Real& x, const Real& sz, int& period){
 		Real norm=x/sz; period=(int)floor(norm); return (norm-period)*sz;
 	}
+
+	Vector3r getRefSize(){ return refSize; }
+	void setRefSize(const Vector3r& s){ refSize=s; integrateAndUpdate(0); }
+	Matrix3r getTrsf(){ return trsf; }
+	void setTrsf(const Matrix3r& m){ trsf=m; integrateAndUpdate(0); }
+
 	void postProcessAttributes(bool deserializing){ if(deserializing) integrateAndUpdate(0); }
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY
 		(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
-
-		((Vector3r,refSize,Vector3r(1,1,1),"Reference size of the cell"))
-		((Matrix3r,trsf,Matrix3r::IDENTITY,"Current transformation matrix of the cell"))
+		((Vector3r,refSize,Vector3r(1,1,1),"[will be overridden below]"))
+		((Matrix3r,trsf,Matrix3r::IDENTITY,"[will be overridden below]"))
 		((Matrix3r,velGrad,Matrix3r::ZERO,"Velocity gradient of the transformation; used in NewtonIntegrator.")),
 
 		/*ctor*/ integrateAndUpdate(0),
 
 		/*py*/
 		.def_readonly("size",&Cell::getSize_copy,"Current size of the cell, i.e. lengths of 3 cell lateral vectors after applying current trsf. Update automatically at every step.")
+		/* accessors that ensure cache coherence */
+		.add_property("refSize",&Cell::getRefSize,&Cell::setRefSize,"Reference size of the cell.")
+		.add_property("trsf",&Cell::getTrsf,&Cell::setTrsf,"Transformation matrix of the cell.")
 	);
 };
 REGISTER_SERIALIZABLE(Cell);

@@ -23,7 +23,7 @@ BOOST_PYTHON_MODULE(_packSpheres){
 		.def("cellRepeat",&SpherePack::cellRepeat,"Repeat the packing given number of times in each dimension. Periodicity is retained, cellSize changes. Raises exception for non-periodic packing.")
 		.def("relDensity",&SpherePack::relDensity,"Relative packing density, measured as sum of spheres' volumes / aabb volume.\n(Sphere overlaps are ignored.)")
 		.def("translate",&SpherePack::translate,"Translate all spheres by given vector.")
-		.def("rotate",&SpherePack::rotate,"Rotate all spheres around packing center (in terms of aabb()), given axis and angle of the rotation.")
+		.def("rotate",&SpherePack::rotate,(python::arg("axis"),python::arg("angle")),"Rotate all spheres around packing center (in terms of aabb()), given axis and angle of the rotation.")
 		.def("scale",&SpherePack::scale,"Scale the packing around its center (in terms of aabb()) by given factor (may be negative).")
 		.def("__len__",&SpherePack::len,"Get number of spheres in the packing")
 		.def("__getitem__",&SpherePack::getitem,"Get entry at given index, as tuple of center and radius.")

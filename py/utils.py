@@ -645,7 +645,7 @@ This class is used by :yref:`yade.utils.readParamsFromTable`.
 		# read file in memory, remove newlines and comments; the [''] makes lines 1-indexed
 		ll=[re.sub('\s*#.*','',l[:-1]) for l in ['']+open(file,'r').readlines()]
 		# usable lines are those that contain something else than just spaces
-		usableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i][:-1])]
+		usableLines=[i for i in range(len(ll)) if not re.match(r'^\s*(#.*)?$',ll[i])]
 		headings=ll[usableLines[0]].split()
 		# use all values of which heading has ! after its name to build up the description string
 		# if there are none, use all columns

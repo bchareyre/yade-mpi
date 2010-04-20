@@ -35,14 +35,24 @@ class Facet : public Shape {
 
 	void postProcessAttributes(bool deserializing);
 
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Facet,Shape,"Facet (triangular particle) geometry.",
-		((vector<Vector3r>,vertices,vector<Vector3r>(3),"Vertex positions in local coordinates."))
+	void setVertices(const vector<Vector3r>& v){
+		if(v.size()!=3) throw runtime_error("Facet must have exactly 3 vertices.");
+		assert(vertices.size()==3);
+		for(int i=0; i<3; i++) vertices[i]=v[i];
+		Facet::postProcessAttributes(true);
+	}
+	vector<Vector3r> getVertices(){ vector<Vector3r> ret(3); for(int i=0; i<3; i++) ret[i]=vertices[i]; return ret;}
+
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Facet,Shape,"Facet (triangular particle) geometry.",
+		((vector<Vector3r>,vertices,vector<Vector3r>(3),"[overridden below]"))
 		#ifdef FACET_TOPO
 		((vector<body_id_t>,edgeAdjIds,vector<body_id_t>(3,Body::ID_NONE),"Facet id's that are adjacent to respective edges [experimental]"))
 		((vector<Real>,edgeAdjHalfAngle,vector<Real>(3,0),"half angle between normals of this facet and the adjacent facet [experimental]"))
 		#endif
 		,
-		/* ctor */ createIndex();
+		/* ctor */ createIndex();,
+		/* must be separate to call postProcessAttributes(0) when changed, to keep internal data consistent */
+		.add_property("vertices",&Facet::getVertices,&Facet::setVertices,"Vertex positions in local coordinates.")
 	);
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Facet,Shape);

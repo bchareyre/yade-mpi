@@ -383,7 +383,7 @@ def randomPeriPack(radius,rRelFuzz,initSize):
 	sp=SpherePack()
 	O.periodic=True
 	O.cell.refSize=Vector3(initSize)
-	sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,rRelFuzz,int(initSize[0]*initSize[1]*initSize[2]/((4/3.)*pi*radius**3)),True)
+	sp.makeCloud(Vector3().ZERO,O.cell.refSize,radius,rRelFuzz,-1,True)
 	O.engines=[ForceResetter(),BoundDispatcher([Bo1_Sphere_Aabb()]),InsertionSortCollider(nBins=2,sweepLength=.05*radius),InteractionDispatchers([Ig2_Sphere_Sphere_Dem3DofGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_Dem3DofGeom_FrictPhys_Basic()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
