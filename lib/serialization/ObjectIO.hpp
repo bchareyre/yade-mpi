@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifdef YADE_BOOST_SERIALIZATION
+
 #include<locale>
 #include<boost/archive/codecvt_null.hpp>
 #include<boost/iostreams/filtering_stream.hpp>
@@ -66,3 +68,5 @@ struct ObjectIO{
 };
 
 }
+
+#endif
