@@ -33,13 +33,23 @@ void ElasticContactLaw::action()
 	}
 }
 
+Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
+{
+	Real energy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		FrictPhys* phys = dynamic_cast<FrictPhys*>(I->interactionPhysics.get());
+		if(phys) {
+			energy += 0.5*(phys->normalForce.SquaredLength()/phys->kn + phys->shearForce.SquaredLength()/phys->ks);}
+	}
+	return energy;
+}
 
 CREATE_LOGGER(Law2_ScGeom_FrictPhys_Basic);
 void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared_ptr<InteractionPhysics>& ip, Interaction* contact, Scene* ncb){
 	Real dt = Omega::instance().getTimeStep();
 	int id1 = contact->getId1(), id2 = contact->getId2();
-// 			// FIXME: mask handling should move to LawFunctor itself, outside the functors
-// 			if( !(Body::byId(id1,ncb)->getGroupMask() & Body::byId(id2,ncb)->getGroupMask() & sdecGroupMask) ) return;
+
 	ScGeom*    currentContactGeometry= static_cast<ScGeom*>(ig.get());
 	FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());
 	if(currentContactGeometry->penetrationDepth <0){
@@ -54,18 +64,42 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	Real un=currentContactGeometry->penetrationDepth;
 	TRVAR3(currentContactGeometry->penetrationDepth,de1->se3.position,de2->se3.position);
 	currentContactPhysics->normalForce=currentContactPhysics->kn*std::max(un,(Real) 0)*currentContactGeometry->normal;
-	if(useShear){
-		currentContactGeometry->updateShear(de1,de2,dt);
-		shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
-	} else {
-		currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);}
-	// PFC3d SlipModel, is using friction angle. CoulombCriterion
-	Real maxFs = currentContactPhysics->normalForce.SquaredLength()*
+	
+	if (!traceEnergy){//Update force but don't compute energy terms
+		if(useShear){
+			currentContactGeometry->updateShear(de1,de2,dt);
+			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;
+		} else {
+			currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);}
+		// PFC3d SlipModel, is using friction angle. CoulombCriterion
+		Real maxFs = currentContactPhysics->normalForce.SquaredLength()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-	if( shearForce.SquaredLength() > maxFs ){
-		Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
-		shearForce *= ratio;
-		if(useShear) currentContactGeometry->shear*=ratio;}
+		if( shearForce.SquaredLength() > maxFs ){
+			Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+			shearForce *= ratio;
+			if(useShear) currentContactGeometry->shear*=ratio;}
+	} else {//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
+		Vector3r prevForce=shearForce;//store prev force for definition of plastic slip
+		if(useShear) throw ("energy tracing not defined with useShear==true");
+		/*{
+			currentContactGeometry->updateShear(de1,de2,dt);
+			shearForce=currentContactPhysics->ks*currentContactGeometry->shear;//FIXME : energy terms if useShear?
+		} else {*/
+		Vector3r shearDisp = currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
+ 		//}
+		// PFC3d SlipModel, is using friction angle. CoulombCriterion
+		Real maxFs = currentContactPhysics->normalForce.SquaredLength()*
+			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
+		if( shearForce.SquaredLength() > maxFs ){
+			Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+			//define the plastic work input and increment the total plastic energy dissipated
+			plasticDissipation +=
+			(shearDisp+(1/currentContactPhysics->ks)*(shearForce-prevForce))//plastic disp.
+			.Dot(shearForce);//active force
+			shearForce *= ratio;
+			//if(useShear) currentContactGeometry->shear*=ratio;
+		}
+	}	
 	applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
 	currentContactPhysics->prevNormal = currentContactGeometry->normal;
 }

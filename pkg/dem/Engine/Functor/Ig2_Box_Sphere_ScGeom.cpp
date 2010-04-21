@@ -93,17 +93,15 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
 		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 
-		#ifdef SCG_SHEAR
-			if(isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
-			else {scm->prevNormal=scm->normal;}
-		#endif
+		if(isNew) { /* same as below */ scm->prevNormal=pt1-pt2; scm->prevNormal.Normalize(); }
+		else {scm->prevNormal=scm->normal;}
 			
 		// contact point is in the middle of overlapping volumes
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->normal = pt1-pt2; scm->normal.Normalize();
 		scm->penetrationDepth = (pt1-pt2).Length();
-		scm->radius1 = s->radius*2;
+		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
 	} else { // outside
@@ -140,10 +138,9 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		bool isNew=!c->interactionGeometry;
 		if (isNew) scm = shared_ptr<ScGeom>(new ScGeom());
 		else scm = YADE_PTR_CAST<ScGeom>(c->interactionGeometry);	
-		#ifdef SCG_SHEAR
-			if(isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
-			else {scm->prevNormal=scm->normal;}
-		#endif
+		if(isNew) { /* same as below */ scm->prevNormal=-cOnBox_sphere; }
+		else {scm->prevNormal=scm->normal;}
+		
 		scm->contactPoint = 0.5*(pt1+pt2);
 		//scm->normal = pt1-pt2; scm->normal.Normalize();
 		//scm->penetrationDepth = (pt1-pt2).Length();
@@ -151,7 +148,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		scm->penetrationDepth = depth;
 		
 		
-		scm->radius1 = s->radius*2;
+		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
 	}

@@ -65,7 +65,7 @@ Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool
 }
 #endif
 
-void ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
+Vector3r ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& prevNormal, const State* rbp1, const State* rbp2, Real dt, bool avoidGranularRatcheting){
 
 	Vector3r axis;
 	Real angle;
@@ -113,6 +113,7 @@ void ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r& pre
 	Vector3r shearVelocity = relativeVelocity-normal.Dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = shearVelocity*dt;
 	shearForce -= ks*shearDisplacement;
+	return shearDisplacement;
 }
 
 
