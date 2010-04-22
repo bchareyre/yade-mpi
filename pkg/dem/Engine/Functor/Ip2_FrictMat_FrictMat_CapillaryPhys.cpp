@@ -19,24 +19,16 @@ YADE_PLUGIN((Ip2_FrictMat_FrictMat_CapillaryPhys));
 void Ip2_FrictMat_FrictMat_CapillaryPhys::go( const shared_ptr<Material>& b1 //FrictMat
 					, const shared_ptr<Material>& b2 // FrictMat
 					, const shared_ptr<Interaction>& interaction)
-{
-	
+{	
 	ScGeom* interactionGeometry = YADE_CAST<ScGeom*>(interaction->interactionGeometry.get());
-	
-	if(interactionGeometry) // so it is ScGeom  - NON PERMANENT LINK
+	if(interactionGeometry) 
 	{
-//cerr << "interactionGeometry" << endl;
 		if(!interaction->interactionPhysics)
 		{
-//cerr << "interaction->isNew" << endl;
-			
-// 			Body* de1 = (*bodies)[id1].get();
-// 			Body* de2 = (*bodies)[id2].get();
  			const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>(b1);
  			const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>(b2);
 			
  			if (!interaction->interactionPhysics) interaction->interactionPhysics = shared_ptr<CapillaryPhys>(new CapillaryPhys());
-//			interaction->interactionPhysics = shared_ptr<CapillaryPhys>(new CapillaryPhys());
 			const shared_ptr<CapillaryPhys>& contactPhysics = YADE_PTR_CAST<CapillaryPhys>(interaction->interactionPhysics);
 
 			Real Ea 	= sdec1->young;
@@ -47,43 +39,17 @@ void Ip2_FrictMat_FrictMat_CapillaryPhys::go( const shared_ptr<Material>& b1 //F
 			Real Db 	= interactionGeometry->radius2; // FIXME - as above
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
-
-			//Real Eab	= 2*Ea*Eb/(Ea+Eb);
-			//Real Vab	= 2*Va*Vb/(Va+Vb);
-
-			Real Dinit 	= Da+Db; 			// FIXME - is it just a sum?
-			//Real Sinit 	= Mathr::PI * std::pow( std::min(Da,Db) , 2);
-
 			Real Kn = 2*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 			Real Ks = 2*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
-
-
-	//This is the formula used in PFC-3D
-	//
-	//Real Kn = 4 * ((Ea+Eb)*0.5) * ((Da+Db)*0.5);
-	//Real Ks = Kn/2.0;
-
-
 			contactPhysics->initialKn			= Kn;
 			contactPhysics->initialKs			= Ks;
-//cerr << "Ks: " <<       contactPhysics->initialKs			<< endl;
-			contactPhysics->frictionAngle			= std::min(fa,fb); // FIXME - this is actually a waste of memory space, just like initialKs and initialKn
-//cerr << "contactPhysics->frictionAngle " << contactPhysics->frictionAngle << " "<< fa << " " << fb << endl;
+			contactPhysics->frictionAngle			= std::min(fa,fb);
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle); 
-//cerr << "contactPhysics->tangensOfFrictionAngle " << contactPhysics->tangensOfFrictionAngle << endl;
-
 			contactPhysics->prevNormal 			= interactionGeometry->normal;
-			contactPhysics->initialEquilibriumDistance	= Dinit;			
-
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
-			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-
 		}
-		
-		
 	}
-
 };
 
 

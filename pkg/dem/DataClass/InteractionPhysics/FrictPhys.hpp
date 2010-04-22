@@ -9,8 +9,9 @@ class FrictPhys: public NormShearPhys
 		// kn,ks,normal inherited from NormShearPhys
 		Real initialKn			// initial normal elastic constant.
 				,initialKs			// initial shear elastic constant.
-				,equilibriumDistance		// equilibrium distance
-				,initialEquilibriumDistance	// initial equilibrium distance
+				//Those two attributes were removed. If you need them, copy those two lines in your class inheriting from FrictPhys
+// 				,equilibriumDistance		// equilibrium distance
+// 				,initialEquilibriumDistance	// initial equilibrium distance
 				,frictionAngle 			// angle of friction, according to Coulumb criterion
 				;	
 		virtual ~FrictPhys();

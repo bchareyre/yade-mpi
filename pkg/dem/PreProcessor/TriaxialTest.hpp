@@ -20,8 +20,8 @@ class GlobalStiffnessTimeStepper;
 
 /*! \brief Isotropic compression + triaxial compression test
 
-	TriaxialTest full documentation is here : http://yade-dem.org/index.php/TriaxialTest
-	This preprocessor is designed to :
+	TriaxialTest full documentation is here : http://yade-dem.org/wiki/TriaxialTest
+	This preprocessor shows how to simulate a triaxial test in Yade. It is using the elastic-frictional contact law defined in ElasticContactLaw (similar procedures can be used for other contact laws).  It is designed to :
 	1/ generate random loose packings and compress them under isotropic confining stress, either squeezing the packing between moving rigid boxes or expanding the particles while boxes are fixed (depending on flag "InternalCompaction").
 	2/ simulate all sorts triaxial loading path (there is however a default loading path corresponding to constant lateral stress in 2 directions and constant strain rate on the third direction - this loading path is used when the flag AutoCompressionActivation = true, otherwise the simulation stops after isotropic compression)
 	
@@ -68,16 +68,13 @@ class TriaxialTest : public FileGenerator
 		void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius,bool big,bool dynamic);
 		void createActors(shared_ptr<Scene>& rootBody);
 		void positionRootBody(shared_ptr<Scene>& rootBody);
-
-		typedef pair<Vector3r, Real> BasicSphere;
-	
+		typedef pair<Vector3r, Real> BasicSphere;	
 	public : 
-		//TriaxialTest ();
 		~TriaxialTest ();
 		bool generate();
 		
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
-		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. See full documentation at http://yade-dem.org/index.php/TriaxialTest."
+		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. See full documentation at http://yade-dem.org/wiki/TriaxialTest."
 		,
    		((Vector3r,lowerCorner,Vector3r(0,0,0),"Lower corner of the box."))
 		((Vector3r,upperCorner,Vector3r(1,1,1),"Upper corner of the box."))
@@ -85,14 +82,12 @@ class TriaxialTest : public FileGenerator
 		((string,Key,"","A code that is added to output filenames."))
 		((string,fixedBoxDims,"","string that contains some subset (max. 2) of {'x','y','z'} ; containes axes will have box dimension hardcoded, even if box is scaled as mean_radius is prescribed: scaling will be applied on the rest."))
 		((string,AnimationSnapshotsBaseName,"./snapshots_"+Key+"/snap",""))
-		((string,WallStressRecordFile,"./WallStresses"+Key,""))
-					
+		((string,WallStressRecordFile,"./WallStresses"+Key,""))					
 		((bool,internalCompaction,false,"flag for choosing between moving boundaries or increasing particles sizes during the compaction stage."))
 		((bool,biaxial2dTest,false,"FIXME : what is that?"))
-		((bool,rotationBlocked,false,"FIXME : what is that?"))
 		((bool,fixedPoroCompaction,false,"flag to choose an isotropic compaction until a fixed porosity choosing a same translation speed for the six walls"))
 		((bool,autoCompressionActivation,true,"Do we just want to generate a stable packing under isotropic pressure (false) or do we want the triaxial loading to start automatically right after compaction stage (true)?"))
-		((bool,autoUnload,true,"auto adjust the isotropic stress state from :yref:'TriaxialTest::sigmaIsoCompaction' to :yref:'TriaxialTest::sigmaLateralConfinement' if they have different values. See docs for :yref:'TriaxialCompressionEngine::autoUnload'"))
+		((bool,autoUnload,true,"auto adjust the isotropic stress state from :yref:`TriaxialTest::sigmaIsoCompaction` to :yref:`TriaxialTest::sigmaLateralConfinement` if they have different values. See docs for :yref:`TriaxialCompressionEngine::autoUnload`"))
 		((bool,autoStopSimulation,false,"freeze the simulation when conditions are reached (don't activate this if you want to be able to run/stop from Qt GUI)"))
 		((bool,saveAnimationSnapshots,false,""))
 		((bool,noFiles,false,"Do not create any files during run (.xml, .spheres, wall stress records)"))
@@ -105,26 +100,26 @@ class TriaxialTest : public FileGenerator
 		((Real,maxMultiplier,1.01,"max multiplier of diameters during internal compaction (initial fast increase)"))
 		((Real,finalMaxMultiplier,1.001,"max multiplier of diameters during internal compaction (secondary precise adjustment)"))
 		((Real,radiusStdDev,0.3,"Normalized standard deviation of generated sizes."))
-		((Real,radiusMean,-1,"Mean radius. If negative (default), autocomputed to as a function of box size and :yref:'TriaxialTest::numberOfGrains'"))
+		((Real,radiusMean,-1,"Mean radius. If negative (default), autocomputed to as a function of box size and :yref:`TriaxialTest::numberOfGrains`"))
 		((Real,sphereYoungModulus,15000000.0,"Stiffness of spheres."))
 		((Real,sphereKsDivKn,0.5,"Ratio of shear vs. normal contact stiffness for spheres."))
 		((Real,sphereFrictionDeg,18.0,"Friction angle [°] of spheres assigned just before triaxial testing."))
-		((Real,compactionFrictionDeg,sphereFrictionDeg,"Friction angle [°] of spheres during compaction (different values result in different porosities)]. This value is overriden by :yref:'TriaxialTest::sphereFrictionDeg' before triaxial testing."))
+		((Real,compactionFrictionDeg,sphereFrictionDeg,"Friction angle [°] of spheres during compaction (different values result in different porosities)]. This value is overriden by :yref:`TriaxialTest::sphereFrictionDeg` before triaxial testing."))
 		((Real,boxYoungModulus,15000000.0,"Stiffness of boxes."))
 		((Real,maxWallVelocity,10,"max velocity of boundaries. Usually useless, but can help stabilizing the system in some cases."))
 		((Real,boxKsDivKn,0.5,"Ratio of shear vs. normal contact stiffness for boxes."))
 		((Real,boxFrictionDeg,0.0,"Friction angle [°] of boundaries contacts."))
 		((Real,density,2600,"density of spheres"))
-		((Real,strainRate,0.1,"Strain rate in triaxial testing."))
+		((Real,strainRate,0.1,"Strain rate in triaxial loading."))
 		((Real,defaultDt,-1,"Max time-step. Used as initial value if defined. Latter adjusted by the time stepper."))
 		((Real,dampingForce,0.2,"Coefficient of Cundal-Non-Viscous damping (applied on on the 3 components of forces)"))
 		((Real,dampingMomentum,0.2,"Coefficient of Cundal-Non-Viscous damping (applied on on the 3 components of torques)"))
 		((Real,StabilityCriterion,0.01,"Value of unbalanced force for which the system is considered stable. Used in conditionals to switch between loading stages."))
 		((Real,wallOversizeFactor,1.3,"Make boundaries larger than the packing to make sure spheres don't go out during deformation."))
 		((Real,sigmaIsoCompaction,50000,"Confining stress during isotropic compaction."))
-		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:'TriaxialTest::SigmaIsoCompaction'."))
+		((Real,sigmaLateralConfinement,50000,"Lateral stress during triaxial loading. An isotropic unloading is performed if the value is not equal to :yref:`TriaxialTest::SigmaIsoCompaction`."))
 		
-		((int,timeStepUpdateInterval,50,"interval for :yref:'GlobalStiffnessTimeStepper'"))
+		((int,timeStepUpdateInterval,50,"interval for :yref:`GlobalStiffnessTimeStepper`"))
 		((int,timeStepOutputInterval,50,"interval for outputing general informations on the simulation (stress,unbalanced force,...)"))
 		((int,wallStiffnessUpdateInterval,10,"interval for updating the stiffness of sample/boundaries contacts"))
 		((int,radiusControlInterval,10,"interval between size changes when growing spheres."))

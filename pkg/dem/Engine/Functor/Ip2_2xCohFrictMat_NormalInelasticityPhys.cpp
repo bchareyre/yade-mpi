@@ -56,12 +56,6 @@ void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>&
 			Real fa 	= sdec1->frictionAngle;
 			Real fb 	= sdec2->frictionAngle;
 
-			//Real Eab	= 2*Ea*Eb/(Ea+Eb);
-			//Real Vab	= 2*Va*Vb/(Va+Vb);
-
-			Real Dinit 	= Da+Db; 			// FIXME - is it just a sum?
-			//Real Sinit 	= Mathr::PI * std::pow( std::min(Da,Db) , 2);
-
 			Real Kn = 2.0*Ea*Da*Eb*Db/(Ea*Da+Eb*Db);//harmonic average of two stiffnesses
 			Real Ks = 2.0*Ea*Da*Va*Eb*Db*Vb/(Ea*Da*Va+Eb*Db*Va);//harmonic average of two stiffnesses with ks=V*kn for each sphere
 
@@ -104,12 +98,8 @@ void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>&
 			}
 
 			contactPhysics->prevNormal 			= interactionGeometry->normal;
-			contactPhysics->initialEquilibriumDistance	= Dinit;			
-
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
-			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-
 			// FIXME - or here [1] ?
 			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
 			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
@@ -131,8 +121,6 @@ void Ip2_2xCohFrictMat_NormalInelasticityPhys::go(	  const shared_ptr<Material>&
 
 			contactPhysics->kn = contactPhysics->initialKn;
 			contactPhysics->ks = contactPhysics->initialKs;
-			contactPhysics->equilibriumDistance = contactPhysics->initialEquilibriumDistance;
-
 			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive) 
 			{ 
 				//setCohesionNow = false;
