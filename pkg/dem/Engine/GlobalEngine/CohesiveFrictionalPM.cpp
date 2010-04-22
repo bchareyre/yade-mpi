@@ -25,7 +25,7 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	Real Dtensile=phys->FnMax/phys->kn;
 	Real Dsoftening = phys->strengthSoftening*Dtensile; 
 	
-	/*to set the equilibrium distance between all cohesive elements when they first meet*/
+	/*to set the equilibrium distance between all cohesive elements when they first meet -> stress-free assembly*/
 	if ( contact->isFresh(rootBody) ) { phys->initD = displN; phys->normalForce = Vector3r::ZERO; phys->shearForce = Vector3r::ZERO;}
 	
 	Real D = displN - phys->initD; // interparticular distance is computed depending on the equilibrium distance (which is 0 for non cohesive interactions)
@@ -35,22 +35,12 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	  if (!phys->isCohesive){ rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return; } // destroy the interaction before calculation
 	  if ((phys->isCohesive) && (abs(D) > (Dtensile + Dsoftening))) { // spheres are bonded and the interacting distance is greater than the one allowed ny the defined cohesion
 	    phys->isCohesive=false; 
-	    /// update body state with the number of broken bonds
-	    // as in ConcretePM but needs CpmStateUpdater
-// 	    const shared_ptr<Body>& body1=Body::byId(contact->getId1(),scene), body2=Body::byId(contact->getId2(),scene); assert(body1); assert(body2);
-// 	    const shared_ptr<CFpmState>& st1=YADE_PTR_CAST<CFpmState>(body1->state), st2=YADE_PTR_CAST<CFpmState>(body2->state);
-// 	    { boost::mutex::scoped_lock lock(st1->updateMutex); st1->numBrokenCohesive+=1;}
-// 	    { boost::mutex::scoped_lock lock(st2->updateMutex); st2->numBrokenCohesive+=1;}
-	    // luc test
+	    // update body state with the number of broken bonds
 	    CFpmState* st1=dynamic_cast<CFpmState*>(b1->state.get());
 	    CFpmState* st2=dynamic_cast<CFpmState*>(b2->state.get());
-	    //// autre solution
-// 	    State* st1 = Body::byId(id1,rootBody)->state.get();
-// 	    State* st2 = Body::byId(id2,rootBody)->state.get();
 	    st1->numBrokenCohesive+=1;
 	    st2->numBrokenCohesive+=1;
-
-	    /// end of update
+	    // end of update
 	    rootBody->interactions->requestErase(contact->getId1(),contact->getId2()); return;
 	  }
 	}	  
@@ -65,7 +55,6 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	else {
 	  Fn = phys->kn*D;
 	}
-		
 	phys->normalForce = Fn*geom->normal;  // NOTE normal is position2-position1 - It is directed from particle1 to particle2
 	        
 	/*ShearForce*/
@@ -80,17 +69,14 @@ void Law2_ScGeom_CFpmPhys_CohesiveFrictionalPM::go(shared_ptr<InteractionGeometr
 	phys->prevNormal = geom->normal;
 		
 	/* Morh-Coulomb criterion */
-	Vector3r Fs = shearForce; // NOTE the following could be done directly with shearForce?
 	Real maxFs = abs(Fn)*phys->tanFrictionAngle + phys->FsMax;
-		
-	if (Fs.SquaredLength() > maxFs*maxFs){ 
-	  Fs*=maxFs/Fs.Length(); // to fix the shear force to its yielding value
+
+	if (shearForce.SquaredLength() > maxFs*maxFs){ 
+	  shearForce*=maxFs/shearForce.Length(); // to fix the shear force to its yielding value
 	}
-	phys->shearForce = Fs; 
 	
 	/* Apply forces */
 	Vector3r f = phys->normalForce + phys->shearForce;
-	
 	// NOTE applyForceAtContactPoint computes torque induced by normal and shear force too
  	applyForceAtContactPoint(f, geom->contactPoint, contact->getId2(), b2->state->pos, contact->getId1(), b1->state->pos, rootBody); // NOTE id1 and id2 must suit the orientation of the force
 
