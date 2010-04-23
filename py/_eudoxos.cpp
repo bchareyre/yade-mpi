@@ -252,7 +252,7 @@ class InteractionLocator{
 	// cleanup
 	~InteractionLocator(){ locator->Delete(); points->Delete(); grid->Delete(); }
 
-	py::list intrsWithinDistance(const Vector3r& pt, Real radius){
+	py::list intrsAroundPt(const Vector3r& pt, Real radius){
 		vtkIdList *ids=vtkIdList::New();
 		locator->FindPointsWithinRadius(radius,(const double*)(&pt),ids);
 		int numIds=ids->GetNumberOfIds();
@@ -262,6 +262,29 @@ class InteractionLocator{
 			ret.append(intrs[ids->GetId(i)]);
 		}
 		return ret;
+	}
+	python::tuple macroAroundPt(const Vector3r& pt, Real radius){
+		Matrix3r ss(Matrix3r::ZERO);
+		vtkIdList *ids=vtkIdList::New();
+		locator->FindPointsWithinRadius(radius,(const double*)(&pt),ids);
+		int numIds=ids->GetNumberOfIds();
+		Real omegaCumm=0, kappaCumm=0;
+		for(int k=0; k<numIds; k++){
+			const shared_ptr<Interaction>& I(intrs[ids->GetId(k)]);
+			Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(I->interactionGeometry.get());
+			CpmPhys* phys=YADE_CAST<CpmPhys*>(I->interactionPhysics.get());
+			Real d=(geom->se31.position-geom->se32.position).Length(); // current contact length
+			const Vector3r& n=geom->normal;
+			const Real& A=phys->crossSection;
+			const Vector3r& sigmaT=phys->sigmaT;
+			const Real& sigmaN=phys->sigmaN;
+			for(int i=0; i<3; i++) for(int j=0;j<3; j++){
+				ss[i][j]+=d*A*(sigmaN*n[i]*n[j]+.5*(sigmaT[i]*n[j]+sigmaT[j]*n[i]));
+			}
+			omegaCumm+=phys->omega; kappaCumm+=phys->kappaD;
+		}
+		ss*=1/((4/3.)*Mathr::PI*pow(radius,3));
+		return py::make_tuple(ss,omegaCumm/numIds,kappaCumm/numIds);
 	}
 	py::tuple getBounds(){ return py::make_tuple(mn,mx);}
 	int getCnt(){ return cnt; }
@@ -277,7 +300,8 @@ BOOST_PYTHON_MODULE(_eudoxos){
 	py::def("testNumpy",testNumpy);
 #ifdef YADE_VTK
 	py::class_<InteractionLocator>("InteractionLocator","Locate all (real) interactions in space by their :yref:`contact point<Dem3DofGeom::contactPoint>`. When constructed, all real interactions are spatially indexed (uses vtkPointLocator internally). Use intrsWithinDistance to use those data. \n\n.. note::\n\tData might become inconsistent with real simulation state if simulation is being run between creation of this object and spatial queries.")
-		.def("intrsWithinDistance",&InteractionLocator::intrsWithinDistance,((python::arg("point"),python::arg("maxDist"))),"Return list of real interactions that are not further than *maxDist* from *point*.")
+		.def("intrsAroundPt",&InteractionLocator::intrsAroundPt,((python::arg("point"),python::arg("maxDist"))),"Return list of real interactions that are not further than *maxDist* from *point*.")
+		.def("macroAroundPt",&InteractionLocator::macroAroundPt,((python::arg("point"),python::arg("maxDist"))),"Return tuple of averaged stress tensor (as Matrix3), average omega and average kappa values.")
 		.add_property("bounds",&InteractionLocator::getBounds,"Return coordinates of lower and uppoer corner of axis-aligned abounding box of all interactions")
 		.add_property("count",&InteractionLocator::getCnt,"Number of interactions held")
 	;
@@ -287,5 +311,5 @@ BOOST_PYTHON_MODULE(_eudoxos){
 		python::init<Real,int,Real>((python::arg("dH_dTheta"),python::arg("axis")=0,python::arg("theta0")=0),":Parameters:\n\n\tdH_dTheta: float\n\t\tSpiral inclination, i.e. height increase per 1 radian turn;\n\taxis: int\n\t\tAxis of rotation (0=x,1=y,2=z)\n\ttheta: float\n\t\tSpiral angle at zero height (theta intercept)\n\n")
 	)
 		.def("intrsAroundPt",&SpiralInteractionLocator2d::intrsAroundPt,(python::arg("pt2d"),python::arg("radius")),"Return list of interaction objects that are not further from *pt2d* than *radius* in the projection plane")
-		.def("macroStressAroundPt",&SpiralInteractionLocator2d::macroStressAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point, rotating the interaction to the projection plane first. The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates.\n\n$\\sigma^{T}$ and $n$ are transformed by angle $\\theta$ as given by :yref:`utils.spiralProject`.");
+		.def("macroStressAroundPt",&SpiralInteractionLocator2d::macroStressAroundPt,(python::arg("pt2d"),python::arg("radius")),"Compute macroscopic stress around given point, rotating the interaction to the projection plane first. The formula used is\n\n.. math::\n\n    \\sigma_{ij}=\\frac{1}{V}\\sum_{IJ}d^{IJ}A^{IJ}\\left[\\sigma^{N,IJ}n_i^{IJ}n_j^{IJ}+\\frac{1}{2}\\left(\\sigma_i^{T,IJ}n_j^{IJ}+\\sigma_j^{T,IJ}n_i^{IJ}\\right)\\right]\n\nwhere the sum is taken over volume $V$ containing interactions $IJ$ between spheres $I$ and $J$;\n\n* $i$, $j$ indices denote Cartesian components of vectors and tensors,\n* $d^{IJ}$ is current distance between spheres $I$ and $J$,\n* $A^{IJ}$ is area of contact $IJ$,\n* $n$ is interaction normal (unit vector pointing from center of $I$ to the center of $J$)\n* $\\sigma^{N,IJ}$  is normal stress (as scalar) in contact $IJ$,\n* $\\sigma^{T,IJ}$ is shear stress in contact $IJ$ in global coordinates.\n\n$\\sigma^{T}$ and $n$ are transformed by angle $\\theta$ as given by :yref:`yade.utils.spiralProject`.");
 }

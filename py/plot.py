@@ -1,9 +1,7 @@
 # encoding: utf-8
 # 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
 """
-Module containing utility functions for plotting inside yade.
-
-Experimental, interface may change (even drastically).
+Module containing utility functions for plotting inside yade. See :ysrc:`scripts/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
 
 """
 import matplotlib
@@ -13,25 +11,24 @@ import matplotlib
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
-
-data={} # global, common for all plots: {'name':[value,...],...}
+"""Global dictionary containing all data values, common for all plots, in the form {'name':[value,...],...}. Data should be added using plot.addData function. All [value,...] columns have the same length, they are padded with NaN if unspecified."""
+# dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
 "Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
 labels={}
 #plotLines={} # dictionary x-name -> Line2d objects (that hopefully still correspond to yspec in plots)
 
 def reset():
+	"Reset all plot-related variables (data, plots, labels)"
 	global data, plots, labels # plotLines
 	data={}; plots={}; # plotLines={};
 	pylab.close('all')
 
 def resetData():
+	"Reset all plot data; keep plots and labels intact."
 	global data
 	data={}
 
-# we could have a yplot class, that would hold: (yspec,...), (Line2d,Line2d,...) ?
-
-plotDataCollector=None
 from yade.wrapper import *
 
 def splitData():

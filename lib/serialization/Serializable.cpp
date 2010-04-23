@@ -11,7 +11,7 @@
 #include "Serializable.hpp"
 
 
-void Serializable::pyRegisterClass(boost::python::object _scope) const {
+void Serializable::pyRegisterClass(boost::python::object _scope) {
 	if(!checkPyClassRegistersItself("Serializable")) return;
 	boost::python::scope thisScope(_scope); 
 	python::class_<Serializable, shared_ptr<Serializable>, noncopyable >("Serializable")

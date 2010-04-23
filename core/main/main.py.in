@@ -127,7 +127,7 @@ if 1:
 			banner='[[ ^L clears screen, ^U kills line.'+(' F12 controller, F11 3d view, F10 both, F9 generator, F8 plot.' if qtEnabled else '')+' ]]',
 			rc_override=dict( # ipython options, see e.g. http://www.cv.nrao.edu/~rreid/casa/tips/ipy_user_conf.py
 				prompt_in1='Yade [\#]: ',
-				prompt_in2='     .\D.. ',
+				prompt_in2='     .\D.: ',
 				prompt_out=" ->  [\#]: ",
 				separate_in='0',
 				separate_out='0',

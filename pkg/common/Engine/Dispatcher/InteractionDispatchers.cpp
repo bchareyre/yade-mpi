@@ -139,7 +139,7 @@ void InteractionDispatchers::action(){
 			if(!I->functorCache.constLaw){
 				I->functorCache.constLaw=lawDispatcher->getFunctor2D(I->interactionGeometry,I->interactionPhysics,swap);
 				if(!I->functorCache.constLaw){
-					LOG_FATAL("getFunctor2D returned empty functor for  #"<<I->getId1()<<"+"<<I->getId2()<<", types "<<I->interactionGeometry->getClassName()<<"="<<I->interactionGeometry->getClassIndex()<<" and "<<I->interactionPhysics->getClassName()<<"="<<I->interactionPhysics->getClassIndex());
+					LOG_FATAL("None of given Law2 functors can handle interaction #"<<I->getId1()<<"+"<<I->getId2()<<", types geom:"<<I->interactionGeometry->getClassName()<<"="<<I->interactionGeometry->getClassIndex()<<" and phys:"<<I->interactionPhysics->getClassName()<<"="<<I->interactionPhysics->getClassIndex()<<" (LawDispatcher::getFunctor2D returned empty functor)");
 					//abort();
 					exit(1);
 				}

@@ -135,8 +135,11 @@ namespace yade{
 	template<> struct py_wrap_ref<Matrix3r>: public boost::true_type{};
 };
 #define _DEF_READWRITE_BY_VALUE(thisClass,attr,doc) add_property(/*attr name*/BOOST_PP_STRINGIZE(attr),/*read access*/boost::python::make_getter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*write access*/boost::python::make_setter(&thisClass::attr,boost::python::return_value_policy<boost::python::return_by_value>()),/*docstring*/doc)
+/* Huh, add_static_property does not support doc argument (add_property does); if so, use add_property for now at least... */
+#define _DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc)  _DEF_READWRITE_BY_VALUE(thisClass,attr,doc)
 // the conditional should be eliminated by compiler at compile-time, as it depends only on types, not their values
 #define _DEF_READWRITE_CUSTOM(thisClass,attr,doc) { if(yade::py_wrap_ref<typeof(thisClass::attr)>::value) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE(thisClass,attr,doc); }
+#define _DEF_READWRITE_CUSTOM_STATIC(thisClass,attr,doc) { if(yade::py_wrap_ref<typeof(thisClass::attr)>::value) _classObj.def_readwrite(BOOST_PP_STRINGIZE(attr),&thisClass::attr,doc); else _classObj._DEF_READWRITE_BY_VALUE_STATIC(thisClass,attr,doc); }
 
 // macros for deprecated attribute access
 // gcc<=4.3 is not able to compile this code; we will just not generate any code for deprecated attributes in such case
@@ -173,7 +176,7 @@ namespace yade{
 	REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIPDOC2,thisClass,attrs),deprec) \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass) \
 	/* accessors for deprecated attributes, with warnings */ BOOST_PP_SEQ_FOR_EACH(_ACCESS_DEPREC,thisClass,deprec) \
-	/* python class registration */ virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()); BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs); (void) _classObj BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec); (void) _classObj extras ; }
+	/* python class registration */ virtual void pyRegisterClass(python::object _scope) { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); _classObj.def("__init__",python::raw_constructor(Serializable_ctor_kwAttrs<thisClass>)).def("clone",&Serializable_clone<thisClass>,python::arg("attrs")=python::dict()); BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEF,thisClass,attrs); (void) _classObj BOOST_PP_SEQ_FOR_EACH(_PYATTR_DEPREC_DEF,thisClass,deprec); (void) _classObj extras ; }
 	// use later: void must_use_both_YADE_CLASS_BASE_DOC_ATTRS_and_YADE_PLUGIN(); 
 // #define YADE_CLASS_BASE_DOC_ATTRS_PY(thisClass,baseClass,docString,attrs,extras) YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,attrs,,extras)
 
@@ -193,16 +196,19 @@ namespace yade{
 	_YADE_CLASS_BASE_DOC_ATTRS_DEPREC_PY(thisClass,baseClass,docString,BOOST_PP_SEQ_FOR_EACH(_STRIPDECL4,~,attrDecls),deprec,extras)
 
 #define _DEF_READWRITE_STATIC(thisClass,attr,doc)
-#define _STATATTR_PY(x,thisClass,z) _DEF_READWRITE_CUSTOM(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
+#define _STATATTR_PY(x,thisClass,z) _DEF_READWRITE_CUSTOM_STATIC(thisClass,BOOST_PP_TUPLE_ELEM(4,1,z),/*docstring*/ "|ystatic| :ydefault:`" BOOST_PP_STRINGIZE(BOOST_PP_TUPLE_ELEM(4,2,z)) "` " BOOST_PP_TUPLE_ELEM(4,3,z))
 #define _STATATTR_DECL(x,y,z) static BOOST_PP_TUPLE_ELEM(4,0,z) BOOST_PP_TUPLE_ELEM(4,1,z);
 #define _STRIP_TYPE_DEFAULT_DOC(x,y,z) (BOOST_PP_TUPLE_ELEM(4,1,z))
+#define _STATATTR_SET(x,thisClass,z) thisClass::BOOST_PP_TUPLE_ELEM(4,1,z)=BOOST_PP_TUPLE_ELEM(4,2,z);
 
 #define YADE_CLASS_BASE_DOC_STATICATTRS(thisClass,baseClass,docString,attrs)\
 	public: BOOST_PP_SEQ_FOR_EACH(_STATATTR_DECL,~,attrs) /* attribute declarations */ \
 	/* no ctor */ \
 	REGISTER_CLASS_AND_BASE(thisClass,baseClass); \
 	REGISTER_ATTRIBUTES(baseClass,BOOST_PP_SEQ_FOR_EACH(_STRIP_TYPE_DEFAULT_DOC,~,attrs)) \
-	virtual void pyRegisterClass(python::object _scope) const { if(!checkPyClassRegistersItself(#thisClass)) return; boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
+	/* called only at class registration, to set initial values; storage still has to be alocated in the cpp file! */ \
+	void initSetStaticAttributesValue(void){ BOOST_PP_SEQ_FOR_EACH(_STATATTR_SET,thisClass,attrs); } \
+	virtual void pyRegisterClass(python::object _scope) { if(!checkPyClassRegistersItself(#thisClass)) return; initSetStaticAttributesValue(); boost::python::scope thisScope(_scope); YADE_SET_DOCSTRING_OPTS; \
 		boost::python::class_<thisClass,shared_ptr<thisClass>,boost::python::bases<baseClass>,boost::noncopyable> _classObj(#thisClass,docString); \
 		BOOST_PP_SEQ_FOR_EACH(_STATATTR_PY,thisClass,attrs);  \
 	}
@@ -341,7 +347,7 @@ public :
 		// that means that the class doesn't register itself properly
 		virtual bool checkPyClassRegistersItself(const std::string& thisClassName) const;
 		// perform class registration; overridden in all classes
-		virtual void pyRegisterClass(boost::python::object _scope) const;
+		virtual void pyRegisterClass(boost::python::object _scope);
 		
 		//! update attributes from dictionary
 		void pyUpdateAttrs(const boost::python::dict& d);

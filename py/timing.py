@@ -73,25 +73,25 @@ def stats():
 
 	.. code-block:: none
 
-		Name                                                    Count                 Time            Rel. time
-		-------------------------------------------------------------------------------------------------------
-		ForceResetter                      400               9449μs                0.01%      
-		BoundingVolumeMetaEngine                            400            1171770μs                1.15%      
-		PersistentSAPCollider                               400            9433093μs                9.24%      
-		InteractionGeometryMetaEngine                       400           15177607μs               14.87%      
-		InteractionPhysicsMetaEngine                        400            9518738μs                9.33%      
-		ConstitutiveLawDispatcher                           400           64810867μs               63.49%      
-		  ef2_Spheres_Brefcom_BrefcomLaw                                                                       
-			 setup                                           4926145            7649131μs               15.25%  
-			 geom                                            4926145           23216292μs               46.28%  
-			 material                                        4926145            8595686μs               17.14%  
-			 rest                                            4926145           10700007μs               21.33%  
-			 TOTAL                                                             50161117μs              100.00%  
-		"damper"                                            400            1866816μs                1.83%      
-		"strainer"                                          400              21589μs                0.02%      
-		"plotDataCollector"                                 160              64284μs                0.06%      
-		"damageChecker"                                       9               3272μs                0.00%      
-		TOTAL                                                            102077490μs              100.00%      
+		Name                                     Count                 Time        Rel. time
+		------------------------------------------------------------------------------------
+		ForceResetter                        400               9449μs            0.01%      
+		BoundingVolumeMetaEngine             400            1171770μs            1.15%      
+		PersistentSAPCollider                400            9433093μs            9.24%      
+		InteractionGeometryMetaEngine        400           15177607μs           14.87%      
+		InteractionPhysicsMetaEngine         400            9518738μs            9.33%      
+		ConstitutiveLawDispatcher            400           64810867μs           63.49%      
+		  ef2_Spheres_Brefcom_BrefcomLaw                                                    
+			 setup                            4926145            7649131μs           15.25%  
+			 geom                             4926145           23216292μs           46.28%  
+			 material                         4926145            8595686μs           17.14%  
+			 rest                             4926145           10700007μs           21.33%  
+			 TOTAL                                              50161117μs          100.00%  
+		"damper"                             400            1866816μs            1.83%      
+		"strainer"                           400              21589μs            0.02%      
+		"plotDataCollector"                  160              64284μs            0.06%      
+		"damageChecker"                        9               3272μs            0.00%      
+		TOTAL                                             102077490μs          100.00%      
 
 	"""
 	print 'Name'.ljust(_statCols['label'])+' '+'Count'.rjust(_statCols['count'])+' '+'Time'.rjust(_statCols['time'])+' '+'Rel. time'.rjust(_statCols['relTime'])

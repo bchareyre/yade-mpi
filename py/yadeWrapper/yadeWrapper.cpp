@@ -200,6 +200,7 @@ class pyInteractionContainer{
 		long countReal(){ long ret=0; FOREACH(const shared_ptr<Interaction>& I, *proxee){ if(I->isReal()) ret++; } return ret; }
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
+		void eraseNonReal(){ proxee->eraseNonReal(); }
 };
 
 class pyForceContainer{
@@ -584,6 +585,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("nth",&pyInteractionContainer::pyNth,"Return n-th interaction from the container (usable for picking random interaction).")
 		.def("withBody",&pyInteractionContainer::withBody,"Return list of real interactions of given body.")
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll,"Return list of all (real as well as non-real) interactions of given body.")
+		.def("eraseNonReal",&pyInteractionContainer::eraseNonReal,"Erase all interactions that are not :yref:`real <InteractionContainer.isReal>`.")
 		.add_property("serializeSorted",&pyInteractionContainer::serializeSorted_get,&pyInteractionContainer::serializeSorted_set)
 		.def("clear",&pyInteractionContainer::clear,"Remove all interactions");
 	python::class_<pyInteractionIterator>("InteractionIterator",python::init<pyInteractionIterator&>())

@@ -10,11 +10,11 @@
 #include<yade/pkg-common/Sphere.hpp>
 #include<yade/lib-opengl/OpenGLWrapper.hpp>
 
-bool Gl1_Sphere::wire=false;
-bool Gl1_Sphere::stripes=false;
-bool Gl1_Sphere::glutNormalize=true;
-int  Gl1_Sphere::glutSlices=12;
-int  Gl1_Sphere::glutStacks=6;
+bool Gl1_Sphere::wire;
+bool Gl1_Sphere::stripes;
+bool Gl1_Sphere::glutNormalize;
+int  Gl1_Sphere::glutSlices;
+int  Gl1_Sphere::glutStacks;
 
 vector<Vector3r> Gl1_Sphere::vertices, Gl1_Sphere::faces;
 int Gl1_Sphere::glSphereList=-1;
