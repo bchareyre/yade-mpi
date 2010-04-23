@@ -40,8 +40,9 @@ class FlowBoundingSphere
 		double TOLERANCE;
 		double RELAX;
 		double ks; //Hydraulic Conductivity
-		bool meanK_LIMIT, meanK_STAT;
+		bool meanK_LIMIT, meanK_STAT, distance_correction;
 		double K_opt_factor;
+		int Iterations;
 		
 		Boundary boundaries [6];
 		short id_offset;

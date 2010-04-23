@@ -29,6 +29,7 @@ class FlowEngine : public PartialEngine
 		void Triangulate ();
 		void AddBoundary ();
 		void Build_Triangulation (double P_zero );
+		void Build_Triangulation ();
 		void UpdateVolumes ();
 		void Initialize_volumes ();
 		Real Volume_cell_single_fictious (CGT::Cell_handle cell);

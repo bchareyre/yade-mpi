@@ -47,7 +47,7 @@ void FlowEngine::action ( )
 
 		if ( current_state==3 )
 		{
-			if ( first || Update_Triangulation ) { Build_Triangulation( P_zero );}
+			if ( first ) { Build_Triangulation( P_zero );first=false;}
 
 				timingDeltas->checkpoint("Triangulating");
 				
@@ -72,8 +72,7 @@ void FlowEngine::action ( )
 			
 // 				flow->MGPost(flow->T[flow->currentTes].Triangulation());
 
-				flow->Compute_Forces();
-// 				flow->ComputeTetrahedralForces();
+				flow->ComputeTetrahedralForces();
 			
 				timingDeltas->checkpoint("Compute_Forces");
 
@@ -108,9 +107,9 @@ void FlowEngine::action ( )
 				if ( Omega::instance().getCurrentIteration() % PermuteInterval == 0 )
 				{ Update_Triangulation = true; }
 				
-				timingDeltas->checkpoint("Storing Max Pressure");
+				if ( Update_Triangulation ) { Build_Triangulation( );}
 				
-				first=false;
+				timingDeltas->checkpoint("Storing Max Pressure");
 		}
 	}
 }
@@ -130,7 +129,12 @@ void FlowEngine::Oedometer_Boundary_Conditions()
 	triaxialCompressionEngine->wall_bottom_activated=1;
 }
 
-void FlowEngine::Build_Triangulation (double P_zero )
+void FlowEngine::Build_Triangulation ()
+{
+	Build_Triangulation (0);
+}
+
+void FlowEngine::Build_Triangulation (double P_zero)
 {
 	if (first)
 	{
@@ -173,7 +177,7 @@ void FlowEngine::Build_Triangulation (double P_zero )
 		flow->TOLERANCE=Tolerance;
 		flow->RELAX=Relax;
 	}
-	else 
+	else
 	{
 		cout << "---------UPDATE PERMEABILITY VALUE--------------" << endl;
 		if (compute_K) {flow->TOLERANCE=1e-06; K = flow->Sample_Permeability ( flow->T[flow->currentTes].Triangulation(), flow->x_min, flow->x_max, flow->y_min, flow->y_max, flow->z_min, flow->z_max, flow->key );}
