@@ -11,8 +11,9 @@ import matplotlib
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 
-"""Global dictionary containing all data values, common for all plots, in the form {'name':[value,...],...}. Data should be added using plot.addData function. All [value,...] columns have the same length, they are padded with NaN if unspecified."""
-# dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
+"Global dictionary containing all data values, common for all plots, in the form {'name':[value,...],...}. Data should be added using plot.addData function. All [value,...] columns have the same length, they are padded with NaN if unspecified."
+data={}
+"dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')"
 plots={} # dictionary x-name -> (yspec,...), where yspec is either y-name or (y-name,'line-specification')
 "Dictionary converting names in data to human-readable names (TeX names, for instance); if a variable is not specified, it is left untranslated."
 labels={}

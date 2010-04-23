@@ -33,7 +33,7 @@ O.engines=[
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
 	NewtonIntegrator(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)
-	PeriodicPythonRunner(iterPeriod=10,command='myAddPlotData()',label='plotDataCollector')
+	PeriodicPythonRunner(iterPeriod=10,command='myAddPlotData()')
 ]
 
 O.bodies.append([
@@ -47,7 +47,7 @@ O.dt=utils.PWaveTimeStep()
 # callback for plotDataCollector
 import yade.plot as yp
 def myAddPlotData():
-	yp.addData({'t':O.time,'F_applied':forcer['force'],'supportReaction':O.actions.f(0)[2]})
+	yp.addData(t=O.time,F_applied=forcer.force,supportReaction=O.forces.f(0)[2])
 
 O.saveTmp()
 
