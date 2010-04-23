@@ -8,7 +8,7 @@
 
 from numpy import arange
 
-nPulses=10 # run for total of 2 pulses
+nPulses=4 # run for total of 4 pulses
 freq=10. # 5 pulses per second
 times=arange(0,1/freq,.01/freq) # generate 100 points equally distributed over the period (can be much more)
 maxMag=1e5 # maximum magnitude of applied force
@@ -33,7 +33,7 @@ O.engines=[
 	# without damping, the interaction never stabilizes and oscillates wildly… try it
 	NewtonIntegrator(damping=0.01),
 	# collect some data to plot periodically (every 50 steps)
-	PeriodicPythonRunner(iterPeriod=10,command='myAddPlotData()')
+	PeriodicPythonRunner(iterPeriod=1,command='myAddPlotData()')
 ]
 
 O.bodies.append([
@@ -42,12 +42,12 @@ O.bodies.append([
 ])
 
 # elastic timestep
-O.dt=utils.PWaveTimeStep()
+O.dt=.5*utils.PWaveTimeStep()
 
 # callback for plotDataCollector
 import yade.plot as yp
 def myAddPlotData():
-	yp.addData(t=O.time,F_applied=forcer.force,supportReaction=O.forces.f(0)[2])
+	yp.addData(t=O.time,F_applied=forcer.force[2],supportReaction=O.forces.f(0)[2])
 
 O.saveTmp()
 
