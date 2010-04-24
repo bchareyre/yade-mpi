@@ -88,6 +88,17 @@ void quaterniontoGLMatrix(const Quaternionr& q, Real m[16]);
 #if !defined(__GCCXML__) and defined(YADE_BOOST_SERIALIZATION)
 
 #include<boost/serialization/nvp.hpp>
+#include<boost/serialization/is_bitwise_serializable.hpp>
+
+// fast serialization (no version infor and no tracking) for basic math types
+// http://www.boost.org/doc/libs/1_42_0/libs/serialization/doc/traits.html#bitwise
+BOOST_IS_BITWISE_SERIALIZABLE(Vector2r);
+BOOST_IS_BITWISE_SERIALIZABLE(Vector2<int>);
+BOOST_IS_BITWISE_SERIALIZABLE(Vector3r);
+BOOST_IS_BITWISE_SERIALIZABLE(Vector3<int>);
+BOOST_IS_BITWISE_SERIALIZABLE(Quaternionr);
+BOOST_IS_BITWISE_SERIALIZABLE(Se3r);
+BOOST_IS_BITWISE_SERIALIZABLE(Matrix3r);
 
 namespace boost {
 namespace serialization {

@@ -241,7 +241,7 @@ def facet(vertices,dynamic=False,wire=True,color=None,highlight=False,noBound=Fa
 	vertices=Vector3(vertices[0])-center,Vector3(vertices[1])-center,Vector3(vertices[2])-center
 	b.shape=Facet(color=color if color else randomColor(),wire=wire,highlight=highlight)
 	b.shape.vertices=vertices
-	b.shape.postProcessAttributes(True)
+	#b.shape.postProcessAttributes(True)
 	_commonBodySetup(b,0,Vector3(0,0,0),material,noBound=noBound)
 	b.state.pos=b.state.refPos=center
 	b.dynamic=dynamic

@@ -312,8 +312,8 @@ shared_ptr<T> Serializable_clone(const shared_ptr<T>& self, const python::dict& 
 // creates boost::introspection::has_non_const_member_function_preProcessAttributes<class>
 // which is used to detect that method in serialization code (if using boost::serialization)
 // inside attribute registration macros above
-BOOST_HAS_NON_CONST_MEMBER_FUNCTION(preProcessAttributes,bool(bool))
-BOOST_HAS_NON_CONST_MEMBER_FUNCTION(postProcessAttributes,bool(bool))
+BOOST_HAS_NON_CONST_MEMBER_FUNCTION(preProcessAttributes,void(bool))
+BOOST_HAS_NON_CONST_MEMBER_FUNCTION(postProcessAttributes,void(bool))
 #endif
 
 class Serializable : public Factorable

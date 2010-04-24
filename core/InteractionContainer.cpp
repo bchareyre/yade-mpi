@@ -9,6 +9,7 @@
 
 #ifdef YADE_BOOST_SERIALIZATION
 	BOOST_CLASS_EXPORT(InteractionContainer);
+	//BOOST_SERIALIZATION_FACTORY_0(InteractionContainer);
 #endif
 
 bool InteractionContainer::insert(const shared_ptr<Interaction>& i)

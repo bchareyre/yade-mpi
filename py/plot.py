@@ -80,9 +80,7 @@ def _xlateLabel(l):
 	else: return l
 
 def plot(noShow=False):
-	"""Show current plot, returning the figure object.
-	
-	If *noShow* is true, figure will not be shown on screen at all.
+	"""Do the actual plot, which is either shown on screen (and nothing is returned: if *noShow* is False) or returned as object (if *noShow* is True).
 	
 	You can use 
 	
@@ -118,7 +116,7 @@ def plot(noShow=False):
 		pylab.xlabel(_xlateLabel(p))
 		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
 	if not noShow: pylab.show()
-	return pylab.gcf() # return current figure
+	else: return pylab.gcf() # return current figure
 updatePeriod=0
 
 def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,title=None,varData=False):
