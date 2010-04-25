@@ -13,7 +13,7 @@ runCxxPattern=r'^((c|g|so)\+\+|ccache|distcc).*$'
 #
 # Likewise for deprecatedPattern. It must have the following groups: file, line, symbol.
 # This one works for g++4.0 and possibly other compilers.
-deprecatedPattern=r"^(.*?):([0-9]+): warning: '([_a-zA-Z0-9]+)' is deprecated.*$"
+deprecatedPattern=r"^(.*?):([0-9]+): warning: '.*<[a-zA-Z]*>::([a-zA-Z0-9_]+)(\(.*'|') is deprecated.*$"
 #
 # All files modified are backed up to their directory with some extension like .~undeprecated~.
 #
@@ -23,6 +23,7 @@ import sys
 from re import *
 import logging
 from os.path import join
+import os.path
 import shutil
 from pprint import pprint
 
@@ -40,10 +41,10 @@ renamedSymbols={
 	'UNIT_Y':'UnitY()',
 	'UNIT_Z':'UnitZ()',
 	'ONE':'Ones()',
-	'w':'W',
-	'x':'X',
-	'y':'Y',
-	'z':'Z'}
+	'W':'w',
+	'X':'x',
+	'Y':'y',
+	'Z':'z'}
 
 # places where deprecated methods are used
 # keys are symbols, value is a list of (file,line,count)
@@ -70,6 +71,7 @@ Doffsets={}
 for l in sys.stdin.xreadlines():
 	if match(runCxxPattern,l): #initialization, i.e. the compiler being run; until the next compiler run or EOF, all messages belong to this compilation.
 		# merge dictonary from the previous compiler run
+		print 'COMPILER'
 		for s in D1.keys():
 			if not s in D.keys(): # new symbol; simply add
 				D[s]=D1[s]
@@ -92,33 +94,33 @@ for l in sys.stdin.xreadlines():
 		# now hashes have been merged
 		D1={}
 		continue # this input line is not further processed
-
 	# deprecation warning from the compiler
 	dep=match(deprecatedPattern,l)
 	if dep:
-		file=dep.group(1)
+		f=dep.group(1)
 		line=int(dep.group(2))
 		symbol=dep.group(3)
+		if 'yade/lib-miniWm3/' in f: continue # ignore warnings in wwm3 headers themselves
 		# this indicates inconsistency of what symbols are marked as deprecated and what we think these are
 		if not symbol in renamedSymbols.keys():
-			logging.error("%s:%d: Unknown symbol `%s' reported as deprecated?!"%file,line,symbol)
+			logging.error("%s:%d: Unknown symbol `%s' reported as deprecated?!"%(f,line,symbol))
 			continue
 		Dcount+=1
 		# handle cases where compiler reports wrong line number: adjust the line number
-		if (symbol,file,line) in Doffsets.keys(): line=Doffsets[(symbol,file,line)]
+		if (symbol,f,line) in Doffsets.keys(): line=Doffsets[(symbol,f,line)]
 		if not symbol in D1.keys(): # first warning emitted for this symbol in this file
-			D1[symbol]=[[file,line,1]] 
+			D1[symbol]=[[f,line,1]] 
 			continue
 		done=False
 		# iterate over all warnings about this symbols we've had so far in this run
 		for ww in D1[symbol]:
-			if ww[0]!=file: continue
+			if ww[0]!=f: continue
 			if ww[1]!=line: continue
 			# only care if both filename and linenumber match: increment count
 			ww[2]+=1
 			done=True
 		# otherwise create a new record
-		if not done: D1[symbol].append([file,line,1])
+		if not done: D1[symbol].append([f,line,1])
 
 logging.info('Total number of %d deprecation warnings processed.'%Dcount)
 
@@ -152,10 +154,11 @@ logging.info('%d files to be modified'%len(fileList))
 
 for fName in fileList:
 	origFile=join(buildRoot,fName)
+	origFile=os.path.realpath(origFile)
 	bcupFile=origFile+'.~undeprecated~'
 	logging.info("Modifying file `%s' (%s); backup is `%s'."%(origFile,fName,bcupFile))
 	# the first branch is normal run. The second one is a dry-run, where original files are not modified
-	if 0:
+	if 1:
 		shutil.move(origFile,bcupFile)
 		fout=open(origFile,'w')
 		fin=open(bcupFile)
@@ -171,11 +174,12 @@ for fName in fileList:
 				# make sure we have found exactly the same number of matches compiler told us about!
 				# this is not the case if the expressions spans several lines or if there are local symbols with the same name as the deprecated method
 				# some cases have been already handled by the Doffset custom dictionary above
-				if subs!=count: 
-					logging.error("%s:%d: Regexp found different number (%d) of `%s' than the compiler (%d). Fix by hand (replace by `%s'), please."%(fName,lineno,subs,symbol,count,renamedSymbols[symbol]))
-				else:
-					logging.info('%s:%d: %s -> %s'%(fName,lineno,symbol,renamedSymbols[symbol]))
-					l=l2
+				#if subs!=count: 
+				#	logging.info("%s:%d: Regexp found different number (%d) of `%s' than the compiler (%d).") # Fix by hand (replace by `%s'), please."%(fName,lineno,subs,symbol,count,renamedSymbols[symbol]))
+					#l=l2
+				#else:
+				logging.info('%s:%d: %s -> %s %s'%(fName,lineno,symbol,renamedSymbols[symbol],'count mismatch %d!=%d'%(subs,count) if subs!=count else ''))
+				l=l2
 		fout.write(l)
 
 

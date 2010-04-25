@@ -459,16 +459,16 @@ void GLViewer::draw()
 			assert(manipulatedClipPlane<renderer->numClipPlanes);
 			float v0,v1,v2; manipulatedFrame()->getPosition(v0,v1,v2);
 			double q0,q1,q2,q3; manipulatedFrame()->getOrientation(q0,q1,q2,q3);
-			Se3r newSe3(Vector3r(v0,v1,v2),Quaternionr(q0,q1,q2,q3)); newSe3.orientation.Normalize();
+			Se3r newSe3(Vector3r(v0,v1,v2),Quaternionr(q0,q1,q2,q3)); newSe3.orientation.normalize();
 			const Se3r& oldSe3=renderer->clipPlaneSe3[manipulatedClipPlane];
 			FOREACH(int planeId, boundClipPlanes){
 				if(planeId>=renderer->numClipPlanes || !renderer->clipPlaneActive[planeId] || planeId==manipulatedClipPlane) continue;
 				Se3r& boundSe3=renderer->clipPlaneSe3[planeId];
-				Quaternionr relOrient=oldSe3.orientation.Conjugate()*boundSe3.orientation; relOrient.Normalize();
-				Vector3r relPos=oldSe3.orientation.Conjugate()*(boundSe3.position-oldSe3.position);
+				Quaternionr relOrient=oldSe3.orientation.conjugate()*boundSe3.orientation; relOrient.normalize();
+				Vector3r relPos=oldSe3.orientation.conjugate()*(boundSe3.position-oldSe3.position);
 				boundSe3.position=newSe3.position+newSe3.orientation*relPos;
 				boundSe3.orientation=newSe3.orientation*relOrient;
-				boundSe3.orientation.Normalize();
+				boundSe3.orientation.normalize();
 			}
 			renderer->clipPlaneSe3[manipulatedClipPlane]=newSe3;
 		}

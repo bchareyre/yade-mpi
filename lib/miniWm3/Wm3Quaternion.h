@@ -110,6 +110,9 @@
     WM3_FUN Quaternion Conjugate () const;
     WM3_FUN Quaternion Exp () const;  // apply to quaternion with w = 0
     WM3_FUN Quaternion Log () const;  // apply to unit-length quaternion
+	 EIG_FUN void normalize() { (void)Normalize(); } 
+	 EIG_FUN Quaternion conjugate() const { (void)Conjugate(); } 
+
 
     // rotation of a vector by a quaternion
     WM3_FUN Vector3<Real> Rotate (const Vector3<Real>& rkVector) const;
@@ -153,6 +156,7 @@
     // special values
     WM3_FUN WM3_ITEM static const Quaternion IDENTITY;  // the identity rotation
     WM3_FUN WM3_ITEM static const Quaternion ZERO;
+	 EIG_FUN static const Quaternion Identity(){ return IDENTITY; }
 
 private:
     // support for comparisons

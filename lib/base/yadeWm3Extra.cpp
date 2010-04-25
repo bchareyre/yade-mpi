@@ -84,9 +84,9 @@ Vector3r operator* (const Quaternionr& q, const Vector3r& v)
 Vector2 std::minVector (const Vector2& rkV) const;
 Vector2 multDiag (const Vector2& rkV) const;*/
 
-Vector2r componentMaxVector(const Vector2r& a, const Vector2r& rkV) {return Vector2r(std::max(a.X(),rkV.X()),std::max(a.Y(),rkV.Y()));}
-Vector2r componentMinVector(const Vector2r& a, const Vector2r& rkV)  {return Vector2r(std::min(a.X(),rkV.X()),std::min(a.Y(),rkV.Y()));}
-Vector2r diagMult(const Vector2r& a, const Vector2r& rkV)  { return Vector2r(a.X()*rkV.X(),a.Y()*rkV.Y());}
+Vector2r componentMaxVector(const Vector2r& a, const Vector2r& rkV) {return Vector2r(std::max(a.x(),rkV.x()),std::max(a.y(),rkV.y()));}
+Vector2r componentMinVector(const Vector2r& a, const Vector2r& rkV)  {return Vector2r(std::min(a.x(),rkV.x()),std::min(a.y(),rkV.y()));}
+Vector2r diagMult(const Vector2r& a, const Vector2r& rkV)  { return Vector2r(a.x()*rkV.x(),a.y()*rkV.y());}
 
 /*RealType angleBetweenUnitVectors(const Vector3r& rkV) const;
 Vector3r std::maxVector (const Vector3r& rkV) const;
@@ -94,19 +94,20 @@ Vector3r std::minVector (const Vector3r& rkV) const;
 Vector3r multDiag (const Vector3r& rkV) const;
 Vector3r divDiag (const Vector3r& rkV) const;*/
 
-Vector3r componentMaxVector (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(std::max(a.X(),rkV.X()),std::max(a.Y(),rkV.Y()),std::max(a.Z(),rkV.Z()));}
-Vector3r componentMinVector (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(std::min(a.X(),rkV.X()),std::min(a.Y(),rkV.Y()),std::min(a.Z(),rkV.Z())); }
-Vector3r diagMult (const Vector3r& a, const Vector3r& rkV)  {	return Vector3r(a.X()*rkV.X(),a.Y()*rkV.Y(),a.Z()*rkV.Z()); }
-Vector3r diagDiv (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(a.X()/rkV.X(),a.Y()/rkV.Y(),a.Z()/rkV.Z()); }
+Vector3r componentMaxVector (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(std::max(a.x(),rkV.x()),std::max(a.y(),rkV.y()),std::max(a.z(),rkV.z()));}
+Vector3r componentMinVector (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(std::min(a.x(),rkV.x()),std::min(a.y(),rkV.y()),std::min(a.z(),rkV.z())); }
+Vector3r diagMult (const Vector3r& a, const Vector3r& rkV)  {	return Vector3r(a.x()*rkV.x(),a.y()*rkV.y(),a.z()*rkV.z()); }
+Vector3r diagDiv (const Vector3r& a, const Vector3r& rkV)  { return Vector3r(a.x()/rkV.x(),a.y()/rkV.y(),a.z()/rkV.z()); }
 Real unitVectorsAngle(const Vector3r& a, const Vector3r& rkV)  { return Mathr::ACos(a.Dot(rkV)); }
 
 Real componentSum(const Vector3r& v){return v[0]+v[1]+v[2];}
 
+#if 0
 Quaternionr quaternionFromAxes (const Vector3r& axis1,const Vector3r& axis2,const Vector3r& axis3){
 	Matrix3r m;
-	m[0][0] = axis1.X(); m[1][0] = axis1.Y(); m[2][0] = axis1.Z();
-	m[0][1] = axis2.X(); m[1][1] = axis2.Y(); m[2][1] = axis2.Z();
-	m[0][2] = axis3.X(); m[1][2] = axis3.Y(); m[2][2] = axis3.Z();
+	m[0][0] = axis1.x(); m[1][0] = axis1.y(); m[2][0] = axis1.z();
+	m[0][1] = axis2.x(); m[1][1] = axis2.y(); m[2][1] = axis2.z();
+	m[0][2] = axis3.x(); m[1][2] = axis3.y(); m[2][2] = axis3.z();
 	Quaternionr ret;
 	ret.FromRotationMatrix(m);
 	return ret;
@@ -115,35 +116,35 @@ Quaternionr quaternionFromAxes (const Vector3r& axis1,const Vector3r& axis2,cons
 void quaternionToAxes(const Quaternionr& q, Vector3r& axis1, Vector3r& axis2, Vector3r& axis3){
 	Matrix3r m;
 	q.ToRotationMatrix(m);
-   axis1.X() = m[0][0]; axis1.Y() = m[1][0]; axis1.Z() = m[2][0];
-	axis2.X() = m[0][1]; axis2.Y() = m[1][1]; axis2.Z() = m[2][1];
-	axis3.X() = m[0][2]; axis3.Y() = m[1][2]; axis3.Z() = m[2][2];
+   axis1.x() = m[0][0]; axis1.y() = m[1][0]; axis1.z() = m[2][0];
+	axis2.x() = m[0][1]; axis2.y() = m[1][1]; axis2.z() = m[2][1];
+	axis3.x() = m[0][2]; axis3.y() = m[1][2]; axis3.z() = m[2][2];
 }
 
 //template <class RealType>
 void quaternionToEulerAngles (const Quaternionr& q, Vector3r& eulerAngles,Real threshold){
 	Real heading,attitude,bank;
-	Real test = q.X()*q.Y() + q.Z()*q.W();
+	Real test = q.x()*q.y() + q.z()*q.w();
 	if (test > 0.5-threshold /*0.499*/) // singularity at north pole
 	{ 
-		heading = 2 * Mathr::ATan2(q.X(),q.W());
+		heading = 2 * Mathr::ATan2(q.x(),q.w());
 		attitude = Mathr::HALF_PI;
 		bank = 0;
 	}
 	if (test < threshold-0.5 /*-0.499*/) // singularity at south pole
 	{
-		heading = -2 * Mathr::ATan2(q.X(),q.W());
+		heading = -2 * Mathr::ATan2(q.x(),q.w());
 		attitude = - Mathr::HALF_PI;
 		bank = 0;
 	}
 	else
 	{
-		Real sqx = q.X()*q.X();
-		Real sqy = q.Y()*q.Y();
-		Real sqz = q.Z()*q.Z();
-		heading = Mathr::ATan2(2*q.Y()*q.W()-2*q.X()*q.Z() , 1 - 2*sqy - 2*sqz);
+		Real sqx = q.x()*q.x();
+		Real sqy = q.y()*q.y();
+		Real sqz = q.z()*q.z();
+		heading = Mathr::ATan2(2*q.y()*q.w()-2*q.x()*q.z() , 1 - 2*sqy - 2*sqz);
 		attitude = Mathr::ASin(2*test);
-		bank = Mathr::ATan2(2*q.X()*q.W()-2*q.Y()*q.Z() , 1 - 2*sqx - 2*sqz);
+		bank = Mathr::ATan2(2*q.x()*q.w()-2*q.y()*q.z() , 1 - 2*sqx - 2*sqz);
 	}
 	eulerAngles[0] = bank;
  	eulerAngles[1] = heading;
@@ -189,3 +190,5 @@ void quaterniontoGLMatrix(const Quaternionr& q, Real m[16]) {
 	m[11] = 0.0l;
 	m[15] = 1.0l;
 }
+
+#endif
