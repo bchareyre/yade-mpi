@@ -21,14 +21,14 @@ void NewtonIntegrator::cundallDamp(const Real& dt, const Vector3r& N, const Vect
 }
 void NewtonIntegrator::blockTranslateDOFs(unsigned blockedDOFs, Vector3r& v) {
 	if(blockedDOFs==State::DOF_NONE) return;
-	if(blockedDOFs==State::DOF_ALL) { v=Vector3r::ZERO; return; }
+	if(blockedDOFs==State::DOF_ALL) { v=Vector3r::Zero(); return; }
 	if((blockedDOFs & State::DOF_X)!=0) v[0]=0;
 	if((blockedDOFs & State::DOF_Y)!=0) v[1]=0;
 	if((blockedDOFs & State::DOF_Z)!=0) v[2]=0;
 }
 void NewtonIntegrator::blockRotateDOFs(unsigned blockedDOFs, Vector3r& v) {
 	if(blockedDOFs==State::DOF_NONE) return;
-	if(blockedDOFs==State::DOF_ALL) { v=Vector3r::ZERO; return; }
+	if(blockedDOFs==State::DOF_ALL) { v=Vector3r::Zero(); return; }
 	if((blockedDOFs & State::DOF_RX)!=0) v[0]=0;
 	if((blockedDOFs & State::DOF_RY)!=0) v[1]=0;
 	if((blockedDOFs & State::DOF_RZ)!=0) v[2]=0;
@@ -202,17 +202,17 @@ inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state
 	state->angVel+=dt*state->angAccel;
 	Vector3r axis = state->angVel;
 	
-	if (axis!=Vector3r::ZERO) {							//If we have an angular velocity, we make a rotation
+	if (axis!=Vector3r::Zero()) {							//If we have an angular velocity, we make a rotation
 		Quaternionr q;
-		Real angle = axis.Normalize();
+		Real angle=axis.norm(); axis/=angle;
 		q.FromAxisAngle ( axis,angle*dt );
 		state->ori = q*state->ori;
 	}
 	
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::ZERO) {
+	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
 		Quaternionr q;
 		Vector3r r(scene->forces.getRot(id));
-		Real norm=r.Normalize();
+		Real norm=r.norm(); r/=norm;
 		q.FromAxisAngle(r,norm);
 		state->ori=q*state->ori;
 	}
@@ -234,9 +234,9 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	state->ori+=dt*dotQ_half; // Q at time n+1
 	state->angVel=state->ori.Rotate(angVel_b_half); // global angular velocity at time n+1/2
 
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::ZERO) {
+	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
 		Vector3r r(scene->forces.getRot(id));
-		Real norm=r.Normalize();
+		Real norm=r.norm(); r/=norm;
 		Quaternionr q;
 		q.FromAxisAngle(r,norm);
 		state->ori=q*state->ori;
@@ -245,7 +245,8 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 }
 // http://www.euclideanspace.com/physics/kinematics/angularvelocity/QuaternionDifferentiation2.pdf
 Quaternionr NewtonIntegrator::DotQ(const Vector3r& angVel, const Quaternionr& Q){
-	Quaternionr dotQ(Quaternionr::ZERO);
+	// FIXME: uses index access which has different meaning in Wm3 and Eigen
+	Quaternionr dotQ;
 	dotQ[0] = (-Q[1]*angVel[0]-Q[2]*angVel[1]-Q[3]*angVel[2])/2;
 	dotQ[1] = ( Q[0]*angVel[0]-Q[3]*angVel[1]+Q[2]*angVel[2])/2;
 	dotQ[2] = ( Q[3]*angVel[0]+Q[0]*angVel[1]-Q[1]*angVel[2])/2;

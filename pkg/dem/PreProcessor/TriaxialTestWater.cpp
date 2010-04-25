@@ -14,7 +14,6 @@
 // #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_FrictPhys.hpp>
 #include<yade/pkg-dem/Ip2_FrictMat_FrictMat_CapillaryPhys.hpp>
 #include<yade/pkg-common/ElastMat.hpp>
-#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
 
 #include<yade/pkg-dem/TriaxialStressController.hpp>
@@ -89,8 +88,6 @@ TriaxialTestWater::TriaxialTestWater () : FileGenerator()
 	spheresColor		= Vector3r(0.8,0.3,0.3);
 	spheresRandomColor	= false;
 	recordIntervalIter	= 20;
-	saveAnimationSnapshots = false;
-	AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
 	WallStressRecordFile = "./WallStresses"+Key;
 	capillaryStressRecordFile	= "./CapillaryStresses"+Key;
 
@@ -514,12 +511,6 @@ void TriaxialTestWater::createActors(shared_ptr<Scene>& rootBody)
 	//	rootBody->engines.push_back(orientationIntegrator);
 	//rootBody->engines.push_back(triaxialstressController);
 	
-		
-	if (saveAnimationSnapshots) {
-	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-	positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
-	rootBody->engines.push_back(positionOrientationRecorder);}
-	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(boundDispatcher);
 	
@@ -544,7 +535,7 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 	long tries = 1000; //nb of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
 		
-	Real mean_radius = std::pow(dimensions.X()*dimensions.Y()*dimensions.Z()*(1-porosity)/(3.1416*1.3333*number),0.333333);
+	Real mean_radius = std::pow(dimensions.x()*dimensions.y()*dimensions.z()*(1-porosity)/(3.1416*1.3333*number),0.333333);
         //cerr << mean_radius;
         Real Rmin=mean_radius, Rmax=mean_radius;
 
@@ -555,12 +546,12 @@ string GenerateCloud_water(vector<BasicSphere>& sphere_list, Vector3r lowerCorne
 		BasicSphere s;
 		s.second = (random1()-0.5)*rad_std_dev*mean_radius+mean_radius;
 		for (t=0; t<tries; ++t) {
-			s.first.X() = lowerCorner.X()+s.second+(dimensions.X()-2*s.second)*random1();
-			s.first.Y() = lowerCorner.Y()+s.second+(dimensions.Y()-2*s.second)*random1();
-			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*random1();
+			s.first.x() = lowerCorner.x()+s.second+(dimensions.x()-2*s.second)*random1();
+			s.first.y() = lowerCorner.y()+s.second+(dimensions.y()-2*s.second)*random1();
+			s.first.z() = lowerCorner.z()+s.second+(dimensions.z()-2*s.second)*random1();
 			bool overlap=false;
 			for (long j=0; (j<i && !overlap); j++)
-				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).SquaredLength()) overlap=true;
+				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).squaredNorm()) overlap=true;
 			if (!overlap)
 			{
 				sphere_list.push_back(s);

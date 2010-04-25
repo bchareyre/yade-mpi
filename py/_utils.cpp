@@ -36,8 +36,8 @@ py::tuple aabbExtrema(Real cutoff=0.0, bool centers=false){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=dynamic_pointer_cast<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
-		minimum=componentMinVector(minimum,b->state->pos-(centers?Vector3r::ZERO:rrr));
-		maximum=componentMaxVector(maximum,b->state->pos+(centers?Vector3r::ZERO:rrr));
+		minimum=componentMinVector(minimum,b->state->pos-(centers?Vector3r::Zero():rrr));
+		maximum=componentMaxVector(maximum,b->state->pos+(centers?Vector3r::Zero():rrr));
 	}
 	Vector3r dim=maximum-minimum;
 	return py::make_tuple(minimum+.5*cutoff*dim,maximum-.5*cutoff*dim);
@@ -57,7 +57,7 @@ py::tuple negPosExtremeIds(int axis, Real distFactor=1.1){
 BOOST_PYTHON_FUNCTION_OVERLOADS(negPosExtremeIds_overloads,negPosExtremeIds,1,2);
 
 py::tuple coordsAndDisplacements(int axis,py::tuple Aabb=py::tuple()){
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=py::len(Aabb)>0;
+	Vector3r bbMin(Vector3r::Zero()), bbMax(Vector3r::Zero()); bool useBB=py::len(Aabb)>0;
 	if(useBB){bbMin=py::extract<Vector3r>(Aabb[0])();bbMax=py::extract<Vector3r>(Aabb[1])();}
 	py::list retCoord,retDispl;
 	FOREACH(const shared_ptr<Body>&b, *Omega::instance().getScene()->bodies){
@@ -117,7 +117,7 @@ Real elasticEnergyInAABB(py::tuple Aabb){
  */
 py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::tuple aabb=py::tuple(), Real minProjLen=1e-6){
 	if(axis<0||axis>2) throw invalid_argument("Axis must be from {0,1,2}=x,y,z.");
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
+	Vector3r bbMin(Vector3r::Zero()), bbMax(Vector3r::Zero()); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
 	Real binStep=Mathr::PI/bins; int axis2=(axis+1)%3, axis3=(axis+2)%3;
 	vector<Real> cummProj(bins,0.);
 	shared_ptr<Scene> rb=Omega::instance().getScene();
@@ -140,7 +140,7 @@ py::tuple interactionAnglesHistogram(int axis, int mask=0, size_t bins=20, py::t
 BOOST_PYTHON_FUNCTION_OVERLOADS(interactionAnglesHistogram_overloads,interactionAnglesHistogram,1,4);
 
 py::tuple bodyNumInteractionsHistogram(py::tuple aabb=py::tuple()){
-	Vector3r bbMin(Vector3r::ZERO), bbMax(Vector3r::ZERO); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
+	Vector3r bbMin(Vector3r::Zero()), bbMax(Vector3r::Zero()); bool useBB=py::len(aabb)>0; if(useBB){bbMin=py::extract<Vector3r>(aabb[0])();bbMax=py::extract<Vector3r>(aabb[1])();}
 	const shared_ptr<Scene>& rb=Omega::instance().getScene();
 	vector<int> bodyNumIntr; bodyNumIntr.resize(rb->bodies->size(),0);
 	int maxIntr=0;
@@ -363,7 +363,7 @@ Real approxSectionArea(Real coord, int axis){
 	(This could be easily extended to return sum of only normal forces or only of shear forces.)
 */
 Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
-	Vector3r ret(Vector3r::ZERO);
+	Vector3r ret(Vector3r::Zero());
 	Scene* rootBody=Omega::instance().getScene().get();
 	FOREACH(const shared_ptr<Interaction>&I, *rootBody->interactions){
 		if(!I->isReal()) continue;
@@ -384,8 +384,8 @@ Vector3r forcesOnPlane(const Vector3r& planePt, const Vector3r&  normal){
 
 /* Less general than forcesOnPlane, computes force on plane perpendicular to axis, passing through coordinate coord. */
 Vector3r forcesOnCoordPlane(Real coord, int axis){
-	Vector3r planePt(Vector3r::ZERO); planePt[axis]=coord;
-	Vector3r normal(Vector3r::ZERO); normal[axis]=1;
+	Vector3r planePt(Vector3r::Zero()); planePt[axis]=coord;
+	Vector3r normal(Vector3r::Zero()); normal[axis]=1;
 	return forcesOnPlane(planePt,normal);
 }
 
@@ -443,5 +443,5 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("wireAll",wireAll,"Set :yref:`Shape::wire` on all bodies to True, rendering them with wireframe only.");
 	py::def("wireNone",wireNone,"Set :yref:`Shape::wire` on all bodies to False, rendering them as solids.");
 	py::def("wireNoSpheres",wireNoSpheres,"Set :yref:`Shape::wire` to True on non-spherical bodies (:yref:`Facets<Facet>`, :yref:`Walls<Wall>`).");
-	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r::ZERO),"Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that periodic cell defines by repetition or its corners regular grid of points in $R^3$; however, all cells generating identical grid are equivalent and can be flipped one over another. This necessiatates adjustment of :yref:`Interaction.cellDist` for interactions that cross boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is accessible as ``Shop::flipCell``.\n\n.. warning::\n\t This function is currently broken and should not be used.");
+	py::def("flipCell",&Shop::flipCell,(py::arg("flip")=Matrix3r::Zero()),"Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that periodic cell defines by repetition or its corners regular grid of points in $R^3$; however, all cells generating identical grid are equivalent and can be flipped one over another. This necessiatates adjustment of :yref:`Interaction.cellDist` for interactions that cross boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is accessible as ``Shop::flipCell``.\n\n.. warning::\n\t This function is currently broken and should not be used.");
 }

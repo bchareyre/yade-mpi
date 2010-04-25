@@ -16,8 +16,8 @@ class LawFunctor: public Functor2D <
 	void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contactPoint, const body_id_t id1, const Vector3r& pos1, const body_id_t id2, const Vector3r& pos2, Scene* rb){
 		addForce(id1,force,rb);
 		addForce(id2,-force,rb);
-		addTorque(id1,(contactPoint-pos1).Cross(force),rb);
-		addTorque(id2,-(contactPoint-pos2).Cross(force),rb);
+		addTorque(id1,(contactPoint-pos1).cross(force),rb);
+		addTorque(id2,-(contactPoint-pos2).cross(force),rb);
 	}
 	YADE_CLASS_BASE_DOC(LawFunctor,Functor,"Functor for applying constitutive laws on :yref:`interactions<Interaction>`.");
 };

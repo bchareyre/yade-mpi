@@ -84,7 +84,7 @@ class OpenGLRenderingEngine : public Serializable
 	public: void postProcessAttributes(bool deserializing);
 
 	YADE_CLASS_BASE_DOC_ATTRS_DEPREC_INIT_CTOR_PY(OpenGLRenderingEngine,Serializable,"Class responsible for rendering scene on OpenGL devices.",
-		((Vector3r,dispScale,((void)"disable scaling",Vector3r::ONE),"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
+		((Vector3r,dispScale,((void)"disable scaling",Vector3r::Ones()),"Artificially enlarge (scale) dispalcements from bodies' :yref:`reference positions<State.refPos>` by this relative amount, so that they become better visible (independently in 3 dimensions). Disbled if (1,1,1)."))
 		((Real,rotScale,((void)"disable scaling",1.),"Artificially enlarge (scale) rotations of bodies relative to their :yref:`reference orientation<State.refOri>`, so the they are better visible."))
 		((Vector3r,lightPos,Vector3r(75,130,0),"Position of OpenGL light source in the scene."))
 		((Vector3r,bgColor,Vector3r(.2,.2,.2),"Color of the backgroud canvas (RGB)"))
@@ -97,7 +97,7 @@ class OpenGLRenderingEngine : public Serializable
 		((bool,intrGeom,false,"Render :yref:`Interaction::interactionGeometry` objects."))
 		((bool,intrPhys,false,"Render :yref:`Interaction::interactionPhysics` objects"))
 		((int,mask,((void)"draw everything",~0),"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
-		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)),"Position and orientation of clipping planes"))
+		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::Zero(),Quaternionr::Identity())),"Position and orientation of clipping planes"))
 		((vector<int>,clipPlaneActive,vector<int>(numClipPlanes,0),"Activate/deactivate respective clipping planes"))
 		((size_t,selectBodyLimit,1000,"Limit number of bodies to allow picking body with mouse (performance reasons)"))
 		((bool,intrAllWire,false,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),

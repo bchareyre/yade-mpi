@@ -5,7 +5,7 @@
 
 class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	//! turn planePt in plane with normal0 around line passing through origin to plane with normal1
-	static Vector3r turnPlanePt(const Vector3r& planePt, const Vector3r& normal0, const Vector3r& normal1){ Quaternionr q; q.Align(normal0,normal1); return q*planePt; }
+	static Vector3r turnPlanePt(const Vector3r& planePt, const Vector3r& normal0, const Vector3r& normal1){ Quaternionr q; q.setFromTwoVectors(normal0,normal1); return q*planePt; }
 
 	Vector3r contPtInTgPlane1() const { return turnPlanePt(se31.position+se31.orientation*cp1pt-contactPoint,se31.orientation*localFacetNormal,normal); }
 	Vector3r contPtInTgPlane2() const { return Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(se32.orientation*cp2rel,effR2,-normal);}
@@ -13,7 +13,7 @@ class Dem3DofGeom_FacetSphere: public Dem3DofGeom{
 	public:
 		virtual ~Dem3DofGeom_FacetSphere();
 		/******* API ********/
-		virtual Real displacementN(){ return (se32.position-contactPoint).Length()-refLength;}
+		virtual Real displacementN(){ return (se32.position-contactPoint).norm()-refLength;}
 		virtual Vector3r displacementT(){ relocateContactPoints(); return contPtInTgPlane2()-contPtInTgPlane1(); }
 		virtual Real slipToDisplacementTMax(Real displacementTMax);
 		/***** end API ******/
@@ -57,7 +57,7 @@ class Ig2_Facet_Sphere_Dem3DofGeom:public InteractionGeometryFunctor{
 	Vector3r getClosestSegmentPt(const Vector3r& P, const Vector3r& A, const Vector3r& B){
 		// algo: http://local.wasp.uwa.edu.au/~pbourke/geometry/pointline/
 		Vector3r BA=B-A;
-		Real u=(P.Dot(BA)-A.Dot(BA))/(BA.SquaredLength());
+		Real u=(P.dot(BA)-A.dot(BA))/(BA.squaredNorm());
 		return A+min(1.,max(0.,u))*BA;
 	}
 	public:

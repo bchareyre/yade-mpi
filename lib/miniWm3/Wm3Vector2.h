@@ -11,6 +11,7 @@
 #ifndef WM3VECTOR2_H
 #define WM3VECTOR2_H
 
+#include "EigenCompat.h"
 #include "Wm3FoundationLIB.h"
 #include "Wm3Math.h"
 
@@ -24,18 +25,22 @@ public:
     // construction
     Vector2 ();  // uninitialized
     Vector2 (Real fX, Real fY);
-    Vector2 (const Real* afTuple);
+    WM3_FUN Vector2 (const Real* afTuple);
     Vector2 (const Vector2& rkV);
 
     // coordinate access
-    operator const Real* () const;
-    operator Real* ();
+    WM3_FUN operator const Real* () const;
+    WM3_FUN operator Real* ();
     Real operator[] (int i) const;
     Real& operator[] (int i);
-    Real X () const;
-    Real& X ();
-    Real Y () const;
-    Real& Y ();
+	 EIG_FUN Real x() const{return X();}
+	 EIG_FUN Real& x(){return X();}
+	 EIG_FUN Real y() const{return Y();}
+	 EIG_FUN Real& y(){return Y();}
+    WM3_FUN Real X () const;
+    WM3_FUN Real& X ();
+    WM3_FUN Real Y () const;
+    WM3_FUN Real& Y ();
 
     // assignment
     Vector2& operator= (const Vector2& rkV);
@@ -43,10 +48,10 @@ public:
     // comparison
     bool operator== (const Vector2& rkV) const;
     bool operator!= (const Vector2& rkV) const;
-    bool operator<  (const Vector2& rkV) const;
-    bool operator<= (const Vector2& rkV) const;
-    bool operator>  (const Vector2& rkV) const;
-    bool operator>= (const Vector2& rkV) const;
+    WM3_FUN bool operator<  (const Vector2& rkV) const;
+    WM3_FUN bool operator<= (const Vector2& rkV) const;
+    WM3_FUN bool operator>  (const Vector2& rkV) const;
+    WM3_FUN bool operator>= (const Vector2& rkV) const;
 
     // arithmetic operations
     Vector2 operator+ (const Vector2& rkV) const;
@@ -62,46 +67,58 @@ public:
     Vector2& operator/= (Real fScalar);
 
     // vector operations
-    Real Length () const;
-    Real SquaredLength () const;
-    Real Dot (const Vector2& rkV) const;
-    Real Normalize ();
+    WM3_FUN Real Length () const;
+    WM3_FUN Real SquaredLength () const;
+    WM3_FUN Real Dot (const Vector2& rkV) const;
+    WM3_FUN Real Normalize ();
+	 //
+	 EIG_FUN Real norm() const {return Length();}
+	 EIG_FUN Real squaredNorm() const { return SquaredLength(); }
+	 EIG_FUN Real dot(const Vector2& b) const { return Dot(b); }
+	 // different prototype here (doesn't return Real)
+	 EIG_FUN void normalize() { (void)Normalize(); } 
+
 
     // returns (y,-x)
-    Vector2 Perp () const;
+    WM3_FUN Vector2 Perp () const;
 
     // returns (y,-x)/sqrt(x*x+y*y)
-    Vector2 UnitPerp () const;
+    WM3_FUN Vector2 UnitPerp () const;
 
     // returns DotPerp((x,y),(V.x,V.y)) = x*V.y - y*V.x
-    Real DotPerp (const Vector2& rkV) const;
+    WM3_FUN Real DotPerp (const Vector2& rkV) const;
 
     // Compute the barycentric coordinates of the point with respect to the
     // triangle <V0,V1,V2>, P = b0*V0 + b1*V1 + b2*V2, where b0 + b1 + b2 = 1.
-    void GetBarycentrics (const Vector2<Real>& rkV0,
+    WM3_FUN void GetBarycentrics (const Vector2<Real>& rkV0,
         const Vector2<Real>& rkV1, const Vector2<Real>& rkV2,
         Real afBary[3]) const;
 
     // Gram-Schmidt orthonormalization.  Take linearly independent vectors U
     // and V and compute an orthonormal set (unit length, mutually
     // perpendicular).
-    static void Orthonormalize (Vector2& rkU, Vector2& rkV);
+    WM3_FUN static void Orthonormalize (Vector2& rkU, Vector2& rkV);
 
     // Input V must be initialized to a nonzero vector, output is {U,V}, an
     // orthonormal basis.  A hint is provided about whether or not V is
     // already unit length.
-    static void GenerateOrthonormalBasis (Vector2& rkU, Vector2& rkV,
+    WM3_FUN static void GenerateOrthonormalBasis (Vector2& rkU, Vector2& rkV,
         bool bUnitLengthV);
 
     // Compute the extreme values.
-    static void ComputeExtremes (int iVQuantity, const Vector2* akPoint,
+    WM3_FUN static void ComputeExtremes (int iVQuantity, const Vector2* akPoint,
         Vector2& rkMin, Vector2& rkMax);
 
     // special vectors
-    WM3_ITEM static const Vector2 ZERO;    // (0,0)
-    WM3_ITEM static const Vector2 UNIT_X;  // (1,0)
-    WM3_ITEM static const Vector2 UNIT_Y;  // (0,1)
-    WM3_ITEM static const Vector2 ONE;     // (1,1)
+    WM3_FUN WM3_ITEM static const Vector2 ZERO;    // (0,0)
+    WM3_FUN WM3_ITEM static const Vector2 UNIT_X;  // (1,0)
+    WM3_FUN WM3_ITEM static const Vector2 UNIT_Y;  // (0,1)
+    WM3_FUN WM3_ITEM static const Vector2 ONE;     // (1,1)
+	 EIG_FUN static const Vector2 Zero(){ return ZERO; }
+	 EIG_FUN static const Vector2 UnitX() {return UNIT_X;}
+	 EIG_FUN static const Vector2 UnitY() {return UNIT_Y;}
+	 EIG_FUN static const Vector2 Ones() {return ONE; }
+
 
 private:
     // support for comparisons

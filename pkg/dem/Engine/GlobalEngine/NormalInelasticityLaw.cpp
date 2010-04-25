@@ -52,7 +52,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 
 		if (contact->isFresh(scene))
 			{
-			shearForce			= Vector3r::ZERO;
+			shearForce			= Vector3r::Zero();
 			currentContactPhysics->previousun=0.0;
 			currentContactPhysics->previousFn=0.0;
 			currentContactPhysics->unMax=0.0;
@@ -99,8 +99,8 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 
 					 scene->interactions->requestErase(contact->getId1(),contact->getId2());
 					 // probably not useful anymore
-                currentContactPhysics->normalForce = Vector3r::ZERO;
-                currentContactPhysics->shearForce = Vector3r::ZERO;
+                currentContactPhysics->normalForce = Vector3r::Zero();
+                currentContactPhysics->shearForce = Vector3r::Zero();
 
                 //return;
                 //    else
@@ -114,11 +114,11 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 
 //                 Here is the code with approximated rotations
 
-		axis	 		= currentContactPhysics->prevNormal.Cross(currentContactGeometry->normal);
-		shearForce 	       -= shearForce.Cross(axis);
-		angle 			= dt*0.5*currentContactGeometry->normal.Dot(de1->angVel+de2->angVel);
+		axis	 		= currentContactPhysics->prevNormal.cross(currentContactGeometry->normal);
+		shearForce 	       -= shearForce.cross(axis);
+		angle 			= dt*0.5*currentContactGeometry->normal.dot(de1->angVel+de2->angVel);
 		axis 			= angle*currentContactGeometry->normal;
-		shearForce 	       -= shearForce.Cross(axis);
+		shearForce 	       -= shearForce.cross(axis);
 
 //                 Here is the code with exact rotationns
 
@@ -146,15 +146,15 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 		///   ed. T. Triantafyllidis (Balklema, London, 2004), p. 3-10 - and a lot more papers from the same authors)
                 Vector3r _c1x_	= currentContactGeometry->radius1*currentContactGeometry->normal;
                 Vector3r _c2x_	= -currentContactGeometry->radius2*currentContactGeometry->normal;
-                Vector3r relativeVelocity		= (de2->vel+de2->angVel.Cross(_c2x_)) - (de1->vel+de1->angVel.Cross(_c1x_));
-                Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.Dot(relativeVelocity)*currentContactGeometry->normal;
+                Vector3r relativeVelocity		= (de2->vel+de2->angVel.cross(_c2x_)) - (de1->vel+de1->angVel.cross(_c1x_));
+                Vector3r shearVelocity			= relativeVelocity-currentContactGeometry->normal.dot(relativeVelocity)*currentContactGeometry->normal;
                 Vector3r shearDisplacement		= shearVelocity*dt;
 
 
 		shearForce -= currentContactPhysics->ks*shearDisplacement;
 
                 Real maxFs = 0;
-                Real Fs = currentContactPhysics->shearForce.Length();
+                Real Fs = currentContactPhysics->shearForce.norm();
                 maxFs = std::max((Real) 0,Fn*currentContactPhysics->tangensOfFrictionAngle);
                 
                 if ( Fs  > maxFs )
@@ -168,7 +168,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 			if (maxFs>1)
                         	cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
                     	shearForce *= maxFs;
-			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::ZERO;
+			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();
                 }
 
 
@@ -177,22 +177,22 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
                 Vector3r f	= currentContactPhysics->normalForce + shearForce;
 		scene->forces.addForce (id1,-f);
 		scene->forces.addForce (id2,+f);
-		scene->forces.addTorque(id1,-c1x.Cross(f));
-		scene->forces.addTorque(id2, c2x.Cross(f));
+		scene->forces.addTorque(id1,-c1x.cross(f));
+		scene->forces.addTorque(id2, c2x.cross(f));
 
 
 	// Moment law					 	 ///
 		if(momentRotationLaw)
 		{
 			{// updates only orientation of contact (local coordinate system)
-				Vector3r axis = currentContactPhysics->prevNormal.UnitCross(currentContactGeometry->normal);
+				Vector3r axis = currentContactPhysics->prevNormal.cross(currentContactGeometry->normal); axis.normalize();
 				Real angle =  unitVectorsAngle(currentContactPhysics->prevNormal,currentContactGeometry->normal);
 				Quaternionr align(axis,angle);
 				currentContactPhysics->currentContactOrientation =  align * currentContactPhysics->currentContactOrientation;
 			}
 
-			Quaternionr delta( de1->se3.orientation * currentContactPhysics->initialOrientation1.Conjugate() *
-		                           currentContactPhysics->initialOrientation2 * de2->se3.orientation.Conjugate());
+			Quaternionr delta( de1->se3.orientation * currentContactPhysics->initialOrientation1.conjugate() *
+		                           currentContactPhysics->initialOrientation2 * de2->se3.orientation.conjugate());
 
 			Vector3r axis;	// axis of rotation - this is the Moment direction UNIT vector.
 			Real angle;	// angle represents the power of resistant ELASTIC moment
@@ -202,7 +202,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 	//This indentation is a rewrite of original equations (the two commented lines), should work exactly the same.
 //Real elasticMoment = currentContactPhysics->kr * std::abs(angle); // positive value (*)
 
-			Real angle_twist(angle * axis.Dot(currentContactGeometry->normal) );
+			Real angle_twist(angle * axis.dot(currentContactGeometry->normal) );
 			Vector3r axis_twist(angle_twist * currentContactGeometry->normal);
 			Vector3r moment_twist(axis_twist * currentContactPhysics->kr);
 
@@ -217,7 +217,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 			if (!momentAlwaysElastic)
 			{
 				Real normeMomentMax = currentContactPhysics->forMaxMoment * std::fabs(Fn);
-				Real normeMoment = moment.Length();
+				Real normeMoment = moment.norm();
 				if(normeMoment>normeMomentMax)
 					{
 					moment *= normeMomentMax/normeMoment;

@@ -18,7 +18,7 @@ class Dem3DofGeom_SphereSphere: public Dem3DofGeom{
 		virtual ~Dem3DofGeom_SphereSphere();
 		
 		/********* API **********/
-		Real displacementN(){ return (pos2-pos1).Length()-refLength; }
+		Real displacementN(){ return (pos2-pos1).norm()-refLength; }
 		Vector3r displacementT() {
 			// enabling automatic relocation decreases overall simulation speed by about 3%; perhaps: bool largeStrains ... ?
 			#if 1 

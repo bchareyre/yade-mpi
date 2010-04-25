@@ -66,7 +66,7 @@ void ResetRandomPosition::action()
 		State* rb = b->state.get();
 		Vector3r& position = rb->se3.position;
 
-		if ( (position-point).Dot(normal) < 0 )
+		if ( (position-point).dot(normal) < 0 )
 		{
 			Vector3r backup_pos = position;
 

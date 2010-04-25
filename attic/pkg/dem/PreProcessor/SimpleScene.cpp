@@ -113,7 +113,7 @@ bool SimpleScene::generate(){
 		shared_ptr<BodyMacroParameters> physics(new BodyMacroParameters);
 		physics->mass=8*extents[0]*extents[1]*extents[2]*2400;
 		physics->inertia=Vector3r(physics->mass*(4*extents[1]*extents[1]+4*extents[2]*extents[2])/12.,physics->mass*(4*extents[0]*extents[0]+4*extents[2]*extents[2])/12.,physics->mass*(4*extents[0]*extents[0]+4*extents[1]*extents[1])/12.);
-		physics->se3=Se3r(Vector3r(0,0,0),Quaternionr::IDENTITY);
+		physics->se3=Se3r(Vector3r(0,0,0),Quaternionr::Identity());
 		physics->young=30e9;
 		physics->poisson=.3;
 		b->physicalParameters=physics;

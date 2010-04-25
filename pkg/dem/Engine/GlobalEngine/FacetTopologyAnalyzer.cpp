@@ -21,8 +21,8 @@ void FacetTopologyAnalyzer::action(){
 		if(!f) continue;
 		const Vector3r& pos=b->state->pos;
 		for(size_t i=0; i<3; i++){
-			vv.push_back(shared_ptr<VertexData>(new VertexData(b->getId(),i,f->vertices[i]+pos,(f->vertices[i]+pos).Dot(projectionAxis))));
-			minSqLen=min(minSqLen,(f->vertices[i]-f->vertices[(i+1)%3]).SquaredLength());
+			vv.push_back(shared_ptr<VertexData>(new VertexData(b->getId(),i,f->vertices[i]+pos,(f->vertices[i]+pos).dot(projectionAxis))));
+			minSqLen=min(minSqLen,(f->vertices[i]-f->vertices[(i+1)%3]).squaredNorm());
 		}
 	}
 	LOG_DEBUG("Added data for "<<vv.size()<<" vertices ("<<vv.size()/3.<<" facets).");
@@ -37,7 +37,7 @@ void FacetTopologyAnalyzer::action(){
 			if(abs(vi->pos[0]-vj->pos[0])<=tolerance &&
 				abs(vi->pos[1]-vj->pos[1])<=tolerance &&
 				abs(vi->pos[2]-vj->pos[2])<=tolerance &&
-				(vi->pos-vj->pos).SquaredLength()<=tolerance*tolerance){
+				(vi->pos-vj->pos).squaredNorm()<=tolerance*tolerance){
 				// OK, these two vertices touch
 				// LOG_TRACE("Vertices "<<vi->id<<"/"<<vi->vertexNo<<" and "<<vj->id<<"/"<<vj->vertexNo<<" close enough.");
 				// add vertex to the nextIndetical of the one that has lower index; the one that is added will have isLowestIndex=false
@@ -127,9 +127,9 @@ void FacetTopologyAnalyzer::action(){
 			Vector3r n1g=b1->state->ori*f1->nf, n2g=b2->state->ori*f2->nf;
 			//TRVAR2(n1g,n2g);
 			Vector3r contEdge1g=b1->state->ori*(f1->vertices[(ei+1)%3]-f1->vertices[ei]); // vector of the edge of contact in global coords
-			Quaternionr q12; q12.Align(n1g,(invNormals?-1.:1.)*n2g); Real halfAngle; Vector3r axis; q12.ToAxisAngle(axis,halfAngle); halfAngle*=.5;
+			Quaternionr q12; q12.setFromTwoVectors(n1g,(invNormals?-1.:1.)*n2g); Real halfAngle; Vector3r axis; q12.ToAxisAngle(axis,halfAngle); halfAngle*=.5;
 			assert(halfAngle>=0 && halfAngle<=Mathr::HALF_PI);
-			if(axis.Dot(contEdge1g)<0 /* convex contact from the side of +n1 */ ) halfAngle*=-1.;
+			if(axis.dot(contEdge1g)<0 /* convex contact from the side of +n1 */ ) halfAngle*=-1.;
 			f1->edgeAdjHalfAngle[ei]=halfAngle;
 			f2->edgeAdjHalfAngle[ej]=(invNormals ? -halfAngle : halfAngle);
 			commonEdgesFound++;

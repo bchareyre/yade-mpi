@@ -23,9 +23,9 @@ Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}
  * @returns The projected point coordinates (with origin at the contact point).
  */
 Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& planeNormal){
-	Quaternionr normal2pt; normal2pt.Align(planeNormal,fromXtoPtOri*Vector3r::UNIT_X);
+	Quaternionr normal2pt; normal2pt.setFromTwoVectors(planeNormal,fromXtoPtOri*Vector3r::UnitX());
 	Vector3r axis; Real angle; normal2pt.ToAxisAngle(axis,angle);
-	return (angle*radius) /* length */ *(axis.Cross(planeNormal)) /* direction: both are unit vectors */;
+	return (angle*radius) /* length */ *(axis.cross(planeNormal)) /* direction: both are unit vectors */;
 }
 
 /*! Project point from tangent plane to the sphere.
@@ -40,14 +40,14 @@ Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& from
  * @note It is not checked whether planePt relly lies on the tangent plane. If not, result will be incorrect.
  */
 Quaternionr Dem3DofGeom_SphereSphere::rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& planeNormal){
-	if (planePt!=Vector3r::ZERO) {
+	if (planePt!=Vector3r::Zero()) {
 		Quaternionr normal2pt;
-		Vector3r axis=planeNormal.Cross(planePt); axis.Normalize();
-		Real angle=planePt.Length()/radius;
+		Vector3r axis=planeNormal.cross(planePt); axis.Normalize();
+		Real angle=planePt.norm()/radius;
 		normal2pt.FromAxisAngle(axis,angle);
-		Quaternionr ret; return ret.Align(Vector3r::UNIT_X,normal2pt*planeNormal);
+		Quaternionr ret; return ret.setFromTwoVectors(Vector3r::UnitX(),normal2pt*planeNormal);
 	} else {
-		Quaternionr ret; return ret.Align(Vector3r::UNIT_X,planeNormal);
+		Quaternionr ret; return ret.setFromTwoVectors(Vector3r::UnitX(),planeNormal);
 	}
 }
 
@@ -57,8 +57,8 @@ Quaternionr Dem3DofGeom_SphereSphere::rollPlanePtToSphere(const Vector3r& planeP
  * (should be on the plane passing through origin and oriented with normal; not checked!)
  */
 void Dem3DofGeom_SphereSphere::setTgPlanePts(Vector3r p1new, Vector3r p2new){
-	cp1rel=ori1.Conjugate()*rollPlanePtToSphere(p1new,effR1,normal);
-	cp2rel=ori2.Conjugate()*rollPlanePtToSphere(p2new,effR2,-normal);
+	cp1rel=ori1.conjugate()*rollPlanePtToSphere(p1new,effR1,normal);
+	cp2rel=ori2.conjugate()*rollPlanePtToSphere(p2new,effR2,-normal);
 }
 
 
@@ -71,11 +71,11 @@ Real Dem3DofGeom_SphereSphere::slipToDisplacementTMax(Real displacementTMax){
 	if(displacementTMax<=0.){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
 	// otherwise
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Real currDistSq=(p2-p1).SquaredLength();
+	Real currDistSq=(p2-p1).squaredNorm();
 	if(currDistSq<pow(displacementTMax,2)) return 0; // close enough, no slip needed
 	Vector3r diff=.5*(sqrt(currDistSq)/displacementTMax-1)*(p2-p1);
 	setTgPlanePts(p1+diff,p2-diff);
-	return 2*diff.Length();
+	return 2*diff.norm();
 }
 
 
@@ -89,7 +89,7 @@ void Dem3DofGeom_SphereSphere::relocateContactPoints(){
 /*! Like Dem3DofGeom_SphereSphere::relocateContactPoints(), but use already computed tangent plane points. */
 void Dem3DofGeom_SphereSphere::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
 	Vector3r midPt=(effR1/(effR1+effR2))*(p1+p2); // proportionally to radii, so that angle would be the same
-	if((p1.SquaredLength()>pow(effR1,2) || p2.SquaredLength()>pow(effR2,2)) && midPt.SquaredLength()>pow(min(effR1,effR2),2)){
+	if((p1.squaredNorm()>pow(effR1,2) || p2.squaredNorm()>pow(effR2,2)) && midPt.squaredNorm()>pow(min(effR1,effR2),2)){
 		//cerr<<"RELOCATION with displacementT="<<displacementT(); // should be the same before and after relocation
 		setTgPlanePts(p1-midPt,p2-midPt);
 		//cerr<<" → "<<displacementT()<<endl;
@@ -101,8 +101,8 @@ Dem6DofGeom_SphereSphere::~Dem6DofGeom_SphereSphere(){}
 
 Vector3r Dem6DofGeom_SphereSphere::relRotVector() const{
 	// FIXME: this is not correct, as it assumes normal will not change (?)
-	Quaternionr relOri12=ori1.Conjugate()*ori2;
-	Quaternionr oriDiff=initRelOri12.Conjugate()*relOri12;
+	Quaternionr relOri12=ori1.conjugate()*ori2;
+	Quaternionr oriDiff=initRelOri12.conjugate()*relOri12;
 	Vector3r axis; Real angle;
 	oriDiff.ToAxisAngle(axis,angle);
 	if(angle>Mathr::PI)angle-=Mathr::TWO_PI;
@@ -112,7 +112,7 @@ Vector3r Dem6DofGeom_SphereSphere::relRotVector() const{
 
 void Dem6DofGeom_SphereSphere::bendTwistAbs(Vector3r& bend, Real& twist){
 	const Vector3r& relRot=relRotVector();
-	twist=relRot.Dot(normal);
+	twist=relRot.dot(normal);
 	bend=relRot-twist*normal;
 }
 
@@ -152,11 +152,11 @@ void Dem6DofGeom_SphereSphere::bendTwistAbs(Vector3r& bend, Real& twist){
 		#endif
 		// sphere center to point on the sphere
 		if(rolledPoints){
-			GLUtils::GLDrawLine(pos1,pos1+(ss->ori1*ss->cp1rel*Vector3r::UNIT_X*ss->effR1),Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(pos2,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2),Vector3r(0,1,.5));
+			GLUtils::GLDrawLine(pos1,pos1+(ss->ori1*ss->cp1rel*Vector3r::UnitX()*ss->effR1),Vector3r(0,.5,1));
+			GLUtils::GLDrawLine(pos2,pos2+(ss->ori2*ss->cp2rel*Vector3r::UnitX()*ss->effR2),Vector3r(0,1,.5));
 		}
 		//TRVAR4(pos1,ss->ori1,pos2,ss->ori2);
-		//TRVAR2(ss->cp2rel,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2));
+		//TRVAR2(ss->cp2rel,pos2+(ss->ori2*ss->cp2rel*Vector3r::UnitX()*ss->effR2));
 		// contact point to projected points
 		if(unrolledPoints||shear){
 			Vector3r ptTg1=ss->contPtInTgPlane1(), ptTg2=ss->contPtInTgPlane2();
@@ -167,7 +167,7 @@ void Dem6DofGeom_SphereSphere::bendTwistAbs(Vector3r& bend, Real& twist){
 			}
 			if(shear){
 				GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
-				if(shearLabel) GLUtils::GLDrawNum(ss->displacementT().Length(),contPt,Vector3r(1,1,1));
+				if(shearLabel) GLUtils::GLDrawNum(ss->displacementT().norm(),contPt,Vector3r(1,1,1));
 			}
 		}
 	}
@@ -178,12 +178,12 @@ CREATE_LOGGER(Ig2_Sphere_Sphere_Dem3DofGeom);
 bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c){
 	Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
 	Vector3r normal=(state2.pos+shift2)-state1.pos;
-	Real penetrationDepthSq=pow((distFactor>0?distFactor:1.)*(s1->radius+s2->radius),2)-normal.SquaredLength();
+	Real penetrationDepthSq=pow((distFactor>0?distFactor:1.)*(s1->radius+s2->radius),2)-normal.squaredNorm();
 	if (penetrationDepthSq<0 && !c->isReal() && !force){
 		return false;
 	}
 
-	Real dist=normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */
+	Real dist=normal.norm(); normal/=dist; /* normal is unit vector now */
 	shared_ptr<Dem3DofGeom_SphereSphere> ss;
 	if(c->interactionGeometry) ss=YADE_PTR_CAST<Dem3DofGeom_SphereSphere>(c->interactionGeometry);
 	else {
@@ -203,8 +203,8 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 		
 		// for bending only: ss->initRelOri12=state1.ori.Conjugate()*state2.ori;
 		// quasi-constants
-		ss->cp1rel.Align(Vector3r::UNIT_X,state1.ori.Conjugate()*normal);
-		ss->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normal));
+		ss->cp1rel.setFromTwoVectors(Vector3r::UnitX(),state1.ori.conjugate()*normal);
+		ss->cp2rel.setFromTwoVectors(Vector3r::UnitX(),state2.ori.conjugate()*(-normal));
 		ss->cp1rel.Normalize(); ss->cp2rel.Normalize();
 	}
 	ss->normal=normal;
@@ -223,7 +223,7 @@ bool Ig2_Sphere_Sphere_Dem6DofGeom::go(const shared_ptr<Shape>& cm1, const share
 		assert(c->interactionGeometry);
 		assert(c->interactionGeometry->getClassName()=="Dem3DofGeom_SphereSphere");
 		const shared_ptr<Dem6DofGeom_SphereSphere> geom(new Dem6DofGeom_SphereSphere(*YADE_CAST<Dem3DofGeom_SphereSphere*>(c->interactionGeometry.get())));
-		geom->initRelOri12=state1.ori.Conjugate()*state2.ori;
+		geom->initRelOri12=state1.ori.conjugate()*state2.ori;
 		c->interactionGeometry=geom;
 		//TRVAR3(geom->refLength,geom->contactPoint,geom->initRelOri12)
 	}

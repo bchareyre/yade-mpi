@@ -17,7 +17,6 @@
 #include<yade/pkg-dem/NormalInelasticityLaw.hpp>
 #include <yade/pkg-dem/Ip2_2xCohFrictMat_NormalInelasticityPhys.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
-#include <yade/pkg-dem/PositionOrientationRecorder.hpp>
 
 // #include <yade/pkg-dem/PositionRecorder.hpp>
 // #include <yade/pkg-dem/PositionSnapshot.hpp>
@@ -313,7 +312,7 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowe
 	sphere_list.clear();
 	long tries = 1000; //nb max of tries for positionning the next sphere
 	Vector3r dimensions = upperCorner - lowerCorner;
-	Real mean_radius = Mathr::Pow(dimensions.X()*dimensions.Y()*dimensions.Z()*(1-porosity)/(4.0/3.0*Mathr::PI*number),1.0/3.0);
+	Real mean_radius = Mathr::Pow(dimensions.x()*dimensions.y()*dimensions.z()*(1-porosity)/(4.0/3.0*Mathr::PI*number),1.0/3.0);
 	cerr << " mean radius " << mean_radius << endl;;
 
 // 	std::cerr << "generating aggregates ... ";
@@ -325,12 +324,12 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list,Vector3r lowe
 		for (t=0; t<tries; ++t) 
 		{
 			s.second = (Mathr::UnitRandom()-0.5)*rad_std_dev*mean_radius+mean_radius;
-			s.first.X() = lowerCorner.X()+s.second+(dimensions.X()-2*s.second)*Mathr::UnitRandom();
-			s.first.Y() = lowerCorner.Y()+s.second+(dimensions.Y()-2*s.second)*Mathr::UnitRandom();
-			s.first.Z() = lowerCorner.Z()+s.second+(dimensions.Z()-2*s.second)*Mathr::UnitRandom();
+			s.first.x() = lowerCorner.x()+s.second+(dimensions.x()-2*s.second)*Mathr::UnitRandom();
+			s.first.y() = lowerCorner.y()+s.second+(dimensions.y()-2*s.second)*Mathr::UnitRandom();
+			s.first.z() = lowerCorner.z()+s.second+(dimensions.z()-2*s.second)*Mathr::UnitRandom();
 			bool overlap=false;
 			for (long j=0; (j<i && !overlap); j++)
-				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).SquaredLength()) overlap=true;
+				if ( pow(sphere_list[j].second+s.second, 2) > (sphere_list[j].first-s.first).squaredNorm()) overlap=true;
 			if (!overlap)
 			{
 				sphere_list.push_back(s);
@@ -376,9 +375,9 @@ std::pair<string,bool> SimpleShear::ImportCloud(vector<BasicSphere>& sphere_list
 			BasicSphere s;		// l'elt de la liste sphere_list (= la sphere) que l'on va lire maintenant
 			loadFile >> it;
 			loadFile >> s.second;	// son rayon	
-			loadFile >> s.first.X();
-			loadFile >> s.first.Y();// le Y de la position de son centre
-			loadFile >> s.first.Z();// le Z de la position de son centre
+			loadFile >> s.first.x();
+			loadFile >> s.first.y();// le y de la position de son centre
+			loadFile >> s.first.z();// le z de la position de son centre
 			sphere_list.push_back(s);
 			nombre++;
 		}		

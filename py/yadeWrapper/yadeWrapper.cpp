@@ -295,7 +295,7 @@ class pyOmega{
 	double simulationTime(){return OMEGA.getSimulationTime();}
 	double realTime(){ return OMEGA.getComputationTime(); }
 	double dt_get(){return OMEGA.getTimeStep();}
-	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt);}
+	void dt_set(double dt){OMEGA.skipTimeStepper(true); OMEGA.setTimeStep(dt); LOG_WARN("Setting timestep "<<dt<<", "<<dt_get()); }
 
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIteration; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIteration=s; }

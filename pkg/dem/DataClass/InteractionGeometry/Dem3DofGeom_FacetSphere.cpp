@@ -13,15 +13,15 @@ Dem3DofGeom_FacetSphere::~Dem3DofGeom_FacetSphere(){}
 
 void Dem3DofGeom_FacetSphere::setTgPlanePts(const Vector3r& p1new, const Vector3r& p2new){
 	TRVAR3(cp1pt,cp2rel,contPtInTgPlane2()-contPtInTgPlane1());	
-	cp1pt=se31.orientation.Conjugate()*(turnPlanePt(p1new,normal,se31.orientation*localFacetNormal)+contactPoint-se31.position);
-	cp2rel=se32.orientation.Conjugate()*Dem3DofGeom_SphereSphere::rollPlanePtToSphere(p2new,effR2,-normal);
+	cp1pt=se31.orientation.conjugate()*(turnPlanePt(p1new,normal,se31.orientation*localFacetNormal)+contactPoint-se31.position);
+	cp2rel=se32.orientation.conjugate()*Dem3DofGeom_SphereSphere::rollPlanePtToSphere(p2new,effR2,-normal);
 	TRVAR3(cp1pt,cp2rel,contPtInTgPlane2()-contPtInTgPlane1());	
 }
 
 void Dem3DofGeom_FacetSphere::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
 	//TRVAR2(p2.Length(),effR2);
-	if(p2.SquaredLength()>pow(effR2,2)){
-		setTgPlanePts(Vector3r::ZERO,p2-p1);
+	if(p2.squaredNorm()>pow(effR2,2)){
+		setTgPlanePts(Vector3r::Zero(),p2-p1);
 	}
 }
 
@@ -31,7 +31,7 @@ Real Dem3DofGeom_FacetSphere::slipToDisplacementTMax(Real displacementTMax){
 	if(displacementTMax<=0.){ setTgPlanePts(Vector3r(0,0,0),Vector3r(0,0,0)); return displacementTMax;}
 	// otherwise
 	Vector3r p1=contPtInTgPlane1(), p2=contPtInTgPlane2();
-	Real currDistSq=(p2-p1).SquaredLength();
+	Real currDistSq=(p2-p1).squaredNorm();
 	if(currDistSq<pow(displacementTMax,2)) return 0; // close enough, no slip needed
 	//Vector3r diff=.5*(sqrt(currDistSq)/displacementTMax-1)*(p2-p1); setTgPlanePts(p1+diff,p2-diff);
 	Real scale=displacementTMax/sqrt(currDistSq); setTgPlanePts(scale*p1,scale*p2);
@@ -50,16 +50,16 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			as sega's algo below, but seems more readable to me.
 			The FACET_TOPO thing is still missing here but can be copied literally once it is tested */
 		// begin facet-local coordinates
-			Vector3r cogLine=state1.ori.Conjugate()*(state2.pos+shift2-state1.pos); // connect centers of gravity
+			Vector3r cogLine=state1.ori.conjugate()*(state2.pos+shift2-state1.pos); // connect centers of gravity
 			//TRVAR4(state1.pos,state1.ori,state2.pos,cogLine);
 			Vector3r normal=facet->nf;
-			Real planeDist=normal.Dot(cogLine);
+			Real planeDist=normal.dot(cogLine);
 			if(planeDist<0){normal*=-1; planeDist*=-1; }
 			if(planeDist>sphereRadius && !c->isReal()) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
 			Vector3r planarPt=cogLine-planeDist*normal; // project sphere center to the facet plane
 			Real normDotPt[3];
-			Vector3r contactPt(Vector3r::ZERO);
-			for(int i=0; i<3; i++) normDotPt[i]=facet->ne[i].Dot(planarPt-facet->vertices[i]);
+			Vector3r contactPt(Vector3r::Zero());
+			for(int i=0; i<3; i++) normDotPt[i]=facet->ne[i].dot(planarPt-facet->vertices[i]);
 			short w=(normDotPt[0]>0?1:0)+(normDotPt[1]>0?2:0)+(normDotPt[2]>0?4:0);
 			//TRVAR4(planarPt,normDotPt[0],normDotPt[1],normDotPt[2]);
 			//TRVAR2(normal,cogLine);
@@ -77,8 +77,9 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			}
 			normal=cogLine-contactPt; // called normal, but it is no longer the facet's normal (for compat)
 			//TRVAR3(normal,contactPt,sphereRadius);
-			if(!c->isReal() && normal.SquaredLength()>sphereRadius*sphereRadius && !force) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
-			Real penetrationDepth=sphereRadius-normal.Normalize();
+			if(!c->isReal() && normal.squaredNorm()>sphereRadius*sphereRadius && !force) { /* LOG_TRACE("Sphere too far from closest point"); */ return false; } // fast test before sqrt
+			Real norm=normal.norm(); normal/=norm; // normal is unit vector now
+			Real penetrationDepth=sphereRadius-norm;
 	#else
 		/* This code was mostly copied from InteractingFacet2InteractinSphere4SpheresContactGeometry */
 		// begin facet-local coordinates 
@@ -131,7 +132,8 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 				#endif
 				//TRVAR4(contactLine,contactPt,normal,normal.Length());
 				//TRVAR3(se31.orientation*contactLine,se31.position+se31.orientation*contactPt,se31.orientation*normal);
-				penetrationDepth=sphereRadius-normal.Normalize();
+				Real norm=normal.norm(); normal/=norm;
+				penetrationDepth=sphereRadius-norm;
 				//TRVAR1(penetrationDepth);
 			}
 		// end facet-local coordinates
@@ -160,7 +162,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		// fs->refLength=…
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=facet->nf;
-		fs->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
+		fs->cp2rel.setFromTwoVectors(Vector3r::UnitX(),state2.ori.conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		fs->cp2rel.Normalize();
 	}
 	fs->se31=state1.se3; fs->se32=state2.se3; fs->se32.position+=shift2;
@@ -169,7 +171,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 	// this refLength computation mimics what displacementN() does inside
 	// displcementN will therefore return exactly zero at the step the contact
 	// was created, which is what we want
-	if(isNew) fs->refLength=(state2.pos+shift2-fs->contactPoint).Length();
+	if(isNew) fs->refLength=(state2.pos+shift2-fs->contactPoint).norm();
 	return true;
 }
 
@@ -198,7 +200,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		if(rolledPoints){
 			//cerr<<pos1<<" "<<pos1+ori1*fs->cp1pt<<" "<<contPt<<endl;
 			GLUtils::GLDrawLine(pos1+ori1*fs->cp1pt,contPt,Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(pos2,pos2+(ori2*fs->cp2rel*Vector3r::UNIT_X*fs->effR2),Vector3r(0,1,.5));
+			GLUtils::GLDrawLine(pos2,pos2+(ori2*fs->cp2rel*Vector3r::UnitX()*fs->effR2),Vector3r(0,1,.5));
 		}
 		// contact point to projected points
 		if(unrolledPoints||shear){
@@ -210,7 +212,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			}
 			if(shear){
 				GLUtils::GLDrawLine(contPt+ptTg1,contPt+ptTg2,Vector3r(1,1,1));
-				if(shearLabel) GLUtils::GLDrawNum(fs->displacementT().Length(),contPt,Vector3r(1,1,1));
+				if(shearLabel) GLUtils::GLDrawNum(fs->displacementT().norm(),contPt,Vector3r(1,1,1));
 			}
 		}
 	}

@@ -294,7 +294,7 @@ Real Vector3<Real>::Dot (const Vector3& rkV) const
 }
 //----------------------------------------------------------------------------
 template <class Real>
-Real Vector3<Real>::Normalize ()
+void Vector3<Real>::Normalize ()
 {
     Real fLength = Length();
 
@@ -313,7 +313,7 @@ Real Vector3<Real>::Normalize ()
         m_afTuple[2] = (Real)0.0;
     }
 
-    return fLength;
+    //return fLength;
 }
 //----------------------------------------------------------------------------
 template <class Real>

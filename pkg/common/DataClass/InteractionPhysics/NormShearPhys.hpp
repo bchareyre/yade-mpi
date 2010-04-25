@@ -9,7 +9,7 @@ class NormPhys:public InteractionPhysics {
 		virtual ~NormPhys();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormPhys,InteractionPhysics,"Abstract class for interactions that have normal stiffness.",
 		((Real,kn,NaN,"Normal stiffness"))
-		((Vector3r,normalForce,Vector3r::ZERO,"Normal force after previous step (in global coordinates).")),
+		((Vector3r,normalForce,Vector3r::Zero(),"Normal force after previous step (in global coordinates).")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(NormPhys,InteractionPhysics);
@@ -22,7 +22,7 @@ class NormShearPhys: public NormPhys{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(NormShearPhys,NormPhys,
 		"Abstract class for interactions that have shear stiffnesses, in addition to normal stiffness. This class is used in the PFC3d-style stiffness timestepper.",
 		((Real,ks,NaN,"Shear stiffness"))
-		((Vector3r,shearForce,Vector3r::ZERO,"Shear force after previous step (in global coordinates).")),
+		((Vector3r,shearForce,Vector3r::Zero(),"Shear force after previous step (in global coordinates).")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(NormShearPhys,NormPhys);

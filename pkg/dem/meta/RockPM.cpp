@@ -43,9 +43,9 @@ void Law2_Dem3DofGeom_RockPMPhys_Rpm::go(shared_ptr<InteractionGeometry>& ig, sh
 
 		/**Check, whether the shear stress more, than normal force multiplicated to tanFrictionAngle*/
 		
-		Real maxFsSq = phys->normalForce.SquaredLength()*phys->tanFrictionAngle*phys->tanFrictionAngle;
-		if(sigmaT.SquaredLength()>maxFsSq) {
-			sigmaT*=sqrt(maxFsSq/(sigmaT.SquaredLength()));
+		Real maxFsSq = phys->normalForce.squaredNorm()*phys->tanFrictionAngle*phys->tanFrictionAngle;
+		if(sigmaT.squaredNorm()>maxFsSq) {
+			sigmaT*=sqrt(maxFsSq/(sigmaT.squaredNorm()));
 		}
 		
 		Fs=sigmaT*crossSection;

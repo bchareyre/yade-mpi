@@ -81,7 +81,6 @@ class TriaxialTest : public FileGenerator
 		((string,importFilename,"","File with positions and sizes of spheres."))
 		((string,Key,"","A code that is added to output filenames."))
 		((string,fixedBoxDims,"","string that contains some subset (max. 2) of {'x','y','z'} ; containes axes will have box dimension hardcoded, even if box is scaled as mean_radius is prescribed: scaling will be applied on the rest."))
-		((string,AnimationSnapshotsBaseName,"./snapshots_"+Key+"/snap",""))
 		((string,WallStressRecordFile,"./WallStresses"+Key,""))					
 		((bool,internalCompaction,false,"flag for choosing between moving boundaries or increasing particles sizes during the compaction stage."))
 		((bool,biaxial2dTest,false,"FIXME : what is that?"))
@@ -89,7 +88,6 @@ class TriaxialTest : public FileGenerator
 		((bool,autoCompressionActivation,true,"Do we just want to generate a stable packing under isotropic pressure (false) or do we want the triaxial loading to start automatically right after compaction stage (true)?"))
 		((bool,autoUnload,true,"auto adjust the isotropic stress state from :yref:`TriaxialTest::sigmaIsoCompaction` to :yref:`TriaxialTest::sigmaLateralConfinement` if they have different values. See docs for :yref:`TriaxialCompressionEngine::autoUnload`"))
 		((bool,autoStopSimulation,false,"freeze the simulation when conditions are reached (don't activate this if you want to be able to run/stop from Qt GUI)"))
-		((bool,saveAnimationSnapshots,false,""))
 		((bool,noFiles,false,"Do not create any files during run (.xml, .spheres, wall stress records)"))
 		((bool,facetWalls,false,"Use facets for boundaries (not tested)"))
 		((bool,wallWalls,false,"Use walls for boundaries (not tested)"))
@@ -144,8 +142,6 @@ class TriaxialTest : public FileGenerator
 		wall_4_wire		= true;
 		spheresColor		= Vector3r(0.8,0.3,0.3);
 		spheresRandomColor	= false;
-		AnimationSnapshotsBaseName = "./snapshots_"+Key+"/snap";
-		saveAnimationSnapshots = false;
 		WallStressRecordFile = "./WallStresses"+Key;	
 		gravity 		= Vector3r(0,-9.81,0);
 		,

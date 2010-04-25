@@ -25,26 +25,26 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
 	
-	if(!sdec || stiffness==Vector3r::ZERO)
+	if(!sdec || stiffness==Vector3r::Zero())
 		return; // not possible to compute!
 	
 	Real dtx, dty, dtz;	
 
-	Real dt = max( max (stiffness.X(), stiffness.Y()), stiffness.Z() );
+	Real dt = max( max (stiffness.x(), stiffness.y()), stiffness.z() );
 	if (dt!=0) {
 		dt = sdec->mass/dt;  computedSomething = true;}//dt = squared eigenperiod of translational motion 
 	else dt = Mathr::MAX_REAL;
 	
-	if (Rstiffness.X()!=0) {
-		dtx = sdec->inertia.X()/Rstiffness.X();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
+	if (Rstiffness.x()!=0) {
+		dtx = sdec->inertia.x()/Rstiffness.x();  computedSomething = true;}//dtx = squared eigenperiod of rotational motion around x
 	else dtx = Mathr::MAX_REAL;
 	
-	if (Rstiffness.Y()!=0) {
-		dty = sdec->inertia.Y()/Rstiffness.Y();  computedSomething = true;}
+	if (Rstiffness.y()!=0) {
+		dty = sdec->inertia.y()/Rstiffness.y();  computedSomething = true;}
 	else dty = Mathr::MAX_REAL;
 
-	if (Rstiffness.Z()!=0) {
-		dtz = sdec->inertia.Z()/Rstiffness.Z();  computedSomething = true;}
+	if (Rstiffness.z()!=0) {
+		dtz = sdec->inertia.z()/Rstiffness.z();  computedSomething = true;}
 	else dtz = Mathr::MAX_REAL;
 	
 	Real Rdt =  std::min( std::min (dtx, dty), dtz );//Rdt = smallest squared eigenperiod for rotational motions
@@ -106,11 +106,11 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 		NormShearPhys* phys=YADE_CAST<NormShearPhys*>(contact->interactionPhysics.get()); assert(phys);
 		// all we need for getting stiffness
 		Vector3r& normal=geom->normal; Real& kn=phys->kn; Real& ks=phys->ks; Real& radius1=geom->refR1; Real& radius2=geom->refR2;
-		Real fn = (static_cast<NormShearPhys *> (contact->interactionPhysics.get()))->normalForce.SquaredLength();
+		Real fn = (static_cast<NormShearPhys *> (contact->interactionPhysics.get()))->normalForce.squaredNorm();
 		if (fn==0) continue;//Is it a problem with some laws? I still don't see why.
 		
 		//Diagonal terms of the translational stiffness matrix
-		Vector3r diag_stiffness = Vector3r(std::pow(normal.X(),2),std::pow(normal.Y(),2),std::pow(normal.Z(),2));
+		Vector3r diag_stiffness = Vector3r(std::pow(normal.x(),2),std::pow(normal.y(),2),std::pow(normal.z(),2));
 		diag_stiffness *= kn-ks;
 		diag_stiffness = diag_stiffness + Vector3r(1,1,1)*ks;
 
@@ -118,9 +118,9 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 		// Vector3r branch1 = currentContactGeometry->normal*currentContactGeometry->radius1;
 		// Vector3r branch2 = currentContactGeometry->normal*currentContactGeometry->radius2;
 		Vector3r diag_Rstiffness =
-			Vector3r(std::pow(normal.Y(),2)+std::pow(normal.Z(),2),
-				std::pow(normal.X(),2)+std::pow(normal.Z(),2),
-				std::pow(normal.X(),2)+std::pow(normal.Y(),2));
+			Vector3r(std::pow(normal.y(),2)+std::pow(normal.z(),2),
+				std::pow(normal.x(),2)+std::pow(normal.z(),2),
+				std::pow(normal.x(),2)+std::pow(normal.y(),2));
 		diag_Rstiffness *= ks;
 		//NOTE : contact laws with moments would be handled correctly by summing directly bending+twisting stiffness to diag_Rstiffness. The fact that there is no problem currently with e.g. cohesiveFrict law is probably because final computed dt is constrained by translational motion, not rotations.
 		stiffnesses [contact->getId1()]+=diag_stiffness;

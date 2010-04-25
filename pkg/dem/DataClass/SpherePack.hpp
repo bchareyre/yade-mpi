@@ -37,8 +37,8 @@ public:
 	};
 	std::vector<Sph> pack;
 	Vector3r cellSize;
-	SpherePack(): cellSize(Vector3r::ZERO){};
-	SpherePack(const python::list& l):cellSize(Vector3r::ZERO){ fromList(l); }
+	SpherePack(): cellSize(Vector3r::Zero()){};
+	SpherePack(const python::list& l):cellSize(Vector3r::Zero()){ fromList(l); }
 	// add single sphere
 	void add(const Vector3r& c, Real r){ pack.push_back(Sph(c,r)); }
 
@@ -75,7 +75,7 @@ public:
 	// transformations
 	void translate(const Vector3r& shift){ FOREACH(Sph& s, pack) s.c+=shift; }
 	void rotate(const Vector3r& axis, Real angle){
-		if(cellSize!=Vector3r::ZERO) { LOG_WARN("Periodicity reset when rotating periodic packing (non-zero cellSize="<<cellSize<<")"); cellSize=Vector3r::ZERO; }
+		if(cellSize!=Vector3r::Zero()) { LOG_WARN("Periodicity reset when rotating periodic packing (non-zero cellSize="<<cellSize<<")"); cellSize=Vector3r::Zero(); }
 		Vector3r mid=midPt(); Quaternionr q(axis,angle); FOREACH(Sph& s, pack) s.c=q*(s.c-mid)+mid;
 	}
 	void scale(Real scale){ Vector3r mid=midPt(); cellSize*=scale; FOREACH(Sph& s, pack) {s.c=scale*(s.c-mid)+mid; s.r*=abs(scale); } }

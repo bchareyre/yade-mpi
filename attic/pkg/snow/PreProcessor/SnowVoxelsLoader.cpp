@@ -488,11 +488,6 @@ void SnowVoxelsLoader::createActors(shared_ptr<Scene>& rootBody)
 	//rootBody->engines.push_back(velocityRecorder);
 	//rootBody->engines.push_back(forcerec);
 	
-	//if (saveAnimationSnapshots) {
-	//shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-	//positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
-	//rootBody->engines.push_back(positionOrientationRecorder);}
-	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(boundDispatcher);
 	
@@ -507,8 +502,8 @@ void SnowVoxelsLoader::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;
-	physics->velocity		= Vector3r::ZERO;
-	physics->acceleration		= Vector3r::ZERO;
+	physics->velocity		= Vector3r::Zero();
+	physics->acceleration		= Vector3r::Zero();
 	
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);

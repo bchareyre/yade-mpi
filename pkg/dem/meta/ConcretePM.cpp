@@ -278,7 +278,7 @@ Real Law2_Dem3DofGeom_CpmPhys_Cpm::yieldSigmaTMagnitude(Real sigmaN, Real omega,
 			glDisable(GL_CULL_FACE);
 			glPushMatrix();
 				glTranslatev(midPt);
-				Quaternionr q; q.Align(Vector3r::UNIT_Z,geom->normal);
+				Quaternionr q; q.Align(Vector3r::UnitZ(),geom->normal);
 				Vector3r axis; Real angle; q.ToAxisAngle(axis,angle);
 				glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
 				glBegin(GL_POLYGON);

@@ -14,14 +14,14 @@ Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool
 	Vector3r axis;
 	Real angle;
 
-	Vector3r shearIncrement(Vector3r::ZERO);
+	Vector3r shearIncrement(Vector3r::Zero());
 
 	// approximated rotations
-		axis = prevNormal.Cross(normal); 
-		shearIncrement -= shear.Cross(axis);
-		angle = dt*0.5*normal.Dot(rbp1->angVel + rbp2->angVel);
+		axis = prevNormal.cross(normal); 
+		shearIncrement -= shear.cross(axis);
+		angle = dt*0.5*normal.dot(rbp1->angVel + rbp2->angVel);
 		axis = angle*normal;
-		shearIncrement -= (shear+shearIncrement).Cross(axis);
+		shearIncrement -= (shear+shearIncrement).cross(axis);
 		
 	// exact rotations (not adapted to shear/shearIncrement!)
 	#if 0
@@ -55,8 +55,8 @@ Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool
 		c2x = (x - rbp2->pos);
 	}
 
-	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.Cross(c2x)) - (rbp1->vel+rbp1->angVel.Cross(c1x));
-	Vector3r shearVelocity = relativeVelocity-normal.Dot(relativeVelocity)*normal;
+	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
+	Vector3r shearVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = shearVelocity*dt;
 	shearIncrement -= shearDisplacement;
 
@@ -71,11 +71,11 @@ Vector3r ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r&
 	Real angle;
 
 	// approximated rotations
-		axis = prevNormal.Cross(normal); 
-		shearForce -= shearForce.Cross(axis);
-		angle = dt*0.5*normal.Dot(rbp1->angVel + rbp2->angVel);
+		axis = prevNormal.cross(normal); 
+		shearForce -= shearForce.cross(axis);
+		angle = dt*0.5*normal.dot(rbp1->angVel + rbp2->angVel);
 		axis = angle*normal;
-		shearForce -= shearForce.Cross(axis);
+		shearForce -= shearForce.cross(axis);
 		
 	// exact rotations
 	#if 0
@@ -109,8 +109,8 @@ Vector3r ScGeom::updateShearForce(Vector3r& shearForce, Real ks, const Vector3r&
 		c2x = (x - rbp2->pos);
 	}
 
-	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.Cross(c2x)) - (rbp1->vel+rbp1->angVel.Cross(c1x));
-	Vector3r shearVelocity = relativeVelocity-normal.Dot(relativeVelocity)*normal;
+	Vector3r relativeVelocity = (rbp2->vel+rbp2->angVel.cross(c2x)) - (rbp1->vel+rbp1->angVel.cross(c1x));
+	Vector3r shearVelocity = relativeVelocity-normal.dot(relativeVelocity)*normal;
 	Vector3r shearDisplacement = shearVelocity*dt;
 	shearForce -= ks*shearDisplacement;
 	return shearDisplacement;

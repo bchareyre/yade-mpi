@@ -154,9 +154,9 @@ struct FundamentalHandler< Vector3<RealType> >
 			vector<string> tokens;
 			IOFormatManager::parseFundamental(*tmpStr, tokens);
 		
-			tmp->X() = lexical_cast_maybeNanInf<RealType>(tokens[0]);
-			tmp->Y() = lexical_cast_maybeNanInf<RealType>(tokens[1]);
-			tmp->Z() = lexical_cast_maybeNanInf<RealType>(tokens[2]);
+			tmp->x() = lexical_cast_maybeNanInf<RealType>(tokens[0]);
+			tmp->y() = lexical_cast_maybeNanInf<RealType>(tokens[1]);
+			tmp->z() = lexical_cast_maybeNanInf<RealType>(tokens[2]);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -165,9 +165,9 @@ struct FundamentalHandler< Vector3<RealType> >
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
-			tmp->X() = content[0];
-			tmp->Y() = content[1];
-			tmp->Z() = content[2];
+			tmp->x() = content[0];
+			tmp->y() = content[1];
+			tmp->z() = content[2];
 		}
 		else
 			throw HandlerError(SerializationExceptions::ExtraCopyError);
@@ -179,11 +179,11 @@ struct FundamentalHandler< Vector3<RealType> >
 			string * tmpStr = any_cast<string*>(a);
 			Vector3<RealType> * tmp = any_cast<Vector3<RealType>*>(ac.getAddress());
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
-					lexical_cast<string>(tmp->X())			+
+					lexical_cast<string>(tmp->x())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(tmp->Y())			+
+					lexical_cast<string>(tmp->y())			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(tmp->Z())			+
+					lexical_cast<string>(tmp->z())			+
 					IOFormatManager::getCustomFundamentalClosingBracket();
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from string to binary stream
@@ -193,9 +193,9 @@ struct FundamentalHandler< Vector3<RealType> >
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
-			content.push_back(tmp->X());
-			content.push_back(tmp->Y());
-			content.push_back(tmp->Z());
+			content.push_back(tmp->x());
+			content.push_back(tmp->y());
+			content.push_back(tmp->z());
 			data_to_binary(content,*tmpBin);
 		}
 		else
@@ -319,7 +319,8 @@ struct FundamentalHandler< Quaternion<RealType> >
 				axis[0] = lexical_cast_maybeNanInf<RealType>(tokens[0]);
 				axis[1] = lexical_cast_maybeNanInf<RealType>(tokens[1]);
 				axis[2] = lexical_cast_maybeNanInf<RealType>(tokens[2]);
-				angle = axis.Normalize();
+				angle=axis.norm();
+				axis/=angle;
 			}
 			else // tokens.size()==4 Quaternion is written as axis angle
 			{
@@ -337,10 +338,10 @@ struct FundamentalHandler< Quaternion<RealType> >
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
-			tmp->W() = content[0];
-			tmp->X() = content[1];
-			tmp->Y() = content[2];
-			tmp->Z() = content[3];
+			tmp->w() = content[0];
+			tmp->x() = content[1];
+			tmp->y() = content[2];
+			tmp->z() = content[3];
 		}
 		else
 			throw HandlerError(SerializationExceptions::ExtraCopyError);
@@ -356,7 +357,7 @@ struct FundamentalHandler< Quaternion<RealType> >
 			RealType angle;
 			Vector3<RealType> axis;
 			tmp->ToAxisAngle(axis,angle);
-			axis.Normalize();
+			axis.normalize();
 
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
 					lexical_cast<string>(axis[0])			+
@@ -375,10 +376,10 @@ struct FundamentalHandler< Quaternion<RealType> >
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
-			content.push_back(tmp->W());
-			content.push_back(tmp->X());
-			content.push_back(tmp->Y());
-			content.push_back(tmp->Z());
+			content.push_back(tmp->w());
+			content.push_back(tmp->x());
+			content.push_back(tmp->y());
+			content.push_back(tmp->z());
 			data_to_binary(content,*tmpBin);
 		}
 		else
@@ -415,7 +416,8 @@ struct FundamentalHandler< Se3<RealType> >
 				axis[0]		= lexical_cast_maybeNanInf<RealType>(tokens[4]);
 				axis[1]		= lexical_cast_maybeNanInf<RealType>(tokens[3]);
 				axis[2]		= lexical_cast_maybeNanInf<RealType>(tokens[5]);
-				angle		= axis.Normalize();
+				angle=axis.norm();
+				axis/=angle;
 			}
 			else // tokens.size()==7 Quaternion is writted as axis angle
 			{
@@ -437,13 +439,13 @@ struct FundamentalHandler< Se3<RealType> >
 			static vector<RealType> content;
 			content.clear();
 			binary_to_data(*tmpBin,content);
-			tmp->position.X() = content[0];
-			tmp->position.Y() = content[1];
-			tmp->position.Z() = content[2];
-			tmp->orientation.W() = content[3];
-			tmp->orientation.X() = content[4];
-			tmp->orientation.Y() = content[5];
-			tmp->orientation.Z() = content[6];
+			tmp->position.x() = content[0];
+			tmp->position.y() = content[1];
+			tmp->position.z() = content[2];
+			tmp->orientation.w() = content[3];
+			tmp->orientation.x() = content[4];
+			tmp->orientation.y() = content[5];
+			tmp->orientation.z() = content[6];
 		}
 		else
 			throw HandlerError(SerializationExceptions::ExtraCopyError);
@@ -461,7 +463,7 @@ struct FundamentalHandler< Se3<RealType> >
 			Vector3<RealType> position;
 		
 			tmp->orientation.ToAxisAngle(axis,angle);
-			axis.Normalize();
+			axis.normalize();
 			position = tmp->position;
 		
 			//*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket();
@@ -491,13 +493,13 @@ struct FundamentalHandler< Se3<RealType> >
 			(*tmpBin).clear();
 			static vector<RealType> content;
 			content.clear();
-			content.push_back(tmp->position.X());
-			content.push_back(tmp->position.Y());
-			content.push_back(tmp->position.Z());
-			content.push_back(tmp->orientation.W());
-			content.push_back(tmp->orientation.X());
-			content.push_back(tmp->orientation.Y());
-			content.push_back(tmp->orientation.Z());
+			content.push_back(tmp->position.x());
+			content.push_back(tmp->position.y());
+			content.push_back(tmp->position.z());
+			content.push_back(tmp->orientation.w());
+			content.push_back(tmp->orientation.x());
+			content.push_back(tmp->orientation.y());
+			content.push_back(tmp->orientation.z());
 			data_to_binary(content,*tmpBin);
 		}
 		else

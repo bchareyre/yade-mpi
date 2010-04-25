@@ -141,7 +141,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 
                         /// intergranular distance
 
-                        Real D = alpha*(b2->state->pos-b1->state->pos).Length()-alpha*(currentContactGeometry->radius1+ currentContactGeometry->radius2); // scGeom->penetrationDepth could probably be used here?
+                        Real D = alpha*(b2->state->pos-b1->state->pos).norm()-alpha*(currentContactGeometry->radius1+ currentContactGeometry->radius2); // scGeom->penetrationDepth could probably be used here?
 
                         if ((currentContactGeometry->penetrationDepth>=0)||(D<=0)) //||(Omega::instance().getCurrentIteration() < 1) ) // a simplified way to define meniscii everywhere
 			{
@@ -217,7 +217,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					{
 						if (currentContactPhysics->fusionNumber !=0) 
 						{	//cerr << "fusion" << endl;
-                                                        currentContactPhysics->Fcap = Vector3r::ZERO;
+                                                        currentContactPhysics->Fcap = Vector3r::Zero();
                                                         continue;
                                                 }
                                         }
@@ -289,9 +289,9 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 					// normal is always from id1 to id2
 					
 					Real normalDot = 0;
-					if ((*firstMeniscus)->getId1() ==  (*currentMeniscus)->getId1() ||  (*firstMeniscus)->getId2()  == (*currentMeniscus)->getId2()) normalDot = normalFirstMeniscus.Dot(normalCurrentMeniscus);
+					if ((*firstMeniscus)->getId1() ==  (*currentMeniscus)->getId1() ||  (*firstMeniscus)->getId2()  == (*currentMeniscus)->getId2()) normalDot = normalFirstMeniscus.dot(normalCurrentMeniscus);
 					else
-					normalDot = - (normalFirstMeniscus.Dot(normalCurrentMeniscus));
+					normalDot = - (normalFirstMeniscus.dot(normalCurrentMeniscus));
 					
 					//cerr << "normalDot ="<< normalDot << endl;
 					

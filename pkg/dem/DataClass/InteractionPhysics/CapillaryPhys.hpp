@@ -21,7 +21,7 @@ class CapillaryPhys : public FrictPhys
 				 ((Real,Vmeniscus,0.,"Volume of the menicus"))
 				 ((Real,Delta1,0.,"Defines the surface area wetted by the meniscus on the smallest grains of radius R1 (R1<R2)"))
 				 ((Real,Delta2,0.,"Defines the surface area wetted by the meniscus on the biggest grains of radius R2 (R1<R2)"))
-				 ((Vector3r,Fcap,Vector3r::ZERO,"Capillary Force produces by the presence of the meniscus"))
+				 ((Vector3r,Fcap,Vector3r::Zero(),"Capillary Force produces by the presence of the meniscus"))
 				 ((short int,fusionNumber,0.,"Indicates the number of meniscii that overlap with this one"))
 				 ,createIndex();currentIndexes[0]=currentIndexes[1]=currentIndexes[2]=currentIndexes[3]=0;
 				 );

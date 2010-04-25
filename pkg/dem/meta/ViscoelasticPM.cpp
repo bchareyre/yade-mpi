@@ -78,7 +78,7 @@ void Law2_ScGeom_ViscElPhys_Basic::go(shared_ptr<InteractionGeometry>& _geom, sh
 	// and then add the viscous part if we pass the Mohr-Coulomb criterion.
 	// See http://www.mail-archive.com/yade-users@lists.launchpad.net/msg01391.html
 	shearForce += phys.ks*dt*shearVelocity; // the elastic shear force have a history, but
-	Vector3r shearForceVisc = Vector3r::ZERO; // the viscous shear damping haven't a history because it is a function of the instant velocity 
+	Vector3r shearForceVisc = Vector3r::Zero(); // the viscous shear damping haven't a history because it is a function of the instant velocity 
 
 	phys.normalForce = ( phys.kn * geom.penetrationDepth + phys.cn * normalVelocity ) * geom.normal;
 	phys.prevNormal = geom.normal;

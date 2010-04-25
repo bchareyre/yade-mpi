@@ -15,5 +15,6 @@ namespace Wm3 {
 	template<class T> class Quaternion; typedef Quaternion<Real> Quaternionr;
 	template<class T> class Vector2; typedef Vector2<Real> Vector2r; typedef Vector2<int> Vector2i;
 	template<class T> class Vector3; typedef Vector3<Real> Vector3r; typedef Vector3<int> Vector3i;
+	template<class T> class AngleAxis; typedef AngleAxis<Real> AngleAxisr;
 }
 using namespace Wm3;

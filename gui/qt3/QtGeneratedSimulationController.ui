@@ -300,69 +300,11 @@
                         <property name="name">
                             <cstring>layout8</cstring>
                         </property>
-                        <grid>
+                        <vbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QButtonGroup" row="3" column="0">
-                                <property name="name">
-                                    <cstring>timestep</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>3</hsizetype>
-                                        <vsizetype>3</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="frameShadow">
-                                    <enum>Sunken</enum>
-                                </property>
-                                <property name="lineWidth">
-                                    <number>1</number>
-                                </property>
-                                <property name="title">
-                                    <string>timestep</string>
-                                </property>
-                                <property name="flat">
-                                    <bool>false</bool>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QRadioButton">
-                                        <property name="name">
-                                            <cstring>rbTimeStepper</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>Time stepper</string>
-                                        </property>
-                                        <property name="buttonGroupId">
-                                            <number>0</number>
-                                        </property>
-                                    </widget>
-                                    <widget class="QRadioButton">
-                                        <property name="name">
-                                            <cstring>rbFixed</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>Fixed step</string>
-                                        </property>
-                                        <property name="buttonGroupId">
-                                            <number>2</number>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QLayoutWidget" row="0" column="0">
+                            <widget class="QLayoutWidget">
                                 <property name="name">
                                     <cstring>layout6</cstring>
                                 </property>
@@ -404,76 +346,26 @@
                                     </widget>
                                 </hbox>
                             </widget>
-                            <widget class="QLayoutWidget" row="4" column="0">
+                            <widget class="QLabel">
                                 <property name="name">
-                                    <cstring>layout4</cstring>
+                                    <cstring>tlCurrentSimulation</cstring>
                                 </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer1</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QSpinBox">
-                                        <property name="name">
-                                            <cstring>sbSecond</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="value">
-                                            <number>40</number>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>tl10Power</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>×10</string>
-                                        </property>
-                                        <property name="alignment">
-                                            <set>AlignVCenter|AlignRight</set>
-                                        </property>
-                                    </widget>
-                                    <widget class="QSpinBox">
-                                        <property name="name">
-                                            <cstring>sb10PowerSecond</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="maxValue">
-                                            <number>20</number>
-                                        </property>
-                                        <property name="minValue">
-                                            <number>-20</number>
-                                        </property>
-                                        <property name="value">
-                                            <number>-3</number>
-                                        </property>
-                                    </widget>
-                                </hbox>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>7</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>...</string>
+                                </property>
+                                <property name="alignment">
+                                    <set>AlignCenter</set>
+                                </property>
                             </widget>
-                            <widget class="QFrame" row="2" column="0">
+                            <widget class="QFrame">
                                 <property name="name">
                                     <cstring>frame5</cstring>
                                 </property>
@@ -635,26 +527,80 @@
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QLabel" row="1" column="0">
+                            <widget class="QButtonGroup">
                                 <property name="name">
-                                    <cstring>tlCurrentSimulation</cstring>
+                                    <cstring>timestep</cstring>
                                 </property>
                                 <property name="sizePolicy">
                                     <sizepolicy>
-                                        <hsizetype>7</hsizetype>
-                                        <vsizetype>0</vsizetype>
+                                        <hsizetype>3</hsizetype>
+                                        <vsizetype>3</vsizetype>
                                         <horstretch>0</horstretch>
                                         <verstretch>0</verstretch>
                                     </sizepolicy>
                                 </property>
-                                <property name="text">
-                                    <string>...</string>
+                                <property name="frameShadow">
+                                    <enum>Sunken</enum>
                                 </property>
-                                <property name="alignment">
-                                    <set>AlignCenter</set>
+                                <property name="lineWidth">
+                                    <number>1</number>
                                 </property>
+                                <property name="title">
+                                    <string>timestep</string>
+                                </property>
+                                <property name="flat">
+                                    <bool>false</bool>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QRadioButton">
+                                        <property name="name">
+                                            <cstring>rbTimeStepper</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>Time stepper</string>
+                                        </property>
+                                        <property name="buttonGroupId">
+                                            <number>0</number>
+                                        </property>
+                                    </widget>
+                                    <widget class="QRadioButton">
+                                        <property name="name">
+                                            <cstring>rbFixed</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="text">
+                                            <string>Fixed step</string>
+                                        </property>
+                                        <property name="buttonGroupId">
+                                            <number>2</number>
+                                        </property>
+                                    </widget>
+                                </vbox>
                             </widget>
-                        </grid>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>layout7</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>leTimestep</cstring>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                        </vbox>
                     </widget>
                 </grid>
             </widget>
@@ -917,18 +863,6 @@
         <slot>pbOneSimulationStepClicked()</slot>
     </connection>
     <connection>
-        <sender>sbSecond</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>QtGeneratedSimulationController</receiver>
-        <slot>sbSecondValueChanged(int)</slot>
-    </connection>
-    <connection>
-        <sender>sb10PowerSecond</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>QtGeneratedSimulationController</receiver>
-        <slot>sb10PowerSecondValueChanged(int)</slot>
-    </connection>
-    <connection>
         <sender>sbRefreshTime</sender>
         <signal>valueChanged(int)</signal>
         <receiver>QtGeneratedSimulationController</receiver>
@@ -1012,6 +946,12 @@
         <receiver>QtGeneratedSimulationController</receiver>
         <slot>pbGenerate_clicked()</slot>
     </connection>
+    <connection>
+        <sender>leTimestep</sender>
+        <signal>returnPressed()</signal>
+        <receiver>QtGeneratedSimulationController</receiver>
+        <slot>leTimestep_returnPressed()</slot>
+    </connection>
 </connections>
 <includes>
     <include location="local" impldecl="in implementation">QtGeneratedSimulationController.ui.h</include>
@@ -1032,8 +972,6 @@
     <slot>pbCenterSceneClicked()</slot>
     <slot>pbOneSimulationStepClicked()</slot>
     <slot>bgTimeStepClicked( int )</slot>
-    <slot>sbSecondValueChanged( int )</slot>
-    <slot>sb10PowerSecondValueChanged( int )</slot>
     <slot>pbSaveClicked()</slot>
     <slot>sbRefreshvalueChanged( int )</slot>
     <slot>sbRefreshValueChanged( int )</slot>
@@ -1047,6 +985,7 @@
     <slot>pbZXY_clicked()</slot>
     <slot>pyOnelinerEnter()</slot>
     <slot>pbGenerate_clicked()</slot>
+    <slot>leTimestep_returnPressed()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

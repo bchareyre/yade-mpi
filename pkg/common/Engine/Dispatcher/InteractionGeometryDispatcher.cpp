@@ -29,12 +29,12 @@ shared_ptr<Interaction> InteractionGeometryDispatcher::explicitAction(const shar
 	if(force){
 		assert(b1->shape && b2->shape);
 		shared_ptr<Interaction> i(new Interaction(b1->getId(),b2->getId()));
-		bool op=operator()(b1->shape,b2->shape,*b1->state,*b2->state,/*shift2*/Vector3r::ZERO,/*force*/true,i);
+		bool op=operator()(b1->shape,b2->shape,*b1->state,*b2->state,/*shift2*/Vector3r::Zero(),/*force*/true,i);
 		if(!op) throw runtime_error("InteractionGeometryDispatcher::explicitAction could not dispatch for given types ("+b1->shape->getClassName()+","+b2->shape->getClassName()+") or the dispatchee returned false (it was asked to force creation of InteractionGeometry; that would a bug).");
 		return i;
 	} else {
 		shared_ptr<Interaction> interaction(new Interaction(b1->getId(),b2->getId()));
-		b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::ZERO, /*force*/ false, interaction );
+		b1->shape && b2->shape && operator()( b1->shape , b2->shape , *b1->state , *b2->state , Vector3r::Zero(), /*force*/ false, interaction );
 		return interaction;
 	}
 }
@@ -71,7 +71,7 @@ void InteractionGeometryDispatcher::action(){
 			if (!b1->shape || !b2->shape) { assert(!wasReal); continue; } // some bodies do not have shape
 			bool geomCreated;
 			if(!scene->isPeriodic){
-				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/ false, I);
+				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/ false, I);
 			} else{
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]); // add periodicity to the position of the 2nd body
 				geomCreated=operator()(b1->shape, b2->shape, *b1->state, *b2->state, shift2, /*force*/ false, I);

@@ -131,8 +131,8 @@ void serialize(Archive & ar, Vector3<int> & g, const unsigned int version){
 template<class Archive>
 void serialize(Archive & ar, Quaternionr & g, const unsigned int version)
 {
-	Real &x=g[0], &y=g[1], &z=g[2], &w=g[2];
-	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z) & BOOST_SERIALIZATION_NVP(w);
+	Real &w=g.w(), &x=g.x(), &y=g.y(), &z=g.z();
+	ar & BOOST_SERIALIZATION_NVP(w) & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
 }
 
 template<class Archive>

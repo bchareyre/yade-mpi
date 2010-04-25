@@ -94,8 +94,8 @@ class Cell: public Serializable{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY
 		(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		((Vector3r,refSize,Vector3r(1,1,1),"[will be overridden below]"))
-		((Matrix3r,trsf,Matrix3r::IDENTITY,"[will be overridden below]"))
-		((Matrix3r,velGrad,Matrix3r::ZERO,"Velocity gradient of the transformation; used in NewtonIntegrator.")),
+		((Matrix3r,trsf,Matrix3r::Identity(),"[will be overridden below]"))
+		((Matrix3r,velGrad,Matrix3r::Zero(),"Velocity gradient of the transformation; used in NewtonIntegrator.")),
 
 		/*ctor*/ integrateAndUpdate(0),
 

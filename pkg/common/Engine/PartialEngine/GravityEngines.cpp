@@ -50,7 +50,7 @@ void AxialGravityEngine::action(){
 		const Vector3r& x0=b->state->pos;
 		const Vector3r& x1=axisPoint;
 		const Vector3r x2=axisPoint+axisDirection;
-		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).Dot(x2-x1))/((x2-x1).SquaredLength());
+		Vector3r closestAxisPoint=(x2-x1) * /* t */ (-(x1-x0).dot(x2-x1))/((x2-x1).squaredNorm());
 		Vector3r toAxis=closestAxisPoint-x0; toAxis.Normalize();
 		scene->forces.addForce(b->getId(),acceleration*b->state->mass*toAxis);
 	}

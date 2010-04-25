@@ -19,14 +19,15 @@ bool Ig2_Sphere_Sphere_ScGeom::go(	const shared_ptr<Shape>& cm1,
 
 	Sphere *s1=static_cast<Sphere*>(cm1.get()), *s2=static_cast<Sphere*>(cm2.get());
 	Vector3r normal=(se32.position+shift2)-se31.position;
-	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.SquaredLength();
+	Real penetrationDepthSq=pow(interactionDetectionFactor*(s1->radius+s2->radius),2) - normal.squaredNorm();
 	if (penetrationDepthSq>0 || c->isReal() || force){
 		shared_ptr<ScGeom> scm;
 		bool isNew=c->interactionGeometry;
 		if(c->interactionGeometry) scm=YADE_PTR_CAST<ScGeom>(c->interactionGeometry);
 		else { scm=shared_ptr<ScGeom>(new ScGeom()); c->interactionGeometry=scm; }
 
-		Real penetrationDepth=s1->radius+s2->radius-normal.Normalize(); /* Normalize() works in-place and returns length before normalization; from here, normal is unit vector */
+		Real norm=normal.norm(); normal/=norm; // normal is unit vector now
+		Real penetrationDepth=s1->radius+s2->radius-norm;
 		scm->contactPoint=se31.position+(s1->radius-0.5*penetrationDepth)*normal;//0.5*(pt1+pt2);
 		#ifdef SCG_SHEAR
 			if(isNew) scm->prevNormal=normal; 

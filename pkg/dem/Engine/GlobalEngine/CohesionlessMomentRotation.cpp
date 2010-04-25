@@ -45,11 +45,11 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 
 
 	/// Here is the code with approximated rotations ///
-	axis	 = phys->prevNormal.Cross(geom->normal);  //axis of rotation between previous and current
-	shearForce -= shearForce.Cross(axis); //minus shearForce that is perpendicular (outward) to contact (not tangent)
-	angle 	= dt*0.5*geom->normal.Dot(Body::byId(id1)->state->angVel+Body::byId(id2)->state->angVel); 
+	axis	 = phys->prevNormal.cross(geom->normal);  //axis of rotation between previous and current
+	shearForce -= shearForce.cross(axis); //minus shearForce that is perpendicular (outward) to contact (not tangent)
+	angle 	= dt*0.5*geom->normal.dot(Body::byId(id1)->state->angVel+Body::byId(id2)->state->angVel); 
 	axis 	= angle*geom->normal;
-	shearForce -= shearForce.Cross(axis); //minus shearForce that is perpendicular outward to contact (not tangent)
+	shearForce -= shearForce.cross(axis); //minus shearForce that is perpendicular outward to contact (not tangent)
 
 	/// Here is the code with exact rotations 		 ///
 	//Quaternionr q;
@@ -84,8 +84,8 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 		_c2x_ = c2x;
 	}
 
-	Vector3r relativeVelocity	= (b2->state->vel + b2->state->angVel.Cross(_c2x_)) - (b1->state->vel + b1->state->angVel.Cross(_c1x_));
-	Vector3r shearVelocity=relativeVelocity- geom->normal.Dot(relativeVelocity)*geom->normal; //1st find the scalar value of normal velocity.  Then change it to a vector.  Then minus.
+	Vector3r relativeVelocity	= (b2->state->vel + b2->state->angVel.cross(_c2x_)) - (b1->state->vel + b1->state->angVel.cross(_c1x_));
+	Vector3r shearVelocity=relativeVelocity- geom->normal.dot(relativeVelocity)*geom->normal; //1st find the scalar value of normal velocity.  Then change it to a vector.  Then minus.
 	Vector3r shearDisplacement	= shearVelocity*dt; //in Dem3DofGeom displacementT() is cumulative
 	shearForce -= phys->ks*shearDisplacement; //shearForce is cumulative here because shearDisplacement is not cumulative.  See CundallStrack.hpp, it is different!
       
@@ -95,12 +95,12 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 
 	/* Coulomb's Law */
 	Real maxFs = 0;
-        Real Fs = shearForce.Length(); //scalar
+        Real Fs = shearForce.norm(); //scalar
 	maxFs = std::max((Real) 0, Fn*phys->tanFrictionAngle); //Fn is scalar
       	if ( Fs  > maxFs )
 	{
 	shearForce *= maxFs/Fs;
-	//if ( Fn<0 )  phys->normalForce = Vector3r::ZERO;
+	//if ( Fn<0 )  phys->normalForce = Vector3r::Zero();
 	}
 
 	phys->shearForce = shearForce; //for recording purposes
@@ -109,11 +109,11 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 	Vector3r f = phys->normalForce + shearForce;
 	rootBody->forces.addForce (id1,-f);
 	rootBody->forces.addForce (id2, f);
-	rootBody->forces.addTorque(id1,-(c1x).Cross(f)); //about axis perpendicular to normal and force
-	rootBody->forces.addTorque(id2, c2x.Cross(f));
+	rootBody->forces.addTorque(id1,-(c1x).cross(f)); //about axis perpendicular to normal and force
+	rootBody->forces.addTorque(id2, c2x.cross(f));
 
 	/* Moment Rotation Law */
-	Quaternionr delta( b1->state->ori * phys->initialOrientation1.Conjugate() *phys->initialOrientation2 * b2->state->ori.Conjugate()); //relative orientation
+	Quaternionr delta( b1->state->ori * phys->initialOrientation1.conjugate() *phys->initialOrientation2 * b2->state->ori.conjugate()); //relative orientation
 	Vector3r axisM;	// axis of rotation - this is the Moment direction UNIT vector.
 	Real angleM;	// angle represents the power of resistant ELASTIC moment
 	delta.ToAxisAngle(axisM,angleM);
@@ -125,7 +125,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 	
 
 	//Find angle*axis. That's all.  But first find angle about contact normal. Result is scalar. Axis is contact normal.
-	Real angle_twist(angleM * axisM.Dot(geom->normal) ); //rotation about normal
+	Real angle_twist(angleM * axisM.dot(geom->normal) ); //rotation about normal
 	Vector3r axis_twist(angle_twist * geom->normal);
 	Vector3r moment_twist(axis_twist * phys->kr);
 	
@@ -135,7 +135,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 
 	Real radiusm = 0.5*(geom->radius1 + geom->radius2); //radius is used here
 	Real MomentMax = phys->Eta * radiusm* std::fabs(Fn);
-	Real scalarMoment = moment.Length();
+	Real scalarMoment = moment.norm();
 
 
 	if(scalarMoment > MomentMax) /*Plastic moment */

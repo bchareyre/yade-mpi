@@ -28,18 +28,18 @@ void KinemCTDEngine::action()
 	boxbas = Body::byId(id_boxbas);
 
 // Computation of the current dimensions of the box : //
-	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
+	Real Xleft = leftbox->state->pos.x() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.x();
 
-	Real Xright = rightbox->state->pos.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
+	Real Xright = rightbox->state->pos.x() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.x();
 
-	Real Zfront = frontbox->state->pos.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
-	Real Zback = backbox->state->pos.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
+	Real Zfront = frontbox->state->pos.z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.z();
+	Real Zback = backbox->state->pos.z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.z();
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 // End of computation of the current dimensions of the box //
 
 	scene->forces.sync(); Vector3r F_sup=scene->forces.getForce(id_topbox);
-	Real current_NormalForce=(scene->forces.getForce(id_topbox)).Y();
+	Real current_NormalForce=(scene->forces.getForce(id_topbox)).y();
 	current_sigma=current_NormalForce/(1000.0*Scontact);	// so we have the current value of sigma, in kPa
 
 	if( ((compSpeed > 0) && (current_sigma < target_sigma)) || ((compSpeed < 0) && (current_sigma > target_sigma)) )
@@ -90,8 +90,8 @@ void KinemCTDEngine::letMove()
 		,dgamma=0
 		;
 
-	Real Ysup = topbox->state->pos.Y();
-	Real Ylat = leftbox->state->pos.Y();
+	Real Ysup = topbox->state->pos.y();
+	Real Ylat = leftbox->state->pos.y();
 
 // 	Changes in vertical and horizontal position :
 
@@ -100,8 +100,8 @@ void KinemCTDEngine::letMove()
 	leftbox->state->pos += Vector3r(dgamma/2.0,dh/2.0,0);
 	rightbox->state->pos += Vector3r(dgamma/2.0,dh/2.0,0);
 
-	Real Ysup_mod = topbox->state->pos.Y();
-	Real Ylat_mod = leftbox->state->pos.Y();
+	Real Ysup_mod = topbox->state->pos.y();
+	Real Ylat_mod = leftbox->state->pos.y();
 
 //	with the corresponding velocities :
 	topbox->state->vel = Vector3r(dgamma/dt,dh/dt,0);

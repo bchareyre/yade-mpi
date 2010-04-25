@@ -39,7 +39,7 @@ bool Ig2_Box_Sphere_ScGeom::go(
 
 	// FIXME: do we need rotation matrix? Can't quaternion do just fine?
 	Matrix3r boxAxisT; se31.orientation.ToRotationMatrix(boxAxisT); 
-	Matrix3r boxAxis = boxAxisT.Transpose();
+	Matrix3r boxAxis = boxAxisT.transpose();
 	
 	Vector3r relPos21 = se32.position-se31.position; // relative position of centroids
 	
@@ -100,14 +100,14 @@ bool Ig2_Box_Sphere_ScGeom::go(
 		//(in the direction of penetration, which is normal to the box surface closest to sphere center) of overlapping volumes
 		scm->contactPoint = 0.5*(pt1+pt2);
 		scm->normal = pt1-pt2; scm->normal.Normalize();
-		scm->penetrationDepth = (pt1-pt2).Length();
+		scm->penetrationDepth = (pt1-pt2).norm();
 		scm->radius1 = s->radius;
 		scm->radius2 = s->radius;
 		c->interactionGeometry = scm;
 	} else { // outside
 		Vector3r cOnBox_box = boxAxisT*cOnBox_boxLocal; // projection of sphere's center on closest box surface - relative to box's origin, but GLOBAL orientation!
 		Vector3r cOnBox_sphere = cOnBox_box-relPos21; // same, but origin in sphere's center
-		depth=s->radius-cOnBox_sphere.Length();
+		depth=s->radius-cOnBox_sphere.norm();
 		if (depth<0 && !c->isReal() && !force) return false;
 
 		/*

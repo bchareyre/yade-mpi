@@ -33,6 +33,8 @@ class SimulationController : public QtGeneratedSimulationController
 		bool syncRunning;
 		bool hasSimulation;
 		long lastRenderedIteration;
+		// first update in current simulation (do not trigger dt change based on gui value)
+		bool initUpdate;
 
 		const int iterPerSec_TTL_ms;
 		long  iterPerSec_LastIter;
@@ -51,7 +53,6 @@ class SimulationController : public QtGeneratedSimulationController
 		QFrame * scrollViewFrame;
 		QVBoxLayout* scrollViewLayout;
 		void addNewView();
-		void dtIntegerMantissaExponent(int& mantissa, int& exponent);
 
 	
 	public : 
@@ -73,8 +74,6 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void pbCenterSceneClicked();
 		virtual void pbOneSimulationStepClicked();
 		virtual void bgTimeStepClicked(int i);
-		virtual void sb10PowerSecondValueChanged(int);
-		virtual void sbSecondValueChanged(int);
 		virtual void sbRefreshValueChanged(int);
 		virtual void cbSyncToggled(bool);
 		virtual void pbStart2Clicked();
@@ -83,6 +82,7 @@ class SimulationController : public QtGeneratedSimulationController
 		virtual void pbZXY_clicked();
 		virtual void pbGenerate_clicked();
 		virtual void pyOnelinerEnter();
+		virtual void leTimestep_returnPressed();
 
 		void keyPressEvent(QKeyEvent *event);
 

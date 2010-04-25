@@ -384,12 +384,12 @@ Real LatticeExampleCTData::calcBeamPositionOrientationLength(
 		beam->bendingStiffness          = k_b;
 		beam->torsionalStiffness        = k_t;
 		
-		se3Beam.orientation.Align( Vector3r::UNIT_X , dist );
+		se3Beam.orientation.Align( Vector3r::UnitX() , dist );
 		beam->se3 		= se3Beam;
 		beam->se3Displacement.position 	= Vector3r(0.0,0.0,0.0);
 		beam->se3Displacement.orientation.Align(dist,dist);
 
-		beam->otherDirection	= beam->se3.orientation*Vector3r::UNIT_Y; // any unit vector that is orthogonal to direction.
+		beam->otherDirection	= beam->se3.orientation*Vector3r::UnitY(); // any unit vector that is orthogonal to direction.
 
 		return length;
 	}

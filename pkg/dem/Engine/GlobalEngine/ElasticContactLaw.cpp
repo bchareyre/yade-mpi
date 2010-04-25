@@ -40,7 +40,7 @@ Real Law2_ScGeom_FrictPhys_Basic::elasticEnergy()
 		if(!I->isReal()) continue;
 		FrictPhys* phys = dynamic_cast<FrictPhys*>(I->interactionPhysics.get());
 		if(phys) {
-			energy += 0.5*(phys->normalForce.SquaredLength()/phys->kn + phys->shearForce.SquaredLength()/phys->ks);}
+			energy += 0.5*(phys->normalForce.squaredNorm()/phys->kn + phys->shearForce.squaredNorm()/phys->ks);}
 	}
 	return energy;
 }
@@ -54,8 +54,8 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());
 	if(currentContactGeometry->penetrationDepth <0){
 		if (neverErase) {
-			currentContactPhysics->shearForce = Vector3r::ZERO;
-			currentContactPhysics->normalForce = Vector3r::ZERO;}
+			currentContactPhysics->shearForce = Vector3r::Zero();
+			currentContactPhysics->normalForce = Vector3r::Zero();}
 		else 	ncb->interactions->requestErase(id1,id2);
 		return;}
 	State* de1 = Body::byId(id1,ncb)->state.get();
@@ -72,10 +72,10 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 		} else {
 			currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);}
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
-		Real maxFs = currentContactPhysics->normalForce.SquaredLength()*
+		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-		if( shearForce.SquaredLength() > maxFs ){
-			Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+		if( shearForce.squaredNorm() > maxFs ){
+			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
 			shearForce *= ratio;
 			if(useShear) currentContactGeometry->shear*=ratio;}
 	} else {//almost the same with 2 additional Vector3r instanciated for energy tracing, duplicated block to make sure there is no cost for the instanciation of the vectors when traceEnergy==false
@@ -88,14 +88,14 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 		Vector3r shearDisp = currentContactGeometry->updateShearForce(shearForce,currentContactPhysics->ks,currentContactPhysics->prevNormal,de1,de2,dt);
  		//}
 		// PFC3d SlipModel, is using friction angle. CoulombCriterion
-		Real maxFs = currentContactPhysics->normalForce.SquaredLength()*
+		Real maxFs = currentContactPhysics->normalForce.squaredNorm()*
 			std::pow(currentContactPhysics->tangensOfFrictionAngle,2);
-		if( shearForce.SquaredLength() > maxFs ){
-			Real ratio = Mathr::Sqrt(maxFs) / shearForce.Length();
+		if( shearForce.squaredNorm() > maxFs ){
+			Real ratio = Mathr::Sqrt(maxFs) / shearForce.norm();
 			//define the plastic work input and increment the total plastic energy dissipated
 			plasticDissipation +=
 			(shearDisp+(1/currentContactPhysics->ks)*(shearForce-prevForce))//plastic disp.
-			.Dot(shearForce);//active force
+			.dot(shearForce);//active force
 			shearForce *= ratio;
 			//if(useShear) currentContactGeometry->shear*=ratio;
 		}
@@ -111,9 +111,9 @@ void Law2_Dem3DofGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, s
 	Real displN=geom->displacementN();
 	if(displN>0){ scene->interactions->requestErase(contact->getId1(),contact->getId2()); return; }
 	phys->normalForce=phys->kn*displN*geom->normal;
-	Real maxFsSq=phys->normalForce.SquaredLength()*pow(phys->tangensOfFrictionAngle,2);
+	Real maxFsSq=phys->normalForce.squaredNorm()*pow(phys->tangensOfFrictionAngle,2);
 	Vector3r trialFs=phys->ks*geom->displacementT();
-	if(trialFs.SquaredLength()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)/phys->ks); trialFs*=sqrt(maxFsSq/(trialFs.SquaredLength()));}
+	if(trialFs.squaredNorm()>maxFsSq){ geom->slipToDisplacementTMax(sqrt(maxFsSq)/phys->ks); trialFs*=sqrt(maxFsSq/(trialFs.squaredNorm()));}
 	phys->shearForce=trialFs;
 	applyForceAtContactPoint(phys->normalForce+trialFs,geom->contactPoint,contact->getId1(),geom->se31.position,contact->getId2(),geom->se32.position,scene);
 }

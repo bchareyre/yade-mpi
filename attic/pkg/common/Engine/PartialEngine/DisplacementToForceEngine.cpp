@@ -10,7 +10,7 @@
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/ParticleParameters.hpp>
 
-DisplacementToForceEngine::DisplacementToForceEngine() : targetForce(Vector3r::ZERO), targetForceMask(Vector3r::ZERO) 
+DisplacementToForceEngine::DisplacementToForceEngine() : targetForce(Vector3r::Zero()), targetForceMask(Vector3r::Zero()) 
 {
 	direction=1.0;
 	old_direction=1.0;

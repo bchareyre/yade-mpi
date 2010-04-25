@@ -79,7 +79,7 @@ class VelocityBins{
 	// to ensure that the same formulas are used (once we have angularVelocity + Aabb span,
 	// for instance
 	static Real getBodyVelSq(const State* state){
-		return state->vel.SquaredLength();
+		return state->vel.squaredNorm();
 	}
 
 	DECLARE_LOGGER;

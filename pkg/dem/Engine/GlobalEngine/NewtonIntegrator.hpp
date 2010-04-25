@@ -74,7 +74,7 @@ class NewtonIntegrator : public GlobalEngine{
 		((vector<shared_ptr<BodyCallback> >,callbacks,,"List (std::vector in c++) of :yref:`BodyCallbacks<BodyCallback>` which will be called for each body as it is being processed."))
 		,
 		/*ctor*/
-			prevCellSize=Vector3r::ZERO;
+			prevCellSize=Vector3r::Zero();
 			#ifdef YADE_OPENMP
 				threadMaxVelocitySq.resize(omp_get_max_threads());
 			#endif

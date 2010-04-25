@@ -13,7 +13,7 @@ class GravityEngine: public FieldApplier{
 	public:
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GravityEngine,FieldApplier,"Engine applying constant acceleration to all bodies.",
-		((Vector3r,gravity,Vector3r::ZERO,"Acceleration [kgms⁻²]"))
+		((Vector3r,gravity,Vector3r::Zero(),"Acceleration [kgms⁻²]"))
 		,/*ctor*/,/*py*/
 	);
 };
@@ -43,8 +43,8 @@ class AxialGravityEngine: public FieldApplier {
 	public:
 	virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(AxialGravityEngine,FieldApplier,"Apply acceleration (independent of distance) directed towards an axis.",
-		((Vector3r,axisPoint,Vector3r::ZERO,"Point through which the axis is passing."))
-		((Vector3r,axisDirection,Vector3r::UNIT_X,"direction of the gravity axis (will be normalized automatically)"))
+		((Vector3r,axisPoint,Vector3r::Zero(),"Point through which the axis is passing."))
+		((Vector3r,axisDirection,Vector3r::UnitX(),"direction of the gravity axis (will be normalized automatically)"))
 		((Real,acceleration,0,"Acceleration magnitude [kgms⁻²]"))
 	);
 };

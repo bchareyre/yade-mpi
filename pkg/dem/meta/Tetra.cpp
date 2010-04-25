@@ -419,7 +419,7 @@ void TetraVolumetricLaw::action()
 			Vector3r center = (t->v[0]+t->v[1]+t->v[2]+t->v[3])*.25, faceCenter, n;
 			glDisable(GL_CULL_FACE); glEnable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
-				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).UnitCross(t->v[c]-t->v[a]); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
+				#define __ONEFACE(a,b,c) n=(t->v[b]-t->v[a]).cross(t->v[c]-t->v[a]); n.normalize(); faceCenter=(t->v[a]+t->v[b]+t->v[c])/3.; if((faceCenter-center).Dot(n)<0)n=-n; glNormal3v(n); glVertex3v(t->v[a]); glVertex3v(t->v[b]); glVertex3v(t->v[c]);
 					__ONEFACE(3,0,1);
 					__ONEFACE(0,1,2);
 					__ONEFACE(1,2,3);
@@ -568,7 +568,7 @@ Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody){
 	Matrix3r I_old=TetrahedronInertiaTensor(tMold->v); //≡TetrahedronCentralInertiaTensor
 	Matrix3r I_rot(true), I_new(true); 
 	I_old.EigenDecomposition(I_rot,I_new);
-	Quaternionr I_Qrot; I_Qrot.FromRotationMatrix(I_rot);
+	Quaternionr I_Qrot(I_rot);
 	//! @fixme from right to left: rotate by I_rot, then add original rotation (?!!)
 	rbp->se3.orientation=rbp->se3.orientation*I_Qrot;
 	for(size_t i=0; i<4; i++){

@@ -71,7 +71,7 @@ class RpmPhys: public NormShearPhys {
 			((Real,lengthMaxCompression,0,"Maximal penetration of particles during compression. If it is more, the interaction is deleted [m]"))
 			((Real,lengthMaxTension,0,"Maximal distance between particles during tension. If it is more, the interaction is deleted [m]"))
 			,
-			/*ctor*/createIndex(); epsT=Vector3r::ZERO; omega=0; Fn=0; Fs=Vector3r::ZERO;
+			/*ctor*/createIndex(); epsT=Vector3r::Zero(); omega=0; Fn=0; Fs=Vector3r::Zero();
 		);
 	REGISTER_CLASS_INDEX(RpmPhys,NormShearPhys);
 };

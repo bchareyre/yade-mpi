@@ -73,8 +73,8 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			CGT::Sphere sp(CGT::Point(pos[0],pos[1],pos[2]),rad*rad);
 			spheres.push_back(sp);
 			pointsPtrs.push_back(std::make_pair(&(spheres[Ng]/*.point()*/),(*bi)->getId()));
-			TW.Pmin = CGT::Point(min(TW.Pmin.x(),pos.X()-rad),min(TW.Pmin.y(), pos.Y()-rad),min(TW.Pmin.z(), pos.Z()-rad));
-			TW.Pmax = CGT::Point(max(TW.Pmax.x(),pos.X()+rad),max(TW.Pmax.y(),pos.Y()+rad),max(TW.Pmax.z(),pos.Z()+rad));
+			TW.Pmin = CGT::Point(min(TW.Pmin.x(),pos.x()-rad),min(TW.Pmin.y(), pos.y()-rad),min(TW.Pmin.z(), pos.z()-rad));
+			TW.Pmax = CGT::Point(max(TW.Pmax.x(),pos.x()+rad),max(TW.Pmax.y(),pos.y()+rad),max(TW.Pmax.z(),pos.z()+rad));
 			Ng++; TW.mean_radius += rad;
 			MaxId = max(MaxId,(*bi)->getId());
 		}

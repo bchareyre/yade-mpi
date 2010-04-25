@@ -94,9 +94,9 @@ void Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<InteractionGeometry>& ig, sh
 
  
 	/*** MOHR-COULOMB LAW ***/
-	Real maxFs = phys->normalForce.SquaredLength();
-	if (trialFs.SquaredLength() > maxFs)
-	{Real ratio = Mathr::Sqrt(maxFs)/trialFs.Length(); trialFs *= ratio;}
+	Real maxFs = phys->normalForce.squaredNorm();
+	if (trialFs.squaredNorm() > maxFs)
+	{Real ratio = Mathr::Sqrt(maxFs)/trialFs.norm(); trialFs *= ratio;}
 	phys->shearForce = trialFs; // store shearForce now that is at the actual value
 
 

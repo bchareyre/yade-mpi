@@ -63,9 +63,9 @@ class CFpmPhys: public NormShearPhys {
 		  ((Real,cumulativeRotation,0,"Cumulated rotation... [-]"))
 		  ((Real,kr,0,"Defines the stiffness to compute the resistive moment in rotation. [-]"))
 		  ((Real,maxBend,0,"Defines the maximum admissible resistive moment in rotation Mtmax=maxBend*Fn, maxBend=eta*meanRadius. [m]"))
-		  ((Vector3r,prevNormal,Vector3r::ZERO,"Normal to the contact at previous time step."))
-		  ((Vector3r,moment_twist,Vector3r::ZERO," [N.m]"))
-		  ((Vector3r,moment_bending,Vector3r::ZERO," [N.m]"))
+		  ((Vector3r,prevNormal,Vector3r::Zero(),"Normal to the contact at previous time step."))
+		  ((Vector3r,moment_twist,Vector3r::Zero()," [N.m]"))
+		  ((Vector3r,moment_bending,Vector3r::Zero()," [N.m]"))
 		  ((Quaternionr,initialOrientation1,Quaternionr(1.0,0.0,0.0,0.0),"Used for moment computation."))
 		  ((Quaternionr,initialOrientation2,Quaternionr(1.0,0.0,0.0,0.0),"Used for moment computation."))
 		  ,

@@ -93,7 +93,7 @@ void Clump::moveMembers(){
 
 		//! FIXME: we set velocity because of damping here; but since positions are integrated after all forces applied, these velocities will be used in the NEXT step for CundallNonViscousDamping. Does that matter?!
 		//subState->vel=state->vel+state->angVel.Cross(I->second.position);
-		subState->vel=state->vel+state->angVel.Cross(subState->pos-state->pos);
+		subState->vel=state->vel+state->angVel.cross(subState->pos-state->pos);
 		subState->angVel=state->angVel;
 	}
 	/* @bug Temporarily we reset acceleration and angularAcceleration of the clump here;
@@ -110,7 +110,7 @@ void Clump::moveMembers(){
 		}
 	#endif
 
-	state->accel=state->angAccel=Vector3r::ZERO;
+	state->accel=state->angAccel=Vector3r::Zero();
 }
 
 /*! Clump's se3 will be updated (origin at centroid and axes coincident with principal inertia axes) and subSe3 modified in such a way that members positions in world coordinates will not change.
@@ -169,11 +169,11 @@ void Clump::updateProperties(bool intersecting){
 		state->pos=subState->pos;
 		state->ori=subState->ori;
 		// relative member's se3 is identity
-		I->second.position=Vector3r::ZERO; I->second.orientation=Quaternionr::IDENTITY;
+		I->second.position=Vector3r::Zero(); I->second.orientation=Quaternionr::Identity();
 		state->inertia=subState->inertia;	
 		state->mass=subState->mass;
-		state->vel=Vector3r::ZERO;
-		state->angVel=Vector3r::ZERO;
+		state->vel=Vector3r::Zero();
+		state->angVel=Vector3r::Zero();
 		return;
 	}
 
@@ -192,7 +192,7 @@ void Clump::updateProperties(bool intersecting){
 			Sg+=subState->mass*subState->pos;
 			// transform from local to global coords
 			// FIXME: verify this!
-			Quaternionr subState_orientation_conjugate=subState->ori.Conjugate();
+			Quaternionr subState_orientation_conjugate=subState->ori.conjugate();
 			Matrix3r Imatrix(subState->inertia[0],subState->inertia[1],subState->inertia[2]);
 			// TRWM3MAT(Imatrix); TRWM3QUAT(subRBP_orientation_conjugate);
 			Ig+=Clump::inertiaTensorTranslate(Clump::inertiaTensorRotate(Imatrix,subState_orientation_conjugate),subState->mass,-1.*subState->pos);
@@ -224,7 +224,7 @@ void Clump::updateProperties(bool intersecting){
 	//TRWM3MAT(Clump::inertiaTensorRotate(Ic_orientG,R_g2c));
 
 	// set quaternion from rotation matrix
-	state->ori.FromRotationMatrix(R_g2c);
+	state->ori=Quaternionr(R_g2c);
 	// now Ic is diagonal
 	state->inertia=Vector3r(Ic(0,0),Ic(1,1),Ic(2,2));
 	state->mass=M;
@@ -240,13 +240,13 @@ void Clump::updateProperties(bool intersecting){
 			shared_ptr<Body> subBody=Body::byId(I->first);
 			state->inertia=subBody->state->inertia*10.; // 10 is arbitrary; just to have inertia of clump bigger
 			// orientation of the clump is broken as well, since is result of EigenDecomposition as well (rotation matrix)
-			state->ori.FromRotationMatrix(Matrix3r(1,0,0,0,1,0,0,0,1));
+			state->ori=Quaternionr::IDENTITY;
 		}
 	#endif
 	TRWM3VEC(state->inertia);
 
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
-	state->vel=state->angVel=Vector3r::ZERO;
+	state->vel=state->angVel=Vector3r::Zero();
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
 	// Conjugate is equivalent to Inverse for normalized quaternions
@@ -255,8 +255,8 @@ void Clump::updateProperties(bool intersecting){
 		shared_ptr<Body> subBody=Body::byId(I->first);
 		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
 		State* subState=subBody->state.get();
-		I->second.orientation=state->ori.Conjugate()*subState->ori;
-		I->second.position=state->ori.Conjugate()*(subState->pos-state->pos);
+		I->second.orientation=state->ori.conjugate()*subState->ori;
+		I->second.position=state->ori.conjugate()*(subState->pos-state->pos);
 	}
 
 }
@@ -269,7 +269,7 @@ void Clump::updateProperties(bool intersecting){
  * @return inertia tensor in the new coordinate system; the matrix is symmetric.
  */
 Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vector3r& off){
-	Real ooff=off.Dot(off);
+	Real ooff=off.dot(off);
 	Matrix3r I2=I;
 	//TRWM3VEC(off); TRVAR2(ooff,m); TRWM3MAT(I);
 	// translation away from centroid
@@ -291,7 +291,7 @@ Matrix3r Clump::inertiaTensorTranslate(const Matrix3r& I,const Real m, const Vec
 Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I,const Matrix3r& T){
 	/* [http://www.kwon3d.com/theory/moi/triten.html] */
 	//TRWM3MAT(I); TRWM3MAT(T);
-	return T.Transpose()*I*T;
+	return T.transpose()*I*T;
 }
 
 /*! @brief Recalculate body's inertia tensor in rotated coordinates.

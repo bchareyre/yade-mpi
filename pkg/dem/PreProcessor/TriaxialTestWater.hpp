@@ -96,8 +96,7 @@ class TriaxialTestWater : public FileGenerator
 				,internalCompaction
 				,water
 				,fusionDetection
-				,binaryFusion
-				,saveAnimationSnapshots;
+				,binaryFusion;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval
@@ -113,7 +112,6 @@ class TriaxialTestWater : public FileGenerator
 				,wall_back_id;*/
 		
 		string		importFilename
-				,AnimationSnapshotsBaseName
 				,WallStressRecordFile
 				,capillaryStressRecordFile
 				,contactStressRecordFile
@@ -184,8 +182,6 @@ class TriaxialTestWater : public FileGenerator
 	//	(spheresColor)
 	//	(spheresRandomColor)
 		(recordIntervalIter)
-		(saveAnimationSnapshots)
-		(AnimationSnapshotsBaseName)
 		(WallStressRecordFile)
 	// 	(capillaryStressRecordFile)
 		(contactStressRecordFile)

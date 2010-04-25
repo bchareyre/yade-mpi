@@ -45,7 +45,7 @@ void PeriIsoCompressor::action(){
 	}
 	Real sigmaGoal=stresses[state]; assert(sigmaGoal<0);
 	// expansion of cell in this step (absolute length)
-	Vector3r cellGrow(Vector3r::ZERO);
+	Vector3r cellGrow(Vector3r::Zero());
 	// is the stress condition satisfied in all directions?
 	bool allStressesOK=true;
 	if(keepProportions){ // the same algo as below, but operating on quantitites averaged over all dimensions
@@ -110,8 +110,8 @@ void PeriTriaxController::strainStressStiffUpdate(){
 	Real volume=scene->cell->trsf.Determinant()*scene->cell->refSize[0]*scene->cell->refSize[1]*scene->cell->refSize[2];
 
 	//Compute sum(fi*lj) and stiffness
-	stressTensor = Matrix3r::ZERO;
-	Vector3r sumStiff(Vector3r::ZERO);
+	stressTensor = Matrix3r::Zero();
+	Vector3r sumStiff(Vector3r::Zero());
 	int n=0;
 	// NOTE : This sort of loops on interactions could be removed if we had callbacks in e.g. constitutive laws
 	// → very likely performance hit; do you have some concrete design in mind?
@@ -144,7 +144,7 @@ void PeriTriaxController::strainStressStiffUpdate(){
 				<<"unbalanced = "<<Shop::unbalancedForce ( /*useMaxForce=*/false,scene ) );
 
 	if (n>0) stiff=(1./n)*sumStiff;
-	else stiff=Vector3r::ZERO;
+	else stiff=Vector3r::Zero();
 }
 
 
@@ -174,7 +174,7 @@ void PeriTriaxController::action()
 	bool doUpdate((scene->currentIteration%globUpdate)==0);
 	if(doUpdate || min(stiff[0],min(stiff[1],stiff[2])) <=0 || dynCell){ strainStressStiffUpdate(); }
 
-	bool allOk=true; Vector3r cellGrow(Vector3r::ZERO);
+	bool allOk=true; Vector3r cellGrow(Vector3r::Zero());
 	// apply condition along each axis separately (stress or strain)
 	for(int axis=0; axis<3; axis++){
 		Real maxGrow=maxStrainRate[axis]*scene->dt;

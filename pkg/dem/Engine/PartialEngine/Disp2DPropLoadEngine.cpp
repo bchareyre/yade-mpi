@@ -43,11 +43,11 @@ void Disp2DPropLoadEngine::action()
 	if(firstIt)
 	{
 		it_begin=Omega::instance().getCurrentIteration();
-		H0=topbox->state->pos.Y();
-		X0=topbox->state->pos.X();
+		H0=topbox->state->pos.y();
+		X0=topbox->state->pos.x();
 		Vector3r F_sup=scene->forces.getForce(id_topbox);
-		Fn0=F_sup.Y();
-		Ft0=F_sup.X();
+		Fn0=F_sup.y();
+		Ft0=F_sup.x();
 
 		Real	OnlySsInt=0	// the half number of real sphere-sphere (only) interactions, at the beginning of the perturbation
 			,TotInt=0	// the half number of all the real interactions, at the beginning of the perturbation
@@ -93,8 +93,8 @@ void Disp2DPropLoadEngine::letDisturb()
 	dgamma=cos(theta*Mathr::PI/180.0)*v*dt;
 	dh=sin(theta*Mathr::PI/180.0)*v*dt;
 
-	Real Ysup = topbox->state->pos.Y();
-	Real Ylat = leftbox->state->pos.Y();
+	Real Ysup = topbox->state->pos.y();
+	Real Ylat = leftbox->state->pos.y();
 
 // 	Changes in vertical and horizontal position :
 	topbox->state->pos += Vector3r(dgamma,dh,0);
@@ -102,8 +102,8 @@ void Disp2DPropLoadEngine::letDisturb()
 	leftbox->state->pos += Vector3r(dgamma/2.0,dh/2.0,0);
 	rightbox->state->pos += Vector3r(dgamma/2.0,dh/2.0,0);
 
-	Real Ysup_mod = topbox->state->pos.Y();
-	Real Ylat_mod = leftbox->state->pos.Y();
+	Real Ysup_mod = topbox->state->pos.y();
+	Real Ylat_mod = leftbox->state->pos.y();
 
 //	with the corresponding velocities :
 	topbox->state->vel=Vector3r(dgamma/dt,dh/dt,0);
@@ -127,7 +127,7 @@ void Disp2DPropLoadEngine::letDisturb()
 	Quaternionr qcorr;
 	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
 	if(LOG)
-		cout << "Quaternion associe a la rotation incrementale : " << qcorr.W() << " " << qcorr.X() << " " << qcorr.Y() << " " << qcorr.Z() << endl;
+		cout << "Quaternion associe a la rotation incrementale : " << qcorr.w() << " " << qcorr.x() << " " << qcorr.y() << " " << qcorr.z() << endl;
 
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
 	leftbox->state->ori = qcorr*leftbox->state->ori;
@@ -173,12 +173,12 @@ void Disp2DPropLoadEngine::stopMovement()
 
 void Disp2DPropLoadEngine::saveData()
 {
-	Real Xleft = leftbox->state->pos.X() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.X();
+	Real Xleft = leftbox->state->pos.x() + (YADE_CAST<Box*>(leftbox->shape.get()))->extents.x();
 
-	Real Xright = rightbox->state->pos.X() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.X();
+	Real Xright = rightbox->state->pos.x() - (YADE_CAST<Box*>(rightbox->shape.get()))->extents.x();
 
-	Real Zfront = frontbox->state->pos.Z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.Z();
-	Real Zback = backbox->state->pos.Z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.Z();
+	Real Zfront = frontbox->state->pos.z() - YADE_CAST<Box*>(frontbox->shape.get())->extents.z();
+	Real Zback = backbox->state->pos.z() + (YADE_CAST<Box*>(backbox->shape.get()))->extents.z();
 
 	Real Scontact = (Xright-Xleft)*(Zfront-Zback);	// that's so the value of section at the middle of the height of the box
 
@@ -205,10 +205,10 @@ void Disp2DPropLoadEngine::saveData()
 
 	Vector3r F_sup = scene->forces.getForce(id_topbox);
 
-	Real	dFn=F_sup.Y()-Fn0	// OK pour le signe
-		,dFt=(F_sup.X()-Ft0)
-		,du=-( topbox->state->pos.Y() - H0 )	// OK pour le signe (>0 en compression)
-		,dgamma=topbox->state->pos.X()-X0
+	Real	dFn=F_sup.y()-Fn0	// OK pour le signe
+		,dFt=(F_sup.x()-Ft0)
+		,du=-( topbox->state->pos.y() - H0 )	// OK pour le signe (>0 en compression)
+		,dgamma=topbox->state->pos.x()-X0
 		,SigN0 = (Fn0/Scontact)/1000	// en kPa, pour comparer à Fortran
 		,Tau0 = -(Ft0/Scontact)/1000	// en kPa, pour comparer à Fortran, Ok pour le signe, cf p. Yade29
 		,dSigN= (dFn/Scontact)/1000	// Ok pour le signe

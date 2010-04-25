@@ -84,7 +84,8 @@ bool Ig2_Facet_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1,
 //			cp = facet->vertices[(m+1>2)?0:m+1];
 			cp = facet->vu[m]*(facet->vl[m]-sh);
 		normal = cl-cp;
-		penetrationDepth = sphereRadius - normal.Normalize();
+		Real norm=normal.norm(); normal/=norm;
+		penetrationDepth = sphereRadius - norm;
 	}
 
 	//

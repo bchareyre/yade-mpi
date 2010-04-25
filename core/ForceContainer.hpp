@@ -98,13 +98,13 @@ class ForceContainer{
 			if(synced) return; // if synced meanwhile
 			// #pragma omp parallel for schedule(static)
 			for(long id=0; id<(long)size; id++){
-				Vector3r sumF(Vector3r::ZERO), sumT(Vector3r::ZERO);
+				Vector3r sumF(Vector3r::Zero()), sumT(Vector3r::Zero());
 				for(int thread=0; thread<nThreads; thread++){ sumF+=_forceData[thread][id]; sumT+=_torqueData[thread][id];}
 				_force[id]=sumF; _torque[id]=sumT;
 			}
 			if(moveRotUsed){
 				for(long id=0; id<(long)size; id++){
-					Vector3r sumM(Vector3r::ZERO), sumR(Vector3r::ZERO);
+					Vector3r sumM(Vector3r::Zero()), sumR(Vector3r::Zero());
 					for(int thread=0; thread<nThreads; thread++){ sumM+=_moveData[thread][id]; sumR+=_rotData[thread][id];}
 					_move[id]=sumM; _rot[id]=sumR;
 				}
@@ -120,13 +120,13 @@ class ForceContainer{
 			boost::mutex::scoped_lock lock(globalMutex);
 			if(size>=newSize) return; // in case on thread was waiting for resize, but it was already satisfied by another one
 			for(int thread=0; thread<nThreads; thread++){
-				_forceData [thread].resize(newSize,Vector3r::ZERO);
-				_torqueData[thread].resize(newSize,Vector3r::ZERO);
-				_moveData[thread].resize(newSize,Vector3r::ZERO);
-				_rotData[thread].resize(newSize,Vector3r::ZERO);
+				_forceData [thread].resize(newSize,Vector3r::Zero());
+				_torqueData[thread].resize(newSize,Vector3r::Zero());
+				_moveData[thread].resize(newSize,Vector3r::Zero());
+				_rotData[thread].resize(newSize,Vector3r::Zero());
 			}
-			_force.resize(newSize,Vector3r::ZERO); _torque.resize(newSize,Vector3r::ZERO);
-			_move.resize(newSize,Vector3r::ZERO); _rot.resize(newSize,Vector3r::ZERO);
+			_force.resize(newSize,Vector3r::Zero()); _torque.resize(newSize,Vector3r::Zero());
+			_move.resize(newSize,Vector3r::Zero()); _rot.resize(newSize,Vector3r::Zero());
 			size=newSize;
 		}
 		/*! Reset all data, also reset summary forces/torques and mark the container clean. */
@@ -193,10 +193,10 @@ class ForceContainer {
 		/*! Resize the container; this happens automatically,
 		 * but you may want to set the size beforehand to avoid resizes as the simulation grows. */
 		void resize(size_t newSize){
-			_force.resize(newSize,Vector3r::ZERO);
-			_torque.resize(newSize,Vector3r::ZERO);
-			_move.resize(newSize,Vector3r::ZERO);
-			_rot.resize(newSize,Vector3r::ZERO);
+			_force.resize(newSize,Vector3r::Zero());
+			_torque.resize(newSize,Vector3r::Zero());
+			_move.resize(newSize,Vector3r::Zero());
+			_rot.resize(newSize,Vector3r::Zero());
 			size=newSize;
 		}
 		const int getNumAllocatedThreads() const {return 1;}

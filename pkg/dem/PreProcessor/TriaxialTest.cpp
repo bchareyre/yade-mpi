@@ -14,7 +14,6 @@
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
 #include <yade/pkg-dem/TriaxialStateRecorder.hpp>
-#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 #include<yade/pkg-common/Aabb.hpp>
 #include<yade/core/Scene.hpp>
 #include<yade/pkg-common/InsertionSortCollider.hpp>
@@ -74,7 +73,7 @@ bool TriaxialTest::generate()
 	Real porosity=.8;
 	SpherePack sphere_pack;
 	if(importFilename==""){
-		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.X()*dimensions.Y()*dimensions.Z();
+		Vector3r dimensions=upperCorner-lowerCorner; Real volume=dimensions.x()*dimensions.y()*dimensions.z();
 		if(radiusMean<=0) radiusMean=pow(volume*(1-porosity)/(Mathr::PI*(4/3.)*numberOfGrains),1/3.);
 		else {
 			bool fixedDims[3];
@@ -267,7 +266,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	int ax0 = extents[0]==0 ? 0 : (extents[1]==0 ? 1 : 2); int ax1=(ax0+1)%3, ax2=(ax0+2)%3;
 	if(facetWalls){
 		Vector3r corner=position-extents; // "lower right" corner, with 90 degrees
-		Vector3r side1(Vector3r::ZERO); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::ZERO); side2[ax2]=4*extents[ax2];
+		Vector3r side1(Vector3r::Zero()); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::Zero()); side2[ax2]=4*extents[ax2];
 		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
 		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<Facet> iFacet(new Facet);
@@ -393,10 +392,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	newton->damping=dampingMomentum;
 	rootBody->engines.push_back(newton);
 	//if (0) rootBody->engines.push_back(shared_ptr<Engine>(new MicroMacroAnalyser));
-	if (saveAnimationSnapshots) {
-		shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-		positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
-		rootBody->engines.push_back(positionOrientationRecorder);}	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(boundDispatcher);	
 }

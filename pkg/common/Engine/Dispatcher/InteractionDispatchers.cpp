@@ -97,7 +97,7 @@ void InteractionDispatchers::action(){
 			assert(I->functorCache.geom);
 			bool wasReal=I->isReal();
 			bool geomCreated;
-			if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::ZERO, /*force*/false, I);
+			if(!scene->isPeriodic) geomCreated=I->functorCache.geom->go(b1->shape,b2->shape, *b1->state, *b2->state, Vector3r::Zero(), /*force*/false, I);
 			else{ // handle periodicity
 				Vector3r shift2(I->cellDist[0]*cellSize[0],I->cellDist[1]*cellSize[1],I->cellDist[2]*cellSize[2]);
 
@@ -154,7 +154,7 @@ void InteractionDispatchers::action(){
 			bool wasReal=I->isReal();
 			bool geomCreated =
 				b1->shape && b2->shape && // some bodies do not have shape
-				geomDispatcher->operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::ZERO, I);
+				geomDispatcher->operator()(b1->shape, b2->shape, *b1->state, *b2->state, Vector3r::Zero(), I);
 			// FIXME: port from the part above
 			if(scene->isPeriodic) { LOG_FATAL(__FILE__ ": Periodicity not handled without DISPATCH_CACHE."); abort(); }
 			if(!geomCreated){
