@@ -18,7 +18,7 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 
 	// Load geometry
     vector<double> vtmp, ntmp; vector<int>  etmp, ftmp;
-    STLReader reader; reader.tolerance=Math<Real>::Zero()_TOLERANCE;
+    STLReader reader; reader.tolerance=Math<Real>::ZERO_TOLERANCE;
     if(!reader.open(filename, back_inserter(vtmp), back_inserter(etmp), back_inserter(ftmp), back_inserter(ntmp))) 
 	{
 		LOG_ERROR("Can't open file: " << filename);

@@ -466,7 +466,7 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 	int ax1=(axis+1)%3,ax2=(axis+2)%3;
 	Real r=sqrt(pow(pt[ax1],2)+pow(pt[ax2],2));
 	Real theta;
-	if(r>Mathr::Zero()_TOLERANCE){
+	if(r>Mathr::ZERO_TOLERANCE){
 		theta=acos(pt[ax1]/r);
 		if(pt[ax2]<0) theta=Mathr::TWO_PI-theta;
 	}
@@ -1140,8 +1140,8 @@ void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real
     b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
     b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
 
-    if (Math<Real>::FAbs(b->cn) <= Math<Real>::Zero()_TOLERANCE ) b->cn=0;
-    if (Math<Real>::FAbs(b->cs) <= Math<Real>::Zero()_TOLERANCE ) b->cs=0;
+    if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
+    if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
 }
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale
