@@ -22,9 +22,9 @@ bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	// inserted element maps id2->currSize; currSize will be incremented immediately
 	if(!vecmap[id1].insert(pair<body_id_t,size_t>(id2,currSize)).second) return false; // id1,id2 pair already present
 		
-	assert(intrs.size()==currSize);
+	//assert(intrs.size()==currSize);
 	intrs.resize(++currSize); // currSize updated
-	assert(intrs.size()==currSize);
+	//assert(intrs.size()==currSize);
 
 	intrs[currSize-1]=i; // assign last element
 	
@@ -68,10 +68,10 @@ bool InteractionContainer::erase(body_id_t id1,body_id_t id2){
 		if (id1>id2) swap(id1,id2);
 		vecmap[id1][id2]=iid;
 	}
-	assert(intrs.size()==currSize);
+	//assert(intrs.size()==currSize);
 	// in either case, last element can be removed now
 	intrs.resize(--currSize); // currSize updated
-	assert(intrs.size()==currSize);
+	//assert(intrs.size()==currSize);
 	return true;
 }
 
