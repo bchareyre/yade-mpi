@@ -33,14 +33,17 @@ be possible to create class template for this, though).
 class InteractionContainer: public Serializable{
 	private :
 		typedef vector<shared_ptr<Interaction> > ContainerT;
+		// linear array of container interactions
 		vector<shared_ptr<Interaction> > intrs;
-		vector<map<body_id_t, unsigned int  > > vecmap;
-		unsigned int currentSize;
+		// array where vecmap[id1] maps id2 to index in intrs (unsigned int)
+		vector<map<body_id_t,size_t> > vecmap;
+		// always in sync with intrs.size()
+		size_t currSize;
 		shared_ptr<Interaction> empty;
 		// used only during serialization/deserialization
 		vector<shared_ptr<Interaction> > interaction;
 	public :
-		InteractionContainer(): currentSize(0),serializeSorted(false),iterColliderLastRun(-1){
+		InteractionContainer(): currSize(0),serializeSorted(false),iterColliderLastRun(-1){
 			#ifdef YADE_OPENMP
 				threadsPendingErase.resize(omp_get_max_threads());
 			#endif
@@ -61,7 +64,7 @@ class InteractionContainer: public Serializable{
 		// index access
 		shared_ptr<Interaction>& operator[](size_t id){return intrs[id];}
 		const shared_ptr<Interaction>& operator[](size_t id) const { return intrs[id];}
-		size_t size(){ return currentSize; }
+		size_t size(){ return currSize; }
 		// simulation API
 
 		//! Erase all non-real (in term of Interaction::isReal()) interactions

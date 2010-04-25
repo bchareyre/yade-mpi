@@ -12,31 +12,23 @@
 	//BOOST_SERIALIZATION_FACTORY_0(InteractionContainer);
 #endif
 
-bool InteractionContainer::insert(const shared_ptr<Interaction>& i)
-{
+bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	boost::mutex::scoped_lock lock(drawloopmutex);
+	body_id_t id1=i->getId1(), id2=i->getId2();
+	if (id1>id2) swap(id1,id2);
 
-	body_id_t id1 = i->getId1();
-	body_id_t id2 = i->getId2();
+	if((size_t)id1>=vecmap.size()) vecmap.resize(id1+1); // resize linear map to accomodate id1
 
-	if (id1>id2)
-		swap(id1,id2);
+	// inserted element maps id2->currSize; currSize will be incremented immediately
+	if(!vecmap[id1].insert(pair<body_id_t,size_t>(id2,currSize)).second) return false; // id1,id2 pair already present
+		
+	assert(intrs.size()==currSize);
+	intrs.resize(++currSize); // currSize updated
+	assert(intrs.size()==currSize);
 
-	if ( static_cast<unsigned int>(id1) >=vecmap.size())
-		vecmap.resize(id1+1);
-
-	if (vecmap[id1].insert(pair<body_id_t,unsigned int >(id2,currentSize)).second)
-	{
-		if (intrs.size() == currentSize)
-			intrs.resize(currentSize+1);
-
-		intrs[currentSize]=i;
-		currentSize++;
+	intrs[currSize-1]=i; // assign last element
 	
-		return true;
-	}
-	else
-		return false;
+	return true;
 }
 
 
@@ -47,73 +39,52 @@ bool InteractionContainer::insert(body_id_t id1,body_id_t id2)
 }
 
 
-void InteractionContainer::clear()
-{
+void InteractionContainer::clear(){
 	boost::mutex::scoped_lock lock(drawloopmutex);
 
 	vecmap.clear();
 	intrs.clear();
 	pendingErase.clear();
-	currentSize=0;
+	currSize=0;
 }
 
 
-bool InteractionContainer::erase(body_id_t id1,body_id_t id2)
-{
+bool InteractionContainer::erase(body_id_t id1,body_id_t id2){
 	boost::mutex::scoped_lock lock(drawloopmutex);
-
-	if (id1>id2)
-		swap(id1,id2);
-
-	if ( static_cast<unsigned int>(id1) < vecmap.size())
-	{
-		map<body_id_t,unsigned int >::iterator mii;
-		mii = vecmap[id1].find(id2);
-		if ( mii != vecmap[id1].end() )
-		{
-			unsigned int iid = (*mii).second;
-			vecmap[id1].erase(mii);
-			currentSize--;
-			if (iid<currentSize) {
-				intrs[iid]=intrs[currentSize];
-				id1 = intrs[iid]->getId1();
-				id2 = intrs[iid]->getId2();
-				if (id1>id2) swap(id1,id2);
-				vecmap[id1][id2]=iid;
-			}
-			return true;
-		}
-		else
-			return false;
+	if (id1>id2) swap(id1,id2);
+	if((size_t)id1<=vecmap.size()) return false; // id1 out of bounds
+	map<body_id_t,size_t>::iterator mii;
+	mii=vecmap[id1].find(id2);
+	if(mii==vecmap[id1].end()) return false; // id2 not in interaction with id1
+	// interaction found; erase from vecmap and then from intrs as well
+	size_t iid=(*mii).second;
+	vecmap[id1].erase(mii);
+	// iid is not the last element; we have to move last one to its place
+	if (iid<currSize-1) {
+		intrs[iid]=intrs[currSize-1];
+		// adjust map, so that id1,id2 points to element at iid, which used to be last
+		id1=intrs[iid]->getId1();
+		id2=intrs[iid]->getId2();
+		if (id1>id2) swap(id1,id2);
+		vecmap[id1][id2]=iid;
 	}
-
-	return false;
-
+	assert(intrs.size()==currSize);
+	// in either case, last element can be removed now
+	intrs.resize(--currSize); // currSize updated
+	assert(intrs.size()==currSize);
+	return true;
 }
 
 
-const shared_ptr<Interaction>& InteractionContainer::find(body_id_t id1,body_id_t id2)
-{
-	if (id1>id2)
-		swap(id1,id2);
+const shared_ptr<Interaction>& InteractionContainer::find(body_id_t id1,body_id_t id2){
+	if (id1>id2) swap(id1,id2);
 
-	if (static_cast<unsigned int>(id1)<vecmap.size())
-	{
-		map<body_id_t,unsigned int >::iterator mii;
-		mii = vecmap[id1].find(id2);
-		if (mii!=vecmap[id1].end())
-			return intrs[(*mii).second];
-		else
-		{
-			empty = shared_ptr<Interaction>();
-			return empty;
-		}
-	}
-	else
-	{
-		empty = shared_ptr<Interaction>();
-		return empty;
-	}
+	if ((size_t)id1>=vecmap.size()) { empty=shared_ptr<Interaction>(); return empty; }
+
+	map<body_id_t,size_t>::iterator mii;
+	mii = vecmap[id1].find(id2);
+	if (mii!=vecmap[id1].end()) return intrs[(*mii).second];
+	else { empty=shared_ptr<Interaction>(); return empty; }
 }
 
 void InteractionContainer::requestErase(body_id_t id1, body_id_t id2, bool force){
