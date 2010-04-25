@@ -5,22 +5,24 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
-#include "QtGUI.hpp"
-#include "YadeQtMainWindow.hpp"
-#include "SimulationController.hpp"
-#include "MessageDialog.hpp"
-#include "FileDialog.hpp"
-#include "YadeCamera.hpp"
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qgroupbox.h>
-#include <qradiobutton.h>
-#include <qlineedit.h>
-#include <boost/lexical_cast.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <unistd.h>
+#include"QtGUI.hpp"
+#include"YadeQtMainWindow.hpp"
+#include"SimulationController.hpp"
+#include"MessageDialog.hpp"
+#include"FileDialog.hpp"
+#include"YadeCamera.hpp"
+#include<qlabel.h>
+#include<qpushbutton.h>
+#include<qgroupbox.h>
+#include<qradiobutton.h>
+#include<qlineedit.h>
+#include<qregexp.h>
+#include<qvalidator.h>
+#include<boost/lexical_cast.hpp>
+#include<boost/filesystem/operations.hpp>
+#include<boost/filesystem/convenience.hpp>
+#include<boost/date_time/posix_time/posix_time.hpp>
+#include<unistd.h>
 #include<yade/core/Scene.hpp>
 #include<yade/lib-base/Math.hpp>
 #include<boost/version.hpp>
@@ -49,6 +51,7 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	refreshTime = 40;
 	changeTimeStep=false;
 	lastRenderedIteration=-1;
+	initUpdate=true;
 
 	iterPerSec_LastIter=Omega::instance().getCurrentIteration();
 	iterPerSec_LastLocalTime=microsec_clock::local_time();
@@ -86,14 +89,11 @@ SimulationController::SimulationController(QWidget * parent) : QtGeneratedSimula
 	}
 	else{ LOG_DEBUG("Not loading simulation in ctor"); }
 
-	int mantissa, exponent;
-	dtIntegerMantissaExponent(mantissa,exponent);
-	sb10PowerSecond->setValue(exponent);
-	sbSecond->setValue(mantissa);
-
 	// run timer ANY TIME (simulation may be started asynchronously)
 	updateTimerId=startTimer(refreshTime);
 
+	leTimestep->setText(lexical_cast<string>(Omega::instance().getScene()->dt));
+	leTimestep->setValidator(new QRegExpValidator(QRegExp("[+]?\\d+(\\.\\d*)?([eE][+-]?\\d+)?"),this));
 }
 
 /* restart timer with SimulationController::refreshTime */
@@ -125,6 +125,16 @@ void SimulationController::pbZXY_clicked()
 	YadeQtMainWindow::self->adjustCameraInCurrentView(qglviewer::Vec(1,0,0),qglviewer::Vec(0,-1,0));
 };
 
+
+void SimulationController::leTimestep_returnPressed(){
+	try{
+		Real dt=lexical_cast<Real>(leTimestep->text());
+		Omega::instance().getScene()->dt=dt;
+		LOG_DEBUG("Changed timestep by hand to "<<dt);
+	} catch (const boost::bad_lexical_cast& e){
+		LOG_ERROR("Invalid dt value "<<leTimestep->text()<<" (unable to convert to Real), ignored.")
+	}
+}
 
 /* enter was pressed in the line-entry;
    execute the command and make the line empty
@@ -329,16 +339,7 @@ void SimulationController::bgTimeStepClicked(int i)
 			changeTimeStep = true;
 			wasUsingTimeStepper=false;
 			Omega::instance().skipTimeStepper(true);
-			if(sbSecond->value()==0){ sbSecond->setValue(9); sb10PowerSecond->setValue(sb10PowerSecond->value()-1); }
-			if(sbSecond->value()==10){ sbSecond->setValue(1); sb10PowerSecond->setValue(sb10PowerSecond->value()+1); }
-			int second=(sbSecond->value()), powerSecond = (sb10PowerSecond->value());
-			int exp10,mantissa; dtIntegerMantissaExponent(mantissa,exp10);
-			// only change timestep if the current timestep would have different representation in this integral thing
-			// important so that merely opening the controller doesn't round the existing timestep
-			if((mantissa!=second) || (exp10!=powerSecond)){
-				LOG_DEBUG("Change timestep: current "<<mantissa<<"^"<<exp10<<"; gui "<<second<<"^"<<powerSecond);
-				Omega::instance().setTimeStep((Real)second*Mathr::Pow(10.,(Real)powerSecond));
-			}
+			leTimestep_returnPressed();
 			break;
 		}
 		default: break;
@@ -346,23 +347,6 @@ void SimulationController::bgTimeStepClicked(int i)
 
 }
 
-
-void SimulationController::sb10PowerSecondValueChanged(int)
-{
-//	if(!rbFixed->isOn() && userChangingTimestep){ rbFixed->toggle(); bgTimeStepClicked(2); } // this should do the callback as if user clicked fixed timestepper button
-//	changeTimeStep = true;
-	//assert(rbFixed->isOn()); 
-	if(rbFixed->isOn()) bgTimeStepClicked(2);
-}
-
-
-void SimulationController::sbSecondValueChanged(int)
-{ 
-//	if(!rbFixed->isOn() && userChangingTimestep){ rbFixed->toggle(); bgTimeStepClicked(2); } // dtto
-//	changeTimeStep = true;
-	//assert(rbFixed->isOn());
-	if(rbFixed->isOn()) bgTimeStepClicked(2);
-}
 
 void SimulationController::sbRefreshValueChanged(int v)
 {
@@ -389,8 +373,6 @@ void SimulationController::deactivateControlsWhenLoading(){
 	pbOneSimulationStep->setEnabled(false);
 	rbFixed->setEnabled(false);
 	rbTimeStepper->setEnabled(false);
-	sbSecond->setEnabled(false);
-	sb10PowerSecond->setEnabled(false);
 }
 
 
@@ -406,8 +388,9 @@ void SimulationController::doUpdate(){
 		return;
 	}
 	// if we got the lock, update controls as normally
+	Scene* scene=Omega::instance().getScene().get();
 
-	Real simulationTime = Omega::instance().getSimulationTime();
+	Real simulationTime = scene->simulationTime;
 
 	unsigned int sec	= (unsigned int)(simulationTime);
 	unsigned int min	= sec/60;
@@ -447,8 +430,8 @@ void SimulationController::doUpdate(){
 	// does someone need to display that with more precision than integer?
 	long iterPerSec_LastAgo_ms=(microsec_clock::local_time()-iterPerSec_LastLocalTime).total_milliseconds();
 	if(iterPerSec_LastAgo_ms>iterPerSec_TTL_ms){
-		iterPerSec=(1000.*(Omega::instance().getCurrentIteration()-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
-		iterPerSec_LastIter=Omega::instance().getCurrentIteration();
+		iterPerSec=(1000.*(scene->currentIteration-iterPerSec_LastIter))/iterPerSec_LastAgo_ms;
+		iterPerSec_LastIter=scene->currentIteration;
 		iterPerSec_LastLocalTime=microsec_clock::local_time();
 	}
 	char strIter[64];
@@ -458,18 +441,18 @@ void SimulationController::doUpdate(){
 
    // update estimation time
 	char strEstimation[64];
-	if (Omega::instance().getScene()->stopAtIteration>0 && iterPerSec>0 ) estimation=duration+time_duration(seconds((Omega::instance().getScene()->stopAtIteration-Omega::instance().getCurrentIteration())/iterPerSec));
+	if (scene->stopAtIteration>0 && iterPerSec>0 ) estimation=duration+time_duration(seconds((scene->stopAtIteration-scene->currentIteration)/iterPerSec));
 	snprintf(strEstimation,64,"estimation %02d:%02d:%02d",estimation.hours(),estimation.minutes(),estimation.seconds());
  	labelEstimationTime->setText(strEstimation);
 
 	char strStopAtIter[64];
-	snprintf(strStopAtIter,64,"stopAtIter #%ld",Omega::instance().getScene()->stopAtIteration);
+	snprintf(strStopAtIter,64,"stopAtIter #%ld",scene->stopAtIteration);
 	labelStopAtIter->setText(strStopAtIter);
 
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
 
 	char strStep[64];
-	snprintf(strStep,64,"step %g",(double)Omega::instance().getTimeStep());
+	snprintf(strStep,64,"step %g",(double)scene->dt);
 	labelStep->setText(string(strStep));
 
 	//changeSkipTimeStepper = false;
@@ -490,22 +473,13 @@ void SimulationController::doUpdate(){
 	pbOneSimulationStep->setEnabled(hasSimulation && !isRunning);
 	rbFixed->setEnabled(true);
 	rbTimeStepper->setEnabled(hasTimeStepper);
-	sbSecond->setEnabled(!usesTimeStepper);
-	sb10PowerSecond->setEnabled(!usesTimeStepper);
+	leTimestep->setEnabled(!usesTimeStepper);
 
 	// conditionals only avoid setting the state that is already set, to avoid spurious signals
 	if(rbFixed->isChecked()==usesTimeStepper){ LOG_DEBUG("Checking rbFixed"); rbFixed->setChecked(!usesTimeStepper); }
 	if(rbTimeStepper->isChecked()!=usesTimeStepper){ LOG_DEBUG("Checking rbTimeStepper"); rbTimeStepper->setChecked(usesTimeStepper); }
 
-	int exp10,mantissa; dtIntegerMantissaExponent(mantissa,exp10);
-	sb10PowerSecond->setValue(exp10); sbSecond->setValue(mantissa);
-
-}
-
-void SimulationController::dtIntegerMantissaExponent(int& mantissa, int& exponent){
-	Real dt=Omega::instance().getTimeStep();
-	exponent=floor(log10(dt));
-	mantissa=((int)(.1+dt/(pow((float)10,exponent)))); // .1: rounding issues
+	if(!leTimestep->hasFocus()) leTimestep->setText(lexical_cast<string>(scene->dt));
 }
 
 void SimulationController::keyPressEvent(QKeyEvent *event){

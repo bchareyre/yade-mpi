@@ -45,6 +45,7 @@
 //           0       0       1
 // where t > 0 indicates a counterclockwise rotation in the xy-plane.
 
+#include "EigenCompat.h"
 #include "Wm3FoundationLIB.h"
 #include "Wm3Vector3.h"
 
@@ -71,45 +72,45 @@ public:
     // interpreted based on the Boolean input as
     //   true:  entry[0..8]={m00,m01,m02,m10,m11,m12,m20,m21,m22} [row major]
     //   false: entry[0..8]={m00,m10,m20,m01,m11,m21,m02,m12,m22} [col major]
-    Matrix3 (const Real afEntry[9], bool bRowMajor);
+    WM3_FUN Matrix3 (const Real afEntry[9], bool bRowMajor);
 
     // Create matrices based on vector input.  The Boolean is interpreted as
     //   true: vectors are columns of the matrix
     //   false: vectors are rows of the matrix
-    Matrix3 (const Vector3<Real>& rkU, const Vector3<Real>& rkV,
+    WM3_FUN Matrix3 (const Vector3<Real>& rkU, const Vector3<Real>& rkV,
         const Vector3<Real>& rkW, bool bColumns);
-    Matrix3 (const Vector3<Real>* akV, bool bColumns);
+    WM3_FUN Matrix3 (const Vector3<Real>* akV, bool bColumns);
 
     // create a diagonal matrix
-    Matrix3 (Real fM00, Real fM11, Real fM22);
+    WM3_FUN Matrix3 (Real fM00, Real fM11, Real fM22);
 
     // Create rotation matrices (positive angle - counterclockwise).  The
     // angle must be in radians, not degrees.
-    Matrix3 (const Vector3<Real>& rkAxis, Real fAngle);
+    WM3_FUN Matrix3 (const Vector3<Real>& rkAxis, Real fAngle);
 
     // create a tensor product U*V^T
-    Matrix3 (const Vector3<Real>& rkU, const Vector3<Real>& rkV);
+    WM3_FUN Matrix3 (const Vector3<Real>& rkU, const Vector3<Real>& rkV);
 
     // create various matrices
-    Matrix3& MakeZero ();
-    Matrix3& MakeIdentity ();
-    Matrix3& MakeDiagonal (Real fM00, Real fM11, Real fM22);
-    Matrix3& FromAxisAngle (const Vector3<Real>& rkAxis, Real fAngle);
-    Matrix3& MakeTensorProduct (const Vector3<Real>& rkU,
+    WM3_FUN Matrix3& MakeZero ();
+    WM3_FUN Matrix3& MakeIdentity ();
+    WM3_FUN Matrix3& MakeDiagonal (Real fM00, Real fM11, Real fM22);
+    WM3_FUN Matrix3& FromAxisAngle (const Vector3<Real>& rkAxis, Real fAngle);
+    WM3_FUN Matrix3& MakeTensorProduct (const Vector3<Real>& rkU,
         const Vector3<Real>& rkV);
 
     // member access
-    operator const Real* () const;
-    operator Real* ();
-    const Real* operator[] (int iRow) const;
-    Real* operator[] (int iRow);
+    WM3_FUN operator const Real* () const;
+    WM3_FUN operator Real* ();
+    WM3_FUN const Real* operator[] (int iRow) const;
+    WM3_FUN Real* operator[] (int iRow);
     Real operator() (int iRow, int iCol) const;
     Real& operator() (int iRow, int iCol);
-    void SetRow (int iRow, const Vector3<Real>& rkV);
-    Vector3<Real> GetRow (int iRow) const;
-    void SetColumn (int iCol, const Vector3<Real>& rkV);
-    Vector3<Real> GetColumn (int iCol) const;
-    void GetColumnMajor (Real* afCMajor) const;
+    WM3_FUN void SetRow (int iRow, const Vector3<Real>& rkV);
+    WM3_FUN Vector3<Real> GetRow (int iRow) const;
+    WM3_FUN void SetColumn (int iCol, const Vector3<Real>& rkV);
+    WM3_FUN Vector3<Real> GetColumn (int iCol) const;
+    WM3_FUN void GetColumnMajor (Real* afCMajor) const;
 
     // assignment
     Matrix3& operator= (const Matrix3& rkM);
@@ -117,10 +118,10 @@ public:
     // comparison
     bool operator== (const Matrix3& rkM) const;
     bool operator!= (const Matrix3& rkM) const;
-    bool operator<  (const Matrix3& rkM) const;
-    bool operator<= (const Matrix3& rkM) const;
-    bool operator>  (const Matrix3& rkM) const;
-    bool operator>= (const Matrix3& rkM) const;
+    WM3_FUN bool operator<  (const Matrix3& rkM) const;
+    WM3_FUN bool operator<= (const Matrix3& rkM) const;
+    WM3_FUN bool operator>  (const Matrix3& rkM) const;
+    WM3_FUN bool operator>= (const Matrix3& rkM) const;
 
     // arithmetic operations
     Matrix3 operator+ (const Matrix3& rkM) const;
@@ -140,73 +141,78 @@ public:
     Vector3<Real> operator* (const Vector3<Real>& rkV) const;  // M * v
 
     // other operations
-    Matrix3 Transpose () const;  // M^T
-    Matrix3 TransposeTimes (const Matrix3& rkM) const;  // this^T * M
-    Matrix3 TimesTranspose (const Matrix3& rkM) const;  // this * M^T
-    Matrix3 Inverse () const;
-    Matrix3 Adjoint () const;
-    Real Determinant () const;
-    Real QForm (const Vector3<Real>& rkU,
+    WM3_FUN Matrix3 Transpose () const;  // M^T
+    WM3_FUN Matrix3 TransposeTimes (const Matrix3& rkM) const;  // this^T * M
+    WM3_FUN Matrix3 TimesTranspose (const Matrix3& rkM) const;  // this * M^T
+    WM3_FUN Matrix3 Inverse () const;
+    WM3_FUN Matrix3 Adjoint () const;
+    WM3_FUN Real Determinant () const;
+    WM3_FUN Real QForm (const Vector3<Real>& rkU,
         const Vector3<Real>& rkV) const;  // u^T*M*v
-    Matrix3 TimesDiagonal (const Vector3<Real>& rkDiag) const;  // M*D
-    Matrix3 DiagonalTimes (const Vector3<Real>& rkDiag) const;  // D*M
+    WM3_FUN Matrix3 TimesDiagonal (const Vector3<Real>& rkDiag) const;  // M*D
+    WM3_FUN Matrix3 DiagonalTimes (const Vector3<Real>& rkDiag) const;  // D*M
+
+	 EIG_FUN Matrix3 transpose() const {return Transpose();}
+	 EIG_FUN Matrix3 adjoint() const {return Adjoint();}
+	 EIG_FUN Matrix3 determinant() const {return Determinant();}
+	 EIG_FUN Matrix3 inverse() const {return inverse();}
 
     // The matrix must be a rotation for these functions to be valid.  The
     // last function uses Gram-Schmidt orthonormalization applied to the
     // columns of the rotation matrix.  The angle must be in radians, not
     // degrees.
-    void ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle) const;
-    void Orthonormalize ();
+    WM3_FUN void ToAxisAngle (Vector3<Real>& rkAxis, Real& rfAngle) const;
+    WM3_FUN void Orthonormalize ();
 
     // The matrix must be symmetric.  Factor M = R * D * R^T where
     // R = [u0|u1|u2] is a rotation matrix with columns u0, u1, and u2 and
     // D = diag(d0,d1,d2) is a diagonal matrix whose diagonal entries are d0,
     // d1, and d2.  The eigenvector u[i] corresponds to eigenvector d[i].
     // The eigenvalues are ordered as d0 <= d1 <= d2.
-    void EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const;
+    WM3_FUN void EigenDecomposition (Matrix3& rkRot, Matrix3& rkDiag) const;
 
     // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
     // where yaw is rotation about the Up vector, pitch is rotation about the
     // Right axis, and roll is rotation about the Direction axis.
-    Matrix3& FromEulerAnglesXYZ (Real fYAngle, Real fPAngle, Real fRAngle);
-    Matrix3& FromEulerAnglesXZY (Real fYAngle, Real fPAngle, Real fRAngle);
-    Matrix3& FromEulerAnglesYXZ (Real fYAngle, Real fPAngle, Real fRAngle);
-    Matrix3& FromEulerAnglesYZX (Real fYAngle, Real fPAngle, Real fRAngle);
-    Matrix3& FromEulerAnglesZXY (Real fYAngle, Real fPAngle, Real fRAngle);
-    Matrix3& FromEulerAnglesZYX (Real fYAngle, Real fPAngle, Real fRAngle);
-    bool ToEulerAnglesXYZ (Real& rfYAngle, Real& rfPAngle,
+    WM3_FUN Matrix3& FromEulerAnglesXYZ (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_FUN Matrix3& FromEulerAnglesXZY (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_FUN Matrix3& FromEulerAnglesYXZ (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_FUN Matrix3& FromEulerAnglesYZX (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_FUN Matrix3& FromEulerAnglesZXY (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_FUN Matrix3& FromEulerAnglesZYX (Real fYAngle, Real fPAngle, Real fRAngle);
+    WM3_FUN bool ToEulerAnglesXYZ (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    bool ToEulerAnglesXZY (Real& rfYAngle, Real& rfPAngle,
+    WM3_FUN bool ToEulerAnglesXZY (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    bool ToEulerAnglesYXZ (Real& rfYAngle, Real& rfPAngle,
+    WM3_FUN bool ToEulerAnglesYXZ (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    bool ToEulerAnglesYZX (Real& rfYAngle, Real& rfPAngle,
+    WM3_FUN bool ToEulerAnglesYZX (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    bool ToEulerAnglesZXY (Real& rfYAngle, Real& rfPAngle,
+    WM3_FUN bool ToEulerAnglesZXY (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
-    bool ToEulerAnglesZYX (Real& rfYAngle, Real& rfPAngle,
+    WM3_FUN bool ToEulerAnglesZYX (Real& rfYAngle, Real& rfPAngle,
         Real& rfRAngle) const;
 
     // SLERP (spherical linear interpolation) without quaternions.  Computes
     // R(t) = R0*(Transpose(R0)*R1)^t.  If Q is a rotation matrix with
     // unit-length axis U and angle A, then Q^t is a rotation matrix with
     // unit-length axis U and rotation angle t*A.
-    static Matrix3 Slerp (Real fT, const Matrix3& rkR0,
+    WM3_FUN static Matrix3 Slerp (Real fT, const Matrix3& rkR0,
         const Matrix3& rkR1);
 
     // Singular value decomposition, M = L*S*R, where L and R are orthogonal
     // and S is a diagonal matrix whose diagonal entries are nonnegative.
-    void SingularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
+    WM3_FUN void SingularValueDecomposition (Matrix3& rkL, Matrix3& rkS,
         Matrix3& rkR) const;
-    void SingularValueComposition (const Matrix3& rkL, const Matrix3& rkS,
+    WM3_FUN void SingularValueComposition (const Matrix3& rkL, const Matrix3& rkS,
         const Matrix3& rkR);
 
     // factor M = Q*D*U with orthogonal Q, diagonal D, upper triangular U
-    void QDUDecomposition (Matrix3& rkQ, Matrix3& rkD, Matrix3& rkU) const;
+    WM3_FUN void QDUDecomposition (Matrix3& rkQ, Matrix3& rkD, Matrix3& rkU) const;
 
     // special matrices
-    WM3_ITEM static const Matrix3 ZERO;
-    WM3_ITEM static const Matrix3 IDENTITY;
+    WM3_FUN WM3_ITEM static const Matrix3 ZERO;
+    WM3_FUN WM3_ITEM static const Matrix3 IDENTITY;
 
 private:
     // Support for eigendecomposition.  The Tridiagonalize function applies
