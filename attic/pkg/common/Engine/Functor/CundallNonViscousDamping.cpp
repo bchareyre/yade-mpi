@@ -10,7 +10,7 @@ void CundallNonViscousForceDamping::go(const shared_ptr<PhysicalParameters>& pp,
 	if(body->isClump()) return;
 	Vector3r f=getForceUnsynced(body->getId(),rb);
 	ParticleParameters *p=static_cast<ParticleParameters*>(pp.get());
-	Vector3r df=Vector3r::ZERO;
+	Vector3r df=Vector3r::Zero();
 	for(int i=0; i<3; i++){df[i]=-f[i]*damping*Mathr::Sign(f[i]*p->velocity[i]);}
 	rb->forces.addForce(body->getId(),df);
 }
@@ -20,7 +20,7 @@ void CundallNonViscousMomentumDamping::go(const shared_ptr<PhysicalParameters>& 
 	body_id_t id=body->getId();
 	Vector3r f=getForceUnsynced(id,rb),t=getTorqueUnsynced(id,rb);
 	RigidBodyParameters *p=static_cast<RigidBodyParameters*>(pp.get());
-	Vector3r df=Vector3r::ZERO, dt=Vector3r::ZERO;
+	Vector3r df=Vector3r::Zero(), dt=Vector3r::Zero();
 	for(int i=0; i<3; i++){
 		df[i]=-f[i]*damping*Mathr::Sign(f[i]*p->velocity[i]);
 		dt[i]=-t[i]*damping*Mathr::Sign(t[i]*p->angularVelocity[i]);

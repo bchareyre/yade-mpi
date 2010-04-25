@@ -12,7 +12,6 @@
 #include<yade/pkg-dem/Ip2_2xCohFrictMat_CohFrictPhys.hpp>
 #include<yade/pkg-dem/CohFrictMat.hpp>
 #include<yade/pkg-dem/GlobalStiffnessTimeStepper.hpp>
-#include<yade/pkg-dem/PositionOrientationRecorder.hpp>
 
 #include<yade/pkg-dem/TriaxialStressController.hpp>
 #include<yade/pkg-dem/TriaxialCompressionEngine.hpp>
@@ -89,8 +88,6 @@ CohesiveTriaxialTest::CohesiveTriaxialTest () : FileGenerator()
 	positionRecordFile	= "./positions";
 	recordIntervalIter	= 20;
 	velocityRecordFile 	= "./velocities";
-	saveAnimationSnapshots = false;
-	AnimationSnapshotsBaseName = "./snapshots/snap";
 	WallStressRecordFile = "./WallStresses";
 
 	rotationBlocked = false;
@@ -446,11 +443,6 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 	//rootBody->engines.push_back(hydraulicForceEngine);//<-------------HYDRAULIC ENGINE HERE
 	rootBody->engines.push_back(newton);
 
-	if (saveAnimationSnapshots) {
-	shared_ptr<PositionOrientationRecorder> positionOrientationRecorder(new PositionOrientationRecorder);
-	positionOrientationRecorder->outputFile = AnimationSnapshotsBaseName;
-	rootBody->engines.push_back(positionOrientationRecorder);}
-	
 	rootBody->initializers.clear();
 	rootBody->initializers.push_back(boundDispatcher);
 	

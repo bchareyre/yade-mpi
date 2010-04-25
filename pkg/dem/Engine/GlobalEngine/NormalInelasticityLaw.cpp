@@ -52,7 +52,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 
 		if (contact->isFresh(scene))
 			{
-			shearForce			= Vector3r::ZERO;
+			shearForce			= Vector3r::Zero();
 			currentContactPhysics->previousun=0.0;
 			currentContactPhysics->previousFn=0.0;
 			currentContactPhysics->unMax=0.0;
@@ -99,8 +99,8 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 
 					 scene->interactions->requestErase(contact->getId1(),contact->getId2());
 					 // probably not useful anymore
-                currentContactPhysics->normalForce = Vector3r::ZERO;
-                currentContactPhysics->shearForce = Vector3r::ZERO;
+                currentContactPhysics->normalForce = Vector3r::Zero();
+                currentContactPhysics->shearForce = Vector3r::Zero();
 
                 //return;
                 //    else
@@ -168,7 +168,7 @@ void Law2_ScGeom_NormalInelasticityPhys_NormalInelasticity::action()// a remplac
 			if (maxFs>1)
                         	cerr << "maxFs>1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
                     	shearForce *= maxFs;
-			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::ZERO;
+			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();
                 }
 
 

@@ -97,7 +97,7 @@ class OpenGLRenderingEngine : public Serializable
 		((bool,intrGeom,false,"Render :yref:`Interaction::interactionGeometry` objects."))
 		((bool,intrPhys,false,"Render :yref:`Interaction::interactionPhysics` objects"))
 		((int,mask,((void)"draw everything",~0),"Bitmask for showing only bodies where ((mask & :yref:`Body::mask`)!=0)"))
-		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::ZERO,Quaternionr::IDENTITY)),"Position and orientation of clipping planes"))
+		((vector<Se3r>,clipPlaneSe3,vector<Se3r>(numClipPlanes,Se3r(Vector3r::Zero(),Quaternionr::Identity())),"Position and orientation of clipping planes"))
 		((vector<int>,clipPlaneActive,vector<int>(numClipPlanes,0),"Activate/deactivate respective clipping planes"))
 		((size_t,selectBodyLimit,1000,"Limit number of bodies to allow picking body with mouse (performance reasons)"))
 		((bool,intrAllWire,false,"Draw wire for all interactions, blue for potential and green for real ones (mostly for debugging)")),

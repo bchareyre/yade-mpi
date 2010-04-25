@@ -88,7 +88,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 		ScGeom* currentContactGeometry  = YADE_CAST<ScGeom*> (ig.get());
 		CohFrictPhys* currentContactPhysics = YADE_CAST<CohFrictPhys*> (ip.get());
 		Vector3r& shearForce    = currentContactPhysics->shearForce;
-		if (contact->isFresh(scene)) shearForce   = Vector3r::ZERO;
+		if (contact->isFresh(scene)) shearForce   = Vector3r::Zero();
 
 		Real un     = currentContactGeometry->penetrationDepth;
 		Real Fn    = currentContactPhysics->kn*un;
@@ -99,8 +99,8 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 			scene->interactions->requestErase(contact->getId1(),contact->getId2());
 			// contact->interactionPhysics was reset now; currentContactPhysics still hold the object, but is not associated with the interaction anymore
 			currentContactPhysics->cohesionBroken = true;
-			currentContactPhysics->normalForce = Vector3r::ZERO;
-			currentContactPhysics->shearForce = Vector3r::ZERO;
+			currentContactPhysics->normalForce = Vector3r::Zero();
+			currentContactPhysics->shearForce = Vector3r::Zero();
 		} else {
 			State* de1 = Body::byId(id1,ncb)->state.get();
 			State* de2 = Body::byId(id2,ncb)->state.get();
@@ -122,7 +122,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 				maxFs = maxFs / Fs;
 				if (maxFs>1) cerr << "maxFs>1!!" << endl;
 				shearForce *= maxFs;
-				if (Fn<0)  currentContactPhysics->normalForce = Vector3r::ZERO;}
+				if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();}
 			
 			applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
 

@@ -23,7 +23,7 @@ Dem3DofGeom_SphereSphere::~Dem3DofGeom_SphereSphere(){}
  * @returns The projected point coordinates (with origin at the contact point).
  */
 Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& fromXtoPtOri, const Real& radius, const Vector3r& planeNormal){
-	Quaternionr normal2pt; normal2pt.Align(planeNormal,fromXtoPtOri*Vector3r::UNIT_X);
+	Quaternionr normal2pt; normal2pt.Align(planeNormal,fromXtoPtOri*Vector3r::UnitX());
 	Vector3r axis; Real angle; normal2pt.ToAxisAngle(axis,angle);
 	return (angle*radius) /* length */ *(axis.Cross(planeNormal)) /* direction: both are unit vectors */;
 }
@@ -40,14 +40,14 @@ Vector3r Dem3DofGeom_SphereSphere::unrollSpherePtToPlane(const Quaternionr& from
  * @note It is not checked whether planePt relly lies on the tangent plane. If not, result will be incorrect.
  */
 Quaternionr Dem3DofGeom_SphereSphere::rollPlanePtToSphere(const Vector3r& planePt, const Real& radius, const Vector3r& planeNormal){
-	if (planePt!=Vector3r::ZERO) {
+	if (planePt!=Vector3r::Zero()) {
 		Quaternionr normal2pt;
 		Vector3r axis=planeNormal.Cross(planePt); axis.Normalize();
 		Real angle=planePt.Length()/radius;
 		normal2pt.FromAxisAngle(axis,angle);
-		Quaternionr ret; return ret.Align(Vector3r::UNIT_X,normal2pt*planeNormal);
+		Quaternionr ret; return ret.Align(Vector3r::UnitX(),normal2pt*planeNormal);
 	} else {
-		Quaternionr ret; return ret.Align(Vector3r::UNIT_X,planeNormal);
+		Quaternionr ret; return ret.Align(Vector3r::UnitX(),planeNormal);
 	}
 }
 
@@ -152,11 +152,11 @@ void Dem6DofGeom_SphereSphere::bendTwistAbs(Vector3r& bend, Real& twist){
 		#endif
 		// sphere center to point on the sphere
 		if(rolledPoints){
-			GLUtils::GLDrawLine(pos1,pos1+(ss->ori1*ss->cp1rel*Vector3r::UNIT_X*ss->effR1),Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(pos2,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2),Vector3r(0,1,.5));
+			GLUtils::GLDrawLine(pos1,pos1+(ss->ori1*ss->cp1rel*Vector3r::UnitX()*ss->effR1),Vector3r(0,.5,1));
+			GLUtils::GLDrawLine(pos2,pos2+(ss->ori2*ss->cp2rel*Vector3r::UnitX()*ss->effR2),Vector3r(0,1,.5));
 		}
 		//TRVAR4(pos1,ss->ori1,pos2,ss->ori2);
-		//TRVAR2(ss->cp2rel,pos2+(ss->ori2*ss->cp2rel*Vector3r::UNIT_X*ss->effR2));
+		//TRVAR2(ss->cp2rel,pos2+(ss->ori2*ss->cp2rel*Vector3r::UnitX()*ss->effR2));
 		// contact point to projected points
 		if(unrolledPoints||shear){
 			Vector3r ptTg1=ss->contPtInTgPlane1(), ptTg2=ss->contPtInTgPlane2();
@@ -203,8 +203,8 @@ bool Ig2_Sphere_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const share
 		
 		// for bending only: ss->initRelOri12=state1.ori.Conjugate()*state2.ori;
 		// quasi-constants
-		ss->cp1rel.Align(Vector3r::UNIT_X,state1.ori.Conjugate()*normal);
-		ss->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normal));
+		ss->cp1rel.Align(Vector3r::UnitX(),state1.ori.Conjugate()*normal);
+		ss->cp2rel.Align(Vector3r::UnitX(),state2.ori.Conjugate()*(-normal));
 		ss->cp1rel.Normalize(); ss->cp2rel.Normalize();
 	}
 	ss->normal=normal;

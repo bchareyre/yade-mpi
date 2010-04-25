@@ -213,6 +213,9 @@ public:
     // special matrices
     WM3_FUN WM3_ITEM static const Matrix3 ZERO;
     WM3_FUN WM3_ITEM static const Matrix3 IDENTITY;
+	 EIG_FUN static const Matrix3 Identity(){ return IDENTITY; }
+	 EIG_FUN static const Matrix3 Zero(){ return ZERO; }
+
 
 private:
     // Support for eigendecomposition.  The Tridiagonalize function applies

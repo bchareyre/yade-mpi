@@ -54,8 +54,8 @@ void Law2_ScGeom_FrictPhys_Basic::go(shared_ptr<InteractionGeometry>& ig, shared
 	FrictPhys* currentContactPhysics = static_cast<FrictPhys*>(ip.get());
 	if(currentContactGeometry->penetrationDepth <0){
 		if (neverErase) {
-			currentContactPhysics->shearForce = Vector3r::ZERO;
-			currentContactPhysics->normalForce = Vector3r::ZERO;}
+			currentContactPhysics->shearForce = Vector3r::Zero();
+			currentContactPhysics->normalForce = Vector3r::Zero();}
 		else 	ncb->interactions->requestErase(id1,id2);
 		return;}
 	State* de1 = Body::byId(id1,ncb)->state.get();

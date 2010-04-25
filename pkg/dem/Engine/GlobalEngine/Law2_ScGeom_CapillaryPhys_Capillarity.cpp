@@ -217,7 +217,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 					{
 						if (currentContactPhysics->fusionNumber !=0) 
 						{	//cerr << "fusion" << endl;
-                                                        currentContactPhysics->Fcap = Vector3r::ZERO;
+                                                        currentContactPhysics->Fcap = Vector3r::Zero();
                                                         continue;
                                                 }
                                         }

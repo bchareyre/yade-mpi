@@ -111,7 +111,7 @@
     WM3_FUN Quaternion Exp () const;  // apply to quaternion with w = 0
     WM3_FUN Quaternion Log () const;  // apply to unit-length quaternion
 	 EIG_FUN void normalize() { (void)Normalize(); } 
-	 EIG_FUN Quaternion conjugate() const { (void)Conjugate(); } 
+	 EIG_FUN Quaternion conjugate() const { return Conjugate(); } 
 
 
     // rotation of a vector by a quaternion
@@ -138,6 +138,7 @@
     // any axis of rotation will do, such as the permutation (z2,x2,y2), where
     // V2 = (x2,y2,z2).
     WM3_FUN Quaternion& Align (const Vector3<Real>& rkV1, const Vector3<Real>& rkV2);
+	 EIG_FUN Quaternion& setFromTwoVectors(const Vector3r& a, const Vector3r& b){ return Align(a,b); }
 
     // Decompose a quaternion into q = q_twist * q_swing, where q is 'this'
     // quaternion.  If V1 is the input axis and V2 is the rotation of V1 by

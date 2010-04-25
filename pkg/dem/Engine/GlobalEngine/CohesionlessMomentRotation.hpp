@@ -48,14 +48,14 @@ class MomentPhys: public NormShearPhys {
 		((Real,frictionAngle,0,"Friction angle [rad]"))
 		((Real,tanFrictionAngle,0,"Tangent of friction angle"))
 		((Real,Eta,0,"??"))
-		((Quaternionr,initialOrientation1,Quaternionr::IDENTITY,"??"))
-		((Quaternionr,initialOrientation2,Quaternionr::IDENTITY,"??"))
-		((Vector3r,prevNormal,Vector3r::ZERO,"Normal in the previous step."))
+		((Quaternionr,initialOrientation1,Quaternionr::Identity(),"??"))
+		((Quaternionr,initialOrientation2,Quaternionr::Identity(),"??"))
+		((Vector3r,prevNormal,Vector3r::Zero(),"Normal in the previous step."))
 		((Real,kr,0,"rolling stiffness"))
-		((Vector3r,moment_twist,Vector3r::ZERO,"??"))
-		((Vector3r,moment_bending,Vector3r::ZERO,"??"))
+		((Vector3r,moment_twist,Vector3r::Zero(),"??"))
+		((Vector3r,moment_bending,Vector3r::Zero(),"??"))
 		((Real,cumulativeRotation,0,"??"))
-		((Vector3r,shear,Vector3r::ZERO,"??")),
+		((Vector3r,shear,Vector3r::Zero(),"??")),
 		createIndex();
 	);
 	REGISTER_CLASS_INDEX(MomentPhys,NormShearPhys);

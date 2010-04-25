@@ -100,7 +100,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
       	if ( Fs  > maxFs )
 	{
 	shearForce *= maxFs/Fs;
-	//if ( Fn<0 )  phys->normalForce = Vector3r::ZERO;
+	//if ( Fn<0 )  phys->normalForce = Vector3r::Zero();
 	}
 
 	phys->shearForce = shearForce; //for recording purposes

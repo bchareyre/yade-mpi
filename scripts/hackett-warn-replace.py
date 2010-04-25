@@ -44,7 +44,17 @@ renamedSymbols={
 	'W':'w',
 	'X':'x',
 	'Y':'y',
-	'Z':'z'}
+	'Z':'z',
+	'Cross':'cross',
+	'Dot':'dot',
+	'Conjugate':'conjugate',
+	'Inverse':'inverse',
+	'Determinant':'determinant',
+	'Transpose':'transpose',
+	'Length':'norm',
+	'SquaredLength':'squaredNorm',
+	'Align':'setFromTwoVectors'
+	}
 
 # places where deprecated methods are used
 # keys are symbols, value is a list of (file,line,count)
@@ -67,11 +77,12 @@ Doffsets={}
 #	('z','include/yade/yade-lib-serialization/KnownFundamentalsHandler.tpp',187):192,
 #	('sqRoot','include/yade/yade-lib-wm3-math/Vector2.ipp',243):241}
 
+unknownDeprec=set()
+
 # parse the build log as fed by stdin
 for l in sys.stdin.xreadlines():
 	if match(runCxxPattern,l): #initialization, i.e. the compiler being run; until the next compiler run or EOF, all messages belong to this compilation.
 		# merge dictonary from the previous compiler run
-		print 'COMPILER'
 		for s in D1.keys():
 			if not s in D.keys(): # new symbol; simply add
 				D[s]=D1[s]
@@ -83,12 +94,12 @@ for l in sys.stdin.xreadlines():
 					if ss[0]!=ss1[0]: continue # file doesn't match, doesn't belong here
 					if ss[1]!=ss1[1]: continue # line doesn't match, dtto
 					# here, symbol, file, and line match. Make sure that count also matches. It should.
-					if ss[2]==ss1[2]: # this is OK. Last compilation all report that symbole the same number of times for that line
+					if ss[2]==ss1[2]: # this is OK. Last compilation all report that symbol the same number of times for that line
 						done=True
 					else:
-						logging.error("%s:%d: Deprecations warning number doesn't match for `%s'"%(file,line))
+						logging.error("%s:%d: Deprecations warning number doesn't match for `%s'"%(f,line,s))
 						# since it is a fatal logic error, bail out
-						assert(1==0)
+						#assert(1==0)
 				if done: continue
 				D[s].append(ss1) # warning not yet encountered at this place exactly
 		# now hashes have been merged
@@ -103,7 +114,8 @@ for l in sys.stdin.xreadlines():
 		if 'yade/lib-miniWm3/' in f: continue # ignore warnings in wwm3 headers themselves
 		# this indicates inconsistency of what symbols are marked as deprecated and what we think these are
 		if not symbol in renamedSymbols.keys():
-			logging.error("%s:%d: Unknown symbol `%s' reported as deprecated?!"%(f,line,symbol))
+			#logging.error("%s:%d: Unknown symbol `%s' reported as deprecated."%(f,line,symbol))
+			unknownDeprec.add(symbol)
 			continue
 		Dcount+=1
 		# handle cases where compiler reports wrong line number: adjust the line number
@@ -123,6 +135,7 @@ for l in sys.stdin.xreadlines():
 		if not done: D1[symbol].append([f,line,1])
 
 logging.info('Total number of %d deprecation warnings processed.'%Dcount)
+logging.info('These symbols were reported deprecated but are not known: %s'%(', '.join(unknownDeprec)))
 
 #############################################################################################################################
 ## now go ahead and modify sources... :-( scared? huh, there will be many safety checks on the way, don't worry...
@@ -158,7 +171,7 @@ for fName in fileList:
 	bcupFile=origFile+'.~undeprecated~'
 	logging.info("Modifying file `%s' (%s); backup is `%s'."%(origFile,fName,bcupFile))
 	# the first branch is normal run. The second one is a dry-run, where original files are not modified
-	if 1:
+	if 0:
 		shutil.move(origFile,bcupFile)
 		fout=open(origFile,'w')
 		fin=open(bcupFile)

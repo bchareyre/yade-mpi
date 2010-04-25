@@ -24,7 +24,7 @@ void SumIntrForcesCb::go(IntrCallback* _self, Interaction* i){
 	NormShearPhys* nsp=YADE_CAST<NormShearPhys*>(i->interactionPhysics.get());
 	assert(nsp!=NULL); // only effective in debug mode
 	Vector3r f=nsp->normalForce+nsp->shearForce;
-	if(f==Vector3r::ZERO) return;
+	if(f==Vector3r::Zero()) return;
 	self->numIntr+=1;
 	self->force+=f.Length();
 	//cerr<<"[cb#"<<i->getId1()<<"+"<<i->getId2()<<"]";

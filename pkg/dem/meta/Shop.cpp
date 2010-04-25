@@ -72,14 +72,14 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 	Scene* scene=Omega::instance().getScene().get(); const shared_ptr<Cell>& cell(scene->cell); const Matrix3r& trsf(cell->trsf);
 	Vector3r size=cell->getSize();
 	Matrix3r flip;
-	if(_flip==Matrix3r::ZERO){
+	if(_flip==Matrix3r::Zero()){
 		bool hasNonzero=false;
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
 			if(i==j){ flip[i][j]=0; continue; }
 			flip[i][j]=-floor(.5+trsf[i][j]/(size[j]/size[i]));
 			if(flip[i][j]!=0) hasNonzero=true;
 		}
-		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::ZERO;}
+		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::Zero();}
 		LOG_DEBUG("Computed flip matrix: upper "<<flip[0][1]<<","<<flip[0][2]<<","<<flip[1][2]<<"; lower "<<flip[1][0]<<","<<flip[2][0]<<","<<flip[2][1]);
 	} else {
 		flip=_flip;
@@ -152,7 +152,7 @@ Requires all .isReal() interaction to have interactionPhysics deriving from Norm
 */
 Vector3r Shop::totalForceInVolume(Real& avgIsoStiffness, Scene* _rb){
 	Scene* rb=_rb ? _rb : Omega::instance().getScene().get();
-	Vector3r force(Vector3r::ZERO); Real stiff=0; long n=0;
+	Vector3r force(Vector3r::Zero()); Real stiff=0; long n=0;
 	FOREACH(const shared_ptr<Interaction>&I, *rb->interactions){
 		if(!I->isReal()) continue;
 		NormShearPhys* nsi=YADE_CAST<NormShearPhys*>(I->interactionPhysics.get());
@@ -466,7 +466,7 @@ boost::tuple<Real,Real,Real> Shop::spiralProject(const Vector3r& pt, Real dH_dTh
 	int ax1=(axis+1)%3,ax2=(axis+2)%3;
 	Real r=sqrt(pow(pt[ax1],2)+pow(pt[ax2],2));
 	Real theta;
-	if(r>Mathr::ZERO_TOLERANCE){
+	if(r>Mathr::Zero()_TOLERANCE){
 		theta=acos(pt[ax1]/r);
 		if(pt[ax2]<0) theta=Mathr::TWO_PI-theta;
 	}
@@ -1140,8 +1140,8 @@ void Shop::getViscoelasticFromSpheresInteraction( Real m, Real tc, Real en, Real
     b->ks = 2.0/7.0 * m/tc/tc * ( Mathr::PI*Mathr::PI + Mathr::Pow(Mathr::Log(es),2) );
     b->cs = -2.0/7.0 * m/tc * Mathr::Log(es);
 
-    if (Math<Real>::FAbs(b->cn) <= Math<Real>::ZERO_TOLERANCE ) b->cn=0;
-    if (Math<Real>::FAbs(b->cs) <= Math<Real>::ZERO_TOLERANCE ) b->cs=0;
+    if (Math<Real>::FAbs(b->cn) <= Math<Real>::Zero()_TOLERANCE ) b->cn=0;
+    if (Math<Real>::FAbs(b->cs) <= Math<Real>::Zero()_TOLERANCE ) b->cs=0;
 }
 
 /* This function is copied almost verbatim from scientific python, module Visualization, class ColorScale

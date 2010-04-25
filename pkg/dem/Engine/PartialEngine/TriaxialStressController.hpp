@@ -116,8 +116,8 @@ class TriaxialStressController : public BoundaryController
    		/* constructor */
    		first = true;
 		stiffness.resize(6);
-		previousTranslation.assign(Vector3r::ZERO);
-		for (int i=0; i<6; ++i){normal[i]=stress[i]=force[i]=Vector3r::ZERO;stiffness[i]=0;}
+		previousTranslation.assign(Vector3r::Zero());
+		for (int i=0; i<6; ++i){normal[i]=stress[i]=force[i]=Vector3r::Zero();stiffness[i]=0;}
 		normal[wall_bottom].Y()=1;
 		normal[wall_top].Y()=-1;
 		normal[wall_left].X()=1;

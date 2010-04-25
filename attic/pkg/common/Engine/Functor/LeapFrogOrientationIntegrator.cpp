@@ -43,7 +43,7 @@ void LeapFrogOrientationIntegrator::go(	  const shared_ptr<PhysicalParameters>& 
 		if((rb->blockedDOFs & PhysicalParameters::DOF_RY)==0) rb->angularVelocity[1]+=dt*rb->angularAcceleration[1];
 		if((rb->blockedDOFs & PhysicalParameters::DOF_RZ)==0) rb->angularVelocity[2]+=dt*rb->angularAcceleration[2];
 	}
-	if(forces.getMoveRotUsed() && forces.getRot(body->getId())!=Vector3r::ZERO){ Vector3r r(forces.getRot(body->getId())); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); rb->se3.orientation=q*rb->se3.orientation; }
+	if(forces.getMoveRotUsed() && forces.getRot(body->getId())!=Vector3r::Zero()){ Vector3r r(forces.getRot(body->getId())); Real norm=r.Normalize(); q.FromAxisAngle(r,norm); rb->se3.orientation=q*rb->se3.orientation; }
 
 	rb->se3.orientation.Normalize();
 

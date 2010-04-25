@@ -66,7 +66,7 @@ void PositionSnapshot::action()
 	myfile << "Id Rayon Xc Yc Zc   a l'it " << Omega::instance().getCurrentIteration() << endl;
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	Vector3r pos(Vector3r::ZERO);	// which will be the position (of the center) of the considered body
+	Vector3r pos(Vector3r::Zero());	// which will be the position (of the center) of the considered body
 	body_id_t Id;			// its identity
 
 	BodyContainer::iterator bi    = bodies->begin();

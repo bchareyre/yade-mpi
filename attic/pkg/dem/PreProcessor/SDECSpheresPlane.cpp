@@ -355,7 +355,7 @@ void SDECSpheresPlane::positionRootBody(shared_ptr<Scene>& rootBody)
 	physics->se3				= Se3r(Vector3r(0,0,0),q);
 	physics->mass				= 0;
 	physics->velocity			= Vector3r(0,0,0);
-	physics->acceleration			= Vector3r::ZERO;
+	physics->acceleration			= Vector3r::Zero();
 		
 	
 	shared_ptr<Aabb> aabb(new Aabb);

@@ -15,7 +15,7 @@
 #define RENDERS(name) public: virtual string renders() const { return #name;};
 
 struct GLViewInfo{
-	GLViewInfo(): sceneCenter(Vector3r::ZERO), sceneRadius(1.){}
+	GLViewInfo(): sceneCenter(Vector3r::Zero()), sceneRadius(1.){}
 	Vector3r sceneCenter;
 	Real sceneRadius;
 };

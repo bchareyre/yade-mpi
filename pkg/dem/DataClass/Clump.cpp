@@ -110,7 +110,7 @@ void Clump::moveMembers(){
 		}
 	#endif
 
-	state->accel=state->angAccel=Vector3r::ZERO;
+	state->accel=state->angAccel=Vector3r::Zero();
 }
 
 /*! Clump's se3 will be updated (origin at centroid and axes coincident with principal inertia axes) and subSe3 modified in such a way that members positions in world coordinates will not change.
@@ -169,11 +169,11 @@ void Clump::updateProperties(bool intersecting){
 		state->pos=subState->pos;
 		state->ori=subState->ori;
 		// relative member's se3 is identity
-		I->second.position=Vector3r::ZERO; I->second.orientation=Quaternionr::IDENTITY;
+		I->second.position=Vector3r::Zero(); I->second.orientation=Quaternionr::Identity();
 		state->inertia=subState->inertia;	
 		state->mass=subState->mass;
-		state->vel=Vector3r::ZERO;
-		state->angVel=Vector3r::ZERO;
+		state->vel=Vector3r::Zero();
+		state->angVel=Vector3r::Zero();
 		return;
 	}
 
@@ -246,7 +246,7 @@ void Clump::updateProperties(bool intersecting){
 	TRWM3VEC(state->inertia);
 
 	// TODO: these might be calculated from members... but complicated... - someone needs that?!
-	state->vel=state->angVel=Vector3r::ZERO;
+	state->vel=state->angVel=Vector3r::Zero();
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
 	// Conjugate is equivalent to Inverse for normalized quaternions

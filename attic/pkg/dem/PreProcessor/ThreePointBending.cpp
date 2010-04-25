@@ -236,7 +236,7 @@ void ThreePointBending::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 							, physics->mass*(extents[0]*extents[0]+extents[2]*extents[2])/3
 							, physics->mass*(extents[1]*extents[1]+extents[0]*extents[0])/3
 						);
-	physics->se3			= Se3r(position,Quaternionr::IDENTITY);
+	physics->se3			= Se3r(position,Quaternionr::Identity());
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
@@ -337,8 +337,8 @@ void ThreePointBending::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;
-	physics->velocity		= Vector3r::ZERO;
-	physics->acceleration		= Vector3r::ZERO;
+	physics->velocity		= Vector3r::Zero();
+	physics->acceleration		= Vector3r::Zero();
 	
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);

@@ -71,7 +71,7 @@ void ForceSnapshot::action()
 // 	that is to say : the ids of the two interacting bodies, the norm of the normal force, and the radii and the position of the centers of the two spheres, and finally the number of the corresponding iteration
 
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	Vector3r pos(Vector3r::ZERO);	// which will be the position (of the center) of the considered body
+	Vector3r pos(Vector3r::Zero());	// which will be the position (of the center) of the considered body
 
 	InteractionContainer::iterator ii    = ncb->interactions->begin();
 	InteractionContainer::iterator iiEnd = ncb->interactions->end();

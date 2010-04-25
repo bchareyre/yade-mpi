@@ -16,9 +16,9 @@ class RotationEngine: public PartialEngine{
 		virtual void action();
 	YADE_CLASS_BASE_DOC_ATTRS(RotationEngine,PartialEngine,"Engine applying rotation (by setting angular velocity) to subscribed bodies. If rotateAroundZero is set, then each body is also displaced around zeroPoint.",
 		((Real,angularVelocity,0,"Angular velocity. [rad/s]"))
-		((Vector3r,rotationAxis,Vector3r::UNIT_X,"Axis of rotation (direction); will be normalized automatically."))
+		((Vector3r,rotationAxis,Vector3r::UnitX(),"Axis of rotation (direction); will be normalized automatically."))
 		((bool,rotateAroundZero,false,"If True, bodies will not rotate around their centroids, but rather around ``zeroPoint``."))
-		((Vector3r,zeroPoint,Vector3r::ZERO,"Point around which bodies will rotate if ``rotateAroundZero`` is True"))
+		((Vector3r,zeroPoint,Vector3r::Zero(),"Point around which bodies will rotate if ``rotateAroundZero`` is True"))
 	);
 };
 REGISTER_SERIALIZABLE(RotationEngine);
@@ -31,8 +31,8 @@ class SpiralEngine:public PartialEngine{
 	YADE_CLASS_BASE_DOC_ATTRS(SpiralEngine,PartialEngine,"Engine applying both rotation and translation, along the same axis, whence the name SpiralEngine",
 		((Real,angularVelocity,0,"Angular velocity [rad/s]"))
 		((Real,linearVelocity,0,"Linear velocity [m/s]"))
-		((Vector3r,axis,Vector3r::UNIT_X,"Axis of translation and rotation; will be normalized by the engine."))
-		((Vector3r,axisPt,Vector3r::ZERO,"A point on the axis, to position it in space properly."))
+		((Vector3r,axis,Vector3r::UnitX(),"Axis of translation and rotation; will be normalized by the engine."))
+		((Vector3r,axisPt,Vector3r::Zero(),"A point on the axis, to position it in space properly."))
 		((Real,angleTurned,0,"How much have we turned so far. |yupdate| [rad]"))
 	);
 };

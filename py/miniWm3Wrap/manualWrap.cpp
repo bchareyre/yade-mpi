@@ -100,8 +100,8 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		/* extras for matrices */
 		.def("__setitem__",&::Matrix3_set_item_linear)
 		.def("__getitem__",&::Matrix3_get_item_linear)
-		.def_readonly("IDENTITY",Matrix3r::IDENTITY)
-		.def_readonly("ZERO",Matrix3r::ZERO)
+		.def_readonly("IDENTITY",Matrix3r::Identity())
+		.def_readonly("ZERO",Matrix3r::Zero())
 	;
 	bp::class_<Quaternionr>("Quaternion",bp::init<>())
 		.def(bp::init<Vector3r,Real>((bp::arg("axis"),bp::arg("angle"))))
@@ -135,8 +135,8 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__getitem__",&::Quaternion_get_item)
 		.def("__str__",&::Quaternion_str)
 		.def("__repr__",&::Quaternion_str)
-		.def_readonly("IDENTITY",Matrix3r::IDENTITY)
-		.def_readonly("ZERO",Matrix3r::ZERO)
+		.def_readonly("IDENTITY",Matrix3r::Identity())
+		.def_readonly("ZERO",Matrix3r::Zero())
 	;
 	bp::class_<Vector2r>("Vector2",bp::init<>())
 		.def(bp::init<Vector2r>((bp::arg("other"))))
@@ -163,9 +163,9 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__str__",&::Vector2_str)
 		.def("__repr__",&::Vector2_str)
 		.def_readonly("ONE",Vector2r::ONE)
-		.def_readonly("UNIT_X",Vector2r::UNIT_X)
-		.def_readonly("UNIT_Y",Vector2r::UNIT_Y)
-		.def_readonly("ZERO",Vector2r::ZERO)
+		.def_readonly("UNIT_X",Vector2r::UnitX())
+		.def_readonly("UNIT_Y",Vector2r::UnitY())
+		.def_readonly("ZERO",Vector2r::Zero())
 	;
 	bp::class_<Vector3r>("Vector3",bp::init<>())
 		.def(bp::init<Vector3r>((bp::arg("other"))))
@@ -193,10 +193,10 @@ BOOST_PYTHON_MODULE(miniWm3Wrap){
 		.def("__str__",&::Vector3_str)
 		.def("__repr__",&::Vector3_str)
 		.def_readonly("ONE",Vector3r::ONE)
-		.def_readonly("UNIT_X",Vector3r::UNIT_X)
-		.def_readonly("UNIT_Y",Vector3r::UNIT_Y)
-		.def_readonly("UNIT_Z",Vector3r::UNIT_Z)
-		.def_readonly("ZERO",Vector3r::ZERO)
+		.def_readonly("UNIT_X",Vector3r::UnitX())
+		.def_readonly("UNIT_Y",Vector3r::UnitY())
+		.def_readonly("UNIT_Z",Vector3r::UnitZ())
+		.def_readonly("ZERO",Vector3r::Zero())
 	;	
 	
 };

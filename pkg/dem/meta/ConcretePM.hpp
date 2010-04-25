@@ -66,8 +66,8 @@ class CpmState: public State {
 		((Real,normDmg,0,"Average damage including already deleted contacts (it is really not damage, but 1-relResidualStrength now)"))
 		((Real,epsPlBroken,0,"Plastic strain on contacts already deleted (bogus values)"))
 		((Real,normEpsPl,0,"Sum of plastic strains normalized by number of contacts (bogus values)"))
-		((Vector3r,sigma,Vector3r::ZERO,"Normal stresses on the particle"))
-		((Vector3r,tau,Vector3r::ZERO,"Shear stresses on the particle."))
+		((Vector3r,sigma,Vector3r::Zero(),"Normal stresses on the particle"))
+		((Vector3r,tau,Vector3r::Zero(),"Shear stresses on the particle."))
 	);
 };
 REGISTER_SERIALIZABLE(CpmState);
@@ -136,7 +136,7 @@ class CpmPhys: public NormShearPhys {
 			((Real,epsPlSum,0,"cummulative shear plastic strain measure (scalar) on this contact"))
 			((bool,isCohesive,false,"if not cohesive, interaction is deleted when distance is greater than zero."))
 			,
-			createIndex(); epsT=Fs=Vector3r::ZERO; Fn=0; omega=0;
+			createIndex(); epsT=Fs=Vector3r::Zero(); Fn=0; omega=0;
 			,
 			.def_readonly("omega",&CpmPhys::omega,"Damage internal variable")
 			.def_readonly("epsT",&CpmPhys::epsT,"Transversal strain (not used)")
@@ -221,7 +221,7 @@ REGISTER_SERIALIZABLE(Law2_Dem3DofGeom_CpmPhys_Cpm);
 #endif
 
 class CpmStateUpdater: public PeriodicEngine {
-	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::ZERO), tau(Vector3r::ZERO) {} };
+	struct BodyStats{ int nCohLinks; int nLinks; Real dmgSum, epsPlSum; Vector3r sigma, tau; BodyStats(): nCohLinks(0), nLinks(0), dmgSum(0.), epsPlSum(0.), sigma(Vector3r::Zero()), tau(Vector3r::Zero()) {} };
 	public:
 		virtual void action(){ update(scene); }
 		void update(Scene* rb=NULL);

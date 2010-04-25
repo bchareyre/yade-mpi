@@ -267,7 +267,7 @@ void TriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, Vector3r
 	int ax0 = extents[0]==0 ? 0 : (extents[1]==0 ? 1 : 2); int ax1=(ax0+1)%3, ax2=(ax0+2)%3;
 	if(facetWalls){
 		Vector3r corner=position-extents; // "lower right" corner, with 90 degrees
-		Vector3r side1(Vector3r::ZERO); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::ZERO); side2[ax2]=4*extents[ax2];
+		Vector3r side1(Vector3r::Zero()); side1[ax1]=4*extents[ax1]; Vector3r side2(Vector3r::Zero()); side2[ax2]=4*extents[ax2];
 		Vector3r v[3]; v[0]=corner; v[1]=corner+side1; v[2]=corner+side2;
 		Vector3r cog=Shop::inscribedCircleCenter(v[0],v[1],v[2]);
 		shared_ptr<Facet> iFacet(new Facet);

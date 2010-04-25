@@ -14,7 +14,7 @@ Vector3r ScGeom::updateShear(const State* rbp1, const State* rbp2, Real dt, bool
 	Vector3r axis;
 	Real angle;
 
-	Vector3r shearIncrement(Vector3r::ZERO);
+	Vector3r shearIncrement(Vector3r::Zero());
 
 	// approximated rotations
 		axis = prevNormal.Cross(normal); 

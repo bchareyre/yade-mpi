@@ -110,7 +110,7 @@ void particleMacroStress(void){
 	}
 	for(body_id_t id1=0; id1<(body_id_t)bIntr.size(); id1++){
 		if(bIntr[id1].size()==0) continue;
-		Matrix3r ss(Matrix3r::ZERO); // stress tensor on current particle
+		Matrix3r ss(Matrix3r::Zero()); // stress tensor on current particle
 		FOREACH(body_id_t id2, bIntr[id1]){
 			const shared_ptr<Interaction> i=scene->interactions->find(id1,id2);
 			assert(i);
@@ -179,14 +179,14 @@ struct SpiralInteractionLocator2d{
 	// return macroscopic stress around interactions that project around given point
 	// stresses are rotated around axis back by theta angle
 	Matrix3r macroStressAroundPt(const Vector2r& pt, Real radius){
-		Matrix3r ss(Matrix3r::ZERO);
+		Matrix3r ss(Matrix3r::Zero());
 		FOREACH(const Vector2i& v, grid->circleFilter(pt,radius)){
 			FOREACH(const FlatInteraction& fi, grid->grid[v[0]][v[1]]){
 				if((pow(fi.r-pt[0],2)+pow(fi.h-pt[1],2))>radius*radius) continue; // too far
 				Dem3DofGeom* geom=YADE_CAST<Dem3DofGeom*>(fi.i->interactionGeometry.get());
 				CpmPhys* phys=YADE_CAST<CpmPhys*>(fi.i->interactionPhysics.get());
 				// transformation matrix, to rotate to the plane
-				Vector3r ax(Vector3r::ZERO); ax[axis]=1.;
+				Vector3r ax(Vector3r::Zero()); ax[axis]=1.;
 				Quaternionr q; q.FromAxisAngle(ax,fi.theta); q=q.Conjugate();
 				Matrix3r TT; q.ToRotationMatrix(TT);
 				//
@@ -264,7 +264,7 @@ class InteractionLocator{
 		return ret;
 	}
 	python::tuple macroAroundPt(const Vector3r& pt, Real radius){
-		Matrix3r ss(Matrix3r::ZERO);
+		Matrix3r ss(Matrix3r::Zero());
 		vtkIdList *ids=vtkIdList::New();
 		locator->FindPointsWithinRadius(radius,(const double*)(&pt),ids);
 		int numIds=ids->GetNumberOfIds();

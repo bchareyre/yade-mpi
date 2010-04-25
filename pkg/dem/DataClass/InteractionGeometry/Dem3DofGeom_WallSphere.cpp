@@ -21,7 +21,7 @@ void Dem3DofGeom_WallSphere::setTgPlanePts(const Vector3r& p1new, const Vector3r
 void Dem3DofGeom_WallSphere::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
 	//TRVAR2(p2.Length(),effR2);
 	if(p2.SquaredLength()>pow(effR2,2)){
-		setTgPlanePts(Vector3r::ZERO,p2-p1);
+		setTgPlanePts(Vector3r::Zero(),p2-p1);
 	}
 }
 
@@ -63,8 +63,8 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 		ws->refR1=-1; ws->refR2=sphereRadius;
 		ws->refLength=ws->effR2;
 		ws->cp1pt=contPt-state1.pos; // initial contact point relative to wall position (orientation is global, since it is coincident with local for a wall)
-		ws->cp2rel=Quaternionr::IDENTITY;
-		ws->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
+		ws->cp2rel=Quaternionr::Identity();
+		ws->cp2rel.Align(Vector3r::UnitX(),state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		ws->cp2rel.Normalize();
 		//LOG_INFO(ws->cp1pt);
 	}
@@ -98,7 +98,7 @@ bool Ig2_Wall_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared_
 		// sphere center to point on the sphere
 		if(rolledPoints){
 			GLUtils::GLDrawLine(pos1+ws->cp1pt,contPt,Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(pos2,pos2+(ori2*ws->cp2rel*Vector3r::UNIT_X*ws->effR2),Vector3r(0,1,.5));
+			GLUtils::GLDrawLine(pos2,pos2+(ori2*ws->cp2rel*Vector3r::UnitX()*ws->effR2),Vector3r(0,1,.5));
 		}
 		// contact point to projected points
 		if(unrolledPoints||shear){

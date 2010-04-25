@@ -507,8 +507,8 @@ void SnowVoxelsLoader::positionRootBody(shared_ptr<Scene>& rootBody)
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
 	physics->se3			= Se3r(Vector3r(0,0,0),q);
 	physics->mass			= 0;
-	physics->velocity		= Vector3r::ZERO;
-	physics->acceleration		= Vector3r::ZERO;
+	physics->velocity		= Vector3r::Zero();
+	physics->acceleration		= Vector3r::Zero();
 	
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);

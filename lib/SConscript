@@ -54,8 +54,7 @@ if 'opengl' in env['features']:
 #env.Install('$PREFIX/lib/yade$SUFFIX/lib',env.StaticLibrary
 yadeStaticOrSharedLib('yade-support',[
 	env.Combine('yade-support.cpp',(['base/yadeEigenWrapper.cpp'] if 'nowm3' in env['features'] else ['base/yadeWm3Extra.cpp'])+
-		['computational-geometry/MarchingCube.cpp',
-			'factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
+		['factory/ClassFactory.cpp','serialization/SerializableSingleton.cpp','factory/DynLibManager.cpp','factory/FactoryExceptions.cpp',
 			'multimethods/Indexable.cpp','multimethods/MultiMethodsExceptions.cpp',
 			'serialization-xml/XMLFormatManager.cpp','serialization-xml/XMLSaxParser.cpp','serialization/Archive.cpp','serialization/IOFormatManager.cpp','serialization/IOManagerExceptions.cpp',
 			'serialization/FormatChecker.cpp','serialization/Serializable.cpp','serialization/SerializationExceptions.cpp',

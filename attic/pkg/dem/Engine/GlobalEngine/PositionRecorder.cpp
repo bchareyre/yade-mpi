@@ -48,7 +48,7 @@ bool PositionRecorder::isActivated(Scene*)
 void PositionRecorder::action()
 {
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
-	Vector3r pos(Vector3r::ZERO);
+	Vector3r pos(Vector3r::Zero());
 
 	//std::vector<int>::const_iterator ii = subscribedBodies.begin();
 	//std::vector<int>::const_iterator iiEnd = subscribedBodies.end();

@@ -82,8 +82,7 @@ class CohesiveTriaxialTest : public FileGenerator
 				,recordBottomForce
 				,recordAveragePositions
 				,boxWalls
-				,internalCompaction
-				,saveAnimationSnapshots;
+				,internalCompaction;
 
 		int		 recordIntervalIter
 				,timeStepUpdateInterval
@@ -102,7 +101,6 @@ class CohesiveTriaxialTest : public FileGenerator
 				,positionRecordFile
 				,velocityRecordFile
 				,importFilename
-				,AnimationSnapshotsBaseName
 				,WallStressRecordFile;
 	
 		//shared_ptr<ForceRecorder> forcerec;

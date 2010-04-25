@@ -32,7 +32,7 @@ Real computeOBB(const std::vector<Vector3r>& pts, const Matrix3r& rot, Vector3r&
 }
 
 void bestFitOBB(const std::vector<Vector3r>& pts, Vector3r& center, Vector3r& halfSize, Quaternionr& rot){
-	Vector3r angle0(Vector3r::ZERO), angle(Vector3r::ZERO);
+	Vector3r angle0(Vector3r::Zero()), angle(Vector3r::Zero());
 	Vector3r center0; Vector3r halfSize0;
 	Real bestVolume=std::numeric_limits<Real>::infinity();
 	Real sweep=Mathr::PI/4; Real steps=7.;

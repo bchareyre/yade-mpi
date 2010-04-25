@@ -25,7 +25,7 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 	Vector3r&  stiffness= stiffnesses[body->getId()];
 	Vector3r& Rstiffness=Rstiffnesses[body->getId()];
 	
-	if(!sdec || stiffness==Vector3r::ZERO)
+	if(!sdec || stiffness==Vector3r::Zero())
 		return; // not possible to compute!
 	
 	Real dtx, dty, dtz;	

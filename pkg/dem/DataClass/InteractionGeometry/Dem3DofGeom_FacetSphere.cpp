@@ -21,7 +21,7 @@ void Dem3DofGeom_FacetSphere::setTgPlanePts(const Vector3r& p1new, const Vector3
 void Dem3DofGeom_FacetSphere::relocateContactPoints(const Vector3r& p1, const Vector3r& p2){
 	//TRVAR2(p2.Length(),effR2);
 	if(p2.SquaredLength()>pow(effR2,2)){
-		setTgPlanePts(Vector3r::ZERO,p2-p1);
+		setTgPlanePts(Vector3r::Zero(),p2-p1);
 	}
 }
 
@@ -58,7 +58,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 			if(planeDist>sphereRadius && !c->isReal()) { /* LOG_TRACE("Sphere too far ("<<planeDist<<") from plane"); */ return false;  }
 			Vector3r planarPt=cogLine-planeDist*normal; // project sphere center to the facet plane
 			Real normDotPt[3];
-			Vector3r contactPt(Vector3r::ZERO);
+			Vector3r contactPt(Vector3r::Zero());
 			for(int i=0; i<3; i++) normDotPt[i]=facet->ne[i].Dot(planarPt-facet->vertices[i]);
 			short w=(normDotPt[0]>0?1:0)+(normDotPt[1]>0?2:0)+(normDotPt[2]>0?4:0);
 			//TRVAR4(planarPt,normDotPt[0],normDotPt[1],normDotPt[2]);
@@ -160,7 +160,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		// fs->refLength=…
 		fs->cp1pt=contactPt; // facet-local intial contact point
 		fs->localFacetNormal=facet->nf;
-		fs->cp2rel.Align(Vector3r::UNIT_X,state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
+		fs->cp2rel.Align(Vector3r::UnitX(),state2.ori.Conjugate()*(-normalGlob)); // initial sphere-local center-contactPt orientation WRT +x
 		fs->cp2rel.Normalize();
 	}
 	fs->se31=state1.se3; fs->se32=state2.se3; fs->se32.position+=shift2;
@@ -198,7 +198,7 @@ bool Ig2_Facet_Sphere_Dem3DofGeom::go(const shared_ptr<Shape>& cm1, const shared
 		if(rolledPoints){
 			//cerr<<pos1<<" "<<pos1+ori1*fs->cp1pt<<" "<<contPt<<endl;
 			GLUtils::GLDrawLine(pos1+ori1*fs->cp1pt,contPt,Vector3r(0,.5,1));
-			GLUtils::GLDrawLine(pos2,pos2+(ori2*fs->cp2rel*Vector3r::UNIT_X*fs->effR2),Vector3r(0,1,.5));
+			GLUtils::GLDrawLine(pos2,pos2+(ori2*fs->cp2rel*Vector3r::UnitX()*fs->effR2),Vector3r(0,1,.5));
 		}
 		// contact point to projected points
 		if(unrolledPoints||shear){

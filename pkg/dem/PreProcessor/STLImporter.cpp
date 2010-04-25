@@ -18,7 +18,7 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 
 	// Load geometry
     vector<double> vtmp, ntmp; vector<int>  etmp, ftmp;
-    STLReader reader; reader.tolerance=Math<Real>::ZERO_TOLERANCE;
+    STLReader reader; reader.tolerance=Math<Real>::Zero()_TOLERANCE;
     if(!reader.open(filename, back_inserter(vtmp), back_inserter(etmp), back_inserter(ftmp), back_inserter(ntmp))) 
 	{
 		LOG_ERROR("Can't open file: " << filename);
@@ -41,7 +41,7 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 		//iFacet->postProcessAttributes(true); //postProcessAttributes is protected
 		shared_ptr<Body> b(new Body());
 		b->state->pos=b->state->refPos=icc;
-		b->state->ori=b->state->refOri=Quaternionr::IDENTITY;
+		b->state->ori=b->state->refOri=Quaternionr::Identity();
 		b->shape	= iFacet;
 		imported.push_back(b);
 	}

@@ -123,7 +123,7 @@ void SpherePack::cellFill(Vector3r vol){
 }
 
 void SpherePack::cellRepeat(Vector3<int> count){
-	if(cellSize==Vector3r::ZERO){ throw std::runtime_error("cellRepeat cannot be used on non-periodic packing."); }
+	if(cellSize==Vector3r::Zero()){ throw std::runtime_error("cellRepeat cannot be used on non-periodic packing."); }
 	if(count[0]<=0 || count[1]<=0 || count[2]<=0){ throw std::invalid_argument("Repeat count components must be positive."); }
 	size_t origSize=pack.size();
 	pack.reserve(origSize*count[0]*count[1]*count[2]);

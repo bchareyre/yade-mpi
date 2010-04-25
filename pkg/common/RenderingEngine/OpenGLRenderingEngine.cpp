@@ -103,7 +103,7 @@ bool OpenGLRenderingEngine::pointClipped(const Vector3r& p){
 void OpenGLRenderingEngine::setBodiesDispInfo(){
 	if(scene->bodies->size()!=bodyDisp.size()) bodyDisp.resize(scene->bodies->size());
 	bool scaleRotations=(rotScale!=1.0);
-	bool scaleDisplacements=(dispScale!=Vector3r::ONE);
+	bool scaleDisplacements=(dispScale!=Vector3r::Ones());
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if(!b || !b->state) continue;
 		size_t id=b->getId();
@@ -132,7 +132,7 @@ void OpenGLRenderingEngine::drawPeriodicCell(){
 	glColor3v(Vector3r(1,1,0));
 	glPushMatrix();
 		Vector3r size=scene->cell->getSize();
-		if(dispScale!=Vector3r::ONE) size+=diagMult(dispScale,size-scene->cell->refSize);
+		if(dispScale!=Vector3r::Ones()) size+=diagMult(dispScale,size-scene->cell->refSize);
 		glTranslatev(scene->cell->shearPt(.5*size)); // shear center (moves when sheared)
 		glMultMatrixd(scene->cell->getGlShearTrsfMatrix());
 		glScalev(size);
@@ -182,9 +182,9 @@ void OpenGLRenderingEngine::render(const shared_ptr<Scene>& _scene,body_id_t sel
 	assert(clipPlaneNormals.size()==(size_t)numClipPlanes);
 	for(size_t i=0;i<(size_t)numClipPlanes; i++){
 		// someone could have modified those from python and truncate the vectors; fill those here in that case
-		if(i==clipPlaneSe3.size()) clipPlaneSe3.push_back(Se3r(Vector3r::ZERO,Quaternionr::IDENTITY));
+		if(i==clipPlaneSe3.size()) clipPlaneSe3.push_back(Se3r(Vector3r::Zero(),Quaternionr::Identity()));
 		if(i==clipPlaneActive.size()) clipPlaneActive.push_back(false);
-		if(i==clipPlaneNormals.size()) clipPlaneNormals.push_back(Vector3r::UNIT_X);
+		if(i==clipPlaneNormals.size()) clipPlaneNormals.push_back(Vector3r::UnitX());
 		// end filling stuff modified from python
 		if(clipPlaneActive[i]) clipPlaneNormals[i]=clipPlaneSe3[i].orientation*Vector3r(0,0,1);
 		/* glBegin(GL_LINES);glVertex3v(clipPlaneSe3[i].position);glVertex3v(clipPlaneSe3[i].position+clipPlaneNormals[i]);glEnd(); */
@@ -343,7 +343,7 @@ void OpenGLRenderingEngine::renderShape()
 				///
 				glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);
 				glColorMaterial(GL_FRONT_AND_BACK,GL_EMISSION);
-				glColor3v(Vector3r::ZERO);
+				glColor3v(Vector3r::Zero());
 				glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 			} else {
 				shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
@@ -356,7 +356,7 @@ void OpenGLRenderingEngine::renderShape()
 				const Vector3r& mn=b->bound->min; const Vector3r& mx=b->bound->max; const Vector3r& p=pos;
 				Vector3r ext(viewDirection[0]>0?p[0]-mn[0]:p[0]-mx[0],viewDirection[1]>0?p[1]-mn[1]:p[1]-mx[1],viewDirection[2]>0?p[2]-mn[2]:p[2]-mx[2]); // signed extents towards the camera
 				Vector3r dr=-1.01*(viewDirection.Dot(ext)*viewDirection);
-				GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::ONE);
+				GLUtils::GLDrawInt(b->getId(),pos+dr,Vector3r::Ones());
 			}
 		}
 		// if the body goes over the cell margin, draw it in positions where the bbox overlaps with the cell in wire
