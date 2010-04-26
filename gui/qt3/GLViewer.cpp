@@ -608,11 +608,10 @@ void GLViewer::postDraw(){
 		for(int planeId=0; planeId<renderer->numClipPlanes; planeId++){
 			if(!renderer->clipPlaneActive[planeId] && planeId!=manipulatedClipPlane) continue;
 			glPushMatrix();
-				Real angle; Vector3r axis;	
 				const Se3r& se3=renderer->clipPlaneSe3[planeId];
-				se3.orientation.ToAxisAngle(axis,angle);	
+				AngleAxisr aa(angleAxisFromQuat(se3.orientation));	
 				glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-				glRotated(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+				glRotated(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 				Real cff=1;
 				if(!renderer->clipPlaneActive[planeId]) cff=.4;
 				glColor3f(max((Real)0.,cff*cos(planeId)),max((Real)0.,cff*sin(planeId)),planeId==manipulatedClipPlane); // variable colors

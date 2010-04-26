@@ -107,9 +107,8 @@ void KinemCNLEngine::letMove()
 		Real A = (Ysup_mod - Ylat_mod) * 2.0*Mathr::Tan(alpha) / (2.0*(Ysup - Ylat) + dx*Mathr::Tan(alpha) );
 		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
 	}
-	
-	Quaternionr qcorr;
-	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
+
+	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha
 	leftbox->state->ori	= qcorr*leftbox->state->ori;

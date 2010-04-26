@@ -175,16 +175,13 @@ void DirectShearCis::createSphere(shared_ptr<Body>& body, Vector3r position, Rea
 	shared_ptr<SphereModel> gSphere(new SphereModel);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-	
 	body->isDynamic			= true;
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius);
-	physics->se3			= Se3r(position,q);
+	physics->se3			= Se3r(position,Quaternionr::Identity());
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
@@ -217,9 +214,6 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 	shared_ptr<Box> iBox(new Box);
 	
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	body->isDynamic			= false;
 	
 	physics->angularVelocity	= Vector3r(0,0,0);
@@ -232,7 +226,7 @@ void DirectShearCis::createBox(shared_ptr<Body>& body, Vector3r position, Vector
 						);
 	//physics->mass			= 0;
 	//physics->inertia		= Vector3r(0,0,0);
-	physics->se3			= Se3r(position,q);
+	physics->se3			= Se3r(position,Quaternion::Identity());
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxPoissonRatio;
 	physics->frictionAngle		= 0.0;	//default value, modified after for w2 and w4 to have good values of phi(sphere-walls)
@@ -338,11 +332,8 @@ void DirectShearCis::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
-	physics->se3				= Se3r(Vector3r(0,0,0),q);
+	physics->se3				= Se3r(Vector3r(0,0,0),Quaternionr::Identity());
 	physics->mass				= 0;
 	physics->velocity			= Vector3r(0,0,0);
 	physics->acceleration			= Vector3r::Zero();

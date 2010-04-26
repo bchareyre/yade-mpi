@@ -6,6 +6,10 @@
 #include<Wm3Quaternion.h>
 using namespace Wm3;
 
+// this will be replaced by AngleAxisr(Quaternionr) ctor once we use Eigen everywhere
+template<typename RealType>
+AngleAxis<RealType> angleAxisFromQuat(const Quaternion<RealType>& q){ AngleAxis<RealType> aa; q.ToAxisAngle(aa.axis(),aa.angle()); return aa; }
+
 #include"yadeWm3_dont_include_directly.hpp"
 #include<limits>
 

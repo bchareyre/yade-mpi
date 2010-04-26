@@ -150,9 +150,6 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-	
 	Vector3r position		= Vector3r(i,j+spheresHeight,k)*(2*maxRadius*1.1) 
 					  - Vector3r( nbSpheres[0]/2*(2*maxRadius*1.1) , 0 , nbSpheres[2]/2*(2*maxRadius*1.1) )
 					  + Vector3r( 	 Mathr::SymmetricRandom()*disorder[0]
@@ -167,7 +164,7 @@ void STLImporterTest::createSphere(shared_ptr<Body>& body, int i, int j, int k)
 	physics->velocity		= Vector3r(0,0,0);
 	physics->mass			= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	physics->inertia		= Vector3r(2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius,2.0/5.0*physics->mass*radius*radius); //
-	physics->se3			= Se3r(position,q);
+	physics->se3			= Se3r(position,Quaternionr::Identity());
 	physics->young			= sphereYoungModulus;
 	physics->poisson		= spherePoissonRatio;
 	physics->frictionAngle		= sphereFrictionDeg * Mathr::PI/180.0;
@@ -256,11 +253,8 @@ void STLImporterTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {
 	rootBody->isDynamic		= false;
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	shared_ptr<ParticleParameters> physics(new ParticleParameters); // FIXME : fix indexable class PhysicalParameters
-	physics->se3				= Se3r(Vector3r(0,0,0),q);
+	physics->se3				= Se3r(Vector3r(0,0,0),Quaternionr::Identity());
 	physics->mass				= 0;
 	physics->velocity			= Vector3r(0,0,0);
 	physics->acceleration			= Vector3r::Zero();

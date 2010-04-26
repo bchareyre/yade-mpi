@@ -285,7 +285,6 @@ void CohesiveTriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r positio
 	
 	Quaternionr q(Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom(),Mathr::SymmetricRandom());
 	q.Normalize();
-//	q.FromAxisAngle( Vector3r(0,0,1),0);
 	
 	body->isDynamic			= dynamic;
 	
@@ -328,9 +327,6 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 
 	shared_ptr<Box> iBox(new Box);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	body->isDynamic			= false;
 	
 	body->state->angVel		= Vector3r(0,0,0);
@@ -344,7 +340,7 @@ void CohesiveTriaxialTest::createBox(shared_ptr<Body>& body, Vector3r position, 
 						);
 //	physics->mass			= 0;
 //	physics->inertia		= Vector3r(0,0,0);
-	body->state->se3			= Se3r(position,q);
+	body->state->se3			= Se3r(position,Quaternionr::Identity());
 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxKsDivKn;
@@ -451,9 +447,6 @@ void CohesiveTriaxialTest::createActors(shared_ptr<Scene>& rootBody)
 
 void CohesiveTriaxialTest::positionRootBody(shared_ptr<Scene>& rootBody)
 {	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	shared_ptr<Aabb> aabb(new Aabb);
 	aabb->diffuseColor		= Vector3r(0,0,1);
 }

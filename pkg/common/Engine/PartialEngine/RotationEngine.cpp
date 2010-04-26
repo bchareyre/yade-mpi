@@ -21,8 +21,7 @@ void InterpolatingSpiralEngine::action(){
 void SpiralEngine::action(){
 	Real dt=Omega::instance().getTimeStep();
 	axis.Normalize();
-	Quaternionr q;
-	q.FromAxisAngle(axis,angularVelocity*dt);
+	Quaternionr q(AngleAxisr(angularVelocity*dt,axis));
 	angleTurned+=angularVelocity*dt;
 	shared_ptr<BodyContainer> bodies = scene->bodies;
 	FOREACH(body_id_t id,subscribedBodies){
@@ -46,8 +45,7 @@ void SpiralEngine::action(){
 
 void RotationEngine::action(){
 	rotationAxis.Normalize();
-	Quaternionr q;
-	q.FromAxisAngle(rotationAxis,angularVelocity*scene->dt);
+	Quaternionr q(AngleAxisr(angularVelocity*scene->dt,rotationAxis));
 	#ifdef YADE_OPENMP
 	const long size=subscribedBodies.size();
 	#pragma omp parallel for schedule(static)

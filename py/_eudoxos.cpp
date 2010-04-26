@@ -187,7 +187,7 @@ struct SpiralInteractionLocator2d{
 				CpmPhys* phys=YADE_CAST<CpmPhys*>(fi.i->interactionPhysics.get());
 				// transformation matrix, to rotate to the plane
 				Vector3r ax(Vector3r::Zero()); ax[axis]=1.;
-				Quaternionr q; q.FromAxisAngle(ax,fi.theta); q=q.Conjugate();
+				Quaternionr q(AngleAxisr(fi.theta,ax)); q=q.Conjugate();
 				Matrix3r TT; q.ToRotationMatrix(TT);
 				//
 				Real d=(geom->se31.position-geom->se32.position).Length(); // current contact length

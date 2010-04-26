@@ -143,9 +143,6 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-	
 	body->isDynamic			= true;
 	
 	physics->velocity		= Vector3r(//
@@ -161,7 +158,7 @@ void SpheresFactory::createSphere(shared_ptr<Body>& body, const Vector3r& positi
 			2.0/5.0*physics->mass*r*r,
 			2.0/5.0*physics->mass*r*r,
 			2.0/5.0*physics->mass*r*r); 
-	physics->se3			= Se3r(position,q);
+	physics->se3			= Se3r(position,Quaternionr::Identity());
 	if (young) 			physics->young			= young;
 	if (poisson) 		physics->poisson		= poisson;
 	if (frictionAngle) 	physics->frictionAngle	= frictionAngle;

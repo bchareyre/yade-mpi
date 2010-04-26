@@ -220,8 +220,6 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Sphere> iSphere(new Sphere);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);	
 	body->isDynamic			= dynamic;	
 	body->state->mass		= 4.0/3.0*Mathr::PI*radius*radius*radius*density;
 	body->state->inertia		= Vector3r( 	2.0/5.0*body->state->mass*radius*radius,

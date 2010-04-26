@@ -329,7 +329,7 @@ struct FundamentalHandler< Quaternion<RealType> >
 				axis[2] = lexical_cast_maybeNanInf<RealType>(tokens[2]);
 				angle   = lexical_cast_maybeNanInf<RealType>(tokens[3]);
 			}
-			tmp->FromAxisAngle(axis,angle);
+			*tmp=Quaternionr(AngleAxisr(angle,axis));
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
 		{
@@ -354,19 +354,17 @@ struct FundamentalHandler< Quaternion<RealType> >
 			string * tmpStr = any_cast<string*>(a);
 			Quaternion<RealType> * tmp = any_cast<Quaternion<RealType>*>(ac.getAddress());
 		
-			RealType angle;
-			Vector3<RealType> axis;
-			tmp->ToAxisAngle(axis,angle);
-			axis.normalize();
+			AngleAxis<RealType> aa(angleAxisFromQuat(*tmp));
+			aa.axis().normalize();
 
 			*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket()	+
-					lexical_cast<string>(axis[0])			+
+					lexical_cast<string>(aa.axis()[0])			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(axis[1])			+
+					lexical_cast<string>(aa.axis()[1])			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(axis[2])			+
+					lexical_cast<string>(aa.axis()[2])			+
 					IOFormatManager::getCustomFundamentalSeparator()	+
-					lexical_cast<string>(angle)			+
+					lexical_cast<string>(aa.angle())			+
 					IOFormatManager::getCustomFundamentalClosingBracket();
 		}
 		else if (a.type()==typeid(vector<unsigned char>*)) // from Vector2<RealType> to binary stream
@@ -429,7 +427,7 @@ struct FundamentalHandler< Se3<RealType> >
 				axis[2]		= lexical_cast_maybeNanInf<RealType>(tokens[5]);
 				angle		= lexical_cast_maybeNanInf<RealType>(tokens[6]);
 			}
-			orientation.FromAxisAngle(axis,angle);
+			orientation=Quaternionr(AngleAxisr(angle,axis));
 			*tmp = Se3<RealType>(position,orientation);
 		}
 		else if (a.type()==typeid(const vector<unsigned char>*)) // from binary stream to Type
@@ -458,12 +456,10 @@ struct FundamentalHandler< Se3<RealType> >
 			string * tmpStr = any_cast<string*>(a);
 			Se3<RealType> * tmp = any_cast<Se3<RealType>*>(ac.getAddress());
 		
-			RealType angle;
-			Vector3<RealType> axis;
 			Vector3<RealType> position;
 		
-			tmp->orientation.ToAxisAngle(axis,angle);
-			axis.normalize();
+			AngleAxis<RealType> aa(angleAxisFromQuat(tmp->orientation));
+			aa.axis().normalize();
 			position = tmp->position;
 		
 			//*tmpStr =	IOFormatManager::getCustomFundamentalOpeningBracket();
@@ -476,13 +472,13 @@ struct FundamentalHandler< Se3<RealType> >
 						//IOFormatManager::getCustomFundamentalClosingBracket()	+
 						IOFormatManager::getCustomFundamentalSeparator()	+
 						//IOFormatManager::getCustomFundamentalOpeningBracket()	+
-						lexical_cast<string>(axis[0])			+
+						lexical_cast<string>(aa.axis()[0])			+
 						IOFormatManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(axis[1])			+
+						lexical_cast<string>(aa.axis()[1])			+
 						IOFormatManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(axis[2])			+
+						lexical_cast<string>(aa.axis()[2])			+
 						IOFormatManager::getCustomFundamentalSeparator()	+
-						lexical_cast<string>(angle)			+
+						lexical_cast<string>(aa.angle())			+
 					IOFormatManager::getCustomFundamentalClosingBracket();
 			//		IOFormatManager::getCustomFundamentalClosingBracket();
 		}

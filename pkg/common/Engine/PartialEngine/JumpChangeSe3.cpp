@@ -10,9 +10,9 @@ void JumpChangeSe3::action(){
 		if(setVelocities){
 			Real dt=Omega::instance().getTimeStep();
 			b->state->vel=deltaSe3.position/dt;
-			Vector3r axis; Real angle; deltaSe3.orientation.ToAxisAngle(axis,angle); axis.Normalize();
-			b->state->angVel=axis*angle/dt;
-			LOG_DEBUG("Angular velocity set to "<<axis*angle/dt<<". Axis="<<axis<<", angle="<<angle);
+			AngleAxisr aa(angleAxisFromQuat(deltaSe3.orientation)); aa.axis().normalize();
+			b->state->angVel=aa.axis()*aa.angle()/dt;
+			LOG_DEBUG("Angular velocity set to "<<aa.axis()*aa.angle()/dt<<". Axis="<<aa.axis()<<", angle="<<aa.angle());
 		}
 		if(!setVelocities || (setVelocities && !b->isDynamic)){
 			b->state->pos+=deltaSe3.position;

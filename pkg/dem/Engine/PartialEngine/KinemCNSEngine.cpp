@@ -92,8 +92,7 @@ void KinemCNSEngine::letMove()
 		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
 	}
 
-	Quaternionr qcorr;
-	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
+	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 	if(LOG)
 		cout << "Quaternion associe a la rotation incrementale : " << qcorr.W() << " " << qcorr.X() << " " << qcorr.Y() << " " << qcorr.Z() << endl;
 // On applique la rotation en changeant l'orientation des plaques, leurs vang et en affectant donc alpha

@@ -124,8 +124,7 @@ void Disp2DPropLoadEngine::letDisturb()
 		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
 	}
 
-	Quaternionr qcorr;
-	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
+	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 	if(LOG)
 		cout << "Quaternion associe a la rotation incrementale : " << qcorr.w() << " " << qcorr.x() << " " << qcorr.y() << " " << qcorr.z() << endl;
 

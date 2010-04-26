@@ -119,8 +119,7 @@ void KinemCTDEngine::letMove()
 		dalpha = Mathr::ATan( (A - Mathr::Tan(alpha))/(1.0 + A * Mathr::Tan(alpha)));
 	}
 
-	Quaternionr qcorr;
-	qcorr.FromAxisAngle(Vector3r(0,0,1),dalpha);
+	Quaternionr qcorr(AngleAxisr(dalpha,Vector3r::UnitZ()));
 
 // On applique la rotation en changeant l'orientation des plaques et leurs vang
 	leftbox->state->ori	= qcorr*leftbox->state->ori;

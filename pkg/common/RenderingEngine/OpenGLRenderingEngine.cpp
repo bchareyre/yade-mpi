@@ -81,9 +81,9 @@ void OpenGLRenderingEngine::renderWithNames(const shared_ptr<Scene>& _scene){
 		if(!b || !b->shape) continue;
 		glPushMatrix();
 		const Se3r& se3=b->state->se3;
-		Real angle; Vector3r axis;	se3.orientation.ToAxisAngle(axis,angle);	
+		AngleAxisr aa(angleAxisFromQuat(se3.orientation));
 		glTranslatef(se3.position[0],se3.position[1],se3.position[2]);
-		glRotatef(angle*Mathr::RAD_TO_DEG,axis[0],axis[1],axis[2]);
+		glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 		//if(b->shape->getClassName() != "LineSegment"){ // FIXME: a body needs to say: I am selectable ?!?!
 			glPushName(b->getId());
 			shapeDispatcher(b->shape,b->state,wire || b->shape->wire,viewInfo);
@@ -119,9 +119,9 @@ void OpenGLRenderingEngine::setBodiesDispInfo(){
 		if(!scaleRotations) bodyDisp[id].ori=ori;
 		else{
 			Quaternionr relRot=refOri.Conjugate()*ori;
-			Vector3r axis; Real angle; relRot.ToAxisAngle(axis,angle);
-			angle*=rotScale;
-			bodyDisp[id].ori=refOri*Quaternionr(axis,angle);
+			AngleAxisr aa(angleAxisFromQuat(relRot));
+			aa.angle()*=rotScale;
+			bodyDisp[id].ori=refOri*Quaternionr(aa);
 		}
 	}
 }

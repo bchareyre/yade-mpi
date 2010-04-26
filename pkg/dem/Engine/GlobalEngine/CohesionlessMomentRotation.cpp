@@ -56,7 +56,7 @@ void Law2_SCG_MomentPhys_CohesionlessMomentRotation::go(shared_ptr<InteractionGe
 	//1st imagine we have to rotate shearForce ON the x-y plane as a result of contact point rotation
 	//axis = phys->prevNormal.Cross(geom->normal); // axis of rotation of contact point
 	//angle = Mathr::ACos(geom->normal.Dot(phys->prevNormal)); //angle of rotation of contact point
-	//q.FromAxisAngle(axis,angle); //quaternion for rotation of contact point
+	//q=Quaternion(AngleAxisr(angleAxis)); //quaternion for rotation of contact point
 	// shearForce = q*shearForce; //rotate shearForce from previous contact orientation to current contact orientation
 	
 	//Then imagine we have to find a direction by rotating  THROUGH the x-y plane, ABOUT the contact normal (i.e. axis).  The direction should be along the resultant angular velocity.

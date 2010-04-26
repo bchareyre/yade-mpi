@@ -203,17 +203,15 @@ inline void NewtonIntegrator::leapfrogSphericalRotate(Scene* scene, State* state
 	Vector3r axis = state->angVel;
 	
 	if (axis!=Vector3r::Zero()) {							//If we have an angular velocity, we make a rotation
-		Quaternionr q;
 		Real angle=axis.norm(); axis/=angle;
-		q.FromAxisAngle ( axis,angle*dt );
+		Quaternionr q(AngleAxisr(angle*dt,axis));
 		state->ori = q*state->ori;
 	}
 	
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
-		Quaternionr q;
 		Vector3r r(scene->forces.getRot(id));
 		Real norm=r.norm(); r/=norm;
-		q.FromAxisAngle(r,norm);
+		Quaternionr q(AngleAxisr(norm,r));
 		state->ori=q*state->ori;
 	}
 	state->ori.Normalize();
@@ -237,8 +235,7 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
 		Vector3r r(scene->forces.getRot(id));
 		Real norm=r.norm(); r/=norm;
-		Quaternionr q;
-		q.FromAxisAngle(r,norm);
+		Quaternionr q(AngleAxisr(norm,r));
 		state->ori=q*state->ori;
 	}
 	state->ori.Normalize(); 
@@ -247,9 +244,9 @@ void NewtonIntegrator::leapfrogAsphericalRotate(Scene* scene, State* state, cons
 Quaternionr NewtonIntegrator::DotQ(const Vector3r& angVel, const Quaternionr& Q){
 	// FIXME: uses index access which has different meaning in Wm3 and Eigen
 	Quaternionr dotQ;
-	dotQ[0] = (-Q[1]*angVel[0]-Q[2]*angVel[1]-Q[3]*angVel[2])/2;
-	dotQ[1] = ( Q[0]*angVel[0]-Q[3]*angVel[1]+Q[2]*angVel[2])/2;
-	dotQ[2] = ( Q[3]*angVel[0]+Q[0]*angVel[1]-Q[1]*angVel[2])/2;
-	dotQ[3] = (-Q[2]*angVel[0]+Q[1]*angVel[1]+Q[0]*angVel[2])/2;
+	dotQ.w() = (-Q.x()*angVel[0]-Q.y()*angVel[1]-Q.z()*angVel[2])/2;
+	dotQ.x() = ( Q.w()*angVel[0]-Q.z()*angVel[1]+Q.y()*angVel[2])/2;
+	dotQ.y() = ( Q.z()*angVel[0]+Q.w()*angVel[1]-Q.x()*angVel[2])/2;
+	dotQ.z() = (-Q.y()*angVel[0]+Q.x()*angVel[1]+Q.w()*angVel[2])/2;
 	return dotQ;
 }

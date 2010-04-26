@@ -346,9 +346,6 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 	shared_ptr<Aabb> aabb(new Aabb);
 	shared_ptr<Box> iBox(new Box);
 	
-	Quaternionr q;
-	q.FromAxisAngle( Vector3r(0,0,1),0);
-
 	body->isDynamic			= false;
 	
 	body->state->angVel		= Vector3r(0,0,0);
@@ -362,7 +359,7 @@ void TriaxialTestWater::createBox(shared_ptr<Body>& body, Vector3r position, Vec
 						  );
 //	physics->mass			= 0;
 //	physics->inertia		= Vector3r(0,0,0);
-	body->state->se3			= Se3r(position,q);
+	body->state->se3			= Se3r(position,Quaternionr::Identity());
 
 	physics->young			= boxYoungModulus;
 	physics->poisson		= boxKsDivKn;

@@ -88,7 +88,7 @@ struct custom_Se3r_from_seq{
 			se3->position=Vector3r(extract<Real>(PySequence_GetItem(obj_ptr,0)),extract<Real>(PySequence_GetItem(obj_ptr,1)),extract<Real>(PySequence_GetItem(obj_ptr,2)));
 			Vector3r axis=Vector3r(extract<Real>(PySequence_GetItem(obj_ptr,3)),extract<Real>(PySequence_GetItem(obj_ptr,4)),extract<Real>(PySequence_GetItem(obj_ptr,5)));
 			Real angle=extract<Real>(PySequence_GetItem(obj_ptr,6));
-			se3->orientation.FromAxisAngle(axis,angle);
+			se3->orientation=Quaternionr(AngleAxisr(angle,axis));
 		} else throw std::logic_error(__FILE__ ": First, the sequence size for Se3r object was 2 or 7, but now is not? (programming error, please report!");
 		data->convertible=storage;
 	}
