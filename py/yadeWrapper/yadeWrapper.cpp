@@ -361,8 +361,6 @@ class pyOmega{
 		OMEGA.setSimulationFileName(fileName);
 		LOG_DEBUG("SAVE!");
 	}
-
-	// double getSpheresVolume(){ return Shop::getSpheresVolume(); }
 	
 	python::list miscParams_get(){
 		python::list ret;
@@ -518,7 +516,6 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("saveTmp",&pyOmega::saveTmp,(python::args("mark")=""),"Save simulation to memory (disappears at shutdown), can be loaded later with loadTmp. *mark* optionally distinguishes different memory-saved simulations.")
 		.def("tmpToFile",&pyOmega::tmpToFile,(python::arg("fileName"),python::arg("mark")=""),"Save XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation into *fileName*.")
 		.def("tmpToString",&pyOmega::tmpToString,(python::arg("mark")=""),"Return XML of :yref:`saveTmp<Omega.saveTmp>`'d simulation as string.")
-		//.def("getSpheresVolume",&pyOmega::getSpheresVolume,"Compute the total volume of spheres in the simulation (might crash for now if dynamic bodies are not spheres)")
 		.def("run",&pyOmega::run,(python::arg("nSteps")=-1,python::arg("wait")=false),"Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.")
 		.def("pause",&pyOmega::pause,"Stop simulation execution. (May be called from within the loop, and it will stop after the current step).")
 		.def("step",&pyOmega::step,"Advance the simulation by one step. Returns after the step will have finished.")
