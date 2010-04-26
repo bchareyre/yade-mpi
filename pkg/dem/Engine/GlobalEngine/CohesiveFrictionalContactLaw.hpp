@@ -23,7 +23,7 @@ class Law2_ScGeom_CohFrictPhys_ElasticPlastic: public LawFunctor{
 		((bool,always_use_moment_law,false,"If true, use bending/twisting moments at all contacts. If false, compute moments only for cohesive contacts."))
 		((bool,shear_creep,false,"activate creep on the shear force, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
 		((bool,twist_creep,false,"activate creep on the twisting moment, using :yref:`CohesiveFrictionalContactLaw::creep_viscosity`."))
-		((Real,creep_viscosity,false,"creep viscosity [Pa.s/m]. probably should be moved to Ip2_2xCohFrictMat_CohFrictPhys..."))
+		((Real,creep_viscosity,1,"creep viscosity [Pa.s/m]. probably should be moved to Ip2_2xCohFrictMat_CohFrictPhys..."))
 		((bool,erosionActivated,false,""))
 		((bool,detectBrokenBodies,false,""))
 		

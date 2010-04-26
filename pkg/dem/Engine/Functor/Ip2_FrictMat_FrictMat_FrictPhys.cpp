@@ -24,22 +24,14 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go( const shared_ptr<Material>& b1
 	if(interaction->interactionPhysics) return;
 	const shared_ptr<FrictMat>& mat1 = YADE_PTR_CAST<FrictMat>(b1);
 	const shared_ptr<FrictMat>& mat2 = YADE_PTR_CAST<FrictMat>(b2);
-	if (!interaction->interactionPhysics)
-		interaction->interactionPhysics = shared_ptr<FrictPhys>(new FrictPhys());
+	interaction->interactionPhysics = shared_ptr<FrictPhys>(new FrictPhys());
 	const shared_ptr<FrictPhys>& contactPhysics = YADE_PTR_CAST<FrictPhys>(interaction->interactionPhysics);
 	Real Ea 	= mat1->young;
 	Real Eb 	= mat2->young;
 	Real Va 	= mat1->poisson;
 	Real Vb 	= mat2->poisson;
 	
-	Real Da,Db; Vector3r normal;
-	//FIXME : dynamic casts here???!!!
-// 	ScGeom* scg=dynamic_cast<ScGeom*>(interaction->interactionGeometry.get());
-// 	Dem3DofGeom* d3dg=dynamic_cast<Dem3DofGeom*>(interaction->interactionGeometry.get());
-// 	if(scg){Da=scg->radius1; Db=scg->radius2; normal=scg->normal;}
-// 	else if(d3dg){Da=d3dg->refR1>0?d3dg->refR1:2*d3dg->refR2; Db=d3dg->refR2>0?d3dg->refR2:d3dg->refR1; normal=d3dg->normal;}
-// 	else throw runtime_error("Ip2_FrictMat_FrictMat_FrictPhys: geometry is neither ScGeom nor Dem3DofGeom");
-	
+	Real Da,Db; Vector3r normal;	
 	assert(dynamic_cast<GenericSpheresContact*>(interaction->interactionGeometry.get()));//only in debug mode
 	GenericSpheresContact* sphCont=YADE_CAST<GenericSpheresContact*>(interaction->interactionGeometry.get());
 	{Da=sphCont->refR1>0?sphCont->refR1:sphCont->refR2; Db=sphCont->refR2>0?sphCont->refR2:sphCont->refR1; normal=sphCont->normal;}

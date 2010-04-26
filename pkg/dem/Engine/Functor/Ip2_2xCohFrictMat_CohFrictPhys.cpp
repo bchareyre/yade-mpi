@@ -50,9 +50,6 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 			// Victor Donze, "Calibration procedure for spherical
 			// discrete elements using a local moemnt law".
 			Real Kr = Da*Db*Ks*2.0; // just like "2.0" above - it's an arbitrary parameter
-
-			contactPhysics->initialKn			= Kn;
-			contactPhysics->initialKs			= Ks;
 			contactPhysics->frictionAngle			= std::min(fa,fb);
 			contactPhysics->tangensOfFrictionAngle		= std::tan(contactPhysics->frictionAngle);
 
@@ -73,8 +70,8 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 				contactPhysics->orientationToContact2	= contactPhysics->initialOrientation2.Conjugate() * contactPhysics->initialContactOrientation;
 			}
 			contactPhysics->prevNormal = interactionGeometry->normal;
-			contactPhysics->kn = contactPhysics->initialKn;
-			contactPhysics->ks = contactPhysics->initialKs;
+			contactPhysics->kn = Kn;
+			contactPhysics->ks = Ks;
 			contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
 			contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 			contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
@@ -89,8 +86,6 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 		else // !isNew, but if setCohesionNow, all contacts are initialized like if they were newly created
 		{
 			CohFrictPhys* contactPhysics = YADE_CAST<CohFrictPhys*>(interaction->interactionPhysics.get());
-			contactPhysics->kn = contactPhysics->initialKn;
-			contactPhysics->ks = contactPhysics->initialKs;
 			if (setCohesionNow && sdec1->isCohesive && sdec2->isCohesive)
 			{
 				contactPhysics->cohesionBroken = false;
@@ -100,10 +95,6 @@ void Ip2_2xCohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1    // Coh
 				contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 				contactPhysics->initialPosition1    = Body::byId(interaction->getId1())->state->pos;
 				contactPhysics->initialPosition2    = Body::byId(interaction->getId2())->state->pos;
-				Real Da 	= interactionGeometry->radius1;
-				Real Db 	= interactionGeometry->radius2;
-				Real Kr = Da*Db*contactPhysics->ks*2.0; // just like "2.0" above - it's an arbitrary parameter
-				contactPhysics->kr = Kr;
 				contactPhysics->initialContactOrientation.Align(Vector3r(1.0,0.0,0.0),interactionGeometry->normal);
 				contactPhysics->currentContactOrientation = contactPhysics->initialContactOrientation;
 				contactPhysics->orientationToContact1   = contactPhysics->initialOrientation1.Conjugate() * contactPhysics->initialContactOrientation;

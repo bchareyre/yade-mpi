@@ -120,6 +120,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		firstRun=true;
 		previousSigmaIso=sigma_iso;
 		boxVolume=0;
+		saveSimulation=false;
 		,
 	 	.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
 		 )
