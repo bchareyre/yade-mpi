@@ -69,7 +69,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 
 	Vector3r& shearForce    = currentContactPhysics->shearForce;
 
-	if (contact->isFresh(ncb)) shearForce   = Vector3r::ZERO;
+	if (contact->isFresh(ncb)) shearForce   = Vector3r::Zero();
 	Real un     = currentContactGeometry->penetrationDepth;
 	Real Fn    = currentContactPhysics->kn*un;
 	currentContactPhysics->normalForce = Fn*currentContactGeometry->normal;
@@ -102,7 +102,7 @@ void Law2_ScGeom_CohFrictPhys_ElasticPlastic::go(shared_ptr<InteractionGeometry>
 			maxFs = maxFs / Fs;
 			if (maxFs>1) cerr << "maxFs>1!!" << endl;
 			shearForce *= maxFs;
-			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::ZERO;//Vector3r::Zero()
+			if (Fn<0)  currentContactPhysics->normalForce = Vector3r::Zero();//Vector3r::Zero()
 		}
 
 		applyForceAtContactPoint(-currentContactPhysics->normalForce-shearForce, currentContactGeometry->contactPoint, id1, de1->se3.position, id2, de2->se3.position, ncb);
