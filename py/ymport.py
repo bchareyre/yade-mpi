@@ -76,10 +76,7 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaterni
 	qTemp = Quaternion(Vector3(orientation[0],orientation[1],orientation[2]),orientation[3])
 	for line in lines[findVerticesString+1:numNodes+findVerticesString+1]:
 		data = line.split()
-		tempNodeVector=Vector3(float(data[0])*scale,float(data[1])*scale,float(data[2])*scale)
-		tempNodeVector=qTemp.Rotate(tempNodeVector)
-		tempNodeVector+=Vector3(shift[0],shift[1],shift[2])
-		nodelistVector3[id] = tempNodeVector
+		nodelistVector3[id] = qTemp.Rotate(Vector3(float(data[0])*scale,float(data[1])*scale,float(data[2])*scale))+Vector3(shift[0],shift[1],shift[2])
 		id += 1
 	numTriangles = int(lines[numNodes+findVerticesString+2].split()[0])
 	triList = []
