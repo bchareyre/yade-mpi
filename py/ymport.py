@@ -44,10 +44,11 @@ def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
 	surf.translate(shift) 
 	yade.pack.gtsSurface2Facets(surf,**kw)
 
-def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
+def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaternion().IDENTITY,**kw):
 	""" Imports geometry from mesh file and creates facets.
 	shift[X,Y,Z] parameter moves the specimen.
 	scale factor scales the given data.
+	orientation quaternion: orientation of the imported mesh
 	
 	Remaining **kw arguments are passed to utils.facet; 
 	mesh files can be easily created with `GMSH <http://www.geuz.org/gmsh/>`_.
@@ -72,12 +73,13 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 		nodelistVector3.append(Vector3(0.0,0.0,0.0))
 	id = 0
 	
+	qTemp = Quaternion(Vector3(orientation[0],orientation[1],orientation[2]),orientation[3])
 	for line in lines[findVerticesString+1:numNodes+findVerticesString+1]:
 		data = line.split()
-		X = shift[0]+float(data[0])*scale
-		Y = shift[1]+float(data[1])*scale
-		Z = shift[2]+float(data[2])*scale
-		nodelistVector3[id] = Vector3(X,Y,Z)
+		tempNodeVector=Vector3(float(data[0])*scale,float(data[1])*scale,float(data[2])*scale)
+		tempNodeVector=qTemp.Rotate(tempNodeVector)
+		tempNodeVector+=Vector3(shift[0],shift[1],shift[2])
+		nodelistVector3[id] = tempNodeVector
 		id += 1
 	numTriangles = int(lines[numNodes+findVerticesString+2].split()[0])
 	triList = []
