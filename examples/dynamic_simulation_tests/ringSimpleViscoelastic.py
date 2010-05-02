@@ -31,8 +31,8 @@ def fill_cylinder_with_spheres(sphereRadius,cylinderRadius,cylinderHeight,cylind
 					y = cylinderOrigin[1]+2*r*sphereRadius*sin(dfi*a)
 					z = cylinderOrigin[2]+h*2*sphereRadius
 					s=utils.sphere([x,y*cos(cylinderSlope)+z*sin(cylinderSlope),z*cos(cylinderSlope)-y*sin(cylinderSlope)],sphereRadius,material=sphereMat)
-					p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-					s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+					p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
+					s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
 					o.bodies.append(s)
 					spheresCount+=1
 	return spheresCount
@@ -68,7 +68,7 @@ o.engines=[
 		## Create physical information about the interaction.
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		## Constitutive law
-		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),
@@ -84,13 +84,13 @@ for b in o.bodies:
     if b.shape.name=='Sphere':
         b.state.blockedDOFs=['z']
 
-o.dt=0.2*tc
+o.dt=0.02*tc
 
 o.saveTmp('init');
 
 from yade import qt
 renderer=qt.Renderer()
-renderer['Body_wire']=True
+renderer.wire=True
 #qt.Controller()
 qt.View()
 O.run()

@@ -27,4 +27,6 @@ O.engines=[
 O.dt=utils.PWaveTimeStep()
 
 
-
+from yade import qt
+qt.Controller()
+qt.View()

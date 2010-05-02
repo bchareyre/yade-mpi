@@ -39,7 +39,7 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 	for b in facets:
 		b.dynamic=dynamic
 		b.shape.postProcessAttributes(True)
-		b.shape.diffuseColor=color if color else utils.randomColor()
+		b.shape.Color=color if color else utils.randomColor()
 		b.shape.wire=wire
 		b.shape.highlight=highlight
 		utils._commonBodySetup(b,0,Vector3(0,0,0),noBound=noBound,material=material,resetState=False)

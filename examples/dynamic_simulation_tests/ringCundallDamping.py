@@ -70,13 +70,13 @@ for b in o.bodies:
     if b.shape.name=='Sphere':
         b.state.blockedDOFs=['z'] # blocked movement along Z
 
-o.dt=0.2*utils.PWaveTimeStep()
+o.dt=0.02*utils.PWaveTimeStep()
 
 o.saveTmp('init');
 
 from yade import qt
 renderer=qt.Renderer()
-renderer['Body_wire']=True
+renderer.wire=True
 #qt.Controller()
 qt.View()
 O.run()

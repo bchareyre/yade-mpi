@@ -69,7 +69,7 @@ O.engines=[
 	GravityEngine(gravity=(0,0,-9.8)),
 	TranslationEngine(translationAxis=[1,0,0],velocity=5,subscribedBodies=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=.3),
-	SnapshotEngine(iterPeriod=1600,fileBase='/tmp/buldozer-',viewNo=0,label='snapshooter'),
+	SnapshotEngine(iterPeriod=100,fileBase='/tmp/bulldozer-',viewNo=0,label='snapshooter'),
 ]
 
 O.saveTmp()
@@ -77,7 +77,6 @@ from yade import qt
 qt.Controller()
 qt.View()
 r=qt.Renderer()
-r['Light_position']=Vector3(0,0,50)
-O.run(1500000); O.wait()
-utils.encodeVideoFromFrames(snapshooter['savedSnapshots'],out='/tmp/buldozer.ogg',fps=30)
-
+r.lightPos=Vector3(0,0,50)
+O.run(2000); O.wait()
+utils.encodeVideoFromFrames(snapshooter.savedSnapshots,out='/tmp/bulldozer.ogg',fps=2)

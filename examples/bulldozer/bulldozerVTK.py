@@ -11,6 +11,7 @@ from yade import pack
 numKnifeParts = 10
 radiusKnife=1
 lengthKnife=2
+buldozerHeight=1.2
 radiusSph = 0.05
 numBoxes = Vector3(8,5,2)
 gapBetweenBoxes = 0.05
@@ -37,6 +38,11 @@ for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
 KnifeP=[Knife,[p+Vector3(0,lengthKnife,0) for p in Knife]]
 KnifePoly=pack.sweptPolylines2gtsSurface(KnifeP,threshold=1e-4)
 KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False,material=facetMat))
+
+KnifeIDs+=O.bodies.append(utils.facetBox((-lengthKnife/2-radiusKnife,lengthKnife/2,-radiusKnife+buldozerHeight/2),(lengthKnife/2,lengthKnife/2,buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
+
+KnifeIDs+=O.bodies.append(utils.facetBox((-lengthKnife/2-radiusKnife-lengthKnife/4.,lengthKnife/2,-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
+
 O.bodies.append(utils.facetBox((0,0,radiusKnife),(lengthKnife*3,lengthKnife*3,lengthKnife),wallMask=16,color=(1,1,1),wire=False,material=facetMat))
 
 
@@ -51,8 +57,8 @@ for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(
 	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph,material=sphereMat))
 	for id in ids_spheres[1]:
 		s=O.bodies[id]
-		p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-		s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+		p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
+		s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:
@@ -69,12 +75,12 @@ O.engines=[
 	InteractionDispatchers(
 		[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
-		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	GravityEngine(gravity=[0,0,-9.8]),
 	TranslationEngine(translationAxis=[1,0,0],velocity=2,subscribedBodies=KnifeIDs), # Buldozer motion
 	NewtonIntegrator(damping=0),
-	VTKRecorder(virtPeriod=0.01,fileName='/tmp/buldozer-',recorders=['spheres','facets'])
+	VTKRecorder(iterPeriod=1000,fileName='/tmp/bulldozer-',recorders=['spheres','facets'])
 ]
 
 O.saveTmp()
@@ -82,7 +88,7 @@ from yade import qt
 qt.Controller()
 qt.View()
 r=qt.Renderer()
-r['Light_position']=Vector3(0,0,50)
-O.run()
+r.lightPos=Vector3(0,0,50)
+O.run(20000)
 #qt.makeSimulationVideo('/tmp/buldozer.ogg',iterPeriod=1000,fps=30)
 
