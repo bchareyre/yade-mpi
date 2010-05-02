@@ -227,9 +227,7 @@ void OpenGLRenderingEngine::renderDOF_ID(){
 	FOREACH(const shared_ptr<Body> b, *scene->bodies){
 		if(!b) continue;
 		if(b->shape && ((b->getGroupMask() & mask) || b->getGroupMask()==0)){
-			//if(b->state /* && FIXME: !b->physicalParameters->isDisplayed */) continue;
 			if(!id && b->state->blockedDOFs==0) continue;
-			const Se3r& se3=b->state->se3; // FIXME: should be dispSe3
 			if(current_selection==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
 			{ // write text
 				glColor3f(1.0-bgColor[0],1.0-bgColor[1],1.0-bgColor[2]);
@@ -247,7 +245,7 @@ void OpenGLRenderingEngine::renderDOF_ID(){
 				if(id) str += sId;
 				if(dof) str += sDof;
 				const Vector3r& h(current_selection==b->getId() ? highlightEmission0 : Vector3r(1,1,1));
-				GLUtils::GLDrawText(str,se3.position, h );
+				GLUtils::GLDrawText(str,bodyDisp[b->id].pos,h);
 			}
 			if(current_selection == b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorUnselected);}
 		}

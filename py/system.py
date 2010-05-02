@@ -139,6 +139,8 @@ _deprecated={
 	'SimpleViscoelasticPhys':'ViscElPhys', # Fri Apr  9 19:26:34 2010, vaclav@flux
 	'Law2_Spheres_Viscoelastic_SimpleViscoelastic':'Law2_ScGeom_ViscElPhys_Basic', # Fri Apr  9 19:28:02 2010, vaclav@flux
 	'Ip2_SimleViscoelasticMat_SimpleViscoelasticMat_SimpleViscoelasticPhys':'Ip2_ViscElMat_ViscElMat_ViscElPhys', # Fri Apr  9 19:28:48 2010, vaclav@flux
+	'MomentEngine':'TorqueEngine', # Sun May  2 16:09:34 2010, vaclav@flux
+	'JumpChangeSe3':'StepDisplacer', # Sun May  2 16:14:21 2010, vaclav@flux
 	### END_RENAMED_CLASSES_LIST ### (do not delete this line; scripts/rename-class.py uses it
 }
 

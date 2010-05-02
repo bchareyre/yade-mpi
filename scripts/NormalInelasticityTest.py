@@ -26,7 +26,7 @@ O.engines=[
 
 
 #Def of the python command letMove() :
-# Will move "by hand" the upperSphere towards or away from the lower one. Modifying by hand only the speed of bodies is indeed not sufficient, see NewtonsIntegrator, and https://bugs.launchpad.net/yade/+bug/398089. For such purposes you could also use TranslationEngine, or you can also use JumpChangeSe3, which applies finite change in position/orientation in each step
+# Will move "by hand" the upperSphere towards or away from the lower one. Modifying by hand only the speed of bodies is indeed not sufficient, see NewtonsIntegrator, and https://bugs.launchpad.net/yade/+bug/398089. For such purposes you could also use TranslationEngine, or you can also use StepDisplacer, which applies finite change in position/orientation in each step
 def letMove():#Load for the first 10 iterations, unload for the 7 following iterations, then reload
 	vImposed=[0,-1,0]
 	if O.iter < 25 and O.iter>14:

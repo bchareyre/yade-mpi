@@ -1,10 +1,10 @@
 // 2008 © Václav Šmilauer <eudoxos@arcig.cz> 
-#include"JumpChangeSe3.hpp"
+#include"StepDisplacer.hpp"
 #include<yade/core/State.hpp>
-CREATE_LOGGER(JumpChangeSe3);
-YADE_PLUGIN((JumpChangeSe3));
+CREATE_LOGGER(StepDisplacer);
+YADE_PLUGIN((StepDisplacer));
 
-void JumpChangeSe3::action(){
+void StepDisplacer::action(){
 	FOREACH(body_id_t id, subscribedBodies){
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(setVelocities){

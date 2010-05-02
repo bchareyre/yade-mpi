@@ -363,9 +363,6 @@ void SimulationController::deactivateControlsWhenLoading(){
 	labelSimulTime->setText(string(""));
 	labelRealTime->setText(string(""));
 	labelIter->setText(string(""));
-	labelStep->setText(string(""));
-	labelEstimationTime->setText(string(""));
-	labelStopAtIter->setText(string(""));
 	tlCurrentSimulation->setText("[loading]");
 	pbStartSimulation->setEnabled(false);
 	pbStopSimulation->setEnabled(false);
@@ -423,8 +420,15 @@ void SimulationController::doUpdate(){
 		char strReal[64];
 		if(days>0) snprintf(strReal,64,"real %dd %02d:%02d:%03d.%03d",days,hours,minutes,seconds,mseconds);
 		else snprintf(strReal,64,"real %02d:%02d:%03d.%03d",hours,minutes,seconds,mseconds);
-		labelRealTime->setText(string(strReal));
-        
+		string s(strReal);
+	   // update estimation time
+		if (scene->stopAtIteration>0 && iterPerSec>0){
+			char strEstimation[64];
+			estimation=duration+time_duration(boost::posix_time::seconds((scene->stopAtIteration-scene->currentIteration)/iterPerSec));
+			snprintf(strEstimation,64," (ETA %02d:%02d:%02d)",estimation.hours(),estimation.minutes(),estimation.seconds());
+			s+=strEstimation;
+		}
+		labelRealTime->setText(s);
 	}
 	// update iterations per second - only one in a while (iterPerSec_TTL_ms)
 	// does someone need to display that with more precision than integer?
@@ -434,26 +438,14 @@ void SimulationController::doUpdate(){
 		iterPerSec_LastIter=scene->currentIteration;
 		iterPerSec_LastLocalTime=microsec_clock::local_time();
 	}
-	char strIter[64];
+	char strIter[128];
 	/* print 0 instead of bogus values (at startup) */
-	snprintf(strIter,64,"iter #%ld, %.1f/s",Omega::instance().getCurrentIteration(),(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.);
+	float perSec=(iterPerSec<1e9 && iterPerSec>0)?iterPerSec:0.;
+	if(scene->stopAtIteration<=0) snprintf(strIter,64,"iter #%ld, %.1f/s",scene->currentIteration,perSec);
+	else snprintf(strIter,64,"iter #%ld / %ld, %.1f/s",scene->currentIteration,scene->stopAtIteration,perSec);
 	labelIter->setText(strIter);
 
-   // update estimation time
-	char strEstimation[64];
-	if (scene->stopAtIteration>0 && iterPerSec>0 ) estimation=duration+time_duration(seconds((scene->stopAtIteration-scene->currentIteration)/iterPerSec));
-	snprintf(strEstimation,64,"estimation %02d:%02d:%02d",estimation.hours(),estimation.minutes(),estimation.seconds());
- 	labelEstimationTime->setText(strEstimation);
-
-	char strStopAtIter[64];
-	snprintf(strStopAtIter,64,"stopAtIter #%ld",scene->stopAtIteration);
-	labelStopAtIter->setText(strStopAtIter);
-
 	if(sbRefreshTime->value()!=refreshTime) sbRefreshTime->setValue(refreshTime);
-
-	char strStep[64];
-	snprintf(strStep,64,"step %g",(double)scene->dt);
-	labelStep->setText(string(strStep));
 
 	//changeSkipTimeStepper = false;
 	//changeTimeStep = false;

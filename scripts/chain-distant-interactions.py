@@ -13,7 +13,7 @@ o.engines=[
 	InteractionGeometryDispatcher([Ig2_Sphere_Sphere_ScGeom(hasShear=True)]),
 	InteractionPhysicsDispatcher([Ip2_FrictMat_FrictMat_FrictPhys()]),
 	ElasticContactLaw(isCohesive=True),
-	MomentEngine(subscribedBodies=[1],moment=(0,1000,0)),
+	TorqueEngine(subscribedBodies=[1],moment=(0,1000,0)),
 	GravityEngine(gravity=(0,0,1e-2)),
 	NewtonIntegrator(damping=0.2)
 ]

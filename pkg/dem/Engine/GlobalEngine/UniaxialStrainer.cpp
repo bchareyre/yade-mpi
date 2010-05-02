@@ -78,7 +78,7 @@ void UniaxialStrainer::init(){
 			b->state->vel[axis]=pNormalized*(v1-v0)+v0;
 		}
 	}
-	stressUpdateInterval=min(1000,max(1,(int)(1e-5/(abs(strainRate)*Omega::instance().getTimeStep()))));
+	stressUpdateInterval=min(1000,max(1,(int)(1e-5/(abs(strainRate)*scene->dt))));
 	LOG_INFO("Stress will be updated every "<<stressUpdateInterval<<" steps.");
 
 	/* if we have default (<0) crossSectionArea, try to get it from root's Aabb;

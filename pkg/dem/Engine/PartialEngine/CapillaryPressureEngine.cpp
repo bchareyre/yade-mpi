@@ -10,11 +10,10 @@
 #include <yade/pkg-dem/Law2_ScGeom_CapillaryPhys_Capillarity.hpp>
 #include <yade/core/Scene.hpp>
 
+YADE_REQUIRE_FEATURE(!! This engine is not functional; remove this line to enable it again !!);
+
 YADE_PLUGIN((CapillaryPressureEngine));
 CREATE_LOGGER(CapillaryPressureEngine);
-
-using namespace boost; // ???
-using namespace std; // ???
 
 CapillaryPressureEngine::~CapillaryPressureEngine()
 {
