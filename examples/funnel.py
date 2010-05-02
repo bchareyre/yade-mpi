@@ -1,3 +1,6 @@
+"""This example demonstrates GTS (http://gts.sourceforge.net/) opportunities for creating surfaces
+VTU-files are created in /tmp directory after simulation. If you open those with paraview
+(or other VTK-based) program, you can create video, make screenshots etc."""
 
 from numpy import linspace
 from yade import pack
@@ -22,7 +25,7 @@ O.engines=[
 	),
 	GravityEngine(gravity=(0,0,-9.81)),
 	NewtonIntegrator(),
-	VTKRecorder(recorders=['spheres','facets','colors'],fileName='/tmp/p1',realPeriod=.5)
+	VTKRecorder(iterPeriod=100,recorders=['spheres','facets','colors'],fileName='/tmp/p1')
 ]
 O.dt=utils.PWaveTimeStep()
 
@@ -30,3 +33,5 @@ O.dt=utils.PWaveTimeStep()
 from yade import qt
 qt.Controller()
 qt.View()
+
+O.run(8500)

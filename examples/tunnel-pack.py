@@ -25,4 +25,6 @@ pred=pack.inAlignedBox((-.5*boxSize[0],-.5*boxSize[1],0),(.5*boxSize[0],.5*boxSi
 # http://beta.arcig.cz/~eudoxos/yade/epydoc/yade.pack-module.html#randomDensePack
 O.bodies.append(pack.randomDensePack(pred,radius=rSphere,rRelFuzz=.3,memoizeDb='/tmp/triaxPackCache.sqlite',spheresInCell=3000))
 
-
+from yade import qt
+qt.Controller()
+qt.View()

@@ -26,8 +26,8 @@ for i in xrange(nbSpheres[0]):
             y = (j*2 - nbSpheres[1])*sphereRadius*1.1
             z = (k*2 - nbSpheres[2])*sphereRadius*1.1
             s=utils.sphere([x,y,z],sphereRadius,material=sphereMat)
-            p=utils.getViscoelasticFromSpheresInteraction(s.state['mass'],tc,en,es)
-            s.mat['kn'],s.mat['cn'],s.mat['ks'],s.mat['cs']=p['kn'],p['cn'],p['ks'],p['cs']
+            p=utils.getViscoelasticFromSpheresInteraction(s.state.mass,tc,en,es)
+            s.mat.kn,s.mat.cn,s.mat.ks,s.mat.cs=p['kn'],p['cn'],p['ks'],p['cs']
             O.bodies.append(s)
 
 ## Timestep 
@@ -48,7 +48,7 @@ O.engines=[
 		## Create physical information about the interaction.
 		[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 		## Constitutive law
-		[Law2_Spheres_Viscoelastic_SimpleViscoelastic()],
+		[Law2_ScGeom_ViscElPhys_Basic()],
 	),
 	## Apply gravity
 	GravityEngine(gravity=[0,-9.81,0]),

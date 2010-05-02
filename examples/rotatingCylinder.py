@@ -1,3 +1,6 @@
+"""The script demonstrates rotating cylinder, created with GTS-help (http://gts.sourceforge.net/).
+Inside the cylinder there are a "cloud" of spheres."""
+
 # encoding: utf-8
 cylHt,cylRd=1,.2
 nSpheres=2e4
@@ -49,8 +52,9 @@ O.engines=[
 	NewtonIntegrator(damping=.3),
 ]
 O.dt=utils.PWaveTimeStep()
-O.stopAtIter=int(2*pi/(rotor['angularVelocity']*O.dt))
+O.stopAtIter=int(2*pi/(rotor.angularVelocity*O.dt))
 O.timingEnabled=True; timing.reset()
 
-
-
+from yade import qt
+qt.Controller()
+qt.View()

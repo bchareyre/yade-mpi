@@ -4,6 +4,6 @@ bulldozer.py is using Law2_Dem3DofGeom_FrictPhys_Basic constitutive law for inte
 It stores screenshots from simulation in /tmp/bulldozer-????.png files and creates video then.
 
 bulldozerVTK.py is using Law2_ScGeom_ViscElPhys_Basic - visco-elastic model for interaction between elements.
-Also it saves snapshots in VTK-format in /tmp/bulldozer-*.vtk files. If you open those with paraview
-(or other VTK-based) programm, you can create video from them, make screenshots etc.
+Also it saves snapshots in VTK-format in /tmp/bulldozer-*.vtu files. If you open those with paraview
+(or other VTK-based) program, you can create video from them, make screenshots etc.
 
