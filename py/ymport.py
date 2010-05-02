@@ -9,8 +9,17 @@ from yade import utils
 
 def text(fileName,shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	"""Load sphere coordinates from file, create spheres, insert them to the simulation.
-	filename is the file which has 4 colums [x, y, z, radius].
-	All remaining arguments are passed the the yade.utils.sphere function which creates bodies.
+
+	:Parameters:
+		`filename`: string
+			file which has 4 colums [x, y, z, radius].
+		`shift`: [float,float,float]
+			[X,Y,Z] parameter moves the specimen.
+		`scale`: float
+			factor scales the given data.
+		`**kw`: (unused keyword arguments)
+				is passed to :yref:`utils.sphere`
+	:Returns: list of spheres.
 	Lines starting with # are skipped
 	"""
 	infile = open(fileName,"r")
@@ -37,7 +46,19 @@ def stl(file, dynamic=False,wire=True,color=None,highlight=False,noBound=False,m
 	return facets
 
 def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
-	""" Read given meshfile in gts format, apply scale and shift (in this order); return list of corresponding facets. **kw is passed to :yref:`utils.facet`."""
+	""" Read given meshfile in gts format.
+
+	:Parameters:
+		`meshfile`: string
+			name of the input file.
+		`shift`: [float,float,float]
+			[X,Y,Z] parameter moves the specimen.
+		`scale`: float
+			factor scales the given data.
+		`**kw`: (unused keyword arguments)
+				is passed to :yref:`utils.facet`
+	:Returns: list of facets.
+	"""
 	import gts,yade.pack
 	surf=gts.read(open(meshfile))
 	surf.scale(scale)
@@ -46,11 +67,18 @@ def gts(meshfile,shift=(0,0,0),scale=1.0,**kw):
 
 def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaternion().IDENTITY,**kw):
 	""" Imports geometry from mesh file and creates facets.
-	shift[X,Y,Z] parameter moves the specimen.
-	scale factor scales the given data.
-	orientation quaternion: orientation of the imported mesh
+
+	:Parameters:
+		`shift`: [float,float,float]
+			[X,Y,Z] parameter moves the specimen.
+		`scale`: float
+			factor scales the given data.
+		`orientation`: quaternion
+			orientation of the imported mesh
+		`**kw`: (unused keyword arguments)
+				is passed to :yref:`utils.facet`
+	:Returns: list of facets forming the specimen.
 	
-	Remaining **kw arguments are passed to utils.facet; 
 	mesh files can be easily created with `GMSH <http://www.geuz.org/gmsh/>`_.
 	Example added to :ysrc:`scripts/test/regular-sphere-pack.py`
 	
@@ -104,9 +132,17 @@ def gmsh(meshfile="file.mesh",shift=[0.0,0.0,0.0],scale=1.0,orientation=Quaterni
 
 def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo .geo file and creates spheres.
-	shift[X,Y,Z] parameter moves the specimen.
-	scale factor scales the given data.
-	Remaining **kw arguments are passed to :yref:`yade.utils.sphere`; 
+	
+	:Parameters:
+		`filename`: string
+			file which has 4 colums [x, y, z, radius].
+		`shift`: [float,float,float]
+			[X,Y,Z] parameter moves the specimen.
+		`scale`: float
+			factor scales the given data.
+		`**kw`: (unused keyword arguments)
+				is passed to :yref:`utils.sphere`
+	:Returns: list of spheres.
 	
 	LSMGenGeo library allows to create pack of spheres
 	with given [Rmin:Rmax] with null stress inside the specimen.
@@ -132,8 +168,16 @@ def gengeoFile(fileName="file.geo",shift=[0.0,0.0,0.0],scale=1.0,**kw):
 
 def gengeo(mntable,shift=Vector3().ZERO,scale=1.0,**kw):
 	""" Imports geometry from LSMGenGeo library and creates spheres.
-	shift[X,Y,Z] parameter moves the specimen.
-	Remaining **kw arguments are passed to :yref:`yade.utils.sphere`; 
+
+	:Parameters:
+		`mntable`: mntable
+			object, which creates by LSMGenGeo library, see example
+		`shift`: [float,float,float]
+			[X,Y,Z] parameter moves the specimen.
+		`scale`: float
+			factor scales the given data.
+		`**kw`: (unused keyword arguments)
+				is passed to :yref:`utils.sphere`
 	
 	LSMGenGeo library allows to create pack of spheres
 	with given [Rmin:Rmax] with null stress inside the specimen.
