@@ -31,11 +31,11 @@ length=100
 minRadius=0.5
 maxRadius=2.0
 
-origin=Vec3(0.0,0.0,0.0)
-axis=Vec3(0.0,0.0,1.0)
+origin=Vector3(0.0,0.0,0.0)
+axis=Vector3(0.0,0.0,1.0)
 
-minPoint=Vec3(-radius,-radius,-length)
-maxPoint=Vec3(radius,radius,length)
+minPoint=Vector3(-radius,-radius,-length)
+maxPoint=Vector3(radius,radius,length)
 
 box=CylinderVol (
   origin = origin,
